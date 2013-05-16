@@ -8,8 +8,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -72,14 +72,12 @@ package org.openforis.collect.presenter {
 			view.day.text = StringUtil.zeroPad(day, 2);
 			
 			var fields:Array = [view.year, view.month, view.day];
-			var requests:ListCollectionView = new ArrayCollection();
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			for each (var field:InputField in fields) {
-				var r:RecordUpdateRequestProxy = field.presenter.createValueUpdateRequest();
-				requests.addItem(r);
+				var r:NodeUpdateRequestProxy = field.presenter.createValueUpdateRequest();
+				reqSet.addRequest(r);
 			}
-			var req:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
-			req.requests = requests;
-			_dataClient.updateActiveRecord(req, null, faultHandler);
+			_dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		
 		protected function getDateFromFields():Date {

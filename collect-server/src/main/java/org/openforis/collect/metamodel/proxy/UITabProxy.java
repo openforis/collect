@@ -16,7 +16,7 @@ public class UITabProxy extends UITabSetProxy {
 	
 	private transient UITab uiTab;
 
-	public static List<UITabProxy> fromList(List<UITab> tabs) {
+	public static List<UITabProxy> fromTabList(List<UITab> tabs) {
 		ArrayList<UITabProxy> result = new ArrayList<UITabProxy>();
 		for (UITab tab : tabs) {
 			UITabProxy proxy = new UITabProxy(tab);

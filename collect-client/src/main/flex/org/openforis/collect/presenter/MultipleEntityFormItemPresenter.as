@@ -14,8 +14,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.EntityAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -117,7 +117,7 @@ package org.openforis.collect.presenter
 				var r:EntityAddRequestProxy = new EntityAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
 				r.nodeName = view.entityDefinition.name;
-				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+				var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
 				ClientFactory.dataClient.updateActiveRecord(reqSet, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = view.entityDefinition.getInstanceOrHeadingLabelText();
@@ -133,7 +133,7 @@ package org.openforis.collect.presenter
 		protected function performDeletion():void {
 			var r:NodeDeleteRequestProxy = new NodeDeleteRequestProxy();
 			r.nodeId = view.entity.id;
-			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
 			ClientFactory.dataClient.updateActiveRecord(reqSet, deleteResultHandler, faultHandler);
 		}
 		
@@ -177,7 +177,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
-			var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
+			var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
 			appEvt.result = responseSet;
 			eventDispatcher.dispatchEvent(appEvt);

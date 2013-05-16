@@ -55,6 +55,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 //	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
+	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
 	
 	private Window selectLanguagePopUp;
 	private Window previewPreferencesPopUp;
@@ -123,17 +124,22 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	@GlobalCommand
-	public void openCodeListsManagerPopUp(@BindingParam("selectedCodeList") CodeList selectedCodeList) {
+	public void openCodeListsManagerPopUp(
+			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
+			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
 			dispatchCurrentFormValidatedCommand(true);
 			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("selectedCodeList", selectedCodeList);
+			args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
+			args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
 			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
 		}
 	}
 
 	@GlobalCommand
-	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
+	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
+			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
 		if ( codeListsPopUp != null ) {
 			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 				@Override
@@ -141,9 +147,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 					closePopUp(codeListsPopUp);
 					codeListsPopUp = null;
 					dispatchCurrentFormValidatedCommand(true);
+					dispatchCodeListsPopUpClosedCommand(editingAttribute, selectedCodeList);
 				}
 			});
 		}
+	}
+
+	public void dispatchCodeListsPopUpClosedCommand(Boolean editingAttribute, CodeList selectedCodeList) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
+		args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
+		BindUtils.postGlobalCommand(null, null, CODE_LISTS_POP_UP_CLOSED_COMMAND, args);
 	}
 	
 	@GlobalCommand

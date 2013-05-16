@@ -48,5 +48,11 @@ public class SamplingDesignLine extends Line {
 	public void setSrsId(String srsId) {
 		this.srsId = srsId;
 	}
+	
+	public boolean hasEqualsLocation(SamplingDesignLine other){
+		return getX().equals(other.getX()) 
+				&& getY().equals(other.getY()) 
+				&& getSrsId().equals(other.getSrsId());
+	}
 
 }

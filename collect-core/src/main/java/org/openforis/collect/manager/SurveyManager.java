@@ -15,6 +15,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
@@ -40,6 +41,8 @@ public class SurveyManager {
 	@Autowired
 	private SurveyWorkDao surveyWorkDao;
 	@Autowired
+	private RecordDao recordDao;
+	@Autowired
 	private CollectSurveyContext collectSurveyContext;
 	
 	private List<CollectSurvey> surveys;
@@ -48,13 +51,14 @@ public class SurveyManager {
 	private Map<String, CollectSurvey> surveysByUri;
 
 	public SurveyManager() {
+		surveys = new ArrayList<CollectSurvey>();
 		surveysById = new HashMap<Integer, CollectSurvey>();
 		surveysByName = new HashMap<String, CollectSurvey>();
 		surveysByUri = new HashMap<String, CollectSurvey>();
 	}
 
 	@Transactional
-	protected void init() {
+	public void init() {
 		initSurveysCache();
 	}
 
@@ -261,12 +265,13 @@ public class SurveyManager {
 	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		Integer surveyWorkId = survey.getId();
-		if ( survey.isPublished() ) {
-			updateModel(survey);
-		} else {
+		CollectSurvey publishedSurvey = get(survey.getName());
+		if ( publishedSurvey == null ) {
 			survey.setPublished(true);
 			importModel(survey);
 			initSurveysCache();
+		} else {
+			updateModel(survey);
 		}
 		if ( surveyWorkId != null ) {
 			int publishedSurveyId = survey.getId();
@@ -276,6 +281,25 @@ public class SurveyManager {
 		}
 	}
 
+	@Transactional
+	public void deleteSurvey(Integer id) {
+		CollectSurvey survey = getById(id);
+		if ( survey != null ) {
+			recordDao.deleteBySurvey(id);
+			speciesManager.deleteTaxonomiesBySurvey(id);
+			samplingDesignManager.deleteBySurvey(id);
+			surveyDao.delete(id);
+			removeFromCache(survey);
+		}
+	}
+	
+	@Transactional
+	public void deleteSurveyWork(Integer id) {
+		speciesManager.deleteTaxonomiesBySurveyWork(id);
+		samplingDesignManager.deleteBySurveyWork(id);
+		surveyWorkDao.delete(id);
+	}
+	
 	/*
 	 * Getters and setters
 	 * 
@@ -319,5 +343,5 @@ public class SurveyManager {
 	public void setCollectSurveyContext(CollectSurveyContext collectSurveyContext) {
 		this.collectSurveyContext = collectSurveyContext;
 	}
-	
+
 }

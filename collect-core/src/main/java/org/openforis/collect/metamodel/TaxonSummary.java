@@ -15,17 +15,18 @@ import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
 /**
- * @author riccist
+ * @author S. Ricci
  *
  */
 public class TaxonSummary {
 
-	private static final String SYNONYM_VERNACULAR_LANG_CODE = "";
+	private static final String SYNONYM_VERNACULAR_LANG_CODE = "lat";
 	private static final String VERNACULAR_NAMES_SEPARATOR = ", ";
 
 	private int taxonSystemId;
 	private Integer taxonId;
 	private String code;
+	private String familyName;
 	private String scientificName;
 	private TaxonRank rank;
 	private Map<String, List<String>> languageToVernacularNames;
@@ -79,7 +80,12 @@ public class TaxonSummary {
 	}
 	
 	public List<String> getSynonyms() {
-		return getVernacularNames(SYNONYM_VERNACULAR_LANG_CODE);
+		List<String> synonyms1 = getVernacularNames("");
+		List<String> synonyms2 = getVernacularNames(SYNONYM_VERNACULAR_LANG_CODE);
+		List<String> synonyms = new ArrayList<String>();
+		synonyms.addAll(synonyms1);
+		synonyms.addAll(synonyms2);
+		return synonyms;
 	}
 	
 	public String getJointSynonyms() {
@@ -87,7 +93,8 @@ public class TaxonSummary {
 	}
 	
 	public String getJointSynonyms(String separator) {
-		return getJointVernacularNames(SYNONYM_VERNACULAR_LANG_CODE, separator);
+		List<String> synonyms = getSynonyms();
+		return StringUtils.join(synonyms, separator);
 	}
 	
 	public int getTaxonSystemId() {
@@ -112,6 +119,14 @@ public class TaxonSummary {
 	
 	public void setCode(String code) {
 		this.code = code;
+	}
+	
+	public String getFamilyName() {
+		return familyName;
+	}
+	
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
 	}
 	
 	public String getScientificName() {

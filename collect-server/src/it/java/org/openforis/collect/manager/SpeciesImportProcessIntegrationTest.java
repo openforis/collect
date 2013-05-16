@@ -9,6 +9,7 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.speciesimport.SpeciesFileColumn;
 import org.openforis.collect.manager.speciesimport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesimport.SpeciesImportStatus;
+import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -95,21 +97,36 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
-		
-		String code = "AFZ/QUA";
-		TaxonOccurrence occurrence = findByCode(code);
-		TaxonOccurrence expected = new TaxonOccurrence(8, code, "Afzelia quanzensis");
-		assertEquals(expected, occurrence);
-
-		String code2 = "ALB/GLA";
-		TaxonOccurrence occurrence2 = findByCode(code2);
-		TaxonOccurrence expected2 = new TaxonOccurrence(11, code2, "Albizia glaberrima");
-		assertEquals(expected2, occurrence2);
-		
-		String code3 = "ALB/SCH/amaniensis";
-		TaxonOccurrence occurrence3 = findByCode(code3);
-		TaxonOccurrence expected3 = new TaxonOccurrence(12, code3, "Albizia schimperiana var. amaniensis");
-		assertEquals(expected3, occurrence3);
+		{
+			String code = "OLE/CAP/macrocarpa";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(5, code, "Olea capensis subsp. macrocarpa");
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "OLE/EUR/cuspidata";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(7, code, "Olea europaea subsp. cuspidata");
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "AFZ/QUA";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(8, code, "Afzelia quanzensis");
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "ALB/GLA";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(11, code, "Albizia glaberrima");
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "ALB/SCH/amaniensis";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(12, code, "Albizia schimperiana var. amaniensis");
+			assertEquals(expected, occurrence);
+		}
 	}
 
 	@Test
@@ -195,34 +212,48 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
-		
-		Taxon subSpecies = findTaxonByCode("ALB/SCH/amaniensis");
-		assertNotNull(subSpecies);
-		assertEquals(SUBSPECIES, subSpecies.getTaxonRank());
-		
-		Integer speciesId = subSpecies.getParentId();
-		assertNotNull(speciesId);
-		Taxon species = taxonDao.loadById(speciesId);
-		assertNotNull(species);
-		assertNull(species.getCode());
-		assertEquals(SPECIES, species.getTaxonRank());
-		assertEquals("Albizia schimperiana", species.getScientificName());
-		
-		Integer genusId = species.getParentId();
-		assertNotNull(genusId);
-		Taxon genus = taxonDao.loadById(genusId);
-		assertNotNull(genus);
-		assertEquals("ALB", genus.getCode());
-		assertEquals(GENUS, genus.getTaxonRank());
-		assertEquals("Albizia sp.", genus.getScientificName());
-		
-		Integer familyId = genus.getParentId();
-		assertNotNull(familyId);
-		Taxon family = taxonDao.loadById(familyId);
-		assertNotNull(family);
-		assertNull(family.getParentId());
-		assertEquals(FAMILY, family.getTaxonRank());
-		assertEquals("Fabaceae", family.getScientificName());
+		{
+			Taxon variety = findTaxonByCode("ALB/SCH/amaniensis");
+			assertNotNull(variety);
+			assertEquals(VARIETY, variety.getTaxonRank());
+			
+			Integer speciesId = variety.getParentId();
+			assertNotNull(speciesId);
+			Taxon species = taxonDao.loadById(speciesId);
+			assertNotNull(species);
+			assertNull(species.getCode());
+			assertEquals(SPECIES, species.getTaxonRank());
+			assertEquals("Albizia schimperiana", species.getScientificName());
+			
+			Integer genusId = species.getParentId();
+			assertNotNull(genusId);
+			Taxon genus = taxonDao.loadById(genusId);
+			assertNotNull(genus);
+			assertEquals("ALB", genus.getCode());
+			assertEquals(GENUS, genus.getTaxonRank());
+			assertEquals("Albizia sp.", genus.getScientificName());
+			
+			Integer familyId = genus.getParentId();
+			assertNotNull(familyId);
+			Taxon family = taxonDao.loadById(familyId);
+			assertNotNull(family);
+			assertNull(family.getParentId());
+			assertEquals(FAMILY, family.getTaxonRank());
+			assertEquals("Fabaceae", family.getScientificName());
+		}
+		{
+			Taxon subspecies = findTaxonByCode("OLE/EUR/cuspidata");
+			assertNotNull(subspecies);
+			assertEquals(SUBSPECIES, subspecies.getTaxonRank());
+			
+			Integer speciesId = subspecies.getParentId();
+			assertNotNull(speciesId);
+			Taxon species = taxonDao.loadById(speciesId);
+			assertNotNull(species);
+			assertEquals(SPECIES, species.getTaxonRank());
+			assertEquals("OLE/EUR", species.getCode());
+			assertEquals("Olea europaea", species.getScientificName());
+		}
 	}
 	
 	@Test
@@ -268,6 +299,16 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 10, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 11, "swh", ErrorType.INVALID_VALUE));
+	}
+	
+	@Test
+	public void testExport() throws Exception {
+		SpeciesImportProcess process = importCSVFile(VALID_TEST_CSV);
+		SpeciesImportStatus status = process.getStatus();
+		assertTrue(status.isComplete());
+		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomy.getId());
+		assertNotNull(summaries);
 	}
 
 	protected boolean containsError(List<ParsingError> errors, long row, String column, ErrorType type) {

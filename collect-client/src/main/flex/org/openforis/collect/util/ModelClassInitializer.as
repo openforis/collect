@@ -39,26 +39,29 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.model.SurveySummary;
-	import org.openforis.collect.model.proxy.AttributeAddResponseProxy;
+	import org.openforis.collect.model.proxy.AttributeAddChangeProxy;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.CoordinateProxy;
 	import org.openforis.collect.model.proxy.DateProxy;
-	import org.openforis.collect.model.proxy.EntityAddResponseProxy;
+	import org.openforis.collect.model.proxy.EntityAddChangeProxy;
+	import org.openforis.collect.model.proxy.EntityChangeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.FileProxy;
 	import org.openforis.collect.model.proxy.IntegerRangeProxy;
-	import org.openforis.collect.model.proxy.NodeDeleteResponseProxy;
+	import org.openforis.collect.model.proxy.NodeAddChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+	import org.openforis.collect.model.proxy.NodeDeleteChangeProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.model.proxy.RealRangeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
@@ -89,11 +92,12 @@ package org.openforis.collect.util {
 
 		public static function init():void {
 			var array:Array = [
-				AttributeAddResponseProxy,
+				AttributeAddChangeProxy,
+				AttributeChangeProxy,
 				AttributeDefaultProxy,
 				AttributeDefinitionProxy,
 				AttributeProxy,
-				AttributeUpdateResponseProxy,
+				org.openforis.collect.model.proxy.AttributeChangeProxy,
 				BasicMap, 
 				BooleanAttributeDefinitionProxy,
 				CodeAttributeDefinitionProxy,
@@ -115,9 +119,9 @@ package org.openforis.collect.util {
 				DataImportSummaryItemProxy,
 				DateAttributeDefinitionProxy,
 				DateProxy,
-				EntityAddResponseProxy,
+				EntityAddChangeProxy,
 				EntityDefinitionProxy,
-				EntityUpdateResponseProxy,
+				EntityChangeProxy,
 				EntityProxy,
 				FieldProxy,
 				FileAttributeDefinitionProxy,
@@ -127,7 +131,7 @@ package org.openforis.collect.util {
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
 				NodeDefinitionSummary,
-				NodeDeleteResponseProxy,
+				NodeDeleteChangeProxy,
 				NodeUnmarshallingErrorProxy,
 				NodeLabelProxy,
 				NodeLabelProxy$Type,
@@ -138,9 +142,12 @@ package org.openforis.collect.util {
 				RangeAttributeDefinitionProxy,
 				RealRangeProxy,
 				RecordProxy,
-				RecordUpdateRequestProxy,
-				RecordUpdateRequestSetProxy,
-				RecordUpdateResponseSetProxy,
+				NodeAddChangeProxy,
+				NodeChangeProxy,
+				NodeChangeSetProxy,
+				NodeUpdateRequestProxy,
+				NodeUpdateRequestSetProxy,
+				NodeChangeSetProxy,
 				SamplingDesignImportStatusProxy,
 				SamplingDesignItemProxy,
 				SamplingDesignSummariesProxy,

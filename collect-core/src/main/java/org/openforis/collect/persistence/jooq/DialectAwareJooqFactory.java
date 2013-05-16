@@ -20,7 +20,8 @@ public class DialectAwareJooqFactory extends Factory {
 	private enum Database {
 		POSTGRES("PostgreSQL", SQLDialect.POSTGRES),
 		DERBY("Apache Derby", SQLDialect.DERBY),
-		SQLITE("SQLite", SQLDialect.SQLITE);
+		SQLITE("SQLite", SQLDialect.SQLITE),
+		SQLITE_FOR_ANDROID("SQLite for Android", SQLDialect.SQLITE);
 		
 		private String productName;
 		private SQLDialect dialect;

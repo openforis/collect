@@ -1,13 +1,19 @@
 package org.openforis.collect.designer.form.validator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.zkoss.util.resource.Labels;
 
@@ -25,12 +31,34 @@ public class SurveyValidator {
 		this.surveyManager = surveyManager;
 	}
 	
+	public List<SurveyValidationResult> validateSurveyForPublishing(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
+		List<SurveyValidationResult> results = validateSurvey(newSurvey);
+		if ( oldPublishedSurvey != null ) {
+			results.addAll(validateChanges(oldPublishedSurvey, newSurvey));
+		}
+		return results;
+	}
+	
 	public List<SurveyValidationResult> validateSurvey(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		List<SurveyValidationResult> partialResults = validateEnties(survey);
 		results.addAll(partialResults);
 //		partialResults = validateExpressions(survey);
 //		results.addAll(partialResults);
+		return results;
+	}
+	
+	public List<SurveyValidationResult> validateChanges(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> partialResults;
+		partialResults = validateParentRelationship(oldPublishedSurvey, newSurvey);
+		results.addAll(partialResults);
+		partialResults = validateMultiplicityNotChanged(oldPublishedSurvey, newSurvey);
+		results.addAll(partialResults);
+		partialResults = validateDataTypeNotChanged(oldPublishedSurvey, newSurvey);
+		results.addAll(partialResults);
+		partialResults = validateEnumeratingCodeListsNotChanged(oldPublishedSurvey, newSurvey);
+		results.addAll(partialResults);
 		return results;
 	}
 	
@@ -125,7 +153,110 @@ public class SurveyValidator {
 	}
 	*/
 	
-	public static class SurveyValidationResult {
+	protected List<SurveyValidationResult> validateParentRelationship(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
+		final Schema oldSchema = oldPublishedSurvey.getSchema();
+		SurveyValidationNodeDefinitionVisitor visitor = new SurveyValidationNodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition nodeDefn) {
+				NodeDefinition oldDefn = oldSchema.getDefinitionById(nodeDefn.getId());
+				if ( oldDefn != null ) {
+					NodeDefinition parentDefn = nodeDefn.getParentDefinition();
+					NodeDefinition oldParentDefn = oldDefn.getParentDefinition();
+					Integer parentDefnId = parentDefn == null ? null: parentDefn.getId();
+					Integer oldParentDefnId = oldParentDefn == null ? null: oldParentDefn.getId();
+					if ( parentDefnId == null && oldParentDefnId != null || 
+							parentDefnId != null && oldParentDefnId == null ||
+							parentDefnId != null && ! parentDefnId.equals(oldParentDefnId) ) {
+						String message = Labels.getLabel("survey.validation.error.parent_changed");
+						String path = nodeDefn.getPath();
+						SurveyValidationResult validationResult = new SurveyValidationResult(path, message);
+						addValidationError(validationResult);
+					}
+				}
+			}
+		};
+		visitNodeDefinitions(newSurvey, visitor);
+		return visitor.getResults();
+	}
+	
+	protected List<SurveyValidationResult> validateDataTypeNotChanged(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
+		final Schema oldSchema = oldPublishedSurvey.getSchema();
+		SurveyValidationNodeDefinitionVisitor visitor = new SurveyValidationNodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition nodeDefn) {
+				NodeDefinition oldDefn = oldSchema.getDefinitionById(nodeDefn.getId());
+				if ( oldDefn != null && 
+					(oldDefn.getClass() != nodeDefn.getClass() || 
+					oldDefn instanceof NumericAttributeDefinition && 
+						((NumericAttributeDefinition) oldDefn).getType() != ((NumericAttributeDefinition) nodeDefn).getType())) {
+					String message = Labels.getLabel("survey.validation.error.data_type_changed");
+					String path = nodeDefn.getPath();
+					SurveyValidationResult validationError = new SurveyValidationResult(path, message);
+					addValidationError(validationError);
+				}
+			}
+		};
+		visitNodeDefinitions(newSurvey, visitor);
+		return visitor.getResults();
+	}
+
+	protected List<SurveyValidationResult> validateMultiplicityNotChanged(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
+		final Schema oldSchema = oldPublishedSurvey.getSchema();
+		SurveyValidationNodeDefinitionVisitor visitor = new SurveyValidationNodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition nodeDefn) {
+				NodeDefinition oldDefn = oldSchema.getDefinitionById(nodeDefn.getId());
+				if ( oldDefn != null && oldDefn.isMultiple() && ! nodeDefn.isMultiple() ) {
+					String message = Labels.getLabel("survey.validation.error.cardinality_changed_from_multiple_to_single");
+					String path = nodeDefn.getPath();
+					SurveyValidationResult validationError = new SurveyValidationResult(path, message);
+					addValidationError(validationError);
+				}
+			}
+		};
+		visitNodeDefinitions(newSurvey, visitor);
+		return visitor.getResults();
+	}
+	
+	protected List<SurveyValidationResult> validateEnumeratingCodeListsNotChanged(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<CodeList> codeLists = newSurvey.getCodeLists();
+		for (CodeList codeList : codeLists) {
+			CodeList oldCodeList = oldPublishedSurvey.getCodeListById(codeList.getId());
+			if ( oldCodeList != null && oldCodeList.isEnumeratingList() ) {
+				results.addAll(validateEnumeratingCodeListNotChanged(oldCodeList, codeList));
+			}
+		}
+		return results;
+	}
+	
+	protected List<SurveyValidationResult> validateEnumeratingCodeListNotChanged(CodeList oldCodeList,
+			CodeList codeList) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<CodeListItem> oldItems = oldCodeList.getItems();
+		for (CodeListItem oldItem : oldItems) {
+			CodeListItem newItem = codeList.getItem(oldItem.getCode());
+			if ( newItem == null ) {
+				String message = Labels.getLabel("survey.validation.error.enumerating_code_list_changed.code_removed");
+				String path = "codeList" + "/" + codeList.getName() + "/" + oldItem.getCode();
+				SurveyValidationResult validationError = new SurveyValidationResult(path, message);
+				results.add(validationError);
+			}
+		}
+		return results;
+	}
+
+	protected void visitNodeDefinitions(CollectSurvey survey, NodeDefinitionVisitor nodeDefnVisitor) {
+		Schema schema = survey.getSchema();
+		List<EntityDefinition> rootEntityDefns = schema.getRootEntityDefinitions();
+		for (EntityDefinition entityDefn : rootEntityDefns) {
+			entityDefn.traverse(nodeDefnVisitor);
+		}
+	}
+	
+	public static class SurveyValidationResult implements Serializable {
+		
+		private static final long serialVersionUID = 1L;
 		
 		private String path;
 		private String message;
@@ -146,4 +277,21 @@ public class SurveyValidator {
 
 	}
 	
+	public static abstract class SurveyValidationNodeDefinitionVisitor implements NodeDefinitionVisitor {
+		
+		private List<SurveyValidationResult> results;
+		
+		public void addValidationError(SurveyValidationResult result) {
+			if ( results == null ) {
+				results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+			}
+			results.add(result);
+		}
+		
+		public List<SurveyValidationResult> getResults() {
+			return CollectionUtils.unmodifiableList(results);
+		}
+		
+	}
+		
 }

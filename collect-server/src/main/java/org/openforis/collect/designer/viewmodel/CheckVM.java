@@ -45,7 +45,7 @@ public abstract class CheckVM<T extends Check<?>> extends SurveyObjectBaseVM<T> 
 
 	@Override
 	protected void addNewItemToSurvey() {
-		parentDefinition.addCheck(editedItem);
+		//do nothing, performed by AttributeVM
 	}
 
 	@Override

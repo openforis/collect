@@ -111,11 +111,21 @@
 						 styleName="formVersionText" />
 			</s:HGroup>
 			<!-- Buttons: save, etc...-->
-			<s:Button id="saveButton" label="{Message.get('edit.save')}"
-					  horizontalCenter="0"
+			<s:HGroup horizontalCenter="0"
 					  verticalCenter="0"
-					  useHandCursor="true" buttonMode="true"
-					  />
+					  gap="20">
+				<s:Button id="saveButton" 
+						  verticalCenter="0"
+						  label="{Message.get('edit.save')}"
+						  useHandCursor="true" buttonMode="true" />
+				<s:CheckBox id="autoSaveCheckBox"
+							verticalCenter="0"
+							label="{Message.get('edit.autosave')}" />
+			</s:HGroup>
+			<s:Label id="updateStatusLabel"
+					 verticalCenter="0"
+					 horizontalCenter="150"
+					 styleName="updateStatusLabel" />
 		</s:Group>
 	</s:VGroup>
 	

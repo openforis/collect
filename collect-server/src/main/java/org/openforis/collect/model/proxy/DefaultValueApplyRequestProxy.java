@@ -4,8 +4,8 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.DefaultValueApplyRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.DefaultValueApplyRequest;
 import org.openforis.idm.model.Attribute;
 
 /**
@@ -13,16 +13,16 @@ import org.openforis.idm.model.Attribute;
  * @author S. Ricci
  *
  */
-public class DefaultValueApplyRequestProxy extends RecordUpdateRequestProxy<DefaultValueApplyRequest> {
+public class DefaultValueApplyRequestProxy extends NodeUpdateRequestProxy<DefaultValueApplyRequest> {
 	
 	private Integer nodeId;
 
 	@Override
-	public DefaultValueApplyRequest toUpdateRequest(CollectRecord record) {
-		DefaultValueApplyRequest request = new RecordUpdateRequest.DefaultValueApplyRequest();
+	public DefaultValueApplyRequest toNodeUpdateOptions(CollectRecord record) {
+		DefaultValueApplyRequest opts = new NodeUpdateRequest.DefaultValueApplyRequest();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		request.setAttribute(attribute);
-		return request;
+		opts.setAttribute(attribute);
+		return opts;
 	}
 
 	public Integer getNodeId() {

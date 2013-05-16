@@ -4,6 +4,7 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
 
 import java.io.Closeable;
 import java.io.File;
@@ -22,8 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.TaxonTree;
 import org.openforis.collect.model.TaxonTree.Node;
@@ -46,7 +47,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificNameName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
 	
-	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES};
+	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY};
 	public static final String GENUS_SUFFIX = "sp.";
 
 	private static final String CSV = "csv";
@@ -214,14 +215,17 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		case SPECIES:
 			createTaxonSpecies(line);
 			return mostSpecificRank;
-		default:
+		case SUBSPECIES:
+		case VARIETY:
 			Taxon parent = findParentTaxon(line);
-			if ( parent == null ) {
+			if ( ! mostSpecificRank || parent == null ) {
 				return false;
 			} else {
 				createTaxon(line, rank, parent);
 				return true;
 			}
+		default: 
+			return false;
 		}
 	}
 
@@ -251,7 +255,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			}
 		}
 		final Integer taxonomyId = taxonomy.getId();
-		taxonTree.bfs(new TaxonTree.NodeVisitor() {
+		taxonTree.depthFirstVisit(new TaxonTree.NodeVisitor() {
 			@Override
 			public void visit(Node node) {
 				if ( status.isRunning() ) {
@@ -274,11 +278,9 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			speciesManager.save(taxon);
 			
 			List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
-			if ( vernacularNames != null ) {
-				for (TaxonVernacularName vernacularName : vernacularNames) {
-					vernacularName.setTaxonSystemId(taxon.getSystemId());
-					speciesManager.save(vernacularName);
-				}
+			for (TaxonVernacularName vernacularName : vernacularNames) {
+				vernacularName.setTaxonSystemId(taxon.getSystemId());
+				speciesManager.save(vernacularName);
 			}
 		} catch (Exception e) {
 			LOG.error(e);
@@ -365,7 +367,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			checkDuplicates(line, code, taxonId);
 			taxon.setCode(code);
 			taxon.setTaxonId(taxonId);
-			taxonTree.index(taxon);
+			taxonTree.updateNodeInfo(taxon);
 			processVernacularNames(line, taxon);
 		}
 		return taxon;

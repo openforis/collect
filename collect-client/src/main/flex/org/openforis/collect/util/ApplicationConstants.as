@@ -1,5 +1,6 @@
 package org.openforis.collect.util {
 	import mx.core.FlexGlobals;
+	import mx.utils.StringUtil;
 	import mx.utils.URLUtil;
 	
 	/**
@@ -16,7 +17,13 @@ package org.openforis.collect.util {
 		public static var COUNTRY_LOGO_ID:int = 1;
 
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
+		
 		private static const SPECIES_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
+		private static const _SPECIES_EXPORT_URL:String = "species/export/{0}";
+		
+		private static const _SAMPLING_DESIGN_EXPORT_URL:String = "samplingdesign/export/{0}";
+		private static const _SAMPLING_DESIGN_WORK_SURVEY_EXPORT_URL:String = "samplingdesign/export/work/{0}";
+		
 		private static const FILE_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
 
 		private static const RECORD_FILE_UPLOAD_SERVLET_NAME:String = "uploadRecordFile.htm";
@@ -56,6 +63,16 @@ package org.openforis.collect.util {
 			return _SPECIES_IMPORT_UPLOAD_URL;
 		}
 		
+		public static function getSpeciesExportUrl(taxonomyId:int):String {
+			return mx.utils.StringUtil.substitute(_SPECIES_EXPORT_URL, taxonomyId);
+		}
+
+		public static function getSamplingDesignExportUrl(surveyId:int, work:Boolean = false):String {
+			var baseUrl:String = work ? _SAMPLING_DESIGN_WORK_SURVEY_EXPORT_URL: _SAMPLING_DESIGN_EXPORT_URL;
+			return mx.utils.StringUtil.substitute(baseUrl, surveyId);
+		}
+		
+
 		public static function get DATA_IMPORT_UPLOAD_URL():String {
 			return _DATA_IMPORT_UPLOAD_URL;
 		}

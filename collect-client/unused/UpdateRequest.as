@@ -7,6 +7,8 @@
 
 package org.openforis.collect.remoting.service {
 	import mx.collections.ArrayCollection;
+	
+	import org.openforis.collect.Application;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.remoting.service.UpdateRequest")]
@@ -15,6 +17,7 @@ package org.openforis.collect.remoting.service {
 		
 		public function UpdateRequest(operation:UpdateRequestOperation = null) {
 			super();
+			autoSave = !Application.preview && Application.autoSave;
 			operations = new ArrayCollection();
 			if(operation != null) {
 				operations.addItem(operation);

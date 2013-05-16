@@ -6,8 +6,8 @@ package org.openforis.collect.model.proxy;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.AttributeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Value;
@@ -17,20 +17,20 @@ import org.openforis.idm.model.Value;
  * @author S. Ricci
  *
  */
-public class AttributeUpdateRequestProxy extends BaseAttributeRequestProxy<AttributeUpdateRequest<?>> {
+public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy<AttributeUpdateRequest<?>> {
 	
 	private Integer nodeId;
 
 	@Override
-	public AttributeUpdateRequest<?> toUpdateRequest(CollectRecord record) {
+	public AttributeUpdateRequest<?> toNodeUpdateOptions(CollectRecord record) {
 		throw new UnsupportedOperationException();
 	}
 	
 	@SuppressWarnings("unchecked")
-	public AttributeUpdateRequest<?> toUpdateRequest(CollectRecord record, RecordFileManager fileManager, SessionManager sessionManager) {
-		AttributeUpdateRequest<Value> request = new RecordUpdateRequest.AttributeUpdateRequest<Value>();
+	public AttributeUpdateRequest<?> toNodeUpdateOptions(CollectRecord record, RecordFileManager fileManager, SessionManager sessionManager) {
+		AttributeUpdateRequest<Value> opts = new NodeUpdateRequest.AttributeUpdateRequest<Value>();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		request.setAttribute((Attribute<?, Value>) attribute);
+		opts.setAttribute((Attribute<?, Value>) attribute);
 		if ( value != null ) {
 			Value parsedValue;
 			if ( attribute instanceof FileAttribute ) {
@@ -38,11 +38,11 @@ public class AttributeUpdateRequestProxy extends BaseAttributeRequestProxy<Attri
 			} else {
 				parsedValue = parseCompositeAttributeValue(attribute.getParent(), attribute.getDefinition(), value);
 			}
-			request.setValue(parsedValue);
+			opts.setValue(parsedValue);
 		}
-		request.setSymbol(symbol);
-		request.setRemarks(remarks);
-		return request;
+		opts.setSymbol(symbol);
+		opts.setRemarks(remarks);
+		return opts;
 	}
 	
 	

@@ -4,8 +4,8 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ErrorConfirmRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.ErrorConfirmRequest;
 import org.openforis.idm.model.Attribute;
 
 /**
@@ -13,16 +13,16 @@ import org.openforis.idm.model.Attribute;
  * @author S. Ricci
  *
  */
-public class ConfirmErrorRequestProxy extends RecordUpdateRequestProxy<ErrorConfirmRequest> {
+public class ConfirmErrorRequestProxy extends NodeUpdateRequestProxy<ErrorConfirmRequest> {
 	
 	private Integer nodeId;
 
 	@Override
-	public ErrorConfirmRequest toUpdateRequest(CollectRecord record) {
-		ErrorConfirmRequest request = new RecordUpdateRequest.ErrorConfirmRequest();
+	public ErrorConfirmRequest toNodeUpdateOptions(CollectRecord record) {
+		ErrorConfirmRequest opts = new NodeUpdateRequest.ErrorConfirmRequest();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		request.setAttribute(attribute);
-		return request;
+		opts.setAttribute(attribute);
+		return opts;
 	}
 
 	public Integer getNodeId() {

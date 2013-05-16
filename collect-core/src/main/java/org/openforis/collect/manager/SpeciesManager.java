@@ -30,6 +30,7 @@ import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.model.species.Taxon;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
 import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,6 +143,16 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
+	public TaxonSummaries loadFullTaxonSummaries(int taxonomyId) {
+		TaxonTree tree = loadTaxonTree(taxonomyId);
+		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.GENUS, false);
+		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
+		Collections.sort(sortedVernacularNamesLanguageCodes);
+		TaxonSummaries result = new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes);
+		return result;
+	}
+	
+	@Transactional
 	public TaxonSummaries loadTaxonSummaries(int taxonomyId) {
 		return loadTaxonSummaries(taxonomyId, 0, Integer.MAX_VALUE);
 	}
@@ -239,7 +250,7 @@ public class SpeciesManager {
 	
 	@Transactional
 	public void publishTaxonomies(Integer surveyWorkId, int publishedSurveyId) {
-		deleteTaxonomies(publishedSurveyId);
+		deleteTaxonomiesBySurvey(publishedSurveyId);
 		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurveyWork(surveyWorkId);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			taxonomy.setSurveyWorkId(null);
@@ -248,9 +259,18 @@ public class SpeciesManager {
 		}
 	}
 
-	protected void deleteTaxonomies(int surveyId) {
-		List<CollectTaxonomy> publishedTaxonomies = taxonomyDao.loadAllBySurvey(surveyId);
-		for (CollectTaxonomy taxonomy : publishedTaxonomies) {
+	@Transactional
+	public void deleteTaxonomiesBySurvey(int surveyId) {
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(surveyId);
+		for (CollectTaxonomy taxonomy : taxonomies) {
+			delete(taxonomy);
+		}
+	}
+	
+	@Transactional
+	public void deleteTaxonomiesBySurveyWork(int surveyId) {
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurveyWork(surveyId);
+		for (CollectTaxonomy taxonomy : taxonomies) {
 			delete(taxonomy);
 		}
 	}
@@ -336,7 +356,7 @@ public class SpeciesManager {
 	}
 
 	@Transactional
-	public TaxonTree createTaxonTree(int taxonomyId) {
+	public TaxonTree loadTaxonTree(int taxonomyId) {
 		List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(taxonomyId);
 		TaxonTree tree = new TaxonTree();
 		Map<Integer, Taxon> idToTaxon = new HashMap<Integer, Taxon>();
@@ -346,7 +366,7 @@ public class SpeciesManager {
 			Taxon parent = parentId == null ? null: idToTaxon.get(parentId);
 			Node newNode = tree.addNode(parent, taxon);
 			List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(systemId);
-			newNode.setVernacularNames(vernacularNames);
+			tree.addVernacularNames(newNode, vernacularNames);
 			idToTaxon.put(systemId, taxon);
 		}
 		return tree;

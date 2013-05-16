@@ -3,44 +3,18 @@
  */
 package org.openforis.collect.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
-import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
-import org.openforis.collect.model.NodeUpdateResponse.NodeAddResponse;
-import org.openforis.collect.model.NodeUpdateResponse.NodeDeleteResponse;
-import org.openforis.collect.model.RecordUpdateRequest.AttributeAddRequest;
-import org.openforis.collect.model.RecordUpdateRequest.EntityAddRequest;
-import org.openforis.collect.model.RecordUpdateRequest.NodeDeleteRequest;
-import org.openforis.idm.metamodel.validation.ValidationResultFlag;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.Coordinate;
-import org.openforis.idm.model.Date;
-import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.EntityBuilder;
-import org.openforis.idm.model.Node;
-import org.openforis.idm.model.RealAttribute;
-import org.openforis.idm.model.Time;
 
 /**
  * @author S. Ricci
  *
  */
 public class CollectRecordIntegrationTest extends CollectIntegrationTest {
-	
 	@Test
 	public void testAddPlot() throws Exception {
+	}
+	/*
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		RecordUpdateRequestSet requestSet = new RecordUpdateRequestSet();
@@ -271,5 +245,5 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			}
 		}
 	}
-
+	*/
 }

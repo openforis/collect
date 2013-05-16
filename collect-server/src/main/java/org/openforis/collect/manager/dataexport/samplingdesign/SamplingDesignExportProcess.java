@@ -2,6 +2,7 @@ package org.openforis.collect.manager.dataexport.samplingdesign;
 
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -37,9 +38,7 @@ public class SamplingDesignExportProcess {
 				samplingDesignManager.loadBySurveyWork(surveyId): 
 				samplingDesignManager.loadBySurvey(surveyId);;
 			ArrayList<String> colNames = new ArrayList<String>();
-			colNames.add(SamplingDesignFileColumn.LEVEL_1.getColumnName());
-			colNames.add(SamplingDesignFileColumn.LEVEL_2.getColumnName());
-			colNames.add(SamplingDesignFileColumn.LEVEL_2.getColumnName());
+			colNames.addAll(Arrays.asList(SamplingDesignFileColumn.LEVEL_COLUMN_NAMES));
 			colNames.add(SamplingDesignFileColumn.X.getColumnName());
 			colNames.add(SamplingDesignFileColumn.Y.getColumnName());
 			colNames.add(SamplingDesignFileColumn.SRS_ID.getColumnName());
@@ -58,7 +57,8 @@ public class SamplingDesignExportProcess {
 	protected void writeSummary(CsvWriter writer, SamplingDesignItem item) {
 		List<String> lineValues = new ArrayList<String>();
 		List<String> levelCodes = item.getLevelCodes();
-		for ( int level = 1 ; level <= 3; level ++ ) {
+		SamplingDesignFileColumn[] levelColumns = SamplingDesignFileColumn.LEVEL_COLUMNS;
+		for (int level = 1; level <= levelColumns.length; level++) {
 			String levelCode = level <= levelCodes.size() ? item.getLevelCode(level): "";
 			lineValues.add(levelCode);
 		}

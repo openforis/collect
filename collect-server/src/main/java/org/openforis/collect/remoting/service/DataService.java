@@ -20,16 +20,24 @@ import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.NodeUpdateResponse;
+import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.RecordSummarySortField;
-import org.openforis.collect.model.RecordUpdateRequestSet;
-import org.openforis.collect.model.RecordUpdateResponseSet;
+import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.RecordProxy;
-import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
+import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeAddRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.DefaultValueApplyRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.EntityAddRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.ErrorConfirmRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.FieldUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.MissingValueApproveRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.NodeDeleteRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateRequest;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
 import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.collect.web.session.SessionState;
@@ -39,6 +47,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
@@ -170,18 +179,76 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordUpdateResponseSetProxy updateActiveRecord(RecordUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
+	public NodeChangeSetProxy updateActiveRecord(NodeUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		CollectRecord activeRecord = getActiveRecord();
-		RecordUpdateRequestSet reqSet = requestSet.toRecordUpdateResponseSet(activeRecord, fileManager, sessionManager);
-		RecordUpdateResponseSet responseSet = activeRecord.update(reqSet);
-		List<NodeUpdateResponse<?>> responses = responseSet.getResponses();
-		if ( ! responses.isEmpty() && isCurrentRecordIndexable() ) {
+		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateOptionsSet(activeRecord, fileManager, sessionManager);
+		NodeChangeSet changeSet = updateRecord(activeRecord, reqSet);
+		List<NodeChange<?>> changes = changeSet.getChanges();
+		if ( ! changes.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
-		return new RecordUpdateResponseSetProxy(messageContextHolder, responseSet);
+		if ( requestSet.isAutoSave() ) {
+			try {
+				saveActiveRecord();
+				changeSet.setRecordSaved(true);
+			} catch(Exception e) {
+				changeSet.setRecordSaved(false);
+			}
+		}
+		return new NodeChangeSetProxy(messageContextHolder, changeSet);
 	}
 
+	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequestSet nodeUpdateOptionSet) throws RecordPersistenceException, RecordIndexException {
+		List<NodeUpdateRequest> opts = nodeUpdateOptionSet.getRequests();
+		NodeChangeSet changeSet = new NodeChangeSet();
+		for (NodeUpdateRequest req : opts) {
+			List<NodeChange<?>> changes = updateRecord(record, req);
+			for (NodeChange<?> change : changes) {
+				changeSet.addChange(change);
+			}
+		}
+		changeSet.setErrors(record.getErrors());
+		changeSet.setMissing(record.getMissing());
+		changeSet.setMissingErrors(record.getMissingErrors());
+		changeSet.setMissingWarnings(record.getMissingWarnings());
+		changeSet.setSkipped(record.getSkipped());
+		changeSet.setWarnings(record.getWarnings());
+		return changeSet;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected List<NodeChange<?>> updateRecord(CollectRecord record, NodeUpdateRequest req) throws RecordPersistenceException {
+		if ( req instanceof ErrorConfirmRequest ) {
+			return record.confirmError(((ErrorConfirmRequest) req).getAttribute());
+		} else if ( req instanceof MissingValueApproveRequest ) {
+			MissingValueApproveRequest r = (MissingValueApproveRequest) req;
+			return record.approveMissingValue(r.getParentEntityId(), r.getNodeName());
+		} else if ( req instanceof RemarksUpdateRequest ) {
+			RemarksUpdateRequest r = (RemarksUpdateRequest) req;
+			return record.updateRemarks(r.getField(), r.getRemarks());
+		} else if ( req instanceof AttributeAddRequest ) {
+			AttributeAddRequest<Value> r = (AttributeAddRequest<Value>) req;
+			return record.addAttribute(r.getParentEntity(), r.getNodeName(), r.getValue(), 
+					r.getSymbol(), r.getRemarks());
+		} else if ( req instanceof EntityAddRequest ) {
+			EntityAddRequest r = (EntityAddRequest) req;
+			return record.addEntity(r.getParentEntity(), r.getNodeName());
+		} else if ( req instanceof AttributeUpdateRequest ) {
+			AttributeUpdateRequest<Value> r = (AttributeUpdateRequest<Value>) req;
+			return record.updateAttribute(r.getAttribute(), r.getValue(), r.getSymbol(), r.getRemarks());
+		} else if ( req instanceof FieldUpdateRequest ) {
+			FieldUpdateRequest r = (FieldUpdateRequest) req;
+			return record.updateField(r.getField(), r.getValue(), r.getSymbol(), r.getRemarks());
+		} else if ( req instanceof DefaultValueApplyRequest ) {
+			return record.applyDefaultValue(((DefaultValueApplyRequest) req).getAttribute());
+		} else if ( req instanceof NodeDeleteRequest ) {
+			return record.deleteNode(((NodeDeleteRequest) req).getNode());
+		} else {
+			throw new IllegalArgumentException("NodeChange not supported: " + req.getClass().getSimpleName());
+		}
+	}
+	
 	@Secured("ROLE_ENTRY")
 	public void promoteToCleansing() throws RecordPersistenceException, RecordPromoteException  {
 		promote(Step.CLEANSING);

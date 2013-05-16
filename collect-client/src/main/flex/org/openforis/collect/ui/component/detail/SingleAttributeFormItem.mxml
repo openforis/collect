@@ -54,7 +54,7 @@
 	
 	<detail:FormItemLabel id="formItemLabel"
 	  				  nodeDefinition="{attributeDefinition}"
-					  width="{labelWidth}"
+					  minWidth="{labelWidth}"
 					  includeIn="form"
 					  />
 	

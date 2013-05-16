@@ -1,3 +1,4 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
@@ -154,23 +155,23 @@
 		        				<row>
 		        					<label
 		        						value="${labels.survey.code_list.type.$}:" />
-                      <hlayout>
-  		        					<radiogroup id="typeRG"
-  		        						selectedItem="@bind(fx.type)"
-  		        						onCheck="@command('typeChanged', type=self.selectedItem.value)">
-  		        						<radio
-  		        							label="${labels.survey.code_list.type.hierarchical}"
-  		        							value="HIERARCHICAL"
-  		        							disabled="@load(vm.multipleLevelsPresent)" />
-  		        						<radio
-  		        							label="${labels.survey.code_list.type.flat}"
-  		        							value="FLAT"
-  		        							disabled="@load(vm.multipleLevelsPresent)" />
-  		        					</radiogroup>
-                        <button
-                          label="${labels.global.import_data}"
-                          onClick="@command('openCodeListImportPopUp')" />
-                      </hlayout>
+                      				<hlayout>
+	  		        					<radiogroup id="typeRG"
+	  		        						selectedItem="@bind(fx.type)"
+	  		        						onCheck="@command('typeChanged', type=self.selectedItem.value)">
+	  		        						<radio
+	  		        							label="${labels.survey.code_list.type.hierarchical}"
+	  		        							value="HIERARCHICAL"
+	  		        							disabled="@load(vm.multipleLevelsPresent)" />
+	  		        						<radio
+	  		        							label="${labels.survey.code_list.type.flat}"
+	  		        							value="FLAT"
+	  		        							disabled="@load(vm.multipleLevelsPresent)" />
+	  		        					</radiogroup>
+				                        <button
+				                          label="${labels.global.import_data}"
+				                          onClick="@command('openCodeListImportPopUp')" />
+			                      	</hlayout>
 		        				</row>
 		        				<row
 		        					visible="@load(fx.type eq 'HIERARCHICAL')">
@@ -197,7 +198,7 @@
 		        						<groupbox closable="false"
 		        							contentStyle="padding: 0px"
 		        							mold="@load(fx.type eq 'HIERARCHICAL' ? '3d': '')"
-		        							width="140px">
+		        							width="180px">
 		        							<caption
 		        								visible="@load(fx.type eq 'HIERARCHICAL' ? true: false)">
 		        								<textbox inplace="true"
@@ -211,7 +212,7 @@
 													       vm.selectedItemsPerLevel[forEachStatus.index]: null)"
 		        								onSelect="@command('listItemSelected', item=self.selectedItem.value, levelIndex=forEachStatus.index)">
 		        								<listhead>
-		        									<listheader width="100px" />
+		        									<listheader />
 		        									<listheader width="20px" />
 		        								</listhead>
 		        								<template
@@ -220,14 +221,14 @@
 		        										draggable="level_${each.depth}"
 		        										droppable="level_${each.depth}"
 		        										onDrop="@command('moveChildItem')">
-		        										<listcell
+		        										<listcell 
 		        											onDoubleClick="@command('editCodeListItem', item=each)">
-		        											<label
-		        												value="@load(each.code)" />
+		        											<label width="100%" sclass="nowrap"
+		        												value="@load(c:cat3(each.code, ' - ', vm.getCodeListItemLabel(each)))" />
 		        										</listcell>
 		        										<listcell
 		        											style="padding: 0px">
-		        											<image
+		        											<image visible="@load(each.hasChildItems())"
 		        												src="@load(each.hasChildItems() ? 
 																			(vm.isCodeListItemSelected(each) ? 
 																				'/assets/images/arrow-right-selected-small.png': 
@@ -279,7 +280,9 @@
 			<south border="none">
 				<box align="center" width="100%">
 					<button label="${labels.global.ok}" 
-						onClick="@global-command('closeCodeListsManagerPopUp')" />
+						onClick="@global-command('closeCodeListsManagerPopUp', 
+							editingAttribute=vm.editingAttribute, 
+							selectedCodeList=vm.selectedItem)" />
 				</box>
 			</south>
 		</borderlayout>

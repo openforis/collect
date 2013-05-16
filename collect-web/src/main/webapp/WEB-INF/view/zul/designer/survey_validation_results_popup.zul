@@ -1,5 +1,5 @@
 <zk>
-  <window id="surveyImportPopUp"
+  <window id="surveyValidationResultsPopUp"
   	title="${labels.survey.validation.popup.title}"
     border="normal" 
     position="center"

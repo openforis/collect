@@ -1,56 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <services-config>
-	
+
 	<factories>
 		<factory id="springFactory" class="org.granite.spring.SpringServiceFactory">
 			<properties>
-				<service-exception-handler>org.openforis.collect.remoting.service.ServiceExceptionHandler</service-exception-handler>
+				<service-exception-handler>org.openforis.collect.remoting.service.ServiceExceptionHandler
+				</service-exception-handler>
 			</properties>
 		</factory>
 	</factories>
-    
-  <services>
-<!--        <service-include file-path="proxy-config.xml" />-->
-<!--         <service-include file-path="remoting-config.xml" /> -->
-<!--         <service-include file-path="messaging-config.xml" /> -->
-			
-		<service
-            id="granite-service"
-            class="flex.messaging.services.RemotingService"
-            messageTypes="flex.messaging.messages.RemotingMessage">
-      
-      <destination id="codeListImportService">
-        <properties>
-          <factory>springFactory</factory>
-            <source>codeListImportService</source>
-            <scope>application</scope>
-        </properties>
-      </destination>
-      
+
+	<services>
+		<!-- <service-include file-path="proxy-config.xml" /> -->
+		<!-- <service-include file-path="remoting-config.xml" /> -->
+		<!-- <service-include file-path="messaging-config.xml" /> -->
+
+		<service id="granite-service" class="flex.messaging.services.RemotingService"
+			messageTypes="flex.messaging.messages.RemotingMessage">
+
+			<destination id="codeListImportService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>codeListImportService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
+
 			<destination id="dataService">
-        <properties>
-        	<factory>springFactory</factory>
-            <source>dataService</source>
-            <scope>application</scope>
-        </properties>
+				<properties>
+					<factory>springFactory</factory>
+					<source>dataService</source>
+					<scope>application</scope>
+				</properties>
 			</destination>
-			
+
 			<destination id="dataExportService">
-        <properties>
-        	<factory>springFactory</factory>
-            <source>dataExportService</source>
-            <scope>application</scope>
-        </properties>
+				<properties>
+					<factory>springFactory</factory>
+					<source>dataExportService</source>
+					<scope>application</scope>
+				</properties>
 			</destination>
-			
+
 			<destination id="dataImportService">
-        <properties>
-        	<factory>springFactory</factory>
-            <source>dataImportService</source>
-            <scope>application</scope>
-        </properties>
+				<properties>
+					<factory>springFactory</factory>
+					<source>dataImportService</source>
+					<scope>application</scope>
+				</properties>
 			</destination>
-			
+
 			<destination id="logoService">
 				<properties>
 					<factory>springFactory</factory>
@@ -60,87 +59,93 @@
 			</destination>
 
 			<destination id="modelService">
-        <properties>
-        	<factory>springFactory</factory>
-            <source>modelService</source>
-            <scope>application</scope>
-        </properties>
+				<properties>
+					<factory>springFactory</factory>
+					<source>modelService</source>
+					<scope>application</scope>
+				</properties>
 			</destination>
-			
+
 			<destination id="recordFileService">
-        <properties>
-        	<factory>springFactory</factory>
-            <source>recordFileService</source>
-            <scope>application</scope>
-        </properties>
+				<properties>
+					<factory>springFactory</factory>
+					<source>recordFileService</source>
+					<scope>application</scope>
+				</properties>
 			</destination>
-      
-      <destination id="samplingDesignService">
-          <properties>
-            <factory>springFactory</factory>
-              <source>samplingDesignService</source>
-              <scope>application</scope>
-          </properties>
-      </destination>
-      
-      <destination id="samplingDesignImportService">
-          <properties>
-            <factory>springFactory</factory>
-              <source>samplingDesignImportService</source>
-              <scope>application</scope>
-          </properties>
-      </destination>
 
-      <destination id="sessionService">
-        <properties>
-        	<factory>springFactory</factory>
-            <source>sessionService</source>
-            <scope>application</scope>
-        </properties>
+			<destination id="samplingDesignService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>samplingDesignService</source>
+					<scope>application</scope>
+				</properties>
 			</destination>
-			
+
+			<destination id="samplingDesignImportService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>samplingDesignImportService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
+
+			<destination id="sessionService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>sessionService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
+
 			<destination id="speciesService">
-        <properties>
-        	<factory>springFactory</factory>
-            <source>speciesService</source>
-            <scope>application</scope>
-        </properties>
-      </destination>
-
-      <destination id="speciesImportService">
-        <properties>
-          <factory>springFactory</factory>
-            <source>speciesImportService</source>
-            <scope>application</scope>
-        </properties>
-      </destination>
-            
- 			<destination id="userService">
-        <properties>
-        	<factory>springFactory</factory>
-            <source>userService</source>
-            <scope>application</scope>
-        </properties>
+				<properties>
+					<factory>springFactory</factory>
+					<source>speciesService</source>
+					<scope>application</scope>
+				</properties>
 			</destination>
-			
-    </service>
 
-    <default-channels>
-        <channel ref="my-amf"/>
-    </default-channels>
-  </services>
-    
-  <channels>
-    <channel-definition id="my-amf" class="mx.messaging.channels.AMFChannel">
-        <endpoint url="http://{server.name}:{server.port}/{context.root}/messagebroker/amf" class="flex.messaging.endpoints.AMFEndpoint"/>
-    </channel-definition>
-    <channel-definition id="my-polling-amf" class="mx.messaging.channels.AMFChannel">
-        <endpoint url="http://{server.name}:{server.port}/{context.root}/messagebroker/amfpolling" class="flex.messaging.endpoints.AMFEndpoint"/>
-            <properties>
-            	<polling-enabled>true</polling-enabled>
-            	<polling-interval-seconds>1</polling-interval-seconds>
-            </properties>
-    </channel-definition>
-  </channels>
-    
+			<destination id="speciesImportService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>speciesImportService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
+
+			<destination id="userService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>userService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
+
+		</service>
+
+		<default-channels>
+			<channel ref="my-amf" />
+		</default-channels>
+	</services>
+
+	<channels>
+		<channel-definition id="my-amf"
+			class="mx.messaging.channels.AMFChannel">
+			<endpoint
+				url="http://{server.name}:{server.port}/{context.root}/messagebroker/amf"
+				class="flex.messaging.endpoints.AMFEndpoint" />
+		</channel-definition>
+		<channel-definition id="my-polling-amf"
+			class="mx.messaging.channels.AMFChannel">
+			<endpoint
+				url="http://{server.name}:{server.port}/{context.root}/messagebroker/amfpolling"
+				class="flex.messaging.endpoints.AMFEndpoint" />
+			<properties>
+				<polling-enabled>true</polling-enabled>
+				<polling-interval-seconds>1</polling-interval-seconds>
+			</properties>
+		</channel-definition>
+	</channels>
+
 </services-config>

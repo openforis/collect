@@ -27,7 +27,9 @@
             </fieldErrorHandler>
             <button sclass="icon"
               tooltiptext="${labels.survey.code_list.manager.title}"
-              onClick="@global-command('openCodeListsManagerPopUp', selectedCodeList=fx.list)"
+              onClick="@global-command('openCodeListsManagerPopUp', 
+              		editingAttribute=true, 
+              		selectedCodeList=fx.list)"
               image="/assets/images/edit-small.png" />
           </hlayout>
         </cell>

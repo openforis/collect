@@ -13,21 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
-import org.openforis.collect.model.NodeUpdateResponse.AttributeUpdateResponse;
-import org.openforis.collect.model.NodeUpdateResponse.EntityUpdateResponse;
-import org.openforis.collect.model.RecordUpdateRequest.AttributeAddRequest;
-import org.openforis.collect.model.RecordUpdateRequest.AttributeUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.DefaultValueApplyRequest;
-import org.openforis.collect.model.RecordUpdateRequest.EntityAddRequest;
-import org.openforis.collect.model.RecordUpdateRequest.ErrorConfirmRequest;
-import org.openforis.collect.model.RecordUpdateRequest.FieldUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.MissingValueApproveRequest;
-import org.openforis.collect.model.RecordUpdateRequest.NodeDeleteRequest;
-import org.openforis.collect.model.RecordUpdateRequest.RemarksUpdateRequest;
-import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.model.NodeChange.AttributeChange;
+import org.openforis.collect.model.NodeChange.EntityChange;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -198,7 +187,7 @@ public class CollectRecord extends Record {
 		warnings = null;
 	}
 
-	public Node<?> deleteNode(Node<?> node) {
+	public Node<?> performNodeDeletion(Node<?> node) {
 		if(node.isDetached()) {
 			throw new IllegalArgumentException("Unable to delete a node already detached");
 		}
@@ -270,7 +259,6 @@ public class CollectRecord extends Record {
 			warnings.add(childName);
 			break;
 		default:
-			//do nothing
 		}
 		this.missing = null;
 		this.missingErrors = null;
@@ -282,7 +270,6 @@ public class CollectRecord extends Record {
 	public void updateValidationMaxCounts(Integer entityId, String childName, ValidationResultFlag flag) {
 		Set<String> errors = clearEntityValidationCounts(maxCountErrorCounts, entityId, childName);
 		Set<String> warnings = clearEntityValidationCounts(maxCountWarningCounts, entityId, childName);
-		
 		switch(flag) {
 		case ERROR:
 			errors.add(childName);
@@ -291,7 +278,6 @@ public class CollectRecord extends Record {
 			warnings.add(childName);
 			break;
 		default:
-			//do nothing
 		}
 		this.errors = null;
 		this.warnings = null;
@@ -396,23 +382,21 @@ public class CollectRecord extends Record {
 
 	public Integer getMissing() {
 		if (missing == null) {
-			Integer errors = getMissingErrors();
-			Integer warnings = getMissingWarnings();
-			missing = errors + warnings;
+			missing = getMissingErrors();
 		}
 		return missing;
 	}
 	
 	public Integer getMissingErrors() {
 		if ( missingErrors == null ) {
-			missingErrors = getMissingCount( minCountErrorCounts );
+			missingErrors = getMissingCount(minCountErrorCounts);
 		}
 		return missingErrors;
 	}
 	
 	public Integer getMissingWarnings() {
 		if ( missingWarnings == null ) {
-			missingWarnings = getMissingCount( minCountWarningCounts);
+			missingWarnings = getMissingCount(minCountWarningCounts);
 		}
 		return missingWarnings;
 	}
@@ -436,6 +420,7 @@ public class CollectRecord extends Record {
 	public Integer getWarnings() {
 		if(warnings == null) {
 			warnings = getAttributeValidationCount(warningCounts);
+			warnings += getEntityValidationCount(minCountWarningCounts);
 			warnings += getEntityValidationCount(maxCountWarningCounts);
 		}
 		return warnings;
@@ -630,57 +615,13 @@ public class CollectRecord extends Record {
 		return result;
 	}
 
-	public RecordUpdateResponseSet update(RecordUpdateRequestSet requestSet) throws RecordPersistenceException, RecordIndexException {
-		List<RecordUpdateRequest> requests = requestSet.getRequests();
-		RecordUpdateResponseSet responseSet = new RecordUpdateResponseSet();
-		for (RecordUpdateRequest req : requests) {
-			List<NodeUpdateResponse<?>> responses = update(req);
-			for (NodeUpdateResponse<?> resp : responses) {
-				responseSet.addResponse(resp);
-			}
-		}
-		responseSet.setErrors(getErrors());
-		responseSet.setMissing(getMissing());
-		responseSet.setMissingErrors(getMissingErrors());
-		responseSet.setMissingWarnings(getMissingWarnings());
-		responseSet.setSkipped(getSkipped());
-		responseSet.setWarnings(getWarnings());
-		return responseSet;
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected List<NodeUpdateResponse<?>> update(RecordUpdateRequest req) throws RecordPersistenceException {
-		if ( req instanceof ErrorConfirmRequest ) {
-			return confirmError((ErrorConfirmRequest) req);
-		} else if ( req instanceof MissingValueApproveRequest ) {
-			return approveMissingValue((MissingValueApproveRequest) req);
-		} else if ( req instanceof RemarksUpdateRequest ) {
-			return updateRemarks((RemarksUpdateRequest) req);
-		} else if ( req instanceof AttributeAddRequest ) {
-			return addAttribute((AttributeAddRequest<Value>) req);
-		} else if ( req instanceof EntityAddRequest ) {
-			return addEntity((EntityAddRequest) req);
-		} else if ( req instanceof AttributeUpdateRequest ) {
-			return updateAttribute((AttributeUpdateRequest<?>) req);
-		} else if ( req instanceof FieldUpdateRequest ) {
-			return updateField((FieldUpdateRequest) req);
-		} else if ( req instanceof DefaultValueApplyRequest ) {
-			return applyDefaultValue((DefaultValueApplyRequest) req);
-		} else if ( req instanceof NodeDeleteRequest ) {
-			return deleteNode((NodeDeleteRequest) req);
-		} else {
-			throw new IllegalArgumentException("RecordUpdateRequest not supported: " + req.getClass().getSimpleName());
-		}
-	}
-
-	protected List<NodeUpdateResponse<?>> deleteNode(
-			NodeDeleteRequest req) {
+	public List<NodeChange<?>> deleteNode(
+			Node<?> node) {
 		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
 		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
 		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
-		Node<?> node = req.getNode();
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
-		responseMap.prepareDeleteNodeResponse(node);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.prepareDeleteNodeChange(node);
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(node);
 		Stack<Node<?>> depthFirstDescendants = getDepthFirstDescendants(node);
 		while ( !depthFirstDescendants.isEmpty() ) {
@@ -690,7 +631,7 @@ public class CollectRecord extends Record {
 			if ( n instanceof Attribute ) {
 				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
 			}
-			deleteNode(n);
+			performNodeDeletion(n);
 		}
 		//clear dependencies
 		clearRelevantDependencies(relevantDependencies);
@@ -700,8 +641,8 @@ public class CollectRecord extends Record {
 		clearRequiredDependencies(relevanceRequiredDependencies);
 		clearValidationResults(checkDependencies);
 		
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
-		return responseMap.values();
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
+		return changeMap.values();
 	}
 	
 	protected Stack<Node<?>> getDepthFirstDescendants(Node<?> node) {
@@ -722,126 +663,115 @@ public class CollectRecord extends Record {
 		return result;
 	}
 
-	protected List<NodeUpdateResponse<?>> applyDefaultValue(
-			DefaultValueApplyRequest req) {
-		Attribute<?, ?> attribute = req.getAttribute();
-		applyDefaultValue(attribute);
+	public List<NodeChange<?>> applyDefaultValue(
+			Attribute<?, ?> attribute) {
+		performDefaultValueApply(attribute);
 		Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
 		int fieldCount = attribute.getFieldCount();
 		for (int idx = 0; idx < fieldCount; idx ++) {
 			Field<?> field = attribute.getField(idx);
 			fieldValues.put(idx, field.getValue());
 		}
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
-		AttributeUpdateResponse response = responseMap.prepareAttributeResponse(attribute);
-		response.setUpdatedFieldValues(fieldValues);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		AttributeChange change = changeMap.prepareAttributeChange(attribute);
+		change.setUpdatedFieldValues(fieldValues);
 		
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(attribute);
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
 		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 		checkDependencies.add(attribute);
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
-		return responseMap.values();
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
+		return changeMap.values();
 	}
 
-	protected List<NodeUpdateResponse<?>> updateAttribute(
-			AttributeUpdateRequest<?> req) {
-		@SuppressWarnings("unchecked")
-		Attribute<? extends NodeDefinition, Value> attribute = (Attribute<?, Value>) req.getAttribute();
+	public List<NodeChange<?>> updateAttribute(
+			Attribute<? extends NodeDefinition, Value> attribute,
+			Value value, FieldSymbol symbol, String remarks) {
 		Entity parentEntity = attribute.getParent();
 
 		setErrorConfirmed(attribute, false);
 		setMissingApproved(parentEntity, attribute.getName(), false);
 		setDefaultValueApplied(attribute, false);
 		
-		String remarks = req.getRemarks();
-
-		setAttributeValue(attribute, req.getValue(), remarks);
+		attribute.setValue(value);
+		Field<?> field = attribute.getField(0);
+		field.setRemarks(remarks);
+		field.setSymbol(null);
 		
 		Map<Integer, Object> updatedFieldValues = new HashMap<Integer, Object>();
 		for (int idx = 0; idx < attribute.getFieldCount(); idx++) {
-			Field<?> field = attribute.getField(idx);
-			Object fieldValue = field.getValue();
+			Field<?> f = attribute.getField(idx);
+			Object fieldValue = f.getValue();
 			updatedFieldValues.put(idx, fieldValue);
-			setFieldValue(attribute, fieldValue, remarks, req.getSymbol(), idx);
+			setFieldValue(f, fieldValue, remarks, symbol);
 		}
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
-		AttributeUpdateResponse response = responseMap.prepareAttributeResponse(attribute);
-		response.setUpdatedFieldValues(updatedFieldValues);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		AttributeChange change = changeMap.prepareAttributeChange(attribute);
+		change.setUpdatedFieldValues(updatedFieldValues);
 		
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
 		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 		checkDependencies.add(attribute);
 		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(attribute);
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
-		return responseMap.values();
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		return changeMap.values();
 	}
 
-	protected List<NodeUpdateResponse<?>> updateField(
-			FieldUpdateRequest operation) {
-		Attribute<?, ?> attribute = operation.getAttribute();
+	public List<NodeChange<?>> updateField(
+			Field<?> field, Object rawValue, FieldSymbol symbol, String remarks) {
+		Attribute<?, ?> attribute = field.getAttribute();
 		Entity parentEntity = attribute.getParent();
 
 		setErrorConfirmed(attribute, false);
 		setMissingApproved(parentEntity, attribute.getName(), false);
 		setDefaultValueApplied(attribute, false);
+		int fieldIndex = field.getIndex();
+		Object value = parseFieldValue(parentEntity, attribute.getDefinition(), (String) rawValue, fieldIndex);
+		setFieldValue(field, value, remarks, symbol);
 		
-		Integer fieldIndex = operation.getFieldIndex();
-		Object requestValue = operation.getValue();
-		String remarks = operation.getRemarks();
-		FieldSymbol symbol = operation.getSymbol();
-
-		Object value = parseFieldValue(parentEntity, attribute.getDefinition(), (String) requestValue, fieldIndex);
-		setFieldValue(attribute, value, remarks, symbol, fieldIndex);
-		
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
-		AttributeUpdateResponse response = responseMap.prepareAttributeResponse(attribute);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		AttributeChange change = changeMap.prepareAttributeChange(attribute);
 
 		Map<Integer, Object> updatedFieldValues = getFieldValuesMap(attribute);
-		response.setUpdatedFieldValues(updatedFieldValues);
+		change.setUpdatedFieldValues(updatedFieldValues);
 		
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
 		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 		checkDependencies.add(attribute);
 		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(attribute);
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
-		return responseMap.values();
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		return changeMap.values();
 	}
 	
-	protected List<NodeUpdateResponse<?>> addEntity(
-			EntityAddRequest req) {
-		String nodeName = req.getNodeName();
-		Entity parentEntity = (Entity) getNodeByInternalId(req.getParentEntityId());
-		
-		Entity createdNode = addEntity(parentEntity, nodeName);
+	public List<NodeChange<?>> addEntity(
+			Entity parentEntity, String nodeName) {
+		Entity createdNode = performEntityAdd(parentEntity, nodeName);
 		
 		setMissingApproved(parentEntity, nodeName, false);
 		
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
-		responseMap.prepareAddEntityResponse(createdNode);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.prepareAddEntityChange(createdNode);
 		
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(createdNode);
 		Set<Attribute<?, ?>> checkDependencies = null;
 		relevanceRequiredDependencies.add(new NodePointer(createdNode.getParent(), nodeName));
 		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(createdNode);
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
-		return responseMap.values();
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		return changeMap.values();
 	}
 
-	protected List<NodeUpdateResponse<?>> addAttribute(
-			AttributeAddRequest<Value> req) {
-		String nodeName = req.getNodeName();
-		Entity parentEntity = (Entity) getNodeByInternalId(req.getParentEntityId());
-		
-		Attribute<?, ?> createdNode = addAttribute(parentEntity, nodeName, req.getValue(), req.getSymbol(), req.getRemarks());
+	public List<NodeChange<?>> addAttribute(
+			Entity parentEntity, String nodeName, Value value, FieldSymbol symbol, 
+			String remarks) {
+		Attribute<?, ?> createdNode = performAttributeAdd(parentEntity, nodeName, value, symbol, remarks);
 		
 		setMissingApproved(parentEntity, nodeName, false);
 		
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
-		responseMap.prepareAddAttributeResponse(createdNode);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.prepareAddAttributeChange(createdNode);
 		
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(createdNode);
 		Set<Attribute<?, ?>> checkDependencies = null;
@@ -852,44 +782,40 @@ public class CollectRecord extends Record {
 		}
 		relevanceRequiredDependencies.add(new NodePointer(createdNode.getParent(), nodeName));
 		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(createdNode);
-		prepareUpdateResponse(responseMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
-		return responseMap.values();
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		return changeMap.values();
 	}
 
-	protected List<NodeUpdateResponse<?>> updateRemarks(
-			RemarksUpdateRequest req) {
-		Attribute<?, ?> attribute = req.getAttribute();
-		Field<?> fld = attribute.getField(req.getFieldIndex());
-		fld.setRemarks(req.getRemarks());
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
-		responseMap.prepareAttributeResponse(attribute);
-		return responseMap.values();
+	public List<NodeChange<?>> updateRemarks(
+			Field<?> fld, String remarks) {
+		fld.setRemarks(remarks);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		Attribute<?, ?> attribute = fld.getAttribute();
+		changeMap.prepareAttributeChange(attribute);
+		return changeMap.values();
 	}
 
-	protected List<NodeUpdateResponse<?>> approveMissingValue(
-			MissingValueApproveRequest req) {
-		String nodeName = req.getNodeName();
-		Integer parentEntityId = req.getParentEntityId();
+	public List<NodeChange<?>> approveMissingValue(
+			Integer parentEntityId, String nodeName) {
 		Entity parentEntity = (Entity) getNodeByInternalId(parentEntityId);
 		setMissingApproved(parentEntity, nodeName, true);
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(parentEntity);
 		cardinalityNodePointers.add(new NodePointer(parentEntity, nodeName));
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
-		validateAll(responseMap, cardinalityNodePointers, false);
-		return responseMap.values();
+		NodeChangeMap changeMap = new NodeChangeMap();
+		validateAll(changeMap, cardinalityNodePointers, false);
+		return changeMap.values();
 	}
 
-	protected List<NodeUpdateResponse<?>> confirmError(ErrorConfirmRequest req) {
-		NodeUpdateResponseMap responseMap = new NodeUpdateResponseMap();
+	public List<NodeChange<?>> confirmError(Attribute<?, ?> attribute) {
 		Set<Attribute<?,?>> checkDependencies = new HashSet<Attribute<?,?>>();
-		Attribute<?, ?> attribute = req.getAttribute();
 		setErrorConfirmed(attribute, true);
 		attribute.clearValidationResults();
 		checkDependencies.add(attribute);
 		
-		responseMap.prepareAttributeResponse(attribute);
-		validateChecks(responseMap, checkDependencies);
-		return responseMap.values();
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.prepareAttributeChange(attribute);
+		validateChecks(changeMap, checkDependencies);
+		return changeMap.values();
 	}
 
 	protected List<NodePointer> createCardinalityNodePointers(Node<?> node){
@@ -907,91 +833,91 @@ public class CollectRecord extends Record {
 		return nodePointers;
 	}
 
-	protected void prepareUpdateResponse(NodeUpdateResponseMap responseMap, Set<NodePointer> relevanceRequiredDependencies, 
+	protected void prepareChange(NodeChangeMap changeMap, Set<NodePointer> relevanceRequiredDependencies, 
 			Collection<Attribute<?, ?>> checkDependencies, Collection<NodePointer> cardinalityDependencies) {
-		validateAll(responseMap, cardinalityDependencies, false);
-		validateAll(responseMap, relevanceRequiredDependencies, true);
-		validateChecks(responseMap, checkDependencies);
+		validateAll(changeMap, cardinalityDependencies, false);
+		validateAll(changeMap, relevanceRequiredDependencies, true);
+		validateChecks(changeMap, checkDependencies);
 	}
 
-	protected void validateChecks(NodeUpdateResponseMap responseMap,
+	protected void validateChecks(NodeChangeMap changeMap,
 			Collection<Attribute<?, ?>> attributes) {
 		if (attributes != null) {
 			for (Attribute<?, ?> attr : attributes) {
-				validateAttribute(responseMap, attr);
+				validateAttribute(changeMap, attr);
 			}
 		}
 	}
 
-	protected void validateAttribute(NodeUpdateResponseMap responseMap,
+	protected void validateAttribute(NodeChangeMap changeMap,
 			Attribute<?, ?> attr) {
 		if ( !attr.isDetached() ) {
 			attr.clearValidationResults();
 			ValidationResults results = attr.validateValue();
-			AttributeUpdateResponse response = responseMap.prepareAttributeResponse(attr);
-			response.setValidationResults(results);
+			AttributeChange change = changeMap.prepareAttributeChange(attr);
+			change.setValidationResults(results);
 		}
 	}
 
-	protected void validateChecks(NodeUpdateResponseMap responseMap,
+	protected void validateChecks(NodeChangeMap changeMap,
 			Entity entity, String childName) {
 		List<Node<?>> children = entity.getAll(childName);
 		for ( Node<?> node : children ) {
 			if ( node instanceof Attribute ){
-				validateAttribute(responseMap, (Attribute<?, ?>) node);
+				validateAttribute(changeMap, (Attribute<?, ?>) node);
 			}
 		}
 	}
 	
-	protected void validateAll(NodeUpdateResponseMap responseMap,
+	protected void validateAll(NodeChangeMap changeMap,
 			Collection<NodePointer> nodePointers, boolean validateChecks) {
 		if (nodePointers != null) {
 			for (NodePointer nodePointer : nodePointers) {
 				Entity parent = nodePointer.getEntity();
 				if ( parent != null && ! parent.isDetached()) {
-					validateCardinality(responseMap, nodePointer);
-					validateRelevanceState(responseMap, nodePointer);
-					validateRequirenessState(responseMap, nodePointer);
+					validateCardinality(changeMap, nodePointer);
+					validateRelevanceState(changeMap, nodePointer);
+					validateRequirenessState(changeMap, nodePointer);
 					if ( validateChecks ) {
-						validateChecks(responseMap, parent, nodePointer.getChildName());
+						validateChecks(changeMap, parent, nodePointer.getChildName());
 					}
 				}
 			}
 		}
 	}
 
-	protected void validateCardinality(NodeUpdateResponseMap responseMap, NodePointer nodePointer) {
+	protected void validateCardinality(NodeChangeMap changeMap, NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
-		EntityUpdateResponse response = responseMap.prepareEntityResponse(entity);
-		response.setChildrenMinCountValidation(childName, entity.validateMinCount(childName));
-		response.setChildrenMaxCountValidation(childName, entity.validateMaxCount(childName));
+		EntityChange change = changeMap.prepareEntityChange(entity);
+		change.setChildrenMinCountValidation(childName, entity.validateMinCount(childName));
+		change.setChildrenMaxCountValidation(childName, entity.validateMaxCount(childName));
 	}
 
 	protected void validateRelevanceState(
-			NodeUpdateResponseMap responseMap, NodePointer nodePointer) {
+			NodeChangeMap changeMap, NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
-		EntityUpdateResponse response = responseMap.prepareEntityResponse(entity);
-		response.setChildrenRelevance(childName, entity.isRelevant(childName));
+		EntityChange change = changeMap.prepareEntityChange(entity);
+		change.setChildrenRelevance(childName, entity.isRelevant(childName));
 	}
 
 	protected void validateRequirenessState(
-			NodeUpdateResponseMap responseMap, NodePointer nodePointer) {
+			NodeChangeMap changeMap, NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		String childName = nodePointer.getChildName();
-		EntityUpdateResponse response = responseMap.prepareEntityResponse(entity);
-		response.setChildrenRequireness(childName, entity.isRequired(childName));
+		EntityChange change = changeMap.prepareEntityChange(entity);
+		change.setChildrenRequireness(childName, entity.isRequired(childName));
 	}
 
-	protected Attribute<?, ?> addAttribute(Entity parentEntity, String nodeName, Value requestValue, FieldSymbol symbol, String remarks) {
+	protected Attribute<?, ?> performAttributeAdd(Entity parentEntity, String nodeName, Value value, FieldSymbol symbol, String remarks) {
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		AttributeDefinition def = (AttributeDefinition) parentEntityDefn.getChildDefinition(nodeName);
 		@SuppressWarnings("unchecked")
 		Attribute<?, Value> attribute = (Attribute<?, Value>) def.createNode();
 		parentEntity.add(attribute);
-		if ( requestValue != null ) {
-			attribute.setValue(requestValue);
+		if ( value != null ) {
+			attribute.setValue(value);
 		}
 		if(symbol != null || remarks != null) {
 			Character symbolChar = null;
@@ -1074,7 +1000,7 @@ public class CollectRecord extends Record {
 	}
 	
 	
-	public Entity addEntity(Entity parentEntity, String nodeName) {
+	public Entity performEntityAdd(Entity parentEntity, String nodeName) {
 		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName);
 		addEmptyNodes(entity);
 		return entity;
@@ -1190,7 +1116,7 @@ public class CollectRecord extends Record {
 					Node<?> createNode = childDefn.createNode();
 					entity.add(createNode);
 				} else if(childDefn instanceof EntityDefinition ) {
-					addEntity(entity, childName);
+					performEntityAdd(entity, childName);
 				}
 				count ++;
 			}
@@ -1222,7 +1148,7 @@ public class CollectRecord extends Record {
 			if ( child instanceof Attribute ) {
 				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
 				if ( attribute.isEmpty() ) {
-					applyDefaultValue(attribute);
+					performDefaultValueApply(attribute);
 				}
 			} else if ( child instanceof Entity ) {
 				applyDefaultValues((Entity) child);
@@ -1230,7 +1156,7 @@ public class CollectRecord extends Record {
 		}
 	}
 	
-	public <V extends Value> void applyDefaultValue(Attribute<?, V> attribute) {
+	public <V extends Value> void performDefaultValueApply(Attribute<?, V> attribute) {
 		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
 		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
 		if ( defaults != null && defaults.size() > 0 ) {
@@ -1260,11 +1186,7 @@ public class CollectRecord extends Record {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <V> void setFieldValue(Attribute<?,?> attribute, Object value, String remarks, FieldSymbol symbol, int fieldIdx){
-		if(fieldIdx < 0){
-			fieldIdx = 0;
-		}
-		Field<V> field = (Field<V>) attribute.getField(fieldIdx);
+	protected <V> void setFieldValue(Field<V> field, Object value, String remarks, FieldSymbol symbol){
 		field.setValue((V)value);
 		field.setRemarks(remarks);
 		Character symbolChar = null;
@@ -1272,7 +1194,6 @@ public class CollectRecord extends Record {
 			symbolChar = symbol.getCode();
 		}
 		field.setSymbol(symbolChar);
-		setDefaultValueApplied(attribute, false);
 	}
 
 	public Set<NodePointer> clearRelevanceRequiredDependencies(Node<?> node){

@@ -22,7 +22,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
@@ -270,7 +270,7 @@ package org.openforis.collect.presenter {
 		
 		public function performSelectTaxon(taxonOccurrence:Object):void {
 			_lastSelectedTaxon = taxonOccurrence;
-			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			//update code
 			view.codeTextInput.text = taxonOccurrence.code;
 			reqSet.addRequest(view.codeTextInput.presenter.createValueUpdateRequest());

@@ -8,8 +8,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.IntegerInputField;
 	import org.openforis.collect.ui.component.input.NumericAttributeRenderer;
 	import org.openforis.collect.ui.component.input.NumericInputField;
@@ -53,8 +53,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateValue():void {
-			var updReqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
-			var updateValueOp:RecordUpdateRequestProxy = view.numericInputField.presenter.createValueUpdateRequest();
+			var updReqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
+			var updateValueOp:NodeUpdateRequestProxy = view.numericInputField.presenter.createValueUpdateRequest();
 			updReqSet.addRequest(updateValueOp);
 			var updateUnitOp:FieldUpdateRequestProxy = createUpdateUnitOperation();
 			if ( updateUnitOp != null ) {

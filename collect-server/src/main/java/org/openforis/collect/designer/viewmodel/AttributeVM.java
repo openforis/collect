@@ -18,6 +18,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.zkoss.bind.Binder;
@@ -141,6 +142,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@GlobalCommand
 	public void applyChangesToEditedCheck(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( editedCheck != null && checkCanLeaveForm() ) {
+			if ( editingNewCheck ) {
+				editedItem.addCheck(editedCheck);
+			}
 			closeCheckEditPopUp(binder);
 			editedCheck = null;
 			initChecks();
@@ -152,9 +156,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	public void cancelChangesToEditedCheck(@ContextParam(ContextType.BINDER) Binder binder) {
 		//TODO confirm if there are not committed changes 
 		if ( editedCheck != null ) {
-			if ( editingNewCheck ) {
-				editedItem.removeCheck(editedCheck);
-			}
 			closeCheckEditPopUp(binder);
 			editedCheck = null;
 		}
@@ -329,7 +330,11 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 
 	public List<CheckType> getCheckTypes() {
 		CheckType[] values = CheckType.values();
-		return Arrays.asList(values);
+		List<CheckType> list = new ArrayList<CheckType>(Arrays.asList(values));
+		if ( !(editedItem instanceof CoordinateAttributeDefinition) ) {
+			list.remove(CheckType.DISTANCE);
+		}
+		return list;
 	}
 	
 	public String getCheckTypeLabel(Check<?> check) {

@@ -1,26 +1,28 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
-  <grid class="inner">
-    <columns>
-      <column width="150px" />
-      <column />
-    </columns>
-    <rows>
-      <row>
-        <label
-          value="${labels.survey.schema.attribute.numeric.type_label}:" />
-        <cell>
-          <radiogroup selectedItem="@bind(fx.type)"
-            onCheck="@command('applyChanges')">
-            <radio
-              label="${labels.survey.schema.attribute.numeric.type.integer}"
-              value="INTEGER" />
-            <radio
-              label="${labels.survey.schema.attribute.numeric.type.real}"
-              value="REAL" />
-          </radiogroup>
-        </cell>
-      </row>
-    </rows>
-  </grid>
+	<grid class="inner">
+		<columns>
+			<column width="150px" />
+			<column />
+		</columns>
+		<rows>
+			<row>
+				<label
+					value="${labels.survey.schema.attribute.numeric.type_label}:" />
+				<cell>
+					<radiogroup selectedItem="@bind(fx.type)"
+						onCheck="@command('applyChanges')">
+						<radio 
+							disabled="@load(vm.typeChangeDisabled)"
+							label="${labels.survey.schema.attribute.numeric.type.integer}"
+							value="INTEGER" />
+						<radio
+							disabled="@load(vm.typeChangeDisabled)"
+							label="${labels.survey.schema.attribute.numeric.type.real}"
+							value="REAL" />
+					</radiogroup>
+				</cell>
+			</row>
+		</rows>
+	</grid>
 </zk>

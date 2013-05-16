@@ -4,8 +4,8 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.NodeDeleteRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.NodeDeleteRequest;
 import org.openforis.idm.model.Node;
 
 /**
@@ -13,16 +13,16 @@ import org.openforis.idm.model.Node;
  * @author S. Ricci
  *
  */
-public class NodeDeleteRequestProxy extends RecordUpdateRequestProxy<NodeDeleteRequest> {
+public class NodeDeleteRequestProxy extends NodeUpdateRequestProxy<NodeDeleteRequest> {
 	
 	private Integer nodeId;
 
 	@Override
-	public NodeDeleteRequest toUpdateRequest(CollectRecord record) {
-		NodeDeleteRequest request = new RecordUpdateRequest.NodeDeleteRequest();
+	public NodeDeleteRequest toNodeUpdateOptions(CollectRecord record) {
+		NodeDeleteRequest result = new NodeUpdateRequest.NodeDeleteRequest();
 		Node<?> node = record.getNodeByInternalId(nodeId);
-		request.setNode(node);
-		return request;
+		result.setNode(node);
+		return result;
 	}
 
 	public Integer getNodeId() {

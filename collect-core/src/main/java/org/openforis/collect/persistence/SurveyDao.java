@@ -1,7 +1,6 @@
 package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
-import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
 import java.util.ArrayList;
@@ -112,10 +111,11 @@ public class SurveyDao extends SurveyBaseDao {
 		return surveys;
 	}
 
-	public void clearModel() {
-		Factory jf = getJooqFactory();
-		jf.delete(OFC_RECORD).execute();
-		jf.delete(OFC_SURVEY).execute();
+	public void delete(int id) {
+		DialectAwareJooqFactory jf = getJooqFactory();
+		jf.delete(OFC_SURVEY)
+			.where(OFC_SURVEY.ID.equal(id))
+			.execute();
 	}
 
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {

@@ -6,7 +6,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.util.StringUtil;
@@ -78,7 +78,7 @@ package org.openforis.collect.presenter {
 			r.nodeId = _view.attribute.id;
 			r.fieldIndex = QUALIFIER_FIELD_IDX;
 			r.value = value;
-			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
 			dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		

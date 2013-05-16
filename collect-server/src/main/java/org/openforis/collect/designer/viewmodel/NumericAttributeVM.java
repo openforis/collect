@@ -8,11 +8,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Precision;
+import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -23,6 +28,7 @@ import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Window;
 
 /**
@@ -31,6 +37,9 @@ import org.zkoss.zul.Window;
  */
 public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> {
 
+	@WireVariable
+	private SurveyManager surveyManager;
+	
 	protected List<Precision> precisions;
 	protected Precision selectedPrecision;
 	private boolean editingNewPrecision;
@@ -178,6 +187,25 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 	protected void moveSelectedPrecision(int indexTo) {
 		editedItem.movePrecisionDefinition(selectedPrecision, indexTo);
 		initPrecisions();
+	}
+	
+	public boolean isTypeChangeDisabled() {
+		NodeDefinition oldNodeDefn = getOldNodeDefinition();
+		return oldNodeDefn != null;
+	}
+	
+	protected NodeDefinition getOldNodeDefinition() {
+		SessionStatus sessionStatus = getSessionStatus();
+		Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
+		if ( publishedSurveyId != null ) {
+			CollectSurvey publishedSurvey = surveyManager.getById(publishedSurveyId);
+			Schema schema = publishedSurvey.getSchema();
+			int nodeId = editedItem.getId();
+			NodeDefinition oldDefn = schema.getDefinitionById(nodeId);
+			return oldDefn;
+		} else {
+			return null;
+		}
 	}
 	
 	@DependsOn({"precisions","selectedPrecision"})

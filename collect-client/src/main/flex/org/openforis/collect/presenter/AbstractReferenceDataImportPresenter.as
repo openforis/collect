@@ -22,7 +22,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
-	import org.openforis.collect.model.proxy.AbstractSummariesProxy;
 	import org.openforis.collect.ui.component.datagrid.PaginationBar;
 	import org.openforis.collect.ui.view.AbstractReferenceDataImportView;
 	import org.openforis.collect.util.AlertUtil;
@@ -94,6 +93,9 @@ package org.openforis.collect.presenter {
 			_fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 			
 			_view.importButton.addEventListener(MouseEvent.CLICK, importButtonClickHandler);
+			if (_view.exportButton != null ) {
+				_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			}
 			_view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
 			if ( _view.paginationBar != null ) {
 				_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
@@ -130,16 +132,16 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected function exportButtonClickHandler(event:MouseEvent):void {
+			//to be implemented in sub-classes
+		}
+		
 		protected function browseFileToImport():void {
 			_fileReference.browse([_fileFilter]);
 		}
 		
 		protected function checkCanImport():Boolean {
 			return true;
-		}
-		
-		protected function exportButtonClickHandler(event:MouseEvent):void {
-			//TODO
 		}
 		
 		protected function cancelClickHandler(event:MouseEvent):void {

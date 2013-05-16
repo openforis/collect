@@ -4,25 +4,25 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.MissingValueApproveRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.MissingValueApproveRequest;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class MissingValueApproveRequestProxy extends RecordUpdateRequestProxy<MissingValueApproveRequest> {
+public class MissingValueApproveRequestProxy extends NodeUpdateRequestProxy<MissingValueApproveRequest> {
 	
 	private Integer parentEntityId;
 	private String nodeName;
 	
 	@Override
-	public MissingValueApproveRequest toUpdateRequest(CollectRecord record) {
-		MissingValueApproveRequest request = new RecordUpdateRequest.MissingValueApproveRequest();
-		request.setParentEntityId(parentEntityId);
-		request.setNodeName(nodeName);
-		return request;	
+	public MissingValueApproveRequest toNodeUpdateOptions(CollectRecord record) {
+		MissingValueApproveRequest opts = new NodeUpdateRequest.MissingValueApproveRequest();
+		opts.setParentEntityId(parentEntityId);
+		opts.setNodeName(nodeName);
+		return opts;	
 	}
 	
 	public Integer getParentEntityId() {

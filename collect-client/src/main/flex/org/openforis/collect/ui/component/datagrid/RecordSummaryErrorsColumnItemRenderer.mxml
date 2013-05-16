@@ -24,13 +24,20 @@
 							tempToolTip = Message.get("list.errorsToolTipEntry", [record.errors, record.skipped]);
 							break;
 						case CollectRecord$Step.CLEANSING:
+							tempToolTip = Message.get("list.errorsToolTipCleansing", [record.errors, record.missing]);
+							break;
 						case CollectRecord$Step.ANALYSIS:
-							tempToolTip = Message.get("list.errorsToolTipCleansing", [record.errors, record.missingErrors]);
+							if ( record.errors > 0 ) {
+								tempToolTip = Message.get("list.errorsToolTipAnalysis.invalidAndMissingValues", [record.errors, record.missing]);
+							} else {
+								tempToolTip = Message.get("list.errorsToolTipAnalysis.missingValues", [record.missing]);
+							}
 							break;
 					}
 				}
 				_toolTip = tempToolTip;
 			}
+			
 		]]>
 	</fx:Script>
 	

@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.form;
 
+import liquibase.util.StringUtils;
+
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 
 /**
@@ -17,10 +19,10 @@ public class DistanceCheckFormObject extends CheckFormObject<DistanceCheck> {
 	@Override
 	public void saveTo(DistanceCheck dest, String languageCode) {
 		super.saveTo(dest, languageCode);
-		dest.setDestinationPointExpression(destinationPointExpression);
-		dest.setMaxDistanceExpression(maxDistanceExpression);
-		dest.setMinDistanceExpression(minDistanceExpression);
-		dest.setSourcePointExpression(sourcePointExpression);
+		dest.setDestinationPointExpression(StringUtils.trimToNull(destinationPointExpression));
+		dest.setMaxDistanceExpression(StringUtils.trimToNull(maxDistanceExpression));
+		dest.setMinDistanceExpression(StringUtils.trimToNull(minDistanceExpression));
+		dest.setSourcePointExpression(StringUtils.trimToNull(sourcePointExpression));
 	}
 	
 	@Override

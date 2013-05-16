@@ -9,10 +9,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
+	import org.openforis.collect.model.proxy.EntityChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -69,7 +69,7 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null && _view.attribute != null || _view.attributes != null) {
-				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
+				var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				if ( nodeUpdated(responseSet) ) {
 					updateView();
 				} else if ( parentEntityUpdated(responseSet) ) {
@@ -78,10 +78,10 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function nodeUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
-			for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
-				if ( response is AttributeUpdateResponseProxy) {
-					var attrResp:AttributeUpdateResponseProxy = AttributeUpdateResponseProxy(response);
+		protected function nodeUpdated(responseSet:NodeChangeSetProxy):Boolean {
+			for each (var change:NodeChangeProxy in responseSet.changes) {
+				if ( change is AttributeChangeProxy) {
+					var attrResp:AttributeChangeProxy = AttributeChangeProxy(change);
 					if (_view.attribute != null && _view.attribute.id == attrResp.nodeId ||
 					 	_view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", attrResp.nodeId) ) {
 						return true;
@@ -91,9 +91,9 @@ package org.openforis.collect.presenter {
 			return false;
 		}
 		
-		protected function parentEntityUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
-			for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
-				if ( response is EntityUpdateResponseProxy && EntityUpdateResponseProxy(response).nodeId == _view.parentEntity.id ) {
+		protected function parentEntityUpdated(responseSet:NodeChangeSetProxy):Boolean {
+			for each (var change:NodeChangeProxy in responseSet.changes) {
+				if ( change is EntityChangeProxy && EntityChangeProxy(change).nodeId == _view.parentEntity.id ) {
 					return true;
 				}
 			}

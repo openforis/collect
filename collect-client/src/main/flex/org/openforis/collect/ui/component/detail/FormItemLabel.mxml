@@ -68,19 +68,20 @@
 		]]>
 	</fx:Script>
 	
-	<s:Label id="numberLabel"
-			 styleName="bold"
-			 width="30"
-			 visible="{_numberLabelText != null}"
-			 includeInLayout="{_numberLabelText != null}"
-			 text="{_numberLabelText}"
-			 />
-			
-	<s:Label id="instanceLabel"
-			 styleName="bold"
-			 width="100%"
-			 text="{_instanceLabelText}"
-			 />
+	<s:HGroup gap="5">
+		<s:Label id="numberLabel"
+				 styleName="bold"
+				 minWidth="25"
+				 visible="{_numberLabelText != null}"
+				 includeInLayout="{_numberLabelText != null}"
+				 text="{_numberLabelText}"
+				 />
+				
+		<s:Label id="instanceLabel"
+				 styleName="bold"
+				 text="{_instanceLabelText}"
+				 />
+	</s:HGroup>
 	
 	<s:Group id="descriptionIconContainer"
 			 width="20"

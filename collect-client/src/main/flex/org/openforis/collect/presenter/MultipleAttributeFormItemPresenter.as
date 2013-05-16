@@ -10,10 +10,10 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
-	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
+	import org.openforis.collect.model.proxy.EntityChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -46,10 +46,10 @@ package org.openforis.collect.presenter
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			super.updateResponseReceivedHandler(event);
 			if(_view.parentEntity != null) {
-				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
-				for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
-					if( response is EntityUpdateResponseProxy && 
-							EntityUpdateResponseProxy(response).nodeId == _view.parentEntity.id) {
+				var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var response:NodeChangeProxy in responseSet.changes) {
+					if( response is EntityChangeProxy && 
+							EntityChangeProxy(response).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						break;
@@ -94,7 +94,7 @@ package org.openforis.collect.presenter
 				var r:AttributeAddRequestProxy = new AttributeAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
 				r.nodeName = view.attributeDefinition.name;
-				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+				var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
 				ClientFactory.dataClient.updateActiveRecord(reqSet, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = view.attributeDefinition.getInstanceOrHeadingLabelText();

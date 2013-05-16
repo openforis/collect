@@ -190,8 +190,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	protected boolean isDuplicateLocation(SamplingDesignLine line1, SamplingDesignLine line2) throws ParsingException {
 		List<String> line1LevelCodes = line1.getLevelCodes();
 		List<String> line2LevelCodes = line2.getLevelCodes();
-		if ( line1.getX().equals(line2.getX()) && 
-				line1.getY().equals(line2.getY()) ) {
+		if ( line1.hasEqualsLocation(line2) ) {
 			if ( line2LevelCodes.size() == line1LevelCodes.size()) {
 				return true;
 			} else {

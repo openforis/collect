@@ -5,16 +5,17 @@ package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.FieldSymbol;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.FieldUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.FieldUpdateRequest;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Field;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class FieldUpdateRequestProxy extends RecordUpdateRequestProxy<FieldUpdateRequest> {
+public class FieldUpdateRequestProxy extends NodeUpdateRequestProxy<FieldUpdateRequest> {
 	
 	private Integer nodeId;
 	private int fieldIndex;
@@ -23,15 +24,15 @@ public class FieldUpdateRequestProxy extends RecordUpdateRequestProxy<FieldUpdat
 	protected FieldSymbol symbol;
 	
 	@Override
-	public FieldUpdateRequest toUpdateRequest(CollectRecord record) {
-		FieldUpdateRequest request = new RecordUpdateRequest.FieldUpdateRequest();
+	public FieldUpdateRequest toNodeUpdateOptions(CollectRecord record) {
+		FieldUpdateRequest opts = new NodeUpdateRequest.FieldUpdateRequest();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		request.setAttribute(attribute);
-		request.setFieldIndex(fieldIndex);
-		request.setValue(value);
-		request.setSymbol(symbol);
-		request.setRemarks(remarks);
-		return request;	
+		Field<?> field = attribute.getField(fieldIndex);
+		opts.setField(field);
+		opts.setValue(value);
+		opts.setSymbol(symbol);
+		opts.setRemarks(remarks);
+		return opts;	
 	}
 	
 	public Integer getNodeId() {

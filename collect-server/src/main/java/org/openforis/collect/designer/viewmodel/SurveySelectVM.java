@@ -62,11 +62,15 @@ public class SurveySelectVM extends BaseVM {
 	public void editSelectedSurvey() throws IOException {
 		CollectSurvey surveyWork = loadSelectedSurvey();
 		SessionStatus sessionStatus = getSessionStatus();
-		if ( selectedSurvey.isPublished() && ! selectedSurvey.isWorking() ) {
-			sessionStatus.setPublishedSurveyId(selectedSurvey.getId());
-		} else {
-			sessionStatus.setPublishedSurveyId(null);
+		Integer publishedSurveyId = null;
+		if ( selectedSurvey.isPublished() ) {
+			if ( selectedSurvey.isWorking() ) {
+				publishedSurveyId = selectedSurvey.getPublishedSurveyId();
+			} else {
+				publishedSurveyId = selectedSurvey.getId();
+			}
 		}
+		sessionStatus.setPublishedSurveyId(publishedSurveyId);
 		sessionStatus.setSurvey(surveyWork);
 		sessionStatus.setCurrentLanguageCode(null);
 		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
@@ -94,7 +98,8 @@ public class SurveySelectVM extends BaseVM {
 	@Command
 	public void publishSelectedSurvey() throws IOException {
 		final CollectSurvey survey = loadSelectedSurvey();
-		if ( validateSurvey(survey) ) {
+		final CollectSurvey publishedSurvey = selectedSurvey.isPublished() ? surveyManager.getByUri(survey.getUri()): null;
+		if ( validateSurvey(survey, publishedSurvey) ) {
 			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
@@ -104,9 +109,38 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 	
-	protected boolean validateSurvey(CollectSurvey survey) {
+	@Command
+	public void deleteSelectedSurvey() {
+		String messageKey;
+		if ( selectedSurvey.isWorking() ) {
+			if ( selectedSurvey.isPublished() ) {
+				messageKey = "survey.delete.published_work.confirm";
+			} else {
+				messageKey = "survey.delete.work.confirm";
+			}
+		} else {
+			messageKey = "survey.delete.confirm";
+		}
+		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performSelectedSurveyDeletion();
+			}
+		}, messageKey, new String[]{selectedSurvey.getName()});
+	}
+	
+	protected void performSelectedSurveyDeletion() {
+		if ( selectedSurvey.isWorking() ) {
+			surveyManager.deleteSurveyWork(selectedSurvey.getId());
+		} else {
+			surveyManager.deleteSurvey(selectedSurvey.getId());
+		}
+		notifyChange("surveySummaries");
+	}
+
+	protected boolean validateSurvey(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
 		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
-		List<SurveyValidationResult> validationResults = surveyValidator.validateSurvey(survey);
+		List<SurveyValidationResult> validationResults = surveyValidator.validateSurveyForPublishing(oldPublishedSurvey, survey);
 		if ( validationResults.isEmpty() ) {
 			return true;
 		} else {
@@ -114,8 +148,9 @@ public class SurveySelectVM extends BaseVM {
 			return false;
 		}
 	}
-
-	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
+	
+	@GlobalCommand
+	public void openValidationResultsPopUp(@BindingParam("validationResults") List<SurveyValidationResult> validationResults) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("validationResults", validationResults);
 		validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);

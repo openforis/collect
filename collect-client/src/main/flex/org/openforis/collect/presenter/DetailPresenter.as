@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.IList;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -49,6 +50,7 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
 			_view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
+			_view.autoSaveCheckBox.addEventListener(MouseEvent.CLICK, autoSaveCheckBoxClickHandler);
 			_view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
 			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
@@ -92,6 +94,9 @@ package org.openforis.collect.presenter {
 				_view.rejectButton.label = step == CollectRecord$Step.ANALYSIS ? Message.get("edit.unlock"): Message.get("edit.reject");
 			}
 			_view.saveButton.visible = canSave;
+			_view.updateStatusLabel.text = null;
+			_view.autoSaveCheckBox.visible = canSave;
+			_view.updateStatusLabel.visible = canSave;
 			
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var form:FormContainer = null;
@@ -110,8 +115,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
-			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText()
+			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
 			_view.messageDisplay.show(Message.get("edit.recordSaved", [rootEntityLabel]));
+		}
+		
+		protected function autoSaveCheckBoxClickHandler(event:MouseEvent):void {
+			Application.autoSave = _view.autoSaveCheckBox.selected;
 		}
 		
 		protected function updateRecordKeyLabel(event:Event = null):void {
@@ -221,6 +230,7 @@ package org.openforis.collect.presenter {
 		internal function saveActiveRecordResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.activeRecord.showErrors();
 			Application.activeRecord.updated = false;
+			updateStatusLabel();
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.RECORD_SAVED);
 			eventDispatcher.dispatchEvent(applicationEvent);
 		}
@@ -252,7 +262,17 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			//update 
+			updateStatusLabel();
+		}
+		
+		protected function updateStatusLabel():void {
+			var updateMessageKey:String;
+			if ( Application.activeRecord.updated ) {
+				updateMessageKey = "edit.changes_not_saved";
+			} else {
+				updateMessageKey = "edit.all_changes_saved";
+			}
+			_view.updateStatusLabel.text = Message.get(updateMessageKey);			
 		}
 		
 		protected function stageKeyDownHandler(event:KeyboardEvent):void {
@@ -271,7 +291,6 @@ package org.openforis.collect.presenter {
 					return CollectRecord$Step.ANALYSIS;
 				default:
 					return null;
-					
 			}
 		}
 		

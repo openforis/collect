@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.form;
 
+import liquibase.util.StringUtils;
+
 import org.openforis.idm.metamodel.validation.UniquenessCheck;
 
 /**
@@ -14,7 +16,7 @@ public class UniquenessCheckFormObject extends CheckFormObject<UniquenessCheck> 
 	@Override
 	public void saveTo(UniquenessCheck dest, String languageCode) {
 		super.saveTo(dest, languageCode);
-		dest.setExpression(expression);
+		dest.setExpression(StringUtils.trimToNull(expression));
 	}
 	
 	@Override

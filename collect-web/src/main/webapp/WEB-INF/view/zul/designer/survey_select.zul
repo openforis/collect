@@ -81,21 +81,25 @@
       onClick="@command('editSelectedSurvey')"
       disabled="@load(vm.editingDisabled)" />
     
-    <button 
-      sclass="icon"
-      tooltiptext="${labels.surveys_list.import_export}"
-      image="/assets/images/import-export-small.png" 
-      popup="adminOptionsPopUp" />
-   </hlayout>
-
-  <menupopup id="adminOptionsPopUp">
-    <menuitem label="${labels.survey.export}"
-      disabled="@load(vm.exportDisabled)"
-      onClick="@command('exportSelectedSurvey')" />
-    <menuitem label="${labels.survey.import_survey.$}"
+    <button
+      label="${labels.survey.export}"
+      onClick="@command('exportSelectedSurvey')"
+      disabled="@load(vm.exportDisabled)" />
+    
+    <button
+      label="${labels.survey.import_survey.$}"
       onClick="@command('openSurveyImportPopUp')" />
-    <menuitem label="${labels.survey.publish.$}"
-      disabled="@load(vm.publishDisabled)"
-      onClick="@command('publishSelectedSurvey')" />
-  </menupopup>
+    
+     <button
+      label="${labels.survey.publish.$}"
+      onClick="@command('publishSelectedSurvey')"
+      disabled="@load(vm.publishDisabled)" />
+    	
+    <button
+      label="${labels.survey.delete.$}"
+      onClick="@command('deleteSelectedSurvey')"
+      disabled="@load(vm.editingDisabled)" />
+    
+   </hlayout>
+	
 </vbox>

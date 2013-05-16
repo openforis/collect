@@ -7,8 +7,8 @@ package org.openforis.collect.client {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	
 	/**
 	 * 
@@ -86,7 +86,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function updateActiveRecord(requestSet:RecordUpdateRequestSetProxy, resultHandler:Function = null, faultHandler:Function = null):void {
+		public function updateActiveRecord(requestSet:NodeUpdateRequestSetProxy, resultHandler:Function = null, faultHandler:Function = null):void {
+			requestSet.autoSave = Application.autoSave;
 			this._queueProcessor.appendOperation(requestSet, resultHandler, faultHandler, _updateActiveRecordOperation, requestSet);
 		}
 		
@@ -141,14 +142,14 @@ package org.openforis.collect.client {
 			if(lastCall != null) {
 				switch(lastCall.operation) {
 					case _updateActiveRecordOperation:
-						updateActiveRecordResultHandler(event, token as RecordUpdateRequestSetProxy);
+						updateActiveRecordResultHandler(event, token as NodeUpdateRequestSetProxy);
 						break;
 				}
 			}
 		}
 			
-		protected function updateActiveRecordResultHandler(event:ResultEvent, token:RecordUpdateRequestSetProxy):void {
-			var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
+		protected function updateActiveRecordResultHandler(event:ResultEvent, token:NodeUpdateRequestSetProxy):void {
+			var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 			Application.activeRecord.update(responseSet, token);
 		}
 

@@ -15,6 +15,14 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.csv.AutomaticColumnProvider;
+import org.openforis.collect.csv.ColumnProvider;
+import org.openforis.collect.csv.ColumnProviderChain;
+import org.openforis.collect.csv.DataTransformation;
+import org.openforis.collect.csv.ModelCsvWriter;
+import org.openforis.collect.csv.NodePositionColumnProvider;
+import org.openforis.collect.csv.PivotExpressionColumnProvider;
+import org.openforis.collect.csv.SingleAttributeColumnProvider;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -27,14 +35,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.expression.InvalidExpressionException;
-import org.openforis.idm.transform.AutomaticColumnProvider;
-import org.openforis.idm.transform.ColumnProvider;
-import org.openforis.idm.transform.ColumnProviderChain;
-import org.openforis.idm.transform.DataTransformation;
-import org.openforis.idm.transform.NodePositionColumnProvider;
-import org.openforis.idm.transform.PivotExpressionColumnProvider;
-import org.openforis.idm.transform.SingleAttributeColumnProvider;
-import org.openforis.idm.transform.csv.ModelCsvWriter;
 
 /**
  * 

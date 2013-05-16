@@ -4,29 +4,30 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.RemarksUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateRequest;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Field;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class RemarksUpdateRequestProxy extends RecordUpdateRequestProxy<RemarksUpdateRequest> {
+public class RemarksUpdateRequestProxy extends NodeUpdateRequestProxy<RemarksUpdateRequest> {
 	
 	private Integer nodeId;
 	private Integer fieldIndex;
 	private String remarks;
 	
 	@Override
-	public RemarksUpdateRequest toUpdateRequest(CollectRecord record) {
-		RemarksUpdateRequest request = new RecordUpdateRequest.RemarksUpdateRequest();
+	public RemarksUpdateRequest toNodeUpdateOptions(CollectRecord record) {
+		RemarksUpdateRequest o = new NodeUpdateRequest.RemarksUpdateRequest();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		request.setAttribute(attribute);
-		request.setFieldIndex(fieldIndex);
-		request.setRemarks(remarks);
-		return request;
+		Field<?> field = attribute.getField(fieldIndex);
+		o.setField(field);
+		o.setRemarks(remarks);
+		return o;
 	}
 
 	public Integer getNodeId() {

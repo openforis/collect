@@ -37,7 +37,7 @@ public class UITabSetProxy implements Proxy {
 
 	@ExternalizedProperty
 	public List<UITabProxy> getTabs() {
-		return UITabProxy.fromList(tabSet.getTabs());
+		return UITabProxy.fromTabList(tabSet.getTabs());
 	}
 
 }
