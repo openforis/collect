@@ -3,12 +3,10 @@ package org.openforis.collect.persistence.xml;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
@@ -38,6 +36,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class DataHandler extends DefaultHandler {
 	
+	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+	private static final String XML_DATE_TIME_FORMAT = "yyyy-MM-d'T'HH:mm:ss";
 	private static final String ATTRIBUTE_VERSION = "version";
 	private static final String ATTRIBUTE_MODIFIED_BY = "modified_by";
 	private static final String ATTRIBUTE_CREATED_BY = "created_by";
@@ -54,7 +54,7 @@ public class DataHandler extends DefaultHandler {
 	private List<NodeUnmarshallingError> failures;
 	private List<NodeUnmarshallingError> warnings;
 	private StringBuilder content;
-	protected Attributes attributes;
+	protected Map<String, String> attributes;
 	private CollectSurvey recordSurvey;
 	private CollectSurvey currentSurvey;
 	private int ignoreLevels;
@@ -98,7 +98,7 @@ public class DataHandler extends DefaultHandler {
 				startRecord(name, attributes);
 			} else {
 				this.content = new StringBuilder();
-				this.attributes = attributes;
+				this.attributes = createAttributesMap(attributes);
 				if ( node instanceof Entity ) {
 					startChildNode(name, attributes);
 				} else if ( node instanceof Attribute ) {
@@ -324,9 +324,9 @@ public class DataHandler extends DefaultHandler {
 	protected void setField(Field<?> fld) {
 		String value = getXmlValue();
 		fld.setValueFromString(value);
-		String remarks = attributes.getValue(ATTRIBUTE_REMARKS);
+		String remarks = attributes.get(ATTRIBUTE_REMARKS);
 		fld.setRemarks(remarks);
-		String s = attributes.getValue(ATTRIBUTE_SYMBOL);
+		String s = attributes.get(ATTRIBUTE_SYMBOL);
 		if ( StringUtils.isNotBlank(s) ) {
 			char c = s.charAt(0);
 			FieldSymbol fs = FieldSymbol.valueOf(c);
@@ -341,7 +341,7 @@ public class DataHandler extends DefaultHandler {
 	}
 
 	private Integer getNodeState() {
-		String state = attributes.getValue(ATTRIBUTE_STATE);
+		String state = attributes.get(ATTRIBUTE_STATE);
 		int stateInt = 0;
 		if ( state != null) {
 			stateInt = Integer.parseInt(state);
@@ -361,29 +361,41 @@ public class DataHandler extends DefaultHandler {
 	protected Date parseDateTime(String dateTime) {
 		Date result = null;
 		if(StringUtils.isNotBlank(dateTime)) {
-			try {
-				//try to parse datetime in xml format 
-				Calendar cal = DatatypeConverter.parseDateTime(dateTime);
-				result = cal.getTime();
-			} catch (Exception e) {
-				//try to parse datetime in another format 
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-				try {
-					result = sdf.parse(dateTime);
-				} catch (ParseException e1) {
+			result = parseDateTime(dateTime, XML_DATE_TIME_FORMAT);
+			if ( result == null ) {
+				result = parseDateTime(dateTime, DATE_TIME_FORMAT);
+				if ( result == null ) {
 					throw new IllegalArgumentException("Invalid format expected for datetime: " + dateTime);
 				}
 			}
 		}
 		return result;
 	}
+	
+	protected Date parseDateTime(String dateTime, String format) {
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		Date result = null;
+		try {
+			result = sdf.parse(dateTime);
+		} catch (ParseException e) {
+			//ignore
+		}
+		return result;
+	}
+
+	protected Map<String, String> createAttributesMap(Attributes attributes) {
+		HashMap<String, String> result = new HashMap<String, String>();
+		int length = attributes.getLength();
+		for ( int i = 0; i < length; i++) {
+			String qName = attributes.getQName(i);
+			String value = attributes.getValue(i);
+			result.put(qName, value);
+		}
+		return result;
+	}
 
 	public CollectRecord getRecord() {
 		return record;
-	}
-
-	public Attributes getAttributes() {
-		return attributes;
 	}
 
 	public List<NodeUnmarshallingError> getFailures() {
