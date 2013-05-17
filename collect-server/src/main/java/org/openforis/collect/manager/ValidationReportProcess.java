@@ -138,7 +138,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	protected void writeValidationReport(final CollectRecord record) throws IOException {
 		final ModelVersion version = record.getVersion();
 		Entity rootEntity = record.getRootEntity();
-		recordManager.addEmptyNodes(rootEntity);
+		record.addEmptyNodes(rootEntity);
 		rootEntity.traverse(new NodeVisitor() {
 			@Override
 			public void visit(Node<? extends NodeDefinition> node, int idx) {

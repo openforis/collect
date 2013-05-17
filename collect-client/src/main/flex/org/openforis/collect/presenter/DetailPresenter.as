@@ -26,7 +26,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.ErrorListPopUp;
 	import org.openforis.collect.ui.component.detail.FormContainer;
@@ -160,7 +159,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function performSaveActiveRecord():void {
-			_dataClient.saveActiveRecord(saveActiveRecordResultHandler, faultHandler, Application.autoSave);
+			_dataClient.saveActiveRecord(saveActiveRecordResultHandler, faultHandler);
 		}
 		
 		protected function submitButtonClickHandler(event:MouseEvent):void {

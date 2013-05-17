@@ -3,7 +3,6 @@ package org.openforis.collect.presenter {
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
-	import mx.collections.IList;
 	import mx.events.CollectionEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -11,13 +10,16 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.model.FieldSymbol;
+	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
@@ -74,12 +76,15 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attributes != null) {
-				var responses:IList = IList(event.result);
-				for each (var response:UpdateResponse in responses) {
-					var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", response.nodeId) as AttributeProxy;
-					if(attribute != null) {
-						updateView();
-						return;
+				var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var response:NodeChangeProxy in responseSet.changes) {
+					if ( response is AttributeChangeProxy ) {
+						var nodeId:int = AttributeChangeProxy(response).nodeId;
+						var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", nodeId) as AttributeProxy;
+						if(attribute != null) {
+							updateView();
+							return;
+						}
 					}
 				}
 			}
@@ -111,11 +116,12 @@ package org.openforis.collect.presenter {
 		override public function updateValue():void {
 			var text:String = textToRequestValue();
 			var removeAttributesOperations:ArrayCollection = new ArrayCollection();
-			var o:UpdateRequestOperation;
+			var r:NodeUpdateRequestProxy;
 			//remove old attributes
 			for each (var a:AttributeProxy in _view.attributes) {
-				o = getUpdateRequestOperation(UpdateRequestOperation$Method.DELETE, a.id);
-				removeAttributesOperations.addItem(o);
+				r = new NodeDeleteRequestProxy();
+				NodeDeleteRequestProxy(r).nodeId = a.id;
+				removeAttributesOperations.addItem(r);
 			}
 			//add new attributes
 			var addAttributesOperations:ArrayCollection = new ArrayCollection();
@@ -125,31 +131,31 @@ package org.openforis.collect.presenter {
 				var parts:Array = text.split(",");
 				if(parts.length == 1 && FieldProxy.isShortCutForReasonBlank(text)) {
 					symbol = FieldProxy.parseShortCutForReasonBlank(text);
-					o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, symbol, remarks);
-					addAttributesOperations.addItem(o);
+					r = createAttributeAddRequest(null, symbol, remarks);
+					addAttributesOperations.addItem(r);
 				} else {
 					for each (var part:String in parts) {
 						var trimmedPart:String = StringUtil.trim(part);
 						if(StringUtil.isNotBlank(trimmedPart)) {
-							o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, trimmedPart, null, remarks);
-							addAttributesOperations.addItem(o);
+							r = createAttributeAddRequest(trimmedPart, symbol, remarks);
+							addAttributesOperations.addItem(r);
 						}
 					}
 				}
 			} else if(StringUtil.isNotBlank(remarks)) {
-				o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN, null, null, remarks);
-				addAttributesOperations.addItem(o);
+				r = createAttributeAddRequest(null, null, remarks);
+				addAttributesOperations.addItem(r);
 			}
 			if ( addAttributesOperations.length == 0 ) {
 				//add empty attribute
-				o = getUpdateRequestOperation(UpdateRequestOperation$Method.ADD, NaN);
-				addAttributesOperations.addItem(o);
+				r = createAttributeAddRequest(null, null, remarks);
+				addAttributesOperations.addItem(r);
 			}
-			var operations:ArrayCollection = new ArrayCollection();
-			operations.addAll(removeAttributesOperations);
-			operations.addAll(addAttributesOperations);
-			var req:UpdateRequest = new UpdateRequest();
-			req.operations = operations;
+			var requests:ArrayCollection = new ArrayCollection();
+			requests.addAll(removeAttributesOperations);
+			requests.addAll(addAttributesOperations);
+			var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
+			req.requests = requests;
 			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
 		}
 		

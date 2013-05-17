@@ -1,14 +1,12 @@
 package org.openforis.collect.presenter {
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.util.StringUtil;
@@ -20,6 +18,8 @@ package org.openforis.collect.presenter {
 	 * */
 	public class FixedCodeInputFieldPresenter extends InputFieldPresenter {
 		
+		private static const QUALIFIER_FIELD_IDX:int = 1;
+
 		private var _view:FixedCodeInputField;
 		
 		public function FixedCodeInputFieldPresenter(inputField:FixedCodeInputField) {
@@ -74,15 +74,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function applyQualifier(value:String):void {
-			var o:UpdateRequestOperation = new UpdateRequestOperation();
-			o.method = UpdateRequestOperation$Method.UPDATE;
-			o.parentEntityId = _view.parentEntity.id;
-			o.nodeName = _view.attribute.name;
-			o.nodeId = _view.attribute.id;
-			o.fieldIndex = 1;
-			o.value = value;
-			var req:UpdateRequest = new UpdateRequest(o);
-			dataClient.updateActiveRecord(req, null, faultHandler);
+			var r:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
+			r.nodeId = _view.attribute.id;
+			r.fieldIndex = QUALIFIER_FIELD_IDX;
+			r.value = value;
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
+			dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		
 	}

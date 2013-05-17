@@ -13,15 +13,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.RecordLock;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
@@ -32,26 +27,11 @@ import org.openforis.collect.persistence.RecordLockedByActiveUserException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
-import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.EntityBuilder;
-import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.NodePointer;
-import org.openforis.idm.model.Record;
-import org.openforis.idm.model.Value;
-import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 public class RecordManager {
-	private final Log log = LogFactory.getLog(RecordManager.class);
+//	private final Log log = LogFactory.getLog(RecordManager.class);
 	
 	@Autowired
 	private RecordDao recordDao;
@@ -209,7 +189,7 @@ public class RecordManager {
 			recordDao.update( record );
 		}
 
-		applyDefaultValues(record);
+		record.applyDefaultValues();
 		
 		//change step and update the record
 		Step currentStep = record.getStep();
@@ -231,60 +211,6 @@ public class RecordManager {
 		recordDao.update( record );
 	}
 
-	/**
-	 * Applies default values on each descendant attribute of a record in which empty nodes have already been added.
-	 * Default values are applied only to "empty" attributes.
-	 * 
-	 * @param record
-	 * @throws InvalidExpressionException 
-	 */
-	public void applyDefaultValues(CollectRecord record) {
-		Entity rootEntity = record.getRootEntity();
-		applyDefaultValues(rootEntity);
-	}
-
-	/**
-	 * Applies default values on each descendant attribute of an Entity in which empty nodes have already been added.
-	 * Default values are applied only to "empty" attributes.
-	 * 
-	 * @param entity
-	 * @throws InvalidExpressionException 
-	 */
-	protected void applyDefaultValues(Entity entity) {
-		List<Node<?>> children = entity.getChildren();
-		for (Node<?> child: children) {
-			if ( child instanceof Attribute ) {
-				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
-				if ( attribute.isEmpty() ) {
-					applyDefaultValue(attribute);
-				}
-			} else if ( child instanceof Entity ) {
-				applyDefaultValues((Entity) child);
-			}
-		}
-	}
-
-	public <V extends Value> void applyDefaultValue(Attribute<?, V> attribute) {
-		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
-		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
-		if ( defaults != null && defaults.size() > 0 ) {
-			for (AttributeDefault attributeDefault : defaults) {
-				try {
-					V value = attributeDefault.evaluate(attribute);
-					if ( value != null ) {
-						attribute.setValue(value);
-						CollectRecord record = (CollectRecord) attribute.getRecord();
-						record.setDefaultValueApplied(attribute, true);
-						clearRelevanceRequiredStates(attribute);
-						clearValidationResults(attribute);
-					}
-				} catch (InvalidExpressionException e) {
-					log.warn("Error applying default value for attribute " + attributeDefn.getPath());
-				}
-			}
-		}
-	}
-	
 	@Transactional
 	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
@@ -305,7 +231,7 @@ public class RecordManager {
 		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		Entity rootEntity = record.getRootEntity();
-		addEmptyNodes(rootEntity);
+		record.addEmptyNodes(rootEntity);
 		record.updateDerivedStates();
 		record.updateRootEntityKeyValues();
 		record.updateEntityCounts();
@@ -315,18 +241,6 @@ public class RecordManager {
 		}
 	}
 	
-	public Entity addEntity(Entity parentEntity, String nodeName) {
-		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName);
-		addEmptyNodes(entity);
-		return entity;
-	}
-
-	public Entity addEntity(Entity parentEntity, String nodeName, int idx) {
-		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName, idx);
-		addEmptyNodes(entity);
-		return entity;
-	}
-	
 	public void moveNode(CollectRecord record, int nodeId, int index) {
 		Node<?> node = record.getNodeByInternalId(nodeId);
 		Entity parent = node.getParent();
@@ -334,183 +248,6 @@ public class RecordManager {
 		List<Node<?>> siblings = parent.getAll(name);
 		int oldIndex = siblings.indexOf(node);
 		parent.move(name, oldIndex, index);
-	}
-	
-	public void addEmptyNodes(Entity entity) {
-		Record record = entity.getRecord();
-		ModelVersion version = record.getVersion();
-		addEmptyEnumeratedEntities(entity);
-		EntityDefinition entityDefn = entity.getDefinition();
-		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
-		for (NodeDefinition childDefn : childDefinitions) {
-			if(version == null || version.isApplicable(childDefn)) {
-				String childName = childDefn.getName();
-				if(entity.getCount(childName) == 0) {
-					int toBeInserted = entity.getEffectiveMinCount(childName);
-					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
-						//insert at least one node
-						toBeInserted = 1;
-					}
-					addEmptyChildren(entity, childDefn, toBeInserted);
-				} else {
-					List<Node<?>> children = entity.getAll(childName);
-					for (Node<?> child : children) {
-						if(child instanceof Entity) {
-							addEmptyNodes((Entity) child);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	protected int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
-		String childName = childDefn.getName();
-		CollectSurvey survey = (CollectSurvey) entity.getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
-		int count = 0;
-		boolean multipleEntityFormLayout = childDefn instanceof EntityDefinition && childDefn.isMultiple() && 
-				uiOptions != null && uiOptions.getLayout((EntityDefinition) childDefn) == Layout.FORM;
-		if ( ! multipleEntityFormLayout ) {
-			while(count < toBeInserted) {
-				if(childDefn instanceof AttributeDefinition) {
-					Node<?> createNode = childDefn.createNode();
-					entity.add(createNode);
-				} else if(childDefn instanceof EntityDefinition ) {
-					addEntity(entity, childName);
-				}
-				count ++;
-			}
-		}
-		return count;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <V> void setFieldValue(Attribute<?,?> attribute, Object value, String remarks, FieldSymbol symbol, int fieldIdx){
-		if(fieldIdx < 0){
-			fieldIdx = 0;
-		}
-		Field<V> field = (Field<V>) attribute.getField(fieldIdx);
-		field.setValue((V)value);
-		field.setRemarks(remarks);
-		Character symbolChar = null;
-		if (symbol != null) {
-			symbolChar = symbol.getCode();
-		}
-		field.setSymbol(symbolChar);
-		CollectRecord record = (CollectRecord) attribute.getRecord();
-		record.setDefaultValueApplied(attribute, false);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <V extends Value> void setAttributeValue(Attribute<?,V> attribute, Object value, String remarks){
-		attribute.setValue((V)value);
-		Field<V> field = (Field<V>) attribute.getField(0);
-		field.setRemarks(remarks);
-		field.setSymbol(null);
-		CollectRecord record = (CollectRecord) attribute.getRecord();
-		record.setDefaultValueApplied(attribute, false);
-	}
-	
-	public Set<Attribute<?, ?>> clearValidationResults(Attribute<?,?> attribute){
-		Set<Attribute<?,?>> checkDependencies = attribute.getCheckDependencies();
-		clearValidationResults(checkDependencies);
-		return checkDependencies;
-	}
-
-	public void clearValidationResults(Set<Attribute<?, ?>> checkDependencies) {
-		for (Attribute<?, ?> attr : checkDependencies) {
-			attr.clearValidationResults();
-		}
-	}
-	
-	public Set<NodePointer> clearRelevanceRequiredStates(Node<?> node){
-		Set<NodePointer> relevantDependencies = node.getRelevantDependencies();
-		clearRelevantDependencies(relevantDependencies);
-		Set<NodePointer> requiredDependencies = node.getRequiredDependencies();
-		requiredDependencies.addAll(relevantDependencies);
-		clearRequiredDependencies(requiredDependencies);
-		return requiredDependencies;
-	}
-	
-	public void clearRelevantDependencies(Set<NodePointer> nodePointers) {
-		for (NodePointer nodePointer : nodePointers) {
-			Entity entity = nodePointer.getEntity();
-			entity.clearRelevanceState(nodePointer.getChildName());
-		}
-	}
-	
-	public void clearRequiredDependencies(Set<NodePointer> nodePointers) {
-		for (NodePointer nodePointer : nodePointers) {
-			Entity entity = nodePointer.getEntity();
-			entity.clearRequiredState(nodePointer.getChildName());
-		}
-	}
-	
-	private void addEmptyEnumeratedEntities(Entity parentEntity) {
-		Record record = parentEntity.getRecord();
-		CollectSurvey survey = (CollectSurvey) parentEntity.getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
-		ModelVersion version = record.getVersion();
-		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-		List<NodeDefinition> childDefinitions = parentEntityDefn.getChildDefinitions();
-		for (NodeDefinition childDefn : childDefinitions) {
-			if ( childDefn instanceof EntityDefinition && (version == null || version.isApplicable(childDefn)) ) {
-				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
-				boolean tableLayout = uiOptions == null || uiOptions.getLayout(childEntityDefn) == Layout.TABLE;
-				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable() && tableLayout) {
-					addEmptyEnumeratedEntities(parentEntity, childEntityDefn);
-				}
-			}
-		}
-	}
-
-	private void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enumerableEntityDefn) {
-		Record record = parentEntity.getRecord();
-		ModelVersion version = record.getVersion();
-		CodeAttributeDefinition enumeratingCodeDefn = enumerableEntityDefn.getEnumeratingKeyCodeAttribute(version);
-		if(enumeratingCodeDefn != null) {
-			String enumeratedEntityName = enumerableEntityDefn.getName();
-			CodeList list = enumeratingCodeDefn.getList();
-			List<CodeListItem> items = list.getItems();
-			for (int i = 0; i < items.size(); i++) {
-				CodeListItem item = items.get(i);
-				if(version == null || version.isApplicable(item)) {
-					String code = item.getCode();
-					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enumerableEntityDefn, enumeratingCodeDefn, code);
-					if( enumeratedEntity == null ) {
-						Entity addedEntity = addEntity(parentEntity, enumeratedEntityName, i);
-						//set the value of the key CodeAttribute
-						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn.getName(), 0);
-						addedCode.setValue(new Code(code));
-					} else {
-						parentEntity.move(enumeratedEntityName, enumeratedEntity.getIndex(), i);
-					}
-				}
-			}
-		}
-	}
-
-	private Entity getEnumeratedEntity(Entity parentEntity, EntityDefinition childEntityDefn, 
-			CodeAttributeDefinition enumeratingCodeAttributeDef, String value) {
-		List<Node<?>> children = parentEntity.getAll(childEntityDefn.getName());
-		for (Node<?> child : children) {
-			Entity entity = (Entity) child;
-			Code code = getCodeAttributeValue(entity, enumeratingCodeAttributeDef);
-			if(code != null && value.equals(code.getCode())) {
-				return entity;
-			}
-		}
-		return null;
-	}
-	
-	private Code getCodeAttributeValue(Entity entity, CodeAttributeDefinition def) {
-		Node<?> node = entity.get(def.getName(), 0);
-		if(node != null) {
-			return ((CodeAttribute)node).getValue();
-		} else {
-			return null;
-		}
 	}
 	
 	private void checkAllKeysSpecified(CollectRecord record) throws MissingRecordKeyException {
@@ -528,7 +265,6 @@ public class RecordManager {
 			}
 		}
 	}
-
 	
 	/* --- START OF LOCKING METHODS --- */
 	

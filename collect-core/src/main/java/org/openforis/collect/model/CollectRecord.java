@@ -1,35 +1,63 @@
 package org.openforis.collect.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
+import org.openforis.collect.model.NodeChange.AttributeChange;
+import org.openforis.collect.model.NodeChange.EntityChange;
+import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
+import org.openforis.idm.metamodel.RangeAttributeDefinition;
+import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextAttribute;
+import org.openforis.idm.model.Value;
+import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.InvalidExpressionException;
+import org.openforis.idm.model.expression.ModelPathExpression;
 
 /**
+ * 
  * @author G. Miceli
  * @author M. Togna
+ * @author S. Ricci
+ * 
  */
 public class CollectRecord extends Record {
 
@@ -143,7 +171,7 @@ public class CollectRecord extends Record {
 		initErrorCountInfo();
 	}
 
-	private void initErrorCountInfo() {
+	protected void initErrorCountInfo() {
 		minCountErrorCounts = new HashMap<Integer, Set<String>>();
 		minCountWarningCounts = new HashMap<Integer, Set<String>>();
 		maxCountErrorCounts = new HashMap<Integer, Set<String>>();
@@ -159,26 +187,6 @@ public class CollectRecord extends Record {
 		warnings = null;
 	}
 
-	public Node<?> deleteNode(Node<?> node) {
-		if(node.isDetached()) {
-			throw new IllegalArgumentException("Unable to delete a node already detached");
-		}
-		Entity parentEntity = node.getParent();
-		int index = node.getIndex();
-		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
-		removeValidationCounts(deletedNode.getInternalId());
-		return deletedNode;
-	}
-	
-	public void setErrorConfirmed(Attribute<?,?> attribute, boolean confirmed){
-		int fieldCount = attribute.getFieldCount();
-		
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
-			field.getState().set(CONFIRMED_ERROR_POSITION, confirmed);
-		}
-	}
-	
 	public boolean isErrorConfirmed(Attribute<?,?> attribute){
 		int fieldCount = attribute.getFieldCount();		
 		for( int i=0; i <fieldCount; i++ ){
@@ -190,24 +198,10 @@ public class CollectRecord extends Record {
 		return true;
 	}
 	
-	public void setMissingApproved(Entity parentEntity, String childName, boolean approved) {
-		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
-		childState.set(APPROVED_MISSING_POSITION, approved);
-	}
-	
 	public boolean isMissingApproved(Entity parentEntity, String childName){
 		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
 		return childState.get(APPROVED_MISSING_POSITION);
 	} 
-	
-	public void setDefaultValueApplied(Attribute<?, ?> attribute, boolean applied) {
-		int fieldCount = attribute.getFieldCount();
-		
-		for( int i=0; i <fieldCount; i++ ){
-			Field<?> field = attribute.getField(i);
-			field.getState().set(DEFAULT_APPLIED_POSITION, applied);
-		}
-	}
 	
 	public boolean isDefaultValueApplied(Attribute<?, ?> attribute) {
 		int fieldCount = attribute.getFieldCount();		
@@ -220,79 +214,6 @@ public class CollectRecord extends Record {
 		return true;
 	}
 
-	public void updateValidationMinCounts(Integer entityId, String childName, ValidationResultFlag flag) {
-		Set<String> errors = clearEntityValidationCounts(minCountErrorCounts, entityId, childName);
-		Set<String> warnings = clearEntityValidationCounts(minCountWarningCounts, entityId, childName);
-		switch (flag) {
-			case ERROR:
-				errors.add(childName);
-				break;
-			case WARNING:
-				warnings.add(childName);
-				break;
-			default:
-		}
-		this.missing = null;
-		this.missingErrors = null;
-		this.missingWarnings = null;
-		this.errors = null;
-		this.warnings = null;
-	}
-
-	public void updateValidationMaxCounts(Integer entityId, String childName, ValidationResultFlag flag) {
-		Set<String> errors = clearEntityValidationCounts(maxCountErrorCounts, entityId, childName);
-		Set<String> warnings = clearEntityValidationCounts(maxCountWarningCounts, entityId, childName);
-		switch(flag) {
-		case ERROR:
-			errors.add(childName);
-			break;
-		case WARNING:
-			warnings.add(childName);
-			break;
-		default:
-		}
-		this.errors = null;
-		this.warnings = null;
-	}
-	
-	public void updateValidationCounts(Integer attributeId, ValidationResults validationResults) {
-		removeValidationCounts(attributeId);
-		
-		int errorCounts = validationResults.getErrors().size();
-		int warningCounts = validationResults.getWarnings().size();
-		this.errorCounts.put(attributeId, errorCounts);
-		this.warningCounts.put(attributeId, warningCounts);
-		
-		errors = null;
-		warnings = null;
-	}
-	
-	public void updateSkippedCount(Integer attributeId) {
-		removeValidationCounts(attributeId);
-		skippedNodes.add(attributeId);
-		skipped = null;
-	}
-	
-	public void removeValidationCounts(Integer nodeId) {
-		Node<?> node = this.getNodeByInternalId(nodeId);
-		if(node instanceof Attribute<?, ?>) {
-			skippedNodes.remove(nodeId);
-			errorCounts.remove(nodeId);
-			warningCounts.remove(nodeId);
-		} else {
-			minCountErrorCounts.remove(nodeId);
-			maxCountErrorCounts.remove(nodeId);
-			minCountWarningCounts.remove(nodeId);
-			maxCountWarningCounts.remove(nodeId);
-		}
-		skipped = null;
-		missing = null;
-		missingErrors = null;
-		missingWarnings = null;
-		errors = null;
-		warnings = null;
-	}
-	
 	public Step getStep() {
 		return step;
 	}
@@ -452,6 +373,28 @@ public class CollectRecord extends Record {
 		entityCounts = counts;
 	}
 	
+	/**
+	 * Returns first level entity definitions that have the attribute countInSummaryList set to true
+	 * 
+	 * @param rootEntityDefinition
+	 * @return 
+	 */
+	protected List<EntityDefinition> getCountableEntitiesInList() {
+		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		EntityDefinition rootEntityDefinition = getRootEntity().getDefinition();
+		List<NodeDefinition> childDefinitions = rootEntityDefinition .getChildDefinitions();
+		for (NodeDefinition childDefinition : childDefinitions) {
+			if(childDefinition instanceof EntityDefinition) {
+				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
+				String annotation = childDefinition.getAnnotation(UIOptions.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
+				if(annotation != null && Boolean.parseBoolean(annotation)) {
+					result.add(entityDefinition);
+				}
+			}
+		}
+		return result;
+	}
+	
 	public void setRootEntityKeyValues(List<String> keys) {
 		this.rootEntityKeyValues = keys;
 	}
@@ -464,49 +407,8 @@ public class CollectRecord extends Record {
 		this.entityCounts = counts;
 	}
 
-	private Set<String> clearEntityValidationCounts(Map<Integer, Set<String>> counts, Integer entityId, String childName) {
-		Set<String> set = counts.get(entityId);
-		if(set == null) {
-			set = new HashSet<String>();
-			counts.put(entityId, set);
-		} else {
-			set.remove(childName);
-		}
-		return set;
-	}
-	
-	private Integer getEntityValidationCount(Map<Integer, Set<String>> map) {
-		int count = 0;
-		for (Set<String> set : map.values()) {
-			count += set.size();
-		}
-		return count;
-	}
-	
-	private Integer getMissingCount(Map<Integer, Set<String>> minCounts) {
-		int result = 0;
-		Set<Integer> keySet = minCounts.keySet();
-		for (Integer id : keySet) {
-			Entity entity = (Entity) getNodeByInternalId(id);
-			Set<String> set = minCounts.get(id);
-			for (String childName : set) {
-				int missingCount = entity.getMissingCount(childName);
-				result += missingCount;
-			}
-		}
-		return result;
-	}
-	
-	private Integer getAttributeValidationCount(Map<Integer, Integer> map) {
-		int count = 0;
-		for (Integer i : map.values()) {
-			count += i;
-		}
-		return count;
-	}
-
 	/**
-	 * Clear all node states and all attribute symbols
+	 * Clear all node states
 	 */
 	public void clearNodeStates() {
 		Entity rootEntity = getRootEntity();
@@ -565,28 +467,849 @@ public class CollectRecord extends Record {
 		});
 	}
 	
-	/**
-	 * Returns first level entity definitions that have the attribute countInSummaryList set to true
-	 * 
-	 * @param rootEntityDefinition
-	 * @return 
-	 */
-	private List<EntityDefinition> getCountableEntitiesInList() {
-		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		EntityDefinition rootEntityDefinition = getRootEntity().getDefinition();
-		List<NodeDefinition> childDefinitions = rootEntityDefinition .getChildDefinitions();
-		for (NodeDefinition childDefinition : childDefinitions) {
-			if(childDefinition instanceof EntityDefinition) {
-				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(UIOptions.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
-				if(annotation != null && Boolean.parseBoolean(annotation)) {
-					result.add(entityDefinition);
+	public List<NodeChange<?>> deleteNode(
+			Node<?> node) {
+		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
+		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
+		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.prepareDeleteNodeChange(node);
+		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(node);
+		Stack<Node<?>> depthFirstDescendants = getDepthFirstDescendants(node);
+		while ( !depthFirstDescendants.isEmpty() ) {
+			Node<?> n = depthFirstDescendants.pop();
+			relevantDependencies.addAll(n.getRelevantDependencies());
+			requiredDependencies.addAll(n.getRequiredDependencies());
+			if ( n instanceof Attribute ) {
+				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
+			}
+			performNodeDeletion(n);
+		}
+		//clear dependencies
+		clearRelevantDependencies(relevantDependencies);
+		HashSet<NodePointer> relevanceRequiredDependencies = new HashSet<NodePointer>();
+		relevanceRequiredDependencies.addAll(relevantDependencies);
+		relevanceRequiredDependencies.addAll(requiredDependencies);
+		clearRequiredDependencies(relevanceRequiredDependencies);
+		clearValidationResults(checkDependencies);
+		
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
+		return changeMap.values();
+	}
+	
+	protected Node<?> performNodeDeletion(Node<?> node) {
+		if(node.isDetached()) {
+			throw new IllegalArgumentException("Unable to delete a node already detached");
+		}
+		Entity parentEntity = node.getParent();
+		int index = node.getIndex();
+		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
+		removeValidationCounts(deletedNode.getInternalId());
+		return deletedNode;
+	}
+	
+	protected Stack<Node<?>> getDepthFirstDescendants(Node<?> node) {
+		Stack<Node<?>> result = new Stack<Node<?>>();
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.push(node);
+		while(!stack.isEmpty()){
+			Node<?> n = stack.pop();
+			result.push(n);
+			if(n instanceof Entity){
+				Entity entity = (Entity) n;
+				List<Node<? extends NodeDefinition>> children = entity.getChildren();
+				for (Node<? extends NodeDefinition> child : children) {
+					stack.push(child);
 				}
 			}
 		}
 		return result;
 	}
 
+	public List<NodeChange<?>> applyDefaultValue(
+			Attribute<?, ?> attribute) {
+		performDefaultValueApply(attribute);
+		Map<Integer, Object> updatedFieldValues = createFieldValuesMap(attribute);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		AttributeChange change = changeMap.prepareAttributeChange(attribute);
+		change.setUpdatedFieldValues(updatedFieldValues);
+		
+		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(attribute);
+		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
+		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
+		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
+		checkDependencies.add(attribute);
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
+		return changeMap.values();
+	}
+
+	protected <V extends Value> void performDefaultValueApply(Attribute<?, V> attribute) {
+		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
+		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
+		if ( defaults != null && defaults.size() > 0 ) {
+			for (AttributeDefault attributeDefault : defaults) {
+				try {
+					V value = attributeDefault.evaluate(attribute);
+					if ( value != null ) {
+						attribute.setValue(value);
+						setDefaultValueApplied(attribute, true);
+						clearRelevanceRequiredDependencies(attribute);
+						clearValidationResults(attribute);
+					}
+				} catch (InvalidExpressionException e) {
+					throw new RuntimeException("Error applying default value for attribute " + attributeDefn.getPath());
+				}
+			}
+		}
+	}
+	
+	public List<NodeChange<?>> updateAttribute(
+			Attribute<? extends NodeDefinition, Value> attribute,
+			Value value, FieldSymbol symbol, String remarks) {
+		Entity parentEntity = attribute.getParent();
+
+		setErrorConfirmed(attribute, false);
+		performMissingValueApproval(parentEntity, attribute.getName(), false);
+		setDefaultValueApplied(attribute, false);
+		
+		attribute.setValue(value);
+		setSymbolOnFields(attribute, symbol);
+		setRemarksOnFields(attribute, remarks);
+		
+		Map<Integer, Object> updatedFieldValues = createFieldValuesMap(attribute);
+		
+		NodeChangeMap changeMap = new NodeChangeMap();
+		AttributeChange change = changeMap.prepareAttributeChange(attribute);
+		change.setUpdatedFieldValues(updatedFieldValues);
+		
+		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
+		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
+		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
+		checkDependencies.add(attribute);
+		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(attribute);
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		return changeMap.values();
+	}
+
+	public List<NodeChange<?>> updateField(
+			Field<?> field, Object rawValue, FieldSymbol symbol, String remarks) {
+		Attribute<?, ?> attribute = field.getAttribute();
+		Entity parentEntity = attribute.getParent();
+
+		setErrorConfirmed(attribute, false);
+		performMissingValueApproval(parentEntity, attribute.getName(), false);
+		setDefaultValueApplied(attribute, false);
+		int fieldIndex = field.getIndex();
+		Object value = parseFieldValue(parentEntity, attribute.getDefinition(), (String) rawValue, fieldIndex);
+		setFieldValue(field, value, remarks, symbol);
+		
+		NodeChangeMap changeMap = new NodeChangeMap();
+		AttributeChange change = changeMap.prepareAttributeChange(attribute);
+
+		Map<Integer, Object> updatedFieldValues = createFieldValuesMap(attribute);
+		change.setUpdatedFieldValues(updatedFieldValues);
+		
+		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
+		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
+		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
+		checkDependencies.add(attribute);
+		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(attribute);
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		return changeMap.values();
+	}
+	
+	public List<NodeChange<?>> addEntity(
+			Entity parentEntity, String nodeName) {
+		Entity createdNode = performEntityAdd(parentEntity, nodeName);
+		
+		performMissingValueApproval(parentEntity, nodeName, false);
+		
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.prepareAddEntityChange(createdNode);
+		
+		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(createdNode);
+		Set<Attribute<?, ?>> checkDependencies = null;
+		relevanceRequiredDependencies.add(new NodePointer(createdNode.getParent(), nodeName));
+		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(createdNode);
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		return changeMap.values();
+	}
+
+	public List<NodeChange<?>> addAttribute(
+			Entity parentEntity, String nodeName, Value value, FieldSymbol symbol, 
+			String remarks) {
+		Attribute<?, ?> createdNode = performAttributeAdd(parentEntity, nodeName, value, symbol, remarks);
+		
+		performMissingValueApproval(parentEntity, nodeName, false);
+		
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.prepareAddAttributeChange(createdNode);
+		
+		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(createdNode);
+		Set<Attribute<?, ?>> checkDependencies = null;
+		if(createdNode instanceof Attribute){
+			Attribute<?, ?> attribute = (Attribute<?, ?>) createdNode;
+			checkDependencies = clearValidationResults(attribute);
+			checkDependencies.add(attribute);
+		}
+		relevanceRequiredDependencies.add(new NodePointer(createdNode.getParent(), nodeName));
+		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(createdNode);
+		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		return changeMap.values();
+	}
+
+	public List<NodeChange<?>> updateRemarks(
+			Field<?> fld, String remarks) {
+		fld.setRemarks(remarks);
+		NodeChangeMap changeMap = new NodeChangeMap();
+		Attribute<?, ?> attribute = fld.getAttribute();
+		changeMap.prepareAttributeChange(attribute);
+		return changeMap.values();
+	}
+
+	public List<NodeChange<?>> approveMissingValue(
+			Entity parentEntity, String nodeName) {
+		return approveMissingValue(parentEntity, nodeName, true);
+	}
+
+	public List<NodeChange<?>> approveMissingValue(
+			Entity parentEntity, String nodeName, boolean approved) {
+		performMissingValueApproval(parentEntity, nodeName, approved);
+		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(parentEntity);
+		cardinalityNodePointers.add(new NodePointer(parentEntity, nodeName));
+		NodeChangeMap changeMap = new NodeChangeMap();
+		validateAll(changeMap, cardinalityNodePointers, false);
+		return changeMap.values();
+	}
+
+	public List<NodeChange<?>> confirmError(Attribute<?, ?> attribute) {
+		return confirmError(attribute, true);
+	}
+	
+	public List<NodeChange<?>> confirmError(Attribute<?, ?> attribute, boolean confirmed) {
+		Set<Attribute<?,?>> checkDependencies = new HashSet<Attribute<?,?>>();
+		setErrorConfirmed(attribute, confirmed);
+		attribute.clearValidationResults();
+		checkDependencies.add(attribute);
+		
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.prepareAttributeChange(attribute);
+		validateChecks(changeMap, checkDependencies);
+		return changeMap.values();
+	}
+	
+	protected Set<String> clearEntityValidationCounts(Map<Integer, Set<String>> counts, Integer entityId, String childName) {
+		Set<String> set = counts.get(entityId);
+		if(set == null) {
+			set = new HashSet<String>();
+			counts.put(entityId, set);
+		} else {
+			set.remove(childName);
+		}
+		return set;
+	}
+	
+	protected Integer getEntityValidationCount(Map<Integer, Set<String>> map) {
+		int count = 0;
+		for (Set<String> set : map.values()) {
+			count += set.size();
+		}
+		return count;
+	}
+	
+	protected Integer getMissingCount(Map<Integer, Set<String>> minCounts) {
+		int result = 0;
+		Set<Integer> keySet = minCounts.keySet();
+		for (Integer id : keySet) {
+			Entity entity = (Entity) getNodeByInternalId(id);
+			Set<String> set = minCounts.get(id);
+			for (String childName : set) {
+				int missingCount = entity.getMissingCount(childName);
+				result += missingCount;
+			}
+		}
+		return result;
+	}
+	
+	protected Integer getAttributeValidationCount(Map<Integer, Integer> map) {
+		int count = 0;
+		for (Integer i : map.values()) {
+			count += i;
+		}
+		return count;
+	}
+
+	protected List<NodePointer> createCardinalityNodePointers(Node<?> node){
+		List<NodePointer> nodePointers = new ArrayList<NodePointer>();
+		
+		Entity parent = node.getParent();
+		String childName = node.getName();
+		while(parent != null){
+			NodePointer nodePointer = new NodePointer(parent, childName );
+			nodePointers.add(nodePointer);
+			
+			childName = parent.getName();
+			parent = parent.getParent();
+		}
+		return nodePointers;
+	}
+
+	protected void prepareChange(NodeChangeMap changeMap, Set<NodePointer> relevanceRequiredDependencies, 
+			Collection<Attribute<?, ?>> checkDependencies, Collection<NodePointer> cardinalityDependencies) {
+		validateAll(changeMap, cardinalityDependencies, false);
+		validateAll(changeMap, relevanceRequiredDependencies, true);
+		validateChecks(changeMap, checkDependencies);
+	}
+
+	protected void validateChecks(NodeChangeMap changeMap,
+			Collection<Attribute<?, ?>> attributes) {
+		if (attributes != null) {
+			for (Attribute<?, ?> attr : attributes) {
+				validateAttribute(changeMap, attr);
+			}
+		}
+	}
+
+	protected void validateAttribute(NodeChangeMap changeMap,
+			Attribute<?, ?> attr) {
+		if ( !attr.isDetached() ) {
+			attr.clearValidationResults();
+			ValidationResults results = attr.validateValue();
+			AttributeChange change = changeMap.prepareAttributeChange(attr);
+			change.setValidationResults(results);
+		}
+	}
+
+	protected void validateChecks(NodeChangeMap changeMap,
+			Entity entity, String childName) {
+		List<Node<?>> children = entity.getAll(childName);
+		for ( Node<?> node : children ) {
+			if ( node instanceof Attribute ){
+				validateAttribute(changeMap, (Attribute<?, ?>) node);
+			}
+		}
+	}
+	
+	protected void validateAll(NodeChangeMap changeMap,
+			Collection<NodePointer> nodePointers, boolean validateChecks) {
+		if (nodePointers != null) {
+			for (NodePointer nodePointer : nodePointers) {
+				Entity parent = nodePointer.getEntity();
+				if ( parent != null && ! parent.isDetached()) {
+					validateCardinality(changeMap, nodePointer);
+					validateRelevanceState(changeMap, nodePointer);
+					validateRequirenessState(changeMap, nodePointer);
+					if ( validateChecks ) {
+						validateChecks(changeMap, parent, nodePointer.getChildName());
+					}
+				}
+			}
+		}
+	}
+
+	protected void validateCardinality(NodeChangeMap changeMap, NodePointer nodePointer) {
+		Entity entity = nodePointer.getEntity();
+		String childName = nodePointer.getChildName();
+		EntityChange change = changeMap.prepareEntityChange(entity);
+		change.setChildrenMinCountValidation(childName, entity.validateMinCount(childName));
+		change.setChildrenMaxCountValidation(childName, entity.validateMaxCount(childName));
+	}
+
+	protected void validateRelevanceState(
+			NodeChangeMap changeMap, NodePointer nodePointer) {
+		Entity entity = nodePointer.getEntity();
+		String childName = nodePointer.getChildName();
+		EntityChange change = changeMap.prepareEntityChange(entity);
+		change.setChildrenRelevance(childName, entity.isRelevant(childName));
+	}
+
+	protected void validateRequirenessState(
+			NodeChangeMap changeMap, NodePointer nodePointer) {
+		Entity entity = nodePointer.getEntity();
+		String childName = nodePointer.getChildName();
+		EntityChange change = changeMap.prepareEntityChange(entity);
+		change.setChildrenRequireness(childName, entity.isRequired(childName));
+	}
+
+	protected Attribute<?, ?> performAttributeAdd(Entity parentEntity, String nodeName, Value value, FieldSymbol symbol, String remarks) {
+		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
+		AttributeDefinition def = (AttributeDefinition) parentEntityDefn.getChildDefinition(nodeName);
+		@SuppressWarnings("unchecked")
+		Attribute<?, Value> attribute = (Attribute<?, Value>) def.createNode();
+		parentEntity.add(attribute);
+		if ( value != null ) {
+			attribute.setValue(value);
+		}
+		if(symbol != null || remarks != null) {
+			Character symbolChar = null;
+			if(symbol != null) {
+				symbolChar = symbol.getCode();
+			}
+			int fieldCount = attribute.getFieldCount();
+			for (int idx = 0; idx < fieldCount; idx++) {
+				Field<?> field = attribute.getField(idx);
+				field.setSymbol(symbolChar);
+				field.setRemarks(remarks);
+			}
+		}
+		return attribute;
+	}
+	
+	protected Object parseFieldValue(Entity parentEntity, AttributeDefinition def, String value, Integer fieldIndex) {
+		Object fieldValue = null;
+		if(StringUtils.isBlank(value)) {
+			return null;
+		}
+		if(def instanceof BooleanAttributeDefinition) {
+			fieldValue = Boolean.parseBoolean(value);
+		} else if(def instanceof CoordinateAttributeDefinition) {
+			if(fieldIndex != null) {
+				if(fieldIndex == 2) {
+					fieldValue = value;
+				} else {
+					fieldValue = Double.valueOf(value);
+				}
+			}
+		} else if(def instanceof DateAttributeDefinition) {
+			Integer val = Integer.valueOf(value);
+			fieldValue = val;
+		} else if(def instanceof NumberAttributeDefinition) {
+			NumericAttributeDefinition numberDef = (NumericAttributeDefinition) def;
+			if(fieldIndex != null && fieldIndex == 2) {
+				//unit id
+				fieldValue = Integer.parseInt(value);
+			} else {
+				NumericAttributeDefinition.Type type = numberDef.getType();
+				Number number = null;
+				switch(type) {
+					case INTEGER:
+						number = Integer.valueOf(value);
+						break;
+					case REAL:
+						number = Double.valueOf(value);
+						break;
+				}
+				if(number != null) {
+					fieldValue = number;
+				}
+			}
+		} else if(def instanceof RangeAttributeDefinition) {
+			if(fieldIndex != null && fieldIndex == 3) {
+				//unit id
+				fieldValue = Integer.parseInt(value);
+			} else {
+				RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) def).getType();
+				Number number = null;
+				switch(type) {
+					case INTEGER:
+						number = Integer.valueOf(value);
+						break;
+					case REAL:
+						number = Double.valueOf(value);
+						break;
+				}
+				if(number != null) {
+					fieldValue = number;
+				}
+			}
+		} else if(def instanceof TimeAttributeDefinition) {
+			fieldValue = Integer.valueOf(value);
+		} else {
+			fieldValue = value;
+		}
+		return fieldValue;
+	}
+	
+	
+	public Entity performEntityAdd(Entity parentEntity, String nodeName) {
+		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName);
+		addEmptyNodes(entity);
+		return entity;
+	}
+
+	public Entity addEntity(Entity parentEntity, String nodeName, int idx) {
+		Entity entity = EntityBuilder.addEntity(parentEntity, nodeName, idx);
+		addEmptyNodes(entity);
+		return entity;
+	}
+	
+	public void addEmptyNodes(Entity entity) {
+		ModelVersion version = getVersion();
+		addEmptyEnumeratedEntities(entity);
+		EntityDefinition entityDefn = entity.getDefinition();
+		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
+		for (NodeDefinition childDefn : childDefinitions) {
+			if(version == null || version.isApplicable(childDefn)) {
+				String childName = childDefn.getName();
+				if(entity.getCount(childName) == 0) {
+					int toBeInserted = entity.getEffectiveMinCount(childName);
+					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
+						//insert at least one node
+						toBeInserted = 1;
+					}
+					addEmptyChildren(entity, childDefn, toBeInserted);
+				} else {
+					List<Node<?>> children = entity.getAll(childName);
+					for (Node<?> child : children) {
+						if(child instanceof Entity) {
+							addEmptyNodes((Entity) child);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	protected void addEmptyEnumeratedEntities(Entity parentEntity) {
+		CollectSurvey survey = (CollectSurvey) parentEntity.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		ModelVersion version = getVersion();
+		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
+		List<NodeDefinition> childDefinitions = parentEntityDefn.getChildDefinitions();
+		for (NodeDefinition childDefn : childDefinitions) {
+			if ( childDefn instanceof EntityDefinition && (version == null || version.isApplicable(childDefn)) ) {
+				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
+				boolean tableLayout = uiOptions == null || uiOptions.getLayout(childEntityDefn) == Layout.TABLE;
+				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable() && tableLayout) {
+					addEmptyEnumeratedEntities(parentEntity, childEntityDefn);
+				}
+			}
+		}
+	}
+
+	protected void addEmptyEnumeratedEntities(Entity parentEntity, EntityDefinition enumerableEntityDefn) {
+		ModelVersion version = getVersion();
+		CodeAttributeDefinition enumeratingCodeDefn = enumerableEntityDefn.getEnumeratingKeyCodeAttribute(version);
+		if(enumeratingCodeDefn != null) {
+			String enumeratedEntityName = enumerableEntityDefn.getName();
+			CodeList list = enumeratingCodeDefn.getList();
+			List<CodeListItem> items = list.getItems();
+			for (int i = 0; i < items.size(); i++) {
+				CodeListItem item = items.get(i);
+				if(version == null || version.isApplicable(item)) {
+					String code = item.getCode();
+					Entity enumeratedEntity = getEnumeratedEntity(parentEntity, enumerableEntityDefn, enumeratingCodeDefn, code);
+					if( enumeratedEntity == null ) {
+						Entity addedEntity = addEntity(parentEntity, enumeratedEntityName, i);
+						//set the value of the key CodeAttribute
+						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn.getName(), 0);
+						addedCode.setValue(new Code(code));
+					} else {
+						parentEntity.move(enumeratedEntityName, enumeratedEntity.getIndex(), i);
+					}
+				}
+			}
+		}
+	}
+
+	protected Entity getEnumeratedEntity(Entity parentEntity, EntityDefinition childEntityDefn, 
+			CodeAttributeDefinition enumeratingCodeAttributeDef, String value) {
+		List<Node<?>> children = parentEntity.getAll(childEntityDefn.getName());
+		for (Node<?> child : children) {
+			Entity entity = (Entity) child;
+			Code code = getCodeAttributeValue(entity, enumeratingCodeAttributeDef);
+			if(code != null && value.equals(code.getCode())) {
+				return entity;
+			}
+		}
+		return null;
+	}
+	
+	private Code getCodeAttributeValue(Entity entity, CodeAttributeDefinition def) {
+		Node<?> node = entity.get(def.getName(), 0);
+		if(node != null) {
+			return ((CodeAttribute)node).getValue();
+		} else {
+			return null;
+		}
+	}
+	
+	protected int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
+		String childName = childDefn.getName();
+		CollectSurvey survey = (CollectSurvey) entity.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		int count = 0;
+		boolean multipleEntityFormLayout = childDefn instanceof EntityDefinition && childDefn.isMultiple() && 
+				uiOptions != null && uiOptions.getLayout((EntityDefinition) childDefn) == Layout.FORM;
+		if ( ! multipleEntityFormLayout ) {
+			while(count < toBeInserted) {
+				if(childDefn instanceof AttributeDefinition) {
+					Node<?> createNode = childDefn.createNode();
+					entity.add(createNode);
+				} else if(childDefn instanceof EntityDefinition ) {
+					performEntityAdd(entity, childName);
+				}
+				count ++;
+			}
+		}
+		return count;
+	}
+	
+	/**
+	 * Applies default values on each descendant attribute of a record in which empty nodes have already been added.
+	 * Default values are applied only to "empty" attributes.
+	 * 
+	 * @throws InvalidExpressionException 
+	 */
+	public void applyDefaultValues() {
+		Entity rootEntity = getRootEntity();
+		applyDefaultValues(rootEntity);
+	}
+
+	/**
+	 * Applies default values on each descendant attribute of an Entity in which empty nodes have already been added.
+	 * Default values are applied only to "empty" attributes.
+	 * 
+	 * @param entity
+	 * @throws InvalidExpressionException 
+	 */
+	protected void applyDefaultValues(Entity entity) {
+		List<Node<?>> children = entity.getChildren();
+		for (Node<?> child: children) {
+			if ( child instanceof Attribute ) {
+				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
+				if ( attribute.isEmpty() ) {
+					performDefaultValueApply(attribute);
+				}
+			} else if ( child instanceof Entity ) {
+				applyDefaultValues((Entity) child);
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <V> void setFieldValue(Field<V> field, Object value, String remarks, FieldSymbol symbol){
+		field.setValue((V)value);
+		field.setRemarks(remarks);
+		setFieldSymbol(field, symbol);
+	}
+	
+	protected <V> void setFieldSymbol(Field<V> field, FieldSymbol symbol){
+		Character symbolChar = null;
+		if (symbol != null) {
+			symbolChar = symbol.getCode();
+		}
+		field.setSymbol(symbolChar);
+	}
+	
+	public Set<NodePointer> clearRelevanceRequiredDependencies(Node<?> node){
+		Set<NodePointer> relevantDependencies = node.getRelevantDependencies();
+		clearRelevantDependencies(relevantDependencies);
+		Set<NodePointer> requiredDependencies = node.getRequiredDependencies();
+		requiredDependencies.addAll(relevantDependencies);
+		clearRequiredDependencies(requiredDependencies);
+		return requiredDependencies;
+	}
+	
+	public void clearRelevantDependencies(Set<NodePointer> nodePointers) {
+		for (NodePointer nodePointer : nodePointers) {
+			Entity entity = nodePointer.getEntity();
+			entity.clearRelevanceState(nodePointer.getChildName());
+		}
+	}
+	
+	public void clearRequiredDependencies(Set<NodePointer> nodePointers) {
+		for (NodePointer nodePointer : nodePointers) {
+			Entity entity = nodePointer.getEntity();
+			entity.clearRequiredState(nodePointer.getChildName());
+		}
+	}
+	
+	public Set<Attribute<?, ?>> clearValidationResults(Attribute<?,?> attribute){
+		Set<Attribute<?,?>> checkDependencies = attribute.getCheckDependencies();
+		clearValidationResults(checkDependencies);
+		return checkDependencies;
+	}
+
+	public void clearValidationResults(Set<Attribute<?, ?>> checkDependencies) {
+		for (Attribute<?, ?> attr : checkDependencies) {
+			attr.clearValidationResults();
+		}
+	}
+	
+	protected Map<Integer, Object> createFieldValuesMap(
+			Attribute<?, ?> attribute) {
+		Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
+		int fieldCount = attribute.getFieldCount();
+		for (int idx = 0; idx < fieldCount; idx ++) {
+			Field<?> field = attribute.getField(idx);
+			fieldValues.put(idx, field.getValue());
+		}
+		return fieldValues;
+	}
+
+	protected void setSymbolOnFields(
+			Attribute<? extends NodeDefinition, Value> attribute,
+			FieldSymbol symbol) {
+		for (Field<?> field : attribute.getFields()) {
+			setFieldSymbol(field, symbol);
+		}
+	}
+	
+	protected void setRemarksOnFields(
+			Attribute<? extends NodeDefinition, Value> attribute,
+			String remarks) {
+		for (Field<?> field : attribute.getFields()) {
+			field.setRemarks(remarks);
+		}
+	}
+
+	protected CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
+		try {
+			Record record = context.getRecord();
+			SurveyContext surveyContext = record.getSurveyContext();
+			ExpressionFactory expressionFactory = surveyContext.getExpressionFactory();
+			String parentExpr = def.getParentExpression();
+			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpr);
+			Node<?> parentNode = expression.evaluate(context, null);
+			if (parentNode != null && parentNode instanceof CodeAttribute) {
+				return (CodeAttribute) parentNode;
+			}
+		} catch (Exception e) {
+			// return null;
+		}
+		return null;
+	}
+
+	public CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
+		String adaptedCode = code.trim();
+		adaptedCode = adaptedCode.toUpperCase();
+		//remove initial zeros
+		adaptedCode = adaptedCode.replaceFirst("^0+", "");
+		adaptedCode = Pattern.quote(adaptedCode);
+
+		for (CodeListItem item : siblings) {
+			String itemCode = item.getCode();
+			Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$", Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(itemCode);
+			if(matcher.find()) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	public List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
+		List<CodeListItem> items = null;
+		if(StringUtils.isEmpty(def.getParentExpression())){
+			items = def.getList().getItems();
+		} else {
+			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
+			if(parentCodeAttribute!=null){
+				CodeListItem parentCodeListItem = parentCodeAttribute.getCodeListItem();
+				if(parentCodeListItem != null) {
+					//TODO exception if parent not specified
+					items = parentCodeListItem.getChildItems();
+				}
+			}
+		}
+		List<CodeListItem> result = new ArrayList<CodeListItem>();
+		if(items != null) {
+			ModelVersion version = getVersion();
+			for (CodeListItem item : items) {
+				if (version == null || version.isApplicable(item)) {
+					result.add(item);
+				}
+			}
+		}
+		return result;
+	}
+	
+	protected void setErrorConfirmed(Attribute<?,?> attribute, boolean confirmed){
+		int fieldCount = attribute.getFieldCount();
+		for( int i=0; i <fieldCount; i++ ){
+			Field<?> field = attribute.getField(i);
+			field.getState().set(CONFIRMED_ERROR_POSITION, confirmed);
+		}
+	}
+	
+	protected void performMissingValueApproval(Entity parentEntity, String childName, boolean approved) {
+		org.openforis.idm.model.State childState = parentEntity.getChildState(childName);
+		childState.set(APPROVED_MISSING_POSITION, approved);
+	}
+	
+	protected void setDefaultValueApplied(Attribute<?, ?> attribute, boolean applied) {
+		int fieldCount = attribute.getFieldCount();
+		
+		for( int i=0; i <fieldCount; i++ ){
+			Field<?> field = attribute.getField(i);
+			field.getState().set(DEFAULT_APPLIED_POSITION, applied);
+		}
+	}
+	
+	public void updateSkippedCount(Integer attributeId) {
+		removeValidationCounts(attributeId);
+		skippedNodes.add(attributeId);
+		skipped = null;
+	}
+	
+	public void updateValidationMinCounts(Integer entityId, String childName, ValidationResultFlag flag) {
+		Set<String> errors = clearEntityValidationCounts(minCountErrorCounts, entityId, childName);
+		Set<String> warnings = clearEntityValidationCounts(minCountWarningCounts, entityId, childName);
+		switch (flag) {
+		case ERROR:
+			errors.add(childName);
+			break;
+		case WARNING:
+			warnings.add(childName);
+			break;
+		default:
+		}
+		this.missing = null;
+		this.missingErrors = null;
+		this.missingWarnings = null;
+		this.errors = null;
+		this.warnings = null;
+	}
+
+	public void updateValidationMaxCounts(Integer entityId, String childName, ValidationResultFlag flag) {
+		Set<String> errors = clearEntityValidationCounts(maxCountErrorCounts, entityId, childName);
+		Set<String> warnings = clearEntityValidationCounts(maxCountWarningCounts, entityId, childName);
+		switch(flag) {
+		case ERROR:
+			errors.add(childName);
+			break;
+		case WARNING:
+			warnings.add(childName);
+			break;
+		default:
+		}
+		this.errors = null;
+		this.warnings = null;
+	}
+	
+	public void updateValidationCounts(Integer attributeId, ValidationResults validationResults) {
+		removeValidationCounts(attributeId);
+		
+		int errorCounts = validationResults.getErrors().size();
+		int warningCounts = validationResults.getWarnings().size();
+		this.errorCounts.put(attributeId, errorCounts);
+		this.warningCounts.put(attributeId, warningCounts);
+		
+		errors = null;
+		warnings = null;
+	}
+	
+	protected void removeValidationCounts(Integer nodeId) {
+		Node<?> node = this.getNodeByInternalId(nodeId);
+		if(node instanceof Attribute<?, ?>) {
+			skippedNodes.remove(nodeId);
+			errorCounts.remove(nodeId);
+			warningCounts.remove(nodeId);
+		} else {
+			minCountErrorCounts.remove(nodeId);
+			maxCountErrorCounts.remove(nodeId);
+			minCountWarningCounts.remove(nodeId);
+			maxCountWarningCounts.remove(nodeId);
+		}
+		skipped = null;
+		missing = null;
+		missingErrors = null;
+		missingWarnings = null;
+		errors = null;
+		warnings = null;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

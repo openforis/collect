@@ -15,16 +15,14 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.StringUtil;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SpeciesClient;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
-	import org.openforis.collect.i18n.Languages;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
 	import org.openforis.collect.ui.component.input.TaxonAutoCompletePopUp;
@@ -272,10 +270,10 @@ package org.openforis.collect.presenter {
 		
 		public function performSelectTaxon(taxonOccurrence:Object):void {
 			_lastSelectedTaxon = taxonOccurrence;
-			var req:UpdateRequest = new UpdateRequest();
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			//update code
 			view.codeTextInput.text = taxonOccurrence.code;
-			req.addOperation(view.codeTextInput.presenter.createUpdateValueOperation());
+			reqSet.addRequest(view.codeTextInput.presenter.createValueUpdateRequest());
 			
 			if ( ( taxonOccurrence != UNKNOWN_ITEM && taxonOccurrence != UNLISTED_ITEM )  || 
 				_lastSearchType != SEARCH_BY_SCIENTIFIC_NAME && _lastSearchType != SEARCH_BY_VERNACULAR_NAME ) {
@@ -288,11 +286,11 @@ package org.openforis.collect.presenter {
 				//update language variety
 				view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
 			}
-			req.addOperation(view.scientificNameTextInput.presenter.createUpdateValueOperation());
-			req.addOperation(view.vernacularNameTextInput.presenter.createUpdateValueOperation());
-			req.addOperation(view.languageAutocomplete.presenter.createUpdateValueOperation());
-			req.addOperation(view.languageVarietyTextInput.presenter.createUpdateValueOperation());
-			ClientFactory.dataClient.updateActiveRecord(req, null, faultHandler);
+			reqSet.addRequest(view.scientificNameTextInput.presenter.createValueUpdateRequest());
+			reqSet.addRequest(view.vernacularNameTextInput.presenter.createValueUpdateRequest());
+			reqSet.addRequest(view.languageAutocomplete.presenter.createValueUpdateRequest());
+			reqSet.addRequest(view.languageVarietyTextInput.presenter.createValueUpdateRequest());
+			ClientFactory.dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		
 		protected static function autoCompleteSearchResultHandler(event:ResultEvent, token:Object):void {

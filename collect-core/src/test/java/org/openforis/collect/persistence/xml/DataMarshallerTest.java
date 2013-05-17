@@ -120,7 +120,7 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 		EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
 		EntityBuilder.addValue(cluster, "region", new Code("001"));
 		CodeAttribute districtAttr = EntityBuilder.addValue(cluster, "district", new Code("XXX"));
-		record.setErrorConfirmed(districtAttr, true);
+		record.confirmError(districtAttr);
 		EntityBuilder.addValue(cluster, "crew_no", 10);
 		EntityBuilder.addValue(cluster, "map_sheet", "value 1");
 		EntityBuilder.addValue(cluster, "map_sheet", "value 2");

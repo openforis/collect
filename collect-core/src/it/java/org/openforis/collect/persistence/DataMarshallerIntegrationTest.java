@@ -125,13 +125,13 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 		EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
 		EntityBuilder.addValue(cluster, "region", new Code("001"));
 		CodeAttribute districtAttr = EntityBuilder.addValue(cluster, "district", new Code("XXX"));
-		record.setErrorConfirmed(districtAttr, true);
+		record.confirmError(districtAttr);
 		EntityBuilder.addValue(cluster, "crew_no", 10);
 		EntityBuilder.addValue(cluster, "map_sheet", "value 1");
 		EntityBuilder.addValue(cluster, "map_sheet", "value 2");
 		EntityBuilder.addValue(cluster, "vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
 		EntityBuilder.addValue(cluster, "gps_model", "TomTom 1.232");
-		record.setMissingApproved(cluster, "accessibility", true);
+		record.approveMissingValue(cluster, "accessibility");
 		{
 			Entity ts = EntityBuilder.addEntity(cluster, "time_study");
 			EntityBuilder.addValue(ts, "date", new Date(2011,2,14));
