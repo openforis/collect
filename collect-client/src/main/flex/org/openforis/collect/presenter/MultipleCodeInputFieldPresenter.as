@@ -76,10 +76,10 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attributes != null) {
-				var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
-				for each (var response:NodeChangeProxy in responseSet.changes) {
-					if ( response is AttributeChangeProxy ) {
-						var nodeId:int = AttributeChangeProxy(response).nodeId;
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if ( change is AttributeChangeProxy ) {
+						var nodeId:int = AttributeChangeProxy(change).nodeId;
 						var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", nodeId) as AttributeProxy;
 						if(attribute != null) {
 							updateView();

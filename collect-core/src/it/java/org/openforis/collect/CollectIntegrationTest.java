@@ -9,9 +9,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -37,9 +35,7 @@ public abstract class CollectIntegrationTest {
 	protected CollectSurvey loadSurvey() throws IdmlParseException, IOException  {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		SurveyIdmlBinder binder = new SurveyIdmlBinder(collectSurveyContext);
-		binder.addApplicationOptionsBinder(new UIOptionsBinder());
-		CollectSurvey survey = (CollectSurvey) binder.unmarshal(is);
+		CollectSurvey survey = surveyDao.unmarshalIdml(is);
 		survey.setName("archenland1");
 		return survey;
 	}

@@ -46,10 +46,10 @@ package org.openforis.collect.presenter
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			super.updateResponseReceivedHandler(event);
 			if(_view.parentEntity != null) {
-				var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
-				for each (var response:NodeChangeProxy in responseSet.changes) {
-					if( response is EntityChangeProxy && 
-							EntityChangeProxy(response).nodeId == _view.parentEntity.id) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if( change is EntityChangeProxy && 
+							EntityChangeProxy(change).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						break;

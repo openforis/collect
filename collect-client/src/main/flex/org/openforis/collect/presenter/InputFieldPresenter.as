@@ -301,10 +301,10 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
-				var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
-				for each (var response:NodeChangeProxy in responseSet.changes) {
-					if ( response is AttributeChangeProxy && 
-							AttributeChangeProxy(response).nodeId == _view.attribute.id) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if ( change is AttributeChangeProxy && 
+							AttributeChangeProxy(change).nodeId == _view.attribute.id) {
 						_view.changed = false
 						updateView();
 						return;

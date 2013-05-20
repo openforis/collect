@@ -74,8 +74,8 @@ package org.openforis.collect.presenter
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null) {
-				var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
-				for each (var change:NodeChangeProxy in responseSet.changes) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
 					if ( change is NodeChangeProxy && 
 							NodeChangeProxy(change).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();

@@ -149,8 +149,8 @@ package org.openforis.collect.client {
 		}
 			
 		protected function updateActiveRecordResultHandler(event:ResultEvent, token:NodeUpdateRequestSetProxy):void {
-			var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
-			Application.activeRecord.update(responseSet, token);
+			var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+			Application.activeRecord.update(changeSet, token);
 		}
 
 	}

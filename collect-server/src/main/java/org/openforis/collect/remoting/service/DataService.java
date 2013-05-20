@@ -20,13 +20,15 @@ import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.NodeChange;
-import org.openforis.collect.model.RecordSummarySortField;
+import org.openforis.collect.model.NodeChangeMap;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.proxy.RecordProxy;
-import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeAddRequest;
@@ -184,41 +186,36 @@ public class DataService {
 		CollectRecord activeRecord = getActiveRecord();
 		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateOptionsSet(activeRecord, fileManager, sessionManager);
 		NodeChangeSet changeSet = updateRecord(activeRecord, reqSet);
-		List<NodeChange<?>> changes = changeSet.getChanges();
-		if ( ! changes.isEmpty() && isCurrentRecordIndexable() ) {
+		if ( ! changeSet.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
+		NodeChangeSetProxy result = new NodeChangeSetProxy(messageContextHolder, activeRecord, changeSet);
 		if ( requestSet.isAutoSave() ) {
 			try {
 				saveActiveRecord();
-				changeSet.setRecordSaved(true);
+				result.setRecordSaved(true);
 			} catch(Exception e) {
-				changeSet.setRecordSaved(false);
+				result.setRecordSaved(false);
 			}
 		}
-		return new NodeChangeSetProxy(messageContextHolder, changeSet);
+		return result;
 	}
 
 	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequestSet nodeUpdateOptionSet) throws RecordPersistenceException, RecordIndexException {
 		List<NodeUpdateRequest> opts = nodeUpdateOptionSet.getRequests();
-		NodeChangeSet changeSet = new NodeChangeSet();
+		NodeChangeMap result = new NodeChangeMap();
 		for (NodeUpdateRequest req : opts) {
-			List<NodeChange<?>> changes = updateRecord(record, req);
+			NodeChangeSet partialChangeSet = updateRecord(record, req);
+			List<NodeChange<?>> changes = partialChangeSet.getChanges();
 			for (NodeChange<?> change : changes) {
-				changeSet.addChange(change);
+				result.addOrMergeChange(change);
 			}
 		}
-		changeSet.setErrors(record.getErrors());
-		changeSet.setMissing(record.getMissing());
-		changeSet.setMissingErrors(record.getMissingErrors());
-		changeSet.setMissingWarnings(record.getMissingWarnings());
-		changeSet.setSkipped(record.getSkipped());
-		changeSet.setWarnings(record.getWarnings());
-		return changeSet;
+		return new NodeChangeSet(result.getChanges());
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected List<NodeChange<?>> updateRecord(CollectRecord record, NodeUpdateRequest req) throws RecordPersistenceException {
+	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequest req) throws RecordPersistenceException {
 		if ( req instanceof ErrorConfirmRequest ) {
 			return record.confirmError(((ErrorConfirmRequest) req).getAttribute());
 		} else if ( req instanceof MissingValueApproveRequest ) {
@@ -236,7 +233,15 @@ public class DataService {
 			return record.addEntity(r.getParentEntity(), r.getNodeName());
 		} else if ( req instanceof AttributeUpdateRequest ) {
 			AttributeUpdateRequest<Value> r = (AttributeUpdateRequest<Value>) req;
-			return record.updateAttribute(r.getAttribute(), r.getValue(), r.getSymbol(), r.getRemarks());
+			Value value = r.getValue();
+			FieldSymbol symbol = r.getSymbol();
+			if ( value == null && symbol == null || value != null ) {
+				return record.updateAttribute(r.getAttribute(), value);
+			} else if ( symbol != null ) {
+				return record.updateAttribute(r.getAttribute(), symbol);
+			} else {
+				throw new IllegalArgumentException("Cannot specify both value and symbol");
+			}
 		} else if ( req instanceof FieldUpdateRequest ) {
 			FieldUpdateRequest r = (FieldUpdateRequest) req;
 			return record.updateField(r.getField(), r.getValue(), r.getSymbol(), r.getRemarks());

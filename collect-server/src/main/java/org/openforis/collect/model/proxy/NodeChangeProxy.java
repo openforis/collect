@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.model.AttributeAddChange;
+import org.openforis.collect.model.AttributeChange;
+import org.openforis.collect.model.EntityAddChange;
+import org.openforis.collect.model.EntityChange;
 import org.openforis.collect.model.NodeChange;
-import org.openforis.collect.model.NodeChange.AttributeAddChange;
-import org.openforis.collect.model.NodeChange.AttributeChange;
-import org.openforis.collect.model.NodeChange.EntityAddChange;
-import org.openforis.collect.model.NodeChange.EntityChange;
-import org.openforis.collect.model.NodeChange.NodeDeleteChange;
+import org.openforis.collect.model.NodeDeleteChange;
 import org.openforis.collect.spring.MessageContextHolder;
 
 /**

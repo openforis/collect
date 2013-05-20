@@ -177,9 +177,9 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
-			var responseSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+			var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responseSet;
+			appEvt.result = changeSet;
 			eventDispatcher.dispatchEvent(appEvt);
 			selectEntity(null);
 			updateViewEntities();

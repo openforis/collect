@@ -3,7 +3,7 @@ package org.openforis.collect.model.proxy;
 import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.model.NodeChange.AttributeChange;
+import org.openforis.collect.model.AttributeChange;
 import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.idm.model.Attribute;
 

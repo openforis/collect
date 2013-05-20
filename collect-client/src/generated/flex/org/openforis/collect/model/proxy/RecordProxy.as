@@ -117,16 +117,16 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		private function applyChange(response:NodeChangeProxy):void {
-			if ( response is NodeAddChangeProxy ) {
-				processNodeAddResponse(NodeAddChangeProxy(response));
+		private function applyChange(change:NodeChangeProxy):void {
+			if ( change is NodeAddChangeProxy ) {
+				processNodeAddResponse(NodeAddChangeProxy(change));
 			}
-			if ( response is NodeDeleteChangeProxy ) {
-				processNodeDeleteResponse(NodeDeleteChangeProxy(response));
-			} else if ( response is AttributeChangeProxy ) {
-				processAttributeUpdateResponse(AttributeChangeProxy(response));
-			} else if ( response is EntityChangeProxy ) {
-				processEntityUpdateResponse(EntityChangeProxy(response));
+			if ( change is NodeDeleteChangeProxy ) {
+				processNodeDeleteResponse(NodeDeleteChangeProxy(change));
+			} else if ( change is AttributeChangeProxy ) {
+				processAttributeUpdateResponse(AttributeChangeProxy(change));
+			} else if ( change is EntityChangeProxy ) {
+				processEntityUpdateResponse(EntityChangeProxy(change));
 			}
 		}
 		
@@ -145,9 +145,9 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		protected function processNodeDeleteResponse(response:NodeDeleteChangeProxy):void {
-			if ( response.deletedNodeId > 0 ) {
-				var node:NodeProxy = getNode(response.deletedNodeId);
+		protected function processNodeDeleteResponse(change:NodeDeleteChangeProxy):void {
+			if ( change.deletedNodeId > 0 ) {
+				var node:NodeProxy = getNode(change.deletedNodeId);
 				if (node != null ) {
 					var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
 					parent.removeChild(node);
@@ -156,17 +156,17 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		protected function processAttributeUpdateResponse(response:AttributeChangeProxy):void {
-			var node:NodeProxy = getNode(response.nodeId);
+		protected function processAttributeUpdateResponse(change:AttributeChangeProxy):void {
+			var node:NodeProxy = getNode(change.nodeId);
 			var a:AttributeProxy = AttributeProxy(node);
-			if ( response.validationResults != null ) {
-				a.validationResults = response.validationResults;
+			if ( change.validationResults != null ) {
+				a.validationResults = change.validationResults;
 			}
-			if ( response.updatedFieldValues != null ) {
-				var fieldIdxs:ArrayCollection = response.updatedFieldValues.keySet;
+			if ( change.updatedFieldValues != null ) {
+				var fieldIdxs:ArrayCollection = change.updatedFieldValues.keySet;
 				for each (var i:int in fieldIdxs) {
 					var f:FieldProxy = a.getField(i);
-					f.value = response.updatedFieldValues.get(i);
+					f.value = change.updatedFieldValues.get(i);
 				}
 				a.errorConfirmed = false;
 				var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
@@ -174,20 +174,20 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		protected function processEntityUpdateResponse(response:EntityChangeProxy):void {
-			var node:NodeProxy = getNode(response.nodeId);
+		protected function processEntityUpdateResponse(change:EntityChangeProxy):void {
+			var node:NodeProxy = getNode(change.nodeId);
 			var e:EntityProxy = node as EntityProxy;
-			if ( response.maxCountValidation != null && response.maxCountValidation.length > 0 ) {
-				e.updateChildrenMaxCountValiditationMap(response.maxCountValidation);
+			if ( change.maxCountValidation != null && change.maxCountValidation.length > 0 ) {
+				e.updateChildrenMaxCountValiditationMap(change.maxCountValidation);
 			}
-			if ( response.minCountValidation != null && response.minCountValidation.length > 0 ) {
-				e.updateChildrenMinCountValiditationMap(response.minCountValidation);
+			if ( change.minCountValidation != null && change.minCountValidation.length > 0 ) {
+				e.updateChildrenMinCountValiditationMap(change.minCountValidation);
 			}
-			if ( response.relevant != null && response.relevant.length > 0 ) {
-				e.updateChildrenRelevanceMap(response.relevant);
+			if ( change.relevant != null && change.relevant.length > 0 ) {
+				e.updateChildrenRelevanceMap(change.relevant);
 			}
-			if ( response.required != null && response.required.length > 0 ) {
-				e.updateChildrenRequiredMap(response.required);
+			if ( change.required != null && change.required.length > 0 ) {
+				e.updateChildrenRequiredMap(change.required);
 			}
 		}
 		

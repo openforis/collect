@@ -41,7 +41,6 @@ public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy
 			opts.setValue(parsedValue);
 		}
 		opts.setSymbol(symbol);
-		opts.setRemarks(remarks);
 		return opts;
 	}
 	

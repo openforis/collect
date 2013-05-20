@@ -41,16 +41,7 @@ public abstract class NodeUpdateRequest {
 	public static abstract class BaseAttributeUpdateRequest<V extends Value> extends NodeUpdateRequest {
 		
 		private V value;
-		private String remarks;
 		private FieldSymbol symbol;
-		
-		public String getRemarks() {
-			return remarks;
-		}
-
-		public void setRemarks(String remarks) {
-			this.remarks = remarks;
-		}
 
 		public FieldSymbol getSymbol() {
 			return symbol;
@@ -74,7 +65,8 @@ public abstract class NodeUpdateRequest {
 
 		private Entity parentEntity;
 		private String nodeName;
-		
+		private String remarks;
+
 		public Entity getParentEntity() {
 			return parentEntity;
 		}
@@ -91,6 +83,14 @@ public abstract class NodeUpdateRequest {
 			this.nodeName = nodeName;
 		}
 		
+		public String getRemarks() {
+			return remarks;
+		}
+
+		public void setRemarks(String remarks) {
+			this.remarks = remarks;
+		}
+
 	}
 	
 	public static class AttributeUpdateRequest<V extends Value>  extends BaseAttributeUpdateRequest<V> {
@@ -110,7 +110,7 @@ public abstract class NodeUpdateRequest {
 	public static class FieldUpdateRequest extends NodeUpdateRequest {
 		
 		private Field<?> field;
-		private Object value;
+		private String value;
 		private String remarks;
 		private FieldSymbol symbol;
 		
@@ -138,11 +138,11 @@ public abstract class NodeUpdateRequest {
 			this.symbol = symbol;
 		}
 
-		public Object getValue() {
+		public String getValue() {
 			return value;
 		}
 
-		public void setValue(Object value) {
+		public void setValue(String value) {
 			this.value = value;
 		}
 

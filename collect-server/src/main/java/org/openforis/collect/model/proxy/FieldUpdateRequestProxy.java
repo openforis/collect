@@ -19,7 +19,7 @@ public class FieldUpdateRequestProxy extends NodeUpdateRequestProxy<FieldUpdateR
 	
 	private Integer nodeId;
 	private int fieldIndex;
-	protected Object value;
+	protected String value;
 	protected String remarks;
 	protected FieldSymbol symbol;
 	
@@ -51,11 +51,11 @@ public class FieldUpdateRequestProxy extends NodeUpdateRequestProxy<FieldUpdateR
 		this.fieldIndex = fieldIndex;
 	}
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	public void setValue(Object value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 
