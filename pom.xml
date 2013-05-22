@@ -73,8 +73,8 @@
 				<version>0.4</version>
 				<dependencies>
 					<dependency>
-						<groupId>org.openforis.licenses</groupId>
-						<artifactId>licenses</artifactId>
+						<groupId>org.openforis.common-build</groupId>
+						<artifactId>common-build-license-verifier</artifactId>
 						<version>1.0-SNAPSHOT</version>
 					</dependency>
 				</dependencies>
