@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="sampling-design-key" author="ricci" dbms="postgresql">
+		<comment>Add unique constraint to ofc_sampling_design.level# columns</comment>
+		
+		<addUniqueConstraint constraintName="ofc_sampling_design_key"
+			tableName="ofc_sampling_design"
+			columnNames="survey_id,survey_work_id,level1,level2,level3" />
+	</changeSet>
+  
+</databaseChangeLog>
