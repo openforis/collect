@@ -128,11 +128,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>1.4</version>
-			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -188,6 +183,40 @@
 		</pluginManagement>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>license</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>license-maven-plugin</artifactId>
+						<version>1.4</version>
+						<dependencies>
+							<dependency>
+								<groupId>org.openforis.common-build</groupId>
+								<artifactId>common-build-license</artifactId>
+								<version>1.0-SNAPSHOT</version>
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<id>update-project-license</id>
+								<goals>
+									<goal>update-project-license</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<licenseName>openforis_license</licenseName>
+							<licenseResolver>classpath://org/openforis/license</licenseResolver>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+		
 	<repositories>
 		<repository>
 			<id>openforis-releases-repository</id>
