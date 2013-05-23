@@ -133,8 +133,14 @@ public class RecordManager {
 	 * @throws RecordLockedException
 	 * @throws MultipleEditException
 	 */
+	@Deprecated
 	@Transactional
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+		return checkout(survey, user, recordId, Step.valueOf(step), sessionId, forceUnlock);
+	}
+	
+	@Transactional
+	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
 			isLockAllowed(user, recordId, sessionId, forceUnlock);
 			lock(recordId, user, sessionId, forceUnlock);
@@ -142,13 +148,19 @@ public class RecordManager {
 		return load(survey, recordId, step);
 	}
 	
+	@Deprecated
 	@Transactional
 	public CollectRecord load(CollectSurvey survey, int recordId, int step) {
-		CollectRecord record = recordDao.load(survey, recordId, step);
+		Step stepEnum = Step.valueOf(step);
+		return load(survey, recordId, stepEnum);
+	}
+	
+	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
+		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		recordConverter.convertToLatestVersion(record);
 		return record;
 	}
-	
+
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
 		return loadSummaries(survey, rootEntity, (String[]) null);
@@ -178,13 +190,26 @@ public class RecordManager {
 		return recordDao.hasAssociatedRecords(userId);
 	}
 
-	@Transactional
+	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName) throws RecordPersistenceException {
+		return create(survey, rootEntityName, user, modelVersionName, (String) null);
+	}
+	
+	public CollectRecord create(CollectSurvey survey, String rootEntityName, String modelVersionName) throws RecordPersistenceException {
+		return create(survey, rootEntityName, (User) null, modelVersionName, (String) null);
+	}
+	
 	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
+		return create(survey, rootEntityDefinition.getName(), user, modelVersionName, sessionId);
+	}
+	
+	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
+		if ( lockingEnabled && sessionId == null ) {
+			throw new IllegalArgumentException("Lock session id not specified");
+		}
 		CollectRecord record = new CollectRecord(survey, modelVersionName);
-		record.createRootEntity(rootEntityDefinition.getName());
+		record.createRootEntity(rootEntityName);
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
-		record.setStep(Step.ENTRY);
 		return record;
 	}
 
