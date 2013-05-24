@@ -1,11 +1,10 @@
-package org.openforis.collect.designer.form.validator;
+package org.openforis.collect.manager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.CodeList;
@@ -15,7 +14,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.zkoss.util.resource.Labels;
 
 /**
  * 
@@ -31,7 +29,12 @@ public class SurveyValidator {
 		this.surveyManager = surveyManager;
 	}
 	
-	public List<SurveyValidationResult> validateSurveyForPublishing(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
+	/**
+	 * Verifies that the survey is compatible with an existing one and that replacing the old one
+	 * will not break the inserted data (if any). 
+	 * 
+	 */
+	public List<SurveyValidationResult> validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
 		List<SurveyValidationResult> results = validateSurvey(newSurvey);
 		if ( oldPublishedSurvey != null ) {
 			results.addAll(validateChanges(oldPublishedSurvey, newSurvey));
@@ -78,9 +81,9 @@ public class SurveyValidator {
 			EntityDefinition entity = entitiesStack.pop();
 			List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
 			if ( childDefinitions.size() == 0 ) {
-				String message = Labels.getLabel("survey.validation.error.empty_entity");
+				String messageKey = "survey.validation.error.empty_entity";
 				String path = entity.getPath();
-				SurveyValidationResult validationResult = new SurveyValidationResult(path, message);
+				SurveyValidationResult validationResult = new SurveyValidationResult(path, messageKey);
 				results.add(validationResult);
 			} else {
 				for (NodeDefinition childDefn : childDefinitions) {
@@ -167,9 +170,9 @@ public class SurveyValidator {
 					if ( parentDefnId == null && oldParentDefnId != null || 
 							parentDefnId != null && oldParentDefnId == null ||
 							parentDefnId != null && ! parentDefnId.equals(oldParentDefnId) ) {
-						String message = Labels.getLabel("survey.validation.error.parent_changed");
+						String messageKey = "survey.validation.error.parent_changed";
 						String path = nodeDefn.getPath();
-						SurveyValidationResult validationResult = new SurveyValidationResult(path, message);
+						SurveyValidationResult validationResult = new SurveyValidationResult(path, messageKey);
 						addValidationError(validationResult);
 					}
 				}
@@ -189,9 +192,9 @@ public class SurveyValidator {
 					(oldDefn.getClass() != nodeDefn.getClass() || 
 					oldDefn instanceof NumericAttributeDefinition && 
 						((NumericAttributeDefinition) oldDefn).getType() != ((NumericAttributeDefinition) nodeDefn).getType())) {
-					String message = Labels.getLabel("survey.validation.error.data_type_changed");
+					String messageKey = "survey.validation.error.data_type_changed";
 					String path = nodeDefn.getPath();
-					SurveyValidationResult validationError = new SurveyValidationResult(path, message);
+					SurveyValidationResult validationError = new SurveyValidationResult(path, messageKey);
 					addValidationError(validationError);
 				}
 			}
@@ -207,9 +210,9 @@ public class SurveyValidator {
 			public void visit(NodeDefinition nodeDefn) {
 				NodeDefinition oldDefn = oldSchema.getDefinitionById(nodeDefn.getId());
 				if ( oldDefn != null && oldDefn.isMultiple() && ! nodeDefn.isMultiple() ) {
-					String message = Labels.getLabel("survey.validation.error.cardinality_changed_from_multiple_to_single");
+					String messageKey = "survey.validation.error.cardinality_changed_from_multiple_to_single";
 					String path = nodeDefn.getPath();
-					SurveyValidationResult validationError = new SurveyValidationResult(path, message);
+					SurveyValidationResult validationError = new SurveyValidationResult(path, messageKey);
 					addValidationError(validationError);
 				}
 			}
@@ -237,9 +240,9 @@ public class SurveyValidator {
 		for (CodeListItem oldItem : oldItems) {
 			CodeListItem newItem = codeList.getItem(oldItem.getCode());
 			if ( newItem == null ) {
-				String message = Labels.getLabel("survey.validation.error.enumerating_code_list_changed.code_removed");
+				String messageKey = "survey.validation.error.enumerating_code_list_changed.code_removed";
 				String path = "codeList" + "/" + codeList.getName() + "/" + oldItem.getCode();
-				SurveyValidationResult validationError = new SurveyValidationResult(path, message);
+				SurveyValidationResult validationError = new SurveyValidationResult(path, messageKey);
 				results.add(validationError);
 			}
 		}
@@ -259,20 +262,20 @@ public class SurveyValidator {
 		private static final long serialVersionUID = 1L;
 		
 		private String path;
-		private String message;
+		private String messageKey;
 
-		public SurveyValidationResult(String path, String message) {
+		public SurveyValidationResult(String path, String messageKey) {
 			super();
 			this.path = path;
-			this.message = message;
+			this.messageKey = messageKey;
 		}
 
 		public String getPath() {
 			return path;
 		}
 
-		public String getMessage() {
-			return message;
+		public String getMessageKey() {
+			return messageKey;
 		}
 
 	}

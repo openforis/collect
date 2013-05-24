@@ -20,6 +20,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.SurveyValidator;
+import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -54,10 +56,14 @@ public class DataImportProcess implements Callable<Void> {
 	private SurveyManager surveyManager;
 
 	private Map<String, User> users;
+	private String selectedSurveyUri;
 	private String newSurveyName;
 	private DataImportState state;
 	private File packagedFile;
 
+	/**
+	 * Survey contained into the package file
+	 */
 	private CollectSurvey packagedSurvey;
 
 	private boolean overwriteAll;
@@ -70,11 +76,13 @@ public class DataImportProcess implements Callable<Void> {
 	
 	private List<Integer> entryIdsToImport;
 	
-	public DataImportProcess(SurveyManager surveyManager, RecordManager recordManager, RecordDao recordDao, Map<String, User> users, File packagedFile, boolean overwriteAll) {
+	public DataImportProcess(SurveyManager surveyManager, RecordManager recordManager, RecordDao recordDao,
+			String selectedSurveyUri, Map<String, User> users, File packagedFile, boolean overwriteAll) {
 		super();
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
 		this.recordDao = recordDao;
+		this.selectedSurveyUri = selectedSurveyUri;
 		this.users = users;
 		this.packagedFile = packagedFile;
 		this.overwriteAll = overwriteAll;
@@ -106,10 +114,13 @@ public class DataImportProcess implements Callable<Void> {
 	@Override
 	public Void call() throws Exception {
 		if ( state.getSubStep() == SubStep.PREPARING ) {
-			if ( state.getMainStep() == MainStep.SUMMARY_CREATION ) {
+			switch ( state.getMainStep() ) {
+			case SUMMARY_CREATION:
 				createDataImportSummary();
-			} else if ( state.getMainStep() == MainStep.IMPORT ) {
+				break;
+			case IMPORT:
 				importPackagedFile();
+				break;
 			}
 		}
 		return null;
@@ -121,20 +132,21 @@ public class DataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.RUNNING);
 			summary = null;
 			packagedSurvey = extractPackagedSurvey();
-			if ( packagedSurvey == null ) {
-				throw new DataImportExeption(IDML_FILE_NAME + " not found in packaged file.");
+			CollectSurvey oldSurvey = getOldSurvey();
+			String packagedSurveyUri = packagedSurvey.getUri();
+			if ( selectedSurveyUri != null && !selectedSurveyUri.equals(packagedSurveyUri) ) {
+				throw new IllegalArgumentException("Cannot import data related to survey '" + packagedSurveyUri + 
+						"' into on a different survey (" + selectedSurveyUri + ")");
 			}
-			String uri = packagedSurvey.getUri();
-			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
-			String surveyName = oldSurvey != null ? oldSurvey.getName(): null;
 			if ( oldSurvey != null ) {
-				packagedSurvey.setId(oldSurvey.getId());
-				packagedSurvey.setName(oldSurvey.getName());
-				if ( ! oldSurvey.equals(packagedSurvey) ) {
-					throw new DataImportExeption("Packaged survey is different from the survey already present into the system");
+				SurveyValidator validator = new SurveyValidator(surveyManager);
+				List<SurveyValidationResult> compatibilityResult = validator.validateCompatibility(oldSurvey, packagedSurvey);
+				if ( ! compatibilityResult.isEmpty() ) {
+					throw new DataImportExeption("Packaged survey is not compatible with the survey already present into the system.\n" +
+							"Please try to import it using the Designer to get the list of errors.");
 				}
 			}
-			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, oldSurvey != null ? oldSurvey: packagedSurvey);
+			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, oldSurvey);
 			
 			Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
 			for (Step step : Step.values()) {
@@ -159,7 +171,8 @@ public class DataImportProcess implements Callable<Void> {
 				}
 			}
 			if ( state.getSubStep() == SubStep.RUNNING ) {
-				summary = createSummary(packagedSkippedFileErrors, surveyName,
+				String oldSurveyName = oldSurvey == null ? null: oldSurvey.getName();
+				summary = createSummary(packagedSkippedFileErrors, oldSurveyName,
 						totalPerStep, packagedRecords, packagedStepsPerRecord,
 						conflictingPackagedRecords, warnings);
 				state.setSubStep(DataImportState.SubStep.COMPLETE);
@@ -179,6 +192,21 @@ public class DataImportProcess implements Callable<Void> {
 		}
 	}
 
+	protected CollectSurvey getOldSurvey() {
+		String uri;
+		if ( selectedSurveyUri == null ) {
+			uri = packagedSurvey.getUri();
+		} else {
+			uri = selectedSurveyUri;
+		}
+		CollectSurvey survey = surveyManager.getByUri(uri);
+		if ( survey == null && selectedSurveyUri != null ) {
+			throw new IllegalArgumentException("Published survey not found. URI: " + selectedSurveyUri);
+		} else {
+			return survey;
+		}
+	}
+	
 	private void createSummaryForEntry(Enumeration<? extends ZipEntry> entries, ZipFile zipFile, 
 			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
@@ -288,8 +316,7 @@ public class DataImportProcess implements Callable<Void> {
 			processedRecords = new ArrayList<Integer>();
 			state.setTotal(entryIdsToImport.size());
 			state.resetCount();
-			String uri = packagedSurvey.getUri();
-			CollectSurvey oldSurvey = surveyManager.getByUri(uri);
+			CollectSurvey oldSurvey = getOldSurvey();
 			if ( oldSurvey == null ) {
 				packagedSurvey.setName(newSurveyName);
 				surveyManager.importModel(packagedSurvey);
@@ -388,7 +415,8 @@ public class DataImportProcess implements Callable<Void> {
 	}
 
 	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
-		DataHandler handler = new DataHandler(existingSurvey, packagedSurvey, users);;
+		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
+		DataHandler handler = new DataHandler(currentSurvey, packagedSurvey, users);;
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
 		return dataUnmarshaller;
 	}
@@ -406,23 +434,38 @@ public class DataImportProcess implements Callable<Void> {
 		return null;
 	}
 
-	public CollectSurvey extractPackagedSurvey() throws IOException, IdmlParseException {
-		ZipFile zipFile = new ZipFile(packagedFile);
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-			if (zipEntry.isDirectory()) {
-				continue;
+	public CollectSurvey extractPackagedSurvey() throws IOException, IdmlParseException, DataImportExeption {
+		ZipFile zipFile = null;
+		CollectSurvey survey = null;
+		try {
+			zipFile = new ZipFile(packagedFile);
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while (entries.hasMoreElements()) {
+				ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+				if (zipEntry.isDirectory()) {
+					continue;
+				}
+				String entryName = zipEntry.getName();
+				if (IDML_FILE_NAME.equals(entryName)) {
+					InputStream is = zipFile.getInputStream(zipEntry);
+					survey = surveyManager.unmarshalSurvey(is);
+					SurveyValidator validator = new SurveyValidator(surveyManager);
+					List<SurveyValidationResult> validationResults = validator.validateSurvey(survey);
+					if ( ! validationResults.isEmpty() ) {
+						throw new IllegalStateException("Packaged survey is not valid." +
+								"\nPlease try to import it using the Designer to get the list of errors.");
+					}
+				}
 			}
-			String entryName = zipEntry.getName();
-			if (IDML_FILE_NAME.equals(entryName)) {
-				InputStream is = zipFile.getInputStream(zipEntry);
-				CollectSurvey survey = surveyManager.unmarshalSurvey(is);
-				return survey;
+		} finally {
+			if ( zipFile != null) {
+				zipFile.close();
 			}
 		}
-		zipFile.close();
-		return null;
+		if ( survey == null ) {
+			throw new DataImportExeption(IDML_FILE_NAME + " not found in packaged file.");
+		}
+		return survey;
 	}
 
 	private ParseRecordResult parseRecord(Reader reader) throws IOException {

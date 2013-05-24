@@ -25,6 +25,11 @@ public class SurveyProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
+	public String getUri() {
+		return survey.getUri();
+	}
+	
+	@ExternalizedProperty
 	public String getName() {
 		return survey.getName();
 	}

@@ -1,3 +1,4 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
 <zk>
   <window id="surveyValidationResultsPopUp"
   	title="${labels.survey.validation.popup.title}"
@@ -21,7 +22,7 @@
         <template name="model">
           <listitem>
             <listcell label="@load(each.path)" />
-            <listcell label="@load(each.message)" />
+            <listcell label="${c:l(each.messageKey)}" />
           </listitem>
         </template>
       </listbox>
