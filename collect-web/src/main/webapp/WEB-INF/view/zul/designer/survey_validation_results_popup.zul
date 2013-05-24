@@ -11,13 +11,13 @@
     <vbox align="center">
       <listbox id="listbox" 
         rows="10"
-        width="410px" 
+        width="610px" 
         model="@load(vm.validationResults)">
         <listhead>
-          <listheader label="${labels.survey.validation.path}" width="200px" 
+          <listheader label="${labels.survey.validation.path}" width="400px" 
             sort="auto(path)" />
           <listheader label="${labels.survey.validation.message}" width="200px"
-            sort="auto(message, path)" />
+            sort="auto(messageKey, path)" />
         </listhead>
         <template name="model">
           <listitem>
