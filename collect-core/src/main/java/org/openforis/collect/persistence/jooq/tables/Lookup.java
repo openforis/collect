@@ -46,7 +46,7 @@ public class Lookup extends UpdatableTableImpl<LookupRecord> {
 
 	public final org.jooq.TableField<LookupRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER, this);
 
-	public TableField<LookupRecord, String> getFieldByName(String name) {
+	public TableField<LookupRecord, String> createFieldByName(String name) {
 		return createField(name, org.jooq.impl.SQLDataType.VARCHAR, this);
 	}
 
