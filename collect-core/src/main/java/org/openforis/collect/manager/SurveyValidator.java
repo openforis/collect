@@ -165,11 +165,9 @@ public class SurveyValidator {
 				if ( oldDefn != null ) {
 					NodeDefinition parentDefn = nodeDefn.getParentDefinition();
 					NodeDefinition oldParentDefn = oldDefn.getParentDefinition();
-					Integer parentDefnId = parentDefn == null ? null: parentDefn.getId();
-					Integer oldParentDefnId = oldParentDefn == null ? null: oldParentDefn.getId();
-					if ( parentDefnId == null && oldParentDefnId != null || 
-							parentDefnId != null && oldParentDefnId == null ||
-							parentDefnId != null && ! parentDefnId.equals(oldParentDefnId) ) {
+					int parentDefnId = parentDefn == null ? -1: parentDefn.getId();
+					int oldParentDefnId = oldParentDefn == null ? -1: oldParentDefn.getId();
+					if ( parentDefnId != oldParentDefnId ) {
 						String messageKey = "survey.validation.error.parent_changed";
 						String path = nodeDefn.getPath();
 						SurveyValidationResult validationResult = new SurveyValidationResult(path, messageKey);
