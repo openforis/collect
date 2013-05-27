@@ -45,9 +45,9 @@ public class DatabaseExternalCodeListProvider implements
 	@Deprecated
 	@Override
 	public String getCode(CodeList list, String attribute, Object... keys) {
-		String tableName = list.getLookupTable();
+		String listName = list.getLookupTable();
 		Object[] filters = addSurveyFilter(list, keys);
-		Object object = dynamicTableDao.load(tableName, attribute, filters);
+		Object object = dynamicTableDao.load(listName, attribute, filters);
 		if (object == null) {
 			return null;
 		} else {
