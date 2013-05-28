@@ -475,7 +475,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	protected void initItemsPerLevel() {
 		itemsPerLevel = new ArrayList<List<CodeListItem>>();
-		if ( editedItem != null ) {
+		if ( editedItem != null && ! editedItem.isExternal() ) {
 			List<CodeListItem> items = new ArrayList<CodeListItem>(editedItem.getItems());
 			itemsPerLevel.add(items);
 			for (CodeListItem selectedItem : selectedItemsPerLevel) {

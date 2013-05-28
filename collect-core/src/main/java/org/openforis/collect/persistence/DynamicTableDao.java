@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import liquibase.statement.NotNullConstraint;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -22,12 +20,12 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectJoinStep;
 import org.jooq.TableField;
+import org.openforis.collect.model.StringKeyValuePair;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
 import org.openforis.commons.collection.CollectionUtils;
-import org.openforis.idm.metamodel.StringKeyValuePair;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -40,20 +38,10 @@ public class DynamicTableDao extends JooqDaoSupport {
 	@Deprecated
 	@Transactional
 	public Object load(String table, String column, Object... keys) {
-		if ( keys == null || keys.length % 2 == 1 ) {
-			throw new IllegalArgumentException("Invalid keys specified: odd couple of values expected");
-		}
-		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();
-		for(int i = 0; i < keys.length; i ++ ) {
-			String key = (String) keys[i];
-			String value = (String) keys[i+1];
-			StringKeyValuePair pair = new StringKeyValuePair(key, value);
-			filters.add(pair);
-		}
-		StringKeyValuePair[] filtersArray = (StringKeyValuePair[]) filters.toArray(new StringKeyValuePair[] {});
-		return loadValue(table, column, filtersArray);
+		StringKeyValuePair[] filters = StringKeyValuePair.fromKeyValuePairs(keys);
+		return loadValue(table, column, filters);
 	}
-	
+
 	@Transactional
 	public Object loadValue(String table, String column, StringKeyValuePair... filters) {
 		Map<String, String> row = loadRow(table, filters);
@@ -102,12 +90,16 @@ public class DynamicTableDao extends JooqDaoSupport {
 		for (StringKeyValuePair filter : filters) {
 			String colName = filter.getKey();
 			@SuppressWarnings("unchecked")
-			TableField<LookupRecord, String> tableField = (TableField<LookupRecord, String>) lookupTable.getField(colName);
+			TableField<LookupRecord, Object> tableField = (TableField<LookupRecord, Object>) lookupTable.getField(colName);
 			if ( tableField != null ) {
-				String colValue = filter.getValue();
-				Condition condition = tableField.equal(colValue);
-				if ( StringUtils.isBlank(colValue) ) {
-					condition = condition.or(tableField.isNull());
+				Object colValue = filter.getValue();
+				Condition condition;
+				if ( colValue == null ) {
+					condition = tableField.isNull();
+				} else if ( colValue instanceof String && StringUtils.isEmpty((String) colValue) ) {
+					condition = tableField.isNull().or(tableField.trim().equal(""));
+				} else {
+					condition = tableField.equal(colValue);
 				}
 				select.where(condition);
 			} else {
@@ -116,13 +108,13 @@ public class DynamicTableDao extends JooqDaoSupport {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void addNotNullConditions(Lookup lookupTable, SelectJoinStep select, String[] columns) {
 		if ( columns != null ) {
 			for (String colName : columns) {
-				@SuppressWarnings("unchecked")
-				TableField<LookupRecord, String> tableField = (TableField<LookupRecord, String>) lookupTable.getField(colName);
+				Field<?> tableField = lookupTable.getField(colName);
 				if ( tableField != null ) {
-					select.where(tableField.isNotNull().and(tableField.notEqual("")));
+					select.where(tableField.isNotNull().and(((Field<String>) tableField).notEqual("")));
 				} else {
 					logger.warn("Not null filter not applied on column: " + colName);
 				}
@@ -132,24 +124,29 @@ public class DynamicTableDao extends JooqDaoSupport {
 
 	protected void initTable(String table) {
 		Lookup lookupTable = Lookup.getInstance(table);
-		Collection<String> colNames = getColumnNames(table);
-		for (String colName : colNames) {
+		Collection<Map<String, ?>> colsMetadata = getColumnsMetadata(table);
+		for (Map<String, ?> colMetadata : colsMetadata) {
+			String colName = (String) colMetadata.get("COLUMN_NAME");
 			if ( lookupTable.getField(colName) == null ) {
-				lookupTable.createFieldByName(colName);
+				Integer dataType = (Integer) colMetadata.get("DATA_TYPE");
+				lookupTable.createField(colName, dataType);
 			}
+			
 		}
 	}
 	
-	private Collection<String> getColumnNames(String table) {
-		List<String> result = new ArrayList<String>();
+	private List<Map<String, ?>> getColumnsMetadata(String table) {
+		List<Map<String, ?>> result = new ArrayList<Map<String,?>>();
 		try { 
 			DialectAwareJooqFactory factory = getJooqFactory();
 			Connection connection = factory.getConnection();
 			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet columns = metaData.getColumns(null, null, table, null);
-			while (columns.next()) {
-				String colName = columns.getString("COLUMN_NAME");
-				result.add(colName);
+			ResultSet columnRs = metaData.getColumns(null, null, table, null);
+			while (columnRs.next()) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("COLUMN_NAME", columnRs.getString("COLUMN_NAME"));
+				map.put("DATA_TYPE", columnRs.getInt("DATA_TYPE"));
+				result.add(map);
 			}
 		} catch(SQLException e) {
 			throw new RuntimeException(e);

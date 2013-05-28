@@ -52,7 +52,7 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 	public void saveTo(CodeList dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setName(name);
-		dest.setLookupTable(lookupTable);
+		dest.setLookupTable(StringUtils.trimToNull(lookupTable));
 		dest.setLabel(CodeListLabel.Type.ITEM, languageCode, itemLabel);
 		dest.setLabel(CodeListLabel.Type.LIST, languageCode, listLabel);
 		dest.setDescription(languageCode, description);

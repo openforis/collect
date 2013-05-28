@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
@@ -47,7 +46,6 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
@@ -58,7 +56,6 @@ import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
-import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.IntegerRange;
@@ -67,8 +64,6 @@ import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.NumericRange;
 import org.openforis.idm.model.RealRange;
 import org.openforis.idm.model.Value;
-import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,6 +79,8 @@ public class DataService {
 	private SessionManager sessionManager;
 	@Autowired
 	private transient RecordManager recordManager;
+	@Autowired
+	private transient CodeListManager codeListManager;
 	@Autowired
 	private transient RecordFileManager fileManager;
 	@Autowired
@@ -177,7 +174,7 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		//TODO check that the record is in ENTRY phase: only delete in ENTRY phase is allowed
-		CollectRecord record = recordManager.load(survey, id, Step.ENTRY.getStepNumber());
+		CollectRecord record = recordManager.load(survey, id, Step.ENTRY);
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
 	}
@@ -732,7 +729,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.getAssignableCodeListItems(parent, def);
 		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>();
 		if(codes != null && codes.length > 0) {
 			//filter by specified codes
@@ -760,7 +757,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
 		List<Node<?>> selectedCodes = parent.getAll(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
@@ -780,10 +777,10 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attributeName);
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
 		for (String code : codes) {
-			CodeListItem item = findCodeListItem(items, code);
+			CodeListItem item = codeListManager.findCodeListItem(items, code);
 			if(item != null) {
 				CodeListItemProxy proxy = new CodeListItemProxy(item);
 				result.add(proxy);
@@ -816,73 +813,8 @@ public class DataService {
 		return recordManager;
 	}
 
-	/**
-	 * Start of CodeList utility methods
-	 * 
-	 * TODO move them to a better location
-	 */
-	private List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
-		CollectRecord record = getActiveRecord();
-		List<CodeListItem> items = null;
-		if(StringUtils.isEmpty(def.getParentExpression())){
-			items = def.getList().getItems();
-		} else {
-			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
-			if(parentCodeAttribute!=null){
-				CodeListItem parentCodeListItem = parentCodeAttribute.getCodeListItem();
-				if(parentCodeListItem != null) {
-					//TODO exception if parent not specified
-					items = parentCodeListItem.getChildItems();
-				}
-			}
-		}
-		List<CodeListItem> result = new ArrayList<CodeListItem>();
-		if(items != null) {
-			ModelVersion version = record.getVersion();
-			for (CodeListItem item : items) {
-				if (version == null || version.isApplicable(item)) {
-					result.add(item);
-				}
-			}
-		}
-		return result;
-	}
-	
-	private CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
-		try {
-			String parentExpr = def.getParentExpression();
-			ExpressionFactory expressionFactory = context.getRecord().getSurveyContext().getExpressionFactory();
-			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpr);
-			Node<?> parentNode = expression.evaluate(context, null);
-			if (parentNode != null && parentNode instanceof CodeAttribute) {
-				return (CodeAttribute) parentNode;
-			}
-		} catch (Exception e) {
-			// return null;
-		}
-		return null;
-	}
-
-	private CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
-		String adaptedCode = code.trim();
-		adaptedCode = adaptedCode.toUpperCase();
-		//remove initial zeros
-		adaptedCode = adaptedCode.replaceFirst("^0+", "");
-		adaptedCode = Pattern.quote(adaptedCode);
-
-		for (CodeListItem item : siblings) {
-			String itemCode = item.getCode();
-			Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$", Pattern.CASE_INSENSITIVE);
-			Matcher matcher = pattern.matcher(itemCode);
-			if(matcher.find()) {
-				return item;
-			}
-		}
-		return null;
-	}
-	
 	private Code parseCode(Entity parent, CodeAttributeDefinition def, String value) {
-		List<CodeListItem> items = getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.getAssignableCodeListItems(parent, def);
 		Code code = parseCode(value, items);
 		return code;
 	}
@@ -901,7 +833,7 @@ public class DataService {
 			default:
 				//TODO throw error: invalid parameter
 		}
-		CodeListItem codeListItem = findCodeListItem(codeList, codeStr);
+		CodeListItem codeListItem = codeListManager.findCodeListItem(codeList, codeStr);
 		if(codeListItem != null) {
 			code = new Code(codeListItem.getCode(), qualifier);
 		}
