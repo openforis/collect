@@ -13,7 +13,7 @@ import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 
 /**
  * @author M. Togna
@@ -23,7 +23,7 @@ import org.openforis.collect.spring.MessageContextHolder;
 public class RecordProxy implements Proxy {
 
 	private transient CollectRecord record;
-	private transient MessageContextHolder messageContextHolder;
+	private transient SpringMessageSource messageContextHolder;
 
 	private Integer errors;
 	private Integer skipped;
@@ -33,7 +33,7 @@ public class RecordProxy implements Proxy {
 	private Integer warnings;
 
 	
-	public RecordProxy(MessageContextHolder messageContextHolder, CollectRecord record) {
+	public RecordProxy(SpringMessageSource messageContextHolder, CollectRecord record) {
 		this.record = record;
 		this.messageContextHolder = messageContextHolder;
 		errors = record.getErrors();
@@ -45,7 +45,7 @@ public class RecordProxy implements Proxy {
 		warnings = record.getWarnings();
 	}
 
-	public static List<RecordProxy> fromList(MessageContextHolder messageContextHolder, List<CollectRecord> records) {
+	public static List<RecordProxy> fromList(SpringMessageSource messageContextHolder, List<CollectRecord> records) {
 		List<RecordProxy> result = new ArrayList<RecordProxy>();
 		if ( records != null ) {
 			for (CollectRecord collectRecord : records) {

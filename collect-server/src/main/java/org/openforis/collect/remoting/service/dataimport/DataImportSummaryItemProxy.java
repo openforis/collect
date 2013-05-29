@@ -11,7 +11,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 
 /**
  * 
@@ -20,15 +20,15 @@ import org.openforis.collect.spring.MessageContextHolder;
  */
 public class DataImportSummaryItemProxy implements Proxy {
 
-	private transient MessageContextHolder messageContextHolder;
+	private transient SpringMessageSource messageContextHolder;
 	private transient DataImportSummaryItem item;
 	
-	public DataImportSummaryItemProxy(MessageContextHolder messageContextHolder, DataImportSummaryItem item) {
+	public DataImportSummaryItemProxy(SpringMessageSource messageContextHolder, DataImportSummaryItem item) {
 		this.messageContextHolder = messageContextHolder;
 		this.item = item;
 	}
 	
-	public static List<DataImportSummaryItemProxy> fromList(MessageContextHolder messageContextHolder, List<DataImportSummaryItem> items) {
+	public static List<DataImportSummaryItemProxy> fromList(SpringMessageSource messageContextHolder, List<DataImportSummaryItem> items) {
 		List<DataImportSummaryItemProxy> result = new ArrayList<DataImportSummaryItemProxy>();
 		if ( items != null ) {
 			for (DataImportSummaryItem item : items) {

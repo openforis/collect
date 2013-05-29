@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
@@ -21,12 +21,12 @@ import org.openforis.idm.model.Node;
  */
 public class NodeProxy implements Proxy {
 
-	protected transient MessageContextHolder messageContextHolder;
+	protected transient SpringMessageSource messageContextHolder;
 	
 	private EntityProxy parent;
 	private transient Node<?> node;
 	
-	public static NodeProxy fromNode(MessageContextHolder messageContextHolder, Node<?> node) {
+	public static NodeProxy fromNode(SpringMessageSource messageContextHolder, Node<?> node) {
 		if (node instanceof Attribute<?, ?>) {
 			return new AttributeProxy(messageContextHolder, null, (Attribute<?, ?>) node);
 		} else if (node instanceof Entity) {
@@ -35,14 +35,14 @@ public class NodeProxy implements Proxy {
 		return null;
 	}
 	
-	public NodeProxy(MessageContextHolder messageContextHolder, EntityProxy parent, Node<?> node) {
+	public NodeProxy(SpringMessageSource messageContextHolder, EntityProxy parent, Node<?> node) {
 		super();
 		this.messageContextHolder = messageContextHolder;
 		this.parent = parent;
 		this.node = node;
 	}
 
-	public static List<NodeProxy> fromList(MessageContextHolder messageContextHolder, EntityProxy parent, List<Node<?>> list) {
+	public static List<NodeProxy> fromList(SpringMessageSource messageContextHolder, EntityProxy parent, List<Node<?>> list) {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		if(list != null) {
 			for (Node<?> node : list) {

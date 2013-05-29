@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -26,7 +26,7 @@ public class EntityProxy extends NodeProxy {
 
 	private transient Entity entity;
 	
-	public EntityProxy(MessageContextHolder messageContextHolder, EntityProxy parent, Entity entity) {
+	public EntityProxy(SpringMessageSource messageContextHolder, EntityProxy parent, Entity entity) {
 		super(messageContextHolder, parent, entity);
 		this.entity = entity;
 	}

@@ -1,4 +1,4 @@
-package org.openforis.collect.util;
+package org.openforis.collect.model.validation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,10 +7,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.validation.RecordKeyUniquenessValidator;
-import org.openforis.collect.model.validation.SpecifiedValidator;
-import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -61,15 +59,15 @@ public class ValidationMessageBuilder {
 	private static final String PRETTY_PATH_SEPARATOR = " / ";
 	private static final String RECORD_KEYS_LABEL_SEPARATOR = "-";
 	
-	private MessageContextHolder messageContextHolder;
+	private MessageSource messageBundle;
 	
-	protected ValidationMessageBuilder(MessageContextHolder messageContextHolder) {
+	protected ValidationMessageBuilder(MessageSource messageBundle) {
 		super();
-		this.messageContextHolder = messageContextHolder;
+		this.messageBundle = messageBundle;
 	}
 	
-	public static ValidationMessageBuilder createInstance(MessageContextHolder messageContextHolder) {
-		return new ValidationMessageBuilder(messageContextHolder);
+	public static ValidationMessageBuilder createInstance(MessageSource messageBundle) {
+		return new ValidationMessageBuilder(messageBundle);
 	}
 
 	public String getValidationMessage(Attribute<?, ?> attribute, ValidationResult validationResult) {
@@ -86,7 +84,7 @@ public class ValidationMessageBuilder {
 			String key = getMessageKey(attribute, validationResult);
 			if ( key != null ) {
 				Object[] args = getMessageArgs(attribute, validationResult);
-				String result = messageContextHolder.getMessage(key, args);
+				String result = messageBundle.getMessage(key, args);
 				return result;
 			} else {
 				return validator.getClass().getSimpleName();
@@ -95,7 +93,8 @@ public class ValidationMessageBuilder {
 	}
 
 	private String getCustomMessage(Check<?> check) {
-		String langCode = messageContextHolder.getCurrentLanguageCode();
+		Locale locale = messageBundle.getCurrentLocale();
+		String langCode = locale == null ? null: locale.getLanguage();
 		String customMessage = check.getMessage(langCode);
 		if ( customMessage == null ) {
 			customMessage = check.getMessage(null);
@@ -120,14 +119,14 @@ public class ValidationMessageBuilder {
 	public String getMaxCountValidationMessage(NodeDefinition defn) {
 		Integer maxCount = defn.getMaxCount();
 		Object[] args = new Integer[]{maxCount > 0 ? maxCount: 1};
-		String message = messageContextHolder.getMessage("edit.validation.maxCount", args);
+		String message = messageBundle.getMessage("edit.validation.maxCount", args);
 		return message;
 	}
 
 	public String getMinCountValidationMessage(Entity parentEntity, String childName) {
 		int effectiveMinCount = parentEntity.getEffectiveMinCount(childName);
 		Object[] args = new Integer[]{effectiveMinCount};
-		String message = messageContextHolder.getMessage("validation.minCount", args);
+		String message = messageBundle.getMessage("validation.minCount", args);
 		return message;
 	}
 	
@@ -249,14 +248,14 @@ public class ValidationMessageBuilder {
 			String op = argParts[0];
 			String value = argParts[1];
 			String opMessageKey = VALIDATION_COMPARE_MESSAGES_PREFIX + op;
-			String operator = messageContextHolder.getMessage(opMessageKey);
+			String operator = messageBundle.getMessage(opMessageKey);
 			String argAdapted = StringUtils.join(new String[]{operator, value}, " ");
 			adaptedArgs[i - 1] = argAdapted;
 		}
-		String andOperator = StringUtils.join(" ", messageContextHolder.getMessage(AND_OPERATOR_MESSAGE_KEY), " ");
+		String andOperator = StringUtils.join(" ", messageBundle.getMessage(AND_OPERATOR_MESSAGE_KEY), " ");
 		String argsConcat = StringUtils.join(adaptedArgs, andOperator);
 		String messageKey = getMessageKey(attribute, validationResult);
-		String result = messageContextHolder.getMessage(messageKey, new Object[]{nodeLabel, argsConcat});
+		String result = messageBundle.getMessage(messageKey, new Object[]{nodeLabel, argsConcat});
 		return result;
 	}
 

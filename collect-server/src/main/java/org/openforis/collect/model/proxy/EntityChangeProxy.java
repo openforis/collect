@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.model.EntityChange;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 /**
@@ -15,7 +15,7 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 public class EntityChangeProxy extends NodeChangeProxy<EntityChange> {
 
 	public EntityChangeProxy(
-			MessageContextHolder messageContextHolder,
+			SpringMessageSource messageContextHolder,
 			EntityChange change) {
 		super(messageContextHolder, change);
 	}

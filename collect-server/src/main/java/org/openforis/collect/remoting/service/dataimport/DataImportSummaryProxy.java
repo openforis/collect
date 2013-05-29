@@ -7,7 +7,7 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummary.FileErrorItem;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 
 /**
  * 
@@ -17,9 +17,9 @@ import org.openforis.collect.spring.MessageContextHolder;
 public class DataImportSummaryProxy implements Proxy {
 
 	private transient DataImportSummary summary;
-	private transient MessageContextHolder messageContextHolder;
+	private transient SpringMessageSource messageContextHolder;
 
-	public DataImportSummaryProxy(MessageContextHolder messageContextHolder, DataImportSummary summary) {
+	public DataImportSummaryProxy(SpringMessageSource messageContextHolder, DataImportSummary summary) {
 		super();
 		this.summary = summary;
 	}

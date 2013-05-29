@@ -41,7 +41,7 @@ import org.openforis.collect.remoting.service.NodeUpdateRequest.MissingValueAppr
 import org.openforis.collect.remoting.service.NodeUpdateRequest.NodeDeleteRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateRequest;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -70,7 +70,7 @@ public class DataService {
 	@Autowired
 	private transient RecordIndexService recordIndexService;
 	@Autowired
-	private MessageContextHolder messageContextHolder;
+	private SpringMessageSource messageContextHolder;
 
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation

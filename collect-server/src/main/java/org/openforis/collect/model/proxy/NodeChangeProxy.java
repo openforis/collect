@@ -12,7 +12,7 @@ import org.openforis.collect.model.EntityAddChange;
 import org.openforis.collect.model.EntityChange;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeDeleteChange;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 
 /**
  * 
@@ -22,15 +22,15 @@ import org.openforis.collect.spring.MessageContextHolder;
  */
 public class NodeChangeProxy<C extends NodeChange<?>> implements Proxy {
 
-	protected transient MessageContextHolder messageContextHolder;
+	protected transient SpringMessageSource messageContextHolder;
 	protected transient C change;
 
-	public NodeChangeProxy(MessageContextHolder messageContextHolder, C change) {
+	public NodeChangeProxy(SpringMessageSource messageContextHolder, C change) {
 		this.change = change;
 		this.messageContextHolder = messageContextHolder;
 	}
 
-	public static List<NodeChangeProxy<?>> fromList(MessageContextHolder messageContextHolder, Collection<NodeChange<?>> items) {
+	public static List<NodeChangeProxy<?>> fromList(SpringMessageSource messageContextHolder, Collection<NodeChange<?>> items) {
 		List<NodeChangeProxy<?>> result = new ArrayList<NodeChangeProxy<?>>();
 		if ( items != null ) {
 			for (NodeChange<?> item : items) {

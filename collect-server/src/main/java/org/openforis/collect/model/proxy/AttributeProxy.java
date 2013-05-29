@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -32,7 +32,7 @@ public class AttributeProxy extends NodeProxy {
 	private boolean errorConfirmed;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public AttributeProxy(MessageContextHolder messageContextHolder, EntityProxy parent, Attribute attribute) {
+	public AttributeProxy(SpringMessageSource messageContextHolder, EntityProxy parent, Attribute attribute) {
 		super(messageContextHolder, parent, attribute);
 		this.attribute = attribute;
 		ValidationResults validationRes = attribute.validateValue();

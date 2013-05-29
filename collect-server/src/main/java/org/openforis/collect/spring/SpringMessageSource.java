@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.AbstractMessageSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.NoSuchMessageException;
@@ -19,25 +20,15 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class MessageContextHolder {
+public class SpringMessageSource extends AbstractMessageSource {
 
-	public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
-	
-	private final Log log = LogFactory.getLog(MessageContextHolder.class);
+	private final Log log = LogFactory.getLog(SpringMessageSource.class);
 	
 	@Autowired
 	private ApplicationContext context;
 	
-	public String getMessage(String code, Object... args){
-		Locale locale = getCurrentLocale();
-		String message = getMessage(locale, code, args);
-		if ( message == null ) {
-			message = getMessage(DEFAULT_LOCALE, code, args);
-		}
-		return message;
-	}
-
-	public String getMessage(Locale locale, String code, Object[] args) {
+	@Override
+	public String getMessage(Locale locale, String code, Object... args) {
 		try {
 			String message = context.getMessage(code, args, locale);
 			return message;
@@ -49,18 +40,15 @@ public class MessageContextHolder {
 		}
 	}
 
+	@Override
 	public Locale getCurrentLocale() {
 		Locale locale = LocaleContextHolder.getLocale();
 		return locale;
 	}
 	
-	public String getCurrentLanguageCode() {
-		Locale locale = getCurrentLocale();
-		if ( locale == null ) {
-			return null;
-		} else {
-			return locale.getLanguage();
-		}
+	@Override
+	public void setCurrentLocale(Locale locale) {
+		//managed by Spring
 	}
 	
 }

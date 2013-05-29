@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.model.AttributeChange;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.idm.model.Attribute;
 
 /**
@@ -15,7 +15,7 @@ import org.openforis.idm.model.Attribute;
 public class AttributeChangeProxy extends NodeChangeProxy<AttributeChange> {
 
 	public AttributeChangeProxy(
-			MessageContextHolder messageContextHolder,
+			SpringMessageSource messageContextHolder,
 			AttributeChange change) {
 		super(messageContextHolder, change);
 	}

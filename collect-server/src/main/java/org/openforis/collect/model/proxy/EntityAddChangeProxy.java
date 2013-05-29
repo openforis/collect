@@ -2,7 +2,7 @@ package org.openforis.collect.model.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.model.EntityAddChange;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.spring.SpringMessageSource;
 
 /**
  * 
@@ -12,7 +12,7 @@ import org.openforis.collect.spring.MessageContextHolder;
 public class EntityAddChangeProxy extends EntityChangeProxy implements NodeAddChangeProxy {
 
 	public EntityAddChangeProxy(
-			MessageContextHolder messageContextHolder,
+			SpringMessageSource messageContextHolder,
 			EntityAddChange change) {
 		super(messageContextHolder, change);
 	}

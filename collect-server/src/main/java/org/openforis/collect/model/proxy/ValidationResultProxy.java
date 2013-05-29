@@ -10,8 +10,8 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
-import org.openforis.collect.spring.MessageContextHolder;
-import org.openforis.collect.util.ValidationMessageBuilder;
+import org.openforis.collect.model.validation.ValidationMessageBuilder;
+import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationRule;
@@ -26,12 +26,12 @@ public class ValidationResultProxy implements Proxy {
 	private transient ValidationResult validationResult;
 	private String validationMessage;
 
-	public ValidationResultProxy(MessageContextHolder messageContextHolder, Attribute<?, ?> attribute, ValidationResult validationResult) {
+	public ValidationResultProxy(SpringMessageSource messageContextHolder, Attribute<?, ?> attribute, ValidationResult validationResult) {
 		this.validationMessage = createValidationMessage(messageContextHolder, attribute, validationResult);
 		this.validationResult = validationResult;
 	}
 
-	public static List<ValidationResultProxy> fromList(MessageContextHolder messageContextHolder, Attribute<?, ?> attribute, List<ValidationResult> list) {
+	public static List<ValidationResultProxy> fromList(SpringMessageSource messageContextHolder, Attribute<?, ?> attribute, List<ValidationResult> list) {
 		if (list != null) {
 			List<ValidationResultProxy> proxies = new ArrayList<ValidationResultProxy>();
 			for (ValidationResult validationResults : list) {
@@ -62,7 +62,7 @@ public class ValidationResultProxy implements Proxy {
 		}
 	}
 	
-	protected String createValidationMessage(MessageContextHolder messageContextholder, Attribute<?, ?> attribute,
+	protected String createValidationMessage(SpringMessageSource messageContextholder, Attribute<?, ?> attribute,
 			ValidationResult validationResult) {
 		ValidationMessageBuilder validationMessageBuilder = ValidationMessageBuilder.createInstance(messageContextholder);
 		return validationMessageBuilder.getValidationMessage(attribute, validationResult);
