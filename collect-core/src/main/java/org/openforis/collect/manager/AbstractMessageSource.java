@@ -14,8 +14,11 @@ public abstract class AbstractMessageSource implements MessageSource {
 	@Override
 	public String getMessage(String code, Object... args){
 		Locale locale = getCurrentLocale();
+		if ( locale == null ) {
+			locale = DEFAULT_LOCALE;
+		}
 		String message = getMessage(locale, code, args);
-		if ( message == null ) {
+		if ( message == null && ! locale.equals(DEFAULT_LOCALE) ) {
 			message = getMessage(DEFAULT_LOCALE, code, args);
 		}
 		return message;

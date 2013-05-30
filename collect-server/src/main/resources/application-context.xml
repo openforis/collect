@@ -147,7 +147,7 @@
 	<bean name="messageSource"
 		class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename">
-			<value>resourcebundles/validation</value>
+			<value>org/openforis/collect/resourcebundles/validation</value>
 		</property>
 	</bean>
 </beans>
