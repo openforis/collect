@@ -2,6 +2,7 @@ package org.openforis.collect.manager;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -15,13 +16,13 @@ import java.util.PropertyResourceBundle;
  * @author S. Ricci
  *
  */
-public class ResourceMessageBundle extends AbstractMessageSource {
+public class ResourceBundleMessageSource extends AbstractMessageSource {
 
-	private Locale locale;
+	private Locale currentLocale;
 	private List<String> bundleBaseNames;
 	private Map<Locale, List<PropertyResourceBundle>> localeToResourceBundles;
 	
-	public ResourceMessageBundle(List<String> bundleBaseNames) {
+	public ResourceBundleMessageSource(List<String> bundleBaseNames) {
 		super();
 		this.bundleBaseNames = bundleBaseNames;
 		this.localeToResourceBundles = new HashMap<Locale, List<PropertyResourceBundle>>();
@@ -29,7 +30,7 @@ public class ResourceMessageBundle extends AbstractMessageSource {
 
 	@Override
 	public String getMessage(Locale locale, String code, Object... args) {
-		List<PropertyResourceBundle> resourceBundles = localeToResourceBundles.get(locale);
+		List<PropertyResourceBundle> resourceBundles = getBundles(locale);
 		if ( resourceBundles == null || resourceBundles.isEmpty() ) {
 			return null;
 		} else {
@@ -43,14 +44,23 @@ public class ResourceMessageBundle extends AbstractMessageSource {
 			return null;
 		}
 	}
+
+	protected List<PropertyResourceBundle> getBundles(Locale locale) {
+		List<PropertyResourceBundle> bundles = localeToResourceBundles.get(locale);
+		if ( bundles == null ) {
+			bundles = initBundles(locale);
+		}
+		return bundles;
+	}
 	
-	protected void initBundles(Locale locale) {
+	protected List<PropertyResourceBundle> initBundles(Locale locale) {
 		List<PropertyResourceBundle> resourceBundles = new ArrayList<PropertyResourceBundle>();
 		for (String baseName : bundleBaseNames) {
 			PropertyResourceBundle bundle = (PropertyResourceBundle) PropertyResourceBundle.getBundle(baseName, locale);
 			resourceBundles.add(bundle);
 		}
 		localeToResourceBundles.put(locale, resourceBundles);
+		return resourceBundles;
 	}
 	
 	public void setBundleBaseNames(List<String> bundleBaseNames) {
@@ -59,15 +69,17 @@ public class ResourceMessageBundle extends AbstractMessageSource {
 	
 	@Override
 	public Locale getCurrentLocale() {
-		return locale;
+		return currentLocale;
 	}
 	
+	@Override
 	public void setCurrentLocale(Locale locale) {
-		this.locale = locale;
-		if ( ! localeToResourceBundles.containsKey(locale) ) {
-			initBundles(locale);
-		}
+		this.currentLocale = locale;
 	}
-	
-
+	/*
+	public static void main(String[] args) {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource(Arrays.asList("org/openforis/collect/resourcebundles/validation"));
+		System.out.println(messageSource.getMessage("validation.specifiedError"));
+	}
+	*/
 }
