@@ -19,7 +19,6 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordLock;
 import org.openforis.collect.model.RecordSummarySortField;
-import org.openforis.collect.model.RecordValidationReportGenerator;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
@@ -225,27 +224,25 @@ public class RecordManager {
 	}
 	
 	@Transactional
-	public RecordValidationReportGenerator validateAndSave(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
+	public void validateAndSave(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
 			isLockAllowed(user, recordId, sessionId, true);
 			lock(recordId, user, sessionId, true);
 		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
-		RecordValidationReportGenerator result = validate(record);
+		validate(record);
 		record.updateRootEntityKeyValues();
 		record.updateEntityCounts();
 		recordDao.update(record);
 		if ( isLockingEnabled() ) {
 			releaseLock(recordId);
 		}
-		return result;
 	}
 
-	public RecordValidationReportGenerator validate(CollectRecord record) {
+	public void validate(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		record.addEmptyNodes(rootEntity);
 		record.updateDerivedStates();
-		return new RecordValidationReportGenerator(record);
 	}
 	
 	public void moveNode(CollectRecord record, int nodeId, int index) {

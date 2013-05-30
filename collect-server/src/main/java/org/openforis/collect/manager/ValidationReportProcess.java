@@ -129,8 +129,9 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 
 	protected void writeValidationReport(CollectRecord record) throws IOException {
 		
-		RecordValidationReportGenerator validationResult = recordManager.validate(record);
-		List<RecordValidationReportItem> validationItems = validationResult.generateValidationItems(
+		recordManager.validate(record);
+		RecordValidationReportGenerator reportGenerator = new RecordValidationReportGenerator(record);
+		List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(
 				validationMessageBuilder, ValidationResultFlag.ERROR, includeConfirmedErrors);
 		for (RecordValidationReportItem item : validationItems) {
 			writeValidationReportLine(record, item.getPath(), item.getMessage());

@@ -2,6 +2,7 @@ package org.openforis.collect.manager;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,9 +18,15 @@ import java.util.PropertyResourceBundle;
  */
 public class ResourceBundleMessageSource extends AbstractMessageSource {
 
+	private static final String VALIDATION_BUNDLE_NAME = "org/openforis/collect/resourcebundles/validation";
+	
 	private Locale currentLocale;
 	private List<String> bundleBaseNames;
 	private Map<Locale, List<PropertyResourceBundle>> localeToResourceBundles;
+	
+	public ResourceBundleMessageSource() {
+		this(Arrays.asList(VALIDATION_BUNDLE_NAME));
+	}
 	
 	public ResourceBundleMessageSource(List<String> bundleBaseNames) {
 		super();

@@ -1,5 +1,6 @@
 package org.openforis.collect.model.validation;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.MessageSource;
+import org.openforis.collect.manager.ResourceBundleMessageSource;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -66,6 +68,10 @@ public class ValidationMessageBuilder {
 		this.messageBundle = messageBundle;
 	}
 	
+	public static ValidationMessageBuilder createInstance() {
+		return createInstance(new ResourceBundleMessageSource());
+	}
+
 	public static ValidationMessageBuilder createInstance(MessageSource messageBundle) {
 		return new ValidationMessageBuilder(messageBundle);
 	}

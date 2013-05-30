@@ -31,7 +31,11 @@ public class RecordValidationReportGenerator {
 		this.record = record;
 		this.validationCache = record.getValidationCache();
 	}
-
+	
+	public List<RecordValidationReportItem> generateValidationItems() {
+		return generateValidationItems(ValidationMessageBuilder.createInstance(), ValidationResultFlag.ERROR, true);
+	}
+	
 	public List<RecordValidationReportItem> generateValidationItems(ValidationMessageBuilder messageBuilder,
 			ValidationResultFlag level, boolean includeConfirmedErrors) {
 		List<RecordValidationReportItem> result = new ArrayList<RecordValidationReportItem>();
