@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,10 +50,5 @@ public class SpringMessageSource extends AbstractMessageSource {
 	public void setCurrentLocale(Locale locale) {
 		//managed by Spring
 	}
-	
-	public static void main(String[] args) {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
-		SpringMessageSource bean = ctx.getBean(SpringMessageSource.class);
-		System.out.println(bean.getMessage("validation.codeError"));
-	}
+
 }
