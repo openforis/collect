@@ -150,33 +150,20 @@ public class CollectRecord extends Record {
 	
 	private List<String> rootEntityKeyValues;
 	private List<Integer> entityCounts;
-
-	private Map<Integer, Set<String>> minCountErrorChildNamesByEntityId;
-	private Map<Integer, Set<String>> minCountWarningChildNamesByEntityId;
-	private Map<Integer, Set<String>> maxCountErrorChildNamesByEntityId;
-	private Map<Integer, Set<String>> maxCountWarningChildNamesByEntityId;
-	private Map<Integer, Integer> errorCounts;
-	private Map<Integer, Integer> warningCounts;
-	private Set<Integer> skippedNodes;
+	
+	private RecordValidationCache validationCache;
 
 	public CollectRecord(CollectSurvey survey, String versionName) {
 		super(survey, versionName);
 		this.step = Step.ENTRY;
-		
+		this.validationCache = new RecordValidationCache(this);
 		// use List to preserve the order of the keys and counts
-		rootEntityKeyValues = new ArrayList<String>();
-		entityCounts = new ArrayList<Integer>();
+		this.rootEntityKeyValues = new ArrayList<String>();
+		this.entityCounts = new ArrayList<Integer>();
 		initErrorCountInfo();
 	}
 
 	protected void initErrorCountInfo() {
-		minCountErrorChildNamesByEntityId = new HashMap<Integer, Set<String>>();
-		minCountWarningChildNamesByEntityId = new HashMap<Integer, Set<String>>();
-		maxCountErrorChildNamesByEntityId = new HashMap<Integer, Set<String>>();
-		maxCountWarningChildNamesByEntityId = new HashMap<Integer, Set<String>>();
-		errorCounts = new HashMap<Integer, Integer>();
-		warningCounts = new HashMap<Integer, Integer>();
-		skippedNodes = new HashSet<Integer>();
 		skipped = null;
 		missing = null;
 		missingErrors = null;
@@ -262,7 +249,7 @@ public class CollectRecord extends Record {
 
 	public Integer getSkipped() {
 		if ( skipped == null ) {
-			skipped = skippedNodes.size();
+			skipped = validationCache.getSkippedNodeIds().size();
 		}
 		return skipped;
 	}
@@ -280,14 +267,14 @@ public class CollectRecord extends Record {
 	
 	public Integer getMissingErrors() {
 		if ( missingErrors == null ) {
-			missingErrors = getMissingCount(minCountErrorChildNamesByEntityId);
+			missingErrors = validationCache.getTotalMissingMinCountErrors();
 		}
 		return missingErrors;
 	}
 	
 	public Integer getMissingWarnings() {
 		if ( missingWarnings == null ) {
-			missingWarnings = getMissingCount(minCountWarningChildNamesByEntityId);
+			missingWarnings = validationCache.getTotalMissingMinCountWarnings();
 		}
 		return missingWarnings;
 	}
@@ -298,8 +285,8 @@ public class CollectRecord extends Record {
 
 	public Integer getErrors() {
 		if(errors == null) {
-			errors = getAttributeValidationCount(errorCounts);
-			errors += getEntityValidationCount(maxCountErrorChildNamesByEntityId);
+			errors = validationCache.getTotalAttributeErrors();
+			errors += validationCache.getTotalMaxCountErrors();
 		}
 		return errors;
 	}
@@ -310,9 +297,9 @@ public class CollectRecord extends Record {
 
 	public Integer getWarnings() {
 		if(warnings == null) {
-			warnings = getAttributeValidationCount(warningCounts);
-			warnings += getEntityValidationCount(minCountWarningChildNamesByEntityId);
-			warnings += getEntityValidationCount(maxCountWarningChildNamesByEntityId);
+			warnings = validationCache.getTotalAttributeWarnings();
+			warnings += validationCache.getTotalMinCountWarnings();
+			warnings += validationCache.getTotalMaxCountWarnings();
 		}
 		return warnings;
 	}
@@ -323,6 +310,10 @@ public class CollectRecord extends Record {
 
 	public List<String> getRootEntityKeyValues() {
 		return rootEntityKeyValues;
+	}
+
+	public RecordValidationCache getValidationCache() {
+		return validationCache;
 	}
 	
 	public void updateRootEntityKeyValues(){
@@ -440,17 +431,15 @@ public class CollectRecord extends Record {
 	 * Updates all derived states of all nodes
 	 * @return 
 	 */
-	public RecordValidationResult updateDerivedStates() {
+	public void updateDerivedStates() {
 		initErrorCountInfo();
 		Entity rootEntity = getRootEntity();
-		final RecordValidationResult result = new RecordValidationResult(this);
 		rootEntity.traverse(new NodeVisitor() {
 			@Override
 			public void visit(Node<? extends NodeDefinition> node, int idx) {
 				if ( node instanceof Attribute ) {
 					Attribute<?,?> attribute = (Attribute<?, ?>) node;
-					ValidationResults results = attribute.validateValue();
-					result.addValidationResult(attribute, results);
+					attribute.validateValue();
 				} else if ( node instanceof Entity ) {
 					Entity entity = (Entity) node;
 					ModelVersion version = getVersion();
@@ -459,24 +448,13 @@ public class CollectRecord extends Record {
 					for (NodeDefinition childDefinition : childDefinitions) {
 						if ( version == null || version.isApplicable(childDefinition) ) {
 							String childName = childDefinition.getName();
-							ValidationResultFlag maxCountResult = entity.validateMaxCount( childName );
-							ValidationResultFlag minCountResult = entity.validateMinCount( childName );
-							boolean relevant = entity.isRelevant(childName);
-							boolean required = entity.isRequired(childName);
-							
-							List<Node<? extends NodeDefinition>> children = entity.getAll(childName);
-							for (Node<? extends NodeDefinition> child : children) {
-								result.addMinCountValidation(entity, childName, minCountResult);
-								result.addMaxCountValidation(entity, childName, maxCountResult);
-								result.setRelevant(child, relevant);
-								result.setRequired(child, required);
-							}
+							entity.validateMaxCount(childName);
+							entity.validateMinCount(childName);
 						}
 					}
 				}
 			}
 		});
-		return result;
 	}
 	
 	/**
@@ -522,7 +500,7 @@ public class CollectRecord extends Record {
 		Entity parentEntity = node.getParent();
 		int index = node.getIndex();
 		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
-		removeValidationCounts(deletedNode.getInternalId());
+		removeValidationCache(deletedNode.getInternalId());
 		return deletedNode;
 	}
 	
@@ -787,47 +765,6 @@ public class CollectRecord extends Record {
 		return new NodeChangeSet(changeMap.getChanges());
 	}
 	
-	protected Set<String> clearEntityValidationCounts(Map<Integer, Set<String>> counts, Integer entityId, String childName) {
-		Set<String> set = counts.get(entityId);
-		if(set == null) {
-			set = new HashSet<String>();
-			counts.put(entityId, set);
-		} else {
-			set.remove(childName);
-		}
-		return set;
-	}
-	
-	protected Integer getEntityValidationCount(Map<Integer, Set<String>> map) {
-		int count = 0;
-		for (Set<String> set : map.values()) {
-			count += set.size();
-		}
-		return count;
-	}
-	
-	protected Integer getMissingCount(Map<Integer, Set<String>> minCounts) {
-		int result = 0;
-		Set<Integer> keySet = minCounts.keySet();
-		for (Integer id : keySet) {
-			Entity entity = (Entity) getNodeByInternalId(id);
-			Set<String> set = minCounts.get(id);
-			for (String childName : set) {
-				int missingCount = entity.getMissingCount(childName);
-				result += missingCount;
-			}
-		}
-		return result;
-	}
-	
-	protected Integer getAttributeValidationCount(Map<Integer, Integer> map) {
-		int count = 0;
-		for (Integer i : map.values()) {
-			count += i;
-		}
-		return count;
-	}
-
 	protected List<NodePointer> createCardinalityNodePointers(Node<?> node){
 		List<NodePointer> nodePointers = new ArrayList<NodePointer>();
 		
@@ -1321,23 +1258,13 @@ public class CollectRecord extends Record {
 	}
 	
 	public void updateSkippedCount(Integer attributeId) {
-		removeValidationCounts(attributeId);
-		skippedNodes.add(attributeId);
+		removeValidationCache(attributeId);
+		validationCache.addSkippedNodeId(attributeId);
 		skipped = null;
 	}
 	
-	public void updateValidationMinCounts(Integer entityId, String childName, ValidationResultFlag flag) {
-		Set<String> errors = clearEntityValidationCounts(minCountErrorChildNamesByEntityId, entityId, childName);
-		Set<String> warnings = clearEntityValidationCounts(minCountWarningChildNamesByEntityId, entityId, childName);
-		switch (flag) {
-		case ERROR:
-			errors.add(childName);
-			break;
-		case WARNING:
-			warnings.add(childName);
-			break;
-		default:
-		}
+	public void updateMinCountsValidationCache(Integer entityId, String childName, ValidationResultFlag flag) {
+		validationCache.updateMinCountInfo(entityId, childName, flag);
 		this.missing = null;
 		this.missingErrors = null;
 		this.missingWarnings = null;
@@ -1345,62 +1272,29 @@ public class CollectRecord extends Record {
 		this.warnings = null;
 	}
 
-	public void updateValidationMaxCounts(Integer entityId, String childName, ValidationResultFlag flag) {
-		Set<String> errors = clearEntityValidationCounts(maxCountErrorChildNamesByEntityId, entityId, childName);
-		Set<String> warnings = clearEntityValidationCounts(maxCountWarningChildNamesByEntityId, entityId, childName);
-		switch(flag) {
-		case ERROR:
-			errors.add(childName);
-			break;
-		case WARNING:
-			warnings.add(childName);
-			break;
-		default:
-		}
+	public void updateMaxCountsValidationCache(Integer entityId, String childName, ValidationResultFlag flag) {
+		validationCache.updateMaxCountInfo(entityId, childName, flag);
 		this.errors = null;
 		this.warnings = null;
 	}
 	
-	public void updateValidationCounts(Integer attributeId, ValidationResults validationResults) {
-		removeValidationCounts(attributeId);
+	public void updateAttributeValidationCache(Integer attributeId, ValidationResults validationResults) {
+		removeValidationCache(attributeId);
 		
 		int errorCounts = validationResults.getErrors().size();
 		int warningCounts = validationResults.getWarnings().size();
-		this.errorCounts.put(attributeId, errorCounts);
-		this.warningCounts.put(attributeId, warningCounts);
+		validationCache.setAttributeErrorCount(attributeId, errorCounts);
+		validationCache.setAttributeWarningCount(attributeId, warningCounts);
+		validationCache.setAttributeValidationResults(attributeId, validationResults);
 		
 		errors = null;
 		warnings = null;
 	}
 	
-	public boolean isMinCountError(Entity entity, String childName) {
-		return minCountErrorChildNamesByEntityId.containsKey(childName);
-	}
 	
-	public boolean isMaxCountError(Entity entity, String childName) {
-		return maxCountErrorChildNamesByEntityId.containsKey(childName);
-	}
-	
-	public boolean isMinCountWarning(Entity entity, String childName) {
-		return minCountWarningChildNamesByEntityId.containsKey(childName);
-	}
-	
-	public boolean isMaxCountWarning(Entity entity, String childName) {
-		return maxCountWarningChildNamesByEntityId.containsKey(childName);
-	}
-	
-	protected void removeValidationCounts(Integer nodeId) {
+	protected void removeValidationCache(Integer nodeId) {
 		Node<?> node = this.getNodeByInternalId(nodeId);
-		if(node instanceof Attribute<?, ?>) {
-			skippedNodes.remove(nodeId);
-			errorCounts.remove(nodeId);
-			warningCounts.remove(nodeId);
-		} else {
-			minCountErrorChildNamesByEntityId.remove(nodeId);
-			maxCountErrorChildNamesByEntityId.remove(nodeId);
-			minCountWarningChildNamesByEntityId.remove(nodeId);
-			maxCountWarningChildNamesByEntityId.remove(nodeId);
-		}
+		validationCache.remove(node);
 		skipped = null;
 		missing = null;
 		missingErrors = null;

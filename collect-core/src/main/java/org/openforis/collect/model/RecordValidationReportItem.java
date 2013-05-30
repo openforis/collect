@@ -9,14 +9,14 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
  * @author S. Ricci
  *
  */
-public class RecordValidationItem {
+public class RecordValidationReportItem {
 
 	private Integer nodeId;
 	private String path;
 	private ValidationResultFlag severity;
 	private String message;
 	
-	public RecordValidationItem(Integer nodeId, String path,
+	public RecordValidationReportItem(Integer nodeId, String path,
 			ValidationResultFlag severity, String message) {
 		super();
 		this.nodeId = nodeId;
@@ -25,7 +25,7 @@ public class RecordValidationItem {
 		this.message = message;
 	}
 
-	public RecordValidationItem(String path, ValidationResultFlag severity,
+	public RecordValidationReportItem(String path, ValidationResultFlag severity,
 			String message) {
 		super();
 		this.path = path;

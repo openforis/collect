@@ -11,12 +11,13 @@ import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.RecordValidationItem;
-import org.openforis.collect.model.RecordValidationResult;
+import org.openforis.collect.model.RecordValidationReportItem;
+import org.openforis.collect.model.RecordValidationReportGenerator;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.commons.io.csv.CsvWriter;
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 /**
  * 
@@ -126,49 +127,14 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		
 	}
 
-	protected void writeValidationReport(final CollectRecord record) throws IOException {
+	protected void writeValidationReport(CollectRecord record) throws IOException {
 		
-		RecordValidationResult validationResult = recordManager.validate(record);
-		List<RecordValidationItem> validationItems = validationResult.createPrintableItems(validationMessageBuilder);
-		for (RecordValidationItem item : validationItems) {
+		RecordValidationReportGenerator validationResult = recordManager.validate(record);
+		List<RecordValidationReportItem> validationItems = validationResult.generateValidationItems(
+				validationMessageBuilder, ValidationResultFlag.ERROR, includeConfirmedErrors);
+		for (RecordValidationReportItem item : validationItems) {
 			writeValidationReportLine(record, item.getPath(), item.getMessage());
 		}
-		/*
-		final ModelVersion version = record.getVersion();
-		Entity rootEntity = record.getRootEntity();
-		record.addEmptyNodes(rootEntity);
-		rootEntity.traverse(new NodeVisitor() {
-			@Override
-			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				if ( node instanceof Attribute ) {
-					Attribute<?,?> attribute = (Attribute<?, ?>) node;
-					ValidationResults validationResults = attribute.validateValue();
-					boolean errorConfirmed = record.isErrorConfirmed(attribute);
-					if ( validationResults.hasErrors() || (includeConfirmedErrors && validationResults.hasWarnings() && errorConfirmed) ) {
-						writeErrors(attribute, validationResults);
-					}
-				} else if ( node instanceof Entity ) {
-					Entity entity = (Entity) node;
-					EntityDefinition definition = entity.getDefinition();
-					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
-					for (NodeDefinition childDefinition : childDefinitions) {
-						if ( version == null || version.isApplicable(childDefinition) ) {
-							String childName = childDefinition.getName();
-							ValidationResultFlag validateMaxCount = entity.validateMaxCount( childName );
-							if ( validateMaxCount.isError() ) {
-								writeMaxCountError(entity, childName);
-							}
-							ValidationResultFlag validateMinCount = entity.validateMinCount( childName );
-							boolean missingApproved = record.isMissingApproved(entity, childName);
-							if ( validateMinCount.isError() || (includeConfirmedErrors && validateMinCount.isWarning() && missingApproved) ) {
-								writeMinCountError(entity, childName);
-							}
-						}
-					}
-				}
-			}
-		});
-		*/
 	}
 	
 	protected void writeHeader() throws IOException {
@@ -178,42 +144,6 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		break;
 		}
 	}
-//
-//	protected void writeErrors(Attribute<?,?> attribute, ValidationResults validationResults) {
-//		CollectRecord record = (CollectRecord) attribute.getRecord();
-//		List<String> messages = validationMessageBuilder.getValidationMessages(attribute, validationResults, Flag.ERROR);
-//		if ( messages.isEmpty() && record.isErrorConfirmed(attribute) ) {
-//			messages = validationMessageBuilder.getValidationMessages(attribute, validationResults, Flag.WARN);
-//		}
-//		if ( ! messages.isEmpty() ) {
-//			String path = validationMessageBuilder.getPrettyFormatPath(attribute);
-//			for (String message : messages) {
-//				writeValidationReportLine(record, path, message);
-//			}
-//		}
-//	}
-//	
-//	private void writeMinCountError(Entity parentEntity, String childName) {
-//		writeCountError(true, parentEntity, childName);
-//	}
-//
-//	private void writeMaxCountError(Entity parentEntity, String childName) {
-//		writeCountError(false, parentEntity, childName);
-//	}
-//	
-//	protected void writeCountError(boolean min, Entity parentEntity, String childName) {
-//		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-//		NodeDefinition childDefn = parentEntityDefn.getChildDefinition(childName);
-//		String message;
-//		if ( min ) {
-//			message = validationMessageBuilder.getMinCountValidationMessage(parentEntity, childName); 
-//		} else {
-//			message = validationMessageBuilder.getMaxCountValidationMessage(childDefn);
-//		}
-//		String path = validationMessageBuilder.getPrettyFormatPath(parentEntity, childName);
-//		CollectRecord record = (CollectRecord) parentEntity.getRecord();
-//		writeValidationReportLine(record, path, message);
-//	}
 
 	protected void writeValidationReportLine(CollectRecord record, String path, String message) {
 		String recordKey = validationMessageBuilder.getRecordKey(record);

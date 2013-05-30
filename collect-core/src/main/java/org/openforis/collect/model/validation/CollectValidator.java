@@ -70,7 +70,7 @@ public class CollectValidator extends Validator {
 			if (step == Step.ENTRY) {
 				results = adjustErrorsForEntryPhase(results, attribute);
 			}
-			record.updateValidationCounts(attribute.getInternalId(), results);
+			record.updateAttributeValidationCache(attribute.getInternalId(), results);
 		}
 		return results;
 	}
@@ -84,7 +84,7 @@ public class CollectValidator extends Validator {
 	public ValidationResultFlag validateMinCount(Entity entity, String childName) {
 		ValidationResultFlag flag = super.validateMinCount(entity, childName);
 		CollectRecord record = (CollectRecord) entity.getRecord();
-		record.updateValidationMinCounts(entity.getInternalId(), childName, flag);
+		record.updateMinCountsValidationCache(entity.getInternalId(), childName, flag);
 		return flag;
 	}
 	
@@ -92,7 +92,7 @@ public class CollectValidator extends Validator {
 	public ValidationResultFlag validateMaxCount(Entity entity, String childName) {
 		ValidationResultFlag flag = super.validateMaxCount(entity, childName);
 		CollectRecord record = (CollectRecord) entity.getRecord();
-		record.updateValidationMaxCounts(entity.getInternalId(), childName, flag);
+		record.updateMaxCountsValidationCache(entity.getInternalId(), childName, flag);
 		return flag;
 	}
 	

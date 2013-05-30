@@ -91,6 +91,11 @@ public class ValidationMessageBuilder {
 			}
 		}
 	}
+	
+	public String getReasonBlankNotSpecifiedMessage() {
+		String message = messageBundle.getMessage("validation.specifiedError");
+		return message;
+	}
 
 	private String getCustomMessage(Check<?> check) {
 		Locale locale = messageBundle.getCurrentLocale();
@@ -119,8 +124,14 @@ public class ValidationMessageBuilder {
 	public String getMaxCountValidationMessage(NodeDefinition defn) {
 		Integer maxCount = defn.getMaxCount();
 		Object[] args = new Integer[]{maxCount > 0 ? maxCount: 1};
-		String message = messageBundle.getMessage("edit.validation.maxCount", args);
+		String message = messageBundle.getMessage("validation.maxCount", args);
 		return message;
+	}
+
+	public String getMaxCountValidationMessage(Entity parentEntity, String childName) {
+		EntityDefinition defn = parentEntity.getDefinition();
+		NodeDefinition childDefn = defn.getChildDefinition(childName);
+		return getMaxCountValidationMessage(childDefn);
 	}
 
 	public String getMinCountValidationMessage(Entity parentEntity, String childName) {
