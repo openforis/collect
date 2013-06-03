@@ -150,15 +150,17 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 			if ( isVersionInUse(version, codeList) ) {
 				references.add(codeList);
 			}
-			List<CodeListItem> items = codeList.getItems();
-			Stack<CodeListItem> itemsStack = new Stack<CodeListItem>();
-			itemsStack.addAll(items);
-			while ( ! itemsStack.isEmpty() ) {
-				CodeListItem item = itemsStack.pop();
-				if ( isVersionInUse(version, item) ) {
-					references.add(item);
+			if ( ! codeList.isExternal() ) {
+				List<CodeListItem> items = codeList.getItems();
+				Stack<CodeListItem> itemsStack = new Stack<CodeListItem>();
+				itemsStack.addAll(items);
+				while ( ! itemsStack.isEmpty() ) {
+					CodeListItem item = itemsStack.pop();
+					if ( isVersionInUse(version, item) ) {
+						references.add(item);
+					}
+					itemsStack.addAll(item.getChildItems());
 				}
-				itemsStack.addAll(item.getChildItems());
 			}
 		}
 		return references;

@@ -66,7 +66,7 @@ public class DataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public DataImportStateProxy startSummaryCreation(boolean overwriteAll) throws DataImportExeption {
+	public DataImportStateProxy startSummaryCreation(String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
 		if ( dataImportProcess == null || ! dataImportProcess.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
@@ -76,7 +76,7 @@ public class DataImportService {
 			for (User user : usersList) {
 				users.put(user.getName(), user);
 			}
-			dataImportProcess = new DataImportProcess(surveyManager, recordManager, recordDao, users, packagedFile, overwriteAll);
+			dataImportProcess = new DataImportProcess(surveyManager, recordManager, recordDao, selectedSurveyUri, users, packagedFile, overwriteAll);
 			dataImportProcess.prepareToStartSummaryCreation();
 			ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 		}

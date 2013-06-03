@@ -40,6 +40,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 
 	/**
 	 * 
@@ -145,7 +146,9 @@ package org.openforis.collect.presenter {
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
 			_view.currentState = DataImportView.STATE_LOADING;
 			var responder:AsyncResponder = new AsyncResponder(startSummaryCreationResultHandler, faultHandler);
-			_dataImportClient.startSummaryCreation(responder);
+			var activeSurvey:SurveyProxy = Application.activeSurvey;
+			var selectedSurveyUri:String = activeSurvey == null ? null: activeSurvey.uri;
+			_dataImportClient.startSummaryCreation(responder, selectedSurveyUri);
 			startProgressTimer();
 		}
 		

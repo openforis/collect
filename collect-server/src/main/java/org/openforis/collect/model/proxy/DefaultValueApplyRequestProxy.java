@@ -18,7 +18,7 @@ public class DefaultValueApplyRequestProxy extends NodeUpdateRequestProxy<Defaul
 	private Integer nodeId;
 
 	@Override
-	public DefaultValueApplyRequest toNodeUpdateOptions(CollectRecord record) {
+	public DefaultValueApplyRequest toNodeUpdateRequest(CollectRecord record) {
 		DefaultValueApplyRequest opts = new NodeUpdateRequest.DefaultValueApplyRequest();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 		opts.setAttribute(attribute);

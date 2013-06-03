@@ -17,12 +17,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
-	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
-	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -171,7 +169,7 @@ package org.openforis.collect.presenter {
 		
 		protected function updateDescription():void {
 			_view.description = "";
-			if(_view.attribute != null) {
+			if ( ! CodeAttributeDefinitionProxy(_view.attributeDefinition).external && _view.attribute != null) {
 				var codes:Array = [];
 				var code:String;
 				var attribute:AttributeProxy;

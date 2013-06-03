@@ -19,7 +19,7 @@ public class MissingValueApproveRequestProxy extends NodeUpdateRequestProxy<Miss
 	private String nodeName;
 	
 	@Override
-	public MissingValueApproveRequest toNodeUpdateOptions(CollectRecord record) {
+	public MissingValueApproveRequest toNodeUpdateRequest(CollectRecord record) {
 		MissingValueApproveRequest opts = new NodeUpdateRequest.MissingValueApproveRequest();
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
 		opts.setParentEntity(parentEntity);

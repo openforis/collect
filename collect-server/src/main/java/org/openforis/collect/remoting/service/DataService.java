@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
@@ -66,6 +67,8 @@ public class DataService {
 	@Autowired
 	private transient RecordManager recordManager;
 	@Autowired
+	private transient CodeListManager codeListManager;
+	@Autowired
 	private transient RecordFileManager fileManager;
 	@Autowired
 	private transient RecordIndexService recordIndexService;
@@ -79,16 +82,16 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
+	public RecordProxy loadRecord(int id, int stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
 		}
 		final CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
+		Step step = Step.valueOf(stepNumber);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
-		Entity rootEntity = record.getRootEntity();
-		record.addEmptyNodes(rootEntity);
+		recordManager.addEmptyNodes(record);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
 		prepareRecordIndexing();
@@ -143,8 +146,7 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
-		Entity rootEntity = record.getRootEntity();
-		record.addEmptyNodes(rootEntity);
+		recordManager.addEmptyNodes(record);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
 		RecordProxy recordProxy = new RecordProxy(messageContextHolder, record);
@@ -157,7 +159,7 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		//TODO check that the record is in ENTRY phase: only delete in ENTRY phase is allowed
-		CollectRecord record = recordManager.load(survey, id, Step.ENTRY.getStepNumber());
+		CollectRecord record = recordManager.load(survey, id, Step.ENTRY);
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
 	}
@@ -184,7 +186,7 @@ public class DataService {
 	public NodeChangeSetProxy updateActiveRecord(NodeUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		CollectRecord activeRecord = getActiveRecord();
-		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateOptionsSet(activeRecord, fileManager, sessionManager);
+		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateRequestSet(codeListManager, fileManager, sessionManager, activeRecord);
 		NodeChangeSet changeSet = updateRecord(activeRecord, reqSet);
 		if ( ! changeSet.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
@@ -201,8 +203,8 @@ public class DataService {
 		return result;
 	}
 
-	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequestSet nodeUpdateOptionSet) throws RecordPersistenceException, RecordIndexException {
-		List<NodeUpdateRequest> opts = nodeUpdateOptionSet.getRequests();
+	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequestSet nodeUpdateRequestSet) throws RecordPersistenceException, RecordIndexException {
+		List<NodeUpdateRequest> opts = nodeUpdateRequestSet.getRequests();
 		NodeChangeMap result = new NodeChangeMap();
 		for (NodeUpdateRequest req : opts) {
 			NodeChangeSet partialChangeSet = updateRecord(record, req);
@@ -217,41 +219,44 @@ public class DataService {
 	@SuppressWarnings("unchecked")
 	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequest req) throws RecordPersistenceException {
 		if ( req instanceof ErrorConfirmRequest ) {
-			return record.confirmError(((ErrorConfirmRequest) req).getAttribute());
+			return recordManager.confirmError(((ErrorConfirmRequest) req).getAttribute());
 		} else if ( req instanceof MissingValueApproveRequest ) {
 			MissingValueApproveRequest r = (MissingValueApproveRequest) req;
-			return record.approveMissingValue(r.getParentEntity(), r.getNodeName());
+			return recordManager.approveMissingValue(r.getParentEntity(), r.getNodeName());
 		} else if ( req instanceof RemarksUpdateRequest ) {
 			RemarksUpdateRequest r = (RemarksUpdateRequest) req;
-			return record.updateRemarks(r.getField(), r.getRemarks());
+			return recordManager.updateRemarks(r.getField(), r.getRemarks());
 		} else if ( req instanceof AttributeAddRequest ) {
 			AttributeAddRequest<Value> r = (AttributeAddRequest<Value>) req;
-			return record.addAttribute(r.getParentEntity(), r.getNodeName(), r.getValue(), 
+			return recordManager.addAttribute(r.getParentEntity(), r.getNodeName(), r.getValue(), 
 					r.getSymbol(), r.getRemarks());
 		} else if ( req instanceof EntityAddRequest ) {
 			EntityAddRequest r = (EntityAddRequest) req;
-			return record.addEntity(r.getParentEntity(), r.getNodeName());
+			return recordManager.addEntity(r.getParentEntity(), r.getNodeName());
 		} else if ( req instanceof AttributeUpdateRequest ) {
 			AttributeUpdateRequest<Value> r = (AttributeUpdateRequest<Value>) req;
 			Value value = r.getValue();
 			FieldSymbol symbol = r.getSymbol();
 			if ( value == null && symbol == null || value != null ) {
-				return record.updateAttribute(r.getAttribute(), value);
+				return recordManager.updateAttribute(r.getAttribute(), value);
 			} else if ( symbol != null ) {
-				return record.updateAttribute(r.getAttribute(), symbol);
+				return recordManager.updateAttribute(r.getAttribute(), symbol);
 			} else {
 				throw new IllegalArgumentException("Cannot specify both value and symbol");
 			}
 		} else if ( req instanceof FieldUpdateRequest ) {
-			FieldUpdateRequest r = (FieldUpdateRequest) req;
-			return record.updateField(r.getField(), r.getValue(), r.getSymbol(), r.getRemarks());
+			return processUpdateFieldRequest((FieldUpdateRequest<?>) req);
 		} else if ( req instanceof DefaultValueApplyRequest ) {
-			return record.applyDefaultValue(((DefaultValueApplyRequest) req).getAttribute());
+			return recordManager.applyDefaultValue(((DefaultValueApplyRequest) req).getAttribute());
 		} else if ( req instanceof NodeDeleteRequest ) {
-			return record.deleteNode(((NodeDeleteRequest) req).getNode());
+			return recordManager.deleteNode(((NodeDeleteRequest) req).getNode());
 		} else {
 			throw new IllegalArgumentException("NodeChange not supported: " + req.getClass().getSimpleName());
 		}
+	}
+
+	protected <T> NodeChangeSet processUpdateFieldRequest(FieldUpdateRequest<T> r) {
+		return recordManager.updateField(r.getField(), r.getValue(), r.getSymbol(), r.getRemarks());
 	}
 	
 	@Secured("ROLE_ENTRY")
@@ -354,7 +359,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.getAssignableCodeListItems(parent, def);
 		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>();
 		if(codes != null && codes.length > 0) {
 			//filter by specified codes
@@ -382,7 +387,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
 		List<Node<?>> selectedCodes = parent.getAll(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
@@ -402,10 +407,10 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attributeName);
-		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.getAssignableCodeListItems(parent, def);
 		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
 		for (String code : codes) {
-			CodeListItem item = record.findCodeListItem(items, code);
+			CodeListItem item = codeListManager.findCodeListItem(items, code);
 			if(item != null) {
 				CodeListItemProxy proxy = new CodeListItemProxy(item);
 				result.add(proxy);

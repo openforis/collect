@@ -14,6 +14,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.MinCountValidator;
 import org.openforis.idm.metamodel.validation.NumberValueUnitValidator;
 import org.openforis.idm.metamodel.validation.NumericRangeUnitValidator;
+import org.openforis.idm.metamodel.validation.TaxonVernacularLanguageValidator;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -78,6 +79,11 @@ public class CollectValidator extends Validator {
 	@Override
 	protected MinCountValidator getMinCountValidator(NodeDefinition defn) {
 		return new CollectMinCountValidator(defn);
+	}
+	
+	@Override
+	protected TaxonVernacularLanguageValidator getTaxonVernacularLanguageValidator() {
+		return new CollectTaxonVernacularLanguageValidator();
 	}
 	
 	@Override

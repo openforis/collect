@@ -3,12 +3,14 @@
  */
 package org.openforis.collect.model.proxy;
 
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.NodeUpdateRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Value;
 
@@ -22,21 +24,24 @@ public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy
 	private Integer nodeId;
 
 	@Override
-	public AttributeUpdateRequest<?> toNodeUpdateOptions(CollectRecord record) {
+	public AttributeUpdateRequest<?> toNodeUpdateRequest(CollectRecord record) {
 		throw new UnsupportedOperationException();
 	}
 	
 	@SuppressWarnings("unchecked")
-	public AttributeUpdateRequest<?> toNodeUpdateOptions(CollectRecord record, RecordFileManager fileManager, SessionManager sessionManager) {
+	public AttributeUpdateRequest<?> toNodeUpdateOptions(CodeListManager codeListManager, RecordFileManager fileManager, 
+			SessionManager sessionManager, CollectRecord record) {
 		AttributeUpdateRequest<Value> opts = new NodeUpdateRequest.AttributeUpdateRequest<Value>();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 		opts.setAttribute((Attribute<?, Value>) attribute);
 		if ( value != null ) {
 			Value parsedValue;
 			if ( attribute instanceof FileAttribute ) {
-				parsedValue = parseFileAttributeValue(record, fileManager, sessionManager, nodeId, value);
+				parsedValue = parseFileAttributeValue(fileManager, record, sessionManager, nodeId, value);
 			} else {
-				parsedValue = parseCompositeAttributeValue(attribute.getParent(), attribute.getDefinition(), value);
+				Entity parentEntity = attribute.getParent();
+				String attributeName = attribute.getName();
+				parsedValue = parseCompositeAttributeValue(codeListManager, parentEntity, attributeName, value);
 			}
 			opts.setValue(parsedValue);
 		}

@@ -63,6 +63,7 @@ package org.openforis.collect.presenter {
 	public class CollectPresenter extends AbstractPresenter {
 
 		private static const KEEP_ALIVE_FREQUENCY:Number = 30000;
+		private static const KEEP_ALIVE_MAX_RETRY:int = 4;
 		
 		private static const MOUSE_WHEEL_BUMP_DELTA:Number = 30;
 		
@@ -73,6 +74,7 @@ package org.openforis.collect.presenter {
 		private var _speciesImportPopUp:SpeciesImportPopUp;
 		
 		private var _keepAliveTimer:Timer;
+		private var _keepAliveRetryTimes:int;
 		
 		public function CollectPresenter(view:collect) {
 			this._view = view;
@@ -81,6 +83,7 @@ package org.openforis.collect.presenter {
 
 			super();
 
+			_keepAliveRetryTimes = 0;
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
@@ -363,12 +366,17 @@ package org.openforis.collect.presenter {
 		
 		internal function keepAliveResult(event:ResultEvent, token:Object = null):void {
 			//keep alive heartbeat sent correctly
+			_keepAliveRetryTimes = 0;
 		}
 		
 		internal function keepAliveFaultHandler(event:FaultEvent, token:Object = null):void {
-			faultHandler(event, token);
-			if(Application.serverOffline) {
-				_keepAliveTimer.stop();
+			if ( _keepAliveRetryTimes == KEEP_ALIVE_MAX_RETRY ) { 
+				faultHandler(event, token);
+				if(Application.serverOffline) {
+					_keepAliveTimer.stop();
+				}
+			} else {
+				_keepAliveRetryTimes ++;
 			}
 		}
 		

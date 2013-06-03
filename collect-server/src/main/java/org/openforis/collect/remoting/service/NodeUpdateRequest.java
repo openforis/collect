@@ -107,18 +107,18 @@ public abstract class NodeUpdateRequest {
 
 	}
 	
-	public static class FieldUpdateRequest extends NodeUpdateRequest {
+	public static class FieldUpdateRequest<T> extends NodeUpdateRequest {
 		
-		private Field<?> field;
-		private String value;
+		private Field<T> field;
+		private T value;
 		private String remarks;
 		private FieldSymbol symbol;
 		
-		public Field<?> getField() {
+		public Field<T> getField() {
 			return field;
 		}
 		
-		public void setField(Field<?> field) {
+		public void setField(Field<T> field) {
 			this.field = field;
 		}
 		
@@ -138,11 +138,11 @@ public abstract class NodeUpdateRequest {
 			this.symbol = symbol;
 		}
 
-		public String getValue() {
+		public T getValue() {
 			return value;
 		}
 
-		public void setValue(String value) {
+		public void setValue(T value) {
 			this.value = value;
 		}
 

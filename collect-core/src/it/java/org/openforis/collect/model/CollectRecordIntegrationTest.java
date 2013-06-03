@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
@@ -28,18 +29,23 @@ import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author S. Ricci
  *
  */
 public class CollectRecordIntegrationTest extends CollectIntegrationTest {
+	
+	@Autowired
+	private RecordManager recordManager;
+	
 	@Test
 	public void testAddMultipleEntity() throws Exception {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
-		NodeChangeSet changeSet = record.addEntity(cluster, "plot");
+		NodeChangeSet changeSet = recordManager.addEntity(cluster, "plot");
 		assertNotNull(changeSet);
 		assertEquals(2, changeSet.size());
 		List<NodeChange<?>> changes = changeSet.getChanges();
@@ -71,7 +77,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
 		{
-			NodeChangeSet changeSet = record.addEntity(cluster, "time_study");
+			NodeChangeSet changeSet = recordManager.addEntity(cluster, "time_study");
 			List<NodeChange<?>> changes = changeSet.getChanges();
 			assertEquals(2, changes.size());
 			Iterator<NodeChange<?>> respIt = changes.iterator();
@@ -96,7 +102,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			}
 		}
 		{
-			NodeChangeSet changeSet = record.addEntity(cluster, "time_study");
+			NodeChangeSet changeSet = recordManager.addEntity(cluster, "time_study");
 			List<NodeChange<?>> changes = changeSet.getChanges();
 			assertEquals(2, changes.size());
 			NodeChange<?> clusterChange = changes.get(1);
@@ -116,7 +122,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
 		Entity timeStudy = (Entity) cluster.get("time_study", 0);
-		NodeChangeSet changeSet = record.deleteNode(timeStudy);
+		NodeChangeSet changeSet = recordManager.deleteNode(timeStudy);
 		List<NodeChange<?>> changes = changeSet.getChanges();
 		assertEquals(2, changes.size());
 		{
@@ -149,7 +155,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Entity timeStudy = (Entity) cluster.get("time_study", 0);
 		{
 			//delete node (min count error expected)
-			NodeChangeSet changeSet = record.deleteNode(timeStudy);
+			NodeChangeSet changeSet = recordManager.deleteNode(timeStudy);
 			List<NodeChange<?>> changes = changeSet.getChanges();
 			int missingCount2 = cluster.getMissingCount("time_study");
 			assertEquals(1, missingCount2);
@@ -162,7 +168,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		}
 		{
 			//approve missing value (min count warning expected)
-			NodeChangeSet changeSet = record.approveMissingValue(cluster, "time_study");
+			NodeChangeSet changeSet = recordManager.approveMissingValue(cluster, "time_study");
 			List<NodeChange<?>> changes = changeSet.getChanges();
 			NodeChange<?> clusterChange = changes.get(0);
 			assertTrue(clusterChange instanceof EntityChange);
@@ -182,7 +188,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CodeAttribute region = (CodeAttribute) cluster.get("region", 0);
 		//add wrong value
 		{
-			NodeChangeSet changeSet = record.updateAttribute(region, new Code("ZZZ"));
+			NodeChangeSet changeSet = recordManager.updateAttribute(region, new Code("ZZZ"));
 			assertFalse(changeSet.isEmpty());
 			List<NodeChange<?>> changes = changeSet.getChanges();
 			NodeChange<?> regionChange = changes.get(0);
@@ -194,7 +200,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			assertTrue(warnings.isEmpty());
 		}
 		{
-			NodeChangeSet changeSet = record.confirmError(region);
+			NodeChangeSet changeSet = recordManager.confirmError(region);
 			assertFalse(changeSet.isEmpty());
 			List<NodeChange<?>> changes = changeSet.getChanges();
 			NodeChange<?> regionChange = changes.get(0);

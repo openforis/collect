@@ -18,7 +18,7 @@ public class NodeDeleteRequestProxy extends NodeUpdateRequestProxy<NodeDeleteReq
 	private Integer nodeId;
 
 	@Override
-	public NodeDeleteRequest toNodeUpdateOptions(CollectRecord record) {
+	public NodeDeleteRequest toNodeUpdateRequest(CollectRecord record) {
 		NodeDeleteRequest result = new NodeUpdateRequest.NodeDeleteRequest();
 		Node<?> node = record.getNodeByInternalId(nodeId);
 		result.setNode(node);

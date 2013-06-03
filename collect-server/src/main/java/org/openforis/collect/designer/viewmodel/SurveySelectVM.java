@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.form.validator.SurveyValidator;
-import org.openforis.collect.designer.form.validator.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.designer.model.SurveyManagerUtil;
 import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
@@ -19,6 +17,8 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.SurveyValidator;
+import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.annotation.BindingParam;
@@ -140,7 +140,7 @@ public class SurveySelectVM extends BaseVM {
 
 	protected boolean validateSurvey(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
 		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
-		List<SurveyValidationResult> validationResults = surveyValidator.validateSurveyForPublishing(oldPublishedSurvey, survey);
+		List<SurveyValidationResult> validationResults = surveyValidator.validateCompatibility(oldPublishedSurvey, survey);
 		if ( validationResults.isEmpty() ) {
 			return true;
 		} else {

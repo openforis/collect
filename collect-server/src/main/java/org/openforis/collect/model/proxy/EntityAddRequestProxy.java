@@ -19,7 +19,7 @@ public class EntityAddRequestProxy extends NodeUpdateRequestProxy<EntityAddReque
 	private String nodeName;
 	
 	@Override
-	public EntityAddRequest toNodeUpdateOptions(CollectRecord record) {
+	public EntityAddRequest toNodeUpdateRequest(CollectRecord record) {
 		EntityAddRequest opts = new NodeUpdateRequest.EntityAddRequest();
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
 		opts.setParentEntity(parentEntity);

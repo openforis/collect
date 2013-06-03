@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -170,7 +171,7 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateDescription():void {
 			_view.description = "";
-			if(_view.attributes != null) {
+			if ( ! CodeAttributeDefinitionProxy(_view.attributeDefinition).external && _view.attributes != null ) {
 				var codes:Array = [];
 				var code:String;
 				var attribute:AttributeProxy;

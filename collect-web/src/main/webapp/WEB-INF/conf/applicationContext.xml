@@ -166,6 +166,7 @@
 	<!-- ===================================== -->
 	<!-- Managers -->
 	<!-- ===================================== -->
+	<bean id="codeListManager" class="org.openforis.collect.manager.CodeListManager" />
 	<bean id="configurationManager" class="org.openforis.collect.manager.ConfigurationManager"
 		init-method="init" />
 	<bean id="databaseVersionManager" class="org.openforis.collect.manager.DatabaseVersionManager" />

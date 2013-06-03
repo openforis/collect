@@ -72,7 +72,7 @@ public class CodeValueFKColumn extends DataColumn {
 	protected Integer getDefaultCodeId(CodeAttributeDefinition defn,
 			ModelVersion version) {
 		CodeList list = defn.getList();
-		int levelIdx = defn.getCodeListLevel();
+		int levelIdx = defn.getLevelIndex();
 		CodeListItem defaultCodeItem = list.getItem(defaultCodeValue, levelIdx, version);
 		return defaultCodeItem == null ? -1: defaultCodeItem.getId();
 	}

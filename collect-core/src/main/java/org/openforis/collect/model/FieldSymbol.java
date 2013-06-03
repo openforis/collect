@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.model;
 
+import org.openforis.idm.model.Field;
+
 /**
  * 
  * @author S. Ricci
@@ -41,7 +43,18 @@ public enum FieldSymbol {
 		return fieldSymbol != null;
 	}
 
+	public static boolean isReasonBlankSpecified(Field<?> field) {
+		Character symbol = field.getSymbol();
+		if ( symbol == null ) {
+			return false;
+		} else {			
+			FieldSymbol fieldSymbol = FieldSymbol.valueOf(symbol);
+			return fieldSymbol == null ? false: fieldSymbol.isReasonBlank();
+		}
+	}
+
 	public boolean isReasonBlank() {
 		return this == BLANK_ON_FORM || this == DASH_ON_FORM || this == ILLEGIBLE;
 	}
+	
 }

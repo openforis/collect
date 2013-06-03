@@ -273,7 +273,7 @@ public class SurveyManager {
 			surveyWorkDao.delete(surveyWorkId);
 		}
 	}
-
+	
 	@Transactional
 	public void deleteSurvey(Integer id) {
 		CollectSurvey survey = getById(id);

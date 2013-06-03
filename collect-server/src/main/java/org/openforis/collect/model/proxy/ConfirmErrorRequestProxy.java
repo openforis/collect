@@ -18,7 +18,7 @@ public class ConfirmErrorRequestProxy extends NodeUpdateRequestProxy<ErrorConfir
 	private Integer nodeId;
 
 	@Override
-	public ErrorConfirmRequest toNodeUpdateOptions(CollectRecord record) {
+	public ErrorConfirmRequest toNodeUpdateRequest(CollectRecord record) {
 		ErrorConfirmRequest opts = new NodeUpdateRequest.ErrorConfirmRequest();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 		opts.setAttribute(attribute);

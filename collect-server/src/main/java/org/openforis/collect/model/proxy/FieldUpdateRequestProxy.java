@@ -15,7 +15,7 @@ import org.openforis.idm.model.Field;
  * @author S. Ricci
  *
  */
-public class FieldUpdateRequestProxy extends NodeUpdateRequestProxy<FieldUpdateRequest> {
+public class FieldUpdateRequestProxy extends NodeUpdateRequestProxy<FieldUpdateRequest<?>> {
 	
 	private Integer nodeId;
 	private int fieldIndex;
@@ -24,16 +24,88 @@ public class FieldUpdateRequestProxy extends NodeUpdateRequestProxy<FieldUpdateR
 	protected FieldSymbol symbol;
 	
 	@Override
-	public FieldUpdateRequest toNodeUpdateOptions(CollectRecord record) {
-		FieldUpdateRequest opts = new NodeUpdateRequest.FieldUpdateRequest();
-		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		Field<?> field = attribute.getField(fieldIndex);
-		opts.setField(field);
-		opts.setValue(value);
-		opts.setSymbol(symbol);
-		opts.setRemarks(remarks);
-		return opts;	
+	public FieldUpdateRequest<?> toNodeUpdateRequest(CollectRecord record) {
+		return toFieldUpdateRequest(record);	
 	}
+	protected <T> FieldUpdateRequest<T> toFieldUpdateRequest(CollectRecord record) {
+		FieldUpdateRequest<T> req = new NodeUpdateRequest.FieldUpdateRequest<T>();
+		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
+		@SuppressWarnings("unchecked")
+		Field<T> field = (Field<T>) attribute.getField(fieldIndex);
+		req.setField(field);
+		T parsedValue = field.parseValue(value);
+		req.setValue(parsedValue);
+		req.setSymbol(symbol);
+		req.setRemarks(remarks);
+		return req;
+	}
+	/*
+	protected <T extends Object> T parseFieldValue(Field<T> field, String value) {
+		T fieldValue = null;
+		if(StringUtils.isBlank(value)) {
+			return null;
+		}
+		int fieldIndex = field.getIndex();
+		Attribute<?, ?> attribute = field.getAttribute();
+		AttributeDefinition defn = attribute.getDefinition();
+		if(defn instanceof BooleanAttributeDefinition) {
+			fieldValue = Boolean.parseBoolean(value);
+		} else if(defn instanceof CoordinateAttributeDefinition) {
+			if(fieldIndex == 2) {
+				fieldValue = value;
+			} else {
+				fieldValue = Double.valueOf(value);
+			}
+		} else if(defn instanceof DateAttributeDefinition) {
+			Integer val = Integer.valueOf(value);
+			fieldValue = val;
+		} else if(defn instanceof NumberAttributeDefinition) {
+			NumericAttributeDefinition numberDef = (NumericAttributeDefinition) defn;
+			if(fieldIndex == 2) {
+				//unit id
+				fieldValue = Integer.parseInt(value);
+			} else {
+				NumericAttributeDefinition.Type type = numberDef.getType();
+				Number number = null;
+				switch(type) {
+					case INTEGER:
+						number = Integer.valueOf(value);
+						break;
+					case REAL:
+						number = Double.valueOf(value);
+						break;
+				}
+				if(number != null) {
+					fieldValue = number;
+				}
+			}
+		} else if(defn instanceof RangeAttributeDefinition) {
+			if(fieldIndex == 3) {
+				//unit id
+				fieldValue = Integer.parseInt(value);
+			} else {
+				RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) defn).getType();
+				Number number = null;
+				switch(type) {
+					case INTEGER:
+						number = Integer.valueOf(value);
+						break;
+					case REAL:
+						number = Double.valueOf(value);
+						break;
+				}
+				if(number != null) {
+					fieldValue = number;
+				}
+			}
+		} else if(defn instanceof TimeAttributeDefinition) {
+			fieldValue = Integer.valueOf(value);
+		} else {
+			fieldValue = value;
+		}
+		return fieldValue;
+	}
+	 */
 	
 	public Integer getNodeId() {
 		return nodeId;

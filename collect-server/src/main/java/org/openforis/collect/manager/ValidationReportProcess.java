@@ -85,7 +85,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 						Step step = summary.getStep();
 						Integer recordId = summary.getId();
 						try {
-							final CollectRecord record = recordManager.checkout(survey, user, recordId, step.getStepNumber(), sessionId, true);
+							final CollectRecord record = recordManager.checkout(survey, user, recordId, step, sessionId, true);
 							writeValidationReport(record);
 							status.incrementProcessed();
 						} finally {

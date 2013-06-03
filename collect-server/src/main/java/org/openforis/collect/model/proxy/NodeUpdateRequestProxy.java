@@ -14,6 +14,6 @@ import org.openforis.collect.remoting.service.NodeUpdateRequest;
  */
 public abstract class NodeUpdateRequestProxy<T extends NodeUpdateRequest> implements Proxy {
 	
-	public abstract T toNodeUpdateOptions(CollectRecord record);
+	public abstract T toNodeUpdateRequest(CollectRecord record);
 	
 }

@@ -97,11 +97,12 @@
 	</bean>
 	
 	<!--  Managers -->
+	<bean id="codeListManager"			class="org.openforis.collect.manager.CodeListManager" />
 	<bean id="configurationManager" 	class="org.openforis.collect.manager.ConfigurationManager" init-method="init" lazy-init="false" />
 	<bean id="recordManager" 			class="org.openforis.collect.manager.RecordManager" init-method="init" />	
 	<bean id="recordIndexManager" 		class="org.openforis.collect.manager.RecordIndexManager" lazy-init="false" init-method="init" />
 	<bean id="samplingDesignManager"    class="org.openforis.collect.manager.SamplingDesignManager" />
-  <bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
+  	<bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 
 	<!-- Expression Factory -->

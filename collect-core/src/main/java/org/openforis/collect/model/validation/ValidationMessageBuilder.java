@@ -32,6 +32,7 @@ import org.openforis.idm.metamodel.validation.NumberValueUnitValidator;
 import org.openforis.idm.metamodel.validation.NumericRangeUnitValidator;
 import org.openforis.idm.metamodel.validation.PatternCheck;
 import org.openforis.idm.metamodel.validation.RealRangeValidator;
+import org.openforis.idm.metamodel.validation.TaxonVernacularLanguageValidator;
 import org.openforis.idm.metamodel.validation.TimeValidator;
 import org.openforis.idm.metamodel.validation.UniquenessCheck;
 import org.openforis.idm.metamodel.validation.ValidationResult;
@@ -43,6 +44,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -191,6 +193,14 @@ public class ValidationMessageBuilder {
 				key = "validation.timeError";
 			} else {
 				key = "validation.incompleteTimeError";
+			}
+		} else if ( validator instanceof TaxonVernacularLanguageValidator ) {
+			TaxonAttribute taxonAttr = (TaxonAttribute) attribute;
+			if ( StringUtils.isNotBlank(taxonAttr.getVernacularName()) && 
+					StringUtils.isBlank(taxonAttr.getLanguageCode()) ) {
+				key = "validator.taxon.missingVernacularLanguage";
+			} else {
+				key = "validator.taxon.vernacularLanguageNotRequired";
 			}
 		} else if(validator instanceof UniquenessCheck) {
 			key = "validation.uniquenessError";

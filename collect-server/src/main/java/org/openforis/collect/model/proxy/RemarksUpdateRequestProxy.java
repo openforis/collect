@@ -21,7 +21,7 @@ public class RemarksUpdateRequestProxy extends NodeUpdateRequestProxy<RemarksUpd
 	private String remarks;
 	
 	@Override
-	public RemarksUpdateRequest toNodeUpdateOptions(CollectRecord record) {
+	public RemarksUpdateRequest toNodeUpdateRequest(CollectRecord record) {
 		RemarksUpdateRequest o = new NodeUpdateRequest.RemarksUpdateRequest();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 		Field<?> field = attribute.getField(fieldIndex);

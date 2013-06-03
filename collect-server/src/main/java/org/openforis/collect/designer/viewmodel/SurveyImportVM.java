@@ -13,10 +13,10 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
-import org.openforis.collect.designer.form.validator.SurveyValidator;
-import org.openforis.collect.designer.form.validator.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.SurveyValidator;
+import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -161,7 +161,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	
 	protected boolean validateSurveyForPublishing(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
 		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
-		List<SurveyValidationResult> validationResults = surveyValidator.validateSurveyForPublishing(oldPublishedSurvey, survey);
+		List<SurveyValidationResult> validationResults = surveyValidator.validateCompatibility(oldPublishedSurvey, survey);
 		if ( validationResults.isEmpty() ) {
 			return true;
 		} else {

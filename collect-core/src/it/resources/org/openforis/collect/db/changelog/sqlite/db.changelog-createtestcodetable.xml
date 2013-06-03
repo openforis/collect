@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+	
+	<changeSet author="collect" id="createhierachicalcodetable" dbms="sqlite">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="ofc_hierarchicalcodetable" />
+			</not>
+		</preConditions>
+		<createTable tableName="ofc_hierarchicalcodetable">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_ierarchicalcodetable_pkey" />
+			</column>
+			<column name="survey_id" type="INTEGER">
+<!-- 				<constraints foreignKeyName="ofc_sampling_design_survey_fkey"  -->
+<!-- 					references="ofc_survey(id)" /> -->
+			</column>
+			<column name="survey_work_id" type="INTEGER">
+<!-- 				<constraints foreignKeyName="ofc_sampling_design_survey_work_fkey"  -->
+<!-- 					references="ofc_survey_work(id)" /> -->
+			</column>
+			<column name="level1" type="VARCHAR(255)">
+			  <constraints nullable="false" />
+			</column>
+			<column name="level2" type="VARCHAR(255)" />
+			<column name="level3" type="VARCHAR(255)" />
+			<column name="label1" type="VARCHAR(255)" />
+			<column name="label2" type="VARCHAR(255)" />
+			<column name="label3" type="VARCHAR(255)" />
+			<column name="description1" type="VARCHAR(255)" />
+			<column name="description2" type="VARCHAR(255)" />
+			<column name="description3" type="VARCHAR(255)" />
+		</createTable>
+		<!-- INSERT DATA -->
+		<insert tableName="ofc_hierarchicalcodetable">
+			<column name="id" value="1" />
+			<column name="survey_id" value="1" />
+			<column name="level1" value="001" />
+			<column name="label1" value="Code 1" />
+		</insert>
+		<insert tableName="ofc_hierarchicalcodetable">
+			<column name="id" value="2" />
+			<column name="survey_id" value="1" />
+			<column name="level1" value="002" />
+			<column name="label1" value="Code 2" />
+		</insert>
+		<insert tableName="ofc_hierarchicalcodetable">
+			<column name="id" value="3" />
+			<column name="survey_id" value="1" />
+			<column name="level1" value="001" />
+			<column name="level2" value="011" />
+			<column name="label1" value="Code 1-1" />
+		</insert>
+		<insert tableName="ofc_hierarchicalcodetable">
+			<column name="id" value="4" />
+			<column name="survey_id" value="1" />
+			<column name="level1" value="001" />
+			<column name="level2" value="012" />
+			<column name="label1" value="Code 1-2" />
+		</insert>
+	</changeSet>
+	<changeSet author="collect" id="createflatcodetable" dbms="sqlite">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="ofc_flatcodetable" />
+			</not>
+		</preConditions>
+		<createTable tableName="ofc_flatcodetable">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_flatcodetable_pkey" />
+			</column>
+			<column name="survey_id" type="INTEGER">
+<!-- 				<constraints foreignKeyName="ofc_sampling_design_survey_fkey"  -->
+<!-- 					references="ofc_survey(id)" /> -->
+			</column>
+			<column name="survey_work_id" type="INTEGER">
+<!-- 				<constraints foreignKeyName="ofc_sampling_design_survey_work_fkey"  -->
+<!-- 					references="ofc_survey_work(id)" /> -->
+			</column>
+			<column name="code" type="VARCHAR(255)">
+			  <constraints nullable="false" />
+			</column>
+			<column name="label1" type="VARCHAR(255)" />
+			<column name="label2" type="VARCHAR(255)" />
+			<column name="label3" type="VARCHAR(255)" />
+			<column name="description1" type="VARCHAR(255)" />
+			<column name="description2" type="VARCHAR(255)" />
+			<column name="description3" type="VARCHAR(255)" />
+		</createTable>
+		<!-- INSERT DATA -->
+		<insert tableName="ofc_flatcodetable">
+			<column name="id" value="1" />
+			<column name="survey_id" value="1" />
+			<column name="code" value="001" />
+			<column name="label1" value="Code 1" />
+		</insert>
+		<insert tableName="ofc_flatcodetable">
+			<column name="id" value="2" />
+			<column name="survey_id" value="1" />
+			<column name="code" value="002" />
+			<column name="label1" value="Code 2" />
+		</insert>
+		<insert tableName="ofc_flatcodetable">
+			<column name="id" value="3" />
+			<column name="survey_id" value="1" />
+			<column name="code" value="003" />
+			<column name="label1" value="Code 3" />
+		</insert>
+	</changeSet>
+</databaseChangeLog>
