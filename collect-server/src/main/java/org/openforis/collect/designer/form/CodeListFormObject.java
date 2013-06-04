@@ -15,7 +15,7 @@ import org.openforis.idm.metamodel.CodeListLevel;
  */
 public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 
-	protected static final CodeScope DEFAULT_SCOPE = CodeScope.SCHEME;
+	public static final CodeScope DEFAULT_SCOPE = CodeScope.SCHEME;
 	
 	private String name;
 	private String lookupTable;
