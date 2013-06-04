@@ -170,6 +170,7 @@
 	  		        					</radiogroup>
 				                        <button
 				                          label="${labels.global.import_data}"
+				                          visible="@load(empty vm.editedItem.lookupTable)"
 				                          onClick="@command('openCodeListImportPopUp')" />
 			                      	</hlayout>
 		        				</row>

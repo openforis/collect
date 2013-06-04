@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.FormObject;
@@ -262,7 +263,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Command
 	@NotifyChange({"itemsPerLevel"})
 	public void deleteCodeListItem(@BindingParam("item") final CodeListItem item) {
-		if ( isSurveyPublished() && isEditingItemEnumeratingCodeList() ) {
+		if ( isSurveyPublished() && isEnumeratingCodeList() ) {
 			MessageUtil.showWarning("survey.code_list.cannot_delete_enumerating_code_list_items");
 		} else {
 			String messageKey;
@@ -280,7 +281,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 	}
 
-	protected boolean isEditingItemEnumeratingCodeList() {
+	protected boolean isEnumeratingCodeList() {
 		return editedItem.isEnumeratingList();
 	}
 	
@@ -334,7 +335,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(CodeListItemVM.ITEM_ARG, editedChildItem);
 		args.put(CodeListItemVM.PARENT_ITEM_ARG, editedChildItemParentItem);
-		args.put(CodeListItemVM.ENUMERATING_CODE_LIST_ARG, isSurveyPublished() && isEditingItemEnumeratingCodeList());
+		args.put(CodeListItemVM.ENUMERATING_CODE_LIST_ARG, isSurveyPublished() && isEnumeratingCodeList());
 		codeListItemPopUp = openPopUp(Resources.Component.CODE_LIST_ITEM_EDIT_POP_UP.getLocation(), true, args);
 		Binder binder = ComponentUtil.getBinder(codeListItemPopUp);
 		validateForm(binder);
@@ -420,18 +421,28 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Command
 	public void openCodeListImportPopUp() {
 		if ( canImportCodeList() ) {
-			MessageUtil.showWarning("survey.code_list.cannot_import_items_on_enumerating_code_list");
-		} else {
 			Map<String, Object> args = new HashMap<String, Object>();
 			args.put("codeListId", editedItem.getId());
 			codeListImportPopUp = openPopUp(Resources.Component.CODE_LIST_IMPORT_POPUP.getLocation(), true, args);
+		} else if ( isExternalCodeList() ) {
+			MessageUtil.showWarning("survey.code_list.cannot_import_items_on_external_code_list");
+		} else {
+			MessageUtil.showWarning("survey.code_list.cannot_import_items_on_enumerating_code_list");
 		}
 	}
 
 	protected boolean canImportCodeList() {
-		return isSurveyPublished() && isEditingItemEnumeratingCodeList() && isCodeListInPublishedSurvey();
+		return ! isExternalCodeList() && ! isUsedAsEnumeratorInPublishedSurvey();
+	}
+
+	private boolean isUsedAsEnumeratorInPublishedSurvey() {
+		return isSurveyPublished() && isEnumeratingCodeList() && isCodeListInPublishedSurvey();
 	}
 	
+	private boolean isExternalCodeList() {
+		return StringUtils.isNotBlank(editedItem.getLookupTable());
+	}
+
 	protected boolean isCodeListInPublishedSurvey() {
 		SessionStatus sessionStatus = getSessionStatus();
 		Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
