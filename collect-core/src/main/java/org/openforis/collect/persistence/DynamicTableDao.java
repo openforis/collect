@@ -92,14 +92,15 @@ public class DynamicTableDao extends JooqDaoSupport {
 			@SuppressWarnings("unchecked")
 			TableField<LookupRecord, Object> tableField = (TableField<LookupRecord, Object>) lookupTable.getField(colName);
 			if ( tableField != null ) {
-				Object colValue = filter.getValue();
+				Object filterValue = filter.getValue();
 				Condition condition;
-				if ( colValue == null ) {
-					condition = tableField.isNull();
-				} else if ( colValue instanceof String && StringUtils.isEmpty((String) colValue) ) {
+				if ( tableField.getType() == String.class && 
+						(filterValue == null || filterValue instanceof String && StringUtils.isEmpty((String) filterValue)) ) {
 					condition = tableField.isNull().or(tableField.trim().equal(""));
+				} else if ( filterValue == null ) {
+					condition = tableField.isNull();
 				} else {
-					condition = tableField.equal(colValue);
+					condition = tableField.equal(filterValue);
 				}
 				select.where(condition);
 			} else {
