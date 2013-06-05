@@ -3,7 +3,7 @@
 				 xmlns:s="library://ns.adobe.com/flex/spark" 
 				 xmlns:mx="library://ns.adobe.com/flex/mx"
 				 xmlns:component="org.openforis.collect.ui.component.*"
-				 width="300" height="230"
+				 width="350" height="230"
 				 title="{Message.get('surveySelection.popUp.title')}"
 				 >
 	
@@ -58,10 +58,12 @@
 		<s:VGroup horizontalCenter="0" horizontalAlign="center" gap="30">
 			<s:Form>
 				<s:FormItem label="{Message.get('surveySelection.survey')}">
-					<s:DropDownList id="surveyDDL" labelField="name" />
+					<s:DropDownList id="surveyDDL" labelField="name"
+									width="200" />
 				</s:FormItem>
 				<s:FormItem label="{Message.get('surveySelection.rootEntity')}">
-					<s:DropDownList id="rootEntityDDL" labelField="name" />
+					<s:DropDownList id="rootEntityDDL" labelField="name"
+									width="150" />
 				</s:FormItem>
 			</s:Form>
 			<s:HGroup gap="30">
