@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,6 +142,12 @@ public class SurveyManager {
 			SurveySummary summary = new SurveySummary(id, name, uri, projectName);
 			summaries.add(summary);
 		}
+		Collections.sort(summaries, new Comparator<SurveySummary>() {
+			@Override
+			public int compare(SurveySummary s1, SurveySummary s2) {
+				return s1.getName().compareTo(s2.getName());
+			}
+		});
 		return summaries;
 	}
 	
