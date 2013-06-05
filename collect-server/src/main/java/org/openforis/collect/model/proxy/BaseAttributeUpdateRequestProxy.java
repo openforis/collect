@@ -5,7 +5,6 @@ package org.openforis.collect.model.proxy;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
@@ -16,21 +15,13 @@ import org.openforis.collect.remoting.service.FileWrapper;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.BaseAttributeUpdateRequest;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
-import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
-import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.metamodel.Unit;
-import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Field;
 import org.openforis.idm.model.File;
 import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.NumericRange;
@@ -49,6 +40,14 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 	protected Object value;
 	protected String remarks;
 	protected FieldSymbol symbol;
+	
+	@Override
+	public T toNodeUpdateRequest(CollectRecord record) {
+		throw new UnsupportedOperationException();
+	}
+	
+	public abstract T toAttributeUpdateRequest(CodeListManager codeListManager, RecordFileManager fileManager, 
+			SessionManager sessionManager, CollectRecord record);
 	
 	protected File parseFileAttributeValue(RecordFileManager fileManager, CollectRecord record,
 			SessionManager sessionManager, Integer nodeId, Object value) {
@@ -141,73 +140,6 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 		return code;
 	}
 
-	protected Object parseFieldValue(Field<?> field, String value, Integer fieldIndex) {
-		Object fieldValue = null;
-		if(StringUtils.isBlank(value)) {
-			return null;
-		}
-		Attribute<?, ?> attribute = field.getAttribute();
-		AttributeDefinition defn = attribute.getDefinition();
-		if(defn instanceof BooleanAttributeDefinition) {
-			fieldValue = Boolean.parseBoolean(value);
-		} else if(defn instanceof CoordinateAttributeDefinition) {
-			if(fieldIndex != null) {
-				if(fieldIndex == 2) {
-					fieldValue = value;
-				} else {
-					fieldValue = Double.valueOf(value);
-				}
-			}
-		} else if(defn instanceof DateAttributeDefinition) {
-			Integer val = Integer.valueOf(value);
-			fieldValue = val;
-		} else if(defn instanceof NumberAttributeDefinition) {
-			NumericAttributeDefinition numberDef = (NumericAttributeDefinition) defn;
-			if(fieldIndex != null && fieldIndex == 2) {
-				//unit id
-				fieldValue = Integer.parseInt(value);
-			} else {
-				NumericAttributeDefinition.Type type = numberDef.getType();
-				Number number = null;
-				switch(type) {
-					case INTEGER:
-						number = Integer.valueOf(value);
-						break;
-					case REAL:
-						number = Double.valueOf(value);
-						break;
-				}
-				if(number != null) {
-					fieldValue = number;
-				}
-			}
-		} else if(defn instanceof RangeAttributeDefinition) {
-			if(fieldIndex != null && fieldIndex == 3) {
-				//unit id
-				fieldValue = Integer.parseInt(value);
-			} else {
-				RangeAttributeDefinition.Type type = ((RangeAttributeDefinition) defn).getType();
-				Number number = null;
-				switch(type) {
-					case INTEGER:
-						number = Integer.valueOf(value);
-						break;
-					case REAL:
-						number = Double.valueOf(value);
-						break;
-				}
-				if(number != null) {
-					fieldValue = number;
-				}
-			}
-		} else if(defn instanceof TimeAttributeDefinition) {
-			fieldValue = Integer.valueOf(value);
-		} else {
-			fieldValue = value;
-		}
-		return fieldValue;
-	}
-	
 	public Object getValue() {
 		return value;
 	}

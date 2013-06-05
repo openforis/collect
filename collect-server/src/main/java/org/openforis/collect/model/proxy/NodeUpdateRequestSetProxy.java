@@ -29,8 +29,8 @@ public class NodeUpdateRequestSetProxy implements Proxy {
 		List<NodeUpdateRequest> convertedOptions = new ArrayList<NodeUpdateRequest>();
 		for (NodeUpdateRequestProxy<?> proxy : requests) {
 			NodeUpdateRequest converted;
-			if ( proxy instanceof AttributeUpdateRequestProxy ) {
-				converted = ((AttributeUpdateRequestProxy) proxy).toNodeUpdateOptions(codeListManager, fileManager, sessionManager, record);
+			if ( proxy instanceof BaseAttributeUpdateRequestProxy<?> ) {
+				converted = ((BaseAttributeUpdateRequestProxy<?>) proxy).toAttributeUpdateRequest(codeListManager, fileManager, sessionManager, record);
 			} else {
 				converted = proxy.toNodeUpdateRequest(record);
 			}

@@ -24,12 +24,8 @@ public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy
 	private Integer nodeId;
 
 	@Override
-	public AttributeUpdateRequest<?> toNodeUpdateRequest(CollectRecord record) {
-		throw new UnsupportedOperationException();
-	}
-	
 	@SuppressWarnings("unchecked")
-	public AttributeUpdateRequest<?> toNodeUpdateOptions(CodeListManager codeListManager, RecordFileManager fileManager, 
+	public AttributeUpdateRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, RecordFileManager fileManager, 
 			SessionManager sessionManager, CollectRecord record) {
 		AttributeUpdateRequest<Value> opts = new NodeUpdateRequest.AttributeUpdateRequest<Value>();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
@@ -48,7 +44,6 @@ public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy
 		opts.setSymbol(symbol);
 		return opts;
 	}
-	
 	
 	public Integer getNodeId() {
 		return nodeId;

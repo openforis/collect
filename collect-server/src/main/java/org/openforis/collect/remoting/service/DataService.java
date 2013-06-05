@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
@@ -91,7 +92,6 @@ public class DataService {
 		User user = sessionState.getUser();
 		Step step = Step.valueOf(stepNumber);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
-		recordManager.addEmptyNodes(record);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
 		prepareRecordIndexing();
@@ -146,7 +146,6 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
-		recordManager.addEmptyNodes(record);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
 		RecordProxy recordProxy = new RecordProxy(messageContextHolder, record);
@@ -256,7 +255,17 @@ public class DataService {
 	}
 
 	protected <T> NodeChangeSet processUpdateFieldRequest(FieldUpdateRequest<T> r) {
-		return recordManager.updateField(r.getField(), r.getValue(), r.getSymbol(), r.getRemarks());
+		if ( StringUtils.equals(r.getField().getRemarks(), r.getRemarks()) ) {
+			if ( r.getValue() == null && r.getSymbol() == null ) {
+				return recordManager.updateField(r.getField(), (T) null);
+			} else if ( r.getValue() != null ) {
+				return recordManager.updateField(r.getField(), r.getValue());
+			} else {
+				return recordManager.updateField(r.getField(), r.getSymbol());
+			}
+		} else {
+			return recordManager.updateRemarks(r.getField(), r.getRemarks());
+		}
 	}
 	
 	@Secured("ROLE_ENTRY")

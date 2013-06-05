@@ -12,10 +12,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
@@ -37,7 +35,6 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
-import org.openforis.collect.persistence.RecordLockedByActiveUserException;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
@@ -72,27 +69,29 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class RecordManager {
 //	private final Log log = LogFactory.getLog(RecordManager.class);
+	private static final int DEFAULT_LOCK_TIMEOUT_MILLIS = 60000;
 	
 	@Autowired
 	private RecordDao recordDao;
+	
 	private RecordConverter recordConverter;
-	private Map<Integer, RecordLock> locks;
 	private long lockTimeoutMillis;
 	private boolean lockingEnabled;
+	private RecordLockManager lockManager;
 	
 	public RecordManager() {
 		this(true);
 	}
 	
-	public RecordManager(boolean recordLockingEnabled) {
+	public RecordManager(boolean lockingEnabled) {
 		super();
-		this.lockingEnabled = recordLockingEnabled;
-		lockTimeoutMillis = 60000;
+		this.lockingEnabled = lockingEnabled;
+		lockTimeoutMillis = DEFAULT_LOCK_TIMEOUT_MILLIS;
 		recordConverter = new RecordConverter();
 	}
 
 	protected void init() {
-		locks = new HashMap<Integer, RecordLock>();
+		lockManager = new RecordLockManager(lockTimeoutMillis);
 	}
 	
 	@Transactional
@@ -110,11 +109,11 @@ public class RecordManager {
 			id = record.getId();
 			//todo fix: concurrency problem may occur..
 			if ( isLockingEnabled() ) {
-				lock(id, user, sessionId);
+				lockManager.lock(id, user, sessionId);
 			}
 		} else {
 			if ( isLockingEnabled() ) {
-				checkIsLocked(id, user, sessionId);
+				lockManager.checkIsLocked(id, user, sessionId);
 			}
 			recordDao.update(record);
 		}
@@ -122,8 +121,8 @@ public class RecordManager {
 
 	@Transactional
 	public void delete(int recordId) throws RecordPersistenceException {
-		if ( isLockingEnabled() && isLocked(recordId) ) {
-			RecordLock lock = getLock(recordId);
+		if ( isLockingEnabled() && lockManager.isLocked(recordId) ) {
+			RecordLock lock = lockManager.getLock(recordId);
 			User lockUser = lock.getUser();
 			throw new RecordLockedException(lockUser.getName());
 		} else {
@@ -153,10 +152,12 @@ public class RecordManager {
 	@Transactional
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
-			isLockAllowed(user, recordId, sessionId, forceUnlock);
-			lock(recordId, user, sessionId, forceUnlock);
+			lockManager.isLockAllowed(user, recordId, sessionId, forceUnlock);
+			lockManager.lock(recordId, user, sessionId, forceUnlock);
 		}
-		return load(survey, recordId, step);
+		CollectRecord record = load(survey, recordId, step);
+		addEmptyNodes(record);
+		return record;
 	}
 	
 	@Deprecated
@@ -196,17 +197,8 @@ public class RecordManager {
 		return count;
 	}
 	
-	@Transactional
-	public boolean hasAssociatedRecords(int userId) {
-		return recordDao.hasAssociatedRecords(userId);
-	}
-
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName) throws RecordPersistenceException {
 		return create(survey, rootEntityName, user, modelVersionName, (String) null);
-	}
-	
-	public CollectRecord create(CollectSurvey survey, String rootEntityName, String modelVersionName) throws RecordPersistenceException {
-		return create(survey, rootEntityName, (User) null, modelVersionName, (String) null);
 	}
 	
 	public CollectRecord create(CollectSurvey survey, EntityDefinition rootEntityDefinition, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
@@ -221,6 +213,7 @@ public class RecordManager {
 		record.createRootEntity(rootEntityName);
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
+		addEmptyNodes(record);
 		return record;
 	}
 
@@ -282,8 +275,8 @@ public class RecordManager {
 	@Transactional
 	public void validateAndSave(CollectSurvey survey, User user, String sessionId, int recordId, Step step) throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
-			isLockAllowed(user, recordId, sessionId, true);
-			lock(recordId, user, sessionId, true);
+			lockManager.isLockAllowed(user, recordId, sessionId, true);
+			lockManager.lock(recordId, user, sessionId, true);
 		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		validate(record);
@@ -291,7 +284,7 @@ public class RecordManager {
 		record.updateEntityCounts();
 		recordDao.update(record);
 		if ( isLockingEnabled() ) {
-			releaseLock(recordId);
+			lockManager.releaseLock(recordId);
 		}
 	}
 
@@ -319,7 +312,7 @@ public class RecordManager {
 	 * @return
 	 */
 	public NodeChangeSet updateAttribute(
-			Attribute<? extends NodeDefinition, ?> attribute,
+			Attribute<?, ?> attribute,
 			FieldSymbol symbol) {
 		beforeAttributeUpdate(attribute);
 		setSymbolOnFields(attribute, symbol);
@@ -335,7 +328,7 @@ public class RecordManager {
 	}
 
 	protected <V extends Value> NodeChangeSet afterAttributeUpdate(
-			Attribute<? extends NodeDefinition, V> attribute) {
+			Attribute<?, V> attribute) {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		AttributeChange change = changeMap.prepareAttributeChange(attribute);
 		Map<Integer, Object> updatedFieldValues = createFieldValuesMap(attribute);
@@ -354,43 +347,43 @@ public class RecordManager {
 		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
 		return new NodeChangeSet(changeMap.getChanges());
 	}
-
+	
 	/**
-	 * Updates a field with a new value or symbol.
+	 * Updates a field with a new value.
 	 * The value will be parsed according to field data type.
 	 * 
 	 * @param field
-	 * @param rawValue 
-	 * @param symbol
-	 * @param remarks
+	 * @param value 
 	 * @return
 	 */
 	public <V> NodeChangeSet updateField(
-			Field<V> field, V value, FieldSymbol symbol, String remarks) {
+			Field<V> field, V value) {
 		Attribute<?, ?> attribute = field.getAttribute();
-		Entity parentEntity = attribute.getParent();
 
-		setErrorConfirmed(attribute, false);
-		setMissingValueApproved(parentEntity, attribute.getName(), false);
-		setDefaultValueApplied(attribute, false);
+		beforeAttributeUpdate(attribute);
 
 		field.setValue(value);
-		field.setRemarks(remarks);
+		
+		return afterAttributeUpdate(attribute);
+	}
+	
+	/**
+	 * Updates a field with a new symbol.
+	 * 
+	 * @param field
+	 * @param symbol 
+	 * @return
+	 */
+	public <V> NodeChangeSet updateField(
+			Field<V> field, FieldSymbol symbol) {
+		Attribute<?, ?> attribute = field.getAttribute();
+
+		beforeAttributeUpdate(attribute);
+
+		field.setValue(null);
 		setFieldSymbol(field, symbol);
 		
-		NodeChangeMap changeMap = new NodeChangeMap();
-		AttributeChange change = changeMap.prepareAttributeChange(attribute);
-
-		Map<Integer, Object> updatedFieldValues = createFieldValuesMap(attribute);
-		change.setUpdatedFieldValues(updatedFieldValues);
-		
-		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
-		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
-		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
-		checkDependencies.add(attribute);
-		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(attribute);
-		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
-		return new NodeChangeSet(changeMap.getChanges());
+		return afterAttributeUpdate(attribute);
 	}
 	
 	/**
@@ -469,12 +462,8 @@ public class RecordManager {
 	}
 
 	public NodeChangeSet confirmError(Attribute<?, ?> attribute) {
-		return confirmError(attribute, true);
-	}
-	
-	public NodeChangeSet confirmError(Attribute<?, ?> attribute, boolean confirmed) {
 		Set<Attribute<?,?>> checkDependencies = new HashSet<Attribute<?,?>>();
-		setErrorConfirmed(attribute, confirmed);
+		setErrorConfirmed(attribute, true);
 		attribute.clearValidationResults();
 		checkDependencies.add(attribute);
 		
@@ -488,7 +477,7 @@ public class RecordManager {
 	 * Clear all node states
 	 * @param record 
 	 */
-	public void clearNodeStates(CollectRecord record) {
+	protected void clearNodeStates(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		rootEntity.traverse( new NodeVisitor() {
 			@Override
@@ -625,18 +614,7 @@ public class RecordManager {
 	public NodeChangeSet applyDefaultValue(
 			Attribute<?, ?> attribute) {
 		performDefaultValueApply(attribute);
-		NodeChangeMap changeMap = new NodeChangeMap();
-		AttributeChange change = changeMap.prepareAttributeChange(attribute);
-		Map<Integer, Object> updatedFieldValues = createFieldValuesMap(attribute);
-		change.setUpdatedFieldValues(updatedFieldValues);
-		
-		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(attribute);
-		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
-		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
-		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
-		checkDependencies.add(attribute);
-		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityNodePointers);
-		return new NodeChangeSet(changeMap.getChanges());
+		return afterAttributeUpdate(attribute);
 	}
 
 	/**
@@ -760,6 +738,9 @@ public class RecordManager {
 
 	protected Attribute<?, ?> performAttributeAdd(Entity parentEntity, String nodeName, Value value, 
 			FieldSymbol symbol, String remarks) {
+		if ( value != null && symbol != null ) {
+			throw new IllegalArgumentException("Cannot specify both value and symbol");
+		}
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
 		AttributeDefinition def = (AttributeDefinition) parentEntityDefn.getChildDefinition(nodeName);
 		@SuppressWarnings("unchecked")
@@ -767,12 +748,11 @@ public class RecordManager {
 		parentEntity.add(attribute);
 		if ( value != null ) {
 			attribute.setValue(value);
-		}
-		if ( symbol != null ) {
+		} else if ( symbol != null ) {
 			setSymbolOnFields(attribute, symbol);
 		}
 		if ( remarks != null ) {
-			setRemarksOnFields(attribute, remarks);
+			setRemarksOnFirstField(attribute, remarks);
 		}
 		return attribute;
 	}
@@ -789,7 +769,7 @@ public class RecordManager {
 		return entity;
 	}
 	
-	public void addEmptyNodes(CollectRecord record) {
+	protected void addEmptyNodes(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		addEmptyNodes(rootEntity);
 	}
@@ -950,7 +930,7 @@ public class RecordManager {
 		field.setSymbol(symbolChar);
 	}
 	
-	public Set<NodePointer> clearRelevanceRequiredDependencies(Node<?> node){
+	protected Set<NodePointer> clearRelevanceRequiredDependencies(Node<?> node){
 		Set<NodePointer> relevantDependencies = node.getRelevantDependencies();
 		clearRelevantDependencies(relevantDependencies);
 		Set<NodePointer> requiredDependencies = node.getRequiredDependencies();
@@ -959,27 +939,27 @@ public class RecordManager {
 		return requiredDependencies;
 	}
 	
-	public void clearRelevantDependencies(Set<NodePointer> nodePointers) {
+	protected void clearRelevantDependencies(Set<NodePointer> nodePointers) {
 		for (NodePointer nodePointer : nodePointers) {
 			Entity entity = nodePointer.getEntity();
 			entity.clearRelevanceState(nodePointer.getChildName());
 		}
 	}
 	
-	public void clearRequiredDependencies(Set<NodePointer> nodePointers) {
+	protected void clearRequiredDependencies(Set<NodePointer> nodePointers) {
 		for (NodePointer nodePointer : nodePointers) {
 			Entity entity = nodePointer.getEntity();
 			entity.clearRequiredState(nodePointer.getChildName());
 		}
 	}
 	
-	public Set<Attribute<?, ?>> clearValidationResults(Attribute<?,?> attribute){
+	protected Set<Attribute<?, ?>> clearValidationResults(Attribute<?,?> attribute){
 		Set<Attribute<?,?>> checkDependencies = attribute.getCheckDependencies();
 		clearValidationResults(checkDependencies);
 		return checkDependencies;
 	}
 
-	public void clearValidationResults(Set<Attribute<?, ?>> checkDependencies) {
+	protected void clearValidationResults(Set<Attribute<?, ?>> checkDependencies) {
 		for (Attribute<?, ?> attr : checkDependencies) {
 			attr.clearValidationResults();
 		}
@@ -1004,12 +984,11 @@ public class RecordManager {
 		}
 	}
 	
-	protected <V extends Value> void setRemarksOnFields(
+	protected <V extends Value> void setRemarksOnFirstField(
 			Attribute<? extends NodeDefinition, V> attribute,
 			String remarks) {
-		for (Field<?> field : attribute.getFields()) {
-			field.setRemarks(remarks);
-		}
+		Field<?> field = attribute.getField(0);
+		field.setRemarks(remarks);
 	}
 	
 	protected void setErrorConfirmed(Attribute<?,?> attribute, boolean confirmed){
@@ -1034,8 +1013,6 @@ public class RecordManager {
 		}
 	}
 	
-	//END OF RECORD UPDATE METHODS
-	
 	public void moveNode(CollectRecord record, int nodeId, int index) {
 		Node<?> node = record.getNodeByInternalId(nodeId);
 		Entity parent = node.getParent();
@@ -1044,6 +1021,8 @@ public class RecordManager {
 		int oldIndex = siblings.indexOf(node);
 		parent.move(name, oldIndex, index);
 	}
+	
+	//END OF RECORD UPDATE METHODS
 	
 	private void checkAllKeysSpecified(CollectRecord record) throws MissingRecordKeyException {
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
@@ -1060,107 +1039,19 @@ public class RecordManager {
 			}
 		}
 	}
-	
-	/* --- START OF LOCKING METHODS --- */
-	
-	public synchronized void releaseLock(int recordId) {
-		RecordLock lock = getLock(recordId);
-		if ( lock != null ) {
-			locks.remove(recordId);
+
+	public void checkIsLocked(int recordId, User user, String lockId) throws RecordUnlockedException {
+		if ( lockingEnabled ) {
+			lockManager.checkIsLocked(recordId, user, lockId);
 		}
 	}
 	
-	public synchronized boolean checkIsLocked(int recordId, User user, String sessionId) throws RecordUnlockedException {
-		RecordLock lock = getLock(recordId);
-		String lockUserName = null;
-		if ( lock != null) {
-			String lockSessionId = lock.getSessionId();
-			int lockRecordId = lock.getRecordId();
-			User lUser = lock.getUser();
-			if( recordId == lockRecordId  && 
-					( lUser == user || lUser.getId() == user.getId() ) &&  
-					lockSessionId.equals(sessionId) ) {
-				lock.keepAlive();
-				return true;
-			} else {
-				User lockUser = lock.getUser();
-				lockUserName = lockUser.getName();
-			}
+	public void releaseLock(Integer recordId) {
+		if ( lockingEnabled ) {
+			lockManager.releaseLock(recordId);
 		}
-		throw new RecordUnlockedException(lockUserName);
-	}
-	
-	private synchronized void lock(int recordId, User user, String sessionId) throws RecordLockedException, MultipleEditException {
-		lock(recordId, user, sessionId, false);
-	}
-	
-	private synchronized void lock(int recordId, User user, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
-		RecordLock oldLock = getLock(recordId);
-		if ( oldLock != null ) {
-			locks.remove(recordId);
-		}
-		RecordLock lock = new RecordLock(sessionId, recordId, user, lockTimeoutMillis);
-		locks.put(recordId, lock);
 	}
 
-	private boolean isForceUnlockAllowed(User user, RecordLock lock) {
-		boolean isAdmin = user.hasRole("ROLE_ADMIN");
-		Integer userId = user.getId();
-		User lockUser = lock.getUser();
-		return isAdmin || userId.equals(lockUser.getId());
-	}
-	
-	private synchronized boolean isLockAllowed(User user, int recordId, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
-		RecordLock uLock = getLockBySessionId(sessionId);
-		if ( uLock != null ) {
-			throw new MultipleEditException("User is editing another record: " + uLock.getRecordId());
-		}
-		RecordLock lock = getLock(recordId);
-		if ( lock == null || ( forceUnlock && isForceUnlockAllowed(user, lock) ) ) {
-			return true;
-		} else if ( lock.getUser().getId().equals(user.getId()) ) {
-			throw new RecordLockedByActiveUserException(user.getName());
-		} else {
-			String lockingUserName = lock.getUser().getName();
-			throw new RecordLockedException("Record already locked", lockingUserName);
-		}
-	}
-	
-	private synchronized boolean isLocked(int recordId) {
-		RecordLock lock = getLock(recordId);
-		return lock != null;	
-	}
-	
-	private synchronized RecordLock getLock(int recordId) {
-		clearInactiveLocks();
-		RecordLock lock = locks.get(recordId);
-		return lock;
-	}
-	
-	private synchronized RecordLock getLockBySessionId(String sessionId) {
-		clearInactiveLocks();
-		Collection<RecordLock> lcks = locks.values();
-		for (RecordLock l : lcks) {
-			if ( l.getSessionId().equals(sessionId) ) {
-				return l;
-			}
-		}
-		return null;
-	}
-	
-	private synchronized void clearInactiveLocks() {
-		Set<Entry<Integer, RecordLock>> entrySet = locks.entrySet();
-		Iterator<Entry<Integer, RecordLock>> iterator = entrySet.iterator();
-		while (iterator.hasNext()) {
-			Entry<Integer, RecordLock> entry = iterator.next();
-			RecordLock lock = entry.getValue();
-			if( !lock.isActive() ){
-				iterator.remove();
-			}
-		}
-	}
-	
-	/* --- END OF LOCKING METHODS --- */
 
 	public long getLockTimeoutMillis() {
 		return lockTimeoutMillis;

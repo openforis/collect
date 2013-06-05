@@ -128,11 +128,11 @@ public class SessionManager {
 	public void checkIsActiveRecordLocked() throws RecordUnlockedException {
 		SessionState sessionState = getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		User user = sessionState.getUser();
-		String lockId = sessionState.getSessionId();
 		if ( record == null ) {
 			throw new RecordUnlockedException();
 		} else if ( record.getId() != null ) {
+			User user = sessionState.getUser();
+			String lockId = sessionState.getSessionId();
 			try {
 				recordManager.checkIsLocked(record.getId(), user, lockId);
 				sessionState.keepActiveRecordAlive();
