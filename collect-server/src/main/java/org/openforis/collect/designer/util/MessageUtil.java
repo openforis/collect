@@ -78,11 +78,11 @@ public class MessageUtil {
 	}
 
 	public static void showMessage(MessageType type, String messageKey, Object[] args, String titleKey, Object[] titleArgs) {
-		String message = Labels.getLabel(messageKey, args);
+		String message = getLabel(messageKey, args);
 		if ( message == null ) {
 			message = messageKey;
 		}
-		String title = Labels.getLabel(titleKey, titleArgs);
+		String title = getLabel(titleKey, titleArgs);
 		if ( title == null ) {
 			title = titleKey;
 		}
@@ -110,10 +110,18 @@ public class MessageUtil {
 	}
 
 	public static void showConfirm(ConfirmHandler handler, String messageKey, Object[] args, String titleKey, Object[] titleArgs) {
-		String message = Labels.getLabel(messageKey, args);
-		String title = Labels.getLabel(titleKey, titleArgs);
+		String message = getLabel(messageKey, args);
+		String title = getLabel(titleKey, titleArgs);
 		EventListener<Event> eventListener = new ConfirmEventListener(handler);
 		Messagebox.show(message, title, Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, eventListener );
+	}
+
+	protected static String getLabel(String key, Object[] args) {
+		String label = Labels.getLabel(key, args);
+		if ( label != null ) {
+			label = label.replaceAll("\\\\n", "\n");
+		}
+		return label;
 	}
 	
 	static class ConfirmEventListener implements EventListener<Event> {
