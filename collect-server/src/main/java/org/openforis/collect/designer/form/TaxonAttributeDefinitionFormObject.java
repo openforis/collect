@@ -6,7 +6,6 @@ package org.openforis.collect.designer.form;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
@@ -29,7 +28,7 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	public void loadFrom(TaxonAttributeDefinition source, String languageCode, String defaultLanguage) {
 		super.loadFrom(source, languageCode, defaultLanguage);
 		taxonomy = source.getTaxonomy();
-		highestRank = getHighestRankName(source.getHighestRank());
+		highestRank = source.getHighestTaxonRank() == null ? null: source.getHighestTaxonRank().getName();
 		qualifiers = new ArrayList<String>(source.getQualifiers());
 	}
 
@@ -37,18 +36,10 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	public void saveTo(TaxonAttributeDefinition dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setTaxonomy(taxonomy);
-		dest.setHighestRank(highestRank);
+		dest.setHighestTaxonRank(TaxonRank.fromName(highestRank));
 		dest.setQualifiers(qualifiers);
 	}
 
-	protected String getHighestRankName(String rankName) {
-		if ( StringUtils.isNotBlank(rankName) ) {
-			TaxonRank rank = TaxonRank.fromName(rankName, true);
-			return rank == null ? null: rank.getName();
-		}
-		return null;
-	}
-	
 	public String getTaxonomy() {
 		return taxonomy;
 	}
