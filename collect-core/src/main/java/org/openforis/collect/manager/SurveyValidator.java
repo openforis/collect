@@ -1,10 +1,19 @@
 package org.openforis.collect.manager;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.CodeList;
@@ -14,6 +23,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.xml.sax.SAXException;
 
 /**
  * 
@@ -253,6 +263,31 @@ public class SurveyValidator {
 		for (EntityDefinition entityDefn : rootEntityDefns) {
 			entityDefn.traverse(nodeDefnVisitor);
 		}
+	}
+	
+	public void validateAgainstSchema(InputStream is) throws SurveyValidationException {
+	    try {
+	    	SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	    	Source[] schemas = getSourcesFromClassPath("xml.xsd", "idml3.xsd", "idml3-ui.xsd");
+			javax.xml.validation.Schema schema = factory.newSchema(schemas);
+	        Validator validator = schema.newValidator();
+	        validator.validate(new StreamSource(is));
+	    } catch(SAXException e) {
+	        throw new SurveyValidationException(e);
+	    } catch (IOException e) {
+	    	throw new SurveyValidationException(e.getMessage(), e);
+		}
+	}
+	
+	private Source[] getSourcesFromClassPath(String... sources) throws IOException {
+		Source[] result = new Source[sources.length];
+		for (int i = 0; i < sources.length; i++) {
+			String sourceName = sources[i];
+			InputStream is = getClass().getClassLoader().getResourceAsStream(sourceName);
+			StreamSource streamSource = new StreamSource(is);
+			result[i] = streamSource;
+		}
+		return result;
 	}
 	
 	public static class SurveyValidationResult implements Serializable {

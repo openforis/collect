@@ -3,7 +3,11 @@
  */
 package org.openforis.collect.manager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -13,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
@@ -21,6 +27,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
+import org.openforis.collect.utils.CollectIOUtils;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
@@ -169,13 +176,66 @@ public class SurveyManager {
 	}
 
 	public CollectSurvey unmarshalSurvey(InputStream is) throws IdmlParseException {
-		return surveyDao.unmarshalIdml(is);
+		try {
+			return unmarshalSurvey(is, false);
+		} catch (SurveyValidationException e) {
+			//never thrown: validation against schema disabled
+			return null;
+		}
 	}
 	
+	public CollectSurvey unmarshalSurvey(InputStream is, boolean validateAgainstSchema) throws IdmlParseException, SurveyValidationException {
+		InputStreamReader reader = new InputStreamReader(is);
+		return unmarshalSurvey(reader, validateAgainstSchema);
+	}
+
 	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException {
-		return surveyDao.unmarshalIdml(reader);
+		try {
+			return unmarshalSurvey(reader, false);
+		} catch (SurveyValidationException e) {
+			//should never enter here
+			throw new RuntimeException(e); 
+		}
 	}
 	
+	public CollectSurvey unmarshalSurvey(Reader reader, boolean validateAgainstSchema) throws IdmlParseException, SurveyValidationException {
+		if ( validateAgainstSchema ) {
+			File tempFile = CollectIOUtils.copyToTempFile(reader);
+			validateIdml(tempFile);
+			CollectSurvey result = unmarshallSurvey(tempFile);
+			tempFile.delete();
+			return result;
+		} else {
+			return surveyDao.unmarshalIdml(reader);
+		}
+	}
+	
+	protected CollectSurvey unmarshallSurvey(File file) throws IdmlParseException {
+		FileInputStream tempIs = null;
+		try {
+			tempIs = new FileInputStream(file);
+			return surveyDao.unmarshalIdml(tempIs);
+		} catch (Exception e) {
+			//should never enter here
+			throw new RuntimeException(e); 
+		} finally {
+			IOUtils.closeQuietly(tempIs);
+		}
+	}
+
+	protected void validateIdml(File file) throws SurveyValidationException {
+		FileInputStream is = null;
+		try {
+			is = new FileInputStream(file);
+			SurveyValidator validator = new SurveyValidator(this);
+			validator.validateAgainstSchema(is);
+		} catch (IOException e) {
+			throw new RuntimeException("Error validating the survey (creation of temp file): " + e.getMessage(), e);
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+	}
+
 	@Transactional
 	public List<SurveySummary> loadSurveySummaries() {
 		List<SurveySummary> result = surveyDao.loadSummaries();
@@ -300,7 +360,7 @@ public class SurveyManager {
 		samplingDesignManager.deleteBySurveyWork(id);
 		surveyWorkDao.delete(id);
 	}
-	
+
 	/*
 	 * Getters and setters
 	 * 

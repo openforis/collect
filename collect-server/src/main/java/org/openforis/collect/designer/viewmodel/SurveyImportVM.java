@@ -17,9 +17,11 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyValidator;
 import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.ValidationContext;
@@ -110,18 +112,44 @@ public class SurveyImportVM extends SurveyBaseVM {
  		Media media = event.getMedia();
 		String contentType = media.getContentType();
 		if ( contentType.equals(TEXT_XML_CONTENT) ) {
-			fileName = media.getName();
-			Reader reader = media.getReaderData();
-			uploadedSurvey = unmarshalSurvey(reader);
-			notifyChange("fileName","uploadedSurvey");
-			String surveyName = getSurveyNameValue();
-			if ( StringUtils.isEmpty(surveyName) ) {
-				surveyName = FilenameUtils.removeExtension(fileName);
-				form.put(SURVEY_NAME_FIELD, surveyName);
-				notifyChange("form");
-			}
+			unmarshalSurvey(media, false);
 		} else {
 			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
+		}
+	}
+
+	protected void unmarshalSurvey(final Media media, boolean skipValidation) {
+		try {
+			Reader reader = media.getReaderData();
+			uploadedSurvey = surveyManager.unmarshalSurvey(reader, ! skipValidation);
+		} catch(IdmlParseException e) {
+			log.error("Error unmarhalling survey", e);
+			Object[] args = new String[]{e.getMessage()};
+			MessageUtil.showError("survey.import_survey.error", args);
+		} catch (SurveyValidationException e) {
+			Object[] args = new String[] {e.getMessage()};
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					unmarshalSurvey(media, true);
+				}
+			}, "survey.import_survey.confirm_process_invalid_survey", args);
+		}
+		updateForm(media.getName());
+	}
+
+	protected void updateForm(String uploadedFileName) {
+		if ( uploadedSurvey == null ) {
+			fileName = null;
+		} else {
+			fileName = uploadedFileName;
+		}
+		notifyChange("fileName","uploadedSurvey");
+		String surveyName = getSurveyNameValue();
+		if ( StringUtils.isEmpty(surveyName) ) {
+			surveyName = FilenameUtils.removeExtension(fileName);
+			form.put(SURVEY_NAME_FIELD, surveyName);
+			notifyChange("form");
 		}
 	}
 
@@ -185,18 +213,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 	protected boolean existsSurveyWithSameUriButDifferentName(String surveyName, String uri) {
 		SurveySummary collidingSurvey = getSurveyByURI(uri);
 		return  collidingSurvey != null && ! collidingSurvey.getName().equals(surveyName);
-	}
-
-	protected CollectSurvey unmarshalSurvey(Reader reader) {
-		CollectSurvey survey = null;
-		try {
-			survey = surveyManager.unmarshalSurvey(reader);
-		} catch(Exception e) {
-			log.error(e);
-			Object[] args = new String[]{e.getMessage()};
-			MessageUtil.showError("survey.import_survey.error", args);
-		}
-		return survey;
 	}
 
 	protected boolean existsSurveyWithName(String name) {
