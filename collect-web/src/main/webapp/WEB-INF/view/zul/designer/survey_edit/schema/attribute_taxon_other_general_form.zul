@@ -20,8 +20,11 @@
           value="${labels.survey.schema.attribute.taxon.highest_rank}:" />
         <fieldErrorHandler message="@load(vmsgs['highestRank'])">
           <listbox width="150px" model="@load(vm.ranks)"
-            selectedItem="@bind(fx.highestRank)" mold="select"
+          	selectedItem="@bind(fx.highestRank)" mold="select"
             onSelect="@command('applyChanges')">
+            <template name="model">
+               <listitem label="@load(vm.getRankLabel(each))" />
+             </template>
           </listbox>
         </fieldErrorHandler>
       </row>
