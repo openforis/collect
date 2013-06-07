@@ -209,7 +209,7 @@ public class SurveyManager {
 			return surveyDao.unmarshalIdml(reader);
 		}
 	}
-	
+
 	protected CollectSurvey unmarshallSurvey(File file) throws IdmlParseException {
 		FileInputStream tempIs = null;
 		try {
