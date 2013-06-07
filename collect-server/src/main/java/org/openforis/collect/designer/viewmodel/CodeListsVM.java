@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.FormObject;
+import org.openforis.collect.designer.form.validator.BaseValidator;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -31,6 +32,8 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
+import org.zkoss.bind.ValidationContext;
+import org.zkoss.bind.Validator;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -236,6 +239,22 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 	}
 
+	public String getHierarchyLevelNameValidationKey(int levelIdx) {
+		return "hiearchyLevelName_" + levelIdx;
+	}
+	
+	public Validator getHierarchyLevelNameValidator(final int levelIdx) {
+		return new BaseValidator() {
+			@Override
+			public void validate(ValidationContext ctx) {
+				String validationKey = getHierarchyLevelNameValidationKey(levelIdx);
+				if ( validateRequired(ctx, null, validationKey) ) {
+					validateInternalName(ctx, null, validationKey);
+				}
+			}
+		};
+	}
+	
 	protected void performRemoveLevel(int levelIndex) {
 		editedItem.removeLevel(levelIndex);
 		deselectItemsAfterLevel(levelIndex);
