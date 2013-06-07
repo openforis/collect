@@ -19,7 +19,7 @@ public abstract class SurveyManagerUtil {
 
 	public static List<SurveyWorkSummary> getSurveySummaries(SurveyManager surveyManager) {
 		List<SurveySummary> surveySummaries = surveyManager.getSurveySummaries(null);
-		List<SurveySummary> surveyWorkSummaries = surveyManager.getSurveyWorkSummaries();
+		List<SurveySummary> surveyWorkSummaries = surveyManager.loadSurveyWorkSummaries();
 		List<SurveyWorkSummary> result = new ArrayList<SurveyWorkSummary>();
 		Map<String, SurveyWorkSummary> workingSummariesByUri = new HashMap<String, SurveyWorkSummary>();
 		for (SurveySummary summary : surveyWorkSummaries) {

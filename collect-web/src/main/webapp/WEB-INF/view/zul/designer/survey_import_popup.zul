@@ -27,8 +27,8 @@
           <cell>
             <hbox hflex="1">
               <hbox hflex="1">
-                <label value="@load(empty vm.fileName ? 
-                  labels.survey.import_survey.file_not_selected : vm.fileName)" />
+                <label visible="@load(not empty vm.fileName)" value="@load(vm.fileName)" />
+                <label visible="@load(empty vm.fileName)" value="${labels.survey.import_survey.file_not_selected}" />
               </hbox>
               <button id="selectFileBtn" label="${labels.global.select_file_to_upload}"
                 upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />
@@ -38,12 +38,24 @@
         <row>
           <label value="${labels.survey.import_survey.survey_name}:" />
           <fieldErrorHandler message="@load(vmsgs['surveyName'])">
-            <textbox width="300px" value="@load(fx.surveyName) @save(fx.surveyName) @validator(vm.nameValidator)" />
+            <textbox width="300px"
+            	disabled="@load(vm.updatingExistingSurvey)"
+            	value="@bind(fx.surveyName) @validator(vm.nameValidator)" />
           </fieldErrorHandler>
         </row>
         <row>
           <label value="${labels.survey.import_survey.uri}:" />
           <label value="@load(vm.uploadedSurvey.uri)" />
+        </row>
+        <row>
+        	<cell />
+        	<cell>
+        		<label visible="@load(vm.updatingExistingSurvey and not vm.updatingPublishedSurvey)"
+	        		value="${labels.survey.import_survey.updating_survey_work}" />
+	        	<label visible="@load(vm.updatingPublishedSurvey)"
+	        		sclass="alertMessage" 
+	        		value="${labels.survey.import_survey.updating_published_survey}" />
+        	</cell>
         </row>
       </rows>
     </grid>

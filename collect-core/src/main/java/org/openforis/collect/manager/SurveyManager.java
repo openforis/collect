@@ -248,7 +248,7 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public List<SurveySummary> getSurveyWorkSummaries() {
+	public List<SurveySummary> loadSurveyWorkSummaries() {
 		List<SurveySummary> result = surveyWorkDao.loadSummaries();
 		return result;
 	}
@@ -261,6 +261,11 @@ public class SurveyManager {
 	@Transactional
 	public SurveySummary loadSurveyWorkSummaryByName(String name) {
 		return surveyWorkDao.loadSurveySummaryByName(name);
+	}
+	
+	@Transactional
+	public SurveySummary loadSurveyWorkSummaryByUri(String uri) {
+		return surveyWorkDao.loadSurveySummaryByUri(uri);
 	}
 	
 	@Transactional

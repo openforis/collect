@@ -451,7 +451,7 @@ public class DataImportProcess implements Callable<Void> {
 					InputStream is = zipFile.getInputStream(zipEntry);
 					survey = surveyManager.unmarshalSurvey(is);
 					SurveyValidator validator = new SurveyValidator(surveyManager);
-					List<SurveyValidationResult> validationResults = validator.validateSurvey(survey);
+					List<SurveyValidationResult> validationResults = validator.validate(survey);
 					if ( ! validationResults.isEmpty() ) {
 						throw new IllegalStateException("Packaged survey is not valid." +
 								"\nPlease try to import it using the Designer to get the list of errors.");

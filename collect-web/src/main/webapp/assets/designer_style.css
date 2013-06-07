@@ -82,6 +82,12 @@ button.icon {
 }
 /* END OF TITLES */
 
+/* START OF MESSAGES STYLE */
+.alertMessage {
+	color: red;
+}
+/* END OF MESSAGES STYLE */
+
 /* START OF GROUPBOX STYLE */
 .form .z-groupbox .z-groupbox-cnt {
 	padding: 0px;

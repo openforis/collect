@@ -45,14 +45,14 @@ public class SurveyValidator {
 	 * 
 	 */
 	public List<SurveyValidationResult> validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
-		List<SurveyValidationResult> results = validateSurvey(newSurvey);
+		List<SurveyValidationResult> results = validate(newSurvey);
 		if ( oldPublishedSurvey != null ) {
 			results.addAll(validateChanges(oldPublishedSurvey, newSurvey));
 		}
 		return results;
 	}
 	
-	public List<SurveyValidationResult> validateSurvey(CollectSurvey survey) {
+	public List<SurveyValidationResult> validate(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		List<SurveyValidationResult> partialResults = validateEnties(survey);
 		results.addAll(partialResults);
