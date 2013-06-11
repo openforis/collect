@@ -249,7 +249,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			newChildItem = true;
 			editedChildItemLevel = levelIndex;
 			editedChildItem = editedItem.createItem();
-			editedChildItem.setCodeList(editedItem);
 			if ( editedChildItemLevel == 0 ) {
 				editedChildItemParentItem = null;
 			} else {

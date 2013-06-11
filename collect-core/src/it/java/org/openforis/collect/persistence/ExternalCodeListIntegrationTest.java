@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -90,7 +91,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 
 	@Test
 	public void getFlatListItemsTest() throws SQLException {
-		List<ExternalCodeListItem> childItems = codeListManager.getRootItems(flatList);
+		List<ExternalCodeListItem> childItems = codeListManager.loadRootItems(flatList);
 		assertEquals(3, childItems.size());
 		{
 			ExternalCodeListItem item = childItems.get(0);
@@ -111,9 +112,9 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 
 	@Test
 	public void getNestedChildItemTest() throws SQLException {
-		List<ExternalCodeListItem> rootItems = codeListManager.getRootItems(hierarchicalList);
+		List<ExternalCodeListItem> rootItems = codeListManager.loadRootItems(hierarchicalList);
 		ExternalCodeListItem parent = rootItems.get(0);
-		List<ExternalCodeListItem> children = codeListManager.getChildItems(parent);
+		List<ExternalCodeListItem> children = codeListManager.loadChildItems(parent);
 		assertEquals(2, children.size());
 		ExternalCodeListItem child = children.get(1);
 		assertEquals("012", child.getCode());
@@ -121,7 +122,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	
 	@Test
 	public void getFirstLevelItemsTest() throws SQLException {
-		List<ExternalCodeListItem> childItems = codeListManager.getRootItems(hierarchicalList);
+		List<ExternalCodeListItem> childItems = codeListManager.loadRootItems(hierarchicalList);
 		assertEquals(2, childItems.size());
 		{
 			ExternalCodeListItem item = childItems.get(0);
@@ -137,9 +138,9 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 
 	@Test
 	public void getChildItemsTest() throws SQLException {
-		List<ExternalCodeListItem> firstLevelItems = codeListManager.getRootItems(hierarchicalList);
+		List<ExternalCodeListItem> firstLevelItems = codeListManager.loadRootItems(hierarchicalList);
 		ExternalCodeListItem parent = firstLevelItems.get(0);
-		List<ExternalCodeListItem> childItems = codeListManager.getChildItems(parent);
+		List<ExternalCodeListItem> childItems = codeListManager.loadChildItems(parent);
 		assertEquals(2, childItems.size());
 		{
 			ExternalCodeListItem item = childItems.get(0);
@@ -155,20 +156,29 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	
 	@Test
 	public void getParentItemTest() throws SQLException {
-		List<ExternalCodeListItem> firstLevelItems = codeListManager.getRootItems(hierarchicalList);
+		List<ExternalCodeListItem> firstLevelItems = codeListManager.loadRootItems(hierarchicalList);
 		{
 			ExternalCodeListItem item = firstLevelItems.get(0);
-			ExternalCodeListItem parentItem = codeListManager.getParentItem(item);
+			ExternalCodeListItem parentItem = codeListManager.loadExternalParentItem(item);
 			assertNull(parentItem);
 		}
 		{
 			ExternalCodeListItem firstLevelItem = firstLevelItems.get(0);
-			List<ExternalCodeListItem> childItems = codeListManager.getChildItems(firstLevelItem);
+			List<ExternalCodeListItem> childItems = codeListManager.loadChildItems(firstLevelItem);
 			assertEquals(2, childItems.size());
 			ExternalCodeListItem secondLevelItem = childItems.get(0);
-			ExternalCodeListItem parentItem = codeListManager.getParentItem(secondLevelItem);
+			ExternalCodeListItem parentItem = codeListManager.loadExternalParentItem(secondLevelItem);
 			assertEquals(parentItem, firstLevelItem);
 		}
+	}
+	
+	@Test
+	public void exportFromXMLAndStoreTest() throws IdmlParseException {
+		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
+		codeListManager.exportFromXMLAndStore(is);
+		CodeList list = survey.getCodeList("measurement");
+		List<ExternalCodeListItem> rootItems = codeListManager.loadRootItems(list);
+		assertEquals(3, rootItems.size());
 	}
 	
 }

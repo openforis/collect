@@ -143,7 +143,7 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		return entities;
 	}
 
-	private E newEntity() {
+	protected E newEntity() {
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException e) {

@@ -65,13 +65,13 @@
 							<packageName>org.openforis.collect.persistence.jooq</packageName>
 							<directory>${basedir}/src/generated/java</directory>
 						</target>
-						<masterDataTables>
-							<masterDataTable>
-								<name>t_language</name>
-								<literal>cd</literal>
-								<description>description</description>
-							</masterDataTable>
-						</masterDataTables>
+<!-- 						<masterDataTables> -->
+<!-- 							<masterDataTable> -->
+<!-- 								<name>t_language</name> -->
+<!-- 								<literal>cd</literal> -->
+<!-- 								<description>description</description> -->
+<!-- 							</masterDataTable> -->
+<!-- 						</masterDataTables> -->
 					</generator>
 				</configuration>
 			</plugin>
