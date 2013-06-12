@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectCodeListPersisterContext;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.CodeListItemDao;
 import org.openforis.collect.persistence.DatabaseExternalCodeListProvider;
 import org.openforis.commons.collection.CollectionUtils;
@@ -17,6 +16,8 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyCodeListPersisterBinder;
@@ -43,53 +44,85 @@ public class CodeListManager {
 	@Autowired
 	private CollectCodeListPersisterContext persisterContext;
 
-	public ExternalCodeListItem loadCodeListItem(CodeAttribute attribute) {
+	public CodeListItem loadItemByAttribute(CodeAttribute attribute) {
 		CodeAttributeDefinition defn = attribute.getDefinition();
 		CodeList list = defn.getList();
 		if ( list.isExternal() ) {
 			return provider.getItem(attribute);
+		} else if ( list.isEmpty() ) {
+			return loadPersistedCodeListItem(attribute);
 		} else {
-			return loadInternalCodeListItem(attribute);
+			return getInternalCodeListItem(attribute);
 		}
 	}
 
-	protected ExternalCodeListItem loadInternalCodeListItem(CodeAttribute attribute) {
+	protected CodeListItem getInternalCodeListItem(CodeAttribute attribute) {
+		Code code = attribute.getValue();
+		if (code != null) {
+			String codeValue = code.getCode();
+			if (StringUtils.isNotBlank(codeValue)) {
+				ModelVersion currentVersion = attribute.getRecord().getVersion();
+				CodeAttributeDefinition definition = attribute.getDefinition();
+				String parentExpression = definition.getParentExpression();
+				if (StringUtils.isBlank(parentExpression)) {
+					return findCodeListItem(definition.getList().getItems(), codeValue, currentVersion);
+				} else {
+					CodeAttribute codeParent = attribute.getCodeParent();
+					if (codeParent != null) {
+						CodeListItem codeListItemParent = loadItemByAttribute(codeParent);
+						if (codeListItemParent != null) {
+							return findCodeListItem(codeListItemParent.getChildItems(), codeValue, currentVersion);
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	protected PersistedCodeListItem loadPersistedCodeListItem(CodeAttribute attribute) {
 		Code code = attribute.getValue();
 		if ( code == null || StringUtils.isBlank(code.getCode()) ) {
 			return null;
 		} else {
-			ExternalCodeListItem parentItem = loadParentItem(attribute);
+			PersistedCodeListItem parentItem = (PersistedCodeListItem) loadParentItem(attribute);
 			if ( parentItem == null ) {
 				return null;
 			} else {
-				ExternalCodeListItem item = loadItem(attribute, parentItem.getSystemId());
-				return item;
+				CodeListItem item = loadPersistedItem(attribute, parentItem.getSystemId());
+				return (PersistedCodeListItem) item;
 			}
 		}
 	}
 	
-	protected ExternalCodeListItem loadParentItem(CodeAttribute attribute) {
-		ExternalCodeListItem lastParentItem = null;
-		List<CodeAttribute> codeAncestors = attribute.getCodeAncestors();
-		for (int i = 0; i < codeAncestors.size(); i++) {
-			CodeAttribute ancestor = codeAncestors.get(i);
-			Integer lastParentItemId = lastParentItem == null ? null: lastParentItem.getSystemId();
-			lastParentItem = loadItem(ancestor, lastParentItemId);
+	protected CodeListItem loadParentItem(CodeAttribute attribute) {
+		CodeList list = attribute.getDefinition().getList();
+		if ( list.isExternal() ) {
+			ExternalCodeListItem item = (ExternalCodeListItem) loadItemByAttribute(attribute);
+			return provider.getParentItem(item);
+		} else if ( list.isEmpty() ) {
+			PersistedCodeListItem lastParentItem = null;
+			List<CodeAttribute> codeAncestors = attribute.getCodeAncestors();
+			for (int i = 0; i < codeAncestors.size(); i++) {
+				CodeAttribute ancestor = codeAncestors.get(i);
+				Integer lastParentItemId = lastParentItem == null ? null: lastParentItem.getSystemId();
+				lastParentItem = (PersistedCodeListItem) loadPersistedItem(ancestor, lastParentItemId);
+			}
+			return lastParentItem;
+		} else {
+			CodeAttribute codeParent = attribute.getCodeParent();
+			return loadItemByAttribute(codeParent);
 		}
-		return lastParentItem;
 	}
 	
-	protected ExternalCodeListItem loadItem(CodeAttribute attribute, Integer parentItemId) {
+	protected PersistedCodeListItem loadPersistedItem(CodeAttribute attribute, Integer parentItemId) {
 		Code code = attribute.getValue();
 		if ( code == null || StringUtils.isBlank(code.getCode()) ) {
 			return null;
 		} else {
-			CollectSurvey survey = (CollectSurvey) attribute.getSurvey();
 			CodeAttributeDefinition defn = attribute.getDefinition();
 			CodeList list = defn.getList();
-			ExternalCodeListItem item = codeListItemDao.loadItem(survey.getId(), 
-					survey.isWork(), list.getId(), parentItemId, code.getCode());
-			return item;
+			return codeListItemDao.loadItem(list, parentItemId, code.getCode());
 		}
 	}
 
@@ -97,16 +130,16 @@ public class CodeListManager {
 		return provider.getParentItem(item);
 	}
 
-	public List<ExternalCodeListItem> loadRootItems(CodeList list) {
+	@SuppressWarnings("unchecked")
+	public <T extends CodeListItem> List<T> loadRootItems(CodeList list) {
 		if ( list.isExternal() ) {
-			return provider.getRootItems(list);
+			return (List<T>) provider.getRootItems(list);
 		} else {
-			CollectSurvey survey = (CollectSurvey) list.getSurvey();
-			return codeListItemDao.loadRootItems(survey.getId(), survey.isWork(), list.getId());
+			return (List<T>) codeListItemDao.loadRootItems(list);
 		}
 	}
 
-	public CodeListItem findCodeListItem(List<CodeListItem> siblings, String code) {
+	public CodeListItem findCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
 		String adaptedCode = code.trim();
 		adaptedCode = adaptedCode.toUpperCase();
 		//remove initial zeros
@@ -115,10 +148,12 @@ public class CodeListManager {
 		Pattern pattern = Pattern.compile("^[0]*" + adaptedCode + "$", Pattern.CASE_INSENSITIVE);
 
 		for (CodeListItem item : siblings) {
-			String itemCode = item.getCode();
-			Matcher matcher = pattern.matcher(itemCode);
-			if(matcher.find()) {
-				return item;
+			if ( version == null || version.isApplicable(item) ) {
+				String itemCode = item.getCode();
+				Matcher matcher = pattern.matcher(itemCode);
+				if(matcher.find()) {
+					return item;
+				}
 			}
 		}
 		return null;
@@ -132,7 +167,7 @@ public class CodeListManager {
 		} else {
 			CodeAttribute parentCodeAttribute = getCodeParent(parent, def);
 			if ( parentCodeAttribute != null ) {
-				ExternalCodeListItem parentCodeListItem = loadCodeListItem(parentCodeAttribute);
+				CodeListItem parentCodeListItem = loadItemByAttribute(parentCodeAttribute);
 				if ( parentCodeListItem != null ) {
 					items = loadChildItems(parentCodeListItem);
 				}
@@ -143,9 +178,9 @@ public class CodeListManager {
 		return filterApplicableItems(items, version);
 	}
 
-	public void exportFromXMLAndStore(InputStream is) throws IdmlParseException {
+	public void exportFromXMLAndStore(Survey survey, InputStream is) throws IdmlParseException {
 		SurveyCodeListPersisterBinder binder = new SurveyCodeListPersisterBinder(persisterContext);
-		binder.exportFromXMLAndStore(is);
+		binder.exportFromXMLAndStore(survey, is);
 	}
 	
 	protected List<CodeListItem> filterApplicableItems(
@@ -180,12 +215,27 @@ public class CodeListManager {
 		return null;
 	}
 	
-	public List<ExternalCodeListItem> loadChildItems(ExternalCodeListItem item) {
-		return provider.getChildItems(item);
+	@SuppressWarnings("unchecked")
+	public <T extends CodeListItem> List<T> loadChildItems(CodeListItem parent) {
+		CodeList list = parent.getCodeList();
+		if ( list.isExternal() ) {
+			return (List<T>) provider.getChildItems((ExternalCodeListItem) parent);
+		} else if ( list.isEmpty() ) {
+			return (List<T>) codeListItemDao.loadItems(list, ((PersistedCodeListItem) parent).getSystemId());
+		} else {
+			return list.getItems();
+		}
 	}	
 	
-	public DatabaseExternalCodeListProvider getExternalCodeListProvider() {
-		return provider;
+	public CodeListItem loadChildItem(CodeListItem parent, String code) {
+		CodeList list = parent.getCodeList();
+		if ( list.isExternal() ) {
+			return provider.getChildItem((ExternalCodeListItem) parent, code);
+		} else if ( list.isEmpty() ) {
+			return codeListItemDao.loadItem(list, ((PersistedCodeListItem) parent).getSystemId(), code);
+		} else {
+			return parent.getChildItem(code);
+		}
 	}
 	
 	public void setExternalCodeListProvider(

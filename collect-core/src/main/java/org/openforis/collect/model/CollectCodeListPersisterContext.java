@@ -1,6 +1,6 @@
 package org.openforis.collect.model;
 
-import org.openforis.idm.metamodel.ExternalCodeListPersister;
+import org.openforis.idm.metamodel.CodeListItemPersister;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.SurveyCodeListPersisterContext;
 
@@ -12,7 +12,7 @@ import org.openforis.idm.metamodel.SurveyCodeListPersisterContext;
 public class CollectCodeListPersisterContext implements
 		SurveyCodeListPersisterContext {
 	
-	private ExternalCodeListPersister externalCodeListPersister;
+	private CodeListItemPersister externalCodeListPersister;
 	private ExternalCodeListProvider externalCodeListProvider;
 	
 	@Override
@@ -26,12 +26,12 @@ public class CollectCodeListPersisterContext implements
 	}
 	
 	@Override
-	public ExternalCodeListPersister getExternalCodeListPersister() {
+	public CodeListItemPersister getExternalCodeListPersister() {
 		return externalCodeListPersister;
 	}
 
 	public void setExternalCodeListPersister(
-			ExternalCodeListPersister externalCodeListPersister) {
+			CodeListItemPersister externalCodeListPersister) {
 		this.externalCodeListPersister = externalCodeListPersister;
 	}
 }

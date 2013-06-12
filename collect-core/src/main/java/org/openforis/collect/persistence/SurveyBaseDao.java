@@ -45,13 +45,21 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 	
 	public CollectSurvey unmarshalIdml(InputStream is) throws IdmlParseException {
+		return unmarshalIdml(is, false);
+	}
+	
+	public CollectSurvey unmarshalIdml(InputStream is, boolean skipCodeListItems) throws IdmlParseException {
 		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
-		return (CollectSurvey) binder.unmarshal(is);
+		return (CollectSurvey) binder.unmarshal(is, skipCodeListItems);
 	}
 
 	public CollectSurvey unmarshalIdml(Reader reader) throws IdmlParseException {
+		return unmarshalIdml(reader, false);
+	}
+	
+	public CollectSurvey unmarshalIdml(Reader reader, boolean skipCodeListItems) throws IdmlParseException {
 		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
-		return (CollectSurvey) binder.unmarshal(reader);
+		return (CollectSurvey) binder.unmarshal(reader, skipCodeListItems);
 	}
 
 	public String marshalSurvey(Survey survey) throws SurveyImportException {

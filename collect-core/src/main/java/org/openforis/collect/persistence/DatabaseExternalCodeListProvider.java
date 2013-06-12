@@ -129,18 +129,17 @@ public class DatabaseExternalCodeListProvider implements
 		return result;
 	}
 
-//	@Override
-//	public ExternalCodeListItem getRootItem(CodeList list, String code) {
-//		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();
-//		addSurveyFilter(list, filters);
-//		List<StringKeyValuePair> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
-//		filters.addAll(emptyNextLevelsFilters);
-//		String firstLevelKeyColName = getLevelKeyColumnName(list, 1);
-//		StringKeyValuePair itemFilter = new StringKeyValuePair(firstLevelKeyColName, code);
-//		filters.add(itemFilter);
-//		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new StringKeyValuePair[0]));
-//		return parseRow(row, list, 1);
-//	}
+	public ExternalCodeListItem getRootItem(CodeList list, String code) {
+		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();
+		addSurveyFilter(list, filters);
+		List<StringKeyValuePair> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
+		filters.addAll(emptyNextLevelsFilters);
+		String firstLevelKeyColName = getLevelKeyColumnName(list, 1);
+		StringKeyValuePair itemFilter = new StringKeyValuePair(firstLevelKeyColName, code);
+		filters.add(itemFilter);
+		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new StringKeyValuePair[0]));
+		return parseRow(row, list, 1);
+	}
 	
 	public List<ExternalCodeListItem> getChildItems(ExternalCodeListItem item) {
 		CodeList list = item.getCodeList();
@@ -160,20 +159,19 @@ public class DatabaseExternalCodeListProvider implements
 		return result;
 	}
 	
-//	@Override
-//	public ExternalCodeListItem getChildItem(ExternalCodeListItem item,
-//			String code) {
-//		CodeList list = item.getCodeList();
-//		List<StringKeyValuePair> filters = createChildItemsFilters(item);
-//		int itemLevel = item.getLevel();
-//		int childrenLevel = itemLevel + 1;
-//		String childrenLevelColName = getLevelKeyColumnName(list, childrenLevel);
-//		StringKeyValuePair codeFilter = new StringKeyValuePair(childrenLevelColName, code);
-//		filters.add(codeFilter);
-//		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), 
-//				filters.toArray(new StringKeyValuePair[0]));
-//		return parseRow(row, list, childrenLevel);
-//	}
+	public ExternalCodeListItem getChildItem(ExternalCodeListItem item,
+			String code) {
+		CodeList list = item.getCodeList();
+		List<StringKeyValuePair> filters = createChildItemsFilters(item);
+		int itemLevel = item.getLevel();
+		int childrenLevel = itemLevel + 1;
+		String childrenLevelColName = getLevelKeyColumnName(list, childrenLevel);
+		StringKeyValuePair codeFilter = new StringKeyValuePair(childrenLevelColName, code);
+		filters.add(codeFilter);
+		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), 
+				filters.toArray(new StringKeyValuePair[0]));
+		return parseRow(row, list, childrenLevel);
+	}
 	
 	protected List<StringKeyValuePair> createChildItemsFilters(ExternalCodeListItem item) {
 		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();

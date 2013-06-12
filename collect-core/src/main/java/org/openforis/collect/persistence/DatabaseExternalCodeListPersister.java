@@ -2,8 +2,8 @@ package org.openforis.collect.persistence;
 
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.ExternalCodeListItem;
-import org.openforis.idm.metamodel.ExternalCodeListPersister;
+import org.openforis.idm.metamodel.CodeListItemPersister;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -11,13 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
-public class DatabaseExternalCodeListPersister implements ExternalCodeListPersister {
+public class DatabaseExternalCodeListPersister implements CodeListItemPersister {
 	
 	@Autowired
 	private CodeListItemDao codeListItemDao;
 
 	@Override
-	public void save(ExternalCodeListItem item) {
+	public void save(PersistedCodeListItem item) {
 		if ( item.getSystemId() == null ) {
 			codeListItemDao.insert(item);
 		} else {
@@ -26,12 +26,12 @@ public class DatabaseExternalCodeListPersister implements ExternalCodeListPersis
 	}
 
 	@Override
-	public void delete(ExternalCodeListItem item) {
+	public void delete(PersistedCodeListItem item) {
 		codeListItemDao.delete(item.getId());
 	}
 
 	@Override
-	public void deleteAll(CodeList list) {
+	public void deleteAllItems(CodeList list) {
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
 		codeListItemDao.deleteBySurvey(survey.isWork(), survey.getId());
 	}

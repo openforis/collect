@@ -111,6 +111,11 @@ public class SurveyManager {
 	}
 	
 	@Transactional
+	public void importModel(InputStream is, String name) throws IdmlParseException {
+		//TODO
+	}
+	
+	@Transactional
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.importModel(survey);
 		addToCache(survey);
@@ -161,11 +166,19 @@ public class SurveyManager {
 	}
 
 	public CollectSurvey unmarshalSurvey(InputStream is) throws IdmlParseException {
-		return surveyDao.unmarshalIdml(is);
+		return unmarshalSurvey(is, false);
+	}
+
+	public CollectSurvey unmarshalSurvey(InputStream is, boolean skipCodeListItems) throws IdmlParseException {
+		return surveyDao.unmarshalIdml(is, skipCodeListItems);
 	}
 	
 	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException {
-		return surveyDao.unmarshalIdml(reader);
+		return unmarshalSurvey(reader, false);
+	}
+	
+	public CollectSurvey unmarshalSurvey(Reader reader, boolean skipCodeListItems) throws IdmlParseException {
+		return surveyDao.unmarshalIdml(reader, skipCodeListItems);
 	}
 	
 	@Transactional

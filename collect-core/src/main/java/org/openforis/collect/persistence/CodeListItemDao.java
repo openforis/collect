@@ -11,12 +11,13 @@ import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.ExternalCodeListItem;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Survey;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 @Transactional
-public class CodeListItemDao extends MappingJooqDaoSupport<ExternalCodeListItem, CodeListItemDao.JooqFactory> {
+public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem, CodeListItemDao.JooqFactory> {
 	
 	@SuppressWarnings("rawtypes")
 	private static final TableField[] LABEL_FIELDS = {OFC_CODE_LIST.LABEL1, OFC_CODE_LIST.LABEL2, OFC_CODE_LIST.LABEL3}; 
@@ -36,23 +37,25 @@ public class CodeListItemDao extends MappingJooqDaoSupport<ExternalCodeListItem,
 	}
 
 	@Override
-	public ExternalCodeListItem loadById(int id) {
+	public PersistedCodeListItem loadById(int id) {
 		return super.loadById(id);
 	}
 
 	@Override
-	public void insert(ExternalCodeListItem item) {
-		super.insert(item);
+	public void insert(PersistedCodeListItem item) {
+		JooqFactory jf = getMappingJooqFactory(item.getCodeList());
+		jf.insertQuery(item).execute();
 	}
 
 	@Override
-	public void update(ExternalCodeListItem item) {
-		super.update(item);
+	public void update(PersistedCodeListItem item) {
+		JooqFactory jf = getMappingJooqFactory(item.getCodeList());
+		jf.updateQuery(item).execute();
 	}
 
-	@Override
 	public void delete(int id) {
-		super.delete(id);
+		JooqFactory jf = getMappingJooqFactory(null);
+		jf.deleteQuery(id).execute();
 	}
 
 	public void deleteBySurvey(int surveyId) {
@@ -64,56 +67,68 @@ public class CodeListItemDao extends MappingJooqDaoSupport<ExternalCodeListItem,
 	}
 	
 	public void deleteBySurvey(boolean work, int surveyId) {
-		JooqFactory jf = getMappingJooqFactory();
+		JooqFactory jf = getMappingJooqFactory(null);
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(work);
 		jf.delete(OFC_CODE_LIST)
 			.where(surveyIdField.equal(surveyId))
 			.execute();
 	}
 
-	public List<ExternalCodeListItem> loadRootItems(int surveyId, boolean surveyWork, int codeListId) {
-		return loadItems(surveyId, false, codeListId, (Integer) null);
+	public List<PersistedCodeListItem> loadRootItems(CodeList codeList) {
+		return loadItems(codeList, (Integer) null);
 	}
 	
-	public ExternalCodeListItem loadRootItem(int surveyId, boolean surveyWork, int codeListId, String code) {
-		return loadItem(surveyId, surveyWork, codeListId, (Integer) null, code);
+	public PersistedCodeListItem loadRootItem(CodeList codeList, String code) {
+		return loadItem(codeList, (Integer) null, code);
 	}
 	
-	public List<ExternalCodeListItem> loadItems(int surveyId, boolean surveyWork, int codeListId, Integer parentItemId) {
-		JooqFactory jf = getMappingJooqFactory();
-		SelectQuery q = jf.selectQuery();	
-		q.addFrom(OFC_CODE_LIST);
-		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(surveyWork);
-		q.addConditions(
-				surveyIdField.equal(surveyId),
-				OFC_CODE_LIST.CODE_LIST_ID.equal(codeListId),
-				OFC_CODE_LIST.PARENT_ID.equal(parentItemId));
+	public List<PersistedCodeListItem> loadItems(CodeList codeList, Integer parentItemId) {
+		JooqFactory jf = getMappingJooqFactory(codeList);
+		SelectQuery q = createSelectQuery(jf, codeList, parentItemId);
 		Result<Record> result = q.fetch();
 		return jf.fromResult(result);
 	}
 	
-	public ExternalCodeListItem loadItem(int surveyId, boolean surveyWork, int codeListId, Integer parentItemId, String code) {
-		JooqFactory jf = getMappingJooqFactory();
-		SelectQuery q = jf.selectQuery();	
-		q.addFrom(OFC_CODE_LIST);
-		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(surveyWork);
+	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code) {
+		JooqFactory jf = getMappingJooqFactory(codeList);
+		SelectQuery q = createSelectQuery(jf, codeList, parentItemId);
 		q.addConditions(
-				surveyIdField.equal(surveyId),
-				OFC_CODE_LIST.CODE_LIST_ID.equal(codeListId),
-				OFC_CODE_LIST.PARENT_ID.equal(parentItemId),
-				OFC_CODE_LIST.CODE.equal(code));
+				OFC_CODE_LIST.CODE.equal(code)
+		);
 		Record r = q.fetchOne();
 		return jf.fromRecord(r);
 	}
 
+	protected SelectQuery createSelectQuery(JooqFactory jf, CodeList codeList, Integer parentItemId) {
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		SelectQuery q = jf.selectQuery();	
+		q.addFrom(OFC_CODE_LIST);
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		q.addConditions(
+				surveyIdField.equal(survey.getId()),
+				OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
+				OFC_CODE_LIST.PARENT_ID.equal(parentItemId));
+		return q;
+	}
+	
+	@Override
+	protected JooqFactory getMappingJooqFactory() {
+		throw new UnsupportedOperationException();
+	}
+	
+	protected JooqFactory getMappingJooqFactory(CodeList codeList) {
+		Connection connection = getConnection();
+		return new JooqFactory(connection, codeList);
+	}
+	
 	@Override
 	protected DialectAwareJooqFactory getJooqFactory() {
 		throw new UnsupportedOperationException();
 	}
 	
-	protected DialectAwareJooqFactory getJooqFactory(CodeList codeList, boolean surveyWork) {
+	protected DialectAwareJooqFactory getJooqFactory(CodeList codeList) {
 		Connection connection = getConnection();
-		return new JooqFactory(connection, codeList, surveyWork);
+		return new JooqFactory(connection, codeList);
 	}
 	
 	protected TableField<OfcCodeListRecord, Integer> getSurveyIdField(
@@ -123,38 +138,36 @@ public class CodeListItemDao extends MappingJooqDaoSupport<ExternalCodeListItem,
 		return surveyIdField;
 	}
 	
-	protected static class JooqFactory extends MappingJooqFactory<ExternalCodeListItem> {
+	protected static class JooqFactory extends MappingJooqFactory<PersistedCodeListItem> {
 
 		private static final long serialVersionUID = 1L;
 		
 		private CodeList codeList;
-		private boolean surveyWork;
 		
-		public JooqFactory(Connection connection, CodeList codeList, boolean surveyWork) {
-			super(connection, OFC_CODE_LIST.ID, OFC_CODE_LIST_ID_SEQ, ExternalCodeListItem.class);
+		public JooqFactory(Connection connection, CodeList codeList) {
+			super(connection, OFC_CODE_LIST.ID, OFC_CODE_LIST_ID_SEQ, PersistedCodeListItem.class);
 			this.codeList = codeList;
-			this.surveyWork = surveyWork;
 		}
 		
 		@Override
-		protected ExternalCodeListItem newEntity() {
+		protected PersistedCodeListItem newEntity() {
 			throw new UnsupportedOperationException();
 		}
 		
-		protected ExternalCodeListItem newEntity(int itemId) {
-			return new ExternalCodeListItem(codeList, itemId, null);
+		protected PersistedCodeListItem newEntity(int itemId) {
+			return new PersistedCodeListItem(codeList, itemId);
 		}
 		
 		@Override
-		public ExternalCodeListItem fromRecord(Record record) {
+		public PersistedCodeListItem fromRecord(Record record) {
 			int itemId = record.getValue(OFC_CODE_LIST.ITEM_ID);
-			ExternalCodeListItem entity = newEntity(itemId);
+			PersistedCodeListItem entity = newEntity(itemId);
 			fromRecord(record, entity);
 			return entity;
 		}
 
 		@Override
-		public void fromRecord(Record r, ExternalCodeListItem i) {
+		public void fromRecord(Record r, PersistedCodeListItem i) {
 			i.setSystemId(r.getValue(OFC_CODE_LIST.ID));
 			i.setCode(r.getValue(OFC_CODE_LIST.CODE));
 			i.setParentId(r.getValue(OFC_CODE_LIST.PARENT_ID));
@@ -162,7 +175,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<ExternalCodeListItem,
 			extractDescriptions(r, i);
 		}
 
-		protected void extractLabels(Record r, ExternalCodeListItem item) {
+		protected void extractLabels(Record r, PersistedCodeListItem item) {
 			Survey survey = codeList.getSurvey();
 			item.removeAllLabels();
 			List<String> languages = survey.getLanguages();
@@ -173,7 +186,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<ExternalCodeListItem,
 			}
 		}
 		
-		protected void extractDescriptions(Record r, ExternalCodeListItem item) {
+		protected void extractDescriptions(Record r, PersistedCodeListItem item) {
 			Survey survey = codeList.getSurvey();
 			item.removeAllDescriptions();
 			List<String> languages = survey.getLanguages();
@@ -185,55 +198,88 @@ public class CodeListItemDao extends MappingJooqDaoSupport<ExternalCodeListItem,
 		}
 
 		@Override
-		public void fromObject(ExternalCodeListItem item, StoreQuery<?> q) {
+		public void fromObject(PersistedCodeListItem item, StoreQuery<?> q) {
 			q.addValue(OFC_CODE_LIST.ID, item.getSystemId());
-			q.addValue(OFC_CODE_LIST.CODE_LIST_ID, item.getCodeList().getId());
-			Survey survey = item.getSurvey();
+			CollectSurvey survey = (CollectSurvey) item.getSurvey();
 			Integer surveyId = survey.getId();
-			if ( surveyWork ) {
+			if ( survey.isWork() ) {
 				q.addValue(OFC_CODE_LIST.SURVEY_ID, null);
 				q.addValue(OFC_CODE_LIST.SURVEY_WORK_ID, surveyId);
 			} else {
 				q.addValue(OFC_CODE_LIST.SURVEY_ID, surveyId);
 				q.addValue(OFC_CODE_LIST.SURVEY_WORK_ID, null);
 			}
+			q.addValue(OFC_CODE_LIST.CODE_LIST_ID, item.getCodeList().getId());
+			q.addValue(OFC_CODE_LIST.ITEM_ID, item.getId());
+			q.addValue(OFC_CODE_LIST.PARENT_ID, item.getParentId());
+			q.addValue(OFC_CODE_LIST.CODE, item.getCode());
 			addLabelValues(q, item);
 			addDescriptionValues(q, item);
 		}
 
-		@SuppressWarnings("unchecked")
-		protected void addLabelValues(StoreQuery<?> q, ExternalCodeListItem item) {
+		protected void addLabelValues(StoreQuery<?> q, PersistedCodeListItem item) {
 			Survey survey = item.getSurvey();
 			List<String> languages = survey.getLanguages();
-			for (int i = 0; i < languages.size() && i < LABEL_FIELDS.length; i++) {
-				String lang = languages.get(i);
-				q.addValue(LABEL_FIELDS[i], lang);
-			}
-			for (int i = languages.size(); i < LABEL_FIELDS.length; i++ ) {
-				q.addValue(LABEL_FIELDS[i], null);
+			for (int i = 0; i < LABEL_FIELDS.length; i++) {
+				@SuppressWarnings("unchecked")
+				TableField<?, String> field = LABEL_FIELDS[i];
+				String label;
+				if ( i < languages.size() ) {
+					String lang = languages.get(i);
+					label = getLabel(item, lang);
+				} else {
+					label = null;
+				}
+				q.addValue(field, label);
 			}
 		}
 
-		@SuppressWarnings("unchecked")
-		protected void addDescriptionValues(StoreQuery<?> q, ExternalCodeListItem item) {
+		protected String getLabel(PersistedCodeListItem item, String lang) {
+			String label = item.getLabel(lang);
+			if ( label == null ) {
+				CollectSurvey survey = (CollectSurvey) item.getSurvey();
+				if ( survey.isDefaultLanguage(lang) ) {
+					label = item.getLabel(null);
+				}
+			}
+			return label;
+		}
+		
+		protected void addDescriptionValues(StoreQuery<?> q, PersistedCodeListItem item) {
 			Survey survey = item.getSurvey();
 			List<String> languages = survey.getLanguages();
-			for (int i = 0; i < languages.size() && i < DESCRIPTION_FIELDS.length; i++) {
-				String lang = languages.get(i);
-				q.addValue(DESCRIPTION_FIELDS[i], lang);
-			}
-			for (int i = languages.size(); i < DESCRIPTION_FIELDS.length; i++ ) {
-				q.addValue(DESCRIPTION_FIELDS[i], null);
+			for (int i = 0; i < DESCRIPTION_FIELDS.length; i++) {
+				@SuppressWarnings("unchecked")
+				TableField<?, String> field = DESCRIPTION_FIELDS[i];
+				String description;
+				if ( i < languages.size() ) {
+					String lang = languages.get(i);
+					description = getDescription(item, lang);
+				} else {
+					description = null;
+				}
+				q.addValue(field, description);
 			}
 		}
 
+		protected String getDescription(PersistedCodeListItem item, String lang) {
+			String description = item.getDescription(lang);
+			if ( description == null ) {
+				CollectSurvey survey = (CollectSurvey) item.getSurvey();
+				if ( survey.isDefaultLanguage(lang) ) {
+					description = item.getDescription(null);
+				}
+			}
+			return description;
+		}
+		
 		@Override
-		protected void setId(ExternalCodeListItem t, int id) {
+		protected void setId(PersistedCodeListItem t, int id) {
 			t.setSystemId(id);
 		}
 
 		@Override
-		protected Integer getId(ExternalCodeListItem t) {
+		protected Integer getId(PersistedCodeListItem t) {
 			return t.getSystemId();
 		}
 		

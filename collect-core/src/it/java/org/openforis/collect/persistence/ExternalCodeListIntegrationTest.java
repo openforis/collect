@@ -1,6 +1,7 @@
 package org.openforis.collect.persistence;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -36,6 +38,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
  */
 public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	
+	private static final String EN_LANG_CODE = "en";
 	private static final String LIQUIBASE_CHANGELOG = "org/openforis/collect/db/changelog/sqlite/db.changelog-createtestcodetable.xml";
 	private static final String TEST_HIERARCHICAL_CODE_TABLE_NAME = "ofc_hierarchicalcodetable";
 	private static final String TEST_HIERARCHICAL_CODE_LIST_NAME = "hierarchicalTestCodeList";
@@ -96,17 +99,17 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 		{
 			ExternalCodeListItem item = childItems.get(0);
 			assertEquals("001", item.getCode());
-			assertEquals("Code 1", item.getLabel("en"));
+			assertEquals("Code 1", item.getLabel(EN_LANG_CODE));
 		}
 		{
 			ExternalCodeListItem item = childItems.get(1);
 			assertEquals("002", item.getCode());
-			assertEquals("Code 2", item.getLabel("en"));
+			assertEquals("Code 2", item.getLabel(EN_LANG_CODE));
 		}
 		{
 			ExternalCodeListItem item = childItems.get(2);
 			assertEquals("003", item.getCode());
-			assertEquals("Code 3", item.getLabel("en"));
+			assertEquals("Code 3", item.getLabel(EN_LANG_CODE));
 		}
 	}
 
@@ -127,12 +130,12 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 		{
 			ExternalCodeListItem item = childItems.get(0);
 			assertEquals("001", item.getCode());
-			assertEquals("Code 1", item.getLabel("en"));
+			assertEquals("Code 1", item.getLabel(EN_LANG_CODE));
 		}
 		{
 			ExternalCodeListItem item = childItems.get(1);
 			assertEquals("002", item.getCode());
-			assertEquals("Code 2", item.getLabel("en"));
+			assertEquals("Code 2", item.getLabel(EN_LANG_CODE));
 		}
 	}
 
@@ -145,12 +148,12 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 		{
 			ExternalCodeListItem item = childItems.get(0);
 			assertEquals("011", item.getCode());
-			assertEquals("Code 1-1", item.getLabel("en"));
+			assertEquals("Code 1-1", item.getLabel(EN_LANG_CODE));
 		}
 		{
 			ExternalCodeListItem item = childItems.get(1);
 			assertEquals("012", item.getCode());
-			assertEquals("Code 1-2", item.getLabel("en"));
+			assertEquals("Code 1-2", item.getLabel(EN_LANG_CODE));
 		}
 	}
 	
@@ -175,10 +178,35 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void exportFromXMLAndStoreTest() throws IdmlParseException {
 		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
-		codeListManager.exportFromXMLAndStore(is);
-		CodeList list = survey.getCodeList("measurement");
-		List<ExternalCodeListItem> rootItems = codeListManager.loadRootItems(list);
-		assertEquals(3, rootItems.size());
+		CollectSurvey survey = surveyManager.unmarshalSurvey(is, true);
+		is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
+		codeListManager.exportFromXMLAndStore(survey, is);
+		{
+			CodeList list = survey.getCodeList("measurement");
+			List<PersistedCodeListItem> rootItems = codeListManager.loadRootItems(list);
+			assertEquals(3, rootItems.size());
+			{
+				PersistedCodeListItem item = rootItems.get(0);
+				assertEquals("P", item.getCode());
+				assertEquals("Planned", item.getLabel(EN_LANG_CODE));
+				assertEquals("Planned as part of original sampling design", item.getDescription(EN_LANG_CODE));
+			}
+		}
+		{
+			CodeList list = survey.getCodeList("admin_unit");
+			List<PersistedCodeListItem> rootItems = codeListManager.loadRootItems(list);
+			assertEquals(8, rootItems.size());
+			{
+				PersistedCodeListItem item = rootItems.get(2);
+				assertEquals(22, item.getId());
+				assertEquals("003", item.getCode());
+				assertEquals("Colin", item.getLabel(EN_LANG_CODE));
+				PersistedCodeListItem child = (PersistedCodeListItem) codeListManager.loadChildItem(item, "002");
+				assertNotNull(child);
+				assertEquals(24, child.getId());
+				assertEquals("Muddy Banks", child.getLabel(EN_LANG_CODE));
+			}
+		}
 	}
 	
 }
