@@ -12,7 +12,6 @@ import org.openforis.collect.model.EntityAddChange;
 import org.openforis.collect.model.EntityChange;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeDeleteChange;
-import org.openforis.collect.spring.SpringMessageSource;
 
 /**
  * 
@@ -22,29 +21,27 @@ import org.openforis.collect.spring.SpringMessageSource;
  */
 public class NodeChangeProxy<C extends NodeChange<?>> implements Proxy {
 
-	protected transient SpringMessageSource messageContextHolder;
 	protected transient C change;
 
-	public NodeChangeProxy(SpringMessageSource messageContextHolder, C change) {
+	public NodeChangeProxy(C change) {
 		this.change = change;
-		this.messageContextHolder = messageContextHolder;
 	}
 
-	public static List<NodeChangeProxy<?>> fromList(SpringMessageSource messageContextHolder, Collection<NodeChange<?>> items) {
+	public static List<NodeChangeProxy<?>> fromList(Collection<NodeChange<?>> items) {
 		List<NodeChangeProxy<?>> result = new ArrayList<NodeChangeProxy<?>>();
 		if ( items != null ) {
 			for (NodeChange<?> item : items) {
 				NodeChangeProxy<?> proxy;
 				if ( item instanceof AttributeAddChange ) {
-					proxy = new AttributeAddChangeProxy(messageContextHolder, (AttributeAddChange) item);
+					proxy = new AttributeAddChangeProxy((AttributeAddChange) item);
 				} else if ( item instanceof EntityAddChange ) {
-					proxy = new EntityAddChangeProxy(messageContextHolder, (EntityAddChange) item);
+					proxy = new EntityAddChangeProxy((EntityAddChange) item);
 				} else if ( item instanceof AttributeChange ) {
-					proxy = new AttributeChangeProxy(messageContextHolder, (AttributeChange) item);
+					proxy = new AttributeChangeProxy((AttributeChange) item);
 				} else if ( item instanceof EntityChange) {
-					proxy = new EntityChangeProxy(messageContextHolder, (EntityChange) item);
+					proxy = new EntityChangeProxy((EntityChange) item);
 				} else if ( item instanceof NodeDeleteChange ) {
-					proxy = new NodeDeleteChangeProxy(messageContextHolder, (NodeDeleteChange) item);
+					proxy = new NodeDeleteChangeProxy((NodeDeleteChange) item);
 				} else {
 					throw new IllegalArgumentException("NodeChange type not supported: " + item.getClass().getSimpleName());
 				}

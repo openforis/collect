@@ -4,8 +4,8 @@
 package org.openforis.collect.model.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
-import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -20,19 +20,25 @@ public class CodeAttributeProxy extends AttributeProxy {
 
 	private transient CodeAttribute codeAttribute;
 	
-	public CodeAttributeProxy(SpringMessageSource messageContextHolder, EntityProxy parent, CodeAttribute attribute) {
-		super(messageContextHolder, parent, attribute);
+	public CodeAttributeProxy(EntityProxy parent,
+			CodeAttribute attribute) {
+		super(parent, attribute);
 		this.codeAttribute = attribute;
 	}
 
 	@ExternalizedProperty
 	public CodeListItemProxy getCodeListItem() {
 		if (! isExternalCodeList() ) {
-			CodeListItem codeListItem = codeAttribute.getCodeListItem();
+			CodeListManager codeListManager = getCodeListManager();
+			CodeListItem codeListItem = codeListManager.loadItemByAttribute(codeAttribute);
 			return codeListItem == null ? null: new CodeListItemProxy(codeListItem);
 		} else {
 			return null;
 		}
+	}
+
+	private CodeListManager getCodeListManager() {
+		return getContextBean(CodeListManager.class);
 	}
 
 	@ExternalizedProperty

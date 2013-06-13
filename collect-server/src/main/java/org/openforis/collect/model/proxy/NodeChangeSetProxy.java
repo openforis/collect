@@ -9,7 +9,6 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.NodeChangeSet;
-import org.openforis.collect.spring.SpringMessageSource;
 
 /**
  * @author S. Ricci
@@ -17,24 +16,21 @@ import org.openforis.collect.spring.SpringMessageSource;
  */
 public class NodeChangeSetProxy implements Proxy {
 
-	private transient SpringMessageSource messageContextHolder;
 	private transient NodeChangeSet changeSet;
 	private transient CollectRecord record;
 	private boolean recordSaved;
 	
 	public NodeChangeSetProxy(
-			SpringMessageSource messageContextHolder,
 			CollectRecord record,
 			NodeChangeSet changeSet) {
 		super();
-		this.messageContextHolder = messageContextHolder;
 		this.record = record;
 		this.changeSet = changeSet;
 	}
 
 	@ExternalizedProperty
 	public List<NodeChangeProxy<?>> getChanges() {
-		return NodeChangeProxy.fromList(messageContextHolder, changeSet.getChanges());
+		return NodeChangeProxy.fromList(changeSet.getChanges());
 	}
 
 	public boolean isRecordSaved() {

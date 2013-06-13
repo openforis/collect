@@ -2,7 +2,6 @@ package org.openforis.collect.model.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.model.NodeDeleteChange;
-import org.openforis.collect.spring.SpringMessageSource;
 
 /**
  * 
@@ -11,10 +10,8 @@ import org.openforis.collect.spring.SpringMessageSource;
  */
 public class NodeDeleteChangeProxy extends NodeChangeProxy<NodeDeleteChange> {
 
-	public NodeDeleteChangeProxy(
-			SpringMessageSource messageContextHolder,
-			NodeDeleteChange change) {
-		super(messageContextHolder, change);
+	public NodeDeleteChangeProxy(NodeDeleteChange change) {
+		super(change);
 	}
 
 	@ExternalizedProperty
