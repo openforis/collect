@@ -2,7 +2,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
-import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zul.ListModelList;

@@ -43,7 +43,6 @@ import org.openforis.collect.remoting.service.NodeUpdateRequest.MissingValueAppr
 import org.openforis.collect.remoting.service.NodeUpdateRequest.NodeDeleteRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateRequest;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
-import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -73,8 +72,6 @@ public class DataService {
 	private transient RecordFileManager fileManager;
 	@Autowired
 	private transient RecordIndexService recordIndexService;
-	@Autowired
-	private SpringMessageSource messageContextHolder;
 
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -95,7 +92,7 @@ public class DataService {
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
 		prepareRecordIndexing();
-		return new RecordProxy(messageContextHolder, record);
+		return new RecordProxy(record);
 	}
 
 	protected void prepareRecordIndexing() throws RecordIndexException {
@@ -127,7 +124,7 @@ public class DataService {
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
 		int count = recordManager.getRecordCount(activeSurvey, rootEntityDefinitionName, keyValues);
 		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
-		List<RecordProxy> proxies = RecordProxy.fromList(messageContextHolder, summaries);
+		List<RecordProxy> proxies = RecordProxy.fromList(summaries);
 		result.put("count", count);
 		result.put("records", proxies);
 		return result;
@@ -148,7 +145,7 @@ public class DataService {
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
-		RecordProxy recordProxy = new RecordProxy(messageContextHolder, record);
+		RecordProxy recordProxy = new RecordProxy(record);
 		return recordProxy;
 	}
 	
@@ -190,7 +187,7 @@ public class DataService {
 		if ( ! changeSet.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
-		NodeChangeSetProxy result = new NodeChangeSetProxy(messageContextHolder, activeRecord, changeSet);
+		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet);
 		if ( requestSet.isAutoSave() ) {
 			try {
 				saveActiveRecord();

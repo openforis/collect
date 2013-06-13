@@ -20,9 +20,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.SurveyValidator;
-import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -55,6 +55,7 @@ public class DataImportProcess implements Callable<Void> {
 	private RecordManager recordManager;
 	private RecordDao recordDao;
 	private SurveyManager surveyManager;
+	private SurveyValidator surveyValidator;
 
 	private Map<String, User> users;
 	private String selectedSurveyUri;
@@ -76,11 +77,13 @@ public class DataImportProcess implements Callable<Void> {
 	private DataImportSummary summary;
 	
 	private List<Integer> entryIdsToImport;
+
 	
-	public DataImportProcess(SurveyManager surveyManager, RecordManager recordManager, RecordDao recordDao,
+	public DataImportProcess(SurveyManager surveyManager, SurveyValidator surveyValidator, RecordManager recordManager, RecordDao recordDao,
 			String selectedSurveyUri, Map<String, User> users, File packagedFile, boolean overwriteAll) {
 		super();
 		this.surveyManager = surveyManager;
+		this.surveyValidator = surveyValidator;
 		this.recordManager = recordManager;
 		this.recordDao = recordDao;
 		this.selectedSurveyUri = selectedSurveyUri;
@@ -140,8 +143,7 @@ public class DataImportProcess implements Callable<Void> {
 						"' into on a different survey (" + selectedSurveyUri + ")");
 			}
 			if ( oldSurvey != null ) {
-				SurveyValidator validator = new SurveyValidator(surveyManager);
-				List<SurveyValidationResult> compatibilityResult = validator.validateCompatibility(oldSurvey, packagedSurvey);
+				List<SurveyValidationResult> compatibilityResult = surveyValidator.validateCompatibility(oldSurvey, packagedSurvey);
 				if ( ! compatibilityResult.isEmpty() ) {
 					throw new DataImportExeption("Packaged survey is not compatible with the survey already present into the system.\n" +
 							"Please try to import it using the Designer to get the list of errors.");
@@ -450,8 +452,7 @@ public class DataImportProcess implements Callable<Void> {
 				if (IDML_FILE_NAME.equals(entryName)) {
 					InputStream is = zipFile.getInputStream(zipEntry);
 					survey = surveyManager.unmarshalSurvey(is);
-					SurveyValidator validator = new SurveyValidator(surveyManager);
-					List<SurveyValidationResult> validationResults = validator.validate(survey);
+					List<SurveyValidationResult> validationResults = surveyValidator.validate(survey);
 					if ( ! validationResults.isEmpty() ) {
 						throw new IllegalStateException("Packaged survey is not valid." +
 								"\nPlease try to import it using the Designer to get the list of errors.");

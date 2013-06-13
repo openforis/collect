@@ -4,6 +4,7 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -32,16 +33,14 @@ public class DataExportService {
 	
 	@Autowired
 	private SessionManager sessionManager;
-
 	@Autowired
 	private SurveyManager surveyManager;
-
 	@Autowired
 	private RecordManager recordManager;
-	
+	@Autowired
+	private CodeListManager codeListManager;
 	@Autowired
 	private DataMarshaller dataMarshaller;
-	
 	@Autowired 
 	private ServletContext servletContext;
 	
@@ -76,7 +75,9 @@ public class DataExportService {
 				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
 			}
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			SelectiveDataExportProcess process = new SelectiveDataExportProcess(recordManager, exportDir, survey, rootEntityName, entityId, Step.valueOf(stepNumber));
+			SelectiveDataExportProcess process = new SelectiveDataExportProcess(
+					recordManager, codeListManager, exportDir, survey,
+					rootEntityName, entityId, Step.valueOf(stepNumber));
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}

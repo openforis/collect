@@ -59,14 +59,14 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	public void deleteBySurvey(int surveyId) {
-		deleteBySurvey(false, surveyId);
+		deleteBySurvey(surveyId, false);
 	}
 	
 	public void deleteBySurveyWork(int surveyId) {
-		deleteBySurvey(true, surveyId);
+		deleteBySurvey(surveyId, true);
 	}
 	
-	public void deleteBySurvey(boolean work, int surveyId) {
+	public void deleteBySurvey(int surveyId, boolean work) {
 		JooqFactory jf = getMappingJooqFactory(null);
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(work);
 		jf.delete(OFC_CODE_LIST)
@@ -96,7 +96,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				OFC_CODE_LIST.CODE.equal(code)
 		);
 		Record r = q.fetchOne();
-		return jf.fromRecord(r);
+		if ( r == null ) {
+			return null;
+		} else {
+			return jf.fromRecord(r);
+		}
 	}
 
 	protected SelectQuery createSelectQuery(JooqFactory jf, CodeList codeList, Integer parentItemId) {
@@ -203,11 +207,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			CollectSurvey survey = (CollectSurvey) item.getSurvey();
 			Integer surveyId = survey.getId();
 			if ( survey.isWork() ) {
-				q.addValue(OFC_CODE_LIST.SURVEY_ID, null);
+				q.addValue(OFC_CODE_LIST.SURVEY_ID, (Integer) null);
 				q.addValue(OFC_CODE_LIST.SURVEY_WORK_ID, surveyId);
 			} else {
 				q.addValue(OFC_CODE_LIST.SURVEY_ID, surveyId);
-				q.addValue(OFC_CODE_LIST.SURVEY_WORK_ID, null);
+				q.addValue(OFC_CODE_LIST.SURVEY_WORK_ID, (Integer) null);
 			}
 			q.addValue(OFC_CODE_LIST.CODE_LIST_ID, item.getCodeList().getId());
 			q.addValue(OFC_CODE_LIST.ITEM_ID, item.getId());

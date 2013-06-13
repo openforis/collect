@@ -20,7 +20,7 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectJoinStep;
 import org.jooq.TableField;
-import org.openforis.collect.model.StringKeyValuePair;
+import org.openforis.collect.model.NameValueEntry;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
@@ -38,18 +38,18 @@ public class DynamicTableDao extends JooqDaoSupport {
 	@Deprecated
 	@Transactional
 	public Object load(String table, String column, Object... keys) {
-		StringKeyValuePair[] filters = StringKeyValuePair.fromKeyValuePairs(keys);
+		NameValueEntry[] filters = NameValueEntry.fromKeyValuePairs(keys);
 		return loadValue(table, column, filters);
 	}
 
 	@Transactional
-	public Object loadValue(String table, String column, StringKeyValuePair... filters) {
+	public Object loadValue(String table, String column, NameValueEntry... filters) {
 		Map<String, String> row = loadRow(table, filters);
 		return row == null ? null: row.get(column);
 	}
 
 	@Transactional
-	public Map<String, String> loadRow(String table, StringKeyValuePair[] filters) {
+	public Map<String, String> loadRow(String table, NameValueEntry[] filters) {
 		List<Map<String, String>> rows = loadRows(table, filters);
 		if ( rows == null || rows.isEmpty()) {
 			return null;
@@ -59,12 +59,12 @@ public class DynamicTableDao extends JooqDaoSupport {
 	}
 
 	@Transactional
-	public List<Map<String, String>> loadRows(String table, StringKeyValuePair[] filters) {
+	public List<Map<String, String>> loadRows(String table, NameValueEntry[] filters) {
 		return loadRows(table, filters, (String[]) null);
 	}
 	
 	@Transactional
-	public List<Map<String, String>> loadRows(String table, StringKeyValuePair[] filters, String[] notNullColumns) {
+	public List<Map<String, String>> loadRows(String table, NameValueEntry[] filters, String[] notNullColumns) {
 		Lookup lookupTable = Lookup.getInstance(table);
 		initTable(table);
 		DialectAwareJooqFactory factory = getJooqFactory();
@@ -86,8 +86,8 @@ public class DynamicTableDao extends JooqDaoSupport {
 	}
 
 	protected void addFilterConditions(Lookup lookupTable,
-			SelectJoinStep select, StringKeyValuePair[] filters) {
-		for (StringKeyValuePair filter : filters) {
+			SelectJoinStep select, NameValueEntry[] filters) {
+		for (NameValueEntry filter : filters) {
 			String colName = filter.getKey();
 			@SuppressWarnings("unchecked")
 			TableField<LookupRecord, Object> tableField = (TableField<LookupRecord, Object>) lookupTable.getField(colName);

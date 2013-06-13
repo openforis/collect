@@ -17,8 +17,8 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.SurveyValidator;
-import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.annotation.BindingParam;
@@ -46,6 +46,8 @@ public class SurveySelectVM extends BaseVM {
 	
 	@WireVariable
 	private SurveyManager surveyManager;
+	@WireVariable
+	private SurveyValidator surveyValidator;
 	
 	private SurveyWorkSummary selectedSurvey;
 
@@ -139,7 +141,6 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	protected boolean validateSurvey(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
-		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
 		List<SurveyValidationResult> validationResults = surveyValidator.validateCompatibility(oldPublishedSurvey, survey);
 		if ( validationResults.isEmpty() ) {
 			return true;

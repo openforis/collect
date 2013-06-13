@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.persistence;
 
-import org.openforis.collect.model.StringKeyValuePair;
+import org.openforis.collect.model.NameValueEntry;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class DatabaseLookupProvider implements LookupProvider {
 
 	@Override
 	public Object lookup(String name, String attribute, Object... columns) {
-		StringKeyValuePair[] filters = StringKeyValuePair.fromKeyValuePairs(columns);
+		NameValueEntry[] filters = NameValueEntry.fromKeyValuePairs(columns);
 		Object object = dynamicTableDao.loadValue(name, attribute, filters);
 		if(object != null){
 			Coordinate coordinate = Coordinate.parseCoordinate(object.toString());

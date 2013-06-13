@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -24,29 +25,30 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	
 	private static final Log LOG = LogFactory.getLog(AutomaticColumnProvider.class);
 	
-	public AutomaticColumnProvider(EntityDefinition entityDefinition, List<String> exclusions) {
-		super(createProviders(entityDefinition, exclusions));
+	public AutomaticColumnProvider(CodeListManager codeListManager, EntityDefinition entityDefinition, List<String> exclusions) {
+		super(createProviders(codeListManager, entityDefinition, exclusions));
 	}
 
-	public AutomaticColumnProvider(EntityDefinition entityDefinition) {
-		this(entityDefinition, null);
+	public AutomaticColumnProvider(CodeListManager codeListManager, EntityDefinition entityDefinition) {
+		this(codeListManager, entityDefinition, null);
 	}
 	
-	public AutomaticColumnProvider(String headingPrefix, EntityDefinition entityDefinition) {
-		this(headingPrefix,  entityDefinition, null);
+	public AutomaticColumnProvider(CodeListManager codeListManager, String headingPrefix, EntityDefinition entityDefinition) {
+		this(codeListManager, headingPrefix, entityDefinition, null);
 	}
 	
-	public AutomaticColumnProvider(String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
-		super(headingPrefix, createProviders(entityDefinition, exclusions));
+	public AutomaticColumnProvider(CodeListManager codeListManager, String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
+		super(headingPrefix, createProviders(codeListManager, entityDefinition, exclusions));
 	}
 	
-	private static List<ColumnProvider> createProviders(EntityDefinition rowDefn, List<String> exclusions) {
+	private static List<ColumnProvider> createProviders(CodeListManager codeListManager, 
+			EntityDefinition rowDefn, List<String> exclusions) {
 		List<ColumnProvider> cols = new ArrayList<ColumnProvider>();
 		List<NodeDefinition> childDefinitions = rowDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {
 			if (includeChild(exclusions, childDefn)) {
 				if (childDefn instanceof EntityDefinition) {
-					createEntityProviders((EntityDefinition) childDefn, cols);
+					createEntityProviders(codeListManager, (EntityDefinition) childDefn, cols);
 				} else if (childDefn instanceof AttributeDefinition) {
 					createAttributeProviders((AttributeDefinition) childDefn, cols);
 				}
@@ -59,19 +61,20 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		return exclusions == null || !exclusions.contains(childDefn.getName());
 	}
 	
-	private static void createEntityProviders(EntityDefinition defn, List<ColumnProvider> cols) {
+	private static void createEntityProviders(CodeListManager codeListManager, 
+			EntityDefinition defn, List<ColumnProvider> cols) {
 		String name = defn.getName();
 		if ( defn.isMultiple() ) {
 			if ( defn.isEnumerable() ) {
 				LOG.info("Flatting enumerable multiple entity "+defn.getPath());
-				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(defn);
+				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(codeListManager, defn);
 				cols.add(p);
 			} else {
 				LOG.info("Skipping multiple entity "+defn.getPath());
 			}
 		} else {
 			LOG.info("Flatting single entity "+defn.getPath());
-			ColumnProvider p = new AutomaticColumnProvider(defn);
+			ColumnProvider p = new AutomaticColumnProvider(codeListManager, defn);
 			List<ColumnProvider> childCols = Arrays.asList(p);
 			PivotExpressionColumnProvider col = new PivotExpressionColumnProvider(name, name+"_", childCols);
 			cols.add(col);

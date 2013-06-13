@@ -57,11 +57,6 @@ public class CodeListProxy extends VersionableSurveyObjectProxy {
 	}
 
 	@ExternalizedProperty
-	public List<CodeListItemProxy> getItems() {
-		return CodeListItemProxy.fromList(codeList.getItems());
-	}
-
-	@ExternalizedProperty
 	public CodeScope getCodeScope() {
 		if (codeList.getCodeScope() != null) {
 			return CodeScope.valueOf(codeList.getCodeScope().toString());

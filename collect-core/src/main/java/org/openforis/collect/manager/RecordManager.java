@@ -73,6 +73,8 @@ public class RecordManager {
 	
 	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private CodeListManager codeListManager;
 	
 	private RecordConverter recordConverter;
 	private long lockTimeoutMillis;
@@ -827,7 +829,7 @@ public class RecordManager {
 		if(enumeratingCodeDefn != null) {
 			String enumeratedEntityName = enumerableEntityDefn.getName();
 			CodeList list = enumeratingCodeDefn.getList();
-			List<CodeListItem> items = list.getItems();
+			List<CodeListItem> items = codeListManager.loadRootItems(list);
 			for (int i = 0; i < items.size(); i++) {
 				CodeListItem item = items.get(i);
 				if(version == null || version.isApplicable(item)) {

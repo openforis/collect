@@ -1,5 +1,7 @@
-package org.openforis.collect.manager;
+package org.openforis.collect.manager.validation;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -13,6 +15,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
@@ -23,6 +27,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
 
 /**
@@ -32,13 +37,9 @@ import org.xml.sax.SAXException;
  */
 public class SurveyValidator {
 
-	@SuppressWarnings("unused")
-	private SurveyManager surveyManager;
+	@Autowired
+	private CodeListManager codeListManager;
 
-	public SurveyValidator(SurveyManager surveyManager) {
-		this.surveyManager = surveyManager;
-	}
-	
 	/**
 	 * Verifies that the survey is compatible with an existing one and that replacing the old one
 	 * will not break the inserted data (if any). 
@@ -50,6 +51,13 @@ public class SurveyValidator {
 			results.addAll(validateChanges(oldPublishedSurvey, newSurvey));
 		}
 		return results;
+	}
+	
+	public void checkCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) throws SurveyValidationException {
+		List<SurveyValidationResult> result = validateCompatibility(oldPublishedSurvey, newSurvey);
+		if ( ! result.isEmpty() ) {
+			throw new SurveyValidationException("The survey is not compatible with the old published one");
+		}
 	}
 	
 	public List<SurveyValidationResult> validate(CollectSurvey survey) {
@@ -244,9 +252,9 @@ public class SurveyValidator {
 	protected List<SurveyValidationResult> validateEnumeratingCodeListNotChanged(CodeList oldCodeList,
 			CodeList codeList) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
-		List<CodeListItem> oldItems = oldCodeList.getItems();
+		List<CodeListItem> oldItems = codeListManager.loadRootItems(oldCodeList);
 		for (CodeListItem oldItem : oldItems) {
-			CodeListItem newItem = codeList.getItem(oldItem.getCode());
+			CodeListItem newItem = codeListManager.loadRootItem(codeList, oldItem.getCode());
 			if ( newItem == null ) {
 				String messageKey = "survey.validation.error.enumerating_code_list_changed.code_removed";
 				String path = "codeList" + "/" + codeList.getName() + "/" + oldItem.getCode();
@@ -262,6 +270,18 @@ public class SurveyValidator {
 		List<EntityDefinition> rootEntityDefns = schema.getRootEntityDefinitions();
 		for (EntityDefinition entityDefn : rootEntityDefns) {
 			entityDefn.traverse(nodeDefnVisitor);
+		}
+	}
+	
+	public void validateAgainstSchema(File file) throws SurveyValidationException {
+		FileInputStream is = null;
+		try {
+			is = new FileInputStream(file);
+			validateAgainstSchema(is);
+		} catch (IOException e) {
+			throw new RuntimeException("Error validating the survey (creation of temp file): " + e.getMessage(), e);
+		} finally {
+			IOUtils.closeQuietly(is);
 		}
 	}
 	
@@ -329,5 +349,9 @@ public class SurveyValidator {
 		}
 		
 	}
-		
+	
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
+	}
+	
 }

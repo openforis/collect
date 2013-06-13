@@ -23,6 +23,7 @@ import org.openforis.collect.csv.ModelCsvWriter;
 import org.openforis.collect.csv.NodePositionColumnProvider;
 import org.openforis.collect.csv.PivotExpressionColumnProvider;
 import org.openforis.collect.csv.SingleAttributeColumnProvider;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -46,6 +47,7 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 	private static Log LOG = LogFactory.getLog(DataExportProcess.class);
 
 	private RecordManager recordManager;
+	private CodeListManager codeListManager;
 	private File exportDirectory;
 	private DataExportState state;
 	private CollectSurvey survey;
@@ -53,10 +55,12 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 	private int entityId;
 	private Step step;
 	
-	public SelectiveDataExportProcess(RecordManager recordManager, File exportDirectory, 
+	public SelectiveDataExportProcess(RecordManager recordManager,
+			CodeListManager codeListManager, File exportDirectory,
 			CollectSurvey survey, String rootEntityName, int entityId, Step step) {
 		super();
 		this.recordManager = recordManager;
+		this.codeListManager = codeListManager;
 		this.exportDirectory = exportDirectory;
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
@@ -171,7 +175,7 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		List<ColumnProvider> columnProviders = createAncestorsColumnsProvider(entityDefn);
-		columnProviders.add(new AutomaticColumnProvider(entityDefn));
+		columnProviders.add(new AutomaticColumnProvider(codeListManager, entityDefn));
 		ColumnProvider provider = new ColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
 		return new DataTransformation(axisPath, provider);

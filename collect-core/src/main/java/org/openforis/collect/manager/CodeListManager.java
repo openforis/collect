@@ -1,5 +1,8 @@
 package org.openforis.collect.manager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,8 +10,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.exception.CodeListImportException;
 import org.openforis.collect.model.CollectCodeListPersisterContext;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.CodeListItemDao;
 import org.openforis.collect.persistence.DatabaseExternalCodeListProvider;
 import org.openforis.commons.collection.CollectionUtils;
@@ -18,7 +24,6 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyCodeListPersisterBinder;
@@ -135,8 +140,20 @@ public class CodeListManager {
 	public <T extends CodeListItem> List<T> loadRootItems(CodeList list) {
 		if ( list.isExternal() ) {
 			return (List<T>) provider.getRootItems(list);
-		} else {
+		} else if ( list.isEmpty() ) {
 			return (List<T>) codeListItemDao.loadRootItems(list);
+		} else {
+			return list.getItems();
+		}
+	}
+	
+	public CodeListItem loadRootItem(CodeList list, String code) {
+		if ( list.isExternal() ) {
+			return provider.getRootItem(list, code);
+		} else if ( list.isEmpty() ) {
+			return codeListItemDao.loadRootItem(list, code);
+		} else {
+			return list.getItem(code);
 		}
 	}
 
@@ -201,9 +218,25 @@ public class CodeListManager {
 		return filterApplicableItems(items, version);
 	}
 
-	public void exportFromXMLAndStore(Survey survey, InputStream is) throws IdmlParseException {
+	public void parseXMLAndStoreItems(CollectSurvey survey, InputStream is) throws CodeListImportException {
 		SurveyCodeListPersisterBinder binder = new SurveyCodeListPersisterBinder(persisterContext);
-		binder.exportFromXMLAndStore(survey, is);
+		try {
+			binder.exportFromXMLAndStore(survey, is);
+		} catch (IdmlParseException e) {
+			throw new CodeListImportException(e);
+		}
+	}
+	
+	public void parseXMLAndStoreItems(CollectSurvey survey, File file) throws CodeListImportException {
+		FileInputStream is = null;
+		try {
+			is = new FileInputStream(file);
+			parseXMLAndStoreItems(survey, is);
+		} catch (FileNotFoundException e) {
+			throw new CodeListImportException(e);
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
 	}
 	
 	protected List<CodeListItem> filterApplicableItems(
@@ -246,7 +279,7 @@ public class CodeListManager {
 		} else if ( list.isEmpty() ) {
 			return (List<T>) codeListItemDao.loadItems(list, ((PersistedCodeListItem) parent).getSystemId());
 		} else {
-			return list.getItems();
+			return parent.getChildItems();
 		}
 	}	
 	
@@ -261,6 +294,10 @@ public class CodeListManager {
 		}
 	}
 	
+	public void deleteBySurvey(Integer surveyId, boolean work) {
+		codeListItemDao.deleteBySurvey(surveyId, work);
+	}
+
 	public void setExternalCodeListProvider(
 			DatabaseExternalCodeListProvider externalCodeListProvider) {
 		this.provider = externalCodeListProvider;

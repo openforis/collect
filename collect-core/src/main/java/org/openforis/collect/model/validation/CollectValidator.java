@@ -5,12 +5,15 @@ package org.openforis.collect.model.validation;
 
 import java.util.List;
 
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.validation.CodeParentValidator;
+import org.openforis.idm.metamodel.validation.CodeValidator;
 import org.openforis.idm.metamodel.validation.MinCountValidator;
 import org.openforis.idm.metamodel.validation.NumberValueUnitValidator;
 import org.openforis.idm.metamodel.validation.NumericRangeUnitValidator;
@@ -36,6 +39,8 @@ public class CollectValidator extends Validator {
 
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private CodeListManager codeListManager;
 
 	@Override
 	public ValidationResults validate(Attribute<?, ?> attribute) {
@@ -84,6 +89,16 @@ public class CollectValidator extends Validator {
 	@Override
 	protected TaxonVernacularLanguageValidator getTaxonVernacularLanguageValidator() {
 		return new CollectTaxonVernacularLanguageValidator();
+	}
+	
+	@Override
+	protected CodeValidator getCodeValidator() {
+		return new CollectCodeValidator(codeListManager);
+	}
+	
+	@Override
+	protected CodeParentValidator getCodeParentValidator() {
+		return new CollectCodeParentValidator(codeListManager);
 	}
 	
 	@Override
@@ -173,5 +188,13 @@ public class CollectValidator extends Validator {
 			}
 		}
 		return true;
+	}
+	
+	public void setRecordManager(RecordManager recordManager) {
+		this.recordManager = recordManager;
+	}
+	
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
 	}
 }

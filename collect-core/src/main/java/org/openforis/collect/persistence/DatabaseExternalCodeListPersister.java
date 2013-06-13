@@ -33,7 +33,7 @@ public class DatabaseExternalCodeListPersister implements CodeListItemPersister 
 	@Override
 	public void deleteAllItems(CodeList list) {
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
-		codeListItemDao.deleteBySurvey(survey.isWork(), survey.getId());
+		codeListItemDao.deleteBySurvey(survey.getId(), survey.isWork());
 	}
 
 }

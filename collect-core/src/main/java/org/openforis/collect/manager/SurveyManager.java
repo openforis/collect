@@ -5,7 +5,6 @@ package org.openforis.collect.manager;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -18,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.manager.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
@@ -42,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyManager {
 
 	@Autowired
+	private CodeListManager codeListManager;
+	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private SpeciesManager speciesManager;
@@ -53,6 +56,8 @@ public class SurveyManager {
 	private RecordDao recordDao;
 	@Autowired
 	private CollectSurveyContext collectSurveyContext;
+	@Autowired
+	private SurveyValidator validator;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
@@ -120,16 +125,91 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public void importModel(InputStream is, String name) throws IdmlParseException {
-		//TODO
+	public CollectSurvey importModel(InputStream is, String name, boolean overwrite, boolean validate)
+			throws SurveyImportException, SurveyValidationException {
+		File tempFile = null;
+		try {
+			tempFile = CollectIOUtils.copyToTempFile(new InputStreamReader(is));
+			return importModel(tempFile, name, overwrite,
+					validate);
+		} finally {
+			tempFile.delete();
+		}
+	}
+
+	@Transactional
+	public CollectSurvey importModel(File surveyFile, String name,
+			boolean overwrite, boolean validate) throws SurveyImportException, SurveyValidationException {
+		try {
+			if ( validate ) {
+				validator.validateAgainstSchema(surveyFile);
+			}
+			CollectSurvey survey = unmarshallSurvey(surveyFile, true);
+			if ( validate ) {
+				validator.validate(survey);
+			}
+			SurveySummary oldSurveyWork = loadSurveyWorkSummaryByUri(survey.getUri());
+			CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
+			if ( oldSurveyWork == null && oldPublishedSurvey == null ) {
+				importNewModel(surveyFile, name, survey);
+			} else if ( ! overwrite ) {
+				throw new IllegalArgumentException("Survey already existing but not asking for overwite");
+			} else if ( oldPublishedSurvey != null ) {
+				updatePublishedSurvey(surveyFile, survey, validate);
+			} else {
+				updateExistingSurveyWork(surveyFile, survey, oldSurveyWork);
+			}
+			return survey;
+		} catch ( CodeListImportException e ) {
+			throw new SurveyImportException(e);
+		} catch (IdmlParseException e) {
+			throw new SurveyImportException(e);
+		}
+	}
+
+	protected void updateExistingSurveyWork(File surveyFile,
+			CollectSurvey survey, SurveySummary oldSurveyWorkSummary)
+			throws SurveyImportException, CodeListImportException {
+		Integer id = oldSurveyWorkSummary.getId();
+		survey.setId(id);
+		survey.setName(oldSurveyWorkSummary.getName());
+		survey.setWork(true);
+		codeListManager.deleteBySurvey(id, true);
+		saveSurveyWork(survey);
+		codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+	}
+
+	protected void updatePublishedSurvey(File surveyFile,
+			CollectSurvey survey, boolean validate) throws SurveyValidationException,
+			SurveyImportException, CodeListImportException {
+		CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
+		Integer id = oldPublishedSurvey.getId();
+		survey.setId(id);
+		survey.setName(oldPublishedSurvey.getName());
+		if ( validate ) {
+			validator.checkCompatibility(oldPublishedSurvey, survey);
+		}
+		codeListManager.deleteBySurvey(id, false);
+		updateModel(survey);
+		codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+	}
+
+	protected void importNewModel(File surveyFile, String name, CollectSurvey survey)
+			throws SurveyImportException, CodeListImportException {
+		survey.setName(name);
+		surveyDao.importModel(survey);
+		addToCache(survey);
+		codeListManager.parseXMLAndStoreItems(survey, surveyFile);
 	}
 	
+	@Deprecated
 	@Transactional
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
 		surveyDao.importModel(survey);
 		addToCache(survey);
 	}
 	
+	@Deprecated
 	@Transactional
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
 		//remove old survey from surveys cache
@@ -154,13 +234,17 @@ public class SurveyManager {
 			SurveySummary summary = new SurveySummary(id, name, uri, projectName);
 			summaries.add(summary);
 		}
+		sortByName(summaries);
+		return summaries;
+	}
+
+	protected void sortByName(List<SurveySummary> summaries) {
 		Collections.sort(summaries, new Comparator<SurveySummary>() {
 			@Override
 			public int compare(SurveySummary s1, SurveySummary s2) {
 				return s1.getName().compareTo(s2.getName());
 			}
 		});
-		return summaries;
 	}
 	
 	public String marshalSurvey(Survey survey)  {
@@ -200,12 +284,12 @@ public class SurveyManager {
 			throws IdmlParseException, SurveyValidationException {
 		if ( validateAgainstSchema ) {
 			File tempFile = CollectIOUtils.copyToTempFile(reader);
-			validateIdml(tempFile);
+			validateSurveyXMLAgainstSchema(tempFile);
 			CollectSurvey result = unmarshallSurvey(tempFile, skipCodeListItems);
 			tempFile.delete();
 			return result;
 		} else {
-			return surveyDao.unmarshalIdml(reader);
+			return surveyDao.unmarshalIdml(reader, skipCodeListItems);
 		}
 	}
 
@@ -222,17 +306,8 @@ public class SurveyManager {
 		}
 	}
 
-	protected void validateIdml(File file) throws SurveyValidationException {
-		FileInputStream is = null;
-		try {
-			is = new FileInputStream(file);
-			SurveyValidator validator = new SurveyValidator(this);
-			validator.validateAgainstSchema(is);
-		} catch (IOException e) {
-			throw new RuntimeException("Error validating the survey (creation of temp file): " + e.getMessage(), e);
-		} finally {
-			IOUtils.closeQuietly(is);
-		}
+	protected void validateSurveyXMLAgainstSchema(File file) throws SurveyValidationException {
+		validator.validateAgainstSchema(file);
 	}
 
 	@Transactional
@@ -307,6 +382,7 @@ public class SurveyManager {
 		CollectSurvey surveyWork = survey;
 		surveyWork.setId(null);
 		surveyWork.setPublished(true);
+		surveyWork.setWork(true);
 		return surveyWork;
 	}
 	

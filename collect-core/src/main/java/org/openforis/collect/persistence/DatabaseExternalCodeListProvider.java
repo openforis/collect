@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.StringKeyValuePair;
+import org.openforis.collect.model.NameValueEntry;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -60,7 +60,7 @@ public class DatabaseExternalCodeListProvider implements
 	@Override
 	@Deprecated
 	public String getCode(CodeList list, String attribute, Object... keys) {
-		StringKeyValuePair[] filters = StringKeyValuePair.fromKeyValuePairs(keys);
+		NameValueEntry[] filters = NameValueEntry.fromKeyValuePairs(keys);
 		addSurveyFilter(list, filters);
 		String listName = list.getLookupTable();
 		Object object = dynamicTableDao.loadValue(listName, attribute, filters);
@@ -76,22 +76,22 @@ public class DatabaseExternalCodeListProvider implements
 		CodeAttributeDefinition defn = attribute.getDefinition();
 		CodeList list = defn.getList();
 		
-		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();
+		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		addSurveyFilter(list, filters);
 		CodeAttribute codeParent = attribute.getCodeParent();
 		while (codeParent != null) {
 			String colName = getLevelKeyColumnName(codeParent);
 			String codeValue = getCodeValue(codeParent);
-			filters.add(new StringKeyValuePair(colName, codeValue));
+			filters.add(new NameValueEntry(colName, codeValue));
 			codeParent = codeParent.getCodeParent();
 		}
 		String colName = getLevelKeyColumnName(attribute);
 		String codeValue = getCodeValue(attribute);
-		filters.add(new StringKeyValuePair(colName, codeValue));
+		filters.add(new NameValueEntry(colName, codeValue));
 		int level = defn.getLevelPosition();
-		List<StringKeyValuePair> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, level);
+		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, level);
 		filters.addAll(emptyNextLevelsFilters);
-		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new StringKeyValuePair[0]));
+		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new NameValueEntry[0]));
 		if ( row == null ) {
 			return null;
 		} else {
@@ -101,26 +101,26 @@ public class DatabaseExternalCodeListProvider implements
 	}
 
 	public ExternalCodeListItem getParentItem(ExternalCodeListItem item) {
-		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();
+		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		CodeList list = item.getCodeList();
-		Collection<StringKeyValuePair> parentKeys = getParentKeys(item);
+		Collection<NameValueEntry> parentKeys = getParentKeys(item);
 		filters.addAll(parentKeys);
 		addSurveyFilter(list, filters);
 		int level = parentKeys.size() + 1;
 		int parentLevel = level - 1;
-		List<StringKeyValuePair> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, parentLevel);
+		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, parentLevel);
 		filters.addAll(emptyNextLevelsFilters);
-		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new StringKeyValuePair[0]));
+		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new NameValueEntry[0]));
 		return parseRow(row, list, parentLevel);
 	}
 
 	public List<ExternalCodeListItem> getRootItems(CodeList list) {
-		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();
+		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		addSurveyFilter(list, filters);
-		List<StringKeyValuePair> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
+		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
 		filters.addAll(emptyNextLevelsFilters);
 		List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
-				filters.toArray(new StringKeyValuePair[0]));
+				filters.toArray(new NameValueEntry[0]));
 		List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
 		for (Map<String, String> row : rows) {
 			ExternalCodeListItem item = parseRow(row, list, 1);
@@ -130,26 +130,26 @@ public class DatabaseExternalCodeListProvider implements
 	}
 
 	public ExternalCodeListItem getRootItem(CodeList list, String code) {
-		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();
+		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		addSurveyFilter(list, filters);
-		List<StringKeyValuePair> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
+		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, 1);
 		filters.addAll(emptyNextLevelsFilters);
 		String firstLevelKeyColName = getLevelKeyColumnName(list, 1);
-		StringKeyValuePair itemFilter = new StringKeyValuePair(firstLevelKeyColName, code);
+		NameValueEntry itemFilter = new NameValueEntry(firstLevelKeyColName, code);
 		filters.add(itemFilter);
-		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new StringKeyValuePair[0]));
+		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), filters.toArray(new NameValueEntry[0]));
 		return parseRow(row, list, 1);
 	}
 	
 	public List<ExternalCodeListItem> getChildItems(ExternalCodeListItem item) {
 		CodeList list = item.getCodeList();
-		List<StringKeyValuePair> filters = createChildItemsFilters(item);
+		List<NameValueEntry> filters = createChildItemsFilters(item);
 		int itemLevel = item.getLevel();
 		int childrenLevel = itemLevel + 1;
 		String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
 		String[] notNullColumns = new String[]{childrenKeyColName};
 		List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
-				filters.toArray(new StringKeyValuePair[0]),
+				filters.toArray(new NameValueEntry[0]),
 				notNullColumns);
 		List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
 		for (Map<String, String> row : rows) {
@@ -162,28 +162,28 @@ public class DatabaseExternalCodeListProvider implements
 	public ExternalCodeListItem getChildItem(ExternalCodeListItem item,
 			String code) {
 		CodeList list = item.getCodeList();
-		List<StringKeyValuePair> filters = createChildItemsFilters(item);
+		List<NameValueEntry> filters = createChildItemsFilters(item);
 		int itemLevel = item.getLevel();
 		int childrenLevel = itemLevel + 1;
 		String childrenLevelColName = getLevelKeyColumnName(list, childrenLevel);
-		StringKeyValuePair codeFilter = new StringKeyValuePair(childrenLevelColName, code);
+		NameValueEntry codeFilter = new NameValueEntry(childrenLevelColName, code);
 		filters.add(codeFilter);
 		Map<String, String> row = dynamicTableDao.loadRow(list.getLookupTable(), 
-				filters.toArray(new StringKeyValuePair[0]));
+				filters.toArray(new NameValueEntry[0]));
 		return parseRow(row, list, childrenLevel);
 	}
 	
-	protected List<StringKeyValuePair> createChildItemsFilters(ExternalCodeListItem item) {
-		List<StringKeyValuePair> filters = new ArrayList<StringKeyValuePair>();
+	protected List<NameValueEntry> createChildItemsFilters(ExternalCodeListItem item) {
+		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		CodeList list = item.getCodeList();
-		Collection<StringKeyValuePair> parentKeys = getParentKeys(item);
+		Collection<NameValueEntry> parentKeys = getParentKeys(item);
 		filters.addAll(parentKeys);
 		addSurveyFilter(list, filters);
 		int itemLevel = item.getLevel();
 		int childrenLevel = itemLevel + 1;
 		String itemKeyColName = getLevelKeyColumnName(list, itemLevel);
-		filters.add(new StringKeyValuePair(itemKeyColName, item.getCode()));
-		List<StringKeyValuePair> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, childrenLevel);
+		filters.add(new NameValueEntry(itemKeyColName, item.getCode()));
+		List<NameValueEntry> emptyNextLevelsFilters = createEmptyNextLevelFilters(list, childrenLevel);
 		filters.addAll(emptyNextLevelsFilters);
 		return filters;
 	}
@@ -215,50 +215,50 @@ public class DatabaseExternalCodeListProvider implements
 		return item;
 	}
 
-	protected StringKeyValuePair createSurveyFilter(CodeList list) {
+	protected NameValueEntry createSurveyFilter(CodeList list) {
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
 		Integer surveyId = survey.getId();
 		boolean surveyWork = surveyManager.isSurveyWork(survey);
 		if ( surveyId != null ) {
 			String surveyIdFieldName = surveyWork ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
-			StringKeyValuePair keyValue = new StringKeyValuePair(surveyIdFieldName, surveyId.toString());
+			NameValueEntry keyValue = new NameValueEntry(surveyIdFieldName, surveyId.toString());
 			return keyValue;
 		} else {
 			return null;
 		}
 	}
 
-	protected StringKeyValuePair[] addSurveyFilter(CodeList list,
-			StringKeyValuePair... filters) {
-		StringKeyValuePair surveyFilter = createSurveyFilter(list);
-		StringKeyValuePair[] newFilters = Arrays.copyOf(filters, filters.length + 1);
+	protected NameValueEntry[] addSurveyFilter(CodeList list,
+			NameValueEntry... filters) {
+		NameValueEntry surveyFilter = createSurveyFilter(list);
+		NameValueEntry[] newFilters = Arrays.copyOf(filters, filters.length + 1);
 		newFilters[filters.length] = surveyFilter;
 		return newFilters;
 	}
 	
 	protected void addSurveyFilter(CodeList list,
-			List<StringKeyValuePair> filters) {
-		StringKeyValuePair surveyFilter = createSurveyFilter(list);
+			List<NameValueEntry> filters) {
+		NameValueEntry surveyFilter = createSurveyFilter(list);
 		filters.add(surveyFilter);
 	}
 	
-	protected List<StringKeyValuePair> createEmptyNextLevelFilters(CodeList list, int level) {
-		List<StringKeyValuePair> result = new ArrayList<StringKeyValuePair>();
+	protected List<NameValueEntry> createEmptyNextLevelFilters(CodeList list, int level) {
+		List<NameValueEntry> result = new ArrayList<NameValueEntry>();
 		List<CodeListLevel> hierarchy = list.getHierarchy();
 		for(int i = level; i < hierarchy.size(); i++){
 			CodeListLevel codeListLevel = hierarchy.get(i);
 			String name = codeListLevel.getName();
-			result.add(new StringKeyValuePair(name, ""));
+			result.add(new NameValueEntry(name, ""));
 		}
 		return result;
 	}
 	
-	protected Collection<StringKeyValuePair> getParentKeys(ExternalCodeListItem item) {
-		Set<StringKeyValuePair> result = new HashSet<StringKeyValuePair>();
+	protected Collection<NameValueEntry> getParentKeys(ExternalCodeListItem item) {
+		Set<NameValueEntry> result = new HashSet<NameValueEntry>();
 		Map<String, String> parentKeyByLevel = item.getParentKeyByLevel();
 		Set<Entry<String,String>> entrySet = parentKeyByLevel.entrySet();
 		for (Entry<String, String> entry : entrySet) {
-			StringKeyValuePair keyValuePair = new StringKeyValuePair(entry);
+			NameValueEntry keyValuePair = new NameValueEntry(entry);
 			result.add(keyValuePair);
 		}
 		return result;
