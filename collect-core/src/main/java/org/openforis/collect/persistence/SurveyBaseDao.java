@@ -4,11 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.io.IOUtils;
 import org.jooq.Record;
+import org.openforis.collect.manager.SurveyMigrator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
@@ -49,8 +52,8 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 	
 	public CollectSurvey unmarshalIdml(InputStream is, boolean skipCodeListItems) throws IdmlParseException {
-		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
-		return (CollectSurvey) binder.unmarshal(is, skipCodeListItems);
+		InputStreamReader reader = new InputStreamReader(is);
+		return unmarshalIdml(reader, skipCodeListItems);
 	}
 
 	public CollectSurvey unmarshalIdml(Reader reader) throws IdmlParseException {
@@ -59,7 +62,14 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	
 	public CollectSurvey unmarshalIdml(Reader reader, boolean skipCodeListItems) throws IdmlParseException {
 		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
-		return (CollectSurvey) binder.unmarshal(reader, skipCodeListItems);
+		try {
+			CollectSurvey survey = (CollectSurvey) binder.unmarshal(reader, skipCodeListItems);
+			SurveyMigrator migrator = getSurveyMigrator();
+			migrator.migrate(survey);
+			return survey;
+		} finally {
+			IOUtils.closeQuietly(reader);
+		}
 	}
 
 	public String marshalSurvey(Survey survey) throws SurveyImportException {
@@ -80,6 +90,10 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 		} catch (IOException e) {
 			throw new SurveyImportException("Error marshalling survey", e);
 		}
+	}
+	
+	protected SurveyMigrator getSurveyMigrator() {
+		return new SurveyMigrator();
 	}
 	
 	public CollectSurveyContext getSurveyContext() {

@@ -55,7 +55,7 @@ public class UIOptionsSerializer {
 	protected void writeTabSet(XmlSerializer serializer, UITabSet tabSet)
 			throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, TAB_SET);
-		serializer.attribute(UI_NAMESPACE_URI, NAME	, tabSet.getName());
+		serializer.attribute("", NAME, tabSet.getName());
 		List<UITab> tabs = tabSet.getTabs();
 		for (UITab tab : tabs) {
 			writeTab(serializer, tab);
@@ -65,7 +65,7 @@ public class UIOptionsSerializer {
 
 	protected void writeTab(XmlSerializer serializer, UITab tab) throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, TAB);
-		serializer.attribute(UI_NAMESPACE_URI, NAME	, tab.getName());
+		serializer.attribute("", NAME, tab.getName());
 		List<LanguageSpecificText> labels = tab.getLabels();
 		for (LanguageSpecificText label : labels) {
 			writeLabel(serializer, label);
@@ -82,7 +82,7 @@ public class UIOptionsSerializer {
 		serializer.startTag(UI_NAMESPACE_URI, LABEL);
 		String lang = label.getLanguage();
 		if ( lang != null ) {
-			serializer.attribute(UI_NAMESPACE_URI, IdmlConstants.XML_LANG_ATTRIBUTE, lang);
+			serializer.attribute(IdmlConstants.XML_NAMESPACE_URI, IdmlConstants.XML_LANG_ATTRIBUTE, lang);
 		}
 		serializer.text(label.getText());
 		serializer.endTag(UI_NAMESPACE_URI, LABEL);

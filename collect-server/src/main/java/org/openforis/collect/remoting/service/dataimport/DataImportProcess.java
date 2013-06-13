@@ -22,6 +22,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyValidator;
 import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -434,7 +435,7 @@ public class DataImportProcess implements Callable<Void> {
 		return null;
 	}
 
-	public CollectSurvey extractPackagedSurvey() throws IOException, IdmlParseException, DataImportExeption {
+	public CollectSurvey extractPackagedSurvey() throws IOException, IdmlParseException, DataImportExeption, SurveyValidationException {
 		ZipFile zipFile = null;
 		CollectSurvey survey = null;
 		try {
@@ -450,7 +451,7 @@ public class DataImportProcess implements Callable<Void> {
 					InputStream is = zipFile.getInputStream(zipEntry);
 					survey = surveyManager.unmarshalSurvey(is);
 					SurveyValidator validator = new SurveyValidator(surveyManager);
-					List<SurveyValidationResult> validationResults = validator.validateSurvey(survey);
+					List<SurveyValidationResult> validationResults = validator.validate(survey);
 					if ( ! validationResults.isEmpty() ) {
 						throw new IllegalStateException("Packaged survey is not valid." +
 								"\nPlease try to import it using the Designer to get the list of errors.");

@@ -1,6 +1,7 @@
 package org.openforis.collect.manager;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -139,7 +140,7 @@ public class CodeListManager {
 		}
 	}
 
-	public CodeListItem findCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
+	protected CodeListItem findCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
 		String adaptedCode = code.trim();
 		adaptedCode = adaptedCode.toUpperCase();
 		//remove initial zeros
@@ -158,8 +159,30 @@ public class CodeListManager {
 		}
 		return null;
 	}
+	
+	public CodeListItem findAssignableItem(Entity parent,
+			CodeAttributeDefinition defn, String code) {
+		List<CodeListItem> items = findAssignableItems(parent, defn, code);
+		return items.size() == 1 ? items.get(0): null;
+	}
 
-	public List<CodeListItem> getAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
+	public List<CodeListItem> findAssignableItems(Entity parent, CodeAttributeDefinition defn, String... codes) {
+		List<CodeListItem> result = new ArrayList<CodeListItem>();
+		List<CodeListItem> assignableItems = loadAssignableCodeListItems(parent, defn);
+		if ( ! assignableItems.isEmpty() ) {
+			Record record = parent.getRecord();
+			ModelVersion version = record.getVersion();
+			for (String code: codes) {
+				CodeListItem item = findCodeListItem(assignableItems, code, version);
+				if ( item != null ) {
+					result.add(item);
+				}
+			}
+		}
+		return CollectionUtils.unmodifiableList(result);
+	}
+
+	public List<CodeListItem> loadAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
 		List<? extends CodeListItem> items = null;
 		CodeList list = def.getList();
 		if ( StringUtils.isEmpty(def.getParentExpression()) ) {

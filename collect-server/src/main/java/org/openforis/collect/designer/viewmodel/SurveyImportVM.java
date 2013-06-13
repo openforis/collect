@@ -3,8 +3,6 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.List;
@@ -13,13 +11,17 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
+import org.openforis.collect.designer.model.SurveyManagerUtil;
+import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyValidator;
 import org.openforis.collect.manager.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.ValidationContext;
@@ -50,23 +52,37 @@ public class SurveyImportVM extends SurveyBaseVM {
 	
 	private String fileName;
 	private CollectSurvey uploadedSurvey;
+	private boolean updatingExistingSurvey;
+	private boolean updatingPublishedSurvey;
 	
 	public SurveyImportVM() {
 		form = new HashMap<String, String>();
+		reset();
+	}
+	
+	protected void reset() {
+		fileName = null;
+		uploadedSurvey = null;
+		updatingExistingSurvey = false;
+		updatingPublishedSurvey = false;
+		notifyChange("fileName","uploadedSurvey","nameEditDisabled");
 	}
 	
 	@Command
 	public void importSurvey(@ContextParam(ContextType.BIND_CONTEXT) BindContext ctx) {
 		if ( validateForm(ctx) ) {
-			final String name = getSurveyNameValue();
-			if ( existsSurveyWithName(name) ) {
+			final String name = getFormSurveyName();
+			if ( updatingExistingSurvey ) {
 				Object[] args = new String[] {name};
+				String messageKey = updatingPublishedSurvey ? 
+					"survey.import_survey.confirm_overwrite_published": 
+					"survey.import_survey.confirm_overwrite";
 				MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 					@Override
 					public void onOk() {
 						processSurveyImport(name, true);
 					}
-				}, "survey.import_survey.confirm_overwrite", args);
+				}, messageKey, args);
 			} else {
 				processSurveyImport(name, false);
 			}
@@ -74,22 +90,35 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected boolean validateForm(BindContext ctx) {
-		String surveyName = getSurveyNameValue();
+		String surveyName = getFormSurveyName();
+		String messageKey = null;
 		if (StringUtils.isBlank(surveyName ) ) {
-			MessageUtil.showWarning("survey.import_survey.specify_name");
-			return false;
+			messageKey = "survey.import_survey.specify_name";
 		} else if ( uploadedSurvey == null ) {
-			MessageUtil.showWarning("survey.import_survey.upload_a_file");
-			return false;
-		} else if ( existsSurveyWithSameUriButDifferentName(surveyName, uploadedSurvey.getUri()) ) {
-			MessageUtil.showWarning("survey.import_survey.exists_survey_same_uri");
-			return false;
-		} else {
+			messageKey = "survey.import_survey.upload_a_file";
+		} else if ( ! updatingExistingSurvey && existsSurveyWithName(surveyName) ) {
+			messageKey = "survey.import_survey.error.duplicate_name";
+		}
+		if ( messageKey == null ) {
 			return true;
+		} else {
+			MessageUtil.showWarning(messageKey);
+			return false;
 		}
 	}
+	
+	protected boolean existsSurveyWithName(String name) {
+		List<SurveyWorkSummary> summaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
+		for (SurveySummary summary : summaries) {
+			String summaryName = summary.getName();
+			if ( summaryName.equals(name) ) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-	private String getSurveyNameValue() {
+	private String getFormSurveyName() {
 		return (String) form.get(SURVEY_NAME_FIELD);
 	}
 	
@@ -110,52 +139,102 @@ public class SurveyImportVM extends SurveyBaseVM {
  		Media media = event.getMedia();
 		String contentType = media.getContentType();
 		if ( contentType.equals(TEXT_XML_CONTENT) ) {
-			fileName = media.getName();
-			Reader reader = media.getReaderData();
-			uploadedSurvey = unmarshalSurvey(reader);
-			notifyChange("fileName","uploadedSurvey");
-			String surveyName = getSurveyNameValue();
-			if ( StringUtils.isEmpty(surveyName) ) {
-				surveyName = FilenameUtils.removeExtension(fileName);
-				form.put(SURVEY_NAME_FIELD, surveyName);
-				notifyChange("form");
-			}
+			unmarshalSurvey(media, false);
 		} else {
 			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
 		}
 	}
 
-	protected InputStream getInputStream(Media media) {
+	protected void unmarshalSurvey(final Media media, boolean skipValidation) {
 		try {
-			media.getStreamData();
-			String stringData = media.getStringData();
-			byte[] bytes = stringData.getBytes("UTF-8");
-			ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-			return is;
-		} catch(Exception e) {
+			Reader reader = media.getReaderData();
+			uploadedSurvey = surveyManager.unmarshalSurvey(reader, ! skipValidation, true);
+			if ( validateSurvey(uploadedSurvey) ) {
+				updateForm(media.getName());
+			} else {
+				reset();
+			}
+		} catch(IdmlParseException e) {
+			log.error("Error unmarhalling survey", e);
+			Object[] args = new String[]{e.getMessage()};
+			MessageUtil.showError("survey.import_survey.error", args);
+		} catch (SurveyValidationException e) {
+			Object[] args = new String[] {e.getMessage()};
+			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					unmarshalSurvey(media, true);
+				}
+			}, "survey.import_survey.confirm_process_invalid_survey", args);
+		}
+	}
+
+	protected void updateForm(String uploadedFileName) {
+		if ( uploadedSurvey == null ) {
+			fileName = null;
+		} else {
+			fileName = uploadedFileName;
+		}
+		String uri = uploadedSurvey.getUri();
+		CollectSurvey publishedSurvey = surveyManager.getByUri(uri);
+		SurveySummary surveyWork = surveyManager.loadSurveyWorkSummaryByUri(uri);
+		String surveyName = null;
+		if ( publishedSurvey != null ) {
+			updatingExistingSurvey = true;
+			updatingPublishedSurvey = true;
+			surveyName = publishedSurvey.getName();
+		} else if ( surveyWork != null ) {
+			updatingExistingSurvey = true;
+			updatingPublishedSurvey = false;
+			surveyName = surveyWork.getName();
+		} else {
+			updatingExistingSurvey = false;
+			updatingPublishedSurvey = false;
+			surveyName = getFormSurveyName();
+			if ( StringUtils.isEmpty(surveyName) ) {
+				surveyName = FilenameUtils.removeExtension(fileName);
+			}
+		}
+		form.put(SURVEY_NAME_FIELD, surveyName);
+		notifyChange("fileName","uploadedSurvey","updatingPublishedSurvey","updatingExistingSurvey","form");
+	}
+
+	protected void processSurveyImport(String surveyName, boolean overwrite) {
+		uploadedSurvey.setName(surveyName);
+		String uri = uploadedSurvey.getUri();
+		SurveySummary oldSurveyWorkSummary = surveyManager.loadSurveyWorkSummaryByUri(uri);
+		CollectSurvey oldPublishedSurvey = surveyManager.getByUri(uri);
+		if ( (oldSurveyWorkSummary != null || oldPublishedSurvey != null) && ! overwrite ) {
+			throw new IllegalArgumentException("Survey with same URI already exists and override parameter not specified");
+		}
+		try {
+			if ( oldSurveyWorkSummary != null ) {
+				uploadedSurvey.setId(oldSurveyWorkSummary.getId());
+				surveyManager.saveSurveyWork(uploadedSurvey);
+			} else if ( oldPublishedSurvey != null && validateSurveyForPublishing(uploadedSurvey, oldPublishedSurvey)) {
+				uploadedSurvey.setId(oldPublishedSurvey.getId());
+				surveyManager.updateModel(uploadedSurvey);
+			} else {
+				surveyManager.saveSurveyWork(uploadedSurvey);
+			}
+			closeImportPopUp(true);
+			Object[] args = new String[]{surveyName};
+			MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
+		} catch (SurveyImportException e) {
 			log.error(e);
-			throw new RuntimeException(e);
+			Object[] args = new String[]{e.getMessage()};
+			MessageUtil.showError("survey.import_survey.error", args);
 		}
 	}
 	
-	protected void processSurveyImport(String surveyName, boolean overwrite) {
-		CollectSurvey publishedSurvey = surveyManager.get(surveyName);
-		if ( validateSurveyForPublishing(uploadedSurvey, publishedSurvey) ) {
-			uploadedSurvey.setName(surveyName);
-			if ( overwrite ) {
-				Integer id = getSurveyWorkId(surveyName);
-				uploadedSurvey.setId(id);
-			}
-			try {
-				surveyManager.saveSurveyWork(uploadedSurvey);
-				closeImportPopUp(true);
-				Object[] args = new String[]{surveyName};
-				MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
-			} catch (SurveyImportException e) {
-				log.error(e);
-				Object[] args = new String[]{e.getMessage()};
-				MessageUtil.showError("survey.import_survey.error", args);
-			}
+	protected boolean validateSurvey(CollectSurvey survey) {
+		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
+		List<SurveyValidationResult> validationResults = surveyValidator.validate(survey);
+		if ( validationResults.isEmpty() ) {
+			return true;
+		} else {
+			openValidationResultsPopUp(validationResults);
+			return false;
 		}
 	}
 	
@@ -182,54 +261,12 @@ public class SurveyImportVM extends SurveyBaseVM {
 		BindUtils.postGlobalCommand(null, null, SurveySelectVM.CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD, args);
 	}
 	
-	protected boolean existsSurveyWithSameUriButDifferentName(String surveyName, String uri) {
-		SurveySummary collidingSurvey = getSurveyByURI(uri);
-		return  collidingSurvey != null && ! collidingSurvey.getName().equals(surveyName);
-	}
-
-	protected CollectSurvey unmarshalSurvey(Reader reader) {
-		CollectSurvey survey = null;
-		try {
-			survey = surveyManager.unmarshalSurvey(reader);
-		} catch(Exception e) {
-			log.error(e);
-			Object[] args = new String[]{e.getMessage()};
-			MessageUtil.showError("survey.import_survey.error", args);
-		}
-		return survey;
-	}
-
-	protected boolean existsSurveyWithName(String name) {
-		List<SurveySummary> summaries = surveyManager.getSurveyWorkSummaries();
-		for (SurveySummary summary : summaries) {
-			String summaryName = summary.getName();
-			if ( summaryName.equals(name) ) {
-				return true;
-			}
-		}
-		return false;
+	public boolean isUpdatingPublishedSurvey() {
+		return updatingPublishedSurvey;
 	}
 	
-	protected Integer getSurveyWorkId(String name) {
-		List<SurveySummary> summaries = surveyManager.getSurveyWorkSummaries();
-		for (SurveySummary summary : summaries) {
-			String summaryName = summary.getName();
-			if ( summaryName.equals(name) ) {
-				return summary.getId();
-			}
-		}
-		return null;
-	}
-	
-	protected SurveySummary getSurveyByURI(String uri) {
-		List<SurveySummary> summaries = surveyManager.getSurveyWorkSummaries();
-		for (SurveySummary summary : summaries) {
-			String summaryUri = summary.getUri();
-			if ( summaryUri.equals(uri) ) {
-				return summary;
-			}
-		}
-		return null;
+	public boolean isUpdatingExistingSurvey() {
+		return updatingExistingSurvey;
 	}
 	
 	public String getFileName() {

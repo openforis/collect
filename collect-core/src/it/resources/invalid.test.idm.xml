@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<survey xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect"
+	xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	lastId="1">
+	<project>Archenland NFI</project>
+	<uri>http://www.openforis.org/idm/archenland</uri>
+	<cycle>1</cycle>
+	<description>First inventory of the Kingdom of Archenland (1015-1020)</description>
+	<language>en</language>
+	<applicationOptions>
+		<options type="ui">
+			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="cluster">
+				<tab name="cluster">
+					<label>Cluster</label>
+				</tab>
+				<tab name="plot">
+					<label>Plot</label>
+					<tab name="plot_det">
+						<label>Details (2)</label>
+					</tab>
+					<tab name="shrubs_regen">
+						<label>Shrubs &amp; Regeneration (3)</label>
+					</tab>
+					<tab name="tree">
+						<label>Trees (4)</label>
+					</tab>
+					<tab name="dead_wood">
+						<label>Dead Wood (5a)</label>
+					</tab>
+					<tab name="stump">
+						<label>Stumps (5b)</label>
+					</tab>
+					<tab name="bamboo">
+						<label>Bamboo (6)</label>
+					</tab>
+				</tab>
+				<tab name="informant">
+					<label>Informant Interviews</label>
+				</tab>
+			</tabSet>
+			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="household">
+				<tab name="hs_general">
+					<label>General (A/B/C)</label>
+				</tab>
+				<tab name="hs_assets">
+					<label>Assets (D)</label>
+				</tab>
+				<tab name="hs_foodsecurity">
+					<label>Food Security (E)</label>
+				</tab>
+				<tab name="hs_income_opinions">
+					<label>Income &amp; Opinions (F/G)</label>
+				</tab>
+				<tab name="hs_forest_products">
+					<label>Forest Products &amp; Services (H)</label>
+				</tab>
+				<tab name="hs_org_comments">
+					<label>Organizations &amp; Comments (I/J)</label>
+				</tab>
+				<tab name="hs_forest_governance">
+					<label>Forest Governance (K)</label>
+				</tab>
+				<tab name="hs_comments">
+					<label>Comments</label>
+				</tab>
+			</tabSet>
+		</options>
+	</applicationOptions>
+	<schema>
+		<entity id="1" name="invalid-name" ui:tab="cluster" ui:tabSet="cluster">
+			<label>Invalid name entity</label>
+		</entity>
+	</schema>
+</survey>

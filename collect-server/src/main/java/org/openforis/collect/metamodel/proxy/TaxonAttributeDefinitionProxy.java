@@ -5,6 +5,7 @@ package org.openforis.collect.metamodel.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 
 /**
  * @author S. Ricci
@@ -26,7 +27,8 @@ public class TaxonAttributeDefinitionProxy extends AttributeDefinitionProxy {
 
 	@ExternalizedProperty
 	public String getHighestRank() {
-		return attributeDefn.getHighestRank();
+		TaxonRank rank = attributeDefn.getHighestTaxonRank();
+		return rank == null ? null: rank.getName();
 	}
 
 }

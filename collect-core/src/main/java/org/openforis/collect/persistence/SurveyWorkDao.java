@@ -95,6 +95,17 @@ public class SurveyWorkDao extends SurveyBaseDao {
 	}
 
 	@Transactional
+	public SurveySummary loadSurveySummaryByUri(String uri) {
+		Factory jf = getJooqFactory();
+		Record record = jf.select()
+				.from(OFC_SURVEY_WORK)
+				.where(OFC_SURVEY_WORK.URI.equal(uri))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
+
+	@Transactional
 	public void insert(CollectSurvey survey) throws SurveyImportException {
 		String idml = marshalSurvey(survey);
 		DialectAwareJooqFactory jf = getJooqFactory();

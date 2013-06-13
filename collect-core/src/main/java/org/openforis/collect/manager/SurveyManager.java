@@ -3,14 +3,22 @@
  */
 package org.openforis.collect.manager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
@@ -19,6 +27,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
+import org.openforis.collect.utils.CollectIOUtils;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
@@ -145,6 +154,12 @@ public class SurveyManager {
 			SurveySummary summary = new SurveySummary(id, name, uri, projectName);
 			summaries.add(summary);
 		}
+		Collections.sort(summaries, new Comparator<SurveySummary>() {
+			@Override
+			public int compare(SurveySummary s1, SurveySummary s2) {
+				return s1.getName().compareTo(s2.getName());
+			}
+		});
 		return summaries;
 	}
 	
@@ -165,22 +180,61 @@ public class SurveyManager {
 		}
 	}
 
-	public CollectSurvey unmarshalSurvey(InputStream is) throws IdmlParseException {
-		return unmarshalSurvey(is, false);
+	public CollectSurvey unmarshalSurvey(InputStream is) throws IdmlParseException, SurveyValidationException {
+		return unmarshalSurvey(is, false, false);
+	}
+	
+	public CollectSurvey unmarshalSurvey(InputStream is,
+			boolean validateAgainstSchema, boolean skipCodeListItems)
+			throws IdmlParseException, SurveyValidationException {
+		InputStreamReader reader = new InputStreamReader(is);
+		return unmarshalSurvey(reader, validateAgainstSchema, skipCodeListItems);
 	}
 
-	public CollectSurvey unmarshalSurvey(InputStream is, boolean skipCodeListItems) throws IdmlParseException {
-		return surveyDao.unmarshalIdml(is, skipCodeListItems);
+	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException, SurveyValidationException {
+		return unmarshalSurvey(reader, false, false);
 	}
 	
-	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException {
-		return unmarshalSurvey(reader, false);
+	public CollectSurvey unmarshalSurvey(Reader reader,
+			boolean validateAgainstSchema, boolean skipCodeListItems)
+			throws IdmlParseException, SurveyValidationException {
+		if ( validateAgainstSchema ) {
+			File tempFile = CollectIOUtils.copyToTempFile(reader);
+			validateIdml(tempFile);
+			CollectSurvey result = unmarshallSurvey(tempFile, skipCodeListItems);
+			tempFile.delete();
+			return result;
+		} else {
+			return surveyDao.unmarshalIdml(reader);
+		}
 	}
-	
-	public CollectSurvey unmarshalSurvey(Reader reader, boolean skipCodeListItems) throws IdmlParseException {
-		return surveyDao.unmarshalIdml(reader, skipCodeListItems);
+
+	protected CollectSurvey unmarshallSurvey(File file, boolean skipCodeListItems) throws IdmlParseException {
+		FileInputStream tempIs = null;
+		try {
+			tempIs = new FileInputStream(file);
+			return surveyDao.unmarshalIdml(tempIs, skipCodeListItems);
+		} catch (Exception e) {
+			//should never enter here
+			throw new RuntimeException(e); 
+		} finally {
+			IOUtils.closeQuietly(tempIs);
+		}
 	}
-	
+
+	protected void validateIdml(File file) throws SurveyValidationException {
+		FileInputStream is = null;
+		try {
+			is = new FileInputStream(file);
+			SurveyValidator validator = new SurveyValidator(this);
+			validator.validateAgainstSchema(is);
+		} catch (IOException e) {
+			throw new RuntimeException("Error validating the survey (creation of temp file): " + e.getMessage(), e);
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+	}
+
 	@Transactional
 	public List<SurveySummary> loadSurveySummaries() {
 		List<SurveySummary> result = surveyDao.loadSummaries();
@@ -193,7 +247,7 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public List<SurveySummary> getSurveyWorkSummaries() {
+	public List<SurveySummary> loadSurveyWorkSummaries() {
 		List<SurveySummary> result = surveyWorkDao.loadSummaries();
 		return result;
 	}
@@ -206,6 +260,11 @@ public class SurveyManager {
 	@Transactional
 	public SurveySummary loadSurveyWorkSummaryByName(String name) {
 		return surveyWorkDao.loadSurveySummaryByName(name);
+	}
+	
+	@Transactional
+	public SurveySummary loadSurveyWorkSummaryByUri(String uri) {
+		return surveyWorkDao.loadSurveySummaryByUri(uri);
 	}
 	
 	@Transactional
@@ -305,7 +364,7 @@ public class SurveyManager {
 		samplingDesignManager.deleteBySurveyWork(id);
 		surveyWorkDao.delete(id);
 	}
-	
+
 	/*
 	 * Getters and setters
 	 * 

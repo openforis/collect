@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -176,9 +177,9 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	@Test
-	public void exportFromXMLAndStoreTest() throws IdmlParseException {
+	public void exportFromXMLAndStoreTest() throws IdmlParseException, SurveyValidationException {
 		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
-		CollectSurvey survey = surveyManager.unmarshalSurvey(is, true);
+		CollectSurvey survey = surveyManager.unmarshalSurvey(is, false, true);
 		is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
 		codeListManager.exportFromXMLAndStore(survey, is);
 		{

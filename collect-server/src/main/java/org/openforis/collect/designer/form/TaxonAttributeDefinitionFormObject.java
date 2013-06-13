@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 
 /**
  * @author S. Ricci
@@ -27,15 +28,15 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	public void loadFrom(TaxonAttributeDefinition source, String languageCode, String defaultLanguage) {
 		super.loadFrom(source, languageCode, defaultLanguage);
 		taxonomy = source.getTaxonomy();
-		highestRank = source.getHighestRank();
+		highestRank = source.getHighestTaxonRank() == null ? null: source.getHighestTaxonRank().getName();
 		qualifiers = new ArrayList<String>(source.getQualifiers());
 	}
-	
+
 	@Override
 	public void saveTo(TaxonAttributeDefinition dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setTaxonomy(taxonomy);
-		dest.setHighestRank(highestRank);
+		dest.setHighestTaxonRank(TaxonRank.fromName(highestRank));
 		dest.setQualifiers(qualifiers);
 	}
 

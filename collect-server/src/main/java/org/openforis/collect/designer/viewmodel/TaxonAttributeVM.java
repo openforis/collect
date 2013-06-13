@@ -8,6 +8,7 @@ import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
 import static org.openforis.collect.designer.model.LabelKeys.RANK_PREFIX;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -37,10 +39,6 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 
 	private static final String QUALIFIERS_FIELD = "qualifiers";
-	
-	public enum Rank {
-		FAMILY, GENUS, SPECIES
-	}
 	
 	@WireVariable
 	private SpeciesManager speciesManager;
@@ -112,15 +110,15 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	
 	public List<String> getRanks() {
 		List<String> result = new ArrayList<String>();
-		String emptyOption = Labels.getLabel(EMPTY_OPTION);
-		result.add(emptyOption);
-		Rank[] ranks = Rank.values();
-		for (Rank rank : ranks) {
-			String labelKey = RANK_PREFIX + rank.name().toLowerCase();
-			String label = Labels.getLabel(labelKey);
-			result.add(label);
-		}
+		result.add(Labels.getLabel(EMPTY_OPTION));
+		result.addAll(Arrays.asList(TaxonRank.names()));
 		return result;
+	}
+	
+	public String getRankLabel(String name) {
+		String labelKey = RANK_PREFIX + name.toLowerCase();
+		String label = Labels.getLabel(labelKey);
+		return label;
 	}
 	
 	@DependsOn("surveyId")

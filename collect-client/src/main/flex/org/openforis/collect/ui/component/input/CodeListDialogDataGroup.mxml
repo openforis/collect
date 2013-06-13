@@ -97,6 +97,7 @@
 				<mx:TextInput height="20" id="textInput" 
 							  visible="{data.qualifiable}" 
 							  includeInLayout="{data.qualifiable}"
+							  enabled="{checkBox.selected}"
 							  text="{data.qualifier}"
 							  change="textInputChangeHandler(event)"/>
 			</s:ItemRenderer>

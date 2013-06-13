@@ -414,10 +414,21 @@ public class RecordIndexManager extends BaseStorageManager {
         return query;
     }
 	
-	protected void close(Closeable indexHandler) {
-		if ( indexHandler != null ) {
+	protected void close(IndexSearcher searcher) {
+		if ( searcher != null ) {
 			try {
-				indexHandler.close();
+				searcher.close();
+				close(searcher.getIndexReader());
+			} catch (Exception e) {
+				LOG.error(e.getMessage(), e);
+			}
+		}
+	}
+	
+	protected void close(Closeable closeable) {
+		if ( closeable != null ) {
+			try {
+				closeable.close();
 			} catch (Exception e) {
 				LOG.error(e.getMessage(), e);
 			}

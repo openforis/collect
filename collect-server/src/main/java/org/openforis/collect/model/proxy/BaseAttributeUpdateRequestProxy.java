@@ -3,8 +3,6 @@
  */
 package org.openforis.collect.model.proxy;
 
-import java.util.List;
-
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
@@ -108,15 +106,27 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 		}
 	}
 	
-	protected Code parseCode(CodeListManager codeListManager, Entity parent, CodeAttributeDefinition def, String value) {
-		CollectRecord record = (CollectRecord) parent.getRecord();
-		List<CodeListItem> items = codeListManager.getAssignableCodeListItems(parent, def);
-		Code code = parseCode(codeListManager, record, value, items);
-		return code;
+	protected Code parseCode(CodeListManager codeListManager, Entity parent, CodeAttributeDefinition defn, String value) {
+		Code code = parseCode(value);
+		if ( code == null ) {
+			return null;
+		} else {
+			String normalizedCode = findNormalizedCode(codeListManager, parent, defn, code.getCode());
+			return new Code(normalizedCode, code.getQualifier());
+		}
 	}
 	
-	protected Code parseCode(CodeListManager codeListManager, CollectRecord record, 
-			String value, List<CodeListItem> codeList) {
+	protected String findNormalizedCode(CodeListManager codeListManager, Entity parent,
+			CodeAttributeDefinition defn, String code) {
+		CodeListItem codeListItem = codeListManager.findAssignableItem(parent, defn, code);
+		if(codeListItem == null) {
+			return code;
+		} else {
+			return codeListItem.getCode();
+		}
+	}
+
+	protected Code parseCode(String value) {
 		Code code = null;
 		String[] strings = value.split(QUALIFIER_SEPARATOR);
 		String codeStr = null;
@@ -130,16 +140,12 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 			default:
 				//TODO throw error: invalid parameter
 		}
-		CodeListItem codeListItem = codeListManager.findCodeListItem(codeList, codeStr);
-		if(codeListItem != null) {
-			code = new Code(codeListItem.getCode(), qualifier);
-		}
-		if (code == null) {
+		if ( codeStr != null ) {
 			code = new Code(codeStr, qualifier);
 		}
 		return code;
 	}
-
+	
 	public Object getValue() {
 		return value;
 	}

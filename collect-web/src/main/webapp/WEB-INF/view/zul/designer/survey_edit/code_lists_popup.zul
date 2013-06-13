@@ -170,6 +170,7 @@
 	  		        					</radiogroup>
 				                        <button
 				                          label="${labels.global.import_data}"
+				                          visible="@load(empty vm.editedItem.lookupTable)"
 				                          onClick="@command('openCodeListImportPopUp')" />
 			                      	</hlayout>
 		        				</row>
@@ -201,9 +202,12 @@
 		        							width="180px">
 		        							<caption
 		        								visible="@load(fx.type eq 'HIERARCHICAL' ? true: false)">
-		        								<textbox inplace="true"
-		        									width="100%" 
-		        									value="@bind(each.name)" />
+		        								<fieldErrorHandler
+		        									message="@load(vmsgs[vm.getHierarchyLevelNameValidationKey(forEachStatus.index)])">
+			        								<textbox inplace="true"
+			        									width="100%" 
+			        									value="@bind(each.name) @validator(vm.getHierarchyLevelNameValidator(forEachStatus.index))" />
+	        									</fieldErrorHandler>
 		        							</caption>
 		        							<listbox
 		        								model="@load(vm.itemsPerLevel[forEachStatus.index])"
