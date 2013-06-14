@@ -74,6 +74,15 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.execute();
 	}
 
+	public void moveToPublishedSurvey(int publishedSurveyId, int surveyWorkId) {
+		JooqFactory jf = getMappingJooqFactory(null);
+		jf.update(OFC_CODE_LIST)
+			.set(OFC_CODE_LIST.SURVEY_ID, publishedSurveyId)
+			.set(OFC_CODE_LIST.SURVEY_WORK_ID, (Integer) null)
+			.where(OFC_CODE_LIST.SURVEY_WORK_ID.equal(surveyWorkId))
+			.execute();
+	}
+
 	public List<PersistedCodeListItem> loadRootItems(CodeList codeList) {
 		return loadItems(codeList, (Integer) null);
 	}
@@ -288,4 +297,5 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 		
 	}
+
 }

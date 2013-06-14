@@ -63,7 +63,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 		survey = loadSurvey();
 		createHierarchicalTestList();
 		createFlatTestList();
-		surveyManager.importModel(survey);
+		surveyDao.importModel(survey);
 	}
 
 	protected void createFlatTestList() {

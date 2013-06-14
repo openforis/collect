@@ -45,7 +45,7 @@
         </row>
         <row>
           <label value="${labels.survey.import_survey.uri}:" />
-          <label value="@load(vm.uploadedSurvey.uri)" />
+          <label value="@load(vm.uploadedSurveyUri)" />
         </row>
         <row>
         	<cell />

@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.model.SurveyManagerUtil;
-import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
@@ -20,6 +18,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -49,7 +48,7 @@ public class SurveySelectVM extends BaseVM {
 	@WireVariable
 	private SurveyValidator surveyValidator;
 	
-	private SurveyWorkSummary selectedSurvey;
+	private SurveySummary selectedSurvey;
 
 	private Window surveyImportPopUp;
 
@@ -66,8 +65,8 @@ public class SurveySelectVM extends BaseVM {
 		SessionStatus sessionStatus = getSessionStatus();
 		Integer publishedSurveyId = null;
 		if ( selectedSurvey.isPublished() ) {
-			if ( selectedSurvey.isWorking() ) {
-				publishedSurveyId = selectedSurvey.getPublishedSurveyId();
+			if ( selectedSurvey.isWork() ) {
+				publishedSurveyId = selectedSurvey.getPublishedId();
 			} else {
 				publishedSurveyId = selectedSurvey.getId();
 			}
@@ -114,7 +113,7 @@ public class SurveySelectVM extends BaseVM {
 	@Command
 	public void deleteSelectedSurvey() {
 		String messageKey;
-		if ( selectedSurvey.isWorking() ) {
+		if ( selectedSurvey.isWork() ) {
 			if ( selectedSurvey.isPublished() ) {
 				messageKey = "survey.delete.published_work.confirm";
 			} else {
@@ -132,7 +131,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	protected void performSelectedSurveyDeletion() {
-		if ( selectedSurvey.isWorking() ) {
+		if ( selectedSurvey.isWork() ) {
 			surveyManager.deleteSurveyWork(selectedSurvey.getId());
 		} else {
 			surveyManager.deleteSurvey(selectedSurvey.getId());
@@ -204,16 +203,16 @@ public class SurveySelectVM extends BaseVM {
 		return surveyWork;
 	}
 	
-	public ListModel<SurveyWorkSummary> getSurveySummaries() {
-		List<SurveyWorkSummary> summaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
-		return new BindingListModelList<SurveyWorkSummary>(summaries, false);
+	public ListModel<SurveySummary> getSurveySummaries() {
+		List<SurveySummary> summaries = surveyManager.loadSummaries();
+		return new BindingListModelList<SurveySummary>(summaries, false);
 	}
 
-	public SurveyWorkSummary getSelectedSurvey() {
+	public SurveySummary getSelectedSurvey() {
 		return selectedSurvey;
 	}
 
-	public void setSelectedSurvey(SurveyWorkSummary selectedSurvey) {
+	public void setSelectedSurvey(SurveySummary selectedSurvey) {
 		this.selectedSurvey = selectedSurvey;
 	}
 	
@@ -234,8 +233,7 @@ public class SurveySelectVM extends BaseVM {
 
 	@DependsOn("selectedSurvey")
 	public boolean isPublishDisabled() {
-		//TODO check validity of survey
-		return this.selectedSurvey == null || ! this.selectedSurvey.isWorking();
+		return this.selectedSurvey == null || ! this.selectedSurvey.isWork();
 	}
 
 }

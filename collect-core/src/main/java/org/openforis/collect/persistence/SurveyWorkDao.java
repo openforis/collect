@@ -169,7 +169,9 @@ public class SurveyWorkDao extends SurveyBaseDao {
 		Integer id = row.getValueAsInteger(OFC_SURVEY_WORK.ID);
 		String name = row.getValue(OFC_SURVEY_WORK.NAME);
 		String uri = row.getValue(OFC_SURVEY.URI);
-		SurveySummary survey = new SurveySummary(id, true, name, uri);
+		SurveySummary survey = new SurveySummary(id, name, uri, null);
+		survey.setWork(true);
+		survey.setPublished(false);
 		return survey;
 	}
 
