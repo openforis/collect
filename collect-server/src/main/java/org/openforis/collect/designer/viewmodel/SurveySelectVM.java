@@ -195,10 +195,12 @@ public class SurveySelectVM extends BaseVM {
 	protected CollectSurvey loadSelectedSurvey() {
 		String uri = selectedSurvey.getUri();
 		CollectSurvey surveyWork;
-		if ( selectedSurvey.isPublished() ) {
-			surveyWork = surveyManager.loadPublishedSurveyForEdit(uri);
-		} else {
+		if ( selectedSurvey.isWork() ) {
 			surveyWork = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		} else if ( selectedSurvey.isPublished() ) {
+			surveyWork = surveyManager.duplicatePublishedSurveyForEdit(uri);
+		} else {
+			throw new IllegalStateException("Trying to load an invalid survey: " + uri);
 		}
 		return surveyWork;
 	}

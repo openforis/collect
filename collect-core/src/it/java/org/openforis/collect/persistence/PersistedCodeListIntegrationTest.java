@@ -35,7 +35,7 @@ public class PersistedCodeListIntegrationTest extends CollectIntegrationTest {
 	public void importFromXMLTest() throws IdmlParseException,
 			SurveyImportException, SurveyValidationException {
 		InputStream is = ClassLoader.getSystemResourceAsStream(IDM_TEST_XML);
-		CollectSurvey survey = surveyManager.importModel(is, "archenland1", true, false);
+		CollectSurvey survey = surveyManager.updateModel(is, false);
 		{
 			CodeList list = survey.getCodeList("measurement");
 			List<PersistedCodeListItem> rootItems = codeListManager.loadRootItems(list);

@@ -48,22 +48,22 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 	
 	public CollectSurvey unmarshalIdml(InputStream is) throws IdmlParseException {
-		return unmarshalIdml(is, false);
+		return unmarshalIdml(is, true);
 	}
 	
-	public CollectSurvey unmarshalIdml(InputStream is, boolean skipCodeListItems) throws IdmlParseException {
+	public CollectSurvey unmarshalIdml(InputStream is, boolean includeCodeListItems) throws IdmlParseException {
 		InputStreamReader reader = new InputStreamReader(is);
-		return unmarshalIdml(reader, skipCodeListItems);
+		return unmarshalIdml(reader, includeCodeListItems);
 	}
 
 	public CollectSurvey unmarshalIdml(Reader reader) throws IdmlParseException {
-		return unmarshalIdml(reader, false);
+		return unmarshalIdml(reader, true);
 	}
 	
-	public CollectSurvey unmarshalIdml(Reader reader, boolean skipCodeListItems) throws IdmlParseException {
+	public CollectSurvey unmarshalIdml(Reader reader, boolean includeCodeListItems) throws IdmlParseException {
 		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
 		try {
-			CollectSurvey survey = (CollectSurvey) binder.unmarshal(reader, skipCodeListItems);
+			CollectSurvey survey = (CollectSurvey) binder.unmarshal(reader, includeCodeListItems);
 			SurveyMigrator migrator = getSurveyMigrator();
 			migrator.migrate(survey);
 			return survey;

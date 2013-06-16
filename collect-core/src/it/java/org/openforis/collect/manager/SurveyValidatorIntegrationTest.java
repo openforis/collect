@@ -1,17 +1,15 @@
 package org.openforis.collect.manager;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -25,24 +23,23 @@ public class SurveyValidatorIntegrationTest extends CollectIntegrationTest {
 	private SurveyManager surveyManager;
 	
 	@Test
-	public void skipValidationTest() throws IdmlParseException, IOException, SurveyValidationException {
-		URL idm = ClassLoader.getSystemResource("invalid.test.idm.xml");
-		InputStream is = idm.openStream();
-		CollectSurvey survey = surveyManager.unmarshalSurvey(is);
+	public void skipValidationTest() throws SurveyValidationException, SurveyImportException {
+		InputStream is = ClassLoader.getSystemResourceAsStream("invalid.test.idm.xml");
+		CollectSurvey survey = surveyManager.importModel(is, "test_survey", false);
 		assertNotNull(survey);
 	}
 	
 	@Test(expected=SurveyValidationException.class)
 	public void invalidSurveyImportTest() throws SurveyValidationException, SurveyImportException {
 		InputStream is = ClassLoader.getSystemResourceAsStream("invalid.test.idm.xml");
-		CollectSurvey survey = surveyManager.importModel(is, "test_survey", false, true);
+		CollectSurvey survey = surveyManager.importModel(is, "test_survey", true);
 		assertNull(survey);
 	}
 
 	@Test
 	public void validSurveyUnmarshallTest() throws SurveyValidationException, SurveyImportException {
 		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
-		CollectSurvey survey = surveyManager.importModel(is, "test_survey", false, false);
+		CollectSurvey survey = surveyManager.importModel(is, "test_survey", false);
 		assertNotNull(survey);
 	}
 }
