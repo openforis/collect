@@ -5,6 +5,7 @@ package org.openforis.collect.manager;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -125,40 +126,25 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public CollectSurvey importModel(InputStream is, String name, boolean overwrite, boolean validate)
+	public CollectSurvey importWorkModel(InputStream is, String name, boolean validate)
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
 		try {
 			tempFile = CollectIOUtils.copyToTempFile(new InputStreamReader(is));
-			return importModel(tempFile, name, overwrite,
-					validate);
+			return importInWorkSurvey(tempFile, name, validate);
 		} finally {
 			tempFile.delete();
 		}
 	}
 
 	@Transactional
-	public CollectSurvey importModel(File surveyFile, String name,
-			boolean overwrite, boolean validate) throws SurveyImportException, SurveyValidationException {
+	public CollectSurvey importInWorkSurvey(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
 		try {
-			if ( validate ) {
-				validator.validateAgainstSchema(surveyFile);
-			}
-			CollectSurvey survey = unmarshallSurvey(surveyFile, true);
-			if ( validate ) {
-				validator.validate(survey);
-			}
-			SurveySummary oldSurveyWork = loadWorkSummaryByUri(survey.getUri());
-			CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
-			if ( oldSurveyWork == null && oldPublishedSurvey == null ) {
-				importNewModel(surveyFile, name, survey);
-			} else if ( ! overwrite ) {
-				throw new IllegalArgumentException("Survey already existing but not asking for overwite");
-			} else if ( oldPublishedSurvey != null ) {
-				updatePublishedSurvey(surveyFile, survey, validate);
-			} else {
-				updateSurveyWork(surveyFile, survey, oldSurveyWork);
-			}
+			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
+			survey.setName(name);
+			survey.setWork(true);
+			surveyWorkDao.insert(survey);
+			codeListManager.parseXMLAndStoreItems(survey, surveyFile);
 			return survey;
 		} catch ( CodeListImportException e ) {
 			throw new SurveyImportException(e);
@@ -167,21 +153,88 @@ public class SurveyManager {
 		}
 	}
 
+	@Transactional
+	public CollectSurvey importInPublishedWorkSurvey(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
+		CollectSurvey surveyWork = duplicatePublishedSurveyForEdit(uri);
+		updateModel(surveyFile, validate);
+		return surveyWork;
+	}
+	
+	@Transactional
+	public CollectSurvey importModel(InputStream is, String name, boolean validate)
+			throws SurveyImportException, SurveyValidationException {
+		File tempFile = null;
+		try {
+			tempFile = CollectIOUtils.copyToTempFile(new InputStreamReader(is));
+			return importModel(tempFile, name, validate);
+		} finally {
+			tempFile.delete();
+		}
+	}
+
+	@Transactional
+	public CollectSurvey importModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
+		try {
+			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
+			survey.setName(name);
+			surveyDao.importModel(survey);
+			addToCache(survey);
+			codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+			return survey;
+		} catch ( CodeListImportException e ) {
+			throw new SurveyImportException(e);
+		} catch (IdmlParseException e) {
+			throw new SurveyImportException(e);
+		}
+	}
+
+	@Transactional
+	public CollectSurvey updateModel(InputStream is, boolean validate) throws IdmlParseException, SurveyValidationException, SurveyImportException {
+		File surveyFile = CollectIOUtils.copyToTempFile(new InputStreamReader(is));
+		return updateModel(surveyFile, validate);
+	}
+
+	@Transactional
+	public CollectSurvey updateModel(File surveyFile, boolean validate)
+			throws SurveyValidationException, SurveyImportException {
+		CollectSurvey parsedSurvey;
+		try {
+			parsedSurvey = unmarshalSurvey(surveyFile, validate, false);
+		} catch (IdmlParseException e) {
+			throw new SurveyImportException(e);
+		}
+		String uri = parsedSurvey.getUri();
+		SurveySummary oldSurveyWork = loadWorkSummaryByUri(uri);
+		CollectSurvey oldPublishedSurvey = getByUri(uri);
+		if ( oldSurveyWork == null && oldPublishedSurvey == null ) {
+			throw new IllegalArgumentException("Survey to update not found: " + uri);
+		} else if ( oldPublishedSurvey != null ) {
+			updatePublishedSurvey(surveyFile, parsedSurvey, validate);
+		} else {
+			updateSurveyWork(surveyFile, parsedSurvey, oldSurveyWork);
+		}
+		return parsedSurvey;
+	}
+
 	protected void updateSurveyWork(File surveyFile,
-			CollectSurvey survey, SurveySummary oldSurveyWorkSummary)
-			throws SurveyImportException, CodeListImportException {
+			CollectSurvey parsedSurvey, SurveySummary oldSurveyWorkSummary)
+			throws SurveyImportException {
 		Integer id = oldSurveyWorkSummary.getId();
-		survey.setId(id);
-		survey.setName(oldSurveyWorkSummary.getName());
-		survey.setWork(true);
+		parsedSurvey.setId(id);
+		parsedSurvey.setName(oldSurveyWorkSummary.getName());
+		parsedSurvey.setWork(true);
 		codeListManager.deleteBySurvey(id, true);
-		saveSurveyWork(survey);
-		codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+		saveSurveyWork(parsedSurvey);
+		try {
+			codeListManager.parseXMLAndStoreItems(parsedSurvey, surveyFile);
+		} catch (CodeListImportException e) {
+			throw new SurveyImportException(e);
+		}
 	}
 
 	protected void updatePublishedSurvey(File surveyFile,
 			CollectSurvey survey, boolean validate) throws SurveyValidationException,
-			SurveyImportException, CodeListImportException {
+			SurveyImportException {
 		CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
 		Integer id = oldPublishedSurvey.getId();
 		survey.setId(id);
@@ -191,17 +244,13 @@ public class SurveyManager {
 		}
 		codeListManager.deleteBySurvey(id, false);
 		updateModel(survey);
-		codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+		try {
+			codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+		} catch (CodeListImportException e) {
+			throw new SurveyImportException(e);
+		}
 	}
 
-	protected void importNewModel(File surveyFile, String name, CollectSurvey survey)
-			throws SurveyImportException, CodeListImportException {
-		survey.setName(name);
-		surveyDao.importModel(survey);
-		addToCache(survey);
-		codeListManager.parseXMLAndStoreItems(survey, surveyFile);
-	}
-	
 	@Transactional
 	@Deprecated
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
@@ -270,39 +319,51 @@ public class SurveyManager {
 	}
 
 	public CollectSurvey unmarshalSurvey(InputStream is) throws IdmlParseException, SurveyValidationException {
-		return unmarshalSurvey(is, false, false);
+		return unmarshalSurvey(is, false, true);
 	}
 	
-	public CollectSurvey unmarshalSurvey(InputStream is,
-			boolean validateAgainstSchema, boolean skipCodeListItems)
-			throws IdmlParseException, SurveyValidationException {
-		InputStreamReader reader = new InputStreamReader(is);
-		return unmarshalSurvey(reader, validateAgainstSchema, skipCodeListItems);
-	}
-
-	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException, SurveyValidationException {
-		return unmarshalSurvey(reader, false, false);
-	}
-	
-	public CollectSurvey unmarshalSurvey(Reader reader,
-			boolean validateAgainstSchema, boolean skipCodeListItems)
-			throws IdmlParseException, SurveyValidationException {
-		if ( validateAgainstSchema ) {
-			File tempFile = CollectIOUtils.copyToTempFile(reader);
-			validateSurveyXMLAgainstSchema(tempFile);
-			CollectSurvey result = unmarshallSurvey(tempFile, skipCodeListItems);
-			tempFile.delete();
-			return result;
-		} else {
-			return surveyDao.unmarshalIdml(reader, skipCodeListItems);
+	private CollectSurvey unmarshalSurvey(File surveyFile, boolean validate,
+			boolean includeCodeListItems) throws IdmlParseException, SurveyValidationException {
+		try {
+			return unmarshalSurvey(new FileInputStream(surveyFile), validate, includeCodeListItems);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
-	protected CollectSurvey unmarshallSurvey(File file, boolean skipCodeListItems) throws IdmlParseException {
+	public CollectSurvey unmarshalSurvey(InputStream is,
+			boolean validate, boolean includeCodeListItems)
+			throws IdmlParseException, SurveyValidationException {
+		InputStreamReader reader = new InputStreamReader(is);
+		return unmarshalSurvey(reader, validate, includeCodeListItems);
+	}
+
+	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException, SurveyValidationException {
+		return unmarshalSurvey(reader, false, true);
+	}
+	
+	public CollectSurvey unmarshalSurvey(Reader reader,
+			boolean validate, boolean includeCodeListItems)
+			throws IdmlParseException, SurveyValidationException {
+		CollectSurvey survey;
+		File tempFile = CollectIOUtils.copyToTempFile(reader);
+		if ( validate ) {
+			//validate against schema
+			validateSurveyXMLAgainstSchema(tempFile);
+		}
+		survey = unmarshalSurvey(tempFile, includeCodeListItems);
+		if ( validate ) {
+			validator.validate(survey);
+		}
+		tempFile.delete();
+		return survey;
+	}
+
+	protected CollectSurvey unmarshalSurvey(File file, boolean includeCodeListItems) throws IdmlParseException {
 		FileInputStream tempIs = null;
 		try {
 			tempIs = new FileInputStream(file);
-			return surveyDao.unmarshalIdml(tempIs, skipCodeListItems);
+			return surveyDao.unmarshalIdml(tempIs, includeCodeListItems);
 		} catch (Exception e) {
 			//should never enter here
 			throw new RuntimeException(e); 
@@ -374,16 +435,6 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public CollectSurvey loadPublishedSurveyForEdit(String uri) {
-		CollectSurvey surveyWork = surveyWorkDao.loadByUri(uri);
-		if ( surveyWork == null ) {
-			CollectSurvey publishedSurvey = (CollectSurvey) surveyDao.loadByUri(uri);
-			surveyWork = createSurveyWork(publishedSurvey);
-		}
-		return surveyWork;
-	}
-
-	@Transactional
 	public boolean isSurveyWork(CollectSurvey survey) {
 		Integer id = survey.getId();
 		String uri = survey.getUri();
@@ -408,7 +459,7 @@ public class SurveyManager {
 		return survey;
 	}
 	
-	protected CollectSurvey createSurveyWork(CollectSurvey survey) {
+	protected CollectSurvey dupilcateAsSurveyWork(CollectSurvey survey) {
 //		CollectSurvey surveyWork = survey.clone();
 		CollectSurvey surveyWork = survey;
 		surveyWork.setId(null);
@@ -422,17 +473,33 @@ public class SurveyManager {
 		Integer id = survey.getId();
 		if ( id == null ) {
 			surveyWorkDao.insert(survey);
-			CollectSurvey publishedSurvey = surveyDao.loadByUri(survey.getUri());
-			if ( publishedSurvey != null ) {
-				int surveyWorkId = survey.getId();
-				int publishedSurveyId = publishedSurvey.getId();
-				samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
-				speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
-				codeListManager.duplicateCodeListsForWork(publishedSurvey, survey);
-			}
 		} else {
 			surveyWorkDao.update(survey);
 		}
+	}
+	
+	@Transactional
+	public CollectSurvey duplicatePublishedSurveyForEdit(String uri) {
+		SurveySummary existingSurveyWork = surveyWorkDao.loadSurveySummaryByUri(uri);
+		if ( existingSurveyWork != null ) {
+			throw new IllegalArgumentException("Survey work already existing");
+		}
+		CollectSurvey publishedSurvey = (CollectSurvey) surveyDao.loadByUri(uri);
+		CollectSurvey surveyWork = dupilcateAsSurveyWork(publishedSurvey);
+		try {
+			surveyWorkDao.insert(surveyWork);
+		} catch (SurveyImportException e) {
+			//it should never enter here, we are duplicating an already existing survey
+			throw new RuntimeException(e);
+		}
+		if ( publishedSurvey != null ) {
+			int surveyWorkId = surveyWork.getId();
+			int publishedSurveyId = publishedSurvey.getId();
+			samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
+			speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
+			codeListManager.duplicateCodeListsForWork(publishedSurvey, surveyWork);
+		}
+		return surveyWork;
 	}
 	
 	@Transactional

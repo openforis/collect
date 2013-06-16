@@ -84,11 +84,11 @@ public class SurveyImportVM extends SurveyBaseVM {
 				MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 					@Override
 					public void onOk() {
-						processSurveyImport(name, true, false);
+						processSurveyImport(name, false);
 					}
 				}, messageKey, args);
 			} else {
-				processSurveyImport(name, false, false);
+				processSurveyImport(name, false);
 			}
 		}
 	}
@@ -145,22 +145,18 @@ public class SurveyImportVM extends SurveyBaseVM {
 		
 		if ( contentType.equals(TEXT_XML_CONTENT) ) {
 			File tempFile = CollectIOUtils.copyToTempFile(media.getReaderData());
-			prepareSurveyImport(tempFile, media.getName(), false);
+			prepareSurveyImport(tempFile, media.getName(), true);
 		} else {
 			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
 		}
 	}
 
-	protected void prepareSurveyImport(final File file, final String name, boolean skipValidation) {
+	protected void prepareSurveyImport(final File file, final String name, boolean validate) {
 		try {
-			CollectSurvey survey = surveyManager.unmarshalSurvey(new FileInputStream(file), ! skipValidation, true);
-			if ( validateSurvey(survey) ) {
-				uploadedSurveyUri = survey.getUri();
-				uploadedFile = file;
-				updateForm(name);
-			} else {
-				reset();
-			}
+			CollectSurvey survey = surveyManager.unmarshalSurvey(new FileInputStream(file), validate, true);
+			uploadedSurveyUri = survey.getUri();
+			uploadedFile = file;
+			updateForm(name);
 		} catch(IdmlParseException e) {
 			log.error("Error unmarhalling survey", e);
 			Object[] args = new String[]{e.getMessage()};
@@ -170,7 +166,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
-					prepareSurveyImport(file, name, true);
+					prepareSurveyImport(file, name, false);
 				}
 			}, "survey.import_survey.confirm_process_invalid_survey", args);
 		} catch (FileNotFoundException e) {
@@ -198,17 +194,38 @@ public class SurveyImportVM extends SurveyBaseVM {
 		notifyChange("fileName","uploadedSurveyUri","updatingPublishedSurvey","updatingExistingSurvey","form");
 	}
 
-	protected void processSurveyImport(String surveyName, boolean overwrite, boolean validate) {
+	protected void processSurveyImport(final String surveyName, boolean validate) {
 		try {
-			surveyManager.importModel(uploadedFile, surveyName, overwrite, validate);
+			if ( updatingExistingSurvey ) {
+				if ( updatingPublishedSurvey ) {
+					surveyManager.importInPublishedWorkSurvey(uploadedSurveyUri, uploadedFile, validate);
+				} else {
+					surveyManager.updateModel(uploadedFile, validate);
+				}
+			} else {
+				surveyManager.importInWorkSurvey(uploadedFile, surveyName, validate);
+			}
+			closeImportPopUp(true);
+			Object[] args = new String[]{surveyName};
+			MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
+		} catch (SurveyValidationException e) {
+			if ( validate ) {
+				Object[] args = new String[] {e.getMessage()};
+				MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+					@Override
+					public void onOk() {
+						processSurveyImport(surveyName, false);
+					}
+				}, "survey.import_survey.confirm_process_invalid_survey", args);
+			} else {
+				//it should never enter here if validate = false
+				throw new RuntimeException(e);
+			}
 		} catch(Exception e) {
 			log.error(e);
 			Object[] args = new String[]{e.getMessage()};
 			MessageUtil.showError("survey.import_survey.error", args);
 		}
-		closeImportPopUp(true);
-		Object[] args = new String[]{surveyName};
-		MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
 		/*
 		String uri = uploadedSurvey.getUri();
 		SurveySummary oldSurveyWorkSummary = surveyManager.loadSurveyWorkSummaryByUri(uri);
