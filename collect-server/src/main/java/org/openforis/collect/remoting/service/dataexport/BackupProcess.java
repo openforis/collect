@@ -149,7 +149,7 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 		ZipEntry entry = new ZipEntry(entryFileName);
 		try {
 			zipOutputStream.putNextEntry(entry);
-			surveyManager.marshalSurvey(survey, zipOutputStream);
+			surveyManager.marshalSurvey(survey, zipOutputStream, true, true, false);
 //			String surveyMarshalled = surveyManager.marshalSurvey(survey);
 //			PrintWriter printWriter = new PrintWriter(zipOutputStream);
 //			printWriter.write(surveyMarshalled);

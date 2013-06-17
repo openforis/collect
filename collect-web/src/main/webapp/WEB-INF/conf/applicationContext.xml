@@ -251,17 +251,18 @@
 	<bean id="surveyValidator" 				class="org.openforis.collect.manager.validation.SurveyValidator" />
 	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
-	<bean id="externalCodeListPersister" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListPersister" />
-	
-	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext" lazy-init="false">
-		<constructor-arg><ref bean="expressionFactory"/></constructor-arg>
-		<constructor-arg><ref bean="validator"/></constructor-arg>
+	<bean id="persistedCodeListProvider" 	class="org.openforis.collect.persistence.DatabasePersistedCodeListProvider" />
+	<bean id="codeListPersister" 	class="org.openforis.collect.persistence.DatabaseCodeListPersister" />
+
+	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
+		<constructor-arg ref="expressionFactory" />
+		<constructor-arg ref="validator" />
 		<property name="externalCodeListProvider" ref="externalCodeListProvider" />
+		<property name="persistedCodeListProvider" ref="persistedCodeListProvider" />
 	</bean>
-    
+	
 	<bean id="collectCodeListPersisterContext" class="org.openforis.collect.model.CollectCodeListPersisterContext">
-		<property name="externalCodeListProvider" ref="externalCodeListProvider" />
-		<property name="externalCodeListPersister" ref="externalCodeListPersister" />
+		<property name="codeListPersister" ref="codeListPersister" />
 	</bean>
 	
 	<!-- ===================================== -->

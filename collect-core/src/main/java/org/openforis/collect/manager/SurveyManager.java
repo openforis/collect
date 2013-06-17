@@ -311,8 +311,15 @@ public class SurveyManager {
 	}
 
 	public void marshalSurvey(Survey survey, OutputStream os)  {
+		marshalSurvey(survey, os, true, false, false);
+	}
+	
+	public void marshalSurvey(Survey survey, OutputStream os,
+			boolean marshalCodeLists, boolean marshalPersistedCodeLists,
+			boolean marshalExternalCodeLists) {
 		try {
-			surveyDao.marshalSurvey(survey, os);
+			surveyDao.marshalSurvey(survey, os, marshalCodeLists,
+					marshalPersistedCodeLists, marshalExternalCodeLists);
 		} catch (SurveyImportException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}

@@ -90,7 +90,7 @@ public class SurveySelectVM extends BaseVM {
 	public void exportSelectedSurvey() throws IOException {
 		CollectSurvey survey = loadSelectedSurvey();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		surveyManager.marshalSurvey(survey, os);
+		surveyManager.marshalSurvey(survey, os, true, true, false);
 		byte[] content = os.toByteArray();
 		String fileName = survey.getName() + ".xml";
 		Filedownload.save(content, TEXT_XML, fileName);

@@ -130,17 +130,18 @@
 	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
 	<bean id="surveyValidator" 				class="org.openforis.collect.manager.validation.SurveyValidator" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
-	<bean id="externalCodeListPersister" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListPersister" />
+	<bean id="persistedCodeListProvider" 	class="org.openforis.collect.persistence.DatabasePersistedCodeListProvider" />
+	<bean id="codeListPersister" 	class="org.openforis.collect.persistence.DatabaseCodeListPersister" />
 
 	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
-	    <constructor-arg><ref bean="expressionFactory"/></constructor-arg>
-	    <constructor-arg><ref bean="validator"/></constructor-arg>
-	    <property name="externalCodeListProvider" ref="externalCodeListProvider" />
-	</bean>
-
-	<bean id="collectCodeListPersisterContext" class="org.openforis.collect.model.CollectCodeListPersisterContext">
+		<constructor-arg ref="expressionFactory" />
+		<constructor-arg ref="validator" />
 		<property name="externalCodeListProvider" ref="externalCodeListProvider" />
-		<property name="externalCodeListPersister" ref="externalCodeListPersister" />
+		<property name="persistedCodeListProvider" ref="persistedCodeListProvider" />
+	</bean>
+	
+	<bean id="collectCodeListPersisterContext" class="org.openforis.collect.model.CollectCodeListPersisterContext">
+		<property name="codeListPersister" ref="codeListPersister" />
 	</bean>
 	
 	<!-- XML DataMarshaller -->

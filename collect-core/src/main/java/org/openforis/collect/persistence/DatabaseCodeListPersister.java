@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
-public class DatabaseExternalCodeListPersister implements CodeListItemPersister {
+public class DatabaseCodeListPersister implements CodeListItemPersister {
 	
 	@Autowired
 	private CodeListItemDao codeListItemDao;

@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NameValueEntry;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -43,20 +42,7 @@ public class DatabaseExternalCodeListProvider implements
 
 	@Autowired
 	private DynamicTableDao dynamicTableDao;
-	@Autowired
-	private SurveyManager surveyManager;
-	private boolean active;
 
-	@Override
-	public boolean isActive() {
-		return active;
-	}
-	
-	@Override
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-	
 	@Override
 	@Deprecated
 	public String getCode(CodeList list, String attribute, Object... keys) {
@@ -114,6 +100,7 @@ public class DatabaseExternalCodeListProvider implements
 		return parseRow(row, list, parentLevel);
 	}
 
+	@Override
 	public List<ExternalCodeListItem> getRootItems(CodeList list) {
 		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		addSurveyFilter(list, filters);
@@ -141,6 +128,7 @@ public class DatabaseExternalCodeListProvider implements
 		return parseRow(row, list, 1);
 	}
 	
+	@Override
 	public List<ExternalCodeListItem> getChildItems(ExternalCodeListItem item) {
 		CodeList list = item.getCodeList();
 		List<NameValueEntry> filters = createChildItemsFilters(item);
@@ -218,9 +206,8 @@ public class DatabaseExternalCodeListProvider implements
 	protected NameValueEntry createSurveyFilter(CodeList list) {
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
 		Integer surveyId = survey.getId();
-		boolean surveyWork = surveyManager.isSurveyWork(survey);
 		if ( surveyId != null ) {
-			String surveyIdFieldName = surveyWork ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
+			String surveyIdFieldName = survey.isWork() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
 			NameValueEntry keyValue = new NameValueEntry(surveyIdFieldName, surveyId.toString());
 			return keyValue;
 		} else {
@@ -304,14 +291,6 @@ public class DatabaseExternalCodeListProvider implements
 		} else {
 			return null;
 		}
-	}
-	
-	public SurveyManager getSurveyManager() {
-		return surveyManager;
-	}
-	
-	public void setSurveyManager(SurveyManager surveyManager) {
-		this.surveyManager = surveyManager;
 	}
 	
 }
