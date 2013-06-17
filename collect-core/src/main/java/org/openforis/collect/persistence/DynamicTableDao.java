@@ -20,6 +20,7 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectJoinStep;
 import org.jooq.TableField;
+import org.jooq.impl.Factory;
 import org.openforis.collect.model.NameValueEntry;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
@@ -85,6 +86,19 @@ public class DynamicTableDao extends JooqDaoSupport {
 		return CollectionUtils.unmodifiableList(result);
 	}
 
+	@Transactional
+	public boolean exists(String table, NameValueEntry[] filters, String[] notNullColumns) {
+		Lookup lookupTable = Lookup.getInstance(table);
+		initTable(table);
+		DialectAwareJooqFactory factory = getJooqFactory();
+		SelectJoinStep select = factory.selectCount().from(lookupTable);
+		addFilterConditions(lookupTable, select, filters);
+		addNotNullConditions(lookupTable, select, notNullColumns);
+		Record record = select.fetchOne();
+		Integer count = record.getValueAsInteger(0);
+		return count > 0;
+	}
+	
 	protected void addFilterConditions(Lookup lookupTable,
 			SelectJoinStep select, NameValueEntry[] filters) {
 		for (NameValueEntry filter : filters) {

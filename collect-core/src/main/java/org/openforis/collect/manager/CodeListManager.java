@@ -59,7 +59,7 @@ public class CodeListManager {
 		if ( list.isExternal() ) {
 			return provider.getItem(attribute);
 		} else if ( list.isEmpty() ) {
-			return loadPersistedCodeListItem(attribute);
+			return loadPersistedItem(attribute);
 		} else {
 			return getInternalCodeListItem(attribute);
 		}
@@ -89,17 +89,25 @@ public class CodeListManager {
 		return null;
 	}
 
-	protected PersistedCodeListItem loadPersistedCodeListItem(CodeAttribute attribute) {
+	protected PersistedCodeListItem loadPersistedItem(CodeAttribute attribute) {
 		Code code = attribute.getValue();
 		if ( code == null || StringUtils.isBlank(code.getCode()) ) {
 			return null;
 		} else {
-			PersistedCodeListItem parentItem = (PersistedCodeListItem) loadParentItem(attribute);
-			if ( parentItem == null ) {
-				return null;
-			} else {
-				CodeListItem item = loadPersistedItem(attribute, parentItem.getSystemId());
+			String codeVal = code.getCode();
+			CodeAttributeDefinition defn = attribute.getDefinition();
+			CodeList list = defn.getList();
+			if ( StringUtils.isBlank(defn.getParentExpression()) ) {
+				CodeListItem item = codeListItemDao.loadItem(list, (Integer) null, codeVal);
 				return (PersistedCodeListItem) item;
+			} else {
+				PersistedCodeListItem parentItem = (PersistedCodeListItem) loadParentItem(attribute);
+				if ( parentItem == null ) {
+					return null;
+				} else {
+					CodeListItem item = codeListItemDao.loadItem(list, parentItem.getSystemId(), codeVal);
+					return (PersistedCodeListItem) item;
+				}
 			}
 		}
 	}
@@ -115,26 +123,23 @@ public class CodeListManager {
 			for (int i = 0; i < codeAncestors.size(); i++) {
 				CodeAttribute ancestor = codeAncestors.get(i);
 				Integer lastParentItemId = lastParentItem == null ? null: lastParentItem.getSystemId();
-				lastParentItem = (PersistedCodeListItem) loadPersistedItem(ancestor, lastParentItemId);
+				Code code = ancestor.getValue();
+				lastParentItem = codeListItemDao.loadItem(list, lastParentItemId, code.getCode());
+				if ( lastParentItem == null ) {
+					break;
+				}
 			}
 			return lastParentItem;
 		} else {
 			CodeAttribute codeParent = attribute.getCodeParent();
-			return loadItemByAttribute(codeParent);
+			if ( codeParent == null ) {
+				return null;
+			} else {
+				return loadItemByAttribute(codeParent);
+			}
 		}
 	}
 	
-	protected PersistedCodeListItem loadPersistedItem(CodeAttribute attribute, Integer parentItemId) {
-		Code code = attribute.getValue();
-		if ( code == null || StringUtils.isBlank(code.getCode()) ) {
-			return null;
-		} else {
-			CodeAttributeDefinition defn = attribute.getDefinition();
-			CodeList list = defn.getList();
-			return codeListItemDao.loadItem(list, parentItemId, code.getCode());
-		}
-	}
-
 	public ExternalCodeListItem loadExternalParentItem(ExternalCodeListItem item) {
 		return provider.getParentItem(item);
 	}
@@ -284,7 +289,19 @@ public class CodeListManager {
 		} else {
 			return parent.getChildItems();
 		}
-	}	
+	}
+	
+	public boolean hasChildItems(CodeListItem parent) {
+		CodeList list = parent.getCodeList();
+		if ( list.isExternal() ) {
+			return provider.hasChildItems((ExternalCodeListItem) parent);
+		} else if ( list.isEmpty() ) {
+			return codeListItemDao.hasChildItems(list, ((PersistedCodeListItem) parent).getSystemId());
+		} else {
+			List<CodeListItem> childItems = parent.getChildItems();
+			return ! childItems.isEmpty();
+		}
+	}
 	
 	public CodeListItem loadChildItem(CodeListItem parent, String code) {
 		CodeList list = parent.getCodeList();
@@ -294,6 +311,17 @@ public class CodeListManager {
 			return codeListItemDao.loadItem(list, ((PersistedCodeListItem) parent).getSystemId(), code);
 		} else {
 			return parent.getChildItem(code);
+		}
+	}
+	
+	public CodeListItem loadParentItem(CodeListItem item) {
+		CodeList list = item.getCodeList();
+		if ( list.isExternal() ) {
+			return provider.getParentItem((ExternalCodeListItem) item);
+		} else if ( list.isEmpty() ) {
+			return codeListItemDao.loadById(((PersistedCodeListItem) item).getParentId());
+		} else {
+			return item.getParentItem();
 		}
 	}
 	
@@ -338,10 +366,53 @@ public class CodeListManager {
 		}
 	}
 	
+	public void save(PersistedCodeListItem item) {
+		if ( item.getSystemId() == null ) {
+			codeListItemDao.insert(item);
+		} else {
+			codeListItemDao.update(item);
+		}
+	}
+	
+	public void delete(CodeListItem item) {
+		CodeList list = item.getCodeList();
+		if ( list.isExternal() ) {
+			//return provider.delete((ExternalCodeListItem) item);
+		} else if ( list.isEmpty() ) {
+			codeListItemDao.delete(((PersistedCodeListItem) item).getSystemId());
+		} else {
+			CodeListItem parentItem = item.getParentItem();
+			int id = item.getId();
+			if ( parentItem == null ) {
+				CodeList codeList = item.getCodeList();
+				codeList.removeItem(id);
+			} else {
+				parentItem.removeChildItem(id);
+			}
+		}
+	}
+	
 	public void deleteBySurvey(Integer surveyId, boolean work) {
 		codeListItemDao.deleteBySurvey(surveyId, work);
 	}
 
+	public void shiftItem(CodeListItem item, int indexTo) {
+		CodeList list = item.getCodeList();
+		if ( list.isExternal() ) {
+			//TODO
+		} else if ( list.isEmpty()) {
+			codeListItemDao.shiftItem((PersistedCodeListItem) item, indexTo);
+		} else {
+			CodeListItem parentItem = item.getParentItem();
+			if ( parentItem == null ) {
+				CodeList codeList = item.getCodeList();
+				codeList.moveItem(item, indexTo);
+			} else {
+				parentItem.moveChildItem(item, indexTo);
+			}
+		}
+	}
+	
 	public void setExternalCodeListProvider(
 			DatabaseExternalCodeListProvider externalCodeListProvider) {
 		this.provider = externalCodeListProvider;

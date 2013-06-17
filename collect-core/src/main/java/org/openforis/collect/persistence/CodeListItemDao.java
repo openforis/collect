@@ -11,14 +11,17 @@ import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
+import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.SurveyObject;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -51,6 +54,62 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	public void update(PersistedCodeListItem item) {
 		JooqFactory jf = getMappingJooqFactory(item.getCodeList());
 		jf.updateQuery(item).execute();
+	}
+	
+	public void shiftItem(PersistedCodeListItem item, int toIndex) {
+		CodeList list = item.getCodeList();
+		List<PersistedCodeListItem> siblings = loadItems(list, item.getParentId()); 
+		int newSortOrder;
+		int prevItemIdx;
+		if ( toIndex >= siblings.size() ) {
+			prevItemIdx = siblings.size() - 1;
+		} else {
+			prevItemIdx = toIndex;
+		}
+		PersistedCodeListItem previousItem = siblings.get(prevItemIdx);
+		newSortOrder = previousItem.getSortOrder();
+		updateSortOrder(item, newSortOrder);
+	}
+
+	protected void updateSortOrder(PersistedCodeListItem item, int newSortOrder) {
+		CodeList list = item.getCodeList();
+		CollectSurvey survey = (CollectSurvey) list.getSurvey();
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		JooqFactory jf = getMappingJooqFactory(list);
+		Integer oldSortOrder = item.getSortOrder();
+		if ( newSortOrder == oldSortOrder ) {
+			return;
+		} else {
+			//give top sort order to the item
+			jf.update(OFC_CODE_LIST)
+				.set(OFC_CODE_LIST.SORT_ORDER, 0)
+				.where(OFC_CODE_LIST.ID.equal(item.getSystemId())).execute();
+			if ( newSortOrder > oldSortOrder ) {
+				//move backwards previous items
+				jf.update(OFC_CODE_LIST)
+					.set(OFC_CODE_LIST.SORT_ORDER, OFC_CODE_LIST.SORT_ORDER.sub(1))
+					.where(surveyIdField.equal(survey.getId()),
+							OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId()),
+							OFC_CODE_LIST.PARENT_ID.equal(item.getParentId()),
+							OFC_CODE_LIST.SORT_ORDER.greaterThan(oldSortOrder),
+							OFC_CODE_LIST.SORT_ORDER.lessOrEqual(newSortOrder)
+							).execute();
+			} else {
+				//move forward next items
+				jf.update(OFC_CODE_LIST)
+					.set(OFC_CODE_LIST.SORT_ORDER, OFC_CODE_LIST.SORT_ORDER.add(1))
+					.where(surveyIdField.equal(survey.getId()),
+							OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId()),
+							OFC_CODE_LIST.PARENT_ID.equal(item.getParentId()),
+							OFC_CODE_LIST.SORT_ORDER.greaterOrEqual(newSortOrder),
+							OFC_CODE_LIST.SORT_ORDER.lessThan(oldSortOrder)
+							).execute();
+			}
+			//set item sort order to final value
+			jf.update(OFC_CODE_LIST)
+				.set(OFC_CODE_LIST.SORT_ORDER, newSortOrder)
+				.where(OFC_CODE_LIST.ID.equal(item.getSystemId())).execute();
+		}
 	}
 
 	public void delete(int id) {
@@ -93,14 +152,23 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	public List<PersistedCodeListItem> loadItems(CodeList codeList, Integer parentItemId) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
-		SelectQuery q = createSelectQuery(jf, codeList, parentItemId);
+		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
 		Result<Record> result = q.fetch();
 		return jf.fromResult(result);
 	}
 	
+	public boolean hasChildItems(CodeList codeList, Integer parentItemId) {
+		JooqFactory jf = getMappingJooqFactory(codeList);
+		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
+		q.addSelect(Factory.count());
+		Record record = q.fetchOne();
+		Integer count = record.getValueAsInteger(0);
+		return count > 0;
+	}
+	
 	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
-		SelectQuery q = createSelectQuery(jf, codeList, parentItemId);
+		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
 		q.addConditions(
 				OFC_CODE_LIST.CODE.equal(code)
 		);
@@ -112,16 +180,22 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 	}
 
-	protected SelectQuery createSelectQuery(JooqFactory jf, CodeList codeList, Integer parentItemId) {
-		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+	protected static SelectQuery createSelectChildItemsQuery(JooqFactory jf, CodeList codeList, Integer parentItemId) {
 		SelectQuery q = jf.selectQuery();	
 		q.addFrom(OFC_CODE_LIST);
+		addFilterByParentItemConditions(q, codeList, parentItemId);
+		q.addOrderBy(OFC_CODE_LIST.SORT_ORDER);
+		return q;
+	}
+
+	protected static void addFilterByParentItemConditions(SelectQuery select,
+			CodeList codeList, Integer parentItemId) {
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
-		q.addConditions(
+		select.addConditions(
 				surveyIdField.equal(survey.getId()),
 				OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
 				OFC_CODE_LIST.PARENT_ID.equal(parentItemId));
-		return q;
 	}
 	
 	@Override
@@ -144,7 +218,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return new JooqFactory(connection, codeList);
 	}
 	
-	protected TableField<OfcCodeListRecord, Integer> getSurveyIdField(
+	protected static TableField<OfcCodeListRecord, Integer> getSurveyIdField(
 			boolean work) {
 		TableField<OfcCodeListRecord, Integer> surveyIdField = work ? 
 				OFC_CODE_LIST.SURVEY_WORK_ID: OFC_CODE_LIST.SURVEY_ID;
@@ -182,12 +256,25 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		@Override
 		public void fromRecord(Record r, PersistedCodeListItem i) {
 			i.setSystemId(r.getValue(OFC_CODE_LIST.ID));
+			i.setSortOrder(r.getValue(OFC_CODE_LIST.SORT_ORDER));
 			i.setCode(r.getValue(OFC_CODE_LIST.CODE));
 			i.setParentId(r.getValue(OFC_CODE_LIST.PARENT_ID));
+			i.setQualifiable(r.getValue(OFC_CODE_LIST.QUALIFIABLE));
+			i.setSinceVersion(extractModelVersion(r, i, OFC_CODE_LIST.SINCE_VERSION_ID));
+			i.setDeprecatedVersion(extractModelVersion(r, i, OFC_CODE_LIST.DEPRECATED_VERSION_ID));
 			extractLabels(r, i);
 			extractDescriptions(r, i);
 		}
 
+		protected ModelVersion extractModelVersion(Record r,
+				SurveyObject surveyObject,
+				TableField<OfcCodeListRecord, Integer> versionIdField) {
+			Survey survey = surveyObject.getSurvey();
+			Integer versionId = r.getValue(versionIdField);
+			ModelVersion version = versionId == null ? null: survey.getVersionById(versionId);
+			return version;
+		}
+		
 		protected void extractLabels(Record r, PersistedCodeListItem item) {
 			Survey survey = codeList.getSurvey();
 			item.removeAllLabels();
@@ -225,9 +312,29 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			q.addValue(OFC_CODE_LIST.CODE_LIST_ID, item.getCodeList().getId());
 			q.addValue(OFC_CODE_LIST.ITEM_ID, item.getId());
 			q.addValue(OFC_CODE_LIST.PARENT_ID, item.getParentId());
+			Integer sortOrder = item.getSortOrder();
+			if ( sortOrder == null ) {
+				sortOrder = nextSortOrder(item);
+			}
+			q.addValue(OFC_CODE_LIST.SORT_ORDER, sortOrder);
 			q.addValue(OFC_CODE_LIST.CODE, item.getCode());
+			q.addValue(OFC_CODE_LIST.QUALIFIABLE, item.isQualifiable());
+			Integer sinceVersionId = item.getSinceVersion() == null ? null: item.getSinceVersion().getId();
+			q.addValue(OFC_CODE_LIST.SINCE_VERSION_ID, sinceVersionId);
+			Integer deprecatedVersionId = item.getDeprecatedVersion() == null ? null: item.getDeprecatedVersion().getId();
+			q.addValue(OFC_CODE_LIST.DEPRECATED_VERSION_ID, deprecatedVersionId);
 			addLabelValues(q, item);
 			addDescriptionValues(q, item);
+		}
+
+		private Integer nextSortOrder(PersistedCodeListItem item) {
+			SelectQuery select = selectQuery();
+			select.addSelect(max(OFC_CODE_LIST.SORT_ORDER));
+			select.addFrom(OFC_CODE_LIST);
+			addFilterByParentItemConditions(select, codeList, item.getParentId());
+			Record record = select.fetchOne();
+			Integer max = record.getValueAsInteger(0);
+			return max == null ? 1: max + 1;
 		}
 
 		protected void addLabelValues(StoreQuery<?> q, PersistedCodeListItem item) {

@@ -147,6 +147,18 @@ public class DatabaseExternalCodeListProvider implements
 		return result;
 	}
 	
+	public boolean hasChildItems(ExternalCodeListItem item) {
+		CodeList list = item.getCodeList();
+		List<NameValueEntry> filters = createChildItemsFilters(item);
+		int itemLevel = item.getLevel();
+		int childrenLevel = itemLevel + 1;
+		String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
+		String[] notNullColumns = new String[]{childrenKeyColName};
+		return dynamicTableDao.exists(list.getLookupTable(), 
+				filters.toArray(new NameValueEntry[0]),
+				notNullColumns);
+	}
+	
 	public ExternalCodeListItem getChildItem(ExternalCodeListItem item,
 			String code) {
 		CodeList list = item.getCodeList();
