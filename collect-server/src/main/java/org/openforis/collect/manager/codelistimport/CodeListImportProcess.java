@@ -13,6 +13,7 @@ import java.util.Stack;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.codelistimport.CodeListLine.CodeLabelItem;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
@@ -22,6 +23,7 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
 
 /**
  * 
@@ -36,6 +38,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	
 	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
 	//parameters
+	private CodeListManager codeListManager;
 	private File file;
 	private CodeList codeList;
 	private CodeScope codeScope;
@@ -46,8 +49,11 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private List<String> levels;
 	private Map<String, CodeListItem> codeToRootItem;
 	private boolean overwriteData;
-	
-	public CodeListImportProcess(CodeList codeList, CodeScope codeScope, String langCode, File file, boolean overwriteData) {
+
+	public CodeListImportProcess(CodeListManager codeListManager,
+			CodeList codeList, CodeScope codeScope, String langCode, File file,
+			boolean overwriteData) {
+		this.codeListManager = codeListManager;
 		this.codeList = codeList;
 		this.codeScope = codeScope;
 		this.langCode = langCode;
@@ -106,9 +112,19 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			codeList.removeAllLevels();
 		}
 		addLevelsToCodeList();
+		
 		Collection<CodeListItem> rootItems = codeToRootItem.values();
-		for (CodeListItem item : rootItems) {
-			codeList.addItem(item);
+		
+		saveItems(rootItems, null);
+	}
+
+	protected void saveItems(Collection<CodeListItem> items,
+			Integer parentItemId) {
+		for (CodeListItem item : items) {
+			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
+			persistedChildItem.setParentId(parentItemId);
+			codeListManager.save(persistedChildItem);
+			saveItems(item.getChildItems(), persistedChildItem.getSystemId());
 		}
 	}
 

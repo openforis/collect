@@ -3,6 +3,7 @@ package org.openforis.collect.remoting.service;
 import java.io.File;
 
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
 import org.openforis.collect.manager.codelistimport.CodeListImportStatus;
@@ -24,6 +25,8 @@ public class CodeListImportService extends ReferenceDataImportService<CodeListIm
 	private static final String IMPORT_FILE_NAME = "code_list.csv";
 	
 	@Autowired
+	private CodeListManager codeListManager;
+	@Autowired
 	private SessionManager sessionManager;
 	
 	public CodeListImportService() {
@@ -39,7 +42,7 @@ public class CodeListImportService extends ReferenceDataImportService<CodeListIm
 			String langCode = designerSessionStatus.getCurrentLanguageCode();
 			CodeList codeList = survey.getCodeListById(codeListId);
 			CodeScope codeScope = codeList.getHierarchy().size() > 1 && codeList.getCodeScope() == CodeScope.SCHEME ? CodeScope.SCHEME: CodeScope.LOCAL;
-			importProcess = new CodeListImportProcess(codeList, codeScope, langCode, importFile, overwriteData);
+			importProcess = new CodeListImportProcess(codeListManager, codeList, codeScope, langCode, importFile, overwriteData);
 			importProcess.init();
 			CodeListImportStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

@@ -60,7 +60,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 	
 	public CodeListImportProcess importCSVFile(String fileName, CodeList codeList, CodeScope codeScope) throws Exception {
 		File file = getTestFile(fileName);
-		CodeListImportProcess process = new CodeListImportProcess(codeList, codeScope, LANG, file, true);
+		CodeListImportProcess process = new CodeListImportProcess(codeListManager, codeList, codeScope, LANG, file, true);
 		process.call();
 		return process;
 	}
