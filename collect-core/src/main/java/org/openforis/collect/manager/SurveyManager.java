@@ -156,7 +156,7 @@ public class SurveyManager {
 	@Transactional
 	public CollectSurvey importInPublishedWorkSurvey(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
 		CollectSurvey surveyWork = duplicatePublishedSurveyForEdit(uri);
-		updateModel(surveyFile, validate);
+		updateSurveyWork(surveyFile, surveyWork);
 		return surveyWork;
 	}
 	
@@ -208,12 +208,18 @@ public class SurveyManager {
 		CollectSurvey oldPublishedSurvey = getByUri(uri);
 		if ( oldSurveyWork == null && oldPublishedSurvey == null ) {
 			throw new IllegalArgumentException("Survey to update not found: " + uri);
-		} else if ( oldPublishedSurvey != null ) {
-			updatePublishedSurvey(surveyFile, parsedSurvey, validate);
-		} else {
+		} else if ( oldSurveyWork != null ) {
 			updateSurveyWork(surveyFile, parsedSurvey, oldSurveyWork);
+		} else {
+			updatePublishedSurvey(surveyFile, parsedSurvey, validate);
 		}
 		return parsedSurvey;
+	}
+	
+	protected void updateSurveyWork(File surveyFile,
+			CollectSurvey parsedSurvey) throws SurveyImportException {
+		SurveySummary oldSurveyWork = loadWorkSummaryByUri(parsedSurvey.getUri());
+		updateSurveyWork(surveyFile, parsedSurvey, oldSurveyWork);
 	}
 
 	protected void updateSurveyWork(File surveyFile,
@@ -514,6 +520,7 @@ public class SurveyManager {
 		Integer surveyWorkId = survey.getId();
 		CollectSurvey publishedSurvey = get(survey.getName());
 		if ( publishedSurvey == null ) {
+			survey.setWork(false);
 			survey.setPublished(true);
 			importModel(survey);
 			initSurveysCache();

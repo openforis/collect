@@ -4,10 +4,13 @@ import static org.openforis.collect.persistence.jooq.Sequences.OFC_CODE_LIST_ID_
 import static org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE_LIST;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.ResultQuery;
+import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
@@ -39,9 +42,15 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		super(CodeListItemDao.JooqFactory.class);
 	}
 
-	@Override
-	public PersistedCodeListItem loadById(int id) {
-		return super.loadById(id);
+	public PersistedCodeListItem loadById(CodeList list, int id) {
+		JooqFactory jf = getMappingJooqFactory(list);
+		ResultQuery<?> selectQuery = jf.selectByIdQuery(id);
+		Record r = selectQuery.fetchOne();
+		if ( r == null ) {
+			return null;
+		} else {
+			return jf.fromRecord(r);
+		}
 	}
 
 	@Override
@@ -58,7 +67,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	public void shiftItem(PersistedCodeListItem item, int toIndex) {
 		CodeList list = item.getCodeList();
-		List<PersistedCodeListItem> siblings = loadItems(list, item.getParentId()); 
+		List<PersistedCodeListItem> siblings = loadChildItems(list, item.getParentId()); 
 		int newSortOrder;
 		int prevItemIdx;
 		if ( toIndex >= siblings.size() ) {
@@ -143,18 +152,38 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	public List<PersistedCodeListItem> loadRootItems(CodeList codeList) {
-		return loadItems(codeList, (Integer) null);
+		return loadChildItems(codeList, (Integer) null);
 	}
 	
 	public PersistedCodeListItem loadRootItem(CodeList codeList, String code) {
 		return loadItem(codeList, (Integer) null, code);
 	}
 	
-	public List<PersistedCodeListItem> loadItems(CodeList codeList, Integer parentItemId) {
+	public List<PersistedCodeListItem> loadChildItems(PersistedCodeListItem item) {
+		return loadChildItems(item.getCodeList(), item.getSystemId());
+	}
+	
+	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Integer parentItemId) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
 		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
 		Result<Record> result = q.fetch();
 		return jf.fromResult(result);
+	}
+	
+	public List<PersistedCodeListItem> loadItems(CodeList list, int level) {
+		int currentLevel = 1;
+		List<PersistedCodeListItem> currentLevelItems = loadRootItems(list);;
+		List<PersistedCodeListItem> nextLevelItems;
+		while ( currentLevel < level ) {
+			nextLevelItems = new ArrayList<PersistedCodeListItem>();
+			for (PersistedCodeListItem item : currentLevelItems) {
+				List<PersistedCodeListItem> childItems = loadChildItems(item);
+				nextLevelItems.addAll(childItems);
+			}
+			currentLevelItems = nextLevelItems;
+			currentLevel++;
+		}
+		return currentLevelItems;
 	}
 	
 	public boolean hasChildItems(CodeList codeList, Integer parentItemId) {
@@ -164,6 +193,26 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		Record record = q.fetchOne();
 		Integer count = record.getValueAsInteger(0);
 		return count > 0;
+	}
+	
+	public boolean hasQualifiableItems(CodeList codeList) {
+		JooqFactory jf = getMappingJooqFactory(codeList);
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		SelectConditionStep q = jf.selectCount()
+				.from(OFC_CODE_LIST)
+				.where(
+					surveyIdField.equal(survey.getId()),
+					OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
+					OFC_CODE_LIST.QUALIFIABLE.equal(Boolean.TRUE)
+				);
+		Record r = q.fetchOne();
+		if ( r == null ) {
+			return false;
+		} else {
+			Integer count = r.getValueAsInteger(0);
+			return count > 0;
+		}
 	}
 	
 	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code) {

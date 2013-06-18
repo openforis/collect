@@ -252,7 +252,7 @@
 	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 	<bean id="persistedCodeListProvider" 	class="org.openforis.collect.persistence.DatabasePersistedCodeListProvider" />
-	<bean id="codeListPersister" 	class="org.openforis.collect.persistence.DatabaseCodeListPersister" />
+	<bean id="codeListPersister" 			class="org.openforis.collect.persistence.DatabaseCodeListPersister" />
 
 	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
 		<constructor-arg ref="expressionFactory" />

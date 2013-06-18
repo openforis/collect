@@ -145,6 +145,18 @@ public class CodeListManager {
 	}
 
 	@SuppressWarnings("unchecked")
+	public <T extends CodeListItem> List<T> loadItems(CodeList list, int level) {
+		if ( list.isExternal() ) {
+			//TODO
+			return null;
+		} else if ( list.isEmpty() ) {
+			return (List<T>) codeListItemDao.loadItems(list, level);
+		} else {
+			return (List<T>) list.getItems(level);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> List<T> loadRootItems(CodeList list) {
 		if ( list.isExternal() ) {
 			return (List<T>) provider.getRootItems(list);
@@ -285,7 +297,7 @@ public class CodeListManager {
 		if ( list.isExternal() ) {
 			return (List<T>) provider.getChildItems((ExternalCodeListItem) parent);
 		} else if ( list.isEmpty() ) {
-			return (List<T>) codeListItemDao.loadItems(list, ((PersistedCodeListItem) parent).getSystemId());
+			return (List<T>) codeListItemDao.loadChildItems((PersistedCodeListItem) parent);
 		} else {
 			return parent.getChildItems();
 		}
@@ -319,7 +331,7 @@ public class CodeListManager {
 		if ( list.isExternal() ) {
 			return provider.getParentItem((ExternalCodeListItem) item);
 		} else if ( list.isEmpty() ) {
-			return codeListItemDao.loadById(((PersistedCodeListItem) item).getParentId());
+			return codeListItemDao.loadById(list, ((PersistedCodeListItem) item).getParentId());
 		} else {
 			return item.getParentItem();
 		}

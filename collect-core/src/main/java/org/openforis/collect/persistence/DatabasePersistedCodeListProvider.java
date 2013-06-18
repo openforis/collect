@@ -35,7 +35,22 @@ public class DatabasePersistedCodeListProvider implements
 	public List<PersistedCodeListItem> getChildItems(
 			PersistedCodeListItem parentItem) {
 		CodeList codeList = parentItem.getCodeList();
-		return codeListItemDao.loadItems(codeList, parentItem.getSystemId());
+		return codeListItemDao.loadChildItems(codeList, parentItem.getSystemId());
+	}
+	
+	@Override
+	public List<PersistedCodeListItem> getItems(CodeList codeList, int level) {
+		return codeListItemDao.loadItems(codeList, level);
+	}
+	
+	@Override
+	public boolean hasQualifiableItems(CodeList codeList) {
+		return codeListItemDao.hasQualifiableItems(codeList);
+	}
+	
+	@Override
+	public PersistedCodeListItem getParentItem(PersistedCodeListItem item) {
+		return codeListItemDao.loadById(item.getCodeList(), item.getParentId());
 	}
 
 }
