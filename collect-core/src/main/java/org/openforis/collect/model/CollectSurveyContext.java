@@ -6,7 +6,7 @@ package org.openforis.collect.model;
 import java.io.Serializable;
 
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
-import org.openforis.idm.metamodel.PersistedCodeListProvider;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.Validator;
@@ -24,7 +24,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	private ExpressionFactory expressionFactory;
 	private Validator validator;
 	private ExternalCodeListProvider externalCodeListProvider;
-	private PersistedCodeListProvider persistedCodeListProvider;
+	private CodeListService codeListService;
 
 	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
 		this.expressionFactory = expressionFactory;
@@ -65,13 +65,13 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	}
 
 	@Override
-	public PersistedCodeListProvider getPersistedCodeListProvider() {
-		return persistedCodeListProvider;
+	public CodeListService getCodeListService() {
+		return codeListService;
 	}
 	
-	public void setPersistedCodeListProvider(
-			PersistedCodeListProvider persistedCodeListProvider) {
-		this.persistedCodeListProvider = persistedCodeListProvider;
+	public void setCodeListService(
+			CodeListService codeListService) {
+		this.codeListService = codeListService;
 	}
 	
 }

@@ -5,8 +5,8 @@ import java.util.List;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
-import org.openforis.idm.metamodel.PersistedCodeListProvider;
 import org.openforis.idm.metamodel.SurveyContext;
 
 /**
@@ -75,16 +75,9 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 	public Dataset extractData() {
 		Dataset data = new Dataset();
 		Integer levelIdx = getLevelIdx();
-		List<? extends CodeListItem> items;
-		if ( codeList.isEmpty() ) {
-			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
-			SurveyContext context = survey.getContext();
-			PersistedCodeListProvider codeListProvider = context.getPersistedCodeListProvider();
-			int level = levelIdx == null ? 1: levelIdx + 1;
-			items = codeListProvider.getItems(codeList, level);
-		} else {
-			items = codeList.getItems(levelIdx);
-		}
+		CodeListService codeListService = getCodeListService();
+		int level = levelIdx == null ? 1: levelIdx + 1;
+		List<? extends CodeListItem> items = codeListService.loadItems(codeList, level);
 		if ( defaultCode != null ) {
 			addDefaultCodeRow(data, items);
 		}
@@ -93,6 +86,13 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 			data.addRow(row);
 		}
 		return data;
+	}
+
+	protected CodeListService getCodeListService() {
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		SurveyContext context = survey.getContext();
+		CodeListService codeListService = context.getCodeListService();
+		return codeListService;
 	}
 
 	protected void addDefaultCodeRow(Dataset data, List<? extends CodeListItem> items) {

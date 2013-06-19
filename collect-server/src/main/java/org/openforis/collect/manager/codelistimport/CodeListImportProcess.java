@@ -113,18 +113,18 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		}
 		addLevelsToCodeList();
 		
+		codeListManager.deleteAllItems(codeList);
 		Collection<CodeListItem> rootItems = codeToRootItem.values();
-		
-		saveItems(rootItems, null);
+		saveItemsAndDescendants(rootItems, null);
 	}
 
-	protected void saveItems(Collection<CodeListItem> items,
+	protected void saveItemsAndDescendants(Collection<CodeListItem> items,
 			Integer parentItemId) {
 		for (CodeListItem item : items) {
 			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
 			persistedChildItem.setParentId(parentItemId);
 			codeListManager.save(persistedChildItem);
-			saveItems(item.getChildItems(), persistedChildItem.getSystemId());
+			saveItemsAndDescendants(item.getChildItems(), persistedChildItem.getSystemId());
 		}
 	}
 

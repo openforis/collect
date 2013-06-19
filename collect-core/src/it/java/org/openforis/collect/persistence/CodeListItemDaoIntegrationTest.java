@@ -70,7 +70,7 @@ public class CodeListItemDaoIntegrationTest extends CollectIntegrationTest {
 			boolean hasChildItems = codeListItemDao.hasChildItems(list, item.getSystemId());
 			assertTrue(hasChildItems);
 			{
-				PersistedCodeListItem child = (PersistedCodeListItem) codeListItemDao.loadItem(list, item.getSystemId(), "002");
+				PersistedCodeListItem child = (PersistedCodeListItem) codeListItemDao.loadItem(list, item.getSystemId(), "002", null);
 				assertNotNull(child);
 				assertEquals(24, child.getId());
 				assertEquals(Integer.valueOf(2), child.getSortOrder());

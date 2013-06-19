@@ -2,8 +2,8 @@ package org.openforis.collect.relational.model;
 
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
-import org.openforis.idm.metamodel.PersistedCodeListProvider;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 
@@ -26,8 +26,8 @@ public class CodeParentKeyColumn extends IdColumn<CodeListItem> {
 		} else {
 			CodeListItem parent;
 			if ( list.isEmpty() ) {
-				PersistedCodeListProvider persistedCodeListProvider = getPersistedCodeListProvider(list);
-				parent = persistedCodeListProvider.getParentItem((PersistedCodeListItem) source);
+				CodeListService codeListService = getCodeListService(list);
+				parent = codeListService.loadParentItem((PersistedCodeListItem) source);
 			} else {
 				parent = source.getParentItem();
 			}
@@ -42,11 +42,11 @@ public class CodeParentKeyColumn extends IdColumn<CodeListItem> {
 		}
 	}
 
-	protected PersistedCodeListProvider getPersistedCodeListProvider(CodeList list) {
+	protected CodeListService getCodeListService(CodeList list) {
 		Survey survey = list.getSurvey();
 		SurveyContext context = survey.getContext();
-		PersistedCodeListProvider persistedCodeListProvider = context.getPersistedCodeListProvider();
-		return persistedCodeListProvider;
+		CodeListService codeListService = context.getCodeListService();
+		return codeListService;
 	}
 	
 }

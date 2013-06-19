@@ -78,7 +78,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 		List<CodeListItem> items = codeListManager.loadRootItems(codeList);
 		assertEquals(2, items.size());
 		{
-			CodeListItem item = codeListManager.loadRootItem(codeList, "001");
+			CodeListItem item = codeListManager.loadRootItem(codeList, "001", null);
 			assertNotNull(item);
 			assertEquals("Dodoma", item.getLabel(LANG));
 			List<CodeListItem> childItems = codeListManager.loadChildItems(item);
@@ -91,7 +91,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 			assertEquals("Mpwapwa", childItem.getLabel(LANG));
 		}
 		{
-			CodeListItem item = codeListManager.loadRootItem(codeList, "002");
+			CodeListItem item = codeListManager.loadRootItem(codeList, "002", null);
 			assertNotNull(item);
 			assertEquals("Arusha", item.getLabel(LANG));
 			List<CodeListItem> childItems = codeListManager.loadChildItems(item);

@@ -11,13 +11,13 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
-import org.openforis.idm.metamodel.PersistedCodeListProvider;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -296,8 +296,8 @@ public class RelationalSchemaGenerator {
 		} else if ( list.isEmpty() ) {
 			Survey survey = list.getSurvey();
 			SurveyContext context = survey.getContext();
-			PersistedCodeListProvider persistedCodeListProvider = context.getPersistedCodeListProvider();
-			qualifiable = persistedCodeListProvider.hasQualifiableItems(list);
+			CodeListService codeListService = context.getCodeListService();
+			qualifiable = codeListService.hasQualifiableItems(list);
 		} else {
 			qualifiable = list.isQualifiable();
 		}

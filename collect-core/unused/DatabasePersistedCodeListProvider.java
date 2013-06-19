@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
-import org.openforis.idm.metamodel.PersistedCodeListProvider;
+import org.openforis.idm.metamodel.CodeListService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 public class DatabasePersistedCodeListProvider implements
-		PersistedCodeListProvider {
+		CodeListService {
 
 	@Autowired
 	private CodeListItemDao codeListItemDao;
@@ -39,7 +39,7 @@ public class DatabasePersistedCodeListProvider implements
 	}
 	
 	@Override
-	public List<PersistedCodeListItem> getItems(CodeList codeList, int level) {
+	public List<PersistedCodeListItem> loadItems(CodeList codeList, int level) {
 		return codeListItemDao.loadItems(codeList, level);
 	}
 	

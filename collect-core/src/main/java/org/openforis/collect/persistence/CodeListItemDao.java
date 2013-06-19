@@ -126,6 +126,17 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		jf.deleteQuery(id).execute();
 	}
 
+	public void deleteByCodeList(CodeList list) {
+		JooqFactory jf = getMappingJooqFactory(null);
+		CollectSurvey survey = (CollectSurvey) list.getSurvey();
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		jf.delete(OFC_CODE_LIST)
+			.where(
+					surveyIdField.equal(survey.getId()),
+					OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId())
+			).execute();
+	}
+	
 	public void deleteBySurvey(int surveyId) {
 		deleteBySurvey(surveyId, false);
 	}
@@ -152,18 +163,30 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	public List<PersistedCodeListItem> loadRootItems(CodeList codeList) {
-		return loadChildItems(codeList, (Integer) null);
+		return loadChildItems(codeList, (Integer) null, (ModelVersion) null);
 	}
 	
 	public PersistedCodeListItem loadRootItem(CodeList codeList, String code) {
-		return loadItem(codeList, (Integer) null, code);
+		return loadRootItem(codeList, code, (ModelVersion) null);
+	}
+	
+	public PersistedCodeListItem loadRootItem(CodeList codeList, String code, ModelVersion version) {
+		return loadItem(codeList, (Integer) null, code, version);
 	}
 	
 	public List<PersistedCodeListItem> loadChildItems(PersistedCodeListItem item) {
-		return loadChildItems(item.getCodeList(), item.getSystemId());
+		return loadChildItems(item, (ModelVersion) null);
+	}
+	
+	public List<PersistedCodeListItem> loadChildItems(PersistedCodeListItem item, ModelVersion version) {
+		return loadChildItems(item.getCodeList(), item.getSystemId(), version);
 	}
 	
 	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Integer parentItemId) {
+		return loadChildItems(codeList, parentItemId, (ModelVersion) null);
+	}
+	
+	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Integer parentItemId, ModelVersion version) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
 		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
 		Result<Record> result = q.fetch();
@@ -215,17 +238,28 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 	}
 	
-	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code) {
+	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code, ModelVersion version) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
 		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
 		q.addConditions(
 				OFC_CODE_LIST.CODE.equal(code)
 		);
-		Record r = q.fetchOne();
-		if ( r == null ) {
+		Result<Record> result = q.fetch();
+		List<PersistedCodeListItem> list = jf.fromResult(result);
+		List<PersistedCodeListItem> filteredByVersion = filterApplicableItems(list, version);
+		if ( filteredByVersion.isEmpty() ) {
 			return null;
 		} else {
-			return jf.fromRecord(r);
+			return filteredByVersion.get(0);
+		}
+	}
+	
+	protected List<PersistedCodeListItem> filterApplicableItems(List<PersistedCodeListItem> list, ModelVersion version) {
+		if ( version == null ) {
+			return list;
+		} else {
+			List<PersistedCodeListItem> appliable = version.filterApplicableItems(list);
+			return appliable;
 		}
 	}
 

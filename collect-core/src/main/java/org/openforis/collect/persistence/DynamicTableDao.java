@@ -20,7 +20,6 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectJoinStep;
 import org.jooq.TableField;
-import org.jooq.impl.Factory;
 import org.openforis.collect.model.NameValueEntry;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;

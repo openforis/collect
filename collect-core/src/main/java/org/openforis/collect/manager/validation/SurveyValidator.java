@@ -254,7 +254,7 @@ public class SurveyValidator {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		List<CodeListItem> oldItems = codeListManager.loadRootItems(oldCodeList);
 		for (CodeListItem oldItem : oldItems) {
-			CodeListItem newItem = codeListManager.loadRootItem(codeList, oldItem.getCode());
+			CodeListItem newItem = codeListManager.loadRootItem(codeList, oldItem.getCode(), null);
 			if ( newItem == null ) {
 				String messageKey = "survey.validation.error.enumerating_code_list_changed.code_removed";
 				String path = "codeList" + "/" + codeList.getName() + "/" + oldItem.getCode();
