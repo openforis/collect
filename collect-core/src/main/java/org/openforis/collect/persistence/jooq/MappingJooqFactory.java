@@ -115,6 +115,10 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		return nextId(idField, idSequence);
 	}
 	
+	protected void restartSequence(Number value) {
+		restartSequence(idSequence, value);
+	}
+	
 	@SuppressWarnings({"rawtypes"})
 	public UpdateQuery updateQuery(E object) {
 		

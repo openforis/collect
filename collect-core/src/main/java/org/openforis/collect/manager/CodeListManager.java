@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,7 +23,6 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
-import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -244,7 +244,8 @@ public class CodeListManager {
 	}
 
 	public void parseXMLAndStoreItems(CollectSurvey survey, InputStream is) throws CodeListImportException {
-		SurveyCodeListPersisterBinder binder = new SurveyCodeListPersisterBinder(persisterContext);
+		int nextSystemId = codeListItemDao.nextSystemId();
+		SurveyCodeListPersisterBinder binder = new SurveyCodeListPersisterBinder(persisterContext, nextSystemId);
 		try {
 			binder.exportFromXMLAndStore(survey, is);
 		} catch (IdmlParseException e) {
@@ -354,45 +355,13 @@ public class CodeListManager {
 		}
 	}
 	
-	public void publishCodeLists(int publishedSurveyId, int surveyWorkId) {
-		codeListItemDao.moveToPublishedSurvey(publishedSurveyId, surveyWorkId);
+	public void publishedCodeLists(int publishedSurveyId, int surveyWorkId) {
+		codeListItemDao.deleteBySurvey(publishedSurveyId);
+		codeListItemDao.moveItemsToPublishedSurvey(publishedSurveyId, surveyWorkId);
 	}
 	
-	public void duplicateCodeListsForWork(CollectSurvey publishedSurvey, CollectSurvey workSurvey) {
-		List<CodeList> codeLists = publishedSurvey.getCodeLists();
-		for (CodeList codeList : codeLists) {
-			if ( ! codeList.isExternal() ) {
-				CodeList workList = workSurvey.getCodeListById(codeList.getId());
-				List<PersistedCodeListItem> rootItems = loadRootItems(codeList);
-				//duplicateFromPublishedToWorkSurvey(rootItems, workSurvey);
-				duplicateItemsForWork(rootItems, workList, null);
-			}
-		}
-	}
-	
-	protected PersistedCodeListItem duplicateForWork(PersistedCodeListItem item, CodeList workList, Integer parentItemId) {
-		PersistedCodeListItem workItem = new PersistedCodeListItem(workList, item.getId());
-		workItem.setCode(item.getCode());
-		workItem.setParentId(parentItemId);
-		List<LanguageSpecificText> labels = item.getLabels();
-		for (LanguageSpecificText label : labels) {
-			workItem.setLabel(label.getLanguage(), label.getText());
-		}
-		List<LanguageSpecificText> descriptions = item.getDescriptions();
-		for (LanguageSpecificText description : descriptions) {
-			workItem.setDescription(description.getLanguage(), description.getText());
-		}
-		codeListItemDao.insert(workItem);
-		return workItem;
-	}
-	
-	protected void duplicateItemsForWork(List<PersistedCodeListItem> items, CodeList workList, Integer parentWorkId) {
-		for (PersistedCodeListItem item: items) {
-			PersistedCodeListItem workItem = duplicateForWork(item, workList, parentWorkId);
-			int newItemId = workItem.getId();
-			List<PersistedCodeListItem> childItems = loadChildItems(item);
-			duplicateItemsForWork(childItems, workList, newItemId);
-		}
+	public void duplicateCodeListsForWork(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
+		codeListItemDao.duplicateItems(fromSurvey.getId(), fromSurvey.isWork(), toSurvey.getId(), toSurvey.isWork());
 	}
 	
 	public void save(PersistedCodeListItem item) {
@@ -403,6 +372,34 @@ public class CodeListManager {
 		}
 	}
 	
+	public void save(List<PersistedCodeListItem> items) {
+		codeListItemDao.insert(items);
+	}
+	
+	public void saveItemsAndDescendants(List<CodeListItem> items) {
+		List<PersistedCodeListItem> persistedItems = createPersistedItems(items, codeListItemDao.nextSystemId(), null);
+		save(persistedItems);
+	}
+	
+	protected List<PersistedCodeListItem> createPersistedItems(Collection<CodeListItem> items,
+			int nextId,
+			Integer parentItemId) {
+		List<PersistedCodeListItem> result = new ArrayList<PersistedCodeListItem>();
+		int sortOrder = 1;
+		for (CodeListItem item : items) {
+			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
+			persistedChildItem.setParentId(parentItemId);
+			int id = nextId++;
+			persistedChildItem.setSystemId(id);
+			persistedChildItem.setSortOrder(sortOrder++);
+			result.add(persistedChildItem);
+			List<PersistedCodeListItem> temp = createPersistedItems(item.getChildItems(), nextId, id);
+			nextId+=temp.size();
+			result.addAll(temp);
+		}
+		return result;
+	}
+
 	public void delete(CodeListItem item) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {

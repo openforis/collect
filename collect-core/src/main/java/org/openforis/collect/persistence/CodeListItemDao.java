@@ -5,11 +5,17 @@ import static org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.jooq.BatchBindStep;
+import org.jooq.Field;
+import org.jooq.Insert;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.ResultQuery;
+import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.StoreQuery;
@@ -58,7 +64,68 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		JooqFactory jf = getMappingJooqFactory(item.getCodeList());
 		jf.insertQuery(item).execute();
 	}
-
+	
+	/**
+	 * Inserts the items in batch.
+	 * 
+	 * @param items
+	 */
+	public void insert(List<PersistedCodeListItem> items) {
+		if ( items != null && items.size() > 0 ) {
+			PersistedCodeListItem firstItem = items.get(0);
+			CodeList list = firstItem.getCodeList();
+			JooqFactory jf = getMappingJooqFactory(list);
+			int id = jf.nextId();
+			int maxId = id;
+			Insert<OfcCodeListRecord> query = jf.createInsertStatement();
+			BatchBindStep batch = jf.batch(query);
+			for (PersistedCodeListItem item : items) {
+				if ( item.getSystemId() == null ) {
+					item.setSystemId(id++);
+				}
+				Object[] values = jf.extractValues(item);
+				batch.bind(values);
+				maxId = Math.max(maxId, item.getSystemId());
+			}
+			batch.execute();
+			jf.restartSequence(maxId + 1);
+		}
+	}
+	
+	public void duplicateItems(int oldSurveyId, boolean oldSurveyWork, int newSurveyId, boolean newSurveyWork) {
+		JooqFactory jf = getMappingJooqFactory(null);
+		TableField<OfcCodeListRecord, Integer> oldSurveyIdField = getSurveyIdField(oldSurveyWork);
+		int nextId = jf.nextId();
+		Integer minId = jf.select(Factory.min(OFC_CODE_LIST.ID))
+			.from(OFC_CODE_LIST)
+			.where(oldSurveyIdField.equal(oldSurveyId))
+			.fetchOne(0, Integer.class);
+		int idGap = nextId - (minId == null ? 0: minId);
+		Integer selectSurveyIdValue = newSurveyWork ? null: newSurveyId;
+		Integer selectSurveyWorkIdValue = newSurveyWork ? newSurveyId: null;
+		Field<?>[] selectFields = {
+				OFC_CODE_LIST.ID.add(idGap),
+				Factory.val(selectSurveyIdValue, OFC_CODE_LIST.SURVEY_ID),
+				Factory.val(selectSurveyWorkIdValue, OFC_CODE_LIST.SURVEY_WORK_ID),
+				OFC_CODE_LIST.CODE_LIST_ID,
+				OFC_CODE_LIST.ITEM_ID,
+				OFC_CODE_LIST.PARENT_ID.add(idGap),
+				OFC_CODE_LIST.SORT_ORDER,
+				OFC_CODE_LIST.CODE,
+				OFC_CODE_LIST.QUALIFIABLE,
+				OFC_CODE_LIST.SINCE_VERSION_ID,
+				OFC_CODE_LIST.DEPRECATED_VERSION_ID
+			};
+		selectFields = ArrayUtils.addAll(selectFields, LABEL_FIELDS);
+		selectFields = ArrayUtils.addAll(selectFields, DESCRIPTION_FIELDS);
+		Select<?> select = jf.select(selectFields)
+			.from(OFC_CODE_LIST)
+			.where(oldSurveyIdField.equal(oldSurveyId))
+			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
+		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST).select(select);
+		insert.execute();
+	}
+	
 	@Override
 	public void update(PersistedCodeListItem item) {
 		JooqFactory jf = getMappingJooqFactory(item.getCodeList());
@@ -153,7 +220,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.execute();
 	}
 
-	public void moveToPublishedSurvey(int publishedSurveyId, int surveyWorkId) {
+	public void moveItemsToPublishedSurvey(int publishedSurveyId, int surveyWorkId) {
 		JooqFactory jf = getMappingJooqFactory(null);
 		jf.update(OFC_CODE_LIST)
 			.set(OFC_CODE_LIST.SURVEY_ID, publishedSurveyId)
@@ -301,6 +368,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return new JooqFactory(connection, codeList);
 	}
 	
+	public int nextSystemId() {
+		JooqFactory jf = getMappingJooqFactory(null);
+		return jf.nextId();
+	}
+
 	protected static TableField<OfcCodeListRecord, Integer> getSurveyIdField(
 			boolean work) {
 		TableField<OfcCodeListRecord, Integer> surveyIdField = work ? 
@@ -409,6 +481,51 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			addLabelValues(q, item);
 			addDescriptionValues(q, item);
 		}
+		
+		public Insert<OfcCodeListRecord> createInsertStatement() {
+			TableField<?, ?>[] fieldsList = getFields();
+			Object[] valuesPlaceholders = new String[fieldsList.length];
+			Arrays.fill(valuesPlaceholders, "?");
+			return insertInto(OFC_CODE_LIST, fieldsList).values(valuesPlaceholders);
+		}
+		
+		protected TableField<?, ?>[] getFields() {
+			TableField<?,?>[] fields = {
+					OFC_CODE_LIST.ID,
+					OFC_CODE_LIST.SURVEY_ID,
+					OFC_CODE_LIST.SURVEY_WORK_ID,
+					OFC_CODE_LIST.CODE_LIST_ID,
+					OFC_CODE_LIST.ITEM_ID,
+					OFC_CODE_LIST.PARENT_ID,
+					OFC_CODE_LIST.SORT_ORDER,
+					OFC_CODE_LIST.CODE,
+					OFC_CODE_LIST.QUALIFIABLE,
+					OFC_CODE_LIST.SINCE_VERSION_ID,
+					OFC_CODE_LIST.DEPRECATED_VERSION_ID
+			};
+			fields = ArrayUtils.addAll(fields, LABEL_FIELDS);
+			fields = ArrayUtils.addAll(fields, DESCRIPTION_FIELDS);
+			return fields;
+		}
+		
+		protected Object[] extractValues(PersistedCodeListItem item) {
+			CodeList list = item.getCodeList();
+			CollectSurvey survey = (CollectSurvey) item.getSurvey();
+			Integer surveyId = survey.getId();
+			boolean surveyWork = survey.isWork();
+			ModelVersion sinceVersion = item.getSinceVersion();
+			Integer sinceVersionId = sinceVersion == null ? null: sinceVersion.getId();
+			ModelVersion deprecatedVersion = item.getDeprecatedVersion();
+			Integer deprecatedVersionId = deprecatedVersion == null ? null: deprecatedVersion.getId();
+			Object[] values = {item.getSystemId(), surveyWork ? null: surveyId, surveyWork ? surveyId: null, 
+					list.getId(), item.getId(), item.getParentId(), item.getSortOrder(), item.getCode(), 
+					item.isQualifiable(), sinceVersionId, deprecatedVersionId};
+			Object[] labelValues = getLabelValues(item);
+			values = ArrayUtils.addAll(values, labelValues);
+			Object[] descriptionValues = getDescriptionValues(item);
+			values = ArrayUtils.addAll(values, descriptionValues);
+			return values;
+		}
 
 		private Integer nextSortOrder(PersistedCodeListItem item) {
 			SelectQuery select = selectQuery();
@@ -421,11 +538,21 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 
 		protected void addLabelValues(StoreQuery<?> q, PersistedCodeListItem item) {
-			Survey survey = item.getSurvey();
-			List<String> languages = survey.getLanguages();
+			String[] values = getLabelValues(item);
 			for (int i = 0; i < LABEL_FIELDS.length; i++) {
 				@SuppressWarnings("unchecked")
 				TableField<?, String> field = LABEL_FIELDS[i];
+				String label = values[i];
+				q.addValue(field, label);
+			}
+		}
+		
+		protected String[] getLabelValues(PersistedCodeListItem item) {
+			int size = LABEL_FIELDS.length;
+			String[] result = new String[size];
+			Survey survey = item.getSurvey();
+			List<String> languages = survey.getLanguages();
+			for (int i = 0; i < size; i++) {
 				String label;
 				if ( i < languages.size() ) {
 					String lang = languages.get(i);
@@ -433,8 +560,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				} else {
 					label = null;
 				}
-				q.addValue(field, label);
+				result[i] = label;
 			}
+			return result;
 		}
 
 		protected String getLabel(PersistedCodeListItem item, String lang) {
@@ -449,11 +577,21 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 		
 		protected void addDescriptionValues(StoreQuery<?> q, PersistedCodeListItem item) {
-			Survey survey = item.getSurvey();
-			List<String> languages = survey.getLanguages();
+			String[] values = getDescriptionValues(item);
 			for (int i = 0; i < DESCRIPTION_FIELDS.length; i++) {
 				@SuppressWarnings("unchecked")
 				TableField<?, String> field = DESCRIPTION_FIELDS[i];
+				String description = values[i];
+				q.addValue(field, description);
+			}
+		}
+
+		protected String[] getDescriptionValues(PersistedCodeListItem item) {
+			int size = DESCRIPTION_FIELDS.length;
+			String[] result = new String[size];
+			Survey survey = item.getSurvey();
+			List<String> languages = survey.getLanguages();
+			for (int i = 0; i < size; i++) {
 				String description;
 				if ( i < languages.size() ) {
 					String lang = languages.get(i);
@@ -461,10 +599,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				} else {
 					description = null;
 				}
-				q.addValue(field, description);
+				result[i] = description;
 			}
+			return result;
 		}
-
+		
 		protected String getDescription(PersistedCodeListItem item, String lang) {
 			String description = item.getDescription(lang);
 			if ( description == null ) {
@@ -486,6 +625,15 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			return t.getSystemId();
 		}
 		
+		@Override
+		public int nextId() {
+			return super.nextId();
+		}
+		
+		@Override
+		public void restartSequence(Number value) {
+			super.restartSequence(value);
+		}
 	}
 
 }

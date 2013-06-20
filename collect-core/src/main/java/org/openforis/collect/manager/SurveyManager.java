@@ -131,14 +131,14 @@ public class SurveyManager {
 		File tempFile = null;
 		try {
 			tempFile = CollectIOUtils.copyToTempFile(new InputStreamReader(is));
-			return importInWorkSurvey(tempFile, name, validate);
+			return importWorkModel(tempFile, name, validate);
 		} finally {
 			tempFile.delete();
 		}
 	}
 
 	@Transactional
-	public CollectSurvey importInWorkSurvey(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
+	public CollectSurvey importWorkModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
 		try {
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
 			survey.setName(name);
@@ -154,7 +154,7 @@ public class SurveyManager {
 	}
 
 	@Transactional
-	public CollectSurvey importInPublishedWorkSurvey(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
+	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
 		CollectSurvey surveyWork = duplicatePublishedSurveyForEdit(uri);
 		updateSurveyWork(surveyFile, surveyWork);
 		return surveyWork;
@@ -472,12 +472,19 @@ public class SurveyManager {
 		return survey;
 	}
 	
-	protected CollectSurvey dupilcateAsSurveyWork(CollectSurvey survey) {
+	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri) {
+		CollectSurvey survey = surveyDao.loadByUri(uri);
 //		CollectSurvey surveyWork = survey.clone();
 		CollectSurvey surveyWork = survey;
 		surveyWork.setId(null);
 		surveyWork.setPublished(true);
 		surveyWork.setWork(true);
+		try {
+			surveyWorkDao.insert(surveyWork);
+		} catch (SurveyImportException e) {
+			//it should never enter here, we are duplicating an already existing survey
+			throw new RuntimeException(e);
+		}
 		return surveyWork;
 	}
 	
@@ -497,21 +504,13 @@ public class SurveyManager {
 		if ( existingSurveyWork != null ) {
 			throw new IllegalArgumentException("Survey work already existing");
 		}
-		CollectSurvey publishedSurvey = (CollectSurvey) surveyDao.loadByUri(uri);
-		CollectSurvey surveyWork = dupilcateAsSurveyWork(publishedSurvey);
-		try {
-			surveyWorkDao.insert(surveyWork);
-		} catch (SurveyImportException e) {
-			//it should never enter here, we are duplicating an already existing survey
-			throw new RuntimeException(e);
-		}
-		if ( publishedSurvey != null ) {
-			int surveyWorkId = surveyWork.getId();
-			int publishedSurveyId = publishedSurvey.getId();
-			samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
-			speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
-			codeListManager.duplicateCodeListsForWork(publishedSurvey, surveyWork);
-		}
+		CollectSurvey surveyWork = duplicatePublishedSurveyAsWork(uri);
+		CollectSurvey publishedSurvey = getByUri(uri);
+		int surveyWorkId = surveyWork.getId();
+		int publishedSurveyId = publishedSurvey.getId();
+		samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
+		speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
+		codeListManager.duplicateCodeListsForWork(publishedSurvey, surveyWork);
 		return surveyWork;
 	}
 	
@@ -519,21 +518,20 @@ public class SurveyManager {
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		Integer surveyWorkId = survey.getId();
 		CollectSurvey publishedSurvey = get(survey.getName());
+		survey.setWork(false);
+		survey.setPublished(true);
 		if ( publishedSurvey == null ) {
-			survey.setWork(false);
-			survey.setPublished(true);
-			importModel(survey);
-			initSurveysCache();
+			surveyDao.importModel(survey);
 		} else {
-			updateModel(survey);
+			removeFromCache(publishedSurvey);
+			surveyDao.updateModel(survey);
 		}
-		if ( surveyWorkId != null ) {
-			int publishedSurveyId = survey.getId();
-			samplingDesignManager.publishSamplingDesign(surveyWorkId, publishedSurveyId);
-			speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
-			codeListManager.publishCodeLists(publishedSurveyId, surveyWorkId);
-			surveyWorkDao.delete(surveyWorkId);
-		}
+		addToCache(survey);
+		int publishedSurveyId = survey.getId();
+		samplingDesignManager.publishSamplingDesign(surveyWorkId, publishedSurveyId);
+		speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
+		codeListManager.publishedCodeLists(publishedSurveyId, surveyWorkId);
+		surveyWorkDao.delete(surveyWorkId);
 	}
 	
 	@Transactional

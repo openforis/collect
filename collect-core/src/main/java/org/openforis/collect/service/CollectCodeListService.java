@@ -59,6 +59,12 @@ public class CollectCodeListService implements CodeListService {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public <T extends CodeListItem> void save(List<T> items) {
+		codeListManager.save((List<PersistedCodeListItem>) items);
+	}
+	
+	@Override
 	public <T extends CodeListItem> void delete(T item) {
 		if ( item instanceof PersistedCodeListItem ) {
 			codeListManager.delete((PersistedCodeListItem) item);

@@ -198,12 +198,12 @@ public class SurveyImportVM extends SurveyBaseVM {
 		try {
 			if ( updatingExistingSurvey ) {
 				if ( updatingPublishedSurvey ) {
-					surveyManager.importInPublishedWorkSurvey(uploadedSurveyUri, uploadedFile, validate);
+					surveyManager.importInPublishedWorkModel(uploadedSurveyUri, uploadedFile, validate);
 				} else {
 					surveyManager.updateModel(uploadedFile, validate);
 				}
 			} else {
-				surveyManager.importInWorkSurvey(uploadedFile, surveyName, validate);
+				surveyManager.importWorkModel(uploadedFile, surveyName, validate);
 			}
 			closeImportPopUp(true);
 			Object[] args = new String[]{surveyName};

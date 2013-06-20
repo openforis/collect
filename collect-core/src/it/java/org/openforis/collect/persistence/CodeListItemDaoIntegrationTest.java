@@ -126,5 +126,71 @@ public class CodeListItemDaoIntegrationTest extends CollectIntegrationTest {
 		}
 		return codes;
 	}
-	
+	/*
+	@Test
+	public void importHugeCodeList() {
+		CodeList list = survey.createCodeList();
+		list.setName("huge_list");
+		int size = 100000;
+		List<PersistedCodeListItem> items = generateItems(list, size);
+		{
+			System.out.println("----- Batch import -----");
+			System.out.println("Start importing " + size + " records");
+			long start = System.currentTimeMillis();
+			codeListItemDao.insert(items);
+			long end = System.currentTimeMillis();
+			System.out.println("End. Batch insert took: " + (end - start) + " millis.");
+		}
+		codeListItemDao.deleteByCodeList(list);
+		{
+			System.out.println("----- Simple Batch import -----");
+			System.out.println("Start importing " + size + " records");
+			long start = System.currentTimeMillis();
+			codeListItemDao.simpleBatchInsert(items);
+			long end = System.currentTimeMillis();
+			System.out.println("End. Batch insert took: " + (end - start) + " millis.");
+		}
+		codeListItemDao.deleteByCodeList(list);
+		{
+			System.out.println("----- Sequencial insert import -----");
+			System.out.println("Start importing " + size + " records");
+			long start = System.currentTimeMillis();
+			for (PersistedCodeListItem item : items) {
+				codeListItemDao.insert(item);
+			}
+			long end = System.currentTimeMillis();
+			System.out.println("End. Sequencial insert took: " + (end - start) + " millis.");
+		}
+	}
+
+	private List<PersistedCodeListItem> generateItems(CodeList codeList, int size) {
+		int lastId = 10000;
+		Integer parentId = null;
+		return generateItems(codeList, size, lastId, parentId);
+	}
+
+	protected List<PersistedCodeListItem> generateItems(CodeList codeList,
+			int size, int lastId, Integer parentId) {
+		List<PersistedCodeListItem> result = new ArrayList<PersistedCodeListItem>(size);
+		int sortOrder = 1;
+		for(int i=0; i < size; i++) {
+			PersistedCodeListItem item = new PersistedCodeListItem(codeList);
+			item.setSystemId(++lastId);
+			item.setParentId(parentId);
+			item.setCode(String.valueOf(i));
+			item.setLabel("en", "Code " + i);
+			item.setSortOrder(sortOrder ++);
+			result.add(item);
+			double childrenSize = Math.min(size - i - 1, 10);
+			int intChildrenSize = new Double(childrenSize).intValue();
+			if ( childrenSize > 0 ) {
+				List<PersistedCodeListItem> children = generateItems(codeList, intChildrenSize, lastId, item.getSystemId());
+				result.addAll(children);
+				lastId += intChildrenSize;
+				i+=intChildrenSize;
+			}
+		}
+		return result;
+	}
+	*/
 }

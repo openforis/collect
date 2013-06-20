@@ -1,8 +1,6 @@
 package org.openforis.collect;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 import org.junit.runner.RunWith;
 import org.openforis.collect.manager.SurveyManager;
@@ -35,15 +33,14 @@ public abstract class CollectIntegrationTest {
 	@Autowired
 	protected SurveyManager surveyManager;
 	
-	protected CollectSurvey loadSurvey() throws IdmlParseException, IOException  {
-		URL idm = ClassLoader.getSystemResource("test.idm.xml");
-		InputStream is = idm.openStream();
+	protected CollectSurvey loadSurvey() throws IdmlParseException {
+		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
 		CollectSurvey survey = surveyDao.unmarshalIdml(is);
 		survey.setName("archenland1");
 		return survey;
 	}
 
-	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException, IOException  {
+	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException {
 		CollectSurvey survey = (CollectSurvey) loadSurvey();
 		surveyManager.importModel(survey);
 		return survey;

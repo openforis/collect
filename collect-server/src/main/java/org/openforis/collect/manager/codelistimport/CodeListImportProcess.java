@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +23,6 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
-import org.openforis.idm.metamodel.PersistedCodeListItem;
 
 /**
  * 
@@ -114,19 +113,20 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		addLevelsToCodeList();
 		
 		codeListManager.deleteAllItems(codeList);
-		Collection<CodeListItem> rootItems = codeToRootItem.values();
-		saveItemsAndDescendants(rootItems, null);
+		List<CodeListItem> rootItems = new ArrayList<CodeListItem>(codeToRootItem.values());
+		codeListManager.saveItemsAndDescendants(rootItems);
+		//saveItemsAndDescendants(rootItems, null);
 	}
 
-	protected void saveItemsAndDescendants(Collection<CodeListItem> items,
-			Integer parentItemId) {
-		for (CodeListItem item : items) {
-			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
-			persistedChildItem.setParentId(parentItemId);
-			codeListManager.save(persistedChildItem);
-			saveItemsAndDescendants(item.getChildItems(), persistedChildItem.getSystemId());
-		}
-	}
+//	protected void saveItemsAndDescendants(Collection<CodeListItem> items,
+//			Integer parentItemId) {
+//		for (CodeListItem item : items) {
+//			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
+//			persistedChildItem.setParentId(parentItemId);
+//			codeListManager.save(persistedChildItem);
+//			saveItemsAndDescendants(item.getChildItems(), persistedChildItem.getSystemId());
+//		}
+//	}
 
 	protected void parseCSVLines(File file) {
 		InputStreamReader isReader = null;

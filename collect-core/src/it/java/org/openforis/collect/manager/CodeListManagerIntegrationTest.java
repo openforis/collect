@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.manager;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.InputStream;
 import java.util.List;
@@ -54,6 +54,5 @@ public class CodeListManagerIntegrationTest extends CollectIntegrationTest {
 		}
 		
 	}
-	
 	
 }

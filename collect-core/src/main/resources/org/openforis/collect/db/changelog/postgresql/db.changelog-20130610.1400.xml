@@ -54,7 +54,35 @@
 			<column name="description2" type="VARCHAR(255)" />
 			<column name="description3" type="VARCHAR(255)" />
 	    </createTable>
-	
+		<!-- INDEXES -->
+		<createIndex
+            indexName="ofc_code_list_survey_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_survey_work_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_work_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_id" type="INTEGER"/>
+	        <column name="code_list_id" type="INTEGER"/>
+	        <column name="parent_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_work_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_work_id" type="INTEGER"/>
+	        <column name="code_list_id" type="INTEGER"/>
+	        <column name="parent_id" type="INTEGER"/>
+    	</createIndex>
 	</changeSet>
 	
 </databaseChangeLog>
