@@ -15,7 +15,7 @@
 	    
 	    <createSequence sequenceName="ofc_code_list_id_seq" />
 	  
-	    <createTable tableName="ofc_code_list">
+	    <createTable schemaName="collect" tableName="ofc_code_list">
 			<column name="id" type="INTEGER">
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_code_list_pkey" />
@@ -57,18 +57,28 @@
 		<!-- INDEXES -->
 		<createIndex
             indexName="ofc_code_list_survey_idx"
+            schemaName="collect"
             tableName="ofc_code_list"
             unique="false">
 	        <column name="survey_id" type="INTEGER"/>
     	</createIndex>
 		<createIndex
             indexName="ofc_code_list_survey_work_idx"
+            schemaName="collect"
             tableName="ofc_code_list"
             unique="false">
 	        <column name="survey_work_id" type="INTEGER"/>
     	</createIndex>
 		<createIndex
-            indexName="ofc_code_list_idx"
+            indexName="ofc_code_list_parent_id_idx"
+            schemaName="collect"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="parent_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_child_items_idx"
+            schemaName="collect"
             tableName="ofc_code_list"
             unique="false">
 	        <column name="survey_id" type="INTEGER"/>
@@ -76,7 +86,8 @@
 	        <column name="parent_id" type="INTEGER"/>
     	</createIndex>
 		<createIndex
-            indexName="ofc_code_list_work_idx"
+            indexName="ofc_code_list_work_child_items__idx"
+            schemaName="collect"
             tableName="ofc_code_list"
             unique="false">
 	        <column name="survey_work_id" type="INTEGER"/>
