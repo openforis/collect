@@ -38,5 +38,26 @@ public class ProcessStatusProxy implements Proxy {
 	public String getErrorMessage() {
 		return status.getErrorMessage();
 	}
+
+	@ExternalizedProperty
+	public boolean isInit() {
+		return status.isInit();
+	}
+
+	@ExternalizedProperty
+	public boolean isRunning() {
+		return status.isRunning();
+	}
+
+	@ExternalizedProperty
+	public boolean isComplete() {
+		return status.isComplete();
+	}
+
+	@ExternalizedProperty
+	public boolean isError() {
+		return status.isError();
+	}
+	
 	
 }

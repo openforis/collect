@@ -13,7 +13,7 @@ public abstract class AbstractProcess<V, S extends ProcessStatus> implements org
 
 	protected S status;
 	
-	protected void init() {
+	public void init() {
 		initStatus();
 	}
 

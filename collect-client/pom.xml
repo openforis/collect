@@ -83,6 +83,9 @@
                                 <includeClass>org.openforis.idm.model.species.Taxon$TaxonRank</includeClass>
                                 <includeClass>org.openforis.idm.metamodel.validation.ValidationResultFlag</includeClass>
                                 <includeClass>org.openforis.collect.Proxy</includeClass>
+                                <includeClass>org.openforis.collect.manager.dataexport.DataExportStatus$Format</includeClass>
+                                <includeClass>org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
+                                <includeClass>org.openforis.collect.manager.process.ProcessStatus</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.manager.referencedataimport.ParsingError$ErrorType</includeClass>
@@ -102,8 +105,6 @@
                                 <includeClass>org.openforis.collect.remoting.service.FileWrapper</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.codelistimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataprocessing.DataProcessingState</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataexport.DataExportState</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataexport.DataExportState$Format</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportConflictProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportStateProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportState$MainStep</includeClass>

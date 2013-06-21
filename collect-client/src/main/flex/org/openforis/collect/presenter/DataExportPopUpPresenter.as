@@ -9,8 +9,8 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.controls.Alert;
 	import mx.controls.Tree;
-	import mx.events.CloseEvent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -18,15 +18,14 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
-	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
+	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.NodeItem;
-	import org.openforis.collect.remoting.service.dataexport.DataExportState;
 	import org.openforis.collect.ui.component.DataExportPopUp;
-	import org.openforis.collect.ui.component.PopUp;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	
@@ -47,7 +46,7 @@ package org.openforis.collect.presenter {
 		private var _getStateResponder:IResponder;
 		private var _progressTimer:Timer;
 		private var _type:String;
-		private var _state:DataExportState;
+		private var _state:DataExportStatusProxy;
 		private var _firstOpen:Boolean = true;
 		
 		public function DataExportPopUpPresenter(view:DataExportPopUp) {
@@ -71,7 +70,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function closeHandler(event:Event = null):void {
-			if ( _state != null && _state.running ) {
+			if ( _state != null && _state.step == ProcessStatus$Step.RUN ) {
 				AlertUtil.showMessage("export.cannotClosePopUp");
 			} else {
 				PopUpManager.removePopUp(_view);
@@ -145,7 +144,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function exportResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataExportState;
+			_state = event.result as DataExportStatusProxy;
 			updateView();
 		}
 		
@@ -177,34 +176,36 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataExportState;
+			_state = event.result as DataExportStatusProxy;
 			updateView();
 		}
 		
 		protected function updateView():void {
 			if(_state != null) {
-				if ( _state.running && _state.count <= _state.total ) {
+				var processed:int = _state.processed;
+				var step:ProcessStatus$Step = _state.step;
+				if ( step == ProcessStatus$Step.RUN && processed <= _state.total ) {
 					_view.currentState = DataExportPopUp.STATE_EXPORTING;
-					DataExportPopUp(_view).progressBar.setProgress(_state.count, _state.total);
+					DataExportPopUp(_view).progressBar.setProgress(processed, _state.total);
 					var progressText:String;
 					if ( _state.total == 0 ) {
 						progressText = Message.get("export.processing");
 					} else {
-						progressText = Message.get("export.progressLabel", [_state.count, _state.total]);
+						progressText = Message.get("export.progressLabel", [processed, _state.total]);
 					}
 					DataExportPopUp(_view).progressLabel.text = progressText;
 					if ( _progressTimer == null ) {
 						startProgressTimer();
 					}
-				} else if ( !_firstOpen && _state.complete ) {
+				} else if ( !_firstOpen && step == ProcessStatus$Step.COMPLETE ) {
 					_view.currentState = DataExportPopUp.STATE_COMPLETE;
 					stopProgressTimer();
 				} else {
 					if ( !_firstOpen ) {
-						if ( _state.error ) {
+						if ( step == ProcessStatus$Step.ERROR ) {
 							AlertUtil.showError("export.error");
 							resetView();
-						} else if ( _state.cancelled ) {
+						} else if ( step == ProcessStatus$Step.CANCEL ) {
 							AlertUtil.showError("export.cancelled");
 							resetView();
 						} else {

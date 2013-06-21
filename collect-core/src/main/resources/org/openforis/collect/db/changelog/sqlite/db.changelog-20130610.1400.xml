@@ -67,7 +67,13 @@
 	        <column name="survey_work_id" type="INTEGER"/>
     	</createIndex>
 		<createIndex
-            indexName="ofc_code_list_idx"
+            indexName="ofc_code_list_parent_id_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="parent_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_child_items_idx"
             tableName="ofc_code_list"
             unique="false">
 	        <column name="survey_id" type="INTEGER"/>
@@ -75,7 +81,7 @@
 	        <column name="parent_id" type="INTEGER"/>
     	</createIndex>
 		<createIndex
-            indexName="ofc_code_list_work_idx"
+            indexName="ofc_code_list_work_child_items__idx"
             tableName="ofc_code_list"
             unique="false">
 	        <column name="survey_work_id" type="INTEGER"/>

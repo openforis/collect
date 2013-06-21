@@ -1,6 +1,9 @@
 package org.openforis.collect.util {
 	
 	import org.granite.collections.BasicMap;
+	import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
+	import org.openforis.collect.manager.process.ProcessStatus;
+	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.metamodel.NodeDefinitionSummary;
 	import org.openforis.collect.metamodel.proxy.AttributeDefaultProxy;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -42,7 +45,6 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.AttributeAddChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.CodeProxy;
 	import org.openforis.collect.model.proxy.CoordinateProxy;
@@ -72,7 +74,6 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
-	import org.openforis.collect.remoting.service.dataexport.DataExportState;
 	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
@@ -113,7 +114,7 @@ package org.openforis.collect.util {
 				CodeProxy,
 				CoordinateAttributeDefinitionProxy,
 				CoordinateProxy,
-				DataExportState,
+				DataExportStatusProxy,
 				DataImportStateProxy,
 				DataImportSummaryProxy,
 				DataImportSummaryItemProxy,
@@ -136,6 +137,8 @@ package org.openforis.collect.util {
 				NodeLabelProxy,
 				NodeLabelProxy$Type,
 				NodeProxy,
+				ProcessStatus,
+				ProcessStatus$Step,
 				PrecisionProxy,
 				PromptProxy,
 				PromptProxy$Type,

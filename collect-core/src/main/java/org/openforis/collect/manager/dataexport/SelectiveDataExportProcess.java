@@ -1,4 +1,4 @@
-package org.openforis.collect.remoting.service.dataexport;
+package org.openforis.collect.manager.dataexport;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -25,12 +24,13 @@ import org.openforis.collect.csv.PivotExpressionColumnProvider;
 import org.openforis.collect.csv.SingleAttributeColumnProvider;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
+import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.RecordPersistenceException;
-import org.openforis.collect.remoting.service.dataexport.DataExportState.Format;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -42,14 +42,13 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  * @author S. Ricci
  *
  */
-public class SelectiveDataExportProcess implements Callable<Void>, DataExportProcess {
+public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 	
-	private static Log LOG = LogFactory.getLog(DataExportProcess.class);
+	private static Log LOG = LogFactory.getLog(SelectiveDataExportProcess.class);
 
 	private RecordManager recordManager;
 	private CodeListManager codeListManager;
 	private File exportDirectory;
-	private DataExportState state;
 	private CollectSurvey survey;
 	private String rootEntityName;
 	private int entityId;
@@ -66,46 +65,17 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 		this.rootEntityName = rootEntityName;
 		this.entityId = entityId;
 		this.step = step;
-		this.state = new DataExportState(Format.CSV);
 	}
 
 	@Override
-	public DataExportState getState() {
-		return state;
-	}
-
-	@Override
-	public void cancel() {
-		state.setCancelled(true);
-		state.setRunning(false);
+	protected void initStatus() {
+		this.status = new DataExportStatus(Format.CSV);		
 	}
 	
 	@Override
-	public boolean isRunning() {
-		return state.isRunning();
-	}
-	
-	@Override
-	public boolean isComplete() {
-		return state.isComplete();
-	}
-	
-	@Override
-	public Void call() throws Exception {
-		try {
-			state.reset();
-			state.setRunning(true);
-			exportData();
-			if ( ! state.isCancelled() ) {
-				state.setComplete(true);
-			}
-		} catch (Exception e) {
-			state.setError(true);
-			LOG.error("Error during data export", e);
-		} finally {
-			state.setRunning(false);
-		}
-		return null;
+	public void startProcessing() throws Exception {
+		super.startProcessing();
+		exportData();
 	}
 	
 	private File exportData() throws Exception {
@@ -144,14 +114,14 @@ public class SelectiveDataExportProcess implements Callable<Void>, DataExportPro
 		modelWriter.printColumnHeadings();
 		
 		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String) null);
-		state.setTotal(calculateTotal(summaries));
+		status.setTotal(calculateTotal(summaries));
 		int stepNumber = step.getStepNumber();
 		for (CollectRecord s : summaries) {
-			if ( ! state.isCancelled() ) {
+			if ( status.isRunning() ) {
 				if ( stepNumber == s.getStep().getStepNumber() ) {
 					CollectRecord record = recordManager.load(survey, s.getId(), stepNumber);
 					modelWriter.printData(record);
-					state.incrementCount();
+					status.incrementProcessed();
 				}
 			} else {
 				break;

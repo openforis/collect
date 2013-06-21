@@ -1,4 +1,4 @@
-package org.openforis.collect.remoting.service.dataexport;
+package org.openforis.collect.manager.dataexport;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -14,18 +13,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
+import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.xml.DataMarshaller;
-import org.openforis.collect.remoting.service.dataexport.DataExportState.Format;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class BackupProcess implements Callable<Void>, DataExportProcess {
+public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 
 	private static Log LOG = LogFactory.getLog(BackupProcess.class);
 
@@ -37,7 +38,6 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 	
 	private File directory;
 	private CollectSurvey survey;
-	private DataExportState state;
 	private int[] stepNumbers;
 	private String rootEntityName;
 	
@@ -51,37 +51,19 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
 		this.stepNumbers = stepNumbers;
-		this.state = new DataExportState(Format.XML);
 	}
 
 	@Override
-	public DataExportState getState() {
-		return state;
-	}
-
-	@Override
-	public void cancel() {
-		state.setCancelled(true);
-		state.setRunning(false);
+	protected void initStatus() {
+		this.status = new DataExportStatus(Format.XML);
 	}
 	
 	@Override
-	public boolean isRunning() {
-		return state.isRunning();
-	}
-	
-	@Override
-	public boolean isComplete() {
-		return state.isComplete();
-	}
-	
-	@Override
-	public Void call() throws Exception {
+	public void startProcessing() throws Exception {
+		super.startProcessing();
 		try {
-			state.reset();
 			List<CollectRecord> recordSummaries = loadAllSummaries();
 			if ( recordSummaries != null && stepNumbers != null ) {
-				state.setRunning(true);
 				String fileName = FILE_NAME;
 				File file = new File(directory, fileName);
 				if (file.exists()) {
@@ -93,34 +75,27 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 				backup(zipOutputStream, recordSummaries);
 				zipOutputStream.flush();
 				zipOutputStream.close();
-				if ( ! state.isCancelled() ) {
-					state.setComplete(true);
-				}
 			}
 		} catch (Exception e) {
-			state.setError(true);
+			status.error();
 			LOG.error("Error during data export", e);
-		} finally {
-			state.setRunning(false);
 		}
-		return null;
 	}
 
 	private void backup(ZipOutputStream zipOutputStream, List<CollectRecord> recordSummaries) {
 		int total = calculateTotal(recordSummaries);
-		state.setTotal(total);
+		status.setTotal(total);
 		includeIdml(zipOutputStream);
 		for (CollectRecord summary : recordSummaries) {
-			if ( ! state.isCancelled() ) {
+			if ( status.isRunning() ) {
 				int recordStepNumber = summary.getStep().getStepNumber();
 				for (int stepNum: stepNumbers) {
 					if ( stepNum <= recordStepNumber) {
-						backup(zipOutputStream, summary, stepNum);
-						state.incrementCount();
+						backup(zipOutputStream, summary, Step.valueOf(stepNum));
+						status.incrementProcessed();
 					}
 				}
 			} else {
-				state.setRunning(false);
 				break;
 			}
 		}
@@ -164,11 +139,11 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 		}
 	}
 	
-	private void backup(ZipOutputStream zipOutputStream, CollectRecord summary, int stepNumber) {
+	private void backup(ZipOutputStream zipOutputStream, CollectRecord summary, Step step) {
 		Integer id = summary.getId();
 		try {
-			CollectRecord record = recordManager.load(survey, id, stepNumber);
-			String entryFileName = buildEntryFileName(record, stepNumber);
+			CollectRecord record = recordManager.load(survey, id, step);
+			String entryFileName = buildEntryFileName(record, step.getStepNumber());
 			ZipEntry entry = new ZipEntry(entryFileName);
 			zipOutputStream.putNextEntry(entry);
 			OutputStreamWriter writer = new OutputStreamWriter(zipOutputStream);
@@ -187,5 +162,5 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 	private String buildEntryFileName(CollectRecord record, int stepNumber) {
 		return stepNumber + File.separator + record.getId() + ".xml";
 	}
-	
+
 }
