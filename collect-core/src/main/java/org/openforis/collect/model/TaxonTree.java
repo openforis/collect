@@ -33,6 +33,8 @@ public class TaxonTree {
 	Map<String, Node> codeToNode;
 	Map<Integer, Node> taxonIdToNode;
 	Set<String> vernacularLanguageCodes;
+	Integer lastTaxonId;
+	Integer lastTaxonVernacularNameId;
 
 	public TaxonTree() {
 		super();
@@ -255,6 +257,27 @@ public class TaxonTree {
 	
 	public Set<String> getVernacularLanguageCodes() {
 		return CollectionUtils.unmodifiableSet(vernacularLanguageCodes);
+	}
+	
+	public void assignSystemIds(int startFromTaxonId, int startFromVernacularNameId) {
+		lastTaxonId = startFromTaxonId;
+		lastTaxonVernacularNameId = startFromVernacularNameId;
+		depthFirstVisit(new NodeVisitor() {
+			public void visit(Node node) {
+				Taxon taxon = node.getTaxon();
+				taxon.setSystemId(lastTaxonId++);
+				Node parent = node.getParent();
+				if ( parent != null ) {
+					Taxon parentTaxon = parent.getTaxon();
+					taxon.setParentId(parentTaxon.getSystemId());
+				}
+				List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
+				for (TaxonVernacularName vernacularName : vernacularNames) {
+					vernacularName.setId(lastTaxonVernacularNameId++);
+					vernacularName.setTaxonSystemId(taxon.getSystemId());
+				}
+			}
+		});
 	}
 	
 	public static class Node {

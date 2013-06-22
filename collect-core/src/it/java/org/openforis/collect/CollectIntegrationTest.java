@@ -1,6 +1,9 @@
 package org.openforis.collect;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.junit.runner.RunWith;
 import org.openforis.collect.manager.SurveyManager;
@@ -51,4 +54,9 @@ public abstract class CollectIntegrationTest {
 		return createSurvey;
 	}
 	
+	protected File getSystemResourceFile(String fileName) throws URISyntaxException {
+		URL fileUrl = ClassLoader.getSystemResource(fileName);
+		File file = new File(fileUrl.toURI());
+		return file;
+	}
 }

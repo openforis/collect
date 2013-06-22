@@ -5,36 +5,36 @@ package org.openforis.collect.manager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.metamodel.TaxonSummaries;
+import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.openforis.idm.model.species.Taxon;
+import org.openforis.idm.model.species.TaxonVernacularName;
+import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  *
  */
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
-public class SurveyManagerIntegrationTest  {
+public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 
 	private CollectSurvey survey;
 
@@ -42,6 +42,8 @@ public class SurveyManagerIntegrationTest  {
 	private SurveyManager surveyManager;
 	@Autowired
 	private CodeListManager codeListManager;
+	@Autowired
+	private SpeciesManager speciesManager;
 	
 	@Before
 	public void init() throws SurveyImportException, SurveyValidationException {
@@ -107,6 +109,56 @@ public class SurveyManagerIntegrationTest  {
 		{
 			PersistedCodeListItem item = codeListManager.loadRootItem(list, "001", null);
 			assertNull(item);
+		}
+	}
+	
+	@Test
+	public void publishSurveyTaxonomyTest() throws SurveyImportException {
+		insertTestTaxonomy();
+		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
+		{
+			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyWorkByName(surveyWork.getId(), "tree");
+			assertNotNull(taxonomy);
+			TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomy.getId());
+			assertEquals(1, summaries.getTotalCount());
+			List<TaxonSummary> taxonSummaryList = summaries.getItems();
+			{
+				TaxonSummary taxonSummary = taxonSummaryList.get(0);
+				assertEquals("Albizia glaberrima", taxonSummary.getScientificName());
+				
+				List<String> vernacularLanguages = taxonSummary.getVernacularLanguages();
+				assertEquals(Arrays.asList("swh"), vernacularLanguages);
+				
+				List<String> vernacularNames = taxonSummary.getVernacularNames("swh");
+				assertEquals(Arrays.asList("Mgerenge", "Mchani"), vernacularNames);
+			}
+		}
+	}
+	
+	private void insertTestTaxonomy() {
+		CollectTaxonomy taxonomy = new CollectTaxonomy();
+		taxonomy.setName("tree");
+		taxonomy.setSurveyId(survey.getId());
+		speciesManager.save(taxonomy);
+		Taxon taxon = new Taxon();
+		taxon.setTaxonomyId(taxonomy.getId());
+		taxon.setCode("ALB/GLA");
+		taxon.setScientificName("Albizia glaberrima");
+		taxon.setTaxonRank(TaxonRank.GENUS);
+		speciesManager.save(taxon);
+		{
+			TaxonVernacularName vernacularName = new TaxonVernacularName();
+			vernacularName.setTaxonSystemId(taxon.getSystemId());
+			vernacularName.setVernacularName("Mgerenge");
+			vernacularName.setLanguageCode("swh");
+			speciesManager.save(vernacularName);
+		}
+		{
+			TaxonVernacularName vernacularName = new TaxonVernacularName();
+			vernacularName.setTaxonSystemId(taxon.getSystemId());
+			vernacularName.setVernacularName("Mchani");
+			vernacularName.setLanguageCode("swh");
+			speciesManager.save(vernacularName);
 		}
 	}
 }
