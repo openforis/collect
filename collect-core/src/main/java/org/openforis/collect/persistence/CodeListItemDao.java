@@ -94,13 +94,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	public void duplicateItems(int oldSurveyId, boolean oldSurveyWork, int newSurveyId, boolean newSurveyWork) {
 		JooqFactory jf = getMappingJooqFactory(null);
-		TableField<OfcCodeListRecord, Integer> oldSurveyIdField = getSurveyIdField(oldSurveyWork);
+		int minId = loadMinId(jf, oldSurveyId, oldSurveyWork);
 		int nextId = jf.nextId();
-		Integer minId = jf.select(Factory.min(OFC_CODE_LIST.ID))
-			.from(OFC_CODE_LIST)
-			.where(oldSurveyIdField.equal(oldSurveyId))
-			.fetchOne(0, Integer.class);
-		int idGap = nextId - (minId == null ? 0: minId);
+		int idGap = nextId - minId;
 		Integer selectSurveyIdValue = newSurveyWork ? null: newSurveyId;
 		Integer selectSurveyWorkIdValue = newSurveyWork ? newSurveyId: null;
 		Field<?>[] selectFields = {
@@ -118,14 +114,17 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			};
 		selectFields = ArrayUtils.addAll(selectFields, LABEL_FIELDS);
 		selectFields = ArrayUtils.addAll(selectFields, DESCRIPTION_FIELDS);
+		TableField<OfcCodeListRecord, Integer> oldSurveyIdField = getSurveyIdField(oldSurveyWork);
 		Select<?> select = jf.select(selectFields)
 			.from(OFC_CODE_LIST)
 			.where(oldSurveyIdField.equal(oldSurveyId))
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
-		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST).select(select);
+		TableField<?, ?>[] insertFields = jf.getFields();
+		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, insertFields).select(select);
 		insert.execute();
+		updateIdSequence(jf);
 	}
-	
+
 	@Override
 	public void update(PersistedCodeListItem item) {
 		JooqFactory jf = getMappingJooqFactory(item.getCodeList());
@@ -328,6 +327,27 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			List<PersistedCodeListItem> appliable = version.filterApplicableItems(list);
 			return appliable;
 		}
+	}
+	
+	protected int loadMinId(JooqFactory jf, int surveyId, boolean work) {
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(work);
+		Integer minId = jf.select(Factory.min(OFC_CODE_LIST.ID))
+				.from(OFC_CODE_LIST)
+				.where(surveyIdField.equal(surveyId))
+				.fetchOne(0, Integer.class);
+		return minId == null ? 0: minId.intValue();
+	}
+
+	private void updateIdSequence(JooqFactory jf) {
+		int maxId = loadMaxId(jf);
+		jf.restartSequence(maxId + 1);
+	}
+	
+	protected int loadMaxId(JooqFactory jf) {
+		Integer maxId = jf.select(Factory.max(OFC_CODE_LIST.ID))
+				.from(OFC_CODE_LIST)
+				.fetchOne(0, Integer.class);
+		return maxId == null ? 0: maxId.intValue();
 	}
 
 	protected static SelectQuery createSelectChildItemsQuery(JooqFactory jf, CodeList codeList, Integer parentItemId) {
