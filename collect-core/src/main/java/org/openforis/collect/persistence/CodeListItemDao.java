@@ -220,7 +220,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.execute();
 	}
 
-	public void moveItemsToPublishedSurvey(int publishedSurveyId, int surveyWorkId) {
+	public void moveItemsToPublishedSurvey(int surveyWorkId, int publishedSurveyId) {
 		JooqFactory jf = getMappingJooqFactory(null);
 		jf.update(OFC_CODE_LIST)
 			.set(OFC_CODE_LIST.SURVEY_ID, publishedSurveyId)
@@ -479,6 +479,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			Integer sortOrder = item.getSortOrder();
 			if ( sortOrder == null ) {
 				sortOrder = nextSortOrder(item);
+				item.setSortOrder(sortOrder);
 			}
 			q.addValue(OFC_CODE_LIST.SORT_ORDER, sortOrder);
 			q.addValue(OFC_CODE_LIST.CODE, item.getCode());

@@ -355,11 +355,13 @@ public class CodeListManager {
 		}
 	}
 	
-	public void publishedCodeLists(int publishedSurveyId, int surveyWorkId) {
+	@Transactional
+	public void publishCodeLists(int surveyWorkId, int publishedSurveyId) {
 		codeListItemDao.deleteBySurvey(publishedSurveyId);
-		codeListItemDao.moveItemsToPublishedSurvey(publishedSurveyId, surveyWorkId);
+		codeListItemDao.moveItemsToPublishedSurvey(surveyWorkId, publishedSurveyId);
 	}
 	
+	@Transactional
 	public void duplicateCodeListsForWork(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
 		codeListItemDao.duplicateItems(fromSurvey.getId(), fromSurvey.isWork(), toSurvey.getId(), toSurvey.isWork());
 	}

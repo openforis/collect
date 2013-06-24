@@ -530,7 +530,7 @@ public class SurveyManager {
 		int publishedSurveyId = survey.getId();
 		samplingDesignManager.publishSamplingDesign(surveyWorkId, publishedSurveyId);
 		speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
-		codeListManager.publishedCodeLists(publishedSurveyId, surveyWorkId);
+		codeListManager.publishCodeLists(surveyWorkId, publishedSurveyId);
 		surveyWorkDao.delete(surveyWorkId);
 	}
 	

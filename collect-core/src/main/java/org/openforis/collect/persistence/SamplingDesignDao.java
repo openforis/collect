@@ -1,7 +1,6 @@
 package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SAMPLING_DESIGN_ID_SEQ;
-import static org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE_LIST;
 import static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OFC_SAMPLING_DESIGN;
 
 import java.sql.Connection;
@@ -23,7 +22,6 @@ import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.SamplingDesignItem;
-import org.openforis.collect.persistence.CodeListItemDao.JooqFactory;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord;
