@@ -121,8 +121,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
 		TableField<?, ?>[] insertFields = jf.getFields();
 		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, insertFields).select(select);
-		insert.execute();
-		updateIdSequence(jf);
+		int insertedCount = insert.execute();
+		nextId = nextId + insertedCount;
+		jf.restartSequence(OFC_CODE_LIST_ID_SEQ, nextId);
 	}
 
 	@Override
@@ -336,18 +337,6 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				.where(surveyIdField.equal(surveyId))
 				.fetchOne(0, Integer.class);
 		return minId == null ? 0: minId.intValue();
-	}
-
-	private void updateIdSequence(JooqFactory jf) {
-		int maxId = loadMaxId(jf);
-		jf.restartSequence(maxId + 1);
-	}
-	
-	protected int loadMaxId(JooqFactory jf) {
-		Integer maxId = jf.select(Factory.max(OFC_CODE_LIST.ID))
-				.from(OFC_CODE_LIST)
-				.fetchOne(0, Integer.class);
-		return maxId == null ? 0: maxId.intValue();
 	}
 
 	protected static SelectQuery createSelectChildItemsQuery(JooqFactory jf, CodeList codeList, Integer parentItemId) {
