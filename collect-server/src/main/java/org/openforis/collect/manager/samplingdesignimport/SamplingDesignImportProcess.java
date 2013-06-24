@@ -14,8 +14,8 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 
@@ -150,7 +150,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	protected void processLines() {
 		for (SamplingDesignLine line : lines) {
 			long lineNumber = line.getLineNumber();
-			if ( ! status.isRowProcessed(lineNumber) && ! status.isRowInError(lineNumber) ) {
+			if ( status.isRunning() && ! status.isRowProcessed(lineNumber) && ! status.isRowInError(lineNumber) ) {
 				try {
 					boolean processed = processLine(line);
 					if (processed ) {
@@ -222,20 +222,20 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	}
 
 	protected void persistSamplingDesign() {
-		if ( overwriteAll ) {
-			Integer surveyId = survey.getId();
-			if ( work ) {
-				samplingDesignManager.deleteBySurveyWork(surveyId);
-			} else {
-				samplingDesignManager.deleteBySurvey(surveyId);
-			}
-		}
-		for (SamplingDesignLine line : lines) {
-			persistLine(line);
-		}
+		List<SamplingDesignItem> items = createItemsFromLines();
+		samplingDesignManager.insert(survey, items, overwriteAll);
 	}
 
-	protected void persistLine(SamplingDesignLine line) {
+	protected List<SamplingDesignItem> createItemsFromLines() {
+		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
+		for (SamplingDesignLine line : lines) {
+			SamplingDesignItem item = createItemFromLine(line);
+			items.add(item);
+		}
+		return items;
+	}
+	
+	protected SamplingDesignItem createItemFromLine(SamplingDesignLine line) {
 		SamplingDesignItem item = new SamplingDesignItem();
 		Integer surveyId = survey.getId();
 		if ( work ) {
@@ -247,7 +247,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		item.setY(Double.parseDouble(line.getY()));
 		item.setSrsId(line.getSrsId());
 		item.setLevelCodes(line.getLevelCodes());
-		samplingDesignManager.save(item);
+		return item;
 	}
 
 	private void close(Closeable closeable) {

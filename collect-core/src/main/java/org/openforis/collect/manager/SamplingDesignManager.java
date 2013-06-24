@@ -6,6 +6,7 @@ package org.openforis.collect.manager;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.persistence.SamplingDesignDao;
@@ -89,24 +90,26 @@ public class SamplingDesignManager {
 	}
 	
 	@Transactional
-	public void publishSamplingDesign(Integer surveyWorkId, int publishedSurveyId) {
-		List<SamplingDesignItem> items = samplingDesignDao.loadItemsBySurveyWork(surveyWorkId, 0, Integer.MAX_VALUE);
+	public void publishSamplingDesign(int surveyWorkId, int publishedSurveyId) {
 		samplingDesignDao.deleteBySurvey(publishedSurveyId);
-		for (SamplingDesignItem item : items) {
-			item.setSurveyWorkId(null);
-			item.setSurveyId(publishedSurveyId);
-			samplingDesignDao.update(item);
-		}
+		samplingDesignDao.moveItemsToPublishedSurvey(surveyWorkId, publishedSurveyId);
 	}
 	
 	@Transactional
-	public void duplicateSamplingDesignForWork(int publishedSurveyId, Integer surveyWorkId) {
-		List<SamplingDesignItem> items = samplingDesignDao.loadItemsBySurvey(publishedSurveyId, 0, Integer.MAX_VALUE);
-		for (SamplingDesignItem item : items) {
-			item.setId(null);
-			item.setSurveyId(null);
-			item.setSurveyWorkId(surveyWorkId);
-			samplingDesignDao.insert(item);
+	public void duplicateSamplingDesignForWork(int publishedSurveyId, int surveyWorkId) {
+		samplingDesignDao.duplicateItems(publishedSurveyId, false, surveyWorkId, true);
+	}
+
+	@Transactional
+	public void insert(CollectSurvey survey, List<SamplingDesignItem> items, boolean overwriteAll) {
+		if ( overwriteAll ) {
+			Integer surveyId = survey.getId();
+			if ( survey.isWork() ) {
+				deleteBySurveyWork(surveyId);
+			} else {
+				deleteBySurvey(surveyId);
+			}
 		}
+		samplingDesignDao.insert(items);
 	}
 }

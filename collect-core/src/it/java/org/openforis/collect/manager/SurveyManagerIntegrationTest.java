@@ -21,6 +21,8 @@ import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.collect.model.SamplingDesignItem;
+import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -44,6 +46,8 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	private CodeListManager codeListManager;
 	@Autowired
 	private SpeciesManager speciesManager;
+	@Autowired
+	private SamplingDesignManager samplingDesignManager;
 	
 	@Before
 	public void init() throws SurveyImportException, SurveyValidationException {
@@ -135,6 +139,66 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 		}
 	}
 	
+	@Test
+	public void duplicateSurveySamplingDesignForEditTest() {
+		insertTestSamplingDesign();
+		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
+		SamplingDesignSummaries summaries = samplingDesignManager.loadBySurveyWork(surveyWork.getId());
+		List<SamplingDesignItem> records = summaries.getRecords();
+		assertEquals(3, records.size());
+		{
+			SamplingDesignItem item = records.get(0);
+			assertEquals(Arrays.asList("7_81"), item.getLevelCodes());
+			assertEquals("EPSG:21035", item.getSrsId());
+			assertEquals(Double.valueOf(792200d), item.getX());
+			assertEquals(Double.valueOf(9484420d), item.getY());
+		}
+		{
+			SamplingDesignItem item = records.get(1);
+			assertEquals(Arrays.asList("7_81", "2"), item.getLevelCodes());
+			assertEquals("EPSG:21035", item.getSrsId());
+			assertEquals(Double.valueOf(792200d), item.getX());
+			assertEquals(Double.valueOf(9484420d), item.getY());
+		}
+		{
+			SamplingDesignItem item = records.get(2);
+			assertEquals(Arrays.asList("7_81", "3"), item.getLevelCodes());
+			assertEquals("EPSG:21035", item.getSrsId());
+			assertEquals(Double.valueOf(792200d), item.getX());
+			assertEquals(Double.valueOf(9484670d), item.getY());
+		}
+	}
+	
+	private void insertTestSamplingDesign() {
+		{
+			SamplingDesignItem item = new SamplingDesignItem();
+			item.setSurveyId(survey.getId());
+			item.setLevelCodes(Arrays.asList("7_81"));
+			item.setSrsId("EPSG:21035");
+			item.setX(792200d);
+			item.setY(9484420d);
+			samplingDesignManager.save(item);
+		}
+		{
+			SamplingDesignItem item = new SamplingDesignItem();
+			item.setSurveyId(survey.getId());
+			item.setLevelCodes(Arrays.asList("7_81", "2"));
+			item.setSrsId("EPSG:21035");
+			item.setX(792200d);
+			item.setY(9484420d);
+			samplingDesignManager.save(item);
+		}
+		{
+			SamplingDesignItem item = new SamplingDesignItem();
+			item.setSurveyId(survey.getId());
+			item.setLevelCodes(Arrays.asList("7_81", "3"));
+			item.setSrsId("EPSG:21035");
+			item.setX(792200d);
+			item.setY(9484670d);
+			samplingDesignManager.save(item);
+		}
+	}
+
 	private void insertTestTaxonomy() {
 		CollectTaxonomy taxonomy = new CollectTaxonomy();
 		taxonomy.setName("tree");
