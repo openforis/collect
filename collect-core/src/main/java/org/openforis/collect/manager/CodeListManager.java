@@ -456,4 +456,13 @@ public class CodeListManager {
 		this.provider = externalCodeListProvider;
 	}
 
+	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
+		this.codeListItemDao = codeListItemDao;
+	}
+	
+	public void setPersisterContext(
+			CollectCodeListPersisterContext persisterContext) {
+		this.persisterContext = persisterContext;
+	}
+	
 }
