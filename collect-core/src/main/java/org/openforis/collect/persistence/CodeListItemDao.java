@@ -43,6 +43,26 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	private static final TableField[] LABEL_FIELDS = {OFC_CODE_LIST.LABEL1, OFC_CODE_LIST.LABEL2, OFC_CODE_LIST.LABEL3}; 
 	@SuppressWarnings("rawtypes")
 	private static final TableField[] DESCRIPTION_FIELDS = {OFC_CODE_LIST.DESCRIPTION1, OFC_CODE_LIST.DESCRIPTION2, OFC_CODE_LIST.DESCRIPTION3}; 
+	@SuppressWarnings("rawtypes")
+	private static final TableField[] FIELDS = {
+			OFC_CODE_LIST.ID,
+			OFC_CODE_LIST.SURVEY_ID,
+			OFC_CODE_LIST.SURVEY_WORK_ID,
+			OFC_CODE_LIST.CODE_LIST_ID,
+			OFC_CODE_LIST.ITEM_ID,
+			OFC_CODE_LIST.PARENT_ID,
+			OFC_CODE_LIST.SORT_ORDER,
+			OFC_CODE_LIST.CODE,
+			OFC_CODE_LIST.QUALIFIABLE,
+			OFC_CODE_LIST.SINCE_VERSION_ID,
+			OFC_CODE_LIST.DEPRECATED_VERSION_ID,
+			OFC_CODE_LIST.LABEL1, 
+			OFC_CODE_LIST.LABEL2, 
+			OFC_CODE_LIST.LABEL3,
+			OFC_CODE_LIST.DESCRIPTION1, 
+			OFC_CODE_LIST.DESCRIPTION2, 
+			OFC_CODE_LIST.DESCRIPTION3
+	};
 	
 	public CodeListItemDao() {
 		super(CodeListItemDao.JooqFactory.class);
@@ -119,8 +139,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.from(OFC_CODE_LIST)
 			.where(oldSurveyIdField.equal(oldSurveyId))
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
-		TableField<?, ?>[] insertFields = jf.getFields();
-		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, insertFields).select(select);
+		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, FIELDS).select(select);
 		int insertedCount = insert.execute();
 		nextId = nextId + insertedCount;
 		jf.restartSequence(OFC_CODE_LIST_ID_SEQ, nextId);
@@ -493,29 +512,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 		
 		public Insert<OfcCodeListRecord> createInsertStatement() {
-			TableField<?, ?>[] fieldsList = getFields();
-			Object[] valuesPlaceholders = new String[fieldsList.length];
+			Object[] valuesPlaceholders = new String[FIELDS.length];
 			Arrays.fill(valuesPlaceholders, "?");
-			return insertInto(OFC_CODE_LIST, fieldsList).values(valuesPlaceholders);
-		}
-		
-		protected TableField<?, ?>[] getFields() {
-			TableField<?,?>[] fields = {
-					OFC_CODE_LIST.ID,
-					OFC_CODE_LIST.SURVEY_ID,
-					OFC_CODE_LIST.SURVEY_WORK_ID,
-					OFC_CODE_LIST.CODE_LIST_ID,
-					OFC_CODE_LIST.ITEM_ID,
-					OFC_CODE_LIST.PARENT_ID,
-					OFC_CODE_LIST.SORT_ORDER,
-					OFC_CODE_LIST.CODE,
-					OFC_CODE_LIST.QUALIFIABLE,
-					OFC_CODE_LIST.SINCE_VERSION_ID,
-					OFC_CODE_LIST.DEPRECATED_VERSION_ID
-			};
-			fields = ArrayUtils.addAll(fields, LABEL_FIELDS);
-			fields = ArrayUtils.addAll(fields, DESCRIPTION_FIELDS);
-			return fields;
+			return insertInto(OFC_CODE_LIST, FIELDS).values(valuesPlaceholders);
 		}
 		
 		protected Object[] extractValues(PersistedCodeListItem item) {
