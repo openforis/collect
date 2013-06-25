@@ -196,7 +196,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		return minId == null ? 0: minId.intValue();
 	}
 
-	public void moveItemsToPublishedSurvey(int publishedSurveyId, int surveyWorkId) {
+	public void moveItemsToPublishedSurvey(int surveyWorkId, int publishedSurveyId) {
 		JooqFactory jf = getMappingJooqFactory();
 		jf.update(OFC_SAMPLING_DESIGN)
 			.set(OFC_SAMPLING_DESIGN.SURVEY_ID, publishedSurveyId)
