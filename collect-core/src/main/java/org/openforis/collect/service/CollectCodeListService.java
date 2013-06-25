@@ -89,4 +89,7 @@ public class CollectCodeListService implements CodeListService {
 		return codeListManager.loadRootItem(list, code, version);
 	}
 
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
+	}
 }
