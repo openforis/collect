@@ -65,7 +65,10 @@ public class SurveyImportVM extends SurveyBaseVM {
 	
 	protected void reset() {
 		fileName = null;
-		uploadedFile = null;
+		if ( uploadedFile != null ) {
+			uploadedFile.delete();
+			uploadedFile = null;
+		}
 		uploadedSurveyUri = null;
 		updatingExistingSurvey = false;
 		updatingPublishedSurvey = false;
@@ -205,10 +208,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 			} else {
 				surveyManager.importWorkModel(uploadedFile, surveyName, validate);
 			}
-			closeImportPopUp(true);
 			Object[] args = new String[]{surveyName};
 			MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
-			uploadedFile.delete();
+			closeImportPopUp(true);
 		} catch (SurveyValidationException e) {
 			if ( validate ) {
 				Object[] args = new String[] {e.getMessage()};

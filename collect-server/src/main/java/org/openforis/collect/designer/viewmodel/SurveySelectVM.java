@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -20,6 +21,7 @@ import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidation
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
@@ -185,6 +187,11 @@ public class SurveySelectVM extends BaseVM {
 	
 	@GlobalCommand
 	public void closeSurveyImportPopUp(@BindingParam("successfullyImported") Boolean successfullyImported) {
+		if ( surveyImportPopUp != null ) {
+			Binder binder = ComponentUtil.getBinder(surveyImportPopUp);
+			SurveyImportVM vm = (SurveyImportVM) binder.getViewModel();
+			vm.reset();
+		}
 		closePopUp(surveyImportPopUp);
 		surveyImportPopUp = null;
 		if ( successfullyImported != null && successfullyImported.booleanValue()) {
