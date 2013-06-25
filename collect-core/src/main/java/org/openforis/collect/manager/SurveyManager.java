@@ -188,8 +188,12 @@ public class SurveyManager {
 
 	@Transactional
 	public CollectSurvey updateModel(InputStream is, boolean validate) throws IdmlParseException, SurveyValidationException, SurveyImportException {
-		File surveyFile = IOUtils.copyToTempFile(is);
-		return updateModel(surveyFile, validate);
+		File tempFile = IOUtils.copyToTempFile(is);
+		try {
+			return updateModel(tempFile, validate);
+		} finally {
+			tempFile.delete();
+		}
 	}
 
 	@Transactional
@@ -520,15 +524,17 @@ public class SurveyManager {
 		if ( publishedSurvey == null ) {
 			surveyDao.importModel(survey);
 		} else {
-			removeFromCache(publishedSurvey);
 			surveyDao.updateModel(survey);
 		}
-		addToCache(survey);
 		int publishedSurveyId = survey.getId();
 		samplingDesignManager.publishSamplingDesign(surveyWorkId, publishedSurveyId);
 		speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
 		codeListManager.publishCodeLists(surveyWorkId, publishedSurveyId);
 		surveyWorkDao.delete(surveyWorkId);
+		if ( publishedSurvey != null ) {
+			removeFromCache(publishedSurvey);
+		}
+		addToCache(survey);
 	}
 	
 	@Transactional
