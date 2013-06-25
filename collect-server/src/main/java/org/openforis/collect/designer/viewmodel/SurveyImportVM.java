@@ -20,7 +20,7 @@ import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.utils.CollectIOUtils;
+import org.openforis.collect.utils.IOUtils;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
@@ -144,7 +144,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		String contentType = media.getContentType();
 		
 		if ( contentType.equals(TEXT_XML_CONTENT) ) {
-			File tempFile = CollectIOUtils.copyToTempFile(media.getReaderData());
+			File tempFile = IOUtils.copyToTempFile(media.getReaderData());
 			prepareSurveyImport(tempFile, media.getName(), true);
 		} else {
 			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
@@ -208,6 +208,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			closeImportPopUp(true);
 			Object[] args = new String[]{surveyName};
 			MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
+			uploadedFile.delete();
 		} catch (SurveyValidationException e) {
 			if ( validate ) {
 				Object[] args = new String[] {e.getMessage()};
@@ -226,29 +227,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 			Object[] args = new String[]{e.getMessage()};
 			MessageUtil.showError("survey.import_survey.error", args);
 		}
-		/*
-		String uri = uploadedSurvey.getUri();
-		SurveySummary oldSurveyWorkSummary = surveyManager.loadSurveyWorkSummaryByUri(uri);
-		CollectSurvey oldPublishedSurvey = surveyManager.getByUri(uri);
-		if ( (oldSurveyWorkSummary != null || oldPublishedSurvey != null) && ! overwrite ) {
-			throw new IllegalArgumentException("Survey with same URI already exists and override parameter not specified");
-		}
-		try {
-			if ( oldSurveyWorkSummary != null ) {
-				uploadedSurvey.setId(oldSurveyWorkSummary.getId());
-				surveyManager.saveSurveyWork(uploadedSurvey);
-			} else if ( oldPublishedSurvey != null && validateSurveyForPublishing(uploadedSurvey, oldPublishedSurvey)) {
-				uploadedSurvey.setId(oldPublishedSurvey.getId());
-				surveyManager.updateModel(uploadedSurvey);
-			} else {
-				surveyManager.saveSurveyWork(uploadedSurvey);
-			}
-		} catch (SurveyImportException e) {
-			log.error(e);
-			Object[] args = new String[]{e.getMessage()};
-			MessageUtil.showError("survey.import_survey.error", args);
-		}
-		*/
 	}
 	
 	protected boolean validateSurvey(CollectSurvey survey) {

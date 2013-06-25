@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.openforis.collect.manager.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator;
@@ -29,7 +27,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
-import org.openforis.collect.utils.CollectIOUtils;
+import org.openforis.collect.utils.IOUtils;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
@@ -130,7 +128,7 @@ public class SurveyManager {
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
 		try {
-			tempFile = CollectIOUtils.copyToTempFile(new InputStreamReader(is));
+			tempFile = IOUtils.copyToTempFile(is);
 			return importWorkModel(tempFile, name, validate);
 		} finally {
 			tempFile.delete();
@@ -165,7 +163,7 @@ public class SurveyManager {
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
 		try {
-			tempFile = CollectIOUtils.copyToTempFile(new InputStreamReader(is));
+			tempFile = IOUtils.copyToTempFile(is);
 			return importModel(tempFile, name, validate);
 		} finally {
 			tempFile.delete();
@@ -190,7 +188,7 @@ public class SurveyManager {
 
 	@Transactional
 	public CollectSurvey updateModel(InputStream is, boolean validate) throws IdmlParseException, SurveyValidationException, SurveyImportException {
-		File surveyFile = CollectIOUtils.copyToTempFile(new InputStreamReader(is));
+		File surveyFile = IOUtils.copyToTempFile(is);
 		return updateModel(surveyFile, validate);
 	}
 
@@ -347,8 +345,7 @@ public class SurveyManager {
 	public CollectSurvey unmarshalSurvey(InputStream is,
 			boolean validate, boolean includeCodeListItems)
 			throws IdmlParseException, SurveyValidationException {
-		InputStreamReader reader = new InputStreamReader(is);
-		return unmarshalSurvey(reader, validate, includeCodeListItems);
+		return unmarshalSurvey(IOUtils.toReader(is), validate, includeCodeListItems);
 	}
 
 	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException, SurveyValidationException {
@@ -359,7 +356,7 @@ public class SurveyManager {
 			boolean validate, boolean includeCodeListItems)
 			throws IdmlParseException, SurveyValidationException {
 		CollectSurvey survey;
-		File tempFile = CollectIOUtils.copyToTempFile(reader);
+		File tempFile = IOUtils.copyToTempFile(reader);
 		if ( validate ) {
 			//validate against schema
 			validateSurveyXMLAgainstSchema(tempFile);

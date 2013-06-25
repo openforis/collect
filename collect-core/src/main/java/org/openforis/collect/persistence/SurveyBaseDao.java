@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -52,8 +51,7 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 	
 	public CollectSurvey unmarshalIdml(InputStream is, boolean includeCodeListItems) throws IdmlParseException {
-		InputStreamReader reader = new InputStreamReader(is);
-		return unmarshalIdml(reader, includeCodeListItems);
+		return unmarshalIdml(org.openforis.collect.utils.IOUtils.toReader(is), includeCodeListItems);
 	}
 
 	public CollectSurvey unmarshalIdml(Reader reader) throws IdmlParseException {
