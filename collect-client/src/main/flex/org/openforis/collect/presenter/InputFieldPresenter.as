@@ -4,14 +4,13 @@ package org.openforis.collect.presenter {
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	
-	import mx.binding.utils.BindingUtils;
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.controls.Alert;
+	import mx.events.PropertyChangeEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
-	import org.openforis.collect.Proxy;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.ApplicationEvent;
@@ -84,7 +83,7 @@ package org.openforis.collect.presenter {
 			}
 			_view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, keyFocusChangeHandler);
 			
-			BindingUtils.bindSetter(setAttribute, _view, "attribute");
+			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler); 
 		}
 		
 		protected function setFocusHandler(event:InputFieldEvent):void {
@@ -324,7 +323,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function setAttribute(value:AttributeProxy):void {
+		protected function attributeChangeHandler(event:PropertyChangeEvent):void {
 			_view.changed = false;
 			_view.visited = false;
 			_view.updating = false;
@@ -649,14 +648,12 @@ package org.openforis.collect.presenter {
 		protected function updateView():void {
 			//update view according to attribute (generic text value)
 			var hasRemarks:Boolean = false;
-			if(_view.attributeDefinition != null) {
-				var text:String = getTextFromValue();
-				if ( ! _view.changed ) {
-					_view.text = text;
-				}
-				hasRemarks = StringUtil.isNotBlank(getRemarks());
-				_contextMenu.updateItems();
+			var text:String = getTextFromValue();
+			if ( ! _view.changed ) {
+				_view.text = text;
 			}
+			hasRemarks = StringUtil.isNotBlank(getRemarks());
+			_contextMenu.updateItems();
 			
 			var newStyles:Array = [];
 			if ( hasRemarks ) {
@@ -668,7 +665,6 @@ package org.openforis.collect.presenter {
 			UIUtil.replaceStyleNames(_view.validationStateDisplay, newStyles, 
 				[InputField.REMARKS_PRESENT_STYLE, InputField.READONLY_STYLE] );
 			
-			//_view.hasRemarks = hasRemarks;
 			_view.editable = Application.activeRecordEditable;
 		}
 		

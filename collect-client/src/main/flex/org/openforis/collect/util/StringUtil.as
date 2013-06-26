@@ -15,7 +15,12 @@ package org.openforis.collect.util
 				temp = rightTrim(temp, trimChar);
 				return temp;
 			}
-		} 
+		}
+		
+		public static function trimToNull(value:String, trimChar:String = null):String {
+			var result:String = trim(value, trimChar);
+			return result == '' ? null: result;
+		}
 
 		public static function leftTrim(value:String, trimChar:String = null):String {
 			if(trimChar == null)

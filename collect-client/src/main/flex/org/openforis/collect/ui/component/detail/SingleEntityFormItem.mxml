@@ -49,13 +49,6 @@
 		<s:VerticalLayout />
 	</detail:layout>
 
-	<!--<s:BorderContainer id="border" 
-					   height="100%" 
-					   width="100%"
-					   minHeight="0"
-					   minWidth="0">
-	-->		
-	
 	<detail:FormItemLabel id="formItemLabel"
 		  				  nodeDefinition="{entityDefinition}" 
 						  includeIn="verticalFormLayout"

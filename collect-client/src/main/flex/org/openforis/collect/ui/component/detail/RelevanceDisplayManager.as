@@ -38,11 +38,7 @@ package org.openforis.collect.ui.component.detail
 		}
 		
 		public function apply(relevant:Boolean):void {
-			if(relevant) {
-				UIUtil.removeStyleName(_display, STYLE_NAME_NOT_RELEVANT);
-			} else {
-				UIUtil.addStyleName(_display, STYLE_NAME_NOT_RELEVANT);
-			}
+			UIUtil.toggleStyleName(_display, STYLE_NAME_NOT_RELEVANT, ! relevant);
 		}
 		
 	}

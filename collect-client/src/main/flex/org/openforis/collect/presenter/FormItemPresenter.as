@@ -1,10 +1,8 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
-	
-	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -45,7 +43,10 @@ package org.openforis.collect.presenter
 			updateRelevanceDisplayManager();
 			_contextMenu = new FormItemContextMenu(view);
 			super();
-			
+			onAfterCreation();
+		}
+		
+		protected function onAfterCreation():void {
 			updateView();
 		}
 		
@@ -71,8 +72,7 @@ package org.openforis.collect.presenter
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
-			BindingUtils.bindSetter(parentEntitySetter, _view, "parentEntity");
-			//ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
+			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -97,7 +97,7 @@ package org.openforis.collect.presenter
 			updateValidationDisplayManager();
 		}
 		
-		protected function parentEntitySetter(parentEntity:EntityProxy):void {
+		protected function parentEntityChangeHandler(event:PropertyChangeEvent):void {
 			updateView();
 		}
 		

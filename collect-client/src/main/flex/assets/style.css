@@ -174,7 +174,6 @@ component|ErrorListPopUp, component|DataImportNodeErrorsPopUp {
 	skinClass: ClassReference("org.openforis.collect.ui.skin.ResizableTitleWindowSkin");
 }
 
-
 input|NumericAttributeRenderer input|DropDownInputField s|DropDownList,
 	input|RangeAttributeRenderer input|DropDownInputField s|DropDownList,
 	input|CoordinateAttributeRenderer input|DropDownInputField s|DropDownList {
@@ -210,30 +209,27 @@ mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 	borderColor: #FF8800;
 }
 
-detail|AttributeItemRenderer {
+input|AttributeRenderer,
+	detail|CompositeAttributeRenderer {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.SimpleBorderBoxSkin");
 	borderColor: #FFFFFF;
 	borderWeight: 1;
 }
 
-detail|MultipleAttributeFormItem s|BorderContainer, 
-	detail|SingleEntityFormItem s|BorderContainer,
-	detail|MultipleEntityFormItem s|BorderContainer,
-	detail|MultipleEntityAsTableFormItem s|BorderContainer  {
+.externalBorder { 
 	borderColor: #FFFFFF;
 	borderWeight: 1;
 }
 
-detail|AttributeItemRenderer.error, 
-	detail|MultipleAttributeFormItem.error s|BorderContainer,
-	detail|SingleEntityFormItem.error s|BorderContainer,
-	detail|MultipleEntityAsTableFormItem.error s|BorderContainer {
+detail|CompositeAttributeRenderer.error,
+	detail|MultipleAttributeFormItem.error .externalBorder,
+	detail|MultipleEntityAsTableFormItem.error .externalBorder {
 	borderColor: #FF0000;
 }
 
-detail|AttributeItemRenderer.warning, 
-	detail|MultipleAttributeFormItem.warning s|BorderContainer,
-	detail|SingleEntityFormItem.warning s|BorderContainer,
-	detail|MultipleEntityAsTableFormItem.warning s|BorderContainer {
+detail|CompositeAttributeRenderer.warning,
+	detail|MultipleAttributeFormItem.warning .externalBorder,
+	detail|MultipleEntityAsTableFormItem.warning .externalBorder {
 	borderColor: #FF8800;
 }
 
@@ -271,7 +267,7 @@ input|TextInput.readOnly, mx|TextArea.readOnly {
 	contentBackgroundColor: #DDDDDD;
 }
 
-s|BorderContainer.entityForm {
+.entityForm {
 	borderColor: #CCCCCC;
 	borderAlpha: 0.8;
 	borderStyle: solid;

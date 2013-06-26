@@ -1,11 +1,7 @@
 package org.openforis.collect.presenter
 {
-	import mx.binding.utils.BindingUtils;
 	import mx.collections.IList;
 	
-	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	
@@ -18,24 +14,11 @@ package org.openforis.collect.presenter
 		
 		public function EntityFormItemPresenter(view:EntityFormItem) {
 			super(view);
-			initNodeDefinitions();
 		}
 		
-		override internal function initEventListeners():void {
-			super.initEventListeners();
-			
-			BindingUtils.bindSetter(setModelVersion, _view, "modelVersion");
-			BindingUtils.bindSetter(setEntityDefinition, view, "entityDefinition");
-		}
-		
-		protected function setEntityDefinition(entityDefinition:EntityDefinitionProxy):void {
+		override protected function onAfterCreation():void {
 			initNodeDefinitions();
-			updateView();
-		}
-		
-		protected function setModelVersion(version:ModelVersionProxy):void {
-			initNodeDefinitions();
-			updateView();
+			super.onAfterCreation();
 		}
 		
 		private function get view():EntityFormItem {
@@ -48,10 +31,6 @@ package org.openforis.collect.presenter
 				temp = view.entityDefinition.getDefinitionsInVersion(view.modelVersion);
 			}
 			view.nodeDefinitions = temp;
-		}
-		
-		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			super.updateResponseReceivedHandler(event);
 		}
 		
 		override protected function updateView():void {

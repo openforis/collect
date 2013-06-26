@@ -45,10 +45,6 @@
 
 	<fx:Style source="assets/style.css" />
 	
-	<fx:Declarations>
-		
-	</fx:Declarations>
-
 	<s:states>
 		<s:State name="default" />
 		<s:State name="fullScreen" />

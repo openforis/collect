@@ -173,10 +173,8 @@ package org.openforis.collect.presenter {
 			_view.description = "";
 			if(_view.attribute != null) {
 				var codes:Array = [];
-				var code:String;
-				var attribute:AttributeProxy;
-				attribute = _view.attribute;
-				code = attribute.getField(0).value as String;
+				var attribute:AttributeProxy = _view.attribute;
+				var code:String = attribute.getField(0).value as String;
 				if( StringUtil.isNotBlank(code)) {
 					codes.push(code);
 				}
