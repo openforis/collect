@@ -185,7 +185,7 @@ public class BackupProcess implements Callable<Void>, DataExportProcess {
 	}
 	
 	private String buildEntryFileName(CollectRecord record, int stepNumber) {
-		return stepNumber + File.separator + record.getId() + ".xml";
+		return stepNumber + "/" + record.getId() + ".xml";
 	}
 	
 }
