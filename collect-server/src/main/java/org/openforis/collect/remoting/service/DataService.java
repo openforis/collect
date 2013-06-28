@@ -365,7 +365,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = codeListManager.loadAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.loadValidItems(parent, def);
 		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>();
 		if(codes != null && codes.length > 0) {
 			//filter by specified codes
@@ -393,7 +393,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = codeListManager.loadAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.loadValidItems(parent, def);
 		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
 		List<Node<?>> selectedCodes = parent.getAll(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
@@ -413,7 +413,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attributeName);
-		List<CodeListItem> items = codeListManager.findAssignableItems(parent, def, codes);
+		List<CodeListItem> items = codeListManager.findValidItems(parent, def, codes);
 		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
 		for (CodeListItem item : items) {
 			result.add(new CodeListItemProxy(item));

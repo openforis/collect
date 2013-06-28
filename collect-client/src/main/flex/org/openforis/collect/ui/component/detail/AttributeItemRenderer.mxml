@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:BorderContainer 
+<s:SkinnableContainer 
 				xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				xmlns:s="library://ns.adobe.com/flex/spark" 
 				xmlns:mx="library://ns.adobe.com/flex/mx"
@@ -19,8 +19,6 @@
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.AttributePresenter;
 			import org.openforis.collect.util.UIUtil;
-			
-			import spark.components.BorderContainer;
 			
 			public static const STYLE_NAME_NORMAL:String = "normal";
 			public static const STYLE_NAME_DISABLED:String = "disabled";
@@ -125,15 +123,11 @@
 			
 			public function set approved(value:Boolean):void {
 				_approved = value;
-				if(value) {
-					UIUtil.addStyleName(this, STYLE_NAME_APPROVED);
-				} else {
-					UIUtil.removeStyleName(this, STYLE_NAME_APPROVED);
-				}
+				UIUtil.toggleStyleName(this, STYLE_NAME_APPROVED, _approved);
 			}
 			
 		]]>
 	</fx:Script>
 	
 	
-</s:BorderContainer>
+</s:SkinnableContainer>

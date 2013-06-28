@@ -92,4 +92,5 @@ public class CollectCodeListService implements CodeListService {
 	public void setCodeListManager(CodeListManager codeListManager) {
 		this.codeListManager = codeListManager;
 	}
+	
 }

@@ -80,6 +80,7 @@
 	</detail:layout>
 	
 	<s:BorderContainer id="border" 
+					   styleName="externalBorder"
 					   height="100%" 
 					   width="100%"
 					   minHeight="0"
@@ -158,12 +159,12 @@
 						<fx:Component>
 							<detail:EntityDataGroupItemRenderer
 								entityDefinition="{outerDocument.entityDefinition}"
-								entity="{data as EntityProxy}"
 								modelVersion="{outerDocument.modelVersion}"
 								nodeDefinitions="{outerDocument.nodeDefinitions}"
 								dragEnabled="{Application.activeRecordEditable &amp;&amp; ! outerDocument.entityDefinition.enumerable}"
 								nodesDirection="{outerDocument.entitiesDirection == MultipleEntityAsTableFormItem.DIRECTION_BY_COLUMNS ? 
 									EntityDataGroupItemRenderer.DIRECTION_VERTICAL: EntityDataGroupItemRenderer.DIRECTION_HORIZONTAL}"
+								entity="{data as EntityProxy}"
 								>
 								<fx:Script>
 									<![CDATA[

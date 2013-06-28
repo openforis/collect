@@ -142,7 +142,7 @@ public class SurveyManager {
 			survey.setName(name);
 			survey.setWork(true);
 			surveyWorkDao.insert(survey);
-			codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+			codeListManager.importCodeLists(survey, surveyFile);
 			return survey;
 		} catch ( CodeListImportException e ) {
 			throw new SurveyImportException(e);
@@ -177,7 +177,7 @@ public class SurveyManager {
 			survey.setName(name);
 			surveyDao.importModel(survey);
 			addToCache(survey);
-			codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+			codeListManager.importCodeLists(survey, surveyFile);
 			return survey;
 		} catch ( CodeListImportException e ) {
 			throw new SurveyImportException(e);
@@ -234,7 +234,7 @@ public class SurveyManager {
 		codeListManager.deleteBySurvey(id, true);
 		saveSurveyWork(parsedSurvey);
 		try {
-			codeListManager.parseXMLAndStoreItems(parsedSurvey, surveyFile);
+			codeListManager.importCodeLists(parsedSurvey, surveyFile);
 		} catch (CodeListImportException e) {
 			throw new SurveyImportException(e);
 		}
@@ -253,7 +253,7 @@ public class SurveyManager {
 		codeListManager.deleteBySurvey(id, false);
 		updateModel(survey);
 		try {
-			codeListManager.parseXMLAndStoreItems(survey, surveyFile);
+			codeListManager.importCodeLists(survey, surveyFile);
 		} catch (CodeListImportException e) {
 			throw new SurveyImportException(e);
 		}
@@ -511,7 +511,7 @@ public class SurveyManager {
 		int publishedSurveyId = publishedSurvey.getId();
 		samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
 		speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
-		codeListManager.duplicateCodeListsForWork(publishedSurvey, surveyWork);
+		codeListManager.cloneCodeLists(publishedSurvey, surveyWork);
 		return surveyWork;
 	}
 	

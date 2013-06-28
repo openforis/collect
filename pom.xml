@@ -107,27 +107,27 @@
 				<artifactId>maven-release-plugin</artifactId>
 				<version>2.3</version>
 	    	</plugin>
-	    	<plugin>
-				<groupId>com.soebes.maven.plugins.mlv</groupId>
-				<artifactId>maven-license-verifier-plugin</artifactId>
-				<version>0.4</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.openforis.common-build</groupId>
-						<artifactId>common-build-license-verifier</artifactId>
-						<version>1.0-SNAPSHOT</version>
-					</dependency>
-				</dependencies>
-				<executions>
-			      <execution>
-						<id>license-verifier</id>
-						<goals>
-							<goal>report</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!-- 	    	<plugin> -->
+<!-- 				<groupId>com.soebes.maven.plugins.mlv</groupId> -->
+<!-- 				<artifactId>maven-license-verifier-plugin</artifactId> -->
+<!-- 				<version>0.4</version> -->
+<!-- 				<dependencies> -->
+<!-- 					<dependency> -->
+<!-- 						<groupId>org.openforis.common-build</groupId> -->
+<!-- 						<artifactId>common-build-license-verifier</artifactId> -->
+<!-- 						<version>1.0-SNAPSHOT</version> -->
+<!-- 					</dependency> -->
+<!-- 				</dependencies> -->
+<!-- 				<executions> -->
+<!-- 			      <execution> -->
+<!-- 						<id>license-verifier</id> -->
+<!-- 						<goals> -->
+<!-- 							<goal>report</goal> -->
+<!-- 							<goal>verify</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>

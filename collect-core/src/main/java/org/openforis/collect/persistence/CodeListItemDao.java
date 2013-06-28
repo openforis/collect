@@ -112,7 +112,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 	}
 	
-	public void duplicateItems(int oldSurveyId, boolean oldSurveyWork, int newSurveyId, boolean newSurveyWork) {
+	public void cloneItems(int oldSurveyId, boolean oldSurveyWork, int newSurveyId, boolean newSurveyWork) {
 		JooqFactory jf = getMappingJooqFactory(null);
 		int minId = loadMinId(jf, oldSurveyId, oldSurveyWork);
 		int nextId = jf.nextId();

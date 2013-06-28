@@ -14,10 +14,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.exception.CodeListImportException;
-import org.openforis.collect.model.CollectCodeListPersisterContext;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.CodeListItemDao;
 import org.openforis.collect.persistence.DatabaseExternalCodeListProvider;
+import org.openforis.collect.service.CollectCodeListService;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -26,8 +26,8 @@ import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.xml.CodeListImporter;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.openforis.idm.metamodel.xml.SurveyCodeListPersisterBinder;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
@@ -50,9 +50,30 @@ public class CodeListManager {
 	private DatabaseExternalCodeListProvider provider;
 	@Autowired
 	private CodeListItemDao codeListItemDao;
-	@Autowired
-	private CollectCodeListPersisterContext persisterContext;
-
+	
+	public void importCodeLists(CollectSurvey survey, InputStream is) throws CodeListImportException {
+		int nextSystemId = codeListItemDao.nextSystemId();
+		CollectCodeListService service = new CollectCodeListService();
+		service.setCodeListManager(this);
+		CodeListImporter binder = new CodeListImporter(service, nextSystemId);
+		try {
+			binder.importCodeLists(survey, is);
+		} catch (IdmlParseException e) {
+			throw new CodeListImportException(e);
+		}
+	}
+	
+	public void importCodeLists(CollectSurvey survey, File file) throws CodeListImportException {
+		FileInputStream is = null;
+		try {
+			is = new FileInputStream(file);
+			importCodeLists(survey, is);
+		} catch (FileNotFoundException e) {
+			throw new CodeListImportException(e);
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+	}
 	@SuppressWarnings("unchecked")
 	public <T extends CodeListItem> T loadItemByAttribute(CodeAttribute attribute) {
 		CodeAttributeDefinition defn = attribute.getDefinition();
@@ -202,15 +223,15 @@ public class CodeListManager {
 		return null;
 	}
 	
-	public CodeListItem findAssignableItem(Entity parent,
+	public CodeListItem findValidItem(Entity parent,
 			CodeAttributeDefinition defn, String code) {
-		List<CodeListItem> items = findAssignableItems(parent, defn, code);
+		List<CodeListItem> items = findValidItems(parent, defn, code);
 		return items.size() == 1 ? items.get(0): null;
 	}
 
-	public List<CodeListItem> findAssignableItems(Entity parent, CodeAttributeDefinition defn, String... codes) {
+	public List<CodeListItem> findValidItems(Entity parent, CodeAttributeDefinition defn, String... codes) {
 		List<CodeListItem> result = new ArrayList<CodeListItem>();
-		List<CodeListItem> assignableItems = loadAssignableCodeListItems(parent, defn);
+		List<CodeListItem> assignableItems = loadValidItems(parent, defn);
 		if ( ! assignableItems.isEmpty() ) {
 			Record record = parent.getRecord();
 			ModelVersion version = record.getVersion();
@@ -224,7 +245,7 @@ public class CodeListManager {
 		return CollectionUtils.unmodifiableList(result);
 	}
 
-	public List<CodeListItem> loadAssignableCodeListItems(Entity parent, CodeAttributeDefinition def) {
+	public List<CodeListItem> loadValidItems(Entity parent, CodeAttributeDefinition def) {
 		List<? extends CodeListItem> items = null;
 		CodeList list = def.getList();
 		if ( StringUtils.isEmpty(def.getParentExpression()) ) {
@@ -243,28 +264,6 @@ public class CodeListManager {
 		return filterApplicableItems(items, version);
 	}
 
-	public void parseXMLAndStoreItems(CollectSurvey survey, InputStream is) throws CodeListImportException {
-		int nextSystemId = codeListItemDao.nextSystemId();
-		SurveyCodeListPersisterBinder binder = new SurveyCodeListPersisterBinder(persisterContext, nextSystemId);
-		try {
-			binder.exportFromXMLAndStore(survey, is);
-		} catch (IdmlParseException e) {
-			throw new CodeListImportException(e);
-		}
-	}
-	
-	public void parseXMLAndStoreItems(CollectSurvey survey, File file) throws CodeListImportException {
-		FileInputStream is = null;
-		try {
-			is = new FileInputStream(file);
-			parseXMLAndStoreItems(survey, is);
-		} catch (FileNotFoundException e) {
-			throw new CodeListImportException(e);
-		} finally {
-			IOUtils.closeQuietly(is);
-		}
-	}
-	
 	protected List<CodeListItem> filterApplicableItems(
 			List<? extends CodeListItem> items, ModelVersion version) {
 		if ( items == null ) {
@@ -362,8 +361,8 @@ public class CodeListManager {
 	}
 	
 	@Transactional
-	public void duplicateCodeListsForWork(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
-		codeListItemDao.duplicateItems(fromSurvey.getId(), fromSurvey.isWork(), toSurvey.getId(), toSurvey.isWork());
+	public void cloneCodeLists(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
+		codeListItemDao.cloneItems(fromSurvey.getId(), fromSurvey.isWork(), toSurvey.getId(), toSurvey.isWork());
 	}
 	
 	public void save(PersistedCodeListItem item) {
@@ -430,7 +429,7 @@ public class CodeListManager {
 		}
 	}
 
-	public void deleteBySurvey(Integer surveyId, boolean work) {
+	public void deleteBySurvey(int surveyId, boolean work) {
 		codeListItemDao.deleteBySurvey(surveyId, work);
 	}
 
@@ -451,6 +450,10 @@ public class CodeListManager {
 		}
 	}
 	
+	public int nextSystemId() {
+		return codeListItemDao.nextSystemId();
+	}
+	
 	public void setExternalCodeListProvider(
 			DatabaseExternalCodeListProvider externalCodeListProvider) {
 		this.provider = externalCodeListProvider;
@@ -458,11 +461,6 @@ public class CodeListManager {
 
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
-	}
-	
-	public void setPersisterContext(
-			CollectCodeListPersisterContext persisterContext) {
-		this.persisterContext = persisterContext;
 	}
 	
 }

@@ -5,6 +5,7 @@ package org.openforis.collect.presenter
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -38,16 +39,12 @@ package org.openforis.collect.presenter
 		protected function focusOutHandler(event:FocusEvent):void {
 		}
 		
-		override protected function parentEntitySetter(parentEntity:EntityProxy):void {
+		override protected function parentEntityChangeHandler(event:PropertyChangeEvent):void {
 			assignAttribute();
 		}
 		
 		protected function attributeChangeHandler(event:Event):void {
 			updateView();
-		}
-		
-		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			super.updateResponseReceivedHandler(event);
 		}
 		
 		private function get view():AttributeFormItem {

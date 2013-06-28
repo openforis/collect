@@ -1,5 +1,4 @@
 package org.openforis.collect.presenter {
-	import mx.binding.utils.BindingUtils;
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
 	import mx.core.UIComponent;
@@ -43,8 +42,8 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
-			BindingUtils.bindSetter(setAttribute, _view, "attribute");
-			BindingUtils.bindSetter(setAttributes, _view, "attributes");
+			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
+			ChangeWatcher.watch(_view, "attributes", attributesChangeHandler);
 		}
 		
 		protected function initValidationDisplayManager():void {
@@ -113,12 +112,12 @@ package org.openforis.collect.presenter {
 			updateValidationDisplayManager();
 		}
 		
-		protected function setAttribute(attribute:AttributeProxy):void {
+		protected function attributeChangeHandler(event:PropertyChangeEvent):void {
 			_view.visited = false;
 			updateView();
 		}
 		
-		protected function setAttributes(attributes:IList):void {
+		protected function attributesChangeHandler(event:PropertyChangeEvent):void {
 			_view.visited = false;
 			updateView();
 		}

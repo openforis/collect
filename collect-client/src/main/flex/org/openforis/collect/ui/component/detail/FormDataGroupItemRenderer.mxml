@@ -32,28 +32,23 @@
 				BindingUtils.bindSetter(updateMultipleEntitiesMaxWidth, this, "width");
 			}
 			
-			override protected function createChildren():void {
-				super.createChildren();
-				if(data != null) {
-					var formItem:CollectFormItem;
-					if(data is AttributeDefinitionProxy) {
-						formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(data));
-						formItem.labelWidth = labelWidth;
-						addElement(formItem);
-					} else if(data is EntityDefinitionProxy) {
-						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
-						addElement(formItem);
-						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
-					}
-					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
-					BindingUtils.bindProperty(formItem, "occupyEntirePage", this, "occupyEntirePage");
+			protected function addFormItemElement():void {
+				var formItem:CollectFormItem;
+				if(data is AttributeDefinitionProxy) {
+					formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(data));
+					formItem.labelWidth = labelWidth;
+					addElement(formItem);
+				} else if(data is EntityDefinitionProxy) {
+					formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
+					addElement(formItem);
+					BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 				}
+				BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
+				BindingUtils.bindProperty(formItem, "occupyEntirePage", this, "occupyEntirePage");
 			}
 			
 			protected function dataChangeHandler(event:FlexEvent):void {
-				removeAllElements();
-				initialized = false;
-				initialize();
+				addFormItemElement();
 			}
 			
 			protected function updateMultipleEntitiesMaxHeight(value:Number):void {

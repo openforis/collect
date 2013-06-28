@@ -154,6 +154,7 @@ package org.openforis.collect.util
 			var componentStyleName:String = component.styleName as String;
 			if(hasStyleName(component, styleName)) {
 				componentStyleName = componentStyleName.replace(styleName, "");
+				componentStyleName = StringUtil.trimToNull(componentStyleName);
 				if(applyImmediately) {
 					component.styleName = componentStyleName;
 				}
@@ -168,11 +169,11 @@ package org.openforis.collect.util
 			return component.styleName as String;
 		}
 		
-		public static function toggleStyleName(component:UIComponent, READONLY_STYLE:String, apply:Boolean = true, applyImmediately:Boolean = true):String {
+		public static function toggleStyleName(component:UIComponent, styleName:String, apply:Boolean = true, applyImmediately:Boolean = true):String {
 			if ( apply ) {
-				return addStyleName(component, READONLY_STYLE, applyImmediately);
+				return addStyleName(component, styleName, applyImmediately);
 			} else {
-				return removeStyleName(component, READONLY_STYLE, applyImmediately);
+				return removeStyleName(component, styleName, applyImmediately);
 			}
 		}
 
@@ -188,8 +189,12 @@ package org.openforis.collect.util
 			var cleanedStyle:String = removeStyleNames(component, oldStyles);
 			var newStylesConcat:String = StringUtil.concat(" ", newStyles);
 			var result:String = StringUtil.concat(" ", [cleanedStyle, newStylesConcat]);
-			if(applyImmediately) {
-				component.styleName = result;
+			result = StringUtil.trimToNull(result);
+			if ( applyImmediately ) {
+				var oldStyleName:String = StringUtil.trimToNull(component.styleName as String);
+				if ( result != oldStyleName ) {
+					component.styleName = result;
+				}
 			}
 			return result;
 		}

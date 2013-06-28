@@ -221,7 +221,7 @@ public class DataImportProcess implements Callable<Void> {
 		}
 		Step step = getStep(entryName);
 		InputStream inputStream = zipFile.getInputStream(zipEntry);
-		InputStreamReader reader = new InputStreamReader(inputStream);
+		InputStreamReader reader = new InputStreamReader(inputStream, "UTF-8");
 		ParseRecordResult parseRecordResult = parseRecord(reader);
 		CollectRecord parsedRecord = parseRecordResult.getRecord();
 		if ( ! parseRecordResult.isSuccess()) {
@@ -363,7 +363,7 @@ public class DataImportProcess implements Callable<Void> {
 			String entryName = step.getStepNumber() + File.separator + entryId + ".xml";
 			InputStream inputStream = getEntryInputStream(zipFile, entryId, step);
 			if ( inputStream != null ) {
-				InputStreamReader reader = new InputStreamReader(inputStream);
+				InputStreamReader reader = new InputStreamReader(inputStream, "UTF-8");
 				ParseRecordResult parseRecordResult = parseRecord(reader);
 				CollectRecord parsedRecord = parseRecordResult.getRecord();
 				String message = parseRecordResult.getMessage();

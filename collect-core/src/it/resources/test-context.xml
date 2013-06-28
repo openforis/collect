@@ -119,10 +119,6 @@
 		<property name="codeListService" ref="codeListService" />
 	</bean>
 	
-	<bean id="collectCodeListPersisterContext" class="org.openforis.collect.model.CollectCodeListPersisterContext">
-		<property name="codeListService" ref="codeListService" />
-	</bean>
-	
 	<!-- XML DataMarshaller -->
 	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />
 	

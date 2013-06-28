@@ -160,7 +160,7 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 	}
 	
 	private String buildEntryFileName(CollectRecord record, int stepNumber) {
-		return stepNumber + File.separator + record.getId() + ".xml";
+		return stepNumber + "/" + record.getId() + ".xml";
 	}
 
 }

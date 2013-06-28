@@ -898,7 +898,7 @@ public class RecordManager {
 	 * 
 	 * @throws InvalidExpressionException 
 	 */
-	public void applyDefaultValues(CollectRecord record) {
+	protected void applyDefaultValues(CollectRecord record) {
 		Entity rootEntity = record.getRootEntity();
 		applyDefaultValues(rootEntity);
 	}

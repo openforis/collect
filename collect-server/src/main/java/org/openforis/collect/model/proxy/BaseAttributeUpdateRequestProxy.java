@@ -118,7 +118,7 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 	
 	protected String findNormalizedCode(CodeListManager codeListManager, Entity parent,
 			CodeAttributeDefinition defn, String code) {
-		CodeListItem codeListItem = codeListManager.findAssignableItem(parent, defn, code);
+		CodeListItem codeListItem = codeListManager.findValidItem(parent, defn, code);
 		if(codeListItem == null) {
 			return code;
 		} else {

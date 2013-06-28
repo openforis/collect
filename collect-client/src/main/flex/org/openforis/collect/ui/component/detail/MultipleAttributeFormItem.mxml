@@ -31,8 +31,9 @@
 		]]>
 	</fx:Script>
 	
-	<s:BorderContainer id="border" 
-					   height="100%" 
+	<s:BorderContainer id="border"
+					   styleName="externalBorder"
+					   height="100%"
 					   width="100%"
 					   minHeight="0"
 					   minWidth="0">

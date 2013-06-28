@@ -262,10 +262,6 @@
 		<property name="codeListService" ref="codeListService" />
 	</bean>
 	
-	<bean id="collectCodeListPersisterContext" class="org.openforis.collect.model.CollectCodeListPersisterContext">
-		<property name="codeListService" ref="codeListService" />
-	</bean>
-	
 	<!-- ===================================== -->
 	<!-- Security -->
 	<!-- ===================================== -->

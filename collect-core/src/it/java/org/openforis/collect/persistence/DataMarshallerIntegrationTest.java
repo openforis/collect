@@ -135,6 +135,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 		EntityBuilder.addValue(cluster, "vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
 		EntityBuilder.addValue(cluster, "gps_model", "TomTom 1.232");
 		recordManager.approveMissingValue(cluster, "accessibility");
+		EntityBuilder.addValue(cluster, "remarks", "Remarks with UTF-8 character: Í");
 		{
 			Entity ts = EntityBuilder.addEntity(cluster, "time_study");
 			EntityBuilder.addValue(ts, "date", new Date(2011,2,14));

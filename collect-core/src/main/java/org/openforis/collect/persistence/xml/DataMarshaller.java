@@ -49,7 +49,9 @@ public class DataMarshaller {
 		XmlSerializer serializer = factory.newSerializer();
 		serializer.setFeature(INDENT_FEATURE, true);
 		serializer.setOutput(out);
-		serializer.startDocument("UTF-8", true);
+		//do not use UTF-8 encoding: unicode text will be escaped by the serializer instead
+		//serializer.startDocument("UTF-8", true);
+		serializer.startDocument(null, true); 
 		
 		Entity rootEntity = record.getRootEntity();
 		String rootEntityName = rootEntity.getName();
