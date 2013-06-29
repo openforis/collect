@@ -63,7 +63,7 @@ public class SurveySelectVM extends BaseVM {
 	
 	@Command
 	public void editSelectedSurvey() throws IOException {
-		CollectSurvey surveyWork = loadSelectedSurvey();
+		CollectSurvey surveyWork = loadSelectedSurveyForEdit();
 		SessionStatus sessionStatus = getSessionStatus();
 		Integer publishedSurveyId = null;
 		if ( selectedSurvey.isPublished() ) {
@@ -199,7 +199,7 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 	
-	protected CollectSurvey loadSelectedSurvey() {
+	protected CollectSurvey loadSelectedSurveyForEdit() {
 		String uri = selectedSurvey.getUri();
 		CollectSurvey surveyWork;
 		if ( selectedSurvey.isWork() ) {
@@ -210,6 +210,17 @@ public class SurveySelectVM extends BaseVM {
 			throw new IllegalStateException("Trying to load an invalid survey: " + uri);
 		}
 		return surveyWork;
+	}
+	
+	protected CollectSurvey loadSelectedSurvey() {
+		String uri = selectedSurvey.getUri();
+		CollectSurvey survey;
+		if ( selectedSurvey.isWork() ) {
+			survey = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		} else {
+			survey = surveyManager.getByUri(uri);
+		}
+		return survey;
 	}
 	
 	public ListModel<SurveySummary> getSurveySummaries() {
