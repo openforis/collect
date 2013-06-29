@@ -91,13 +91,9 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 					if ( status.isRunning() ) {
 						Step step = summary.getStep();
 						Integer recordId = summary.getId();
-						try {
-							final CollectRecord record = recordManager.checkout(survey, user, recordId, step, sessionId, true);
-							writeValidationReport(record);
-							status.incrementProcessed();
-						} finally {
-							recordManager.releaseLock(recordId);
-						}
+						final CollectRecord record = recordManager.load(survey, recordId, step);
+						writeValidationReport(record);
+						status.incrementProcessed();
 						//long elapsedMillis = System.currentTimeMillis() - start;
 						//print(outputStream, "Validation of record " + recordKey + " completed in " + elapsedMillis + " millis");
 					}

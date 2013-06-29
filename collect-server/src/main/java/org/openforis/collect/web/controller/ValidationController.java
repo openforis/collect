@@ -105,6 +105,7 @@ public class ValidationController extends BasicController {
 			String sessionId = sessionState.getSessionId();
 			ValidationReportProcess process = new ValidationReportProcess(outputStream, recordManager, messageContextHolder, 
 					ReportType.CSV, user, sessionId, survey, r, true);
+			process.init();
 			process.call();
 		} catch (Exception e) {
 			//outputStream.println("ERROR - Validation of records not completed: " + e.getMessage());

@@ -6,6 +6,9 @@ package org.openforis.collect.presenter {
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
+	import flash.net.URLVariables;
+	import flash.net.navigateToURL;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
@@ -40,6 +43,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.ui.view.ListView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
@@ -51,6 +55,7 @@ package org.openforis.collect.presenter {
 		
 		private const EXPORT_DATA_MENU_ITEM:String = Message.get("list.admin.exportData");
 		private const IMPORT_DATA_MENU_ITEM:String = Message.get("list.admin.importData");
+		private const VALIDATION_REPORT_MENU_ITEM:String = Message.get("list.admin.validationReport");
 		
 		private var _view:ListView;
 		private var _dataClient:DataClient;
@@ -138,6 +143,7 @@ package org.openforis.collect.presenter {
 			result.addItem(EXPORT_DATA_MENU_ITEM);
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(IMPORT_DATA_MENU_ITEM);
+				result.addItem(VALIDATION_REPORT_MENU_ITEM);
 			}
 			_view.advancedFunctionsButton.dataProvider = result;
 		}
@@ -149,6 +155,16 @@ package org.openforis.collect.presenter {
 					break;
 				case EXPORT_DATA_MENU_ITEM:
 					PopUpUtil.createPopUp(DataExportPopUp, true);
+					break;
+				case VALIDATION_REPORT_MENU_ITEM:
+					var url:String = ApplicationConstants.VALIDATION_REPORT_URL;
+					var req:URLRequest = new URLRequest(url);
+					var params:URLVariables = new URLVariables();
+					params.s = Application.activeSurvey.name;
+					params.r = Application.activeRootEntity.name;
+					params.locale = Application.localeString;
+					req.data = params;
+					navigateToURL(req, "_new");
 					break;
 			}
 		}
