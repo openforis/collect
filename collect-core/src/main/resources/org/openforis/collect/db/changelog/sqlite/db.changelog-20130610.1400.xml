@@ -13,8 +13,6 @@
 	    
 	    <comment>Code list storage table</comment>
 	    
-	    <createSequence sequenceName="ofc_code_list_id_seq" />
-	  
 	    <createTable tableName="ofc_code_list">
 			<column name="id" type="INTEGER">
 				<constraints nullable="false" primaryKey="true" />
