@@ -56,7 +56,7 @@ public class SurveyManager {
 	@Autowired
 	private CollectSurveyContext collectSurveyContext;
 	@Autowired
-	private SurveyValidator validator;
+	private SurveyValidator surveyValidator;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
@@ -166,7 +166,9 @@ public class SurveyManager {
 			tempFile = IOUtils.copyToTempFile(is);
 			return importModel(tempFile, name, validate);
 		} finally {
-			tempFile.delete();
+			if ( tempFile != null && tempFile.exists() ) {
+				tempFile.delete();
+			}
 		}
 	}
 
@@ -248,7 +250,7 @@ public class SurveyManager {
 		survey.setId(id);
 		survey.setName(oldPublishedSurvey.getName());
 		if ( validate ) {
-			validator.checkCompatibility(oldPublishedSurvey, survey);
+			surveyValidator.checkCompatibility(oldPublishedSurvey, survey);
 		}
 		codeListManager.deleteBySurvey(id, false);
 		updateModel(survey);
@@ -337,7 +339,7 @@ public class SurveyManager {
 		return unmarshalSurvey(is, false, true);
 	}
 	
-	private CollectSurvey unmarshalSurvey(File surveyFile, boolean validate,
+	public CollectSurvey unmarshalSurvey(File surveyFile, boolean validate,
 			boolean includeCodeListItems) throws IdmlParseException, SurveyValidationException {
 		try {
 			return unmarshalSurvey(new FileInputStream(surveyFile), validate, includeCodeListItems);
@@ -367,7 +369,7 @@ public class SurveyManager {
 		}
 		survey = unmarshalSurvey(tempFile, includeCodeListItems);
 		if ( validate ) {
-			validator.validate(survey);
+			surveyValidator.validate(survey);
 		}
 		tempFile.delete();
 		return survey;
@@ -387,7 +389,7 @@ public class SurveyManager {
 	}
 
 	protected void validateSurveyXMLAgainstSchema(File file) throws SurveyValidationException {
-		validator.validateAgainstSchema(file);
+		surveyValidator.validateAgainstSchema(file);
 	}
 
 	@Transactional
@@ -602,4 +604,20 @@ public class SurveyManager {
 		this.collectSurveyContext = collectSurveyContext;
 	}
 
+	public CodeListManager getCodeListManager() {
+		return codeListManager;
+	}
+	
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
+	}
+	
+	public SurveyValidator getSurveyValidator() {
+		return surveyValidator;
+	}
+	
+	public void setSurveyValidator(SurveyValidator validator) {
+		this.surveyValidator = validator;
+	}
+	
 }
