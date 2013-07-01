@@ -273,14 +273,14 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportProcess process = importCSVFile(INVALID_TEST_CSV);
 		SpeciesImportStatus status = process.getStatus();
 		List<ParsingError> errors = status.getErrors();
-		assertEquals(8, errors.size());
+		assertEquals(7, errors.size());
 		
 		assertTrue(status.isRowProcessed(1));
 		assertTrue(status.isRowProcessed(2));
+		assertTrue(status.isRowProcessed(4));
 		assertTrue(status.isRowProcessed(5));
 		
 		assertFalse(status.isRowProcessed(3));
-		assertFalse(status.isRowProcessed(4));
 		assertFalse(status.isRowProcessed(6));
 		assertFalse(status.isRowProcessed(7));
 		assertFalse(status.isRowProcessed(8));
@@ -291,7 +291,6 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertFalse(status.isRowProcessed(12));
 		
 		assertTrue(containsError(errors, 3, SpeciesFileColumn.CODE, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 4, SpeciesFileColumn.SCIENTIFIC_NAME, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 6, SpeciesFileColumn.CODE, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 7, SpeciesFileColumn.FAMILY, ErrorType.EMPTY));
 		assertTrue(containsError(errors, 8, SpeciesFileColumn.NO, ErrorType.DUPLICATE_VALUE));

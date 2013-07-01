@@ -97,16 +97,16 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		public SpeciesLine parse() throws ParsingException {
 			SpeciesLine line = super.parse();
 			this.rawScientificName = extractRawScientificName();
-			this.parsedScientificName = parseRawScienfificName();
+			this.parsedScientificName = this.rawScientificName == null ? null: parseRawScienfificName();
 			line.setTaxonId(extractTaxonId(false));
 			line.setCode(extractCode(true));
 			line.setFamilyName(extractFamilyName());
 			line.setRawScientificName(this.rawScientificName);
-			line.setGenus(extractGenus());
-			line.setSpeciesName(extractSpeciesName());
-			line.setRank(extractRank());
+			line.setGenus(this.rawScientificName == null ? null: extractGenus());
+			line.setSpeciesName(this.rawScientificName == null ? null: extractSpeciesName());
+			line.setRank(this.rawScientificName == null ? TaxonRank.FAMILY: extractRank());
 			normalizeRank(line);
-			line.setCanonicalScientificName(extractCanonicalScientificName(line.getRank(), parsedScientificName));
+			line.setCanonicalScientificName(this.rawScientificName == null ? null: extractCanonicalScientificName(line.getRank(), parsedScientificName));
 			line.setLanguageToVernacularNames(extractVernacularNames());
 			return line;
 		}
@@ -130,7 +130,7 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 
 		protected String extractRawScientificName() throws ParsingException {
-			return getColumnValue(SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), true, String.class);
+			return getColumnValue(SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), false, String.class);
 		}
 		
 		protected ParsedName<Object> parseRawScienfificName() throws ParsingException {
@@ -208,9 +208,11 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		
 		protected Map<String, List<String>> extractVernacularNames() throws ParsingException {
 			VernacularLanguagesMap result = extractVernacularNamesFromColumns();
-			List<String> synonyms = extractSynonymsFromScientificName();
-			if ( ! synonyms.isEmpty() ) {
-				result.addSynonyms(synonyms);
+			if ( rawScientificName != null ) {
+				List<String> synonyms = extractSynonymsFromScientificName();
+				if ( ! synonyms.isEmpty() ) {
+					result.addSynonyms(synonyms);
+				}
 			}
 			return result.getMap();
 		}
