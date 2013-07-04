@@ -233,7 +233,7 @@ public class SurveyManager {
 		parsedSurvey.setId(id);
 		parsedSurvey.setName(oldSurveyWorkSummary.getName());
 		parsedSurvey.setWork(true);
-		codeListManager.deleteBySurvey(id, true);
+		codeListManager.deleteAllItemsBySurvey(id, true);
 		saveSurveyWork(parsedSurvey);
 		try {
 			codeListManager.importCodeLists(parsedSurvey, surveyFile);
@@ -252,7 +252,7 @@ public class SurveyManager {
 		if ( validate ) {
 			surveyValidator.checkCompatibility(oldPublishedSurvey, survey);
 		}
-		codeListManager.deleteBySurvey(id, false);
+		codeListManager.deleteAllItemsBySurvey(id, false);
 		updateModel(survey);
 		try {
 			codeListManager.importCodeLists(survey, surveyFile);
@@ -546,7 +546,7 @@ public class SurveyManager {
 			recordDao.deleteBySurvey(id);
 			speciesManager.deleteTaxonomiesBySurvey(id);
 			samplingDesignManager.deleteBySurvey(id);
-			codeListManager.deleteBySurvey(id, false);
+			codeListManager.deleteAllItemsBySurvey(id, false);
 			surveyDao.delete(id);
 			removeFromCache(survey);
 		}
@@ -556,7 +556,7 @@ public class SurveyManager {
 	public void deleteSurveyWork(Integer id) {
 		speciesManager.deleteTaxonomiesBySurveyWork(id);
 		samplingDesignManager.deleteBySurveyWork(id);
-		codeListManager.deleteBySurvey(id, true);
+		codeListManager.deleteAllItemsBySurvey(id, true);
 		surveyWorkDao.delete(id);
 	}
 

@@ -25,6 +25,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.CodeListImporter;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
@@ -400,6 +401,13 @@ public class CodeListManager {
 		}
 		return result;
 	}
+	
+	@Transactional
+	public void delete(CodeList codeList) {
+		Survey survey = codeList.getSurvey();
+		deleteAllItems(codeList);
+		survey.removeCodeList(codeList);
+	}
 
 	public void delete(CodeListItem item) {
 		CodeList list = item.getCodeList();
@@ -429,7 +437,7 @@ public class CodeListManager {
 		}
 	}
 
-	public void deleteBySurvey(int surveyId, boolean work) {
+	public void deleteAllItemsBySurvey(int surveyId, boolean work) {
 		codeListItemDao.deleteBySurvey(surveyId, work);
 	}
 

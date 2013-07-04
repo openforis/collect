@@ -112,8 +112,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	@Override
 	protected void deleteItemFromSurvey(CodeList item) {
-		CollectSurvey survey = getSurvey();
-		survey.removeCodeList(item);
+		codeListManager.delete(item);
 		dispatchCodeListsUpdatedCommand();
 	}
 	
