@@ -20,7 +20,7 @@ import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.utils.IOUtils;
+import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
@@ -147,7 +147,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		String contentType = media.getContentType();
 		
 		if ( contentType.equals(TEXT_XML_CONTENT) ) {
-			File tempFile = IOUtils.copyToTempFile(media.getReaderData());
+			File tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData());
 			prepareSurveyImport(tempFile, media.getName(), true);
 		} else {
 			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
