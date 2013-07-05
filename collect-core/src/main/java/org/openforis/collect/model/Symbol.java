@@ -7,30 +7,26 @@ package org.openforis.collect.model;
 public enum Symbol {
 	BLANK_ON_FORM('*'), DASH_ON_FORM('-'), ILLEGIBLE('?');
 
-	private Character symbol;
+	private char shortCut;
 
-	private Symbol(Character symbol) {
-		this.symbol = symbol;
+	private Symbol(char shortCut) {
+		this.shortCut = shortCut;
 	}
 
-	public boolean equals(CharSequence charSequence) {
-		if (charSequence.length() == 1) {
-			Character other = charSequence.charAt(0);
-			return this.symbol.equals(other);
-		}
-		return false;
+	public char getShortCut() {
+		return shortCut;
 	}
-
+	
 	@Override
 	public String toString() {
-		return this.symbol.toString();
+		return String.valueOf(this.shortCut);
 	}
 
 	public static Symbol fromString(String string) {
 		if (string != null && string.length() == 1) {
-			Character character = string.charAt(0);
+			char character = string.charAt(0);
 			for (Symbol symbol : values()) {
-				if (symbol.equals(character)) {
+				if (symbol.shortCut == character) {
 					return symbol;
 				}
 			}
