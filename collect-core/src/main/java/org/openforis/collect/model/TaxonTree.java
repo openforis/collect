@@ -294,6 +294,7 @@ public class TaxonTree {
 		}
 
 		public Node(TaxonTree tree, Taxon taxon) {
+			this.tree = tree;
 			this.taxon = taxon;
 		}
 		
