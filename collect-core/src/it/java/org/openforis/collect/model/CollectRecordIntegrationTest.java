@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -187,6 +188,44 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
 			ValidationResultFlag timeStudyMinCountValid = childrenMinCountValid.get("time_study");
 			assertEquals(ValidationResultFlag.WARNING, timeStudyMinCountValid);
+		}
+	}
+	
+	@Test
+	public void testUpdateValue() throws Exception {
+		CollectSurvey survey = loadSurvey();
+		CollectRecord record = createTestRecord(survey);
+		Entity cluster = record.getRootEntity();
+		CodeAttribute region = (CodeAttribute) cluster.get("region", 0);
+		{
+			NodeChangeSet nodeChangeSet = recordManager.updateAttribute(region, FieldSymbol.BLANK_ON_FORM);
+			assertTrue(region.isEmpty());
+			assertEquals(FieldSymbol.BLANK_ON_FORM, FieldSymbol.valueOf(region.getCodeField().getSymbol()));
+			assertEquals(FieldSymbol.BLANK_ON_FORM, FieldSymbol.valueOf(region.getQualifierField().getSymbol()));
+
+			NodeChange<?> regionChange = nodeChangeSet.getChanges().get(0);
+			assertTrue(regionChange instanceof AttributeChange);
+			assertEquals(region, regionChange.getNode());
+			Map<Integer, Object> updatedFieldValues = ((AttributeChange) regionChange).getUpdatedFieldValues();
+			Map<Integer, Object> expectedValues = new HashMap<Integer, Object>();
+			expectedValues.put(Integer.valueOf(0), null);
+			expectedValues.put(Integer.valueOf(1), null);
+			assertEquals(expectedValues, updatedFieldValues);
+		}
+		{
+			NodeChangeSet nodeChangeSet = recordManager.updateAttribute(region, new Code("AAA"));
+			assertFalse(region.isEmpty());
+			assertEquals(null, FieldSymbol.valueOf(region.getCodeField().getSymbol()));
+			assertEquals(null, FieldSymbol.valueOf(region.getQualifierField().getSymbol()));
+
+			NodeChange<?> regionChange = nodeChangeSet.getChanges().get(0);
+			assertTrue(regionChange instanceof AttributeChange);
+			assertEquals(region, regionChange.getNode());
+			Map<Integer, Object> updatedFieldValues = ((AttributeChange) regionChange).getUpdatedFieldValues();
+			Map<Integer, Object> expectedValues = new HashMap<Integer, Object>();
+			expectedValues.put(Integer.valueOf(0), "AAA");
+			expectedValues.put(Integer.valueOf(1), null);
+			assertEquals(expectedValues, updatedFieldValues);
 		}
 	}
 	
