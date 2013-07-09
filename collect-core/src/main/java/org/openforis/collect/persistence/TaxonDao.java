@@ -93,7 +93,7 @@ public class TaxonDao extends MappingJooqDaoSupport<Taxon, TaxonDao.JooqFactory>
 		SelectQuery q = f.selectCountQuery();
 		q.addConditions(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
 		Record r = q.fetchOne();
-		return r.getValueAsInteger(0);
+		return (Integer) r.getValue(0);
 	}
 	
 	public List<Taxon> loadTaxons(int taxonomyId, int offset, int maxRecords) {

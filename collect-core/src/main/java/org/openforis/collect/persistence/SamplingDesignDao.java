@@ -85,7 +85,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		TableField<OfcSamplingDesignRecord, Integer> surveyIdField = getSurveyIdField(work);
 		q.addConditions(surveyIdField.equal(surveyId));
 		Record r = q.fetchOne();
-		return r.getValueAsInteger(0);
+		return (Integer) r.getValue(0);
 	}
 	
 	public void deleteBySurvey(int surveyId) {

@@ -94,7 +94,7 @@ public class DynamicTableDao extends JooqDaoSupport {
 		addFilterConditions(lookupTable, select, filters);
 		addNotNullConditions(lookupTable, select, notNullColumns);
 		Record record = select.fetchOne();
-		Integer count = record.getValueAsInteger(0);
+		Integer count = (Integer) record.getValue(0);
 		return count > 0;
 	}
 	

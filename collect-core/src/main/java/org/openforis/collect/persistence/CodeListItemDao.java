@@ -300,7 +300,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
 		q.addSelect(Factory.count());
 		Record record = q.fetchOne();
-		Integer count = record.getValueAsInteger(0);
+		Integer count = (Integer) record.getValue(0);
 		return count > 0;
 	}
 	
@@ -319,7 +319,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		if ( r == null ) {
 			return false;
 		} else {
-			Integer count = r.getValueAsInteger(0);
+			Integer count = (Integer) r.getValue(0);
 			return count > 0;
 		}
 	}
@@ -542,7 +542,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			select.addFrom(OFC_CODE_LIST);
 			addFilterByParentItemConditions(select, codeList, item.getParentId());
 			Record record = select.fetchOne();
-			Integer max = record.getValueAsInteger(0);
+			Integer max = (Integer) record.getValue(0);
 			return max == null ? 1: max + 1;
 		}
 
