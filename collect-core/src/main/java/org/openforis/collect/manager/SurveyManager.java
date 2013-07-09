@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.manager.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator;
@@ -27,7 +28,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
-import org.openforis.collect.utils.IOUtils;
+import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
@@ -128,10 +129,12 @@ public class SurveyManager {
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
 		try {
-			tempFile = IOUtils.copyToTempFile(is);
+			tempFile = OpenForisIOUtils.copyToTempFile(is);
 			return importWorkModel(tempFile, name, validate);
 		} finally {
-			tempFile.delete();
+			if ( tempFile != null && tempFile.exists() ) {
+				tempFile.delete();
+			}
 		}
 	}
 
@@ -163,7 +166,7 @@ public class SurveyManager {
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
 		try {
-			tempFile = IOUtils.copyToTempFile(is);
+			tempFile = OpenForisIOUtils.copyToTempFile(is);
 			return importModel(tempFile, name, validate);
 		} finally {
 			if ( tempFile != null && tempFile.exists() ) {
@@ -190,7 +193,7 @@ public class SurveyManager {
 
 	@Transactional
 	public CollectSurvey updateModel(InputStream is, boolean validate) throws IdmlParseException, SurveyValidationException, SurveyImportException {
-		File tempFile = IOUtils.copyToTempFile(is);
+		File tempFile = OpenForisIOUtils.copyToTempFile(is);
 		try {
 			return updateModel(tempFile, validate);
 		} finally {
@@ -233,7 +236,7 @@ public class SurveyManager {
 		parsedSurvey.setId(id);
 		parsedSurvey.setName(oldSurveyWorkSummary.getName());
 		parsedSurvey.setWork(true);
-		codeListManager.deleteBySurvey(id, true);
+		codeListManager.deleteAllItemsBySurvey(id, true);
 		saveSurveyWork(parsedSurvey);
 		try {
 			codeListManager.importCodeLists(parsedSurvey, surveyFile);
@@ -252,7 +255,7 @@ public class SurveyManager {
 		if ( validate ) {
 			surveyValidator.checkCompatibility(oldPublishedSurvey, survey);
 		}
-		codeListManager.deleteBySurvey(id, false);
+		codeListManager.deleteAllItemsBySurvey(id, false);
 		updateModel(survey);
 		try {
 			codeListManager.importCodeLists(survey, surveyFile);
@@ -351,7 +354,7 @@ public class SurveyManager {
 	public CollectSurvey unmarshalSurvey(InputStream is,
 			boolean validate, boolean includeCodeListItems)
 			throws IdmlParseException, SurveyValidationException {
-		return unmarshalSurvey(IOUtils.toReader(is), validate, includeCodeListItems);
+		return unmarshalSurvey(OpenForisIOUtils.toReader(is), validate, includeCodeListItems);
 	}
 
 	public CollectSurvey unmarshalSurvey(Reader reader) throws IdmlParseException, SurveyValidationException {
@@ -362,7 +365,7 @@ public class SurveyManager {
 			boolean validate, boolean includeCodeListItems)
 			throws IdmlParseException, SurveyValidationException {
 		CollectSurvey survey;
-		File tempFile = IOUtils.copyToTempFile(reader);
+		File tempFile = OpenForisIOUtils.copyToTempFile(reader);
 		if ( validate ) {
 			//validate against schema
 			validateSurveyXMLAgainstSchema(tempFile);
@@ -455,9 +458,9 @@ public class SurveyManager {
 		Integer id = survey.getId();
 		String uri = survey.getUri();
 		SurveySummary workSurveySummary = loadWorkSummaryByUri(uri);
-		if (workSurveySummary == null || workSurveySummary.getId() != id ) {
+		if (workSurveySummary == null || ! workSurveySummary.getId().equals(id) ) {
 			CollectSurvey publishedSurvey = getByUri(uri);
-			if (publishedSurvey == null || publishedSurvey.getId() != id ) {
+			if (publishedSurvey == null || ! publishedSurvey.getId().equals(id) ) {
 				throw new IllegalStateException("Survey with uri '" + uri
 						+ "' not found");
 			} else {
@@ -546,7 +549,7 @@ public class SurveyManager {
 			recordDao.deleteBySurvey(id);
 			speciesManager.deleteTaxonomiesBySurvey(id);
 			samplingDesignManager.deleteBySurvey(id);
-			codeListManager.deleteBySurvey(id, false);
+			codeListManager.deleteAllItemsBySurvey(id, false);
 			surveyDao.delete(id);
 			removeFromCache(survey);
 		}
@@ -556,7 +559,7 @@ public class SurveyManager {
 	public void deleteSurveyWork(Integer id) {
 		speciesManager.deleteTaxonomiesBySurveyWork(id);
 		samplingDesignManager.deleteBySurveyWork(id);
-		codeListManager.deleteBySurvey(id, true);
+		codeListManager.deleteAllItemsBySurvey(id, true);
 		surveyWorkDao.delete(id);
 	}
 

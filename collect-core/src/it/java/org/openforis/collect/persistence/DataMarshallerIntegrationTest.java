@@ -109,7 +109,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 		record.setCreatedBy(user);
 		record.setModifiedBy(user);
 		Entity cluster = record.createRootEntity("cluster");
-		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
+		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		record.setModifiedDate(new GregorianCalendar(2012, 2, 3, 9, 30).getTime());
 		record.setStep(Step.ENTRY);
 		record.setState(State.REJECTED);

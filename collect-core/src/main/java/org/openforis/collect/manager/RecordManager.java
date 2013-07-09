@@ -317,6 +317,7 @@ public class RecordManager {
 			Attribute<?, ?> attribute,
 			FieldSymbol symbol) {
 		beforeAttributeUpdate(attribute);
+		attribute.setValue(null);
 		setSymbolOnFields(attribute, symbol);
 		return afterAttributeUpdate(attribute);
 	}

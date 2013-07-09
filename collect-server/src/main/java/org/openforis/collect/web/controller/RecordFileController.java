@@ -53,7 +53,9 @@ public class RecordFileController extends BasicController implements Serializabl
 		if(file != null && file.exists()) {
 			writeFileToResponse(response, file);
 		} else {
-			Exception e = new Exception("File not found: " + file.getName() + " record id: " + record.getId() + " node id: " + nodeId);
+			Integer recordId = record == null ? null: record.getId();
+			String fileName = file == null ? null: file.getName();
+			Exception e = new Exception("File not found: " + fileName + " record id: " + recordId + " node id: " + nodeId);
 			LOG.error(e);
 			throw e;
 		}

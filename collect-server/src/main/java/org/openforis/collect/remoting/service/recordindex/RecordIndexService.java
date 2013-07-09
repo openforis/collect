@@ -40,7 +40,7 @@ public class RecordIndexService implements Serializable {
 	@Qualifier("volatileRecordIndexManager")
 	private transient VolatileRecordIndexManager volatileIndexManager;
 	
-	private RecordIndexProcess indexProcess;
+	private transient RecordIndexProcess indexProcess;
 	
 	public List<String> search(SearchType searchType, Survey survey, int attributeDefnId, int fieldIndex, String queryText, int maxResults)  throws RecordIndexException {
 		Schema schema = survey.getSchema();

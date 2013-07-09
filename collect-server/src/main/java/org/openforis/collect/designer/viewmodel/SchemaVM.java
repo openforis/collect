@@ -126,7 +126,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	protected void nodesTreeFilterChanged(final EntityDefinition rootEntity, final ModelVersion version) {
-		if ( checkCanLeaveForm(new CanLeaveFormCompleteConfirmHandler() {
+		checkCanLeaveForm(new CanLeaveFormCompleteConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
 				selectedRootEntity = rootEntity;
@@ -140,7 +140,7 @@ public class SchemaVM extends SurveyBaseVM {
 			public void onCancel() {
 				notifyChange("selectedRootEntity","selectedVersion");
 			}
-		}));
+		});
 	}
 
 	protected void performSelectNode(Binder binder, SchemaTreeNodeData data) {

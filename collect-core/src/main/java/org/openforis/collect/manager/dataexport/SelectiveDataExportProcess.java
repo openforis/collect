@@ -98,9 +98,11 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			zipOutputStream.closeEntry();
-			zipOutputStream.flush();
-			zipOutputStream.close();
+			if ( zipOutputStream != null ) {
+				zipOutputStream.closeEntry();
+				zipOutputStream.flush();
+				zipOutputStream.close();
+			}
 		}
 		//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
 		return file;

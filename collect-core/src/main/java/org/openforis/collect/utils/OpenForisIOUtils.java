@@ -9,12 +9,14 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
+
 /**
  * 
  * @author S. Ricci
  *
  */
-public class IOUtils extends org.apache.commons.io.IOUtils {
+public class OpenForisIOUtils {
 
 	public static final String UTF_8 = "UTF-8";
 

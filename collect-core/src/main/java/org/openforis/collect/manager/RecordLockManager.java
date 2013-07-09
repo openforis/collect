@@ -44,8 +44,8 @@ public class RecordLockManager {
 			int lockRecordId = lock.getRecordId();
 			User lUser = lock.getUser();
 			if( recordId == lockRecordId  && 
-					( lUser == user || lUser.getId() == user.getId() ) &&  
-					lockSessionId.equals(sessionId) ) {
+					( lUser == user || lUser.getId().equals(user.getId()) ) &&  
+						lockSessionId.equals(sessionId) ) {
 				lock.keepAlive();
 				return true;
 			} else {

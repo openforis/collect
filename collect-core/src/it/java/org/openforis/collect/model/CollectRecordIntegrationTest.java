@@ -9,14 +9,25 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.validation.CodeParentValidator;
+import org.openforis.idm.metamodel.validation.CodeValidator;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -181,6 +192,44 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	@Test
+	public void testUpdateValue() throws Exception {
+		CollectSurvey survey = loadSurvey();
+		CollectRecord record = createTestRecord(survey);
+		Entity cluster = record.getRootEntity();
+		CodeAttribute region = (CodeAttribute) cluster.get("region", 0);
+		{
+			NodeChangeSet nodeChangeSet = recordManager.updateAttribute(region, FieldSymbol.BLANK_ON_FORM);
+			assertTrue(region.isEmpty());
+			assertEquals(FieldSymbol.BLANK_ON_FORM, FieldSymbol.valueOf(region.getCodeField().getSymbol()));
+			assertEquals(FieldSymbol.BLANK_ON_FORM, FieldSymbol.valueOf(region.getQualifierField().getSymbol()));
+
+			NodeChange<?> regionChange = nodeChangeSet.getChanges().get(0);
+			assertTrue(regionChange instanceof AttributeChange);
+			assertEquals(region, regionChange.getNode());
+			Map<Integer, Object> updatedFieldValues = ((AttributeChange) regionChange).getUpdatedFieldValues();
+			Map<Integer, Object> expectedValues = new HashMap<Integer, Object>();
+			expectedValues.put(Integer.valueOf(0), null);
+			expectedValues.put(Integer.valueOf(1), null);
+			assertEquals(expectedValues, updatedFieldValues);
+		}
+		{
+			NodeChangeSet nodeChangeSet = recordManager.updateAttribute(region, new Code("AAA"));
+			assertFalse(region.isEmpty());
+			assertEquals(null, FieldSymbol.valueOf(region.getCodeField().getSymbol()));
+			assertEquals(null, FieldSymbol.valueOf(region.getQualifierField().getSymbol()));
+
+			NodeChange<?> regionChange = nodeChangeSet.getChanges().get(0);
+			assertTrue(regionChange instanceof AttributeChange);
+			assertEquals(region, regionChange.getNode());
+			Map<Integer, Object> updatedFieldValues = ((AttributeChange) regionChange).getUpdatedFieldValues();
+			Map<Integer, Object> expectedValues = new HashMap<Integer, Object>();
+			expectedValues.put(Integer.valueOf(0), "AAA");
+			expectedValues.put(Integer.valueOf(1), null);
+			assertEquals(expectedValues, updatedFieldValues);
+		}
+	}
+	
+	@Test
 	public void testConfirmError() throws Exception {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
@@ -212,11 +261,69 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			assertFalse(warnings.isEmpty());
 		}
 	}
+
+	@Test
+	public void testMultipleCodeListLevelValidation() {
+		CollectRecord record = createTestMultipleCodeListLevelRecord();
+		recordManager.validate(record);
+		assertEquals(Integer.valueOf(0), record.getErrors());
+		assertEquals(Integer.valueOf(0), record.getWarnings());
+		
+		Entity rootEntity = record.getRootEntity();
+		
+		CodeAttribute code1 = (CodeAttribute) rootEntity.get("code1", 0);
+		CodeAttribute code2 = (CodeAttribute) rootEntity.get("code2", 0);
+		CodeAttribute code3 = (CodeAttribute) rootEntity.get("code3", 0);
+		
+		recordManager.updateAttribute(code1, new Code("WRONG"));
+		
+		assertEquals(Integer.valueOf(1), record.getErrors());
+		assertEquals(Integer.valueOf(2), record.getWarnings());
+		
+		checkHasError(record, code1.getInternalId(), CodeValidator.class);
+		checkHasWarning(record, code2.getInternalId(), CodeParentValidator.class);
+		checkHasWarning(record, code3.getInternalId(), CodeParentValidator.class);
+		
+		recordManager.updateAttribute(code1, new Code("A"));
+		
+		assertEquals(Integer.valueOf(0), record.getErrors());
+		assertEquals(Integer.valueOf(0), record.getWarnings());
+		
+		recordManager.updateAttribute(code2, new Code("WRONG"));
+		
+		assertEquals(Integer.valueOf(1), record.getErrors());
+		assertEquals(Integer.valueOf(1), record.getWarnings());
+			
+		checkHasError(record, code2.getInternalId(), CodeValidator.class);
+		checkHasWarning(record, code3.getInternalId(), CodeParentValidator.class);
+	}
+
+	private void checkHasError(CollectRecord record, int attributeId, Class<?> checkType) {
+		ValidationResults validationResults = record.getValidationCache().getAttributeValidationResults(attributeId);
+		List<ValidationResult> errors = validationResults.getErrors();
+		for (ValidationResult validationResult : errors) {
+			if ( checkType.isAssignableFrom(validationResult.getValidator().getClass()) ) {
+				return;
+			}
+		}
+		Assert.fail("Error of class " + checkType + " not found in validation results");
+	}
+	
+	private void checkHasWarning(CollectRecord record, int attributeId, Class<?> checkType) {
+		ValidationResults validationResults = record.getValidationCache().getAttributeValidationResults(attributeId);
+		List<ValidationResult> warnings = validationResults.getWarnings();
+		for (ValidationResult validationResult : warnings) {
+			if ( checkType.isAssignableFrom(validationResult.getValidator().getClass()) ) {
+				return;
+			}
+		}
+		Assert.fail();
+	}
 	
 	private CollectRecord createTestRecord(CollectSurvey survey) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
-		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
+		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		record.setStep(Step.ENTRY);
 		String id = "123_456";
 		
@@ -228,6 +335,206 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		//set keys
 		record.getRootEntityKeyValues().add(id);
 		
+		return record;
+	}
+	
+	private CollectSurvey createMultipleLevelCodeListTestSurvey() {
+		CollectSurvey survey = surveyManager.createSurveyWork();
+		CodeList codeList = survey.createCodeList();
+		{
+			CodeListLevel codeListLevel = new CodeListLevel();
+			codeListLevel.setName("level1");
+			codeList.addLevel(codeListLevel);
+		}
+		{
+			CodeListLevel codeListLevel = new CodeListLevel();
+			codeListLevel.setName("level2");
+			codeList.addLevel(codeListLevel);
+		}
+		{
+			CodeListLevel codeListLevel = new CodeListLevel();
+			codeListLevel.setName("level3");
+			codeList.addLevel(codeListLevel);
+		}
+		{
+			CodeListItem item  = codeList.createItem();
+			item.setCode("A");
+			codeList.addItem(item);
+			{
+				CodeListItem child = codeList.createItem();
+				child.setCode("1");
+				item.addChildItem(child);
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("a");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("b");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("c");
+					child.addChildItem(child2);
+				}
+			}
+			{
+				CodeListItem child = codeList.createItem();
+				child.setCode("2");
+				item.addChildItem(child);
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("a");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("b");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("c");
+					child.addChildItem(child2);
+				}
+			}
+			{
+				CodeListItem child = codeList.createItem();
+				child.setCode("3");
+				item.addChildItem(child);
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("a");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("b");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("c");
+					child.addChildItem(child2);
+				}
+			}
+		}
+		{
+			CodeListItem item  = codeList.createItem();
+			item.setCode("B");
+			codeList.addItem(item);
+			{
+				CodeListItem child = codeList.createItem();
+				child.setCode("1");
+				item.addChildItem(child);
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("a");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("b");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("c");
+					child.addChildItem(child2);
+				}
+			}
+			{
+				CodeListItem child = codeList.createItem();
+				child.setCode("2");
+				item.addChildItem(child);
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("a");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("b");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("c");
+					child.addChildItem(child2);
+				}
+			}
+			{
+				CodeListItem child = codeList.createItem();
+				child.setCode("3");
+				item.addChildItem(child);
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("a");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("b");
+					child.addChildItem(child2);
+				}
+				{
+					CodeListItem child2 = codeList.createItem();
+					child2.setCode("c");
+					child.addChildItem(child2);
+				}
+			}
+		}
+		survey.addCodeList(codeList);
+		
+		Schema schema = survey.getSchema();
+		EntityDefinition root = schema.createEntityDefinition();
+		root.setName("root");
+		schema.addRootEntityDefinition(root);
+		{
+			CodeAttributeDefinition codeAttrDefn = schema.createCodeAttributeDefinition();
+			codeAttrDefn.setList(codeList);
+			codeAttrDefn.setName("code1");
+			root.addChildDefinition(codeAttrDefn);
+		}
+		{
+			CodeAttributeDefinition codeAttrDefn = schema.createCodeAttributeDefinition();
+			codeAttrDefn.setList(codeList);
+			codeAttrDefn.setName("code2");
+			codeAttrDefn.setParentExpression("code1");
+			root.addChildDefinition(codeAttrDefn);
+		}
+		{
+			CodeAttributeDefinition codeAttrDefn = schema.createCodeAttributeDefinition();
+			codeAttrDefn.setList(codeList);
+			codeAttrDefn.setName("code3");
+			codeAttrDefn.setParentExpression("code2");
+			root.addChildDefinition(codeAttrDefn);
+		}
+		return survey;
+	}
+	
+	private CollectRecord createTestMultipleCodeListLevelRecord() {
+		CollectSurvey survey = createMultipleLevelCodeListTestSurvey();
+		CollectRecord record = new CollectRecord(survey, null);
+		Entity root = record.createRootEntity("root");
+		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
+		record.setStep(Step.ENTRY);
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition("root");
+		NodeDefinition code1Defn = rootEntityDefn.getChildDefinition("code1");
+		CodeAttribute code1 = (CodeAttribute) code1Defn.createNode();
+		code1.setValue(new Code("A"));
+		root.add(code1);
+		NodeDefinition code2Defn = rootEntityDefn.getChildDefinition("code2");
+		CodeAttribute code2 = (CodeAttribute) code2Defn.createNode();
+		code2.setValue(new Code("2"));
+		root.add(code2);
+		NodeDefinition code3Defn = rootEntityDefn.getChildDefinition("code3");
+		CodeAttribute code3 = (CodeAttribute) code3Defn.createNode();
+		code3.setValue(new Code("b"));
+		root.add(code3);
 		return record;
 	}
 	
