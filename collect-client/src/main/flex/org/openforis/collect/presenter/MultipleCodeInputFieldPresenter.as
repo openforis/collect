@@ -21,6 +21,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -164,7 +165,7 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateDescription():void {
 			_view.description = "";
-			if(_view.attributes != null) {
+			if(_view.attributes != null && _view.attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
 				var codes:Array = [];
 				var code:String;
 				var attribute:AttributeProxy;
