@@ -17,6 +17,7 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
+import org.openforis.collect.utils.CollectIOUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +49,7 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 	
 	public CollectSurvey unmarshalIdml(InputStream is) throws IdmlParseException {
-		InputStreamReader reader = new InputStreamReader(is);
-		return unmarshalIdml(reader);
+		return unmarshalIdml(CollectIOUtils.toReader(is));
 	}
 
 	public CollectSurvey unmarshalIdml(Reader reader) throws IdmlParseException {

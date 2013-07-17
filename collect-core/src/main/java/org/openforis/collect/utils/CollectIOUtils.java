@@ -3,7 +3,10 @@ package org.openforis.collect.utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -15,6 +18,8 @@ import org.apache.commons.io.IOUtils;
  */
 public class CollectIOUtils {
 
+	public static final String UTF_8 = "UTF-8";
+	
 	public static File copyToTempFile(Reader reader) {
 		File tempFile = createTempFile();
 		FileOutputStream tempOut = null;
@@ -52,6 +57,14 @@ public class CollectIOUtils {
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot creating temp file: " + e.getMessage());
+		}
+	}
+	
+	public static InputStreamReader toReader(InputStream is) {
+		try {
+			return new InputStreamReader(is, UTF_8);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }
