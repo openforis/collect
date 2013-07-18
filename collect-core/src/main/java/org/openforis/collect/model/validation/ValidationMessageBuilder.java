@@ -47,7 +47,6 @@ import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
  * 
@@ -313,7 +312,7 @@ public class ValidationMessageBuilder {
 	}
 	
 	public String getPrettyLabelText(NodeDefinition definition) {
-		Locale locale = LocaleContextHolder.getLocale();
+		Locale locale = messageBundle.getCurrentLocale();
 		String language = locale.getLanguage();
 		return getPrettyLabelText(definition, language);
 	}

@@ -18,6 +18,8 @@ import java.util.PropertyResourceBundle;
  */
 public class ResourceBundleMessageSource extends AbstractMessageSource {
 
+	private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+
 	private static final String VALIDATION_BUNDLE_NAME = "org/openforis/collect/resourcebundles/validation";
 	
 	private Locale currentLocale;
@@ -32,6 +34,7 @@ public class ResourceBundleMessageSource extends AbstractMessageSource {
 		super();
 		this.bundleBaseNames = bundleBaseNames;
 		this.localeToResourceBundles = new HashMap<Locale, List<PropertyResourceBundle>>();
+		this.currentLocale = DEFAULT_LOCALE;
 	}
 
 	@Override
