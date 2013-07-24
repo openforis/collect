@@ -1,6 +1,7 @@
 package org.openforis.collect.relational.model;
 
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -23,6 +24,7 @@ import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition.Type;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.path.Path;
+import org.openforis.idm.path.PathElement;
 
 /**
  * 
@@ -180,6 +182,9 @@ public class RelationalSchemaGenerator {
 			throw new CollectRdbException("Duplicate table '"+name+"' for "+defn.getPath());
 		}
 		addPKColumn(table);
+		
+		addAncestorKeyColumns(table);
+		
 		if ( parentTable != null ) {
 			// Create FK column
 			String fkColumnName = parentTable.getBaseName() + config.getIdColumnSuffix();
@@ -203,6 +208,64 @@ public class RelationalSchemaGenerator {
 		table.addColumn(pkColumn);
 		// Create PK constraint
 		addPKConstraint(table, pkColumn);
+	}
+	
+	protected void addAncestorKeyColumns(DataTable table) throws CollectRdbException {
+		NodeDefinition nodeDefn = table.getNodeDefinition();
+		List<EntityDefinition> ancestors = getAncestorEntities(nodeDefn);
+		for (int levelIdx = 0; levelIdx < ancestors.size(); levelIdx++) {
+			EntityDefinition ancestor = ancestors.get(levelIdx);
+			List<AttributeDefinition> keyAttrDefns = ancestor.getKeyAttributeDefinitions();
+			for (AttributeDefinition keyDefn : keyAttrDefns) {
+				FieldDefinition<?> fieldDefn = getKeyAttributeValueFieldDefinition(keyDefn);
+				Path fieldRelativePath = createAncestorKeyRelativePath(ancestors.size() - levelIdx, fieldDefn);
+				String colName = getAncestorKeyColumnName(keyDefn);
+				AncestorKeyColumn col = new AncestorKeyColumn(colName, fieldDefn, fieldRelativePath);
+				addColumn(table, col);
+			}
+		}
+	}
+	
+	protected FieldDefinition<?> getKeyAttributeValueFieldDefinition(
+			AttributeDefinition defn) {
+		FieldDefinition<?> fieldDefn;
+		if ( defn instanceof CodeAttributeDefinition ) {
+			fieldDefn = defn.getFieldDefinition(CodeAttributeDefinition.CODE_FIELD);
+		} else if ( defn instanceof NumberAttributeDefinition ) {
+			fieldDefn = defn.getFieldDefinition(NumberAttributeDefinition.VALUE_FIELD);
+		} else if ( defn instanceof TextAttributeDefinition ) {
+			fieldDefn = defn.getFieldDefinition("value"); //TODO create constant in TextAttributeDefinition
+		} else {
+			throw new IllegalArgumentException("Invalid key attribute definition type: " + defn.getClass().getName());
+		}
+		return fieldDefn;
+	}
+
+	protected String getAncestorKeyColumnName(AttributeDefinition keyDefn) {
+		NodeDefinition parentDefn = keyDefn.getParentDefinition();
+		return parentDefn.getName() + "_" + keyDefn.getName();
+	}
+
+	//TODO move to NodeDefinition ??
+	protected List<EntityDefinition> getAncestorEntities(NodeDefinition defn) {
+		List<EntityDefinition> ancestors = new ArrayList<EntityDefinition>();
+		EntityDefinition parentDefn = (EntityDefinition) defn.getParentDefinition();
+		while ( parentDefn != null ) {
+			ancestors.add(0, parentDefn);
+			parentDefn = (EntityDefinition) parentDefn.getParentDefinition();
+		}
+		return ancestors;
+	}
+
+	protected Path createAncestorKeyRelativePath(int depth, FieldDefinition<?> field) {
+		Path result = Path.relative(".");
+		for (int i = 0; i < depth; i++) {
+			result = result.append(new PathElement(".."));
+		}
+		NodeDefinition parentDefn = field.getParentDefinition();
+		result = result.appendElement(parentDefn.getName());
+		result = result.appendElement(field.getName());
+		return result;
 	}
 	
 	protected void addPKColumn(CodeTable table) {
