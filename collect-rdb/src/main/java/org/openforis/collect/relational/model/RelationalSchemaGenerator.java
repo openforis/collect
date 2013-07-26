@@ -465,6 +465,9 @@ public class RelationalSchemaGenerator {
 			jdbcType = Types.FLOAT;
 			typeName =  "float";
 			length = config.getFloatingPointPrecision();
+		} else if ( type == Long.class ) {
+			jdbcType = Types.BIGINT;
+			typeName = "bigint";
 		} else if ( type == Boolean.class ) {
 			jdbcType = Types.BOOLEAN;
 			typeName =  "boolean";
