@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
+import org.openforis.commons.collection.CollectionUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -44,7 +45,7 @@ public class DataUnmarshaller {
 				CollectRecord record = handler.getRecord();
 				result.setRecord(record);
 				List<NodeUnmarshallingError> warns = handler.getWarnings();
-				if (warns.size() > 0) {
+				if ( ! warns.isEmpty() ) {
 					result.setMessage("Processed with errors: " + warns.toString());
 					result.setWarnings(warns);
 				}
@@ -113,8 +114,12 @@ public class DataUnmarshaller {
 			this.record = record;
 		}
 
+		public boolean hasFailures() {
+			return failures != null && ! failures.isEmpty();
+		}
+
 		public boolean hasWarnings() {
-			return warnings != null && warnings.size() > 0;
+			return warnings != null && ! warnings.isEmpty();
 		}
 
 		public String getMessage() {
@@ -142,7 +147,7 @@ public class DataUnmarshaller {
 		}
 
 		public List<NodeUnmarshallingError> getWarnings() {
-			return warnings;
+			return CollectionUtils.unmodifiableList(warnings);
 		}
 
 		public void setWarnings(List<NodeUnmarshallingError> warnings) {
@@ -150,7 +155,7 @@ public class DataUnmarshaller {
 		}
 
 		public List<NodeUnmarshallingError> getFailures() {
-			return failures;
+			return CollectionUtils.unmodifiableList(failures);
 		}
 
 		public void setFailures(List<NodeUnmarshallingError> failures) {

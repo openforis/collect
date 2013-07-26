@@ -398,6 +398,10 @@ public class DataHandler extends DefaultHandler {
 		return record;
 	}
 
+	public CollectSurvey getRecordSurvey() {
+		return recordSurvey;
+	}
+	
 	public List<NodeUnmarshallingError> getFailures() {
 		return CollectionUtils.unmodifiableList(failures);
 	}
@@ -444,6 +448,11 @@ public class DataHandler extends DefaultHandler {
 
 		public void setMessage(String message) {
 			this.message = message;
+		}
+		
+		@Override
+		public String toString() {
+			return "Node: " + path + " message: " + message;
 		}
 
 	}
