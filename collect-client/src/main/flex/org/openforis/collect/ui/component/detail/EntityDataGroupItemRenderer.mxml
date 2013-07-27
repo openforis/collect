@@ -47,7 +47,7 @@
 					if(nodeDefn is AttributeDefinitionProxy) {
 						formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(nodeDefn));
 						formItem.labelWidth = DEFAULT_LABEL_WIDTH;
-					} else if(data is EntityDefinitionProxy) {
+					} else if(nodeDefn is EntityDefinitionProxy) {
 						formItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(nodeDefn));
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					}
