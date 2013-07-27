@@ -32,7 +32,7 @@ public final class RelationalSchema {
 		this.survey = survey;
 		this.name = name;
 		this.tables = new LinkedHashMap<String, Table<?>>();
-		this.codeListTables = new HashMap<CodeListTableKey, CodeTable>();
+		this.codeListTables = new LinkedHashMap<CodeListTableKey, CodeTable>();
 		this.rootDataTables = new HashMap<String, DataTable>();
 	}
 
