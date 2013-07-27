@@ -2,6 +2,8 @@ package org.openforis.collect.relational.model;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Date;
@@ -15,9 +17,12 @@ import org.openforis.idm.path.Path;
 /**
  * 
  * @author G. Miceli
+ * @author S. Ricci
  *
  */
 public class DataColumn extends AbstractColumn<Node<?>> {
+	
+	private final Log log = LogFactory.getLog(DataColumn.class);
 	
 	private Object defaultValue;
 	private NodeDefinition nodeDefinition;
@@ -78,18 +83,29 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 	private Object convert(Node<?> valNode) {
 		if ( valNode == null ) {
 			return null;
-		} else if ( valNode instanceof Field ) {
-			return ((Field<?>) valNode).getValue();
-		} else if ( valNode instanceof DateAttribute ) {
-			Date date = ((DateAttribute) valNode).getValue();
-			return date.toJavaDate();
-		} else if ( valNode instanceof TimeAttribute ) {
-			Time time = ((TimeAttribute) valNode).getValue();
-			return time.toXmlTime();
-		} else if ( valNode instanceof Attribute ) {
-			return ((Attribute<?,?>) valNode).getValue();
 		} else {
-			throw new RuntimeException("Unknown data node type "+valNode.getClass());
+			try {	
+				if ( valNode instanceof Field ) {
+					return ((Field<?>) valNode).getValue();
+				} else if ( valNode instanceof DateAttribute ) {
+					Date date = ((DateAttribute) valNode).getValue();
+					return date.toJavaDate();
+				} else if ( valNode instanceof TimeAttribute ) {
+					Time time = ((TimeAttribute) valNode).getValue();
+					return time.toXmlTime();
+				} else if ( valNode instanceof Attribute ) {
+					return ((Attribute<?,?>) valNode).getValue();
+				} else {
+					throw new RuntimeException("Unknown data node type "+valNode.getClass());
+				}
+			} catch ( Exception e) {
+				//ERRORS in data?
+				String messageFormat = "Error converting attribute value in record: %d - node: %s";
+				String message = String.format(messageFormat, valNode.getRecord().getId(), valNode.getPath());
+				log.error(message);
+				System.out.println(message);
+				return null;
+			}
 		}
 	}
 	
