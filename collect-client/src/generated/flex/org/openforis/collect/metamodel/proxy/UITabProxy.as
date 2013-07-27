@@ -15,9 +15,13 @@ package org.openforis.collect.metamodel.proxy {
 		
 		public function get labelText():String {
 			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, langCode, defaultLanguage);
-			if ( result == null ) {
+			var defaultLangCode:String = Application.activeSurvey.defaultLanguageCode;
+			var isDefaultLang:Boolean = defaultLangCode == langCode;
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, langCode, isDefaultLang);
+			if ( result == null && ! isDefaultLang ) {
+				result = LanguageSpecificTextProxy.getLocalizedText(this.labels, defaultLangCode, true);
+			}
+			if ( result == null) {
 				return name;
 			}
 			return result;

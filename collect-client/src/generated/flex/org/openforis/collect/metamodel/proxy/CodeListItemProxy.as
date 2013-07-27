@@ -6,6 +6,8 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import mx.collections.ListCollectionView;
+	
 	import org.openforis.collect.Application;
 
     [Bindable]
@@ -13,16 +15,21 @@ package org.openforis.collect.metamodel.proxy {
     public class CodeListItemProxy extends CodeListItemProxyBase {
 		
 		public function getLabelText():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(labels, langCode, defaultLanguage);
-			return result;
+			return getLocalizedLabelText(this.labels);
 		}
 		
 		public function getDescriptionText():String {
+			return getLocalizedLabelText(this.descriptions);
+		}
+		
+		private function getLocalizedLabelText(labels:ListCollectionView):String {
 			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, langCode, defaultLanguage);
+			var defaultLangCode:String = Application.activeSurvey.defaultLanguageCode;
+			var isDefaultLang:Boolean = langCode == defaultLangCode;
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(labels, langCode, isDefaultLang);
+			if ( result == null && ! isDefaultLang ) {
+				result = LanguageSpecificTextProxy.getLocalizedText(labels, defaultLangCode, true);
+			}
 			return result;
 		}
 		
