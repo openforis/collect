@@ -80,8 +80,10 @@ package org.openforis.collect.metamodel.proxy {
 						return label;
 					}
 				}
+				return getDefaultLanguageLabelByType(type);
+			} else {
+				return null;
 			}
-			return null;
 		}
 		
 		public function getLabelsByType(type:NodeLabelProxy$Type):IList {
@@ -94,9 +96,25 @@ package org.openforis.collect.metamodel.proxy {
 			return result;
 		}
 		
+		public function getDefaultLanguageLabelByType(type:NodeLabelProxy$Type):NodeLabelProxy {
+			var labelsPerType:IList = getLabelsByType(type);
+			var defaultLangCode:String = Application.activeSurvey.defaultLanguageCode;
+			for each(var label:NodeLabelProxy in labelsPerType) {
+				if ( label.language == null || label.language == defaultLangCode) {
+					return label;
+				}
+			}
+			return null;
+		}
+		
 		public function getDescription():String {
 			var langCode:String = Application.localeLanguageCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, langCode);
+			var defaultLangCode:String = Application.activeSurvey.defaultLanguageCode;
+			var isDefaultLang:Boolean = langCode == defaultLangCode;
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, langCode, isDefaultLang);
+			if ( result == null && ! isDefaultLang) {
+				result = LanguageSpecificTextProxy.getLocalizedText(descriptions, defaultLangCode, true);;
+			}
 			result = TextUtil.trimLeadingWhitespace(result);
 			return result;
 		}
