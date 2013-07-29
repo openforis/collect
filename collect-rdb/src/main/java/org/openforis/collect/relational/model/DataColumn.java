@@ -2,6 +2,8 @@ package org.openforis.collect.relational.model;
 
 import java.util.List;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Date;
@@ -44,6 +46,29 @@ public class DataColumn extends AbstractColumn<Node<?>> {
 	
 	public Object getDefaultValue() {
 		return defaultValue;
+	}
+	
+	/**
+	 * Returns the {@link AttributeDefinition} associated to the column.
+	 * 
+	 * @param column
+	 * @return
+	 */
+	public AttributeDefinition getAttributeDefinition() {
+		if ( nodeDefinition == null ) {
+			return null;
+		}
+		AttributeDefinition attributeDefn;
+		if ( nodeDefinition instanceof AttributeDefinition ) {
+			attributeDefn = (AttributeDefinition) nodeDefinition;
+		} else if ( nodeDefinition instanceof FieldDefinition ) {
+			attributeDefn = (AttributeDefinition) nodeDefinition.getParentDefinition();
+		} else {
+			throw new IllegalStateException(
+					"Invalid node definition, expected AttributeDefinition or FieldDefinition, found: "
+							+ nodeDefinition.getClass().getName());
+		}
+		return attributeDefn;
 	}
 
 	@Override

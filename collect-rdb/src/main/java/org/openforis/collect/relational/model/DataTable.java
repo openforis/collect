@@ -94,4 +94,24 @@ public class DataTable extends AbstractTable<Node<?>> {
 			}
 		}
 	}
+	
+	public DataPrimaryKeyColumn getPrimaryKeyColumn() {
+		List<Column<?>> columns = getColumns();
+		for (Column<?> c : columns) {
+			if ( c instanceof DataPrimaryKeyColumn ) {
+				return (DataPrimaryKeyColumn) c;
+			}
+		}
+		return null;
+	}
+	
+	public DataParentKeyColumn getParentKeyColumn() {
+		List<Column<?>> columns = getColumns();
+		for (Column<?> c : columns) {
+			if ( c instanceof DataParentKeyColumn ) {
+				return (DataParentKeyColumn) c;
+			}
+		}
+		return null;
+	}
 }
