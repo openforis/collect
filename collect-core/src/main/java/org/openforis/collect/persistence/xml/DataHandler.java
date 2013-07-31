@@ -23,6 +23,7 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
+import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -282,7 +283,7 @@ public class DataHandler extends DefaultHandler {
 		Attribute attr = (Attribute) node;
 		try {
 			if (field != null) {
-				Field<?> fld = attr.getField(field);
+				Field<?> fld = getField();
 				if ( fld != null ) {
 					setField(fld);
 				} else {
@@ -300,6 +301,24 @@ public class DataHandler extends DefaultHandler {
 		} else {
 			this.field = null;
 		}
+	}
+
+	private Field<?> getField() {
+		Attribute<?, ?> attr = (Attribute<?, ?>) node;
+		Field<?> fld;
+		if ( attr instanceof FileAttribute ) {
+			//backwards compatibility
+			if ( field.equals("fileName") ) {
+				fld = ((FileAttribute) attr).getFilenameField();
+			} else if ( field.equals("fileSize") ) {
+				fld = ((FileAttribute) attr).getSizeField();
+			} else {
+				fld = attr.getField(field);
+			}
+		} else {
+			fld = attr.getField(field);
+		}
+		return fld;
 	}
 
 	protected void removeIfEmpty(Node<?> node) {
