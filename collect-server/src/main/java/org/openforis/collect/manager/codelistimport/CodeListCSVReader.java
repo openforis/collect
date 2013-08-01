@@ -23,19 +23,26 @@ import org.openforis.commons.io.csv.CsvLine;
 public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 
 	public static final String CODE_COLUMN_SUFFIX = "_code";
+	public static final String LABEL_COLUMN_SUFFIX = "_label";
 	public static final String LEVEL_NAME_COLUMN_EXPR = "[a-z][a-z0-9_]*";
 	public static final String CODE_COLUMN_EXPR = "^" + LEVEL_NAME_COLUMN_EXPR + CODE_COLUMN_SUFFIX + "$";
 	public static final String LABEL_COLUMN_EXPR = "^" + LEVEL_NAME_COLUMN_EXPR + "$";
 
 	private List<String> levels;
+	private List<String> languages;
+	private String defaultLanguage;
 	
-	public CodeListCSVReader(String filename) throws IOException, ParsingException {
+	public CodeListCSVReader(String filename, List<String> languages, String defaultLanguage) throws IOException, ParsingException {
 		super(filename);
+		this.languages = languages;
+		this.defaultLanguage = defaultLanguage;
 		initLevels();
 	}
 
-	public CodeListCSVReader(Reader reader) throws IOException, ParsingException {
+	public CodeListCSVReader(Reader reader, List<String> languages, String defaultLanguage) throws IOException, ParsingException {
 		super(reader);
+		this.languages = languages;
+		this.defaultLanguage = defaultLanguage;
 		initLevels();
 	}
 	
@@ -58,8 +65,9 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 		levels = new ArrayList<String>();
 		for (int i = 0; i < colNames.size(); i++) {
 			String colName = colNames.get(i);
-			if ( i % 2 != 0 ) {
-				levels.add(colName);
+			if ( colName.matches(CODE_COLUMN_EXPR) ) {
+				String levelName = colName.substring(0, colName.lastIndexOf(CODE_COLUMN_SUFFIX));
+				levels.add(levelName);
 			}
 		}
 	}
@@ -68,6 +76,14 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 		return levels;
 	}
 	
+	public List<String> getLanguages() {
+		return languages;
+	}
+	
+	public String getDefaultLanguage() {
+		return defaultLanguage;
+	}
+
 	public static class CodeListCSVLineParser extends CSVLineParser<CodeListLine> {
 		
 		CodeListCSVLineParser(CodeListCSVReader reader, CsvLine line) {
@@ -80,13 +96,37 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 	
 		public CodeListLine parse() throws ParsingException {
 			CodeListLine line = super.parse();
+			List<String> languages = ((CodeListCSVReader) reader).getLanguages();
 			List<String> levels = ((CodeListCSVReader) reader).getLevels();
-			for (String level : levels) {
-				String code = getColumnValue(level + CODE_COLUMN_SUFFIX, true, String.class);
-				String label = getColumnValue(level, true, String.class);
-				line.addCodeLabelItem(code, label);
+			for (int i = 0; i < levels.size(); i++) {
+				String level = levels.get(i);
+				String codeColumnName = level + CODE_COLUMN_SUFFIX;
+				String code = getColumnValue(codeColumnName, false, String.class);
+				if ( code != null ) {
+					line.addLevelCode(code);
+					addLabels(line, languages, level, i);
+				} else {
+					break;
+				}
 			}
 			return line;
+		}
+
+		private void addLabels(CodeListLine line, List<String> languages,
+				String level, int levelIdx) throws ParsingException {
+			String defaultLangLabelColName = level;
+			String label = getColumnValue(defaultLangLabelColName, false, String.class);
+			if ( label != null ) {
+				String defaultLang = ((CodeListCSVReader) reader).getDefaultLanguage();
+				line.addLabel(levelIdx, defaultLang, label);
+			}
+			for (String lang : languages) {
+				String labelColumnName = level + LABEL_COLUMN_SUFFIX + "_" + lang;
+				String l = getColumnValue(labelColumnName, false, String.class);
+				if ( l != null ) {
+					line.addLabel(levelIdx, lang, l);
+				}
+			}
 		}
 
 	}
@@ -101,27 +141,18 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 
 		protected void validateHeaders() throws ParsingException {
 			List<String> colNames = getColumnNames();
-			if ( colNames == null || colNames.size() % 2 != 0 ) {
-				ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
-				throw new ParsingException(error);
-			}
-			String levelName = null;
+			boolean codeColumnFound = false;
 			for (int i = 0; i < colNames.size(); i++) {
 				String colName = StringUtils.trimToEmpty(colNames.get(i));
-				boolean codeColumn = i % 2 == 0;
-				if ( codeColumn ) {
-					//code column
-					if ( colName.matches(CODE_COLUMN_EXPR) ) {
-						levelName = colName.substring(0, colName.toLowerCase().lastIndexOf(CODE_COLUMN_SUFFIX.toLowerCase()));
-					} else {
-						String expectedColName = colName + CODE_COLUMN_SUFFIX;
-						ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, expectedColName);
-						throw new ParsingException(error);
-					}
-				} else if (! colName.equalsIgnoreCase(levelName) ) {
-					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, levelName);
-					throw new ParsingException(error);
+				if ( colName.matches(CODE_COLUMN_EXPR) ) {
+					codeColumnFound = true;
+					break;
 				}
+			}
+			if ( ! codeColumnFound ) {
+				ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
+						(String) null, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
+				throw new ParsingException(error);
 			}
 		}
 

@@ -24,7 +24,7 @@ public abstract class CSVLineParser<T extends Line> extends LineParser<T> {
 	
 	@Override
 	protected <V> V getColumnValue(String column, boolean required, Class<V> type) throws ParsingException {
-		V value = csvLine.getValue(column, type);
+		V value = getColumnValue(column, type);
 		if ( required && ( value == null || value instanceof String && StringUtils.isBlank((String) value) )) {
 			throwEmptyColumnParsingException(column);
 		}
@@ -32,6 +32,16 @@ public abstract class CSVLineParser<T extends Line> extends LineParser<T> {
 			value = trimValue(value);
 		}
 		return value;
+	}
+
+	private <V> V getColumnValue(String column, Class<V> type) {
+		String[] lineContent = csvLine.getLine();
+		Integer columnIndex = csvLine.getColumnIndex(column);
+		if ( columnIndex == null || columnIndex < 0 || columnIndex >= lineContent.length ) {
+			return null;
+		} else {
+			return csvLine.getValue(columnIndex, type);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

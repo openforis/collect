@@ -13,15 +13,17 @@ import java.util.Stack;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.manager.codelistimport.CodeListLine.CodeLabelItem;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ParsingException;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.CollectIOUtils;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.LanguageSpecificText;
 
 /**
  * 
@@ -30,16 +32,18 @@ import org.openforis.idm.metamodel.CodeListLevel;
  */
 public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportStatus> {
 
+	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
+
 	private static final String CSV = "csv";
 
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "codeListImport.error.internalErrorImportingFile";
 	
-	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
+	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.error.differentLabel";
+	
 	//parameters
 	private File file;
 	private CodeList codeList;
 	private CodeScope codeScope;
-	private String langCode;
 	
 	//internal variables
 	private CodeListCSVReader reader;
@@ -47,10 +51,9 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private Map<String, CodeListItem> codeToRootItem;
 	private boolean overwriteData;
 	
-	public CodeListImportProcess(CodeList codeList, CodeScope codeScope, String langCode, File file, boolean overwriteData) {
+	public CodeListImportProcess(CodeList codeList, CodeScope codeScope, File file, boolean overwriteData) {
 		this.codeList = codeList;
 		this.codeScope = codeScope;
-		this.langCode = langCode;
 		this.file = file;
 		this.overwriteData = overwriteData;
 	}
@@ -118,8 +121,11 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		long currentRowNumber = 0;
 		try {
 			is = new FileInputStream(file);
-			isReader = new InputStreamReader(is);
-			reader = new CodeListCSVReader(isReader);
+			isReader = CollectIOUtils.toReader(is);
+			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+			List<String> languages = survey.getLanguages();
+			String defaultLanguage = survey.getDefaultLanguage();
+			reader = new CodeListCSVReader(isReader, languages, defaultLanguage);
 			levels = reader.getLevels();
 			adjustCodeScope();
 			status.addProcessedRow(1);
@@ -128,11 +134,12 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 				try {
 					CodeListLine line = reader.readNextLine();
 					if ( line != null ) {
-						CodeListItem parentItem = null;
-						for (int levelIdx = 0; levelIdx < levels.size(); levelIdx++) {
-							boolean leafNode = levelIdx == levels.size() - 1;
-							CodeListItem item = processLevel(parentItem, line, levelIdx, leafNode);
-							parentItem = item;
+						CodeListItem currentParentItem = null;
+						List<String> levelCodes = line.getLevelCodes();
+						for (int levelIdx = 0; levelIdx < levelCodes.size(); levelIdx++) {
+							boolean lastLevel = levelIdx == levelCodes.size() - 1;
+							CodeListItem item = processLevel(currentParentItem, line, levelIdx, lastLevel);
+							currentParentItem = item;
 						}
 						status.addProcessedRow(currentRowNumber);
 					}
@@ -151,7 +158,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			status.addParsingError(1, e.getError());
 		} catch (Exception e) {
 			status.error();
-			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.getMessage()));
+			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.toString()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
 			try {
@@ -162,18 +169,28 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		}
 	}
 
-	protected CodeListItem processLevel(CodeListItem parent, CodeListLine line, int levelIdx, boolean leafNode) {
+	protected CodeListItem processLevel(CodeListItem parent, CodeListLine line, int levelIdx, boolean lastLevel) {
 		CodeListItem result;
-		List<CodeLabelItem> codeLabelItems = line.getCodeLabelItems();
-		CodeLabelItem codeLabelItem = codeLabelItems.get(levelIdx);
-		if ( isDuplicate(codeLabelItem, parent, levelIdx, leafNode) ) {
+		//validate code
+		List<String> codes = line.getLevelCodes();
+		if ( codes.isEmpty() ) {
+			addEmptyCodeColumnError(line, levelIdx);
+		}
+		String code = codes.get(levelIdx);
+		if ( lastLevel && isDuplicate(code, parent) ) {
 			addDuplicateCodeError(line, levelIdx);
-		} 
-		String code = codeLabelItem.getCode();
+		}
+		//validate labels
+		List<LanguageSpecificText> labels = line.getLabelItems(levelIdx);
+		for (LanguageSpecificText label : labels) {
+			if ( hasDifferentLabel(code, label, parent)) {
+				addDifferentLabelError(line, levelIdx, label.getLanguage());
+			}
+		}
 		result = getChildItem(parent, code);
 		if ( result == null ) {
 			result = codeList.createItem();
-			fillItem(codeLabelItem, result);
+			fillItem(result, code, labels);
 			if ( parent == null ) {
 				codeToRootItem.put(code, result);
 			} else {
@@ -190,26 +207,30 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	 * or is leaf and:
 	 * - LOCAL scope and exist item with same code at the same level
 	 * - SCHEME scope and exist item with same code in some level
-	 * @param codeLabelItem
+	 * @param code
 	 * @param parentItem
-	 * @param levelIdx
-	 * @param leafNode
+	 * @param lastLevel
 	 * @return
 	 */
-	protected boolean isDuplicate(CodeLabelItem codeLabelItem, CodeListItem parentItem, int levelIdx, boolean leafNode) {
-		String code = codeLabelItem.getCode();
-		if ( leafNode ) {
-			CodeListItem duplicateItem;
-			if ( codeScope == CodeScope.LOCAL ) {
-				duplicateItem = getChildItem(parentItem, code);
-			} else {
-				duplicateItem = getCodeListItemInDescendants(code);
-			}
-			return duplicateItem != null;
+	protected boolean isDuplicate(String code, CodeListItem parentItem) {
+		CodeListItem duplicateItem;
+		if ( codeScope == CodeScope.LOCAL ) {
+			duplicateItem = getChildItem(parentItem, code);
 		} else {
-			CodeListItem existingItem = getChildItem(parentItem, code);
-			String label = codeLabelItem.getLabel();
-			return existingItem != null && ! existingItem.getLabel(langCode).equals(label);
+			duplicateItem = getCodeListItemInDescendants(code);
+		}
+		return duplicateItem != null;
+	}
+	
+	protected boolean hasDifferentLabel(String code, LanguageSpecificText item, CodeListItem parentItem) {
+		CodeListItem existingItem = getChildItem(parentItem, code);
+		if ( existingItem == null ) {
+			return false;
+		} else {
+			String lang = item.getLanguage();
+			String label = item.getText();
+			String existingItemLabel = existingItem.getLabel(lang);
+			return ! existingItemLabel.equals(label);
 		}
 	}
 
@@ -223,11 +244,27 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		return duplicateItem;
 	}
 	
+	protected void addEmptyCodeColumnError(CodeListLine line, int levelIdx) {
+		String level = levels.get(levelIdx);
+		String column = level + CodeListCSVReader.CODE_COLUMN_SUFFIX;
+		long lineNumber = line.getLineNumber();
+		ParsingError error = new ParsingError(ErrorType.EMPTY, lineNumber, column);
+		status.addParsingError(lineNumber, error);
+	}
+	
 	protected void addDuplicateCodeError(CodeListLine line,	int levelIdx) {
 		String level = levels.get(levelIdx);
 		String column = level + CodeListCSVReader.CODE_COLUMN_SUFFIX;
 		long lineNumber = line.getLineNumber();
 		ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, column);
+		status.addParsingError(lineNumber, error);
+	}
+	
+	protected void addDifferentLabelError(CodeListLine line, int levelIdx, String lang) {
+		String level = levels.get(levelIdx);
+		String column = level + CodeListCSVReader.LABEL_COLUMN_SUFFIX + "_" + lang;
+		long lineNumber = line.getLineNumber();
+		ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, lineNumber, column, DIFFERENT_LABEL_MESSAGE_KEY);
 		status.addParsingError(lineNumber, error);
 	}
 
@@ -244,9 +281,11 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		}
 		return null;
 	}
-	protected void fillItem(CodeLabelItem codeLabelItem, CodeListItem item) {
-		item.setCode(codeLabelItem.getCode());
-		item.setLabel(langCode, codeLabelItem.getLabel());
+	protected void fillItem(CodeListItem item, String code, List<LanguageSpecificText> labelItems) {
+		item.setCode(code);
+		for (LanguageSpecificText labelItem : labelItems) {
+			item.setLabel(labelItem.getLanguage(), labelItem.getText());
+		}
 	}
 
 	protected void addLevelsToCodeList() {

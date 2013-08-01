@@ -36,10 +36,9 @@ public class CodeListImportService extends ReferenceDataImportService<CodeListIm
 			File importFile = getImportFile();
 			SessionStatus designerSessionStatus = sessionManager.getDesignerSessionStatus();
 			CollectSurvey survey = designerSessionStatus.getSurvey();
-			String langCode = designerSessionStatus.getCurrentLanguageCode();
 			CodeList codeList = survey.getCodeListById(codeListId);
 			CodeScope codeScope = codeList.getHierarchy().size() > 1 && codeList.getCodeScope() == CodeScope.SCHEME ? CodeScope.SCHEME: CodeScope.LOCAL;
-			importProcess = new CodeListImportProcess(codeList, codeScope, langCode, importFile, overwriteData);
+			importProcess = new CodeListImportProcess(codeList, codeScope, importFile, overwriteData);
 			importProcess.init();
 			CodeListImportStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

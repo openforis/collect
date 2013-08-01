@@ -2,6 +2,7 @@ package org.openforis.collect.manager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -40,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest {
 
 	private static final String VALID_TEST_CSV = "code-list-test.csv";
+	private static final String VALID_MULTILANG_TEST_CSV = "code-list-multi-lang-test.csv";
 	private static final String INVALID_TEST_CSV = "code-list-invalid-test.csv";
 	private static final String INVALID_SCHEME_SCOPE_TEST_CSV = "code-list-invalid-scheme-scope-test.csv";
 	private static final String LANG = "en";
@@ -58,7 +60,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 	
 	public CodeListImportProcess importCSVFile(String fileName, CodeList codeList, CodeScope codeScope) throws Exception {
 		File file = getTestFile(fileName);
-		CodeListImportProcess process = new CodeListImportProcess(codeList, codeScope, LANG, file, true);
+		CodeListImportProcess process = new CodeListImportProcess(codeList, codeScope, file, true);
 		process.call();
 		return process;
 	}
@@ -72,9 +74,9 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 		CodeListImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
-		assertEquals(5, status.getProcessed());
+		assertEquals(6, status.getProcessed());
 		List<CodeListItem> items = codeList.getItems();
-		assertEquals(2, items.size());
+		assertEquals(3, items.size());
 		{
 			CodeListItem item = codeList.getItem("001");
 			assertNotNull(item);
@@ -101,6 +103,54 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 			assertEquals("002", childItem.getCode());
 			assertEquals("Arumeru", childItem.getLabel(LANG));
 		}
+		{
+			CodeListItem item = codeList.getItem("003");
+			assertNotNull(item);
+		}
+	}
+	
+	@Test
+	public void testMultiLangImport() throws Exception {
+		survey.addLanguage("es");
+		CodeList codeList = survey.createCodeList();
+		codeList.setName(TEST_CODE_LIST_NAME);
+		survey.addCodeList(codeList);
+		CodeListImportProcess process = importCSVFile(VALID_MULTILANG_TEST_CSV, codeList, CodeScope.LOCAL);
+		CodeListImportStatus status = process.getStatus();
+		assertTrue(status.isComplete());
+		assertTrue(status.getSkippedRows().isEmpty());
+		assertEquals(5, status.getProcessed());
+		List<CodeListItem> items = codeList.getItems();
+		assertEquals(2, items.size());
+		{
+			CodeListItem item = codeList.getItem("001");
+			assertNotNull(item);
+			assertEquals("Dodoma", item.getLabel(LANG));
+			assertEquals("Dodoma ES", item.getLabel("es"));
+			List<CodeListItem> childItems = item.getChildItems();
+			assertEquals(2, childItems.size());
+			CodeListItem childItem = childItems.get(0);
+			assertEquals("001", childItem.getCode());
+			assertEquals("Kondoa", childItem.getLabel(LANG));
+			childItem = childItems.get(1);
+			assertEquals("002", childItem.getCode());
+			assertEquals("Mpwapwa", childItem.getLabel(LANG));
+			assertEquals("Mpwapwa ES", childItem.getLabel("es"));
+		}
+		{
+			CodeListItem item = codeList.getItem("002");
+			assertNotNull(item);
+			assertEquals("Arusha", item.getLabel(LANG));
+			List<CodeListItem> childItems = item.getChildItems();
+			assertEquals(2, childItems.size());
+			CodeListItem childItem = childItems.get(0);
+			assertEquals("001", childItem.getCode());
+			assertEquals("Monduli", childItem.getLabel(LANG));
+			assertNull(childItem.getLabel("es"));
+			childItem = childItems.get(1);
+			assertEquals("002", childItem.getCode());
+			assertEquals("Arumeru", childItem.getLabel(LANG));
+		}
 	}
 	
 	@Test
@@ -112,7 +162,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 		CodeListImportStatus status = process.getStatus();
 		assertTrue(status.isError());
 		List<ParsingError> errors = status.getErrors();
-		assertTrue(containsError(errors, 4, "region_code"));
+		assertTrue(containsError(errors, 4, "region_label_en")); //different label
 		assertTrue(containsError(errors, 4, "district_code"));
 		assertTrue(containsError(errors, 7, "district_code"));
 	}
@@ -126,7 +176,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 		CodeListImportStatus status = process.getStatus();
 		assertTrue(status.isError());
 		List<ParsingError> errors = status.getErrors();
-		assertTrue(containsError(errors, 4, "region_code"));
+		assertTrue(containsError(errors, 4, "region_label_en")); //different label
 		assertTrue(containsError(errors, 5, "district_code"));
 		assertTrue(containsError(errors, 6, "district_code"));
 	}
