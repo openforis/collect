@@ -20,6 +20,7 @@
 			private var _forms:ArrayCollection;
 			
 			public static const EDIT_STATE:String = "edit";
+			public static const ENLARGED_STATE:String = "enlarged";
 			public static const LOADING_STATE:String = "loading";
 			
 			override protected function initializationComplete():void {
@@ -33,13 +34,14 @@
 	
 	<s:states>
 		<s:State name="edit" />
+		<s:State name="enlarged" basedOn="edit" />
 		<s:State name="loading" />
 	</s:states>
 	
 	<s:VGroup gap="10" height="100%" width="100%">
 		<s:Spacer height="1" />
 		<!-- Record id, form version, save msg, etc.. -->
-		<s:Group id="header" width="100%">
+		<s:Group id="topButtonBar" width="100%">
 			<s:HGroup gap="10" verticalAlign="middle">
 				<s:Button id="backToListButton"
 						  icon="{Images.BACK}"
@@ -89,18 +91,37 @@
 					useHandCursor="true"
 					buttonMode="true"
 					/>
+				
 			</s:HGroup>
+			
 		</s:Group>
 		
 		<!--<s:Group id="formWrapper" width="100%" height="100%" />-->
 		<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate" />
 		
-		<detail:FormsContainer id="formsContainer" 
-							   height="100%" 
-							   width="100%" 
-							   includeIn="edit" 
-							   itemCreationPolicy="immediate" 
-							   verticalGap="0" />
+		<s:Group id="editGroup"
+				 height="100%" 
+				 width="100%" 
+				 includeIn="edit" 
+				 itemCreationPolicy="immediate">
+			
+			<detail:FormsContainer id="formsContainer" 
+								   height="100%" 
+								   width="100%"
+								   verticalGap="0" />
+				 
+			<s:Button id="resizeBtn"
+					  icon="@Embed(source='/assets/images/resize_full.png')"
+					  icon.enlarged="@Embed(source='/assets/images/resize_small.png')"
+					  height="20"
+					  width="20"
+					  right="0"
+					  top="0"
+					  useHandCursor="true"
+					  toolTip="{Message.get('screen.enlarge')}"
+					  toolTip.enlarged="{Message.get('screen.reduce')}"
+					  />
+		</s:Group>
 		
 		<s:Group id="buttonBar" width="100%">
 			<s:HGroup id="formVersionContainer" gap="5" left="0" verticalCenter="0">

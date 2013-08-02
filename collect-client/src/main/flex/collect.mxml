@@ -25,6 +25,7 @@
 			private var _collectPresenter:CollectPresenter;
 			
 			public static const DEFAULT_STATE:String = "default";
+			public static const ENLARGED_STATE:String = "enlarged";
 			public static const FULL_SCREEN_STATE:String = "fullScreen";
 			
 			protected function initializeHandler(event:FlexEvent):void {
@@ -47,6 +48,7 @@
 	
 	<s:states>
 		<s:State name="default" />
+		<s:State name="enlarged" basedOn="default" />
 		<s:State name="fullScreen" />
 	</s:states>
 	
@@ -58,9 +60,10 @@
 			</s:fill>
 		</s:Rect>
 		
-		<s:Group height="100%" 
-				  width="974" 
-				  horizontalCenter="0">
+		<s:Group height="100%"
+				 width.default="974"
+				 width.enlarged="100%"
+				 horizontalCenter="0">
 			<s:Rect width="100%" height="100%">
 				<s:fill>
 					<s:SolidColor color="0xFFFFFF" />
@@ -70,7 +73,9 @@
 					  width="100%"
 					  gap="0">
 				<view:Header id="header" 
-							 width="100%" includeIn="default" />
+							 width="100%" includeIn="default"
+							 currentState.default="default"
+							 currentState.enlarged="enlarged" />
 				<view:MasterView id="masterView" width="100%" height="100%" 
 								 includeIn="default" />
 				<!--<view:Footer id="footer" width="100%"  />-->

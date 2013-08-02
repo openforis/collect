@@ -40,6 +40,7 @@ package org.openforis.collect {
 		private static var _locale:Locale;
 		private static var _localeString:String;
 		private static var _localeLanguageCode:String;
+		private static var _extendedDetailView:Boolean = false;
 		
 		private static var initialized:Boolean = false;
 		
@@ -201,6 +202,15 @@ package org.openforis.collect {
 		
 		public static function set autoSave(value:Boolean):void {
 			_autoSave = value;
+		}
+		
+		[Bindable]
+		public static function get extendedDetailView():Boolean {
+			return _extendedDetailView;
+		}
+		
+		public static function set extendedDetailView(value:Boolean):void {
+			_extendedDetailView = value;
 		}
 		
 		[Bindable]

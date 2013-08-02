@@ -54,6 +54,7 @@ package org.openforis.collect.presenter {
 			_view.autoSaveCheckBox.addEventListener(MouseEvent.CLICK, autoSaveCheckBoxClickHandler);
 			_view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
 			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
+			_view.resizeBtn.addEventListener(MouseEvent.CLICK, toggleViewSizeClickHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
@@ -88,7 +89,7 @@ package org.openforis.collect.presenter {
 			var canReject:Boolean = !preview && user.canReject(activeRecord);
 			var canSave:Boolean = !preview && Application.activeRecordEditable;
 			
-			_view.header.visible = _view.header.includeInLayout = !preview;
+			_view.topButtonBar.visible = _view.topButtonBar.includeInLayout = !preview;
 			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			if ( canReject ) {
@@ -102,7 +103,7 @@ package org.openforis.collect.presenter {
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var form:FormContainer = null;
 			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
-				_view.currentState = DetailView.EDIT_STATE;
+				_view.currentState = Application.extendedDetailView ? DetailView.ENLARGED_STATE: DetailView.EDIT_STATE;
 				form = _view.formsContainer.getForm(version, rootEntityDefn);
 			} else {
 				//build form 
@@ -145,6 +146,10 @@ package org.openforis.collect.presenter {
 			} else {
 				performClearActiveRecord();
 			}
+		}
+		
+		protected function toggleViewSizeClickHandler(event:Event):void {
+			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.TOGGLE_DETAIL_VIEW_SIZE));
 		}
 		
 		protected function performClearActiveRecord():void {

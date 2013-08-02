@@ -43,19 +43,33 @@
 		]]>
 	</fx:Script>
 	
-	<s:Group>
+	<s:states>
+		<s:State name="default" />
+		<s:State name="enlarged" />
+	</s:states>
+	
+	<s:Group horizontalCenter="0" width="100%">
         <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
-		<s:VGroup verticalCenter="0" 
-				  right="0" 
-				  paddingTop="5" 
-				  paddingBottom="5"
-				  paddingRight="5"
-				  paddingLeft="5">
-	        <s:Image id="image" 
-					 maxHeight="80"
-					 maxWidth="80"
-					 smooth="true" /> 
-		</s:VGroup>
+		<s:Group right="0" 
+				 verticalCenter="0">
+			<s:VGroup verticalCenter="0" 
+					  right="0" 
+					  paddingTop="5" 
+					  paddingBottom="5"
+					  paddingRight="5"
+					  paddingLeft="5">
+		        <s:Image id="image" 
+						 maxHeight="80"
+						 maxWidth="80"
+						 smooth="true" /> 
+			</s:VGroup>
+		</s:Group>
 	</s:Group>
+	
+	<s:Rect width="100%" height="3" bottom="0">
+		<s:fill>
+			<s:SolidColor color="#0087C9" />
+		</s:fill>
+	</s:Rect>
 	
 </s:Group>

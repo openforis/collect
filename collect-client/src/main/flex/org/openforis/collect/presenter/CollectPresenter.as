@@ -55,6 +55,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.ObjectUtil;
 	import mx.resources.Locale;
 	import mx.controls.Alert;
+	import org.openforis.collect.ui.view.MasterView;
 	
 	/**
 	 * 
@@ -99,6 +100,8 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
 			eventDispatcher.addEventListener(UIEvent.OPEN_SPECIES_IMPORT_POPUP, openSpeciesImportPopUpHandler);
 			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
+			eventDispatcher.addEventListener(UIEvent.TOGGLE_DETAIL_VIEW_SIZE, toggleDetailViewSizeHandler);
+			eventDispatcher.addEventListener(UIEvent.CHECK_VIEW_SIZE, checkViewSizeHandler);
 			
 			CONFIG::debugging {
 				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
@@ -196,6 +199,19 @@ package org.openforis.collect.presenter {
 			} else {
 				AlertUtil.showError("referenceDataImport.invalidParameters");
 				return false;
+			}
+		}
+		
+		protected function toggleDetailViewSizeHandler(event:UIEvent):void {
+			Application.extendedDetailView = ! Application.extendedDetailView;
+			checkViewSizeHandler(null);
+		}
+		
+		protected function checkViewSizeHandler(event:UIEvent):void {
+			if ( _view.masterView.currentState == MasterView.DETAIL_STATE && Application.extendedDetailView ) {
+				_view.currentState = collect.ENLARGED_STATE;
+			} else {
+				_view.currentState = collect.DEFAULT_STATE;	
 			}
 		}
 		

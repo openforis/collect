@@ -54,6 +54,10 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
 		}
 		
+		protected function refreshGlobalViewSize():void {
+			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.CHECK_VIEW_SIZE));
+		}
+		
 		protected function showSpeciesImportModuleHandler(event:UIEvent):void {
 			_view.currentState = MasterView.SPECIES_IMPORT_STATE;
 			_view.speciesImportView.surveyId = event.obj.surveyId;
@@ -114,6 +118,8 @@ package org.openforis.collect.presenter {
 			
 			var uiEvent:UIEvent = new UIEvent(UIEvent.ACTIVE_RECORD_CHANGED);
 			eventDispatcher.dispatchEvent(uiEvent);
+			
+			refreshGlobalViewSize();
 		}
 		
 		/**
@@ -127,6 +133,8 @@ package org.openforis.collect.presenter {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
 			uiEvent.obj = {firstAccess: true};
 			eventDispatcher.dispatchEvent(uiEvent);
+			
+			refreshGlobalViewSize();
 		}
 		
 		internal function newRecordCreatedHandler(event:UIEvent):void {
@@ -138,12 +146,16 @@ package org.openforis.collect.presenter {
 			Application.activeRootEntity = null;
 			_view.currentState = MasterView.ERROR_STATE;
 			_view.errorView.errorLabel.text = String(event.obj);
+			
+			refreshGlobalViewSize();
 		}
 		
 		internal function backToHomeHandler(event:UIEvent):void {
 			Application.activeSurvey = null;
 			Application.activeRootEntity = null;
 			_view.currentState = MasterView.HOME_STATE;
+
+			refreshGlobalViewSize();
 		}
 			
 		internal function backToListHandler(event:UIEvent):void {
@@ -151,6 +163,8 @@ package org.openforis.collect.presenter {
 			_view.currentState = MasterView.LIST_STATE;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.RELOAD_RECORD_SUMMARIES);
 			eventDispatcher.dispatchEvent(uiEvent);
+			
+			refreshGlobalViewSize();
 		}
 		
 		protected function loadRecordFaultHandler(event:FaultEvent, token:Object = null):void {

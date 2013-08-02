@@ -18,6 +18,8 @@ package org.openforis.collect.event {
 		public static const SHOW_ERROR_PAGE:String = "showErrorPage";
 		public static const SHOW_HOME_PAGE:String = "backToHome";
 		public static const SHOW_LIST_OF_RECORDS:String = "showListOfRecords";
+		public static const TOGGLE_DETAIL_VIEW_SIZE:String = "toggleDetailViewSize";
+		public static const CHECK_VIEW_SIZE:String = "checkViewSize";
 		
 		public static const RECORD_SELECTED:String = "recordSelected";
 		public static const RECORD_CREATED:String = "recordCreated";

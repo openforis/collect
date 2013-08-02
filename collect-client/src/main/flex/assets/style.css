@@ -79,6 +79,7 @@ s|ToggleButton.filter {
 
 view|Footer {
 	padding-bottom: 5;
+	backgroundColor: #B8E4ED;
 }
 
 component|MessageDisplay {
