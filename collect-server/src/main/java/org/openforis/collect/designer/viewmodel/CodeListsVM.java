@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,6 +24,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -47,6 +51,7 @@ import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Window;
 
@@ -64,6 +69,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
 	public static final String CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND = "closeCodeListImportPopUp";
+	private static final String CSV_CONTENT_TYPE = null;
 	
 	private List<List<CodeListItem>> itemsPerLevel;
 	private boolean newChildItem;
@@ -448,6 +454,16 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		} else {
 			MessageUtil.showWarning("survey.code_list.cannot_import_items_on_enumerating_code_list");
 		}
+	}
+	
+	@Command
+	public void exportCodeList() throws IOException {
+		CollectSurvey survey = getSurvey();
+		CodeListExportProcess codeListExportProcess = new CodeListExportProcess();
+		File tempFile = File.createTempFile("code_list_" + editedItem.getName(), ".csv");
+		FileOutputStream os = new FileOutputStream(tempFile);
+		codeListExportProcess.exportToCSV(os, survey, editedItem.getId());
+		Filedownload.save(tempFile, CSV_CONTENT_TYPE);
 	}
 
 	protected boolean canImportCodeList() {

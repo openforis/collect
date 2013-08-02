@@ -35,10 +35,8 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
 
 	private static final String CSV = "csv";
-
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "codeListImport.error.internalErrorImportingFile";
-	
-	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.error.differentLabel";
+	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";
 	
 	//parameters
 	private File file;
@@ -289,15 +287,17 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	}
 
 	protected void addLevelsToCodeList() {
-		for (String levelName : levels) {
-			CodeListLevel level = new CodeListLevel();
-			level.setName(levelName);
-			codeList.addLevel(level);
+		if ( levels != null && levels.size() > 1 ) {
+			for (String levelName : levels) {
+				CodeListLevel level = new CodeListLevel();
+				level.setName(levelName);
+				codeList.addLevel(level);
+			}
 		}
 	}
 	
 	protected void adjustCodeScope() {
-		if ( levels.size() == 1 ) {
+		if ( levels.size() <= 1 ) {
 			codeScope = CodeScope.SCHEME;
 		}
 	}

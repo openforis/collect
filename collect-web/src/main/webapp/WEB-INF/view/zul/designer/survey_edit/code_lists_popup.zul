@@ -168,10 +168,19 @@
 	  		        							value="FLAT"
 	  		        							disabled="@load(vm.multipleLevelsPresent)" />
 	  		        					</radiogroup>
-				                        <button
-				                          label="${labels.global.import_data}"
-				                          visible="@load(empty vm.editedItem.lookupTable)"
-				                          onClick="@command('openCodeListImportPopUp')" />
+	  		        					
+	  		        					<space spacing="20px" />
+	  		        					
+	  		        					<hlayout spacing="40px">
+					                        <button
+					                          label="${labels.global.import_data}"
+					                          visible="@load(empty vm.editedItem.lookupTable)"
+					                          onClick="@command('openCodeListImportPopUp')" />
+					                        <button
+					                          label="${labels.global.export_data}"
+					                          visible="@load(empty vm.editedItem.lookupTable)"
+					                          onClick="@command('exportCodeList')" />
+					                	</hlayout>
 			                      	</hlayout>
 		        				</row>
 		        				<row

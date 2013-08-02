@@ -26,7 +26,8 @@ import org.openforis.idm.metamodel.CodeListLevel;
 public class CodeListExportProcess {
 
 	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
-	
+
+	private static final String FLAT_LIST_LEVEL_NAME = "item";
 	private static final char SEPARATOR = ',';
 	private static final char QUOTECHAR = '"';
 	
@@ -36,17 +37,7 @@ public class CodeListExportProcess {
 			OutputStreamWriter osWriter = new OutputStreamWriter(out, Charset.forName("UTF-8"));
 			writer = new CsvWriter(osWriter, SEPARATOR, QUOTECHAR);
 			CodeList list = survey.getCodeListById(codeListId);
-			ArrayList<String> colNames = new ArrayList<String>();
-			List<CodeListLevel> levels = list.getHierarchy();
-			for (CodeListLevel level : levels) {
-				String levelName = level.getName();
-				colNames.add(levelName + CodeListCSVReader.CODE_COLUMN_SUFFIX);
-				List<String> langs = survey.getLanguages();
-				for (String lang : langs) {
-					colNames.add(levelName + CodeListCSVReader.LABEL_COLUMN_SUFFIX + "_" + lang);
-				}
-			}
-			writer.writeHeaders(colNames.toArray(new String[0]));
+			initHeaders(writer, survey, list);
 			List<CodeListItem> rootItems = list.getItems();
 			for (CodeListItem item : rootItems) {
 				List<CodeListItem> ancestors = Collections.emptyList();
@@ -57,6 +48,30 @@ public class CodeListExportProcess {
 		} finally {
 			IOUtils.closeQuietly(writer);
 		}
+	}
+
+	private void initHeaders(CsvWriter writer, CollectSurvey survey,
+			CodeList list) {
+		ArrayList<String> colNames = new ArrayList<String>();
+		List<CodeListLevel> levels = list.getHierarchy();
+		List<String> levelNames = new ArrayList<String>();
+		if ( levels.isEmpty() ) {
+			//fake level for flat list
+			levelNames.add(FLAT_LIST_LEVEL_NAME);
+		} else {
+			for (CodeListLevel level : levels) {
+				String levelName = level.getName();
+				levelNames.add(levelName);
+			}
+		}
+		for (String levelName : levelNames) {
+			colNames.add(levelName + CodeListCSVReader.CODE_COLUMN_SUFFIX);
+			List<String> langs = survey.getLanguages();
+			for (String lang : langs) {
+				colNames.add(levelName + CodeListCSVReader.LABEL_COLUMN_SUFFIX + "_" + lang);
+			}
+		}
+		writer.writeHeaders(colNames.toArray(new String[0]));
 	}
 
 	protected void writeItem(CsvWriter writer, CodeListItem item, List<CodeListItem> ancestors) {
