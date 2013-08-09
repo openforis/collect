@@ -436,7 +436,7 @@ public class RelationalSchemaGenerator {
 		String codeListTableNamePrefix = getCodeListTableNamePrefix(list, levelIdx);
 		String codeListTableName = codeListTableNamePrefix + config.getCodeListTableSuffix();
 		String codeValueColumnName = getDataColumnName(table, attrDefn);
-		String fkColumnName = codeValueColumnName + config.getCodeListTableSuffix() + config.getIdColumnSuffix();
+		String fkColumnName = codeValueColumnName + config.getIdColumnSuffix();
 		CodeValueFKColumn col = new CodeValueFKColumn(fkColumnName, attrDefn, relativePath,
 				config.getDefaultCode());
 		addColumn(table, col);
