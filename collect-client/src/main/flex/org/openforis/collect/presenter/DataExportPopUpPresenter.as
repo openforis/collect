@@ -105,6 +105,8 @@ package org.openforis.collect.presenter {
 					var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
 					if ( selectedEntity == null ) {
 						AlertUtil.showMessage("export.selectAnEntity");
+					} else if ( ! selectedEntity.nodeDefinition.multiple ) {
+						AlertUtil.showMessage("export.selectMultipleEntity");
 					} else {
 						step = DataExportPopUp(_view).stepDropDownList.selectedItem;
 						if ( step == null ) {

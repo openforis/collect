@@ -18,6 +18,7 @@ package org.openforis.collect.model
 		private var _label:String;
 		private var _children:IList;
 		private var _state:String;
+		private var _nodeDefinition:NodeDefinitionProxy;
 		
 		public function NodeItem() {
 		}
@@ -29,11 +30,12 @@ package org.openforis.collect.model
 			var item:NodeItem = new NodeItem();
 			item.id = nodeDef.id;
 			item.label = nodeDef.getInstanceOrHeadingLabelText();
+			item.nodeDefinition = nodeDef;
 			if(includeChildren) {
 				var children:IList = new ArrayCollection();
 				var childDefinitions:ListCollectionView = EntityDefinitionProxy(nodeDef).childDefinitions;
 				for each (var childNodeDefn:NodeDefinitionProxy in childDefinitions) {
-					if ( (childNodeDefn is EntityDefinitionProxy && (childNodeDefn.multiple || includeSingleEntities)) || 
+					if ( (childNodeDefn is EntityDefinitionProxy && (childNodeDefn.multiple || includeSingleEntities || EntityDefinitionProxy(childNodeDefn).hasMultipleEntitiesDescendants())) || 
 						(childNodeDefn is AttributeDefinitionProxy && includeChildrenAttributes) ) {
 						var child:NodeItem = fromNodeDef(childNodeDefn, includeChildren, includeChildrenAttributes, includeSingleEntities);
 						children.addItem(child);
@@ -45,7 +47,6 @@ package org.openforis.collect.model
 			}
 			return item;
 		}
-		
 		
 		public function get label():String {
 			return _label;
@@ -77,6 +78,14 @@ package org.openforis.collect.model
 
 		public function set id(value:int):void {
 			_id = value;
+		}
+		
+		public function get nodeDefinition():NodeDefinitionProxy {
+			return _nodeDefinition;
+		}
+		
+		public function set nodeDefinition(nodeDefinition:NodeDefinitionProxy):void {
+			_nodeDefinition = nodeDefinition;
 		}
 
 

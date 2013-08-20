@@ -8,6 +8,8 @@
 package org.openforis.collect.metamodel.proxy {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	
+	import org.openforis.collect.util.ArrayUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.EntityDefinitionProxy")]
@@ -53,6 +55,22 @@ package org.openforis.collect.metamodel.proxy {
 		
 		public function isRoot():Boolean {
 			return this == rootEntity;
+		}
+		
+		public function hasMultipleEntitiesDescendants():Boolean {
+			var stack:Array = new Array();
+			ArrayUtil.addAll(stack, childDefinitions.toArray());
+			while ( stack.length > 0 ) {
+				var nodeDef:NodeDefinitionProxy = stack.pop();
+				if ( nodeDef is EntityDefinitionProxy ) {
+					if ( nodeDef.multiple ) {
+						return true;
+					} else {
+						ArrayUtil.addAll(stack, EntityDefinitionProxy(nodeDef).childDefinitions.toArray());
+					}
+				}
+			}
+			return false;
 		}
 	}
 		
