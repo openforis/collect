@@ -24,7 +24,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.NodeItem;
-	import org.openforis.collect.remoting.service.dataexport.DataExportState;
+	import org.openforis.collect.remoting.service.dataexport.DataExportStateProxy;
 	import org.openforis.collect.ui.component.DataExportPopUp;
 	import org.openforis.collect.ui.component.PopUp;
 	import org.openforis.collect.util.AlertUtil;
@@ -47,7 +47,7 @@ package org.openforis.collect.presenter {
 		private var _getStateResponder:IResponder;
 		private var _progressTimer:Timer;
 		private var _type:String;
-		private var _state:DataExportState;
+		private var _state:DataExportStateProxy;
 		private var _firstOpen:Boolean = true;
 		
 		public function DataExportPopUpPresenter(view:DataExportPopUp) {
@@ -147,7 +147,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function exportResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataExportState;
+			_state = event.result as DataExportStateProxy;
 			updateView();
 		}
 		
@@ -179,7 +179,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataExportState;
+			_state = event.result as DataExportStateProxy;
 			updateView();
 		}
 		

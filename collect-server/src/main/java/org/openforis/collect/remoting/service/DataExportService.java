@@ -12,7 +12,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.remoting.service.dataexport.BackupProcess;
 import org.openforis.collect.remoting.service.dataexport.DataExportProcess;
-import org.openforis.collect.remoting.service.dataexport.DataExportState;
+import org.openforis.collect.remoting.service.dataexport.DataExportStateProxy;
 import org.openforis.collect.remoting.service.dataexport.SelectiveDataExportProcess;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
@@ -68,7 +68,7 @@ public class DataExportService {
 	 * @return state of the export
 	 */
 	@Transactional
-	public DataExportState export(String rootEntityName, int stepNumber, int entityId) {
+	public DataExportStateProxy export(String rootEntityName, int stepNumber, int entityId) {
 		if ( dataExportProcess == null || ! dataExportProcess.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
@@ -80,11 +80,11 @@ public class DataExportService {
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}
-		return dataExportProcess.getState();
+		return getState();
 	}
 	
 	@Transactional
-	public DataExportState fullExport(String rootEntityName, int[] stepNumbers) {
+	public DataExportStateProxy fullExport(String rootEntityName, int[] stepNumbers) {
 		if ( dataExportProcess == null || ! dataExportProcess.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
@@ -99,7 +99,7 @@ public class DataExportService {
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}
-		return dataExportProcess.getState();
+		return getState();
 	}
 
 	private int[] getAllStepNumbers() {
@@ -119,9 +119,9 @@ public class DataExportService {
 		}
 	}
 
-	public DataExportState getState() {
+	public DataExportStateProxy getState() {
 		if ( dataExportProcess != null ) {
-			return dataExportProcess.getState();
+			return new DataExportStateProxy(dataExportProcess.getState());
 		} else {
 			return null;
 		}

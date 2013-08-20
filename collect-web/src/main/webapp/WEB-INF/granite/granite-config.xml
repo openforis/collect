@@ -44,7 +44,6 @@
 			<include type="org.openforis.collect.model.RecordSummary"/>
 			<include type="org.openforis.collect.model.RecordSummarySortField"/>
 			<include type="org.openforis.collect.model.SurveySummary"/>
-			<include type="org.openforis.collect.remoting.service.dataExport.DataExportState"/>
 			<include type="org.openforis.collect.remoting.service.FileWrapper"/>
         </externalizer>
     </externalizers>

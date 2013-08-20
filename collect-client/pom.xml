@@ -105,8 +105,8 @@
                                 <includeClass>org.openforis.collect.remoting.service.UpdateRequestOperation$Method</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.UpdateResponse</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.codelistimport.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataprocessing.DataProcessingState</includeClass>
-                                <includeClass>org.openforis.collect.remoting.service.dataexport.DataExportState</includeClass>
+                                <includeClass>org.openforis.collect.remoting.service.dataprocessing.DataProcessingStateProxy</includeClass>
+                                <includeClass>org.openforis.collect.remoting.service.dataexport.DataExportStateProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataexport.DataExportState$Format</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportConflictProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.dataimport.DataImportStateProxy</includeClass>

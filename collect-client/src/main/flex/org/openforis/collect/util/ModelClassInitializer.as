@@ -62,12 +62,13 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
+	import org.openforis.collect.remoting.service.dataexport.DataExportState$Format;
+	import org.openforis.collect.remoting.service.dataexport.DataExportStateProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
-	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
-	import org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy;
-	import org.openforis.collect.remoting.service.dataexport.DataExportState;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
+	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
+	import org.openforis.collect.remoting.service.dataimport.NodeUnmarshallingErrorProxy;
 	import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;
 	import org.openforis.collect.remoting.service.speciesimport.proxy.SpeciesImportStatusProxy;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
@@ -100,7 +101,8 @@ package org.openforis.collect.util {
 				CodeProxy,
 				CoordinateAttributeDefinitionProxy,
 				CoordinateProxy,
-				DataExportState,
+				DataExportStateProxy,
+				DataExportState$Format,
 				DataImportStateProxy,
 				DataImportSummaryProxy,
 				DataImportSummaryItemProxy,

@@ -8,7 +8,7 @@
 package org.openforis.collect.remoting.service.dataexport {
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataexport.DataExportState")]
-    public class DataExportState extends DataExportStateBase {
+    [RemoteClass(alias="org.openforis.collect.remoting.service.dataexport.DataExportStateProxy")]
+    public class DataExportStateProxy extends DataExportStateProxyBase {
     }
 }
