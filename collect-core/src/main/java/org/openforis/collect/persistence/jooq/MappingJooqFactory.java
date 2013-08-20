@@ -115,6 +115,10 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		return nextId(idField, idSequence);
 	}
 	
+	protected void restartSequence(Number value) {
+		restartSequence(idSequence, value);
+	}
+	
 	@SuppressWarnings({"rawtypes"})
 	public UpdateQuery updateQuery(E object) {
 		
@@ -143,7 +147,7 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		return entities;
 	}
 
-	private E newEntity() {
+	protected E newEntity() {
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException e) {

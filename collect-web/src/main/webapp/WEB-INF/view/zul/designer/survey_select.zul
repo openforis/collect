@@ -45,9 +45,9 @@
       <listheader label="${labels.survey.uri}" width="250px"
         sort="auto(uri)" />
       <listheader label="${labels.survey.modified}" width="70px"
-        sort="auto(working, published, name)" />
+        sort="auto(work, published, name)" />
       <listheader label="${labels.survey.published}" width="70px"
-        sort="auto(published, working, name)" />
+        sort="auto(published, work, name)" />
     </listhead>
     <template name="model">
       <listitem>
@@ -57,7 +57,7 @@
           onDoubleClick="@command('editSelectedSurvey')" />
         <listcell
           onDoubleClick="@command('editSelectedSurvey')">
-          <box align="center" width="100%" visible="${each.working}">
+          <box align="center" width="100%" visible="${each.work}">
             <image src="/assets/images/tick-small.png" />
           </box>
         </listcell>

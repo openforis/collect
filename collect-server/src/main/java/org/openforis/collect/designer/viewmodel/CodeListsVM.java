@@ -23,9 +23,11 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
@@ -33,6 +35,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
@@ -85,6 +88,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	@WireVariable
 	private SurveyManager surveyManager;
+	@WireVariable
+	private CodeListManager codeListManager;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam(EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
@@ -113,8 +118,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	@Override
 	protected void deleteItemFromSurvey(CodeList item) {
-		CollectSurvey survey = getSurvey();
-		survey.removeCodeList(item);
+		codeListManager.delete(item);
 		dispatchCodeListsUpdatedCommand();
 	}
 	
@@ -274,14 +278,23 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		if ( checkCanLeaveForm() ) {
 			newChildItem = true;
 			editedChildItemLevel = levelIndex;
-			editedChildItem = editedItem.createItem();
-			editedChildItem.setCodeList(editedItem);
+			editedChildItem = createChildItem();
 			if ( editedChildItemLevel == 0 ) {
 				editedChildItemParentItem = null;
 			} else {
 				editedChildItemParentItem = selectedItemsPerLevel.get(editedChildItemLevel - 1);
 			}
 			openChildItemEditPopUp();
+		}
+	}
+
+	protected CodeListItem createChildItem() {
+		if ( editedItem.isExternal() ) {
+			throw new UnsupportedOperationException("Cannot instantiate ExternalCodeListItem object");
+		} else if ( editedItem.isEmpty() ) {
+			return new PersistedCodeListItem(editedItem);
+		} else {
+			return editedItem.createItem();
 		}
 	}
 	
@@ -292,7 +305,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			MessageUtil.showWarning("survey.code_list.cannot_delete_enumerating_code_list_items");
 		} else {
 			String messageKey;
-			if ( item.hasChildItems() ) {
+			if ( codeListManager.hasChildItems(item) ) {
 				messageKey = "survey.code_list.confirm.delete_non_empty_item";
 			} else {
 				messageKey = "survey.code_list.confirm.delete_item";
@@ -311,17 +324,11 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	protected void performDeleteCodeListItem(CodeListItem item) {
-		if ( isCodeListItemSelected(item) ) {
-			int itemLevelIndex = item.getDepth() - 1;
+		boolean selected = isCodeListItemSelected(item);
+		int itemLevelIndex = getLevelIndex(item);
+		codeListManager.delete(item);
+		if ( selected ) {
 			deselectItemsAfterLevel(itemLevelIndex);
-		}
-		CodeListItem parentItem = item.getParentItem();
-		int id = item.getId();
-		if ( parentItem == null ) {
-			CodeList codeList = item.getCodeList();
-			codeList.removeItem(id);
-		} else {
-			parentItem.removeChildItem(id);
 		}
 		initItemsPerLevel();
 		notifyChange("itemsPerLevel","selectedItemsPerLevel");
@@ -391,34 +398,60 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 	}
 	
-	protected void moveChildItem(CodeListItem item, int indexTo) {
-		CodeListItem parentItem = item.getParentItem();
-		int depth = item.getDepth();
-		int levelIndex = depth - 1;
-		List<CodeListItem> siblings;
-		if ( parentItem == null ) {
-			CodeList codeList = item.getCodeList();
-			codeList.moveItem(item, indexTo);
-			siblings = codeList.getItems();
-		} else {
-			parentItem.moveChildItem(item, indexTo);
-			siblings = parentItem.getChildItems();
+	protected void moveChildItem(CodeListItem item, int toIndex) {
+		codeListManager.shiftItem(item, toIndex);
+		int levelIdx = getLevelIndex(item);
+		List<CodeListItem> siblings = itemsPerLevel.get(levelIdx);
+		CollectionUtils.shiftItem(siblings, item, toIndex);
+		itemsPerLevel.set(levelIdx, siblings);
+		if ( item instanceof PersistedCodeListItem ) {
+			reloadSiblingsSortOrder((PersistedCodeListItem) item);
 		}
-		itemsPerLevel.set(levelIndex, siblings);
 		notifyChange("itemsPerLevel");
 	}
-
-	protected int getItemIndex(CodeListItem item) {
-		CodeListItem parentItem = item.getParentItem();
-		int index;
-		List<CodeListItem> siblings;
-		if ( parentItem == null ) {
-			CodeList codeList = item.getCodeList();
-			siblings = codeList.getItems();
+	
+	/**
+	 * Reloads the siblings from the database.
+	 * The sort order of these items changes after calling codeListManager.shiftItem method.
+	 * 
+	 * @param item
+	 */
+	protected void reloadSiblingsSortOrder(PersistedCodeListItem item) {
+		int levelIdx = getLevelIndex(item);
+		List<CodeListItem> newItems;
+		if ( levelIdx == 0 ) {
+			newItems = codeListManager.loadRootItems(item.getCodeList());
 		} else {
-			siblings = parentItem.getChildItems();
+			CodeListItem parentItem = codeListManager.loadParentItem(item);
+			newItems = codeListManager.loadChildItems(parentItem);
 		}
-		index = siblings.indexOf(item);
+		List<CodeListItem> items = itemsPerLevel.get(levelIdx);
+		for(int i=0; i < items.size(); i++) {
+			CodeListItem oldItem = items.get(i);
+			CodeListItem newItem = newItems.get(i);
+			((PersistedCodeListItem) oldItem).setSortOrder(((PersistedCodeListItem) newItem).getSortOrder());
+		}
+	}
+
+	protected int getLevelIndex(CodeListItem item) {
+		for ( int index = 0; index < itemsPerLevel.size(); index++) {
+			List<CodeListItem> items = itemsPerLevel.get(index);
+			if ( items.contains(item) ) {
+				return index;
+			}
+		}
+		throw new IllegalArgumentException("Item not found in cache");
+	}
+	
+	protected List<CodeListItem> getSiblings(CodeListItem item) {
+		int levelIdx = getLevelIndex(item);
+		List<CodeListItem> siblings = itemsPerLevel.get(levelIdx);
+		return siblings;
+	}
+	
+	protected int getItemIndex(CodeListItem item) {
+		List<CodeListItem> siblings = getSiblings(item);
+		int index = siblings.indexOf(item);
 		return index;
 	}
 	
@@ -432,6 +465,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			if ( newChildItem ) {
 				addChildItemToCodeList();
 			} else {
+				if ( editedChildItem instanceof PersistedCodeListItem ) {
+					codeListManager.save((PersistedCodeListItem) editedChildItem);
+				}
 				BindUtils.postNotifyChange(null, null, editedChildItem, "*");
 			}
 		}
@@ -514,7 +550,14 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	private void addChildItemToCodeList() {
-		if ( editedChildItemParentItem == null ) {
+		if ( editedItem.isEmpty() ) {
+			PersistedCodeListItem persistedChildItem = (PersistedCodeListItem) editedChildItem;
+			if ( editedChildItemParentItem != null ) {
+				PersistedCodeListItem parentId = (PersistedCodeListItem) editedChildItemParentItem;
+				persistedChildItem.setParentId(parentId.getSystemId());
+			}
+			codeListManager.save(persistedChildItem);
+		} else if ( editedChildItemParentItem == null ) {
 			editedItem.addItem(editedChildItem);
 		} else {
 			editedChildItemParentItem.addChildItem(editedChildItem);
@@ -529,11 +572,11 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	protected void initItemsPerLevel() {
 		itemsPerLevel = new ArrayList<List<CodeListItem>>();
-		if ( editedItem != null ) {
-			List<CodeListItem> items = new ArrayList<CodeListItem>(editedItem.getItems());
+		if ( editedItem != null && ! editedItem.isExternal() ) {
+			List<CodeListItem> items = codeListManager.loadRootItems(editedItem);
 			itemsPerLevel.add(items);
 			for (CodeListItem selectedItem : selectedItemsPerLevel) {
-				List<CodeListItem> childItems = new ArrayList<CodeListItem>(selectedItem.getChildItems());
+				List<CodeListItem> childItems = codeListManager.loadChildItems(selectedItem);
 				itemsPerLevel.add(childItems);
 			}
 		}

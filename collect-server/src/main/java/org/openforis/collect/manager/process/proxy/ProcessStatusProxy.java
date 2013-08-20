@@ -12,7 +12,7 @@ import org.openforis.collect.manager.process.ProcessStatus.Step;
  */
 public class ProcessStatusProxy implements Proxy {
 	
-	private transient ProcessStatus status;
+	protected transient ProcessStatus status;
 
 	public ProcessStatusProxy(ProcessStatus status) {
 		super();
@@ -38,5 +38,26 @@ public class ProcessStatusProxy implements Proxy {
 	public String getErrorMessage() {
 		return status.getErrorMessage();
 	}
+
+	@ExternalizedProperty
+	public boolean isInit() {
+		return status.isInit();
+	}
+
+	@ExternalizedProperty
+	public boolean isRunning() {
+		return status.isRunning();
+	}
+
+	@ExternalizedProperty
+	public boolean isComplete() {
+		return status.isComplete();
+	}
+
+	@ExternalizedProperty
+	public boolean isError() {
+		return status.isError();
+	}
+	
 	
 }

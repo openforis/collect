@@ -24,9 +24,8 @@
 	   initialSize="5"
 	   maxActive="20"
 	   maxIdle="5">
-	</Resource>
-	-->
-	
+	 </Resource>
+
 	<!-- OPTIONAL Relational Database configuration 
 	<Resource 
 	   name="jdbc/collectRdbDs" 
@@ -42,4 +41,5 @@
 	   maxIdle="5">
 	</Resource>
 	-->
+
 </Context>

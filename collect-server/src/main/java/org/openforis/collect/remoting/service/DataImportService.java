@@ -10,6 +10,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.remoting.service.dataimport.DataImportExeption;
@@ -18,7 +19,6 @@ import org.openforis.collect.remoting.service.dataimport.DataImportState;
 import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummary;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
-import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +40,8 @@ public class DataImportService {
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
+	private SurveyValidator surveyValidator;
+	@Autowired
 	private RecordManager recordManager;
 	@Autowired
 	private RecordDao recordDao;
@@ -47,13 +49,11 @@ public class DataImportService {
 	private UserManager userManager;
 	@Autowired 
 	private ServletContext servletContext;
-	@Autowired
-	private MessageContextHolder messageContextHolder;
 	
 	private File packagedFile;
 	private File importDirectory;
 	private DataImportProcess dataImportProcess;
-
+	
 	protected void init() {
 		String importRealPath = servletContext.getRealPath(IMPORT_PATH);
 		importDirectory = new File(importRealPath);
@@ -76,7 +76,7 @@ public class DataImportService {
 			for (User user : usersList) {
 				users.put(user.getName(), user);
 			}
-			dataImportProcess = new DataImportProcess(surveyManager, recordManager, recordDao, selectedSurveyUri, users, packagedFile, overwriteAll);
+			dataImportProcess = new DataImportProcess(surveyManager, surveyValidator, recordManager, recordDao, selectedSurveyUri, users, packagedFile, overwriteAll);
 			dataImportProcess.prepareToStartSummaryCreation();
 			ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 		}
@@ -111,7 +111,7 @@ public class DataImportService {
 	public DataImportSummaryProxy getSummary() {
 		if ( dataImportProcess != null ) {
 			DataImportSummary summary = dataImportProcess.getSummary();
-			DataImportSummaryProxy proxy = new DataImportSummaryProxy(messageContextHolder, summary);
+			DataImportSummaryProxy proxy = new DataImportSummaryProxy(summary);
 			return proxy;
 		} else {
 			return null;

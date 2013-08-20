@@ -2,6 +2,7 @@ package org.openforis.collect.remoting.service.dataprocessing;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.manager.process.ProcessStatus;
 
 /**
  * 
@@ -10,46 +11,46 @@ import org.openforis.collect.Proxy;
  */
 public class DataProcessingStateProxy implements Proxy {
 
-	protected transient DataProcessingState state;
+	protected transient ProcessStatus status;
 
-	public DataProcessingStateProxy(DataProcessingState state) {
+	public DataProcessingStateProxy(ProcessStatus status) {
 		super();
-		this.state = state;
+		this.status = status;
 	}
 
 	@ExternalizedProperty
 	public boolean isRunning() {
-		return state.isRunning();
+		return status.isRunning();
 	}
 
 	@ExternalizedProperty
 	public boolean isError() {
-		return state.isError();
+		return status.isError();
 	}
 
 	@ExternalizedProperty
 	public boolean isCancelled() {
-		return state.isCancelled();
+		return status.isCancelled();
 	}
 
 	@ExternalizedProperty
-	public int getCount() {
-		return state.getCount();
+	public long getProcessed() {
+		return status.getProcessed();
 	}
 
 	@ExternalizedProperty
-	public int getTotal() {
-		return state.getTotal();
+	public long getTotal() {
+		return status.getTotal();
 	}
 
 	@ExternalizedProperty
 	public boolean isComplete() {
-		return state.isComplete();
+		return status.isComplete();
 	}
 
 	@ExternalizedProperty
 	public String getErrorMessage() {
-		return state.getErrorMessage();
+		return status.getErrorMessage();
 	}
 	
 }

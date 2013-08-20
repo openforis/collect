@@ -20,6 +20,7 @@ import javax.xml.xpath.XPathFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -32,6 +33,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -43,6 +45,8 @@ import org.xml.sax.SAXException;
 public class DataMarshallerTest extends CollectIntegrationTest {
 	
 	private DataMarshaller dataMarshaller;
+	@Autowired
+	private RecordManager recordManager;
 	
 	@Before
 	public void init() {
@@ -101,7 +105,7 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 	private CollectRecord createTestRecord(CollectSurvey survey) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
 		Entity cluster = record.createRootEntity("cluster");
-		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
+		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDaoIntegrationTest");
 		record.setStep(Step.ENTRY);
 
@@ -115,12 +119,11 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 	}
 	
 	private void addTestValues(Entity cluster) {
-		CollectRecord record = (CollectRecord) cluster.getRecord();
 		EntityBuilder.addValue(cluster, "id", new Code("123_456"));
 		EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
 		EntityBuilder.addValue(cluster, "region", new Code("001"));
 		CodeAttribute districtAttr = EntityBuilder.addValue(cluster, "district", new Code("XXX"));
-		record.setErrorConfirmed(districtAttr, true);
+		recordManager.confirmError(districtAttr);
 		EntityBuilder.addValue(cluster, "crew_no", 10);
 		EntityBuilder.addValue(cluster, "map_sheet", "value 1");
 		EntityBuilder.addValue(cluster, "map_sheet", "value 2");

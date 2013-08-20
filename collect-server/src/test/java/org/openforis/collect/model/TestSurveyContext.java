@@ -1,6 +1,7 @@
 package org.openforis.collect.model;
 
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.validation.LookupProvider;
@@ -32,6 +33,11 @@ public class TestSurveyContext implements SurveyContext {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public CodeListService getCodeListService() {
+		throw new UnsupportedOperationException();
+	}
+	
 	@Override
 	public Survey createSurvey() {
 		return new CollectSurvey(this);

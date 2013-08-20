@@ -9,9 +9,9 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
-import org.openforis.collect.spring.MessageContextHolder;
-import org.openforis.collect.util.ValidationMessageBuilder;
+import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationRule;
@@ -26,16 +26,16 @@ public class ValidationResultProxy implements Proxy {
 	private transient ValidationResult validationResult;
 	private String validationMessage;
 
-	public ValidationResultProxy(MessageContextHolder messageContextHolder, Attribute<?, ?> attribute, ValidationResult validationResult) {
-		this.validationMessage = createValidationMessage(messageContextHolder, attribute, validationResult);
+	public ValidationResultProxy(MessageSource messageSource, Attribute<?, ?> attribute, ValidationResult validationResult) {
+		this.validationMessage = createValidationMessage(messageSource, attribute, validationResult);
 		this.validationResult = validationResult;
 	}
 
-	public static List<ValidationResultProxy> fromList(MessageContextHolder messageContextHolder, Attribute<?, ?> attribute, List<ValidationResult> list) {
+	public static List<ValidationResultProxy> fromList(MessageSource messageSource, Attribute<?, ?> attribute, List<ValidationResult> list) {
 		if (list != null) {
 			List<ValidationResultProxy> proxies = new ArrayList<ValidationResultProxy>();
 			for (ValidationResult validationResults : list) {
-				proxies.add(new ValidationResultProxy(messageContextHolder, attribute, validationResults));
+				proxies.add(new ValidationResultProxy(messageSource, attribute, validationResults));
 			}
 			return proxies;
 		} else {
@@ -62,9 +62,9 @@ public class ValidationResultProxy implements Proxy {
 		}
 	}
 	
-	protected String createValidationMessage(MessageContextHolder messageContextholder, Attribute<?, ?> attribute,
+	protected String createValidationMessage(MessageSource messageSource, Attribute<?, ?> attribute,
 			ValidationResult validationResult) {
-		ValidationMessageBuilder validationMessageBuilder = ValidationMessageBuilder.createInstance(messageContextholder);
+		ValidationMessageBuilder validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
 		return validationMessageBuilder.getValidationMessage(attribute, validationResult);
 	}
 

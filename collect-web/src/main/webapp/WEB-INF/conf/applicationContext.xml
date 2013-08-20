@@ -31,7 +31,7 @@
 	<bean name="messageSource"
 		class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename">
-			<value>resourcebundles/validation</value>
+			<value>org/openforis/collect/resourcebundles/validation</value>
 		</property>
 	</bean>
 
@@ -125,6 +125,10 @@
 		lazy-init="false" depends-on="liquibase">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	<bean id="codeListItemDao" class="org.openforis.collect.persistence.CodeListItemDao"
+		lazy-init="false" depends-on="liquibase">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao"
 		lazy-init="false" depends-on="liquibase">
 		<property name="dataSource" ref="dataSource" />
@@ -166,6 +170,7 @@
 	<!-- ===================================== -->
 	<!-- Managers -->
 	<!-- ===================================== -->
+	<bean id="codeListManager" class="org.openforis.collect.manager.CodeListManager" />
 	<bean id="configurationManager" class="org.openforis.collect.manager.ConfigurationManager"
 		init-method="init" />
 	<bean id="databaseVersionManager" class="org.openforis.collect.manager.DatabaseVersionManager" />
@@ -194,11 +199,14 @@
 	
 	<!-- <bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" 
 		/> -->
-
+	
 	<!-- XML DataMarshaller -->
 	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller"
 		lazy-init="false" autowire-candidate="true" autowire="byName" />
-		    
+	
+	<!--  Services -->
+	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />
+	
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
@@ -243,15 +251,17 @@
 	
     <!--  Survey Context -->
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
+	<bean id="surveyValidator" 				class="org.openforis.collect.manager.validation.SurveyValidator" />
 	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
-	
-	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext" lazy-init="false">
-		<constructor-arg><ref bean="expressionFactory"/></constructor-arg>
-		<constructor-arg><ref bean="validator"/></constructor-arg>
+
+	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
+		<constructor-arg ref="expressionFactory" />
+		<constructor-arg ref="validator" />
 		<property name="externalCodeListProvider" ref="externalCodeListProvider" />
+		<property name="codeListService" ref="codeListService" />
 	</bean>
-    
+	
 	<!-- ===================================== -->
 	<!-- Security -->
 	<!-- ===================================== -->

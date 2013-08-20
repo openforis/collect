@@ -4,5 +4,6 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
 
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-baseline.xml" />
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20130610.1400.xml" />
   
 </databaseChangeLog>

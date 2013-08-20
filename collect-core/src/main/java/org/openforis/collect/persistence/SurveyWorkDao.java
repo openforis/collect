@@ -154,6 +154,7 @@ public class SurveyWorkDao extends SurveyBaseDao {
 			CollectSurvey survey = unmarshalIdml(idml);
 			survey.setId(row.getValueAsInteger(OFC_SURVEY_WORK.ID));
 			survey.setName(row.getValue(OFC_SURVEY_WORK.NAME));
+			survey.setWork(true);
 			return survey;
 		} catch (IdmlParseException e) {
 			throw new RuntimeException("Error deserializing IDML from database", e);
@@ -168,7 +169,9 @@ public class SurveyWorkDao extends SurveyBaseDao {
 		Integer id = row.getValueAsInteger(OFC_SURVEY_WORK.ID);
 		String name = row.getValue(OFC_SURVEY_WORK.NAME);
 		String uri = row.getValue(OFC_SURVEY.URI);
-		SurveySummary survey = new SurveySummary(id, name, uri);
+		SurveySummary survey = new SurveySummary(id, name, uri, null);
+		survey.setWork(true);
+		survey.setPublished(false);
 		return survey;
 	}
 

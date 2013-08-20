@@ -46,6 +46,11 @@ public class SpeciesManager {
 	
 	private final Log log = LogFactory.getLog(SpeciesManager.class);
 	
+	private static final int CONFIRMED_TAXON_STEP_NUMBER = 9;
+
+	private static final int TAXON_INSERT_BUFFER_SIZE = 1000;
+	private static final int TAXON_VERNACULAR_NAME_INSERT_BUFFER_SIZE = 1000;
+	
 	@Autowired
 	private TaxonDao taxonDao;
 	@Autowired
@@ -209,13 +214,12 @@ public class SpeciesManager {
 	@Transactional
 	public void delete(CollectTaxonomy taxonomy) {
 		Integer id = taxonomy.getId();
-		deleteTaxonsByTaxonomy(taxonomy);
+		deleteTaxonsByTaxonomy(id);
 		taxonomyDao.delete(id);
 	}
 
 	@Transactional
-	public void deleteTaxonsByTaxonomy(CollectTaxonomy taxonomy) {
-		Integer id = taxonomy.getId();
+	public void deleteTaxonsByTaxonomy(int id) {
 		taxonVernacularNameDao.deleteByTaxonomy(id);
 		taxonDao.deleteByTaxonomy(id);
 	}
@@ -227,6 +231,64 @@ public class SpeciesManager {
 		} else {
 			taxonDao.update(taxon);
 		}
+	}
+	
+	@Transactional
+	public void insertVernacularNames(List<TaxonVernacularName> vernacularNames) {
+		taxonVernacularNameDao.insert(vernacularNames);
+	}
+	
+	@Transactional
+	public void insertTaxons(final int taxonomyId, TaxonTree tree, boolean overwriteAll) {
+		CollectTaxonomy taxonomy = taxonomyDao.loadById(taxonomyId);
+		if ( taxonomy == null ) {
+			throw new IllegalStateException("Taxonomy not found");
+		}
+		if ( overwriteAll ) {
+			deleteTaxonsByTaxonomy(taxonomyId);
+		}
+		final List<Taxon> taxonInsertBuffer = new ArrayList<Taxon>();
+		final List<TaxonVernacularName> taxonVernacularNameInsertBuffer = new ArrayList<TaxonVernacularName>();
+		int nextTaxonId = taxonDao.nextId();
+		int nextTaxonVernacularNameId = taxonVernacularNameDao.nextId();
+		tree.assignSystemIds(nextTaxonId, nextTaxonVernacularNameId);
+		tree.depthFirstVisit(new TaxonTree.NodeVisitor() {
+			@Override
+			public void visit(Node node) {
+				persistTaxonTreeNode(taxonInsertBuffer, taxonVernacularNameInsertBuffer, taxonomyId, node);
+			}
+		});
+		flushTaxonInsertBuffer(taxonInsertBuffer);
+		flushTaxonVernacularNameInsertBuffer(taxonVernacularNameInsertBuffer);
+	}
+	
+	protected void persistTaxonTreeNode(List<Taxon> taxonInsertBuffer, List<TaxonVernacularName> taxonVernacularNameInsertBuffer, 
+			int taxonomyId, Node node) {
+		Taxon taxon = node.getTaxon();
+		taxon.setTaxonomyId(taxonomyId);
+		taxon.setStep(CONFIRMED_TAXON_STEP_NUMBER);
+		taxonInsertBuffer.add(taxon);
+		if ( taxonInsertBuffer.size() > TAXON_INSERT_BUFFER_SIZE ) {
+			flushTaxonInsertBuffer(taxonInsertBuffer);
+		}
+		List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
+		for (TaxonVernacularName vernacularName : vernacularNames) {
+			taxonVernacularNameInsertBuffer.add(vernacularName);
+			if ( taxonInsertBuffer.size() > TAXON_VERNACULAR_NAME_INSERT_BUFFER_SIZE ) {
+				flushTaxonVernacularNameInsertBuffer(taxonVernacularNameInsertBuffer);
+			}	
+		}
+	}
+
+	protected void flushTaxonInsertBuffer(List<Taxon> taxonInsertBuffer) {
+		taxonDao.insert(taxonInsertBuffer);
+		taxonInsertBuffer.clear();
+	}
+
+	protected void flushTaxonVernacularNameInsertBuffer(
+			List<TaxonVernacularName> taxonVernacularNameInsertBuffer) {
+		taxonVernacularNameDao.insert(taxonVernacularNameInsertBuffer);
+		taxonVernacularNameInsertBuffer.clear();
 	}
 
 	@Transactional
@@ -286,11 +348,13 @@ public class SpeciesManager {
 			taxonomyDao.insert(taxonomy);
 			Integer newTaxonomyId = taxonomy.getId();
 			duplicateTaxons(oldTaxonomyId, newTaxonomyId);
-
 		}
 	}
 
 	protected void duplicateTaxons(int oldTaxonomyId, Integer newTaxonomyId) {
+		int taxonIdShift = taxonDao.duplicateTaxons(oldTaxonomyId, newTaxonomyId);
+		taxonVernacularNameDao.duplicateVernacularNames(oldTaxonomyId, taxonIdShift);
+		/*
 		List<Taxon> taxons = taxonDao.loadTaxonsForTreeBuilding(oldTaxonomyId);
 		Map<Integer, Taxon> oldIdToNewTaxon = new HashMap<Integer, Taxon>();
 		for (Taxon taxon : taxons) {
@@ -307,8 +371,9 @@ public class SpeciesManager {
 			duplicateVernacularNames(oldId, newTaxonId);
 			oldIdToNewTaxon.put(oldId, taxon);
 		}
+		*/
 	}
-
+/*
 	protected void duplicateVernacularNames(int oldTaxonId, int newTaxonId) {
 		List<TaxonVernacularName> vernacularNames = taxonVernacularNameDao.findByTaxon(oldTaxonId);
 		for (TaxonVernacularName vernacularName : vernacularNames) {
@@ -317,7 +382,7 @@ public class SpeciesManager {
 			taxonVernacularNameDao.insert(vernacularName);
 		}
 	}
-	
+	*/
 	protected List<TaxonOccurrence> createOccurrenceList(
 			List<TaxonVernacularName> vernacularNames) {
 		List<TaxonOccurrence> result = new ArrayList<TaxonOccurrence>();

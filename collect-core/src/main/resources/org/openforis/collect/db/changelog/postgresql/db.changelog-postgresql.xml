@@ -6,5 +6,6 @@
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-baseline.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130326.1500.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130522.1600.xml" />
+ 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20130610.1400.xml" />
   
 </databaseChangeLog>

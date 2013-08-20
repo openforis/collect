@@ -8,7 +8,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
+	import org.openforis.collect.model.proxy.EntityChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -65,28 +68,31 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null && _view.attribute != null || _view.attributes != null) {
-				var responses:IList = IList(event.result);
-				if ( nodeUpdated(responses) ) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				if ( nodeUpdated(changeSet) ) {
 					updateView();
-				} else if ( parentEntityUpdated(responses) ) {
+				} else if ( parentEntityUpdated(changeSet) ) {
 					updateValidationDisplayManager();
 				}
 			}
 		}
 		
-		protected function nodeUpdated(responses:IList):Boolean {
-			for each (var response:UpdateResponse in responses) {
-				if ( _view.attribute != null && _view.attribute.id == response.nodeId ||
-					 _view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", response.nodeId) ) {
-					return true;
+		protected function nodeUpdated(changeSet:NodeChangeSetProxy):Boolean {
+			for each (var change:NodeChangeProxy in changeSet.changes) {
+				if ( change is AttributeChangeProxy) {
+					var attrResp:AttributeChangeProxy = AttributeChangeProxy(change);
+					if (_view.attribute != null && _view.attribute.id == attrResp.nodeId ||
+					 	_view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", attrResp.nodeId) ) {
+						return true;
+					}
 				}
 			}
 			return false;
 		}
 		
-		protected function parentEntityUpdated(responses:IList):Boolean {
-			for each (var response:UpdateResponse in responses) {
-				if ( response.nodeId == _view.parentEntity.id ) {
+		protected function parentEntityUpdated(changeSet:NodeChangeSetProxy):Boolean {
+			for each (var change:NodeChangeProxy in changeSet.changes) {
+				if ( change is EntityChangeProxy && EntityChangeProxy(change).nodeId == _view.parentEntity.id ) {
 					return true;
 				}
 			}

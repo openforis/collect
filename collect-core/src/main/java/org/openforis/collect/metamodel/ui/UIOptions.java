@@ -295,7 +295,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		EntityDefinition rootEntity = entityDefn.getRootEntity();
 		UITabSet rootTabSet = getAssignedRootTabSet(rootEntity);
 		if ( rootTabSet != null ) {
-			if ( entityDefn == null || entityDefn.getParentDefinition() == null ) {
+			if ( entityDefn.getParentDefinition() == null ) {
 				List<UITab> tabs = new ArrayList<UITab>(rootTabSet.getTabs());
 				UITab mainTab = getMainTab(rootTabSet);
 				tabs.addAll(mainTab.getTabs());

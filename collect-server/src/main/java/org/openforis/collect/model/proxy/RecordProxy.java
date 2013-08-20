@@ -13,7 +13,6 @@ import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.spring.MessageContextHolder;
 
 /**
  * @author M. Togna
@@ -23,7 +22,6 @@ import org.openforis.collect.spring.MessageContextHolder;
 public class RecordProxy implements Proxy {
 
 	private transient CollectRecord record;
-	private transient MessageContextHolder messageContextHolder;
 
 	private Integer errors;
 	private Integer skipped;
@@ -33,9 +31,8 @@ public class RecordProxy implements Proxy {
 	private Integer warnings;
 
 	
-	public RecordProxy(MessageContextHolder messageContextHolder, CollectRecord record) {
+	public RecordProxy(CollectRecord record) {
 		this.record = record;
-		this.messageContextHolder = messageContextHolder;
 		errors = record.getErrors();
 		skipped = record.getSkipped();
 		missing = record.getMissing();
@@ -45,11 +42,11 @@ public class RecordProxy implements Proxy {
 		warnings = record.getWarnings();
 	}
 
-	public static List<RecordProxy> fromList(MessageContextHolder messageContextHolder, List<CollectRecord> records) {
+	public static List<RecordProxy> fromList(List<CollectRecord> records) {
 		List<RecordProxy> result = new ArrayList<RecordProxy>();
 		if ( records != null ) {
 			for (CollectRecord collectRecord : records) {
-				RecordProxy proxy = new RecordProxy(messageContextHolder, collectRecord);
+				RecordProxy proxy = new RecordProxy(collectRecord);
 				result.add(proxy);
 			}
 		}
@@ -100,7 +97,7 @@ public class RecordProxy implements Proxy {
 	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
 		if(record.getRootEntity() != null) {
-			return new EntityProxy(messageContextHolder, null, record.getRootEntity());
+			return new EntityProxy(null, record.getRootEntity());
 		} else {
 			return null;
 		}
@@ -145,6 +142,8 @@ public class RecordProxy implements Proxy {
 			switch(record.getStep()) {
 				case ANALYSIS:
 					return true;
+				default:
+					return false;
 			}
 		}
 		return false;

@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -52,6 +53,9 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	
 	@Autowired
 	private DataMarshaller dataMarshaller;
+	
+	@Autowired
+	private RecordManager recordManager;
 	
 	private static Map<String, User> users;
 	
@@ -105,7 +109,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 		record.setCreatedBy(user);
 		record.setModifiedBy(user);
 		Entity cluster = record.createRootEntity("cluster");
-		record.setCreationDate(new GregorianCalendar(2011, 12, 31, 23, 59).getTime());
+		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		record.setModifiedDate(new GregorianCalendar(2012, 2, 3, 9, 30).getTime());
 		record.setStep(Step.ENTRY);
 		record.setState(State.REJECTED);
@@ -120,19 +124,18 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	private void addTestValues(Entity cluster) {
-		CollectRecord record = (CollectRecord) cluster.getRecord();
 		EntityBuilder.addValue(cluster, "id", new Code("123_456"));
 		EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
 		EntityBuilder.addValue(cluster, "region", new Code("001"));
 		CodeAttribute districtAttr = EntityBuilder.addValue(cluster, "district", new Code("XXX"));
-		record.setErrorConfirmed(districtAttr, true);
+		recordManager.confirmError(districtAttr);
 		EntityBuilder.addValue(cluster, "crew_no", 10);
 		EntityBuilder.addValue(cluster, "map_sheet", "value 1");
 		EntityBuilder.addValue(cluster, "map_sheet", "value 2");
 		EntityBuilder.addValue(cluster, "vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
 		EntityBuilder.addValue(cluster, "gps_model", "TomTom 1.232");
+		recordManager.approveMissingValue(cluster, "accessibility");
 		EntityBuilder.addValue(cluster, "remarks", "Remarks with UTF-8 character: Í");
-		record.setMissingApproved(cluster, "accessibility", true);
 		{
 			Entity ts = EntityBuilder.addEntity(cluster, "time_study");
 			EntityBuilder.addValue(ts, "date", new Date(2011,2,14));

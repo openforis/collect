@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.web.session;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import org.openforis.collect.model.CollectRecord;
@@ -14,8 +15,13 @@ import org.openforis.collect.model.User;
  * @author G. Miceli
  * @author S. Ricci
  */
-public class SessionState {
+public class SessionState implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public static String SESSION_ATTRIBUTE_NAME = "sessionState";
 	public static final long ACTIVE_RECORD_TIMEOUT = 70000;
 	

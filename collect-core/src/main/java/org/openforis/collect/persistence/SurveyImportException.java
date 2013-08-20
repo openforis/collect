@@ -14,5 +14,9 @@ public class SurveyImportException extends Exception {
 	public SurveyImportException(String message) {
 		super(message);
 	}
+
+	public SurveyImportException(Throwable cause) {
+		super(cause);
+	}
 	
 }

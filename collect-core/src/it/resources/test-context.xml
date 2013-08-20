@@ -37,10 +37,11 @@
 		<property name="username" value="${collect.devdb.username}" />
 		<property name="password" value="${collect.devdb.password}" />
 	</bean>
-	
-  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-  	<property name="dataSource" ref="dataSource"/>
-  </bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 
 	<!-- ===================================== -->
 	<!-- Liquibase -->
@@ -50,69 +51,72 @@
 		<property name="changeLog" value="classpath:org/openforis/collect/db/changelog/db.changelog-master.xml" />
 		<property name="defaultSchema" value="collect" />
 	</bean>
-  
-	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao" 
+
+	<bean id="codeListItemDao" class="org.openforis.collect.persistence.CodeListItemDao"
 		lazy-init="false" depends-on="liquibase">
-  	<property name="dataSource" ref="dataSource"/>
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
+	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao"
+		lazy-init="false" depends-on="liquibase">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
-  	<property name="dataSource" ref="dataSource"/>
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
 	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
-  	<property name="dataSource" ref="dataSource"/>
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
 	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
-  	<property name="dataSource" ref="dataSource"/>
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-
-  <bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
-    <property name="dataSource" ref="dataSource"/>
-  </bean>
-  
-	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao" init-method="init">
-  	<property name="dataSource" ref="dataSource"/>
+	<bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-
-  <bean id="surveyWorkDao" class="org.openforis.collect.persistence.SurveyWorkDao" init-method="init">
-    <property name="dataSource" ref="dataSource"/>
-  </bean>
-
+	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao"
+		init-method="init">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="surveyWorkDao" class="org.openforis.collect.persistence.SurveyWorkDao"
+		init-method="init">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
 	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDao">
-  	<property name="dataSource" ref="dataSource"/>
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
 	<bean id="taxonDao" class="org.openforis.collect.persistence.TaxonDao">
-  	<property name="dataSource" ref="dataSource"/>
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-	
-	<bean id="taxonVernacularNameDao" class="org.openforis.collect.persistence.TaxonVernacularNameDao">
-  	<property name="dataSource" ref="dataSource"/>
+	<bean id="taxonVernacularNameDao"
+		class="org.openforis.collect.persistence.TaxonVernacularNameDao">
+		<property name="dataSource" ref="dataSource" />
 	</bean>
-
 	<bean id="userDao" class="org.openforis.collect.persistence.UserDao">
-  	<property name="dataSource" ref="dataSource"/>
+		<property name="dataSource" ref="dataSource" />
 	</bean>
 	
 	<!--  Managers -->
+	<bean id="codeListManager"			class="org.openforis.collect.manager.CodeListManager" />
 	<bean id="configurationManager" 	class="org.openforis.collect.manager.ConfigurationManager" init-method="init" lazy-init="false" />
 	<bean id="recordManager" 			class="org.openforis.collect.manager.RecordManager" init-method="init" />	
 	<bean id="recordIndexManager" 		class="org.openforis.collect.manager.RecordIndexManager" lazy-init="false" init-method="init" />
 	<bean id="samplingDesignManager"    class="org.openforis.collect.manager.SamplingDesignManager" />
-  <bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
+  	<bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 
+	<!--  Services -->
+	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />
+	
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />
-	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
+	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
+	<bean id="surveyValidator" 				class="org.openforis.collect.manager.validation.SurveyValidator" />
 	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
 
 	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
-    <constructor-arg><ref bean="expressionFactory"/></constructor-arg>
-    <constructor-arg><ref bean="validator"/></constructor-arg>
-    <property name="externalCodeListProvider" ref="externalCodeListProvider" />
+		<constructor-arg ref="expressionFactory" />
+		<constructor-arg ref="validator" />
+		<property name="externalCodeListProvider" ref="externalCodeListProvider" />
+		<property name="codeListService" ref="codeListService" />
 	</bean>
 	
 	<!-- XML DataMarshaller -->

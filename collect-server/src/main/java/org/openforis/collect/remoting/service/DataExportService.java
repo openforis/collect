@@ -4,16 +4,18 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.dataexport.BackupProcess;
+import org.openforis.collect.manager.dataexport.DataExportStatus;
+import org.openforis.collect.manager.dataexport.SelectiveDataExportProcess;
+import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
+import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
-import org.openforis.collect.remoting.service.dataexport.BackupProcess;
-import org.openforis.collect.remoting.service.dataexport.DataExportProcess;
-import org.openforis.collect.remoting.service.dataexport.DataExportStateProxy;
-import org.openforis.collect.remoting.service.dataexport.SelectiveDataExportProcess;
 import org.openforis.collect.util.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,22 +34,20 @@ public class DataExportService {
 	
 	@Autowired
 	private SessionManager sessionManager;
-
 	@Autowired
 	private SurveyManager surveyManager;
-
 	@Autowired
 	private RecordManager recordManager;
-	
+	@Autowired
+	private CodeListManager codeListManager;
 	@Autowired
 	private DataMarshaller dataMarshaller;
-	
 	@Autowired 
 	private ServletContext servletContext;
 	
 	private File exportDirectory;
 	
-	private DataExportProcess dataExportProcess;
+	private AbstractProcess<Void, DataExportStatus> dataExportProcess;
 
 	public void init() {
 		String exportRealPath = servletContext.getRealPath(EXPORT_PATH);
@@ -68,15 +68,18 @@ public class DataExportService {
 	 * @return state of the export
 	 */
 	@Transactional
-	public DataExportStateProxy export(String rootEntityName, int stepNumber, int entityId) {
-		if ( dataExportProcess == null || ! dataExportProcess.isRunning() ) {
+	public DataExportStatusProxy export(String rootEntityName, int stepNumber, int entityId) {
+		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
 			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
 				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
 			}
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			SelectiveDataExportProcess process = new SelectiveDataExportProcess(recordManager, exportDir, survey, rootEntityName, entityId, Step.valueOf(stepNumber));
+			SelectiveDataExportProcess process = new SelectiveDataExportProcess(
+					recordManager, codeListManager, exportDir, survey,
+					rootEntityName, entityId, Step.valueOf(stepNumber));
+			process.init();
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}
@@ -84,8 +87,8 @@ public class DataExportService {
 	}
 	
 	@Transactional
-	public DataExportStateProxy fullExport(String rootEntityName, int[] stepNumbers) {
-		if ( dataExportProcess == null || ! dataExportProcess.isRunning() ) {
+	public DataExportStatusProxy fullExport(String rootEntityName, int[] stepNumbers) {
+		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
 			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
@@ -96,6 +99,7 @@ public class DataExportService {
 				stepNumbers = getAllStepNumbers();
 			}
 			BackupProcess process = new BackupProcess(surveyManager, recordManager, dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
+			process.init();
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}
@@ -119,9 +123,9 @@ public class DataExportService {
 		}
 	}
 
-	public DataExportStateProxy getState() {
+	public DataExportStatusProxy getState() {
 		if ( dataExportProcess != null ) {
-			return new DataExportStateProxy(dataExportProcess.getState());
+			return new DataExportStatusProxy(dataExportProcess.getStatus());
 		} else {
 			return null;
 		}

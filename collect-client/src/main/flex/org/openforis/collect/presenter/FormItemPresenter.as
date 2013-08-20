@@ -1,7 +1,6 @@
 package org.openforis.collect.presenter
 {
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.IList;
 	import mx.events.PropertyChangeEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -13,9 +12,10 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
@@ -77,9 +77,10 @@ package org.openforis.collect.presenter
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null) {
-				var responses:IList = IList(event.result);
-				for each (var response:UpdateResponse in responses) {
-					if(response.nodeId == _view.parentEntity.id) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if ( change is NodeChangeProxy && 
+							NodeChangeProxy(change).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						_contextMenu.updateItems();

@@ -7,9 +7,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.IntegerInputField;
 	import org.openforis.collect.ui.component.input.NumericAttributeRenderer;
 	import org.openforis.collect.ui.component.input.NumericInputField;
@@ -20,6 +20,8 @@ package org.openforis.collect.presenter {
 	 * @author S. Ricci
 	 * */
 	public class NumericAttributePresenter extends CompositeAttributePresenter {
+		
+		private static const UNIT_FIELD_IDX:int = 2;
 		
 		public function NumericAttributePresenter(view:NumericAttributeRenderer) {
 			_view = view;
@@ -51,32 +53,30 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateValue():void {
-			var updReq:UpdateRequest = new UpdateRequest();
-			var updateValueOp:UpdateRequestOperation = view.numericInputField.presenter.createUpdateValueOperation();
-			updReq.addOperation(updateValueOp);
-			var updateUnitOp:UpdateRequestOperation = createUpdateUnitOperation();
+			var updReqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
+			var updateValueOp:NodeUpdateRequestProxy = view.numericInputField.presenter.createValueUpdateRequest();
+			updReqSet.addRequest(updateValueOp);
+			var updateUnitOp:FieldUpdateRequestProxy = createUpdateUnitOperation();
 			if ( updateUnitOp != null ) {
-				if(updateValueOp.value == null) {
+				if ( updateValueOp is FieldUpdateRequestProxy &&
+					FieldUpdateRequestProxy(updateValueOp).value == null) {
 					//clear unit
 					updateUnitOp.value = null;
 				}
-				updReq.addOperation(updateUnitOp);
+				updReqSet.addRequest(updateUnitOp);
 			}
-			ClientFactory.dataClient.updateActiveRecord(updReq, null, faultHandler);
+			ClientFactory.dataClient.updateActiveRecord(updReqSet, null, faultHandler);
 		}
 		
-		protected function createUpdateUnitOperation():UpdateRequestOperation {
+		protected function createUpdateUnitOperation():FieldUpdateRequestProxy {
 			var attrDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(view.attributeDefinition);
-			var result:UpdateRequestOperation = null;
+			var result:FieldUpdateRequestProxy = null;
 			if(view.unitInputField != null) {
-				result = view.unitInputField.presenter.createUpdateValueOperation();
+				result = view.unitInputField.presenter.createValueUpdateRequest() as FieldUpdateRequestProxy;
 			} else if ( attrDefn.defaultUnit != null ) {
-				result = new UpdateRequestOperation();
-				result.method = UpdateRequestOperation$Method.UPDATE;
-				result.parentEntityId = view.attribute.parentId;
-				result.nodeName = view.attributeDefinition.name;
+				result = new FieldUpdateRequestProxy();
 				result.nodeId = view.attribute.id;
-				result.fieldIndex = 2;
+				result.fieldIndex = UNIT_FIELD_IDX;
 				result.value = String(attrDefn.defaultUnit.id);
 			}
 			return result;

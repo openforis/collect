@@ -3,15 +3,13 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.ListCollectionView;
-	import mx.events.CalendarLayoutChangeEvent;
 	import mx.events.DropdownEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
-	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -74,14 +72,12 @@ package org.openforis.collect.presenter {
 			view.day.text = StringUtil.zeroPad(day, 2);
 			
 			var fields:Array = [view.year, view.month, view.day];
-			var operations:ListCollectionView = new ArrayCollection();
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			for each (var field:InputField in fields) {
-				var o:UpdateRequestOperation = field.presenter.createUpdateValueOperation();
-				operations.addItem(o);
+				var r:NodeUpdateRequestProxy = field.presenter.createValueUpdateRequest();
+				reqSet.addRequest(r);
 			}
-			var req:UpdateRequest = new UpdateRequest();
-			req.operations = operations;
-			_dataClient.updateActiveRecord(req, null, faultHandler);
+			_dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		
 		protected function getDateFromFields():Date {

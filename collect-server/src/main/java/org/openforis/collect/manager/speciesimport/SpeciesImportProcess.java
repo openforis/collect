@@ -39,7 +39,6 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  */
 public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportStatus> {
 
-	private static final int CONFIRMED_TAXON_STEP_NUMBER = 9;
 	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
 	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
 	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
@@ -244,49 +243,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 
 	protected void persistTaxa() {
-		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
-		if ( taxonomy == null ) {
-			throw new IllegalStateException("Taxonomy not found");
-		} else {
-			if ( overwriteAll ) {
-				speciesManager.deleteTaxonsByTaxonomy(taxonomy);
-			} else {
-				throw new IllegalStateException("Taxonomy already existent but no 'overwriteAll' requested");
-			}
-		}
-		final Integer taxonomyId = taxonomy.getId();
-		taxonTree.depthFirstVisit(new TaxonTree.NodeVisitor() {
-			@Override
-			public void visit(Node node) {
-				if ( status.isRunning() ) {
-					persistTaxonTreeNode(taxonomyId, node);
-				}
-			}
-		});
-	}
-
-	protected void persistTaxonTreeNode(Integer taxonomyId, Node node) {
-		try {
-			Taxon taxon = node.getTaxon();
-			taxon.setTaxonomyId(taxonomyId);
-			Node parent = node.getParent();
-			if ( parent != null ) {
-				Taxon parentTaxon = parent.getTaxon();
-				taxon.setParentId(parentTaxon.getSystemId());
-				taxon.setStep(CONFIRMED_TAXON_STEP_NUMBER);
-			}
-			speciesManager.save(taxon);
-			
-			List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
-			for (TaxonVernacularName vernacularName : vernacularNames) {
-				vernacularName.setTaxonSystemId(taxon.getSystemId());
-				speciesManager.save(vernacularName);
-			}
-		} catch (Exception e) {
-			LOG.error(e);
-			status.error();
-			status.setErrorMessage(e.getMessage());
-		}
+		speciesManager.insertTaxons(taxonomyId, taxonTree, overwriteAll);
 	}
 
 	private Taxon findParentTaxon(SpeciesLine line) throws ParsingException {

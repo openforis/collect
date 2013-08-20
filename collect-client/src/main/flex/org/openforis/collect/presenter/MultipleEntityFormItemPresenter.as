@@ -11,10 +11,11 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.model.proxy.EntityAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
+	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -22,10 +23,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.events.IndexChangeEvent;
-	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.UIUtil;
-	
-	import spark.events.IndexChangeEvent;
+
 
 	/**
 	 * 
@@ -116,12 +114,11 @@ package org.openforis.collect.presenter
 			var entities:IList = getEntities();
 			var maxCount:Number = view.entityDefinition.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
-				var o:UpdateRequestOperation = new UpdateRequestOperation();
-				o.method = UpdateRequestOperation$Method.ADD;
-				o.parentEntityId = view.parentEntity.id;
-				o.nodeName = view.entityDefinition.name;
-				var req:UpdateRequest = new UpdateRequest(o);
-				ClientFactory.dataClient.updateActiveRecord(req, addResultHandler, faultHandler);
+				var r:EntityAddRequestProxy = new EntityAddRequestProxy();
+				r.parentEntityId = view.parentEntity.id;
+				r.nodeName = view.entityDefinition.name;
+				var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
+				ClientFactory.dataClient.updateActiveRecord(reqSet, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = view.entityDefinition.getInstanceOrHeadingLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
@@ -134,13 +131,10 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function performDeletion():void {
-			var o:UpdateRequestOperation = new UpdateRequestOperation();
-			o.method = UpdateRequestOperation$Method.DELETE;
-			o.parentEntityId = _view.parentEntity.id;
-			o.nodeName = view.entity.name;
-			o.nodeId = view.entity.id;
-			var req:UpdateRequest = new UpdateRequest(o);
-			ClientFactory.dataClient.updateActiveRecord(req, deleteResultHandler, faultHandler);
+			var r:NodeDeleteRequestProxy = new NodeDeleteRequestProxy();
+			r.nodeId = view.entity.id;
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
+			ClientFactory.dataClient.updateActiveRecord(reqSet, deleteResultHandler, faultHandler);
 		}
 		
 		protected function inputFieldVisitedHandler(event:InputFieldEvent):void {
@@ -183,9 +177,9 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
-			var responses:IList = IList(event.result);
+			var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
+			appEvt.result = changeSet;
 			eventDispatcher.dispatchEvent(appEvt);
 			selectEntity(null);
 			updateViewEntities();

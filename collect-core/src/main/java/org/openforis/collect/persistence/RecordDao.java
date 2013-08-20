@@ -96,7 +96,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 				.and(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootDefinitionId)));
 		addFilterByKeyConditions(q, keyValues);
 		Record r = q.fetchOne();
-		return r.getValueAsInteger(0);
+		return (Integer) r.getValue(0);
 	}
 	
 	@Transactional
@@ -106,7 +106,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		q.addConditions(OFC_RECORD.CREATED_BY_ID.equal(userId)
 				.or(OFC_RECORD.MODIFIED_BY_ID.equal(userId)));
 		Record r = q.fetchOne();
-		Integer count = r.getValueAsInteger(0);
+		Integer count = (Integer) r.getValue(0);
 		return count > 0;
 	}
 

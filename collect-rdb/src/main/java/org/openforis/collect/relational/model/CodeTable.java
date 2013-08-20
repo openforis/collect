@@ -2,9 +2,12 @@ package org.openforis.collect.relational.model;
 
 import java.util.List;
 
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
+import org.openforis.idm.metamodel.SurveyContext;
 
 /**
  * 
@@ -66,13 +69,15 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 
 	@Override
 	public Dataset extractData(CodeListItem source) {
-		return extractData();
+		throw new UnsupportedOperationException();
 	}
 
 	public Dataset extractData() {
 		Dataset data = new Dataset();
 		Integer levelIdx = getLevelIdx();
-		List<CodeListItem> items = codeList.getItems(levelIdx);
+		CodeListService codeListService = getCodeListService();
+		int level = levelIdx == null ? 1: levelIdx + 1;
+		List<? extends CodeListItem> items = codeListService.loadItems(codeList, level);
 		if ( defaultCode != null ) {
 			addDefaultCodeRow(data, items);
 		}
@@ -83,7 +88,14 @@ public class CodeTable extends AbstractTable<CodeListItem> {
 		return data;
 	}
 
-	protected void addDefaultCodeRow(Dataset data, List<CodeListItem> items) {
+	protected CodeListService getCodeListService() {
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		SurveyContext context = survey.getContext();
+		CodeListService codeListService = context.getCodeListService();
+		return codeListService;
+	}
+
+	protected void addDefaultCodeRow(Dataset data, List<? extends CodeListItem> items) {
 		boolean containsDefaultAlready = false;
 		for (CodeListItem item : items) {
 			if ( item.getCode().equals(defaultCode) ) {

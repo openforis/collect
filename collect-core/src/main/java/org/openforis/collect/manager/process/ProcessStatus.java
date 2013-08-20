@@ -61,6 +61,10 @@ public class ProcessStatus {
 		return step == COMPLETE;
 	}
 	
+	public boolean isCancelled() {
+		return step == CANCEL;
+	}
+	
 	public boolean isError() {
 		return step == ERROR;
 	}

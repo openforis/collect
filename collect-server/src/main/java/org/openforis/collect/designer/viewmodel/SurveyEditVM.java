@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.model.LabelKeys;
-import org.openforis.collect.designer.model.SurveyManagerUtil;
-import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -18,6 +16,7 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -272,8 +271,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	protected boolean checkCanSave(boolean publishing) {
 		if ( checkCanLeaveForm() ) {
-			List<SurveyWorkSummary> surveySummaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
-			for (SurveyWorkSummary surveySummary : surveySummaries) {
+			List<SurveySummary> surveySummaries = surveyManager.loadSummaries();
+			for (SurveySummary surveySummary : surveySummaries) {
 				boolean notDuplicate = checkIsNotDuplicate(surveySummary, publishing);
 				if ( ! notDuplicate ) {
 					return false;
@@ -285,7 +284,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		}
 	}
 
-	protected boolean checkIsNotDuplicate(SurveyWorkSummary summary, boolean publishing) {
+	protected boolean checkIsNotDuplicate(SurveySummary summary, boolean publishing) {
 		Integer surveyId = survey.getId();
 		Integer publishedSurveyId = getSessionStatus().getPublishedSurveyId();
 		Integer summaryId = summary.getId();

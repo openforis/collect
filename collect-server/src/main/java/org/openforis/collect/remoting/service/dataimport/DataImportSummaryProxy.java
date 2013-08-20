@@ -7,7 +7,6 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummary.FileErrorItem;
-import org.openforis.collect.spring.MessageContextHolder;
 
 /**
  * 
@@ -17,9 +16,8 @@ import org.openforis.collect.spring.MessageContextHolder;
 public class DataImportSummaryProxy implements Proxy {
 
 	private transient DataImportSummary summary;
-	private transient MessageContextHolder messageContextHolder;
 
-	public DataImportSummaryProxy(MessageContextHolder messageContextHolder, DataImportSummary summary) {
+	public DataImportSummaryProxy(DataImportSummary summary) {
 		super();
 		this.summary = summary;
 	}
@@ -43,12 +41,12 @@ public class DataImportSummaryProxy implements Proxy {
 
 	@ExternalizedProperty
 	public List<DataImportSummaryItemProxy> getRecordsToImport() {
-		return DataImportSummaryItemProxy.fromList(messageContextHolder, summary.getRecordsToImport());
+		return DataImportSummaryItemProxy.fromList(summary.getRecordsToImport());
 	}
 
 	@ExternalizedProperty
 	public List<DataImportSummaryItemProxy> getConflictingRecords() {
-		return DataImportSummaryItemProxy.fromList(messageContextHolder, summary.getConflictingRecords());
+		return DataImportSummaryItemProxy.fromList(summary.getConflictingRecords());
 	}
 
 	

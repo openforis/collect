@@ -1,17 +1,17 @@
 package org.openforis.collect;
 
-import java.io.IOException;
+import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.runner.RunWith;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,20 +33,19 @@ public abstract class CollectIntegrationTest {
 	protected CollectSurveyContext collectSurveyContext;
 	@Autowired
 	protected SurveyDao surveyDao;
+	@Autowired
+	protected SurveyManager surveyManager;
 	
-	protected CollectSurvey loadSurvey() throws IdmlParseException, IOException  {
-		URL idm = ClassLoader.getSystemResource("test.idm.xml");
-		InputStream is = idm.openStream();
-		SurveyIdmlBinder binder = new SurveyIdmlBinder(collectSurveyContext);
-		binder.addApplicationOptionsBinder(new UIOptionsBinder());
-		CollectSurvey survey = (CollectSurvey) binder.unmarshal(is);
+	protected CollectSurvey loadSurvey() throws IdmlParseException {
+		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
+		CollectSurvey survey = surveyDao.unmarshalIdml(is);
 		survey.setName("archenland1");
 		return survey;
 	}
 
-	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException, IOException  {
+	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException {
 		CollectSurvey survey = (CollectSurvey) loadSurvey();
-		surveyDao.importModel(survey);
+		surveyManager.importModel(survey);
 		return survey;
 	}
 	
@@ -55,4 +54,9 @@ public abstract class CollectIntegrationTest {
 		return createSurvey;
 	}
 	
+	protected File getSystemResourceFile(String fileName) throws URISyntaxException {
+		URL fileUrl = ClassLoader.getSystemResource(fileName);
+		File file = new File(fileUrl.toURI());
+		return file;
+	}
 }

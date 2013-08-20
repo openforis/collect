@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.spring.MessageContextHolder;
+import org.openforis.collect.manager.MessageSource;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 
@@ -20,22 +20,22 @@ public class ValidationResultsProxy implements Proxy {
 
 	private transient Attribute<?, ?> attribute;
 	private transient ValidationResults validationResults;
-	private transient MessageContextHolder messageContextHolder;
+	private transient MessageSource messageSource;
 
-	public ValidationResultsProxy(MessageContextHolder messageContextHolder, Attribute<?, ?> attribute, ValidationResults validationResults) {
-		this.messageContextHolder = messageContextHolder;
+	public ValidationResultsProxy(MessageSource messageSource, Attribute<?, ?> attribute, ValidationResults validationResults) {
+		this.messageSource = messageSource;
 		this.attribute = attribute;
 		this.validationResults = validationResults;
 	}
 
 	@ExternalizedProperty
 	public List<ValidationResultProxy> getErrors() {
-		return ValidationResultProxy.fromList(messageContextHolder, attribute, validationResults.getErrors());
+		return ValidationResultProxy.fromList(messageSource, attribute, validationResults.getErrors());
 	}
 
 	@ExternalizedProperty
 	public List<ValidationResultProxy> getWarnings() {
-		return ValidationResultProxy.fromList(messageContextHolder, attribute, validationResults.getWarnings());
+		return ValidationResultProxy.fromList(messageSource, attribute, validationResults.getWarnings());
 	}
 
 }

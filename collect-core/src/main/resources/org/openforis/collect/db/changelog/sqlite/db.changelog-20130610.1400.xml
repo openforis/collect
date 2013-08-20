@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="code-list-storage" author="ricci" dbms="sqlite">
+
+	    <preConditions onFail="MARK_RAN">
+	    	<not>
+		    	<tableExists tableName="ofc_code_list" />
+	    	</not>
+	    </preConditions>
+	    
+	    <comment>Code list storage table</comment>
+	    
+	    <createTable tableName="ofc_code_list">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="survey_id" type="INTEGER">
+				<constraints foreignKeyName="ofc_code_list_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="survey_work_id" type="INTEGER">
+				<constraints foreignKeyName="ofc_code_list_survey_work_fkey" 
+					references="ofc_survey_work(id)" />
+			</column>
+			<column name="code_list_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="item_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="parent_id" type="INTEGER">
+				<constraints foreignKeyName="ofc_code_list_parent_fkey" 
+					references="ofc_code_list(id)" />
+			</column>
+			<column name="sort_order" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="code" type="VARCHAR(255)">
+			  <constraints nullable="false" />
+			</column>
+			<column name="qualifiable" type="BOOLEAN" />
+			<column name="since_version_id" type="INTEGER" />
+			<column name="deprecated_version_id" type="INTEGER" />
+			<column name="label1" type="VARCHAR(255)" />
+			<column name="label2" type="VARCHAR(255)" />
+			<column name="label3" type="VARCHAR(255)" />
+			<column name="description1" type="VARCHAR(255)" />
+			<column name="description2" type="VARCHAR(255)" />
+			<column name="description3" type="VARCHAR(255)" />
+	    </createTable>
+		<!-- INDEXES -->
+		<createIndex
+            indexName="ofc_code_list_survey_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_survey_work_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_work_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_parent_id_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="parent_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_child_items_idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_id" type="INTEGER"/>
+	        <column name="code_list_id" type="INTEGER"/>
+	        <column name="parent_id" type="INTEGER"/>
+    	</createIndex>
+		<createIndex
+            indexName="ofc_code_list_work_child_items__idx"
+            tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_work_id" type="INTEGER"/>
+	        <column name="code_list_id" type="INTEGER"/>
+	        <column name="parent_id" type="INTEGER"/>
+    	</createIndex>
+	</changeSet>
+	
+</databaseChangeLog>

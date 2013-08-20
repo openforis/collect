@@ -15,10 +15,10 @@ import org.openforis.collect.manager.ValidationReportProcess;
 import org.openforis.collect.manager.ValidationReportProcess.ReportType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
-import org.openforis.collect.spring.MessageContextHolder;
-import org.openforis.collect.util.ValidationMessageBuilder;
+import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,7 +42,7 @@ public class ValidationController extends BasicController {
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private MessageContextHolder messageContextHolder;
+	private SpringMessageSource messageContextHolder;
 	
 	@RequestMapping(value = "/validateAllRecords.htm", method = RequestMethod.GET)
 	public void validateAllRecords(HttpServletRequest request, HttpServletResponse response, @RequestParam String s, @RequestParam String r) throws IOException {
@@ -71,7 +71,7 @@ public class ValidationController extends BasicController {
 					print(outputStream, "Start validating record: " + recordKey);
 					Integer id = summary.getId();
 					Step step = summary.getStep();
-					recordManager.validate(survey, user, sessionId, id, step);
+					recordManager.validateAndSave(survey, user, sessionId, id, step);
 					long elapsedMillis = System.currentTimeMillis() - start;
 					print(outputStream, "Validation of record " + recordKey + " completed in " + elapsedMillis + " millis");
 				}
