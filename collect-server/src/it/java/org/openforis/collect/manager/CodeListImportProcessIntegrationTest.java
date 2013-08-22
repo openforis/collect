@@ -77,13 +77,13 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(6, status.getProcessed());
-		List<CodeListItem> items = codeList.getItems();
+		List<CodeListItem> items = codeListManager.loadRootItems(codeList);
 		assertEquals(3, items.size());
 		{
-			CodeListItem item = codeList.getItem("001");
+			CodeListItem item = codeListManager.loadRootItem(codeList, "001", null);
 			assertNotNull(item);
 			assertEquals("Dodoma", item.getLabel(LANG));
-			List<CodeListItem> childItems = item.getChildItems();
+			List<CodeListItem> childItems = codeListManager.loadChildItems(item);
 			assertEquals(2, childItems.size());
 			CodeListItem childItem = childItems.get(0);
 			assertEquals("001", childItem.getCode());
@@ -93,10 +93,10 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 			assertEquals("Mpwapwa", childItem.getLabel(LANG));
 		}
 		{
-			CodeListItem item = codeList.getItem("002");
+			CodeListItem item = codeListManager.loadRootItem(codeList, "002", null);
 			assertNotNull(item);
 			assertEquals("Arusha", item.getLabel(LANG));
-			List<CodeListItem> childItems = item.getChildItems();
+			List<CodeListItem> childItems = codeListManager.loadChildItems(item);
 			assertEquals(2, childItems.size());
 			CodeListItem childItem = childItems.get(0);
 			assertEquals("001", childItem.getCode());
@@ -106,7 +106,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 			assertEquals("Arumeru", childItem.getLabel(LANG));
 		}
 		{
-			CodeListItem item = codeList.getItem("003");
+			CodeListItem item = codeListManager.loadRootItem(codeList, "003", null);
 			assertNotNull(item);
 		}
 	}
