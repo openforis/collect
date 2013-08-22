@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.0-CR1-SNAPSHOT</version>
+	<version>3.0-Alpha7-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -22,6 +22,7 @@
 		<flexmojos.version>4.2-beta</flexmojos.version>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<idm.version>3.0-Alpha7</idm.version>
 	</properties>
 
 	<distributionManagement>
@@ -229,7 +230,7 @@
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>0.0.4-SNAPSHOT</version>
+				<version>0.0.4</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
@@ -274,17 +275,17 @@
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-api</artifactId>
-				<version>3.0-CR1-SNAPSHOT</version>
+				<version>${idm.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
-				<artifactId>idm-transform</artifactId>
-				<version>3.0-CR1-SNAPSHOT</version>
+				<artifactId>idm-api-protostuff</artifactId>
+				<version>${idm.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-test</artifactId>
-				<version>3.0-CR1-SNAPSHOT</version>
+				<version>${idm.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
