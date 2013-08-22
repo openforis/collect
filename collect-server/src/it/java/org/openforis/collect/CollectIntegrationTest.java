@@ -41,6 +41,7 @@ public abstract class CollectIntegrationTest {
 		binder.addApplicationOptionsBinder(new UIOptionsBinder());
 		CollectSurvey survey = (CollectSurvey) binder.unmarshal(is);
 		survey.setName("archenland1");
+		survey.setWork(true);
 		return survey;
 	}
 
