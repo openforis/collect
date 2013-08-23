@@ -14,7 +14,7 @@ import org.openforis.commons.collection.CollectionUtils;
  * @author S. Ricci
  *
  */
-public abstract class ReferenceDataImportStatus<E extends ParsingError> extends ProcessStatus {
+public class ReferenceDataImportStatus<E extends ParsingError> extends ProcessStatus {
 	
 	private Map<Long, List<E>> rowToErrors;
 	private List<Long> processedRows;
