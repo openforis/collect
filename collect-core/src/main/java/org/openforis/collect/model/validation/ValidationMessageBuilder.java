@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.ResourceBundleMessageSource;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -306,7 +307,14 @@ public class ValidationMessageBuilder {
 			Type type) {
 		String result = definition.getLabel(type, language);
 		if ( result == null ) {
-			result = definition.getLabel(type, null);
+			CollectSurvey survey = (CollectSurvey) definition.getSurvey();
+			String defaultLanguage = survey.getDefaultLanguage();
+			if ( ! defaultLanguage.equals(language) ) {
+				result = definition.getLabel(type, defaultLanguage);
+			}
+			if ( result == null ) {
+				result = definition.getLabel(type, null);
+			}
 		}
 		return result;
 	}
