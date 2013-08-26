@@ -26,6 +26,7 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,8 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
 		survey = loadSurvey();
-		surveyManager.saveSurveyWork(survey);
+		survey.setWork(false);
+		surveyManager.importModel(survey);
 	}
 	
 	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId) throws Exception {
@@ -78,7 +80,18 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(3, status.getProcessed());
 		
-//		Entity plot1 = (Entity) cluster.get("plot", 0);
+		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY.getStepNumber());
+		Entity reloadedCluster = reloadedRecord.getRootEntity();
+		{
+			Entity plot = (Entity) reloadedCluster.get("plot", 0);
+			CodeAttribute landUse = (CodeAttribute) plot.getChild("land_use");
+			assertEquals("2", landUse.getValue().getCode());
+		}
+		{
+			Entity plot = (Entity) reloadedCluster.get("plot", 1);
+			CodeAttribute landUse = (CodeAttribute) plot.getChild("land_use");
+			assertEquals("3", landUse.getValue().getCode());
+		}
 	}
 	
 	protected boolean containsError(List<ParsingError> errors, long row,

@@ -15,8 +15,13 @@ import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * @author S. Ricci
@@ -70,6 +75,19 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return result;
 	}
 	
+	private String getMainFieldName(AttributeDefinition attrDefn) {
+		if ( attrDefn instanceof BooleanAttributeDefinition ) {
+			return BooleanAttributeDefinition.VALUE_FIELD;
+		} else if ( attrDefn instanceof CodeAttributeDefinition ) {
+			return CodeAttributeDefinition.CODE_FIELD;
+		} else if ( attrDefn instanceof DateAttributeDefinition ) {
+			throw new IllegalArgumentException("No main field defined");
+		} else if ( attrDefn instanceof TimeAttributeDefinition ) {
+			return CodeAttributeDefinition.CODE_FIELD;
+		}
+		return null;
+	}
+
 	class DataCSVLineParser extends CSVLineParser<DataLine> {
 		
 		DataCSVLineParser(DataCSVReader reader) {
@@ -88,7 +106,27 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			List<String> attrColNames = colNames.subList(ancestorKeyAttrDefns.size(), colNames.size());
 			for (String colName : attrColNames) {
 				String value = getColumnValue(colName, true, String.class);
-				line.addAttributeValue(colName, value);
+				String[] colNameSplitted = colName.split("\\.");
+				String attrName = colNameSplitted[0];
+				FieldDefinition<?> fieldDefn;
+				try {
+					AttributeDefinition attrDefn = (AttributeDefinition) parentEntityDefinition.getChildDefinition(attrName);
+					String fieldName;
+					switch ( colNameSplitted.length ) {
+					case 2:
+						fieldName = colNameSplitted[1];
+						break;
+					case 1:
+						fieldName = getMainFieldName(attrDefn);
+						break;
+					default:
+						throw new ParsingException(new ParsingError(ErrorType.WRONG_COLUMN_NAME, getLineNumber(), colName));
+					}
+					fieldDefn = attrDefn.getFieldDefinition(fieldName);
+					line.addFieldValue(fieldDefn, value);
+				} catch ( Exception e ) {
+					throw new ParsingException(new ParsingError(ErrorType.WRONG_COLUMN_NAME, getLineNumber(), colName));
+				}
 			}
 			return line;
 		}

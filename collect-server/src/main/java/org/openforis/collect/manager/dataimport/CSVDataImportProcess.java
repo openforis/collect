@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
@@ -139,9 +141,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						} else {
 							CollectRecord recordSummary = recordSummaries.get(0);
 							CollectRecord record = recordDao.load(survey, recordSummary.getId(), recordSummary.getStep().getStepNumber());
-							Entity parentEntity = getParentEntity(record, currentRowNumber, line.getAncestorKeys());
+							Entity parentEntity = getOrCreateParentEntity(record, currentRowNumber, line.getAncestorKeys());
 							if ( parentEntity != null ) {
-								setValuesInAttributes(parentEntity, line.getAttributeValues(), currentRowNumber);
+								setValuesInAttributes(parentEntity, line.getFieldValues(), currentRowNumber);
 								recordDao.update(record);
 								status.addProcessedRow(currentRowNumber);
 							}
@@ -176,21 +178,21 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void setValuesInAttributes(Entity parentEntity,
-			Map<String, String> attributeValuesByName, long row) {
-		Set<String> attributeNames = attributeValuesByName.keySet();
-		for (String name : attributeNames) {
-			Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.getChild(name);
-			String strValue = attributeValuesByName.get(name);
+			Map<FieldDefinition<?>, String> attributeValuesByField, long row) {
+		Set<FieldDefinition<?>> fieldDefns = attributeValuesByField.keySet();
+		for (FieldDefinition<?> fieldDefn : fieldDefns) {
+			AttributeDefinition attrDefn = fieldDefn.getAttributeDefinition();
+			String attrName = attrDefn.getName();
+			Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.getChild(attrName);
 			if ( attr == null ) {
-				EntityDefinition parentDefn = parentEntity.getDefinition();
-				AttributeDefinition attrDefn = (AttributeDefinition) parentDefn.getChildDefinition(name);
 				attr = (Attribute<?, ?>) attrDefn.createNode();
 				parentEntity.add(attr);
 			}
 			try {
+				String strValue = attributeValuesByField.get(fieldDefn);
 				setValueInAttribute(attr, strValue);
 			} catch ( Exception e) {
-				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, attr.getName(), strValue));
+				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, attr.getName()));
 			}
 		}
 	}
@@ -225,7 +227,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		attr.setValue(val);
 	}
 
-	private Entity getParentEntity(CollectRecord record, long row, Map<AttributeDefinition, String> ancestorKeyValues) {
+	private Entity getOrCreateParentEntity(CollectRecord record, long row, Map<AttributeDefinition, String> ancestorKeyByDefinition) {
 		Survey survey = record.getSurvey();
 		Schema schema = survey.getSchema();
 		EntityDefinition parentEntityDefn = (EntityDefinition) schema.getDefinitionById(parentEntityDefinitionId);
@@ -236,18 +238,45 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		//skip the root entity
 		for (int i = 1; i < ancestorEntityDefns.size(); i++) {
 			EntityDefinition ancestorDefn = ancestorEntityDefns.get(i);
-			String[] ancestorKeys = getAncestorKeyValues(ancestorKeyValues, ancestorDefn.getKeyAttributeDefinitions());
-			Entity childEntity = currentParent.getChildEntityByKeys(ancestorDefn.getName(), ancestorKeys);
-			if ( childEntity == null ) {
-				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, (String) null, NO_PARENT_ENTITY_FOUND));
-				return null;
+			String[] ancestorKeys = getAncestorKeyValues(ancestorKeyByDefinition, ancestorDefn.getKeyAttributeDefinitions());
+			Entity childEntity;
+			if ( ancestorDefn.isMultiple() ) {
+				childEntity = currentParent.getChildEntityByKeys(ancestorDefn.getName(), ancestorKeys);
+				if ( childEntity == null ) {
+					if ( i == ancestorEntityDefns.size() - 1 ) {
+						//create entity
+						childEntity = (Entity) ancestorDefn.createNode();
+						setKeyValues(childEntity, ancestorKeys, row);
+					} else {
+						status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, (String) null, NO_PARENT_ENTITY_FOUND));
+						return null;
+					}
+				}
 			} else {
-				currentParent = childEntity;
+				childEntity = (Entity) currentParent.getChild(ancestorDefn.getName());
 			}
+			currentParent = childEntity;
+		}
+		if ( currentParent == null ) {
+			status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, (String) null, NO_PARENT_ENTITY_FOUND));
 		}
 		return currentParent;
 	}
 	
+
+	private void setKeyValues(Entity entity, String[] values, long row) {
+		//create key attribute values by name
+		Map<FieldDefinition<?>, String> keyValuesByField = new HashMap<FieldDefinition<?>, String>();
+		EntityDefinition entityDefn = entity.getDefinition();
+		List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
+		for (int i = 0; i < keyDefns.size(); i++) {
+			AttributeDefinition keyDefn = keyDefns.get(i);
+			String mainFieldName = keyDefn.getMainFieldName();
+			FieldDefinition<?> mainField = keyDefn.getFieldDefinition(mainFieldName);
+			keyValuesByField.put(mainField, values[i]);
+		}
+		setValuesInAttributes(entity, keyValuesByField, row);
+	}
 
 	private String[] getAncestorKeyValues(Map<AttributeDefinition, String> ancestorKeyValuesByDefinition,
 			List<AttributeDefinition> keyAttributeDefns) {

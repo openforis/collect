@@ -7,6 +7,7 @@ import java.util.Map;
 import org.openforis.collect.manager.referencedataimport.Line;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 
 /**
  * 
@@ -17,12 +18,12 @@ public class DataLine extends Line {
 
 	private Map<AttributeDefinition, String> recordKeysByDefn;
 	private Map<AttributeDefinition, String> ancestorKeysByDefn;
-	private Map<String, String> attributeValues;
+	private Map<FieldDefinition<?>, String> fieldValues;
 	
 	public DataLine() {
 		recordKeysByDefn = new HashMap<AttributeDefinition, String>();
 		ancestorKeysByDefn = new HashMap<AttributeDefinition, String>();
-		attributeValues = new HashMap<String, String>();
+		fieldValues = new HashMap<FieldDefinition<?>, String>();
 	}
 	
 	public void addAncestorKey(AttributeDefinition keyDefn, String value) {
@@ -32,8 +33,8 @@ public class DataLine extends Line {
 		ancestorKeysByDefn.put(keyDefn, value);
 	}
 
-	public void addAttributeValue(String name, String value) {
-		attributeValues.put(name, value);
+	public void addFieldValue(FieldDefinition<?> fieldDefinition, String value) {
+		fieldValues.put(fieldDefinition, value);
 	}
 	
 	public String[] getRecordKeyValues(EntityDefinition rootEntityDefn) {
@@ -55,8 +56,8 @@ public class DataLine extends Line {
 		return ancestorKeysByDefn;
 	} 
 	
-	public Map<String, String> getAttributeValues() {
-		return attributeValues;
+	public Map<FieldDefinition<?>, String> getFieldValues() {
+		return fieldValues;
 	}
 	
 }
