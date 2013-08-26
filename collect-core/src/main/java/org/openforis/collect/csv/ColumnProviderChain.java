@@ -9,6 +9,8 @@ import org.openforis.idm.model.Node;
 
 /**
  * @author G. Miceli
+ * @author S. Ricci
+ * 
  * @deprecated replaced with idm-transform api
  */
 @Deprecated
@@ -17,9 +19,9 @@ public class ColumnProviderChain implements ColumnProvider {
 	private List<String> headings;
 
 	public ColumnProviderChain(String headingPrefix, List<ColumnProvider> providers) {
-		if ( providers == null || providers.isEmpty() ) {
-			throw new IllegalArgumentException("Providers may not be null or empty");
-		}
+//		if ( providers == null || providers.isEmpty() ) {
+//			throw new IllegalArgumentException("Providers may not be null or empty");
+//		}
 		this.providers = providers;
 		this.headings = getColumnHeadingsInternal(headingPrefix);
 	}
