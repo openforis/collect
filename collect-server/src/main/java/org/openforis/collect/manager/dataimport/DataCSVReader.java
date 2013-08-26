@@ -15,19 +15,17 @@ import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * @author S. Ricci
  *
  */
 public class DataCSVReader extends CSVDataImportReader<DataLine> {
+
+	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataImport.parsingError.missing_required_columns.message";
 
 	private EntityDefinition parentEntityDefinition;
 
@@ -56,13 +54,28 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return true;
 	}
 	
-	protected String getKeyAttributeColumnName(AttributeDefinition keyAttrDefn) {
+	protected static String getKeyAttributeColumnName(
+			EntityDefinition parentEntityDefinition,
+			AttributeDefinition keyAttrDefn) {
 		StringBuilder sb = new StringBuilder();
 		NodeDefinition parentDefn = keyAttrDefn.getParentDefinition();
-		sb.append(parentDefn.getName());
-		sb.append("_");
+		if ( parentDefn != parentEntityDefinition ) {
+			sb.append(parentDefn.getName());
+			sb.append("_");
+		}
 		sb.append(keyAttrDefn.getName());
 		return sb.toString();
+	}
+	
+	protected static String[] getKeyAttributeColumnNames(EntityDefinition parentEntityDefinition, 
+			List<AttributeDefinition> ancestorKeyAttrDefns) {
+		String[] result = new String[ancestorKeyAttrDefns.size()];
+		for (int i = 0; i < ancestorKeyAttrDefns.size(); i++) {
+			AttributeDefinition attrDefn = ancestorKeyAttrDefns.get(i);
+			String colName = getKeyAttributeColumnName(parentEntityDefinition, attrDefn);
+			result[i] = colName;
+		}
+		return result;
 	}
 	
 	protected List<AttributeDefinition> getAncestorKeyAttributeDefinitions() {
@@ -75,19 +88,6 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return result;
 	}
 	
-	private String getMainFieldName(AttributeDefinition attrDefn) {
-		if ( attrDefn instanceof BooleanAttributeDefinition ) {
-			return BooleanAttributeDefinition.VALUE_FIELD;
-		} else if ( attrDefn instanceof CodeAttributeDefinition ) {
-			return CodeAttributeDefinition.CODE_FIELD;
-		} else if ( attrDefn instanceof DateAttributeDefinition ) {
-			throw new IllegalArgumentException("No main field defined");
-		} else if ( attrDefn instanceof TimeAttributeDefinition ) {
-			return CodeAttributeDefinition.CODE_FIELD;
-		}
-		return null;
-	}
-
 	class DataCSVLineParser extends CSVLineParser<DataLine> {
 		
 		DataCSVLineParser(DataCSVReader reader) {
@@ -98,7 +98,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			DataLine line = super.parse();
 			List<AttributeDefinition> ancestorKeyAttrDefns = getAncestorKeyAttributeDefinitions();
 			for (AttributeDefinition keyDefn : ancestorKeyAttrDefns) {
-				String keyAttrColName = getKeyAttributeColumnName(keyDefn);
+				String keyAttrColName = getKeyAttributeColumnName(parentEntityDefinition, keyDefn);
 				String value = getColumnValue(keyAttrColName, true, String.class);
 				line.addAncestorKey(keyDefn, value);
 			}
@@ -117,7 +117,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 						fieldName = colNameSplitted[1];
 						break;
 					case 1:
-						fieldName = getMainFieldName(attrDefn);
+						fieldName = attrDefn.getMainFieldName();
 						break;
 					default:
 						throw new ParsingException(new ParsingError(ErrorType.WRONG_COLUMN_NAME, getLineNumber(), colName));
@@ -135,8 +135,6 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	
 	class Validator {
 		
-		private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "codeListImport.parsingError.missing_required_columns.message";
-
 		public void validate() throws ParsingException {
 			validateHeaders();
 		}
@@ -149,14 +147,54 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				ancestorKeyAttrDefns.addAll(ancestorEntityDefn.getKeyAttributeDefinitions());
 			}
 			ancestorKeyAttrDefns.addAll(parentEntityDefinition.getKeyAttributeDefinitions());
-			for (int i = 0; i < colNames.size(); i++) {
+			//validate ancestor key columns
+			for (int i = 0; i < ancestorKeyAttrDefns.size() && i < colNames.size(); i++) {
 				String colName = StringUtils.trimToEmpty(colNames.get(i));
-				if ( i < ancestorKeyAttrDefns.size() ) {
-					AttributeDefinition ancestorKeyAttrDefn = ancestorKeyAttrDefns.get(i);
-					String expectedColName = getKeyAttributeColumnName(ancestorKeyAttrDefn);
-					if ( ! colName.equals(expectedColName) ) {
-						ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
-								(String) null, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
+				AttributeDefinition ancestorKeyAttrDefn = ancestorKeyAttrDefns.get(i);
+				String expectedColName = getKeyAttributeColumnName(parentEntityDefinition, ancestorKeyAttrDefn);
+				if ( ! colName.equals(expectedColName) ) {
+					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
+							(String) null, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
+					String[] keyAttrExpectedColNames = getKeyAttributeColumnNames(parentEntityDefinition, ancestorKeyAttrDefns);
+					error.setMessageArgs(keyAttrExpectedColNames);
+					throw new ParsingException(error);
+				}
+			}
+			validateAttributeHeaders(colNames, ancestorKeyAttrDefns);
+		}
+
+		protected void validateAttributeHeaders(List<String> colNames,
+				List<AttributeDefinition> ancestorKeyAttrDefns)
+				throws ParsingException {
+			for (int i = ancestorKeyAttrDefns.size(); i < colNames.size(); i++) {
+				String colName = StringUtils.trimToEmpty(colNames.get(i));
+				String[] splittedColName = colName.split("\\.");
+				boolean wrongColName = false;
+				if ( splittedColName.length < 1 || splittedColName.length > 2 ) {
+					wrongColName = true;
+				} else {
+					String attrName = splittedColName[0];
+					if ( parentEntityDefinition.containsChildDefinition(attrName) ) {
+						NodeDefinition childDefn = parentEntityDefinition.getChildDefinition(attrName);
+						if ( childDefn instanceof AttributeDefinition ) {
+							if ( splittedColName.length == 2 ) {
+								String fieldName = splittedColName[1];
+								FieldDefinition<?> fieldDefn = ((AttributeDefinition) childDefn).getFieldDefinition(fieldName);
+								if ( fieldDefn == null ) {
+									//field definition not found
+									wrongColName = true;
+								}
+							}
+						} else {
+							//attribute definition expected
+							wrongColName = true;
+						}
+					} else {
+						//node definition not found
+						wrongColName = true;
+					}
+					if ( wrongColName ) {
+						ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName);
 						throw new ParsingException(error);
 					}
 				}

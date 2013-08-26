@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.process.AbstractProcess;
@@ -27,8 +28,10 @@ import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
@@ -37,6 +40,8 @@ import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Field;
+import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
@@ -50,10 +55,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static Log LOG = LogFactory.getLog(CSVDataImportProcess.class);
 
 	private static final String CSV = "csv";
-	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "dataImport.error.internalErrorImportingFile";
-	private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "dataImport.error.noRecordFound";
-	private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "dataImport.error.multipleRecordsFound";
-	private static final String NO_PARENT_ENTITY_FOUND = "dataImport.error.parentEntityNotFound";
+	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "csvDataImport.error.internalErrorImportingFile";
+	private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";
+	private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
+	private static final String NO_PARENT_ENTITY_FOUND = "csvDataImport.error.parentEntityNotFound";
 	
 	private RecordDao recordDao;
 	private File file;
@@ -132,12 +137,19 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 						String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 						List<CollectRecord> recordSummaries = recordDao.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
+						String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
+								parentEntityDefn,
+								rootEntityDefn.getKeyAttributeDefinitions());
 						if ( recordSummaries.size() == 0 ) {
-							status.addParsingError(currentRowNumber, new ParsingError(ErrorType.INVALID_VALUE, 
-									currentRowNumber, (String) null, NO_RECORD_FOUND_ERROR_MESSAGE_KEY));
+							ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
+									currentRowNumber, recordKeyColumnNames, NO_RECORD_FOUND_ERROR_MESSAGE_KEY);
+							parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
+							status.addParsingError(currentRowNumber, parsingError);
 						} else if ( recordSummaries.size() > 1 ) {
-							status.addParsingError(currentRowNumber, new ParsingError(ErrorType.INVALID_VALUE, 
-									currentRowNumber, (String) null, MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY));
+							ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
+									currentRowNumber, recordKeyColumnNames, MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY);
+							parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
+							status.addParsingError(currentRowNumber, parsingError);
 						} else {
 							CollectRecord recordSummary = recordSummaries.get(0);
 							CollectRecord record = recordDao.load(survey, recordSummary.getId(), recordSummary.getStep().getStepNumber());
@@ -178,8 +190,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void setValuesInAttributes(Entity parentEntity,
-			Map<FieldDefinition<?>, String> attributeValuesByField, long row) {
-		Set<FieldDefinition<?>> fieldDefns = attributeValuesByField.keySet();
+			Map<FieldDefinition<?>, String> fieldValues, long row) {
+		Set<FieldDefinition<?>> fieldDefns = fieldValues.keySet();
 		for (FieldDefinition<?> fieldDefn : fieldDefns) {
 			AttributeDefinition attrDefn = fieldDefn.getAttributeDefinition();
 			String attrName = attrDefn.getName();
@@ -188,12 +200,28 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				attr = (Attribute<?, ?>) attrDefn.createNode();
 				parentEntity.add(attr);
 			}
+			String strValue = fieldValues.get(fieldDefn);
 			try {
-				String strValue = attributeValuesByField.get(fieldDefn);
-				setValueInAttribute(attr, strValue);
+				setValueInField(attr, fieldDefn.getName(), strValue);
+				//setValueInAttribute(attr, strValue);
 			} catch ( Exception e) {
 				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, attr.getName()));
 			}
+		}
+	}
+
+	private void setValueInField(Attribute<?, ?> attr, String fieldName, String value) {
+		if ( attr instanceof NumberAttribute && 
+				(fieldName.equals(NumberAttributeDefinition.UNIT_FIELD) ||
+				fieldName.equals(NumberAttributeDefinition.UNIT_NAME_FIELD)) ) {
+			Survey survey = attr.getSurvey();
+			Unit unit = survey.getUnit(value);
+			((NumberAttribute<?, ?>) attr).setUnit(unit);
+		} else {
+			@SuppressWarnings("unchecked")
+			Field<Object> field = (Field<Object>) attr.getField(fieldName);
+			Object fieldVal = field.parseValue(value);
+			field.setValue(fieldVal);
 		}
 	}
 
