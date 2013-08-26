@@ -28,9 +28,9 @@
 			private var _progressLabelText:String;
 			private var _progressTitleText:String;
 			
-			[SkinPart(type="org.openforis.collect.ui.component.datagrid.PaginationBar")]
+			[SkinPart(required="false",type="org.openforis.collect.ui.component.datagrid.PaginationBar")]
 			public var paginationBar:PaginationBar;
-			[SkinPart(type="spark.components.DataGrid")]
+			[SkinPart(required="false",type="spark.components.DataGrid")]
 			public var summaryDataGrid:DataGrid;
 			[SkinPart(required="true", type="mx.controls.ProgressBar")]
 			public var progressBar:ProgressBar;

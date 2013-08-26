@@ -10,7 +10,7 @@ package org.openforis.collect.client {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class CodeListImportClient extends AbstractReferenceDataImportClient {
+	public class CodeListImportClient extends AbstractImportProcessClient {
 		
 		public function CodeListImportClient() {
 			super("codeListImportService");

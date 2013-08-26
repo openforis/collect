@@ -13,6 +13,21 @@
 		]]>
 	</fx:Script>
 	
-	<view:DataImportView id="dataImportView" />
+	<s:VGroup gap="0" 
+			  height="100%" 
+			  width="100%">
+		<s:TabBar id="tabBar" dataProvider="{viewStack}" />
+		
+		<mx:ViewStack id="viewStack" 
+					  height="100%" 
+					  width="100%">
+			<s:NavigatorContent label="XML">
+				<view:DataImportView id="dataImportView" />
+			</s:NavigatorContent>
+			<s:NavigatorContent label="CSV">
+				<view:CSVDataImportView id="csvDataImportView" />
+			</s:NavigatorContent>
+		</mx:ViewStack>
+	</s:VGroup>
 	
 </component:PopUp>

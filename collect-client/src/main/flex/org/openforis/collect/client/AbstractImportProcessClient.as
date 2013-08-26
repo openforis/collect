@@ -10,13 +10,13 @@ package org.openforis.collect.client {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class AbstractReferenceDataImportClient extends AbstractClient {
+	public class AbstractImportProcessClient extends AbstractClient {
 		
 		protected var _getStatusOperation:Operation;
 		protected var _startOperation:Operation;
 		protected var _cancelOperation:Operation;
 		
-		public function AbstractReferenceDataImportClient(serviceName:String) {
+		public function AbstractImportProcessClient(serviceName:String) {
 			super(serviceName);
 			
 			_startOperation = getOperation("start");
