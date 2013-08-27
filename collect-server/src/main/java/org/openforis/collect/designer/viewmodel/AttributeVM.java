@@ -371,7 +371,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	public String getCheckExpressionPreview(Check<?> check) {
 		if ( check instanceof ComparisonCheck ) {
-			return getComparisonCheckExpressionPreview((ComparisonCheck) check);
+			return ((ComparisonCheck) check).getExpression();
 		} else if ( check instanceof CustomCheck ) {
 			return ((CustomCheck) check).getExpression();
 		} else if ( check instanceof DistanceCheck ) {
@@ -398,45 +398,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 					dc.getMaxDistanceExpression()}));
 		}
 		return StringUtils.join(parts, "\n");
-	}
-
-	private String getComparisonCheckExpressionPreview(ComparisonCheck cp) {
-		if ( StringUtils.isNotBlank(cp.getEqualsExpression()) ) {
-			return getComparisonCheckExpressionPart(
-					Labels.getLabel("survey.schema.node.check.comparison.eq"),
-					cp.getEqualsExpression());
-		} else {
-			List<String> parts = new ArrayList<String>();
-			if ( StringUtils.isNotBlank(cp.getGreaterThanExpression()) ) {
-				parts.add(getComparisonCheckExpressionPart(
-						Labels.getLabel("survey.schema.node.check.comparison.gt"),
-						cp.getGreaterThanExpression()));
-			} else if ( StringUtils.isNotBlank(cp.getGreaterThanOrEqualsExpression()) ) {
-				parts.add(getComparisonCheckExpressionPart(
-						Labels.getLabel("survey.schema.node.check.comparison.gte"),
-						cp.getGreaterThanOrEqualsExpression()));
-			}
-			if ( StringUtils.isNotBlank(cp.getLessThanExpression()) ) {
-				parts.add(getComparisonCheckExpressionPart(
-						Labels.getLabel("survey.schema.node.check.comparison.lt"),
-						cp.getLessThanExpression()));
-			} else if ( StringUtils.isNotBlank(cp.getLessThanOrEqualsExpression()) ) {
-				parts.add(getComparisonCheckExpressionPart(
-						Labels.getLabel("survey.schema.node.check.comparison.lte"),
-						cp.getLessThanOrEqualsExpression()));
-			}
-			String separator = " " + Labels.getLabel("survey.schema.node.check.comparison.and") + " ";
-			separator = separator.toLowerCase();
-			return StringUtils.join(parts, separator);
-		}
-	}
-
-	private String getComparisonCheckExpressionPart(String operator,
-			String operand) {
-		String result = 
-				operator + " " +
-				operand;
-		return result;
 	}
 
 }
