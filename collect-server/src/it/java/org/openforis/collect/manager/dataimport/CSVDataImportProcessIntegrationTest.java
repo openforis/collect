@@ -1,7 +1,7 @@
 package org.openforis.collect.manager.dataimport;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.dataimport.CSVDataImportProcess.ImportException;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ReferenceDataImportStatus;
@@ -26,17 +27,17 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
-import org.openforis.idm.model.Node;
-import org.openforis.idm.model.NumberValue;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.RealValue;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -50,12 +51,13 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration( locations = {"classpath:test-context.xml"} )
 @TransactionConfiguration(defaultRollback=true)
 @Transactional
-public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest {
+public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest implements BeanFactoryAware {
 
 	private static final String VALID_TEST_CSV = "data-import-test.csv";
 	private static final String VALID_NESTED_ENTITY_TEST_CSV = "data-import-nested-entity-test.csv";
 	private static final String INVALID_HEADER_TEST_CSV = "data-import-invalid-header-test.csv";
 	private static final String MISSING_REQUIRED_COLUMNS_TEST_CSV ="data-import-missing-required-columns-test.csv";
+	private static final String MISSING_RECORD_TEST_CSV ="data-import-missing-record-test.csv";
 
 	@Autowired
 	private SurveyManager surveyManager;
@@ -67,6 +69,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	private Unit meterUnit;
 	private Unit centimeterUnit;
 	private Unit kilometerUnit;
+	private BeanFactory beanFactory;
 	
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
@@ -80,13 +83,22 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId) throws Exception {
 		File file = getTestFile(fileName);
-		CSVDataImportProcess process = new CSVDataImportProcess(recordDao, file, survey, parentEntityDefinitionId, true);
-		process.call();
+		CSVDataImportProcess process = beanFactory.getBean(CSVDataImportProcess.class);
+		process.setFile(file);
+		process.setSurvey(survey);
+		process.setParentEntityDefinitionId(parentEntityDefinitionId);
+		process.setStep(null);
+		process.init();
+		try {
+			process.call();
+		} catch ( ImportException e) {
+			
+		}
 		return process;
 	}
 	
 	@Test
-	public void testImport() throws Exception {
+	public void validTest() throws Exception {
 		{
 			CollectRecord record = createTestRecord(survey, "10_111");
 			recordDao.insert(record);
@@ -121,15 +133,8 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		}
 	}
 
-	private CollectRecord loadRecord(String key) {
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", key);
-		CollectRecord summary = summaries.get(0);
-		CollectRecord reloadedRecord = recordDao.load(survey, summary.getId(), summary.getStep().getStepNumber());
-		return reloadedRecord;
-	}
-	
 	@Test
-	public void testNestedEntityImport() throws Exception {
+	public void nestedEntityTest() throws Exception {
 		CollectRecord record = createTestRecord(survey, "10_114");
 		recordDao.insert(record);
 		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
@@ -143,19 +148,57 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY.getStepNumber());
 		Entity reloadedCluster = reloadedRecord.getRootEntity();
 		{
-			Entity plot = (Entity) reloadedCluster.get("plot", 0);
+			Entity plot = (Entity) reloadedCluster.getChildEntityByKeys("plot", "1", "A");
 			CodeAttribute landUse = (CodeAttribute) plot.getChild("land_use");
 			assertEquals("2", landUse.getValue().getCode());
 		}
 		{
-			Entity plot = (Entity) reloadedCluster.get("plot", 1);
+			Entity plot = (Entity) reloadedCluster.getChildEntityByKeys("plot", "2", "B");
 			CodeAttribute landUse = (CodeAttribute) plot.getChild("land_use");
 			assertEquals("3", landUse.getValue().getCode());
 		}
 	}
 	
+	//@Test
+	public void missingRecordTest() throws Exception {
+		{
+			CollectRecord record = createTestRecord(survey, "10_111");
+			recordDao.insert(record);
+		}
+		{
+			CollectRecord record = createTestRecord(survey, "10_114");
+			recordDao.insert(record);
+		}
+		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
+		CSVDataImportProcess process = importCSVFile(MISSING_RECORD_TEST_CSV, clusterDefn.getId());
+
+		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
+		assertTrue(status.isError());
+		assertEquals(1, status.getSkippedRows().size());
+		assertEquals(1, status.getRowsInError().size());
+		assertEquals(3, status.getProcessed());
+
+		//verify that the transaction is rolled back properly
+		{
+			CollectRecord reloadedRecord = loadRecord("10_111");
+			Entity cluster = reloadedRecord.getRootEntity();
+			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
+			RealValue plotDistanceVal = plotDistance.getValue();
+			assertEquals(Double.valueOf(100d), plotDistanceVal.getValue());
+			assertEquals(meterUnit, plotDistanceVal.getUnit());
+		}
+		{
+			CollectRecord reloadedRecord = loadRecord("10_114");
+			Entity cluster = reloadedRecord.getRootEntity();
+			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
+			RealValue plotDistanceVal = plotDistance.getValue();
+			assertEquals(Double.valueOf(100d), plotDistanceVal.getValue());
+			assertEquals(meterUnit, plotDistanceVal.getUnit());
+		}
+	}
+	
 	@Test
-	public void testMissingRequiredColumnsImport() throws Exception {
+	public void missingRequiredColumnsTest() throws Exception {
 		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
 		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
 		CSVDataImportProcess process = importCSVFile(MISSING_REQUIRED_COLUMNS_TEST_CSV, plotDefn.getId());
@@ -169,7 +212,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	@Test
-	public void testInvalidHeaderImport() throws Exception {
+	public void invalidHeaderTest() throws Exception {
 		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
 		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
 		CSVDataImportProcess process = importCSVFile(INVALID_HEADER_TEST_CSV, plotDefn.getId());
@@ -181,6 +224,13 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		ParsingError headerError = errors.get(0);
 		assertEquals(ErrorType.WRONG_COLUMN_NAME, headerError.getErrorType());
 		assertTrue(Arrays.equals(new String[]{"land_usage"}, headerError.getColumns()));
+	}
+	
+	private CollectRecord loadRecord(String key) {
+		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", key);
+		CollectRecord summary = summaries.get(0);
+		CollectRecord reloadedRecord = recordDao.load(survey, summary.getId(), summary.getStep().getStepNumber());
+		return reloadedRecord;
 	}
 	
 	protected boolean containsError(List<ParsingError> errors, long row,
@@ -221,5 +271,10 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		URL fileUrl = ClassLoader.getSystemResource(fileName);
 		File file = new File(fileUrl.toURI());
 		return file;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;
 	}
 }

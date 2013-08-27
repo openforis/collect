@@ -16,12 +16,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.manager.referencedataimport.ReferenceDataImportStatus;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.utils.OpenForisIOUtils;
@@ -45,11 +47,19 @@ import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  *
  */
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Transactional
 public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImportStatus<ParsingError>> {
 
 	private static Log LOG = LogFactory.getLog(CSVDataImportProcess.class);
@@ -59,21 +69,19 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";
 	private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
 	private static final String NO_PARENT_ENTITY_FOUND = "csvDataImport.error.parentEntityNotFound";
-	
+	private static final String UNIT_NOT_FOUND = "csvDataImport.error.unitNotFound";
+
+	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private RecordManager recordManager;
+	
 	private File file;
 	private CollectSurvey survey;
+	private Step step;
 	private int parentEntityDefinitionId;
-	private boolean overwriteData;
-	private DataCSVReader reader;
 	
-	public CSVDataImportProcess(RecordDao recordDao,
-			File file, CollectSurvey survey, int parentEntityDefinitionId, boolean overwriteData) {
-		this.recordDao = recordDao;
-		this.file = file;
-		this.survey = survey;
-		this.parentEntityDefinitionId = parentEntityDefinitionId;
-		this.overwriteData = overwriteData;
+	public CSVDataImportProcess() {
 	}
 	
 	@Override
@@ -87,10 +95,30 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		status = new ReferenceDataImportStatus<ParsingError>();
 	}
 	
+	@Override
+	@Transactional(rollbackFor=ImportException.class)
+	public Void call() throws Exception {
+		Void result = super.call();
+		if ( ! status.isComplete() ) {
+			//rollback transaction
+			throw new ImportException();
+		}
+		return result;
+	}
+	
 	protected void validateParameters() {
-		if ( ! file.exists() && ! file.canRead() ) {
+		if ( ! file.exists() || ! file.canRead() ) {
 			status.error();
 			status.setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
+		} else {
+			String fileName = file.getName();
+			String extension = FilenameUtils.getExtension(fileName);
+			if ( !  CSV.equalsIgnoreCase(extension) ) {
+				String errorMessage = "File type not supported" + extension;
+				status.setErrorMessage(errorMessage);
+				status.error();
+				LOG.error("Error importing file: " + errorMessage);
+			}
 		}
 	}
 	
@@ -100,92 +128,103 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		processFile();
 	}
 
-	protected void processFile() throws IOException {
-		String fileName = file.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if ( CSV.equalsIgnoreCase(extension) ) {
-			parseCSVLines(file);
-		} else {
-			String errorMessage = "File type not supported" + extension;
-			status.setErrorMessage(errorMessage);
-			status.error();
-			LOG.error("Species import: " + errorMessage);
-		}
-		if ( status.hasErrors() ) {
-			status.error();
-		} else if ( status.isRunning() ) {
-			status.complete();
-		}
-	}
-
-	protected void parseCSVLines(File file) {
+	protected void processFile() throws ImportException {
 		InputStreamReader isReader = null;
 		FileInputStream is = null;
 		long currentRowNumber = 0;
-		reader = null;
+		DataCSVReader reader = null;
 		try {
 			is = new FileInputStream(file);
 			isReader = OpenForisIOUtils.toReader(is);
-			EntityDefinition parentEntityDefn = (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
+			EntityDefinition parentEntityDefn = getParentEntityDefinition();
 			reader = new DataCSVReader(isReader, parentEntityDefn);
 			status.addProcessedRow(1);
-			currentRowNumber = 2;
+			currentRowNumber = 1;
 			while ( status.isRunning() ) {
+				currentRowNumber ++;
 				try {
 					DataLine line = reader.readNextLine();
 					if ( line != null ) {
-						EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
-						String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-						List<CollectRecord> recordSummaries = recordDao.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
-						String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
-								parentEntityDefn,
-								rootEntityDefn.getKeyAttributeDefinitions());
-						if ( recordSummaries.size() == 0 ) {
-							ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
-									currentRowNumber, recordKeyColumnNames, NO_RECORD_FOUND_ERROR_MESSAGE_KEY);
-							parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
-							status.addParsingError(currentRowNumber, parsingError);
-						} else if ( recordSummaries.size() > 1 ) {
-							ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
-									currentRowNumber, recordKeyColumnNames, MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY);
-							parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
-							status.addParsingError(currentRowNumber, parsingError);
-						} else {
-							CollectRecord recordSummary = recordSummaries.get(0);
-							CollectRecord record = recordDao.load(survey, recordSummary.getId(), recordSummary.getStep().getStepNumber());
-							Entity parentEntity = getOrCreateParentEntity(record, currentRowNumber, line.getAncestorKeys());
-							if ( parentEntity != null ) {
-								setValuesInAttributes(parentEntity, line.getFieldValues(), currentRowNumber);
-								recordDao.update(record);
-								status.addProcessedRow(currentRowNumber);
-							}
-						}
+						processLine(line);
 					}
 					if ( ! reader.isReady() ) {
 						break;
 					}
 				} catch (ParsingException e) {
 					status.addParsingError(currentRowNumber, e.getError());
-				} finally {
-					currentRowNumber ++;
 				}
 			}
 			status.setTotal(reader.getLinesRead() + 1);
+			if ( status.hasErrors() ) {
+				status.error();
+			} else if ( status.isRunning() ) {
+				status.complete();
+			}
 		} catch (ParsingException e) {
 			status.error();
 			status.addParsingError(1, e.getError());
 		} catch (Exception e) {
 			status.error();
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.toString()));
-			LOG.error("Error importing species CSV file", e);
+			LOG.error("Error importing CSV file", e);
 		} finally {
-			try {
-				if ( reader != null ) {
-					reader.close();
+			close(reader);
+		}
+	}
+
+	private void processLine(DataLine line) {
+		long currentRowNumber = line.getLineNumber();
+		EntityDefinition parentEntityDefn = getParentEntityDefinition();
+		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
+		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+		List<CollectRecord> recordSummaries = recordDao.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
+		String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
+				parentEntityDefn,
+				rootEntityDefn.getKeyAttributeDefinitions());
+		if ( recordSummaries.size() == 0 ) {
+			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
+					currentRowNumber, recordKeyColumnNames, NO_RECORD_FOUND_ERROR_MESSAGE_KEY);
+			parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
+			status.addParsingError(currentRowNumber, parsingError);
+		} else if ( recordSummaries.size() > 1 ) {
+			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
+					currentRowNumber, recordKeyColumnNames, MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY);
+			parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
+			status.addParsingError(currentRowNumber, parsingError);
+		} else {
+			CollectRecord recordSummary = recordSummaries.get(0);
+			setValuesInRecord(line, recordSummary);
+			status.addProcessedRow(currentRowNumber);
+		}
+	}
+
+	private void setValuesInRecord(DataLine line, CollectRecord recordSummary) {
+		if ( step == null ) {
+			for (Step currentStep : Step.values()) {
+				Step recordStep = recordSummary.getStep();
+				if ( currentStep.compareTo(recordStep) <= 0  ) {
+					setValuesInRecord(line, recordSummary,
+							currentStep);
 				}
-			} catch (IOException e) {
-				LOG.error("Error closing reader", e);
 			}
+		}
+	}
+
+	private void setValuesInRecord(DataLine line, CollectRecord recordSummary, Step step) {
+		LOG.info("Setting values in record: " + recordSummary.getId() + "[" + recordSummary.getRootEntityKeyValues() + "]" + " step: " + step);
+		
+		long currentRowNumber = line.getLineNumber();
+		CollectRecord record = recordDao.load(survey, recordSummary.getId(), step.getStepNumber());
+		Entity parentEntity = getOrCreateParentEntity(record, currentRowNumber, line.getAncestorKeys());
+		if ( parentEntity != null ) {
+			setValuesInAttributes(parentEntity, line.getFieldValues(), currentRowNumber);
+			if ( step == Step.ANALYSIS ) {
+				record.setStep(Step.CLEANSING);
+				recordDao.update(record);
+				record.setStep(Step.ANALYSIS);
+			}
+			recordManager.validate(record);
+			recordDao.update(record);
 		}
 	}
 
@@ -202,7 +241,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			}
 			String strValue = fieldValues.get(fieldDefn);
 			try {
-				setValueInField(attr, fieldDefn.getName(), strValue);
+				setValueInField(attr, fieldDefn.getName(), strValue, row, null);
 				//setValueInAttribute(attr, strValue);
 			} catch ( Exception e) {
 				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, attr.getName()));
@@ -210,13 +249,17 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void setValueInField(Attribute<?, ?> attr, String fieldName, String value) {
+	private void setValueInField(Attribute<?, ?> attr, String fieldName, String value, long row, String colName) {
 		if ( attr instanceof NumberAttribute && 
 				(fieldName.equals(NumberAttributeDefinition.UNIT_FIELD) ||
 				fieldName.equals(NumberAttributeDefinition.UNIT_NAME_FIELD)) ) {
 			Survey survey = attr.getSurvey();
 			Unit unit = survey.getUnit(value);
-			((NumberAttribute<?, ?>) attr).setUnit(unit);
+			if ( unit == null ) {
+				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName, UNIT_NOT_FOUND));
+			} else {
+				((NumberAttribute<?, ?>) attr).setUnit(unit);
+			}
 		} else {
 			@SuppressWarnings("unchecked")
 			Field<Object> field = (Field<Object>) attr.getField(fieldName);
@@ -274,6 +317,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 					if ( i == ancestorEntityDefns.size() - 1 ) {
 						//create entity
 						childEntity = (Entity) ancestorDefn.createNode();
+						currentParent.add(childEntity);
 						setKeyValues(childEntity, ancestorKeys, row);
 					} else {
 						status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, (String) null, NO_PARENT_ENTITY_FOUND));
@@ -316,5 +360,60 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 		return result;
 	}
+
+	private void close(DataCSVReader reader) {
+		try {
+			if ( reader != null ) {
+				reader.close();
+			}
+		} catch (IOException e) {
+			LOG.error("Error closing reader", e);
+		}
+	}
+
+	private EntityDefinition getParentEntityDefinition() {
+		return (EntityDefinition) survey.getSchema().getDefinitionById(parentEntityDefinitionId);
+	}
+
+	public File getFile() {
+		return file;
+	}
 	
+	public void setFile(File file) {
+		this.file = file;
+	}
+	
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+	}
+	
+	public Step getStep() {
+		return step;
+	}
+	
+	public void setStep(Step step) {
+		this.step = step;
+	}
+
+	public int getParentEntityDefinitionId() {
+		return parentEntityDefinitionId;
+	}
+	
+	public void setParentEntityDefinitionId(int parentEntityDefinitionId) {
+		this.parentEntityDefinitionId = parentEntityDefinitionId;
+	}
+	
+	static class ImportException extends Exception {
+
+		private static final long serialVersionUID = 1L;
+
+		public ImportException() {
+			super();
+		}
+		
+	}
 }

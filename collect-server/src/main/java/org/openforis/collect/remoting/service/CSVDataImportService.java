@@ -11,6 +11,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.remoting.service.dataimport.DataImportExeption;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.annotation.Secured;
 
 /**
@@ -26,6 +27,8 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 	private SessionManager sessionManager;
 	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private ApplicationContext applicationContext;
 	
 	public CSVDataImportService() {
 		super(IMPORT_FILE_NAME);
@@ -37,7 +40,11 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 			File importFile = getImportFile();
 			SessionState sessionState = sessionManager.getSessionState();
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			importProcess = new CSVDataImportProcess(recordDao, importFile, survey, parentEntityId, overwriteAll);
+			importProcess = applicationContext.getBean(CSVDataImportProcess.class);
+			importProcess.setFile(importFile);
+			importProcess.setSurvey(survey);
+			importProcess.setParentEntityDefinitionId(parentEntityId);
+			importProcess.setStep(null);
 			importProcess.init();
 			ProcessStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {
