@@ -2,7 +2,9 @@ package org.openforis.collect.presenter
 {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.collections.ListCollectionView;
 	import mx.controls.Tree;
+	import mx.events.ListEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -10,10 +12,14 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.CSVDataImportClient;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.NodeItem;
 	import org.openforis.collect.ui.view.CSVDataImportView;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.StringUtil;
 	
 	import spark.components.DropDownList;
 	
@@ -32,7 +38,70 @@ package org.openforis.collect.presenter
 		public function CSVDataImportPresenter(view:CSVDataImportView) {
 			_importClient = ClientFactory.csvDataImportClient;
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
-			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
+			updateImporotFileFormatInfoMessage();
+		}
+		
+		override internal function initEventListeners():void {
+			super.initEventListeners();
+			view.entitySelectionTree.addEventListener(ListEvent.ITEM_CLICK, entityTreeItemSelectHandler);
+		}
+		
+		protected function entityTreeItemSelectHandler(event:ListEvent):void {
+			updateImporotFileFormatInfoMessage();
+		}
+		
+		protected function updateImporotFileFormatInfoMessage():void {
+			var messageArgs:Array = [];
+			var tree:Tree = view.entitySelectionTree;
+			var selectedTreeItem:NodeItem = tree.selectedItem as NodeItem;
+			var selectedNodeDefn:EntityDefinitionProxy = selectedTreeItem.nodeDefinition as EntityDefinitionProxy;
+			messageArgs[0] = StringUtil.concat(", ", getRecordKeyColumnNames(selectedNodeDefn));
+			messageArgs[1] = StringUtil.concat(", ", getAncestorKeyColumnNames(selectedNodeDefn));
+			messageArgs[2] = StringUtil.concat(", ", getExampleAttributeColumnNames(selectedNodeDefn));
+			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO, messageArgs);
+		}
+		
+		private function getExampleAttributeColumnNames(selectedNodeDefn:EntityDefinitionProxy):Array {
+			var result:Array = new Array();
+			var children:ListCollectionView = selectedNodeDefn.childDefinitions;
+			for ( var i:int = 0; i < children.length && i <= 3; i++) {
+				var child:NodeDefinitionProxy = children.getItemAt(i) as NodeDefinitionProxy;
+				if ( child is AttributeDefinitionProxy && 
+						! CollectionUtil.contains(selectedNodeDefn.keyAttributeDefinitions, child, "id") ) {
+					result.push(child.name);
+				}
+			}
+			return result;
+		}
+		
+		protected function getRecordKeyColumnNames(nodeDefn:EntityDefinitionProxy):Array {
+			var result:Array = new Array();
+			var rootEntityDefn:EntityDefinitionProxy = nodeDefn.rootEntity;
+			var keyDefns:IList = rootEntityDefn.keyAttributeDefinitions;
+			for each (var keyDefn:AttributeDefinitionProxy in keyDefns) {
+				result.push(rootEntityDefn.name + "_" + keyDefn.name);
+			}
+			return result;
+		}
+		
+		protected function getAncestorKeyColumnNames(nodeDefn:EntityDefinitionProxy):Array {
+			var result:ArrayCollection = new ArrayCollection();
+			var currentParent:EntityDefinitionProxy = nodeDefn;
+			while ( currentParent != null && currentParent != nodeDefn.rootEntity ) {
+				var keyDefns:IList = currentParent.keyAttributeDefinitions;
+				var colNames:Array = new Array();
+				for each (var keyDefn:AttributeDefinitionProxy in keyDefns) {
+					var colName:String = "";
+					if ( currentParent != nodeDefn ) {
+						colName += currentParent.name + "_";
+					}
+					colName += keyDefn.name;
+					colNames.push(colName);
+				}
+				result.addAllAt(new ArrayCollection(colNames), 0);
+				currentParent = currentParent.parent;
+			}
+			return result.toArray();
 		}
 		
 		private function get view():CSVDataImportView {
@@ -111,14 +180,6 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 	}
 	*/
 	
-	public function get FILE_NOT_SELECTED():String {
-		return "csvDataImport.fileNotSelected";
-	}
-	
-	public function get IMPORT_POPUP_TITLE():String {
-		return "csvDataImport.importPopUpTitle";
-	}
-
 	public function get IMPORT_FILE_FORMAT_INFO():String {
 		return "csvDataImport.importFileFormatInfo";
 	}

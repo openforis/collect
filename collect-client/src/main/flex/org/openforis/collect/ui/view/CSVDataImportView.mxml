@@ -40,11 +40,11 @@
 			}
 			
 			override public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
-				if ( item.errorType == ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS ) {
-					var jointColNames:String = StringUtil.concat(", ", item.messageArgs);
-					return Message.get("codeListImport.parsingError.missing_required_columns.message", [jointColNames]);
-				} else {
-					return super.errorMessageLabelFunction(item, gridColumn);
+				switch ( item.errorType ) {
+					case ParsingError$ErrorType.WRONG_COLUMN_NAME:
+						return "";
+					default:
+						return super.errorMessageLabelFunction(item, gridColumn);	
 				}
 			}
 			

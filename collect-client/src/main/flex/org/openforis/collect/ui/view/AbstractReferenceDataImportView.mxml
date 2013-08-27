@@ -72,13 +72,16 @@
 			
 			public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
 				var messageKey:String;
+				var messageArgs:Array = item.messageArgs;
 				if ( StringUtil.isBlank(item.message) ) {
 					switch (item.errorType) {
 						case ParsingError$ErrorType.WRONG_COLUMN_NAME:
-							messageKey = "referenceDataImport.parsingError.wrong_column_name.message";
+							messageKey = "referenceDataImport.parsingError.type.wrong_column_name.message";
 							break;
 						case ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS:
 							messageKey = "referenceDataImport.parsingError.type.missing_required_columns.message";
+							var jointColNames:String = StringUtil.concat(", ", item.messageArgs);
+							messageArgs = [jointColNames];
 							break;
 						default:
 							messageKey = item.message;
@@ -86,7 +89,7 @@
 				} else {
 					messageKey = item.message;
 				}
-				var message:String = Message.get(messageKey, item.messageArgs);
+				var message:String = Message.get(messageKey, messageArgs);
 				return message;
 			}
 			

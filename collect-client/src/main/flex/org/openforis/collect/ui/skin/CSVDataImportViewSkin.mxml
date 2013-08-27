@@ -52,7 +52,7 @@
 					  width="100%" 
 					  height="100%">
 				<s:Label text="{Message.get('csvDataImport.entitySelectionLabel')}"
-						 styleName="formLabel"/>
+						 styleName="formLabelBig"/>
 				
 				<mx:Tree id="entitySelectionTree"
 						 height="100%"
@@ -67,7 +67,7 @@
 		<s:HGroup gap="50">
 			<s:HGroup gap="10">
 				<s:Button id="importButton" 
-						  label="{Message.get('referenceDataImport.import')}"
+						  label="{Message.get('dataImport.selectFileToUpload')}"
 						  useHandCursor="true"
 						  buttonMode="true"
 						  />

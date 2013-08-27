@@ -21,11 +21,19 @@
 		<mx:ViewStack id="viewStack" 
 					  height="100%" 
 					  width="100%">
-			<s:NavigatorContent label="XML">
-				<view:DataImportView id="dataImportView" />
+			<s:NavigatorContent label="XML"
+								height="100%" 
+								width="100%">
+				<view:DataImportView id="dataImportView"
+									 height="100%" 
+									 width="100%" />
 			</s:NavigatorContent>
-			<s:NavigatorContent label="CSV">
-				<view:CSVDataImportView id="csvDataImportView" />
+			<s:NavigatorContent label="CSV" 
+								height="100%" 
+								width="100%">
+				<view:CSVDataImportView id="csvDataImportView"
+										height="100%" 
+										width="100%" />
 			</s:NavigatorContent>
 		</mx:ViewStack>
 	</s:VGroup>
