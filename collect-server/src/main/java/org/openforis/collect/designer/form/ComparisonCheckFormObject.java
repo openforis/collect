@@ -20,19 +20,25 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 		super.saveTo(dest, languageCode);
 		resetExpressions(dest);
 		String trimmedGreaterThanExpr = StringUtils.trimToNull(greaterThan);
-		if ( trimmedGreaterThanExpr != null ) {
-			if ( greaterThanEqual ) {
-				dest.setGreaterThanOrEqualsExpression(trimmedGreaterThanExpr);
-			} else {
-				dest.setGreaterThanExpression(trimmedGreaterThanExpr);
-			}
-		}
 		String trimmedLessThanExpr = StringUtils.trimToNull(lessThan);
-		if ( trimmedLessThanExpr != null ) {
-			if ( lessThanEqual ) {
-				dest.setLessThanOrEqualsExpression(trimmedLessThanExpr);
-			} else {
-				dest.setLessThanExpression(trimmedLessThanExpr);
+		if ( trimmedGreaterThanExpr != null && trimmedLessThanExpr != null && 
+				greaterThanEqual && lessThanEqual && 
+				trimmedGreaterThanExpr.equals(trimmedLessThanExpr)) {
+			dest.setEqualsExpression(trimmedGreaterThanExpr);
+		} else {
+			if ( trimmedGreaterThanExpr != null ) {
+				if ( greaterThanEqual ) {
+					dest.setGreaterThanOrEqualsExpression(trimmedGreaterThanExpr);
+				} else {
+					dest.setGreaterThanExpression(trimmedGreaterThanExpr);
+				}
+			}
+			if ( trimmedLessThanExpr != null ) {
+				if ( lessThanEqual ) {
+					dest.setLessThanOrEqualsExpression(trimmedLessThanExpr);
+				} else {
+					dest.setLessThanExpression(trimmedLessThanExpr);
+				}
 			}
 		}
 	}
@@ -69,6 +75,7 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 	}
 	
 	protected void resetExpressions(ComparisonCheck dest) {
+		dest.setEqualsExpression(null);
 		dest.setGreaterThanExpression(null);
 		dest.setGreaterThanOrEqualsExpression(null);
 		dest.setLessThanExpression(null);

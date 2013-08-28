@@ -6,7 +6,8 @@
       rows="3">
       <listhead>
         <listheader label="${labels.survey.schema.node.check.flag.$}" width="80px" />
-        <listheader label="${labels.survey.schema.node.check.type.$}" width="200px" />
+        <listheader label="${labels.survey.schema.node.check.type.$}" width="100px" />
+        <listheader label="${labels.survey.schema.node.check.expression}" width="200px" />
         <listheader label="${labels.survey.schema.node.check.message}" />
       </listhead>
       <template name="model">
@@ -14,6 +15,8 @@
           <listcell label="${vm.getCheckFlagLabel(each)}"
             onDoubleClick="@command('editCheck')" />
           <listcell label="${vm.getCheckTypeLabel(each)}"
+            onDoubleClick="@command('editCheck')" />
+          <listcell label="${vm.getCheckExpressionPreview(each)}"
             onDoubleClick="@command('editCheck')" />
           <listcell label="${vm.getCheckMessage(each)}"
             onDoubleClick="@command('editCheck')" />
