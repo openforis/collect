@@ -1,5 +1,7 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.MouseEvent;
+	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
@@ -18,6 +20,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.NodeItem;
 	import org.openforis.collect.ui.view.CSVDataImportView;
+	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -38,7 +42,7 @@ package org.openforis.collect.presenter
 		public function CSVDataImportPresenter(view:CSVDataImportView) {
 			_importClient = ClientFactory.csvDataImportClient;
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
-			updateImporotFileFormatInfoMessage();
+			updateImportFileFormatInfoMessage();
 		}
 		
 		override internal function initEventListeners():void {
@@ -47,24 +51,28 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function entityTreeItemSelectHandler(event:ListEvent):void {
-			updateImporotFileFormatInfoMessage();
+			updateImportFileFormatInfoMessage();
 		}
 		
-		protected function updateImporotFileFormatInfoMessage():void {
+		protected function updateImportFileFormatInfoMessage():void {
 			var messageArgs:Array = [];
 			var tree:Tree = view.entitySelectionTree;
 			var selectedTreeItem:NodeItem = tree.selectedItem as NodeItem;
-			var selectedNodeDefn:EntityDefinitionProxy = selectedTreeItem.nodeDefinition as EntityDefinitionProxy;
-			messageArgs[0] = StringUtil.concat(", ", getRecordKeyColumnNames(selectedNodeDefn));
-			messageArgs[1] = StringUtil.concat(", ", getAncestorKeyColumnNames(selectedNodeDefn));
-			messageArgs[2] = StringUtil.concat(", ", getExampleAttributeColumnNames(selectedNodeDefn));
-			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO, messageArgs);
+			if ( selectedTreeItem == null ) {
+				view.importFileFormatInfo = Message.get("csvDataImport.alert.selectEntity");
+			} else {
+				var selectedNodeDefn:EntityDefinitionProxy = selectedTreeItem.nodeDefinition as EntityDefinitionProxy;
+				messageArgs[0] = StringUtil.concat(", ", getRecordKeyColumnNames(selectedNodeDefn));
+				messageArgs[1] = StringUtil.concat(", ", getAncestorKeyColumnNames(selectedNodeDefn));
+				messageArgs[2] = StringUtil.concat(", ", getExampleAttributeColumnNames(selectedNodeDefn));
+				view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO, messageArgs);
+			}
 		}
 		
 		private function getExampleAttributeColumnNames(selectedNodeDefn:EntityDefinitionProxy):Array {
 			var result:Array = new Array();
 			var children:ListCollectionView = selectedNodeDefn.childDefinitions;
-			for ( var i:int = 0; i < children.length && i <= 3; i++) {
+			for ( var i:int = 0; i < children.length && result.length <= 3; i++) {
 				var child:NodeDefinitionProxy = children.getItemAt(i) as NodeDefinitionProxy;
 				if ( child is AttributeDefinitionProxy && 
 						! CollectionUtil.contains(selectedNodeDefn.keyAttributeDefinitions, child, "id") ) {
@@ -104,6 +112,16 @@ package org.openforis.collect.presenter
 			return result.toArray();
 		}
 		
+		public function getRequiredColumnNamesForSelectedEntity():Array {
+			var result:Array = new Array();
+			var selectedEntity:EntityDefinitionProxy = view.entitySelectionTree.selectedItem as EntityDefinitionProxy;
+			if ( selectedEntity != null ) {
+				ArrayUtil.addAll(result, getRecordKeyColumnNames(selectedEntity));
+				ArrayUtil.addAll(result, getAncestorKeyColumnNames(selectedEntity));
+			}
+			return result;
+		}
+		
 		private function get view():CSVDataImportView {
 			return CSVDataImportView(_view);
 		}
@@ -111,11 +129,21 @@ package org.openforis.collect.presenter
 		private function get messageKeys():MessageKeys {
 			return MessageKeys(_messageKeys);
 		}
+
+		override protected function importButtonClickHandler(event:MouseEvent):void {
+			if ( view.entitySelectionTree.selectedItem == null ) {
+				AlertUtil.showError("csvDataImport.alert.selectEntity");
+			} else {
+				super.importButtonClickHandler(event);
+			}
+		}
 		
 		override protected function performProcessStart():void {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
 			var enityId:int = NodeItem(view.entitySelectionTree.selectedItem).id;
-			_importClient.start(responder, enityId, true);
+			var selectedStepItem:* = view.stepDropDownList.selectedItem;
+			var selectedStep:CollectRecord$Step = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
+			_importClient.start(responder, enityId, selectedStep);
 		}
 		
 		override protected function performImportCancel():void {
@@ -147,7 +175,7 @@ package org.openforis.collect.presenter
 		
 		protected function initView():void {
 			initEntitiesTree();
-			/*initStepsDropDown();*/
+			initStepsDropDown();
 		}
 		
 		protected function initEntitiesTree():void {
@@ -160,7 +188,7 @@ package org.openforis.collect.presenter
 			});
 		}
 		
-		/*protected function initStepsDropDown():void {
+		protected function initStepsDropDown():void {
 			var steps:IList = new ArrayCollection(CollectRecord$Step.constants);
 			steps.addItemAt(ALL_STEPS_ITEM, 0);
 			var stepDropDownList:DropDownList = view.stepDropDownList;
@@ -168,7 +196,7 @@ package org.openforis.collect.presenter
 			stepDropDownList.callLater(function():void {
 				stepDropDownList.selectedIndex = 0;
 			});
-		}*/
+		}
 	}
 }
 import org.openforis.collect.presenter.ReferenceDataImportMessageKeys;
@@ -182,6 +210,10 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 	
 	public function get IMPORT_FILE_FORMAT_INFO():String {
 		return "csvDataImport.importFileFormatInfo";
+	}
+	
+	override public function get CONFIRM_IMPORT():String {
+		return "csvDataImport.confirmImport.message";
 	}
 
 }

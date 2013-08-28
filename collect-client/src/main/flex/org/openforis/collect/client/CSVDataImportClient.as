@@ -6,6 +6,8 @@ package org.openforis.collect.client {
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.remoting.Operation;
 	
+	import org.openforis.collect.model.CollectRecord$Step;
+	
 	/**
 	 * 
 	 * @author S. Ricci
@@ -16,8 +18,8 @@ package org.openforis.collect.client {
 			super("csvDataImportService");
 		}
 		
-		public function start(responder:IResponder, parentEntityId:int, overwriteAll:Boolean):void {
-			var token:AsyncToken = _startOperation.send(parentEntityId, overwriteAll);
+		public function start(responder:IResponder, parentEntityId:int, step:CollectRecord$Step = null):void {
+			var token:AsyncToken = _startOperation.send(parentEntityId, step);
 			token.addResponder(responder);
 		}
 

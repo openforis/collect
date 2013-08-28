@@ -12,12 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.process.AbstractProcess;
+import org.openforis.collect.manager.referencedataimport.CSVDataImportReader;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ParsingException;
@@ -62,10 +65,11 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static final String CSV = "csv";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "csvDataImport.error.internalErrorImportingFile";
 	private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";
+	private static final String NO_PARENT_ENTITY_FOUND_MESSAGE_KEY = "csvDataImport.error.noParentEntityFound";
 	private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
-	private static final String NO_PARENT_ENTITY_FOUND = "csvDataImport.error.parentEntityNotFound";
-	private static final String UNIT_NOT_FOUND = "csvDataImport.error.unitNotFound";
-	private static final String SRS_NOT_FOUND = "csvDataImport.error.srsNotFound";
+	private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.unitNotFound";
+	private static final String SRS_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.srsNotFound";
+	private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "csvDataImport.error.recordNotInSelectedStep";
 
 	@Autowired
 	private RecordDao recordDao;
@@ -195,14 +199,19 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void setValuesInRecord(DataLine line, CollectRecord recordSummary) {
+		Step recordStep = recordSummary.getStep();
 		if ( step == null ) {
 			for (Step currentStep : Step.values()) {
-				Step recordStep = recordSummary.getStep();
 				if ( currentStep.compareTo(recordStep) <= 0  ) {
 					setValuesInRecord(line, recordSummary,
 							currentStep);
 				}
 			}
+		} else if ( step.compareTo(recordStep) <= 0  ) {
+			setValuesInRecord(line, recordSummary,
+					step);
+		} else {
+			status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
 		}
 	}
 
@@ -271,7 +280,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		Survey survey = attr.getSurvey();
 		SpatialReferenceSystem srs = survey.getSpatialReferenceSystem(value);
 		if ( srs == null ) {
-			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, SRS_NOT_FOUND);
+			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, SRS_NOT_FOUND_MESSAGE_KEY);
 			parsingError.setMessageArgs(new String[]{value});
 			status.addParsingError(parsingError);
 		} else {
@@ -285,7 +294,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		Unit unit = survey.getUnit(value);
 		NumericAttributeDefinition defn = (NumericAttributeDefinition) attr.getDefinition();
 		if ( unit == null || ! defn.getUnits().contains(unit) ) {
-			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, UNIT_NOT_FOUND);
+			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, UNIT_NOT_FOUND_MESSAGE_KEY);
 			parsingError.setMessageArgs(new String[]{value});
 			status.addParsingError(parsingError);
 		} else {
@@ -334,7 +343,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						currentParent.add(childEntity);
 						setKeyValues(childEntity, ancestorKeys, line.getColumnNamesByField(), row);
 					} else {
-						status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, (String) null, NO_PARENT_ENTITY_FOUND));
+						ParsingError error = createParentEntityNotFoundError(record,
+								line, ancestorKeys);
+						status.addParsingError(error);
 						return null;
 					}
 				}
@@ -343,13 +354,28 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			}
 			currentParent = childEntity;
 		}
-		if ( currentParent == null ) {
-			status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, (String) null, NO_PARENT_ENTITY_FOUND));
-		}
 		return currentParent;
 	}
-	
 
+	private ParsingError createParentEntityNotFoundError(CollectRecord record, DataLine line, String[] parentEntityKeys) {
+		Survey survey = record.getSurvey();
+		Schema schema = survey.getSchema();
+		EntityDefinition parentEntityDefn = (EntityDefinition) schema.getDefinitionById(parentEntityDefinitionId);
+		String[] colNames = DataCSVReader.getKeyAttributeColumnNames(parentEntityDefn, parentEntityDefn.getKeyAttributeDefinitions());
+		ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), colNames, NO_PARENT_ENTITY_FOUND_MESSAGE_KEY);
+		List<String> recordKeys = record.getRootEntityKeyValues();
+		CollectionUtils.filter(recordKeys, new Predicate() {
+			@Override
+			public boolean evaluate(Object object) {
+				return StringUtils.isNotBlank((String) object);
+			}
+		});
+		String jointRecordKeys = StringUtils.join(recordKeys, ", ");
+		String jointParentEntityKeys = StringUtils.join(parentEntityKeys, ", ");
+		error.setMessageArgs(new String[]{parentEntityDefn.getName(), jointParentEntityKeys, jointRecordKeys});
+		return error;
+	}
+	
 	private void setKeyValues(Entity entity, String[] values, Map<FieldDefinition<?>, String> colNamesByField, long row) {
 		//create key attribute values by name
 		Map<FieldDefinition<?>, String> keyValuesByField = new HashMap<FieldDefinition<?>, String>();

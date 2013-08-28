@@ -169,7 +169,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
 							(String) null, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
 					String[] keyAttrExpectedColNames = getKeyAttributeColumnNames(parentEntityDefinition, ancestorKeyAttrDefns);
-					error.setMessageArgs(keyAttrExpectedColNames);
+					String messageArg = StringUtils.join(keyAttrExpectedColNames, ", ");
+					error.setMessageArgs(new String[]{messageArg});
 					throw new ParsingException(error);
 				}
 			}

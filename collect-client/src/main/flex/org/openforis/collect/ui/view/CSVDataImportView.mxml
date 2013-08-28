@@ -28,10 +28,9 @@
 			
 			[SkinPart(required="true", type="mx.controls.Tree")]
 			public var entitySelectionTree:Tree;
-			/* 
+			 
 			[SkinPart(required="true", type="spark.compoenents.DropDownList")]
 			public var stepDropDownList:DropDownList;
-			*/
 			
 			private var _presenter:CSVDataImportPresenter;
 			

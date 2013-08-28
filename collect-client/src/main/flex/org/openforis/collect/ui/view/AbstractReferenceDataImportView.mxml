@@ -80,8 +80,7 @@
 							break;
 						case ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS:
 							messageKey = "referenceDataImport.parsingError.type.missing_required_columns.message";
-							var jointColNames:String = StringUtil.concat(", ", item.messageArgs);
-							messageArgs = [jointColNames];
+							messageArgs = [StringUtil.concat(", ", item.messageArgs)];
 							break;
 						default:
 							messageKey = item.message;

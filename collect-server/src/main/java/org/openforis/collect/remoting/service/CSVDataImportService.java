@@ -6,6 +6,7 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.dataimport.CSVDataImportProcess;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.remoting.service.dataimport.DataImportExeption;
@@ -35,7 +36,7 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 	}
 
 	@Secured("ROLE_ADMIN")
-	public ReferenceDataImportStatusProxy start(int parentEntityId, boolean overwriteAll) throws DataImportExeption {
+	public ReferenceDataImportStatusProxy start(int parentEntityId, CollectRecord.Step step) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = getImportFile();
 			SessionState sessionState = sessionManager.getSessionState();
@@ -44,7 +45,7 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 			importProcess.setFile(importFile);
 			importProcess.setSurvey(survey);
 			importProcess.setParentEntityDefinitionId(parentEntityId);
-			importProcess.setStep(null);
+			importProcess.setStep(step);
 			importProcess.init();
 			ProcessStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {
