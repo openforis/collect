@@ -19,22 +19,28 @@ public class DataLine extends Line {
 	private Map<AttributeDefinition, String> recordKeysByDefn;
 	private Map<AttributeDefinition, String> ancestorKeysByDefn;
 	private Map<FieldDefinition<?>, String> fieldValues;
+	private Map<FieldDefinition<?>, String> columnNameByField;
 	
 	public DataLine() {
 		recordKeysByDefn = new HashMap<AttributeDefinition, String>();
 		ancestorKeysByDefn = new HashMap<AttributeDefinition, String>();
 		fieldValues = new HashMap<FieldDefinition<?>, String>();
+		columnNameByField = new HashMap<FieldDefinition<?>, String>();
 	}
 	
-	public void addAncestorKey(AttributeDefinition keyDefn, String value) {
+	public void setAncestorKey(AttributeDefinition keyDefn, String value) {
 		if ( keyDefn.getParentEntityDefinition() == keyDefn.getRootEntity() ) {
 			recordKeysByDefn.put(keyDefn, value);
 		}
 		ancestorKeysByDefn.put(keyDefn, value);
 	}
 
-	public void addFieldValue(FieldDefinition<?> fieldDefinition, String value) {
+	public void setFieldValue(FieldDefinition<?> fieldDefinition, String value) {
 		fieldValues.put(fieldDefinition, value);
+	}
+	
+	public void setColumnNameByField(FieldDefinition<?> fieldDefinition, String colName) {
+		columnNameByField.put(fieldDefinition, colName);
 	}
 	
 	public String[] getRecordKeyValues(EntityDefinition rootEntityDefn) {
@@ -58,6 +64,14 @@ public class DataLine extends Line {
 	
 	public Map<FieldDefinition<?>, String> getFieldValues() {
 		return fieldValues;
+	}
+	
+	public String getColumnName(FieldDefinition<?> fieldDefn) {
+		return columnNameByField.get(fieldDefn);
+	}
+
+	public Map<FieldDefinition<?>, String> getColumnNamesByField() {
+		return columnNameByField;
 	}
 	
 }

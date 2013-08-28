@@ -125,7 +125,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			for (AttributeDefinition keyDefn : ancestorKeyAttrDefns) {
 				String keyAttrColName = getKeyAttributeColumnName(parentEntityDefinition, keyDefn);
 				String value = getColumnValue(keyAttrColName, true, String.class);
-				line.addAncestorKey(keyDefn, value);
+				line.setAncestorKey(keyDefn, value);
 			}
 			List<String> colNames = csvLine.getColumnNames();
 			List<String> attrColNames = colNames.subList(ancestorKeyAttrDefns.size(), colNames.size());
@@ -138,7 +138,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 					fieldName = attrDefn.getMainFieldName();
 				}
 				FieldDefinition<?> fieldDefn = attrDefn.getFieldDefinition(fieldName);
-				line.addFieldValue(fieldDefn, value);
+				line.setFieldValue(fieldDefn, value);
+				line.setColumnNameByField(fieldDefn, colName);
 			}
 			return line;
 		}

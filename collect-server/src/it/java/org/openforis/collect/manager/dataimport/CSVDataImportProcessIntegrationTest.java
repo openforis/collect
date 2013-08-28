@@ -58,7 +58,8 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	private static final String INVALID_HEADER_TEST_CSV = "data-import-invalid-header-test.csv";
 	private static final String MISSING_REQUIRED_COLUMNS_TEST_CSV ="data-import-missing-required-columns-test.csv";
 	private static final String MISSING_RECORD_TEST_CSV ="data-import-missing-record-test.csv";
-
+	private static final String INVALID_VALUES_TEST_CSV = "data-import-invalid-values-test.csv";
+	
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -224,6 +225,49 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		ParsingError headerError = errors.get(0);
 		assertEquals(ErrorType.WRONG_COLUMN_NAME, headerError.getErrorType());
 		assertTrue(Arrays.equals(new String[]{"land_usage"}, headerError.getColumns()));
+	}
+	
+	@Test
+	public void invalidValuesTest() throws Exception {
+		{
+			CollectRecord record = createTestRecord(survey, "10_111");
+			recordDao.insert(record);
+		}
+		{
+			CollectRecord record = createTestRecord(survey, "10_114");
+			recordDao.insert(record);
+		}
+		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
+		CSVDataImportProcess process = importCSVFile(INVALID_VALUES_TEST_CSV, clusterDefn.getId());
+		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
+		assertFalse(status.isComplete());
+		assertTrue(status.isError());
+		List<ParsingError> errors = status.getErrors();
+		assertEquals(4, errors.size());
+		{
+			ParsingError error = errors.get(0);
+			assertEquals(2, error.getRow());
+			assertEquals(ErrorType.INVALID_VALUE, error.getErrorType());
+			assertTrue(Arrays.equals(new String[]{"vehicle_location_srs"}, error.getColumns()));
+		}
+		{
+			ParsingError error = errors.get(1);
+			assertEquals(4, error.getRow());
+			assertEquals(ErrorType.INVALID_VALUE, error.getErrorType());
+			assertTrue(Arrays.equals(new String[]{"vehicle_location_x"}, error.getColumns()));
+		}
+		{
+			ParsingError error = errors.get(2);
+			assertEquals(4, error.getRow());
+			assertEquals(ErrorType.INVALID_VALUE, error.getErrorType());
+			assertTrue(Arrays.equals(new String[]{"plot_distance"}, error.getColumns()));
+		}
+		{
+			ParsingError error = errors.get(3);
+			assertEquals(5, error.getRow());
+			assertEquals(ErrorType.INVALID_VALUE, error.getErrorType());
+			assertTrue(Arrays.equals(new String[]{"vehicle_location_y"}, error.getColumns()));
+		}
 	}
 	
 	private CollectRecord loadRecord(String key) {

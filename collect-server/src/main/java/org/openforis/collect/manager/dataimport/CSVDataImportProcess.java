@@ -28,25 +28,20 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
-import org.openforis.idm.model.Date;
-import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.NumberAttribute;
-import org.openforis.idm.model.TextAttribute;
-import org.openforis.idm.model.TextValue;
-import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -70,6 +65,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
 	private static final String NO_PARENT_ENTITY_FOUND = "csvDataImport.error.parentEntityNotFound";
 	private static final String UNIT_NOT_FOUND = "csvDataImport.error.unitNotFound";
+	private static final String SRS_NOT_FOUND = "csvDataImport.error.srsNotFound";
 
 	@Autowired
 	private RecordDao recordDao;
@@ -213,11 +209,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private void setValuesInRecord(DataLine line, CollectRecord recordSummary, Step step) {
 		LOG.info("Setting values in record: " + recordSummary.getId() + "[" + recordSummary.getRootEntityKeyValues() + "]" + " step: " + step);
 		
-		long currentRowNumber = line.getLineNumber();
 		CollectRecord record = recordDao.load(survey, recordSummary.getId(), step.getStepNumber());
-		Entity parentEntity = getOrCreateParentEntity(record, currentRowNumber, line.getAncestorKeys());
+		Entity parentEntity = getOrCreateParentEntity(record, line);
 		if ( parentEntity != null ) {
-			setValuesInAttributes(parentEntity, line.getFieldValues(), currentRowNumber);
+			setValuesInAttributes(parentEntity, line);
 			if ( step == Step.ANALYSIS ) {
 				record.setStep(Step.CLEANSING);
 				recordDao.update(record);
@@ -228,8 +223,15 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void setValuesInAttributes(Entity parentEntity,
-			Map<FieldDefinition<?>, String> fieldValues, long row) {
+	private void setValuesInAttributes(Entity parentEntity, DataLine line) {
+		Map<FieldDefinition<?>, String> fieldValues = line.getFieldValues();
+		long row = line.getLineNumber();
+		Map<FieldDefinition<?>, String> colNamesByField = line.getColumnNamesByField();
+		setValuesInAttributes(parentEntity, fieldValues, colNamesByField, row);
+	}
+	
+	private void setValuesInAttributes(Entity parentEntity, Map<FieldDefinition<?>, String> fieldValues, 
+			Map<FieldDefinition<?>, String> colNameByField, long row) {
 		Set<FieldDefinition<?>> fieldDefns = fieldValues.keySet();
 		for (FieldDefinition<?> fieldDefn : fieldDefns) {
 			AttributeDefinition attrDefn = fieldDefn.getAttributeDefinition();
@@ -240,11 +242,12 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				parentEntity.add(attr);
 			}
 			String strValue = fieldValues.get(fieldDefn);
+			String colName = colNameByField.get(fieldDefn);
 			try {
-				setValueInField(attr, fieldDefn.getName(), strValue, row, null);
+				setValueInField(attr, fieldDefn.getName(), strValue, row, colName);
 				//setValueInAttribute(attr, strValue);
 			} catch ( Exception e) {
-				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, attr.getName()));
+				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName));
 			}
 		}
 	}
@@ -253,52 +256,63 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		if ( attr instanceof NumberAttribute && 
 				(fieldName.equals(NumberAttributeDefinition.UNIT_FIELD) ||
 				fieldName.equals(NumberAttributeDefinition.UNIT_NAME_FIELD)) ) {
-			Survey survey = attr.getSurvey();
-			Unit unit = survey.getUnit(value);
-			if ( unit == null ) {
-				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName, UNIT_NOT_FOUND));
-			} else {
-				((NumberAttribute<?, ?>) attr).setUnit(unit);
-			}
+			setUnitField(attr, value, row, colName);
+		} else if ( attr instanceof CoordinateAttribute && fieldName.equals(CoordinateAttributeDefinition.SRS_FIELD_NAME) ) {
+			setSRSIdField(attr, value, row, colName);
 		} else {
 			@SuppressWarnings("unchecked")
 			Field<Object> field = (Field<Object>) attr.getField(fieldName);
-			Object fieldVal = field.parseValue(value);
-			field.setValue(fieldVal);
+			field.setValueFromString(value);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T extends Value> void setValueInAttribute(Attribute<?, T> attr, String strVal) {
-		T val;
-		if ( attr instanceof DateAttribute ) {
-			val = (T) Date.parseDate(strVal);
-		} else if ( attr instanceof CodeAttribute ) {
-			val = (T) new Code(strVal);
-		} else if ( attr instanceof CoordinateAttribute ) {
-			val = (T) Coordinate.parseCoordinate(strVal);
-//		} else if ( attr instanceof NumberAttribute ) {
-//			Type type = ((NumberAttributeDefinition) attr.getDefinition()).getType();
-//			Field<?> numberField = ((NumberAttribute<?, ?>) attr).getNumberField();
-//			Number value = (Number) numberField.parseValue(strVal);
-//			//TODO set unit
-//			Unit unit = null;
-//			switch ( type ) {
-//			case INTEGER: 
-//				val = (T) new IntegerValue((Integer) value, unit);
-//				break;
-//			case REAL:
-//				val = (T) new RealValue((Double) value, unit);
-//			}
-		} else if ( attr instanceof TextAttribute ) {
-			val = (T) new TextValue(strVal);
+	private void setSRSIdField(Attribute<?, ?> attr, String value, long row,
+			String colName) {
+		Survey survey = attr.getSurvey();
+		SpatialReferenceSystem srs = survey.getSpatialReferenceSystem(value);
+		if ( srs == null ) {
+			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, SRS_NOT_FOUND);
+			parsingError.setMessageArgs(new String[]{value});
+			status.addParsingError(parsingError);
 		} else {
-			throw new UnsupportedOperationException("Attribute type not supported: " + attr.getClass().getName());
+			((CoordinateAttribute) attr).getSrsIdField().setValue(value);
 		}
-		attr.setValue(val);
 	}
 
-	private Entity getOrCreateParentEntity(CollectRecord record, long row, Map<AttributeDefinition, String> ancestorKeyByDefinition) {
+	private void setUnitField(Attribute<?, ?> attr, String value, long row,
+			String colName) {
+		Survey survey = attr.getSurvey();
+		Unit unit = survey.getUnit(value);
+		NumericAttributeDefinition defn = (NumericAttributeDefinition) attr.getDefinition();
+		if ( unit == null || ! defn.getUnits().contains(unit) ) {
+			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, UNIT_NOT_FOUND);
+			parsingError.setMessageArgs(new String[]{value});
+			status.addParsingError(parsingError);
+		} else {
+			((NumberAttribute<?, ?>) attr).setUnit(unit);
+		}
+	}
+
+//	@SuppressWarnings("unchecked")
+//	private <T extends Value> void setValueInAttribute(Attribute<?, T> attr, String strVal) {
+//		T val;
+//		if ( attr instanceof DateAttribute ) {
+//			val = (T) Date.parseDate(strVal);
+//		} else if ( attr instanceof CodeAttribute ) {
+//			val = (T) new Code(strVal);
+//		} else if ( attr instanceof CoordinateAttribute ) {
+//			val = (T) Coordinate.parseCoordinate(strVal);
+//		} else if ( attr instanceof TextAttribute ) {
+//			val = (T) new TextValue(strVal);
+//		} else {
+//			throw new UnsupportedOperationException("Attribute type not supported: " + attr.getClass().getName());
+//		}
+//		attr.setValue(val);
+//	}
+
+	private Entity getOrCreateParentEntity(CollectRecord record, DataLine line) {
+		Map<AttributeDefinition, String> ancestorKeyByDefinition = line.getAncestorKeys();
+		long row = line.getLineNumber();
 		Survey survey = record.getSurvey();
 		Schema schema = survey.getSchema();
 		EntityDefinition parentEntityDefn = (EntityDefinition) schema.getDefinitionById(parentEntityDefinitionId);
@@ -318,7 +332,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						//create entity
 						childEntity = (Entity) ancestorDefn.createNode();
 						currentParent.add(childEntity);
-						setKeyValues(childEntity, ancestorKeys, row);
+						setKeyValues(childEntity, ancestorKeys, line.getColumnNamesByField(), row);
 					} else {
 						status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, (String) null, NO_PARENT_ENTITY_FOUND));
 						return null;
@@ -336,7 +350,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 	
 
-	private void setKeyValues(Entity entity, String[] values, long row) {
+	private void setKeyValues(Entity entity, String[] values, Map<FieldDefinition<?>, String> colNamesByField, long row) {
 		//create key attribute values by name
 		Map<FieldDefinition<?>, String> keyValuesByField = new HashMap<FieldDefinition<?>, String>();
 		EntityDefinition entityDefn = entity.getDefinition();
@@ -347,7 +361,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			FieldDefinition<?> mainField = keyDefn.getFieldDefinition(mainFieldName);
 			keyValuesByField.put(mainField, values[i]);
 		}
-		setValuesInAttributes(entity, keyValuesByField, row);
+		setValuesInAttributes(entity, keyValuesByField, colNamesByField, row);
 	}
 
 	private String[] getAncestorKeyValues(Map<AttributeDefinition, String> ancestorKeyValuesByDefinition,
