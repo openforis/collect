@@ -31,10 +31,13 @@ import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Date;
+import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.RealValue;
+import org.openforis.idm.model.TextAttribute;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -55,6 +58,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 
 	private static final String VALID_TEST_CSV = "data-import-test.csv";
 	private static final String VALID_NESTED_ENTITY_TEST_CSV = "data-import-nested-entity-test.csv";
+	private static final String VALID_SINGLE_ENTITY_TEST_CSV = "data-import-single-entity-test.csv";
 	private static final String INVALID_HEADER_TEST_CSV = "data-import-invalid-header-test.csv";
 	private static final String MISSING_REQUIRED_COLUMNS_TEST_CSV ="data-import-missing-required-columns-test.csv";
 	private static final String MISSING_RECORD_TEST_CSV ="data-import-missing-record-test.csv";
@@ -68,10 +72,12 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	private CollectSurvey survey;
 
 	private Unit meterUnit;
+	@SuppressWarnings("unused")
 	private Unit centimeterUnit;
 	private Unit kilometerUnit;
 	private BeanFactory beanFactory;
 	
+	@SuppressWarnings("deprecation")
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
 		survey = loadSurvey();
@@ -119,18 +125,28 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		{
 			CollectRecord reloadedRecord = loadRecord("10_111");
 			Entity cluster = reloadedRecord.getRootEntity();
+			RealAttribute plotDirection = (RealAttribute) cluster.getChild("plot_direction");
+			RealValue plotDirectionVal = plotDirection.getValue();
+			assertEquals(Double.valueOf(50d), plotDirectionVal.getValue());
 			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(200d), plotDistanceVal.getValue());
 			assertEquals(meterUnit, plotDistanceVal.getUnit());
+			TextAttribute gpsModel = (TextAttribute) cluster.getChild("gps_model");
+			assertEquals("GPS MAP 62S", gpsModel.getValue().getValue());
 		}
 		{
 			CollectRecord reloadedRecord = loadRecord("10_114");
 			Entity cluster = reloadedRecord.getRootEntity();
+			RealAttribute plotDirection = (RealAttribute) cluster.getChild("plot_direction");
+			RealValue plotDirectionVal = plotDirection.getValue();
+			assertEquals(Double.valueOf(40d), plotDirectionVal.getValue());
 			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(0.3d), plotDistanceVal.getValue());
 			assertEquals(kilometerUnit, plotDistanceVal.getUnit());
+			TextAttribute gpsModel = (TextAttribute) cluster.getChild("gps_model");
+			assertEquals("GPS MAP 62S", gpsModel.getValue().getValue());
 		}
 	}
 
@@ -160,6 +176,36 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		}
 	}
 	
+	@Test
+	public void singleEntityTest() throws Exception {
+		{
+			CollectRecord record = createTestRecord(survey, "10_114");
+			recordDao.insert(record);
+		}
+		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
+		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
+		CSVDataImportProcess process = importCSVFile(VALID_SINGLE_ENTITY_TEST_CSV, plotDefn.getId());
+		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
+		assertTrue(status.isComplete());
+		assertTrue(status.getSkippedRows().isEmpty());
+		assertEquals(3, status.getProcessed());
+		{
+			CollectRecord reloadedRecord = loadRecord("10_114");
+			Entity reloadedCluster = reloadedRecord.getRootEntity();
+			{
+				Entity plot = (Entity) reloadedCluster.getChildEntityByKeys("plot", "1", "A");
+				Entity timeStudy = (Entity) plot.getChild("time_study");
+				DateAttribute date = (DateAttribute) timeStudy.getChild("date");
+				assertEquals(new Date(2012, 2, 15), date.getValue());
+			}
+			{
+				Entity plot = (Entity) reloadedCluster.getChildEntityByKeys("plot", "2", "B");
+				Entity timeStudy = (Entity) plot.getChild("time_study");
+				DateAttribute date = (DateAttribute) timeStudy.getChild("date");
+				assertEquals(new Date(2013, 5, 18), date.getValue());
+			}
+		}
+	}
 	//@Test
 	public void missingRecordTest() throws Exception {
 		{

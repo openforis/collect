@@ -90,24 +90,47 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return result;
 	}
 	
-	private String extractAttributeName(EntityDefinition parentEntityDefn, String colName) {
-		String fieldName = extractFieldName(parentEntityDefn, colName);
-		if ( fieldName == null ) {
-			return colName;
-		} else {
-			return colName.substring(0, colName.length() - fieldName.length() - 1);
+	private AttributeDefinition extractAttributeDefinition(EntityDefinition parentEntityDefn, String colName) {
+		List<NodeDefinition> childDefns = parentEntityDefn.getChildDefinitions();
+		for (NodeDefinition childDefn : childDefns) {
+			String childName = childDefn.getName();
+			if ( colName.equals(childName) ) {
+				if ( childDefn instanceof AttributeDefinition ) {
+					return (AttributeDefinition) childDefn;
+				} else {
+					//column name matches an entity name: error
+					return null;
+				}				
+			} else if ( colName.startsWith(childName + ATTRIBUTE_FIELD_SEPARATOR) ) {
+				if ( childDefn instanceof EntityDefinition ) {
+					if ( childDefn.isMultiple() ) {
+						//ignore it
+					} else {
+						String colNamePart = colName.substring(childName.length() + ATTRIBUTE_FIELD_SEPARATOR.length());
+						AttributeDefinition nestedAttrDefn = extractAttributeDefinition((EntityDefinition) childDefn, colNamePart);
+						if ( nestedAttrDefn != null ) {
+							return nestedAttrDefn;
+						}
+					}
+				} else {
+					List<FieldDefinition<?>> fieldDefns = ((AttributeDefinition) childDefn).getFieldDefinitions();
+					for (FieldDefinition<?> fieldDefn : fieldDefns) {
+						if ( colName.equals(childName + ATTRIBUTE_FIELD_SEPARATOR + fieldDefn.getName() ) ) {
+							return (AttributeDefinition) childDefn;
+						}
+					}
+				}
+			}
 		}
+		return null;
 	}
 	
-	private String extractFieldName(EntityDefinition parentEntityDefn, String colName) {
-		int lastIndexOfFieldSeparator = colName.lastIndexOf(ATTRIBUTE_FIELD_SEPARATOR);
-		while ( lastIndexOfFieldSeparator > 0 ) {
-			String attrName = colName.substring(0, lastIndexOfFieldSeparator);
-			if ( parentEntityDefn.containsChildDefinition(attrName) && 
-					parentEntityDefn.getChildDefinition(attrName) instanceof AttributeDefinition ) {
-				return colName.substring(lastIndexOfFieldSeparator + 1);
-			} else {
-				lastIndexOfFieldSeparator = attrName.lastIndexOf(ATTRIBUTE_FIELD_SEPARATOR);
+	private FieldDefinition<?> extractFieldDefinition(AttributeDefinition attributeDefinition, String columnName) {
+		List<FieldDefinition<?>> fieldDefns = attributeDefinition.getFieldDefinitions();
+		for (FieldDefinition<?> fieldDefn : fieldDefns) {
+			String fieldName = fieldDefn.getName();
+			if ( columnName.endsWith(fieldName) ) {
+				return fieldDefn;
 			}
 		}
 		return null;
@@ -124,22 +147,20 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			List<AttributeDefinition> ancestorKeyAttrDefns = getAncestorKeyAttributeDefinitions();
 			for (AttributeDefinition keyDefn : ancestorKeyAttrDefns) {
 				String keyAttrColName = getKeyAttributeColumnName(parentEntityDefinition, keyDefn);
-				String value = getColumnValue(keyAttrColName, true, String.class);
+				String value = getColumnValue(keyAttrColName, false, String.class);
 				line.setAncestorKey(keyDefn, value);
 			}
 			List<String> colNames = csvLine.getColumnNames();
 			List<String> attrColNames = colNames.subList(ancestorKeyAttrDefns.size(), colNames.size());
 			for (String colName : attrColNames) {
-				String value = getColumnValue(colName, true, String.class);
-				String attrName = extractAttributeName(parentEntityDefinition, colName);
-				AttributeDefinition attrDefn = (AttributeDefinition) parentEntityDefinition.getChildDefinition(attrName);
-				String fieldName = extractFieldName(parentEntityDefinition, colName);
-				if ( fieldName == null ) {
-					fieldName = attrDefn.getMainFieldName();
+				String value = getColumnValue(colName, false, String.class);
+				AttributeDefinition attrDefn = extractAttributeDefinition(parentEntityDefinition, colName);;
+				FieldDefinition<?> fieldDefn = extractFieldDefinition(attrDefn, colName);
+				if ( fieldDefn == null ) {
+					fieldDefn = attrDefn.getFieldDefinition(attrDefn.getMainFieldName());
 				}
-				FieldDefinition<?> fieldDefn = attrDefn.getFieldDefinition(fieldName);
-				line.setFieldValue(fieldDefn, value);
-				line.setColumnNameByField(fieldDefn, colName);
+				line.setFieldValue(attrDefn.getId(), fieldDefn.getName(), value);
+				line.setColumnNameByField(attrDefn.getId(), fieldDefn.getName(), colName);
 			}
 			return line;
 		}
@@ -182,28 +203,9 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				throws ParsingException {
 			for (int i = ancestorKeyAttrDefns.size(); i < colNames.size(); i++) {
 				String colName = StringUtils.trimToEmpty(colNames.get(i));
-				boolean wrongColName = false;
-				String attrName = extractAttributeName(parentEntityDefinition, colName);
-				if ( parentEntityDefinition.containsChildDefinition(attrName) ) {
-					NodeDefinition childDefn = parentEntityDefinition.getChildDefinition(attrName);
-					if ( childDefn instanceof AttributeDefinition ) {
-						String fieldName = extractFieldName(parentEntityDefinition, colName);
-						if ( fieldName != null ) {
-							FieldDefinition<?> fieldDefn = ((AttributeDefinition) childDefn).getFieldDefinition(fieldName);
-							if ( fieldDefn == null ) {
-								//field definition not found
-								wrongColName = true;
-							}
-						}
-					} else {
-						//attribute definition expected
-						wrongColName = true;
-					}
-				} else {
-					//node definition not found
-					wrongColName = true;
-				}
-				if ( wrongColName ) {
+				AttributeDefinition attrDefn = extractAttributeDefinition(parentEntityDefinition, colName);
+				if ( attrDefn == null ) {
+					//attribute definition not found
 					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName);
 					throw new ParsingException(error);
 				}
