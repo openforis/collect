@@ -141,7 +141,7 @@
 								  width="150" />
 					<s:GridColumn headerText="{Message.get('referenceDataImport.parsingError.message')}"
 								  labelFunction="{hostComponent.errorMessageLabelFunction}" 
-								  width="350" />
+								  />
 				</s:ArrayList>
 			</s:columns>
 		</s:DataGrid>
