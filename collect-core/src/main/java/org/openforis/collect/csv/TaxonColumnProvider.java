@@ -3,11 +3,14 @@
  */
 package org.openforis.collect.csv;
 
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Field;
+import org.openforis.idm.model.TaxonAttribute;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  * @deprecated replaced with idm-transform api
  */
@@ -20,12 +23,25 @@ public class TaxonColumnProvider extends CompositeAttributeColumnProvider {
 
 	@Override
 	protected String[] getFieldsHeadings() {
-		return new String[] { "species_code", "species_scientific_name", "species_vernacular_name", "species_language" };
+		return new String[] {
+				getFieldHeading(TaxonAttributeDefinition.CODE_FIELD_NAME),
+				getFieldHeading(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME),
+				getFieldHeading(TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME),
+				getFieldHeading(TaxonAttributeDefinition.LANGUAGE_CODE_FIELD_NAME),
+				getFieldHeading(TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME)
+		};
 	}
 
 	@Override
 	protected Field<?>[] getFieldsToExtract(Attribute<?, ?> attr) {
-		return new Field[] { attr.getField(0), attr.getField(1), attr.getField(2), attr.getField(3) };
+		TaxonAttribute taxonAttr = (TaxonAttribute) attr;
+		return new Field[] { 
+				taxonAttr.getCodeField(), 
+				taxonAttr.getScientificNameField(), 
+				taxonAttr.getVernacularNameField(),
+				taxonAttr.getLanguageCodeField(),
+				taxonAttr.getLanguageVarietyField()
+		};
 	}
 
 }
