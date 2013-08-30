@@ -150,10 +150,10 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
+		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
 		if ( isPositionColumnRequired(entityDefn) ) {
 			columnProviders.add(createPositionColumnProvider(entityDefn));
 		}
-		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
 		columnProviders.add(new AutomaticColumnProvider(codeListManager, entityDefn));
 		ColumnProvider provider = new ColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
