@@ -96,6 +96,9 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 			
 			exportData(zipOutputStream);
 		} catch (Exception e) {
+			status.error();
+			status.setErrorMessage(e.getMessage());
+			LOG.error(e.getMessage(), e);
 			throw e;
 		} finally {
 			if ( zipOutputStream != null ) {
@@ -146,13 +149,17 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 	private DataTransformation getTransform() throws InvalidExpressionException {
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
-		List<ColumnProvider> columnProviders = createAncestorsColumnsProvider(entityDefn);
+		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
+		if ( isPositionColumnRequired(entityDefn) ) {
+			columnProviders.add(createPositionColumnProvider(entityDefn));
+		}
+		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
 		columnProviders.add(new AutomaticColumnProvider(codeListManager, entityDefn));
 		ColumnProvider provider = new ColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
 		return new DataTransformation(axisPath, provider);
 	}
-	
+
 	private List<ColumnProvider> createAncestorsColumnsProvider(EntityDefinition entityDefn) {
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
 		EntityDefinition parentDefn = (EntityDefinition) entityDefn.getParentDefinition();
@@ -174,13 +181,17 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 			SingleAttributeColumnProvider keyColumnProvider = new SingleAttributeColumnProvider(keyDefn.getName(), columnName);
 			providers.add(keyColumnProvider);
 		}
-		if ( entityDefn.getParentDefinition() != null ) {
+		if ( isPositionColumnRequired(entityDefn) ) {
 			ColumnProvider positionColumnProvider = createPositionColumnProvider(entityDefn);
 			providers.add(positionColumnProvider);
 		}
 		String expression = StringUtils.repeat("parent()", "/", depth);
-		ColumnProvider result = new PivotExpressionColumnProvider(expression, providers.toArray(new ColumnProvider[1]));
+		ColumnProvider result = new PivotExpressionColumnProvider(expression, providers.toArray(new ColumnProvider[0]));
 		return result;
+	}
+	
+	private boolean isPositionColumnRequired(EntityDefinition entityDefn) {
+		return entityDefn.getParentDefinition() != null && entityDefn.isMultiple() && entityDefn.getKeyAttributeDefinitions().isEmpty();
 	}
 	
 	private ColumnProvider createPositionColumnProvider(EntityDefinition entityDefn) {
@@ -191,29 +202,18 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 	
 	private String createKeyAttributeColumnName(AttributeDefinition attrDefn) {
 		StringBuilder sb = new StringBuilder();
-		String name = attrDefn.getName();
-		sb.append(name);
-		EntityDefinition parent = (EntityDefinition) attrDefn.getParentDefinition();
-		while ( parent != null ) {
-			String parentName = parent.getName();
-			sb.insert(0, '_').insert(0, parentName);
-			parent = (EntityDefinition) parent.getParentDefinition();
+		NodeDefinition parentDefn = attrDefn.getParentDefinition();
+		if ( parentDefn.getId() != entityId ) {
+			sb.append(parentDefn.getName());
+			sb.append("_");
 		}
+		sb.append(attrDefn.getName());
 		return sb.toString();
 	}
 	
-	private String createPositionColumnName(NodeDefinition nodeDefn) {
-		StringBuilder sb = new StringBuilder();
-		String name = nodeDefn.getName();
-		sb.append(name);
-		sb.append("_position");
-		EntityDefinition parent = (EntityDefinition) nodeDefn.getParentDefinition();
-		while ( parent != null ) {
-			String parentName = parent.getName();
-			sb.insert(0, '_').insert(0, parentName);
-			parent = (EntityDefinition) parent.getParentDefinition();
-		}
-		return sb.toString();
+	private String createPositionColumnName(EntityDefinition nodeDefn) {
+		return "_" + nodeDefn.getName() + "_position";
 	}
+	
 }
 
