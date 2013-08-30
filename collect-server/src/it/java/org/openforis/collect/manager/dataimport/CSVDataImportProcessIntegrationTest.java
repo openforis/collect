@@ -62,6 +62,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	private static final String INVALID_HEADER_TEST_CSV = "data-import-invalid-header-test.csv";
 	private static final String MISSING_REQUIRED_COLUMNS_TEST_CSV ="data-import-missing-required-columns-test.csv";
 	private static final String MISSING_RECORD_TEST_CSV ="data-import-missing-record-test.csv";
+	private static final String MISSING_PARENT_ENTITY_TEST_CSV ="data-import-missing-parent-entity-test.csv";
 	private static final String INVALID_VALUES_TEST_CSV = "data-import-invalid-values-test.csv";
 	
 	@Autowired
@@ -165,12 +166,12 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY.getStepNumber());
 		Entity reloadedCluster = reloadedRecord.getRootEntity();
 		{
-			Entity plot = (Entity) reloadedCluster.getChildEntityByKeys("plot", "1", "A");
+			Entity plot = reloadedCluster.findChildEntitiesByKeys("plot", "1", "A").get(0);
 			CodeAttribute landUse = (CodeAttribute) plot.getChild("land_use");
 			assertEquals("2", landUse.getValue().getCode());
 		}
 		{
-			Entity plot = (Entity) reloadedCluster.getChildEntityByKeys("plot", "2", "B");
+			Entity plot = reloadedCluster.findChildEntitiesByKeys("plot", "2", "B").get(0);
 			CodeAttribute landUse = (CodeAttribute) plot.getChild("land_use");
 			assertEquals("3", landUse.getValue().getCode());
 		}
@@ -193,13 +194,13 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			CollectRecord reloadedRecord = loadRecord("10_114");
 			Entity reloadedCluster = reloadedRecord.getRootEntity();
 			{
-				Entity plot = (Entity) reloadedCluster.getChildEntityByKeys("plot", "1", "A");
+				Entity plot = reloadedCluster.findChildEntitiesByKeys("plot", "1", "A").get(0);
 				Entity timeStudy = (Entity) plot.getChild("time_study");
 				DateAttribute date = (DateAttribute) timeStudy.getChild("date");
 				assertEquals(new Date(2012, 2, 15), date.getValue());
 			}
 			{
-				Entity plot = (Entity) reloadedCluster.getChildEntityByKeys("plot", "2", "B");
+				Entity plot = reloadedCluster.findChildEntitiesByKeys("plot", "2", "B").get(0);
 				Entity timeStudy = (Entity) plot.getChild("time_study");
 				DateAttribute date = (DateAttribute) timeStudy.getChild("date");
 				assertEquals(new Date(2013, 5, 18), date.getValue());
@@ -224,7 +225,14 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertEquals(1, status.getSkippedRows().size());
 		assertEquals(1, status.getRowsInError().size());
 		assertEquals(3, status.getProcessed());
-
+		
+		{
+			ParsingError error = status.getErrors().get(0);
+			assertEquals(ErrorType.INVALID_VALUE, error.getErrorType());
+			assertEquals(4, error.getRow());
+			assertTrue(Arrays.equals(new String[]{"cluster_id"}, error.getColumns()));
+		}
+		
 		//verify that the transaction is rolled back properly
 		{
 			CollectRecord reloadedRecord = loadRecord("10_111");
@@ -241,6 +249,32 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			RealValue plotDistanceVal = plotDistance.getValue();
 			assertEquals(Double.valueOf(100d), plotDistanceVal.getValue());
 			assertEquals(meterUnit, plotDistanceVal.getUnit());
+		}
+	}
+	
+	@Test
+	public void missingParentEntityTest() throws Exception {
+		{
+			CollectRecord record = createTestRecord(survey, "10_111");
+			recordDao.insert(record);
+		}
+		{
+			CollectRecord record = createTestRecord(survey, "10_114");
+			recordDao.insert(record);
+		}
+		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
+		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
+		EntityDefinition treeDefn = (EntityDefinition) plotDefn.getChildDefinition("tree");
+		CSVDataImportProcess process = importCSVFile(MISSING_PARENT_ENTITY_TEST_CSV, treeDefn.getId());
+		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
+		assertTrue(status.isError());
+		assertEquals(1, status.getRowsInError().size());
+		assertEquals(4, status.getProcessed());
+		{
+			ParsingError error = status.getErrors().get(0);
+			assertEquals(ErrorType.INVALID_VALUE, error.getErrorType());
+			assertEquals(3, error.getRow());
+			assertTrue(Arrays.equals(new String[]{"tree_no", "stem_no"}, error.getColumns()));
 		}
 	}
 	
@@ -345,12 +379,54 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			EntityBuilder.addValue(plot, "no", new Code("1"));
 			EntityBuilder.addValue(plot, "subplot", "A");
 			EntityBuilder.addValue(plot, "land_use", new Code("1"));
+			{
+				Entity tree = EntityBuilder.addEntity(plot, "tree");
+				EntityBuilder.addValue(tree, "tree_no", 1);
+				EntityBuilder.addValue(tree, "stem_no", 1);
+				EntityBuilder.addValue(tree, "dbh", 10.5d);
+			}
+			{
+				Entity tree = EntityBuilder.addEntity(plot, "tree");
+				EntityBuilder.addValue(tree, "tree_no", 2);
+				EntityBuilder.addValue(tree, "stem_no", 1);
+				EntityBuilder.addValue(tree, "dbh", 20.5d);
+			}
 		}
 		{
 			Entity plot = EntityBuilder.addEntity(cluster, "plot");
 			EntityBuilder.addValue(plot, "no", new Code("2"));
 			EntityBuilder.addValue(plot, "subplot", "A");
 			EntityBuilder.addValue(plot, "land_use", new Code("2"));
+			{
+				Entity tree = EntityBuilder.addEntity(plot, "tree");
+				EntityBuilder.addValue(tree, "tree_no", 1);
+				EntityBuilder.addValue(tree, "stem_no", 1);
+				EntityBuilder.addValue(tree, "dbh", 10.5d);
+			}
+			{
+				Entity tree = EntityBuilder.addEntity(plot, "tree");
+				EntityBuilder.addValue(tree, "tree_no", 2);
+				EntityBuilder.addValue(tree, "stem_no", 1);
+				EntityBuilder.addValue(tree, "dbh", 20.5d);
+			}
+		}
+		{
+			Entity plot = EntityBuilder.addEntity(cluster, "plot");
+			EntityBuilder.addValue(plot, "no", new Code("2"));
+			EntityBuilder.addValue(plot, "subplot", "B");
+			EntityBuilder.addValue(plot, "land_use", new Code("3"));
+			{
+				Entity tree = EntityBuilder.addEntity(plot, "tree");
+				EntityBuilder.addValue(tree, "tree_no", 1);
+				EntityBuilder.addValue(tree, "stem_no", 1);
+				EntityBuilder.addValue(tree, "dbh", 10.5d);
+			}
+			{
+				Entity tree = EntityBuilder.addEntity(plot, "tree");
+				EntityBuilder.addValue(tree, "tree_no", 2);
+				EntityBuilder.addValue(tree, "stem_no", 1);
+				EntityBuilder.addValue(tree, "dbh", 20.5d);
+			}
 		}
 		record.updateRootEntityKeyValues();
 		record.updateEntityCounts();

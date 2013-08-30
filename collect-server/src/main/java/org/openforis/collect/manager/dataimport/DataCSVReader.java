@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.dataimport.DataLine.EntityIdentifierDefinition;
+import org.openforis.collect.manager.dataimport.DataLine.EntityPositionIdentifierDefinition;
+import org.openforis.collect.manager.dataimport.DataLine.SingleEntityIdentifierDefinition;
 import org.openforis.collect.manager.referencedataimport.CSVDataImportReader;
 import org.openforis.collect.manager.referencedataimport.CSVLineParser;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
@@ -18,6 +21,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 
 /**
  * @author S. Ricci
@@ -28,6 +32,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	private static final String ATTRIBUTE_FIELD_SEPARATOR = "_";
 
 	private static final String MISSING_REQUIRED_COLUMNS_MESSAGE_KEY = "dataImport.parsingError.missing_required_columns.message";
+
+	private static final Object POSITION_COLUMN_SUFFIX = null;
 
 	private EntityDefinition parentEntityDefinition;
 
@@ -69,6 +75,10 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return sb.toString();
 	}
 	
+	protected static String getPositionColumnName(EntityDefinition defn) {
+		return "_" + defn.getName() + "_" + POSITION_COLUMN_SUFFIX;
+	}
+
 	protected static String[] getKeyAttributeColumnNames(EntityDefinition parentEntityDefinition, 
 			List<AttributeDefinition> ancestorKeyAttrDefns) {
 		String[] result = new String[ancestorKeyAttrDefns.size()];
@@ -175,33 +185,57 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 
 		protected void validateHeaders() throws ParsingException {
 			List<String> colNames = getColumnNames();
-			List<AttributeDefinition> ancestorKeyAttrDefns = new ArrayList<AttributeDefinition>();
 			List<EntityDefinition> ancestorEntityDefns = parentEntityDefinition.getAncestorEntityDefinitions();
+			ancestorEntityDefns.add(parentEntityDefinition);
+			List<EntityIdentifierDefinition> entityIdentifierDefns = new ArrayList<DataLine.EntityIdentifierDefinition>();
 			for (EntityDefinition ancestorEntityDefn : ancestorEntityDefns) {
-				ancestorKeyAttrDefns.addAll(ancestorEntityDefn.getKeyAttributeDefinitions());
+				EntityIdentifierDefinition identifier;
+				if ( ancestorEntityDefn.isMultiple() ) {
+					List<AttributeDefinition> keyDefns = ancestorEntityDefn.getKeyAttributeDefinitions();
+					if ( keyDefns.isEmpty() ) {
+						identifier = new DataLine.EntityPositionIdentifierDefinition(ancestorEntityDefn.getId());
+					} else {
+						identifier = new DataLine.EntityKeysIdentifierDefintion(ancestorEntityDefn);
+					}
+				} else {
+					identifier = new DataLine.SingleEntityIdentifierDefinition(ancestorEntityDefn.getId());
+				}
+				entityIdentifierDefns.add(identifier);
 			}
-			ancestorKeyAttrDefns.addAll(parentEntityDefinition.getKeyAttributeDefinitions());
 			//validate ancestor key columns
-			for (int i = 0; i < ancestorKeyAttrDefns.size() && i < colNames.size(); i++) {
-				String colName = StringUtils.trimToEmpty(colNames.get(i));
-				AttributeDefinition ancestorKeyAttrDefn = ancestorKeyAttrDefns.get(i);
-				String expectedColName = getKeyAttributeColumnName(parentEntityDefinition, ancestorKeyAttrDefn);
-				if ( ! colName.equals(expectedColName) ) {
-					ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
-							(String) null, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
-					String[] keyAttrExpectedColNames = getKeyAttributeColumnNames(parentEntityDefinition, ancestorKeyAttrDefns);
-					String messageArg = StringUtils.join(keyAttrExpectedColNames, ", ");
-					error.setMessageArgs(new String[]{messageArg});
-					throw new ParsingException(error);
+			Schema schema = parentEntityDefinition.getSchema();
+			List<String> expectedEntityKeyColumns = new ArrayList<String>();
+			for (EntityIdentifierDefinition identifier : entityIdentifierDefns) {
+				int defnId = identifier.getEntityDefinitionId();
+				EntityDefinition defn = (EntityDefinition) schema.getDefinitionById(defnId);
+				if ( identifier instanceof EntityPositionIdentifierDefinition ) {
+					String expectedColName = getPositionColumnName(defn);
+					expectedEntityKeyColumns.add(expectedColName);
+				} else if ( identifier instanceof SingleEntityIdentifierDefinition ) {
+					//skip
+				} else {
+					List<AttributeDefinition> keyDefns = defn.getKeyAttributeDefinitions();
+					for (AttributeDefinition keyDefn : keyDefns) {
+						String expectedColName = getKeyAttributeColumnName(parentEntityDefinition, keyDefn);
+						expectedEntityKeyColumns.add(expectedColName);
+					}
 				}
 			}
-			validateAttributeHeaders(colNames, ancestorKeyAttrDefns);
+			if ( expectedEntityKeyColumns.size() > colNames.size() || 
+					!expectedEntityKeyColumns.equals(colNames.subList(0, expectedEntityKeyColumns.size()))) {
+				ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
+						(String) null, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
+				String messageArg = StringUtils.join(expectedEntityKeyColumns, ", ");
+				error.setMessageArgs(new String[]{messageArg});
+				throw new ParsingException(error);
+			}
+			List<String> attributeColumnNames = colNames.subList(expectedEntityKeyColumns.size(), colNames.size());
+			validateAttributeHeaders(attributeColumnNames);
 		}
 
-		protected void validateAttributeHeaders(List<String> colNames,
-				List<AttributeDefinition> ancestorKeyAttrDefns)
+		protected void validateAttributeHeaders(List<String> colNames)
 				throws ParsingException {
-			for (int i = ancestorKeyAttrDefns.size(); i < colNames.size(); i++) {
+			for (int i = 0; i < colNames.size(); i++) {
 				String colName = StringUtils.trimToEmpty(colNames.get(i));
 				AttributeDefinition attrDefn = extractAttributeDefinition(parentEntityDefinition, colName);
 				if ( attrDefn == null ) {
