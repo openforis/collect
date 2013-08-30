@@ -17,13 +17,11 @@ import org.openforis.idm.metamodel.FieldDefinition;
  */
 public class DataLine extends Line {
 
-	private Map<AttributeDefinition, String> recordKeysByDefn;
 	private Map<Integer, EntityIdentifier<?>> ancestorIdentifierByDefinitionId;
 	private Map<FieldValueKey, String> fieldValues;
 	private Map<FieldValueKey, String> columnNameByField;
 	
 	public DataLine() {
-		recordKeysByDefn = new HashMap<AttributeDefinition, String>();
 		ancestorIdentifierByDefinitionId = new HashMap<Integer, EntityIdentifier<?>>();
 		fieldValues = new HashMap<FieldValueKey, String>();
 		columnNameByField = new HashMap<FieldValueKey, String>();
@@ -38,26 +36,17 @@ public class DataLine extends Line {
 	}
 	
 	public String[] getRecordKeyValues(EntityDefinition rootEntityDefn) {
-		List<AttributeDefinition> rootKeyAttrDefns = rootEntityDefn.getKeyAttributeDefinitions();
-		String[] recordKeys = new String[rootKeyAttrDefns.size()];
-		for (int i = 0; i < rootKeyAttrDefns.size(); i++) {
-			AttributeDefinition keyDefn = rootKeyAttrDefns.get(i);
-			String key = recordKeysByDefn.get(keyDefn);
-			recordKeys[i] = key;
-		}
-		return recordKeys;
+		EntityKeysIdentifier identifier = (EntityKeysIdentifier) ancestorIdentifierByDefinitionId.get(rootEntityDefn.getId());
+		return identifier.getKeyValues();
 	}
 	
 	public void setAncestorIdentifier(EntityIdentifier<?> identifier) {
-		ancestorIdentifierByDefinitionId.put(identifier.getDefinition().getEntityDefinitionId(), identifier);
+		int entityDefnId = identifier.getDefinition().getEntityDefinitionId();
+		ancestorIdentifierByDefinitionId.put(entityDefnId, identifier);
 	}
 	
 	public EntityIdentifier<?> getAncestorIdentifier(int entityDefinitionId) {
 		return ancestorIdentifierByDefinitionId.get(entityDefinitionId);
-	}
-	
-	public Map<AttributeDefinition, String> getRecordKeys() {
-		return recordKeysByDefn;
 	}
 	
 	public Map<FieldValueKey, String> getFieldValues() {

@@ -38,6 +38,7 @@ import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.RealValue;
 import org.openforis.idm.model.TextAttribute;
+import org.openforis.idm.model.Time;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -59,6 +60,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	private static final String VALID_TEST_CSV = "data-import-test.csv";
 	private static final String VALID_NESTED_ENTITY_TEST_CSV = "data-import-nested-entity-test.csv";
 	private static final String VALID_SINGLE_ENTITY_TEST_CSV = "data-import-single-entity-test.csv";
+	private static final String VALID_ENTITY_POSITION_TEST_CSV = "data-import-entity-position-test.csv";
 	private static final String INVALID_HEADER_TEST_CSV = "data-import-invalid-header-test.csv";
 	private static final String MISSING_REQUIRED_COLUMNS_TEST_CSV ="data-import-missing-required-columns-test.csv";
 	private static final String MISSING_RECORD_TEST_CSV ="data-import-missing-record-test.csv";
@@ -148,6 +150,46 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertEquals(kilometerUnit, plotDistanceVal.getUnit());
 			TextAttribute gpsModel = (TextAttribute) cluster.getChild("gps_model");
 			assertEquals("GPS MAP 62S", gpsModel.getValue().getValue());
+		}
+	}
+
+	@Test
+	public void validEntityPositionTest() throws Exception {
+		{
+			CollectRecord record = createTestRecord(survey, "10_111");
+			recordDao.insert(record);
+		}
+		{
+			CollectRecord record = createTestRecord(survey, "10_114");
+			recordDao.insert(record);
+		}
+		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
+		EntityDefinition timeStudyDefn = clusterDefn.getChildDefinition("time_study", EntityDefinition.class);
+		
+		CSVDataImportProcess process = importCSVFile(VALID_ENTITY_POSITION_TEST_CSV, timeStudyDefn.getId());
+		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
+		assertTrue(status.isComplete());
+		assertTrue(status.getSkippedRows().isEmpty());
+		assertEquals(3, status.getProcessed());
+		{
+			CollectRecord reloadedRecord = loadRecord("10_111");
+			Entity cluster = reloadedRecord.getRootEntity();
+			{
+				Entity timeStudy = (Entity) cluster.get("time_study", 0);
+				DateAttribute date = (DateAttribute) timeStudy.getChild("date");
+				Date dateVal = date.getValue();
+				assertEquals(Integer.valueOf(2013), dateVal.getYear());
+				assertEquals(Integer.valueOf(2), dateVal.getMonth());
+				assertEquals(Integer.valueOf(24), dateVal.getDay());
+			}
+			{
+				Entity timeStudy = (Entity) cluster.get("time_study", 1);
+				DateAttribute date = (DateAttribute) timeStudy.getChild("date");
+				Date dateVal = date.getValue();
+				assertEquals(Integer.valueOf(2013), dateVal.getYear());
+				assertEquals(Integer.valueOf(3), dateVal.getMonth());
+				assertEquals(Integer.valueOf(15), dateVal.getDay());
+			}
 		}
 	}
 
@@ -374,6 +416,18 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		record.setStep(Step.ENTRY);
 		EntityBuilder.addValue(cluster, "id", new Code(id));
 		EntityBuilder.addValue(cluster, "plot_distance", 100d, meterUnit);
+		{
+			Entity timeStudy = EntityBuilder.addEntity(cluster, "time_study");
+			EntityBuilder.addValue(timeStudy, "date", new Date(2012, 1, 1));
+			EntityBuilder.addValue(timeStudy, "start_time", new Time(9, 10));
+			EntityBuilder.addValue(timeStudy, "end_time", new Time(12, 20));
+		}
+		{
+			Entity timeStudy = EntityBuilder.addEntity(cluster, "time_study");
+			EntityBuilder.addValue(timeStudy, "date", new Date(2012, 2, 20));
+			EntityBuilder.addValue(timeStudy, "start_time", new Time(8, 15));
+			EntityBuilder.addValue(timeStudy, "end_time", new Time(11, 10));
+		}
 		{
 			Entity plot = EntityBuilder.addEntity(cluster, "plot");
 			EntityBuilder.addValue(plot, "no", new Code("1"));
