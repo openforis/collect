@@ -21,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.dataimport.DataLine.EntityIdentifier;
-import org.openforis.collect.manager.dataimport.DataLine.EntityKeyIdentifier;
+import org.openforis.collect.manager.dataimport.DataLine.EntityKeysIdentifier;
 import org.openforis.collect.manager.dataimport.DataLine.EntityPositionIdentifier;
 import org.openforis.collect.manager.dataimport.DataLine.FieldValueKey;
 import org.openforis.collect.manager.process.AbstractProcess;
@@ -407,7 +407,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			String[] keys = new String[keyDefns.size()];
 			for (int i = 0; i < keyDefns.size(); i++) {
 				AttributeDefinition keyDefn = keyDefns.get(i);
-				String key = ((EntityKeyIdentifier) identifier).getKeyValue(keyDefn.getId());
+				String key = ((EntityKeysIdentifier) identifier).getKeyValue(keyDefn.getId());
 				keys[i] = key;
 			}
 			return currentParent.findChildEntitiesByKeys(childName, keys);
@@ -431,7 +431,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		String jointRecordKeys = StringUtils.join(recordKeys, ", ");
 		String jointParentEntityKeys = identifier instanceof EntityPositionIdentifier ? 
 				"[" + ((EntityPositionIdentifier) identifier).getPosition() + "]" :
-				StringUtils.join(((EntityKeyIdentifier) identifier).getKeyValues(), ", ");
+				StringUtils.join(((EntityKeysIdentifier) identifier).getKeyValues(), ", ");
 		error.setMessageArgs(new String[]{parentEntityDefn.getName(), jointParentEntityKeys, jointRecordKeys});
 		return error;
 	}
