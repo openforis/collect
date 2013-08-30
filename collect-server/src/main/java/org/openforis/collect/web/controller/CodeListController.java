@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
@@ -29,6 +30,9 @@ public class CodeListController {
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 	
+	@Autowired
+	private CodeListManager codeListManager;
+	
 	@RequestMapping(value = "/codelist/export/{surveyId}/{codeListId}", method = RequestMethod.GET)
 	public @ResponseBody String exportCodeList(HttpServletResponse response,
 			@PathVariable("surveyId") Integer surveyId, 
@@ -51,7 +55,7 @@ public class CodeListController {
 		response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
 		response.setContentType(CSV_CONTENT_TYPE); 
 		ServletOutputStream out = response.getOutputStream();
-		CodeListExportProcess process = new CodeListExportProcess();
+		CodeListExportProcess process = new CodeListExportProcess(codeListManager);
 		process.exportToCSV(out, survey, codeListId);
 		return "ok";
 	}

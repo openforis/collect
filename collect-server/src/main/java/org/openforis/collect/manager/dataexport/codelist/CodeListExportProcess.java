@@ -10,6 +10,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.codelistimport.CodeListCSVReader;
 import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
 import org.openforis.collect.model.CollectSurvey;
@@ -31,6 +32,13 @@ public class CodeListExportProcess {
 	private static final char SEPARATOR = ',';
 	private static final char QUOTECHAR = '"';
 	
+	private CodeListManager codeListManager;
+	
+	public CodeListExportProcess(CodeListManager codeListManager) {
+		super();
+		this.codeListManager = codeListManager;
+	}
+
 	public void exportToCSV(OutputStream out, CollectSurvey survey, int codeListId) {
 		CsvWriter writer = null;
 		try {
@@ -38,7 +46,7 @@ public class CodeListExportProcess {
 			writer = new CsvWriter(osWriter, SEPARATOR, QUOTECHAR);
 			CodeList list = survey.getCodeListById(codeListId);
 			initHeaders(writer, survey, list);
-			List<CodeListItem> rootItems = list.getItems();
+			List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
 			for (CodeListItem item : rootItems) {
 				List<CodeListItem> ancestors = Collections.emptyList();
 				writeItem(writer, item, ancestors);
@@ -81,7 +89,7 @@ public class CodeListExportProcess {
 
 		writer.writeNext(lineValues.toArray(new String[0]));
 		
-		List<CodeListItem> children = item.getChildItems();
+		List<CodeListItem> children = codeListManager.loadChildItems(item);
 		List<CodeListItem> childAncestors = new ArrayList<CodeListItem>(ancestors);
 		childAncestors.add(item);
 		for (CodeListItem child : children) {

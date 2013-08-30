@@ -495,7 +495,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Command
 	public void exportCodeList() throws IOException {
 		CollectSurvey survey = getSurvey();
-		CodeListExportProcess codeListExportProcess = new CodeListExportProcess();
+		CodeListExportProcess codeListExportProcess = new CodeListExportProcess(codeListManager);
 		File tempFile = File.createTempFile("code_list_" + editedItem.getName(), ".csv");
 		FileOutputStream os = new FileOutputStream(tempFile);
 		codeListExportProcess.exportToCSV(os, survey, editedItem.getId());
