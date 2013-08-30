@@ -76,6 +76,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static final String SRS_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.srsNotFound";
 	private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "csvDataImport.error.recordNotInSelectedStep";
 
+	private static final String MULTIPLE_ATTRIBUTE_VALUES_SEPARATOR = ",";
+
 	@Autowired
 	private RecordDao recordDao;
 	@Autowired
@@ -249,49 +251,55 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			Schema schema = ancestorDefn.getSchema();
 			AttributeDefinition attrDefn = (AttributeDefinition) schema.getDefinitionById(fieldValueKey.getAttributeDefinitionId());
 			String fieldName = fieldValueKey.getFieldName();
-			String attrName = attrDefn.getName();
-			Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
-			Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.getChild(attrName);
-			if ( attr == null ) {
-				attr = (Attribute<?, ?>) attrDefn.createNode();
-				parentEntity.add(attr);
-			}
 			String strValue = fieldValues.get(fieldValueKey);
+			Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
 			String colName = colNameByField.get(fieldValueKey);
-			try {
-				setValueInField(attr, fieldName, strValue, row, colName);
-				//setValueInAttribute(attr, strValue);
-			} catch ( Exception e) {
-				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName));
+			if ( attrDefn.isMultiple() ) {
+				setValuesInMultipleAttribute(parentEntity, attrDefn, fieldName,
+						strValue, colName, row);
+			} else {
+				setValueInField(parentEntity, attrDefn, 0, fieldName,
+						strValue, colName, row);
 			}
-		}
-	}
-	
-	private Entity getOrCreateParentEntity(Entity ancestorEntity, AttributeDefinition attrDefn) {
-		EntityDefinition ancestorEntityDefn = ancestorEntity.getDefinition();
-		List<EntityDefinition> attributeAncestors = attrDefn.getAncestorEntityDefinitions();
-		int indexOfAncestorEntity = attributeAncestors.indexOf(ancestorEntityDefn);
-		if ( indexOfAncestorEntity < 0 ) {
-			throw new IllegalArgumentException("AttributeDefinition is not among the ancestor entity descendants");
-		} else if ( indexOfAncestorEntity == attributeAncestors.size() - 1 ) {
-			return ancestorEntity;
-		} else {
-			Entity currentParent = ancestorEntity;
-			List<EntityDefinition> nearestAncestors = attributeAncestors.subList(indexOfAncestorEntity + 1, attributeAncestors.size());
-			for (EntityDefinition ancestor : nearestAncestors) {
-				String ancestorName = ancestor.getName();
-				if ( currentParent.getCount(ancestorName) == 0 ) {
-					Entity newNode = (Entity) ancestor.createNode();
-					currentParent.add(newNode);
-					currentParent = newNode;
-				} else {
-					currentParent = (Entity) currentParent.getChild(ancestorName);
-				}
-			}
-			return currentParent;
 		}
 	}
 
+	private void setValuesInMultipleAttribute(Entity parentEntity,
+			AttributeDefinition attrDefn, String fieldName, String strValue,
+			String colName, long row) {
+		String[] splittedValues = strValue.split(MULTIPLE_ATTRIBUTE_VALUES_SEPARATOR);
+		int newValuesCount = splittedValues.length;
+		for (int i = 0; i < newValuesCount; i++) {
+			String strVal = splittedValues[i].trim();
+			setValueInField(parentEntity, attrDefn, i, fieldName,
+					strVal, colName, row);
+		}
+		//remove old attributes
+		String attrName = attrDefn.getName();
+		int totalCount = parentEntity.getCount(attrName);
+		if ( totalCount > newValuesCount ) {
+			for (int i = totalCount - 1; i >= newValuesCount; i--) {
+				parentEntity.remove(attrName, i);
+			}
+		}
+	}
+
+	private void setValueInField(Entity parentEntity,
+			AttributeDefinition attrDefn, int index, String fieldName,
+			String value, String colName, long row) {
+		String attrName = attrDefn.getName();
+		Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrName, index);
+		if ( attr == null ) {
+			attr = (Attribute<?, ?>) attrDefn.createNode();
+			parentEntity.add(attr);
+		}
+		try {
+			setValueInField(attr, fieldName, value, row, colName);
+		} catch ( Exception e) {
+			status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName));
+		}
+	}
+	
 	private void setValueInField(Attribute<?, ?> attr, String fieldName, String value, long row, String colName) {
 		if ( attr instanceof NumberAttribute && 
 				(fieldName.equals(NumberAttributeDefinition.UNIT_FIELD) ||
@@ -330,6 +338,31 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			status.addParsingError(parsingError);
 		} else {
 			((NumberAttribute<?, ?>) attr).setUnit(unit);
+		}
+	}
+
+	private Entity getOrCreateParentEntity(Entity ancestorEntity, AttributeDefinition attrDefn) {
+		EntityDefinition ancestorEntityDefn = ancestorEntity.getDefinition();
+		List<EntityDefinition> attributeAncestors = attrDefn.getAncestorEntityDefinitions();
+		int indexOfAncestorEntity = attributeAncestors.indexOf(ancestorEntityDefn);
+		if ( indexOfAncestorEntity < 0 ) {
+			throw new IllegalArgumentException("AttributeDefinition is not among the ancestor entity descendants");
+		} else if ( indexOfAncestorEntity == attributeAncestors.size() - 1 ) {
+			return ancestorEntity;
+		} else {
+			Entity currentParent = ancestorEntity;
+			List<EntityDefinition> nearestAncestors = attributeAncestors.subList(indexOfAncestorEntity + 1, attributeAncestors.size());
+			for (EntityDefinition ancestor : nearestAncestors) {
+				String ancestorName = ancestor.getName();
+				if ( currentParent.getCount(ancestorName) == 0 ) {
+					Entity newNode = (Entity) ancestor.createNode();
+					currentParent.add(newNode);
+					currentParent = newNode;
+				} else {
+					currentParent = (Entity) currentParent.getChild(ancestorName);
+				}
+			}
+			return currentParent;
 		}
 	}
 

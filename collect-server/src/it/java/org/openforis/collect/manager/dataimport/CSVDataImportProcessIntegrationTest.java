@@ -124,7 +124,6 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(3, status.getProcessed());
-		
 		{
 			CollectRecord reloadedRecord = loadRecord("10_111");
 			Entity cluster = reloadedRecord.getRootEntity();
@@ -137,6 +136,16 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			assertEquals(meterUnit, plotDistanceVal.getUnit());
 			TextAttribute gpsModel = (TextAttribute) cluster.getChild("gps_model");
 			assertEquals("GPS MAP 62S", gpsModel.getValue().getValue());
+			
+			assertEquals(2, cluster.getCount("map_sheet"));
+			{
+				TextAttribute mapSheet = (TextAttribute) cluster.get("map_sheet", 0);
+				assertEquals("new map sheet 1", mapSheet.getValue().getValue());
+			}
+			{
+				TextAttribute mapSheet = (TextAttribute) cluster.get("map_sheet", 1);
+				assertEquals("new map sheet 2", mapSheet.getValue().getValue());
+			}
 		}
 		{
 			CollectRecord reloadedRecord = loadRecord("10_114");
@@ -416,6 +425,9 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		record.setStep(Step.ENTRY);
 		EntityBuilder.addValue(cluster, "id", new Code(id));
 		EntityBuilder.addValue(cluster, "plot_distance", 100d, meterUnit);
+		EntityBuilder.addValue(cluster, "map_sheet", "map sheet 1");
+		EntityBuilder.addValue(cluster, "map_sheet", "map sheet 2");
+		EntityBuilder.addValue(cluster, "map_sheet", "map sheet 3");
 		{
 			Entity timeStudy = EntityBuilder.addEntity(cluster, "time_study");
 			EntityBuilder.addValue(timeStudy, "date", new Date(2012, 1, 1));
