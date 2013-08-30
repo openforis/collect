@@ -32,6 +32,10 @@ public abstract class CompositeAttributeColumnProvider implements ColumnProvider
 
 	protected abstract Field<?>[] getFieldsToExtract(Attribute<?, ?> attr);
 
+	protected String getFieldHeading(String fieldName) {
+		return getAttributeName() + "_" + fieldName;
+	}
+	
 	@Override
 	public List<String> getColumnHeadings() {
 		return columnHeadings;
