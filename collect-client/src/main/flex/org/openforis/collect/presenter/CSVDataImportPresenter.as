@@ -97,16 +97,24 @@ package org.openforis.collect.presenter
 			var currentParent:EntityDefinitionProxy = nodeDefn;
 			while ( currentParent != null && currentParent != nodeDefn.rootEntity ) {
 				var keyDefns:IList = currentParent.keyAttributeDefinitions;
-				var colNames:Array = new Array();
-				for each (var keyDefn:AttributeDefinitionProxy in keyDefns) {
-					var colName:String = "";
-					if ( currentParent != nodeDefn ) {
-						colName += currentParent.name + "_";
+				if ( CollectionUtil.isEmpty(keyDefns) ) {
+					if ( currentParent.multiple ) {
+						result.addItemAt("_" + currentParent.name + "_position", 0);
+					} else {
+						//TODO consider it for naming following key definitions
 					}
-					colName += keyDefn.name;
-					colNames.push(colName);
+				} else {
+					var colNames:Array = new Array();
+					for each (var keyDefn:AttributeDefinitionProxy in keyDefns) {
+						var colName:String = "";
+						if ( currentParent != nodeDefn ) {
+							colName += currentParent.name + "_";
+						}
+						colName += keyDefn.name;
+						colNames.push(colName);
+					}
+					result.addAllAt(new ArrayCollection(colNames), 0);
 				}
-				result.addAllAt(new ArrayCollection(colNames), 0);
 				currentParent = currentParent.parent;
 			}
 			return result.toArray();
@@ -133,6 +141,8 @@ package org.openforis.collect.presenter
 		override protected function importButtonClickHandler(event:MouseEvent):void {
 			if ( view.entitySelectionTree.selectedItem == null ) {
 				AlertUtil.showError("csvDataImport.alert.selectEntity");
+			} else if ( ! NodeItem(view.entitySelectionTree.selectedItem).nodeDefinition.multiple ) {
+				AlertUtil.showError("csvDataImport.alert.selectMultipleEntity");
 			} else {
 				super.importButtonClickHandler(event);
 			}
