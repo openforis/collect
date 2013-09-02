@@ -72,11 +72,14 @@
 						  buttonMode="true"
 						  />
 				<s:Image id="importFileFormatInfoIcon"
-						 source="{Images.INFO}"
-						useHandCursor="true"
-						toolTip="{Message.get('referenceDataImport.importFileFormatIconToolTip')}"
-						click="{AlertUtil.showMessage(hostComponent.importFileFormatInfo)}"
-						horizontalCenter="0"
+						 click="{AlertUtil.showMessage(hostComponent.importFileFormatInfo)}"
+						 toolTip="{Message.get('referenceDataImport.importFileFormatIconToolTip')}"
+						 source="{Images.HELP}"
+						 useHandCursor="true"
+						 buttonMode="true"
+						 height="24"
+						 width="24"
+						 horizontalCenter="0"
 						 verticalCenter="0"
 						 />
 			</s:HGroup>
