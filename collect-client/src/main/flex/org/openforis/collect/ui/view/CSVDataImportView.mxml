@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view:AbstractReferenceDataImportView 
+		 xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:component="org.openforis.collect.ui.component.*"
+		 xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*"
+		 xmlns:view="org.openforis.collect.ui.view.*"
+		 skinClass="org.openforis.collect.ui.skin.CSVDataImportViewSkin"
+		 creationComplete="creationCompleteHandler(event)" 
+		 >
+
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Tree;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.manager.referencedataimport.ParsingError$ErrorType;
+			import org.openforis.collect.manager.referencedataimport.proxy.ParsingErrorProxy;
+			import org.openforis.collect.model.CollectRecord$Step;
+			import org.openforis.collect.presenter.CSVDataImportPresenter;
+			import org.openforis.collect.util.ArrayUtil;
+			import org.openforis.collect.util.StringUtil;
+			
+			import spark.components.DropDownList;
+			import spark.components.gridClasses.GridColumn;
+			
+			[SkinPart(required="true", type="mx.controls.Tree")]
+			public var entitySelectionTree:Tree;
+			 
+			[SkinPart(required="true", type="spark.compoenents.DropDownList")]
+			public var stepDropDownList:DropDownList;
+			
+			private var _presenter:CSVDataImportPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new CSVDataImportPresenter(this);
+			}
+			
+			override public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
+				switch ( item.errorType ) {
+					case ParsingError$ErrorType.WRONG_COLUMN_NAME:
+						return "";
+					default:
+						return super.errorMessageLabelFunction(item, gridColumn);	
+				}
+			}
+			
+			public function stepLabelFunction(step:Object):String {
+				switch(step) {
+					case CollectRecord$Step.ENTRY:
+						return Message.get("edit.dataEntry");
+					case CollectRecord$Step.CLEANSING:
+						return Message.get("edit.dataCleansing");
+					case CollectRecord$Step.ANALYSIS:
+						return Message.get("edit.dataAnalysis");
+					default:
+						return step.label;
+				} 
+			}
+			
+		]]>
+	</fx:Script>
+	
+</view:AbstractReferenceDataImportView>

@@ -38,6 +38,9 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/info.png")]
 		public static const INFO:Class;
 
+		[Embed("/assets/images/help_48x48.png")]
+		public static const HELP:Class;
+
 		[Embed("/assets/images/error.png")]
 		public static const ERROR:Class;
 		

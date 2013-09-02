@@ -25,6 +25,14 @@
 					<scope>application</scope>
 				</properties>
 			</destination>
+			
+			<destination id="csvDataImportService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>csvDataImportService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
 
 			<destination id="dataService">
 				<properties>

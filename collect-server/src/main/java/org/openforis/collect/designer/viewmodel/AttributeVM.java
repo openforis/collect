@@ -20,6 +20,7 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
@@ -339,6 +340,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		List<CheckType> list = new ArrayList<CheckType>(Arrays.asList(values));
 		if ( !(editedItem instanceof CoordinateAttributeDefinition) ) {
 			list.remove(CheckType.DISTANCE);
+		}
+		if ( ! (editedItem instanceof TextAttributeDefinition) ) {
+			list.remove(CheckType.PATTERN);
 		}
 		return list;
 	}

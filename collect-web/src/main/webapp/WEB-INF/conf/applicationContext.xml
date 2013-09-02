@@ -210,6 +210,9 @@
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
+	<bean id="csvDataImportService"
+		class="org.openforis.collect.remoting.service.CSVDataImportService"
+		autowire="byName" init-method="init" />
 	<bean id="codeListImportService"
 		class="org.openforis.collect.remoting.service.CodeListImportService"
 		autowire="byName" init-method="init" />

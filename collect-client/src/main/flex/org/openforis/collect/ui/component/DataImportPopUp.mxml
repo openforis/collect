@@ -13,6 +13,49 @@
 		]]>
 	</fx:Script>
 	
-	<view:DataImportView id="dataImportView" />
+	<s:VGroup gap="20" 
+			  horizontalAlign="center"
+			  height="100%" 
+			  width="100%">
+		
+		<s:HGroup verticalAlign="middle">
+			<s:Label text="{Message.get('dataImport.fileFormat')}"
+					  styleName="formLabel"/>
+			
+			<s:DropDownList id="typeDropDownList" selectedIndex="0">
+				<mx:ArrayCollection>
+					<fx:String>-- Select one --</fx:String>
+					<fx:String>From XML</fx:String>
+					<fx:String>From CSV</fx:String>
+				</mx:ArrayCollection>
+			</s:DropDownList>
+		</s:HGroup>
+						
+		
+		<mx:ViewStack id="viewStack" 
+					  height="100%" 
+					  width="100%"
+					  selectedIndex="{typeDropDownList.selectedIndex}">
+			<s:NavigatorContent />
+								
+			<s:NavigatorContent label="XML"
+								height="100%" 
+								width="100%">
+				<view:DataImportView id="dataImportView"
+									 height="100%" 
+									 width="100%" />
+			</s:NavigatorContent>
+			<s:NavigatorContent label="CSV" 
+								height="100%" 
+								width="100%">
+				<view:CSVDataImportView id="csvDataImportView"
+										height="100%" 
+										width="100%" />
+			</s:NavigatorContent>
+		</mx:ViewStack>
+		
+		
+		
+	</s:VGroup>
 	
 </component:PopUp>

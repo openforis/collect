@@ -1,0 +1,5 @@
+id,vehicle_location_srs,vehicle_location_x,vehicle_location_y,plot_distance,plot_distance_unit
+10_111,EPSG:NOTEXISTING,10000,20000,200,m
+10_114,EPSG:21036,20000,30000,0.3,km
+10_114,EPSG:21036,XXX,20000,X,m
+10_114,EPSG:21036,10000,XXX,10,m
