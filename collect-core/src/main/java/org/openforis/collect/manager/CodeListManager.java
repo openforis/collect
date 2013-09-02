@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -309,6 +310,29 @@ public class CodeListManager {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <T extends CodeListItem> T loadChildItem(CodeList list,
+			String code, ModelVersion version) {
+		if ( list.isExternal() ) {
+			//TODO
+			return null;
+		} else if ( list.isEmpty() ) {
+			return (T) codeListItemDao.loadItem(list, code, version);
+		} else {
+			Stack<CodeListItem> stack = new Stack<CodeListItem>();
+			stack.addAll(list.getItems());
+			while ( ! stack.isEmpty() ) {
+				CodeListItem item = stack.pop();
+				if ( item.matchCode(code) ) {
+					return (T) item;
+				} else {
+					stack.addAll(item.getChildItems());
+				}
+			}
+			return null;
+		}
+	}
+	
 	public boolean hasChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();
 		if ( list.isExternal() ) {
@@ -470,5 +494,5 @@ public class CodeListManager {
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
 	}
-	
+
 }

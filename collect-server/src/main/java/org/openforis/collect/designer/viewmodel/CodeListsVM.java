@@ -355,7 +355,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void editCodeListItem(@BindingParam("item") CodeListItem item) {
 		newChildItem = false;
 		editedChildItem = item;
-		editedChildItemParentItem = item.getParentItem();
+		editedChildItemParentItem = codeListManager.loadParentItem(item);
 		openChildItemEditPopUp();
 	}
 	

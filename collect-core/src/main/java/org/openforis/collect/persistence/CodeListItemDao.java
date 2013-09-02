@@ -340,6 +340,27 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 	}
 	
+	public PersistedCodeListItem loadItem(CodeList codeList, String code, ModelVersion version) {
+		JooqFactory jf = getMappingJooqFactory(codeList);
+		SelectQuery q = jf.selectQuery();	
+		q.addFrom(OFC_CODE_LIST);
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		q.addConditions(
+				surveyIdField.equal(survey.getId()),
+				OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
+				OFC_CODE_LIST.CODE.equal(code)
+		);
+		Result<Record> result = q.fetch();
+		List<PersistedCodeListItem> list = jf.fromResult(result);
+		List<PersistedCodeListItem> filteredByVersion = filterApplicableItems(list, version);
+		if ( filteredByVersion.isEmpty() ) {
+			return null;
+		} else {
+			return filteredByVersion.get(0);
+		}
+	}
+
 	protected List<PersistedCodeListItem> filterApplicableItems(List<PersistedCodeListItem> list, ModelVersion version) {
 		if ( version == null ) {
 			return list;

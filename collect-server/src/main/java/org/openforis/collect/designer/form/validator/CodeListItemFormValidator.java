@@ -1,8 +1,7 @@
 package org.openforis.collect.designer.form.validator;
 
-import java.util.Stack;
-
 import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -19,6 +18,8 @@ public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeLis
 	public static final String CODE_ALREADY_DEFINED_MESSAGE_KEY = "survey.code_list.validation.code_already_defined";
 
 	protected static final String PARENT_ITEM_ARG = "parentItem";
+	protected static final String CODE_LIST_MANAGER_ARG = "codeListManager";
+
 	protected static final String CODE_FIELD = "code";
 	
 	@Override
@@ -28,6 +29,11 @@ public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeLis
 
 	protected CodeListItem getParentItem(ValidationContext ctx) {
 		CodeListItem result = (CodeListItem) ctx.getValidatorArg(PARENT_ITEM_ARG);
+		return result;
+	}
+	
+	protected CodeListManager getCodeListManager(ValidationContext ctx) {
+		CodeListManager result = (CodeListManager) ctx.getValidatorArg(CODE_LIST_MANAGER_ARG);
 		return result;
 	}
 	
@@ -60,30 +66,17 @@ public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeLis
 		CodeScope codeScope = codeList.getCodeScope();
 		CodeListItem parentItem = getParentItem(ctx);
 		CodeListItem existingItem = null;
+		CodeListManager codeListManager = getCodeListManager(ctx);
 		if ( codeScope == CodeScope.LOCAL ) {
 			if ( parentItem == null ) {
-				existingItem = codeList.findItem(code);
+				existingItem = codeListManager.loadRootItem(codeList, code, null);
 			} else {
-				existingItem = parentItem.findChildItem(code);
+				existingItem = codeListManager.loadChildItem(parentItem, code, null);
 			}
 		} else {
-			existingItem = getCodeListItemInDescendants(codeList, code);
+			existingItem = codeListManager.loadChildItem(codeList, code, null);
 		}
 		return existingItem;
 	}
 
-	protected CodeListItem getCodeListItemInDescendants(CodeList codeList, String code) {
-		Stack<CodeListItem> stack = new Stack<CodeListItem>();
-		stack.addAll(codeList.getItems());
-		while ( ! stack.isEmpty() ) {
-			CodeListItem item = stack.pop();
-			if ( item.matchCode(code) ) {
-				return item;
-			} else {
-				stack.addAll(item.getChildItems());
-			}
-		}
-		return null;
-	}
-	
 }

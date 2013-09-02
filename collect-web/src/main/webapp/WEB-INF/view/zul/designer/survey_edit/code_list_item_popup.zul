@@ -17,7 +17,7 @@
 		form="@id('fx') 
 			@load(vm.formObject) 
             @save(vm.formObject, before={'validate','applyChanges'})
-            @validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator', parentItem=parentItem)">
+            @validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator', codeListManager=vm.codeListManager, parentItem=parentItem)">
 		<grid>
 			<columns>
 				<column width="150px" />
