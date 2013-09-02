@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataimport.CSVDataImportProcess.ImportException;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
@@ -71,6 +72,8 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	private SurveyManager surveyManager;
 	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private RecordManager recordManager;
 	
 	private CollectSurvey survey;
 
@@ -112,6 +115,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		{
 			CollectRecord record = createTestRecord(survey, "10_111");
 			recordDao.insert(record);
+			assertEquals(Integer.valueOf(0), record.getErrors());
 		}
 		{
 			CollectRecord record = createTestRecord(survey, "10_114");
@@ -126,6 +130,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertEquals(3, status.getProcessed());
 		{
 			CollectRecord reloadedRecord = loadRecord("10_111");
+			assertEquals(Integer.valueOf(1), reloadedRecord.getErrors());
 			Entity cluster = reloadedRecord.getRootEntity();
 			RealAttribute plotDirection = (RealAttribute) cluster.getChild("plot_direction");
 			RealValue plotDirectionVal = plotDirection.getValue();
@@ -424,6 +429,8 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		record.setStep(Step.ENTRY);
 		EntityBuilder.addValue(cluster, "id", new Code(id));
+		EntityBuilder.addValue(cluster, "region", new Code("001"));
+		EntityBuilder.addValue(cluster, "district", new Code("002"));
 		EntityBuilder.addValue(cluster, "plot_distance", 100d, meterUnit);
 		EntityBuilder.addValue(cluster, "map_sheet", "map sheet 1");
 		EntityBuilder.addValue(cluster, "map_sheet", "map sheet 2");
@@ -496,6 +503,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		}
 		record.updateRootEntityKeyValues();
 		record.updateEntityCounts();
+		recordManager.validate(record);
 		return record;
 	}
 
