@@ -373,7 +373,12 @@ public class CodeListManager {
 		if ( list.isExternal() ) {
 			return (T) provider.getParentItem((ExternalCodeListItem) item);
 		} else if ( list.isEmpty() ) {
-			return (T) codeListItemDao.loadById(list, ((PersistedCodeListItem) item).getParentId());
+			Integer parentId = ((PersistedCodeListItem) item).getParentId();
+			if ( parentId != null ) {
+				return (T) codeListItemDao.loadById(list, parentId);
+			} else {
+				return null;
+			}
 		} else {
 			return (T) item.getParentItem();
 		}
@@ -465,6 +470,10 @@ public class CodeListManager {
 		codeListItemDao.deleteBySurvey(surveyId, work);
 	}
 
+	public void deleteDetachedItems(CollectSurvey survey) {
+		codeListItemDao.deleteDetachedItems(survey);
+	}
+	
 	public void shiftItem(CodeListItem item, int indexTo) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {

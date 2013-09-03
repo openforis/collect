@@ -238,6 +238,21 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.where(surveyIdField.equal(surveyId))
 			.execute();
 	}
+	
+	public void deleteDetachedItems(CollectSurvey survey) {
+		List<Integer> codeListsIds = new ArrayList<Integer>();
+ 		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList codeList : codeLists) {
+			codeListsIds.add(codeList.getId());
+		}
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		JooqFactory jf = getMappingJooqFactory(null);
+		jf.delete(OFC_CODE_LIST)
+			.where(
+					surveyIdField.equal(survey.getId())
+						.and(OFC_CODE_LIST.CODE_LIST_ID.notIn(codeListsIds))
+			).execute();
+	}
 
 	public void moveItemsToPublishedSurvey(int surveyWorkId, int publishedSurveyId) {
 		JooqFactory jf = getMappingJooqFactory(null);

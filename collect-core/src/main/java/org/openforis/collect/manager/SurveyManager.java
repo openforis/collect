@@ -439,7 +439,11 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey loadSurveyWork(int id) {
-		return surveyWorkDao.load(id);
+		CollectSurvey survey = surveyWorkDao.load(id);
+		if ( survey != null ) {
+			codeListManager.deleteDetachedItems(survey);
+		}
+		return survey;
 	}
 	
 	@Transactional
