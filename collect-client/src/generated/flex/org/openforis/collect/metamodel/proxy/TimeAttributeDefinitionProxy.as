@@ -10,5 +10,10 @@ package org.openforis.collect.metamodel.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy")]
     public class TimeAttributeDefinitionProxy extends TimeAttributeDefinitionProxyBase {
+		
+		override public function hasAlwaysHorizontalLayout():Boolean {
+			return true;
+		}
+		
     }
 }

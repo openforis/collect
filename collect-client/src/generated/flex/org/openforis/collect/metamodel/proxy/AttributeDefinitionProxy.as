@@ -6,9 +6,19 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy")]
     public class AttributeDefinitionProxy extends AttributeDefinitionProxyBase {
+		
+		public function hasAlwaysHorizontalLayout():Boolean {
+			return false;
+		}
+		
+		public function hasDirectionByColumns():Boolean {
+			return parent != null && parent.direction == UIOptions$Direction.BY_COLUMNS
+		}
+		
     }
 }

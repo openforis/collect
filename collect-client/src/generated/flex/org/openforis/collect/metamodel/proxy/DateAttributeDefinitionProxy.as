@@ -10,5 +10,10 @@ package org.openforis.collect.metamodel.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy")]
     public class DateAttributeDefinitionProxy extends DateAttributeDefinitionProxyBase {
+		
+		override public function hasAlwaysHorizontalLayout():Boolean {
+			return true;
+		}
+		
     }
 }

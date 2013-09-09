@@ -46,14 +46,13 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
+			var entities:IList = null;
 			if(view.entityDefinition != null
 					&& view.entityDefinition.multiple
 					&& view.parentEntity != null) {
-				var entities:IList = getEntities();
-				view.dataGroup.dataProvider = entities;
-			} else {
-				view.dataGroup.dataProvider = null;
+				entities = getEntities();
 			}
+			view.list.dataProvider = entities;
 			super.updateView();
 		}
 		
@@ -89,8 +88,8 @@ package org.openforis.collect.presenter
 			view.callLater(function():void {
 				updateValidationDisplayManager();
 				
-				if(view.scroller != null && view.scroller.verticalScrollBar != null) {
-					view.scroller.verticalScrollBar.value = view.scroller.verticalScrollBar.maximum;
+				if ( view.list.scroller != null && view.list.scroller.verticalScrollBar != null ) {
+					view.list.scroller.verticalScrollBar.value = view.list.scroller.verticalScrollBar.maximum;
 				}
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});

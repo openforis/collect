@@ -6,7 +6,6 @@
  */
 
 package org.openforis.collect.model.proxy {
-	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.util.CollectionUtil;
 
 	/**
@@ -72,17 +71,6 @@ package org.openforis.collect.model.proxy {
 				}
 			}
 			return true;
-		}
-		
-		public function getParentMutipleEntity():EntityProxy {
-			var p:EntityProxy = parent;
-			while ( p != null ) {
-				if ( p.definition.multiple ) {
-					return p;
-				}
-				p = p.parent;
-			}
-			return null;
 		}
 		
 	}

@@ -90,10 +90,10 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function getParentMultipleEntity():EntityProxy {
-			var currentParent:EntityProxy = parent;
+			var currentParent:NodeProxy = parent;
 			while ( currentParent != null ) {
-				if ( currentParent.definition.multiple ) {
-					return currentParent;
+				if ( currentParent is EntityProxy && currentParent.definition.multiple ) {
+					return EntityProxy(currentParent);
 				}
 				currentParent = currentParent.parent;
 			}
@@ -107,6 +107,12 @@ package org.openforis.collect.model.proxy {
 			} else {
 				return null;
 			}
+		}
+
+		public function getIndex():Boolean {
+			var siblings:IList = getSiblings();
+			var result:int = siblings.getItemIndex(this);
+			return result;
 		}
 		
 		public function get definition():NodeDefinitionProxy {

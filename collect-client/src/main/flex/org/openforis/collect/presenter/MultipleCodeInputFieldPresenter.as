@@ -3,6 +3,7 @@ package org.openforis.collect.presenter {
 	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
 	import mx.events.CollectionEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -12,15 +13,16 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
-	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
 	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+	import org.openforis.collect.ui.CollectFocusManager;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
@@ -60,21 +62,19 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false, sameFieldIndex:Boolean = true):Boolean {
-			var attributeName:String = _view.attributeDefinition.name;
-			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
-			inputFieldEvent.nodeName = attributeName;
-			inputFieldEvent.fieldIdx = _view.fieldIndex;
-			var attributeToFocusIn:AttributeProxy;
+		/*override protected function setFocusOnAttributeInSiblingEntity(offset:int, circularLookup:Boolean = false, sameFieldIndex:Boolean = true):Boolean {
 			var siblingEntity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset, circularLookup));
 			if ( siblingEntity != null ) {
+				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
+				inputFieldEvent.nodeName = _view.attributeDefinition.name;
+				inputFieldEvent.fieldIdx = _view.fieldIndex;
 				inputFieldEvent.parentEntityId = siblingEntity.id;
 				eventDispatcher.dispatchEvent(inputFieldEvent);
 				return true;
 			} else {
 				return false;
 			}
-		}
+		}*/
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attributes != null) {
@@ -189,6 +189,21 @@ package org.openforis.collect.presenter {
 				
 				dataClient.getCodeListItems(responder, parentEntityId, name, codes);
 			}
+		}
+		
+		override protected function moveFocusOnNextField(horizontalMove:Boolean, offset:int):Boolean {
+			var focusChanged:Boolean = false;
+			var attributes:IList = _view.attributes;
+			if ( CollectionUtil.isNotEmpty(attributes) ) {
+				var attribute:AttributeProxy = AttributeProxy(attributes.getItemAt(0));
+				var fieldIndex:int = _view.fieldIndex;
+				var field:FieldProxy = attribute.getField(fieldIndex);
+				focusChanged = CollectFocusManager.moveFocusOnNextField(field, horizontalMove, offset);
+			}
+			if ( ! focusChanged ) {
+				focusChanged = UIUtil.moveFocus(offset < 0);
+			}
+			return focusChanged;
 		}
 	}
 }

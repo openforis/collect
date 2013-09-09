@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -62,7 +63,7 @@ package org.openforis.collect.presenter {
 			
 			initFileFilter();
 		}
-		
+
 		private function initFileFilter():void {
 			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(_view.attributeDefinition);
 			var extensions:IList = attrDefn.extensions;
@@ -101,6 +102,14 @@ package org.openforis.collect.presenter {
 			var remarks:String = getRemarks();
 			hasRemarks = StringUtil.isNotBlank(remarks);
 			_view.remarksPresent = hasRemarks;
+		}
+		
+		override protected function setFocusHandler(event:InputFieldEvent):void {
+			if ( _view.browseButton != null && _view.attribute != null && 
+				_view.attribute.id == event.attributeId && 
+				_view.fieldIndex == event.fieldIdx ) {
+				_view.browseButton.setFocus();
+			}
 		}
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {

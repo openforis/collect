@@ -5,7 +5,6 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.events.PropertyChangeEvent;
 	import mx.rpc.events.ResultEvent;
@@ -16,18 +15,13 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.ConfirmErrorRequestProxy;
 	import org.openforis.collect.model.proxy.DefaultValueApplyRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -41,6 +35,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.model.proxy.RemarksUpdateRequestProxy;
+	import org.openforis.collect.ui.CollectFocusManager;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.InputFieldContextMenu;
 	import org.openforis.collect.util.StringUtil;
@@ -343,215 +338,51 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function keyDownHandler(event:KeyboardEvent):void {
-			var directionByColumns:Boolean = _view.attributeDefinition.parent != null && _view.attributeDefinition.parent.direction == UIOptions$Direction.BY_COLUMNS;
-			var keyCode:uint = event.keyCode;
+			var horizontalMove:Boolean = false;
 			var offset:int = 0;
-			var moveByEntity:Boolean = ! directionByColumns;
-			switch(keyCode) {
+			switch(event.keyCode) {
 				case Keyboard.ESCAPE:
 					undoLastChange();
-					break;
+					return;
 				case Keyboard.TAB:
-					handleTabKey(event.shiftKey);
+					horizontalMove = true;
+					offset = event.shiftKey ? -1: 1;
 					break;
 				case Keyboard.DOWN:
+					horizontalMove = false;
 					offset = 1;
 					break;
 				case Keyboard.UP:
+					horizontalMove = false;
 					offset = -1;
 					break;
 				case Keyboard.PAGE_DOWN:
+					horizontalMove = false;
 					offset = 10;
 					break;
 				case Keyboard.PAGE_UP:
-					offset = - 10;
+					horizontalMove = false;
+					offset = -10;
 					break;
+				default:
+					return;
 			}
 			if ( offset != 0 ) {
-				if ( moveByEntity ) {
-					setFocusOnSiblingEntity(offset);
-				} else {
-					setFocusOnSiblingAttribute(offset);
-				}
+				moveFocusOnNextField(horizontalMove, offset);
 			}
 		}
 		
-		protected function handleTabKey(shiftKey:Boolean = false):void {
-			var directionByColumns:Boolean = _view.attributeDefinition.parent != null && _view.attributeDefinition.parent.direction == UIOptions$Direction.BY_COLUMNS;
-			var focusChanged:Boolean = false;
-			if ( directionByColumns ) {
-				var offset:int = shiftKey ? -1: 1;
-				var siblingFocusableField:FieldProxy = getSiblingFocusableFieldInAttribute(getField(), ! shiftKey);
-				if ( siblingFocusableField == null ) {
-					focusChanged = setFocusOnSiblingEntity(offset, true, false);
-				}
+		protected function moveFocusOnNextField(horizontalMove:Boolean, offset:int):Boolean {
+			var attribute:AttributeProxy = _view.attribute;
+			var fieldIndex:int = _view.fieldIndex;
+			var field:FieldProxy = attribute.getField(fieldIndex);
+			var focusChanged:Boolean = CollectFocusManager.moveFocusOnNextField(field, horizontalMove, offset);
+			if ( ! focusChanged ) {
+				focusChanged = UIUtil.moveFocus(offset < 0);
 			}
-			if ( !focusChanged ) {
-				UIUtil.moveFocus(shiftKey);
-			}
+			return focusChanged;
 		}
-		
-		protected function setFocusOnSiblingAttribute(offset:int):Boolean {
-			var currentField:FieldProxy = _view.attribute.getField(_view.fieldIndex);
-			var fieldToFocusIn:FieldProxy = getSiblingFocusableField(currentField, offset);
-			if ( fieldToFocusIn != null ) {
-				dispatchFocusSetEvent(fieldToFocusIn);
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		protected function getSiblingFocusableField(field:FieldProxy, offset:int, limit:Boolean = true):FieldProxy {
-			var parentMultipleEntity:EntityProxy = field.parent.getParentMultipleEntity();
-			if ( parentMultipleEntity != null ) {
-				var siblingFields:IList = getLeafFocusableFields(parentMultipleEntity);
-				var currentFieldIndex:int = siblingFields.getItemIndex(field);
-				var siblingFieldIndex:int = currentFieldIndex + offset;
-				if ( siblingFieldIndex < 0 ) {
-					if ( limit ) {
-						siblingFieldIndex = 0;
-					} else {
-						return null;
-					}
-				} else if ( siblingFieldIndex > siblingFields.length - 1 ) {
-					if ( limit ) {
-						siblingFieldIndex = siblingFields.length - 1;
-					} else {
-						return null;
-					}
-				}
-				if ( siblingFieldIndex != currentFieldIndex ) {
-					return siblingFields.getItemAt(siblingFieldIndex) as FieldProxy;
-				} else {
-					return null;
-				}
-			} else {
-				return null;
-			}
-		}
-		
-		protected function dispatchFocusSetEvent(field:FieldProxy):void {
-			var attributeToFocusIn:AttributeProxy = field.parent;
-			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
-			inputFieldEvent.fieldIdx = attributeToFocusIn is CodeAttributeProxy ? -1: field.index;
-			inputFieldEvent.attributeId = attributeToFocusIn.id;
-			inputFieldEvent.nodeName = attributeToFocusIn.name;
-			inputFieldEvent.parentEntityId = attributeToFocusIn.parentId;
-			eventDispatcher.dispatchEvent(inputFieldEvent);
-		}
-		
-		public static function getLeafFocusableFields(entity:EntityProxy):IList {
-			var result:ArrayCollection = new ArrayCollection();
-			var leafFields:IList = entity.getLeafFields();
-			for each (var f:FieldProxy in leafFields) {
-				if ( isFieldFocusable(f) ) {
-					result.addItem(f);
-				}
-			}
-			return result;
-		}
-		
-		public static function getLeafFocusableAttributes(entity:EntityProxy):IList {
-			var result:ArrayCollection = new ArrayCollection();
-			var leafAttributes:IList = entity.getLeafAttributes();
-			for each (var a:AttributeProxy in leafAttributes) {
-				result.addItem(a);
-			}
-			return result;
-		}
-		
-		public static function isFieldFocusable(field:FieldProxy):Boolean {
-			if ( ! (field.parent is CodeAttributeProxy) || 
-				! (field.parent.definition as CodeAttributeDefinitionProxy).enumeratingAttribute && field.index == 0 ) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
-		public static function getSiblingFocusableFieldInAttribute(field:FieldProxy, forward:Boolean = true):FieldProxy {
-			var attr:AttributeProxy = field.parent;
-			var siblingFieldIndex:int;
-			if ( attr.definition is DateAttributeDefinitionProxy ) {
-				switch ( field.index ) {
-					case 0: //year
-						siblingFieldIndex = forward ? -1: 1;
-						break;
-					case 1: //month
-						siblingFieldIndex = forward ? 0: 2;
-						break;
-					case 2: //date
-						siblingFieldIndex = forward ? 1: -1;
-						break;
-				}
-			} else if ( attr.definition is CodeAttributeDefinitionProxy ) {
-				//a single field is focusable
-				siblingFieldIndex = -1;
-			} else {
-				siblingFieldIndex = field.index + forward ? 1: -1;
-			}
-			if ( siblingFieldIndex >= 0 && siblingFieldIndex < attr.fields.length ) {
-				return attr.getField(siblingFieldIndex);
-			} else {
-				return null;
-			}
-		}
-		
-		public static function getFirstFocusableFieldIndex(attrDefn:AttributeDefinitionProxy):int {
-			if ( attrDefn is DateAttributeDefinitionProxy ) {
-				return 2;
-			} else {
-				return 0;
-			}
-		}
-		
-		public static function getLastFocusableFieldIndex(attrDefn:AttributeDefinitionProxy):int {
-			if ( attrDefn is DateAttributeDefinitionProxy ) {
-				return 0;
-			} else {
-				return 0;
-			}
-		}
-		
-		protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false, sameFieldIndex:Boolean = true):Boolean {
-			var attributeToFocusIn:AttributeProxy;
-			if ( _view.attributeDefinition.multiple ) {
-				var attribute:AttributeProxy = _view.attribute;
-				attributeToFocusIn = AttributeProxy(attribute.getSibling(offset));
-			} else {
-				var parentMultipleEntity:EntityProxy = _view.attribute.getParentMultipleEntity();
-				var siblingEntity:EntityProxy = EntityProxy(parentMultipleEntity.getSibling(offset, circularLookup));
-				if ( siblingEntity != null ) {
-					attributeToFocusIn = siblingEntity.getDescendantSingleAttribute(_view.attributeDefinition.id);
-					var circularLookupApplied:Boolean = circularLookup && siblingEntity.index - parentMultipleEntity.index != offset;
-					if ( circularLookupApplied ) {
-						var siblingField:FieldProxy = getSiblingFocusableField(attributeToFocusIn.getField(0), offset > 0 ? 1: -1, false);
-						if ( siblingField == null || siblingField.parent == attributeToFocusIn ) {
-							attributeToFocusIn = null;
-						} else {
-							attributeToFocusIn = siblingField.parent;
-						}
-					}
-				}
-			}
-			if ( attributeToFocusIn != null ) {
-				var fieldIndex:int;
-				if ( sameFieldIndex ) {
-					fieldIndex = _view.fieldIndex;
-				} else if ( offset > 0 ) {
-					fieldIndex = getFirstFocusableFieldIndex(_view.attributeDefinition);
-				} else {
-					fieldIndex = getLastFocusableFieldIndex(_view.attributeDefinition);
-				}
-				var fieldToFocusIn:FieldProxy = attributeToFocusIn.getField(fieldIndex);
-				dispatchFocusSetEvent(fieldToFocusIn);
-				return true;
-			} else {
-				return false;
-			}
-		}
-		
+
 		public function undoLastChange():void {
 			_view.changed = false;
 			updateView();

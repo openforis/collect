@@ -376,3 +376,7 @@ mx|PopUpMenuButton.settings {
 	popUpIcon: Embed(source='assets/images/settings.png');
 }
 
+s|List.entityList {
+	borderVisible: false;
+}
+

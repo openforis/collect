@@ -10,6 +10,7 @@ package org.openforis.collect.metamodel.proxy {
 	import mx.collections.IList;
 	
 	import org.openforis.collect.util.ArrayUtil;
+	import org.openforis.collect.util.UIUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.EntityDefinitionProxy")]
@@ -72,6 +73,11 @@ package org.openforis.collect.metamodel.proxy {
 			}
 			return false;
 		}
+
+		public function hasTableLayout():Boolean {
+			return layout == UIUtil.LAYOUT_TABLE;
+		}
+
 	}
-		
+	
 }

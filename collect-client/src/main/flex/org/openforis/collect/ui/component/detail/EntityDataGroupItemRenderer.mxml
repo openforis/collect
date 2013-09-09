@@ -13,10 +13,12 @@
 			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+			import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.UIBuilder;
 
@@ -29,6 +31,7 @@
 			private var _modelVersion:ModelVersionProxy;
 			private var _entity:EntityProxy;
 			private var _nodesDirection:String = DIRECTION_HORIZONTAL;
+			private var _inited:Boolean = false;
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
@@ -38,10 +41,33 @@
 			override protected function createChildren():void {
 				super.createChildren();
 				contentGroup.addElement(rowNumberLabel);
-				contentGroup.addElement(nodeDefinitionsGroup);
+			}
+			
+			protected function initNodeDefinitions():void {
+				modelVersion = Application.activeRecord.version;
+				entityDefinition = _entity.definition as EntityDefinitionProxy;
+				nodeDefinitions = _entityDefinition.getDefinitionsInVersion(_modelVersion);
+				nodesDirection = _entityDefinition.direction == UIOptions$Direction.BY_COLUMNS ?
+					DIRECTION_VERTICAL: DIRECTION_HORIZONTAL;
+				dragEnabled = Application.activeRecordEditable && ! _entityDefinition.enumerable;
+				addNodeDefinitionItemRenderers();
+			}
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				var firstTime:Boolean = _entity == null;
+				entity = value as EntityProxy;
+				if ( ! _inited ) {
+					initNodeDefinitions();
+					_inited = true;
+				}
 			}
 			
 			protected function addNodeDefinitionItemRenderers():void {
+				if ( _inited ) {
+					contentGroup.removeElement(nodeDefinitionsGroup);
+					nodeDefinitionsGroup.removeAllElements();
+				}
 				for each (var nodeDefn:NodeDefinitionProxy in nodeDefinitions) {
 					var formItem:CollectFormItem;
 					if(nodeDefn is AttributeDefinitionProxy) {
@@ -54,6 +80,7 @@
 					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
 					nodeDefinitionsGroup.addElement(formItem);
 				}
+				contentGroup.addElement(nodeDefinitionsGroup);
 			}
 			
 			[Bindable]
@@ -81,9 +108,6 @@
 			
 			public function set nodeDefinitions(value:IList):void {
 				_nodeDefinitions = value;
-				if ( value != null ) {
-					addNodeDefinitionItemRenderers();
-				}
 			}
 			
 			[Bindable]
@@ -103,6 +127,7 @@
 			public function set nodesDirection(value:String):void {
 				_nodesDirection = value;
 			}
+			
 		]]>
 	</fx:Script>
 	

@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.FieldSymbol;
@@ -57,6 +58,14 @@ package org.openforis.collect.presenter {
 			_view.changed = true;
 			if(_view.applyChangesOnFocusOut) {
 				updateValue();
+			}
+		}
+		
+		override protected function setFocusHandler(event:InputFieldEvent):void {
+			if ( _view.dropDownList != null && _view.attribute != null && 
+				_view.attribute.id == event.attributeId && 
+				_view.fieldIndex == event.fieldIdx ) {
+				_view.dropDownList.setFocus();
 			}
 		}
 		
@@ -143,25 +152,27 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function keyDownHandler(event:KeyboardEvent):void {
-			var item:Object = null;
-			var char:String = String.fromCharCode(event.charCode);
-			switch(char) {
-				case FieldProxy.SHORTCUT_BLANK_ON_FORM:
-					item = BLANK_ON_FORM_ITEM;
-					break;
-				case FieldProxy.SHORTCUT_DASH_ON_FORM:
-					item = DASH_ON_FORM_ITEM;
-					break;
-				case FieldProxy.SHORTCUT_ILLEGIBLE:
-					item = ILLEGIBLE_ITEM;
-					break;
-			}
 			if ( event.charCode == Keyboard.TAB ) {
-				handleTabKey(event.shiftKey);
-			}
-			if(item != null) {
-				_view.dropDownList.selectedItem = item;
-				updateValue();
+				var offset:int = event.shiftKey ? -1: 1;
+				moveFocusOnNextField(true, offset);
+			} else {
+				var item:Object = null;
+				var char:String = String.fromCharCode(event.charCode);
+				switch(char) {
+					case FieldProxy.SHORTCUT_BLANK_ON_FORM:
+						item = BLANK_ON_FORM_ITEM;
+						break;
+					case FieldProxy.SHORTCUT_DASH_ON_FORM:
+						item = DASH_ON_FORM_ITEM;
+						break;
+					case FieldProxy.SHORTCUT_ILLEGIBLE:
+						item = ILLEGIBLE_ITEM;
+						break;
+				}
+				if(item != null) {
+					_view.dropDownList.selectedItem = item;
+					updateValue();
+				}
 			}
 		}
 
