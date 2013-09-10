@@ -70,7 +70,7 @@
     <table width="100%"  height="100%">
     	<tr height="102">
     		<td colspan="3" align="center">
-    			<img alt="Open Foris Collect" src="images/banner.jpg">
+    			<img alt="Open Foris Collect" src="assets/images/header.jpg">
     		</td>
     	</tr>
     	<tr height="50">
@@ -125,7 +125,7 @@
     	</tr>
     	<tr>
     		<td colspan="3" align="center">
-    			<img  src="images/footer.jpg">
+    			<img  src="assets/images/footer.jpg">
     		</td>
     	</tr>
     </table>
