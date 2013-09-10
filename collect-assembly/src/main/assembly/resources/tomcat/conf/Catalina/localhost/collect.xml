@@ -25,7 +25,7 @@
 	   maxActive="20"
 	   maxIdle="5">
 	 </Resource>
-
+	-->
 	<!-- OPTIONAL Relational Database configuration 
 	<Resource 
 	   name="jdbc/collectRdbDs" 
