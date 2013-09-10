@@ -12,6 +12,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$CoordinateAttributeFieldsOrder;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
@@ -117,22 +118,28 @@ package org.openforis.collect.ui {
 				var fieldsOrder:UIOptions$CoordinateAttributeFieldsOrder = CoordinateAttributeDefinitionProxy(attr.definition).fieldsOrder;
 				switch ( fieldsOrder ) {
 					case UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y:
-						result.addItem(fields[2]);
-						result.addItem(fields[0]);
-						result.addItem(fields[1]);
+						result.addItem(fields[2]); //srs
+						result.addItem(fields[0]); //x
+						result.addItem(fields[1]); //y
 						break;
 					case UIOptions$CoordinateAttributeFieldsOrder.SRS_Y_X:
-						result.addItem(fields[2]);
-						result.addItem(fields[1]);
-						result.addItem(fields[0]);
+						result.addItem(fields[2]); //srs
+						result.addItem(fields[1]); //y
+						result.addItem(fields[0]); //x
 						break;
 					default:
 						result.addAll(new ArrayCollection(fields));
 				}
 			} else if ( attr.definition is DateAttributeDefinitionProxy ) {
-				result.addItem(fields[2]);
-				result.addItem(fields[1]);
-				result.addItem(fields[0]);
+				result.addItem(fields[2]); //year
+				result.addItem(fields[1]); //month
+				result.addItem(fields[0]); //day
+			} else if ( attr.definition is NumericAttributeDefinitionProxy ) {
+				result.addItem(fields[0]); //value field
+				var unitIdField:FieldProxy = FieldProxy(fields[2]);
+				if ( isFieldFocusable(unitIdField) ) {
+					result.addItem(unitIdField);
+				}
 			} else {
 				for each (var f:FieldProxy in attr.fields) {
 					if ( isFieldFocusable(f) ) {
@@ -147,8 +154,7 @@ package org.openforis.collect.ui {
 			var result:ArrayCollection = new ArrayCollection();
 			var leafAttributes:IList = entity.getLeafAttributes();
 			for each (var a:AttributeProxy in leafAttributes) {
-				if ( a.definition is CodeAttributeDefinitionProxy && (! a.definition.multiple ||
-					a.getIndex() == 0) ) { 
+				if ( ! (a.definition is CodeAttributeDefinitionProxy) || (! a.definition.multiple) || a.getIndex() == 0 ) { 
 					result.addItem(a);
 				}
 			}
@@ -158,8 +164,7 @@ package org.openforis.collect.ui {
 		public static function isFieldFocusable(field:FieldProxy):Boolean {
 			var attrDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(field.parent.definition);
 			if ( attrDefn is CodeAttributeDefinitionProxy && 
-					( CodeAttributeDefinitionProxy(attrDefn).enumeratingAttribute || field.index > 0 ) 
-				) {
+					( CodeAttributeDefinitionProxy(attrDefn).enumeratingAttribute || field.index > 0 ) ) {
 				return false;
 			} else if ( attrDefn is NumberAttributeDefinitionProxy && NumberAttributeDefinitionProxy(attrDefn).units.length <= 1 && field.index > 0) {
 				return false;

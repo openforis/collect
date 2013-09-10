@@ -71,10 +71,10 @@
 				for each (var nodeDefn:NodeDefinitionProxy in nodeDefinitions) {
 					var formItem:CollectFormItem;
 					if(nodeDefn is AttributeDefinitionProxy) {
-						formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(nodeDefn));
+						formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(nodeDefn)) as CollectFormItem;
 						formItem.labelWidth = DEFAULT_LABEL_WIDTH;
-					} else if(nodeDefn is EntityDefinitionProxy) {
-						formItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(nodeDefn));
+					} else {
+						formItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(nodeDefn)) as CollectFormItem;
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					}
 					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");

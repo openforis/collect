@@ -24,7 +24,6 @@
 			public static const STATE_BY_ROWS:String = "byRows";
 			
 			private var _entitiesDirection:String = DIRECTION_BY_ROWS;
-			//private var _constraintLayout:ConstraintLayout;
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
@@ -32,10 +31,10 @@
 				//so that the header is always aligned with the content
 				BindingUtils.bindProperty(
 					headerScroller.horizontalScrollBar, "value", 
-					list.scroller, ["horizontalScrollBar", "value"]);
+					scroller, ["horizontalScrollBar", "value"]);
 				BindingUtils.bindProperty(
 					headerScroller.verticalScrollBar, "value", 
-					list.scroller, ["verticalScrollBar", "value"]);
+					scroller, ["verticalScrollBar", "value"]);
 			}
 			
 			override protected function initPresenter():void {
@@ -45,17 +44,6 @@
 			protected function updateCurrentState():void {
 				currentState = _entitiesDirection == DIRECTION_BY_COLUMNS ? STATE_BY_COLUMNS: STATE_BY_ROWS;
 			}
-			
-			/*
-			[Bindable]
-			public function get constraintLayout():ConstraintLayout {
-				return _constraintLayout;
-			}
-			
-			public function set constraintLayout(value:ConstraintLayout):void {
-				_constraintLayout = value;
-			}
-			*/
 			
 			[Bindable(event="entitiesDirectionChange")]
 			public function get entitiesDirection():String {
@@ -112,8 +100,8 @@
 						verticalScrollPolicy="off"
 						width.byRows="100%"
 						height.byColumns="100%"
-						includeInLayout="{list.dataProvider.length > 0}"
-						visible="{list.dataProvider.length > 0}"
+						includeInLayout="{dataGroup.dataProvider.length > 0}"
+						visible="{dataGroup.dataProvider.length > 0}"
 						>
 				<s:Group>
 					<s:layout.byColumns>
@@ -139,42 +127,27 @@
 											   />
 					<!-- spacer that ensures the correct alignment of the headerScroller with the dataGroup scroller -->
 					<s:Spacer 
-						includeInLayout="{list.scroller.verticalScrollBar != null}" 
-						width="{list.scroller.verticalScrollBar.width}" />
+						includeInLayout="{scroller.verticalScrollBar != null}" 
+						width="{scroller.verticalScrollBar.width}" />
 				</s:Group>
 			</s:Scroller>
 			
-			<s:List id="list" 
-					width="100%" 
-					height="100%"
-					minHeight="0"
-					minWidth="0"
-					styleName="entityList"
-					itemRenderer="org.openforis.collect.ui.component.detail.EntityDataGroupItemRenderer">
-				<s:layout.byColumns>
-					<s:HorizontalLayout gap="2" />
-				</s:layout.byColumns>
-				<s:layout.byRows>
-					<s:VerticalLayout gap="2" />
-				</s:layout.byRows> 
-			</s:List>
-				
-			<!--
 			<s:Scroller id="scroller" 
 						width="100%"
-						height="100%"
-						>
-				<s:DataGroup id="dataGroup" 
+						height="100%">
+				<s:DataGroup id="dataGroup"
 							 itemRenderer="org.openforis.collect.ui.component.detail.EntityDataGroupItemRenderer">
 					<s:layout.byColumns>
-						<s:HorizontalLayout gap="2" />
+						<s:HorizontalLayout gap="2"
+											useVirtualLayout="true" />
 					</s:layout.byColumns>
 					<s:layout.byRows>
-						<s:VerticalLayout gap="2" />
-					</s:layout.byRows> 
+						<s:VerticalLayout gap="2"
+										  useVirtualLayout="true" />
+					</s:layout.byRows>
 				</s:DataGroup>
 			</s:Scroller>
-			-->
+			
 			<mx:LinkButton
 				id="addButton"
 				label="{Message.get('global.add')}" 

@@ -73,7 +73,7 @@ s|Button.logout {
 /* end of Home Page */
 
 s|ToggleButton.filter {
-	icon: Embed(source='assets/images/filter.png');
+	icon: Embed(source="assets/images/filter.png");
 	cornerRadius: 5;
 }
 
@@ -375,8 +375,3 @@ s|Label.dataGroupHeader {
 mx|PopUpMenuButton.settings {
 	popUpIcon: Embed(source='assets/images/settings.png');
 }
-
-s|List.entityList {
-	borderVisible: false;
-}
-
