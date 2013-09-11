@@ -1,8 +1,21 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
 	<custom-attributes parentDefinition="${arg.parentDefinition}"/>
 	<custom-attributes check="${arg.check}"/>
 	<custom-attributes newItem="${arg.newItem}"/>
-	<window id="checkPopUp" title="${labels.survey.schema.node.check.popup.title}" 
+	<zscript language="Java"><![CDATA[
+		import org.openforis.idm.metamodel.AttributeDefinition;
+		import org.openforis.idm.metamodel.validation.Check;
+		import org.openforis.collect.designer.model.CheckType;
+		import org.zkoss.util.resource.Labels;
+		
+		Check check = (Check) arg.get("check");
+		CheckType type = CheckType.valueOf(check);
+		String typeLabel = type.getLabel();
+		String attrName = ((AttributeDefinition) arg.get("parentDefinition")).getName();
+        String title = Labels.getLabel("survey.schema.node.check.popup.title", new String[]{typeLabel, attrName});
+    ]]></zscript>
+	<window id="checkPopUp" title="${title}" 
 		width="500px"
 		border="normal"
 		position="center" 
