@@ -251,6 +251,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		dispatchValidateAllCommand();
 //		validateMainForm(binder);
 		if ( checkCanSave(false) ) {
+			survey.refreshSurveyDependencies();
 			surveyManager.saveSurveyWork(survey);
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
 			BindUtils.postNotifyChange(null, null, survey, "id");
