@@ -18,8 +18,6 @@
 	<context:component-scan base-package="org.openforis.collect" />
     <context:annotation-config/>
     
-<!--     <bean id="applicationContextProvider" class="org.openforis.collect.context.ApplicationContextAwareImpl" /> -->
-    
 	<bean id="devPropertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<!-- <property name="location" value="file:${user.dir}/dev.properties"/> -->
