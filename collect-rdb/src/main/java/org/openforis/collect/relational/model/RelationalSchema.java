@@ -25,6 +25,7 @@ public final class RelationalSchema {
 	private Survey survey;
 	private String name;
 	private LinkedHashMap<String, Table<?>> tables;
+	private Map<Integer, DataTable> dataTablesById;
 	private Map<CodeListTableKey, CodeTable> codeListTables;
 	private Map<String, DataTable> rootDataTables;
 	
@@ -34,6 +35,7 @@ public final class RelationalSchema {
 		this.tables = new LinkedHashMap<String, Table<?>>();
 		this.codeListTables = new LinkedHashMap<CodeListTableKey, CodeTable>();
 		this.rootDataTables = new HashMap<String, DataTable>();
+		this.dataTablesById = new HashMap<Integer, DataTable>();
 	}
 
 	public Survey getSurvey() {
@@ -83,8 +85,9 @@ public final class RelationalSchema {
 		tables.put(name, table);
 		if ( table instanceof DataTable ) {
 			DataTable dataTable = (DataTable) table;
+			NodeDefinition defn = dataTable.getNodeDefinition();
+			dataTablesById.put(defn.getId(), dataTable);
 			if ( dataTable.getParent() == null ) {
-				NodeDefinition defn = dataTable.getNodeDefinition();
 				rootDataTables.put(defn.getName(), dataTable);
 			}
 		} else if ( table instanceof CodeTable ) {
@@ -104,6 +107,11 @@ public final class RelationalSchema {
 			throw new IllegalArgumentException("Invalid root entity "+name);
 		}
 		return dataTable.extractData(root);
+	}
+
+	public DataTable getDataTable(NodeDefinition nodeDefinition) {
+		int id = nodeDefinition.getId();
+		return dataTablesById.get(id);
 	}
 	
 	private static class CodeListTableKey {
@@ -145,5 +153,5 @@ public final class RelationalSchema {
 		}
 		
 	}
-	
+
 }

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.relational.CollectRdbException;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.path.Path;
@@ -110,6 +112,36 @@ public class DataTable extends AbstractTable<Node<?>> {
 		for (Column<?> c : columns) {
 			if ( c instanceof DataParentKeyColumn ) {
 				return (DataParentKeyColumn) c;
+			}
+		}
+		return null;
+	}
+	
+	public List<DataColumn> getDataColumns(AttributeDefinition attributeDefinition) {
+		List<DataColumn> result = new ArrayList<DataColumn>();
+		int attributeDefinitionId = attributeDefinition.getId();
+		for ( Column<?> column : getColumns() ) {
+			if ( column instanceof DataColumn ) {
+				DataColumn dataCol = (DataColumn) column;
+				AttributeDefinition columnAttrDefn = dataCol.getAttributeDefinition();
+				if ( ! ( dataCol instanceof CodeValueFKColumn ) && 
+						columnAttrDefn.getId() == attributeDefinitionId ) {
+					result.add(dataCol); 
+				}
+			}
+		}
+		return result;
+	}
+	
+	public DataColumn getDataColumn(FieldDefinition<?> fieldDefinition) {
+		AttributeDefinition attributeDefinition = (AttributeDefinition) fieldDefinition.getParentDefinition();
+		List<DataColumn> attributeDataColumns = getDataColumns(attributeDefinition);
+		String fieldDefinitionName = fieldDefinition.getName();
+		for ( DataColumn column : attributeDataColumns ) {
+			NodeDefinition columnNodeDefn = column.getNodeDefinition();
+			if ( columnNodeDefn instanceof FieldDefinition && 
+					columnNodeDefn.getName().equals(fieldDefinitionName)) {
+				return column; 
 			}
 		}
 		return null;
