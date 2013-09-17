@@ -23,7 +23,6 @@ import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,7 +112,7 @@ public class CollectRDBPublisher {
 		Connection targetConn = DataSourceUtils.getConnection(targetDataSource);
 		return targetConn;
 	}
-	
+	/*
 	public static void main(String[] args) throws CollectRdbException {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");
 		CollectRDBPublisher publisher = ctx.getBean(CollectRDBPublisher.class);
@@ -127,5 +126,5 @@ public class CollectRDBPublisher {
 				config);
 //		DriverManager.getConnection("jdbc:postgresql://localhost:5433/archenland1", "postgres","postgres")); 
 	}
-	
+	*/
 }

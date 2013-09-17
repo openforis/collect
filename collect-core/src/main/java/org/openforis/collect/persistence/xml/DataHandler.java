@@ -62,6 +62,10 @@ public class DataHandler extends DefaultHandler {
 	
 	private Map<String, User> users;
 	
+	public DataHandler(CollectSurvey survey) {
+		this(survey, (Map<String, User>) null);
+	}
+	
 	public DataHandler(CollectSurvey survey, Map<String, User> users) {
 		this(survey, survey, users);
 	}

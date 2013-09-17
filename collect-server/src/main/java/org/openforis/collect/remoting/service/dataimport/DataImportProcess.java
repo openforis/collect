@@ -50,7 +50,7 @@ public class DataImportProcess implements Callable<Void> {
 
 	private static Log LOG = LogFactory.getLog(DataImportProcess.class);
 
-	private static final Object IDML_FILE_NAME = "idml.xml";
+	private static final String IDML_FILE_NAME = "idml.xml";
 
 	private RecordManager recordManager;
 	private RecordDao recordDao;

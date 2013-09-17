@@ -48,9 +48,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CodeListManager {
 	
-	@Autowired
+	@Autowired(required=false)
 	private DatabaseExternalCodeListProvider provider;
-	@Autowired
+	@Autowired(required=false)
 	private CodeListItemDao codeListItemDao;
 	
 	public void importCodeLists(CollectSurvey survey, InputStream is) throws CodeListImportException {

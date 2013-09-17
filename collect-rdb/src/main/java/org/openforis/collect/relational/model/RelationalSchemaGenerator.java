@@ -42,6 +42,8 @@ public class RelationalSchemaGenerator {
 	private static final String RDB_NAMESPACE = "http://www.openforis.org/collect/3.0/rdb";
 	private static final QName TABLE_NAME_QNAME = new QName(RDB_NAMESPACE, "table");
 	private static final QName COLUMN_NAME_QNAME = new QName(RDB_NAMESPACE, "column");
+	private static final String DATA_TABLE_PK_FORMAT = "_%s%s";
+	private static final String CODE_TABLE_PK_FORMAT = "%s%s";
 	
 	private RelationalSchemaConfig config; 
 	
@@ -111,9 +113,8 @@ public class RelationalSchemaGenerator {
 		CodeListCodeColumn codeColumn = new CodeListCodeColumn(tableNamePrefix);
 		table.addColumn(codeColumn);
 		if ( parent != null ) {
-			String parentName = parent.getName();
 			// Create Parent FK column
-			Column<?> parentIdColumn = new CodeParentKeyColumn(parentName + config.getIdColumnSuffix());
+			Column<?> parentIdColumn = new CodeParentKeyColumn(getCodeTablePKColumnName(parent));
 			addColumn(table, parentIdColumn);
 			// Create FK constraint
 			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + parent.getBaseName();
@@ -189,8 +190,7 @@ public class RelationalSchemaGenerator {
 		
 		if ( parentTable != null ) {
 			// Create FK column
-			String fkColumnName = parentTable.getBaseName() + config.getIdColumnSuffix();
-			Column<?> fkColumn = new DataParentKeyColumn(fkColumnName);
+			Column<?> fkColumn = new DataParentKeyColumn(getTablePKColumnName(parentTable));
 			table.addColumn(fkColumn);
 			// Create FK constraint
 			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + parentTable.getBaseName();
@@ -204,14 +204,24 @@ public class RelationalSchemaGenerator {
 	}
 
 	protected void addPKColumn(DataTable table) {
-		String name = table.getName() + config.getIdColumnSuffix();
+		String name = getTablePKColumnName(table);
 		// Create PK column
 		Column<?> pkColumn = new DataPrimaryKeyColumn(name);
 		table.addColumn(pkColumn);
 		// Create PK constraint
 		addPKConstraint(table, pkColumn);
 	}
+
+	private String getTablePKColumnName(AbstractTable<?> table) {
+		String result = String.format(DATA_TABLE_PK_FORMAT, table.getName(), config.getIdColumnSuffix());
+		return result;
+	}
 	
+	private String getCodeTablePKColumnName(CodeTable table) {
+		String result = String.format(CODE_TABLE_PK_FORMAT, table.getName(), config.getIdColumnSuffix());
+		return result;
+	}
+
 	protected void addAncestorKeyColumns(DataTable table) throws CollectRdbException {
 		NodeDefinition nodeDefn = table.getNodeDefinition();
 		List<EntityDefinition> ancestors = getAncestorEntities(nodeDefn);
@@ -271,9 +281,8 @@ public class RelationalSchemaGenerator {
 	}
 	
 	protected void addPKColumn(CodeTable table) {
-		String name = table.getName() + config.getIdColumnSuffix();
 		// Create PK column
-		Column<?> pkColumn = new CodePrimaryKeyColumn(name);
+		Column<?> pkColumn = new CodePrimaryKeyColumn(getCodeTablePKColumnName(table));
 		table.addColumn(pkColumn);
 		// Create PK constraint
 		addPKConstraint(table, pkColumn);
