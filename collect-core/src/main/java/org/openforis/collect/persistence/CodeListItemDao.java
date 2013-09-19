@@ -289,7 +289,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	protected List<PersistedCodeListItem> loadChildItems(CodeList codeList, Integer parentItemId, ModelVersion version) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
-		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
+		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId, true);
 		Result<Record> result = q.fetch();
 		return jf.fromResult(result);
 	}
@@ -312,7 +312,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	public boolean hasChildItems(CodeList codeList, Integer parentItemId) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
-		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
+		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId, false);
 		q.addSelect(Factory.count());
 		Record record = q.fetchOne();
 		Integer count = (Integer) record.getValue(0);
@@ -341,7 +341,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code, ModelVersion version) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
-		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId);
+		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId, false);
 		q.addConditions(
 				OFC_CODE_LIST.CODE.equal(code)
 		);
@@ -394,11 +394,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return minId == null ? 0: minId.intValue();
 	}
 
-	protected static SelectQuery createSelectChildItemsQuery(JooqFactory jf, CodeList codeList, Integer parentItemId) {
+	protected static SelectQuery createSelectChildItemsQuery(JooqFactory jf, CodeList codeList, Integer parentItemId, boolean addOrderByClause) {
 		SelectQuery q = jf.selectQuery();	
 		q.addFrom(OFC_CODE_LIST);
 		addFilterByParentItemConditions(q, codeList, parentItemId);
-		q.addOrderBy(OFC_CODE_LIST.SORT_ORDER);
+		if ( addOrderByClause ) {
+			q.addOrderBy(OFC_CODE_LIST.SORT_ORDER);
+		}
 		return q;
 	}
 
