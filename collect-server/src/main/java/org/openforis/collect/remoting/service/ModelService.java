@@ -54,6 +54,12 @@ public class ModelService {
 		return result;
 	}
 
+	public boolean isActiveSurveyRecordsLocked() {
+		CollectSurvey survey = sessionManager.getActiveSurvey();
+		boolean result = survey.isPublished() && surveyManager.isRecordValidationInProgress(survey.getId());
+		return result;
+	}
+	
 	protected String getActiveLanguageCode() {
 		SessionState sessionState = sessionManager.getSessionState();
 		Locale locale = sessionState.getLocale();

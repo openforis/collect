@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.model;
 
+import org.openforis.collect.manager.process.ProcessStatus;
+
 /**
  * @author M. Togna
  * @author S. Ricci
@@ -17,6 +19,7 @@ public class SurveySummary {
 	private String projectName;
 	private boolean work;
 	private boolean published;
+	private ProcessStatus recordValidationProcessStatus;
 	
 	public SurveySummary(Integer id, String name, String uri) {
 		this(id, name, uri, null);
@@ -44,6 +47,14 @@ public class SurveySummary {
 		SurveySummary summary = new SurveySummary(id, name, uri, projectName);
 		summary.setWork(survey.isWork());
 		return summary;
+	}
+	
+	public boolean isRecordValidationInProgress() {
+		return recordValidationProcessStatus != null && recordValidationProcessStatus.isRunning();
+	}
+	
+	public int getRecordValidationProgressPercent() {
+		return recordValidationProcessStatus == null ? 0: recordValidationProcessStatus.getProgressPercent();
 	}
 
 	public Integer getId() {
@@ -84,5 +95,14 @@ public class SurveySummary {
 	
 	public void setPublishedId(Integer publishedId) {
 		this.publishedId = publishedId;
+	}
+
+	public ProcessStatus getRecordValidationProcessStatus() {
+		return recordValidationProcessStatus;
+	}
+
+	public void setRecordValidationProcessStatus(
+			ProcessStatus recordValidationProcessStatus) {
+		this.recordValidationProcessStatus = recordValidationProcessStatus;
 	}
 }

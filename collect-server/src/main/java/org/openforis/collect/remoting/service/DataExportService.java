@@ -16,7 +16,7 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
-import org.openforis.collect.util.ExecutorServiceUtil;
+import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;

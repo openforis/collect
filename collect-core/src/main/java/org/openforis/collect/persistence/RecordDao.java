@@ -13,10 +13,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
+import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -165,6 +167,23 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Result<Record> result = q.fetch();
 		
 		return jf.fromResult(result);
+	}
+	
+	public int countRecords(CollectSurvey survey) {
+		return countRecords(survey, null);
+	}
+	
+	public int countRecords(CollectSurvey survey, Integer rootEntityDefinitionId) {
+		JooqFactory jf = getMappingJooqFactory(survey);
+		SelectConditionStep q = jf.selectCount()
+			.from(OFC_RECORD)
+			.where(OFC_RECORD.SURVEY_ID.eq(survey.getId()));
+		if ( rootEntityDefinitionId != null ) {
+			q.and(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.eq(rootEntityDefinitionId));
+		}
+		Record record = q.fetchOne();
+		int result = record.getValue(Factory.count());
+		return result;
 	}
 
 	private void addFilterByKeyConditions(SelectQuery q, String... keyValues) {

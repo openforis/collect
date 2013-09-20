@@ -20,7 +20,9 @@ import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -41,12 +43,17 @@ import org.zkoss.zul.Window;
  */
 public class SurveySelectVM extends BaseVM {
 	
+//	private static Log LOG = LogFactory.getLog(SurveySelectVM.class);
+
 	private static final String TEXT_XML = "text/xml";
 
 	public static final String CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD = "closeSurveyImportPopUp";
+
+	public static final String UPDATE_SURVEY_LIST_COMMAND = "updateSurveyList";
 	
 	@WireVariable
 	private SurveyManager surveyManager;
+	
 	@WireVariable
 	private SurveyValidator surveyValidator;
 	
@@ -55,10 +62,13 @@ public class SurveySelectVM extends BaseVM {
 	private Window surveyImportPopUp;
 
 	private Window validationResultsPopUp;
+
+	private List<SurveySummary> summaries;
 	
 	@Init()
 	public void init() {
 		PageUtil.clearConfirmClose();
+		loadSurveySummaries();
 	}
 	
 	@Command
@@ -167,9 +177,12 @@ public class SurveySelectVM extends BaseVM {
 	protected void performSurveyPublishing(CollectSurvey survey) {
 		try {
 			surveyManager.publish(survey);
-			notifyChange("surveySummaries");
+			loadSurveySummaries();
+			notifyChange("surveySummaries");		
 			Object[] args = new String[]{survey.getName()};
 			MessageUtil.showInfo("survey.successfully_published", args);
+			User user = getLoggedUser();
+			surveyManager.validateRecords(survey.getId(), user);
 		} catch (SurveyImportException e) {
 			throw new RuntimeException(e);
 		}
@@ -199,6 +212,63 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 	
+	@Command
+	public void validateAllRecords() {
+		User user = getLoggedUser();
+		Integer publishedSurveyId = getSelectedPublishedSurveyId();
+		surveyManager.validateRecords(publishedSurveyId, user);
+		updateSurveyList();
+	}
+
+	private Integer getSelectedPublishedSurveyId() {
+		return !selectedSurvey.isPublished() ? null	: 
+				selectedSurvey.isWork() ? selectedSurvey.getPublishedId() : 
+					selectedSurvey.getId();
+	}
+	
+	@Command
+	public void cancelRecordValidation() {
+		Integer selectedPublishedSurveyId = getSelectedPublishedSurveyId();
+		surveyManager.cancelRecordValidation(selectedPublishedSurveyId);
+		updateSurveyList();
+	}
+	
+	@GlobalCommand
+	public void updateSurveyList() {
+		List<SurveySummary> newSummaries = surveyManager.loadSummaries();
+		if ( summaries == null ) {
+			summaries = newSummaries;
+		} else {
+			for (SurveySummary newSummary : newSummaries) {
+				SurveySummary oldSummary = findSummary(summaries, newSummary.getId(), newSummary.isPublished(), newSummary.isWork());
+				if ( oldSummary == null ) {
+					//TODO handle this??
+				} else {
+					oldSummary.setRecordValidationProcessStatus(newSummary.getRecordValidationProcessStatus());
+					BindUtils.postNotifyChange(null, null, oldSummary, "recordValidationProgressStatus");
+					BindUtils.postNotifyChange(null, null, oldSummary, "recordValidationInProgress");
+					BindUtils.postNotifyChange(null, null, oldSummary, "recordValidationProgressPercent");
+				}
+			}
+		}
+	}
+	
+	private void loadSurveySummaries() {
+		summaries = surveyManager.loadSummaries();
+	}
+
+	private SurveySummary findSummary(List<SurveySummary> summaries2,
+			Integer id, boolean published, boolean work) {
+		for (SurveySummary summary : summaries) {
+			if ( summary.getId().equals(id) && 
+					summary.isPublished() == published &&
+					summary.isWork() == work) {
+				return summary;
+			}
+		}
+		return null;
+	}
+
 	protected CollectSurvey loadSelectedSurveyForEdit() {
 		String uri = selectedSurvey.getUri();
 		CollectSurvey surveyWork;
@@ -224,10 +294,9 @@ public class SurveySelectVM extends BaseVM {
 	}
 	
 	public ListModel<SurveySummary> getSurveySummaries() {
-		List<SurveySummary> summaries = surveyManager.loadSummaries();
 		return new BindingListModelList<SurveySummary>(summaries, false);
 	}
-
+	
 	public SurveySummary getSelectedSurvey() {
 		return selectedSurvey;
 	}

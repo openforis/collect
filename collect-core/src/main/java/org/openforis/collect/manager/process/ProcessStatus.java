@@ -93,4 +93,20 @@ public class ProcessStatus {
 		this.errorMessage = errorMessage;
 	}
 	
+	public int getProgressPercent() {
+		switch ( step ) {
+		case COMPLETE:
+			return 100;
+		case RUN:
+			if ( total > 0 ) {
+				int result = Double.valueOf(Math.ceil( processed * 100 / total )).intValue();
+				return result;
+			} else {
+				return 0;
+			}
+		default:
+			return 0;
+		}
+	}
+	
 }

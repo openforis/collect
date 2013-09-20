@@ -15,24 +15,32 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.manager.process.ProcessStatus;
+import org.openforis.collect.manager.validation.RecordValidationProcess;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
+import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -41,6 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 public class SurveyManager {
+	
+	private static Log LOG = LogFactory.getLog(SurveyManager.class);
 
 	@Autowired
 	private CodeListManager codeListManager;
@@ -58,17 +68,22 @@ public class SurveyManager {
 	private CollectSurveyContext collectSurveyContext;
 	@Autowired
 	private SurveyValidator surveyValidator;
+	@Autowired
+	private ApplicationContext applicationContext;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
 	private Map<String, CollectSurvey> surveysByName;
 	private Map<String, CollectSurvey> surveysByUri;
-
+	
+	private Map<Integer, RecordValidationProcess> recordValidationProcessesBySurvey;
+	
 	public SurveyManager() {
 		surveys = new ArrayList<CollectSurvey>();
 		surveysById = new HashMap<Integer, CollectSurvey>();
 		surveysByName = new HashMap<String, CollectSurvey>();
 		surveysByUri = new HashMap<String, CollectSurvey>();
+		recordValidationProcessesBySurvey = new HashMap<Integer, RecordValidationProcess>();
 	}
 
 	@Transactional
@@ -290,6 +305,10 @@ public class SurveyManager {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (CollectSurvey survey : surveys) {
 			SurveySummary summary = SurveySummary.createFromSurvey(survey, lang);
+			if ( summary.isPublished() ) {
+				int publishedSurveyId = summary.isWork() ? summary.getPublishedId(): summary.getId();
+				summary.setRecordValidationProcessStatus(getRecordValidationProcessStatus(publishedSurveyId));
+			}
 			summaries.add(summary);
 		}
 		sortByName(summaries);
@@ -414,6 +433,7 @@ public class SurveyManager {
 			} else {
 				summaryWork.setPublished(true);
 				summaryWork.setPublishedId(summary.getId());
+				summaryWork.setRecordValidationProcessStatus(summary.getRecordValidationProcessStatus());
 			}
 		}
 		sortByName(result);
@@ -534,6 +554,7 @@ public class SurveyManager {
 		if ( publishedSurvey == null ) {
 			surveyDao.importModel(survey);
 		} else {
+			cancelRecordValidation(survey.getId());
 			surveyDao.updateModel(survey);
 		}
 		int publishedSurveyId = survey.getId();
@@ -547,8 +568,42 @@ public class SurveyManager {
 		addToCache(survey);
 	}
 	
+	public void cancelRecordValidation(int surveyId) {
+		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
+		if ( process != null && process.getStatus().isRunning() ) {
+			process.cancel();
+		}
+	}
+
+	public void validateRecords(int surveyId, User user) {
+		CollectSurvey survey = surveysById.get(surveyId);
+		if ( survey == null ) {
+			throw new IllegalStateException("Published survey not found, id="+surveyId);
+		}
+		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
+		if ( process != null && process.getStatus().isRunning() ) {
+			throw new IllegalStateException("Record validation process already started");
+		} else {
+			process = applicationContext.getBean(RecordValidationProcess.class);
+			process.setSurvey(survey);
+			process.setUser(user);
+			UUID sessionId = UUID.randomUUID();
+			process.setSessionId(sessionId.toString());
+			recordValidationProcessesBySurvey.put(survey.getId(), process);
+			try {
+				process.init();
+				ExecutorServiceUtil.execute(process);
+			} catch (Exception e) {
+				LOG.error("Error validating survey records", e);
+			}
+		}
+	}
+	
 	@Transactional
-	public void deleteSurvey(Integer id) {
+	public void deleteSurvey(int id) {
+		if ( isRecordValidationInProgress(id) ) {
+			cancelRecordValidation(id);
+		}
 		CollectSurvey survey = getById(id);
 		if ( survey != null ) {
 			recordDao.deleteBySurvey(id);
@@ -566,6 +621,16 @@ public class SurveyManager {
 		samplingDesignManager.deleteBySurveyWork(id);
 		codeListManager.deleteAllItemsBySurvey(id, true);
 		surveyWorkDao.delete(id);
+	}
+
+	protected ProcessStatus getRecordValidationProcessStatus(int surveyId) {
+		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
+		return process == null ? null: process.getStatus();
+	}
+	
+	public boolean isRecordValidationInProgress(int surveyId) {
+		ProcessStatus status = getRecordValidationProcessStatus(surveyId);
+		return status != null && status.isRunning();
 	}
 
 	/*

@@ -15,7 +15,7 @@
 			private var _details:String;
 			private var _messageIconClass:Class;
 			
-			public static function show(title:String, message:String, details:String, messageIconClass:Class = null):void {
+			public static function show(title:String, message:String, details:String, messageIconClass:Class = null):BlockingMessagePopUp {
 				var popUp:BlockingMessagePopUp = new BlockingMessagePopUp();
 				popUp.title = title;
 				popUp.message = message;
@@ -26,6 +26,7 @@
 				}
 				PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 				PopUpManager.centerPopUp(popUp);
+				return popUp;
 			}
 			
 			[Bindable]

@@ -247,6 +247,9 @@
 	<bean id="userService" class="org.openforis.collect.remoting.service.UserService"
 		autowire="byName" />
 
+	<bean id="recordValidationProcess" class="org.openforis.collect.manager.validation.RecordValidationProcess"
+	     scope="prototype" />
+	
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
 		<property name="lookupProvider" ref="lookupProvider" />

@@ -19,7 +19,7 @@ import org.openforis.collect.remoting.service.dataimport.DataImportState;
 import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummary;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
-import org.openforis.collect.util.ExecutorServiceUtil;
+import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;

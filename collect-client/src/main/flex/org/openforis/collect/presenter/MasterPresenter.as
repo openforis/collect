@@ -3,9 +3,12 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author Mino Togna
 	 * */
-	import flash.events.Event;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 	
+	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
@@ -13,16 +16,22 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
 	import org.openforis.collect.event.UIEvent;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
+	import org.openforis.collect.ui.component.BlockingMessagePopUp;
 	import org.openforis.collect.ui.view.MasterView;
 	import org.openforis.collect.util.AlertUtil;
 
 	public class MasterPresenter extends AbstractPresenter {
 		
+		private static const CHECK_RECORDS_LOCK_FREQUENCY:Number = 30000;
+		
 		private var _view:MasterView;
 		private var _dataClient:DataClient;
+		private var _checkRecordsLockTimer:Timer;
+		private var _editingBlockPopup:BlockingMessagePopUp;
 		
 		public function MasterPresenter(view:MasterView) {
 			this._view = view;
@@ -31,6 +40,9 @@ package org.openforis.collect.presenter {
 
 			_view.currentState = MasterView.LOADING_STATE;
 			
+			_checkRecordsLockTimer = new Timer(CHECK_RECORDS_LOCK_FREQUENCY)
+			_checkRecordsLockTimer.addEventListener(TimerEvent.TIMER, checkRecordsLockTimeoutHandler);
+			_checkRecordsLockTimer.start();
 			/*
 			wait for surveys and sessionState loading, then dispatch APPLICATION_INITIALIZED event
 			if more than one survey is found, then whow surveySelection view
@@ -54,6 +66,43 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
 		}
 		
+		protected function checkRecordsLockTimeoutHandler(event:TimerEvent = null, onSuccess:Function = null, onFault:Function = null):void {
+			var resp:AsyncResponder = new AsyncResponder(isActiveSurveyRecordsLockedResultHandler, faultHandler);
+			
+			function isActiveSurveyRecordsLockedResultHandler(event:ResultEvent, token:Object = null):void {
+				var locked:Boolean = event.result as Boolean;
+				var blockingPopUpVisible:Boolean = (_view.currentState == MasterView.LIST_STATE ) && 
+					locked && ! Application.serverOffline;
+				if ( blockingPopUpVisible ) {
+					if ( _editingBlockPopup == null ) {
+						_editingBlockPopup = BlockingMessagePopUp.show(
+							Message.get("list.recordsLockedPopUp.title"), 
+							Message.get("list.recordsLockedPopUp.message"), 
+							Message.get("list.recordsLockedPopUp.details"));
+					}
+					if ( onFault != null ) {
+						onFault();
+					}
+				} else {
+					if ( _editingBlockPopup != null ) {
+						PopUpManager.removePopUp(_editingBlockPopup);
+						_editingBlockPopup = null;
+						//record locking ended
+						dispatchLoadSummariesEvent();
+						refreshGlobalViewSize();
+					}
+					if ( onSuccess != null ) {
+						onSuccess();
+					}
+				}
+			}
+			checkRecordsLock(resp);
+		}
+		
+		protected function checkRecordsLock(responder:IResponder):void {
+			ClientFactory.modelClient.isActiveSurveyRecordsLocked(responder);
+		}
+		
 		protected function refreshGlobalViewSize():void {
 			eventDispatcher.dispatchEvent(new UIEvent(UIEvent.CHECK_VIEW_SIZE));
 		}
@@ -74,7 +123,8 @@ package org.openforis.collect.presenter {
 		protected function showSamplingDesignImportHandler(event:UIEvent):void {
 			_view.currentState = MasterView.SAMPLING_DESIGN_IMPORT_STATE;
 			_view.samplingDesignImportView.surveyId = event.obj.surveyId;
-			_view.samplingDesignImportView.work = event.obj.work;		}
+			_view.samplingDesignImportView.work = event.obj.work;		
+		}
 
 		/**
 		 * RecordSummary selected from list page
@@ -130,11 +180,18 @@ package org.openforis.collect.presenter {
 			Application.activeRootEntity = rootEntityDef;
 			_view.currentState = MasterView.LIST_STATE;
 			
+			checkRecordsLockTimeoutHandler(null, onNotLocked);
+			
+			function onNotLocked(): void {
+				dispatchLoadSummariesEvent();
+				refreshGlobalViewSize();
+			}
+		}
+		
+		private function dispatchLoadSummariesEvent():void {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_SUMMARIES);
 			uiEvent.obj = {firstAccess: true};
 			eventDispatcher.dispatchEvent(uiEvent);
-			
-			refreshGlobalViewSize();
 		}
 		
 		internal function newRecordCreatedHandler(event:UIEvent):void {

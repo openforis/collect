@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.util;
+package org.openforis.collect.utils;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;

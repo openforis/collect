@@ -15,7 +15,7 @@ import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.RecordIndexProcess;
-import org.openforis.collect.util.ExecutorServiceUtil;
+import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;

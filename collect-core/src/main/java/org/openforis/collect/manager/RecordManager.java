@@ -38,6 +38,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.collect.persistence.RecordValidationInProgressException;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -75,6 +76,8 @@ public class RecordManager {
 	private RecordDao recordDao;
 	@Autowired
 	private CodeListManager codeListManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	
 	private RecordConverter recordConverter;
 	private long lockTimeoutMillis;
@@ -154,6 +157,7 @@ public class RecordManager {
 	@Transactional
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
+			checkSurveyRecordValidationNotInProgress(survey);
 			lockManager.isLockAllowed(user, recordId, sessionId, forceUnlock);
 			lockManager.lock(recordId, user, sessionId, forceUnlock);
 		}
@@ -162,6 +166,12 @@ public class RecordManager {
 		return record;
 	}
 	
+	private void checkSurveyRecordValidationNotInProgress(CollectSurvey survey) throws RecordValidationInProgressException {
+		if ( survey.isPublished() && ! survey.isWork() && surveyManager.isRecordValidationInProgress(survey.getId()) ) {
+			throw new RecordValidationInProgressException();
+		}
+	}
+
 	@Deprecated
 	@Transactional
 	public CollectRecord load(CollectSurvey survey, int recordId, int step) {
@@ -191,6 +201,14 @@ public class RecordManager {
 		return recordsSummary;
 	}
 
+	public int countRecords(CollectSurvey survey) {
+		return recordDao.countRecords(survey);
+	}
+	
+	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId) {
+		return recordDao.countRecords(survey, rootEntityDefinitionId);
+	}
+	
 	@Transactional
 	public int getRecordCount(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
