@@ -4,6 +4,7 @@
 package org.openforis.collect.manager;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -53,6 +55,23 @@ public class CodeListManagerIntegrationTest extends CollectIntegrationTest {
 			assertEquals("002", item.getCode());
 		}
 		
+	}
+	
+	@Test
+	public void cascadeDeleteTest() {
+		CodeList list = survey.getCodeList("admin_unit");
+		List<CodeListItem> rootItems = codeListManager.loadItems(list, 1);
+		assertEquals(8, rootItems.size());
+		PersistedCodeListItem parentItem = (PersistedCodeListItem) rootItems.get(1);
+		List<CodeListItem> childItems = codeListManager.loadChildItems(parentItem);
+		assertEquals(3, childItems.size());
+		codeListManager.delete(parentItem);
+		rootItems = codeListManager.loadItems(list, 1);
+		assertEquals(7, rootItems.size());
+		PersistedCodeListItem fakeItem = new PersistedCodeListItem(list, parentItem.getId());
+		fakeItem.setSystemId(parentItem.getSystemId());
+		List<CodeListItem> reloadedItems = codeListManager.loadChildItems(fakeItem);
+		assertTrue(reloadedItems.isEmpty());
 	}
 	
 }

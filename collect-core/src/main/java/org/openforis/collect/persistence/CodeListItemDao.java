@@ -15,6 +15,7 @@ import org.jooq.Insert;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.ResultQuery;
+import org.jooq.SQLDialect;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
@@ -207,9 +208,15 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 	}
 
-	public void delete(int id) {
+	public void delete(PersistedCodeListItem item) {
 		JooqFactory jf = getMappingJooqFactory(null);
-		jf.deleteQuery(id).execute();
+		jf.deleteQuery(item.getSystemId()).execute();
+		
+		if ( jf.getDialect() == SQLDialect.SQLITE ) {
+			//SQLite foreign keys support disabled in order to have better performances
+			//delete referencing items programmatically
+			deleteInvalidParentReferenceItems(item.getCodeList());
+		}
 	}
 
 	public void deleteByCodeList(CodeList list) {
@@ -239,7 +246,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.execute();
 	}
 	
-	public void deleteDetachedItems(CollectSurvey survey) {
+	public void deleteInvalidCodeListReferenceItems(CollectSurvey survey) {
 		List<Integer> codeListsIds = new ArrayList<Integer>();
  		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList codeList : codeLists) {
@@ -253,7 +260,26 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 						.and(OFC_CODE_LIST.CODE_LIST_ID.notIn(codeListsIds))
 			).execute();
 	}
-
+	
+	public void deleteInvalidParentReferenceItems(CodeList codeList) {
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		int codeListId = codeList.getId();
+		JooqFactory jf = getMappingJooqFactory(null);
+		jf.delete(OFC_CODE_LIST)
+			.where(OFC_CODE_LIST.CODE_LIST_ID.eq(codeListId)
+				.and(surveyIdField.eq(survey.getId()))
+				.and(OFC_CODE_LIST.PARENT_ID.isNotNull())
+				.and(OFC_CODE_LIST.PARENT_ID.notIn(
+					jf.select(OFC_CODE_LIST.ID)
+						.from(OFC_CODE_LIST)
+						.where(OFC_CODE_LIST.CODE_LIST_ID.eq(codeListId))
+						)
+					)
+				)
+			.execute();
+	}
+	
 	public void moveItemsToPublishedSurvey(int surveyWorkId, int publishedSurveyId) {
 		JooqFactory jf = getMappingJooqFactory(null);
 		jf.update(OFC_CODE_LIST)

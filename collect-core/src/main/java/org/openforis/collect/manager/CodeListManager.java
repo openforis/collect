@@ -443,7 +443,7 @@ public class CodeListManager {
 		if ( list.isExternal() ) {
 			throw new UnsupportedOperationException();
 		} else if ( list.isEmpty() ) {
-			codeListItemDao.delete(((PersistedCodeListItem) item).getSystemId());
+			codeListItemDao.delete((PersistedCodeListItem) item);
 		} else {
 			CodeListItem parentItem = item.getParentItem();
 			int id = item.getId();
@@ -470,8 +470,8 @@ public class CodeListManager {
 		codeListItemDao.deleteBySurvey(surveyId, work);
 	}
 
-	public void deleteDetachedItems(CollectSurvey survey) {
-		codeListItemDao.deleteDetachedItems(survey);
+	public void deleteInvalidCodeListReferenceItems(CollectSurvey survey) {
+		codeListItemDao.deleteInvalidCodeListReferenceItems(survey);
 	}
 	
 	public void shiftItem(CodeListItem item, int indexTo) {
@@ -503,5 +503,6 @@ public class CodeListManager {
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
 	}
+
 
 }

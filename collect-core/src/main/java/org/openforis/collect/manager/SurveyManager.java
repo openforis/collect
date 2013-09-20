@@ -441,7 +441,7 @@ public class SurveyManager {
 	public CollectSurvey loadSurveyWork(int id) {
 		CollectSurvey survey = surveyWorkDao.load(id);
 		if ( survey != null ) {
-			codeListManager.deleteDetachedItems(survey);
+			codeListManager.deleteInvalidCodeListReferenceItems(survey);
 		}
 		return survey;
 	}
@@ -526,6 +526,7 @@ public class SurveyManager {
 	
 	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
+		codeListManager.deleteInvalidCodeListReferenceItems(survey);
 		Integer surveyWorkId = survey.getId();
 		CollectSurvey publishedSurvey = get(survey.getName());
 		survey.setWork(false);
