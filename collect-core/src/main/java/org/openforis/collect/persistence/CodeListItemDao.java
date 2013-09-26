@@ -96,17 +96,19 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			PersistedCodeListItem firstItem = items.get(0);
 			CodeList list = firstItem.getCodeList();
 			JooqFactory jf = getMappingJooqFactory(list);
-			int id = jf.nextId();
-			int maxId = id;
+			int nextId = jf.nextId();
+			int maxId = nextId;
 			Insert<OfcCodeListRecord> query = jf.createInsertStatement();
 			BatchBindStep batch = jf.batch(query);
 			for (PersistedCodeListItem item : items) {
-				if ( item.getSystemId() == null ) {
-					item.setSystemId(id++);
+				Integer id = item.getSystemId();
+				if ( id == null ) {
+					id = nextId++;
+					item.setSystemId(id);
 				}
 				Object[] values = jf.extractValues(item);
 				batch.bind(values);
-				maxId = Math.max(maxId, item.getSystemId());
+				maxId = Math.max(maxId, id);
 			}
 			batch.execute();
 			jf.restartSequence(maxId + 1);
@@ -141,9 +143,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.where(oldSurveyIdField.equal(oldSurveyId))
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
 		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, FIELDS).select(select);
-		int insertedCount = insert.execute();
-		nextId = nextId + insertedCount;
-		jf.restartSequence(OFC_CODE_LIST_ID_SEQ, nextId);
+		insert.execute();
+		restartIdSequence(jf);
+	}
+
+	private void restartIdSequence(JooqFactory jf) {
+		int maxId = loadMaxId(jf);
+		jf.restartSequence(OFC_CODE_LIST_ID_SEQ, maxId + 1);
 	}
 
 	@Override
@@ -413,11 +419,18 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	protected int loadMinId(JooqFactory jf, int surveyId, boolean work) {
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(work);
-		Integer minId = jf.select(Factory.min(OFC_CODE_LIST.ID))
+		Integer result = jf.select(Factory.min(OFC_CODE_LIST.ID))
 				.from(OFC_CODE_LIST)
 				.where(surveyIdField.equal(surveyId))
 				.fetchOne(0, Integer.class);
-		return minId == null ? 0: minId.intValue();
+		return result == null ? 0: result.intValue();
+	}
+
+	protected int loadMaxId(JooqFactory jf) {
+		Integer result = jf.select(Factory.max(OFC_CODE_LIST.ID))
+				.from(OFC_CODE_LIST)
+				.fetchOne(0, Integer.class);
+		return result == null ? 0: result.intValue();
 	}
 
 	protected static SelectQuery createSelectChildItemsQuery(JooqFactory jf, CodeList codeList, Integer parentItemId, boolean addOrderByClause) {
