@@ -56,7 +56,7 @@ public class ModelService {
 
 	public boolean isActiveSurveyRecordsLocked() {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
-		boolean result = survey.isPublished() && surveyManager.isRecordValidationInProgress(survey.getId());
+		boolean result = survey != null && survey.isPublished() && surveyManager.isRecordValidationInProgress(survey.getId());
 		return result;
 	}
 	
