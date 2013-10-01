@@ -37,6 +37,7 @@ import org.openforis.collect.persistence.SurveyWorkDao;
 import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,7 +173,8 @@ public class SurveyManager {
 	@Transactional
 	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
 		CollectSurvey surveyWork = duplicatePublishedSurveyForEdit(uri);
-		updateSurveyWork(surveyFile, surveyWork);
+		SurveySummary oldSummary = SurveySummary.createFromSurvey(surveyWork);
+		updateSurveyWork(surveyFile, surveyWork, oldSummary);
 		return surveyWork;
 	}
 	
@@ -239,22 +241,24 @@ public class SurveyManager {
 	}
 	
 	protected void updateSurveyWork(File surveyFile,
-			CollectSurvey parsedSurvey) throws SurveyImportException {
-		SurveySummary oldSurveyWork = loadWorkSummaryByUri(parsedSurvey.getUri());
-		updateSurveyWork(surveyFile, parsedSurvey, oldSurveyWork);
+			CollectSurvey survey) throws SurveyImportException {
+		updateSurveyWork(surveyFile, survey, SurveySummary.createFromSurvey(survey));
 	}
-
+	
 	protected void updateSurveyWork(File surveyFile,
-			CollectSurvey parsedSurvey, SurveySummary oldSurveyWorkSummary)
+			CollectSurvey survey, SurveySummary oldSummary)
 			throws SurveyImportException {
-		Integer id = oldSurveyWorkSummary.getId();
-		parsedSurvey.setId(id);
-		parsedSurvey.setName(oldSurveyWorkSummary.getName());
-		parsedSurvey.setWork(true);
+		Integer id = oldSummary.getId();
+		survey.setId(id);
+		survey.setName(oldSummary.getName());
+		survey.setWork(true);
+		for (CodeList codeList : survey.getCodeLists()) {
+			codeList.removeAllItems();
+		}
 		codeListManager.deleteAllItemsBySurvey(id, true);
-		saveSurveyWork(parsedSurvey);
+		saveSurveyWork(survey);
 		try {
-			codeListManager.importCodeLists(parsedSurvey, surveyFile);
+			codeListManager.importCodeLists(survey, surveyFile);
 		} catch (CodeListImportException e) {
 			throw new SurveyImportException(e);
 		}
