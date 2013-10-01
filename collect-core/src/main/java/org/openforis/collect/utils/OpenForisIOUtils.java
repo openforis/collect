@@ -1,15 +1,14 @@
 package org.openforis.collect.utils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.util.UUID;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.input.ReaderInputStream;
 
 /**
  * 
@@ -21,47 +20,23 @@ public class OpenForisIOUtils {
 	public static final String UTF_8 = "UTF-8";
 
 	public static File copyToTempFile(InputStream is) {
-		return copyToTempFile(toReader(is));
+		try {
+			File tempFile = File.createTempFile("collect", "");
+			FileUtils.copyInputStreamToFile(is, tempFile);
+			return tempFile;
+		} catch (IOException e) {
+			throw new RuntimeException("Error copying to temp file: " + e.getMessage());
+		}
 	}
 		
 	public static File copyToTempFile(Reader reader) {
-		File tempFile = createTempFile();
-		FileOutputStream tempOut = null;
-		try {
-			tempOut = new FileOutputStream(tempFile);
-			IOUtils.copy(reader, tempOut, UTF_8);
-		} catch (Exception e) {
-			throw new RuntimeException("Error copying to temp file: " + e.getMessage());
-		} finally {
-			IOUtils.closeQuietly(reader);
-			IOUtils.closeQuietly(tempOut);
-		}
-		return tempFile;
+		InputStream is = toInputStream(reader);
+		return copyToTempFile(is);
 	}
 
-	public static File createTempFile() {
-		return createTempFile(1);
-	}
-	
-	private static File createTempFile(int tempative) {
-		try {
-			String fileName = UUID.randomUUID().toString();
-			String tmpDirPath = System.getProperty("java.io.tmpdir");
-			File file = new File(tmpDirPath, fileName);
-			if ( file.exists() ) {
-				if ( tempative < 5 ) {
-					return createTempFile(tempative + 1);
-				} else {
-					throw new RuntimeException("Cannot creating temp file (name already exists): " + fileName);
-				}
-			} else if ( file.createNewFile() ) {
-				return file;
-			} else {
-				throw new RuntimeException("Cannot creating temp file");
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("Cannot creating temp file: " + e.getMessage());
-		}
+	public static InputStream toInputStream(Reader reader) {
+		InputStream is = new ReaderInputStream(reader, UTF_8);
+		return is;
 	}
 
 	public static InputStreamReader toReader(InputStream is) {
