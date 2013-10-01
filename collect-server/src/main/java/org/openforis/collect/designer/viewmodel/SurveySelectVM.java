@@ -148,6 +148,7 @@ public class SurveySelectVM extends BaseVM {
 		} else {
 			surveyManager.deleteSurvey(selectedSurvey.getId());
 		}
+		loadSurveySummaries();
 		notifyChange("surveySummaries");
 	}
 
@@ -208,6 +209,7 @@ public class SurveySelectVM extends BaseVM {
 		closePopUp(surveyImportPopUp);
 		surveyImportPopUp = null;
 		if ( successfullyImported != null && successfullyImported.booleanValue()) {
+			loadSurveySummaries();
 			notifyChange("surveySummaries");
 		}
 	}
