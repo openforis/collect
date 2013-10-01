@@ -146,7 +146,7 @@ public class SurveyImportVM extends SurveyBaseVM {
  		Media media = event.getMedia();
 		String contentType = media.getContentType();
 		
-		if ( contentType.equals(TEXT_XML_CONTENT) ) {
+		if ( TEXT_XML_CONTENT.equals(contentType) ) {
 			File tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData());
 			prepareSurveyImport(tempFile, media.getName(), true);
 		} else {
@@ -156,7 +156,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	protected void prepareSurveyImport(final File file, final String name, boolean validate) {
 		try {
-			CollectSurvey survey = surveyManager.unmarshalSurvey(new FileInputStream(file), validate, true);
+			CollectSurvey survey = surveyManager.unmarshalSurvey(new FileInputStream(file), validate, false);
 			uploadedSurveyUri = survey.getUri();
 			uploadedFile = file;
 			updateForm(name);
