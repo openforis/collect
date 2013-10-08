@@ -40,6 +40,8 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 	private CollectSurvey survey;
 	private int[] stepNumbers;
 	private String rootEntityName;
+
+	private boolean includeIdm;
 	
 	public BackupProcess(SurveyManager surveyManager, RecordManager recordManager, DataMarshaller dataMarshaller, File directory,
 			CollectSurvey survey, String rootEntityName, int[] stepNumbers) {
@@ -51,6 +53,7 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
 		this.stepNumbers = stepNumbers;
+		this.includeIdm = true;
 	}
 
 	@Override
@@ -85,7 +88,9 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 	private void backup(ZipOutputStream zipOutputStream, List<CollectRecord> recordSummaries) {
 		int total = calculateTotal(recordSummaries);
 		status.setTotal(total);
-		includeIdml(zipOutputStream);
+		if ( includeIdm ) {
+			includeIdml(zipOutputStream);
+		}
 		for (CollectRecord summary : recordSummaries) {
 			if ( status.isRunning() ) {
 				int recordStepNumber = summary.getStep().getStepNumber();
@@ -163,4 +168,12 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		return stepNumber + "/" + record.getId() + ".xml";
 	}
 
+	public boolean isIncludeIdm() {
+		return includeIdm;
+	}
+
+	public void setIncludeIdm(boolean includeIdm) {
+		this.includeIdm = includeIdm;
+	}
+	
 }

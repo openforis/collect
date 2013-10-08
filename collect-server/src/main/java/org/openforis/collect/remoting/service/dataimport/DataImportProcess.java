@@ -136,20 +136,9 @@ public class DataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.RUNNING);
 			summary = null;
 			packagedSurvey = extractPackagedSurvey();
-			CollectSurvey oldSurvey = getOldSurvey();
-			String packagedSurveyUri = packagedSurvey.getUri();
-			if ( selectedSurveyUri != null && !selectedSurveyUri.equals(packagedSurveyUri) ) {
-				throw new IllegalArgumentException("Cannot import data related to survey '" + packagedSurveyUri + 
-						"' into on a different survey (" + selectedSurveyUri + ")");
-			}
-			if ( oldSurvey != null ) {
-				List<SurveyValidationResult> compatibilityResult = surveyValidator.validateCompatibility(oldSurvey, packagedSurvey);
-				if ( ! compatibilityResult.isEmpty() ) {
-					throw new DataImportExeption("Packaged survey is not compatible with the survey already present into the system.\n" +
-							"Please try to import it using the Designer to get the list of errors.");
-				}
-			}
-			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, oldSurvey);
+			validatePackagedSurvey();
+			CollectSurvey existingSurvey = getExistingSurvey();
+			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
 			
 			Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
 			for (Step step : Step.values()) {
@@ -174,7 +163,7 @@ public class DataImportProcess implements Callable<Void> {
 				}
 			}
 			if ( state.getSubStep() == SubStep.RUNNING ) {
-				String oldSurveyName = oldSurvey == null ? null: oldSurvey.getName();
+				String oldSurveyName = existingSurvey == null ? null: existingSurvey.getName();
 				summary = createSummary(packagedSkippedFileErrors, oldSurveyName,
 						totalPerStep, packagedRecords, packagedStepsPerRecord,
 						conflictingPackagedRecords, warnings);
@@ -195,10 +184,34 @@ public class DataImportProcess implements Callable<Void> {
 		}
 	}
 
-	protected CollectSurvey getOldSurvey() {
+	private void validatePackagedSurvey() throws DataImportExeption {
+		CollectSurvey existingSurvey = getExistingSurvey();
+		if ( packagedSurvey == null && existingSurvey == null ) {
+			throw new IllegalStateException("Published survey not found and " + IDML_FILE_NAME + " not found in packaged file");
+		} else if ( packagedSurvey == null ) {
+			packagedSurvey = existingSurvey;
+		} else {
+			String packagedSurveyUri = packagedSurvey.getUri();
+			if ( selectedSurveyUri != null && !selectedSurveyUri.equals(packagedSurveyUri) ) {
+				throw new IllegalArgumentException("Cannot import data related to survey '" + packagedSurveyUri + 
+						"' into on a different survey (" + selectedSurveyUri + ")");
+			}
+			List<SurveyValidationResult> compatibilityResult = surveyValidator.validateCompatibility(existingSurvey, packagedSurvey);
+			if ( ! compatibilityResult.isEmpty() ) {
+				throw new DataImportExeption("Packaged survey is not compatible with the survey already present into the system.\n" +
+						"Please try to import it using the Designer to get the list of errors.");
+			}
+		}
+	}
+
+	protected CollectSurvey getExistingSurvey() {
 		String uri;
 		if ( selectedSurveyUri == null ) {
-			uri = packagedSurvey.getUri();
+			if ( packagedSurvey == null ) {
+				throw new IllegalStateException("Survey uri not specified and packaged survey not found");
+			} else {
+				uri = packagedSurvey.getUri();
+			}
 		} else {
 			uri = selectedSurveyUri;
 		}
@@ -319,7 +332,7 @@ public class DataImportProcess implements Callable<Void> {
 			processedRecords = new ArrayList<Integer>();
 			state.setTotal(entryIdsToImport.size());
 			state.resetCount();
-			CollectSurvey oldSurvey = getOldSurvey();
+			CollectSurvey oldSurvey = getExistingSurvey();
 			if ( oldSurvey == null ) {
 				packagedSurvey.setName(newSurveyName);
 				surveyManager.importModel(packagedSurvey);
@@ -464,9 +477,6 @@ public class DataImportProcess implements Callable<Void> {
 				zipFile.close();
 			}
 		}
-		if ( survey == null ) {
-			throw new DataImportExeption(IDML_FILE_NAME + " not found in packaged file.");
-		}
 		return survey;
 	}
 
@@ -522,9 +532,9 @@ public class DataImportProcess implements Callable<Void> {
 		toRecord.setStep(fromRecord.getStep());
 		toRecord.setState(fromRecord.getState());
 		toRecord.setRootEntity(fromRecord.getRootEntity());
-		recordManager.validate(toRecord);
 		toRecord.updateRootEntityKeyValues();
 		toRecord.updateEntityCounts();
+		recordManager.validate(toRecord);
 	}
 
 	protected CollectRecord createRecordSummary(CollectRecord record) {

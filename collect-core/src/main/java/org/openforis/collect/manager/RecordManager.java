@@ -533,7 +533,7 @@ public class RecordManager {
 	 * @return 
 	 */
 	public void validate(final CollectRecord record) {
-		record.resetErrorCountInfo();
+		record.resetValidationInfo();
 		Entity rootEntity = record.getRootEntity();
 		addEmptyNodes(rootEntity);
 		rootEntity.traverse(new NodeVisitor() {
@@ -558,7 +558,7 @@ public class RecordManager {
 			}
 		});
 	}
-	
+
 	/**
 	 * Deletes a node from the record.
 	 * 

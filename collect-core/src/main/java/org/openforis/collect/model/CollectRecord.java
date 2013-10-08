@@ -17,6 +17,7 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextAttribute;
@@ -127,20 +128,37 @@ public class CollectRecord extends Record {
 	public CollectRecord(CollectSurvey survey, String versionName) {
 		super(survey, versionName);
 		this.step = Step.ENTRY;
-		this.validationCache = new RecordValidationCache(this);
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
-		resetErrorCountInfo();
+		this.validationCache = new RecordValidationCache(this);
 	}
 
-	public void resetErrorCountInfo() {
+	public void resetValidationInfo() {
 		skipped = null;
 		missing = null;
 		missingErrors = null;
 		missingWarnings = null;
 		errors = null;
 		warnings = null;
+		this.validationCache = new RecordValidationCache(this);
+		Entity rootEntity = getRootEntity();
+		if ( rootEntity != null ) {
+			rootEntity.traverse( new NodeVisitor() {
+				@Override
+				public void visit(Node<? extends NodeDefinition> node, int idx) {
+					if ( node instanceof Attribute ) {
+						((Attribute<?, ?>) node).clearValidationResults();
+					}
+				} 
+			});
+		}
+	}
+	
+	@Override
+	public void setRootEntity(Entity entity) {
+		super.setRootEntity(entity);
+		resetValidationInfo();
 	}
 
 	public Step getStep() {
