@@ -36,6 +36,7 @@ import org.openforis.idm.model.Date;
 import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
+import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.RealValue;
 import org.openforis.idm.model.TextAttribute;
@@ -309,7 +310,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	@Test
-	public void missingParentEntityTest() throws Exception {
+	public void createMissingParentEntityTest() throws Exception {
 		{
 			CollectRecord record = createTestRecord(survey, "10_111");
 			recordDao.insert(record);
@@ -323,14 +324,21 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		EntityDefinition treeDefn = (EntityDefinition) plotDefn.getChildDefinition("tree");
 		CSVDataImportProcess process = importCSVFile(MISSING_PARENT_ENTITY_TEST_CSV, treeDefn.getId());
 		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
-		assertTrue(status.isError());
-		assertEquals(1, status.getRowsInError().size());
+		assertTrue(status.isComplete());
+		assertEquals(0, status.getRowsInError().size());
 		assertEquals(4, status.getProcessed());
 		{
-			ParsingError error = status.getErrors().get(0);
-			assertEquals(ErrorType.INVALID_VALUE, error.getErrorType());
-			assertEquals(3, error.getRow());
-			assertTrue(Arrays.equals(new String[]{"tree_no", "stem_no"}, error.getColumns()));
+			CollectRecord reloadedRecord = loadRecord("10_111");
+			Entity cluster = reloadedRecord.getRootEntity();
+			Entity plot = (Entity) cluster.get("plot", 0);
+			assertEquals(3, plot.getCount("tree"));
+			Entity tree = (Entity) plot.get("tree", 2);
+			IntegerAttribute treeNo = (IntegerAttribute) tree.getChild("tree_no");
+			assertEquals(Integer.valueOf(2), treeNo.getValue().getValue());
+			IntegerAttribute stemNo = (IntegerAttribute) tree.getChild("stem_no");
+			assertEquals(Integer.valueOf(2), stemNo.getValue().getValue());
+			RealAttribute dbh = (RealAttribute) tree.getChild("dbh");
+			assertEquals(Double.valueOf(200), dbh.getValue().getValue());
 		}
 	}
 	
