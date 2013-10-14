@@ -31,7 +31,15 @@
 			<directory>${basedir}/src/main/assembly/resources/tomcat/data</directory>
 			<outputDirectory>${output.directory}/tomcat/data</outputDirectory>
 		</fileSet>
-	</fileSets>
+		<!-- Include startup/shutdown batch files -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/resources</directory>
+			<outputDirectory>${output.directory}</outputDirectory>
+			<includes>
+				<include>*</include>
+			</includes>
+		</fileSet>
+			</fileSets>
 	<dependencySets>
 		<dependencySet>
 			<!-- Add SQLite, PostgreSQL and connection pool dependencies for server installations -->
