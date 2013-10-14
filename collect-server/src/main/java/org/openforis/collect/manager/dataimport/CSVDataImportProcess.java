@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,7 @@ import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
@@ -69,7 +71,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static final String CSV = "csv";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "csvDataImport.error.internalErrorImportingFile";
 	private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";
-	private static final String NO_PARENT_ENTITY_FOUND_MESSAGE_KEY = "csvDataImport.error.noParentEntityFound";
 	private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
 	private static final String MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY = "csvDataImport.error.multipleParentEntityFound";
 	private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.unitNotFound";
@@ -399,13 +400,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			Entity childEntity;
 			if ( ancestorDefn.isMultiple() ) {
 				List<Entity> childEntities = findChildEntities(currentParent, ancestorName, identifier);
-				if ( childEntities.isEmpty() ) {
-					status.addParsingError(createParentEntitySearchError(record,
-							line, identifier, NO_PARENT_ENTITY_FOUND_MESSAGE_KEY));
-					return null;
-				} else if ( childEntities.size() == 1 ) {
+				switch ( childEntities.size() ) {
+				case 0:
+					childEntity = createChildEntity(currentParent, ancestorName, identifier, line.getColumnNamesByField(), line.getLineNumber());
+					break;
+				case 1:
 					childEntity = childEntities.get(0);
-				} else {
+					break;
+				default:
 					status.addParsingError(createParentEntitySearchError(record,
 							line, identifier, MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY));
 					return null;
@@ -446,6 +448,28 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			return currentParent.findChildEntitiesByKeys(childName, keys);
 		}
 	}
+	
+	private Entity createChildEntity(Entity currentParent, String childName,
+			EntityIdentifier<?> identifier,
+			Map<FieldValueKey, String> colNamesByField, long row) {
+		if ( identifier instanceof EntityPositionIdentifier ) {
+			int position = ((EntityPositionIdentifier) identifier).getPosition();
+			if ( position == currentParent.getCount(childName) + 1 ) {
+				Entity entity = EntityBuilder.addEntity(currentParent, childName);
+				return entity;
+			} else {
+				throw new IllegalArgumentException(
+						"Trying to create child in a invalid position: "
+								+ currentParent.getPath() + "/" + childName
+								+ "[" + position + "]");
+			}
+		} else {
+			Entity entity = EntityBuilder.addEntity(currentParent, childName);
+			String[] keyValues = ((EntityKeysIdentifier) identifier).getKeyValues();
+			setKeyValues(entity, keyValues, colNamesByField, row);
+			return entity;
+		}
+	}
 
 	private ParsingError createParentEntitySearchError(CollectRecord record, DataLine line, 
 			EntityIdentifier<?> identifier, String messageKey) {
@@ -469,18 +493,18 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		return error;
 	}
 	
-//	private void setKeyValues(Entity entity, String[] values, Map<FieldValueKey, String> colNamesByField, long row) {
-//		//create key attribute values by name
-//		Map<FieldValueKey, String> keyValuesByField = new HashMap<FieldValueKey, String>();
-//		EntityDefinition entityDefn = entity.getDefinition();
-//		List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
-//		for (int i = 0; i < keyDefns.size(); i++) {
-//			AttributeDefinition keyDefn = keyDefns.get(i);
-//			String mainFieldName = keyDefn.getMainFieldName();
-//			keyValuesByField.put(new FieldValueKey(keyDefn.getId(), mainFieldName), values[i]);
-//		}
-//		setValuesInAttributes(entity, keyValuesByField, colNamesByField, row);
-//	}
+	private void setKeyValues(Entity entity, String[] values, Map<FieldValueKey, String> colNamesByField, long row) {
+		//create key attribute values by name
+		Map<FieldValueKey, String> keyValuesByField = new HashMap<FieldValueKey, String>();
+		EntityDefinition entityDefn = entity.getDefinition();
+		List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
+		for (int i = 0; i < keyDefns.size(); i++) {
+			AttributeDefinition keyDefn = keyDefns.get(i);
+			String mainFieldName = keyDefn.getMainFieldName();
+			keyValuesByField.put(new FieldValueKey(keyDefn.getId(), mainFieldName), values[i]);
+		}
+		setValuesInAttributes(entity, keyValuesByField, colNamesByField, row);
+	}
 
 	private void close(DataCSVReader reader) {
 		try {
