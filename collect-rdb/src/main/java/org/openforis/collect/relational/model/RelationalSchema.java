@@ -51,6 +51,15 @@ public final class RelationalSchema {
 		return Collections.unmodifiableList(tableList);
 	}
 	
+	public Table<?> getTable(String name) {
+		Table<?> table = tables.get(name);
+		if ( table == null ) {
+			throw new IllegalArgumentException("Table not found: " + name);
+		} else {
+			return table;
+		}
+	}
+	
 	public List<CodeTable> getCodeListTables() {
 		List<CodeTable> tableList = new ArrayList<CodeTable>(codeListTables.values());
 		return Collections.unmodifiableList(tableList);

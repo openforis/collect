@@ -54,6 +54,16 @@ abstract class AbstractTable<T> implements Table<T>  {
 		columns.put(columnName, column);
 	}
 	
+	@Override
+	public Column<?> getColumn(String name) {
+		Column<?> column = columns.get(name);
+		if ( column == null ) {
+			throw new IllegalArgumentException("Column '" + name + "' not found in table '" + getName() + "'");
+		} else {
+			return column;
+		}
+	}
+	
 	void setPrimaryKeyConstraint(PrimaryKeyConstraint primaryKeyConstraint) {
 		this.primaryKeyConstraint = primaryKeyConstraint;
 	}

@@ -25,6 +25,7 @@ public class RelationalSchemaConfig implements Cloneable {
 	private int floatingPointPrecision;
 	private String defaultCode;
 	private LanguageSpecificTextMap defaultCodeLabels;
+	private boolean uniqueColumnNames;
 	
 	private static final RelationalSchemaConfig DEFAULT;
 	static {
@@ -44,6 +45,7 @@ public class RelationalSchemaConfig implements Cloneable {
 		config.defaultCode = "NA";
 		config.defaultCodeLabels = new LanguageSpecificTextMap();
 		config.defaultCodeLabels.add(new LanguageSpecificText("en", "N/A"));
+		config.uniqueColumnNames = false;
 		DEFAULT = config;
 	}
 	
@@ -180,6 +182,14 @@ public class RelationalSchemaConfig implements Cloneable {
 
 	public void setDefaultCodeLabels(LanguageSpecificTextMap defaultCodeLabels) {
 		this.defaultCodeLabels = defaultCodeLabels;
+	}
+
+	public boolean isUniqueColumnNames() {
+		return uniqueColumnNames;
+	}
+
+	public void setUniqueColumnNames(boolean uniqueColumnNames) {
+		this.uniqueColumnNames = uniqueColumnNames;
 	}
 
 }

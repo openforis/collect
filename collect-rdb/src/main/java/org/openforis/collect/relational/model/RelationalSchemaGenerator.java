@@ -1,14 +1,16 @@
 package org.openforis.collect.relational.model;
 
 import java.sql.Types;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -45,7 +47,10 @@ public class RelationalSchemaGenerator {
 	private static final String DATA_TABLE_PK_FORMAT = "_%s%s";
 	private static final String CODE_TABLE_PK_FORMAT = "%s%s";
 	
-	private RelationalSchemaConfig config; 
+	private RelationalSchemaConfig config;
+	
+	//transient
+	private ColumnNameGenerator columnNameGenerator; 
 	
 	public RelationalSchemaGenerator() {
 		this(RelationalSchemaConfig.createDefault());
@@ -53,6 +58,7 @@ public class RelationalSchemaGenerator {
 	
 	public RelationalSchemaGenerator(RelationalSchemaConfig config) {
 		this.config = config;
+		this.columnNameGenerator = new ColumnNameGenerator(config.isUniqueColumnNames(), config.getOtherColumnSuffix());
 	}
 
 	public RelationalSchema generateSchema(Survey survey, String schemaName) throws CollectRdbException {
@@ -224,7 +230,7 @@ public class RelationalSchemaGenerator {
 
 	protected void addAncestorKeyColumns(DataTable table) throws CollectRdbException {
 		NodeDefinition nodeDefn = table.getNodeDefinition();
-		List<EntityDefinition> ancestors = getAncestorEntities(nodeDefn);
+		List<EntityDefinition> ancestors = nodeDefn.getAncestorEntityDefinitions();
 		for (int levelIdx = 0; levelIdx < ancestors.size(); levelIdx++) {
 			EntityDefinition ancestor = ancestors.get(levelIdx);
 			List<AttributeDefinition> keyAttrDefns = ancestor.getKeyAttributeDefinitions();
@@ -257,18 +263,7 @@ public class RelationalSchemaGenerator {
 		NodeDefinition parentDefn = keyDefn.getParentDefinition();
 		return parentDefn.getName() + "_" + keyDefn.getName();
 	}
-
-	//TODO move to NodeDefinition ??
-	protected List<EntityDefinition> getAncestorEntities(NodeDefinition defn) {
-		List<EntityDefinition> ancestors = new ArrayList<EntityDefinition>();
-		EntityDefinition parentDefn = (EntityDefinition) defn.getParentDefinition();
-		while ( parentDefn != null ) {
-			ancestors.add(0, parentDefn);
-			parentDefn = (EntityDefinition) parentDefn.getParentDefinition();
-		}
-		return ancestors;
-	}
-
+	
 	protected Path createAncestorKeyRelativePath(int depth, FieldDefinition<?> field) {
 		Path result = Path.relative(".");
 		for (int i = 0; i < depth; i++) {
@@ -390,7 +385,7 @@ public class RelationalSchemaGenerator {
 	
 	private void addCodeColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) throws CollectRdbException {
 		relativePath = relativePath.appendElement(defn.getName());
-		String name = getDataColumnName(table, (FieldDefinition<?>) defn);
+		String name = columnNameGenerator.generateName(defn);
 		CodeColumn column = new CodeColumn(name, defn, relativePath,  config.getTextMaxLength(), config.getDefaultCode()); 
 		addColumn(table, column);
 	}
@@ -414,38 +409,6 @@ public class RelationalSchemaGenerator {
 		table.addColumn(column);
 	}
 
-	private String getDataColumnName(DataTable table, AttributeDefinition defn) {		
-		String name = defn.getAnnotation(COLUMN_NAME_QNAME);		
-		if ( name == null ) {
-			String prefix = getDataColumnNamePrefix(table, defn);
-			return prefix + defn.getName();
-		}
-		return name;
-	}
-
-	private String getDataColumnName(DataTable table, FieldDefinition<?> fld) {
-		AttributeDefinition attr = fld.getAttributeDefinition();
-		if ( table.getNodeDefinition() == attr ) {
-			return getAttributeTableColumnName(table, fld);
-		} else {
-			String name = getDataColumnName(table, attr);
-			String suffix = getDataColumnSuffix((FieldDefinition<?>) fld);
-			return name + suffix;
-		}
-	}
-	
-	private String getDataColumnNamePrefix(DataTable table, AttributeDefinition defn) {
-		StringBuilder sb = new StringBuilder();
-		NodeDefinition ptr = defn.getParentDefinition();
-		while ( !ptr.isMultiple() ) {
-			sb.insert(0, '_');
-			sb.insert(0, ptr.getName());
-			
-			ptr = ptr.getParentDefinition();
-		}
-		return sb.toString();
-	}
-
 	private DataColumn createDataColumn(DataTable table, NodeDefinition defn, Path relativePath) {
 		if ( defn instanceof FieldDefinition ) {
 			return createDataColumn(table, (FieldDefinition<?>) defn, relativePath);
@@ -462,7 +425,8 @@ public class RelationalSchemaGenerator {
 		Integer levelIdx = attrDefn.getListLevelIndex();
 		String codeListTableNamePrefix = getCodeListTableNamePrefix(list, levelIdx);
 		String codeListTableName = codeListTableNamePrefix + config.getCodeListTableSuffix();
-		String codeValueColumnName = getDataColumnName(table, attrDefn);
+		DataColumn codeValueColumn = table.getDataColumn(attrDefn.getFieldDefinition(CodeAttributeDefinition.CODE_FIELD));
+		String codeValueColumnName = codeValueColumn.getName();
 		String fkColumnName = codeValueColumnName + config.getCodeListTableSuffix() + config.getIdColumnSuffix();
 		CodeValueFKColumn col = new CodeValueFKColumn(fkColumnName, attrDefn, relativePath,
 				config.getDefaultCode());
@@ -478,7 +442,7 @@ public class RelationalSchemaGenerator {
 	}
 
 	private DataColumn createDataColumn(DataTable table, FieldDefinition<?> defn, Path relativePath) {
-		String name = getDataColumnName(table, (FieldDefinition<?>) defn); 
+		String name = columnNameGenerator.generateName(defn); 
 		int jdbcType;
 		String typeName;
 		Integer length = null;
@@ -521,7 +485,7 @@ public class RelationalSchemaGenerator {
 	}
 
 	private DataColumn createDataColumn(DataTable table, AttributeDefinition defn, Path relativePath) {
-		String name = getDataColumnName(table, defn);;
+		String name = columnNameGenerator.generateName(defn);
 		int jdbcType;
 		String typeName;
 		Integer length = null;
@@ -540,41 +504,81 @@ public class RelationalSchemaGenerator {
 		return new DataColumn(name, jdbcType, typeName, defn, relativePath, length, nullable);
 	}
 
-	/**
-	 * 
-	 * @param defn
-	 * @return the suffix to append to a column name in an entity tables
-	 */
-	private String getDataColumnSuffix(FieldDefinition<?> defn) {
-		String fld = defn.getName();
-		if ( fld.equals(CodeAttributeDefinition.CODE_FIELD) || 
-				fld.equals(NumberAttributeDefinition.VALUE_FIELD) ) {
-			return "";
-		}  else if ( fld.equals("qualifier") ) {
-			return config.getOtherColumnSuffix();
-		} else {
-			return "_" + fld;
-		}
-	}
-	
-	/**
-	 * @param defn
-	 * @param table 
-	 * @return the column name of a field when in a multiple attribute table
-	 */
-	private String getAttributeTableColumnName(DataTable table, FieldDefinition<?> defn) {
-		String fld = defn.getName();
-		if ( fld.equals(NumberAttributeDefinition.VALUE_FIELD) ) {
-			return getDataColumnName(table, defn.getAttributeDefinition());
-		} else if ( fld.equals(CodeAttributeDefinition.QUALIFIER_FIELD) ) {
-			return config.getOtherColumnSuffix();
-		} else {
-			return fld;
-		}
-	}
-	
 	public void setConfig(RelationalSchemaConfig config) {
 		this.config = config;
+	}
+	
+	class ColumnNameGenerator {
+		
+		private boolean uniqueNames;
+		private String otherColumnSuffix;
+		private Set<String> uniqueColumnNames;
+		
+		public ColumnNameGenerator(boolean uniqueNames, String otherColumnSuffix) {
+			this.uniqueNames = uniqueNames;
+			this.otherColumnSuffix = otherColumnSuffix;
+			this.uniqueColumnNames = new HashSet<String>();
+		}
+
+		public String generateName(NodeDefinition node) {
+			AttributeDefinition attr = (node instanceof AttributeDefinition ? (AttributeDefinition) node: 
+				((FieldDefinition<?>) node).getAttributeDefinition());
+			String baseName = attr.getAnnotation(COLUMN_NAME_QNAME);		
+			if ( baseName == null ) {
+				baseName = attr.getName();
+			}
+			String completeName = getCompleteName(node, baseName);
+			if ( uniqueNames ) {
+				//if the name is not unique, prepend ancestor names
+				if ( uniqueColumnNames.contains(completeName) ) {
+					EntityDefinition parent = attr.getParentEntityDefinition();
+					while ( parent != null &&  uniqueColumnNames.contains(completeName) ) {
+						baseName = parent.getName() + "_" + baseName;
+						completeName = getCompleteName(node, baseName);
+						parent = parent.getParentEntityDefinition();
+					}
+				}
+				//if the name is still not unique, append a number to the name
+				if ( uniqueColumnNames.contains(completeName) ) {
+					String tempBaseName = baseName;
+					completeName = getCompleteName(node, tempBaseName);
+					int count = 1;
+					while ( uniqueColumnNames.contains(completeName) ) {
+						baseName = tempBaseName + (count++);
+						completeName = getCompleteName(node, baseName);
+					}
+				}
+				uniqueColumnNames.add(completeName);
+			}
+			return completeName; 
+		}
+
+		private String getCompleteName(NodeDefinition node, String baseName) {
+			String suffix = node instanceof FieldDefinition ? getFieldNameSuffix((FieldDefinition<?>) node): "";
+			return baseName + suffix;
+		}
+		
+		/**
+		 * 
+		 * @param defn
+		 * @return the suffix to append to a column name in multiple entity tables
+		 */
+		public String getFieldNameSuffix(FieldDefinition<?> defn) {
+			String fldName = defn.getName();
+			AttributeDefinition attrDefn = defn.getAttributeDefinition();
+			if ( attrDefn instanceof BooleanAttributeDefinition ||
+				attrDefn instanceof TextAttributeDefinition ||
+				attrDefn instanceof CodeAttributeDefinition && fldName.equals(CodeAttributeDefinition.CODE_FIELD) || 
+				attrDefn instanceof NumberAttributeDefinition && fldName.equals(NumberAttributeDefinition.VALUE_FIELD)
+				) {
+				return "";
+			}  else if ( attrDefn instanceof CodeAttributeDefinition && fldName.equals(CodeAttributeDefinition.QUALIFIER_FIELD) ) {
+				return otherColumnSuffix;
+			} else {
+				return "_" + fldName;
+			}
+		}
+
 	}
 }
 

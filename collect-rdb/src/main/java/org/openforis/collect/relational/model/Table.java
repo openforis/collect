@@ -16,6 +16,8 @@ public interface Table<T> {
 	String getName();
 	
 	List<Column<?>> getColumns();
+	
+	Column<?> getColumn(String name);
 
 	PrimaryKeyConstraint getPrimaryKeyConstraint();
 //	List<UniquenessConstraint> getUniquenessConstraints();
