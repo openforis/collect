@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -196,9 +197,13 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		}
 		//validate labels
 		List<LanguageSpecificText> labels = line.getLabelItems(levelIdx);
-		for (LanguageSpecificText label : labels) {
-			if ( hasDifferentLabel(code, label, parent)) {
-				addDifferentLabelError(line, levelIdx, label.getLanguage());
+		if ( CollectionUtils.isEmpty(labels) ) {
+			addMissingDefaultLanguageLabelError(line, levelIdx);
+		} else {
+			for (LanguageSpecificText label : labels) {
+				if ( hasDifferentLabel(code, label, parent)) {
+					addDifferentLabelError(line, levelIdx, label.getLanguage());
+				}
 			}
 		}
 		result = getChildItem(parent, code);
@@ -282,6 +287,14 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		status.addParsingError(lineNumber, error);
 	}
 
+	protected void addMissingDefaultLanguageLabelError(CodeListLine line, int levelIdx) {
+		String level = levels.get(levelIdx);
+		String column = level + CodeListCSVReader.LABEL_COLUMN_SUFFIX;
+		long lineNumber = line.getLineNumber();
+		ParsingError error = new ParsingError(ErrorType.EMPTY, lineNumber, column);
+		status.addParsingError(lineNumber, error);
+	}
+	
 	protected CodeListItem getCodeListItemInDescendants(String code) {
 		Stack<CodeListItem> stack = new Stack<CodeListItem>();
 		stack.addAll(codeToRootItem.values());

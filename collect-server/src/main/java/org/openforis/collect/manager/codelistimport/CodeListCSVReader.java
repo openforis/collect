@@ -114,12 +114,13 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 
 		private void addLabels(CodeListLine line, List<String> languages,
 				String level, int levelIdx) throws ParsingException {
-			String defaultLangLabelColName = level;
-			String label = getColumnValue(defaultLangLabelColName, false, String.class);
-			if ( label != null ) {
+			//add default language label
+			String defaultLangLabel = getLevelDefaultLanguageLabel(level);
+			if ( defaultLangLabel != null ) {
 				String defaultLang = ((CodeListCSVReader) reader).getDefaultLanguage();
-				line.addLabel(levelIdx, defaultLang, label);
+				line.addLabel(levelIdx, defaultLang, defaultLangLabel);
 			}
+			//add labels per each language
 			for (String lang : languages) {
 				String labelColumnName = level + LABEL_COLUMN_SUFFIX + "_" + lang;
 				String l = getColumnValue(labelColumnName, false, String.class);
@@ -129,6 +130,19 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 			}
 		}
 
+		private String getLevelDefaultLanguageLabel(String level)
+				throws ParsingException {
+			String defaultLangLabel = null;
+			String[] defaultLangLabelColNames = {level, level + LABEL_COLUMN_SUFFIX};
+			for (String defaultLangLabelColName : defaultLangLabelColNames) {
+				String label = getColumnValue(defaultLangLabelColName, false, String.class);
+				if ( label != null ) {
+					defaultLangLabel = label;
+				}
+			}
+			return defaultLangLabel;
+		}
+		
 	}
 	
 	class Validator {
