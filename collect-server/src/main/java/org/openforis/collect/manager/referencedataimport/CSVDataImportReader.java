@@ -21,16 +21,14 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 	public CSVDataImportReader(String filename) throws IOException, ParsingException {
 		super();
 		csvReader = new CsvReader(filename);
-		init();
 	}
 
 	public CSVDataImportReader(Reader reader) throws IOException, ParsingException {
 		super();
 		csvReader = new CsvReader(reader);
-		init();
 	}
 	
-	protected void init() throws IOException, ParsingException {
+	public void init() throws IOException, ParsingException {
 		csvReader.readHeaders();
 		validateAllFile();
 	}

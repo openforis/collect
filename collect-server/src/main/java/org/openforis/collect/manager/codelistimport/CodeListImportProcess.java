@@ -141,6 +141,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			List<String> languages = survey.getLanguages();
 			String defaultLanguage = survey.getDefaultLanguage();
 			reader = new CodeListCSVReader(isReader, languages, defaultLanguage);
+			reader.init();
 			levels = reader.getLevels();
 			adjustCodeScope();
 			status.addProcessedRow(1);
@@ -176,14 +177,20 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.toString()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				LOG.error("Error closing reader", e);
-			}
+			closeReader();
 		}
 	}
 
+	private void closeReader() {
+		try {
+			if ( reader != null ) {
+				reader.close();
+			}
+		} catch (IOException e) {
+			LOG.error("Error closing reader", e);
+		}
+	}
+	
 	protected CodeListItem processLevel(CodeListItem parent, CodeListLine line, int levelIdx, boolean lastLevel) {
 		CodeListItem result;
 		//validate code

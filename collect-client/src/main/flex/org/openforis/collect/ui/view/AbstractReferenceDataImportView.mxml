@@ -11,7 +11,6 @@
 			import org.openforis.collect.manager.referencedataimport.ParsingError$ErrorType;
 			import org.openforis.collect.manager.referencedataimport.proxy.ParsingErrorProxy;
 			import org.openforis.collect.ui.component.datagrid.PaginationBar;
-			import org.openforis.collect.util.ArrayUtil;
 			import org.openforis.collect.util.StringUtil;
 			
 			import spark.components.Button;
@@ -71,25 +70,28 @@
 			}
 			
 			public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
-				var messageKey:String;
+				var messageKey:String = getErrorMessageKey(item);
 				var messageArgs:Array = item.messageArgs;
 				if ( StringUtil.isBlank(item.message) ) {
 					switch (item.errorType) {
-						case ParsingError$ErrorType.WRONG_COLUMN_NAME:
-							messageKey = "referenceDataImport.parsingError.type.wrong_column_name.message";
-							break;
 						case ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS:
-							messageKey = "referenceDataImport.parsingError.type.missing_required_columns.message";
 							messageArgs = [StringUtil.concat(", ", item.messageArgs)];
 							break;
-						default:
-							messageKey = item.message;
 					}
-				} else {
-					messageKey = item.message;
 				}
 				var message:String = Message.get(messageKey, messageArgs);
 				return message;
+			}
+			
+			protected function getErrorMessageKey(item:ParsingErrorProxy):String {
+				switch (item.errorType) {
+					case ParsingError$ErrorType.WRONG_COLUMN_NAME:
+						return "referenceDataImport.parsingError.type.wrong_column_name.message";
+					case ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS:
+						return "referenceDataImport.parsingError.type.missing_required_columns.message";
+					default:
+						return item.message;
+				}
 			}
 			
 			public function get surveyId():int {

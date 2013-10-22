@@ -25,7 +25,6 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ParsingException;
-import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.TaxonTree;
 import org.openforis.collect.model.TaxonTree.Node;
 import org.openforis.idm.model.species.Taxon;
@@ -154,6 +153,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			isReader = new InputStreamReader(is);
 			
 			reader = new SpeciesCSVReader(isReader);
+			reader.init();
 			status.addProcessedRow(1);
 			currentRowNumber = 2;
 			while ( status.isRunning() ) {

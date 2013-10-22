@@ -27,6 +27,9 @@ package org.openforis.collect.presenter
 		public function get ERROR():String {
 			return "referenceDataImport.error";
 		}
+		public function get ERROR_MISSING_REQUIRED_COLUMNS():String {
+			return "referenceDataImport.parsingError.type.missing_required_columns.message";
+		}
 		public function get UPLOADING_FILE_ERROR():String {
 			return "referenceDataImport.file.error";
 		}

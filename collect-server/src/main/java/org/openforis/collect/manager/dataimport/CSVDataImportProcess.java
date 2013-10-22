@@ -146,6 +146,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			isReader = OpenForisIOUtils.toReader(is);
 			EntityDefinition parentEntityDefn = getParentEntityDefinition();
 			reader = new DataCSVReader(isReader, parentEntityDefn);
+			reader.init();
 			status.addProcessedRow(1);
 			currentRowNumber = 1;
 			while ( status.isRunning() ) {

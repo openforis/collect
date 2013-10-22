@@ -4,7 +4,7 @@
 <zk>
 	<window id="codeListsManagerPopUp" title="${labels.survey.code_list.manager.title}" 
 		width="800px" 
-		height="590px"
+		height="620px"
 		border="normal"
 		position="center" 
 		closable="false">

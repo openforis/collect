@@ -43,15 +43,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	public DataCSVReader(Reader reader, EntityDefinition parentEntityDefinition) throws IOException, ParsingException {
 		super(reader);
 		this.parentEntityDefinition = parentEntityDefinition;
-		validateAllFile();
 	}
 	
-	@Override
-	protected void init() throws IOException, ParsingException {
-		csvReader.readHeaders();
-		//postpone file validation
-	}
-
 	@Override
 	protected DataCSVLineParser createLineParserInstance() {
 		DataCSVLineParser lineParser = new DataCSVLineParser(this);
