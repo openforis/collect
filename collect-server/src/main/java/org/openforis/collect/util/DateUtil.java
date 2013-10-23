@@ -16,10 +16,21 @@ import org.apache.commons.lang3.StringUtils;
 public class DateUtil {
 
 	private static final String XML_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+	private static final String XML_DATE_FORMAT = "yyyy-MM-dd";
 
 	public static Date parseXMLDateTime(String dateTime) {
 		if ( StringUtils.isNotBlank(dateTime) ) {
 			Calendar cal = DatatypeConverter.parseDateTime(dateTime);
+			Date result = cal.getTime();
+			return result;
+		} else {
+			return null;
+		}
+	}
+	
+	public static Date parseXMLDate(String date) {
+		if ( StringUtils.isNotBlank(date) ) {
+			Calendar cal = DatatypeConverter.parseDate(date);
 			Date result = cal.getTime();
 			return result;
 		} else {
@@ -51,7 +62,11 @@ public class DateUtil {
 	}
 	
 	public static String formatDateToXML(Date dateTime) {
-		return formatDate(dateTime, XML_DATE_TIME_FORMAT);
+		return formatDate(dateTime, XML_DATE_FORMAT);
 	}
 	
+	public static String formatDateTimeToXML(Date dateTime) {
+		return formatDate(dateTime, XML_DATE_TIME_FORMAT);
+	}
+
 }
