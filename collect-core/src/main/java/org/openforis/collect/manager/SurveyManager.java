@@ -78,15 +78,13 @@ public class SurveyManager {
 	private Map<String, CollectSurvey> surveysByUri;
 	
 	private Map<Integer, ProcessStatus> recordValidationStatusBySurvey;
-	//private Map<Integer, RecordValidationProcess> recordValidationProcessesBySurvey;
 	
 	public SurveyManager() {
 		surveys = new ArrayList<CollectSurvey>();
 		surveysById = new HashMap<Integer, CollectSurvey>();
 		surveysByName = new HashMap<String, CollectSurvey>();
 		surveysByUri = new HashMap<String, CollectSurvey>();
-		recordValidationStatusBySurvey = new HashMap<Integer, ProcessStatus>();
-//		recordValidationProcessesBySurvey = new HashMap<Integer, RecordValidationProcess>();
+		recordValidationStatusBySurvey = Collections.synchronizedMap(new HashMap<Integer, ProcessStatus>());
 	}
 
 	@Transactional
@@ -595,11 +593,10 @@ public class SurveyManager {
 			process.setUser(user);
 			UUID sessionId = UUID.randomUUID();
 			process.setSessionId(sessionId.toString());
-//			recordValidationProcessesBySurvey.put(survey.getId(), process);
 			try {
 				process.init();
 				recordValidationStatusBySurvey.put(survey.getId(), process.getStatus());
-				ExecutorServiceUtil.execute(process);
+				ExecutorServiceUtil.executeInCachedPool(process);
 			} catch (Exception e) {
 				LOG.error("Error validating survey records", e);
 			}
