@@ -43,6 +43,7 @@ package org.openforis.collect.presenter {
 			_checkRecordsLockTimer = new Timer(CHECK_RECORDS_LOCK_FREQUENCY)
 			_checkRecordsLockTimer.addEventListener(TimerEvent.TIMER, checkRecordsLockTimeoutHandler);
 			_checkRecordsLockTimer.start();
+			
 			/*
 			wait for surveys and sessionState loading, then dispatch APPLICATION_INITIALIZED event
 			if more than one survey is found, then whow surveySelection view

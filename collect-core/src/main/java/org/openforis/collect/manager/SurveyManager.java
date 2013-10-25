@@ -77,14 +77,16 @@ public class SurveyManager {
 	private Map<String, CollectSurvey> surveysByName;
 	private Map<String, CollectSurvey> surveysByUri;
 	
-	private Map<Integer, RecordValidationProcess> recordValidationProcessesBySurvey;
+	private Map<Integer, ProcessStatus> recordValidationStatusBySurvey;
+	//private Map<Integer, RecordValidationProcess> recordValidationProcessesBySurvey;
 	
 	public SurveyManager() {
 		surveys = new ArrayList<CollectSurvey>();
 		surveysById = new HashMap<Integer, CollectSurvey>();
 		surveysByName = new HashMap<String, CollectSurvey>();
 		surveysByUri = new HashMap<String, CollectSurvey>();
-		recordValidationProcessesBySurvey = new HashMap<Integer, RecordValidationProcess>();
+		recordValidationStatusBySurvey = new HashMap<Integer, ProcessStatus>();
+//		recordValidationProcessesBySurvey = new HashMap<Integer, RecordValidationProcess>();
 	}
 
 	@Transactional
@@ -573,9 +575,9 @@ public class SurveyManager {
 	}
 	
 	public void cancelRecordValidation(int surveyId) {
-		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
-		if ( process != null && process.getStatus().isRunning() ) {
-			process.cancel();
+		ProcessStatus status = getRecordValidationProcessStatus(surveyId);
+		if ( status != null ) {
+			status.cancel();
 		}
 	}
 
@@ -584,18 +586,19 @@ public class SurveyManager {
 		if ( survey == null ) {
 			throw new IllegalStateException("Published survey not found, id="+surveyId);
 		}
-		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
-		if ( process != null && process.getStatus().isRunning() ) {
+		ProcessStatus status = getRecordValidationProcessStatus(surveyId);
+		if ( status != null && status.isRunning() ) {
 			throw new IllegalStateException("Record validation process already started");
 		} else {
-			process = applicationContext.getBean(RecordValidationProcess.class);
+			RecordValidationProcess process = applicationContext.getBean(RecordValidationProcess.class);
 			process.setSurvey(survey);
 			process.setUser(user);
 			UUID sessionId = UUID.randomUUID();
 			process.setSessionId(sessionId.toString());
-			recordValidationProcessesBySurvey.put(survey.getId(), process);
+//			recordValidationProcessesBySurvey.put(survey.getId(), process);
 			try {
 				process.init();
+				recordValidationStatusBySurvey.put(survey.getId(), process.getStatus());
 				ExecutorServiceUtil.execute(process);
 			} catch (Exception e) {
 				LOG.error("Error validating survey records", e);
@@ -628,8 +631,8 @@ public class SurveyManager {
 	}
 
 	protected ProcessStatus getRecordValidationProcessStatus(int surveyId) {
-		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
-		return process == null ? null: process.getStatus();
+		ProcessStatus status = recordValidationStatusBySurvey.get(surveyId);
+		return status;
 	}
 	
 	public boolean isRecordValidationInProgress(int surveyId) {

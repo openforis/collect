@@ -7,53 +7,62 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.utils.ObjectUtil;
+			
+			import org.openforis.collect.util.AlertUtil;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-						
-			private var _forms:Array = new Array();
+			import org.openforis.collect.metamodel.proxy.SurveyProxy;
+
+			private var _forms:Dictionary = new Dictionary();
 			
 			/**
 			 * Return true if the form for teh specified version / entity definition has been generated
 			 * */
-			public function contatinsForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):Boolean {
-				var form:FormContainer = getForm(version, entity);
-				var containsForm:Boolean = form != null;
-				return containsForm;
+			public function containsForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):Boolean {
+				var form:FormContainer = getForm(entity, version);
+				var result:Boolean = form != null;
+				AlertUtil.showMessage("contains: "+result);
+				return result;
 			}
 			
 			/**
 			 * Add the form to the stack
 			 * */
-			public function addForm(form:FormContainer, version:ModelVersionProxy, entity:EntityDefinitionProxy):void {
-				var name:String = getFormName(version,entity);
-				_forms[name] = form; 
+			public function addForm(form:FormContainer, entity:EntityDefinitionProxy, version:ModelVersionProxy):void {
+				var key:FormContainerKey = getFormKey(entity, version);
+				_forms[key] = form; 
 				this.addElement(form);
 			}
 			
 			/**
 			 * Return the form for the given version and entity definition, null if it has not been created yet. 
 			 * */
-			public function getForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainer{
-				var name:String = getFormName(version,entity);
-				var form:FormContainer = _forms[name] as FormContainer;
-				return form;
+			public function getForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer{
+				var key:FormContainerKey = getFormKey(entity, version);
+				for each(var formKey:FormContainerKey in _forms) {
+					if ( ObjectUtil.compare(key, formKey) == 0) {
+						var form:FormContainer = _forms[key] as FormContainer;
+						return form;
+					}
+				}
+				return null;
 			}
 			
 			/**
 			 * Show the the form for the given version and entity definition
 			 * */
-			public function setActiveForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainer {
-				var form:FormContainer = getForm(version, entity);
+			public function setActiveForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
+				var form:FormContainer = getForm(entity, version);
 				this.selectedChild = form;
 				return form;
 			}
 			
-			private function getFormName(version:ModelVersionProxy, entity:EntityDefinitionProxy):String {
-				var name:String = entity.name;
-				if ( version != null ) {
-					name += "_" + version.name;
-				}
-				return name;
+			private function getFormKey(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainerKey {
+				var survey:SurveyProxy = entity.survey;
+				var versionId:int = version == null ? 0: version.id;
+				var key:FormContainerKey = new FormContainerKey(survey.id, entity.id, versionId);
+				return key;
 			}
 			
 		]]>

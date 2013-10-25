@@ -9,7 +9,6 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.IList;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
@@ -57,7 +56,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
-			
+	
 			_view.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDownHandler);
 		}
 		
@@ -101,17 +100,17 @@ package org.openforis.collect.presenter {
 			
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			var form:FormContainer = null;
-			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
+			if (_view.formsContainer.containsForm(rootEntityDefn, version)){
 				_view.currentState = Application.extendedDetailView ? DetailView.ENLARGED_STATE: DetailView.EDIT_STATE;
-				form = _view.formsContainer.getForm(version, rootEntityDefn);
+				form = _view.formsContainer.getForm(rootEntityDefn, version);
 			} else {
 				//build form 
 				_view.currentState = DetailView.LOADING_STATE;
 				form = UIBuilder.buildForm(rootEntityDefn, version);
-				_view.formsContainer.addForm(form, version, rootEntityDefn);
+				_view.formsContainer.addForm(form, rootEntityDefn, version);
 				_view.currentState = DetailView.EDIT_STATE;
 			}
-			form = _view.formsContainer.setActiveForm(version, rootEntityDefn);
+			form = _view.formsContainer.setActiveForm(rootEntityDefn, version);
 			form.record = activeRecord;
 		}
 		

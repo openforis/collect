@@ -13,6 +13,7 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
+	import mx.controls.Alert;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
@@ -122,6 +123,7 @@ package org.openforis.collect.presenter {
 				openSelectVersionPopUp();
 			}
 		}
+		
 		protected function openSelectVersionPopUp():void {
 			if(_selectVersionPopUp == null) {
 				_selectVersionPopUp = new SelectVersionPopUp();

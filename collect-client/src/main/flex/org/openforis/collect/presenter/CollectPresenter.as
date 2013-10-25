@@ -54,7 +54,6 @@ package org.openforis.collect.presenter {
 	import mx.core.IFlexDisplayObject;
 	import org.openforis.collect.util.ObjectUtil;
 	import mx.resources.Locale;
-	import mx.controls.Alert;
 	import org.openforis.collect.ui.view.MasterView;
 	
 	/**
@@ -316,12 +315,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function showListOfRecordsHandler(event:UIEvent):void {
-			if ( Application.activeSurvey != null && Application.activeRootEntity != null ) {
-				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
-				uiEvent.obj = Application.activeRootEntity;
-				eventDispatcher.dispatchEvent(uiEvent);
-			} else {
+			var rootEntity:EntityDefinitionProxy = Application.activeSurvey == null ? null: Application.activeRootEntity;
+			if ( rootEntity == null ) {
 				openSurveySelectionPopUp();
+			} else {
+				var uiEvent:UIEvent = new UIEvent(UIEvent.ROOT_ENTITY_SELECTED);
+				uiEvent.obj = rootEntity;
+				eventDispatcher.dispatchEvent(uiEvent);
 			}
 		}
 		
