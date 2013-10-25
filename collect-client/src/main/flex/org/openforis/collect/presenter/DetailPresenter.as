@@ -99,18 +99,16 @@ package org.openforis.collect.presenter {
 			_view.updateStatusLabel.visible = canSave;
 			
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
-			var form:FormContainer = null;
-			if (_view.formsContainer.containsForm(rootEntityDefn, version)){
-				_view.currentState = Application.extendedDetailView ? DetailView.ENLARGED_STATE: DetailView.EDIT_STATE;
-				form = _view.formsContainer.getForm(rootEntityDefn, version);
-			} else {
-				//build form 
-				_view.currentState = DetailView.LOADING_STATE;
+			//do not mantain more than one form in FormsContainer for performance issues
+			_view.currentState = DetailView.LOADING_STATE;
+			var form:FormContainer = _view.formsContainer.getForm(rootEntityDefn, version);
+			if ( form == null ) {
+				_view.formsContainer.reset();
 				form = UIBuilder.buildForm(rootEntityDefn, version);
 				_view.formsContainer.addForm(form, rootEntityDefn, version);
-				_view.currentState = DetailView.EDIT_STATE;
+				_view.formsContainer.selectedChild = form;
 			}
-			form = _view.formsContainer.setActiveForm(rootEntityDefn, version);
+			_view.currentState = DetailView.EDIT_STATE;
 			form.record = activeRecord;
 		}
 		
