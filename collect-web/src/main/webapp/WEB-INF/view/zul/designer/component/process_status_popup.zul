@@ -1,0 +1,16 @@
+<zk>
+	<window id="processStatusPopUp" title="@load(vm.title)"
+		border="normal" position="center"
+		apply="org.openforis.collect.designer.composer.ProcessStatusPopUpComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.ProcessStatusPopUpVM')">
+
+		<timer id="processStatusTimer" delay="3000" repeats="true" />
+
+		<vbox align="center" hflex="1">
+			<progressmeter value="@load(vm.progress)" hflex="1" />
+
+			<button id="cancelBtn" label="${labels.global.cancel}"
+				onClick="@command('cancel')" visible="@load(vm.cancelable)" />
+		</vbox>
+	</window>
+</zk>
