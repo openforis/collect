@@ -177,13 +177,13 @@ public class SurveyImportVM extends SurveyBaseVM {
 	
 	protected void openSurveyUnmarshallStatusPopUp() {
 		processStatusPopUp = ProcessStatusPopUpVM.openPopUp(
-				Labels.getLabel("survey.import_survey.unmarshall_process_status_popup.title"), 
+				Labels.getLabel("survey.import_survey.unmarshall_process_status_popup.message"), 
 				unmarshallProcess, true);
 	}
 	
 	protected void openSurveyImportStatusPopUp() {
 		processStatusPopUp = ProcessStatusPopUpVM.openPopUp(
-				Labels.getLabel("survey.import_survey.import_process_status_popup.title"), 
+				Labels.getLabel("survey.import_survey.import_process_status_popup.message"), 
 				importProcess, false);
 	}
 	
@@ -206,7 +206,13 @@ public class SurveyImportVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void processCancelled() {
 		closeProcessStatusPopUp();
+		if ( unmarshallProcess != null ) {
+			uploadedFileName = null;
+			uploadedSurveyUri = null;
+			uploadedFile = null;
+		}
 		resetAsyncProcesses();
+		updateForm();
 	}
 
 	@GlobalCommand

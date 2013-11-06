@@ -11,7 +11,6 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.util.resource.Labels;
 import org.zkoss.zul.Window;
 
 /**
@@ -24,17 +23,17 @@ public class ProcessStatusPopUpVM extends BaseVM {
 	public static final String UPDATE_PROGRESS_COMMAND = "updateProgress";
 	
 	public static final String PROCESS_ARG = "process";
-	public static final String TITLE_ARG = "title";
+	public static final String MESSAGE_ARG = "message";
 	public static final String CANCELABLE_ARG = "cancelable";
 	
 	private AbstractProcess<?, ?> process;
 
-	private String title;
+	private String message;
 	private boolean cancelable;
 	
-	public static Window openPopUp(String title, AbstractProcess<?, ?> process, boolean cancelable) {
+	public static Window openPopUp(String message, AbstractProcess<?, ?> process, boolean cancelable) {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put(ProcessStatusPopUpVM.TITLE_ARG, title);
+		args.put(ProcessStatusPopUpVM.MESSAGE_ARG, message);
 		args.put(ProcessStatusPopUpVM.PROCESS_ARG, process);
 		args.put(ProcessStatusPopUpVM.CANCELABLE_ARG, cancelable);
 		Window popUp = PopUpUtil.openPopUp(Resources.Component.PROCESS_STATUS_POPUP.getLocation(), true, args);
@@ -42,10 +41,10 @@ public class ProcessStatusPopUpVM extends BaseVM {
 	}
 	
 	@Init
-	public void init(@ExecutionArgParam(TITLE_ARG) String title, 
+	public void init(@ExecutionArgParam(MESSAGE_ARG) String message, 
 			@ExecutionArgParam(PROCESS_ARG) AbstractProcess<?, ?> process,
 			@ExecutionArgParam(CANCELABLE_ARG) boolean cancelable) {
-		this.title = title;
+		this.message = message;
 		this.process = process;
 		this.cancelable = cancelable;
 	}
@@ -73,8 +72,8 @@ public class ProcessStatusPopUpVM extends BaseVM {
 		return process.getStatus().getProgressPercent();
 	}
 	
-	public String getTitle() {
-		return title;
+	public String getMessage() {
+		return message;
 	}
 	
 	public boolean isCancelable() {

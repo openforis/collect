@@ -122,7 +122,7 @@ public class SurveySelectVM extends BaseVM {
 
 	protected void openSurveyExportStatusPopUp(CollectSurvey survey) {
 		processStatusPopUp = ProcessStatusPopUpVM.openPopUp(Labels.getLabel(
-				"survey.export_survey.process_status_popup.title",
+				"survey.export_survey.process_status_popup.message",
 				new String[] { survey.getName() }), surveyExportProcess, true);
 	}
 
@@ -155,11 +155,13 @@ public class SurveySelectVM extends BaseVM {
 	@GlobalCommand
 	public void processError(@BindingParam("errorMessage") String errorMessage) {
 		closeProcessStatusPopUp();
+		surveyExportProcess = null;
 	}
 	
 	@GlobalCommand
 	public void processCancelled() {
 		closeProcessStatusPopUp();
+		surveyExportProcess = null;
 	}
 
 	@Command
