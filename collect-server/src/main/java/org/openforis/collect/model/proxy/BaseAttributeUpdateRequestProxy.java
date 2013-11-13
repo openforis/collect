@@ -4,9 +4,9 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.RecordFileException;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.remoting.service.FileWrapper;

@@ -5,6 +5,7 @@ import java.io.File;
 import javax.servlet.ServletContext;
 
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -38,6 +39,8 @@ public class DataExportService {
 	private SurveyManager surveyManager;
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private RecordFileManager recordFileManager;
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
@@ -98,7 +101,8 @@ public class DataExportService {
 			if ( stepNumbers == null ) {
 				stepNumbers = getAllStepNumbers();
 			}
-			BackupProcess process = new BackupProcess(surveyManager, recordManager, dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
+			BackupProcess process = new BackupProcess(surveyManager, recordManager, recordFileManager,
+					dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
 			process.init();
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);

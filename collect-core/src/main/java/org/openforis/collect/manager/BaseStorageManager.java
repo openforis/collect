@@ -24,7 +24,22 @@ public abstract class BaseStorageManager implements Serializable {
 	@Autowired
 	protected transient ConfigurationManager configurationManager;
 
+	/**
+	 * Directory in which files will be stored
+	 */
 	protected File storageDirectory;
+	
+	/**
+	 * Default path in which files will be stored.
+	 * If not specified, java temp folder or catalina base temp folder
+	 * will be used as storage directory.
+	 */
+	private String defaultStoragePath;
+	
+	public BaseStorageManager() {
+		defaultStoragePath = null;
+		storageDirectory = null;
+	}
 	
 	protected File getTempFolder() {
 		return getReadableSysPropLocation(JAVA_IO_TMPDIR, null);
@@ -60,10 +75,7 @@ public abstract class BaseStorageManager implements Serializable {
 		Configuration configuration = configurationManager.getConfiguration();
 		String storagePath = configuration.get(pathConfigurationKey);
 		if ( StringUtils.isBlank(storagePath) ) {
-			File rootDir = getCatalinaBaseTempFolder();
-			if ( rootDir == null ) {
-				rootDir = getTempFolder();
-			}
+			File rootDir = getDefaultStorageRootDirectory();
 			if ( rootDir == null ) {
 				storageDirectory = null;
 			} else {
@@ -73,5 +85,24 @@ public abstract class BaseStorageManager implements Serializable {
 			storageDirectory = new File(storagePath, subFolder);
 		}
 	}
+
+	protected File getDefaultStorageRootDirectory() {
+		if ( defaultStoragePath == null ) {
+			File rootDir = getCatalinaBaseTempFolder();
+			if ( rootDir == null ) {
+				rootDir = getTempFolder();
+			}
+			return rootDir;
+		} else {
+			return new File(defaultStoragePath );
+		}
+	}
 	
+	public String getDefaultStoragePath() {
+		return defaultStoragePath;
+	}
+	
+	public void setDefaultStoragePath(String defaultStoragePath) {
+		this.defaultStoragePath = defaultStoragePath;
+	}
 }

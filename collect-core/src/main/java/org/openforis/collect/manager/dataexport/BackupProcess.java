@@ -2,6 +2,7 @@ package org.openforis.collect.manager.dataexport;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -9,8 +10,10 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
@@ -20,6 +23,8 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.xml.DataMarshaller;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
+import org.openforis.idm.model.FileAttribute;
 
 /**
  * 
@@ -28,11 +33,15 @@ import org.openforis.collect.persistence.xml.DataMarshaller;
  */
 public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 
+
 	private static Log LOG = LogFactory.getLog(BackupProcess.class);
 
 	private static final String FILE_NAME = "data.zip";
+	private static final String ZIP_DIRECTORY_SEPARATOR = "/";
+	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
 
 	private RecordManager recordManager;
+	private RecordFileManager recordFileManager;
 	private SurveyManager surveyManager;
 	private DataMarshaller dataMarshaller;
 	
@@ -43,11 +52,14 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 
 	private boolean includeIdm;
 	
-	public BackupProcess(SurveyManager surveyManager, RecordManager recordManager, DataMarshaller dataMarshaller, File directory,
+	public BackupProcess(SurveyManager surveyManager, RecordManager recordManager,
+			RecordFileManager recordFileManager,
+			DataMarshaller dataMarshaller, File directory,
 			CollectSurvey survey, String rootEntityName, int[] stepNumbers) {
 		super();
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
+		this.recordFileManager = recordFileManager;
 		this.dataMarshaller = dataMarshaller;
 		this.directory = directory;
 		this.survey = survey;
@@ -155,6 +167,7 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 			dataMarshaller.write(record, writer);
 			zipOutputStream.closeEntry();
 			zipOutputStream.flush();
+			backupRecordFiles(zipOutputStream, record);
 		} catch (Exception e) {
 			String message = "Error while backing up " + id + " " + e.getMessage();
 			if (LOG.isErrorEnabled()) {
@@ -164,8 +177,33 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		}
 	}
 	
+	private void backupRecordFiles(ZipOutputStream zipOutputStream,
+			CollectRecord record) {
+		List<FileAttribute> fileAttributes = record.getFileAttributes();
+		for (FileAttribute fileAttribute : fileAttributes) {
+			File file = recordFileManager.getRepositoryFile(record, fileAttribute.getInternalId());
+			FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
+			String repositoryRelativePath = recordFileManager.getRepositoryRelativePath(fileAttributeDefinition, ZIP_DIRECTORY_SEPARATOR, false);
+			String relativePath = RECORD_FILE_DIRECTORY_NAME + ZIP_DIRECTORY_SEPARATOR + repositoryRelativePath;
+			String fileName = relativePath + ZIP_DIRECTORY_SEPARATOR + fileAttribute.getFilename();
+			writeFile(zipOutputStream, file, fileName);
+		}
+	}
+
+	private void writeFile(ZipOutputStream zipOutputStream, File file, String fileName) {
+		try {
+			ZipEntry entry = new ZipEntry(fileName);
+			zipOutputStream.putNextEntry(entry);
+			IOUtils.copy(new FileInputStream(file), zipOutputStream);
+			zipOutputStream.closeEntry();
+			zipOutputStream.flush();
+		} catch (IOException e) {
+			LOG.error(String.format("Error writing record file (fileName: %s)", fileName));
+		}
+	}
+
 	private String buildEntryFileName(CollectRecord record, int stepNumber) {
-		return stepNumber + "/" + record.getId() + ".xml";
+		return stepNumber + ZIP_DIRECTORY_SEPARATOR + record.getId() + ".xml";
 	}
 
 	public boolean isIncludeIdm() {

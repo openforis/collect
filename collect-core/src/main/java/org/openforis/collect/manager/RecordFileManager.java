@@ -1,31 +1,28 @@
 package org.openforis.collect.manager;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.File;
 import org.openforis.idm.model.FileAttribute;
-import org.openforis.idm.model.Node;
-import org.openforis.idm.model.NodeVisitor;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
@@ -49,11 +46,13 @@ public class RecordFileManager extends BaseStorageManager {
 	private Map<Integer, String> filesToDelete;
 
 	protected java.io.File tempRootDir;
-	
 
-	protected void init() {
+	public RecordFileManager() {
+	}
+	
+	public void init() {
 		initTempDir();
-		initStorageDirectory(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
+		initStorageDirectory();
 		reset();
 	}
 
@@ -62,11 +61,10 @@ public class RecordFileManager extends BaseStorageManager {
 		filesToDelete = new HashMap<Integer, String>();
 	}
 
-	@Override
-	protected void initStorageDirectory(String pathConfigurationKey, String subFolder) {
-		super.initStorageDirectory(pathConfigurationKey, subFolder);
+	protected void initStorageDirectory() {
+		super.initStorageDirectory(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
 		if ( storageDirectory == null ) {
-			String message = "Upload directory not configured conrrectly";
+			String message = "Upload directory not configured properly";
 			LOG.error(message);
 			throw new IllegalStateException(message);
 		} else if ( LOG.isInfoEnabled() ) {
@@ -98,15 +96,6 @@ public class RecordFileManager extends BaseStorageManager {
 		return file;
 	}
 	
-	public File saveToTempFolder(MultipartFile file, String sessionId, CollectRecord record, int nodeId) throws Exception {
-		if (!file.isEmpty()) {
-			File result = saveToTempFolder(file.getInputStream(), file.getOriginalFilename(), sessionId, record, nodeId);
-			return result;
-		} else {
-			throw new Exception("file is empty");
-		}
-	}
-	
 	public File saveToTempFolder(InputStream is, String originalFileName, String sessionId, CollectRecord record, int nodeId) throws RecordFileException {
 		try {
 			prepareDeleteFile(sessionId, record, nodeId);
@@ -116,7 +105,7 @@ public class RecordFileManager extends BaseStorageManager {
 				String fileId = generateUniqueFilename(originalFileName);
 				java.io.File tempDestinationFile = new java.io.File(tempDestinationFolder, fileId);
 				if (!tempDestinationFile.exists() && tempDestinationFile.createNewFile()) {
-					writeToFile(is, tempDestinationFile);
+					FileUtils.copyInputStreamToFile(is, tempDestinationFile);
 					tempFiles.put(nodeId, fileId);
 					long size = tempDestinationFile.length();
 					File result = new File(fileId, size);
@@ -159,19 +148,22 @@ public class RecordFileManager extends BaseStorageManager {
 		}
 	}
 	
-	public void deleteAllFiles(final CollectRecord record) {
-		Entity rootEntity = record.getRootEntity();
-		rootEntity.traverse(new NodeVisitor() {
-			@Override
-			public void visit(Node<? extends NodeDefinition> node, int pos) {
-				if ( node instanceof FileAttribute ) {
-					java.io.File repositoryFile = getRepositoryFile(record, node.getInternalId());
-					if (repositoryFile != null ) {
-						repositoryFile.delete();
-					}
-				}
+	public void deleteAllFiles(CollectRecord record) {
+		List<java.io.File> files = getAllFiles(record);
+		for (java.io.File file : files) {
+			file.delete();
+		}
+	}
+	
+	public List<java.io.File> getAllFiles(final CollectRecord record) {
+		final List<java.io.File> result = new ArrayList<java.io.File>();
+		for (FileAttribute fileAttribute : record.getFileAttributes()) {
+			java.io.File repositoryFile = getRepositoryFile(record, fileAttribute.getInternalId());
+			if (repositoryFile != null ) {
+				result.add(repositoryFile);
 			}
-		});
+		}
+		return result;
 	}
 	
 	public void prepareDeleteFile(String sessionId, CollectRecord record, int nodeId) {
@@ -225,7 +217,7 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 
 	protected String generateUniqueFilename(String originalFileName) {
-		String extension = getExtension(originalFileName);
+		String extension = FilenameUtils.getExtension(originalFileName);
 		String fileId = UUID.randomUUID().toString() + "." + extension;
 		return fileId;
 	}
@@ -251,12 +243,25 @@ public class RecordFileManager extends BaseStorageManager {
 		}
 	}
 	
-	protected java.io.File getRepositoryDir(Integer surveyId, Integer nodeDefnId) {
-		java.io.File file = new java.io.File(storageDirectory, surveyId + java.io.File.separator + nodeDefnId);
+	protected java.io.File getRepositoryDir(FileAttributeDefinition defn) {
+		java.io.File baseDirectory = storageDirectory;
+		String relativePath = getRepositoryRelativePath(defn);
+		java.io.File file = new java.io.File(baseDirectory, relativePath);
 		return file;
 	}
+
+	public String getRepositoryRelativePath(FileAttributeDefinition defn) {
+		return getRepositoryRelativePath(defn, java.io.File.separator, true);
+	}
+
+	public String getRepositoryRelativePath(FileAttributeDefinition defn, 
+			String directorySeparator, boolean surveyRelative) {
+		Survey survey = defn.getSurvey();
+		String relativePath = survey.getId() + directorySeparator + defn.getId();
+		return relativePath;
+	}
 	
-	protected java.io.File getRepositoryFile(CollectRecord record, int nodeId) {
+	public java.io.File getRepositoryFile(CollectRecord record, int nodeId) {
 		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
 		if ( fileAttribute != null ) {
 			String filename = fileAttribute.getFilename();
@@ -269,44 +274,13 @@ public class RecordFileManager extends BaseStorageManager {
 	
 	protected java.io.File getRepositoryFile(CollectRecord record, int nodeId, String fileName) {
 		java.io.File file = null;
-		Survey survey = record.getSurvey();
-		Integer surveyId = survey.getId();
 		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
 		if ( fileAttribute != null ) {
 			FileAttributeDefinition definition = fileAttribute.getDefinition();
-			java.io.File repositoryDir = getRepositoryDir(surveyId, definition.getId());
+			java.io.File repositoryDir = getRepositoryDir(definition);
 			file = new java.io.File(repositoryDir, fileName);
 		}
 		return file;
-	}
-
-	protected String getExtension(String fileName) {
-		String extension = null;
-		if (fileName != null) {
-			int lastIndexOfDot = fileName.lastIndexOf('.');
-			if (lastIndexOfDot > 0) {
-				extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-			}
-		}
-		return extension;
-	}
-	
-	protected static void writeToFile(InputStream is, java.io.File file) throws IOException {
-		try {  
-			OutputStream os = new FileOutputStream(file);  
-			try {  
-				byte[] buffer = new byte[4096];  
-				for (int n; (n = is.read(buffer)) != -1; ) {   
-					os.write(buffer, 0, n);  
-				}
-			}
-			finally { 
-				os.close(); 
-			}
-		}
-		finally { 
-			is.close(); 
-		}  
 	}
 
 }
