@@ -90,7 +90,7 @@ public class DataService {
 		Step step = Step.valueOf(stepNumber);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
-		fileManager.reset();
+		fileManager.resetTempInfo();
 		prepareRecordIndexing();
 		return new RecordProxy(record);
 	}
@@ -171,7 +171,9 @@ public class DataService {
 		record.setModifiedBy(user);
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
-		fileManager.commitChanges(sessionId, record);
+		if ( fileManager.commitChanges(sessionId, record) ) {
+			recordManager.save(record, sessionId);
+		}
 		if ( isCurrentRecordIndexable() ) {
 			recordIndexService.permanentlyIndex(record);
 		}

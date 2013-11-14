@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,6 +22,7 @@ import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.File;
 import org.openforis.idm.model.FileAttribute;
+import org.openforis.idm.model.Record;
 
 /**
  * 
@@ -47,16 +47,13 @@ public class RecordFileManager extends BaseStorageManager {
 
 	protected java.io.File tempRootDir;
 
-	public RecordFileManager() {
-	}
-	
 	public void init() {
 		initTempDir();
 		initStorageDirectory();
-		reset();
+		resetTempInfo();
 	}
 
-	public void reset() {
+	public void resetTempInfo() {
 		tempFiles = new HashMap<Integer, String>();
 		filesToDelete = new HashMap<Integer, String>();
 	}
@@ -102,35 +99,36 @@ public class RecordFileManager extends BaseStorageManager {
 			
 			java.io.File tempDestinationFolder = getTempDestDir(sessionId, nodeId);
 			if (tempDestinationFolder.exists() || tempDestinationFolder.mkdirs()) {
-				String fileId = generateUniqueFilename(originalFileName);
-				java.io.File tempDestinationFile = new java.io.File(tempDestinationFolder, fileId);
-				if (!tempDestinationFile.exists() && tempDestinationFile.createNewFile()) {
+				String fileName = generateUniqueFilename(tempDestinationFolder, originalFileName);
+				java.io.File tempDestinationFile = new java.io.File(tempDestinationFolder, fileName);
+				if ( ! tempDestinationFile.exists() && tempDestinationFile.createNewFile() ) {
 					FileUtils.copyInputStreamToFile(is, tempDestinationFile);
-					tempFiles.put(nodeId, fileId);
 					long size = tempDestinationFile.length();
-					File result = new File(fileId, size);
+					File result = new File(fileName, size);
+					tempFiles.put(nodeId, fileName);
 					return result;
 				} else {
-					throw new RecordFileException("Cannot write file");
+					throw new RecordFileException("Cannot write temp file: " + tempDestinationFile.getAbsolutePath());
 				}
 			} else {
-				throw new RecordFileException("Cannot write to destination folder");
+				throw new RecordFileException("Cannot write into destination folder: " + tempDestinationFolder.getAbsolutePath());
 			}
 		} catch (IOException e) {
 			throw new RecordFileException(e);
 		}
 	}
 	
-	public void moveTempFilesToRepository(String sessionId, CollectRecord record) throws RecordFileException {
+	protected boolean moveTempFilesToRepository(String sessionId, CollectRecord record) throws RecordFileException {
 		try {
 			Set<Entry<Integer,String>> entrySet = tempFiles.entrySet();
-			Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
-			while (iterator.hasNext()) {
-				Entry<Integer, String> entry = iterator.next();
+			boolean result = false;
+			for (Entry<Integer, String> entry : entrySet) {
 				int nodeId = entry.getKey();
-				moveTempFileToRepository(sessionId, record, nodeId);
-				iterator.remove();
+				boolean recordChanged = moveTempFileToRepository(sessionId, record, nodeId);
+				result = result || recordChanged;
 			}
+			tempFiles.clear();
+			return result;
 		} catch (IOException e) {
 			throw new RecordFileException(e);
 		}
@@ -138,13 +136,17 @@ public class RecordFileManager extends BaseStorageManager {
 	
 	public void deleteAllTempFiles(String sessionId) {
 		Set<Entry<Integer,String>> entrySet = tempFiles.entrySet();
-		Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
-		while (iterator.hasNext()) {
-			Entry<Integer, String> entry = iterator.next();
+		for (Entry<Integer, String> entry : entrySet) {
 			int nodeId = entry.getKey();
 			java.io.File tempFile = getTempFile(sessionId, nodeId);
 			tempFile.delete();
-			iterator.remove();
+		}
+		tempFiles.clear();
+	}
+	
+	public void prepareDeleteAllFiles(String sessionId, CollectRecord record) {
+		for (FileAttribute fileAttribute : record.getFileAttributes()) {
+			prepareDeleteFile(sessionId, record, fileAttribute.getInternalId());
 		}
 	}
 	
@@ -158,7 +160,7 @@ public class RecordFileManager extends BaseStorageManager {
 	public List<java.io.File> getAllFiles(final CollectRecord record) {
 		final List<java.io.File> result = new ArrayList<java.io.File>();
 		for (FileAttribute fileAttribute : record.getFileAttributes()) {
-			java.io.File repositoryFile = getRepositoryFile(record, fileAttribute.getInternalId());
+			java.io.File repositoryFile = getRepositoryFile(fileAttribute);
 			if (repositoryFile != null ) {
 				result.add(repositoryFile);
 			}
@@ -180,9 +182,20 @@ public class RecordFileManager extends BaseStorageManager {
 		}
 	}
 	
-	public void commitChanges(String sessionId, CollectRecord record) throws RecordFileException {
-		completeFilesDeletion(record);
-		moveTempFilesToRepository(sessionId, record);
+	/**
+	 * Apply the changes from the temp directory to the final repository directory.
+	 * Returns true if the passed record have been changed during the saving process
+	 * (for example fileName attribute changed)
+	 * 
+	 * @param sessionId
+	 * @param record
+	 * @return
+	 * @throws RecordFileException
+	 */
+	public boolean commitChanges(String sessionId, CollectRecord record) throws RecordFileException {
+		performFilesDelete(record);
+		boolean recordChanged = moveTempFilesToRepository(sessionId, record);
+		return recordChanged;
 	}
 	
 	public java.io.File getFile(String sessionId, CollectRecord record, int nodeId) {
@@ -195,31 +208,57 @@ public class RecordFileManager extends BaseStorageManager {
 		return file;
 	}
 
-	protected void completeFilesDeletion(CollectRecord record) {
+	protected boolean performFilesDelete(CollectRecord record) {
+		boolean result = false;
 		Set<Entry<Integer,String>> entrySet = filesToDelete.entrySet();
-		Iterator<Entry<Integer, String>> iterator = entrySet.iterator();
-		while (iterator.hasNext()) {
-			Entry<Integer, String> entry = iterator.next();
+		for (Entry<Integer, String> entry : entrySet) {
 			int nodeId = entry.getKey();
 			String fileName = entry.getValue();
-			java.io.File repositoryFile = getRepositoryFile(record, nodeId, fileName);
+			FileAttribute fileAttr = (FileAttribute) record.getNodeByInternalId(nodeId);
+			FileAttributeDefinition defn = fileAttr.getDefinition();
+			java.io.File repositoryFile = getRepositoryFile(defn, fileName);
 			repositoryFile.delete();
-			iterator.remove();
+			result = true;
 		}
+		filesToDelete.clear();
+		return result;
 	}
 	
-	protected void moveTempFileToRepository(String sessionId, CollectRecord record, int nodeId) throws IOException {
+	protected boolean moveTempFileToRepository(String sessionId, CollectRecord record, int nodeId) throws IOException {
+		boolean recordUpdated = false;
+		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
+		FileAttributeDefinition defn = fileAttribute.getDefinition();
+		java.io.File repositoryDir = getRepositoryDir(defn);
 		java.io.File tempFile = getTempFile(sessionId, nodeId);
-		String fileName = tempFile.getName();
-		java.io.File repositoryFile = getRepositoryFile(record, nodeId, fileName);
-		FileUtils.copyFile(tempFile, repositoryFile, true);
-		tempFile.delete();
+		String repositoryFileName = generateRepositoryFilename(fileAttribute, tempFile.getName());
+		java.io.File repositoryFile = new java.io.File(repositoryDir, repositoryFileName);
+		long repositoryFileSize = repositoryFile.length();
+		if ( ! repositoryFileName.equals(fileAttribute.getFilename() ) || 
+				! new Long(repositoryFileSize).equals(fileAttribute.getSize()) ) {
+			recordUpdated = true;
+			fileAttribute.setFilename(repositoryFileName);
+			fileAttribute.setSize(repositoryFileSize);
+		}
+		FileUtils.deleteQuietly(repositoryFile);
+		FileUtils.moveFile(tempFile, repositoryFile);
+		return recordUpdated;
 	}
 
-	protected String generateUniqueFilename(String originalFileName) {
+	private String generateRepositoryFilename(FileAttribute fileAttribute, String tempFileName) {
+		Record record = fileAttribute.getRecord();
+		String extension = FilenameUtils.getExtension(tempFileName);
+		return record.getId() + "." + extension;
+	}
+
+	protected String generateUniqueFilename(java.io.File parentDir, String originalFileName) {
 		String extension = FilenameUtils.getExtension(originalFileName);
-		String fileId = UUID.randomUUID().toString() + "." + extension;
-		return fileId;
+		String fileName;
+		java.io.File file;
+		do {
+			fileName = UUID.randomUUID().toString() + "." + extension;
+			file = new java.io.File(parentDir, fileName);
+		} while ( file.exists() );
+		return fileName;
 	}
 	
 	protected java.io.File getTempDestRootDirPerSession(String sessionId) {
@@ -250,36 +289,45 @@ public class RecordFileManager extends BaseStorageManager {
 		return file;
 	}
 
-	public String getRepositoryRelativePath(FileAttributeDefinition defn) {
+	public static String getRepositoryRelativePath(FileAttributeDefinition defn) {
 		return getRepositoryRelativePath(defn, java.io.File.separator, true);
 	}
 
-	public String getRepositoryRelativePath(FileAttributeDefinition defn, 
+	public static String getRepositoryRelativePath(FileAttributeDefinition defn, 
 			String directorySeparator, boolean surveyRelative) {
 		Survey survey = defn.getSurvey();
-		String relativePath = survey.getId() + directorySeparator + defn.getId();
-		return relativePath;
+		StringBuilder sb = new StringBuilder();
+		if ( surveyRelative ) {
+			sb.append(survey.getId());
+			sb.append(directorySeparator);
+		}
+		sb.append(defn.getId());
+		return sb.toString();
 	}
 	
 	public java.io.File getRepositoryFile(CollectRecord record, int nodeId) {
 		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
 		if ( fileAttribute != null ) {
-			String filename = fileAttribute.getFilename();
-			if ( StringUtils.isNotBlank(filename) ) {
-				return getRepositoryFile(record, nodeId, filename);
-			}
+			return getRepositoryFile(fileAttribute);
+		} else {
+			return null;
 		}
-		return null;
 	}
 	
-	protected java.io.File getRepositoryFile(CollectRecord record, int nodeId, String fileName) {
-		java.io.File file = null;
-		FileAttribute fileAttribute = (FileAttribute) record.getNodeByInternalId(nodeId);
-		if ( fileAttribute != null ) {
-			FileAttributeDefinition definition = fileAttribute.getDefinition();
-			java.io.File repositoryDir = getRepositoryDir(definition);
-			file = new java.io.File(repositoryDir, fileName);
+	public java.io.File getRepositoryFile(FileAttribute fileAttribute) {
+		FileAttributeDefinition defn = fileAttribute.getDefinition();
+		String filename = fileAttribute.getFilename();
+		if ( StringUtils.isNotBlank(filename) ) {
+			java.io.File file = getRepositoryFile(defn, filename);
+			return file;
+		} else {
+			return null;
 		}
+	}
+
+	protected java.io.File getRepositoryFile(FileAttributeDefinition fileAttributeDefn, String fileName) {
+		java.io.File repositoryDir = getRepositoryDir(fileAttributeDefn);
+		java.io.File file = new java.io.File(repositoryDir, fileName);
 		return file;
 	}
 

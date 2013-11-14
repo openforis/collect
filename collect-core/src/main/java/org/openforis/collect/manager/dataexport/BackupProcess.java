@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +18,8 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
+import org.openforis.collect.manager.exception.DataImportExeption;
+import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -36,9 +39,11 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 
 	private static Log LOG = LogFactory.getLog(BackupProcess.class);
 
-	private static final String FILE_NAME = "data.zip";
-	private static final String ZIP_DIRECTORY_SEPARATOR = "/";
+	public static final String IDML_FILE_NAME = "idml.xml";
+	public static final String ZIP_DIRECTORY_SEPARATOR = "/";
 	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
+
+	private static final String OUTPUT_FILE_NAME = "data.zip";
 
 	private RecordManager recordManager;
 	private RecordFileManager recordFileManager;
@@ -79,7 +84,7 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		try {
 			List<CollectRecord> recordSummaries = loadAllSummaries();
 			if ( recordSummaries != null && stepNumbers != null ) {
-				String fileName = FILE_NAME;
+				String fileName = OUTPUT_FILE_NAME;
 				File file = new File(directory, fileName);
 				if (file.exists()) {
 					file.delete();
@@ -137,8 +142,7 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 	}
 	
 	private void includeIdml(ZipOutputStream zipOutputStream) {
-		String entryFileName = "idml.xml";
-		ZipEntry entry = new ZipEntry(entryFileName);
+		ZipEntry entry = new ZipEntry(IDML_FILE_NAME);
 		try {
 			zipOutputStream.putNextEntry(entry);
 			surveyManager.marshalSurvey(survey, zipOutputStream, true, true, false);
@@ -160,8 +164,9 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		Integer id = summary.getId();
 		try {
 			CollectRecord record = recordManager.load(survey, id, step);
-			String entryFileName = buildEntryFileName(record, step.getStepNumber());
-			ZipEntry entry = new ZipEntry(entryFileName);
+			RecordEntry recordEntry = new RecordEntry(step, id);
+			String entryName = recordEntry.getName();
+			ZipEntry entry = new ZipEntry(entryName);
 			zipOutputStream.putNextEntry(entry);
 			OutputStreamWriter writer = new OutputStreamWriter(zipOutputStream);
 			dataMarshaller.write(record, writer);
@@ -178,32 +183,41 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 	}
 	
 	private void backupRecordFiles(ZipOutputStream zipOutputStream,
-			CollectRecord record) {
+			CollectRecord record) throws RecordFileException {
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		for (FileAttribute fileAttribute : fileAttributes) {
-			File file = recordFileManager.getRepositoryFile(record, fileAttribute.getInternalId());
-			FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
-			String repositoryRelativePath = recordFileManager.getRepositoryRelativePath(fileAttributeDefinition, ZIP_DIRECTORY_SEPARATOR, false);
-			String relativePath = RECORD_FILE_DIRECTORY_NAME + ZIP_DIRECTORY_SEPARATOR + repositoryRelativePath;
-			String fileName = relativePath + ZIP_DIRECTORY_SEPARATOR + fileAttribute.getFilename();
-			writeFile(zipOutputStream, file, fileName);
+			if ( ! fileAttribute.isEmpty() ) {
+				File file = recordFileManager.getRepositoryFile(fileAttribute);
+				if ( file == null ) {
+					String message = String.format("Missing file: %s attributeId: %d attributeName: %s", 
+							fileAttribute.getFilename(), fileAttribute.getInternalId(), fileAttribute.getName());
+					throw new RecordFileException(message);
+				} else {
+					String entryName = calculateRecordFileEntryName(fileAttribute);
+					writeFile(zipOutputStream, file, entryName);
+				}
+			}
 		}
 	}
 
-	private void writeFile(ZipOutputStream zipOutputStream, File file, String fileName) {
+	public static String calculateRecordFileEntryName(FileAttribute fileAttribute) {
+		FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
+		String repositoryRelativePath = RecordFileManager.getRepositoryRelativePath(fileAttributeDefinition, ZIP_DIRECTORY_SEPARATOR, false);
+		String relativePath = RECORD_FILE_DIRECTORY_NAME + ZIP_DIRECTORY_SEPARATOR + repositoryRelativePath;
+		String entryName = relativePath + ZIP_DIRECTORY_SEPARATOR + fileAttribute.getFilename();
+		return entryName;
+	}
+
+	private void writeFile(ZipOutputStream zipOutputStream, File file, String entryName) {
 		try {
-			ZipEntry entry = new ZipEntry(fileName);
+			ZipEntry entry = new ZipEntry(entryName);
 			zipOutputStream.putNextEntry(entry);
 			IOUtils.copy(new FileInputStream(file), zipOutputStream);
 			zipOutputStream.closeEntry();
 			zipOutputStream.flush();
 		} catch (IOException e) {
-			LOG.error(String.format("Error writing record file (fileName: %s)", fileName));
+			LOG.error(String.format("Error writing record file (fileName: %s)", entryName));
 		}
-	}
-
-	private String buildEntryFileName(CollectRecord record, int stepNumber) {
-		return stepNumber + ZIP_DIRECTORY_SEPARATOR + record.getId() + ".xml";
 	}
 
 	public boolean isIncludeIdm() {
@@ -212,6 +226,79 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 
 	public void setIncludeIdm(boolean includeIdm) {
 		this.includeIdm = includeIdm;
+	}
+	
+	public static class RecordEntry {
+		private Step step;
+		private int recordId;
+		
+		public RecordEntry(Step step, int recordId) {
+			this.step = step;
+			this.recordId = recordId;
+		}
+		
+		public static boolean isValidRecordEntry(ZipEntry zipEntry) {
+			String name = zipEntry.getName();
+			return ! (zipEntry.isDirectory() || IDML_FILE_NAME.equals(name) || 
+					name.startsWith(RECORD_FILE_DIRECTORY_NAME));
+		}
+		
+		public static RecordEntry parse(String zipEntryName) throws DataImportExeption {
+			//for retro compatibility with previous generated backup files
+			String zipEntryNameFixed = zipEntryName.replace("\\", ZIP_DIRECTORY_SEPARATOR);
+			String[] entryNameSplitted = zipEntryNameFixed.split(ZIP_DIRECTORY_SEPARATOR);
+			if (entryNameSplitted.length != 2) {
+				throw new DataImportExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName);
+			}
+			//step
+			String stepNumStr = entryNameSplitted[0];
+			int stepNumber = Integer.parseInt(stepNumStr);
+			Step step = Step.valueOf(stepNumber);
+			//file name
+			String fileName = entryNameSplitted[1];
+			String baseName = FilenameUtils.getBaseName(fileName);
+			int recordId = Integer.parseInt(baseName);
+			RecordEntry result = new RecordEntry(step, recordId);
+			return result;
+		}
+
+		public String getName() {
+			return step.getStepNumber() + ZIP_DIRECTORY_SEPARATOR + recordId + ".xml";
+		}
+		
+		public int getRecordId() {
+			return recordId;
+		}
+		
+		public Step getStep() {
+			return step;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + recordId;
+			result = prime * result + ((step == null) ? 0 : step.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			RecordEntry other = (RecordEntry) obj;
+			if (recordId != other.recordId)
+				return false;
+			if (step != other.step)
+				return false;
+			return true;
+		}
+		
 	}
 	
 }
