@@ -98,11 +98,9 @@ public class DataExportService {
 				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
 			}
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			if ( stepNumbers == null ) {
-				stepNumbers = getAllStepNumbers();
-			}
+			Step[] steps = toStepsArray(stepNumbers);
 			BackupProcess process = new BackupProcess(surveyManager, recordManager, recordFileManager,
-					dataMarshaller, exportDir, survey, rootEntityName, stepNumbers);
+					dataMarshaller, exportDir, survey, rootEntityName, steps);
 			process.init();
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);
@@ -110,17 +108,20 @@ public class DataExportService {
 		return getState();
 	}
 
-	private int[] getAllStepNumbers() {
-		int[] stepNumbers;
-		Step[] steps = Step.values();
-		stepNumbers = new int[steps.length];
-		int i = 0;
-		for (Step step : steps) {
-			stepNumbers[i++] = step.getStepNumber();
+	private Step[] toStepsArray(int[] stepNumbers) {
+		if ( stepNumbers == null ) {
+			return Step.values();
+		} else {
+			Step[] steps = new Step[stepNumbers.length];
+			for (int i = 0; i < stepNumbers.length; i++ ) {
+				int stepNum = stepNumbers[i];
+				Step step = Step.valueOf(stepNum);
+				steps[i] = step;
+			}
+			return steps;
 		}
-		return stepNumbers;
 	}
-	
+
 	public void cancel() {
 		if ( dataExportProcess != null ) {
 			dataExportProcess.cancel();

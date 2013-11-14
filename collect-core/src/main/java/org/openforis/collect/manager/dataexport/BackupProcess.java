@@ -52,7 +52,7 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 	
 	private File directory;
 	private CollectSurvey survey;
-	private int[] stepNumbers;
+	private Step[] steps;
 	private String rootEntityName;
 
 	private boolean includeIdm;
@@ -60,7 +60,15 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 	public BackupProcess(SurveyManager surveyManager, RecordManager recordManager,
 			RecordFileManager recordFileManager,
 			DataMarshaller dataMarshaller, File directory,
-			CollectSurvey survey, String rootEntityName, int[] stepNumbers) {
+			CollectSurvey survey, String rootEntityName) {
+		this(surveyManager, recordManager, recordFileManager, dataMarshaller, 
+				directory, survey, rootEntityName, Step.values());
+	}
+	
+	public BackupProcess(SurveyManager surveyManager, RecordManager recordManager,
+			RecordFileManager recordFileManager,
+			DataMarshaller dataMarshaller, File directory,
+			CollectSurvey survey, String rootEntityName, Step[] steps) {
 		super();
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
@@ -69,7 +77,7 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		this.directory = directory;
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
-		this.stepNumbers = stepNumbers;
+		this.steps = steps;
 		this.includeIdm = true;
 	}
 
@@ -83,7 +91,7 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		super.startProcessing();
 		try {
 			List<CollectRecord> recordSummaries = loadAllSummaries();
-			if ( recordSummaries != null && stepNumbers != null ) {
+			if ( recordSummaries != null && steps != null && steps.length > 0 ) {
 				String fileName = OUTPUT_FILE_NAME;
 				File file = new File(directory, fileName);
 				if (file.exists()) {
@@ -111,8 +119,9 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		for (CollectRecord summary : recordSummaries) {
 			if ( status.isRunning() ) {
 				int recordStepNumber = summary.getStep().getStepNumber();
-				for (int stepNum: stepNumbers) {
-					if ( stepNum <= recordStepNumber) {
+				for (Step step : steps) {
+					int stepNum = step.getStepNumber();
+					if ( stepNum <= recordStepNumber ) {
 						backup(zipOutputStream, summary, Step.valueOf(stepNum));
 						status.incrementProcessed();
 					}
@@ -132,8 +141,8 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		int count = 0;
 		for (CollectRecord summary : recordSummaries) {
 			int recordStepNumber = summary.getStep().getStepNumber();
-			for (int stepNumber: stepNumbers) {
-				if ( stepNumber <= recordStepNumber ) {
+			for (Step step: steps) {
+				if ( step.getStepNumber() <= recordStepNumber ) {
 					count ++;
 				}
 			}
