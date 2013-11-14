@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				width="100%" autoDrawBackground="false"
+				dragEnter="dragEnterHandler(event)"
+				dragExit="dragExitHandler(event)"
+				dragOver="dragOverHandler(event)"
+				dragDrop="dragDropHandler(event)"
+				mouseOut="mouseOutHandler(event)"
+				mouseOver="mouseOverHandler(event)"
+				>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.DragEvent;
+			
+			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			
+			private function textInputChangeHandler(event:Event):void {
+				data.qualifier = textInput.text;
+			}
+			
+			private function checkBoxChangeHandler(event:Event):void {
+				var item:CodeListItemProxy = data as CodeListItemProxy;
+				item.selected = checkBox.selected;
+				CodeListDialogDataGroup(owner).selectionChangeHandler(item);
+			}
+			
+			[Bindable(event="dataChange")]
+			override public function get label():String {
+				var item:CodeListItemProxy = CodeListItemProxy(data);
+				var label:String = item.code + " - " + item.getLabelText();
+				return label;
+			}
+		
+			protected function dragEnterHandler(event:DragEvent):void {
+				
+			}
+			
+			protected function dragExitHandler(event:DragEvent):void {
+				
+			}
+			
+			protected function dragOverHandler(event:DragEvent):void {
+				
+			}
+			
+			protected function dragDropHandler(event:DragEvent):void {
+				
+			}
+			
+			protected function mouseOverHandler(event:MouseEvent):void {
+				
+			}
+			
+			protected function mouseOutHandler(event:MouseEvent):void {
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:HorizontalLayout verticalAlign="middle" horizontalAlign="left"
+							gap="0"
+							paddingBottom="0" paddingRight="0" paddingLeft="0" paddingTop="0" />
+	</s:layout>
+	
+	<s:CheckBox id="checkBox" 
+				enabled="{parentDocument.editable}"
+				selected="{data.selected}" 
+				label="{label}" 
+				change="checkBoxChangeHandler(event)" 
+				/>
+	
+	<mx:TextInput height="20" id="textInput" 
+				  visible="{data.qualifiable}" 
+				  includeInLayout="{data.qualifiable}"
+				  enabled="{checkBox.selected}"
+				  text="{data.qualifier}"
+				  change="textInputChangeHandler(event)"/>
+</s:ItemRenderer>
