@@ -7,15 +7,25 @@
 				  >
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.IList;
+			
+			import org.openforis.collect.event.UIEvent;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			import org.openforis.collect.util.CollectionUtil;
 			
-			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_LOADING:String = "loading";
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_VALUES_SORTING_ALLOWED:String = "valuesSortingAllowed";
 			
-			private var _maxSpecified:int = 1;
 			private var _multiple:Boolean = false;
 			private var _editable:Boolean = true;
 			private var _codeInputField:CodeInputField;
+			private var _valuesRankingEnabled:Boolean = false;
+			private var _items:IList = null;
+			private var _selectedItems:ArrayCollection = null;
+			private var _notSelectedItems:ArrayCollection = null;
 			
 			[Bindable]
 			public function get multiple():Boolean {
@@ -26,15 +36,6 @@
 				_multiple = value;
 			}
 
-			[Bindable]
-			public function get maxSpecified():int {
-				return _maxSpecified;
-			}
-
-			public function set maxSpecified(value:int):void {
-				_maxSpecified = value;
-			}
-			
 			[Bindable]
 			public function get codeInputField():CodeInputField {
 				return _codeInputField;
@@ -52,13 +53,74 @@
 			public function set editable(value:Boolean):void {
 				_editable = value;
 			}
+			
+			[Bindable("itemsChanged")]
+			public function get items():IList {
+				return _items;
+			}
+			
+			public function set items(value:IList):void {
+				_items = value;
+				if ( value != null ) {
+					_selectedItems = new ArrayCollection();
+					for each (var item:CodeListItemProxy in value) {
+						if (item.selected) {
+							_selectedItems.addItem(item);
+						}
+					}
+					_notSelectedItems = new ArrayCollection(value.toArray());
+					_notSelectedItems.filterFunction = function(item:CodeListItemProxy):Boolean {
+						return ! (item.selected);
+					}
+					_notSelectedItems.refresh();
+				} else {
+					_selectedItems = _notSelectedItems = new ArrayCollection();
+				}
+				dispatchEvent(new Event("itemsChanged"));
+			}
 
+			[Bindable("itemsChanged")]
+			public function get selectedItems():ArrayCollection {
+				return _selectedItems;
+			}
+			
+			public function set selectedItems(value:ArrayCollection):void {
+				_selectedItems = value;
+			}
+			
+			[Bindable("itemsChanged")]
+			public function get notSelectedItems():ArrayCollection {
+				return _notSelectedItems;
+			}
+			
+			public function set notSelectedItems(value:ArrayCollection):void {
+				_notSelectedItems = value;
+			}
+			
+			public function selectionChangeHandler(event:UIEvent):void {
+				var item:CodeListItemProxy = CodeListItemProxy(event.obj);
+				if ( ! multiple ) {
+					for each(var itm:Object in items) {
+						if(itm != item) {
+							//reset selection
+							itm.selected = false;
+						}
+					}
+				}
+				if ( item.selected ) {
+					_selectedItems.addItem(item);
+				} else {
+					CollectionUtil.removeItem(_selectedItems, item);
+				}
+			}
+			
 		]]>
 	</fx:Script>
 		
 	<s:states>
-		<s:State name="default" />
 		<s:State name="loading" />
+		<s:State name="default" />
+		<s:State name="valuesSortingAllowed" basedOn="default" />
 	</s:states>
 	
 	<s:Group id="loadingContainer" includeIn="loading" itemCreationPolicy="immediate">
@@ -72,21 +134,69 @@
 				label="{Message.get('global.cancel')}" 
 				/>
 	</s:Group>
-
-	<s:VGroup id="dataContainer" 
-			  maxHeight="500" 
+	
+	<s:VGroup maxHeight="500" 
 			  maxWidth="500" 
-			  includeIn="default"  
+			  includeIn="default, valuesSortingAllowed"
 			  itemCreationPolicy="immediate">
-		<s:Scroller height="100%" width="100%">
-			<input:CodeListDialogDataGroup
-					id="dataGroup" 
-					multiple="{multiple}" 
-					editable="{editable}"
-					maxSpecified="{maxSpecified}"
-					width="100%" 
-					/>
-		</s:Scroller>
+		<mx:ViewStack selectedIndex="0"
+					  height="100%" 
+					  width="100%"
+					  selectedIndex.valuesSortingAllowed="1">
+			
+			<s:NavigatorContent height="100%" width="100%">
+				
+				<s:Scroller height="100%" width="100%">
+					<input:CodeListDialogDataGroup
+						id="dataGroup" 
+						dataProvider="{items}"
+						editable="{editable}"
+						width="100%" 
+						/>
+				</s:Scroller>
+			</s:NavigatorContent>
+			
+			<s:NavigatorContent height="100%" width="100%">
+				<s:VGroup
+					includeIn="valuesSortingAllowed"
+					height="100%" 
+					width="100%">
+					
+					<s:Label text="Select one or more values:&#13;(drag and drop selected items to reorder them)" />
+					
+					<s:Scroller width="100%"
+								maxHeight="200">
+						<input:CodeListDialogDataGroup
+							id="selectedItemsDataGroup" 
+							dataProvider="{selectedItems}"
+							editable="{editable}"
+							selectionChange="selectionChangeHandler(event)"
+							width="100%" 
+							/>
+					</s:Scroller>
+					
+					<s:Line width="100%">
+						<s:stroke>
+							<s:SolidColorStroke color="#000000" weight="1" caps="square"/>
+						</s:stroke>
+					</s:Line>
+					
+					<s:Scroller width="100%"
+								height="100%">
+						<input:CodeListDialogDataGroup
+							id="notSelectedItemsDataGroup" 
+							dataProvider="{notSelectedItems}"
+							selectionChange="selectionChangeHandler(event)"
+							editable="{editable}"
+							width="100%" 
+							/>
+					</s:Scroller>
+					
+				</s:VGroup>
+				
+			</s:NavigatorContent>
+			
+		</mx:ViewStack>
 		
 		<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle" gap="30">
 			<s:Button id="applyButton"
@@ -101,5 +211,7 @@
 					  label="{Message.get('global.cancel')}"  />
 		</s:HGroup>
 	</s:VGroup>
+	
+		
 	
 </s:TitleWindow>

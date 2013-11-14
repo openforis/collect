@@ -92,7 +92,6 @@ package org.openforis.collect.presenter {
 			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			_popUp.editable = Application.activeRecordEditable;
 			_popUp.multiple = _view.attributeDefinition.multiple;
-			_popUp.maxSpecified = _view.attributeDefinition.maxCount;
 			_popUp.title = _view.attributeDefinition.getInstanceOrHeadingLabelText();
 			_popUp.codeInputField = _view;
 			_popUp.setFocus();
@@ -112,8 +111,13 @@ package org.openforis.collect.presenter {
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
 			var data:IList = event.result as IList;
-			_popUp.dataGroup.dataProvider = data;
-			_popUp.currentState = CodeListDialog.STATE_DEFAULT;
+			_popUp.items = data;
+			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
+			//if ( codeAttributeDef.allowValuesSorting ) {
+				_popUp.currentState = CodeListDialog.STATE_VALUES_SORTING_ALLOWED;
+			/*} else {
+				_popUp.currentState = CodeListDialog.STATE_DEFAULT;
+			}*/
 			PopUpManager.centerPopUp(_popUp);
 		}
 
