@@ -11,12 +11,20 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.event.UIEvent;
+			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			import org.openforis.collect.util.CollectionUtil;
+			
 			private var _editable:Boolean = true;
+			private var _sortable:Boolean = false;
 			
 			public function selectionChangeHandler(lastSelectedData:Object):void {
 				var event:UIEvent = new UIEvent('selectionChange');
 				event.obj = lastSelectedData;
 				dispatchEvent(event);
+			}
+			
+			public function itemsOrderChangeHandler(item:CodeListItemProxy, indexTo:int):void {
+				CollectionUtil.moveItem(dataProvider, item, indexTo);
 			}
 			
 			[Bindable]
@@ -26,6 +34,15 @@
 
 			public function set editable(value:Boolean):void {
 				_editable = value;
+			}
+			
+			[Bindable]
+			public function get sortable():Boolean {
+				return _sortable;
+			}
+			
+			public function set sortable(value:Boolean):void {
+				_sortable = value;
 			}
 			
 		]]>

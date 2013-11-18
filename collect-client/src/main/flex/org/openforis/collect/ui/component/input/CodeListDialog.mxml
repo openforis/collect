@@ -22,7 +22,6 @@
 			private var _multiple:Boolean = false;
 			private var _editable:Boolean = true;
 			private var _codeInputField:CodeInputField;
-			private var _valuesRankingEnabled:Boolean = false;
 			private var _items:IList = null;
 			private var _selectedItems:ArrayCollection = null;
 			private var _notSelectedItems:ArrayCollection = null;
@@ -54,32 +53,16 @@
 				_editable = value;
 			}
 			
-			[Bindable("itemsChanged")]
+			[Bindable]
 			public function get items():IList {
 				return _items;
 			}
 			
 			public function set items(value:IList):void {
 				_items = value;
-				if ( value != null ) {
-					_selectedItems = new ArrayCollection();
-					for each (var item:CodeListItemProxy in value) {
-						if (item.selected) {
-							_selectedItems.addItem(item);
-						}
-					}
-					_notSelectedItems = new ArrayCollection(value.toArray());
-					_notSelectedItems.filterFunction = function(item:CodeListItemProxy):Boolean {
-						return ! (item.selected);
-					}
-					_notSelectedItems.refresh();
-				} else {
-					_selectedItems = _notSelectedItems = new ArrayCollection();
-				}
-				dispatchEvent(new Event("itemsChanged"));
 			}
 
-			[Bindable("itemsChanged")]
+			[Bindable]
 			public function get selectedItems():ArrayCollection {
 				return _selectedItems;
 			}
@@ -88,7 +71,7 @@
 				_selectedItems = value;
 			}
 			
-			[Bindable("itemsChanged")]
+			[Bindable]
 			public function get notSelectedItems():ArrayCollection {
 				return _notSelectedItems;
 			}
@@ -170,6 +153,7 @@
 							id="selectedItemsDataGroup" 
 							dataProvider="{selectedItems}"
 							editable="{editable}"
+							sortable="true"
 							selectionChange="selectionChangeHandler(event)"
 							width="100%" 
 							/>

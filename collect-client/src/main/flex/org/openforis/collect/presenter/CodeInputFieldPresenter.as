@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	import flash.events.MouseEvent;
 	import flash.ui.Keyboard;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
@@ -111,13 +112,34 @@ package org.openforis.collect.presenter {
 		
 		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
 			var data:IList = event.result as IList;
+			
+			var selectedItems:ArrayCollection;
+			var notSelectedItems:ArrayCollection;
+			if ( data != null ) {
+				selectedItems = new ArrayCollection();
+				for each (var item:CodeListItemProxy in data) {
+					if (item.selected) {
+						selectedItems.addItem(item);
+					}
+				}
+				notSelectedItems = new ArrayCollection(data.toArray());
+				notSelectedItems.filterFunction = function(item:CodeListItemProxy):Boolean {
+					return ! (item.selected);
+				}
+				notSelectedItems.refresh();
+			} else {
+				selectedItems = notSelectedItems = new ArrayCollection();
+			}
 			_popUp.items = data;
+			_popUp.selectedItems = selectedItems;
+			_popUp.notSelectedItems = notSelectedItems;
+			
 			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
-			//if ( codeAttributeDef.allowValuesSorting ) {
+			if ( codeAttributeDef.allowValuesSorting ) {
 				_popUp.currentState = CodeListDialog.STATE_VALUES_SORTING_ALLOWED;
-			/*} else {
+			} else {
 				_popUp.currentState = CodeListDialog.STATE_DEFAULT;
-			}*/
+			}
 			PopUpManager.centerPopUp(_popUp);
 		}
 
@@ -128,16 +150,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function applyButtonClickHandler(event:MouseEvent):void {
-			var items:IList = _popUp.dataGroup.dataProvider;
+			var selectedItems:IList = _popUp.selectedItems;
 			var parts:Array = new Array();
-			for each (var item:CodeListItemProxy in items) { 
-				if(item.selected) {
-					var codeStr:String = StringUtil.concat(": ", item.code, item.qualifier);
-					parts.push(codeStr);
-				}
+			for each (var item:CodeListItemProxy in selectedItems ) { 
+				var codeStr:String = StringUtil.concat(": ", item.code, item.qualifier);
+				parts.push(codeStr);
 			}
-			var codesStr:String = StringUtil.concat(", ", parts);
-			TextInput(_popUp.codeInputField.textInput).text = codesStr;
+			var inputFieldText:String = StringUtil.concat(", ", parts);
+			TextInput(_popUp.codeInputField.textInput).text = inputFieldText;
 			_popUp.codeInputField.presenter.updateValue();
 			closePopupHandler();
 		}
