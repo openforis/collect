@@ -18,7 +18,7 @@ package org.openforis.collect.client {
 		public function UserClient() {
 			super("userService");
 			
-			_loadAllOperation = getOperation("loadAll");
+			_loadAllOperation = getOperation("loadAll", CONCURRENCY_MULTIPLE);
 			_saveOperation = getOperation("save");
 			_deleteOperation = getOperation("delete");
 		}

@@ -29,6 +29,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
+	import org.openforis.collect.ui.component.datagrid.RecordOwnerColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryErrorsColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;
@@ -145,6 +146,9 @@ package org.openforis.collect.ui {
 			columns.addItem(column);
 			//date modified column
 			column = getGridColumn(Message.get("list.modifiedDate"), "modifiedDate", 120, UIUtil.gridColumnDateTimeLabelFunction);
+			columns.addItem(column);
+			//owner column
+			column = getGridColumn(Message.get("list.owner"), "ownerName", 120, null, true, new ClassFactory(RecordOwnerColumnItemRenderer));
 			columns.addItem(column);
 			//entry completed column
 			column = getGridColumn(Message.get("list.entryComplete"), "entryComplete", 70, 

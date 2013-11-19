@@ -34,6 +34,7 @@ package org.openforis.collect.client {
 		private var _getCodeListItemsOperation:Operation;
 		private var _findAssignableCodeListItemsOperation:Operation;
 		private var _searchAutoCompleteValuesOperation:Operation;
+		private var _assignOwnerOperation:Operation;
 		
 		public function DataClient() {
 			super("dataService");
@@ -54,6 +55,7 @@ package org.openforis.collect.client {
 			this._getCodeListItemsOperation = getOperation("getCodeListItems", CONCURRENCY_MULTIPLE);
 			this._findAssignableCodeListItemsOperation = getOperation("findAssignableCodeListItems", CONCURRENCY_MULTIPLE);
 			this._searchAutoCompleteValuesOperation = getOperation("searchAutoCompleteValues", CONCURRENCY_LAST, false);
+			this._assignOwnerOperation = getOperation("assignOwner", CONCURRENCY_MULTIPLE, false);
 		}
 		
 		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String):void {
@@ -137,6 +139,11 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
+		public function assignOwner(recordId:int, ownerId:Number, responder:IResponder):void {
+			var token:AsyncToken = this._assignOwnerOperation.send(recordId, ownerId);
+			token.addResponder(responder);
+		}
+
 		protected function queueResultHandler(event:ResultEvent, token:Object = null):void {
 			var lastCall:RemoteCallWrapper = _queueProcessor.lastCall;
 			if(lastCall != null) {

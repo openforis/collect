@@ -13,7 +13,6 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
-	import mx.controls.Alert;
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
@@ -202,12 +201,12 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function editButtonClickHandler(event:MouseEvent):void {
 			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
-			if(selectedRecord != null) {
+			if(selectedRecord == null) {
+				AlertUtil.showError("list.error.recordNotSelected");
+			} else {
 				var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_SELECTED);
 				uiEvent.obj = selectedRecord;
 				eventDispatcher.dispatchEvent(uiEvent);
-			} else {
-				AlertUtil.showError("list.error.recordNotSelected");
 			}
 		}
 		
@@ -226,6 +225,9 @@ package org.openforis.collect.presenter {
 				} else {
 					AlertUtil.showError("list.error.cannoDeletePromotedRecord", [rootEntityLabel, stepName]);
 				}
+			} else if ( ! selectedRecord.unassigned && ! Application.user.isOwner(selectedRecord) &&
+					! Application.user.canDeleteNotOwnedRecords() ) {
+				AlertUtil.showError("list.error.cannotDelete.differentOwner", [selectedRecord.owner.name]);
 			} else {
 				AlertUtil.showConfirm("list.delete.confirm", [rootEntityLabel], "list.delete.confirmTitle", executeDelete, [selectedRecord]);
 			}

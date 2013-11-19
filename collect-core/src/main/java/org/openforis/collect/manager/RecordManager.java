@@ -36,6 +36,7 @@ import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.RecordLockedException;
+import org.openforis.collect.persistence.RecordNotOwnedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.RecordValidationInProgressException;
@@ -134,6 +135,23 @@ public class RecordManager {
 			recordDao.delete(recordId);
 		}
 	}
+	
+	@Transactional
+	public void assignOwner(CollectSurvey survey, int recordId, Integer ownerId, User user, String sessionId) 
+			throws RecordLockedException, MultipleEditException {
+		if ( isLockingEnabled() ) {
+			checkSurveyRecordValidationNotInProgress(survey);
+			lockManager.isLockAllowed(user, recordId, sessionId, false);
+			lockManager.lock(recordId, user, sessionId, false);
+		}
+		try {
+			recordDao.assignOwner(recordId, ownerId);
+		} finally {
+			if ( isLockingEnabled() ) {
+				releaseLock(recordId);
+			}
+		}
+	}
 
 	/**
 	 * Returns a record and lock it
@@ -145,23 +163,29 @@ public class RecordManager {
 	 * @param sessionId
 	 * @param forceUnlock
 	 * @return
-	 * @throws RecordLockedException
-	 * @throws MultipleEditException
+	 * @throws RecordPersistence
 	 */
 	@Deprecated
 	@Transactional
-	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
 		return checkout(survey, user, recordId, Step.valueOf(step), sessionId, forceUnlock);
 	}
 	
 	@Transactional
-	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordLockedException, MultipleEditException {
+	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
 		if ( isLockingEnabled() ) {
 			checkSurveyRecordValidationNotInProgress(survey);
 			lockManager.isLockAllowed(user, recordId, sessionId, forceUnlock);
 			lockManager.lock(recordId, user, sessionId, forceUnlock);
 		}
 		CollectRecord record = load(survey, recordId, step);
+		if ( step == Step.ENTRY && record.getOwner() != null && ! record.getOwner().getId().equals(user.getId())
+				&& ! ( user.hasRole("ROLE_ADMIN") || user.hasRole("ROLE_ANALYSIS") || user.hasRole("ROLE_CLEANSING")) ) {
+			if ( isLockingEnabled() ) {
+				releaseLock(recordId);
+			}
+			throw new RecordNotOwnedException(record.getOwner().getName());
+		}
 		addEmptyNodes(record);
 		return record;
 	}

@@ -114,6 +114,7 @@ public class CollectRecord extends Record {
 	private transient User createdBy;
 	private transient Date modifiedDate;
 	private transient User modifiedBy;
+	private transient User owner;
 	private transient Integer missing;
 	private transient Integer missingErrors;
 	private transient Integer missingWarnings;
@@ -208,6 +209,14 @@ public class CollectRecord extends Record {
 
 	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+	
+	public User getOwner() {
+		return owner;
+	}
+	
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 
 	public Integer getSkipped() {

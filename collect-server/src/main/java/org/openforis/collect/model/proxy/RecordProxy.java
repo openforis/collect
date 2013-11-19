@@ -29,7 +29,7 @@ public class RecordProxy implements Proxy {
 	private Integer missingErrors;
 	private Integer missingWarnings;
 	private Integer warnings;
-
+	private UserProxy owner;
 	
 	public RecordProxy(CollectRecord record) {
 		this.record = record;
@@ -40,6 +40,7 @@ public class RecordProxy implements Proxy {
 		//missingWarnings = record.getMissingWarnings();
 		missingErrors = missingWarnings = 0; //TODO these values are not stored in records table
 		warnings = record.getWarnings();
+		owner = record.getOwner() == null ? null: new UserProxy(record.getOwner());
 	}
 
 	public static List<RecordProxy> fromList(List<CollectRecord> records) {
@@ -197,4 +198,11 @@ public class RecordProxy implements Proxy {
 		this.missingWarnings = missingWarnings;
 	}
 
+	public UserProxy getOwner() {
+		return owner;
+	}
+	
+	public void setOwner(UserProxy owner) {
+		this.owner = owner;
+	}
 }

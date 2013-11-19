@@ -25,6 +25,7 @@ package org.openforis.collect.model {
         public static const WARNINGS:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("WARNINGS", _);
         public static const DATE_CREATED:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("DATE_CREATED", _);
         public static const DATE_MODIFIED:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("DATE_MODIFIED", _);
+        public static const OWNER_NAME:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("OWNER_NAME", _);
         public static const STEP:RecordSummarySortField$Sortable = new RecordSummarySortField$Sortable("STEP", _);
 
         function RecordSummarySortField$Sortable(value:String = null, restrictor:* = null) {
@@ -36,7 +37,7 @@ package org.openforis.collect.model {
         }
 
         public static function get constants():Array {
-            return [KEY1, KEY2, KEY3, COUNT1, COUNT2, COUNT3, SKIPPED, MISSING, ERRORS, WARNINGS, DATE_CREATED, DATE_MODIFIED, STEP];
+            return [KEY1, KEY2, KEY3, COUNT1, COUNT2, COUNT3, SKIPPED, MISSING, ERRORS, WARNINGS, DATE_CREATED, DATE_MODIFIED, OWNER_NAME, STEP];
         }
 
         public static function valueOf(name:String):RecordSummarySortField$Sortable {

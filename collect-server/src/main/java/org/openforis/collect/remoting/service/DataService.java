@@ -32,6 +32,7 @@ import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeAddRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
@@ -169,6 +170,7 @@ public class DataService {
 		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
+		record.setOwner(user);
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
 		if ( fileManager.commitChanges(sessionId, record) ) {
@@ -432,7 +434,13 @@ public class DataService {
 		return result;
 	}
 	
-	
+	@Secured("ROLE_CLEANSING")
+	public void assignOwner(int recordId, Integer ownerId) throws RecordLockedException, MultipleEditException {
+		SessionState sessionState = sessionManager.getSessionState();
+		recordManager.assignOwner(sessionState.getActiveSurvey(), 
+				recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
+	}
+
 	protected CollectRecord getActiveRecord() {
 		SessionState sessionState = getSessionManager().getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();
