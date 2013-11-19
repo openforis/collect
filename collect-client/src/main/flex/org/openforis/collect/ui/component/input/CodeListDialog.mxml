@@ -87,6 +87,7 @@
 						if(itm != item) {
 							//reset selection
 							itm.selected = false;
+							CollectionUtil.removeItem(_selectedItems, itm);
 						}
 					}
 				}
@@ -103,10 +104,12 @@
 	<s:states>
 		<s:State name="loading" />
 		<s:State name="default" />
-		<s:State name="valuesSortingAllowed" basedOn="default" />
+		<s:State name="valuesSortingAllowed" />
 	</s:states>
 	
-	<s:Group id="loadingContainer" includeIn="loading" itemCreationPolicy="immediate">
+	<s:Group id="loadingContainer" 
+			 includeIn="loading" 
+			 itemCreationPolicy="immediate">
 		<component:LoadingContent height="100" width="200" />
 		<s:Button 
 				id="cancelLoading" 
@@ -118,84 +121,74 @@
 				/>
 	</s:Group>
 	
-	<s:VGroup maxHeight="500" 
-			  maxWidth="500" 
-			  includeIn="default, valuesSortingAllowed"
-			  itemCreationPolicy="immediate">
-		<mx:ViewStack selectedIndex="0"
-					  height="100%" 
-					  width="100%"
-					  selectedIndex.valuesSortingAllowed="1">
-			
-			<s:NavigatorContent height="100%" width="100%">
-				
-				<s:Scroller height="100%" width="100%">
-					<input:CodeListDialogDataGroup
-						id="dataGroup" 
-						dataProvider="{items}"
-						editable="{editable}"
-						width="100%" 
-						/>
-				</s:Scroller>
-			</s:NavigatorContent>
-			
-			<s:NavigatorContent height="100%" width="100%">
-				<s:VGroup
-					includeIn="valuesSortingAllowed"
-					height="100%" 
-					width="100%">
-					
-					<s:Label text="Select one or more values:&#13;(drag and drop selected items to reorder them)" />
-					
-					<s:Scroller width="100%"
-								maxHeight="200">
-						<input:CodeListDialogDataGroup
-							id="selectedItemsDataGroup" 
-							dataProvider="{selectedItems}"
-							editable="{editable}"
-							sortable="true"
-							selectionChange="selectionChangeHandler(event)"
-							width="100%" 
-							/>
-					</s:Scroller>
-					
-					<s:Line width="100%">
-						<s:stroke>
-							<s:SolidColorStroke color="#000000" weight="1" caps="square"/>
-						</s:stroke>
-					</s:Line>
-					
-					<s:Scroller width="100%"
-								height="100%">
-						<input:CodeListDialogDataGroup
-							id="notSelectedItemsDataGroup" 
-							dataProvider="{notSelectedItems}"
-							selectionChange="selectionChangeHandler(event)"
-							editable="{editable}"
-							width="100%" 
-							/>
-					</s:Scroller>
-					
-				</s:VGroup>
-				
-			</s:NavigatorContent>
-			
-		</mx:ViewStack>
+	<s:Scroller includeIn="default" 
+				width="100%"
+				maxHeight="400">
+		<input:CodeListDialogDataGroup
+			id="dataGroup" 
+			dataProvider="{items}"
+			editable="{editable}"
+			sortable="false"
+			selectionChange="selectionChangeHandler(event)"
+			width="100%" 
+			/>
+	</s:Scroller>
+	
+	<s:VGroup includeIn="valuesSortingAllowed" width="100%">
 		
-		<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle" gap="30">
-			<s:Button id="applyButton"
-					  useHandCursor="true" 
-					  buttonMode="true" 
-					  label="{Message.get('global.apply')}"
-					  enabled="{editable}"
-					  />
-			<s:Button id="cancelButton"
-					  useHandCursor="true"
-					  buttonMode="true" 
-					  label="{Message.get('global.cancel')}"  />
-		</s:HGroup>
+		<s:Label text="Select one or more values:&#13;(drag and drop selected items to reorder them)" />
+		
+		<s:Scroller width="100%"
+					maxHeight="300"
+					id="selectedItemsDataGroupScroller">
+			<input:CodeListDialogDataGroup
+				id="selectedItemsDataGroup" 
+				dataProvider="{selectedItems}"
+				editable="{editable}"
+				sortable="true"
+				selectionChange="selectionChangeHandler(event)"
+				width="100%" 
+				/>
+		</s:Scroller>
+		
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="#000000" weight="1" caps="square"/>
+			</s:stroke>
+		</s:Line>
+		
+		<s:Scroller width="100%"
+					minHeight="30"
+					maxHeight="{400 - selectedItemsDataGroupScroller.height}">
+			<input:CodeListDialogDataGroup
+				id="notSelectedItemsDataGroup" 
+				dataProvider="{notSelectedItems}"
+				selectionChange="selectionChangeHandler(event)"
+				editable="{editable}"
+				sortable="false"
+				width="100%" 
+				/>
+		</s:Scroller>
+		
 	</s:VGroup>
 	
-		
+	
+	<s:HGroup includeIn="default, valuesSortingAllowed"
+			  itemCreationPolicy="immediate"
+			  width="100%" 
+			  horizontalAlign="center" 
+			  verticalAlign="middle" 
+			  gap="30">
+		<s:Button id="applyButton"
+				  useHandCursor="true" 
+				  buttonMode="true" 
+				  label="{Message.get('global.apply')}"
+				  enabled="{editable}"
+				  />
+		<s:Button id="cancelButton"
+				  useHandCursor="true"
+				  buttonMode="true" 
+				  label="{Message.get('global.cancel')}"  />
+	</s:HGroup>
 	
 </s:TitleWindow>
