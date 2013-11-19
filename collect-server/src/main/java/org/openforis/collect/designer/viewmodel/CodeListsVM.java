@@ -114,12 +114,16 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		CollectSurvey survey = getSurvey();
 		survey.addCodeList(editedItem);
 		dispatchCodeListsUpdatedCommand();
+		dispatchSurveySaveCommand();
+		initItemsPerLevel();
+		notifyChange("itemsPerLevel");
 	}
 
 	@Override
 	protected void deleteItemFromSurvey(CodeList item) {
 		codeListManager.delete(item);
 		dispatchCodeListsUpdatedCommand();
+		dispatchSurveySaveCommand();
 	}
 	
 	@Override
@@ -129,6 +133,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	protected void dispatchCodeListsUpdatedCommand() {
 		BindUtils.postGlobalCommand(null, null, CODE_LISTS_UPDATED_GLOBAL_COMMAND, null);
+	}
+	
+	protected void dispatchSurveySaveCommand() {
+		BindUtils.postGlobalCommand(null, null, SurveyEditVM.BACKGROUD_SAVE_GLOBAL_COMMAND, null);
 	}
 	
 	@Command
@@ -465,6 +473,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			if ( newChildItem ) {
 				addChildItemToCodeList();
 			} else {
+				dispatchSurveySaveCommand();
 				if ( editedChildItem instanceof PersistedCodeListItem ) {
 					codeListManager.save((PersistedCodeListItem) editedChildItem);
 				}
@@ -572,13 +581,16 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	protected void initItemsPerLevel() {
 		itemsPerLevel = new ArrayList<List<CodeListItem>>();
-		if ( editedItem != null && ! editedItem.isExternal() ) {
+		if ( isSurveyStored() && editedItem != null && ! editedItem.isExternal() ) {
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(editedItem);
 			itemsPerLevel.add(new ArrayList<CodeListItem>(rootItems));
 			for (CodeListItem selectedItem : selectedItemsPerLevel) {
 				List<CodeListItem> childItems = codeListManager.loadChildItems(selectedItem);
 				itemsPerLevel.add(new ArrayList<CodeListItem>(childItems));
 			}
+		} else {
+			//add empty root items list
+			itemsPerLevel.add(new ArrayList<CodeListItem>());
 		}
 	}
 	

@@ -195,6 +195,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 	}
 	
+	public boolean isSurveyStored() {
+		return getSurveyId() != null;
+	}
+	
 	public boolean isSurveyPublished() {
 		if ( survey == null ) {
 			return false;

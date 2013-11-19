@@ -52,6 +52,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private static final String TEXT_XML = "text/xml";
 	private static final String PREVIEW_WINDOW_ID = "collect_survey_preview";
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
+	public static final String BACKGROUD_SAVE_GLOBAL_COMMAND = "backgroundSurveySave";
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 //	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
 	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
@@ -251,14 +252,19 @@ public class SurveyEditVM extends SurveyBaseVM {
 		dispatchValidateAllCommand();
 //		validateMainForm(binder);
 		if ( checkCanSave(false) ) {
-			survey.refreshSurveyDependencies();
-			surveyManager.saveSurveyWork(survey);
+			backgroundSurveySave();
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
-			BindUtils.postNotifyChange(null, null, survey, "id");
-			BindUtils.postNotifyChange(null, null, survey, "published");
-			notifyChange("surveyId","surveyPublished");
-			changed = false;
 		}
+	}
+	
+	@GlobalCommand
+	public void backgroundSurveySave() throws SurveyImportException {
+		survey.refreshSurveyDependencies();
+		surveyManager.saveSurveyWork(survey);
+		BindUtils.postNotifyChange(null, null, survey, "id");
+		BindUtils.postNotifyChange(null, null, survey, "published");
+		notifyChange("surveyStored","surveyId","surveyPublished");
+		changed = false;
 	}
 	
 	protected void validateMainForm(Binder binder) {
