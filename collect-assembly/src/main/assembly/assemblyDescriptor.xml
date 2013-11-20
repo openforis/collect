@@ -26,6 +26,14 @@
 				<include>**/**</include>
 			</includes>
 		</fileSet>
+		<!-- Include custom startup scripts (e.g. setenv.sh/setenv.bat) -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/resources/tomcat/bin</directory>
+			<outputDirectory>${output.directory}/tomcat/bin</outputDirectory>
+			<includes>
+				<include>**/**</include>
+			</includes>
+		</fileSet>
 		<!-- Include empty data directory -->
 		<fileSet>
 			<directory>${basedir}/src/main/assembly/resources/tomcat/data</directory>
