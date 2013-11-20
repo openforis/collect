@@ -88,15 +88,15 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		public function canDeleteNotOwnedRecords():Boolean {
+		public function get canDeleteNotOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 		
-		public function canEditNotOwnedRecords():Boolean {
+		public function get canEditNotOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 		
-		public function canViewDifferentOwnedRecords():Boolean {
+		public function get canViewDifferentOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_CLEANSING);
 		}
 		

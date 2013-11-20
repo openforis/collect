@@ -135,7 +135,7 @@ package org.openforis.collect.presenter {
 			var record:RecordProxy = uiEvent.obj as RecordProxy;
 			if ( ! record.unassigned && 
 				! Application.user.isOwner(record) &&
-				! Application.user.canEditNotOwnedRecords() ) {
+				! Application.user.canEditNotOwnedRecords ) {
 				AlertUtil.showError("list.error.cannotEdit.differentOwner", [record.owner.name]);
 			} else {
 				var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, record);
