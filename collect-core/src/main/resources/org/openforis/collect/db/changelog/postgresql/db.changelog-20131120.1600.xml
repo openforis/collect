@@ -7,20 +7,16 @@
 
 		<comment>Add index on ofc_code_list table to optimize search performances</comment>
 		
-		<dropIndex indexName="ofc_code_list_survey_idx"
-			tableName="ofc_code_list" />
-		
-		<dropIndex indexName="ofc_code_list_survey_work_idx"
-			tableName="ofc_code_list" />
-		
-		<dropIndex indexName="ofc_code_list_child_items_idx"
-			tableName="ofc_code_list" />
-		
-		<dropIndex indexName="ofc_code_list_work_child_items__idx"
-			tableName="ofc_code_list" />
+		<sql>
+		    drop index if exists collect.ofc_code_list_survey_idx;
+		    drop index if exists collect.ofc_code_list_survey_work_idx;
+		    drop index if exists collect.ofc_code_list_child_items_idx;
+		    drop index if exists collect.ofc_code_list_work_child_items__idx;
+		</sql>
 						    	
 		<createIndex 
-		    indexName="ofc_code_list_child_item_idx"
+			indexName="ofc_code_list_child_item_idx"
+		    schemaName="collect"
 			tableName="ofc_code_list" 
 			unique="true">
 			<column name="survey_id" type="INTEGER" />
@@ -32,7 +28,8 @@
 		
 		<createIndex
             indexName="ofc_code_list_survey_idx"
-            tableName="ofc_code_list"
+            schemaName="collect"
+			tableName="ofc_code_list"
             unique="false">
 	        <column name="survey_id" type="INTEGER"/>
 	        <column name="survey_work_id" type="INTEGER"/>
@@ -40,7 +37,8 @@
     	
 		<createIndex
             indexName="ofc_code_list_child_items_idx"
-            tableName="ofc_code_list"
+            schemaName="collect"
+			tableName="ofc_code_list"
             unique="false">
 	        <column name="survey_id" type="INTEGER"/>
 	        <column name="survey_work_id" type="INTEGER"/>
