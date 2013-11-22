@@ -24,6 +24,8 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	private static final String 	MIN_COUNT_FIELD = "minCount";
 	protected static final String 	MAX_COUNT_FIELD = "maxCount";
 	protected static final String 	TAB_NAME_FIELD = "tabName";
+	protected static final String 	REQUIRED_EXPR_FIELD = "requiredExpression";
+	protected static final String 	RELEVANT_EXPR_FIELD = "relevantExpression";
 	
 	protected static final int 		MAX_COUNT_MIN_VALUE = 2;
 
@@ -33,6 +35,9 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		validateDescription(ctx);
 		validateMinCount(ctx);
 		validateMaxCount(ctx);
+		NodeDefinition contextNode = getEditedNode(ctx);
+		validatePathExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
+		validatePathExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
 	}
 
 	protected boolean validateName(ValidationContext ctx) {

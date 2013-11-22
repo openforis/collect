@@ -254,6 +254,10 @@
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
 		<property name="lookupProvider" ref="lookupProvider" />
 	</bean>
+
+	<bean id="expressionValidator" class="org.openforis.idm.metamodel.expression.ExpressionValidator">
+		<constructor-arg ref="expressionFactory" />
+	</bean>
 	
     <!--  Survey Context -->
 	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />

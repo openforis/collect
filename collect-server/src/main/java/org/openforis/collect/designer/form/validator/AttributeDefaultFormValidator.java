@@ -27,20 +27,43 @@ public class AttributeDefaultFormValidator extends FormValidator {
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
+		validateCondition(ctx);
+		validateValue(ctx);
+		validateExpression(ctx);
+	}
+
+	private void validateCondition(ValidationContext ctx) {
+		NodeDefinition contextNode = getContextNode(ctx);
+		validateBooleanCondition(ctx, contextNode, CONDITION_FIELD);
+	}
+
+	private void validateValue(ValidationContext ctx) {
 		String value = getValue(ctx, VALUE_FIELD);
 		String expression = getValue(ctx, EXPRESSION_FIELD);
-		if ( StringUtils.isBlank(value) ) {
-			if ( StringUtils.isBlank(expression) ) {
-				addInvalidMessage(ctx, VALUE_FIELD, Labels.getLabel(VALUE_OR_EXPRESSION_REQUIRED_MESSAGE_KEY));
-				addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(VALUE_OR_EXPRESSION_REQUIRED_MESSAGE_KEY));
-			}
-		} else if ( StringUtils.isNotBlank(expression) ) {
+		if ( StringUtils.isBlank(value) && StringUtils.isBlank(expression) ) {
+			addInvalidMessage(ctx, VALUE_FIELD, Labels.getLabel(VALUE_OR_EXPRESSION_REQUIRED_MESSAGE_KEY));
+		} else if ( StringUtils.isNotBlank(value) && StringUtils.isNotBlank(expression) ) {
 			addInvalidMessage(ctx, VALUE_FIELD, Labels.getLabel(CANNOT_SPECIFY_BOTH_VALUE_AND_EXPRESSION_MESSAGE_KEY));
-			addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(CANNOT_SPECIFY_BOTH_VALUE_AND_EXPRESSION_MESSAGE_KEY));
+		} else {
+			NodeDefinition contextNode = getContextNode(ctx);
+			validateValueExpression(ctx, contextNode, VALUE_FIELD);
 		}
 	}
 	
-	protected NodeDefinition getParentDefintion(ValidationContext ctx) {
+	private void validateExpression(ValidationContext ctx) {
+		String value = getValue(ctx, VALUE_FIELD);
+		String expression = getValue(ctx, EXPRESSION_FIELD);
+		if ( StringUtils.isBlank(value) && StringUtils.isBlank(expression) ) {
+			addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(VALUE_OR_EXPRESSION_REQUIRED_MESSAGE_KEY));
+		} else if ( StringUtils.isNotBlank(value) && StringUtils.isNotBlank(expression) ) {
+			addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(CANNOT_SPECIFY_BOTH_VALUE_AND_EXPRESSION_MESSAGE_KEY));
+		} else {
+			NodeDefinition contextNode = getContextNode(ctx);
+			validateValueExpression(ctx, contextNode, EXPRESSION_FIELD);
+		}
+	}
+	
+	protected NodeDefinition getContextNode(ValidationContext ctx) {
 		NodeDefinition result = (NodeDefinition) ctx.getValidatorArg(PARENT_DEFINITION_ARG);
 		return result;
 	}

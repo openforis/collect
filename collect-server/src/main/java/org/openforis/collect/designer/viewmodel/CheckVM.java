@@ -20,7 +20,7 @@ import org.zkoss.bind.annotation.Init;
 public abstract class CheckVM<T extends Check<?>> extends SurveyObjectBaseVM<T> {
 
 	protected AttributeDefinition parentDefinition;
-
+	
 	@Init(superclass=false)
 	public void init(AttributeDefinition parentDefinition, T check, Boolean newItem ) {
 		super.init();

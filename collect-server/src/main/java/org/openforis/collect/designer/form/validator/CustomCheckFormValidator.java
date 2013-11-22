@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form.validator;
 
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.ValidationContext;
 
 /**
@@ -15,6 +16,9 @@ public class CustomCheckFormValidator extends CheckFormValidator {
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
-		validateRequired(ctx, EXPRESSION_FIELD);
+		super.internalValidate(ctx);
+		NodeDefinition parentDefn = getContextNode(ctx);
+		validateValueExpression(ctx, parentDefn, EXPRESSION_FIELD);
 	}
+	
 }
