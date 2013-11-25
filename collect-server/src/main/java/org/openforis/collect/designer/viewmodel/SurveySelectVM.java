@@ -302,6 +302,10 @@ public class SurveySelectVM extends BaseVM {
 
 	@GlobalCommand
 	public void updateSurveyList() {
+		if ( surveyImportPopUp != null || processStatusPopUp != null ) {
+			//skip survey list update
+			return;
+		}
 		List<SurveySummary> newSummaries = surveyManager.loadSummaries();
 		if (summaries == null) {
 			summaries = newSummaries;

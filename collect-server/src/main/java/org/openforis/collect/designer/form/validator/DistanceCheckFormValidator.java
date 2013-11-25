@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.form.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -20,7 +21,12 @@ public class DistanceCheckFormValidator extends CheckFormValidator {
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
-		validateMinOrMaxExpressionRequireness(ctx);
+		super.internalValidate(ctx);
+		if ( validateMinOrMaxExpressionRequireness(ctx) ) {
+			NodeDefinition contextNode = getContextNode(ctx);
+			validateValueExpression(ctx, contextNode, MIN_DISTANCE_FIELD);
+			validateValueExpression(ctx, contextNode, MAX_DISTANCE_FIELD);
+		}
 	}
 
 	protected boolean validateMinOrMaxExpressionRequireness(ValidationContext ctx) {
@@ -34,4 +40,5 @@ public class DistanceCheckFormValidator extends CheckFormValidator {
 			return true;
 		}
 	}
+	
 }

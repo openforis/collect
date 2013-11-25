@@ -4,6 +4,8 @@
 package org.openforis.collect.designer.form.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -11,8 +13,8 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  *
  */
-public class ComparisonCheckFormValidator extends CheckFormValidator {
 	
+public class ComparisonCheckFormValidator extends CheckFormValidator {
 	private String GREATER_THAN_FIELD = "greaterThan";
 	private String LESS_THAN_FIELD = "lessThan";
 	
@@ -20,7 +22,12 @@ public class ComparisonCheckFormValidator extends CheckFormValidator {
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
-		validateGreaterOrLessRequireness(ctx);
+		super.internalValidate(ctx);
+		if ( validateGreaterOrLessRequireness(ctx) ) {
+			NodeDefinition contextDefn = getContextNode(ctx);
+			validateValueExpression(ctx, contextDefn, GREATER_THAN_FIELD);
+			validateValueExpression(ctx, contextDefn, LESS_THAN_FIELD);
+		}
 	}
 
 	protected boolean validateGreaterOrLessRequireness(ValidationContext ctx) {

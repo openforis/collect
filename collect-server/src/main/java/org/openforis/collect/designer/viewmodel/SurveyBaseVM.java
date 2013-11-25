@@ -24,6 +24,7 @@ import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Unit;
+import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.GlobalCommand;
@@ -50,6 +51,9 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	@WireVariable
 	protected CollectSurvey survey;
+	
+	@WireVariable
+	private ExpressionValidator expressionValidator;
 
 	protected String currentLanguageCode;
 	
@@ -327,6 +331,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return currentFormBlocking;
 	}
 
+	public ExpressionValidator getExpressionValidator() {
+		return expressionValidator;
+	}
+	
 	public interface CanLeaveFormConfirmHandler {
 		void onOk(boolean confirmed);
 	}
