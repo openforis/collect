@@ -1,9 +1,9 @@
 package org.openforis.collect.presenter {
 	import flash.events.Event;
 	
-	import mx.collections.ArrayCollection;
-	import mx.collections.ListCollectionView;
+	import mx.controls.DateField;
 	import mx.events.DropdownEvent;
+	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
@@ -11,8 +11,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
-	import org.openforis.collect.ui.component.input.DateField;
 	import org.openforis.collect.ui.component.input.InputField;
+	import org.openforis.collect.util.DateUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.events.DropDownEvent;
@@ -46,6 +46,11 @@ package org.openforis.collect.presenter {
 			view.dateField.addEventListener(DropDownEvent.OPEN, dateFieldOpenHandler);
 		}
 		
+		override protected function attributeChangeHandler(event:PropertyChangeEvent):void {
+			super.attributeChangeHandler(event);
+			view.year.visited = view.month.visited = view.day.visited = false;
+		}
+		
 		private function get view():DateAttributeRenderer {
 			return DateAttributeRenderer(_view);
 		}
@@ -60,8 +65,10 @@ package org.openforis.collect.presenter {
 		protected function dateFieldCloseHandler(event:Event):void {
 			if(Application.activeRecordEditable) {
 				var date:Date = (event.target as DateField).dropdown.selectedDate;
-				if(date != null) {
+				var oldDate:Date = getDateFromFields();
+				if(date != null && DateUtil.compareDates(date, oldDate) != 0 ) {
 					setDateOnFields(date.fullYear, date.month + 1, date.date);
+					view.year.visited = view.month.visited = view.day.visited = true;
 				}
 			}
 		}
