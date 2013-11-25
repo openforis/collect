@@ -76,16 +76,34 @@ public class SurveyValidator {
 	}
 	
 	public List<SurveyValidationResult> validate(CollectSurvey survey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
-		List<SurveyValidationResult> partialResults = validateEntities(survey);
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		List<SurveyValidationResult> partialResults;
+		partialResults = validateRootKeyAttributeSpecified(survey);
+		results.addAll(partialResults);
+		partialResults = validateEntities(survey);
 		results.addAll(partialResults);
 		partialResults = validateExpressions(survey);
 		results.addAll(partialResults);
 		return results;
 	}
+
+	private List<SurveyValidationResult> validateRootKeyAttributeSpecified(CollectSurvey survey) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		Schema schema = survey.getSchema();
+		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
+		for (EntityDefinition rootEntity : rootEntityDefinitions) {
+			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
+			if ( keyAttributeDefinitions.isEmpty() ) {
+				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntity.getPath(), 
+						"survey.validation.error.key_attribute_not_specified");
+				results.add(validationResult);
+			}
+		}
+		return results;
+	}
 	
 	public List<SurveyValidationResult> validateChanges(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<SurveyValidationResult> partialResults;
 		partialResults = validateParentRelationship(oldPublishedSurvey, newSurvey);
 		results.addAll(partialResults);
@@ -105,7 +123,7 @@ public class SurveyValidator {
 	 * @return
 	 */
 	protected List<SurveyValidationResult> validateEntities(CollectSurvey survey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
 		Stack<EntityDefinition> entitiesStack = new Stack<EntityDefinition>();
 		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
@@ -114,9 +132,7 @@ public class SurveyValidator {
 			EntityDefinition entity = entitiesStack.pop();
 			List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
 			if ( childDefinitions.size() == 0 ) {
-				String messageKey = "survey.validation.error.empty_entity";
-				String path = entity.getPath();
-				SurveyValidationResult validationResult = new SurveyValidationResult(path, messageKey);
+				SurveyValidationResult validationResult = new SurveyValidationResult(entity.getPath(), "survey.validation.error.empty_entity");
 				results.add(validationResult);
 			} else {
 				for (NodeDefinition childDefn : childDefinitions) {
@@ -130,7 +146,7 @@ public class SurveyValidator {
 	}
 	
 	protected List<SurveyValidationResult> validateExpressions(CollectSurvey survey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
 		Stack<NodeDefinition> nodesStack = new Stack<NodeDefinition>();
 		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
@@ -182,7 +198,7 @@ public class SurveyValidator {
 	}
 
 	private List<SurveyValidationResult> validateGenericNodeExpressions(NodeDefinition node) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		//validate required expression
 		addBooleanExpressionValidationResult(results, node, node.getRequiredExpression(), 
 				"survey.validation.node.error.invalid_required_expression");
@@ -203,7 +219,7 @@ public class SurveyValidator {
 	}
 	
 	protected List<SurveyValidationResult> validateAttributeDefaults(AttributeDefinition node) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<AttributeDefault> attributeDefaults = node.getAttributeDefaults();
 		for (AttributeDefault attributeDefault : attributeDefaults) {
 			validateAttributeDefault(results, node, attributeDefault);
@@ -350,7 +366,7 @@ public class SurveyValidator {
 	}
 	
 	protected List<SurveyValidationResult> validateEnumeratingCodeListsNotChanged(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<CodeList> codeLists = newSurvey.getCodeLists();
 		for (CodeList codeList : codeLists) {
 			CodeList oldCodeList = oldPublishedSurvey.getCodeListById(codeList.getId());
@@ -363,7 +379,7 @@ public class SurveyValidator {
 	
 	protected List<SurveyValidationResult> validateEnumeratingCodeListNotChanged(CodeList oldCodeList,
 			CodeList codeList) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<CodeListItem> oldItems = codeListManager.loadRootItems(oldCodeList);
 		for (CodeListItem oldItem : oldItems) {
 			CodeListItem newItem = codeListManager.loadRootItem(codeList, oldItem.getCode(), null);
@@ -451,7 +467,7 @@ public class SurveyValidator {
 		
 		public void addValidationError(SurveyValidationResult result) {
 			if ( results == null ) {
-				results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+				results = new ArrayList<SurveyValidationResult>();
 			}
 			results.add(result);
 		}
