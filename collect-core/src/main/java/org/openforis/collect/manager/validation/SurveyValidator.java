@@ -161,7 +161,7 @@ public class SurveyValidator {
 	}
 
 	private List<SurveyValidationResult> validateAttributeExpressions(AttributeDefinition node) {
-		List<SurveyValidationResult> results = validateGenericNodeExpressions(node);
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		if ( node instanceof CodeAttributeDefinition ) {
 			addSchemaPathExpressionValidationResult(results, node, ((CodeAttributeDefinition) node).getParentExpression(),
 					"survey.validation.attribute.code.invalid_parent_expression");
@@ -184,16 +184,16 @@ public class SurveyValidator {
 	private List<SurveyValidationResult> validateGenericNodeExpressions(NodeDefinition node) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		//validate required expression
-		addSchemaPathExpressionValidationResult(results, node, node.getRequiredExpression(), 
+		addBooleanExpressionValidationResult(results, node, node.getRequiredExpression(), 
 				"survey.validation.node.error.invalid_required_expression");
 		//validate required expression
-		addSchemaPathExpressionValidationResult(results, node, node.getRelevantExpression(), 
+		addBooleanExpressionValidationResult(results, node, node.getRelevantExpression(), 
 				"survey.validation.node.error.invalid_relevant_expression");
 		return results;
 	}
 
 	protected List<SurveyValidationResult> validateChecks(AttributeDefinition node) {
-		List<SurveyValidationResult> results = validateGenericNodeExpressions(node);
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<Check<?>> checks = node.getChecks();
 		for (Check<?> check : checks) {
 			List<SurveyValidationResult> checkValidationResults = validateCheck(node, check);
@@ -213,7 +213,7 @@ public class SurveyValidator {
 
 	private void validateAttributeDefault(List<SurveyValidationResult> results,
 			AttributeDefinition node, AttributeDefault attributeDefault) {
-		addCheckExpressionValidationResult(results, node, attributeDefault.getCondition(), 
+		addBooleanExpressionValidationResult(results, node, attributeDefault.getCondition(), 
 				"survey.validation.attribute.default_value.error.invalid_condition_expression");
 		String value = attributeDefault.getValue();
 		if ( StringUtils.isNotBlank(value)) {
@@ -224,29 +224,29 @@ public class SurveyValidator {
 					"survey.validation.attribute.default_value.error.invalid_value"));
 			}
 		}
-		addCheckExpressionValidationResult(results, node, attributeDefault.getExpression(), 
+		addValueExpressionValidationResult(results, node, attributeDefault.getExpression(), 
 				"survey.validation.attribute.default_value.error.invalid_expression");
 	}
 
 	private List<SurveyValidationResult> validateCheck(AttributeDefinition node, Check<?> check) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+
 		//validate condition expression
-		String condition = check.getCondition();
-		if ( StringUtils.isNotBlank(condition) && ! expressionValidator.validateBooleanExpression(node, condition) ) {
-			results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.error.invalid_condition_expression"));
-		}
+		addBooleanExpressionValidationResult(results, node, check.getCondition(), 
+				"survey.validation.check.error.invalid_condition_expression");
+		
 		if ( check instanceof ComparisonCheck ) {
-			addCheckExpressionValidationResult(results, node, ((ComparisonCheck) check).getExpression(),
+			addBooleanExpressionValidationResult(results, node, ((ComparisonCheck) check).getExpression(),
 					"survey.validation.check.comparison.error.invalid_comparison_expression");
 		} else if ( check instanceof CustomCheck ) {
-			addCheckExpressionValidationResult(results, node, ((CustomCheck) check).getExpression(),
+			addBooleanExpressionValidationResult(results, node, ((CustomCheck) check).getExpression(),
 					"survey.validation.check.custom.error.error.invalid_custom_expression");
 		} else if ( check instanceof DistanceCheck ) {
 			//validate min distance
-			addCheckExpressionValidationResult(results, node, ((DistanceCheck) check).getMinDistanceExpression(),
+			addBooleanExpressionValidationResult(results, node, ((DistanceCheck) check).getMinDistanceExpression(),
 					"survey.validation.check.distance.error.invalid_min_distance_expression");
 			//validate min distance
-			addCheckExpressionValidationResult(results, node, ((DistanceCheck) check).getMaxDistanceExpression(),
+			addBooleanExpressionValidationResult(results, node, ((DistanceCheck) check).getMaxDistanceExpression(),
 					"survey.validation.check.distance.error.invalid_max_distance_expression");
 		} else if ( check instanceof PatternCheck ) {
 			String regEx = ((PatternCheck) check).getRegularExpression();
@@ -254,16 +254,26 @@ public class SurveyValidator {
 				results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.pattern.error.invalid_pattern_expression"));
 			}
 		} else if ( check instanceof UniquenessCheck ) {
-			addCheckExpressionValidationResult(results, node, ((UniquenessCheck) check).getExpression(),
-					"survey.validation.check.uniqueness.error.invalid_uniqueness_expression");
+			String expression = ((UniquenessCheck) check).getExpression();
+			if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateUniquenessExpression(node, expression) ) {
+				results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.uniqueness.error.invalid_uniqueness_expression"));
+			}
 		}
 		return results;
 	}
 
-	private void addCheckExpressionValidationResult(
+	private void addBooleanExpressionValidationResult(
 			List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
-		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateCheckExpression(node, expression) ) {
+		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateBooleanExpression(node, expression) ) {
+			results.add(new SurveyValidationResult(node.getPath(), messageKey));
+		}
+	}
+
+	private void addValueExpressionValidationResult(
+			List<SurveyValidationResult> results, NodeDefinition node,
+			String expression, String messageKey) {
+		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateValueExpression(node, expression) ) {
 			results.add(new SurveyValidationResult(node.getPath(), messageKey));
 		}
 	}

@@ -56,7 +56,7 @@ public abstract class FormValidator extends BaseValidator {
 		}
 	}
 
-	protected boolean validateBooleanCondition(ValidationContext ctx,
+	protected boolean validateBooleanExpression(ValidationContext ctx,
 			NodeDefinition contextNode, String field) {
 		String condition = (String) getValue(ctx, field);
 		ExpressionValidator expressionValidator = getExpressionValidator(ctx);
@@ -83,7 +83,7 @@ public abstract class FormValidator extends BaseValidator {
 		String expression = getValue(ctx, fieldName);
 		NodeDefinitionVM<?> vm = (NodeDefinitionVM<?>) getVM(ctx);
 		ExpressionValidator expressionValidator = vm.getExpressionValidator();
-		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateValueExpression(contextNode, expression)) {
+		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateSchemaPathExpression(contextNode, expression)) {
 			addInvalidMessage(ctx, fieldName, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
 			return false;
 		} else {

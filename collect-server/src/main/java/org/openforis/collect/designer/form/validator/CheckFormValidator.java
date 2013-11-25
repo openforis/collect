@@ -19,7 +19,7 @@ public abstract class CheckFormValidator extends FormValidator {
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		NodeDefinition node = getContextNode(ctx);
-		validateBooleanCondition(ctx, node, CONDITION_FIELD);
+		validateBooleanExpression(ctx, node, CONDITION_FIELD);
 	}
 
 	protected NodeDefinition getContextNode(ValidationContext ctx) {

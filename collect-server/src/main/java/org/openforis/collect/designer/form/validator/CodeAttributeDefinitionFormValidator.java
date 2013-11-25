@@ -21,5 +21,4 @@ public class CodeAttributeDefinitionFormValidator extends AttributeDefinitionFor
 		validatePathExpression(ctx, contextNode, PARENT_EXPR_FIELD);
 	}
 
-
 }

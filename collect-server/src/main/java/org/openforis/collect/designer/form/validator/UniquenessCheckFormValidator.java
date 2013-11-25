@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.designer.form.validator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.ValidationContext;
@@ -28,7 +27,7 @@ public class UniquenessCheckFormValidator extends CheckFormValidator {
 			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
 			NodeDefinition parentDefn = getContextNode(ctx);
 			String expression = getValue(ctx, EXPRESSION_FIELD);
-			if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateUniquenessExpression(parentDefn, expression)) {
+			if ( ! expressionValidator.validateUniquenessExpression(parentDefn, expression)) {
 				addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
 				return false;
 			} else {

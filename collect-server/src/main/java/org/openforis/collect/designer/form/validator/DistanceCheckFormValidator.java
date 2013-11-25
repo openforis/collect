@@ -5,7 +5,6 @@ package org.openforis.collect.designer.form.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -24,8 +23,9 @@ public class DistanceCheckFormValidator extends CheckFormValidator {
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
 		if ( validateMinOrMaxExpressionRequireness(ctx) ) {
-			validateFieldExpression(ctx, MIN_DISTANCE_FIELD);
-			validateFieldExpression(ctx, MAX_DISTANCE_FIELD);
+			NodeDefinition contextNode = getContextNode(ctx);
+			validateValueExpression(ctx, contextNode, MIN_DISTANCE_FIELD);
+			validateValueExpression(ctx, contextNode, MAX_DISTANCE_FIELD);
 		}
 	}
 
@@ -41,15 +41,4 @@ public class DistanceCheckFormValidator extends CheckFormValidator {
 		}
 	}
 	
-	private boolean validateFieldExpression(ValidationContext ctx, String field) {
-		ExpressionValidator expressionValidator = getExpressionValidator(ctx);
-		NodeDefinition parentDefn = getContextNode(ctx);
-		String expression = getValue(ctx, field);
-		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateValueExpression(parentDefn, expression)) {
-			addInvalidMessage(ctx, field, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
-			return false;
-		} else {
-			return true;
-		}
-	}
 }

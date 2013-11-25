@@ -36,8 +36,8 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		validateMinCount(ctx);
 		validateMaxCount(ctx);
 		NodeDefinition contextNode = getEditedNode(ctx);
-		validatePathExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
-		validatePathExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
+		validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
+		validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
 	}
 
 	protected boolean validateName(ValidationContext ctx) {
