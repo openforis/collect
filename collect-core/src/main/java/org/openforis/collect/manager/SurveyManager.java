@@ -328,6 +328,15 @@ public class SurveyManager {
 		}
 	}
 
+	public SurveySummary getPublishedSummaryByName(String name) {
+		CollectSurvey survey = get(name);
+		if ( survey == null ) {
+			return null;
+		} else {
+			return SurveySummary.createFromSurvey(survey);
+		}
+	}
+	
 	protected void sortByName(List<SurveySummary> summaries) {
 		Collections.sort(summaries, new Comparator<SurveySummary>() {
 			@Override
@@ -461,6 +470,24 @@ public class SurveyManager {
 		return result;
 	}
 	
+
+	@Transactional
+	public SurveySummary loadSummaryByName(String name) {
+		SurveySummary workSummary = loadWorkSummaryByName(name);
+		SurveySummary publishedSummary = getPublishedSummaryByName(name);
+		SurveySummary result; 
+		if ( workSummary != null ) {
+			result = workSummary;
+			if ( publishedSummary != null ) {
+				result.setPublished(true);
+				result.setPublishedId(publishedSummary.getId());
+			}
+		} else {
+			result = publishedSummary;
+		}
+		return result;
+	}
+	
 	@Transactional
 	public CollectSurvey loadSurveyWork(int id) {
 		CollectSurvey survey = surveyWorkDao.load(id);
@@ -479,6 +506,10 @@ public class SurveyManager {
 	@Transactional
 	public SurveySummary loadWorkSummaryByUri(String uri) {
 		return surveyWorkDao.loadSurveySummaryByUri(uri);
+	}
+	@Transactional
+	public SurveySummary loadWorkSummaryByName(String name) {
+		return surveyWorkDao.loadSurveySummaryByName(name);
 	}
 	
 	@Transactional

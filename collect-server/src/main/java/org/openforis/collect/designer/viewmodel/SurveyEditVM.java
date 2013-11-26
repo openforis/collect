@@ -250,8 +250,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@Command
 	public void save(@ContextParam(ContextType.BINDER) Binder binder) throws SurveyImportException {
 		dispatchValidateAllCommand();
-//		validateMainForm(binder);
-		if ( checkCanSave(false) ) {
+		if ( checkCanSave() ) {
 			backgroundSurveySave();
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
 		}
@@ -267,55 +266,40 @@ public class SurveyEditVM extends SurveyBaseVM {
 		changed = false;
 	}
 	
-	protected void validateMainForm(Binder binder) {
-		Component view = binder.getView();
-		IdSpace spaceOwner = view.getSpaceOwner();
-		Component mainInfoFormContainer = Path.getComponent(spaceOwner, "mainInfoInclude/formContainer");
-		Binder mainFormBinder = (Binder) mainInfoFormContainer.getAttribute("binder");
-		SurveyMainInfoVM mainFormVM = (SurveyMainInfoVM) mainFormBinder.getViewModel();
-		mainFormVM.validateForm(mainFormBinder);
-	}
-
-	protected boolean checkCanSave(boolean publishing) {
+	protected boolean checkCanSave() {
 		if ( checkCanLeaveForm() ) {
-			List<SurveySummary> surveySummaries = surveyManager.loadSummaries();
-			for (SurveySummary surveySummary : surveySummaries) {
-				boolean notDuplicate = checkIsNotDuplicate(surveySummary, publishing);
-				if ( ! notDuplicate ) {
-					return false;
-				}
+			if ( ! checkSurveyNameUniqueness() ) {
+				return false;
+			} else if ( ! checkSurveyUriUniqueness() ) {
+				return false;
+			} else {
+				return true;
 			}
-			return true;
 		} else {
 			return false;
 		}
 	}
 
-	protected boolean checkIsNotDuplicate(SurveySummary summary, boolean publishing) {
-		Integer surveyId = survey.getId();
-		Integer publishedSurveyId = getSessionStatus().getPublishedSurveyId();
-		Integer summaryId = summary.getId();
-		boolean skip = false;
-		if ( surveyId == null ) {
-			if ( publishedSurveyId != null && summary.isPublished() && publishedSurveyId.equals(summaryId) ) {
-				skip = true;
-			}
-		} else if ( summaryId.equals(surveyId)) {
-			skip = true;
+	private boolean checkSurveyNameUniqueness() {
+		SurveySummary existingSurveySummary = surveyManager.loadSummaryByName(survey.getName());
+		if ( existingSurveySummary != null && ! isCurrentEditedSurvey(existingSurveySummary) ) {
+			String messageKey = LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_NAME;
+			MessageUtil.showWarning(messageKey);
+			return false;
+		} else {
+			return true;
 		}
-		if ( ! skip ) {
-			if ( summary.getName().equals(survey.getName()) ) {
-				String messageKey = publishing ? LabelKeys.SURVEY_PUBLISH_ERROR_DUPLICATE_NAME: LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_NAME;
-				MessageUtil.showWarning(messageKey);
-				return false;
-			}
-			if ( summary.getUri().equals(survey.getUri()) ) {
-				String messageKey = publishing ? LabelKeys.SURVEY_PUBLISH_ERROR_DUPLICATE_URI: LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_URI;
-				MessageUtil.showWarning(messageKey);
-				return false;
-			}
+	}
+
+	private boolean checkSurveyUriUniqueness() {
+		SurveySummary existingSurveySummary = surveyManager.loadSummaryByUri(survey.getUri());
+		if ( existingSurveySummary != null && ! isCurrentEditedSurvey(existingSurveySummary) ) {
+			String messageKey = LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_URI;
+			MessageUtil.showWarning(messageKey);
+			return false;
+		} else {
+			return true;
 		}
-		return true;
 	}
 
 	@GlobalCommand

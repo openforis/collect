@@ -18,6 +18,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -367,6 +368,24 @@ public abstract class SurveyBaseVM extends BaseVM {
 		result.put("work", Boolean.toString(work));
 		result.put("surveyId", surveyIdStr);
 		return result;
+	}
+	
+	public boolean isCurrentEditedSurvey(SurveySummary surveySummary) {
+		SessionStatus sessionStatus = getSessionStatus();
+		Integer editedPublishedSurveyId = sessionStatus.getPublishedSurveyId();
+		Integer editedSurveyId = getSurveyId();
+		if ( editedSurveyId == null ) {
+			if ( editedPublishedSurveyId != null && surveySummary.isPublished() && 
+					editedPublishedSurveyId.equals(surveySummary.getId()) ) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if ( surveySummary.getId().equals(editedSurveyId)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

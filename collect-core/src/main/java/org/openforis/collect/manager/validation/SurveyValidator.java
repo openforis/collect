@@ -78,15 +78,18 @@ public class SurveyValidator {
 	public List<SurveyValidationResult> validate(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<SurveyValidationResult> partialResults;
+		//root entity key required
 		partialResults = validateRootKeyAttributeSpecified(survey);
 		results.addAll(partialResults);
+		//empty entities not allowed
 		partialResults = validateEntities(survey);
 		results.addAll(partialResults);
+		//validate expressions
 		partialResults = validateExpressions(survey);
 		results.addAll(partialResults);
 		return results;
 	}
-
+	
 	private List<SurveyValidationResult> validateRootKeyAttributeSpecified(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
@@ -480,6 +483,10 @@ public class SurveyValidator {
 	
 	public void setCodeListManager(CodeListManager codeListManager) {
 		this.codeListManager = codeListManager;
+	}
+	
+	public void setExpressionValidator(ExpressionValidator expressionValidator) {
+		this.expressionValidator = expressionValidator;
 	}
 	
 }
