@@ -380,8 +380,8 @@ public class DataImportProcess implements Callable<Void> {
 	}
 	
 	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption, RecordFileException {
-		CollectRecord lastStepRecord = null;
-		Step oldRecordStep = null;
+		CollectRecord lastProcessedRecord = null;
+		Step originalRecordStep = null;
 		Step[] steps = Step.values();
 		for (Step step : steps) {
 			RecordEntry recordEntry = new RecordEntry(step, recordId);
@@ -396,43 +396,43 @@ public class DataImportProcess implements Callable<Void> {
 					state.addError(entryName, message);
 				} else {
 					parsedRecord.setStep(step);
-					if ( lastStepRecord == null ) {
+					if ( lastProcessedRecord == null ) {
 						CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
-						if (oldRecordSummary != null) {
-							//overwrite existing record
-							oldRecordStep = oldRecordSummary.getStep();
-							CollectSurvey parsedRecordSurvey = (CollectSurvey) parsedRecord.getSurvey();
-							CollectRecord oldRecord = recordDao.load(parsedRecordSurvey, oldRecordSummary.getId(), oldRecordStep.getStepNumber());
-							if ( includesRecordFiles ) {
-								recordFileManager.deleteAllFiles(oldRecord);
-							}
-							replaceData(parsedRecord, oldRecord);
-							lastStepRecord = oldRecord;
-							recordDao.update(lastStepRecord);
-							LOG.info("Updated: " + oldRecordSummary.getId() + " (from file " + entryName  + ")");
-						} else {
+						if (oldRecordSummary == null) {
 							//insert new record
 							recordDao.insert(parsedRecord);
-							lastStepRecord = parsedRecord;
 							LOG.info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
+						} else {
+							//overwrite existing record
+							originalRecordStep = oldRecordSummary.getStep();
+							parsedRecord.setId(oldRecordSummary.getId());
+							if ( includesRecordFiles ) {
+								recordFileManager.deleteAllFiles(parsedRecord);
+							}
+							recordDao.update(parsedRecord);
+							LOG.info("Updated: " + oldRecordSummary.getId() + " (from file " + entryName  + ")");
 						}
+						lastProcessedRecord = parsedRecord;
 					} else {
-						replaceData(parsedRecord, lastStepRecord);
-						recordDao.update(lastStepRecord);
+						replaceData(parsedRecord, lastProcessedRecord);
+						recordDao.update(lastProcessedRecord);
 					}
 					if ( parseRecordResult.hasWarnings() ) {
 						//state.addWarnings(entryName, parseRecordResult.getWarnings());
 					}
 				}
 			}
-			if ( lastStepRecord != null && oldRecordStep != null && lastStepRecord.getStep() != oldRecordStep ) {
-				lastStepRecord.setStep(oldRecordStep);
-				recordManager.validate(lastStepRecord);
-				recordDao.update(lastStepRecord);
-			}
+		}
+		if ( lastProcessedRecord != null && originalRecordStep != null && originalRecordStep.compareTo(lastProcessedRecord.getStep()) > 0 ) {
+			//reset the step to the original one and revalidate the record
+			CollectSurvey survey = (CollectSurvey) lastProcessedRecord.getSurvey();
+			CollectRecord originalRecord = recordDao.load(survey, lastProcessedRecord.getId(), originalRecordStep.getStepNumber());
+			originalRecord.setStep(originalRecordStep);
+			validateRecord(originalRecord);
+			recordDao.update(originalRecord);
 		}
 		if ( includesRecordFiles ) {
-			importRecordFiles(zipFile, lastStepRecord);
+			importRecordFiles(zipFile, lastProcessedRecord);
 		}
 	}
 
@@ -543,15 +543,19 @@ public class DataImportProcess implements Callable<Void> {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
-			try {
-				recordManager.validate(record);
-			} catch (Exception e) {
-				LOG.info("Error validating record: " + record.getRootEntityKeyValues());
-			}
+			validateRecord(record);
 			record.updateRootEntityKeyValues();
 			record.updateEntityCounts();
 		}
 		return result;
+	}
+
+	private void validateRecord(CollectRecord record) {
+		try {
+			recordManager.validate(record);
+		} catch (Exception e) {
+			LOG.info("Error validating record: " + record.getRootEntityKeyValues());
+		}
 	}
 
 	private void replaceData(CollectRecord fromRecord, CollectRecord toRecord) {
