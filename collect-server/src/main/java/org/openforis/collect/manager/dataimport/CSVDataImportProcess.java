@@ -89,9 +89,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private Step step;
 	private int parentEntityDefinitionId;
 	
-	public CSVDataImportProcess() {
-	}
-	
 	@Override
 	public void init() {
 		super.init();
@@ -217,10 +214,29 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				}
 			}
 		} else if ( step.compareTo(recordStep) <= 0  ) {
-			setValuesInRecord(line, recordSummary,
-					step);
+			setValuesInRecord(line, recordSummary, step);
+			if ( step.compareTo(recordStep) < 0 ) {
+				//reset record step to the original one
+				resetStep(recordSummary.getId(), recordStep);
+			}
 		} else {
 			status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
+		}
+	}
+
+	private void resetStep(Integer id, Step recordStep) {
+		CollectRecord record = recordDao.load(survey, id, recordStep.getStepNumber());
+		record.setStep(recordStep);
+		validateRecord(record);
+		recordDao.update(record);
+	}
+
+	private void validateRecord(CollectRecord record) {
+		try {
+			recordManager.validate(record);
+		} catch ( Exception e ) {
+			LOG.warn(String.format("Error validating record (id: %d, key: %s)", 
+				record.getId(), record.getRootEntityKeyValues()), e);
 		}
 	}
 
@@ -228,6 +244,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		LOG.info("Setting values in record: " + recordSummary.getId() + "[" + recordSummary.getRootEntityKeyValues() + "]" + " step: " + step);
 		
 		CollectRecord record = recordDao.load(survey, recordSummary.getId(), step.getStepNumber());
+		record.setStep(step);
 		Entity parentEntity = getOrCreateParentEntity(record, line);
 		if ( parentEntity != null ) {
 			setValuesInAttributes(parentEntity, line);
@@ -236,7 +253,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				recordDao.update(record);
 				record.setStep(Step.ANALYSIS);
 			}
-			recordManager.validate(record);
+			validateRecord(record);
 			recordDao.update(record);
 		}
 	}
