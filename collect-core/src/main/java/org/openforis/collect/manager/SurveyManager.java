@@ -584,10 +584,10 @@ public class SurveyManager {
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		codeListManager.deleteInvalidCodeListReferenceItems(survey);
 		Integer surveyWorkId = survey.getId();
-		CollectSurvey publishedSurvey = get(survey.getName());
 		survey.setWork(false);
 		survey.setPublished(true);
-		if ( publishedSurvey == null ) {
+		CollectSurvey oldPublishedSurvey = get(survey.getName());
+		if ( oldPublishedSurvey == null ) {
 			surveyDao.importModel(survey);
 		} else {
 			cancelRecordValidation(survey.getId());
@@ -598,8 +598,9 @@ public class SurveyManager {
 		speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
 		codeListManager.publishCodeLists(surveyWorkId, publishedSurveyId);
 		surveyWorkDao.delete(surveyWorkId);
-		if ( publishedSurvey != null ) {
-			removeFromCache(publishedSurvey);
+		
+		if ( oldPublishedSurvey != null ) {
+			removeFromCache(oldPublishedSurvey);
 		}
 		addToCache(survey);
 	}
