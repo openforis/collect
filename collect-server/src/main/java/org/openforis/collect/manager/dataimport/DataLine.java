@@ -40,7 +40,7 @@ public class DataLine extends Line {
 		return identifier.getKeyValues();
 	}
 	
-	public void setAncestorIdentifier(EntityIdentifier<?> identifier) {
+	public void addAncestorIdentifier(EntityIdentifier<?> identifier) {
 		int entityDefnId = identifier.getDefinition().getEntityDefinitionId();
 		ancestorIdentifierByDefinitionId.put(entityDefnId, identifier);
 	}
