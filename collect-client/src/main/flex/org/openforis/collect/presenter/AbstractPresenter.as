@@ -54,6 +54,9 @@ package org.openforis.collect.presenter {
 					var uiEvent:UIEvent = new UIEvent(UIEvent.BACK_TO_LIST);
 					eventDispatcher.dispatchEvent(uiEvent);
 					break;
+				case "org.openforis.collect.persistence.RecordNotOwnedException":
+					AlertUtil.showError("list.error.cannotEdit.differentOwner");
+					break;
 				case "org.openforis.collect.manager.RecordPromoteException" :
 					AlertUtil.showError('error.promoteException');
 					break;

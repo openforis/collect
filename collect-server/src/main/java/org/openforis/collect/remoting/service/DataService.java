@@ -32,6 +32,7 @@ import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.MultipleEditException;
+import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeAddRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
@@ -90,7 +91,7 @@ public class DataService {
 		Step step = Step.valueOf(stepNumber);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
-		fileManager.reset();
+		fileManager.resetTempInfo();
 		prepareRecordIndexing();
 		return new RecordProxy(record);
 	}
@@ -169,9 +170,12 @@ public class DataService {
 		User user = sessionState.getUser();
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(user);
+		record.setOwner(user);
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
-		fileManager.commitChanges(sessionId, record);
+		if ( fileManager.commitChanges(sessionId, record) ) {
+			recordManager.save(record, sessionId);
+		}
 		if ( isCurrentRecordIndexable() ) {
 			recordIndexService.permanentlyIndex(record);
 		}
@@ -430,7 +434,13 @@ public class DataService {
 		return result;
 	}
 	
-	
+	@Secured("ROLE_CLEANSING")
+	public void assignOwner(int recordId, Integer ownerId) throws RecordLockedException, MultipleEditException {
+		SessionState sessionState = sessionManager.getSessionState();
+		recordManager.assignOwner(sessionState.getActiveSurvey(), 
+				recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
+	}
+
 	protected CollectRecord getActiveRecord() {
 		SessionState sessionState = getSessionManager().getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();

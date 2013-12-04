@@ -2,8 +2,6 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;

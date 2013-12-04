@@ -16,6 +16,7 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
+import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.NumberAttribute;
@@ -113,6 +114,7 @@ public class CollectRecord extends Record {
 	private transient User createdBy;
 	private transient Date modifiedDate;
 	private transient User modifiedBy;
+	private transient User owner;
 	private transient Integer missing;
 	private transient Integer missingErrors;
 	private transient Integer missingWarnings;
@@ -207,6 +209,14 @@ public class CollectRecord extends Record {
 
 	public void setModifiedBy(User modifiedBy) {
 		this.modifiedBy = modifiedBy;
+	}
+	
+	public User getOwner() {
+		return owner;
+	}
+	
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 
 	public Integer getSkipped() {
@@ -370,6 +380,20 @@ public class CollectRecord extends Record {
 				}
 			}
 		}
+		return result;
+	}
+	
+	public List<FileAttribute> getFileAttributes() {
+		final List<FileAttribute> result = new ArrayList<FileAttribute>();
+		Entity rootEntity = getRootEntity();
+		rootEntity.traverse(new NodeVisitor() {
+			@Override
+			public void visit(Node<? extends NodeDefinition> node, int pos) {
+				if ( node instanceof FileAttribute ) {
+					result.add((FileAttribute) node);
+				}
+			}
+		});
 		return result;
 	}
 	

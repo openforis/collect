@@ -31,7 +31,12 @@ public abstract class AbstractProcess<V, S extends ProcessStatus> implements org
 	
 	@Override
 	public V call() throws Exception {
-		startProcessing();
+		try {
+			startProcessing();
+		} catch(Exception e) {
+			status.error();
+			status.setErrorMessage(e.getMessage());
+		}
 		if ( status.isRunning() ) {
 			status.complete();
 		}

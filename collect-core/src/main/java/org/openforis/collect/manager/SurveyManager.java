@@ -77,14 +77,14 @@ public class SurveyManager {
 	private Map<String, CollectSurvey> surveysByName;
 	private Map<String, CollectSurvey> surveysByUri;
 	
-	private Map<Integer, RecordValidationProcess> recordValidationProcessesBySurvey;
+	private Map<Integer, ProcessStatus> recordValidationStatusBySurvey;
 	
 	public SurveyManager() {
 		surveys = new ArrayList<CollectSurvey>();
 		surveysById = new HashMap<Integer, CollectSurvey>();
 		surveysByName = new HashMap<String, CollectSurvey>();
 		surveysByUri = new HashMap<String, CollectSurvey>();
-		recordValidationProcessesBySurvey = new HashMap<Integer, RecordValidationProcess>();
+		recordValidationStatusBySurvey = Collections.synchronizedMap(new HashMap<Integer, ProcessStatus>());
 	}
 
 	@Transactional
@@ -328,6 +328,15 @@ public class SurveyManager {
 		}
 	}
 
+	public SurveySummary getPublishedSummaryByName(String name) {
+		CollectSurvey survey = get(name);
+		if ( survey == null ) {
+			return null;
+		} else {
+			return SurveySummary.createFromSurvey(survey);
+		}
+	}
+	
 	protected void sortByName(List<SurveySummary> summaries) {
 		Collections.sort(summaries, new Comparator<SurveySummary>() {
 			@Override
@@ -461,6 +470,24 @@ public class SurveyManager {
 		return result;
 	}
 	
+
+	@Transactional
+	public SurveySummary loadSummaryByName(String name) {
+		SurveySummary workSummary = loadWorkSummaryByName(name);
+		SurveySummary publishedSummary = getPublishedSummaryByName(name);
+		SurveySummary result; 
+		if ( workSummary != null ) {
+			result = workSummary;
+			if ( publishedSummary != null ) {
+				result.setPublished(true);
+				result.setPublishedId(publishedSummary.getId());
+			}
+		} else {
+			result = publishedSummary;
+		}
+		return result;
+	}
+	
 	@Transactional
 	public CollectSurvey loadSurveyWork(int id) {
 		CollectSurvey survey = surveyWorkDao.load(id);
@@ -479,6 +506,10 @@ public class SurveyManager {
 	@Transactional
 	public SurveySummary loadWorkSummaryByUri(String uri) {
 		return surveyWorkDao.loadSurveySummaryByUri(uri);
+	}
+	@Transactional
+	public SurveySummary loadWorkSummaryByName(String name) {
+		return surveyWorkDao.loadSurveySummaryByName(name);
 	}
 	
 	@Transactional
@@ -501,6 +532,7 @@ public class SurveyManager {
 	
 	public CollectSurvey createSurveyWork() {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
+		survey.setWork(true);
 		UIOptions uiOptions = survey.createUIOptions();
 		survey.addApplicationOptions(uiOptions);
 		return survey;
@@ -552,10 +584,10 @@ public class SurveyManager {
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		codeListManager.deleteInvalidCodeListReferenceItems(survey);
 		Integer surveyWorkId = survey.getId();
-		CollectSurvey publishedSurvey = get(survey.getName());
 		survey.setWork(false);
 		survey.setPublished(true);
-		if ( publishedSurvey == null ) {
+		CollectSurvey oldPublishedSurvey = get(survey.getName());
+		if ( oldPublishedSurvey == null ) {
 			surveyDao.importModel(survey);
 		} else {
 			cancelRecordValidation(survey.getId());
@@ -566,16 +598,17 @@ public class SurveyManager {
 		speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
 		codeListManager.publishCodeLists(surveyWorkId, publishedSurveyId);
 		surveyWorkDao.delete(surveyWorkId);
-		if ( publishedSurvey != null ) {
-			removeFromCache(publishedSurvey);
+		
+		if ( oldPublishedSurvey != null ) {
+			removeFromCache(oldPublishedSurvey);
 		}
 		addToCache(survey);
 	}
 	
 	public void cancelRecordValidation(int surveyId) {
-		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
-		if ( process != null && process.getStatus().isRunning() ) {
-			process.cancel();
+		ProcessStatus status = getRecordValidationProcessStatus(surveyId);
+		if ( status != null ) {
+			status.cancel();
 		}
 	}
 
@@ -584,19 +617,19 @@ public class SurveyManager {
 		if ( survey == null ) {
 			throw new IllegalStateException("Published survey not found, id="+surveyId);
 		}
-		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
-		if ( process != null && process.getStatus().isRunning() ) {
+		ProcessStatus status = getRecordValidationProcessStatus(surveyId);
+		if ( status != null && status.isRunning() ) {
 			throw new IllegalStateException("Record validation process already started");
 		} else {
-			process = applicationContext.getBean(RecordValidationProcess.class);
+			RecordValidationProcess process = applicationContext.getBean(RecordValidationProcess.class);
 			process.setSurvey(survey);
 			process.setUser(user);
 			UUID sessionId = UUID.randomUUID();
 			process.setSessionId(sessionId.toString());
-			recordValidationProcessesBySurvey.put(survey.getId(), process);
 			try {
 				process.init();
-				ExecutorServiceUtil.execute(process);
+				recordValidationStatusBySurvey.put(survey.getId(), process.getStatus());
+				ExecutorServiceUtil.executeInCachedPool(process);
 			} catch (Exception e) {
 				LOG.error("Error validating survey records", e);
 			}
@@ -628,8 +661,8 @@ public class SurveyManager {
 	}
 
 	protected ProcessStatus getRecordValidationProcessStatus(int surveyId) {
-		RecordValidationProcess process = recordValidationProcessesBySurvey.get(surveyId);
-		return process == null ? null: process.getStatus();
+		ProcessStatus status = recordValidationStatusBySurvey.get(surveyId);
+		return status;
 	}
 	
 	public boolean isRecordValidationInProgress(int surveyId) {

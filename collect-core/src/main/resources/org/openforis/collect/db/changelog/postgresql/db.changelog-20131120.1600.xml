@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="improve-code-list-search-performances" author="ricci" dbms="postgresql">
+
+		<comment>Add index on ofc_code_list table to optimize search performances</comment>
+		
+		<sql>
+		    drop index if exists collect.ofc_code_list_survey_idx;
+		    drop index if exists collect.ofc_code_list_survey_work_idx;
+		    drop index if exists collect.ofc_code_list_child_items_idx;
+		    drop index if exists collect.ofc_code_list_work_child_items__idx;
+		</sql>
+						    	
+		<createIndex 
+			indexName="ofc_code_list_child_item_idx"
+		    schemaName="collect"
+			tableName="ofc_code_list" 
+			unique="true">
+			<column name="survey_id" type="INTEGER" />
+			<column name="survey_work_id" type="INTEGER" />
+			<column name="code_list_id" type="INTEGER" />
+			<column name="parent_id" type="INTEGER" />
+			<column name="code" type="VARCHAR" />
+		</createIndex>
+		
+		<createIndex
+            indexName="ofc_code_list_survey_idx"
+            schemaName="collect"
+			tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_id" type="INTEGER"/>
+	        <column name="survey_work_id" type="INTEGER"/>
+    	</createIndex>
+    	
+		<createIndex
+            indexName="ofc_code_list_child_items_idx"
+            schemaName="collect"
+			tableName="ofc_code_list"
+            unique="false">
+	        <column name="survey_id" type="INTEGER"/>
+	        <column name="survey_work_id" type="INTEGER"/>
+	        <column name="code_list_id" type="INTEGER"/>
+	        <column name="parent_id" type="INTEGER"/>
+    	</createIndex>
+
+	</changeSet>
+	
+</databaseChangeLog>

@@ -40,7 +40,7 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		lookupTable = source.getLookupTable();
 		itemLabel = getLabel(source, CodeListLabel.Type.ITEM, languageCode, defaultLanguage);
 		listLabel = getLabel(source, CodeListLabel.Type.LIST, languageCode, defaultLanguage);
-		description = source.getDescription(languageCode);
+		description = getDescription(source, languageCode, defaultLanguage);
 		List<CodeListLevel> levels = source.getHierarchy();
 		boolean hasMultipleLevels = levels.size() > 1;
 		type = hasMultipleLevels ? Type.HIERARCHICAL.name(): Type.FLAT.name();
@@ -65,6 +65,15 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
 			//try to get the label associated to default language
 			result = source.getLabel(type, null);
+		}
+		return result;
+	}
+	
+	protected String getDescription(CodeList source, String languageCode, String defaultLanguage) {
+		String result = source.getDescription(languageCode);
+		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
+			//try to get the label associated to default language
+			result = source.getDescription(null);
 		}
 		return result;
 	}

@@ -4,7 +4,6 @@ package org.openforis.collect.presenter {
 	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.events.CollectionEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	
@@ -12,10 +11,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
-	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
@@ -41,17 +38,13 @@ package org.openforis.collect.presenter {
 			_view.fieldIndex = -1;
 			super(view);
 		}
-		
+	
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			
 			ChangeWatcher.watch(_view, "attributes", attributesChangeHandler);
 		}
 		
 		protected function attributesChangeHandler(event:Event):void {
-			if(! (event is CollectionEvent) && _view.attributes != null && !_view.attributes.hasEventListener(CollectionEvent.COLLECTION_CHANGE)) {
-				_view.attributes.addEventListener(CollectionEvent.COLLECTION_CHANGE, attributesChangeHandler);
-			}
 			updateView();
 		}
 		
@@ -61,20 +54,6 @@ package org.openforis.collect.presenter {
 				_view.textInput.setFocus();
 			}
 		}
-		
-		/*override protected function setFocusOnAttributeInSiblingEntity(offset:int, circularLookup:Boolean = false, sameFieldIndex:Boolean = true):Boolean {
-			var siblingEntity:EntityProxy = EntityProxy(_view.parentEntity.getSibling(offset, circularLookup));
-			if ( siblingEntity != null ) {
-				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.SET_FOCUS);
-				inputFieldEvent.nodeName = _view.attributeDefinition.name;
-				inputFieldEvent.fieldIdx = _view.fieldIndex;
-				inputFieldEvent.parentEntityId = siblingEntity.id;
-				eventDispatcher.dispatchEvent(inputFieldEvent);
-				return true;
-			} else {
-				return false;
-			}
-		}*/
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attributes != null) {

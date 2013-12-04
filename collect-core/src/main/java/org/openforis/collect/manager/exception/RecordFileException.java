@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.manager;
+package org.openforis.collect.manager.exception;
 
 import org.openforis.collect.persistence.RecordPersistenceException;
 

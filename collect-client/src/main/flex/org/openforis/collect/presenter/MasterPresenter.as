@@ -18,6 +18,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.component.BlockingMessagePopUp;
@@ -43,6 +44,7 @@ package org.openforis.collect.presenter {
 			_checkRecordsLockTimer = new Timer(CHECK_RECORDS_LOCK_FREQUENCY)
 			_checkRecordsLockTimer.addEventListener(TimerEvent.TIMER, checkRecordsLockTimeoutHandler);
 			_checkRecordsLockTimer.start();
+			
 			/*
 			wait for surveys and sessionState loading, then dispatch APPLICATION_INITIALIZED event
 			if more than one survey is found, then whow surveySelection view
@@ -131,8 +133,14 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function recordSelectedHandler(uiEvent:UIEvent):void {
 			var record:RecordProxy = uiEvent.obj as RecordProxy;
-			var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, record);
-			_dataClient.loadRecord(responder, record.id, record.step);
+			if ( ! record.unassigned && 
+				! Application.user.isOwner(record) &&
+				! Application.user.canEditNotOwnedRecords ) {
+				AlertUtil.showError("list.error.cannotEdit.differentOwner", [record.owner.name]);
+			} else {
+				var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, record);
+				_dataClient.loadRecord(responder, record.id, record.step);
+			}
 		}
 		
 		/**

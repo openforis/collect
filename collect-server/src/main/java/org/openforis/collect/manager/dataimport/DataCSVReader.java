@@ -43,15 +43,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	public DataCSVReader(Reader reader, EntityDefinition parentEntityDefinition) throws IOException, ParsingException {
 		super(reader);
 		this.parentEntityDefinition = parentEntityDefinition;
-		validateAllFile();
 	}
 	
-	@Override
-	protected void init() throws IOException, ParsingException {
-		csvReader.readHeaders();
-		//postpone file validation
-	}
-
 	@Override
 	protected DataCSVLineParser createLineParserInstance() {
 		DataCSVLineParser lineParser = new DataCSVLineParser(this);
@@ -202,26 +195,40 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		
 		public DataLine parse() throws ParsingException {
 			DataLine line = super.parse();
+			
+			addAncestorIdentifierValues(line);
+			
+			addFieldValues(line);
+			
+			return line;
+		}
+
+		private void addAncestorIdentifierValues(DataLine line) throws ParsingException {
 			Schema schema = parentEntityDefinition.getSchema();
 			List<EntityIdentifierDefinition> ancestorIdentifiers = getAncestorIdentifiers();
 			for (EntityIdentifierDefinition identifierDefn : ancestorIdentifiers) {
 				EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(identifierDefn.getEntityDefinitionId());
-				EntityIdentifier<?> identifier;
 				if ( identifierDefn instanceof EntityKeysIdentifierDefintion ) {
-					identifier = new DataLine.EntityKeysIdentifier((EntityKeysIdentifierDefintion) identifierDefn);
+					EntityIdentifier<?> identifier = new DataLine.EntityKeysIdentifier((EntityKeysIdentifierDefintion) identifierDefn);
 					List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
 					for (AttributeDefinition keyDefn : keyDefns) {
 						String keyAttrColName = getKeyAttributeColumnName(parentEntityDefinition, keyDefn);
 						String value = getColumnValue(keyAttrColName, false, String.class);
 						((EntityKeysIdentifier) identifier).addKeyValue(keyDefn.getId(), value);
 					}
-				} else {
+					line.addAncestorIdentifier(identifier);
+				} else if ( identifierDefn instanceof EntityPositionIdentifierDefinition ) {
 					String positionColName = getPositionColumnName(entityDefn);
 					int position = getColumnValue(positionColName, true, Integer.class);
-					identifier = new DataLine.EntityPositionIdentifier((EntityPositionIdentifierDefinition) identifierDefn, position);
+					EntityIdentifier<?> identifier = new DataLine.EntityPositionIdentifier((EntityPositionIdentifierDefinition) identifierDefn, position);
+					line.addAncestorIdentifier(identifier);
+				} else {
+					//single entity identifier: no need to identify the entity with a value column
 				}
-				line.setAncestorIdentifier(identifier);
 			}
+		}
+
+		private void addFieldValues(DataLine line) throws ParsingException {
 			List<String> colNames = csvLine.getColumnNames();
 			List<String> expectedAncestorKeyColumnNames = getExpectedAncestorKeyColumnNames();
 			List<String> attrColNames = colNames.subList(expectedAncestorKeyColumnNames.size(), colNames.size());
@@ -235,7 +242,6 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				line.setFieldValue(attrDefn.getId(), fieldDefn.getName(), value);
 				line.setColumnNameByField(attrDefn.getId(), fieldDefn.getName(), colName);
 			}
-			return line;
 		}
 
 	}

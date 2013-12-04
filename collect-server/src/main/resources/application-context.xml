@@ -140,6 +140,9 @@
 	
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />
+	<bean id="expressionValidator" class="org.openforis.idm.metamodel.expression.ExpressionValidator">
+		<constructor-arg ref="expressionFactory" />
+	</bean>
 	<bean id="validator" 					class="org.openforis.idm.metamodel.validation.Validator" />
 	<bean id="surveyValidator" 				class="org.openforis.collect.manager.validation.SurveyValidator" />
 	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />

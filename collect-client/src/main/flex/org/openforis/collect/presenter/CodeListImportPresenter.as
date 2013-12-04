@@ -36,7 +36,7 @@ package org.openforis.collect.presenter
 			return CodeListImportView(_view);
 		}
 		
-		private function get messageKeys():MessageKeys {
+		public function get messageKeys():MessageKeys {
 			return MessageKeys(_messageKeys);
 		}
 		
@@ -115,6 +115,10 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 		return "codeListImport.confirmImport.message";
 	}
 	
+	override public function get ERROR_MISSING_REQUIRED_COLUMNS():String {
+		return "codeListImport.parsingError.missing_required_columns.message";
+	}
+	
 	public function get FILE_NOT_SELECTED():String {
 		return "codeListImport.fileNotSelected";
 	}
@@ -122,4 +126,5 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 	public function get IMPORT_POPUP_TITLE():String {
 		return "codeListImport.title";
 	}
+	
 }

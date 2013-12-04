@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-record-owner" author="ricci" dbms="postgresql">
+		<comment>Add owner column to record table</comment>
+		
+		<addColumn tableName="ofc_record">
+            <column name="owner_id" type="int4" />
+	    </addColumn>
+	        
+		<addForeignKeyConstraint
+            baseTableName="ofc_record"
+		    baseColumnNames="owner_id"
+            constraintName="ofc_record_owner_fkey"
+            referencedColumnNames="id"
+            referencedTableName="ofc_user" />
+		 
+		<sql>
+			update collect.ofc_record set owner_id = modified_by_id;
+		</sql>
+		
+	</changeSet>
+  
+</databaseChangeLog>

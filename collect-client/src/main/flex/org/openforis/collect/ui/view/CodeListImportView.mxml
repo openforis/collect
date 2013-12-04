@@ -13,6 +13,8 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.manager.referencedataimport.ParsingError$ErrorType;
+			import org.openforis.collect.manager.referencedataimport.proxy.ParsingErrorProxy;
 			import org.openforis.collect.presenter.CodeListImportPresenter;
 			
 			import spark.components.Button;
@@ -38,6 +40,14 @@
 				_codeListId = value;
 			}
 
+			override protected function getErrorMessageKey(item:ParsingErrorProxy):String {
+				switch (item.errorType) {
+					case ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS:
+						return _presenter.messageKeys.ERROR_MISSING_REQUIRED_COLUMNS;
+					default:
+						return super.getErrorMessageKey(item);
+				}
+			}
 		]]>
 	</fx:Script>
 	

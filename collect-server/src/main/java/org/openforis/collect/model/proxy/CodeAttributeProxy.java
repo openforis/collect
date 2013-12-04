@@ -28,7 +28,7 @@ public class CodeAttributeProxy extends AttributeProxy {
 
 	@ExternalizedProperty
 	public CodeListItemProxy getCodeListItem() {
-		if (! isExternalCodeList() ) {
+		if ( isEnumerator() ) {
 			CodeListManager codeListManager = getCodeListManager();
 			CodeListItem codeListItem = codeListManager.loadItemByAttribute(codeAttribute);
 			return codeListItem == null ? null: new CodeListItemProxy(codeListItem);

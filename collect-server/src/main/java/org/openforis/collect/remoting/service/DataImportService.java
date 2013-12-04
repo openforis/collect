@@ -6,14 +6,15 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.exception.DataImportExeption;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
-import org.openforis.collect.remoting.service.dataimport.DataImportExeption;
 import org.openforis.collect.remoting.service.dataimport.DataImportProcess;
 import org.openforis.collect.remoting.service.dataimport.DataImportState;
 import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
@@ -43,6 +44,8 @@ public class DataImportService {
 	private SurveyValidator surveyValidator;
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private RecordFileManager recordFileManager;
 	@Autowired
 	private RecordDao recordDao;
 	@Autowired
@@ -76,7 +79,8 @@ public class DataImportService {
 			for (User user : usersList) {
 				users.put(user.getName(), user);
 			}
-			dataImportProcess = new DataImportProcess(surveyManager, surveyValidator, recordManager, recordDao, selectedSurveyUri, users, packagedFile, overwriteAll);
+			dataImportProcess = new DataImportProcess(surveyManager, surveyValidator, recordManager, recordDao, recordFileManager, 
+					selectedSurveyUri, users, packagedFile, overwriteAll);
 			dataImportProcess.prepareToStartSummaryCreation();
 			ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
 		}

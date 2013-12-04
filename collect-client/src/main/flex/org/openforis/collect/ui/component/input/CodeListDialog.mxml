@@ -7,15 +7,24 @@
 				  >
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.IList;
+			
+			import org.openforis.collect.event.UIEvent;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			import org.openforis.collect.util.CollectionUtil;
 			
-			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_LOADING:String = "loading";
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_VALUES_SORTING_ALLOWED:String = "valuesSortingAllowed";
 			
-			private var _maxSpecified:int = 1;
 			private var _multiple:Boolean = false;
 			private var _editable:Boolean = true;
 			private var _codeInputField:CodeInputField;
+			private var _items:IList = null;
+			private var _selectedItems:ArrayCollection = null;
+			private var _notSelectedItems:ArrayCollection = null;
 			
 			[Bindable]
 			public function get multiple():Boolean {
@@ -26,15 +35,6 @@
 				_multiple = value;
 			}
 
-			[Bindable]
-			public function get maxSpecified():int {
-				return _maxSpecified;
-			}
-
-			public function set maxSpecified(value:int):void {
-				_maxSpecified = value;
-			}
-			
 			[Bindable]
 			public function get codeInputField():CodeInputField {
 				return _codeInputField;
@@ -52,16 +52,64 @@
 			public function set editable(value:Boolean):void {
 				_editable = value;
 			}
+			
+			[Bindable]
+			public function get items():IList {
+				return _items;
+			}
+			
+			public function set items(value:IList):void {
+				_items = value;
+			}
 
+			[Bindable]
+			public function get selectedItems():ArrayCollection {
+				return _selectedItems;
+			}
+			
+			public function set selectedItems(value:ArrayCollection):void {
+				_selectedItems = value;
+			}
+			
+			[Bindable]
+			public function get notSelectedItems():ArrayCollection {
+				return _notSelectedItems;
+			}
+			
+			public function set notSelectedItems(value:ArrayCollection):void {
+				_notSelectedItems = value;
+			}
+			
+			public function selectionChangeHandler(event:UIEvent):void {
+				var item:CodeListItemProxy = CodeListItemProxy(event.obj);
+				if ( ! multiple ) {
+					for each(var itm:Object in items) {
+						if(itm != item) {
+							//reset selection
+							itm.selected = false;
+							CollectionUtil.removeItem(_selectedItems, itm);
+						}
+					}
+				}
+				if ( item.selected ) {
+					_selectedItems.addItem(item);
+				} else {
+					CollectionUtil.removeItem(_selectedItems, item);
+				}
+			}
+			
 		]]>
 	</fx:Script>
 		
 	<s:states>
-		<s:State name="default" />
 		<s:State name="loading" />
+		<s:State name="default" />
+		<s:State name="valuesSortingAllowed" />
 	</s:states>
 	
-	<s:Group id="loadingContainer" includeIn="loading" itemCreationPolicy="immediate">
+	<s:Group id="loadingContainer" 
+			 includeIn="loading" 
+			 itemCreationPolicy="immediate">
 		<component:LoadingContent height="100" width="200" />
 		<s:Button 
 				id="cancelLoading" 
@@ -72,34 +120,75 @@
 				label="{Message.get('global.cancel')}" 
 				/>
 	</s:Group>
-
-	<s:VGroup id="dataContainer" 
-			  maxHeight="500" 
-			  maxWidth="500" 
-			  includeIn="default"  
-			  itemCreationPolicy="immediate">
-		<s:Scroller height="100%" width="100%">
+	
+	<s:Scroller includeIn="default" 
+				width="100%"
+				maxHeight="400">
+		<input:CodeListDialogDataGroup
+			id="dataGroup" 
+			dataProvider="{items}"
+			editable="{editable}"
+			sortable="false"
+			selectionChange="selectionChangeHandler(event)"
+			width="100%" 
+			/>
+	</s:Scroller>
+	
+	<s:VGroup includeIn="valuesSortingAllowed" width="100%">
+		
+		<s:Label text="Select one or more values:&#13;(drag and drop selected items to reorder them)" />
+		
+		<s:Scroller width="100%"
+					maxHeight="300"
+					id="selectedItemsDataGroupScroller">
 			<input:CodeListDialogDataGroup
-					id="dataGroup" 
-					multiple="{multiple}" 
-					editable="{editable}"
-					maxSpecified="{maxSpecified}"
-					width="100%" 
-					/>
+				id="selectedItemsDataGroup" 
+				dataProvider="{selectedItems}"
+				editable="{editable}"
+				sortable="true"
+				selectionChange="selectionChangeHandler(event)"
+				width="100%" 
+				/>
 		</s:Scroller>
 		
-		<s:HGroup width="100%" horizontalAlign="center" verticalAlign="middle" gap="30">
-			<s:Button id="applyButton"
-					  useHandCursor="true" 
-					  buttonMode="true" 
-					  label="{Message.get('global.apply')}"
-					  enabled="{editable}"
-					  />
-			<s:Button id="cancelButton"
-					  useHandCursor="true"
-					  buttonMode="true" 
-					  label="{Message.get('global.cancel')}"  />
-		</s:HGroup>
+		<s:Line width="100%">
+			<s:stroke>
+				<s:SolidColorStroke color="#000000" weight="1" caps="square"/>
+			</s:stroke>
+		</s:Line>
+		
+		<s:Scroller width="100%"
+					minHeight="30"
+					maxHeight="{400 - selectedItemsDataGroupScroller.height}">
+			<input:CodeListDialogDataGroup
+				id="notSelectedItemsDataGroup" 
+				dataProvider="{notSelectedItems}"
+				selectionChange="selectionChangeHandler(event)"
+				editable="{editable}"
+				sortable="false"
+				width="100%" 
+				/>
+		</s:Scroller>
+		
 	</s:VGroup>
+	
+	
+	<s:HGroup includeIn="default, valuesSortingAllowed"
+			  itemCreationPolicy="immediate"
+			  width="100%" 
+			  horizontalAlign="center" 
+			  verticalAlign="middle" 
+			  gap="30">
+		<s:Button id="applyButton"
+				  useHandCursor="true" 
+				  buttonMode="true" 
+				  label="{Message.get('global.apply')}"
+				  enabled="{editable}"
+				  />
+		<s:Button id="cancelButton"
+				  useHandCursor="true"
+				  buttonMode="true" 
+				  label="{Message.get('global.cancel')}"  />
+	</s:HGroup>
 	
 </s:TitleWindow>

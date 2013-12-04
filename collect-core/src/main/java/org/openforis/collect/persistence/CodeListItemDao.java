@@ -138,9 +138,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		selectFields = ArrayUtils.addAll(selectFields, LABEL_FIELDS);
 		selectFields = ArrayUtils.addAll(selectFields, DESCRIPTION_FIELDS);
 		TableField<OfcCodeListRecord, Integer> oldSurveyIdField = getSurveyIdField(oldSurveyWork);
+		TableField<OfcCodeListRecord, Integer> oppositeOldSurveyIdField = getSurveyIdField(! oldSurveyWork);
 		Select<?> select = jf.select(selectFields)
 			.from(OFC_CODE_LIST)
-			.where(oldSurveyIdField.equal(oldSurveyId))
+			.where(oldSurveyIdField.equal(oldSurveyId)
+					.and(oppositeOldSurveyIdField.isNull()))
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
 		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, FIELDS).select(select);
 		insert.execute();
@@ -177,6 +179,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		CodeList list = item.getCodeList();
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
 		JooqFactory jf = getMappingJooqFactory(list);
 		Integer oldSortOrder = item.getSortOrder();
 		if ( newSortOrder == oldSortOrder ) {
@@ -185,32 +188,38 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			//give top sort order to the item
 			jf.update(OFC_CODE_LIST)
 				.set(OFC_CODE_LIST.SORT_ORDER, 0)
-				.where(OFC_CODE_LIST.ID.equal(item.getSystemId())).execute();
+				.where(OFC_CODE_LIST.ID.equal(item.getSystemId()))
+				.execute();
 			if ( newSortOrder > oldSortOrder ) {
 				//move backwards previous items
 				jf.update(OFC_CODE_LIST)
 					.set(OFC_CODE_LIST.SORT_ORDER, OFC_CODE_LIST.SORT_ORDER.sub(1))
-					.where(surveyIdField.equal(survey.getId()),
-							OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId()),
-							OFC_CODE_LIST.PARENT_ID.equal(item.getParentId()),
-							OFC_CODE_LIST.SORT_ORDER.greaterThan(oldSortOrder),
-							OFC_CODE_LIST.SORT_ORDER.lessOrEqual(newSortOrder)
-							).execute();
+					.where(
+						surveyIdField.equal(survey.getId()),
+						oppositeSurveyIdField.isNull(),
+						OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId()),
+						OFC_CODE_LIST.PARENT_ID.equal(item.getParentId()),
+						OFC_CODE_LIST.SORT_ORDER.greaterThan(oldSortOrder),
+						OFC_CODE_LIST.SORT_ORDER.lessOrEqual(newSortOrder)
+					).execute();
 			} else {
 				//move forward next items
 				jf.update(OFC_CODE_LIST)
 					.set(OFC_CODE_LIST.SORT_ORDER, OFC_CODE_LIST.SORT_ORDER.add(1))
-					.where(surveyIdField.equal(survey.getId()),
-							OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId()),
-							OFC_CODE_LIST.PARENT_ID.equal(item.getParentId()),
-							OFC_CODE_LIST.SORT_ORDER.greaterOrEqual(newSortOrder),
-							OFC_CODE_LIST.SORT_ORDER.lessThan(oldSortOrder)
-							).execute();
+					.where(
+						surveyIdField.equal(survey.getId()),
+						oppositeSurveyIdField.isNull(),
+						OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId()),
+						OFC_CODE_LIST.PARENT_ID.equal(item.getParentId()),
+						OFC_CODE_LIST.SORT_ORDER.greaterOrEqual(newSortOrder),
+						OFC_CODE_LIST.SORT_ORDER.lessThan(oldSortOrder)
+					).execute();
 			}
 			//set item sort order to final value
 			jf.update(OFC_CODE_LIST)
 				.set(OFC_CODE_LIST.SORT_ORDER, newSortOrder)
-				.where(OFC_CODE_LIST.ID.equal(item.getSystemId())).execute();
+				.where(OFC_CODE_LIST.ID.equal(item.getSystemId()))
+				.execute();
 		}
 	}
 
@@ -229,9 +238,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		JooqFactory jf = getMappingJooqFactory(null);
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
 		jf.delete(OFC_CODE_LIST)
 			.where(
 					surveyIdField.equal(survey.getId()),
+					oppositeSurveyIdField.isNull(),
 					OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId())
 			).execute();
 	}
@@ -247,8 +258,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	public void deleteBySurvey(int surveyId, boolean work) {
 		JooqFactory jf = getMappingJooqFactory(null);
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(work);
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! work);
 		jf.delete(OFC_CODE_LIST)
-			.where(surveyIdField.equal(surveyId))
+			.where(
+					surveyIdField.equal(surveyId)).
+						and(oppositeSurveyIdField.isNull())
 			.execute();
 	}
 	
@@ -259,10 +273,12 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			codeListsIds.add(codeList.getId());
 		}
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
 		JooqFactory jf = getMappingJooqFactory(null);
 		jf.delete(OFC_CODE_LIST)
 			.where(
 					surveyIdField.equal(survey.getId())
+						.and(oppositeSurveyIdField.isNull())
 						.and(OFC_CODE_LIST.CODE_LIST_ID.notIn(codeListsIds))
 			).execute();
 	}
@@ -270,11 +286,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	public void deleteInvalidParentReferenceItems(CodeList codeList) {
 		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
 		int codeListId = codeList.getId();
 		JooqFactory jf = getMappingJooqFactory(null);
 		jf.delete(OFC_CODE_LIST)
 			.where(OFC_CODE_LIST.CODE_LIST_ID.eq(codeListId)
 				.and(surveyIdField.eq(survey.getId()))
+				.and(oppositeSurveyIdField.isNull())
 				.and(OFC_CODE_LIST.PARENT_ID.isNotNull())
 				.and(OFC_CODE_LIST.PARENT_ID.notIn(
 					jf.select(OFC_CODE_LIST.ID)
@@ -291,7 +309,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		jf.update(OFC_CODE_LIST)
 			.set(OFC_CODE_LIST.SURVEY_ID, publishedSurveyId)
 			.set(OFC_CODE_LIST.SURVEY_WORK_ID, (Integer) null)
-			.where(OFC_CODE_LIST.SURVEY_WORK_ID.equal(surveyWorkId))
+			.where(OFC_CODE_LIST.SURVEY_WORK_ID.equal(surveyWorkId)
+					.and(OFC_CODE_LIST.SURVEY_ID.isNull()))
 			.execute();
 	}
 
@@ -355,10 +374,12 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		JooqFactory jf = getMappingJooqFactory(codeList);
 		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
 		SelectConditionStep q = jf.selectCount()
 				.from(OFC_CODE_LIST)
 				.where(
 					surveyIdField.equal(survey.getId()),
+					oppositeSurveyIdField.isNull(),
 					OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
 					OFC_CODE_LIST.QUALIFIABLE.equal(Boolean.TRUE)
 				);
@@ -393,8 +414,10 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		q.addFrom(OFC_CODE_LIST);
 		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
 		q.addConditions(
 				surveyIdField.equal(survey.getId()),
+				oppositeSurveyIdField.isNull(),
 				OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
 				OFC_CODE_LIST.CODE.equal(code)
 		);
@@ -419,9 +442,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	protected int loadMinId(JooqFactory jf, int surveyId, boolean work) {
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(work);
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! work);
 		Integer result = jf.select(Factory.min(OFC_CODE_LIST.ID))
 				.from(OFC_CODE_LIST)
-				.where(surveyIdField.equal(surveyId))
+				.where(surveyIdField.equal(surveyId)
+						.and(oppositeSurveyIdField.isNull()))
 				.fetchOne(0, Integer.class);
 		return result == null ? 0: result.intValue();
 	}
@@ -447,8 +472,10 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			CodeList codeList, Integer parentItemId) {
 		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
 		select.addConditions(
 				surveyIdField.equal(survey.getId()),
+				oppositeSurveyIdField.isNull(),
 				OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
 				OFC_CODE_LIST.PARENT_ID.equal(parentItemId));
 	}

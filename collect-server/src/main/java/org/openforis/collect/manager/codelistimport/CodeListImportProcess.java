@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -140,6 +141,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			List<String> languages = survey.getLanguages();
 			String defaultLanguage = survey.getDefaultLanguage();
 			reader = new CodeListCSVReader(isReader, languages, defaultLanguage);
+			reader.init();
 			levels = reader.getLevels();
 			adjustCodeScope();
 			status.addProcessedRow(1);
@@ -175,14 +177,20 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.toString()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				LOG.error("Error closing reader", e);
-			}
+			closeReader();
 		}
 	}
 
+	private void closeReader() {
+		try {
+			if ( reader != null ) {
+				reader.close();
+			}
+		} catch (IOException e) {
+			LOG.error("Error closing reader", e);
+		}
+	}
+	
 	protected CodeListItem processLevel(CodeListItem parent, CodeListLine line, int levelIdx, boolean lastLevel) {
 		CodeListItem result;
 		//validate code
@@ -196,9 +204,13 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		}
 		//validate labels
 		List<LanguageSpecificText> labels = line.getLabelItems(levelIdx);
-		for (LanguageSpecificText label : labels) {
-			if ( hasDifferentLabel(code, label, parent)) {
-				addDifferentLabelError(line, levelIdx, label.getLanguage());
+		if ( CollectionUtils.isEmpty(labels) ) {
+			addMissingDefaultLanguageLabelError(line, levelIdx);
+		} else {
+			for (LanguageSpecificText label : labels) {
+				if ( hasDifferentLabel(code, label, parent)) {
+					addDifferentLabelError(line, levelIdx, label.getLanguage());
+				}
 			}
 		}
 		result = getChildItem(parent, code);
@@ -282,6 +294,14 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		status.addParsingError(lineNumber, error);
 	}
 
+	protected void addMissingDefaultLanguageLabelError(CodeListLine line, int levelIdx) {
+		String level = levels.get(levelIdx);
+		String column = level + CodeListCSVReader.LABEL_COLUMN_SUFFIX;
+		long lineNumber = line.getLineNumber();
+		ParsingError error = new ParsingError(ErrorType.EMPTY, lineNumber, column);
+		status.addParsingError(lineNumber, error);
+	}
+	
 	protected CodeListItem getCodeListItemInDescendants(String code) {
 		Stack<CodeListItem> stack = new Stack<CodeListItem>();
 		stack.addAll(codeToRootItem.values());

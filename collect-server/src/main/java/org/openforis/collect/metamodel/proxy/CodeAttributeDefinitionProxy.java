@@ -40,4 +40,9 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		CodeList list = attributeDefinition.getList();
 		return list != null && list.isExternal();
 	}
+	
+	@ExternalizedProperty
+	public boolean isAllowValuesSorting() {
+		return attributeDefinition.isAllowValuesSorting();
+	}
 }

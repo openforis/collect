@@ -54,6 +54,10 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
+		public function isOwner(record:RecordProxy):Boolean {
+			return record.owner != null && record.owner.id == id;
+		}
+		
 		public function canSubmit(record:RecordProxy):Boolean {
 			return hasEffectiveRole(ROLE_ENTRY) && record.step == CollectRecord$Step.ENTRY || 
 				hasEffectiveRole(ROLE_CLEANSING) && record.step == CollectRecord$Step.CLEANSING;
@@ -70,12 +74,12 @@ package org.openforis.collect.model.proxy {
 			switch ( step ) {
 				case CollectRecord$Step.ENTRY:
 					result = hasEffectiveRole(UserProxy.ROLE_ENTRY) || 
-					hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
-					hasEffectiveRole(UserProxy.ROLE_ADMIN);
+							hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
+							hasEffectiveRole(UserProxy.ROLE_ADMIN);
 					break;
 				case CollectRecord$Step.CLEANSING:
 					result = hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
-						hasEffectiveRole(UserProxy.ROLE_ADMIN);
+							hasEffectiveRole(UserProxy.ROLE_ADMIN);
 					break;
 				case CollectRecord$Step.ANALYSIS:
 					result = false
@@ -83,5 +87,18 @@ package org.openforis.collect.model.proxy {
 			}
 			return result;
 		}
+		
+		public function get canDeleteNotOwnedRecords():Boolean {
+			return hasEffectiveRole(ROLE_CLEANSING);
+		}
+		
+		public function get canEditNotOwnedRecords():Boolean {
+			return hasEffectiveRole(ROLE_CLEANSING);
+		}
+		
+		public function get canViewDifferentOwnedRecords():Boolean {
+			return hasEffectiveRole(ROLE_CLEANSING);
+		}
+		
 	}
 }

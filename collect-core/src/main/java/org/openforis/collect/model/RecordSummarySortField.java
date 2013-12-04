@@ -7,7 +7,12 @@ package org.openforis.collect.model;
 public class RecordSummarySortField {
 
 	public enum Sortable {
-		KEY1, KEY2, KEY3, COUNT1, COUNT2, COUNT3, SKIPPED, MISSING, ERRORS, WARNINGS, DATE_CREATED, DATE_MODIFIED, STEP
+		KEY1, KEY2, KEY3, 
+		COUNT1, COUNT2, COUNT3, 
+		SKIPPED, MISSING, ERRORS, WARNINGS, 
+		DATE_CREATED, DATE_MODIFIED, 
+		OWNER_NAME,
+		STEP
 	}
 	
 	private Sortable field;

@@ -6,6 +6,8 @@ package org.openforis.collect.manager.codelistimport;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,13 +38,17 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 		super(filename);
 		this.languages = languages;
 		this.defaultLanguage = defaultLanguage;
-		initLevels();
 	}
 
 	public CodeListCSVReader(Reader reader, List<String> languages, String defaultLanguage) throws IOException, ParsingException {
 		super(reader);
 		this.languages = languages;
 		this.defaultLanguage = defaultLanguage;
+	}
+	
+	@Override
+	public void init() throws IOException, ParsingException {
+		super.init();
 		initLevels();
 	}
 	
@@ -66,12 +72,22 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 		for (int i = 0; i < colNames.size(); i++) {
 			String colName = colNames.get(i);
 			if ( colName.matches(CODE_COLUMN_EXPR) ) {
-				String levelName = colName.substring(0, colName.lastIndexOf(CODE_COLUMN_SUFFIX));
+				String levelName = extractLevelName(colName);
 				levels.add(levelName);
 			}
 		}
 	}
+
+	private String extractLevelName(String colName) {
+		String levelName = colName.substring(0, colName.lastIndexOf(CODE_COLUMN_SUFFIX));
+		return levelName;
+	}
 	
+	private static String[] getPossibleDefaultLanguageLabelColumnNames(String defaultLanguage, String level) {
+		String[] colNames = {level, level + LABEL_COLUMN_SUFFIX, level + LABEL_COLUMN_SUFFIX + "_" + defaultLanguage};
+		return colNames;
+	}
+
 	public List<String> getLevels() {
 		return levels;
 	}
@@ -114,12 +130,13 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 
 		private void addLabels(CodeListLine line, List<String> languages,
 				String level, int levelIdx) throws ParsingException {
-			String defaultLangLabelColName = level;
-			String label = getColumnValue(defaultLangLabelColName, false, String.class);
-			if ( label != null ) {
+			//add default language label
+			String defaultLangLabel = getDefaultLanguageLabel(level);
+			if ( defaultLangLabel != null ) {
 				String defaultLang = ((CodeListCSVReader) reader).getDefaultLanguage();
-				line.addLabel(levelIdx, defaultLang, label);
+				line.addLabel(levelIdx, defaultLang, defaultLangLabel);
 			}
+			//add labels per each language
 			for (String lang : languages) {
 				String labelColumnName = level + LABEL_COLUMN_SUFFIX + "_" + lang;
 				String l = getColumnValue(labelColumnName, false, String.class);
@@ -127,6 +144,21 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 					line.addLabel(levelIdx, lang, l);
 				}
 			}
+		}
+
+		private String getDefaultLanguageLabel(String levelName)
+				throws ParsingException {
+			String defaultLangLabel = null;
+			String defaultLang = ((CodeListCSVReader) reader).getDefaultLanguage();
+			String[] defaultLangLabelColNames = getPossibleDefaultLanguageLabelColumnNames(defaultLang, levelName);
+			for (String defaultLangLabelColName : defaultLangLabelColNames) {
+				String label = getColumnValue(defaultLangLabelColName, false, String.class);
+				if ( label != null ) {
+					defaultLangLabel = label;
+					break;
+				}
+			}
+			return defaultLangLabel;
 		}
 
 	}
@@ -140,16 +172,34 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 		}
 
 		protected void validateHeaders() throws ParsingException {
+			//at least one code column is required
 			List<String> colNames = getColumnNames();
-			boolean codeColumnFound = false;
+			Collection<String> levelNames = new HashSet<String>();
 			for (int i = 0; i < colNames.size(); i++) {
 				String colName = StringUtils.trimToEmpty(colNames.get(i));
 				if ( colName.matches(CODE_COLUMN_EXPR) ) {
-					codeColumnFound = true;
+					String levelName = extractLevelName(colName);
+					levelNames.add(levelName);
+				}
+			}
+			//a default language label column for each level is required
+			boolean defaultLabelColumnsFound = true;
+			String defaultLang = getDefaultLanguage();
+			for (String levelName : levelNames) {
+				boolean columnFound = false;
+				String[] defaultLanguageLabelColumnNames = getPossibleDefaultLanguageLabelColumnNames(defaultLang, levelName);
+				for (String colName : defaultLanguageLabelColumnNames) {
+					if ( colNames.contains(colName) ) {
+						columnFound = true;
+						break;
+					}
+				}
+				if ( ! columnFound ) {
+					defaultLabelColumnsFound = false;
 					break;
 				}
 			}
-			if ( ! codeColumnFound ) {
+			if ( levelNames.isEmpty() || ! defaultLabelColumnsFound ) {
 				ParsingError error = new ParsingError(ErrorType.MISSING_REQUIRED_COLUMNS, 1, 
 						(String) null, MISSING_REQUIRED_COLUMNS_MESSAGE_KEY);
 				throw new ParsingException(error);

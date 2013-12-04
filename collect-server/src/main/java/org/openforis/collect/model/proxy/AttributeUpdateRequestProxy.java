@@ -30,17 +30,17 @@ public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy
 		AttributeUpdateRequest<Value> opts = new NodeUpdateRequest.AttributeUpdateRequest<Value>();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 		opts.setAttribute((Attribute<?, Value>) attribute);
-		if ( value != null ) {
-			Value parsedValue;
-			if ( attribute instanceof FileAttribute ) {
-				parsedValue = parseFileAttributeValue(fileManager, record, sessionManager, nodeId, value);
-			} else {
-				Entity parentEntity = attribute.getParent();
-				String attributeName = attribute.getName();
-				parsedValue = parseCompositeAttributeValue(codeListManager, parentEntity, attributeName, value);
-			}
-			opts.setValue(parsedValue);
+		Value parsedValue;
+		if ( attribute instanceof FileAttribute ) {
+			parsedValue = parseFileAttributeValue(fileManager, record, sessionManager, nodeId, value);
+		} else if ( value != null ) {
+			Entity parentEntity = attribute.getParent();
+			String attributeName = attribute.getName();
+			parsedValue = parseCompositeAttributeValue(codeListManager, parentEntity, attributeName, value);
+		} else {
+			parsedValue = null;
 		}
+		opts.setValue(parsedValue);
 		opts.setSymbol(symbol);
 		return opts;
 	}

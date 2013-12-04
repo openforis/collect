@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Field;
+import org.jooq.JoinType;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
@@ -53,7 +54,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		{OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
 	private static final TableField[] SUMMARY_FIELDS = 
 		{OFC_RECORD.DATE_CREATED, OFC_RECORD.CREATED_BY_ID, OFC_RECORD.DATE_MODIFIED, OFC_RECORD.ERRORS, OFC_RECORD.ID, 
-	     OFC_RECORD.MISSING, OFC_RECORD.MODEL_VERSION, OFC_RECORD.MODIFIED_BY_ID, 
+	     OFC_RECORD.MISSING, OFC_RECORD.MODEL_VERSION, OFC_RECORD.MODIFIED_BY_ID, OFC_RECORD.OWNER_ID, 
 	     OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, OFC_RECORD.SKIPPED, OFC_RECORD.STATE, OFC_RECORD.STEP, OFC_RECORD.SURVEY_ID, 
 	     OFC_RECORD.WARNINGS, OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3, 
 	     OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
@@ -138,8 +139,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			List<RecordSummarySortField> sortFields, String... keyValues) {
 		JooqFactory jf = getMappingJooqFactory(survey);
 		SelectQuery q = jf.selectQuery();	
-		q.addFrom(OFC_RECORD);
 		q.addSelect(SUMMARY_FIELDS);
+		Field<String> ownerNameField = OFC_USER.USERNAME.as(RecordSummarySortField.Sortable.OWNER_NAME.name());
+		q.addSelect(ownerNameField);
+		q.addFrom(OFC_RECORD);
+		q.addJoin(OFC_USER, JoinType.LEFT_OUTER_JOIN, OFC_RECORD.OWNER_ID.equal(OFC_USER.ID));
 
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
@@ -153,7 +157,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		
 		if ( sortFields != null ) {
 			for (RecordSummarySortField sortField : sortFields) {
-				addOrderBy(q, sortField);
+				addOrderBy(q, sortField, ownerNameField);
 			}
 		}
 		
@@ -199,7 +203,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		}
 	}
 
-	private void addOrderBy(SelectQuery q, RecordSummarySortField sortField) {
+	private void addOrderBy(SelectQuery q, RecordSummarySortField sortField, Field<String> ownerNameField) {
 		Field<?> orderBy = null;
 		if(sortField != null) {
 			switch(sortField.getField()) {
@@ -242,6 +246,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			case STEP:
 				orderBy = OFC_RECORD.STEP;
 				break;
+			case OWNER_NAME:
+				orderBy = ownerNameField;
+				break;
 			}
 		}
 		if(orderBy != null) {
@@ -271,7 +278,16 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	public void delete(int id) {
 		super.delete(id);
 	}
-	
+
+	@Transactional
+	public void assignOwner(int recordId, Integer ownerId) {
+		JooqFactory jf = getMappingJooqFactory();
+		jf.update(OFC_RECORD)
+			.set(OFC_RECORD.OWNER_ID, ownerId)
+			.where(OFC_RECORD.ID.eq(recordId))
+			.execute();
+	}
+
 	public void deleteBySurvey(int id) {
 		JooqFactory jf = getMappingJooqFactory();
 		jf.delete(OFC_RECORD)
@@ -342,16 +358,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			c.setCreationDate(r.getValue(OFC_RECORD.DATE_CREATED));
 			c.setModifiedDate(r.getValue(OFC_RECORD.DATE_MODIFIED));
 			
-			Integer createdById = r.getValue(OFC_RECORD.CREATED_BY_ID);
-			if(createdById !=null){
-				User user = loadUser(createdById);
-				c.setCreatedBy(user);
-			}
-			Integer modifiedById = r.getValue(OFC_RECORD.MODIFIED_BY_ID);
-			if(modifiedById !=null){
-				User user = loadUser(modifiedById);
-				c.setModifiedBy(user);
-			}
+			c.setCreatedBy(loadUser(r.getValue(OFC_RECORD.CREATED_BY_ID)));
+			c.setModifiedBy(loadUser(r.getValue(OFC_RECORD.MODIFIED_BY_ID)));
+			c.setOwner(loadUser(r.getValue(OFC_RECORD.OWNER_ID)));
 			c.setWarnings(r.getValue(OFC_RECORD.WARNINGS));
 			c.setErrors(r.getValue(OFC_RECORD.ERRORS));
 			c.setSkipped(r.getValue(OFC_RECORD.SKIPPED));
@@ -391,7 +400,10 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			}
 		}
 
-		private User loadUser(int userId) {
+		private User loadUser(Integer userId) {
+			if ( userId == null ) {
+				return null;
+			}
 			SimpleSelectQuery<OfcUserRecord> userSelect = selectQuery(OFC_USER);
 			userSelect.addConditions(OFC_USER.ID.equal(userId));
 			OfcUserRecord userRecord = userSelect.fetchOne();
@@ -423,6 +435,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			if (record.getModifiedBy() != null) {
 				q.addValue(OFC_RECORD.MODIFIED_BY_ID, record.getModifiedBy().getId());
 			}
+			Integer ownerId = record.getOwner() == null ? null: record.getOwner().getId();
+			q.addValue(OFC_RECORD.OWNER_ID, ownerId);
+
 			ModelVersion version = record.getVersion();
 			String versionName = version != null ? version.getName(): null;
 			q.addValue(OFC_RECORD.MODEL_VERSION, versionName);

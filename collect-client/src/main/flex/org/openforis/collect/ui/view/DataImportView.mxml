@@ -361,8 +361,6 @@
 		<s:Label text="{Message.get('dataImport.complete')}"
 				 styleName="infoMessage" />
 		
-		<s:Button id="closeButton"
-				  label="{Message.get('global.close')}"/>
 	</s:VGroup>
 
 </s:Group>

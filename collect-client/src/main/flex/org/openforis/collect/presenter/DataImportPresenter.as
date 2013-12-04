@@ -14,8 +14,6 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.controls.Alert;
-	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -26,6 +24,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.DataImportEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.remoting.service.dataimport.DataImportState$MainStep;
 	import org.openforis.collect.remoting.service.dataimport.DataImportState$SubStep;
@@ -34,13 +33,11 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
 	import org.openforis.collect.ui.component.DataImportNodeErrorsPopUp;
-	import org.openforis.collect.ui.component.DataImportPopUp;
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 
 	/**
 	 * 
@@ -87,7 +84,6 @@ package org.openforis.collect.presenter {
 			_view.uploadButton.addEventListener(MouseEvent.CLICK, uploadButtonClickHandler);
 			_view.startImportButton.addEventListener(MouseEvent.CLICK, startImportClickHandler);
 			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
-			_view.closeButton.addEventListener(MouseEvent.CLICK, closeButtonClickHandler);
 			
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
@@ -107,11 +103,6 @@ package org.openforis.collect.presenter {
 				_dataImportClient.cancel(responder);
 			}
 			_view.currentState = DataImportView.STATE_DEFAULT;
-		}
-		
-		protected function closeButtonClickHandler(event:MouseEvent):void {
-			var popUp:DataImportPopUp = _view.owner as DataImportPopUp;
-			PopUpManager.removePopUp(popUp);
 		}
 		
 		protected function fileReferenceSelectHandler(event:Event):void {

@@ -58,14 +58,14 @@ public final class Tables {
 	public static final org.openforis.collect.persistence.jooq.tables.OfcTaxon OFC_TAXON = org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON;
 
 	/**
-	 * The table collect.ofc_taxon_vernacular_name
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName OFC_TAXON_VERNACULAR_NAME = org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
-
-	/**
 	 * The table collect.ofc_taxonomy
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcTaxonomy OFC_TAXONOMY = org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY;
+
+	/**
+	 * The table collect.ofc_taxon_vernacular_name
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName OFC_TAXON_VERNACULAR_NAME = org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME;
 
 	/**
 	 * The table collect.ofc_user

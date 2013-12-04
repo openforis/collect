@@ -33,11 +33,8 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.bind.annotation.QueryParam;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.IdSpace;
-import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Filedownload;
@@ -52,6 +49,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private static final String TEXT_XML = "text/xml";
 	private static final String PREVIEW_WINDOW_ID = "collect_survey_preview";
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
+	public static final String BACKGROUD_SAVE_GLOBAL_COMMAND = "backgroundSurveySave";
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 //	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
 	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
@@ -249,67 +247,56 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@Command
 	public void save(@ContextParam(ContextType.BINDER) Binder binder) throws SurveyImportException {
 		dispatchValidateAllCommand();
-//		validateMainForm(binder);
-		if ( checkCanSave(false) ) {
-			survey.refreshSurveyDependencies();
-			surveyManager.saveSurveyWork(survey);
+		if ( checkCanSave() ) {
+			backgroundSurveySave();
 			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
-			BindUtils.postNotifyChange(null, null, survey, "id");
-			BindUtils.postNotifyChange(null, null, survey, "published");
-			notifyChange("surveyId","surveyPublished");
-			changed = false;
 		}
 	}
 	
-	protected void validateMainForm(Binder binder) {
-		Component view = binder.getView();
-		IdSpace spaceOwner = view.getSpaceOwner();
-		Component mainInfoFormContainer = Path.getComponent(spaceOwner, "mainInfoInclude/formContainer");
-		Binder mainFormBinder = (Binder) mainInfoFormContainer.getAttribute("binder");
-		SurveyMainInfoVM mainFormVM = (SurveyMainInfoVM) mainFormBinder.getViewModel();
-		mainFormVM.validateForm(mainFormBinder);
+	@GlobalCommand
+	public void backgroundSurveySave() throws SurveyImportException {
+		survey.refreshSurveyDependencies();
+		surveyManager.saveSurveyWork(survey);
+		BindUtils.postNotifyChange(null, null, survey, "id");
+		BindUtils.postNotifyChange(null, null, survey, "published");
+		notifyChange("surveyStored","surveyId","surveyPublished");
+		changed = false;
 	}
-
-	protected boolean checkCanSave(boolean publishing) {
+	
+	protected boolean checkCanSave() {
 		if ( checkCanLeaveForm() ) {
-			List<SurveySummary> surveySummaries = surveyManager.loadSummaries();
-			for (SurveySummary surveySummary : surveySummaries) {
-				boolean notDuplicate = checkIsNotDuplicate(surveySummary, publishing);
-				if ( ! notDuplicate ) {
-					return false;
-				}
+			if ( ! checkSurveyNameUniqueness() ) {
+				return false;
+			} else if ( ! checkSurveyUriUniqueness() ) {
+				return false;
+			} else {
+				return true;
 			}
-			return true;
 		} else {
 			return false;
 		}
 	}
 
-	protected boolean checkIsNotDuplicate(SurveySummary summary, boolean publishing) {
-		Integer surveyId = survey.getId();
-		Integer publishedSurveyId = getSessionStatus().getPublishedSurveyId();
-		Integer summaryId = summary.getId();
-		boolean skip = false;
-		if ( surveyId == null ) {
-			if ( publishedSurveyId != null && summary.isPublished() && publishedSurveyId.equals(summaryId) ) {
-				skip = true;
-			}
-		} else if ( summaryId.equals(surveyId)) {
-			skip = true;
+	private boolean checkSurveyNameUniqueness() {
+		SurveySummary existingSurveySummary = surveyManager.loadSummaryByName(survey.getName());
+		if ( existingSurveySummary != null && ! isCurrentEditedSurvey(existingSurveySummary) ) {
+			String messageKey = LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_NAME;
+			MessageUtil.showWarning(messageKey);
+			return false;
+		} else {
+			return true;
 		}
-		if ( ! skip ) {
-			if ( summary.getName().equals(survey.getName()) ) {
-				String messageKey = publishing ? LabelKeys.SURVEY_PUBLISH_ERROR_DUPLICATE_NAME: LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_NAME;
-				MessageUtil.showWarning(messageKey);
-				return false;
-			}
-			if ( summary.getUri().equals(survey.getUri()) ) {
-				String messageKey = publishing ? LabelKeys.SURVEY_PUBLISH_ERROR_DUPLICATE_URI: LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_URI;
-				MessageUtil.showWarning(messageKey);
-				return false;
-			}
+	}
+
+	private boolean checkSurveyUriUniqueness() {
+		SurveySummary existingSurveySummary = surveyManager.loadSummaryByUri(survey.getUri());
+		if ( existingSurveySummary != null && ! isCurrentEditedSurvey(existingSurveySummary) ) {
+			String messageKey = LabelKeys.SURVEY_SAVE_ERROR_DUPLICATE_URI;
+			MessageUtil.showWarning(messageKey);
+			return false;
+		} else {
+			return true;
 		}
-		return true;
 	}
 
 	@GlobalCommand

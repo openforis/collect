@@ -7,12 +7,14 @@ import java.util.List;
 
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SurveyMainInfoFormObject;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 /**
  * 
@@ -21,6 +23,9 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
+	
+	@WireVariable
+	private SurveyManager surveyManager;
 	
 	@Init(superclass=false)
 	public void init(@ContextParam(ContextType.BINDER) Binder binder) {
@@ -59,4 +64,12 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 
 	@Override
 	protected void moveSelectedItem(int indexTo) {}
+	
+	public SurveyManager getSurveyManager() {
+		return surveyManager;
+	}
+	
+	public Integer getEditedSurveyPublishedId() {
+		return getSessionStatus().getPublishedSurveyId();
+	}
 }

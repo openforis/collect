@@ -18,12 +18,14 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Unit;
+import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.GlobalCommand;
@@ -50,6 +52,9 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	@WireVariable
 	protected CollectSurvey survey;
+	
+	@WireVariable
+	private ExpressionValidator expressionValidator;
 
 	protected String currentLanguageCode;
 	
@@ -195,6 +200,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 	}
 	
+	public boolean isSurveyStored() {
+		return getSurveyId() != null;
+	}
+	
 	public boolean isSurveyPublished() {
 		if ( survey == null ) {
 			return false;
@@ -323,6 +332,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 		return currentFormBlocking;
 	}
 
+	public ExpressionValidator getExpressionValidator() {
+		return expressionValidator;
+	}
+	
 	public interface CanLeaveFormConfirmHandler {
 		void onOk(boolean confirmed);
 	}
@@ -355,6 +368,24 @@ public abstract class SurveyBaseVM extends BaseVM {
 		result.put("work", Boolean.toString(work));
 		result.put("surveyId", surveyIdStr);
 		return result;
+	}
+	
+	public boolean isCurrentEditedSurvey(SurveySummary surveySummary) {
+		SessionStatus sessionStatus = getSessionStatus();
+		Integer editedPublishedSurveyId = sessionStatus.getPublishedSurveyId();
+		Integer editedSurveyId = getSurveyId();
+		if ( editedSurveyId == null ) {
+			if ( editedPublishedSurveyId != null && surveySummary.isPublished() && 
+					editedPublishedSurveyId.equals(surveySummary.getId()) ) {
+				return true;
+			} else {
+				return false;
+			}
+		} else if ( surveySummary.getId().equals(editedSurveyId)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

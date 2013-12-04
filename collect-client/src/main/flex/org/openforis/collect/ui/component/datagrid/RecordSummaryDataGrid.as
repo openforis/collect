@@ -137,6 +137,9 @@ package org.openforis.collect.ui.component.datagrid
 				case "modifiedDate":
 					sortField.field = RecordSummarySortField$Sortable.DATE_MODIFIED;
 					break;
+				case "ownerName":
+					sortField.field = RecordSummarySortField$Sortable.OWNER_NAME;
+					break;
 				case "entryComplete":
 				case "cleansingComplete":
 					sortField.field = RecordSummarySortField$Sortable.STEP;

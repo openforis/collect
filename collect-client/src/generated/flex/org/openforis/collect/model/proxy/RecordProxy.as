@@ -205,6 +205,10 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
+		public function get unassigned():Boolean {
+			return owner == null;
+		}
+		
 		public function get survey():SurveyProxy {
 			return _survey;
 		}

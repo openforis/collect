@@ -117,6 +117,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 			isReader = new InputStreamReader(is);
 			
 			reader = new SamplingDesignCSVReader(isReader);
+			reader.init();
 			status.addProcessedRow(1);
 			currentRowNumber = 2;
 			while ( status.isRunning() ) {

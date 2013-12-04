@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -17,10 +18,12 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	private CodeList list;
 	private String parentExpression;
 	private boolean strict;
+	private boolean allowValuesSorting;
 	
 	CodeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 		strict = true;
+		allowValuesSorting = false;
 	}
 
 	@Override
@@ -29,7 +32,8 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 		dest.setList(list);
 		dest.setKey(key);
 		dest.setAllowUnlisted(! strict);
-		dest.setParentExpression(parentExpression);
+		dest.setParentExpression(StringUtils.trimToNull(parentExpression));
+		dest.setAllowValuesSorting(dest.isMultiple() && allowValuesSorting);
 	}
 	
 	@Override
@@ -39,6 +43,7 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 		list = source.getList();
 		parentExpression = source.getParentExpression();
 		strict = ! source.isAllowUnlisted();
+		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 	}
 
 	public boolean isKey() {
@@ -71,6 +76,14 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	
 	public void setParentExpression(String parentExpression) {
 		this.parentExpression = parentExpression;
+	}
+	
+	public boolean isAllowValuesSorting() {
+		return allowValuesSorting;
+	}
+	
+	public void setAllowValuesSorting(boolean allowValuesSorting) {
+		this.allowValuesSorting = allowValuesSorting;
 	}
 
 }

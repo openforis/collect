@@ -144,7 +144,9 @@ public class SurveyDao extends SurveyBaseDao {
 		// Get OFC_SURVEY table id for name
 		DialectAwareJooqFactory jf = getJooqFactory();
 		int surveyId = 0;
-		SelectConditionStep query = jf.select(OFC_SURVEY.ID).from(OFC_SURVEY)
+		SelectConditionStep query = jf
+				.select(OFC_SURVEY.ID)
+				.from(OFC_SURVEY)
 				.where(OFC_SURVEY.NAME.equal(name));
 		query.execute();
 		Result<Record> result = query.getResult();
