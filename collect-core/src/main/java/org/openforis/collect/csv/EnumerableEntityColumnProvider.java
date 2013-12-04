@@ -65,9 +65,11 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 			for (Node<?> child : children) {
 				Entity childEntity = (Entity) child;
 				Code childCode = (Code) childEntity.getValue(keyName, 0);
-				String codeVal = childCode.getCode();
-				if ( code.equals(codeVal) ) {
-					return super.extractValues(childEntity);
+				if(childCode != null ){
+					String codeVal = childCode.getCode();
+					if ( code.equals(codeVal) ) {
+						return super.extractValues(childEntity);
+					}
 				}
 			}
 			// not found; return empty array
