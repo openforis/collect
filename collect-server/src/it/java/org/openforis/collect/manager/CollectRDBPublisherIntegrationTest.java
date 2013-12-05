@@ -3,6 +3,7 @@ package org.openforis.collect.manager;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.relational.CollectRDBPublisher;
 import org.openforis.collect.relational.CollectRdbException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;

@@ -1,4 +1,4 @@
-package org.openforis.collect.manager;
+package org.openforis.collect.relational;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -8,14 +8,12 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
-import org.openforis.collect.relational.CollectRdbException;
-import org.openforis.collect.relational.DatabaseExporter;
-import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.jooq.JooqDatabaseExporter;
 import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;

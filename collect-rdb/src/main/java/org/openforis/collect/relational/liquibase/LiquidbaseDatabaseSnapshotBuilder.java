@@ -28,7 +28,7 @@ class LiquidbaseDatabaseSnapshotBuilder {
 	}
 
 	synchronized
-	public DatabaseSnapshot createSnapshot(RelationalSchema relationalSchema) throws DatabaseException {
+	public DatabaseSnapshot createSnapshot(RelationalSchema relationalSchema, boolean dbSupportsFKs) throws DatabaseException {
 		this.schema = relationalSchema;
 		UnsupportedDatabase db = new UnsupportedDatabase();
 		snapshot = new DatabaseSnapshot(db, null);
@@ -36,7 +36,9 @@ class LiquidbaseDatabaseSnapshotBuilder {
 		createCodeListTables();
 		createDataTables();
 		
-		createForeignKeys();
+		if( dbSupportsFKs ){
+			createForeignKeys();
+		}
 		
 		// TODO
 		

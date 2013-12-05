@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.jooq.InsertQuery;
 import org.jooq.Record;
+import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
@@ -54,7 +55,7 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 				Row row = rows.get(rowno);
 				Table<?> table = row.getTable();
 				List<Column<?>> cols = table.getColumns();
-				InsertQuery<Record> insert = create.insertQuery(tableByName(schema.getName(), table.getName()));
+				InsertQuery<Record> insert = create.insertQuery(getQualifiedTableName(schema, table));
 				List<Object> values = row.getValues();
 				for (int colno = 0; colno < cols.size(); colno++) {
 					Object val = values.get(colno);
@@ -73,6 +74,16 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 			} else {
 				throw new CollectRdbException("Batch insert failed", e);
 			}
+		}
+	}
+
+	private org.jooq.Table<Record> getQualifiedTableName(RelationalSchema schema, Table<?> table) {
+		boolean isSchemaLessDB = create.getDialect() == SQLDialect.SQLITE;
+		
+		if ( isSchemaLessDB ) {
+			return tableByName(table.getName());
+		} else {
+			return tableByName(schema.getName(), table.getName());
 		}
 	}
 }

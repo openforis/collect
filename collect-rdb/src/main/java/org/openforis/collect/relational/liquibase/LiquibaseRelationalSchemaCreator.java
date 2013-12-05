@@ -9,16 +9,21 @@ import java.sql.Connection;
 import javax.xml.parsers.ParserConfigurationException;
 
 import liquibase.Liquibase;
+import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.core.PostgresDatabase;
+import liquibase.database.core.SQLiteDatabase;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.diff.Diff;
 import liquibase.diff.DiffResult;
+import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.snapshot.DatabaseSnapshot;
 
-import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.CollectRdbException;
+import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
 
 /**
@@ -35,10 +40,11 @@ public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator
 		try {
 			LiquidbaseDatabaseSnapshotBuilder snapshotGen = new LiquidbaseDatabaseSnapshotBuilder();
 			
-			DatabaseSnapshot generatedSnapshot = snapshotGen.createSnapshot(schema);
-			DatabaseConnection dbconn = new JdbcConnection(targetConn);
+			Database rdb = getDatabaseImplementation(targetConn);
 			
-			CollectPostgresDatabase rdb = new CollectPostgresDatabase(dbconn);
+			boolean dbSupportsFKs = rdb instanceof SQLiteDatabase ? false : true;
+			DatabaseSnapshot generatedSnapshot = snapshotGen.createSnapshot(schema, dbSupportsFKs);
+			
 			String targetSchema = schema.getName();
 			rdb.setDefaultSchemaName(targetSchema);
 			DatabaseSnapshot emptyDbSnapshot = new DatabaseSnapshot(rdb, targetSchema);
@@ -70,5 +76,17 @@ public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator
 				ps.close();
 			}
 		}		
+	}
+
+	private Database getDatabaseImplementation(Connection targetConn) throws DatabaseException {
+		DatabaseConnection dbconn = new JdbcConnection(targetConn);
+
+		DatabaseFactory dbFactory = DatabaseFactory.getInstance();
+		Database rdb = dbFactory.findCorrectDatabaseImplementation(dbconn);
+		
+		if( rdb instanceof PostgresDatabase){
+			rdb = new CollectPostgresDatabase(dbconn);
+		}
+		return rdb;
 	}
 }
