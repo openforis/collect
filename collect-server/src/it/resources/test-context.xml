@@ -122,7 +122,7 @@
   	<bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
 	<!-- RDB -->
-	<bean id="rdbPublisher" 			class="org.openforis.collect.manager.CollectRDBPublisher" />
+	<bean id="rdbPublisher" 			class="org.openforis.collect.relational.CollectRDBPublisher" />
 	
 	<!--  Services -->
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />

@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.openforis.collect.manager.CollectRDBPublisher;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.relational.CollectRDBPublisher;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.springframework.beans.factory.annotation.Autowired;

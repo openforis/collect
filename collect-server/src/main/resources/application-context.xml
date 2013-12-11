@@ -136,7 +136,7 @@
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />
 	
 	<!-- RDB -->
-	<bean id="rdbPublisher" class="org.openforis.collect.manager.CollectRDBPublisher" />
+	<bean id="rdbPublisher" class="org.openforis.collect.relational.CollectRDBPublisher" />
 	
 	<!-- Expression Factory -->
 	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory" />

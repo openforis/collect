@@ -195,7 +195,7 @@
 	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
 	
 	<!-- RDB -->
-	<bean id="rdbPublisher" class="org.openforis.collect.manager.CollectRDBPublisher" lazy-init="true" />
+	<bean id="rdbPublisher" class="org.openforis.collect.relational.CollectRDBPublisher" lazy-init="true" />
 	
 	<!-- <bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" 
 		/> -->
