@@ -1,14 +1,13 @@
 package org.openforis.collect.presenter {
 	import mx.binding.utils.ChangeWatcher;
-	import mx.collections.IList;
 	import mx.core.UIComponent;
 	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
-	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
+	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
