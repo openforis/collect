@@ -70,7 +70,7 @@ package org.openforis.collect.presenter {
 			_view = inputField;
 			_contextMenu = new InputFieldContextMenu(_view);
 			super();
-			//updateView();
+			updateView();
 		}
 		
 		override internal function initEventListeners():void {
