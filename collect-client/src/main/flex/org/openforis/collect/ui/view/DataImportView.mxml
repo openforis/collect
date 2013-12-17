@@ -29,8 +29,19 @@
 			
 			private var _presenter:DataImportPresenter;
 			
+			private var _allConflictingRecordsSelected:Boolean;
+			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new DataImportPresenter(this);
+			}
+			
+			[Bindable]
+			public function get allConflictingRecordsSelected():Boolean {
+				return _allConflictingRecordsSelected;
+			}
+			
+			public function set allConflictingRecordsSelected(value:Boolean):void {
+				_allConflictingRecordsSelected = value;
 			}
 			
 		]]>
@@ -94,6 +105,7 @@
 								 sortExpertMode="true"
 								 selectable="false"
 								 height="150"
+								 sortableColumns="false"
 								 >
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
@@ -102,12 +114,12 @@
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
 												   sortable="false"
-												   width="120"
+												   width="110"
 												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
 												   sortable="false"
-												   width="120"
+												   width="110"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.step"
@@ -119,25 +131,28 @@
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
 						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
 												   sortable="false"
-												   width="120"
+												   width="110"
 												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
 												   sortable="false"
-												   width="120"
+												   width="110"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
 							<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
 													   width="60"
+													   sortable="false"
 													   headerText="{Message.get('dataImport.recordList.entryDataPresent')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 							<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
 													   width="60"
+													   sortable="false"
 													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 							<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
 													   width="60"
+													   sortable="false"
 													   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						</mx:AdvancedDataGridColumnGroup>
@@ -160,23 +175,54 @@
 												  useHandCursor="true" buttonMode="true"
 												  visible="{data.warnings.length &gt; 0}"
 												  click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
-												  new DataImportEvent(DataImportEvent.SHOW_IMPORT_WARNINGS, data as DataImportSummaryItemProxy))}" />
+												  		new DataImportEvent(DataImportEvent.SHOW_IMPORT_WARNINGS, data as DataImportSummaryItemProxy))}" />
 									</mx:Canvas>
 								</fx:Component>
 							</mx:itemRenderer>
 						</mx:AdvancedDataGridColumn>
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumn dataField="selected" 
-											   headerText="{Message.get('dataImport.recordConflicts.replace')}"
-											   width="70"
+											   width="90"
 											   editable="true"
-											   rendererIsEditor="true" >
+											   sortable="false"
+											   rendererIsEditor="true">
+						<mx:headerRenderer>
+							<fx:Component>
+								<mx:Canvas>
+									<fx:Script>
+										<![CDATA[
+											import org.openforis.collect.event.DataImportEvent;
+											import org.openforis.collect.event.EventDispatcherFactory;
+											import org.openforis.collect.i18n.Message;
+										]]>
+									</fx:Script>
+									<mx:VBox>
+										<mx:Label text="{Message.get('dataImport.recordConflicts.replace')}" />
+										<mx:HBox>
+											<mx:Label text="{Message.get('dataImport.recordConflicts.replace.all')}" />
+											<mx:CheckBox id="selectAllConflictingCheckBox" 
+														selected="{outerDocument.allConflictingRecordsSelected}"
+														click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+															new DataImportEvent(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS))}" />
+										</mx:HBox>
+									</mx:VBox>
+								</mx:Canvas>
+							</fx:Component>
+						</mx:headerRenderer>
 						<mx:itemRenderer>
 							<fx:Component>
 								<mx:Canvas width="100%" height="100%">
+									<fx:Script>
+										<![CDATA[
+											import org.openforis.collect.event.DataImportEvent;
+											import org.openforis.collect.event.EventDispatcherFactory;
+										]]>
+									</fx:Script>
 									<mx:CheckBox horizontalCenter="0" verticalCenter="0" 
 												 selected="{data.selected}" 
-												 change="{data.selected = event.target.selected}" />
+												 change="{data.selected = event.target.selected; 
+												 	EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+												 		new DataImportEvent(DataImportEvent.CONFLICTING_RECORDS_SELECTION_CHANGE))}" />
 								</mx:Canvas>
 							</fx:Component>
 						</mx:itemRenderer>

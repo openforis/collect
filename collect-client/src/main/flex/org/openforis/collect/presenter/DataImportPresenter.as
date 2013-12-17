@@ -36,6 +36,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.view.DataImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 
@@ -57,10 +58,13 @@ package org.openforis.collect.presenter {
 		
 		private var _getStateResponder:IResponder;
 		private var _firstOpen:Boolean;
+		private var _allConflictingRecordsSelected:Boolean;
 		
 		public function DataImportPresenter(view:DataImportView) {
 			this._view = view;
 			_firstOpen = true;
+			_allConflictingRecordsSelected = false;
+			
 			_fileReference = new FileReference();
 			_dataImportClient = ClientFactory.dataImportClient;
 			
@@ -87,6 +91,8 @@ package org.openforis.collect.presenter {
 			
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
+			eventDispatcher.addEventListener(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS, selectAllConflictingRecords);
+			eventDispatcher.addEventListener(DataImportEvent.CONFLICTING_RECORDS_SELECTION_CHANGE, conflictingRecordsSelectionChange);
 		}
 		
 		protected function uploadButtonClickHandler(event:MouseEvent):void {
@@ -175,7 +181,8 @@ package org.openforis.collect.presenter {
 			setItemsSelected(_summary.recordsToImport);
 			_view.recordToImportDataGrid.dataProvider = _summary.recordsToImport;
 			//default not selected
-			setItemsSelected(_summary.conflictingRecords, false);
+			_allConflictingRecordsSelected = false;
+			setItemsSelected(_summary.conflictingRecords, _allConflictingRecordsSelected);
 			_view.conflictDataGrid.dataProvider = _summary.conflictingRecords;
 		}
 		
@@ -210,9 +217,23 @@ package org.openforis.collect.presenter {
 			}
 			return result;
 		}
+		
 		protected function setItemsSelected(items:IList, value:Boolean = true):void {
 			for each (var item:DataImportSummaryItemProxy in items) {
 				item.selected = value;
+			}
+		}
+		
+		protected function isAllItemsSelected(items:IList):Boolean {
+			if ( CollectionUtil.isEmpty(items) ) {
+				return false;
+			} else {
+				for each (var item:DataImportSummaryItemProxy in items) {
+					if ( ! item.selected ) {
+						return false;
+					}
+				}
+				return true;
 			}
 		}
 		
@@ -401,6 +422,16 @@ package org.openforis.collect.presenter {
 			popUp.title = Message.get("dataImport.skippedFileErrors.title", [fileName]);
 			popUp.showStep = false;
 			popUp.dataGrid.dataProvider = errors;
+		}
+		
+		protected function selectAllConflictingRecords(event:DataImportEvent):void {
+			_allConflictingRecordsSelected = ! _allConflictingRecordsSelected;
+			setItemsSelected(_summary.conflictingRecords, _allConflictingRecordsSelected);
+		}
+		
+		protected function conflictingRecordsSelectionChange(event:DataImportEvent):void {
+			_allConflictingRecordsSelected = isAllItemsSelected(_summary.conflictingRecords);
+			_view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
 		}
 	}
 }
