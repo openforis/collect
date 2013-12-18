@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="extend-code-list-item-description" author="ricci" dbms="postgresql">
+
+		<comment>Extend code list item description column size to 500 characters</comment>
+		
+		<modifyDataType
+		    schemaName="collect"
+		    tableName="ofc_code_list"
+		    columnName="description1"
+			newDataType="VARCHAR(500)" />
+
+		<modifyDataType 
+		    schemaName="collect"
+		    tableName="ofc_code_list"
+			columnName="description2"
+			newDataType="VARCHAR(500)" />
+		
+		<modifyDataType
+			schemaName="collect"
+		    tableName="ofc_code_list"
+		    columnName="description3"
+			newDataType="VARCHAR(500)" />
+						
+	</changeSet>
+	
+</databaseChangeLog>
