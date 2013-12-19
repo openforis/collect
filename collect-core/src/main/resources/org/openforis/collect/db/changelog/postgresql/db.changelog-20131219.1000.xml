@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="reset-sequences" author="ricci" dbms="postgresql">
+
+		<comment>Restart sequences with the maximum value of the corresponding primary key column</comment>
+		
+		<sql>
+		    select setval('collect.ofc_code_list_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_code_list), false);
+			select setval('collect.ofc_record_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_record), false);
+			select setval('collect.ofc_sampling_design_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_sampling_design), false);
+			select setval('collect.ofc_survey_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_survey), false);
+			select setval('collect.ofc_survey_work_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_survey_work), false);
+			select setval('collect.ofc_taxon_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_taxon), false);
+			select setval('collect.ofc_taxon_vernacular_name_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_taxon_vernacular_name), false);
+			select setval('collect.ofc_taxonomy_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_taxonomy), false);
+			select setval('collect.ofc_user_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_user), false);
+			select setval('collect.ofc_user_role_id_seq', (select coalesce(max(id), 0) + 1 from collect.ofc_user_role), false);
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>
