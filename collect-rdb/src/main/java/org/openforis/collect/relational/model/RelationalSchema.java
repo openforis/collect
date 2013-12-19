@@ -107,6 +107,14 @@ public final class RelationalSchema {
 		}
 	}
 
+	void assignAncestorTable(EntityDefinition entityDefn) {
+		int nodeId = entityDefn.getId();
+		while( ! entityDefn.isMultiple() ) {
+				entityDefn = entityDefn.getParentEntityDefinition();
+		}
+		dataTablesById.put( nodeId, dataTablesById.get(entityDefn.getId()) );
+	}
+	
 	public Dataset createDataset(Record record) {
 		Entity root = record.getRootEntity();
 		EntityDefinition rootDefn = root.getDefinition();
