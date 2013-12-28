@@ -159,6 +159,9 @@ public class RelationalSchemaGenerator {
 				// Create table for multiple entity 
 				table = createDataTable(rs, table, defn, relativePath);
 				rs.addTable(table);
+			} else {
+				// just keep a reference 
+				rs.assignAncestorTable((EntityDefinition) defn);
 			}
 				
 			// Add child tables and columns

@@ -2,10 +2,13 @@ package org.openforis.collect.relational.model;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
@@ -22,6 +25,7 @@ public class DataTable extends AbstractTable<Node<?>> {
 	private Path relativePath;
 	private DataTable parent;
 	private List<DataTable> childTables;
+	private Map<Integer, CodeValueFKColumn> foreignKeyCodeColumns;
 	
 	DataTable(String prefix, String name, DataTable parent, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		super(prefix, name);
@@ -29,8 +33,22 @@ public class DataTable extends AbstractTable<Node<?>> {
 		this.parent = parent;
 		this.relativePath = relativePath;
 		this.childTables = new ArrayList<DataTable>();
+		this.foreignKeyCodeColumns = new HashMap<Integer, CodeValueFKColumn>();
 	}
 
+	@Override
+	void addColumn(Column<?> column) {
+		super.addColumn(column);
+		if ( column instanceof CodeValueFKColumn ) {
+			int attrDefnId = ((CodeValueFKColumn) column).getAttributeDefinition().getId();
+			foreignKeyCodeColumns.put(attrDefnId, (CodeValueFKColumn) column);
+		}
+	}
+	
+	public CodeValueFKColumn getForeignKeyCodeColumn(CodeAttributeDefinition defn) {
+		return foreignKeyCodeColumns.get(defn.getId());
+	}
+	
 	public NodeDefinition getNodeDefinition() {
 		return definition;
 	}
