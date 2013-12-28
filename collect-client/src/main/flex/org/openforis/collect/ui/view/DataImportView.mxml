@@ -40,10 +40,10 @@
 				return _allConflictingRecordsSelected;
 			}
 			
-			public function set allConflictingRecordsSelected(value:Boolean):void {
+			 public function set allConflictingRecordsSelected(value:Boolean):void {
 				_allConflictingRecordsSelected = value;
 			}
-			
+			 
 		]]>
 		
 	</fx:Script>
@@ -97,6 +97,7 @@
 				  visible="{conflictDataGrid.dataProvider.length > 0}"
 				  includeInLayout="{conflictDataGrid.dataProvider.length > 0}"
 				  horizontalAlign="center"
+				  height="100%"
 				  >
 			<s:Label text="{Message.get('dataImport.recordsInConflict')}"
 					 styleName="formLabel" />
@@ -104,55 +105,61 @@
 			<mx:AdvancedDataGrid id="conflictDataGrid"
 								 sortExpertMode="true"
 								 selectable="false"
-								 height="150"
-								 sortableColumns="false"
-								 >
+								 draggableColumns="false"
+								 height="100%">
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
 											   headerText="{Message.get('dataImport.recordList.key')}"
 											   width="100" />
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.currentRecord')}">
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.creationDate" 
-												   sortable="false"
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
+												   sortCompareFunction="{function(o1:Object, o2:Object):int {
+												   		return UIUtil.gridColumnSortCompareFunction('conflictingRecord.creationDate', o1, o2);
+												   }}"
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.modifiedDate" 
-												   sortable="false"
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
+												   sortCompareFunction="{function(o1:Object, o2:Object):int {
+												   		return UIUtil.gridColumnSortCompareFunction('conflictingRecord.modifiedDate', o1, o2);
+												   }}"
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="conflictingRecord.step"
-												   sortable="false"
 												   width="60"
 												   headerText="{Message.get('dataImport.recordList.step')}" 
+												   sortCompareFunction="{function(o1:Object, o2:Object):int {
+													   return UIUtil.gridColumnSortCompareFunction('conflictingRecord.step', o1, o2);
+												   }}"
 												   labelFunction="{UIUtil.gridColumnStepLabelFunction}" />
 					</mx:AdvancedDataGridColumnGroup>
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordConflicts.newRecord')}">
 						<mx:AdvancedDataGridColumn dataField="record.creationDate" 
-												   sortable="false"
 												   width="110"
-												   headerText="{Message.get('dataImport.recordList.creationDate')}" 
+												   headerText="{Message.get('dataImport.recordList.creationDate')}"
+												   sortCompareFunction="{function(o1:Object, o2:Object):int {
+													   return UIUtil.gridColumnSortCompareFunction('record.creationDate', o1, o2);
+												   }}"
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
-												   sortable="false"
 												   width="110"
 												   headerText="{Message.get('dataImport.recordList.modifiedDate')}" 
+												   sortCompareFunction="{function(o1:Object, o2:Object):int {
+												   		return UIUtil.gridColumnSortCompareFunction('record.modifiedDate', o1, o2);
+												   }}"
 												   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 						<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
 							<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
 													   width="60"
-													   sortable="false"
 													   headerText="{Message.get('dataImport.recordList.entryDataPresent')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 							<mx:AdvancedDataGridColumn dataField="cleansingDataPresent" 
 													   width="60"
-													   sortable="false"
 													   headerText="{Message.get('dataImport.recordList.cleansingDataPresent')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 							<mx:AdvancedDataGridColumn dataField="analysisDataPresent" 
 													   width="60"
-													   sortable="false"
 													   headerText="{Message.get('dataImport.recordList.analysisDataPresent')}"
 													   itemRenderer="org.openforis.collect.ui.component.datagrid.AdvancedDataGridBooleanColumnItemRenderer" />
 						</mx:AdvancedDataGridColumnGroup>
@@ -184,11 +191,13 @@
 					<mx:AdvancedDataGridColumn dataField="selected" 
 											   width="90"
 											   editable="true"
-											   sortable="false"
-											   rendererIsEditor="true">
+											   rendererIsEditor="true"
+											   >
 						<mx:headerRenderer>
 							<fx:Component>
-								<mx:Canvas>
+								<mx:VBox width="100%" height="100%" 
+										 horizontalAlign="center"
+										 verticalAlign="middle">
 									<fx:Script>
 										<![CDATA[
 											import org.openforis.collect.event.DataImportEvent;
@@ -196,17 +205,14 @@
 											import org.openforis.collect.i18n.Message;
 										]]>
 									</fx:Script>
-									<mx:VBox>
-										<mx:Label text="{Message.get('dataImport.recordConflicts.replace')}" />
-										<mx:HBox>
-											<mx:Label text="{Message.get('dataImport.recordConflicts.replace.all')}" />
-											<mx:CheckBox id="selectAllConflictingCheckBox" 
-														selected="{outerDocument.allConflictingRecordsSelected}"
-														click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+									<mx:Label text="{Message.get('dataImport.recordConflicts.replace')}" />
+									<mx:HBox>
+										<mx:Label text="{Message.get('dataImport.recordConflicts.replace.all')}" />
+										<mx:CheckBox selected="{outerDocument.allConflictingRecordsSelected}"
+													click="{EventDispatcherFactory.getEventDispatcher().dispatchEvent(
 															new DataImportEvent(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS))}" />
-										</mx:HBox>
-									</mx:VBox>
-								</mx:Canvas>
+									</mx:HBox>
+								</mx:VBox>
 							</fx:Component>
 						</mx:headerRenderer>
 						<mx:itemRenderer>
@@ -234,28 +240,34 @@
 		<s:VGroup id="recordsContainer" 
 				  visible="{recordToImportDataGrid.dataProvider.length > 0}"
 				  includeInLayout="{recordToImportDataGrid.dataProvider.length > 0}"
-				  horizontalAlign="center">
+				  horizontalAlign="center"
+				  height="100%">
 			<s:Label text="{Message.get('dataImport.recordsToBeImported')}"
 					 styleName="formLabel" />
 	
 			<mx:AdvancedDataGrid id="recordToImportDataGrid"
 								 sortExpertMode="true"
 								 selectable="false"
-								 height="150"
+								 draggableColumns="false"
+								 height="100%"
 								 >
 				<mx:groupedColumns>
 					<mx:AdvancedDataGridColumn dataField="key"
 											   headerText="{Message.get('dataImport.recordList.key')}"
 											   width="100" />
 					<mx:AdvancedDataGridColumn dataField="record.creationDate"
-											   sortable="false"
 											   width="120"
 											   headerText="{Message.get('dataImport.recordList.creationDate')}"
+											   sortCompareFunction="{function(o1:Object, o2:Object):int {
+												   return UIUtil.gridColumnSortCompareFunction('record.creationDate', o1, o2);
+											   }}"
 											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 					<mx:AdvancedDataGridColumn dataField="record.modifiedDate" 
-											   sortable="false"
 											   width="120"
 											   headerText="{Message.get('dataImport.recordList.modifiedDate')}"
+											   sortCompareFunction="{function(o1:Object, o2:Object):int {
+											   		return UIUtil.gridColumnSortCompareFunction('record.modifiedDate', o1, o2);
+											   }}"
 											   labelFunction="{UIUtil.gridColumnDateTimeLabelFunction}" />
 					<mx:AdvancedDataGridColumnGroup headerText="{Message.get('dataImport.recordList.steps')}">
 						<mx:AdvancedDataGridColumn dataField="entryDataPresent" 
@@ -318,13 +330,14 @@
 		<s:VGroup id="skippedFilesContainer" 
 				  visible="{skippedFilesDataGrid.dataProvider.length > 0}"
 				  includeInLayout="{skippedFilesDataGrid.dataProvider.length > 0}"
-				  horizontalAlign="center">
+				  horizontalAlign="center"
+				  height="100%">
 			<s:Label text="{Message.get('dataImport.skippedFiles')}"
 					 styleName="formLabel" />
 		
 			<s:DataGrid id="skippedFilesDataGrid"
 						selectionMode="none"
-						height="100"
+						height="100%"
 						>
 				<s:columns>
 					<s:ArrayList>

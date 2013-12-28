@@ -14,6 +14,7 @@ package org.openforis.collect.util
 	import mx.managers.IFocusManagerComponent;
 	import mx.styles.CSSStyleDeclaration;
 	import mx.styles.IStyleManager2;
+	import mx.utils.ObjectUtil;
 	
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.CollectRecord$Step;
@@ -263,7 +264,7 @@ package org.openforis.collect.util
 
 		public static function gridColumnDateTimeLabelFunction(item:Object, column:Object):String {
 			var result:String = null;
-			var value:* = ObjectUtil.getValue(item, column.dataField);
+			var value:* = org.openforis.collect.util.ObjectUtil.getValue(item, column.dataField);
 			if ( value != null && value is Date ) {
 				var date:Date = value as Date;
 				result = _dataTimeFormatter.format(date);
@@ -273,7 +274,7 @@ package org.openforis.collect.util
 		
 		public static function gridColumnStepLabelFunction(item:Object, column:Object):String {
 			var dataField:String = column.dataField;
-			var step:CollectRecord$Step = ObjectUtil.getValue(item, dataField) as CollectRecord$Step;
+			var step:CollectRecord$Step = org.openforis.collect.util.ObjectUtil.getValue(item, dataField) as CollectRecord$Step;
 			if ( step != null ) {
 				switch ( step.name ) {
 					case CollectRecord$Step.ENTRY.name:
@@ -289,12 +290,18 @@ package org.openforis.collect.util
 		
 		public static function gridColumnNumberLabelFunction(item:Object, gridColumn:GridColumn):String {
 			var dataField:String = gridColumn.dataField;
-			var value:Object = ObjectUtil.getValue(item, dataField);
+			var value:Object = org.openforis.collect.util.ObjectUtil.getValue(item, dataField);
 			if ( value != null && !isNaN(Number(value)) ) {
 				return value.toString();
 			} else {
 				return "";
 			}
+		}
+		
+		public static function gridColumnSortCompareFunction(propertyName:String, o1:Object, o2:Object):int {
+			var value1:* = org.openforis.collect.util.ObjectUtil.getValue(o1, propertyName);
+			var value2:* = org.openforis.collect.util.ObjectUtil.getValue(o2, propertyName);
+			return mx.utils.ObjectUtil.compare(value1, value2);
 		}
 		
 		private static function isDescendantOf(parent:UIComponent, component:UIComponent):Boolean {

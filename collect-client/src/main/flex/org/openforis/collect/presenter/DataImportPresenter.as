@@ -14,6 +14,9 @@ package org.openforis.collect.presenter {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.collections.ListCollectionView;
+	import mx.controls.CheckBox;
+	import mx.events.AdvancedDataGridEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -88,6 +91,8 @@ package org.openforis.collect.presenter {
 			_view.uploadButton.addEventListener(MouseEvent.CLICK, uploadButtonClickHandler);
 			_view.startImportButton.addEventListener(MouseEvent.CLICK, startImportClickHandler);
 			_view.cancelButton.addEventListener(MouseEvent.CLICK, cancelButtonClickHandler);
+			
+			_view.conflictDataGrid.addEventListener(AdvancedDataGridEvent.HEADER_RELEASE, conflictDataGridHeaderReleaseHandler);
 			
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_IMPORT_WARNINGS, showImportWarningsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
@@ -219,9 +224,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function setItemsSelected(items:IList, value:Boolean = true):void {
+			ListCollectionView(items).disableAutoUpdate();
 			for each (var item:DataImportSummaryItemProxy in items) {
 				item.selected = value;
 			}
+			ListCollectionView(items).enableAutoUpdate();
 		}
 		
 		protected function isAllItemsSelected(items:IList):Boolean {
@@ -426,6 +433,7 @@ package org.openforis.collect.presenter {
 		
 		protected function selectAllConflictingRecords(event:DataImportEvent):void {
 			_allConflictingRecordsSelected = ! _allConflictingRecordsSelected;
+			_view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
 			setItemsSelected(_summary.conflictingRecords, _allConflictingRecordsSelected);
 		}
 		
@@ -433,5 +441,12 @@ package org.openforis.collect.presenter {
 			_allConflictingRecordsSelected = isAllItemsSelected(_summary.conflictingRecords);
 			_view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
 		}
+
+		protected function conflictDataGridHeaderReleaseHandler(event:AdvancedDataGridEvent):void {
+			if ( event.triggerEvent.target is CheckBox) {
+				event.preventDefault();
+			}
+		}
+
 	}
 }
