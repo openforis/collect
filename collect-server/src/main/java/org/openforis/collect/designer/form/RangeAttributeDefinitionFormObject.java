@@ -23,8 +23,8 @@ public class RangeAttributeDefinitionFormObject<T extends RangeAttributeDefiniti
 	}
 
 	@Override
-	public void loadFrom(T source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 	}
 
 }

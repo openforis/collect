@@ -34,13 +34,13 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 	}
 	
 	@Override
-	public void loadFrom(CodeList source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(CodeList source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		name = source.getName();
 		lookupTable = source.getLookupTable();
-		itemLabel = getLabel(source, CodeListLabel.Type.ITEM, languageCode, defaultLanguage);
-		listLabel = getLabel(source, CodeListLabel.Type.LIST, languageCode, defaultLanguage);
-		description = getDescription(source, languageCode, defaultLanguage);
+		itemLabel = source.getLabel(CodeListLabel.Type.ITEM, languageCode);
+		listLabel = source.getLabel(CodeListLabel.Type.LIST, languageCode);
+		description = source.getDescription(languageCode);
 		List<CodeListLevel> levels = source.getHierarchy();
 		boolean hasMultipleLevels = levels.size() > 1;
 		type = hasMultipleLevels ? Type.HIERARCHICAL.name(): Type.FLAT.name();
@@ -60,24 +60,6 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		dest.setCodeScope(scope);
 	}
 	
-	protected String getLabel(CodeList source, CodeListLabel.Type type, String languageCode, String defaultLanguage) {
-		String result = source.getLabel(type, languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getLabel(type, null);
-		}
-		return result;
-	}
-	
-	protected String getDescription(CodeList source, String languageCode, String defaultLanguage) {
-		String result = source.getDescription(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getDescription(null);
-		}
-		return result;
-	}
-
 	public String getName() {
 		return name;
 	}

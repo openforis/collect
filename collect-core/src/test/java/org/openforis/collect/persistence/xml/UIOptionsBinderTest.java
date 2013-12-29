@@ -13,24 +13,31 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.model.CollectSurveyContext;
+import org.openforis.idm.metamodel.Survey;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class UIOptionsBinderTest {
-
+public class UIOptionsBinderTest extends CollectIntegrationTest {
+	
+	@Autowired
+	private CollectSurveyContext context;
 	
 	@Test
 	public void testUnmarshall() throws IOException {
 		String optionsBody = loadTestOptions();
 		UIOptionsBinder binder = new UIOptionsBinder();
-		UIOptions uiOptions = binder.unmarshal(UIOptionsConstants.UI_TYPE, optionsBody);
+		Survey survey = createTestSurvey();
+		UIOptions uiOptions = binder.unmarshal(survey, UIOptionsConstants.UI_TYPE, optionsBody);
 		assertNotNull(uiOptions);
 		List<UITabSet> tabSets = uiOptions.getTabSets();
 		assertEquals(1, tabSets.size());
@@ -53,7 +60,8 @@ public class UIOptionsBinderTest {
 	public void roundTripMarshallingTest() throws IOException {
 		String optionsBody = loadTestOptions();
 		UIOptionsBinder binder = new UIOptionsBinder();
-		UIOptions uiOptions = binder.unmarshal(UIOptionsConstants.UI_TYPE, optionsBody);
+		Survey survey = createTestSurvey();
+		UIOptions uiOptions = binder.unmarshal(survey, UIOptionsConstants.UI_TYPE, optionsBody);
 		new File("target/test/output").mkdirs();
 		FileOutputStream fos = new FileOutputStream("target/test/output/marshalled.uioptions.xml");
 		String marshalled = binder.marshal(uiOptions);
@@ -69,6 +77,14 @@ public class UIOptionsBinderTest {
 		IOUtils.copy(is, writer, "UTF-8");
 		String result = writer.toString();
 		return result;
+	}
+	
+	private Survey createTestSurvey() {
+		Survey survey = context.createSurvey();
+		survey.setName("test");
+		survey.setUri("http://www.openforis.org/test");
+		survey.addLanguage("en");
+		return survey;
 	}
 	
 }

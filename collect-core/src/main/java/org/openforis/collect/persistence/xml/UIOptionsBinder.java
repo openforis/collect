@@ -12,9 +12,11 @@ import java.io.Writer;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.DataInconsistencyException;
 import org.openforis.collect.persistence.xml.internal.marshal.UIOptionsSerializer;
 import org.openforis.collect.persistence.xml.internal.unmarshal.UITabSetPR;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.ApplicationOptionsBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParser;
@@ -28,10 +30,8 @@ import org.xmlpull.v1.XmlPullParserFactory;
 public class UIOptionsBinder implements
 		ApplicationOptionsBinder<UIOptions> {
 
-	protected UIOptions uiOptions;
-	
 	@Override
-	public UIOptions unmarshal(String type, String body) {
+	public UIOptions unmarshal(Survey survey, String type, String body) {
 		XmlPullParser parser = null;
 		try {
 			XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -39,7 +39,8 @@ public class UIOptionsBinder implements
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
 			Reader reader = new StringReader(body);
 			parser.setInput(reader);
-			uiOptions = new UIOptions();
+			UIOptions uiOptions = new UIOptions();
+			uiOptions.setSurvey((CollectSurvey) survey);
 			UITabSet tabSet = unmarshalTabSet(parser, uiOptions);
 			while ( tabSet != null ) {
 				uiOptions.addTabSet(tabSet);
@@ -53,7 +54,7 @@ public class UIOptionsBinder implements
 
 	private UITabSet unmarshalTabSet(XmlPullParser parser, UIOptions uiOptions) throws IOException, XmlPullParserException, XmlParseException {
 		try {
-			UITabSetPR tabSetPR = new UITabSetPR(this);
+			UITabSetPR tabSetPR = new UITabSetPR(this, uiOptions);
 			tabSetPR.parse(parser);
 			UITabSet tabSet = tabSetPR.getTabSet();
 			return tabSet;
@@ -88,8 +89,4 @@ public class UIOptionsBinder implements
 		}
 	}
 	
-	public UIOptions getUiOptions() {
-		return uiOptions;
-	}
-
 }

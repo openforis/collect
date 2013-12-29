@@ -41,8 +41,8 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	}
 	
 	@Override
-	public void loadFrom(T source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		loadFieldsOrderValue(source);
 	}
 

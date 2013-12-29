@@ -257,9 +257,6 @@ public abstract class SurveyBaseVM extends BaseVM {
 			String result = null;
 			if ( version != null ) {
 				result = version.getLabel(currentLanguageCode);
-				if ( result == null && isDefaultLanguage() ) {
-					result = version.getLabel(null);
-				}
 				if ( result == null ) {
 					result = version.getName();
 				}

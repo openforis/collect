@@ -18,7 +18,7 @@ public abstract class FormObject<T> {
 		VERSION_EMPTY_SELECTION = new NamedObject(EMPTY_OPTION);
 	}
 	
-	public abstract void loadFrom(T source, String language, String defaultLanguage);
+	public abstract void loadFrom(T source, String language);
 	
 	public abstract void saveTo(T dest, String language);
 	

@@ -31,8 +31,8 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 	}
 
 	@Override
-	public void loadFrom(T source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		type = source.getType() != null ? source.getType().name(): null;
 	}
 

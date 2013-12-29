@@ -243,8 +243,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			if ( survey == null ) {
 				//session expired
 			} else {
-				String defaultLanguage = survey.getDefaultLanguage();
-				formObject.loadFrom(editedItem, currentLanguageCode, defaultLanguage);
+				formObject.loadFrom(editedItem, currentLanguageCode);
 			}
 		}
 		notifyChange("editedItem","formObject");

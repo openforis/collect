@@ -154,12 +154,6 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 
 	protected void setTabLabel(UITab tab, String label) {
-		if ( isDefaultLanguage() ) {
-			//remove label associated to default language, if any
-			if ( tab.getLabel(null) != null ) {
-				tab.removeLabel(null);
-			}
-		}
 		tab.setLabel(currentLanguageCode, label.trim());
 	}
 	
@@ -175,10 +169,6 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	public String getTabLabel(UITab tab) {
 		if ( tab != null ) {
 			String result = tab.getLabel(currentLanguageCode);
-			if ( result == null && isDefaultLanguage() ) {
-				//try to get label associated to default language code
-				result = tab.getLabel(null);
-			}
 			return result;
 		} else {
 			return null;

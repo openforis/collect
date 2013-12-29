@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
@@ -23,10 +24,13 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 public class UITabSetPR extends UITabSetPRBase {
 
-	public UITabSetPR(UIOptionsBinder binder) {
+	private UIOptions uiOptions;
+
+	public UITabSetPR(UIOptionsBinder binder, UIOptions uiOptions) {
 		super(TAB_SET, binder);
 		
 		this.binder = binder;
+		this.uiOptions = uiOptions;
 		
 		addChildPullReaders(
 			new UITabPR(binder)
@@ -42,7 +46,6 @@ public class UITabSetPR extends UITabSetPRBase {
 	@Override
 	protected void onStartTag() throws XmlParseException,
 			XmlPullParserException, IOException {
-		UIOptions uiOptions = getUIOptions();
 		tabSet = uiOptions.createTabSet(getAttribute(NAME, true));
 		setParentSetInChildren(tabSet);
 	}
@@ -56,7 +59,12 @@ public class UITabSetPR extends UITabSetPRBase {
 		}
 	}
 	
+	public UIOptions getUiOptions() {
+		return uiOptions;
+	}
 	
-
+	public CollectSurvey getSurvey() {
+		return uiOptions.getSurvey();
+	}
 }
 

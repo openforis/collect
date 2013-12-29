@@ -14,8 +14,7 @@ public class AttributeDefaultFormObject extends FormObject<AttributeDefault> {
 	private String condition;
 
 	@Override
-	public void loadFrom(AttributeDefault source, String language,
-			String defaultLanguage) {
+	public void loadFrom(AttributeDefault source, String language) {
 		value = source.getValue();
 		expression = source.getExpression();
 		condition = source.getCondition();

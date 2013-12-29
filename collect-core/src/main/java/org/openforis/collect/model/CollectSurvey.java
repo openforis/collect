@@ -3,8 +3,6 @@
  */
 package org.openforis.collect.model;
 
-import java.util.List;
-
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.idm.metamodel.ApplicationOptions;
@@ -27,20 +25,6 @@ public class CollectSurvey extends Survey {
 		this.work = false;
 	}
 
-	public String getDefaultLanguage() {
-		List<String> languages = getLanguages();
-		if ( languages == null || languages.isEmpty() ) {
-			return null;
-		} else {
-			return languages.get(0);
-		}
-	}
-	
-	public boolean isDefaultLanguage(String langCode) {
-		String defaultLanguage = getDefaultLanguage();
-		return defaultLanguage.equals(langCode);
-	}
-	
 	public UIOptions createUIOptions() {
 		return new UIOptions(this);
 	}

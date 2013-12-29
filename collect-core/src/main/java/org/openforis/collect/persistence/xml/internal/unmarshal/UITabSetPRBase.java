@@ -4,7 +4,6 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE
 
 import java.io.IOException;
 
-import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
@@ -16,7 +15,7 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author S. Ricci
  *
  */
-abstract class UITabSetPRBase extends XmlPullReader {
+abstract class UITabSetPRBase extends UIElementPullReader {
 
 	protected UIOptionsBinder binder;
 	protected UITabSet parentTabSet;
@@ -46,15 +45,8 @@ abstract class UITabSetPRBase extends XmlPullReader {
 		}
 	}
 
-	public UIOptions getUIOptions() {
-		return binder.getUiOptions();
-	}
-	
 	public UITabSet getTabSet() {
 		return tabSet;
 	}
-
-	
-
 
 }

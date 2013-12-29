@@ -4,7 +4,6 @@
 package org.openforis.collect.designer.form;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.designer.model.CheckType;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
 
@@ -19,10 +18,10 @@ public class CheckFormObject<T extends Check<?>> extends FormObject<T> {
 	private String message;
 	
 	@Override
-	public void loadFrom(T source, String languageCode, String defaultLanguageCode) {
+	public void loadFrom(T source, String languageCode) {
 		flag = source.getFlag().name();
 		condition = source.getCondition();
-		message = getMessage(source, languageCode, defaultLanguageCode);
+		message = source.getMessage(languageCode);
 	}
 	
 	@Override
@@ -32,19 +31,6 @@ public class CheckFormObject<T extends Check<?>> extends FormObject<T> {
 		dest.setMessage(languageCode, StringUtils.trimToNull(message));
 	}
 	
-	protected String getMessage(T source, String languageCode, String defaultLanguage) {
-		String result = source.getMessage(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getMessage(null);
-		}
-		if ( result == null ) {
-			CheckType type = CheckType.valueOf(source);
-			result = type.getDefaultMessage();
-		}
-		return result;
-	}
-
 	@Override
 	protected void reset() {
 		flag = null;
