@@ -170,14 +170,19 @@ public class SurveyManager {
 		}
 	}
 
+	/**
+	 * Duplicates a published survey into a work survey and import the survey file into this new survey work
+	 */
 	@Transactional
 	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
-		CollectSurvey surveyWork = duplicatePublishedSurveyForEdit(uri);
-		SurveySummary oldSummary = SurveySummary.createFromSurvey(surveyWork);
-		updateSurveyWork(surveyFile, surveyWork, oldSummary);
-		return surveyWork;
+		duplicatePublishedSurveyForEdit(uri);
+		CollectSurvey newSurveyWork = updateModel(surveyFile, validate);
+		return newSurveyWork;
 	}
 	
+	/**
+	 * Imports a survey from a XML file input stream and publishes it.
+	 */
 	@Transactional
 	public CollectSurvey importModel(InputStream is, String name, boolean validate)
 			throws SurveyImportException, SurveyValidationException {
@@ -218,6 +223,12 @@ public class SurveyManager {
 		}
 	}
 
+	/**
+	 * Updates a published or a work survey and overwrites it with the specified one.
+	 * The existing survey will be searched by his URI.
+	 * If a work survey with the same URI as the survey in the surveyFile exists,
+	 * than it will be overwritten with the passed one, otherwise the published survey will be overwritten.
+	 */
 	@Transactional
 	public CollectSurvey updateModel(File surveyFile, boolean validate)
 			throws SurveyValidationException, SurveyImportException {
@@ -240,12 +251,7 @@ public class SurveyManager {
 		return parsedSurvey;
 	}
 	
-	protected void updateSurveyWork(File surveyFile,
-			CollectSurvey survey) throws SurveyImportException {
-		updateSurveyWork(surveyFile, survey, SurveySummary.createFromSurvey(survey));
-	}
-	
-	protected void updateSurveyWork(File surveyFile,
+	protected CollectSurvey updateSurveyWork(File surveyFile,
 			CollectSurvey survey, SurveySummary oldSummary)
 			throws SurveyImportException {
 		Integer id = oldSummary.getId();
@@ -262,6 +268,7 @@ public class SurveyManager {
 		} catch (CodeListImportException e) {
 			throw new SurveyImportException(e);
 		}
+		return survey;
 	}
 
 	protected void updatePublishedSurvey(File surveyFile,
@@ -283,6 +290,13 @@ public class SurveyManager {
 		}
 	}
 
+	/**
+	 * Import a survey and consider it as published.
+	 * 
+	 * @param survey
+	 * @throws SurveyImportException
+	 * @deprecated use {@link #importModel(File, String, boolean)} instead.
+	 */
 	@Transactional
 	@Deprecated
 	public void importModel(CollectSurvey survey) throws SurveyImportException {
@@ -290,6 +304,14 @@ public class SurveyManager {
 		addToCache(survey);
 	}
 	
+	/**
+	 * Updates a published survey and overwrites it with the specified one.
+	 * The existing published survey will be searched by his URI.
+	 * 
+	 * @param survey
+	 * @throws SurveyImportException
+	 * @deprecated Use {@link #updateModel(File, boolean)} instead.
+	 */
 	@Deprecated
 	@Transactional
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
