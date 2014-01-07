@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet id="update-taxon-rank" author="ricci" dbms="postgresql">
+
+		<comment>Update taxon rank to TaxonRank enum values</comment>
+		
+		<sql>
+			update collect.ofc_taxon set taxon_rank = 'subspecies' where taxon_rank = 'Sub-species';
+			update collect.ofc_taxon set taxon_rank = lower(taxon_rank);
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>
