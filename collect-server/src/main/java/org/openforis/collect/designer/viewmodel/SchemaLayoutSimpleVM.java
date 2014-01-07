@@ -78,6 +78,14 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		initTreeModel();
 	}
 	
+	@Override
+	@GlobalCommand
+	@NotifyChange({"treeModel"})
+	public void currentLanguageChanged() {
+		super.currentLanguageChanged();
+		initTreeModel();
+	}
+	
 	@Command
 	@NotifyChange({"selectedTab"})
 	public void selectTab(@BindingParam("tab") UITab tab) {
@@ -182,6 +190,16 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 			return result;
 		} else {
 			return null;
+		}
+	}
+	
+	public String getDefaultLanugageTabLabel(UITab tab) {
+		if ( tab == null ) {
+			return null;
+		} else {
+			String defaultLanguage = getSurvey().getDefaultLanguage();
+			String result = tab.getLabel(defaultLanguage);
+			return result;
 		}
 	}
 	
