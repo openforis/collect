@@ -19,7 +19,7 @@ public class DatabaseVersionManager {
 
 	private static final String VOID_VERSION = "PROJECT_VERSION"; //token was not being replaced into version.properties in previous releases
 	
-	private static final String[] MIGRATION_VERSIONS = new String[]{
+	private static final String[] MIGRATION_REQUIRED_VERSIONS = new String[]{
 		"3.0-Alpha2"
 	};
 	
@@ -44,7 +44,7 @@ public class DatabaseVersionManager {
 		if ( ( schemaVersion == null && appVersion.equals(VOID_VERSION) ) || appVersion.equals(schemaVersion) ) {
 			return true;
 		} else {
-			String lastMigrationVersion = MIGRATION_VERSIONS[MIGRATION_VERSIONS.length - 1];
+			String lastMigrationVersion = MIGRATION_REQUIRED_VERSIONS[MIGRATION_REQUIRED_VERSIONS.length - 1];
 			VersionInfo appVersionInfo = VersionInfo.parse(appVersion);
 			VersionInfo lastMigrationVersionInfo = VersionInfo.parse(lastMigrationVersion);
 			if ( appVersionInfo.compareTo(lastMigrationVersionInfo) >= 0) {
@@ -61,8 +61,10 @@ public class DatabaseVersionManager {
 	 * @author S. Ricci
 	 */
 	public static class VersionInfo implements Comparable<VersionInfo> {
+		private static final String VERSION_PATTERN = "(\\d+)\\.(\\d+)(\\.(\\d+))?(-(Alpha|Beta)(\\d+)?)?(-SNAPSHOT)?";
+
 		private int major;
-		private Integer minor;
+		private int minor;
 		private Integer rev;
 		private String testType;
 		private Integer testVersion;
@@ -76,11 +78,11 @@ public class DatabaseVersionManager {
 			this.major = major;
 		}
 		
-		public Integer getMinor() {
+		public int getMinor() {
 			return minor;
 		}
 		
-		public void setMinor(Integer minor) {
+		public void setMinor(int minor) {
 			this.minor = minor;
 		}
 		
@@ -124,34 +126,46 @@ public class DatabaseVersionManager {
 			this.snapshot = snapshot;
 		}
 
+		/**
+		 * Returns:
+		 * 1 if this is a Alpha version
+		 * 2 if this is a Beta version
+		 * {@link Integer#MAX_VALUE} if this is final release
+		 */
 		public int getTestLevel() {
 			if ( isAlpha() ) {
 				return 1;
 			} else if ( isBeta() ) {
 				return 2;
 			} else {
+				//final release
 				return Integer.MAX_VALUE;
 			}
 		}
 		
 		@Override
 		public int compareTo(VersionInfo o) {
-			int result = Integer.compare(major, o.major);
+			//compare major release
+			int result = compareIntegers(major, o.major);
 			if ( result == 0 ) {
+				//compare minor release
 				result = compareIntegers(minor, o.minor);
 				if ( result == 0 ) {
+					//compare revision
 					result = compareIntegers(rev, o.rev);
+					if ( result == 0 ) {
+						//compare test level
+						result = compareIntegers(getTestLevel(), o.getTestLevel());
+						if ( result == 0 ) {
+							//compare test version
+							result = compareIntegers(testVersion, o.getTestVersion());
+							if ( result == 0 ) {
+								//snapshot version is considered less than final version
+								result = - ( Boolean.valueOf(snapshot).compareTo(o.snapshot) );
+							}
+						}
+					}
 				}
-			}
-			if ( result == 0 ) {
-				//compare test version
-				result = Integer.compare(getTestLevel(), o.getTestLevel());
-				if ( result == 0 ) {
-					result = compareIntegers(testVersion, o.getTestVersion());
-				}
-			}
-			if ( result == 0 ) {
-				result = Boolean.compare(snapshot, o.snapshot);
 			}
 			return result;
 		}
@@ -164,7 +178,7 @@ public class DatabaseVersionManager {
 			} else if ( n2 == null ) {
 				return 1;
 			} else {
-				return Integer.compare(n1.intValue(), n2.intValue());
+				return n1.compareTo(n2);
 			}
 		}
 		
@@ -173,8 +187,7 @@ public class DatabaseVersionManager {
 		 * E.g. 3.0, 3.0.2, 3.0-Alpha2, 3.0-Alpha3-SNAPSHOT
 		 */
 		public static VersionInfo parse(String ver) {
-		    Matcher m = Pattern.compile("(\\d+)\\.(\\d+)(\\.(\\d+))?(-(Alpha|Beta)(\\d+)?)?(-SNAPSHOT)?")
-		                       .matcher(ver);
+		    Matcher m = Pattern.compile(VERSION_PATTERN).matcher(ver);
 		    if (!m.matches())
 		        throw new IllegalArgumentException("Malformed version number");
 
@@ -197,6 +210,35 @@ public class DatabaseVersionManager {
 		    return result;
 		}
 		
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append(major);
+			sb.append(".");
+			sb.append(minor);
+			if ( rev != null ) {
+				sb.append(".");
+				sb.append(rev);
+			}
+			if ( testType != null ) {
+				sb.append("-");
+				sb.append(testType);
+				if ( testVersion != null ) {
+					sb.append(testVersion);
+				}
+			}
+			if ( snapshot ) {
+				sb.append("-");
+				sb.append("SNAPSHOT");
+			}
+			return sb.toString();
+		}
+		
+	}
+	
+	public static void main(String[] args) {
+		VersionInfo v1 = VersionInfo.parse("3");
+		System.out.println(v1);
 	}
 	
 }
