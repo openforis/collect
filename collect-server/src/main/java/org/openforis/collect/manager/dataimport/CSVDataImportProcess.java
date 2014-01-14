@@ -88,6 +88,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private CollectSurvey survey;
 	private Step step;
 	private int parentEntityDefinitionId;
+
+	private CollectRecord lastModifiedRecordSummary;
+
+	private CollectRecord lastModifiedRecord;
 	
 	@Override
 	public void init() {
@@ -154,6 +158,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						processLine(line);
 					}
 					if ( ! reader.isReady() ) {
+						//end of file reached
+						if ( step != null ) {
+							saveLastModifiedRecord();
+						}
 						break;
 					}
 				} catch (ParsingException e) {
@@ -179,6 +187,57 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void processLine(DataLine line) {
+		if ( validateRecordKey(line) ) {
+			if ( step == null ) {
+				CollectRecord recordSummary = loadRecordSummary(line);
+				Step originalRecordStep = recordSummary.getStep();
+				//set values in each step data
+				for (Step currentStep : Step.values()) {
+					if ( currentStep.compareTo(originalRecordStep) <= 0  ) {
+						CollectRecord record = recordDao.load(survey, recordSummary.getId(), currentStep.getStepNumber());
+						setValuesInRecord(line, record, currentStep);
+						//always save record when updating multiple record steps in the same process
+						saveRecord(record, currentStep);
+					}
+				}
+			} else {
+				CollectRecord recordSummary = loadRecordSummary(line);
+				Step originalRecordStep = recordSummary.getStep();
+				if ( step.compareTo(originalRecordStep) <= 0  ) {
+					CollectRecord record;
+					if ( lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() ) ) {
+						//record changed
+						if ( lastModifiedRecordSummary != null ) {
+							saveLastModifiedRecord();
+						}
+						record = recordDao.load(survey, recordSummary.getId(), step.getStepNumber());
+					} else {
+						record = lastModifiedRecord;
+					}
+					setValuesInRecord(line, record, step);
+					lastModifiedRecordSummary = recordSummary;
+					lastModifiedRecord = record;
+				} else {
+					status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
+				}
+			}
+			status.addProcessedRow(line.getLineNumber());
+		}
+	}
+
+	private void saveLastModifiedRecord() {
+		saveRecord(lastModifiedRecord, step);
+		Step originalStep = lastModifiedRecordSummary.getStep();
+		if ( step.compareTo(originalStep) < 0 ) {
+			//reset record step to the original one
+			CollectRecord record = recordDao.load(survey, lastModifiedRecordSummary.getId(), originalStep.getStepNumber());
+			record.setStep(originalStep);
+			validateRecord(record);
+			recordDao.update(record);
+		}
+	}
+	
+	private boolean validateRecordKey(DataLine line) {
 		long currentRowNumber = line.getLineNumber();
 		EntityDefinition parentEntityDefn = getParentEntityDefinition();
 		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
@@ -192,43 +251,25 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 					currentRowNumber, recordKeyColumnNames, NO_RECORD_FOUND_ERROR_MESSAGE_KEY);
 			parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
 			status.addParsingError(currentRowNumber, parsingError);
+			return false;
 		} else if ( recordSummaries.size() > 1 ) {
 			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
 					currentRowNumber, recordKeyColumnNames, MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY);
 			parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
 			status.addParsingError(currentRowNumber, parsingError);
+			return false;
 		} else {
-			CollectRecord recordSummary = recordSummaries.get(0);
-			setValuesInRecord(line, recordSummary);
-			status.addProcessedRow(currentRowNumber);
+			return true;
 		}
 	}
-
-	private void setValuesInRecord(DataLine line, CollectRecord recordSummary) {
-		Step recordStep = recordSummary.getStep();
-		if ( step == null ) {
-			for (Step currentStep : Step.values()) {
-				if ( currentStep.compareTo(recordStep) <= 0  ) {
-					setValuesInRecord(line, recordSummary,
-							currentStep);
-				}
-			}
-		} else if ( step.compareTo(recordStep) <= 0  ) {
-			setValuesInRecord(line, recordSummary, step);
-			if ( step.compareTo(recordStep) < 0 ) {
-				//reset record step to the original one
-				resetStep(recordSummary.getId(), recordStep);
-			}
-		} else {
-			status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
-		}
-	}
-
-	private void resetStep(Integer id, Step recordStep) {
-		CollectRecord record = recordDao.load(survey, id, recordStep.getStepNumber());
-		record.setStep(recordStep);
-		validateRecord(record);
-		recordDao.update(record);
+	
+	private CollectRecord loadRecordSummary(DataLine line) {
+		EntityDefinition parentEntityDefn = getParentEntityDefinition();
+		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
+		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+		List<CollectRecord> recordSummaries = recordDao.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
+		CollectRecord recordSummary = recordSummaries.get(0);
+		return recordSummary;
 	}
 
 	private void validateRecord(CollectRecord record) {
@@ -240,21 +281,16 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void setValuesInRecord(DataLine line, CollectRecord recordSummary, Step step) {
-		LOG.info("Setting values in record: " + recordSummary.getId() + "[" + recordSummary.getRootEntityKeyValues() + "]" + " step: " + step);
-		
-		CollectRecord record = recordDao.load(survey, recordSummary.getId(), step.getStepNumber());
+	private boolean setValuesInRecord(DataLine line, CollectRecord record, Step step) {
+		LOG.info("Setting values in record: " + record.getId() + "[" + record.getRootEntityKeyValues() + "]" + " step: " + step);
 		record.setStep(step);
 		Entity parentEntity = getOrCreateParentEntity(record, line);
-		if ( parentEntity != null ) {
+		if ( parentEntity == null ) {
+			//TODO add parsing error?
+			return false;
+		} else {
 			setValuesInAttributes(parentEntity, line);
-			if ( step == Step.ANALYSIS ) {
-				record.setStep(Step.CLEANSING);
-				recordDao.update(record);
-				record.setStep(Step.ANALYSIS);
-			}
-			validateRecord(record);
-			recordDao.update(record);
+			return true;
 		}
 	}
 
@@ -385,6 +421,16 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
+	private void saveRecord(CollectRecord record, Step step) {
+		if ( step == Step.ANALYSIS ) {
+			record.setStep(Step.CLEANSING);
+			recordDao.update(record);
+			record.setStep(Step.ANALYSIS);
+		}
+		validateRecord(record);
+		recordDao.update(record);
+	}
+	
 //	@SuppressWarnings("unchecked")
 //	private <T extends Value> void setValueInAttribute(Attribute<?, T> attr, String strVal) {
 //		T val;

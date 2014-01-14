@@ -96,47 +96,38 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return result;
 	}
 	
-	private AttributeDefinition extractAttributeDefinition(EntityDefinition parentEntityDefn, String colName) {
+	private FieldDefinition<?> extractFieldDefinition(EntityDefinition parentEntityDefn, String colName) {
 		List<NodeDefinition> childDefns = parentEntityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefns) {
 			String childName = childDefn.getName();
 			if ( colName.equals(childName) ) {
 				if ( childDefn instanceof AttributeDefinition ) {
-					return (AttributeDefinition) childDefn;
+					AttributeDefinition attrDefn = (AttributeDefinition) childDefn;
+					String mainFieldName = attrDefn.getMainFieldName();
+					return attrDefn.getFieldDefinition(mainFieldName);
 				} else {
 					//column name matches an entity name: error
 					return null;
-				}				
+				}
 			} else if ( colName.startsWith(childName + ATTRIBUTE_FIELD_SEPARATOR) ) {
 				if ( childDefn instanceof EntityDefinition ) {
 					if ( childDefn.isMultiple() ) {
 						//ignore it
 					} else {
 						String colNamePart = colName.substring(childName.length() + ATTRIBUTE_FIELD_SEPARATOR.length());
-						AttributeDefinition nestedAttrDefn = extractAttributeDefinition((EntityDefinition) childDefn, colNamePart);
-						if ( nestedAttrDefn != null ) {
-							return nestedAttrDefn;
+						FieldDefinition<?> nestedFieldDefn = extractFieldDefinition((EntityDefinition) childDefn, colNamePart);
+						if ( nestedFieldDefn != null ) {
+							return nestedFieldDefn;
 						}
 					}
 				} else {
 					List<FieldDefinition<?>> fieldDefns = ((AttributeDefinition) childDefn).getFieldDefinitions();
 					for (FieldDefinition<?> fieldDefn : fieldDefns) {
 						if ( colName.equals(childName + ATTRIBUTE_FIELD_SEPARATOR + fieldDefn.getName() ) ) {
-							return (AttributeDefinition) childDefn;
+							return fieldDefn;
 						}
 					}
 				}
-			}
-		}
-		return null;
-	}
-	
-	private FieldDefinition<?> extractFieldDefinition(AttributeDefinition attributeDefinition, String columnName) {
-		List<FieldDefinition<?>> fieldDefns = attributeDefinition.getFieldDefinitions();
-		for (FieldDefinition<?> fieldDefn : fieldDefns) {
-			String fieldName = fieldDefn.getName();
-			if ( columnName.endsWith(fieldName) ) {
-				return fieldDefn;
 			}
 		}
 		return null;
@@ -161,8 +152,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			entityIdentifierDefns.add(identifier);
 		}
 		return entityIdentifierDefns;
+		
 	}
-
 	private List<String> getExpectedAncestorKeyColumnNames() {
 		List<EntityIdentifierDefinition> entityIdentifierDefns = getAncestorIdentifiers();
 		//validate ancestor key columns
@@ -234,11 +225,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			List<String> attrColNames = colNames.subList(expectedAncestorKeyColumnNames.size(), colNames.size());
 			for (String colName : attrColNames) {
 				String value = getColumnValue(colName, false, String.class);
-				AttributeDefinition attrDefn = extractAttributeDefinition(parentEntityDefinition, colName);
-				FieldDefinition<?> fieldDefn = extractFieldDefinition(attrDefn, colName);
-				if ( fieldDefn == null ) {
-					fieldDefn = attrDefn.getFieldDefinition(attrDefn.getMainFieldName());
-				}
+				FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
+				AttributeDefinition attrDefn = (AttributeDefinition) fieldDefn.getParentDefinition();
 				line.setFieldValue(attrDefn.getId(), fieldDefn.getName(), value);
 				line.setColumnNameByField(attrDefn.getId(), fieldDefn.getName(), colName);
 			}
@@ -271,8 +259,8 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				throws ParsingException {
 			for (int i = 0; i < colNames.size(); i++) {
 				String colName = StringUtils.trimToEmpty(colNames.get(i));
-				AttributeDefinition attrDefn = extractAttributeDefinition(parentEntityDefinition, colName);
-				if ( attrDefn == null ) {
+				FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
+				if ( fieldDefn == null ) {
 					//attribute definition not found
 					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName);
 					throw new ParsingException(error);
