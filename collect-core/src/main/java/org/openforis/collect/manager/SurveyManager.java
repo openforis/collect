@@ -608,7 +608,7 @@ public class SurveyManager {
 		Integer surveyWorkId = survey.getId();
 		survey.setWork(false);
 		survey.setPublished(true);
-		CollectSurvey oldPublishedSurvey = get(survey.getName());
+		CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
 		if ( oldPublishedSurvey == null ) {
 			surveyDao.importModel(survey);
 		} else {
