@@ -47,6 +47,14 @@
 								/>
 			</s:HGroup>
 			
+			<s:HGroup verticalAlign="middle">
+				<s:CheckBox id="transactionalCheckBox" 
+							label="{Message.get('csvDataImport.processInTransaction')}" />
+				
+				<s:CheckBox id="validateRecordsCheckBox" 
+							label="{Message.get('csvDataImport.validateRecords')}" />
+			</s:HGroup>
+			
 			<s:VGroup horizontalAlign="center"
 					  gap="4"
 					  width="100%" 

@@ -61,7 +61,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
-@Component
+@Component("csvDataImportProcess")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Transactional
 public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImportStatus<ParsingError>> {
@@ -88,10 +88,15 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private CollectSurvey survey;
 	private Step step;
 	private int parentEntityDefinitionId;
+	private boolean recordValidationEnabled;
 
 	private CollectRecord lastModifiedRecordSummary;
 
 	private CollectRecord lastModifiedRecord;
+
+	public CSVDataImportProcess() {
+		recordValidationEnabled = true;
+	}
 	
 	@Override
 	public void init() {
@@ -102,17 +107,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	@Override
 	protected void initStatus() {
 		status = new ReferenceDataImportStatus<ParsingError>();
-	}
-	
-	@Override
-	@Transactional(rollbackFor=ImportException.class)
-	public Void call() throws Exception {
-		Void result = super.call();
-		if ( ! status.isComplete() ) {
-			//rollback transaction
-			throw new ImportException();
-		}
-		return result;
 	}
 	
 	protected void validateParameters() {
@@ -137,7 +131,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		processFile();
 	}
 
-	protected void processFile() throws ImportException {
+	protected void processFile() {
 		InputStreamReader isReader = null;
 		FileInputStream is = null;
 		long currentRowNumber = 0;
@@ -197,7 +191,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						CollectRecord record = recordDao.load(survey, recordSummary.getId(), currentStep.getStepNumber());
 						setValuesInRecord(line, record, currentStep);
 						//always save record when updating multiple record steps in the same process
-						saveRecord(record, currentStep);
+						saveRecord(record, originalRecordStep, currentStep);
 					}
 				}
 			} else {
@@ -226,13 +220,15 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void saveLastModifiedRecord() {
-		saveRecord(lastModifiedRecord, step);
 		Step originalStep = lastModifiedRecordSummary.getStep();
+		saveRecord(lastModifiedRecord, originalStep, step);
 		if ( step.compareTo(originalStep) < 0 ) {
 			//reset record step to the original one
 			CollectRecord record = recordDao.load(survey, lastModifiedRecordSummary.getId(), originalStep.getStepNumber());
 			record.setStep(originalStep);
-			validateRecord(record);
+			if ( recordValidationEnabled ) {
+				validateRecord(record);
+			}
 			recordDao.update(record);
 		}
 	}
@@ -421,13 +417,15 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void saveRecord(CollectRecord record, Step step) {
-		if ( step == Step.ANALYSIS ) {
+	private void saveRecord(CollectRecord record, Step originalRecordStep, Step dataStep) {
+		if ( dataStep == Step.ANALYSIS ) {
 			record.setStep(Step.CLEANSING);
 			recordDao.update(record);
 			record.setStep(Step.ANALYSIS);
 		}
-		validateRecord(record);
+		if ( recordValidationEnabled && originalRecordStep == dataStep ) {
+			validateRecord(record);
+		}
 		recordDao.update(record);
 	}
 	
@@ -614,6 +612,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	
 	public void setParentEntityDefinitionId(int parentEntityDefinitionId) {
 		this.parentEntityDefinitionId = parentEntityDefinitionId;
+	}
+	
+	public boolean isRecordValidationEnabled() {
+		return recordValidationEnabled;
+	}
+	
+	public void setRecordValidationEnabled(boolean recordValidationEnabled) {
+		this.recordValidationEnabled = recordValidationEnabled;
 	}
 	
 	static class ImportException extends Exception {

@@ -13,6 +13,9 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.controls.Tree;
+			
+			import spark.components.CheckBox;
+			
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
@@ -31,6 +34,12 @@
 			 
 			[SkinPart(required="true", type="spark.compoenents.DropDownList")]
 			public var stepDropDownList:DropDownList;
+			
+			[SkinPart(required="true", type="spark.compoenents.CheckBox")]
+			public var transactionalCheckBox:CheckBox;
+			
+			[SkinPart(required="true", type="spark.compoenents.CheckBox")]
+			public var validateRecordsCheckBox:CheckBox;
 			
 			private var _presenter:CSVDataImportPresenter;
 			

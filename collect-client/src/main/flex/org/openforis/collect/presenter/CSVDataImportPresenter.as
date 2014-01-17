@@ -153,7 +153,9 @@ package org.openforis.collect.presenter
 			var enityId:int = NodeItem(view.entitySelectionTree.selectedItem).id;
 			var selectedStepItem:* = view.stepDropDownList.selectedItem;
 			var selectedStep:CollectRecord$Step = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
-			_importClient.start(responder, enityId, selectedStep);
+			var transactional:Boolean = view.transactionalCheckBox.selected;
+			var validateRecords:Boolean = view.validateRecordsCheckBox.selected;
+			_importClient.start(responder, enityId, selectedStep, transactional, validateRecords);
 		}
 		
 		override protected function performImportCancel():void {
@@ -186,6 +188,8 @@ package org.openforis.collect.presenter
 		protected function initView():void {
 			initEntitiesTree();
 			initStepsDropDown();
+			view.transactionalCheckBox.selected = true;
+			view.validateRecordsCheckBox.selected = true;
 		}
 		
 		protected function initEntitiesTree():void {

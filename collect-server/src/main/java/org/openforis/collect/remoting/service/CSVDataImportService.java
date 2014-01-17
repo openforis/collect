@@ -36,16 +36,19 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 	}
 
 	@Secured("ROLE_ADMIN")
-	public ReferenceDataImportStatusProxy start(int parentEntityId, CollectRecord.Step step) throws DataImportExeption {
+	public ReferenceDataImportStatusProxy start(int parentEntityId, CollectRecord.Step step, 
+			boolean transactional, boolean validateRecords) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = getImportFile();
 			SessionState sessionState = sessionManager.getSessionState();
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			importProcess = applicationContext.getBean(CSVDataImportProcess.class);
+			importProcess = (CSVDataImportProcess) applicationContext.getBean(
+					transactional ? "transactionalCsvDataImportProcess": "csvDataImportProcess");
 			importProcess.setFile(importFile);
 			importProcess.setSurvey(survey);
 			importProcess.setParentEntityDefinitionId(parentEntityId);
 			importProcess.setStep(step);
+			importProcess.setRecordValidationEnabled(validateRecords);
 			importProcess.init();
 			ProcessStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

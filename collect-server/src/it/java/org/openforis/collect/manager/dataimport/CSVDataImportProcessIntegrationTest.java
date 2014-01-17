@@ -96,8 +96,13 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId) throws Exception {
+		return importCSVFile(fileName, parentEntityDefinitionId, true);
+	}
+	
+	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional) throws Exception {
 		File file = getTestFile(fileName);
-		CSVDataImportProcess process = beanFactory.getBean(CSVDataImportProcess.class);
+		CSVDataImportProcess process = (CSVDataImportProcess) beanFactory.getBean(
+				transactional ? "transactionalCsvDataImportProcess": "csvDataImportProcess");
 		process.setFile(file);
 		process.setSurvey(survey);
 		process.setParentEntityDefinitionId(parentEntityDefinitionId);
@@ -264,7 +269,9 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			}
 		}
 	}
+	
 	//@Test
+	//TODO transactional process not working only in test spring context
 	public void missingRecordTest() throws Exception {
 		{
 			CollectRecord record = createTestRecord(survey, "10_111");
@@ -287,7 +294,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			ParsingError error = status.getErrors().get(0);
 			assertEquals(ErrorType.INVALID_VALUE, error.getErrorType());
 			assertEquals(4, error.getRow());
-			assertTrue(Arrays.equals(new String[]{"cluster_id"}, error.getColumns()));
+			assertTrue(Arrays.equals(new String[]{"id"}, error.getColumns()));
 		}
 		
 		//verify that the transaction is rolled back properly
