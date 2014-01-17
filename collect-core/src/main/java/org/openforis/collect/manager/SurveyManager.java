@@ -282,7 +282,11 @@ public class SurveyManager {
 			surveyValidator.checkCompatibility(oldPublishedSurvey, survey);
 		}
 		codeListManager.deleteAllItemsBySurvey(id, false);
-		updateModel(survey);
+		
+		removeFromCache(oldPublishedSurvey);
+		surveyDao.updateModel(survey);
+		addToCache(survey);
+
 		try {
 			codeListManager.importCodeLists(survey, surveyFile);
 		} catch (CodeListImportException e) {

@@ -133,52 +133,39 @@ public class SurveyDao extends SurveyBaseDao {
 	}
 
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {
-		String name = survey.getName();
-		if (StringUtils.isBlank(name)) {
+		//validate name
+		if (StringUtils.isBlank(survey.getName())) {
 			throw new SurveyImportException(
 					"Survey name must be set before importing");
 		}
+		DialectAwareJooqFactory jf = getJooqFactory();
 
+		// Get OFC_SURVEY record id by survey uri
+		Integer oldSurveyId = getSurveyId(jf, survey.getUri());
+		if ( oldSurveyId == null ) {
+			throw new SurveyImportException(String.format("Published survey with uri %s not found", survey.getUri()));
+		}
+		survey.setId(oldSurveyId);
+		
 		String idml = marshalSurvey(survey);
 
-		// Get OFC_SURVEY table id for name
-		DialectAwareJooqFactory jf = getJooqFactory();
-		int surveyId = 0;
+		jf.update(OFC_SURVEY)
+				.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
+				.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
+	}
+
+	private Integer getSurveyId(DialectAwareJooqFactory jf, String uri) {
 		SelectConditionStep query = jf
 				.select(OFC_SURVEY.ID)
 				.from(OFC_SURVEY)
-				.where(OFC_SURVEY.NAME.equal(name));
+				.where(OFC_SURVEY.URI.equal(uri));
 		query.execute();
 		Result<Record> result = query.getResult();
 
-		if ( LOG.isDebugEnabled() ) {
-			LOG.debug("Checking survey");
-		}
-		if (result.isEmpty()) { // we should insert it now			
-			surveyId = jf.nextId(OFC_SURVEY.ID, OFC_SURVEY_ID_SEQ);
-			if ( LOG.isDebugEnabled() ) {
-				LOG.debug("    Survey " +  name + " not exist. Inserting with ID = " + surveyId );
-			}
-			jf.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)
-					.set(OFC_SURVEY.NAME, survey.getName())
-					.set(OFC_SURVEY.URI, survey.getUri())
-					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
-					.execute();
-			survey.setId(surveyId);
-		} else {
-			Record record = result.get(0);			
-			surveyId = record.getValueAsInteger(OFC_SURVEY.ID);			
-			survey.setId(surveyId);
-			if ( LOG.isDebugEnabled() ) {
-				LOG.debug("    Survey " +  name + " exist. Updating with ID = " + surveyId );
-			}
-			jf.update(OFC_SURVEY)
-					.set(OFC_SURVEY.IDML, Factory.val(idml, SQLDataType.CLOB))
-					.set(OFC_SURVEY.NAME, survey.getName())
-					.set(OFC_SURVEY.URI, survey.getUri())
-					.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
-		}
+		Record record = result.get(0);			
+		Integer surveyId = record.getValueAsInteger(OFC_SURVEY.ID);
 
+		return surveyId;
 	}
 	
 	@Override
