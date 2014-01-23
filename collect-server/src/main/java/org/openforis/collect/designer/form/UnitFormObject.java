@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.form;
 
 import org.openforis.idm.metamodel.Unit;
+import org.openforis.idm.metamodel.Unit.Dimension;
 import org.zkoss.util.resource.Labels;
 
 /**
@@ -15,28 +16,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	private String abbreviation;
 	private String dimensionLabel;
 	private Double conversionFactor;
-	
-	public enum Dimension {
-		ANGLE, AREA, CURRENCY, LENGTH, MASS, RATIO, TIME;
 		
-		public String getLabel() {
-			String labelKey = "survey.unit.dimension." + this.name().toLowerCase();
-			String label = Labels.getLabel(labelKey);
-			return label;
-		}
-		
-		public static Dimension fromLabel(String label) {
-			Dimension[] dimensions = values();
-			for (Dimension dimension : dimensions) {
-				String dimLabel = dimension.getLabel();
-				if ( dimLabel.equals(label) ) {
-					return dimension;
-				}
-			}
-			return null;
-		}
-	}
-	
 	@Override
 	public void loadFrom(Unit source, String languageCode) {
 		name = source.getName();
@@ -45,7 +25,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		String dimensionValue = source.getDimension();
 		if ( dimensionValue != null ) {
 			Dimension dimension = Dimension.valueOf(dimensionValue.toUpperCase());
-			dimensionLabel = dimension.getLabel();
+			dimensionLabel = getDimensionLabel(dimension);
 		} else {
 			dimensionLabel = null;
 		}
@@ -57,7 +37,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		dest.setName(name);
 		dest.setLabel(languageCode, label);
 		dest.setAbbreviation(languageCode, abbreviation);
-		Dimension dimension = Dimension.fromLabel(dimensionLabel);
+		Dimension dimension = getDimensionFromLabel(dimensionLabel);
 		dest.setDimension(dimension == null ? null: dimension.name().toLowerCase());
 		dest.setConversionFactor(conversionFactor);
 	}
@@ -65,6 +45,22 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	@Override
 	protected void reset() {
 		// TODO Auto-generated method stub
+	}
+	
+	private String getDimensionLabel(Dimension dimension) {
+		String labelKey = "survey.unit.dimension." + dimension.name().toLowerCase();
+		String label = Labels.getLabel(labelKey);
+		return label;
+	}
+	
+	private Dimension getDimensionFromLabel(String label) {
+		for (Dimension dimension : Dimension.values()) {
+			String dimLabel = getDimensionLabel(dimension);
+			if ( dimLabel.equals(label) ) {
+				return dimension;
+			}
+		}
+		return null;
 	}
 	
 	public String getName() {
