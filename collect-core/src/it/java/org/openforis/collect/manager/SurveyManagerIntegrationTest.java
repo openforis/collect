@@ -85,7 +85,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 		
 		CollectSurvey survey = surveyManager.getByUri(surveyWork.getUri());
 		assertFalse(survey.isWork());
-		assertEquals("New Project Name", survey.getProjectName(null));
+		assertEquals("New Project Name", survey.getProjectName("en"));
 	}
 	
 	@Test
