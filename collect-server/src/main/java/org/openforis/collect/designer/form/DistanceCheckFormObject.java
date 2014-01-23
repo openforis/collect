@@ -26,8 +26,8 @@ public class DistanceCheckFormObject extends CheckFormObject<DistanceCheck> {
 	}
 	
 	@Override
-	public void loadFrom(DistanceCheck source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(DistanceCheck source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		destinationPointExpression = source.getDestinationPointExpression();
 		maxDistanceExpression = source.getMaxDistanceExpression();
 		minDistanceExpression = source.getMinDistanceExpression();

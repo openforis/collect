@@ -119,9 +119,6 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 
 	protected String getInstanceLabel(NodeDefinition nodeDefn) {
 		String label = nodeDefn.getLabel(Type.INSTANCE, currentLanguageCode);
-		if ( label == null && isDefaultLanguage() ) {
-			label = nodeDefn.getLabel(Type.INSTANCE, null);
-		}
 		return label;
 	}
 	
@@ -211,10 +208,6 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			UITab tab = getTab(tabName);
 			if ( tab != null ) {
 				String result = tab.getLabel(currentLanguageCode);
-				if ( result == null && isDefaultLanguage() ) {
-					//try to get label associated to default language code
-					result = tab.getLabel(null);
-				}
 				return result;
 			} else {
 				return null;

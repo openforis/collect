@@ -625,10 +625,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	public String getCodeListItemLabel(CodeListItem item) {
 		String label = item.getLabel(currentLanguageCode);
-		if ( label == null && isDefaultLanguage() ) {
-			//try to get the label associated to default language
-			label = item.getLabel(null);
-		}
 		return label;
 	}
 

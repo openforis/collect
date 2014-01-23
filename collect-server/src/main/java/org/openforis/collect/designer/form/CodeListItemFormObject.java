@@ -1,6 +1,5 @@
 package org.openforis.collect.designer.form;
 
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeListItem;
 
 /**
@@ -16,11 +15,11 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 	private boolean qualifiable;
 	
 	@Override
-	public void loadFrom(CodeListItem source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(CodeListItem source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		code = source.getCode();
-		label = getLabel(source, languageCode, defaultLanguage);
-		description = getDescription(source, languageCode, defaultLanguage);
+		label = source.getLabel(languageCode);
+		description = source.getDescription(languageCode);
 		qualifiable = source.isQualifiable();
 	}
 	
@@ -28,49 +27,11 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 	public void saveTo(CodeListItem dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setCode(code);
-		saveLabel(dest, languageCode);
-		saveDescription(dest, languageCode);
+		dest.setLabel(languageCode, label);
+		dest.setDescription(languageCode, description);
 		dest.setQualifiable(qualifiable);
 	}
 
-	protected String getLabel(CodeListItem source, String languageCode, String defaultLanguage) {
-		String result = source.getLabel(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getLabel(null);
-		}
-		return result;
-	}
-	
-	protected String getDescription(CodeListItem source, String languageCode, String defaultLanguage) {
-		String result = source.getDescription(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getDescription(null);
-		}
-		return result;
-	}
-
-	protected void saveLabel(CodeListItem dest, String languageCode) {
-		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
-		String defaultLanguage = survey.getDefaultLanguage();
-		if ( defaultLanguage.equals(languageCode) ) {
-			//remove default label
-			dest.removeLabel(null);
-		}
-		dest.setLabel(languageCode, label);
-	}
-	
-	protected void saveDescription(CodeListItem dest, String languageCode) {
-		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
-		String defaultLanguage = survey.getDefaultLanguage();
-		if ( defaultLanguage.equals(languageCode) ) {
-			//remove default label
-			dest.removeDescription(null);
-		}
-		dest.setDescription(languageCode, description);
-	}
-	
 	public String getCode() {
 		return code;
 	}

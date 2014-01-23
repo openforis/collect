@@ -103,9 +103,6 @@ public class CodeListExportProcess {
 		List<String> langs = survey.getLanguages();
 		for (String lang : langs) {
 			String label = item.getLabel(lang);
-			if ( label == null && lang.equals(survey.getDefaultLanguage()) ) {
-				label = item.getLabel(null);
-			}
 			lineValues.add(label);
 		}
 	}

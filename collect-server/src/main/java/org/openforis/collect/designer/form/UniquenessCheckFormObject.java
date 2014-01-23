@@ -20,8 +20,8 @@ public class UniquenessCheckFormObject extends CheckFormObject<UniquenessCheck> 
 	}
 	
 	@Override
-	public void loadFrom(UniquenessCheck source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(UniquenessCheck source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		expression = source.getExpression();
 	}
 

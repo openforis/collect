@@ -3,6 +3,7 @@ package org.openforis.collect.metamodel.ui;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
 
@@ -34,7 +35,15 @@ public class UITab extends UITabSet {
 	}
 	
 	public String getLabel(String language) {
-		return labels == null ? null: labels.getText(language);
+		if ( labels == null ) {
+			return null;
+		} else if ( language == null ) {
+			CollectSurvey survey = uiOptions.getSurvey();
+			String defaultLanguage = survey.getDefaultLanguage();
+			return labels.getText(defaultLanguage);
+		} else {
+			return labels.getText(language);
+		}
 	}
 	
 	public void addLabel(LanguageSpecificText label) {

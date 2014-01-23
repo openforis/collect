@@ -15,10 +15,10 @@ public class SpatialReferenceSystemFormObject extends FormObject<SpatialReferenc
 	private String wellKnownText;
 	
 	@Override
-	public void loadFrom(SpatialReferenceSystem source, String languageCode, String defaultLanguage) {
+	public void loadFrom(SpatialReferenceSystem source, String languageCode) {
 		id = source.getId();
-		label = getLabel(source, languageCode, defaultLanguage);
-		description = getDescription(source, languageCode, defaultLanguage);
+		label = source.getLabel(languageCode);
+		description = source.getDescription(languageCode);
 		wellKnownText = source.getWellKnownText();
 	}
 	
@@ -34,25 +34,6 @@ public class SpatialReferenceSystemFormObject extends FormObject<SpatialReferenc
 	protected void reset() {
 		// TODO Auto-generated method stub
 	}
-
-	protected String getLabel(SpatialReferenceSystem source, String languageCode, String defaultLanguage) {
-		String result = source.getLabel(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getLabel(null);
-		}
-		return result;
-	}
-
-	protected String getDescription(SpatialReferenceSystem source, String languageCode, String defaultLanguage) {
-		String result = source.getDescription(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getDescription(null);
-		}
-		return result;
-	}
-	
 
 	public String getId() {
 		return id;

@@ -312,9 +312,6 @@ public class ValidationMessageBuilder {
 			if ( ! defaultLanguage.equals(language) ) {
 				result = definition.getLabel(type, defaultLanguage);
 			}
-			if ( result == null ) {
-				result = definition.getLabel(type, null);
-			}
 		}
 		return result;
 	}

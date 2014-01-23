@@ -17,12 +17,12 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private String projectCycle;
 	
 	@Override
-	public void loadFrom(CollectSurvey source, String languageCode, String defaultLanguage) {
+	public void loadFrom(CollectSurvey source, String languageCode) {
 		name = source.getName();
-		description = getDescription(source, languageCode, defaultLanguage);
+		description = source.getDescription(languageCode);
 		uri = source.getUri();
 		published = source.isPublished();
-		projectName = getProjectName(source, languageCode, defaultLanguage);
+		projectName = source.getProjectName(languageCode);
 		projectCycle = source.getCycle();
 	}
 	
@@ -41,24 +41,6 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		// TODO Auto-generated method stub
 	}
 
-	protected String getDescription(CollectSurvey source, String languageCode, String defaultLanguage) {
-		String result = source.getDescription(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getDescription(null);
-		}
-		return result;
-	}
-
-	protected String getProjectName(CollectSurvey source, String languageCode, String defaultLanguage) {
-		String result = source.getProjectName(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getProjectName(null);
-		}
-		return result;
-	}
-	
 	public String getName() {
 		return name;
 	}

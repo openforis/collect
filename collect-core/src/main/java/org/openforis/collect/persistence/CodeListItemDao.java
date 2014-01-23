@@ -669,7 +669,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				String label;
 				if ( i < languages.size() ) {
 					String lang = languages.get(i);
-					label = getLabel(item, lang);
+					label = item.getLabel(lang);
 				} else {
 					label = null;
 				}
@@ -678,17 +678,6 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			return result;
 		}
 
-		protected String getLabel(PersistedCodeListItem item, String lang) {
-			String label = item.getLabel(lang);
-			if ( label == null ) {
-				CollectSurvey survey = (CollectSurvey) item.getSurvey();
-				if ( survey.isDefaultLanguage(lang) ) {
-					label = item.getLabel(null);
-				}
-			}
-			return label;
-		}
-		
 		protected void addDescriptionValues(StoreQuery<?> q, PersistedCodeListItem item) {
 			String[] values = getDescriptionValues(item);
 			for (int i = 0; i < DESCRIPTION_FIELDS.length; i++) {
@@ -708,24 +697,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				String description;
 				if ( i < languages.size() ) {
 					String lang = languages.get(i);
-					description = getDescription(item, lang);
+					description = item.getDescription(lang);
 				} else {
 					description = null;
 				}
 				result[i] = description;
 			}
 			return result;
-		}
-		
-		protected String getDescription(PersistedCodeListItem item, String lang) {
-			String description = item.getDescription(lang);
-			if ( description == null ) {
-				CollectSurvey survey = (CollectSurvey) item.getSurvey();
-				if ( survey.isDefaultLanguage(lang) ) {
-					description = item.getDescription(null);
-				}
-			}
-			return description;
 		}
 		
 		@Override

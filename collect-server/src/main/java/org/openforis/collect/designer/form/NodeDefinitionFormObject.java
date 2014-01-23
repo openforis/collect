@@ -105,8 +105,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	}
 	
 	@Override
-	public void loadFrom(T source, String language, String defaultLanguage) {
-		super.loadFrom(source, language, defaultLanguage);
+	public void loadFrom(T source, String language) {
+		super.loadFrom(source, language);
 		//generic
 		name = source.getName();
 		multiple = source.isMultiple();
@@ -120,47 +120,20 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			maxCount = null;
 		}
 		//labels
-		headingLabel = getLabel(source, Type.HEADING, language, defaultLanguage);
-		instanceLabel = getLabel(source, Type.INSTANCE, language, defaultLanguage);
-		numberLabel = getLabel(source, Type.NUMBER, language, defaultLanguage);
-		interviewPromptLabel = getPrompt(source, Prompt.Type.INTERVIEW, language, defaultLanguage);
-		paperPromptLabel = getPrompt(source, Prompt.Type.PAPER, language, defaultLanguage);
-		handheldPromptLabel = getPrompt(source, Prompt.Type.HANDHELD, language, defaultLanguage);
-		pcPromptLabel = getPrompt(source, Prompt.Type.PC, language, defaultLanguage);
-		description = getDescription(source, language, defaultLanguage);
+		headingLabel = source.getLabel(Type.HEADING, language);
+		instanceLabel = source.getLabel(Type.INSTANCE, language);
+		numberLabel = source.getLabel(Type.NUMBER, language);
+		interviewPromptLabel = source.getPrompt(Prompt.Type.INTERVIEW, language);
+		paperPromptLabel = source.getPrompt(Prompt.Type.PAPER, language);
+		handheldPromptLabel = source.getPrompt(Prompt.Type.HANDHELD, language);
+		pcPromptLabel = source.getPrompt(Prompt.Type.PC, language);
+		description = source.getDescription(language);
 		//layout
 		UIOptions uiOptions = getUIOptions(source);
 		UITab tab = uiOptions.getAssignedTab(parentDefinition, source, false);
 		tabName = tab != null ? tab.getName(): INHERIT_TAB_NAME;
 	}
 
-	protected String getLabel(T source, Type type, String languageCode, String defaultLanguage) {
-		String result = source.getLabel(type, languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getLabel(type, null);
-		}
-		return result;
-	}
-
-	protected String getPrompt(T source, Prompt.Type type, String languageCode, String defaultLanguage) {
-		String result = source.getPrompt(type, languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getPrompt(type, null);
-		}
-		return result;
-	}
-	
-	protected String getDescription(T source, String languageCode, String defaultLanguage) {
-		String result = source.getDescription(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getDescription(null);
-		}
-		return result;
-	}
-	
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);

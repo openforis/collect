@@ -78,9 +78,9 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void publishSurveyTest() throws SurveyImportException {
 		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
-		assertEquals("Archenland NFI", surveyWork.getProjectName(null));
+		assertEquals("Archenland NFI", surveyWork.getProjectName());
 		
-		surveyWork.setProjectName(null, "New Project Name");
+		surveyWork.setProjectName("en", "New Project Name");
 		surveyManager.publish(surveyWork);
 		
 		CollectSurvey survey = surveyManager.getByUri(surveyWork.getUri());

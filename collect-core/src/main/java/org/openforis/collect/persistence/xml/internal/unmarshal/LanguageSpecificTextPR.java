@@ -2,13 +2,14 @@ package org.openforis.collect.persistence.xml.internal.unmarshal;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.TYPE;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE_URI;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.XML_LANG_ATTRIBUTE;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.XML_NAMESPACE_URI;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.LanguageSpecificText;
-import org.openforis.idm.metamodel.xml.IdmlConstants;
 import org.openforis.idm.metamodel.xml.XmlParseException;
-import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -18,7 +19,7 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author S. Ricci
  *
  */
-class LanguageSpecificTextPR extends XmlPullReader {
+class LanguageSpecificTextPR extends UIElementPullReader {
 	private boolean requireType;
 	
 	public LanguageSpecificTextPR(String tagName, boolean requireType) {
@@ -33,7 +34,10 @@ class LanguageSpecificTextPR extends XmlPullReader {
 	@Override
 	protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 		XmlPullParser parser = getParser();
-		String lang = parser.getAttributeValue(IdmlConstants.XML_NAMESPACE_URI, IdmlConstants.XML_LANG_ATTRIBUTE);
+		String lang = parser.getAttributeValue(XML_NAMESPACE_URI, XML_LANG_ATTRIBUTE);
+		if ( StringUtils.isBlank(lang) ) {
+			lang = getSurvey().getDefaultLanguage();
+		}
 		String type = getAttribute(TYPE, requireType);
 		String text = parser.nextText();
 		processText(lang, type, text);

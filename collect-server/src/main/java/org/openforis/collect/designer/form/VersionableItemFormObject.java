@@ -17,7 +17,7 @@ public class VersionableItemFormObject<T extends VersionableSurveyObject> extend
 	private int deprecatedVersionId;
 	
 	@Override
-	public void loadFrom(T source, String languageCode, String defaultLanguage) {
+	public void loadFrom(T source, String languageCode) {
 		ModelVersion sinceVersion = source.getSinceVersion();
 		sinceVersionId = sinceVersion != null ? sinceVersion.getId(): -1;
 		ModelVersion deprecatedVersion = source.getDeprecatedVersion();

@@ -38,8 +38,8 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	}
 	
 	@Override
-	public void loadFrom(T source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(T source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		maxSize = source.getMaxSize();
 		List<String> extensionsList = source.getExtensions();
 		extensions = StringUtils.join(extensionsList, EXTENSIONS_SEPARATOR);

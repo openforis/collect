@@ -38,10 +38,10 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 	}
 	
 	@Override
-	public void loadFrom(Unit source, String languageCode, String defaultLanguage) {
+	public void loadFrom(Unit source, String languageCode) {
 		name = source.getName();
-		label = getLabel(source, languageCode, defaultLanguage);
-		abbreviation = getAbbreviation(source, languageCode, defaultLanguage);
+		label = source.getLabel(languageCode);
+		abbreviation = source.getAbbreviation(languageCode);
 		String dimensionValue = source.getDimension();
 		if ( dimensionValue != null ) {
 			Dimension dimension = Dimension.valueOf(dimensionValue.toUpperCase());
@@ -58,7 +58,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		dest.setLabel(languageCode, label);
 		dest.setAbbreviation(languageCode, abbreviation);
 		Dimension dimension = Dimension.fromLabel(dimensionLabel);
-		dest.setDimension(dimension != null ? dimension.name().toLowerCase(): null);
+		dest.setDimension(dimension == null ? null: dimension.name().toLowerCase());
 		dest.setConversionFactor(conversionFactor);
 	}
 	
@@ -67,24 +67,6 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		// TODO Auto-generated method stub
 	}
 	
-	protected String getLabel(Unit source, String languageCode, String defaultLanguage) {
-		String result = source.getLabel(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getLabel(null);
-		}
-		return result;
-	}
-
-	protected String getAbbreviation(Unit source, String languageCode, String defaultLanguage) {
-		String result = source.getAbbreviation(languageCode);
-		if ( result == null && languageCode != null && languageCode.equals(defaultLanguage) ) {
-			//try to get the label associated to default language
-			result = source.getAbbreviation(null);
-		}
-		return result;
-	}
-
 	public String getName() {
 		return name;
 	}

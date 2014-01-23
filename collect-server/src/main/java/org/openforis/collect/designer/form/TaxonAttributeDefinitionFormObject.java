@@ -25,8 +25,8 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	}
 
 	@Override
-	public void loadFrom(TaxonAttributeDefinition source, String languageCode, String defaultLanguage) {
-		super.loadFrom(source, languageCode, defaultLanguage);
+	public void loadFrom(TaxonAttributeDefinition source, String languageCode) {
+		super.loadFrom(source, languageCode);
 		taxonomy = source.getTaxonomy();
 		highestRank = source.getHighestTaxonRank() == null ? null: source.getHighestTaxonRank().getName();
 		qualifiers = new ArrayList<String>(source.getQualifiers());

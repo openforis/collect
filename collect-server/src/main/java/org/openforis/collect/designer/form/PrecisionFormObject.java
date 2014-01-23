@@ -17,18 +17,18 @@ public class PrecisionFormObject extends FormObject<Precision> {
 	private Integer decimalDigits;
 	private boolean defaultPrecision;
 
-	public static List<PrecisionFormObject> fromList(List<Precision> precisionDefinitions, String languageCode, String defaultLanguage) {
+	public static List<PrecisionFormObject> fromList(List<Precision> precisionDefinitions, String languageCode) {
 		ArrayList<PrecisionFormObject> result = new ArrayList<PrecisionFormObject>();
 		for (Precision precision : precisionDefinitions) {
 			PrecisionFormObject formObject = new PrecisionFormObject();
-			formObject.loadFrom(precision, languageCode, defaultLanguage);
+			formObject.loadFrom(precision, languageCode);
 			result.add(formObject);
 		}
 		return result;
 	}
 
 	@Override
-	public void loadFrom(Precision source, String languageCode, String defaultLanguage) {
+	public void loadFrom(Precision source, String languageCode) {
 		unit = source.getUnit();
 		decimalDigits = source.getDecimalDigits();
 		defaultPrecision = source.isDefaultPrecision();
