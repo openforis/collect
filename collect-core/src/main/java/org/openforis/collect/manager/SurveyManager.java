@@ -562,6 +562,7 @@ public class SurveyManager {
 		UIOptions uiOptions = survey.createUIOptions();
 		survey.addApplicationOptions(uiOptions);
 		SurveyObjectsGenerator surveyObjectsGenereator = new SurveyObjectsGenerator();
+		surveyObjectsGenereator.addPredefinedObjects(survey);
 		return survey;
 	}
 	

@@ -2,8 +2,11 @@ package org.openforis.collect.manager;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ServiceLoader;
 
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.LanguageSpecificText;
+import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.Unit.Dimension;
@@ -17,7 +20,7 @@ public class SurveyObjectsGenerator {
 	
 	public void addPredefinedObjects(Survey survey) {
 		addPredefinedUnits(survey);
-		addPredefinedSRS(survey);
+		addPredefinedSRSs(survey);
 	}
 
 	protected void addPredefinedUnits(Survey survey) {
@@ -59,8 +62,21 @@ public class SurveyObjectsGenerator {
 				Arrays.asList(new LanguageSpecificText("en", "%")));
 	}
 	
-	protected void addPredefinedSRS(Survey survey) {
-		//TODO
+	protected void addPredefinedSRSs(Survey survey) {
+		CoordinateOperations coordinateOperations = getCoordinateOperationsService();
+		if ( coordinateOperations != null ) {
+			SpatialReferenceSystem srs = coordinateOperations.fetchSRS("EPSG:4326");
+			survey.addSpatialReferenceSystem(srs);
+		}
+		return;
+	}
+	
+	private CoordinateOperations getCoordinateOperationsService() {
+		ServiceLoader<CoordinateOperations> serviceLoader = ServiceLoader.load(CoordinateOperations.class);
+		for (CoordinateOperations coordinateOperations : serviceLoader) {
+			return coordinateOperations;
+		}
+		return null;
 	}
 	
 	private void addUnit(Survey survey, String name, Dimension dimension,

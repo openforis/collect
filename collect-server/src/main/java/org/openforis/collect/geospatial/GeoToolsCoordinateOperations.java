@@ -9,6 +9,7 @@ import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +21,7 @@ import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -89,6 +91,29 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		}
 	}
 
+	@Override
+	public SpatialReferenceSystem fetchSRS(String code) {
+		try {
+			CRSAuthorityFactory factory = CRS.getAuthorityFactory(true);
+			CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem(code);
+			SpatialReferenceSystem result = new SpatialReferenceSystem();
+			result.setId(code);
+			result.setLabel("en", code);
+			result.setWellKnownText(crs.toWKT());
+			result.setLabel("en", code);
+			result.setDescription("en", crs.getScope().toString());
+			return result;
+		} catch (Exception e) {
+			throw new RuntimeException("Error fetching SRS with code: " + code, e);
+		}
+	}
+	
+	@Override
+	public Set<String> listAvailableSRSs() {
+		Set<String> result = CRS.getSupportedCodes("EPSG");
+		return result;
+	}
+	
 	@Override
 	public void parseSRS(SpatialReferenceSystem srs) {
 		String srsId = srs.getId();
