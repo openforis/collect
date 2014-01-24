@@ -9,7 +9,6 @@ import java.util.Stack;
 
 import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.form.UnitFormObject;
-import org.openforis.collect.designer.form.UnitFormObject.Dimension;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -17,6 +16,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Unit;
+import org.openforis.idm.metamodel.Unit.Dimension;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -38,6 +38,12 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 	
 	private Window confirmDeleteItemWithErrorsPopUp;
 
+	public static String getDimensionLabel(Dimension dimension) {
+		String labelKey = "survey.unit.dimension." + dimension.name().toLowerCase();
+		String label = Labels.getLabel(labelKey);
+		return label;
+	}
+	
 	@Override
 	@Init(superclass=false)
 	public void init() {
@@ -150,7 +156,7 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 		Dimension[] dimensions = Dimension.values();
 		List<String> result = new ArrayList<String>(dimensions.length);
 		for (Dimension dimension : dimensions) {
-			String label = dimension.getLabel();
+			String label = getDimensionLabel(dimension);
 			result.add(label);
 		}
 		return result;

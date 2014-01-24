@@ -1,8 +1,8 @@
 package org.openforis.collect.designer.form;
 
+import org.openforis.collect.designer.viewmodel.UnitsVM;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.Unit.Dimension;
-import org.zkoss.util.resource.Labels;
 
 /**
  * 
@@ -25,7 +25,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		String dimensionValue = source.getDimension();
 		if ( dimensionValue != null ) {
 			Dimension dimension = Dimension.valueOf(dimensionValue.toUpperCase());
-			dimensionLabel = getDimensionLabel(dimension);
+			dimensionLabel = UnitsVM.getDimensionLabel(dimension);
 		} else {
 			dimensionLabel = null;
 		}
@@ -47,15 +47,9 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		// TODO Auto-generated method stub
 	}
 	
-	private String getDimensionLabel(Dimension dimension) {
-		String labelKey = "survey.unit.dimension." + dimension.name().toLowerCase();
-		String label = Labels.getLabel(labelKey);
-		return label;
-	}
-	
 	private Dimension getDimensionFromLabel(String label) {
 		for (Dimension dimension : Dimension.values()) {
-			String dimLabel = getDimensionLabel(dimension);
+			String dimLabel = UnitsVM.getDimensionLabel(dimension);
 			if ( dimLabel.equals(label) ) {
 				return dimension;
 			}
