@@ -9,7 +9,8 @@
 		height="300px"
 		border="normal"
 		position="center" 
-		closable="false">
+		closable="true"
+		onClose="@command('close')">
 		<borderlayout>
 			<west width="180px">
 				<borderlayout>
@@ -102,12 +103,6 @@
 					</grid>
 				</vlayout>
 			</center>
-			<south>
-				<box align="center" width="100%">
-					<button label="${labels.global.ok}" 
-						onClick="@global-command('closeVersioningManagerPopUp')" />
-				</box>
-			</south>
 		</borderlayout>
 	</window>
 </zk>

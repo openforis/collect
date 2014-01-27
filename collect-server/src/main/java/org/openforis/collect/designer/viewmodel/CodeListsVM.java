@@ -52,6 +52,7 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.DropEvent;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
@@ -630,6 +631,20 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	public boolean isEditingAttribute() {
 		return editingAttribute;
+	}
+	
+	@Command
+	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
+		event.stopPropagation();
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+			@Override
+			public void onOk(boolean confirmed) {
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put("editingAttribute", editingAttribute);
+				params.put("selectedCodeList", selectedItem);
+				BindUtils.postGlobalCommand((String) null, (String) null, "closeCodeListsManagerPopUp", params);
+			}
+		});
 	}
 	
 }

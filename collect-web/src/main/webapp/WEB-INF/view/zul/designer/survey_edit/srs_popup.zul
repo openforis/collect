@@ -9,7 +9,9 @@
 		position="center" 
 		validationMessages="@id('vmsgs')"
 		apply="org.zkoss.bind.BindComposer"
-		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SpatialReferenceSystemsVM')">
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SpatialReferenceSystemsVM')"
+		closable="true"
+		onClose="@command('close')">
 		<borderlayout>
 			<west width="180px">
 				<borderlayout>
@@ -99,12 +101,6 @@
 					</grid>
 				</div>
 			</center>
-			<south>
-				<box align="center" width="100%">
-					<button label="${labels.global.ok}" 
-						onClick="@global-command('closeSRSManagerPopUp')" />
-				</box>
-			</south>
 		</borderlayout>
     </window>
 </zk>

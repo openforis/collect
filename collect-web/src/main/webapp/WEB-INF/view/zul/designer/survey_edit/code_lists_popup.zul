@@ -7,11 +7,12 @@
 		height="620px"
 		border="normal"
 		position="center" 
-		closable="false">
-		<borderlayout id="codeListsManagerContainer"
-				apply="org.zkoss.bind.BindComposer"
-				viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListsVM')"
-				validationMessages="@id('vmsgs')">
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListsVM')"
+		validationMessages="@id('vmsgs')"
+		closable="true"
+		onClose="@command('close')">
+		<borderlayout id="codeListsManagerContainer">
 			<west width="220px">
 				<borderlayout>
 					<center border="none">
@@ -290,14 +291,6 @@
 		        	</south>
 		        </borderlayout>
 			</center>
-			<south border="none">
-				<box align="center" width="100%">
-					<button label="${labels.global.ok}" 
-						onClick="@global-command('closeCodeListsManagerPopUp', 
-							editingAttribute=vm.editingAttribute, 
-							selectedCodeList=vm.selectedItem)" />
-				</box>
-			</south>
 		</borderlayout>
 	</window>
 </zk>

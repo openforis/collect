@@ -110,14 +110,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void closeSRSManagerPopUp() {
-		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				closePopUp(srsPopUp);
-				srsPopUp = null;
-				dispatchCurrentFormValidatedCommand(true);
-			}
-		});
+		closePopUp(srsPopUp);
+		srsPopUp = null;
+		dispatchCurrentFormValidatedCommand(true);
 	}
 	
 	@GlobalCommand
@@ -138,15 +133,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
 			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
 		if ( codeListsPopUp != null ) {
-			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-				@Override
-				public void onOk(boolean confirmed) {
-					closePopUp(codeListsPopUp);
-					codeListsPopUp = null;
-					dispatchCurrentFormValidatedCommand(true);
-					dispatchCodeListsPopUpClosedCommand(editingAttribute, selectedCodeList);
-				}
-			});
+			closePopUp(codeListsPopUp);
+			codeListsPopUp = null;
+			dispatchCurrentFormValidatedCommand(true);
+			dispatchCodeListsPopUpClosedCommand(editingAttribute, selectedCodeList);
 		}
 	}
 
@@ -168,14 +158,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void closeUnitsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( unitsPopUp != null ) {
-			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-				@Override
-				public void onOk(boolean confirmed) {
-					closePopUp(unitsPopUp);
-					unitsPopUp = null;
-					dispatchCurrentFormValidatedCommand(true);
-				}
-			});
+			closePopUp(unitsPopUp);
+			unitsPopUp = null;
+			dispatchCurrentFormValidatedCommand(true);
 		}
 	}	
 	
@@ -190,14 +175,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void closeVersioningManagerPopUp() {
 		if ( versioningPopUp != null ) {
-			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-				@Override
-				public void onOk(boolean confirmed) {
-					closePopUp(versioningPopUp);
-					versioningPopUp = null;
-					dispatchCurrentFormValidatedCommand(true);
-				}
-			});
+			closePopUp(versioningPopUp);
+			versioningPopUp = null;
+			dispatchCurrentFormValidatedCommand(true);
 		}
 	}
 	

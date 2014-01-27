@@ -6,10 +6,11 @@
 		height="370px"
 		border="normal"
 		position="center" 
-		closable="false"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.UnitsVM')"
-		validationMessages="@id('vmsgs')">
+		validationMessages="@id('vmsgs')"
+		closable="true"
+		onClose="@command('close')">
 		<borderlayout>
 			<west width="220px">
 				<borderlayout>
@@ -101,12 +102,6 @@
 					</grid>
 				</vlayout>
 			</center>
-			<south>
-				<box align="center" width="100%">
-					<button label="${labels.global.ok}" 
-						onClick="@global-command('closeUnitsManagerPopUp')" />
-				</box>
-			</south>
 	    </borderlayout>
 	</window>
 </zk>

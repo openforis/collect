@@ -21,9 +21,12 @@ import org.openforis.idm.metamodel.VersionableSurveyObject;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.Window;
 
@@ -176,4 +179,14 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 		BindUtils.postGlobalCommand(null, null, VERSIONS_UPDATED_GLOBAL_COMMAND, null);
 	}
 
+	@Command
+	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
+		event.stopPropagation();
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+			@Override
+			public void onOk(boolean confirmed) {
+				BindUtils.postGlobalCommand(null, null, "closeVersioningManagerPopUp", null);
+			}
+		});
+	}
 }
