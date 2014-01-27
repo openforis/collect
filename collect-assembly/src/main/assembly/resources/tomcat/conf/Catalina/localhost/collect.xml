@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context path="/collect" reloadable="false">
 	
-	<!-- SQLite database stored in CATALINA_HOME/data/collect.db file -->
+   	<!-- Parameters -->
+	<Parameter name="collect.simple_editor" value="false" /> <!-- Simplifies Survey Editor UI -->
+	
+   	<!-- SQLite database stored in CATALINA_HOME/data/collect.db file -->
 	<Resource 
 	   name="jdbc/collectDs" 
 	   auth="Container"

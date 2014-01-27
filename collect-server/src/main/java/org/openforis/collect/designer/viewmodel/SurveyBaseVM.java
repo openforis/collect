@@ -50,6 +50,9 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	public static final String DATE_FORMAT = Labels.getLabel("global.date_format");
 	
+	//application context init parameters
+	private boolean simpleEditor;
+	
 	@WireVariable
 	protected CollectSurvey survey;
 	
@@ -68,6 +71,9 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	@Init
 	public void init() {
+		//read context init parameters
+		simpleEditor = Boolean.valueOf(getInitParameter("collect.simple_editor"));
+				
 		initSurvey();
 		initCurrentLanguageCode();
 	}
@@ -385,4 +391,8 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 	}
 
+	public boolean isSimpleEditor() {
+		return simpleEditor;
+	}
+	
 }

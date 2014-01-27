@@ -33,14 +33,17 @@
                  w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
                <tab id="speciesImportTab"
                  label="${labels.survey.species_import.$}"
-                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"
+                 visible="@load(not vm.simpleEditor)" />
                <tab id="samplingDesignImportTab"
                  label="${labels.survey.sampling_design_import.$}"
-                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"
+                 visible="@load(not vm.simpleEditor)" />
                <tab id="schemaTab" label="${labels.survey.schema.$}"
                  w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
                <tab id="layoutTab" label="${labels.survey.layout.$}"
-                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"
+                 visible="@load(not vm.simpleEditor)" />
              </tabs>
              <tabpanels>
                <tabpanel>

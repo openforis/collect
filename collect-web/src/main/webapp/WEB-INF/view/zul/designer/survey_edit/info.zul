@@ -65,7 +65,7 @@
         <column />
       </columns>
       <rows>
-        <row>
+        <row visible="@load(not vm.simpleEditor)">
           <label value="${labels.survey.srs.$}:" />
           <cell>
             <button sclass="icon"
