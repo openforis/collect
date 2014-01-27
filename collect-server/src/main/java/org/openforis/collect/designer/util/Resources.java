@@ -50,7 +50,8 @@ public class Resources {
 		PRECISION_POPUP("survey_edit/schema/precision_popup.zul"),
 		SURVEY_VALIDATION_RESULTS_POPUP("survey_validation_results_popup.zul"),
 		CONFIRM_SURVEY_ERRORS_POPUP("component/confirm_survey_errors_popup.zul"),
-		PROCESS_STATUS_POPUP("component/process_status_popup.zul");
+		PROCESS_STATUS_POPUP("component/process_status_popup.zul"),
+		SELECT_TEMPLATE_POPUP("component/select_template_popup.zul");
 		
 		private String location;
 		

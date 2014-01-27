@@ -4,7 +4,9 @@
 package org.openforis.collect.model;
 
 import java.io.Serializable;
+import java.util.UUID;
 
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.Survey;
@@ -19,6 +21,8 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  */
 public class CollectSurveyContext implements SurveyContext, Serializable {
 
+	private static final String DEFAULT_URI_PREFIX = "http://www.openforis.org/idm/";
+
 	private static final long serialVersionUID = 1L;
 	
 	private transient ExpressionFactory expressionFactory;
@@ -26,14 +30,21 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	private transient ExternalCodeListProvider externalCodeListProvider;
 	private transient CodeListService codeListService;
 
+	private String uriPrefix;
+
 	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
 		this.expressionFactory = expressionFactory;
 		this.validator = validator;
+		this.uriPrefix = DEFAULT_URI_PREFIX;
 	}
 	
 	@Override
 	public Survey createSurvey() {
 		CollectSurvey survey = new CollectSurvey(this);
+		UIOptions uiOptions = survey.createUIOptions();
+		survey.addApplicationOptions(uiOptions);
+		UUID uuid = UUID.randomUUID();
+		survey.setUri(uriPrefix + uuid.toString());
 		return survey;
 	}
 
@@ -72,6 +83,14 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	public void setCodeListService(
 			CodeListService codeListService) {
 		this.codeListService = codeListService;
+	}
+
+	public String getUriPrefix() {
+		return uriPrefix;
+	}
+	
+	public void setUriPrefix(String uriPrefix) {
+		this.uriPrefix = uriPrefix;
 	}
 	
 }

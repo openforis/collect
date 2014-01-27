@@ -25,7 +25,6 @@ import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.manager.validation.RecordValidationProcess;
 import org.openforis.collect.manager.validation.SurveyValidator;
-import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
@@ -559,9 +558,11 @@ public class SurveyManager {
 	public CollectSurvey createSurveyWork() {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
 		survey.setWork(true);
-		UIOptions uiOptions = survey.createUIOptions();
-		survey.addApplicationOptions(uiOptions);
 		return survey;
+	}
+	
+	public String generateRandomSurveyUri() {
+		return collectSurveyContext.getUriPrefix() + UUID.randomUUID();
 	}
 	
 	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri) {

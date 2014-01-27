@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
@@ -30,21 +31,21 @@ public class SurveyLocaleVM extends BaseVM {
 	public static final String CURRENT_LANGUAGE_CHANGED_COMMAND = "currentLanguageChanged";
 	public static final String SURVEY_LANGUAGES_CHANGED_COMMAND = "surveyLanguagesChanged";
 
-	private List<LanguageItem> languages;
-	private BindingListModelListModel<LanguageItem> languagesModel;
+	private List<LabelledItem> languages;
+	private BindingListModelListModel<LabelledItem> languagesModel;
 	
 	@Init
 	public void init() {
-		languages = new ArrayList<LanguageItem>();
+		languages = new ArrayList<LabelledItem>();
 		List<String> codes = Languages.getCodes(Standard.ISO_639_1);
 		for (String code : codes) {
-			LanguageItem item = new LanguageItem(code, Labels.getLabel(code));
+			LabelledItem item = new LabelledItem(code, Labels.getLabel(code));
 			languages.add(item);
 		}
-		Collections.sort(languages, new LanguageComparator());
-		languagesModel = new BindingListModelListModel<LanguageItem>(new ListModelList<LanguageItem>(languages));
+		Collections.sort(languages, new LabelComparator());
+		languagesModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(languages));
 		languagesModel.setMultiple(true);
-		List<LanguageItem> assignedLanguages = getAssignedLanguages();
+		List<LabelledItem> assignedLanguages = getAssignedLanguages();
 		languagesModel.setSelection(assignedLanguages);
 	}
 	
@@ -58,12 +59,12 @@ public class SurveyLocaleVM extends BaseVM {
 		}
 	}
 	
-	protected List<LanguageItem> getAssignedLanguages() {
-		List<LanguageItem> result = new ArrayList<LanguageItem>();
+	protected List<LabelledItem> getAssignedLanguages() {
+		List<LabelledItem> result = new ArrayList<LabelledItem>();
 		List<String> assignedLanguageCodes = getAssignedLanguageCodes();
 		for (String code : assignedLanguageCodes) {
-			for (LanguageItem item : languages) {
-				if ( item.code.equals(code)) { 
+			for (LabelledItem item : languages) {
+				if ( item.getCode().equals(code)) { 
 					result.add(item);
 				}
 			}
@@ -71,16 +72,16 @@ public class SurveyLocaleVM extends BaseVM {
 		return result;
 	}
 	
-	public BindingListModelListModel<LanguageItem> getLanguagesModel() {
+	public BindingListModelListModel<LabelledItem> getLanguagesModel() {
 		return languagesModel;
 	}
 	
 	public List<String> getSelectedLanguageCodes() {
 		List<String> result = new ArrayList<String>();
-		Set<LanguageItem> languages = languagesModel.getSelection();
+		Set<LabelledItem> languages = languagesModel.getSelection();
 		if ( languages != null ) {
-			for (LanguageItem item : languages) {
-				result.add(item.code);
+			for (LabelledItem item : languages) {
+				result.add(item.getCode());
 			}
 		}
 		//TODO sort...
@@ -118,38 +119,11 @@ public class SurveyLocaleVM extends BaseVM {
 		}
 	}
 
-	public static class LanguageItem {
-		private String code;
-		private String label;
-
-		public LanguageItem(String code, String label) {
-			this.code = code;
-			this.label = label;
-		}
-
-		public String getCode() {
-			return code;
-		}
-
-		public void setCode(String code) {
-			this.code = code;
-		}
-
-		public String getLabel() {
-			return label;
-		}
-
-		public void setLabel(String label) {
-			this.label = label;
-		}
-		
-	}
-	
-	private class LanguageComparator implements Comparator<LanguageItem> {
+	private class LabelComparator implements Comparator<LabelledItem> {
 
 		@Override
-		public int compare(LanguageItem item1, LanguageItem item2) {
-			return item1.label.compareTo(item2.label);
+		public int compare(LabelledItem item1, LabelledItem item2) {
+			return item1.getLabel().compareTo(item2.getLabel());
 		}
 		
 	}

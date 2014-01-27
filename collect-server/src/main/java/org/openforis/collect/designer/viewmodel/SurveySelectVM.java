@@ -78,6 +78,8 @@ public class SurveySelectVM extends BaseVM {
 
 	private Window processStatusPopUp;
 
+	private Window newSurveyTemplatePopUp;
+
 	@Init()
 	public void init() {
 		PageUtil.clearConfirmClose();
@@ -104,11 +106,9 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void newSurvey() throws IOException {
-		CollectSurvey survey = surveyManager.createSurveyWork();
-		SessionStatus sessionStatus = getSessionStatus();
-		sessionStatus.setSurvey(survey);
-		sessionStatus.setCurrentLanguageCode(null);
-		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
+		newSurveyTemplatePopUp = openPopUp(
+				Resources.Component.SELECT_TEMPLATE_POPUP.getLocation(),
+				true);
 	}
 
 	@Command
