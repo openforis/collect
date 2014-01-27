@@ -4,15 +4,15 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.form.SpatialReferenceSystemFormObject;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
@@ -75,28 +75,36 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 	
 	public List<String> getAvailablePredefinedSRSs() {
 		List<SpatialReferenceSystem> currentSRSs = survey.getSpatialReferenceSystems();
-		List<String> currentSRSCodes = new ArrayList<String>();
+		List<String> insertedSRSCodes = new ArrayList<String>();
 		for (SpatialReferenceSystem srs : currentSRSs) {
-			currentSRSCodes.add(srs.getId());
+			insertedSRSCodes.add(srs.getId());
 		}
-		//TODO call service to get srs list
-		Set<String> availableSRSs = new HashSet<String>(Arrays.asList("EPSG:21035", "EPSG:21036", "EPSG:21037", "EPSG:21038", "EPSG:21039", "EPSG:21040"));
+		CoordinateOperations coordinateOperations = getCoordinateOperations();
+		Set<String> availableSRSs = coordinateOperations.getAvailableSRSs();
 		
 		List<String> result = new ArrayList<String>(availableSRSs);
-		result.removeAll(currentSRSCodes);
+		result.removeAll(insertedSRSCodes);
 		Collections.sort(result);
+		
 		return result;
 	}
 	
 	@Command
 	public void addPredefinedSrs() {
-		//TODO call service to get srs details from EPSG authority
-		SpatialReferenceSystem srs = new SpatialReferenceSystem();
-		srs.setId(selectedPredefinedSrsCode);
+		CoordinateOperations coordinateOperations = getCoordinateOperations();
+		SpatialReferenceSystem srs = coordinateOperations.fetchSRS(selectedPredefinedSrsCode);
 		
 		survey.addSpatialReferenceSystem(srs);
 		selectedPredefinedSrsCode = null;
 		notifyChange("items", "selectedPredefinedSrsCode", "availablePredefinedSRSs");
+	}
+
+	private CoordinateOperations getCoordinateOperations() {
+		ServiceLoader<CoordinateOperations> serviceLoader = ServiceLoader.load(CoordinateOperations.class);
+		for (CoordinateOperations coordinateOperations : serviceLoader) {
+			return coordinateOperations;
+		}
+		return null;
 	}
 
 	public String getSelectedPredefinedSrsCode() {
@@ -117,4 +125,5 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 			}
 		});
 	}
+
 }

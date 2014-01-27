@@ -6,10 +6,14 @@ package org.openforis.collect.geospatial;
 import static org.geotools.referencing.CRS.parseWKT;
 import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import liquibase.util.StringUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +29,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.GenericName;
 
 /**
  * @author M. Togna
@@ -100,7 +105,12 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 			result.setId(code);
 			result.setLabel("en", code);
 			result.setWellKnownText(crs.toWKT());
-			result.setLabel("en", code);
+			List<String> aliasNames = new ArrayList<String>();
+			for (GenericName genericName : crs.getAlias()) {
+				aliasNames.add(genericName.toString());
+			}
+			String label = aliasNames.isEmpty() ? code: StringUtils.join(aliasNames, " / ");
+			result.setLabel("en", label);
 			result.setDescription("en", crs.getScope().toString());
 			return result;
 		} catch (Exception e) {
@@ -109,8 +119,18 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	}
 	
 	@Override
-	public Set<String> listAvailableSRSs() {
-		Set<String> result = CRS.getSupportedCodes("EPSG");
+	public Set<String> getAvailableSRSs() {
+		Set<String> result = new HashSet<String>();
+		String authorityCode = "EPSG";
+		String codePrefix = authorityCode + ":";
+		Set<String> supportedCodes = CRS.getSupportedCodes(authorityCode);
+		for (String code : supportedCodes) {
+			if ( code.startsWith(codePrefix) ) {
+				result.add(code);
+			} else {
+				result.add(codePrefix + code);
+			}
+		}
 		return result;
 	}
 	

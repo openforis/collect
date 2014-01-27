@@ -13,8 +13,14 @@
 		closable="true"
 		onClose="@command('close')">
 		<borderlayout>
+			<north>
+				<label value="${labels.susvey.srs.introduction}" />
+			</north>
 			<west width="180px">
 				<borderlayout>
+					<north>
+						<label value="${labels.global.items.header.inserted}:" />
+					</north>
 					<center border="none">
 						<listbox id="itemsListBox"
 				        	selectedItem="@load(vm.selectedItem)"
@@ -33,23 +39,36 @@
 				        </listbox>
 					</center>
 					<south border="none">
-				        <toolbar height="30px">
-				        	<toolbarbutton tooltiptext="${labels.global.add_item}" 
-                                    image="/assets/images/add.png"
-                                    onClick="@command('newItem')" />
-                            <toolbarbutton tooltiptext="${labels.global.delete_item}" 
-                                    image="/assets/images/delete.png"
-                                    disabled="@load(empty vm.selectedItem)" 
-                                    onClick="@command('deleteItem', item=vm.selectedItem)" />
-				        	<toolbarbutton tooltiptext="${labels.global.item.move_up}" 
-                                    image="/assets/images/arrow-up.png"
-									disabled="@load(vm.moveSelectedItemUpDisabled)" 
-						        	onClick="@command('moveSelectedItemUp')" />
-				        	<toolbarbutton tooltiptext="${labels.global.item.move_down}" 
-                                    image="/assets/images/arrow-down.png"
-									disabled="@load(vm.moveSelectedItemDownDisabled)" 
-						        	onClick="@command('moveSelectedItemDown')" />
-				        </toolbar>
+						<vbox spacing="0px" hflex="true">
+							<label value="${labels.survey.srs.predefined_crss}:" />
+							<hbox>
+								<listbox id="predefinedSrsList"
+	       							model="@load(vm.availablePredefinedSRSs)"
+	       							selectedItem="@bind(vm.selectedPredefinedSrsCode)"
+	       							mold="select" />
+								<button label="${labels.global.add_item}" 
+									disabled="@load(empty vm.selectedPredefinedSrsCode)"
+									onClick="@command('addPredefinedSrs')" />
+							</hbox>
+							<separator bar="true"></separator>
+					        <toolbar height="30px">
+					        	<toolbarbutton tooltiptext="${labels.global.add_item}" 
+	                                    image="/assets/images/add.png"
+	                                    onClick="@command('newItem')" />
+	                            <toolbarbutton tooltiptext="${labels.global.delete_item}" 
+	                                    image="/assets/images/delete.png"
+	                                    disabled="@load(empty vm.selectedItem)" 
+	                                    onClick="@command('deleteItem', item=vm.selectedItem)" />
+					        	<toolbarbutton tooltiptext="${labels.global.item.move_up}" 
+	                                    image="/assets/images/arrow-up.png"
+										disabled="@load(vm.moveSelectedItemUpDisabled)" 
+							        	onClick="@command('moveSelectedItemUp')" />
+					        	<toolbarbutton tooltiptext="${labels.global.item.move_down}" 
+	                                    image="/assets/images/arrow-down.png"
+										disabled="@load(vm.moveSelectedItemDownDisabled)" 
+							        	onClick="@command('moveSelectedItemDown')" />
+					        </toolbar>
+						</vbox>
 					</south>
 				</borderlayout>
 		    </west>
