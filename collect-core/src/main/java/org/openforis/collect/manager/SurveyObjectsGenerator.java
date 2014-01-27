@@ -1,11 +1,12 @@
 package org.openforis.collect.manager;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import org.openforis.idm.geospatial.CoordinateOperations;
-import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.Unit;
@@ -24,48 +25,63 @@ public class SurveyObjectsGenerator {
 	}
 
 	protected void addPredefinedUnits(Survey survey) {
+		Set<String> labelLanguages = new HashSet<String>(survey.getLanguages());
+		labelLanguages.add("en");
+		
 		//ANGLE
 		addUnit(survey, "deg", Dimension.ANGLE, null,
-				Arrays.asList(new LanguageSpecificText("en", "Degrees")), 
-				Arrays.asList(new LanguageSpecificText("en", "deg")));
+				Arrays.asList("Degrees"), 
+				Arrays.asList("deg"),
+				labelLanguages);
 		//LENGTH
 		addUnit(survey, "m", Dimension.LENGTH, 1.0,
-				Arrays.asList(new LanguageSpecificText("en", "metres")), 
-				Arrays.asList(new LanguageSpecificText("en", "m")));
+				Arrays.asList("metres"), 
+				Arrays.asList("m"),
+				labelLanguages);
 		
 		addUnit(survey, "dm", Dimension.LENGTH, 0.1,
-				Arrays.asList(new LanguageSpecificText("en", "decimeters")), 
-				Arrays.asList(new LanguageSpecificText("en", "dm")));
+				Arrays.asList("decimeters"), 
+				Arrays.asList("dm"),
+				labelLanguages);
 		
 		addUnit(survey, "cm", Dimension.LENGTH, 0.01,
-				Arrays.asList(new LanguageSpecificText("en", "centimeters")), 
-				Arrays.asList(new LanguageSpecificText("en", "cm")));
+				Arrays.asList("centimeters"), 
+				Arrays.asList("cm"),
+				labelLanguages);
 		
 		addUnit(survey, "mm", Dimension.LENGTH, 0.001,
-				Arrays.asList(new LanguageSpecificText("en", "millimeters")), 
-				Arrays.asList(new LanguageSpecificText("en", "mm")));
+				Arrays.asList("millimeters"), 
+				Arrays.asList("mm"),
+				labelLanguages);
 		
 		addUnit(survey, "km", Dimension.LENGTH, 1000.0,
-				Arrays.asList(new LanguageSpecificText("en", "kilometers")), 
-				Arrays.asList(new LanguageSpecificText("en", "km")));
+				Arrays.asList("kilometers"), 
+				Arrays.asList("km"),
+				labelLanguages);
 		//AREA
 		addUnit(survey, "ac", Dimension.AREA, 2.47105381,
-				Arrays.asList(new LanguageSpecificText("en", "acres")), 
-				Arrays.asList(new LanguageSpecificText("en", "ac")));
+				Arrays.asList("acres"),
+				Arrays.asList("ac"),
+				labelLanguages);
 		
 		addUnit(survey, "ha", Dimension.AREA, 1.0,
-				Arrays.asList(new LanguageSpecificText("en", "hectares")), 
-				Arrays.asList(new LanguageSpecificText("en", "ha")));
+				Arrays.asList("hectares"), 
+				Arrays.asList("ha"),
+				labelLanguages);
 		//RATIO
 		addUnit(survey, "percent", Dimension.RATIO, 0.01,
-				Arrays.asList(new LanguageSpecificText("en", "percent")), 
-				Arrays.asList(new LanguageSpecificText("en", "%")));
+				Arrays.asList("percent"), 
+				Arrays.asList("%"),
+				labelLanguages);
 	}
 	
 	protected void addPredefinedSRSs(Survey survey) {
 		CoordinateOperations coordinateOperations = getCoordinateOperationsService();
 		if ( coordinateOperations != null ) {
-			SpatialReferenceSystem srs = coordinateOperations.fetchSRS("EPSG:4326");
+			Set<String> labelLanguages = new HashSet<String>(survey.getLanguages());
+			labelLanguages.add("en");
+
+			SpatialReferenceSystem srs = coordinateOperations.fetchSRS("EPSG:4326", labelLanguages);
 			survey.addSpatialReferenceSystem(srs);
 		}
 		return;
@@ -81,17 +97,22 @@ public class SurveyObjectsGenerator {
 	
 	private void addUnit(Survey survey, String name, Dimension dimension,
 			Double conversionFactor,
-			List<LanguageSpecificText> labels,
-			List<LanguageSpecificText> abbreviations) {
+			List<String> labels,
+			List<String> abbreviations,
+			Set<String> labelLanguages) {
 		Unit unit = survey.createUnit();
 		unit.setName(name);
 		unit.setDimension(dimension.name());
 		unit.setConversionFactor(conversionFactor);
-		for (LanguageSpecificText label : labels) {
-			unit.addLabel(label);
+		for (String label : labels) {
+			for (String lang : labelLanguages) {
+				unit.setLabel(lang, label);
+			}
 		}
-		for (LanguageSpecificText abbreviation : abbreviations) {
-			unit.addAbbreviation(abbreviation);
+		for (String abbr : abbreviations) {
+			for (String lang : labelLanguages) {
+				unit.setAbbreviation(lang, abbr);
+			}
 		}
 		survey.addUnit(unit);
 	}

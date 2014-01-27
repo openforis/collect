@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
@@ -92,6 +93,7 @@ public class SurveyLocaleVM extends BaseVM {
 		CollectSurvey survey = sessionStatus.getSurvey();
 		List<String> selectedLanguageCodes = getSelectedLanguageCodes();
 		List<String> oldLangCodes = new ArrayList<String>(survey.getLanguages());
+		boolean firstTime = oldLangCodes.isEmpty();
 		for (String oldLangCode : oldLangCodes) {
 			if (! selectedLanguageCodes.contains(oldLangCode)) {
 				survey.removeLanguage(oldLangCode);
@@ -101,6 +103,10 @@ public class SurveyLocaleVM extends BaseVM {
 			if ( ! oldLangCodes.contains(lang) ) {
 				survey.addLanguage(lang);
 			}
+		}
+		if ( firstTime ) {
+			SurveyObjectsGenerator surveyObjectsGenereator = new SurveyObjectsGenerator();
+			surveyObjectsGenereator.addPredefinedObjects(survey);
 		}
 		String selectedCurrentLanguageCode = selectedLanguageCodes.isEmpty() ? null: selectedLanguageCodes.iterator().next();
 		if ( StringUtils.isNotBlank(selectedCurrentLanguageCode) ) {

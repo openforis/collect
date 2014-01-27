@@ -5,6 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -92,7 +93,9 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 	@Command
 	public void addPredefinedSrs() {
 		CoordinateOperations coordinateOperations = getCoordinateOperations();
-		SpatialReferenceSystem srs = coordinateOperations.fetchSRS(selectedPredefinedSrsCode);
+		Set<String> languages = new HashSet<String>(survey.getLanguages());
+		
+		SpatialReferenceSystem srs = coordinateOperations.fetchSRS(selectedPredefinedSrsCode, languages);
 		
 		survey.addSpatialReferenceSystem(srs);
 		selectedPredefinedSrsCode = null;

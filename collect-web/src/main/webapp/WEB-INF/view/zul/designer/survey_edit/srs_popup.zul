@@ -50,7 +50,7 @@
 									disabled="@load(empty vm.selectedPredefinedSrsCode)"
 									onClick="@command('addPredefinedSrs')" />
 							</hbox>
-							<separator bar="true"></separator>
+							<separator bar="true" />
 					        <toolbar height="30px">
 					        	<toolbarbutton tooltiptext="${labels.global.add_item}" 
 	                                    image="/assets/images/add.png"
