@@ -129,12 +129,14 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 			}
 		}
 		if ( confirmMessageKey != null ) {
-			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
 					performRemoveSelectedTab();
 				}
 			}, confirmMessageKey);
+			params.setOkLabelKey("global.delete_item");
+			MessageUtil.showConfirm(params);
 		} else {
 			performRemoveSelectedTab();
 		}

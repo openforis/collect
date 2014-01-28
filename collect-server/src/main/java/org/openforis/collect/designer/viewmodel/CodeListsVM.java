@@ -251,7 +251,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 						performRemoveLevel(levelIndex);
 					}
 				};
-				MessageUtil.showConfirm(handler, "survey.code_list.alert.cannot_delete_non_empty_level");
+				MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(handler, "survey.code_list.alert.cannot_delete_non_empty_level");
+				params.setOkLabelKey("global.delete_item");
+				MessageUtil.showConfirm(params);
 			} else {
 				performRemoveLevel(levelIndex);
 			}
@@ -319,12 +321,14 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			} else {
 				messageKey = "survey.code_list.confirm.delete_item";
 			}
-			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
 					performDeleteCodeListItem(item);
 				}
 			}, messageKey);
+			params.setOkLabelKey("global.delete_item");
+			MessageUtil.showConfirm(params);
 		}
 	}
 

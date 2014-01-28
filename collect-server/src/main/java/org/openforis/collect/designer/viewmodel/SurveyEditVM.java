@@ -184,12 +184,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@Command
 	public void backToSurveysList() {
 		if ( changed ) {
-			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
 					performBackToSurveysList();
 				}
 			}, "survey.edit.leave_page");
+			params.setOkLabelKey("global.leave_this_page");
+			MessageUtil.showConfirm(params);
 		} else {
 			performBackToSurveysList();
 		}

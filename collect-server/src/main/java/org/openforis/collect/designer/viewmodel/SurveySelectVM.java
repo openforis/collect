@@ -106,6 +106,10 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void newSurvey() throws IOException {
+		if ( newSurveyTemplatePopUp != null ) {
+			closePopUp(newSurveyTemplatePopUp);
+			newSurveyTemplatePopUp = null;
+		}
 		newSurveyTemplatePopUp = openPopUp(
 				Resources.Component.SELECT_TEMPLATE_POPUP.getLocation(),
 				true);
@@ -170,12 +174,14 @@ public class SurveySelectVM extends BaseVM {
 		final CollectSurvey publishedSurvey = selectedSurvey.isPublished() ? surveyManager
 				.getByUri(survey.getUri()) : null;
 		if (validateSurvey(survey, publishedSurvey)) {
-			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
 					performSurveyPublishing(survey);
 				}
 			}, "survey.publish.confirm");
+			params.setOkLabelKey("survey.publish");
+			MessageUtil.showConfirm(params);
 		}
 	}
 
@@ -184,19 +190,21 @@ public class SurveySelectVM extends BaseVM {
 		String messageKey;
 		if (selectedSurvey.isWork()) {
 			if (selectedSurvey.isPublished()) {
-				messageKey = "survey.delete.published_work.confirm";
+				messageKey = "survey.delete.published_work.confirm.message";
 			} else {
-				messageKey = "survey.delete.work.confirm";
+				messageKey = "survey.delete.work.confirm.message";
 			}
 		} else {
-			messageKey = "survey.delete.confirm";
+			messageKey = "survey.delete.confirm.message";
 		}
 		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
 				performSelectedSurveyDeletion();
 			}
-		}, messageKey, new String[] { selectedSurvey.getName() });
+		}, messageKey, new String[] { selectedSurvey.getName() }, 
+			"survey.delete.confirm.title", (String[]) null, 
+			"global.delete_item", "global.cancel");
 	}
 
 	protected void performSelectedSurveyDeletion() {

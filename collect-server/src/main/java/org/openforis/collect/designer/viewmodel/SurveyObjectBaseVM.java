@@ -197,11 +197,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	@Command
 	public void deleteItem(@BindingParam("item") final T item) {
-		MessageUtil.showConfirm(new ConfirmHandler() {
+		MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new ConfirmHandler() {
 			@Override
 			public void onOk() {
 				performDeleteItem(item);
 			}}, "global.item.confirm_remove");
+		params.setOkLabelKey("global.delete_item");
+		MessageUtil.showConfirm(params);
 	}
 
 	protected void performDeleteItem(T item) {

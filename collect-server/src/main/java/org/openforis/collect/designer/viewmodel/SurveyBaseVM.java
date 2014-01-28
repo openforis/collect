@@ -172,7 +172,8 @@ public abstract class SurveyBaseVM extends BaseVM {
 							((CanLeaveFormCompleteConfirmHandler) confirmHandler).onCancel();
 						}
 					}
-				}, messageKey);
+				}, messageKey, (Object[]) null, "global.unsaved_changes", (Object[]) null, 
+						"global.continue_and_loose_changes", "global.stay_on_this_page");
 			}
 		}
 		return currentFormValid;

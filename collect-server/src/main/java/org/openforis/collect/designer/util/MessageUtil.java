@@ -1,9 +1,10 @@
 package org.openforis.collect.designer.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Messagebox.ClickEvent;
 
 /**
  * 
@@ -106,16 +107,50 @@ public class MessageUtil {
 	}
 
 	public static void showConfirm(ConfirmHandler handler, String messageKey, Object[] args) {
-		showConfirm(handler, messageKey, args, DEFAULT_CONFIRM_TITLE_KEY, null);
+		showConfirm(handler, messageKey, args, DEFAULT_CONFIRM_TITLE_KEY, null, (String) null, (String) null);
 	}
 
-	public static void showConfirm(ConfirmHandler handler, String messageKey, Object[] args, String titleKey, Object[] titleArgs) {
-		String message = getLabel(messageKey, args);
-		String title = getLabel(titleKey, titleArgs);
-		EventListener<Event> eventListener = new ConfirmEventListener(handler);
-		Messagebox.show(message, title, Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, eventListener );
+	public static void showConfirm(ConfirmHandler handler, String messageKey, Object[] args, String titleKey, Object[] titleArgs, String okLabelKey, String cancelLabelKey) {
+		ConfirmParams params = new ConfirmParams(handler, messageKey);
+		params.setMessageArgs(args);
+		params.setTitleKey(titleKey);
+		params.setTitleArgs(titleArgs);
+		params.setOkLabelKey(okLabelKey);
+		params.setCancelLabelKey(cancelLabelKey);
+		showConfirm(params);
 	}
-
+	
+	public static void showConfirm(ConfirmParams params) {
+		String message = getLabel(params.getMessageKey(), params.getMessageArgs());
+		String title = getLabel(params.getTitleKey() == null ? "global.confirm.title": params.getTitleKey(), params.getTitleArgs());
+		
+		EventListener<ClickEvent> eventListener = new ConfirmEventListener(params.getConfirmHandler());
+		//Messagebox.show(message, title, Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION, eventListener );
+		
+		String okLabel = getLabel(params.getOkLabelKey());
+		String cancelLabel = getLabel(params.getCancelLabelKey());
+		
+		String[] btnLabels = null;
+		if ( StringUtils.isNotBlank(okLabel) ) {
+			if (StringUtils.isNotBlank(cancelLabel) ) {
+				btnLabels = new String[] {okLabel, cancelLabel};
+			} else {
+				btnLabels = new String[] {okLabel};
+			}
+		}
+		Messagebox.show(message, 
+				title,
+			    new Messagebox.Button[] {Messagebox.Button.OK, Messagebox.Button.CANCEL},
+			    btnLabels,
+			    Messagebox.QUESTION, 
+			    Messagebox.Button.CANCEL, 
+			    eventListener);
+	}
+	
+	protected static String getLabel(String key) {
+		return getLabel(key, (Object[]) null);
+	}
+	
 	protected static String getLabel(String key, Object[] args) {
 		String label = Labels.getLabel(key, args);
 		if ( label != null ) {
@@ -124,7 +159,7 @@ public class MessageUtil {
 		return label;
 	}
 	
-	static class ConfirmEventListener implements EventListener<Event> {
+	static class ConfirmEventListener implements EventListener<ClickEvent> {
 		
 		private ConfirmHandler handler;
 		
@@ -133,7 +168,7 @@ public class MessageUtil {
 			this.handler = handler;
 		}
 
-		public void onEvent(Event evt) throws InterruptedException {
+		public void onEvent(ClickEvent evt) throws InterruptedException {
 	        String evtName = evt.getName();
 			if ( "onOK".equals(evtName) ) {
 	            handler.onOk();
@@ -151,4 +186,73 @@ public class MessageUtil {
 	public interface CompleteConfirmHandler extends ConfirmHandler {
 		void onCancel();
 	}
+	
+	public static class ConfirmParams {
+		private ConfirmHandler confirmHandler;
+		private String messageKey;
+		private Object[] messageArgs;
+		private String titleKey;
+		private Object[] titleArgs;
+		private String okLabelKey;
+		private String cancelLabelKey;
+		
+		public ConfirmParams(ConfirmHandler confirmHandler, String messageKey) {
+			this.confirmHandler = confirmHandler;
+			this.messageKey = messageKey;
+		}
+
+		public ConfirmHandler getConfirmHandler() {
+			return confirmHandler;
+		}
+
+		public String getMessageKey() {
+			return messageKey;
+		}
+
+		public void setMessageKey(String messageKey) {
+			this.messageKey = messageKey;
+		}
+
+		public String getTitleKey() {
+			return titleKey;
+		}
+
+		public void setTitleKey(String titleKey) {
+			this.titleKey = titleKey;
+		}
+
+		public Object[] getTitleArgs() {
+			return titleArgs;
+		}
+
+		public void setTitleArgs(Object[] titleArgs) {
+			this.titleArgs = titleArgs;
+		}
+
+		public String getOkLabelKey() {
+			return okLabelKey;
+		}
+
+		public void setOkLabelKey(String okLabelKey) {
+			this.okLabelKey = okLabelKey;
+		}
+
+		public String getCancelLabelKey() {
+			return cancelLabelKey;
+		}
+
+		public void setCancelLabelKey(String cancelLabelKey) {
+			this.cancelLabelKey = cancelLabelKey;
+		}
+
+		public Object[] getMessageArgs() {
+			return messageArgs;
+		}
+		
+		public void setMessageArgs(Object[] messageArgs) {
+			this.messageArgs = messageArgs;
+		}
+		
+	}
+	
 }

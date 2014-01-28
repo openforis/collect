@@ -382,7 +382,7 @@ public class SchemaVM extends SurveyBaseVM {
 					public void onOk() {
 						performRemoveNode(nodeDefn);
 					}
-				}, confirmMessageKey, messageArgs, CONFIRM_REMOVE_NODE_TITLE_KEY, titleArgs);
+				}, confirmMessageKey, messageArgs, CONFIRM_REMOVE_NODE_TITLE_KEY, titleArgs, "global.remove_item", "global.cancel");
 			}
 		}
 	}

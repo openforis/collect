@@ -90,14 +90,16 @@ public class SurveyImportVM extends SurveyBaseVM {
 			if ( updatingExistingSurvey ) {
 				Object[] args = new String[] {getFormSurveyName()};
 				String messageKey = updatingPublishedSurvey ? 
-					"survey.import_survey.confirm_overwrite_published": 
-					"survey.import_survey.confirm_overwrite";
+					"survey.import_survey.confirm_overwrite_published.message": 
+					"survey.import_survey.confirm_overwrite.message";
 				MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 					@Override
 					public void onOk() {
 						startSurveyImport();
 					}
-				}, messageKey, args);
+				}, messageKey, args, 
+					"survey.import_survey.confirm_overwrite.title", (String[]) null, 
+					"global.overwrite", "global.cancel");
 			} else {
 				startSurveyImport();
 			}
@@ -254,10 +256,11 @@ public class SurveyImportVM extends SurveyBaseVM {
 				uploadedSurveyUri = null;
 				updateForm();
 			}
-		}, "survey.import_survey.confirm_process_invalid_survey", args);
+		}, "survey.import_survey.confirm_process_invalid_survey.message", args,
+				"survey.import_survey.confirm_process_invalid_survey.title", (String[]) null,
+				"survey.import_survey.force_import", "global.cancel");
 	}
-
-
+	
 	protected void updateForm() {
 		SurveySummary surveySummary = surveyManager.loadSummaryByUri(uploadedSurveyUri);
 		String surveyName = null;
