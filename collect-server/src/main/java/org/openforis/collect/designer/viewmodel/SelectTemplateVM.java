@@ -28,6 +28,12 @@ import org.zkoss.zul.ListModelList;
  */
 public class SelectTemplateVM extends BaseVM {
 
+	private enum TemplateType {
+		//BIOPHYSICAL, 
+		//SOCIOECONOMIC, 
+		IPCC, BLANK
+	};
+	
 	@WireVariable
 	private SurveyManager surveyManager;
 	
@@ -37,10 +43,10 @@ public class SelectTemplateVM extends BaseVM {
 	@Init
 	public void init() {
 		templates = new ArrayList<LabelledItem>();
-		templates.add(new LabelledItem("biophysical", Labels.getLabel("survey.template.type.biophysical")));
-		templates.add(new LabelledItem("socioeconomic", Labels.getLabel("survey.template.type.socioeconomic")));
-		templates.add(new LabelledItem("ipcc", Labels.getLabel("survey.template.type.ipcc")));
-		templates.add(new LabelledItem("blank", Labels.getLabel("survey.template.type.blank")));
+		for (TemplateType templateType : TemplateType.values()) {
+			String name = templateType.name();
+			templates.add(new LabelledItem(name, Labels.getLabel("survey.template.type." + name.toLowerCase())));
+		}
 		templatesModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(templates));
 		templatesModel.setMultiple(false);
 	}
@@ -63,12 +69,19 @@ public class SelectTemplateVM extends BaseVM {
 	public void ok() throws IdmlParseException, SurveyValidationException {
 		String templateCode = getSelectedTemplateCode();
 		if ( templateCode != null ) {
-			String templateFileName = "org/openforis/collect/designer/templates/" + templateCode + ".idm.xml";
-			InputStream surveyFileIs = ClassLoader.getSystemResourceAsStream(templateFileName);
-			CollectSurvey survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
-			survey.setWork(true);
-			survey.setUri(surveyManager.generateRandomSurveyUri());
-			
+			CollectSurvey survey;
+			if ( templateCode.equals(TemplateType.BLANK.name())) {
+				//create empty survey
+				survey = surveyManager.createSurveyWork();
+			} else {
+				//create survey from template
+				String templateFileName = "/org/openforis/collect/designer/templates/" + templateCode.toLowerCase() + ".idm.xml";
+				InputStream surveyFileIs = this.getClass().getResourceAsStream(templateFileName);
+				survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
+				survey.setWork(true);
+				survey.setUri(surveyManager.generateRandomSurveyUri());
+			}
+			//put survey in session and redirect into survey edit page
 			SessionStatus sessionStatus = getSessionStatus();
 			sessionStatus.setSurvey(survey);
 			sessionStatus.setCurrentLanguageCode(null);

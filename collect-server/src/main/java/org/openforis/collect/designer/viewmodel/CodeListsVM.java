@@ -560,7 +560,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	private void addChildItemToCodeList() {
-		if ( editedItem.isEmpty() ) {
+		if ( editedItem.isEmpty() && isSurveyStored() ) {
+			//persist item in db
 			PersistedCodeListItem persistedChildItem = (PersistedCodeListItem) editedChildItem;
 			if ( editedChildItemParentItem != null ) {
 				PersistedCodeListItem parentId = (PersistedCodeListItem) editedChildItemParentItem;
@@ -568,8 +569,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			}
 			codeListManager.save(persistedChildItem);
 		} else if ( editedChildItemParentItem == null ) {
+			//add item among the root items
 			editedItem.addItem(editedChildItem);
 		} else {
+			//add item as a child of the edited parent item in the code list
 			editedChildItemParentItem.addChildItem(editedChildItem);
 		}
 		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(editedChildItemLevel);
@@ -582,7 +585,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	protected void initItemsPerLevel() {
 		itemsPerLevel = new ArrayList<List<CodeListItem>>();
-		if ( isSurveyStored() && editedItem != null && ! editedItem.isExternal() ) {
+		if ( /*isSurveyStored() && */ editedItem != null && ! editedItem.isExternal() ) {
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(editedItem);
 			itemsPerLevel.add(new ArrayList<CodeListItem>(rootItems));
 			for (CodeListItem selectedItem : selectedItemsPerLevel) {

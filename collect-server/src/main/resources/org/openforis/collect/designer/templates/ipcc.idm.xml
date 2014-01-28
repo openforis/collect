@@ -6,12 +6,20 @@
 	http://www.openforis.org/collect/3.0/ui 
 	https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
 	lastId="1000">
-	<project>PNG - Open Foris Collect Earth</project>
+	<project>Open Foris Collect Earth</project>
 	<uri>http://www.openforis.org/idm/earth</uri>
 	<cycle>2013-2014</cycle>
 	<description></description>
 	<language>en</language>
-
+	<applicationOptions>
+		<options type="ui">
+			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="plot_tab_set">
+				<tab name="plot_tab">
+					<label>Plot</label>
+				</tab>
+			</tabSet>
+		</options>
+	</applicationOptions>
 	<codeLists>
 		<list id="100" name="land_use">
 			<label type="item">Land Use</label>
@@ -30,259 +38,73 @@
 					<code>forest</code>
 					<label>Forest</label>
 					<item id="102">
-						<code>low_altitude_forest_on_plainsand</code>
-						<label>Low altitude forest on plains and fans</label>
-					</item>
-					<item id="103">
-						<code>low_altitude_forest_on_upland</code>
-						<label>Low altitude forest on uplands</label>
-					</item>
-					<item id="104">
-						<code>lower_montane_forest</code>
-						<label>Lower montane forest</label>
-					</item>
-					<item id="105">
-						<code>montane_forest</code>
-						<label>Montane forest</label>
-					</item>
-					<item id="115">
-						<code>montane_coniferous_forest</code>
-						<label>Montane coniferous forest</label>
-					</item>	
-					<item id="106">
-						<code>dry_seasonal_forest</code>
-						<label>Dry seasonal forest</label>
-					</item>
-					<item id="107">
-						<code>littoral_forest</code>
-						<label>Littoral forest</label>
-					</item>
-					<item id="108">
-						<code>seral_forest</code>
-						<label>Seral forest</label>
-					</item>
-					
-					<item id="109">
-						<code>swamp_forest</code>
-						<label>Swamp forest</label>
-					</item>
-					<item id="110">
-						<code>savanna</code>
-						<label>Savanna</label>
-					</item>
-					<item id="111">
-						<code>woodland</code>
-						<label>Woodland</label>
-					</item>
-					<item id="112">
-						<code>scrub</code>
-						<label>Scrub</label>
-					</item>
-					<item id="113">
-						<code>mangrove</code>
-						<label>Mangrove</label>
-					</item>	
-					<item id="116">
-						<code>teak_plantation</code>
-						<label>Teak Plantation</label>
-					</item>
-					<item id="117">
-						<code>eucalyptus_plantation</code>
-						<label>Eucalyptus Plantation</label>
-					</item>				
-					<item id="118">
-						<code>balsa_plantation</code>
-						<label>Balsa Plantation</label>
-					</item>	
-					<item id="119">
-						<code>klinki_plantation</code>
-						<label>Klinky Plantation</label>
-					</item>		
-					<item id="120">
-						<code>hoop_plantation</code>
-						<label>Hoop Plantation</label>
-					</item>	
-					<item id="121">
-						<code>pine_plantation</code>
-						<label>Pine Plantation</label>
-					</item>		
-					<item id="122">
-						<code>acacia_plantation</code>
-						<label>Acacia Plantation</label>
-					</item>			
-					<item id="123">
-						<code>terminalia_plantation</code>
-						<label>Terminalia Plantation</label>
-					</item>	
-					<item id="124">
-						<code>undetermined_plantation</code>
-						<label>Undetermined Plantation</label>
-					</item>	
-					<item id="125">
-						<code>not_sure</code>
-						<label>Not Sure</label>
-					</item>			
-					<item id="126">
-						<code>rubber_plantation</code>
-						<label>Rubber Plantation</label>
+						<code>forest_subdivision</code>
+						<label>Forest subdivision (example)</label>
 					</item>
 					<item id="127">
-						<code>other_plantation</code>
-						<label>Other Plantation</label>
+						<code>unknown_forest</code>
+						<label>Unknown Forest</label>
 					</item>					
 				</item>
 				<item id="220">
 					<code>cropland</code>
 					<label>Cropland</label>
 					<item id="221">
-						<code>subsistence_agriculture</code>
-						<label>Subsistence Agriculture</label>
+						<code>crop_subdivision</code>
+						<label>Crop subdivision (example)</label>
 					</item>
 					<item id="233">
-						<code>subsistence_agriculture_permanent</code>
-						<label>Subsistence Agriculture - Permanent</label>
+						<code>unknown_crop</code>
+						<label>Unknown crop</label>
 					</item>
-					<item id="234">
-						<code>subsistence_agriculture_shifting</code>
-						<label>Subsistence Agriculture - Shifting</label>
-					</item>
-					<item id="235">
-						<code>subsistence_agriculture_not_sure</code>
-						<label>Subsistence Agriculture - Not Sure</label>
-					</item>
-					<item id="222">
-						<code>irrigated_perennial_crops</code>
-						<label>Irrigated Perennial Crops</label>
-					</item>
-					<item id="223">
-						<code>non_irrigated_perennial_crops</code>
-						<label>Non Irrigated Perennial Crops</label>
-					</item>
-					<item id="224">
-						<code>rice</code>
-						<label>Rice</label>
-					</item>
-					<item id="225">
-						<code>spices</code>
-						<label>Spices</label>
-					</item>
-					<item id="226">
-						<code>tea</code>
-						<label>Tea</label>
-					</item>
-					<item id="227">
-						<code>coffee</code>
-						<label>Coffee</label>
-					</item>
-					
-					<item id="228">
-						<code>palm_oil</code>
-						<label>Palm Oil</label>
-					</item>
-					<item id="229">
-						<code>cocoa</code>
-						<label>Cocoa</label>
-					</item>
-					<item id="230">
-						<code>coconut</code>
-						<label>Coconut</label>
-					</item>
-					<item id="231">
-						<code>citrus</code>
-						<label>Citrus</label>
-					</item>
-					<item id="232">
-						<code>other_crop</code>
-						<label>Other</label>
-					</item>
-
-					
 				</item>
-				
 				<item id="130">
 					<code>grassland</code>
 					<label>Grassland</label>
 					<item id="131">
-						<code>meadows</code>
-						<label>Meadows</label>
+						<code>grassland_subdivision</code>
+						<label>Grassland subdivision (example)</label>
 					</item>
 					<item id="132">
-						<code>alpine_grassland</code>
-						<label>Alpine Grassland</label>
-					</item>
-					<item id="133">
-						<code>herbland</code>
-						<label>Herbland</label>
+						<code>unknown_grassland</code>
+						<label>Unknown grassland</label>
 					</item>
 				</item>
-				
 				<item id="140">
 					<code>settlement</code>
 					<label>Settlement</label>
 					<item id="141">
-						<code>village</code>
-						<label>Village</label>
+						<code>settlement_example</code>
+						<label>Settlement (example)</label>
 					</item>
 					<item id="142">
-						<code>large_settlement</code>
-						<label>Large settlement</label>
-					</item>
-					<item id="143">
-						<code>infrastructure</code>
-						<label>Infrastructure</label>
+						<code>other_settlement</code>
+						<label>Other settlement</label>
 					</item>
 				</item>
-				
 				<item id="150">
 					<code>otherLand</code>
 					<label>Other Land</label>
 					<item id="151">
-						<code>barrein_soil</code>
-						<label>Barrein soil</label>
-					</item>
-					<item id="152">
-						<code>sand_soil</code>
-						<label>Sand soil</label>
-					</item>
-					<item id="153">
-						<code>land_slides</code>
-						<label>Land slides</label>
-					</item>
-					
-					<item id="154">
-						<code>rock</code>
-						<label>Rock</label>
-					</item>
-					<item id="155">
-						<code>river</code>
-						<label>River</label>
-					</item>
-					<item id="156">
-						<code>lake</code>
-						<label>Lake</label>
+						<code>other_example</code>
+						<label>Other (example)</label>
 					</item>
 				</item>
 				<item id="180">
 					<code>wetLand</code>
 					<label>Wet Land</label>
 					<item id="181">
-						<code>saline_brackish_swamp</code>
-						<label>Saline Brackish Swamps</label>
+						<code>wetland_example</code>
+						<label>Wetland example</label>
 					</item>
 					<item id="182">
-						<code>freshwater_swamp</code>
-						<label>Freshwater Swamps</label>
+						<code>other_wetland</code>
+						<label>Other wetland</label>
 					</item>
-					<item id="183">
-						<code>montane_swamp</code>
-						<label>Montane Swamp</label>
-					</item>
-					
 				</item>
-				
 				<item id="170">
 					<code>noData</code>
-					<label>No data</label>	
+					<label>No data reason</label>	
 					<item id="171">
 						<code>sea</code>
 						<label>Sea</label>
@@ -294,7 +116,7 @@
 					<item id="173">
 						<code>other_reason</code>
 						<label>Other reason</label>
-					</item>			
+					</item>
 				</item>
 			</items>
 		</list>
@@ -747,7 +569,7 @@
 	</spatialReferenceSystems>
 	
 	<schema>
-		<entity id="1" name="plot" ui:tabSet="placemark" ui:tab="placemark">
+		<entity id="1" name="plot" ui:tabSet="plot_tab_set" ui:tab="plot_tab">
 			<label xml:lang="en">Plot</label>
 			<text id="2" name="id" required="true" key="true">
 				<label xml:lang="en">Id</label>
