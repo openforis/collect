@@ -23,7 +23,7 @@ public class SurveyObjectsGenerator {
 		addPredefinedUnits(survey);
 		addPredefinedSRSs(survey);
 	}
-
+	
 	protected void addPredefinedUnits(Survey survey) {
 		Set<String> labelLanguages = new HashSet<String>(survey.getLanguages());
 		labelLanguages.add("en");

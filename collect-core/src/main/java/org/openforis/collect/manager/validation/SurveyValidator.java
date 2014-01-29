@@ -49,6 +49,16 @@ import org.xml.sax.SAXException;
  */
 public class SurveyValidator {
 
+	private static final String XML_XSD_FILE_NAME = "xml.xsd";
+	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
+	private static final String IDML_UI_XSD_FILE_NAME = "idml3-ui.xsd";
+
+	private static final String[] SURVEY_XSD_FILE_NAMES = new String[] {
+			XML_XSD_FILE_NAME, 
+			IDML_XSD_FILE_NAME,
+			IDML_UI_XSD_FILE_NAME 
+	};
+	
 	@Autowired
 	private CodeListManager codeListManager;
 	
@@ -419,7 +429,7 @@ public class SurveyValidator {
 	public void validateAgainstSchema(InputStream is) throws SurveyValidationException {
 	    try {
 	    	SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-	    	Source[] schemas = getSourcesFromClassPath("xml.xsd", "idml3.xsd", "idml3-ui.xsd");
+	    	Source[] schemas = getSourcesFromClassPath(SURVEY_XSD_FILE_NAMES);
 			javax.xml.validation.Schema schema = factory.newSchema(schemas);
 	        Validator validator = schema.newValidator();
 	        validator.validate(new StreamSource(is));

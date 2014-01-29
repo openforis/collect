@@ -8,6 +8,7 @@ import org.openforis.collect.manager.exception.DataImportExeption;
 import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportProcess;
 import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportStatus;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -31,7 +32,7 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public SamplingDesignImportStatusProxy start(int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption {
+	public SamplingDesignImportStatusProxy start(int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption, SurveyImportException {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = getImportFile();
 			CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);

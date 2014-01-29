@@ -112,35 +112,39 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 			SpatialReferenceSystem result = new SpatialReferenceSystem();
 			result.setId(code);
 			result.setWellKnownText(crs.toWKT());
-			String label = getLabel(code, crs);
-			String scope = crs.getScope().toString();
+			String description = getDescription(crs);
 			for (String lang : labelLanguages) {
-				result.setLabel(lang, label);
-				result.setDescription(lang, scope);
+				result.setLabel(lang, code);
+				result.setDescription(lang, description);
 			}
 			return result;
 		} catch (Exception e) {
 			throw new RuntimeException("Error fetching SRS with code: " + code, e);
 		}
 	}
-
-	private String getLabel(String code, CoordinateReferenceSystem crs) {
-		String label;
+	
+	/**
+	 * It returns a concatenation of datum, aliases and scope
+	 */
+	private String getDescription(CoordinateReferenceSystem crs) {
+		List<String> parts = new ArrayList<String>();
+		//datum
 		if ( crs instanceof AbstractSingleCRS ) {
 			Datum datum = ((AbstractSingleCRS) crs).getDatum();
 			String datumName = datum.getName().toString();
-			label = datumName;
-		} else {
-			List<String> aliasNames = new ArrayList<String>();
-			for (GenericName genericName : crs.getAlias()) {
-				aliasNames.add(genericName.toString());
-			}
-			label = StringUtils.join(aliasNames, " / ");
+			parts.add(datumName);
 		}
-		if ( StringUtils.isBlank(label) ) {
-			label = code;
+		//aliases
+		for (GenericName genericName : crs.getAlias()) {
+			parts.add(genericName.toString());
 		}
-		return label;
+		//scope
+		String scope = crs.getScope().toString();
+		if ( StringUtils.isNotBlank(scope) ) {
+			parts.add(scope);
+		}
+		String result = StringUtils.join(parts, "\n");
+		return result;
 	}
 	
 	@Override
