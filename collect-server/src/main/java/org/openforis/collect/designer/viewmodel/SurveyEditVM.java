@@ -189,8 +189,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 				public void onOk() {
 					performBackToSurveysList();
 				}
-			}, "survey.edit.leave_page");
-			params.setOkLabelKey("global.leave_this_page");
+			}, "survey.edit.leave_page_with_unsaved_changes");
+			params.setTitleKey("global.unsaved_changes");;
+			params.setOkLabelKey("global.continue_and_loose_changes");
+			params.setCancelLabelKey("global.stay_on_this_page");
 			MessageUtil.showConfirm(params);
 		} else {
 			performBackToSurveysList();

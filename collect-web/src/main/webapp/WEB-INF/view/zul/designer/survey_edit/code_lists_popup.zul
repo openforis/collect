@@ -53,7 +53,7 @@
                  @save(vm.formObject, before={'validate','applyChanges'})
                  @validator('org.openforis.collect.designer.form.validator.CodeListFormValidator')"
 		        	width="100%">
-		        	<center border="none">
+		        	<north border="none">
 		        		<grid>
 		        			<columns>
 		        				<column width="150px" />
@@ -83,17 +83,6 @@
 		        				</row>
 		        				<row>
 		        					<multilanguageLabel
-		        						value="${labels.survey.code_list.list_label}"
-		        						languageCode="@load(vm.currentLanguageCode)" />
-		        					<fieldErrorHandler
-		        						message="@load(vmsgs['listLabel'])">
-		        						<textbox width="150px"
-		        							value="@bind(fx.listLabel)"
-		        							onChange="@command('applyChanges')" />
-		        					</fieldErrorHandler>
-		        				</row>
-		        				<row>
-		        					<multilanguageLabel
 		        						value="${labels.global.item.description}"
 		        						languageCode="@load(vm.currentLanguageCode)" />
 		        					<fieldErrorHandler
@@ -105,102 +94,24 @@
 		        				</row>
 		        				<row>
 		        					<label
-		        						value="${labels.survey.code_list.lookup_table}:" />
-		        					<fieldErrorHandler
-		        						message="@load(vmsgs['lookupTable'])">
-		        						<textbox width="150px"
-		        							value="@bind(fx.lookupTable)"
-		        							onChange="@command('applyChanges')" />
-		        					</fieldErrorHandler>
-		        				</row>
-		        				<row>
-		        					<label
-		        						value="${labels.global.item.since_version}:" />
-		        					<fieldErrorHandler
-		        						message="@load(vmsgs['sinceVersionId'])">
-		        						<listbox width="200px"
-		        							model="@load(vm.formVersionIdsWithEmptyOption)"
-		        							selectedItem="@bind(fx.sinceVersionId)" mold="select"
-		        							onSelect="@command('applyChanges')">
-		        							<template name="model">
-		        								<listitem
-		        									label="@load(vm.getVersionLabel(each))" />
-		        							</template>
-		        						</listbox>
-		        						<button
-		        							tooltiptext="${labels.survey.versioning_manager}"
-		        							onClick="@global-command('openVersioningManagerPopUp')"
-		        							image="/assets/images/edit-small.png" />
-		        					</fieldErrorHandler>
-		        				</row>
-		        				<row>
-		        					<label
-		        						value="${labels.global.item.deprecated_version}:" />
-		        					<fieldErrorHandler
-		        						message="@load(vmsgs['deprecatedVersionId'])">
-		        						<listbox width="200px"
-		        							model="@load(vm.formVersionIdsWithEmptyOption)"
-		        							selectedItem="@bind(fx.deprecatedVersionId)"
-		        							mold="select" onSelect="@command('applyChanges')">
-		        							<template name="model">
-		        								<listitem
-		        									label="@load(vm.getVersionLabel(each))" />
-		        							</template>
-		        						</listbox>
-		        						<button
-		        							tooltiptext="${labels.survey.versioning_manager}"
-		        							onClick="@global-command('openVersioningManagerPopUp')"
-		        							image="/assets/images/edit-small.png" />
-		        					</fieldErrorHandler>
-		        				</row>
-		        				<row>
-		        					<label
 		        						value="${labels.survey.code_list.type.$}:" />
-                      				<hlayout>
-	  		        					<radiogroup id="typeRG"
-	  		        						selectedItem="@bind(fx.type)"
-	  		        						onCheck="@command('typeChanged', type=self.selectedItem.value)">
-	  		        						<radio
-	  		        							label="${labels.survey.code_list.type.hierarchical}"
-	  		        							value="HIERARCHICAL"
-	  		        							disabled="@load(vm.multipleLevelsPresent)" />
-	  		        						<radio
-	  		        							label="${labels.survey.code_list.type.flat}"
-	  		        							value="FLAT"
-	  		        							disabled="@load(vm.multipleLevelsPresent)" />
-	  		        					</radiogroup>
-	  		        					
-	  		        					<space spacing="20px" />
-	  		        					
-	  		        					<hlayout spacing="40px">
-					                        <button
-					                          label="${labels.global.import_data}"
-					                          visible="@load(empty vm.editedItem.lookupTable)"
-					                          onClick="@command('openCodeListImportPopUp')" />
-					                        <button
-					                          label="${labels.global.export_data}"
-					                          visible="@load(empty vm.editedItem.lookupTable)"
-					                          onClick="@command('exportCodeList')" />
-					                	</hlayout>
-			                      	</hlayout>
-		        				</row>
-		        				<row
-		        					visible="@load(fx.type eq 'HIERARCHICAL')">
-		        					<label
-		        						value="${labels.survey.code_list.codeScope.$}:" />
-		        					<radiogroup
-		        						selectedItem="@bind(fx.codeScope)"
-		        						onCheck="@command('applyChanges')">
-		        						<radio value="LOCAL"
-		        							label="${labels.survey.code_list.codeScope.local}" />
-		        						<radio value="SCHEME"
-		        							label="${labels.survey.code_list.codeScope.scheme}" />
-		        					</radiogroup>
+  		        					<radiogroup id="typeRG"
+  		        						selectedItem="@bind(fx.type)"
+  		        						onCheck="@command('typeChanged', type=self.selectedItem.value)">
+  		        						<radio
+  		        							label="${labels.survey.code_list.type.hierarchical}"
+  		        							value="HIERARCHICAL"
+  		        							disabled="@load(vm.multipleLevelsPresent)" />
+  		        						<radio
+  		        							label="${labels.survey.code_list.type.flat}"
+  		        							value="FLAT"
+  		        							disabled="@load(vm.multipleLevelsPresent)" />
+  		        					</radiogroup>
 		        				</row>
 		        			</rows>
 		        		</grid>
-		        	</center>
-		        	<south height="210px" border="none">
+		        	</north>
+		        	<center border="none">
 		        		<borderlayout>
 		        			<center>
 		        				<hlayout children="@load(vm.listLevels)"
@@ -221,7 +132,7 @@
 		        							</caption>
 		        							<listbox
 		        								model="@load(vm.itemsPerLevel[forEachStatus.index])"
-		        								height="120px"
+		        								height="300px"
 		        								selectedItem="@load(vm.lastSelectedLevelIndex ge forEachStatus.index ? 
 													       vm.selectedItemsPerLevel[forEachStatus.index]: null)"
 		        								onSelect="@command('listItemSelected', item=self.selectedItem.value, levelIndex=forEachStatus.index)">
@@ -288,6 +199,22 @@
 		        				</vlayout>
 		        			</east>
 		        		</borderlayout>
+		        	</center>
+		        	<south>
+       					<box  
+       						align="center" 
+       						width="100%">
+       						<hbox spacing="100px">
+	       						<button
+	       							label="${labels.global.import_data}"
+	       							visible="@load(empty vm.editedItem.lookupTable)"
+	       							onClick="@command('openCodeListImportPopUp')" />
+	       						<button
+	       							label="${labels.global.export_data}"
+	       							visible="@load(empty vm.editedItem.lookupTable)"
+	       							onClick="@command('exportCodeList')" />
+	       					</hbox>
+       					</box>
 		        	</south>
 		        </borderlayout>
 			</center>

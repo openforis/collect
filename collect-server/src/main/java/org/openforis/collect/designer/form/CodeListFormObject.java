@@ -2,9 +2,7 @@ package org.openforis.collect.designer.form;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListLabel;
 import org.openforis.idm.metamodel.CodeListLevel;
 
@@ -15,15 +13,11 @@ import org.openforis.idm.metamodel.CodeListLevel;
  */
 public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 
-	public static final CodeScope DEFAULT_SCOPE = CodeScope.SCHEME;
-	
 	private String name;
-	private String lookupTable;
 	private String itemLabel;
 	private String listLabel;
 	private String description;
 	private String type;
-	private String codeScope;
 	
 	public enum Type {
 		FLAT, HIERARCHICAL;
@@ -37,27 +31,21 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 	public void loadFrom(CodeList source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		name = source.getName();
-		lookupTable = source.getLookupTable();
 		itemLabel = source.getLabel(CodeListLabel.Type.ITEM, languageCode);
 		listLabel = source.getLabel(CodeListLabel.Type.LIST, languageCode);
 		description = source.getDescription(languageCode);
 		List<CodeListLevel> levels = source.getHierarchy();
 		boolean hasMultipleLevels = levels.size() > 1;
 		type = hasMultipleLevels ? Type.HIERARCHICAL.name(): Type.FLAT.name();
-		CodeScope codeScopeEnum = source.getCodeScope();
-		codeScope = codeScopeEnum != null ? codeScopeEnum.name(): DEFAULT_SCOPE.name();
 	}
 	
 	@Override
 	public void saveTo(CodeList dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setName(name);
-		dest.setLookupTable(StringUtils.trimToNull(lookupTable));
 		dest.setLabel(CodeListLabel.Type.ITEM, languageCode, itemLabel);
 		dest.setLabel(CodeListLabel.Type.LIST, languageCode, listLabel);
 		dest.setDescription(languageCode, description);
-		CodeScope scope = StringUtils.isNotBlank(codeScope) ? CodeScope.valueOf(codeScope): DEFAULT_SCOPE;
-		dest.setCodeScope(scope);
 	}
 	
 	public String getName() {
@@ -66,14 +54,6 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getLookupTable() {
-		return lookupTable;
-	}
-
-	public void setLookupTable(String lookupTable) {
-		this.lookupTable = lookupTable;
 	}
 
 	public String getItemLabel() {
@@ -108,13 +88,4 @@ public class CodeListFormObject extends VersionableItemFormObject<CodeList> {
 		this.type = type;
 	}
 
-	public String getCodeScope() {
-		return codeScope;
-	}
-
-	public void setCodeScope(String codeScope) {
-		this.codeScope = codeScope;
-	}
-
-	
 }

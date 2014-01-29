@@ -14,12 +14,10 @@ import org.zkoss.util.resource.Labels;
 public class CodeListFormValidator extends SurveyObjectFormValidator<CodeList> {
 	
 	protected static final String NAME_FIELD = "name";
-	protected static final String LOOKUP_TABLE_FIELD = "lookupTable";
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		validateName(ctx);
-		validateLookupTable(ctx);
 	}
 
 	protected boolean validateName(ValidationContext ctx) {
@@ -30,11 +28,6 @@ public class CodeListFormValidator extends SurveyObjectFormValidator<CodeList> {
 				result = validateNameUniqueness(ctx);
 			}
 		}
-		return result;
-	}
-
-	protected boolean validateLookupTable(ValidationContext ctx) {
-		boolean result = validateInternalName(ctx, LOOKUP_TABLE_FIELD);
 		return result;
 	}
 
