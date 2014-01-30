@@ -3,8 +3,8 @@
  */
 package org.openforis.collect.manager.codelistimport;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -34,14 +34,8 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 	private List<String> languages;
 	private String defaultLanguage;
 	
-	public CodeListCSVReader(String filename, List<String> languages, String defaultLanguage) throws IOException, ParsingException {
-		super(filename);
-		this.languages = languages;
-		this.defaultLanguage = defaultLanguage;
-	}
-
-	public CodeListCSVReader(Reader reader, List<String> languages, String defaultLanguage) throws IOException, ParsingException {
-		super(reader);
+	public CodeListCSVReader(File file, List<String> languages, String defaultLanguage) throws IOException, ParsingException {
+		super(file);
 		this.languages = languages;
 		this.defaultLanguage = defaultLanguage;
 	}

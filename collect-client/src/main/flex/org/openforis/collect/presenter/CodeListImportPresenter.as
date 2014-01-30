@@ -12,6 +12,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.metamodel.proxy.CodeListProxy$CodeScope;
 	import org.openforis.collect.ui.view.CodeListImportView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.NavigationUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -43,6 +45,7 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			view.browseButton.addEventListener(MouseEvent.CLICK, browseButtonClickHandler);
+			view.downloadExampleButton.addEventListener(MouseEvent.CLICK, downloadExampleButtonClickHandler);
 		}
 		
 		override protected function loadInitialData():void {
@@ -95,6 +98,10 @@ package org.openforis.collect.presenter
 		
 		protected function browseButtonClickHandler(event:MouseEvent):void {
 			browseFileToImport();
+		}
+		
+		protected function downloadExampleButtonClickHandler(event:MouseEvent):void {
+			NavigationUtil.openInNewWindow(ApplicationConstants.CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_URL);
 		}
 		
 		protected function validateImportForm():Boolean {

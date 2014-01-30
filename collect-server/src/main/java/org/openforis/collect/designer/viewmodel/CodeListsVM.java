@@ -29,13 +29,13 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.ValidationContext;
@@ -104,7 +104,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Override
 	protected List<CodeList> getItemsInternal() {
 		CollectSurvey survey = getSurvey();
-		List<CodeList> codeLists = survey.getCodeLists();
+		List<CodeList> codeLists = survey.getCodeLists(false);
 		codeLists = sort(codeLists);
 		return codeLists;
 	}

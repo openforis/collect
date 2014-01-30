@@ -1,14 +1,11 @@
 package org.openforis.collect.manager.samplingdesignimport;
 
-import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SamplingDesignManager;
@@ -78,10 +75,6 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	@Override
 	public void startProcessing() throws Exception {
 		super.startProcessing();
-		processFile();
-	}
-
-	protected void processFile() throws IOException {
 		String fileName = file.getName();
 		String extension = FilenameUtils.getExtension(fileName);
 		if ( CSV.equalsIgnoreCase(extension) ) {
@@ -109,16 +102,12 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	}
 
 	protected void parseCSVLines(File file) {
-		InputStreamReader isReader = null;
-		FileInputStream is = null;
 		long currentRowNumber = 0;
 		try {
-			is = new FileInputStream(file);
-			isReader = new InputStreamReader(is);
-			
-			reader = new SamplingDesignCSVReader(isReader);
+			reader = new SamplingDesignCSVReader(file);
 			reader.init();
 			status.addProcessedRow(1);
+			status.setTotal(reader.size());
 			currentRowNumber = 2;
 			while ( status.isRunning() ) {
 				try {
@@ -144,7 +133,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.getMessage()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
-			close(isReader);
+			IOUtils.closeQuietly(reader);
 		}
 	}
 	
@@ -251,14 +240,4 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		return item;
 	}
 
-	private void close(Closeable closeable) {
-		if ( closeable != null ) {
-			try {
-				closeable.close();
-			} catch (IOException e) {
-				LOG.error("Error closing stream: ", e);
-			}
-		}
-	}
-	
 }

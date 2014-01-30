@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
@@ -18,7 +19,8 @@ import org.zkoss.util.resource.Labels;
 public abstract class FormValidator extends BaseValidator {
 
 	protected static final String INVALID_EXPRESSION_MESSAGE_KEY = "survey.validation.error.invalid_expression";
-
+	protected static final String RESERVED_NAME_MESSAGE_KEY = "survey.validation.error.reserved_name";
+	
 	protected boolean blocking;
 	
 	@Override
@@ -85,6 +87,17 @@ public abstract class FormValidator extends BaseValidator {
 		ExpressionValidator expressionValidator = vm.getExpressionValidator();
 		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateSchemaPathExpression(contextNode, expression)) {
 			addInvalidMessage(ctx, fieldName, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	protected boolean validateNameNotReserved(ValidationContext ctx, String nameField, String[] reservedNames) {
+		String name = (String) getValue(ctx, nameField);
+		if ( ArrayUtils.contains(reservedNames, name) ) {
+			String message = Labels.getLabel(RESERVED_NAME_MESSAGE_KEY);
+			addInvalidMessage(ctx, nameField, message);
 			return false;
 		} else {
 			return true;

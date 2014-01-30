@@ -3,8 +3,8 @@
  */
 package org.openforis.collect.manager.samplingdesignimport;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.referencedataimport.CSVDataImportReader;
 import org.openforis.collect.manager.referencedataimport.CSVLineParser;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.commons.io.csv.CsvLine;
 
 /**
@@ -24,12 +24,8 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 
 	public static final SamplingDesignFileColumn[] LEVEL_COLUMNS = {SamplingDesignFileColumn.LEVEL_1, SamplingDesignFileColumn.LEVEL_2, SamplingDesignFileColumn.LEVEL_3};
 
-	public SamplingDesignCSVReader(Reader reader) throws IOException, ParsingException {
-		super(reader);
-	}
-
-	public SamplingDesignCSVReader(String filename) throws IOException, ParsingException {
-		super(filename);
+	public SamplingDesignCSVReader(File file) throws IOException, ParsingException {
+		super(file);
 	}
 
 	@Override

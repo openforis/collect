@@ -14,6 +14,7 @@ import org.zkoss.util.resource.Labels;
 public class CodeListFormValidator extends SurveyObjectFormValidator<CodeList> {
 	
 	protected static final String NAME_FIELD = "name";
+	protected static final String[] RESERVED_NAMES = new String[] {CollectSurvey.SAMPLING_DESIGN_CODE_LIST_NAME};
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
@@ -25,7 +26,10 @@ public class CodeListFormValidator extends SurveyObjectFormValidator<CodeList> {
 		if ( result ) {
 			result = validateInternalName(ctx, NAME_FIELD);
 			if ( result ) {
-				result = validateNameUniqueness(ctx);
+				result = validateNameNotReserved(ctx, NAME_FIELD, RESERVED_NAMES);
+				if ( result ) {
+					result = validateNameUniqueness(ctx);
+				}
 			}
 		}
 		return result;

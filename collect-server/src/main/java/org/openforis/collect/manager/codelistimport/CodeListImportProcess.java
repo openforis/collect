@@ -1,9 +1,7 @@
 package org.openforis.collect.manager.codelistimport;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,6 +10,7 @@ import java.util.Stack;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.CodeListManager;
@@ -20,7 +19,6 @@ import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -127,16 +125,12 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 //	}
 
 	protected void parseCSVLines(File file) {
-		InputStreamReader isReader = null;
-		FileInputStream is = null;
 		long currentRowNumber = 0;
 		try {
-			is = new FileInputStream(file);
-			isReader = OpenForisIOUtils.toReader(is);
 			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 			List<String> languages = survey.getLanguages();
 			String defaultLanguage = survey.getDefaultLanguage();
-			reader = new CodeListCSVReader(isReader, languages, defaultLanguage);
+			reader = new CodeListCSVReader(file, languages, defaultLanguage);
 			reader.init();
 			levels = reader.getLevels();
 			status.addProcessedRow(1);
@@ -172,20 +166,10 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.toString()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
-			closeReader();
+			IOUtils.closeQuietly(reader);
 		}
 	}
 
-	private void closeReader() {
-		try {
-			if ( reader != null ) {
-				reader.close();
-			}
-		} catch (IOException e) {
-			LOG.error("Error closing reader", e);
-		}
-	}
-	
 	protected CodeListItem processLevel(CodeListItem parent, CodeListLine line, int levelIdx, boolean lastLevel) {
 		CodeListItem result;
 		//validate code

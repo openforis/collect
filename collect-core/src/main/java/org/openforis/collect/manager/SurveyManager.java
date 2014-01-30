@@ -564,6 +564,22 @@ public class SurveyManager {
 	public String generateRandomSurveyUri() {
 		return collectSurveyContext.getUriPrefix() + UUID.randomUUID();
 	}
+
+	/**
+	 * Adds the system code list related to the sampling design and persist the changed into the database
+	 */
+	@Transactional
+	public void addSamplingDesignCodeList(CollectSurvey survey) throws SurveyImportException {
+		survey.addSamplingDesignCodeList();
+		if ( survey.getId() != null ) {
+			//persist changes
+			if ( survey.isWork() ) {
+				surveyWorkDao.update(survey);
+			} else {
+				surveyDao.updateModel(survey);
+			}
+		}
+	}
 	
 	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri) {
 		CollectSurvey survey = surveyDao.loadByUri(uri);

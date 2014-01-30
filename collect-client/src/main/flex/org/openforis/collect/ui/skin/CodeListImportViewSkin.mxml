@@ -30,6 +30,13 @@
 			  height="100%" width="100%"
 			  gap="30"
 			  >
+		<s:Label width="80%" styleName="infoMessage" text="{Message.get('codeListImport.introduction')}" />
+		
+		<s:Button id="downloadExampleButton"
+				  label="{Message.get('global.download_example_file')}"
+				  buttonMode="true"
+				  useHandCursor="true"
+				  />
 		
 		<s:Form>
 			<s:FormItem label="{Message.get('referenceDataImport.sourceFile')}">

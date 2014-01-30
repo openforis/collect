@@ -1,5 +1,6 @@
 package org.openforis.collect.manager.referencedataimport;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
@@ -19,10 +20,15 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 	protected CsvLine currentCSVLine;
 	
 	public CSVDataImportReader(String filename) throws IOException, ParsingException {
-		super();
-		csvReader = new CsvReader(filename);
+		this(new File(filename));
 	}
 
+	public CSVDataImportReader(File file) throws IOException, ParsingException {
+		super();
+		csvReader = new CsvReader(file);
+	}
+
+	@Deprecated
 	public CSVDataImportReader(Reader reader) throws IOException, ParsingException {
 		super();
 		csvReader = new CsvReader(reader);
@@ -43,6 +49,15 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 		return csvReader.getLinesRead();
 	}
 	
+	public int size() throws IOException {
+		return csvReader.size();
+	}
+	
+	@Override
+	public void close() throws IOException {
+		csvReader.close();
+	}
+	
 	public T readNextLine() throws ParsingException {
 		try {
 			currentCSVLine = csvReader.readNextLine();
@@ -58,8 +73,4 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 		return csvReader.getColumnNames();
 	}
 
-	public void close() throws IOException {
-		csvReader.close();
-	}
-	
 }

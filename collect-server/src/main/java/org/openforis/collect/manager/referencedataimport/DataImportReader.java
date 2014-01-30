@@ -1,5 +1,8 @@
 package org.openforis.collect.manager.referencedataimport;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 
 /**
  * 
@@ -7,7 +10,7 @@ package org.openforis.collect.manager.referencedataimport;
  *
  * @param <T>
  */
-public abstract class DataImportReader<T extends Line> {
+public abstract class DataImportReader<T extends Line> implements Closeable {
 	
 	protected T currentLine;
 	
@@ -22,6 +25,9 @@ public abstract class DataImportReader<T extends Line> {
 	public abstract T readNextLine() throws ParsingException;
 
 	public abstract long getLinesRead();
+
+	@Override
+	public abstract void close() throws IOException;
 	
 	protected T parseCurrentLine() throws ParsingException {
 		if ( isReady() ) {
