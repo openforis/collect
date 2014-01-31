@@ -612,6 +612,11 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		return selectedItemsPerLevel.contains(item);
 	}
 	
+	public boolean hasChildItems(CodeListItem item) {
+		boolean result = codeListManager.hasChildItems(item);
+		return result;
+	}
+	
 	public String getCodeListItemLabel(CodeListItem item) {
 		String label = item.getLabel(currentLanguageCode);
 		return label;

@@ -153,8 +153,8 @@
 		        										</listcell>
 		        										<listcell
 		        											style="padding: 0px">
-		        											<image visible="@load(each.hasChildItems())"
-		        												src="@load(each.hasChildItems() ? 
+		        											<image visible="@load(vm.hasChildItems(each))"
+		        												src="@load(vm.hasChildItems(each) ? 
 																			(vm.isCodeListItemSelected(each) ? 
 																				'/assets/images/arrow-right-selected-small.png': 
 																				'/assets/images/arrow-right-small.png'
