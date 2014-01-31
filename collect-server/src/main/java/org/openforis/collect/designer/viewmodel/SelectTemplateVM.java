@@ -12,6 +12,8 @@ import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
@@ -27,6 +29,8 @@ import org.zkoss.zul.ListModelList;
  *
  */
 public class SelectTemplateVM extends BaseVM {
+
+	private static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
 
 	private enum TemplateType {
 		//BIOPHYSICAL, 
@@ -73,6 +77,12 @@ public class SelectTemplateVM extends BaseVM {
 			if ( templateCode.equals(TemplateType.BLANK.name())) {
 				//create empty survey
 				survey = surveyManager.createSurveyWork();
+				//add default root entity
+				Schema schema = survey.getSchema();
+				EntityDefinition rootEntity = schema.createEntityDefinition();
+				rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
+				schema.addRootEntityDefinition(rootEntity);
+				survey.getUIOptions().createRootTabSet((EntityDefinition) rootEntity);
 			} else {
 				//create survey from template
 				String templateFileName = "/org/openforis/collect/designer/templates/" + templateCode.toLowerCase() + ".idm.xml";

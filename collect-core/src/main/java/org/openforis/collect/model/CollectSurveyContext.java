@@ -21,9 +21,9 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  */
 public class CollectSurveyContext implements SurveyContext, Serializable {
 
-	private static final String DEFAULT_URI_PREFIX = "http://www.openforis.org/idm/";
-
 	private static final long serialVersionUID = 1L;
+	
+	private static final String DEFAULT_URI_PREFIX = "http://www.openforis.org/idm/";
 	
 	private transient ExpressionFactory expressionFactory;
 	private transient Validator validator;
@@ -41,10 +41,12 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	@Override
 	public Survey createSurvey() {
 		CollectSurvey survey = new CollectSurvey(this);
-		UIOptions uiOptions = survey.createUIOptions();
-		survey.addApplicationOptions(uiOptions);
+		//set URI
 		UUID uuid = UUID.randomUUID();
 		survey.setUri(uriPrefix + uuid.toString());
+		//application options
+		UIOptions uiOptions = survey.createUIOptions();
+		survey.addApplicationOptions(uiOptions);
 		return survey;
 	}
 

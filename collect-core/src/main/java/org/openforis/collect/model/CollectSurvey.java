@@ -23,9 +23,9 @@ import org.openforis.idm.metamodel.SurveyContext;
  */
 public class CollectSurvey extends Survey {
 
-	public static final String SAMPLING_DESIGN_CODE_LIST_NAME = "sampling_design";
-
 	private static final long serialVersionUID = 1L;
+	
+	public static final String SAMPLING_DESIGN_CODE_LIST_NAME = "sampling_design";
 	
 	private boolean work;
 	
