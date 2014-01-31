@@ -19,7 +19,7 @@ package org.openforis.collect.util {
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
 		
 		private static const SPECIES_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
-		private static const SPECIES_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "/species/import/example.htm";
+		private static const SPECIES_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "species/import/example.htm";
 		private static const _SPECIES_EXPORT_URL:String = "species/export/{0}";
 		
 		private static const _SAMPLING_DESIGN_EXPORT_URL:String = "samplingdesign/export/{0}";
@@ -115,11 +115,11 @@ package org.openforis.collect.util {
 			return _CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_URL;
 		}
 		
-		public static function get SAMPLING_DESIGN_IMPORT_DOWNLOAD_EXAMPLE_URL():String {
+		public static function get SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_URL():String {
 			return _SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_URL;
 		}
 		
-		public static function get SPECIES_IMPORT_EXAMPLE_URL():String {
+		public static function get SPECIES_IMPORT_EXAMPLE_DOWNLOAD_URL():String {
 			return _SPECIES_IMPORT_EXAMPLE_DOWNLOAD_URL;
 		}
 		

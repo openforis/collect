@@ -18,10 +18,14 @@
 			import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 			import org.openforis.collect.presenter.SamplingDesignImportPresenter;
 			
+			import spark.components.Button;
 			import spark.components.gridClasses.GridColumn;
 			
 			private var _presenter:SamplingDesignImportPresenter;
 			private var _spatialReferenceSystems:IList;
+			
+			[SkinPart(required="true", type="spark.components.Button")]
+			public var downloadExampleButton:Button;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new SamplingDesignImportPresenter(this);

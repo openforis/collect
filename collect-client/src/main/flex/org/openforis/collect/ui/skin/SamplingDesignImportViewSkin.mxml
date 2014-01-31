@@ -78,7 +78,7 @@
 									/>
 		</s:VGroup>
 		
-		<s:HGroup gap="50">
+		<s:HGroup gap="100">
 			<s:HGroup gap="10">
 				<s:Button id="importButton" 
 						  label="{Message.get('referenceDataImport.import')}"
@@ -86,7 +86,7 @@
 						  buttonMode="true"
 						  />
 				<s:Image id="importFileFormatInfoIcon"
-						 source="{Images.INFO}"
+						 source="{Images.INFO_SMALL}"
 						useHandCursor="true"
 						toolTip="{Message.get('referenceDataImport.importFileFormatIconToolTip')}"
 						click="{AlertUtil.showMessage(hostComponent.importFileFormatInfo)}"
@@ -94,6 +94,11 @@
 						 verticalCenter="0"
 						 />
 			</s:HGroup>
+			<s:Button id="downloadExampleButton"
+					  label="{Message.get('global.download_example_file')}"
+					  buttonMode="true"
+					  useHandCursor="true"
+					  />
 			<s:Button id="exportButton" 
 					  label="{Message.get('referenceDataImport.export')}"
 					  useHandCursor="true"

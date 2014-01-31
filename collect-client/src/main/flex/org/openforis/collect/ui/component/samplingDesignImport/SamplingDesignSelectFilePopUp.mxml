@@ -3,7 +3,7 @@
 				 xmlns:s="library://ns.adobe.com/flex/spark" 
 				 xmlns:mx="library://ns.adobe.com/flex/mx" 
 				 xmlns:component="org.openforis.collect.ui.component.*" 
-				 title="{Message.get('speciesImport.checklist')}" 
+				 title="{Message.get('samplingDesignImport.importPopUpTitle')}" 
 				 height="150" width="250"
 				>	
 	<fx:Script>

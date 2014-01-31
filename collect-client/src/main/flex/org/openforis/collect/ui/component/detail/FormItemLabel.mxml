@@ -90,7 +90,7 @@
 			 includeInLayout="{_description != null}"
 			 >
 		<s:Image id="descriptionIcon"
-				 source="{Images.INFO}"
+				 source="{Images.INFO_VERY_SMALL}"
 				 toolTip="{_description}"
 				 horizontalCenter="0"
 				 verticalCenter="0"

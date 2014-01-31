@@ -35,8 +35,14 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/magnifier.png")]
 		public static const MAGNIFIER:Class;
 		
-		[Embed("/assets/images/info.png")]
+		[Embed("/assets/images/info-24x24.png")]
 		public static const INFO:Class;
+		
+		[Embed("/assets/images/info-16x16.png")]
+		public static const INFO_SMALL:Class;
+
+		[Embed("/assets/images/info-11x11.png")]
+		public static const INFO_VERY_SMALL:Class;
 
 		[Embed("/assets/images/help_48x48.png")]
 		public static const HELP:Class;

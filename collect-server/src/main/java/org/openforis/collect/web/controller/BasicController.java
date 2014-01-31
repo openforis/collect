@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.activation.FileTypeMap;
 import javax.activation.MimetypesFileTypeMap;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.web.session.SessionState;
 
 /**
@@ -30,17 +32,22 @@ public abstract class BasicController {
 	}
 	
 	protected void writeFileToResponse(HttpServletResponse response, File file) throws IOException {
-		FileInputStream is = null;
+		writeFileToResponse(new FileInputStream(file), file.getName(), Long.valueOf(file.length()).intValue(), response);
+	}
+	
+	protected void writeFileToResponse(HttpServletResponse response, File file, String outputFileName) throws IOException {
+		writeFileToResponse(new FileInputStream(file), outputFileName, Long.valueOf(file.length()).intValue(), response);	
+	}
+	
+	protected void writeFileToResponse(InputStream is, String outputFileName, int fileSize, HttpServletResponse response) throws IOException {
 		BufferedInputStream buf = null;
 		try {
-			String name = file.getName();
 			FileTypeMap defaultFileTypeMap = MimetypesFileTypeMap.getDefaultFileTypeMap();
-			String contentType = defaultFileTypeMap.getContentType(name);
+			String contentType = defaultFileTypeMap.getContentType(outputFileName);
 			response.setContentType(contentType); 
-			response.setContentLength(new Long(file.length()).intValue());
-			response.setHeader("Content-Disposition", "attachment; filename=" + name);
+			response.setContentLength(fileSize);
+			response.setHeader("Content-Disposition", "attachment; filename=" + outputFileName);
 			ServletOutputStream outputStream = response.getOutputStream();
-			is = new FileInputStream(file);
 			buf = new BufferedInputStream(is);
 			int readBytes = 0;
 			//read from the file; write to the ServletOutputStream
@@ -50,12 +57,8 @@ public abstract class BasicController {
 		} catch (IOException e) {
 			throw e;
 		} finally {
-			if ( buf != null) {
-				buf.close();
-			}
-			if ( is != null ) {
-				is.close();
-			}
+			IOUtils.closeQuietly(buf);
+			IOUtils.closeQuietly(is);
 		}
 	}
 	

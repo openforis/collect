@@ -9,6 +9,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.CodeListImportClient;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.CodeListProxy$CodeScope;
 	import org.openforis.collect.ui.view.CodeListImportView;
 	import org.openforis.collect.util.AlertUtil;
@@ -32,6 +33,8 @@ package org.openforis.collect.presenter
 			_codeListImportClient = ClientFactory.codeListImportClient;
 
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			
+			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		
 		private function get view():CodeListImportView {
@@ -134,4 +137,7 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 		return "codeListImport.title";
 	}
 	
+	public function get IMPORT_FILE_FORMAT_INFO():String {
+		return "codeListImport.importFileFormatInfo";
+	}
 }
