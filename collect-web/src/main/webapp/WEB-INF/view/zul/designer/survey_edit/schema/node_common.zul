@@ -199,7 +199,7 @@
       </groupbox>
     </groupbox>
 
-    <groupbox width="100%" closable="false">
+    <groupbox width="100%" closable="false" visible="${not vm.rootEntity}">
       <caption label="${labels.survey.schema.node.versioning}"/>
     	<grid class="inner">
     		<columns>
@@ -242,34 +242,37 @@
     		</rows>
     	</grid>
    </groupbox>
-   <groupbox width="100%" 
-   		closable="false"
-   		visible="@load(not vm.rootEntity)">
-    <caption label="${labels.survey.schema.node.layout.$}"/>
-    <vlayout width="100%">
-      <grid class="inner">
-        <columns>
-          <column width="150px" />
-          <column />
-        </columns>
-        <rows>
-          <row>
-            <label value="${labels.survey.schema.node.layout.tab}:" />
-            <fieldErrorHandler message="@load(vmsgs['tab'])">
-                <listbox width="150px" model="@load(vm.assignableTabNames)"
-                  selectedItem="@bind(fx.tabName)" mold="select"
-                  onSelect="@command('applyChanges')">
-                <template name="model">
-                  <listitem label="@load(vm.getTabLabel(each))" />
-                </template>
-              </listbox>
-            </fieldErrorHandler>
-          </row>
-        </rows>
-      </grid>
-      
-      <include src="${arg.otherLayoutForm}" />
-      
-    </vlayout>
-   </groupbox>
+
+    <groupbox width="100%" closable="false" visible="@load(not vm.rootEntity)">
+    	<caption label="${labels.survey.schema.node.layout.$}" />
+    	<vlayout width="100%">
+    		<grid class="inner">
+    			<columns>
+    				<column width="150px" />
+    				<column />
+    			</columns>
+    			<rows>
+    				<row>
+    					<label
+    						value="${labels.survey.schema.node.layout.tab}:" />
+    					<fieldErrorHandler
+    						message="@load(vmsgs['tab'])">
+    						<listbox width="150px"
+    							model="@load(vm.assignableTabNames)"
+    							selectedItem="@bind(fx.tabName)" mold="select"
+    							onSelect="@command('applyChanges')">
+    							<template name="model">
+    								<listitem
+    									label="@load(vm.getTabLabel(each))" />
+    							</template>
+    						</listbox>
+    					</fieldErrorHandler>
+    				</row>
+    			</rows>
+    		</grid>
+
+    		<include src="${arg.otherLayoutForm}" />
+
+    	</vlayout>
+    </groupbox>
 </zk>
