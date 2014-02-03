@@ -9,6 +9,7 @@ package org.openforis.collect.presenter
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SamplingDesignClient;
 	import org.openforis.collect.client.SamplingDesignImportClient;
@@ -37,6 +38,11 @@ package org.openforis.collect.presenter
 			_samplingDesignImportClient = ClientFactory.samplingDesignImportClient;
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
 			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
+			view.spatialReferenceSystems = Application.activeSurvey.spatialReferenceSystems;
+		}
+		
+		override internal function initEventListeners():void {
+			super.initEventListeners();
 			view.downloadExampleButton.addEventListener(MouseEvent.CLICK, downloadExampleButtonClickHandler);
 		}
 		

@@ -11,6 +11,8 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.util.AlertUtil;
+			import org.openforis.collect.util.ArrayUtil;
+			import org.openforis.collect.util.StringUtil;
 		]]>
 	</fx:Script>
 	
@@ -77,6 +79,8 @@
 									horizontalCenter="0"
 									/>
 		</s:VGroup>
+		
+		<s:Label text="{Message.get('samplingDesignImport.definedSrsIds', [hostComponent.spatialReferenceSystemIds])}" />
 		
 		<s:HGroup gap="100">
 			<s:HGroup gap="10">

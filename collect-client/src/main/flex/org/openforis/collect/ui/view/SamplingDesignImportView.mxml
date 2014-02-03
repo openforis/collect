@@ -17,6 +17,8 @@
 			import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
 			import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 			import org.openforis.collect.presenter.SamplingDesignImportPresenter;
+			import org.openforis.collect.util.ArrayUtil;
+			import org.openforis.collect.util.StringUtil;
 			
 			import spark.components.Button;
 			import spark.components.gridClasses.GridColumn;
@@ -53,13 +55,20 @@
 				return item.srsId;
 			}
 			
-			[Bindable]
+			[Bindable("spatialReferenceSystemsChange")]
 			public function get spatialReferenceSystems():IList {
 				return _spatialReferenceSystems;
 			}
 			
 			public function set spatialReferenceSystems(value:IList):void {
 				_spatialReferenceSystems = value;
+				dispatchEvent(new Event("spatialReferenceSystemsChange"));
+			}
+			
+			[Bindable("spatialReferenceSystemsChange")]
+			public function get spatialReferenceSystemIds():String {
+				var result:String = StringUtil.concat(', ', ArrayUtil.getProjection(spatialReferenceSystems, 'id'));
+				return result;
 			}
 			
 		]]>
