@@ -38,7 +38,7 @@
 
   <listbox id="surveysListbox" 
     rows="8"
-    width="500px" 
+    width="530px" 
     model="@load(vm.surveySummaries)"
     selectedItem="@bind(vm.selectedSurvey)">
     <listhead>

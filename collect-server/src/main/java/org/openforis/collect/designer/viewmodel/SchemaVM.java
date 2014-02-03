@@ -89,8 +89,15 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@AfterCompose
 	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
-		 Selectors.wireComponents(view, this, false);
-		 Selectors.wireEventListeners(view, this);
+		Selectors.wireComponents(view, this, false);
+		Selectors.wireEventListeners(view, this);
+		 
+		//if one root entity is defined, select it
+		List<EntityDefinition> rootEntities = getRootEntities();
+		if (rootEntities.size() == 1) {
+			EntityDefinition mainRootEntity = rootEntities.get(0);
+			performNodeTreeFilterChange(mainRootEntity, null);
+		}
 	}
 	
 	@Command
@@ -129,12 +136,7 @@ public class SchemaVM extends SurveyBaseVM {
 		checkCanLeaveForm(new CanLeaveFormCompleteConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
-				selectedRootEntity = rootEntity;
-				selectedVersion = version;
-				resetEditingStatus();
-				updateTreeModel();
-				dispatchCurrentFormValidatedCommand(true, isCurrentFormBlocking());
-				notifyChange("selectedTreeNode","selectedRootEntity","selectedVersion");
+				performNodeTreeFilterChange(rootEntity, version);
 			}
 			@Override
 			public void onCancel() {
@@ -143,6 +145,15 @@ public class SchemaVM extends SurveyBaseVM {
 		});
 	}
 
+	private void performNodeTreeFilterChange(EntityDefinition rootEntity, ModelVersion version) {
+		selectedRootEntity = rootEntity;
+		selectedVersion = version;
+		resetEditingStatus();
+		updateTreeModel();
+		dispatchCurrentFormValidatedCommand(true, isCurrentFormBlocking());
+		notifyChange("selectedTreeNode","selectedRootEntity","selectedVersion");
+	}
+	
 	protected void performSelectNode(Binder binder, SchemaTreeNodeData data) {
 		selectedTreeNode = data;
 		treeModel.select(data);

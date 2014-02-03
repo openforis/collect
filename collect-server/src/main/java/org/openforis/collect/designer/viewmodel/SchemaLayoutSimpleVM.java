@@ -16,13 +16,17 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
@@ -47,6 +51,16 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 		super.init();
 	}
 	
+	@AfterCompose
+	public void afterCompose(@ContextParam(ContextType.VIEW) Component view){
+		//if one root entity is defined, select it
+		List<EntityDefinition> rootEntities = getRootEntities();
+		if (rootEntities.size() == 1) {
+			EntityDefinition mainRootEntity = rootEntities.get(0);
+			performNodeTreeFilterChange(mainRootEntity, null);
+		}
+	}
+	
 	@GlobalCommand
 	@NotifyChange({"rootEntities","treeModel"})
 	public void schemaChanged() {
@@ -65,17 +79,20 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	@NotifyChange({"selectedRootEntity","treeModel"})
 	public void rootEntitySelected(@BindingParam("rootEntity") EntityDefinition rootEntity) {
-		selectedRootEntity = rootEntity;
-		initTreeModel();
+		performNodeTreeFilterChange(rootEntity, selectedVersion);
 	}
 	
 	@Command
-	@NotifyChange({"selectedVersion","treeModel"})
 	public void versionSelected(@BindingParam("version") ModelVersion version) {
+		performNodeTreeFilterChange(selectedRootEntity, version);
+	}
+	
+	private void performNodeTreeFilterChange(EntityDefinition rootEntity, ModelVersion version) {
+		selectedRootEntity = rootEntity;
 		selectedVersion = version;
 		initTreeModel();
+		notifyChange("selectedRootEntity", "selectedVersion", "treeModel");
 	}
 	
 	@Override
