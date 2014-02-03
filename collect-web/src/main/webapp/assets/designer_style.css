@@ -86,6 +86,9 @@ button.icon {
 .alertMessage {
 	color: red;
 }
+.tipMessage {
+	font-style: italic;
+}
 /* END OF MESSAGES STYLE */
 
 /* START OF GROUPBOX STYLE */

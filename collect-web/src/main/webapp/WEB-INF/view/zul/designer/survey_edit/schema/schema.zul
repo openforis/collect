@@ -36,14 +36,20 @@
             </tree>
           </center>
           <south>
-            <toolbar width="100%" height="26px">
-              <toolbarbutton image="/assets/images/arrow-up.png"
-                disabled="@load(vm.moveNodeUpDisabled)"
-                onClick="@command('moveNodeUp')" />
-              <toolbarbutton image="/assets/images/arrow-down.png"
-                disabled="@load(vm.moveNodeDownDisabled)"
-                onClick="@command('moveNodeDown')" />
-            </toolbar>
+          	<vlayout>
+          		<label value="${labels.survey.schema.right_click_tip}" sclass="tipMessage" />
+          		
+	            <toolbar width="100%" height="26px">
+	              <toolbarbutton image="/assets/images/arrow-up.png"
+	              	tooltiptext="${labels.global.item.move_up}"
+	                disabled="@load(vm.moveNodeUpDisabled)"
+	                onClick="@command('moveNodeUp')" />
+	              <toolbarbutton image="/assets/images/arrow-down.png"
+	              	tooltiptext="${labels.global.item.move_down}"
+	                disabled="@load(vm.moveNodeDownDisabled)"
+	                onClick="@command('moveNodeDown')" />
+	            </toolbar>
+          	</vlayout>
           </south>
         </borderlayout>
       </west>
