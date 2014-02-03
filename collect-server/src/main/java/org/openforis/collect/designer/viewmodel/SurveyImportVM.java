@@ -269,7 +269,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			surveyName = getFormSurveyName();
 			updatingPublishedSurvey = false;
 			if ( StringUtils.isEmpty(surveyName) ) {
-				surveyName = FilenameUtils.removeExtension(uploadedFileName);
+				surveyName = suggestSurveyName(uploadedFileName);
 			}
 		} else {
 			updatingExistingSurvey = true;
@@ -326,6 +326,18 @@ public class SurveyImportVM extends SurveyBaseVM {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("successfullyImported", successfullyImported);
 		BindUtils.postGlobalCommand(null, null, SurveySelectVM.CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD, args);
+	}
+	
+	private String suggestSurveyName(String fileName) {
+		//remove extension
+		String result = FilenameUtils.removeExtension(fileName);
+		//make it all lowercase
+		result = result.toLowerCase();
+		//replace invalid characters with underscore character (_)
+		result = result.replaceAll("[^0-9a-z_]", "_");
+		//remove trailing underscore character
+		result = result.replaceAll("^_+", "");
+		return result;
 	}
 	
 	public boolean isUpdatingPublishedSurvey() {
