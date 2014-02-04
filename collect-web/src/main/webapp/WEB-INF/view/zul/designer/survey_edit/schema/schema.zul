@@ -22,14 +22,21 @@
                 <treeitem draggable="false"
                   context="@load(each.data.detached eq true ? 
                       detachedNodePopup
-                      : vm.isEntity(each.data.nodeDefinition) ?
-                        (vm.isTableEntity(each.data.nodeDefinition) ?
-                         tableEntityPopup
-                         : entityPopup)
-                       : attributePopup)">
+                      : (
+                      	vm.isTab(each.data) ?
+	                      	tabPopup
+	                      	: vm.isEntity(each.data) ?
+		                        (
+		                        vm.isTableEntity(each.data) ?
+									tableEntityPopup
+		                        : entityPopup
+		                        )
+		                       : attributePopup
+                       )
+                    )">
                   <treerow>
-                    <treecell label="@load(each.data.name)"
-                        image="${vm.getIcon(each.data.nodeDefinition)}" />
+                    <treecell label="@load(each.data.label)"
+                        image="@load(each.data.icon)" />
                   </treerow>
                 </treeitem>
               </template>
@@ -144,6 +151,10 @@
     <menupopup id="attributePopup">
       <menuitem label="${labels.survey.schema.remove_node}"
         onClick="@command('removeNode')" />
+    </menupopup>
+    <menupopup id="tabPopup">
+      <menuitem label="REMOVE TAB"
+        onClick="@command('removeTab')" />
     </menupopup>
     <menupopup id="detachedNodePopup">
       <menuitem label="${labels.survey.schema.remove_node}"

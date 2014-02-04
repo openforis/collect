@@ -24,7 +24,7 @@ public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {
 
 	public static UITabsTreeModel createInstance(UITabSet tabSet) {
 		List<UITab> tabs = tabSet.getTabs();
-		List<AbstractTreeNode<UITabSet>> treeNodes = UITabSetTreeNode.fromList(tabs);
+		List<AbstractNode<UITabSet>> treeNodes = UITabSetTreeNode.fromList(tabs);
 		UITabSetTreeNode root = new UITabSetTreeNode(null, treeNodes);
 		UITabsTreeModel result = new UITabsTreeModel(root);
 		result.openAllItems();
@@ -32,7 +32,7 @@ public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {
 	}
 
 	@Override
-	protected AbstractTreeNode<UITabSet> createNode(
+	protected AbstractNode<UITabSet> createNode(
 			UITabSet data, boolean defineEmptyChildrenForLeaves) {
 		UITabSetTreeNode result = UITabSetTreeNode.createNode(data, defineEmptyChildrenForLeaves);
 		return result;
@@ -53,7 +53,7 @@ public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {
 		return toArray(result);
 	}
 
-	static class UITabSetTreeNode extends AbstractTreeNode<UITabSet> {
+	static class UITabSetTreeNode extends AbstractNode<UITabSet> {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -61,17 +61,17 @@ public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {
 			super(data);
 		}
 		
-		UITabSetTreeNode(UITabSet data, Collection<AbstractTreeNode<UITabSet>> children) {
+		UITabSetTreeNode(UITabSet data, Collection<AbstractNode<UITabSet>> children) {
 			super(data, children);
 		}
 		
 		static UITabSetTreeNode createNode(UITabSet item, boolean defineEmptyChildrenForLeaves) {
 			UITabSetTreeNode node = null;
 			List<UITab> childItems = item.getTabs();
-			List<AbstractTreeNode<UITabSet>> childNodes = fromList(childItems);
+			List<AbstractNode<UITabSet>> childNodes = fromList(childItems);
 			if ( childNodes == null || childNodes.isEmpty() ) {
 				if ( defineEmptyChildrenForLeaves ) {
-					node = new UITabSetTreeNode(item, new ArrayList<AbstractTreeModel.AbstractTreeNode<UITabSet>>());
+					node = new UITabSetTreeNode(item, new ArrayList<AbstractTreeModel.AbstractNode<UITabSet>>());
 				} else {
 					node = new UITabSetTreeNode(item);
 				}
@@ -81,10 +81,10 @@ public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {
 			return node;
 		}
 		
-		static List<AbstractTreeNode<UITabSet>> fromList(List<? extends UITabSet> items) {
-			List<AbstractTreeNode<UITabSet>> result = null;
+		static List<AbstractNode<UITabSet>> fromList(List<? extends UITabSet> items) {
+			List<AbstractNode<UITabSet>> result = null;
 			if ( items != null ) {
-				result = new ArrayList<AbstractTreeNode<UITabSet>>();
+				result = new ArrayList<AbstractNode<UITabSet>>();
 				for (UITabSet item : items) {
 					UITabSetTreeNode node = createNode(item, false);
 					if ( node != null ) {

@@ -9,8 +9,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.designer.component.AbstractTreeModel.NodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel;
-import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNodeData;
+import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
+import org.openforis.collect.designer.component.SchemaTreeModel.TabNodeData;
 import org.openforis.collect.designer.composer.SurveySchemaEditComposer;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
@@ -56,7 +58,6 @@ import org.zkoss.zul.Include;
 public class SchemaVM extends SurveyBaseVM {
 
 	private static final boolean FILTER_BY_ROOT_ENTITY = true;
-	private static final boolean INCLUDE_ROOT_ENTITY_IN_TREE = true;
 	private static final String NODE_TYPES_IMAGES_PATH = "/assets/images/node_types/";
 
 	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
@@ -67,7 +68,7 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY = "survey.schema.confirm_remove_non_empty_entity";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
 
-	private SchemaTreeNodeData selectedTreeNode;
+	private SchemaNodeData selectedTreeNode;
 	private NodeDefinition editedNode;
 	private boolean newNode;
 
@@ -101,7 +102,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void nodeSelected(@ContextParam(ContextType.BINDER) final Binder binder, @BindingParam("data") final SchemaTreeNodeData data) {
+	public void nodeSelected(@ContextParam(ContextType.BINDER) final Binder binder, @BindingParam("data") final SchemaNodeData data) {
 		if ( data != null ) {
 			checkCanLeaveForm(new CanLeaveFormCompleteConfirmHandler() {
 				@Override
@@ -154,7 +155,7 @@ public class SchemaVM extends SurveyBaseVM {
 		notifyChange("selectedTreeNode","selectedRootEntity","selectedVersion");
 	}
 	
-	protected void performSelectNode(Binder binder, SchemaTreeNodeData data) {
+	protected void performSelectNode(Binder binder, SchemaNodeData data) {
 		selectedTreeNode = data;
 		treeModel.select(data);
 		NodeDefinition nodeDefn = data.getNodeDefinition();
@@ -168,12 +169,12 @@ public class SchemaVM extends SurveyBaseVM {
 			@Override
 			public void onOk(boolean confirmed) {
 				resetNodeSelection();
-				EntityDefinition newNode = createRootEntityDefinition();
-				selectedRootEntity = newNode;
+				EntityDefinition rootEntity = createRootEntityDefinition();
+				selectedRootEntity = rootEntity;
 				selectedVersion = null;
-				editNode(binder, true, null, newNode);
+				editNode(binder, true, null, rootEntity);
 				updateTreeModel();
-				selectTreeNode(newNode);
+				selectTreeNode(rootEntity);
 				treeModel.markSelectedNodeAsDetached();
 				notifyChange("selectedRootEntity","selectedVersion");
 			}
@@ -368,7 +369,7 @@ public class SchemaVM extends SurveyBaseVM {
 		removeNode(selectedTreeNode);
 	}
 
-	public void removeNode(final SchemaTreeNodeData data) {
+	public void removeNode(final SchemaNodeData data) {
 		if ( data.isDetached() ) {
 			performRemoveDetachedNode();
 		} else {
@@ -525,7 +526,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( survey == null ) {
 			//TODO session expired...?
 		} else {
-			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, INCLUDE_ROOT_ENTITY_IN_TREE, true);
+			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, true);
 		}
 	}
 
@@ -538,20 +539,26 @@ public class SchemaVM extends SurveyBaseVM {
 		notifyChange("treeModel");
 	}
 	
-	public boolean isEntity(NodeDefinition nodeDefn) {
-		return nodeDefn instanceof EntityDefinition;
+	public boolean isTab(NodeData data) {
+		return data instanceof TabNodeData;
 	}
 	
-	public boolean isTableEntity(NodeDefinition nodeDefn) {
-		UIOptions uiOptions = survey.getUIOptions();
-		if ( nodeDefn instanceof EntityDefinition ) {
-			Layout layout = uiOptions.getLayout((EntityDefinition) nodeDefn);
+	public boolean isEntity(NodeData data) {
+		return data instanceof SchemaNodeData && ((SchemaNodeData) data).getNodeDefinition() instanceof EntityDefinition;
+	}
+	
+	public boolean isTableEntity(NodeData data) {
+		if ( isEntity(data) ) {
+			UIOptions uiOptions = survey.getUIOptions();
+			EntityDefinition entityDefn = (EntityDefinition) ((SchemaNodeData) data).getNodeDefinition();
+			Layout layout = uiOptions.getLayout(entityDefn);
 			return layout == Layout.TABLE;
+		} else {
+			return false;
 		}
-		return  false;
 	}
 	
-	protected List<NodeDefinition> getSiblingsInTree(SchemaTreeNodeData data) {
+	protected List<NodeDefinition> getSiblingsInTree(SchemaNodeData data) {
 		NodeDefinition nodeDefn = data.getNodeDefinition();
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
@@ -668,30 +675,39 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	public String getIcon(NodeDefinition nodeDefn) {
 		if ( nodeDefn instanceof EntityDefinition ) {
-			return getNodeTypeIcon(NodeType.ENTITY.name());
+			return getEntityIcon((EntityDefinition) nodeDefn);
 		} else {
 			AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) nodeDefn);
 			return getAttributeIcon(attributeType.name());
 		}
 	}
 	
-	public String getNodeTypeIcon(String type) {
-		NodeType nodeType = NodeType.valueOf(type);
-		switch (nodeType) {
-		case ENTITY:
-			return NODE_TYPES_IMAGES_PATH + "entity-small.png";
-		default:
-			return null;
+	protected String getEntityIcon(EntityDefinition entityDefn) {
+		UIOptions uiOptions = survey.getUIOptions();
+		Layout layout = uiOptions.getLayout(entityDefn);
+		String icon;
+		if ( entityDefn.isMultiple() ) {
+			switch ( layout ) {
+			case TABLE:
+				icon = "table-small.png";
+				break;
+			case FORM:
+			default:
+				icon = "form-small.png";
+			}
+		} else {
+			icon = "entity-small.png";
 		}
+		return NODE_TYPES_IMAGES_PATH + icon;
 	}
-		
+
 	public String getAttributeIcon(String type) {
 		AttributeType attributeType = AttributeType.valueOf(type);
 		String result = NODE_TYPES_IMAGES_PATH + attributeType.name().toLowerCase() + "-small.png";
 		return result;
 	}
 	
-	public SchemaTreeNodeData getSelectedTreeNode() {
+	public SchemaNodeData getSelectedTreeNode() {
 		return selectedTreeNode;
 	}
 	

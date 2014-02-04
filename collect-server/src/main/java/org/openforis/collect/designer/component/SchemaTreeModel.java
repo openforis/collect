@@ -1,13 +1,15 @@
 package org.openforis.collect.designer.component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -22,7 +24,7 @@ import org.zkoss.zul.TreeNode;
  * @author S. Ricci
  *
  */
-public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTreeNodeData> {
+public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeData> {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -31,28 +33,24 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 	private boolean singleRootEntity;
 	private boolean includeAttributes;
 
-	SchemaTreeModel(SchemaTreeNode root, ModelVersion version, boolean singleRootEntity, boolean includeAttributes) {
+	SchemaTreeModel(AbstractTreeModel.AbstractNode<NodeData> root, ModelVersion version, boolean singleRootEntity, boolean includeAttributes) {
 		super(root);
 		this.singleRootEntity = singleRootEntity;
 		this.includeAttributes = includeAttributes;
 		this.version = version;
 	}
 	
-	public static SchemaTreeModel createInstance(CollectSurvey survey, boolean includeAttributes) {
-		return createInstance(survey, (ModelVersion) null, includeAttributes);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, boolean includeRootEntity, boolean includeAttributes) {
+	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, boolean includeAttributes) {
 		if ( rootEntity != null && (version == null || version.isApplicable(rootEntity)) ) {
-			List<AbstractTreeNode<SchemaTreeNodeData>> firstLevelTreeNodes;
-			if ( includeRootEntity ) {
-				AbstractTreeNode<SchemaTreeNodeData> rootEntityNode = SchemaTreeNode.createNode(rootEntity, version, includeAttributes, false);
-				firstLevelTreeNodes = Arrays.asList(rootEntityNode);
-			} else {
-				firstLevelTreeNodes = SchemaTreeNode.fromList(rootEntity.getChildDefinitions(), version, includeAttributes);
+			List<TabTreeNode> firstLevelTreeNodes = new ArrayList<TabTreeNode>();
+			CollectSurvey survey = (CollectSurvey) rootEntity.getSurvey();
+			UIOptions uiOptions = survey.getUIOptions();
+			UITabSet tabSet = uiOptions.getAssignedRootTabSet(rootEntity);
+			for (UITab tab : tabSet.getTabs()) {
+				TabTreeNode node = SchemaTreeNode.createNode(tab, version, includeAttributes, false);
+				firstLevelTreeNodes.add(node);
 			}
-			SchemaTreeNode root = new SchemaTreeNode(null, firstLevelTreeNodes);
+			TabTreeNode root = new TabTreeNode(null, firstLevelTreeNodes);
 			SchemaTreeModel result = new SchemaTreeModel(root, version, true, includeAttributes);
 			result.openAllItems();
 			return result;
@@ -61,62 +59,68 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 		}
 	}
 	
-	public static SchemaTreeModel createInstance(CollectSurvey survey, ModelVersion version, boolean includeAttributes) {
-		Schema schema = survey.getSchema();
-		List<EntityDefinition> rootDefns = schema.getRootEntityDefinitions();
-		List<AbstractTreeNode<SchemaTreeNodeData>> treeNodes = SchemaTreeNode.fromList(rootDefns, version, includeAttributes);
-		SchemaTreeNode root = new SchemaTreeNode(null, treeNodes);
-		SchemaTreeModel result = new SchemaTreeModel(root, version, false, includeAttributes);
-		return result;
-	}
-	
 	@Override
-	protected AbstractTreeNode<SchemaTreeNodeData> createNode(SchemaTreeNodeData data, boolean defineEmptyChildrenForLeaves) {
-		SchemaTreeNode result = SchemaTreeNode.createNode(data, version, includeAttributes, defineEmptyChildrenForLeaves);
+	protected AbstractNode<NodeData> createNode(NodeData data, boolean defineEmptyChildrenForLeaves) {
+		return createNodeInternal(data, defineEmptyChildrenForLeaves);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends AbstractNode<D>, D extends NodeData> T createNodeInternal(D data, boolean defineEmptyChildrenForLeaves) {
+		T result;
+		if ( data instanceof SchemaNodeData ) {
+			result = (T) SchemaTreeNode.createNode((SchemaNodeData) data, version, includeAttributes, defineEmptyChildrenForLeaves);
+		} else {
+			result = (T) SchemaTreeNode.createNode((TabNodeData) data, version, includeAttributes, defineEmptyChildrenForLeaves);
+		}
 		return result;
 	}
 	
-	public SchemaTreeNodeData getNodeData(NodeDefinition nodeDefn) {
+	public SchemaNodeData getNodeData(NodeDefinition nodeDefn) {
 		int[] path = getNodePath(nodeDefn);
 		if ( path == null ) {
 			return null;
 		} else {
-			TreeNode<SchemaTreeNodeData> node = getChild(path);
-			SchemaTreeNodeData data = node.getData();
+			TreeNode<NodeData> node = getChild(path);
+			SchemaNodeData data = (SchemaNodeData) node.getData();
 			return data;
 		}
 	}
 	
 	protected int[] getNodePath(NodeDefinition nodeDefn) {
-		TreeNode<SchemaTreeNodeData> treeNode = getTreeNode(nodeDefn);
+		@SuppressWarnings("rawtypes")
+		TreeNode treeNode = getTreeNode(nodeDefn);
 		if ( treeNode == null ) {
 			return null;
 		} else {
-			int[] result = getPath(treeNode);
+			@SuppressWarnings("unchecked")
+			int[] result = super.getPath(treeNode);
 			return result;
 		}
 	}
 	
-	protected TreeNode<SchemaTreeNodeData> getTreeNode(NodeDefinition nodeDefn) {
-		TreeNode<SchemaTreeNodeData> root = getRoot();
-		Stack<TreeNode<SchemaTreeNodeData>> treeNodesStack = new Stack<TreeNode<SchemaTreeNodeData>>();
+	protected SchemaTreeNode getTreeNode(NodeDefinition nodeDefn) {
+		TreeNode<NodeData> root = getRoot();
+		Stack<TreeNode<?>> treeNodesStack = new Stack<TreeNode<?>>();
 		treeNodesStack.push(root);
 		while ( ! treeNodesStack.isEmpty() ) {
-			TreeNode<SchemaTreeNodeData> treeNode = treeNodesStack.pop();
-			SchemaTreeNodeData treeNodeData = treeNode.getData();
-			if ( treeNodeData != null && treeNodeData.getNodeDefinition().equals(nodeDefn) ) {
-				return treeNode;
+			TreeNode<?> treeNode = treeNodesStack.pop();
+			NodeData treeNodeData = (NodeData) treeNode.getData();
+			if ( treeNodeData != null && treeNodeData instanceof SchemaNodeData && 
+					((SchemaNodeData) treeNodeData).getNodeDefinition().equals(nodeDefn) ) {
+				return (SchemaTreeNode) treeNode;
 			}
-			List<TreeNode<SchemaTreeNodeData>> children = treeNode.getChildren();
+			List<?> children = treeNode.getChildren();
 			if ( children != null && children.size() > 0 ) {
-				treeNodesStack.addAll(children);
+				for (Object child : children) {
+					treeNodesStack.push((TreeNode<?>) child);
+				}
 			}
 		}
 		return null;
 	}
 	
 	public void select(NodeDefinition nodeDefn) {
-		SchemaTreeNodeData data = getNodeData(nodeDefn);
+		SchemaNodeData data = getNodeData(nodeDefn);
 		super.select(data);
 	}
 	
@@ -125,24 +129,26 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 	}
 	
 	public void appendNodeToSelected(NodeDefinition nodeDefn, boolean detached) {
-		AbstractTreeNode<?> selectedNode = getSelectedNode();
+		AbstractNode<?> selectedNode = getSelectedNode();
 		boolean root = selectedNode == null;
-		SchemaTreeNodeData data = new SchemaTreeNodeData(nodeDefn, root, detached);
+		String label = detached ? SchemaNodeData.getDetachedLabel(nodeDefn, root): nodeDefn.getName();
+		SchemaNodeData data = new SchemaNodeData(nodeDefn, label, root, detached);
 		super.appendNodeToSelected(data);
 	}
 	
-	public void setSelectedNodeName(String name) {
-		AbstractTreeNode<SchemaTreeNodeData> selectedNode = getSelectedNode();
+	public void setSelectedNodeLabel(String label) {
+		AbstractNode<NodeData> selectedNode = getSelectedNode();
 		if ( selectedNode != null ) {
-			SchemaTreeNodeData data = selectedNode.getData();
-			data.setName(name);
-			BindUtils.postNotifyChange(null, null, data, "name");
+			NodeData data = selectedNode.getData();
+			data.setLabel(label);
+			BindUtils.postNotifyChange(null, null, data, "label");
 		}
 	}
 	
 	public void markSelectedNodeAsDetached() {
-		SchemaTreeNode selectedNode = (SchemaTreeNode) getSelectedNode();
-		selectedNode.markAsDetached();
+		AbstractNode<NodeData> selectedNode = getSelectedNode();
+		NodeData data = selectedNode.getData();
+		data.setDetached(true);
 	}
 
 	protected int getIndexInTree(EntityDefinition parent, NodeDefinition node) {
@@ -181,46 +187,63 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 		return version == null || version.isApplicable(childDefn);
 	}
 
-	protected SchemaTreeNode recreateNode(SchemaTreeNode node, boolean defineEmptyChildrenForLeaves) {
-		SchemaTreeNode parent = (SchemaTreeNode) node.getParent();
-		SchemaTreeNodeData data = node.getData();
-		NodeDefinition nodeDefn = data.getNodeDefinition();
-		SchemaTreeNode newNode = SchemaTreeNode.createNode(nodeDefn, version, includeAttributes, defineEmptyChildrenForLeaves);
+	protected TreeNode<NodeData> recreateNode(TreeNode<NodeData> node, boolean defineEmptyChildrenForLeaves) {
+		AbstractNode<NodeData> parent = (AbstractNode<NodeData>) node.getParent();
+		NodeData data = (NodeData) node.getData();
+		TreeNode<NodeData> newNode; 
+		if ( data instanceof SchemaNodeData ) {
+			NodeDefinition nodeDefn = ((SchemaNodeData) data).getNodeDefinition();
+			newNode = SchemaTreeNode.createNode(nodeDefn, version, includeAttributes, defineEmptyChildrenForLeaves);
+		} else {
+			UITab tab = ((TabNodeData) data).getTab();
+			newNode = SchemaTreeNode.createNode(tab, version, includeAttributes, defineEmptyChildrenForLeaves);
+		}
 		parent.replace(node, newNode);
 		return newNode;
 	}
 
-	static class SchemaTreeNode extends AbstractTreeNode<SchemaTreeNodeData> {
-		
+	static class TabTreeNode extends AbstractNode<NodeData> {
+
 		private static final long serialVersionUID = 1L;
 		
-		SchemaTreeNode(SchemaTreeNodeData data) {
+		TabTreeNode(TabNodeData data, Collection<? extends AbstractNode<NodeData>> children) {
+			super(data, children);
+		}
+
+		TabTreeNode(TabNodeData data) {
 			super(data);
 		}
 		
-		SchemaTreeNode(SchemaTreeNodeData data, Collection<AbstractTreeNode<SchemaTreeNodeData>> children) {
+	}
+	
+	static class SchemaTreeNode extends AbstractNode<NodeData> {
+		
+		private static final long serialVersionUID = 1L;
+		
+		SchemaTreeNode(SchemaNodeData data) {
+			super(data);
+		}
+		
+		SchemaTreeNode(SchemaNodeData data, Collection<SchemaTreeNode> children) {
 			super(data, children);
 		}
 		
 		public void markAsDetached() {
-			TreeNode<SchemaTreeNodeData> parent = getParent();
-			TreeNode<SchemaTreeNodeData> root = getModel().getRoot();
-			SchemaTreeNodeData data = getData();
-			boolean rootEntity = parent == root;
-			data.markAsDetached(rootEntity);
+			NodeData data = getData();
+			data.setDetached(true);
+//			data.setLabel(SchemaTreeNodeData.getDetachedLabel(nodeDefinition, root));
 		}
 		
-		public static SchemaTreeNode createNode(SchemaTreeNodeData data, ModelVersion version,
+		public static SchemaTreeNode createNode(SchemaNodeData data, ModelVersion version,
 				boolean includeAttributes, boolean defineEmptyChildrenForLeaves) {
 			SchemaTreeNode node = null;
 			NodeDefinition nodeDefn = data.getNodeDefinition();
 			if ( nodeDefn instanceof EntityDefinition ) {
 				List<NodeDefinition> childDefns = ((EntityDefinition) nodeDefn).getChildDefinitions();
-				List<AbstractTreeNode<SchemaTreeNodeData>> childNodes = fromList(childDefns, version, includeAttributes);
+				List<SchemaTreeNode> childNodes = fromSchemaNodeList(childDefns, version, includeAttributes);
 				if ( childNodes == null || childNodes.isEmpty() ) {
 					if ( defineEmptyChildrenForLeaves ) {
-						List<AbstractTreeNode<SchemaTreeNodeData>> emptyChildrenList = Collections.emptyList();
-						node = new SchemaTreeNode(data, emptyChildrenList);
+						node = new SchemaTreeNode(data, Collections.<SchemaTreeNode>emptyList());
 					} else {
 						node = new SchemaTreeNode(data);
 					}
@@ -231,20 +254,42 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 				node = new SchemaTreeNode(data);	
 			}
 			return node;
+		}
+		
+		public static TabTreeNode createNode(TabNodeData data, ModelVersion version,
+				boolean includeAttributes, boolean defineEmptyChildrenForLeaves) {
+			Collection<AbstractNode<NodeData>> childNodes = new ArrayList<AbstractNode<NodeData>>();
 			
+			UITab tab = data.getTab();
+			UIOptions uiOptions = tab.getUIOptions();
+			
+			List<UITab> tabs = tab.getTabs();
+			List<TabTreeNode> childTabNodes = fromTabsList(tabs, version, includeAttributes);
+			List<NodeDefinition> childDefns = uiOptions.getNodesPerTab(tab, false);
+			List<SchemaTreeNode> childSchemaNodes = fromSchemaNodeList(childDefns, version, includeAttributes);
+			childNodes.addAll(childSchemaNodes);
+			childNodes.addAll(childTabNodes);
+			TabTreeNode node = new TabTreeNode(data, childNodes);
+			return node;
 		}
 		
 		public static SchemaTreeNode createNode(NodeDefinition item, ModelVersion version,
 				boolean includeAttributes, boolean defineEmptyChildrenForLeaves) {
-			SchemaTreeNodeData data = new SchemaTreeNodeData(item);
+			SchemaNodeData data = new SchemaNodeData(item, item.getName(), false, false);
 			return createNode(data, version, includeAttributes, defineEmptyChildrenForLeaves);
 		}
 		
-		public static List<AbstractTreeNode<SchemaTreeNodeData>> fromList(List<? extends NodeDefinition> items,
+		public static TabTreeNode createNode(UITab tab, ModelVersion version,
+				boolean includeAttributes, boolean defineEmptyChildrenForLeaves) {
+			TabNodeData data = new TabNodeData(tab, tab.getName(), false, false);
+			return createNode(data, version, includeAttributes, defineEmptyChildrenForLeaves);
+		}
+		
+		protected static List<SchemaTreeNode> fromSchemaNodeList(List<? extends NodeDefinition> items,
 				ModelVersion version, boolean includeAttributes) {
-			List<AbstractTreeNode<SchemaTreeNodeData>> result = null;
+			List<SchemaTreeNode> result = null;
 			if ( items != null ) {
-				result = new ArrayList<AbstractTreeNode<SchemaTreeNodeData>>();
+				result = new ArrayList<SchemaTreeNode>();
 				for (NodeDefinition item : items) {
 					if ( version == null || version.isApplicable(item) ) {
 						SchemaTreeNode node = createNode(item, version, includeAttributes, false);
@@ -257,59 +302,55 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaTre
 			return result;
 		}
 
-	}
-
-	public static class SchemaTreeNodeData {
-		
-		private boolean detached;
-		private String name;
-		private NodeDefinition nodeDefinition;
-		
-		protected SchemaTreeNodeData(NodeDefinition nodeDefinition) {
-			super();
-			this.nodeDefinition = nodeDefinition;
-			this.name = nodeDefinition == null ? null: nodeDefinition.getName();
-		}
-		
-		protected SchemaTreeNodeData(NodeDefinition nodeDefinition, boolean root, boolean detached) {
-			this(nodeDefinition);
-			this.detached = detached;
-			if ( detached ) {
-				this.name = getDetachedLabel(nodeDefinition, root);
+		protected static List<TabTreeNode> fromTabsList(List<UITab> tabs, ModelVersion version, boolean includeAttributes) {
+			List<TabTreeNode> result = null;
+			if ( tabs != null ) {
+				result = new ArrayList<TabTreeNode>();
+				for (UITab tab : tabs) {
+					TabTreeNode node = createNode(tab, version, includeAttributes, false);
+					if ( node != null ) {
+						result.add(node);
+					}
+				}
 			}
-		}
-
-		protected String getDetachedLabel(NodeDefinition nodeDefn, boolean root) {
-			String nodeTypeLabel = NodeType.getHeaderLabel(nodeDefn, root, true);
-			Object[] args = new String[]{nodeTypeLabel};
-			String result = Labels.getLabel("survey.schema.tree.new_node_label", args);
 			return result;
 		}
 
-		public void markAsDetached(boolean root) {
-			if ( name == null ) {
-				name = getDetachedLabel(nodeDefinition, root);
-			}
-		}
+	}
+
+	public static class SchemaNodeData extends NodeData {
 		
-		public boolean isDetached() {
-			return detached;
-		}
+		private NodeDefinition nodeDefinition;
 		
-		public void setDetached(boolean detached) {
-			this.detached = detached;
+		protected SchemaNodeData(NodeDefinition nodeDefinition, String label, boolean root, boolean detached) {
+			super(label, root, detached);
+			this.nodeDefinition = nodeDefinition;
+		}
+
+		protected static String getDetachedLabel(NodeDefinition nodeDefinition, boolean root) {
+			String nodeTypeLabel = NodeType.getHeaderLabel(nodeDefinition, root, true);
+			Object[] args = new String[]{nodeTypeLabel};
+			String result = Labels.getLabel("survey.schema.tree.new_node_label", args);
+			return result;
 		}
 		
 		public NodeDefinition getNodeDefinition() {
 			return nodeDefinition;
 		}
 
-		public String getName() {
-			return name;
-		}
+	}
+	
+	public static class TabNodeData extends NodeData {
+		
+		private UITab tab;
 
-		public void setName(String name) {
-			this.name = name;
+		public TabNodeData(UITab tab, String label, boolean root, boolean detached) {
+			super(label, root, detached);
+			this.tab = tab;
+		}
+		
+		public UITab getTab() {
+			return tab;
 		}
 		
 	}

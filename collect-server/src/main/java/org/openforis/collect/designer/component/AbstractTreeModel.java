@@ -21,12 +21,12 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 	
 	private static final long serialVersionUID = 1L;
 	
-	AbstractTreeModel(AbstractTreeNode<T> root) {
+	AbstractTreeModel(AbstractNode<T> root) {
 		super(root);
 	}
 	
 	public void deselect() {
-		Collection<AbstractTreeNode<T>> emptySelection = Collections.emptyList();
+		Collection<AbstractNode<T>> emptySelection = Collections.emptyList();
 		setSelection(emptySelection);
 	}
 
@@ -53,8 +53,8 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 	public void removeSelectedNode() {
 		int[] selectionPath = getSelectionPath();
 		if ( selectionPath != null ) {
-			AbstractTreeNode<T> treeNode = (AbstractTreeNode<T>) getChild(selectionPath);
-			AbstractTreeNode<T> parentTreeNode = (AbstractTreeNode<T>) treeNode.getParent();
+			AbstractNode<T> treeNode = (AbstractNode<T>) getChild(selectionPath);
+			AbstractNode<T> parentTreeNode = (AbstractNode<T>) treeNode.getParent();
 			Set<TreeNode<T>> openObjects = getOpenObjects();
 			parentTreeNode.remove(treeNode);
 			setOpenObjects(openObjects);
@@ -63,13 +63,13 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 	
 	@SuppressWarnings("unchecked")
 	public void appendNodeToSelected(T data) {
-		AbstractTreeNode<T> parentNode = getSelectedNode();
+		AbstractNode<T> parentNode = getSelectedNode();
 		if( parentNode == null ) {
-			parentNode = (AbstractTreeNode<T>) getRoot();
+			parentNode = (AbstractNode<T>) getRoot();
 		} else if ( parentNode.isLeaf() ) {
 			parentNode = recreateNode(parentNode);
 		}
-		AbstractTreeNode<T> node = getNode(data);
+		AbstractNode<T> node = getNode(data);
 		if ( node == null ) {
 			node = createNode(data);
 			parentNode.add(node);
@@ -78,14 +78,14 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		setSelection(Arrays.asList(node));
 	}
 	
-	protected AbstractTreeNode<T> getSelectedNode() {
+	protected AbstractNode<T> getSelectedNode() {
 		int[] selectionPath = getSelectionPath();
-		return selectionPath != null ? (AbstractTreeNode<T>) getChild(selectionPath): null;
+		return selectionPath != null ? (AbstractNode<T>) getChild(selectionPath): null;
 	}
 
-	protected AbstractTreeNode<T> getParentNode(T item) {
-		AbstractTreeNode<T> node = getNode(item);
-		AbstractTreeNode<T> parent = (AbstractTreeNode<T>) node.getParent();
+	protected AbstractNode<T> getParentNode(T item) {
+		AbstractNode<T> node = getNode(item);
+		AbstractNode<T> parent = (AbstractNode<T>) node.getParent();
 		return parent;
 	}
 
@@ -104,13 +104,13 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		if ( data == null ) {
 			selection = Collections.emptyList();
 		} else {
-			AbstractTreeNode<T> treeNode = getNode(data);
+			AbstractNode<T> treeNode = getNode(data);
 			selection = Arrays.asList(treeNode);
 		}
 		setSelection(selection);
 	}
 	
-	protected AbstractTreeNode<T> getNode(T data) {
+	protected AbstractNode<T> getNode(T data) {
 		if ( data == null ) {
 			return null;
 		} else {
@@ -118,7 +118,7 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 			if ( path == null ) {
 				return null;
 			} else {
-				return (AbstractTreeNode<T>) getChild(path);
+				return (AbstractNode<T>) getChild(path);
 			}
 		}
 	}
@@ -151,42 +151,42 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		return null;
 	}
 
-	protected AbstractTreeNode<T> recreateNode(AbstractTreeNode<T> node) {
-		AbstractTreeNode<T> parent = (AbstractTreeNode<T>) node.getParent();
+	protected AbstractNode<T> recreateNode(AbstractNode<T> node) {
+		AbstractNode<T> parent = (AbstractNode<T>) node.getParent();
 		T data = node.getData();
-		AbstractTreeNode<T> newNode = createNode(data, true);
+		AbstractNode<T> newNode = createNode(data, true);
 		parent.replace(node, newNode);
 		return newNode;
 	}
 
-	protected AbstractTreeNode<T> createNode(T data) {
+	protected AbstractNode<T> createNode(T data) {
 		return createNode(data, false);
 	}
 	
-	protected abstract AbstractTreeNode<T> createNode(
+	protected abstract AbstractNode<T> createNode(
 			T data, boolean defineEmptyChildrenForLeaves);
 
 	public void moveSelectedNode(int toIndex) {
 		int[] selectionPath = getSelectionPath();
-		AbstractTreeNode<T> treeNode = (AbstractTreeNode<T>) getChild(selectionPath);
-		AbstractTreeNode<T> parentTreeNode = (AbstractTreeNode<T>) treeNode.getParent();
+		AbstractNode<T> treeNode = (AbstractNode<T>) getChild(selectionPath);
+		AbstractNode<T> parentTreeNode = (AbstractNode<T>) treeNode.getParent();
 		Set<TreeNode<T>> openObjects = getOpenObjects();
 		parentTreeNode.insert(treeNode, toIndex);
 		setOpenObjects(openObjects);
 		@SuppressWarnings("unchecked")
-		List<AbstractTreeNode<T>> selection = Arrays.asList(treeNode);
+		List<AbstractNode<T>> selection = Arrays.asList(treeNode);
 		setSelection(selection);
 	}
 
-	static abstract class AbstractTreeNode<T> extends DefaultTreeNode<T> {
+	static abstract class AbstractNode<T> extends DefaultTreeNode<T> {
 		
 		private static final long serialVersionUID = 1L;
 		
-		AbstractTreeNode(T data) {
+		AbstractNode(T data) {
 			super(data);
 		}
 		
-		AbstractTreeNode(T data, Collection<AbstractTreeNode<T>> children) {
+		AbstractNode(T data, Collection<? extends AbstractNode<T>> children) {
 			super(data, children);
 		}
 		
@@ -197,5 +197,54 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		}
 		
 	}
+	
+	public static abstract class NodeData {
+		
+		protected boolean detached;
+		protected boolean root;
+		protected String label;
+		protected String icon;
+		
+		public NodeData(String label, boolean root, boolean detached) {
+			super();
+			this.detached = detached;
+			this.root = root;
+			this.label = label;
+		}
+		
+		public String getLabel() {
+			return label;
+		}
+		
+		public void setLabel(String label) {
+			this.label = label;
+		}
+		
+		public boolean isDetached() {
+			return detached;
+		}
+
+		public void setDetached(boolean detached) {
+			this.detached = detached;
+		}
+		
+		public String getIcon() {
+			return icon;
+		}
+		
+		public void setIcon(String icon) {
+			this.icon = icon;
+		}
+
+		/*
+		public void markAsDetached(boolean root) {
+			if ( label == null ) {
+				label = getDetachedLabel(nodeDefinition, root);
+			}
+		}
+		*/
+	}
+
+
 
 }

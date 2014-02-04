@@ -2,10 +2,10 @@ package org.openforis.collect.designer.composer;
 
 import java.util.Set;
 
+import org.openforis.collect.designer.component.AbstractTreeModel.NodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel;
-import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNodeData;
+import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.viewmodel.SchemaVM;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -58,40 +58,39 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 		}
 	}
 	
-	public void refreshSelectedTreeNodeLabel(String name) {
+	public void refreshSelectedTreeNodeLabel(String label) {
 		TreeModel<?> treeModel = nodesTree.getModel();
-		((SchemaTreeModel) treeModel).setSelectedNodeName(name);
-		SchemaTreeNodeData data = getSelectedNodeData();
-		String nodeName = data.getName();
+		((SchemaTreeModel) treeModel).setSelectedNodeLabel(label);
 		Treeitem selectedItem = nodesTree.getSelectedItem();
-		selectedItem.setLabel(nodeName);
+		selectedItem.setLabel(label);
 	}
 
-	protected SchemaTreeNodeData getSelectedNodeData() {
+	protected NodeData getSelectedNodeData() {
 		TreeModel<?> treeModel = nodesTree.getModel();
-		Set<TreeNode<SchemaTreeNodeData>> selection = ((SchemaTreeModel) treeModel).getSelection();
-		TreeNode<SchemaTreeNodeData> selectedNode = selection.iterator().next();
-		SchemaTreeNodeData data = selectedNode.getData();
+		Set<TreeNode<NodeData>> selection = ((SchemaTreeModel) treeModel).getSelection();
+		TreeNode<NodeData> selectedNode = selection.iterator().next();
+		NodeData data = selectedNode.getData();
 		return data;
 	}
 	
 	public void refreshSelectedTreeNodeContextMenu() {
 		SchemaVM viewModel = (SchemaVM) getViewModel();
 		Treeitem selectedItem = nodesTree.getSelectedItem();
-		SchemaTreeNodeData data = getSelectedNodeData();
-		NodeDefinition nodeDefinition = data.getNodeDefinition();
-		Menupopup popupMenu;
-		if ( data.isDetached() ) { 
-			popupMenu = detachedNodePopup;
-		} else if ( viewModel.isEntity(nodeDefinition) ) {
-			if ( viewModel.isTableEntity(nodeDefinition)) {
-				popupMenu = tableEntityPopup;
+		NodeData data = getSelectedNodeData();
+		if ( data instanceof SchemaNodeData ) {
+			Menupopup popupMenu;
+			if ( data.isDetached() ) { 
+				popupMenu = detachedNodePopup;
+			} else if ( viewModel.isEntity(data) ) {
+				if ( viewModel.isTableEntity(data)) {
+					popupMenu = tableEntityPopup;
+				} else {
+					popupMenu = entityPopup;
+				}
 			} else {
-				popupMenu = entityPopup;
+				popupMenu = attributePopup;
 			}
-		} else {
-			popupMenu = attributePopup;
+			selectedItem.setContext(popupMenu);
 		}
-		selectedItem.setContext(popupMenu);
 	}
 }
