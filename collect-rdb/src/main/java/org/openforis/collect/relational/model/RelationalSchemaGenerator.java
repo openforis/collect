@@ -195,7 +195,9 @@ public class RelationalSchemaGenerator {
 		}
 		addPKColumn(table);
 		
-		addAncestorKeyColumns(table);
+		if ( config.isAncestorKeyColumnsIncluded() ) {
+			addAncestorKeyColumns(table);
+		}
 		
 		if ( parentTable != null ) {
 			// Create FK column

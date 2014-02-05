@@ -26,6 +26,7 @@ public class RelationalSchemaConfig implements Cloneable {
 	private String defaultCode;
 	private LanguageSpecificTextMap defaultCodeLabels;
 	private boolean uniqueColumnNames;
+	private boolean ancestorKeyColumnsIncluded;
 	
 	private static final RelationalSchemaConfig DEFAULT;
 	static {
@@ -46,6 +47,7 @@ public class RelationalSchemaConfig implements Cloneable {
 		config.defaultCodeLabels = new LanguageSpecificTextMap();
 		config.defaultCodeLabels.add(new LanguageSpecificText("en", "N/A"));
 		config.uniqueColumnNames = false;
+		config.ancestorKeyColumnsIncluded = false;
 		DEFAULT = config;
 	}
 	
@@ -192,4 +194,12 @@ public class RelationalSchemaConfig implements Cloneable {
 		this.uniqueColumnNames = uniqueColumnNames;
 	}
 
+	public boolean isAncestorKeyColumnsIncluded() {
+		return ancestorKeyColumnsIncluded;
+	}
+	
+	public void setAncestorKeyColumnsIncluded(boolean ancestorKeyColumnsIncluded) {
+		this.ancestorKeyColumnsIncluded = ancestorKeyColumnsIncluded;
+	}
+	
 }
