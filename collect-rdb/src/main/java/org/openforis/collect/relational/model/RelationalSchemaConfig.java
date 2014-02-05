@@ -43,7 +43,7 @@ public class RelationalSchemaConfig implements Cloneable {
 		config.textMaxLength = 255;
 		config.memoMaxLength = 2048;
 		config.floatingPointPrecision = 24;
-		config.defaultCode = "NA";
+		config.defaultCode = "-1";
 		config.defaultCodeLabels = new LanguageSpecificTextMap();
 		config.defaultCodeLabels.add(new LanguageSpecificText("en", "N/A"));
 		config.uniqueColumnNames = false;
