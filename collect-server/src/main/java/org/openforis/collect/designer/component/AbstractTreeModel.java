@@ -178,7 +178,7 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		setSelection(selection);
 	}
 
-	static abstract class AbstractNode<T> extends DefaultTreeNode<T> {
+	public static abstract class AbstractNode<T> extends DefaultTreeNode<T> {
 		
 		private static final long serialVersionUID = 1L;
 		
@@ -194,6 +194,10 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 			int index = this.getIndex(oldNode);
 			this.remove(index);
 			this.insert(newNode, index);
+		}
+		
+		public String getIcon() {
+			return null;
 		}
 		
 	}

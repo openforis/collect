@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
@@ -77,18 +78,39 @@ public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeDat
 	
 	public SchemaNodeData getNodeData(NodeDefinition nodeDefn) {
 		int[] path = getNodePath(nodeDefn);
+		return (SchemaNodeData) getNodeData(path);
+	}
+
+	private NodeData getNodeData(int[] path) {
 		if ( path == null ) {
 			return null;
 		} else {
 			TreeNode<NodeData> node = getChild(path);
-			SchemaNodeData data = (SchemaNodeData) node.getData();
+			NodeData data = node.getData();
 			return data;
 		}
+	}
+	
+	public TabNodeData getNodeData(UITab tab) {
+		int[] path = getNodePath(tab);
+		return (TabNodeData) getNodeData(path);
 	}
 	
 	protected int[] getNodePath(NodeDefinition nodeDefn) {
 		@SuppressWarnings("rawtypes")
 		TreeNode treeNode = getTreeNode(nodeDefn);
+		if ( treeNode == null ) {
+			return null;
+		} else {
+			@SuppressWarnings("unchecked")
+			int[] result = super.getPath(treeNode);
+			return result;
+		}
+	}
+	
+	protected int[] getNodePath(UITab tab) {
+		@SuppressWarnings("rawtypes")
+		TreeNode treeNode = getTreeNode(tab);
 		if ( treeNode == null ) {
 			return null;
 		} else {
@@ -106,7 +128,7 @@ public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeDat
 			TreeNode<?> treeNode = treeNodesStack.pop();
 			NodeData treeNodeData = (NodeData) treeNode.getData();
 			if ( treeNodeData != null && treeNodeData instanceof SchemaNodeData && 
-					((SchemaNodeData) treeNodeData).getNodeDefinition().equals(nodeDefn) ) {
+					((SchemaNodeData) treeNodeData).getNodeDefinition().getId() == nodeDefn.getId() ) {
 				return (SchemaTreeNode) treeNode;
 			}
 			List<?> children = treeNode.getChildren();
@@ -119,9 +141,37 @@ public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeDat
 		return null;
 	}
 	
-	public void select(NodeDefinition nodeDefn) {
+	protected TabTreeNode getTreeNode(UITab tab) {
+		TreeNode<NodeData> root = getRoot();
+		Stack<TreeNode<?>> treeNodesStack = new Stack<TreeNode<?>>();
+		treeNodesStack.push(root);
+		while ( ! treeNodesStack.isEmpty() ) {
+			TreeNode<?> treeNode = treeNodesStack.pop();
+			NodeData treeNodeData = (NodeData) treeNode.getData();
+			if ( treeNodeData != null && treeNodeData instanceof TabNodeData && 
+					((TabNodeData) treeNodeData).getTab().getName().equals(tab.getName()) ) {
+				return (TabTreeNode) treeNode;
+			}
+			List<?> children = treeNode.getChildren();
+			if ( children != null && children.size() > 0 ) {
+				for (Object child : children) {
+					treeNodesStack.push((TreeNode<?>) child);
+				}
+			}
+		}
+		return null;
+	}
+	
+	public SchemaNodeData select(NodeDefinition nodeDefn) {
 		SchemaNodeData data = getNodeData(nodeDefn);
 		super.select(data);
+		return data;
+	}
+	
+	public TabNodeData select(UITab tab) {
+		TabNodeData data = getNodeData(tab);
+		super.select(data);
+		return data;
 	}
 	
 	public void appendNodeToSelected(NodeDefinition nodeDefn) {
@@ -202,7 +252,7 @@ public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeDat
 		return newNode;
 	}
 
-	static class TabTreeNode extends AbstractNode<NodeData> {
+	public static class TabTreeNode extends AbstractNode<NodeData> {
 
 		private static final long serialVersionUID = 1L;
 		
@@ -214,9 +264,15 @@ public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeDat
 			super(data);
 		}
 		
+		@Override
+		public String getIcon() {
+			NodeData data = getData();
+			return SchemaVM.getIcon(data);
+		}
+		
 	}
 	
-	static class SchemaTreeNode extends AbstractNode<NodeData> {
+	public static class SchemaTreeNode extends AbstractNode<NodeData> {
 		
 		private static final long serialVersionUID = 1L;
 		
@@ -234,13 +290,23 @@ public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeDat
 //			data.setLabel(SchemaTreeNodeData.getDetachedLabel(nodeDefinition, root));
 		}
 		
+		@Override
+		public String getIcon() {
+			NodeData data = getData();
+			return SchemaVM.getIcon(data);
+		}
+		
 		public static SchemaTreeNode createNode(SchemaNodeData data, ModelVersion version,
 				boolean includeAttributes, boolean defineEmptyChildrenForLeaves) {
-			SchemaTreeNode node = null;
 			NodeDefinition nodeDefn = data.getNodeDefinition();
+			SchemaTreeNode node = null;
 			if ( nodeDefn instanceof EntityDefinition ) {
+				CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
+				UIOptions uiOptions = survey.getUIOptions();
+				UITab assignedTab = uiOptions.getAssignedTab(nodeDefn);
+				
 				List<NodeDefinition> childDefns = ((EntityDefinition) nodeDefn).getChildDefinitions();
-				List<SchemaTreeNode> childNodes = fromSchemaNodeList(childDefns, version, includeAttributes);
+				List<SchemaTreeNode> childNodes = fromSchemaNodeList(assignedTab, childDefns, version, includeAttributes);
 				if ( childNodes == null || childNodes.isEmpty() ) {
 					if ( defineEmptyChildrenForLeaves ) {
 						node = new SchemaTreeNode(data, Collections.<SchemaTreeNode>emptyList());
@@ -266,7 +332,7 @@ public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeDat
 			List<UITab> tabs = tab.getTabs();
 			List<TabTreeNode> childTabNodes = fromTabsList(tabs, version, includeAttributes);
 			List<NodeDefinition> childDefns = uiOptions.getNodesPerTab(tab, false);
-			List<SchemaTreeNode> childSchemaNodes = fromSchemaNodeList(childDefns, version, includeAttributes);
+			List<SchemaTreeNode> childSchemaNodes = fromSchemaNodeList(tab, childDefns, version, includeAttributes);
 			childNodes.addAll(childSchemaNodes);
 			childNodes.addAll(childTabNodes);
 			TabTreeNode node = new TabTreeNode(data, childNodes);
@@ -285,13 +351,17 @@ public class SchemaTreeModel extends AbstractTreeModel<AbstractTreeModel.NodeDat
 			return createNode(data, version, includeAttributes, defineEmptyChildrenForLeaves);
 		}
 		
-		protected static List<SchemaTreeNode> fromSchemaNodeList(List<? extends NodeDefinition> items,
+		protected static List<SchemaTreeNode> fromSchemaNodeList(UITab parentTab, 
+				List<? extends NodeDefinition> items,
 				ModelVersion version, boolean includeAttributes) {
 			List<SchemaTreeNode> result = null;
 			if ( items != null ) {
 				result = new ArrayList<SchemaTreeNode>();
 				for (NodeDefinition item : items) {
-					if ( version == null || version.isApplicable(item) ) {
+					CollectSurvey survey = (CollectSurvey) item.getSurvey();
+					UIOptions uiOptions = survey.getUIOptions();
+					UITab assignedTab = uiOptions.getAssignedTab(item);
+					if ( assignedTab == parentTab && ( version == null || version.isApplicable(item) ) ) {
 						SchemaTreeNode node = createNode(item, version, includeAttributes, false);
 						if ( node != null ) {
 							result.add(node);

@@ -22,7 +22,6 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
-import org.openforis.idm.metamodel.Schema;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
@@ -83,11 +82,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		boolean editingRootEntity = parentEntity == null;
 		if ( newItem ) {
 			if ( editingRootEntity ) {
-				CollectSurvey survey = getSurvey();
-				UIOptions uiOptions = survey.getUIOptions();
-				uiOptions.createRootTabSet((EntityDefinition) editedItem);
-				Schema schema = editedItem.getSchema();
-				schema.addRootEntityDefinition((EntityDefinition) editedItem);
+//				CollectSurvey survey = getSurvey();
+//				UIOptions uiOptions = survey.getUIOptions();
+//				uiOptions.createRootTabSet((EntityDefinition) editedItem);
+//				Schema schema = editedItem.getSchema();
+//				schema.addRootEntityDefinition((EntityDefinition) editedItem);
 			} else {
 				parentEntity.addChildDefinition(editedItem);
 			}

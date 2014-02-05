@@ -26,7 +26,7 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
-		validateLayout(ctx);
+//		validateLayout(ctx);
 	}
 
 	protected void validateLayout(ValidationContext ctx) {

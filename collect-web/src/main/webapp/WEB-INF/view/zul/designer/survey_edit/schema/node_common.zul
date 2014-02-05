@@ -252,22 +252,6 @@
     				<column />
     			</columns>
     			<rows>
-    				<row>
-    					<label
-    						value="${labels.survey.schema.node.layout.tab}:" />
-    					<fieldErrorHandler
-    						message="@load(vmsgs['tab'])">
-    						<listbox width="150px"
-    							model="@load(vm.assignableTabNames)"
-    							selectedItem="@bind(fx.tabName)" mold="select"
-    							onSelect="@command('applyChanges')">
-    							<template name="model">
-    								<listitem
-    									label="@load(vm.getTabLabel(each))" />
-    							</template>
-    						</listbox>
-    					</fieldErrorHandler>
-    				</row>
     			</rows>
     		</grid>
 

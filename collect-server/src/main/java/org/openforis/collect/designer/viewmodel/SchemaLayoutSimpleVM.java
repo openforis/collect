@@ -171,17 +171,9 @@ public class SchemaLayoutSimpleVM extends SurveyBaseVM {
 	@Command
 	public void updateTabLabel(@BindingParam("tab") UITab tab, @BindingParam("label") String label) {
 		if ( validateTabLabel(label) ) {
-			performUpdateTabLabel(tab, label);
+			tab.setLabel(currentLanguageCode, label.trim());
+			dispatchTabChangedCommand(tab);
 		}
-	}
-	
-	protected void performUpdateTabLabel(UITab tab, String label) {
-		setTabLabel(tab, label);
-		dispatchTabChangedCommand(tab);
-	}
-
-	protected void setTabLabel(UITab tab, String label) {
-		tab.setLabel(currentLanguageCode, label.trim());
 	}
 	
 	protected boolean validateTabLabel(String label) {

@@ -2,10 +2,12 @@ package org.openforis.collect.designer.composer;
 
 import java.util.Set;
 
+import org.openforis.collect.designer.component.AbstractTreeModel.AbstractNode;
 import org.openforis.collect.designer.component.AbstractTreeModel.NodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.viewmodel.SchemaVM;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -15,10 +17,14 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeModel;
 import org.zkoss.zul.TreeNode;
+import org.zkoss.zul.Treecell;
 import org.zkoss.zul.Treeitem;
+import org.zkoss.zul.TreeitemRenderer;
+import org.zkoss.zul.Treerow;
 
 /**
  * 
@@ -46,6 +52,7 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 		super.doAfterCompose(view);
 		Selectors.wireEventListeners(view, this);
 		Selectors.wireComponents(view, this, false);
+		//nodesTree.setItemRenderer(new SchemaTreeItemRenderer());
 	}
 	
 	@Listen("onSelectTreeNode")
@@ -92,5 +99,29 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 			}
 			selectedItem.setContext(popupMenu);
 		}
+	}
+	
+	static class SchemaTreeItemRenderer implements TreeitemRenderer<AbstractNode<NodeData>> {
+
+		@Override
+		public void render(Treeitem item, AbstractNode<NodeData> node, int index)
+				throws Exception {
+			NodeData data = node.getData();
+			Treerow row = new Treerow();
+			Treecell cell = new Treecell();
+			if ( data instanceof SchemaNodeData ) {
+				//schema node
+				NodeDefinition nodeDefn = ((SchemaNodeData) data).getNodeDefinition();
+				cell.setLabel(nodeDefn.getName());
+			} else {
+				//tab
+				Textbox textbox = new Textbox();
+				cell.appendChild(textbox);
+			}
+			cell.setImage(SchemaVM.getIcon(data));
+			row.appendChild(cell);
+			item.appendChild(row);
+		}
+		
 	}
 }

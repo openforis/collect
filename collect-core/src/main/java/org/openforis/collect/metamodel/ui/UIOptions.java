@@ -317,6 +317,29 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 
+	public EntityDefinition getParentEntityForAssignedNodes(final UITab tab) {
+		UITabSet root = tab.getRootTabSet();
+		EntityDefinition rootEntity = getRootEntityDefinition(root);
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		stack.push(rootEntity);
+		while ( ! stack.isEmpty() ) {
+			NodeDefinition nodeDefn = stack.pop();
+			if ( nodeDefn instanceof EntityDefinition ) {
+				EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
+				List<UITab> tabs = getTabsAssignableToChildren(entityDefn);
+				for (UITab t : tabs) {
+					if ( t == tab ) {
+						return entityDefn;
+					}
+				}
+				List<NodeDefinition> children = entityDefn.getChildDefinitions();
+				for (NodeDefinition child : children) {
+					stack.push(child);
+				}
+			}
+		}
+		throw new IllegalStateException("Parent entity for assigned nodes not found for tab: " + tab.getName());
+	}
 	
 	public boolean isAssociatedWithMultipleEntityForm(UITab tab) {
 		return getFormLayoutMultipleEntity(tab) != null;
