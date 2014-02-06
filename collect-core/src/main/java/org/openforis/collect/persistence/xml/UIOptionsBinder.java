@@ -39,8 +39,7 @@ public class UIOptionsBinder implements
 			parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true);
 			Reader reader = new StringReader(body);
 			parser.setInput(reader);
-			UIOptions uiOptions = new UIOptions();
-			uiOptions.setSurvey((CollectSurvey) survey);
+			UIOptions uiOptions = new UIOptions((CollectSurvey) survey);
 			UITabSet tabSet = unmarshalTabSet(parser, uiOptions);
 			while ( tabSet != null ) {
 				uiOptions.addTabSet(tabSet);

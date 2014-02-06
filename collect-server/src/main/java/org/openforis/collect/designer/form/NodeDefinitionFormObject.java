@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -20,21 +19,12 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public static final String REQUIRED_FIELD = "required";
 	
-	public static final String INHERIT_TAB_NAME = "inherit";
-	
-	//public static NamedObject INHERIT_TAB;
-	public static UITab INHERIT_TAB;
-	
-	static {
-		//init static variables
-		//INHERIT_TAB = new NamedObject(LabelKeys.INHERIT_TAB);
-		INHERIT_TAB = new UITab();
-	};
-	
+	@SuppressWarnings("unused")
 	private EntityDefinition parentDefinition;
 	
 	//generic
 	private String name;
+	private String path;
 	private String description;
 	private boolean multiple;
 	private boolean required;
@@ -109,6 +99,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		super.loadFrom(source, language);
 		//generic
 		name = source.getName();
+		path = source.getPath();
 		multiple = source.isMultiple();
 		Integer nodeMinCount = source.getMinCount();
 		required = nodeMinCount != null && nodeMinCount.intValue() > 0;
@@ -128,10 +119,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		handheldPromptLabel = source.getPrompt(Prompt.Type.HANDHELD, language);
 		pcPromptLabel = source.getPrompt(Prompt.Type.PC, language);
 		description = source.getDescription(language);
-		//layout
-		UIOptions uiOptions = getUIOptions(source);
-		UITab tab = uiOptions.getAssignedTab(parentDefinition, source, false);
-		tabName = tab != null ? tab.getName(): INHERIT_TAB_NAME;
 	}
 
 	@Override
@@ -160,19 +147,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
-		saveTabInfo(dest);
-	}
-
-	protected void saveTabInfo(T dest) {
-		if ( parentDefinition != null ) {
-			UIOptions uiOptions = getUIOptions(dest);
-			if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
-				uiOptions.removeTabAssociation(dest);
-			} else {
-				UITab tab = uiOptions.getTab(tabName);
-				uiOptions.assignToTab(dest, tab);
-			}
-		}
+		//update path
+		path = dest.getPath();
 	}
 
 	@Override
@@ -188,6 +164,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String getPath() {
+		return path;
 	}
 	
 	public void setName(String name) {

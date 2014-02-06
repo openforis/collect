@@ -26,7 +26,7 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
-//		validateLayout(ctx);
+		validateLayout(ctx);
 	}
 
 	protected void validateLayout(ValidationContext ctx) {
@@ -38,7 +38,8 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 		CollectSurvey survey = (CollectSurvey) editedNode.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
 		Boolean multiple = getValue(ctx, MULTIPLE_FIELD);
-		UITab tab = getAssociatedTab(ctx, uiOptions, parentEntity);
+		UITab tab = uiOptions.getAssignedTab(editedNode);
+//		UITab tab = getAssociatedTab(ctx, uiOptions, parentEntity);
 		if ( tab != null ) {
 			boolean assignable = uiOptions.isLayoutSupported(parentEntity, editedNode.getId(), tab, multiple, layout);
 			if ( ! assignable ) {

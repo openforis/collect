@@ -101,11 +101,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private CollectSurvey survey;
 	private List<UITabSet> tabSets;
 	
-	public UIOptions() {
-	}
-	
 	public UIOptions(CollectSurvey survey) {
-		this();
 		this.survey = survey;
 	}
 
@@ -224,13 +220,22 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		UITabSet rootTabSet = getAssignedRootTabSet(parentDefn, nodeDefn);
 		if ( rootTabSet != null ) {
 			String tabName = nodeDefn.getAnnotation(Annotation.TAB_NAME.getQName());
-			if ( StringUtils.isNotBlank(tabName) && ( parentDefn == null || parentDefn.getParentDefinition() == null ) ) {
-				result = rootTabSet.getTab(tabName);
-			} else if ( parentDefn != null ) {
-				UITab parentTab = getAssignedTab(parentDefn);
-				if ( parentTab != null && StringUtils.isNotBlank(tabName) ) {
-					result = parentTab.getTab(tabName);
-				} else if ( includeInherited ) {
+			if ( StringUtils.isNotBlank(tabName) ) {
+				if ( parentDefn == null || parentDefn.getParentDefinition() == null ) {
+					result = rootTabSet.getTab(tabName);
+				} else {
+					UITab parentTab = getAssignedTab(parentDefn);
+					if ( parentTab != null ) {
+						if ( tabName.equals(parentTab.getName()) ) {
+							result = parentTab;
+						} else {
+							result = parentTab.getTab(tabName);
+						}
+					}
+				}
+			} else {
+				if ( includeInherited ) {
+					UITab parentTab = getAssignedTab(parentDefn);
 					result = parentTab;
 				}
 			}
@@ -316,6 +321,36 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		boolean result = allowedTabs.contains(tab);
 		return result;
 	}
+	
+	/**
+	 * Returns true if the specified tab is not assigned to one of the descendants of the belonging rootEntity
+	 */
+	public boolean isUnassigned(UITab tab) {
+		UITabSet rootTabSet = tab.getRootTabSet();
+		EntityDefinition rootEntityDefinition = getRootEntityDefinition(rootTabSet);
+		return isUnassigned(tab, rootEntityDefinition);
+	}
+	/**
+	 * Returns true if the specified tab is not assigned to one of the descendants of the specified rootEntity
+	 */
+	public boolean isUnassigned(UITab tab, EntityDefinition rootEntity) {
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		stack.add(rootEntity);
+		while ( ! stack.isEmpty() ) {
+			NodeDefinition childDefn = stack.pop();
+			UITab assignedTab = getAssignedTab(childDefn, false);
+			if ( tab == assignedTab ) {
+				return false;
+			}
+			if ( childDefn instanceof EntityDefinition ) {
+				List<NodeDefinition> nestedChildDefns = ((EntityDefinition) childDefn).getChildDefinitions();
+				for (NodeDefinition nestedChildDefn : nestedChildDefns) {
+					stack.push(nestedChildDefn);
+				}
+			}
+		}
+		return true;
+	}
 
 	public EntityDefinition getParentEntityForAssignedNodes(final UITab tab) {
 		UITabSet root = tab.getRootTabSet();
@@ -326,11 +361,9 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			NodeDefinition nodeDefn = stack.pop();
 			if ( nodeDefn instanceof EntityDefinition ) {
 				EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
-				List<UITab> tabs = getTabsAssignableToChildren(entityDefn);
-				for (UITab t : tabs) {
-					if ( t == tab ) {
-						return entityDefn;
-					}
+				UITab assignedTab = getAssignedTab(entityDefn, false);
+				if ( assignedTab == tab ) {
+					return entityDefn;
 				}
 				List<NodeDefinition> children = entityDefn.getChildDefinitions();
 				for (NodeDefinition child : children) {

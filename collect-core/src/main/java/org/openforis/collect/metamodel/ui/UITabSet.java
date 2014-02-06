@@ -1,17 +1,17 @@
 package org.openforis.collect.metamodel.ui;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.SurveyObject;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class UITabSet implements Serializable {
+public class UITabSet extends SurveyObject {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -21,6 +21,7 @@ public class UITabSet implements Serializable {
 	protected UITabSet parent;
 	
 	UITabSet(UIOptions uiOptions) {
+		super(uiOptions.getSurvey());
 		this.uiOptions = uiOptions;
 	}
 	

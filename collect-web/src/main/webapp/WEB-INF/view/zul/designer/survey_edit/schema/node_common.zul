@@ -6,83 +6,106 @@
   <custom-attributes otherMinorGeneralDetailsForm="${arg.otherMinorGeneralDetailsForm}"/>
   <custom-attributes otherLayoutForm="${arg.otherLayoutForm}"/>
   <custom-attributes otherAttributesForm="${arg.otherAttributesForm}"/>
-  
+
   <groupbox width="100%" closable="false">
-    <caption label="${labels.survey.schema.node.general}"/>
-    <grid class="inner">
-      <columns>
-        <column width="150px" />
-        <column />
-      </columns>
-      <rows>
-        <row>
-          <label value="${labels.global.item.name}:" />
-          <fieldErrorHandler message="@load(vmsgs['name'])">
-            <textbox width="200px" maxlength="40" value="@bind(fx.name)"
-              onChange="@global-command('editedNodeNameChanging', name=self.value)" />
-          </fieldErrorHandler>
-        </row>
-      </rows>
-    </grid>
+  	<caption label="${labels.survey.schema.node.general}" />
+  	<grid class="inner">
+  		<columns>
+  			<column width="150px" />
+  			<column />
+  		</columns>
+  		<rows>
+  			<row>
+  				<label value="${labels.global.item.name}:" />
+  				<fieldErrorHandler message="@load(vmsgs['name'])">
+  					<textbox width="200px" maxlength="40"
+  						value="@bind(fx.name)"
+  						onChange="@global-command('editedNodeNameChanging', name=self.value)" />
+  				</fieldErrorHandler>
+  			</row>
+  			<row>
+  				<label value="${labels.survey.schema.node.path}:" />
+  				<label width="200px"
+  					value="@load(fx.path)" />
+  			</row>
+  		</rows>
+  	</grid>
 
-    <include src="${arg.otherGeneralDetailsForm}" />
-     
-    <grid class="inner">
-        <columns>
-          <column width="150px" />
-          <column />
-        </columns>
-        <rows>
-			<row visible="${not vm.rootEntity}">
-				<label value="${labels.survey.schema.node.multiple}:" />
-                <fieldErrorHandler message="@load(vmsgs['multiple'])">
-    				<checkbox checked="@load(fx.multiple eq true) @save(fx.multiple)" 
-                      onCheck="@command('applyChanges')" />
-                </fieldErrorHandler>
-			</row>
-			<row visible="@load(not vm.rootEntity and fx.multiple ne true and vm.requiredApplied)">
-				<label value="${labels.survey.schema.node.required}:" />
-				<fieldErrorHandler message="@load(vmsgs['required'])">
-					<checkbox
-						checked="@load(fx.required eq true) @save(fx.required)"
-						onCheck="@command('applyChanges')" />
-				</fieldErrorHandler>
-			</row>
-			<row visible="@load(not vm.rootEntity and fx.multiple ne true)">
-				<label value="${labels.survey.schema.node.required_expression}:" />
-				<fieldErrorHandler message="@load(vmsgs['requiredExpression'])">
-                  <textbox width="150px" value="@bind(fx.requiredExpression)" 
-                      onChange="@command('applyChanges')" />
-                </fieldErrorHandler>
-			</row>
-			<row visible="@load(not vm.rootEntity and fx.multiple eq true)">
-				<label value="${labels.survey.schema.node.min_count}:" />
-				<fieldErrorHandler message="@load(vmsgs['minCount'])">
-                    <intbox value="@bind(fx.minCount)" onChange="@command('applyChanges')" />
-                </fieldErrorHandler>
-			</row>
-			<row visible="@load(not vm.rootEntity and fx.multiple eq true)">
-				<label value="${labels.survey.schema.node.max_count}:" />
-				<fieldErrorHandler message="@load(vmsgs['maxCount'])">
-                    <intbox value="@bind(fx.maxCount)" onChange="@command('applyChanges')" />
-                </fieldErrorHandler>
-			</row>
-            <row visible="@load(not vm.rootEntity)">
-              <label value="${labels.survey.schema.node.relevant_expression}:" />
-              <fieldErrorHandler
-                message="@load(vmsgs['relevantExpression'])">
-                <textbox width="150px"
-                  value="@bind(fx.relevantExpression)"
-                  onChange="@command('applyChanges')" />
-              </fieldErrorHandler>
-            </row>
-      </rows>
-     </grid>
+  	<include src="${arg.otherGeneralDetailsForm}" />
 
-     <include src="${arg.otherMinorGeneralDetailsForm}" />
-    </groupbox>
-    
-    <include src="${arg.otherAttributesForm}" />
+  	<grid class="inner">
+  		<columns>
+  			<column width="150px" />
+  			<column />
+  		</columns>
+  		<rows>
+  			<row visible="${not vm.rootEntity}">
+  				<label value="${labels.survey.schema.node.multiple}:" />
+  				<fieldErrorHandler
+  					message="@load(vmsgs['multiple'])">
+  					<checkbox
+  						checked="@load(fx.multiple eq true) @save(fx.multiple)"
+  						onCheck="@command('applyChanges')" />
+  				</fieldErrorHandler>
+  			</row>
+  			<row
+  				visible="@load(not vm.rootEntity and fx.multiple ne true and vm.requiredApplied)">
+  				<label value="${labels.survey.schema.node.required}:" />
+  				<fieldErrorHandler
+  					message="@load(vmsgs['required'])">
+  					<checkbox
+  						checked="@load(fx.required eq true) @save(fx.required)"
+  						onCheck="@command('applyChanges')" />
+  				</fieldErrorHandler>
+  			</row>
+  			<row
+  				visible="@load(not vm.rootEntity and fx.multiple ne true)">
+  				<label
+  					value="${labels.survey.schema.node.required_expression}:" />
+  				<fieldErrorHandler
+  					message="@load(vmsgs['requiredExpression'])">
+  					<textbox width="150px"
+  						value="@bind(fx.requiredExpression)"
+  						onChange="@command('applyChanges')" />
+  				</fieldErrorHandler>
+  			</row>
+  			<row
+  				visible="@load(not vm.rootEntity and fx.multiple eq true)">
+  				<label
+  					value="${labels.survey.schema.node.min_count}:" />
+  				<fieldErrorHandler
+  					message="@load(vmsgs['minCount'])">
+  					<intbox value="@bind(fx.minCount)"
+  						onChange="@command('applyChanges')" />
+  				</fieldErrorHandler>
+  			</row>
+  			<row
+  				visible="@load(not vm.rootEntity and fx.multiple eq true)">
+  				<label
+  					value="${labels.survey.schema.node.max_count}:" />
+  				<fieldErrorHandler
+  					message="@load(vmsgs['maxCount'])">
+  					<intbox value="@bind(fx.maxCount)"
+  						onChange="@command('applyChanges')" />
+  				</fieldErrorHandler>
+  			</row>
+  			<row visible="@load(not vm.rootEntity)">
+  				<label
+  					value="${labels.survey.schema.node.relevant_expression}:" />
+  				<fieldErrorHandler
+  					message="@load(vmsgs['relevantExpression'])">
+  					<textbox width="150px"
+  						value="@bind(fx.relevantExpression)"
+  						onChange="@command('applyChanges')" />
+  				</fieldErrorHandler>
+  			</row>
+  		</rows>
+  	</grid>
+
+  	<include src="${arg.otherMinorGeneralDetailsForm}" />
+  </groupbox>
+
+  <include src="${arg.otherAttributesForm}" />
     
     <groupbox width="100%" closable="false">
       <caption label="${labels.survey.schema.node.labels}"/>

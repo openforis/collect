@@ -3,21 +3,15 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
-import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.NodeType;
-import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -31,7 +25,6 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
@@ -92,28 +85,10 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			}
 			newItem = false;
 		}
-		if ( editingRootEntity ) {
-			updateMainTabLabel((EntityDefinition) editedItem);
-		}
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", parentEntity);
 		BindUtils.postGlobalCommand(null, null, "editedNodeChanged", args);
 		dispatchSurveyChangedCommand();
-	}
-
-	protected void updateMainTabLabel(EntityDefinition rootEntityDefn) {
-		UIOptions uiOptions = survey.getUIOptions();
-		UITabSet rootTabSet = uiOptions.getAssignedTabSet(rootEntityDefn);
-		UITab mainTab = uiOptions.getMainTab(rootTabSet);
-		if ( mainTab != null ) {
-			String tabLabel = getTabLabel(mainTab.getName());
-			if ( StringUtils.isBlank(tabLabel) ) {
-				String rootEntityLabel = getInstanceLabel(rootEntityDefn);
-				mainTab.setLabel(currentLanguageCode, rootEntityLabel);
-				BindUtils.postNotifyChange(null, null, mainTab, "*");
-				notifyChange("assignableTabNames");
-			}
-		}
 	}
 
 	protected String getInstanceLabel(NodeDefinition nodeDefn) {
@@ -165,71 +140,6 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	// GETTERS AND SETTERS
 	public Form getTempFormObject() {
 		return tempFormObject;
-	}
-	
-	@Deprecated
-	public List<Object> getAssignableTabs() {
-		if ( editedItem == null ) {
-			return null;
-		} else {
-			CollectSurvey survey = getSurvey();
-			UIOptions uiOptions = survey.getUIOptions();
-			List<Object> result = new ArrayList<Object>();
-			result.add(NodeDefinitionFormObject.INHERIT_TAB);
-			result.addAll(uiOptions.getAssignableTabs(parentEntity, editedItem));
-			return result;
-		}
-	}
-	
-	public List<String> getAssignableTabNames() {
-		if ( editedItem == null ) {
-			return null;
-		} else if ( parentEntity == null ) {
-			return Collections.emptyList();
-		} else {
-			CollectSurvey survey = getSurvey();
-			UIOptions uiOptions = survey.getUIOptions();
-			List<UITab> assignableTabs = uiOptions.getAssignableTabs(parentEntity, editedItem);
-			List<String> result = new ArrayList<String>();
-			result.add(NodeDefinitionFormObject.INHERIT_TAB_NAME);
-			for (UITab uiTab : assignableTabs) {
-				result.add(uiTab.getName());
-			}
-			return result;
-		}
-	}
-	
-	public String getTabLabel(String tabName) {
-		if ( tabName == null || tabName.equals(NodeDefinitionFormObject.INHERIT_TAB_NAME) ) {
-			return Labels.getLabel(LabelKeys.INHERIT_TAB);
-			//return NodeDefinitionFormObject.INHERIT_TAB.getName();
-		} else {
-			UITab tab = getTab(tabName);
-			if ( tab != null ) {
-				String result = tab.getLabel(currentLanguageCode);
-				return result;
-			} else {
-				return null;
-			}
-		}
-	}
-
-	protected UITab getTab(String tabName) {
-		UIOptions uiOptions = survey.getUIOptions();
-		UITab tab = uiOptions.getTab(tabName);
-		return tab;
-	}
-	
-	protected UITabSet getParentTabSet() {
-		CollectSurvey survey = getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
-		UITabSet result;
-		if ( parentEntity == null ) {
-			result = uiOptions.getAssignedRootTabSet((EntityDefinition) editedItem);
-		} else {
-			result = uiOptions.getAssignedTabSet(parentEntity);
-		}
-		return result;
 	}
 	
 	@DependsOn("editedItem")

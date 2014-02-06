@@ -3,11 +3,11 @@ package org.openforis.collect.designer.composer;
 import java.util.Set;
 
 import org.openforis.collect.designer.component.AbstractTreeModel.AbstractNode;
-import org.openforis.collect.designer.component.AbstractTreeModel.NodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SurveyObject;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -65,25 +65,24 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 		}
 	}
 	
-	public void refreshSelectedTreeNodeLabel(String label) {
+	public void updateNodeLabel(SurveyObject surveyObject, String label) {
 		TreeModel<?> treeModel = nodesTree.getModel();
-		((SchemaTreeModel) treeModel).setSelectedNodeLabel(label);
-		Treeitem selectedItem = nodesTree.getSelectedItem();
-		selectedItem.setLabel(label);
+		SchemaTreeModel schemaTreeModel = (SchemaTreeModel) treeModel;
+		schemaTreeModel.updateNodeLabel(surveyObject, label);
 	}
 
-	protected NodeData getSelectedNodeData() {
+	protected SchemaNodeData getSelectedNodeData() {
 		TreeModel<?> treeModel = nodesTree.getModel();
-		Set<TreeNode<NodeData>> selection = ((SchemaTreeModel) treeModel).getSelection();
-		TreeNode<NodeData> selectedNode = selection.iterator().next();
-		NodeData data = selectedNode.getData();
+		Set<TreeNode<SchemaNodeData>> selection = ((SchemaTreeModel) treeModel).getSelection();
+		TreeNode<SchemaNodeData> selectedNode = selection.iterator().next();
+		SchemaNodeData data = selectedNode.getData();
 		return data;
 	}
 	
 	public void refreshSelectedTreeNodeContextMenu() {
 		SchemaVM viewModel = (SchemaVM) getViewModel();
 		Treeitem selectedItem = nodesTree.getSelectedItem();
-		NodeData data = getSelectedNodeData();
+		SchemaNodeData data = getSelectedNodeData();
 		if ( data instanceof SchemaNodeData ) {
 			Menupopup popupMenu;
 			if ( data.isDetached() ) { 
@@ -101,18 +100,18 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 		}
 	}
 	
-	static class SchemaTreeItemRenderer implements TreeitemRenderer<AbstractNode<NodeData>> {
+	static class SchemaTreeItemRenderer implements TreeitemRenderer<AbstractNode<SchemaNodeData>> {
 
 		@Override
-		public void render(Treeitem item, AbstractNode<NodeData> node, int index)
+		public void render(Treeitem item, AbstractNode<SchemaNodeData> node, int index)
 				throws Exception {
-			NodeData data = node.getData();
+			SchemaNodeData data = node.getData();
 			Treerow row = new Treerow();
 			Treecell cell = new Treecell();
-			if ( data instanceof SchemaNodeData ) {
+			SurveyObject surveyObject = data.getSurveyObject();
+			if ( surveyObject instanceof NodeDefinition ) {
 				//schema node
-				NodeDefinition nodeDefn = ((SchemaNodeData) data).getNodeDefinition();
-				cell.setLabel(nodeDefn.getName());
+				cell.setLabel(((NodeDefinition) surveyObject).getName());
 			} else {
 				//tab
 				Textbox textbox = new Textbox();

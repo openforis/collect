@@ -202,14 +202,14 @@ public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
 		
 	}
 	
-	public static abstract class NodeData {
+	public static abstract class SimpleNodeData {
 		
 		protected boolean detached;
 		protected boolean root;
 		protected String label;
 		protected String icon;
 		
-		public NodeData(String label, boolean root, boolean detached) {
+		public SimpleNodeData(String label, boolean root, boolean detached) {
 			super();
 			this.detached = detached;
 			this.root = root;
