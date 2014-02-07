@@ -24,7 +24,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	//generic
 	private String name;
-	private String path;
 	private String description;
 	private boolean multiple;
 	private boolean required;
@@ -99,7 +98,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		super.loadFrom(source, language);
 		//generic
 		name = source.getName();
-		path = source.getPath();
 		multiple = source.isMultiple();
 		Integer nodeMinCount = source.getMinCount();
 		required = nodeMinCount != null && nodeMinCount.intValue() > 0;
@@ -147,8 +145,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
-		//update path
-		path = dest.getPath();
 	}
 
 	@Override
@@ -164,10 +160,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public String getName() {
 		return name;
-	}
-	
-	public String getPath() {
-		return path;
 	}
 	
 	public void setName(String name) {

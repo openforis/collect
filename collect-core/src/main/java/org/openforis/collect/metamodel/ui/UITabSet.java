@@ -114,7 +114,6 @@ public class UITabSet extends SurveyObject {
 		this.parent = parent;
 	}
 
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

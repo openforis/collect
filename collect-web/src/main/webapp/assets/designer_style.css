@@ -77,7 +77,7 @@ button.icon {
 	font-weight: bold;
 }
 .sectionTitle {
-	font-size: 14px;
+	font-size: 12px;
 	font-weight: bold;
 }
 /* END OF TITLES */
@@ -88,6 +88,10 @@ button.icon {
 }
 .tipMessage {
 	font-style: italic;
+}
+.infoMessage {
+	font-size: 12px;
+	font-weight: normal;
 }
 /* END OF MESSAGES STYLE */
 
@@ -142,4 +146,14 @@ button.icon {
 .z-flash.maximised {
 	height: 100%;
 	width: 100%;
+}
+
+.node-type-header {
+	margin-left: -10px;
+	padding-right: 14px;
+}
+
+.path-abel {
+	text-align: right;
+	display: inline-block;
 }

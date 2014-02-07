@@ -74,6 +74,23 @@ public class UITab extends UITabSet {
 		int index = siblings.indexOf(this);
 		return index;
 	}
+	
+	public String getPath(String language) {
+		StringBuilder sb = new StringBuilder();
+		UITab currentTab = this;
+		while ( currentTab != null ) {
+			String label = currentTab.getLabel(language);
+			sb.insert(0, "/");
+			sb.insert(0, label);
+			UITabSet parent = currentTab.getParent();
+			if ( parent instanceof UITab ) {
+				currentTab = (UITab) parent;
+			} else {
+				break;
+			}
+		}
+		return sb.toString();
+	}
 
 	@Override
 	public void detatch() {
