@@ -41,8 +41,8 @@ public class EntityDefinitionFormValidator extends NodeDefinitionFormValidator {
 		UITab tab = uiOptions.getAssignedTab(editedNode);
 //		UITab tab = getAssociatedTab(ctx, uiOptions, parentEntity);
 		if ( tab != null ) {
-			boolean assignable = uiOptions.isLayoutSupported(parentEntity, editedNode.getId(), tab, multiple, layout);
-			if ( ! assignable ) {
+			boolean valid = uiOptions.isLayoutSupported(parentEntity, editedNode.getId(), tab, multiple, layout);
+			if ( ! valid ) {
 				String message = Labels.getLabel(LabelKeys.LAYOUT_NOT_SUPPORTED_MESSAGE_KEY);
 				addInvalidMessage(ctx, field, message);
 			}

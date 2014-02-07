@@ -49,6 +49,10 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 	}
 	
 	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, boolean includeAttributes, String labelLanguage) {
+		return createInstance(rootEntity, version, includeAttributes, labelLanguage, false);
+	}
+	
+	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, boolean includeAttributes, String labelLanguage, boolean openAllItems) {
 		if ( rootEntity != null && (version == null || version.isApplicable(rootEntity)) ) {
 			Collection<AbstractNode<SchemaNodeData>> firstLevelTreeNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
 			CollectSurvey survey = (CollectSurvey) rootEntity.getSurvey();
@@ -60,7 +64,9 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 			}
 			SchemaTreeNode root = new SchemaTreeNode(null, firstLevelTreeNodes);
 			SchemaTreeModel result = new SchemaTreeModel(root, rootEntity, version, true, includeAttributes, labelLanguage);
-			result.openAllItems();
+			if ( openAllItems ) {
+				result.openAllItems();
+			}
 			return result;
 		} else {
 			return null;
