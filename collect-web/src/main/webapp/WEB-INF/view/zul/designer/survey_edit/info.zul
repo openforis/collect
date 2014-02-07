@@ -69,15 +69,6 @@
           </cell>
         </row>
         <row>
-          <label value="${labels.survey.code_lists}:" />
-          <cell>
-            <button sclass="icon"
-              tooltiptext="${labels.survey.code_list.manager.title}"
-              onClick="@global-command('openCodeListsManagerPopUp')"
-              image="/assets/images/edit-small.png" />
-          </cell>
-        </row>
-        <row>
           <label value="${labels.survey.units}:" />
           <cell>
             <button sclass="icon" 

@@ -31,6 +31,8 @@
              <tabs id="tabs">
                <tab id="genericTab" label="${labels.survey.$}"
                  w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
+               <tab id="codeListsTab" label="${labels.survey.code_lists}"
+                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
                <tab id="speciesImportTab"
                  label="${labels.survey.species_import.$}"
                  w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
@@ -44,6 +46,10 @@
                <tabpanel>
                  <include id="mainInfoInclude"
                    src="survey_edit/info.zul" />
+               </tabpanel>
+               <tabpanel>
+                 <include id="codeListsInclude"
+                   src="survey_edit/code_lists.zul" />
                </tabpanel>
                <tabpanel>
                	<label value="${labels.survey.species_import.save_survey_before}" 
