@@ -544,7 +544,7 @@ public class SchemaVM extends SurveyBaseVM {
 			selectedTreeNode = treeModel.getNodeData(editedNode);
 			treeModel.select(selectedTreeNode);
 			newNode = false;
-			notifyChange("selectedTreeNode", "newNode");
+			notifyChange("selectedTreeNode", "newNode", "editedNodePath");
 		}
 		dispatchSchemaChangedCommand();
 		//to be called when not notifying changes on treeModel
@@ -687,8 +687,7 @@ public class SchemaVM extends SurveyBaseVM {
 			if ( editedNode instanceof NodeDefinition ) {
 				return NodeType.getHeaderLabel((NodeDefinition) editedNode, editedNodeParentEntity == null, newNode);
 			} else {
-				//TODO
-				return null;
+				return Labels.getLabel("survey.schema.node.layout.tab");
 			}
 		} else {
 			return null;
@@ -781,7 +780,7 @@ public class SchemaVM extends SurveyBaseVM {
 				icon = "form-small.png";
 			}
 		} else {
-			icon = "entity-small.png";
+			icon = "grouping-small.png";
 		}
 		return NODE_TYPES_IMAGES_PATH + icon;
 	}
@@ -790,6 +789,22 @@ public class SchemaVM extends SurveyBaseVM {
 		AttributeType attributeType = AttributeType.valueOf(type);
 		String result = NODE_TYPES_IMAGES_PATH + attributeType.name().toLowerCase() + "-small.png";
 		return result;
+	}
+	
+	@DependsOn("editedNode")
+	public String getEditedNodePath() {
+		if ( editedNode == null ) {
+			return null;
+		} else if ( editedNode instanceof NodeDefinition ) {
+			if ( newNode ) {
+				return editedNodeParentEntity.getPath() + "/...";
+			} else {
+				return ((NodeDefinition) editedNode).getPath();
+			}
+		} else {
+			//tab
+			return ((UITab) editedNode).getPath(currentLanguageCode);
+		}
 	}
 	
 	@Command

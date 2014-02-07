@@ -211,12 +211,17 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		changed = false;
 		notifyChange("items","changed");
 		if ( item.equals(selectedItem) ) {
-			formObject = null;
-			editedItem = null;
-			selectedItem = null;
+			resetEditedItem();
 			dispatchCurrentFormValidatedCommand(true);
-			notifyChange("formObject", "editedItem", "selectedItem", "currentFormValid");
+			notifyChange("currentFormValid");
 		}
+	}
+
+	protected void resetEditedItem() {
+		formObject = null;
+		editedItem = null;
+		selectedItem = null;
+		notifyChange("formObject", "editedItem", "selectedItem");
 	}
 
 	protected abstract void deleteItemFromSurvey(T item);

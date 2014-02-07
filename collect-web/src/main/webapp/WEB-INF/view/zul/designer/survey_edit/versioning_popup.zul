@@ -12,9 +12,15 @@
 		closable="true"
 		onClose="@command('close')">
 		<borderlayout>
+			<north>
+				<box pack="center" align="center" height="30px" hflex="1">
+					<label value="${labels.survey.versioning.introduction}" />
+				</box>
+			</north>
 			<west width="180px">
 				<borderlayout>
-					<center border="none">
+					<center border="none"
+						title="${labels.global.items.header.inserted}:">
 						<listbox id="itemsListBox"
 				        	selectedItem="@load(vm.selectedItem)"
 				        	model="@load(vm.items)"
@@ -57,51 +63,61 @@
 				</borderlayout>
 		    </west>
 	        <center>
-				<vlayout
-					visible="@load(vm.editingItem)"
-                    sclass="form"
-					form="@id('fx') 
-						@load(vm.formObject)
-                        @save(vm.formObject, before={'validate','applyChanges'})
-						@validator('org.openforis.collect.designer.form.validator.ModelVersionFormValidator')"
-					width="100%">
-					<grid>
-						<columns>
-							<column width="150px" />
-							<column />
-						</columns>
-						<rows>
-							<row>
-								<label value="${labels.survey.versioning.name}:" />
-      			                <fieldErrorHandler message="@load(vmsgs['name'])">
-									<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
-                                </fieldErrorHandler>
-							</row>
-							<row>
-								<multilanguageLabel value="${labels.survey.versioning.label}" 
-                                  languageCode="@load(vm.currentLanguageCode)" />
-      			                <fieldErrorHandler message="@load(vmsgs['label'])">
-									<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-                                </fieldErrorHandler>
-							</row>
-							<row>
-								<multilanguageLabel value="${labels.survey.versioning.description}" 
-                                  languageCode="@load(vm.currentLanguageCode)" />
-      			                <fieldErrorHandler message="@load(vmsgs['description'])">
-									<textbox width="300px" multiline="true" rows="4"
-                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
-                                </fieldErrorHandler>
-							</row>
-							<row>
-								<label value="${labels.survey.versioning.date}:" />
-      			                <fieldErrorHandler message="@load(vmsgs['date'])">
-									<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
-			                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
-                                </fieldErrorHandler>
-							</row>
-						</rows>
-					</grid>
-				</vlayout>
+	        	<absolutelayout>
+	        		<absolutechildren hflex="1" vflex="1">
+	        			<box pack="center" align="center" hflex="1" vflex="1"
+	        				visible="@load(not vm.editingItem)">
+		        			<label value="${labels.global.item.select_or_create_new_one}" />
+	        			</box>
+	        		</absolutechildren>
+	        		<absolutechildren hflex="1" vflex="1">
+						<vlayout
+							visible="@load(vm.editingItem)"
+		                    sclass="form"
+							form="@id('fx') 
+								@load(vm.formObject)
+		                        @save(vm.formObject, before={'validate','applyChanges'})
+								@validator('org.openforis.collect.designer.form.validator.ModelVersionFormValidator')"
+							width="100%">
+							<grid>
+								<columns>
+									<column width="150px" />
+									<column />
+								</columns>
+								<rows>
+									<row>
+										<label value="${labels.survey.versioning.name}:" />
+		      			                <fieldErrorHandler message="@load(vmsgs['name'])">
+											<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<multilanguageLabel value="${labels.survey.versioning.label}" 
+		                                  languageCode="@load(vm.currentLanguageCode)" />
+		      			                <fieldErrorHandler message="@load(vmsgs['label'])">
+											<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<multilanguageLabel value="${labels.survey.versioning.description}" 
+		                                  languageCode="@load(vm.currentLanguageCode)" />
+		      			                <fieldErrorHandler message="@load(vmsgs['description'])">
+											<textbox width="300px" multiline="true" rows="4"
+		                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<label value="${labels.survey.versioning.date}:" />
+		      			                <fieldErrorHandler message="@load(vmsgs['date'])">
+											<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
+					                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+								</rows>
+							</grid>
+						</vlayout>
+					</absolutechildren>
+				</absolutelayout>
 			</center>
 		</borderlayout>
 	</window>
