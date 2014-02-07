@@ -543,6 +543,12 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		initItemsPerLevel();
 		notifyChange("formObject","listLevels","selectedItemsPerLevel");
 	}
+	
+	@GlobalCommand
+	public void closeCodeListsManagerPopUp() {
+		resetEditedItem();
+		notifyChange("items");
+	}
 
 	private void addChildItemToCodeList() {
 		if ( editedItem.isEmpty() && isSurveyStored() ) {
