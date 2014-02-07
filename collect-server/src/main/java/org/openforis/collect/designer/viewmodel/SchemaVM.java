@@ -164,7 +164,7 @@ public class SchemaVM extends SurveyBaseVM {
 		selectedTreeNode = data;
 		treeModel.select(data);
 		SurveyObject surveyObject = data.getSurveyObject();
-		EntityDefinition parentDefn = treeModel.getNearestEntityDefinition(surveyObject);
+		EntityDefinition parentDefn = treeModel.getNearestParentEntityDefinition(surveyObject);
 		editNode(binder, false, parentDefn, surveyObject);
 	}
 
@@ -231,7 +231,7 @@ public class SchemaVM extends SurveyBaseVM {
 			if ( surveyObject instanceof NodeDefinition ) {
 				return (EntityDefinition) surveyObject;
 			} else {
-				EntityDefinition parentEntity = treeModel.getNearestEntityDefinition(surveyObject);
+				EntityDefinition parentEntity = treeModel.getNearestParentEntityDefinition(surveyObject);
 				return parentEntity;
 			}
 		}

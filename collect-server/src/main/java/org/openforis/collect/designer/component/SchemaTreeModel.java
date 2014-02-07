@@ -78,15 +78,17 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 		return getNodeData(path);
 	}
 	
-	public EntityDefinition getNearestEntityDefinition(SurveyObject surveyObject) {
+	public EntityDefinition getNearestParentEntityDefinition(SurveyObject surveyObject) {
 		SchemaTreeNode treeNode = getTreeNode(surveyObject);
-		while ( treeNode != null && treeNode.getData() != null ) {
-			SurveyObject currentSurveyObject = treeNode.getData().getSurveyObject();
+		SchemaTreeNode parentNode = (SchemaTreeNode)  treeNode.getParent();
+		while ( parentNode != null && parentNode.getData() != null ) {
+			SurveyObject currentSurveyObject = parentNode.getData().getSurveyObject();
 			if ( currentSurveyObject instanceof EntityDefinition ) {
 				return (EntityDefinition) currentSurveyObject;
 			}
-			treeNode = (SchemaTreeNode) treeNode.getParent();
+			parentNode = (SchemaTreeNode) parentNode.getParent();
 		}
+		//if not found, return root entity
 		return rootEntity;
 	}
 

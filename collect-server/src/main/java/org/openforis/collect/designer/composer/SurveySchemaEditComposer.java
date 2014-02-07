@@ -5,6 +5,7 @@ import java.util.Set;
 import org.openforis.collect.designer.component.AbstractTreeModel.AbstractNode;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
+import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNode;
 import org.openforis.collect.designer.viewmodel.SchemaVM;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.SurveyObject;
@@ -69,6 +70,15 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 		TreeModel<?> treeModel = nodesTree.getModel();
 		SchemaTreeModel schemaTreeModel = (SchemaTreeModel) treeModel;
 		schemaTreeModel.updateNodeLabel(surveyObject, label);
+		
+		for (Treeitem item : nodesTree.getItems()) {
+			SchemaTreeNode node = item.getValue();
+			SchemaNodeData data = node.getData();
+			SurveyObject itemSO = data.getSurveyObject();
+			if ( itemSO == surveyObject ) {
+				item.setLabel(label);
+			}
+		}
 	}
 
 	protected SchemaNodeData getSelectedNodeData() {
@@ -83,21 +93,19 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 		SchemaVM viewModel = (SchemaVM) getViewModel();
 		Treeitem selectedItem = nodesTree.getSelectedItem();
 		SchemaNodeData data = getSelectedNodeData();
-		if ( data instanceof SchemaNodeData ) {
-			Menupopup popupMenu;
-			if ( data.isDetached() ) { 
-				popupMenu = detachedNodePopup;
-			} else if ( viewModel.isEntity(data) ) {
-				if ( viewModel.isTableEntity(data)) {
-					popupMenu = tableEntityPopup;
-				} else {
-					popupMenu = entityPopup;
-				}
+		Menupopup popupMenu;
+		if ( data.isDetached() ) { 
+			popupMenu = detachedNodePopup;
+		} else if ( viewModel.isEntity(data) ) {
+			if ( viewModel.isTableEntity(data)) {
+				popupMenu = tableEntityPopup;
 			} else {
-				popupMenu = attributePopup;
+				popupMenu = entityPopup;
 			}
-			selectedItem.setContext(popupMenu);
+		} else {
+			popupMenu = attributePopup;
 		}
+		selectedItem.setContext(popupMenu);
 	}
 	
 	static class SchemaTreeItemRenderer implements TreeitemRenderer<AbstractNode<SchemaNodeData>> {
