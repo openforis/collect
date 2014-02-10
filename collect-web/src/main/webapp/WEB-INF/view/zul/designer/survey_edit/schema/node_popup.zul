@@ -1,0 +1,21 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
+<zk>
+	<window id="nodeEditPopUp" 
+		title="${arg.title}" 
+		width="500px" 
+		height="320px"
+		border="normal"
+		position="center" 
+		closable="true"
+		onClose="@command('closeNodeEditPopUp')">
+		
+		<include id="nodeFormInclude"
+			src="${arg.formLocation}"
+			parentEntity="${arg.parentEntity}"
+			item="${arg.item}"
+			newItem="${arg.newItem}"
+	 	/>
+ 	</window>
+</zk>

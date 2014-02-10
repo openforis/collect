@@ -61,6 +61,7 @@ import org.zkoss.zul.Window;
 public class SchemaVM extends SurveyBaseVM {
 
 	private static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
+	private static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
 
 	private static final boolean FILTER_BY_ROOT_ENTITY = true;
 	private static final String NODE_TYPES_IMAGES_PATH = "/assets/images/node_types/";
@@ -174,19 +175,19 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void addRootEntity(@ContextParam(ContextType.BINDER) final Binder binder) {
+	public void addRootEntity() {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
 				resetNodeSelection();
+				resetEditingStatus();
 				EntityDefinition rootEntity = createRootEntityDefinition();
 				selectedRootEntity = rootEntity;
 				selectedVersion = null;
-//				editNode(binder, true, null, rootEntity);
 				updateTreeModel();
-//				selectTreeNode(rootEntity);
-//				treeModel.markSelectedNodeAsDetached();
+				selectTreeNode(null);
 				notifyChange("selectedRootEntity","selectedVersion");
+				editRootEntity();
 			}
 		});
 	}
@@ -297,10 +298,13 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@GlobalCommand
-	public void editedNodeNameChanging(@ContextParam(ContextType.BINDER) Binder binder, 
-			@ContextParam(ContextType.VIEW) Component view, @BindingParam("name") String name) {
-		applyChangesToForm(binder);
-		modfiyNodeLabel(view, editedNode, name);
+	public void editedNodeNameChanging(
+			@ContextParam(ContextType.VIEW) Component view,
+			@BindingParam("item") SurveyObject item,
+			@BindingParam("name") String name) {
+		if ( editedNode != null && editedNode == item ) {
+			modfiyNodeLabel(view, editedNode, name);
+		}
 	}
 
 	private void modfiyNodeLabel(Component view, SurveyObject item, String label) {
@@ -395,21 +399,26 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 		
 	protected void validateForm(@ContextParam(ContextType.BINDER) Binder binder) {
-		Binder formComponentBinder = getNodeFormBinder(binder);
+		Component view = binder.getView();
+		IdSpace idSpace = view.getSpaceOwner();
+		Binder formComponentBinder = getNodeFormBinder(idSpace);
 		formComponentBinder.postCommand(VALIDATE_COMMAND, null);
 	}
 
-	protected Binder getNodeFormBinder(Binder binder) {
-		Component view = binder.getView();
-		IdSpace currentIdSpace = view.getSpaceOwner();
-		Component formComponent = Path.getComponent(currentIdSpace, "nodeFormInclude/nodeFormContainer");
+	protected Binder getNodeFormBinder(IdSpace idSpace) {
+		Component formComponent = getNodeFormComponent(idSpace);
 		Binder formComponentBinder = (Binder) formComponent.getAttribute("binder");
 		return formComponentBinder;
 	}
 
-	protected void applyChangesToForm(@ContextParam(ContextType.BINDER) Binder binder) {
-		Binder formComponentBinder = getNodeFormBinder(binder);
-		formComponentBinder.postCommand(APPLY_CHANGES_COMMAND, null);
+	protected Component getNodeFormComponent(IdSpace idSpace) {
+		Component component = Path.getComponent(idSpace, "nodeFormInclude/nodeFormContainer");
+		return component;
+	}
+
+	protected void applyChangesToForm(IdSpace idSpace) {
+		Binder binder = getNodeFormBinder(idSpace);
+		binder.postCommand(APPLY_CHANGES_COMMAND, null);
 	}
 	
 	@Command
@@ -462,10 +471,22 @@ public class SchemaVM extends SurveyBaseVM {
 	public void editRootEntity() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("formLocation", Resources.Component.ENTITY.getLocation());
+		args.put("title", Labels.getLabel("survey.layout.root_entity"));
 		args.put("parentEntity", null);
 		args.put("item", selectedRootEntity);
 		args.put("newItem", false);
 		rootEntityEditPopUp = openPopUp(Resources.Component.NODE_EDIT_POPUP.getLocation(), true, args);
+	}
+	
+	@Command
+	public void closeNodeEditPopUp() {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+			@Override
+			public void onOk(boolean confirmed) {
+				closePopUp(rootEntityEditPopUp);
+				rootEntityEditPopUp = null;
+			}
+		});
 	}
 	
 	@Command
@@ -554,25 +575,35 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@GlobalCommand
 	public void editedNodeChanged(@ContextParam(ContextType.VIEW) Component view, 
-			@BindingParam("parentEntity") EntityDefinition parentEntity) {
-		if ( newNode ) {
-			if ( editedNode instanceof NodeDefinition && parentEntity == null ) {
-				selectedRootEntity = (EntityDefinition) editedNode;
-				notifyChange("selectedRootEntity","selectedVersion");
-				updateTreeModel();
-			} else {
+			@BindingParam("parentEntity") EntityDefinition parentEntity,
+			@BindingParam("node") SurveyObject editedNode,
+			@BindingParam("newItem") Boolean newNode) {
+		if ( parentEntity == null ) {
+			//root entity
+			EntityDefinition rootEntity = (EntityDefinition) editedNode;
+			String label = rootEntity.getLabel(Type.INSTANCE, currentLanguageCode);
+			if ( StringUtils.isNotBlank(label) ) {
+				UITab mainTab = survey.getUIOptions().getMainTab(rootTabSet);
+				if ( DEFAULT_MAIN_TAB_LABEL.equals(mainTab.getLabel(currentLanguageCode))) {
+					mainTab.setLabel(currentLanguageCode, label);
+					updateTabLabel(mainTab, label);
+				}
+			}
+		} else {
+			if ( newNode ) {
 				//editing tab or nested node definition
 				selectedTreeNode.setDetached(false);
 				BindUtils.postNotifyChange(null, null, selectedTreeNode, "detached");
+
+				selectedTreeNode = treeModel.getNodeData(editedNode);
+				treeModel.select(selectedTreeNode);
+				newNode = false;
+				notifyChange("selectedTreeNode", "newNode", "editedNodePath");
 			}
-			selectedTreeNode = treeModel.getNodeData(editedNode);
-			treeModel.select(selectedTreeNode);
-			newNode = false;
-			notifyChange("selectedTreeNode", "newNode", "editedNodePath");
+			//to be called when not notifying changes on treeModel
+			refreshSelectedTreeNode(view);
 		}
 		dispatchSchemaChangedCommand();
-		//to be called when not notifying changes on treeModel
-		refreshSelectedTreeNode(view);
 	}
 
 	protected void refreshSelectedTreeNode(Component view) {
@@ -584,7 +615,12 @@ public class SchemaVM extends SurveyBaseVM {
 		EntityDefinition rootEntity = createEntityDefinition();
 		rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
 		survey.getSchema().addRootEntityDefinition(rootEntity);
-		survey.getUIOptions().createRootTabSet((EntityDefinition) rootEntity);
+		
+		UIOptions uiOptions = survey.getUIOptions();
+		rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
+		UITab mainTab = uiOptions.getMainTab(rootTabSet);
+		mainTab.setLabel(currentLanguageCode, DEFAULT_MAIN_TAB_LABEL);
+		
 		return rootEntity;
 	}
 
@@ -624,25 +660,24 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	public boolean isTab(SchemaNodeData data) {
-		return data.getSurveyObject() instanceof UITab;
+		return data != null && data.getSurveyObject() instanceof UITab;
 	}
 	
 	public boolean isMainTab(SchemaNodeData data) {
-		SurveyObject surveyObject = data.getSurveyObject();
-		if ( surveyObject instanceof UITab ) {
+		if ( isTab(data) ) {
 			UIOptions uiOptions = survey.getUIOptions();
-			return uiOptions.isMainTab((UITab) surveyObject);
+			return uiOptions.isMainTab((UITab) data.getSurveyObject());
 		} else {
 			return false;
 		}
 	}
 	
 	public boolean isEntity(SchemaNodeData data) {
-		return data.getSurveyObject() instanceof EntityDefinition;
+		return data != null && data.getSurveyObject() instanceof EntityDefinition;
 	}
 	
 	public boolean isSingleEntity(SchemaNodeData data) {
-		return data.getSurveyObject() instanceof EntityDefinition && ! ((NodeDefinition) data.getSurveyObject()).isMultiple();
+		return isEntity(data) && ! ((NodeDefinition) data.getSurveyObject()).isMultiple();
 	}
 	
 	public boolean isTableEntity(SchemaNodeData data) {

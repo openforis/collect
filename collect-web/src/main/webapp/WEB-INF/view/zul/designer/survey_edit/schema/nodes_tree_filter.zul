@@ -12,7 +12,7 @@
     <hlayout visible="${canEditRootEntities}">
       <button sclass="icon"
         tooltiptext="${labels.survey.schema.add_root_entity}"
-        image="/assets/images/add.png"
+        image="/assets/images/add-small.png"
         onClick="@command('addRootEntity')" />
       <button sclass="icon" 
       	disabled="@load(not vm.rootEntitySelected)"

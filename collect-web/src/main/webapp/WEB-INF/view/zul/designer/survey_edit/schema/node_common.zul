@@ -20,7 +20,7 @@
   				<fieldErrorHandler message="@load(vmsgs['name'])">
   					<textbox width="200px" maxlength="40"
   						value="@bind(fx.name)"
-  						onChange="@global-command('editedNodeNameChanging', name=self.value)" />
+  						onChange="@command('nameChanged', name=self.value)" />
   				</fieldErrorHandler>
   			</row>
   		</rows>

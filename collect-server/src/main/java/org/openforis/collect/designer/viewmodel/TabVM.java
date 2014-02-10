@@ -12,6 +12,11 @@ import org.openforis.collect.designer.form.TabFormObject;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
+import org.zkoss.bind.annotation.BindingParam;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
@@ -74,6 +79,8 @@ public class TabVM extends SurveyObjectBaseVM<UITab> {
 		super.commitChanges();
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", parentEntity);
+		args.put("node", editedItem);
+		args.put("newItem", newItem);
 		BindUtils.postGlobalCommand(null, null, "editedNodeChanged", args);
 	}
 	
@@ -83,6 +90,16 @@ public class TabVM extends SurveyObjectBaseVM<UITab> {
 		super.currentLanguageChanged();
 		setEditedItem(editedItem);
 		notifyChange("tempFormObject","formObject");
+	}
+	
+	@Command
+	public void labelChanged(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam("label") String label) {
+		dispatchApplyChangesCommand(binder);
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("item", editedItem);
+		args.put("name", label);
+		BindUtils.postGlobalCommand(null, null, "editedNodeNameChanging", args);
 	}
 	
 }

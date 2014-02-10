@@ -72,14 +72,14 @@
       </west>
 	<center>
         <vlayout hflex="true" vflex="true"
-          style="overflow: auto; padding: 10px">
+          style="overflow: auto; padding: 10px"
+          visible="@load(vm.editingNode)">
           	<hbox hflex="true" sclass="z-center-header node-type-header">
 				<label value="@load(vm.nodeTypeHeaderLabel)" />
 				<label value="Path:" sclass="pathLabel" />
           		<label value="@load(vm.editedNodePath)" hflex="true" />
           	</hbox>
-          <include id="nodeFormInclude" visible="@load(vm.editingNode)"
-            hflex="true" />
+          <include id="nodeFormInclude" hflex="true" />
         </vlayout>
       </center>
     </borderlayout>

@@ -20,6 +20,7 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.BindingParam;
+import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
@@ -87,10 +88,22 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		}
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", parentEntity);
+		args.put("node", editedItem);
+		args.put("newItem", newItem);
 		BindUtils.postGlobalCommand(null, null, "editedNodeChanged", args);
 		dispatchSurveyChangedCommand();
 	}
 
+	@Command
+	public void nameChanged(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam("name") String name) {
+		dispatchApplyChangesCommand(binder);
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("item", editedItem);
+		args.put("name", name);
+		BindUtils.postGlobalCommand(null, null, "editedNodeNameChanging", args);
+	}
+	
 	protected String getInstanceLabel(NodeDefinition nodeDefn) {
 		String label = nodeDefn.getLabel(Type.INSTANCE, currentLanguageCode);
 		return label;

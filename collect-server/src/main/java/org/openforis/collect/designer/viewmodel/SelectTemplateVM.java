@@ -75,14 +75,7 @@ public class SelectTemplateVM extends BaseVM {
 		if ( templateCode != null ) {
 			CollectSurvey survey;
 			if ( templateCode.equals(TemplateType.BLANK.name())) {
-				//create empty survey
-				survey = surveyManager.createSurveyWork();
-				//add default root entity
-				Schema schema = survey.getSchema();
-				EntityDefinition rootEntity = schema.createEntityDefinition();
-				rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
-				schema.addRootEntityDefinition(rootEntity);
-				survey.getUIOptions().createRootTabSet((EntityDefinition) rootEntity);
+				survey = createEmptySurvey();
 			} else {
 				//create survey from template
 				String templateFileName = "/org/openforis/collect/designer/templates/" + templateCode.toLowerCase() + ".idm.xml";
@@ -99,6 +92,19 @@ public class SelectTemplateVM extends BaseVM {
 		} else {
 			MessageUtil.showWarning("survey.template.error.select_type");
 		}
+	}
+
+	protected CollectSurvey createEmptySurvey() {
+		CollectSurvey survey;
+		//create empty survey
+		survey = surveyManager.createSurveyWork();
+		//add default root entity
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntity = schema.createEntityDefinition();
+		rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
+		schema.addRootEntityDefinition(rootEntity);
+		survey.getUIOptions().createRootTabSet((EntityDefinition) rootEntity);
+		return survey;
 	}
 
 }
