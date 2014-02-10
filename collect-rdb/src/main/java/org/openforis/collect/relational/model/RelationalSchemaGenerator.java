@@ -127,17 +127,29 @@ public class RelationalSchemaGenerator {
 			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, parentPkConstraint, parentIdColumn);
 			table.addConstraint(fkConstraint);
 		}
-		//add label columns
 		Survey survey = codeList.getSurvey();
-		List<String> langCodes = survey.getLanguages();
-		for (String langCode : langCodes) {
-			String colName = tableNamePrefix + config.getLabelColumnMiddleSuffix() + langCode;
+		//add default language label column
+		{
+			CodeLabelColumn col = new CodeLabelColumn(survey.getDefaultLanguage(), tableNamePrefix + config.getLabelColumnSuffix());
+			addColumn(table, col);
+		}
+		
+		//add label columns
+		for (String langCode : survey.getLanguages()) {
+			String colName = tableNamePrefix + config.getLabelColumnSuffix() + "_" + langCode;
 			CodeLabelColumn col = new CodeLabelColumn(langCode, colName);
 			addColumn(table, col);
 		}
+		
+		//add default language description column
+		{
+			CodeListDescriptionColumn col = new CodeListDescriptionColumn(survey.getDefaultLanguage(), tableNamePrefix + config.getDescriptionColumnSuffix());
+			addColumn(table, col);
+		}
+		
 		//add description columns
-		for (String langCode : langCodes) {
-			String colName = tableNamePrefix + config.getDescriptionColumnMiddleSuffix() + langCode;
+		for (String langCode : survey.getLanguages()) {
+			String colName = tableNamePrefix + config.getDescriptionColumnSuffix() + "_" + langCode;
 			CodeListDescriptionColumn col = new CodeListDescriptionColumn(langCode, colName);
 			table.addColumn(col);
 		}

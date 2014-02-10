@@ -14,6 +14,16 @@
         tooltiptext="${labels.survey.schema.add_root_entity}"
         image="/assets/images/add.png"
         onClick="@command('addRootEntity')" />
+      <button sclass="icon" 
+      	disabled="@load(not vm.rootEntitySelected)"
+      	tooltiptext="${labels.survey.schema.edit_root_entity}"
+      	onClick="@command('editRootEntity')"
+      	image="/assets/images/edit-small.png" />
+      <button sclass="icon"
+      	disabled="@load(not vm.rootEntitySelected)" 
+      	tooltiptext="${labels.survey.schema.remove_root_entity}"
+      	onClick="@command('removeRootEntity')"
+      	image="/assets/images/delete-small.png" />
     </hlayout>
     <label value="${labels.survey.schema.form_version}:" />
     <listbox width="150px" model="@load(vm.formVersions)"

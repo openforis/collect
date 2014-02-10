@@ -23,11 +23,6 @@
   						onChange="@global-command('editedNodeNameChanging', name=self.value)" />
   				</fieldErrorHandler>
   			</row>
-  			<row>
-  				<label value="${labels.survey.schema.node.path}:" />
-  				<label width="200px"
-  					value="@load(fx.path)" />
-  			</row>
   		</rows>
   	</grid>
 

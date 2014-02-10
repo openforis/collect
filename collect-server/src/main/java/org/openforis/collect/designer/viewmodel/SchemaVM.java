@@ -6,7 +6,9 @@ package org.openforis.collect.designer.viewmodel;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
@@ -48,6 +50,7 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Window;
 
 /**
  * 
@@ -84,6 +87,8 @@ public class SchemaVM extends SurveyBaseVM {
 	private SchemaTreeModel treeModel;
 
 	private EntityDefinition editedNodeParentEntity;
+
+	private Window rootEntityEditPopUp;
 
 	@Override
 	@Init(superclass=false)
@@ -409,40 +414,58 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@Command
 	public void removeNode() {
-		removeNode(selectedTreeNode);
+		removeTreeNode(selectedTreeNode);
 	}
 
-	public void removeNode(final SchemaNodeData data) {
+	private void removeTreeNode(final SchemaNodeData data) {
 		if ( data.isDetached() ) {
 			performRemoveDetachedNode();
 		} else {
 			SurveyObject surveyObject = data.getSurveyObject();
 			if ( surveyObject instanceof NodeDefinition ) {
-				final NodeDefinition nodeDefn = (NodeDefinition) surveyObject;
-				String confirmMessageKey;
-				if (nodeDefn instanceof EntityDefinition && !((EntityDefinition) nodeDefn).getChildDefinitions().isEmpty() ) {
-					confirmMessageKey = CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY;
-				} else {
-					confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
-				}
-				NodeType type = NodeType.valueOf(nodeDefn);
-				String typeLabel = type.getLabel().toLowerCase();
-				boolean isRootEntity = nodeDefn.getParentDefinition() == null;
-				if ( isRootEntity ) {
-					typeLabel = Labels.getLabel("survey.schema.root_entity");
-				}
-				Object[] messageArgs = new String[] {typeLabel, nodeDefn.getName()};
-				Object[] titleArgs = new String[] {typeLabel};
-				MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
-					@Override
-					public void onOk() {
-						performRemoveNode(nodeDefn);
-					}
-				}, confirmMessageKey, messageArgs, CONFIRM_REMOVE_NODE_TITLE_KEY, titleArgs, "global.remove_item", "global.cancel");
+				removeNodeDefinition((NodeDefinition) surveyObject);
 			} else {
 				//TODO
 			}
 		}
+	}
+
+	protected void removeNodeDefinition(final NodeDefinition nodeDefn) {
+		String confirmMessageKey;
+		if (nodeDefn instanceof EntityDefinition && !((EntityDefinition) nodeDefn).getChildDefinitions().isEmpty() ) {
+			confirmMessageKey = CONFIRM_REMOVE_NON_EMPTY_ENTITY_MESSAGE_KEY;
+		} else {
+			confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
+		}
+		NodeType type = NodeType.valueOf(nodeDefn);
+		String typeLabel = type.getLabel().toLowerCase();
+		boolean isRootEntity = nodeDefn.getParentDefinition() == null;
+		if ( isRootEntity ) {
+			typeLabel = Labels.getLabel("survey.schema.root_entity");
+		}
+		Object[] messageArgs = new String[] {typeLabel, nodeDefn.getName()};
+		Object[] titleArgs = new String[] {typeLabel};
+		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performRemoveNode(nodeDefn);
+			}
+		}, confirmMessageKey, messageArgs, CONFIRM_REMOVE_NODE_TITLE_KEY, titleArgs, "global.remove_item", "global.cancel");
+	}
+	
+	@Command
+	public void removeRootEntity() {
+		removeNodeDefinition(selectedRootEntity);
+	}
+	
+	@Command
+	public void editRootEntity() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("formLocation", Resources.Component.ENTITY.getLocation());
+		args.put("parentEntity", null);
+		args.put("item", selectedRootEntity);
+		args.put("newItem", false);
+		rootEntityEditPopUp = openPopUp(Resources.Component.NODE_EDIT_POPUP.getLocation(), true, args);
 	}
 	
 	@Command
@@ -505,13 +528,8 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	protected void performRemoveNode(NodeDefinition nodeDefn) {
 		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
-		if ( parentDefn != null ) {
-			if ( treeModel != null ) {
-				treeModel.removeSelectedNode();
-				notifyChange("treeModel");
-			}
-			parentDefn.removeChildDefinition(nodeDefn);
-		} else {
+		if ( parentDefn == null ) {
+			//root entity
 			UIOptions uiOpts = survey.getUIOptions();
 			UITabSet tabSet = uiOpts.getAssignedRootTabSet((EntityDefinition) nodeDefn);
 			uiOpts.removeTabSet(tabSet);
@@ -522,6 +540,12 @@ public class SchemaVM extends SurveyBaseVM {
 			rootTabSet = null;
 			notifyChange("selectedRootEntity");
 			updateTreeModel();
+		} else {
+			if ( treeModel != null ) {
+				treeModel.removeSelectedNode();
+				notifyChange("treeModel");
+			}
+			parentDefn.removeChildDefinition(nodeDefn);
 		}
 		resetEditingStatus();
 		dispatchCurrentFormValidatedCommand(true);
@@ -926,5 +950,10 @@ public class SchemaVM extends SurveyBaseVM {
 	public ModelVersion getSelectedVersion() {
 		return selectedVersion;
 	}
-
+	
+	@DependsOn("selectedRootEntity")
+	public boolean isRootEntitySelected() {
+		return selectedRootEntity != null;
+	}
+	
 }
