@@ -16,8 +16,8 @@ public class RelationalSchemaConfig implements Cloneable {
 	private String fkConstraintPrefix;
 	private String codeListTableSuffix;
 	private String codeListTablePrefix;
-	private String labelColumnMiddleSuffix;
-	private String descriptionColumnMiddleSuffix;
+	private String labelColumnSuffix;
+	private String descriptionColumnSuffix;
 	private String dataTablePrefix;
 	private String otherColumnSuffix;
 	private int textMaxLength;
@@ -36,8 +36,8 @@ public class RelationalSchemaConfig implements Cloneable {
 		config.fkConstraintPrefix = "fk_";
 		config.codeListTableSuffix = "_code";
 		config.codeListTablePrefix = "";
-		config.labelColumnMiddleSuffix = "_label_";
-		config.descriptionColumnMiddleSuffix = "_desc_";
+		config.labelColumnSuffix = "_label";
+		config.descriptionColumnSuffix = "_desc";
 		config.dataTablePrefix = "";
 		config.otherColumnSuffix = "_other";
 		config.textMaxLength = 255;
@@ -113,21 +113,20 @@ public class RelationalSchemaConfig implements Cloneable {
 		this.codeListTablePrefix = codeListTablePrefix;
 	}
 
-	public String getLabelColumnMiddleSuffix() {
-		return labelColumnMiddleSuffix;
+	public String getLabelColumnSuffix() {
+		return labelColumnSuffix;
 	}
-
-	public void setLabelColumnMiddleSuffix(String labelColumnMiddleSuffix) {
-		this.labelColumnMiddleSuffix = labelColumnMiddleSuffix;
+	
+	public void setLabelColumnSuffix(String labelColumnSuffix) {
+		this.labelColumnSuffix = labelColumnSuffix;
 	}
-
-	public String getDescriptionColumnMiddleSuffix() {
-		return descriptionColumnMiddleSuffix;
+	
+	public String getDescriptionColumnSuffix() {
+		return descriptionColumnSuffix;
 	}
-
-	public void setDescriptionColumnMiddleSuffix(
-			String descriptionColumnMiddleSuffix) {
-		this.descriptionColumnMiddleSuffix = descriptionColumnMiddleSuffix;
+	
+	public void setDescriptionColumnSuffix(String descriptionColumnSuffix) {
+		this.descriptionColumnSuffix = descriptionColumnSuffix;
 	}
 
 	public String getDataTablePrefix() {
