@@ -34,51 +34,65 @@
 			  gap="30"
 			  >
 		
-		<s:VGroup height="100%" 
-				  maxHeight="490"
-				  width="100%"
-				  horizontalAlign="center">
-			<s:DataGrid id="summaryDataGrid" 
-						height="100%"
-						rowHeight="22">
-				<s:columns>
-					<s:ArrayList>
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
-									  dataField="level_1"
-									  sortable="false"
-									  labelFunction="{hostComponent.levelLabelFunction}"
-									  width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level2Code')}" 
-									  dataField="level_2"
-									  sortable="false"
-									  labelFunction="{hostComponent.levelLabelFunction}"
-									  width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level3Code')}" 
-									  dataField="level_3"
-									  labelFunction="{hostComponent.levelLabelFunction}"
-									  width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.srs')}" 
-									  dataField="srsId"
-									  sortable="false"
-									  labelFunction="{hostComponent.samplingDesignSrsLabelFunction}"
-									  width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.x')}" 
-									  dataField="x"
-									  sortable="false"
-									  width="100" />
-						<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.y')}" 
-									  dataField="y"
-									  sortable="false"
-									  width="100" />
-					</s:ArrayList>
-				</s:columns>
-			</s:DataGrid>
-			
-			<datagrid:PaginationBar id="paginationBar" 
-									height="16"
-									horizontalCenter="0"
-									/>
-		</s:VGroup>
+		<s:Label text="{Message.get('samplingDesignImport.introduction')}" styleName="infoMessage" />
+		
+		<mx:ViewStack id="summaryContainer"
+					height="100%" width="100%" maxHeight="490"
+					creationPolicy="all">
+			<s:NavigatorContent height="100%" width="100%">
+				<s:Label text="{Message.get('samplingDesignImport.noItemsFound')}" 
+						 styleName="infoMessage"
+						 verticalCenter="0" horizontalCenter="0" />
+			</s:NavigatorContent>
+			<s:NavigatorContent height="100%" width="100%">
+				<s:VGroup height="100%" 
+						  maxHeight="490"
+						  width="100%"
+						  horizontalAlign="center">
+					<s:DataGrid id="summaryDataGrid" 
+								height="100%"
+								rowHeight="22">
+						<s:columns>
+							<s:ArrayList>
+								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level1Code')}" 
+											  dataField="level_1"
+											  sortable="false"
+											  labelFunction="{hostComponent.levelLabelFunction}"
+											  width="100" />
+								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level2Code')}" 
+											  dataField="level_2"
+											  sortable="false"
+											  labelFunction="{hostComponent.levelLabelFunction}"
+											  width="100" />
+								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.level3Code')}" 
+											  dataField="level_3"
+											  labelFunction="{hostComponent.levelLabelFunction}"
+											  width="100" />
+								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.srs')}" 
+											  dataField="srsId"
+											  sortable="false"
+											  labelFunction="{hostComponent.samplingDesignSrsLabelFunction}"
+											  width="100" />
+								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.x')}" 
+											  dataField="x"
+											  sortable="false"
+											  width="100" />
+								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.y')}" 
+											  dataField="y"
+											  sortable="false"
+											  width="100" />
+							</s:ArrayList>
+						</s:columns>
+					</s:DataGrid>
+					
+					<datagrid:PaginationBar id="paginationBar" 
+											height="16"
+											horizontalCenter="0"
+											/>
+				</s:VGroup>
+				
+			</s:NavigatorContent>
+		</mx:ViewStack>
 		
 		<s:Label text="{Message.get('samplingDesignImport.definedSrsIds', [hostComponent.spatialReferenceSystemIds])}" />
 		

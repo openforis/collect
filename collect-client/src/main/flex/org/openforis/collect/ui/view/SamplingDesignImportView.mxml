@@ -12,6 +12,7 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
+			import mx.containers.ViewStack;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.SpatialReferenceSystemProxy;
@@ -28,6 +29,8 @@
 			
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var downloadExampleButton:Button;
+			[SkinPart(required="true", type="mx.containers.ViewStack")]
+			public var summaryContainer:ViewStack;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new SamplingDesignImportPresenter(this);

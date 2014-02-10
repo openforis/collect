@@ -81,6 +81,7 @@ package org.openforis.collect.presenter
 		
 		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {
 			var result:SamplingDesignSummariesProxy = event.result as SamplingDesignSummariesProxy;
+			SamplingDesignImportView(_view).summaryContainer.selectedIndex = result.totalCount > 0 ? 1: 0;
 			_view.summaryDataGrid.dataProvider = result.records;
 			_view.paginationBar.totalRecords = result.totalCount;
 		}
