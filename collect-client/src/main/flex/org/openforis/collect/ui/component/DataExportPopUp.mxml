@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <component:PopUp xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx"
-		 xmlns:component="org.openforis.collect.ui.component.*"
-		 currentState="{STATE_LOADING}"
-		 width="400" height="300" height.partialExportParametersSelection="500"
-		 title="{Message.get('export.popUp.title')}"
-		 >
+				 xmlns:s="library://ns.adobe.com/flex/spark" 
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 xmlns:component="org.openforis.collect.ui.component.*"
+				 currentState="{STATE_LOADING}"
+				 width="400" height="300" height.partialExportParametersSelection="500"
+				 title="{Message.get('export.popUp.title')}"
+				 >
 	
 	<fx:Script>
 		<![CDATA[
@@ -22,7 +22,7 @@
 			public static const STATE_COMPLETE:String = "complete";
 			
 			private var _presenter:DataExportPopUpPresenter;
-
+			
 			override protected function initializationComplete():void {
 				super.initializationComplete();
 				_presenter = new DataExportPopUpPresenter(this);
@@ -107,7 +107,7 @@
 							   />
 			</s:VGroup>
 		</s:VGroup>
-			
+		
 		<s:VGroup id="parametersSelectionContainer"
 				  horizontalAlign="center"
 				  width="100%" height="100%"
@@ -135,13 +135,22 @@
 						 styleName="formLabel"/>
 				
 				<mx:Tree id="rootTree"
+						 enabled="{! exportAllCheckBox.selected}"
 						 height="100%"
 						 width="100%"
 						 defaultLeafIcon="{null}"
 						 folderOpenIcon="{null}"
 						 folderClosedIcon="{null}"
 						 />
+				
+				<s:CheckBox id="exportAllCheckBox" label="{Message.get('export.exportAll')}" />
+				
+				<s:CheckBox id="includeAllAncestorAttributesCheckBox" 
+							selected="false" 
+							label="{Message.get('export.includeAllAncestorAttributes')}" />
+				
 			</s:VGroup>
+
 		</s:VGroup>
 		
 		<s:HGroup horizontalAlign="center" width="100%" gap="40">
@@ -177,20 +186,20 @@
 						/>
 		
 		<s:Label id="progressLabel" />
-
+		
 		<s:Button id="cancelExportButton"
 				  label="{Message.get('global.cancel')}"
 				  useHandCursor="true" 
 				  buttonMode="true"
 				  />
 	</s:VGroup>
-		
+	
 	<s:VGroup includeIn="complete" itemCreationPolicy="immediate"
-			 height="100%" width="100%"
-			 horizontalAlign="center"
-			 verticalAlign="middle"
-			 gap="20"
-			 >
+			  height="100%" width="100%"
+			  horizontalAlign="center"
+			  verticalAlign="middle"
+			  gap="20"
+			  >
 		<s:Label text="{Message.get('export.complete')}"
 				 styleName="infoMessageBig"
 				 />

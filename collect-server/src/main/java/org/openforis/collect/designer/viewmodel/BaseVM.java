@@ -10,6 +10,8 @@ import org.openforis.collect.model.User;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
+import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.WebApp;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Window;
 
@@ -72,6 +74,11 @@ public abstract class BaseVM {
 		for (String property : properties) {
 			BindUtils.postNotifyChange(null, null, this, property);
 		}
+	}
+	
+	protected String getInitParameter(String name) {
+		WebApp webApp = Sessions.getCurrent().getWebApp();
+		return webApp.getInitParameter(name);
 	}
 	
 }

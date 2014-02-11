@@ -233,6 +233,10 @@ public class RecordManager {
 		return recordDao.countRecords(survey, rootEntityDefinitionId);
 	}
 	
+	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId, int dataStepNumber) {
+		return recordDao.countRecords(survey, rootEntityDefinitionId, dataStepNumber);
+	}
+	
 	@Transactional
 	public int getRecordCount(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();

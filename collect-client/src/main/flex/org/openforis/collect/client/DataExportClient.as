@@ -30,11 +30,11 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function export(responder:IResponder, rootEntityName:String, stepNumber:int, entityId:Number = NaN):void {
-			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId);
+		public function export(responder:IResponder, rootEntityName:String, stepNumber:int, entityId:Number = NaN, includeAllAncestorAttributes:Boolean = false):void {
+			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes);
 			token.addResponder(responder);
 		}
-
+		
 		public function fullExport(responder:IResponder, rootEntityName:String, stepNumbers:Array = null):void {
 			var token:AsyncToken = this._fullExportOperation.send(rootEntityName, stepNumbers);
 			token.addResponder(responder);

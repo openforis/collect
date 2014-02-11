@@ -84,7 +84,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			PageUtil.confirmClose(confirmCloseMessage);
 		}
 	}
-	
+
 	@Command
 	public void openLanguageManagerPopUp() {
 		if ( checkCanLeaveForm() ) {

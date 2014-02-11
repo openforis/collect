@@ -178,12 +178,19 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 	
 	public int countRecords(CollectSurvey survey, Integer rootEntityDefinitionId) {
+		return countRecords(survey, rootEntityDefinitionId, (Integer) null);
+	}
+	
+	public int countRecords(CollectSurvey survey, Integer rootEntityDefinitionId, Integer dataStepNumber) {
 		JooqFactory jf = getMappingJooqFactory(survey);
 		SelectConditionStep q = jf.selectCount()
 			.from(OFC_RECORD)
 			.where(OFC_RECORD.SURVEY_ID.eq(survey.getId()));
 		if ( rootEntityDefinitionId != null ) {
 			q.and(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.eq(rootEntityDefinitionId));
+		}
+		if ( dataStepNumber != null ) {
+			q.and(OFC_RECORD.STEP.ge(dataStepNumber));
 		}
 		Record record = q.fetchOne();
 		int result = record.getValue(Factory.count());
