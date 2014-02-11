@@ -76,7 +76,9 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 			LOG.info("Flatting single entity "+defn.getPath());
 			ColumnProvider p = new AutomaticColumnProvider(codeListManager, defn);
 			List<ColumnProvider> childCols = Arrays.asList(p);
-			PivotExpressionColumnProvider col = new PivotExpressionColumnProvider(name, name+"_", childCols);
+			String pivotExpression = name;
+			String headingPrefix = name + "_";
+			PivotExpressionColumnProvider col = new PivotExpressionColumnProvider(pivotExpression, headingPrefix, childCols);
 			cols.add(col);
 		}
 	}

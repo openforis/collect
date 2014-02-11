@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -29,11 +32,11 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 
@@ -51,20 +54,23 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 	private File exportDirectory;
 	private CollectSurvey survey;
 	private String rootEntityName;
-	private int entityId;
+	private Integer entityId;
 	private Step step;
+	private boolean includeAllAncestorAttributes;
 	
 	public SelectiveDataExportProcess(RecordManager recordManager,
 			CodeListManager codeListManager, File exportDirectory,
-			CollectSurvey survey, String rootEntityName, int entityId, Step step) {
+			CollectSurvey survey, String rootEntityName, Step step, 
+			Integer entityId, boolean includeAllAncestorAttributes) {
 		super();
 		this.recordManager = recordManager;
 		this.codeListManager = codeListManager;
 		this.exportDirectory = exportDirectory;
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
-		this.entityId = entityId;
 		this.step = step;
+		this.entityId = entityId;
+		this.includeAllAncestorAttributes = includeAllAncestorAttributes;
 	}
 
 	@Override
@@ -80,50 +86,75 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 	
 	private File exportData() throws Exception {
 		File file = null;
-		file = new File(exportDirectory, "data.zip");
+		String outputFileName = calculateOutputFileName();
+		file = new File(exportDirectory, outputFileName);
 		if ( file.exists() ) {
 			file.delete();
 			file.createNewFile();
 		}
 		FileOutputStream fileOutputStream = null;
-		ZipOutputStream zipOutputStream = null;
+		ZipOutputStream zipOS = null;
 		try {
+			status.setTotal(calculateTotal());
+
 			fileOutputStream = new FileOutputStream(file);
 			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-			zipOutputStream = new ZipOutputStream(bufferedOutputStream);
-			ZipEntry entry = new ZipEntry("data.csv");
-			zipOutputStream.putNextEntry(entry);
-			
-			exportData(zipOutputStream);
+			zipOS = new ZipOutputStream(bufferedOutputStream);
+			EntryNameGenerator entryNameGenerator = new EntryNameGenerator();
+			Collection<EntityDefinition> entities = getEntitiesToExport();
+			for (EntityDefinition entity : entities) {
+				String entryName = entryNameGenerator.generateEntryName(entity);
+				ZipEntry entry = new ZipEntry(entryName);
+				zipOS.putNextEntry(entry);
+				exportData(zipOS, entity.getId());
+				zipOS.closeEntry();
+			}
 		} catch (Exception e) {
 			status.error();
 			status.setErrorMessage(e.getMessage());
 			LOG.error(e.getMessage(), e);
 			throw e;
 		} finally {
-			if ( zipOutputStream != null ) {
-				zipOutputStream.closeEntry();
-				zipOutputStream.flush();
-				zipOutputStream.close();
+			if ( zipOS != null ) {
+				zipOS.flush();
+				zipOS.close();
 			}
 		}
 		//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
 		return file;
 	}
 
-	private void exportData(ZipOutputStream zipOutputStream) throws InvalidExpressionException, IOException, RecordPersistenceException {
+	private String calculateOutputFileName() {
+		return "data.zip";
+		/*
+		StringBuilder sb = new StringBuilder();
+		sb.append(survey.getName());
+		sb.append("_");
+		sb.append(rootEntityName);
+		sb.append("_");
+		sb.append("csv_data");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		String today = formatter.format(new Date());
+		sb.append(today);
+		sb.append(".zip");
+		return sb.toString();
+		*/
+	}
+
+	private void exportData(ZipOutputStream zipOutputStream, int entityId) throws InvalidExpressionException, IOException, RecordPersistenceException {
 		Writer outputWriter = new OutputStreamWriter(zipOutputStream);
-		DataTransformation transform = getTransform();
+		DataTransformation transform = getTransform(entityId);
 		
+		@SuppressWarnings("resource")
+		//closing modelWriter will close referenced output stream
 		ModelCsvWriter modelWriter = new ModelCsvWriter(outputWriter, transform);
 		modelWriter.printColumnHeadings();
 		
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String) null);
-		status.setTotal(calculateTotal(summaries));
 		int stepNumber = step.getStepNumber();
+		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName);
 		for (CollectRecord s : summaries) {
 			if ( status.isRunning() ) {
-				if ( stepNumber == s.getStep().getStepNumber() ) {
+				if ( stepNumber <= s.getStep().getStepNumber() ) {
 					CollectRecord record = recordManager.load(survey, s.getId(), stepNumber);
 					modelWriter.printData(record);
 					status.incrementProcessed();
@@ -132,6 +163,59 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 				break;
 			}
 		}
+	}
+	
+	private Collection<EntityDefinition> getEntitiesToExport() {
+		final Collection<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		Schema schema = survey.getSchema();
+		if ( entityId == null ) {
+			EntityDefinition rootEntity = schema.getRootEntityDefinition(rootEntityName);
+			rootEntity.traverse(new NodeDefinitionVisitor() {
+				@Override
+				public void visit(NodeDefinition node) {
+					if ( node instanceof EntityDefinition && node.isMultiple() ) {
+						result.add((EntityDefinition) node);
+					}
+				}
+			});
+		} else {
+			EntityDefinition entity = (EntityDefinition) schema.getDefinitionById(entityId);
+			result.add(entity);
+		}
+		return result;
+	}
+	
+	private int calculateTotal() {
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntity = schema.getRootEntityDefinition(rootEntityName);
+		int stepNumber = step.getStepNumber();
+		int totalRecords = recordManager.countRecords(survey, rootEntity.getId(), stepNumber);
+		Collection<EntityDefinition> entitiesToExport = getEntitiesToExport();
+		int result = totalRecords * entitiesToExport.size();
+		return result;
+	}
+
+	private DataTransformation getTransform(int entityId) throws InvalidExpressionException {
+		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
+		
+		Schema schema = survey.getSchema();
+		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
+		
+		//entity children columns
+		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(codeListManager, entityDefn);
+
+		//ancestor columns
+		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
+		//position column
+		if ( isPositionColumnRequired(entityDefn) ) {
+			columnProviders.add(createPositionColumnProvider(entityDefn));
+		}
+		columnProviders.add(entityColumnProvider);
+		
+		//create data transformation
+		ColumnProvider provider = new ColumnProviderChain(columnProviders);
+		String axisPath = entityDefn.getPath();
+		return new DataTransformation(axisPath, provider);
 	}
 	
 	private int calculateTotal(List<CollectRecord> recordSummaries) {
@@ -162,31 +246,37 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 
 	private List<ColumnProvider> createAncestorsColumnsProvider(EntityDefinition entityDefn) {
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
-		EntityDefinition parentDefn = (EntityDefinition) entityDefn.getParentDefinition();
+		EntityDefinition ancestorDefn = (EntityDefinition) entityDefn.getParentDefinition();
 		int depth = 1;
-		while ( parentDefn != null ) {
-			ColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(parentDefn, depth);
+		while ( ancestorDefn != null ) {
+			ColumnProvider parentKeysColumnsProvider = createAncestorColumnProvider(ancestorDefn, depth);
 			columnProviders.add(0, parentKeysColumnsProvider);
-			parentDefn = (EntityDefinition) parentDefn.getParentDefinition();
+			ancestorDefn = ancestorDefn.getParentEntityDefinition();
 			depth++;
 		}
 		return columnProviders;
 	}
 	
 	private ColumnProvider createAncestorColumnProvider(EntityDefinition entityDefn, int depth) {
-		List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
 		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
-		for (AttributeDefinition keyDefn : keyAttrDefns) {
-			String columnName = createKeyAttributeColumnName(keyDefn);
-			SingleAttributeColumnProvider keyColumnProvider = new SingleAttributeColumnProvider(keyDefn.getName(), columnName);
-			providers.add(keyColumnProvider);
+		String pivotExpression = StringUtils.repeat("parent()", "/", depth);
+		if ( includeAllAncestorAttributes ) {
+			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(codeListManager, entityDefn.getName() + "_", entityDefn);
+			providers.add(0, ancestorEntityColumnProvider);
+		} else {
+			//include only key attributes
+			List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
+			for (AttributeDefinition keyDefn : keyAttrDefns) {
+				String columnName = calculateAncestorKeyColumnName(keyDefn, false);
+				SingleAttributeColumnProvider keyColumnProvider = new SingleAttributeColumnProvider(keyDefn.getName(), columnName);
+				providers.add(keyColumnProvider);
+			}
+			if ( isPositionColumnRequired(entityDefn) ) {
+				ColumnProvider positionColumnProvider = createPositionColumnProvider(entityDefn);
+				providers.add(positionColumnProvider);
+			}
 		}
-		if ( isPositionColumnRequired(entityDefn) ) {
-			ColumnProvider positionColumnProvider = createPositionColumnProvider(entityDefn);
-			providers.add(positionColumnProvider);
-		}
-		String expression = StringUtils.repeat("parent()", "/", depth);
-		ColumnProvider result = new PivotExpressionColumnProvider(expression, providers.toArray(new ColumnProvider[0]));
+		ColumnProvider result = new PivotExpressionColumnProvider(pivotExpression, providers.toArray(new ColumnProvider[0]));
 		return result;
 	}
 	
@@ -195,25 +285,36 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 	}
 	
 	private ColumnProvider createPositionColumnProvider(EntityDefinition entityDefn) {
-		String columnName = createPositionColumnName(entityDefn);
+		String columnName = calculatePositionColumnName(entityDefn);
 		NodePositionColumnProvider columnProvider = new NodePositionColumnProvider(columnName);
 		return columnProvider;
 	}
 	
-	private String createKeyAttributeColumnName(AttributeDefinition attrDefn) {
-		StringBuilder sb = new StringBuilder();
-		NodeDefinition parentDefn = attrDefn.getParentDefinition();
-		if ( parentDefn.getId() != entityId ) {
-			sb.append(parentDefn.getName());
-			sb.append("_");
-		}
-		sb.append(attrDefn.getName());
-		return sb.toString();
+	private String calculateAncestorKeyColumnName(AttributeDefinition attrDefn, boolean includeAllAncestors) {
+		EntityDefinition parent = attrDefn.getParentEntityDefinition();
+		return parent.getName() + "_" + attrDefn.getName();
 	}
 	
-	private String createPositionColumnName(EntityDefinition nodeDefn) {
+	private String calculatePositionColumnName(EntityDefinition nodeDefn) {
 		return "_" + nodeDefn.getName() + "_position";
 	}
 	
+	private static class EntryNameGenerator {
+		
+		private Set<String> entryNames;
+		
+		public EntryNameGenerator() {
+			entryNames = new HashSet<String>();
+		}
+		
+		public String generateEntryName(EntityDefinition entity) {
+			String name = entity.getName() + ".csv";
+			if ( entryNames.contains(name) ) {
+				name = entity.getParentEntityDefinition().getName() + "_" + name;
+			}
+			entryNames.add(name);
+			return name;
+		}
+	}
 }
 

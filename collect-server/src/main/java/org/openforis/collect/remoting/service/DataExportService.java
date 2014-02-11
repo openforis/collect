@@ -71,7 +71,7 @@ public class DataExportService {
 	 * @return state of the export
 	 */
 	@Transactional
-	public DataExportStatusProxy export(String rootEntityName, int stepNumber, int entityId) {
+	public DataExportStatusProxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes) {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
@@ -81,7 +81,7 @@ public class DataExportService {
 			CollectSurvey survey = sessionState.getActiveSurvey();
 			SelectiveDataExportProcess process = new SelectiveDataExportProcess(
 					recordManager, codeListManager, exportDir, survey,
-					rootEntityName, entityId, Step.valueOf(stepNumber));
+					rootEntityName, Step.valueOf(stepNumber), entityId, includeAllAncestorAttributes);
 			process.init();
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);

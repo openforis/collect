@@ -1,5 +1,5 @@
 package org.openforis.collect.presenter {
-
+	
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
@@ -29,7 +29,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.ApplicationConstants;
 	
 	import spark.components.DropDownList;
-
+	
 	/**
 	 * 
 	 * @author S. Ricci
@@ -93,30 +93,27 @@ package org.openforis.collect.presenter {
 					break;
 			}
 		}
-			
+		
 		protected function exportButtonClickHandler(event:MouseEvent):void {
 			var rootEntity:String = Application.activeRootEntity.name;
 			var step:Object;
 			var stepNumber:Number;
 			switch ( _type ) {
 				case "partial":
-					var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
-					if ( selectedEntity == null ) {
-						AlertUtil.showMessage("export.selectAnEntity");
-					} else if ( ! selectedEntity.nodeDefinition.multiple ) {
-						AlertUtil.showMessage("export.selectMultipleEntity");
-					} else {
+					if ( validatePartialExportForm() ) {
 						step = DataExportPopUp(_view).stepDropDownList.selectedItem;
-						if ( step == null ) {
-							AlertUtil.showError("export.error.selectStep");
-						} else {
-							stepNumber = Application.getRecordStepNumber(CollectRecord$Step(step));
-							var entityId:int = selectedEntity.id;
-							ClientFactory.dataExportClient.export(_exportResponder, rootEntity, stepNumber, entityId);
-							
-							_view.currentState = DataExportPopUp.STATE_EXPORTING;
-							DataExportPopUp(_view).progressBar.setProgress(0, 0);
+						stepNumber = Application.getRecordStepNumber(CollectRecord$Step(step));
+						var exportAll:Boolean = DataExportPopUp(_view).exportAllCheckBox.selected;
+						var entityId:Number = NaN;
+						if ( ! exportAll ) {
+							var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
+							entityId = selectedEntity.id;
 						}
+						var includeAllAncestorAttributes:Boolean = DataExportPopUp(_view).includeAllAncestorAttributesCheckBox.selected;
+						ClientFactory.dataExportClient.export(_exportResponder, rootEntity, stepNumber, entityId, includeAllAncestorAttributes);
+						
+						_view.currentState = DataExportPopUp.STATE_EXPORTING;
+						DataExportPopUp(_view).progressBar.setProgress(0, 0);
 					}
 					break;
 				case "full":
@@ -132,6 +129,32 @@ package org.openforis.collect.presenter {
 					_view.currentState = DataExportPopUp.STATE_EXPORTING;
 					DataExportPopUp(_view).progressBar.setProgress(0, 0);
 					break;
+			}
+		}
+		
+		private function validatePartialExportForm():Boolean {
+			var step:CollectRecord$Step = DataExportPopUp(_view).stepDropDownList.selectedItem;
+			//validate step
+			if ( step == null ) {
+				AlertUtil.showError("export.error.selectStep");
+				return false;
+			} else {
+				//validate selected entity
+				var exportAll:Boolean = DataExportPopUp(_view).exportAllCheckBox.selected;
+				if ( exportAll ) {
+					return true;
+				} else {
+					var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
+					if ( selectedEntity == null ) {
+						AlertUtil.showMessage("export.selectAnEntity");
+						return false;
+					} else if ( ! selectedEntity.nodeDefinition.multiple ) {
+						AlertUtil.showMessage("export.selectMultipleEntity");
+						return false;
+					} else {
+						return true;
+					}
+				}
 			}
 		}
 		
