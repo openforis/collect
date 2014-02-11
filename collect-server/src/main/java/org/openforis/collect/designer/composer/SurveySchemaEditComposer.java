@@ -39,11 +39,17 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 	@Wire
 	private Tree nodesTree;
 	@Wire
-	private Menupopup entityPopup;
+	private Menupopup mainTabPopup;
 	@Wire
-	private Menupopup attributePopup;
+	private Menupopup tabPopup;
+	@Wire
+	private Menupopup singleEntityPopup;
 	@Wire
 	private Menupopup tableEntityPopup;
+	@Wire
+	private Menupopup formEntityPopup;
+	@Wire
+	private Menupopup attributePopup;
 	@Wire
 	private Menupopup detachedNodePopup;
 	
@@ -90,22 +96,35 @@ public class SurveySchemaEditComposer extends BindComposer<Component> {
 	}
 	
 	public void refreshSelectedTreeNodeContextMenu() {
-		SchemaVM viewModel = (SchemaVM) getViewModel();
 		Treeitem selectedItem = nodesTree.getSelectedItem();
 		SchemaNodeData data = getSelectedNodeData();
+		Menupopup popupMenu = getPopupMenu(data);
+		selectedItem.setContext(popupMenu);
+	}
+
+	private Menupopup getPopupMenu(SchemaNodeData data) {
 		Menupopup popupMenu;
+		SchemaVM vm = (SchemaVM) getViewModel();
 		if ( data.isDetached() ) { 
 			popupMenu = detachedNodePopup;
-		} else if ( viewModel.isEntity(data) ) {
-			if ( viewModel.isTableEntity(data)) {
+		} else if ( vm.isTab(data) ) {
+			if ( vm.isMainTab(data) ) {
+				popupMenu = mainTabPopup;
+			} else {
+				popupMenu = tabPopup;
+			}
+		} else if ( vm.isEntity(data) ) {
+			if ( vm.isSingleEntity(data) ) {
+				popupMenu = singleEntityPopup;
+			} else if ( vm.isTableEntity(data)) {
 				popupMenu = tableEntityPopup;
 			} else {
-				popupMenu = entityPopup;
+				popupMenu = formEntityPopup;
 			}
 		} else {
 			popupMenu = attributePopup;
 		}
-		selectedItem.setContext(popupMenu);
+		return popupMenu;
 	}
 	
 	static class SchemaTreeItemRenderer implements TreeitemRenderer<AbstractNode<SchemaNodeData>> {

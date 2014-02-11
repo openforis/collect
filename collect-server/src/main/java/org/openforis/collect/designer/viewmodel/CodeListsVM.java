@@ -91,6 +91,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@WireVariable
 	private CodeListManager codeListManager;
 	
+	public CodeListsVM() {
+		formObject = createFormObject();
+	}
+	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam(EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
 			@ExecutionArgParam(SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {

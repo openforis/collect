@@ -4,6 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
+import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.BindContext;
@@ -25,8 +26,10 @@ public abstract class FormValidator extends BaseValidator {
 	
 	@Override
 	public void validate(ValidationContext ctx) {
-		internalValidate(ctx);
-		afterValidate(ctx);
+		if ( isEditingItem(ctx) ) {
+			internalValidate(ctx);
+			afterValidate(ctx);
+		}
 	}
 	
 	protected void afterValidate(ValidationContext ctx) {
@@ -108,4 +111,13 @@ public abstract class FormValidator extends BaseValidator {
 		return blocking;
 	}
 	
+	protected boolean isEditingItem(ValidationContext ctx) {
+		Object vm = getVM(ctx);
+		if ( vm instanceof SurveyObjectBaseVM ) {
+			return ((SurveyObjectBaseVM<?>) vm).isEditingItem();
+		} else {
+			return false;
+		}
+	}
+
 }

@@ -16,7 +16,6 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.SurveyObject;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.util.resource.Labels;
@@ -34,15 +33,12 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 	private ModelVersion version;
 	
 	private EntityDefinition rootEntity;
-	private boolean singleRootEntity;
 	private boolean includeAttributes;
 	private String labelLanguage;
 
-	SchemaTreeModel(AbstractNode<SchemaNodeData> root, EntityDefinition rootEntity, ModelVersion version, 
-			boolean singleRootEntity, boolean includeAttributes, String labelLanguage) {
+	SchemaTreeModel(AbstractNode<SchemaNodeData> root, EntityDefinition rootEntity, ModelVersion version, boolean includeAttributes, String labelLanguage) {
 		super(root);
 		this.rootEntity = rootEntity;
-		this.singleRootEntity = singleRootEntity;
 		this.includeAttributes = includeAttributes;
 		this.version = version;
 		this.labelLanguage = labelLanguage;
@@ -59,7 +55,7 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 				firstLevelTreeNodes.add(node);
 			}
 			SchemaTreeNode root = new SchemaTreeNode(null, firstLevelTreeNodes);
-			SchemaTreeModel result = new SchemaTreeModel(root, rootEntity, version, true, includeAttributes, labelLanguage);
+			SchemaTreeModel result = new SchemaTreeModel(root, rootEntity, version, includeAttributes, labelLanguage);
 			return result;
 		} else {
 			return null;
@@ -111,7 +107,7 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 		}
 	}
 	
-	protected SchemaTreeNode getTreeNode(SurveyObject surveyObject) {
+	public SchemaTreeNode getTreeNode(SurveyObject surveyObject) {
 		TreeNode<SchemaNodeData> root = getRoot();
 		Stack<SchemaTreeNode> stack = new Stack<SchemaTreeNode>();
 		stack.push((SchemaTreeNode) root);
@@ -177,40 +173,22 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 		data.setDetached(true);
 	}
 
-	protected int getIndexInTree(EntityDefinition parent, NodeDefinition node) {
-		List<NodeDefinition> siblings;
-		if ( parent == null ) {
-			if ( singleRootEntity ) {
-				return 0;
-			} else {
-				Schema schema = node.getSchema();
-				siblings = new ArrayList<NodeDefinition>();
-				List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
-				for (EntityDefinition rootEntity : rootEntities) {
-					if ( version == null || version.isApplicable(rootEntity) ) {
-						siblings.add(rootEntity);
-					}
-				}
-			}
-		} else {
-			siblings = getFilteredChildren(parent);
-		}
-		return siblings.indexOf(node);
-	}
-	
-	protected List<NodeDefinition> getFilteredChildren(EntityDefinition parent) {
-		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
-		List<NodeDefinition> allSiblings = parent.getChildDefinitions();
-		for (NodeDefinition childDefn : allSiblings) {
-			if ( isInVersion(childDefn) && (includeAttributes || childDefn instanceof EntityDefinition) ) {
-				result.add(childDefn);
+	public List<SurveyObject> getSiblingsAndSelf(SurveyObject obj, boolean sameType) {
+		List<SurveyObject> result = new ArrayList<SurveyObject>();
+		TreeNode<SchemaNodeData> treeNode = getTreeNode(obj);
+		SchemaTreeNode parent = (SchemaTreeNode) treeNode.getParent();
+		List<TreeNode<SchemaNodeData>> children = parent.getChildren();
+		for (TreeNode<SchemaNodeData> child : children) {
+			SurveyObject surveyObject = child.getData().getSurveyObject();
+			if ( sameType && (
+					(obj instanceof UITab && surveyObject instanceof UITab)
+					||
+					(obj instanceof NodeDefinition && surveyObject instanceof NodeDefinition)
+				) ) {
+				result.add(surveyObject);
 			}
 		}
 		return result;
-	}
-
-	protected boolean isInVersion(NodeDefinition childDefn) {
-		return version == null || version.isApplicable(childDefn);
 	}
 
 	protected SchemaTreeNode recreateNode(SchemaTreeNode node, boolean defineEmptyChildrenForLeaves) {
@@ -243,6 +221,19 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 		public String getIcon() {
 			SchemaNodeData data = getData();
 			return SchemaVM.getIcon(data);
+		}
+		
+		public int getIndexInModel() {
+			int result;
+			SchemaNodeData data = getData();
+			SurveyObject surveyObject = data.getSurveyObject();
+			if ( surveyObject instanceof NodeDefinition ) {
+				EntityDefinition parentEntity = ((NodeDefinition) surveyObject).getParentEntityDefinition();
+				result = parentEntity.getChildDefinitionIndex((NodeDefinition) surveyObject);
+			} else {
+				result = ((UITab) surveyObject).getIndex();
+			}
+			return result;
 		}
 		
 		public static AbstractNode<SchemaNodeData> createNode(SchemaNodeData data, ModelVersion version,

@@ -76,8 +76,8 @@
           visible="@load(vm.editingNode)">
           	<hbox hflex="true" sclass="z-center-header node-type-header">
 				<label value="@load(vm.nodeTypeHeaderLabel)" />
-				<label value="Path:" sclass="pathLabel" />
-          		<label value="@load(vm.editedNodePath)" hflex="true" />
+				<label value="Path:" sclass="path-label" hflex="true" />
+          		<label value="@load(vm.editedNodePath)" />
           	</hbox>
           <include id="nodeFormInclude" hflex="true" />
         </vlayout>

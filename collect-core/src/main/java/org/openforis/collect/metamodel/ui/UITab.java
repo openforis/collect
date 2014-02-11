@@ -80,7 +80,9 @@ public class UITab extends UITabSet {
 		UITab currentTab = this;
 		while ( currentTab != null ) {
 			String label = currentTab.getLabel(language);
-			sb.insert(0, "/");
+			if ( currentTab != this ) {
+				sb.insert(0, "/");
+			}
 			sb.insert(0, label);
 			UITabSet parent = currentTab.getParent();
 			if ( parent instanceof UITab ) {

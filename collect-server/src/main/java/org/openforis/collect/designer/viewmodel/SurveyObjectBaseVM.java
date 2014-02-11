@@ -18,6 +18,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
@@ -42,6 +43,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	public SurveyObjectBaseVM() {
 		commitChangesOnApply = true;
+	}
+	
+	@Override
+	@GlobalCommand
+	public void undoLastChanges(@ContextParam(ContextType.VIEW) Component view) {
+		super.undoLastChanges(view);
+		resetEditedItem();
 	}
 	
 	public BindingListModelList<T> getItems() {
@@ -218,7 +226,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	}
 
 	protected void resetEditedItem() {
-		formObject = null;
+		formObject = createFormObject();
 		editedItem = null;
 		selectedItem = null;
 		notifyChange("formObject", "editedItem", "selectedItem");
