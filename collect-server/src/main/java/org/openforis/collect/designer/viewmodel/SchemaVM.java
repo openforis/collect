@@ -15,6 +15,7 @@ import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.composer.SurveySchemaEditComposer;
 import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -210,20 +211,23 @@ public class SchemaVM extends SurveyBaseVM {
 				EntityDefinition parentEntity = getSelectedNodeParentEntity();
 				EntityDefinition newNode = createEntityDefinition();
 				newNode.setMultiple(multiple);
-				UIOptions uiOpts = survey.getUIOptions();
+				UIOptions uiOptions = survey.getUIOptions();
 				Layout layoutEnum = Layout.valueOf(layout);
-//				if ( uiOpts.isLayoutSupported(parentEntity, newNode.getId(), (UITab) null, multiple, layoutEnum) ) {
-					uiOpts.setLayout(newNode, layoutEnum);
-					SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-					if ( surveyObject instanceof UITab ) {
-						UIOptions uiOptions = survey.getUIOptions();
-						uiOptions.assignToTab(newNode, (UITab) surveyObject);
+				SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();
+				UITab parentTab = null;
+				if ( selectedSurveyObject instanceof UITab ) {
+					parentTab = (UITab) selectedSurveyObject;
+				}
+				if ( uiOptions.isLayoutSupported(parentEntity, newNode.getId(), parentTab, multiple, layoutEnum) ) {
+					uiOptions.setLayout(newNode, layoutEnum);
+					if ( parentTab != null ) {
+						uiOptions.assignToTab(newNode, parentTab);
 					}
 					editNode(binder, true, parentEntity, newNode);
 					afterNewNodeCreated(newNode, true);
-//				} else {
-//					MessageUtil.showWarning(LabelKeys.LAYOUT_NOT_SUPPORTED_MESSAGE_KEY);
-//				}
+				} else {
+					MessageUtil.showWarning(LabelKeys.LAYOUT_NOT_SUPPORTED_MESSAGE_KEY);
+				}
 			}
 
 		});
@@ -259,10 +263,11 @@ public class SchemaVM extends SurveyBaseVM {
 				AttributeType attributeTypeEnum = AttributeType.valueOf(attributeType);
 				AttributeDefinition newNode = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeTypeEnum);
 				EntityDefinition parentEntity = getSelectedNodeParentEntity();
-				SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-				if ( surveyObject instanceof UITab ) {
+				SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();
+				if ( selectedSurveyObject instanceof UITab ) {
+					UITab selectedTab = (UITab) selectedSurveyObject;
 					UIOptions uiOptions = survey.getUIOptions();
-					uiOptions.assignToTab(newNode, (UITab) surveyObject);
+					uiOptions.assignToTab(newNode, selectedTab);
 				}
 				editNode(binder, true, parentEntity, newNode);
 				afterNewNodeCreated(newNode, true);
