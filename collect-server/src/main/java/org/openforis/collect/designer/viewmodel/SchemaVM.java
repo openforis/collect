@@ -102,9 +102,9 @@ public class SchemaVM extends SurveyBaseVM {
 		Selectors.wireComponents(view, this, false);
 		Selectors.wireEventListeners(view, this);
 		 
-		//if one root entity is defined, select it
+		//select first root entity
 		List<EntityDefinition> rootEntities = getRootEntities();
-		if (rootEntities.size() == 1) {
+		if (rootEntities.size() > 0) {
 			EntityDefinition mainRootEntity = rootEntities.get(0);
 			performNodeTreeFilterChange(mainRootEntity, null);
 		}
