@@ -1,4 +1,4 @@
-package org.openforis.collect.remoting.service.dataimport;
+package org.openforis.collect.io.data;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,34 +17,37 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.data.DataImportState.MainStep;
+import org.openforis.collect.io.data.DataImportState.SubStep;
+import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
+import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.dataexport.BackupProcess;
 import org.openforis.collect.manager.dataexport.BackupProcess.RecordEntry;
-import org.openforis.collect.manager.exception.DataImportExeption;
-import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
-import org.openforis.collect.remoting.service.dataimport.DataImportState.MainStep;
-import org.openforis.collect.remoting.service.dataimport.DataImportState.SubStep;
-import org.openforis.collect.remoting.service.dataimport.DataImportSummary.FileErrorItem;
 import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.FileAttribute;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -52,21 +55,26 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  * 
  */
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataImportProcess implements Callable<Void> {
 
 	private static Log LOG = LogFactory.getLog(DataImportProcess.class);
 
-	private RecordDao recordDao;
+	@Autowired
 	private RecordManager recordManager;
+	@Autowired
 	private RecordFileManager recordFileManager;
+	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
 	private SurveyValidator surveyValidator;
+	@Autowired
+	private UserManager userManager;
 
-	private Map<String, User> users;
-	private String selectedSurveyUri;
-	private String newSurveyName;
+	private String surveyUri;
 	private DataImportState state;
-	private File packagedFile;
+	private File file;
 
 	/**
 	 * Survey contained into the package file
@@ -85,23 +93,11 @@ public class DataImportProcess implements Callable<Void> {
 
 	private boolean includesRecordFiles;
 
-	
-	public DataImportProcess(SurveyManager surveyManager, SurveyValidator surveyValidator, RecordManager recordManager, RecordDao recordDao,
-			RecordFileManager recordFileManager,
-			String selectedSurveyUri, Map<String, User> users, File packagedFile, boolean overwriteAll) {
+	public DataImportProcess() {
 		super();
-		this.surveyManager = surveyManager;
-		this.surveyValidator = surveyValidator;
-		this.recordManager = recordManager;
-		this.recordDao = recordDao;
-		this.recordFileManager = recordFileManager;
-		this.selectedSurveyUri = selectedSurveyUri;
-		this.users = users;
-		this.packagedFile = packagedFile;
-		this.overwriteAll = overwriteAll;
 		this.state = new DataImportState();
-		processedRecords = new ArrayList<Integer>();
-		entryIdsToImport = new ArrayList<Integer>();
+		this.processedRecords = new ArrayList<Integer>();
+		this.entryIdsToImport = new ArrayList<Integer>();
 	}
 
 	public DataImportState getState() {
@@ -134,6 +130,7 @@ public class DataImportProcess implements Callable<Void> {
 			case IMPORT:
 				importPackagedFile();
 				break;
+			default:
 			}
 		}
 		return null;
@@ -158,7 +155,7 @@ public class DataImportProcess implements Callable<Void> {
 			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors = new HashMap<String, List<NodeUnmarshallingError>>();
 			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings = new HashMap<Integer, Map<Step,List<NodeUnmarshallingError>>>();
-			zipFile = new ZipFile(packagedFile);
+			zipFile = new ZipFile(file);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			state.setTotal(zipFile.size());
 			state.resetCount();
@@ -202,9 +199,9 @@ public class DataImportProcess implements Callable<Void> {
 			packagedSurvey = existingSurvey;
 		} else {
 			String packagedSurveyUri = packagedSurvey.getUri();
-			if ( selectedSurveyUri != null && !selectedSurveyUri.equals(packagedSurveyUri) ) {
+			if ( surveyUri != null && !surveyUri.equals(packagedSurveyUri) ) {
 				throw new IllegalArgumentException("Cannot import data related to survey '" + packagedSurveyUri + 
-						"' into on a different survey (" + selectedSurveyUri + ")");
+						"' into on a different survey (" + surveyUri + ")");
 			}
 			List<SurveyValidationResult> compatibilityResult = surveyValidator.validateCompatibility(existingSurvey, packagedSurvey);
 			if ( ! compatibilityResult.isEmpty() ) {
@@ -216,18 +213,18 @@ public class DataImportProcess implements Callable<Void> {
 
 	protected CollectSurvey getExistingSurvey() {
 		String uri;
-		if ( selectedSurveyUri == null ) {
+		if ( surveyUri == null ) {
 			if ( packagedSurvey == null ) {
 				throw new IllegalStateException("Survey uri not specified and packaged survey not found");
 			} else {
 				uri = packagedSurvey.getUri();
 			}
 		} else {
-			uri = selectedSurveyUri;
+			uri = surveyUri;
 		}
 		CollectSurvey survey = surveyManager.getByUri(uri);
-		if ( survey == null && selectedSurveyUri != null ) {
-			throw new IllegalArgumentException("Published survey not found. URI: " + selectedSurveyUri);
+		if ( survey == null && surveyUri != null ) {
+			throw new IllegalArgumentException("Published survey not found. URI: " + surveyUri);
 		} else {
 			return survey;
 		}
@@ -343,12 +340,7 @@ public class DataImportProcess implements Callable<Void> {
 			processedRecords = new ArrayList<Integer>();
 			state.setTotal(entryIdsToImport.size());
 			state.resetCount();
-			CollectSurvey oldSurvey = getExistingSurvey();
-			if ( oldSurvey == null ) {
-				packagedSurvey.setName(newSurveyName);
-				surveyManager.importModel(packagedSurvey);
-			}
-			zipFile = new ZipFile(packagedFile);
+			zipFile = new ZipFile(file);
 			state.setRunning(true);
 			for (Integer entryId : entryIdsToImport) {
 				if ( state.getSubStep() == SubStep.RUNNING && ! processedRecords.contains(entryId) ) {
@@ -379,7 +371,7 @@ public class DataImportProcess implements Callable<Void> {
 		}
 	}
 	
-	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption, RecordFileException {
+	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption, RecordPersistenceException {
 		CollectRecord lastProcessedRecord = null;
 		Step originalRecordStep = null;
 		Step[] steps = Step.values();
@@ -400,7 +392,7 @@ public class DataImportProcess implements Callable<Void> {
 						CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
 						if (oldRecordSummary == null) {
 							//insert new record
-							recordDao.insert(parsedRecord);
+							recordManager.save(parsedRecord);
 							LOG.info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
 						} else {
 							//overwrite existing record
@@ -409,13 +401,13 @@ public class DataImportProcess implements Callable<Void> {
 							if ( includesRecordFiles ) {
 								recordFileManager.deleteAllFiles(parsedRecord);
 							}
-							recordDao.update(parsedRecord);
+							recordManager.save(parsedRecord);
 							LOG.info("Updated: " + oldRecordSummary.getId() + " (from file " + entryName  + ")");
 						}
 						lastProcessedRecord = parsedRecord;
 					} else {
 						replaceData(parsedRecord, lastProcessedRecord);
-						recordDao.update(lastProcessedRecord);
+						recordManager.save(lastProcessedRecord);
 					}
 					if ( parseRecordResult.hasWarnings() ) {
 						//state.addWarnings(entryName, parseRecordResult.getWarnings());
@@ -426,17 +418,17 @@ public class DataImportProcess implements Callable<Void> {
 		if ( lastProcessedRecord != null && originalRecordStep != null && originalRecordStep.compareTo(lastProcessedRecord.getStep()) > 0 ) {
 			//reset the step to the original one and revalidate the record
 			CollectSurvey survey = (CollectSurvey) lastProcessedRecord.getSurvey();
-			CollectRecord originalRecord = recordDao.load(survey, lastProcessedRecord.getId(), originalRecordStep.getStepNumber());
+			CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep);
 			originalRecord.setStep(originalRecordStep);
 			validateRecord(originalRecord);
-			recordDao.update(originalRecord);
+			recordManager.save(originalRecord);
 		}
 		if ( includesRecordFiles ) {
 			importRecordFiles(zipFile, lastProcessedRecord);
 		}
 	}
 
-	private void importRecordFiles(ZipFile zipFile, CollectRecord record) throws IOException, RecordFileException {
+	private void importRecordFiles(ZipFile zipFile, CollectRecord record) throws IOException, RecordPersistenceException {
 		recordFileManager.resetTempInfo();
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		String sessionId = "admindataimport";
@@ -451,10 +443,10 @@ public class DataImportProcess implements Callable<Void> {
 		if ( recordFileManager.commitChanges(sessionId, record) ) {
 			if ( record.getStep() == Step.ANALYSIS ) {
 				record.setStep(Step.CLEANSING);
-				recordDao.update(record);
+				recordManager.save(record, sessionId);
 				record.setStep(Step.ANALYSIS);
 			}
-			recordDao.update(record);
+			recordManager.save(record, sessionId);
 		}
 	}
 
@@ -489,7 +481,7 @@ public class DataImportProcess implements Callable<Void> {
 
 	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
 		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
-		DataHandler handler = new DataHandler(currentSurvey, packagedSurvey, users);;
+		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey);
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
 		return dataUnmarshaller;
 	}
@@ -513,7 +505,7 @@ public class DataImportProcess implements Callable<Void> {
 		ZipFile zipFile = null;
 		CollectSurvey survey = null;
 		try {
-			zipFile = new ZipFile(packagedFile);
+			zipFile = new ZipFile(file);
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry zipEntry = (ZipEntry) entries.nextElement();
@@ -599,10 +591,6 @@ public class DataImportProcess implements Callable<Void> {
 		this.overwriteAll = overwriteAll;
 	}
 
-	public void setNewSurveyName(String newSurveyName) {
-		this.newSurveyName = newSurveyName;
-	}
-
 	public DataImportSummary getSummary() {
 		return summary;
 	}
@@ -615,4 +603,20 @@ public class DataImportProcess implements Callable<Void> {
 		this.entryIdsToImport = entryIdsToImport;
 	}
 
+	public String getSurveyUri() {
+		return surveyUri;
 	}
+
+	public void setSurveyUri(String surveyUri) {
+		this.surveyUri = surveyUri;
+	}
+
+	public File getFile() {
+		return file;
+	}
+	
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+}

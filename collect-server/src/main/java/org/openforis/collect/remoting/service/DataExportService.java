@@ -11,7 +11,7 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.BackupProcess;
 import org.openforis.collect.manager.dataexport.DataExportStatus;
-import org.openforis.collect.manager.dataexport.SelectiveDataExportProcess;
+import org.openforis.collect.manager.dataexport.CSVDataExportProcess;
 import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -79,9 +79,9 @@ public class DataExportService {
 				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
 			}
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			SelectiveDataExportProcess process = new SelectiveDataExportProcess(
-					recordManager, codeListManager, exportDir, survey,
-					rootEntityName, Step.valueOf(stepNumber), entityId, includeAllAncestorAttributes);
+			File outputFile = new File(exportDir, "data.zip");
+			CSVDataExportProcess process = new CSVDataExportProcess(outputFile,
+					recordManager, survey, rootEntityName, Step.valueOf(stepNumber), entityId, includeAllAncestorAttributes);
 			process.init();
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);

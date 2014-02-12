@@ -1,9 +1,9 @@
-package org.openforis.collect.remoting.service.dataimport;
+package org.openforis.collect.io.data;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openforis.collect.remoting.service.dataprocessing.DataProcessingState;
+import org.openforis.collect.manager.process.DataProcessingState;
 
 
 /**

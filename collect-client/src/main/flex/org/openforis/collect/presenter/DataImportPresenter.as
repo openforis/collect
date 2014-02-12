@@ -29,8 +29,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.remoting.service.dataimport.DataImportState$MainStep;
-	import org.openforis.collect.remoting.service.dataimport.DataImportState$SubStep;
+	import org.openforis.collect.io.data.DataImportState$MainStep;
+	import org.openforis.collect.io.data.DataImportState$SubStep;
 	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
@@ -203,11 +203,7 @@ package org.openforis.collect.presenter {
 					return;
 				}
 				var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
-				var surveyName:String = null;
-				if ( _view.currentState == DataImportView.STATE_SUMMARY_CREATION_COMPLETE_NEW_SURVEY ) {
-					surveyName = _view.surveyNameTextInput.text;
-				}
-				_dataImportClient.startImport(responder, entryIdsToImport, surveyName);
+				_dataImportClient.startImport(responder, entryIdsToImport);
 				_view.progressBar.setProgress(0, 0);
 				_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 			}

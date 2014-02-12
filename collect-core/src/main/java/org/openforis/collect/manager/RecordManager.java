@@ -100,6 +100,12 @@ public class RecordManager {
 		lockManager = new RecordLockManager(lockTimeoutMillis);
 	}
 	
+
+	@Transactional
+	public void save(CollectRecord record) throws RecordPersistenceException {
+		save(record, null);
+	}
+	
 	@Transactional
 	public void save(CollectRecord record, String sessionId) throws RecordPersistenceException {
 		User user = record.getModifiedBy();
@@ -114,11 +120,11 @@ public class RecordManager {
 			recordDao.insert(record);
 			id = record.getId();
 			//todo fix: concurrency problem may occur..
-			if ( isLockingEnabled() ) {
+			if ( sessionId != null && isLockingEnabled() ) {
 				lockManager.lock(id, user, sessionId);
 			}
 		} else {
-			if ( isLockingEnabled() ) {
+			if ( sessionId != null && isLockingEnabled() ) {
 				lockManager.checkIsLocked(id, user, sessionId);
 			}
 			recordDao.update(record);

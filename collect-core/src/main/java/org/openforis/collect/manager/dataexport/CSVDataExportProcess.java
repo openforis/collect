@@ -25,7 +25,6 @@ import org.openforis.collect.csv.ModelCsvWriter;
 import org.openforis.collect.csv.NodePositionColumnProvider;
 import org.openforis.collect.csv.PivotExpressionColumnProvider;
 import org.openforis.collect.csv.SingleAttributeColumnProvider;
-import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
 import org.openforis.collect.manager.process.AbstractProcess;
@@ -45,27 +44,24 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  * @author S. Ricci
  *
  */
-public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
+public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 	
-	private static Log LOG = LogFactory.getLog(SelectiveDataExportProcess.class);
+	private static Log LOG = LogFactory.getLog(CSVDataExportProcess.class);
 
 	private RecordManager recordManager;
-	private CodeListManager codeListManager;
-	private File exportDirectory;
+	private File outputFile;
 	private CollectSurvey survey;
 	private String rootEntityName;
 	private Integer entityId;
 	private Step step;
 	private boolean includeAllAncestorAttributes;
 	
-	public SelectiveDataExportProcess(RecordManager recordManager,
-			CodeListManager codeListManager, File exportDirectory,
+	public CSVDataExportProcess(File outputFile, RecordManager recordManager,
 			CollectSurvey survey, String rootEntityName, Step step, 
 			Integer entityId, boolean includeAllAncestorAttributes) {
 		super();
 		this.recordManager = recordManager;
-		this.codeListManager = codeListManager;
-		this.exportDirectory = exportDirectory;
+		this.outputFile = outputFile;
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
 		this.step = step;
@@ -84,20 +80,16 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		exportData();
 	}
 	
-	private File exportData() throws Exception {
-		File file = null;
-		String outputFileName = calculateOutputFileName();
-		file = new File(exportDirectory, outputFileName);
-		if ( file.exists() ) {
-			file.delete();
-			file.createNewFile();
-		}
+	private void exportData() throws Exception {
 		FileOutputStream fileOutputStream = null;
 		ZipOutputStream zipOS = null;
+		if ( outputFile.exists() ) {
+			outputFile.delete();
+			outputFile.createNewFile();
+		}
 		try {
 			status.setTotal(calculateTotal());
-
-			fileOutputStream = new FileOutputStream(file);
+			fileOutputStream = new FileOutputStream(outputFile);
 			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 			zipOS = new ZipOutputStream(bufferedOutputStream);
 			EntryNameGenerator entryNameGenerator = new EntryNameGenerator();
@@ -121,7 +113,6 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 			}
 		}
 		//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
-		return file;
 	}
 
 	private String calculateOutputFileName() {
@@ -202,7 +193,7 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		
 		//entity children columns
-		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(codeListManager, entityDefn);
+		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(entityDefn);
 
 		//ancestor columns
 		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
@@ -238,7 +229,7 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		if ( isPositionColumnRequired(entityDefn) ) {
 			columnProviders.add(createPositionColumnProvider(entityDefn));
 		}
-		columnProviders.add(new AutomaticColumnProvider(codeListManager, entityDefn));
+		columnProviders.add(new AutomaticColumnProvider(entityDefn));
 		ColumnProvider provider = new ColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
 		return new DataTransformation(axisPath, provider);
@@ -261,7 +252,7 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
 		String pivotExpression = StringUtils.repeat("parent()", "/", depth);
 		if ( includeAllAncestorAttributes ) {
-			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(codeListManager, entityDefn.getName() + "_", entityDefn);
+			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(entityDefn.getName() + "_", entityDefn);
 			providers.add(0, ancestorEntityColumnProvider);
 		} else {
 			//include only key attributes

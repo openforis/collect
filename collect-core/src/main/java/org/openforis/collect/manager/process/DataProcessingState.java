@@ -1,8 +1,6 @@
-package org.openforis.collect.remoting.service.dataprocessing;
+package org.openforis.collect.manager.process;
 
 import java.io.Serializable;
-
-import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 
 
 /**
@@ -47,7 +45,6 @@ public class DataProcessingState implements Serializable {
 		count = 0;
 	}
 	
-	@ExternalizedProperty
 	public boolean isRunning() {
 		return (! complete && ! error) && running;
 	}

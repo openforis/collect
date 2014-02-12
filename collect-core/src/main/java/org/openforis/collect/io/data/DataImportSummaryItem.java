@@ -1,4 +1,4 @@
-package org.openforis.collect.remoting.service.dataimport;
+package org.openforis.collect.io.data;
 
 import java.util.HashMap;
 import java.util.List;

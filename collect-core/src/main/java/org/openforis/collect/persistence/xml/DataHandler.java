@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -48,6 +51,8 @@ public class DataHandler extends DefaultHandler {
 	private static final String ATTRIBUTE_SYMBOL = "symbol";
 	private static final String ATTRIBUTE_REMARKS = "remarks";
 	
+	private UserManager userManager;
+
 	private CollectRecord record;
 	protected Node<?> node;
 	protected String field;
@@ -60,21 +65,18 @@ public class DataHandler extends DefaultHandler {
 	private CollectSurvey currentSurvey;
 	private int ignoreLevels;
 	
-	private Map<String, User> users;
+	private Map<String, User> usersByName;
 	
-	public DataHandler(CollectSurvey survey) {
-		this(survey, (Map<String, User>) null);
+	public DataHandler(UserManager userManager, CollectSurvey survey) {
+		this(userManager, survey, survey);
 	}
 	
-	public DataHandler(CollectSurvey survey, Map<String, User> users) {
-		this(survey, survey, users);
-	}
-	
-	public DataHandler(CollectSurvey currentSurvey, CollectSurvey recordSurvey, Map<String, User> users) {
+	public DataHandler(UserManager userManager, CollectSurvey currentSurvey, CollectSurvey recordSurvey) {
 		super();
+		this.userManager = userManager;
 		this.currentSurvey = currentSurvey;
 		this.recordSurvey = recordSurvey;
-		this.users = users;
+		usersByName = new HashMap<String, User>();
 	}
 
 	@Override
@@ -147,16 +149,37 @@ public class DataHandler extends DefaultHandler {
 			Date modified = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
 			record.setCreationDate(created);
 			record.setModifiedDate(modified);
-			if (users != null) {
-				String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);
-				User createdBy = users.get(createdByUserName);
-				record.setCreatedBy(createdBy);
-				String modifiedByUserName = attributes.getValue(ATTRIBUTE_MODIFIED_BY);
-				User modifiedBy = users.get(modifiedByUserName);
-				record.setModifiedBy(modifiedBy);
-			}				
+
+			String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);
+			User createdBy = fetchUser(createdByUserName);
+			record.setCreatedBy(createdBy);
+			String modifiedByUserName = attributes.getValue(ATTRIBUTE_MODIFIED_BY);
+			User modifiedBy = fetchUser(modifiedByUserName);
+			record.setModifiedBy(modifiedBy);
+
 			node = record.createRootEntity(localName);
 		}
+	}
+	
+	private User fetchUser(String name) {
+		User user;
+		if ( usersByName.containsKey(name) ) {
+			user = usersByName.get(name);
+		} else if ( StringUtils.isNotBlank(name) ) {
+			user = userManager.loadByUserName(name);
+			if ( user == null ) {
+				//create a user with data entry role and password equal to the user name
+				try {
+					user = userManager.insertUser(name, name, UserRole.ENTRY);
+				} catch (UserPersistenceException e) {
+					throw new RuntimeException("Error creating new user with username '" + name + "'", e);
+				}
+			}
+			usersByName.put(name, user);
+		} else {
+			user = null;
+		}
+		return user;
 	}
 
 	protected String extractVersionName(Attributes attributes) {

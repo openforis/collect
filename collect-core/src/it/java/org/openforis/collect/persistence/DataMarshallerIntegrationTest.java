@@ -7,20 +7,21 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
@@ -53,23 +54,14 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	
 	@Autowired
 	private DataMarshaller dataMarshaller;
-	
 	@Autowired
 	private RecordManager recordManager;
-	
-	private static Map<String, User> users;
-	
-	@BeforeClass
-	public static void init() {
-		users = new HashMap<String, User>();
-		User user = new User();
-		user.setId(1);
-		user.setName("admin");
-		users.put(user.getName(), user);
-		user = new User();
-		user.setId(2);
-		user.setName("data_entry");
-		users.put(user.getName(), user);
+	@Autowired
+	private UserManager userManager;
+
+	@Before
+	public void init() throws UserPersistenceException {
+		userManager.insertUser("entry", "pass", UserRole.ENTRY);
 	}
 	
 	@Test
@@ -96,7 +88,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	private ParseRecordResult parseRecord(CollectSurvey survey, String xml) throws IOException, DataUnmarshallerException {
-		DataHandler dataHandler = new DataHandler(survey, users);
+		DataHandler dataHandler = new DataHandler(userManager, survey);
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(dataHandler);
 		StringReader reader = new StringReader(xml);
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
@@ -105,7 +97,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	
 	private CollectRecord createTestRecord(CollectSurvey survey) {
 		CollectRecord record = new CollectRecord(survey, "2.0");
-		User user = users.get("admin");
+		User user = userManager.loadByUserName("admin");
 		record.setCreatedBy(user);
 		record.setModifiedBy(user);
 		Entity cluster = record.createRootEntity("cluster");

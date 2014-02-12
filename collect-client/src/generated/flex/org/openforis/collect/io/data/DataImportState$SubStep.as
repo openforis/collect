@@ -5,12 +5,12 @@
  * THE GENERATOR.
  */
 
-package org.openforis.collect.remoting.service.dataimport {
+package org.openforis.collect.io.data {
 
     import org.granite.util.Enum;
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.remoting.service.dataimport.DataImportState$SubStep")]
+    [RemoteClass(alias="org.openforis.collect.io.data.DataImportState$SubStep")]
     public class DataImportState$SubStep extends Enum {
 
         public static const INITED:DataImportState$SubStep = new DataImportState$SubStep("INITED", _);
