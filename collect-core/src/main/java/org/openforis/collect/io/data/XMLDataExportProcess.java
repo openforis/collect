@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.dataexport;
+package org.openforis.collect.io.data;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -10,15 +10,13 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.data.DataExportStatus.Format;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
-import org.openforis.collect.manager.exception.DataImportExeption;
 import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
@@ -28,56 +26,46 @@ import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.model.FileAttribute;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 
 
-	private static Log LOG = LogFactory.getLog(BackupProcess.class);
+	private static Log LOG = LogFactory.getLog(XMLDataExportProcess.class);
 
 	public static final String IDML_FILE_NAME = "idml.xml";
 	public static final String ZIP_DIRECTORY_SEPARATOR = "/";
 	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
 
-	private static final String OUTPUT_FILE_NAME = "data.zip";
-
+	@Autowired
 	private RecordManager recordManager;
+	@Autowired
 	private RecordFileManager recordFileManager;
+	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
 	private DataMarshaller dataMarshaller;
 	
-	private File directory;
+	private File outputFile;
 	private CollectSurvey survey;
 	private Step[] steps;
 	private String rootEntityName;
 
 	private boolean includeIdm;
 	
-	public BackupProcess(SurveyManager surveyManager, RecordManager recordManager,
-			RecordFileManager recordFileManager,
-			DataMarshaller dataMarshaller, File directory,
-			CollectSurvey survey, String rootEntityName) {
-		this(surveyManager, recordManager, recordFileManager, dataMarshaller, 
-				directory, survey, rootEntityName, Step.values());
-	}
-	
-	public BackupProcess(SurveyManager surveyManager, RecordManager recordManager,
-			RecordFileManager recordFileManager,
-			DataMarshaller dataMarshaller, File directory,
-			CollectSurvey survey, String rootEntityName, Step[] steps) {
+	public XMLDataExportProcess() {
 		super();
-		this.surveyManager = surveyManager;
-		this.recordManager = recordManager;
-		this.recordFileManager = recordFileManager;
-		this.dataMarshaller = dataMarshaller;
-		this.directory = directory;
-		this.survey = survey;
-		this.rootEntityName = rootEntityName;
-		this.steps = steps;
+		this.steps = Step.values();
 		this.includeIdm = true;
 	}
 
@@ -92,12 +80,11 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		try {
 			List<CollectRecord> recordSummaries = loadAllSummaries();
 			if ( recordSummaries != null && steps != null && steps.length > 0 ) {
-				String fileName = OUTPUT_FILE_NAME;
-				File file = new File(directory, fileName);
-				if (file.exists()) {
-					file.delete();
+				if (outputFile.exists()) {
+					outputFile.delete();
+					outputFile.createNewFile();
 				}
-				FileOutputStream fileOutputStream = new FileOutputStream(file);
+				FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
 				BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 				ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 				backup(zipOutputStream, recordSummaries);
@@ -237,77 +224,36 @@ public class BackupProcess extends AbstractProcess<Void, DataExportStatus> {
 		this.includeIdm = includeIdm;
 	}
 	
-	public static class RecordEntry {
-		private Step step;
-		private int recordId;
-		
-		public RecordEntry(Step step, int recordId) {
-			this.step = step;
-			this.recordId = recordId;
-		}
-		
-		public static boolean isValidRecordEntry(ZipEntry zipEntry) {
-			String name = zipEntry.getName();
-			return ! (zipEntry.isDirectory() || IDML_FILE_NAME.equals(name) || 
-					name.startsWith(RECORD_FILE_DIRECTORY_NAME));
-		}
-		
-		public static RecordEntry parse(String zipEntryName) throws DataImportExeption {
-			//for retro compatibility with previous generated backup files
-			String zipEntryNameFixed = zipEntryName.replace("\\", ZIP_DIRECTORY_SEPARATOR);
-			String[] entryNameSplitted = zipEntryNameFixed.split(ZIP_DIRECTORY_SEPARATOR);
-			if (entryNameSplitted.length != 2) {
-				throw new DataImportExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName);
-			}
-			//step
-			String stepNumStr = entryNameSplitted[0];
-			int stepNumber = Integer.parseInt(stepNumStr);
-			Step step = Step.valueOf(stepNumber);
-			//file name
-			String fileName = entryNameSplitted[1];
-			String baseName = FilenameUtils.getBaseName(fileName);
-			int recordId = Integer.parseInt(baseName);
-			RecordEntry result = new RecordEntry(step, recordId);
-			return result;
-		}
-
-		public String getName() {
-			return step.getStepNumber() + ZIP_DIRECTORY_SEPARATOR + recordId + ".xml";
-		}
-		
-		public int getRecordId() {
-			return recordId;
-		}
-		
-		public Step getStep() {
-			return step;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + recordId;
-			result = prime * result + ((step == null) ? 0 : step.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			RecordEntry other = (RecordEntry) obj;
-			if (recordId != other.recordId)
-				return false;
-			if (step != other.step)
-				return false;
-			return true;
-		}
-		
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+	}
+	
+	public String getRootEntityName() {
+		return rootEntityName;
+	}
+	
+	public void setRootEntityName(String rootEntityName) {
+		this.rootEntityName = rootEntityName;
+	}
+	
+	public Step[] getSteps() {
+		return steps;
+	}
+	
+	public void setSteps(Step[] steps) {
+		this.steps = steps;
+	}
+	
+	public File getOutputFile() {
+		return outputFile;
+	}
+	
+	public void setOutputFile(File outputFile) {
+		this.outputFile = outputFile;
 	}
 	
 }

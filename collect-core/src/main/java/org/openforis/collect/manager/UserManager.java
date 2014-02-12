@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,18 +95,28 @@ public class UserManager {
 	}
 
 	@Transactional
-	public void insert(User user) {
-		userDao.insert(user);
-	}
-
-	@Transactional
 	public void delete(int id) throws CannotDeleteUserException {
 		if ( recordDao.hasAssociatedRecords(id) ) {
 			throw new CannotDeleteUserException();
 		}
 		userDao.delete(id);
 	}
-
+	
+	/**
+	 * Inserts a new user with name, password and role as specified.
+	 * @return 
+	 * 
+	 * @throws UserPersistenceException 
+	 */
+	@Transactional
+	public User insertUser(String name, String password, UserRole role) throws UserPersistenceException {
+		User user = new User(name);
+		user.setPassword(name);
+		user.addRole(role.getCode());
+		save(user);
+		return user;
+	}
+	
 	public UserDao getUserDao() {
 		return userDao;
 	}
@@ -121,5 +132,5 @@ public class UserManager {
 	public void setRecordDao(RecordDao recordDao) {
 		this.recordDao = recordDao;
 	}
-	
+
 }

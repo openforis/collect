@@ -100,6 +100,7 @@
 	<bean id="samplingDesignManager"    class="org.openforis.collect.manager.SamplingDesignManager" />
   	<bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" init-method="init" />
+	<bean id="userManager"				class="org.openforis.collect.manager.UserManager" />
 
 	<!--  Services -->
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />

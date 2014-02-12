@@ -3,12 +3,13 @@ package org.openforis.collect.csv;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.manager.CodeListManager;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -25,21 +26,23 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 	// TODO Check that list is not lookup
 	// TODO support hierarchical lists!
 	
-	public EnumerableEntityColumnProvider(CodeListManager codeListManager, EntityDefinition defn) {
-		super(defn.getName()+"_", createProviders(codeListManager, defn));
+	public EnumerableEntityColumnProvider(EntityDefinition defn) {
+		super(defn.getName()+"_", createProviders(defn));
 	}
 
-	private static List<ColumnProvider> createProviders(CodeListManager codeListManager, EntityDefinition defn) {
+	private static List<ColumnProvider> createProviders(EntityDefinition defn) {
 		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
 		List<AttributeDefinition> keyDefs = defn.getKeyAttributeDefinitions();
 		CodeAttributeDefinition keyDef = (CodeAttributeDefinition) keyDefs.get(0);
 		CodeList codeList = keyDef.getList();
-		List<CodeListItem> items = codeListManager.loadRootItems(codeList);
+		SurveyContext context = defn.getSurvey().getContext();
+		CodeListService codeListService = context.getCodeListService();
+		List<CodeListItem> items = codeListService.loadRootItems(codeList);
 //		String entityName = defn.getName();
 		for (CodeListItem item : items) {
 			String code = item.getCode();
 			String keyName = keyDef.getName();
-			PerCodeColumnProvider p = new PerCodeColumnProvider(codeListManager, defn, keyName, code);
+			PerCodeColumnProvider p = new PerCodeColumnProvider(defn, keyName, code);
 			providers.add(p);
 		}
 		return providers;
@@ -51,8 +54,8 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 		private String keyName;
 		private String code;
 
-		public PerCodeColumnProvider(CodeListManager codeListManager, EntityDefinition defn, String keyName, String code) {
-			super(codeListManager, code+"_", defn);
+		public PerCodeColumnProvider(EntityDefinition defn, String keyName, String code) {
+			super(code + "_", defn);
 			this.entityDefinition = defn;
 			this.keyName = keyName;
 			this.code = code;

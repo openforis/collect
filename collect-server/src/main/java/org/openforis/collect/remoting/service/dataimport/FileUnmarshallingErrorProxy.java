@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.remoting.service.dataimport.DataImportSummary.FileErrorItem;
+import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
 
 /**
  * 

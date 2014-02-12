@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.dataexport;
+package org.openforis.collect.io.data;
 
 import org.openforis.collect.manager.process.ProcessStatus;
 

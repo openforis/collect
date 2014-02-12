@@ -2,9 +2,9 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 
+import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.exception.DataImportExeption;
 import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportProcess;
 import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportStatus;
 import org.openforis.collect.model.CollectSurvey;

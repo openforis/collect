@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.dataexport;
+package org.openforis.collect.io.data;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -25,9 +25,8 @@ import org.openforis.collect.csv.ModelCsvWriter;
 import org.openforis.collect.csv.NodePositionColumnProvider;
 import org.openforis.collect.csv.PivotExpressionColumnProvider;
 import org.openforis.collect.csv.SingleAttributeColumnProvider;
-import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.io.data.DataExportStatus.Format;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -39,40 +38,32 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.expression.InvalidExpressionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 	
-	private static Log LOG = LogFactory.getLog(SelectiveDataExportProcess.class);
+	private static Log LOG = LogFactory.getLog(CSVDataExportProcess.class);
 
+	@Autowired
 	private RecordManager recordManager;
-	private CodeListManager codeListManager;
-	private File exportDirectory;
+	
+	private File outputFile;
 	private CollectSurvey survey;
 	private String rootEntityName;
 	private Integer entityId;
 	private Step step;
 	private boolean includeAllAncestorAttributes;
 	
-	public SelectiveDataExportProcess(RecordManager recordManager,
-			CodeListManager codeListManager, File exportDirectory,
-			CollectSurvey survey, String rootEntityName, Step step, 
-			Integer entityId, boolean includeAllAncestorAttributes) {
-		super();
-		this.recordManager = recordManager;
-		this.codeListManager = codeListManager;
-		this.exportDirectory = exportDirectory;
-		this.survey = survey;
-		this.rootEntityName = rootEntityName;
-		this.step = step;
-		this.entityId = entityId;
-		this.includeAllAncestorAttributes = includeAllAncestorAttributes;
-	}
-
 	@Override
 	protected void initStatus() {
 		this.status = new DataExportStatus(Format.CSV);		
@@ -84,20 +75,16 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		exportData();
 	}
 	
-	private File exportData() throws Exception {
-		File file = null;
-		String outputFileName = calculateOutputFileName();
-		file = new File(exportDirectory, outputFileName);
-		if ( file.exists() ) {
-			file.delete();
-			file.createNewFile();
-		}
+	private void exportData() throws Exception {
 		FileOutputStream fileOutputStream = null;
 		ZipOutputStream zipOS = null;
+		if ( outputFile.exists() ) {
+			outputFile.delete();
+			outputFile.createNewFile();
+		}
 		try {
 			status.setTotal(calculateTotal());
-
-			fileOutputStream = new FileOutputStream(file);
+			fileOutputStream = new FileOutputStream(outputFile);
 			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 			zipOS = new ZipOutputStream(bufferedOutputStream);
 			EntryNameGenerator entryNameGenerator = new EntryNameGenerator();
@@ -121,7 +108,6 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 			}
 		}
 		//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
-		return file;
 	}
 
 	private String calculateOutputFileName() {
@@ -202,7 +188,7 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		
 		//entity children columns
-		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(codeListManager, entityDefn);
+		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(entityDefn);
 
 		//ancestor columns
 		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
@@ -238,7 +224,7 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		if ( isPositionColumnRequired(entityDefn) ) {
 			columnProviders.add(createPositionColumnProvider(entityDefn));
 		}
-		columnProviders.add(new AutomaticColumnProvider(codeListManager, entityDefn));
+		columnProviders.add(new AutomaticColumnProvider(entityDefn));
 		ColumnProvider provider = new ColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
 		return new DataTransformation(axisPath, provider);
@@ -261,7 +247,7 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
 		String pivotExpression = StringUtils.repeat("parent()", "/", depth);
 		if ( includeAllAncestorAttributes ) {
-			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(codeListManager, entityDefn.getName() + "_", entityDefn);
+			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(entityDefn.getName() + "_", entityDefn);
 			providers.add(0, ancestorEntityColumnProvider);
 		} else {
 			//include only key attributes
@@ -315,6 +301,56 @@ public class SelectiveDataExportProcess extends AbstractProcess<Void, DataExport
 			entryNames.add(name);
 			return name;
 		}
+	}
+
+
+
+	public File getOutputFile() {
+		return outputFile;
+	}
+
+	public void setOutputFile(File outputFile) {
+		this.outputFile = outputFile;
+	}
+
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+	}
+
+	public String getRootEntityName() {
+		return rootEntityName;
+	}
+
+	public void setRootEntityName(String rootEntityName) {
+		this.rootEntityName = rootEntityName;
+	}
+
+	public Integer getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(Integer entityId) {
+		this.entityId = entityId;
+	}
+
+	public Step getStep() {
+		return step;
+	}
+
+	public void setStep(Step step) {
+		this.step = step;
+	}
+
+	public boolean isIncludeAllAncestorAttributes() {
+		return includeAllAncestorAttributes;
+	}
+
+	public void setIncludeAllAncestorAttributes(boolean includeAllAncestorAttributes) {
+		this.includeAllAncestorAttributes = includeAllAncestorAttributes;
 	}
 }
 

@@ -4,8 +4,9 @@ import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.remoting.service.dataimport.DataImportState.MainStep;
-import org.openforis.collect.remoting.service.dataimport.DataImportState.SubStep;
+import org.openforis.collect.io.data.DataImportState;
+import org.openforis.collect.io.data.DataImportState.MainStep;
+import org.openforis.collect.io.data.DataImportState.SubStep;
 
 /**
  * 

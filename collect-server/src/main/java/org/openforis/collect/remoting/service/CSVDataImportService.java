@@ -2,9 +2,9 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 
+import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.dataimport.CSVDataImportProcess;
-import org.openforis.collect.manager.exception.DataImportExeption;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
 import org.openforis.collect.model.CollectRecord;

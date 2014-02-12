@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.manager.exception.CodeListImportException;
+import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.CodeListItemDao;
 import org.openforis.collect.persistence.DatabaseExternalCodeListProvider;
