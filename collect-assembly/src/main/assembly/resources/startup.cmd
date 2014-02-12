@@ -26,4 +26,5 @@ if "%JRE_HOME%"=="" (
 	set JRE_HOME
 	cd tomcat/bin
 	startup.bat
+	start http://localhost:8080/collect
 )
