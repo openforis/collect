@@ -65,6 +65,13 @@
 	              	tooltiptext="${labels.global.item.move_down}"
 	                disabled="@load(vm.moveNodeDownDisabled)"
 	                onClick="@command('moveNodeDown')" />
+	              <space width="100px" />
+	              <toolbarbutton image="/assets/images/expand-small.png"
+	              	tooltiptext="${labels.survey.schema.tree.expand}"
+	                onClick="@command('expandTree')" />
+	              <toolbarbutton image="/assets/images/collapse-small.png"
+	              	tooltiptext="${labels.survey.schema.tree.collapse}"
+	                onClick="@command('collapseTree')" />
 	            </toolbar>
           	</vlayout>
           </south>

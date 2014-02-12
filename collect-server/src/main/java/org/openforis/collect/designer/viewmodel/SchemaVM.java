@@ -281,6 +281,18 @@ public class SchemaVM extends SurveyBaseVM {
 		notifyChange("treeModel");
 	}
 
+	@Command
+	public void expandTree() {
+		treeModel.openAllItems();
+		notifyChange("treeModel");
+	}
+	
+	@Command
+	public void collapseTree() {
+		treeModel.clearOpen();
+		notifyChange("treeModel");
+	}
+	
 	@Override
 	@GlobalCommand
 	public void undoLastChanges(@ContextParam(ContextType.VIEW) Component view) {
