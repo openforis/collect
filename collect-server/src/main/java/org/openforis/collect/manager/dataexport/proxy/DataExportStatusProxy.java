@@ -1,8 +1,8 @@
 package org.openforis.collect.manager.dataexport.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.manager.dataexport.DataExportStatus;
-import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
+import org.openforis.collect.io.data.DataExportStatus;
+import org.openforis.collect.io.data.DataExportStatus.Format;
 import org.openforis.collect.manager.process.proxy.ProcessStatusProxy;
 
 /**

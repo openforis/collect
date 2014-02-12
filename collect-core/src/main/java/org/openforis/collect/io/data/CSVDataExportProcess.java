@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.dataexport;
+package org.openforis.collect.io.data;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -25,8 +25,8 @@ import org.openforis.collect.csv.ModelCsvWriter;
 import org.openforis.collect.csv.NodePositionColumnProvider;
 import org.openforis.collect.csv.PivotExpressionColumnProvider;
 import org.openforis.collect.csv.SingleAttributeColumnProvider;
+import org.openforis.collect.io.data.DataExportStatus.Format;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.dataexport.DataExportStatus.Format;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -38,17 +38,25 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.expression.InvalidExpressionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author S. Ricci
  *
  */
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 	
 	private static Log LOG = LogFactory.getLog(CSVDataExportProcess.class);
 
+	@Autowired
 	private RecordManager recordManager;
+	
 	private File outputFile;
 	private CollectSurvey survey;
 	private String rootEntityName;
@@ -56,19 +64,6 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private Step step;
 	private boolean includeAllAncestorAttributes;
 	
-	public CSVDataExportProcess(File outputFile, RecordManager recordManager,
-			CollectSurvey survey, String rootEntityName, Step step, 
-			Integer entityId, boolean includeAllAncestorAttributes) {
-		super();
-		this.recordManager = recordManager;
-		this.outputFile = outputFile;
-		this.survey = survey;
-		this.rootEntityName = rootEntityName;
-		this.step = step;
-		this.entityId = entityId;
-		this.includeAllAncestorAttributes = includeAllAncestorAttributes;
-	}
-
 	@Override
 	protected void initStatus() {
 		this.status = new DataExportStatus(Format.CSV);		
@@ -306,6 +301,56 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			entryNames.add(name);
 			return name;
 		}
+	}
+
+
+
+	public File getOutputFile() {
+		return outputFile;
+	}
+
+	public void setOutputFile(File outputFile) {
+		this.outputFile = outputFile;
+	}
+
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+	}
+
+	public String getRootEntityName() {
+		return rootEntityName;
+	}
+
+	public void setRootEntityName(String rootEntityName) {
+		this.rootEntityName = rootEntityName;
+	}
+
+	public Integer getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(Integer entityId) {
+		this.entityId = entityId;
+	}
+
+	public Step getStep() {
+		return step;
+	}
+
+	public void setStep(Step step) {
+		this.step = step;
+	}
+
+	public boolean isIncludeAllAncestorAttributes() {
+		return includeAllAncestorAttributes;
+	}
+
+	public void setIncludeAllAncestorAttributes(boolean includeAllAncestorAttributes) {
+		this.includeAllAncestorAttributes = includeAllAncestorAttributes;
 	}
 }
 

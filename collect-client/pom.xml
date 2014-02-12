@@ -85,7 +85,7 @@
                                 <includeClass>org.openforis.collect.Proxy</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataImportState$MainStep</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataImportState$SubStep</includeClass>
-                                <includeClass>org.openforis.collect.manager.dataexport.DataExportStatus$Format</includeClass>
+                                <includeClass>org.openforis.collect.io.data.DataExportStatus$Format</includeClass>
                                 <includeClass>org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>

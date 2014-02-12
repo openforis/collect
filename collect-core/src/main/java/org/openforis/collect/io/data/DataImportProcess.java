@@ -21,12 +21,11 @@ import org.openforis.collect.io.data.DataImportState.MainStep;
 import org.openforis.collect.io.data.DataImportState.SubStep;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
 import org.openforis.collect.io.exception.DataImportExeption;
+import org.openforis.collect.io.exception.DataParsingExeption;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.manager.dataexport.BackupProcess;
-import org.openforis.collect.manager.dataexport.BackupProcess.RecordEntry;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
@@ -194,7 +193,7 @@ public class DataImportProcess implements Callable<Void> {
 	private void validatePackagedSurvey() throws DataImportExeption {
 		CollectSurvey existingSurvey = getExistingSurvey();
 		if ( packagedSurvey == null && existingSurvey == null ) {
-			throw new IllegalStateException("Published survey not found and " + BackupProcess.IDML_FILE_NAME + " not found in packaged file");
+			throw new IllegalStateException("Published survey not found and " + XMLDataExportProcess.IDML_FILE_NAME + " not found in packaged file");
 		} else if ( packagedSurvey == null ) {
 			packagedSurvey = existingSurvey;
 		} else {
@@ -233,7 +232,7 @@ public class DataImportProcess implements Callable<Void> {
 	private void createSummaryForEntry(Enumeration<? extends ZipEntry> entries, ZipFile zipFile, 
 			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
-			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws DataImportExeption, IOException {
+			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
 		ZipEntry zipEntry = (ZipEntry) entries.nextElement();
 		if ( ! RecordEntry.isValidRecordEntry(zipEntry) ) {
 			return;
@@ -433,7 +432,7 @@ public class DataImportProcess implements Callable<Void> {
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		String sessionId = "admindataimport";
 		for (FileAttribute fileAttribute : fileAttributes) {
-			String recordFileEntryName = BackupProcess.calculateRecordFileEntryName(fileAttribute);
+			String recordFileEntryName = XMLDataExportProcess.calculateRecordFileEntryName(fileAttribute);
 			InputStream is = getEntryInputStream(zipFile, recordFileEntryName);
 			if ( is != null ) {
 				recordFileManager.saveToTempFolder(is, fileAttribute.getFilename(), 
@@ -466,7 +465,7 @@ public class DataImportProcess implements Callable<Void> {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {
 			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-			if ( zipEntry.getName().startsWith(BackupProcess.RECORD_FILE_DIRECTORY_NAME)) {
+			if ( zipEntry.getName().startsWith(XMLDataExportProcess.RECORD_FILE_DIRECTORY_NAME)) {
 				return true;
 			}
 		}
@@ -513,7 +512,7 @@ public class DataImportProcess implements Callable<Void> {
 					continue;
 				}
 				String entryName = zipEntry.getName();
-				if (BackupProcess.IDML_FILE_NAME.equals(entryName)) {
+				if (XMLDataExportProcess.IDML_FILE_NAME.equals(entryName)) {
 					InputStream is = zipFile.getInputStream(zipEntry);
 					survey = surveyManager.unmarshalSurvey(is);
 					List<SurveyValidationResult> validationResults = surveyValidator.validate(survey);

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.manager.exception;
+package org.openforis.collect.io.exception;
 
 /**
  * @author S. Ricci

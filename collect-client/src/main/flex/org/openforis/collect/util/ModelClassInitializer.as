@@ -1,7 +1,7 @@
 package org.openforis.collect.util {
 	
 	import org.granite.collections.BasicMap;
-	import org.openforis.collect.manager.dataexport.DataExportStatus$Format;
+	import org.openforis.collect.io.data.DataExportStatus$Format;
 	import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
 	import org.openforis.collect.manager.process.ProcessStatus;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
