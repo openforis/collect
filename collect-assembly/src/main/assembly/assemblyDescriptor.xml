@@ -16,20 +16,31 @@
 				<exclude>**/webapps/ROOT/**</exclude>
 				<exclude>**/webapps/docs/**</exclude>
 				<exclude>**/webapps/examples/**</exclude>
+				<exclude>bin/*.sh</exclude>
 			</excludes>
 		</fileSet>
-		<!-- Include Collect context config -->
+		<!-- Include sh files from unpacked Tomcat distribution with execute permissions -->
 		<fileSet>
-			<directory>${basedir}/src/main/assembly/resources/tomcat/conf</directory>
-			<outputDirectory>${output.directory}/tomcat/conf</outputDirectory>
+			<directory>${project.build.directory}/apache-tomcat-${tomcat.version}/bin</directory>
+			<outputDirectory>${output.directory}/tomcat/bin</outputDirectory>
 			<includes>
-				<include>**/**</include>
+				<include>*.sh</include>
 			</includes>
+			<fileMode>755</fileMode>
 		</fileSet>
 		<!-- Include custom startup scripts (e.g. setenv.sh/setenv.bat) -->
 		<fileSet>
 			<directory>${basedir}/src/main/assembly/resources/tomcat/bin</directory>
 			<outputDirectory>${output.directory}/tomcat/bin</outputDirectory>
+			<includes>
+				<include>**/**</include>
+			</includes>
+			<fileMode>755</fileMode>
+		</fileSet>
+		<!-- Include Collect context config -->
+		<fileSet>
+			<directory>${basedir}/src/main/assembly/resources/tomcat/conf</directory>
+			<outputDirectory>${output.directory}/tomcat/conf</outputDirectory>
 			<includes>
 				<include>**/**</include>
 			</includes>
@@ -47,7 +58,7 @@
 				<include>*</include>
 			</includes>
 		</fileSet>
-			</fileSets>
+	</fileSets>
 	<dependencySets>
 		<dependencySet>
 			<!-- Add SQLite, PostgreSQL and connection pool dependencies for server installations -->
