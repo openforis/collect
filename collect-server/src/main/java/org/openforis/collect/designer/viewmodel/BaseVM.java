@@ -8,6 +8,7 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Form;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
@@ -79,6 +80,12 @@ public abstract class BaseVM {
 	protected String getInitParameter(String name) {
 		WebApp webApp = Sessions.getCurrent().getWebApp();
 		return webApp.getInitParameter(name);
+	}
+	
+	protected void setValueOnFormField(Form form, String field,
+			Object value) {
+		form.setField(field, value);
+		BindUtils.postNotifyChange(null, null, form, field);
 	}
 	
 }

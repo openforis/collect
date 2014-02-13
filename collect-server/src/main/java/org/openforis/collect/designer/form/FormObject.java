@@ -17,11 +17,19 @@ public abstract class FormObject<T> {
 		//init static variables
 		VERSION_EMPTY_SELECTION = new NamedObject(EMPTY_OPTION);
 	}
+
+	private T source;
 	
-	public abstract void loadFrom(T source, String language);
+	public void loadFrom(T source, String language) {
+		this.source = source;
+	}
 	
 	public abstract void saveTo(T dest, String language);
 	
 	protected abstract void reset();
+	
+	public T getSource() {
+		return source;
+	}
 	
 }

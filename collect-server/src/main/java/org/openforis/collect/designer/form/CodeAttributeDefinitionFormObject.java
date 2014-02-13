@@ -3,10 +3,10 @@
  */
 package org.openforis.collect.designer.form;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.zkoss.bind.annotation.DependsOn;
 
 /**
  * @author S. Ricci
@@ -16,7 +16,7 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	
 	private boolean key;
 	private CodeList list;
-	private String parentExpression;
+	private CodeAttributeDefinition parentCodeAttribute;
 	private boolean strict;
 	private boolean allowValuesSorting;
 	
@@ -32,7 +32,7 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 		dest.setList(list);
 		dest.setKey(key);
 		dest.setAllowUnlisted(! strict);
-		dest.setParentExpression(StringUtils.trimToNull(parentExpression));
+		dest.setParentCodeAttributeDefinition(parentCodeAttribute);
 		dest.setAllowValuesSorting(dest.isMultiple() && allowValuesSorting);
 	}
 	
@@ -41,7 +41,7 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 		super.loadFrom(source, languageCode);
 		key = source.isKey();
 		list = source.getList();
-		parentExpression = source.getParentExpression();
+		parentCodeAttribute = source.getParentCodeAttributeDefinition();
 		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 	}
@@ -70,14 +70,6 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 		this.strict = strict;
 	}
 	
-	public String getParentExpression() {
-		return parentExpression;
-	}
-	
-	public void setParentExpression(String parentExpression) {
-		this.parentExpression = parentExpression;
-	}
-	
 	public boolean isAllowValuesSorting() {
 		return allowValuesSorting;
 	}
@@ -85,5 +77,22 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	public void setAllowValuesSorting(boolean allowValuesSorting) {
 		this.allowValuesSorting = allowValuesSorting;
 	}
+	
+	public CodeAttributeDefinition getParentCodeAttribute() {
+		return parentCodeAttribute;
+	}
+	
+	public void setParentCodeAttribute(CodeAttributeDefinition parentCodeAttribute) {
+		this.parentCodeAttribute = parentCodeAttribute;
+	}
 
+	@DependsOn("parentCodeAttribute")
+	public String getParentCodeAttributePath() {
+		return parentCodeAttribute == null ? null: parentCodeAttribute.getPath();
+	}
+	
+	@DependsOn("list")
+	public boolean isHierarchicalList() {
+		return list != null && list.isHierarchical();
+	}
 }
