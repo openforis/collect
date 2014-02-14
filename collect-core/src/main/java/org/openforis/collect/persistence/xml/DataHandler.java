@@ -67,6 +67,10 @@ public class DataHandler extends DefaultHandler {
 	
 	private Map<String, User> usersByName;
 	
+	public DataHandler(CollectSurvey survey) {
+		this(null, survey);
+	}
+	
 	public DataHandler(UserManager userManager, CollectSurvey survey) {
 		this(userManager, survey, survey);
 	}
@@ -163,9 +167,11 @@ public class DataHandler extends DefaultHandler {
 	
 	private User fetchUser(String name) {
 		User user;
-		if ( usersByName.containsKey(name) ) {
-			user = usersByName.get(name);
-		} else if ( StringUtils.isNotBlank(name) ) {
+		if ( StringUtils.isBlank(name) || userManager == null ) {
+			return null;
+		} else if ( usersByName.containsKey(name) ) {
+			return usersByName.get(name);
+		} else {
 			user = userManager.loadByUserName(name);
 			if ( user == null ) {
 				//create a user with data entry role and password equal to the user name
@@ -176,10 +182,8 @@ public class DataHandler extends DefaultHandler {
 				}
 			}
 			usersByName.put(name, user);
-		} else {
-			user = null;
+			return user;
 		}
-		return user;
 	}
 
 	protected String extractVersionName(Attributes attributes) {

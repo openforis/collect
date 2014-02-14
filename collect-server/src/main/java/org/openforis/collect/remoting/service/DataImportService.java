@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import org.openforis.collect.io.data.DataImportProcess;
+import org.openforis.collect.io.data.XMLDataImportProcess;
 import org.openforis.collect.io.data.DataImportState;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.exception.DataImportExeption;
@@ -54,7 +54,7 @@ public class DataImportService {
 	
 	private File packagedFile;
 	private File importDirectory;
-	private DataImportProcess dataImportProcess;
+	private XMLDataImportProcess dataImportProcess;
 	@Autowired
 	private ApplicationContext appContext;
 	
@@ -76,7 +76,7 @@ public class DataImportService {
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
 			packagedFile = new File(userImportFolder, FILE_NAME);
 			
-			dataImportProcess = appContext.getBean(DataImportProcess.class);
+			dataImportProcess = appContext.getBean(XMLDataImportProcess.class);
 			dataImportProcess.setSurveyUri(selectedSurveyUri);
 			dataImportProcess.setFile(packagedFile);
 			dataImportProcess.setOverwriteAll(overwriteAll);
