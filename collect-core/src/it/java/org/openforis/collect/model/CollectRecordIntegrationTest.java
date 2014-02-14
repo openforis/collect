@@ -512,6 +512,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			codeAttrDefn.setParentExpression("code2");
 			root.addChildDefinition(codeAttrDefn);
 		}
+		survey.init();
 		return survey;
 	}
 	

@@ -33,29 +33,37 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 	private ModelVersion version;
 	
 	private EntityDefinition rootEntity;
-	private boolean includeAttributes;
+	private Predicate<SurveyObject> includePredicate;
 	private String labelLanguage;
 
-	SchemaTreeModel(AbstractNode<SchemaNodeData> root, EntityDefinition rootEntity, ModelVersion version, boolean includeAttributes, String labelLanguage) {
+	private boolean includeEmptyNodes;
+
+
+	SchemaTreeModel(AbstractNode<SchemaNodeData> root, EntityDefinition rootEntity, ModelVersion version, Predicate<SurveyObject> includePredicate, 
+			boolean includeEmptyNodes, String labelLanguage) {
 		super(root);
 		this.rootEntity = rootEntity;
-		this.includeAttributes = includeAttributes;
+		this.includePredicate = includePredicate;
+		this.includeEmptyNodes = includeEmptyNodes;
 		this.version = version;
 		this.labelLanguage = labelLanguage;
 	}
 	
-	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, boolean includeAttributes, String labelLanguage) {
+	public static SchemaTreeModel createInstance(EntityDefinition rootEntity, ModelVersion version, Predicate<SurveyObject> includePredicate, 
+			boolean includeEmptyNodes, String labelLanguage) {
 		if ( rootEntity != null && (version == null || version.isApplicable(rootEntity)) ) {
 			Collection<AbstractNode<SchemaNodeData>> firstLevelTreeNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
 			CollectSurvey survey = (CollectSurvey) rootEntity.getSurvey();
 			UIOptions uiOptions = survey.getUIOptions();
 			UITabSet tabSet = uiOptions.getAssignedRootTabSet(rootEntity);
 			for (UITab tab : tabSet.getTabs()) {
-				SchemaTreeNode node = SchemaTreeNode.createNode(tab, version, includeAttributes, false, labelLanguage);
-				firstLevelTreeNodes.add(node);
+				SchemaTreeNode node = SchemaTreeNode.createNode(tab, version, includePredicate, includeEmptyNodes, false, labelLanguage);
+				if ( node != null ) {
+					firstLevelTreeNodes.add(node);
+				}
 			}
 			SchemaTreeNode root = new SchemaTreeNode(null, firstLevelTreeNodes);
-			SchemaTreeModel result = new SchemaTreeModel(root, rootEntity, version, includeAttributes, labelLanguage);
+			SchemaTreeModel result = new SchemaTreeModel(root, rootEntity, version, includePredicate, includeEmptyNodes, labelLanguage);
 			return result;
 		} else {
 			return null;
@@ -64,7 +72,7 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 	
 	@Override
 	protected AbstractNode<SchemaNodeData> createNode(SchemaNodeData data, boolean defineEmptyChildrenForLeaves) {
-		AbstractNode<SchemaNodeData> result = SchemaTreeNode.createNode(data, version, includeAttributes, defineEmptyChildrenForLeaves, labelLanguage);
+		AbstractNode<SchemaNodeData> result = SchemaTreeNode.createNode(data, version, includePredicate, includeEmptyNodes, defineEmptyChildrenForLeaves, labelLanguage);
 		return result;
 	}
 	
@@ -133,6 +141,17 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 		return data;
 	}
 	
+	public void showSelectedNode() {
+		AbstractNode<SchemaNodeData> selectedNode = getSelectedNode();
+		if ( selectedNode != null ) {
+			TreeNode<SchemaNodeData> parent = selectedNode.getParent();
+			while ( parent != null ) {
+				addOpenObject(parent);
+				parent = parent.getParent();
+			}
+		}
+	}
+
 	public void updateNodeLabel(SurveyObject surveyObject, String label) {
 		SchemaNodeData data = getNodeData(surveyObject);
 		data.setLabel(label);
@@ -194,7 +213,7 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 	protected SchemaTreeNode recreateNode(SchemaTreeNode node, boolean defineEmptyChildrenForLeaves) {
 		SchemaTreeNode parent = (SchemaTreeNode) node.getParent();
 		SchemaNodeData data = node.getData();
-		SchemaTreeNode newNode = (SchemaTreeNode) SchemaTreeNode.createNode(data, version, includeAttributes, defineEmptyChildrenForLeaves, labelLanguage);
+		SchemaTreeNode newNode = (SchemaTreeNode) SchemaTreeNode.createNode(data, version, includePredicate, includeEmptyNodes, defineEmptyChildrenForLeaves, labelLanguage);
 		parent.replace(node, newNode);
 		return newNode;
 	}
@@ -237,67 +256,69 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 		}
 		
 		public static AbstractNode<SchemaNodeData> createNode(SchemaNodeData data, ModelVersion version,
-				boolean includeAttributes, boolean defineEmptyChildrenForLeaves, String labelLanguage) {
-			SurveyObject surveyObject = data.getSurveyObject();
+				Predicate<SurveyObject> includePredicate, boolean includeEmptyNodes, boolean defineEmptyChildrenForLeaves, String labelLanguage) {
 			SchemaTreeNode node = null;
-			List<AbstractNode<SchemaNodeData>> childNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
-			if ( surveyObject instanceof NodeDefinition ) {
-				NodeDefinition nodeDefn = (NodeDefinition) surveyObject;
-				if ( nodeDefn instanceof EntityDefinition ) {
-					List<AbstractNode<SchemaNodeData>> entityChildrenNodes = createChildNodes(nodeDefn, version, includeAttributes,
-							labelLanguage);
+			SurveyObject surveyObject = data.getSurveyObject();
+			if ( includePredicate == null || includePredicate.evaluate(surveyObject) ) {
+				List<AbstractNode<SchemaNodeData>> childNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
+				if ( surveyObject instanceof EntityDefinition ) {
+					List<AbstractNode<SchemaNodeData>> entityChildrenNodes = createChildNodes((EntityDefinition) surveyObject, version, includePredicate,
+							includeEmptyNodes, labelLanguage);
 					childNodes.addAll(entityChildrenNodes);
-				} else if ( nodeDefn instanceof AttributeDefinition && ! includeAttributes ) {
-					return null;
+				} else if ( surveyObject instanceof UITab ) {
+					List<SchemaTreeNode> childTabNodes = createChildNodes((UITab) surveyObject, version, includePredicate, includeEmptyNodes,
+							labelLanguage);
+					childNodes.addAll(childTabNodes);
+				} else if ( surveyObject instanceof AttributeDefinition ) {
+					//no nested nodes for attributes
+					childNodes = null;
 				}
-			} else if ( surveyObject instanceof UITab ) {
-				UITab tab = (UITab) surveyObject;
-				
-				List<SchemaTreeNode> childTabNodes = createChildNodes(tab, version, includeAttributes,
-						labelLanguage);
-				childNodes.addAll(childTabNodes);
-			}
-			//create result
-			if ( childNodes == null || childNodes.isEmpty() ) {
-				if ( defineEmptyChildrenForLeaves ) {
-					node = new SchemaTreeNode(data, Collections.<AbstractNode<SchemaNodeData>>emptyList());
-				} else {
+				//create result
+				if ( childNodes == null ) {
 					node = new SchemaTreeNode(data);
+				} else if ( childNodes.isEmpty() ) {
+					if ( includeEmptyNodes ) {
+						if ( defineEmptyChildrenForLeaves ) {
+							node = new SchemaTreeNode(data, Collections.<AbstractNode<SchemaNodeData>>emptyList());
+						} else {
+							node = new SchemaTreeNode(data);
+						}
+					} else {
+						node = null;
+					}
+				} else {
+					node = new SchemaTreeNode(data, (List<AbstractNode<SchemaNodeData>>) childNodes);
 				}
-			} else {
-				node = new SchemaTreeNode(data, (List<AbstractNode<SchemaNodeData>>) childNodes);
 			}
 			return node;
 		}
 
-		private static List<AbstractNode<SchemaNodeData>> createChildNodes(NodeDefinition nodeDefn,
-				ModelVersion version, boolean includeAttributes,
-				String labelLanguage) {
+		private static List<AbstractNode<SchemaNodeData>> createChildNodes(EntityDefinition entityDefn,
+				ModelVersion version, Predicate<SurveyObject> includePredicate, boolean includeEmptyNodes, String labelLanguage) {
 			List<AbstractNode<SchemaNodeData>> childNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
-			CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
+			CollectSurvey survey = (CollectSurvey) entityDefn.getSurvey();
 			UIOptions uiOptions = survey.getUIOptions();
-			UITab assignedTab = uiOptions.getAssignedTab(nodeDefn);
+			UITab assignedTab = uiOptions.getAssignedTab(entityDefn);
 			
-			EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
 			List<NodeDefinition> childDefns = entityDefn.getChildDefinitions();
 			Collection<? extends AbstractNode<SchemaNodeData>> schemaTreeNodes = fromSchemaNodeList(assignedTab, childDefns, version, 
-					includeAttributes, labelLanguage);
+					includePredicate, includeEmptyNodes, labelLanguage);
 			childNodes.addAll(schemaTreeNodes);
 			
 			//include tabs
 			List<UITab> tabs = uiOptions.getTabsAssignableToChildren(entityDefn);
-			Collection<? extends AbstractNode<SchemaNodeData>> tabNodes = fromTabsList(tabs, version, includeAttributes, labelLanguage);
+			Collection<? extends AbstractNode<SchemaNodeData>> tabNodes = fromTabsList(tabs, version, includePredicate, includeEmptyNodes, labelLanguage);
 			childNodes.addAll(tabNodes);
 			return childNodes;
 		}
 
 		private static List<SchemaTreeNode> createChildNodes(UITab tab, ModelVersion version,
-				boolean includeAttributes, String labelLanguage) {
+				Predicate<SurveyObject> includePredicate, boolean includeEmptyNodes, String labelLanguage) {
 			List<SchemaTreeNode> result = new ArrayList<SchemaTreeNode>();
 			//add schema node definition tree nodes
 			UIOptions uiOptions = tab.getUIOptions();
 			List<NodeDefinition> childDefns = uiOptions.getNodesPerTab(tab, false);
-			List<SchemaTreeNode> childSchemaNodes = SchemaTreeNode.fromSchemaNodeList(tab, childDefns, version, includeAttributes, labelLanguage);
+			List<SchemaTreeNode> childSchemaNodes = SchemaTreeNode.fromSchemaNodeList(tab, childDefns, version, includePredicate, includeEmptyNodes, labelLanguage);
 			result.addAll(childSchemaNodes);
 			
 			//add children unassigned tab tree nodes
@@ -316,32 +337,33 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 			return result;
 		}
 		
-		public static SchemaTreeNode createNode(NodeDefinition item, ModelVersion version,
-				boolean includeAttributes, boolean defineEmptyChildrenForLeaves, String labelLangugage) {
+		public static SchemaTreeNode createNode(NodeDefinition item, ModelVersion version, Predicate<SurveyObject> includePredicate, 
+				boolean includeEmptyNodes, boolean defineEmptyChildrenForLeaves, String labelLangugage) {
 			SchemaNodeData data = new SchemaNodeData(item, item.getName(), false, false);
-			return (SchemaTreeNode) createNode(data, version, includeAttributes, defineEmptyChildrenForLeaves, labelLangugage);
+			return (SchemaTreeNode) createNode(data, version, includePredicate, includeEmptyNodes, defineEmptyChildrenForLeaves, labelLangugage);
 		}
 		
-		public static SchemaTreeNode createNode(UITab tab, ModelVersion version,
-				boolean includeAttributes, boolean defineEmptyChildrenForLeaves, String labelLanguage) {
+		public static SchemaTreeNode createNode(UITab tab, ModelVersion version, Predicate<SurveyObject> includePredicate, 
+				boolean includeEmptyNodes, boolean defineEmptyChildrenForLeaves, String labelLanguage) {
 			SchemaNodeData data = new SchemaNodeData(tab, tab.getLabel(labelLanguage), false, false);
-			return (SchemaTreeNode) createNode(data, version, includeAttributes, defineEmptyChildrenForLeaves, labelLanguage);
+			return (SchemaTreeNode) createNode(data, version, includePredicate, includeEmptyNodes, defineEmptyChildrenForLeaves, labelLanguage);
 		}
 		
-		protected static List<SchemaTreeNode> fromSchemaNodeList(UITab parentTab, 
-				List<? extends NodeDefinition> items,
-				ModelVersion version, boolean includeAttributes, String labelLanguage) {
+		protected static List<SchemaTreeNode> fromSchemaNodeList(UITab parentTab, List<? extends NodeDefinition> nodes, 
+				ModelVersion version, Predicate<SurveyObject> includePredicate, boolean includeEmptyNodes, String labelLanguage) {
 			List<SchemaTreeNode> result = null;
-			if ( items != null ) {
+			if ( nodes != null ) {
 				result = new ArrayList<SchemaTreeNode>();
-				for (NodeDefinition item : items) {
-					CollectSurvey survey = (CollectSurvey) item.getSurvey();
-					UIOptions uiOptions = survey.getUIOptions();
-					UITab assignedTab = uiOptions.getAssignedTab(item);
-					if ( assignedTab == parentTab && ( version == null || version.isApplicable(item) ) ) {
-						SchemaTreeNode node = createNode(item, version, includeAttributes, false, labelLanguage);
-						if ( node != null ) {
-							result.add(node);
+				for (NodeDefinition nodeDefn : nodes) {
+					if ( includePredicate == null || includePredicate.evaluate(nodeDefn) ) {
+						CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
+						UIOptions uiOptions = survey.getUIOptions();
+						UITab assignedTab = uiOptions.getAssignedTab(nodeDefn);
+						if ( assignedTab == parentTab && ( version == null || version.isApplicable(nodeDefn) ) ) {
+							SchemaTreeNode treeNode = createNode(nodeDefn, version, includePredicate, includeEmptyNodes, false, labelLanguage);
+							if ( treeNode != null ) {
+								result.add(treeNode);
+							}
 						}
 					}
 				}
@@ -350,12 +372,12 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 		}
 
 		protected static List<SchemaTreeNode> fromTabsList(List<UITab> tabs, ModelVersion version, 
-				boolean includeAttributes, String labelLanguage) {
+				Predicate<SurveyObject> includePredicate, boolean includeEmptyNodes, String labelLanguage) {
 			List<SchemaTreeNode> result = null;
 			if ( tabs != null ) {
 				result = new ArrayList<SchemaTreeNode>();
 				for (UITab tab : tabs) {
-					SchemaTreeNode node = createNode(tab, version, includeAttributes, false, labelLanguage);
+					SchemaTreeNode node = createNode(tab, version, includePredicate, includeEmptyNodes, false, labelLanguage);
 					if ( node != null ) {
 						result.add(node);
 					}
@@ -391,6 +413,12 @@ public class SchemaTreeModel extends AbstractTreeModel<SchemaTreeModel.SchemaNod
 			return surveyObject;
 		}
 
+	}
+	
+	public static interface Predicate<T> {
+		
+		public boolean evaluate(T item);
+		
 	}
 
 }

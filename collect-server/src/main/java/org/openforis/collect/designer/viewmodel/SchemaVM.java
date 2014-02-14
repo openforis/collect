@@ -660,7 +660,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( survey == null ) {
 			//TODO session expired...?
 		} else {
-			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, true, currentLanguageCode);
+			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, null, true, currentLanguageCode);
 		}
 	}
 

@@ -19,7 +19,7 @@
             <fieldErrorHandler message="@load(vmsgs['list'])">
               <listbox width="150px" model="@load(vm.codeLists)"
                 selectedItem="@bind(fx.list)" mold="select"
-                onSelect="@command('applyChanges')">
+                onSelect="@command('onListChanged', list=self.selectedItem.value)">
                 <template name="model">
                   <listitem label="@load(each.name)" />
                 </template>
@@ -39,12 +39,12 @@
         <checkbox checked="@load(fx.strict eq true) @save(fx.strict)"
           onCheck="@command('applyChanges')" />
       </row>
-      <row visible="@load(fx.hierarchicalList)">
+      <row visible="@load(fx.list.hierarchical)">
         <label
           value="${labels.survey.schema.attribute.code.parent_path}:" />
         <cell>
         	<hlayout>
-				<textbox width="150px" value="@load(fx.parentCodeAttributePath)" readonly="true" />
+				<textbox width="150px" value="@load(fx.parentCodeAttributeDefinition.path)" readonly="true" />
 		        <button sclass="icon"
 		              tooltiptext="${labels.survey.schema.attribute.code.select_parent}"
 		              onClick="@command('openParentAttributeSelector')"

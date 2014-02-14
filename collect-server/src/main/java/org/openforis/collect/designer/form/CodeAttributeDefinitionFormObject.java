@@ -6,17 +6,16 @@ package org.openforis.collect.designer.form;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.zkoss.bind.annotation.DependsOn;
 
 /**
  * @author S. Ricci
  *
  */
-public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition> extends AttributeDefinitionFormObject<T> {
+public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormObject<CodeAttributeDefinition> {
 	
 	private boolean key;
 	private CodeList list;
-	private CodeAttributeDefinition parentCodeAttribute;
+	private CodeAttributeDefinition parentCodeAttributeDefinition;
 	private boolean strict;
 	private boolean allowValuesSorting;
 	
@@ -27,21 +26,21 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	}
 
 	@Override
-	public void saveTo(T dest, String languageCode) {
+	public void saveTo(CodeAttributeDefinition dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setList(list);
 		dest.setKey(key);
 		dest.setAllowUnlisted(! strict);
-		dest.setParentCodeAttributeDefinition(parentCodeAttribute);
+		dest.setParentCodeAttributeDefinition(parentCodeAttributeDefinition);
 		dest.setAllowValuesSorting(dest.isMultiple() && allowValuesSorting);
 	}
 	
 	@Override
-	public void loadFrom(T source, String languageCode) {
+	public void loadFrom(CodeAttributeDefinition source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		key = source.isKey();
 		list = source.getList();
-		parentCodeAttribute = source.getParentCodeAttributeDefinition();
+		parentCodeAttributeDefinition = source.getParentCodeAttributeDefinition();
 		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 	}
@@ -78,21 +77,12 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 		this.allowValuesSorting = allowValuesSorting;
 	}
 	
-	public CodeAttributeDefinition getParentCodeAttribute() {
-		return parentCodeAttribute;
+	public CodeAttributeDefinition getParentCodeAttributeDefinition() {
+		return parentCodeAttributeDefinition;
 	}
 	
-	public void setParentCodeAttribute(CodeAttributeDefinition parentCodeAttribute) {
-		this.parentCodeAttribute = parentCodeAttribute;
+	public void setParentCodeAttributeDefinition(CodeAttributeDefinition parentCodeAttributeDefinition) {
+		this.parentCodeAttributeDefinition = parentCodeAttributeDefinition;
 	}
 
-	@DependsOn("parentCodeAttribute")
-	public String getParentCodeAttributePath() {
-		return parentCodeAttribute == null ? null: parentCodeAttribute.getPath();
-	}
-	
-	@DependsOn("list")
-	public boolean isHierarchicalList() {
-		return list != null && list.isHierarchical();
-	}
 }
