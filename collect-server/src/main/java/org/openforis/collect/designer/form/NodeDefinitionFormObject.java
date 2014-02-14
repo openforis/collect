@@ -101,11 +101,16 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		multiple = source.isMultiple();
 		Integer nodeMinCount = source.getMinCount();
 		required = nodeMinCount != null && nodeMinCount.intValue() > 0;
-		requiredExpression = source.getRequiredExpression();
+		if ( required ) {
+			requiredExpression = null;
+		} else {
+			requiredExpression = source.getRequiredExpression();
+		}
 		relevantExpression = source.getRelevantExpression();
 		minCount = nodeMinCount;
-		maxCount = source.getMaxCount();
-		if (! multiple ) {
+		if ( multiple ) {
+			maxCount = source.getMaxCount();
+		} else {
 			maxCount = null;
 		}
 		//labels
@@ -138,10 +143,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( multiple ) {
 			dest.setMinCount(minCount);
 			dest.setMaxCount(maxCount);
+		} else if (required) {
+			dest.setMinCount(1);
 		} else {
-			if (required) {
-				dest.setMinCount(1);
-			}
 			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));

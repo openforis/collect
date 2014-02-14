@@ -44,7 +44,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and fx.multiple ne true and vm.requiredApplied)">
+  				visible="@load(not vm.rootEntity and fx.multiple ne true and vm.requiredApplied and (empty fx.requiredExpression or fx.required))">
   				<label value="${labels.survey.schema.node.required}:" />
   				<fieldErrorHandler
   					message="@load(vmsgs['required'])">
@@ -54,7 +54,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and fx.multiple ne true)">
+  				visible="@load(not vm.rootEntity and fx.multiple ne true and (fx.required eq false || not empty fx.requiredExpression))">
   				<label
   					value="${labels.survey.schema.node.required_expression}:" />
   				<fieldErrorHandler
