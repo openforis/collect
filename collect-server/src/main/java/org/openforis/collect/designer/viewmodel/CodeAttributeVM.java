@@ -127,11 +127,18 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 							item instanceof CodeAttributeDefinition && assignableParentAttributes.contains(item);
 				}
 			};
+			SchemaTreeModel.Predicate<SurveyObject> selectPredicate = new SchemaTreeModel.Predicate<SurveyObject>() {
+				@Override
+				public boolean evaluate(SurveyObject item) {
+					return ! (item instanceof UITab);
+				}
+			};
 			Map<String, Object> args = new HashMap<String, Object>();
 			args.put("rootEntity", editedItem.getRootEntity());
 			args.put("version", null);
 			args.put("title", title);
 			args.put("includePredicate", includePredicate);
+			args.put("selectPredicate", selectPredicate);
 			args.put("selection", parentCodeAttributeDefinition);
 			parentSelectorPopUp = openPopUp(Resources.Component.SCHEMA_TREE_POPUP.getLocation(), true, args);
 		}

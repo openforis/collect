@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.openforis.collect.designer.component.SchemaTreeModel;
+import org.openforis.collect.designer.component.SchemaTreeModel.Predicate;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SurveyObject;
@@ -26,19 +27,23 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	
 	private SchemaTreeModel treeModel;
 	private SurveyObject selectedNode;
+
+	private Predicate<SurveyObject> selectPredicate;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("rootEntity") EntityDefinition rootEntity, 
 			@ExecutionArgParam("version") ModelVersion version,
 			@ExecutionArgParam("selection") SurveyObject selection,
-			@ExecutionArgParam("includePredicate") SchemaTreeModel.Predicate<SurveyObject> includePredicate) {
+			@ExecutionArgParam("includePredicate") SchemaTreeModel.Predicate<SurveyObject> includePredicate,
+			@ExecutionArgParam("selectPredicate") SchemaTreeModel.Predicate<SurveyObject> selectPredicate) {
 		super.init();
-		treeModel = SchemaTreeModel.createInstance(rootEntity, version, includePredicate, false, currentLanguageCode);
-		treeModel.openAllItems();
+		this.treeModel = SchemaTreeModel.createInstance(rootEntity, version, includePredicate, false, currentLanguageCode);
+		this.treeModel.openAllItems();
+		this.selectPredicate = selectPredicate; 
 		if ( selection != null ) {
-			selectedNode = selection;
-			treeModel.select(selection);
-			treeModel.showSelectedNode();
+			this.selectedNode = selection;
+			this.treeModel.select(selection);
+			this.treeModel.showSelectedNode();
 		}
 	}
 	
@@ -51,7 +56,9 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	
 	@Command
 	public void nodeSelected(@BindingParam("node") SurveyObject surveyObject) {
-		if ( selectedNode == surveyObject ) {
+		if ( selectPredicate != null && ! selectPredicate.evaluate(surveyObject) ) {
+			treeModel.select(selectedNode);
+		} else if ( selectedNode == surveyObject ) {
 			treeModel.clearSelection();
 			selectedNode = null;
 		} else {
