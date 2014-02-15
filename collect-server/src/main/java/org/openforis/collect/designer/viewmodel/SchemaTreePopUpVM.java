@@ -34,7 +34,9 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 			@ExecutionArgParam("includePredicate") SchemaTreeModel.Predicate<SurveyObject> includePredicate) {
 		super.init();
 		treeModel = SchemaTreeModel.createInstance(rootEntity, version, includePredicate, false, currentLanguageCode);
+		treeModel.openAllItems();
 		if ( selection != null ) {
+			selectedNode = selection;
 			treeModel.select(selection);
 			treeModel.showSelectedNode();
 		}

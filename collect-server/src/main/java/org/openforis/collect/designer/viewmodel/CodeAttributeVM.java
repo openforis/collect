@@ -6,6 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -56,14 +57,9 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			@BindingParam("list") final CodeList list) {
 		if ( editedItem.hasDependentCodeAttributeDefinitions() ) {
 			ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.CompleteConfirmHandler() {
-				
 				@Override
 				public void onOk() {
-					CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
-					fo.setParentCodeAttributeDefinition(null);
-					fo.setList(list);
-					notifyChange("formObject");
-					dispatchApplyChangesCommand(binder);
+					performListChange(binder, list);
 				}
 				@Override
 				public void onCancel() {
@@ -80,9 +76,24 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			}
 			confirmParams.setMessageArgs(new String[]{StringUtils.join(dependentAttributePaths, ", ")});
 			MessageUtil.showConfirm(confirmParams);
+		} else {
+			performListChange(binder, list);
 		}
 	}
 	
+	private void performListChange(final Binder binder,
+			final CodeList list) {
+		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
+		fo.setParentCodeAttributeDefinition(null);
+		fo.setList(list);
+		Form form = getForm(binder);
+		setValueOnFormField(form, "list", list);
+		setValueOnFormField(form, "list.hierarchical", list != null && list.isHierarchical());
+		setValueOnFormField(form, "parentCodeAttributeDefinition.path", null);
+		dispatchApplyChangesCommand(binder);
+		notifyChange("dependentCodePaths");
+	}
+
 	@GlobalCommand
 	public void codeListsPopUpClosed(@ContextParam(ContextType.BINDER) Binder binder, 
 			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
@@ -135,11 +146,29 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	}
 	
 	@GlobalCommand
-	public void schemaTreeNodeSelected(@BindingParam("node") SurveyObject surveyObject) {
-		CodeAttributeDefinition parentAttrDefn = (CodeAttributeDefinition) surveyObject;
-		((CodeAttributeDefinitionFormObject) formObject).setParentCodeAttributeDefinition(parentAttrDefn);
-		notifyChange("formObject");
-		closeParentAttributeSelector();
+	public void schemaTreeNodeSelected(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("node") SurveyObject surveyObject) {
+		if ( parentSelectorPopUp != null ) {
+			CodeAttributeDefinition parentAttrDefn = (CodeAttributeDefinition) surveyObject;
+			((CodeAttributeDefinitionFormObject) formObject).setParentCodeAttributeDefinition(parentAttrDefn);
+			notifyChange("formObject");
+			dispatchApplyChangesCommand(binder);
+			closeParentAttributeSelector();
+			notifyChange("dependentCodePaths");
+		}
+	}
+
+	public String getDependentCodePaths() {
+		StringBuilder sb = new StringBuilder();
+		Collection<CodeAttributeDefinition> dependents = editedItem.getDependentCodeAttributeDefinitions();
+		Iterator<CodeAttributeDefinition> it = dependents.iterator();
+		while (it.hasNext()) {
+			CodeAttributeDefinition dependent = it.next();
+			sb.append(dependent.getPath());
+			if ( it.hasNext() ) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
 	}
 
 }
