@@ -449,7 +449,7 @@ public class SchemaVM extends SurveyBaseVM {
 			if ( surveyObject instanceof NodeDefinition ) {
 				removeNodeDefinition((NodeDefinition) surveyObject);
 			} else {
-				//TODO
+				removeTab((UITab) surveyObject);
 			}
 		}
 	}
@@ -928,8 +928,12 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@Command
 	public void removeTab() {
-		String confirmMessageKey = null;
 		UITab tab = (UITab) selectedTreeNode.getSurveyObject();
+		removeTab(tab);
+	}
+
+	private void removeTab(final UITab tab) {
+		String confirmMessageKey = null;
 		if ( tab.getTabs().isEmpty() ) {
 			CollectSurvey survey = getSurvey();
 			UIOptions uiOpts = survey.getUIOptions();
@@ -944,23 +948,28 @@ public class SchemaVM extends SurveyBaseVM {
 			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
-					performRemoveSelectedTab();
+					performRemoveTab(tab);
 				}
 			}, confirmMessageKey);
 			params.setOkLabelKey("global.delete_item");
 			MessageUtil.showConfirm(params);
 		} else {
-			performRemoveSelectedTab();
+			performRemoveTab(tab);
 		}
 	}
 	
-	protected void performRemoveSelectedTab() {
-		UITab tab = (UITab) selectedTreeNode.getSurveyObject();
+	protected void performRemoveTab(UITab tab) {
+		//remove all nodes associated to the tab
+		UIOptions uiOptions = tab.getUIOptions();
+		List<NodeDefinition> nodesPerTab = uiOptions.getNodesPerTab(tab, false);
+		for (NodeDefinition nodeDefn : nodesPerTab) {
+			EntityDefinition parentDefn = nodeDefn.getParentEntityDefinition();
+			parentDefn.removeChildDefinition(nodeDefn);
+		}
 		UITabSet parent = tab.getParent();
 		parent.removeTab(tab);
 		treeModel.removeSelectedNode();
 		notifyChange("treeModel", "selectedTab");
-//		dispatchTabSetChangedCommand();
 	}
 	
 	@Command
