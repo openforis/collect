@@ -13,7 +13,7 @@
         minsize="250"
         splittable="true">
         <borderlayout visible="@load(not empty vm.treeModel)">
-          <center>
+          <center border="none">
             <tree id="nodesTree" zclass="z-dottree" width="100%"
               vflex="true" model="@load(vm.treeModel)"
               context="nodesTreePopup"
@@ -77,17 +77,27 @@
           </south>
         </borderlayout>
       </west>
-	<center>
-        <vlayout hflex="true" vflex="true"
-          style="overflow: auto; padding: 10px"
-          visible="@load(vm.editingNode)">
-          	<hbox hflex="true" sclass="z-center-header node-type-header">
-				<label value="@load(vm.nodeTypeHeaderLabel)" />
-				<label value="Path:" sclass="path-label" hflex="true" />
-          		<label value="@load(vm.editedNodePath)" />
-          	</hbox>
-          <include id="nodeFormInclude" hflex="true" />
-        </vlayout>
+      <center>
+      	<borderlayout hflex="true" visible="@load(vm.editingNode)">
+      		<north border="none" height="30px">
+      			<hlayout hflex="true" sclass="z-center-header node-type-header">
+  					<box hflex="1">
+		      			<label value="@load(vm.nodeTypeHeaderLabel)" />
+					</box>
+  					<box hflex="1" align="end">
+      					<hlayout>
+			      			<label value="Path:" sclass="path-label" />
+			      			<label value="@load(vm.editedNodePath)" />
+      					</hlayout>
+					</box>
+      			</hlayout>
+      			
+<!--       			sclass="z-center-header node-type-header" -->
+      		</north>
+      		<center border="none" autoscroll="true">
+	      		<include id="nodeFormInclude" hflex="true" />
+      		</center>
+      	</borderlayout>
       </center>
     </borderlayout>
 

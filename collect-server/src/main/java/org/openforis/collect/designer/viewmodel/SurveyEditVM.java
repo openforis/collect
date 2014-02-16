@@ -15,6 +15,8 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -63,8 +65,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	@WireVariable
 	private SurveyManager surveyManager;
-	
+	@WireVariable
+	private SurveyValidator surveyValidator;
+
 	private boolean changed;
+	private Window validationResultsPopUp;
 
 	@Init(superclass=false)
 	public void init(@QueryParam("temp_id") Integer tempId) {
@@ -281,6 +286,24 @@ public class SurveyEditVM extends SurveyBaseVM {
 		} else {
 			return true;
 		}
+	}
+	
+	@Command
+	public void validate() {
+		List<SurveyValidationResult> result = surveyValidator.validate(survey);
+		if ( result.isEmpty() ) {
+			MessageUtil.showInfo("survey.successfully_validated");
+		} else {
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("validationResults", result);
+			validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
+		}
+	}
+	
+	@GlobalCommand
+	public void closeValidationResultsPopUp() {
+		closePopUp(validationResultsPopUp);
+		validationResultsPopUp = null;
 	}
 
 	@GlobalCommand

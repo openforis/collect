@@ -148,9 +148,11 @@ button.icon {
 	width: 100%;
 }
 
-.node-type-header {
-	margin-left: -10px;
-	padding-right: 14px;
+.node-type-header .z-label {
+/* 	margin-left: -10px; */
+/* 	padding-right: 14px; */
+	font-size: 12px;
+	font-weight: bold;
 }
 
 .path-label {
