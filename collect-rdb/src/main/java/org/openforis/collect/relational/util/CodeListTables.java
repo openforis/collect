@@ -40,7 +40,11 @@ public class CodeListTables {
 	}
 	
 	public static String getCodeColumnName(String tableName) {
-		return tableName;
+		return getCodeColumnName(RelationalSchemaConfig.createDefault(), tableName);
+	}
+	
+	public static String getCodeColumnName(RelationalSchemaConfig config, String tableName) {
+		return StringUtils.removeEnd(tableName, config.getCodeListTableSuffix());
 	}
 
 	public static String getLabelColumnName(CodeList codeList, Integer levelIdx) {
@@ -56,16 +60,23 @@ public class CodeListTables {
 	}
 
 	public static String getLabelColumnName(RelationalSchemaConfig config, String tableName) {
-		return StringUtils.removeEnd(tableName, config.getLabelColumnSuffix());
+		String baseName = extractBaseTableName(config, tableName);
+		return getLabelColumnName(config, baseName, null);
 	}
+
 	
 	public static String getLabelColumnName(CodeList codeList, Integer levelIdx, String langCode) {
 		return getLabelColumnName(RelationalSchemaConfig.createDefault(), codeList, levelIdx, langCode);
 	}
 	
 	public static String getLabelColumnName(RelationalSchemaConfig config, CodeList codeList, Integer levelIdx, String langCode) {
+		String baseTableName = getBaseTableName(codeList, levelIdx);
+		return getLabelColumnName(config, baseTableName, langCode);
+	}
+
+	private static String getLabelColumnName(RelationalSchemaConfig config, String baseTableName, String langCode) {
 		StringBuilder sb = new StringBuilder(64);
-		sb.append(getBaseTableName(codeList, levelIdx));
+		sb.append(baseTableName);
 		sb.append(config.getLabelColumnSuffix());
 		if ( StringUtils.isNotBlank(langCode) ) {
 			sb.append("_");
@@ -79,7 +90,8 @@ public class CodeListTables {
 	}
 
 	public static String getDescriptionColumnName(RelationalSchemaConfig config, String tableName) {
-		return StringUtils.removeEnd(tableName, config.getDescriptionColumnSuffix());
+		String baseName = extractBaseTableName(config, tableName);
+		return getDescriptionColumnName(config, baseName, null);
 	}
 	
 	public static String getDescriptionColumnName(CodeList codeList, Integer levelIdx) {
@@ -95,8 +107,13 @@ public class CodeListTables {
 	}
 	
 	public static String getDescriptionColumnName(RelationalSchemaConfig config, CodeList codeList, Integer levelIdx, String langCode) {
+		String baseTableName = getBaseTableName(codeList, levelIdx);
+		return getDescriptionColumnName(config, baseTableName, langCode);
+	}
+
+	protected static String getDescriptionColumnName(RelationalSchemaConfig config, String baseTableName, String langCode) {
 		StringBuilder sb = new StringBuilder(64);
-		sb.append(getBaseTableName(codeList, levelIdx));
+		sb.append(baseTableName);
 		sb.append(config.getDescriptionColumnSuffix());
 		if ( StringUtils.isNotBlank(langCode) ) {
 			sb.append("_");
@@ -120,5 +137,9 @@ public class CodeListTables {
 		return name;
 	}
 
-
+	private static String extractBaseTableName(RelationalSchemaConfig config, String tableName) {
+		String baseName = StringUtils.removeEnd(tableName, config.getCodeListTableSuffix());
+		return baseName;
+	}
+	
 }
