@@ -84,7 +84,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	}
 	
 	private void exportData() throws Exception {
-		FileOutputStream fileOutputStream = null;
+		BufferedOutputStream bufferedOutputStream = null;
 		ZipOutputStream zipOS = null;
 		if ( outputFile.exists() ) {
 			outputFile.delete();
@@ -92,8 +92,8 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		}
 		try {
 			status.setTotal(calculateTotal());
-			fileOutputStream = new FileOutputStream(outputFile);
-			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+			FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+			bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 			
 			Collection<EntityDefinition> entities = getEntitiesToExport();
 			
@@ -101,8 +101,6 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 				//export entity into a single csv file 
 				EntityDefinition entity = entities.iterator().next();
 				exportData(bufferedOutputStream, entity.getId());
-				bufferedOutputStream.flush();
-				IOUtils.close(bufferedOutputStream);
 			} else {
 				//export entities into a zip file containing different csv files
 				zipOS = new ZipOutputStream(bufferedOutputStream);
@@ -121,10 +119,9 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			LOG.error(e.getMessage(), e);
 			throw e;
 		} finally {
-			if ( zipOS != null ) {
-				zipOS.flush();
-				zipOS.close();
-			}
+			IOUtils.close(zipOS);
+			IOUtils.close(bufferedOutputStream);
+
 		}
 		//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
 	}
