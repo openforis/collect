@@ -56,9 +56,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DataImportProcess implements Callable<Void> {
+public class XMLDataImportProcess implements Callable<Void> {
 
-	private static Log LOG = LogFactory.getLog(DataImportProcess.class);
+	private static Log LOG = LogFactory.getLog(XMLDataImportProcess.class);
 
 	@Autowired
 	private RecordManager recordManager;
@@ -92,7 +92,7 @@ public class DataImportProcess implements Callable<Void> {
 
 	private boolean includesRecordFiles;
 
-	public DataImportProcess() {
+	public XMLDataImportProcess() {
 		super();
 		this.state = new DataImportState();
 		this.processedRecords = new ArrayList<Integer>();
