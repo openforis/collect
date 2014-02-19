@@ -65,10 +65,14 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private Integer entityId;
 	private Step step;
 	private boolean includeAllAncestorAttributes;
+	private boolean includeKMLColumnForCoordinates;
+	private boolean includeCodeItemPositionColumn;
 	private boolean alwaysGenerateZipFile;
 	
 	public CSVDataExportProcess() {
 		includeAllAncestorAttributes = false;
+		includeKMLColumnForCoordinates = false;
+		includeCodeItemPositionColumn = false;
 		alwaysGenerateZipFile = false;
 	}
 	
@@ -197,17 +201,18 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		return result;
 	}
 
-	private DataTransformation getTransform(int entityId) throws InvalidExpressionException {
+	protected DataTransformation getTransform(int entityId) throws InvalidExpressionException {
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
 		
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		
 		//entity children columns
-		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(entityDefn);
+		AutomaticColumnProvider entityColumnProvider = createEntityColumnProvider(entityDefn);
 
 		//ancestor columns
 		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
+		
 		//position column
 		if ( isPositionColumnRequired(entityDefn) ) {
 			columnProviders.add(createPositionColumnProvider(entityDefn));
@@ -218,6 +223,12 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		ColumnProvider provider = new ColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
 		return new DataTransformation(axisPath, provider);
+	}
+
+	protected AutomaticColumnProvider createEntityColumnProvider(
+			EntityDefinition entityDefn) {
+		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider("", entityDefn, null, includeKMLColumnForCoordinates, includeCodeItemPositionColumn);
+		return entityColumnProvider;
 	}
 	
 	private int calculateTotal(List<CollectRecord> recordSummaries) {
@@ -270,7 +281,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
 			for (AttributeDefinition keyDefn : keyAttrDefns) {
 				String columnName = calculateAncestorKeyColumnName(keyDefn, false);
-				SingleAttributeColumnProvider keyColumnProvider = new SingleAttributeColumnProvider(keyDefn.getName(), columnName);
+				SingleAttributeColumnProvider keyColumnProvider = new SingleAttributeColumnProvider(keyDefn, columnName);
 				providers.add(keyColumnProvider);
 			}
 			if ( isPositionColumnRequired(entityDefn) ) {
@@ -373,6 +384,24 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 
 	public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
 		this.alwaysGenerateZipFile = alwaysGenerateZipFile;
+	}
+
+	public boolean isIncludeKMLColumnForCoordinates() {
+		return includeKMLColumnForCoordinates;
+	}
+
+	public void setIncludeKMLColumnForCoordinates(
+			boolean includeKMLColumnForCoordinates) {
+		this.includeKMLColumnForCoordinates = includeKMLColumnForCoordinates;
+	}
+
+	public boolean isIncludeCodeItemPositionColumn() {
+		return includeCodeItemPositionColumn;
+	}
+
+	public void setIncludeCodeItemPositionColumn(
+			boolean includeCodeItemPositionColumn) {
+		this.includeCodeItemPositionColumn = includeCodeItemPositionColumn;
 	}
 
 }
