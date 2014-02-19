@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.csv.AutomaticColumnProvider;
 import org.openforis.collect.csv.ColumnProvider;
 import org.openforis.collect.csv.ColumnProviderChain;
@@ -63,6 +65,12 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private Integer entityId;
 	private Step step;
 	private boolean includeAllAncestorAttributes;
+	private boolean alwaysGenerateZipFile;
+	
+	public CSVDataExportProcess() {
+		includeAllAncestorAttributes = false;
+		alwaysGenerateZipFile = false;
+	}
 	
 	@Override
 	protected void initStatus() {
@@ -86,15 +94,26 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			status.setTotal(calculateTotal());
 			fileOutputStream = new FileOutputStream(outputFile);
 			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-			zipOS = new ZipOutputStream(bufferedOutputStream);
-			EntryNameGenerator entryNameGenerator = new EntryNameGenerator();
+			
 			Collection<EntityDefinition> entities = getEntitiesToExport();
-			for (EntityDefinition entity : entities) {
-				String entryName = entryNameGenerator.generateEntryName(entity);
-				ZipEntry entry = new ZipEntry(entryName);
-				zipOS.putNextEntry(entry);
-				exportData(zipOS, entity.getId());
-				zipOS.closeEntry();
+			
+			if ( entities.size() == 1 && ! alwaysGenerateZipFile ) {
+				//export entity into a single csv file 
+				EntityDefinition entity = entities.iterator().next();
+				exportData(bufferedOutputStream, entity.getId());
+				bufferedOutputStream.flush();
+				IOUtils.close(bufferedOutputStream);
+			} else {
+				//export entities into a zip file containing different csv files
+				zipOS = new ZipOutputStream(bufferedOutputStream);
+				EntryNameGenerator entryNameGenerator = new EntryNameGenerator();
+				for (EntityDefinition entity : entities) {
+					String entryName = entryNameGenerator.generateEntryName(entity);
+					ZipEntry entry = new ZipEntry(entryName);
+					zipOS.putNextEntry(entry);
+					exportData(zipOS, entity.getId());
+					zipOS.closeEntry();
+				}
 			}
 		} catch (Exception e) {
 			status.error();
@@ -127,8 +146,8 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		*/
 	}
 
-	private void exportData(ZipOutputStream zipOutputStream, int entityId) throws InvalidExpressionException, IOException, RecordPersistenceException {
-		Writer outputWriter = new OutputStreamWriter(zipOutputStream);
+	private void exportData(OutputStream outputStream, int entityId) throws InvalidExpressionException, IOException, RecordPersistenceException {
+		Writer outputWriter = new OutputStreamWriter(outputStream);
 		DataTransformation transform = getTransform(entityId);
 		
 		@SuppressWarnings("resource")
@@ -303,8 +322,6 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		}
 	}
 
-
-
 	public File getOutputFile() {
 		return outputFile;
 	}
@@ -352,5 +369,14 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	public void setIncludeAllAncestorAttributes(boolean includeAllAncestorAttributes) {
 		this.includeAllAncestorAttributes = includeAllAncestorAttributes;
 	}
+
+	public boolean isAlwaysGenerateZipFile() {
+		return alwaysGenerateZipFile;
+	}
+
+	public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
+		this.alwaysGenerateZipFile = alwaysGenerateZipFile;
+	}
+
 }
 
