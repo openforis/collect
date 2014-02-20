@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.0-Alpha24</version>
+	<version>3.0-Alpha25-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -42,7 +42,7 @@
 		<connection>scm:git:git@github.com:openforis/collect.git</connection>
 		<url>scm:git:git@github.com:openforis/collect.git</url>
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
-		<tag>collect-3.0-Alpha24</tag>
+		<tag>HEAD</tag>
 	</scm>
 	
 	<build>
