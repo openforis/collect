@@ -5,7 +5,6 @@ package org.openforis.collect.csv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -56,7 +55,9 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 			Attribute<?, ?> attr = (Attribute<?, ?>) ((Entity) axis).get(defn.getName(), 0);
 			if (attr == null) {
 				List<String> emptyValues = new ArrayList<String>(getFieldNames().length);
-				Collections.fill(emptyValues, "");
+				for (int i = 0; i < getFieldNames().length; i++) {
+					emptyValues.add("");
+				}
 				return emptyValues;
 			} else {
 				String[] fields = getFieldNames();
