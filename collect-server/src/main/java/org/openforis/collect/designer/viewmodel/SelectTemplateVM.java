@@ -11,6 +11,9 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UITab;
+import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -29,8 +32,6 @@ import org.zkoss.zul.ListModelList;
  *
  */
 public class SelectTemplateVM extends BaseVM {
-
-	private static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
 
 	private enum TemplateType {
 		//BIOPHYSICAL, 
@@ -77,33 +78,44 @@ public class SelectTemplateVM extends BaseVM {
 			if ( templateCode.equals(TemplateType.BLANK.name())) {
 				survey = createEmptySurvey();
 			} else {
-				//create survey from template
-				String templateFileName = "/org/openforis/collect/designer/templates/" + templateCode.toLowerCase() + ".idm.xml";
-				InputStream surveyFileIs = this.getClass().getResourceAsStream(templateFileName);
-				survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
-				survey.setWork(true);
-				survey.setUri(surveyManager.generateRandomSurveyUri());
+				survey = createNewSurveyFromTemplate(templateCode);
 			}
 			//put survey in session and redirect into survey edit page
 			SessionStatus sessionStatus = getSessionStatus();
 			sessionStatus.setSurvey(survey);
-			sessionStatus.setCurrentLanguageCode(null);
+			sessionStatus.setCurrentLanguageCode(survey.getDefaultLanguage());
 			Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 		} else {
 			MessageUtil.showWarning("survey.template.error.select_type");
 		}
 	}
 
+	protected CollectSurvey createNewSurveyFromTemplate(String templateCode)
+			throws IdmlParseException, SurveyValidationException {
+		String templateFileName = "/org/openforis/collect/designer/templates/" + templateCode.toLowerCase() + ".idm.xml";
+		InputStream surveyFileIs = this.getClass().getResourceAsStream(templateFileName);
+		CollectSurvey survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
+		survey.setWork(true);
+		survey.setUri(surveyManager.generateRandomSurveyUri());
+		return survey;
+	}
+
 	protected CollectSurvey createEmptySurvey() {
-		CollectSurvey survey;
+		String defaultLanguge = "en";
 		//create empty survey
-		survey = surveyManager.createSurveyWork();
+		CollectSurvey survey = surveyManager.createSurveyWork();
+		//add default language
+		survey.addLanguage(defaultLanguge);
 		//add default root entity
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntity = schema.createEntityDefinition();
-		rootEntity.setName(DEFAULT_ROOT_ENTITY_NAME);
+		rootEntity.setName(SchemaVM.DEFAULT_ROOT_ENTITY_NAME);
 		schema.addRootEntityDefinition(rootEntity);
-		survey.getUIOptions().createRootTabSet((EntityDefinition) rootEntity);
+		//create root tab set
+		UIOptions uiOptions = survey.getUIOptions();
+		UITabSet rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
+		UITab mainTab = uiOptions.getMainTab(rootTabSet);
+		mainTab.setLabel(defaultLanguge, SchemaVM.DEFAULT_MAIN_TAB_LABEL);
 		return survey;
 	}
 

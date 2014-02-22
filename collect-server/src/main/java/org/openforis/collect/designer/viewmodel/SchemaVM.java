@@ -61,8 +61,8 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SchemaVM extends SurveyBaseVM {
 
-	private static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
-	private static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
+	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
+	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
 
 	private static final String NODE_TYPES_IMAGES_PATH = "/assets/images/node_types/";
 
