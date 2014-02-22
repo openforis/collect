@@ -22,7 +22,7 @@
 		<flexmojos.version>4.2-beta</flexmojos.version>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<idm.version>3.0-Alpha9</idm.version>
+		<idm.version>3.0-Alpha10-SNAPSHOT</idm.version>
 	</properties>
 
 	<distributionManagement>

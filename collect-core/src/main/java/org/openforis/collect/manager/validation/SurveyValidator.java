@@ -27,6 +27,7 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
@@ -95,10 +96,14 @@ public class SurveyValidator {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		for (EntityDefinition rootEntity : rootEntityDefinitions) {
-			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
+			List<KeyAttributeDefinition> keyAttributeDefinitions = schema.getKeyAttributeDefinitions(rootEntity);
 			if ( keyAttributeDefinitions.isEmpty() ) {
 				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntity.getPath(), 
 						"survey.validation.error.key_attribute_not_specified");
+				results.add(validationResult);
+			} else if ( keyAttributeDefinitions.size() > 3 ) {
+				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntity.getPath(), 
+						"survey.validation.error.maximum_key_attribute_definitions_exceeded");
 				results.add(validationResult);
 			}
 		}

@@ -20,6 +20,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
@@ -74,6 +75,7 @@ package org.openforis.collect.ui {
 	import spark.layouts.HorizontalLayout;
 	import spark.layouts.VerticalLayout;
 	import spark.layouts.supportClasses.LayoutBase;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	
 	/**
 	 * @author Mino Togna
@@ -106,7 +108,9 @@ package org.openforis.collect.ui {
 			var column:GridColumn;
 			//key attributes columns
 			var position:int = 1;
-			var keyAttributeDefs:IList = rootEntity.keyAttributeDefinitions;
+			var survey:SurveyProxy = rootEntity.survey;
+			var schema:SchemaProxy = survey.schema;
+			var keyAttributeDefs:IList = schema.getKeyAttributeDefinitions(rootEntity);
 			var headerText:String, dataField:String, width:Number, labelFunction:Function;
 			for each(var keyAttributeDef:AttributeDefinitionProxy in keyAttributeDefs) {
 				headerText = keyAttributeDef.getInstanceOrHeadingLabelText();

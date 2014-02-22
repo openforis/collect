@@ -21,7 +21,7 @@
 					var record:RecordProxy = value as RecordProxy;
 					switch ( record.step ) {
 						case CollectRecord$Step.ENTRY:
-							tempToolTip = Message.get("list.errorsToolTipEntry", [record.errors, record.skipped]);
+							tempToolTip = Message.get("list.errorsToolTipEntry", [record.errors, record.skipped, record.missing]);
 							break;
 						case CollectRecord$Step.CLEANSING:
 							tempToolTip = Message.get("list.errorsToolTipCleansing", [record.errors, record.missing]);

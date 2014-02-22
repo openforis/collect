@@ -169,6 +169,7 @@ package org.openforis.collect.presenter {
 			r.showErrors();
 			var applicationEvent:ApplicationEvent = new ApplicationEvent(ApplicationEvent.ASK_FOR_SUBMIT);
 			eventDispatcher.dispatchEvent(applicationEvent);
+			
 			var totalErrors:int = r.errors + r.missingErrors + r.skipped;
 			if ( totalErrors > 0 ) {
 				openErrorsListPopUp();

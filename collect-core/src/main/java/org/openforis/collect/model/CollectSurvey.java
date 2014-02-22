@@ -41,7 +41,7 @@ public class CollectSurvey extends Survey {
 			((UIOptions) options).setSurvey(this);
 		}
 	}
-
+	
 	public boolean isWork() {
 		return work;
 	}

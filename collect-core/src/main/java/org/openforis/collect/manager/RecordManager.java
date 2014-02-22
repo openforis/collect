@@ -46,6 +46,7 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -193,6 +194,7 @@ public class RecordManager {
 			throw new RecordNotOwnedException(record.getOwner().getName());
 		}
 		addEmptyNodes(record);
+		validate(record);
 		return record;
 	}
 	
@@ -1080,16 +1082,24 @@ public class RecordManager {
 	//END OF RECORD UPDATE METHODS
 	
 	private void checkAllKeysSpecified(CollectRecord record) throws MissingRecordKeyException {
-		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		Schema schema = survey.getSchema();
 		Entity rootEntity = record.getRootEntity();
-		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
-		List<AttributeDefinition> keyAttributeDefns = rootEntityDefn.getKeyAttributeDefinitions();
-		for (int i = 0; i < keyAttributeDefns.size(); i++) {
-			AttributeDefinition keyAttrDefn = keyAttributeDefns.get(i);
-			if ( rootEntity.isRequired(keyAttrDefn.getName()) ) {
-				String keyValue = rootEntityKeyValues.get(i);
-				if ( StringUtils.isBlank(keyValue) ) {
+		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
+		List<KeyAttributeDefinition> keyDefns = schema.getKeyAttributeDefinitions(rootEntity.getDefinition());
+		for (int i = 0; i < keyDefns.size(); i++) {
+			NodeDefinition keyDefn = (NodeDefinition) keyDefns.get(i);
+			boolean required = keyDefn.getMinCount() != null && keyDefn.getMinCount() > 0;
+			if ( required ) {
+				String path = keyDefn.getPath();
+				Node<?> keyNode = record.getNodeByPath(path);
+				if ( keyNode == null ) {
 					throw new MissingRecordKeyException();
+				} else {
+					String keyValue = rootEntityKeyValues.get(i);
+					if ( StringUtils.isBlank(keyValue) ) {
+						throw new MissingRecordKeyException();
+					}
 				}
 			}
 		}

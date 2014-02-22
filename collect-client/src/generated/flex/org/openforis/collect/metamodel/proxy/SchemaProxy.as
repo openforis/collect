@@ -8,6 +8,7 @@
 package org.openforis.collect.metamodel.proxy {
 	import flash.utils.Dictionary;
 	
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.util.ArrayUtil;
@@ -48,6 +49,16 @@ package org.openforis.collect.metamodel.proxy {
 			return _definitionsMap[id];
 		}
 
+		public function getKeyAttributeDefinitions(rootEntity:EntityDefinitionProxy):IList {
+			var result:ArrayCollection = new ArrayCollection();
+			var keyDefnIds:IList = keyAttributeDefinitionIdsByRootEntityId.get(rootEntity.id);
+			for each (var id:int in keyDefnIds) {
+				var keyDefn:NodeDefinitionProxy = getDefinitionById(id);
+				result.addItem(keyDefn);
+			}
+			return result;
+		}
+		
 		public function get survey():SurveyProxy {
 			return _survey;
 		}

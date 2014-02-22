@@ -10,7 +10,6 @@ package org.openforis.collect.model.proxy {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
-	import mx.collections.ListCollectionView;
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
@@ -72,6 +71,7 @@ package org.openforis.collect.model.proxy {
 			this.missingErrors = changeSet.missingErrors;
 			this.missingWarnings = changeSet.missingWarnings;
 			this.warnings = changeSet.warnings;
+			
 			for each (var change:NodeChangeProxy in changeSet.changes)	{
 				applyChange(change);
 			}
