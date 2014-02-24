@@ -14,7 +14,8 @@ import org.openforis.collect.metamodel.ui.UITabSet;
  * @author S. Ricci
  *
  */
-public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {
+@Deprecated
+public class UITabsTreeModel extends BasicTreeModel<UITabSet> {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -71,7 +72,7 @@ public class UITabsTreeModel extends AbstractTreeModel<UITabSet> {
 			List<AbstractNode<UITabSet>> childNodes = fromList(childItems);
 			if ( childNodes == null || childNodes.isEmpty() ) {
 				if ( defineEmptyChildrenForLeaves ) {
-					node = new UITabSetTreeNode(item, new ArrayList<AbstractTreeModel.AbstractNode<UITabSet>>());
+					node = new UITabSetTreeNode(item, new ArrayList<BasicTreeModel.AbstractNode<UITabSet>>());
 				} else {
 					node = new UITabSetTreeNode(item);
 				}

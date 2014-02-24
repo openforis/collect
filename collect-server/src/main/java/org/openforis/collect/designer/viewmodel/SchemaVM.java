@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNode;
+import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
+import org.openforis.collect.designer.component.UITreeModelCreator;
 import org.openforis.collect.designer.composer.SurveySchemaEditComposer;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.LabelKeys;
@@ -597,6 +599,7 @@ public class SchemaVM extends SurveyBaseVM {
 		} else {
 			if ( newNode ) {
 				//editing tab or nested node definition
+				//update tree node
 				selectedTreeNode.setDetached(false);
 				BindUtils.postNotifyChange(null, null, selectedTreeNode, "detached");
 
@@ -663,7 +666,8 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( survey == null ) {
 			//TODO session expired...?
 		} else {
-			treeModel = SchemaTreeModel.createInstance(selectedRootEntity, selectedVersion, null, true, currentLanguageCode);
+			SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(selectedVersion, null, true, currentLanguageCode);
+			treeModel = modelCreator.createModel(selectedRootEntity);
 		}
 	}
 

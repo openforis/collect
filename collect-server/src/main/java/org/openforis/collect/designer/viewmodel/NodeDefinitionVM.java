@@ -74,7 +74,8 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	protected void commitChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		boolean editingRootEntity = parentEntity == null;
-		if ( newItem ) {
+		boolean wasNewItem = newItem;
+		if ( wasNewItem ) {
 			if ( editingRootEntity ) {
 //				CollectSurvey survey = getSurvey();
 //				UIOptions uiOptions = survey.getUIOptions();
@@ -89,7 +90,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", parentEntity);
 		args.put("node", editedItem);
-		args.put("newItem", newItem);
+		args.put("newItem", wasNewItem);
 		BindUtils.postGlobalCommand(null, null, "editedNodeChanged", args);
 		dispatchSurveyChangedCommand();
 	}

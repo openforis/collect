@@ -6,8 +6,10 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.SchemaTreeModel;
-import org.openforis.collect.designer.component.SchemaTreeModel.Predicate;
+import org.openforis.collect.designer.component.UITreeModelCreator;
+import org.openforis.collect.designer.util.Predicate;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SurveyObject;
@@ -34,10 +36,11 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	public void init(@ExecutionArgParam("rootEntity") EntityDefinition rootEntity, 
 			@ExecutionArgParam("version") ModelVersion version,
 			@ExecutionArgParam("selection") SurveyObject selection,
-			@ExecutionArgParam("includePredicate") SchemaTreeModel.Predicate<SurveyObject> includePredicate,
-			@ExecutionArgParam("selectPredicate") SchemaTreeModel.Predicate<SurveyObject> selectPredicate) {
+			@ExecutionArgParam("includePredicate") Predicate<SurveyObject> includePredicate,
+			@ExecutionArgParam("selectPredicate") Predicate<SurveyObject> selectPredicate) {
 		super.init();
-		this.treeModel = SchemaTreeModel.createInstance(rootEntity, version, includePredicate, false, currentLanguageCode);
+		SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(version, includePredicate, false, currentLanguageCode);
+		this.treeModel = modelCreator.createModel(rootEntity);
 		this.treeModel.openAllItems();
 		this.selectPredicate = selectPredicate; 
 		if ( selection != null ) {

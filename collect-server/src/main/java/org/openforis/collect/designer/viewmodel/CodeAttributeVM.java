@@ -12,9 +12,9 @@ import java.util.Map;
 
 import liquibase.util.StringUtils;
 
-import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -120,14 +120,14 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			MessageUtil.showWarning("survey.schema.attribute.code.no_assignable_parent_available");
 		} else {
 			CodeAttributeDefinition parentCodeAttributeDefinition = ((CodeAttributeDefinitionFormObject) formObject).getParentCodeAttributeDefinition();
-			SchemaTreeModel.Predicate<SurveyObject> includePredicate = new SchemaTreeModel.Predicate<SurveyObject>() {
+			Predicate<SurveyObject> includePredicate = new Predicate<SurveyObject>() {
 				@Override
 				public boolean evaluate(SurveyObject item) {
 					return item instanceof UITab || item instanceof EntityDefinition ||
 							item instanceof CodeAttributeDefinition && assignableParentAttributes.contains(item);
 				}
 			};
-			SchemaTreeModel.Predicate<SurveyObject> selectPredicate = new SchemaTreeModel.Predicate<SurveyObject>() {
+			Predicate<SurveyObject> selectPredicate = new Predicate<SurveyObject>() {
 				@Override
 				public boolean evaluate(SurveyObject item) {
 					return ! (item instanceof UITab);
@@ -165,17 +165,21 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	}
 
 	public String getDependentCodePaths() {
-		StringBuilder sb = new StringBuilder();
-		Collection<CodeAttributeDefinition> dependents = editedItem.getDependentCodeAttributeDefinitions();
-		Iterator<CodeAttributeDefinition> it = dependents.iterator();
-		while (it.hasNext()) {
-			CodeAttributeDefinition dependent = it.next();
-			sb.append(dependent.getPath());
-			if ( it.hasNext() ) {
-				sb.append(", ");
+		if ( newItem ) {
+			return null;
+		} else {
+			StringBuilder sb = new StringBuilder();
+			Collection<CodeAttributeDefinition> dependents = editedItem.getDependentCodeAttributeDefinitions();
+			Iterator<CodeAttributeDefinition> it = dependents.iterator();
+			while (it.hasNext()) {
+				CodeAttributeDefinition dependent = it.next();
+				sb.append(dependent.getPath());
+				if ( it.hasNext() ) {
+					sb.append(", ");
+				}
 			}
+			return sb.toString();
 		}
-		return sb.toString();
 	}
 
 }

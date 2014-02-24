@@ -2,7 +2,7 @@ package org.openforis.collect.designer.composer;
 
 import java.util.Set;
 
-import org.openforis.collect.designer.component.AbstractTreeModel.AbstractNode;
+import org.openforis.collect.designer.component.BasicTreeModel.AbstractNode;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNode;

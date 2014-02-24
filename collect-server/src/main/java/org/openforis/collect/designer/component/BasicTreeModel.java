@@ -17,11 +17,11 @@ import org.zkoss.zul.TreeNode;
  * @author S. Ricci
  *
  */
-public abstract class AbstractTreeModel<T> extends DefaultTreeModel<T> {
+public abstract class BasicTreeModel<T> extends DefaultTreeModel<T> {
 	
 	private static final long serialVersionUID = 1L;
 	
-	AbstractTreeModel(AbstractNode<T> root) {
+	BasicTreeModel(AbstractNode<T> root) {
 		super(root);
 	}
 	
