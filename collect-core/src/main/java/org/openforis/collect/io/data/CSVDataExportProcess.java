@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.csv.AutomaticColumnProvider;
 import org.openforis.collect.csv.ColumnProvider;
 import org.openforis.collect.csv.ColumnProviderChain;
@@ -63,6 +65,16 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private Integer entityId;
 	private Step step;
 	private boolean includeAllAncestorAttributes;
+	private boolean includeKMLColumnForCoordinates;
+	private boolean includeCodeItemPositionColumn;
+	private boolean alwaysGenerateZipFile;
+	
+	public CSVDataExportProcess() {
+		includeAllAncestorAttributes = false;
+		includeKMLColumnForCoordinates = false;
+		includeCodeItemPositionColumn = false;
+		alwaysGenerateZipFile = false;
+	}
 	
 	@Override
 	protected void initStatus() {
@@ -76,7 +88,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	}
 	
 	private void exportData() throws Exception {
-		FileOutputStream fileOutputStream = null;
+		BufferedOutputStream bufferedOutputStream = null;
 		ZipOutputStream zipOS = null;
 		if ( outputFile.exists() ) {
 			outputFile.delete();
@@ -84,17 +96,26 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		}
 		try {
 			status.setTotal(calculateTotal());
-			fileOutputStream = new FileOutputStream(outputFile);
-			BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-			zipOS = new ZipOutputStream(bufferedOutputStream);
-			EntryNameGenerator entryNameGenerator = new EntryNameGenerator();
+			FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+			bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+			
 			Collection<EntityDefinition> entities = getEntitiesToExport();
-			for (EntityDefinition entity : entities) {
-				String entryName = entryNameGenerator.generateEntryName(entity);
-				ZipEntry entry = new ZipEntry(entryName);
-				zipOS.putNextEntry(entry);
-				exportData(zipOS, entity.getId());
-				zipOS.closeEntry();
+			
+			if ( entities.size() == 1 && ! alwaysGenerateZipFile ) {
+				//export entity into a single csv file 
+				EntityDefinition entity = entities.iterator().next();
+				exportData(bufferedOutputStream, entity.getId());
+			} else {
+				//export entities into a zip file containing different csv files
+				zipOS = new ZipOutputStream(bufferedOutputStream);
+				EntryNameGenerator entryNameGenerator = new EntryNameGenerator();
+				for (EntityDefinition entity : entities) {
+					String entryName = entryNameGenerator.generateEntryName(entity);
+					ZipEntry entry = new ZipEntry(entryName);
+					zipOS.putNextEntry(entry);
+					exportData(zipOS, entity.getId());
+					zipOS.closeEntry();
+				}
 			}
 		} catch (Exception e) {
 			status.error();
@@ -102,10 +123,9 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			LOG.error(e.getMessage(), e);
 			throw e;
 		} finally {
-			if ( zipOS != null ) {
-				zipOS.flush();
-				zipOS.close();
-			}
+			IOUtils.close(zipOS);
+			IOUtils.close(bufferedOutputStream);
+
 		}
 		//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
 	}
@@ -127,8 +147,8 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		*/
 	}
 
-	private void exportData(ZipOutputStream zipOutputStream, int entityId) throws InvalidExpressionException, IOException, RecordPersistenceException {
-		Writer outputWriter = new OutputStreamWriter(zipOutputStream);
+	private void exportData(OutputStream outputStream, int entityId) throws InvalidExpressionException, IOException, RecordPersistenceException {
+		Writer outputWriter = new OutputStreamWriter(outputStream);
 		DataTransformation transform = getTransform(entityId);
 		
 		@SuppressWarnings("resource")
@@ -181,17 +201,18 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		return result;
 	}
 
-	private DataTransformation getTransform(int entityId) throws InvalidExpressionException {
+	protected DataTransformation getTransform(int entityId) throws InvalidExpressionException {
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
 		
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		
 		//entity children columns
-		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(entityDefn);
+		AutomaticColumnProvider entityColumnProvider = createEntityColumnProvider(entityDefn);
 
 		//ancestor columns
 		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
+		
 		//position column
 		if ( isPositionColumnRequired(entityDefn) ) {
 			columnProviders.add(createPositionColumnProvider(entityDefn));
@@ -202,6 +223,12 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		ColumnProvider provider = new ColumnProviderChain(columnProviders);
 		String axisPath = entityDefn.getPath();
 		return new DataTransformation(axisPath, provider);
+	}
+
+	protected AutomaticColumnProvider createEntityColumnProvider(
+			EntityDefinition entityDefn) {
+		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider("", entityDefn, null, includeKMLColumnForCoordinates, includeCodeItemPositionColumn);
+		return entityColumnProvider;
 	}
 	
 	private int calculateTotal(List<CollectRecord> recordSummaries) {
@@ -254,7 +281,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 			List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
 			for (AttributeDefinition keyDefn : keyAttrDefns) {
 				String columnName = calculateAncestorKeyColumnName(keyDefn, false);
-				SingleAttributeColumnProvider keyColumnProvider = new SingleAttributeColumnProvider(keyDefn.getName(), columnName);
+				SingleAttributeColumnProvider keyColumnProvider = new SingleAttributeColumnProvider(keyDefn, columnName);
 				providers.add(keyColumnProvider);
 			}
 			if ( isPositionColumnRequired(entityDefn) ) {
@@ -303,8 +330,6 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		}
 	}
 
-
-
 	public File getOutputFile() {
 		return outputFile;
 	}
@@ -352,5 +377,32 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	public void setIncludeAllAncestorAttributes(boolean includeAllAncestorAttributes) {
 		this.includeAllAncestorAttributes = includeAllAncestorAttributes;
 	}
+
+	public boolean isAlwaysGenerateZipFile() {
+		return alwaysGenerateZipFile;
+	}
+
+	public void setAlwaysGenerateZipFile(boolean alwaysGenerateZipFile) {
+		this.alwaysGenerateZipFile = alwaysGenerateZipFile;
+	}
+
+	public boolean isIncludeKMLColumnForCoordinates() {
+		return includeKMLColumnForCoordinates;
+	}
+
+	public void setIncludeKMLColumnForCoordinates(
+			boolean includeKMLColumnForCoordinates) {
+		this.includeKMLColumnForCoordinates = includeKMLColumnForCoordinates;
+	}
+
+	public boolean isIncludeCodeItemPositionColumn() {
+		return includeCodeItemPositionColumn;
+	}
+
+	public void setIncludeCodeItemPositionColumn(
+			boolean includeCodeItemPositionColumn) {
+		this.includeCodeItemPositionColumn = includeCodeItemPositionColumn;
+	}
+
 }
 

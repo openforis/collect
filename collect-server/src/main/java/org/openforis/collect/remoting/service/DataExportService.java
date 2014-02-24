@@ -92,6 +92,7 @@ public class DataExportService {
 			process.setStep(step);
 			process.setEntityId(entityId);
 			process.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
+			process.setAlwaysGenerateZipFile(true);
 			
 			process.init();
 			dataExportProcess = process;

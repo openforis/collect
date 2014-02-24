@@ -16,6 +16,7 @@ public abstract class BaseStorageManager implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final String DEFAULT_BASE_DATA_SUBDIR = "data";
 	private static final String DEFAULT_BASE_TEMP_SUBDIR = "temp";
 
 	private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
@@ -43,6 +44,10 @@ public abstract class BaseStorageManager implements Serializable {
 	
 	protected File getTempFolder() {
 		return getReadableSysPropLocation(JAVA_IO_TMPDIR, null);
+	}
+	
+	protected File getCatalinaBaseDataFolder() {
+		return getReadableSysPropLocation(CATALINA_BASE, DEFAULT_BASE_DATA_SUBDIR);
 	}
 	
 	protected File getCatalinaBaseTempFolder() {
@@ -88,7 +93,7 @@ public abstract class BaseStorageManager implements Serializable {
 
 	protected File getDefaultStorageRootDirectory() {
 		if ( defaultStoragePath == null ) {
-			File rootDir = getCatalinaBaseTempFolder();
+			File rootDir = getCatalinaBaseDataFolder();
 			if ( rootDir == null ) {
 				rootDir = getTempFolder();
 			}

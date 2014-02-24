@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -16,18 +17,16 @@ import org.openforis.idm.model.Node;
 @Deprecated
 public class MultipleAttributeColumnProvider implements ColumnProvider {
 
-	private String attributeName;
 	private String headerName;
 	private String delimiter;
+	private AttributeDefinition defn;
 
-	public MultipleAttributeColumnProvider(String childName, String delimiter) {
-		this.attributeName = childName;
-		this.delimiter = delimiter;
-		this.headerName = childName;
+	public MultipleAttributeColumnProvider(AttributeDefinition defn, String delimiter) {
+		this(defn, delimiter, defn.getName());
 	}
 	
-	public MultipleAttributeColumnProvider(String childName, String delimiter, String headerName) {
-		this.attributeName = childName;
+	public MultipleAttributeColumnProvider(AttributeDefinition defn, String delimiter, String headerName) {
+		this.defn = defn;
 		this.delimiter = delimiter;
 		this.headerName = headerName;
 	}
@@ -39,7 +38,7 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 	public List<String> extractValues(Node<?> axis) {
 		if ( axis instanceof Entity ) {
 			Entity entity = (Entity) axis;
-			int cnt = entity.getCount(attributeName);
+			int cnt = entity.getCount(defn.getName());
 			StringBuffer sb = new StringBuffer();
 			for (int i = 0; i < cnt; i++) {
 				if ( i > 0 ) {
@@ -55,7 +54,7 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 	}
 
 	private String extractValue(Entity entity, int i) {
-		Attribute<?,?> attr = (Attribute<?, ?>) entity.get(attributeName, i);
+		Attribute<?,?> attr = (Attribute<?, ?>) entity.get(defn.getName(), i);
 		if ( attr == null ) {
 			return ""; 
 		} else {
