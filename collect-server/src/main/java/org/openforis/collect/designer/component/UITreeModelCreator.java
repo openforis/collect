@@ -49,10 +49,12 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 
 	private List<AbstractNode<SchemaNodeData>> createChildNodes(EntityDefinition entityDefn) {
 		List<AbstractNode<SchemaNodeData>> childNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
+		
 		CollectSurvey survey = (CollectSurvey) entityDefn.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
 		UITab assignedTab = uiOptions.getAssignedTab(entityDefn);
 		
+		//include node definitions
 		List<NodeDefinition> childDefns = entityDefn.getChildDefinitions();
 		Collection<? extends AbstractNode<SchemaNodeData>> schemaTreeNodes = createNodes(assignedTab, childDefns);
 		childNodes.addAll(schemaTreeNodes);
@@ -61,6 +63,7 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 		List<UITab> tabs = uiOptions.getTabsAssignableToChildren(entityDefn);
 		Collection<? extends AbstractNode<SchemaNodeData>> tabNodes = createNodes(tabs);
 		childNodes.addAll(tabNodes);
+
 		return childNodes;
 	}
 

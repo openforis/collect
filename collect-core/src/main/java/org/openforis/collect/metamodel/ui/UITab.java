@@ -98,6 +98,7 @@ public class UITab extends UITabSet {
 	public void detatch() {
 		super.detatch();
 		uiOptions.removeTabAssociation(this);
+		parent = null;
 	}
 	
 	@Override

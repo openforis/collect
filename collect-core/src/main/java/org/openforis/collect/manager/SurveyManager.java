@@ -518,6 +518,7 @@ public class SurveyManager {
 		CollectSurvey survey = surveyWorkDao.load(id);
 		if ( survey != null ) {
 			codeListManager.deleteInvalidCodeListReferenceItems(survey);
+			survey.getUIOptions().removeUnassignedTabs();
 		}
 		return survey;
 	}

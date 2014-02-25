@@ -351,6 +351,37 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 		return true;
 	}
+	
+	public void removeUnassignedTabs() {
+		List<UITabSet> rootTabSets = getTabSets();
+		for (UITabSet rootTabSet : rootTabSets) {
+			Stack<UITabSet> stack = new Stack<UITabSet>();
+			stack.push(rootTabSet);
+			while ( ! stack.isEmpty() ) {
+				UITabSet tabSet = stack.pop();
+				List<UITab> childTabs = tabSet.getTabs();
+				if ( childTabs.isEmpty() ) {
+					//leaf, remove it and all ancestors if leaf and unassigned
+					if ( tabSet instanceof UITab ) {
+						UITab leaf = (UITab) tabSet;
+						while ( leaf.getParent() != null && isUnassigned(leaf) ) {
+							UITabSet parent = leaf.getParent();
+							parent.removeTab(leaf);
+							if ( parent instanceof UITab && parent.getTabs().isEmpty() ) {
+								leaf = (UITab) parent;
+							} else {
+								break;
+							}
+						}
+					}
+				} else {
+					for (UITab childTab : tabSet.getTabs()) {
+						stack.push(childTab);
+					}
+				}
+			}
+		}
+	}
 
 	public EntityDefinition getParentEntityForAssignedNodes(final UITab tab) {
 		UITabSet root = tab.getRootTabSet();
@@ -412,13 +443,13 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 
 	protected void afterTabAssociationChanged(NodeDefinition nodeDefn) {
-		if ( nodeDefn instanceof EntityDefinition ) {
+		if ( nodeDefn instanceof EntityDefinition && nodeDefn.getParentDefinition() != null ) {
 			removeInvalidTabAssociationInDescendants((EntityDefinition) nodeDefn);
 		}
 	}
 
-	protected void removeInvalidTabAssociationInDescendants(EntityDefinition nodeDefn) {
-		((EntityDefinition) nodeDefn).traverse(new NodeDefinitionVisitor() {
+	protected void removeInvalidTabAssociationInDescendants(EntityDefinition entityDefn) {
+		entityDefn.traverse(new NodeDefinitionVisitor() {
 			@Override
 			public void visit(NodeDefinition descendantDefn) {
 				UITab descendantTab = getAssignedTab(descendantDefn, false);
