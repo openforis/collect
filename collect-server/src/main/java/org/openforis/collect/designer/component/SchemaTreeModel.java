@@ -209,12 +209,16 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 		
 		private static final long serialVersionUID = 1L;
 		
+		private boolean disabled;
+		
 		SchemaTreeNode(SchemaNodeData data) {
 			super(data);
+			this.disabled = false;
 		}
 		
 		SchemaTreeNode(SchemaNodeData data, Collection<AbstractNode<SchemaNodeData>> children) {
 			super(data, children);
+			this.disabled = false;
 		}
 		
 		public void markAsDetached() {
@@ -241,7 +245,15 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 			}
 			return result;
 		}
-		
+
+		public boolean isDisabled() {
+			return disabled;
+		}
+
+		public void setDisabled(boolean disabled) {
+			this.disabled = disabled;
+		}
+
 	}
 
 }

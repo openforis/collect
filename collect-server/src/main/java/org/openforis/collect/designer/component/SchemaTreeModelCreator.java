@@ -23,7 +23,14 @@ public class SchemaTreeModelCreator extends SurveyObjectTreeModelCreator {
 	public SchemaTreeModelCreator(ModelVersion version,
 			Predicate<SurveyObject> includeNodePredicate,
 			boolean includeEmptyNodes, String labelLanguage) {
-		super(version, includeNodePredicate, includeEmptyNodes, labelLanguage);
+		this(version, null, includeNodePredicate, includeEmptyNodes, labelLanguage);
+	}
+
+	public SchemaTreeModelCreator(ModelVersion version,
+			Predicate<SurveyObject> disabledNodePredicate,
+			Predicate<SurveyObject> includeNodePredicate,
+			boolean includeEmptyNodes, String labelLanguage) {
+		super(version, disabledNodePredicate, includeNodePredicate, includeEmptyNodes, labelLanguage);
 	}
 
 	@Override

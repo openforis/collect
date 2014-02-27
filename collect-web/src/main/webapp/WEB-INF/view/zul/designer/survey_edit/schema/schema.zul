@@ -1,3 +1,4 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
   <div id="itemsContainer"
     apply="org.openforis.collect.designer.composer.SurveySchemaEditComposer"
@@ -13,6 +14,20 @@
         minsize="250"
         splittable="true">
         <borderlayout visible="@load(not empty vm.treeModel)">
+        	<north border="none">
+				<!-- View type -->
+       		  <hlayout valign="middle">
+       		  	<label value="${labels.survey.schema.tree.view_type.$}:" />
+       		  	<listbox width="150px"
+       		  		model="@load(vm.treeViewTypes)"
+       		  		selectedItem="@load(vm.selectedTreeViewType)" mold="select"
+       		  		onSelect="@command('treeViewTypeSelected', type=self.selectedItem.value)">
+       		  		<template name="model">
+       		  			<listitem label="@load(vm.getTreeViewTypeLabel(each))" />
+       		  		</template>
+       		  	</listbox>
+       		  </hlayout>
+        	</north>
           <center border="none">
             <tree id="nodesTree" zclass="z-dottree" width="100%"
               vflex="true" model="@load(vm.treeModel)"
@@ -20,30 +35,7 @@
               onSelect="@command('nodeSelected', data=self.selectedItem.value.data)">
               <template name="model">
                 <treeitem draggable="false"
-                	context="@load(each.data.detached eq true ? 
-                      detachedNodePopup
-                      : (
-                      	vm.isTab(each.data) ?
-                      		(vm.isMainTab(each.data) ? 
-                      			mainTabPopup
-                      			:
-	                      		tabPopup
-	                      	)
-                      	: (
-                      		vm.isEntity(each.data) ?
-	                        (
-		                        vm.isSingleEntity(each.data) ?
-		                        	singleEntityPopup
-		                        :
-		                        vm.isTableEntity(each.data) ?
-									tableEntityPopup
-		                        : 
-		                        formEntityPopup
-	                        )
-	                       : attributePopup
-		                  )
-                       )
-                    )">
+                	context="@load(vm.getPopupMenu(each.data))">
                 	<treerow>
                 		<treecell image="@load(each.icon)"
                 			label="@load(each.data.label)" />
@@ -54,8 +46,9 @@
           </center>
           <south>
           	<vlayout>
-          		<label value="${labels.survey.schema.right_click_tip}" sclass="tipMessage" />
-          		
+          		<!-- Info tip -->
+       		  <label value="${labels.survey.schema.right_click_tip}" sclass="tipMessage" />
+          		<!-- Button bar -->
 	            <toolbar width="100%" height="26px">
 	              <toolbarbutton image="/assets/images/arrow-up.png"
 	              	tooltiptext="${labels.global.item.move_up}"
@@ -91,8 +84,6 @@
       					</hlayout>
 					</box>
       			</hlayout>
-      			
-<!--       			sclass="z-center-header node-type-header" -->
       		</north>
       		<center border="none" autoscroll="true">
 	      		<include id="nodeFormInclude" hflex="true" />
@@ -226,6 +217,11 @@
     		</menupopup>
     	</menu>
     	<menuseparator />
+    	<!-- Move node -->
+    	<menuitem label="${labels.survey.schema.move_node.$}"
+    		image="/assets/images/move-small.png"
+    		onClick="@command('openMoveNodePopup')" />
+    	<menuseparator />
     	<!-- Remove node -->
     	<menuitem label="${labels.survey.schema.remove_node}"
     		image="/assets/images/delete-small.png"
@@ -269,6 +265,11 @@
     		</menupopup>
     	</menu>
     	<menuseparator />
+    	<!-- Move node -->
+    	<menuitem label="${labels.survey.schema.move_node.$}"
+    		image="/assets/images/move-small.png"
+    		onClick="@command('openMoveNodePopup')" />
+    	<menuseparator />
     	<!-- Remove node -->
     	<menuitem label="${labels.survey.schema.remove_node}"
     		image="/assets/images/delete-small.png"
@@ -298,6 +299,11 @@
     		</menupopup>
     	</menu>
     	<menuseparator />
+    	<!-- Move node -->
+    	<menuitem label="${labels.survey.schema.move_node.$}"
+    		image="/assets/images/move-small.png"
+    		onClick="@command('openMoveNodePopup')" />
+    	<menuseparator />
     	<!-- Remove node -->
     	<menuitem label="${labels.survey.schema.remove_node}"
     		image="/assets/images/delete-small.png"
@@ -305,12 +311,19 @@
     </menupopup>
     
     <menupopup id="attributePopup">
+    	<!-- Move node -->
+    	<menuitem label="${labels.survey.schema.move_node.$}"
+    		image="/assets/images/move-small.png"
+    		onClick="@command('openMoveNodePopup')" />
+    	<menuseparator />
+    	<!-- Remove node -->
     	<menuitem label="${labels.survey.schema.remove_node}"
     		image="/assets/images/delete-small.png"
     		onClick="@command('removeNode')" />
     </menupopup>
     
     <menupopup id="detachedNodePopup">
+    	<!-- Remove node -->
     	<menuitem label="${labels.survey.schema.remove_node}"
     		image="/assets/images/delete-small.png"
     		onClick="@command('removeNode')" />

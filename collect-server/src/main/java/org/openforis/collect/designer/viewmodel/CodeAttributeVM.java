@@ -5,18 +5,15 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import liquibase.util.StringUtils;
 
 import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
-import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -120,32 +117,25 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			MessageUtil.showWarning("survey.schema.attribute.code.no_assignable_parent_available");
 		} else {
 			CodeAttributeDefinition parentCodeAttributeDefinition = ((CodeAttributeDefinitionFormObject) formObject).getParentCodeAttributeDefinition();
-			Predicate<SurveyObject> includePredicate = new Predicate<SurveyObject>() {
+			Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
 				@Override
 				public boolean evaluate(SurveyObject item) {
 					return item instanceof UITab || item instanceof EntityDefinition ||
 							item instanceof CodeAttributeDefinition && assignableParentAttributes.contains(item);
 				}
 			};
-			Predicate<SurveyObject> selectPredicate = new Predicate<SurveyObject>() {
+			Predicate<SurveyObject> selectableNodePredicate = new Predicate<SurveyObject>() {
 				@Override
 				public boolean evaluate(SurveyObject item) {
 					return ! (item instanceof UITab);
 				}
 			};
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("rootEntity", editedItem.getRootEntity());
-			args.put("version", null);
-			args.put("title", title);
-			args.put("includePredicate", includePredicate);
-			args.put("selectPredicate", selectPredicate);
-			args.put("selection", parentCodeAttributeDefinition);
-			parentSelectorPopUp = openPopUp(Resources.Component.SCHEMA_TREE_POPUP.getLocation(), true, args);
+			parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title, editedItem.getRootEntity(), null, includedNodePredicate, false, null, selectableNodePredicate, parentCodeAttributeDefinition);
 		}
 	}
 
 	@GlobalCommand
-	public void closeParentAttributeSelector() {
+	public void closeSchemaNodeSelector() {
 		if ( parentSelectorPopUp != null ) {
 			closePopUp(parentSelectorPopUp);
 			parentSelectorPopUp = null;
@@ -159,7 +149,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			((CodeAttributeDefinitionFormObject) formObject).setParentCodeAttributeDefinition(parentAttrDefn);
 			notifyChange("formObject");
 			dispatchApplyChangesCommand(binder);
-			closeParentAttributeSelector();
+			closeSchemaNodeSelector();
 			notifyChange("dependentCodePaths");
 		}
 	}

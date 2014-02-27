@@ -20,15 +20,18 @@ import org.openforis.idm.metamodel.SurveyObject;
 public abstract class SurveyObjectTreeModelCreator {
 
 	protected ModelVersion version;
+	private Predicate<SurveyObject> disabledNodePredicate;
 	protected Predicate<SurveyObject> includeNodePredicate;
 	protected boolean includeEmptyNodes;
 	protected String labelLanguage;
 
 	public SurveyObjectTreeModelCreator(ModelVersion version,
+			Predicate<SurveyObject> disabledNodePredicate,
 			Predicate<SurveyObject> includeNodePredicate,
 			boolean includeEmptyNodes, String labelLanguage) {
 		super();
 		this.version = version;
+		this.disabledNodePredicate = disabledNodePredicate;
 		this.includeNodePredicate = includeNodePredicate;
 		this.includeEmptyNodes = includeEmptyNodes;
 		this.labelLanguage = labelLanguage;
@@ -65,6 +68,11 @@ public abstract class SurveyObjectTreeModelCreator {
 				}
 			} else {
 				node = new SchemaTreeNode(data, (List<AbstractNode<SchemaNodeData>>) childNodes);
+			}
+		}
+		if ( node != null && disabledNodePredicate != null ) {
+			if ( disabledNodePredicate.evaluate(surveyObject) ) {
+				node.setDisabled(true);
 			}
 		}
 		return node;

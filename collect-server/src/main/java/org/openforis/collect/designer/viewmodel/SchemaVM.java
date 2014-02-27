@@ -13,14 +13,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNode;
+import org.openforis.collect.designer.component.SchemaTreeModelCreator;
 import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.UITreeModelCreator;
-import org.openforis.collect.designer.composer.SurveySchemaEditComposer;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.NodeType;
-import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
@@ -53,6 +53,10 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Menupopup;
+import org.zkoss.zul.Tree;
+import org.zkoss.zul.TreeNode;
+import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
 
 /**
@@ -84,16 +88,37 @@ public class SchemaVM extends SurveyBaseVM {
 	private EntityDefinition selectedRootEntity;
 	private UITabSet rootTabSet;
 	private ModelVersion selectedVersion;
-	
-	@Wire
-	private Include nodeFormInclude;
-	
-	private SchemaTreeModel treeModel;
-
+	private String selectedTreeViewType;
 	private EntityDefinition editedNodeParentEntity;
 
+	@Wire
+	private Include nodeFormInclude;
+	@Wire
+	private Tree nodesTree;
+	@Wire
+	private Menupopup mainTabPopup;
+	@Wire
+	private Menupopup tabPopup;
+	@Wire
+	private Menupopup singleEntityPopup;
+	@Wire
+	private Menupopup tableEntityPopup;
+	@Wire
+	private Menupopup formEntityPopup;
+	@Wire
+	private Menupopup attributePopup;
+	@Wire
+	private Menupopup detachedNodePopup;
+	
 	private Window rootEntityEditPopUp;
+	private Window nodeMovePopUp;
 
+	private SchemaTreeModel treeModel;
+
+	public enum TreeViewType {
+		ENTRY, DATA
+	}
+	
 	@Override
 	@Init(superclass=false)
 	public void init() {
@@ -105,6 +130,8 @@ public class SchemaVM extends SurveyBaseVM {
 		Selectors.wireComponents(view, this, false);
 		Selectors.wireEventListeners(view, this);
 		 
+		selectedTreeViewType = TreeViewType.ENTRY.name().toLowerCase();
+
 		//select first root entity
 		List<EntityDefinition> rootEntities = getRootEntities();
 		if (rootEntities.size() > 0) {
@@ -325,8 +352,15 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	private void updateTreeNodeLabel(Component view, SurveyObject item, String label) {
-		SurveySchemaEditComposer composer = ComponentUtil.getComposer(view);
-		composer.updateNodeLabel(item, label);
+		treeModel.updateNodeLabel(item, label);
+		for (Treeitem treeItem : nodesTree.getItems()) {
+			SchemaTreeNode node = treeItem.getValue();
+			SchemaNodeData data = node.getData();
+			SurveyObject itemSO = data.getSurveyObject();
+			if ( itemSO == item ) {
+				treeItem.setLabel(label);
+			}
+		}
 	}
 
 	protected void resetEditingStatus() {
@@ -606,8 +640,9 @@ public class SchemaVM extends SurveyBaseVM {
 				selectedTreeNode = treeModel.getNodeData(editedNode);
 				treeModel.select(selectedTreeNode);
 				newNode = false;
-				notifyChange("selectedTreeNode", "newNode", "editedNodePath");
+				notifyChange("selectedTreeNode", "newNode");
 			}
+			notifyChange("editedNodePath");
 			//to be called when not notifying changes on treeModel
 			refreshSelectedTreeNode(view);
 		}
@@ -627,8 +662,12 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	protected void refreshSelectedTreeNode(Component view) {
-		SurveySchemaEditComposer composer = ComponentUtil.getComposer(view);
-		composer.refreshSelectedTreeNodeContextMenu();
+		Treeitem selectedItem = nodesTree.getSelectedItem();
+		SchemaTreeNode treeNode = selectedItem.getValue();
+		SchemaNodeData data = treeNode.getData();
+		//update context menu
+		Menupopup popupMenu = getPopupMenu(data);
+		selectedItem.setContext(popupMenu);
 	}
 	
 	protected EntityDefinition createRootEntityDefinition() {
@@ -666,7 +705,15 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( survey == null ) {
 			//TODO session expired...?
 		} else {
-			SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(selectedVersion, null, true, currentLanguageCode);
+			TreeViewType viewType = TreeViewType.valueOf(selectedTreeViewType.toUpperCase());
+			SurveyObjectTreeModelCreator modelCreator;
+			switch (viewType) {
+			case ENTRY:
+				modelCreator = new UITreeModelCreator(selectedVersion, null, true, currentLanguageCode);
+				break;
+			default:
+				modelCreator = new SchemaTreeModelCreator(selectedVersion, null, true, currentLanguageCode);
+			}
 			treeModel = modelCreator.createModel(selectedRootEntity);
 		}
 	}
@@ -892,15 +939,23 @@ public class SchemaVM extends SurveyBaseVM {
 	@Command
 	@NotifyChange({"treeModel","selectedTab"})
 	public void addTab(@ContextParam(ContextType.BINDER) Binder binder) {
-		treeModel.deselect();
-		addTabInternal(binder, rootTabSet);
+		if ( TreeViewType.DATA.name().equalsIgnoreCase(selectedTreeViewType) ) {
+			MessageUtil.showWarning("survey.schema.unsupported_operation_in_data_view");
+		} else {
+			treeModel.deselect();
+			addTabInternal(binder, rootTabSet);
+		}
 	}
 	
 	@Command
 	@NotifyChange({"treeModel","selectedTab"})
 	public void addChildTab(@ContextParam(ContextType.BINDER) Binder binder) {
-		SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-		addTabInternal(binder, surveyObject);
+		if ( TreeViewType.DATA.name().equalsIgnoreCase(selectedTreeViewType) ) {
+			MessageUtil.showWarning("survey.schema.unsupported_operation_in_data_view");
+		} else {
+			SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
+			addTabInternal(binder, surveyObject);
+		}
 	}
 	
 	protected void addTabInternal(final Binder binder, final SurveyObject parent) {
@@ -993,6 +1048,155 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 	
+	@Command
+	public void treeViewTypeSelected(@BindingParam("type") String type) {
+		selectedTreeViewType = type;
+		resetEditingStatus();
+		updateTreeModel();
+	}
+	
+	public Menupopup getPopupMenu(SchemaNodeData data) {
+		if ( data == null ) {
+			return null;
+		}
+		Menupopup popupMenu;
+		if ( data.isDetached() ) { 
+			popupMenu = detachedNodePopup;
+		} else if ( isTab(data) ) {
+			if ( isMainTab(data) ) {
+				popupMenu = mainTabPopup;
+			} else {
+				popupMenu = tabPopup;
+			}
+		} else if ( isEntity(data) ) {
+			if ( isSingleEntity(data) ) {
+				popupMenu = singleEntityPopup;
+			} else if ( isTableEntity(data)) {
+				popupMenu = tableEntityPopup;
+			} else {
+				popupMenu = formEntityPopup;
+			}
+		} else {
+			popupMenu = attributePopup;
+		}
+		return popupMenu;
+	}
+	
+	@Command
+	public void openMoveNodePopup() {
+		SchemaNodeData selectedTreeNode = getSelectedTreeNode();
+		if ( selectedTreeNode == null ) {
+			return;
+		}
+		SurveyObject selectedItem = selectedTreeNode.getSurveyObject();
+		
+		if ( selectedItem instanceof NodeDefinition ) {
+			NodeDefinition selectedNode = (NodeDefinition) selectedItem;
+			boolean changeParentNodeAllowed = checkChangeParentNodeAllowed(selectedNode);
+			if ( changeParentNodeAllowed ) {
+				openSelectParentNodePopup(selectedNode);
+			}
+		} else {
+			//TODO support tab moving
+			return;
+		}
+	}
+
+	private boolean checkChangeParentNodeAllowed(NodeDefinition selectedNode) {
+		UIOptions uiOptions = survey.getUIOptions();
+		if ( survey.isPublished() ) {
+			//only tab changing allowed
+			final List<UITab> assignableTabs = uiOptions.getAssignableTabs(editedNodeParentEntity, selectedNode);
+			if ( assignableTabs.size() > 1 ) {
+				return true;
+			} else {
+				MessageUtil.showWarning("survey.schema.move_node.published_survey.no_other_tabs_allowed");
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+
+	private void openSelectParentNodePopup(final NodeDefinition selectedItem) {
+		UIOptions uiOptions = survey.getUIOptions();
+		final List<UITab> assignableTabs = uiOptions.getAssignableTabs(editedNodeParentEntity, selectedItem);
+
+		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
+			@Override
+			public boolean evaluate(SurveyObject item) {
+				return item instanceof UITab || item instanceof EntityDefinition;
+			}
+		};
+		Predicate<SurveyObject> disabledPredicate = new Predicate<SurveyObject>() {
+			@Override
+			public boolean evaluate(SurveyObject item) {
+				if ( item instanceof UITab ) {
+					return ! assignableTabs.contains(item);
+				} else if ( ! survey.isPublished() && item instanceof EntityDefinition && ! item.equals(selectedItem) ) {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		};
+		String nodeName = editedNode instanceof NodeDefinition ? ((NodeDefinition) editedNode).getName(): "";
+		UITab assignedTab = survey.getUIOptions().getAssignedTab((NodeDefinition) editedNode);
+		String assignedTabLabel = assignedTab.getLabel(currentLanguageCode);
+		String title = Labels.getLabel("survey.schema.move_node_popup_title", new String[]{getNodeTypeHeaderLabel(), nodeName, assignedTabLabel});
+		
+		//calculate parent item (tab or entity)
+		SchemaTreeNode treeNode = treeModel.getTreeNode(selectedItem);
+		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
+		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
+
+		nodeMovePopUp = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, true, disabledPredicate, null, parentItem);
+	}
+	
+	@GlobalCommand
+	public void closeSchemaNodeSelector() {
+		if ( nodeMovePopUp != null ) {
+			closePopUp(nodeMovePopUp);
+			nodeMovePopUp = null;
+		}
+	}
+	
+	@GlobalCommand
+	public void schemaTreeNodeSelected(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("node") SurveyObject surveyObject) {
+		if ( surveyObject instanceof UITab ) {
+			associateNodeToTab((NodeDefinition) editedNode, (UITab) surveyObject);
+		} else if ( surveyObject instanceof EntityDefinition ) {
+			changeEditedNodeParentEntity((EntityDefinition) surveyObject);
+		}
+		closeSchemaNodeSelector();
+	}
+
+	private void changeEditedNodeParentEntity(EntityDefinition newParentEntity) {
+		//update parent entity
+		NodeDefinition node = (NodeDefinition) editedNode;
+		Schema schema = survey.getSchema();
+		schema.changeParentEntity(node, newParentEntity);
+		//update tab
+		UIOptions uiOptions = survey.getUIOptions();
+		UITab newTab = uiOptions.getAssignedTab(newParentEntity);
+		uiOptions.assignToTab(node, newTab);
+		//update ui
+		updateTreeModel();
+		editedNodeParentEntity = newParentEntity;
+		selectTreeNode(editedNode);
+		treeModel.showSelectedNode();
+		notifyChange("selectedTreeNode","editedNode");
+	}
+	
+	private void associateNodeToTab(NodeDefinition node, UITab tab) {
+		UIOptions uiOptions = survey.getUIOptions();
+		uiOptions.assignToTab(node, tab);
+		updateTreeModel();
+		selectTreeNode(node);
+		treeModel.showSelectedNode();
+		notifyChange("selectedTreeNode","editedNode");
+	}
+
 	public SchemaNodeData getSelectedTreeNode() {
 		return selectedTreeNode;
 	}
@@ -1023,4 +1227,21 @@ public class SchemaVM extends SurveyBaseVM {
 		return selectedRootEntity != null;
 	}
 	
+	public String getSelectedTreeViewType() {
+		return selectedTreeViewType;
+	}
+	
+	public String[] getTreeViewTypes() {
+		TreeViewType[] values = TreeViewType.values();
+		String[] result = new String[values.length];
+		for (int i = 0; i < values.length; i++) {
+			TreeViewType type = values[i];
+			result[i] = type.name().toLowerCase();
+		}
+		return result;
+	}
+	
+	public String getTreeViewTypeLabel(String type) {
+		return Labels.getLabel("survey.schema.tree.view_type." + type);
+	}
 }

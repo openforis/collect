@@ -28,9 +28,16 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 	public UITreeModelCreator(ModelVersion version,
 			Predicate<SurveyObject> includeNodePredicate,
 			boolean includeEmptyNodes, String labelLanguage) {
-		super(version, includeNodePredicate, includeEmptyNodes, labelLanguage);
+		this(version, null, includeNodePredicate, includeEmptyNodes, labelLanguage);
 	}
-	
+
+	public UITreeModelCreator(ModelVersion version,
+			Predicate<SurveyObject> disabledNodePredicate,
+			Predicate<SurveyObject> includeNodePredicate,
+			boolean includeEmptyNodes, String labelLanguage) {
+		super(version, disabledNodePredicate, includeNodePredicate, includeEmptyNodes, labelLanguage);
+	}
+
 	@Override
 	protected List<AbstractNode<SchemaNodeData>> createChildNodes(SurveyObject surveyObject) {
 		List<AbstractNode<SchemaNodeData>> childNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
