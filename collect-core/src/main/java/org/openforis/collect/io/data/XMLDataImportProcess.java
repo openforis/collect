@@ -146,9 +146,9 @@ public class XMLDataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.RUNNING);
 			summary = null;
 			packagedSurvey = extractPackagedSurvey();
-			validatePackagedSurvey();
-			
 			existingSurvey = loadExistingSurvey();
+
+			validatePackagedSurvey();
 			
 			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
 			
