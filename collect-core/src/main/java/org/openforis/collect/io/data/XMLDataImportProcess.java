@@ -80,6 +80,11 @@ public class XMLDataImportProcess implements Callable<Void> {
 	 */
 	private CollectSurvey packagedSurvey;
 
+	/**
+	 * Survey stored in the system with the same uri as the packaged one
+	 */
+	private CollectSurvey existingSurvey;
+
 	private boolean overwriteAll;
 
 	private DataUnmarshaller dataUnmarshaller;
@@ -142,7 +147,9 @@ public class XMLDataImportProcess implements Callable<Void> {
 			summary = null;
 			packagedSurvey = extractPackagedSurvey();
 			validatePackagedSurvey();
-			CollectSurvey existingSurvey = getExistingSurvey();
+			
+			existingSurvey = loadExistingSurvey();
+			
 			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
 			
 			Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
@@ -210,7 +217,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 
-	protected CollectSurvey getExistingSurvey() {
+	protected CollectSurvey loadExistingSurvey() {
 		String uri;
 		if ( surveyUri == null ) {
 			if ( packagedSurvey == null ) {
@@ -618,4 +625,12 @@ public class XMLDataImportProcess implements Callable<Void> {
 		this.file = file;
 	}
 
+	public CollectSurvey getExistingSurvey() {
+		return existingSurvey;
+	}
+
+	public CollectSurvey getPackagedSurvey() {
+		return packagedSurvey;
+	}
+	
 }
