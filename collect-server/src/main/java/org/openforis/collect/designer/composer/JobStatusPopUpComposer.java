@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.composer;
 
-import org.openforis.collect.designer.viewmodel.ProcessStatusPopUpVM;
+import org.openforis.collect.designer.viewmodel.JobStatusPopUpVM;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.zk.ui.Component;
@@ -13,8 +13,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
  * @author S. Ricci
  *
  */
-@Deprecated
-public class ProcessStatusPopUpComposer extends BindComposer<Component> {
+public class JobStatusPopUpComposer extends BindComposer<Component> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -25,8 +24,8 @@ public class ProcessStatusPopUpComposer extends BindComposer<Component> {
 	}
 	
 	@Listen("onTimer=#processStatusTimer")
-	public void onSurveysListUpdateTimeout(Event event) throws InterruptedException {
-		BindUtils.postGlobalCommand(null, null, ProcessStatusPopUpVM.UPDATE_PROGRESS_COMMAND, null);
+	public void onProgressStatusTimeout(Event event) throws InterruptedException {
+		BindUtils.postGlobalCommand(null, null, JobStatusPopUpVM.UPDATE_PROGRESS_COMMAND, null);
 	}
 	
 }

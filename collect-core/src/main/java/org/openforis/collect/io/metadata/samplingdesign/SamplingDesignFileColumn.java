@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.samplingdesignimport;
+package org.openforis.collect.io.metadata.samplingdesign;
 
 /**
  * 

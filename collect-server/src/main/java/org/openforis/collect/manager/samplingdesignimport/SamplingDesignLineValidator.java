@@ -3,6 +3,7 @@ package org.openforis.collect.manager.samplingdesignimport;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignFileColumn;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.model.CollectSurvey;

@@ -4,31 +4,30 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
+import org.openforis.collect.io.metadata.SurveyBackupJob;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.process.SimpleProcess;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.utils.ExecutorServiceUtil;
+import org.openforis.collect.schedule.CollectJobManager;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -54,8 +53,6 @@ public class SurveySelectVM extends BaseVM {
 
 	private static Log log = Log.lookup(SurveySelectVM.class);
 
-	private static final String TEXT_XML = "text/xml";
-
 	public static final String CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD = "closeSurveyImportPopUp";
 
 	public static final String UPDATE_SURVEY_LIST_COMMAND = "updateSurveyList";
@@ -66,6 +63,9 @@ public class SurveySelectVM extends BaseVM {
 	@WireVariable
 	private SurveyValidator surveyValidator;
 
+	@WireVariable
+	private CollectJobManager collectJobManager;
+
 	private SurveySummary selectedSurvey;
 
 	private Window surveyImportPopUp;
@@ -74,10 +74,9 @@ public class SurveySelectVM extends BaseVM {
 
 	private List<SurveySummary> summaries;
 
-	private SurveyExportProcess surveyExportProcess;
+	private SurveyBackupJob surveyBackupJob;
 
-	private Window processStatusPopUp;
-
+	private Window jobStatusPopUp;
 	private Window newSurveyTemplatePopUp;
 
 	@Init()
@@ -118,56 +117,68 @@ public class SurveySelectVM extends BaseVM {
 	@Command
 	public void exportSelectedSurvey() throws IOException {
 		CollectSurvey survey = loadSelectedSurvey();
-		surveyExportProcess = new SurveyExportProcess(surveyManager, survey);
-		surveyExportProcess.init();
-		ExecutorServiceUtil.executeInCachedPool(surveyExportProcess);
-		openSurveyExportStatusPopUp(survey);
+		Integer surveyId = survey.getId();
+		surveyBackupJob = collectJobManager.createJob(SurveyBackupJob.class);
+		surveyBackupJob.setSurvey(survey);
+		collectJobManager.startJob(surveyBackupJob, surveyId);
+		
+		openSurveyExportStatusPopUp();
 	}
 
-	protected void openSurveyExportStatusPopUp(CollectSurvey survey) {
-		processStatusPopUp = ProcessStatusPopUpVM.openPopUp(Labels.getLabel(
-				"survey.export_survey.process_status_popup.message",
-				new String[] { survey.getName() }), surveyExportProcess, true);
+	protected void openSurveyExportStatusPopUp() {
+		String surveyName = surveyBackupJob.getSurvey().getName();
+		String title = Labels.getLabel("survey.export_survey.process_status_popup.message", new String[] { surveyName });
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(title, surveyBackupJob, true);
 	}
 
-	protected void closeProcessStatusPopUp() {
-		closePopUp(processStatusPopUp);
-		processStatusPopUp = null;
+	protected void closeJobStatusPopUp() {
+		closePopUp(jobStatusPopUp);
+		jobStatusPopUp = null;
 	}
 
 	@GlobalCommand
-	public void processComplete() {
-		closeProcessStatusPopUp();
-		
-		if (surveyExportProcess != null) {
-			File file = surveyExportProcess.getOutputFile();
-			CollectSurvey survey = surveyExportProcess.getSurvey();
-			String fileName = survey.getName() + ".xml";
-			FileReader reader = null;
-			try {
-				reader = new FileReader(file);
-				Filedownload.save(reader, TEXT_XML, fileName);
-			} catch (FileNotFoundException e) {
-				log.error(e);
-				MessageUtil.showError("survey.export_survey.error", new String[]{e.getMessage()});
-			} finally {
-				surveyExportProcess = null;
-			}
+	public void jobCompleted() {
+		if ( surveyBackupJob != null ) {
+			surveyExportJobCompleted();
 		}
 	}
 
-	@GlobalCommand
-	public void processError(@BindingParam("errorMessage") String errorMessage) {
-		closeProcessStatusPopUp();
-		surveyExportProcess = null;
+	private void surveyExportJobCompleted() {
+		closeJobStatusPopUp();
+		File file = surveyBackupJob.getOutputFile();
+		CollectSurvey survey = surveyBackupJob.getSurvey();
+		String extension = FilenameUtils.getExtension(file.getName());
+		String fileName = survey.getName() + "." + extension;
+		String contentType = URLConnection.guessContentTypeFromName(fileName);
+		try {
+			FileInputStream is = new FileInputStream(file);
+			Filedownload.save(is, contentType, fileName);
+		} catch (FileNotFoundException e) {
+			log.error(e);
+			MessageUtil.showError("survey.export_survey.error", new String[]{e.getMessage()});
+		} finally {
+			surveyBackupJob = null;
+		}
 	}
 	
 	@GlobalCommand
-	public void processCancelled() {
-		closeProcessStatusPopUp();
-		surveyExportProcess = null;
+	public void jobFailed(@BindingParam("errorMessage") String errorMessage) {
+		if ( surveyBackupJob != null ) {
+			closeJobStatusPopUp();
+			surveyBackupJob = null;
+			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
+		}
 	}
+	
 
+	@GlobalCommand
+	public void jobAborted() {
+		if ( surveyBackupJob != null ) {
+			closeJobStatusPopUp();
+			surveyBackupJob = null;
+		}
+	}
+	
 	@Command
 	public void publishSelectedSurvey() throws IOException {
 		final CollectSurvey survey = loadSelectedSurvey();
@@ -310,7 +321,7 @@ public class SurveySelectVM extends BaseVM {
 
 	@GlobalCommand
 	public void updateSurveyList() {
-		if ( surveyImportPopUp != null || processStatusPopUp != null ) {
+		if ( surveyImportPopUp != null || jobStatusPopUp != null ) {
 			//skip survey list update
 			return;
 		}
@@ -411,38 +422,4 @@ public class SurveySelectVM extends BaseVM {
 		return this.selectedSurvey == null || !this.selectedSurvey.isWork();
 	}
 
-	static class SurveyExportProcess extends SimpleProcess {
-
-		private CollectSurvey survey;
-		private SurveyManager surveyManager;
-		private File outputFile;
-
-		public SurveyExportProcess(SurveyManager surveyManager,
-				CollectSurvey survey) {
-			this.surveyManager = surveyManager;
-			this.survey = survey;
-		}
-
-		@Override
-		public void startProcessing() throws Exception {
-			super.startProcessing();
-			outputFile = File.createTempFile("openforis-collect-survey-export",
-					survey.getName());
-			OutputStream os = null;
-			try {
-				os = new FileOutputStream(outputFile);
-				surveyManager.marshalSurvey(survey, os, true, true, false);
-			} finally {
-				IOUtils.closeQuietly(os);
-			}
-		}
-
-		public CollectSurvey getSurvey() {
-			return survey;
-		}
-
-		public File getOutputFile() {
-			return outputFile;
-		}
-	}
 }

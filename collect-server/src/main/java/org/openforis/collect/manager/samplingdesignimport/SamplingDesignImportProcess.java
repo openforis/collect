@@ -8,6 +8,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignFileColumn;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;

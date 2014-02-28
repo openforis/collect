@@ -257,6 +257,10 @@
           <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
+          <groupId>org.openforis.commons</groupId>
+          <artifactId>commons-schedule</artifactId>
+        </dependency>
+        <dependency>
 			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api</artifactId>
 		</dependency>

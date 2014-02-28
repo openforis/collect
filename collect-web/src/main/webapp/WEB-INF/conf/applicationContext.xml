@@ -277,4 +277,8 @@
 	<!-- ===================================== -->
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
 	
+	<bean id="jobExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor">
+		<property name="concurrencyLimit" value="20"/>
+	</bean>
+	
 </beans>

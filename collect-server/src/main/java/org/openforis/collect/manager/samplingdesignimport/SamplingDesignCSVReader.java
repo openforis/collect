@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignFileColumn;
 import org.openforis.collect.manager.referencedataimport.CSVDataImportReader;
 import org.openforis.collect.manager.referencedataimport.CSVLineParser;
 import org.openforis.collect.manager.referencedataimport.ParsingError;

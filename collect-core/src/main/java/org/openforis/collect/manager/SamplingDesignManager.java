@@ -51,6 +51,20 @@ public class SamplingDesignManager {
 	}
 	
 	@Transactional
+	public int countBySurvey(int surveyId) {
+		return count(surveyId, false);
+	}
+	
+	@Transactional
+	public int countBySurveyWork(int surveyWorkId) {
+		return count(surveyWorkId, true);
+	}
+	
+	private int count(int surveyId, boolean work) {
+		return samplingDesignDao.count(work, surveyId);
+	}
+
+	@Transactional
 	protected SamplingDesignSummaries load(boolean work, int surveyId, int offset, int maxRecords) {
 		int totalCount = work ? samplingDesignDao.countPerSurveyWork(surveyId): samplingDesignDao.countPerSurvey(surveyId);
 		List<SamplingDesignItem> records;
