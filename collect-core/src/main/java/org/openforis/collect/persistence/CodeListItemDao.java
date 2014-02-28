@@ -361,6 +361,10 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return currentLevelItems;
 	}
 	
+	public boolean isEmpty(CodeList list) {
+		return ! hasChildItems(list, (Integer) null);
+	}
+
 	public boolean hasChildItems(CodeList codeList, Integer parentItemId) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
 		SelectQuery q = createSelectChildItemsQuery(jf, codeList, parentItemId, false);
