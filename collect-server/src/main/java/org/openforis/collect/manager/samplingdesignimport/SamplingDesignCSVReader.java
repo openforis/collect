@@ -28,7 +28,7 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 	public SamplingDesignCSVReader(File file) throws IOException, ParsingException {
 		super(file);
 	}
-
+	
 	@Override
 	protected SamplingDesignCSVLineParser createLineParserInstance() {
 		SamplingDesignCSVLineParser lineParser = SamplingDesignCSVLineParser.createInstance(this, currentCSVLine);

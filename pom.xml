@@ -235,7 +235,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
-				<artifactId>commons-schedule</artifactId>
+				<artifactId>commons-concurrency</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
 			<dependency>

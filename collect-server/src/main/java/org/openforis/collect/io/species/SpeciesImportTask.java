@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.speciesimport;
+package org.openforis.collect.io.species;
 
 import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
@@ -13,144 +13,108 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.ReferenceDataImportTask;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
 import org.openforis.collect.manager.SpeciesManager;
-import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
 import org.openforis.collect.manager.referencedataimport.ParsingException;
+import org.openforis.collect.manager.speciesimport.SpeciesCSVReader;
+import org.openforis.collect.manager.speciesimport.SpeciesLine;
 import org.openforis.collect.model.TaxonTree;
 import org.openforis.collect.model.TaxonTree.Node;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author S. Ricci
  * 
  */
-public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportStatus> {
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class SpeciesImportTask extends ReferenceDataImportTask<ParsingError> {
 
 	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
 	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
 	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
 	private static final String INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidSpeciesName";
 	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificNameName";
-	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
 	
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY};
 	public static final String GENUS_SUFFIX = "sp.";
 
-	private static final String CSV = "csv";
-	//private static final String ZIP = "zip";
-	
-	private static Log LOG = LogFactory.getLog(SpeciesImportProcess.class);
-
+	@Autowired
 	private SpeciesManager speciesManager;
+
+	//parameters
 	private int taxonomyId;
-	private File file;
 	private boolean overwriteAll;
+	private transient File file;
 	
-	private TaxonTree taxonTree;
-	private SpeciesCSVReader reader;
-	private String errorMessage;
-	private List<SpeciesLine> lines;
+	//runtime instance variables
+	private transient TaxonTree taxonTree;
+	private transient SpeciesCSVReader reader;
+	private transient List<SpeciesLine> lines;
 	
-	public SpeciesImportProcess(SpeciesManager speciesManager, int taxonomyId, File file, boolean overwriteAll) {
-		super();
-		this.speciesManager = speciesManager;
-		this.taxonomyId = taxonomyId;
-		this.file = file;
-		this.overwriteAll = overwriteAll;
+	public SpeciesImportTask() {
 	}
 	
 	@Override
 	public void init() {
-		super.init();
 		taxonTree = new TaxonTree();
 		lines = new ArrayList<SpeciesLine>();
 		validateParameters();
+		try {
+			reader = new SpeciesCSVReader(file);
+		} catch (Exception e) {
+			throw new RuntimeException("Error initializing task: " + e.getMessage(), e);
+		}
+		super.init();
 	}
 	
 	protected void validateParameters() {
-		if ( ! file.exists() && ! file.canRead() ) {
-			status.error();
-			status.setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
-		} else if ( taxonomyId <= 0 ) {
-			status.error();
-			status.setErrorMessage(TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY);
+		if ( taxonomyId <= 0 ) {
+			changeStatus(Status.FAILED);
+			setErrorMessage(TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY);
 		}
 	}
 	
 	@Override
-	protected void initStatus() {
-		status = new SpeciesImportStatus(taxonomyId);
-	}
-
-	@Override
-	public void startProcessing() throws Exception {
-		super.startProcessing();
-		processFile();
-	}
-
-	protected void processFile() throws IOException {
-		String fileName = file.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if ( CSV.equalsIgnoreCase(extension) ) {
-			parseTaxonCSVLines(file);
-//		} else if (ZIP.equals(extension) ) {
-//			processPackagedFile();
-//			status.complete();
-		} else {
-			errorMessage = "File type not supported" + extension;
-			status.setErrorMessage(errorMessage);
-			status.error();
-			LOG.error("Species import: " + errorMessage);
-		}
-		if ( status.isRunning() ) {
+	protected void execute() throws Throwable {
+		parseTaxonCSVLines();
+		if ( isRunning() ) {
 			processLines();
 		}
-		if ( status.isRunning() && ! status.hasErrors() ) {
+		if ( isRunning() && ! hasErrors() ) {
 			persistTaxa();
 		} else {
-			status.error();
-		}
-		if ( status.isRunning() ) {
-			status.complete();
+			changeStatus(Status.FAILED);
 		}
 	}
-	/*
-	protected void processPackagedFile() throws IOException {
-		File unzippedCsvFile = null;
-		ZipFile zipFile = new ZipFile(file);
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-			InputStream is = zipFile.getInputStream(zipEntry);
-			String unzippedPath = file.getAbsolutePath() + "_unzipped.csv";
-			FileOutputStream os = new FileOutputStream(unzippedPath);
-			IOUtils.copy(is, os);
-			unzippedCsvFile = new File(unzippedPath);
-			processCSV(unzippedCsvFile);
+	
+	@Override
+	protected long countTotalItems() {
+		try {
+			return reader.size();
+		} catch (IOException e) {
+			throw new RuntimeException("Error counting total items: " + e.getMessage(), e);
 		}
-		zipFile.close();
 	}
-	*/
 
-	protected void parseTaxonCSVLines(File file) {
+	protected void parseTaxonCSVLines() {
 		long currentRowNumber = 0;
 		try {
-			reader = new SpeciesCSVReader(file);
 			reader.init();
-			status.addProcessedRow(1);
+			addProcessedRow(1);
 			currentRowNumber = 2;
-			while ( status.isRunning() ) {
+			while ( isRunning() ) {
 				try {
 					SpeciesLine line = reader.readNextLine();
 					if ( line != null ) {
@@ -160,21 +124,18 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 						break;
 					}
 				} catch (ParsingException e) {
-					status.addParsingError(currentRowNumber, e.getError());
+					addParsingError(currentRowNumber, e.getError());
 				} finally {
 					currentRowNumber ++;
 				}
 			}
-			status.setTotal(reader.getLinesRead() + 1);
 		} catch (ParsingException e) {
-			status.error();
-			status.addParsingError(1, e.getError());
+			addParsingError(1, e.getError());
+			changeStatus(Status.FAILED);
 		} catch (Exception e) {
-			status.error();
-			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.getMessage()));
-			LOG.error("Error importing species CSV file", e);
-		} finally {
-			IOUtils.closeQuietly(reader);
+			addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.getMessage()));
+			changeStatus(Status.FAILED);
+			log().error("Error importing species CSV file", e);
 		}
 	}
 	
@@ -182,14 +143,14 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		for (TaxonRank rank : TAXON_RANKS) {
 			for (SpeciesLine line : lines) {
 				long lineNumber = line.getLineNumber();
-				if ( ! status.isRowProcessed(lineNumber) && ! status.isRowInError(lineNumber) ) {
+				if ( ! isRowProcessed(lineNumber) && ! isRowInError(lineNumber) ) {
 					try {
 						boolean processed = processLine(line, rank);
 						if (processed ) {
-							status.addProcessedRow(lineNumber);
+							addProcessedRow(lineNumber);
 						}
 					} catch (ParsingException e) {
-						status.addParsingError(lineNumber, e.getError());
+						addParsingError(lineNumber, e.getError());
 					}
 				}
 			}
@@ -347,6 +308,30 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName());
 			throw new ParsingException(error);
 		}
+	}
+
+	public int getTaxonomyId() {
+		return taxonomyId;
+	}
+
+	public void setTaxonomyId(int taxonomyId) {
+		this.taxonomyId = taxonomyId;
+	}
+
+	public File getFile() {
+		return file;
+	}
+	
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+	public boolean isOverwriteAll() {
+		return overwriteAll;
+	}
+
+	public void setOverwriteAll(boolean overwriteAll) {
+		this.overwriteAll = overwriteAll;
 	}
 
 }

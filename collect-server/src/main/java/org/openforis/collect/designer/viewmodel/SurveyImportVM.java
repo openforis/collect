@@ -12,16 +12,15 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.io.SurveyRestoreJob;
+import org.openforis.collect.io.SurveyUnmarshallJob;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.exception.SurveyValidationException;
-import org.openforis.collect.manager.process.SimpleProcess;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.utils.OpenForisIOUtils;
-import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.openforis.concurrency.JobManager;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.ValidationContext;
@@ -31,7 +30,6 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
-import org.zkoss.util.logging.Log;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.UploadEvent;
@@ -45,14 +43,17 @@ import org.zkoss.zul.Window;
 public class SurveyImportVM extends SurveyBaseVM {
 
 	private static final String SURVEY_NAME_FIELD = "surveyName";
-	private static final String TEXT_XML_CONTENT = "text/xml";
+//	private static final String TEXT_XML_CONTENT = "text/xml";
+	private static final Object ZIP_CONTENT = "application/zip";
 
-	private static final Log log = Log.lookup(SurveyImportVM.class);
+	//private static final Log log = Log.lookup(SurveyImportVM.class);
 	
 	@WireVariable
 	private SurveyManager surveyManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
+	@WireVariable
+	private JobManager jobManager;
 
 	private Map<String,String> form;
 	
@@ -63,9 +64,12 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private boolean updatingExistingSurvey;
 	private boolean updatingPublishedSurvey;
 
-	private SurveyUnmarshallProcess unmarshallProcess;
-	private SurveyImportProcess importProcess;
-	private Window processStatusPopUp;
+	//private SurveyUnmarshallProcess unmarshallProcess;
+	//private SurveyImportProcess importProcess;
+	private SurveyUnmarshallJob unmarshallJob;
+	private SurveyRestoreJob restoreJob;
+	
+	private Window jobStatusPopUp;
 	
 	public SurveyImportVM() {
 		form = new HashMap<String, String>();
@@ -156,8 +160,8 @@ public class SurveyImportVM extends SurveyBaseVM {
  		Media media = event.getMedia();
 		String contentType = media.getContentType();
 		
-		if ( TEXT_XML_CONTENT.equals(contentType) ) {
-			File tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData());
+		if ( ZIP_CONTENT.equals(contentType) ) {
+			File tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData());
 			this.uploadedFile = tempFile;
 			this.uploadedFileName = media.getName();
 			updateForm();
@@ -168,47 +172,46 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 
 	protected void prepareSurveyImport(boolean validate) {
-		if ( unmarshallProcess != null && unmarshallProcess.getStatus().isRunning() ) {
-			unmarshallProcess.cancel();
+		if ( unmarshallJob != null && unmarshallJob.isRunning() ) {
+			unmarshallJob.abort();
 		}
-		unmarshallProcess = new SurveyUnmarshallProcess(surveyManager, this.uploadedFile, validate);
-		unmarshallProcess.init();
-		ExecutorServiceUtil.executeInCachedPool(unmarshallProcess);
+		unmarshallJob = jobManager.createJob(SurveyUnmarshallJob.class);
+		unmarshallJob.setFile(this.uploadedFile);
+		unmarshallJob.setValidate(validate);
+		jobManager.start(unmarshallJob);
 		openSurveyUnmarshallStatusPopUp();
 	}
 	
 	protected void openSurveyUnmarshallStatusPopUp() {
-		processStatusPopUp = ProcessStatusPopUpVM.openPopUp(
-				Labels.getLabel("survey.import_survey.unmarshall_process_status_popup.message"), 
-				unmarshallProcess, true);
+		String message = Labels.getLabel("survey.import_survey.unmarshall_process_status_popup.message");
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(message, unmarshallJob, true);
 	}
 	
-	protected void openSurveyImportStatusPopUp() {
-		processStatusPopUp = ProcessStatusPopUpVM.openPopUp(
-				Labels.getLabel("survey.import_survey.import_process_status_popup.message"), 
-				importProcess, false);
+	protected void openSurveyRestoreStatusPopUp() {
+		String message = Labels.getLabel("survey.import_survey.import_process_status_popup.message");
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(message, restoreJob, false);
 	}
 	
-	protected void closeProcessStatusPopUp() {
-		closePopUp(processStatusPopUp);
-		processStatusPopUp = null;
+	protected void closeJobStatusPopUp() {
+		closePopUp(jobStatusPopUp);
+		jobStatusPopUp = null;
 	}
 	
 	@GlobalCommand
-	public void processComplete() {
-		closeProcessStatusPopUp();
+	public void jobCompleted() {
+		closeJobStatusPopUp();
 
-		if ( unmarshallProcess != null ) {
+		if ( unmarshallJob != null ) {
 			afterSurveyUnmarshallComplete();
-		} else if ( importProcess != null ) {
+		} else if ( restoreJob!= null ) {
 			afterSurveyImportCompleted();
 		}
 	}
 	
 	@GlobalCommand
-	public void processCancelled() {
-		closeProcessStatusPopUp();
-		if ( unmarshallProcess != null ) {
+	public void jobAborted() {
+		closeJobStatusPopUp();
+		if ( unmarshallJob != null ) {
 			uploadedFileName = null;
 			uploadedSurveyUri = null;
 			uploadedFile = null;
@@ -218,10 +221,10 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	public void processError(@BindingParam("errorMessage") String errorMessage) {
-		closeProcessStatusPopUp();
+	public void jobFailed(@BindingParam("errorMessage") String errorMessage) {
+		closeJobStatusPopUp();
 		
-		if ( unmarshallProcess != null && unmarshallProcess.isValidate() ) {
+		if ( unmarshallJob != null && unmarshallJob.isValidate() ) {
 			confirmImportInvalidSurvey(errorMessage);
 		} else if (errorMessage != null ) {
 			Object[] args = new String[]{errorMessage};
@@ -231,14 +234,14 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	private void resetAsyncProcesses() {
-		unmarshallProcess = null;
-		importProcess = null;
+		unmarshallJob = null;
+		restoreJob = null;
 	}
 
 	protected void afterSurveyUnmarshallComplete() {
-		survey = unmarshallProcess.getSurvey();
+		survey = unmarshallJob.getSurvey();
 		uploadedSurveyUri = survey.getUri();
-		unmarshallProcess = null;
+		unmarshallJob = null;
 		updateForm();
 	}
 
@@ -283,17 +286,22 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	protected void startSurveyImport() {
 		String surveyName = getFormSurveyName();
-		importProcess = new SurveyImportProcess(surveyManager, uploadedFile, survey, surveyName, updatingExistingSurvey, updatingPublishedSurvey);
-		importProcess.init();
-		ExecutorServiceUtil.executeInCachedPool(importProcess);
-		openSurveyImportStatusPopUp();
+		restoreJob = jobManager.createJob(SurveyRestoreJob.class);
+		restoreJob.setFile(uploadedFile);
+		restoreJob.setPublishedSurveyUri(survey.getUri());
+		restoreJob.setSurveyName(surveyName);
+		restoreJob.setUpdatingExistingSurvey(updatingExistingSurvey);
+		restoreJob.setUpdatingPublishedSurvey(updatingPublishedSurvey);
+
+		jobManager.start(restoreJob);
+		openSurveyRestoreStatusPopUp();
 	}
 	
 	protected void afterSurveyImportCompleted() {
 		Object[] args = new String[]{getFormSurveyName()};
 		MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
 		closeImportPopUp(true);
-		importProcess = null;
+		restoreJob = null;
 	}
 	
 	protected boolean validateSurvey(CollectSurvey survey) {
@@ -364,75 +372,4 @@ public class SurveyImportVM extends SurveyBaseVM {
 		this.form = form;
 	}
 	
-	static class SurveyUnmarshallProcess extends SimpleProcess {
-
-		private File file;
-		private boolean validate;
-		private SurveyManager surveyManager;
-		private CollectSurvey survey;
-
-		public SurveyUnmarshallProcess(SurveyManager surveyManager, File file, boolean validate) {
-			this.surveyManager = surveyManager;
-			this.file = file;
-			this.validate = validate;
-		}
-
-		@Override
-		public void startProcessing() throws Exception {
-			super.startProcessing();
-			try {
-				this.survey = this.surveyManager.unmarshalSurvey(file, validate, false);
-			} catch(IdmlParseException e) {
-				log.warning("Error unmarhalling survey: " + e.getMessage());
-				this.status.error();
-				this.status.setErrorMessage(e.getMessage());
-			} catch (SurveyValidationException e) {
-				log.warning("Error validating survey to import: " + e.getMessage());
-				this.status.error();
-				this.status.setErrorMessage(e.getMessage());
-			}
-		}
-		
-		public CollectSurvey getSurvey() {
-			return survey;
-		}
-		
-		public boolean isValidate() {
-			return validate;
-		}
-	}
-	
-	static class SurveyImportProcess extends SimpleProcess {
-		private CollectSurvey survey;
-		private File file;
-		private SurveyManager surveyManager;
-		private boolean updatingExistingSurvey;
-		private boolean updatingPublishedSurvey;
-		private String name;
-
-		public SurveyImportProcess(SurveyManager surveyManager, File file,
-				CollectSurvey survey, String name,
-				boolean updatingExistingSurvey, boolean updatingPublishedSurvey) {
-			this.surveyManager = surveyManager;
-			this.file = file;
-			this.survey = survey;
-			this.name = name;
-			this.updatingExistingSurvey = updatingExistingSurvey;
-			this.updatingPublishedSurvey = updatingPublishedSurvey;
-		}
-
-		@Override
-		public void startProcessing() throws Exception {
-			super.startProcessing();
-			if ( updatingExistingSurvey ) {
-				if ( updatingPublishedSurvey ) {
-					surveyManager.importInPublishedWorkModel(survey.getUri(), file, false);
-				} else {
-					surveyManager.updateModel(file, false);
-				}
-			} else {
-				surveyManager.importWorkModel(file, name, false);
-			}
-		}
-	}
 }

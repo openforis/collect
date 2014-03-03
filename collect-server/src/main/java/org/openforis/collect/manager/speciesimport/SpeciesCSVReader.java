@@ -9,8 +9,8 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +23,7 @@ import org.gbif.ecat.model.ParsedName;
 import org.gbif.ecat.parser.NameParser;
 import org.gbif.ecat.parser.UnparsableException;
 import org.gbif.ecat.voc.Rank;
+import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
 import org.openforis.collect.manager.referencedataimport.CSVDataImportReader;
 import org.openforis.collect.manager.referencedataimport.CSVLineParser;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
@@ -38,14 +39,10 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  */
 public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 
-	public SpeciesCSVReader(String filename) throws IOException, ParsingException {
-		super(filename);
+	public SpeciesCSVReader(File file) throws IOException, ParsingException {
+		super(file);
 	}
 
-	public SpeciesCSVReader(Reader reader) throws IOException, ParsingException {
-		super(reader);
-	}
-	
 	@Override
 	protected SpeciesCSVLineParser createLineParserInstance() {
 		SpeciesCSVLineParser lineParser = SpeciesCSVLineParser.createInstance(this, currentCSVLine);

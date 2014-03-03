@@ -8,8 +8,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
 import org.openforis.collect.manager.SpeciesManager;
-import org.openforis.collect.manager.speciesimport.SpeciesFileColumn;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.commons.io.csv.CsvWriter;
@@ -19,6 +19,7 @@ import org.openforis.commons.io.csv.CsvWriter;
  * @author S. Ricci
  *
  */
+@Deprecated
 public class SpeciesExportProcess {
 	
 	private static final String LATIN_LANG_CODE = "lat";

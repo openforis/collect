@@ -258,7 +258,7 @@
         </dependency>
         <dependency>
           <groupId>org.openforis.commons</groupId>
-          <artifactId>commons-schedule</artifactId>
+          <artifactId>commons-concurrency</artifactId>
         </dependency>
         <dependency>
 			<groupId>org.openforis.idm</groupId>

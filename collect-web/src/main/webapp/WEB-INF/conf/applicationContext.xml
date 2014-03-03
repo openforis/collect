@@ -20,6 +20,7 @@
 	default-lazy-init="true">
 
 	<context:component-scan base-package="org.openforis.collect" />
+	<context:component-scan base-package="org.openforis.concurrency" />
 	<context:annotation-config />
 
 	<mvc:resources mapping="collect.swf" location="collect.swf" />

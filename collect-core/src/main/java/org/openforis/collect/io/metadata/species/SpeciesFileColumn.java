@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.speciesimport;
+package org.openforis.collect.io.metadata.species;
 
 /**
  * 

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.schedule.CollectJob;
+import org.openforis.concurrency.Job;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ExecutionArgParam;
@@ -32,9 +32,9 @@ public class JobStatusPopUpVM extends BaseVM {
 	private String message;
 	private boolean cancelable;
 
-	private CollectJob<?> job;
+	private Job job;
 	
-	public static <J extends CollectJob<J>> Window openPopUp(String message, J job, boolean cancelable) {
+	public static <J extends Job> Window openPopUp(String message, J job, boolean cancelable) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(JobStatusPopUpVM.MESSAGE_ARG, message);
 		args.put(JobStatusPopUpVM.JOB_ARG, job);
@@ -44,7 +44,7 @@ public class JobStatusPopUpVM extends BaseVM {
 	}
 	
 	@Init
-	public <J extends CollectJob<J>> void init(@ExecutionArgParam(MESSAGE_ARG) String message, 
+	public <J extends Job> void init(@ExecutionArgParam(MESSAGE_ARG) String message, 
 			@ExecutionArgParam(JOB_ARG) J job,
 			@ExecutionArgParam(CANCELABLE_ARG) boolean cancelable) {
 		this.message = message;
@@ -92,6 +92,5 @@ public class JobStatusPopUpVM extends BaseVM {
 		job.abort();
 		dispatchJobAbortedCommand();
 	}
-	
 	
 }
