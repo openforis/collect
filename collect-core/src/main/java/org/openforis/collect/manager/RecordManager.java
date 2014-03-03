@@ -233,6 +233,14 @@ public class RecordManager {
 		return recordsSummary;
 	}
 
+	/**
+	 * Returns only the records modified after the specified date.
+	 */
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Date modifiedSince) {
+		return recordDao.loadSummaries(survey, rootEntity, modifiedSince);
+	}
+	
 	public int countRecords(CollectSurvey survey) {
 		return recordDao.countRecords(survey);
 	}

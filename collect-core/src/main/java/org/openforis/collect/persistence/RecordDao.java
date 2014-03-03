@@ -6,7 +6,9 @@ import static org.openforis.collect.persistence.jooq.Tables.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.Tables.OFC_USER;
 
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -120,22 +122,26 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
-		return loadSummaries(survey, rootEntity, step, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
+		return loadSummaries(survey, rootEntity, step, (Date) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
 	}
 
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
-		return loadSummaries(survey, rootEntity, (Step) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, keyValues);
+		return loadSummaries(survey, rootEntity, (Step) null, (Date) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, keyValues);
 	}
 
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
-		return loadSummaries(survey, rootEntity, (Step) null, offset, maxRecords, sortFields, keyValues);
+		return loadSummaries(survey, rootEntity, (Step) null, (Date) null, offset, maxRecords, sortFields, keyValues);
 	}
 	
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Date modifiedSince) {
+		return loadSummaries(survey, rootEntity, (Step) null, modifiedSince, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
+	}
+
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, int offset, int maxRecords, 
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, Date modifiedSince, int offset, int maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
 		JooqFactory jf = getMappingJooqFactory(survey);
 		SelectQuery q = jf.selectQuery();	
@@ -152,6 +158,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootEntityDefnId));
 		if ( step != null ) {
 			q.addConditions(OFC_RECORD.STEP.equal(step.getStepNumber()));
+		}
+		if ( modifiedSince != null ) {
+			q.addConditions(OFC_RECORD.DATE_MODIFIED.greaterOrEqual(new Timestamp(modifiedSince.getTime())));
 		}
 		addFilterByKeyConditions(q, keyValues);
 		
