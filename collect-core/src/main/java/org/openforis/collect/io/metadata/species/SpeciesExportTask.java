@@ -38,7 +38,7 @@ public class SpeciesExportTask extends Task {
 	protected void execute() throws Throwable {
 		CsvWriter writer = new CsvWriter(outputStream);
 		
-		TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomyId);
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomyId);
 		
 		List<String> vernacularNamesLangCodes = getNotEmptyValues(summaries.getVernacularNamesLanguageCodes());
 		vernacularNamesLangCodes.remove(LATIN_LANG_CODE); //consider Latin vernacular name as synonym

@@ -3,10 +3,10 @@ package org.openforis.collect.remoting.service;
 import java.io.File;
 
 import org.openforis.collect.io.exception.DataImportExeption;
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportProcess;
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportStatus;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportProcess;
-import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportStatus;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;

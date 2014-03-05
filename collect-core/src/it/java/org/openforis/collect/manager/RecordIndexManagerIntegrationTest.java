@@ -37,13 +37,13 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 	//private final Log log = LogFactory.getLog(ConfigurationDaoIntegrationTest.class);
 	
 	@Autowired
-	protected RecordIndexManager indexManager;
+	protected RecordIndexManager persistedRecordIndexManager;
 	
 	@Before
 	public void before() throws Exception {
-		indexManager.destroyIndex();
-		indexManager.init();
-		if ( ! indexManager.isInited() ) {
+		persistedRecordIndexManager.destroyIndex();
+		persistedRecordIndexManager.init();
+		if ( ! persistedRecordIndexManager.isInited() ) {
 			throw new Exception("Index manager not inited");
 		}
 	}
@@ -70,11 +70,11 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 	
 	@After
 	public void after() throws Exception {
-		indexManager.destroyIndex();
+		persistedRecordIndexManager.destroyIndex();
 	}
 
 	private void testSingleResultMatching(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
-		List<String> result = indexManager.search(SearchType.EQUAL, survey, autoCompleteNodeDefn.getId(), 0, "SXBLUEII-L", 10);
+		List<String> result = persistedRecordIndexManager.search(SearchType.EQUAL, survey, autoCompleteNodeDefn.getId(), 0, "SXBLUEII-L", 10);
 		assertNotNull(result);
 		assertEquals(1, result.size());
 		String value = result.iterator().next();
@@ -91,7 +91,7 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 
 	private void testMultipleResultsFound(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
 		List<String> result;
-		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS", 10);
+		result = persistedRecordIndexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS", 10);
 		assertNotNull(result);
 		assertEquals(3, result.size());
 		assertArrayEquals(new String[] {"GPS MAP 60CSX", "GPS MAP 62 S", "GPS MAP 62S"}, result.toArray());
@@ -99,7 +99,7 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 
 	private void testMultipleResultsFoundWithNonCompleteTerm(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
 		List<String> result;
-		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS MA", 10);
+		result = persistedRecordIndexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS MA", 10);
 		assertNotNull(result);
 		assertEquals(3, result.size());
 		assertArrayEquals(new String[] {"GPS MAP 60CSX", "GPS MAP 62 S", "GPS MAP 62S"}, result.toArray());
@@ -107,14 +107,14 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 	
 	private void testNoResultsFound(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
 		List<String> result;
-		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS NOT LISTED", 10);
+		result = persistedRecordIndexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS NOT LISTED", 10);
 		assertNotNull(result);
 		assertEquals(0, result.size());
 	}
 
 	private void testLimitedMultipleResultsFound(CollectSurvey survey, NodeDefinition autoCompleteNodeDefn) throws Exception {
 		List<String> result;
-		result = indexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS", 2);
+		result = persistedRecordIndexManager.search(SearchType.STARTS_WITH, survey, autoCompleteNodeDefn.getId(), 0, "GPS", 2);
 		assertNotNull(result);
 		assertEquals(2, result.size());
 		assertArrayEquals(new String[] {"GPS MAP 60CSX", "GPS MAP 62 S"}, result.toArray());
@@ -124,7 +124,7 @@ public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 		int count = 1;
 		for (String gpsModel : gpsModels) {
 			CollectRecord record = createTestRecord(survey, count, Integer.toString(count++), gpsModel);
-			indexManager.index(record);
+			persistedRecordIndexManager.index(record);
 		}
 	}
 	

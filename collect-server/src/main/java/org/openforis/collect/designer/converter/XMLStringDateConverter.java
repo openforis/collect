@@ -2,7 +2,7 @@ package org.openforis.collect.designer.converter;
 
 import java.util.Date;
 
-import org.openforis.collect.util.DateUtil;
+import org.openforis.collect.utils.Dates;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.Converter;
 import org.zkoss.zk.ui.Component;
@@ -16,7 +16,7 @@ public class XMLStringDateConverter implements Converter<Date, String, Component
      * @return the converted String
      */
 	public Date coerceToUi(String val, Component comp, BindContext ctx) {
-        final Date xmlDateTime = DateUtil.parseXMLDateTime(val);
+        final Date xmlDateTime = Dates.parseXMLDateTime(val);
         return xmlDateTime;
     }
      
@@ -28,7 +28,7 @@ public class XMLStringDateConverter implements Converter<Date, String, Component
      * @return the converted Date
      */
     public String coerceToBean(Date val, Component comp, BindContext ctx) {
-        String result = DateUtil.formatDateToXML(val);
+        String result = Dates.formatDateToXML(val);
         return result;
     }
 }

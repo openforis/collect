@@ -66,6 +66,9 @@
 						rowHeight="22">
 				<s:columns>
 					<s:ArrayList>
+						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.rank')}" 
+									  labelFunction="{hostComponent.rankLabelFunction}" 
+									  width="80" />
 						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.taxonId')}" 
 									  labelFunction="{hostComponent.taxonIdLabelFunction}" 
 									  width="60" />
@@ -74,9 +77,6 @@
 									  width="100" />
 						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.scientificName')}" 
 									  dataField="scientificName" />
-						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.rank')}" 
-									  labelFunction="{hostComponent.rankLabelFunction}" 
-									  width="80" />
 					</s:ArrayList>
 				</s:columns>
 			</s:DataGrid>

@@ -32,6 +32,7 @@ public class TaxonTree {
 	Map<String, Node> scientificNameToNode;
 	Map<String, Node> codeToNode;
 	Map<Integer, Node> taxonIdToNode;
+	Map<Integer, Node> systemIdToNode;
 	Set<String> vernacularLanguageCodes;
 	Integer lastTaxonId;
 	Integer lastTaxonVernacularNameId;
@@ -42,6 +43,7 @@ public class TaxonTree {
 		scientificNameToNode = new HashMap<String, TaxonTree.Node>();
 		codeToNode = new HashMap<String, TaxonTree.Node>();
 		taxonIdToNode = new HashMap<Integer, TaxonTree.Node>();
+		systemIdToNode = new HashMap<Integer, TaxonTree.Node>();
 	}
 	
 	public List<Node> getRoots() {
@@ -190,6 +192,10 @@ public class TaxonTree {
 		if ( taxonId != null ) {
 			taxonIdToNode.put(taxonId, node);
 		}
+		Integer systemId = taxon.getSystemId();
+		if ( systemId != null ) {
+			systemIdToNode.put(systemId, node);
+		}
 	}
 
 	public Node getDuplicateScienfificNameNode(Taxon parent, String scientificName) {
@@ -211,6 +217,11 @@ public class TaxonTree {
 	
 	public Node getNodeByCode(String code) {
 		Node foundNode = codeToNode.get(code);
+		return foundNode;
+	}
+	
+	public Node getNodeBySystemId(Integer id) {
+		Node foundNode = systemIdToNode.get(id);
 		return foundNode;
 	}
 	
@@ -238,6 +249,7 @@ public class TaxonTree {
 		Taxon taxon = node.getTaxon();
 		TaxonSummary summary = new TaxonSummary();
 		summary.setTaxonSystemId(taxon.getSystemId());
+		summary.setParentSystemId(taxon.getParentId());
 		summary.setTaxonId(taxon.getTaxonId());
 		summary.setCode(taxon.getCode());
 		summary.setRank(taxon.getTaxonRank());

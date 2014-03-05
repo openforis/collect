@@ -12,8 +12,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.collect.io.SurveyRestoreJob;
-import org.openforis.collect.io.SurveyUnmarshallJob;
+import org.openforis.collect.io.metadata.SurveyRestoreJob;
+import org.openforis.collect.io.metadata.SurveyUnmarshallJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
@@ -221,13 +221,21 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	public void jobFailed(@BindingParam("errorMessage") String errorMessage) {
+	public void jobFailed(@BindingParam("errorMessage") String errorMessageKey) {
 		closeJobStatusPopUp();
 		
 		if ( unmarshallJob != null && unmarshallJob.isValidate() ) {
-			confirmImportInvalidSurvey(errorMessage);
-		} else if (errorMessage != null ) {
-			Object[] args = new String[]{errorMessage};
+			confirmImportInvalidSurvey(errorMessageKey);
+		} else {
+			String message = null;
+			if ( errorMessageKey == null ) {
+				message = null;
+			} else {
+				//try to get message using labels repository
+				String labelsMessage = Labels.getLabel(errorMessageKey);
+				message = labelsMessage == null ? errorMessageKey: labelsMessage;
+			}
+			Object[] args = new String[] { message };
 			MessageUtil.showError("survey.import_survey.error", args);
 		}
 		resetAsyncProcesses();

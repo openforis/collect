@@ -44,8 +44,8 @@ package org.openforis.collect.presenter {
 		private static const LATIN_LANGUAGE_CODE:String = "lat";
 		private static const UPLOAD_FILE_NAME_PREFIX:String = "species";
 		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
-		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;
-		private static const VERANCULAR_NAMES_SEPARATOR:String = ", ";
+		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 4;
+		private static const VERANCULAR_NAMES_SEPARATOR:String = " / ";
 		
 		private var _speciesImportClient:SpeciesImportClient;
 		private var _speciesClient:SpeciesClient;

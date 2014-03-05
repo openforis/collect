@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
+import org.openforis.collect.io.metadata.parsing.ParsingError;
+import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 
 /**
  * 

@@ -60,7 +60,7 @@ public class JobStatusPopUpVM extends BaseVM {
 			break;
 		case FAILED:
 			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("errorMessage", job.getLastException().getMessage());
+			args.put("errorMessage", job.getErrorMessage());
 			BindUtils.postGlobalCommand(null, null, JOB_FAILED_COMMAND, args);
 			break;
 		case ABORTED:

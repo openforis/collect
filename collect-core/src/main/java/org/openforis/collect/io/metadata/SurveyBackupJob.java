@@ -9,7 +9,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask;
-import org.openforis.collect.io.metadata.species.SpeciesExportTask;
+import org.openforis.collect.io.metadata.species.SpeciesBackupExportTask;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
@@ -32,7 +32,9 @@ public class SurveyBackupJob extends Job {
 
 	public static final String SURVEY_XML_ENTRY_NAME = "idml.xml";
 	public static final String SAMPLING_DESIGN_ENTRY_NAME = "sampling_design/sampling_design.csv";
-	public static final String SPECIES_ENTRY_FORMAT = "species/%s.csv";
+	public static final String SPECIES_FOLDER = "species";
+	public static final String SPECIES_ENTRY_FORMAT = SPECIES_FOLDER + "/%s.csv";
+	public static final String INFO_FILE_NAME = "info.properties";
 	
 	private CollectSurvey survey;
 	private File outputFile;
@@ -49,6 +51,7 @@ public class SurveyBackupJob extends Job {
 		} catch ( Exception e ) {
 			throw new RuntimeException(e);
 		}
+		addInfoPropertiesCreatorTask();
 		addIdmlExportTask();
 		addSamplingDesignExportTask();
 		addSpeciesExportTask();
@@ -62,6 +65,13 @@ public class SurveyBackupJob extends Job {
 		IOUtils.closeQuietly(zipOutputStream);
 	}
 	
+	private void addInfoPropertiesCreatorTask() {
+		SurveyBackupInfoCreatorTask task = createTask(SurveyBackupInfoCreatorTask.class);
+		task.setOutputStream(zipOutputStream);
+		task.addStatusChangeListener(new SurveyBackupTaskStatusChangeListener(INFO_FILE_NAME));
+		addTask(task);
+	}
+
 	private void addIdmlExportTask() {
 		IdmlExportTask task = createTask(IdmlExportTask.class);
 		task.setSurvey(survey);
@@ -86,7 +96,7 @@ public class SurveyBackupJob extends Job {
 			taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
 		}
 		for (CollectTaxonomy taxonomy : taxonomies) {
-			SpeciesExportTask task = createTask(SpeciesExportTask.class);
+			SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
 			task.setOutputStream(zipOutputStream);
 			task.setTaxonomyId(taxonomy.getId());
 			String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());

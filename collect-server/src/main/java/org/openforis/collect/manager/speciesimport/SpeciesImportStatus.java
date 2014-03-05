@@ -1,7 +1,7 @@
 package org.openforis.collect.manager.speciesimport;
 
-import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ReferenceDataImportStatus;
+import org.openforis.collect.io.ReferenceDataImportStatus;
+import org.openforis.collect.io.metadata.parsing.ParsingError;
 
 /**
  * 

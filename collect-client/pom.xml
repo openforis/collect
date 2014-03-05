@@ -86,11 +86,11 @@
                                 <includeClass>org.openforis.collect.io.data.DataImportState$MainStep</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataImportState$SubStep</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataExportStatus$Format</includeClass>
+                                <includeClass>org.openforis.collect.io.metadata.parsing.ParsingError$ErrorType</includeClass>
                                 <includeClass>org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus$Step</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
-                                <includeClass>org.openforis.collect.manager.referencedataimport.ParsingError$ErrorType</includeClass>
                                 <includeClass>org.openforis.collect.manager.referencedataimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.NodeDefinitionSummary</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>

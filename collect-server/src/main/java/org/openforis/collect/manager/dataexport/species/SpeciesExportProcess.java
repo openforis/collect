@@ -19,7 +19,6 @@ import org.openforis.commons.io.csv.CsvWriter;
  * @author S. Ricci
  *
  */
-@Deprecated
 public class SpeciesExportProcess {
 	
 	private static final String LATIN_LANG_CODE = "lat";
@@ -38,7 +37,7 @@ public class SpeciesExportProcess {
 		CsvWriter writer = null;
 		try {
 			writer = new CsvWriter(out);
-			TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomyId);
+			TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomyId);
 			ArrayList<String> colNames = new ArrayList<String>();
 			colNames.add(SpeciesFileColumn.NO.getColumnName());
 			colNames.add(SpeciesFileColumn.CODE.getColumnName());

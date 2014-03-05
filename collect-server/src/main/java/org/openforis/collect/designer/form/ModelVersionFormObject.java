@@ -2,7 +2,7 @@ package org.openforis.collect.designer.form;
 
 import java.util.Date;
 
-import org.openforis.collect.util.DateUtil;
+import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.ModelVersion;
 
 /**
@@ -22,7 +22,7 @@ public class ModelVersionFormObject extends SurveyObjectFormObject<ModelVersion>
 		name = source.getName();
 		label = source.getLabel(languageCode);
 		description = source.getDescription(languageCode);
-		date = DateUtil.parseXMLDateTime(source.getDate());
+		date = Dates.parseXMLDateTime(source.getDate());
 	}
 	
 	@Override
@@ -30,7 +30,7 @@ public class ModelVersionFormObject extends SurveyObjectFormObject<ModelVersion>
 		dest.setName(name);
 		dest.setLabel(languageCode, label);
 		dest.setDescription(languageCode, description);
-		dest.setDate(DateUtil.formatDateToXML(date));
+		dest.setDate(Dates.formatDateToXML(date));
 	}
 	
 	@Override

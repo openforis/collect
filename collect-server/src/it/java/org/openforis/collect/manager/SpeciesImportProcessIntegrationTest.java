@@ -22,9 +22,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.io.metadata.parsing.ParsingError;
+import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
-import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
+import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.speciesimport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesimport.SpeciesImportStatus;
 import org.openforis.collect.metamodel.TaxonSummaries;
@@ -306,7 +308,7 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 		SpeciesImportStatus status = process.getStatus();
 		assertTrue(status.isComplete());
 		Taxonomy taxonomy = taxonomyDao.load(survey.getId(), TEST_TAXONOMY_NAME);
-		TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomy.getId());
+		TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomy.getId());
 		assertNotNull(summaries);
 	}
 

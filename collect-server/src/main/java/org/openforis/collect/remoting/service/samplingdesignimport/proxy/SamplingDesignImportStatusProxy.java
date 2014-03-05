@@ -3,8 +3,8 @@
  */
 package org.openforis.collect.remoting.service.samplingdesignimport.proxy;
 
+import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportStatus;
 import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
-import org.openforis.collect.manager.samplingdesignimport.SamplingDesignImportStatus;
 
 /**
  * @author S. Ricci
