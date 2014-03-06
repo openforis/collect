@@ -6,7 +6,7 @@ package org.openforis.collect.io.metadata;
 import java.io.File;
 import java.util.zip.ZipFile;
 
-import org.openforis.collect.io.metadata.SurveyRestoreJob.BackupFileExtractor;
+import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.WorkerStatusChangeEvent;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SurveyUnmarshallJob extends Job {
+public class IdmlUnmarshallJob extends Job {
 
 	//input
 	private File file;
@@ -43,7 +43,7 @@ public class SurveyUnmarshallJob extends Job {
 				@Override
 				public void statusChanged(WorkerStatusChangeEvent event) {
 					if ( event.getTo() == Status.COMPLETED ) {
-						SurveyUnmarshallJob.this.survey = task.getSurvey();
+						IdmlUnmarshallJob.this.survey = task.getSurvey();
 					}
 				}
 			});

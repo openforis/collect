@@ -14,20 +14,30 @@ public class RecordEntry {
 	
 	private Step step;
 	private int recordId;
+	private String namePrefix;
 	
 	public RecordEntry(Step step, int recordId) {
+		this(step, recordId, "");
+	}
+	
+	public RecordEntry(Step step, int recordId, String namePrefix) {
 		this.step = step;
 		this.recordId = recordId;
+		this.namePrefix = namePrefix;
 	}
 	
 	public static boolean isValidRecordEntry(ZipEntry zipEntry) {
+		return isValidRecordEntry(zipEntry, "");
+	}
+	
+	public static boolean isValidRecordEntry(ZipEntry zipEntry, String namePrefix) {
 		String name = zipEntry.getName();
 		return ! (zipEntry.isDirectory() || XMLDataExportProcess.IDML_FILE_NAME.equals(name) || 
 				name.startsWith(XMLDataExportProcess.RECORD_FILE_DIRECTORY_NAME));
 	}
 	
 	public static RecordEntry parse(String zipEntryName) throws DataParsingExeption {
-		//for retro compatibility with previous generated backup files
+		//for backward compatibility with previous generated backup files
 		String zipEntryNameFixed = zipEntryName.replace("\\", XMLDataExportProcess.ZIP_DIRECTORY_SEPARATOR);
 		String[] entryNameSplitted = zipEntryNameFixed.split(XMLDataExportProcess.ZIP_DIRECTORY_SEPARATOR);
 		if (entryNameSplitted.length != 2) {
@@ -46,7 +56,11 @@ public class RecordEntry {
 	}
 
 	public String getName() {
-		return step.getStepNumber() + XMLDataExportProcess.ZIP_DIRECTORY_SEPARATOR + recordId + ".xml";
+		return namePrefix + 
+				step.getStepNumber() + 
+				XMLDataExportProcess.ZIP_DIRECTORY_SEPARATOR + 
+				recordId + 
+				".xml";
 	}
 	
 	public int getRecordId() {

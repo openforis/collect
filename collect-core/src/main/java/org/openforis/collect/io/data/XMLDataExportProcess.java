@@ -13,6 +13,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.DataExportStatus.Format;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
@@ -35,7 +36,10 @@ import org.springframework.stereotype.Component;
  * 
  * @author S. Ricci
  *
+ * @deprecated use {@link SurveyBackupJob} or {@link XMLDataExportTask} instead.  
+ *
  */
+@Deprecated
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus> {

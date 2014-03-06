@@ -12,8 +12,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
-import org.openforis.collect.io.metadata.SurveyRestoreJob;
-import org.openforis.collect.io.metadata.SurveyUnmarshallJob;
+import org.openforis.collect.io.SurveyRestoreJob;
+import org.openforis.collect.io.metadata.IdmUnmarshallJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
@@ -66,7 +66,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	//private SurveyUnmarshallProcess unmarshallProcess;
 	//private SurveyImportProcess importProcess;
-	private SurveyUnmarshallJob unmarshallJob;
+	private IdmUnmarshallJob unmarshallJob;
 	private SurveyRestoreJob restoreJob;
 	
 	private Window jobStatusPopUp;
@@ -175,7 +175,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		if ( unmarshallJob != null && unmarshallJob.isRunning() ) {
 			unmarshallJob.abort();
 		}
-		unmarshallJob = jobManager.createJob(SurveyUnmarshallJob.class);
+		unmarshallJob = jobManager.createJob(IdmUnmarshallJob.class);
 		unmarshallJob.setFile(this.uploadedFile);
 		unmarshallJob.setValidate(validate);
 		jobManager.start(unmarshallJob);

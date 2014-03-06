@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.io.metadata;
+package org.openforis.collect.io;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupImportTask;
 import org.openforis.collect.model.CollectSurvey;
@@ -51,6 +52,9 @@ public class SurveyRestoreJob extends Job {
 			addIdmlImportTask();
 			addSamplingDesignImportTask();
 			addSpeciesImportTask();
+			if ( updatingPublishedSurvey && isDataIncluded() ) {
+				addDataImportTask();
+			}
 			super.init();
 		} catch ( Exception e ) {
 			throw new RuntimeException(e);
@@ -117,6 +121,16 @@ public class SurveyRestoreJob extends Job {
 			});
 			addTask(task);
 		}
+	}
+
+	private boolean isDataIncluded() throws IOException {
+		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.DATA_FOLDER);
+		return ! dataEntries.isEmpty();
+	}
+
+	private void addDataImportTask() {
+		
 	}
 
 	@Override

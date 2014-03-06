@@ -19,7 +19,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
-import org.openforis.collect.io.metadata.SurveyBackupJob;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
@@ -120,6 +120,9 @@ public class SurveySelectVM extends BaseVM {
 		Integer surveyId = survey.getId();
 		surveyBackupJob = jobManager.createJob(SurveyBackupJob.class);
 		surveyBackupJob.setSurvey(survey);
+		surveyBackupJob.setIncludeData(true);
+		surveyBackupJob.setIncludeRecordFiles(true);
+		
 		jobManager.start(surveyBackupJob, surveyId);
 		
 		openSurveyExportStatusPopUp();
