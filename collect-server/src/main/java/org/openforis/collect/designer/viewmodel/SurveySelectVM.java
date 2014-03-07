@@ -38,10 +38,18 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.logging.Log;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.IdSpace;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.ListModel;
+import org.zkoss.zul.Radio;
+import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Window;
 
 /**
@@ -116,12 +124,77 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void exportSelectedSurvey() throws IOException {
+		boolean onlyTemporaray = selectedSurvey.isWork() && selectedSurvey.getPublishedId() == null;
+		
+		if ( onlyTemporaray ) {
+			performSelectedSurveyExport(false, false);
+		} else {
+			//set default parameters
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("surveyName", selectedSurvey.getName());
+			Window popup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
+			
+			//initialize components
+			IdSpace space = popup.getSpaceOwner();
+			final Radiogroup typeRadiogroup = (Radiogroup) space.getFellow("typeRadiogroup");
+			final Checkbox includeDataCheckbox = (Checkbox) space.getFellow("includeDataCheckbox");
+			final Checkbox includeUploadedFilesCheckbox = (Checkbox) space.getFellow("includeUploadedFilesCheckbox");
+			
+			Radio publishedTypeRadio = typeRadiogroup.getItemAtIndex(0);
+			Radio temporaryTypeRadio = typeRadiogroup.getItemAtIndex(1);
+			publishedTypeRadio.setDisabled(onlyTemporaray);
+			temporaryTypeRadio.setDisabled(! selectedSurvey.isWork());
+			typeRadiogroup.setSelectedItem(onlyTemporaray ? temporaryTypeRadio: publishedTypeRadio);
+			
+			//update view with default values
+			updateExportPopupView(typeRadiogroup, includeDataCheckbox, includeUploadedFilesCheckbox);
+			
+			//add event listeners
+			typeRadiogroup.addEventListener(Events.ON_CHECK, new EventListener<Event>() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					updateExportPopupView(typeRadiogroup, includeDataCheckbox, includeUploadedFilesCheckbox);
+				}
+			});
+			includeDataCheckbox.addEventListener(Events.ON_CHECK, new EventListener<Event>() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					updateExportPopupView(typeRadiogroup, includeDataCheckbox, includeUploadedFilesCheckbox);
+				}
+			});
+			Button okButton = (Button) space.getFellow("okButton");
+			okButton.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
+				@Override
+				public void onEvent(Event event) throws Exception {
+					performSelectedSurveyExport(includeDataCheckbox.isChecked(), includeUploadedFilesCheckbox.isChecked());
+				}
+			});
+		}
+	}
+	
+	private void updateExportPopupView(Radiogroup typeRadiogroup, Checkbox includeDataCheckbox, Checkbox includeUploadedFilesCheckbox) {
+		String selectedType = typeRadiogroup.getSelectedItem().getValue();
+		if ( "temporary".equals(selectedType) ) {
+			includeDataCheckbox.setChecked(false);
+			includeDataCheckbox.setDisabled(true);
+		} else {
+			includeDataCheckbox.setDisabled(false);
+		}
+		if ( includeDataCheckbox.isChecked() ) {
+			includeUploadedFilesCheckbox.setDisabled(false);
+		} else {
+			includeUploadedFilesCheckbox.setChecked(false);
+			includeUploadedFilesCheckbox.setDisabled(true);
+		}
+	}
+	
+	private void performSelectedSurveyExport(boolean includeData, boolean includeUploadedFiles) {
 		CollectSurvey survey = loadSelectedSurvey();
 		Integer surveyId = survey.getId();
 		surveyBackupJob = jobManager.createJob(SurveyBackupJob.class);
 		surveyBackupJob.setSurvey(survey);
-		surveyBackupJob.setIncludeData(true);
-		surveyBackupJob.setIncludeRecordFiles(true);
+		surveyBackupJob.setIncludeData(includeData);
+		surveyBackupJob.setIncludeRecordFiles(includeUploadedFiles);
 		
 		jobManager.start(surveyBackupJob, surveyId);
 		

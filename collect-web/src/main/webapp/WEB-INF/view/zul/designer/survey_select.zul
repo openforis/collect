@@ -86,7 +86,7 @@
   		onClick="@command('editSelectedSurvey')"
   		disabled="@load(vm.editingDisabled)" />
 
-  	<button label="${labels.survey.export}"
+  	<button label="${labels.survey.export.$}"
   		onClick="@command('exportSelectedSurvey')"
   		disabled="@load(vm.exportDisabled)" />
 
