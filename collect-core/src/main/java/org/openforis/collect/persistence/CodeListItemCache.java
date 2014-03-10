@@ -39,16 +39,20 @@ public class CodeListItemCache {
 	}
 
 	private Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem> getItems(int surveyId, boolean surveyWork, int listId, boolean createIfNull) {
-		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsByCodeList = getItemsPerCodeList(surveyId, surveyWork, createIfNull);
-		Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem> items = itemsByCodeList.get(listId);
-		if ( items == null && createIfNull ) {
-			items = new HashMap<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>();
-			itemsByCodeList.put(listId, items);
+		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsByCodeList = getItemsByCodeList(surveyId, surveyWork, createIfNull);
+		if ( itemsByCodeList == null ) {
+			return null;
+		} else {
+			Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem> items = itemsByCodeList.get(listId);
+			if ( items == null && createIfNull ) {
+				items = new HashMap<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>();
+				itemsByCodeList.put(listId, items);
+			}
+			return items;
 		}
-		return items;
 	}
 
-	protected Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> getItemsPerCodeList(int surveyId, boolean surveyWork, boolean createIfNull) {
+	protected Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> getItemsByCodeList(int surveyId, boolean surveyWork, boolean createIfNull) {
 		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsByCodeList = 
 				surveyWork ? itemsBySurveyWorkAndCodeList.get(surveyId) : itemsBySurveyAndCodeList.get(surveyId);
 		if ( itemsByCodeList == null && createIfNull ) {
@@ -75,7 +79,7 @@ public class CodeListItemCache {
 	}
 	
 	private void removeFirstItemInCache(Integer surveyId, boolean surveyWork) {
-		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsPerCodeList = getItemsPerCodeList(surveyId, surveyWork, false);
+		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsPerCodeList = getItemsByCodeList(surveyId, surveyWork, false);
 		Collection<Map<CodeListItemCache.CodeListCacheItemKey,PersistedCodeListItem>> values = itemsPerCodeList.values();
 		for (Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem> items : values) {
 			if ( ! items.isEmpty() ) {
@@ -88,7 +92,7 @@ public class CodeListItemCache {
 
 	private int countItemsPerSurvey(Integer surveyId, boolean surveyWork) {
 		int count = 0;
-		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsPerCodeList = getItemsPerCodeList(surveyId, surveyWork, false);
+		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsPerCodeList = getItemsByCodeList(surveyId, surveyWork, false);
 		if ( itemsPerCodeList != null ) {
 			for (Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem> itemsByKey : itemsPerCodeList.values()) {
 				count += itemsByKey.size();
@@ -109,7 +113,7 @@ public class CodeListItemCache {
 	}
 
 	public synchronized void removeItemsByCodeList(int surveyId, boolean surveyWork, int codeListId) {
-		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsPerCodeList = getItemsPerCodeList(surveyId, surveyWork, false);
+		Map<Integer, Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem>> itemsPerCodeList = getItemsByCodeList(surveyId, surveyWork, false);
 		if ( itemsPerCodeList != null ) {
 			Map<CodeListItemCache.CodeListCacheItemKey, PersistedCodeListItem> items = itemsPerCodeList.get(codeListId);
 			if ( items != null ) {
