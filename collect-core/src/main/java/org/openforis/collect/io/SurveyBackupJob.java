@@ -8,8 +8,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.openforis.collect.io.data.RecordFileExportTask;
-import org.openforis.collect.io.data.XMLDataExportTask;
+import org.openforis.collect.io.data.RecordFileBackupTask;
+import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.metadata.IdmlExportTask;
 import org.openforis.collect.io.metadata.SurveyBackupInfoCreatorTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask;
@@ -57,15 +57,15 @@ public class SurveyBackupJob extends Job {
 	
 	@Autowired
 	private transient SpeciesManager speciesManager;
+
+	public void configure(CollectSurvey survey, boolean includeData, boolean includeRecordFiles) {
+		this.survey = survey;
+		this.includeData = includeData;
+		this.includeRecordFiles = includeRecordFiles;
+	}
 	
 	@Override
-	public void init() {
-		try {
-			outputFile = File.createTempFile("collect", "survey_export.zip");
-			zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
-		} catch ( Exception e ) {
-			throw new RuntimeException(e);
-		}
+	protected void buildAndAddTasks() throws Throwable {
 		addInfoPropertiesCreatorTask();
 		addIdmlExportTask();
 		addSamplingDesignExportTask();
@@ -73,15 +73,22 @@ public class SurveyBackupJob extends Job {
 		if ( includeData && ! survey.isWork() ) {
 			addDataExportTask();
 			if ( includeRecordFiles ) {
-				addRecordFilesExportTask();
+				addRecordFilesBackupTask();
 			}
 		}
-		super.init();
 	}
 	
 	@Override
-	protected void execute() throws Throwable {
-		super.execute();
+	protected void initInternal() throws Throwable {
+		if ( outputFile == null ) {
+			outputFile = File.createTempFile("collect", "survey_export.zip");
+		}
+		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
+		super.initInternal();
+	}
+	
+	@Override
+	protected void onEnd() {
 		IOUtils.closeQuietly(zipOutputStream);
 	}
 	
@@ -127,22 +134,20 @@ public class SurveyBackupJob extends Job {
 	
 	private void addDataExportTask() {
 		for (EntityDefinition rootEntity : survey.getSchema().getRootEntityDefinitions()) {
-			XMLDataExportTask task = createTask(XMLDataExportTask.class);
+			DataBackupTask task = createTask(DataBackupTask.class);
 			task.setZipOutputStream(zipOutputStream);
 			task.setSurvey(survey);
 			task.setRootEntityName(rootEntity.getName());
-			task.setZipEntryPrefix(DATA_FOLDER + ZIP_FOLDER_SEPARATOR + rootEntity.getName() + ZIP_FOLDER_SEPARATOR);
 			addTask(task);
 		}
 	}
 	
-	private void addRecordFilesExportTask() {
+	private void addRecordFilesBackupTask() {
 		for (EntityDefinition rootEntity : survey.getSchema().getRootEntityDefinitions()) {
-			RecordFileExportTask task = createTask(RecordFileExportTask.class);
+			RecordFileBackupTask task = createTask(RecordFileBackupTask.class);
 			task.setZipOutputStream(zipOutputStream);
 			task.setSurvey(survey);
 			task.setRootEntityName(rootEntity.getName());
-			task.setZipEntryPrefix(UPLOADED_FILES_FOLDER + ZIP_FOLDER_SEPARATOR + rootEntity.getName() + ZIP_FOLDER_SEPARATOR);
 			addTask(task);
 		}
 	}
@@ -157,6 +162,10 @@ public class SurveyBackupJob extends Job {
 	
 	public File getOutputFile() {
 		return outputFile;
+	}
+	
+	public void setOutputFile(File outputFile) {
+		this.outputFile = outputFile;
 	}
 	
 	public boolean isIncludeData() {

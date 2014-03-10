@@ -1,26 +1,17 @@
 package org.openforis.collect.io.data;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.IOUtils;
-import org.openforis.collect.io.SurveyBackupJob;
-import org.openforis.collect.manager.RecordFileManager;
+import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.metamodel.FileAttributeDefinition;
-import org.openforis.idm.model.FileAttribute;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,29 +23,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class RecordFileExportTask extends Task {
+public class DataBackupTask extends Task {
 
-	@Autowired
 	private RecordManager recordManager;
-	@Autowired
-	private RecordFileManager recordFileManager;
-	@Autowired
-	private SurveyManager surveyManager;
-	@Autowired
 	private DataMarshaller dataMarshaller;
-
+	
 	//input
 	private ZipOutputStream zipOutputStream;
 	private CollectSurvey survey;
 	private Step[] steps;
 	private String rootEntityName;
-	private String zipEntryPrefix;
 	
-	public RecordFileExportTask() {
+	public DataBackupTask() {
 		super();
+		//export all steps by default
 		this.steps = Step.values();
 	}
-
+	
 	@Override
 	protected long countTotalItems() {
 		int count = 0;
@@ -68,7 +53,7 @@ public class RecordFileExportTask extends Task {
 		}
 		return count;
 	}
-	
+
 	@Override
 	protected void execute() throws Throwable {
 		List<CollectRecord> recordSummaries = loadAllSummaries();
@@ -94,40 +79,23 @@ public class RecordFileExportTask extends Task {
 		return summaries;
 	}
 	
-	private void backup(CollectRecord summary, Step step) throws RecordFileException, IOException {
+	private void backup(CollectRecord summary, Step step) {
 		Integer id = summary.getId();
-		CollectRecord record = recordManager.load(survey, id, step);
-		List<FileAttribute> fileAttributes = record.getFileAttributes();
-		for (FileAttribute fileAttribute : fileAttributes) {
-			if ( ! fileAttribute.isEmpty() ) {
-				File file = recordFileManager.getRepositoryFile(fileAttribute);
-				if ( file == null ) {
-					String message = String.format("Missing file: %s attributeId: %d attributeName: %s", 
-							fileAttribute.getFilename(), fileAttribute.getInternalId(), fileAttribute.getName());
-					throw new RecordFileException(message);
-				} else {
-					String entryName = calculateRecordFileEntryName(fileAttribute);
-					writeFile(file, entryName);
-				}
-			}
+		try {
+			CollectRecord record = recordManager.load(survey, id, step);
+			BackupRecordEntry recordEntry = new BackupRecordEntry(rootEntityName, step, id);
+			String entryName = recordEntry.getName();
+			ZipEntry entry = new ZipEntry(entryName);
+			zipOutputStream.putNextEntry(entry);
+			OutputStreamWriter writer = new OutputStreamWriter(zipOutputStream);
+			dataMarshaller.write(record, writer);
+			zipOutputStream.closeEntry();
+		} catch (Exception e) {
+			String message = "Error while backing up " + id + " " + e.getMessage();
+			throw new RuntimeException(message, e);
 		}
 	}
-
-	public String calculateRecordFileEntryName(FileAttribute fileAttribute) {
-		FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
-		String repositoryRelativePath = RecordFileManager.getRepositoryRelativePath(fileAttributeDefinition, SurveyBackupJob.ZIP_FOLDER_SEPARATOR, false);
-		String entryName = zipEntryPrefix + repositoryRelativePath + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + fileAttribute.getFilename();
-		return entryName;
-	}
-
-	private void writeFile(File file, String entryName) throws IOException {
-		ZipEntry entry = new ZipEntry(entryName);
-		zipOutputStream.putNextEntry(entry);
-		IOUtils.copy(new FileInputStream(file), zipOutputStream);
-		zipOutputStream.closeEntry();
-		zipOutputStream.flush();
-	}
-
+	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
@@ -160,12 +128,4 @@ public class RecordFileExportTask extends Task {
 		this.zipOutputStream = zipOutputStream;
 	}
 
-	public String getZipEntryPrefix() {
-		return zipEntryPrefix;
-	}
-
-	public void setZipEntryPrefix(String zipEntryPrefix) {
-		this.zipEntryPrefix = zipEntryPrefix;
-	}
-	
 }

@@ -59,7 +59,6 @@ package org.openforis.collect.presenter {
 			var entityId:int = selectedEntity.id;
 			ClientFactory.dataExportClient.export(_exportResponder, rootEntity, entityId, stepNumber);
 
-
 			PopUpManager.addPopUp(_view.progressPopUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			PopUpManager.centerPopUp(_view.progressPopUp);
 			_view.progressBar.setProgress(0, 0);

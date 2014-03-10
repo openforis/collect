@@ -10,6 +10,7 @@ import org.openforis.collect.model.CollectRecord.Step;
  * @author S. Ricci
  *
  */
+@Deprecated
 public class RecordEntry {
 	
 	private Step step;
@@ -27,10 +28,6 @@ public class RecordEntry {
 	}
 	
 	public static boolean isValidRecordEntry(ZipEntry zipEntry) {
-		return isValidRecordEntry(zipEntry, "");
-	}
-	
-	public static boolean isValidRecordEntry(ZipEntry zipEntry, String namePrefix) {
 		String name = zipEntry.getName();
 		return ! (zipEntry.isDirectory() || XMLDataExportProcess.IDML_FILE_NAME.equals(name) || 
 				name.startsWith(XMLDataExportProcess.RECORD_FILE_DIRECTORY_NAME));

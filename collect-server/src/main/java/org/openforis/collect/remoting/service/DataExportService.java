@@ -4,9 +4,11 @@ import java.io.File;
 
 import javax.servlet.ServletContext;
 
+import org.openforis.collect.Proxy;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.CSVDataExportProcess;
 import org.openforis.collect.io.data.DataExportStatus;
-import org.openforis.collect.io.data.XMLDataExportProcess;
+import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
@@ -19,6 +21,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.concurrency.JobManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,11 +53,15 @@ public class DataExportService {
 	private ServletContext servletContext;
 	@Autowired
 	private ApplicationContext appContext;
+	@Autowired
+	private JobManager jobManager;
 	
 	private File exportDirectory;
 	
 	private AbstractProcess<Void, DataExportStatus> dataExportProcess;
 
+	private SurveyBackupJob backupJob;
+	
 	public void init() {
 		String exportRealPath = servletContext.getRealPath(EXPORT_PATH);
 		exportDirectory = new File(exportRealPath);
@@ -74,7 +81,7 @@ public class DataExportService {
 	 * @return state of the export
 	 */
 	@Transactional
-	public DataExportStatusProxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes) {
+	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes) {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
@@ -97,47 +104,56 @@ public class DataExportService {
 			dataExportProcess = process;
 			ExecutorServiceUtil.executeInCachedPool(process);
 		}
-		return getState();
+		return getCurrentJob();
 	}
 	
 	@Transactional
-	public DataExportStatusProxy fullExport(String rootEntityName, int[] stepNumbers) {
-		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
+	public Proxy fullExport(String rootEntityName, boolean includeRecordFiles) {
+		if ( backupJob == null || ! backupJob.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
 			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
 				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
 			}
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			Step[] steps = toStepsArray(stepNumbers);
 			File outputFile = new File(exportDir, "data.zip");
+
+			SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
+			job.setSurvey(survey);
+			job.setIncludeData(true);
+			job.setIncludeRecordFiles(includeRecordFiles);
+			job.setOutputFile(outputFile);
 			
-			XMLDataExportProcess process = appContext.getBean(XMLDataExportProcess.class);
-			process.setOutputFile(outputFile);
-			process.setSurvey(survey);
-			process.setRootEntityName(rootEntityName);
-			process.setSteps(steps);
+			backupJob = job;
 			
-			process.init();
-			dataExportProcess = process;
-			ExecutorServiceUtil.executeInCachedPool(process);
+			jobManager.start(job);
+			
+//			XMLDataExportProcess process = appContext.getBean(XMLDataExportProcess.class);
+//			process.setOutputFile(outputFile);
+//			process.setSurvey(survey);
+//			process.setRootEntityName(rootEntityName);
+//			process.setSteps(steps);
+//			
+//			process.init();
+//			dataExportProcess = process;
+//			ExecutorServiceUtil.executeInCachedPool(process);
 		}
-		return getState();
+		return getCurrentJob();
 	}
 
-	private Step[] toStepsArray(int[] stepNumbers) {
-		if ( stepNumbers == null ) {
-			return Step.values();
-		} else {
-			Step[] steps = new Step[stepNumbers.length];
-			for (int i = 0; i < stepNumbers.length; i++ ) {
-				int stepNum = stepNumbers[i];
-				Step step = Step.valueOf(stepNum);
-				steps[i] = step;
-			}
-			return steps;
-		}
-	}
+//	private Step[] toStepsArray(int[] stepNumbers) {
+//		if ( stepNumbers == null ) {
+//			return Step.values();
+//		} else {
+//			Step[] steps = new Step[stepNumbers.length];
+//			for (int i = 0; i < stepNumbers.length; i++ ) {
+//				int stepNum = stepNumbers[i];
+//				Step step = Step.valueOf(stepNum);
+//				steps[i] = step;
+//			}
+//			return steps;
+//		}
+//	}
 
 	public void cancel() {
 		if ( dataExportProcess != null ) {
@@ -145,8 +161,10 @@ public class DataExportService {
 		}
 	}
 
-	public DataExportStatusProxy getState() {
-		if ( dataExportProcess != null ) {
+	public Proxy getCurrentJob() {
+		if ( backupJob != null ) {
+			return new SurveyBackupJobProxy(backupJob);
+		} else if ( dataExportProcess != null ) {
 			return new DataExportStatusProxy(dataExportProcess.getStatus());
 		} else {
 			return null;

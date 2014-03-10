@@ -42,14 +42,10 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	private List<SamplingDesignLine> lines;
 
 	@Override
-	public void init() {
-		try {
-			lines = new ArrayList<SamplingDesignLine>();
-			reader = new SamplingDesignCSVReader(file);
-			super.init();
-		} catch ( Exception e ) {
-			throw new RuntimeException("Error initializing task: " + e.getMessage(), e);
-		}
+	protected void initInternal() throws Throwable {
+		lines = new ArrayList<SamplingDesignLine>();
+		reader = new SamplingDesignCSVReader(file);
+		super.initInternal();
 	}
 	
 	@Override

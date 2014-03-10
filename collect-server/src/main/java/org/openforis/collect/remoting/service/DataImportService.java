@@ -5,23 +5,18 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import org.openforis.collect.io.data.XMLDataImportProcess;
-import org.openforis.collect.io.data.DataImportState;
 import org.openforis.collect.io.data.DataImportSummary;
+import org.openforis.collect.io.data.DataRestoreJob;
+import org.openforis.collect.io.data.DataRestoreSummaryJob;
+import org.openforis.collect.io.data.proxy.DataRestoreJobProxy;
+import org.openforis.collect.io.data.proxy.DataRestoreSummaryJobProxy;
 import org.openforis.collect.io.exception.DataImportExeption;
-import org.openforis.collect.manager.RecordFileManager;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.manager.validation.SurveyValidator;
-import org.openforis.collect.persistence.RecordDao;
-import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
-import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.concurrency.JobManager;
+import org.openforis.concurrency.proxy.JobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.access.annotation.Secured;
 
 /**
@@ -37,26 +32,16 @@ public class DataImportService {
 	
 	@Autowired
 	private SessionManager sessionManager;
-	@Autowired
-	private SurveyManager surveyManager;
-	@Autowired
-	private SurveyValidator surveyValidator;
-	@Autowired
-	private RecordManager recordManager;
-	@Autowired
-	private RecordFileManager recordFileManager;
-	@Autowired
-	private RecordDao recordDao;
-	@Autowired
-	private UserManager userManager;
 	@Autowired 
 	private ServletContext servletContext;
+	@Autowired
+	private JobManager jobManager;
 	
 	private File packagedFile;
 	private File importDirectory;
-	private XMLDataImportProcess dataImportProcess;
-	@Autowired
-	private ApplicationContext appContext;
+	
+	private DataRestoreSummaryJob summaryJob;
+	private DataRestoreJob dataRestoreJob;
 	
 	protected void init() {
 		String importRealPath = servletContext.getRealPath(IMPORT_PATH);
@@ -70,51 +55,54 @@ public class DataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public DataImportStateProxy startSummaryCreation(String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
-		if ( dataImportProcess == null || ! dataImportProcess.isRunning() ) {
+	public DataRestoreSummaryJobProxy startSummaryCreation(String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
+		if ( summaryJob == null || ! summaryJob.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
 			packagedFile = new File(userImportFolder, FILE_NAME);
 			
-			dataImportProcess = appContext.getBean(XMLDataImportProcess.class);
-			dataImportProcess.setSurveyUri(selectedSurveyUri);
-			dataImportProcess.setFile(packagedFile);
-			dataImportProcess.setOverwriteAll(overwriteAll);
+			summaryJob = jobManager.createJob(DataRestoreSummaryJob.class);
+			summaryJob.setFile(packagedFile);
+			summaryJob.setSurveyUri(selectedSurveyUri);
 			
-			dataImportProcess.prepareToStartSummaryCreation();
+			jobManager.start(summaryJob);
+		}
+		DataRestoreSummaryJobProxy proxy = new DataRestoreSummaryJobProxy(summaryJob);
+		return proxy;
+	}
+	
+	@Secured("ROLE_ADMIN")
+	public JobProxy startImport(List<Integer> entryIdsToImport) throws Exception {
+		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+		job.setFile(packagedFile);
+		job.setPackagedSurvey(summaryJob.getPackagedSurvey());
+		job.setPublishedSurvey(summaryJob.getPublishedSurvey());
+		job.setEntryIdsToImport(entryIdsToImport);
+		job.setRestoreUploadedFiles(true);
 
-			ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
-		}
-		DataImportState state = dataImportProcess.getState();
-		DataImportStateProxy proxy = new DataImportStateProxy(state);
-		return proxy;
+		jobManager.start(job);
+
+		this.summaryJob = null;
+		this.dataRestoreJob = job;
+		
+		return getCurrentJob();
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public DataImportStateProxy startImport(List<Integer> entryIdsToImport) throws Exception {
-		dataImportProcess.setEntryIdsToImport(entryIdsToImport);
-		dataImportProcess.prepareToStartImport();
-		ExecutorServiceUtil.executeInCachedPool(dataImportProcess);
-		DataImportState state = dataImportProcess.getState();
-		DataImportStateProxy proxy = new DataImportStateProxy(state);
-		return proxy;
-	}
-	
-	@Secured("ROLE_ADMIN")
-	public DataImportStateProxy getState() {
-		if ( dataImportProcess != null ) {
-			DataImportState state = dataImportProcess.getState();
-			DataImportStateProxy proxy = new DataImportStateProxy(state);
-			return proxy;
-		} else {
-			return null;
+	public JobProxy getCurrentJob() {
+		JobProxy proxy = null;
+		if ( summaryJob != null ) {
+			proxy = new DataRestoreSummaryJobProxy(summaryJob);
+		} else if ( dataRestoreJob != null) {
+			proxy = new DataRestoreJobProxy(dataRestoreJob);
 		}
+		return proxy;
 	}
 	
 	@Secured("ROLE_ADMIN")
 	public DataImportSummaryProxy getSummary() {
-		if ( dataImportProcess != null ) {
-			DataImportSummary summary = dataImportProcess.getSummary();
+		if ( summaryJob != null ) {
+			DataImportSummary summary = summaryJob.getSummary();
 			DataImportSummaryProxy proxy = new DataImportSummaryProxy(summary);
 			return proxy;
 		} else {
@@ -124,8 +112,10 @@ public class DataImportService {
 
 	@Secured("ROLE_ADMIN")
 	public void cancel() {
-		if ( dataImportProcess != null ) {
-			dataImportProcess.cancel();
+		if ( summaryJob != null ) {
+			summaryJob.abort();
+		} else if ( dataRestoreJob != null ) {
+			dataRestoreJob.abort();
 		}
 	}
 	

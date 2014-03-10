@@ -10,7 +10,6 @@ import org.openforis.concurrency.Job;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
@@ -25,16 +24,15 @@ public class SpeciesBackupImportJob extends Job {
 	private String taxonomyName;
 
 	@Override
-	public void init() {
+	protected void buildAndAddTasks() throws Throwable {
 		SpeciesBackupImportTask task = createTask(SpeciesBackupImportTask.class);
 		task.setFile(file);
 		task.setSurvey(survey);
 		task.setTaxonomyName(taxonomyName);
 		task.setOverwriteAll(true);
 		addTask(task);
-		super.init();
 	}
-
+	
 	public File getFile() {
 		return file;
 	}

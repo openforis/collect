@@ -57,6 +57,10 @@
 			<s:DropDownList id="stepDropDownList" labelFunction="stepLabelFunction" />
 		</s:FormItem>
 		
+		<s:FormItem label="{Message.get('backup.includeRecordFiles')}" creationPolicy="all">
+			<s:CheckBox id="includeRecordFilesCheckBox" />
+		</s:FormItem>
+		
 		<s:HGroup gap="30">
 			<s:Button id="backupButton" 
 					  label="{Message.get('backup.startBackupLabel')}"

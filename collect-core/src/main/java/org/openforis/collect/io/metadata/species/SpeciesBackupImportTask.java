@@ -47,14 +47,10 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 	private transient SpeciesBackupCSVReader reader;
 	
 	@Override
-	public void init() {
+	protected void initInternal() throws Throwable {
 		taxonTree = new TaxonTree();
-		try {
-			reader = new SpeciesBackupCSVReader(file);
-		} catch (Exception e) {
-			throw new RuntimeException("Error initializing task: " + e.getMessage(), e);
-		}
-		super.init();
+		reader = new SpeciesBackupCSVReader(file);
+		super.initInternal();
 	}
 	
 	protected void validateParameters() {

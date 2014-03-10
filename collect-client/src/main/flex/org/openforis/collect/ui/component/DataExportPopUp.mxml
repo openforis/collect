@@ -115,7 +115,11 @@
 				  visible="false" includeInLayout="false"
 				  visible.parametersSelection="true" includeInLayout.parametersSelection="true"
 				  >
-			<s:HGroup verticalAlign="middle">
+			<s:HGroup verticalAlign="middle"
+					  visible="false" 
+					  visible.partialExportParametersSelection="true"
+					  includeInLayout="false" 
+					  includeInLayout.partialExportParametersSelection="true">
 				<s:Label text="{Message.get('export.selectStepLabel')}"
 						 styleName="formLabel"/>
 				<s:DropDownList id="stepDropDownList" 
@@ -125,8 +129,20 @@
 								/>
 			</s:HGroup>
 			
-			<s:VGroup visible="false" visible.partialExportParametersSelection="true"
-					  includeInLayout="false" includeInLayout.partialExportParametersSelection="true"
+			<s:HGroup verticalAlign="middle" 
+					  visible="true" 
+					  includeInLayout="true" 
+					  visible.partialExportParametersSelection="false"
+					  includeInLayout.partialExportParametersSelection="false">
+				<s:Label text="{Message.get('export.includeRecordFiles')}"
+						 styleName="formLabel"/>
+				<s:CheckBox id="includeRecordFilesCheckBox" />
+			</s:HGroup>
+			
+			<s:VGroup visible="false" 
+					  visible.partialExportParametersSelection="true"
+					  includeInLayout="false" 
+					  includeInLayout.partialExportParametersSelection="true"
 					  horizontalAlign="center"
 					  gap="4"
 					  width="100%" 

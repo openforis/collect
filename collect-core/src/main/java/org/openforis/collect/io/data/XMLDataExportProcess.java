@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * 
  * @author S. Ricci
  *
- * @deprecated use {@link SurveyBackupJob} or {@link XMLDataExportTask} instead.  
+ * @deprecated use {@link SurveyBackupJob} or {@link DataBackupTask} instead.  
  *
  */
 @Deprecated

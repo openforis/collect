@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class XMLDataImportSummaryTask extends Task {
+public class DataRestoreSummaryTask extends Task {
 
 	@Autowired
 	private RecordManager recordManager;
@@ -52,9 +52,8 @@ public class XMLDataImportSummaryTask extends Task {
 	private UserManager userManager;
 
 	//input
-	private String surveyUri;
 	private ZipFile zipFile;
-	private String dataPath;
+	private String entryPrefix;
 
 	/**
 	 * Survey contained into the backup file
@@ -64,7 +63,6 @@ public class XMLDataImportSummaryTask extends Task {
 	 * Published survey already inserted into the system
 	 */
 	private CollectSurvey existingSurvey;
-	private boolean overwriteAll;
 	
 	//temporary instance variables
 	private DataUnmarshaller dataUnmarshaller;
@@ -88,7 +86,7 @@ public class XMLDataImportSummaryTask extends Task {
 		while (entries.hasMoreElements()) {
 			if ( isRunning() ) {
 				ZipEntry zipEntry = entries.nextElement();
-				if ( ! RecordEntry.isValidRecordEntry(zipEntry, dataPath) ) {
+				if ( ! BackupDataExtractor.BackupRecordEntry.isValidRecordEntry(zipEntry, entryPrefix) ) {
 					continue;
 				}
 				createSummaryForEntry(zipEntry, skippedEntryNameToErrors, 
@@ -111,7 +109,7 @@ public class XMLDataImportSummaryTask extends Task {
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
 			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
 		String entryName = zipEntry.getName();
-		RecordEntry recordEntry = RecordEntry.parse(entryName);
+		BackupDataExtractor.BackupRecordEntry recordEntry = BackupDataExtractor.BackupRecordEntry.parse(entryName, entryPrefix);
 		Step step = recordEntry.getStep();
 		InputStream is = zipFile.getInputStream(zipEntry);
 		InputStreamReader reader = OpenForisIOUtils.toReader(is);
@@ -257,32 +255,41 @@ public class XMLDataImportSummaryTask extends Task {
 		return result;
 	}
 	
-	public boolean isOverwriteAll() {
-		return overwriteAll;
+	public ZipFile getZipFile() {
+		return zipFile;
 	}
-
-	public void setOverwriteAll(boolean overwriteAll) {
-		this.overwriteAll = overwriteAll;
+	
+	public void setZipFile(ZipFile zipFile) {
+		this.zipFile = zipFile;
 	}
-
+	
+	public CollectSurvey getPackagedSurvey() {
+		return packagedSurvey;
+	}
+	
+	public void setPackagedSurvey(CollectSurvey packagedSurvey) {
+		this.packagedSurvey = packagedSurvey;
+	}
+	
+	public CollectSurvey getExistingSurvey() {
+		return existingSurvey;
+	}
+	
+	public void setExistingSurvey(CollectSurvey existingSurvey) {
+		this.existingSurvey = existingSurvey;
+	}
+	
 	public DataImportSummary getSummary() {
 		return summary;
 	}
 
-	public String getSurveyUri() {
-		return surveyUri;
-	}
-
-	public void setSurveyUri(String surveyUri) {
-		this.surveyUri = surveyUri;
+	public void setEntryPrefix(String entryPrefix) {
+		this.entryPrefix = entryPrefix;
 	}
 	
-	public void setDataPath(String dataPath) {
-		this.dataPath = dataPath;
-	}
-	
-	public String getDataPath() {
-		return dataPath;
+	public String getEntryPrefix() {
+		return entryPrefix;
 	}
 
+	
 }

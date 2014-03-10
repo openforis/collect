@@ -27,11 +27,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.DataImportEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.io.data.proxy.DataRestoreJobProxy;
+	import org.openforis.collect.io.data.proxy.DataRestoreSummaryJobProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.io.data.DataImportState$MainStep;
-	import org.openforis.collect.io.data.DataImportState$SubStep;
-	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryItemProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 	import org.openforis.collect.remoting.service.dataimport.FileUnmarshallingErrorProxy;
@@ -42,6 +41,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.concurrency.proxy.JobProxy;
+	import org.openforis.concurrency.proxy.JobProxy$Status;
 
 	/**
 	 * 
@@ -56,10 +57,10 @@ package org.openforis.collect.presenter {
 		private var _fileReference:FileReference;
 		private var _dataImportClient:DataImportClient;
 		private var _progressTimer:Timer;
-		private var _state:DataImportStateProxy;
+		private var _job:JobProxy;
 		private var _summary:DataImportSummaryProxy;
 		
-		private var _getStateResponder:IResponder;
+		private var _getCurrentJobResponder:IResponder;
 		private var _firstOpen:Boolean;
 		private var _allConflictingRecordsSelected:Boolean;
 		
@@ -71,7 +72,7 @@ package org.openforis.collect.presenter {
 			_fileReference = new FileReference();
 			_dataImportClient = ClientFactory.dataImportClient;
 			
-			_getStateResponder = new AsyncResponder(getStateResultHandler, faultHandler);
+			_getCurrentJobResponder = new AsyncResponder(getCurrentJobResultHandler, faultHandler);
 			
 			super();
 			
@@ -160,7 +161,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function startSummaryCreationResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataImportStateProxy;
+			_job = event.result as JobProxy;
 			updateView();
 		}
 		
@@ -254,7 +255,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function startImportResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataImportStateProxy;
+			_job = event.result as JobProxy;
 			updateView();
 		}
 		
@@ -263,11 +264,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateState():void {
-			_dataImportClient.getState(_getStateResponder);
+			_dataImportClient.getCurrentJob(_getCurrentJobResponder);
 		}
 		
-		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataImportStateProxy;
+		protected function getCurrentJobResultHandler(event:ResultEvent, token:Object = null):void {
+			_job = event.result as JobProxy;
 			updateView();
 		}
 		
@@ -291,10 +292,45 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			if(_state == null || _state.mainStep == DataImportState$MainStep.INITED || 
-				(_firstOpen && _state.subStep != DataImportState$SubStep.RUNNING) ) {
+			if(_job == null || _job.pending || 
+				(_firstOpen && ! _job.running) ) {
 				resetView();
 			} else {
+				_view.currentState = DataImportView.STATE_LOADING;
+				startProgressTimer();
+				switch ( _job.status ) {
+					case JobProxy$Status.PENDING:
+						_view.currentState = DataImportView.STATE_LOADING;
+						startProgressTimer();
+						break;
+					case JobProxy$Status.RUNNING:
+						if ( _job is DataRestoreSummaryJobProxy ) {
+							updateViewForCreatingSummary();
+						} else if ( _job is DataRestoreJobProxy ) {
+							updateViewForImporting();
+						}
+						startProgressTimer();
+						break;
+					case JobProxy$Status.COMPLETED:
+						stopProgressTimer();
+						if ( _job is DataRestoreSummaryJobProxy ) {
+							updateViewSummaryCompleted();
+						} else if ( _job is DataRestoreJobProxy ) {
+							updateViewImportCompleted();
+						}
+						break;
+					case JobProxy$Status.FAILED:
+						resetView();
+						AlertUtil.showError("dataImport.error", [_job.errorMessage]);
+						break;
+					case JobProxy$Status.ABORTED:
+						resetView();
+						AlertUtil.showError("dataImport.cancelled");
+						break;
+					default:
+						resetView();
+				}
+				/*
 				var mainStep:DataImportState$MainStep = _state.mainStep;
 				var subStep:DataImportState$SubStep = _state.subStep;
 				switch ( subStep ) {
@@ -345,6 +381,7 @@ package org.openforis.collect.presenter {
 					default:
 						resetView();
 				}
+				*/
 			}
 			_firstOpen = false;
 		}
@@ -359,51 +396,37 @@ package org.openforis.collect.presenter {
 		private function updateViewForUploading():void {
 			_view.currentState = DataImportView.STATE_UPLOADING;
 			_view.progressTitle.text = Message.get("dataImport.uploadingFile");
-			_view.progressLabel.text = "";
+			//_view.progressLabel.text = "";
 		}
 
 		private function updateViewForImporting():void {
 			_view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 			_view.progressTitle.text = Message.get("dataImport.importingRecords");
-			_view.progressBar.setProgress(_state.count, _state.total);
+			_view.progressBar.setProgress(_job.progressPercent, 100);
 			updateProgressText("dataImport.importingRecordsProgressLabel");
-			updateErrorsTextArea()
 		}
 
 		private function updateViewForCreatingSummary():void {
 			_view.currentState = DataImportView.STATE_SUMMARY_CREATIION_RUNNING;
 			_view.progressTitle.text = Message.get("dataImport.creatingSummary");
-			_view.progressBar.setProgress(_state.count, _state.total);
+			_view.progressBar.setProgress(_job.progressPercent, 100);
 			updateProgressText("dataImport.creatingSummaryProgressLabel");
-			updateErrorsTextArea()
 		}
 		
 		protected function updateProgressText(progressLabelResource:String):void {
+			/*
 			var progressText:String;
-			if ( _state.total == 0 ) {
+			if ( _job.progressPercent == 0 ) {
 				progressText = Message.get("dataImport.processing");
 			} else {
-				progressText = Message.get(progressLabelResource, [_state.count, _state.total]);
+				progressText = Message.get(progressLabelResource, [_job.progressPercent, 100]);
 			}
 			_view.progressLabel.text = progressText;
-		}
-		
-		protected function updateErrorsTextArea():void {
-			/*
-			var result:String = "";
-			if ( _state != null && _state.errors != null ) {
-				var files:IList = _state.errors.keySet;
-				for each (var fileName:String in files ) {
-					var errorMessage:String = _state.errors.get(fileName);
-					result += Message.get('dataImport.errorInFile', [fileName, errorMessage]);
-				}
-			}
-			//_view.errorsTextArea.text = result;
 			*/
 		}
 		
 		protected function resetView():void {
-			_state = null;
+			_job = null;
 			_view.currentState = DataImportView.STATE_DEFAULT;
 			stopProgressTimer();
 		}

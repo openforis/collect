@@ -9,8 +9,7 @@ import java.util.zip.ZipFile;
 import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.WorkerStatusChangeEvent;
-import org.openforis.concurrency.WorkerStatusChangeListener;
+import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,30 +29,38 @@ public class IdmlUnmarshallJob extends Job {
 	//output
 	private CollectSurvey survey;
 	
+	public void configure(File file, boolean validate) {
+		super.configure();
+		this.file = file;
+		this.validate = validate;
+	}
+
 	@Override
-	public void init() {
+	protected void buildAndAddTasks() throws Throwable {
+		ZipFile zipFile = null;
 		try {
-			ZipFile zipFile = new ZipFile(file);
+			zipFile = new ZipFile(file);
 			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 			File idmlFile = backupFileExtractor.extractIdmlFile();
+			zipFile.close();
+		
 			final IdmlUnmarshallTask task = createTask(IdmlUnmarshallTask.class);
 			task.setFile(idmlFile);
 			task.setValidate(validate);
-			task.addStatusChangeListener(new WorkerStatusChangeListener() {
-				@Override
-				public void statusChanged(WorkerStatusChangeEvent event) {
-					if ( event.getTo() == Status.COMPLETED ) {
-						IdmlUnmarshallJob.this.survey = task.getSurvey();
-					}
-				}
-			});
 			addTask(task);
 		} catch ( Exception e ) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Error configuring job: " + e.getMessage(), e);
 		}
-		super.init();
 	}
-
+	
+	@Override
+	protected void onTaskCompleted(Task task) {
+		super.onTaskCompleted(task);
+		if ( task instanceof IdmlUnmarshallTask ) {
+			IdmlUnmarshallJob.this.survey = ((IdmlUnmarshallTask) task).getSurvey();
+		}
+	}
+	
 	public File getFile() {
 		return file;
 	}

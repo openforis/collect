@@ -14,13 +14,18 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.openforis.collect.io.data.DataRestoreTask;
+import org.openforis.collect.io.data.RecordFileRestoreTask;
 import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupImportTask;
+import org.openforis.collect.manager.RecordFileManager;
+import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.WorkerStatusChangeEvent;
-import org.openforis.concurrency.WorkerStatusChangeListener;
+import org.openforis.concurrency.Task;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -33,9 +38,17 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SurveyRestoreJob extends Job {
 
+	@Autowired
+	private RecordManager recordManager;
+	@Autowired
+	private RecordFileManager recordFileManager;
+	@Autowired
+	private UserManager userManager;
+	
 	//parameters
 	private transient File file;
 	private String publishedSurveyUri;
+	private boolean restoreData;
 	private boolean updatingExistingSurvey;
 	private boolean updatingPublishedSurvey;
 	private String surveyName;
@@ -46,61 +59,76 @@ public class SurveyRestoreJob extends Job {
 	private transient CollectSurvey survey;
 	
 	@Override
-	public void init() {
-		try {
-			zipFile = new ZipFile(file);
-			addIdmlImportTask();
-			addSamplingDesignImportTask();
-			addSpeciesImportTask();
-			if ( updatingPublishedSurvey && isDataIncluded() ) {
-				addDataImportTask();
-			}
-			super.init();
-		} catch ( Exception e ) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void addIdmlImportTask() throws IOException {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-		File idmlFile = backupFileExtractor.extractIdmlFile();
-		final IdmlImportTask task = createTask(IdmlImportTask.class);
-		task.setFile(idmlFile);
-		task.setPublishedSurveyUri(publishedSurveyUri);
-		task.setName(surveyName);
-		task.setUpdatingExistingSurvey(updatingExistingSurvey);
-		task.setUpdatingPublishedSurvey(updatingPublishedSurvey);
-		task.addStatusChangeListener(new WorkerStatusChangeListener() {
-			@Override
-			public void statusChanged(WorkerStatusChangeEvent event) {
-				if ( event.getTo() == Status.COMPLETED ) {
-					//get output survey and set it into job instance instance variable
-					SurveyRestoreJob.this.survey = task.getSurvey();
-				}
-			}
-		});
-		addTask(task);
+	public void initInternal() throws Throwable {
+		zipFile = new ZipFile(file);
+		super.initInternal();
 	}
 	
-	private void addSamplingDesignImportTask() throws IOException {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-		File samplingDesignFile = backupFileExtractor.extract(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
-		final SamplingDesignImportTask task = createTask(SamplingDesignImportTask.class);
-		task.setFile(samplingDesignFile);
-		task.setOverwriteAll(true);
-		task.addStatusChangeListener(new WorkerStatusChangeListener() {
-			@Override
-			public void statusChanged(WorkerStatusChangeEvent event) {
-				if ( event.getTo() == Status.RUNNING ) {
-					//set "survey" instance variable
-					task.setSurvey(survey);
-				}
+	@Override
+	protected void buildAndAddTasks() throws Throwable {
+		addTask(IdmlImportTask.class);
+		addTask(SamplingDesignImportTask.class);
+		addSpeciesImportTasks();
+		if ( updatingPublishedSurvey && restoreData && isDataIncluded() ) {
+			addTask(DataRestoreTask.class);
+			if ( isUploadedFilesIncluded() ) {
+				addTask(RecordFileRestoreTask.class);
 			}
-		});
-		addTask(task);
+		}
 	}
-
-	private void addSpeciesImportTask() throws IOException {
+	
+	@Override
+	protected void prepareTask(Task task) {
+		if ( task instanceof IdmlImportTask ) {
+			IdmlImportTask t = (IdmlImportTask) task;
+			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+			File idmlFile = backupFileExtractor.extractIdmlFile();
+			t.setFile(idmlFile);
+			t.setPublishedSurveyUri(publishedSurveyUri);
+			t.setName(surveyName);
+			t.setUpdatingExistingSurvey(updatingExistingSurvey);
+			t.setUpdatingPublishedSurvey(updatingPublishedSurvey);
+		} else if ( task instanceof SamplingDesignImportTask ) {
+			SamplingDesignImportTask t = (SamplingDesignImportTask) task;
+			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+			File samplingDesignFile = backupFileExtractor.extract(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
+			t.setFile(samplingDesignFile);
+			t.setOverwriteAll(true);
+			t.setSurvey(survey);
+		} else if ( task instanceof SpeciesBackupImportTask ) {
+			SpeciesBackupImportTask t = (SpeciesBackupImportTask) task;
+			t.setSurvey(survey);
+		} else if ( task instanceof DataRestoreTask ) {
+			DataRestoreTask t = (DataRestoreTask) task;
+			t.setRecordManager(recordManager);
+			t.setUserManager(userManager);
+			t.setEntryBasePath(SurveyBackupJob.DATA_FOLDER);
+			t.setZipFile(zipFile);
+			t.setPackagedSurvey(survey);
+			t.setExistingSurvey(survey);
+			t.setOverwriteAll(true);
+		} else if ( task instanceof RecordFileRestoreTask ) {
+			RecordFileRestoreTask t = (RecordFileRestoreTask) task;
+			t.setRecordManager(recordManager);
+			t.setRecordFileManager(recordFileManager);
+			t.setZipFile(zipFile);
+			t.setOverwriteAll(true);
+			t.setSurvey(survey);
+		}
+		super.prepareTask(task);
+	}
+	
+	@Override
+	protected void onTaskCompleted(Task task) {
+		super.onTaskCompleted(task);
+		if ( task instanceof IdmlImportTask ) {
+			IdmlImportTask t = (IdmlImportTask) task;
+			//get output survey and set it into job instance instance variable
+			SurveyRestoreJob.this.survey = t.getSurvey();
+		}
+	}
+	
+	private void addSpeciesImportTasks() {
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		List<String> speciesFilesNames = backupFileExtractor.listEntriesInPath(SurveyBackupJob.SPECIES_FOLDER);
 		for (String speciesFileName : speciesFilesNames) {
@@ -110,15 +138,6 @@ public class SurveyRestoreJob extends Job {
 			task.setFile(file);
 			task.setTaxonomyName(taxonomyName);
 			task.setOverwriteAll(true);
-			task.addStatusChangeListener(new WorkerStatusChangeListener() {
-				@Override
-				public void statusChanged(WorkerStatusChangeEvent event) {
-					if ( event.getTo() == Status.RUNNING ) {
-						//set "survey" instance variable
-						task.setSurvey(survey);
-					}
-				}
-			});
 			addTask(task);
 		}
 	}
@@ -129,10 +148,12 @@ public class SurveyRestoreJob extends Job {
 		return ! dataEntries.isEmpty();
 	}
 
-	private void addDataImportTask() {
-		
+	private boolean isUploadedFilesIncluded() throws IOException {
+		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.UPLOADED_FILES_FOLDER);
+		return ! dataEntries.isEmpty();
 	}
-
+	
 	@Override
 	protected void execute() throws Throwable {
 		super.execute();
@@ -147,14 +168,13 @@ public class SurveyRestoreJob extends Job {
 
 		public BackupFileExtractor(ZipFile zipFile) {
 			this.zipFile = zipFile;
-			
 		}
 		
-		public File extractIdmlFile() throws IOException {
+		public File extractIdmlFile() {
 			return extract(SurveyBackupJob.SURVEY_XML_ENTRY_NAME);
 		}
 		
-		public File extract(String entryName) throws IOException {
+		public File extract(String entryName) {
 			ZipEntry entry = findEntry(entryName);
 			if ( entry == null ) {
 				return null;
@@ -163,27 +183,30 @@ public class SurveyRestoreJob extends Job {
 			}
 		}
 
-		private File extract(ZipEntry entry) throws IOException {
+		private File extract(ZipEntry entry) {
 			String entryName = entry.getName();
-			String fileName = FilenameUtils.getName(entryName);
-			File tempFile = File.createTempFile("collect", fileName);
-			InputStream is = zipFile.getInputStream(entry);
-			FileUtils.copyInputStreamToFile(is, tempFile);
-			return tempFile;
+			try {
+				InputStream is = zipFile.getInputStream(entry);
+				String fileName = FilenameUtils.getName(entryName);
+				File tempFile = File.createTempFile("collect", fileName);
+				FileUtils.copyInputStreamToFile(is, tempFile);
+				return tempFile;
+			} catch (IOException e) {
+				throw new RuntimeException(String.format("Error extracting file %s from backup archive: %s", entryName, e.getMessage()), e);
+			}
 		}
 		
-		public List<String> listEntriesInPath(String folder) throws IOException {
+		public List<String> listEntriesInPath(String path) {
+			if ( ! path.endsWith("/") ) {
+				path += "/";
+			}
 			List<String> result = new ArrayList<String>();
 			Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
 			while ( zipEntries.hasMoreElements() ) {
 				ZipEntry zipEntry = zipEntries.nextElement();
 				String name = zipEntry.getName();
-				int lastIndexOfSlash = name.lastIndexOf('/');
-				if ( lastIndexOfSlash > 0 ) {
-					String entryPath = name.substring(0, lastIndexOfSlash);
-					if ( entryPath.equals(folder) ) {
-						result.add(name);
-					}
+				if ( name.startsWith(path) ) {
+					result.add(name);
 				}
 			}
 			return result;
@@ -199,7 +222,7 @@ public class SurveyRestoreJob extends Job {
 			return result;
 		}
 		
-		public ZipEntry findEntry(String entryName) throws IOException {
+		public ZipEntry findEntry(String entryName) {
 			Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
 			while ( zipEntries.hasMoreElements() ) {
 				ZipEntry zipEntry = zipEntries.nextElement();
@@ -209,6 +232,16 @@ public class SurveyRestoreJob extends Job {
 				}
 			}
 			return null;
+		}
+		
+		public InputStream findEntryInputStream(String entryName) throws IOException {
+			ZipEntry entry = findEntry(entryName);
+			if ( entry == null ) {
+				return null;
+			} else {
+				InputStream is = zipFile.getInputStream(entry);
+				return is;
+			}
 		}
 	}
 
@@ -255,5 +288,4 @@ public class SurveyRestoreJob extends Job {
 	public void setPublishedSurveyUri(String publishedSurveyUri) {
 		this.publishedSurveyUri = publishedSurveyUri;
 	}
-
 }

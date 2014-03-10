@@ -1,18 +1,24 @@
 package org.openforis.collect.io.data;
 
-import java.io.OutputStreamWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
+import org.openforis.idm.model.FileAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,10 +31,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class XMLDataExportTask extends Task {
-
-	public static final String ZIP_DIRECTORY_SEPARATOR = "/";
-	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
+public class RecordFileBackupTask extends Task {
 
 	@Autowired
 	private RecordManager recordManager;
@@ -38,47 +41,30 @@ public class XMLDataExportTask extends Task {
 	private SurveyManager surveyManager;
 	@Autowired
 	private DataMarshaller dataMarshaller;
-	
+
 	//input
 	private ZipOutputStream zipOutputStream;
 	private CollectSurvey survey;
-	private Step[] steps;
 	private String rootEntityName;
-	private String zipEntryPrefix;
 	
-	public XMLDataExportTask() {
+	public RecordFileBackupTask() {
 		super();
-		//export all steps by default
-		this.steps = Step.values();
-	}
-	
-	@Override
-	protected long countTotalItems() {
-		int count = 0;
-		List<CollectRecord> recordSummaries = loadAllSummaries();
-		for (CollectRecord summary : recordSummaries) {
-			for (Step step: steps) {
-				if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
-					count ++;
-				}
-			}
-		}
-		return count;
 	}
 
 	@Override
+	protected long countTotalItems() {
+		List<CollectRecord> recordSummaries = loadAllSummaries();
+		return recordSummaries.size();
+	}
+	
+	@Override
 	protected void execute() throws Throwable {
 		List<CollectRecord> recordSummaries = loadAllSummaries();
-		if ( recordSummaries != null && steps != null && steps.length > 0 ) {
+		if ( recordSummaries != null ) {
 			for (CollectRecord summary : recordSummaries) {
 				if ( isRunning() ) {
-					for (Step step : steps) {
-						int stepNum = step.getStepNumber();
-						if ( stepNum <= summary.getStep().getStepNumber() ) {
-							backup(summary, Step.valueOf(stepNum));
-							incrementItemsProcessed();
-						}
-					}
+					backup(summary);
+					incrementItemsProcessed();
 				} else {
 					break;
 				}
@@ -91,23 +77,40 @@ public class XMLDataExportTask extends Task {
 		return summaries;
 	}
 	
-	private void backup(CollectRecord summary, Step step) {
+	private void backup(CollectRecord summary) throws RecordFileException, IOException {
 		Integer id = summary.getId();
-		try {
-			CollectRecord record = recordManager.load(survey, id, step);
-			RecordEntry recordEntry = new RecordEntry(step, id, zipEntryPrefix);
-			String entryName = recordEntry.getName();
-			ZipEntry entry = new ZipEntry(entryName);
-			zipOutputStream.putNextEntry(entry);
-			OutputStreamWriter writer = new OutputStreamWriter(zipOutputStream);
-			dataMarshaller.write(record, writer);
-			zipOutputStream.closeEntry();
-		} catch (Exception e) {
-			String message = "Error while backing up " + id + " " + e.getMessage();
-			throw new RuntimeException(message, e);
+		CollectRecord record = recordManager.load(survey, id, summary.getStep());
+		List<FileAttribute> fileAttributes = record.getFileAttributes();
+		for (FileAttribute fileAttribute : fileAttributes) {
+			if ( ! fileAttribute.isEmpty() ) {
+				File file = recordFileManager.getRepositoryFile(fileAttribute);
+				if ( file == null ) {
+					String message = String.format("Missing file: %s attributeId: %d attributeName: %s", 
+							fileAttribute.getFilename(), fileAttribute.getInternalId(), fileAttribute.getName());
+					throw new RecordFileException(message);
+				} else {
+					String entryName = calculateRecordFileEntryName(fileAttribute);
+					writeFile(file, entryName);
+				}
+			}
 		}
 	}
-	
+
+	public static String calculateRecordFileEntryName(FileAttribute fileAttribute) {
+		FileAttributeDefinition fileAttributeDefinition = fileAttribute.getDefinition();
+		String repositoryRelativePath = RecordFileManager.getRepositoryRelativePath(fileAttributeDefinition, SurveyBackupJob.ZIP_FOLDER_SEPARATOR, false);
+		String entryName = SurveyBackupJob.UPLOADED_FILES_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + repositoryRelativePath + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + fileAttribute.getFilename();
+		return entryName;
+	}
+
+	private void writeFile(File file, String entryName) throws IOException {
+		ZipEntry entry = new ZipEntry(entryName);
+		zipOutputStream.putNextEntry(entry);
+		IOUtils.copy(new FileInputStream(file), zipOutputStream);
+		zipOutputStream.closeEntry();
+		zipOutputStream.flush();
+	}
+
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
@@ -124,28 +127,12 @@ public class XMLDataExportTask extends Task {
 		this.rootEntityName = rootEntityName;
 	}
 	
-	public Step[] getSteps() {
-		return steps;
-	}
-	
-	public void setSteps(Step[] steps) {
-		this.steps = steps;
-	}
-
 	public ZipOutputStream getZipOutputStream() {
 		return zipOutputStream;
 	}
 
 	public void setZipOutputStream(ZipOutputStream zipOutputStream) {
 		this.zipOutputStream = zipOutputStream;
-	}
-
-	public String getZipEntryPrefix() {
-		return zipEntryPrefix;
-	}
-
-	public void setZipEntryPrefix(String zipEntryPrefix) {
-		this.zipEntryPrefix = zipEntryPrefix;
 	}
 
 }

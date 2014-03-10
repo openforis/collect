@@ -80,12 +80,15 @@
 <!-- 								<includeClass>org.openforis.collect.session.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.collect.model.**</includeClass> -->
 <!-- 								<includeClass>org.openforis.idm.model.**</includeClass> -->
+                                <includeClass>org.openforis.concurrency.proxy.*</includeClass>
                                 <includeClass>org.openforis.idm.model.species.Taxon$TaxonRank</includeClass>
                                 <includeClass>org.openforis.idm.metamodel.validation.ValidationResultFlag</includeClass>
                                 <includeClass>org.openforis.collect.Proxy</includeClass>
+                                <includeClass>org.openforis.collect.io.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataImportState$MainStep</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataImportState$SubStep</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataExportStatus$Format</includeClass>
+                                <includeClass>org.openforis.collect.io.data.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.io.metadata.parsing.ParsingError$ErrorType</includeClass>
                                 <includeClass>org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
                                 <includeClass>org.openforis.collect.manager.process.ProcessStatus</includeClass>

@@ -27,7 +27,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.concurrency.JobManager;
+import org.openforis.concurrency.SpringJobManager;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
@@ -72,7 +72,7 @@ public class SurveySelectVM extends BaseVM {
 	private SurveyValidator surveyValidator;
 
 	@WireVariable
-	private JobManager jobManager;
+	private SpringJobManager springJobManager;
 
 	private SurveySummary selectedSurvey;
 
@@ -191,12 +191,12 @@ public class SurveySelectVM extends BaseVM {
 	private void performSelectedSurveyExport(boolean includeData, boolean includeUploadedFiles) {
 		CollectSurvey survey = loadSelectedSurvey();
 		Integer surveyId = survey.getId();
-		surveyBackupJob = jobManager.createJob(SurveyBackupJob.class);
+		surveyBackupJob = springJobManager.createJob(SurveyBackupJob.class);
 		surveyBackupJob.setSurvey(survey);
 		surveyBackupJob.setIncludeData(includeData);
 		surveyBackupJob.setIncludeRecordFiles(includeUploadedFiles);
 		
-		jobManager.start(surveyBackupJob, surveyId);
+		springJobManager.start(surveyBackupJob, String.valueOf(surveyId));
 		
 		openSurveyExportStatusPopUp();
 	}

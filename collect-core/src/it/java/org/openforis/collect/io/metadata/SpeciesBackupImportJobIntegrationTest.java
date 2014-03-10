@@ -89,16 +89,15 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 		job.setFile(file);
 		job.setSurvey(survey);
 		job.setTaxonomyName(TEST_TAXONOMY_NAME);
-		job.init();
-		job.run();
+		jobManager.start(job, false);
 		return job;
 	}
 	
 	@Test
 	public void testSpeciesImport() throws Exception {
 		SpeciesBackupImportJob job = importCSVFile(VALID_TEST_CSV);
-		SpeciesBackupImportTask task = (SpeciesBackupImportTask) job.getTasks().get(0);
 		assertTrue(job.isCompleted());
+		SpeciesBackupImportTask task = (SpeciesBackupImportTask) job.getTasks().get(0);
 		assertTrue(task.getSkippedRows().isEmpty());
 		{
 			String code = "OLE/CAP/macrocarpa";
