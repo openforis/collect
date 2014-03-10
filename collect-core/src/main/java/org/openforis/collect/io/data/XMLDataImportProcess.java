@@ -39,6 +39,7 @@ import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.utils.OpenForisIOUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Entity;
@@ -96,12 +97,15 @@ public class XMLDataImportProcess implements Callable<Void> {
 	private List<Integer> entryIdsToImport;
 
 	private boolean includesRecordFiles;
+	
+	private Predicate<CollectRecord> includeRecordPredicate;
 
 	public XMLDataImportProcess() {
 		super();
 		this.state = new DataImportState();
 		this.processedRecords = new ArrayList<Integer>();
 		this.entryIdsToImport = new ArrayList<Integer>();
+		this.includeRecordPredicate = null;
 	}
 
 	public DataImportState getState() {
@@ -254,7 +258,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		if ( ! parseRecordResult.isSuccess()) {
 			List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
 			packagedSkippedFileErrors.put(entryName, failures);
-		} else {
+		} else if ( includeRecordPredicate == null || includeRecordPredicate.evaluate(parsedRecord) ) {
 			int entryId = recordEntry.getRecordId();
 			CollectRecord recordSummary = createRecordSummary(parsedRecord);
 			packagedRecords.put(entryId, recordSummary);
@@ -631,6 +635,14 @@ public class XMLDataImportProcess implements Callable<Void> {
 
 	public CollectSurvey getPackagedSurvey() {
 		return packagedSurvey;
+	}
+	
+	public Predicate<CollectRecord> getIncludeRecordPredicate() {
+		return includeRecordPredicate;
+	}
+	
+	public void setIncludeRecordPredicate(Predicate<CollectRecord> includeRecordPredicate) {
+		this.includeRecordPredicate = includeRecordPredicate;
 	}
 	
 }

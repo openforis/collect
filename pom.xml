@@ -23,6 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<idm.version>3.0-Alpha11</idm.version>
+		<openforis.commons.version>0.0.6</openforis.commons.version>
 	</properties>
 
 	<distributionManagement>
@@ -230,7 +231,12 @@
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>0.0.4</version>
+				<version>${openforis.commons.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openforis.commons</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>${openforis.commons.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
