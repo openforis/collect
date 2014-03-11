@@ -304,5 +304,12 @@ public class DatabaseExternalCodeListProvider implements
 			return null;
 		}
 	}
-	
+
+    public DynamicTableDao getDynamicTableDao() {
+        return dynamicTableDao;
+    }
+
+    public void setDynamicTableDao(DynamicTableDao dynamicTableDao) {
+        this.dynamicTableDao = dynamicTableDao;
+    }
 }
