@@ -13,7 +13,6 @@ import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -30,16 +29,16 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	private static final String SURVEY_NOT_FOUND_ERROR_MESSAGE_KEY = "samplingDesignImport.error.surveyNotFound";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "samplingDesignImport.error.internalErrorImportingFile";
 	
-	@Autowired
-	private SamplingDesignManager samplingDesignManager;
+	private transient SamplingDesignManager samplingDesignManager;
 	
-	//parameters
+	//input
 	private transient CollectSurvey survey;
 	private transient File file;
 	private boolean overwriteAll;
 	
+	//internal variables
 	private transient SamplingDesignCSVReader reader;
-	private List<SamplingDesignLine> lines;
+	private transient List<SamplingDesignLine> lines;
 
 	@Override
 	protected void initInternal() throws Throwable {
@@ -222,6 +221,14 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 		return item;
 	}
 
+	public SamplingDesignManager getSamplingDesignManager() {
+		return samplingDesignManager;
+	}
+	
+	public void setSamplingDesignManager(SamplingDesignManager samplingDesignManager) {
+		this.samplingDesignManager = samplingDesignManager;
+	}
+	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}

@@ -56,12 +56,10 @@ public class JobStatusPopUpVM extends BaseVM {
 	public void updateProgress() {
 		switch ( job.getStatus() ) {
 		case COMPLETED:
-			BindUtils.postGlobalCommand(null, null, JOB_COMPLETED_COMMAND, null);
+			dispatchJobCompletedCommand();
 			break;
 		case FAILED:
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("errorMessage", job.getErrorMessage());
-			BindUtils.postGlobalCommand(null, null, JOB_FAILED_COMMAND, args);
+			dispatchJobFailedCommand();
 			break;
 		case ABORTED:
 			dispatchJobAbortedCommand();
@@ -71,8 +69,22 @@ public class JobStatusPopUpVM extends BaseVM {
 		notifyChange("progress");
 	}
 
+	private void dispatchJobCompletedCommand() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("job", job);
+		BindUtils.postGlobalCommand(null, null, JOB_COMPLETED_COMMAND, args);
+	}
+
+	private void dispatchJobFailedCommand() {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("job", job);
+		BindUtils.postGlobalCommand(null, null, JOB_FAILED_COMMAND, args);
+	}
+
 	private void dispatchJobAbortedCommand() {
-		BindUtils.postGlobalCommand(null, null, JOB_ABORTED_COMMAND, null);
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("job", job);
+		BindUtils.postGlobalCommand(null, null, JOB_ABORTED_COMMAND, args);
 	}
 	
 	public int getProgress() {

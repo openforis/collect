@@ -33,14 +33,8 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RecordFileBackupTask extends Task {
 
-	@Autowired
 	private RecordManager recordManager;
-	@Autowired
 	private RecordFileManager recordFileManager;
-	@Autowired
-	private SurveyManager surveyManager;
-	@Autowired
-	private DataMarshaller dataMarshaller;
 
 	//input
 	private ZipOutputStream zipOutputStream;
@@ -109,6 +103,22 @@ public class RecordFileBackupTask extends Task {
 		IOUtils.copy(new FileInputStream(file), zipOutputStream);
 		zipOutputStream.closeEntry();
 		zipOutputStream.flush();
+	}
+
+	public RecordManager getRecordManager() {
+		return recordManager;
+	}
+	
+	public void setRecordManager(RecordManager recordManager) {
+		this.recordManager = recordManager;
+	}
+	
+	public RecordFileManager getRecordFileManager() {
+		return recordFileManager;
+	}
+	
+	public void setRecordFileManager(RecordFileManager recordFileManager) {
+		this.recordFileManager = recordFileManager;
 	}
 
 	public CollectSurvey getSurvey() {

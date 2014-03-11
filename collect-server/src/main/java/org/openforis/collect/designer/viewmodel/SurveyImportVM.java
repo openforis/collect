@@ -12,14 +12,16 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.io.SurveyBackupInfoExtractorJob;
 import org.openforis.collect.io.SurveyRestoreJob;
-import org.openforis.collect.io.metadata.IdmlUnmarshallJob;
+import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.utils.OpenForisIOUtils;
+import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
@@ -66,7 +68,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	//private SurveyUnmarshallProcess unmarshallProcess;
 	//private SurveyImportProcess importProcess;
-	private IdmlUnmarshallJob unmarshallJob;
+	private SurveyBackupInfoExtractorJob summaryJob;
 	private SurveyRestoreJob restoreJob;
 	
 	private Window jobStatusPopUp;
@@ -172,19 +174,21 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 
 	protected void prepareSurveyImport(boolean validate) {
-		if ( unmarshallJob != null && unmarshallJob.isRunning() ) {
-			unmarshallJob.abort();
+		if ( summaryJob != null && summaryJob.isRunning() ) {
+			summaryJob.abort();
 		}
-		unmarshallJob = jobManager.createJob(IdmlUnmarshallJob.class);
-		unmarshallJob.setFile(this.uploadedFile);
-		unmarshallJob.setValidate(validate);
-		jobManager.start(unmarshallJob);
-		openSurveyUnmarshallStatusPopUp();
+		summaryJob = jobManager.createJob(SurveyBackupInfoExtractorJob.class);
+		summaryJob.setFile(this.uploadedFile);
+		summaryJob.setValidate(validate);
+		
+		jobManager.start(summaryJob);
+		
+		openSummaryCreationStatusPopUp();
 	}
 	
-	protected void openSurveyUnmarshallStatusPopUp() {
+	protected void openSummaryCreationStatusPopUp() {
 		String message = Labels.getLabel("survey.import_survey.unmarshall_process_status_popup.message");
-		jobStatusPopUp = JobStatusPopUpVM.openPopUp(message, unmarshallJob, true);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(message, summaryJob, true);
 	}
 	
 	protected void openSurveyRestoreStatusPopUp() {
@@ -197,59 +201,69 @@ public class SurveyImportVM extends SurveyBaseVM {
 		jobStatusPopUp = null;
 	}
 	
-	@GlobalCommand
-	public void jobCompleted() {
-		closeJobStatusPopUp();
-
-		if ( unmarshallJob != null ) {
-			afterSurveyUnmarshallComplete();
-		} else if ( restoreJob!= null ) {
-			afterSurveyImportCompleted();
+	private void showImportError(String errorMessageKey) {
+		String message = null;
+		if ( errorMessageKey == null ) {
+			message = null;
+		} else {
+			//try to get message using labels repository
+			String labelsMessage = Labels.getLabel(errorMessageKey);
+			message = labelsMessage == null ? errorMessageKey: labelsMessage;
 		}
+		Object[] args = new String[] { message };
+		MessageUtil.showError("survey.import_survey.error", args);
 	}
 	
 	@GlobalCommand
-	public void jobAborted() {
-		closeJobStatusPopUp();
-		if ( unmarshallJob != null ) {
+	public void jobCompleted(@BindingParam("job") Job job) {
+		if ( job == summaryJob ) {
+			closeJobStatusPopUp();
+			onSummaryCreationComplete();
+		} else if ( job == restoreJob ) {
+			closeJobStatusPopUp();
+			onSurveyImportComplete();
+		}
+	}
+
+	@GlobalCommand
+	public void jobFailed(@BindingParam("job") Job job) {
+		if ( job == summaryJob ) {
+			closeJobStatusPopUp();
+			String errorMessageKey = summaryJob.getErrorMessage();
+			if ( summaryJob.isValidate() && summaryJob.getCurrentTask() instanceof IdmlUnmarshallTask ) {
+				confirmImportInvalidSurvey(errorMessageKey);
+			} else {
+				showImportError(errorMessageKey);
+			}
+			uploadedFile = null;
+			uploadedFileName = null;
+			summaryJob = null;
+		} else if ( job == restoreJob ) {
+			closeJobStatusPopUp();
+			showImportError(restoreJob.getErrorMessage());
+			restoreJob = null;
+		}
+	}
+
+	@GlobalCommand
+	public void jobAborted(@BindingParam("job") Job job) {
+		if ( job == summaryJob ) {
+			closeJobStatusPopUp();
 			uploadedFileName = null;
 			uploadedSurveyUri = null;
 			uploadedFile = null;
+			updateForm();
+			summaryJob = null;
+		} else if ( job == restoreJob ) {
+			closeJobStatusPopUp();
+			restoreJob = null;
 		}
-		resetAsyncProcesses();
-		updateForm();
 	}
 
-	@GlobalCommand
-	public void jobFailed(@BindingParam("errorMessage") String errorMessageKey) {
-		closeJobStatusPopUp();
-		
-		if ( unmarshallJob != null && unmarshallJob.isValidate() ) {
-			confirmImportInvalidSurvey(errorMessageKey);
-		} else {
-			String message = null;
-			if ( errorMessageKey == null ) {
-				message = null;
-			} else {
-				//try to get message using labels repository
-				String labelsMessage = Labels.getLabel(errorMessageKey);
-				message = labelsMessage == null ? errorMessageKey: labelsMessage;
-			}
-			Object[] args = new String[] { message };
-			MessageUtil.showError("survey.import_survey.error", args);
-		}
-		resetAsyncProcesses();
-	}
-	
-	private void resetAsyncProcesses() {
-		unmarshallJob = null;
-		restoreJob = null;
-	}
-
-	protected void afterSurveyUnmarshallComplete() {
-		survey = unmarshallJob.getSurvey();
+	protected void onSummaryCreationComplete() {
+		survey = summaryJob.getSurvey();
 		uploadedSurveyUri = survey.getUri();
-		unmarshallJob = null;
+		summaryJob = null;
 		
 		updateForm();
 	}
@@ -299,14 +313,14 @@ public class SurveyImportVM extends SurveyBaseVM {
 		restoreJob.setFile(uploadedFile);
 		restoreJob.setPublishedSurveyUri(survey.getUri());
 		restoreJob.setSurveyName(surveyName);
-		restoreJob.setUpdatingExistingSurvey(updatingExistingSurvey);
-		restoreJob.setUpdatingPublishedSurvey(updatingPublishedSurvey);
-
+		restoreJob.setNewSurvey(! updatingExistingSurvey);
+		restoreJob.setUpdatePublishedSurvey(updatingPublishedSurvey);
+		
 		jobManager.start(restoreJob);
 		openSurveyRestoreStatusPopUp();
 	}
 	
-	protected void afterSurveyImportCompleted() {
+	protected void onSurveyImportComplete() {
 		Object[] args = new String[]{getFormSurveyName()};
 		MessageUtil.showInfo("survey.import_survey.successfully_imported", args);
 		closeImportPopUp(true);
@@ -344,6 +358,8 @@ public class SurveyImportVM extends SurveyBaseVM {
 		args.put("successfullyImported", successfullyImported);
 		BindUtils.postGlobalCommand(null, null, SurveySelectVM.CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD, args);
 	}
+	
+	
 	
 	private String suggestSurveyName(String fileName) {
 		//remove extension

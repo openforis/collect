@@ -27,7 +27,6 @@ public class SpeciesBackupExportTask extends Task {
 	private static final String LATIN_LANG_CODE = "lat";
 	private static final String VERNACULAR_NAMES_SEPARATOR = " / ";
 
-	@Autowired
 	private SpeciesManager speciesManager;
 	
 	//parameters
@@ -95,6 +94,14 @@ public class SpeciesBackupExportTask extends Task {
 		writer.writeNext(lineValues.toArray(new String[0]));
 	}
 
+	public SpeciesManager getSpeciesManager() {
+		return speciesManager;
+	}
+	
+	public void setSpeciesManager(SpeciesManager speciesManager) {
+		this.speciesManager = speciesManager;
+	}
+	
 	public OutputStream getOutputStream() {
 		return outputStream;
 	}

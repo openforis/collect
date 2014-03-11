@@ -27,6 +27,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.concurrency.Job;
 import org.openforis.concurrency.SpringJobManager;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
@@ -213,14 +214,30 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	@GlobalCommand
-	public void jobCompleted() {
-		if ( surveyBackupJob != null ) {
+	public void jobAborted(@BindingParam("job") Job job) {
+		closeJobStatusPopUp();
+		surveyBackupJob = null;
+	}
+	
+	@GlobalCommand
+	public void jobFailed(@BindingParam("job") Job job) {
+		closeJobStatusPopUp();
+		if ( job == surveyBackupJob ) {
+			surveyBackupJob = null;
+			String errorMessage = job.getErrorMessage();
+			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
+		}
+	}
+	
+	@GlobalCommand
+	public void jobCompleted(@BindingParam("job") Job job) {
+		closeJobStatusPopUp();
+		if ( job == surveyBackupJob ) {
 			surveyExportJobCompleted();
 		}
 	}
-
+	
 	private void surveyExportJobCompleted() {
-		closeJobStatusPopUp();
 		File file = surveyBackupJob.getOutputFile();
 		CollectSurvey survey = surveyBackupJob.getSurvey();
 		String extension = FilenameUtils.getExtension(file.getName());
@@ -233,24 +250,6 @@ public class SurveySelectVM extends BaseVM {
 			log.error(e);
 			MessageUtil.showError("survey.export_survey.error", new String[]{e.getMessage()});
 		} finally {
-			surveyBackupJob = null;
-		}
-	}
-	
-	@GlobalCommand
-	public void jobFailed(@BindingParam("errorMessage") String errorMessage) {
-		if ( surveyBackupJob != null ) {
-			closeJobStatusPopUp();
-			surveyBackupJob = null;
-			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
-		}
-	}
-	
-
-	@GlobalCommand
-	public void jobAborted() {
-		if ( surveyBackupJob != null ) {
-			closeJobStatusPopUp();
 			surveyBackupJob = null;
 		}
 	}

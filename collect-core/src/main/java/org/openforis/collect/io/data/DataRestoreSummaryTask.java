@@ -16,7 +16,6 @@ import java.util.zip.ZipFile;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
 import org.openforis.collect.io.exception.DataParsingExeption;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -30,7 +29,6 @@ import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.model.Entity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -44,11 +42,7 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataRestoreSummaryTask extends Task {
 
-	@Autowired
 	private RecordManager recordManager;
-	@Autowired
-	private SurveyManager surveyManager;
-	@Autowired
 	private UserManager userManager;
 
 	//input
@@ -253,6 +247,22 @@ public class DataRestoreSummaryTask extends Task {
 		result.setState(record.getState());
 		result.setStep(record.getStep());
 		return result;
+	}
+	
+	public RecordManager getRecordManager() {
+		return recordManager;
+	}
+	
+	public void setRecordManager(RecordManager recordManager) {
+		this.recordManager = recordManager;
+	}
+	
+	public UserManager getUserManager() {
+		return userManager;
+	}
+	
+	public void setUserManager(UserManager userManager) {
+		this.userManager = userManager;
 	}
 	
 	public ZipFile getZipFile() {

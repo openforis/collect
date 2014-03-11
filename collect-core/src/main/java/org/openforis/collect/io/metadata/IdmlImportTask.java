@@ -8,7 +8,6 @@ import java.io.File;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Task;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,31 +20,39 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class IdmlImportTask extends Task {
 
-	@Autowired
 	private SurveyManager surveyManager;
 	
 	//parameters
 	private transient File file;
 	private String publishedSurveyUri;
-	private boolean updatingExistingSurvey;
-	private boolean updatingPublishedSurvey;
+	private boolean newSurvey;
+	private boolean updatePublishedSurvey;
 	private String name;
 
 	//output
 	private transient CollectSurvey survey;
 	
 	protected void execute() throws Throwable {
-		if ( updatingExistingSurvey ) {
-			if ( updatingPublishedSurvey ) {
-				survey = surveyManager.importInPublishedWorkModel(publishedSurveyUri, file, false);
-			} else {
-				survey = surveyManager.updateModel(file, false);
-			}
-		} else {
+		if ( newSurvey ) {
+			//import packaged survey into a new work survey
 			survey = surveyManager.importWorkModel(file, name, false);
+		} else if ( updatePublishedSurvey ) {
+			//duplicate published survey into work and update it with packaged file
+			survey = surveyManager.importInPublishedWorkModel(publishedSurveyUri, file, false);
+		} else {
+			//update "temporary/work" survey
+			survey = surveyManager.updateModel(file, false);
 		}
 	}
 
+	public SurveyManager getSurveyManager() {
+		return surveyManager;
+	}
+	
+	public void setSurveyManager(SurveyManager surveyManager) {
+		this.surveyManager = surveyManager;
+	}
+	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
@@ -67,19 +74,19 @@ public class IdmlImportTask extends Task {
 	}
 
 	public boolean isUpdatingExistingSurvey() {
-		return updatingExistingSurvey;
+		return newSurvey;
 	}
 
-	public void setUpdatingExistingSurvey(boolean updatingExistingSurvey) {
-		this.updatingExistingSurvey = updatingExistingSurvey;
+	public void setNewSurvey(boolean newSurvey) {
+		this.newSurvey = newSurvey;
 	}
 
-	public boolean isUpdatingPublishedSurvey() {
-		return updatingPublishedSurvey;
+	public boolean isUpdatePublishedSurvey() {
+		return updatePublishedSurvey;
 	}
 
-	public void setUpdatingPublishedSurvey(boolean updatingPublishedSurvey) {
-		this.updatingPublishedSurvey = updatingPublishedSurvey;
+	public void setUpdatePublishedSurvey(boolean updatePublishedSurvey) {
+		this.updatePublishedSurvey = updatePublishedSurvey;
 	}
 
 	public String getPublishedSurveyUri() {

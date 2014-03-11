@@ -11,7 +11,6 @@ import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Task;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SamplingDesignExportTask extends Task {
 	
-	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 
 	//parameters
@@ -87,6 +85,15 @@ public class SamplingDesignExportTask extends Task {
 		writer.writeNext(lineValues.toArray(new String[0]));
 	}
 
+	public SamplingDesignManager getSamplingDesignManager() {
+		return samplingDesignManager;
+	}
+	
+	public void setSamplingDesignManager(
+			SamplingDesignManager samplingDesignManager) {
+		this.samplingDesignManager = samplingDesignManager;
+	}
+	
 	public OutputStream getOutputStream() {
 		return outputStream;
 	}

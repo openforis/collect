@@ -96,6 +96,22 @@ public class DataBackupTask extends Task {
 		}
 	}
 	
+	public RecordManager getRecordManager() {
+		return recordManager;
+	}
+	
+	public void setRecordManager(RecordManager recordManager) {
+		this.recordManager = recordManager;
+	}
+	
+	public DataMarshaller getDataMarshaller() {
+		return dataMarshaller;
+	}
+	
+	public void setDataMarshaller(DataMarshaller dataMarshaller) {
+		this.dataMarshaller = dataMarshaller;
+	}
+	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}

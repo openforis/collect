@@ -1,11 +1,9 @@
-package org.openforis.collect.io.metadata;
+package org.openforis.collect.io.internal;
 
 import java.io.OutputStream;
-import java.util.Date;
-import java.util.Properties;
 
-import org.openforis.collect.Collect;
-import org.openforis.collect.utils.Dates;
+import org.openforis.collect.io.SurveyBackupInfo;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -21,13 +19,12 @@ import org.springframework.stereotype.Component;
 public class SurveyBackupInfoCreatorTask extends Task {
 
 	private OutputStream outputStream;
+	private CollectSurvey survey;
 	
 	@Override
 	protected void execute() throws Throwable {
-		Properties prop = new Properties();
-		prop.setProperty("collect_version", Collect.getVersion());
-		prop.setProperty("date", Dates.formatDateToXML(new Date()));
-		prop.store(outputStream, null);
+		SurveyBackupInfo info = new SurveyBackupInfo(survey.getUri());
+		info.store(outputStream);
 	}
 	
 	public OutputStream getOutputStream() {
@@ -38,4 +35,11 @@ public class SurveyBackupInfoCreatorTask extends Task {
 		this.outputStream = outputStream;
 	}
 	
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+	}
 }

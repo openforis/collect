@@ -8,7 +8,6 @@ import java.io.File;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Task;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class IdmlUnmarshallTask extends Task {
 
-	@Autowired
 	private SurveyManager surveyManager;
 	
 	//input
@@ -34,6 +32,14 @@ public class IdmlUnmarshallTask extends Task {
 	@Override
 	protected void execute() throws Throwable {
 		this.survey = this.surveyManager.unmarshalSurvey(file, validate, false);
+	}
+	
+	public SurveyManager getSurveyManager() {
+		return surveyManager;
+	}
+	
+	public void setSurveyManager(SurveyManager surveyManager) {
+		this.surveyManager = surveyManager;
 	}
 
 	public boolean isValidate() {

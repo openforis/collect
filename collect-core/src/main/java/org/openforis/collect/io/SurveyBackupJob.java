@@ -10,13 +10,16 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.data.RecordFileBackupTask;
 import org.openforis.collect.io.data.DataBackupTask;
+import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
 import org.openforis.collect.io.metadata.IdmlExportTask;
-import org.openforis.collect.io.metadata.SurveyBackupInfoCreatorTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupExportTask;
+import org.openforis.collect.manager.RecordFileManager;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.WorkerStatusChangeEvent;
 import org.openforis.concurrency.WorkerStatusChangeListener;
@@ -44,6 +47,15 @@ public class SurveyBackupJob extends Job {
 	public static final String DATA_FOLDER = "data";
 	public static final String UPLOADED_FILES_FOLDER = "upload";
 	
+	@Autowired
+	private transient RecordManager recordManager;
+	@Autowired
+	private transient RecordFileManager recordFileManager;
+	@Autowired
+	private transient DataMarshaller dataMarshaller;
+	@Autowired
+	private transient SpeciesManager speciesManager;
+	
 	//input
 	private transient CollectSurvey survey;
 	private boolean includeData;
@@ -55,9 +67,6 @@ public class SurveyBackupJob extends Job {
 	//temporary instance variable
 	private transient ZipOutputStream zipOutputStream;
 	
-	@Autowired
-	private transient SpeciesManager speciesManager;
-
 	public void configure(CollectSurvey survey, boolean includeData, boolean includeRecordFiles) {
 		this.survey = survey;
 		this.includeData = includeData;
@@ -95,6 +104,7 @@ public class SurveyBackupJob extends Job {
 	private void addInfoPropertiesCreatorTask() {
 		SurveyBackupInfoCreatorTask task = createTask(SurveyBackupInfoCreatorTask.class);
 		task.setOutputStream(zipOutputStream);
+		task.setSurvey(survey);
 		task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(INFO_FILE_NAME));
 		addTask(task);
 	}
@@ -124,6 +134,7 @@ public class SurveyBackupJob extends Job {
 		}
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
+			task.setSpeciesManager(speciesManager);
 			task.setOutputStream(zipOutputStream);
 			task.setTaxonomyId(taxonomy.getId());
 			String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
@@ -135,6 +146,8 @@ public class SurveyBackupJob extends Job {
 	private void addDataExportTask() {
 		for (EntityDefinition rootEntity : survey.getSchema().getRootEntityDefinitions()) {
 			DataBackupTask task = createTask(DataBackupTask.class);
+			task.setRecordManager(recordManager);
+			task.setDataMarshaller(dataMarshaller);
 			task.setZipOutputStream(zipOutputStream);
 			task.setSurvey(survey);
 			task.setRootEntityName(rootEntity.getName());
@@ -145,11 +158,29 @@ public class SurveyBackupJob extends Job {
 	private void addRecordFilesBackupTask() {
 		for (EntityDefinition rootEntity : survey.getSchema().getRootEntityDefinitions()) {
 			RecordFileBackupTask task = createTask(RecordFileBackupTask.class);
+			task.setRecordManager(recordManager);
+			task.setRecordFileManager(recordFileManager);
 			task.setZipOutputStream(zipOutputStream);
 			task.setSurvey(survey);
 			task.setRootEntityName(rootEntity.getName());
 			addTask(task);
 		}
+	}
+	
+	public RecordManager getRecordManager() {
+		return recordManager;
+	}
+	
+	public void setRecordManager(RecordManager recordManager) {
+		this.recordManager = recordManager;
+	}
+	
+	public DataMarshaller getDataMarshaller() {
+		return dataMarshaller;
+	}
+	
+	public void setDataMarshaller(DataMarshaller dataMarshaller) {
+		this.dataMarshaller = dataMarshaller;
 	}
 
 	public CollectSurvey getSurvey() {

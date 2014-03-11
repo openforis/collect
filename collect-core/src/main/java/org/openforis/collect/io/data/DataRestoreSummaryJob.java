@@ -8,7 +8,9 @@ import java.util.List;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +27,15 @@ import org.springframework.stereotype.Component;
 public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 
 	@Autowired
-	private transient SurveyManager surveyManager;
+	private RecordManager recordManager;
+	@Autowired
+	private UserManager userManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	
 	//output
 	protected DataImportSummary summary;
-	
+
 	@Override
 	public void initInternal() throws Throwable {
 		super.initInternal();
@@ -49,6 +55,8 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 		super.prepareTask(task);
 		if ( task instanceof DataRestoreSummaryTask ) {
 			DataRestoreSummaryTask t = (DataRestoreSummaryTask) task;
+			t.setRecordManager(recordManager);
+			t.setUserManager(userManager);
 			t.setZipFile(zipFile);
 			t.setEntryPrefix(SurveyBackupJob.DATA_FOLDER);
 			t.setPackagedSurvey(packagedSurvey);
@@ -82,6 +90,22 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 		return ! dataEntries.isEmpty();
 	}
 
+	public UserManager getUserManager() {
+		return userManager;
+	}
+	
+	public void setUserManager(UserManager userManager) {
+		this.userManager = userManager;
+	}
+	
+	public RecordManager getRecordManager() {
+		return recordManager;
+	}
+	
+	public void setRecordManager(RecordManager recordManager) {
+		this.recordManager = recordManager;
+	}
+	
 	public DataImportSummary getSummary() {
 		return summary;
 	}

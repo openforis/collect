@@ -33,7 +33,6 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 
 	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
 	
-	@Autowired
 	private SpeciesManager speciesManager;
 
 	//input
@@ -158,6 +157,14 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 		Node parentNode = line.getParentId() == null ? null : taxonTree.getNodeBySystemId(line.getParentId());
 		Taxon parent = parentNode == null ? null : parentNode.getTaxon();
 		return parent;
+	}
+	
+	public SpeciesManager getSpeciesManager() {
+		return speciesManager;
+	}
+	
+	public void setSpeciesManager(SpeciesManager speciesManager) {
+		this.speciesManager = speciesManager;
 	}
 	
 	public File getFile() {

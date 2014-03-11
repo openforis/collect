@@ -150,5 +150,8 @@
 	<bean id="jobExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor">
 		<property name="concurrencyLimit" value="20"/>
 	</bean>
+
+	<!-- Async job executor -->
+	<bean id="jobManager" class="org.openforis.concurrency.SpringJobManager" />
 	
 </beans>

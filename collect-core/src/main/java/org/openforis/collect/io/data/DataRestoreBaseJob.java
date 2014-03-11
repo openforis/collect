@@ -61,6 +61,7 @@ public abstract class DataRestoreBaseJob extends Job {
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 			File idmlFile = backupFileExtractor.extractIdmlFile();
+			t.setSurveyManager(surveyManager);
 			t.setFile(idmlFile);
 			t.setValidate(false);
 		}
@@ -79,6 +80,14 @@ public abstract class DataRestoreBaseJob extends Job {
 		if ( publishedSurvey == null ) {
 			throw new RuntimeException(String.format("Published survey with uri %s not found", surveyUri));
 		}
+	}
+	
+	public SurveyManager getSurveyManager() {
+		return surveyManager;
+	}
+	
+	public void setSurveyManager(SurveyManager surveyManager) {
+		this.surveyManager = surveyManager;
 	}
 	
 	public File getFile() {

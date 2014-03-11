@@ -14,14 +14,13 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.openforis.collect.io.data.DataRestoreTask;
-import org.openforis.collect.io.data.RecordFileRestoreTask;
+import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupImportTask;
-import org.openforis.collect.manager.RecordFileManager;
-import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.manager.SamplingDesignManager;
+import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
@@ -39,23 +38,29 @@ import org.springframework.stereotype.Component;
 public class SurveyRestoreJob extends Job {
 
 	@Autowired
-	private RecordManager recordManager;
+	private transient SurveyManager surveyManager;
 	@Autowired
-	private RecordFileManager recordFileManager;
+	private transient SpeciesManager speciesManager;
 	@Autowired
-	private UserManager userManager;
+	private transient SamplingDesignManager samplingDesignManager;
 	
 	//parameters
 	private transient File file;
 	private String publishedSurveyUri;
-	private boolean restoreData;
-	private boolean updatingExistingSurvey;
-	private boolean updatingPublishedSurvey;
+	/**
+	 * When it's true, a new survey work is created to store the packaged survey,
+	 * otherwise the work survey with the same URI as the packaged one will be updated.
+	 */
+	private boolean newSurvey;
+	/**
+	 * If true, a copy of the published survey is created as "work" survey and 
+	 * it will be update with the packaged survey.
+	 */
+	private boolean updatePublishedSurvey;
 	private String surveyName;
 
 	//temporary instance variables
 	private transient ZipFile zipFile;
-	
 	private transient CollectSurvey survey;
 	
 	@Override
@@ -66,53 +71,45 @@ public class SurveyRestoreJob extends Job {
 	
 	@Override
 	protected void buildAndAddTasks() throws Throwable {
+		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+		addTask(SurveyBackupInfoExtractorTask.class);
 		addTask(IdmlImportTask.class);
-		addTask(SamplingDesignImportTask.class);
-		addSpeciesImportTasks();
-		if ( updatingPublishedSurvey && restoreData && isDataIncluded() ) {
-			addTask(DataRestoreTask.class);
-			if ( isUploadedFilesIncluded() ) {
-				addTask(RecordFileRestoreTask.class);
-			}
+		if ( backupFileExtractor.containsEntry(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME) ) {
+			addTask(SamplingDesignImportTask.class);
+		}
+		if ( backupFileExtractor.containsEntriesInPath(SurveyBackupJob.SPECIES_FOLDER) ) {
+			addSpeciesImportTasks();
 		}
 	}
 	
 	@Override
 	protected void prepareTask(Task task) {
-		if ( task instanceof IdmlImportTask ) {
+		if ( task instanceof SurveyBackupInfoExtractorTask ) {
+			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
+			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+			File infoFile = backupFileExtractor.extract(SurveyBackupJob.INFO_FILE_NAME);
+			t.setFile(infoFile);
+		} else if ( task instanceof IdmlImportTask ) {
 			IdmlImportTask t = (IdmlImportTask) task;
 			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 			File idmlFile = backupFileExtractor.extractIdmlFile();
+			t.setSurveyManager(surveyManager);
 			t.setFile(idmlFile);
 			t.setPublishedSurveyUri(publishedSurveyUri);
 			t.setName(surveyName);
-			t.setUpdatingExistingSurvey(updatingExistingSurvey);
-			t.setUpdatingPublishedSurvey(updatingPublishedSurvey);
+			t.setNewSurvey(newSurvey);
+			t.setUpdatePublishedSurvey(updatePublishedSurvey);
 		} else if ( task instanceof SamplingDesignImportTask ) {
 			SamplingDesignImportTask t = (SamplingDesignImportTask) task;
 			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 			File samplingDesignFile = backupFileExtractor.extract(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
+			t.setSamplingDesignManager(samplingDesignManager);
 			t.setFile(samplingDesignFile);
 			t.setOverwriteAll(true);
 			t.setSurvey(survey);
 		} else if ( task instanceof SpeciesBackupImportTask ) {
 			SpeciesBackupImportTask t = (SpeciesBackupImportTask) task;
-			t.setSurvey(survey);
-		} else if ( task instanceof DataRestoreTask ) {
-			DataRestoreTask t = (DataRestoreTask) task;
-			t.setRecordManager(recordManager);
-			t.setUserManager(userManager);
-			t.setEntryBasePath(SurveyBackupJob.DATA_FOLDER);
-			t.setZipFile(zipFile);
-			t.setPackagedSurvey(survey);
-			t.setExistingSurvey(survey);
-			t.setOverwriteAll(true);
-		} else if ( task instanceof RecordFileRestoreTask ) {
-			RecordFileRestoreTask t = (RecordFileRestoreTask) task;
-			t.setRecordManager(recordManager);
-			t.setRecordFileManager(recordFileManager);
-			t.setZipFile(zipFile);
-			t.setOverwriteAll(true);
+			t.setSpeciesManager(speciesManager);
 			t.setSurvey(survey);
 		}
 		super.prepareTask(task);
@@ -132,9 +129,9 @@ public class SurveyRestoreJob extends Job {
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		List<String> speciesFilesNames = backupFileExtractor.listEntriesInPath(SurveyBackupJob.SPECIES_FOLDER);
 		for (String speciesFileName : speciesFilesNames) {
-			final SpeciesBackupImportTask task = createTask(SpeciesBackupImportTask.class);
-			File file = backupFileExtractor.extract(speciesFileName);
 			String taxonomyName = FilenameUtils.getBaseName(speciesFileName);
+			File file = backupFileExtractor.extract(speciesFileName);
+			SpeciesBackupImportTask task = createTask(SpeciesBackupImportTask.class);
 			task.setFile(file);
 			task.setTaxonomyName(taxonomyName);
 			task.setOverwriteAll(true);
@@ -142,18 +139,6 @@ public class SurveyRestoreJob extends Job {
 		}
 	}
 
-	private boolean isDataIncluded() throws IOException {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.DATA_FOLDER);
-		return ! dataEntries.isEmpty();
-	}
-
-	private boolean isUploadedFilesIncluded() throws IOException {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.UPLOADED_FILES_FOLDER);
-		return ! dataEntries.isEmpty();
-	}
-	
 	@Override
 	protected void execute() throws Throwable {
 		super.execute();
@@ -170,14 +155,26 @@ public class SurveyRestoreJob extends Job {
 			this.zipFile = zipFile;
 		}
 		
+		public File extractInfoFile() {
+			return extract(SurveyBackupJob.INFO_FILE_NAME);
+		}
+		
 		public File extractIdmlFile() {
 			return extract(SurveyBackupJob.SURVEY_XML_ENTRY_NAME);
 		}
 		
 		public File extract(String entryName) {
+			return extract(entryName, true);
+		}
+		
+		public File extract(String entryName, boolean required) {
 			ZipEntry entry = findEntry(entryName);
 			if ( entry == null ) {
-				return null;
+				if ( required ) {
+					throw new RuntimeException("Entry not found in packaged file: " + entryName);
+				} else {
+					return null;
+				}
 			} else {
 				return extract(entry);
 			}
@@ -197,8 +194,8 @@ public class SurveyRestoreJob extends Job {
 		}
 		
 		public List<String> listEntriesInPath(String path) {
-			if ( ! path.endsWith("/") ) {
-				path += "/";
+			if ( ! path.endsWith(SurveyBackupJob.ZIP_FOLDER_SEPARATOR) ) {
+				path += SurveyBackupJob.ZIP_FOLDER_SEPARATOR;
 			}
 			List<String> result = new ArrayList<String>();
 			Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
@@ -243,8 +240,43 @@ public class SurveyRestoreJob extends Job {
 				return is;
 			}
 		}
+
+		public boolean containsEntry(String name) {
+			ZipEntry entry = findEntry(name);
+			return entry != null;
+		}
+		
+		public boolean containsEntriesInPath(String path) {
+			List<String> entryNames = listEntriesInPath(path);
+			return ! entryNames.isEmpty();
+		}
+		
 	}
 
+	public SurveyManager getSurveyManager() {
+		return surveyManager;
+	}
+	
+	public void setSurveyManager(SurveyManager surveyManager) {
+		this.surveyManager = surveyManager;
+	}
+	
+	public SamplingDesignManager getSamplingDesignManager() {
+		return samplingDesignManager;
+	}
+	
+	public void setSamplingDesignManager(SamplingDesignManager samplingDesignManager) {
+		this.samplingDesignManager = samplingDesignManager;
+	}
+	
+	public SpeciesManager getSpeciesManager() {
+		return speciesManager;
+	}
+	
+	public void setSpeciesManager(SpeciesManager speciesManager) {
+		this.speciesManager = speciesManager;
+	}
+	
 	public File getFile() {
 		return file;
 	}
@@ -257,22 +289,22 @@ public class SurveyRestoreJob extends Job {
 		return survey;
 	}
 
-	public boolean isUpdatingExistingSurvey() {
-		return updatingExistingSurvey;
+	public boolean isNewSurvey() {
+		return newSurvey;
 	}
-
-	public void setUpdatingExistingSurvey(boolean updatingExistingSurvey) {
-		this.updatingExistingSurvey = updatingExistingSurvey;
+	
+	public void setNewSurvey(boolean newSurvey) {
+		this.newSurvey = newSurvey;
 	}
-
-	public boolean isUpdatingPublishedSurvey() {
-		return updatingPublishedSurvey;
+	
+	public boolean isUpdatePublishedSurvey() {
+		return updatePublishedSurvey;
 	}
-
-	public void setUpdatingPublishedSurvey(boolean updatingPublishedSurvey) {
-		this.updatingPublishedSurvey = updatingPublishedSurvey;
+	
+	public void setUpdatePublishedSurvey(boolean updatePublishedSurvey) {
+		this.updatePublishedSurvey = updatePublishedSurvey;
 	}
-
+	
 	public String getSurveyName() {
 		return surveyName;
 	}
@@ -288,4 +320,5 @@ public class SurveyRestoreJob extends Job {
 	public void setPublishedSurveyUri(String publishedSurveyUri) {
 		this.publishedSurveyUri = publishedSurveyUri;
 	}
+	
 }
