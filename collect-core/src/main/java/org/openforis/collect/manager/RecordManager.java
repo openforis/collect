@@ -1150,4 +1150,19 @@ public class RecordManager {
 		this.recordDao = recordDao;
 	}
 
+    public CodeListManager getCodeListManager() {
+        return codeListManager;
+    }
+
+    public void setCodeListManager(CodeListManager codeListManager) {
+        this.codeListManager = codeListManager;
+    }
+
+    public SurveyManager getSurveyManager() {
+        return surveyManager;
+    }
+
+    public void setSurveyManager(SurveyManager surveyManager) {
+        this.surveyManager = surveyManager;
+    }
 }
