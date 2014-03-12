@@ -32,6 +32,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.openforis.idm.metamodel.validation.Check;
@@ -60,6 +61,8 @@ public class SurveyValidator {
 			IDML_UI_XSD_FILE_NAME 
 	};
 	
+	private static final String CODE_LIST_PATH_FORMAT = "codeList/%s";
+
 	@Autowired
 	private CodeListManager codeListManager;
 	
@@ -92,6 +95,9 @@ public class SurveyValidator {
 		//root entity key required
 		partialResults = validateRootKeyAttributeSpecified(survey);
 		results.addAll(partialResults);
+		//empty or unused code lists not allowed
+		partialResults = validateCodeLists(survey);
+		results.addAll(partialResults);
 		//empty entities not allowed
 		partialResults = validateEntities(survey);
 		results.addAll(partialResults);
@@ -120,6 +126,45 @@ public class SurveyValidator {
 		return results;
 	}
 	
+	private List<SurveyValidationResult> validateCodeLists(CollectSurvey survey) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList list : codeLists) {
+			if ( ! isCodeListInUse(list) ) {
+				//unused code list not allowed
+				SurveyValidationResult validationResult = new SurveyValidationResult(String.format(CODE_LIST_PATH_FORMAT, list.getName()), 
+						"survey.validation.error.unused_code_list");
+				results.add(validationResult);
+			} else if ( ! list.isExternal() && codeListManager.isEmpty(list) ) {
+				//empty code list not allowed
+				SurveyValidationResult validationResult = new SurveyValidationResult(String.format(CODE_LIST_PATH_FORMAT, list.getName()), 
+						"survey.validation.error.empty_code_list");
+				results.add(validationResult);
+			}
+		}
+		return results;
+	}
+
+	protected boolean isCodeListInUse(CodeList list) {
+		Survey survey = list.getSurvey();
+		Schema schema = survey.getSchema();
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		stack.addAll(schema.getRootEntityDefinitions());
+		while ( ! stack.isEmpty() ) {
+			NodeDefinition node = stack.pop();
+			if ( node instanceof CodeAttributeDefinition ) {
+				if ( list.equals(((CodeAttributeDefinition) node).getList()) ) {
+					return true;
+				}
+			} else if ( node instanceof EntityDefinition ) {
+				for (NodeDefinition nodeDefinition : ((EntityDefinition) node).getChildDefinitions()) {
+					stack.add(nodeDefinition);
+				}
+			} 
+		}
+		return false;
+	}
+
 	public List<SurveyValidationResult> validateChanges(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<SurveyValidationResult> partialResults;
@@ -403,7 +448,8 @@ public class SurveyValidator {
 			CodeListItem newItem = codeListManager.loadRootItem(codeList, oldItem.getCode(), null);
 			if ( newItem == null ) {
 				String messageKey = "survey.validation.error.enumerating_code_list_changed.code_removed";
-				String path = "codeList" + "/" + codeList.getName() + "/" + oldItem.getCode();
+				String codeListPath = String.format(CODE_LIST_PATH_FORMAT, codeList.getName());
+				String path = codeListPath + "/" + oldItem.getCode();
 				SurveyValidationResult validationError = new SurveyValidationResult(path, messageKey);
 				results.add(validationError);
 			}

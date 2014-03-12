@@ -39,6 +39,7 @@ import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.utils.OpenForisIOUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Entity;
@@ -80,6 +81,11 @@ public class XMLDataImportProcess implements Callable<Void> {
 	 */
 	private CollectSurvey packagedSurvey;
 
+	/**
+	 * Survey stored in the system with the same uri as the packaged one
+	 */
+	private CollectSurvey existingSurvey;
+
 	private boolean overwriteAll;
 
 	private DataUnmarshaller dataUnmarshaller;
@@ -91,12 +97,15 @@ public class XMLDataImportProcess implements Callable<Void> {
 	private List<Integer> entryIdsToImport;
 
 	private boolean includesRecordFiles;
+	
+	private Predicate<CollectRecord> includeRecordPredicate;
 
 	public XMLDataImportProcess() {
 		super();
 		this.state = new DataImportState();
 		this.processedRecords = new ArrayList<Integer>();
 		this.entryIdsToImport = new ArrayList<Integer>();
+		this.includeRecordPredicate = null;
 	}
 
 	public DataImportState getState() {
@@ -141,8 +150,10 @@ public class XMLDataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.RUNNING);
 			summary = null;
 			packagedSurvey = extractPackagedSurvey();
+			existingSurvey = loadExistingSurvey();
+
 			validatePackagedSurvey();
-			CollectSurvey existingSurvey = getExistingSurvey();
+			
 			dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
 			
 			Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
@@ -210,7 +221,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 
-	protected CollectSurvey getExistingSurvey() {
+	protected CollectSurvey loadExistingSurvey() {
 		String uri;
 		if ( surveyUri == null ) {
 			if ( packagedSurvey == null ) {
@@ -247,7 +258,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		if ( ! parseRecordResult.isSuccess()) {
 			List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
 			packagedSkippedFileErrors.put(entryName, failures);
-		} else {
+		} else if ( includeRecordPredicate == null || includeRecordPredicate.evaluate(parsedRecord) ) {
 			int entryId = recordEntry.getRecordId();
 			CollectRecord recordSummary = createRecordSummary(parsedRecord);
 			packagedRecords.put(entryId, recordSummary);
@@ -618,4 +629,20 @@ public class XMLDataImportProcess implements Callable<Void> {
 		this.file = file;
 	}
 
+	public CollectSurvey getExistingSurvey() {
+		return existingSurvey;
+	}
+
+	public CollectSurvey getPackagedSurvey() {
+		return packagedSurvey;
+	}
+	
+	public Predicate<CollectRecord> getIncludeRecordPredicate() {
+		return includeRecordPredicate;
+	}
+	
+	public void setIncludeRecordPredicate(Predicate<CollectRecord> includeRecordPredicate) {
+		this.includeRecordPredicate = includeRecordPredicate;
+	}
+	
 }

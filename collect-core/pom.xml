@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.0-Alpha25-SNAPSHOT</version>
+		<version>3.0-Alpha29-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
@@ -259,6 +259,10 @@
         <dependency>
           <groupId>org.openforis.commons</groupId>
           <artifactId>commons-concurrency</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.openforis.commons</groupId>
+          <artifactId>commons-collections</artifactId>
         </dependency>
         <dependency>
 			<groupId>org.openforis.idm</groupId>

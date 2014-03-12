@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
 import org.openforis.collect.io.exception.DataParsingExeption;
 import org.openforis.collect.manager.RecordManager;
@@ -26,6 +27,7 @@ import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.utils.OpenForisIOUtils;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.model.Entity;
@@ -50,14 +52,20 @@ public class DataRestoreSummaryTask extends Task {
 	private String entryPrefix;
 
 	/**
-	 * Survey contained into the backup file
+	 * Survey packaged into the backup file
 	 */
 	private CollectSurvey packagedSurvey;
+	
 	/**
 	 * Published survey already inserted into the system
 	 */
 	private CollectSurvey existingSurvey;
 	
+	/**
+	 * If specified, it will be used to filter the records to include in the summary
+	 */
+	private Predicate<CollectRecord> includeRecordPredicate;
+
 	//temporary instance variables
 	private DataUnmarshaller dataUnmarshaller;
 	private DataImportSummary summary;
@@ -103,7 +111,7 @@ public class DataRestoreSummaryTask extends Task {
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
 			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
 		String entryName = zipEntry.getName();
-		BackupDataExtractor.BackupRecordEntry recordEntry = BackupDataExtractor.BackupRecordEntry.parse(entryName, entryPrefix);
+		BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, entryPrefix);
 		Step step = recordEntry.getStep();
 		InputStream is = zipFile.getInputStream(zipEntry);
 		InputStreamReader reader = OpenForisIOUtils.toReader(is);
@@ -112,7 +120,8 @@ public class DataRestoreSummaryTask extends Task {
 		if ( ! parseRecordResult.isSuccess()) {
 			List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
 			packagedSkippedFileErrors.put(entryName, failures);
-		} else {
+			incrementItemsSkipped();
+		} else if ( includeRecordPredicate == null || includeRecordPredicate.evaluate(parsedRecord) ) {
 			int entryId = recordEntry.getRecordId();
 			CollectRecord recordSummary = createRecordSummary(parsedRecord);
 			packagedRecords.put(entryId, recordSummary);
@@ -136,8 +145,8 @@ public class DataRestoreSummaryTask extends Task {
 				}
 				warningsPerEntry.put(step, parseRecordResult.getWarnings());
 			}
+			incrementItemsProcessed();
 		}
-		incrementItemsProcessed();
 	}
 	
 	private DataImportSummary createSummary(
@@ -301,5 +310,13 @@ public class DataRestoreSummaryTask extends Task {
 		return entryPrefix;
 	}
 
+	public Predicate<CollectRecord> getIncludeRecordPredicate() {
+		return includeRecordPredicate;
+	}
+	
+	public void setIncludeRecordPredicate(
+			Predicate<CollectRecord> includeRecordPredicate) {
+		this.includeRecordPredicate = includeRecordPredicate;
+	}
 	
 }

@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -64,8 +65,8 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private CollectSurvey survey;
 	private Step[] steps;
 	private String rootEntityName;
-
 	private boolean includeIdm;
+	private Date modifiedSince;
 	
 	public XMLDataExportProcess() {
 		super();
@@ -124,7 +125,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	}
 
 	private List<CollectRecord> loadAllSummaries() {
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String) null);
+		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, modifiedSince);
 		return summaries;
 	}
 	
@@ -258,6 +259,14 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	
 	public void setOutputFile(File outputFile) {
 		this.outputFile = outputFile;
+	}
+
+	public Date getModifiedSince() {
+		return modifiedSince;
+	}
+
+	public void setModifiedSince(Date modifiedSince) {
+		this.modifiedSince = modifiedSince;
 	}
 	
 }

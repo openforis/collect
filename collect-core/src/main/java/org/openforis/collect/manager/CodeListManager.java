@@ -333,6 +333,17 @@ public class CodeListManager {
 		}
 	}
 	
+	public boolean isEmpty(CodeList list) {
+		if ( list.isExternal() ) {
+			//TODO 
+			return false;
+		} else if ( list.isEmpty() ) {
+			return codeListItemDao.isEmpty(list);
+		} else {
+			return false;
+		}
+	}
+	
 	public boolean hasChildItems(CodeListItem parent) {
 		CodeList list = parent.getCodeList();
 		if ( list.isExternal() ) {

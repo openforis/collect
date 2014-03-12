@@ -11,7 +11,9 @@ import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -33,8 +35,11 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	@Autowired
 	private SurveyManager surveyManager;
 	
+	//input
+	private Predicate<CollectRecord> includeRecordPredicate;
+	
 	//output
-	protected DataImportSummary summary;
+	private DataImportSummary summary;
 
 	@Override
 	public void initInternal() throws Throwable {
@@ -62,6 +67,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setPackagedSurvey(packagedSurvey);
 			t.setExistingSurvey(publishedSurvey);
 			t.setPackagedSurvey(DataRestoreSummaryJob.this.packagedSurvey);
+			t.setIncludeRecordPredicate(includeRecordPredicate);
 		}
 	}
 	
@@ -104,6 +110,15 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	
 	public void setRecordManager(RecordManager recordManager) {
 		this.recordManager = recordManager;
+	}
+	
+	public Predicate<CollectRecord> getIncludeRecordPredicate() {
+		return includeRecordPredicate;
+	}
+	
+	public void setIncludeRecordPredicate(
+			Predicate<CollectRecord> includeRecordPredicate) {
+		this.includeRecordPredicate = includeRecordPredicate;
 	}
 	
 	public DataImportSummary getSummary() {
