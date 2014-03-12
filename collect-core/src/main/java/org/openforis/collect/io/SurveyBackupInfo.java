@@ -66,12 +66,12 @@ public class SurveyBackupInfo {
 		this.date = date;
 	}
 	
-	public String getSurveyURI() {
+	public String getSurveyUri() {
 		return surveyUri;
 	}
 	
-	public void setSurveyURI(String surveyURI) {
-		this.surveyUri = surveyURI;
+	public void setSurveyUri(String surveyUri) {
+		this.surveyUri = surveyUri;
 	}
 	
 	public String getCollectVersion() {

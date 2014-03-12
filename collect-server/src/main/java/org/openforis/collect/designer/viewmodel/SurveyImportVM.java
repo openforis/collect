@@ -12,6 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.SurveyBackupInfoExtractorJob;
 import org.openforis.collect.io.SurveyRestoreJob;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
@@ -98,6 +99,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 				String messageKey = updatingPublishedSurvey ? 
 					"survey.import_survey.confirm_overwrite_published.message": 
 					"survey.import_survey.confirm_overwrite.message";
+				
+				String okLabelKey = updatingPublishedSurvey ? "survey.import_survey": "global.overwrite";
+				
 				MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 					@Override
 					public void onOk() {
@@ -105,7 +109,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 					}
 				}, messageKey, args, 
 					"survey.import_survey.confirm_overwrite.title", (String[]) null, 
-					"global.overwrite", "global.cancel");
+					okLabelKey, "global.cancel");
 			} else {
 				startSurveyImport();
 			}
@@ -261,8 +265,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 
 	protected void onSummaryCreationComplete() {
+		SurveyBackupInfo info = summaryJob.getInfo();
 		survey = summaryJob.getSurvey();
-		uploadedSurveyUri = survey.getUri();
+		uploadedSurveyUri = info.getSurveyUri();
 		summaryJob = null;
 		
 		updateForm();
@@ -311,10 +316,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 		String surveyName = getFormSurveyName();
 		restoreJob = jobManager.createJob(SurveyRestoreJob.class);
 		restoreJob.setFile(uploadedFile);
-		restoreJob.setPublishedSurveyUri(survey.getUri());
 		restoreJob.setSurveyName(surveyName);
-		restoreJob.setNewSurvey(! updatingExistingSurvey);
-		restoreJob.setUpdatePublishedSurvey(updatingPublishedSurvey);
+		restoreJob.setRestoreIntoPublishedSurvey(false);
+		restoreJob.setValidateSurvey(false);
 		
 		jobManager.start(restoreJob);
 		openSurveyRestoreStatusPopUp();

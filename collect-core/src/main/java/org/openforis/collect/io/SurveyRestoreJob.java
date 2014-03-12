@@ -44,24 +44,29 @@ public class SurveyRestoreJob extends Job {
 	@Autowired
 	private transient SamplingDesignManager samplingDesignManager;
 	
-	//parameters
+	//input
 	private transient File file;
-	private String publishedSurveyUri;
-	/**
-	 * When it's true, a new survey work is created to store the packaged survey,
-	 * otherwise the work survey with the same URI as the packaged one will be updated.
-	 */
-	private boolean newSurvey;
-	/**
-	 * If true, a copy of the published survey is created as "work" survey and 
-	 * it will be update with the packaged survey.
-	 */
-	private boolean updatePublishedSurvey;
 	private String surveyName;
+	/**
+	 * Restores the survey into a published survey.
+	 * It creates a new one with the specified survey name if it does not exist.
+	 */
+	private boolean restoreIntoPublishedSurvey;
+	/**
+	 * If true, validates the XML file to import against schema.
+	 */
+	private boolean validateSurvey;
+
+	//output
+	private SurveyBackupInfo backupInfo;
+	private transient CollectSurvey survey;
 
 	//temporary instance variables
 	private transient ZipFile zipFile;
-	private transient CollectSurvey survey;
+	
+	public SurveyRestoreJob() {
+		this.restoreIntoPublishedSurvey = false;
+	}
 	
 	@Override
 	public void initInternal() throws Throwable {
@@ -95,10 +100,10 @@ public class SurveyRestoreJob extends Job {
 			File idmlFile = backupFileExtractor.extractIdmlFile();
 			t.setSurveyManager(surveyManager);
 			t.setFile(idmlFile);
-			t.setPublishedSurveyUri(publishedSurveyUri);
-			t.setName(surveyName);
-			t.setNewSurvey(newSurvey);
-			t.setUpdatePublishedSurvey(updatePublishedSurvey);
+			t.setSurveyUri(backupInfo.getSurveyUri());
+			t.setSurveyName(surveyName);
+			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
+			t.setValidate(validateSurvey);
 		} else if ( task instanceof SamplingDesignImportTask ) {
 			SamplingDesignImportTask t = (SamplingDesignImportTask) task;
 			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
@@ -118,10 +123,13 @@ public class SurveyRestoreJob extends Job {
 	@Override
 	protected void onTaskCompleted(Task task) {
 		super.onTaskCompleted(task);
-		if ( task instanceof IdmlImportTask ) {
+		if ( task instanceof SurveyBackupInfoExtractorTask ) {
+			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
+			this.backupInfo = t.getInfo();
+		} else if ( task instanceof IdmlImportTask ) {
 			IdmlImportTask t = (IdmlImportTask) task;
 			//get output survey and set it into job instance instance variable
-			SurveyRestoreJob.this.survey = t.getSurvey();
+			this.survey = t.getSurvey();
 		}
 	}
 	
@@ -285,26 +293,6 @@ public class SurveyRestoreJob extends Job {
 		this.file = file;
 	}
 
-	public CollectSurvey getSurvey() {
-		return survey;
-	}
-
-	public boolean isNewSurvey() {
-		return newSurvey;
-	}
-	
-	public void setNewSurvey(boolean newSurvey) {
-		this.newSurvey = newSurvey;
-	}
-	
-	public boolean isUpdatePublishedSurvey() {
-		return updatePublishedSurvey;
-	}
-	
-	public void setUpdatePublishedSurvey(boolean updatePublishedSurvey) {
-		this.updatePublishedSurvey = updatePublishedSurvey;
-	}
-	
 	public String getSurveyName() {
 		return surveyName;
 	}
@@ -313,12 +301,28 @@ public class SurveyRestoreJob extends Job {
 		this.surveyName = surveyName;
 	}
 
-	public String getPublishedSurveyUri() {
-		return publishedSurveyUri;
-	}
-
-	public void setPublishedSurveyUri(String publishedSurveyUri) {
-		this.publishedSurveyUri = publishedSurveyUri;
+	public boolean isRestoreIntoPublishedSurvey() {
+		return restoreIntoPublishedSurvey;
 	}
 	
+	public void setRestoreIntoPublishedSurvey(boolean restoreIntoPublishedSurvey) {
+		this.restoreIntoPublishedSurvey = restoreIntoPublishedSurvey;
+	}
+	
+	public boolean isValidateSurvey() {
+		return validateSurvey;
+	}
+	
+	public void setValidateSurvey(boolean validateSurvey) {
+		this.validateSurvey = validateSurvey;
+	}
+	
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+	
+	public SurveyBackupInfo getBackupInfo() {
+		return backupInfo;
+	}
+
 }

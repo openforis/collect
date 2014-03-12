@@ -7,6 +7,8 @@ import java.io.File;
 
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -22,26 +24,45 @@ public class IdmlImportTask extends Task {
 
 	private SurveyManager surveyManager;
 	
-	//parameters
+	//input
 	private transient File file;
-	private String publishedSurveyUri;
-	private boolean newSurvey;
-	private boolean updatePublishedSurvey;
-	private String name;
-
+	private boolean importInPublishedSurvey;
+	private String surveyUri;
+	private String surveyName;
+	private boolean validate;
+	
 	//output
 	private transient CollectSurvey survey;
+
+	public IdmlImportTask() {
+		this.validate = false;
+	}
 	
 	protected void execute() throws Throwable {
-		if ( newSurvey ) {
-			//import packaged survey into a new work survey
-			survey = surveyManager.importWorkModel(file, name, false);
-		} else if ( updatePublishedSurvey ) {
-			//duplicate published survey into work and update it with packaged file
-			survey = surveyManager.importInPublishedWorkModel(publishedSurveyUri, file, false);
+		SurveySummary oldSurveySummary = surveyManager.loadSummaryByUri(surveyUri);
+		if ( oldSurveySummary == null ) {
+			//new survey
+			if ( importInPublishedSurvey ) {
+				survey = surveyManager.importModel(file, surveyName, validate);
+			} else {
+				survey = surveyManager.importWorkModel(file, surveyName, validate);
+			}
+		} else if ( importInPublishedSurvey ) {
+			//survey already exists
+			if ( oldSurveySummary.getPublishedId() != null ) {
+				//published survey exists, update it
+				survey = surveyManager.updateModel(file, validate);
+			} else {
+				//work survey exists, cannot import survey as published
+				throw new SurveyImportException(String.format("Cannot import as published survey - " +
+						"survey work already exists for this uri (%s) delete it before proceed", surveyUri));
+			}
+		} else if ( oldSurveySummary.isWork() ) {
+			//survey work already exists, update it
+			survey = surveyManager.updateWorkModel(file, validate);
 		} else {
-			//update "temporary/work" survey
-			survey = surveyManager.updateModel(file, false);
+			//duplicates published survey into work and update it with packaged file
+			survey = surveyManager.importInPublishedWorkModel(surveyUri, file, validate);
 		}
 	}
 
@@ -53,10 +74,6 @@ public class IdmlImportTask extends Task {
 		this.surveyManager = surveyManager;
 	}
 	
-	public CollectSurvey getSurvey() {
-		return survey;
-	}
-
 	public File getFile() {
 		return file;
 	}
@@ -65,36 +82,40 @@ public class IdmlImportTask extends Task {
 		this.file = file;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public boolean isUpdatingExistingSurvey() {
-		return newSurvey;
-	}
-
-	public void setNewSurvey(boolean newSurvey) {
-		this.newSurvey = newSurvey;
-	}
-
-	public boolean isUpdatePublishedSurvey() {
-		return updatePublishedSurvey;
-	}
-
-	public void setUpdatePublishedSurvey(boolean updatePublishedSurvey) {
-		this.updatePublishedSurvey = updatePublishedSurvey;
-	}
-
-	public String getPublishedSurveyUri() {
-		return publishedSurveyUri;
-	}
-
-	public void setPublishedSurveyUri(String publishedSurveyUri) {
-		this.publishedSurveyUri = publishedSurveyUri;
+	public String getSurveyName() {
+		return surveyName;
 	}
 	
+	public void setSurveyName(String surveyName) {
+		this.surveyName = surveyName;
+	}
+
+	public String getSurveyUri() {
+		return surveyUri;
+	}
+	
+	public void setSurveyUri(String surveyUri) {
+		this.surveyUri = surveyUri;
+	}
+	
+	public boolean isImportInPublishedSurvey() {
+		return importInPublishedSurvey;
+	}
+	
+	public void setImportInPublishedSurvey(boolean importInPublishedSurvey) {
+		this.importInPublishedSurvey = importInPublishedSurvey;
+	}
+	
+	public boolean isValidate() {
+		return validate;
+	}
+	
+	public void setValidate(boolean validate) {
+		this.validate = validate;
+	}
+	
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
+
 }
