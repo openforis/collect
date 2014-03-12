@@ -248,7 +248,7 @@ public class RecordFileManager extends BaseStorageManager {
 	private String generateRepositoryFilename(FileAttribute fileAttribute, String tempFileName) {
 		Record record = fileAttribute.getRecord();
 		String extension = FilenameUtils.getExtension(tempFileName);
-		return record.getId() + "." + extension;
+		return String.format("%d_%d.%s", record.getId(), fileAttribute.getInternalId(), extension);
 	}
 
 	protected String generateUniqueFilename(java.io.File parentDir, String originalFileName) {
