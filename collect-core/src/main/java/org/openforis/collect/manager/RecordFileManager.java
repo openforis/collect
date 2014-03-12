@@ -39,6 +39,7 @@ public class RecordFileManager extends BaseStorageManager {
 	protected static Log LOG = LogFactory.getLog(RecordFileManager.class);
 
 	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
+	
 	private static final String TEMP_RECORD_FILES_SUBFOLDER = "collect_upload";
 	private static final String DEFAULT_RECORD_FILES_SUBFOLDER = "collect_upload";
 	

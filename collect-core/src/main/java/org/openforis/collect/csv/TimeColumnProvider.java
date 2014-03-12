@@ -4,9 +4,6 @@
 package org.openforis.collect.csv;
 
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
-import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Field;
-import org.openforis.idm.model.TimeAttribute;
 
 /**
  * @author S. Ricci
@@ -14,26 +11,18 @@ import org.openforis.idm.model.TimeAttribute;
  * @deprecated replaced with idm-transform api
  */
 @Deprecated
-public class TimeColumnProvider extends CompositeAttributeColumnProvider {
+public class TimeColumnProvider extends CompositeAttributeColumnProvider<TimeAttributeDefinition> {
 	
-	public TimeColumnProvider(String attributeName) {
-		super(attributeName);
+	public TimeColumnProvider(TimeAttributeDefinition defn) {
+		super(defn);
 	}
 
 	@Override
-	protected String[] getFieldsHeadings() {
+	protected String[] getFieldNames() {
 		return new String[] {
-				getFieldHeading(TimeAttributeDefinition.HOUR_FIELD),
-				getFieldHeading(TimeAttributeDefinition.MINUTE_FIELD)
+				TimeAttributeDefinition.HOUR_FIELD,
+				TimeAttributeDefinition.MINUTE_FIELD
 		};
 	}
 	
-	@Override
-	protected Field<?>[] getFieldsToExtract(Attribute<?, ?> attr) {
-		TimeAttribute timeAttr = (TimeAttribute) attr;
-		return new Field[] { 
-				timeAttr.getHourField(),
-				timeAttr.getMinuteField()
-		};
-	}
 }

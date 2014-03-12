@@ -36,9 +36,9 @@ public class RecordProxy implements Proxy {
 		errors = record.getErrors();
 		skipped = record.getSkipped();
 		missing = record.getMissing();
-		//missingErrors = record.getMissingErrors();
-		//missingWarnings = record.getMissingWarnings();
-		missingErrors = missingWarnings = 0; //TODO these values are not stored in records table
+		missingErrors = record.getMissingErrors();
+		missingWarnings = record.getMissingWarnings();
+		/*missingErrors = missingWarnings = 0; //TODO these values are not stored in records table */
 		warnings = record.getWarnings();
 		owner = record.getOwner() == null ? null: new UserProxy(record.getOwner());
 	}

@@ -57,12 +57,13 @@ package org.openforis.collect.ui.component.datagrid
 			switch ( recordSummary.step ) {
 				case CollectRecord$Step.ANALYSIS:
 				case CollectRecord$Step.CLEANSING:
+				case CollectRecord$Step.ENTRY:
 					totalErrors = recordSummary.errors + recordSummary.missing + recordSummary.skipped;
 					break;
-				case CollectRecord$Step.ENTRY:
+/*				case CollectRecord$Step.ENTRY:
 					totalErrors = recordSummary.errors + recordSummary.skipped;
 					break;
-			}
+*/			}
 			return totalErrors.toString();
 		}
 		

@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -257,8 +257,8 @@ public class CollectRecord extends Record {
 
 	public Integer getErrors() {
 		if(errors == null) {
-			errors = validationCache.getTotalAttributeErrors();
-			errors += validationCache.getTotalMaxCountErrors();
+			errors = validationCache.getTotalAttributeErrors() +
+					validationCache.getTotalMaxCountErrors();
 		}
 		return errors;
 	}
@@ -269,9 +269,9 @@ public class CollectRecord extends Record {
 
 	public Integer getWarnings() {
 		if(warnings == null) {
-			warnings = validationCache.getTotalAttributeWarnings();
-			warnings += validationCache.getTotalMinCountWarnings();
-			warnings += validationCache.getTotalMaxCountWarnings();
+			warnings = validationCache.getTotalAttributeWarnings() +
+						validationCache.getTotalMinCountWarnings() +
+						validationCache.getTotalMaxCountWarnings();
 		}
 		return warnings;
 	}
@@ -318,6 +318,22 @@ public class CollectRecord extends Record {
 	public void updateRootEntityKeyValues(){
 		Entity rootEntity = getRootEntity();
 		if(rootEntity != null) {
+			List<String> values = new ArrayList<String>();
+			CollectSurvey survey = (CollectSurvey) getSurvey();
+			Schema schema = survey.getSchema();
+			List<KeyAttributeDefinition> keyAttributeDefinitions = schema.getKeyAttributeDefinitions(rootEntity.getDefinition());
+			for (KeyAttributeDefinition keyDefn : keyAttributeDefinitions) {
+				Node<?> keyNode = this.getNodeByPath(((NodeDefinition) keyDefn).getPath());
+				if ( keyNode == null || keyNode.isEmpty() ) {
+					//TODO throw error in this case?
+					values.add(null);
+				} else {
+					String keyValue = getTextValue(keyNode);
+					values.add(keyValue);
+				}
+			}
+			rootEntityKeyValues = values;
+			/*
 			rootEntityKeyValues = new ArrayList<String>();
 			EntityDefinition rootEntityDefn = rootEntity.getDefinition();
 			List<AttributeDefinition> keyDefns = rootEntityDefn.getKeyAttributeDefinitions();
@@ -344,6 +360,21 @@ public class CollectRecord extends Record {
 					rootEntityKeyValues.add(null);
 				}
 			}
+			*/
+		}
+	}
+
+	private String getTextValue(Node<?> keyNode) {
+		if(keyNode instanceof CodeAttribute) {
+			Code code = ((CodeAttribute) keyNode).getValue();
+			return code == null ? null: code.getCode();
+		} else if(keyNode instanceof TextAttribute) {
+			return ((TextAttribute) keyNode).getText();
+		} else if(keyNode instanceof NumberAttribute<?,?>) {
+			Number number = ((NumberAttribute<?,?>) keyNode).getNumber();
+			return number == null ? null: number.toString();
+		} else {
+			throw new UnsupportedOperationException("Unsopported node type: " + keyNode.getClass().getName());
 		}
 	}
 

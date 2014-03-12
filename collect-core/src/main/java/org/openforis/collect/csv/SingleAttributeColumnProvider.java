@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -19,12 +20,12 @@ public class SingleAttributeColumnProvider implements ColumnProvider {
 	private String attributeName;
 	private String headerName;
 
-	public SingleAttributeColumnProvider(String childName) {
-		this(childName, childName);
+	public SingleAttributeColumnProvider(AttributeDefinition defn) {
+		this(defn, defn.getName());
 	}
 	
-	public SingleAttributeColumnProvider(String childName, String headerName) {
-		this.attributeName = childName;
+	public SingleAttributeColumnProvider(AttributeDefinition defn, String headerName) {
+		this.attributeName = defn.getName();
 		this.headerName = headerName;
 	}
 	

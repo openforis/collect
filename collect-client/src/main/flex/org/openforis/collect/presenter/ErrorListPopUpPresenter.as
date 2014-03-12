@@ -51,14 +51,12 @@ package org.openforis.collect.presenter
 			
 			var queue:Queue = new Queue();
 			queue.push(rootEntity);
-			var message:String, label:String, item:Object;
 			while ( ! queue.isEmpty() ) {
 				var node:NodeProxy = NodeProxy(queue.pop());
-				var messages:Array = null;
 				if ( node is AttributeProxy ) {
 					var attribute:AttributeProxy = AttributeProxy(node);
 					if ( attribute.hasErrors() ) {
-						item = createAttributeDataGridItem(attribute);
+						var item:Object = createAttributeDataGridItem(attribute);
 						dataProvider.addItem(item);
 					}
 				} else {
@@ -94,7 +92,11 @@ package org.openforis.collect.presenter
 				var maxCountValid:ValidationResultFlag = entity.childrenMaxCountValidationMap.get(childName);
 				if(minCountValid == ValidationResultFlag.ERROR || maxCountValid == ValidationResultFlag.ERROR) {
 					if ( minCountValid == ValidationResultFlag.ERROR ) {
-						messages = [Message.get("edit.validation.minCount", [childDefn.minCount > 0 ? childDefn.minCount: 1])];
+						if ( childDefn.minCount == 1 ) {
+							messages = [Message.get("edit.validation.requiredField")];
+						} else {
+							messages = [Message.get("edit.validation.minCount", [childDefn.minCount])];
+						}
 					} else {
 						messages = [Message.get("edit.validation.maxCount", [childDefn.maxCount > 0 ? childDefn.maxCount: 1])];
 					}

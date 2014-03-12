@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -18,47 +19,51 @@ import org.openforis.idm.model.Node;
  * @deprecated replaced with idm-transform api
  */
 @Deprecated
-public abstract class CompositeAttributeColumnProvider implements ColumnProvider {
+public abstract class CompositeAttributeColumnProvider<T extends AttributeDefinition> implements ColumnProvider {
 
-	private String attributeName;
-	private List<String> columnHeadings;
+	protected static final String FIELD_SEPARATOR = "_";
 
-	public CompositeAttributeColumnProvider(String attributeName) {
-		this.attributeName = attributeName;
-		this.columnHeadings = Arrays.asList(getFieldsHeadings());
+	protected T defn;
+
+	public CompositeAttributeColumnProvider(T defn) {
+		this.defn = defn;
 	}
 
-	protected abstract String[] getFieldsHeadings();
-
-	protected abstract Field<?>[] getFieldsToExtract(Attribute<?, ?> attr);
-
-	protected String getFieldHeading(String fieldName) {
-		return getAttributeName() + "_" + fieldName;
-	}
-	
 	@Override
 	public List<String> getColumnHeadings() {
-		return columnHeadings;
+		String[] fields = getFieldNames();
+		String[] headings = new String[fields.length];
+		
+		for (int i = 0; i < fields.length; i++) {
+			String field = fields[i];
+			headings[i] = getFieldHeading(field);
+		}
+		return Arrays.asList(headings);
 	}
 
+	protected abstract String[] getFieldNames();
+	
+	protected String getFieldHeading(String fieldName) {
+		return defn.getName() + FIELD_SEPARATOR + fieldName;
+	}
+	
 	@Override
 	public List<String> extractValues(Node<?> axis) {
 		if (axis == null) {
 			throw new NullPointerException("Axis must be non-null");
 		} else if (axis instanceof Entity) {
-			Attribute<?, ?> attr = (Attribute<?, ?>) ((Entity) axis).get(attributeName, 0);
+			Attribute<?, ?> attr = (Attribute<?, ?>) ((Entity) axis).get(defn.getName(), 0);
 			if (attr == null) {
-				int size = columnHeadings.size();
-				List<String> emptyValues = new ArrayList<String>();
-				for (int i = 0; i < size; i++) {
+				List<String> emptyValues = new ArrayList<String>(getFieldNames().length);
+				for (int i = 0; i < getFieldNames().length; i++) {
 					emptyValues.add("");
 				}
 				return emptyValues;
 			} else {
-				Field<?>[] fields = getFieldsToExtract(attr);
+				String[] fields = getFieldNames();
 				List<String> values = new ArrayList<String>(fields.length);
-				for (Field<?> field : fields) {
-					values.add(getFieldValue(field));
+				for (String fieldName : fields) {
+					values.add(extractValue(attr, fieldName));
 				}
 				return values;
 			}
@@ -67,13 +72,18 @@ public abstract class CompositeAttributeColumnProvider implements ColumnProvider
 		}
 	}
 
-	private String getFieldValue(Field<?> field) {
+	protected String extractValue(Field<?> field) {
 		Object value = field.getValue();
 		return value == null ? "" : value.toString();
 	}
+
+	protected String extractValue(Attribute<?, ?> attr, String fieldName) {
+		Field<?> field = attr.getField(fieldName);
+		return extractValue(field);
+	}
 	
 	protected String getAttributeName() {
-		return attributeName;
+		return defn.getName();
 	}
-
+	
 }
