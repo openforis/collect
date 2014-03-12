@@ -316,21 +316,38 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void setValuesInMultipleAttribute(Entity parentEntity,
-			AttributeDefinition attrDefn, String fieldName, String strValue,
+			AttributeDefinition attrDefn, String fieldName, String strValues,
 			String colName, long row) {
-		String[] splittedValues = strValue.split(MULTIPLE_ATTRIBUTE_VALUES_SEPARATOR);
-		int newValuesCount = splittedValues.length;
-		for (int i = 0; i < newValuesCount; i++) {
-			String strVal = splittedValues[i].trim();
-			setValueInField(parentEntity, attrDefn, i, fieldName,
-					strVal, colName, row);
+		int newValuesCount;
+		if ( StringUtils.isBlank(strValues) ) {
+			newValuesCount = 0;
+		} else {
+			String[] splittedValues = strValues.split(MULTIPLE_ATTRIBUTE_VALUES_SEPARATOR);
+			newValuesCount = splittedValues.length;
+			for (int i = 0; i < newValuesCount; i++) {
+				String strVal = splittedValues[i].trim();
+				setValueInField(parentEntity, attrDefn, i, fieldName,
+						strVal, colName, row);
+			}
 		}
 		//remove old attributes
 		String attrName = attrDefn.getName();
 		int totalCount = parentEntity.getCount(attrName);
 		if ( totalCount > newValuesCount ) {
 			for (int i = totalCount - 1; i >= newValuesCount; i--) {
-				parentEntity.remove(attrName, i);
+				boolean toBeDeleted = false;
+				if ( i == 0 ) {
+					//do not delete attribute if it's empty but it has remarks or field symbols
+					Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrName, i);
+					if ( ! attr.hasData() )  {
+						toBeDeleted = true;
+					}
+				} else {
+					toBeDeleted = true;
+				}
+				if ( toBeDeleted ) {
+					parentEntity.remove(attrName, i);
+				}
 			}
 		}
 	}
