@@ -123,18 +123,20 @@ public class CodeListTables {
 	}
 	
 	private static String getBaseTableName(CodeList codeList, Integer levelIdx) {
-		String name;
-		if ( levelIdx == null ) {
-			name = codeList.getAnnotation(TABLE_NAME_QNAME);
-			if ( name == null ) {
-				name = codeList.getName();
-			}
+		StringBuilder sb = new StringBuilder();
+		String tableNameAnnotation = codeList.getAnnotation(TABLE_NAME_QNAME);
+		if ( tableNameAnnotation == null ) {
+			sb.append(codeList.getName());
 		} else {
+			sb.append(tableNameAnnotation);
+		}
+		if ( levelIdx != null ) {
 			List<CodeListLevel> hierarchy = codeList.getHierarchy();
 			CodeListLevel currentLevel = hierarchy.get(levelIdx);
-			name = currentLevel.getName();
+			sb.append("_");
+			sb.append(currentLevel.getName());
 		}
-		return name;
+		return sb.toString();
 	}
 
 	private static String extractBaseTableName(RelationalSchemaConfig config, String tableName) {
