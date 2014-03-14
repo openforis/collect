@@ -204,7 +204,7 @@ public class RelationalSchemaGenerator {
 	}
 
 	private DataTable createDataTable(RelationalSchema rs, DataTable parentTable, NodeDefinition defn, Path relativePath) throws CollectRdbException {
-		String name = getDataTableName(parentTable, defn);
+		String name = generateDataTableName(rs, parentTable, defn);
 		DataTable table = new DataTable(config.getDataTablePrefix(), name, parentTable, defn, relativePath);
 		if ( rs.containsTable(name) ) {
 			throw new CollectRdbException("Duplicate table '"+name+"' for "+defn.getPath());
@@ -297,25 +297,18 @@ public class RelationalSchemaGenerator {
 		table.setPrimaryKeyConstraint(pkConstraint);
 	}
 	
-	private String getDataTableName(DataTable parentTable, NodeDefinition defn) {
+	private String generateDataTableName(RelationalSchema rs, DataTable parentTable, NodeDefinition defn) {
 		String name = defn.getAnnotation(TABLE_NAME_QNAME);
 		if ( name == null ) {
-			NodeDefinition parentDefn = parentTable == null ? null : parentTable.getNodeDefinition();
-			StringBuilder sb = new StringBuilder();
-			NodeDefinition ptr = defn;
-			while ( ptr != parentDefn ) {
-				if ( sb.length() > 0 ) {
-					sb.insert(0 ,'_');
-				}
-				sb.insert(0, ptr.getName());
-				ptr = ptr.getParentDefinition();
+			name = defn.getName();
+			NodeDefinition parent = defn.getParentDefinition();
+			while ( rs.containsTable(name) && parent != null ) {
+				name = parent.getName() + "_" + name;
+				parent = parent.getParentDefinition();
 			}
-			// For multiple attribute tables, prepend parent table name to table name 
-			if ( defn instanceof AttributeDefinition ) {
-				sb.insert(0, '_');
-				sb.insert(0, parentTable.getBaseName());
+			if ( rs.containsTable(name) ) {
+				throw new RuntimeException(String.format("Unable to generate unique data table name for node definition %s", defn.getPath()));
 			}
-			name = sb.toString();
 		}
 		return name;
 	}
