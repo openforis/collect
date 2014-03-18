@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,9 +25,12 @@ import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.CodeListImporter;
@@ -485,6 +490,13 @@ public class CodeListManager {
 		codeListItemDao.deleteInvalidCodeListReferenceItems(survey);
 	}
 	
+	public void deleteUnusedCodeLists(CollectSurvey survey) {
+		Set<CodeList> unusedCodeLists = getUnusedCodeLists(survey);
+		for (CodeList codeList : unusedCodeLists) {
+			delete(codeList);
+		}
+	}
+	
 	public void shiftItem(CodeListItem item, int indexTo) {
 		CodeList list = item.getCodeList();
 		if ( list.isExternal() ) {
@@ -500,6 +512,37 @@ public class CodeListManager {
 				parentItem.moveChildItem(item, indexTo);
 			}
 		}
+	}
+	
+	protected Set<CodeList> getUnusedCodeLists(CollectSurvey survey) {
+		Set<CodeList> result = new HashSet<CodeList>();
+		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList list : codeLists) {
+			if ( ! isCodeListInUse(list) ) {
+				result.add(list);
+			}
+		}
+		return result;
+	}
+	
+	public boolean isCodeListInUse(CodeList list) {
+		Survey survey = list.getSurvey();
+		Schema schema = survey.getSchema();
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		stack.addAll(schema.getRootEntityDefinitions());
+		while ( ! stack.isEmpty() ) {
+			NodeDefinition node = stack.pop();
+			if ( node instanceof CodeAttributeDefinition ) {
+				if ( list.equals(((CodeAttributeDefinition) node).getList()) ) {
+					return true;
+				}
+			} else if ( node instanceof EntityDefinition ) {
+				for (NodeDefinition nodeDefinition : ((EntityDefinition) node).getChildDefinitions()) {
+					stack.add(nodeDefinition);
+				}
+			} 
+		}
+		return false;
 	}
 	
 	public int nextSystemId() {

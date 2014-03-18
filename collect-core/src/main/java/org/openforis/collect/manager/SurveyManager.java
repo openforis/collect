@@ -654,6 +654,7 @@ public class SurveyManager {
 	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		codeListManager.deleteInvalidCodeListReferenceItems(survey);
+		
 		Integer surveyWorkId = survey.getId();
 		survey.setWork(false);
 		survey.setPublished(true);
