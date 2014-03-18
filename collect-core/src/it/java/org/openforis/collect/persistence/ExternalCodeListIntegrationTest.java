@@ -159,7 +159,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 		List<ExternalCodeListItem> firstLevelItems = codeListManager.loadRootItems(hierarchicalList);
 		{
 			ExternalCodeListItem item = firstLevelItems.get(0);
-			ExternalCodeListItem parentItem = codeListManager.loadExternalParentItem(item);
+			ExternalCodeListItem parentItem = codeListManager.loadParentItem(item);
 			assertNull(parentItem);
 		}
 		{
@@ -167,7 +167,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 			List<ExternalCodeListItem> childItems = codeListManager.loadChildItems(firstLevelItem);
 			assertEquals(2, childItems.size());
 			ExternalCodeListItem secondLevelItem = childItems.get(0);
-			ExternalCodeListItem parentItem = codeListManager.loadExternalParentItem(secondLevelItem);
+			ExternalCodeListItem parentItem = codeListManager.loadParentItem(secondLevelItem);
 			assertEquals(parentItem, firstLevelItem);
 		}
 	}
