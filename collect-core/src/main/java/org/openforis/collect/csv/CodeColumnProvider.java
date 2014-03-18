@@ -65,7 +65,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 			CodeListService codeListService = context.getCodeListService();
 			CodeListItem item = codeListService.loadItem((CodeAttribute) attr);
 			if ( item != null ) {
-				List<CodeListItem> items = codeListService.loadItems(defn.getList(), defn.getLevelIndex());
+				List<CodeListItem> items = codeListService.loadItems(defn.getList(), defn.getLevelPosition());
 				int position = items.indexOf(item) + 1;
 				return Integer.toString(position);
 			} else {
