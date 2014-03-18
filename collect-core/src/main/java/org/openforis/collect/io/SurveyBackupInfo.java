@@ -20,6 +20,8 @@ public class SurveyBackupInfo {
 	private static final String COLLECT_VERSION_PROP = "collect_version";
 	private static final String SURVEY_URI_PROP = "survey_uri";
 	
+	private static final String VERSION_3_0 = "3.0"; //for backwards compatibility
+	
 	private String collectVersion;
 	private Date date;
 	private String surveyUri;
@@ -56,6 +58,17 @@ public class SurveyBackupInfo {
 		info.collectVersion = props.getProperty(COLLECT_VERSION_PROP);
 		info.date = Dates.parseXMLDate(props.getProperty(DATE_PROP));
 		return info;
+	}
+	
+	public static SurveyBackupInfo createOldVersionInstance(String surveyUri) {
+		SurveyBackupInfo info = new SurveyBackupInfo(surveyUri);
+		info.setCollectVersion(VERSION_3_0);
+		info.setDate(null);
+		return info;
+	}
+	
+	public boolean isOldFormat() {
+		return VERSION_3_0.equals(collectVersion);
 	}
 	
 	public Date getDate() {

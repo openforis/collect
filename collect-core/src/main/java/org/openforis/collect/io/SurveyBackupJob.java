@@ -48,33 +48,27 @@ public class SurveyBackupJob extends Job {
 	public static final String UPLOADED_FILES_FOLDER = "upload";
 	
 	@Autowired
-	private transient RecordManager recordManager;
+	private RecordManager recordManager;
 	@Autowired
-	private transient RecordFileManager recordFileManager;
+	private RecordFileManager recordFileManager;
 	@Autowired
-	private transient DataMarshaller dataMarshaller;
+	private DataMarshaller dataMarshaller;
 	@Autowired
-	private transient SpeciesManager speciesManager;
+	private SpeciesManager speciesManager;
 	
 	//input
-	private transient CollectSurvey survey;
+	private CollectSurvey survey;
 	private boolean includeData;
 	private boolean includeRecordFiles;
 	
 	//output
-	private transient File outputFile;
+	private File outputFile;
 	
 	//temporary instance variable
-	private transient ZipOutputStream zipOutputStream;
-	
-	public void configure(CollectSurvey survey, boolean includeData, boolean includeRecordFiles) {
-		this.survey = survey;
-		this.includeData = includeData;
-		this.includeRecordFiles = includeRecordFiles;
-	}
+	private ZipOutputStream zipOutputStream;
 	
 	@Override
-	protected void buildAndAddTasks() throws Throwable {
+	protected void buildTasks() throws Throwable {
 		addInfoPropertiesCreatorTask();
 		addIdmlExportTask();
 		addSamplingDesignExportTask();

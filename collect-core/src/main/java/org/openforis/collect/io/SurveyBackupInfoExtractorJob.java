@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.internal.SurveyBackupVerifierTask;
@@ -44,29 +45,40 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	
 	@Override
 	protected void initInternal() throws Throwable {
-		this.zipFile = new ZipFile(file);
+		String ext = FilenameUtils.getExtension(file.getName());
+		if ( "zip".equalsIgnoreCase(ext) ) {
+			this.zipFile = new ZipFile(file);
+		}
 		super.initInternal();
 	}
 	
 	@Override
-	protected void buildAndAddTasks() throws Throwable {
-		addTask(SurveyBackupVerifierTask.class);
-		addTask(SurveyBackupInfoExtractorTask.class);
+	protected void buildTasks() throws Throwable {
+		if (zipFile != null ) {
+			addTask(SurveyBackupVerifierTask.class);
+			addTask(SurveyBackupInfoExtractorTask.class);
+		}
 		addTask(IdmlUnmarshallTask.class);
 	}
 	
 	@Override
 	protected void prepareTask(Task task) {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		if ( task instanceof SurveyBackupVerifierTask ) {
 			SurveyBackupVerifierTask t = (SurveyBackupVerifierTask) task;
 			t.setZipFile(zipFile);
 		} else if ( task instanceof SurveyBackupInfoExtractorTask ) {
+			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
 			File infoFile = backupFileExtractor.extractInfoFile();
 			t.setFile(infoFile);
 		} else if ( task instanceof IdmlUnmarshallTask ) {
-			File idmlFile = backupFileExtractor.extractIdmlFile();
+			File idmlFile;
+			if ( zipFile == null ) {
+				idmlFile = file;
+			} else {
+				BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+				idmlFile = zipFile == null ? file: backupFileExtractor.extractIdmlFile();
+			}
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			t.setSurveyManager(surveyManager);
 			t.setValidate(validate);
@@ -79,9 +91,12 @@ public class SurveyBackupInfoExtractorJob extends Job {
 		super.onTaskCompleted(task);
 		if ( task instanceof SurveyBackupInfoExtractorTask ) {
 			this.info = ((SurveyBackupInfoExtractorTask) task).getInfo();
-		}
-		if ( task instanceof IdmlUnmarshallTask ) {
+		} else if ( task instanceof IdmlUnmarshallTask ) {
 			this.survey = ((IdmlUnmarshallTask) task).getSurvey();
+			if ( zipFile == null ) {
+				//extracting backup info from XML file
+				this.info = SurveyBackupInfo.createOldVersionInstance(survey.getUri());
+			}
 		}
 	}
 	

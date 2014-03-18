@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.SurveyBackupInfoExtractorJob;
 import org.openforis.collect.io.SurveyRestoreJob;
+import org.openforis.collect.io.XMLSurveyRestoreJob;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
@@ -46,9 +49,10 @@ import org.zkoss.zul.Window;
 public class SurveyImportVM extends SurveyBaseVM {
 
 	private static final String SURVEY_NAME_FIELD = "surveyName";
-//	private static final String TEXT_XML_CONTENT = "text/xml";
-	private static final Object ZIP_CONTENT = "application/zip";
-
+	private static final String ZIP_CONTENT = "application/zip";
+	private static final String XML_CONTENT = "text/xml";
+	private static final String[] ALLOWED_UPLOAD_FILE_CONTENT = new String[] {ZIP_CONTENT, XML_CONTENT};
+	
 	//private static final Log log = Log.lookup(SurveyImportVM.class);
 	
 	@WireVariable
@@ -70,7 +74,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	//private SurveyUnmarshallProcess unmarshallProcess;
 	//private SurveyImportProcess importProcess;
 	private SurveyBackupInfoExtractorJob summaryJob;
-	private SurveyRestoreJob restoreJob;
+	private AbstractSurveyRestoreJob restoreJob;
 	
 	private Window jobStatusPopUp;
 	
@@ -166,8 +170,13 @@ public class SurveyImportVM extends SurveyBaseVM {
  		Media media = event.getMedia();
 		String contentType = media.getContentType();
 		
-		if ( ZIP_CONTENT.equals(contentType) ) {
-			File tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData());
+		if ( ArrayUtils.contains(ALLOWED_UPLOAD_FILE_CONTENT, contentType) ) {
+			File tempFile;
+			if ( XML_CONTENT.equals(contentType) ) {
+				tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), "xml");
+			} else {
+				tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), "zip");
+			}
 			this.uploadedFile = tempFile;
 			this.uploadedFileName = media.getName();
 			updateForm();
@@ -314,12 +323,17 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	protected void startSurveyImport() {
 		String surveyName = getFormSurveyName();
-		restoreJob = jobManager.createJob(SurveyRestoreJob.class);
+		
+		if ( FilenameUtils.getExtension(uploadedFile.getName()).equalsIgnoreCase("xml") ) {
+			restoreJob = jobManager.createJob(XMLSurveyRestoreJob.class);
+		} else {
+			restoreJob = jobManager.createJob(SurveyRestoreJob.class);
+		}
 		restoreJob.setFile(uploadedFile);
 		restoreJob.setSurveyName(surveyName);
+		restoreJob.setSurveyUri(uploadedSurveyUri);
 		restoreJob.setRestoreIntoPublishedSurvey(false);
 		restoreJob.setValidateSurvey(false);
-		
 		jobManager.start(restoreJob);
 		openSurveyRestoreStatusPopUp();
 	}

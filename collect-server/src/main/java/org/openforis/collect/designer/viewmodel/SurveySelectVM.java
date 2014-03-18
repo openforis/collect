@@ -28,7 +28,7 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.SpringJobManager;
+import org.openforis.concurrency.spring.SpringJobManager;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;

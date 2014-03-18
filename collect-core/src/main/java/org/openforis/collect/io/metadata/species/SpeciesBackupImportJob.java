@@ -24,7 +24,7 @@ public class SpeciesBackupImportJob extends Job {
 	private String taxonomyName;
 
 	@Override
-	protected void buildAndAddTasks() throws Throwable {
+	protected void buildTasks() throws Throwable {
 		SpeciesBackupImportTask task = createTask(SpeciesBackupImportTask.class);
 		task.setFile(file);
 		task.setSurvey(survey);

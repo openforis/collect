@@ -33,7 +33,7 @@ public abstract class DataRestoreBaseJob extends Job {
 	protected transient ZipFile zipFile;
 
 	@Override
-	protected void buildAndAddTasks() throws Throwable {
+	protected void buildTasks() throws Throwable {
 		if ( packagedSurvey == null ) {
 			addIdmlUnmarshallTask();
 		}

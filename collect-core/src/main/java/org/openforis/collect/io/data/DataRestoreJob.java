@@ -38,8 +38,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private List<Integer> entryIdsToImport;
 
 	@Override
-	protected void buildAndAddTasks() throws Throwable {
-		super.buildAndAddTasks();
+	protected void buildTasks() throws Throwable {
+		super.buildTasks();
 		addTask(DataRestoreTask.class);
 		if ( restoreUploadedFiles && isUploadedFilesIncluded() ) {
 			addTask(RecordFileRestoreTask.class);

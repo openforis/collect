@@ -152,6 +152,6 @@
 	</bean>
 
 	<!-- Async job executor -->
-	<bean id="jobManager" class="org.openforis.concurrency.SpringJobManager" />
+	<bean id="jobManager" class="org.openforis.concurrency.spring.SpringJobManager" />
 	
 </beans>

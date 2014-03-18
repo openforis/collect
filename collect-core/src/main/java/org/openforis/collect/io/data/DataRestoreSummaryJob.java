@@ -50,8 +50,8 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	}
 
 	@Override
-	protected void buildAndAddTasks() throws Throwable {
-		super.buildAndAddTasks();
+	protected void buildTasks() throws Throwable {
+		super.buildTasks();
 		addTask(DataRestoreSummaryTask.class);
 	}
 	
