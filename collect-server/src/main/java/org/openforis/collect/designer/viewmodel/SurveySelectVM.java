@@ -22,7 +22,7 @@ import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
-import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
@@ -305,27 +305,23 @@ public class SurveySelectVM extends BaseVM {
 
 	protected boolean validateSurvey(CollectSurvey survey,
 			CollectSurvey oldPublishedSurvey) {
-		List<SurveyValidationResult> validationResults = surveyValidator
-				.validateCompatibility(oldPublishedSurvey, survey);
-		if (validationResults.isEmpty()) {
+		SurveyValidationResults validationResults = surveyValidator.validateCompatibility(oldPublishedSurvey, survey);
+		if (validationResults.isOk()) {
 			return true;
 		} else {
-			openValidationResultsPopUp(validationResults);
+			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(validationResults, ! validationResults.hasErrors());
 			return false;
 		}
 	}
 
 	@GlobalCommand
-	public void openValidationResultsPopUp(
-			@BindingParam("validationResults") List<SurveyValidationResult> validationResults) {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("validationResults", validationResults);
-		validationResultsPopUp = openPopUp(
-				Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP
-						.getLocation(),
-				true, args);
+	public void confirmValidationResultsPopUp() {
+		closePopUp(validationResultsPopUp);
+		validationResultsPopUp = null;
+		CollectSurvey survey = loadSelectedSurvey();
+		performSurveyPublishing(survey);
 	}
-
+	
 	@GlobalCommand
 	public void closeValidationResultsPopUp() {
 		closePopUp(validationResultsPopUp);

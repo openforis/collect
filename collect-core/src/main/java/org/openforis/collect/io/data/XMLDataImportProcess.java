@@ -28,7 +28,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator;
-import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -213,8 +213,8 @@ public class XMLDataImportProcess implements Callable<Void> {
 				throw new IllegalArgumentException("Cannot import data related to survey '" + packagedSurveyUri + 
 						"' into on a different survey (" + surveyUri + ")");
 			}
-			List<SurveyValidationResult> compatibilityResult = surveyValidator.validateCompatibility(existingSurvey, packagedSurvey);
-			if ( ! compatibilityResult.isEmpty() ) {
+			SurveyValidationResults compatibilityResult = surveyValidator.validateCompatibility(existingSurvey, packagedSurvey);
+			if ( compatibilityResult.hasErrors() ) {
 				throw new DataImportExeption("Packaged survey is not compatible with the survey already present into the system.\n" +
 						"Please try to import it using the Designer to get the list of errors.");
 			}
@@ -526,8 +526,8 @@ public class XMLDataImportProcess implements Callable<Void> {
 				if (XMLDataExportProcess.IDML_FILE_NAME.equals(entryName)) {
 					InputStream is = zipFile.getInputStream(zipEntry);
 					survey = surveyManager.unmarshalSurvey(is);
-					List<SurveyValidationResult> validationResults = surveyValidator.validate(survey);
-					if ( ! validationResults.isEmpty() ) {
+					SurveyValidationResults validationResults = surveyValidator.validate(survey);
+					if ( validationResults.hasErrors() ) {
 						throw new IllegalStateException("Packaged survey is not valid." +
 								"\nPlease try to import it using the Designer to get the list of errors.");
 					}

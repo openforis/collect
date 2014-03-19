@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
@@ -19,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult.Flag;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.AttributeDefault;
@@ -73,40 +75,35 @@ public class SurveyValidator {
 	 * will not break the inserted data (if any). 
 	 * 
 	 */
-	public List<SurveyValidationResult> validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
-		List<SurveyValidationResult> results = validate(newSurvey);
+	public SurveyValidationResults validateCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
+		SurveyValidationResults results = validate(newSurvey);
 		if ( oldPublishedSurvey != null ) {
-			results.addAll(validateChanges(oldPublishedSurvey, newSurvey));
+			results.addResults(validateChanges(oldPublishedSurvey, newSurvey));
 		}
 		return results;
 	}
 	
 	public void checkCompatibility(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) throws SurveyValidationException {
-		List<SurveyValidationResult> result = validateCompatibility(oldPublishedSurvey, newSurvey);
-		if ( ! result.isEmpty() ) {
+		SurveyValidationResults results = validateCompatibility(oldPublishedSurvey, newSurvey);
+		if ( results.hasErrors() ) {
 			throw new SurveyValidationException("The survey is not compatible with the old published one");
 		}
 	}
 	
-	public List<SurveyValidationResult> validate(CollectSurvey survey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
-		List<SurveyValidationResult> partialResults;
+	public SurveyValidationResults validate(CollectSurvey survey) {
+		SurveyValidationResults results = new SurveyValidationResults();
 		
 		//root entity key required
-		partialResults = validateRootKeyAttributeSpecified(survey);
-		results.addAll(partialResults);
+		results.addResults(validateRootKeyAttributeSpecified(survey));
 		
 		//empty or unused code lists not allowed
-		partialResults = validateCodeLists(survey);
-		results.addAll(partialResults);
+		results.addResults(validateCodeLists(survey));
 
 		//empty entities not allowed
-		partialResults = validateEntities(survey);
-		results.addAll(partialResults);
+		results.addResults(validateEntities(survey));
 		
 		//validate expressions
-		partialResults = validateExpressions(survey);
-		results.addAll(partialResults);
+		results.addResults(validateExpressions(survey));
 		return results;
 	}
 	
@@ -135,13 +132,13 @@ public class SurveyValidator {
 		for (CodeList list : codeLists) {
 			if ( ! codeListManager.isInUse(list) ) {
 				//unused code list not allowed
-				SurveyValidationResult validationResult = new SurveyValidationResult(String.format(CODE_LIST_PATH_FORMAT, list.getName()), 
-						"survey.validation.error.unused_code_list");
+				SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
+						String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.unused_code_list");
 				results.add(validationResult);
 			} else if ( ! list.isExternal() && codeListManager.isEmpty(list) ) {
 				//empty code list not allowed
-				SurveyValidationResult validationResult = new SurveyValidationResult(String.format(CODE_LIST_PATH_FORMAT, list.getName()), 
-						"survey.validation.error.empty_code_list");
+				SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
+						String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.empty_code_list");
 				results.add(validationResult);
 			}
 		}
@@ -363,7 +360,7 @@ public class SurveyValidator {
 						String messageKey = "survey.validation.error.parent_changed";
 						String path = nodeDefn.getPath();
 						SurveyValidationResult validationResult = new SurveyValidationResult(path, messageKey);
-						addValidationError(validationResult);
+						addResult(validationResult);
 					}
 				}
 			}
@@ -384,8 +381,8 @@ public class SurveyValidator {
 						((NumericAttributeDefinition) oldDefn).getType() != ((NumericAttributeDefinition) nodeDefn).getType())) {
 					String messageKey = "survey.validation.error.data_type_changed";
 					String path = nodeDefn.getPath();
-					SurveyValidationResult validationError = new SurveyValidationResult(path, messageKey);
-					addValidationError(validationError);
+					SurveyValidationResult result = new SurveyValidationResult(path, messageKey);
+					addResult(result);
 				}
 			}
 		};
@@ -402,8 +399,8 @@ public class SurveyValidator {
 				if ( oldDefn != null && oldDefn.isMultiple() && ! nodeDefn.isMultiple() ) {
 					String messageKey = "survey.validation.error.cardinality_changed_from_multiple_to_single";
 					String path = nodeDefn.getPath();
-					SurveyValidationResult validationError = new SurveyValidationResult(path, messageKey);
-					addValidationError(validationError);
+					SurveyValidationResult result = new SurveyValidationResult(path, messageKey);
+					addResult(result);
 				}
 			}
 		};
@@ -484,20 +481,94 @@ public class SurveyValidator {
 		}
 		return result;
 	}
+
+	public static class SurveyValidationResults implements Serializable {
+
+		private static final long serialVersionUID = 1L;
+		
+		private List<SurveyValidationResult> results;
+		private List<SurveyValidationResult> errors;
+		private List<SurveyValidationResult> warnings;
+		
+		public SurveyValidationResults() {
+			results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+			errors = new ArrayList<SurveyValidator.SurveyValidationResult>();
+			warnings = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		}
+		
+		public void addResults(Collection<SurveyValidationResult> reults) {
+			for (SurveyValidationResult result : reults) {
+				addResult(result);
+			}
+		}
+
+		public List<SurveyValidationResult> getErrors() {
+			return CollectionUtils.unmodifiableList(errors);
+		}
+		
+		public List<SurveyValidationResult> getWarnings() {
+			return CollectionUtils.unmodifiableList(warnings);
+		}
+
+		public boolean hasErrors() {
+			return org.apache.commons.collections.CollectionUtils.isNotEmpty(errors);
+		}
+
+		public boolean hasWarnings() {
+			return org.apache.commons.collections.CollectionUtils.isNotEmpty(warnings);
+		}
+
+		public boolean isOk() {
+			return ! hasErrors() && ! hasWarnings();
+		}
+		
+		public void addResult(SurveyValidationResult result) {
+			switch ( result.getFlag() ) {
+			case ERROR:
+				errors.add(result);
+				break;
+			case WARNING:
+				warnings.add(result);
+				break;
+			default:
+				break;
+			}
+			results.add(result);
+		}
+
+		public List<SurveyValidationResult> getResults() {
+			return CollectionUtils.unmodifiableList(results);
+		}
+
+	}
 	
 	public static class SurveyValidationResult implements Serializable {
 		
 		private static final long serialVersionUID = 1L;
 		
+		public enum Flag {
+			OK, WARNING, ERROR
+		}
+		
+		private Flag flag;
 		private String path;
 		private String messageKey;
 
 		public SurveyValidationResult(String path, String messageKey) {
+			this(Flag.ERROR, path, messageKey);
+		}
+			
+		public SurveyValidationResult(Flag flag, String path, String messageKey) {
 			super();
+			this.flag = flag;
 			this.path = path;
 			this.messageKey = messageKey;
 		}
 
+		public Flag getFlag() {
+			return flag;
+		}
+		
 		public String getPath() {
 			return path;
 		}
@@ -512,7 +583,7 @@ public class SurveyValidator {
 		
 		private List<SurveyValidationResult> results;
 		
-		public void addValidationError(SurveyValidationResult result) {
+		public void addResult(SurveyValidationResult result) {
 			if ( results == null ) {
 				results = new ArrayList<SurveyValidationResult>();
 			}

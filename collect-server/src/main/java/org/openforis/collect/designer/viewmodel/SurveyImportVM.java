@@ -21,7 +21,7 @@ import org.openforis.collect.io.XMLSurveyRestoreJob;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
-import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.utils.OpenForisIOUtils;
@@ -346,8 +346,8 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected boolean validateSurvey(CollectSurvey survey) {
-		List<SurveyValidationResult> validationResults = surveyValidator.validate(survey);
-		if ( validationResults.isEmpty() ) {
+		SurveyValidationResults validationResults = surveyValidator.validate(survey);
+		if ( validationResults.isOk() ) {
 			return true;
 		} else {
 			openValidationResultsPopUp(validationResults);
@@ -356,8 +356,8 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected boolean validateSurveyForPublishing(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
-		List<SurveyValidationResult> validationResults = surveyValidator.validateCompatibility(oldPublishedSurvey, survey);
-		if ( validationResults.isEmpty() ) {
+		SurveyValidationResults validationResults = surveyValidator.validateCompatibility(oldPublishedSurvey, survey);
+		if ( validationResults.isOk() ) {
 			return true;
 		} else {
 			openValidationResultsPopUp(validationResults);
@@ -365,7 +365,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		}
 	}
 
-	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
+	protected void openValidationResultsPopUp(SurveyValidationResults validationResults) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("validationResults", validationResults);
 		BindUtils.postGlobalCommand(null, null, "openValidationResultsPopUp", args);
