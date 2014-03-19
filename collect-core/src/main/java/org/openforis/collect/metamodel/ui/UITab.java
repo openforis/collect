@@ -3,6 +3,7 @@ package org.openforis.collect.metamodel.ui;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
@@ -76,14 +77,22 @@ public class UITab extends UITabSet {
 	}
 	
 	public String getPath(String language) {
+		return getPath(language, null);
+	}
+	
+	public String getPath(String language, String nullValuesReplace) {
 		StringBuilder sb = new StringBuilder();
 		UITab currentTab = this;
 		while ( currentTab != null ) {
-			String label = currentTab.getLabel(language);
 			if ( currentTab != this ) {
 				sb.insert(0, "/");
 			}
-			sb.insert(0, label);
+			String label = currentTab.getLabel(language);
+			if ( nullValuesReplace != null && StringUtils.isBlank(label) ) {
+				sb.insert(0, nullValuesReplace);
+			} else {
+				sb.insert(0, label);
+			}
 			UITabSet parent = currentTab.getParent();
 			if ( parent instanceof UITab ) {
 				currentTab = (UITab) parent;

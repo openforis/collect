@@ -69,6 +69,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
 	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
+	private static final String PATH_NULL_VALUES_REPLACE = "...";
 
 	private static final String NODE_TYPES_IMAGES_PATH = "/assets/images/node_types/";
 
@@ -361,6 +362,13 @@ public class SchemaVM extends SurveyBaseVM {
 				treeItem.setLabel(label);
 			}
 		}
+	}
+	
+	@Override
+	@GlobalCommand
+	public void currentLanguageChanged() {
+		super.currentLanguageChanged();
+		updateTreeModel();
 	}
 
 	protected void resetEditingStatus() {
@@ -926,13 +934,14 @@ public class SchemaVM extends SurveyBaseVM {
 			return null;
 		} else if ( editedNode instanceof NodeDefinition ) {
 			if ( newNode ) {
-				return editedNodeParentEntity.getPath() + "/...";
+				return editedNodeParentEntity.getPath() + "/" + PATH_NULL_VALUES_REPLACE;
 			} else {
 				return ((NodeDefinition) editedNode).getPath();
 			}
 		} else {
 			//tab
-			return ((UITab) editedNode).getPath(currentLanguageCode);
+			UITab tab = (UITab) editedNode;
+			return tab.getPath(currentLanguageCode, PATH_NULL_VALUES_REPLACE);
 		}
 	}
 	
