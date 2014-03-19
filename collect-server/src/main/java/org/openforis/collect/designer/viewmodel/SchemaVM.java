@@ -5,10 +5,13 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
@@ -192,7 +195,7 @@ public class SchemaVM extends SurveyBaseVM {
 		rootTabSet = survey.getUIOptions().getAssignedRootTabSet(rootEntity);
 		selectedVersion = version;
 		resetEditingStatus();
-		updateTreeModel();
+		refreshTreeModel();
 		dispatchCurrentFormValidatedCommand(true, isCurrentFormBlocking());
 		notifyChange("selectedTreeNode","selectedRootEntity","selectedVersion","treeModel");
 	}
@@ -215,7 +218,7 @@ public class SchemaVM extends SurveyBaseVM {
 				EntityDefinition rootEntity = createRootEntityDefinition();
 				selectedRootEntity = rootEntity;
 				selectedVersion = null;
-				updateTreeModel();
+				refreshTreeModel();
 				selectTreeNode(null);
 				notifyChange("selectedRootEntity","selectedVersion");
 				editRootEntity();
@@ -368,7 +371,7 @@ public class SchemaVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void currentLanguageChanged() {
 		super.currentLanguageChanged();
-		updateTreeModel();
+		refreshTreeModel();
 	}
 
 	protected void resetEditingStatus() {
@@ -410,7 +413,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( selectedVersion != null && ! survey.getVersions().contains(selectedVersion) ) {
 			resetEditingStatus();
 			selectedVersion = null;
-			updateTreeModel();
+			refreshTreeModel();
 			notifyChange("selectedVersion");
 		}
 	}
@@ -616,7 +619,7 @@ public class SchemaVM extends SurveyBaseVM {
 			selectedRootEntity = null;
 			rootTabSet = null;
 			notifyChange("selectedRootEntity");
-			updateTreeModel();
+			refreshTreeModel();
 		} else {
 			if ( treeModel != null ) {
 				treeModel.removeSelectedNode();
@@ -730,8 +733,21 @@ public class SchemaVM extends SurveyBaseVM {
 		return survey.getVersions().isEmpty() || selectedVersion != null;
 	}
 	
-	protected void updateTreeModel() {
+	protected void refreshTreeModel() {
+		//keep track of previous opened nodes
+		Set<SurveyObject> openNodes;
+		if (treeModel == null) {
+			openNodes = Collections.emptySet();
+		} else {
+			openNodes = treeModel.getOpenSchemaNodes();
+		}
 		buildTreeModel();
+		treeModel.setOpenSchemaNodes(openNodes);
+		treeModel.select(editedNode);
+		treeModel.showSelectedNode();
+		if ( CollectionUtils.isEmpty(treeModel.getSelection()) ) {
+			resetEditingStatus();
+		}
 		notifyChange("treeModel");
 	}
 	
@@ -1061,7 +1077,7 @@ public class SchemaVM extends SurveyBaseVM {
 	public void treeViewTypeSelected(@BindingParam("type") String type) {
 		selectedTreeViewType = type;
 		resetEditingStatus();
-		updateTreeModel();
+		refreshTreeModel();
 	}
 	
 	public Menupopup getPopupMenu(SchemaNodeData data) {
@@ -1190,7 +1206,7 @@ public class SchemaVM extends SurveyBaseVM {
 		UITab newTab = uiOptions.getAssignedTab(newParentEntity);
 		uiOptions.assignToTab(node, newTab);
 		//update ui
-		updateTreeModel();
+		refreshTreeModel();
 		editedNodeParentEntity = newParentEntity;
 		selectTreeNode(editedNode);
 		treeModel.showSelectedNode();
@@ -1200,7 +1216,7 @@ public class SchemaVM extends SurveyBaseVM {
 	private void associateNodeToTab(NodeDefinition node, UITab tab) {
 		UIOptions uiOptions = survey.getUIOptions();
 		uiOptions.assignToTab(node, tab);
-		updateTreeModel();
+		refreshTreeModel();
 		selectTreeNode(node);
 		treeModel.showSelectedNode();
 		notifyChange("selectedTreeNode","editedNode");

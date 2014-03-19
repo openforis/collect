@@ -5,7 +5,9 @@ package org.openforis.collect.designer.component;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 import org.openforis.collect.designer.model.NodeType;
@@ -132,15 +134,7 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	public void appendNodeToSelected(SurveyObject surveyObject, boolean detached) {
 		AbstractNode<?> selectedNode = getSelectedNode();
 		boolean root = selectedNode == null;
-		String label;
-		if ( detached ) {
-			label = SchemaNodeData.getDetachedLabel(surveyObject, root);
-		} else if ( surveyObject instanceof NodeDefinition ) {
-			label = ((NodeDefinition) surveyObject).getName();
-		} else {
-			label = ((UITab) surveyObject).getLabel(labelLanguage);
-		}
-		SchemaNodeData data = new SchemaNodeData(surveyObject, label, root, detached);
+		SchemaNodeData data = new SchemaNodeData(surveyObject, root, detached, labelLanguage);
 		super.appendNodeToSelected(data);
 	}
 	
@@ -177,15 +171,53 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 		return result;
 	}
 	
+	public Set<SurveyObject> getOpenSchemaNodes() {
+		Set<SurveyObject> result = new HashSet<SurveyObject>();
+		Set<TreeNode<SchemaNodeData>> openObjects = getOpenObjects();
+		for (TreeNode<SchemaNodeData> treeNode : openObjects) {
+			SchemaNodeData data = treeNode.getData();
+			SurveyObject node = data.getSurveyObject();
+			result.add(node);
+		}
+		return result;
+	}
+	
+	public void setOpenSchemaNodes(Collection<SurveyObject> nodes) {
+		Set<SchemaTreeNode> opened = new HashSet<SchemaTreeNode>();
+		for (SurveyObject node : nodes) {
+			SchemaTreeNode treeNode = getTreeNode(node);
+			if ( treeNode != null ) {
+				opened.add(treeNode);
+			}
+		}
+		setOpenObjects(opened);
+	}
+	
 	public static class SchemaNodeData extends BasicTreeModel.SimpleNodeData {
 		
 		private SurveyObject surveyObject;
 		
+		protected SchemaNodeData(SurveyObject surveyObject, boolean root, boolean detached, String labelLanguage) {
+			this(surveyObject, getLabel(surveyObject, root, detached, labelLanguage), root, detached);
+		}
+
 		protected SchemaNodeData(SurveyObject surveyObject, String label, boolean root, boolean detached) {
 			super(label, root, detached);
 			this.surveyObject = surveyObject;
 		}
 
+		protected static String getLabel(SurveyObject surveyObject, boolean root, boolean detached, String labelLanguage) {
+			String label;
+			if ( detached ) {
+				label = SchemaNodeData.getDetachedLabel(surveyObject, root);
+			} else if ( surveyObject instanceof NodeDefinition ) {
+				label = ((NodeDefinition) surveyObject).getName();
+			} else {
+				label = ((UITab) surveyObject).getLabel(labelLanguage);
+			}
+			return label;
+		}
+		
 		protected static String getDetachedLabel(SurveyObject surveyObject, boolean root) {
 			String result;
 			if ( surveyObject instanceof NodeDefinition ) {
