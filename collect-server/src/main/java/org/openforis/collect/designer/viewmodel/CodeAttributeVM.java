@@ -5,8 +5,10 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import liquibase.util.StringUtils;
 
@@ -19,6 +21,7 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.SurveyObject;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.BindingParam;
@@ -38,6 +41,7 @@ import org.zkoss.zul.Window;
  */
 public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
+	private static final String CODE_LIST_ASSIGNED_COMMAND = "codeListAssigned";
 	private static final String FORM_ID = "fx";
 
 	private Window parentSelectorPopUp;
@@ -81,6 +85,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	private void performListChange(final Binder binder,
 			final CodeList list) {
 		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
+		CodeList oldList = fo.getList();
 		fo.setParentCodeAttributeDefinition(null);
 		fo.setList(list);
 		Form form = getForm(binder);
@@ -89,6 +94,16 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		setValueOnFormField(form, "parentCodeAttributeDefinition.path", null);
 		dispatchApplyChangesCommand(binder);
 		notifyChange("dependentCodePaths");
+		
+		dispatchCodeListAssignedCommand(list, oldList);
+	}
+
+	private void dispatchCodeListAssignedCommand(CodeList list, CodeList oldList) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("list", list);
+		args.put("oldList", oldList);
+		args.put("codeAttribute", editedItem);
+		BindUtils.postGlobalCommand(null, null, CODE_LIST_ASSIGNED_COMMAND, args);
 	}
 
 	@GlobalCommand

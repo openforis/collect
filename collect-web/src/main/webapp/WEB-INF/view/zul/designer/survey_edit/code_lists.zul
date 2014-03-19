@@ -16,11 +16,16 @@
 						onSelect="@command('selectionChanged', selectedItem=self.selectedItem.value)"
 						width="220px" vflex="true">
 						<listhead>
-							<listheader label="" width="100%" />
+							<listheader label="" width="175px" />
+							<listheader label="" width="30px" />
 						</listhead>
 						<template name="model">
 							<listitem>
 								<listcell label="@load(each.name)" />
+								<listcell tooltiptext="@load(vm.getWarnings(each))">
+									<image visible="@load(vm.hasWarnings(each))"
+										src="/assets/images/warning-small.png" /> 
+								</listcell>
 							</listitem>
 						</template>
 					</listbox>

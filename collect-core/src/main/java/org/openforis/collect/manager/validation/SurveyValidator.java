@@ -133,7 +133,7 @@ public class SurveyValidator {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList list : codeLists) {
-			if ( ! codeListManager.isCodeListInUse(list) ) {
+			if ( ! codeListManager.isInUse(list) ) {
 				//unused code list not allowed
 				SurveyValidationResult validationResult = new SurveyValidationResult(String.format(CODE_LIST_PATH_FORMAT, list.getName()), 
 						"survey.validation.error.unused_code_list");

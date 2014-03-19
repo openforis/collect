@@ -344,6 +344,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 		initItemsPerLevel();
 		notifyChange("itemsPerLevel","selectedItemsPerLevel");
+		BindUtils.postNotifyChange(null, null, editedItem, ".");
 	}
 	
 	@Command
@@ -576,6 +577,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		selectedItemsPerLevel.add(editedChildItem);
 		initItemsPerLevel();
 		notifyChange("itemsPerLevel","selectedItemsPerLevel");
+		BindUtils.postNotifyChange(null, null, editedItem, ".");
 	}
 
 	protected void initItemsPerLevel() {
@@ -634,6 +636,28 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	public boolean isEditingAttribute() {
 		return editingAttribute;
+	}
+	
+	public boolean hasWarnings(CodeList list) {
+		return ! codeListManager.isInUse(list) || codeListManager.isEmpty(list);
+	}
+	
+	public String getWarnings(CodeList list) {
+		String messageKey;
+		if ( ! codeListManager.isInUse(list) ) {
+			messageKey = "survey.validation.error.unused_code_list";
+		} else if ( codeListManager.isEmpty(list) ) {
+			messageKey = "survey.validation.error.empty_code_list";
+		} else {
+			messageKey = null;
+		}
+		return messageKey == null ? null: Labels.getLabel(messageKey);
+	}
+	
+	@GlobalCommand
+	public void codeListAssigned(@BindingParam("list") CodeList list, @BindingParam("oldList") CodeList oldList) {
+		BindUtils.postNotifyChange(null, null, list, ".");
+		BindUtils.postNotifyChange(null, null, oldList, ".");
 	}
 	
 	@Command
