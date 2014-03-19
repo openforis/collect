@@ -271,7 +271,7 @@ public class SchemaVM extends SurveyBaseVM {
 			return selectedRootEntity;
 		} else {
 			SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-			if ( surveyObject instanceof NodeDefinition ) {
+			if ( surveyObject instanceof EntityDefinition ) {
 				return (EntityDefinition) surveyObject;
 			} else {
 				EntityDefinition parentEntity = treeModel.getNearestParentEntityDefinition(surveyObject);

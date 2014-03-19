@@ -52,7 +52,7 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 	
 	public EntityDefinition getNearestParentEntityDefinition(SurveyObject surveyObject) {
 		SchemaTreeNode treeNode = getTreeNode(surveyObject);
-		SchemaTreeNode parentNode = (SchemaTreeNode)  treeNode.getParent();
+		SchemaTreeNode parentNode = (SchemaTreeNode) treeNode.getParent();
 		while ( parentNode != null && parentNode.getData() != null ) {
 			SurveyObject currentSurveyObject = parentNode.getData().getSurveyObject();
 			if ( currentSurveyObject instanceof EntityDefinition ) {

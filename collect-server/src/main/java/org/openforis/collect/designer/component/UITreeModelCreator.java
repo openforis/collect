@@ -67,7 +67,7 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 		childNodes.addAll(schemaTreeNodes);
 		
 		//include tabs
-		List<UITab> tabs = uiOptions.getTabsAssignableToChildren(entityDefn);
+		List<UITab> tabs = uiOptions.getTabsAssignableToChildren(entityDefn, false);
 		Collection<? extends AbstractNode<SchemaNodeData>> tabNodes = createNodes(tabs);
 		childNodes.addAll(tabNodes);
 

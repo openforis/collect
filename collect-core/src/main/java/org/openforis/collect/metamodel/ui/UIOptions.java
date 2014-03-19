@@ -297,21 +297,42 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 
 	public List<UITab> getTabsAssignableToChildren(EntityDefinition entityDefn) {
+		return getTabsAssignableToChildren(entityDefn, true);
+	}
+	
+	public List<UITab> getTabsAssignableToChildren(EntityDefinition entityDefn, boolean includeAlreadyAssignedTabs) {
 		EntityDefinition rootEntity = entityDefn.getRootEntity();
 		UITabSet rootTabSet = getAssignedRootTabSet(rootEntity);
-		if ( rootTabSet != null ) {
-			if ( entityDefn.getParentDefinition() == null ) {
-				List<UITab> tabs = new ArrayList<UITab>(rootTabSet.getTabs());
-				UITab mainTab = getMainTab(rootTabSet);
-				tabs.addAll(mainTab.getTabs());
-				return tabs;
-			} else {
-				UITab assignedTab = getAssignedTab(entityDefn);
-				List<UITab> tabs = assignedTab.getTabs();
-				return tabs;
-			}
-		} else {
+		if ( rootTabSet == null || getLayout(entityDefn) == Layout.TABLE) {
 			return Collections.emptyList();
+		} else if ( entityDefn == rootEntity ) {
+			List<UITab> tabs = new ArrayList<UITab>(rootTabSet.getTabs());
+			UITab mainTab = getMainTab(rootTabSet);
+			tabs.addAll(mainTab.getTabs());
+			return tabs;
+		} else {
+			UITab assignedTab = getAssignedTab(entityDefn);
+			List<UITab> childTabs = assignedTab.getTabs();
+			List<UITab> validTabs;
+			if ( includeAlreadyAssignedTabs ) {
+				validTabs = childTabs;
+			} else {
+				validTabs = new ArrayList<UITab>();
+				for (UITab childTab : childTabs) {
+					boolean valid = true;
+					List<NodeDefinition> nodesPerTab = getNodesPerTab(childTab, false);
+					for (NodeDefinition node : nodesPerTab) {
+						if ( ! node.isDescendantOf(entityDefn) ) {
+							valid = false;
+							break;
+						}
+					}
+					if ( valid ) {
+						validTabs.add(childTab);
+					}
+				}
+			}
+			return validTabs;
 		}
 	}
 	
