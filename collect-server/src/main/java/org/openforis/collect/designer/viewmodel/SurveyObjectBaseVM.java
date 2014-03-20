@@ -18,6 +18,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
@@ -42,6 +43,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	public SurveyObjectBaseVM() {
 		commitChangesOnApply = true;
+	}
+	
+	@Override
+	@GlobalCommand
+	public void undoLastChanges(@ContextParam(ContextType.VIEW) Component view) {
+		super.undoLastChanges(view);
+		resetEditedItem();
 	}
 	
 	public BindingListModelList<T> getItems() {
@@ -197,11 +205,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	@Command
 	public void deleteItem(@BindingParam("item") final T item) {
-		MessageUtil.showConfirm(new ConfirmHandler() {
+		MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new ConfirmHandler() {
 			@Override
 			public void onOk() {
 				performDeleteItem(item);
 			}}, "global.item.confirm_remove");
+		params.setOkLabelKey("global.delete_item");
+		MessageUtil.showConfirm(params);
 	}
 
 	protected void performDeleteItem(T item) {
@@ -209,12 +219,17 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		changed = false;
 		notifyChange("items","changed");
 		if ( item.equals(selectedItem) ) {
-			formObject = null;
-			editedItem = null;
-			selectedItem = null;
+			resetEditedItem();
 			dispatchCurrentFormValidatedCommand(true);
-			notifyChange("formObject", "editedItem", "selectedItem", "currentFormValid");
+			notifyChange("currentFormValid");
 		}
+	}
+
+	protected void resetEditedItem() {
+		formObject = createFormObject();
+		editedItem = null;
+		selectedItem = null;
+		notifyChange("formObject", "editedItem", "selectedItem");
 	}
 
 	protected abstract void deleteItemFromSurvey(T item);

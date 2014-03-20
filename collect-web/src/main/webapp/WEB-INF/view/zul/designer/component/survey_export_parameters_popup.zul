@@ -1,0 +1,41 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk>
+	<zscript>String[] titleArgs = new String[]{(String) arg.get("surveyName")};</zscript>
+	
+	<window id="surveyExportParametersPopup"
+		title="${c:l2('survey.export.popup.title', titleArgs)}"
+		width="400px"
+		border="normal" 
+		position="center" 
+		closable="true">
+
+		<grid>
+			<columns>
+				<column width="170px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.export.type.$}:" />
+					<radiogroup id="typeRadiogroup" orient="horizontal">
+						<radio label="${labels.survey.export.type.published}" value="published" />
+						<radio label="${labels.survey.export.type.temporary}" value="temporary" />
+					</radiogroup>
+				</row>
+				<row>
+					<label value="${labels.survey.export.include_data}:" />
+					<checkbox id="includeDataCheckbox" />
+				</row>
+				<row>
+					<label value="${labels.survey.export.include_uploaded_files}:" />
+					<checkbox id="includeUploadedFilesCheckbox" />
+				</row>
+				
+			</rows>
+		</grid>
+
+		<box width="100%" align="center">
+			<button id="okButton" label="${labels.survey.export.$}" />
+		</box>
+	</window>
+</zk>

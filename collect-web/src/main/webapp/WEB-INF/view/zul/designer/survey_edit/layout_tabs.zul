@@ -9,7 +9,7 @@
              <include src="survey_edit/schema/nodes_tree_filter.zul" canEditRootEntities="false" />
             </north>
             <center border="none">
-                <borderlayout visible="@load(not empty vm.treeModel))">
+                <borderlayout visible="@load(not empty vm.treeModel)">
                   <north border="none" height="40px">
                     <label sclass="sectionTitle" value="${labels.survey.layout.navigation_tree}" />
                   </north>

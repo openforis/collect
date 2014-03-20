@@ -148,7 +148,7 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
-	public TaxonSummaries loadFullTaxonSummaries(int taxonomyId) {
+	public TaxonSummaries loadFullTaxonSummariesOld(int taxonomyId) {
 		TaxonTree tree = loadTaxonTree(taxonomyId);
 		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.GENUS, false);
 		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
@@ -157,6 +157,16 @@ public class SpeciesManager {
 		return result;
 	}
 	
+	@Transactional
+	public TaxonSummaries loadFullTaxonSummaries(int taxonomyId) {
+		TaxonTree tree = loadTaxonTree(taxonomyId);
+		List<TaxonSummary> summaries = tree.toSummaries(TaxonRank.FAMILY, true);
+		List<String> sortedVernacularNamesLanguageCodes = new ArrayList<String>(tree.getVernacularLanguageCodes());
+		Collections.sort(sortedVernacularNamesLanguageCodes);
+		TaxonSummaries result = new TaxonSummaries(summaries.size(), summaries, sortedVernacularNamesLanguageCodes);
+		return result;
+	}
+
 	@Transactional
 	public TaxonSummaries loadTaxonSummaries(int taxonomyId) {
 		return loadTaxonSummaries(taxonomyId, 0, Integer.MAX_VALUE);

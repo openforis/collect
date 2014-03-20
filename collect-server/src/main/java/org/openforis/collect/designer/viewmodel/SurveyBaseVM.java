@@ -28,9 +28,12 @@ import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
@@ -118,7 +121,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 	
 	@GlobalCommand
-	public void undoLastChanges() {
+	public void undoLastChanges(@ContextParam(ContextType.VIEW) Component view) {
 		dispatchCurrentFormValidatedCommand(true);
 	}
 	
@@ -178,7 +181,8 @@ public abstract class SurveyBaseVM extends BaseVM {
 							((CanLeaveFormCompleteConfirmHandler) confirmHandler).onCancel();
 						}
 					}
-				}, messageKey);
+				}, messageKey, (Object[]) null, "global.unsaved_changes", (Object[]) null, 
+						"global.continue_and_loose_changes", "global.stay_on_this_page");
 			}
 		}
 		return currentFormValid;

@@ -1,9 +1,7 @@
 package org.openforis.collect.manager.codelistimport;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,17 +10,16 @@ import java.util.Stack;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.exception.ParsingException;
+import org.openforis.collect.io.metadata.parsing.ParsingError;
+import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.process.AbstractProcess;
-import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
-import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -44,7 +41,6 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private CodeListManager codeListManager;
 	private File file;
 	private CodeList codeList;
-	private CodeScope codeScope;
 	
 	//internal variables
 	private CodeListCSVReader reader;
@@ -53,11 +49,10 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private boolean overwriteData;
 
 	public CodeListImportProcess(CodeListManager codeListManager,
-			CodeList codeList, CodeScope codeScope, String langCode, File file,
+			CodeList codeList, String langCode, File file,
 			boolean overwriteData) {
 		this.codeListManager = codeListManager;
 		this.codeList = codeList;
-		this.codeScope = codeScope;
 		this.file = file;
 		this.overwriteData = overwriteData;
 	}
@@ -108,7 +103,6 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	}
 
 	protected void saveData() {
-		codeList.setCodeScope(codeScope);
 		if ( overwriteData ) {
 			codeList.removeAllLevels();
 		}
@@ -131,19 +125,14 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 //	}
 
 	protected void parseCSVLines(File file) {
-		InputStreamReader isReader = null;
-		FileInputStream is = null;
 		long currentRowNumber = 0;
 		try {
-			is = new FileInputStream(file);
-			isReader = OpenForisIOUtils.toReader(is);
 			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 			List<String> languages = survey.getLanguages();
 			String defaultLanguage = survey.getDefaultLanguage();
-			reader = new CodeListCSVReader(isReader, languages, defaultLanguage);
+			reader = new CodeListCSVReader(file, languages, defaultLanguage);
 			reader.init();
 			levels = reader.getLevels();
-			adjustCodeScope();
 			status.addProcessedRow(1);
 			currentRowNumber = 2;
 			while ( status.isRunning() ) {
@@ -177,20 +166,10 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.toString()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
-			closeReader();
+			IOUtils.closeQuietly(reader);
 		}
 	}
 
-	private void closeReader() {
-		try {
-			if ( reader != null ) {
-				reader.close();
-			}
-		} catch (IOException e) {
-			LOG.error("Error closing reader", e);
-		}
-	}
-	
 	protected CodeListItem processLevel(CodeListItem parent, CodeListLine line, int levelIdx, boolean lastLevel) {
 		CodeListItem result;
 		//validate code
@@ -240,11 +219,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	 */
 	protected boolean isDuplicate(String code, CodeListItem parentItem) {
 		CodeListItem duplicateItem;
-		if ( codeScope == CodeScope.LOCAL ) {
-			duplicateItem = getChildItem(parentItem, code);
-		} else {
-			duplicateItem = getCodeListItemInDescendants(code);
-		}
+		duplicateItem = getChildItem(parentItem, code);
 		return duplicateItem != null;
 	}
 	
@@ -332,10 +307,4 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		}
 	}
 	
-	protected void adjustCodeScope() {
-		if ( levels.size() <= 1 ) {
-			codeScope = CodeScope.SCHEME;
-		}
-	}
-
 }

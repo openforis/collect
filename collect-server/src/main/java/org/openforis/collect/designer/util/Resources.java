@@ -41,6 +41,7 @@ public class Resources {
 		CODE_LIST_ITEM_EDIT_POP_UP("survey_edit/code_list_item_popup.zul"),
 		CODE_LISTS_POPUP("survey_edit/code_lists_popup.zul"),
 		UNITS_MANAGER_POP_UP("survey_edit/units_popup.zul"), 
+		TAB("survey_edit/schema/tab.zul"),
 		ENTITY("survey_edit/schema/entity.zul"),
 		ATTRIBUTE("survey_edit/schema/attribute_{0}.zul"),
 		ATTRIBUTE_POPUP("survey_edit/schema/attribute_popup.zul"), 
@@ -50,7 +51,12 @@ public class Resources {
 		PRECISION_POPUP("survey_edit/schema/precision_popup.zul"),
 		SURVEY_VALIDATION_RESULTS_POPUP("survey_validation_results_popup.zul"),
 		CONFIRM_SURVEY_ERRORS_POPUP("component/confirm_survey_errors_popup.zul"),
-		PROCESS_STATUS_POPUP("component/process_status_popup.zul");
+		PROCESS_STATUS_POPUP("component/process_status_popup.zul"),
+		JOB_STATUS_POPUP("component/job_status_popup.zul"),
+		SELECT_TEMPLATE_POPUP("component/select_template_popup.zul"), 
+		SURVEY_EXPORT_PARAMETERS_POPUP("component/survey_export_parameters_popup.zul"),
+		NODE_EDIT_POPUP("survey_edit/schema/node_popup.zul"),
+		SCHEMA_TREE_POPUP("survey_edit/schema/schema_tree_popup.zul");
 		
 		private String location;
 		

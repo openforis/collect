@@ -11,7 +11,6 @@ import org.openforis.collect.manager.codelistimport.CodeListImportStatus;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -41,8 +40,7 @@ public class CodeListImportService extends ReferenceDataImportService<CodeListIm
 			CollectSurvey survey = designerSessionStatus.getSurvey();
 			String langCode = designerSessionStatus.getCurrentLanguageCode();
 			CodeList codeList = survey.getCodeListById(codeListId);
-			CodeScope codeScope = codeList.getHierarchy().size() > 1 && codeList.getCodeScope() == CodeScope.SCHEME ? CodeScope.SCHEME: CodeScope.LOCAL;
-			importProcess = new CodeListImportProcess(codeListManager, codeList, codeScope, langCode, importFile, overwriteData);
+			importProcess = new CodeListImportProcess(codeListManager, codeList, langCode, importFile, overwriteData);
 			importProcess.init();
 			CodeListImportStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

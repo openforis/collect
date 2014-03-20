@@ -3,7 +3,6 @@ package org.openforis.collect.designer.form.validator;
 import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeList.CodeScope;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
@@ -63,18 +62,13 @@ public class CodeListItemFormValidator extends SurveyObjectFormValidator<CodeLis
 		SurveyObjectBaseVM<CodeListItem> viewModel = getSurveyObjectVM(ctx);
 		CodeListItem editedItem = viewModel.getEditedItem();
 		CodeList codeList = editedItem.getCodeList();
-		CodeScope codeScope = codeList.getCodeScope();
 		CodeListItem parentItem = getParentItem(ctx);
 		CodeListItem existingItem = null;
 		CodeListManager codeListManager = getCodeListManager(ctx);
-		if ( codeScope == CodeScope.LOCAL ) {
-			if ( parentItem == null ) {
-				existingItem = codeListManager.loadRootItem(codeList, code, null);
-			} else {
-				existingItem = codeListManager.loadChildItem(parentItem, code, null);
-			}
+		if ( parentItem == null ) {
+			existingItem = codeListManager.loadRootItem(codeList, code, null);
 		} else {
-			existingItem = codeListManager.loadChildItem(codeList, code, null);
+			existingItem = codeListManager.loadChildItem(parentItem, code, null);
 		}
 		return existingItem;
 	}

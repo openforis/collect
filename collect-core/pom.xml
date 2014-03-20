@@ -258,6 +258,10 @@
         </dependency>
         <dependency>
           <groupId>org.openforis.commons</groupId>
+          <artifactId>commons-concurrency</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.openforis.commons</groupId>
           <artifactId>commons-collections</artifactId>
         </dependency>
         <dependency>

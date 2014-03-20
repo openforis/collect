@@ -13,6 +13,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
  * @author S. Ricci
  *
  */
+@Deprecated
 public class ProcessStatusPopUpComposer extends BindComposer<Component> {
 
 	private static final long serialVersionUID = 1L;

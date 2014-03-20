@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -86,7 +85,7 @@ public class RelationalSchemaGenerator {
 	}
 
 	private void addCodeListTable(RelationalSchema rs, CodeList codeList) throws CollectRdbException {
-		if ( StringUtils.isBlank(codeList.getLookupTable()) ) {
+		if ( ! codeList.isExternal() ) {
 			List<CodeListLevel> hierarchy = codeList.getHierarchy();
 			if ( hierarchy.size() == 0 ) {
 				CodeTable table = createCodeListTable(rs, codeList, null, null);
@@ -333,7 +332,7 @@ public class RelationalSchemaGenerator {
 		FieldDefinition<?> codeField = defn.getFieldDefinition(CodeAttributeDefinition.CODE_FIELD);
 		addCodeColumn(table, codeField, relativePath);
 		CodeList list = defn.getList();
-		if ( StringUtils.isBlank(list.getLookupTable()) ) {
+		if ( ! list.isExternal() ) {
 			addCodeValueFKColumn(rs, table, defn, relativePath);
 		}
 		boolean qualifiable = isQualifiable(list);

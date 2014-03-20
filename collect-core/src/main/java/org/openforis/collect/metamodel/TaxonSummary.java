@@ -24,6 +24,7 @@ public class TaxonSummary {
 	private static final String VERNACULAR_NAMES_SEPARATOR = ", ";
 
 	private int taxonSystemId;
+	private Integer parentSystemId;
 	private Integer taxonId;
 	private String code;
 	private String familyName;
@@ -105,6 +106,14 @@ public class TaxonSummary {
 		this.taxonSystemId = taxonSystemId;
 	}
 	
+	public Integer getParentSystemId() {
+		return parentSystemId;
+	}
+
+	public void setParentSystemId(Integer parentSystemId) {
+		this.parentSystemId = parentSystemId;
+	}
+	
 	public Integer getTaxonId() {
 		return taxonId;
 	}
@@ -144,5 +153,5 @@ public class TaxonSummary {
 	public void setRank(TaxonRank rank) {
 		this.rank = rank;
 	}
-	
+
 }

@@ -11,22 +11,22 @@ package org.openforis.collect.client {
 	 * */
 	public class DataExportClient extends AbstractClient {
 		
-		private var _getStateOperation:Operation;
+		private var _getCurrentJobOperation:Operation;
 		private var _exportOperation:Operation;
 		private var _fullExportOperation:Operation;
-		private var _cancelOperation:Operation;
+		private var _abortOperation:Operation;
 		
 		public function DataExportClient() {
 			super("dataExportService");
 			
 			this._exportOperation = getOperation("export");
 			this._fullExportOperation = getOperation("fullExport");
-			this._getStateOperation = getOperation("getState", CONCURRENCY_LAST, false);
-			this._cancelOperation = getOperation("cancel");
+			this._getCurrentJobOperation = getOperation("getCurrentJob", CONCURRENCY_LAST, false);
+			this._abortOperation = getOperation("abort");
 		}
 		
-		public function getState(responder:IResponder):void {
-			var token:AsyncToken = this._getStateOperation.send();
+		public function getCurrentJob(responder:IResponder):void {
+			var token:AsyncToken = this._getCurrentJobOperation.send();
 			token.addResponder(responder);
 		}
 		
@@ -35,13 +35,13 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function fullExport(responder:IResponder, rootEntityName:String, stepNumbers:Array = null):void {
-			var token:AsyncToken = this._fullExportOperation.send(rootEntityName, stepNumbers);
+		public function fullExport(responder:IResponder, rootEntityName:String, includeRecordFiles:Boolean = false):void {
+			var token:AsyncToken = this._fullExportOperation.send(rootEntityName, includeRecordFiles);
 			token.addResponder(responder);
 		}
 		
-		public function cancel(responder:IResponder):void {
-			var token:AsyncToken = this._cancelOperation.send();
+		public function abort(responder:IResponder):void {
+			var token:AsyncToken = this._abortOperation.send();
 			token.addResponder(responder);
 		}
 		

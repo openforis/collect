@@ -22,8 +22,8 @@
 		<flexmojos.version>4.2-beta</flexmojos.version>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<idm.version>3.0-Alpha11</idm.version>
-		<openforis.commons.version>0.0.6</openforis.commons.version>
+		<idm.version>3.0-Alpha12-SNAPSHOT</idm.version>
+		<openforis.commons.version>0.0.7-SNAPSHOT</openforis.commons.version>
 	</properties>
 
 	<distributionManagement>
@@ -232,6 +232,21 @@
 				<groupId>org.openforis.commons</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>${openforis.commons.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openforis.commons</groupId>
+				<artifactId>commons-concurrency</artifactId>
+				<version>${openforis.commons.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-beans</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.springframework</groupId>
+						<artifactId>spring-context</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.commons</groupId>

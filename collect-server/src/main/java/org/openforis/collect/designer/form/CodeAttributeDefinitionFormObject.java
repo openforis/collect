@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.designer.form;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -12,11 +11,11 @@ import org.openforis.idm.metamodel.EntityDefinition;
  * @author S. Ricci
  *
  */
-public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition> extends AttributeDefinitionFormObject<T> {
+public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormObject<CodeAttributeDefinition> {
 	
 	private boolean key;
 	private CodeList list;
-	private String parentExpression;
+	private CodeAttributeDefinition parentCodeAttributeDefinition;
 	private boolean strict;
 	private boolean allowValuesSorting;
 	
@@ -27,21 +26,21 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 	}
 
 	@Override
-	public void saveTo(T dest, String languageCode) {
+	public void saveTo(CodeAttributeDefinition dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setList(list);
 		dest.setKey(key);
 		dest.setAllowUnlisted(! strict);
-		dest.setParentExpression(StringUtils.trimToNull(parentExpression));
+		dest.setParentCodeAttributeDefinition(parentCodeAttributeDefinition);
 		dest.setAllowValuesSorting(dest.isMultiple() && allowValuesSorting);
 	}
 	
 	@Override
-	public void loadFrom(T source, String languageCode) {
+	public void loadFrom(CodeAttributeDefinition source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		key = source.isKey();
 		list = source.getList();
-		parentExpression = source.getParentExpression();
+		parentCodeAttributeDefinition = source.getParentCodeAttributeDefinition();
 		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 	}
@@ -70,20 +69,20 @@ public class CodeAttributeDefinitionFormObject<T extends CodeAttributeDefinition
 		this.strict = strict;
 	}
 	
-	public String getParentExpression() {
-		return parentExpression;
-	}
-	
-	public void setParentExpression(String parentExpression) {
-		this.parentExpression = parentExpression;
-	}
-	
 	public boolean isAllowValuesSorting() {
 		return allowValuesSorting;
 	}
 	
 	public void setAllowValuesSorting(boolean allowValuesSorting) {
 		this.allowValuesSorting = allowValuesSorting;
+	}
+	
+	public CodeAttributeDefinition getParentCodeAttributeDefinition() {
+		return parentCodeAttributeDefinition;
+	}
+	
+	public void setParentCodeAttributeDefinition(CodeAttributeDefinition parentCodeAttributeDefinition) {
+		this.parentCodeAttributeDefinition = parentCodeAttributeDefinition;
 	}
 
 }

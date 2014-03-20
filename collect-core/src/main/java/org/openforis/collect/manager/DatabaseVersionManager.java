@@ -236,9 +236,4 @@ public class DatabaseVersionManager {
 		
 	}
 	
-	public static void main(String[] args) {
-		VersionInfo v1 = VersionInfo.parse("3");
-		System.out.println(v1);
-	}
-	
 }

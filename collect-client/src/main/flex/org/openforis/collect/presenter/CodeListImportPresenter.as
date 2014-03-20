@@ -9,9 +9,12 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.CodeListImportClient;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.CodeListProxy$CodeScope;
 	import org.openforis.collect.ui.view.CodeListImportView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.NavigationUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -30,6 +33,8 @@ package org.openforis.collect.presenter
 			_codeListImportClient = ClientFactory.codeListImportClient;
 
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			
+			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		
 		private function get view():CodeListImportView {
@@ -43,6 +48,7 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			view.browseButton.addEventListener(MouseEvent.CLICK, browseButtonClickHandler);
+			view.downloadExampleButton.addEventListener(MouseEvent.CLICK, downloadExampleButtonClickHandler);
 		}
 		
 		override protected function loadInitialData():void {
@@ -97,6 +103,10 @@ package org.openforis.collect.presenter
 			browseFileToImport();
 		}
 		
+		protected function downloadExampleButtonClickHandler(event:MouseEvent):void {
+			NavigationUtil.openInNewWindow(ApplicationConstants.CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_URL);
+		}
+		
 		protected function validateImportForm():Boolean {
 			if ( StringUtil.isBlank(view.sourceFileTextInput.text) ) {
 				AlertUtil.showMessage(messageKeys.FILE_NOT_SELECTED, null, messageKeys.IMPORT_POPUP_TITLE);
@@ -127,4 +137,7 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 		return "codeListImport.title";
 	}
 	
+	public function get IMPORT_FILE_FORMAT_INFO():String {
+		return "codeListImport.importFileFormatInfo";
+	}
 }

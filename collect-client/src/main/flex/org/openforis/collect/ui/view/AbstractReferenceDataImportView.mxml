@@ -8,7 +8,7 @@
 			import mx.controls.ProgressBar;
 			
 			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.manager.referencedataimport.ParsingError$ErrorType;
+			import org.openforis.collect.io.metadata.parsing.ParsingError$ErrorType;
 			import org.openforis.collect.manager.referencedataimport.proxy.ParsingErrorProxy;
 			import org.openforis.collect.ui.component.datagrid.PaginationBar;
 			import org.openforis.collect.util.StringUtil;

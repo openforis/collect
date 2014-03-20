@@ -22,6 +22,8 @@
 			
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var browseButton:Button;
+			[SkinPart(required="true", type="spark.components.Button")]
+			public var downloadExampleButton:Button;
 			[SkinPart(required="true", type="spark.components.TextInput")]
 			public var sourceFileTextInput:TextInput;
 			

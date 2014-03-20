@@ -16,9 +16,12 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.Proxy;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.io.data.DataExportStatus$Format;
+	import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 	import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -27,6 +30,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.DataExportPopUp;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.concurrency.proxy.JobProxy;
+	import org.openforis.concurrency.proxy.JobProxy$Status;
 	
 	import spark.components.DropDownList;
 	
@@ -45,7 +50,7 @@ package org.openforis.collect.presenter {
 		private var _getStateResponder:IResponder;
 		private var _progressTimer:Timer;
 		private var _type:String;
-		private var _state:DataExportStatusProxy;
+		private var _job:Proxy;
 		private var _firstOpen:Boolean = true;
 		
 		public function DataExportPopUpPresenter(view:DataExportPopUp) {
@@ -69,7 +74,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function closeHandler(event:Event = null):void {
-			if ( _state != null && _state.step == ProcessStatus$Step.RUN ) {
+			if ( _job != null && (
+					(_job is DataExportStatusProxy && DataExportStatusProxy(_job).step == ProcessStatus$Step.RUN) ||
+					(_job is JobProxy && JobProxy(_job).running)
+				)) {
 				AlertUtil.showMessage("export.cannotClosePopUp");
 			} else {
 				PopUpManager.removePopUp(_view);
@@ -117,6 +125,7 @@ package org.openforis.collect.presenter {
 					}
 					break;
 				case "full":
+					/*
 					step = DataExportPopUp(_view).stepDropDownList.selectedItem;
 					var stepNums:Array;
 					if ( step != ALL_STEPS_ITEM ) {
@@ -125,7 +134,9 @@ package org.openforis.collect.presenter {
 					} else {
 						stepNums = [1, 2, 3];
 					}
-					ClientFactory.dataExportClient.fullExport(_exportResponder, rootEntity, stepNums);
+					*/
+					var includeRecordFiles:Boolean = DataExportPopUp(_view).includeRecordFilesCheckBox.selected;
+					ClientFactory.dataExportClient.fullExport(_exportResponder, rootEntity, includeRecordFiles);
 					_view.currentState = DataExportPopUp.STATE_EXPORTING;
 					DataExportPopUp(_view).progressBar.setProgress(0, 0);
 					break;
@@ -164,11 +175,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function cancelExportButtonClickHandler(event:MouseEvent):void {
-			ClientFactory.dataExportClient.cancel(_cancelResponder);
+			ClientFactory.dataExportClient.abort(_cancelResponder);
 		}
 		
 		protected function exportResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataExportStatusProxy;
+			_job = event.result as Proxy;
 			updateView();
 		}
 		
@@ -192,7 +203,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateExportState():void {
-			ClientFactory.dataExportClient.getState(_getStateResponder);
+			ClientFactory.dataExportClient.getCurrentJob(_getStateResponder);
 		}
 		
 		protected function cancelResultHandler(event:ResultEvent, token:Object = null):void {
@@ -200,45 +211,82 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function getStateResultHandler(event:ResultEvent, token:Object = null):void {
-			_state = event.result as DataExportStatusProxy;
+			_job = event.result as Proxy;
 			updateView();
 		}
 		
 		protected function updateView():void {
-			if(_state != null) {
-				var processed:int = _state.processed;
-				var step:ProcessStatus$Step = _state.step;
-				if ( step == ProcessStatus$Step.RUN && processed <= _state.total ) {
-					_view.currentState = DataExportPopUp.STATE_EXPORTING;
-					DataExportPopUp(_view).progressBar.setProgress(processed, _state.total);
-					var progressText:String;
-					if ( _state.total == 0 ) {
-						progressText = Message.get("export.processing");
-					} else {
-						progressText = Message.get("export.progressLabel", [processed, _state.total]);
-					}
-					DataExportPopUp(_view).progressLabel.text = progressText;
-					if ( _progressTimer == null ) {
-						startProgressTimer();
-					}
-				} else if ( !_firstOpen && step == ProcessStatus$Step.COMPLETE ) {
-					_view.currentState = DataExportPopUp.STATE_COMPLETE;
-					stopProgressTimer();
-				} else {
-					if ( !_firstOpen ) {
-						if ( step == ProcessStatus$Step.ERROR ) {
-							AlertUtil.showError("export.error");
-							resetView();
-						} else if ( step == ProcessStatus$Step.CANCEL ) {
-							AlertUtil.showError("export.cancelled");
-							resetView();
+			if ( _job != null ) {
+				if ( _job is DataExportStatusProxy ) {
+					var _state:DataExportStatusProxy = _job as DataExportStatusProxy;
+					var processed:int = _state.processed;
+					var step:ProcessStatus$Step = _state.step;
+					if ( step == ProcessStatus$Step.RUN && processed <= _state.total ) {
+						_view.currentState = DataExportPopUp.STATE_EXPORTING;
+						DataExportPopUp(_view).progressBar.setProgress(processed, _state.total);
+						var progressText:String;
+						if ( _state.total == 0 ) {
+							progressText = Message.get("export.processing");
 						} else {
-							//process starting in a while...
+							progressText = Message.get("export.progressLabel", [processed, _state.total]);
+						}
+						DataExportPopUp(_view).progressLabel.text = progressText;
+						if ( _progressTimer == null ) {
 							startProgressTimer();
 						}
+					} else if ( !_firstOpen && step == ProcessStatus$Step.COMPLETE ) {
+						_view.currentState = DataExportPopUp.STATE_COMPLETE;
+						stopProgressTimer();
 					} else {
-						resetView();
+						if ( !_firstOpen ) {
+							if ( step == ProcessStatus$Step.ERROR ) {
+								AlertUtil.showError("export.error");
+								resetView();
+							} else if ( step == ProcessStatus$Step.CANCEL ) {
+								AlertUtil.showError("export.cancelled");
+								resetView();
+							} else {
+								//process starting in a while...
+								startProgressTimer();
+							}
+						} else {
+							resetView();
+						}
 					}
+				} else if ( _job is SurveyBackupJobProxy ) {
+					var job:JobProxy = _job as JobProxy;
+					var progress:int = job.progressPercent;
+					var status:JobProxy$Status = job.status;
+					if ( status == JobProxy$Status.RUNNING && processed <= 100 ) {
+						_view.currentState = DataExportPopUp.STATE_EXPORTING;
+						DataExportPopUp(_view).progressBar.setProgress(processed, 100);
+						var progressText:String = Message.get("export.processing");
+						DataExportPopUp(_view).progressLabel.text = progressText;
+						if ( _progressTimer == null ) {
+							startProgressTimer();
+						}
+					} else if ( !_firstOpen && status == JobProxy$Status.COMPLETED ) {
+						_view.currentState = DataExportPopUp.STATE_COMPLETE;
+						stopProgressTimer();
+					} else {
+						if ( !_firstOpen ) {
+							if ( status == JobProxy$Status.FAILED ) {
+								AlertUtil.showError("export.error");
+								resetView();
+							} else if ( status == JobProxy$Status.ABORTED ) {
+								AlertUtil.showError("export.cancelled");
+								resetView();
+							} else {
+								//process starting in a while...
+								startProgressTimer();
+							}
+						} else {
+							resetView();
+						}
+					}
+				} else {
+					//not supported job type
+					resetView();
 				}
 			} else {
 				resetView();
@@ -247,7 +295,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function resetView():void {
-			_state = null;
+			_job = null;
 			_view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
 			DataExportPopUp(_view).typeGroup.selection = null;
 			stopProgressTimer();

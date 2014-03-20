@@ -1,5 +1,6 @@
 package org.openforis.collect.util
 {
+	import mx.collections.IList;
 	import mx.utils.StringUtil;
 
 	/**
@@ -89,8 +90,8 @@ package org.openforis.collect.util
 		 **/
 		public static function concat(separator:String, ... args):String {
 			var parts:Array;
-			if(args != null && args.length == 1 && args[0] is Array) {
-				parts = args[0];
+			if(args != null && args.length == 1 && ( args[0] is Array || args[0] is IList ) ) {
+				parts = ArrayUtil.getArray(args[0]);
 			} else {
 				parts = args;
 			}

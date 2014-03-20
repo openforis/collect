@@ -33,27 +33,12 @@
             </fieldErrorHandler>
           </row>
           <row>
-            <label value="${labels.survey.project_cycle}:" />
-            <fieldErrorHandler message="@load(vmsgs['projectCycle'])">
-              <textbox width="150px" value="@bind(fx.projectCycle)"
-                onChange="@command('applyChanges')" />
-            </fieldErrorHandler>
-          </row>
-          <row>
             <multilanguageLabel value="${labels.survey.description}" 
               languageCode="@load(vm.currentLanguageCode)" />
             <fieldErrorHandler message="@load(vmsgs['description'])">
               <textbox width="350px" value="@bind(fx.description)"
                 multiline="true" rows="4"
                 onChange="@command('applyChanges')" />
-            </fieldErrorHandler>
-          </row>
-          <row>
-            <label value="${labels.survey.uri}:" />
-            <fieldErrorHandler message="@load(vmsgs['uri'])">
-              <textbox width="350px" value="@bind(fx.uri)"
-                onChange="@command('applyChanges')"
-                readonly="@load(fx.published)" />
             </fieldErrorHandler>
           </row>
          </rows>
@@ -65,7 +50,16 @@
         <column />
       </columns>
       <rows>
-        <row visible="@load(not vm.simpleEditor)">
+        <row>
+          <label value="${labels.survey.versioning_manager}:" />
+          <cell>
+            <button sclass="icon"
+              tooltiptext="${labels.survey.versioning_manager}"
+              onClick="@global-command('openVersioningManagerPopUp')"
+              image="/assets/images/edit-small.png" />
+          </cell>
+        </row>
+        <row>
           <label value="${labels.survey.srs.$}:" />
           <cell>
             <button sclass="icon"
@@ -75,29 +69,11 @@
           </cell>
         </row>
         <row>
-          <label value="${labels.survey.code_lists}:" />
-          <cell>
-            <button sclass="icon"
-              tooltiptext="${labels.survey.code_list.manager.title}"
-              onClick="@global-command('openCodeListsManagerPopUp')"
-              image="/assets/images/edit-small.png" />
-          </cell>
-        </row>
-        <row>
           <label value="${labels.survey.units}:" />
           <cell>
             <button sclass="icon" 
               tooltiptext="${labels.survey.unit.manager.title}"
               onClick="@global-command('openUnitsManagerPopUp')"
-              image="/assets/images/edit-small.png" />
-          </cell>
-        </row>
-        <row>
-          <label value="${labels.survey.versioning_manager}:" />
-          <cell>
-            <button sclass="icon"
-              tooltiptext="${labels.survey.versioning_manager}"
-              onClick="@global-command('openVersioningManagerPopUp')"
               image="/assets/images/edit-small.png" />
           </cell>
         </row>

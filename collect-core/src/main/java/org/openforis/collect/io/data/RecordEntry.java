@@ -10,14 +10,21 @@ import org.openforis.collect.model.CollectRecord.Step;
  * @author S. Ricci
  *
  */
+@Deprecated
 public class RecordEntry {
 	
 	private Step step;
 	private int recordId;
+	private String namePrefix;
 	
 	public RecordEntry(Step step, int recordId) {
+		this(step, recordId, "");
+	}
+	
+	public RecordEntry(Step step, int recordId, String namePrefix) {
 		this.step = step;
 		this.recordId = recordId;
+		this.namePrefix = namePrefix;
 	}
 	
 	public static boolean isValidRecordEntry(ZipEntry zipEntry) {
@@ -27,7 +34,7 @@ public class RecordEntry {
 	}
 	
 	public static RecordEntry parse(String zipEntryName) throws DataParsingExeption {
-		//for retro compatibility with previous generated backup files
+		//for backward compatibility with previous generated backup files
 		String zipEntryNameFixed = zipEntryName.replace("\\", XMLDataExportProcess.ZIP_DIRECTORY_SEPARATOR);
 		String[] entryNameSplitted = zipEntryNameFixed.split(XMLDataExportProcess.ZIP_DIRECTORY_SEPARATOR);
 		if (entryNameSplitted.length != 2) {
@@ -46,7 +53,11 @@ public class RecordEntry {
 	}
 
 	public String getName() {
-		return step.getStepNumber() + XMLDataExportProcess.ZIP_DIRECTORY_SEPARATOR + recordId + ".xml";
+		return namePrefix + 
+				step.getStepNumber() + 
+				XMLDataExportProcess.ZIP_DIRECTORY_SEPARATOR + 
+				recordId + 
+				".xml";
 	}
 	
 	public int getRecordId() {

@@ -12,106 +12,118 @@
 			}
 		}
 	]]></script>
-	<borderlayout id="surveyEditBox"
+	<borderlayout id="surveyEditBox" 
 		hflex="1" vflex="1"
 		self="@define(content)"
 		apply="org.openforis.collect.designer.composer.SurveyEditComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyEditVM')">
-    <north border="none">
-      <box width="100%" align="center">
-        <label sclass="mainTitleEditing"
-          value="${labels.designer_title}" />
-      </box>
-    </north>
-    <center border="none">
+		<north border="none">
+			<box width="100%" align="center">
+				<label sclass="mainTitleEditing"
+					value="${labels.designer_title}" />
+			</box>
+		</north>
+		<center border="none">
 			<absolutelayout hflex="1" vflex="1">
-         <absolutechildren hflex="1" vflex="1">
-           <!-- main tabs -->
-           <tabbox id="tb" hflex="1" vflex="1">
-             <tabs id="tabs">
-               <tab id="genericTab" label="${labels.survey.$}"
-                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
-               <tab id="speciesImportTab"
-                 label="${labels.survey.species_import.$}"
-                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"
-                 visible="@load(not vm.simpleEditor)" />
-               <tab id="samplingDesignImportTab"
-                 label="${labels.survey.sampling_design_import.$}"
-                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"
-                 visible="@load(not vm.simpleEditor)" />
-               <tab id="schemaTab" label="${labels.survey.schema.$}"
-                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
-               <tab id="layoutTab" label="${labels.survey.layout.$}"
-                 w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"
-                 visible="@load(not vm.simpleEditor)" />
-             </tabs>
-             <tabpanels>
-               <tabpanel>
-                 <include id="mainInfoInclude"
-                   src="survey_edit/info.zul" />
-               </tabpanel>
-               <tabpanel>
-               	<label value="${labels.survey.species_import.save_survey_before}" 
-               		visible="@load(empty vm.surveyId)" />
-                 <flash src="@load(vm.speciesImportModuleUrl)"
-                   sclass="maximised" height="100%" width="100%"
-                   visible="@load(not empty vm.surveyId)" />
-               </tabpanel>
-               <tabpanel>
-               	<label value="${labels.survey.sampling_design_import.save_survey_before}" 
-               		visible="@load(empty vm.surveyId)" />
-                 <flash src="@load(vm.samplingDesignImportModuleUrl)"
-                   sclass="maximised" height="100%" width="100%"
-                   visible="@load(not empty vm.surveyId)" />
-               </tabpanel>
-               <tabpanel>
-                 <include id="schemaInclude"
-                   src="survey_edit/schema/schema.zul" />
-               </tabpanel>
-               <tabpanel>
-                 <include id="layoutTabsInclude"
-                   src="survey_edit/layout_tabs.zul" />
-               </tabpanel>
-             </tabpanels>
-           </tabbox>
-         </absolutechildren>
-         <absolutechildren x="480" width="50%">
-             <!-- language selector -->
-             <hlayout id="languageSelector" 
-                hflex="1" 
-                style="text-align: right;"
-                sclass="controlBar">
-               <listbox model="@load(vm.availableLanguages)"
-                 selectedItem="@load(vm.currentLanguageCode)"
-                 onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
-                 mold="select">
-                 <template name="model">
-                    <listitem label="${c:l(each)}" value="@load(each)" />
-                 </template>
-               </listbox>
-               <button sclass="icon"
-                height="24px"
-               	tooltiptext="${labels.survey.language_manager}"
-               	onClick="@command('openLanguageManagerPopUp')"
-               	image="/assets/images/edit-language.png" />
-             </hlayout>
-         </absolutechildren>
+				<absolutechildren hflex="1" vflex="1">
+					<!-- main tabs -->
+					<tabbox id="tb" hflex="1" vflex="1">
+						<tabs id="tabs">
+							<tab id="genericTab"
+								label="${labels.survey.$}" 
+								w:_sel="switchTab"
+								forward="onSwitchTab=onSwitchTab" />
+							<tab id="codeListsTab"
+								label="${labels.survey.code_lists}" 
+								w:_sel="switchTab"
+								forward="onSwitchTab=onSwitchTab" />
+							<tab id="speciesImportTab"
+								label="${labels.survey.species_import.$}" 
+								w:_sel="switchTab"
+								forward="onSwitchTab=onSwitchTab"
+								visible="@load(not vm.simpleEditor)" />
+							<tab id="samplingDesignImportTab"
+								label="${labels.survey.sampling_design_import.$}"
+								w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"
+								visible="@load(not vm.simpleEditor)" />
+							<tab id="schemaTab"
+								label="${labels.survey.schema.$}" 
+								w:_sel="switchTab"
+								forward="onSwitchTab=onSwitchTab" />
+						</tabs>
+						<tabpanels>
+							<tabpanel>
+								<include id="mainInfoInclude"
+									src="survey_edit/info.zul" />
+							</tabpanel>
+							<tabpanel>
+								<include id="codeListsInclude"
+									src="survey_edit/code_lists.zul" />
+							</tabpanel>
+							<tabpanel>
+								<label
+									value="${labels.survey.species_import.save_survey_before}"
+									visible="@load(empty vm.surveyId)" />
+								<flash
+									src="@load(vm.speciesImportModuleUrl)" sclass="maximised"
+									height="100%" width="100%"
+									visible="@load(not empty vm.surveyId)" />
+							</tabpanel>
+							<tabpanel>
+								<label
+									value="${labels.survey.sampling_design_import.save_survey_before}"
+									visible="@load(empty vm.surveyId)" />
+								<flash
+									src="@load(vm.samplingDesignImportModuleUrl)"
+									sclass="maximised" height="100%" width="100%"
+									visible="@load(not empty vm.surveyId)" />
+							</tabpanel>
+							<tabpanel>
+								<include id="schemaInclude"
+									src="survey_edit/schema/schema.zul" />
+							</tabpanel>
+						</tabpanels>
+					</tabbox>
+				</absolutechildren>
+				<absolutechildren x="480" width="50%">
+					<!-- language selector -->
+					<hlayout id="languageSelector" hflex="1"
+						style="text-align: right;" sclass="controlBar">
+						<listbox model="@load(vm.availableLanguages)"
+							selectedItem="@load(vm.currentLanguageCode)"
+							onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
+							mold="select">
+							<template name="model">
+								<listitem label="${c:l(each)}"
+									value="@load(each)" />
+							</template>
+						</listbox>
+						<button sclass="icon" height="24px"
+							tooltiptext="${labels.survey.language_manager}"
+							onClick="@command('openLanguageManagerPopUp')"
+							image="/assets/images/edit-language.png" />
+					</hlayout>
+				</absolutechildren>
 			</absolutelayout>
-	 	</center>
-		<south height="30px">
+		</center>
+		<south height="30px" border="none">
 			<borderlayout hflex="1">
 				<west border="none" size="40%">
-					<button label="${labels.survey.back_to_list}" 
-                        image="/assets/images/back-small.png"
+					<button label="${labels.survey.back_to_list}"
+						image="/assets/images/back-small.png"
 						onClick="@command('backToSurveysList')" />
 				</west>
 				<center border="none">
 					<box width="100%" align="center">
-						<button label="${labels.global.save_item}" 
+						<button label="${labels.global.save_item}"
 							onClick="@command('save')" />
 					</box>
 				</center>
 				<east border="none" size="40%">
+					<box width="100%" align="end">
+						<button label="${labels.survey.validate}"
+							onClick="@command('validate')" />
+					</box>
 				</east>
 			</borderlayout>
 		</south>

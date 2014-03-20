@@ -58,6 +58,9 @@ button.icon {
 	color: grey;
 	font-style: italic;
 }
+.z-treecell-cnt {
+	white-space: nowrap;
+}
 .z-textbox.error, .z-intbox.error, .z-select.error, .z-datebox.error {
 	border: 2px inset #FF0000;
 	color: #000000;
@@ -77,7 +80,7 @@ button.icon {
 	font-weight: bold;
 }
 .sectionTitle {
-	font-size: 14px;
+	font-size: 12px;
 	font-weight: bold;
 }
 /* END OF TITLES */
@@ -85,6 +88,13 @@ button.icon {
 /* START OF MESSAGES STYLE */
 .alertMessage {
 	color: red;
+}
+.tipMessage {
+	font-style: italic;
+}
+.infoMessage {
+	font-size: 12px;
+	font-weight: normal;
 }
 /* END OF MESSAGES STYLE */
 
@@ -139,4 +149,16 @@ button.icon {
 .z-flash.maximised {
 	height: 100%;
 	width: 100%;
+}
+
+.node-type-header .z-label {
+/* 	margin-left: -10px; */
+/* 	padding-right: 14px; */
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.path-label {
+	text-align: right;
+	display: inline-block;
 }

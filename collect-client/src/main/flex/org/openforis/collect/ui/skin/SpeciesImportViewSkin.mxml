@@ -34,17 +34,17 @@
 			  >
 		<s:HGroup width="100%" 
 				  verticalAlign="middle">
-			<s:Label text="{Message.get('speciesImport.checklist')}" 
+			<s:Label text="{Message.get('speciesImport.list')}" 
 					 styleName="formLabel" />
 			
-			<s:DropDownList id="checklistsDropDown" labelField="name" />
+			<s:DropDownList id="listsDropDown" labelField="name" />
 			<s:Button id="newButton" 
 					  label="{Message.get('global.new')}"
 					  useHandCursor="true"
 					  buttonMode="true"
 					  />
 			<s:Button id="editButton" 
-					  label="{Message.get('global.edit')}"
+					  label="{Message.get('global.rename')}"
 					  useHandCursor="true"
 					  buttonMode="true"
 					  />
@@ -58,7 +58,7 @@
 		<s:VGroup height="100%" 
 				  maxHeight="500"
 				  width="100%"
-				  visible="{checklistsDropDown.selectedItem != null}"
+				  visible="{listsDropDown.selectedItem != null}"
 				  horizontalAlign="center">
 			<s:DataGrid id="summaryDataGrid" 
 						height="100%"
@@ -66,6 +66,9 @@
 						rowHeight="22">
 				<s:columns>
 					<s:ArrayList>
+						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.rank')}" 
+									  labelFunction="{hostComponent.rankLabelFunction}" 
+									  width="80" />
 						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.taxonId')}" 
 									  labelFunction="{hostComponent.taxonIdLabelFunction}" 
 									  width="60" />
@@ -74,9 +77,6 @@
 									  width="100" />
 						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.scientificName')}" 
 									  dataField="scientificName" />
-						<s:GridColumn headerText="{Message.get('speciesImport.summaryList.rank')}" 
-									  labelFunction="{hostComponent.rankLabelFunction}" 
-									  width="80" />
 					</s:ArrayList>
 				</s:columns>
 			</s:DataGrid>
@@ -87,7 +87,7 @@
 									/>
 		</s:VGroup>
 		
-		<s:HGroup gap="50">
+		<s:HGroup gap="100">
 			<s:HGroup gap="10">
 				<s:Button id="importButton" 
 						  label="{Message.get('referenceDataImport.import')}"
@@ -95,19 +95,25 @@
 						  buttonMode="true"
 						  />
 				<s:Image id="importFileFormatInfoIcon"
-						 source="{Images.INFO}"
+						 source="{Images.INFO_SMALL}"
 						 useHandCursor="true"
 						 toolTip="{Message.get('referenceDataImport.importFileFormatIconToolTip')}"
 						 click="{AlertUtil.showMessage(hostComponent.importFileFormatInfo)}"
-						 horizontalCenter="0"
-						 verticalCenter="0"
 						 />
 			</s:HGroup>
+			
+			<s:Button id="downloadExampleButton" 
+					  label="{Message.get('global.download_example_file')}"
+					  useHandCursor="true"
+					  buttonMode="true"
+					  />
+			
 			<s:Button id="exportButton" 
 					  label="{Message.get('referenceDataImport.export')}"
 					  useHandCursor="true"
 					  buttonMode="true"
 					  />
+			
 			<s:Button id="closeButton"
 					  label="{Message.get('global.close')}"
 					  includeInLayout="{hostComponent.showCloseButton}"

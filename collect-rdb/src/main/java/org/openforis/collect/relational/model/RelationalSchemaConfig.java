@@ -128,7 +128,7 @@ public class RelationalSchemaConfig implements Cloneable {
 	public void setDescriptionColumnSuffix(String descriptionColumnSuffix) {
 		this.descriptionColumnSuffix = descriptionColumnSuffix;
 	}
-
+	
 	public String getDataTablePrefix() {
 		return dataTablePrefix;
 	}

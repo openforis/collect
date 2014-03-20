@@ -23,13 +23,15 @@
 			import spark.components.gridClasses.GridColumn;
 			
 			[SkinPart(required="true", type="spark.components.DropDownList")]
-			public var checklistsDropDown:DropDownList;
+			public var listsDropDown:DropDownList;
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var newButton:Button;
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var editButton:Button;
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var deleteButton:Button;
+			[SkinPart(required="true", type="spark.components.Button")]
+			public var downloadExampleButton:Button;
 			
 			private var _presenter:SpeciesImportPresenter;
 			

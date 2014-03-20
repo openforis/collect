@@ -9,6 +9,7 @@ package org.openforis.collect.presenter
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SamplingDesignClient;
 	import org.openforis.collect.client.SamplingDesignImportClient;
@@ -17,6 +18,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.view.SamplingDesignImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.NavigationUtil;
 	
 	/**
 	 * 
@@ -36,6 +38,12 @@ package org.openforis.collect.presenter
 			_samplingDesignImportClient = ClientFactory.samplingDesignImportClient;
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
 			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
+			view.spatialReferenceSystems = Application.activeSurvey.spatialReferenceSystems;
+		}
+		
+		override internal function initEventListeners():void {
+			super.initEventListeners();
+			view.downloadExampleButton.addEventListener(MouseEvent.CLICK, downloadExampleButtonClickHandler);
 		}
 		
 		private function get view():SamplingDesignImportView {
@@ -73,6 +81,7 @@ package org.openforis.collect.presenter
 		
 		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {
 			var result:SamplingDesignSummariesProxy = event.result as SamplingDesignSummariesProxy;
+			SamplingDesignImportView(_view).summaryContainer.selectedIndex = result.totalCount > 0 ? 1: 0;
 			_view.summaryDataGrid.dataProvider = result.records;
 			_view.paginationBar.totalRecords = result.totalCount;
 		}
@@ -114,6 +123,10 @@ package org.openforis.collect.presenter
 			var request:URLRequest = new URLRequest(url);
 			request.method = URLRequestMethod.GET;
 			return request;
+		}
+		
+		protected function downloadExampleButtonClickHandler(event:MouseEvent):void {
+			NavigationUtil.openInNewWindow(ApplicationConstants.SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_URL);
 		}
 	}
 }

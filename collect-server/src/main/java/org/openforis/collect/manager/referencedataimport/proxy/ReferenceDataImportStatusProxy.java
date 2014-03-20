@@ -6,9 +6,9 @@ package org.openforis.collect.manager.referencedataimport.proxy;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.io.ReferenceDataImportStatus;
+import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.manager.process.proxy.ProcessStatusProxy;
-import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ReferenceDataImportStatus;
 
 /**
  * @author S. Ricci

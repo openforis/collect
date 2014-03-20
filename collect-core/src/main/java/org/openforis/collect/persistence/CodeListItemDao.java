@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
@@ -292,20 +293,24 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	public void deleteInvalidCodeListReferenceItems(CollectSurvey survey) {
-		List<Integer> codeListsIds = new ArrayList<Integer>();
- 		List<CodeList> codeLists = survey.getCodeLists();
-		for (CodeList codeList : codeLists) {
-			codeListsIds.add(codeList.getId());
-		}
-		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		//create delete where condition
+ 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
 		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
+
+		Condition whereCondition = surveyIdField.equal(survey.getId())
+										.and(oppositeSurveyIdField.isNull());
+		
+		List<Integer> codeListsIds = new ArrayList<Integer>();
+		if ( ! survey.getCodeLists().isEmpty() ) {
+			//include items that belongs to detached code lists
+	 		for (CodeList codeList : survey.getCodeLists()) {
+				codeListsIds.add(codeList.getId());
+			}
+			whereCondition = whereCondition.and(OFC_CODE_LIST.CODE_LIST_ID.notIn(codeListsIds));
+		}
+		//execute delete
 		JooqFactory jf = getMappingJooqFactory(null);
-		jf.delete(OFC_CODE_LIST)
-			.where(
-					surveyIdField.equal(survey.getId())
-						.and(oppositeSurveyIdField.isNull())
-						.and(OFC_CODE_LIST.CODE_LIST_ID.notIn(codeListsIds))
-			).execute();
+		jf.delete(OFC_CODE_LIST).where(whereCondition).execute();
 		
 		if ( useCache ) {
 			for (Integer codeListId : codeListsIds) {

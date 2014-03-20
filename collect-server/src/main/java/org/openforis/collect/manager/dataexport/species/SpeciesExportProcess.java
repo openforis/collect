@@ -8,8 +8,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
 import org.openforis.collect.manager.SpeciesManager;
-import org.openforis.collect.manager.speciesimport.SpeciesFileColumn;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.commons.io.csv.CsvWriter;
@@ -37,7 +37,7 @@ public class SpeciesExportProcess {
 		CsvWriter writer = null;
 		try {
 			writer = new CsvWriter(out);
-			TaxonSummaries summaries = speciesManager.loadFullTaxonSummaries(taxonomyId);
+			TaxonSummaries summaries = speciesManager.loadFullTaxonSummariesOld(taxonomyId);
 			ArrayList<String> colNames = new ArrayList<String>();
 			colNames.add(SpeciesFileColumn.NO.getColumnName());
 			colNames.add(SpeciesFileColumn.CODE.getColumnName());

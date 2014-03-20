@@ -12,7 +12,7 @@ package org.openforis.collect.client {
 	 * */
 	public class DataImportClient extends AbstractClient {
 		
-		private var _getStateOperation:Operation;
+		private var _getCurrentJobOperation:Operation;
 		private var _startSummaryCreationOperation:Operation;
 		private var _getSummaryOperation:Operation;
 		private var _startImportOperation:Operation;
@@ -26,12 +26,12 @@ package org.openforis.collect.client {
 			_getSummaryOperation = getOperation("getSummary");
 			_startImportOperation = getOperation("startImport");
 			_overwriteExistingRecordInConflict = getOperation("overwriteExistingRecordInConflict");
-			_getStateOperation = getOperation("getState", CONCURRENCY_LAST, false);
+			_getCurrentJobOperation = getOperation("getCurrentJob", CONCURRENCY_LAST, false);
 			_cancelOperation = getOperation("cancel");
 		}
 		
-		public function getState(responder:IResponder):void {
-			var token:AsyncToken = this._getStateOperation.send();
+		public function getCurrentJob(responder:IResponder):void {
+			var token:AsyncToken = this._getCurrentJobOperation.send();
 			token.addResponder(responder);
 		}
 		

@@ -19,21 +19,11 @@
 	    http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"
 	default-lazy-init="true">
 
-	<context:component-scan base-package="org.openforis.collect" />
-	<context:annotation-config />
-
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
 	<mvc:resources mapping="/assets/**" location="/assets/" />
 	<mvc:resources mapping="/images/**" location="/images/" />
 	<mvc:resources mapping="/script/**" location="/script/" />
 	<mvc:resources mapping="/org/**" location="/org/" />
-
-	<bean name="messageSource"
-		class="org.springframework.context.support.ResourceBundleMessageSource">
-		<property name="basename">
-			<value>org/openforis/collect/resourcebundles/validation</value>
-		</property>
-	</bean>
 
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
@@ -107,174 +97,7 @@
 	</bean>
 
 	<tx:annotation-driven transaction-manager="rdbTransactionManager" proxy-target-class="true"/>
-	
-	<!-- ===================================== -->
-	<!-- Liquibase -->
-	<!-- ===================================== -->
-	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase">
-		<property name="dataSource" ref="dataSource" />
-		<property name="changeLog"
-			value="classpath:org/openforis/collect/db/changelog/db.changelog-master.xml" />
-		<property name="defaultSchema" value="collect" />
-	</bean>
 
-	<!-- ===================================== -->
-	<!-- Daos -->
-	<!-- ===================================== -->
-	<bean id="applicationInfoDao" class="org.openforis.collect.persistence.ApplicationInfoDao"
-		lazy-init="false" depends-on="liquibase">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="codeListItemDao" class="org.openforis.collect.persistence.CodeListItemDao"
-		lazy-init="false" depends-on="liquibase">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao"
-		lazy-init="false" depends-on="liquibase">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="dynamicTableDao" class="org.openforis.collect.persistence.DynamicTableDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="logoDao" class="org.openforis.collect.persistence.LogoDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="recordDao" class="org.openforis.collect.persistence.RecordDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="samplingDesignDao" class="org.openforis.collect.persistence.SamplingDesignDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="surveyDao" class="org.openforis.collect.persistence.SurveyDao"
-		init-method="init">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="surveyWorkDao" class="org.openforis.collect.persistence.SurveyWorkDao"
-		init-method="init">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="taxonDao" class="org.openforis.collect.persistence.TaxonDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="taxonVernacularNameDao"
-		class="org.openforis.collect.persistence.TaxonVernacularNameDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	<bean id="userDao" class="org.openforis.collect.persistence.UserDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-	
-	<!-- ===================================== -->
-	<!-- Managers -->
-	<!-- ===================================== -->
-	<bean id="codeListManager" class="org.openforis.collect.manager.CodeListManager" />
-	<bean id="configurationManager" class="org.openforis.collect.manager.ConfigurationManager"
-		init-method="init" />
-	<bean id="databaseVersionManager" class="org.openforis.collect.manager.DatabaseVersionManager" />
-	<bean id="logoManager" class="org.openforis.collect.manager.LogoManager" />
-	<bean id="recordFileManager" class="org.openforis.collect.manager.RecordFileManager"
-		init-method="init" scope="session" />
-	<bean id="recordManager" class="org.openforis.collect.manager.RecordManager"
-		init-method="init">
-		<property name="lockTimeoutMillis" value="60000" />
-	</bean>
-	<bean id="persistedRecordIndexManager" class="org.openforis.collect.manager.RecordIndexManager"
-		init-method="init" lazy-init="false" autowire="byName" />
-	<bean id="volatileRecordIndexManager"
-		class="org.openforis.collect.remoting.service.recordindex.VolatileRecordIndexManager"
-		init-method="init" scope="session" lazy-init="false" autowire="byName" />
-	<bean id="samplingDesignManager" class="org.openforis.collect.manager.SamplingDesignManager" />
-	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager"
-		scope="session" />
-	<bean id="speciesManager" class="org.openforis.collect.manager.SpeciesManager" />
-	<bean id="surveyManager" class="org.openforis.collect.manager.SurveyManager"
-		init-method="init" />
-	<bean id="userManager" class="org.openforis.collect.manager.UserManager" />
-	
-	<!-- RDB -->
-	<bean id="rdbPublisher" class="org.openforis.collect.relational.CollectRDBPublisher" lazy-init="true" />
-	
-	<!-- <bean id="recordContext" class="org.openforis.collect.model.CollectRecordContext" 
-		/> -->
-	
-	<!-- XML DataMarshaller -->
-	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller"
-		lazy-init="false" autowire-candidate="true" autowire="byName" />
-	
-	<!--  Services -->
-	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />
-	
-	<!-- ===================================== -->
-	<!-- GraniteDs services -->
-	<!-- ===================================== -->
-	<bean id="csvDataImportService"
-		class="org.openforis.collect.remoting.service.CSVDataImportService"
-		autowire="byName" init-method="init" />
-	<bean id="codeListImportService"
-		class="org.openforis.collect.remoting.service.CodeListImportService"
-		autowire="byName" init-method="init" />
-	<bean id="dataService" class="org.openforis.collect.remoting.service.DataService"
-		autowire="byName" scope="session" />
-	<bean id="dataExportService"
-		class="org.openforis.collect.remoting.service.DataExportService"
-		autowire="byName" init-method="init" scope="session" />
-	<bean id="dataImportService"
-		class="org.openforis.collect.remoting.service.DataImportService"
-		autowire="byName" init-method="init" scope="session" />
-	<bean id="logoService" class="org.openforis.collect.remoting.service.LogoService"
-		autowire="byName" />
-	<bean id="modelService" class="org.openforis.collect.remoting.service.ModelService"
-		autowire="byName" />
-	<bean id="recordIndexService"
-		class="org.openforis.collect.remoting.service.recordindex.RecordIndexService"
-		autowire="byName" scope="session" />
-	<bean id="samplingDesignService"
-		class="org.openforis.collect.remoting.service.SamplingDesignService"
-		autowire="byName" />
-	<bean id="samplingDesignImportService"
-		class="org.openforis.collect.remoting.service.SamplingDesignImportService"
-		autowire="byName" init-method="init" />
-	<bean id="sessionService" class="org.openforis.collect.remoting.service.SessionService"
-		autowire="byName" />
-	<bean id="speciesService" class="org.openforis.collect.remoting.service.SpeciesService"
-		autowire="byName" />
-	<bean id="speciesImportService"
-		class="org.openforis.collect.remoting.service.SpeciesImportService"
-		autowire="byName" init-method="init" />
-	<bean id="userService" class="org.openforis.collect.remoting.service.UserService"
-		autowire="byName" />
-
-	<bean id="recordValidationProcess" class="org.openforis.collect.manager.validation.RecordValidationProcess"
-	     scope="prototype" />
-	
-	<!-- Expression Factory -->
-	<bean id="expressionFactory" class="org.openforis.idm.model.expression.ExpressionFactory">
-		<property name="lookupProvider" ref="lookupProvider" />
-	</bean>
-
-	<bean id="expressionValidator" class="org.openforis.idm.metamodel.expression.ExpressionValidator">
-		<constructor-arg ref="expressionFactory" />
-	</bean>
-	
-    <!--  Survey Context -->
-	<bean id="validator" 					class="org.openforis.collect.model.validation.CollectValidator" />
-	<bean id="surveyValidator" 				class="org.openforis.collect.manager.validation.SurveyValidator" />
-	<bean id="lookupProvider" 				class="org.openforis.collect.persistence.DatabaseLookupProvider" />
-	<bean id="externalCodeListProvider" 	class="org.openforis.collect.persistence.DatabaseExternalCodeListProvider" />
-
-	<bean id="collectSurveyContext" class="org.openforis.collect.model.CollectSurveyContext">
-		<constructor-arg ref="expressionFactory" />
-		<constructor-arg ref="validator" />
-		<property name="externalCodeListProvider" ref="externalCodeListProvider" />
-		<property name="codeListService" ref="codeListService" />
-	</bean>
-	
-	<!-- ===================================== -->
-	<!-- Security -->
-	<!-- ===================================== -->
-	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
+	<import resource="classpath:org/openforis/collect/application-context-server.xml"/>
 	
 </beans>

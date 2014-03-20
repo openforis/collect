@@ -399,8 +399,8 @@
 						width="80%"
 						/>
 		
-		<s:Label id="progressLabel"
-				 styleName="formLabel" />
+		<!--<s:Label id="progressLabel"
+				 styleName="formLabel" />-->
 		
 		<s:Button id="cancelButton"
 				  label="{Message.get('global.cancel')}"

@@ -15,6 +15,8 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -63,8 +65,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	@WireVariable
 	private SurveyManager surveyManager;
-	
+	@WireVariable
+	private SurveyValidator surveyValidator;
+
 	private boolean changed;
+	private Window validationResultsPopUp;
 
 	@Init(superclass=false)
 	public void init(@QueryParam("temp_id") Integer tempId) {
@@ -110,14 +115,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void closeSRSManagerPopUp() {
-		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				closePopUp(srsPopUp);
-				srsPopUp = null;
-				dispatchCurrentFormValidatedCommand(true);
-			}
-		});
+		closePopUp(srsPopUp);
+		srsPopUp = null;
+		dispatchCurrentFormValidatedCommand(true);
 	}
 	
 	@GlobalCommand
@@ -138,15 +138,10 @@ public class SurveyEditVM extends SurveyBaseVM {
 			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
 			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
 		if ( codeListsPopUp != null ) {
-			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-				@Override
-				public void onOk(boolean confirmed) {
-					closePopUp(codeListsPopUp);
-					codeListsPopUp = null;
-					dispatchCurrentFormValidatedCommand(true);
-					dispatchCodeListsPopUpClosedCommand(editingAttribute, selectedCodeList);
-				}
-			});
+			closePopUp(codeListsPopUp);
+			codeListsPopUp = null;
+			dispatchCurrentFormValidatedCommand(true);
+			dispatchCodeListsPopUpClosedCommand(editingAttribute, selectedCodeList);
 		}
 	}
 
@@ -168,14 +163,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void closeUnitsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( unitsPopUp != null ) {
-			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-				@Override
-				public void onOk(boolean confirmed) {
-					closePopUp(unitsPopUp);
-					unitsPopUp = null;
-					dispatchCurrentFormValidatedCommand(true);
-				}
-			});
+			closePopUp(unitsPopUp);
+			unitsPopUp = null;
+			dispatchCurrentFormValidatedCommand(true);
 		}
 	}	
 	
@@ -190,26 +180,25 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void closeVersioningManagerPopUp() {
 		if ( versioningPopUp != null ) {
-			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-				@Override
-				public void onOk(boolean confirmed) {
-					closePopUp(versioningPopUp);
-					versioningPopUp = null;
-					dispatchCurrentFormValidatedCommand(true);
-				}
-			});
+			closePopUp(versioningPopUp);
+			versioningPopUp = null;
+			dispatchCurrentFormValidatedCommand(true);
 		}
 	}
 	
 	@Command
 	public void backToSurveysList() {
 		if ( changed ) {
-			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
 					performBackToSurveysList();
 				}
-			}, "survey.edit.leave_page");
+			}, "survey.edit.leave_page_with_unsaved_changes");
+			params.setTitleKey("global.unsaved_changes");;
+			params.setOkLabelKey("global.continue_and_loose_changes");
+			params.setCancelLabelKey("global.stay_on_this_page");
+			MessageUtil.showConfirm(params);
 		} else {
 			performBackToSurveysList();
 		}
@@ -297,6 +286,24 @@ public class SurveyEditVM extends SurveyBaseVM {
 		} else {
 			return true;
 		}
+	}
+	
+	@Command
+	public void validate() {
+		List<SurveyValidationResult> result = surveyValidator.validate(survey);
+		if ( result.isEmpty() ) {
+			MessageUtil.showInfo("survey.successfully_validated");
+		} else {
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("validationResults", result);
+			validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
+		}
+	}
+	
+	@GlobalCommand
+	public void closeValidationResultsPopUp() {
+		closePopUp(validationResultsPopUp);
+		validationResultsPopUp = null;
 	}
 
 	@GlobalCommand

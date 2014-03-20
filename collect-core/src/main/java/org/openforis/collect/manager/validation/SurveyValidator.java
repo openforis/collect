@@ -32,7 +32,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.openforis.idm.metamodel.validation.Check;
@@ -51,6 +50,16 @@ import org.xml.sax.SAXException;
  */
 public class SurveyValidator {
 
+	private static final String XML_XSD_FILE_NAME = "xml.xsd";
+	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
+	private static final String IDML_UI_XSD_FILE_NAME = "idml3-ui.xsd";
+
+	private static final String[] SURVEY_XSD_FILE_NAMES = new String[] {
+			XML_XSD_FILE_NAME, 
+			IDML_XSD_FILE_NAME,
+			IDML_UI_XSD_FILE_NAME 
+	};
+	
 	private static final String CODE_LIST_PATH_FORMAT = "codeList/%s";
 
 	@Autowired
@@ -82,15 +91,19 @@ public class SurveyValidator {
 	public List<SurveyValidationResult> validate(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<SurveyValidationResult> partialResults;
+		
 		//root entity key required
 		partialResults = validateRootKeyAttributeSpecified(survey);
 		results.addAll(partialResults);
+		
 		//empty or unused code lists not allowed
 		partialResults = validateCodeLists(survey);
 		results.addAll(partialResults);
+
 		//empty entities not allowed
 		partialResults = validateEntities(survey);
 		results.addAll(partialResults);
+		
 		//validate expressions
 		partialResults = validateExpressions(survey);
 		results.addAll(partialResults);
@@ -120,7 +133,7 @@ public class SurveyValidator {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList list : codeLists) {
-			if ( ! isCodeListInUse(list) ) {
+			if ( ! codeListManager.isCodeListInUse(list) ) {
 				//unused code list not allowed
 				SurveyValidationResult validationResult = new SurveyValidationResult(String.format(CODE_LIST_PATH_FORMAT, list.getName()), 
 						"survey.validation.error.unused_code_list");
@@ -133,26 +146,6 @@ public class SurveyValidator {
 			}
 		}
 		return results;
-	}
-
-	protected boolean isCodeListInUse(CodeList list) {
-		Survey survey = list.getSurvey();
-		Schema schema = survey.getSchema();
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
-		stack.addAll(schema.getRootEntityDefinitions());
-		while ( ! stack.isEmpty() ) {
-			NodeDefinition node = stack.pop();
-			if ( node instanceof CodeAttributeDefinition ) {
-				if ( list.equals(((CodeAttributeDefinition) node).getList()) ) {
-					return true;
-				}
-			} else if ( node instanceof EntityDefinition ) {
-				for (NodeDefinition nodeDefinition : ((EntityDefinition) node).getChildDefinitions()) {
-					stack.add(nodeDefinition);
-				}
-			} 
-		}
-		return false;
 	}
 
 	public List<SurveyValidationResult> validateChanges(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
@@ -470,7 +463,7 @@ public class SurveyValidator {
 	public void validateAgainstSchema(InputStream is) throws SurveyValidationException {
 	    try {
 	    	SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-	    	Source[] schemas = getSourcesFromClassPath("xml.xsd", "idml3.xsd", "idml3-ui.xsd");
+	    	Source[] schemas = getSourcesFromClassPath(SURVEY_XSD_FILE_NAMES);
 			javax.xml.validation.Schema schema = factory.newSchema(schemas);
 	        Validator validator = schema.newValidator();
 	        validator.validate(new StreamSource(is));

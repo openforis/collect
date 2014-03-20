@@ -18,6 +18,7 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
+@Deprecated
 public class ProcessStatusPopUpVM extends BaseVM {
 
 	public static final String UPDATE_PROGRESS_COMMAND = "updateProgress";

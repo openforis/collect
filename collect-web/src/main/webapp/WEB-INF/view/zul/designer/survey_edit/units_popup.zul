@@ -6,14 +6,16 @@
 		height="370px"
 		border="normal"
 		position="center" 
-		closable="false"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.UnitsVM')"
-		validationMessages="@id('vmsgs')">
+		validationMessages="@id('vmsgs')"
+		closable="true"
+		onClose="@command('close')">
 		<borderlayout>
 			<west width="220px">
 				<borderlayout>
-					<center border="none">
+					<center border="none"
+						title="${labels.global.items.header.inserted}:">
     			        <listbox id="itemsListBox"
     			        	selectedItem="@load(vm.selectedItem)"
     			        	model="@load(vm.items)"
@@ -44,69 +46,73 @@
                 </borderlayout>
 			</west>
 		    <center>
-		        <vlayout
-		        	id="formContainer"
-		        	visible="@load(vm.editingItem)"
-                    sclass="form"
-					form="@id('fx') 
-						@load(vm.formObject)
-                        @save(vm.formObject, before={'validate','applyChanges'})
-						@validator('org.openforis.collect.designer.form.validator.UnitFormValidator')"
-					width="100%">
-					<grid>
-						<columns>
-							<column width="150px" />
-							<column />
-						</columns>
-						<rows>
-							<row>
-								<label value="${labels.survey.unit.name}:" />
-                                <fieldErrorHandler message="@load(vmsgs['name'])">
-									<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
-                                </fieldErrorHandler>
-							</row>
-							<row>
-								<multilanguageLabel value="${labels.survey.unit.label}" 
-                                  languageCode="@load(vm.currentLanguageCode)" />
-                                <fieldErrorHandler message="@load(vmsgs['label'])">
-									<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-                                </fieldErrorHandler>
-							</row>
-							<row>
-								<multilanguageLabel value="${labels.survey.unit.abbreviation}" 
-                                  languageCode="@load(vm.currentLanguageCode)" />
-                                <fieldErrorHandler message="@load(vmsgs['abbreviation'])">
-									<textbox width="150px" value="@bind(fx.abbreviation)" onChange="@command('applyChanges')" />
-                                </fieldErrorHandler>
-							</row>
-							<row>
-								<label value="${labels.survey.unit.dimension.$}:" />
-                                <fieldErrorHandler message="@load(vmsgs['dimensionLabel'])">
-									<listbox width="150px" model="@load(vm.availableDimensions)"
-										selectedItem="@bind(fx.dimensionLabel)" mold="select"
-										onSelect="@command('applyChanges')" >
-										<template name="model">
-											<listitem label="@load(each)" />
-										</template>
-									</listbox>
-                                </fieldErrorHandler>
-							</row>
-							<row>
-								<label value="${labels.survey.unit.conversionFactor}:" />
-                                <fieldErrorHandler message="@load(vmsgs['conversionFactor'])">
-									<doublebox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
-                                </fieldErrorHandler>
-							</row>
-						</rows>
-					</grid>
-				</vlayout>
+		    	<absolutelayout>
+					<absolutechildren hflex="1" vflex="1">
+						<box pack="center" align="center" hflex="1" vflex="1"
+						 	visible="@load(not vm.editingItem)">
+		        			<label value="${labels.global.item.select_or_create_new_one}" />
+	        			</box>
+					</absolutechildren>
+					<absolutechildren hflex="1" vflex="1">
+				        <vbox
+				        	id="formContainer"
+				        	visible="@load(vm.editingItem)"
+		                    sclass="form"
+							form="@id('fx') 
+								@load(vm.formObject)
+		                        @save(vm.formObject, before={'validate','applyChanges'})
+								@validator('org.openforis.collect.designer.form.validator.UnitFormValidator')"
+							hflex="1" vflex="1">
+							<grid>
+								<columns>
+									<column width="150px" />
+									<column />
+								</columns>
+								<rows>
+									<row>
+										<label value="${labels.survey.unit.name}:" />
+		                                <fieldErrorHandler message="@load(vmsgs['name'])">
+											<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<multilanguageLabel value="${labels.survey.unit.label}" 
+		                                  languageCode="@load(vm.currentLanguageCode)" />
+		                                <fieldErrorHandler message="@load(vmsgs['label'])">
+											<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<multilanguageLabel value="${labels.survey.unit.abbreviation}" 
+		                                  languageCode="@load(vm.currentLanguageCode)" />
+		                                <fieldErrorHandler message="@load(vmsgs['abbreviation'])">
+											<textbox width="150px" value="@bind(fx.abbreviation)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<label value="${labels.survey.unit.dimension.$}:" />
+		                                <fieldErrorHandler message="@load(vmsgs['dimensionLabel'])">
+											<listbox width="150px" model="@load(vm.availableDimensions)"
+												selectedItem="@bind(fx.dimensionLabel)" mold="select"
+												onSelect="@command('applyChanges')" >
+												<template name="model">
+													<listitem label="@load(each)" />
+												</template>
+											</listbox>
+		                                </fieldErrorHandler>
+									</row>
+									<row>
+										<label value="${labels.survey.unit.conversionFactor}:" />
+		                                <fieldErrorHandler message="@load(vmsgs['conversionFactor'])">
+											<doublebox width="150px" value="@bind(fx.conversionFactor)" onChange="@command('applyChanges')" />
+		                                </fieldErrorHandler>
+									</row>
+								</rows>
+							</grid>
+						</vbox>
+					</absolutechildren>
+				</absolutelayout>
 			</center>
-			<south>
-				<box align="center" width="100%">
-					<button label="${labels.global.ok}" 
-						onClick="@global-command('closeUnitsManagerPopUp')" />
-				</box>
-			</south>
 	    </borderlayout>
 	</window>
 </zk>

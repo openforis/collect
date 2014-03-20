@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -20,17 +19,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public static final String REQUIRED_FIELD = "required";
 	
-	public static final String INHERIT_TAB_NAME = "inherit";
-	
-	//public static NamedObject INHERIT_TAB;
-	public static UITab INHERIT_TAB;
-	
-	static {
-		//init static variables
-		//INHERIT_TAB = new NamedObject(LabelKeys.INHERIT_TAB);
-		INHERIT_TAB = new UITab();
-	};
-	
+	@SuppressWarnings("unused")
 	private EntityDefinition parentDefinition;
 	
 	//generic
@@ -112,11 +101,16 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		multiple = source.isMultiple();
 		Integer nodeMinCount = source.getMinCount();
 		required = nodeMinCount != null && nodeMinCount.intValue() > 0;
-		requiredExpression = source.getRequiredExpression();
+		if ( required ) {
+			requiredExpression = null;
+		} else {
+			requiredExpression = source.getRequiredExpression();
+		}
 		relevantExpression = source.getRelevantExpression();
 		minCount = nodeMinCount;
-		maxCount = source.getMaxCount();
-		if (! multiple ) {
+		if ( multiple ) {
+			maxCount = source.getMaxCount();
+		} else {
 			maxCount = null;
 		}
 		//labels
@@ -128,10 +122,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		handheldPromptLabel = source.getPrompt(Prompt.Type.HANDHELD, language);
 		pcPromptLabel = source.getPrompt(Prompt.Type.PC, language);
 		description = source.getDescription(language);
-		//layout
-		UIOptions uiOptions = getUIOptions(source);
-		UITab tab = uiOptions.getAssignedTab(parentDefinition, source, false);
-		tabName = tab != null ? tab.getName(): INHERIT_TAB_NAME;
 	}
 
 	@Override
@@ -153,26 +143,12 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( multiple ) {
 			dest.setMinCount(minCount);
 			dest.setMaxCount(maxCount);
+		} else if (required) {
+			dest.setMinCount(1);
 		} else {
-			if (required) {
-				dest.setMinCount(1);
-			}
 			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
-		saveTabInfo(dest);
-	}
-
-	protected void saveTabInfo(T dest) {
-		if ( parentDefinition != null ) {
-			UIOptions uiOptions = getUIOptions(dest);
-			if ( tabName == null || tabName.equals(INHERIT_TAB_NAME) ) {
-				uiOptions.removeTabAssociation(dest);
-			} else {
-				UITab tab = uiOptions.getTab(tabName);
-				uiOptions.assignToTab(dest, tab);
-			}
-		}
 	}
 
 	@Override

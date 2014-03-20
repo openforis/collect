@@ -43,20 +43,18 @@
             	value="@bind(fx.surveyName) @validator(vm.nameValidator)" />
           </fieldErrorHandler>
         </row>
-        <row>
-          <label value="${labels.survey.import_survey.uri}:" />
-          <label value="@load(vm.uploadedSurveyUri)" />
-        </row>
+<!--         <row> -->
+<!--           <label value="${labels.survey.import_survey.uri}:" /> -->
+<!--           <label value="@load(vm.uploadedSurveyUri)" /> -->
+<!--         </row> -->
         <row>
         	<cell />
         	<cell>
-        		<label visible="@load(vm.updatingExistingSurvey)"
+        		<label visible="@load(vm.updatingExistingSurvey and not vm.updatingPublishedSurvey)"
+	        		sclass="alertMessage" 
 	        		value="${labels.survey.import_survey.updating_survey_work}" />
-<!--         		<label visible="@load(vm.updatingExistingSurvey and not vm.updatingPublishedSurvey)" -->
-<!-- 	        		value="${labels.survey.import_survey.updating_survey_work}" /> -->
-<!-- 	        	<label visible="@load(vm.updatingPublishedSurvey)" -->
-<!-- 	        		sclass="alertMessage"  -->
-<!-- 	        		value="${labels.survey.import_survey.updating_published_survey}" /> -->
+	        	<label visible="@load(vm.updatingPublishedSurvey)"
+	        		value="${labels.survey.import_survey.updating_published_survey}" />
         	</cell>
         </row>
       </rows>
@@ -64,7 +62,7 @@
 
     <box width="100%" align="center">
      <hlayout>
-       <button id="okBtn" label="${labels.global.ok}"
+       <button id="okBtn" label="${labels.survey.import_survey.$}"
           onClick="@command('importSurvey')" />
        <space width="30px" />
        <button id="cancelBtn" label="${labels.global.cancel}"

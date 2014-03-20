@@ -9,6 +9,8 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.util.AlertUtil;
 		]]>
 	</fx:Script>
 	
@@ -31,6 +33,24 @@
 			  gap="30"
 			  >
 		
+		<s:HGroup verticalAlign="middle">
+			<s:Label styleName="infoMessage" text="{Message.get('codeListImport.introduction')}" />
+			
+			<s:Image id="importFileFormatInfoIcon"
+					 source="{Images.INFO_SMALL}"
+					 useHandCursor="true"
+					 toolTip="{Message.get('referenceDataImport.importFileFormatIconToolTip')}"
+					 click="{AlertUtil.showMessage(hostComponent.importFileFormatInfo)}"
+					 />
+			
+			<s:Button id="downloadExampleButton"
+					  label="{Message.get('global.download_example_file')}"
+					  buttonMode="true"
+					  useHandCursor="true"
+					  />
+		</s:HGroup>
+		
+		
 		<s:Form>
 			<s:FormItem label="{Message.get('referenceDataImport.sourceFile')}">
 				<s:layout>
@@ -41,16 +61,17 @@
 							 editable="false"
 							 />
 				<s:Button id="browseButton"
-						  label="{Message.get('global.browse')}"
+						  label="{Message.get('global.selectFile')}"
 						  buttonMode="true"
 						  useHandCursor="true"
 						  />
+				
 			</s:FormItem>
 		</s:Form>
 		
 		<s:HGroup gap="50">
 			<s:Button id="importButton"
-					  label="{Message.get('global.upload')}"
+					  label="{Message.get('referenceDataImport.startImport')}"
 					  buttonMode="true"
 					  useHandCursor="true"
 					  />

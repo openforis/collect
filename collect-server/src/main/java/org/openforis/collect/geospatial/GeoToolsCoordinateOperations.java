@@ -3,26 +3,36 @@
  */
 package org.openforis.collect.geospatial;
 
+
 import static org.geotools.referencing.CRS.parseWKT;
 import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
+import org.geotools.referencing.crs.AbstractSingleCRS;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.coordinate.Position;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.datum.Datum;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.GenericName;
 
 /**
  * @author M. Togna
@@ -88,7 +98,71 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 			parseSRS(srs);
 		}
 	}
+	
+	@Override
+	public SpatialReferenceSystem fetchSRS(String code) {
+		return fetchSRS(code, new HashSet<String>(Arrays.asList("en")));
+	}
 
+	@Override
+	public SpatialReferenceSystem fetchSRS(String code, Set<String> labelLanguages) {
+		try {
+			CRSAuthorityFactory factory = CRS.getAuthorityFactory(true);
+			CoordinateReferenceSystem crs = factory.createCoordinateReferenceSystem(code);
+			SpatialReferenceSystem result = new SpatialReferenceSystem();
+			result.setId(code);
+			result.setWellKnownText(crs.toWKT());
+			String description = getDescription(crs);
+			for (String lang : labelLanguages) {
+				result.setLabel(lang, code);
+				result.setDescription(lang, description);
+			}
+			return result;
+		} catch (Exception e) {
+			throw new RuntimeException("Error fetching SRS with code: " + code, e);
+		}
+	}
+	
+	/**
+	 * It returns a concatenation of datum, aliases and scope
+	 */
+	private String getDescription(CoordinateReferenceSystem crs) {
+		List<String> parts = new ArrayList<String>();
+		//datum
+		if ( crs instanceof AbstractSingleCRS ) {
+			Datum datum = ((AbstractSingleCRS) crs).getDatum();
+			String datumName = datum.getName().toString();
+			parts.add(datumName);
+		}
+		//aliases
+		for (GenericName genericName : crs.getAlias()) {
+			parts.add(genericName.toString());
+		}
+		//scope
+		String scope = crs.getScope().toString();
+		if ( StringUtils.isNotBlank(scope) ) {
+			parts.add(scope);
+		}
+		String result = StringUtils.join(parts, "\n");
+		return result;
+	}
+	
+	@Override
+	public Set<String> getAvailableSRSs() {
+		Set<String> result = new HashSet<String>();
+		String authorityCode = "EPSG";
+		String codePrefix = authorityCode + ":";
+		Set<String> supportedCodes = CRS.getSupportedCodes(authorityCode);
+		for (String code : supportedCodes) {
+			if ( code.startsWith(codePrefix) ) {
+				result.add(code);
+			} else {
+				result.add(codePrefix + code);
+			}
+		}
+		return result;
+	}
+	
 	@Override
 	public void parseSRS(SpatialReferenceSystem srs) {
 		String srsId = srs.getId();

@@ -82,7 +82,7 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 	@Command
 	@NotifyChange({"selectedPrecision","precisions"})
 	public void deletePrecision() {
-		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+		MessageUtil.ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
 				editedItem.removePrecisionDefinition(selectedPrecision);
@@ -91,6 +91,8 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 				notifyChange("selectedPrecision");
 			}
 		}, "survey.schema.attribute.numeric.precisions.confirm_delete");
+		params.setOkLabelKey("global.delete_item");
+		MessageUtil.showConfirm(params);
 	}
 	
 	protected void openPrecisionEditPopUp() {

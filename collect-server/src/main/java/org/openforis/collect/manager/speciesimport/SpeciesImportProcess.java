@@ -6,25 +6,24 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
 
-import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.exception.ParsingException;
+import org.openforis.collect.io.metadata.parsing.ParsingError;
+import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.process.AbstractProcess;
-import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
-import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.model.TaxonTree;
 import org.openforis.collect.model.TaxonTree.Node;
 import org.openforis.idm.model.species.Taxon;
@@ -145,14 +144,9 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	*/
 
 	protected void parseTaxonCSVLines(File file) {
-		InputStreamReader isReader = null;
-		FileInputStream is = null;
 		long currentRowNumber = 0;
 		try {
-			is = new FileInputStream(file);
-			isReader = new InputStreamReader(is);
-			
-			reader = new SpeciesCSVReader(isReader);
+			reader = new SpeciesCSVReader(file);
 			reader.init();
 			status.addProcessedRow(1);
 			currentRowNumber = 2;
@@ -180,7 +174,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.getMessage()));
 			LOG.error("Error importing species CSV file", e);
 		} finally {
-			close(isReader);
+			IOUtils.closeQuietly(reader);
 		}
 	}
 	
@@ -355,14 +349,4 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		}
 	}
 
-	private void close(Closeable closeable) {
-		if ( closeable != null ) {
-			try {
-				closeable.close();
-			} catch (IOException e) {
-				LOG.error("Error closing stream: ", e);
-			}
-		}
-	}
-	
 }

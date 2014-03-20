@@ -25,7 +25,6 @@ import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.manager.validation.RecordValidationProcess;
 import org.openforis.collect.manager.validation.SurveyValidator;
-import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
@@ -176,7 +175,7 @@ public class SurveyManager {
 	@Transactional
 	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
 		duplicatePublishedSurveyForEdit(uri);
-		CollectSurvey newSurveyWork = updateModel(surveyFile, validate);
+		CollectSurvey newSurveyWork = updateWorkModel(surveyFile, validate);
 		return newSurveyWork;
 	}
 	
@@ -238,6 +237,8 @@ public class SurveyManager {
 		} catch (IdmlParseException e) {
 			throw new SurveyImportException(e);
 		}
+		updateModel(surveyFile, parsedSurvey);
+		/*
 		String uri = parsedSurvey.getUri();
 		SurveySummary oldSurveyWork = loadWorkSummaryByUri(uri);
 		CollectSurvey oldPublishedSurvey = getByUri(uri);
@@ -246,54 +247,79 @@ public class SurveyManager {
 		} else if ( oldSurveyWork != null ) {
 			updateSurveyWork(surveyFile, parsedSurvey, oldSurveyWork);
 		} else {
-			updatePublishedSurvey(surveyFile, parsedSurvey, validate);
+			updatePublishedSurvey(surveyFile, parsedSurvey, false);
+		}
+		*/
+		return parsedSurvey;
+	}
+	
+	@Transactional
+	public CollectSurvey updateModel(File surveyFile, CollectSurvey packagedSurvey)
+			throws SurveyValidationException, SurveyImportException {
+		String uri = packagedSurvey.getUri();
+		CollectSurvey oldPublishedSurvey = getByUri(uri);
+		if ( oldPublishedSurvey == null ) {
+			throw new IllegalArgumentException("Survey to update not found: " + uri);
+		}
+		Integer id = oldPublishedSurvey.getId();
+		packagedSurvey.setId(id);
+		packagedSurvey.setName(oldPublishedSurvey.getName());
+		
+//		---- WARNING --- cannot check survey compatibility: code lists in packaged survey are empty
+//		if ( validate ) {
+//			surveyValidator.checkCompatibility(oldPublishedSurvey1, packagedSurvey);
+//		}
+		codeListManager.deleteAllItemsBySurvey(id, false);
+		
+		removeFromCache(oldPublishedSurvey);
+		surveyDao.updateModel(packagedSurvey);
+		addToCache(packagedSurvey);
+		
+		try {
+			codeListManager.importCodeLists(packagedSurvey, surveyFile);
+		} catch (CodeListImportException e) {
+			throw new SurveyImportException(e);
+		}
+		return packagedSurvey;
+	}
+	
+	@Transactional
+	public CollectSurvey updateWorkModel(File surveyFile, boolean validate)
+			throws SurveyValidationException, SurveyImportException {
+		CollectSurvey parsedSurvey;
+		try {
+			parsedSurvey = unmarshalSurvey(surveyFile, validate, false);
+		} catch (IdmlParseException e) {
+			throw new SurveyImportException(e);
+		}
+		String uri = parsedSurvey.getUri();
+		SurveySummary oldSurveyWork = loadWorkSummaryByUri(uri);
+		if ( oldSurveyWork == null ) {
+			throw new IllegalArgumentException("Survey to update not found: " + uri);
+		} else {
+			int oldSurveyId = oldSurveyWork.getId();
+			parsedSurvey.setId(oldSurveyId);
+			parsedSurvey.setName(oldSurveyWork.getName());
+			parsedSurvey.setWork(true);
+			
+			//clean code list items
+			for (CodeList codeList : parsedSurvey.getCodeLists()) {
+				codeList.removeAllItems();
+			}
+			codeListManager.deleteAllItemsBySurvey(oldSurveyId, true);
+
+			saveSurveyWork(parsedSurvey);
+			
+			//import code list items
+			try {
+				codeListManager.importCodeLists(parsedSurvey, surveyFile);
+			} catch (CodeListImportException e) {
+				throw new SurveyImportException(e);
+			}
 		}
 		return parsedSurvey;
 	}
 	
-	protected CollectSurvey updateSurveyWork(File surveyFile,
-			CollectSurvey survey, SurveySummary oldSummary)
-			throws SurveyImportException {
-		Integer id = oldSummary.getId();
-		survey.setId(id);
-		survey.setName(oldSummary.getName());
-		survey.setWork(true);
-		for (CodeList codeList : survey.getCodeLists()) {
-			codeList.removeAllItems();
-		}
-		codeListManager.deleteAllItemsBySurvey(id, true);
-		saveSurveyWork(survey);
-		try {
-			codeListManager.importCodeLists(survey, surveyFile);
-		} catch (CodeListImportException e) {
-			throw new SurveyImportException(e);
-		}
-		return survey;
-	}
-
-	protected void updatePublishedSurvey(File surveyFile,
-			CollectSurvey survey, boolean validate) throws SurveyValidationException,
-			SurveyImportException {
-		CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
-		Integer id = oldPublishedSurvey.getId();
-		survey.setId(id);
-		survey.setName(oldPublishedSurvey.getName());
-		if ( validate ) {
-			surveyValidator.checkCompatibility(oldPublishedSurvey, survey);
-		}
-		codeListManager.deleteAllItemsBySurvey(id, false);
-		
-		removeFromCache(oldPublishedSurvey);
-		surveyDao.updateModel(survey);
-		addToCache(survey);
-
-		try {
-			codeListManager.importCodeLists(survey, surveyFile);
-		} catch (CodeListImportException e) {
-			throw new SurveyImportException(e);
-		}
-	}
-
 	/**
 	 * Import a survey and consider it as published.
 	 * 
@@ -519,6 +545,7 @@ public class SurveyManager {
 		CollectSurvey survey = surveyWorkDao.load(id);
 		if ( survey != null ) {
 			codeListManager.deleteInvalidCodeListReferenceItems(survey);
+			survey.getUIOptions().removeUnassignedTabs();
 		}
 		return survey;
 	}
@@ -559,9 +586,27 @@ public class SurveyManager {
 	public CollectSurvey createSurveyWork() {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
 		survey.setWork(true);
-		UIOptions uiOptions = survey.createUIOptions();
-		survey.addApplicationOptions(uiOptions);
 		return survey;
+	}
+	
+	public String generateRandomSurveyUri() {
+		return collectSurveyContext.getUriPrefix() + UUID.randomUUID();
+	}
+
+	/**
+	 * Adds the system code list related to the sampling design and persist the changed into the database
+	 */
+	@Transactional
+	public void addSamplingDesignCodeList(CollectSurvey survey) throws SurveyImportException {
+		survey.addSamplingDesignCodeList();
+		if ( survey.getId() != null ) {
+			//persist changes
+			if ( survey.isWork() ) {
+				surveyWorkDao.update(survey);
+			} else {
+				surveyDao.updateModel(survey);
+			}
+		}
 	}
 	
 	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri) {
@@ -609,6 +654,7 @@ public class SurveyManager {
 	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		codeListManager.deleteInvalidCodeListReferenceItems(survey);
+		
 		Integer surveyWorkId = survey.getId();
 		survey.setWork(false);
 		survey.setPublished(true);

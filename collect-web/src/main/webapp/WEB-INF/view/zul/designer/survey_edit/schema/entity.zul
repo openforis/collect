@@ -1,5 +1,6 @@
 <zk>
 	<custom-attributes parentEntity="${arg.parentEntity}" />
+	
 	<vlayout id="nodeFormContainer" sclass="form"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.EntityDefinitionVM')"
@@ -8,7 +9,7 @@
 			@init(vm.tempFormObject)
 			@load(vm.formObject) 
 			@save(vm.formObject, before={'validate','applyChanges'})
-      @validator('org.openforis.collect.designer.form.validator.EntityDefinitionFormValidator', parentEntity=parentEntity)">
+			@validator('org.openforis.collect.designer.form.validator.EntityDefinitionFormValidator', parentEntity=parentEntity)">
 
 		<include src="survey_edit/schema/node_common.zul"
 			otherMinorGeneralDetailsForm="survey_edit/schema/entity_minor_general_part.zul"

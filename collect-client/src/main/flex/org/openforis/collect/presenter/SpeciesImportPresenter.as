@@ -1,5 +1,6 @@
 package org.openforis.collect.presenter {
 	
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
@@ -25,6 +26,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.NavigationUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	
@@ -42,8 +44,8 @@ package org.openforis.collect.presenter {
 		private static const LATIN_LANGUAGE_CODE:String = "lat";
 		private static const UPLOAD_FILE_NAME_PREFIX:String = "species";
 		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
-		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;
-		private static const VERANCULAR_NAMES_SEPARATOR:String = ", ";
+		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 4;
+		private static const VERANCULAR_NAMES_SEPARATOR:String = " / ";
 		
 		private var _speciesImportClient:SpeciesImportClient;
 		private var _speciesClient:SpeciesClient;
@@ -67,10 +69,11 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			view.checklistsDropDown.addEventListener(IndexChangeEvent.CHANGE, checklistChangeHandler);
+			view.listsDropDown.addEventListener(IndexChangeEvent.CHANGE, listChangeHandler);
 			view.newButton.addEventListener(MouseEvent.CLICK, newButtonClickHandler);
 			view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
 			view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
+			view.downloadExampleButton.addEventListener(MouseEvent.CLICK, downloadExampleButtonClickHandler);
 		}
 		
 		override protected function loadInitialData():void {
@@ -86,6 +89,14 @@ package org.openforis.collect.presenter {
 			var request:URLRequest = getExportUrlRequest();
 			if(request != null) {
 				navigateToURL(request, "_new");
+			}
+		}
+		
+		override protected function fileReferenceSelectHandler(event:Event):void {
+			if ( _view.summaryDataGrid.dataProvider.length > 0 ) {
+				super.fileReferenceSelectHandler(event);
+			} else {
+				startUpload();
 			}
 		}
 		
@@ -109,7 +120,7 @@ package org.openforis.collect.presenter {
 		
 		protected function loadTaxonomiesResultHandler(event:ResultEvent, token:Object = null):void {
 			var taxonomies:IList = event.result as IList;
-			view.checklistsDropDown.dataProvider = taxonomies;
+			view.listsDropDown.dataProvider = taxonomies;
 			if ( _selectedTaxonomy != null && CollectionUtil.isNotEmpty(taxonomies) ) {
 				selectTaxonomyInView(_selectedTaxonomy);
 				loadSummaries();
@@ -117,13 +128,13 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function selectTaxonomyInView(taxonomy:TaxonomyProxy):void {
-			var taxonomies:IList = view.checklistsDropDown.dataProvider;
+			var taxonomies:IList = view.listsDropDown.dataProvider;
 			var item:TaxonomyProxy = CollectionUtil.getItem(taxonomies, "id", taxonomy.id);
-			view.checklistsDropDown.selectedItem = item;
+			view.listsDropDown.selectedItem = item;
 			_selectedTaxonomy = item;
 		}
 		
-		protected function checklistChangeHandler(event:IndexChangeEvent):void {
+		protected function listChangeHandler(event:IndexChangeEvent):void {
 			_selectedTaxonomy = event.target.selectedItem;
 			_view.paginationBar.showPage(1);
 			loadSummaries();
@@ -262,7 +273,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function checkDuplicateTaxonomyName(name:String, newTaxonomy:Boolean):Boolean {
-			var taxonomies:IList = view.checklistsDropDown.dataProvider;
+			var taxonomies:IList = view.listsDropDown.dataProvider;
 			var duplicateTaxonomy:TaxonomyProxy = CollectionUtil.getItem(taxonomies, "name", name);
 			if ( duplicateTaxonomy != null && (newTaxonomy || duplicateTaxonomy != _selectedTaxonomy )) {
 				AlertUtil.showError(messageKeys.DUPLICATE_TAXONOMY_NAME);
@@ -333,6 +344,10 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateStatus():void {
 			_speciesImportClient.getStatus(_getStatusResponder);
+		}
+		
+		protected function downloadExampleButtonClickHandler(event:MouseEvent):void {
+			NavigationUtil.openInNewWindow(ApplicationConstants.SPECIES_IMPORT_EXAMPLE_DOWNLOAD_URL);
 		}
 		
 	}

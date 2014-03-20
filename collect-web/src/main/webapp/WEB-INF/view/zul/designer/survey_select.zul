@@ -38,14 +38,12 @@
 
   <listbox id="surveysListbox" 
     rows="8"
-    width="780px" 
+    width="530px" 
     model="@load(vm.surveySummaries)"
     selectedItem="@bind(vm.selectedSurvey)">
     <listhead>
       <listheader label="${labels.survey.name}" width="200px" 
         sort="auto(name)" />
-      <listheader label="${labels.survey.uri}" width="250px"
-        sort="auto(uri)" />
       <listheader label="${labels.survey.modified}" width="70px"
         sort="auto(work, published, name)" />
       <listheader label="${labels.survey.published}" width="70px"
@@ -55,8 +53,6 @@
     <template name="model">
       <listitem>
         <listcell label="@load(each.name)"
-          onDoubleClick="@command('editSelectedSurvey')" />
-        <listcell label="@load(each.uri)"
           onDoubleClick="@command('editSelectedSurvey')" />
         <listcell
           onDoubleClick="@command('editSelectedSurvey')">
@@ -90,7 +86,7 @@
   		onClick="@command('editSelectedSurvey')"
   		disabled="@load(vm.editingDisabled)" />
 
-  	<button label="${labels.survey.export}"
+  	<button label="${labels.survey.export.$}"
   		onClick="@command('exportSelectedSurvey')"
   		disabled="@load(vm.exportDisabled)" />
 

@@ -3,7 +3,7 @@ package org.openforis.collect.manager.speciesimport;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.manager.referencedataimport.Line;
+import org.openforis.collect.io.metadata.parsing.Line;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
 /**

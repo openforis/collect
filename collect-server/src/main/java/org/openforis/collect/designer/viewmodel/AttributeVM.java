@@ -16,6 +16,7 @@ import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.CheckType;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -121,7 +122,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	@Command
 	public void deleteCheck() {
-		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+		ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
 				editedItem.removeCheck(selectedCheck);
@@ -130,6 +131,8 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 				notifyChange("selectedCheck","checks");
 			}
 		}, "survey.schema.node.check.confirm_delete");
+		params.setOkLabelKey("global.delete_item");
+		MessageUtil.showConfirm(params);
 	}
 	
 	@Command
@@ -207,7 +210,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@Command
 	@NotifyChange({"selectedAttributeDefault","attributeDefaults"})
 	public void deleteAttributeDefault() {
-		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+		ConfirmParams params = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 			@Override
 			public void onOk() {
 				editedItem.removeAttributeDefault(selectedAttributeDefault);
@@ -216,6 +219,8 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 				notifyChange("selectedAttributeDefault","attributeDefaults");
 			}
 		}, "survey.schema.attribute.attribute_default.confirm_delete");
+		params.setOkLabelKey("global.delete_item");
+		MessageUtil.showConfirm(params);
 	}
 	
 	@Command

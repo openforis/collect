@@ -8,6 +8,7 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Form;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
@@ -58,15 +59,15 @@ public abstract class BaseVM {
 		return user;
 	}
 	
-	protected Window openPopUp(String url, boolean modal) {
+	protected static Window openPopUp(String url, boolean modal) {
 		return openPopUp(url, modal, null);
 	}
 	
-	protected Window openPopUp(String url, boolean modal, Map<String, Object> args) {
+	protected static Window openPopUp(String url, boolean modal, Map<String, Object> args) {
 		return PopUpUtil.openPopUp(url, modal, args);
 	}
 	
-	protected void closePopUp(Window popUp) {
+	protected static void closePopUp(Window popUp) {
 		PopUpUtil.closePopUp(popUp);
 	}
 	
@@ -79,6 +80,12 @@ public abstract class BaseVM {
 	protected String getInitParameter(String name) {
 		WebApp webApp = Sessions.getCurrent().getWebApp();
 		return webApp.getInitParameter(name);
+	}
+	
+	protected void setValueOnFormField(Form form, String field,
+			Object value) {
+		form.setField(field, value);
+		BindUtils.postNotifyChange(null, null, form, field);
 	}
 	
 }
