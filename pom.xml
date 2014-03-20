@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.0-Alpha33-SNAPSHOT</version>
+	<version>3.0.1-Alpha1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -22,8 +22,8 @@
 		<flexmojos.version>4.2-beta</flexmojos.version>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<idm.version>3.0-Alpha12-SNAPSHOT</idm.version>
-		<openforis.commons.version>0.0.7-SNAPSHOT</openforis.commons.version>
+		<idm.version>3.0-Alpha12</idm.version>
+		<openforis.commons.version>0.0.8</openforis.commons.version>
 	</properties>
 
 	<distributionManagement>
