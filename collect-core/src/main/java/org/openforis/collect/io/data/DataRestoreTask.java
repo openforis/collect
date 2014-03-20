@@ -9,8 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipFile;
 
-import org.openforis.collect.io.SurveyRestoreJob;
-import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
+import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordManager;
@@ -58,18 +57,20 @@ public class DataRestoreTask extends Task {
 	private String entryBasePath;
 	private HashMap<String, String> errorByEntryName;
 	private BackupFileExtractor backupFileExtractor;
+	private boolean oldBackupFormat;
 	
 	public DataRestoreTask() {
 		super();
 		this.processedRecords = new ArrayList<Integer>();
 		this.errorByEntryName = new HashMap<String, String>();
+		this.oldBackupFormat = false;
 	}
 
 	@Override
 	protected void initInternal() throws Throwable {
 		super.initInternal();
 		dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
-		backupFileExtractor = new SurveyRestoreJob.BackupFileExtractor(zipFile);
+		backupFileExtractor = new BackupFileExtractor(zipFile);
 	}
 	
 	@Override
@@ -94,8 +95,7 @@ public class DataRestoreTask extends Task {
 		Step[] steps = Step.values();
 		for (Step step : steps) {
 			for (EntityDefinition rootEntityDefn : rootEntityDefinitions) {
-				BackupRecordEntry recordEntry = new BackupRecordEntry(rootEntityDefn.getName(), step, entryId);
-				String entryName = recordEntry.getName();
+				String entryName = getBackupEntryName(entryId, rootEntityDefn.getName(), step);
 				InputStream entryIS = backupFileExtractor.findEntryInputStream(entryName);
 				if ( entryIS != null ) {
 					InputStreamReader reader = OpenForisIOUtils.toReader(entryIS);
@@ -138,6 +138,16 @@ public class DataRestoreTask extends Task {
 			originalRecord.setStep(originalRecordStep);
 			validateRecord(originalRecord);
 			recordManager.save(originalRecord);
+		}
+	}
+
+	protected String getBackupEntryName(int entryId, String rootEntity, Step step) {
+		if ( oldBackupFormat ) {
+			return step.getStepNumber() + "/" + entryId + ".xml";
+		} else {
+			BackupRecordEntry recordEntry = new BackupRecordEntry(rootEntity, step, entryId);
+			String entryName = recordEntry.getName();
+			return entryName;
 		}
 	}
 

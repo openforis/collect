@@ -6,7 +6,7 @@ package org.openforis.collect.io.data;
 import java.io.File;
 import java.util.zip.ZipFile;
 
-import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
+import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;

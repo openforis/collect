@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
-import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.internal.SurveyBackupVerifierTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;

@@ -5,9 +5,8 @@ package org.openforis.collect.io.internal;
 
 import java.util.zip.ZipFile;
 
+import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
-import org.openforis.collect.io.SurveyRestoreJob;
-import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -26,7 +25,7 @@ public class SurveyBackupVerifierTask extends Task {
 	
 	@Override
 	protected void execute() throws Throwable {
-		BackupFileExtractor fileExtractor = new SurveyRestoreJob.BackupFileExtractor(zipFile);
+		BackupFileExtractor fileExtractor = new BackupFileExtractor(zipFile);
 		checkEntryExists(fileExtractor, SurveyBackupJob.INFO_FILE_NAME);
 		checkEntryExists(fileExtractor, SurveyBackupJob.SURVEY_XML_ENTRY_NAME);
 	}

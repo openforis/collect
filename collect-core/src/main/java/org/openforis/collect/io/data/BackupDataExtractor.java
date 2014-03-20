@@ -6,15 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FilenameUtils;
+import liquibase.util.StringUtils;
+
+import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
-import org.openforis.collect.io.SurveyRestoreJob;
-import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
 import org.openforis.collect.io.exception.DataParsingExeption;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -31,6 +32,8 @@ import org.openforis.collect.utils.OpenForisIOUtils;
  */
 public class BackupDataExtractor implements Closeable {
 
+	private static final String ZIP_ENTRY_PATH_SEPARATOR = "/";
+
 	protected static final String IDML_FILE_NAME = "idml.xml";
 
 	//params
@@ -43,16 +46,26 @@ public class BackupDataExtractor implements Closeable {
 	protected Enumeration<? extends ZipEntry> zipEntries;
 	private DataUnmarshaller dataUnmarshaller;
 	private BackupFileExtractor fileExtractor;
+	private String rootEntity;
+	private Step step;
+	private String dataFolderPath = null;
 
-	public BackupDataExtractor(CollectSurvey survey, File file) throws ZipException, IOException {
-		this(survey, new ZipFile(file));
+	public BackupDataExtractor(CollectSurvey survey, File file, String rootEntity, Step step) throws ZipException, IOException {
+		this(survey, new ZipFile(file), rootEntity, step);
 	}
 	
-	public BackupDataExtractor(CollectSurvey survey, ZipFile zipFile) {
+	public BackupDataExtractor(CollectSurvey survey, ZipFile zipFile, String rootEntity, Step step) {
+		this(survey, zipFile, rootEntity, step, SurveyBackupJob.DATA_FOLDER);
+	}
+	
+	public BackupDataExtractor(CollectSurvey survey, ZipFile zipFile, String rootEntity, Step step, String dataFolderPath) {
 		this.survey = survey;
 		this.zipFile = zipFile;
 		this.initialized = false;
-		this.fileExtractor = new SurveyRestoreJob.BackupFileExtractor(zipFile);
+		this.fileExtractor = new BackupFileExtractor(zipFile);
+		this.rootEntity = rootEntity;
+		this.step = step;
+		this.dataFolderPath = dataFolderPath;
 	}
 
 	public void init() throws ZipException, IOException {
@@ -61,15 +74,15 @@ public class BackupDataExtractor implements Closeable {
 		this.initialized = true;
 	}
 
-	public ParseRecordResult nextRecord(Step step) throws Exception {
+	public ParseRecordResult nextRecord() throws Exception {
 		checkInitialized();
 		ParseRecordResult result = null;
 		ZipEntry zipEntry = nextDataEntry();
 		while ( zipEntry != null ) {
 			String entryName = zipEntry.getName();
-			if ( BackupRecordEntry.isValidDataEntry(zipEntry) ) {
-				Step entryStep = extractStep(entryName);
-				if ( step == null || step == entryStep ) {
+			if ( BackupRecordEntry.isValidRecordEntry(zipEntry, dataFolderPath) ) {
+				BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, dataFolderPath);
+				if ( isToBeExported(recordEntry) ) {
 					InputStream is = zipFile.getInputStream(zipEntry);
 					return parse(is);
 				} else {
@@ -78,6 +91,11 @@ public class BackupDataExtractor implements Closeable {
 			}
 		}
 		return result;
+	}
+
+	private boolean isToBeExported(BackupRecordEntry recordEntry) {
+		return (step == null || step == recordEntry.getStep()) && 
+				(rootEntity == null || rootEntity.equals(recordEntry.getRootEntity()));
 	}
 	
 	private ParseRecordResult parse(InputStream inputStream) throws IOException {
@@ -94,7 +112,7 @@ public class BackupDataExtractor implements Closeable {
 	public ZipEntry nextDataEntry() {
 		while ( zipEntries.hasMoreElements() ) {
 			ZipEntry zipEntry = zipEntries.nextElement();
-			if ( BackupRecordEntry.isValidDataEntry(zipEntry) ) {
+			if ( BackupRecordEntry.isValidRecordEntry(zipEntry, dataFolderPath) ) {
 				return zipEntry;
 			}
 		}
@@ -121,38 +139,18 @@ public class BackupDataExtractor implements Closeable {
 	
 	protected void checkInitialized() {
 		if ( ! initialized ) {
-			throw new IllegalStateException("Exctractor not inited");
+			throw new IllegalStateException("Extractor not inited");
 		}
 	}
 	
-	private Step extractStep(String zipEntryName) throws BackupDataExtractorException {
-		String[] entryNameSplitted = getEntryNameSplitted(zipEntryName);
-		String stepNumStr = entryNameSplitted[0];
-		int stepNumber = Integer.parseInt(stepNumStr);
-		return Step.valueOf(stepNumber);
-	}
-	
-	private String[] getEntryNameSplitted(String zipEntryName) throws BackupDataExtractorException {
-		String entryPathSeparator = Pattern.quote(File.separator);
-		String[] entryNameSplitted = zipEntryName.split(entryPathSeparator);
-		if (entryNameSplitted.length != 2) {
-			entryPathSeparator = Pattern.quote("/");
-			entryNameSplitted = zipEntryName.split(entryPathSeparator);
-		}
-		if (entryNameSplitted.length != 2) {
-			throw new BackupDataExtractorException("Packaged file format exception: wrong entry name: " + zipEntryName);
-		}
-		return entryNameSplitted;
-	}
-
-	public long countRecords(Step step) throws BackupDataExtractorException {
+	public long countRecords() throws DataParsingExeption {
 		checkInitialized();
 		int count = 0;
 		ZipEntry entry = nextDataEntry();
 		while ( entry != null ) {
 			String entryName = entry.getName();
-			Step entryStep = extractStep(entryName);
-			if ( step == null || step == entryStep ) {
+			BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, dataFolderPath);
+			if ( isToBeExported(recordEntry) ) {
 				count++;
 			}
 			entry = nextDataEntry();
@@ -185,47 +183,66 @@ public class BackupDataExtractor implements Closeable {
 			this.recordId = recordId;
 		}
 		
-		public static boolean isValidDataEntry(ZipEntry zipEntry) {
+		public static boolean isValidRecordEntry(ZipEntry zipEntry) {
 			return isValidRecordEntry(zipEntry, SurveyBackupJob.DATA_FOLDER);
 		}
 		
 		public static boolean isValidRecordEntry(ZipEntry zipEntry, String basePath) {
-			if ( ! basePath.endsWith("/") ) {
-				basePath += "/";
+			if ( ! basePath.endsWith(ZIP_ENTRY_PATH_SEPARATOR) ) {
+				basePath += ZIP_ENTRY_PATH_SEPARATOR;
 			}
 			String name = zipEntry.getName();
 			return ! zipEntry.isDirectory() && name.startsWith(basePath);
 		}
 		
+		public static BackupRecordEntry parseOldFormat(String zipEntryName, String basePath, String rootEntity) throws DataParsingExeption {
+			String pathSeparatorPattern = getPathSeparatorsPattern();
+			
+			String format = "(\\d+)" + pathSeparatorPattern + "(\\w+)\\.xml";
+			
+			Pattern pattern = Pattern.compile(format);
+			Matcher matcher = pattern.matcher(zipEntryName);
+			if ( matcher.matches() ) {
+				String stepNumStr = matcher.group(1);
+				String recordIdStr = matcher.group(2);
+				int stepNumber = Integer.parseInt(stepNumStr);
+				Step step = Step.valueOf(stepNumber);
+				int recordId = Integer.parseInt(recordIdStr);
+				BackupRecordEntry result = new BackupRecordEntry(rootEntity, step, recordId);
+				return result;
+			} else {
+				throw new DataParsingExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName + " expected: " + basePath + "...");
+			}
+		}
+
+		private static String getPathSeparatorsPattern() {
+			String[] pathSeparators = new String[] {"\\", "/"}; //for backwards compatibility, allow both \ and / as path separators
+			String pathSeparatorPattern = "[";
+			for (String separator : pathSeparators) {
+				pathSeparatorPattern += Pattern.quote(separator);
+			}
+			pathSeparatorPattern += "]";
+			return pathSeparatorPattern;
+		}
+		
 		public static BackupRecordEntry parse(String zipEntryName, String basePath) throws DataParsingExeption {
-			//for backward compatibility with previous generated backup files
-			String zipEntryNameFixed = zipEntryName.replace("\\", SurveyBackupJob.ZIP_FOLDER_SEPARATOR);
-			if ( basePath != null ) {
-				if ( ! basePath.endsWith("/") ) {
-					basePath += "/";
-				}
-				if ( zipEntryName.startsWith(basePath) ) {
-					zipEntryNameFixed = zipEntryNameFixed.substring(basePath.length());
-				} else {
-					throw new DataParsingExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName + " expected: " + basePath + "...");
-				}
+			String pathSeparatorPattern = getPathSeparatorsPattern();
+			
+			String format = Pattern.quote(StringUtils.trimToEmpty(basePath)) + pathSeparatorPattern + "(\\w+)" + pathSeparatorPattern + "(\\d+)" + pathSeparatorPattern + "(\\w+)\\.xml";
+			Pattern pattern = Pattern.compile(format);
+			Matcher matcher = pattern.matcher(zipEntryName);
+			if ( matcher.matches() ) {
+				String rootEntity = matcher.group(1);
+				String stepNumStr = matcher.group(2);
+				String recordIdStr = matcher.group(3);
+				int stepNumber = Integer.parseInt(stepNumStr);
+				Step step = Step.valueOf(stepNumber);
+				int recordId = Integer.parseInt(recordIdStr);
+				BackupRecordEntry result = new BackupRecordEntry(rootEntity, step, recordId);
+				return result;
+			} else {
+				throw new DataParsingExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName + " expected: " + basePath + "...");
 			}
-			String[] entryNameSplitted = zipEntryNameFixed.split(SurveyBackupJob.ZIP_FOLDER_SEPARATOR);
-			if (entryNameSplitted.length != 3) {
-				throw new DataParsingExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName);
-			}
-			//root entity
-			String rootEntity = entryNameSplitted[0];
-			//step
-			String stepNumStr = entryNameSplitted[1];
-			int stepNumber = Integer.parseInt(stepNumStr);
-			Step step = Step.valueOf(stepNumber);
-			//file name
-			String fileName = entryNameSplitted[2];
-			String baseName = FilenameUtils.getBaseName(fileName);
-			int recordId = Integer.parseInt(baseName);
-			BackupRecordEntry result = new BackupRecordEntry(rootEntity, step, recordId);
-			return result;
 		}
 	
 		public String getName() {

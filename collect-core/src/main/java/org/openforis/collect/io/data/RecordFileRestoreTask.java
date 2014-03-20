@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipFile;
 
-import org.openforis.collect.io.SurveyRestoreJob;
-import org.openforis.collect.io.SurveyRestoreJob.BackupFileExtractor;
+import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordFileManager;
@@ -53,7 +52,7 @@ public class RecordFileRestoreTask extends Task {
 	@Override
 	protected void execute() throws Throwable {
 		processedRecords = new ArrayList<Integer>();
-		backupFileExtractor = new SurveyRestoreJob.BackupFileExtractor(zipFile);
+		backupFileExtractor = new BackupFileExtractor(zipFile);
 		for (Integer entryId : entryIdsToImport) {
 			if ( isRunning() && ! processedRecords.contains(entryId) ) {
 				importRecordFiles(entryId);
@@ -97,7 +96,7 @@ public class RecordFileRestoreTask extends Task {
 			Step step = steps[i];
 			for (EntityDefinition rootEntityDefn : rootEntityDefinitions) {
 				BackupRecordEntry recordEntry = new BackupRecordEntry(rootEntityDefn.getName(), step, entryId);
-				BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, zipFile);
+				BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, zipFile, rootEntityDefn.getName(), step);
 				backupDataExtractor.init();
 				ParseRecordResult parseRecordResult = backupDataExtractor.findRecord(recordEntry);
 				if ( parseRecordResult != null ) {
