@@ -41,7 +41,7 @@ public class OpenForisIOUtils {
 	
 	public static File copyToTempFile(Reader reader, String extension) {
 		InputStream is = toInputStream(reader);
-		return copyToTempFile(is);
+		return copyToTempFile(is, extension);
 	}
 
 	public static InputStream toInputStream(Reader reader) {

@@ -520,14 +520,14 @@ public class CodeListManager {
 		Set<CodeList> result = new HashSet<CodeList>();
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList list : codeLists) {
-			if ( ! isCodeListInUse(list) ) {
+			if ( ! isInUse(list) ) {
 				result.add(list);
 			}
 		}
 		return result;
 	}
 	
-	public boolean isCodeListInUse(CodeList list) {
+	public boolean isInUse(CodeList list) {
 		Survey survey = list.getSurvey();
 		Schema schema = survey.getSchema();
 		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();

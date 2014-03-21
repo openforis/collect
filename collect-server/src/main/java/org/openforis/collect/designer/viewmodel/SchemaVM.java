@@ -5,10 +5,13 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SchemaTreeModel.SchemaNodeData;
@@ -69,6 +72,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
 	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
+	private static final String PATH_NULL_VALUES_REPLACE = "...";
 
 	private static final String NODE_TYPES_IMAGES_PATH = "/assets/images/node_types/";
 
@@ -191,7 +195,7 @@ public class SchemaVM extends SurveyBaseVM {
 		rootTabSet = survey.getUIOptions().getAssignedRootTabSet(rootEntity);
 		selectedVersion = version;
 		resetEditingStatus();
-		updateTreeModel();
+		refreshTreeModel();
 		dispatchCurrentFormValidatedCommand(true, isCurrentFormBlocking());
 		notifyChange("selectedTreeNode","selectedRootEntity","selectedVersion","treeModel");
 	}
@@ -214,7 +218,7 @@ public class SchemaVM extends SurveyBaseVM {
 				EntityDefinition rootEntity = createRootEntityDefinition();
 				selectedRootEntity = rootEntity;
 				selectedVersion = null;
-				updateTreeModel();
+				refreshTreeModel();
 				selectTreeNode(null);
 				notifyChange("selectedRootEntity","selectedVersion");
 				editRootEntity();
@@ -267,7 +271,7 @@ public class SchemaVM extends SurveyBaseVM {
 			return selectedRootEntity;
 		} else {
 			SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-			if ( surveyObject instanceof NodeDefinition ) {
+			if ( surveyObject instanceof EntityDefinition ) {
 				return (EntityDefinition) surveyObject;
 			} else {
 				EntityDefinition parentEntity = treeModel.getNearestParentEntityDefinition(surveyObject);
@@ -362,6 +366,13 @@ public class SchemaVM extends SurveyBaseVM {
 			}
 		}
 	}
+	
+	@Override
+	@GlobalCommand
+	public void currentLanguageChanged() {
+		super.currentLanguageChanged();
+		refreshTreeModel();
+	}
 
 	protected void resetEditingStatus() {
 		resetEditingStatus(true);
@@ -402,7 +413,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( selectedVersion != null && ! survey.getVersions().contains(selectedVersion) ) {
 			resetEditingStatus();
 			selectedVersion = null;
-			updateTreeModel();
+			refreshTreeModel();
 			notifyChange("selectedVersion");
 		}
 	}
@@ -608,7 +619,7 @@ public class SchemaVM extends SurveyBaseVM {
 			selectedRootEntity = null;
 			rootTabSet = null;
 			notifyChange("selectedRootEntity");
-			updateTreeModel();
+			refreshTreeModel();
 		} else {
 			if ( treeModel != null ) {
 				treeModel.removeSelectedNode();
@@ -722,8 +733,21 @@ public class SchemaVM extends SurveyBaseVM {
 		return survey.getVersions().isEmpty() || selectedVersion != null;
 	}
 	
-	protected void updateTreeModel() {
+	protected void refreshTreeModel() {
+		//keep track of previous opened nodes
+		Set<SurveyObject> openNodes;
+		if (treeModel == null) {
+			openNodes = Collections.emptySet();
+		} else {
+			openNodes = treeModel.getOpenSchemaNodes();
+		}
 		buildTreeModel();
+		treeModel.setOpenSchemaNodes(openNodes);
+		treeModel.select(editedNode);
+		treeModel.showSelectedNode();
+		if ( CollectionUtils.isEmpty(treeModel.getSelection()) ) {
+			resetEditingStatus();
+		}
 		notifyChange("treeModel");
 	}
 	
@@ -926,13 +950,14 @@ public class SchemaVM extends SurveyBaseVM {
 			return null;
 		} else if ( editedNode instanceof NodeDefinition ) {
 			if ( newNode ) {
-				return editedNodeParentEntity.getPath() + "/...";
+				return editedNodeParentEntity.getPath() + "/" + PATH_NULL_VALUES_REPLACE;
 			} else {
 				return ((NodeDefinition) editedNode).getPath();
 			}
 		} else {
 			//tab
-			return ((UITab) editedNode).getPath(currentLanguageCode);
+			UITab tab = (UITab) editedNode;
+			return tab.getPath(currentLanguageCode, PATH_NULL_VALUES_REPLACE);
 		}
 	}
 	
@@ -1052,7 +1077,7 @@ public class SchemaVM extends SurveyBaseVM {
 	public void treeViewTypeSelected(@BindingParam("type") String type) {
 		selectedTreeViewType = type;
 		resetEditingStatus();
-		updateTreeModel();
+		refreshTreeModel();
 	}
 	
 	public Menupopup getPopupMenu(SchemaNodeData data) {
@@ -1181,7 +1206,7 @@ public class SchemaVM extends SurveyBaseVM {
 		UITab newTab = uiOptions.getAssignedTab(newParentEntity);
 		uiOptions.assignToTab(node, newTab);
 		//update ui
-		updateTreeModel();
+		refreshTreeModel();
 		editedNodeParentEntity = newParentEntity;
 		selectTreeNode(editedNode);
 		treeModel.showSelectedNode();
@@ -1191,7 +1216,7 @@ public class SchemaVM extends SurveyBaseVM {
 	private void associateNodeToTab(NodeDefinition node, UITab tab) {
 		UIOptions uiOptions = survey.getUIOptions();
 		uiOptions.assignToTab(node, tab);
-		updateTreeModel();
+		refreshTreeModel();
 		selectTreeNode(node);
 		treeModel.showSelectedNode();
 		notifyChange("selectedTreeNode","editedNode");

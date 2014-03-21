@@ -16,7 +16,7 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
-import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -290,13 +290,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void validate() {
-		List<SurveyValidationResult> result = surveyValidator.validate(survey);
-		if ( result.isEmpty() ) {
+		SurveyValidationResults results = surveyValidator.validate(survey);
+		if ( ! results.hasErrors() && ! results.hasWarnings() ) {
 			MessageUtil.showInfo("survey.successfully_validated");
 		} else {
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("validationResults", result);
-			validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
+			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, false);
 		}
 	}
 	

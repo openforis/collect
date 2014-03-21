@@ -22,7 +22,9 @@
 		  		</columns>
 		  		<rows>
 		  			<row>
-		  				<label value="${labels.global.item.label}:" />
+						<multilanguageLabel 
+							value="${labels.global.item.label}"
+							languageCode="@load(vm.currentLanguageCode)" />
 		  				<fieldErrorHandler message="@load(vmsgs['label'])">
 		  					<textbox width="200px" maxlength="100"
 		  						value="@bind(fx.label)"
