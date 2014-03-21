@@ -36,30 +36,26 @@ public class BackupDataExtractor implements Closeable {
 	private CollectSurvey survey;
 	protected File file;
 	private Step step;
-	private boolean oldFormat;
 	
 	//transient
 	private boolean initialized;
-	protected Enumeration<? extends ZipEntry> zipEntries;
-	private DataUnmarshaller dataUnmarshaller;
-	private BackupFileExtractor fileExtractor;
 	protected ZipFile zipFile;
+	protected Enumeration<? extends ZipEntry> zipEntries;
+	private BackupFileExtractor fileExtractor;
+	private DataUnmarshaller dataUnmarshaller;
+	private boolean oldFormat;
 
-	public BackupDataExtractor(CollectSurvey survey, File file, Step step) throws ZipException, IOException {
-		this(survey, file, step, false);
-	}
-
-	public BackupDataExtractor(CollectSurvey survey, File file, Step step, boolean oldFormat) {
+	public BackupDataExtractor(CollectSurvey survey, File file, Step step) {
 		this.survey = survey;
 		this.file = file;
 		this.initialized = false;
-		this.fileExtractor = new BackupFileExtractor(zipFile);
 		this.step = step;
-		this.oldFormat = oldFormat;
 	}
 
 	public void init() throws ZipException, IOException {
 		this.zipFile = new ZipFile(file);
+		this.fileExtractor = new BackupFileExtractor(zipFile);
+		this.oldFormat = this.fileExtractor.isOldFormat();
 		this.dataUnmarshaller = new DataUnmarshaller(new DataHandler(survey));
 		this.zipEntries = zipFile.entries();
 		this.initialized = true;
@@ -196,11 +192,9 @@ public class BackupDataExtractor implements Closeable {
 		}
 		
 		public static boolean isValidRecordEntry(ZipEntry zipEntry, boolean oldFormat) {
-			if ( oldFormat ) {
-				return ! zipEntry.isDirectory() && OLD_ENTRY_PATTERN.matcher(zipEntry.getName()).matches();
-			} else {
-				return ! zipEntry.isDirectory() && ENTRY_PATTERN.matcher(zipEntry.getName()).matches();
-			}
+			String entryName = zipEntry.getName();
+			Pattern entryPattern = oldFormat ? OLD_ENTRY_PATTERN: ENTRY_PATTERN;
+			return ! zipEntry.isDirectory() && entryPattern.matcher(entryName).matches();
 		}
 		
 		public static BackupRecordEntry parse(String zipEntryName) throws DataParsingExeption {
