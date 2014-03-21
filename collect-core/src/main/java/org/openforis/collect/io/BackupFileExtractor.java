@@ -125,5 +125,9 @@ public class BackupFileExtractor {
 		List<String> entryNames = listEntriesInPath(path);
 		return ! entryNames.isEmpty();
 	}
+
+	public boolean isOldFormat() {
+		return ! containsEntry(SurveyBackupJob.INFO_FILE_NAME);
+	}
 	
 }

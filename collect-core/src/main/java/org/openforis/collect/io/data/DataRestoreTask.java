@@ -24,8 +24,6 @@ import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -54,7 +52,6 @@ public class DataRestoreTask extends Task {
 	//temporary instance variables
 	private DataUnmarshaller dataUnmarshaller;
 	private List<Integer> processedRecords;
-	private String entryBasePath;
 	private HashMap<String, String> errorByEntryName;
 	private BackupFileExtractor backupFileExtractor;
 	private boolean oldBackupFormat;
@@ -71,6 +68,7 @@ public class DataRestoreTask extends Task {
 		super.initInternal();
 		dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
 		backupFileExtractor = new BackupFileExtractor(zipFile);
+		oldBackupFormat = backupFileExtractor.isOldFormat();
 	}
 	
 	@Override
@@ -90,43 +88,39 @@ public class DataRestoreTask extends Task {
 	private void importEntries(int entryId) throws IOException, DataImportExeption, RecordPersistenceException {
 		CollectRecord lastProcessedRecord = null;
 		Step originalRecordStep = null;
-		Schema schema = packagedSurvey.getSchema();
-		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		Step[] steps = Step.values();
 		for (Step step : steps) {
-			for (EntityDefinition rootEntityDefn : rootEntityDefinitions) {
-				String entryName = getBackupEntryName(entryId, rootEntityDefn.getName(), step);
-				InputStream entryIS = backupFileExtractor.findEntryInputStream(entryName);
-				if ( entryIS != null ) {
-					InputStreamReader reader = OpenForisIOUtils.toReader(entryIS);
-					ParseRecordResult parseRecordResult = parseRecord(reader);
-					CollectRecord parsedRecord = parseRecordResult.getRecord();
-					if (parsedRecord == null) {
-						String message = parseRecordResult.getMessage();
-						addError(entryName, message);
-					} else {
-						parsedRecord.setStep(step);
-						if ( lastProcessedRecord == null ) {
-							CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
-							if (oldRecordSummary == null) {
-								//insert new record
-								recordManager.save(parsedRecord);
-								log().info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
-							} else {
-								//overwrite existing record
-								originalRecordStep = oldRecordSummary.getStep();
-								parsedRecord.setId(oldRecordSummary.getId());
-								recordManager.save(parsedRecord);
-								log().info("Updated: " + oldRecordSummary.getId() + " (from file " + entryName  + ")");
-							}
-							lastProcessedRecord = parsedRecord;
+			String entryName = getBackupEntryName(entryId, step);
+			InputStream entryIS = backupFileExtractor.findEntryInputStream(entryName);
+			if ( entryIS != null ) {
+				InputStreamReader reader = OpenForisIOUtils.toReader(entryIS);
+				ParseRecordResult parseRecordResult = parseRecord(reader);
+				CollectRecord parsedRecord = parseRecordResult.getRecord();
+				if (parsedRecord == null) {
+					String message = parseRecordResult.getMessage();
+					addError(entryName, message);
+				} else {
+					parsedRecord.setStep(step);
+					if ( lastProcessedRecord == null ) {
+						CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
+						if (oldRecordSummary == null) {
+							//insert new record
+							recordManager.save(parsedRecord);
+							log().info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
 						} else {
-							replaceData(parsedRecord, lastProcessedRecord);
-							recordManager.save(lastProcessedRecord);
+							//overwrite existing record
+							originalRecordStep = oldRecordSummary.getStep();
+							parsedRecord.setId(oldRecordSummary.getId());
+							recordManager.save(parsedRecord);
+							log().info("Updated: " + oldRecordSummary.getId() + " (from file " + entryName  + ")");
 						}
-						if ( parseRecordResult.hasWarnings() ) {
+						lastProcessedRecord = parsedRecord;
+					} else {
+						replaceData(parsedRecord, lastProcessedRecord);
+						recordManager.save(lastProcessedRecord);
+					}
+					if ( parseRecordResult.hasWarnings() ) {
 //							addWarnings(entryName, parseRecordResult.getWarnings());
-						}
 					}
 				}
 			}
@@ -141,11 +135,11 @@ public class DataRestoreTask extends Task {
 		}
 	}
 
-	protected String getBackupEntryName(int entryId, String rootEntity, Step step) {
+	protected String getBackupEntryName(int entryId, Step step) {
 		if ( oldBackupFormat ) {
 			return step.getStepNumber() + "/" + entryId + ".xml";
 		} else {
-			BackupRecordEntry recordEntry = new BackupRecordEntry(rootEntity, step, entryId);
+			BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId);
 			String entryName = recordEntry.getName();
 			return entryName;
 		}
@@ -265,12 +259,11 @@ public class DataRestoreTask extends Task {
 		this.entryIdsToImport = entryIdsToImport;
 	}
 
-	public String getEntryBasePath() {
-		return entryBasePath;
+	public boolean isOldBackupFormat() {
+		return oldBackupFormat;
 	}
 	
-	public void setEntryBasePath(String entryBasePath) {
-		this.entryBasePath = entryBasePath;
+	public void setOldBackupFormat(boolean oldBackupFormat) {
+		this.oldBackupFormat = oldBackupFormat;
 	}
-
 }

@@ -55,7 +55,7 @@ public class DataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public DataRestoreSummaryJobProxy startSummaryCreation(String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
+	public JobProxy startSummaryCreation(String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
@@ -67,8 +67,7 @@ public class DataImportService {
 			
 			jobManager.start(summaryJob);
 		}
-		DataRestoreSummaryJobProxy proxy = new DataRestoreSummaryJobProxy(summaryJob);
-		return proxy;
+		return getCurrentJob();
 	}
 	
 	@Secured("ROLE_ADMIN")

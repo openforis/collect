@@ -60,7 +60,7 @@ public class SpeciesBackupCSVReader extends CSVDataImportReader<SpeciesBackupLin
 	public static class SpeciesCSVLineParser extends CSVLineParser<SpeciesBackupLine> {
 		
 		private static final String VERNACULAR_NAME_TRIM_EXPRESSION = "^\\s+|\\s+$|;+$|\\.+$";
-		private static final String SYNONYM_COL_NAME = "";
+		private static final String SYNONYM_COL_NAME = "synonyms";
 		private static final String SYNONYM_SPLIT_EXPRESSION = "((syn|Syn)(\\.\\:|\\.|\\:|\\s))";
 		private static final Pattern SYNONYM_PATTERN = Pattern.compile("^" + SYNONYM_SPLIT_EXPRESSION, Pattern.CASE_INSENSITIVE);
 

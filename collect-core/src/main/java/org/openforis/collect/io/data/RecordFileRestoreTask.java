@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,8 +21,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.FileAttribute;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -40,7 +39,7 @@ public class RecordFileRestoreTask extends Task {
 	private RecordFileManager recordFileManager;
 	
 	//input
-	private ZipFile zipFile;
+	private File file;
 	private CollectSurvey survey;
 	private List<Integer> entryIdsToImport;
 	private boolean overwriteAll;
@@ -48,6 +47,14 @@ public class RecordFileRestoreTask extends Task {
 	//temporary instance variables
 	private List<Integer> processedRecords;
 	private BackupFileExtractor backupFileExtractor;
+	private ZipFile zipFile;
+	private boolean oldBackupFormat;
+	
+	@Override
+	protected void initInternal() throws Throwable {
+		this.zipFile = new ZipFile(file);
+		super.initInternal();
+	}
 	
 	@Override
 	protected void execute() throws Throwable {
@@ -89,23 +96,19 @@ public class RecordFileRestoreTask extends Task {
 	
 	@SuppressWarnings("resource")
 	protected CollectRecord getLastStepBackupRecord(int entryId) throws IOException {
-		Schema schema = survey.getSchema();
-		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		Step[] steps = Step.values();
 		for (int i = steps.length - 1; i >= 0; i--) {
 			Step step = steps[i];
-			for (EntityDefinition rootEntityDefn : rootEntityDefinitions) {
-				BackupRecordEntry recordEntry = new BackupRecordEntry(rootEntityDefn.getName(), step, entryId);
-				BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, zipFile, rootEntityDefn.getName(), step);
-				backupDataExtractor.init();
-				ParseRecordResult parseRecordResult = backupDataExtractor.findRecord(recordEntry);
-				if ( parseRecordResult != null ) {
-					if ( parseRecordResult.isSuccess() ) {
-						return parseRecordResult.getRecord();
-					} else {
-						log().error("Error parsing record for entry: " + recordEntry.getName());
-						//TODO handle this error?
-					}
+			BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId, oldBackupFormat);
+			BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, file, step);
+			backupDataExtractor.init();
+			ParseRecordResult parseRecordResult = backupDataExtractor.findRecord(recordEntry);
+			if ( parseRecordResult != null ) {
+				if ( parseRecordResult.isSuccess() ) {
+					return parseRecordResult.getRecord();
+				} else {
+					log().error("Error parsing record for entry: " + recordEntry.getName());
+					//TODO handle this error?
 				}
 			}
 		}
@@ -175,6 +178,14 @@ public class RecordFileRestoreTask extends Task {
 		this.entryIdsToImport = entryIdsToImport;
 	}
 
+	public boolean isOldBackupFormat() {
+		return oldBackupFormat;
+	}
+	
+	public void setOldBackupFormat(boolean oldBackupFormat) {
+		this.oldBackupFormat = oldBackupFormat;
+	}
+	
 	public boolean isOverwriteAll() {
 		return overwriteAll;
 	}

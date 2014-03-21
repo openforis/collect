@@ -1,6 +1,7 @@
 package org.openforis.collect.io.data;
 
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -12,6 +13,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,7 +34,6 @@ public class DataBackupTask extends Task {
 	private ZipOutputStream zipOutputStream;
 	private CollectSurvey survey;
 	private Step[] steps;
-	private String rootEntityName;
 	
 	public DataBackupTask() {
 		super();
@@ -59,23 +60,27 @@ public class DataBackupTask extends Task {
 		List<CollectRecord> recordSummaries = loadAllSummaries();
 		if ( recordSummaries != null && steps != null && steps.length > 0 ) {
 			for (CollectRecord summary : recordSummaries) {
-				if ( isRunning() ) {
-					for (Step step : steps) {
-						int stepNum = step.getStepNumber();
-						if ( stepNum <= summary.getStep().getStepNumber() ) {
-							backup(summary, Step.valueOf(stepNum));
+				for (Step step : steps) {
+					if ( isRunning() ) {
+						if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
+							backup(summary, step);
 							incrementItemsProcessed();
 						}
+					} else {
+						break;
 					}
-				} else {
-					break;
 				}
 			}
 		}
 	}
 
 	private List<CollectRecord> loadAllSummaries() {
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName);
+		List<CollectRecord> summaries = new ArrayList<CollectRecord>();
+		List<EntityDefinition> rootEntityDefinitions = survey.getSchema().getRootEntityDefinitions();
+		for (EntityDefinition rootEntityDefn : rootEntityDefinitions) {
+			List<CollectRecord> temp = recordManager.loadSummaries(survey, rootEntityDefn.getName());
+			summaries.addAll(temp);
+		}
 		return summaries;
 	}
 	
@@ -83,9 +88,8 @@ public class DataBackupTask extends Task {
 		Integer id = summary.getId();
 		try {
 			CollectRecord record = recordManager.load(survey, id, step);
-			BackupRecordEntry recordEntry = new BackupRecordEntry(rootEntityName, step, id);
-			String entryName = recordEntry.getName();
-			ZipEntry entry = new ZipEntry(entryName);
+			BackupRecordEntry recordEntry = new BackupRecordEntry(step, id);
+			ZipEntry entry = new ZipEntry(recordEntry.getName());
 			zipOutputStream.putNextEntry(entry);
 			OutputStreamWriter writer = new OutputStreamWriter(zipOutputStream);
 			dataMarshaller.write(record, writer);
@@ -118,14 +122,6 @@ public class DataBackupTask extends Task {
 	
 	public void setSurvey(CollectSurvey survey) {
 		this.survey = survey;
-	}
-	
-	public String getRootEntityName() {
-		return rootEntityName;
-	}
-	
-	public void setRootEntityName(String rootEntityName) {
-		this.rootEntityName = rootEntityName;
 	}
 	
 	public Step[] getSteps() {

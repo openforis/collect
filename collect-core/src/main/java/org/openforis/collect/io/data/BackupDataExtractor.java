@@ -12,8 +12,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import liquibase.util.StringUtils;
-
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.exception.DataParsingExeption;
@@ -32,43 +30,36 @@ import org.openforis.collect.utils.OpenForisIOUtils;
  */
 public class BackupDataExtractor implements Closeable {
 
-	private static final String ZIP_ENTRY_PATH_SEPARATOR = "/";
-
 	protected static final String IDML_FILE_NAME = "idml.xml";
 
 	//params
 	private CollectSurvey survey;
 	protected File file;
+	private Step step;
+	private boolean oldFormat;
 	
 	//transient
 	private boolean initialized;
-	protected ZipFile zipFile;
 	protected Enumeration<? extends ZipEntry> zipEntries;
 	private DataUnmarshaller dataUnmarshaller;
 	private BackupFileExtractor fileExtractor;
-	private String rootEntity;
-	private Step step;
-	private String dataFolderPath = null;
+	protected ZipFile zipFile;
 
-	public BackupDataExtractor(CollectSurvey survey, File file, String rootEntity, Step step) throws ZipException, IOException {
-		this(survey, new ZipFile(file), rootEntity, step);
+	public BackupDataExtractor(CollectSurvey survey, File file, Step step) throws ZipException, IOException {
+		this(survey, file, step, false);
 	}
-	
-	public BackupDataExtractor(CollectSurvey survey, ZipFile zipFile, String rootEntity, Step step) {
-		this(survey, zipFile, rootEntity, step, SurveyBackupJob.DATA_FOLDER);
-	}
-	
-	public BackupDataExtractor(CollectSurvey survey, ZipFile zipFile, String rootEntity, Step step, String dataFolderPath) {
+
+	public BackupDataExtractor(CollectSurvey survey, File file, Step step, boolean oldFormat) {
 		this.survey = survey;
-		this.zipFile = zipFile;
+		this.file = file;
 		this.initialized = false;
 		this.fileExtractor = new BackupFileExtractor(zipFile);
-		this.rootEntity = rootEntity;
 		this.step = step;
-		this.dataFolderPath = dataFolderPath;
+		this.oldFormat = oldFormat;
 	}
 
 	public void init() throws ZipException, IOException {
+		this.zipFile = new ZipFile(file);
 		this.dataUnmarshaller = new DataUnmarshaller(new DataHandler(survey));
 		this.zipEntries = zipFile.entries();
 		this.initialized = true;
@@ -80,8 +71,8 @@ public class BackupDataExtractor implements Closeable {
 		ZipEntry zipEntry = nextDataEntry();
 		while ( zipEntry != null ) {
 			String entryName = zipEntry.getName();
-			if ( BackupRecordEntry.isValidRecordEntry(zipEntry, dataFolderPath) ) {
-				BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, dataFolderPath);
+			if ( BackupRecordEntry.isValidRecordEntry(zipEntry, oldFormat) ) {
+				BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, oldFormat);
 				if ( isToBeExported(recordEntry) ) {
 					InputStream is = zipFile.getInputStream(zipEntry);
 					return parse(is);
@@ -94,8 +85,7 @@ public class BackupDataExtractor implements Closeable {
 	}
 
 	private boolean isToBeExported(BackupRecordEntry recordEntry) {
-		return (step == null || step == recordEntry.getStep()) && 
-				(rootEntity == null || rootEntity.equals(recordEntry.getRootEntity()));
+		return (step == null || step == recordEntry.getStep());
 	}
 	
 	private ParseRecordResult parse(InputStream inputStream) throws IOException {
@@ -112,7 +102,7 @@ public class BackupDataExtractor implements Closeable {
 	public ZipEntry nextDataEntry() {
 		while ( zipEntries.hasMoreElements() ) {
 			ZipEntry zipEntry = zipEntries.nextElement();
-			if ( BackupRecordEntry.isValidRecordEntry(zipEntry, dataFolderPath) ) {
+			if ( BackupRecordEntry.isValidRecordEntry(zipEntry, oldFormat) ) {
 				return zipEntry;
 			}
 		}
@@ -149,7 +139,7 @@ public class BackupDataExtractor implements Closeable {
 		ZipEntry entry = nextDataEntry();
 		while ( entry != null ) {
 			String entryName = entry.getName();
-			BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, dataFolderPath);
+			BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, oldFormat);
 			if ( isToBeExported(recordEntry) ) {
 				count++;
 			}
@@ -173,91 +163,94 @@ public class BackupDataExtractor implements Closeable {
 
 	public static class BackupRecordEntry {
 		
-		private String rootEntity;
 		private Step step;
 		private int recordId;
+		private boolean oldEntryFormat;
 		
-		public BackupRecordEntry(String rootEntity, Step step, int recordId) {
-			this.rootEntity = rootEntity;
+		private static final String pathSeparatorsPatern;
+		static {
+			String[] pathSeparators = new String[] {"\\", "/"}; //for backwards compatibility, allow both \ and / as path separators
+			String pattern = "[";
+			for (String separator : pathSeparators) {
+				pattern += Pattern.quote(separator);
+			}
+			pattern += "]";
+			pathSeparatorsPatern = pattern;
+		}
+		
+		private static Pattern OLD_ENTRY_PATTERN = Pattern.compile("(\\d+)" + pathSeparatorsPatern + "(\\w+).xml");
+		private static Pattern ENTRY_PATTERN =  Pattern.compile(Pattern.quote(SurveyBackupJob.DATA_FOLDER) + "/(\\d+)/(\\w+).xml");
+		
+		public BackupRecordEntry(Step step, int recordId) {
+			this(step, recordId, false);
+		}
+		
+		public BackupRecordEntry(Step step, int recordId, boolean oldEntryFormat) {
 			this.step = step;
 			this.recordId = recordId;
+			this.oldEntryFormat = oldEntryFormat;
 		}
-		
+
 		public static boolean isValidRecordEntry(ZipEntry zipEntry) {
-			return isValidRecordEntry(zipEntry, SurveyBackupJob.DATA_FOLDER);
+			return isValidRecordEntry(zipEntry, false);
 		}
 		
-		public static boolean isValidRecordEntry(ZipEntry zipEntry, String basePath) {
-			if ( ! basePath.endsWith(ZIP_ENTRY_PATH_SEPARATOR) ) {
-				basePath += ZIP_ENTRY_PATH_SEPARATOR;
+		public static boolean isValidRecordEntry(ZipEntry zipEntry, boolean oldFormat) {
+			if ( oldFormat ) {
+				return ! zipEntry.isDirectory() && OLD_ENTRY_PATTERN.matcher(zipEntry.getName()).matches();
+			} else {
+				return ! zipEntry.isDirectory() && ENTRY_PATTERN.matcher(zipEntry.getName()).matches();
 			}
-			String name = zipEntry.getName();
-			return ! zipEntry.isDirectory() && name.startsWith(basePath);
 		}
 		
-		public static BackupRecordEntry parseOldFormat(String zipEntryName, String basePath, String rootEntity) throws DataParsingExeption {
-			String pathSeparatorPattern = getPathSeparatorsPattern();
-			
-			String format = "(\\d+)" + pathSeparatorPattern + "(\\w+)\\.xml";
-			
-			Pattern pattern = Pattern.compile(format);
-			Matcher matcher = pattern.matcher(zipEntryName);
+		public static BackupRecordEntry parse(String zipEntryName) throws DataParsingExeption {
+			return parse(zipEntryName, false);
+		}
+		
+		public static BackupRecordEntry parse(String zipEntryName, boolean oldFormat) throws DataParsingExeption {
+			if ( oldFormat ) {
+				return parseOldFormat(zipEntryName);
+			} else {
+				return parseNewFormat(zipEntryName);
+			}
+		}
+		
+		public static BackupRecordEntry parseOldFormat(String zipEntryName) throws DataParsingExeption {
+			Matcher matcher = OLD_ENTRY_PATTERN.matcher(zipEntryName);
 			if ( matcher.matches() ) {
 				String stepNumStr = matcher.group(1);
 				String recordIdStr = matcher.group(2);
 				int stepNumber = Integer.parseInt(stepNumStr);
 				Step step = Step.valueOf(stepNumber);
 				int recordId = Integer.parseInt(recordIdStr);
-				BackupRecordEntry result = new BackupRecordEntry(rootEntity, step, recordId);
+				BackupRecordEntry result = new BackupRecordEntry(step, recordId);
 				return result;
 			} else {
-				throw new DataParsingExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName + " expected: " + basePath + "...");
+				throw new DataParsingExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName + " expected: " + "STEP_NO/RECORD_ID.xml");
 			}
-		}
-
-		private static String getPathSeparatorsPattern() {
-			String[] pathSeparators = new String[] {"\\", "/"}; //for backwards compatibility, allow both \ and / as path separators
-			String pathSeparatorPattern = "[";
-			for (String separator : pathSeparators) {
-				pathSeparatorPattern += Pattern.quote(separator);
-			}
-			pathSeparatorPattern += "]";
-			return pathSeparatorPattern;
 		}
 		
-		public static BackupRecordEntry parse(String zipEntryName, String basePath) throws DataParsingExeption {
-			String pathSeparatorPattern = getPathSeparatorsPattern();
-			
-			String format = Pattern.quote(StringUtils.trimToEmpty(basePath)) + pathSeparatorPattern + "(\\w+)" + pathSeparatorPattern + "(\\d+)" + pathSeparatorPattern + "(\\w+)\\.xml";
-			Pattern pattern = Pattern.compile(format);
-			Matcher matcher = pattern.matcher(zipEntryName);
+		private static BackupRecordEntry parseNewFormat(String zipEntryName) throws DataParsingExeption {
+			Matcher matcher = ENTRY_PATTERN.matcher(zipEntryName);
 			if ( matcher.matches() ) {
-				String rootEntity = matcher.group(1);
-				String stepNumStr = matcher.group(2);
-				String recordIdStr = matcher.group(3);
+				String stepNumStr = matcher.group(1);
+				String recordIdStr = matcher.group(2);
 				int stepNumber = Integer.parseInt(stepNumStr);
 				Step step = Step.valueOf(stepNumber);
 				int recordId = Integer.parseInt(recordIdStr);
-				BackupRecordEntry result = new BackupRecordEntry(rootEntity, step, recordId);
+				BackupRecordEntry result = new BackupRecordEntry(step, recordId);
 				return result;
 			} else {
-				throw new DataParsingExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName + " expected: " + basePath + "...");
+				throw new DataParsingExeption("Packaged file format exception: wrong zip entry name: " + zipEntryName + " expected: " + 
+						SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + "...");
 			}
 		}
 	
 		public String getName() {
-			return SurveyBackupJob.DATA_FOLDER + 
-					SurveyBackupJob.ZIP_FOLDER_SEPARATOR + 
-					rootEntity +
-					SurveyBackupJob.ZIP_FOLDER_SEPARATOR + 
+			return (oldEntryFormat ? "": SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR) + 
 					step.getStepNumber() + 
 					SurveyBackupJob.ZIP_FOLDER_SEPARATOR + 
-					recordId + 
-					".xml";
-		}
-		
-		public String getRootEntity() {
-			return rootEntity;
+					recordId + ".xml";
 		}
 		
 		public int getRecordId() {
@@ -273,8 +266,6 @@ public class BackupDataExtractor implements Closeable {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + recordId;
-			result = prime * result
-					+ ((rootEntity == null) ? 0 : rootEntity.hashCode());
 			result = prime * result + ((step == null) ? 0 : step.hashCode());
 			return result;
 		}
@@ -289,11 +280,6 @@ public class BackupDataExtractor implements Closeable {
 				return false;
 			BackupRecordEntry other = (BackupRecordEntry) obj;
 			if (recordId != other.recordId)
-				return false;
-			if (rootEntity == null) {
-				if (other.rootEntity != null)
-					return false;
-			} else if (!rootEntity.equals(other.rootEntity))
 				return false;
 			if (step != other.step)
 				return false;

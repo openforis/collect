@@ -25,8 +25,8 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataRestoreJob extends DataRestoreBaseJob {
 	
+	@Autowired
 	private RecordFileManager recordFileManager;
-	
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
@@ -36,7 +36,15 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private boolean overwriteAll;
 	private boolean restoreUploadedFiles;
 	private List<Integer> entryIdsToImport;
+	private boolean oldBackupFormat;
 
+	@Override
+	public void initInternal() throws Throwable {
+		super.initInternal();
+		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+		oldBackupFormat = backupFileExtractor.isOldFormat(); 
+	}
+	
 	@Override
 	protected void buildTasks() throws Throwable {
 		super.buildTasks();
@@ -58,8 +66,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			DataRestoreTask t = (DataRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
-			t.setEntryBasePath(SurveyBackupJob.DATA_FOLDER);
 			t.setZipFile(zipFile);
+			t.setOldBackupFormat(oldBackupFormat);
 			t.setPackagedSurvey(packagedSurvey);
 			t.setExistingSurvey(publishedSurvey);
 			t.setOverwriteAll(overwriteAll);
@@ -69,6 +77,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setRecordManager(recordManager);
 			t.setRecordFileManager(recordFileManager);
 			t.setZipFile(zipFile);
+			t.setOldBackupFormat(oldBackupFormat);
 			t.setOverwriteAll(overwriteAll);
 			t.setEntryIdsToImport(entryIdsToImport);
 			t.setSurvey(publishedSurvey);

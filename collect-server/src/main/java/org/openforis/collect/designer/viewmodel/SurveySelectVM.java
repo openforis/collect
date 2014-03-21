@@ -60,6 +60,8 @@ import org.zkoss.zul.Window;
  */
 public class SurveySelectVM extends BaseVM {
 
+	private static final String TEMPORARY_SURVEY_TYPE = "temporary";
+
 	private static Log log = Log.lookup(SurveySelectVM.class);
 
 	public static final String CLOSE_SURVEY_IMPORT_POP_UP_GLOBAL_COMMNAD = "closeSurveyImportPopUp";
@@ -128,7 +130,7 @@ public class SurveySelectVM extends BaseVM {
 		boolean onlyTemporaray = selectedSurvey.isWork() && selectedSurvey.getPublishedId() == null;
 		
 		if ( onlyTemporaray ) {
-			performSelectedSurveyExport(false, false);
+			performSelectedSurveyExport(TEMPORARY_SURVEY_TYPE, false, false);
 		} else {
 			//set default parameters
 			Map<String, Object> args = new HashMap<String, Object>();
@@ -167,7 +169,8 @@ public class SurveySelectVM extends BaseVM {
 			okButton.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
 				@Override
 				public void onEvent(Event event) throws Exception {
-					performSelectedSurveyExport(includeDataCheckbox.isChecked(), includeUploadedFilesCheckbox.isChecked());
+					String surveyType = (String) typeRadiogroup.getSelectedItem().getValue();
+					performSelectedSurveyExport(surveyType, includeDataCheckbox.isChecked(), includeUploadedFilesCheckbox.isChecked());
 				}
 			});
 		}
@@ -175,7 +178,7 @@ public class SurveySelectVM extends BaseVM {
 	
 	private void updateExportPopupView(Radiogroup typeRadiogroup, Checkbox includeDataCheckbox, Checkbox includeUploadedFilesCheckbox) {
 		String selectedType = typeRadiogroup.getSelectedItem().getValue();
-		if ( "temporary".equals(selectedType) ) {
+		if ( TEMPORARY_SURVEY_TYPE.equals(selectedType) ) {
 			includeDataCheckbox.setChecked(false);
 			includeDataCheckbox.setDisabled(true);
 		} else {
@@ -189,8 +192,14 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 	
-	private void performSelectedSurveyExport(boolean includeData, boolean includeUploadedFiles) {
-		CollectSurvey survey = loadSelectedSurvey();
+	private void performSelectedSurveyExport(String surveyType, boolean includeData, boolean includeUploadedFiles) {
+		String uri = selectedSurvey.getUri();
+		CollectSurvey survey;
+		if ( selectedSurvey.isWork() && surveyType.equals(TEMPORARY_SURVEY_TYPE) ) {
+			survey = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		} else {
+			survey = surveyManager.getByUri(uri);
+		}
 		Integer surveyId = survey.getId();
 		surveyBackupJob = springJobManager.createJob(SurveyBackupJob.class);
 		surveyBackupJob.setSurvey(survey);

@@ -41,12 +41,13 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	//output
 	private DataImportSummary summary;
 
+	//transient
+	private boolean oldFormat;
+	
 	@Override
 	public void initInternal() throws Throwable {
 		super.initInternal();
-		if ( ! isDataIncluded() ) {
-			throw new RuntimeException("No data found in backup file");
-		}
+		oldFormat = ! isDataFolderIncluded();
 	}
 
 	@Override
@@ -63,7 +64,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
 			t.setZipFile(zipFile);
-			t.setEntryPrefix(SurveyBackupJob.DATA_FOLDER);
+			t.setOldFormat(oldFormat);
 			t.setPackagedSurvey(packagedSurvey);
 			t.setExistingSurvey(publishedSurvey);
 			t.setPackagedSurvey(DataRestoreSummaryJob.this.packagedSurvey);
@@ -90,7 +91,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 		}
 	}
 
-	private boolean isDataIncluded() {
+	private boolean isDataFolderIncluded() {
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.DATA_FOLDER);
 		return ! dataEntries.isEmpty();

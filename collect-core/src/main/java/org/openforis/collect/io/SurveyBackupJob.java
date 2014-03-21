@@ -138,15 +138,12 @@ public class SurveyBackupJob extends Job {
 	}
 	
 	private void addDataExportTask() {
-		for (EntityDefinition rootEntity : survey.getSchema().getRootEntityDefinitions()) {
-			DataBackupTask task = createTask(DataBackupTask.class);
-			task.setRecordManager(recordManager);
-			task.setDataMarshaller(dataMarshaller);
-			task.setZipOutputStream(zipOutputStream);
-			task.setSurvey(survey);
-			task.setRootEntityName(rootEntity.getName());
-			addTask(task);
-		}
+		DataBackupTask task = createTask(DataBackupTask.class);
+		task.setRecordManager(recordManager);
+		task.setDataMarshaller(dataMarshaller);
+		task.setZipOutputStream(zipOutputStream);
+		task.setSurvey(survey);
+		addTask(task);
 	}
 	
 	private void addRecordFilesBackupTask() {

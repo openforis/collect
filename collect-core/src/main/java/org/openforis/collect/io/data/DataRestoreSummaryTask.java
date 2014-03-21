@@ -49,7 +49,7 @@ public class DataRestoreSummaryTask extends Task {
 
 	//input
 	private ZipFile zipFile;
-	private String entryPrefix;
+	private boolean oldFormat;
 
 	/**
 	 * Survey packaged into the backup file
@@ -88,7 +88,7 @@ public class DataRestoreSummaryTask extends Task {
 		while (entries.hasMoreElements()) {
 			if ( isRunning() ) {
 				ZipEntry zipEntry = entries.nextElement();
-				if ( ! BackupDataExtractor.BackupRecordEntry.isValidRecordEntry(zipEntry, entryPrefix) ) {
+				if ( ! BackupDataExtractor.BackupRecordEntry.isValidRecordEntry(zipEntry, oldFormat) ) {
 					continue;
 				}
 				createSummaryForEntry(zipEntry, skippedEntryNameToErrors, 
@@ -111,7 +111,7 @@ public class DataRestoreSummaryTask extends Task {
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
 			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
 		String entryName = zipEntry.getName();
-		BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, entryPrefix);
+		BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, oldFormat);
 		Step step = recordEntry.getStep();
 		InputStream is = zipFile.getInputStream(zipEntry);
 		InputStreamReader reader = OpenForisIOUtils.toReader(is);
@@ -223,19 +223,10 @@ public class DataRestoreSummaryTask extends Task {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
-			validateRecord(record);
 			record.updateRootEntityKeyValues();
 			record.updateEntityCounts();
 		}
 		return result;
-	}
-
-	private void validateRecord(CollectRecord record) {
-		try {
-			recordManager.validate(record);
-		} catch (Exception e) {
-			log().info("Error validating record: " + record.getRootEntityKeyValues());
-		}
 	}
 
 	private CollectRecord createRecordSummary(CollectRecord record) {
@@ -302,12 +293,12 @@ public class DataRestoreSummaryTask extends Task {
 		return summary;
 	}
 
-	public void setEntryPrefix(String entryPrefix) {
-		this.entryPrefix = entryPrefix;
+	public boolean isOldFormat() {
+		return oldFormat;
 	}
 	
-	public String getEntryPrefix() {
-		return entryPrefix;
+	public void setOldFormat(boolean oldFormat) {
+		this.oldFormat = oldFormat;
 	}
 
 	public Predicate<CollectRecord> getIncludeRecordPredicate() {

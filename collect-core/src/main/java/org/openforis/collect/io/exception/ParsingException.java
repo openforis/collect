@@ -26,12 +26,12 @@ public class ParsingException extends Exception {
 	}
 	
 	public ParsingException(ParsingError error) {
-		super();
+		super(error.getMessage());
 		this.error = error;
 	}
 	
 	public ParsingException(ParsingError error, Throwable cause) {
-		super(cause);
+		super(error.getMessage(), cause);
 		this.error = error;
 	}
 
