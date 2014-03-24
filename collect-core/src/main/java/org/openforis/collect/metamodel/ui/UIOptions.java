@@ -223,6 +223,11 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			if ( StringUtils.isNotBlank(tabName) ) {
 				if ( parentDefn == null || parentDefn.getParentDefinition() == null ) {
 					result = rootTabSet.getTab(tabName);
+					if ( result == null ) {
+						//try to find tab among main tab children
+						UITab mainTab = getMainTab(rootTabSet);
+						result = mainTab.getTab(tabName);
+					}
 				} else {
 					UITab parentTab = getAssignedTab(parentDefn);
 					if ( parentTab != null ) {

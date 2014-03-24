@@ -7,6 +7,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -114,6 +115,7 @@ public class SchemaVM extends SurveyBaseVM {
 	@Wire
 	private Menupopup detachedNodePopup;
 	
+	//transient
 	private Window rootEntityEditPopUp;
 	private Window nodeMovePopUp;
 
@@ -298,9 +300,8 @@ public class SchemaVM extends SurveyBaseVM {
 				EntityDefinition parentEntity = getSelectedNodeParentEntity();
 				SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();
 				if ( selectedSurveyObject instanceof UITab ) {
-					UITab selectedTab = (UITab) selectedSurveyObject;
 					UIOptions uiOptions = survey.getUIOptions();
-					uiOptions.assignToTab(newNode, selectedTab);
+					uiOptions.assignToTab(newNode, (UITab) selectedSurveyObject);
 				}
 				editNode(binder, true, parentEntity, newNode);
 				afterNewNodeCreated(newNode, true);
@@ -975,15 +976,40 @@ public class SchemaVM extends SurveyBaseVM {
 	@Command
 	@NotifyChange({"treeModel","selectedTab"})
 	public void addChildTab(@ContextParam(ContextType.BINDER) Binder binder) {
-		if ( TreeViewType.DATA.name().equalsIgnoreCase(selectedTreeViewType) ) {
-			MessageUtil.showWarning("survey.schema.unsupported_operation_in_data_view");
-		} else {
-			SurveyObject surveyObject = selectedTreeNode.getSurveyObject();
-			addTabInternal(binder, surveyObject);
+		if ( checkCanAddChildTab() ) {
+			UITab parentTab = getSelectedNodeParentTab();
+			addTabInternal(binder, parentTab);
 		}
 	}
 	
-	protected void addTabInternal(final Binder binder, final SurveyObject parent) {
+	private boolean checkCanAddChildTab() {
+		if ( TreeViewType.DATA.name().equalsIgnoreCase(selectedTreeViewType) ) {
+			MessageUtil.showWarning("survey.schema.unsupported_operation_in_data_view");
+			return false;
+		} else {
+			SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();
+			if ( selectedSurveyObject instanceof UITab ) {
+				UITab parentTab = getSelectedNodeParentTab();
+				UIOptions uiOptions = survey.getUIOptions();
+				UITabSet rootTabSet = parentTab.getRootTabSet();
+				UITab mainTab = uiOptions.getMainTab(rootTabSet);
+				if ( parentTab == mainTab ) {
+					MessageUtil.showWarning("survey.schema.cannot_add_nested_tab.unsupported_nested_tabs_in_main_tab");
+					return false;
+				} else if ( uiOptions.isAssociatedWithMultipleEntityForm(parentTab) ) {
+					MessageUtil.showWarning("survey.schema.cannot_add_nested_tab.form_entity_assosicated");
+					return false;
+				} else {
+					MessageUtil.showWarning("survey.schema.cannot_add_nested_tab.maximum_depth_reached");
+					return false;
+				}
+			} else {
+				return true;
+			}
+		}
+	}
+
+	protected void addTabInternal(final Binder binder, final UITabSet parentTabSet) {
 		if ( rootTabSet != null ) {
 			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 				@Override
@@ -993,19 +1019,14 @@ public class SchemaVM extends SurveyBaseVM {
 					UITab tab = uiOptions.createTab();
 					String label = Labels.getLabel("survey.schema.node.layout.default_tab_label");
 					tab.setLabel(currentLanguageCode, label);
-					UITabSet parentTab;
-					if ( parent instanceof UITabSet ) {
-						parentTab = (UITabSet) parent;
-					} else {
-						parentTab = uiOptions.getAssignedTab((NodeDefinition) parent);
-					}
-					parentTab.addTab(tab);
+					parentTabSet.addTab(tab);
 		
 					editNode(binder, false, null, tab);
 					afterNewNodeCreated(tab, false);
 
 					//dispatchTabSetChangedCommand();
 				}
+
 			});
 		}
 	}
@@ -1014,6 +1035,18 @@ public class SchemaVM extends SurveyBaseVM {
 	public void removeTab() {
 		UITab tab = (UITab) selectedTreeNode.getSurveyObject();
 		removeTab(tab);
+	}
+
+	private UITab getSelectedNodeParentTab() {
+		UITab parentTab;
+		SurveyObject selectedSurveyObject = selectedTreeNode.getSurveyObject();
+		if ( selectedSurveyObject instanceof UITab ) {
+			parentTab = (UITab) selectedSurveyObject;
+		} else {
+			UIOptions uiOptions = survey.getUIOptions();
+			parentTab = uiOptions.getAssignedTab((NodeDefinition) selectedSurveyObject);
+		}
+		return parentTab;
 	}
 
 	private void removeTab(final UITab tab) {
@@ -1132,7 +1165,7 @@ public class SchemaVM extends SurveyBaseVM {
 		if ( survey.isPublished() ) {
 			//only tab changing allowed
 			final List<UITab> assignableTabs = uiOptions.getAssignableTabs(editedNodeParentEntity, selectedNode);
-			if ( assignableTabs.size() > 1 ) {
+			if ( assignableTabs.size() > 0 ) {
 				return true;
 			} else {
 				MessageUtil.showWarning("survey.schema.move_node.published_survey.no_other_tabs_allowed");
@@ -1145,8 +1178,11 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private void openSelectParentNodePopup(final NodeDefinition selectedItem) {
 		UIOptions uiOptions = survey.getUIOptions();
-		final List<UITab> assignableTabs = uiOptions.getAssignableTabs(editedNodeParentEntity, selectedItem);
-
+		final Set<UITab> assignableTabs = new HashSet<UITab>(uiOptions.getAssignableTabs(editedNodeParentEntity, selectedItem));
+		final NodeDefinition parentDefn = selectedItem.getParentDefinition();
+		UITab inheritedTab = uiOptions.getAssignedTab(parentDefn);
+		assignableTabs.add(inheritedTab);
+		
 		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
 			@Override
 			public boolean evaluate(SurveyObject item) {
@@ -1158,7 +1194,8 @@ public class SchemaVM extends SurveyBaseVM {
 			public boolean evaluate(SurveyObject item) {
 				if ( item instanceof UITab ) {
 					return ! assignableTabs.contains(item);
-				} else if ( ! survey.isPublished() && item instanceof EntityDefinition && ! item.equals(selectedItem) ) {
+				} else if ( item.equals(parentDefn) || 
+						(! survey.isPublished() && item instanceof EntityDefinition && ! item.equals(selectedItem)) ) {
 					return false;
 				} else {
 					return true;

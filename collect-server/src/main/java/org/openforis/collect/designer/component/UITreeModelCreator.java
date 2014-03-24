@@ -11,6 +11,7 @@ import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -67,10 +68,11 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 		childNodes.addAll(schemaTreeNodes);
 		
 		//include tabs
-		List<UITab> tabs = uiOptions.getTabsAssignableToChildren(entityDefn, false);
-		Collection<? extends AbstractNode<SchemaNodeData>> tabNodes = createNodes(tabs);
-		childNodes.addAll(tabNodes);
-
+		if ( entityDefn.isMultiple() && uiOptions.getLayout(entityDefn) == Layout.FORM ) {
+			List<UITab> tabs = uiOptions.getTabsAssignableToChildren(entityDefn, false);
+			Collection<? extends AbstractNode<SchemaNodeData>> tabNodes = createNodes(tabs);
+			childNodes.addAll(tabNodes);
+		}
 		return childNodes;
 	}
 
@@ -99,17 +101,38 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 		
 		//add children unassigned tab tree nodes
 //		List<UITab> unassignedTabs = new ArrayList<UITab>();
-//		List<UITab> tabs = tab.getTabs();
-//		for (UITab childTab : tabs) {
-//			UITabSet rootTabSet = childTab.getRootTabSet();
-//			EntityDefinition parentEntity = uiOptions.getRootEntityDefinition(rootTabSet);
-//			boolean unassigned = uiOptions.isUnassigned(childTab, parentEntity);
+//		UITabSet rootTabSet = tab.getRootTabSet();
+//		EntityDefinition rootEntity = uiOptions.getRootEntityDefinition(rootTabSet);
+//		
+//		for (UITab childTab : tab.getTabs()) {
+//			boolean unassigned = uiOptions.isUnassigned(childTab, rootEntity);
 //			if ( unassigned ) {
 //				unassignedTabs.add(childTab);
 //			}
 //		}
 //		List<SchemaTreeNode> unassignedTabNodes = fromTabsList(unassignedTabs, version, includeAttributes, labelLanguage);
 //		result.addAll(unassignedTabNodes);
+		
+		List<UITab> nestedTabs = new ArrayList<UITab>();
+		for (UITab childTab : tab.getTabs()) {
+			List<NodeDefinition> nodes = uiOptions.getNodesPerTab(childTab, false);
+			boolean toBeAdded = true;
+			for (NodeDefinition nestedTabChildNode : nodes) {
+				for (NodeDefinition childDefn : childDefns ) {
+					if ( childDefn == nestedTabChildNode || 
+							(childDefn instanceof EntityDefinition && nestedTabChildNode.isDescendantOf((EntityDefinition) childDefn) ) ) {
+						toBeAdded = false;
+						break;
+					}
+				}
+			}
+			if ( toBeAdded ) {
+				nestedTabs.add(childTab);
+			}
+		}
+		Collection<SchemaTreeNode> tabNodes = createNodes(nestedTabs);
+		result.addAll(tabNodes);
+
 		return result;
 	}
 	

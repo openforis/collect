@@ -32,7 +32,8 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	private SchemaTreeModel treeModel;
 	private SurveyObject selectedNode;
 
-	private Predicate<SurveyObject> selectPredicate;
+	private Predicate<SurveyObject> selectableNodePredicate;
+	private Predicate<SurveyObject> disabledNodePredicate;
 	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("rootEntity") EntityDefinition rootEntity, 
@@ -46,7 +47,8 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 		SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(version, disabledNodePredicate, includedNodePredicate, includeEmtptyNodes, currentLanguageCode);
 		this.treeModel = modelCreator.createModel(rootEntity);
 		this.treeModel.openAllItems();
-		this.selectPredicate = selectableNodePredicate; 
+		this.selectableNodePredicate = selectableNodePredicate;
+		this.disabledNodePredicate = disabledNodePredicate;
 		if ( selection != null ) {
 			this.selectedNode = selection;
 			this.treeModel.select(selection);
@@ -72,14 +74,18 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	
 	@Command
 	public void onOk(@BindingParam("selectedSurveyObject") SurveyObject selectedSurveyObject) {
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("node", selectedSurveyObject);
-		BindUtils.postGlobalCommand(null, null, SCHEMA_TREE_NODE_SELECTED_COMMAND, args);
+		if ( ( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) &&
+				( selectableNodePredicate == null || selectableNodePredicate.evaluate(selectedSurveyObject) ) ) {
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("node", selectedSurveyObject);
+			BindUtils.postGlobalCommand(null, null, SCHEMA_TREE_NODE_SELECTED_COMMAND, args);
+		}
 	}
 	
 	@Command
 	public void nodeSelected(@BindingParam("node") SurveyObject surveyObject) {
-		if ( selectPredicate != null && ! selectPredicate.evaluate(surveyObject) ) {
+		if ( selectableNodePredicate != null && ! selectableNodePredicate.evaluate(surveyObject) ) {
+			//deselect node
 			treeModel.select(selectedNode);
 		} else if ( selectedNode == surveyObject ) {
 			treeModel.clearSelection();

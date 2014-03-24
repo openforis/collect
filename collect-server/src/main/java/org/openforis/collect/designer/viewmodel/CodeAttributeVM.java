@@ -139,13 +139,16 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 							item instanceof CodeAttributeDefinition && assignableParentAttributes.contains(item);
 				}
 			};
-			Predicate<SurveyObject> selectableNodePredicate = new Predicate<SurveyObject>() {
+			Predicate<SurveyObject> disabledNodePredicate = new Predicate<SurveyObject>() {
 				@Override
 				public boolean evaluate(SurveyObject item) {
-					return ! (item instanceof UITab);
+					return item instanceof UITab;
 				}
 			};
-			parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title, editedItem.getRootEntity(), null, includedNodePredicate, false, null, selectableNodePredicate, parentCodeAttributeDefinition);
+			parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title,
+					editedItem.getRootEntity(), null, includedNodePredicate,
+					false, disabledNodePredicate, null,
+					parentCodeAttributeDefinition);
 		}
 	}
 
