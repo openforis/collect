@@ -71,6 +71,19 @@ public class DataRestoreSummaryTask extends Task {
 	private DataImportSummary summary;
 	
 	@Override
+	protected long countTotalItems() {
+		long total = 0;
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		while (entries.hasMoreElements()) {
+			ZipEntry zipEntry = entries.nextElement();
+			if ( BackupRecordEntry.isValidRecordEntry(zipEntry, oldFormat) ) {
+				total ++;
+			}
+		}
+		return total;
+	}
+	
+	@Override
 	protected void execute() throws Throwable {
 		summary = null;
 		dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);

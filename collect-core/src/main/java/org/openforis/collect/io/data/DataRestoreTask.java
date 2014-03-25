@@ -5,11 +5,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.io.BackupFileExtractor;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordManager;
@@ -72,9 +75,41 @@ public class DataRestoreTask extends Task {
 	}
 	
 	@Override
+	protected long countTotalItems() {
+		List<Integer> idsToImport = calculateEntryIdsToImport();
+		return idsToImport.size();
+	}
+
+	private List<Integer> calculateEntryIdsToImport() {
+		List<Integer> result = new ArrayList<Integer>();
+		if ( entryIdsToImport == null ) {
+			if ( overwriteAll ) {
+				for (Step step : Step.values()) {
+					int stepNumber = step.getStepNumber();
+					String path = SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + stepNumber;
+					if ( backupFileExtractor.containsEntriesInPath(path) ) {
+						List<String> listEntriesInPath = backupFileExtractor.listEntriesInPath(path);
+						for (String entry : listEntriesInPath) {
+							String entryId = FilenameUtils.getBaseName(entry);
+							result.add(Integer.parseInt(entryId));
+						}
+						return result;
+					}
+				}
+				return Collections.emptyList();
+			} else {
+				throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
+			}
+		} else {
+			return entryIdsToImport;
+		}
+	}
+	
+	@Override
 	protected void execute() throws Throwable {
 		processedRecords = new ArrayList<Integer>();
-		for (Integer entryId : entryIdsToImport) {
+		List<Integer> idsToImport = calculateEntryIdsToImport();
+		for (Integer entryId : idsToImport) {
 			if ( isRunning() && ! processedRecords.contains(entryId) ) {
 				importEntries(entryId);
 				processedRecords.add(entryId);
@@ -175,7 +210,6 @@ public class DataRestoreTask extends Task {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
-			validateRecord(record);
 			record.updateRootEntityKeyValues();
 			record.updateEntityCounts();
 		}
@@ -200,7 +234,7 @@ public class DataRestoreTask extends Task {
 		toRecord.setRootEntity(fromRecord.getRootEntity());
 		toRecord.updateRootEntityKeyValues();
 		toRecord.updateEntityCounts();
-		recordManager.validate(toRecord);
+		validateRecord(toRecord);
 	}
 	
 	public RecordManager getRecordManager() {

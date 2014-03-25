@@ -57,36 +57,41 @@ public class DataImportService {
 	@Secured("ROLE_ADMIN")
 	public JobProxy startSummaryCreation(String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
+			resetJobs();
+			
 			SessionState sessionState = sessionManager.getSessionState();
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
 			packagedFile = new File(userImportFolder, FILE_NAME);
 			
-			summaryJob = jobManager.createJob(DataRestoreSummaryJob.class);
-			summaryJob.setFile(packagedFile);
-			summaryJob.setSurveyUri(selectedSurveyUri);
+			DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
+			job.setFile(packagedFile);
+			job.setSurveyUri(selectedSurveyUri);
 			
-			jobManager.start(summaryJob);
+			jobManager.start(job);
+			
+			this.summaryJob = job;
 		}
 		return getCurrentJob();
 	}
 	
 	@Secured("ROLE_ADMIN")
 	public JobProxy startImport(List<Integer> entryIdsToImport) throws Exception {
-		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
-		job.setFile(packagedFile);
-		job.setPackagedSurvey(summaryJob.getPackagedSurvey());
-		job.setPublishedSurvey(summaryJob.getPublishedSurvey());
-		job.setEntryIdsToImport(entryIdsToImport);
-		job.setRestoreUploadedFiles(true);
-
-		jobManager.start(job);
-
-		this.summaryJob = null;
-		this.dataRestoreJob = job;
-		
+		if ( dataRestoreJob == null || ! dataRestoreJob.isRunning() ) {
+			DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+			job.setFile(packagedFile);
+			job.setPackagedSurvey(summaryJob.getPackagedSurvey());
+			job.setPublishedSurvey(summaryJob.getPublishedSurvey());
+			job.setEntryIdsToImport(entryIdsToImport);
+			job.setRestoreUploadedFiles(true);
+			
+			jobManager.start(job);
+			
+			resetJobs();
+			this.dataRestoreJob = job;
+		}
 		return getCurrentJob();
 	}
-	
+
 	@Secured("ROLE_ADMIN")
 	public JobProxy getCurrentJob() {
 		JobProxy proxy = null;
@@ -116,6 +121,11 @@ public class DataImportService {
 		} else if ( dataRestoreJob != null ) {
 			dataRestoreJob.abort();
 		}
+	}
+
+	private void resetJobs() {
+		this.summaryJob = null;
+		this.dataRestoreJob = null;
 	}
 	
 }

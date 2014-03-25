@@ -58,7 +58,6 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	
 	@Override
 	protected void prepareTask(Task task) {
-		super.prepareTask(task);
 		if ( task instanceof DataRestoreSummaryTask ) {
 			DataRestoreSummaryTask t = (DataRestoreSummaryTask) task;
 			t.setRecordManager(recordManager);
@@ -70,6 +69,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setPackagedSurvey(DataRestoreSummaryJob.this.packagedSurvey);
 			t.setIncludeRecordPredicate(includeRecordPredicate);
 		}
+		super.prepareTask(task);
 	}
 	
 	@Override
