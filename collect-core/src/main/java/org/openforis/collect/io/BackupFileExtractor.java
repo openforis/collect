@@ -72,7 +72,7 @@ public class BackupFileExtractor {
 		while ( zipEntries.hasMoreElements() ) {
 			ZipEntry zipEntry = zipEntries.nextElement();
 			String name = zipEntry.getName();
-			if ( name.startsWith(path) ) {
+			if ( ! zipEntry.isDirectory() && name.startsWith(path) ) {
 				result.add(name);
 			}
 		}
