@@ -257,9 +257,9 @@ package org.openforis.collect.presenter {
 					var job:JobProxy = _job as JobProxy;
 					var progress:int = job.progressPercent;
 					var status:JobProxy$Status = job.status;
-					if ( status == JobProxy$Status.RUNNING && processed <= 100 ) {
+					if ( status == JobProxy$Status.RUNNING && progress <= 100 ) {
 						_view.currentState = DataExportPopUp.STATE_EXPORTING;
-						DataExportPopUp(_view).progressBar.setProgress(processed, 100);
+						DataExportPopUp(_view).progressBar.setProgress(progress, 100);
 						var progressText:String = Message.get("export.processing");
 						DataExportPopUp(_view).progressLabel.text = progressText;
 						if ( _progressTimer == null ) {

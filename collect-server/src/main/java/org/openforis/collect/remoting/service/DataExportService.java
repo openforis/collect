@@ -83,6 +83,8 @@ public class DataExportService {
 	@Transactional
 	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes) {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
+			resetJobs();
+			
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
 			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
@@ -111,6 +113,8 @@ public class DataExportService {
 	@Transactional
 	public Proxy fullExport(String rootEntityName, boolean includeRecordFiles) {
 		if ( backupJob == null || ! backupJob.isRunning() ) {
+			resetJobs();
+			
 			SessionState sessionState = sessionManager.getSessionState();
 			File exportDir = new File(exportDirectory, sessionState.getSessionId());
 			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
@@ -128,37 +132,21 @@ public class DataExportService {
 			backupJob = job;
 			
 			jobManager.start(job);
-			
-//			XMLDataExportProcess process = appContext.getBean(XMLDataExportProcess.class);
-//			process.setOutputFile(outputFile);
-//			process.setSurvey(survey);
-//			process.setRootEntityName(rootEntityName);
-//			process.setSteps(steps);
-//			
-//			process.init();
-//			dataExportProcess = process;
-//			ExecutorServiceUtil.executeInCachedPool(process);
 		}
 		return getCurrentJob();
 	}
 
-//	private Step[] toStepsArray(int[] stepNumbers) {
-//		if ( stepNumbers == null ) {
-//			return Step.values();
-//		} else {
-//			Step[] steps = new Step[stepNumbers.length];
-//			for (int i = 0; i < stepNumbers.length; i++ ) {
-//				int stepNum = stepNumbers[i];
-//				Step step = Step.valueOf(stepNum);
-//				steps[i] = step;
-//			}
-//			return steps;
-//		}
-//	}
+	private void resetJobs() {
+		backupJob = null;
+		dataExportProcess = null;
+	}
 
-	public void cancel() {
+	public void abort() {
 		if ( dataExportProcess != null ) {
 			dataExportProcess.cancel();
+		}
+		if ( backupJob != null ) {
+			backupJob.abort();
 		}
 	}
 
