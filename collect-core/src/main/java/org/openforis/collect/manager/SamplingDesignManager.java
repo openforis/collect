@@ -49,6 +49,18 @@ public class SamplingDesignManager {
 	public SamplingDesignSummaries loadBySurveyWork(int surveyWorkId, int offset, int maxRecords) {
 		return load(true, surveyWorkId, offset, maxRecords);
 	}
+
+	@Transactional
+	public boolean hasSamplingDesign(CollectSurvey survey) {
+		Integer id = survey.getId();
+		if ( id == null ) {
+			return false;
+		} else if ( survey.isWork() ) {
+			return countBySurveyWork(id) > 0;
+		} else {
+			return countBySurvey(id) > 0;
+		}
+	}
 	
 	@Transactional
 	public int countBySurvey(int surveyId) {

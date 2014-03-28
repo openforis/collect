@@ -447,6 +447,11 @@ public class SpeciesManager {
 		return tree;
 	}
 
+	public boolean hasTaxons(int taxonomyId) {
+		int count = taxonDao.countTaxons(taxonomyId);
+		return count > 0;
+	}
+	
 	public TaxonDao getTaxonDao() {
 		return taxonDao;
 	}
@@ -479,5 +484,5 @@ public class SpeciesManager {
 	public void setExpressionFactory(ExpressionFactory expressionFactory) {
 		this.expressionFactory = expressionFactory;
 	}
-	
+
 }

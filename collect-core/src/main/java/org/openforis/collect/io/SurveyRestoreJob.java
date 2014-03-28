@@ -6,6 +6,7 @@ package org.openforis.collect.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
@@ -70,9 +71,12 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		
 		addTask(IdmlImportTask.class);
 		
-		if ( backupFileExtractor.containsEntry(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME) ) {
+		//add sampling design task
+		ZipEntry samplingDesignEntry = backupFileExtractor.findEntry(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
+		if ( samplingDesignEntry != null && samplingDesignEntry.getSize() > 0 ) {
 			addTask(SamplingDesignImportTask.class);
 		}
+		//add species import tasks
 		if ( backupFileExtractor.containsEntriesInPath(SurveyBackupJob.SPECIES_FOLDER) ) {
 			addSpeciesImportTasks();
 		}
@@ -135,11 +139,13 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		for (String speciesFileName : speciesFilesNames) {
 			String taxonomyName = FilenameUtils.getBaseName(speciesFileName);
 			File file = backupFileExtractor.extract(speciesFileName);
-			SpeciesBackupImportTask task = createTask(SpeciesBackupImportTask.class);
-			task.setFile(file);
-			task.setTaxonomyName(taxonomyName);
-			task.setOverwriteAll(true);
-			addTask(task);
+			if ( file.length() > 0 ) {
+				SpeciesBackupImportTask task = createTask(SpeciesBackupImportTask.class);
+				task.setFile(file);
+				task.setTaxonomyName(taxonomyName);
+				task.setOverwriteAll(true);
+				addTask(task);
+			}
 		}
 	}
 	

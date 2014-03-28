@@ -16,6 +16,7 @@ import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask
 import org.openforis.collect.io.metadata.species.SpeciesBackupExportTask;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
@@ -55,6 +56,8 @@ public class SurveyBackupJob extends Job {
 	private DataMarshaller dataMarshaller;
 	@Autowired
 	private SpeciesManager speciesManager;
+	@Autowired
+	private SamplingDesignManager samplingDesignManager;
 	
 	//input
 	private CollectSurvey survey;
@@ -112,11 +115,14 @@ public class SurveyBackupJob extends Job {
 	}
 	
 	private void addSamplingDesignExportTask() {
-		SamplingDesignExportTask task = createTask(SamplingDesignExportTask.class);
-		task.setSurvey(survey);
-		task.setOutputStream(zipOutputStream);
-		task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(SAMPLING_DESIGN_ENTRY_NAME));
-		addTask(task);
+		if ( samplingDesignManager.hasSamplingDesign(survey) ) {
+			SamplingDesignExportTask task = createTask(SamplingDesignExportTask.class);
+			task.setSamplingDesignManager(samplingDesignManager);
+			task.setSurvey(survey);
+			task.setOutputStream(zipOutputStream);
+			task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(SAMPLING_DESIGN_ENTRY_NAME));
+			addTask(task);
+		}
 	}
 
 	private void addSpeciesExportTask() {
@@ -127,13 +133,15 @@ public class SurveyBackupJob extends Job {
 			taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
 		}
 		for (CollectTaxonomy taxonomy : taxonomies) {
-			SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
-			task.setSpeciesManager(speciesManager);
-			task.setOutputStream(zipOutputStream);
-			task.setTaxonomyId(taxonomy.getId());
-			String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
-			task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(entryName));
-			addTask(task);
+			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
+				SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
+				task.setSpeciesManager(speciesManager);
+				task.setOutputStream(zipOutputStream);
+				task.setTaxonomyId(taxonomy.getId());
+				String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
+				task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(entryName));
+				addTask(task);
+			}
 		}
 	}
 	
