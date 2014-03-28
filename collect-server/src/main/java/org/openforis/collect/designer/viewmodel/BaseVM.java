@@ -7,6 +7,8 @@ import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Form;
 import org.zkoss.zk.ui.Executions;
@@ -51,12 +53,16 @@ public abstract class BaseVM {
 		return session;
 	}
 	
-	protected User getLoggedUser() {
-//		Session session = getSession();
-//		HttpSession httpSession = (HttpSession) session.getNativeSession();
-		String userName = "admin";
-		User user = userManager.loadByUserName(userName);
+	public User getLoggedUser() {
+		String loggedUsername = getLoggedUsername();
+		User user = userManager.loadByUserName(loggedUsername);
 		return user;
+	}
+	
+	public String getLoggedUsername() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String loggedUsername = authentication.getName();
+		return loggedUsername;
 	}
 	
 	protected static Window openPopUp(String url, boolean modal) {

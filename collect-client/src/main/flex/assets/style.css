@@ -103,6 +103,14 @@ component|MessageDisplay s|Label {
 	fontSize: 9;
 }
 
+component|ApplicationVersionContainer {
+	color: #eee;
+}
+
+.loggedAsLabel {
+	color: #222;
+}
+
 .updateStatusLabel {
 	fontStyle: italic;
 	fontWeight: bold;

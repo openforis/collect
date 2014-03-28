@@ -16,6 +16,7 @@ package org.openforis.collect.presenter
 	 */
 	public class UserPopUpButtonPresenter extends AbstractPresenter {
 		
+		private const CHANGE_PASSWORD_MENU_ITEM:String = Message.get("usersManagement.changePassword");
 		private const LOGOUT_MENU_ITEM:String = Message.get("global.logout");
 		
 		private var _view:UserPopUpButton;
@@ -33,12 +34,17 @@ package org.openforis.collect.presenter
 		
 		protected function initUserPopUpMenu():void {
 			var result:IList = new ArrayCollection();
+			result.addItem(CHANGE_PASSWORD_MENU_ITEM);
+			result.addItem({type: 'separator'});
 			result.addItem(LOGOUT_MENU_ITEM);
 			_view.loggedPopUpButton.dataProvider = result;
 		}
 		
 		protected function loggedPopUpMenuItemClickHandler(event:MenuEvent):void {
 			switch ( event.item ) {
+			case CHANGE_PASSWORD_MENU_ITEM:
+				eventDispatcher.dispatchEvent(new UIEvent(UIEvent.CHANGE_PASSWORD_CLICK));
+				break;
 			case LOGOUT_MENU_ITEM:
 				eventDispatcher.dispatchEvent(new UIEvent(UIEvent.LOGOUT_CLICK));
 				break;

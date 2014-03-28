@@ -14,10 +14,11 @@
 	
 	<s:Image source="{Images.FOOTER}" />
 	
-	<s:VGroup right="0" verticalCenter="0" gap="0">
+	<s:HGroup verticalAlign="middle" verticalCenter="0" gap="0" width="100%">
+		<s:Spacer width="10" />
 		<component:ApplicationVersionContainer />
-		
+		<s:Spacer width="100%" />
 		<component:UserPopUpButton />
-	</s:VGroup>
+	</s:HGroup>
 	
 </s:BorderContainer>

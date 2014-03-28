@@ -17,13 +17,13 @@
 	</modules>
 
 	<properties>
-		<spring-security.version>3.1.4.RELEASE</spring-security.version>
-		<spring.version>3.1.4.RELEASE</spring.version>
-		<flexmojos.version>4.2-beta</flexmojos.version>		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<idm.version>3.0-Alpha12</idm.version>
 		<openforis.commons.version>0.0.8</openforis.commons.version>
+		<spring.version>3.1.4.RELEASE</spring.version>
+		<spring-security.version>3.1.4.RELEASE</spring-security.version>
+		<flexmojos.version>4.2-beta</flexmojos.version>		
 	</properties>
 
 	<distributionManagement>
@@ -308,6 +308,11 @@
 				<artifactId>idm-test</artifactId>
 				<version>${idm.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>${spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>

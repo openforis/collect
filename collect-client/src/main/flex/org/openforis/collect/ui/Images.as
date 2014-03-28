@@ -8,6 +8,9 @@ package org.openforis.collect.ui {
 	 * */
 	public class Images {
 		
+		[Embed("/assets/images/logout-small.png")]
+		public static const LOGOUT:Class;
+
 		[Embed("/assets/images/default_logo.png")]
 		public static const DEFAULT_LOGO:Class;
 		

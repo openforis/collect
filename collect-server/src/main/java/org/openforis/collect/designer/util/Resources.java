@@ -13,6 +13,7 @@ public class Resources {
 	public enum Page {
 	
 		INDEX("index.htm"),
+		LOGOUT("logout.htm"),
 		DESIGNER("designer.htm"),
 		SURVEY_EDIT("editSurvey.htm"),
 		COLLECT_SWF("collect.swf"),

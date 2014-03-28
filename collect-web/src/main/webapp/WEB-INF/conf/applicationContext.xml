@@ -37,8 +37,9 @@
 		<entry key="/error.htm" value-ref="fileNameViewController" />
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
 		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
-		<entry key="/login.htm" value-ref="fileNameViewController" />
 		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
+		<entry key="/login.htm" value-ref="fileNameViewController" />
+		<entry key="/logout.htm" value-ref="fileNameViewController" />
 		<entry key="/logoUpload" value-ref="fileNameViewController" />
 
 		<entry key="/surveys" value-ref="fileNameViewController" />

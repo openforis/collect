@@ -1,3 +1,20 @@
+.mainContainer {
+	background-color: #F0F0F0;
+}
+.footer {
+	background: url("images/footer.jpg");
+}
+
+.footer .z-label {
+	font-size: 10px;
+	font-style: italic;
+	color: #222;
+}
+
+.footer .z-label.appVersion {
+	color: #eee;
+	padding-left: 2em;
+}
 .error {
 	color: red;
 }
