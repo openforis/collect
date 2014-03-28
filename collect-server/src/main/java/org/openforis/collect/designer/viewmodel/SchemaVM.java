@@ -743,11 +743,13 @@ public class SchemaVM extends SurveyBaseVM {
 			openNodes = treeModel.getOpenSchemaNodes();
 		}
 		buildTreeModel();
-		treeModel.setOpenSchemaNodes(openNodes);
-		treeModel.select(editedNode);
-		treeModel.showSelectedNode();
-		if ( CollectionUtils.isEmpty(treeModel.getSelection()) ) {
-			resetEditingStatus();
+		if ( treeModel != null ) {
+			treeModel.setOpenSchemaNodes(openNodes);
+			treeModel.select(editedNode);
+			treeModel.showSelectedNode();
+			if ( CollectionUtils.isEmpty(treeModel.getSelection()) ) {
+				resetEditingStatus();
+			}
 		}
 		notifyChange("treeModel");
 	}
