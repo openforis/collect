@@ -404,7 +404,8 @@ public class SchemaVM extends SurveyBaseVM {
 	protected void selectTreeNode(SurveyObject surveyObject) {
 		treeModel.select(surveyObject);
 		selectedTreeNode = treeModel.getNodeData(surveyObject);
-		BindUtils.postNotifyChange(null, null, selectedTreeNode, "*");
+		notifyChange("selectedTreeNode");
+		//BindUtils.postNotifyChange(null, null, selectedTreeNode, "*");
 	}
 
 	@Override
@@ -648,11 +649,9 @@ public class SchemaVM extends SurveyBaseVM {
 				//update tree node
 				selectedTreeNode.setDetached(false);
 				BindUtils.postNotifyChange(null, null, selectedTreeNode, "detached");
-
-				selectedTreeNode = treeModel.getNodeData(editedNode);
-				treeModel.select(selectedTreeNode);
-				newNode = false;
-				notifyChange("selectedTreeNode", "newNode");
+				this.newNode = false;
+				notifyChange("newNode");
+				selectTreeNode(editedNode);
 			}
 			notifyChange("editedNodePath");
 			//to be called when not notifying changes on treeModel
@@ -789,27 +788,6 @@ public class SchemaVM extends SurveyBaseVM {
 	protected List<SurveyObject> getSiblingsInTree(SurveyObject surveyObject) {
 		List<SurveyObject> result = treeModel.getSiblingsAndSelf(surveyObject, true);
 		return result;
-		/*
-		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
-		List<? extends NodeDefinition> allSiblings;
-		if ( parentDefn == null ) {
-			if ( FILTER_BY_ROOT_ENTITY ) {
-				allSiblings = Arrays.asList(selectedRootEntity);
-			} else {
-				Schema schema = selectedRootEntity.getSchema();
-				allSiblings = schema.getRootEntityDefinitions();
-			}
-		} else {
-			allSiblings = parentDefn.getChildDefinitions();
-		}
-		//filter siblings
-		for (NodeDefinition sibling : allSiblings) {
-			if ( selectedVersion == null || selectedVersion.isApplicable(sibling) ) {
-				result.add(sibling);
-			}
-		}
-		return result;
-		*/
 	}
 	
 	@DependsOn("selectedTreeNode")
