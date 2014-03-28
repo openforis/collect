@@ -1,5 +1,6 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
@@ -115,6 +116,14 @@ package org.openforis.collect.presenter
 			var request:URLRequest = getExportUrlRequest();
 			if(request != null) {
 				navigateToURL(request, "_new");
+			}
+		}
+		
+		override protected function fileReferenceSelectHandler(event:Event):void {
+			if ( SamplingDesignImportView(_view).summaryContainer.selectedIndex == 0 ) {
+				startUpload();
+			} else {
+				super.fileReferenceSelectHandler(event);
 			}
 		}
 		

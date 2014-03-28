@@ -4,10 +4,12 @@ package org.openforis.collect.presenter
 	import flash.events.MouseEvent;
 	
 	import mx.rpc.AsyncResponder;
+	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.client.CodeListClient;
 	import org.openforis.collect.client.CodeListImportClient;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.CodeListProxy$CodeScope;
@@ -27,9 +29,11 @@ package org.openforis.collect.presenter
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
 		private static const UPLOAD_FILE_NAME_PREFIX:String = "code_list";
 		
+		private var _codeListClient:CodeListClient;
 		private var _codeListImportClient:CodeListImportClient;
 		
 		public function CodeListImportPresenter(view:CodeListImportView) {
+			_codeListClient = ClientFactory.codeListClient;
 			_codeListImportClient = ClientFactory.codeListImportClient;
 
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
@@ -93,9 +97,18 @@ package org.openforis.collect.presenter
 		
 		override protected function importButtonClickHandler(event:MouseEvent):void {
 			if ( validateImportForm() ) {
-				AlertUtil.showConfirm(_messageKeys.CONFIRM_IMPORT, null, 
-					_messageKeys.CONFIRM_IMPORT_TITLE,
-					startUpload);
+				var responder:IResponder = new AsyncResponder(successHandler, faultHandler);
+				_codeListClient.isEditedSurveyCodeListEmpty(responder, view.codeListId);
+				
+				function successHandler(event:ResultEvent, token:Object = null):void {
+					if ( event.result ) {
+						startUpload();
+					} else {
+						AlertUtil.showConfirm(_messageKeys.CONFIRM_IMPORT, null, 
+							_messageKeys.CONFIRM_IMPORT_TITLE,
+							startUpload);
+					}
+				}
 			}
 		}
 		
