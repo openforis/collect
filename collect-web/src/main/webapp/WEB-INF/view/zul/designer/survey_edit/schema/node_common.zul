@@ -19,6 +19,7 @@
   				<label value="${labels.global.item.name}:" />
   				<fieldErrorHandler message="@load(vmsgs['name'])">
   					<textbox width="200px" maxlength="40"
+  						id="nodeNameTextbox"
   						value="@bind(fx.name)"
   						onChange="@command('nameChanged', name=self.value)" />
   				</fieldErrorHandler>

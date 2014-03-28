@@ -13,7 +13,9 @@
 			@save(vm.formObject, before={'validate','applyChanges'})
             @validator('org.openforis.collect.designer.form.validator.FileAttributeDefinitionFormValidator', parentEntity=parentEntity)">
 		
-        <include src="survey_edit/schema/attribute_common.zul" otherGeneralDetailsForm="survey_edit/schema/attribute_file_general_part.zul" />
+        <include id="attributeCommonInclude"
+        	src="survey_edit/schema/attribute_common.zul" 
+        	otherGeneralDetailsForm="survey_edit/schema/attribute_file_general_part.zul" />
         
 	</vlayout>
 </zk>

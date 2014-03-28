@@ -58,6 +58,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Menupopup;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Tree;
 import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
@@ -74,6 +75,10 @@ public class SchemaVM extends SurveyBaseVM {
 	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
 	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
 	private static final String PATH_NULL_VALUES_REPLACE = "...";
+	
+	private static final String TAB_NAME_LABEL_PATH = "labelTextbox";
+	private static final String ENTITY_NAME_TEXTBOX_PATH = "nodeCommonInclude/nodeNameTextbox";
+	private static final String ATTRIBUTE_NAME_TEXTBOX_PATH = "attributeCommonInclude/nodeCommonInclude/nodeNameTextbox";
 
 	private static final String NODE_TYPES_IMAGES_PATH = "/assets/images/node_types/";
 
@@ -438,18 +443,25 @@ public class SchemaVM extends SurveyBaseVM {
 			nodeFormInclude.setDynamicProperty("parentEntity", editedNodeParentEntity);
 			nodeFormInclude.setDynamicProperty("item", editedNode);
 			nodeFormInclude.setDynamicProperty("newItem", newNode);
+			String nodeNameTextboxPath;
 			String location;
 			if ( editedNode instanceof UITab ) {
 				location = Resources.Component.TAB.getLocation();
+				nodeNameTextboxPath = TAB_NAME_LABEL_PATH;
 			} else if ( editedNode instanceof EntityDefinition ) {
 				location = Resources.Component.ENTITY.getLocation();
+				nodeNameTextboxPath = ENTITY_NAME_TEXTBOX_PATH;
 			} else {
 				AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) editedNode);
-				location = Resources.Component.ATTRIBUTE.getLocation();
+				String locationFormat = Resources.Component.ATTRIBUTE.getLocation();
 				String attributeTypeShort = attributeType.name().toLowerCase();
-				location = MessageFormat.format(location, attributeTypeShort);
+				location = MessageFormat.format(locationFormat, attributeTypeShort);
+				nodeNameTextboxPath = ATTRIBUTE_NAME_TEXTBOX_PATH;
 			}
 			nodeFormInclude.setSrc(location);
+			//set focus on name textbox
+			Textbox nodeNameTextbox = (Textbox) Path.getComponent(nodeFormInclude.getSpaceOwner(), nodeNameTextboxPath);
+			nodeNameTextbox.setFocus(true);
 		}
 	}
 	
