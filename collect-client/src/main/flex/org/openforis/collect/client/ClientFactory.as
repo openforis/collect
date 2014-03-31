@@ -22,6 +22,7 @@ package org.openforis.collect.client {
 		private static var _speciesClient:SpeciesClient;
 		private static var _speciesImportClient:SpeciesImportClient;
 		private static var _userClient:UserClient;
+		private static var _userSessionClient:UserSessionClient;
 		
 		public static function get codeListClient():CodeListClient {
 			if(_codeListClient == null){
@@ -119,6 +120,13 @@ package org.openforis.collect.client {
 				_userClient = new UserClient();
 			}
 			return _userClient;
+		}
+		
+		public static function get userSessionClient():UserClient {
+			if(_userSessionClient == null){
+				_userSessionClient = new UserSessionClient();
+			}
+			return _userSessionClient;
 		}
 		
 	}

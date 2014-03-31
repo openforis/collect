@@ -137,7 +137,14 @@
 					<scope>application</scope>
 				</properties>
 			</destination>
-
+			
+			<destination id="userSessionService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>userSessionService</source>
+					<scope>session</scope>
+				</properties>
+			</destination>
 		</service>
 
 		<default-channels>

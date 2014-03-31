@@ -75,6 +75,19 @@ public class UserManager {
 			userDao.update(user);
 		}
 	}
+	
+	@Transactional
+	public void changePassword(int userId, String oldPassword, String newPassword) throws UserPersistenceException {
+		User user = userDao.loadById(userId);
+		String encodedOldPassword = encodePassword(oldPassword);
+		if ( user.getPassword().equals(encodedOldPassword) ) {
+			String encodedNewPassword = encodePassword(newPassword);
+			user.setPassword(encodedNewPassword);
+			userDao.update(user);
+		} else {
+			throw new WrongOldPasswordException();
+		}
+	}
 
 	protected String encodePassword(String password) throws UserPersistenceException {
 		boolean matchesPattern = Pattern.matches(PASSWORD_PATTERN, password);

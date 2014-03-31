@@ -69,6 +69,8 @@
 		autowire="byName" init-method="init" />
 	<bean id="userService" class="org.openforis.collect.remoting.service.UserService"
 		autowire="byName" />
+	<bean id="userSessionService" class="org.openforis.collect.remoting.service.UserSessionService"
+		autowire="byName" scope="session" />
 		
 	<!-- ===================================== -->
 	<!-- Security -->
