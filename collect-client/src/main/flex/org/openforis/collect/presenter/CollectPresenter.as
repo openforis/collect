@@ -55,6 +55,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.ObjectUtil;
 	import mx.resources.Locale;
 	import org.openforis.collect.ui.view.MasterView;
+	import org.openforis.collect.ui.component.user.ChangePasswordPopUp;
+	import mx.events.CloseEvent;
 	
 	/**
 	 * 
@@ -96,6 +98,7 @@ package org.openforis.collect.presenter {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);
+			eventDispatcher.addEventListener(UIEvent.CHANGE_PASSWORD_CLICK, changePasswordClickHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
 			eventDispatcher.addEventListener(UIEvent.OPEN_SPECIES_IMPORT_POPUP, openSpeciesImportPopUpHandler);
 			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
@@ -227,6 +230,10 @@ package org.openforis.collect.presenter {
 				messageKey = "global.confirmLogout";
 			}
 			AlertUtil.showConfirm(messageKey, null, "global.confirmLogoutTitle", performLogout);
+		}
+		
+		protected function changePasswordClickHandler(event:UIEvent):void {
+			var popUp = ChangePasswordPopUp(PopUpUtil.createPopUp(ChangePasswordPopUp));
 		}
 		
 		protected function performLogout():void {

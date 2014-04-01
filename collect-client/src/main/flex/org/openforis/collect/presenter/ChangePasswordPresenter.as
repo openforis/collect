@@ -2,6 +2,7 @@ package org.openforis.collect.presenter {
 	import flash.events.MouseEvent;
 	
 	import mx.events.ValidationResultEvent;
+	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.FaultEvent;
@@ -29,6 +30,8 @@ package org.openforis.collect.presenter {
 			super(view);
 			
 			_userSessionClient = ClientFactory.userSessionClient;
+			
+			fillForm();
 		}
 		
 		private function get view():ChangePasswordPopUp {
@@ -37,6 +40,7 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
+			view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
 		}
 		
 		protected function resetForm():void {
@@ -72,7 +76,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function saveUserResultHandler(event:ResultEvent, token:Object = null):void {
-			//TODO close popup
+			PopUpManager.removePopUp(view);
+			AlertUtil.showMessage("usersManagement.message.passwordChanged");
 		}
 		
 		protected function saveUserFaultHandler(event:FaultEvent, token:Object = null):void {

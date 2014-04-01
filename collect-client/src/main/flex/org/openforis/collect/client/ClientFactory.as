@@ -122,7 +122,7 @@ package org.openforis.collect.client {
 			return _userClient;
 		}
 		
-		public static function get userSessionClient():UserClient {
+		public static function get userSessionClient():UserSessionClient {
 			if(_userSessionClient == null){
 				_userSessionClient = new UserSessionClient();
 			}
