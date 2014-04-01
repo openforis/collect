@@ -26,19 +26,28 @@
 		#mainContainer {
 			margin: auto;
 			width: 974px;
+			height: 100%;
 			background-color: #FFFFFF;
 		}
 		
 		#internalContainer {
 			min-height: 100%; 
-  			height: auto !important; /*Cause footer to stick to bottom in IE 6*/
 			height: 100%;
-			margin: 0 auto -148px; /*Allow for footer height*/
+			padding-bottom: 30px;
 		}
 		
+		#internalContainer:after {
+		    content:" ";
+		    display:block;
+		    clear:both;
+		}
+
 		#footer {
+			position: absolute;
+			bottom: 0px;
 			text-align: left;
 			height: 30px;
+			width: 974px;
 			background: url("assets/images/footer.jpg");
 		}
 		
@@ -111,21 +120,21 @@
   		<div>
 			<img alt="Open Foris Collect" src="assets/images/header.jpg">
     	</div>
-    	<div>
-    		<c:if test="${not empty param.session_expired}">
-		      <div class="warn">
-		        Your session has expired.<br/>
-		      </div>
-		    </c:if>
-		    <c:if test="${not empty param.login_error}">
-		      <div class="error">
-		        Your login attempt was not successful, try again.<br/><br/>
-		        Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/>.
-		      </div>
-		    </c:if>
-    	</div>
     	<!-- INTERNAL CONTAINER -->
 		<div id="internalContainer">
+			<div>
+	    		<c:if test="${not empty param.session_expired}">
+			      <div class="warn">
+			        Your session has expired.<br/>
+			      </div>
+			    </c:if>
+			    <c:if test="${not empty param.login_error}">
+			      <div class="error">
+			        Your login attempt was not successful, try again.<br/><br/>
+			        Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/>.
+			      </div>
+			    </c:if>
+	    	</div>
 			<form name="f" action="<c:url value='j_spring_security_check'/>" method="POST">
 				<table class="login" width="100%" align="center" style="vertical-align: top; height: 100">
 					<tr>
