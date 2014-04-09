@@ -113,6 +113,8 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/loader_small.gif")]
 		public static const LOADER_SMALL_ICON:Class;
 		
+		[Embed("/assets/images/user_16x16.png")]
+		public static const USER_SMALL:Class;
 		
 	}
 }

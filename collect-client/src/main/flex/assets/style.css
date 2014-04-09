@@ -80,6 +80,10 @@ s|ToggleButton.filter {
 view|Footer {
 	padding-bottom: 5;
 	backgroundColor: #B8E4ED;
+	fontStyle: italic;
+	fontWeight: bold;
+	fontSize: 9;
+	color: #eee;
 }
 
 component|MessageDisplay {
@@ -96,15 +100,6 @@ component|MessageDisplay s|Label {
 .blockingMessageText {
 	fontSize: 12;
 	fontWeight: bold;
-}
-
-.appVersionLabel, .appVersionText, .loggedAsLabel {
-	fontStyle: italic;
-	fontSize: 9;
-}
-
-component|ApplicationVersionContainer {
-	color: #eee;
 }
 
 .loggedAsLabel {
@@ -124,11 +119,6 @@ component|ApplicationVersionContainer {
 
 .recordKey {
 	fontSize: 13;
-	fontWeight: bold;
-}
-
-.formVersionLabel, .formVersionText {
-	fontSize: 10;
 	fontWeight: bold;
 }
 
@@ -383,4 +373,9 @@ s|Label.dataGroupHeader {
 
 mx|PopUpMenuButton.settings {
 	popUpIcon: Embed(source='assets/images/settings.png');
+}
+
+mx|PopUpMenuButton.userPopUpMenu {
+	popUpIcon: Embed(source='assets/images/user_16x16.png');
+	color: #000;
 }

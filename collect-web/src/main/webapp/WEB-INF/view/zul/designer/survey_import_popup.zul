@@ -27,8 +27,8 @@
           <cell>
             <hbox hflex="1">
               <hbox hflex="1">
-                <label visible="@load(not empty vm.fileName)" value="@load(vm.fileName)" />
-                <label visible="@load(empty vm.fileName)" value="${labels.survey.import_survey.file_not_selected}" />
+                <label visible="@load(not empty vm.uploadedFileName)" value="@load(vm.uploadedFileName)" />
+                <label visible="@load(empty vm.uploadedFileName)" value="${labels.survey.import_survey.file_not_selected}" />
               </hbox>
               <button id="selectFileBtn" label="${labels.global.select_file_to_upload}"
                 upload="true,maxsize=-1" onUpload="@command('fileUploaded')" />

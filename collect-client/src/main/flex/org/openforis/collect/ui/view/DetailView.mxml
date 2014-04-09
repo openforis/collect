@@ -5,7 +5,8 @@
 		 width="100%" height="100%" 
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*" 
 		 xmlns:component="org.openforis.collect.ui.component.*"
-		 >
+		 xmlns:view="org.openforis.collect.ui.view.*" 
+ 		 >
 	
 	<fx:Script>
 		<![CDATA[
@@ -38,7 +39,7 @@
 		<s:State name="loading" />
 	</s:states>
 	
-	<s:VGroup gap="10" height="100%" width="100%">
+	<s:VGroup gap="0" height="100%" width="100%">
 		<s:Spacer height="1" />
 		<!-- Record id, form version, save msg, etc.. -->
 		<s:Group id="topButtonBar" width="100%">
@@ -98,8 +99,10 @@
 		
 		<!--<s:Group id="formWrapper" width="100%" height="100%" />-->
 		<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate" />
+
+		<s:Spacer height="10" />
 		
-		<s:Group id="editGroup"
+ 		<s:Group id="editGroup"
 				 height="100%" 
 				 width="100%" 
 				 includeIn="edit" 
@@ -123,14 +126,10 @@
 					  />
 		</s:Group>
 		
-		<s:Group id="buttonBar" width="100%">
-			<s:HGroup id="formVersionContainer" gap="5" left="0" verticalCenter="0">
-				<!-- form version label -->
-				<s:Label styleName="formVersionLabel"
-						 text="{Message.get('edit.formVersion')}"/>
-				<s:Label id="formVersionText" 
-						 styleName="formVersionText" />
-			</s:HGroup>
+		<s:Group id="buttonBar" width="100%" height="30">
+			
+			<view:Footer id="footer" width="100%" />
+			
 			<!-- Buttons: save, etc...-->
 			<s:HGroup horizontalCenter="0"
 					  verticalCenter="0"
@@ -150,8 +149,4 @@
 		</s:Group>
 	</s:VGroup>
 	
-	<s:VGroup gap="0" right="0" bottom="0">
-		<component:ApplicationVersionContainer right="0" verticalCenter="0" />
-		<component:UserPopUpButton />
-	</s:VGroup>
 </s:Group>

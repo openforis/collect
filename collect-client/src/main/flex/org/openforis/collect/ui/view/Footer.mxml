@@ -8,7 +8,19 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.ui.Images;
+			
+			private var _formVersion:String = null;
+			
+			[Bindable]
+			public function get formVersion():String {
+				return _formVersion;
+			}
+			
+			public function set formVersion(formVersion:String):void {
+				_formVersion = formVersion;
+			}
 		]]>
 	</fx:Script>
 	
@@ -16,7 +28,16 @@
 	
 	<s:HGroup verticalAlign="middle" verticalCenter="0" gap="0" width="100%">
 		<s:Spacer width="10" />
-		<component:ApplicationVersionContainer />
+		<s:VGroup>
+			<s:HGroup visible="{formVersion != null}" includeInLayout="{formVersion != null}">
+				<s:Label styleName="formVersionLabel"
+					 text="{Message.get('edit.formVersion')}"/>
+				<s:Label id="formVersionText" 
+					 styleName="formVersionText"
+					 text="{formVersion}" />
+			</s:HGroup>
+			<component:ApplicationVersionContainer />
+		</s:VGroup>	
 		<s:Spacer width="100%" />
 		<component:UserPopUpButton />
 	</s:HGroup>

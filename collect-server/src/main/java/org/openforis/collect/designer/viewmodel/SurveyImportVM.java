@@ -64,7 +64,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	private Map<String,String> form;
 	
-	private String fileName;
 	private String uploadedSurveyUri;
 	private File uploadedFile;
 	private String uploadedFileName;
@@ -84,15 +83,16 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected void reset() {
-		fileName = null;
 		if ( uploadedFile != null ) {
 			uploadedFile.delete();
 			uploadedFile = null;
 		}
+		uploadedFileName = null;
 		uploadedSurveyUri = null;
 		updatingExistingSurvey = false;
 		updatingPublishedSurvey = false;
-		notifyChange("fileName","uploadedSurveyUri","updatingPublishedSurvey","updatingExistingSurvey","form");
+		updateForm();
+		notifyChange("uploadedFileName","uploadedSurveyUri");
 	}
 	
 	@Command
@@ -179,6 +179,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			}
 			this.uploadedFile = tempFile;
 			this.uploadedFileName = media.getName();
+			notifyChange("uploadedFileName");
 			updateForm();
 			prepareSurveyImport(true);
 		} else {
@@ -247,10 +248,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 				confirmImportInvalidSurvey(errorMessageKey);
 			} else {
 				showImportError(errorMessageKey);
+				summaryJob = null;
+				reset();
 			}
-			uploadedFile = null;
-			uploadedFileName = null;
-			summaryJob = null;
 		} else if ( job == restoreJob ) {
 			closeJobStatusPopUp();
 			showImportError(restoreJob.getErrorMessage());
@@ -262,10 +262,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	public void jobAborted(@BindingParam("job") Job job) {
 		if ( job == summaryJob ) {
 			closeJobStatusPopUp();
-			uploadedFileName = null;
-			uploadedSurveyUri = null;
-			uploadedFile = null;
-			updateForm();
+			reset();
 			summaryJob = null;
 		} else if ( job == restoreJob ) {
 			closeJobStatusPopUp();
@@ -279,6 +276,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		uploadedSurveyUri = info.getSurveyUri();
 		summaryJob = null;
 		
+		notifyChange("uploadedSurveyUri");
 		updateForm();
 	}
 
@@ -291,10 +289,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			}
 			@Override
 			public void onCancel() {
-				uploadedFile = null;
-				uploadedFileName = null;
-				uploadedSurveyUri = null;
-				updateForm();
+				reset();
 			}
 		}, "survey.import_survey.confirm_process_invalid_survey.message", args,
 				"survey.import_survey.confirm_process_invalid_survey.title", (String[]) null,
@@ -302,23 +297,24 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected void updateForm() {
-		SurveySummary surveySummary = surveyManager.loadSummaryByUri(uploadedSurveyUri);
 		String surveyName = null;
-		if ( surveySummary == null ) {
-			updatingExistingSurvey = false;
-			surveyName = getFormSurveyName();
-			updatingPublishedSurvey = false;
-			if ( StringUtils.isEmpty(surveyName) ) {
-				surveyName = suggestSurveyName(uploadedFileName);
+		if ( uploadedSurveyUri != null ) {
+			SurveySummary surveySummary = surveyManager.loadSummaryByUri(uploadedSurveyUri);
+			if ( surveySummary == null ) {
+				updatingExistingSurvey = false;
+				surveyName = getFormSurveyName();
+				updatingPublishedSurvey = false;
+				if ( StringUtils.isEmpty(surveyName) ) {
+					surveyName = suggestSurveyName(uploadedFileName);
+				}
+			} else {
+				updatingExistingSurvey = true;
+				updatingPublishedSurvey = ! surveySummary.isWork();
+				surveyName = surveySummary.getName();
 			}
-		} else {
-			updatingExistingSurvey = true;
-			updatingPublishedSurvey = ! surveySummary.isWork();
-			surveyName = surveySummary.getName();
 		}
-		this.fileName = uploadedFileName;
 		form.put(SURVEY_NAME_FIELD, surveyName);
-		notifyChange("fileName","uploadedSurveyUri","updatingPublishedSurvey","updatingExistingSurvey","form");
+		notifyChange("updatingPublishedSurvey","updatingExistingSurvey","form");
 	}
 
 	protected void startSurveyImport() {
@@ -399,10 +395,10 @@ public class SurveyImportVM extends SurveyBaseVM {
 		return updatingExistingSurvey;
 	}
 	
-	public String getFileName() {
-		return fileName;
+	public String getUploadedFileName() {
+		return uploadedFileName;
 	}
-
+	
 	public String getUploadedSurveyUri() {
 		return uploadedSurveyUri;
 	}

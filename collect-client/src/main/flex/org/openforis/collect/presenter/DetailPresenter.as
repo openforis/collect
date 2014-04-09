@@ -75,9 +75,12 @@ package org.openforis.collect.presenter {
 			} else {
 				_rootEntityKeyTextChangeWatcher.reset(rootEntity);
 			}
-			_view.formVersionContainer.visible = version != null;
+			//_view.formVersionContainer.visible = version != null;
 			if ( version != null ) {
-				_view.formVersionText.text = version.getLabelText();
+				//_view.formVersionText.text = version.getLabelText();
+				_view.footer.formVersion = version.getLabelText();
+			} else {
+				_view.footer.formVersion = null;
 			}
 			var step:CollectRecord$Step = activeRecord.step;
 			_view.currentPhaseText.text = getStepLabel(step);
