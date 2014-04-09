@@ -104,8 +104,8 @@
 			
 		</s:Group>
 
-		<view:Footer id="footer" width="100%" bottom="0" />
-
 	</s:VGroup>
+	
+	<view:Footer id="footer" width="100%" bottom="0" />
 
 </s:Group>
