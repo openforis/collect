@@ -115,7 +115,8 @@ package org.openforis.collect.model.proxy {
 					var attribute:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
 					return attribute;
 				} else if (attributes.length > 1) {
-					throw new Error("Single attribute expected");
+					var message:String = "Single attribute expected but multiple values found: " + attributeName;
+					throw new Error(message);
 				}
 			}
 			return null;
