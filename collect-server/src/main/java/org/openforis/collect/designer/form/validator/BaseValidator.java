@@ -183,15 +183,27 @@ public abstract class BaseValidator extends AbstractValidator {
 	 * @param fieldName (Optional)
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	protected <T> T getValue(ValidationContext ctx, String fieldName) {
+		return getValue(ctx, fieldName, true);
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected <T> T getValue(ValidationContext ctx, String fieldName, boolean required) {
 		Object value;
 		if ( fieldName == null ) {
 			value = ctx.getProperty().getValue();
 		} else {
 			Map<String, Property> properties = getProperties(ctx);
 			Property property = properties.get(fieldName);
-			value = property.getValue();
+			if ( property == null ) {
+				if ( required ) {
+					throw new RuntimeException("Required property not found in form object: " + fieldName);
+				} else {
+					value = null;
+				}
+			} else {
+				value = property.getValue();
+			}
 		}
 		return (T) value;
 	}

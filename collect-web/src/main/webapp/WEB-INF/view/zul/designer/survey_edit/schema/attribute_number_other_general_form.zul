@@ -9,7 +9,10 @@
         <rows>
           <row>
             <label value="${labels.survey.schema.attribute.number.key}:" />
-            <checkbox checked="@load(fx.key eq true) @save(fx.key)" onCheck="@command('applyChanges')" />
+            <fieldErrorHandler message="@load(vmsgs['key'])">
+		        <checkbox checked="@load(fx.key eq true) @save(fx.key)"
+	    		      onCheck="@command('applyChanges')" />
+	    	</fieldErrorHandler>
           </row>
         </rows>
       </grid>

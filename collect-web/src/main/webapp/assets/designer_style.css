@@ -82,6 +82,43 @@ button.icon {
 	border: 2px inset #FF0000;
 	color: #000000;
 }
+/**
+* Checkbox style
+*/
+.z-checkbox input[type="checkbox"] {
+	-webkit-appearance: none;
+	background-color: #fff;
+	border: 2px inset #cacece;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	padding: 7px;
+	border-radius: 3px;
+	display: inline-block;
+	position: relative;
+	margin: 0px;
+}
+.z-checkbox input[type="checkbox"] + label:active, .z-checkbox input[type="checkbox"] + label:checked:active {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+.z-checkbox input[type="checkbox"] + label:checked {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.1);
+}
+.z-checkbox input[type="checkbox"] + label:checked:after {
+	content: '\2714';
+	font-size: 14px;
+	position: absolute;
+	top: 0px;
+	left: 2px;
+	color: #666;
+}
+.z-checkbox.error input[type="checkbox"] {
+	background-color: #D10909;
+}
+.z-checkbox.error input[type="checkbox"]:checked:after {
+	color: white;
+}
+/**
+* end of Checkbox style
+*/
 .z-popup.error .z-popup-cnt {
 	background: #CE2929;
 	color: #FFFFFF;

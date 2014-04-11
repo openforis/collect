@@ -102,6 +102,9 @@ public class SurveyValidator {
 		//empty entities not allowed
 		results.addResults(validateEntities(survey));
 		
+		//key attributes cannot be multiple
+		results.addResults(validateKeyAttributes(survey));
+		
 		//validate expressions
 		results.addResults(validateExpressions(survey));
 		return results;
@@ -187,7 +190,33 @@ public class SurveyValidator {
 		}
 		return results;
 	}
+
+	protected List<SurveyValidationResult> validateKeyAttributes(CollectSurvey survey) {
+		final List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		Schema schema = survey.getSchema();
+		schema.traverse(new NodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition node) {
+				if ( node instanceof KeyAttributeDefinition ) {
+					SurveyValidationResult result = validateKeyAttributes((KeyAttributeDefinition) node);
+					if ( result != null ) {
+						results.add(result);
+					}
+				}
+			}
+		});
+		return results;
+	}
 	
+	protected SurveyValidationResult validateKeyAttributes(KeyAttributeDefinition keyDefn) {
+		if ( keyDefn.isKey() && ((NodeDefinition) keyDefn).isMultiple() ) {
+			return new SurveyValidationResult(((NodeDefinition) keyDefn).getPath(), 
+					"survey.validation.attribute.key_attribute_cannot_be_multiple");
+		} else {
+			return null;
+		}
+	}
+
 	protected List<SurveyValidationResult> validateExpressions(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();

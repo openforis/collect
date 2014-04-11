@@ -8,8 +8,10 @@
     <rows>
       <row>
         <label value="${labels.survey.schema.attribute.text.key}:" />
-        <checkbox checked="@load(fx.key eq true) @save(fx.key)"
-          onCheck="@command('applyChanges')" />
+        <fieldErrorHandler message="@load(vmsgs['key'])">
+	        <checkbox checked="@load(fx.key eq true) @save(fx.key)"
+	          onCheck="@command('applyChanges')" />
+	    </fieldErrorHandler>
       </row>
       <row>
         <label value="${labels.survey.schema.attribute.text.type}:" />
