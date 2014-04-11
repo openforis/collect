@@ -560,10 +560,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			//persist item in db
 			PersistedCodeListItem persistedChildItem = (PersistedCodeListItem) editedChildItem;
 			if ( editedChildItemParentItem != null ) {
-				PersistedCodeListItem parentId = (PersistedCodeListItem) editedChildItemParentItem;
-				persistedChildItem.setParentId(parentId.getSystemId());
+				persistedChildItem.setParentId(((PersistedCodeListItem) editedChildItemParentItem).getSystemId());
 			}
 			codeListManager.save(persistedChildItem);
+			dispatchSurveySaveCommand();
 		} else if ( editedChildItemParentItem == null ) {
 			//add item among the root items
 			editedItem.addItem(editedChildItem);
