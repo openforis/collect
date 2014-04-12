@@ -1,5 +1,4 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
-<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<window 
 		title="${labels.survey.srs.$}" 
@@ -40,7 +39,7 @@
 					</center>
 					<south border="none">
 						<vbox spacing="0px" hflex="true">
-							<label value="${labels.survey.srs.predefined_crss}:" />
+							<label value="${labels.survey.srs.predefined_srss}:" />
 							<hbox>
 								<listbox id="predefinedSrsList"
 	       							model="@load(vm.availablePredefinedSRSs)"
@@ -95,28 +94,40 @@
 								</columns>
 								<rows>
 									<row>
-										<label value="${labels.survey.srs.id}:" />
+										<fieldErrorHandler message="@load(vmsgs['id'])">
+											<label value="${labels.survey.srs.id}:" />
+										</fieldErrorHandler>
 										<fieldErrorHandler message="@load(vmsgs['id'])">
 											<textbox width="150px" value="@bind(fx.id)" onChange="@command('applyChanges')" />
 										</fieldErrorHandler>
 									</row>
 									<row>
-										<multilanguageLabel value="${labels.survey.srs.label}" 
-		                                  languageCode="@load(vm.currentLanguageCode)" />
+		                                <fieldErrorHandler message="@load(vmsgs['label'])">
+											<label
+								  				use="org.openforis.collect.designer.component.FieldLabel"
+								  				value="${labels.survey.srs.label}" 
+			                                  	languageCode="@load(vm.currentLanguageCode)" />
+			                            </fieldErrorHandler>
 		                                <fieldErrorHandler message="@load(vmsgs['label'])">
 											<textbox width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
 										</fieldErrorHandler>
 									</row>
 									<row>
-										<multilanguageLabel value="${labels.survey.srs.description}" 
-		                                  languageCode="@load(vm.currentLanguageCode)" />
+		                                <fieldErrorHandler message="@load(vmsgs['description'])">
+											<label
+								  				use="org.openforis.collect.designer.component.FieldLabel"
+												value="${labels.survey.srs.description}" 
+		                                  		languageCode="@load(vm.currentLanguageCode)" />
+		                                </fieldErrorHandler>
 		                                <fieldErrorHandler message="@load(vmsgs['description'])">
 											<textbox width="300px" multiline="true" rows="4"
 		                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
 										</fieldErrorHandler>
 									</row>
 									<row>
-										<label value="${labels.survey.srs.wkt}:" />
+		                                <fieldErrorHandler message="@load(vmsgs['wellKnownText'])">
+											<label value="${labels.survey.srs.wkt}:" />
+										</fieldErrorHandler>
 		                                <fieldErrorHandler message="@load(vmsgs['wellKnownText'])">
 											<textbox width="300px" value="@bind(fx.wellKnownText)" 
 												multiline="true" rows="10" cols="40"

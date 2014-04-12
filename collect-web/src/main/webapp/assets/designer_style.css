@@ -96,13 +96,13 @@ button.icon {
 	position: relative;
 	margin: 0px;
 }
-.z-checkbox input[type="checkbox"] + label:active, .z-checkbox input[type="checkbox"] + label:checked:active {
+.z-checkbox input[type="checkbox"]:active, .z-checkbox input[type="checkbox"]:checked:active {
 	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
 }
-.z-checkbox input[type="checkbox"] + label:checked {
+.z-checkbox input[type="checkbox"]:checked {
 	box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.1);
 }
-.z-checkbox input[type="checkbox"] + label:checked:after {
+.z-checkbox input[type="checkbox"]:checked:after {
 	content: '\2714';
 	font-size: 14px;
 	position: absolute;

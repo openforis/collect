@@ -38,7 +38,7 @@ public class ComponentUtil {
 		if ( oldSclass == null ) {
 			oldSclass = "";
 		}
-		if ( !  oldSclass.contains(className) ) {
+		if ( ! oldSclass.contains(className) ) {
 			component.setSclass(oldSclass + " " + className);
 		}
 	}
@@ -46,7 +46,7 @@ public class ComponentUtil {
 	public static void removeClass(HtmlBasedComponent component, String className) {
 		String oldSclass = component.getSclass();
 		if ( oldSclass != null ) {
-			component.setSclass(oldSclass.replaceAll(className, ""));
+			component.setSclass(oldSclass.replaceAll("(?:^|\\s)" + className + "(?!\\S)", ""));
 		}
 	}
 

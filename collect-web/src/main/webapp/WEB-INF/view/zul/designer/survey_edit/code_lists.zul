@@ -1,6 +1,5 @@
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
-<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<borderlayout id="codeListsManagerContainer"
 		apply="org.zkoss.bind.BindComposer"
@@ -69,8 +68,11 @@
 			        			</columns>
 			        			<rows>
 			        				<row>
-			        					<label
-			        						value="${labels.global.item.name}:" />
+			        					<fieldErrorHandler
+			        						message="@load(vmsgs['name'])">
+				        					<label
+				        						value="${labels.global.item.name}:" />
+				        				</fieldErrorHandler>
 			        					<fieldErrorHandler
 			        						message="@load(vmsgs['name'])">
 			        						<textbox width="150px"
@@ -79,9 +81,13 @@
 			        					</fieldErrorHandler>
 			        				</row>
 			        				<row>
-			        					<multilanguageLabel
-			        						value="${labels.survey.code_list.item_label}"
-			        						languageCode="@load(vm.currentLanguageCode)" />
+			        					<fieldErrorHandler
+			        						message="@load(vmsgs['itemLabel'])">
+				        					<label
+			  									use="org.openforis.collect.designer.component.FieldLabel"
+				        						value="${labels.survey.code_list.item_label}"
+				        						languageCode="@load(vm.currentLanguageCode)" />
+				        				</fieldErrorHandler>
 			        					<fieldErrorHandler
 			        						message="@load(vmsgs['itemLabel'])">
 			        						<textbox width="150px"
@@ -90,9 +96,13 @@
 			        					</fieldErrorHandler>
 			        				</row>
 			        				<row>
-			        					<multilanguageLabel
-			        						value="${labels.global.item.description}"
-			        						languageCode="@load(vm.currentLanguageCode)" />
+			        					<fieldErrorHandler
+			        						message="@load(vmsgs['description'])">
+				        					<label
+			  									use="org.openforis.collect.designer.component.FieldLabel"
+												value="${labels.global.item.description}"
+			        							languageCode="@load(vm.currentLanguageCode)" />
+			        					</fieldErrorHandler>
 			        					<fieldErrorHandler
 			        						message="@load(vmsgs['description'])">
 			        						<textbox width="300px"

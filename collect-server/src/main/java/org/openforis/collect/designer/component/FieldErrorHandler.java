@@ -7,8 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Div;
-import org.zkoss.zul.Html;
-import org.zkoss.zul.Popup;
 import org.zkoss.zul.impl.XulElement;
 
 /**
@@ -19,12 +17,10 @@ public class FieldErrorHandler extends Div {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String ERROR_SCLASS = "error";
 	private static final String FIELD_ERROR_SCLASS = "error";
 
-	private Popup tooltip;
+	private FieldErrorTooltip tooltip;
 	private String message;
-	private Html htmlContent;
 
 	private XulElement field;
 	
@@ -37,7 +33,7 @@ public class FieldErrorHandler extends Div {
 		boolean result = super.insertBefore(newChild, refChild);
 		if ( newChild instanceof XulElement ) {
 			field = (XulElement) newChild;
-			updateField();
+			updateFieldStyle();
 		}
 		return result;
 	}
@@ -49,49 +45,44 @@ public class FieldErrorHandler extends Div {
 
 	public void setMessage(String message) {
 		this.message = message;
-		updateView();
+		updateErrorFeedback();
 	}
 	
-	protected void updateView() {
+	protected void updateErrorFeedback() {
 		updateTooltip();
-		updateField();
+		updateFieldStyle();
 	}
 
 	protected void updateTooltip() {
 		if ( StringUtils.isBlank(message) ) {
 			removeTooltip();
 		} else {
-			initTooltip();
-			htmlContent.setContent(message);
+			if ( this.tooltip == null ) {
+				initTooltip();
+			} else {
+				this.tooltip.setMessage(message);
+			}
 		}
 	}
 
-	protected void updateField() {
+	protected void updateFieldStyle() {
 		if ( field != null ) {
 			field.setTooltip(tooltip);
-			toggleErrorClassToField(StringUtils.isNotBlank(message));
+			boolean hasError = StringUtils.isNotBlank(message);
+			ComponentUtil.toggleClass(field, FIELD_ERROR_SCLASS, hasError);
 		}
 	}
 
 	protected void initTooltip() {
-		tooltip = new Popup();
-		tooltip.setSclass(ERROR_SCLASS);
-		htmlContent = new Html();
-		tooltip.appendChild(htmlContent);
+		this.tooltip = new FieldErrorTooltip(message);
 		super.insertBefore(tooltip, null);
-		//tooltip.setParent(this);
 	}
 	
 	protected void removeTooltip() {
-		if ( tooltip != null ) {
+		if ( this.tooltip != null ) {
 			this.removeChild(tooltip);
+			this.tooltip = null;
 		}
-		htmlContent = null;
-		tooltip = null;
-	}
-	
-	protected void toggleErrorClassToField(boolean present) {
-		ComponentUtil.toggleClass(field, FIELD_ERROR_SCLASS, present);
 	}
 	
 	public XulElement getField() {

@@ -1,6 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
-<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<custom-attributes parentEntity="${arg.parentEntity}" />
 
@@ -22,9 +21,12 @@
 		  		</columns>
 		  		<rows>
 		  			<row>
-						<multilanguageLabel 
-							value="${labels.global.item.label}"
-							languageCode="@load(vm.currentLanguageCode)" />
+		  				<fieldErrorHandler message="@load(vmsgs['label'])">
+							<label
+			  					use="org.openforis.collect.designer.component.FieldLabel"
+								value="${labels.global.item.label}"
+								languageCode="@load(vm.currentLanguageCode)" />
+						</fieldErrorHandler>
 		  				<fieldErrorHandler message="@load(vmsgs['label'])">
 		  					<textbox id="labelTextbox"
 		  						width="200px" maxlength="100"

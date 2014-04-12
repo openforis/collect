@@ -1,5 +1,4 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
-<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<window id="versioningManagerPopUp" title="${labels.survey.versioning_manager}" 
 		apply="org.zkoss.bind.BindComposer"
@@ -92,22 +91,34 @@
 		                                </fieldErrorHandler>
 									</row>
 									<row>
-										<multilanguageLabel value="${labels.survey.versioning.label}" 
-		                                  languageCode="@load(vm.currentLanguageCode)" />
-		      			                <fieldErrorHandler message="@load(vmsgs['label'])">
-											<textbox id="labelTextBox" width="150px" value="@bind(fx.label)" onChange="@command('applyChanges')" />
-		                                </fieldErrorHandler>
+										<fieldErrorHandler message="@load(vmsgs['label'])">
+											<label
+												use="org.openforis.collect.designer.component.FieldLabel"
+												value="${labels.survey.versioning.label}"
+												languageCode="@load(vm.currentLanguageCode)" />
+										</fieldErrorHandler>
+										<fieldErrorHandler message="@load(vmsgs['label'])">
+											<textbox
+												id="labelTextBox" width="150px" value="@bind(fx.label)"
+												onChange="@command('applyChanges')" />
+										</fieldErrorHandler>
 									</row>
 									<row>
-										<multilanguageLabel value="${labels.survey.versioning.description}" 
-		                                  languageCode="@load(vm.currentLanguageCode)" />
 		      			                <fieldErrorHandler message="@load(vmsgs['description'])">
+											<label
+												use="org.openforis.collect.designer.component.FieldLabel"
+												value="${labels.survey.versioning.description}" 
+												languageCode="@load(vm.currentLanguageCode)" />
+				                        </fieldErrorHandler>
+	      			                	<fieldErrorHandler message="@load(vmsgs['description'])">
 											<textbox width="300px" multiline="true" rows="4"
 		                                      value="@bind(fx.description)" onChange="@command('applyChanges')" />
 		                                </fieldErrorHandler>
 									</row>
 									<row>
-										<label value="${labels.survey.versioning.date}:" />
+		      			                <fieldErrorHandler message="@load(vmsgs['date'])">
+											<label value="${labels.survey.versioning.date}:" />
+		                                </fieldErrorHandler>
 		      			                <fieldErrorHandler message="@load(vmsgs['date'])">
 											<datebox width="100px" compact="false" buttonVisible="true" format="@load(vm.dateFormat)" 
 					                    		value="@bind(fx.date)" onChange="@command('applyChanges')" />

@@ -1,5 +1,4 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
-<?component name="multilanguageLabel" class="org.openforis.collect.designer.component.MultilanguageLabel" macroURI="/WEB-INF/view/zul/designer/component/multilanguage_label.zul"?>
 <zk>
 	<custom-attributes parentItem="${arg.parentItem}" />
 	<custom-attributes enumeratingCodeList="${arg.enumeratingCodeList}" />
@@ -21,7 +20,9 @@
 			</columns>
 			<rows>
 				<row>
-					<label value="${labels.global.item.code}:" />
+					<fieldErrorHandler message="@load(vmsgs['code'])">
+						<label value="${labels.global.item.code}:" />
+					</fieldErrorHandler>
 					<fieldErrorHandler message="@load(vmsgs['code'])">
 						<textbox width="150px" value="@bind(fx.code)"
 							onChange="@command('applyChanges')"
@@ -29,9 +30,12 @@
 					</fieldErrorHandler>
 				</row>
 				<row>
-					<multilanguageLabel
-						value="${labels.global.item.label}"
-						languageCode="@load(vm.currentLanguageCode)" />
+					<fieldErrorHandler message="@load(vmsgs['label'])">
+						<label
+		  					use="org.openforis.collect.designer.component.FieldLabel"
+			  				value="${labels.global.item.label}"
+							languageCode="@load(vm.currentLanguageCode)" />
+					</fieldErrorHandler>
 					<fieldErrorHandler
 						message="@load(vmsgs['label'])">
 						<textbox width="150px" value="@bind(fx.label)"
@@ -39,9 +43,13 @@
 					</fieldErrorHandler>
 				</row>
 				<row>
-					<multilanguageLabel
-						value="${labels.global.item.description}"
-						languageCode="@load(vm.currentLanguageCode)" />
+					<fieldErrorHandler
+						message="@load(vmsgs['description'])">
+						<label
+		  					use="org.openforis.collect.designer.component.FieldLabel"
+							value="${labels.global.item.description}"
+							languageCode="@load(vm.currentLanguageCode)" />
+					</fieldErrorHandler>
 					<fieldErrorHandler
 						message="@load(vmsgs['description'])">
 						<textbox width="300px"
@@ -62,9 +70,10 @@
 					</fieldErrorHandler>
 				</row>
 				<row>
-					<label value="${labels.global.item.since_version}:" />
-					<fieldErrorHandler
-						message="@load(vmsgs['sinceVersionId'])">
+					<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
+						<label value="${labels.global.item.since_version}:" />
+					</fieldErrorHandler>
+					<fieldErrorHandler message="@load(vmsgs['sinceVersionId'])">
 						<listbox width="200px"
 							model="@load(vm.formVersionIdsWithEmptyOption)"
 							selectedItem="@bind(fx.sinceVersionId)" mold="select"
@@ -80,10 +89,10 @@
 					</fieldErrorHandler>
 				</row>
 				<row>
-					<label
-						value="${labels.global.item.deprecated_version}:" />
-					<fieldErrorHandler
-						message="@load(vmsgs['deprecatedVersionId'])">
+					<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
+						<label value="${labels.global.item.deprecated_version}:" />
+					</fieldErrorHandler>
+					<fieldErrorHandler message="@load(vmsgs['deprecatedVersionId'])">
 						<listbox width="200px"
 							model="@load(vm.formVersionIdsWithEmptyOption)"
 							selectedItem="@bind(fx.deprecatedVersionId)" mold="select"
