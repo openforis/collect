@@ -41,9 +41,15 @@
 		<s:State name="selection" />
 	</s:states>
 	
+	<s:layout>
+		<s:VerticalLayout gap="0" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" />
+	</s:layout>
+	
 	<s:VGroup horizontalAlign="center" gap="6" height="100%" width="100%"
-			  paddingLeft="5" paddingRight="5">
-		<s:Spacer height="10" />
+			  paddingLeft="5" paddingRight="5" paddingBottom="0">
+
+		<s:Spacer height="5" />
+		
 		<s:Group width="100%" height="30">
 			<s:Button id="backToMainMenuButton" 
 					  label="{Message.get('list.backToMainMenu')}" 
@@ -73,13 +79,12 @@
 										/>
 		
 		<s:Group width="100%">
-			
 			<datagrid:PaginationBar id="paginationBar" 
 									height="16"
 									horizontalCenter="0"
 									/>
-			
 		</s:Group>
+		
 		<s:Group width="100%" id="bottomBar">
 			<s:HGroup id="controlsBar" horizontalCenter="0" verticalCenter="0" 
 					  height="30" gap="10">
@@ -103,9 +108,9 @@
 			</s:HGroup>
 			
 		</s:Group>
-
+		
 	</s:VGroup>
-	
-	<view:Footer id="footer" width="100%" bottom="0" />
+
+	<view:Footer id="footer" width="100%" />
 
 </s:Group>
