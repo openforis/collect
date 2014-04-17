@@ -8,6 +8,7 @@ import org.jooq.SQLDialect;
 import org.jooq.Schema;
 import org.jooq.Sequence;
 import org.jooq.TableField;
+import org.jooq.conf.RenderNameStyle;
 import org.jooq.conf.Settings;
 import org.jooq.impl.Factory;
 
@@ -22,7 +23,8 @@ public class DialectAwareJooqFactory extends Factory {
 		POSTGRES("PostgreSQL", SQLDialect.POSTGRES),
 		DERBY("Apache Derby", SQLDialect.DERBY),
 		SQLITE("SQLite", SQLDialect.SQLITE),
-		SQLITE_FOR_ANDROID("SQLite for Android", SQLDialect.SQLITE);
+		SQLITE_FOR_ANDROID("SQLite for Android", SQLDialect.SQLITE),
+        H2("H2", SQLDialect.H2);
 		
 		private String productName;
 		private SQLDialect dialect;
@@ -76,7 +78,11 @@ public class DialectAwareJooqFactory extends Factory {
 		Settings settings = new Settings();
 		if ( dialect == SQLDialect.SQLITE ) {
 			settings.withRenderSchema(false);
-		}  
+		}
+
+        if ( dialect == SQLDialect.H2) {
+            settings.setRenderNameStyle(RenderNameStyle.AS_IS);
+        }
 		return settings;
 	}
 	
