@@ -87,7 +87,7 @@ public abstract class BaseStorageManager implements Serializable {
 				storageDirectory = new File(rootDir, subFolder);
 			}
 		} else {
-			storageDirectory = new File(storagePath, subFolder);
+			storageDirectory = new File(storagePath);
 		}
 	}
 
