@@ -102,6 +102,8 @@
                                 <includeClass>org.openforis.collect.model.AbstractSummaries</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectTaxonomy</includeClass>
+                                <includeClass>org.openforis.collect.model.Logo</includeClass>
+                                <includeClass>org.openforis.collect.model.LogoPosition</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>
                                 <includeClass>org.openforis.collect.model.SurveySummary</includeClass>

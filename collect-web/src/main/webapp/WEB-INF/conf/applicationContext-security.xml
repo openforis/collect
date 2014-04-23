@@ -23,6 +23,7 @@
 		<intercept-url pattern="/error.htm" access="permitAll" />
 		<intercept-url pattern="/login.htm" access="permitAll" />
 		<intercept-url pattern="/logout.htm" access="permitAll" />
+		<intercept-url pattern="/downloadLogo.htm" access="permitAll" />
 		<intercept-url pattern="/codelist/export/**/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/codelist/import/**/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/samplingdesign/export/*" access="hasRole('ROLE_ADMIN')" />

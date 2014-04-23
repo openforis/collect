@@ -48,15 +48,17 @@
 			text-align: left;
 			height: 30px;
 			width: 974px;
-			background: url("assets/images/footer.jpg");
+			/*background: url("assets/images/footer.jpg");*/
 		}
 		
 		#footer label {
 			font-size: 0.7em;
+			font-style: italic;
 			color: #EEE;
-			position: relative;
+			position: absolute;
 			left: 10px;
 			top: 10px;
+			z-index: 2;
 		}
 		
 		form {
@@ -112,13 +114,33 @@
 			color: blue;
 		}
 	</style>
+	<script type="text/javascript">
+		$(function() {
+			var DOWNLOAD_LOGO_URL = "downloadLogo.htm";
+
+			var loadImage = function ( elId, position, defaultImageUrl ) {
+				var imgEl = document.getElementById(elId);
+				var tmpImg = new Image();
+				tmpImg.onerror = function() {
+					imgEl.src = defaultImageUrl;
+				};
+				tmpImg.onload = function() {
+					imgEl.src = this.height > 0 ? this.src : defaultImageUrl;
+				};
+				tmpImg.src = DOWNLOAD_LOGO_URL + "?position=" + position + "&time=" + new Date().getTime();
+			};
+
+			loadImage("headerImg", "header", "assets/images/header.jpg");
+			loadImage("footerImg", "footer", "assets/images/footer.jpg");
+		});
+	</script>
   </head>
 
   <body onload="document.f.j_username.focus();">
   	<div id="mainContainer">
   		<!-- HEADER -->
   		<div>
-			<img alt="Open Foris Collect" src="assets/images/header.jpg">
+			<img id="headerImg" alt="Loading...">
     	</div>
     	<!-- INTERNAL CONTAINER -->
 		<div id="internalContainer">
@@ -155,8 +177,8 @@
 					</tr>
 					<!-- tr><td><input type="checkbox" name="_spring_security_remember_me"></td><td>Don't ask for my password for two weeks</td></tr-->
 					<tr>
-						<td colspan='2' width="100%" style="text-align: center;"><input
-							name="submit" type="submit" class="button" value="Login" /> 
+						<td colspan='2' width="100%" style="text-align: center;">
+							<input name="submit" type="submit" class="button" value="Login" /> 
 						</td>
 					</tr>
 				</table>
@@ -164,6 +186,7 @@
 		</div>
 		<!-- FOOTER -->
 		<div id="footer">
+			<img id="footerImg" alt="Loading..." />
 			<label>Application version: <%= org.openforis.collect.Collect.getVersion()%></label>
 		</div>
   	</div>

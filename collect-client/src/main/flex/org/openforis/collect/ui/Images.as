@@ -7,13 +7,19 @@ package org.openforis.collect.ui {
 	 * 
 	 * */
 	public class Images {
+
+		[Embed("/assets/images/banner.jpg")]
+		public static const HEADER:Class;
+
+		[Embed("/assets/images/footer.jpg")]
+		public static const FOOTER:Class;
+		
+		[Embed("/assets/images/default_logo.png")]
+		public static const TOP_RIGHT_DEFAULT_LOGO:Class;
 		
 		[Embed("/assets/images/logout-small.png")]
 		public static const LOGOUT:Class;
 
-		[Embed("/assets/images/default_logo.png")]
-		public static const DEFAULT_LOGO:Class;
-		
 		[Embed("/assets/images/data_workflow.jpg")]
 		public static const DATA_WORKFLOW:Class;
 		
@@ -100,9 +106,6 @@ package org.openforis.collect.ui {
 		
 		[Embed("/assets/images/dash.png")]
 		public static const DASH:Class;
-		
-		[Embed("/assets/images/footer.jpg")]
-		public static const FOOTER:Class;
 		
 		[Embed("/assets/images/collapse.png")]
 		public static const COLLAPSE:Class;

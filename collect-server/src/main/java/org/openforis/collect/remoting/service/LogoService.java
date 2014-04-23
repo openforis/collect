@@ -4,18 +4,33 @@
 package org.openforis.collect.remoting.service;
 
 import org.openforis.collect.manager.LogoManager;
+import org.openforis.collect.model.Logo;
+import org.openforis.collect.model.LogoPosition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author E. Wibowo
+ * @author S. Ricci
  */
 public class LogoService {
 
 	@Autowired
 	private LogoManager logoManager;
 
-	public byte[] loadLogo(int id) {
-		return logoManager.loadLogo(id);
+	public Logo loadLogo(String position) {
+		return logoManager.loadLogo(LogoPosition.valueOf(position.toUpperCase()));
+	}
+	
+	public void deleteLogo(String position) {
+		Logo logo = logoManager.loadLogo(LogoPosition.valueOf(position.toUpperCase()));
+		if ( logo != null ) {
+			logoManager.delete(logo);
+		}
 	}
 
+	public Logo saveLogo(Logo logo) {
+		logoManager.save(logo);
+		return logo;
+	}
+	
 }

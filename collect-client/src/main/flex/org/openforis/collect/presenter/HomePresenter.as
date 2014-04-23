@@ -10,6 +10,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.Images;
+	import org.openforis.collect.ui.component.ConfigurationPopUp;
 	import org.openforis.collect.ui.component.user.UserManagementPopUp;
 	import org.openforis.collect.ui.view.HomePageView;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -27,13 +28,19 @@ package org.openforis.collect.presenter {
 		private static const DATA_MANAGEMENT_MENU_ITEM:Object = {
 			label: Message.get('home.dataManagement'), 
 			icon: Images.DATA_MANAGEMENT};
+		
 		private static const USERS_MANAGEMENT_MENU_ITEM:Object = {
 			label: Message.get('home.userAccounts'),
 			icon: Images.USER_MANAGEMENT};
+		
 		private static const DESIGNER_MENU_ITEM:Object = {
 			label: Message.get('home.surveyDesigner'),
 			icon: Images.DATABASE_DESIGNER};
-		
+
+		private static const CONFIGURATION_MENU_ITEM:Object = {
+			label: Message.get('home.configuration'),
+			icon: Images.SETTINGS};
+
 		private var _view:HomePageView;
 		
 		public function HomePresenter(view:HomePageView) {
@@ -54,6 +61,7 @@ package org.openforis.collect.presenter {
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(DESIGNER_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
+				result.addItem(CONFIGURATION_MENU_ITEM);
 			}
 			return result;
 		}
@@ -71,6 +79,9 @@ package org.openforis.collect.presenter {
 					break;
 				case DATA_MANAGEMENT_MENU_ITEM:
 					eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SHOW_LIST_OF_RECORDS));
+					break;
+				case CONFIGURATION_MENU_ITEM:
+					PopUpUtil.createPopUp(ConfigurationPopUp, true);
 					break;
 			}
 		}

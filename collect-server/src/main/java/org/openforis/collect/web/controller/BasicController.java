@@ -40,10 +40,17 @@ public abstract class BasicController {
 	}
 	
 	protected void writeFileToResponse(InputStream is, String outputFileName, int fileSize, HttpServletResponse response) throws IOException {
+		FileTypeMap defaultFileTypeMap = MimetypesFileTypeMap.getDefaultFileTypeMap();
+		String contentType = defaultFileTypeMap.getContentType(outputFileName);
+		writeFileToResponse(is, contentType, fileSize, response,
+				outputFileName);
+	}
+
+	protected void writeFileToResponse(InputStream is,
+			String contentType, int fileSize, HttpServletResponse response,
+			String outputFileName) throws IOException {
 		BufferedInputStream buf = null;
 		try {
-			FileTypeMap defaultFileTypeMap = MimetypesFileTypeMap.getDefaultFileTypeMap();
-			String contentType = defaultFileTypeMap.getContentType(outputFileName);
 			response.setContentType(contentType); 
 			response.setContentLength(fileSize);
 			response.setHeader("Content-Disposition", "attachment; filename=" + outputFileName);
@@ -54,8 +61,6 @@ public abstract class BasicController {
 			while ((readBytes = buf.read()) != -1) {
 				outputStream.write(readBytes);
 			}
-		} catch (IOException e) {
-			throw e;
 		} finally {
 			IOUtils.closeQuietly(buf);
 			IOUtils.closeQuietly(is);

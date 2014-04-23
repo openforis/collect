@@ -5,25 +5,40 @@ package org.openforis.collect.model;
  */
 public class Logo {
 
-	private int position;
-	private byte[] image;
+	public static String TOP_RIGHT_POSITION = "top_right";
 	
+	private Integer id;
+	private LogoPosition position;
+	private byte[] image;
+	private String contentType;
 	
 	public Logo() {
-		super();
 	}
 
-	public Logo(int position, byte[] image) {
-		super();
+	public Logo(LogoPosition position, byte[] image, String contentType) {
+		this(null, position, image, contentType);
+	}
+	
+	public Logo(Integer id, LogoPosition position, byte[] image, String contentType) {
+		this.id = id;
 		this.position = position;
 		this.image = image;
+		this.contentType = contentType;
 	}
 
-	public int getPosition() {
+	public Integer getId() {
+		return id;
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public LogoPosition getPosition() {
 		return position;
 	}
 
-	public void setPosition(int position) {
+	public void setPosition(LogoPosition position) {
 		this.position = position;
 	}
 
@@ -35,6 +50,12 @@ public class Logo {
 		this.image = image;
 	}
 	
+	public String getContentType() {
+		return contentType;
+	}
 	
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
 	
 }

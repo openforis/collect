@@ -9,9 +9,9 @@ package org.openforis.collect.remoting.service;
  */
 public class FileWrapper {
 	
-	private byte[] data;
-	
 	private String fileName;
+	private byte[] data;
+	private String contentType;
 
 	public byte[] getData() {
 		return data;
@@ -29,4 +29,11 @@ public class FileWrapper {
 		this.fileName = fileName;
 	}
 	
+	public String getContentType() {
+		return contentType;
+	}
+	
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
 }

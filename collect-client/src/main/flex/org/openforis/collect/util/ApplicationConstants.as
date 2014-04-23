@@ -3,6 +3,8 @@ package org.openforis.collect.util {
 	import mx.utils.StringUtil;
 	import mx.utils.URLUtil;
 	
+	import org.openforis.collect.model.LogoPosition;
+	
 	/**
 	 * 
 	 * @author S. Ricci
@@ -14,8 +16,12 @@ package org.openforis.collect.util {
 		public static const DEBUGGING:Boolean = CONFIG::debugging;
 		public static const VERSION:String = CONFIG::version;
 		
-		public static var COUNTRY_LOGO_ID:int = 1;
+		public static const HEADER_IMAGE_POSITION:LogoPosition = LogoPosition.HEADER;
+		public static const TOP_RIGHT_LOGO_POSITION:LogoPosition = LogoPosition.TOP_RIGHT;
+		public static const FOOTER_IMAGE_POSITION:LogoPosition = LogoPosition.FOOTER;
 
+		public static const DOWNLOAD_LOGO_URL:String = "downloadLogo.htm";
+		
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
 		
 		private static const SPECIES_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";

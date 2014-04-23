@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				 xmlns:s="library://ns.adobe.com/flex/spark" 
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 xmlns:component="org.openforis.collect.ui.component.*"
+				 creationComplete="creationCompleteHandler(event)"
+				 currentState="loading"
+				 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.util.ApplicationConstants;
+			
+			import mx.rpc.AsyncResponder;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import org.openforis.collect.client.ClientFactory;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.Logo;
+			import org.openforis.collect.model.LogoPosition;
+			import org.openforis.collect.remoting.service.FileWrapper;
+			import org.openforis.collect.util.AlertUtil;
+			
+			import spark.formatters.NumberFormatter;
+			
+			private static const MAX_SIZE:int = 10000000;
+			private static const ALLOWED_EXTENSIONS:Array = ["*.jpg", "*.jpeg", "*.png"];
+			
+			private var _fileReference:FileReference;
+			private var _position:LogoPosition;
+			private var _defaultImage:Class;
+			
+			private var logo:Logo;
+			
+			private function creationCompleteHandler(event:FlexEvent):void {
+				_fileReference = new FileReference();
+				_fileReference.addEventListener(Event.SELECT, fileReferenceSelectHandler);
+				_fileReference.addEventListener(ProgressEvent.PROGRESS, fileReferenceProgressHandler);
+				_fileReference.addEventListener(IOErrorEvent.IO_ERROR, fileReferenceIoErrorHandler);
+				_fileReference.addEventListener(Event.COMPLETE, fileReferenceLoadComplete);
+				_fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
+				
+				defaultImageDownloadBtn.addEventListener(MouseEvent.CLICK, defaultImageDownloadClickHandler);
+				customImageDownloadBtn.addEventListener(MouseEvent.CLICK, customImageDownloadClickHandler);
+				deleteBtn.addEventListener(MouseEvent.CLICK, deleteClickHandler);
+				uploadBtn.addEventListener(MouseEvent.CLICK, uploadClickHandler);
+				
+				refreshCustomImage();
+			}
+			
+			protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
+				//upload completed, get data from response
+				var fileName:String = event.data as String;
+			}
+			
+			protected function fileReferenceProgressHandler(event:ProgressEvent):void {
+			}
+			
+			protected function fileReferenceSelectHandler(event:Event):void {
+				if ( _fileReference.size > MAX_SIZE ) {
+					var numberFormatter:spark.formatters.NumberFormatter = new NumberFormatter();
+					numberFormatter.fractionalDigits = 0;
+					var maxSizeFormatted:String = numberFormatter.format(MAX_SIZE);
+					var sizeFormatted:String = numberFormatter.format(_fileReference.size);
+					AlertUtil.showError("edit.file.error.sizeExceedsMaximum", [sizeFormatted, maxSizeFormatted]);
+					return;
+				}
+				/*
+				var url:String = ApplicationConstants.MODEL_FILE_UPLOAD_URL;
+				//workaround for firefox/chrome flahplayer bug
+				url +=";jsessionid=" + Application.sessionId;
+				
+				var request:URLRequest = new URLRequest(url);
+				//request paramters
+				request.method = URLRequestMethod.POST;
+				var parameters:URLVariables = new URLVariables();
+				parameters.sessionId = Application.sessionId;
+				parameters.surveyId = Application.activeSurvey.id;
+				parameters.recordId = Application.activeRecord.id;
+				parameters.nodeDefnId = attrDefn.id;
+				parameters.nodeId = _view.attribute.id;
+				request.data = parameters;
+				//request.data.path = internalXPath;
+				fileReference.upload(request);
+				*/
+				_fileReference.load();
+			}
+			
+			protected function fileReferenceLoadComplete(event:Event):void {
+				var fileWrapper:FileWrapper = new FileWrapper();
+				fileWrapper.data = _fileReference.data;
+				fileWrapper.fileName = _fileReference.name;
+				
+				var logo:Logo = new Logo();
+				if ( this.logo != null ) {
+					logo.id = this.logo.id;
+				}
+				logo.image = _fileReference.data;
+				logo.position = position;
+				ClientFactory.logoClient.saveLogo(new AsyncResponder(saveLogoResultHandler, saveFaultHandler), logo);
+			}
+			
+			private function saveLogoResultHandler(event:ResultEvent, token:Object = null):void {
+				refreshCustomImage();
+			}
+			
+			protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
+				AlertUtil.showError("edit.file.error", [event.text]);
+			}
+			
+			private function refreshCustomImage():void {
+				ClientFactory.logoClient.loadLogo(new AsyncResponder(loadLogoResultHandler, loadFaultHandler), position);
+			}
+			
+			protected function loadLogoResultHandler(event:ResultEvent, token:Object):void {
+				this.logo = event.result as Logo;
+				if ( logo == null ) {
+					currentState = "customImageNotPresent";
+				} else {
+					currentState = "customImagePresent";
+					customLogoImg.source = logo.image;
+				}
+			}
+			
+			protected function uploadClickHandler(event:MouseEvent):void {
+				var fileFilter:FileFilter = new FileFilter(ALLOWED_EXTENSIONS.join(", "), ALLOWED_EXTENSIONS.join("; "));
+				_fileReference.browse([fileFilter]);
+			}
+
+			protected function defaultImageDownloadClickHandler(event:MouseEvent):void {
+			}
+			
+			protected function customImageDownloadClickHandler(event:MouseEvent):void {
+				var request:URLRequest = new URLRequest(ApplicationConstants.DOWNLOAD_LOGO_URL);
+				request.method = URLRequestMethod.GET;
+				var parameters:URLVariables = new URLVariables();
+				parameters.position = position;
+				request.data = parameters;
+				//timestamp parameter to avoid caching
+				request.data._r = new Date().getTime();
+				if(request != null) {
+					navigateToURL(request, "_new");
+				}
+			}
+			
+			protected function deleteClickHandler(event:MouseEvent):void {
+				AlertUtil.showConfirm("configuration.logo.delete.confirm", null, "global.deleteTitle", performDelete);
+			}
+			
+			protected function performDelete():void {
+				ClientFactory.logoClient.deleteLogo(new AsyncResponder(deleteResultHandler, deleteFaultHandler), position);
+			}
+			
+			protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
+				refreshCustomImage();
+			}
+			
+			[Bindable]
+			public function get defaultImage():Class {
+				return _defaultImage;
+			}
+			
+			public function set defaultImage(value:Class):void {
+				_defaultImage = value;
+			}
+			
+			[Bindable]
+			public function get position():LogoPosition {
+				return _position;
+			}
+			
+			public function set position(value:LogoPosition):void {
+				_position = value;
+			}
+			
+			protected function deleteFaultHandler(event:FaultEvent, token:Object = null):void {
+				AlertUtil.showError("configuration.logo.delete.error", [event.message]);
+			}
+			
+			protected function saveFaultHandler(event:FaultEvent, token:Object = null):void {
+				AlertUtil.showError("configuration.logo.save.error", [event.message]);
+			}
+			
+			protected function loadFaultHandler(event:FaultEvent, token:Object = null):void {
+				AlertUtil.showError("configuration.logo.load.error", [event.message]);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="loading" />
+		<s:State name="customImagePresent" />
+		<s:State name="customImageNotPresent" />
+	</s:states>
+	
+	<component:LoadingContent includeIn="loading" />
+	
+	<!-- Default image -->
+	<s:HGroup excludeFrom="loading" itemCreationPolicy="immediate">
+		<s:Label text="{Message.get('configuration.defaultImage')}" width="100" />
+		<s:Image id="defaultLogoEl" maxHeight="50" maxWidth="100" source="{defaultImage}" />
+		<s:Label text="({defaultLogoEl.width}x{defaultLogoEl.height})" />
+		<s:Button id="defaultImageDownloadBtn" label="{Message.get('global.download')}" />
+	</s:HGroup>
+	
+	<!-- Custom image -->
+	<s:HGroup excludeFrom="loading" itemCreationPolicy="immediate">
+		<s:Label text="{Message.get('configuration.customImage')}" width="100" />
+		<s:HGroup includeIn="customImagePresent" itemCreationPolicy="immediate">
+			<s:Image id="customLogoImg" maxHeight="50" maxWidth="100" />
+			<s:VGroup>
+				<s:HGroup>
+					<s:Button id="customImageDownloadBtn" label="{Message.get('global.download')}" />
+					<s:Button id="deleteBtn" label="{Message.get('global.delete')}" />
+				</s:HGroup>
+			</s:VGroup>
+		</s:HGroup>
+		<s:Button id="uploadBtn" label="{Message.get('global.upload')}" />
+	</s:HGroup>
+
+</s:VGroup>

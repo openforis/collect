@@ -4,6 +4,7 @@
 package org.openforis.collect.manager;
 
 import org.openforis.collect.model.Logo;
+import org.openforis.collect.model.LogoPosition;
 import org.openforis.collect.persistence.LogoDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,29 +19,25 @@ public class LogoManager {
 	private LogoDao logoDao;
 	
 	@Transactional
-	public byte[] loadLogo(int id) {
-		Logo logo = logoDao.loadById(id);
-		if ( logo == null ) {
-			return null;
-		} else {
-			return logo.getImage();
-		}
+	public Logo loadLogo(LogoPosition position) {
+		Logo logo = logoDao.loadByPosition(position);
+		return logo;
 	}
 	
 	@Transactional
-	public void save(Logo logo) {
-		int position = logo.getPosition();
-		Logo oldLogo = logoDao.loadById(position);
+	public Logo save(Logo logo) {
+		//Logo oldLogo = logoDao.loadById(logo.getId());
+		Logo oldLogo = logoDao.loadByPosition(logo.getPosition());
 		if ( oldLogo == null ) {
 			logoDao.insert(logo);
 		} else {
 			logoDao.update(logo);
 		}
+		return logo;
 	}
 	
 	@Transactional
 	public void delete(Logo logo) {
-		int position = logo.getPosition();
-		logoDao.delete(position);
+		logoDao.deleteByPosition(logo.getPosition());
 	}
 }

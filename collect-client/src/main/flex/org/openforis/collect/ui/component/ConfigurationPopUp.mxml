@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component:PopUp xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				 xmlns:s="library://ns.adobe.com/flex/spark" 
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 xmlns:component="org.openforis.collect.ui.component.*"
+				 width="600" height="400"
+				 title="{Message.get('home.configuration')}"
+				 >
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.util.ApplicationConstants;
+			
+			/* private var _presenter:SurveySelectionPresenter; */
+			
+			override protected function creationCompleteHandler(event:FlexEvent):void {
+				super.creationCompleteHandler(event);
+				//_presenter = new SurveySelectionPresenter(this);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<component:layout>
+		<s:BasicLayout />
+	</component:layout>
+
+	<s:VGroup horizontalCenter="0" horizontalAlign="center" gap="30"
+			  height="100%" width="100%">
+		<s:Form>
+			<s:FormItem label="{Message.get('configuration.uploadPath')}">
+				<s:TextInput id="uploadPathTextInput" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('configuration.recordIndexPath')}">
+				<s:TextInput id="recordIndexPathTextInput" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('configuration.logo.header')}">
+				<component:CustomLogoConfigurationElement 
+					defaultImage="{Images.HEADER}"
+					position="{ApplicationConstants.HEADER_IMAGE_POSITION}" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('configuration.logo.topRight')}">
+				<component:CustomLogoConfigurationElement 
+					defaultImage="{Images.TOP_RIGHT_DEFAULT_LOGO}"
+					position="{ApplicationConstants.TOP_RIGHT_LOGO_POSITION}" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('configuration.logo.footer')}">
+				<component:CustomLogoConfigurationElement 
+					defaultImage="{Images.FOOTER}"
+					position="{ApplicationConstants.FOOTER_IMAGE_POSITION}" />
+			</s:FormItem>
+		</s:Form>
+	</s:VGroup>
+
+</component:PopUp>
