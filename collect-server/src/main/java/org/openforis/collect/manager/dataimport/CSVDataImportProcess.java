@@ -538,9 +538,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				return entity;
 			} else {
 				throw new IllegalArgumentException(
-						"Trying to create child in a invalid position: "
-								+ currentParent.getPath() + "/" + childName
-								+ "[" + position + "]");
+						String.format("Trying to create child in a invalid position: row=%d path=%s[%d]",
+								row, 
+								currentParent.getPath() + "/" + childName,
+								position));
 			}
 		} else {
 			Entity entity = EntityBuilder.addEntity(currentParent, childName);
