@@ -15,7 +15,7 @@ package org.openforis.collect.client {
 		private var _updateIndexPathOperation:Operation;
 
 		public function ConfigurationClient() {
-			super("logoService");
+			super("configurationService");
 			_loadConfigurationOperation = getOperation("loadConfiguration", CONCURRENCY_MULTIPLE);
 			_updateUploadPathOperation = getOperation("updateUploadPath");
 			_updateIndexPathOperation = getOperation("updateIndexPath");

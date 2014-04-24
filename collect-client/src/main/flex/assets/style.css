@@ -144,7 +144,8 @@ mx|Alert {
 component|BlockingMessagePopUp, 
 	component|BackupPopUp, component|DataExportPopUp, component|DataImportPopUp, 
 	component|SelectVersionPopUp, component|SpeciesImportPopUp, 
-	component|SurveySelectionPopUp, 
+	component|SurveySelectionPopUp,
+	component|ConfigurationPopUp,
 	input|CodeListDialog, 
 	user|UserManagementPopUp,
 	user|ChangePasswordPopUp {

@@ -14,10 +14,14 @@ import org.openforis.collect.model.Configuration;
 public class ConfigurationProxy implements Proxy {
 
 	private transient Configuration configuration;
+	private String defaultRecordFileUploadPath;
+	private String defaultRecordIndexPath;
 
-	public ConfigurationProxy(Configuration configuration) {
+	public ConfigurationProxy(Configuration configuration, String defaultRecordFileUploadPath, String defaultRecordIndexPath) {
 		super();
 		this.configuration = configuration;
+		this.defaultRecordFileUploadPath = defaultRecordFileUploadPath;
+		this.defaultRecordIndexPath = defaultRecordIndexPath;
 	}
 	
 	@ExternalizedProperty
@@ -27,10 +31,9 @@ public class ConfigurationProxy implements Proxy {
 
 	@ExternalizedProperty
 	public String getDefaultUploadPath() {
-		return null;
+		return defaultRecordFileUploadPath;
 	}
 
-	
 	@ExternalizedProperty
 	public String getIndexPath() {
 		return configuration.getIndexPath();
@@ -38,7 +41,15 @@ public class ConfigurationProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public String getDefaultIndexPath() {
-		return null;
+		return defaultRecordIndexPath;
 	}
 
+	public String getDefaultRecordFileUploadPath() {
+		return defaultRecordFileUploadPath;
+	}
+	
+	public String getDefaultRecordIndexPath() {
+		return defaultRecordIndexPath;
+	}
+	
 }

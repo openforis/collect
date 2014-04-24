@@ -17,9 +17,10 @@ public class VolatileRecordIndexManager extends RecordIndexManager {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected synchronized void init() throws RecordIndexException {
+	public synchronized boolean init() throws RecordIndexException {
 		initIndexDirectory();
-		inited = true;
+		initialized = true;
+		return initialized;
 	}
 	
 	@Override

@@ -47,6 +47,10 @@ public class RecordFileManager extends BaseStorageManager {
 
 	protected java.io.File tempRootDir;
 
+	public RecordFileManager() {
+		super(DEFAULT_RECORD_FILES_SUBFOLDER);
+	}
+	
 	public void init() {
 		initTempDir();
 		initStorageDirectory();
@@ -59,7 +63,7 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 
 	protected void initStorageDirectory() {
-		super.initStorageDirectory(Configuration.UPLOAD_PATH_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
+		super.initStorageDirectory(Configuration.UPLOAD_PATH_KEY);
 		if ( storageDirectory == null ) {
 			String message = "Upload directory not configured properly";
 			LOG.error(message);

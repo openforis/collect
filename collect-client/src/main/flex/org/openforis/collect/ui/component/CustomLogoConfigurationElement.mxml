@@ -9,7 +9,9 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
+			import mx.graphics.codec.JPEGEncoder;
 			import mx.rpc.AsyncResponder;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
@@ -22,7 +24,9 @@
 			import org.openforis.collect.util.AlertUtil;
 			import org.openforis.collect.util.ApplicationConstants;
 			
+			import spark.components.Application;
 			import spark.formatters.NumberFormatter;
+			import spark.skins.spark.ApplicationSkin;
 			
 			private static const MAX_SIZE:int = 10000000;
 			private static const ALLOWED_EXTENSIONS:Array = ["*.jpg", "*.jpeg", "*.png"];
@@ -50,8 +54,6 @@
 			}
 			
 			protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
-				//upload completed, get data from response
-				var fileName:String = event.data as String;
 			}
 			
 			protected function fileReferenceProgressHandler(event:ProgressEvent):void {
@@ -66,38 +68,35 @@
 					AlertUtil.showError("edit.file.error.sizeExceedsMaximum", [sizeFormatted, maxSizeFormatted]);
 					return;
 				}
-				/*
-				var url:String = ApplicationConstants.MODEL_FILE_UPLOAD_URL;
-				//workaround for firefox/chrome flahplayer bug
-				url +=";jsessionid=" + Application.sessionId;
-				
-				var request:URLRequest = new URLRequest(url);
-				//request paramters
-				request.method = URLRequestMethod.POST;
-				var parameters:URLVariables = new URLVariables();
-				parameters.sessionId = Application.sessionId;
-				parameters.surveyId = Application.activeSurvey.id;
-				parameters.recordId = Application.activeRecord.id;
-				parameters.nodeDefnId = attrDefn.id;
-				parameters.nodeId = _view.attribute.id;
-				request.data = parameters;
-				//request.data.path = internalXPath;
-				fileReference.upload(request);
-				*/
 				_fileReference.load();
 			}
 			
 			protected function fileReferenceLoadComplete(event:Event):void {
-				var fileWrapper:FileWrapper = new FileWrapper();
-				fileWrapper.data = _fileReference.data;
-				fileWrapper.fileName = _fileReference.name;
-				
+				validateUploadedFileAndSave();
+			}
+			
+			private function validateUploadedFileAndSave():void {
+				var loader:Loader = new Loader();
+				loader.loadBytes(_fileReference.data);
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, function(event:Event):void {
+					var info:LoaderInfo = LoaderInfo(event.target);
+					
+					if ( info.height != defaultLogoEl.sourceHeight || info.width != defaultLogoEl.sourceWidth ) {
+						AlertUtil.showError("configuration.logo.upload.error.invalidResolution", [defaultLogoEl.sourceWidth, defaultLogoEl.sourceHeight]);
+					} else {
+						saveCustomImage(_fileReference.data);
+					}
+				});
+			}
+			
+			private function saveCustomImage(data:ByteArray):void {
 				var logo:Logo = new Logo();
 				if ( this.logo != null ) {
 					logo.id = this.logo.id;
 				}
-				logo.image = _fileReference.data;
+				logo.image = data;
 				logo.position = position;
+				
 				ClientFactory.logoClient.saveLogo(new AsyncResponder(saveLogoResultHandler, saveFaultHandler), logo);
 			}
 			
@@ -129,19 +128,17 @@
 			}
 
 			protected function defaultImageDownloadClickHandler(event:MouseEvent):void {
+				var fileReference:FileReference = new FileReference();
+				var fileName:String = "default_" + position.name.toLowerCase() + ".jpg";
+				var encoder:JPEGEncoder = new JPEGEncoder(100);
+				var data:ByteArray = encoder.encode(defaultLogoEl.bitmapData)
+				fileReference.save(data, fileName);
 			}
 			
 			protected function customImageDownloadClickHandler(event:MouseEvent):void {
-				var request:URLRequest = new URLRequest(ApplicationConstants.DOWNLOAD_LOGO_URL);
-				request.method = URLRequestMethod.GET;
-				var parameters:URLVariables = new URLVariables();
-				parameters.position = position;
-				request.data = parameters;
-				//timestamp parameter to avoid caching
-				request.data._r = new Date().getTime();
-				if(request != null) {
-					navigateToURL(request, "_new");
-				}
+				var fileReference:FileReference = new FileReference();
+				var fileName:String = logo.position.name.toLowerCase() + ".jpg";
+				fileReference.save(logo.image, fileName);
 			}
 			
 			protected function deleteClickHandler(event:MouseEvent):void {
@@ -225,6 +222,8 @@
 			
 			<s:Label text="{Message.get('configuration.logo.customImage')}" width="100" />
 			
+			<s:Button id="uploadBtn" label="{Message.get('global.upload')}" />
+
 			<s:HGroup includeIn="customImagePresent" itemCreationPolicy="immediate">
 				
 				<s:Image id="customLogoImg" maxHeight="100" width="100" />
@@ -235,8 +234,6 @@
 				</s:VGroup>
 			
 			</s:HGroup>
-			
-			<s:Button id="uploadBtn" label="{Message.get('global.upload')}" />
 	
 		</s:HGroup>
 		

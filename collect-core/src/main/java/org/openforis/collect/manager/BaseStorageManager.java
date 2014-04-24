@@ -35,11 +35,20 @@ public abstract class BaseStorageManager implements Serializable {
 	 * If not specified, java temp folder or catalina base temp folder
 	 * will be used as storage directory.
 	 */
-	private String defaultStoragePath;
+	private String defaultRootStoragePath;
+	
+	/**
+	 * Default subfolder used together with the default storage path to determine the default storage folder
+	 */
+	private String defaultSubFolder;
 	
 	public BaseStorageManager() {
-		defaultStoragePath = null;
+		defaultRootStoragePath = null;
 		storageDirectory = null;
+	}
+	
+	public BaseStorageManager(String defaultSubFolder) {
+		this.defaultSubFolder = defaultSubFolder;
 	}
 	
 	protected File getTempFolder() {
@@ -76,38 +85,46 @@ public abstract class BaseStorageManager implements Serializable {
 		}
 	}
 	
-	protected void initStorageDirectory(String pathConfigurationKey, String subFolder) {
+	protected void initStorageDirectory(String pathConfigurationKey) {
 		Configuration configuration = configurationManager.getConfiguration();
-		String storagePath = configuration.get(pathConfigurationKey);
-		if ( StringUtils.isBlank(storagePath) ) {
-			File rootDir = getDefaultStorageRootDirectory();
-			if ( rootDir == null ) {
-				storageDirectory = null;
-			} else {
-				storageDirectory = new File(rootDir, subFolder);
-			}
+		
+		String customStoragePath = configuration.get(pathConfigurationKey);
+		
+		if ( StringUtils.isBlank(customStoragePath) ) {
+			storageDirectory = getDefaultStorageDirectory();
 		} else {
-			storageDirectory = new File(storagePath);
+			storageDirectory = new File(customStoragePath);
 		}
 	}
 
 	protected File getDefaultStorageRootDirectory() {
-		if ( defaultStoragePath == null ) {
+		if ( defaultRootStoragePath == null ) {
 			File rootDir = getCatalinaBaseDataFolder();
 			if ( rootDir == null ) {
 				rootDir = getTempFolder();
 			}
 			return rootDir;
 		} else {
-			return new File(defaultStoragePath );
+			return new File(defaultRootStoragePath );
 		}
 	}
 	
-	public String getDefaultStoragePath() {
-		return defaultStoragePath;
+	public String getDefaultRootStoragePath() {
+		return defaultRootStoragePath;
 	}
 	
-	public void setDefaultStoragePath(String defaultStoragePath) {
-		this.defaultStoragePath = defaultStoragePath;
+	public void setDefaultRootStoragePath(String defaultStoragePath) {
+		this.defaultRootStoragePath = defaultStoragePath;
+	}
+	
+	public File getDefaultStorageDirectory() {
+		File rootDir = getDefaultStorageRootDirectory();
+		if ( rootDir == null ) {
+			return null;
+		} else if ( defaultSubFolder == null ) {
+			return rootDir;
+		} else {
+			return new File(rootDir, defaultSubFolder);
+		}
 	}
 }

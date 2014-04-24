@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author S. Ricci
@@ -30,7 +31,7 @@ public class Configuration implements Cloneable {
 	}
 	
 	public void setUploadPath(String path) {
-		map.put(UPLOAD_PATH_KEY, path);
+		put(UPLOAD_PATH_KEY, path);
 	}
 	
 	public String getIndexPath() {
@@ -38,7 +39,7 @@ public class Configuration implements Cloneable {
 	}
 	
 	public void setIndexPath(String path) {
-		map.put(INDEX_PATH_KEY, path);
+		put(INDEX_PATH_KEY, path);
 	}
 	
 	public String get(String key) {
@@ -48,7 +49,11 @@ public class Configuration implements Cloneable {
 	
 	public void put(String key, String value) {
 		checkSupported(key);
-		map.put(key,  value);
+		if ( StringUtils.isBlank(value) ) {
+			map.remove(key);
+		} else {
+			map.put(key,  value);
+		}
 	}
 	
 	private boolean checkSupported(String key) {

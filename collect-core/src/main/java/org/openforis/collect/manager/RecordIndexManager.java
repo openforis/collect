@@ -74,24 +74,29 @@ public class RecordIndexManager extends BaseStorageManager {
 	private transient RecordManager recordManager;
 	
 	protected Directory indexDirectory;
-	protected boolean inited;
+	protected boolean initialized;
 	protected boolean cancelled;
 	
-	protected synchronized void init() throws RecordIndexException {
+	public RecordIndexManager() {
+		super(COLLECT_INDEX_DEFAULT_FOLDER);
+	}
+	
+	public synchronized boolean init() throws RecordIndexException {
 		unlock();
-		initStorageDirectory(Configuration.INDEX_PATH_KEY, COLLECT_INDEX_DEFAULT_FOLDER);
+		initStorageDirectory(Configuration.INDEX_PATH_KEY);
 		if ( storageDirectory != null ) {
 			if ( LOG.isInfoEnabled() ) {
 				LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());
 			}
 			initIndexDirectory();
 			cancelled = false;
-			inited = true;
+			initialized = true;
 		} else {
 			LOG.warn("Record index manager not inited correctly");
 			indexDirectory = null;
-			inited = false;
+			initialized = false;
 		}
+		return initialized;
 	}
 	
 	protected void initIndexDirectory() throws RecordIndexException {
@@ -436,7 +441,7 @@ public class RecordIndexManager extends BaseStorageManager {
 	}
 	
 	public boolean isInited() {
-		return inited;
+		return initialized;
 	}
 
 	public void printAllDocuments(IndexReader r, PrintStream out) throws IOException {

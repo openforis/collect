@@ -4,14 +4,20 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:component="org.openforis.collect.ui.component.*"
 		 width="100%"
-		 minHeight="0">
+		 minHeight="0"
+		 creationComplete="creationCompleteHandler(event)">
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.model.LogoPosition;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.ui.component.CustomImageLoader;
 			
 			private var _formVersion:String = null;
+			private var footerImageLoader:CustomImageLoader;
 			
 			[Bindable]
 			public function get formVersion():String {
@@ -21,10 +27,21 @@
 			public function set formVersion(formVersion:String):void {
 				_formVersion = formVersion;
 			}
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				footerImageLoader = new CustomImageLoader(footerImg, LogoPosition.FOOTER, Images.FOOTER);
+				
+				loadImages();
+			}
+			
+			public function loadImages():void {
+				footerImageLoader.load();
+			}
+			
 		]]>
 	</fx:Script>
 	
-	<s:Image source="{Images.FOOTER}" />
+	<s:Image id="footerImg" />
 	
 	<s:HGroup verticalAlign="middle" verticalCenter="0" gap="0" width="100%">
 		<s:Spacer width="10" />

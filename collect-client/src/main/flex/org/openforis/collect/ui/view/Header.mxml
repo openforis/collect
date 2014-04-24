@@ -10,10 +10,19 @@
 			import org.openforis.collect.model.LogoPosition;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.CustomImageLoader;
+			
+			private var topRightLogoLoader:CustomImageLoader;
+			private var headerImageLoader:CustomImageLoader;
 
 			private function init():void  {
-				var topRightLogoLoader:CustomImageLoader = new CustomImageLoader(image, LogoPosition.TOP_RIGHT, 
-					Images.TOP_RIGHT_DEFAULT_LOGO);
+				headerImageLoader = new CustomImageLoader(headerImg, LogoPosition.HEADER, Images.HEADER);
+				topRightLogoLoader = new CustomImageLoader(topRightLogoImg, LogoPosition.TOP_RIGHT, Images.TOP_RIGHT_DEFAULT_LOGO);
+				
+				loadImages();
+			}
+			
+			public function loadImages():void {
+				headerImageLoader.load();
 				topRightLogoLoader.load();
 			}
 			
@@ -26,7 +35,7 @@
 	</s:states>
 	
 	<s:Group horizontalCenter="0" width="100%">
-        <s:Image source="@Embed(source='/assets/images/banner.jpg')"/>
+        <s:Image id="headerImg" />
 		<s:Group right="0" 
 				 verticalCenter="0">
 			<s:VGroup verticalCenter="0" 
@@ -35,7 +44,7 @@
 					  paddingBottom="5"
 					  paddingRight="5"
 					  paddingLeft="5">
-		        <s:Image id="image" 
+		        <s:Image id="topRightLogoImg" 
 						 maxHeight="80"
 						 maxWidth="80"
 						 smooth="true" /> 

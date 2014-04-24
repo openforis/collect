@@ -5,6 +5,7 @@
 				 xmlns:component="org.openforis.collect.ui.component.*"
 				 width="600" height="400"
 				 title="{Message.get('home.configuration')}"
+				 currentState="loading"
 				 >
 	
 	<fx:Script>
@@ -27,41 +28,52 @@
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
-				ClientFactory.configurationClient.loadConfiguration(new AsyncResponder(loadConfigurationSuccessHandler, loadConfigurationFaultHandler));
 				
-				uploadPathTextInput.addEventListener(FlexEvent.VALUE_COMMIT, uploadPathChangeHandler);
-				recordIndexPathTextInput.addEventListener(FlexEvent.VALUE_COMMIT, recordIndexPathChangeHandler);
+				ClientFactory.configurationClient.loadConfiguration(new AsyncResponder(loadConfigurationSuccessHandler, loadConfigurationFaultHandler));
 			}
 			
 			private function loadConfigurationSuccessHandler(event:ResultEvent, token:Object = null):void {
+				currentState = "loadComplete";
+
+				uploadPathTextInput.addEventListener(FlexEvent.VALUE_COMMIT, uploadPathChangeHandler);
+				recordIndexPathTextInput.addEventListener(FlexEvent.VALUE_COMMIT, recordIndexPathChangeHandler);
+
 				var conf:ConfigurationProxy = event.result as ConfigurationProxy;
 				//custom paths
 				uploadPathTextInput.text = conf.uploadPath;
 				recordIndexPathTextInput.text = conf.indexPath;
 				//default paths
 				defaultUploadPathTextInput.text = conf.defaultUploadPath;
-				defaultRecordIndexPathTextInput = conf.defaultIndexPath;
+				defaultRecordIndexPathTextInput.text = conf.defaultIndexPath;
 			}
 			
-			private function loadConfigurationFaultHandler(event:FaultEvent):void {
-				AlertUtil.showError("configuration.load.error", [event.message]);
+			private function loadConfigurationFaultHandler(event:FaultEvent, token:Object = null):void {
+				AlertUtil.showError("configuration.load.error", [event.fault.message]);
 			}
 			
 			protected function uploadPathChangeHandler(event:FlexEvent):void {
+				uploadPathTextInput.enabled = false;
+
 				ClientFactory.configurationClient.updateUploadPath(new AsyncResponder(
-					function(event:ResultEvent):void {
+					function(event:ResultEvent, token:Object = null):void {
 						//ok
-					}, function(event:FaultEvent):void {
+						uploadPathTextInput.enabled = true;
+					}, function(event:FaultEvent, token:Object = null):void {
 						//TODO fault handler
+						uploadPathTextInput.enabled = true;
 					}), uploadPathTextInput.text);
 			}
 			
-			protected function recordIndexPathChangeHandler(event:TextOperationEvent):void {
+			protected function recordIndexPathChangeHandler(event:FlexEvent):void {
+				recordIndexPathTextInput.enabled = false;
+				
 				ClientFactory.configurationClient.updateIndexPath(new AsyncResponder(
-					function(event:ResultEvent):void {
+					function(event:ResultEvent, token:Object = null):void {
 						//ok
-					}, function(event:FaultEvent):void {
+						recordIndexPathTextInput.enabled = true;
+					}, function(event:FaultEvent, token:Object = null):void {
 						//TODO fault handler
+						recordIndexPathTextInput.enabled = true;
 					}), recordIndexPathTextInput.text);
 			}
 			
@@ -79,21 +91,27 @@
 	
 	<component:LoadingContent includeIn="loading" />
 	
-	<s:Scroller width="100%" height="100%" excludeFrom="loading" itemCreationPolicy="immediate">
+	<s:Scroller width="100%" height="100%" includeIn="loadComplete" itemCreationPolicy="immediate">
 		
 		<s:VGroup horizontalCenter="0" horizontalAlign="center" gap="30">
 			<s:Form>
 				<s:FormItem label="{Message.get('configuration.uploadPath')}">
-					<s:TextInput id="uploadPathTextInput" />
-				</s:FormItem>
-				<s:FormItem label="{Message.get('configuration.defaultUploadPath')}">
-					<s:TextInput id="defaultUploadPathTextInput" editable="false" />
+					<s:VGroup>
+						<s:TextInput id="uploadPathTextInput" width="230" />
+						<s:HGroup verticalAlign="middle">
+							<s:Label text="{Message.get('global.default')}:" />
+							<s:TextInput id="defaultUploadPathTextInput" width="200" editable="false" />
+						</s:HGroup>
+					</s:VGroup>
 				</s:FormItem>
 				<s:FormItem label="{Message.get('configuration.recordIndexPath')}">
-					<s:TextInput id="recordIndexPathTextInput" />
-				</s:FormItem>
-				<s:FormItem label="{Message.get('configuration.defaultRecordIndexPath')}">
-					<s:TextInput id="defaultRecordIndexPathTextInput" editable="false" />
+					<s:VGroup>
+						<s:TextInput id="recordIndexPathTextInput" width="230" />
+						<s:HGroup verticalAlign="middle">
+							<s:Label text="{Message.get('global.default')}:" />
+							<s:TextInput id="defaultRecordIndexPathTextInput" width="200" editable="false" />
+						</s:HGroup>
+					</s:VGroup>
 				</s:FormItem>
 				<s:FormItem label="{Message.get('configuration.logo.header')}">
 					<component:CustomLogoConfigurationElement 
