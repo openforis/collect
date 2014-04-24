@@ -31,9 +31,8 @@ public class ConfigurationDaoIntegrationTest {
 	public void testCRUD() throws Exception  {
 		// SAVE NEW
 		Configuration config = new Configuration();
-		config.put("property1", "value1");
-		config.put("property2", "value2");
-		config.put("property3", "value3");
+		config.setUploadPath("/home/test/uploadPathTest");
+		config.setIndexPath("/home/test/indexPathTest");
 		configurationDao.save(config);
 		
 		// RELOAD
@@ -41,7 +40,7 @@ public class ConfigurationDaoIntegrationTest {
 		assertNotNull(reloaded);
 		
 		Set<String> properties = reloaded.getProperties();
-		assertEquals(3, properties.size());
+		assertEquals(2, properties.size());
 		for (String name : properties) {
 			String oldValue = config.get(name);
 			assertNotNull(oldValue);

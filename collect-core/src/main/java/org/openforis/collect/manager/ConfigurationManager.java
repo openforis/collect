@@ -21,12 +21,27 @@ public class ConfigurationManager {
 		configuration = configurationDao.load();
 	}
 	
-	public void save(Configuration configuration) {
-		this.configuration = configuration;
+	public void updateUploadPath(String uploadPath) {
+		configuration.put(Configuration.UPLOAD_PATH_KEY, uploadPath);
 		configurationDao.save(configuration);
+	}
+
+	public void updateIndexPath(String indexPath) {
+		configuration.put(Configuration.INDEX_PATH_KEY, indexPath);
+		configurationDao.save(configuration);
+	}
+
+	public void save(Configuration configuration) {
+		configurationDao.save(configuration);
+		this.configuration = configuration;
 	}
 	
 	public Configuration getConfiguration() {
-		return configuration;
+		try {
+			return configuration == null ? null: (Configuration) (configuration.clone());
+		} catch (CloneNotSupportedException e) {
+			//it should never happen
+			throw new RuntimeException("Error cloning configuration", e);
+		}
 	}
 }

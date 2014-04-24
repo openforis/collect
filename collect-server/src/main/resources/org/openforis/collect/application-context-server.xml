@@ -30,14 +30,17 @@
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->
-	<bean id="csvDataImportService"
-		class="org.openforis.collect.remoting.service.CSVDataImportService"
-		autowire="byName" init-method="init" />
 	<bean id="codeListSessionService"
 		class="org.openforis.collect.remoting.service.CodeListSessionService"
 		scope="session" />
 	<bean id="codeListImportService"
 		class="org.openforis.collect.remoting.service.CodeListImportService"
+		autowire="byName" init-method="init" />
+	<bean id="configurationService"
+		class="org.openforis.collect.remoting.service.ConfigurationService"
+		autowire="byName" init-method="init" />
+	<bean id="csvDataImportService"
+		class="org.openforis.collect.remoting.service.CSVDataImportService"
 		autowire="byName" init-method="init" />
 	<bean id="dataService" class="org.openforis.collect.remoting.service.DataService"
 		autowire="byName" scope="session" />

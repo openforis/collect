@@ -7,22 +7,12 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.rpc.AsyncResponder;
-			import mx.rpc.events.FaultEvent;
-			import mx.rpc.events.ResultEvent;
-			
-			import org.openforis.collect.Application;
-			import org.openforis.collect.client.ClientFactory;
-			import org.openforis.collect.client.LogoClient;
-			import org.openforis.collect.i18n.Message;
-			import org.openforis.collect.model.Logo;
-			import org.openforis.collect.model.proxy.UserProxy;
+			import org.openforis.collect.model.LogoPosition;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.ui.component.CustomImageLoader;
-			import org.openforis.collect.util.ApplicationConstants;
 
 			private function init():void  {
-				var topRightLogoLoader:CustomImageLoader = new CustomImageLoader(image, ApplicationConstants.TOP_RIGHT_LOGO_POSITION, 
+				var topRightLogoLoader:CustomImageLoader = new CustomImageLoader(image, LogoPosition.TOP_RIGHT, 
 					Images.TOP_RIGHT_DEFAULT_LOGO);
 				topRightLogoLoader.load();
 			}

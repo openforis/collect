@@ -19,7 +19,7 @@ package org.openforis.collect.client {
 
 		public function LogoClient() {
 			super("logoService");
-			_loadLogoOperation = getOperation("loadLogo", CONCURRENCY_LAST);
+			_loadLogoOperation = getOperation("loadLogo", CONCURRENCY_MULTIPLE);
 			_deleteLogoOperation = getOperation("deleteLogo");
 			_saveLogoOperation = getOperation("saveLogo");
 		}

@@ -39,6 +39,7 @@ import org.apache.lucene.util.Version;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Configuration;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -60,7 +61,6 @@ public class RecordIndexManager extends BaseStorageManager {
 	private static final long serialVersionUID = 1L;
 
 	private static final String COLLECT_INDEX_DEFAULT_FOLDER = "collect_index";
-	protected static final String INDEX_PATH_CONFIGURATION_KEY = "index_path";
 	protected static final String RECORD_ID_FIELD = "_record_id";
 	private static final Version LUCENE_VERSION = Version.LUCENE_36;
 
@@ -79,7 +79,7 @@ public class RecordIndexManager extends BaseStorageManager {
 	
 	protected synchronized void init() throws RecordIndexException {
 		unlock();
-		initStorageDirectory(INDEX_PATH_CONFIGURATION_KEY, COLLECT_INDEX_DEFAULT_FOLDER);
+		initStorageDirectory(Configuration.INDEX_PATH_KEY, COLLECT_INDEX_DEFAULT_FOLDER);
 		if ( storageDirectory != null ) {
 			if ( LOG.isInfoEnabled() ) {
 				LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());

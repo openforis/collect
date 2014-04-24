@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.exception.RecordFileException;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.Configuration;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.File;
@@ -38,8 +39,6 @@ public class RecordFileManager extends BaseStorageManager {
 
 	protected static Log LOG = LogFactory.getLog(RecordFileManager.class);
 
-	private static final String UPLOAD_PATH_CONFIGURATION_KEY = "upload_path";
-	
 	private static final String TEMP_RECORD_FILES_SUBFOLDER = "collect_upload";
 	private static final String DEFAULT_RECORD_FILES_SUBFOLDER = "collect_upload";
 	
@@ -60,7 +59,7 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 
 	protected void initStorageDirectory() {
-		super.initStorageDirectory(UPLOAD_PATH_CONFIGURATION_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
+		super.initStorageDirectory(Configuration.UPLOAD_PATH_KEY, DEFAULT_RECORD_FILES_SUBFOLDER);
 		if ( storageDirectory == null ) {
 			String message = "Upload directory not configured properly";
 			LOG.error(message);

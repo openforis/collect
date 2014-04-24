@@ -34,6 +34,14 @@
 				</properties>
 			</destination>
 			
+			<destination id="configurationService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>configurationService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
+
 			<destination id="csvDataImportService">
 				<properties>
 					<factory>springFactory</factory>
