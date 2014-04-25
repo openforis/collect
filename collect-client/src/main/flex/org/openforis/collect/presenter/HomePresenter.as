@@ -39,7 +39,7 @@ package org.openforis.collect.presenter {
 
 		private static const CONFIGURATION_MENU_ITEM:Object = {
 			label: Message.get('home.configuration'),
-			icon: Images.SETTINGS};
+			icon: Images.CONFIGURATION};
 
 		private var _view:HomePageView;
 		

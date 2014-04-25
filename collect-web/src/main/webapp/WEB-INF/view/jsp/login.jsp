@@ -23,6 +23,12 @@
 			background-color: #F0F0F0;
 		}
 		
+		#header {
+			position: relative;
+			width: 974px; 
+			height: 102px;
+		}
+		
 		#mainContainer {
 			margin: auto;
 			width: 974px;
@@ -131,6 +137,7 @@
 			};
 
 			loadImage("headerImg", "header", "assets/images/header.jpg");
+			loadImage("logoImg", "top_right", "assets/images/default-logo.png");
 			loadImage("footerImg", "footer", "assets/images/footer.jpg");
 		});
 	</script>
@@ -139,8 +146,11 @@
   <body onload="document.f.j_username.focus();">
   	<div id="mainContainer">
   		<!-- HEADER -->
-  		<div>
-			<img id="headerImg" alt="Loading...">
+  		<div id="header">
+			<img id="headerImg" alt="Loading..."
+				style="position: absolute; left: 0px;"></img>
+			<img id="logoImg" alt="Loading..." width="80px" height="80px" 
+				style="position: absolute; right: 0px; top: 10px;" ></img>
     	</div>
     	<!-- INTERNAL CONTAINER -->
 		<div id="internalContainer">

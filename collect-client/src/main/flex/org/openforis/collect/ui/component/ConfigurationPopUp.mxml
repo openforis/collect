@@ -23,21 +23,28 @@
 			import org.openforis.collect.util.AlertUtil;
 			
 			import spark.events.TextOperationEvent;
+			private var _initialized:Boolean;
 			
 			/* private var _presenter:SurveySelectionPresenter; */
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
-				
+				_initialized = false;
+				loadConfiguration();
+			}
+			
+			private function loadConfiguration():void {
 				ClientFactory.configurationClient.loadConfiguration(new AsyncResponder(loadConfigurationSuccessHandler, loadConfigurationFaultHandler));
 			}
 			
 			private function loadConfigurationSuccessHandler(event:ResultEvent, token:Object = null):void {
 				currentState = "loadComplete";
-
-				uploadPathTextInput.addEventListener(FlexEvent.VALUE_COMMIT, uploadPathChangeHandler);
-				recordIndexPathTextInput.addEventListener(FlexEvent.VALUE_COMMIT, recordIndexPathChangeHandler);
-
+				
+				if ( ! _initialized ) {
+					uploadPathTextInput.addEventListener(FlexEvent.VALUE_COMMIT, uploadPathChangeHandler);
+					recordIndexPathTextInput.addEventListener(FlexEvent.VALUE_COMMIT, recordIndexPathChangeHandler);
+					_initialized = true;
+				}
 				var conf:ConfigurationProxy = event.result as ConfigurationProxy;
 				//custom paths
 				uploadPathTextInput.text = conf.uploadPath;
@@ -59,7 +66,7 @@
 						//ok
 						uploadPathTextInput.enabled = true;
 					}, function(event:FaultEvent, token:Object = null):void {
-						//TODO fault handler
+						AlertUtil.showError("configuration.path.error");
 						uploadPathTextInput.enabled = true;
 					}), uploadPathTextInput.text);
 			}
@@ -96,20 +103,20 @@
 		<s:VGroup horizontalCenter="0" horizontalAlign="center" gap="30">
 			<s:Form>
 				<s:FormItem label="{Message.get('configuration.uploadPath')}">
-					<s:VGroup>
-						<s:TextInput id="uploadPathTextInput" width="230" />
-						<s:HGroup verticalAlign="middle">
+					<s:VGroup width="100%">
+						<s:TextInput id="uploadPathTextInput" width="100%" />
+						<s:HGroup verticalAlign="middle" width="100%">
 							<s:Label text="{Message.get('global.default')}:" />
-							<s:TextInput id="defaultUploadPathTextInput" width="200" editable="false" />
+							<s:TextInput id="defaultUploadPathTextInput" width="100%" editable="false" />
 						</s:HGroup>
 					</s:VGroup>
 				</s:FormItem>
 				<s:FormItem label="{Message.get('configuration.recordIndexPath')}">
-					<s:VGroup>
-						<s:TextInput id="recordIndexPathTextInput" width="230" />
-						<s:HGroup verticalAlign="middle">
+					<s:VGroup width="100%">
+						<s:TextInput id="recordIndexPathTextInput" width="100%" />
+						<s:HGroup verticalAlign="middle" width="100%">
 							<s:Label text="{Message.get('global.default')}:" />
-							<s:TextInput id="defaultRecordIndexPathTextInput" width="200" editable="false" />
+							<s:TextInput id="defaultRecordIndexPathTextInput" width="100%" editable="false" />
 						</s:HGroup>
 					</s:VGroup>
 				</s:FormItem>

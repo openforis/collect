@@ -14,7 +14,7 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/footer.jpg")]
 		public static const FOOTER:Class;
 		
-		[Embed("/assets/images/default_logo.png")]
+		[Embed("/assets/images/default_logo_80x80.png")]
 		public static const TOP_RIGHT_DEFAULT_LOGO:Class;
 		
 		[Embed("/assets/images/logout-small.png")]
@@ -31,6 +31,9 @@ package org.openforis.collect.ui {
 		
 		[Embed("/assets/images/user_management.png")]
 		public static const USER_MANAGEMENT:Class;
+		
+		[Embed("/assets/images/settings_48x48.png")]
+		public static const CONFIGURATION:Class;
 		
 		[Embed("/assets/images/delete.png")]
 		public static const DELETE:Class;

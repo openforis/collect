@@ -7,37 +7,31 @@
 	import org.zkoss.spring.*;
 
 	final String DEFAULT_LOGO = "/assets/images/default-logo.png";
-	final int TOP_RIGHT_CORNER_LOGO_POSITION = 1;
+	final String DEFAULT_HEADER = "/assets/images/header.jpg";
+	final String DEFAULT_FOOTER = "/assets/images/footer.jpg";
 	
-	void updateHeaderImages() {
-		BufferedImage content = loadLogoData(TOP_RIGHT_CORNER_LOGO_POSITION);
-		if (content == null) {
-			headerTopRightImage.setSrc(DEFAULT_LOGO);
-		} else {
-			headerTopRightImage.setContent(content);
-		}
+	void onCreate() {
+		loadImage(headerImage, org.openforis.collect.model.LogoPosition.HEADER, DEFAULT_HEADER);
+		loadImage(headerTopRightImage, org.openforis.collect.model.LogoPosition.TOP_RIGHT, DEFAULT_LOGO);
+		loadImage(footerImage, org.openforis.collect.model.LogoPosition.FOOTER, DEFAULT_FOOTER);
 	}
 	
-	BufferedImage loadLogoData(int position) {
+	void loadImage(Image image, org.openforis.collect.model.LogoPosition position, String defaultImageSrc) {
 		LogoManager logoManager = (LogoManager) SpringUtil.getBean("logoManager");
-		byte[] data = logoManager.loadLogo(position);
-		if (data == null) {
-			return null;
+		org.openforis.collect.model.Logo logo = logoManager.loadLogo(position);
+		if ( logo == null ) {
+			image.setSrc(defaultImageSrc);
 		} else {
-			return toImage(data);
-		}
-	}
-	
-	BufferedImage toImage(byte[] data) {
-		ByteArrayInputStream is = null;
-		try {
-			is = new ByteArrayInputStream(data);
-			BufferedImage content = ImageIO.read(is);
-			return content;
-		} catch (IOException e) {
-			return null;
-		} finally {
-			org.apache.commons.io.IOUtils.closeQuietly(is);
+			ByteArrayInputStream is = null;
+			try {
+				is = new ByteArrayInputStream(logo.getImage());
+				BufferedImage content = ImageIO.read(is);
+				image.setContent(content);
+			} catch (IOException e) {
+				//do nothing
+			} finally {
+				org.apache.commons.io.IOUtils.closeQuietly(is);
+			}
 		}
 	}
 	
@@ -51,12 +45,12 @@
 	<style src="/assets/designer_style.css" />
 	
     <box hflex="true" vflex="true" align="center" sclass="mainContainer"
-    	onCreate="updateHeaderImages()" >
+    	onCreate="onCreate()" >
       <borderlayout width="960px" vflex="true">
       	<north height="102px" border="none">
       		<absolutelayout id="header" sclass="header">
-	            <absolutechildren>
-	        		<image src="/assets/images/header.jpg" />
+	            <absolutechildren hflex="true" vflex="true">
+	        		<image id="headerImage" hflex="true" vflex="true" />
 	            </absolutechildren>
 	            <absolutechildren width="100%" height="100%">
 	              <vlayout width="100%" height="100%" spacing="0px">
@@ -79,28 +73,35 @@
       		</vlayout>
       	</center>
       	<south border="none" height="30px">
-      		<hbox sclass="footer" hflex="true" vflex="true">
-		    	<zscript>
-		    		String appVersion = org.openforis.collect.Collect.getVersion();
-		    		
-		    		org.springframework.security.core.Authentication authentication = org.zkoss.spring.security.SecurityUtil.getAuthentication();
-					String loggedUsername = authentication.getName();
-				</zscript>
-
-				<box vflex="true" pack="center">
-	   	          	<label value="${labels.global.application_version}: ${appVersion}" sclass="appVersion" />
-				</box>
-   	          	
-   	          	<box hflex="true" />
-   	          	
-	    	    <hbox align="center" vflex="true">
-	   	          	<label value="${labels.global.logged_as}: ${loggedUsername}" />
-	   	          	<button sclass="icon" height="16px"
-						tooltiptext="${labels.global.logout}"
-						onClick="logout()"
-						image="/assets/images/logout-small.png" />
-	    	    </hbox>
-      		</hbox>
+			<absolutelayout vflex="true" hflex="true">
+				<absolutechildren vflex="true" hflex="true">
+					<image id="footerImage" height="100%" width="100%" />
+				</absolutechildren>
+				<absolutechildren hflex="true" vflex="true">
+		      		<hbox sclass="footer" hflex="true" vflex="true">
+				    	<zscript>
+				    		String appVersion = org.openforis.collect.Collect.getVersion();
+				    		
+				    		org.springframework.security.core.Authentication authentication = org.zkoss.spring.security.SecurityUtil.getAuthentication();
+							String loggedUsername = authentication.getName();
+						</zscript>
+		
+						<box vflex="true" pack="center">
+			   	          	<label value="${labels.global.application_version}: ${appVersion}" sclass="appVersion" />
+						</box>
+		   	          	
+		   	          	<box hflex="true" />
+		   	          	
+			    	    <hbox align="center" vflex="true">
+			   	          	<label value="${labels.global.logged_as}: ${loggedUsername}" />
+			   	          	<button sclass="icon" height="16px"
+								tooltiptext="${labels.global.logout}"
+								onClick="logout()"
+								image="/assets/images/logout-small.png" />
+			    	    </hbox>
+		      		</hbox>
+				</absolutechildren>
+			</absolutelayout>
       	</south>
       </borderlayout>
     </box>

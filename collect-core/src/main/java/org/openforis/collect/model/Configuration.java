@@ -49,7 +49,8 @@ public class Configuration implements Cloneable {
 	
 	public void put(String key, String value) {
 		checkSupported(key);
-		if ( StringUtils.isBlank(value) ) {
+		value = StringUtils.trimToNull(value);
+		if ( value == null ) {
 			map.remove(key);
 		} else {
 			map.put(key,  value);
