@@ -130,6 +130,9 @@ package org.openforis.collect {
 		
 		public static function set preview(value:Boolean):void{
 			_preview = value;
+			if ( ExternalInterface.available ) {
+				ExternalInterface.call("setPreview", value);
+			}
 		}
 		
 		[Bindable]
@@ -166,6 +169,10 @@ package org.openforis.collect {
 		
 		public static function set activeRecord(record:RecordProxy):void{
 			_activeRecord = record;
+			if ( ExternalInterface.available ) {
+				ExternalInterface.call("OPENFORIS.setEditingRecord", record != null);
+			}
+			
 		}
 		
 		[Bindable]

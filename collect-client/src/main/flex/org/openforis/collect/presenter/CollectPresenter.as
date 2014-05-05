@@ -84,12 +84,12 @@ package org.openforis.collect.presenter {
 			this._sessionClient = ClientFactory.sessionClient;
 
 			super();
-
+			
 			_keepAliveRetryTimes = 0;
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
-
+			
 			//set language in session
 			init();
 		}
@@ -382,7 +382,7 @@ package org.openforis.collect.presenter {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.SHOW_HOME_PAGE);
 			eventDispatcher.dispatchEvent(uiEvent);
 		}
-		
+
 		internal function sendKeepAliveMessage(event:TimerEvent):void {
 			this._sessionClient.keepAlive(new ItemResponder(keepAliveResult, keepAliveFaultHandler));
 		}

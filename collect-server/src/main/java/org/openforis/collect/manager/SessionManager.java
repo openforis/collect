@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * 
@@ -164,12 +166,24 @@ public class SessionManager {
 	}
 
 	private Object getSessionAttribute(String attributeName) {
+		Object result = null;
+		
+		//try to get session attribute from GraniteDS context
 		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
 		if (graniteContext != null) {
-			Object result = graniteContext.getSessionMap().get(attributeName);
-			return result;
+			result = graniteContext.getSessionMap().get(attributeName);
 		} else {
+			//try to get session attribute from current request context holder session
+			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			if ( requestAttributes != null ) {
+				HttpSession session = requestAttributes.getRequest().getSession();
+				result = session.getAttribute(attributeName);
+			}
+		}
+		if ( result == null ) {
 			throw new IllegalStateException("Error getting session info");
+		} else {
+			return result;
 		}
 	}
 	

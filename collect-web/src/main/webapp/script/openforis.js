@@ -5,9 +5,10 @@ var OPENFORIS = {
 	CLEAR_ACTIVE_RECORD_PATH: "clearActiveRecord.htm",
 	
 	FLASH_OBJECT_ID: "collect",
-			
-	isEditingRecord: false,
 	
+	editingRecord: false,
+	preview: false,
+			
 	init: function() {
 		//init beforeunload and unload event listeners
 		window.onbeforeunload = OPENFORIS.onBeforeUnloadFun;
@@ -30,18 +31,17 @@ var OPENFORIS = {
 	
 	onBeforeUnloadFun: function() {
 		//if there is an item being edited, show a confirm before exiting page
-		var mainApp = OPENFORIS.getFlexApp();
-		var leavingPageMessage = mainApp.getLeavingPageMessage();
-		OPENFORIS.editingRecord = mainApp != null && mainApp.isEditingRecord();
-		var preview = OPENFORIS.editingRecord && mainApp.isPreview();
-		if(OPENFORIS.editingRecord && ! preview) {
+
+		if ( OPENFORIS.isEditingRecord() && ! OPENFORIS.isPreview() ) {
+			var mainApp = OPENFORIS.getFlexApp();
+			var leavingPageMessage = mainApp.getLeavingPageMessage();
 			return leavingPageMessage;
 		}
 	},
 	
 	onUnloadFun: function() {
 		//unlock current item being edited (if any)
-		if(OPENFORIS.editingRecord) {
+		if ( OPENFORIS.isEditingRecord() ) {
 			$.ajax({
 			  async: false,
 			  type: "POST",
@@ -51,6 +51,22 @@ var OPENFORIS = {
 			  }
 			});
 		}
+	},
+	
+	isEditingRecord: function() {
+		return this.editingRecord;
+	},
+	
+	setEditingRecord: function(editing) {
+		this.editingRecord = editing;
+	},
+	
+	isPreview: function() {
+		return this.preview;
+	},
+	
+	setPreview: function(preview) {
+		this.preview = preview;
 	},
 	
 	onNsRightClick: function(e){

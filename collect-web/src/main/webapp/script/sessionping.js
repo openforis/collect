@@ -3,10 +3,10 @@
 
 	var methods,
 			_local,
-			timeout,
+			timeout = null,
 			defaults = {
-				time: 60 * 1000, // time in miliseconds
-				address: window.location.href
+				time: 60 * 1000, // time in milliseconds
+				address: "keepSessionAlive.htm"
 			},
 			settings;
 
@@ -36,21 +36,31 @@
 	_local = {
 		request: function () {
 			// Clears the timer set with setTimeout()
-			clearTimeout(timeout);
+			if ( timeout ) {
+				clearTimeout(timeout);
+			}
 
+			var editingRecord = typeof OPENFORIS != "undefined" && OPENFORIS.isEditingRecord() ? true: false;
+			
 			var request = $.ajax({
 				url: settings.address,
-				type: 'POST',
-				data: {},
+				type: 'GET',
+				data: {
+					editing: editingRecord,
+					time: new Date().getTime()
+				},
 				contentType: 'application/json; charset=utf-8'
 			});
 
 			request.success(function () {
-				timeout = setTimeout(_local.request, settings.time);
 			});
 
 			request.error(function (err) {
 				settings.onError(err);
+			});
+			
+			request.complete(function() {
+				timeout = setTimeout(_local.request, settings.time);
 			});
 		}
 	};

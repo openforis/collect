@@ -20,23 +20,25 @@
 
 	<http use-expressions="true" auto-config="true"
 		access-decision-manager-ref="accessDecisionManager">
-		<intercept-url pattern="/error.htm" access="permitAll" />
-		<intercept-url pattern="/login.htm" access="permitAll" />
-		<intercept-url pattern="/logout.htm" access="permitAll" />
-		<intercept-url pattern="/downloadLogo.htm" access="permitAll" />
 		<intercept-url pattern="/codelist/export/**/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/codelist/import/**/*" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/samplingdesign/export/*" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/samplingdesign/import/*" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/surveys" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/species/export/*" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/species/import/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/designer.htm" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/downloadLogo.htm" access="permitAll" />
 		<intercept-url pattern="/editSurvey.htm" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/error.htm" access="permitAll" />
 		<intercept-url pattern="/importSurvey.htm" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/index.htm" access="hasRole('ROLE_USER')" />
+		<intercept-url pattern="/keepSessionAlive.htm" access="permitAll" />
+		<intercept-url pattern="/login.htm" access="permitAll" />
+		<intercept-url pattern="/logout.htm" access="permitAll" />
 		<intercept-url pattern="/logoUpload" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/rdbpublish" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/samplingdesign/export/*" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/samplingdesign/import/*" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/species/export/*" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/species/import/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/speciesImport" access="hasRole('ROLE_ADMIN')" />
+		<intercept-url pattern="/surveys" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/uploadData.htm" access="permitAll" />
 		<intercept-url pattern="/uploadFile.htm" access="permitAll" />
 		<intercept-url pattern="/validateAllRecords.htm" access="hasRole('ROLE_ADMIN')" />
@@ -46,9 +48,8 @@
 		<!-- security disabled for these urls because of an issue with flash player 
 			for netscape compatible browser and uplaod to a secured url -->
 		<intercept-url pattern="/uploadRecordFile.htm" access="permitAll" />
-		<intercept-url pattern="/downlodRecordFile.htm" access="permitAll" />
+		<intercept-url pattern="/downloadRecordFile.htm" access="permitAll" />
 
-		<intercept-url pattern="/index.htm" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/*" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/**/*.swf" access="hasRole('ROLE_USER')" />
 		<!-- <intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" 
