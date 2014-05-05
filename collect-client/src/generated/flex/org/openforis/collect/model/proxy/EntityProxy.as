@@ -260,6 +260,13 @@ package org.openforis.collect.model.proxy {
 			node.init();
 			children.addItem(node);
 			showErrorsOnChild(name);
+			
+			if ( node is EntityProxy && CollectionUtil.isEmpty(EntityDefinitionProxy(node.definition).keyAttributeDefinitions)) {
+				var siblings:IList = getChildren(node.name);
+				for each (var sibling:EntityProxy in siblings) {
+					sibling.updateKeyText();
+				}
+			}
 		}
 		
 		public function removeChild(node:NodeProxy):void {
@@ -270,6 +277,13 @@ package org.openforis.collect.model.proxy {
 				children.removeItemAt(index);
 			}
 			showErrorsOnChild(name);
+			
+			if ( node is EntityProxy && CollectionUtil.isEmpty(EntityDefinitionProxy(node.definition).keyAttributeDefinitions)) {
+				var siblings:IList = getChildren(node.name);
+				for each (var sibling:EntityProxy in siblings) {
+					sibling.updateKeyText();
+				}
+			}
 		}
 		
 		public function replaceChild(oldNode:NodeProxy, newNode:NodeProxy):void {
