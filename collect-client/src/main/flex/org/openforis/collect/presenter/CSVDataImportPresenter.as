@@ -1,6 +1,8 @@
 package org.openforis.collect.presenter
 {
 	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
@@ -21,8 +23,10 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.NodeItem;
 	import org.openforis.collect.ui.view.CSVDataImportView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.DataGrids;
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.components.DropDownList;
@@ -48,6 +52,7 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			view.entitySelectionTree.addEventListener(ListEvent.ITEM_CLICK, entityTreeItemSelectHandler);
+			view.exportErrorsButton.addEventListener(MouseEvent.CLICK, exportErrorsClickHandler);
 		}
 		
 		protected function entityTreeItemSelectHandler(event:ListEvent):void {
@@ -211,6 +216,12 @@ package org.openforis.collect.presenter
 				stepDropDownList.selectedIndex = 0;
 			});
 		}
+
+		protected function exportErrorsClickHandler(event:MouseEvent):void {
+			DataGrids.writeToCSV(view.errorsDataGrid);
+			//navigateToURL(new URLRequest(ApplicationConstants.URL + "downloadCSVDataImportErrors.htm"), "_new");
+		}
+		
 	}
 }
 import org.openforis.collect.presenter.ReferenceDataImportMessageKeys;

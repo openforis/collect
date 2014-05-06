@@ -41,7 +41,7 @@
 		autowire="byName" init-method="init" />
 	<bean id="csvDataImportService"
 		class="org.openforis.collect.remoting.service.CSVDataImportService"
-		autowire="byName" init-method="init" />
+		autowire="byName" init-method="init" scope="session" />
 	<bean id="dataService" class="org.openforis.collect.remoting.service.DataService"
 		autowire="byName" scope="session" />
 	<bean id="dataExportService"

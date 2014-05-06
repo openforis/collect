@@ -45,6 +45,8 @@
 			public var closeButton:Button;
 			[SkinPart(required="true", type="spark.components.Button")]
 			public var errorsOkButton:Button;
+			[SkinPart(required="false", type="spark.components.Button")]
+			public var exportErrorsButton:Button;
 
 			private var _surveyId:int;
 			private var _work:Boolean;
