@@ -5,6 +5,7 @@ package org.openforis.collect.model.proxy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
@@ -30,37 +31,38 @@ public class NodeProxy implements Proxy {
 
 	private EntityProxy parent;
 	private transient Node<?> node;
+	private Locale locale;
 	
-	public static NodeProxy fromNode(Node<?> node) {
+	public static NodeProxy fromNode(Node<?> node, Locale locale) {
 		if (node instanceof Attribute<?, ?>) {
-			return new AttributeProxy(null, (Attribute<?, ?>) node);
+			return new AttributeProxy(null, (Attribute<?, ?>) node, locale);
 		} else if (node instanceof Entity) {
-			return new EntityProxy(null, (Entity) node);
+			return new EntityProxy(null, (Entity) node, locale);
 		}
 		return null;
 	}
 	
-	public NodeProxy(EntityProxy parent, Node<?> node) {
+	public NodeProxy(EntityProxy parent, Node<?> node, Locale locale) {
 		super();
 		this.parent = parent;
 		this.node = node;
+		this.locale = locale;
 	}
 
-	public static List<NodeProxy> fromList(
-			EntityProxy parent,
-			List<Node<?>> list) {
+	public static List<NodeProxy> fromList(EntityProxy parent,
+			List<Node<?>> list, Locale locale) {
 		List<NodeProxy> result = new ArrayList<NodeProxy>();
 		if(list != null) {
 			for (Node<?> node : list) {
 				NodeProxy proxy;
 				if(node instanceof Attribute<?, ?>) {
 					if(node instanceof CodeAttribute) {
-						proxy = new CodeAttributeProxy(parent, (CodeAttribute) node);
+						proxy = new CodeAttributeProxy(parent, (CodeAttribute) node, locale);
 					} else {
-						proxy = new AttributeProxy(parent, (Attribute<?, ?>) node);
+						proxy = new AttributeProxy(parent, (Attribute<?, ?>) node, locale);
 					}
 				} else {
-					proxy = new EntityProxy(parent, (Entity) node);
+					proxy = new EntityProxy(parent, (Entity) node, locale);
 				}
 				result.add(proxy);
 			}
@@ -115,5 +117,9 @@ public class NodeProxy implements Proxy {
 	
 	public void setParent(EntityProxy parent) {
 		this.parent = parent;
+	}
+	
+	public Locale getLocale() {
+		return locale;
 	}
 }

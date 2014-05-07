@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -93,7 +94,8 @@ public class DataService {
 		sessionManager.setActiveRecord(record);
 		fileManager.resetTempInfo();
 		prepareRecordIndexing();
-		return new RecordProxy(record);
+		Locale locale = sessionState.getLocale();
+		return new RecordProxy(record, locale);
 	}
 
 	protected void prepareRecordIndexing() throws RecordIndexException {
@@ -125,7 +127,8 @@ public class DataService {
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
 		int count = recordManager.getRecordCount(activeSurvey, rootEntityDefinitionName, keyValues);
 		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
-		List<RecordProxy> proxies = RecordProxy.fromList(summaries);
+		Locale locale = sessionState.getLocale();
+		List<RecordProxy> proxies = RecordProxy.fromList(summaries, locale);
 		result.put("count", count);
 		result.put("records", proxies);
 		return result;
@@ -146,7 +149,8 @@ public class DataService {
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
-		RecordProxy recordProxy = new RecordProxy(record);
+		Locale locale = sessionState.getLocale();
+		RecordProxy recordProxy = new RecordProxy(record, locale);
 		return recordProxy;
 	}
 	
@@ -191,7 +195,8 @@ public class DataService {
 		if ( ! changeSet.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
-		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet);
+		Locale currentLocale = getCurrentLocale();
+		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, currentLocale);
 		if ( requestSet.isAutoSave() ) {
 			try {
 				saveActiveRecord();
@@ -442,9 +447,20 @@ public class DataService {
 	}
 
 	protected CollectRecord getActiveRecord() {
-		SessionState sessionState = getSessionManager().getSessionState();
+		SessionState sessionState = getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();
 		return activeRecord;
+	}
+	
+	protected Locale getCurrentLocale() {
+		SessionState sessionState = getSessionState();
+		Locale locale = sessionState.getLocale();
+		return locale;
+	}
+
+	protected SessionState getSessionState() {
+		SessionState sessionState = getSessionManager().getSessionState();
+		return sessionState;
 	}
 
 	protected SessionManager getSessionManager() {

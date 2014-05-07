@@ -16,13 +16,10 @@ import java.util.PropertyResourceBundle;
  * @author S. Ricci
  *
  */
-public class ResourceBundleMessageSource extends AbstractMessageSource {
-
-	private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+public class ResourceBundleMessageSource implements MessageSource {
 
 	private static final String VALIDATION_BUNDLE_NAME = "org/openforis/collect/resourcebundles/validation";
 	
-	private Locale currentLocale;
 	private List<String> bundleBaseNames;
 	private Map<Locale, List<PropertyResourceBundle>> localeToResourceBundles;
 	
@@ -34,7 +31,6 @@ public class ResourceBundleMessageSource extends AbstractMessageSource {
 		super();
 		this.bundleBaseNames = bundleBaseNames;
 		this.localeToResourceBundles = new HashMap<Locale, List<PropertyResourceBundle>>();
-		this.currentLocale = DEFAULT_LOCALE;
 	}
 
 	@Override
@@ -76,19 +72,4 @@ public class ResourceBundleMessageSource extends AbstractMessageSource {
 		this.bundleBaseNames = bundleBaseNames;
 	}
 	
-	@Override
-	public Locale getCurrentLocale() {
-		return currentLocale;
-	}
-	
-	@Override
-	public void setCurrentLocale(Locale locale) {
-		this.currentLocale = locale;
-	}
-	/*
-	public static void main(String[] args) {
-		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource(Arrays.asList("org/openforis/collect/resourcebundles/validation"));
-		System.out.println(messageSource.getMessage("validation.specifiedError"));
-	}
-	*/
 }

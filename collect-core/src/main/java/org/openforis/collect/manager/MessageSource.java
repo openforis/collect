@@ -9,12 +9,14 @@ import java.util.Locale;
  */
 public interface MessageSource {
 
-	String getMessage(String code, Object... args);
-	
+	/**
+	 * Looks up for the message in the message source using the specified locale
+	 * 
+	 * @param locale
+	 * @param code
+	 * @param args
+	 * @return
+	 */
 	String getMessage(Locale locale, String code, Object... args);
-	
-	Locale getCurrentLocale();
-	
-	void setCurrentLocale(Locale locale);
 	
 }

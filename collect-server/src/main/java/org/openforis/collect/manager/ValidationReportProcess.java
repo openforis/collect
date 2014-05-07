@@ -11,11 +11,10 @@ import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.RecordValidationReportItem;
 import org.openforis.collect.model.RecordValidationReportGenerator;
+import org.openforis.collect.model.RecordValidationReportItem;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
-import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
@@ -35,8 +34,6 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	private ReportType reportType;
 	private CollectSurvey survey;
 	private String rootEntityName;
-	private User user;
-	private String sessionId;
 	private boolean includeConfirmedErrors;
 
 	private ValidationMessageBuilder validationMessageBuilder;
@@ -48,7 +45,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 
 	public ValidationReportProcess(OutputStream outputStream,
 			RecordManager recordManager,
-			SpringMessageSource messageSource,
+			MessageSource messageSource,
 			ReportType reportType, 
 			User user, String sessionId, 
 			CollectSurvey survey, String rootEntityName, boolean includeConfirmedErrors) {
@@ -56,12 +53,10 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		this.outputStream = outputStream;
 		this.recordManager = recordManager;
 		this.reportType = reportType;
-		this.user = user;
-		this.sessionId = sessionId;
 		this.survey = survey;
 		this.rootEntityName = rootEntityName;
 		this.includeConfirmedErrors = includeConfirmedErrors;
-		validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
+		this.validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
 	}
 	
 	@Override
@@ -124,11 +119,10 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	}
 
 	protected void writeValidationReport(CollectRecord record) throws IOException {
-		
 		recordManager.validate(record);
 		RecordValidationReportGenerator reportGenerator = new RecordValidationReportGenerator(record);
 		List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(
-				validationMessageBuilder, ValidationResultFlag.ERROR, includeConfirmedErrors);
+				ValidationResultFlag.ERROR, includeConfirmedErrors);
 		for (RecordValidationReportItem item : validationItems) {
 			writeValidationReportLine(record, item.getPath(), item.getMessage());
 		}

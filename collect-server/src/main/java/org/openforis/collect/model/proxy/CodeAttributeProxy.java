@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.model.proxy;
 
+import java.util.Locale;
+
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
@@ -21,8 +23,8 @@ public class CodeAttributeProxy extends AttributeProxy {
 	private transient CodeAttribute codeAttribute;
 	
 	public CodeAttributeProxy(EntityProxy parent,
-			CodeAttribute attribute) {
-		super(parent, attribute);
+			CodeAttribute attribute, Locale locale) {
+		super(parent, attribute, locale);
 		this.codeAttribute = attribute;
 	}
 

@@ -6,6 +6,7 @@ package org.openforis.collect.model.proxy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
@@ -30,9 +31,13 @@ public class RecordProxy implements Proxy {
 	private Integer missingWarnings;
 	private Integer warnings;
 	private UserProxy owner;
+
+	private Locale locale;
 	
-	public RecordProxy(CollectRecord record) {
+	public RecordProxy(CollectRecord record, Locale locale) {
 		this.record = record;
+		this.locale = locale;
+		
 		errors = record.getErrors();
 		skipped = record.getSkipped();
 		missing = record.getMissing();
@@ -43,11 +48,11 @@ public class RecordProxy implements Proxy {
 		owner = record.getOwner() == null ? null: new UserProxy(record.getOwner());
 	}
 
-	public static List<RecordProxy> fromList(List<CollectRecord> records) {
+	public static List<RecordProxy> fromList(List<CollectRecord> records, Locale locale) {
 		List<RecordProxy> result = new ArrayList<RecordProxy>();
 		if ( records != null ) {
 			for (CollectRecord collectRecord : records) {
-				RecordProxy proxy = new RecordProxy(collectRecord);
+				RecordProxy proxy = new RecordProxy(collectRecord, locale);
 				result.add(proxy);
 			}
 		}
@@ -98,7 +103,7 @@ public class RecordProxy implements Proxy {
 	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
 		if(record.getRootEntity() != null) {
-			return new EntityProxy(null, record.getRootEntity());
+			return new EntityProxy(null, record.getRootEntity(), locale);
 		} else {
 			return null;
 		}

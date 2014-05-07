@@ -1,5 +1,6 @@
 package org.openforis.collect.model.proxy;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -21,8 +22,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class AttributeChangeProxy extends NodeChangeProxy<AttributeChange> {
 
-	public AttributeChangeProxy(AttributeChange change) {
-		super(change);
+	public AttributeChangeProxy(AttributeChange change, Locale locale) {
+		super(change, locale);
 	}
 
 	@ExternalizedProperty
@@ -31,7 +32,7 @@ public class AttributeChangeProxy extends NodeChangeProxy<AttributeChange> {
 			return null;
 		} else {
 			MessageSource messageSource = getMessageSource();
-			return new ValidationResultsProxy(messageSource, (Attribute<?, ?>) change.getNode(), change.getValidationResults());
+			return new ValidationResultsProxy(messageSource, getLocale(), (Attribute<?, ?>) change.getNode(), change.getValidationResults());
 		}
 	}
 

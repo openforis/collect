@@ -4,6 +4,7 @@
 package org.openforis.collect.model.proxy;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
@@ -19,18 +20,18 @@ public class NodeChangeSetProxy implements Proxy {
 	private transient NodeChangeSet changeSet;
 	private transient CollectRecord record;
 	private boolean recordSaved;
+	private Locale currentLocale;
 	
-	public NodeChangeSetProxy(
-			CollectRecord record,
-			NodeChangeSet changeSet) {
+	public NodeChangeSetProxy(CollectRecord record,	NodeChangeSet changeSet, Locale currentLocale) {
 		super();
 		this.record = record;
 		this.changeSet = changeSet;
+		this.currentLocale = currentLocale;
 	}
 
 	@ExternalizedProperty
 	public List<NodeChangeProxy<?>> getChanges() {
-		return NodeChangeProxy.fromList(changeSet.getChanges());
+		return NodeChangeProxy.fromList(changeSet.getChanges(), currentLocale);
 	}
 
 	public boolean isRecordSaved() {

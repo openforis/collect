@@ -4,6 +4,7 @@
 package org.openforis.collect.model.proxy;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
@@ -21,21 +22,23 @@ public class ValidationResultsProxy implements Proxy {
 	private transient Attribute<?, ?> attribute;
 	private transient ValidationResults validationResults;
 	private transient MessageSource messageSource;
+	private Locale locale;
 
-	public ValidationResultsProxy(MessageSource messageSource, Attribute<?, ?> attribute, ValidationResults validationResults) {
+	public ValidationResultsProxy(MessageSource messageSource, Locale locale, Attribute<?, ?> attribute, ValidationResults validationResults) {
 		this.messageSource = messageSource;
 		this.attribute = attribute;
 		this.validationResults = validationResults;
+		this.locale = locale;
 	}
 
 	@ExternalizedProperty
 	public List<ValidationResultProxy> getErrors() {
-		return ValidationResultProxy.fromList(messageSource, attribute, validationResults.getErrors());
+		return ValidationResultProxy.fromList(messageSource, locale, attribute, validationResults.getErrors());
 	}
 
 	@ExternalizedProperty
 	public List<ValidationResultProxy> getWarnings() {
-		return ValidationResultProxy.fromList(messageSource, attribute, validationResults.getWarnings());
+		return ValidationResultProxy.fromList(messageSource, locale, attribute, validationResults.getWarnings());
 	}
 
 }

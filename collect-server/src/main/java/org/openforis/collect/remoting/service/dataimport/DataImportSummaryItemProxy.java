@@ -2,6 +2,7 @@ package org.openforis.collect.remoting.service.dataimport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,16 +22,18 @@ import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
 public class DataImportSummaryItemProxy implements Proxy {
 
 	private transient DataImportSummaryItem item;
+	private Locale locale;
 	
-	public DataImportSummaryItemProxy(DataImportSummaryItem item) {
+	public DataImportSummaryItemProxy(DataImportSummaryItem item, Locale locale) {
 		this.item = item;
+		this.locale = locale;
 	}
 	
-	public static List<DataImportSummaryItemProxy> fromList(List<DataImportSummaryItem> items) {
+	public static List<DataImportSummaryItemProxy> fromList(List<DataImportSummaryItem> items, Locale locale) {
 		List<DataImportSummaryItemProxy> result = new ArrayList<DataImportSummaryItemProxy>();
 		if ( items != null ) {
 			for (DataImportSummaryItem item : items) {
-				DataImportSummaryItemProxy proxy = new DataImportSummaryItemProxy(item);
+				DataImportSummaryItemProxy proxy = new DataImportSummaryItemProxy(item, locale);
 				result.add(proxy);
 			}
 		}
@@ -44,17 +47,17 @@ public class DataImportSummaryItemProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public RecordProxy getRecord() {
-		return getRecordProxy(item.getRecord());
+		return getRecordProxy(item.getRecord(), locale);
 	}
 
 	@ExternalizedProperty
 	public RecordProxy getConflictingRecord() {
-		return getRecordProxy(item.getConflictingRecord());
+		return getRecordProxy(item.getConflictingRecord(), locale);
 	}
 
-	private RecordProxy getRecordProxy(CollectRecord record) {
+	private RecordProxy getRecordProxy(CollectRecord record, Locale locale) {
 		if ( record != null ) {
-			return new RecordProxy(record);
+			return new RecordProxy(record, locale);
 		} else {
 			return null;
 		}

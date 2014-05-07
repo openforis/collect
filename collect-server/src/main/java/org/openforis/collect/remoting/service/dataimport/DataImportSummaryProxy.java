@@ -1,6 +1,7 @@
 package org.openforis.collect.remoting.service.dataimport;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
@@ -17,10 +18,12 @@ import org.openforis.collect.model.CollectRecord.Step;
 public class DataImportSummaryProxy implements Proxy {
 
 	private transient DataImportSummary summary;
+	private Locale locale;
 
-	public DataImportSummaryProxy(DataImportSummary summary) {
+	public DataImportSummaryProxy(DataImportSummary summary, Locale locale) {
 		super();
 		this.summary = summary;
+		this.locale = locale;
 	}
 
 	@ExternalizedProperty
@@ -42,12 +45,12 @@ public class DataImportSummaryProxy implements Proxy {
 
 	@ExternalizedProperty
 	public List<DataImportSummaryItemProxy> getRecordsToImport() {
-		return DataImportSummaryItemProxy.fromList(summary.getRecordsToImport());
+		return DataImportSummaryItemProxy.fromList(summary.getRecordsToImport(), locale);
 	}
 
 	@ExternalizedProperty
 	public List<DataImportSummaryItemProxy> getConflictingRecords() {
-		return DataImportSummaryItemProxy.fromList(summary.getConflictingRecords());
+		return DataImportSummaryItemProxy.fromList(summary.getConflictingRecords(), locale);
 	}
 
 	

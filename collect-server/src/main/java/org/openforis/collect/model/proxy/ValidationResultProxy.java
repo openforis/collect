@@ -6,6 +6,7 @@ package org.openforis.collect.model.proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
@@ -26,16 +27,16 @@ public class ValidationResultProxy implements Proxy {
 	private transient ValidationResult validationResult;
 	private String validationMessage;
 
-	public ValidationResultProxy(MessageSource messageSource, Attribute<?, ?> attribute, ValidationResult validationResult) {
-		this.validationMessage = createValidationMessage(messageSource, attribute, validationResult);
+	public ValidationResultProxy(MessageSource messageSource, Locale locale, Attribute<?, ?> attribute, ValidationResult validationResult) {
+		this.validationMessage = createValidationMessage(messageSource, locale, attribute, validationResult);
 		this.validationResult = validationResult;
 	}
 
-	public static List<ValidationResultProxy> fromList(MessageSource messageSource, Attribute<?, ?> attribute, List<ValidationResult> list) {
+	public static List<ValidationResultProxy> fromList(MessageSource messageSource, Locale locale, Attribute<?, ?> attribute, List<ValidationResult> list) {
 		if (list != null) {
 			List<ValidationResultProxy> proxies = new ArrayList<ValidationResultProxy>();
 			for (ValidationResult validationResults : list) {
-				proxies.add(new ValidationResultProxy(messageSource, attribute, validationResults));
+				proxies.add(new ValidationResultProxy(messageSource, locale, attribute, validationResults));
 			}
 			return proxies;
 		} else {
@@ -62,10 +63,10 @@ public class ValidationResultProxy implements Proxy {
 		}
 	}
 	
-	protected String createValidationMessage(MessageSource messageSource, Attribute<?, ?> attribute,
+	protected String createValidationMessage(MessageSource messageSource, Locale locale, Attribute<?, ?> attribute,
 			ValidationResult validationResult) {
 		ValidationMessageBuilder validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
-		return validationMessageBuilder.getValidationMessage(attribute, validationResult);
+		return validationMessageBuilder.getValidationMessage(attribute, validationResult, locale);
 	}
 
 }

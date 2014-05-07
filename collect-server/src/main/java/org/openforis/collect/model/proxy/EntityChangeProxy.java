@@ -1,5 +1,6 @@
 package org.openforis.collect.model.proxy;
 
+import java.util.Locale;
 import java.util.Map;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
@@ -13,8 +14,8 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
  */
 public class EntityChangeProxy extends NodeChangeProxy<EntityChange> {
 
-	public EntityChangeProxy(EntityChange change) {
-		super(change);
+	public EntityChangeProxy(EntityChange change, Locale locale) {
+		super(change, locale);
 	}
 
 	@ExternalizedProperty

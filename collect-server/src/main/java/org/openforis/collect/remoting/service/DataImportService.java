@@ -2,6 +2,7 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletContext;
 
@@ -60,6 +61,7 @@ public class DataImportService {
 			resetJobs();
 			
 			SessionState sessionState = sessionManager.getSessionState();
+			
 			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
 			packagedFile = new File(userImportFolder, FILE_NAME);
 			
@@ -107,7 +109,9 @@ public class DataImportService {
 	public DataImportSummaryProxy getSummary() {
 		if ( summaryJob != null ) {
 			DataImportSummary summary = summaryJob.getSummary();
-			DataImportSummaryProxy proxy = new DataImportSummaryProxy(summary);
+			SessionState sessionState = sessionManager.getSessionState();
+			Locale locale = sessionState.getLocale();
+			DataImportSummaryProxy proxy = new DataImportSummaryProxy(summary, locale);
 			return proxy;
 		} else {
 			return null;
