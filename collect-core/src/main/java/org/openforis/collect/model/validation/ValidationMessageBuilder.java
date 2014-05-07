@@ -81,9 +81,10 @@ public class ValidationMessageBuilder {
 	}
 
 	public String getValidationMessage(Attribute<?, ?> attribute, ValidationResult validationResult, Locale locale) {
+		String surveyDefaultLanguage = attribute.getSurvey().getDefaultLanguage();
 		ValidationRule<?> validator = validationResult.getValidator();
 		if ( validator instanceof Check ) {
-			String message = getCustomMessage((Check<?>) validator, locale);
+			String message = getCustomMessage((Check<?>) validator, locale, surveyDefaultLanguage);
 			if (message != null ) {
 				return message;
 			}
@@ -94,7 +95,6 @@ public class ValidationMessageBuilder {
 			String key = getMessageKey(attribute, validationResult);
 			if ( key != null ) {
 				Object[] args = getMessageArgs(attribute, validationResult, locale);
-				String surveyDefaultLanguage = attribute.getSurvey().getDefaultLanguage();
 				String result = getMessage(surveyDefaultLanguage, locale, key, args);
 				return result;
 			} else {
@@ -112,12 +112,12 @@ public class ValidationMessageBuilder {
 		return message;
 	}
 
-	private String getCustomMessage(Check<?> check, Locale locale) {
-		String langCode = locale == null ? null: locale.getLanguage();
+	private String getCustomMessage(Check<?> check, Locale locale, String surveyDefaultLanguageCode) {
+		String langCode = locale.getLanguage();
 		String customMessage = check.getMessage(langCode);
-		if ( customMessage == null ) {
+		if ( customMessage == null && ! langCode.equals(surveyDefaultLanguageCode) ) {
 			//get survey default language message
-			customMessage = check.getMessage(null);
+			customMessage = check.getMessage(surveyDefaultLanguageCode);
 		}
 		return customMessage;
 	}
