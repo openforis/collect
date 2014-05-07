@@ -24,6 +24,9 @@ package org.openforis.collect {
 	 * */
 	public class Application {
 		
+		private static const SET_PREVIEW_JS_FUNCTION:String = "OPENFORIS.setPreview";
+		private static const SET_EDITING_RECORD_JS_FUNCTION:String = "OPENFORIS.setEditingRecord";
+		
 		private static var _user:UserProxy;
 		
 		private static var _surveySummaries:IList;
@@ -131,7 +134,7 @@ package org.openforis.collect {
 		public static function set preview(value:Boolean):void{
 			_preview = value;
 			if ( ExternalInterface.available ) {
-				ExternalInterface.call("setPreview", value);
+				ExternalInterface.call(SET_PREVIEW_JS_FUNCTION, value);
 			}
 		}
 		
@@ -170,7 +173,7 @@ package org.openforis.collect {
 		public static function set activeRecord(record:RecordProxy):void{
 			_activeRecord = record;
 			if ( ExternalInterface.available ) {
-				ExternalInterface.call("OPENFORIS.setEditingRecord", record != null);
+				ExternalInterface.call(SET_EDITING_RECORD_JS_FUNCTION, record != null);
 			}
 			
 		}
