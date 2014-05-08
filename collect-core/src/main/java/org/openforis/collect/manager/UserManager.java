@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class UserManager {
 
+	public static final String ADMIN_USER_NAME = "admin";
+	
 	protected static final String PASSWORD_PATTERN = "^\\w{5,}$"; // alphanumeric, at least 5 letters
 
 	@Autowired
@@ -49,6 +51,10 @@ public class UserManager {
 
 	public User loadByUserName(String userName) {
 		return userDao.loadByUserName(userName, null);
+	}
+	
+	public User loadAdminUser() {
+		return loadByUserName(ADMIN_USER_NAME);
 	}
 	
 	public List<User> loadAll() {

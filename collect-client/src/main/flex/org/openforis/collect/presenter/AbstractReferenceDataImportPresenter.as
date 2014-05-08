@@ -153,7 +153,7 @@ package org.openforis.collect.presenter {
 					performImportCancel();
 					break;
 			}
-			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
+			backToDefaultView();
 		}
 		
 		protected function performImportCancel():void {
@@ -222,8 +222,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
-			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
 			AlertUtil.showError(_messageKeys.UPLOADING_FILE_ERROR, [event.text]);
+			backToDefaultView();
 		}
 		
 		protected function startResultHandler(event:ResultEvent, token:Object = null):void {
@@ -299,6 +299,10 @@ package org.openforis.collect.presenter {
 			_firstOpen = false;
 		}
 		
+		protected function backToDefaultView():void {
+			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
+		}
+		
 		protected function updateViewForUploading():void {
 			_view.currentState = AbstractReferenceDataImportView.STATE_UPLOADING;
 			_view.progressTitleText = Message.get(_messageKeys.UPLOADING_FILE);
@@ -313,8 +317,8 @@ package org.openforis.collect.presenter {
 		
 		protected function updateViewForError():void {
 			if ( CollectionUtil.isEmpty(_state.errors) ) {
-				_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
 				AlertUtil.showError(_messageKeys.ERROR, [_state.errorMessage]);
+				backToDefaultView();
 			} else {
 				_view.currentState = AbstractReferenceDataImportView.STATE_ERROR;
 				_view.errorsDataGrid.dataProvider = _state.errors;
@@ -322,8 +326,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateViewProcessComplete():void {
-			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
 			AlertUtil.showMessage(_messageKeys.COMPLETED, [_state.processed, _state.total]);
+			backToDefaultView();
 			loadSummaries();
 		}
 		
@@ -345,7 +349,7 @@ package org.openforis.collect.presenter {
 		
 		protected function resetView():void {
 			_state = null;
-			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
+			backToDefaultView();
 			stopProgressTimer();
 		}
 		

@@ -19,8 +19,10 @@ package org.openforis.collect.client {
 		}
 		
 		public function start(responder:IResponder, parentEntityId:int, step:CollectRecord$Step = null, 
-							  transactional:Boolean = true, validateRecords:Boolean = true):void {
-			var token:AsyncToken = _startOperation.send(parentEntityId, step, transactional, validateRecords);
+							  transactional:Boolean = true, validateRecords:Boolean = true,
+							  insertNewRecords:Boolean = false, newRecordModelVersion:String = null):void {
+			var token:AsyncToken = _startOperation.send(parentEntityId, step, transactional, validateRecords, 
+														insertNewRecords, newRecordModelVersion);
 			token.addResponder(responder);
 		}
 

@@ -103,8 +103,13 @@ public class RecordManager {
 	
 
 	@Transactional
-	public void save(CollectRecord record) throws RecordPersistenceException {
-		save(record, null);
+	public void save(CollectRecord record) {
+		try {
+			save(record, null);
+		} catch (RecordPersistenceException e) {
+			//it should never happen when record locking is not being used
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Transactional

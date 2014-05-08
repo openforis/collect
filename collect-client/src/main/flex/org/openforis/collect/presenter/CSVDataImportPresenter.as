@@ -1,8 +1,7 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.net.URLRequest;
-	import flash.net.navigateToURL;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
@@ -18,12 +17,12 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.NodeItem;
 	import org.openforis.collect.ui.view.CSVDataImportView;
 	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.DataGrids;
@@ -53,6 +52,12 @@ package org.openforis.collect.presenter
 			super.initEventListeners();
 			view.entitySelectionTree.addEventListener(ListEvent.ITEM_CLICK, entityTreeItemSelectHandler);
 			view.exportErrorsButton.addEventListener(MouseEvent.CLICK, exportErrorsClickHandler);
+			view.importType.addEventListener(Event.CHANGE, importTypeChangeHandler);
+		}
+		
+		protected function importTypeChangeHandler(event:Event):void {
+			backToDefaultView();
+			view.stepDropDownList.selectedItem = CollectRecord$Step.ENTRY;
 		}
 		
 		protected function entityTreeItemSelectHandler(event:ListEvent):void {
@@ -144,23 +149,50 @@ package org.openforis.collect.presenter
 		}
 
 		override protected function importButtonClickHandler(event:MouseEvent):void {
-			if ( view.entitySelectionTree.selectedItem == null ) {
-				AlertUtil.showError("csvDataImport.alert.selectEntity");
-			} else if ( ! NodeItem(view.entitySelectionTree.selectedItem).nodeDefinition.multiple ) {
-				AlertUtil.showError("csvDataImport.alert.selectMultipleEntity");
-			} else {
+			//validate form
+			var valid:Boolean = true;
+			var importType:String = view.importType.selectedValue as String;
+			if ( importType == CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE ) {
+				if ( view.entitySelectionTree.selectedItem == null ) {
+					AlertUtil.showError("csvDataImport.alert.selectEntity");
+					valid = false;
+				} else if ( ! NodeItem(view.entitySelectionTree.selectedItem).nodeDefinition.multiple ) {
+					AlertUtil.showError("csvDataImport.alert.selectMultipleEntity");
+					valid = false;
+				}
+			} else if ( view.formVersionDropDownList.selectedItem == null && CollectionUtil.isNotEmpty(view.formVersionDropDownList.dataProvider) ) { 
+				AlertUtil.showError("csvDataImport.alert.selectModelVersion");
+				valid = false;
+			}
+			if ( valid ) {
 				super.importButtonClickHandler(event);
 			}
 		}
 		
 		override protected function performProcessStart():void {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
-			var enityId:int = NodeItem(view.entitySelectionTree.selectedItem).id;
-			var selectedStepItem:* = view.stepDropDownList.selectedItem;
-			var selectedStep:CollectRecord$Step = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
 			var transactional:Boolean = view.transactionalCheckBox.selected;
 			var validateRecords:Boolean = view.validateRecordsCheckBox.selected;
-			_importClient.start(responder, enityId, selectedStep, transactional, validateRecords);
+			
+			var entityId:int;
+			var selectedStep:CollectRecord$Step = null;
+			var insertNewRecords:Boolean;
+			var newRecordModelVersion:String = null;
+			
+			if ( view.importType.selectedValue == CSVDataImportView.INSERT_NEW_RECORDS_TYPE ) {
+				//insert new records
+				insertNewRecords = true;
+				entityId = Application.activeRootEntity.id;
+				var version:ModelVersionProxy = view.formVersionDropDownList.selectedItem;
+				newRecordModelVersion = version == null ? null: version.getLabelText(Application.localeLanguageCode);
+			} else {
+				//update existing records
+				insertNewRecords = false;
+				entityId = NodeItem(view.entitySelectionTree.selectedItem).id;
+				var selectedStepItem:* = view.stepDropDownList.selectedItem;
+				selectedStep = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
+			}
+			_importClient.start(responder, entityId, selectedStep, transactional, validateRecords, insertNewRecords, newRecordModelVersion);
 		}
 		
 		override protected function performImportCancel():void {
@@ -192,7 +224,9 @@ package org.openforis.collect.presenter
 		
 		protected function initView():void {
 			initEntitiesTree();
+			initFormVersionsDropDown();
 			initStepsDropDown();
+			view.importType.selectedValue = CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE;
 			view.transactionalCheckBox.selected = true;
 			view.validateRecordsCheckBox.selected = true;
 		}
@@ -205,6 +239,13 @@ package org.openforis.collect.presenter
 			tree.callLater(function():void {
 				tree.expandItem(rootNodeItem, true);
 			});
+		}
+		
+		protected function initFormVersionsDropDown():void {
+			Application.activeSurvey.versions;
+			var items:IList = new ArrayCollection(Application.activeSurvey.versions.toArray());
+			var dropDownList:DropDownList = view.formVersionDropDownList;
+			dropDownList.dataProvider = items;
 		}
 		
 		protected function initStepsDropDown():void {
@@ -220,6 +261,14 @@ package org.openforis.collect.presenter
 		protected function exportErrorsClickHandler(event:MouseEvent):void {
 			DataGrids.writeToCSV(view.errorsDataGrid);
 			//navigateToURL(new URLRequest(ApplicationConstants.URL + "downloadCSVDataImportErrors.htm"), "_new");
+		}
+		
+		override protected function backToDefaultView():void {
+			if ( view.importType.selectedValue == CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE ) {
+				view.currentState = CSVDataImportView.STATE_UPDATE_EXISTING_RECORDS;
+			} else {
+				view.currentState = CSVDataImportView.STATE_INSERT_NEW_RECORDS;
+			}
 		}
 		
 	}

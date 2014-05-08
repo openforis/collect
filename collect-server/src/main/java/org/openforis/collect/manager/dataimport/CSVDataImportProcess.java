@@ -12,7 +12,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -25,6 +27,7 @@ import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.dataimport.DataLine.EntityIdentifier;
 import org.openforis.collect.manager.dataimport.DataLine.EntityKeysIdentifier;
 import org.openforis.collect.manager.dataimport.DataLine.EntityPositionIdentifier;
@@ -33,11 +36,13 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -72,36 +77,69 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "csvDataImport.error.internalErrorImportingFile";
 	private static final String NO_RECORD_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noRecordFound";
 	private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
+	private static final String ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY = "csvDataImport.error.onlyNewRecordsAllowed";
 	private static final String MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY = "csvDataImport.error.multipleParentEntityFound";
 	private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.unitNotFound";
 	private static final String SRS_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.srsNotFound";
 	private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "csvDataImport.error.recordNotInSelectedStep";
+	private static final String NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY = "csvDataImport.error.noRootEntitySelected";
+	private static final String NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noModelVersionFound";
 
 	private static final String MULTIPLE_ATTRIBUTE_VALUES_SEPARATOR = ",";
 
-	@Autowired
-	private RecordDao recordDao;
+
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private UserManager userManager;
 	
+	//parameters
+	/**
+	 * Input file
+	 */
 	private File file;
+	/**
+	 * Current survey
+	 */
 	private CollectSurvey survey;
+	/**
+	 * Record step that will be considered for insert or update
+	 */
 	private Step step;
+	/**
+	 * Entity definition that should be considered as the parent of each attribute in the csv file
+	 */
 	private int parentEntityDefinitionId;
+	/**
+	 * If true, records are validated after insert or update
+	 */
 	private boolean recordValidationEnabled;
+	/**
+	 * If true, only new records will be inserted and only root entities can be added
+	 */
+	private boolean insertNewRecords;
+	/**
+	 * When insertNewRecords is true, it indicates the name of the model version used during new record creation
+	 */
+	private String newRecordVersionName;
 
+	//transient variables
+	private User adminUser;
 	private CollectRecord lastModifiedRecordSummary;
-
 	private CollectRecord lastModifiedRecord;
+	private String sessionId;
 
 	public CSVDataImportProcess() {
 		recordValidationEnabled = true;
+		insertNewRecords = false;
+		sessionId = UUID.randomUUID().toString();
 	}
 	
 	@Override
 	public void init() {
 		super.init();
 		validateParameters();
+		adminUser = userManager.loadAdminUser();
 	}
 	
 	@Override
@@ -113,6 +151,13 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		if ( ! file.exists() || ! file.canRead() ) {
 			status.error();
 			status.setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
+		} else if ( insertNewRecords && survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId) == null ) {
+			status.error();
+			status.setErrorMessage(NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY);
+		} else if ( insertNewRecords && newRecordVersionName != null && survey.getVersion(newRecordVersionName) == null ) {
+			status.error();
+			status.setErrorMessage(NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY);
+			status.setErrorMessageArgs(new String[]{newRecordVersionName});
 		} else {
 			String fileName = file.getName();
 			String extension = FilenameUtils.getExtension(fileName);
@@ -180,18 +225,25 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void processLine(DataLine line) {
+	private void processLine(DataLine line) throws RecordPersistenceException {
 		if ( validateRecordKey(line) ) {
-			if ( step == null ) {
+			if ( insertNewRecords ) {
+				//create new record
+				EntityDefinition rootEntityDefn = survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId);
+				CollectRecord record = recordManager.create(survey, rootEntityDefn.getName(), adminUser, newRecordVersionName, sessionId);
+				setRecordKeys(line, record);
+				setValuesInRecord(line, record, Step.ENTRY);
+				insertRecord(record);
+			} else if ( step == null ) {
 				CollectRecord recordSummary = loadRecordSummary(line);
 				Step originalRecordStep = recordSummary.getStep();
 				//set values in each step data
 				for (Step currentStep : Step.values()) {
 					if ( currentStep.compareTo(originalRecordStep) <= 0  ) {
-						CollectRecord record = recordDao.load(survey, recordSummary.getId(), currentStep.getStepNumber());
+						CollectRecord record = recordManager.checkout(survey, adminUser, recordSummary.getId(), currentStep, sessionId, true);
 						setValuesInRecord(line, record, currentStep);
 						//always save record when updating multiple record steps in the same process
-						saveRecord(record, originalRecordStep, currentStep);
+						updateRecord(record, originalRecordStep, currentStep);
 					}
 				}
 			} else {
@@ -204,7 +256,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						if ( lastModifiedRecordSummary != null ) {
 							saveLastModifiedRecord();
 						}
-						record = recordDao.load(survey, recordSummary.getId(), step.getStepNumber());
+						record = recordManager.checkout(survey, adminUser, recordSummary.getId(), step, sessionId, true);
 					} else {
 						record = lastModifiedRecord;
 					}
@@ -219,17 +271,28 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void saveLastModifiedRecord() {
+	private void setRecordKeys(DataLine line, CollectRecord record) {
+		EntityDefinition rootEntityDefn = record.getRootEntity().getDefinition();
+		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
+
+		List<KeyAttributeDefinition> keyAttributeDefinitions = survey.getSchema().getKeyAttributeDefinitions(rootEntityDefn);
+		for ( int i = 0; i < keyAttributeDefinitions.size(); i ++ ) {
+			KeyAttributeDefinition keyDefn = keyAttributeDefinitions.get(i);
+			AttributeDefinition keyAttrDefn = (AttributeDefinition) keyDefn;
+			Attribute<?, ?> keyAttr = (Attribute<?, ?>) record.getNodeByPath(keyAttrDefn.getPath() ); //for record key attributes, absolute path must be equal to relative path
+			setValueInField(keyAttr, keyAttrDefn.getMainFieldName(), recordKeyValues[i], line.getLineNumber(), null);
+		}
+	}
+
+	private void saveLastModifiedRecord() throws RecordPersistenceException {
 		Step originalStep = lastModifiedRecordSummary.getStep();
-		saveRecord(lastModifiedRecord, originalStep, step);
+		updateRecord(lastModifiedRecord, originalStep, step);
 		if ( step.compareTo(originalStep) < 0 ) {
 			//reset record step to the original one
-			CollectRecord record = recordDao.load(survey, lastModifiedRecordSummary.getId(), originalStep.getStepNumber());
+			CollectRecord record = recordManager.checkout(survey, adminUser, lastModifiedRecordSummary.getId(), originalStep, sessionId, true);
 			record.setStep(originalStep);
-			if ( recordValidationEnabled ) {
-				validateRecord(record);
-			}
-			recordDao.update(record);
+			
+			updateRecord(record, originalStep, originalStep);
 		}
 	}
 	
@@ -238,24 +301,28 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		EntityDefinition parentEntityDefn = getParentEntityDefinition();
 		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-		List<CollectRecord> recordSummaries = recordDao.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
+		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
 		String[] recordKeyColumnNames = DataCSVReader.getKeyAttributeColumnNames(
 				parentEntityDefn,
 				rootEntityDefn.getKeyAttributeDefinitions());
-		if ( recordSummaries.size() == 0 ) {
-			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
-					currentRowNumber, recordKeyColumnNames, NO_RECORD_FOUND_ERROR_MESSAGE_KEY);
-			parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
-			status.addParsingError(currentRowNumber, parsingError);
-			return false;
+		String errorMessageKey = null;
+		if ( insertNewRecords ) {
+			if ( ! recordSummaries.isEmpty() ) {
+				errorMessageKey = ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY;
+			}
+		} else if ( recordSummaries.size() == 0 ) {
+			errorMessageKey = NO_RECORD_FOUND_ERROR_MESSAGE_KEY;
 		} else if ( recordSummaries.size() > 1 ) {
+			errorMessageKey = MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY;
+		}
+		if ( errorMessageKey == null ) {
+			return true;
+		} else {
 			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, 
-					currentRowNumber, recordKeyColumnNames, MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY);
+					currentRowNumber, recordKeyColumnNames, errorMessageKey);
 			parsingError.setMessageArgs(new String[]{StringUtils.join(recordKeyValues)});
 			status.addParsingError(currentRowNumber, parsingError);
 			return false;
-		} else {
-			return true;
 		}
 	}
 	
@@ -263,7 +330,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		EntityDefinition parentEntityDefn = getParentEntityDefinition();
 		EntityDefinition rootEntityDefn = parentEntityDefn.getRootEntity();
 		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
-		List<CollectRecord> recordSummaries = recordDao.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
+		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
 		CollectRecord recordSummary = recordSummaries.get(0);
 		return recordSummary;
 	}
@@ -296,13 +363,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	
 	private void setValuesInAttributes(Entity ancestorEntity, Map<FieldValueKey, String> fieldValues, 
 			Map<FieldValueKey, String> colNameByField, long row) {
-		Set<FieldValueKey> fieldValueKeys = fieldValues.keySet();
-		for (FieldValueKey fieldValueKey : fieldValueKeys) {
+		Set<Entry<FieldValueKey,String>> entrySet = fieldValues.entrySet();
+		for (Entry<FieldValueKey, String> entry : entrySet) {
+			FieldValueKey fieldValueKey = entry.getKey();
+			String strValue = entry.getValue();
 			EntityDefinition ancestorDefn = ancestorEntity.getDefinition();
 			Schema schema = ancestorDefn.getSchema();
 			AttributeDefinition attrDefn = (AttributeDefinition) schema.getDefinitionById(fieldValueKey.getAttributeDefinitionId());
 			String fieldName = fieldValueKey.getFieldName();
-			String strValue = fieldValues.get(fieldValueKey);
 			Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
 			String colName = colNameByField.get(fieldValueKey);
 			if ( attrDefn.isMultiple() ) {
@@ -434,16 +502,33 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void saveRecord(CollectRecord record, Step originalRecordStep, Step dataStep) {
+	private void updateRecord(CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
+		if ( record.getModifiedBy() == null ) {
+			record.setModifiedBy(adminUser);
+		}
+		
 		if ( dataStep == Step.ANALYSIS ) {
 			record.setStep(Step.CLEANSING);
-			recordDao.update(record);
+			recordManager.save(record, sessionId);
 			record.setStep(Step.ANALYSIS);
 		}
 		if ( recordValidationEnabled && originalRecordStep == dataStep ) {
 			validateRecord(record);
 		}
-		recordDao.update(record);
+		recordManager.save(record, sessionId);
+
+		//release lock
+		if ( originalRecordStep == dataStep ) {
+			recordManager.releaseLock(record.getId());
+		}
+	}
+	
+	private void insertRecord(CollectRecord record) throws RecordPersistenceException {
+		if ( recordValidationEnabled ) {
+			validateRecord(record);
+		}
+		recordManager.save(record);
+		recordManager.releaseLock(record.getId());
 	}
 	
 //	@SuppressWarnings("unchecked")
@@ -580,8 +665,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		List<AttributeDefinition> keyDefns = entityDefn.getKeyAttributeDefinitions();
 		for (int i = 0; i < keyDefns.size(); i++) {
 			AttributeDefinition keyDefn = keyDefns.get(i);
-			String mainFieldName = keyDefn.getMainFieldName();
-			keyValuesByField.put(new FieldValueKey(keyDefn.getId(), mainFieldName), values[i]);
+			keyValuesByField.put(new FieldValueKey(keyDefn), values[i]);
 		}
 		setValuesInAttributes(entity, keyValuesByField, colNamesByField, row);
 	}
@@ -638,6 +722,22 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	
 	public void setRecordValidationEnabled(boolean recordValidationEnabled) {
 		this.recordValidationEnabled = recordValidationEnabled;
+	}
+
+	public boolean isInsertNewRecords() {
+		return insertNewRecords;
+	}
+	
+	public void setInsertNewRecords(boolean insertNewRecords) {
+		this.insertNewRecords = insertNewRecords;
+	}
+	
+	public String getNewRecordVersionName() {
+		return newRecordVersionName;
+	}
+	
+	public void setNewRecordVersionName(String newRecordVersionName) {
+		this.newRecordVersionName = newRecordVersionName;
 	}
 	
 	static class ImportException extends Exception {

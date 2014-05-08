@@ -13,25 +13,38 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.controls.Tree;
-			
-			import spark.components.CheckBox;
-			
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.manager.referencedataimport.ParsingError$ErrorType;
 			import org.openforis.collect.manager.referencedataimport.proxy.ParsingErrorProxy;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.presenter.CSVDataImportPresenter;
 			import org.openforis.collect.util.ArrayUtil;
 			import org.openforis.collect.util.StringUtil;
 			
+			import spark.components.CheckBox;
 			import spark.components.DropDownList;
+			import spark.components.RadioButtonGroup;
 			import spark.components.gridClasses.GridColumn;
+			
+			public static const UPDATE_EXISTING_RECORDS_TYPE:String = "updateExistingRecords";
+			public static const INSERT_NEW_RECORDS_TYPE:String = "insertNewRecords";
+			
+			public static const STATE_UPDATE_EXISTING_RECORDS:String = "updateExistingRecords";
+			public static const STATE_INSERT_NEW_RECORDS:String = "insertNewRecords";
 			
 			[SkinPart(required="true", type="mx.controls.Tree")]
 			public var entitySelectionTree:Tree;
-			 
+			
+			[SkinPart(required="true", type="spark.compoenents.RadioButtonGroup")]
+			public var importType:RadioButtonGroup;
+			
+			[SkinPart(required="true", type="spark.compoenents.DropDownList")]
+			public var formVersionDropDownList:DropDownList;
+			
 			[SkinPart(required="true", type="spark.compoenents.DropDownList")]
 			public var stepDropDownList:DropDownList;
 			
@@ -69,7 +82,21 @@
 				} 
 			}
 			
+			public function formVersionLabelFunction(version:ModelVersionProxy):String {
+				return version.getLabelText(Application.localeLanguageCode);
+			}
+			
 		]]>
 	</fx:Script>
+	
+	<view:states>
+		<s:State name="default" enterState="invalidateSkinState()" />
+		<s:State name="insertNewRecords" enterState="invalidateSkinState()" />
+		<s:State name="updateExistingRecords" enterState="invalidateSkinState()" />
+		<s:State name="loading" enterState="invalidateSkinState()" />
+		<s:State name="uploading" enterState="invalidateSkinState()" />
+		<s:State name="importing" enterState="invalidateSkinState()" />
+		<s:State name="error" enterState="invalidateSkinState()" />
+	</view:states>
 	
 </view:AbstractReferenceDataImportView>

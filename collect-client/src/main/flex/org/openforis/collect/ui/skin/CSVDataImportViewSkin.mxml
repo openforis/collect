@@ -10,22 +10,28 @@
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.ui.view.CSVDataImportView;
 			import org.openforis.collect.util.AlertUtil;
 		]]>
 	</fx:Script>
+	
+	<fx:Declarations>
+		<s:RadioButtonGroup id="importType" />
+	</fx:Declarations>
 	
 	<s:states>
 		<s:State name="normal" />
 		<s:State name="disabled" />
 		<s:State name="default" />
+		<s:State name="insertNewRecords" basedOn="default" />
+		<s:State name="updateExistingRecords" basedOn="default" />
 		<s:State name="loading" />
-		<s:State name="selectFile" />
 		<s:State name="uploading" />
 		<s:State name="importing" />
 		<s:State name="error" />
 	</s:states>
 	
-	<s:VGroup includeIn="default"
+	<s:VGroup includeIn="default, insertNewRecords, updateExistingRecords"
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center"
 			  height="100%" width="100%"
@@ -37,13 +43,41 @@
 				  width="100%" height="100%"
 				  gap="30"
 				  >
+			
+			<s:HGroup>
+				<s:RadioButton id="updateRecordsRadioButton"
+							   label="{Message.get('csvDataImport.updateExistingRecords')}"
+							   value="{CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE}"
+							   group="{importType}" />
+				
+				<s:RadioButton id="insertRecordsRadioButton"
+							   label="{Message.get('csvDataImport.insertNewRecords')}"
+							   value="{CSVDataImportView.INSERT_NEW_RECORDS_TYPE}"
+							   group="{importType}" />
+			</s:HGroup>
+			
+			<s:HGroup verticalAlign="middle"
+					  visible="false"
+					  visible.insertNewRecords="true"
+					  includeInLayout="false"
+					  includeInLayout.insertNewRecords="true">
+				<s:Label text="{Message.get('csvDataImport.formVersion')}"
+						 styleName="formLabel"/>
+				<s:DropDownList id="formVersionDropDownList" 
+								labelFunction="{hostComponent.formVersionLabelFunction}" 
+								prompt="{Message.get('global.dropDownPrompt')}"
+								width="150"
+								/>
+			</s:HGroup>
+			
 			<s:HGroup verticalAlign="middle">
 				<s:Label text="{Message.get('csvDataImport.stepSelectionLabel')}"
-						 styleName="formLabel"/>
+						 styleName="formLabel" />
 				<s:DropDownList id="stepDropDownList" 
 								labelFunction="{hostComponent.stepLabelFunction}" 
 								prompt="{Message.get('global.dropDownPrompt')}"
 								width="150"
+								enabled.insertNewRecords="false"
 								/>
 			</s:HGroup>
 			
@@ -65,6 +99,7 @@
 				<mx:Tree id="entitySelectionTree"
 						 height="100%"
 						 width="100%"
+						 enabled.insertNewRecords="false"
 						 defaultLeafIcon="{null}"
 						 folderOpenIcon="{null}"
 						 folderClosedIcon="{null}"

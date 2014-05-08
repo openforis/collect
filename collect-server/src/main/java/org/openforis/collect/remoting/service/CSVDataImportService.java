@@ -37,7 +37,8 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 
 	@Secured("ROLE_ADMIN")
 	public ReferenceDataImportStatusProxy start(int parentEntityId, CollectRecord.Step step, 
-			boolean transactional, boolean validateRecords) throws DataImportExeption {
+			boolean transactional, boolean validateRecords, 
+			boolean insertNewRecords, String newRecordVersionName) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = getImportFile();
 			SessionState sessionState = sessionManager.getSessionState();
@@ -49,6 +50,8 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 			importProcess.setParentEntityDefinitionId(parentEntityId);
 			importProcess.setStep(step);
 			importProcess.setRecordValidationEnabled(validateRecords);
+			importProcess.setInsertNewRecords(insertNewRecords);
+			importProcess.setNewRecordVersionName(newRecordVersionName);
 			importProcess.init();
 			ProcessStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

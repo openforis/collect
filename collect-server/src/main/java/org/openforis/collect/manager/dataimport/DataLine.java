@@ -66,6 +66,10 @@ public class DataLine extends Line {
 		private int attributeDefinitionId;
 		private String fieldName;
 		
+		public FieldValueKey(AttributeDefinition defn) {
+			this(defn.getId(), defn.getMainFieldName());
+		}
+		
 		public FieldValueKey(int attributeDefinitionId,
 				String fieldName) {
 			super();

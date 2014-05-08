@@ -19,7 +19,6 @@
 			
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_LOADING:String = "loading";
-			public static const STATE_SELECT_FILE:String = "selectFile";
 			public static const STATE_UPLOADING:String = "uploading";
 			public static const STATE_IMPORTING:String = "importing";
 			public static const STATE_ERROR:String = "error";
@@ -154,7 +153,6 @@
 	<fx:Metadata>
 		[SkinState("default")]
 		[SkinState("loading")]
-		[SkinState("selectFile")]
 		[SkinState("uploading")]
 		[SkinState("importing")]
 		[SkinState("error")]
@@ -163,7 +161,6 @@
 	<s:states>
 		<s:State name="default" enterState="invalidateSkinState()" />
 		<s:State name="loading" enterState="invalidateSkinState()" />
-		<s:State name="selectFile" enterState="invalidateSkinState()" />
 		<s:State name="uploading" enterState="invalidateSkinState()" />
 		<s:State name="importing" enterState="invalidateSkinState()" />
 		<s:State name="error" enterState="invalidateSkinState()" />

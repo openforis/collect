@@ -17,6 +17,7 @@ public class ProcessStatus {
 	private long total;
 	private long processed;
 	private String errorMessage;
+	private Object[] errorMessageArgs;
 
 	public ProcessStatus() {
 		init();
@@ -91,6 +92,14 @@ public class ProcessStatus {
 
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
+	}
+	
+	public Object[] getErrorMessageArgs() {
+		return errorMessageArgs;
+	}
+	
+	public void setErrorMessageArgs(Object[] errorMessageArgs) {
+		this.errorMessageArgs = errorMessageArgs;
 	}
 	
 	public int getProgressPercent() {

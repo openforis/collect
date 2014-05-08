@@ -100,6 +100,10 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional) throws Exception {
+		return importCSVFile(fileName, parentEntityDefinitionId, transactional, false, null);
+	}
+	
+	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, boolean insertNewRecords, String newRecordVersionName) throws Exception {
 		File file = getTestFile(fileName);
 		CSVDataImportProcess process = (CSVDataImportProcess) beanFactory.getBean(
 				transactional ? "transactionalCsvDataImportProcess": "csvDataImportProcess");
@@ -107,6 +111,8 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		process.setSurvey(survey);
 		process.setParentEntityDefinitionId(parentEntityDefinitionId);
 		process.setStep(null);
+		process.setInsertNewRecords(insertNewRecords);
+		process.setNewRecordVersionName(newRecordVersionName);
 		process.init();
 		try {
 			process.call();
@@ -317,6 +323,33 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	@Test
+	public void newRecordsTest() throws Exception {
+		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
+		CSVDataImportProcess process = importCSVFile(VALID_TEST_CSV, clusterDefn.getId(), true, true, "2.0");
+
+		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
+		assertTrue(status.isComplete());
+		assertEquals(3, status.getProcessed());
+		
+		{
+			CollectRecord reloadedRecord = loadRecord("10_111");
+			Entity cluster = reloadedRecord.getRootEntity();
+			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
+			RealValue plotDistanceVal = plotDistance.getValue();
+			assertEquals(Double.valueOf(200d), plotDistanceVal.getValue());
+			assertEquals(meterUnit, plotDistanceVal.getUnit());
+		}
+		{
+			CollectRecord reloadedRecord = loadRecord("10_114");
+			Entity cluster = reloadedRecord.getRootEntity();
+			RealAttribute plotDistance = (RealAttribute) cluster.getChild("plot_distance");
+			RealValue plotDistanceVal = plotDistance.getValue();
+			assertEquals(Double.valueOf(0.3d), plotDistanceVal.getValue());
+			assertEquals(kilometerUnit, plotDistanceVal.getUnit());
+		}
+	}
+	
+	@Test
 	public void createMissingParentEntityTest() throws Exception {
 		{
 			CollectRecord record = createTestRecord(survey, "10_111");
@@ -423,6 +456,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	
 	private CollectRecord loadRecord(String key) {
 		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", key);
+		assertEquals(1, summaries.size());
 		CollectRecord summary = summaries.get(0);
 		CollectRecord reloadedRecord = recordDao.load(survey, summary.getId(), summary.getStep().getStepNumber());
 		return reloadedRecord;
