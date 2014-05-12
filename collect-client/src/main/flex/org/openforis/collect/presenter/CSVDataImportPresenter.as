@@ -14,6 +14,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.CSVDataImportClient;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -148,27 +149,37 @@ package org.openforis.collect.presenter
 			return MessageKeys(_messageKeys);
 		}
 
-		override protected function importButtonClickHandler(event:MouseEvent):void {
+		override protected function fileReferenceSelectHandler(event:Event):void {
+			var importType:String = view.importType.selectedValue as String;
+			if ( importType == CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE ) {
+				confirmUploadStart(messageKeys.CONFIRM_IMPORT);
+			} else {
+				//when inserting new records, do not ask for confirmation
+				startUpload();
+			}
+		}
+		
+		override protected function checkCanImport():Boolean {
 			//validate form
-			var valid:Boolean = true;
 			var importType:String = view.importType.selectedValue as String;
 			if ( importType == CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE ) {
 				if ( view.entitySelectionTree.selectedItem == null ) {
 					AlertUtil.showError("csvDataImport.alert.selectEntity");
-					valid = false;
+					return false;
 				} else if ( ! NodeItem(view.entitySelectionTree.selectedItem).nodeDefinition.multiple ) {
 					AlertUtil.showError("csvDataImport.alert.selectMultipleEntity");
-					valid = false;
+					return false;
+				} else {
+					return true;
 				}
 			} else if ( view.formVersionDropDownList.selectedItem == null && CollectionUtil.isNotEmpty(view.formVersionDropDownList.dataProvider) ) { 
 				AlertUtil.showError("csvDataImport.alert.selectModelVersion");
-				valid = false;
-			}
-			if ( valid ) {
-				super.importButtonClickHandler(event);
+				return false;
+			} else {
+				return true;
 			}
 		}
-		
+
 		override protected function performProcessStart():void {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
 			var transactional:Boolean = view.transactionalCheckBox.selected;
@@ -184,7 +195,7 @@ package org.openforis.collect.presenter
 				insertNewRecords = true;
 				entityId = Application.activeRootEntity.id;
 				var version:ModelVersionProxy = view.formVersionDropDownList.selectedItem;
-				newRecordModelVersion = version == null ? null: version.getLabelText(Application.localeLanguageCode);
+				newRecordModelVersion = version == null ? null: version.name;
 			} else {
 				//update existing records
 				insertNewRecords = false;
@@ -211,6 +222,13 @@ package org.openforis.collect.presenter
 		
 		override protected function updateStatus():void {
 			_importClient.getStatus(_getStatusResponder);
+		}
+		
+		override protected function updateViewProcessComplete():void {
+			super.updateViewProcessComplete();
+			//reload record summaries
+			var uiEvent:UIEvent = new UIEvent(UIEvent.RELOAD_RECORD_SUMMARIES);
+			eventDispatcher.dispatchEvent(uiEvent);
 		}
 		
 		override protected function loadInitialData():void {
@@ -246,6 +264,11 @@ package org.openforis.collect.presenter
 			var items:IList = new ArrayCollection(Application.activeSurvey.versions.toArray());
 			var dropDownList:DropDownList = view.formVersionDropDownList;
 			dropDownList.dataProvider = items;
+			
+			//if only one model version is defined, select it
+			if ( items.length == 1 ) {
+				dropDownList.selectedIndex = 0;
+			}
 		}
 		
 		protected function initStepsDropDown():void {

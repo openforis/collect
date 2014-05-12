@@ -177,7 +177,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceSelectHandler(event:Event):void {
-			AlertUtil.showConfirm(_messageKeys.CONFIRM_IMPORT, null, 
+			confirmUploadStart(_messageKeys.CONFIRM_IMPORT);
+		}
+		
+		protected function confirmUploadStart(message:String):void {
+			AlertUtil.showConfirm(message, null, 
 				_messageKeys.CONFIRM_IMPORT_TITLE,
 				startUpload);
 		}
