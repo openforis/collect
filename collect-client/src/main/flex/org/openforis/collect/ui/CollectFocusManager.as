@@ -18,6 +18,8 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.util.ArrayUtil;
+	import org.openforis.collect.util.CollectionUtil;
 
 
 	/**
@@ -163,7 +165,9 @@ package org.openforis.collect.ui {
 		
 		public static function isFieldFocusable(field:FieldProxy):Boolean {
 			var attrDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(field.parent.definition);
-			if ( attrDefn is CodeAttributeDefinitionProxy && 
+			if ( ArrayUtil.notContains( attrDefn.visibleFields, field.name ) ) {
+				return false;
+			} else if ( attrDefn is CodeAttributeDefinitionProxy && 
 					( CodeAttributeDefinitionProxy(attrDefn).enumeratingAttribute || field.index > 0 ) ) {
 				return false;
 			} else if ( attrDefn is NumberAttributeDefinitionProxy && NumberAttributeDefinitionProxy(attrDefn).units.length <= 1 && field.index > 0) {

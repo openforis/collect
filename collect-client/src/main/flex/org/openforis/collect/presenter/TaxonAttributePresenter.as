@@ -20,7 +20,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -85,14 +88,14 @@ package org.openforis.collect.presenter {
 		
 		protected function inputFieldFocusOutHandler(event:FocusEvent):void {
 			var inputField:InputField = event.target.document;
-			if ( inputField != null && inputField.changed ) {
-				if ( ! autoCompletePopUpOpened && ! UIUtil.isFocussed(autoCompletePopUp) ) {
-					inputField.presenter.updateValue();
-					if ( inputField != view.codeTextInput && ! inputField.isEmpty() && 
+			if ( inputField != null && inputField.changed && ! autoCompletePopUpOpened && ! UIUtil.isFocussed(autoCompletePopUp) ) {
+				inputField.presenter.updateValue();
+				var defn:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(view.attributeDefinition);
+				
+				if ( defn.codeVisible && inputField != view.codeTextInput && ! inputField.isEmpty() && 
 						(view.codeTextInput.isEmpty() || FieldProxy.isShortCutForReasonBlank(view.codeTextInput.text)) ) {
-						view.codeTextInput.text = UNLISTED_ITEM.code;
-						view.codeTextInput.presenter.updateValue();
-					}
+					view.codeTextInput.text = UNLISTED_ITEM.code;
+					view.codeTextInput.presenter.updateValue();
 				}
 			}
 		}
@@ -124,7 +127,13 @@ package org.openforis.collect.presenter {
 					_lastSearchType = null;
 			}
 			if(_lastSearchType != null) {
-				showAutoCompletePopUp(_lastSearchType, inputField, view.codeTextInput);
+				var defn:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(view.attributeDefinition)
+				var alignField:InputField = 
+					defn.codeVisible ? view.codeTextInput:
+					defn.scientificNameVisible ? view.scientificNameTextInput:
+					defn.vernacularNameVisible ? view.vernacularNameTextInput:
+					null;
+				showAutoCompletePopUp(_lastSearchType, inputField, alignField);
 			}
 		}
 		
@@ -184,6 +193,8 @@ package org.openforis.collect.presenter {
 				autoCompletePopUp.addEventListener(FlexMouseEvent.MOUSE_DOWN_OUTSIDE, autoCompleteMouseDownOutsideHandler);
 				autoCompletePopUp.addEventListener(TaxonInputFieldEvent.TAXON_SELECT, taxonSelectHandler);
 			}
+			autoCompletePopUp.taxonAttributeDefinition = TaxonAttributeDefinitionProxy(inputField.attributeDefinition);
+			
 			if(! autoCompletePopUpOpened) {
 				PopUpManager.addPopUp(autoCompletePopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
 				
@@ -270,26 +281,41 @@ package org.openforis.collect.presenter {
 		
 		public function performSelectTaxon(taxonOccurrence:Object):void {
 			_lastSelectedTaxon = taxonOccurrence;
-			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
-			//update code
-			view.codeTextInput.text = taxonOccurrence.code;
-			reqSet.addRequest(view.codeTextInput.presenter.createValueUpdateRequest());
+			var defn:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(view.attributeDefinition);
 			
-			if ( ( taxonOccurrence != UNKNOWN_ITEM && taxonOccurrence != UNLISTED_ITEM )  || 
-				_lastSearchType != SEARCH_BY_SCIENTIFIC_NAME && _lastSearchType != SEARCH_BY_VERNACULAR_NAME ) {
-				//update scientific name
-				view.scientificNameTextInput.text = taxonOccurrence.scientificName;
-				//update vernacular name
-				view.vernacularNameTextInput.text = taxonOccurrence.vernacularName;
-				//update language code
-				view.languageAutocomplete.text = taxonOccurrence.language;
-				//update language variety
-				view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
+			if ( defn.codeVisible ) {
+				//update code
+				view.codeTextInput.text = taxonOccurrence.code;
 			}
+			//when searching by code or unlisted/unknown item has been selected, replace fields text
+			if ( _lastSearchType == SEARCH_BY_CODE || 
+					( taxonOccurrence != UNKNOWN_ITEM && taxonOccurrence != UNLISTED_ITEM ) ) {
+				if ( defn.scientificNameVisible ) {
+					//update scientific name
+					view.scientificNameTextInput.text = taxonOccurrence.scientificName;
+				}
+				if ( defn.vernacularNameVisible ) {
+					//update vernacular name
+					view.vernacularNameTextInput.text = taxonOccurrence.vernacularName;
+				}
+				if ( defn.languageCodeVisible ) {
+					//update language code
+					view.languageAutocomplete.text = taxonOccurrence.language;
+				}
+				if ( defn.languageVarietyVisible ) {
+					//update language variety
+					view.languageVarietyTextInput.text = taxonOccurrence.languageVariety;
+				}
+			}
+			//prepare request set
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
+			
+			reqSet.addRequest(view.codeTextInput.presenter.createValueUpdateRequest());
 			reqSet.addRequest(view.scientificNameTextInput.presenter.createValueUpdateRequest());
 			reqSet.addRequest(view.vernacularNameTextInput.presenter.createValueUpdateRequest());
 			reqSet.addRequest(view.languageAutocomplete.presenter.createValueUpdateRequest());
 			reqSet.addRequest(view.languageVarietyTextInput.presenter.createValueUpdateRequest());
+			
 			ClientFactory.dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		

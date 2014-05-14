@@ -15,8 +15,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
@@ -38,6 +42,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.CollectFocusManager;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.InputFieldContextMenu;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -177,9 +182,9 @@ package org.openforis.collect.presenter {
 				var attr:AttributeProxy = AttributeProxy(node);
 				var r:NodeUpdateRequestProxy;
 				var field:FieldProxy;
-				if(isNaN(fieldIdx) || fieldIdx < 0){
+				if ( isNaN(fieldIdx) || fieldIdx < 0 ) {
 					for(var index:int = 0; index < attr.fields.length; index ++) {
-						if ( ! skippedField(attr, index) ) {
+						if ( visibleField(attr, index) ) {
 							field = attr.fields[index];
 							if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
 								r = createUpdateSymbolOperation(node, field, index, symbol);
@@ -211,6 +216,17 @@ package org.openforis.collect.presenter {
 			return r;
 		}
 		
+		private static function visibleField(attr:AttributeProxy, index:int):Boolean {
+			if ( skippedField(attr, index) ) {
+				return false;
+			} else {
+				var defn:AttributeDefinitionProxy = AttributeDefinitionProxy(attr.definition);
+				var visibleFields:Array = defn.visibleFields;
+				var field:FieldProxy = FieldProxy(attr.fields.getItemAt(index));
+				return ArrayUtil.contains(visibleFields, field.name);
+			}
+		}
+				
 		private static function skippedField(attr:AttributeProxy, index:int):Boolean {
 			if ( attr.definition is NumberAttributeDefinitionProxy && index == 1 || 
 				attr.definition is RangeAttributeDefinitionProxy && index == 2 ) {

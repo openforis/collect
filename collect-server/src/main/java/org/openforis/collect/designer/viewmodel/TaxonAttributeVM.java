@@ -12,10 +12,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SpeciesManager;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
@@ -141,6 +143,20 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 			result.add(taxonomy.getName());
 		}
 		return result;
+	}
+	
+	public List<String[]> getVisibleFieldsTemplates() {
+		List<String[]> result = new ArrayList<String[]>(UIOptions.TAXON_VISIBLE_FIELDS_TEMPLATES);
+		result.add(0, editedItem.getFieldNames().toArray(new String[0])); //show all fields option
+		return result;
+	}
+	
+	public String getVisibleFieldsTemplateLabel(String[] template) {
+		if ( template == null || template.length == editedItem.getFieldDefinitions().size() ) {
+			return Labels.getLabel("survey.schema.attribute.visible_fields.all_item");
+		} else {
+			return StringUtils.join(template, UIOptions.VISIBLE_FIELDS_SEPARATOR);
+		}
 	}
 	
 	public List<String> getQualifiers() {

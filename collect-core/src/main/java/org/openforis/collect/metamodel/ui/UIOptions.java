@@ -2,9 +2,11 @@ package org.openforis.collect.metamodel.ui;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE_URI;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -36,9 +39,28 @@ public class UIOptions implements ApplicationOptions, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	public static final String VISIBLE_FIELDS_SEPARATOR = ",";
+	
 	private static final String TABSET_NAME_PREFIX = "tabset_";
 	private static final String TAB_NAME_PREFIX = "tab_";
 
+	public static final List<String[]> TAXON_VISIBLE_FIELDS_TEMPLATES = Arrays.asList(
+		new String[] {
+				CODE_FIELD_NAME,
+				SCIENTIFIC_NAME_FIELD_NAME,
+				VERNACULAR_NAME_FIELD_NAME
+		}
+		,
+		new String[] {
+				CODE_FIELD_NAME,
+				SCIENTIFIC_NAME_FIELD_NAME
+		}
+		,
+		new String[] {
+				VERNACULAR_NAME_FIELD_NAME
+		}
+	);
+	
 	public enum Annotation {
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
 		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB)),
@@ -47,7 +69,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
 		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE)),
-		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER));
+		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER)),
+		VISIBLE_FIELDS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.VISIBLE_FIELDS));
 		
 		private QName qName;
 
@@ -576,6 +599,33 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			value = fieldsOrder.name().toLowerCase();
 		}
 		defn.setAnnotation(Annotation.FIELDS_ORDER.getQName(), value);
+	}
+	
+	public boolean isVisibleField(AttributeDefinition defn, String field) {
+		String[] visibleFields = getVisibleFields(defn);
+		return Arrays.asList(visibleFields).contains(field);
+	}
+	
+	public String[] getVisibleFields(AttributeDefinition defn) {
+		String value = defn.getAnnotation(Annotation.VISIBLE_FIELDS.getQName());
+		if ( StringUtils.isBlank(value) ) {
+			//when no annotation is specified, all fields are visible
+			return defn.getFieldNames().toArray(new String[0]);
+		} else {
+			String[] fields = value.split(VISIBLE_FIELDS_SEPARATOR);
+			return fields;
+		}
+	}
+	
+	public void setVisibleFields(AttributeDefinition defn, String[] fields) {
+		String value;
+		if ( fields == null || fields.length == defn.getFieldNames().size() ) {
+			//do not store annotation value when all fields are visible
+			value = null;
+		} else {
+			value = StringUtils.join(fields, VISIBLE_FIELDS_SEPARATOR);
+		}
+		defn.setAnnotation(Annotation.VISIBLE_FIELDS.getQName(), value);
 	}
 	
 	public boolean getShowRowNumbersValue(EntityDefinition defn) {

@@ -16,7 +16,8 @@
 		<include id="attributeCommonInclude"
 			src="survey_edit/schema/attribute_common.zul" 
             otherGeneralDetailsForm="survey_edit/schema/attribute_taxon_other_general_form.zul"
-            otherAttributesForm="survey_edit/schema/attribute_taxon_other_attributes_form.zul"  />
+            otherAttributesForm="survey_edit/schema/attribute_taxon_other_attributes_form.zul"
+            otherLayoutForm="survey_edit/schema/attribute_taxon_layout_part.zul"  />
 
 	</vlayout>
 </zk>

@@ -20,6 +20,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
@@ -75,7 +76,6 @@ package org.openforis.collect.ui {
 	import spark.layouts.HorizontalLayout;
 	import spark.layouts.VerticalLayout;
 	import spark.layouts.supportClasses.LayoutBase;
-	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	
 	/**
 	 * @author Mino Togna
@@ -248,9 +248,33 @@ package org.openforis.collect.ui {
 				return result;
 			} else if(def is TaxonAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
-					return 504;
+					var total:int = 0;
+					var visibleFieldsCount:int = 0;
+					var taxonDefn:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(def);
+					if ( taxonDefn.codeVisible ) {
+						total += TaxonAttributeRenderer.CODE_WIDTH;
+						visibleFieldsCount ++;
+					}
+					if ( taxonDefn.scientificNameVisible ) {
+						total += TaxonAttributeRenderer.SCIENTIFIC_NAME_WIDTH;
+						visibleFieldsCount ++;
+					}
+					if ( taxonDefn.vernacularNameVisible ) {
+						total += TaxonAttributeRenderer.VERNACULAR_NAME_WIDTH;
+						visibleFieldsCount ++;
+					}
+					if ( taxonDefn.languageCodeVisible ) {
+						total += TaxonAttributeRenderer.LANGUAGE_CODE_WIDTH;
+						visibleFieldsCount ++;
+					}
+					if ( taxonDefn.languageVarietyVisible ) {
+						total += TaxonAttributeRenderer.LANGUAGE_VARIETY_WIDTH;
+						visibleFieldsCount ++;
+					}
+					total += COMPOSITE_ATTRIBUTE_H_GAP * (visibleFieldsCount - 1);
+					return total;
 				} else {
-					return 100;
+					return TaxonAttributeRenderer.SCIENTIFIC_NAME_WIDTH;
 				}
 			} else if(def is TextAttributeDefinitionProxy) {
 				var textAttributeDef:TextAttributeDefinitionProxy = TextAttributeDefinitionProxy(def);
@@ -474,25 +498,36 @@ package org.openforis.collect.ui {
 			var l:Label;
 			var defnLabel:String = defn.getNumberAndHeadingLabelText();
 			if(defn is TaxonAttributeDefinitionProxy) {
+				var taxonAttr:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(defn);
 				//attribute label
 				l = getLabel(defnLabel, 100, HEADER_LABEL_STYLE, directionByColumns);
 				result.addElement(l);
 				//subheader
-				l = getLabel(Message.get('edit.taxon.code'), 80, HEADER_LABEL_STYLE, directionByColumns);
-				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				compositeAttributeLabelsGroup.addElement(l);
-				l = getLabel(Message.get('edit.taxon.scientificName'), 100, HEADER_LABEL_STYLE, directionByColumns);
-				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				compositeAttributeLabelsGroup.addElement(l);
-				l = getLabel(Message.get('edit.taxon.vernacularName'), 100, HEADER_LABEL_STYLE, directionByColumns);
-				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				compositeAttributeLabelsGroup.addElement(l);
-				l = getLabel(Message.get('edit.taxon.languageCode'), 100, HEADER_LABEL_STYLE, directionByColumns);
-				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				compositeAttributeLabelsGroup.addElement(l);
-				l = getLabel(Message.get('edit.taxon.languageVariety'), 100, HEADER_LABEL_STYLE, directionByColumns);
-				l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				compositeAttributeLabelsGroup.addElement(l);
+				if ( taxonAttr.codeVisible ) {
+					l = getLabel(Message.get('edit.taxon.code'), TaxonAttributeRenderer.CODE_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					compositeAttributeLabelsGroup.addElement(l);
+				}
+				if ( taxonAttr.scientificNameVisible ) {
+					l = getLabel(Message.get('edit.taxon.scientificName'), TaxonAttributeRenderer.SCIENTIFIC_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					compositeAttributeLabelsGroup.addElement(l);
+				}
+				if ( taxonAttr.vernacularNameVisible ) {
+					l = getLabel(Message.get('edit.taxon.vernacularName'), TaxonAttributeRenderer.VERNACULAR_NAME_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					compositeAttributeLabelsGroup.addElement(l);
+				}
+				if ( taxonAttr.languageCodeVisible ) {
+					l = getLabel(Message.get('edit.taxon.languageCode'), TaxonAttributeRenderer.LANGUAGE_CODE_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					compositeAttributeLabelsGroup.addElement(l);
+				}
+				if ( taxonAttr.languageVarietyVisible ) {
+					l = getLabel(Message.get('edit.taxon.languageVariety'), TaxonAttributeRenderer.LANGUAGE_VARIETY_WIDTH, HEADER_LABEL_STYLE, directionByColumns);
+					l.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					compositeAttributeLabelsGroup.addElement(l);
+				}
 				result.addElement(compositeAttributeLabelsGroup);
 			} else if(defn is CoordinateAttributeDefinitionProxy) {
 				//attribute label

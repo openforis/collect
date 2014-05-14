@@ -1,0 +1,22 @@
+<zk>
+  <custom-attributes parentEntity="${arg.parentEntity}" />
+  
+  <grid class="inner">
+    <columns>
+      <column width="150px" />
+      <column width="100%" />
+    </columns>
+    <rows>
+      <row>
+        <label value="${labels.survey.schema.attribute.visible_fields.label}:" />
+        <listbox width="300px" model="@load(vm.visibleFieldsTemplates)"
+			selectedItem="@bind(fx.visibleFields)" mold="select"
+			onSelect="@command('applyChanges')">
+			<template name="model">
+				<listitem value="each" label="@load(vm.getVisibleFieldsTemplateLabel(each))" />
+			</template>
+		</listbox>
+      </row>
+    </rows>
+  </grid>
+</zk>

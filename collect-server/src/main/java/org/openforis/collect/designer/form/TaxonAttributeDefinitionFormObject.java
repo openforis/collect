@@ -6,6 +6,7 @@ package org.openforis.collect.designer.form;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
@@ -19,6 +20,8 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	private String taxonomy;
 	private String highestRank;
 	private List<String> qualifiers;
+	//TODO move to AttributeDefinitionFormObject
+	private String[] visibleFields;
 	
 	TaxonAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -30,6 +33,8 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		taxonomy = source.getTaxonomy();
 		highestRank = source.getHighestTaxonRank() == null ? null: source.getHighestTaxonRank().getName();
 		qualifiers = new ArrayList<String>(source.getQualifiers());
+		UIOptions uiOptions = getUIOptions(source);
+		visibleFields = uiOptions.getVisibleFields(source);
 	}
 
 	@Override
@@ -38,6 +43,8 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 		dest.setTaxonomy(taxonomy);
 		dest.setHighestTaxonRank(TaxonRank.fromName(highestRank));
 		dest.setQualifiers(qualifiers);
+		UIOptions uiOptions = getUIOptions(dest);
+		uiOptions.setVisibleFields(dest, visibleFields);
 	}
 
 	public String getTaxonomy() {
@@ -62,6 +69,14 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 
 	public void setQualifiers(List<String> qualifiers) {
 		this.qualifiers = qualifiers;
+	}
+	
+	public String[] getVisibleFields() {
+		return visibleFields;
+	}
+	
+	public void setVisibleFields(String[] visibleFields) {
+		this.visibleFields = visibleFields;
 	}
 
 }

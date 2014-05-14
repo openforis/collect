@@ -26,5 +26,6 @@ public interface UIOptionsConstants {
 	String NAME = "name";
 	String TYPE = "type";
 	String LABEL = "label";
+	String VISIBLE_FIELDS = "visibleFields";
 	
 }

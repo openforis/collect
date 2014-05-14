@@ -50,6 +50,10 @@ package org.openforis.collect.util
 			return false;
 		}
 		
+		public static function notContains(array:Object, value:*):Boolean {
+			return ! contains(array, value);
+		}
+		
 		public static function moveItem(array:Object, indexFrom:int, indexTo:int):int {
 			var newIndex:int;
 			if(array is IList) {

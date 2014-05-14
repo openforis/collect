@@ -73,6 +73,10 @@ package org.openforis.collect.util
 			}
 		}
 		
+		public static function notContains(list:IList, item:Object, keyProperty:String = null):Boolean {
+			return ! contains(list, item, keyProperty);
+		}
+		
 		public static function containsItemWith(list:IList, propertyName:String, value:*):Boolean {
 			var item:Object = getItem(list, propertyName, value);
 			return item != null;

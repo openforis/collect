@@ -14,8 +14,11 @@
 			
 			import org.openforis.collect.event.TaxonInputFieldEvent;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 			import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 			import org.openforis.collect.util.ObjectUtil;
+			
+			private var _taxonAttributeDefinition:TaxonAttributeDefinitionProxy;
 			
 			public function itemClickHandler(event:MouseEvent=null):void {
 				if(dataGrid.selectedItem!=null) {
@@ -24,6 +27,16 @@
 					dispatchEvent(taxonEvent);
 				}
 			}
+			
+			[Bindable]
+			public function get taxonAttributeDefinition():TaxonAttributeDefinitionProxy {
+				return _taxonAttributeDefinition;
+			}
+			
+			public function set taxonAttributeDefinition(value:TaxonAttributeDefinitionProxy):void {
+				_taxonAttributeDefinition = value;
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -40,23 +53,28 @@
 			<s:ArrayList>
 				<s:GridColumn headerText="{Message.get('edit.taxon.code')}" 
 							  dataField="code" 
-							  width="83" 
+							  width="{TaxonAttributeRenderer.CODE_WIDTH + 3}" 
+							  visible="{taxonAttributeDefinition.codeVisible}"
 							  />
 				<s:GridColumn headerText="{Message.get('edit.taxon.scientificName')}" 
 							  dataField="scientificName" 
-							  width="106" 
-							  />
+							  width="{TaxonAttributeRenderer.SCIENTIFIC_NAME_WIDTH + 6}" 
+							  visible="{taxonAttributeDefinition.scientificNameVisible}"
+							   />
 				<s:GridColumn headerText="{Message.get('edit.taxon.vernacularName')}" 
 							  dataField="vernacularName" 
-							  width="106" 
+							  width="{TaxonAttributeRenderer.VERNACULAR_NAME_WIDTH + 6}" 
+							  visible="{taxonAttributeDefinition.vernacularNameVisible}"
 							  />
 				<s:GridColumn headerText="{Message.get('edit.taxon.language')}" 
 							  dataField="language" 
-							  width="106" 
+							  width="{TaxonAttributeRenderer.LANGUAGE_CODE_WIDTH + 6}" 
+							  visible="{taxonAttributeDefinition.languageCodeVisible}"
 							  />
 				<s:GridColumn headerText="{Message.get('edit.taxon.languageVariety')}" 
 							  dataField="languageVariety" 
-							  width="103" 
+							  width="{TaxonAttributeRenderer.LANGUAGE_VARIETY_WIDTH + 3}" 
+							  visible="{taxonAttributeDefinition.languageVarietyVisible}"
 							  />
 			</s:ArrayList>
 		</s:columns>

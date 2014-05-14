@@ -30,5 +30,30 @@ public class TaxonAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		TaxonRank rank = attributeDefn.getHighestTaxonRank();
 		return rank == null ? null: rank.getName();
 	}
+	
+	@ExternalizedProperty
+	public boolean isCodeVisible() {
+		return isFieldVisible(TaxonAttributeDefinition.CODE_FIELD_NAME);
+	}
+
+	@ExternalizedProperty
+	public boolean isScientificNameVisible() {
+		return isFieldVisible(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME);
+	}
+
+	@ExternalizedProperty
+	public boolean isVernacularNameVisible() {
+		return isFieldVisible(TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME);
+	}
+
+	@ExternalizedProperty
+	public boolean isLanguageCodeVisible() {
+		return isFieldVisible(TaxonAttributeDefinition.LANGUAGE_CODE_FIELD_NAME);
+	}
+
+	@ExternalizedProperty
+	public boolean isLanguageVarietyVisible() {
+		return isFieldVisible(TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME);
+	}
 
 }

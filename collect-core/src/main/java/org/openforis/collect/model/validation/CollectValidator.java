@@ -7,9 +7,12 @@ import java.util.List;
 
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.CodeParentValidator;
@@ -178,13 +181,18 @@ public class CollectValidator extends Validator {
 		} else {
 			fieldCount = attribute.getFieldCount();
 		}
-
+		AttributeDefinition defn = attribute.getDefinition();
+		CollectSurvey survey = (CollectSurvey) defn.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		
 		for ( int i = 0 ; i < fieldCount ; i++ ) {
 			Field<?> field = attribute.getField(i);
-			Character symbolCode = field.getSymbol();
-			FieldSymbol symbol = FieldSymbol.valueOf(symbolCode);
-			if ( symbol == null || !symbol.isReasonBlank() ) {
-				return false;
+			boolean visible = uiOptions.isVisibleField(defn, field.getName());
+			if ( visible ) {
+				FieldSymbol symbol = FieldSymbol.valueOf(field.getSymbol());
+				if ( symbol == null || !symbol.isReasonBlank() ) {
+					return false;
+				}
 			}
 		}
 		return true;

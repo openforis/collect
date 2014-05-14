@@ -16,13 +16,14 @@ import org.openforis.idm.model.Field;
  */
 public class FieldProxy implements Proxy {
 
+	private String name;
 	private Object value;
 	private FieldSymbol symbol;
 	private String remarks;
 
 	public FieldProxy(Field<?> field) {
 		super();
-		
+		name = field.getName();
 		value = field.getValue();
 		if(field.getSymbol() != null) {
 			symbol = FieldSymbol.valueOf(field.getSymbol());
@@ -40,6 +41,10 @@ public class FieldProxy implements Proxy {
 			}
 		}
 		return proxies;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public Object getValue() {
