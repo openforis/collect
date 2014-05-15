@@ -1,7 +1,6 @@
 package org.openforis.collect.io.data;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,27 +32,25 @@ public class BackupDataExtractor implements Closeable {
 	protected static final String IDML_FILE_NAME = "idml.xml";
 
 	//params
+	protected ZipFile zipFile;
 	private CollectSurvey survey;
-	protected File file;
 	private Step step;
 	
 	//transient
 	private boolean initialized;
-	protected ZipFile zipFile;
 	protected Enumeration<? extends ZipEntry> zipEntries;
 	private BackupFileExtractor fileExtractor;
 	private DataUnmarshaller dataUnmarshaller;
 	private boolean oldFormat;
 
-	public BackupDataExtractor(CollectSurvey survey, File file, Step step) {
+	public BackupDataExtractor(CollectSurvey survey, ZipFile zipFile, Step step) {
 		this.survey = survey;
-		this.file = file;
+		this.zipFile = zipFile;
 		this.initialized = false;
 		this.step = step;
 	}
 
 	public void init() throws ZipException, IOException {
-		this.zipFile = new ZipFile(file);
 		this.fileExtractor = new BackupFileExtractor(zipFile);
 		this.oldFormat = this.fileExtractor.isOldFormat();
 		this.dataUnmarshaller = new DataUnmarshaller(new DataHandler(survey));

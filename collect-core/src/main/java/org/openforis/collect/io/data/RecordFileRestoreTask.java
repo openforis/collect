@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.io.data;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ public class RecordFileRestoreTask extends Task {
 	private RecordFileManager recordFileManager;
 	
 	//input
-	private File file;
+	private ZipFile zipFile;
 	private CollectSurvey survey;
 	private List<Integer> entryIdsToImport;
 	private boolean overwriteAll;
@@ -47,14 +46,7 @@ public class RecordFileRestoreTask extends Task {
 	//temporary instance variables
 	private List<Integer> processedRecords;
 	private BackupFileExtractor backupFileExtractor;
-	private ZipFile zipFile;
 	private boolean oldBackupFormat;
-	
-	@Override
-	protected void initInternal() throws Throwable {
-		this.zipFile = new ZipFile(file);
-		super.initInternal();
-	}
 	
 	@Override
 	protected void execute() throws Throwable {
@@ -100,7 +92,7 @@ public class RecordFileRestoreTask extends Task {
 		for (int i = steps.length - 1; i >= 0; i--) {
 			Step step = steps[i];
 			BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId, oldBackupFormat);
-			BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, file, step);
+			BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, zipFile, step);
 			backupDataExtractor.init();
 			ParseRecordResult parseRecordResult = backupDataExtractor.findRecord(recordEntry);
 			if ( parseRecordResult != null ) {

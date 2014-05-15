@@ -58,7 +58,6 @@ public class DataImportService {
 	@Secured("ROLE_ADMIN")
 	public JobProxy startSummaryCreation(String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
-			resetJobs();
 			
 			SessionState sessionState = sessionManager.getSessionState();
 			
@@ -68,10 +67,12 @@ public class DataImportService {
 			DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
 			job.setFile(packagedFile);
 			job.setSurveyUri(selectedSurveyUri);
+
+			resetJobs();
+			this.summaryJob = job;
 			
 			jobManager.start(job);
 			
-			this.summaryJob = job;
 		}
 		return getCurrentJob();
 	}
@@ -86,10 +87,10 @@ public class DataImportService {
 			job.setEntryIdsToImport(entryIdsToImport);
 			job.setRestoreUploadedFiles(true);
 			
-			jobManager.start(job);
-			
 			resetJobs();
 			this.dataRestoreJob = job;
+			
+			jobManager.start(job);
 		}
 		return getCurrentJob();
 	}

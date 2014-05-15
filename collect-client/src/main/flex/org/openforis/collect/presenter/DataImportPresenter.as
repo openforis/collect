@@ -292,12 +292,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			if(_job == null || _job.pending || 
-				(_firstOpen && ! _job.running) ) {
+			if ( _job == null || _job.pending || (_firstOpen && ! _job.running) ) {
 				resetView();
 			} else {
 				_view.currentState = DataImportView.STATE_LOADING;
-				startProgressTimer();
 				switch ( _job.status ) {
 					case JobProxy$Status.PENDING:
 						_view.currentState = DataImportView.STATE_LOADING;
@@ -320,68 +318,16 @@ package org.openforis.collect.presenter {
 						}
 						break;
 					case JobProxy$Status.FAILED:
-						resetView();
 						AlertUtil.showError("dataImport.error", [_job.errorMessage]);
+						resetView();
 						break;
 					case JobProxy$Status.ABORTED:
-						resetView();
-						AlertUtil.showError("dataImport.cancelled");
-						break;
-					default:
-						resetView();
-				}
-				/*
-				var mainStep:DataImportState$MainStep = _state.mainStep;
-				var subStep:DataImportState$SubStep = _state.subStep;
-				switch ( subStep ) {
-					case DataImportState$SubStep.INITED:
-						switch ( mainStep ) {
-							case DataImportState$MainStep.SUMMARY_CREATION:
-								resetView();
-								break;
-							case DataImportState$MainStep.IMPORT:
-								updateViewSummaryCompleted();
-								break;
-						}
-						break;
-					case DataImportState$SubStep.PREPARING:
-						_view.currentState = DataImportView.STATE_LOADING;
-						startProgressTimer();
-						break;
-					case DataImportState$SubStep.RUNNING:
-						switch ( mainStep ) {
-							case DataImportState$MainStep.SUMMARY_CREATION:
-								updateViewForCreatingSummary();
-								break;
-							case DataImportState$MainStep.IMPORT:
-								updateViewForImporting();
-								break;
-						}
-						startProgressTimer();
-						break;
-					case DataImportState$SubStep.COMPLETE:
-						stopProgressTimer();
-						switch ( mainStep ) {
-							case DataImportState$MainStep.SUMMARY_CREATION:
-								updateViewSummaryCompleted();
-								break;
-							case DataImportState$MainStep.IMPORT:
-								updateViewImportCompleted();
-								break;
-						}
-						break;
-					case DataImportState$SubStep.ERROR:
-						AlertUtil.showError("dataImport.error", [_state.errorMessage]);
-						resetView();
-						break;
-					case DataImportState$SubStep.CANCELLED:
 						AlertUtil.showError("dataImport.cancelled");
 						resetView();
 						break;
 					default:
 						resetView();
 				}
-				*/
 			}
 			_firstOpen = false;
 		}
@@ -426,9 +372,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function resetView():void {
+			stopProgressTimer();
 			_job = null;
 			_view.currentState = DataImportView.STATE_DEFAULT;
-			stopProgressTimer();
 		}
 		
 		protected function showImportWarningsPopUp(event:DataImportEvent):void {
