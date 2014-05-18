@@ -13,22 +13,21 @@ public class RecordValidationReportItem {
 
 	private Integer nodeId;
 	private String path;
+	private String prettyFormatPath;
 	private ValidationResultFlag severity;
 	private String message;
 	
-	public RecordValidationReportItem(Integer nodeId, String path,
+	public RecordValidationReportItem(String path, String prettyFormatPath, ValidationResultFlag severity,
+			String message) {
+		this(null, path, prettyFormatPath, severity, message);
+	}
+
+	public RecordValidationReportItem(Integer nodeId, String path, String prettyFormatPath,
 			ValidationResultFlag severity, String message) {
 		super();
 		this.nodeId = nodeId;
 		this.path = path;
-		this.severity = severity;
-		this.message = message;
-	}
-
-	public RecordValidationReportItem(String path, ValidationResultFlag severity,
-			String message) {
-		super();
-		this.path = path;
+		this.prettyFormatPath = prettyFormatPath;
 		this.severity = severity;
 		this.message = message;
 	}
@@ -41,6 +40,10 @@ public class RecordValidationReportItem {
 		return path;
 	}
 
+	public String getPrettyFormatPath() {
+		return prettyFormatPath;
+	}
+	
 	public ValidationResultFlag getSeverity() {
 		return severity;
 	}

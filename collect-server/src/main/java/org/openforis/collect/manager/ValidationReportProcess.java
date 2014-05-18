@@ -25,7 +25,7 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
  */
 public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus> {
 
-	private static final String[] VALIDATION_REPORT_HEADERS = new String[] {"Record","Phase","Field","Error message"};
+	private static final String[] VALIDATION_REPORT_HEADERS = new String[] {"Record","Phase","Field path","Field path (labels)","Error message"};
 
 	private static Log LOG = LogFactory.getLog(ValidationReportProcess.class);
 	
@@ -124,7 +124,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(
 				ValidationResultFlag.ERROR, includeConfirmedErrors);
 		for (RecordValidationReportItem item : validationItems) {
-			writeValidationReportLine(record, item.getPath(), item.getMessage());
+			writeValidationReportLine(record, item);
 		}
 	}
 	
@@ -136,10 +136,10 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		}
 	}
 
-	protected void writeValidationReportLine(CollectRecord record, String path, String message) {
+	protected void writeValidationReportLine(CollectRecord record, RecordValidationReportItem item) {
 		String recordKey = validationMessageBuilder.getRecordKey(record);
 		String phase = record.getStep().name();
-		String[] line = new String[]{recordKey, phase, path, message};
+		String[] line = new String[]{recordKey, phase, item.getPath(), item.getPrettyFormatPath(), item.getMessage()};
 		switch (reportType) {
 		case CSV:
 			csvWriter.writeNext(line);
