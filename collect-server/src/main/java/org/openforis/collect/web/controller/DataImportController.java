@@ -1,15 +1,16 @@
 package org.openforis.collect.web.controller;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.web.controller.upload.UploadItem;
 import org.springframework.stereotype.Controller;
@@ -27,7 +28,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 @Controller
 public class DataImportController {
 
-	//private static Log LOG = LogFactory.getLog(DataImportController.class);
+	private static Log LOG = LogFactory.getLog(DataImportController.class);
 
 	private static final String IMPORT_PATH = "import";
 
@@ -36,8 +37,17 @@ public class DataImportController {
 	@RequestMapping(value = "/uploadData.htm", method = RequestMethod.POST)
 	public @ResponseBody String uploadData(UploadItem uploadItem, BindingResult result, HttpServletRequest request, @RequestParam String sessionId) 
 			throws IOException, SurveyImportException {
+		LOG.info("Uploading data file...");
 		File file = creteTempFile(request, sessionId);
-		writeToFile(uploadItem, file);
+		
+		LOG.info("Writing file: " + file.getAbsolutePath());
+		
+		//copy upload item to temp file
+		CommonsMultipartFile fileData = uploadItem.getFileData();
+		InputStream is = fileData.getInputStream();
+		FileUtils.copyInputStreamToFile(is, file);
+		
+		LOG.info("Data file succeffully written");
 		return "ok";
 	}
 
@@ -57,20 +67,5 @@ public class DataImportController {
 		file.createNewFile();
 		return file;
 	}
-	
-	private void writeToFile(UploadItem uploadItem, File file) throws IOException {
-		CommonsMultipartFile fileData = uploadItem.getFileData();
-		InputStream is = fileData.getInputStream();
-		OutputStream out=new FileOutputStream(file);
-		byte buf[]=new byte[1024];
-		int len;
-		while ( ( len=is.read(buf) ) > 0 ) {
-			out.write(buf,0,len);
-		}
-		out.close();
-		is.close();
-	}
 
 }
-
-

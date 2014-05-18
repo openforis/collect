@@ -11,6 +11,8 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
@@ -49,11 +51,12 @@ import org.zkoss.zul.Window;
 public class SurveyImportVM extends SurveyBaseVM {
 
 	private static final String SURVEY_NAME_FIELD = "surveyName";
-	private static final String ZIP_CONTENT = "application/zip";
 	private static final String XML_CONTENT = "text/xml";
-	private static final String[] ALLOWED_UPLOAD_FILE_CONTENT = new String[] {ZIP_CONTENT, XML_CONTENT};
+	private static final String ZIP_CONTENT = "application/zip";
+	private static final String ZIP_CONTENT_COMPRESSED = "application/x-zip-compressed";
+	private static final String[] ALLOWED_UPLOAD_FILE_CONTENT = new String[] {ZIP_CONTENT, ZIP_CONTENT_COMPRESSED, XML_CONTENT};
 	
-	//private static final Log log = Log.lookup(SurveyImportVM.class);
+	private static final Log log = LogFactory.getLog(SurveyImportVM.class);
 	
 	@WireVariable
 	private SurveyManager surveyManager;
@@ -183,6 +186,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			updateForm();
 			prepareSurveyImport(true);
 		} else {
+			log.warn("Trying to upload invalid survey backup file. Content type: " + contentType);
 			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
 		}
 	}

@@ -192,12 +192,12 @@ public class DataHandler extends DefaultHandler {
 		if ( StringUtils.isNotBlank(recordVersionName) ) {
 			ModelVersion recordVersion = recordSurvey.getVersion(recordVersionName);
 			if ( recordVersion == null ) {
-				throw new IllegalArgumentException("Record version not found in the survey");
+				throw new IllegalArgumentException(String.format("Record version with name %s not found in the survey", recordVersionName));
 			}
 			int versionId = recordVersion.getId();
 			ModelVersion version = currentSurvey.getVersionById(versionId);
 			if ( version == null ) {
-				throw new IllegalArgumentException("Record version not found in the current survey");
+				throw new IllegalArgumentException(String.format("Record version with id %d not found in the current survey", versionId));
 			}
 			versionName = version.getName();
 		}
