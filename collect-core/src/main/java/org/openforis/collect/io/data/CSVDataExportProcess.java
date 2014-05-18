@@ -34,6 +34,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.utils.OpenForisIOUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -148,7 +149,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	}
 
 	private void exportData(OutputStream outputStream, int entityId) throws InvalidExpressionException, IOException, RecordPersistenceException {
-		Writer outputWriter = new OutputStreamWriter(outputStream);
+		Writer outputWriter = new OutputStreamWriter(outputStream, OpenForisIOUtils.UTF_8);
 		DataTransformation transform = getTransform(entityId);
 		
 		@SuppressWarnings("resource")
