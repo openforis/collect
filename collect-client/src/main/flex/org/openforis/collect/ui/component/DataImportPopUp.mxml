@@ -22,7 +22,7 @@
 			<s:Label text="{Message.get('dataImport.fileFormat')}"
 					  styleName="formLabel"/>
 			
-			<s:DropDownList id="typeDropDownList" selectedIndex="0">
+			<s:DropDownList id="typeDropDownList" selectedIndex="0" width="150">
 				<mx:ArrayCollection>
 					<fx:String>-- Select one --</fx:String>
 					<fx:String>From XML (Backup)</fx:String>
