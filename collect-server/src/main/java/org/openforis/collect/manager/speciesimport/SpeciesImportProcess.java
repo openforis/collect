@@ -37,6 +37,8 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  */
 public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportStatus> {
 
+	private static final String RAW_SCIENTIFIC_NAME_TREE_NODE_METADATA = "rawScientificName";
+	private static final String LINE_NUMBER_TREE_NODE_METADATA = "lineNumber";
 	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
 	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
 	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
@@ -308,7 +310,9 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			taxon = new Taxon();
 			taxon.setTaxonRank(rank);
 			taxon.setScientificName(normalizedScientificName);
-			taxonTree.addNode(parent, taxon);
+			Node node = taxonTree.addNode(parent, taxon);
+			node.addMetadata(LINE_NUMBER_TREE_NODE_METADATA, line.getLineNumber());
+			node.addMetadata(RAW_SCIENTIFIC_NAME_TREE_NODE_METADATA, line.getRawScientificName());
 		} else if (mostSpecificRank) {
 			checkDuplicateScientificName(line, parent, normalizedScientificName);
 		}
@@ -326,17 +330,14 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 
 	protected void checkDuplicates(SpeciesLine line, String code,
 			Integer taxonId) throws ParsingException {
-		long lineNumber = line.getLineNumber();
 		Node foundNode = null;
 		foundNode = taxonTree.getNodeByTaxonId(taxonId);
 		if ( foundNode != null ) {
-			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, SpeciesFileColumn.NO.getColumnName());
-			throw new ParsingException(error);
+			throwDuplicateRowParsingException(line, SpeciesFileColumn.NO, foundNode);
 		}
 		foundNode = taxonTree.getNodeByCode(code);
 		if ( foundNode != null ) {
-			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, lineNumber, SpeciesFileColumn.CODE.getColumnName());
-			throw new ParsingException(error);
+			throwDuplicateRowParsingException(line, SpeciesFileColumn.CODE, foundNode);
 		}
 	}
 
@@ -344,9 +345,14 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			String normalizedScientificName) throws ParsingException {
 		Node duplicateNode = taxonTree.getDuplicateScienfificNameNode(parent, normalizedScientificName);
 		if ( duplicateNode != null ) {
-			ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName());
-			throw new ParsingException(error);
+			throwDuplicateRowParsingException(line, SpeciesFileColumn.SCIENTIFIC_NAME, duplicateNode);
 		}
+	}
+
+	protected void throwDuplicateRowParsingException(SpeciesLine line, SpeciesFileColumn column, Node foundNode) throws ParsingException {
+		ParsingError error = new ParsingError(ErrorType.DUPLICATE_VALUE, line.getLineNumber(), column.getColumnName());
+		error.setMessageArgs(new String[] {foundNode.getMetadata(LINE_NUMBER_TREE_NODE_METADATA).toString()});
+		throw new ParsingException(error);
 	}
 
 }

@@ -72,16 +72,16 @@
 			
 			public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
 				var messageKey:String = getErrorMessageKey(item);
-				var messageArgs:Array = item.messageArgs;
-				if ( StringUtil.isBlank(item.message) ) {
-					switch (item.errorType) {
-						case ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS:
-							messageArgs = [StringUtil.concat(", ", item.messageArgs)];
-							break;
+				if ( messageKey == null ) {
+					if ( StringUtil.isBlank(item.message) ) {
+						return "";
+					} else {
+						return item.message;
 					}
+				} else {
+					var message:String = Message.get(messageKey, item.messageArgs);
+					return message;
 				}
-				var message:String = Message.get(messageKey, messageArgs);
-				return message;
 			}
 			
 			protected function getErrorMessageKey(item:ParsingErrorProxy):String {
@@ -90,8 +90,10 @@
 						return "referenceDataImport.parsingError.type.wrong_column_name.message";
 					case ParsingError$ErrorType.MISSING_REQUIRED_COLUMNS:
 						return "referenceDataImport.parsingError.type.missing_required_columns.message";
+					case ParsingError$ErrorType.DUPLICATE_VALUE:
+						return "referenceDataImport.parsingError.type.duplicate_value.message";
 					default:
-						return item.message;
+						return null;
 				}
 			}
 			
