@@ -213,3 +213,8 @@ button.icon {
 	text-align: right;
 	display: inline-block;
 }
+
+.z-panel.without-header .z-panel-tl, 
+.z-panel.without-header .z-panel-hl {
+	display: none;
+}

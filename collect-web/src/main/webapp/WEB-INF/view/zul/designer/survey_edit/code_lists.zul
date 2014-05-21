@@ -132,59 +132,66 @@
 			        	<center border="none">
 			        		<borderlayout vflex="true">
 			        			<center>
+		        					<!-- levels container -->
 			        				<hlayout children="@load(vm.listLevels)"
 			        					hflex="true"
 			        					vflex="true"
 			        					style="overflow: auto;">
 			        					<template name="children">
-			        						<groupbox closable="false"
-			        							contentStyle="padding: 0px"
-			        							mold="@load(fx.type eq 'HIERARCHICAL' ? '3d': '')"
+	        								<!-- code list items per level container -->
+			        						<panel closable="false"
+			        							sizable="true"
+			        							border="normal" 
 			        							vflex="true"
-			        							width="180px">
+			        							sclass="@load(fx.type eq 'HIERARCHICAL' ? '': 'without-header')"
+			        							width="300px">
 			        							<caption
 			        								visible="@load(fx.type eq 'HIERARCHICAL' ? true: false)">
 			        								<fieldErrorHandler
 			        									message="@load(vmsgs[vm.getHierarchyLevelNameValidationKey(forEachStatus.index)])">
 				        								<textbox inplace="true"
 				        									width="100%" 
+				        									style="padding-right: 12px;"
 				        									value="@bind(each.name) @validator(vm.getHierarchyLevelNameValidator(forEachStatus.index))" />
 		        									</fieldErrorHandler>
 			        							</caption>
-			        							<listbox
-			        								model="@load(vm.itemsPerLevel[forEachStatus.index])"
-			        								vflex="true"
-			        								selectedItem="@load(vm.lastSelectedLevelIndex ge forEachStatus.index ? 
-														       vm.selectedItemsPerLevel[forEachStatus.index]: null)"
-			        								onSelect="@command('listItemSelected', item=self.selectedItem.value, levelIndex=forEachStatus.index)">
-			        								<listhead>
-			        									<listheader />
-			        									<listheader width="20px" />
-			        								</listhead>
-			        								<template
-			        									name="model">
-			        									<listitem
-			        										draggable="level_${each.depth}"
-			        										droppable="level_${each.depth}"
-			        										onDrop="@command('moveChildItem')">
-			        										<listcell 
-			        											onDoubleClick="@command('editCodeListItem', item=each)">
-			        											<label width="100%" sclass="nowrap"
-			        												value="@load(c:cat3(each.code, ' - ', vm.getCodeListItemLabel(each)))" />
-			        										</listcell>
-			        										<listcell
-			        											style="padding: 0px">
-			        											<image visible="@load(vm.hasChildItems(each))"
-			        												src="@load(vm.hasChildItems(each) ? 
-																				(vm.isCodeListItemSelected(each) ? 
-																					'/assets/images/arrow-right-selected-small.png': 
-																					'/assets/images/arrow-right-small.png'
-																				): '')" />
-			        										</listcell>
-			        									</listitem>
-			        								</template>
-			        							</listbox>
-			        							<toolbar height="25px">
+			        							<panelchildren>
+				        							<listbox
+				        								model="@load(vm.itemsPerLevel[forEachStatus.index])"
+				        								vflex="true"
+				        								selectedItem="@load(vm.lastSelectedLevelIndex ge forEachStatus.index ? 
+															       vm.selectedItemsPerLevel[forEachStatus.index]: null)"
+				        								onSelect="@command('listItemSelected', item=self.selectedItem.value, levelIndex=forEachStatus.index)">
+				        								<listhead>
+				        									<listheader />
+				        									<listheader width="20px" />
+				        								</listhead>
+				        								<template
+				        									name="model">
+				        									<listitem
+				        										draggable="level_${each.depth}"
+				        										droppable="level_${each.depth}"
+				        										onDrop="@command('moveChildItem')">
+				        										<listcell 
+				        											onDoubleClick="@command('editCodeListItem', item=each)">
+				        											<label width="100%" sclass="nowrap"
+				        												value="@load(c:cat3(each.code, ' - ', vm.getCodeListItemLabel(each)))" />
+				        										</listcell>
+				        										<listcell
+				        											style="padding: 0px">
+				        											<image visible="@load(vm.hasChildItems(each))"
+				        												src="@load(vm.hasChildItems(each) ? 
+																					(vm.isCodeListItemSelected(each) ? 
+																						'/assets/images/arrow-right-selected-small.png': 
+																						'/assets/images/arrow-right-small.png'
+																					): '')" />
+				        										</listcell>
+				        									</listitem>
+				        								</template>
+				        							</listbox>
+				        						</panelchildren>
+				        						<!-- action buttons toolbar -->
+			        							<toolbar height="30px">
 			        								<toolbarbutton
 			        									image="/assets/images/add-small.png"
 			        									tooltiptext="${labels.survey.code_list.add_child_item}"
@@ -201,7 +208,7 @@
 			        									visible="@load(empty vm.editedItem.lookupTable and forEachStatus.index le vm.lastSelectedLevelIndex)"
 			        									onClick="@command('deleteCodeListItem', item=vm.selectedItemsPerLevel[forEachStatus.index])" />
 			        							</toolbar>
-			        						</groupbox>
+			        						</panel>
 			        					</template>
 			        				</hlayout>
 			        			</center>
@@ -222,20 +229,20 @@
 			        		</borderlayout>
 			        	</center>
 			        	<south>
-		      					<box  
-		      						align="center" 
-		      						width="100%">
-		      						<hbox spacing="100px">
-			       						<button
-			       							label="${labels.global.import_data}"
-			       							visible="@load(empty vm.editedItem.lookupTable)"
-			       							onClick="@command('openCodeListImportPopUp')" />
-			       						<button
-			       							label="${labels.global.export_data}"
-			       							visible="@load(empty vm.editedItem.lookupTable)"
-			       							onClick="@command('exportCodeList')" />
-			       					</hbox>
-		      					</box>
+	      					<box  
+	      						align="center" 
+	      						width="100%">
+	      						<hbox spacing="100px">
+		       						<button
+		       							label="${labels.global.import_data}"
+		       							visible="@load(empty vm.editedItem.lookupTable)"
+		       							onClick="@command('openCodeListImportPopUp')" />
+		       						<button
+		       							label="${labels.global.export_data}"
+		       							visible="@load(empty vm.editedItem.lookupTable)"
+		       							onClick="@command('exportCodeList')" />
+		       					</hbox>
+	      					</box>
 			        	</south>
 			        </borderlayout>
 				</absolutechildren>
