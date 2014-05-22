@@ -299,6 +299,7 @@ public class TaxonTree {
 		Taxon taxon;
 		List<Node> children;
 		List<TaxonVernacularName> vernacularNames;
+		Map<String, Object> metadata;
 		
 		public Node(Node parent, Taxon taxon) {
 			this(parent.getTree(), taxon);
@@ -347,6 +348,21 @@ public class TaxonTree {
 				vernacularNames = new ArrayList<TaxonVernacularName>();
 			}
 			vernacularNames.add(vernacularName);
+		}
+		
+		public void addMetadata(String key, Object value) {
+			if ( metadata == null ) {
+				metadata = new HashMap<String, Object>();
+			}
+			metadata.put(key, value);
+		}
+		
+		public Object getMetadata(String key) {
+			if ( metadata == null ) {
+				return null;
+			} else {
+				return metadata.get(key);
+			}
 		}
 		
 		public TaxonTree getTree() {

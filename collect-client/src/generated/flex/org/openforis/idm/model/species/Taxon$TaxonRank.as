@@ -15,9 +15,11 @@ package org.openforis.idm.model.species {
 
         public static const FAMILY:Taxon$TaxonRank = new Taxon$TaxonRank("FAMILY", _);
         public static const GENUS:Taxon$TaxonRank = new Taxon$TaxonRank("GENUS", _);
+        public static const SERIES:Taxon$TaxonRank = new Taxon$TaxonRank("SERIES", _);
         public static const SPECIES:Taxon$TaxonRank = new Taxon$TaxonRank("SPECIES", _);
         public static const SUBSPECIES:Taxon$TaxonRank = new Taxon$TaxonRank("SUBSPECIES", _);
         public static const VARIETY:Taxon$TaxonRank = new Taxon$TaxonRank("VARIETY", _);
+        public static const FORM:Taxon$TaxonRank = new Taxon$TaxonRank("FORM", _);
 
         function Taxon$TaxonRank(value:String = null, restrictor:* = null) {
             super((value || FAMILY.name), restrictor);
@@ -28,7 +30,7 @@ package org.openforis.idm.model.species {
         }
 
         public static function get constants():Array {
-            return [FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY];
+            return [FAMILY, GENUS, SERIES, SPECIES, SUBSPECIES, VARIETY, FORM];
         }
 
         public static function valueOf(name:String):Taxon$TaxonRank {

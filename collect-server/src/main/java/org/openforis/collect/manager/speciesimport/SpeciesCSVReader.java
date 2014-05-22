@@ -4,7 +4,9 @@
 package org.openforis.collect.manager.speciesimport;
 
 import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.FORM;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.SERIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
@@ -163,6 +165,9 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 				case GENUS:
 					taxonRank = GENUS;
 					break;
+				case Series:
+					taxonRank = SERIES;
+					break;
 				case SPECIES:
 					taxonRank = SPECIES;
 					break;
@@ -171,6 +176,9 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 					break;
 				case VARIETY:
 					taxonRank = VARIETY;
+					break;
+				case Form:
+					taxonRank = FORM;
 					break;
 				default:
 					taxonRank = SPECIES;
