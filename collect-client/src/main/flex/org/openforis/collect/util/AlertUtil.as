@@ -2,9 +2,12 @@ package org.openforis.collect.util
 {
 	import mx.controls.Alert;
 	import mx.events.CloseEvent;
+	import mx.rpc.Fault;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.Images;
+	import org.openforis.collect.ui.component.BlockingMessagePopUp;
 
 	/**
 	 * @author S. Ricci
@@ -57,6 +60,17 @@ package org.openforis.collect.util
 				}
 			}
 		}
-			
+		
+		public static function showBlockingMessage(messageKey:String, error:Error):void {
+			if(! Application.serverOffline) {
+				var message:String = Message.get(messageKey);
+				var now:String = new Date().toString();
+				var details:String = StringUtil.concat("\n\n", now, error.name, error.toString());
+				BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, details, Images.ERROR);
+			}
+			Application.serverOffline = true;
+			Application.activeRecord = null;
+		}
+		
 	}
 }

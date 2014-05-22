@@ -57,6 +57,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.view.MasterView;
 	import org.openforis.collect.ui.component.user.ChangePasswordPopUp;
 	import mx.events.CloseEvent;
+	import flash.events.UncaughtErrorEvent;
+	import flash.events.ErrorEvent;
+	import mx.rpc.Fault;
 	
 	/**
 	 * 
@@ -104,6 +107,9 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
 			eventDispatcher.addEventListener(UIEvent.TOGGLE_DETAIL_VIEW_SIZE, toggleDetailViewSizeHandler);
 			eventDispatcher.addEventListener(UIEvent.CHECK_VIEW_SIZE, checkViewSizeHandler);
+			
+			//add uncaught error hanlder
+			_view.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 			
 			CONFIG::debugging {
 				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
@@ -410,6 +416,22 @@ package org.openforis.collect.presenter {
 				var surveyDefaultLocale:Locale = new Locale(survey.defaultLanguageCode);
 				Application.locale = surveyDefaultLocale;
 			}
+		}
+		
+		private function uncaughtErrorHandler(event:UncaughtErrorEvent):void {
+			var error:Error;
+			if ( event.error is Error ) {
+				error = event.error as Error;
+			} else if ( event.error is ErrorEvent ) {
+				var errorEvent:ErrorEvent = event.error as ErrorEvent;
+				error = new Error(errorEvent.toString());
+				error.name = "fault_event";
+			} else {
+				// a non-Error, non-ErrorEvent type was thrown and uncaught
+				error = new Error(event.error);
+				error.name = "unknown";
+			}
+			AlertUtil.showBlockingMessage("global.error.uncaught", error);
 		}
 
 	}

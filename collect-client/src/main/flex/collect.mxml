@@ -10,7 +10,7 @@
 			   width="100%" 
 			   height="100%" 
 			   
-			   creationComplete="creationCompleteHandler(event)" 
+			   applicationComplete="applicationCompleteHandler(event)"
 			   initialize="initializeHandler(event)"
 			   currentState="default"
 			   >
@@ -32,9 +32,10 @@
 				org.openforis.collect.Application.init();
 			}
 			
-			protected function creationCompleteHandler(event:FlexEvent):void {
+			protected function applicationCompleteHandler(event:FlexEvent):void {
 				this._collectPresenter = new CollectPresenter(this);
 			}
+			
 			
 		]]>
 	</fx:Script>
@@ -81,6 +82,7 @@
 				<!--<view:Footer id="footer" width="100%"  />-->
 			</s:VGroup>
 		</s:Group>
+		
 	</s:Group>
 	
 	<s:VGroup includeIn="fullScreen" 

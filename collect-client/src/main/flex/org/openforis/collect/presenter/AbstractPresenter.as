@@ -4,6 +4,7 @@ package org.openforis.collect.presenter {
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	
+	import mx.rpc.Fault;
 	import mx.rpc.events.FaultEvent;
 	
 	import org.openforis.collect.Application;
@@ -64,25 +65,14 @@ package org.openforis.collect.presenter {
 					AlertUtil.showError("error.missingRootEntityKeys");
 					break;
 				case "org.openforis.collect.manager.DatabaseVersionNotCompatibleException":
-					showBlockingMessage("error.databaseVersionNotCompatible", event);
+					AlertUtil.showBlockingMessage("error.databaseVersionNotCompatible", event.fault);
 					break;
 				case "Channel.Call.Failed":
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
 				default:
-					showBlockingMessage("global.faultHandlerMsg", event);
+					AlertUtil.showBlockingMessage("global.faultHandlerMsg", event.fault);
 			}
-		}
-		
-		internal static function showBlockingMessage(messageKey:String, event:FaultEvent):void {
-			if(! Application.serverOffline) {
-				var message:String = Message.get(messageKey);
-				var now:String = new Date().toString();
-				var details:String = StringUtil.concat("\n\n", now, event.fault.faultCode, event.fault.faultDetail);
-				BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, details, Images.ERROR);
-			}
-			Application.serverOffline = true;
-			Application.activeRecord = null;
 		}
 		
 		internal function initEventListeners():void {}
