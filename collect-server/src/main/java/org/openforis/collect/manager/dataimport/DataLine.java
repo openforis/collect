@@ -2,6 +2,7 @@ package org.openforis.collect.manager.dataimport;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class DataLine extends Line {
 	
 	public DataLine() {
 		ancestorIdentifierByDefinitionId = new HashMap<Integer, EntityIdentifier<?>>();
-		fieldValues = new HashMap<FieldValueKey, String>();
+		fieldValues = new LinkedHashMap<FieldValueKey, String>();
 		columnNameByField = new HashMap<FieldValueKey, String>();
 	}
 	
