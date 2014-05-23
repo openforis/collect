@@ -26,11 +26,6 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	}
 
 	@ExternalizedProperty
-	public boolean isKey() {
-		return attributeDefinition.isKey();
-	}
-
-	@ExternalizedProperty
 	public boolean isAllowUnlisted() {
 		return attributeDefinition.isAllowUnlisted();
 	}
