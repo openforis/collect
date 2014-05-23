@@ -18,21 +18,34 @@
 			/>
 	</component:layout>
 	
+	<fx:Metadata>
+		[Event(name="apply", type="flash.events.Event")]
+	</fx:Metadata>
+	
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
+			import mx.collections.IList;
+			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
 			
-			private var _fields:ArrayCollection;
+			private var _fields:IList;
 			
 			[Bindable]
-			public function get fields():ArrayCollection {
+			public function get fields():IList {
 				return _fields;
 			}
 			
-			public function set fields(value:ArrayCollection):void {
+			public function set fields(value:IList):void {
 				_fields = value;
+			}
+			
+			protected function textInputEnterHandler(event:FlexEvent):void {
+				dispatchEvent(new Event("apply"));
+			}
+			
+			protected function applyButtonClickHandler(event:MouseEvent):void {
+				dispatchEvent(new Event("apply"));
 			}
 			
 		]]>
@@ -44,8 +57,10 @@
 				<detail:FormItemLabel nodeDefinition="{fieldsRp.currentItem as NodeDefinitionProxy}"
 									  width="120"
 									  />
-				<input:TextInput id="textInput"
-								 width="80"/>
+				<input:TextInput id="textInput" 
+								 width="80" 
+								 enter="textInputEnterHandler(event)"
+								 />
 			</mx:HBox>
 		</mx:Repeater>
 	</mx:VBox>
@@ -57,7 +72,8 @@
 		<s:Button id="applyButton" 
 				  buttonMode="true" 
 				  useHandCursor="true"
-				  label="{Message.get('global.apply')}"/>
+				  label="{Message.get('global.apply')}"
+				  click="applyButtonClickHandler(event)"/>
 	</s:HGroup>
 	
 </component:PopUp>

@@ -30,6 +30,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
@@ -256,21 +257,29 @@ package org.openforis.collect.presenter {
 			var application:DisplayObject = DisplayObject(FlexGlobals.topLevelApplication);
 			_filterPopUp = RecordFilterPopUp(PopUpManager.createPopUp(application, RecordFilterPopUp));
 			_filterPopUp.addEventListener(CloseEvent.CLOSE, filterPopUpCloseHandler);
-			_filterPopUp.applyButton.addEventListener(MouseEvent.CLICK, filterPopUpApplyHandler);
-			PopUpManager.addPopUp(_filterPopUp, application);
-			var keyAttributeDefinitions:IList = Application.activeRootEntity.keyAttributeDefinitions;
-			_filterPopUp.fieldsRp.dataProvider = keyAttributeDefinitions;
-			for(var index:int = 0; index < _filterPopUp.textInput.length; index ++) {
-				var textInput:TextInput = _filterPopUp.textInput[index];
-				textInput.addEventListener(FlexEvent.ENTER, filterPopUpApplyHandler);
-			}
-			PopUpUtil.alignToField(_filterPopUp, _view.openFilterPopUpButton, 
-				PopUpUtil.POSITION_BELOW, 
-				PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
-				PopUpUtil.HORIZONTAL_ALIGN_RIGHT);
+			_filterPopUp.addEventListener("apply", filterPopUpApplyHandler);
 			
-			var firstTextInput:TextInput = _filterPopUp.textInput[0];
-			firstTextInput.setFocus();
+			//focus on first field when the repeater finishes to create the input fields
+			_filterPopUp.fieldsRp.addEventListener(FlexEvent.REPEAT_END, function(event:FlexEvent):void {
+				var firstTextInput:TextInput = _filterPopUp.textInput[0];
+				firstTextInput.setFocus();
+			});
+
+			var schema:SchemaProxy = Application.activeSurvey.schema;
+			var keyAttributeDefinitions:IList = schema.getKeyAttributeDefinitions(Application.activeRootEntity);
+
+			if ( CollectionUtil.isEmpty(keyAttributeDefinitions) ) {
+				AlertUtil.showError("list.error.missingRootEntityKeys");
+			} else {
+				_filterPopUp.fields = keyAttributeDefinitions;
+	
+				PopUpManager.addPopUp(_filterPopUp, application);
+	
+				PopUpUtil.alignToField(_filterPopUp, _view.openFilterPopUpButton, 
+					PopUpUtil.POSITION_BELOW, 
+					PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
+					PopUpUtil.HORIZONTAL_ALIGN_RIGHT);
+			}
 		}
 		
 		protected function stageClickHandler(event:MouseEvent):void {

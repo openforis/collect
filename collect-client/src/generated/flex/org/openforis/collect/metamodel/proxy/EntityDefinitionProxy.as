@@ -9,6 +9,7 @@ package org.openforis.collect.metamodel.proxy {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
+	import org.openforis.collect.model.Queue;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.UIUtil;
 
@@ -44,14 +45,24 @@ package org.openforis.collect.metamodel.proxy {
 			return result;
 		}
 		
+		/**
+		 * Returns all the key attribute definitions of this entity
+		 * (it looks for key attribute defitions even in nested single entities)
+		 */
 		public function get keyAttributeDefinitions():IList {
-			var list:ArrayCollection = new ArrayCollection();
-			for each(var nodeDef:NodeDefinitionProxy in childDefinitions) {
-				if(nodeDef is AttributeDefinitionProxy && (nodeDef as AttributeDefinitionProxy).key) {
-					list.addItem(nodeDef);
+			var result:ArrayCollection = new ArrayCollection();
+			var queue:Queue = new Queue();
+			queue.pushAll(childDefinitions.toArray());
+			while ( ! queue.isEmpty() ) {
+				var nodeDef:NodeDefinitionProxy = queue.pop();
+				if ( nodeDef is AttributeDefinitionProxy && AttributeDefinitionProxy(nodeDef).key ) {
+					result.addItem(nodeDef);
+				} else if ( nodeDef is EntityDefinitionProxy && ! (nodeDef.multiple) ) {
+					var singleEntity:EntityDefinitionProxy = EntityDefinitionProxy(nodeDef);
+					queue.pushAll(singleEntity.childDefinitions.toArray());
 				}
 			}
-			return list;
+			return result;
 		}
 		
 		public function isRoot():Boolean {
