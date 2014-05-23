@@ -313,18 +313,25 @@ public class RelationalSchemaGenerator {
 	}
 	
 	private void addDataColumns(RelationalSchema rs, DataTable table, AttributeDefinition defn, Path relativePath) throws CollectRdbException {
-		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
 		if ( defn instanceof CodeAttributeDefinition ) {
 			addDataColumns(rs, table, (CodeAttributeDefinition) defn, relativePath);
 		} else if ( defn instanceof NumericAttributeDefinition ) {
 			addDataColumns(table, (NumericAttributeDefinition) defn, relativePath);
 		} else if ( defn instanceof DateAttributeDefinition || 
 					defn instanceof TimeAttributeDefinition ) {
+			//create date or time type column
 			addDataColumn(table, defn, relativePath);
+			//add even one column for each field
+			addDataColumnsForEachField(table, defn, relativePath);
 		} else {
-			for (FieldDefinition<?> field : fieldDefinitions) {
-				addDataColumn(table, field, relativePath);
-			}
+			addDataColumnsForEachField(table, defn, relativePath);
+		}
+	}
+
+	private void addDataColumnsForEachField(DataTable table, AttributeDefinition defn, Path relativePath) throws CollectRdbException {
+		List<FieldDefinition<?>> fieldDefinitions = defn.getFieldDefinitions();
+		for (FieldDefinition<?> field : fieldDefinitions) {
+			addDataColumn(table, field, relativePath);
 		}
 	}
 	
@@ -468,6 +475,13 @@ public class RelationalSchemaGenerator {
 		return new DataColumn(name, jdbcType, typeName, defn, relativePath, length, nullable);
 	}
 
+	/**
+	 * Creates a single data column for the specified node definition.
+	 * The column type depends on the {@link NodeDefinition} type.
+	 * - for a {@link FieldDefinition} it depends on the field type (numeric, boolean or text).
+	 * - for a {@link DateAttributeDefinition} the type is "date"
+	 * - for a {@link TimeAttributeDefinition} the type is "time"
+	 */
 	private DataColumn createDataColumn(DataTable table, AttributeDefinition defn, Path relativePath) {
 		String name = columnNameGenerator.generateName(defn);
 		int jdbcType;
