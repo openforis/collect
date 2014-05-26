@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -286,7 +287,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 	private void saveLastModifiedRecord() throws RecordPersistenceException {
 		Step originalStep = lastModifiedRecordSummary.getStep();
+		
 		updateRecord(lastModifiedRecord, originalStep, step);
+		
 		if ( step.compareTo(originalStep) < 0 ) {
 			//reset record step to the original one
 			CollectRecord record = recordManager.checkout(survey, adminUser, lastModifiedRecordSummary.getId(), originalStep, sessionId, true);
@@ -503,9 +506,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void updateRecord(CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
-		if ( record.getModifiedBy() == null ) {
-			record.setModifiedBy(adminUser);
-		}
+		record.setModifiedDate(new Date());
+		record.setModifiedBy(adminUser);
 		
 		if ( dataStep == Step.ANALYSIS ) {
 			record.setStep(Step.CLEANSING);
@@ -515,12 +517,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		if ( recordValidationEnabled && originalRecordStep == dataStep ) {
 			validateRecord(record);
 		}
-		recordManager.save(record, sessionId);
+		recordManager.save(record, adminUser, sessionId);
 
 		//release lock
-		if ( originalRecordStep == dataStep ) {
-			recordManager.releaseLock(record.getId());
-		}
+		recordManager.releaseLock(record.getId());
 	}
 	
 	private void insertRecord(CollectRecord record) throws RecordPersistenceException {

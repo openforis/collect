@@ -114,8 +114,12 @@ public class RecordManager {
 	
 	@Transactional
 	public void save(CollectRecord record, String sessionId) throws RecordPersistenceException {
-		User user = record.getModifiedBy();
-		
+		User lockingUser = record.getModifiedBy();
+		save(record, lockingUser, sessionId);
+	}
+	
+	@Transactional
+	public void save(CollectRecord record, User lockingUser, String sessionId) throws RecordPersistenceException {
 		record.updateRootEntityKeyValues();
 		checkAllKeysSpecified(record);
 		
@@ -127,11 +131,11 @@ public class RecordManager {
 			id = record.getId();
 			//todo fix: concurrency problem may occur..
 			if ( sessionId != null && isLockingEnabled() ) {
-				lockManager.lock(id, user, sessionId);
+				lockManager.lock(id, lockingUser, sessionId);
 			}
 		} else {
 			if ( sessionId != null && isLockingEnabled() ) {
-				lockManager.checkIsLocked(id, user, sessionId);
+				lockManager.checkIsLocked(id, lockingUser, sessionId);
 			}
 			recordDao.update(record);
 		}
