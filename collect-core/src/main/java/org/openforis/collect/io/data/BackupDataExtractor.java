@@ -20,7 +20,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
-import org.openforis.collect.utils.OpenForisIOUtils;
+import org.openforis.commons.io.OpenForisIOUtils;
 
 /**
  * 

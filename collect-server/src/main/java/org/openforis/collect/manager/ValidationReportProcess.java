@@ -2,6 +2,7 @@ package org.openforis.collect.manager;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -101,7 +102,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		}
 	}
 
-	protected void initWriter() {
+	protected void initWriter() throws UnsupportedEncodingException {
 		switch (reportType) {
 		case CSV:
 			csvWriter = new CsvWriter(outputStream);

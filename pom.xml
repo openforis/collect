@@ -20,7 +20,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<idm.version>3.0-Alpha14</idm.version>
-		<openforis.commons.version>0.0.8</openforis.commons.version>
+		<openforis.commons.version>0.0.10-SNAPSHOT</openforis.commons.version>
 		<spring.version>3.1.4.RELEASE</spring.version>
 		<spring-security.version>3.1.4.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>		

@@ -25,7 +25,7 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
-import org.openforis.collect.utils.OpenForisIOUtils;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

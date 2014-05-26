@@ -26,7 +26,7 @@ import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.utils.OpenForisIOUtils;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
 import org.zkoss.bind.BindContext;

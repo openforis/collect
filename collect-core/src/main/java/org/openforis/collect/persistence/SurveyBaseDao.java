@@ -16,7 +16,7 @@ import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
-import org.openforis.collect.utils.OpenForisIOUtils;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
