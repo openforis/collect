@@ -29,7 +29,6 @@ package org.openforis.collect.presenter
 	public class SamplingDesignImportPresenter extends AbstractReferenceDataImportPresenter {
 		
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
-		private static const UPLOAD_FILE_NAME_PREFIX:String = "sampling_design";
 		
 		private var _samplingDesignClient:SamplingDesignClient;
 		private var _samplingDesignImportClient:SamplingDesignImportClient;
@@ -37,7 +36,7 @@ package org.openforis.collect.presenter
 		public function SamplingDesignImportPresenter(view:SamplingDesignImportView) {
 			_samplingDesignClient = ClientFactory.samplingDesignClient;
 			_samplingDesignImportClient = ClientFactory.samplingDesignImportClient;
-			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			super(view, new MessageKeys());
 			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 			view.spatialReferenceSystems = Application.activeSurvey.spatialReferenceSystems;
 		}
@@ -91,7 +90,7 @@ package org.openforis.collect.presenter
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
 			var surveyId:int = view.surveyId;
 			var work:Boolean = view.work;
-			_samplingDesignImportClient.start(responder, surveyId, work, true);
+			_samplingDesignImportClient.start(responder, _uploadedTempFileName, surveyId, work, true);
 		}
 		
 		override protected function performImportCancel():void {

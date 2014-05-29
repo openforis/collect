@@ -42,7 +42,6 @@ package org.openforis.collect.presenter {
 		
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
 		private static const LATIN_LANGUAGE_CODE:String = "lat";
-		private static const UPLOAD_FILE_NAME_PREFIX:String = "species";
 		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
 		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 4;
 		private static const VERANCULAR_NAMES_SEPARATOR:String = " / ";
@@ -55,7 +54,7 @@ package org.openforis.collect.presenter {
 		public function SpeciesImportPresenter(view:SpeciesImportView) {
 			_speciesImportClient = ClientFactory.speciesImportClient;
 			_speciesClient = ClientFactory.speciesClient;
-			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			super(view, new MessageKeys());
 			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		
@@ -339,7 +338,7 @@ package org.openforis.collect.presenter {
 			var taxonomyId:int = _selectedTaxonomy.id;
 			var surveyId:int = view.surveyId;
 			var work:Boolean = view.work;
-			_speciesImportClient.start(responder, taxonomyId, true);
+			_speciesImportClient.start(responder, _uploadedTempFileName, taxonomyId, true);
 		}
 		
 		override protected function updateStatus():void {

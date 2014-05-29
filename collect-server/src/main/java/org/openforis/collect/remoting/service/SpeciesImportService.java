@@ -17,19 +17,13 @@ import org.springframework.security.access.annotation.Secured;
  */
 public class SpeciesImportService extends ReferenceDataImportService<SpeciesImportStatusProxy, SpeciesImportProcess> {
 	
-	private static final String IMPORT_FILE_NAME = "species.csv";
-	
 	@Autowired
 	private SpeciesManager speciesManager;
 	
-	public SpeciesImportService() {
-		super(IMPORT_FILE_NAME);
-	}
-	
 	@Secured("ROLE_ADMIN")
-	public SpeciesImportStatusProxy start(int taxonomyId, boolean overwriteAll) throws DataImportExeption {
+	public SpeciesImportStatusProxy start(String tempFileName, int taxonomyId, boolean overwriteAll) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
-			File importFile = getImportFile();
+			File importFile = new File(tempFileName);
 			importProcess = new SpeciesImportProcess(speciesManager, taxonomyId, importFile, overwriteAll);
 			importProcess.init();
 			SpeciesImportStatus status = importProcess.getStatus();

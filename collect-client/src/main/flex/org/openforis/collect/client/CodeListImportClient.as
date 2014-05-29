@@ -16,8 +16,8 @@ package org.openforis.collect.client {
 			super("codeListImportService");
 		}
 		
-		public function start(responder:IResponder, codeListId:int, overwriteAllData:Boolean = true):void {
-			var token:AsyncToken = this._startOperation.send(codeListId, overwriteAllData);
+		public function start(responder:IResponder, codeListId:int, tempFileName:String, overwriteAllData:Boolean = true):void {
+			var token:AsyncToken = this._startOperation.send(codeListId, tempFileName, overwriteAllData);
 			token.addResponder(responder);
 		}
 

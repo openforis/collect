@@ -38,14 +38,13 @@ package org.openforis.collect.presenter
 	 * */
 	public class CSVDataImportPresenter extends AbstractReferenceDataImportPresenter {
 		
-		private static const UPLOAD_FILE_NAME_PREFIX:String = "data_import";
 		private static const ALL_STEPS_ITEM:Object = {label: Message.get('global.allItemsLabel')};
 		
 		private var _importClient:CSVDataImportClient;
 		
 		public function CSVDataImportPresenter(view:CSVDataImportView) {
 			_importClient = ClientFactory.csvDataImportClient;
-			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			super(view, new MessageKeys());
 			updateImportFileFormatInfoMessage();
 		}
 		
@@ -203,7 +202,7 @@ package org.openforis.collect.presenter
 				var selectedStepItem:* = view.stepDropDownList.selectedItem;
 				selectedStep = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
 			}
-			_importClient.start(responder, entityId, selectedStep, transactional, validateRecords, insertNewRecords, newRecordModelVersion);
+			_importClient.start(responder, _uploadedTempFileName, entityId, selectedStep, transactional, validateRecords, insertNewRecords, newRecordModelVersion);
 		}
 		
 		override protected function performImportCancel():void {

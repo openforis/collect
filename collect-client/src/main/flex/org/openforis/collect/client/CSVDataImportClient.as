@@ -18,10 +18,10 @@ package org.openforis.collect.client {
 			super("csvDataImportService");
 		}
 		
-		public function start(responder:IResponder, parentEntityId:int, step:CollectRecord$Step = null, 
+		public function start(responder:IResponder, tempFileName:String, parentEntityId:int, step:CollectRecord$Step = null, 
 							  transactional:Boolean = true, validateRecords:Boolean = true,
 							  insertNewRecords:Boolean = false, newRecordModelVersion:String = null):void {
-			var token:AsyncToken = _startOperation.send(parentEntityId, step, transactional, validateRecords, 
+			var token:AsyncToken = _startOperation.send(tempFileName, parentEntityId, step, transactional, validateRecords, 
 														insertNewRecords, newRecordModelVersion);
 			token.addResponder(responder);
 		}

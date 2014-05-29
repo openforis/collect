@@ -48,18 +48,17 @@ package org.openforis.collect.presenter {
 		protected var _state:ReferenceDataImportStatusProxy;
 		protected var _messageKeys:ReferenceDataImportMessageKeys;
 		protected var _uploadUrl:String;
-		protected var _uploadFileNamePrefix:String;
+		protected var _uploadedTempFileName:String;
 		
 		protected var _getStatusResponder:IResponder;
 		protected var _firstOpen:Boolean;
 		protected var _fileFilter:FileFilter;
 		
-		public function AbstractReferenceDataImportPresenter(view:AbstractReferenceDataImportView, messageKeys:ReferenceDataImportMessageKeys, uploadFileNamePrefix:String) {
+		public function AbstractReferenceDataImportPresenter(view:AbstractReferenceDataImportView, messageKeys:ReferenceDataImportMessageKeys) {
 			this._view = view;
 			this._messageKeys = messageKeys;
 			
 			_uploadUrl = ApplicationConstants.FILE_UPLOAD_URL;
-			_uploadFileNamePrefix = uploadFileNamePrefix;
 			_firstOpen = true;
 			_fileReference = new FileReference();
 			initFileFilter();
@@ -195,12 +194,10 @@ package org.openforis.collect.presenter {
 			var request:URLRequest = new URLRequest(_uploadUrl);
 			//request paramters
 			request.method = URLRequestMethod.POST;
-			var parameters:URLVariables = new URLVariables();
-			//parameters.name = _fileReference.name;
-			var ext:String = getExtension(_fileReference.name);
-			parameters.name = _uploadFileNamePrefix + ext;
-			parameters.sessionId = Application.sessionId;
-			request.data = parameters;
+			
+			request.data = new URLVariables();
+			request.data.name = _fileReference.name;
+			
 			_fileReference.upload(request, "fileData");
 		}
 		
@@ -217,6 +214,7 @@ package org.openforis.collect.presenter {
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
 			_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
+			_uploadedTempFileName = event.data;
 			performProcessStart();
 			startProgressTimer();
 		}

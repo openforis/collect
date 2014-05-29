@@ -59,13 +59,15 @@ public class DataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public JobProxy startSummaryCreation(String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
+	public JobProxy startSummaryCreation(String selectedSurveyUri, String filePath, boolean overwriteAll) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
 			log.info("Starting data import summary creation");
-			SessionState sessionState = sessionManager.getSessionState();
 			
-			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
-			packagedFile = new File(userImportFolder, FILE_NAME);
+//			SessionState sessionState = sessionManager.getSessionState();
+//			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
+//			packagedFile = new File(userImportFolder, FILE_NAME);
+
+			packagedFile = new File(filePath);
 
 			log.info("Using file: " + packagedFile.getAbsolutePath());
 

@@ -148,10 +148,11 @@ package org.openforis.collect.presenter {
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
 			_view.currentState = DataImportView.STATE_LOADING;
+			var filePath:String = event.data;
 			var responder:AsyncResponder = new AsyncResponder(startSummaryCreationResultHandler, faultHandler);
 			var activeSurvey:SurveyProxy = Application.activeSurvey;
 			var selectedSurveyUri:String = activeSurvey == null ? null: activeSurvey.uri;
-			_dataImportClient.startSummaryCreation(responder, selectedSurveyUri);
+			_dataImportClient.startSummaryCreation(responder, selectedSurveyUri, filePath);
 			startProgressTimer();
 		}
 		

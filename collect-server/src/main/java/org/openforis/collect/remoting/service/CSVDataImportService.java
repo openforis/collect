@@ -22,8 +22,6 @@ import org.springframework.security.access.annotation.Secured;
  */
 public class CSVDataImportService extends ReferenceDataImportService<ReferenceDataImportStatusProxy, CSVDataImportProcess> { 
 	
-	private static final String IMPORT_FILE_NAME = "data_import.csv";
-	
 	@Autowired
 	private SessionManager sessionManager;
 	@Autowired
@@ -31,16 +29,12 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 	@Autowired
 	private ApplicationContext applicationContext;
 	
-	public CSVDataImportService() {
-		super(IMPORT_FILE_NAME);
-	}
-
 	@Secured("ROLE_ADMIN")
-	public ReferenceDataImportStatusProxy start(int parentEntityId, CollectRecord.Step step, 
+	public ReferenceDataImportStatusProxy start(String tempFileName, int parentEntityId, CollectRecord.Step step, 
 			boolean transactional, boolean validateRecords, 
 			boolean insertNewRecords, String newRecordVersionName) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
-			File importFile = getImportFile();
+			File importFile = new File(tempFileName);
 			SessionState sessionState = sessionManager.getSessionState();
 			CollectSurvey survey = sessionState.getActiveSurvey();
 			importProcess = (CSVDataImportProcess) applicationContext.getBean(

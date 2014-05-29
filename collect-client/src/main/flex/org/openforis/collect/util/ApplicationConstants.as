@@ -18,7 +18,6 @@ package org.openforis.collect.util {
 		
 		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
 		
-		private static const SPECIES_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
 		private static const SPECIES_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "species/import/example.htm";
 		private static const _SPECIES_EXPORT_URL:String = "species/export/{0}";
 		
@@ -46,7 +45,6 @@ package org.openforis.collect.util {
 		private static var _RECORD_FILE_UPLOAD_URL:String; 
 		private static var _RECORD_FILE_DOWNLOAD_URL:String; 
 		private static var _RECORD_FILE_DELETE_URL:String; 
-		private static var _SPECIES_IMPORT_UPLOAD_URL:String;
 		private static var _SPECIES_IMPORT_EXAMPLE_DOWNLOAD_URL:String;
 		private static var _SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_URL:String;
 		private static var _FILE_UPLOAD_URL:String;
@@ -67,10 +65,6 @@ package org.openforis.collect.util {
 		public static function init():void {
 			var url:String = FlexGlobals.topLevelApplication.url;
 			setUrl(url);
-		}
-		
-		public static function get SPECIES_IMPORT_UPLOAD_URL():String {
-			return _SPECIES_IMPORT_UPLOAD_URL;
 		}
 		
 		public static function getSpeciesExportUrl(taxonomyId:int):String {
@@ -160,7 +154,6 @@ package org.openforis.collect.util {
 			_URL = applicationUrl;
 			
 			_DATA_IMPORT_UPLOAD_URL = _URL + DATA_IMPORT_UPLOAD_SERVLET_NAME;
-			_SPECIES_IMPORT_UPLOAD_URL = _URL + SPECIES_IMPORT_UPLOAD_SERVLET_NAME;
 			_FILE_UPLOAD_URL = _URL + FILE_UPLOAD_SERVLET_NAME;
 			
 			_RECORD_FILE_UPLOAD_URL = _URL + RECORD_FILE_UPLOAD_SERVLET_NAME;

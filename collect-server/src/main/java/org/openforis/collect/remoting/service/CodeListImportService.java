@@ -21,21 +21,15 @@ import org.springframework.security.access.annotation.Secured;
  */
 public class CodeListImportService extends ReferenceDataImportService<CodeListImportStatusProxy, CodeListImportProcess> {
 	
-	private static final String IMPORT_FILE_NAME = "code_list.csv";
-	
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
 	private SessionManager sessionManager;
 	
-	public CodeListImportService() {
-		super(IMPORT_FILE_NAME);
-	}
-	
 	@Secured("ROLE_ADMIN")
-	public CodeListImportStatusProxy start(int codeListId, boolean overwriteData) throws DataImportExeption {
+	public CodeListImportStatusProxy start(int codeListId, String tempFileName, boolean overwriteData) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
-			File importFile = getImportFile();
+			File importFile = new File(tempFileName);
 			SessionStatus designerSessionStatus = sessionManager.getDesignerSessionStatus();
 			CollectSurvey survey = designerSessionStatus.getSurvey();
 			String langCode = designerSessionStatus.getCurrentLanguageCode();

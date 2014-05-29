@@ -27,7 +27,6 @@ package org.openforis.collect.presenter
 	public class CodeListImportPresenter extends AbstractReferenceDataImportPresenter {
 		
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
-		private static const UPLOAD_FILE_NAME_PREFIX:String = "code_list";
 		
 		private var _codeListClient:CodeListClient;
 		private var _codeListImportClient:CodeListImportClient;
@@ -36,7 +35,7 @@ package org.openforis.collect.presenter
 			_codeListClient = ClientFactory.codeListClient;
 			_codeListImportClient = ClientFactory.codeListImportClient;
 
-			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			super(view, new MessageKeys());
 			
 			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
@@ -65,7 +64,7 @@ package org.openforis.collect.presenter
 		
 		override protected function performProcessStart():void {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
-			_codeListImportClient.start(responder, view.codeListId);
+			_codeListImportClient.start(responder, view.codeListId, _uploadedTempFileName);
 		}
 		
 		override protected function performImportCancel():void {

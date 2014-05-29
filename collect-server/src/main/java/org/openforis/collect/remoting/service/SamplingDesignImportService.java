@@ -20,21 +20,15 @@ import org.springframework.security.access.annotation.Secured;
  */
 public class SamplingDesignImportService extends ReferenceDataImportService<SamplingDesignImportStatusProxy, SamplingDesignImportProcess> {
 	
-	private static final String IMPORT_FILE_NAME = "sampling_design.csv";
-	
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	public SamplingDesignImportService() {
-		super(IMPORT_FILE_NAME);
-	}
-	
 	@Secured("ROLE_ADMIN")
-	public SamplingDesignImportStatusProxy start(int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption, SurveyImportException {
+	public SamplingDesignImportStatusProxy start(String tempFileName, int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption, SurveyImportException {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
-			File importFile = getImportFile();
+			File importFile = new File(tempFileName);
 			CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);
 			if ( survey.getSamplingDesignCodeList() == null ) {
 				surveyManager.addSamplingDesignCodeList(survey);
