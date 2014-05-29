@@ -72,6 +72,7 @@ public class SamplingDesignLineValidator {
 					line.getLineNumber(), 
 					SamplingDesignFileColumn.SRS_ID.getColumnName(), 
 					INVALID_SRS_ID_MESSAGE_KEY);
+			error.setMessageArgs(new String[] {srsId});
 			errors.add(error);
 		}
 	}

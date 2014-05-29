@@ -71,17 +71,19 @@
 			}
 			
 			public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {
-				var messageKey:String = getErrorMessageKey(item);
-				if ( messageKey == null ) {
-					if ( StringUtil.isBlank(item.message) ) {
+				var messageKey:String;
+				if ( StringUtil.isBlank(item.message) ) {
+					var defaultMessageKey:String = getErrorMessageKey(item);
+					if ( StringUtil.isBlank(defaultMessageKey) ) {
 						return "";
 					} else {
-						return item.message;
+						messageKey = defaultMessageKey;
 					}
 				} else {
-					var message:String = Message.get(messageKey, item.messageArgs);
-					return message;
+					messageKey = item.message;
 				}
+				var message:String = Message.get(messageKey, item.messageArgs);
+				return message;
 			}
 			
 			protected function getErrorMessageKey(item:ParsingErrorProxy):String {
