@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.0.1-Alpha15-SNAPSHOT</version>
+		<version>3.0.1-Alpha15</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>collect-rdb</artifactId>
