@@ -29,6 +29,7 @@ import org.openforis.idm.metamodel.validation.CustomCheck;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.metamodel.validation.PatternCheck;
 import org.openforis.idm.metamodel.validation.UniquenessCheck;
+import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
 import org.zkoss.bind.SimpleForm;
@@ -139,6 +140,16 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@NotifyChange("selectedAttributeDefault")
 	public void selectCheck(@BindingParam("check") Check<?> check) {
 		selectedCheck = check;
+	}
+	
+	@Command
+	public void keyChanged(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam("key") boolean key ) {
+		dispatchApplyChangesCommand(binder);
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("item", editedItem);
+		args.put("key", key);
+		BindUtils.postGlobalCommand(null, null, "editedNodeKeyChanging", args);
 	}
 	
 	protected void openCheckEditPopUp() {

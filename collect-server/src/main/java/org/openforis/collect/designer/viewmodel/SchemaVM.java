@@ -33,6 +33,7 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -345,31 +346,58 @@ public class SchemaVM extends SurveyBaseVM {
 				String committedLabel = editedNode instanceof NodeDefinition ? 
 						((NodeDefinition) editedNode).getName(): 
 						((UITab) editedNode).getLabel(currentLanguageCode);
-				updateTreeNodeLabel(view, editedNode, committedLabel);
+				updateTreeNodeLabel(editedNode, committedLabel);
+
+				//restore tree node icon
+				if ( editedNode instanceof KeyAttributeDefinition ) {
+					updateTreeNodeIcon(editedNode, ((KeyAttributeDefinition) editedNode).isKey());
+				}
 			}
 			resetEditingStatus(false);
 		}
 	}
 	
 	@GlobalCommand
-	public void editedNodeNameChanging(
-			@ContextParam(ContextType.VIEW) Component view,
-			@BindingParam("item") SurveyObject item,
-			@BindingParam("name") String name) {
+	public void editedNodeNameChanging(@BindingParam("item") SurveyObject item, @BindingParam("name") String name) {
 		if ( editedNode != null && editedNode == item ) {
-			updateTreeNodeLabel(view, editedNode, name);
+			updateTreeNodeLabel(editedNode, name);
+		}
+	}
+	
+	@GlobalCommand
+	public void editedNodeKeyChanging(@BindingParam("item") SurveyObject item, @BindingParam("key") boolean key) {
+		if ( editedNode != null && editedNode == item ) {
+			updateTreeNodeIcon(editedNode, key);
 		}
 	}
 
-	private void updateTreeNodeLabel(Component view, SurveyObject item, String label) {
-		treeModel.updateNodeLabel(item, label);
+	//TODO move it to tree model class
+	private Treeitem getTreeItem(SurveyObject item) {
 		for (Treeitem treeItem : nodesTree.getItems()) {
 			SchemaTreeNode node = treeItem.getValue();
 			SchemaNodeData data = node.getData();
 			SurveyObject itemSO = data.getSurveyObject();
 			if ( itemSO == item ) {
-				treeItem.setLabel(label);
+				return treeItem;
 			}
+		}
+		return null;
+	}
+	
+	private void updateTreeNodeLabel(SurveyObject item, String label) {
+		treeModel.updateNodeLabel(item, label);
+		Treeitem treeItem = getTreeItem(item);
+		if ( treeItem != null ) {
+			treeItem.setLabel(label);
+		}
+	}
+	
+	private void updateTreeNodeIcon(SurveyObject item, boolean key) {
+		Treeitem treeItem = getTreeItem(item);
+		if ( treeItem != null ) {
+			SchemaNodeData data = treeModel.getNodeData(item);
+			String icon = getIcon(data, key);
+			treeItem.setImage(icon);
 		}
 	}
 	
@@ -679,7 +707,7 @@ public class SchemaVM extends SurveyBaseVM {
 			if ( StringUtils.isNotBlank(label) ) {
 				mainTab.setLabel(currentLanguageCode, label);
 				
-				updateTreeNodeLabel(view, mainTab, label);
+				updateTreeNodeLabel(mainTab, label);
 			}
 		}
 	}
@@ -899,15 +927,22 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	public static String getIcon(SchemaNodeData data) {
 		SurveyObject surveyObject = data.getSurveyObject();
+		boolean key = surveyObject instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) surveyObject).isKey();
+		return getIcon(data, key);
+	}
+	
+	public static String getIcon(SchemaNodeData data, boolean key) {
+		SurveyObject surveyObject = data.getSurveyObject();
+		String imagesRootPath = NODE_TYPES_IMAGES_PATH;
 		if ( surveyObject instanceof UITab ) {
-			return "/assets/images/tab-small.png";
+			return imagesRootPath + "tab-small.png";
+		} else if ( surveyObject instanceof EntityDefinition ) {
+			return getEntityIcon((EntityDefinition) surveyObject);
+		} else if ( key ) {
+			return imagesRootPath + "key-small.png";
 		} else {
-			if ( surveyObject instanceof EntityDefinition ) {
-				return getEntityIcon((EntityDefinition) surveyObject);
-			} else {
-				AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) surveyObject);
-				return getAttributeIcon(attributeType.name());
-			}
+			AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) surveyObject);
+			return getAttributeIcon(attributeType.name());
 		}
 	}
 	

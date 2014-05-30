@@ -11,7 +11,7 @@
             <label value="${labels.survey.schema.attribute.number.key}:" />
             <fieldErrorHandler message="@load(vmsgs['key'])">
 		        <checkbox checked="@load(fx.key eq true) @save(fx.key)"
-	    		      onCheck="@command('applyChanges')" />
+	    		      onCheck="@command('keyChanged', key=self.checked)" />
 	    	</fieldErrorHandler>
           </row>
         </rows>
