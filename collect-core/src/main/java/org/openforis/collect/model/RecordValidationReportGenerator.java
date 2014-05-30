@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResult;
@@ -73,7 +74,7 @@ public class RecordValidationReportGenerator {
 		Set<Integer> skippedNodeIds = validationCache.getSkippedNodeIds();
 		for (Integer nodeId : skippedNodeIds) {
 			Attribute<?, ?> attr = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-			String path = attr.getPath();
+			String path = attr.getPath(false);
 			String prettyFormatPath = messageBuilder.getPrettyFormatPath(attr, locale);
 			String message = messageBuilder.getReasonBlankNotSpecifiedMessage(locale);
 			RecordValidationReportItem recordValidationItem = new RecordValidationReportItem(nodeId, path, prettyFormatPath, ValidationResultFlag.ERROR, message);
@@ -154,7 +155,7 @@ public class RecordValidationReportGenerator {
 	private RecordValidationReportItem createCardinalityValidationItem(
 			final Locale locale, Entity entity,
 			String childName, ValidationResultFlag flag, boolean minCount) {
-		String path = entity.getPath();
+		String path = entity.getPath(false) + "/" + childName;
 		String prettyFormatPath = messageBuilder.getPrettyFormatPath(entity, childName, locale);
 		String message = minCount ? messageBuilder.getMinCountValidationMessage(entity, childName, locale):
 			messageBuilder.getMaxCountValidationMessage(entity, childName, locale);
@@ -178,16 +179,18 @@ public class RecordValidationReportGenerator {
 			Integer attrId, ValidationResultFlag level, boolean includeConfirmedErrors) {
 		List<RecordValidationReportItem> items = new ArrayList<RecordValidationReportItem>();
 		Attribute<?, ?> attr = (Attribute<?, ?>) record.getNodeByInternalId(attrId);
-		String path = attr.getPath();
-		String prettyFormatPath = messageBuilder.getPrettyFormatPath(attr, locale);
 		ValidationResults validationResults = validationCache.getAttributeValidationResults(attrId);
 		List<ValidationResult> failed = validationResults.getFailed();
-		for (ValidationResult validationResult : failed) {
-			ValidationResultFlag flag = validationResult.getFlag();
-			if ( isInLevel(flag, level) || flag == ValidationResultFlag.WARNING && includeConfirmedErrors && record.isErrorConfirmed(attr) ) {
-				String message = messageBuilder.getValidationMessage(attr, validationResult, locale);
-				RecordValidationReportItem recordValidationItem = new RecordValidationReportItem(attrId, path, prettyFormatPath, flag, message);
-				items.add(recordValidationItem);
+		if ( CollectionUtils.isNotEmpty(failed) ) {
+			String path = attr.getPath(false);
+			String prettyFormatPath = messageBuilder.getPrettyFormatPath(attr, locale);
+			for (ValidationResult validationResult : failed) {
+				ValidationResultFlag flag = validationResult.getFlag();
+				if ( isInLevel(flag, level) || flag == ValidationResultFlag.WARNING && includeConfirmedErrors && record.isErrorConfirmed(attr) ) {
+					String message = messageBuilder.getValidationMessage(attr, validationResult, locale);
+					RecordValidationReportItem recordValidationItem = new RecordValidationReportItem(attrId, path, prettyFormatPath, flag, message);
+					items.add(recordValidationItem);
+				}
 			}
 		}
 		return items;
