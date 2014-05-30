@@ -222,7 +222,10 @@ in accordance with the terms of the license agreement accompanying it.
 	<!--- @copy spark.components.SkinnableContainer#contentGroup -->
 	<s:Group id="contentGroup" left="0" right="0" top="0" bottom="0" minWidth="0" minHeight="0">
 		<s:layout>
-			<s:BasicLayout/>
+			<s:VerticalLayout paddingTop="20" 
+							  paddingBottom="10" 
+							  paddingLeft="20" 
+							  paddingRight="20" />
 		</s:layout>
 	</s:Group>
 	

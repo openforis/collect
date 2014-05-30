@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				 xmlns:s="library://ns.adobe.com/flex/spark" 
 				 xmlns:mx="library://ns.adobe.com/flex/mx"
 				 xmlns:component="org.openforis.collect.ui.component.*"
@@ -115,9 +115,9 @@
 			protected function loadLogoResultHandler(event:ResultEvent, token:Object):void {
 				this.logo = event.result as Logo;
 				if ( logo == null ) {
-					currentState = "customImageNotPresent";
+					currentState = "customImageNotDefined";
 				} else {
-					currentState = "customImagePresent";
+					currentState = "customImageDefined";
 					customLogoImg.source = logo.image;
 				}
 			}
@@ -185,7 +185,7 @@
 			
 			protected function defaultLogoElReadyHandler(event:Event):void {
 				//update image size label
-				defaultImageSizeLabel.text = '(' + defaultLogoEl.sourceWidth + 'x' + defaultLogoEl.sourceHeight + ')';				
+				customImageRequiredSizeLabel.text = Message.get("configuration.logo.requiredSize", [defaultLogoEl.sourceWidth + 'x' + defaultLogoEl.sourceHeight]);				
 			}
 			
 		]]>
@@ -194,8 +194,8 @@
 	<s:states>
 		<s:State name="loading" />
 		<s:State name="loadComplete" />
-		<s:State name="customImageNotPresent" basedOn="loadComplete" />
-		<s:State name="customImagePresent" basedOn="loadComplete" />
+		<s:State name="customImageNotDefined" basedOn="loadComplete" />
+		<s:State name="customImageDefined" basedOn="loadComplete" />
 	</s:states>
 	
 	<component:LoadingContent includeIn="loading" />
@@ -205,28 +205,33 @@
 		<!-- Default image -->
 		<s:HGroup verticalAlign="top">
 			
-			<s:Label text="{Message.get('configuration.logo.defaultImage')}" width="100" />
+			<s:Label text="{Message.get('configuration.logo.defaultImage')}" 
+					 width="150" />
 			
-			<s:Image id="defaultLogoEl" maxHeight="100" width="100" source="{defaultImage}" 
+			<s:Image id="defaultLogoEl" maxHeight="200" width="200" 
+					 source="{defaultImage}" 
 					 ready="defaultLogoElReadyHandler(event)" />
 			
-			<s:VGroup>
-				<s:Button id="defaultImageDownloadBtn" label="{Message.get('global.download')}" />
-	
-				<s:Label id="defaultImageSizeLabel" />
-			</s:VGroup>
+			<s:Button id="defaultImageDownloadBtn" label="{Message.get('global.download')}" />
 		</s:HGroup>
 		
 		<!-- Custom image -->
-		<s:HGroup verticalAlign="top">
+		<s:HGroup verticalAlign="top" width="540">
 			
-			<s:Label text="{Message.get('configuration.logo.customImage')}" width="100" />
-			
-			<s:Button id="uploadBtn" label="{Message.get('global.upload')}" />
+			<s:VGroup width="150">
+				<s:Label text="{Message.get('configuration.logo.customImage')}" width="100%" />
 
-			<s:HGroup includeIn="customImagePresent" itemCreationPolicy="immediate">
+				<s:Label id="customImageRequiredSizeLabel" />
+			</s:VGroup>
+			
+			<s:Label includeIn="customImageNotDefined" 
+					 text="{Message.get('configuration.logo.customImageNotDefined')}"
+					 textAlign="center"
+					 width="200" />
+			
+			<s:HGroup includeIn="customImageDefined" itemCreationPolicy="immediate">
 				
-				<s:Image id="customLogoImg" maxHeight="100" width="100" />
+				<s:Image id="customLogoImg" maxHeight="200" width="200" />
 				
 				<s:VGroup>
 					<s:Button id="customImageDownloadBtn" label="{Message.get('global.download')}" />
@@ -234,9 +239,11 @@
 				</s:VGroup>
 			
 			</s:HGroup>
-	
+
+			<s:Button id="uploadBtn" label="{Message.get('global.upload')}" />
+			
 		</s:HGroup>
 		
 	</s:VGroup>
 
-</s:BorderContainer>
+</s:Group>
