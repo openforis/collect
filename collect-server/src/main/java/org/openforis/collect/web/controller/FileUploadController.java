@@ -7,7 +7,6 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.web.controller.upload.UploadItem;
 import org.springframework.stereotype.Controller;

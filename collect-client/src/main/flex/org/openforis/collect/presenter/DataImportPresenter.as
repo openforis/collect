@@ -120,26 +120,22 @@ package org.openforis.collect.presenter {
 		protected function fileReferenceSelectHandler(event:Event):void {
 			updateViewForUploading();
 			
-			var url:String = ApplicationConstants.DATA_IMPORT_UPLOAD_URL;
-			//workaround for firefox/chrome flahplayer bug
-			//url +=";jsessionid=" + Application.sessionId;
+			var url:String = ApplicationConstants.FILE_UPLOAD_URL;
 			
 			var request:URLRequest = new URLRequest(url);
-			//request paramters
 			request.method = URLRequestMethod.POST;
-			var parameters:URLVariables = new URLVariables();
-			parameters.name = _fileReference.name;
-			parameters.sessionId = Application.sessionId;
-			request.data = parameters;
+			
+			//request paramters
+			request.data = new URLVariables();
+			request.data.name = _fileReference.name;
+			
 			_fileReference.upload(request, "fileData");
 		}
 		
 		protected function fileReferenceOpenHandler(event:Event):void {
-			
 		}
 		
 		protected function fileReferenceCompleteHandler(event:Event):void {
-			
 		}
 		
 		protected function fileReferenceProgressHandler(event:ProgressEvent):void {
@@ -152,7 +148,7 @@ package org.openforis.collect.presenter {
 			var responder:AsyncResponder = new AsyncResponder(startSummaryCreationResultHandler, faultHandler);
 			var activeSurvey:SurveyProxy = Application.activeSurvey;
 			var selectedSurveyUri:String = activeSurvey == null ? null: activeSurvey.uri;
-			_dataImportClient.startSummaryCreation(responder, selectedSurveyUri, filePath);
+			_dataImportClient.startSummaryCreation(responder, filePath, selectedSurveyUri);
 			startProgressTimer();
 		}
 		
@@ -293,7 +289,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function updateView():void {
-			if ( _job == null || _job.pending || (_firstOpen && ! _job.running) ) {
+			if ( _job == null || (_firstOpen && ! _job.running) ) {
 				resetView();
 			} else {
 				_view.currentState = DataImportView.STATE_LOADING;

@@ -17,8 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 
@@ -35,14 +33,6 @@ public class RecordFileController extends BasicController implements Serializabl
 	
 	@Autowired
 	private RecordFileManager fileManager;
-	
-	@RequestMapping(value = "/uploadRecordFile.htm", method = RequestMethod.POST)
-	public @ResponseBody String upload(@RequestParam("Filedata") MultipartFile file, HttpServletRequest request, 
-			@RequestParam("sessionId") String sessionId, @RequestParam("surveyId") Integer surveyId, @RequestParam("recordId") Integer recordId,
-			@RequestParam("nodeId") Integer nodeId) throws Exception {
-		//String fileId = fileManager.saveToTempFolder(file, sessionId, surveyId, recordId, nodeId);
-		return null;
-	}
 	
 	@RequestMapping(value = "/downloadRecordFile.htm", method = RequestMethod.POST)
 	public void download(HttpServletRequest request, HttpServletResponse response, @RequestParam("nodeId") Integer nodeId) throws Exception {

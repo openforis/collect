@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.data.DataImportSummary;
@@ -30,43 +28,22 @@ import org.springframework.security.access.annotation.Secured;
 public class DataImportService {
 	
 	private static final Log log = LogFactory.getLog(DataImportService.class);	
-	private static final String IMPORT_PATH = "import";
-	
-	private static final String FILE_NAME = "data_import.zip";
 	
 	@Autowired
 	private SessionManager sessionManager;
-	@Autowired 
-	private ServletContext servletContext;
 	@Autowired
 	private JobManager jobManager;
 	
 	private File packagedFile;
-	private File importDirectory;
 	
 	private DataRestoreSummaryJob summaryJob;
 	private DataRestoreJob dataRestoreJob;
 	
-	protected void init() {
-		String importRealPath = servletContext.getRealPath(IMPORT_PATH);
-		importDirectory = new File(importRealPath);
-		if ( importDirectory.exists() ) {
-			importDirectory.delete();
-		}
-		if ( ! importDirectory.mkdirs() && ! importDirectory.canRead() ) {
-			throw new IllegalStateException("Cannot access import directory: " + importRealPath);
-		}
-	}
-	
 	@Secured("ROLE_ADMIN")
-	public JobProxy startSummaryCreation(String selectedSurveyUri, String filePath, boolean overwriteAll) throws DataImportExeption {
+	public JobProxy startSummaryCreation(String filePath, String selectedSurveyUri, boolean overwriteAll) throws DataImportExeption {
 		if ( summaryJob == null || ! summaryJob.isRunning() ) {
 			log.info("Starting data import summary creation");
 			
-//			SessionState sessionState = sessionManager.getSessionState();
-//			File userImportFolder = new File(importDirectory, sessionState.getSessionId());
-//			packagedFile = new File(userImportFolder, FILE_NAME);
-
 			packagedFile = new File(filePath);
 
 			log.info("Using file: " + packagedFile.getAbsolutePath());

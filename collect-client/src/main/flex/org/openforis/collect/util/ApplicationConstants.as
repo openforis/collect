@@ -16,8 +16,6 @@ package org.openforis.collect.util {
 		
 		public static const DOWNLOAD_LOGO_URL:String = "downloadLogo.htm";
 		
-		private static const DATA_IMPORT_UPLOAD_SERVLET_NAME:String = "uploadData.htm";
-		
 		private static const SPECIES_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME:String = "species/import/example.htm";
 		private static const _SPECIES_EXPORT_URL:String = "species/export/{0}";
 		
@@ -29,7 +27,6 @@ package org.openforis.collect.util {
 		
 		private static const FILE_UPLOAD_SERVLET_NAME:String = "uploadFile.htm";
 
-		private static const RECORD_FILE_UPLOAD_SERVLET_NAME:String = "uploadRecordFile.htm";
 		private static const RECORD_FILE_DOWNLOAD_SERVLET_NAME:String = "downloadRecordFile.htm";
 		private static const RECORD_FILE_DELETE_SERVLET_NAME:String = "deleteRecordFile.htm";
 		
@@ -41,8 +38,6 @@ package org.openforis.collect.util {
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		
-		private static var _DATA_IMPORT_UPLOAD_URL:String;
-		private static var _RECORD_FILE_UPLOAD_URL:String; 
 		private static var _RECORD_FILE_DOWNLOAD_URL:String; 
 		private static var _RECORD_FILE_DELETE_URL:String; 
 		private static var _SPECIES_IMPORT_EXAMPLE_DOWNLOAD_URL:String;
@@ -75,16 +70,7 @@ package org.openforis.collect.util {
 			var baseUrl:String = work ? _SAMPLING_DESIGN_WORK_SURVEY_EXPORT_URL: _SAMPLING_DESIGN_EXPORT_URL;
 			return mx.utils.StringUtil.substitute(baseUrl, surveyId);
 		}
-		
 
-		public static function get DATA_IMPORT_UPLOAD_URL():String {
-			return _DATA_IMPORT_UPLOAD_URL;
-		}
-		
-		public static function get RECORD_FILE_UPLOAD_URL():String {
-			return _RECORD_FILE_UPLOAD_URL;
-		}
-		
 		public static function get RECORD_FILE_DOWNLOAD_URL():String {
 			return _RECORD_FILE_DOWNLOAD_URL;
 		}
@@ -153,10 +139,8 @@ package org.openforis.collect.util {
 			var applicationUrl:String = rootUrl + contextName + "/";
 			_URL = applicationUrl;
 			
-			_DATA_IMPORT_UPLOAD_URL = _URL + DATA_IMPORT_UPLOAD_SERVLET_NAME;
 			_FILE_UPLOAD_URL = _URL + FILE_UPLOAD_SERVLET_NAME;
 			
-			_RECORD_FILE_UPLOAD_URL = _URL + RECORD_FILE_UPLOAD_SERVLET_NAME;
 			_RECORD_FILE_DOWNLOAD_URL = _URL + RECORD_FILE_DOWNLOAD_SERVLET_NAME;
 			_RECORD_FILE_DELETE_URL = _URL + RECORD_FILE_DELETE_SERVLET_NAME;
 			
