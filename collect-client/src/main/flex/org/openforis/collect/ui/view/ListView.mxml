@@ -61,8 +61,8 @@
 			
 			<s:ToggleButton id="openFilterPopUpButton"
 					  		toolTip="{Message.get('list.filter')}"
+							label="{Message.get(openFilterPopUpButton.selected ? 'list.filterOn': 'list.filterOff')}"
 					  		right="0"
-							width="20"
 							height="20"
 							styleName="filter"
 					  		/>
