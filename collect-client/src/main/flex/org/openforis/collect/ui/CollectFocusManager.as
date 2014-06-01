@@ -39,29 +39,29 @@ package org.openforis.collect.ui {
 					//horizontal
 					if ( directionByColumns ) {
 						if ( attrDefn.hasAlwaysHorizontalLayout() ) {
-							focusChanged = setFocusOnSiblingFieldInAttribute(field, offset);
+							focusChanged = setFocusOnSiblingFieldInAttribute(field, offset, true);
 						}
 						if ( !focusChanged ) {
 							focusChanged = setFocusOnAttributeInSiblingEntity(field, offset, true);
 						}
 						if ( !focusChanged ) {
-							focusChanged = setFocusOnSiblingField(field, offset);
+							focusChanged = setFocusOnSiblingField(field, offset, false, true);
 						}
 					} else {
-						focusChanged = setFocusOnSiblingFieldInAttribute(field, offset);
+						focusChanged = setFocusOnSiblingFieldInAttribute(field, offset, true);
 						if ( !focusChanged ) {
-							focusChanged = setFocusOnSiblingField(field, offset);
+							focusChanged = setFocusOnSiblingField(field, offset, false, true);
 						}
 						if ( !focusChanged ) {
-							focusChanged = setFocusOnBoundaryFieldInSiblingEntity(field, offset > 0 ? 1: -1, offset > 0);
+							focusChanged = setFocusOnBoundaryFieldInSiblingEntity(field, offset > 0 ? 1: -1, offset > 0, false);
 						}
 					}
 				} else {
 					//vertical
 					if ( directionByColumns) {
-						focusChanged = setFocusOnSiblingField(field, offset, true);
+						focusChanged = setFocusOnSiblingField(field, offset, true, false);
 					} else {
-						focusChanged = setFocusOnAttributeInSiblingEntity(field, offset, false);
+						focusChanged = setFocusOnAttributeInSiblingEntity(field, offset, false, false);
 					}
 				}
 			}
@@ -217,7 +217,7 @@ package org.openforis.collect.ui {
 		}
 		
 		public static function setFocusOnAttributeInSiblingEntity(field:FieldProxy,
-					 offset:int, circularLookup:Boolean = false):Boolean {
+					 offset:int, circularLookup:Boolean = false, horizontalMove:Boolean = true):Boolean {
 			var attribute:AttributeProxy = field.parent;
 			var attrDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(attribute.definition);
 			var fieldIndex:int = field.index;
@@ -256,10 +256,10 @@ package org.openforis.collect.ui {
 					fieldToFocusIn = getSiblingFocusableField(fieldToFocusIn, offset > 0 ? 1: -1, false);
 				}
 			}
-			return dispatchFocusSetEvent(fieldToFocusIn);
+			return dispatchFocusSetEvent(fieldToFocusIn, horizontalMove, offset);
 		}
 		
-		public static function setFocusOnBoundaryFieldInSiblingEntity(field:FieldProxy, offset:int, firstField:Boolean = true):Boolean {
+		public static function setFocusOnBoundaryFieldInSiblingEntity(field:FieldProxy, offset:int, firstField:Boolean = true, horizontalMove:Boolean = true):Boolean {
 			var attribute:AttributeProxy = field.parent;
 			var parentMultipleEntity:EntityProxy = attribute.getParentMultipleEntity();
 			var siblingEntity:EntityProxy = EntityProxy(parentMultipleEntity.getSibling(offset, false));
@@ -269,18 +269,18 @@ package org.openforis.collect.ui {
 				var leafFocusableFields:IList = getLeafFocusableFields(siblingEntity);
 				var fieldToFocusIdx:int = firstField ? 0: leafFocusableFields.length - 1;
 				var fieldToFocus:FieldProxy = leafFocusableFields.getItemAt(fieldToFocusIdx) as FieldProxy;
-				return dispatchFocusSetEvent(fieldToFocus);
+				return dispatchFocusSetEvent(fieldToFocus, horizontalMove, offset);
 			}
 		}
 		
-		public static function setFocusOnSiblingField(field:FieldProxy, offset:int, limit:Boolean = false):Boolean {
+		public static function setFocusOnSiblingField(field:FieldProxy, offset:int, limit:Boolean = false, horizontalMove:Boolean = true):Boolean {
 			var fieldToFocusIn:FieldProxy = getSiblingFocusableField(field, offset, limit);
-			return dispatchFocusSetEvent(fieldToFocusIn);
+			return dispatchFocusSetEvent(fieldToFocusIn, horizontalMove, offset);
 		}
 		
-		public static function setFocusOnSiblingFieldInAttribute(field:FieldProxy, offset:int):Boolean {
+		public static function setFocusOnSiblingFieldInAttribute(field:FieldProxy, offset:int, horizontalMove:Boolean = true):Boolean {
 			var sibling:FieldProxy = getSiblingFieldInAttribute(field, offset);
-			return dispatchFocusSetEvent(sibling);
+			return dispatchFocusSetEvent(sibling, horizontalMove, offset);
 		}
 		
 		public static function getSiblingFieldInAttribute(field:FieldProxy, offset:int):FieldProxy {
@@ -294,7 +294,7 @@ package org.openforis.collect.ui {
 			}
 		}
 		
-		public static function dispatchFocusSetEvent(field:FieldProxy):Boolean {
+		public static function dispatchFocusSetEvent(field:FieldProxy, horizontalMove:Boolean = true, offset:int = 0):Boolean {
 			if ( field == null) {
 				return false;
 			} else {
@@ -304,6 +304,10 @@ package org.openforis.collect.ui {
 				inputFieldEvent.attributeId = attributeToFocusIn.id;
 				inputFieldEvent.nodeName = attributeToFocusIn.name;
 				inputFieldEvent.parentEntityId = attributeToFocusIn.parentId;
+				inputFieldEvent.obj = {
+					horizontalMove: horizontalMove,
+					offset: offset
+				};
 				EventDispatcherFactory.getEventDispatcher().dispatchEvent(inputFieldEvent);
 				return true;
 			}

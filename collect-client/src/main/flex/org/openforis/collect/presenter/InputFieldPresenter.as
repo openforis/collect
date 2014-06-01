@@ -46,6 +46,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
 	
+	import spark.components.Scroller;
+	
 	/**
 	 * 
 	 * @author M. Togna
@@ -100,6 +102,19 @@ package org.openforis.collect.presenter {
 					_view.attribute.id == event.attributeId && 
 					_view.fieldIndex == event.fieldIdx ) {
 				_view.textInput.setFocus();
+				
+				//adjust scroller view port if field is rendered in MultipleEntityAsTableFormItem
+				var scroller:Scroller = UIUtil.getFirstAncestor(_view, Scroller);
+				if ( scroller != null && scroller.styleName == "multipleEntityScroller" && scroller.viewport != null ) {
+					if ( ! isNaN(scroller.viewport.verticalScrollPosition) ) {
+						var verticalAdjustment:Number = event.obj == null || event.obj.horizontalMove ? 0: event.obj.offset < 0 ? -5: 5;
+						scroller.viewport.verticalScrollPosition += verticalAdjustment;
+					}
+					if ( ! isNaN(scroller.viewport.horizontalScrollPosition) ) {
+						var horizontalAdjustment:Number = event.obj == null || ! event.obj.horizontalMove ? 0: event.obj.offset < 0 ? -5: 5;
+						scroller.viewport.horizontalScrollPosition += horizontalAdjustment;
+					}
+				}
 			}
 		}
 		
@@ -363,6 +378,14 @@ package org.openforis.collect.presenter {
 				case Keyboard.TAB:
 					horizontalMove = true;
 					offset = event.shiftKey ? -1: 1;
+					break;
+				case Keyboard.RIGHT:
+					horizontalMove = true;
+					offset = 1;
+					break;
+				case Keyboard.LEFT:
+					horizontalMove = true;
+					offset = -1;
 					break;
 				case Keyboard.DOWN:
 					horizontalMove = false;

@@ -96,6 +96,7 @@
 			</s:layout.byRows>
 			
 			<s:Scroller id="headerScroller" 
+						styleName="multipleEntityScroller"
 						horizontalScrollPolicy="off" 
 						verticalScrollPolicy="off"
 						width.byRows="100%"
@@ -133,6 +134,7 @@
 			</s:Scroller>
 			
 			<s:Scroller id="scroller" 
+						styleName="multipleEntityScroller"
 						width="100%"
 						height="100%">
 				<s:DataGroup id="dataGroup"
