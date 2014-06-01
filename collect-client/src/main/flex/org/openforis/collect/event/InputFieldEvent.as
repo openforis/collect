@@ -11,6 +11,7 @@ package org.openforis.collect.event
 	public class InputFieldEvent extends UIEvent {
 		
 		public static const FOCUS_IN:String = "inputFieldFocusIn";
+		public static const FOCUS_OUT:String = "inputFieldFocusOut";
 		public static const CHANGING:String = "inputFieldChanging";
 		public static const OPEN_REMARKS_POPUP:String = "inputFieldOpenRemarksPopup";
 		public static const VISITED:String = "visited";

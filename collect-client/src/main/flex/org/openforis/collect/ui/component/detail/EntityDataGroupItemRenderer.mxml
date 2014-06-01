@@ -11,7 +11,6 @@
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
 			import mx.collections.IList;
-			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -20,6 +19,7 @@
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.EntityDataGroupItemPresenter;
 			import org.openforis.collect.ui.UIBuilder;
 
 			public static const DIRECTION_HORIZONTAL:String = "horizontal";
@@ -33,11 +33,10 @@
 			private var _nodesDirection:String = DIRECTION_HORIZONTAL;
 			private var _inited:Boolean = false;
 			
-			override protected function creationCompleteHandler(event:FlexEvent):void {
-				super.creationCompleteHandler(event);
-				//TODO create custom presenter
+			override protected function initPresenter():void {
+				_presenter = new EntityDataGroupItemPresenter(this);	
 			}
-			
+
 			override protected function createChildren():void {
 				super.createChildren();
 				contentGroup.addElement(rowNumberLabel);

@@ -35,7 +35,7 @@ package org.openforis.collect.event {
 		
 		public static const ITEM_SELECT:String = "itemSelect";
 		
-		//survey preveiw
+		//survey preview
 		public static const SHOW_SURVEY_PREVIEW:String = "showSurveyPreview";
 		
 		public static const OPEN_SPECIES_IMPORT_POPUP:String = "openSpeciesImportPopUp";

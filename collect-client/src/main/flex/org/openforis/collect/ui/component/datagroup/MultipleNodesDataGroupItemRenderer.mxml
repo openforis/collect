@@ -21,7 +21,7 @@
 					<s:SolidColorStroke color="#0000EE" weight="2"/>
 				</s:stroke>
 			</s:Line>
-			<s:HGroup id="contentGroup" gap="2">
+			<s:HGroup id="contentGroup" gap="2" paddingBottom="2" paddingTop="2">
 				<mx:Image id="dragAnchor" 
 						  visible="{dragEnabled}" 
 						  includeInLayout="{dragEnabled}"
@@ -36,6 +36,7 @@
 				</s:stroke>
 			</s:Line>
 		</s:VGroup>
+		
 	</fx:Declarations>
 	
 	<fx:Script>
@@ -49,11 +50,15 @@
 			public static const STATE_DROPPING_TOP:String = "droppingTop";
 			public static const STATE_DROPPING_BOTTOM:String = "droppingBottom";
 			
-			private var _presenter:MultipleNodesDataGroupItemPresenter;
+			protected var _presenter:MultipleNodesDataGroupItemPresenter;
 			private var _dragEnabled:Boolean = true;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				_presenter = new MultipleNodesDataGroupItemPresenter(this);
+				initPresenter();
+			}
+			
+			protected function initPresenter():void {
+				_presenter = new MultipleNodesDataGroupItemPresenter(this);	
 			}
 			
 			override protected function createChildren():void {
@@ -73,4 +78,12 @@
 		
 		]]>
 	</fx:Script>
+	
+	<s:Rect id="selectedBackgroundObject" top="0" bottom="0" left="0" right="0" 
+			visible="false">
+		<s:fill>
+			<s:SolidColor color="#A3FFA3" />
+		</s:fill>
+	</s:Rect>
+
 </s:ItemRenderer>

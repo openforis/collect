@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
@@ -101,6 +102,7 @@ package org.openforis.collect.presenter {
 			if ( _view.textInput != null && _view.attribute != null && 
 					_view.attribute.id == event.attributeId && 
 					_view.fieldIndex == event.fieldIdx ) {
+				
 				_view.textInput.setFocus();
 				
 				//adjust scroller view port if field is rendered in MultipleEntityAsTableFormItem
@@ -356,6 +358,12 @@ package org.openforis.collect.presenter {
 		
 		protected function focusInHandler(event:FocusEvent):void {
 			UIUtil.ensureElementIsVisible(event.target);
+			
+			//dispatch FOCUS_IN event
+			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.FOCUS_IN);
+			inputFieldEvent.inputField = _view;
+			inputFieldEvent.parentEntityId = _view.parentEntity.id;
+			eventDispatcher.dispatchEvent(inputFieldEvent);
 		}
 		
 		protected function focusOutHandler(event:FocusEvent):void {
@@ -363,8 +371,16 @@ package org.openforis.collect.presenter {
 				updateValue();
 			}
 			_view.visited = true;
+			
+			//dispatch VISITED event
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.VISITED);
 			inputFieldEvent.inputField = _view;
+			eventDispatcher.dispatchEvent(inputFieldEvent);
+
+			//dispatch FOCUS_OUT event
+			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.FOCUS_OUT);
+			inputFieldEvent.inputField = _view;
+			inputFieldEvent.parentEntityId = _view.parentEntity.id;
 			eventDispatcher.dispatchEvent(inputFieldEvent);
 		}
 		

@@ -1,5 +1,6 @@
 package org.openforis.collect.presenter {
 	import flash.display.DisplayObject;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
 	import mx.core.DragSource;
@@ -7,6 +8,7 @@ package org.openforis.collect.presenter {
 	import mx.managers.DragManager;
 	
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.ui.Images;
@@ -19,7 +21,7 @@ package org.openforis.collect.presenter {
 	 */
 	public class MultipleNodesDataGroupItemPresenter extends AbstractPresenter {
 		
-		private var _view:MultipleNodesDataGroupItemRenderer;
+		protected var _view:MultipleNodesDataGroupItemRenderer;
 		private var _handCursor:int = -1;
 		
 		public function MultipleNodesDataGroupItemPresenter(view:MultipleNodesDataGroupItemRenderer) {
@@ -40,6 +42,9 @@ package org.openforis.collect.presenter {
 			_view.dragAnchor.addEventListener(MouseEvent.MOUSE_MOVE, dragAnchorMouseMoveHandler);
 			_view.dragAnchor.addEventListener(MouseEvent.MOUSE_OVER, dragAnchorMouseOverHandler);
 			_view.dragAnchor.addEventListener(MouseEvent.MOUSE_OUT, dragAnchorMouseOutHandler);
+			
+			eventDispatcher.addEventListener(InputFieldEvent.FOCUS_IN, fieldFocusInHandler);
+			eventDispatcher.addEventListener(InputFieldEvent.FOCUS_OUT, fieldFocusOutHandler);
 		}
 		
 		protected function dragAnchorMouseMoveHandler(event:MouseEvent):void {
@@ -140,5 +145,12 @@ package org.openforis.collect.presenter {
 				_view.dragAnchor.setFocus();
 			}
 		}
+		
+		protected function fieldFocusOutHandler(event:InputFieldEvent):void {
+		}
+		
+		protected function fieldFocusInHandler(event:InputFieldEvent):void {
+		}
+		
 	}
 }
