@@ -1,6 +1,7 @@
 package org.openforis.collect.presenter {
 	import flash.display.DisplayObject;
 	import flash.events.Event;
+	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.ui.Keyboard;
@@ -52,6 +53,8 @@ package org.openforis.collect.presenter {
 			super.initEventListeners();
 			
 			_view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
+			_view.openImage.addEventListener(KeyboardEvent.KEY_DOWN, openImageKeyDownHandler);
+			_view.openImage.addEventListener(FocusEvent.FOCUS_OUT, openImageFocusOutHandler);
 		}
 		
 		protected function initViewState():void {
@@ -228,5 +231,27 @@ package org.openforis.collect.presenter {
 			}
 			return description;
 		}
+		
+		override protected function keyDownHandler(event:KeyboardEvent):void {
+			if ( event.keyCode == Keyboard.TAB && ! event.shiftKey ) {
+				_view.openImage.setFocus();
+				dispatchFocusInEvent();
+			} else {
+				super.keyDownHandler(event);
+			}
+		}
+		
+		protected function openImageKeyDownHandler(event:KeyboardEvent):void {
+			if ( event.keyCode == Keyboard.TAB && event.shiftKey ) {
+				_view.textInput.setFocus();
+			} else {
+				super.keyDownHandler(event);
+			}
+		}
+		
+		protected function openImageFocusOutHandler(event:FocusEvent):void {
+			dispatchFocusOutEvent();
+		}
+
 	}
 }

@@ -47,13 +47,13 @@
 						 toolTip.default="{description}"
 						 />
 		
-		<s:Image id="openImage" 
-				 source="{Images.OPEN_POPUP}" 
-				 useHandCursor="true" 
-				 buttonMode="true"
-				 visible="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
-				 includeInLayout="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
-				 />
+		<s:Button id="openImage"
+				  useHandCursor="true"
+				  buttonMode="true"
+				  skinClass="org.openforis.collect.ui.skin.OpenPopUpButtonSkin"
+				  visible="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
+				  includeInLayout="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
+				  />
 		
 		<s:Label id="descriptionLabel" 
 				 includeIn="descriptionVisible" 

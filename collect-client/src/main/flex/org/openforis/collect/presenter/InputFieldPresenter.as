@@ -359,7 +359,10 @@ package org.openforis.collect.presenter {
 		protected function focusInHandler(event:FocusEvent):void {
 			UIUtil.ensureElementIsVisible(event.target);
 			
-			//dispatch FOCUS_IN event
+			dispatchFocusInEvent();
+		}
+		
+		protected function dispatchFocusInEvent():void {
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.FOCUS_IN);
 			inputFieldEvent.inputField = _view;
 			inputFieldEvent.parentEntityId = _view.parentEntity.id;
@@ -377,7 +380,10 @@ package org.openforis.collect.presenter {
 			inputFieldEvent.inputField = _view;
 			eventDispatcher.dispatchEvent(inputFieldEvent);
 
-			//dispatch FOCUS_OUT event
+			dispatchFocusOutEvent();
+		}
+		
+		protected function dispatchFocusOutEvent():void {
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.FOCUS_OUT);
 			inputFieldEvent.inputField = _view;
 			inputFieldEvent.parentEntityId = _view.parentEntity.id;
