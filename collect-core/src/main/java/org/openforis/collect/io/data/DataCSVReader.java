@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.manager.dataimport;
+package org.openforis.collect.io.data;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -9,17 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.io.data.DataLine.EntityIdentifier;
+import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
+import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
+import org.openforis.collect.io.data.DataLine.EntityKeysIdentifierDefintion;
+import org.openforis.collect.io.data.DataLine.EntityPositionIdentifierDefinition;
+import org.openforis.collect.io.data.DataLine.SingleEntityIdentifierDefinition;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.CSVDataImportReader;
 import org.openforis.collect.io.metadata.parsing.CSVLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
-import org.openforis.collect.manager.dataimport.DataLine.EntityIdentifier;
-import org.openforis.collect.manager.dataimport.DataLine.EntityIdentifierDefinition;
-import org.openforis.collect.manager.dataimport.DataLine.EntityKeysIdentifier;
-import org.openforis.collect.manager.dataimport.DataLine.EntityKeysIdentifierDefintion;
-import org.openforis.collect.manager.dataimport.DataLine.EntityPositionIdentifierDefinition;
-import org.openforis.collect.manager.dataimport.DataLine.SingleEntityIdentifierDefinition;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;

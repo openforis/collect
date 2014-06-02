@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.manager.dataimport;
+package org.openforis.collect.io.data;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,15 +24,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.ReferenceDataImportStatus;
+import org.openforis.collect.io.data.DataLine.EntityIdentifier;
+import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
+import org.openforis.collect.io.data.DataLine.EntityPositionIdentifier;
+import org.openforis.collect.io.data.DataLine.FieldValueKey;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
-import org.openforis.collect.manager.dataimport.DataLine.EntityIdentifier;
-import org.openforis.collect.manager.dataimport.DataLine.EntityKeysIdentifier;
-import org.openforis.collect.manager.dataimport.DataLine.EntityPositionIdentifier;
-import org.openforis.collect.manager.dataimport.DataLine.FieldValueKey;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;

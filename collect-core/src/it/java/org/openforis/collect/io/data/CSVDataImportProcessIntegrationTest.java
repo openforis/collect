@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.dataimport;
+package org.openforis.collect.io.data;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -17,11 +17,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.ReferenceDataImportStatus;
+import org.openforis.collect.io.data.CSVDataImportProcess;
+import org.openforis.collect.io.data.CSVDataImportProcess.ImportException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.dataimport.CSVDataImportProcess.ImportException;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;

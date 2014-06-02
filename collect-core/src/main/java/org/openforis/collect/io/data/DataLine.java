@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.dataimport;
+package org.openforis.collect.io.data;
 
 import java.util.Arrays;
 import java.util.HashMap;
