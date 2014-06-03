@@ -27,6 +27,7 @@ import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeChangeMap;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.proxy.NodeChangeSetProxy;
@@ -120,17 +121,27 @@ public class DataService {
 	@Secured("ROLE_ENTRY")
 	public Map<String, Object> loadRecordSummaries(String rootEntityName, int offset, int maxNumberOfRows, List<RecordSummarySortField> sortFields, String[] keyValues) {
 		Map<String, Object> result = new HashMap<String, Object>();
+		
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
-		int count = recordManager.getRecordCount(activeSurvey, rootEntityDefinitionName, keyValues);
+		
+		//load summaries
 		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
 		Locale locale = sessionState.getLocale();
 		List<RecordProxy> proxies = RecordProxy.fromList(summaries, locale);
-		result.put("count", count);
+		
 		result.put("records", proxies);
+		
+		//count total records
+		RecordFilter filter = new RecordFilter(activeSurvey, rootEntityDefinition.getId());
+		filter.setKeyValues(keyValues);
+		
+		int count = recordManager.countRecords(filter);
+		result.put("count", count);
+		
 		return result;
 	}
 

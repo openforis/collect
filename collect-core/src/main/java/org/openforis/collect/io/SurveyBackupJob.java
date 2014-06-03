@@ -8,8 +8,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.openforis.collect.io.data.RecordFileBackupTask;
 import org.openforis.collect.io.data.DataBackupTask;
+import org.openforis.collect.io.data.RecordFileBackupTask;
 import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
 import org.openforis.collect.io.metadata.IdmlExportTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask;
@@ -20,6 +20,7 @@ import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.WorkerStatusChangeEvent;
@@ -63,6 +64,7 @@ public class SurveyBackupJob extends Job {
 	private CollectSurvey survey;
 	private boolean includeData;
 	private boolean includeRecordFiles;
+	private RecordFilter recordFilter;
 	
 	//output
 	private File outputFile;
@@ -149,6 +151,7 @@ public class SurveyBackupJob extends Job {
 		DataBackupTask task = createTask(DataBackupTask.class);
 		task.setRecordManager(recordManager);
 		task.setDataMarshaller(dataMarshaller);
+		task.setRecordFilter(recordFilter);
 		task.setZipOutputStream(zipOutputStream);
 		task.setSurvey(survey);
 		addTask(task);
@@ -204,6 +207,14 @@ public class SurveyBackupJob extends Job {
 
 	public void setIncludeData(boolean includeData) {
 		this.includeData = includeData;
+	}
+	
+	public RecordFilter getRecordFilter() {
+		return recordFilter;
+	}
+	
+	public void setRecordFilter(RecordFilter recordFilter) {
+		this.recordFilter = recordFilter;
 	}
 	
 	public boolean isIncludeRecordFiles() {

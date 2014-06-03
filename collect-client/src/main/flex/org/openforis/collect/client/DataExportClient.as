@@ -30,13 +30,14 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function export(responder:IResponder, rootEntityName:String, stepNumber:int, entityId:Number = NaN, includeAllAncestorAttributes:Boolean = false):void {
-			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes);
+		public function export(responder:IResponder, rootEntityName:String, stepNumber:int, entityId:Number = NaN, 
+							   includeAllAncestorAttributes:Boolean = false, onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null):void {
+			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes, onlyOwnedRecords, rootEntityKeyValues);
 			token.addResponder(responder);
 		}
 		
-		public function fullExport(responder:IResponder, rootEntityName:String, includeRecordFiles:Boolean = false):void {
-			var token:AsyncToken = this._fullExportOperation.send(rootEntityName, includeRecordFiles);
+		public function fullExport(responder:IResponder, includeRecordFiles:Boolean = false, onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null):void {
+			var token:AsyncToken = this._fullExportOperation.send(includeRecordFiles, onlyOwnedRecords, rootEntityKeyValues);
 			token.addResponder(responder);
 		}
 		

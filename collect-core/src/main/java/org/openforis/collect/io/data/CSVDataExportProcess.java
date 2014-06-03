@@ -33,6 +33,7 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -61,10 +62,8 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private RecordManager recordManager;
 	
 	private File outputFile;
-	private CollectSurvey survey;
-	private String rootEntityName;
+	private RecordFilter recordFilter;
 	private Integer entityId;
-	private Step step;
 	private boolean includeAllAncestorAttributes;
 	private boolean includeKMLColumnForCoordinates;
 	private boolean includeCodeItemPositionColumn;
@@ -131,22 +130,22 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		//System.out.println("Exported "+rowsCount+" rows from "+read+" records in "+(duration/1000)+"s ("+(duration/rowsCount)+"ms/row).");
 	}
 
-	private String calculateOutputFileName() {
-		return "data.zip";
-		/*
-		StringBuilder sb = new StringBuilder();
-		sb.append(survey.getName());
-		sb.append("_");
-		sb.append(rootEntityName);
-		sb.append("_");
-		sb.append("csv_data");
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		String today = formatter.format(new Date());
-		sb.append(today);
-		sb.append(".zip");
-		return sb.toString();
-		*/
-	}
+//	private String calculateOutputFileName() {
+//		return "data.zip";
+//		/*
+//		StringBuilder sb = new StringBuilder();
+//		sb.append(survey.getName());
+//		sb.append("_");
+//		sb.append(rootEntityName);
+//		sb.append("_");
+//		sb.append("csv_data");
+//		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+//		String today = formatter.format(new Date());
+//		sb.append(today);
+//		sb.append(".zip");
+//		return sb.toString();
+//		*/
+//	}
 
 	private void exportData(OutputStream outputStream, int entityId) throws InvalidExpressionException, IOException, RecordPersistenceException {
 		Writer outputWriter = new OutputStreamWriter(outputStream, OpenForisIOUtils.UTF_8);
@@ -157,15 +156,14 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		ModelCsvWriter modelWriter = new ModelCsvWriter(outputWriter, transform);
 		modelWriter.printColumnHeadings();
 		
-		int stepNumber = step.getStepNumber();
-		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName);
+		CollectSurvey survey = recordFilter.getSurvey();
+		Step step = recordFilter.getStepGreaterOrEqual();
+		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
 		for (CollectRecord s : summaries) {
 			if ( status.isRunning() ) {
-				if ( stepNumber <= s.getStep().getStepNumber() ) {
-					CollectRecord record = recordManager.load(survey, s.getId(), stepNumber);
-					modelWriter.printData(record);
-					status.incrementProcessed();
-				}
+				CollectRecord record = recordManager.load(survey, s.getId(), step);
+				modelWriter.printData(record);
+				status.incrementProcessed();
 			} else {
 				break;
 			}
@@ -174,9 +172,9 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	
 	private Collection<EntityDefinition> getEntitiesToExport() {
 		final Collection<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		Schema schema = survey.getSchema();
+		Schema schema = recordFilter.getSurvey().getSchema();
 		if ( entityId == null ) {
-			EntityDefinition rootEntity = schema.getRootEntityDefinition(rootEntityName);
+			EntityDefinition rootEntity = schema.getRootEntityDefinition(recordFilter.getRootEntityId());
 			rootEntity.traverse(new NodeDefinitionVisitor() {
 				@Override
 				public void visit(NodeDefinition node) {
@@ -193,10 +191,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	}
 	
 	private int calculateTotal() {
-		Schema schema = survey.getSchema();
-		EntityDefinition rootEntity = schema.getRootEntityDefinition(rootEntityName);
-		int stepNumber = step.getStepNumber();
-		int totalRecords = recordManager.countRecords(survey, rootEntity.getId(), stepNumber);
+		int totalRecords = recordManager.countRecords(recordFilter);
 		Collection<EntityDefinition> entitiesToExport = getEntitiesToExport();
 		int result = totalRecords * entitiesToExport.size();
 		return result;
@@ -205,6 +200,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	protected DataTransformation getTransform(int entityId) throws InvalidExpressionException {
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
 		
+		CollectSurvey survey = recordFilter.getSurvey();
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		
@@ -232,19 +228,8 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		return entityColumnProvider;
 	}
 	
-	private int calculateTotal(List<CollectRecord> recordSummaries) {
-		int count = 0;
-		int stepNumber = step.getStepNumber();
-		for (CollectRecord summary : recordSummaries) {
-			int recordStepNumber = summary.getStep().getStepNumber();
-			if ( recordStepNumber == stepNumber) {
-				count ++;
-			}
-		}
-		return count;
-	}
-
 	private DataTransformation getTransform() throws InvalidExpressionException {
+		CollectSurvey survey = recordFilter.getSurvey();
 		Schema schema = survey.getSchema();
 		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
@@ -339,36 +324,20 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		this.outputFile = outputFile;
 	}
 
-	public CollectSurvey getSurvey() {
-		return survey;
+	public RecordFilter getRecordFilter() {
+		return recordFilter;
 	}
-
-	public void setSurvey(CollectSurvey survey) {
-		this.survey = survey;
+	
+	public void setRecordFilter(RecordFilter recordFilter) {
+		this.recordFilter = recordFilter;
 	}
-
-	public String getRootEntityName() {
-		return rootEntityName;
-	}
-
-	public void setRootEntityName(String rootEntityName) {
-		this.rootEntityName = rootEntityName;
-	}
-
+	
 	public Integer getEntityId() {
 		return entityId;
 	}
 
 	public void setEntityId(Integer entityId) {
 		this.entityId = entityId;
-	}
-
-	public Step getStep() {
-		return step;
-	}
-
-	public void setStep(Step step) {
-		this.step = step;
 	}
 
 	public boolean isIncludeAllAncestorAttributes() {

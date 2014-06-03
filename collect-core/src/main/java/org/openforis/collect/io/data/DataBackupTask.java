@@ -1,19 +1,19 @@
 package org.openforis.collect.io.data;
 
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.concurrency.Task;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -34,6 +34,7 @@ public class DataBackupTask extends Task {
 	private ZipOutputStream zipOutputStream;
 	private CollectSurvey survey;
 	private Step[] steps;
+	private RecordFilter recordFilter;
 	
 	public DataBackupTask() {
 		super();
@@ -42,13 +43,23 @@ public class DataBackupTask extends Task {
 	}
 	
 	@Override
+	protected void initInternal() throws Throwable {
+		super.initInternal();
+		if ( recordFilter == null ) {
+			recordFilter = new RecordFilter(survey);
+		}
+	}
+	
+	@Override
 	protected long countTotalItems() {
 		int count = 0;
-		List<CollectRecord> recordSummaries = loadAllSummaries();
-		for (CollectRecord summary : recordSummaries) {
-			for (Step step: steps) {
-				if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
-					count ++;
+		List<CollectRecord> recordSummaries = recordManager.loadSummaries(recordFilter);
+		if ( CollectionUtils.isNotEmpty(recordSummaries) && steps != null && steps.length > 0 ) {
+			for (CollectRecord summary : recordSummaries) {
+				for (Step step : steps) {
+					if ( step.getStepNumber() <= summary.getStep().getStepNumber() ) {
+						count ++;
+					}
 				}
 			}
 		}
@@ -57,8 +68,8 @@ public class DataBackupTask extends Task {
 
 	@Override
 	protected void execute() throws Throwable {
-		List<CollectRecord> recordSummaries = loadAllSummaries();
-		if ( recordSummaries != null && steps != null && steps.length > 0 ) {
+		List<CollectRecord> recordSummaries = recordManager.loadSummaries(recordFilter);
+		if ( CollectionUtils.isNotEmpty(recordSummaries) && steps != null && steps.length > 0 ) {
 			for (CollectRecord summary : recordSummaries) {
 				for (Step step : steps) {
 					if ( isRunning() ) {
@@ -74,16 +85,6 @@ public class DataBackupTask extends Task {
 		}
 	}
 
-	private List<CollectRecord> loadAllSummaries() {
-		List<CollectRecord> summaries = new ArrayList<CollectRecord>();
-		List<EntityDefinition> rootEntityDefinitions = survey.getSchema().getRootEntityDefinitions();
-		for (EntityDefinition rootEntityDefn : rootEntityDefinitions) {
-			List<CollectRecord> temp = recordManager.loadSummaries(survey, rootEntityDefn.getName());
-			summaries.addAll(temp);
-		}
-		return summaries;
-	}
-	
 	private void backup(CollectRecord summary, Step step) {
 		Integer id = summary.getId();
 		try {
@@ -114,6 +115,14 @@ public class DataBackupTask extends Task {
 	
 	public void setDataMarshaller(DataMarshaller dataMarshaller) {
 		this.dataMarshaller = dataMarshaller;
+	}
+	
+	public RecordFilter getRecordFilter() {
+		return recordFilter;
+	}
+	
+	public void setRecordFilter(RecordFilter recordFilter) {
+		this.recordFilter = recordFilter;
 	}
 	
 	public CollectSurvey getSurvey() {

@@ -20,7 +20,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.io.data.DataExportStatus$Format;
 	import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 	import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
@@ -28,8 +27,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.NodeItem;
 	import org.openforis.collect.ui.component.DataExportPopUp;
+	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.concurrency.proxy.JobProxy;
 	import org.openforis.concurrency.proxy.JobProxy$Status;
 	
@@ -44,6 +45,9 @@ package org.openforis.collect.presenter {
 		
 		private static const PROGRESS_DELAY:int = 2000;
 		private static const ALL_STEPS_ITEM:Object = {label: Message.get('global.allItemsLabel')};
+		
+		private static const TYPE_FULL:String = "full";
+		private static const TYPE_PARTIAL:String = "partial";
 		
 		private var _cancelResponder:IResponder;
 		private var _exportResponder:IResponder;
@@ -93,79 +97,82 @@ package org.openforis.collect.presenter {
 			_type = type;
 			initStepsDropDown();
 			switch ( type ) {
-				case "full":
+				case TYPE_FULL:
 					_view.currentState = DataExportPopUp.STATE_PARAMETERS_SELECTION;
 					break;
-				case "partial":
+				case TYPE_PARTIAL:
 					_view.currentState = DataExportPopUp.STATE_PARTIAL_EXPORT_PARAMETERS_SELECTION;
 					break;
 			}
 		}
 		
 		protected function exportButtonClickHandler(event:MouseEvent):void {
-			var rootEntity:String = Application.activeRootEntity.name;
+			if ( ! validateForm() ) {
+				return;
+			}
+			var onlyOwnedRecords:Boolean = DataExportPopUp(_view).onlyOwnedRecordsCheckBox.selected;
+			var rootEntityKeys:Array = getInsertedKeyValues();
+			
 			var step:Object;
 			var stepNumber:Number;
 			switch ( _type ) {
-				case "partial":
-					if ( validatePartialExportForm() ) {
-						step = DataExportPopUp(_view).stepDropDownList.selectedItem;
-						stepNumber = Application.getRecordStepNumber(CollectRecord$Step(step));
-						var exportAll:Boolean = DataExportPopUp(_view).exportAllCheckBox.selected;
-						var entityId:Number = NaN;
-						if ( ! exportAll ) {
-							var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
-							entityId = selectedEntity.id;
-						}
-						var includeAllAncestorAttributes:Boolean = DataExportPopUp(_view).includeAllAncestorAttributesCheckBox.selected;
-						ClientFactory.dataExportClient.export(_exportResponder, rootEntity, stepNumber, entityId, includeAllAncestorAttributes);
-						
-						_view.currentState = DataExportPopUp.STATE_EXPORTING;
-						DataExportPopUp(_view).progressBar.setProgress(0, 0);
-					}
-					break;
-				case "full":
-					/*
-					step = DataExportPopUp(_view).stepDropDownList.selectedItem;
-					var stepNums:Array;
-					if ( step != ALL_STEPS_ITEM ) {
-						stepNumber = Application.getRecordStepNumber(CollectRecord$Step(step));
-						stepNums = [stepNumber];
-					} else {
-						stepNums = [1, 2, 3];
-					}
-					*/
-					var includeRecordFiles:Boolean = DataExportPopUp(_view).includeRecordFilesCheckBox.selected;
-					ClientFactory.dataExportClient.fullExport(_exportResponder, rootEntity, includeRecordFiles);
-					_view.currentState = DataExportPopUp.STATE_EXPORTING;
-					DataExportPopUp(_view).progressBar.setProgress(0, 0);
-					break;
+			case TYPE_PARTIAL:
+				var rootEntity:String = Application.activeRootEntity.name;
+				
+				step = DataExportPopUp(_view).stepDropDownList.selectedItem;
+				stepNumber = Application.getRecordStepNumber(CollectRecord$Step(step));
+				var exportAll:Boolean = DataExportPopUp(_view).exportAllCheckBox.selected;
+				var entityId:Number = NaN;
+				if ( ! exportAll ) {
+					var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
+					entityId = selectedEntity.id;
+				}
+				var includeAllAncestorAttributes:Boolean = DataExportPopUp(_view).includeAllAncestorAttributesCheckBox.selected;
+				
+				ClientFactory.dataExportClient.export(_exportResponder, rootEntity, stepNumber, entityId, 
+						includeAllAncestorAttributes, onlyOwnedRecords, rootEntityKeys);
+				
+				_view.currentState = DataExportPopUp.STATE_EXPORTING;
+				DataExportPopUp(_view).progressBar.setProgress(0, 0);
+				break;
+			case TYPE_FULL:
+				var includeRecordFiles:Boolean = DataExportPopUp(_view).includeRecordFilesCheckBox.selected;
+				ClientFactory.dataExportClient.fullExport(_exportResponder, includeRecordFiles, onlyOwnedRecords, rootEntityKeys);
+				_view.currentState = DataExportPopUp.STATE_EXPORTING;
+				DataExportPopUp(_view).progressBar.setProgress(0, 0);
+				break;
 			}
 		}
 		
-		private function validatePartialExportForm():Boolean {
-			var step:CollectRecord$Step = DataExportPopUp(_view).stepDropDownList.selectedItem;
-			//validate step
-			if ( step == null ) {
-				AlertUtil.showError("export.error.selectStep");
-				return false;
-			} else {
-				//validate selected entity
-				var exportAll:Boolean = DataExportPopUp(_view).exportAllCheckBox.selected;
-				if ( exportAll ) {
-					return true;
+		private function validateForm():Boolean {
+			switch ( _type ) {
+			case TYPE_PARTIAL:
+				var step:CollectRecord$Step = DataExportPopUp(_view).stepDropDownList.selectedItem;
+				//validate step
+				if ( step == null ) {
+					AlertUtil.showError("export.error.selectStep");
+					return false;
 				} else {
-					var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
-					if ( selectedEntity == null ) {
-						AlertUtil.showMessage("export.selectAnEntity");
-						return false;
-					} else if ( ! selectedEntity.nodeDefinition.multiple ) {
-						AlertUtil.showMessage("export.selectMultipleEntity");
-						return false;
-					} else {
+					//validate selected entity
+					var exportAll:Boolean = DataExportPopUp(_view).exportAllCheckBox.selected;
+					if ( exportAll ) {
 						return true;
+					} else {
+						var selectedEntity:NodeItem = DataExportPopUp(_view).rootTree.selectedItem as NodeItem;
+						if ( selectedEntity == null ) {
+							AlertUtil.showMessage("export.selectAnEntity");
+							return false;
+						} else if ( ! selectedEntity.nodeDefinition.multiple ) {
+							AlertUtil.showMessage("export.selectMultipleEntity");
+							return false;
+						} else {
+							return true;
+						}
 					}
 				}
+				break;
+			default:
+				return true;
 			}
 		}
 		
@@ -302,10 +309,29 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initView():void {
+			checkEnabledFields();
 			initEntitiesTree();
 			initStepsDropDown();
 			//try to see if there is an export still running
 			updateExportState();
+			
+			populateForm();
+		}
+		
+		protected function checkEnabledFields():void {
+			//only owned records checkbox
+			if ( Application.user.canViewDifferentOwnedRecords ) {
+				DataExportPopUp(_view).onlyOwnedRecordsCheckBox.enabled = true;
+				DataExportPopUp(_view).onlyOwnedRecordsCheckBox.selected = false;
+			} else {
+				DataExportPopUp(_view).onlyOwnedRecordsCheckBox.enabled = false;
+				DataExportPopUp(_view).onlyOwnedRecordsCheckBox.selected = true;
+			}
+		}
+		
+		protected function populateForm():void {
+			var keyDefns:IList = Application.activeRootEntity.keyAttributeDefinitions;
+			DataExportPopUp(_view).rootEntityKeyDefinitions = keyDefns;
 		}
 		
 		protected function initEntitiesTree():void {
@@ -320,16 +346,26 @@ package org.openforis.collect.presenter {
 		
 		protected function initStepsDropDown():void {
 			var steps:IList = new ArrayCollection(CollectRecord$Step.constants);
-			if ( _type == "full" ) {
+			if ( _type == TYPE_FULL ) {
 				steps.addItemAt(ALL_STEPS_ITEM, 0);
 			}
 			var stepDropDownList:DropDownList = DataExportPopUp(_view).stepDropDownList;
 			stepDropDownList.dataProvider = steps;
 			stepDropDownList.callLater(function():void {
-				if ( _type == "full" ) {
+				if ( _type == TYPE_FULL ) {
 					stepDropDownList.selectedIndex = 0;
 				}
 			});
+		}
+		
+		private function getInsertedKeyValues():Array {
+			var result:Array = new Array();
+			for (var idx:int = 0; idx < Application.activeRootEntity.keyAttributeDefinitions.length; idx++) {
+				var textInput:TextInput = TextInput(DataExportPopUp(_view).rootEntityKeyTextInput[idx]);
+				var value:String = StringUtil.trimToNull(textInput.text);
+				result.push(value);
+			}
+			return result;
 		}
 		
 	}

@@ -4,12 +4,14 @@
 				 xmlns:mx="library://ns.adobe.com/flex/mx"
 				 xmlns:component="org.openforis.collect.ui.component.*"
 				 currentState="{STATE_LOADING}"
-				 width="400" height="300" height.partialExportParametersSelection="500"
-				 title="{Message.get('export.popUp.title')}"
+				 width="600" height="300" height.partialExportParametersSelection="600"
+				 title="{Message.get('export.popUp.title')}" xmlns:container="org.openforis.collect.ui.container.*" xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:input="org.openforis.collect.ui.component.input.*"
 				 >
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.IList;
+			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.presenter.DataExportPopUpPresenter;
@@ -22,6 +24,7 @@
 			public static const STATE_COMPLETE:String = "complete";
 			
 			private var _presenter:DataExportPopUpPresenter;
+			private var _rootEntityKeyDefinitions:IList;
 			
 			override protected function initializationComplete():void {
 				super.initializationComplete();
@@ -39,6 +42,15 @@
 					default:
 						return step.label;
 				} 
+			}
+			
+			[Bindable]
+			public function get rootEntityKeyDefinitions():IList {
+				return _rootEntityKeyDefinitions;
+			}
+			
+			public function set rootEntityKeyDefinitions(value:IList):void {
+				this._rootEntityKeyDefinitions = value;
 			}
 			
 		]]>
@@ -111,7 +123,7 @@
 		<s:VGroup id="parametersSelectionContainer"
 				  horizontalAlign="center"
 				  width="100%" height="100%"
-				  gap="30"
+				  gap="15"
 				  visible="false" includeInLayout="false"
 				  visible.parametersSelection="true" includeInLayout.parametersSelection="true"
 				  >
@@ -129,15 +141,32 @@
 								/>
 			</s:HGroup>
 			
-			<s:HGroup verticalAlign="middle" 
-					  visible="true" 
-					  includeInLayout="true" 
-					  visible.partialExportParametersSelection="false"
-					  includeInLayout.partialExportParametersSelection="false">
-				<s:Label text="{Message.get('export.includeRecordFiles')}"
-						 styleName="formLabel"/>
-				<s:CheckBox id="includeRecordFilesCheckBox" />
-			</s:HGroup>
+			<s:VGroup>
+				<s:CheckBox id="onlyOwnedRecordsCheckBox" 
+							selected="false" 
+							label="{Message.get('export.includeOnlyOwnedRecords')}" />
+				
+				
+				<s:CheckBox id="includeRecordFilesCheckBox"
+							label="{Message.get('export.includeRecordFiles')}"
+							visible="true" 
+							includeInLayout="true" 
+							visible.partialExportParametersSelection="false"
+							includeInLayout.partialExportParametersSelection="false"
+							/>
+			</s:VGroup>
+			
+			<mx:HBox verticalAlign="middle">
+				<s:Label text="{Message.get('export.recordKeys')}:" styleName="formLabel"/>
+				
+				<mx:Repeater id="rootEntityKeysRp" dataProvider="{rootEntityKeyDefinitions}">
+					<mx:HBox>
+						<detail:FormItemLabel nodeDefinition="{NodeDefinitionProxy(rootEntityKeysRp.currentItem)}" />
+						
+						<input:TextInput id="rootEntityKeyTextInput" width="80" />
+					</mx:HBox>
+				</mx:Repeater>
+			</mx:HBox>
 			
 			<s:VGroup visible="false" 
 					  visible.partialExportParametersSelection="true"
@@ -159,12 +188,14 @@
 						 folderClosedIcon="{null}"
 						 />
 				
-				<s:CheckBox id="exportAllCheckBox" label="{Message.get('export.exportAll')}" />
-				
-				<s:CheckBox id="includeAllAncestorAttributesCheckBox" 
-							selected="false" 
-							label="{Message.get('export.includeAllAncestorAttributes')}" />
-				
+				<s:HGroup>
+					<s:CheckBox id="exportAllCheckBox" label="{Message.get('export.exportAll')}" />
+					
+					<s:CheckBox id="includeAllAncestorAttributesCheckBox" 
+								selected="false" 
+								label="{Message.get('export.includeAllAncestorAttributes')}" />
+					
+				</s:HGroup>
 			</s:VGroup>
 
 		</s:VGroup>

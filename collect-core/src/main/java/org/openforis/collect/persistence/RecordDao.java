@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Field;
 import org.jooq.JoinType;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.SelectConditionStep;
 import org.jooq.SelectQuery;
 import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
@@ -26,6 +26,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao.JooqFactory;
@@ -94,17 +95,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 
 	@Transactional
-	public int countRecords(int surveyId, int rootDefinitionId, String... keyValues) {
-		JooqFactory f = getMappingJooqFactory();
-		SelectQuery q = f.selectCountQuery();
-		q.addConditions(OFC_RECORD.SURVEY_ID.equal(surveyId)
-				.and(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootDefinitionId)));
-		addFilterByKeyConditions(q, keyValues);
-		Record r = q.fetchOne();
-		return (Integer) r.getValue(0);
-	}
-	
-	@Transactional
 	public boolean hasAssociatedRecords(int userId) {
 		JooqFactory f = getMappingJooqFactory();
 		SelectQuery q = f.selectCountQuery();
@@ -143,27 +133,61 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, Date modifiedSince, int offset, int maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
+		
+		RecordFilter filter = new RecordFilter(survey, rootEntityDefn.getId());
+		filter.setModifiedSince(modifiedSince);
+		filter.setOffset(offset);
+		filter.setMaxNumberOfRecords(maxRecords);
+		filter.setKeyValues(keyValues);
+		return loadSummaries(filter, sortFields);
+	}
+	
+	@Transactional
+	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
+		CollectSurvey survey = filter.getSurvey();
+		
 		JooqFactory jf = getMappingJooqFactory(survey);
 		SelectQuery q = jf.selectQuery();	
+		
 		q.addSelect(SUMMARY_FIELDS);
 		Field<String> ownerNameField = OFC_USER.USERNAME.as(RecordSummarySortField.Sortable.OWNER_NAME.name());
 		q.addSelect(ownerNameField);
 		q.addFrom(OFC_RECORD);
+		//join with user table to get owner name
 		q.addJoin(OFC_USER, JoinType.LEFT_OUTER_JOIN, OFC_RECORD.OWNER_ID.equal(OFC_USER.ID));
 
-		Schema schema = survey.getSchema();
-		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
-		Integer rootEntityDefnId = rootEntityDefn.getId();
+		//survey
 		q.addConditions(OFC_RECORD.SURVEY_ID.equal(survey.getId()));
-		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootEntityDefnId));
-		if ( step != null ) {
-			q.addConditions(OFC_RECORD.STEP.equal(step.getStepNumber()));
-		}
-		if ( modifiedSince != null ) {
-			q.addConditions(OFC_RECORD.DATE_MODIFIED.greaterOrEqual(new Timestamp(modifiedSince.getTime())));
-		}
-		addFilterByKeyConditions(q, keyValues);
 		
+		//root entity
+		if ( filter.getRootEntityId() != null ) {
+			q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(filter.getRootEntityId()));
+		}
+		
+		//step
+		if ( filter.getStep() != null ) {
+			q.addConditions(OFC_RECORD.STEP.equal(filter.getStep().getStepNumber()));
+		}
+		if ( filter.getStepGreaterOrEqual() != null ) {
+			q.addConditions(OFC_RECORD.STEP.greaterOrEqual(filter.getStepGreaterOrEqual().getStepNumber()));
+		}
+		
+		//modified since
+		if ( filter.getModifiedSince() != null ) {
+			q.addConditions(OFC_RECORD.DATE_MODIFIED.greaterOrEqual(new Timestamp(filter.getModifiedSince().getTime())));
+		}
+		//owner
+		if ( filter.getOwnerId() != null ) {
+			q.addConditions(OFC_RECORD.OWNER_ID.equal(filter.getOwnerId()));
+		}
+		//record keys
+		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
+			addFilterByKeyConditions(q, filter.getKeyValues().toArray(new String[0]));
+		}
+
+		//add ordering fields
 		if ( sortFields != null ) {
 			for (RecordSummarySortField sortField : sortFields) {
 				addOrderBy(q, sortField, ownerNameField);
@@ -174,7 +198,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		q.addOrderBy(OFC_RECORD.ID);
 		
 		//add limit
-		q.addLimit(offset, maxRecords);
+		q.addLimit(filter.getOffset(), filter.getMaxNumberOfRecords());
 		
 		//fetch results
 		Result<Record> result = q.fetch();
@@ -191,23 +215,40 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 	
 	public int countRecords(CollectSurvey survey, Integer rootEntityDefinitionId, Integer dataStepNumber) {
-		JooqFactory jf = getMappingJooqFactory(survey);
-		SelectConditionStep q = jf.selectCount()
-			.from(OFC_RECORD)
-			.where(OFC_RECORD.SURVEY_ID.eq(survey.getId()));
-		if ( rootEntityDefinitionId != null ) {
-			q.and(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.eq(rootEntityDefinitionId));
+		RecordFilter filter = new RecordFilter(survey, rootEntityDefinitionId);
+		filter.setStepGreaterOrEqual(Step.valueOf(dataStepNumber));
+		return countRecords(filter);
+	}
+	
+	public int countRecords(RecordFilter filter) {
+		JooqFactory jf = getMappingJooqFactory();
+		SelectQuery q = jf.selectCountQuery();
+		
+		q.addConditions(OFC_RECORD.SURVEY_ID.equal(filter.getSurveyId()));
+		
+		if ( filter.getRootEntityId() != null ) {
+			q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.eq(filter.getRootEntityId()));
 		}
-		if ( dataStepNumber != null ) {
-			q.and(OFC_RECORD.STEP.ge(dataStepNumber));
+		if ( filter.getStepGreaterOrEqual() != null ) {
+			q.addConditions(OFC_RECORD.STEP.ge(filter.getStepGreaterOrEqual().getStepNumber()));
+		}
+		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
+			addFilterByKeyConditions(q, filter.getKeyValues().toArray(new String[0]));
 		}
 		Record record = q.fetchOne();
 		int result = record.getValue(Factory.count());
 		return result;
 	}
 
+	@Transactional
+	public int countRecords(CollectSurvey survey, int rootDefinitionId, String... keyValues) {
+		RecordFilter filter = new RecordFilter(survey, rootDefinitionId);
+		filter.setKeyValues(keyValues);
+		return countRecords(filter);
+	}
+	
 	private void addFilterByKeyConditions(SelectQuery q, String... keyValues) {
-		if ( keyValues != null ) {
+		if ( keyValues != null && keyValues.length > 0 ) {
 			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
 				String key = keyValues[i];
 				if(StringUtils.isNotBlank(key)) {

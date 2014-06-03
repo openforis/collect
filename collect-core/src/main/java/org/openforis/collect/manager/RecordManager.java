@@ -29,6 +29,7 @@ import org.openforis.collect.model.EntityChange;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.NodeChangeMap;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordLock;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
@@ -238,10 +239,21 @@ public class RecordManager {
 	
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
-		List<CollectRecord> recordsSummary = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, keyValues);
-		return recordsSummary;
+		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, keyValues);
+		return summaries;
 	}
 
+	@Transactional
+	public List<CollectRecord> loadSummaries(RecordFilter filter) {
+		return loadSummaries(filter, null);
+	}
+	
+	@Transactional
+	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
+		List<CollectRecord> recordSummaries = recordDao.loadSummaries(filter, sortFields);
+		return recordSummaries;
+	}
+	
 	/**
 	 * Returns only the records modified after the specified date.
 	 */
@@ -250,24 +262,33 @@ public class RecordManager {
 		return recordDao.loadSummaries(survey, rootEntity, modifiedSince);
 	}
 	
+	@Transactional
 	public int countRecords(CollectSurvey survey) {
 		return recordDao.countRecords(survey);
 	}
 	
+	@Transactional
 	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId) {
 		return recordDao.countRecords(survey, rootEntityDefinitionId);
 	}
 	
+	@Transactional
 	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId, int dataStepNumber) {
 		return recordDao.countRecords(survey, rootEntityDefinitionId, dataStepNumber);
 	}
 	
 	@Transactional
-	public int getRecordCount(CollectSurvey survey, String rootEntity, String... keyValues) {
+	public int countRecords(RecordFilter filter) {
+		return recordDao.countRecords(filter);
+	}
+	
+	@Transactional
+	public int countRecords(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
-		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntity);
-		int count = recordDao.countRecords(survey.getId(), rootEntityDefinition.getId(), keyValues);
-		return count;
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
+		RecordFilter filter = new RecordFilter(survey, rootEntityDefn.getId());
+		filter.setKeyValues(keyValues);
+		return countRecords(filter);
 	}
 	
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName) throws RecordPersistenceException {
