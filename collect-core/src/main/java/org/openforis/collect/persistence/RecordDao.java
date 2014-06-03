@@ -137,6 +137,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
 		
 		RecordFilter filter = new RecordFilter(survey, rootEntityDefn.getId());
+		filter.setStep(step);
 		filter.setModifiedSince(modifiedSince);
 		filter.setOffset(offset);
 		filter.setMaxNumberOfRecords(maxRecords);
