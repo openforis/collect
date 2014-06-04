@@ -178,17 +178,16 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	protected void processFile() {
-		InputStreamReader isReader = null;
-		FileInputStream is = null;
 		long currentRowNumber = 0;
 		DataCSVReader reader = null;
 		try {
-			is = new FileInputStream(file);
-			isReader = OpenForisIOUtils.toReader(is);
 			EntityDefinition parentEntityDefn = getParentEntityDefinition();
-			reader = new DataCSVReader(isReader, parentEntityDefn);
+			reader = new DataCSVReader(file, parentEntityDefn);
 			reader.init();
 			status.addProcessedRow(1);
+			
+			status.setTotal(reader.size());
+			
 			currentRowNumber = 1;
 			while ( status.isRunning() ) {
 				currentRowNumber ++;
@@ -208,7 +207,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 					status.addParsingError(currentRowNumber, e.getError());
 				}
 			}
-			status.setTotal(reader.getLinesRead() + 1);
 			if ( status.hasErrors() ) {
 				status.error();
 			} else if ( status.isRunning() ) {

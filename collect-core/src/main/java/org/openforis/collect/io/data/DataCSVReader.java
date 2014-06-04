@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -40,6 +41,13 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 
 	private EntityDefinition parentEntityDefinition;
 
+	
+	public DataCSVReader(File file, EntityDefinition parentEntityDefinition) throws IOException, ParsingException {
+		super(file);
+		this.parentEntityDefinition = parentEntityDefinition;
+	}
+
+	@Deprecated
 	public DataCSVReader(Reader reader, EntityDefinition parentEntityDefinition) throws IOException, ParsingException {
 		super(reader);
 		this.parentEntityDefinition = parentEntityDefinition;
