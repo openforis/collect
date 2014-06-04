@@ -20,7 +20,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<idm.version>3.0-Alpha15</idm.version>
-		<openforis.commons.version>0.0.10</openforis.commons.version>
+		<openforis.commons.version>0.0.11</openforis.commons.version>
 		<spring.version>3.1.4.RELEASE</spring.version>
 		<spring-security.version>3.1.4.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>		
@@ -40,8 +40,8 @@
 	</distributionManagement>
 
 	<scm>
+		<url>https://github.com/openforis/collect</url>
 		<connection>scm:git:git@github.com:openforis/collect.git</connection>
-		<url>scm:git:git@github.com:openforis/collect.git</url>
 		<developerConnection>scm:git:git@github.com:openforis/collect.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
@@ -251,6 +251,11 @@
 			<dependency>
 				<groupId>org.openforis.commons</groupId>
 				<artifactId>commons-collections</artifactId>
+				<version>${openforis.commons.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openforis.commons</groupId>
+				<artifactId>commons-versioning</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
 			<dependency>
