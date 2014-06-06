@@ -41,9 +41,13 @@ public class ResourceBundleMessageSource implements MessageSource {
 		} else {
 			for (PropertyResourceBundle resourceBundle : resourceBundles) {
 				if ( resourceBundle.containsKey(code) ) {
-					String messageKey = resourceBundle.getString(code);
-					String result = MessageFormat.format(messageKey, args);
-					return result;
+					try {
+						String messageKey = resourceBundle.getString(code);
+						String result = MessageFormat.format(messageKey, args);
+						return result;
+					} catch (Exception e) {
+						//resource not found
+					}
 				}
 			}
 			return null;
