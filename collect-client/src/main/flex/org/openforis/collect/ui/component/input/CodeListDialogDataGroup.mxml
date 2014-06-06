@@ -6,6 +6,7 @@
 			 >
 	<fx:Metadata>
 		[Event(name="selectionChange", type="org.openforis.collect.event.UIEvent")]
+		[Event(name="apply", type="flash.events.Event")]
 	</fx:Metadata>
 	
 	<fx:Script>

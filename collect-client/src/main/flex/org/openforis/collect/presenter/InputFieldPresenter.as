@@ -92,8 +92,11 @@ package org.openforis.collect.presenter {
 				_view.textInput.addEventListener(Event.CHANGE, changeHandler);
 				_view.textInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 				_view.textInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+				//key focus change managed by key down handler
+				_view.textInput.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
 			}
-			_view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, keyFocusChangeHandler);
+			//key focus change managed by key down handler
+			_view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
 			
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler); 
 		}
@@ -322,8 +325,7 @@ package org.openforis.collect.presenter {
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
-		protected function keyFocusChangeHandler(event:FocusEvent):void {
-			//handled by tabKeyHandler
+		protected function preventDefaultHandler(event:Event):void {
 			event.preventDefault();
 			event.stopImmediatePropagation();
 		}
@@ -429,6 +431,7 @@ package org.openforis.collect.presenter {
 					return;
 			}
 			if ( offset != 0 ) {
+				preventDefaultHandler(event);
 				moveFocusOnNextField(horizontalMove, offset);
 			}
 		}
@@ -439,7 +442,7 @@ package org.openforis.collect.presenter {
 			var field:FieldProxy = attribute.getField(fieldIndex);
 			var focusChanged:Boolean = CollectFocusManager.moveFocusOnNextField(field, horizontalMove, offset);
 			if ( ! focusChanged ) {
-				focusChanged = UIUtil.moveFocus(offset < 0);
+				focusChanged = UIUtil.moveFocus(offset < 0, _view.focusManager);
 			}
 			return focusChanged;
 		}

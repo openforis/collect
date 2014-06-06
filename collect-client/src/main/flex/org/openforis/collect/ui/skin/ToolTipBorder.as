@@ -86,25 +86,25 @@ public class ToolTipBorder extends RectangularBorder
 		var borderStyle:String = getStyle("borderStyle");
 		switch (borderStyle)
 		{
-			case "errorTipRight":
+			case "tipRight":
 			{
  				_borderMetrics = new EdgeMetrics(15, 1, 3, 3);
 				break;
 			}
 			
-			case "errorTipAbove":
+			case "tipAbove":
 			{
  				_borderMetrics = new EdgeMetrics(3, 1, 3, 15);
  				break;
 			}
 		
-			case "errorTipBelow":
+			case "tipBelow":
 			{
  				_borderMetrics = new EdgeMetrics(3, 13, 3, 3);
  				break;
 			}
 			
-			case "errorTipLeft":
+			case "tipLeft":
 			{
 				_borderMetrics = new EdgeMetrics(3, 1, 15, 3);
 				break;
@@ -168,7 +168,7 @@ public class ToolTipBorder extends RectangularBorder
 				// Don't draw anything
 				break;
 			}
-			case "errorTipRight":
+			case "tipRight":
 			{
 				// border 
 				drawRoundRect(
@@ -186,8 +186,7 @@ public class ToolTipBorder extends RectangularBorder
 				filters = [ new DropShadowFilter(2, 90, 0, 0.4) ];
 				break;
 			}
-			
-			case "errorTipAbove":
+			case "tipAbove":
 			{
 				// border 
 				drawRoundRect(
@@ -205,8 +204,7 @@ public class ToolTipBorder extends RectangularBorder
 				filters = [ new DropShadowFilter(2, 90, 0, 0.4) ];
 				break;
 			}
-
-			case "errorTipBelow":
+			case "tipBelow":
 			{
 				// border 
 				drawRoundRect(
@@ -224,8 +222,7 @@ public class ToolTipBorder extends RectangularBorder
 				filters = [ new DropShadowFilter(2, 90, 0, 0.4) ];
 				break;
 			}
-
-			case "errorTipLeft":
+			case "tipLeft":
 			{
 				// border 
 				drawRoundRect(
