@@ -1,0 +1,19 @@
+<zk>
+	<custom-attributes parentEntity="${arg.parentEntity}" />
+
+	<grid class="inner">
+		<columns>
+			<column width="200px" />
+			<column width="100%" />
+		</columns>
+		<rows>
+			<row>
+				<label
+					value="${labels.survey.schema.attribute.code.showAllowedValuesPreview}:" />
+				<checkbox
+					checked="@load(fx.showAllowedValuesPreview eq true) @save(fx.showAllowedValuesPreview)"
+					onCheck="@command('applyChanges')" />
+			</row>
+		</rows>
+	</grid>
+</zk>

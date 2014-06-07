@@ -52,7 +52,7 @@
 	</mx:states>
 	
 	<mx:VBox>
-		<s:Label styleName="formLabel" text="{codeInputField.attributeDefinition.getInstanceOrHeadingLabelText()}" />
+		<s:Label styleName="title" text="{codeInputField.attributeDefinition.getInstanceOrHeadingLabelText()}" />
 		
 		<s:Group id="loadingContainer" 
 				 includeIn="loading" 

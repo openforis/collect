@@ -21,6 +21,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
@@ -75,7 +76,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
 		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE)),
 		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER)),
-		VISIBLE_FIELDS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.VISIBLE_FIELDS));
+		VISIBLE_FIELDS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.VISIBLE_FIELDS)),
+		SHOW_ALLOWED_VALUES_PREVIEW(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ALLOWED_VALUES_PREVIEW));
 		
 		private QName qName;
 
@@ -639,7 +641,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public void setShowRowNumbersValue(EntityDefinition defn, boolean value) {
-		defn.setAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName(), Boolean.toString(value));
+		defn.setAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName(), value ? Boolean.toString(value): null);
 	}
 	
 	public boolean getCountInSumamryListValue(EntityDefinition defn) {
@@ -648,7 +650,16 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public void setCountInSummaryListValue(EntityDefinition defn, boolean value) {
-		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), Boolean.toString(value));
+		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), value ? Boolean.toString(value): null);
+	}
+	
+	public boolean getShowAllowedValuesPreviewValue(CodeAttributeDefinition defn) {
+		String annotationValue = defn.getAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName());
+		return Boolean.valueOf(annotationValue);
+	}
+	
+	public void setShowAllowedValuesPreviewValue(CodeAttributeDefinition defn, boolean value) {
+		defn.setAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName(), value ? Boolean.toString(value): null);
 	}
 	
 	/**

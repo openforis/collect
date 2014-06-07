@@ -11,9 +11,11 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.core.FlexGlobals;
+	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
+	import mx.managers.IFocusManagerComponent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.AsyncToken;
@@ -27,13 +29,17 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
+	import org.openforis.collect.ui.component.input.CodeListDialogItemRenderer;
 	import org.openforis.collect.ui.component.input.TextInput;
-	import org.openforis.collect.ui.component.input.codelist.CodeListSuggestionDialog;
+	import org.openforis.collect.ui.component.input.codelist.CodeListAllowedValuesPreviewDialog;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
+	
+	import spark.components.CheckBox;
 	
 	/**
 	 * 
@@ -44,9 +50,10 @@ package org.openforis.collect.presenter {
 		
 		private static var _popUp:CodeListDialog;
 		private static var _popUpOpened:Boolean;
-		private static var _suggestionPopUp:CodeListSuggestionDialog;
-		private static var _suggestionPopUpOpened:Boolean;
+		private static var _allowedValuesPreviewPopUp:CodeListAllowedValuesPreviewDialog;
+		private static var _allowedValuesPreviewPopUpOpened:Boolean;
 		private static var _lastLoadCodesAsyncToken:AsyncToken;
+		
 		private var _view:CodeInputField;
 		private var _items:IList;
 		
@@ -66,9 +73,9 @@ package org.openforis.collect.presenter {
 					closePopupHandler(null, false);
 				}
 			}
-			if ( _suggestionPopUpOpened && target != null ) {
-				if ( ! UIUtil.isDescendantOf(_suggestionPopUp, target) ) {
-					closeSuggestionPopUp();
+			if ( _allowedValuesPreviewPopUpOpened && target != null ) {
+				if ( ! UIUtil.isDescendantOf(_allowedValuesPreviewPopUp, target) ) {
+					closeAllowedValuesPreviewPopUp();
 				}
 			}
 		}
@@ -99,9 +106,9 @@ package org.openforis.collect.presenter {
 		/**
 		 * Close the popup
 		 * */
-		internal static function closePopupHandler(event:Event = null, focusOnInputField:Boolean = true):void {
+		internal static function closePopupHandler(event:Event = null, setFocusOnInputField:Boolean = true):void {
 			if ( _popUpOpened ) {
-				if ( focusOnInputField ) {
+				if ( setFocusOnInputField ) {
 					var inputField:CodeInputField = _popUp.codeInputField;
 					inputField.textInput.setFocus();
 				}
@@ -123,18 +130,19 @@ package org.openforis.collect.presenter {
 		protected function openImageClickHandler(event:Event):void {
 			if(_popUp == null) {
 				_popUp = new CodeListDialog();
-				_popUp.addEventListener(CloseEvent.CLOSE, closePopupHandler);
+				_popUp.addEventListener(CloseEvent.CLOSE, popUpApplyHandler);
 				_popUp.cancelLoading.addEventListener(MouseEvent.CLICK, cancelLoadingHandler);
-				//_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
-				_popUp.addEventListener("apply", applyButtonClickHandler);
-				_popUp.addEventListener("selectionChange", popupItemSelectionChangeHandler);
+				_popUp.addEventListener("apply", popUpApplyHandler);
 				_popUp.addEventListener(KeyboardEvent.KEY_DOWN, popUpKeyDownHandler);
+				//_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
+				//_popUp.addEventListener("selectionChange", popupItemSelectionChangeHandler);
 			}
 			_popUpOpened = true;
 			_popUp.codeInputField = _view;
 			_popUp.editable = Application.activeRecordEditable;
 			_popUp.multiple = _view.attributeDefinition.multiple;
 			_popUp.title = _view.attributeDefinition.getInstanceOrHeadingLabelText();
+			
 			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			
 			_popUp.setFocus();
@@ -146,16 +154,16 @@ package org.openforis.collect.presenter {
 			loadCodes(loadListDialogDataResultHandler);
 		}
 		
-		protected function openSuggestionPopUp():void {
-			if( _suggestionPopUp == null) {
-				_suggestionPopUp = new CodeListSuggestionDialog();
-				_suggestionPopUp.addEventListener(FlexEvent.STATE_CHANGE_COMPLETE, stateChangeHandler);
+		protected function openAllowedValuesPreviewPopUp():void {
+			if( _allowedValuesPreviewPopUp == null) {
+				_allowedValuesPreviewPopUp = new CodeListAllowedValuesPreviewDialog();
+				_allowedValuesPreviewPopUp.addEventListener(FlexEvent.STATE_CHANGE_COMPLETE, stateChangeHandler);
 				
 				//popup height not calculated properly immediately after state change
 				//use of timer helps to align it better to the input field
 				var alignmentTimer:Timer = new Timer(100, 1);
 				alignmentTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function(event:Event):void {
-					PopUpUtil.alignToField(_suggestionPopUp, _suggestionPopUp.codeInputField.textInput, PopUpUtil.POSITION_ABOVE, PopUpUtil.VERTICAL_ALIGN_TOP, PopUpUtil.HORIZONTAL_ALIGN_LEFT);
+					PopUpUtil.alignToField(_allowedValuesPreviewPopUp, _allowedValuesPreviewPopUp.codeInputField.textInput, PopUpUtil.POSITION_ABOVE, PopUpUtil.VERTICAL_ALIGN_TOP, PopUpUtil.HORIZONTAL_ALIGN_LEFT);
 				});
 				
 				function stateChangeHandler(event:Event):void {
@@ -163,27 +171,28 @@ package org.openforis.collect.presenter {
 					alignmentTimer.start();
 				}
 			}
-			_suggestionPopUp.codeInputField = _view;
-			_suggestionPopUp.currentState = CodeListSuggestionDialog.STATE_LOADING;
+			_allowedValuesPreviewPopUp.codeInputField = _view;
+			_allowedValuesPreviewPopUp.currentState = CodeListAllowedValuesPreviewDialog.STATE_LOADING;
 			
-			if ( ! _suggestionPopUpOpened ) {
-				PopUpManager.addPopUp(_suggestionPopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
-				_suggestionPopUpOpened = true;
+			if ( ! _allowedValuesPreviewPopUpOpened ) {
+				PopUpManager.addPopUp(_allowedValuesPreviewPopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
+				_allowedValuesPreviewPopUpOpened = true;
+				_view.textInput.setFocus();
 			}
 	
 			function loadCodesResultHandler(event:ResultEvent, token:Object = null):void {
 				var data:IList = event.result as IList;
-				_suggestionPopUp.items = data;
-				_suggestionPopUp.currentState = CodeListSuggestionDialog.STATE_DEFAULT;
+				_allowedValuesPreviewPopUp.items = data;
+				_allowedValuesPreviewPopUp.currentState = CodeListAllowedValuesPreviewDialog.STATE_DEFAULT;
 			}
 
 			loadCodes(loadCodesResultHandler);
 		}
 		
-		protected static function closeSuggestionPopUp():void {
-			if ( _suggestionPopUpOpened ) {
-				_suggestionPopUpOpened = false;
-				PopUpManager.removePopUp(_suggestionPopUp);
+		protected static function closeAllowedValuesPreviewPopUp():void {
+			if ( _allowedValuesPreviewPopUpOpened ) {
+				_allowedValuesPreviewPopUpOpened = false;
+				PopUpManager.removePopUp(_allowedValuesPreviewPopUp);
 			}
 		}
 		
@@ -225,7 +234,10 @@ package org.openforis.collect.presenter {
 			} else {
 				_popUp.currentState = CodeListDialog.STATE_DEFAULT;
 			}
+			
 			PopUpManager.centerPopUp(_popUp);
+			
+			_popUp.setFocus();
 		}
 
 		protected function popUpKeyDownHandler(event:KeyboardEvent):void {
@@ -250,7 +262,7 @@ package org.openforis.collect.presenter {
 			_popUp.codeInputField.presenter.updateValue();
 		}
 		
-		protected static function applyButtonClickHandler(event:Event):void {
+		protected static function popUpApplyHandler(event:Event):void {
 			var selectedItems:IList = _popUp.selectedItems;
 			applySelection(selectedItems);
 			closePopupHandler();
@@ -326,7 +338,7 @@ package org.openforis.collect.presenter {
 		override protected function keyDownHandler(event:KeyboardEvent):void {
 			if ( event.keyCode == Keyboard.TAB && ! event.shiftKey ) {
 				preventDefaultHandler(event);
-				
+				closeAllowedValuesPreviewPopUp();
 				_view.openImage.setFocus();
 				//dispatchFocusInEvent();
 			} else {
@@ -346,19 +358,25 @@ package org.openforis.collect.presenter {
 		
 		override protected function focusInHandler(event:FocusEvent):void {
 			super.focusInHandler(event);
-			
-			if ( ! _suggestionPopUpOpened && ! CodeAttributeDefinitionProxy(_view.attributeDefinition).external ) {
-				openSuggestionPopUp();
+			var attrDefn:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(_view.attributeDefinition);
+			if ( attrDefn.showAllowedValuesPreview && ! _popUpOpened && ! _allowedValuesPreviewPopUpOpened && ! attrDefn.external ) {
+				openAllowedValuesPreviewPopUp();
 			}
 		}
 		
 		override protected function focusOutHandler(event:FocusEvent):void {
 			super.focusOutHandler(event);
 			
-			if ( _suggestionPopUpOpened ) {
-				closeSuggestionPopUp();
+			var focussedElement:IFocusManagerComponent = FlexGlobals.topLevelApplication.focusManager.getFocus();
+			if ( _allowedValuesPreviewPopUpOpened && _view == _allowedValuesPreviewPopUp.codeInputField ) {
+				closeAllowedValuesPreviewPopUp();
 			}
 		}
 
+		override protected function moveFocusOnNextField(horizontalMove:Boolean, offset:int):Boolean {
+			closeAllowedValuesPreviewPopUp();
+			return super.moveFocusOnNextField(horizontalMove, offset);
+		}
+		
 	}
 }

@@ -25,6 +25,29 @@
 			private var _items:IList = null;
 			private var _selectedItems:ArrayCollection = null;
 			private var _notSelectedItems:ArrayCollection = null;
+
+			public function selectionChangeHandler(event:UIEvent):void {
+				var item:CodeListItemProxy = CodeListItemProxy(event.obj);
+				if ( ! multiple ) {
+					for each(var itm:Object in items) {
+						if(itm != item) {
+							//reset selection
+							itm.selected = false;
+							CollectionUtil.removeItem(_selectedItems, itm);
+						}
+					}
+				}
+				if ( item.selected ) {
+					_selectedItems.addItem(item);
+				} else {
+					CollectionUtil.removeItem(_selectedItems, item);
+				}
+				dispatchEvent(new Event("selectionChange"));
+			}
+			
+			protected function applyHandler(event:Event):void {
+				dispatchEvent(new Event("apply")); 
+			}
 			
 			[Bindable]
 			public function get multiple():Boolean {
@@ -78,30 +101,6 @@
 			
 			public function set notSelectedItems(value:ArrayCollection):void {
 				_notSelectedItems = value;
-			}
-			
-			public function selectionChangeHandler(event:UIEvent):void {
-				var item:CodeListItemProxy = CodeListItemProxy(event.obj);
-				if ( ! multiple ) {
-					for each(var itm:Object in items) {
-						if(itm != item) {
-							//reset selection
-							itm.selected = false;
-							CollectionUtil.removeItem(_selectedItems, itm);
-						}
-					}
-				}
-				if ( item.selected ) {
-					_selectedItems.addItem(item);
-				} else {
-					CollectionUtil.removeItem(_selectedItems, item);
-				}
-				var seletionChangeEvent:Event = new Event("selectionChange");
-				dispatchEvent(seletionChangeEvent);
-			}
-			
-			protected function applyHandler(event:Event):void {
-				dispatchEvent(new Event("apply")); 
 			}
 			
 		]]>
