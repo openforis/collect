@@ -1,7 +1,6 @@
 package org.openforis.collect.presenter
 {
 	import flash.events.Event;
-	import flash.events.MouseEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
@@ -26,7 +25,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.DataGrids;
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.components.DropDownList;
@@ -51,7 +49,6 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			view.entitySelectionTree.addEventListener(ListEvent.ITEM_CLICK, entityTreeItemSelectHandler);
-			view.exportErrorsButton.addEventListener(MouseEvent.CLICK, exportErrorsClickHandler);
 			view.importType.addEventListener(Event.CHANGE, importTypeChangeHandler);
 		}
 		
@@ -280,11 +277,6 @@ package org.openforis.collect.presenter
 			});
 		}
 
-		protected function exportErrorsClickHandler(event:MouseEvent):void {
-			DataGrids.writeToCSV(view.errorsDataGrid);
-			//navigateToURL(new URLRequest(ApplicationConstants.URL + "downloadCSVDataImportErrors.htm"), "_new");
-		}
-		
 		override protected function backToDefaultView():void {
 			if ( view.importType.selectedValue == CSVDataImportView.UPDATE_EXISTING_RECORDS_TYPE ) {
 				view.currentState = CSVDataImportView.STATE_UPDATE_EXISTING_RECORDS;

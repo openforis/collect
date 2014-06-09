@@ -17,7 +17,6 @@ package org.openforis.collect.presenter {
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.event.PaginationBarEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
@@ -27,6 +26,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.DataGrids;
 
 	/**
 	 * 
@@ -100,6 +100,9 @@ package org.openforis.collect.presenter {
 				_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
 			}
 			_view.errorsOkButton.addEventListener(MouseEvent.CLICK, errorsOkButtonClickHandler);
+			if ( _view.exportErrorsButton != null ) {
+				_view.exportErrorsButton.addEventListener(MouseEvent.CLICK, exportErrorsClickHandler);
+			}
 			_view.closeButton.addEventListener(MouseEvent.CLICK, closeButtonClickHandler);
 		}
 		
@@ -353,6 +356,10 @@ package org.openforis.collect.presenter {
 			_state = null;
 			backToDefaultView();
 			stopProgressTimer();
+		}
+		
+		protected function exportErrorsClickHandler(event:MouseEvent):void {
+			DataGrids.writeToCSV(_view.errorsDataGrid);
 		}
 		
 	}

@@ -159,7 +159,17 @@
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center">
 		
-		<s:Label text="{Message.get('referenceDataImport.error.title')}" />
+		<s:HGroup width="100%">
+			<s:Label text="{Message.get('referenceDataImport.error.title')}" />
+			
+			<s:Spacer width="100%" />
+			
+			<s:Button id="exportErrorsButton"
+					  label="{Message.get('referenceDataImport.errors.exportToCSV')}"
+					  buttonMode="true"
+					  useHandCursor="true"
+					  horizontalCenter="400" />
+		</s:HGroup>
 		
 		<s:DataGrid id="errorsDataGrid" height="100%">
 			<s:columns>

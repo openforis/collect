@@ -5,6 +5,7 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.FORM;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificNameName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
 	
-	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY};
+	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY, FORM};
 	public static final String GENUS_SUFFIX = "sp.";
 
 	private static final String CSV = "csv";
@@ -212,6 +213,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			return mostSpecificRank;
 		case SUBSPECIES:
 		case VARIETY:
+		case FORM:
 			Taxon parent = findParentTaxon(line);
 			if ( ! mostSpecificRank || parent == null ) {
 				return false;
@@ -284,7 +286,12 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 
 	protected Taxon createTaxonSpecies(SpeciesLine line) throws ParsingException {
-		String speciesName = line.getSpeciesName();
+		String speciesName;
+		if ( line.getRank() == SPECIES ) {
+			speciesName = line.getCanonicalScientificName();
+		} else {
+			speciesName = line.getSpeciesName();
+		}
 		if ( speciesName == null ) {
 			ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), SpeciesFileColumn.SCIENTIFIC_NAME.getColumnName(), INVALID_SPECIES_NAME_ERROR_MESSAGE_KEY);
 			throw new ParsingException(error);

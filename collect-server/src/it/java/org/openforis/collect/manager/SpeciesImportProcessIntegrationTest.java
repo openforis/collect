@@ -129,6 +129,18 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			TaxonOccurrence expected = new TaxonOccurrence(12, code, "Albizia schimperiana var. amaniensis");
 			assertEquals(expected, occurrence);
 		}
+		{
+			String code = "AMA/EUC/GRF";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(15, code, "Eucharis ×grandiflora");
+			assertEquals(expected, occurrence);
+		}
+		{
+			String code = "ARA/ANT/BUL-MAG";
+			TaxonOccurrence occurrence = findByCode(code);
+			TaxonOccurrence expected = new TaxonOccurrence(16, code, "Anthurium bullatus × Anthurium magnificum");
+			assertEquals(expected, occurrence);
+		}
 	}
 
 	@Test

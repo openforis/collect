@@ -41,6 +41,8 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
  */
 public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 
+	private static final String HYBRID_MARKER = "×";
+	
 	public SpeciesCSVReader(File file) throws IOException, ParsingException {
 		super(file);
 	}
@@ -82,8 +84,8 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		
 		public static final String UNEXPECTED_SYNONYM_MESSAGE_KEY = "speciesImport.parsingError.unexpected_synonym.message";
 
-		private ParsedName<Object> parsedScientificName;
-		private String rawScientificName;
+		private transient ParsedName<Object> parsedScientificName;
+		private transient String rawScientificName;
 		
 		SpeciesCSVLineParser(SpeciesCSVReader reader, CsvLine line) {
 			super(reader, line);
@@ -96,14 +98,14 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		public SpeciesLine parse() throws ParsingException {
 			SpeciesLine line = super.parse();
 			this.rawScientificName = extractRawScientificName();
-			this.parsedScientificName = this.rawScientificName == null ? null: parseRawScienfificName();
+			line.setRawScientificName(this.rawScientificName);
+			this.parsedScientificName = parseRawScienfificName();
 			line.setTaxonId(extractTaxonId(false));
 			line.setCode(extractCode(true));
 			line.setFamilyName(extractFamilyName());
-			line.setRawScientificName(this.rawScientificName);
-			line.setGenus(this.rawScientificName == null ? null: extractGenus());
-			line.setSpeciesName(this.rawScientificName == null ? null: extractSpeciesName());
-			line.setRank(this.rawScientificName == null ? TaxonRank.FAMILY: extractRank());
+			line.setGenus(extractGenus());
+			line.setSpeciesName(extractSpeciesName());
+			line.setRank(extractRank());
 			normalizeRank(line);
 			line.setCanonicalScientificName(this.rawScientificName == null ? null: extractCanonicalScientificName(line.getRank(), parsedScientificName));
 			line.setLanguageToVernacularNames(extractVernacularNames());
@@ -133,13 +135,19 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 		
 		protected ParsedName<Object> parseRawScienfificName() throws ParsingException {
-			return parseRawScienfificName(rawScientificName);
+			if ( rawScientificName == null ) {
+				return null;
+			} else {
+				return parseRawScienfificName(rawScientificName);
+			}
 		}
 		
 		protected ParsedName<Object> parseRawScienfificName(String rawScientificName) throws ParsingException {
 			try {
+				//replace " x. " with " x " to avoid skipping hybrid names parsing
+				String adaptedRawScientificName = rawScientificName.replaceAll(" x\\. ", " " + HYBRID_MARKER);				
 				NameParser nameParser = new NameParser();
-				ParsedName<Object> parsedName = nameParser.parse(rawScientificName);
+				ParsedName<Object> parsedName = nameParser.parse(adaptedRawScientificName);
 				return parsedName;
 			} catch (UnparsableException e) {
 				ParsingError error = createFieldParsingError(
@@ -149,42 +157,37 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 		
 		protected TaxonRank extractRank() throws ParsingException {
-			return extractRank(parsedScientificName);
+			if ( parsedScientificName == null ) {
+				return FAMILY;
+			} else {
+				return extractRank(parsedScientificName);
+			}
 		}
 		
 		protected TaxonRank extractRank(ParsedName<Object> parsedName) throws ParsingException {
 			Rank rank = parsedName.getRank();
-			TaxonRank taxonRank;
 			if ( rank == null ) {
-				taxonRank = GENUS;
+				return GENUS;
 			} else {
 				switch ( rank ) {
 				case FAMILY:
-					taxonRank = FAMILY;
-					break;
+					return FAMILY;
 				case GENUS:
-					taxonRank = GENUS;
-					break;
+					return GENUS;
 				case Series:
-					taxonRank = SERIES;
-					break;
+					return SERIES;
 				case SPECIES:
-					taxonRank = SPECIES;
-					break;
+					return SPECIES;
 				case SUBSPECIES:
-					taxonRank = SUBSPECIES;
-					break;
+					return SUBSPECIES;
 				case VARIETY:
-					taxonRank = VARIETY;
-					break;
+					return VARIETY;
 				case Form:
-					taxonRank = FORM;
-					break;
+					return FORM;
 				default:
-					taxonRank = SPECIES;
+					return SPECIES;
 				}
 			}
-			return taxonRank;
 		}
 		
 		protected String extractCanonicalScientificName() throws ParsingException {
@@ -196,18 +199,26 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		}
 
 		protected String extractCanonicalScientificName(TaxonRank rank, ParsedName<Object> parsedName) throws ParsingException {
-			boolean showRankMarker = rank == GENUS || rank == SUBSPECIES || rank == VARIETY;
-			String result = parsedName.buildName(false, showRankMarker, false, false, false, true, true, false, false, false, false);
+			boolean showRankMarker;
+			switch ( rank ) {
+			case SPECIES:
+				showRankMarker = false;
+				break;
+			default:
+				showRankMarker = true;
+			}
+			//String result = parsedName.buildName(false, showRankMarker, false, false, false, true, true, false, false, false, false);
+			String result = parsedName.buildName(true, showRankMarker, false, true, false, true, true, false, false, true, true);
 			return result;
 		}
 		
 		protected String extractGenus() throws ParsingException {
-			String genus = parsedScientificName.getGenusOrAbove();
+			String genus = parsedScientificName == null ? null: parsedScientificName.getGenusOrAbove();
 			return genus;
 		}
 		
 		protected String extractSpeciesName() throws ParsingException {
-			String speciesName = parsedScientificName.canonicalSpeciesName();
+			String speciesName = parsedScientificName == null ? null: parsedScientificName.canonicalSpeciesName();
 			return speciesName;
 		}
 		
