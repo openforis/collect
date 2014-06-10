@@ -25,8 +25,6 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesFileColumn;
-import org.openforis.collect.manager.SpeciesManager;
-import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.speciesimport.SpeciesImportProcess;
 import org.openforis.collect.manager.speciesimport.SpeciesImportStatus;
 import org.openforis.collect.metamodel.TaxonSummaries;
@@ -133,12 +131,6 @@ public class SpeciesImportProcessIntegrationTest extends CollectIntegrationTest 
 			String code = "AMA/EUC/GRF";
 			TaxonOccurrence occurrence = findByCode(code);
 			TaxonOccurrence expected = new TaxonOccurrence(15, code, "Eucharis ×grandiflora");
-			assertEquals(expected, occurrence);
-		}
-		{
-			String code = "ARA/ANT/BUL-MAG";
-			TaxonOccurrence occurrence = findByCode(code);
-			TaxonOccurrence expected = new TaxonOccurrence(16, code, "Anthurium bullatus × Anthurium magnificum");
 			assertEquals(expected, occurrence);
 		}
 	}
