@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 
 /**
  * Gets messages from resource bundles.
@@ -32,7 +33,7 @@ public class ResourceBundleMessageSource implements MessageSource {
 		this.bundleBaseNames = bundleBaseNames;
 		this.localeToResourceBundles = new HashMap<Locale, List<PropertyResourceBundle>>();
 	}
-
+	
 	@Override
 	public String getMessage(Locale locale, String code, Object... args) {
 		List<PropertyResourceBundle> resourceBundles = getBundles(locale);
@@ -65,11 +66,29 @@ public class ResourceBundleMessageSource implements MessageSource {
 	protected List<PropertyResourceBundle> initBundles(Locale locale) {
 		List<PropertyResourceBundle> resourceBundles = new ArrayList<PropertyResourceBundle>();
 		for (String baseName : bundleBaseNames) {
-			PropertyResourceBundle bundle = (PropertyResourceBundle) PropertyResourceBundle.getBundle(baseName, locale);
-			resourceBundles.add(bundle);
+			PropertyResourceBundle bundle = findBundle(locale, baseName);
+			if ( bundle != null ) {
+				resourceBundles.add(bundle);
+			}
 		}
 		localeToResourceBundles.put(locale, resourceBundles);
 		return resourceBundles;
+	}
+
+	protected PropertyResourceBundle findBundle(Locale locale, String baseName) {
+		PropertyResourceBundle bundle = null;
+		try {
+			bundle = (PropertyResourceBundle) PropertyResourceBundle.getBundle(baseName, locale, new ResourceBundle.Control() {
+				@Override
+				public Locale getFallbackLocale(String baseName, Locale locale) {
+					return null;
+				}
+			});
+			return bundle;
+		} catch ( Exception e ) {
+			//missing resource exception
+			return null;
+		}
 	}
 	
 	public void setBundleBaseNames(List<String> bundleBaseNames) {
