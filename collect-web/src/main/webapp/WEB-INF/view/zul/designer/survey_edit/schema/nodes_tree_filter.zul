@@ -26,7 +26,7 @@
       	image="/assets/images/delete-small.png" />
     </hlayout>
     <label value="${labels.survey.schema.form_version}:" />
-    <listbox width="150px" model="@load(vm.formVersions)"
+    <listbox width="150px" model="@load(vm.formVersionsWithEmptyOption)"
       selectedItem="@load(vm.selectedVersion)" mold="select"
       onSelect="@command('versionSelected', version=self.selectedItem.value)">
       <template name="model">
