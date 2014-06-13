@@ -25,6 +25,29 @@
 			private var _items:IList = null;
 			private var _selectedItems:ArrayCollection = null;
 			private var _notSelectedItems:ArrayCollection = null;
+
+			public function selectionChangeHandler(event:UIEvent):void {
+				var item:CodeListItemProxy = CodeListItemProxy(event.obj);
+				if ( ! multiple ) {
+					for each(var itm:Object in items) {
+						if(itm != item) {
+							//reset selection
+							itm.selected = false;
+							CollectionUtil.removeItem(_selectedItems, itm);
+						}
+					}
+				}
+				if ( item.selected ) {
+					_selectedItems.addItem(item);
+				} else {
+					CollectionUtil.removeItem(_selectedItems, item);
+				}
+				dispatchEvent(new Event("selectionChange"));
+			}
+			
+			protected function applyHandler(event:Event):void {
+				dispatchEvent(new Event("apply")); 
+			}
 			
 			[Bindable]
 			public function get multiple():Boolean {
@@ -80,27 +103,13 @@
 				_notSelectedItems = value;
 			}
 			
-			public function selectionChangeHandler(event:UIEvent):void {
-				var item:CodeListItemProxy = CodeListItemProxy(event.obj);
-				if ( ! multiple ) {
-					for each(var itm:Object in items) {
-						if(itm != item) {
-							//reset selection
-							itm.selected = false;
-							CollectionUtil.removeItem(_selectedItems, itm);
-						}
-					}
-				}
-				if ( item.selected ) {
-					_selectedItems.addItem(item);
-				} else {
-					CollectionUtil.removeItem(_selectedItems, item);
-				}
-			}
-			
 		]]>
 	</fx:Script>
-		
+	
+	<fx:Metadata>
+		[Event(name="selectionChange", type="flash.events.Event")]
+	</fx:Metadata>
+	
 	<s:states>
 		<s:State name="loading" />
 		<s:State name="default" />
@@ -130,6 +139,7 @@
 			editable="{editable}"
 			sortable="false"
 			selectionChange="selectionChangeHandler(event)"
+			apply="applyHandler(event)"
 			width="100%" 
 			/>
 	</s:Scroller>
@@ -147,6 +157,7 @@
 				editable="{editable}"
 				sortable="true"
 				selectionChange="selectionChangeHandler(event)"
+				apply="applyHandler(event)"
 				width="100%" 
 				/>
 		</s:Scroller>
@@ -164,6 +175,7 @@
 				id="notSelectedItemsDataGroup" 
 				dataProvider="{notSelectedItems}"
 				selectionChange="selectionChangeHandler(event)"
+				apply="applyHandler(event)"
 				editable="{editable}"
 				sortable="false"
 				width="100%" 
@@ -172,7 +184,7 @@
 		
 	</s:VGroup>
 	
-	
+	<!--
 	<s:HGroup includeIn="default, valuesSortingAllowed"
 			  itemCreationPolicy="immediate"
 			  width="100%" 
@@ -182,13 +194,10 @@
 		<s:Button id="applyButton"
 				  useHandCursor="true" 
 				  buttonMode="true" 
-				  label="{Message.get('global.apply')}"
+				  label="{Message.get('global.close')}"
 				  enabled="{editable}"
+				  click="applyHandler(event)"
 				  />
-		<s:Button id="cancelButton"
-				  useHandCursor="true"
-				  buttonMode="true" 
-				  label="{Message.get('global.cancel')}"  />
 	</s:HGroup>
-	
+	-->
 </s:TitleWindow>

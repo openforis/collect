@@ -7,6 +7,7 @@
 @namespace component "org.openforis.collect.ui.component.*";
 @namespace container "org.openforis.collect.ui.container.*";
 @namespace user "org.openforis.collect.ui.component.user.*";
+@namespace codelist "org.openforis.collect.ui.component.input.codelist.*";
 
 container|CollapsiblePanel {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.CollapsiblePanelSkin');
@@ -153,7 +154,7 @@ component|BlockingMessagePopUp,
 	component|SelectVersionPopUp, component|SpeciesImportPopUp, 
 	component|SurveySelectionPopUp,
 	component|ConfigurationPopUp,
-	input|CodeListDialog, 
+	input|CodeListDialog,
 	user|UserManagementPopUp,
 	user|ChangePasswordPopUp {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.TitleWindowSkin");
@@ -166,11 +167,21 @@ component|BlockingMessagePopUp,
 	background-alpha: 1.0;
 }
 
-component|BlockingMessagePopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, input|CodeListDialog, component|DataExportPopUp, component|BackupPopUp, component|SpeciesImportPopUp {
+component|BlockingMessagePopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, component|DataExportPopUp, component|BackupPopUp, component|SpeciesImportPopUp {
 	showCloseButton: false;
 }
 
-component|RecordFilterPopUp {
+.title {
+	fontSize: 12px;
+	fontWeight: bold;
+	fontStyle: italic;
+	fontFamily: Verdana;
+}
+
+codelist|CodeListAllowedValuesPreviewDialog {
+	borderSkin: ClassReference("org.openforis.collect.ui.skin.ToolTipBorder");
+	borderStyle: "tipAbove";
+	borderColor: #A9D0F5;
 }
 
 input|CodeListDialog s|CheckBox {
@@ -206,7 +217,7 @@ mx|ToolTip.error, mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 	fontSize: 10;
 	fontWeight: "bold";	
 	shadowColor: #000000;
-	borderStyle: "errorTipRight";
+	borderStyle: "tipRight";
 }
 
 mx|ToolTip.error {

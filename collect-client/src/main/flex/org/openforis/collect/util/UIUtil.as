@@ -1,5 +1,6 @@
 package org.openforis.collect.util
 {
+	import flash.display.DisplayObject;
 	import flash.text.AntiAliasType;
 	import flash.text.GridFitType;
 	import flash.text.TextLineMetrics;
@@ -255,11 +256,19 @@ package org.openforis.collect.util
 			}
 		}
 		
-		public static function moveFocus(backward:Boolean = false):Boolean {
-			var focusManager:IFocusManager = FlexGlobals.topLevelApplication.focusManager;
-			var focusManagerComponent:IFocusManagerComponent = focusManager.getNextFocusManagerComponent(backward);
-			focusManager.setFocus(focusManagerComponent);
-			return focusManager.getFocus() == focusManagerComponent;
+		public static function moveFocus(backward:Boolean = false, focusManager:IFocusManager = null):Boolean {
+			if ( focusManager == null ) {
+				focusManager = FlexGlobals.topLevelApplication.focusManager;
+			}
+			var focussed:Boolean = false;
+			var candidate:IFocusManagerComponent = focusManager.getNextFocusManagerComponent(backward);
+			if ( candidate != null ) {
+				var focussedComponent:IFocusManagerComponent = focusManager.getFocus();
+				focusManager.setFocus(candidate);
+				focussedComponent = focusManager.getFocus();
+				focussed = focussedComponent == candidate;
+			}
+			return focussed;
 		}
 
 		public static function gridColumnDateTimeLabelFunction(item:Object, column:Object):String {
@@ -304,11 +313,11 @@ package org.openforis.collect.util
 			return mx.utils.ObjectUtil.compare(value1, value2);
 		}
 		
-		private static function isDescendantOf(parent:UIComponent, component:UIComponent):Boolean {
-			var currentComponent:UIComponent = component;
+		public static function isDescendantOf(parent:DisplayObject, component:DisplayObject):Boolean {
+			var currentComponent:DisplayObject = component;
 			do {
 				if ( currentComponent.hasOwnProperty("parent") ) {
-					var currentParent:UIComponent = currentComponent["parent"] as UIComponent;
+					var currentParent:DisplayObject = currentComponent["parent"] as DisplayObject;
 					if ( parent == currentParent ) {
 						return true;
 					}

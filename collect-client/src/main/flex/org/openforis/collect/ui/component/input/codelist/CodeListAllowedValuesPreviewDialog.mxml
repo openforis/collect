@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  xmlns:component="org.openforis.collect.ui.component.*"
+				  borderSkin="org.openforis.collect.ui.skin.ToolTipBorder"
+				  focusEnabled="false"
+				  >
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.IList;
+			
+			import org.openforis.collect.event.UIEvent;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			import org.openforis.collect.ui.component.input.CodeInputField;
+			import org.openforis.collect.ui.component.input.InputField;
+			import org.openforis.collect.util.CollectionUtil;
+			
+			public static const STATE_LOADING:String = "loading";
+			public static const STATE_DEFAULT:String = "default";
+			
+			private var _codeInputField:CodeInputField;
+			private var _items:IList = null;
+			
+			[Bindable]
+			public function get codeInputField():CodeInputField {
+				return _codeInputField;
+			}
+			
+			public function set codeInputField(value:CodeInputField):void {
+				_codeInputField = value;
+			}
+
+			[Bindable]
+			public function get items():IList {
+				return _items;
+			}
+			
+			public function set items(value:IList):void {
+				_items = value;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<mx:states>
+		<mx:State name="loading" />
+		<mx:State name="default" />
+	</mx:states>
+	
+	<mx:VBox>
+		<s:Label styleName="title" text="{codeInputField.attributeDefinition.getInstanceOrHeadingLabelText()}" />
+		
+		<s:Group id="loadingContainer" 
+				 includeIn="loading" 
+				 itemCreationPolicy="immediate">
+			<component:LoadingContent height="100" width="100" />
+		</s:Group>
+		
+		<s:Scroller includeIn="default" 
+					itemCreationPolicy="immediate"
+					width="100%"
+					maxHeight="100">
+			<s:DataGroup dataProvider="{items}" focusEnabled="false">
+				<s:layout>
+					<s:VerticalLayout />
+				</s:layout>
+				<s:itemRenderer>
+					<fx:Component>
+						<s:ItemRenderer autoDrawBackground="false">
+							<s:Label id="labelDisplay" text="{CodeListItemProxy(data).code + ' - ' + CodeListItemProxy(data).getLabelText()}" />
+							<fx:Script>
+								<![CDATA[
+									import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+								]]>
+							</fx:Script>
+						</s:ItemRenderer>
+					</fx:Component>
+				</s:itemRenderer>
+			</s:DataGroup>
+		</s:Scroller>
+	</mx:VBox>
+	
+</mx:TitleWindow>

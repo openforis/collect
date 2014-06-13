@@ -51,10 +51,11 @@
 				  useHandCursor="true"
 				  buttonMode="true"
 				  skinClass="org.openforis.collect.ui.skin.OpenPopUpButtonSkin"
+				  styleName="openCodeListPopUpButton"
 				  visible="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
 				  includeInLayout="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
 				  />
-		
+
 		<s:Label id="descriptionLabel" 
 				 includeIn="descriptionVisible" 
 				 text="{description}"

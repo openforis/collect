@@ -92,14 +92,14 @@ package org.openforis.collect.util {
 		private static function getBorderStyle(position:String):String {
 			switch(position) {
 				case PopUpUtil.POSITION_LEFT:
-					return "errorTipLeft";
+					return "tipLeft";
 				case PopUpUtil.POSITION_ABOVE:
-					return "errorTipAbove";
+					return "tipAbove";
 				case PopUpUtil.POSITION_BELOW:
-					return "errorTipBelow";
+					return "tipBelow";
 				case PopUpUtil.POSITION_RIGHT:
 				default:
-					return "errorTipRight";
+					return "tipRight";
 					
 			}
 		}

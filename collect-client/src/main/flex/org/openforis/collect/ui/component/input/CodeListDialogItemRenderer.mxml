@@ -18,6 +18,7 @@
 			import mx.managers.DragManager;
 			
 			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			import org.openforis.collect.util.UIUtil;
 			
 			public static const STATE_NORMAL:String = "normal";
 			public static const STATE_DROPPING_TOP:String = "droppingTop";
@@ -122,6 +123,26 @@
 			protected function mouseUpHandler(event:MouseEvent):void {
 				dragPrepared = false;
 			}
+			
+			protected function checkBoxKeyDownHandler(event:KeyboardEvent):void {
+				switch ( event.keyCode ) {
+				case Keyboard.ENTER:
+					CodeListDialogDataGroup(owner).dispatchEvent(new Event("apply"));
+					break;
+				case Keyboard.DOWN:
+					var ckeckBox:CheckBox = CheckBox(event.target);
+					UIUtil.moveFocus(false, checkBox.focusManager);
+					break;
+				case Keyboard.UP:
+					UIUtil.moveFocus(true, checkBox.focusManager);
+					break;
+				}
+			}
+			
+			protected function checkBoxFocusInHandler(event:FocusEvent):void {
+				UIUtil.ensureElementIsVisible(event.target);
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -155,6 +176,8 @@
 					selected="{data.selected}" 
 					label="{label}" 
 					change="checkBoxChangeHandler(event)" 
+					keyDown="checkBoxKeyDownHandler(event)"
+					focusIn="checkBoxFocusInHandler(event)"
 					/>
 		
 		<mx:TextInput height="20" id="textInput" 
@@ -162,7 +185,8 @@
 					  includeInLayout="{data.qualifiable}"
 					  enabled="{checkBox.selected}"
 					  text="{data.qualifier}"
-					  change="textInputChangeHandler(event)"/>
+					  change="textInputChangeHandler(event)"
+					  />
 	</s:HGroup>
 	
 	<s:Line id="dropIndicatorBottom" includeIn="droppingBottom" width="100%">

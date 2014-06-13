@@ -20,6 +20,7 @@ import org.openforis.collect.designer.component.SchemaTreeModel.SchemaTreeNode;
 import org.openforis.collect.designer.component.SchemaTreeModelCreator;
 import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.UITreeModelCreator;
+import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.NodeType;
@@ -181,8 +182,14 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void versionSelected(@BindingParam("version") ModelVersion version) {
-		nodesTreeFilterChanged(selectedRootEntity, version);
+	public void versionSelected(@BindingParam("version") Object version) {
+		ModelVersion modelVersion;
+		if ( version == FormObject.VERSION_EMPTY_SELECTION ) {
+			modelVersion = null;
+		} else {
+			modelVersion = (ModelVersion) version;
+		}
+		nodesTreeFilterChanged(selectedRootEntity, modelVersion);
 	}
 	
 	protected void nodesTreeFilterChanged(final EntityDefinition rootEntity, final ModelVersion version) {

@@ -14,6 +14,8 @@
 					label="{Message.get('master.loading')}"
 					horizontalCenter="0"
 					verticalCenter="0"
+					width="100%" 
+					maxWidth="150"
 					/>
 	
 </s:NavigatorContent>
