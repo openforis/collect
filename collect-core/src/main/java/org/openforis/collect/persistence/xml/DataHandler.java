@@ -319,7 +319,7 @@ public class DataHandler extends DefaultHandler {
 					setField(fld);
 				} else {
 					warn(field, "Can't parse field with type "+attr.getClass().getSimpleName());
-					this.node = node.getParent();
+					//this.node = node.getParent();
 				}
 			}
 		} catch (NumberFormatException e) {
