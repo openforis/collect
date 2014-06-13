@@ -44,10 +44,10 @@ public class DataBackupTask extends Task {
 	
 	@Override
 	protected void initInternal() throws Throwable {
-		super.initInternal();
 		if ( recordFilter == null ) {
 			recordFilter = new RecordFilter(survey);
 		}
+		super.initInternal();
 	}
 	
 	@Override
