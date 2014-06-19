@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.manager;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.Collect;
 import org.openforis.collect.model.ApplicationInfo;
 import org.openforis.collect.persistence.ApplicationInfoDao;
@@ -15,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DatabaseVersionManager {
 
-	private static final String VOID_VERSION = "PROJECT_VERSION"; //token was not being replaced into version.properties in previous releases
-	
 	private static final String[] MIGRATION_REQUIRED_VERSIONS = new String[]{
 		"3.0-Alpha2"
 	};
@@ -26,11 +25,11 @@ public class DatabaseVersionManager {
 	
 	public void checkIsVersionCompatible() throws DatabaseVersionNotCompatibleException {
 		ApplicationInfo info = applicationInfoDao.load();
-		String schemaVersion = null;
-		if ( info != null ) {
-			schemaVersion = info.getVersion();
+		Version schemaVersion = null;
+		if ( info != null && StringUtils.isNotBlank(info.getVersion()) ) {
+			schemaVersion = new Version(info.getVersion());
 		}
-		String appVersion = Collect.getVersion();
+		Version appVersion = Collect.getVersion();
 		if ( ! isVersionCompatible(appVersion, schemaVersion) ) {
 			throw new DatabaseVersionNotCompatibleException("Database version (" + 
 					(schemaVersion != null ? schemaVersion: "not specified") + 
@@ -38,14 +37,13 @@ public class DatabaseVersionManager {
 		}
 	}
 	
-	private boolean isVersionCompatible(String appVersion, String schemaVersion) {
-		if ( ( schemaVersion == null && appVersion.equals(VOID_VERSION) ) || appVersion.equals(schemaVersion) ) {
+	private boolean isVersionCompatible(Version appVersion, Version schemaVersion) {
+		if ( ( schemaVersion == null && appVersion == null ) || appVersion.equals(schemaVersion) ) {
 			return true;
 		} else {
 			String lastMigrationVersion = MIGRATION_REQUIRED_VERSIONS[MIGRATION_REQUIRED_VERSIONS.length - 1];
-			Version appVersionInfo = new Version(appVersion);
 			Version lastMigrationVersionInfo = new Version(lastMigrationVersion);
-			if ( appVersionInfo.compareTo(lastMigrationVersionInfo) >= 0) {
+			if ( appVersion.compareTo(lastMigrationVersionInfo) >= 0) {
 				return true;
 			} else {
 				return false;

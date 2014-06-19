@@ -8,6 +8,7 @@ import java.util.Properties;
 
 import org.openforis.collect.Collect;
 import org.openforis.collect.utils.Dates;
+import org.openforis.commons.versioning.Version;
 
 /**
  * 
@@ -20,9 +21,9 @@ public class SurveyBackupInfo {
 	private static final String COLLECT_VERSION_PROP = "collect_version";
 	private static final String SURVEY_URI_PROP = "survey_uri";
 	
-	private static final String VERSION_3_0 = "3.0"; //for backwards compatibility
+	private static final Version VERSION_3_0 = new Version("3.0"); //for backwards compatibility
 	
-	private String collectVersion;
+	private Version collectVersion;
 	private Date date;
 	private String surveyUri;
 	
@@ -39,7 +40,7 @@ public class SurveyBackupInfo {
 	
 	protected Properties toProperties() {
 		Properties props = new Properties();
-		props.setProperty(COLLECT_VERSION_PROP, collectVersion);
+		props.setProperty(COLLECT_VERSION_PROP, collectVersion.toString());
 		props.setProperty(DATE_PROP, Dates.formatDateToXML(date));
 		props.setProperty(SURVEY_URI_PROP, surveyUri);
 		return props;
@@ -55,7 +56,7 @@ public class SurveyBackupInfo {
 	protected static SurveyBackupInfo parse(Properties props) {
 		String uri = props.getProperty(SURVEY_URI_PROP);
 		SurveyBackupInfo info = new SurveyBackupInfo(uri);
-		info.collectVersion = props.getProperty(COLLECT_VERSION_PROP);
+		info.collectVersion = new Version(props.getProperty(COLLECT_VERSION_PROP));
 		info.date = Dates.parseXMLDate(props.getProperty(DATE_PROP));
 		return info;
 	}
@@ -87,11 +88,11 @@ public class SurveyBackupInfo {
 		this.surveyUri = surveyUri;
 	}
 	
-	public String getCollectVersion() {
+	public Version getCollectVersion() {
 		return collectVersion;
 	}
 
-	public void setCollectVersion(String collectVersion) {
+	public void setCollectVersion(Version collectVersion) {
 		this.collectVersion = collectVersion;
 	}
 	

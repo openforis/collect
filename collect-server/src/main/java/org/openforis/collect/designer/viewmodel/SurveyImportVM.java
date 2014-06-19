@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.Collect;
 import org.openforis.collect.designer.form.validator.FormValidator;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
@@ -50,11 +51,12 @@ import org.zkoss.zul.Window;
  */
 public class SurveyImportVM extends SurveyBaseVM {
 
-	private static final String SURVEY_NAME_FIELD = "surveyName";
 	private static final String XML_CONTENT = "text/xml";
 	private static final String ZIP_CONTENT = "application/zip";
 	private static final String ZIP_CONTENT_COMPRESSED = "application/x-zip-compressed";
 	private static final String[] ALLOWED_UPLOAD_FILE_CONTENT = new String[] {ZIP_CONTENT, ZIP_CONTENT_COMPRESSED, XML_CONTENT};
+	
+	private static final String SURVEY_NAME_FIELD = "surveyName";
 	
 	private static final Log log = LogFactory.getLog(SurveyImportVM.class);
 	
@@ -70,6 +72,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private String uploadedSurveyUri;
 	private File uploadedFile;
 	private String uploadedFileName;
+	private boolean uploadingXML;
 	private boolean updatingExistingSurvey;
 	private boolean updatingPublishedSurvey;
 
@@ -172,10 +175,10 @@ public class SurveyImportVM extends SurveyBaseVM {
 	public void fileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
  		Media media = event.getMedia();
 		String contentType = media.getContentType();
-		
 		if ( ArrayUtils.contains(ALLOWED_UPLOAD_FILE_CONTENT, contentType) ) {
 			File tempFile;
-			if ( XML_CONTENT.equals(contentType) ) {
+			this.uploadingXML = XML_CONTENT.equals(contentType);
+			if ( uploadingXML ) {
 				tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), "xml");
 			} else {
 				tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), "zip");
@@ -184,7 +187,8 @@ public class SurveyImportVM extends SurveyBaseVM {
 			this.uploadedFileName = media.getName();
 			notifyChange("uploadedFileName");
 			updateForm();
-			prepareSurveyImport(true);
+
+			prepareSurveyImport(uploadingXML);
 		} else {
 			log.warn("Trying to upload invalid survey backup file. Content type: " + contentType);
 			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
@@ -276,12 +280,18 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	protected void onSummaryCreationComplete() {
 		SurveyBackupInfo info = summaryJob.getInfo();
-		survey = summaryJob.getSurvey();
-		uploadedSurveyUri = info.getSurveyUri();
-		summaryJob = null;
 		
-		notifyChange("uploadedSurveyUri");
-		updateForm();
+		if ( Collect.getVersion() != null && 
+				Collect.getVersion().compareTo(info.getCollectVersion()) < 0 ) {
+			MessageUtil.showError("survey.import_survey.error.outdated_system_version");
+		} else {
+			survey = summaryJob.getSurvey();
+			uploadedSurveyUri = info.getSurveyUri();
+			summaryJob = null;
+			
+			notifyChange("uploadedSurveyUri");
+			updateForm();
+		}
 	}
 
 	protected void confirmImportInvalidSurvey(String errorMessage) {
