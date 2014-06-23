@@ -33,6 +33,7 @@ package org.openforis.collect {
 		
 		private static var _sessionId:String;
 		private static var _preview:Boolean;
+		private static var _onlyOneRecordEdit:Boolean;
 		private static var _activeSurvey:SurveyProxy;
 		private static var _activeRecord:RecordProxy;
 		private static var _activeRecordEditable:Boolean;
@@ -136,6 +137,15 @@ package org.openforis.collect {
 			if ( ExternalInterface.available ) {
 				ExternalInterface.call(SET_PREVIEW_JS_FUNCTION, value);
 			}
+		}
+		
+		[Bindable]
+		public static function get onlyOneRecordEdit():Boolean {
+			return _onlyOneRecordEdit;
+		}
+		
+		public static function set onlyOneRecordEdit(value:Boolean):void{
+			_onlyOneRecordEdit = value;
 		}
 		
 		[Bindable]

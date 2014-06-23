@@ -66,6 +66,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.SHOW_CODE_LIST_IMPORT, showCodeListImportModuleHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_SELECTED, recordSelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.RECORD_CREATED, recordCreatedHandler);
+			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_FOR_EDIT, loadRecordForEditRecordHandler);
 		}
 		
 		protected function checkRecordsLockTimeoutHandler(event:TimerEvent = null, onSuccess:Function = null, onFault:Function = null):void {
@@ -141,6 +142,15 @@ package org.openforis.collect.presenter {
 				var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler, record);
 				_dataClient.loadRecord(responder, record.id, record.step);
 			}
+		}
+		
+		/**
+		 * Load record for edit event handler
+		 * */
+		internal function loadRecordForEditRecordHandler(uiEvent:UIEvent):void {
+			var recordId:int = uiEvent.obj.recordId;
+			var responder:AsyncResponder = new AsyncResponder(loadRecordResultHandler, loadRecordFaultHandler);
+			_dataClient.loadRecord(responder, recordId);
 		}
 		
 		/**

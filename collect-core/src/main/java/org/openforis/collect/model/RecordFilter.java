@@ -18,6 +18,7 @@ public class RecordFilter {
 	private CollectSurvey survey;
 	private int surveyId;
 	private Integer rootEntityId;
+	private Integer recordId;
 	private Step step;
 	private Step stepGreaterOrEqual;
 	private Date modifiedSince;
@@ -66,6 +67,14 @@ public class RecordFilter {
 	
 	public Integer getRootEntityId() {
 		return rootEntityId;
+	}
+	
+	public Integer getRecordId() {
+		return recordId;
+	}
+	
+	public void setRecordId(Integer recordId) {
+		this.recordId = recordId;
 	}
 	
 	public Step getStep() {

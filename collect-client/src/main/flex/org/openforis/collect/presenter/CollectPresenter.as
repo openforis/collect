@@ -124,6 +124,7 @@ package org.openforis.collect.presenter {
 		internal function init():void {
 			var params:Object = FlexGlobals.topLevelApplication.parameters;
 			var preview:Boolean = params.preview == "true";
+			var edit:Boolean = params.edit == "true";
 			var speciesImport:Boolean = params.species_import == "true";
 			var codeListImport:Boolean = params.code_list_import == "true";
 			var samplingDesignImport:Boolean = params.sampling_design_import == "true";
@@ -132,6 +133,8 @@ package org.openforis.collect.presenter {
 				AlertUtil.showError("global.error.invalidLocaleSpecified");
 			} else if ( preview ) {
 				initPreview(params, localeString);
+			} else if ( edit ) {
+				initEditRecord(params, localeString);
 			} else if ( speciesImport ) {
 				initSpeciesImport();
 			} else if ( samplingDesignImport ) {
@@ -154,7 +157,45 @@ package org.openforis.collect.presenter {
 			var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
 			this._sessionClient.initSession(previewResp, localeString);
 		}
-		
+
+		protected function initEditRecord(params:Object, localeString:String):void {
+			Application.onlyOneRecordEdit = true;
+			
+			function initSessionForEditResultHandler(event:ResultEvent, token:Object = null):void {
+				initSessionCommonResultHandler(event, token);
+				var surveyId:int = token.surveyId;
+				var responder:IResponder = new AsyncResponder(setActiveSurveyResultHandler, faultHandler, token);
+				ClientFactory.sessionClient.setActiveSurveyById(responder, surveyId);
+			}
+			function setActiveSurveyResultHandler(event:ResultEvent, token:Object):void {
+				//set active survey
+				var survey:SurveyProxy = event.result as SurveyProxy;
+				adjustLocaleForSurvey(survey);
+				Application.activeSurvey = survey;
+				survey.init();
+				
+				//set active root entity
+				var schema:SchemaProxy = survey.schema;
+				var rootEntityDefinitions:ListCollectionView = schema.rootEntityDefinitions;
+				var mainRootEntityDef:EntityDefinitionProxy = EntityDefinitionProxy(schema.rootEntityDefinitions.getItemAt(0));
+				Application.activeRootEntity = mainRootEntityDef;
+				
+				//dispatch edit record event
+				var editEvent:UIEvent = new UIEvent(UIEvent.LOAD_RECORD_FOR_EDIT);
+				editEvent.obj = {
+					recordId: token.recordId
+				};
+				eventDispatcher.dispatchEvent(editEvent);
+			}
+			
+			var token:Object = {
+				surveyId: int(params.surveyId), 
+				recordId: int(params.recordId)
+			};
+			var resp:IResponder = new AsyncResponder(initSessionForEditResultHandler, faultHandler, token);
+			this._sessionClient.initSession(resp, localeString);
+		}
+
 		protected function initSpeciesImport():void {
 			var token:ReferenceDataImportToken = new ReferenceDataImportToken();
 			if ( fillRefereceDataImportToken(token) ) {
@@ -239,7 +280,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function changePasswordClickHandler(event:UIEvent):void {
-			var popUp = ChangePasswordPopUp(PopUpUtil.createPopUp(ChangePasswordPopUp));
+			ChangePasswordPopUp(PopUpUtil.createPopUp(ChangePasswordPopUp));
 		}
 		
 		protected function performLogout():void {
@@ -271,7 +312,6 @@ package org.openforis.collect.presenter {
 			var responder:IResponder = new AsyncResponder(setActivePreviewSurveyResultHandler, faultHandler, token);
 			ClientFactory.sessionClient.setDesignerSurveyAsActive(responder, surveyId, work);
 		}
-		
 		
 		internal function initSessionForReferenceDataImportResultHandler(event:ResultEvent, token:ReferenceDataImportToken):void {
 			initSessionCommonResultHandler(event, token);

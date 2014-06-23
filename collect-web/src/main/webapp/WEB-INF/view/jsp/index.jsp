@@ -1,4 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<%@page import="java.util.Map.Entry"%>
+<%@page import="java.util.Set"%>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">	
     <head>
 		<title>Open Foris Collect</title>
@@ -31,18 +33,22 @@
 			var swfVersionStr = "10.2.0";
 			// To use express install, set to playerProductInstall.swf, otherwise the empty string. 
 			var xiSwfUrlStr = "flash/playerProductInstall.swf";
-			var flashvars = {
-				locale : '<%=request.getParameter("locale") == null? request.getLocale().toString(): request.getParameter("locale")%>',
-	        	species_import: '<%=request.getParameter("species_import")%>',
-	        	code_list_import: '<%=request.getParameter("code_list_import")%>',
-	        	sampling_design_import: '<%=request.getParameter("sampling_design_import")%>',
-	        	work: '<%=request.getParameter("work")%>',
-	        	preview: '<%=request.getParameter("preview")%>',
-	        	surveyId: '<%=request.getParameter("surveyId")%>',
-	        	rootEntityId: '<%=request.getParameter("rootEntityId")%>',
-	        	code_list_id: '<%=request.getParameter("code_list_id")%>',
-	        	versionId: '<%=request.getParameter("versionId")%>'
-	        };
+			
+			var flashvars = {};
+			//pass request parameters as flash vars
+			<%
+				Set<Entry<String, String[]>> parametersSet = request.getParameterMap().entrySet();
+				for ( Entry<String, String[]> entry: parametersSet ) {
+					String[] values = entry.getValue();
+					if ( values != null && values.length > 0 ) {
+						String value = values[0];
+						out.write("flashvars['" + entry.getKey() + "'] = '" + value + "';\r\n");
+					}
+				}
+			%>
+			if ( ! flashvars.locale ) {
+				flashvars.locale = '<%= request.getLocale().toString() %>';
+			}
 	        var params = {};
 			// params.wmode = "opaque";
 	        params.quality = "high";

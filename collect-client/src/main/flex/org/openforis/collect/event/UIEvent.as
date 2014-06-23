@@ -22,6 +22,7 @@ package org.openforis.collect.event {
 		public static const CHECK_VIEW_SIZE:String = "checkViewSize";
 		public static const CHANGE_PASSWORD_CLICK:String = "changePasswordClick";
 		
+		public static const LOAD_RECORD_FOR_EDIT:String = "loadRecordForEdit";
 		public static const RECORD_SELECTED:String = "recordSelected";
 		public static const RECORD_CREATED:String = "recordCreated";
 		

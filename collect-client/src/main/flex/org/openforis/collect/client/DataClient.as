@@ -77,8 +77,8 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step, forceUnlock:Boolean = false):void {
-			var stepNumber:int = Application.getRecordStepNumber(step);
+		public function loadRecord(responder:IResponder, id:int, step:CollectRecord$Step = null, forceUnlock:Boolean = false):void {
+			var stepNumber:Number = step == null ? NaN: Application.getRecordStepNumber(step);
 			var token:AsyncToken = this._loadRecordOperation.send(id, stepNumber, forceUnlock);
 			token.addResponder(responder);
 		}

@@ -65,6 +65,7 @@ package org.openforis.collect.presenter {
 		 * */
 		internal function activeRecordChangedListener(event:UIEvent):void {
 			var preview:Boolean = Application.preview;
+			var onlyOneRecordEdit:Boolean = Application.onlyOneRecordEdit;
 			var activeRecord:RecordProxy = Application.activeRecord;
 			var version:ModelVersionProxy = activeRecord.version;
 			var rootEntity:EntityProxy = activeRecord.rootEntity;
@@ -90,7 +91,7 @@ package org.openforis.collect.presenter {
 			var canReject:Boolean = !preview && user.canReject(activeRecord);
 			var canSave:Boolean = !preview && Application.activeRecordEditable;
 			
-			_view.topButtonBar.visible = _view.topButtonBar.includeInLayout = !preview;
+			_view.topButtonBar.visible = _view.topButtonBar.includeInLayout = !preview && !onlyOneRecordEdit;
 			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
 			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
 			if ( canReject ) {

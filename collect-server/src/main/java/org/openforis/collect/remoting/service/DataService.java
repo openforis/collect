@@ -83,14 +83,14 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordProxy loadRecord(int id, int stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
+	public RecordProxy loadRecord(int id, Integer stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
 		}
 		final CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		Step step = Step.valueOf(stepNumber);
+		Step step = stepNumber == null ? null: Step.valueOf(stepNumber);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
 		fileManager.resetTempInfo();

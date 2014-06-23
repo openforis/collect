@@ -54,6 +54,11 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
+		public function setActiveSurveyById(responder:IResponder, surveyId:int):void {
+			var token:AsyncToken = this._setActiveSurveyOperation.send(surveyId);
+			token.addResponder(responder);
+		}
+		
 		public function setDesignerSurveyAsActive(responder:IResponder, id:int, work:Boolean):void {
 			var token:AsyncToken = this._setDesignerSurveyAsActiveOperation.send(id, work);
 			token.addResponder(responder);

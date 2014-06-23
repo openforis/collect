@@ -76,6 +76,12 @@ public class SessionService {
 	}
 
 	@Transactional
+	public SurveyProxy setActiveSurvey(int surveyId) {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		return setActiveSurvey(survey, false);
+	}
+
+	@Transactional
 	public SurveyProxy setActivePreviewSurvey(int surveyId) {
 		CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
 		return setActiveSurvey(survey, true);

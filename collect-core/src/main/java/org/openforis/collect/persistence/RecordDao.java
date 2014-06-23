@@ -179,6 +179,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(filter.getRootEntityId()));
 		}
 		
+		//root entity
+		if ( filter.getRecordId() != null ) {
+			q.addConditions(OFC_RECORD.ID.equal(filter.getRecordId()));
+		}
+		
 		//step
 		if ( filter.getStep() != null ) {
 			q.addConditions(OFC_RECORD.STEP.equal(filter.getStep().getStepNumber()));
