@@ -226,6 +226,11 @@ public class RecordManager {
 		recordConverter.convertToLatestVersion(record);
 		return record;
 	}
+	
+	public byte[] loadBinaryData(CollectSurvey survey, int recordId, Step step) {
+		byte[] result = recordDao.loadBinaryData(survey, recordId, step.getStepNumber());
+		return result;
+	}
 
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
