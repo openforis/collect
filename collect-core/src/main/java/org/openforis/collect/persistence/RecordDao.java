@@ -76,6 +76,18 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			return jf.fromRecord(r);
 		}
 	}
+	
+	public byte[] loadBinaryData(CollectSurvey survey, int id, int step) {
+		JooqFactory jf = getMappingJooqFactory(survey, step);
+		SelectQuery query = jf.selectRecordQuery(id);
+		Record r = query.fetchOne();
+		if ( r == null ) {
+			return null;
+		} else {
+			byte[] result = r.getValue(jf.dataAlias);
+			return result;
+		}
+	}
 
 	private JooqFactory getMappingJooqFactory(CollectSurvey survey) {
 		return new JooqFactory(getConnection(), survey);
@@ -217,7 +229,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	
 	public int countRecords(CollectSurvey survey, Integer rootEntityDefinitionId, Integer dataStepNumber) {
 		RecordFilter filter = new RecordFilter(survey, rootEntityDefinitionId);
-		filter.setStepGreaterOrEqual(Step.valueOf(dataStepNumber));
+		if ( dataStepNumber != null ) {
+			filter.setStepGreaterOrEqual(Step.valueOf(dataStepNumber));
+		}
 		return countRecords(filter);
 	}
 	
