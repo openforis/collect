@@ -67,6 +67,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			switch (attributeType) {
 			case BOOLEAN:
 				return new BooleanAttributeDefinitionFormObject(parentDefn);
+			case CALCULATED:
+				return new CalculatedAttributeDefinitionFormObject(parentDefn);
 			case CODE:
 				return new CodeAttributeDefinitionFormObject(parentDefn);
 			case COORDINATE:
