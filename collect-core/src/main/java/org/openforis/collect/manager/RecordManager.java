@@ -53,6 +53,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.CalculatedAttribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
@@ -237,6 +238,7 @@ public class RecordManager {
 			}
 		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
+		addEmptyNodes(record);
 		recordConverter.convertToLatestVersion(record);
 		return record;
 	}
@@ -251,6 +253,11 @@ public class RecordManager {
 		return loadSummaries(survey, rootEntity, (String[]) null);
 	}
 
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
+		return recordDao.loadSummaries(survey, rootEntity, step);
+	}
+	
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keys) {
 		return recordDao.loadSummaries(survey, rootEntity, keys);
@@ -455,10 +462,14 @@ public class RecordManager {
 			Attribute<? extends NodeDefinition, V> attribute) {
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
+		
 		Set<Attribute<?, ?>> checkDependencies = clearValidationResults(attribute);
 		checkDependencies.add(attribute);
+		
 		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(attribute);
+		
 		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		
 		return new NodeChangeSet(changeMap.getChanges());
 	}
 	
@@ -658,21 +669,29 @@ public class RecordManager {
 	 * @param node
 	 * @return
 	 */
-	public NodeChangeSet deleteNode(
-			Node<?> node) {
+	public NodeChangeSet deleteNode(Node<?> node) {
 		Set<NodePointer> relevantDependencies = new HashSet<NodePointer>();
 		Set<NodePointer> requiredDependencies = new HashSet<NodePointer>();
 		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
+		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.prepareDeleteNodeChange(node);
+		
 		List<NodePointer> cardinalityNodePointers = createCardinalityNodePointers(node);
+		
+		//traverse all descendants
 		Stack<Node<?>> depthFirstDescendants = getDepthFirstDescendants(node);
-		while ( !depthFirstDescendants.isEmpty() ) {
+		while ( ! depthFirstDescendants.isEmpty() ) {
 			Node<?> n = depthFirstDescendants.pop();
 			relevantDependencies.addAll(n.getRelevantDependencies());
 			requiredDependencies.addAll(n.getRequiredDependencies());
 			if ( n instanceof Attribute ) {
 				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
+				Set<CalculatedAttribute<?, ?>> dependantCalculatedAttributes = n.getDependantCalculatedAttributes();
+				for (CalculatedAttribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
+					calculatedAttribute.clearValue();
+					changeMap.prepareAttributeChange(calculatedAttribute);
+				}
 			}
 			performNodeDeletion(n);
 		}
@@ -747,8 +766,10 @@ public class RecordManager {
 					if ( value != null ) {
 						attribute.setValue(value);
 						setDefaultValueApplied(attribute, true);
+						
 						clearRelevanceRequiredDependencies(attribute);
 						clearValidationResults(attribute);
+						clearDependantCalculatedValues(attribute);
 						break;
 					}
 				} catch (InvalidExpressionException e) {
@@ -1076,6 +1097,13 @@ public class RecordManager {
 	protected void clearValidationResults(Set<Attribute<?, ?>> checkDependencies) {
 		for (Attribute<?, ?> attr : checkDependencies) {
 			attr.clearValidationResults();
+		}
+	}
+	
+	private void clearDependantCalculatedValues(Node<?> node) {
+		Set<CalculatedAttribute<?, ?>> dependantCalculatedAttributes = node.getDependantCalculatedAttributes();
+		for ( CalculatedAttribute<?, ?> calculatedAttribute : dependantCalculatedAttributes ) {
+			calculatedAttribute.clearValue();
 		}
 	}
 	

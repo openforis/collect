@@ -8,11 +8,11 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.relational.jooq.JooqDatabaseExporter;
 import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreator;
@@ -37,7 +37,7 @@ public class CollectRDBPublisher {
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private RecordDao recordDao;
+	private RecordManager recordManager;
 	@Autowired
 	@Qualifier("dataSource")
 	private DataSource dataSource;
@@ -67,7 +67,7 @@ public class CollectRDBPublisher {
 		createTargetDBSchema(targetSchema, targetConn);
 		
 		// Insert data
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntityName, step);
+		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, step);
 		int total = summaries.size();
 		if ( LOG.isInfoEnabled() ) {
 			LOG.info("Total records: " + total);
@@ -94,7 +94,7 @@ public class CollectRDBPublisher {
 			if ( LOG.isInfoEnabled() ) {
 				LOG.info("Exporting record #" + (++count) + " id: " + summary.getId());
 			}
-			CollectRecord record = recordDao.load(survey, summary.getId(), step.getStepNumber());
+			CollectRecord record = recordManager.load(survey, summary.getId(), step);
 			databaseExporter.insertData(targetSchema, record);
 		}
 		try {

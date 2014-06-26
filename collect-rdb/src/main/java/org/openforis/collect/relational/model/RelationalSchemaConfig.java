@@ -46,7 +46,7 @@ public class RelationalSchemaConfig implements Cloneable {
 		config.defaultCode = "-1";
 		config.defaultCodeLabels = new LanguageSpecificTextMap();
 		config.defaultCodeLabels.add(new LanguageSpecificText("en", "N/A"));
-		config.uniqueColumnNames = false;
+		config.uniqueColumnNames = true;
 		config.ancestorKeyColumnsIncluded = false;
 		DEFAULT = config;
 	}

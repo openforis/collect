@@ -13,6 +13,7 @@ import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -566,6 +567,7 @@ public class RelationalSchemaGenerator {
 			AttributeDefinition attrDefn = defn.getAttributeDefinition();
 			if ( attrDefn instanceof BooleanAttributeDefinition ||
 				attrDefn instanceof TextAttributeDefinition ||
+				attrDefn instanceof CalculatedAttributeDefinition && fldName.equals(attrDefn.getMainFieldName() ) || 
 				attrDefn instanceof CodeAttributeDefinition && fldName.equals(CodeAttributeDefinition.CODE_FIELD) || 
 				attrDefn instanceof NumberAttributeDefinition && fldName.equals(NumberAttributeDefinition.VALUE_FIELD)
 				) {
