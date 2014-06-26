@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.0.1-Alpha20-SNAPSHOT</version>
+		<version>3.1.0-a2-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-assembly</artifactId>
 	<packaging>pom</packaging>
