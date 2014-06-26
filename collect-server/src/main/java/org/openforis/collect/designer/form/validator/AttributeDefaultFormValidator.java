@@ -1,7 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.designer.viewmodel.AttributeDefaultVM;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.ValidationContext;
@@ -73,12 +72,4 @@ public class AttributeDefaultFormValidator extends FormValidator {
 		return result;
 	}
 
-	protected AttributeDefaultVM getAttributeDefaultVM(ValidationContext ctx) {
-		Object vm = getVM(ctx);
-		if ( vm instanceof AttributeDefaultVM ) {
-			return (AttributeDefaultVM) vm;
-		} else {
-			throw new  IllegalStateException("Unexpected view model class: " + vm.getClass().getName());
-		}
-	}
 }

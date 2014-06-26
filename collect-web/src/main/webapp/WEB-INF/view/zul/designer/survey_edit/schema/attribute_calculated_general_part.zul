@@ -26,16 +26,11 @@
 					</radiogroup>
 				</fieldErrorHandler>
 			</row>
-			<row>
-				<fieldErrorHandler message="@load(vmsgs['formula'])">
-					<label
-						value="${labels.survey.schema.attribute.calculated.formula}:" />
-				</fieldErrorHandler>
-				<fieldErrorHandler message="@load(vmsgs['formula'])">
-					<textbox width="400px" rows="4"
-						value="@bind(fx.formula)" onChange="@command('applyChanges')" />
-				</fieldErrorHandler>
-			</row>
 		</rows>
 	</grid>
+	
+	<groupbox width="100%" closable="false" class="tableFieldSet">
+		<caption label="${labels.survey.schema.attribute.calculated.formulas}" />
+		<include src="survey_edit/schema/attribute_calculated_formulas_list.zul" />
+	</groupbox>
 </zk>

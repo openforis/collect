@@ -9,15 +9,12 @@ import org.zkoss.bind.ValidationContext;
  */
 public class CalculatedAttributeDefinitionFormValidator extends AttributeDefinitionFormValidator {
 	
-	protected static final String FORMULA_FIELD = "formula";
-	
+	private static final String FORMULAS_FIELD = "formulas";
+
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
-		
-		if ( validateRequired(ctx, FORMULA_FIELD) ) {
-			validateValueExpression(ctx, getEditedNode(ctx), FORMULA_FIELD);
-		}
+		validateRequired(ctx, FORMULAS_FIELD);
 	}
 
 }

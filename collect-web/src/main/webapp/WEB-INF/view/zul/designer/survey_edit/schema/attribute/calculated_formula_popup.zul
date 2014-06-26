@@ -1,0 +1,68 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<custom-attributes parentDefinition="${arg.parentDefinition}" />
+	<custom-attributes formula="${arg.formula}" />
+	<custom-attributes newItem="${arg.newItem}" />
+	
+	<zscript language="Java"><![CDATA[
+		import org.openforis.idm.metamodel.AttributeDefinition;
+		import org.openforis.idm.metamodel.CalculatedAttributeDefinition.Formula;
+		import org.zkoss.util.resource.Labels;
+
+		Formula formula = (Formula) arg.get("formula");
+		String attrName = ((AttributeDefinition) arg.get("parentDefinition")).getName();
+		String title = Labels.getLabel("survey.schema.attribute.calculated.formula.popup_title",
+				new String[] { attrName });
+	]]></zscript>
+
+
+	<window id="calculatedAttributeFormulaPopUp" title="${title}"
+		width="500px" border="normal" position="center" closable="false"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CalculatedAttributeFormulaVM')"
+		validationMessages="@id('vmsgs')"
+		form="@id('fx') 
+            @load(vm.formObject) 
+            @save(vm.formObject, before={'validate','applyChanges'})
+            @validator('org.openforis.collect.designer.form.validator.CalculatedAttributeFormulaFormValidator', parentDefinition=parentDefinition)">
+
+		<vlayout id="formContainer">
+			<grid>
+				<columns>
+					<column width="150px" />
+					<column />
+				</columns>
+				<rows>
+					<row>
+						<label
+							value="${labels.survey.schema.attribute.calculated.expression}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['expression'])">
+							<textbox width="150px"
+								value="@bind(fx.expression)"
+								onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+					<row>
+						<label
+							value="${labels.survey.schema.attribute.calculated.condition}:" />
+						<fieldErrorHandler
+							message="@load(vmsgs['condition'])">
+							<textbox width="150px"
+								value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+						</fieldErrorHandler>
+					</row>
+				</rows>
+			</grid>
+			<box width="100%" align="center">
+				<hbox>
+					<button label="${labels.global.apply}"
+						onClick="@command('commitChanges')" />
+					<separator width="30px" />
+					<button label="${labels.global.cancel}"
+						onClick="@global-command('cancelChangesToEditedFormula')" />
+				</hbox>
+			</box>
+		</vlayout>
+	</window>
+</zk>

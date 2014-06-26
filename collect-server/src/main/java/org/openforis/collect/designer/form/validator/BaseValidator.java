@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form.validator;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +33,11 @@ public abstract class BaseValidator extends AbstractValidator {
 	protected static final String ITEM_NAME_ALREADY_DEFINED_MESSAGE_KEY = "global.item.validation.name_already_defined";
 
 	protected boolean validateRequired(ValidationContext ctx, String validationMessageKey, Object value) {
-		if ( value == null || value instanceof String && StringUtils.isBlank((String) value)) {
+		if ( 
+				value == null || 
+				value instanceof String && StringUtils.isBlank((String) value) ||
+				value instanceof Collection && ((Collection<?>) value).isEmpty() 
+				) {
 			this.addInvalidMessage(ctx, validationMessageKey, Labels.getLabel(FIELD_REQUIRED_MESSAGE_KEY));
 			return false;
 		} else {

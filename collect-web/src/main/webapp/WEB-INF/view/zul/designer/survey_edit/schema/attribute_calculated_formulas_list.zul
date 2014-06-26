@@ -1,0 +1,44 @@
+<zk>
+	<vlayout>
+		<listbox id="formulaList"
+			model="@load(vm.formulas)"
+			selectedItem="@bind(vm.selectedFormula)" width="570px" rows="3">
+			<listhead>
+				<listheader
+					label="${labels.survey.schema.attribute.calculated.expression}"
+					width="200px" />
+				<listheader
+					label="${labels.survey.schema.attribute.calculated.condition}" />
+			</listhead>
+			<template name="model">
+				<listitem>
+					<listcell label="${each.expression}"
+						onDoubleClick="@command('editFormula')" />
+					<listcell label="${each.condition}"
+						onDoubleClick="@command('editFormula')" />
+				</listitem>
+			</template>
+		</listbox>
+		<toolbar>
+			<toolbarbutton tooltiptext="${labels.global.add_item}"
+				image="/assets/images/add-small.png"
+				onClick="@command('addFormula')" />
+			<toolbarbutton tooltiptext="${labels.global.edit_item}"
+				image="/assets/images/edit-small.png"
+				disabled="@load(empty vm.selectedFormula)"
+				onClick="@command('editFormula')" />
+			<toolbarbutton tooltiptext="${labels.global.delete_item}"
+				image="/assets/images/delete-small.png"
+				disabled="@load(empty vm.selectedFormula)"
+				onClick="@command('deleteFormula', formula=vm.selectedFormula)" />
+			<toolbarbutton tooltiptext="${labels.global.item.move_up}"
+				image="/assets/images/arrow-up-small.png"
+				disabled="@load(vm.moveSelectedFormulaUpDisabled)"
+				onClick="@command('moveSelectedFormulaUp')" />
+			<toolbarbutton tooltiptext="${labels.global.item.move_down}"
+				image="/assets/images/arrow-down-small.png"
+				disabled="@load(vm.moveSelectedFormulaDownDisabled)"
+				onClick="@command('moveSelectedFormulaDown')" />
+		</toolbar>
+	</vlayout>
+</zk>

@@ -1,6 +1,7 @@
 package org.openforis.collect.io.data;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,6 +51,10 @@ public class BackupDataExtractor implements Closeable {
 		this.step = step;
 	}
 
+	public BackupDataExtractor(CollectSurvey survey, File file, Step step) throws ZipException, IOException {
+		this(survey, new ZipFile(file), step);
+	}
+	
 	public void init() throws ZipException, IOException {
 		this.fileExtractor = new BackupFileExtractor(zipFile);
 		this.oldFormat = this.fileExtractor.isOldFormat();

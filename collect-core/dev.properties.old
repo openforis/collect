@@ -1,0 +1,9 @@
+collect.devdb.driver=org.postgresql.Driver
+collect.devdb.url=jdbc:postgresql://localhost:5432/naforma_simplified
+collect.devdb.username=collect
+collect.devdb.password=collect123
+
+#collect.devdb.driver=org.sqlite.JDBC
+#collect.devdb.url=jdbc:sqlite::memory:
+#collect.devdb.username=
+#collect.devdb.password=
