@@ -18,11 +18,13 @@ import javax.xml.validation.Validator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.Collect;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult.Flag;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -54,12 +56,19 @@ public class SurveyValidator {
 
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
+	private static final String IDML_XSD_3_1_FILE_NAME = "idml3.1.xsd";
 	private static final String IDML_UI_XSD_FILE_NAME = "idml3-ui.xsd";
 
-	private static final String[] SURVEY_XSD_FILE_NAMES = new String[] {
+	private static final String[] SURVEY_XSD_3_0_FILE_NAMES = new String[] {
 			XML_XSD_FILE_NAME, 
 			IDML_XSD_FILE_NAME,
 			IDML_UI_XSD_FILE_NAME 
+	};
+	
+	private static final String[] SURVEY_XSD_3_1_FILE_NAMES = new String[] {
+		XML_XSD_FILE_NAME, 
+		IDML_XSD_3_1_FILE_NAME,
+		IDML_UI_XSD_FILE_NAME 
 	};
 	
 	private static final String CODE_LIST_PATH_FORMAT = "codeList/%s";
@@ -487,10 +496,15 @@ public class SurveyValidator {
 	}
 	
 	public void validateAgainstSchema(InputStream is) throws SurveyValidationException {
+		validateAgainstSchema(is, Collect.getVersion());
+	}
+	
+	public void validateAgainstSchema(InputStream is, Version version) throws SurveyValidationException {
 	    try {
 	    	SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-	    	Source[] schemas = getSourcesFromClassPath(SURVEY_XSD_FILE_NAMES);
-			javax.xml.validation.Schema schema = factory.newSchema(schemas);
+	    	String[] schemaFileNames = getSchemaFileNames(version);
+	    	Source[] schemas = getSourcesFromClassPath(schemaFileNames);
+	    	javax.xml.validation.Schema schema = factory.newSchema(schemas);
 	        Validator validator = schema.newValidator();
 	        validator.validate(new StreamSource(is));
 	    } catch(SAXException e) {
@@ -500,6 +514,14 @@ public class SurveyValidator {
 		}
 	}
 	
+	private String[] getSchemaFileNames(Version version) {
+		if ( version.compareTo(new Version("3.1")) >= 0 ) {
+			return SURVEY_XSD_3_1_FILE_NAMES;
+		} else {
+			return SURVEY_XSD_3_0_FILE_NAMES;
+		}
+	}
+
 	private Source[] getSourcesFromClassPath(String... sources) throws IOException {
 		Source[] result = new Source[sources.length];
 		for (int i = 0; i < sources.length; i++) {
