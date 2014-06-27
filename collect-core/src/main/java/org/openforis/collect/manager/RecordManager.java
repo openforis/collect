@@ -458,8 +458,7 @@ public class RecordManager {
 	}
 
 	protected <V extends Value> NodeChangeSet afterAttributeInsertOrUpdate(
-			NodeChangeMap changeMap,
-			Attribute<? extends NodeDefinition, V> attribute) {
+			NodeChangeMap changeMap, Attribute<? extends NodeDefinition, V> attribute) {
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 		
@@ -471,12 +470,12 @@ public class RecordManager {
 		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
 		
 		//add calculated attribute changes
-//		Set<CalculatedAttribute<?,?>> dependantCalculatedAttributes = attribute.getDependantCalculatedAttributes();
-//		for (CalculatedAttribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
-//			AttributeChange change = changeMap.prepareAttributeChange(calculatedAttribute);
-//			Map<Integer, Object> updatedFieldValues = createFieldValuesMap(calculatedAttribute);
-//			change.setUpdatedFieldValues(updatedFieldValues);
-//		}
+		Set<CalculatedAttribute<?,?>> dependantCalculatedAttributes = attribute.getDependantCalculatedAttributes();
+		for (CalculatedAttribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
+			AttributeChange change = changeMap.prepareAttributeChange(calculatedAttribute);
+			Map<Integer, Object> updatedFieldValues = createFieldValuesMap(calculatedAttribute);
+			change.setUpdatedFieldValues(updatedFieldValues);
+		}
 
 		return new NodeChangeSet(changeMap.getChanges());
 	}

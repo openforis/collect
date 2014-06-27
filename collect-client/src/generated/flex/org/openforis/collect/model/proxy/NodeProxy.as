@@ -89,10 +89,16 @@ package org.openforis.collect.model.proxy {
 			//to be implemented in subclasses
 		}
 		
+		/**
+		 * Returns the nearest multiple entity ancestor or the root entity 
+		 */
 		public function getParentMultipleEntity():EntityProxy {
 			var currentParent:NodeProxy = parent;
 			while ( currentParent != null ) {
-				if ( currentParent is EntityProxy && currentParent.definition.multiple ) {
+				if ( currentParent is EntityProxy && ( 
+						currentParent.definition.multiple ||
+						currentParent.parent == null
+					)) {
 					return EntityProxy(currentParent);
 				}
 				currentParent = currentParent.parent;

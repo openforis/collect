@@ -158,6 +158,10 @@ package org.openforis.collect.model.proxy {
 		
 		protected function processAttributeUpdateResponse(change:AttributeChangeProxy):void {
 			var node:NodeProxy = getNode(change.nodeId);
+			if ( node == null ) {
+				//node not shown in UI: skip it
+				return;
+			}
 			var a:AttributeProxy = AttributeProxy(node);
 			if ( change.validationResults != null ) {
 				a.validationResults = change.validationResults;
