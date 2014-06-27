@@ -470,6 +470,14 @@ public class RecordManager {
 		
 		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
 		
+		//add calculated attribute changes
+//		Set<CalculatedAttribute<?,?>> dependantCalculatedAttributes = attribute.getDependantCalculatedAttributes();
+//		for (CalculatedAttribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
+//			AttributeChange change = changeMap.prepareAttributeChange(calculatedAttribute);
+//			Map<Integer, Object> updatedFieldValues = createFieldValuesMap(calculatedAttribute);
+//			change.setUpdatedFieldValues(updatedFieldValues);
+//		}
+
 		return new NodeChangeSet(changeMap.getChanges());
 	}
 	

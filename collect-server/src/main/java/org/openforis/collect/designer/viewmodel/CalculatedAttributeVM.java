@@ -36,6 +36,8 @@ public class CalculatedAttributeVM extends
 		AttributeVM<CalculatedAttributeDefinition> {
 
 	private static final String FORMULAS_FIELD = "formulas";
+	public static final String FORMULA_POPUP_PARENT_ENTITY_DEFINITION_ARG = "parentEntityDefinition";
+	public static final String FORMULA_POPUP_ATTRIBUTE_DEFINITION_ARG = "attributeDefinition";
 
 	protected List<Formula> formulas;
 	private Boolean editingNewFormula;
@@ -66,7 +68,7 @@ public class CalculatedAttributeVM extends
 		} else {
 			formulas = null;
 		}
-		notifyChange("formulas");
+		notifyChange("formObject", "tempFormObject", "formulas");
 	}
 
 	protected void updateFormObjectFormulas() {
@@ -115,7 +117,8 @@ public class CalculatedAttributeVM extends
 
 	protected void openFormulaEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("parentDefinition", editedItem);
+		args.put(FORMULA_POPUP_PARENT_ENTITY_DEFINITION_ARG, parentEntity );
+		args.put(FORMULA_POPUP_ATTRIBUTE_DEFINITION_ARG, editedItem);
 		args.put("newItem", editingNewFormula);
 		args.put("formula", editedFormula);
 		formulaPopUp = openPopUp(

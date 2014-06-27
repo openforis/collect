@@ -1,6 +1,7 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
-	<custom-attributes parentDefinition="${arg.parentDefinition}" />
+	<custom-attributes attributeDefinition="${arg.attributeDefinition}" />
+	<custom-attributes parentEntityDefinition="${arg.parentEntityDefinition}" />
 	<custom-attributes formula="${arg.formula}" />
 	<custom-attributes newItem="${arg.newItem}" />
 	
@@ -10,7 +11,10 @@
 		import org.zkoss.util.resource.Labels;
 
 		Formula formula = (Formula) arg.get("formula");
-		String attrName = ((AttributeDefinition) arg.get("parentDefinition")).getName();
+		String attrName = ((AttributeDefinition) arg.get(org.openforis.collect.designer.viewmodel.CalculatedAttributeVM.FORMULA_POPUP_ATTRIBUTE_DEFINITION_ARG)).getName();
+		if ( attrName == null ) {
+			attrName = "---";
+		}
 		String title = Labels.getLabel("survey.schema.attribute.calculated.formula.popup_title",
 				new String[] { attrName });
 	]]></zscript>
@@ -24,7 +28,9 @@
 		form="@id('fx') 
             @load(vm.formObject) 
             @save(vm.formObject, before={'validate','applyChanges'})
-            @validator('org.openforis.collect.designer.form.validator.CalculatedAttributeFormulaFormValidator', parentDefinition=parentDefinition)">
+            @validator('org.openforis.collect.designer.form.validator.CalculatedAttributeFormulaFormValidator', 
+            	parentEntityDefinition=parentEntityDefinition,
+           		attributeDefinition=attributeDefinition)">
 
 		<vlayout id="formContainer">
 			<grid>

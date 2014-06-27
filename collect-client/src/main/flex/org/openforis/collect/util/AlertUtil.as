@@ -65,7 +65,7 @@ package org.openforis.collect.util
 			if(! Application.serverOffline) {
 				var message:String = Message.get(messageKey);
 				var now:String = new Date().toString();
-				var details:String = StringUtil.concat("\n\n", now, error.name, error.toString());
+				var details:String = StringUtil.concat("\n\n", now, error.name, error.toString(), error.getStackTrace());
 				BlockingMessagePopUp.show(Message.get("global.errorAlertTitle"), message, details, Images.ERROR);
 			}
 			Application.serverOffline = true;

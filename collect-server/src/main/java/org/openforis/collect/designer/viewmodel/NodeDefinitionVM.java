@@ -13,6 +13,7 @@ import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -198,5 +199,9 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	
 	public boolean isRequiredApplied() {
 		return true;
+	}
+	
+	public boolean isCalculatedAttribute() {
+		return editedItem != null && editedItem instanceof CalculatedAttributeDefinition;
 	}
 }

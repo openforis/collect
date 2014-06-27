@@ -25,17 +25,17 @@ public class CalculatedAttributeFormulaVM extends SurveyObjectBaseVM<Formula> {
 
 	private static final String APPLY_CHANGES_TO_EDITED_FORMULA_GLOBAL_COMMAND = "applyChangesToEditedFormula";
 	
-	protected CalculatedAttributeDefinition parentDefinition;
+	protected CalculatedAttributeDefinition attributeDefinition;
 
 	public CalculatedAttributeFormulaVM() {
 		setCommitChangesOnApply(false);
 	}
 	
 	@Init(superclass=false)
-	public void init(@ExecutionArgParam("parentDefinition") CalculatedAttributeDefinition parentDefinition,
+	public void init(@ExecutionArgParam(CalculatedAttributeVM.FORMULA_POPUP_ATTRIBUTE_DEFINITION_ARG) CalculatedAttributeDefinition attrDefn,
 			@ExecutionArgParam("formula") Formula formula, @ExecutionArgParam("newItem") Boolean newItem) {
 		super.init();
-		this.parentDefinition = parentDefinition;
+		this.attributeDefinition = attrDefn;
 		this.newItem = newItem;
 		setEditedItem(formula);
 	}
@@ -61,7 +61,7 @@ public class CalculatedAttributeFormulaVM extends SurveyObjectBaseVM<Formula> {
 
 	@Override
 	protected void addNewItemToSurvey() {
-		parentDefinition.addFormula(editedItem);
+		attributeDefinition.addFormula(editedItem);
 	}
 
 	@Override

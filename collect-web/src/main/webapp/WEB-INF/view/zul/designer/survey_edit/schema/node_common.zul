@@ -36,7 +36,7 @@
   			<column />
   		</columns>
   		<rows>
-  			<row visible="${not vm.rootEntity}">
+  			<row visible="${not vm.rootEntity and not vm.calculatedAttribute}">
   				<fieldErrorHandler message="@load(vmsgs['multiple'])">
 	  				<label use="org.openforis.collect.designer.component.FieldLabel" 
 	  					value="${labels.survey.schema.node.multiple}" />
@@ -49,7 +49,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and fx.multiple ne true and vm.requiredApplied and (empty fx.requiredExpression or fx.required))">
+  				visible="@load(not vm.rootEntity and not vm.calculatedAttribute and fx.multiple ne true and vm.requiredApplied and (empty fx.requiredExpression or fx.required))">
   				<fieldErrorHandler message="@load(vmsgs['required'])">
 	  				<label value="${labels.survey.schema.node.required}:" />
 	  			</fieldErrorHandler>
@@ -61,7 +61,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and fx.multiple ne true and (fx.required eq false || not empty fx.requiredExpression))">
+  				visible="@load(not vm.rootEntity and not vm.calculatedAttribute and fx.multiple ne true and (fx.required eq false || not empty fx.requiredExpression))">
   				<fieldErrorHandler
   					message="@load(vmsgs['requiredExpression'])">
 	  				<label
@@ -75,7 +75,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and fx.multiple eq true)">
+  				visible="@load(not vm.rootEntity and not vm.calculatedAttribute and fx.multiple eq true)">
   				<fieldErrorHandler message="@load(vmsgs['minCount'])">
   					<label value="${labels.survey.schema.node.min_count}:" />
   				</fieldErrorHandler>
@@ -85,7 +85,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and fx.multiple eq true)">
+  				visible="@load(not vm.rootEntity and not vm.calculatedAttribute and fx.multiple eq true)">
   				<fieldErrorHandler message="@load(vmsgs['maxCount'])">
 	  				<label value="${labels.survey.schema.node.max_count}:" />
 	  			</fieldErrorHandler>
@@ -94,7 +94,7 @@
   						onChange="@command('applyChanges')" />
   				</fieldErrorHandler>
   			</row>
-  			<row visible="@load(not vm.rootEntity)">
+  			<row visible="@load(not vm.rootEntity and not vm.calculatedAttribute)">
   				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
 	  				<label value="${labels.survey.schema.node.relevant_expression}:" />
 	  			</fieldErrorHandler>

@@ -26,6 +26,7 @@ import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.CalculatedAttribute;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -48,6 +49,11 @@ public class CollectValidator extends Validator {
 	@Override
 	public ValidationResults validate(Attribute<?, ?> attribute) {
 		ValidationResults results = new ValidationResults();
+
+		//skip validation for calculated attributes
+		if ( attribute instanceof CalculatedAttribute ) {
+			return results;
+		}
 
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 

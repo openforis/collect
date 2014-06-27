@@ -79,6 +79,11 @@ button.icon {
 	border: 2px inset #FF0000;
 	color: #000000;
 }
+.z-groupbox.error .z-groupbox-hr, 
+.z-groupbox.error .z-groupbox-cnt {
+	border-color: red;
+	border-width: 2px;
+}
 /**
 * Checkbox style
 */
