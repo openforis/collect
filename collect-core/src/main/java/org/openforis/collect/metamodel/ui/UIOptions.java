@@ -21,6 +21,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -77,16 +78,28 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE)),
 		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER)),
 		VISIBLE_FIELDS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.VISIBLE_FIELDS)),
-		SHOW_ALLOWED_VALUES_PREVIEW(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ALLOWED_VALUES_PREVIEW));
+		SHOW_ALLOWED_VALUES_PREVIEW(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ALLOWED_VALUES_PREVIEW)),
+		SHOW_IN_UI(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_IN_UI), false);
 		
 		private QName qName;
+		private Object defaultValue;
 
 		private Annotation(QName qname) {
 			this.qName = qname;
 		}
 		
+		private Annotation(QName qname, Object defaultValue) {
+			this(qname);
+			this.defaultValue = defaultValue;
+		}
+		
 		public QName getQName() {
 			return qName;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public <T> T getDefaultValue() {
+			return (T) defaultValue;
 		}
 	}
 	
@@ -660,6 +673,33 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	public void setShowAllowedValuesPreviewValue(CodeAttributeDefinition defn, boolean value) {
 		defn.setAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName(), value ? Boolean.toString(value): null);
+	}
+	
+	public boolean isShownInUI(CalculatedAttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.SHOW_IN_UI);
+	}
+	
+	public void setShowInUI(CalculatedAttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.SHOW_IN_UI, value);
+	}
+
+	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
+		String annotationValue = defn.getAnnotation(annotation.getQName());
+		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {
+			return annotation.getDefaultValue();
+		} else {
+			return Boolean.valueOf(annotationValue);
+		}
+	}
+
+	private void setAnnotationValue(NodeDefinition defn, Annotation annotation, boolean value) {
+		String annotationValue;
+		if ( annotation.getDefaultValue() != null && annotation.getDefaultValue().equals(value) ) {
+			annotationValue = null;
+		} else {
+			annotationValue = Boolean.toString(value);
+		}
+		defn.setAnnotation(annotation.getQName(), annotationValue);
 	}
 	
 	/**

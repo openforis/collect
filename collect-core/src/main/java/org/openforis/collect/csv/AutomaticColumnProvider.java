@@ -6,7 +6,10 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -43,18 +46,23 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	
 	public AutomaticColumnProvider(String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions, 
 			boolean includeCodeItemPositionColumn, boolean includeKMLColumnForCoordinates) {
-		super(headingPrefix, createProviders( entityDefinition, exclusions, includeKMLColumnForCoordinates, includeCodeItemPositionColumn));
+		super(headingPrefix, createProviders( entityDefinition, exclusions, includeCodeItemPositionColumn, includeKMLColumnForCoordinates));
 	}
 	
 	private static List<ColumnProvider> createProviders(EntityDefinition rowDefn, List<String> exclusions,
-			boolean includeKMLColumnForCoordinates, boolean includeItemPositionColumn) {
+			boolean includeItemPositionColumn, boolean includeKMLColumnForCoordinates) {
 		List<ColumnProvider> cols = new ArrayList<ColumnProvider>();
+		CollectSurvey survey = (CollectSurvey) rowDefn.getSurvey();
+		CollectAnnotations surveyAnnotations = survey.getAnnotations();
 		List<NodeDefinition> childDefinitions = rowDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {
 			if (includeChild(exclusions, childDefn)) {
 				if (childDefn instanceof EntityDefinition) {
 					createEntityProviders((EntityDefinition) childDefn, cols);
-				} else if (childDefn instanceof AttributeDefinition) {
+				} else if (childDefn instanceof AttributeDefinition && (
+					! (childDefn instanceof CalculatedAttributeDefinition) || 
+						surveyAnnotations.isIncludedInDataExport((CalculatedAttributeDefinition) childDefn) )
+					) {
 					createAttributeProviders((AttributeDefinition) childDefn, cols, includeKMLColumnForCoordinates, includeItemPositionColumn);
 				}
 			}

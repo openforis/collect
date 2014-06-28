@@ -28,5 +28,6 @@ public interface UIOptionsConstants {
 	String LABEL = "label";
 	String VISIBLE_FIELDS = "visibleFields";
 	String SHOW_ALLOWED_VALUES_PREVIEW = "showAllowedValuesPreview";
+	String SHOW_IN_UI = "showInUI";
 	
 }

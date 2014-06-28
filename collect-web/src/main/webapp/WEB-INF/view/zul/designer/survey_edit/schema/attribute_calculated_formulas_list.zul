@@ -5,10 +5,10 @@
 			selectedItem="@bind(vm.selectedFormula)" width="570px" rows="3">
 			<listhead>
 				<listheader
-					label="${labels.survey.schema.attribute.calculated.expression}"
+					label="${labels.survey.schema.attribute.calculated.formula.expression}"
 					width="200px" />
 				<listheader
-					label="${labels.survey.schema.attribute.calculated.condition}" />
+					label="${labels.survey.schema.attribute.calculated.formula.condition}" />
 			</listhead>
 			<template name="model">
 				<listitem>

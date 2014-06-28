@@ -41,7 +41,7 @@
 				<rows>
 					<row>
 						<label
-							value="${labels.survey.schema.attribute.calculated.expression}:" />
+							value="${labels.survey.schema.attribute.calculated.formula.expression}:" />
 						<fieldErrorHandler
 							message="@load(vmsgs['expression'])">
 							<textbox width="150px"
@@ -51,7 +51,7 @@
 					</row>
 					<row>
 						<label
-							value="${labels.survey.schema.attribute.calculated.condition}:" />
+							value="${labels.survey.schema.attribute.calculated.formula.condition}:" />
 						<fieldErrorHandler
 							message="@load(vmsgs['condition'])">
 							<textbox width="150px"

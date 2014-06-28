@@ -35,4 +35,32 @@
 			<include src="survey_edit/schema/attribute_calculated_formulas_list.zul" />
 		</groupbox>
 	</fieldErrorHandler>
+	
+	
+	<grid class="inner">
+		<columns>
+			<column width="150px" />
+			<column />
+		</columns>
+		<rows>
+			<row>
+				<fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+		        	<label value="${labels.survey.schema.attribute.calculated.include_in_data_export}:" />
+		        </fieldErrorHandler>
+		        <fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+			        <checkbox checked="@load(fx.includeInDataExport eq true) @save(fx.includeInDataExport)"
+			        	onCheck="@command('applyChanges')" />
+			    </fieldErrorHandler>
+		      </row>
+			<row>
+		        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
+			    	<label value="${labels.survey.schema.attribute.calculated.show_in_ui}:" />
+		        </fieldErrorHandler>
+		        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
+			        <checkbox checked="@load(fx.showInUI eq true) @save(fx.showInUI)"
+			        	onCheck="@command('applyChanges')" />
+			    </fieldErrorHandler>
+		      </row>
+		</rows>
+	</grid>
 </zk>

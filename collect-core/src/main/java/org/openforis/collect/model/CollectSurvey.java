@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
@@ -29,9 +30,12 @@ public class CollectSurvey extends Survey {
 	
 	private boolean work;
 	
+	private CollectAnnotations annotations;
+	
 	protected CollectSurvey(SurveyContext surveyContext) {
 		super(surveyContext);
 		this.work = false;
+		this.annotations = new CollectAnnotations(this);
 	}
 
 	public UIOptions createUIOptions() {
@@ -51,6 +55,10 @@ public class CollectSurvey extends Survey {
 		}
 	}
 
+	public CollectAnnotations getAnnotations() {
+		return annotations;
+	}
+	
 	public CodeList getSamplingDesignCodeList() {
 		for (CodeList list : getCodeLists()) {
 			if ( OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName().equals(list.getLookupTable()) ) {

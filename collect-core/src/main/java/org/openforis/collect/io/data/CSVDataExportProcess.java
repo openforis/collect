@@ -224,7 +224,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 
 	protected AutomaticColumnProvider createEntityColumnProvider(
 			EntityDefinition entityDefn) {
-		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider("", entityDefn, null, includeKMLColumnForCoordinates, includeCodeItemPositionColumn);
+		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider("", entityDefn, null, includeCodeItemPositionColumn, includeKMLColumnForCoordinates);
 		return entityColumnProvider;
 	}
 	

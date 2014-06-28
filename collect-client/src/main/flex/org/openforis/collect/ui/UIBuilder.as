@@ -10,6 +10,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CalculatedAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
@@ -49,6 +50,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
 	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
+	import org.openforis.collect.ui.component.input.CalculatedAttributeField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CoordinateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
@@ -211,6 +213,8 @@ package org.openforis.collect.ui {
 				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
 				var width:Number = Math.max(headerWidth, 20);
 				return width;
+			} else if ( def is CalculatedAttributeDefinitionProxy ) {
+				return 100;
 			} else if(def is CodeAttributeDefinitionProxy) {
 				if(parentLayout == UIUtil.LAYOUT_TABLE) {
 					if(def.key && def.parent.enumerable) {
@@ -344,6 +348,8 @@ package org.openforis.collect.ui {
 			var inputField:InputField = null;
 			if(def is BooleanAttributeDefinitionProxy) {
 				inputField = new BooleanInputField();
+			} else if ( def is CalculatedAttributeDefinitionProxy ) {
+				inputField = new CalculatedAttributeField();
 			} else if(def is CodeAttributeDefinitionProxy) {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
 				if(parentLayout == UIUtil.LAYOUT_TABLE && codeDef.parent.enumerable && codeDef.key) {

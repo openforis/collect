@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -192,14 +194,21 @@ public class RelationalSchemaGenerator {
 				addDataObjects(rs, table, child, childPath);
 			}
 		} else if ( defn instanceof AttributeDefinition ) {
-			if ( defn.isMultiple() ) {
-				// Create table for multiple attributes
-				table = createDataTable(rs, table, defn, relativePath);
-				rs.addTable(table);
-				relativePath = Path.relative(".");
+			CollectSurvey survey = (CollectSurvey) defn.getSurvey();
+			CollectAnnotations annotations = survey.getAnnotations();
+			
+			//do not include if it's a calculated attribute and it has not to be included in data export
+			if ( ! (defn instanceof CalculatedAttributeDefinition) || 
+					annotations.isIncludedInDataExport((CalculatedAttributeDefinition) defn) ) { 
+				if ( defn.isMultiple() ) {
+					// Create table for multiple attributes
+					table = createDataTable(rs, table, defn, relativePath);
+					rs.addTable(table);
+					relativePath = Path.relative(".");
+				}
+				// Add columns for attributes in entity tables or attribute tables
+				addDataColumns(rs, table, (AttributeDefinition) defn, relativePath);
 			}
-			// Add columns for attributes in entity tables or attribute tables
-			addDataColumns(rs, table, (AttributeDefinition) defn, relativePath);
 		}
 	}
 

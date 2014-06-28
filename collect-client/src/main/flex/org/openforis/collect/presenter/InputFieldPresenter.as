@@ -76,7 +76,7 @@ package org.openforis.collect.presenter {
 		
 		public function InputFieldPresenter(inputField:InputField) {
 			_view = inputField;
-			_contextMenu = new InputFieldContextMenu(_view);
+			initContextMenu();
 			super();
 			updateView();
 		}
@@ -99,6 +99,10 @@ package org.openforis.collect.presenter {
 			_view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
 			
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler); 
+		}
+		
+		protected function initContextMenu():void {
+			_contextMenu = new InputFieldContextMenu(_view);
 		}
 		
 		protected function setFocusHandler(event:InputFieldEvent):void {
@@ -583,8 +587,13 @@ package org.openforis.collect.presenter {
 			return _contextMenu;
 		}
 
+		protected function get view():InputField {
+			return _view;
+		}
+			
 		protected static function get dataClient():DataClient {
 			return _dataClient;
 		}
+		
 	}
 }
