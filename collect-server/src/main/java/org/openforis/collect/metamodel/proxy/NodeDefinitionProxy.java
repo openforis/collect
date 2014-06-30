@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -146,7 +147,7 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 
 	@ExternalizedProperty
 	public String getUiTabName() {
-		String tabName = nodeDefinition.getAnnotation(UIOptions.Annotation.TAB_NAME.getQName());
+		String tabName = nodeDefinition.getAnnotation(Annotation.TAB_NAME.getQName());
 		if ( tabName != null) {
 			return tabName;
 		} else {

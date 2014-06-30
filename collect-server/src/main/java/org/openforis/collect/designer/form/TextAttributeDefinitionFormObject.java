@@ -3,8 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
-import static org.openforis.collect.metamodel.ui.UIOptions.Annotation.AUTOCOMPLETE;
-
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition.Type;
@@ -30,7 +29,7 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 		dest.setKey(key);
 		Type typeEnum = TextAttributeDefinition.Type.valueOf(type);
 		dest.setType(typeEnum);
-		dest.setAnnotation(AUTOCOMPLETE.getQName(), autocompleteGroup);
+		dest.setAnnotation(Annotation.AUTOCOMPLETE.getQName(), autocompleteGroup);
 	}
 	
 	@Override
@@ -42,7 +41,7 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 			typeEnum = Type.SHORT;
 		}
 		type = typeEnum.name();
-		autocompleteGroup = source.getAnnotation(AUTOCOMPLETE.getQName());
+		autocompleteGroup = source.getAnnotation(Annotation.AUTOCOMPLETE.getQName());
 	}
 
 	public boolean isKey() {

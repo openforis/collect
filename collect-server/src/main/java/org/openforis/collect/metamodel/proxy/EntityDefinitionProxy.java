@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Direction;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
@@ -34,7 +35,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 
 	@ExternalizedProperty
 	public boolean isCountInSummaryList() {
-		String annotation = entityDefinition.getAnnotation(UIOptions.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
+		String annotation = entityDefinition.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
 		return annotation != null && Boolean.parseBoolean(annotation);
 	}
 
@@ -61,7 +62,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 	
 	@ExternalizedProperty
 	public boolean isShowRowNumbers() {
-		String showRowNumbersString = entityDefinition.getAnnotation(UIOptions.Annotation.SHOW_ROW_NUMBERS.getQName());
+		String showRowNumbersString = entityDefinition.getAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName());
 		if ( StringUtils.isNotBlank(showRowNumbersString) ) {
 			boolean result = Boolean.parseBoolean(showRowNumbersString);
 			return result;
@@ -75,7 +76,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		if ( parent != null ) {
 			return parent.getRootTabSetName();
 		} else {
-			String tabSetName = entityDefinition.getAnnotation(UIOptions.Annotation.TAB_SET.getQName());
+			String tabSetName = entityDefinition.getAnnotation(Annotation.TAB_SET.getQName());
 			return tabSetName;
 		}
 	}

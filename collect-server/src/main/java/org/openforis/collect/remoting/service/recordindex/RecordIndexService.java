@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.RecordIndexProcess;
@@ -45,7 +46,7 @@ public class RecordIndexService implements Serializable {
 	public List<String> search(SearchType searchType, Survey survey, int attributeDefnId, int fieldIndex, String queryText, int maxResults)  throws RecordIndexException {
 		Schema schema = survey.getSchema();
 		AttributeDefinition defn = (AttributeDefinition) schema.getDefinitionById(attributeDefnId);
-		String indexName = defn.getAnnotation(UIOptions.Annotation.AUTOCOMPLETE.getQName());
+		String indexName = defn.getAnnotation(Annotation.AUTOCOMPLETE.getQName());
 		if ( StringUtils.isNotBlank(indexName) ) {
 			try {
 				//search in ram directory

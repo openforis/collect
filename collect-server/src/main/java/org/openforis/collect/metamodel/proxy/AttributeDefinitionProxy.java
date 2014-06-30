@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.proxy;
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -40,7 +41,7 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 	
 	@ExternalizedProperty
 	public boolean isAutocomplete() {
-		String autocompleteStrValue = attributeDefinition.getAnnotation(UIOptions.Annotation.AUTOCOMPLETE.getQName());
+		String autocompleteStrValue = attributeDefinition.getAnnotation(Annotation.AUTOCOMPLETE.getQName());
 		boolean autocomplete = StringUtils.isNotBlank(autocompleteStrValue);
 		return autocomplete;
 	}

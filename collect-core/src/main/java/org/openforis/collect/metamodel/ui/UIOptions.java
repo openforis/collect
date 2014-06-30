@@ -1,8 +1,9 @@
 package org.openforis.collect.metamodel.ui;
 
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE_URI;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
-import static org.openforis.idm.metamodel.TaxonAttributeDefinition.*;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.CODE_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,9 +15,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
 
-import javax.xml.namespace.QName;
-
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
@@ -67,41 +67,6 @@ public class UIOptions implements ApplicationOptions, Serializable {
 				VERNACULAR_NAME_FIELD_NAME
 		}
 	);
-	
-	public enum Annotation {
-		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
-		TAB_NAME(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB)),
-		LAYOUT(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT)),
-		DIRECTION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DIRECTION)),
-		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
-		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
-		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE)),
-		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER)),
-		VISIBLE_FIELDS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.VISIBLE_FIELDS)),
-		SHOW_ALLOWED_VALUES_PREVIEW(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ALLOWED_VALUES_PREVIEW)),
-		SHOW_IN_UI(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_IN_UI), false);
-		
-		private QName qName;
-		private Object defaultValue;
-
-		private Annotation(QName qname) {
-			this.qName = qname;
-		}
-		
-		private Annotation(QName qname, Object defaultValue) {
-			this(qname);
-			this.defaultValue = defaultValue;
-		}
-		
-		public QName getQName() {
-			return qName;
-		}
-		
-		@SuppressWarnings("unchecked")
-		public <T> T getDefaultValue() {
-			return (T) defaultValue;
-		}
-	}
 	
 	public enum CoordinateAttributeFieldsOrder {
 		
@@ -686,7 +651,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {
-			return annotation.getDefaultValue();
+			Boolean defaultValue = annotation.getDefaultValue();
+			return defaultValue.booleanValue();
 		} else {
 			return Boolean.valueOf(annotationValue);
 		}

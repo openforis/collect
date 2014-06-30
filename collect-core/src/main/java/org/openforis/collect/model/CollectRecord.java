@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -405,7 +405,7 @@ public class CollectRecord extends Record {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if(childDefinition instanceof EntityDefinition) {
 				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(UIOptions.Annotation.COUNT_IN_SUMMARY_LIST.getQName());
+				String annotation = childDefinition.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
 				if(annotation != null && Boolean.parseBoolean(annotation)) {
 					result.add(entityDefinition);
 				}
