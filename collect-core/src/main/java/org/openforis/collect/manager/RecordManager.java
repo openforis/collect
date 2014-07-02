@@ -769,15 +769,17 @@ public class RecordManager {
 		if ( defaults != null && defaults.size() > 0 ) {
 			for (AttributeDefault attributeDefault : defaults) {
 				try {
-					V value = attributeDefault.evaluate(attribute);
-					if ( value != null ) {
-						attribute.setValue(value);
-						setDefaultValueApplied(attribute, true);
-						
-						clearRelevanceRequiredDependencies(attribute);
-						clearValidationResults(attribute);
-						clearDependantCalculatedValues(attribute);
-						break;
+					if ( attributeDefault.evaluateCondition(attribute) ) {
+						V value = attributeDefault.evaluate(attribute);
+						if ( value != null ) {
+							attribute.setValue(value);
+							setDefaultValueApplied(attribute, true);
+							
+							clearRelevanceRequiredDependencies(attribute);
+							clearValidationResults(attribute);
+							clearDependantCalculatedValues(attribute);
+							break;
+						}
 					}
 				} catch (InvalidExpressionException e) {
 					throw new RuntimeException("Error applying default value for attribute " + attributeDefn.getPath());
