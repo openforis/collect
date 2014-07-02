@@ -407,14 +407,6 @@ package org.openforis.collect.presenter {
 					horizontalMove = true;
 					offset = event.shiftKey ? -1: 1;
 					break;
-				case Keyboard.RIGHT:
-					horizontalMove = true;
-					offset = 1;
-					break;
-				case Keyboard.LEFT:
-					horizontalMove = true;
-					offset = -1;
-					break;
 				case Keyboard.DOWN:
 					horizontalMove = false;
 					offset = 1;
