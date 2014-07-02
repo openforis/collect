@@ -353,7 +353,7 @@ public class DataHandler extends DefaultHandler {
 	}
 
 	protected void removeIfEmpty(Node<?> node) {
-		if ( node != null && !node.hasData() ) {
+		if ( node != null && ! node.hasData() && node.getParent() != null ) {
 			//if node is empty, remove it
 			node.getParent().remove(node.getName(), node.getIndex());
 		}
