@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.internal.SurveyBackupVerifierTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
@@ -40,12 +41,14 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	private SurveyBackupInfo info;
 
 	//internal variables
+	private boolean fullBackup;
 	private ZipFile zipFile;
 	
 	@Override
 	protected void initInternal() throws Throwable {
 		String ext = FilenameUtils.getExtension(file.getName());
-		if ( "zip".equalsIgnoreCase(ext) ) {
+		fullBackup = ArrayUtils.contains(SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS, ext);
+		if ( fullBackup ) {
 			this.zipFile = new ZipFile(file);
 		}
 		super.initInternal();
@@ -53,7 +56,7 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	
 	@Override
 	protected void buildTasks() throws Throwable {
-		if (zipFile != null ) {
+		if ( fullBackup ) {
 			addTask(SurveyBackupVerifierTask.class);
 			addTask(SurveyBackupInfoExtractorTask.class);
 		}

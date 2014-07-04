@@ -1,10 +1,23 @@
 package org.openforis.collect.util {
 	import mx.utils.ObjectUtil;
 	
+	import spark.formatters.DateTimeFormatter;
+	
 	/**
 	 * Utility class
 	 */
 	public class DateUtil {
+		
+		private static var _dateTimeFormatter:DateTimeFormatter;
+		private static var _xmlDateTimeFormatter:DateTimeFormatter;
+		
+		//initialize static variables
+		{
+			_dateTimeFormatter = new DateTimeFormatter();
+			_dateTimeFormatter.dateTimePattern = ApplicationConstants.DATE_TIME_PATTERN;
+			_xmlDateTimeFormatter = new DateTimeFormatter();
+			_xmlDateTimeFormatter.dateTimePattern = ApplicationConstants.XML_DATE_TIME_PATTERN;
+		}
 		
 		public static function compareDates(date1:Date, date2:Date, ignoreTime:Boolean = true):int {
 			if ( date1 == null && date2 == null ) {
@@ -29,6 +42,16 @@ package org.openforis.collect.util {
 			} else {
 				return mx.utils.ObjectUtil.dateCompare(date1, date2);
 			}
+		}
+		
+		public static function format(date:Date):String {
+			var result:String = _dateTimeFormatter.format(date);
+			return result;
+		}
+		
+		public static function formatToXML(date:Date):String {
+			var result:String = _xmlDateTimeFormatter.format(date);
+			return result;
 		}
 		
 	}

@@ -51,10 +51,12 @@ import org.zkoss.zul.Window;
  */
 public class SurveyImportVM extends SurveyBaseVM {
 
-	private static final String XML_CONTENT = "text/xml";
-	private static final String ZIP_CONTENT = "application/zip";
-	private static final String ZIP_CONTENT_COMPRESSED = "application/x-zip-compressed";
-	private static final String[] ALLOWED_UPLOAD_FILE_CONTENT = new String[] {ZIP_CONTENT, ZIP_CONTENT_COMPRESSED, XML_CONTENT};
+	private static final String XML_FILE_EXTENSION = "xml";
+
+	private static final String[] ALLOWED_FILE_EXTENSIONS = ArrayUtils.addAll(
+			SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS,
+			new String[] {XML_FILE_EXTENSION}
+			);
 	
 	private static final String SURVEY_NAME_FIELD = "surveyName";
 	
@@ -72,7 +74,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private String uploadedSurveyUri;
 	private File uploadedFile;
 	private String uploadedFileName;
-	private boolean uploadingXML;
+	private boolean xmlFileUploaded;
 	private boolean updatingExistingSurvey;
 	private boolean updatingPublishedSurvey;
 
@@ -95,6 +97,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		}
 		uploadedFileName = null;
 		uploadedSurveyUri = null;
+		xmlFileUploaded = false;
 		updatingExistingSurvey = false;
 		updatingPublishedSurvey = false;
 		updateForm();
@@ -174,25 +177,35 @@ public class SurveyImportVM extends SurveyBaseVM {
 	@Command
 	public void fileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
  		Media media = event.getMedia();
-		String contentType = media.getContentType();
-		if ( ArrayUtils.contains(ALLOWED_UPLOAD_FILE_CONTENT, contentType) ) {
+		String fileName = media.getName();
+		if ( validateBackupFile(fileName) ) {
 			File tempFile;
-			this.uploadingXML = XML_CONTENT.equals(contentType);
-			if ( uploadingXML ) {
-				tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), "xml");
+			String extension = FilenameUtils.getExtension(fileName);
+			this.xmlFileUploaded = XML_FILE_EXTENSION.equalsIgnoreCase(extension);
+			if ( xmlFileUploaded ) {
+				tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), extension);
 			} else {
-				tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), "zip");
+				tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), extension);
 			}
 			this.uploadedFile = tempFile;
-			this.uploadedFileName = media.getName();
+			this.uploadedFileName = fileName;
 			notifyChange("uploadedFileName");
 			updateForm();
 
-			prepareSurveyImport(uploadingXML);
-		} else {
-			log.warn("Trying to upload invalid survey backup file. Content type: " + contentType);
-			MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
+			prepareSurveyImport(xmlFileUploaded);
 		}
+	}
+
+	private boolean validateBackupFile(String fileName) {
+		String extension = FilenameUtils.getExtension(fileName);
+		for (String allowedExt : ALLOWED_FILE_EXTENSIONS) {
+			if ( allowedExt.equalsIgnoreCase(extension) ) {
+				return true;
+			}
+		}
+		log.warn("Trying to upload invalid survey backup file. File name: " + fileName);
+		MessageUtil.showError("survey.import_survey.error_file_type_not_supported");
+		return false;
 	}
 
 	protected void prepareSurveyImport(boolean validate) {
@@ -334,7 +347,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	protected void startSurveyImport() {
 		String surveyName = getFormSurveyName();
 		
-		if ( FilenameUtils.getExtension(uploadedFile.getName()).equalsIgnoreCase("xml") ) {
+		if ( xmlFileUploaded ) {
 			restoreJob = jobManager.createJob(XMLSurveyRestoreJob.class);
 		} else {
 			restoreJob = jobManager.createJob(SurveyRestoreJob.class);

@@ -37,6 +37,7 @@ package org.openforis.collect.util {
 		private static const _DESIGNER_URL_PART:String = "designer.htm";
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
+		public static const XML_DATE_TIME_PATTERN:String = "yyyy-MM-dd\'T\'HH:mm:ss";
 		
 		private static var _RECORD_FILE_DOWNLOAD_URL:String; 
 		private static var _RECORD_FILE_DELETE_URL:String; 

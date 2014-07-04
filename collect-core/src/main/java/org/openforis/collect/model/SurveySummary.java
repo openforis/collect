@@ -105,4 +105,9 @@ public class SurveySummary {
 			ProcessStatus recordValidationProcessStatus) {
 		this.recordValidationProcessStatus = recordValidationProcessStatus;
 	}
+	
+	public boolean isOnlyWork() {
+		return work && publishedId == null;
+	}
+	
 }

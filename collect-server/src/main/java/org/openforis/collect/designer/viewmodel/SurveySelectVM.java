@@ -8,18 +8,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
+import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject;
 import org.openforis.collect.io.SurveyBackupJob;
+import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
@@ -27,6 +29,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.utils.Dates;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.spring.SpringJobManager;
 import org.zkoss.bind.BindUtils;
@@ -39,18 +42,10 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.logging.Log;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.IdSpace;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.ListModel;
-import org.zkoss.zul.Radio;
-import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Window;
 
 /**
@@ -59,6 +54,11 @@ import org.zkoss.zul.Window;
  * 
  */
 public class SurveySelectVM extends BaseVM {
+
+	/**
+	 * Pattern for survey export file name (SURVEYNAME_DATE.OUTPUTFORMAT)
+	 */
+	private static final String SURVEY_EXPORT_FILE_NAME_PATTERN = "%s_%s.%s";
 
 	private static final String TEMPORARY_SURVEY_TYPE = "temporary";
 
@@ -89,6 +89,8 @@ public class SurveySelectVM extends BaseVM {
 
 	private Window jobStatusPopUp;
 	private Window newSurveyTemplatePopUp;
+
+	private Window surveyExportPopup;
 
 	@Init()
 	public void init() {
@@ -127,75 +129,17 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void exportSelectedSurvey() throws IOException {
-		boolean onlyTemporaray = selectedSurvey.isWork() && selectedSurvey.getPublishedId() == null;
-		
-		if ( onlyTemporaray ) {
-			performSelectedSurveyExport(TEMPORARY_SURVEY_TYPE, false, false);
-		} else {
-			//set default parameters
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("surveyName", selectedSurvey.getName());
-			Window popup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
-			
-			//initialize components
-			IdSpace space = popup.getSpaceOwner();
-			final Radiogroup typeRadiogroup = (Radiogroup) space.getFellow("typeRadiogroup");
-			final Checkbox includeDataCheckbox = (Checkbox) space.getFellow("includeDataCheckbox");
-			final Checkbox includeUploadedFilesCheckbox = (Checkbox) space.getFellow("includeUploadedFilesCheckbox");
-			
-			Radio publishedTypeRadio = typeRadiogroup.getItemAtIndex(0);
-			Radio temporaryTypeRadio = typeRadiogroup.getItemAtIndex(1);
-			publishedTypeRadio.setDisabled(onlyTemporaray);
-			temporaryTypeRadio.setDisabled(! selectedSurvey.isWork());
-			typeRadiogroup.setSelectedItem(onlyTemporaray ? temporaryTypeRadio: publishedTypeRadio);
-			
-			//update view with default values
-			updateExportPopupView(typeRadiogroup, includeDataCheckbox, includeUploadedFilesCheckbox);
-			
-			//add event listeners
-			typeRadiogroup.addEventListener(Events.ON_CHECK, new EventListener<Event>() {
-				@Override
-				public void onEvent(Event event) throws Exception {
-					updateExportPopupView(typeRadiogroup, includeDataCheckbox, includeUploadedFilesCheckbox);
-				}
-			});
-			includeDataCheckbox.addEventListener(Events.ON_CHECK, new EventListener<Event>() {
-				@Override
-				public void onEvent(Event event) throws Exception {
-					updateExportPopupView(typeRadiogroup, includeDataCheckbox, includeUploadedFilesCheckbox);
-				}
-			});
-			Button okButton = (Button) space.getFellow("okButton");
-			okButton.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
-				@Override
-				public void onEvent(Event event) throws Exception {
-					String surveyType = (String) typeRadiogroup.getSelectedItem().getValue();
-					performSelectedSurveyExport(surveyType, includeDataCheckbox.isChecked(), includeUploadedFilesCheckbox.isChecked());
-				}
-			});
-		}
+		//set default parameters
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("survey", selectedSurvey);
+		surveyExportPopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
 	}
 	
-	private void updateExportPopupView(Radiogroup typeRadiogroup, Checkbox includeDataCheckbox, Checkbox includeUploadedFilesCheckbox) {
-		String selectedType = typeRadiogroup.getSelectedItem().getValue();
-		if ( TEMPORARY_SURVEY_TYPE.equals(selectedType) ) {
-			includeDataCheckbox.setChecked(false);
-			includeDataCheckbox.setDisabled(true);
-		} else {
-			includeDataCheckbox.setDisabled(false);
-		}
-		if ( includeDataCheckbox.isChecked() ) {
-			includeUploadedFilesCheckbox.setDisabled(false);
-		} else {
-			includeUploadedFilesCheckbox.setChecked(false);
-			includeUploadedFilesCheckbox.setDisabled(true);
-		}
-	}
-	
-	private void performSelectedSurveyExport(String surveyType, boolean includeData, boolean includeUploadedFiles) {
+	@GlobalCommand
+	public void performSelectedSurveyExport(@BindingParam("parameters") SurveyExportParametersFormObject parameters) {
 		String uri = selectedSurvey.getUri();
 		CollectSurvey survey;
-		if ( selectedSurvey.isWork() && surveyType.equals(TEMPORARY_SURVEY_TYPE) ) {
+		if ( selectedSurvey.isWork() && parameters.getType().equals(TEMPORARY_SURVEY_TYPE) ) {
 			survey = surveyManager.loadSurveyWork(selectedSurvey.getId());
 		} else {
 			survey = surveyManager.getByUri(uri);
@@ -203,10 +147,14 @@ public class SurveySelectVM extends BaseVM {
 		Integer surveyId = survey.getId();
 		surveyBackupJob = springJobManager.createJob(SurveyBackupJob.class);
 		surveyBackupJob.setSurvey(survey);
-		surveyBackupJob.setIncludeData(includeData);
-		surveyBackupJob.setIncludeRecordFiles(includeUploadedFiles);
+		surveyBackupJob.setIncludeData(parameters.isIncludeData());
+		surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
+		surveyBackupJob.setOutputFormat(OutputFormat.valueOf(parameters.getOutputFormat()));
 		
 		springJobManager.start(surveyBackupJob, String.valueOf(surveyId));
+		
+		closePopUp(surveyExportPopup);
+		surveyExportPopup = null;
 		
 		openSurveyExportStatusPopUp();
 	}
@@ -249,8 +197,10 @@ public class SurveySelectVM extends BaseVM {
 	private void surveyExportJobCompleted() {
 		File file = surveyBackupJob.getOutputFile();
 		CollectSurvey survey = surveyBackupJob.getSurvey();
-		String extension = FilenameUtils.getExtension(file.getName());
-		String fileName = survey.getName() + "." + extension;
+		String surveyName = survey.getName();
+		String dateStr = Dates.formatDateTimeToXML(new Date());
+		String extension = surveyBackupJob.getOutputFormat().getOutputFileExtension();
+		String fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
 		String contentType = URLConnection.guessContentTypeFromName(fileName);
 		try {
 			FileInputStream is = new FileInputStream(file);
@@ -501,5 +451,5 @@ public class SurveySelectVM extends BaseVM {
 	public boolean isPublishDisabled() {
 		return this.selectedSurvey == null || !this.selectedSurvey.isWork();
 	}
-
+	
 }

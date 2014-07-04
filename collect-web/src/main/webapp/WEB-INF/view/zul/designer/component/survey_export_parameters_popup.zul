@@ -1,10 +1,18 @@
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
-	<zscript>String[] titleArgs = new String[]{(String) arg.get("surveyName")};</zscript>
+	<custom-attributes survey="${arg.survey}" />
+
+	<zscript>String[] titleArgs = new String[]{((org.openforis.collect.model.SurveySummary) arg.get("survey")).getName()};</zscript>
 	
 	<window id="surveyExportParametersPopup"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveyExportParametersVM')"
+		form="@id('fx')
+			@init(vm.tempForm) 
+			@load(vm.formObject) 
+			@save(vm.formObject, before={'export'})"
 		title="${c:l2('survey.export.popup.title', titleArgs)}"
-		width="400px"
+		width="500px"
 		border="normal" 
 		position="center" 
 		closable="true">
@@ -17,25 +25,41 @@
 			<rows>
 				<row>
 					<label value="${labels.survey.export.type.$}:" />
-					<radiogroup id="typeRadiogroup" orient="horizontal">
-						<radio label="${labels.survey.export.type.published}" value="published" />
-						<radio label="${labels.survey.export.type.temporary}" value="temporary" />
+					<radiogroup id="typeRadiogroup" orient="horizontal" 
+							onCheck="@command('typeChanged')"
+							selectedItem="@bind(fx.type)">
+						<radio id="publishedTypeRadio" label="${labels.survey.export.type.published}" value="published"
+								disabled="@load(vm.survey.onlyWork)" />
+						<radio id="temporaryTypeRadio" label="${labels.survey.export.type.temporary}" value="temporary" 
+								disabled="@load(! vm.survey.work)" />
 					</radiogroup>
 				</row>
 				<row>
 					<label value="${labels.survey.export.include_data}:" />
-					<checkbox id="includeDataCheckbox" />
+					<checkbox id="includeDataCheckbox"
+						checked="@bind(fx.includeData) @command('includeDataChanged')"
+						disabled="@load(vm.includeDataDisabled)" />
 				</row>
 				<row>
 					<label value="${labels.survey.export.include_uploaded_files}:" />
-					<checkbox id="includeUploadedFilesCheckbox" />
+					<checkbox id="includeUploadedFilesCheckbox" 
+						checked="@bind(fx.includeUploadedFiles)"
+						disabled="@load(vm.includeUploadedFilesDisabled)" />
 				</row>
-				
+				<row>
+					<label value="${labels.survey.export.outputFormat.$}:" />
+					<radiogroup id="outputFormatRadiogroup" orient="horizontal" 
+							selectedItem="@bind(fx.outputFormat)"
+							onCheck="@command('outputFormatChanged')">
+						<radio label="${labels.survey.export.outputFormat.desktop}" value="DESKTOP" selected="true" />
+						<radio label="${labels.survey.export.outputFormat.mobile}" value="MOBILE" />
+					</radiogroup>
+				</row>
 			</rows>
 		</grid>
 
 		<box width="100%" align="center">
-			<button id="okButton" label="${labels.survey.export.$}" />
+			<button id="okButton" onClick="@command('export')" label="${labels.survey.export.$}" />
 		</box>
 	</window>
 </zk>

@@ -118,6 +118,10 @@ button.icon {
 .z-checkbox.error input[type="checkbox"]:checked:after {
 	color: white;
 }
+.z-checkbox input[type="checkbox"]:disabled {
+	background-color: lightGrey;
+}
+
 /**
 * end of Checkbox style
 */

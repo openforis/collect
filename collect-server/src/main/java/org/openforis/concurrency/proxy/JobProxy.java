@@ -22,6 +22,10 @@ public class JobProxy implements Proxy {
 		this.job = job;
 	}
 
+	protected Job getJob() {
+		return job;
+	}
+	
 	@ExternalizedProperty
 	public Status getStatus() {
 		return Status.valueOf(job.getStatus().name());

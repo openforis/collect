@@ -4,6 +4,7 @@ package org.openforis.collect.presenter {
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.net.URLRequest;
+	import flash.net.URLVariables;
 	import flash.net.navigateToURL;
 	import flash.utils.Timer;
 	
@@ -14,14 +15,16 @@ package org.openforis.collect.presenter {
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
+	import mx.utils.StringUtil;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.Proxy;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
+	import org.openforis.collect.io.data.proxy.DataExportStatusProxy;
 	import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
-	import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
 	import org.openforis.collect.manager.process.ProcessStatus$Step;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
@@ -30,6 +33,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
+	import org.openforis.collect.util.DateUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.concurrency.proxy.JobProxy;
 	import org.openforis.concurrency.proxy.JobProxy$Status;
@@ -48,6 +52,9 @@ package org.openforis.collect.presenter {
 		
 		private static const TYPE_FULL:String = "full";
 		private static const TYPE_PARTIAL:String = "partial";
+		
+		private static const XML_EXPORT_FILE_NAME_FORMAT:String = "{0}_{1}.collect";
+		private static const CSV_EXPORT_FILE_NAME_FORMAT:String = "collect_csv_data_{0}_{1}.zip";
 		
 		private var _cancelResponder:IResponder;
 		private var _exportResponder:IResponder;
@@ -178,7 +185,21 @@ package org.openforis.collect.presenter {
 		
 		protected function downloadButtonClickHandler(event:MouseEvent):void {
 			var url:String = ApplicationConstants.DOWNLOAD_EXPORTED_DATA_URL;
-			navigateToURL(new URLRequest(url), "_new");
+			var fileName:String;
+			var outputFileName:String;
+			var dateStr:String = DateUtil.formatToXML(new Date());
+			if ( _job is SurveyBackupJobProxy ) {
+				fileName = SurveyBackupJobProxy(_job).outputFileName;
+				outputFileName = mx.utils.StringUtil.substitute(XML_EXPORT_FILE_NAME_FORMAT, [Application.activeSurvey.name, dateStr]); 
+			} else {
+				fileName = DataExportProcessProxy(_job).outputFileName;
+				outputFileName = mx.utils.StringUtil.substitute(CSV_EXPORT_FILE_NAME_FORMAT, [Application.activeSurvey.name, dateStr]);
+			}
+			var req:URLRequest = new URLRequest(url);
+			req.data = new URLVariables();
+			req.data.fileName = fileName;
+			req.data.outputFileName = outputFileName;
+			navigateToURL(req, "_new");
 		}
 		
 		protected function cancelExportButtonClickHandler(event:MouseEvent):void {
@@ -224,8 +245,8 @@ package org.openforis.collect.presenter {
 		
 		protected function updateView():void {
 			if ( _job != null ) {
-				if ( _job is DataExportStatusProxy ) {
-					var _state:DataExportStatusProxy = _job as DataExportStatusProxy;
+				if ( _job is DataExportProcessProxy ) {
+					var _state:DataExportStatusProxy = DataExportProcessProxy(_job).status;
 					var processed:int = _state.processed;
 					var step:ProcessStatus$Step = _state.step;
 					if ( step == ProcessStatus$Step.RUN && processed <= _state.total ) {
@@ -362,7 +383,7 @@ package org.openforis.collect.presenter {
 			var result:Array = new Array();
 			for (var idx:int = 0; idx < Application.activeRootEntity.keyAttributeDefinitions.length; idx++) {
 				var textInput:TextInput = TextInput(DataExportPopUp(_view).rootEntityKeyTextInput[idx]);
-				var value:String = StringUtil.trimToNull(textInput.text);
+				var value:String = org.openforis.collect.util.StringUtil.trimToNull(textInput.text);
 				result.push(value);
 			}
 			return result;

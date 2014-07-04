@@ -13,10 +13,11 @@ import org.openforis.commons.versioning.Version;
 public class Collect {
 	
 	private static final String VOID_VERSION = "PROJECT_VERSION"; //token was not being replaced into version.properties in previous releases
+	public static Version DEV_VERSION = new Version("3.1.0-SNAPSHOT");
 	
 	private static Properties VERSION_PROPERTIES;
 	private static final Version VERSION;
-	
+
 	static {
 		InputStream is = null;
 		try {
@@ -26,7 +27,7 @@ public class Collect {
 			
 			String versionValue = VERSION_PROPERTIES.getProperty(Collect.class.getPackage().getName()+".version");
 			if ( VOID_VERSION.equals(versionValue) ) {
-				VERSION = null;
+				VERSION = DEV_VERSION;
 			} else {
 				VERSION = new Version(versionValue);
 			}
@@ -46,7 +47,7 @@ public class Collect {
 		return VERSION;
 	}
 	
-//	public static void main(String[] args) {
-//		System.out.println("Open Foris Collect "+Collect.getVersion());
-//	}
+	public static void main(String[] args) {
+		System.out.println("Open Foris Collect " + Collect.getVersion());
+	}
 }

@@ -1,4 +1,4 @@
-package org.openforis.collect.manager.dataexport.proxy;
+package org.openforis.collect.io.data.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.io.data.DataExportStatus;

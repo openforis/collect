@@ -11,6 +11,7 @@ import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.data.RecordFileBackupTask;
 import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
+import org.openforis.collect.io.metadata.CollectMobileBackupConvertTask;
 import org.openforis.collect.io.metadata.IdmlExportTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupExportTask;
@@ -23,6 +24,7 @@ import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.concurrency.Job;
+import org.openforis.concurrency.Task;
 import org.openforis.concurrency.WorkerStatusChangeEvent;
 import org.openforis.concurrency.WorkerStatusChangeListener;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -49,6 +51,23 @@ public class SurveyBackupJob extends Job {
 	public static final String DATA_FOLDER = "data";
 	public static final String UPLOADED_FILES_FOLDER = "upload";
 	
+	public enum OutputFormat {
+		DESKTOP("collect"), 
+		MOBILE("collect-mobile");
+		
+		public static final OutputFormat DEFAULT = DESKTOP;
+		
+		private String outputFileExtension;
+
+		OutputFormat(String outputFileExtension) {
+			this.outputFileExtension = outputFileExtension;
+		}
+		
+		public String getOutputFileExtension() {
+			return outputFileExtension;
+		}
+	}
+	
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
@@ -65,12 +84,26 @@ public class SurveyBackupJob extends Job {
 	private boolean includeData;
 	private boolean includeRecordFiles;
 	private RecordFilter recordFilter;
+	private OutputFormat outputFormat;
 	
 	//output
 	private File outputFile;
 	
 	//temporary instance variable
 	private ZipOutputStream zipOutputStream;
+	
+	public SurveyBackupJob() {
+		outputFormat = OutputFormat.DEFAULT;
+	}
+	
+	@Override
+	protected void initInternal() throws Throwable {
+		if ( outputFile == null ) {
+			outputFile = File.createTempFile("collect_survey_export", ".zip");
+		}
+		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
+		super.initInternal();
+	}
 	
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -84,20 +117,26 @@ public class SurveyBackupJob extends Job {
 				addRecordFilesBackupTask();
 			}
 		}
-	}
-	
-	@Override
-	protected void initInternal() throws Throwable {
-		if ( outputFile == null ) {
-			outputFile = File.createTempFile("collect", "survey_export.zip");
+		switch ( outputFormat ) {
+		case MOBILE:
+			addCollectMobileBackupConverterTask();
+			break;
+		default:
 		}
-		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
-		super.initInternal();
 	}
 	
 	@Override
 	protected void onEnd() {
 		IOUtils.closeQuietly(zipOutputStream);
+	}
+	
+	@Override
+	protected void onTaskCompleted(Task task) {
+		if ( task instanceof CollectMobileBackupConvertTask ) {
+			this.zipOutputStream = null;
+			this.outputFile = ((CollectMobileBackupConvertTask) task).getOutputFile();
+		}
+		super.onTaskCompleted(task);
 	}
 	
 	private void addInfoPropertiesCreatorTask() {
@@ -169,6 +208,21 @@ public class SurveyBackupJob extends Job {
 		}
 	}
 	
+	private void addCollectMobileBackupConverterTask() {
+		CollectMobileBackupConvertTask task = new CollectMobileBackupConvertTask();
+		task.setCollectBackupFile(outputFile);
+		task.setSurveyName(survey.getName());
+		addTask(task);
+	}
+	
+	@Override
+	protected void prepareTask(Task task) {
+		if ( task instanceof CollectMobileBackupConvertTask ) {
+			IOUtils.closeQuietly(zipOutputStream);
+		}
+		super.prepareTask(task);
+	}
+
 	public RecordManager getRecordManager() {
 		return recordManager;
 	}
@@ -199,6 +253,14 @@ public class SurveyBackupJob extends Job {
 	
 	public void setOutputFile(File outputFile) {
 		this.outputFile = outputFile;
+	}
+	
+	public OutputFormat getOutputFormat() {
+		return outputFormat;
+	}
+	
+	public void setOutputFormat(OutputFormat outputFormat) {
+		this.outputFormat = outputFormat;
 	}
 	
 	public boolean isIncludeData() {

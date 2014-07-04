@@ -9,6 +9,7 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>
             /WEB-INF/conf/applicationContext.xml
+            /WEB-INF/conf/applicationContext-database.xml
 			/WEB-INF/conf/applicationContext-security.xml
 			/WEB-INF/conf/applicationContext-graniteds.xml
         </param-value>

@@ -111,8 +111,8 @@
 			<!-- replace version in file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>maven-replacer-plugin</artifactId>
-				<version>1.4.0</version>
+				<artifactId>replacer</artifactId>
+				<version>1.5.1</version>
 				<executions>
 					<execution>
 						<!-- the replace should happen before the app is packaged -->
@@ -230,17 +230,17 @@
 											com.google.code.maven-replacer-plugin
 										</groupId>
 										<artifactId>
-											maven-replacer-plugin
+											replacer
 										</artifactId>
 										<versionRange>
-											[1.4.0,)
+											[1.5.3,)
 										</versionRange>
 										<goals>
 											<goal>replace</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore />
+										<execute />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>

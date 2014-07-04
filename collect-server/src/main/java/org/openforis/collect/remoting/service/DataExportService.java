@@ -1,19 +1,18 @@
 package org.openforis.collect.remoting.service;
 
 import java.io.File;
+import java.io.IOException;
 
 import javax.servlet.ServletContext;
 
 import org.openforis.collect.Proxy;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.CSVDataExportProcess;
-import org.openforis.collect.io.data.DataExportStatus;
+import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
-import org.openforis.collect.manager.dataexport.proxy.DataExportStatusProxy;
-import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
@@ -36,8 +35,6 @@ public class DataExportService {
 
 	//private static Log LOG = LogFactory.getLog(DataExportService.class);
 
-	private static final String EXPORT_PATH = "export";
-	
 	@Autowired
 	private SessionManager sessionManager;
 	@Autowired
@@ -51,40 +48,23 @@ public class DataExportService {
 	@Autowired
 	private JobManager jobManager;
 	
-	private File exportDirectory;
-	
-	private AbstractProcess<Void, DataExportStatus> dataExportProcess;
-
+	private CSVDataExportProcess dataExportProcess;
 	private SurveyBackupJob backupJob;
 	
-	public void init() {
-		String exportRealPath = servletContext.getRealPath(EXPORT_PATH);
-		exportDirectory = new File(exportRealPath);
-		if ( exportDirectory.exists() ) {
-			exportDirectory.delete();
-		}
-		if ( ! exportDirectory.mkdirs() && ! exportDirectory.canRead() ) {
-			throw new IllegalStateException("Cannot access export directory: " + exportRealPath);
-		}
-	}
-
 	@Transactional
-	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
+	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes, boolean onlyOwnedRecords, String[] rootEntityKeyValues) throws IOException {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			resetJobs();
 			
 			SessionState sessionState = sessionManager.getSessionState();
+			CollectSurvey survey = sessionState.getActiveSurvey();
 			
-			File exportDir = new File(exportDirectory, sessionState.getSessionId());
-			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
-				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
-			}
-			CollectSurvey activeSurvey = sessionState.getActiveSurvey();
+			File outputFile = File.createTempFile("collect_data_export_" + survey.getName(), ".zip");
+			
 			Step step = Step.valueOf(stepNumber);
-			File outputFile = new File(exportDir, "data.zip");
 
 			//prepare record filter
-			Schema schema = activeSurvey.getSchema();
+			Schema schema = survey.getSchema();
 			EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntityName);
 			
 			RecordFilter recordFilter = createRecordFilter(rootEntityDefn.getId(), onlyOwnedRecords, rootEntityKeyValues);
@@ -115,13 +95,8 @@ public class DataExportService {
 			resetJobs();
 			
 			SessionState sessionState = sessionManager.getSessionState();
-			File exportDir = new File(exportDirectory, sessionState.getSessionId());
-			if ( ! exportDir.exists() && ! exportDir.mkdirs() ) {
-				throw new IllegalStateException("Cannot create export directory: " + exportDir.getAbsolutePath());
-			}
 			CollectSurvey survey = sessionState.getActiveSurvey();
-			File outputFile = new File(exportDir, "data.zip");
-
+			
 			RecordFilter filter = createRecordFilter(null, onlyOwnedRecords, rootEntityKeyValues);
 			
 			SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
@@ -129,7 +104,6 @@ public class DataExportService {
 			job.setIncludeData(true);
 			job.setIncludeRecordFiles(includeRecordFiles);
 			job.setRecordFilter(filter);
-			job.setOutputFile(outputFile);
 			
 			backupJob = job;
 			
@@ -174,7 +148,7 @@ public class DataExportService {
 		if ( backupJob != null ) {
 			return new SurveyBackupJobProxy(backupJob);
 		} else if ( dataExportProcess != null ) {
-			return new DataExportStatusProxy(dataExportProcess.getStatus());
+			return new DataExportProcessProxy(dataExportProcess);
 		} else {
 			return null;
 		}

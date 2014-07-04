@@ -44,7 +44,7 @@
 		autowire="byName" scope="session" />
 	<bean id="dataExportService"
 		class="org.openforis.collect.remoting.service.DataExportService"
-		autowire="byName" init-method="init" scope="session" />
+		autowire="byName" scope="session" />
 	<bean id="dataImportService"
 		class="org.openforis.collect.remoting.service.DataImportService"
 		autowire="byName" scope="session" />

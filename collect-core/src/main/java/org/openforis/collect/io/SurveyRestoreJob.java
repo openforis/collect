@@ -33,6 +33,13 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 
+	private static final String ZIP_EXTENSION = "zip";
+	
+	public static final String[] COMPLETE_BACKUP_FILE_EXTENSIONS = new String[] {
+		SurveyBackupJob.OutputFormat.DESKTOP.getOutputFileExtension(),
+		ZIP_EXTENSION
+	};
+
 	@Autowired
 	private transient SpeciesManager speciesManager;
 	@Autowired
@@ -58,7 +65,12 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 
 	private boolean isCompleteBackupFile() {
 		String ext = FilenameUtils.getExtension(file.getName());
-		return "zip".equalsIgnoreCase(ext);
+		for (String allowedExt : COMPLETE_BACKUP_FILE_EXTENSIONS) {
+			if ( allowedExt.equalsIgnoreCase(ext) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override

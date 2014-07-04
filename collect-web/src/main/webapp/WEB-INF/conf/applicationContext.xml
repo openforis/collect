@@ -19,6 +19,8 @@
 	    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd"
 	default-lazy-init="true">
 	
+	<import resource="classpath:org/openforis/collect/application-context-server.xml"/>
+
 	<mvc:annotation-driven />
 	
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
@@ -69,41 +71,5 @@
 	<!-- Controllers -->
 	<bean id="fileNameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
 	<bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView" />
-	
-	<!-- ===================================== -->
-	<!-- Data Source -->
-	<!-- ===================================== -->
-	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="java:comp/env/jdbc/collectDs" />
-		<property name="resourceRef" value="true" />
-	</bean>
-
-	<bean id="transactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<tx:annotation-driven transaction-manager="transactionManager"
-		proxy-target-class="true" />
-
-	<!-- ===================================== -->
-	<!-- RDB Data Source -->
-	<!-- ===================================== -->
-	<bean id="rdbDataSource" class="org.springframework.jndi.JndiObjectFactoryBean"
-		lazy-init="true">
-		<property name="jndiName" value="java:comp/env/jdbc/collectRdbDs" />
-		<property name="resourceRef" value="true" />
-	</bean>
-
-	<bean id="rdbTransactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-		lazy-init="true">
-		<qualifier value="rdbTransactionManager" />
-		<property name="dataSource" ref="rdbDataSource" />
-	</bean>
-
-	<tx:annotation-driven transaction-manager="rdbTransactionManager" proxy-target-class="true"/>
-
-	<import resource="classpath:org/openforis/collect/application-context-server.xml"/>
 	
 </beans>
