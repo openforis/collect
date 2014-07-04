@@ -316,7 +316,24 @@ public class RecordManager {
 		filter.setKeyValues(keyValues);
 		return countRecords(filter);
 	}
-	
+
+	/**
+	 * Returns false if another record with the same root entity key values exists.
+	 */
+	public boolean isUnique(CollectRecord record) {
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		record.updateRootEntityKeyValues();
+		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
+		
+		Entity rootEntity = record.getRootEntity();
+		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity.getName(), rootEntityKeyValues.toArray(new String[0]));
+		for (CollectRecord collectRecord : summaries) {
+			if ( ! collectRecord.getId().equals(record.getId()) ) {
+				return false;
+			}
+		}
+		return true;
+	}
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName) throws RecordPersistenceException {
 		return create(survey, rootEntityName, user, modelVersionName, (String) null);
 	}
@@ -1251,4 +1268,5 @@ public class RecordManager {
     public void setSurveyManager(SurveyManager surveyManager) {
         this.surveyManager = surveyManager;
     }
+
 }
