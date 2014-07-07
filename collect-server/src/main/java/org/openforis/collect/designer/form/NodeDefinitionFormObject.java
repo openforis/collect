@@ -29,6 +29,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean required;
 	private String requiredExpression;
 	private String relevantExpression;
+	private boolean hideWhenNotRelevant;
 	private Integer minCount;
 	private Integer maxCount;
 	//labels
@@ -48,17 +49,18 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static NodeDefinitionFormObject<? extends NodeDefinition> newInstance(EntityDefinition parentDefn, NodeType nodeType, AttributeType attributeType) {
-		NodeDefinitionFormObject<NodeDefinition> formObject = null;
-		if ( nodeType != null ) {
+		if ( nodeType == null ) {
+			return null;
+		} else {
 			switch ( nodeType) {
 			case ENTITY:
-				formObject = new EntityDefinitionFormObject(parentDefn);
-				break;
+				return new EntityDefinitionFormObject(parentDefn);
 			case ATTRIBUTE:
 				return (NodeDefinitionFormObject<NodeDefinition>) newInstance(parentDefn, attributeType);
+			default:
+				throw new IllegalArgumentException("Unsupported node type: " + nodeType.getClass().getName());
 			}
 		}
-		return formObject;
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
@@ -109,6 +111,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			requiredExpression = source.getRequiredExpression();
 		}
 		relevantExpression = source.getRelevantExpression();
+		hideWhenNotRelevant = getUIOptions(source).isHideWhenNotRelevant(source);
 		minCount = nodeMinCount;
 		if ( multiple ) {
 			maxCount = source.getMaxCount();
@@ -151,6 +154,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
+		getUIOptions(dest).setHideWhenNotRelevant(dest, hideWhenNotRelevant);
 	}
 
 	@Override
@@ -268,6 +272,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.relevantExpression = relevantExpression;
 	}
 
+	public boolean isHideWhenNotRelevant() {
+		return hideWhenNotRelevant;
+	}
+	
+	public void setHideWhenNotRelevant(boolean hideWhenNotRelevant) {
+		this.hideWhenNotRelevant = hideWhenNotRelevant;
+	}
+	
 	public Integer getMinCount() {
 		return minCount;
 	}

@@ -467,6 +467,39 @@ package org.openforis.collect.model.proxy {
 			return false;
 		}
 		
+		/**
+		 * Returns the first descendant node having the specified node definition.
+		 */
+		public function getDescendantNode(nodeDefn:NodeDefinitionProxy):NodeProxy {
+			var pathDiff:String = nodeDefn.path.substr(this.definition.path.length + 1);
+			var currentParentEntity:EntityProxy = this;
+			var parts:Array = pathDiff.split("/");
+			for each (var part:String in parts) {
+				var node:NodeProxy = currentParentEntity.getChild(part, 0);
+				if ( node == null ) {
+					return null; //node not found
+				} else if ( node.definition.id == nodeDefn.id ) {
+					return node;
+				} else if ( node.definition instanceof EntityDefinitionProxy ) {
+					currentParentEntity = EntityProxy(node);
+				}
+			}
+			//node not found
+			return null;
+		}
+		
+		public function getDescendantCousins(nodeDefn:NodeDefinitionProxy):IList {
+			var result:IList = new ArrayCollection();
+			var siblingEntities:IList = getSiblings();
+			for each (var entity:EntityProxy in siblingEntities) {
+				var cousin:NodeProxy = entity.getDescendantNode(nodeDefn);
+				if ( cousin != null ) {
+					result.addItem(cousin);
+				}
+			}
+			return result;
+		}
+		
 		protected function updateMap(map:IMap, newMap:IMap):void {
 			if(map != null && newMap != null) {
 				var newKeys:ArrayCollection = newMap.keySet;

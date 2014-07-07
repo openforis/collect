@@ -4,6 +4,7 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 		 currentState="{STATE_VERTICAL}"
+		 creationComplete="creationCompleteHandler(event)"
 		 >
 	
 	<fx:Metadata>
@@ -13,8 +14,16 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
-			import org.openforis.collect.model.proxy.EntityProxy;
+			
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			
 			import mx.collections.IList;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.DataGroupHeaderPresenter;
+			
 			import spark.layouts.ConstraintLayout;
 			
 			public static const DIRECTION_VERTICAL:String = "vertical";
@@ -23,14 +32,49 @@
 			public static const STATE_VERTICAL:String = "vertical";
 			public static const STATE_HORIZONTAL:String = "horizontal";
 			
+			private var _presenter:DataGroupHeaderPresenter;
 			private var _parentEntity:EntityProxy;
-			private var _nodeDefinitions:IList;
+			private var _entityDefinition:EntityDefinitionProxy;
+			private var _modelVersion:ModelVersionProxy;
 			private var _labelsDirection:String = DIRECTION_VERTICAL;
+			private var _visibilityByChildIndex:ArrayCollection;
+			private var _nodeDefinitions:IList;
+
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new DataGroupHeaderPresenter(this);
+			}
 			
 			protected function updateCurrentState():void {
 				currentState = _labelsDirection == DIRECTION_VERTICAL ? STATE_VERTICAL: STATE_HORIZONTAL;
 			}
 			//private var _constraintLayout:ConstraintLayout;
+			
+			[Bindable]
+			public function get entityDefinition():EntityDefinitionProxy {
+				return _entityDefinition;
+			}
+			
+			public function set entityDefinition(value:EntityDefinitionProxy):void {
+				_entityDefinition = value;
+			}
+			
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
 			
 			[Bindable]
 			public function get nodeDefinitions():IList {
@@ -40,16 +84,16 @@
 			public function set nodeDefinitions(value:IList):void {
 				_nodeDefinitions = value;
 			}
-
+			
 			[Bindable]
-			public function get parentEntity():EntityProxy {
-				return _parentEntity;
+			public function get visibilityByChildIndex():ArrayCollection {
+				return _visibilityByChildIndex;
 			}
-
-			public function set parentEntity(value:EntityProxy):void {
-				_parentEntity = value;
+			
+			public function set visibilityByChildIndex(value:ArrayCollection):void {
+				_visibilityByChildIndex = value;
 			}
-
+			
 			[Bindable(event="labelsDirectionChange")]
 			public function get labelsDirection():String {
 				return _labelsDirection;
@@ -95,6 +139,8 @@
 		<s:itemRenderer>
 			<fx:Component>
 				<datagroup:DataGroupHeaderItemRenderer
+					visible="{outerDocument.visibilityByChildIndex.getItemAt(this.itemIndex)}"
+					includeInLayout="{outerDocument.visibilityByChildIndex.getItemAt(this.itemIndex)}"
 					height="{outerDocument.labelsDirection == DataGroupHeader.DIRECTION_HORIZONTAL &amp;&amp; 
 						outerDocument.height &gt; 0 ? outerDocument.height: NaN}"
 					parentEntity="{outerDocument.parentEntity}" />

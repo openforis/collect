@@ -45,6 +45,34 @@ package org.openforis.collect.metamodel.proxy {
 			return result;
 		}
 		
+		public function hasHideableDefinitions():Boolean {
+			var hideableDefns:IList = getHideableDefinitions();
+			return hideableDefns.length > 0;
+		}
+		
+		public function getHideableDefinitions():IList {
+			var result:ArrayCollection = new ArrayCollection();
+			traverse(function(defn:NodeDefinitionProxy):void {
+				if ( defn.hideWhenNotRelevant ) {
+					result.addItem(defn);
+				}
+			});
+			return result;
+		}
+		
+		public function traverse(funct:Function):void {
+			var stack:Array = new Array();
+			ArrayUtil.addAll(stack, childDefinitions.toArray());
+			while ( stack.length > 0 ) {
+				var defn:NodeDefinitionProxy = NodeDefinitionProxy(stack.pop());
+				funct(defn);
+				if ( defn is EntityDefinitionProxy ) {
+					var children:IList = EntityDefinitionProxy(defn).childDefinitions;
+					ArrayUtil.addAll(stack, children.toArray());
+				}
+			}
+		}
+		
 		/**
 		 * Returns all the key attribute definitions of this entity
 		 * (it looks for key attribute defitions even in nested single entities)

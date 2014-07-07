@@ -648,6 +648,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		setAnnotationValue(defn, Annotation.SHOW_IN_UI, value);
 	}
 
+	public boolean isHideWhenNotRelevant(NodeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.HIDE_WHEN_NOT_RELEVANT);
+	}
+	
+	public void setHideWhenNotRelevant(NodeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.HIDE_WHEN_NOT_RELEVANT, value);
+	}
+
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {

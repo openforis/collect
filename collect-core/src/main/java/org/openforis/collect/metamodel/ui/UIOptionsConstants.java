@@ -26,6 +26,7 @@ public interface UIOptionsConstants {
 	String NAME = "name";
 	String TYPE = "type";
 	String LABEL = "label";
+	String HIDE_WHEN_NOT_RELEVANT = "hideWhenNotRelevant";
 	String VISIBLE_FIELDS = "visibleFields";
 	String SHOW_ALLOWED_VALUES_PREVIEW = "showAllowedValuesPreview";
 	String SHOW_IN_UI = "showInUI";
