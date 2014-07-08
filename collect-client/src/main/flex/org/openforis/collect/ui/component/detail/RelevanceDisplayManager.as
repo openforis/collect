@@ -3,6 +3,7 @@ package org.openforis.collect.ui.component.detail
 	import mx.collections.IList;
 	import mx.core.UIComponent;
 	
+	import org.openforis.collect.metamodel.proxy.CalculatedAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -52,28 +53,21 @@ package org.openforis.collect.ui.component.detail
 		private function canBeHidden(parentEntity:EntityProxy, defn:NodeDefinitionProxy):Boolean {
 			if ( defn.hideWhenNotRelevant ) {
 				var name:String = defn.name;
+				var nodes:IList;
 				//if nearest parent entity is table, hide fields when all cousins are not relevant and empty
 				if ( defn.nearestParentMultipleEntity.layout == UIUtil.LAYOUT_TABLE ) {
-					var allCousinsEmptyAndNotRelevant:Boolean = true;
-					var cousins:IList = parentEntity.getDescendantCousins(defn);
-					for each (var node:NodeProxy in cousins) {
-						if ( ! node.empty || node.relevant ) {
-							allCousinsEmptyAndNotRelevant = false;
-							break;
-						}
-					}
-					return allCousinsEmptyAndNotRelevant;
+					nodes = parentEntity.getDescendantCousins(defn);
 				} else {
-					var allSiblingsEmpty:Boolean = true;
-					var siblings:IList = parentEntity.getChildren(name);
-					for each (var node:NodeProxy in siblings) {
-						if ( ! node.empty ) {
-							allSiblingsEmpty = false;
-							break;
-						}
-					}
-					return allSiblingsEmpty;
+					nodes = parentEntity.getChildren(name);
 				}
+				var allNodesEmptyAndNotRelevant:Boolean = true;
+				for each (var node:NodeProxy in nodes) {
+					if ( node.relevant || (! defn is CalculatedAttributeDefinitionProxy && ! node.empty ) ) {
+						allNodesEmptyAndNotRelevant = false;
+						break;
+					}
+				}
+				return allNodesEmptyAndNotRelevant;
 			} else {
 				return false;
 			}

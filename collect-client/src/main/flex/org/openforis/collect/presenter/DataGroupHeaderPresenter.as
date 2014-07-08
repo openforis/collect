@@ -5,7 +5,6 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
@@ -16,7 +15,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.component.datagroup.DataGroupHeader;
-	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 
 	/**
@@ -53,7 +51,6 @@ package org.openforis.collect.presenter
 				var record:RecordProxy = Application.activeRecord;
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
-					AlertUtil.showMessage("test" + change.nodeId);
 					var node:NodeProxy = record.getNode(change.nodeId);
 					if ( _view.parentEntity.isAncestorOf(node) ) {
 						if ( change is EntityChangeProxy ) {

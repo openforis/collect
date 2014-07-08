@@ -7,6 +7,7 @@
 
 package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
+	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.collections.Sort;
@@ -470,18 +471,26 @@ package org.openforis.collect.model.proxy {
 		/**
 		 * Returns the first descendant node having the specified node definition.
 		 */
-		public function getDescendantNode(nodeDefn:NodeDefinitionProxy):NodeProxy {
+		public function getDescendantNodes(nodeDefn:NodeDefinitionProxy):IList {
 			var pathDiff:String = nodeDefn.path.substr(this.definition.path.length + 1);
-			var currentParentEntity:EntityProxy = this;
+			var currentParentEntities:IList = new ArrayCollection();
+			currentParentEntities.addItem(this);
+			var currentLevelChildren:IList = new ArrayCollection();
 			var parts:Array = pathDiff.split("/");
-			for each (var part:String in parts) {
-				var node:NodeProxy = currentParentEntity.getChild(part, 0);
-				if ( node == null ) {
+			for ( var count:int = 0; count < parts.length; count++ ) {
+				var part:String = parts[count];
+				for each (var currentParentEntity:EntityProxy in currentParentEntities ) {
+					var currentParentEntityDefn:EntityDefinitionProxy = EntityDefinitionProxy(currentParentEntity.definition);
+					var currentChildren:IList = currentParentEntity.getChildren(part);
+					CollectionUtil.addAll(currentLevelChildren, currentChildren);
+				}
+				if ( currentLevelChildren.length == 0 ) {
 					return null; //node not found
-				} else if ( node.definition.id == nodeDefn.id ) {
-					return node;
-				} else if ( node.definition is EntityDefinitionProxy ) {
-					currentParentEntity = EntityProxy(node);
+				} else if ( count == parts.length - 1 ) {
+					return currentLevelChildren;
+				} else {
+					currentParentEntities = currentLevelChildren;
+					currentLevelChildren = new ArrayCollection();
 				}
 			}
 			//node not found
@@ -492,12 +501,15 @@ package org.openforis.collect.model.proxy {
 			var result:IList = new ArrayCollection();
 			var siblingEntities:IList = getSiblings();
 			for each (var entity:EntityProxy in siblingEntities) {
-				var cousin:NodeProxy = entity.getDescendantNode(nodeDefn);
-				if ( cousin != null ) {
-					result.addItem(cousin);
-				}
+				var cousins:IList = entity.getDescendantNodes(nodeDefn);
+				CollectionUtil.addAll(result, cousins);
 			}
 			return result;
+		}
+		
+		public function isDescendantCousin(node:NodeProxy):Boolean {
+			var cousins:IList = this.getDescendantCousins(node.definition);
+			return CollectionUtil.contains(cousins, node);
 		}
 		
 		public function isAncestorOf(node:NodeProxy):Boolean {

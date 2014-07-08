@@ -141,7 +141,7 @@ package org.openforis.collect.metamodel.proxy {
 			return false;
 		}
 		
-		[Bindable]
+		[Bindable(event="unused")]
 		public function get parentLayout():String {
 			if(parent != null) {
 				return parent.layout;

@@ -11,6 +11,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.NodeEvent;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
@@ -20,6 +21,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.FormItemContextMenu;
+	import org.openforis.collect.util.UIUtil;
 
 	/**
 	 * 
@@ -79,8 +81,7 @@ package org.openforis.collect.presenter
 			if(_view.parentEntity != null) {
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
-					if ( change is NodeChangeProxy && 
-							NodeChangeProxy(change).nodeId == _view.parentEntity.id) {
+					if ( change.nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						_contextMenu.updateItems();

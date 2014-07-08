@@ -7,10 +7,16 @@ package org.openforis.collect.presenter
 	import mx.collections.IList;
 	import mx.events.PropertyChangeEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**
@@ -49,6 +55,23 @@ package org.openforis.collect.presenter
 		
 		private function get view():AttributeFormItem {
 			return AttributeFormItem(_view);
+		}
+		
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			super.updateResponseReceivedHandler(event);
+			if ( view.nodeDefinition.parentLayout == UIUtil.LAYOUT_TABLE && view.nodeDefinition.hideWhenNotRelevant ) {
+				//current form item node is inside a table entity, update relevance display if changed node is a cousin of the current one
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if ( change is AttributeChangeProxy ) {
+						var changedNode:NodeProxy = Application.activeRecord.getNode(change.nodeId);
+						if ( changedNode.definition.id == view.nodeDefinition.id && view.parentEntity.isDescendantCousin(changedNode) ) {
+							updateRelevanceDisplayManager();
+							break;
+						}
+					}
+				}
+			}
 		}
 		
 		override protected function updateRelevanceDisplayManager():void {

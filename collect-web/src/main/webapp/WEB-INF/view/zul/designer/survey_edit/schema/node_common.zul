@@ -94,7 +94,7 @@
   						onChange="@command('applyChanges')" />
   				</fieldErrorHandler>
   			</row>
-  			<row visible="@load(not vm.rootEntity and not vm.calculatedAttribute)">
+  			<row visible="@load(not vm.rootEntity)">
   				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
 	  				<label value="${labels.survey.schema.node.relevant_expression}:" />
 	  			</fieldErrorHandler>
