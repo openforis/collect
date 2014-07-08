@@ -16,6 +16,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.ui.component.datagroup.DataGroupHeader;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 
 	/**
@@ -30,6 +31,7 @@ package org.openforis.collect.presenter
 			this._view = view;
 			super();
 			initNodeDefinitions();
+			updateChildrenVisibility();
 		}
 		
 		override internal function initEventListeners():void {
@@ -51,62 +53,67 @@ package org.openforis.collect.presenter
 				var record:RecordProxy = Application.activeRecord;
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
-					if ( change is EntityChangeProxy ) {
-						var nodeChange:EntityChangeProxy = EntityChangeProxy(change);
-						var entity:NodeProxy = record.getNode(nodeChange.nodeId);
-						var entityDefn:EntityDefinitionProxy = EntityDefinitionProxy(entity.definition);
-						if ( entityDefn.id == _view.entityDefinition.id || entityDefn.isDescendantOf(_view.entityDefinition) ) {
-							updateChildrenVisualization();
+					AlertUtil.showMessage("test" + change.nodeId);
+					var node:NodeProxy = record.getNode(change.nodeId);
+					if ( _view.parentEntity.isAncestorOf(node) ) {
+						if ( change is EntityChangeProxy ) {
+							updateChildrenVisibility();
+							break;
+						} else if ( change is AttributeChangeProxy ) {
+							var attributeChange:AttributeChangeProxy = AttributeChangeProxy(change);
+							var hideableDefinitions:IList = _view.entityDefinition.hideableDefinitions;
+							if ( hideableDefinitions.length > 0 && CollectionUtil.contains(hideableDefinitions, node.definition) ) {
+								updateChildVisibility(node.definition);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		private function updateChildrenVisibility():void {
+			var childDefinitionsInVersion:IList = getChildDefinitionsInVersion();
+			var visibilityByChildIndex:ArrayCollection = new ArrayCollection();
+			CollectionUtil.fill(visibilityByChildIndex, true, childDefinitionsInVersion.length);
+			_view.visibilityByChildIndex = visibilityByChildIndex;
+			var hideableDefinitions:IList = _view.entityDefinition.hideableDefinitions;
+			if ( hideableDefinitions.length > 0 ) {
+				for ( var idx:int = 0; idx < childDefinitionsInVersion.length; idx ++) {
+					var nodeDefn:NodeDefinitionProxy = NodeDefinitionProxy(childDefinitionsInVersion.getItemAt(idx));
+					updateChildVisibility(nodeDefn);
+				}
+			}
+		}
+		
+		protected function updateChildVisibility(nodeDefn:NodeDefinitionProxy):void {
+			var hideableDefinitions:IList = _view.entityDefinition.hideableDefinitions;
+			var entities:IList = _view.parentEntity.getChildren(_view.entityDefinition.name);
+			var visible:Boolean;
+			if ( CollectionUtil.contains(hideableDefinitions, nodeDefn, "id") ) {
+				if ( entities.length > 0 ) {
+					var entity:EntityProxy = EntityProxy(entities.getItemAt(0));
+					var allCousinsNotRelevantAndEmpty:Boolean = true;
+					var cousins:IList = entity.getDescendantCousins(nodeDefn);
+					for each (var cousin:NodeProxy in cousins) {
+						if ( cousin.relevant || ! cousin.empty ) {
+							allCousinsNotRelevantAndEmpty = false;
 							break;
 						}
-					} else if ( change is AttributeChangeProxy ) {
-						var attributeChange:AttributeChangeProxy = AttributeChangeProxy(change);
-						
-						//TODO update children visualization when not relevant node becomes empty/not empty
 					}
-				}
-			}
-		}
-		
-		private function updateChildrenVisualization():void {
-			var visibilityByChildIndex:ArrayCollection = new ArrayCollection();
-			var hideableDefinitions:IList = _view.entityDefinition.getHideableDefinitions();
-			if ( hideableDefinitions.length > 0 ) {
-				var entities:IList = _view.parentEntity.getChildren(_view.entityDefinition.name);
-				for each ( var nodeDefn:NodeDefinitionProxy in _view.nodeDefinitions ) {
-					if ( _view.modelVersion == null || _view.modelVersion.isApplicable(nodeDefn) ) {
-						var visible:Boolean;
-						if ( CollectionUtil.contains(hideableDefinitions, nodeDefn, "id") ) {
-							if ( entities.length > 0 ) {
-								var entity:EntityProxy = EntityProxy(entities.getItemAt(0));
-								var allCousinsNotRelevantAndEmpty:Boolean = true;
-								var cousins:IList = entity.getDescendantCousins(nodeDefn);
-								for each (var cousin:NodeProxy in cousins) {
-									if ( cousin.relevant || ! cousin.empty ) {
-										allCousinsNotRelevantAndEmpty = false;
-										break;
-									}
-								}
-								visible = ! allCousinsNotRelevantAndEmpty;
-							} else {
-								visible = false;
-							}
-						} else {
-							visible = true;
-						}
-						visibilityByChildIndex.addItem(visible);
-					}
+					visible = ! allCousinsNotRelevantAndEmpty;
+				} else {
+					visible = false;
 				}
 			} else {
-				for each ( var nodeDefn:NodeDefinitionProxy in _view.nodeDefinitions ) {
-					if ( _view.modelVersion == null || _view.modelVersion.isApplicable(nodeDefn) ) {
-						visibilityByChildIndex.addItem(true);
-					}
-				}
+				visible = true;
 			}
-			_view.visibilityByChildIndex = visibilityByChildIndex;
+			var childDefinitionsInVersion:IList = getChildDefinitionsInVersion();
+			var idx:int = childDefinitionsInVersion.getItemIndex(nodeDefn);
+			_view.visibilityByChildIndex.setItemAt(visible, idx);
 		}
 		
-		
+		protected function getChildDefinitionsInVersion():IList {
+			return _view.entityDefinition.getDefinitionsInVersion(_view.modelVersion);
+		}
 	}
 }

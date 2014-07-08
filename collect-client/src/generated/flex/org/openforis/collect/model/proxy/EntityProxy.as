@@ -480,7 +480,7 @@ package org.openforis.collect.model.proxy {
 					return null; //node not found
 				} else if ( node.definition.id == nodeDefn.id ) {
 					return node;
-				} else if ( node.definition instanceof EntityDefinitionProxy ) {
+				} else if ( node.definition is EntityDefinitionProxy ) {
 					currentParentEntity = EntityProxy(node);
 				}
 			}
@@ -498,6 +498,17 @@ package org.openforis.collect.model.proxy {
 				}
 			}
 			return result;
+		}
+		
+		public function isAncestorOf(node:NodeProxy):Boolean {
+			var currentParent:EntityProxy = node.parent;
+			while ( currentParent != null ) {
+				if ( currentParent == this ) {
+					return true;
+				}
+				currentParent = currentParent.parent;
+			}
+			return false;
 		}
 		
 		protected function updateMap(map:IMap, newMap:IMap):void {

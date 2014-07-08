@@ -46,11 +46,10 @@ package org.openforis.collect.metamodel.proxy {
 		}
 		
 		public function hasHideableDefinitions():Boolean {
-			var hideableDefns:IList = getHideableDefinitions();
-			return hideableDefns.length > 0;
+			return hideableDefinitions.length > 0;
 		}
 		
-		public function getHideableDefinitions():IList {
+		public function get hideableDefinitions():IList {
 			var result:ArrayCollection = new ArrayCollection();
 			traverse(function(defn:NodeDefinitionProxy):void {
 				if ( defn.hideWhenNotRelevant ) {
