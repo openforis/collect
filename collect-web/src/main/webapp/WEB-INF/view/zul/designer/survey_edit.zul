@@ -120,7 +120,7 @@
 					</box>
 				</center>
 				<east border="none" size="40%">
-					<box width="100%" align="end">
+					<box hflex="true" align="end">
 						<button label="${labels.survey.validate}"
 							onClick="@command('validate')" />
 					</box>

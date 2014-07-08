@@ -4,6 +4,11 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.URLConnection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,12 +19,16 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.utils.Dates;
+import org.openforis.concurrency.Job;
+import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -34,6 +43,7 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.bind.annotation.QueryParam;
+import org.zkoss.util.logging.Log;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -48,6 +58,8 @@ import org.zkoss.zul.Window;
  */
 public class SurveyEditVM extends SurveyBaseVM {
 
+	private static final Log log = Log.lookup(SurveySelectVM.class);
+
 	private static final String TEXT_XML = "text/xml";
 	private static final String PREVIEW_WINDOW_ID = "collect_survey_preview";
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
@@ -55,6 +67,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 //	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
 	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
+	
+	private static final String SCHEMA_SUMMARY_FILE_NAME_PATTERN = "%s_schema_summary_%s.%s";
 	
 	private Window selectLanguagePopUp;
 	private Window previewPreferencesPopUp;
@@ -67,9 +81,12 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private SurveyManager surveyManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
+	@WireVariable(value="springJobManager")
+	private SpringJobManager jobManager;
 
 	private boolean changed;
 	private Window validationResultsPopUp;
+	private Window jobStatusPopUp;
 
 	@Init(superclass=false)
 	public void init(@QueryParam("temp_id") Integer tempId) {
@@ -302,6 +319,41 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void closeValidationResultsPopUp() {
 		closePopUp(validationResultsPopUp);
 		validationResultsPopUp = null;
+	}
+	
+	@GlobalCommand
+	public void exportSchemaSummary() {
+		SchemaSummaryCSVExportJob job = new SchemaSummaryCSVExportJob();
+		job.setJobManager(jobManager);
+		job.setSurvey(survey);
+		jobManager.start(job, survey.getId().toString());
+		
+		String statusPopUpTitle = Labels.getLabel("survey.schema.export_summary.process_status_popup.message", new String[] { survey.getName() });
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(statusPopUpTitle, job, true);
+	}
+	
+	@GlobalCommand
+	public void jobCompleted(@BindingParam("job") Job job) {
+		closeJobStatusPopUp();
+		if ( job instanceof SchemaSummaryCSVExportJob ) {
+			File file = ((SchemaSummaryCSVExportJob) job).getOutputFile();
+			String surveyName = survey.getName();
+			String dateStr = Dates.formatDateTimeToXML(new Date());
+			String fileName = String.format(SCHEMA_SUMMARY_FILE_NAME_PATTERN, surveyName, dateStr, "csv");
+			String contentType = URLConnection.guessContentTypeFromName(fileName);
+			try {
+				FileInputStream is = new FileInputStream(file);
+				Filedownload.save(is, contentType, fileName);
+			} catch (FileNotFoundException e) {
+				log.error(e);
+				MessageUtil.showError("survey.schema.export_summary.error", new String[]{e.getMessage()});
+			}
+		}
+	}
+
+	private void closeJobStatusPopUp() {
+		closePopUp(jobStatusPopUp);
+		jobStatusPopUp = null;
 	}
 
 	@GlobalCommand
