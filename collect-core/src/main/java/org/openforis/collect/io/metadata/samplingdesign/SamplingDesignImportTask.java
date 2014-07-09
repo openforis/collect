@@ -39,7 +39,12 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	//internal variables
 	private transient SamplingDesignCSVReader reader;
 	private transient List<SamplingDesignLine> lines;
+	private boolean skipValidation;
 
+	public SamplingDesignImportTask() {
+		this.skipValidation = false;
+	}
+	
 	@Override
 	protected void initInternal() throws Throwable {
 		lines = new ArrayList<SamplingDesignLine>();
@@ -123,8 +128,8 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 			long lineNumber = line.getLineNumber();
 			if ( isRunning() && ! isRowProcessed(lineNumber) && ! isRowInError(lineNumber) ) {
 				try {
-					boolean processed = processLine(line);
-					if (processed ) {
+					boolean valid = skipValidation || validateLine(line);
+					if (valid ) {
 						addProcessedRow(lineNumber);
 					}
 				} catch (ParsingException e) {
@@ -134,7 +139,7 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 		}
 	}
 	
-	protected boolean processLine(SamplingDesignLine line) throws ParsingException {
+	protected boolean validateLine(SamplingDesignLine line) throws ParsingException {
 		SamplingDesignLineValidator validator = SamplingDesignLineValidator.createInstance(survey);
 		validator.validate(line);
 		List<ParsingError> errors = validator.getErrors();
@@ -251,6 +256,14 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 
 	public void setOverwriteAll(boolean overwriteAll) {
 		this.overwriteAll = overwriteAll;
+	}
+	
+	public boolean isSkipValidation() {
+		return skipValidation;
+	}
+	
+	public void setSkipValidation(boolean skipValidation) {
+		this.skipValidation = skipValidation;
 	}
 
 }

@@ -120,6 +120,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			File samplingDesignFile = backupFileExtractor.extract(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
 			t.setSamplingDesignManager(samplingDesignManager);
 			t.setFile(samplingDesignFile);
+			t.setSkipValidation(true);
 			t.setOverwriteAll(true);
 			t.setSurvey(survey);
 		} else if ( task instanceof SpeciesBackupImportTask ) {
