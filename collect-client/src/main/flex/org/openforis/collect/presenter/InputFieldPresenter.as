@@ -83,7 +83,7 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			
+
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
 			
@@ -106,9 +106,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function setFocusHandler(event:InputFieldEvent):void {
-			if ( _view.textInput != null && _view.attribute != null && 
+			if ( _view.root != null && 
+					_view.textInput != null && 
+					_view.attribute != null && 
 					_view.attribute.id == event.attributeId && 
-					_view.fieldIndex == event.fieldIdx ) {
+					_view.fieldIndex == event.fieldIdx &&
+					_view.getFocus() != _view.textInput ) {
 				
 				_view.textInput.setFocus();
 				
@@ -390,10 +393,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function dispatchFocusOutEvent():void {
-			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.FOCUS_OUT);
-			inputFieldEvent.inputField = _view;
-			inputFieldEvent.parentEntityId = _view.parentEntity.id;
-			eventDispatcher.dispatchEvent(inputFieldEvent);
+			if ( _view.parentEntity != null ) {
+				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.FOCUS_OUT);
+				inputFieldEvent.inputField = _view;
+				inputFieldEvent.parentEntityId = _view.parentEntity.id;
+				eventDispatcher.dispatchEvent(inputFieldEvent);
+			}
 		}
 		
 		protected function keyDownHandler(event:KeyboardEvent):void {

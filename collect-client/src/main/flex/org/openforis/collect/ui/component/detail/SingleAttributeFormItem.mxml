@@ -19,7 +19,7 @@
 			protected var renderer:AttributeItemRenderer;
 			
 			override protected function createChildren():void {
-				if(!childrenAdded) {
+				if ( ! childrenAdded ) {
 					super.createChildren();
 					renderer = UIBuilder.getAttributeItemRenderer(attributeDefinition);
 					BindingUtils.bindProperty(renderer, "attributeDefinition", this, "attributeDefinition");

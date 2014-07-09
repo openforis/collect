@@ -40,6 +40,16 @@
 			override protected function createChildren():void {
 				super.createChildren();
 				contentGroup.addElement(rowNumberLabel);
+				contentGroup.addElement(nodeDefinitionsGroup);
+			}
+			
+			override public function set data(value:Object):void {
+				super.data = value;
+				entity = value as EntityProxy;
+				if ( ! _inited ) {
+					initNodeDefinitions();
+					_inited = true;
+				}
 			}
 			
 			protected function initNodeDefinitions():void {
@@ -52,21 +62,9 @@
 				addNodeDefinitionItemRenderers();
 			}
 			
-			override public function set data(value:Object):void {
-				super.data = value;
-				var firstTime:Boolean = _entity == null;
-				entity = value as EntityProxy;
-				if ( ! _inited ) {
-					initNodeDefinitions();
-					_inited = true;
-				}
-			}
-			
 			protected function addNodeDefinitionItemRenderers():void {
-				if ( _inited ) {
-					contentGroup.removeElement(nodeDefinitionsGroup);
-					nodeDefinitionsGroup.removeAllElements();
-				}
+				nodeDefinitionsGroup.removeAllElements();
+
 				for each (var nodeDefn:NodeDefinitionProxy in nodeDefinitions) {
 					var formItem:CollectFormItem;
 					if(nodeDefn is AttributeDefinitionProxy) {
@@ -79,7 +77,6 @@
 					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
 					nodeDefinitionsGroup.addElement(formItem);
 				}
-				contentGroup.addElement(nodeDefinitionsGroup);
 			}
 			
 			[Bindable]

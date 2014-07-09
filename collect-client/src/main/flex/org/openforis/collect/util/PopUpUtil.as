@@ -80,7 +80,6 @@ package org.openforis.collect.util
 				ensureVisibility:Boolean = true):void {
 			//auto positioning tooltip (first on right, then below, otherwiese on top) 
 			var componentBounds:Rectangle = inputField.getBounds(inputField.stage);
-			
 			var x:Number, y:Number;
 			var adjustedPosition:Point;
 			switch(position) {

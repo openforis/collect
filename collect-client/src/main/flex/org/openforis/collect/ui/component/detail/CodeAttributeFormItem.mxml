@@ -10,20 +10,16 @@
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
 			
+			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 			
-			import mx.core.IVisualElement;
-			
-			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
-			import org.openforis.collect.ui.UIBuilder;
-			import org.openforis.collect.ui.component.input.CodeInputField;
-			
 			override protected function createChildren():void {
-				if(!childrenAdded) {
+				if ( ! childrenAdded) {
 					super.createChildren();
 					if(attributeDefinition != null && 
 						attributeDefinition.multiple && 
 						attributeDefinition is CodeAttributeDefinitionProxy) {
+						
 						BindingUtils.bindProperty(renderer, "attributes", this, "attributes");
 						var codeInputField:MultipleCodeInputField = renderer.getElementAt(0) as MultipleCodeInputField;
 						BindingUtils.bindProperty(codeInputField, "attributes", renderer, "attributes");

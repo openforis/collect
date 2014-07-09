@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
+	import mx.managers.FocusManager;
 	import mx.managers.IFocusManagerComponent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
@@ -63,19 +64,23 @@ package org.openforis.collect.presenter {
 		
 		public static function globalClickHandler(event:MouseEvent):void {
 			//if popup is opened and user clicks outside of it, close it
-			var target:UIComponent = event.target as UIComponent;
-			if ( _popUpOpened && target != null ) {
-				var codeInputField:CodeInputField = _popUp.codeInputField;
-				if ( ! UIUtil.hasStyleName(target, "openCodeListPopUpButton") 
-					&& ! UIUtil.isDescendantOf(_popUp, target) 
-					//&& target != codeInputField.textInput 
-					) {
-					closePopupHandler(null, false);
+			var target:DisplayObject = event.target as DisplayObject;
+			if ( target != null ) {
+				if ( _popUpOpened ) {
+					var codeInputField:CodeInputField = _popUp.codeInputField;
+					if ( ! ( ( target is UIComponent && UIUtil.hasStyleName(UIComponent(target), "openCodeListPopUpButton") ) || UIUtil.isDescendantOf(_popUp, target) ) 
+						//&& target != codeInputField.textInput 
+						) {
+						closePopupHandler(null, false);
+					}
 				}
-			}
-			if ( _allowedValuesPreviewPopUpOpened && target != null ) {
-				if ( ! UIUtil.isDescendantOf(_allowedValuesPreviewPopUp, target) ) {
-					closeAllowedValuesPreviewPopUp();
+				if ( _allowedValuesPreviewPopUpOpened ) {
+					var codeInputField:CodeInputField = _allowedValuesPreviewPopUp.codeInputField;
+					var clickIsInsideAllowedValuesPopUp:Boolean = UIUtil.isDescendantOf(_allowedValuesPreviewPopUp, target);
+					var clickIsInsideCodeInputField:Boolean = UIUtil.isDescendantOf(codeInputField.textInput, target);
+					if ( ! ( clickIsInsideAllowedValuesPopUp || clickIsInsideCodeInputField ) ) {
+						closeAllowedValuesPreviewPopUp();
+					}
 				}
 			}
 		}
@@ -128,20 +133,30 @@ package org.openforis.collect.presenter {
 		 * Open the popup
 		 * */
 		protected function openImageClickHandler(event:Event):void {
+			openCodeListDialog(_view);
+		}
+		
+		protected static function openCodeListDialog(view:CodeInputField):void {
 			if(_popUp == null) {
 				_popUp = new CodeListDialog();
 				_popUp.addEventListener(CloseEvent.CLOSE, popUpApplyHandler);
 				_popUp.cancelLoading.addEventListener(MouseEvent.CLICK, cancelLoadingHandler);
 				_popUp.addEventListener("apply", popUpApplyHandler);
 				_popUp.addEventListener(KeyboardEvent.KEY_DOWN, popUpKeyDownHandler);
+				
+				function popUpKeyDownHandler(event:KeyboardEvent):void {
+					if (event.keyCode == Keyboard.ESCAPE) {
+						closePopupHandler();
+					}
+				}
 				//_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
 				//_popUp.addEventListener("selectionChange", popupItemSelectionChangeHandler);
 			}
 			_popUpOpened = true;
-			_popUp.codeInputField = _view;
+			_popUp.codeInputField = view;
 			_popUp.editable = Application.activeRecordEditable;
-			_popUp.multiple = _view.attributeDefinition.multiple;
-			_popUp.title = _view.attributeDefinition.getInstanceOrHeadingLabelText();
+			_popUp.multiple = view.attributeDefinition.multiple;
+			_popUp.title = view.attributeDefinition.getInstanceOrHeadingLabelText();
 			
 			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			
@@ -151,10 +166,10 @@ package org.openforis.collect.presenter {
 
 			PopUpManager.centerPopUp(_popUp);
 			
-			loadCodes(loadListDialogDataResultHandler);
+			loadCodes(view, loadListDialogDataResultHandler);
 		}
 		
-		protected function openAllowedValuesPreviewPopUp():void {
+		protected static function openAllowedValuesPreviewPopUp(view:CodeInputField):void {
 			if( _allowedValuesPreviewPopUp == null) {
 				_allowedValuesPreviewPopUp = new CodeListAllowedValuesPreviewDialog();
 				_allowedValuesPreviewPopUp.addEventListener(FlexEvent.STATE_CHANGE_COMPLETE, stateChangeHandler);
@@ -163,7 +178,8 @@ package org.openforis.collect.presenter {
 				//use of timer helps to align it better to the input field
 				var alignmentTimer:Timer = new Timer(100, 1);
 				alignmentTimer.addEventListener(TimerEvent.TIMER_COMPLETE, function(event:Event):void {
-					PopUpUtil.alignToField(_allowedValuesPreviewPopUp, _allowedValuesPreviewPopUp.codeInputField.textInput, PopUpUtil.POSITION_ABOVE, PopUpUtil.VERTICAL_ALIGN_TOP, PopUpUtil.HORIZONTAL_ALIGN_LEFT);
+					PopUpUtil.alignToField(_allowedValuesPreviewPopUp, _allowedValuesPreviewPopUp.codeInputField.textInput, 
+						PopUpUtil.POSITION_ABOVE, PopUpUtil.VERTICAL_ALIGN_TOP, PopUpUtil.HORIZONTAL_ALIGN_LEFT);
 				});
 				
 				function stateChangeHandler(event:Event):void {
@@ -171,13 +187,14 @@ package org.openforis.collect.presenter {
 					alignmentTimer.start();
 				}
 			}
-			_allowedValuesPreviewPopUp.codeInputField = _view;
+			_allowedValuesPreviewPopUp.codeInputField = view;
 			_allowedValuesPreviewPopUp.currentState = CodeListAllowedValuesPreviewDialog.STATE_LOADING;
 			
 			if ( ! _allowedValuesPreviewPopUpOpened ) {
-				PopUpManager.addPopUp(_allowedValuesPreviewPopUp, FlexGlobals.topLevelApplication as DisplayObject, false);
+				//FlexGlobals.topLevelApplication as DisplayObject
+				PopUpManager.addPopUp(_allowedValuesPreviewPopUp, view.textInput, false);
 				_allowedValuesPreviewPopUpOpened = true;
-				_view.textInput.setFocus();
+				view.textInput.setFocus();
 			}
 	
 			function loadCodesResultHandler(event:ResultEvent, token:Object = null):void {
@@ -186,7 +203,7 @@ package org.openforis.collect.presenter {
 				_allowedValuesPreviewPopUp.currentState = CodeListAllowedValuesPreviewDialog.STATE_DEFAULT;
 			}
 
-			loadCodes(loadCodesResultHandler);
+			loadCodes(view, loadCodesResultHandler);
 		}
 		
 		protected static function closeAllowedValuesPreviewPopUp():void {
@@ -196,15 +213,15 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function loadCodes(resultHandler:Function):void {
-			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
+		protected static function loadCodes(view:CodeInputField, resultHandler:Function):void {
+			var codeAttributeDef:CodeAttributeDefinitionProxy = view.attributeDefinition as CodeAttributeDefinitionProxy;
 			var attribute:String = codeAttributeDef.name;
-			var parentEntityId:int = _view.parentEntity.id;
+			var parentEntityId:int = view.parentEntity.id;
 			var responder:IResponder = new AsyncResponder(resultHandler, faultHandler);
 			_lastLoadCodesAsyncToken = dataClient.findAssignableCodeListItems(responder, parentEntityId, attribute);
 		}
 		
-		protected function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
+		protected static function loadListDialogDataResultHandler(event:ResultEvent, token:Object = null):void {
 			var data:IList = event.result as IList;
 			
 			var selectedItems:ArrayCollection;
@@ -228,7 +245,7 @@ package org.openforis.collect.presenter {
 			_popUp.selectedItems = selectedItems;
 			_popUp.notSelectedItems = notSelectedItems;
 			
-			var codeAttributeDef:CodeAttributeDefinitionProxy = _view.attributeDefinition as CodeAttributeDefinitionProxy;
+			var codeAttributeDef:CodeAttributeDefinitionProxy = _popUp.codeInputField.attributeDefinition as CodeAttributeDefinitionProxy;
 			if ( codeAttributeDef.allowValuesSorting ) {
 				_popUp.currentState = CodeListDialog.STATE_VALUES_SORTING_ALLOWED;
 			} else {
@@ -240,12 +257,6 @@ package org.openforis.collect.presenter {
 			_popUp.setFocus();
 		}
 
-		protected function popUpKeyDownHandler(event:KeyboardEvent):void {
-			if (event.keyCode == Keyboard.ESCAPE) {
-				closePopupHandler();
-			}
-		}
-		
 		protected function popupItemSelectionChangeHandler(event:Event):void {
 			var selectedItems:IList = _popUp.selectedItems;
 			applySelection(selectedItems);
@@ -360,16 +371,15 @@ package org.openforis.collect.presenter {
 			super.focusInHandler(event);
 			var attrDefn:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(_view.attributeDefinition);
 			if ( attrDefn.showAllowedValuesPreview && ! _popUpOpened && ! _allowedValuesPreviewPopUpOpened && ! attrDefn.external ) {
-				openAllowedValuesPreviewPopUp();
+				openAllowedValuesPreviewPopUp(_view);
 			}
 		}
 		
 		override protected function focusOutHandler(event:FocusEvent):void {
 			super.focusOutHandler(event);
-			
 			var focussedElement:IFocusManagerComponent = FlexGlobals.topLevelApplication.focusManager.getFocus();
 			if ( _allowedValuesPreviewPopUpOpened && _view == _allowedValuesPreviewPopUp.codeInputField ) {
-				closeAllowedValuesPreviewPopUp();
+				//closeAllowedValuesPreviewPopUp();
 			}
 		}
 
