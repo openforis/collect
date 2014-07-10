@@ -1,5 +1,6 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
@@ -12,8 +13,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeProxy;
-	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -37,6 +38,11 @@ package org.openforis.collect.presenter
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
 			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
+		}
+		
+		override protected function removeEventListeners():void {
+			super.removeEventListeners();
+			eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
 		private function get view():MultipleAttributeFormItem {

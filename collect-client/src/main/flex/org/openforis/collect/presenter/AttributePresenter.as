@@ -1,4 +1,6 @@
 package org.openforis.collect.presenter {
+	import flash.events.Event;
+	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.core.UIComponent;
 	import mx.events.PropertyChangeEvent;
@@ -43,6 +45,14 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
 			ChangeWatcher.watch(_view, "attributes", attributesChangeHandler);
+			
+			_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
+		}
+		
+		protected function removedFromStageHandler(event:Event):void {
+			eventDispatcher.removeEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
+			eventDispatcher.removeEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
+			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 		}
 		
 		protected function initValidationDisplayManager():void {

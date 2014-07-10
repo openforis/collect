@@ -15,13 +15,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.NodeEvent;
-	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
@@ -98,7 +94,15 @@ package org.openforis.collect.presenter {
 			//key focus change managed by key down handler
 			_view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
 			
-			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler); 
+			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
+			
+			_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
+		}
+		
+		protected function removedFromStageHandler(event:Event):void {
+			//remove event listeners
+			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			eventDispatcher.removeEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
 		}
 		
 		protected function initContextMenu():void {

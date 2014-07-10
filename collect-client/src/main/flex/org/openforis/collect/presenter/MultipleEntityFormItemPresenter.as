@@ -50,6 +50,11 @@ package org.openforis.collect.presenter
 			view.addSection.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
 		}
 		
+		override protected function removeEventListeners():void {
+			super.removeEventListeners();
+			eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
+		}
+		
 		private function get view():MultipleEntityFormItem {
 			return MultipleEntityFormItem(_view);
 		}

@@ -1,5 +1,7 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.Event;
+	
 	import mx.binding.utils.ChangeWatcher;
 	import mx.events.PropertyChangeEvent;
 	import mx.rpc.AsyncResponder;
@@ -73,6 +75,18 @@ package org.openforis.collect.presenter
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
+			
+			_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
+		}
+		
+		protected function removedFromStageHandler(event:Event):void {
+			removeEventListeners();
+		}
+		
+		protected function removeEventListeners():void {
+			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			eventDispatcher.removeEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
+			eventDispatcher.removeEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
