@@ -86,8 +86,7 @@
 					</s:DataGrid>
 					
 					<datagrid:PaginationBar id="paginationBar" 
-											height="16"
-											horizontalCenter="0"
+											width="80%"
 											/>
 				</s:VGroup>
 				

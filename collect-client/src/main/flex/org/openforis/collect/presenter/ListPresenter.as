@@ -249,7 +249,7 @@ package org.openforis.collect.presenter {
 				openFilterPopUp();
 			} else {
 				resetCurrentFilter();
-				loadRecordSummaries();
+				loadRecordSummaries(0, _view.paginationBar.maxRecordsPerPage);
 			}
 		}
 		
@@ -301,7 +301,7 @@ package org.openforis.collect.presenter {
 			var oldFilter:Array = currentKeyValuesFilter;
 			currentKeyValuesFilter = null;
 			if(oldFilter != null) {
-				loadRecordSummaries();
+				loadRecordSummaries(0, _view.paginationBar.maxRecordsPerPage);
 			}
 			closeFilterPopUp();
 		}
@@ -321,7 +321,7 @@ package org.openforis.collect.presenter {
 			} else {
 				currentKeyValuesFilter = null;
 			}
-			loadRecordSummaries();
+			loadRecordSummaries(0, _view.paginationBar.maxRecordsPerPage);
 			closeFilterPopUp();
 		}
 		
@@ -336,7 +336,7 @@ package org.openforis.collect.presenter {
 			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
 			_view.titleLabel.text = Message.get("list.title", [surveyProjectName, rootEntityLabel]);
 			updateDataGrid();
-			loadRecordSummaries();
+			loadRecordSummaries(0, _view.paginationBar.maxRecordsPerPage);
 		}
 		
 		protected function reloadRecordSummariesHandler(event:UIEvent):void {
@@ -344,7 +344,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function reloadRecordSummaries():void {
-			loadRecordSummaries(_view.paginationBar.offset);
+			loadRecordSummaries(_view.paginationBar.offset, _view.paginationBar.maxRecordsPerPage);
 		}
 		
 		protected function resetCurrentFilter():void {
@@ -358,7 +358,7 @@ package org.openforis.collect.presenter {
 			_view.dataGrid.columns = columns;
 		}
 		
-		protected function loadRecordSummaries(offset:int = 0):void {
+		protected function loadRecordSummaries(offset:int = 0, recordsPerPage:int = MAX_RECORDS_PER_PAGE):void {
 			if ( offset == 0 ) {
 				_view.paginationBar.showPage(1);
 			}
@@ -369,9 +369,9 @@ package org.openforis.collect.presenter {
 			
 			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
 			var rootEntityName:String = Application.activeRootEntity.name;
-			
+
 			_dataClient.loadRecordSummaries(responder, rootEntityName, 
-				offset, MAX_RECORDS_PER_PAGE, currentSortFields, currentKeyValuesFilter);
+				offset, recordsPerPage, currentSortFields, currentKeyValuesFilter);
 		}
 		
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
@@ -393,7 +393,7 @@ package org.openforis.collect.presenter {
 		}
 
 		protected function summaryPageChangeHandler(event:PaginationBarEvent):void {
-			loadRecordSummaries(event.offset);
+			loadRecordSummaries(event.offset, event.recordsPerPage);
 		}
 		
 		protected function dataGridSortChangingHandler(event:GridSortEvent):void {

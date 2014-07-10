@@ -45,7 +45,7 @@ package org.openforis.collect.client {
 			this._saveActiveRecordOperation = getOperation("saveActiveRecord");
 			this._createRecordOperation = getOperation("createRecord");
 			this._deleteRecordOperation = getOperation("deleteRecord");
-			this._loadRecordSummariesOperation = getOperation("loadRecordSummaries");
+			this._loadRecordSummariesOperation = getOperation("loadRecordSummaries", CONCURRENCY_LAST);
 			this._loadRecordOperation = getOperation("loadRecord");
 			this._promoteToCleansingOperation = getOperation("promoteToCleansing");
 			this._promoteToAnalysisOperation = getOperation("promoteToAnalysis");

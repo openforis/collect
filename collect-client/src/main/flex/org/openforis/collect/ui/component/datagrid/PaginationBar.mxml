@@ -4,14 +4,22 @@
 		 xmlns:mx="library://ns.adobe.com/flex/mx">
 	
 	<s:layout>
-		<s:HorizontalLayout verticalAlign="middle" gap="10"/>
+		<s:HorizontalLayout />
 	</s:layout>
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayList;
+			
+			import org.openforis.collect.util.AlertUtil;
+			
+			import mx.events.FlexEvent;
+			
 			import org.openforis.collect.event.PaginationBarEvent;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.ui.Images;
+			
+			import spark.events.IndexChangeEvent;
 			
 			public static const LOADING_STATE:String = "loading";
 			public static const NO_PAGES_STATE:String = "noPages";
@@ -55,6 +63,7 @@
 				var evt:PaginationBarEvent = new PaginationBarEvent(PaginationBarEvent.PAGE_CHANGE);
 				evt.currentPage = _currentPage;
 				evt.offset = offset;
+				evt.recordsPerPage = maxRecordsPerPage;
 				dispatchEvent(evt);
 			}
 			
@@ -82,22 +91,51 @@
 				currentPage = totalPages;
 			}
 			
-			protected function goToPageClickHandler(event:Event):void {
-				//currentPage = _view.paginationBar.goToPageStepper.value;
+			protected function currentPageTextValueCommitHandler(event:FlexEvent):void {
+				var text:String = currentPageTextField.text;
+				var pagNum:Number = Number(text);
+				if ( pagNum > _totalPages ) {
+					pagNum = _totalPages;
+				}
+				if ( pagNum != _currentPage ) {
+					currentPage = pagNum;
+				}
 			}
 			
+			protected function recordsPerPageChangeHandler(event:Event):void {
+				maxRecordsPerPage = recordPerPageDropDown.selectedItem;
+				
+				updateTotalPages();
+				if ( currentPage > _totalPages ) {
+					currentPage = _totalPages;
+				}
+				updateView();
+				dispatchPageChangeEvent();
+			}
+			
+			[Bindable("totalRecordsChange")]
 			public function get totalRecords():int {
 				return _totalRecords;
 			}
 
 			public function set totalRecords(value:int):void {
 				_totalRecords = value;
-				_totalPages = Math.ceil(_totalRecords / _maxRecordsPerPage);
+				updateTotalPages();
 				updateView();
+				dispatchEvent(new Event("totalRecordsChange"));
+			}
+			
+			protected function updateTotalPages():void {
+				totalPages = Math.ceil(_totalRecords / _maxRecordsPerPage);
 			}
 
+			[Bindable]
 			public function get totalPages():int {
 				return _totalPages;
+			}
+			
+			public function set totalPages(value:int):void {
+				_totalPages = value;
 			}
 
 			[Bindable(event="currentPageChange")]
@@ -116,6 +154,7 @@
 				return _currentPage >=0 ? _currentPage.toString(): '';
 			}
 			
+			[Bindable]
 			public function get maxRecordsPerPage():int {
 				return _maxRecordsPerPage;
 			}
@@ -124,7 +163,6 @@
 				_maxRecordsPerPage = value;
 			}
 
-			
 		]]>
 	</fx:Script>
 	
@@ -142,63 +180,96 @@
 	</s:states>
 	
 	<!-- TODO change Image in Button and use skin to apply image background -->
-	<s:Image 
-			id="firstPageButton" 
-			source="{Images.FIRST}" 
-			toolTip="{Message.get('list.first')}" 
-			width="16" 
-			height="16" 
-			useHandCursor="true" 
-			buttonMode="true"
-			enabled.inactive="false" 
-			enabled.firstPage="false" 
-			click="firstPageClickHandler(event)"
-			/>
 	
-	<s:Image 
-			id="previousPageButton" 
-			source="{Images.PREV}" 
-			toolTip="{Message.get('list.previous')}" 
-			width="16" 
-			height="16" 
-			useHandCursor="true" 
-			buttonMode="true"
-			enabled.inactive="false" 
-			enabled.firstPage="false" 
-			click="previousPageClickHandler(event)"
-			/>
+	<s:HGroup width="50%" verticalAlign="middle">
+		
+	</s:HGroup>
 	
-	<mx:Text 
-			fontSize="12" 
-			fontWeight="bold" 
-			id="currentPageTextField" 
-			text="{currentPageText}"
-			/>
+	<s:HGroup gap="10" verticalAlign="middle">
+		<s:Image 
+				id="firstPageButton" 
+				source="{Images.FIRST}" 
+				toolTip="{Message.get('list.first')}" 
+				width="16" 
+				height="16" 
+				useHandCursor="true" 
+				buttonMode="true"
+				enabled.inactive="false" 
+				enabled.firstPage="false" 
+				click="firstPageClickHandler(event)"
+				/>
+		
+		<s:Image 
+				id="previousPageButton" 
+				source="{Images.PREV}" 
+				toolTip="{Message.get('list.previous')}" 
+				width="16" 
+				height="16" 
+				useHandCursor="true" 
+				buttonMode="true"
+				enabled.inactive="false" 
+				enabled.firstPage="false" 
+				click="previousPageClickHandler(event)"
+				/>
+		
+		<s:Label text="{Message.get('list.page')}:" />
+		
+		<s:TextInput 
+				fontSize="12" 
+				fontWeight="bold" 
+				id="currentPageTextField" 
+				text="{currentPageText}"
+				restrict="[0-9]"
+				width="30"
+				textAlign="right"
+				enabled.inactive="false" 
+				valueCommit="currentPageTextValueCommitHandler(event)"
+				/>
+		
+		<mx:Text text="/ {totalPages}" />
+		
+		<s:Image 
+				id="nextPageButton" 
+				source="{Images.NEXT}" 
+				toolTip="{Message.get('list.next')}" 
+				width="16" 
+				height="16" 
+				useHandCursor="true" 
+				buttonMode="true"
+				enabled.inactive="false" 
+				enabled.lastPage="false" 
+				click="nextPageClickHandler(event)"
+				/>
+		
+		<s:Image 
+				id="lastPageButton" 
+				 source="{Images.LAST}" 
+				 toolTip="{Message.get('list.last')}" 
+				 width="16" 
+				 height="16" 
+				 useHandCursor="true" 
+				 buttonMode="true"
+				 enabled.inactive="false" 
+				 enabled.lastPage="false"
+				 click="lastPageClickHandler(event)"
+				 />
+	</s:HGroup>
 	
-	<s:Image 
-			id="nextPageButton" 
-			source="{Images.NEXT}" 
-			toolTip="{Message.get('list.next')}" 
-			width="16" 
-			height="16" 
-			useHandCursor="true" 
-			buttonMode="true"
-			enabled.inactive="false" 
-			enabled.lastPage="false" 
-			click="nextPageClickHandler(event)"
-			/>
-	
-	<s:Image 
-			id="lastPageButton" 
-			 source="{Images.LAST}" 
-			 toolTip="{Message.get('list.last')}" 
-			 width="16" 
-			 height="16" 
-			 useHandCursor="true" 
-			 buttonMode="true"
-			 enabled.inactive="false" 
-			 enabled.lastPage="false"
-			 click="lastPageClickHandler(event)"
-			 />
+	<s:HGroup width="50%" 
+			  gap="20" 
+			  verticalAlign="middle" horizontalAlign="right">
+		<s:HGroup verticalAlign="middle">
+			<s:Label text="{Message.get('Records per page')}:" />
+			<s:DropDownList id="recordPerPageDropDown" 
+							dataProvider="{new ArrayList([10, 20, 50])}" 
+							width="50"
+							selectedItem="{maxRecordsPerPage}"
+							change="recordsPerPageChangeHandler(event)"/>
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle">
+			<s:Label text="{Message.get('list.totalRecords')}:" />
+			<mx:Text text="{totalRecords}" />
+		</s:HGroup>
+	</s:HGroup>
 	
 </s:Group>

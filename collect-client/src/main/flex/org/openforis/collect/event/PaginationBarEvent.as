@@ -13,6 +13,7 @@ package org.openforis.collect.event
 		
 		private var _currentPage:int;
 		private var _offset:int;
+		private var _recordsPerPage:int;
 		
 		public function PaginationBarEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
 			super(type, bubbles, cancelable);
@@ -32,6 +33,14 @@ package org.openforis.collect.event
 
 		public function set offset(value:int):void {
 			_offset = value;
+		}
+
+		public function get recordsPerPage():int {
+			return _recordsPerPage;
+		}
+		
+		public function set recordsPerPage(value:int):void {
+			_recordsPerPage = value;
 		}
 
 

@@ -78,12 +78,9 @@
 										selectionMode="singleRow" 
 										/>
 		
-		<s:Group width="100%">
-			<datagrid:PaginationBar id="paginationBar" 
-									height="16"
-									horizontalCenter="0"
-									/>
-		</s:Group>
+		<datagrid:PaginationBar id="paginationBar" 
+								width="100%"
+								/>
 		
 		<s:Group width="100%" id="bottomBar">
 			<s:HGroup id="controlsBar" horizontalCenter="0" verticalCenter="0" 

@@ -107,20 +107,20 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function summaryPageChangeHandler(event:PaginationBarEvent):void {
-			loadSummaries(event.offset);
+			loadSummaries(event.offset, event.recordsPerPage);
 		}
 		
-		protected function loadSummaries(offset:int = 0):void {
+		protected function loadSummaries(offset:int = 0, recordsPerPage:int = MAX_SUMMARIES_PER_PAGE):void {
 			if ( offset == 0 ) {
 				_view.paginationBar.showPage(1);
 			}
 			_view.summaryDataGrid.dataProvider = null;
 			
 			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
-			performSummariesLoad(offset);
+			performSummariesLoad(offset, recordsPerPage);
 		}
 		
-		protected function performSummariesLoad(offset:int = 0):void {
+		protected function performSummariesLoad(offset:int = 0, recordsPerPage:int = MAX_SUMMARIES_PER_PAGE):void {
 			//to be implemented in sub-classes
 		}
 		
@@ -333,7 +333,7 @@ package org.openforis.collect.presenter {
 		protected function updateViewProcessComplete():void {
 			AlertUtil.showMessage(_messageKeys.COMPLETED, [_state.processed, _state.total]);
 			backToDefaultView();
-			loadSummaries();
+			loadSummaries(0, _view.paginationBar.maxRecordsPerPage);
 		}
 		
 		protected function updateProgressBar(progressLabelResource:String):void {

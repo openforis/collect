@@ -139,12 +139,12 @@ package org.openforis.collect.presenter {
 			loadSummaries();
 		}
 		
-		override protected function performSummariesLoad(offset:int = 0):void {
+		override protected function performSummariesLoad(offset:int = 0, recordsPerPage:int = MAX_SUMMARIES_PER_PAGE):void {
 			var surveyId:int = view.surveyId;
 			var taxonomyId:int = _selectedTaxonomy.id;
 			var work:Boolean = view.work;
 			var responder:IResponder = new AsyncResponder(loadSummariesResultHandler, faultHandler);
-			_speciesClient.loadTaxonSummaries(responder, taxonomyId, offset, MAX_SUMMARIES_PER_PAGE);
+			_speciesClient.loadTaxonSummaries(responder, taxonomyId, offset, recordsPerPage);
 		}
 		
 		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {

@@ -68,14 +68,14 @@ package org.openforis.collect.presenter
 			}
 		}
 
-		override protected function performSummariesLoad(offset:int = 0):void {
+		override protected function performSummariesLoad(offset:int = 0, recordsPerPage:int = MAX_SUMMARIES_PER_PAGE):void {
 			var surveyId:int = view.surveyId;
 			var work:Boolean = view.work;
 			var responder:IResponder = new AsyncResponder(loadSummariesResultHandler, faultHandler);
 			if ( work ) {
-				_samplingDesignClient.loadBySurveyWork(responder, surveyId, offset, MAX_SUMMARIES_PER_PAGE);
+				_samplingDesignClient.loadBySurveyWork(responder, surveyId, offset, recordsPerPage);
 			} else {
-				_samplingDesignClient.loadBySurvey(responder, surveyId, offset, MAX_SUMMARIES_PER_PAGE);
+				_samplingDesignClient.loadBySurvey(responder, surveyId, offset, recordsPerPage);
 			}
 		}
 		
