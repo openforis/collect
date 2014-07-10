@@ -1,7 +1,9 @@
 package org.openforis.collect.io.metadata;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.model.CollectSurvey;
@@ -11,8 +13,8 @@ import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.metamodel.Schema;
 
 /**
  * 
@@ -36,9 +38,9 @@ public class SchemaSummaryCSVExportJob extends Job {
 			@Override
 			protected void execute() throws Throwable {
 				FileOutputStream out = new FileOutputStream(outputFile);
-				final CsvWriter csvWriter = new CsvWriter(out);
+				final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(new OutputStreamWriter(out)), ',', '"');
 				try {
-					csvWriter.writeHeaders(new String[] {"id", "path", "name", "type", "label"});
+					csvWriter.writeHeaders(new String[] {"id", "path", "type", "label"});
 					
 					Schema schema = survey.getSchema();
 					schema.traverse(new NodeDefinitionVisitor() {
@@ -47,7 +49,6 @@ public class SchemaSummaryCSVExportJob extends Job {
 							csvWriter.writeNext(new String[] {
 									Integer.toString(nodeDefn.getId()), 
 									nodeDefn.getPath(),
-									nodeDefn.getName(),
 									nodeDefn instanceof EntityDefinition ? "entity": "attribute",
 									nodeDefn.getLabel(Type.INSTANCE)
 								});
