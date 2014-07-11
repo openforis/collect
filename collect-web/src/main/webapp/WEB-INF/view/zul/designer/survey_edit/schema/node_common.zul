@@ -69,7 +69,7 @@
 	  			</fieldErrorHandler>
   				<fieldErrorHandler
   					message="@load(vmsgs['requiredExpression'])">
-  					<textbox width="150px"
+  					<textbox width="250px"
   						value="@bind(fx.requiredExpression)"
   						onChange="@command('applyChanges')" />
   				</fieldErrorHandler>
@@ -94,14 +94,18 @@
   						onChange="@command('applyChanges')" />
   				</fieldErrorHandler>
   			</row>
-  			<row visible="@load(not vm.rootEntity and not vm.calculatedAttribute)">
+  			<row visible="@load(not vm.rootEntity)">
   				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
 	  				<label value="${labels.survey.schema.node.relevant_expression}:" />
 	  			</fieldErrorHandler>
   				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
-  					<textbox width="150px"
+  					<textbox width="250px"
   						value="@bind(fx.relevantExpression)"
   						onChange="@command('applyChanges')" />
+  					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />  					
+  					<checkbox
+  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
+  						onCheck="@command('applyChanges')" />
   				</fieldErrorHandler>
   			</row>
   		</rows>
@@ -130,7 +134,7 @@
       			</fieldErrorHandler>
       			<fieldErrorHandler
       				message="@load(vmsgs['instanceLabel'])">
-      				<textbox width="150px"
+      				<textbox width="250px"
       					value="@bind(fx.instanceLabel)"
       					onChange="@command('applyChanges')" />
       			</fieldErrorHandler>
@@ -145,7 +149,7 @@
       			</fieldErrorHandler>
       			<fieldErrorHandler
       				message="@load(vmsgs['headingLabel'])">
-      				<textbox width="150px"
+      				<textbox width="250px"
       					value="@bind(fx.headingLabel)"
       					onChange="@command('applyChanges')" />
       			</fieldErrorHandler>
@@ -160,7 +164,7 @@
       			</fieldErrorHandler>
       			<fieldErrorHandler
       				message="@load(vmsgs['numberLabel'])">
-      				<textbox width="150px"
+      				<textbox width="250px"
       					value="@bind(fx.numberLabel)"
       					onChange="@command('applyChanges')" />
       			</fieldErrorHandler>
@@ -209,7 +213,7 @@
 	                </fieldErrorHandler>
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['interviewPromptLabel'])">
-	                	<textbox width="150px"
+	                	<textbox width="250px"
 	                		value="@bind(fx.interviewPromptLabel)"
 	                		onChange="@command('applyChanges')" />
 	                </fieldErrorHandler>
@@ -224,7 +228,7 @@
         		    </fieldErrorHandler>
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['paperPromptLabel'])">
-	                	<textbox width="150px"
+	                	<textbox width="250px"
 	                		value="@bind(fx.paperPromptLabel)"
 	                		onChange="@command('applyChanges')" />
 	                </fieldErrorHandler>
@@ -239,7 +243,7 @@
       				</fieldErrorHandler>
       				<fieldErrorHandler
       					message="@load(vmsgs['handheldPromptLabel'])">
-      					<textbox width="150px"
+      					<textbox width="250px"
       						value="@bind(fx.handheldPromptLabel)"
       						onChange="@command('applyChanges')" />
       				</fieldErrorHandler>
@@ -252,7 +256,7 @@
                       		languageCode="@load(vm.currentLanguageCode)" />
                     </fieldErrorHandler>
       				<fieldErrorHandler message="@load(vmsgs['pcPromptLabel'])">
-                      	<textbox width="150px" value="@bind(fx.pcPromptLabel)" 
+                      	<textbox width="250px" value="@bind(fx.pcPromptLabel)" 
                                 onChange="@command('applyChanges')" />
                     </fieldErrorHandler>
       			</row>

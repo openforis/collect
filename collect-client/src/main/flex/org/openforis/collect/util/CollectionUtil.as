@@ -2,6 +2,7 @@ package org.openforis.collect.util
 {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.utils.ObjectUtil;
 	
 	import org.granite.collections.IMap;
 
@@ -26,9 +27,15 @@ package org.openforis.collect.util
 			}
 		}
 		
+		public static function fill(list:IList, value:Object, size:int):void {
+			for ( var count:int = 0; count < size; count ++ ) {
+				list.addItem(mx.utils.ObjectUtil.clone(value));
+			}
+		}
+		
 		public static function getItem(list:IList, propertyName:String, value:Object):* {
 			for each(var item:Object in list) {
-				if(ObjectUtil.getValue(item, propertyName) == value) {
+				if(org.openforis.collect.util.ObjectUtil.getValue(item, propertyName) == value) {
 					return item;
 				}
 			}
@@ -38,7 +45,7 @@ package org.openforis.collect.util
 		public static function getItemIndex(list:IList, propertyName:String, value:Object):int {
 			for(var index:int = 0; index < list.length; index ++) {
 				var item:Object = list.getItemAt(index);
-				if(ObjectUtil.getValue(item, propertyName) == value) {
+				if(org.openforis.collect.util.ObjectUtil.getValue(item, propertyName) == value) {
 					return index;
 				}
 			}
@@ -63,7 +70,7 @@ package org.openforis.collect.util
 				var idx:int = list.getItemIndex(item);
 				return idx >= 0;
 			} else {
-				var keyValue:* = ObjectUtil.getValue(item, keyProperty);
+				var keyValue:* = org.openforis.collect.util.ObjectUtil.getValue(item, keyProperty);
 				if ( keyValue != null ) {
 					var item:Object = getItem(list, keyProperty, keyValue);
 					return item != null;

@@ -6,8 +6,10 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.util.MathUtil;
 
@@ -106,6 +108,23 @@ package org.openforis.collect.model.proxy {
 			return null;
 		}
 		
+		public function get cousins():IList {
+			var nearestMultipleEntity:EntityProxy = getParentMultipleEntity();
+			var result:IList = nearestMultipleEntity.getDescendantCousins(definition);
+			return result;
+		}
+		
+		public function get allCousinsNotRelevant():Boolean {
+			var allNotRelevant:Boolean = true;
+			for each (var cousin:NodeProxy in cousins) {
+				if ( ! cousin.relevant ) {
+					allNotRelevant = false;
+					break;
+				}
+			}
+			return allNotRelevant;
+		}
+		
 		public function getSiblings():IList {
 			if ( parent != null ) {
 				var result:IList = parent.getChildren(name);
@@ -115,9 +134,14 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 
-		public function getIndex():Boolean {
+		public function getIndex():int {
 			var siblings:IList = getSiblings();
 			var result:int = siblings.getItemIndex(this);
+			return result;
+		}
+		
+		public function get relevant():Boolean {
+			var result:Boolean = parent.childrenRelevanceMap.get(name);
 			return result;
 		}
 		

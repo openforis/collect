@@ -130,13 +130,35 @@ package org.openforis.collect.metamodel.proxy {
 			return parentEntity;
 		}
 		
-		[Bindable]
+		public function isDescendantOf(entityDefn:EntityDefinitionProxy):Boolean {
+			var parentEntity:EntityDefinitionProxy = this.parent;
+			while ( parentEntity != null ) {
+				if ( parentEntity.id == entityDefn.id ) {
+					return true;
+				}
+				parentEntity = parentEntity.parent;
+			}
+			return false;
+		}
+		
+		[Bindable(event="unused")]
 		public function get parentLayout():String {
 			if(parent != null) {
 				return parent.layout;
 			} else {
 				return UIUtil.LAYOUT_FORM;
 			}
+		}
+		
+		public function get nearestParentMultipleEntity():EntityDefinitionProxy {
+			var parentEntity:EntityDefinitionProxy = this.parent;
+			while ( parentEntity != null ) {
+				if ( parentEntity.multiple ) {
+					return parentEntity;
+				}
+				parentEntity = parentEntity.parent;
+			}
+			return null;
 		}
 		
 		public function get survey():SurveyProxy {
