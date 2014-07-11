@@ -8,8 +8,8 @@ import java.util.List;
 
 import org.openforis.collect.Proxy;
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.NodeUpdateRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequestSet;
@@ -23,7 +23,7 @@ public class NodeUpdateRequestSetProxy implements Proxy {
 	private List<NodeUpdateRequestProxy<?>> requests;
 	private boolean autoSave;
 
-	public NodeUpdateRequestSet toNodeUpdateRequestSet(CodeListManager codeListManager, RecordFileManager fileManager,
+	public NodeUpdateRequestSet toNodeUpdateRequestSet(CodeListManager codeListManager, SessionRecordFileManager fileManager,
 			SessionManager sessionManager, CollectRecord record) {
 		NodeUpdateRequestSet result = new NodeUpdateRequestSet();
 		List<NodeUpdateRequest> convertedOptions = new ArrayList<NodeUpdateRequest>();

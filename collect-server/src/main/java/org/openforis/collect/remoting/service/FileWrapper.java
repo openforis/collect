@@ -9,24 +9,16 @@ package org.openforis.collect.remoting.service;
  */
 public class FileWrapper {
 	
-	private String fileName;
-	private byte[] data;
+	private String filePath;
+	private String originalFileName;
 	private String contentType;
 
-	public byte[] getData() {
-		return data;
+	public String getFilePath() {
+		return filePath;
 	}
-
-	public void setData(byte[] data) {
-		this.data = data;
-	}
-
-	public String getFileName() {
-		return fileName;
-	}
-
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
+	
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
 	}
 	
 	public String getContentType() {
@@ -35,5 +27,13 @@ public class FileWrapper {
 	
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
+	}
+
+	public String getOriginalFileName() {
+		return originalFileName;
+	}
+
+	public void setOriginalFileName(String originalFileName) {
+		this.originalFileName = originalFileName;
 	}
 }

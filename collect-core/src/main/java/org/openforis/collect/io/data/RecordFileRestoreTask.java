@@ -14,6 +14,7 @@ import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -36,6 +37,7 @@ public class RecordFileRestoreTask extends Task {
 	//managers
 	private RecordManager recordManager;
 	private RecordFileManager recordFileManager;
+	private SessionRecordFileManager sessionRecordFileManager;
 	
 	//input
 	private ZipFile zipFile;
@@ -108,19 +110,18 @@ public class RecordFileRestoreTask extends Task {
 	}
 	
 	private void importRecordFiles(CollectRecord record) throws IOException, RecordPersistenceException {
-		recordFileManager.resetTempInfo();
+		sessionRecordFileManager.resetTempInfo();
 		recordFileManager.deleteAllFiles(record);
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
-		String sessionId = "admindataimport";
 		for (FileAttribute fileAttribute : fileAttributes) {
 			String recordFileEntryName = RecordFileBackupTask.calculateRecordFileEntryName(fileAttribute);
 			InputStream is = backupFileExtractor.findEntryInputStream(recordFileEntryName);
 			if ( is != null ) {
-				recordFileManager.saveToTempFolder(is, fileAttribute.getFilename(), 
-						sessionId, record, fileAttribute.getInternalId());
+				sessionRecordFileManager.saveToTempFile(is, fileAttribute.getFilename(), 
+						record, fileAttribute.getInternalId());
 			}
 		}
-		if ( recordFileManager.commitChanges(sessionId, record) ) {
+		if ( sessionRecordFileManager.commitChanges(record) ) {
 			if ( record.getStep() == Step.ANALYSIS ) {
 				record.setStep(Step.CLEANSING);
 				recordManager.save(record);

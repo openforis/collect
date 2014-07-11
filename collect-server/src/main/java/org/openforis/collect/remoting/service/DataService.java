@@ -19,6 +19,7 @@ import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -74,6 +75,8 @@ public class DataService {
 	@Autowired
 	private transient RecordFileManager fileManager;
 	@Autowired
+	private transient SessionRecordFileManager sessionFileManager;
+	@Autowired
 	private transient RecordIndexService recordIndexService;
 
 	/**
@@ -93,7 +96,7 @@ public class DataService {
 		Step step = stepNumber == null ? null: Step.valueOf(stepNumber);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
-		fileManager.resetTempInfo();
+		sessionFileManager.resetTempInfo();
 		prepareRecordIndexing();
 		Locale locale = sessionState.getLocale();
 		return new RecordProxy(record, locale);
@@ -188,7 +191,7 @@ public class DataService {
 		record.setOwner(user);
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
-		if ( fileManager.commitChanges(sessionId, record) ) {
+		if ( sessionFileManager.commitChanges(record) ) {
 			recordManager.save(record, sessionId);
 		}
 		if ( isCurrentRecordIndexable() ) {
@@ -201,7 +204,7 @@ public class DataService {
 	public NodeChangeSetProxy updateActiveRecord(NodeUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		CollectRecord activeRecord = getActiveRecord();
-		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateRequestSet(codeListManager, fileManager, sessionManager, activeRecord);
+		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateRequestSet(codeListManager, sessionFileManager, sessionManager, activeRecord);
 		NodeChangeSet changeSet = updateRecord(activeRecord, reqSet);
 		if ( ! changeSet.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);

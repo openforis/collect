@@ -4,8 +4,8 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.NodeUpdateRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
@@ -25,7 +25,7 @@ public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public AttributeUpdateRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, RecordFileManager fileManager, 
+	public AttributeUpdateRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, SessionRecordFileManager fileManager, 
 			SessionManager sessionManager, CollectRecord record) {
 		AttributeUpdateRequest<Value> opts = new NodeUpdateRequest.AttributeUpdateRequest<Value>();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
@@ -33,12 +33,12 @@ public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy
 		Value parsedValue;
 		if ( attribute instanceof FileAttribute ) {
 			parsedValue = parseFileAttributeValue(fileManager, record, sessionManager, nodeId, value);
-		} else if ( value != null ) {
+		} else if ( value == null ) {
+			parsedValue = null;
+		} else {
 			Entity parentEntity = attribute.getParent();
 			String attributeName = attribute.getName();
 			parsedValue = parseCompositeAttributeValue(codeListManager, parentEntity, attributeName, value);
-		} else {
-			parsedValue = null;
 		}
 		opts.setValue(parsedValue);
 		opts.setSymbol(symbol);

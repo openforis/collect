@@ -52,7 +52,7 @@ package org.openforis.collect.presenter
 		
 		override protected function removeEventListeners():void {
 			super.removeEventListeners();
-			eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
+			//eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
 		private function get view():MultipleEntityFormItem {

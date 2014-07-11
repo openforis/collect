@@ -4,13 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.io.FileUtils;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.web.controller.upload.UploadItem;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,11 +30,12 @@ public class FileUploadController {
 	public static final String TEMP_PATH = "temp";
 
 	@RequestMapping(value = "/uploadFile.htm", method = RequestMethod.POST)
-	public @ResponseBody String uploadData(UploadItem uploadItem, BindingResult result, HttpServletRequest request) 
+	public @ResponseBody String uploadFile(UploadItem uploadItem) 
 			throws IOException, SurveyImportException {
-		File file = File.createTempFile("collect_", uploadItem.getName());
-		
 		CommonsMultipartFile fileData = uploadItem.getFileData();
+
+		File file = File.createTempFile("collect_", fileData.getOriginalFilename());
+		
 		InputStream is = fileData.getInputStream();
 
 		FileUtils.copyInputStreamToFile(is, file);

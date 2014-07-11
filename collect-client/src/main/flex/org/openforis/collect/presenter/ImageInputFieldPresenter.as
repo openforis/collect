@@ -39,13 +39,13 @@ package org.openforis.collect.presenter
 		
 		override protected function updateView():void {
 			super.updateView();
-			
+		}
+		
+		override protected function updatePreview():void {
 			if ( _view.currentState == FileInputField.STATE_FILE_UPLOADED ) {
 				var imageDownloadUrlRequest:URLRequest = getDownloadUrlRequest();
 				_view.imagePreview.load(imageDownloadUrlRequest);
-			} else {
-				
-			}
+			}			
 		}
 		
 		protected function imagePreviewClickHandler(event:ImageLoaderEvent):void {

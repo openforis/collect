@@ -4,8 +4,8 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.NodeUpdateRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeAddRequest;
@@ -23,7 +23,7 @@ public class AttributeAddRequestProxy extends BaseAttributeUpdateRequestProxy<At
 	private String nodeName;
 	
 	@Override
-	public AttributeAddRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, RecordFileManager fileManager, 
+	public AttributeAddRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, SessionRecordFileManager fileManager, 
 			SessionManager sessionManager, CollectRecord record) {
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
 		AttributeAddRequest<Value> result = new NodeUpdateRequest.AttributeAddRequest<Value>();

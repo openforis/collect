@@ -1,6 +1,7 @@
 package org.openforis.collect.web.controller;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,15 +9,20 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.manager.RecordFileManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.web.controller.upload.UploadItem;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 
 /**
  * 
@@ -24,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  *
  */
 @Controller
-@Scope("session")
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class RecordFileController extends BasicController implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
@@ -32,14 +38,13 @@ public class RecordFileController extends BasicController implements Serializabl
 	private static Log LOG = LogFactory.getLog(RecordFileController.class);
 	
 	@Autowired
-	private RecordFileManager fileManager;
+	private SessionRecordFileManager fileManager;
 	
 	@RequestMapping(value = "/downloadRecordFile.htm", method = RequestMethod.POST)
 	public void download(HttpServletRequest request, HttpServletResponse response, @RequestParam("nodeId") Integer nodeId) throws Exception {
 		SessionState sessionState = getSessionState(request);
-		String sessionId = sessionState.getSessionId();
 		CollectRecord record = sessionState.getActiveRecord();
-		File file = fileManager.getFile(sessionId, record, nodeId);
+		File file = fileManager.getFile(record, nodeId);
 		if(file != null && file.exists()) {
 			writeFileToResponse(response, file);
 		} else {
@@ -50,4 +55,5 @@ public class RecordFileController extends BasicController implements Serializabl
 			throw e;
 		}
 	}
+	
 }

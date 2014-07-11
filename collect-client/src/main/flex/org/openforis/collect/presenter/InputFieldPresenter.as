@@ -101,8 +101,8 @@ package org.openforis.collect.presenter {
 		
 		protected function removedFromStageHandler(event:Event):void {
 			//remove event listeners
-			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
-			eventDispatcher.removeEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
+			//eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			//eventDispatcher.removeEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
 		}
 		
 		protected function initContextMenu():void {

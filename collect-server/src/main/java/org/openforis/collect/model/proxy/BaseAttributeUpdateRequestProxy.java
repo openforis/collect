@@ -4,14 +4,12 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.manager.exception.RecordFileException;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.remoting.service.FileWrapper;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.BaseAttributeUpdateRequest;
-import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -44,27 +42,23 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 		throw new UnsupportedOperationException();
 	}
 	
-	public abstract T toAttributeUpdateRequest(CodeListManager codeListManager, RecordFileManager fileManager, 
+	public abstract T toAttributeUpdateRequest(CodeListManager codeListManager, SessionRecordFileManager fileManager, 
 			SessionManager sessionManager, CollectRecord record);
 	
-	protected File parseFileAttributeValue(RecordFileManager fileManager, CollectRecord record,
+	protected File parseFileAttributeValue(SessionRecordFileManager fileManager, CollectRecord record,
 			SessionManager sessionManager, Integer nodeId, Object value) {
 		File result;
-		SessionState sessionState = sessionManager.getSessionState();
-		String sessionId = sessionState.getSessionId();
 		if ( value != null ) {
 			if ( value instanceof FileWrapper ) {
 				FileWrapper fileWrapper = (FileWrapper) value;
-				try {
-					result = fileManager.saveToTempFolder(fileWrapper.getData(), fileWrapper.getFileName(), sessionId, record, nodeId);
-				} catch (RecordFileException e) {
-					throw new RuntimeException("Error parsing saving temporary file", e);
-				}
+				java.io.File tempFile = new java.io.File(fileWrapper.getFilePath());
+				fileManager.indexTempFile(tempFile, nodeId);
+				result = new File(tempFile.getAbsolutePath(), tempFile.length());
 			} else {
 				throw new IllegalArgumentException("Invalid value type: expected byte[]");
 			}
 		} else {
-			fileManager.prepareDeleteFile(sessionId, record, nodeId);
+			fileManager.prepareDeleteFile(record, nodeId);
 			result = null;
 		}
 		return result;

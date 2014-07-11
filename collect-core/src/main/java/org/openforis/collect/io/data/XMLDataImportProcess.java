@@ -24,6 +24,7 @@ import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.io.exception.DataParsingExeption;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
@@ -54,9 +55,11 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  * @author S. Ricci
  * 
+ * @deprecated use {@link DataRestoreJob} instead.  
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Deprecated
 public class XMLDataImportProcess implements Callable<Void> {
 
 	private static Log LOG = LogFactory.getLog(XMLDataImportProcess.class);
@@ -65,6 +68,8 @@ public class XMLDataImportProcess implements Callable<Void> {
 	private RecordManager recordManager;
 	@Autowired
 	private RecordFileManager recordFileManager;
+	@Autowired
+	private SessionRecordFileManager sessionRecordFileManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -439,18 +444,18 @@ public class XMLDataImportProcess implements Callable<Void> {
 	}
 
 	private void importRecordFiles(ZipFile zipFile, CollectRecord record) throws IOException, RecordPersistenceException {
-		recordFileManager.resetTempInfo();
+		sessionRecordFileManager.resetTempInfo();
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		String sessionId = "admindataimport";
 		for (FileAttribute fileAttribute : fileAttributes) {
 			String recordFileEntryName = XMLDataExportProcess.calculateRecordFileEntryName(fileAttribute);
 			InputStream is = getEntryInputStream(zipFile, recordFileEntryName);
 			if ( is != null ) {
-				recordFileManager.saveToTempFolder(is, fileAttribute.getFilename(), 
-						sessionId, record, fileAttribute.getInternalId());
+				sessionRecordFileManager.saveToTempFile(is, fileAttribute.getFilename(), 
+						record, fileAttribute.getInternalId());
 			}
 		}
-		if ( recordFileManager.commitChanges(sessionId, record) ) {
+		if ( sessionRecordFileManager.commitChanges(record) ) {
 			if ( record.getStep() == Step.ANALYSIS ) {
 				record.setStep(Step.CLEANSING);
 				recordManager.save(record, sessionId);

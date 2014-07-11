@@ -41,7 +41,7 @@ public class SessionManager {
 	@Autowired
 	private transient RecordManager recordManager;
 	@Autowired
-	private transient RecordFileManager fileManager;
+	private transient SessionRecordFileManager fileManager;
 
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
@@ -209,8 +209,7 @@ public class SessionManager {
 		if ( activeRecord != null && activeRecord.getId() != null ) {
 			recordManager.releaseLock(activeRecord.getId());
 		}
-		String sessionId = sessionState.getSessionId();
-		fileManager.deleteAllTempFiles(sessionId);
+		fileManager.deleteAllTempFiles();
 		sessionState.setActiveRecord(null);
 	}
 	

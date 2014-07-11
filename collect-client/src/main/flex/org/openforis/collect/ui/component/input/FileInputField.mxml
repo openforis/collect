@@ -55,14 +55,15 @@
 		<s:State name="fileUploaded" />
 	</input:states>
 	
-	<mx:UIComponent id="previewContainer"
-					includeIn="fileUploaded"
-					itemCreationPolicy="immediate"
-					/>
+	<s:Label id="previewContainer"
+			includeIn="fileUploaded"
+			itemCreationPolicy="immediate"
+			/>
 	
-	<s:VGroup id="controlsContainer" 
+	<s:HGroup id="controlsContainer" 
 			  visible="{editable}" 
-			  includeInLayout="{editable}" gap="20">
+			  includeInLayout="{editable}" 
+			  gap="5">
 		
 		<s:Group excludeFrom="uploading"
 				 itemCreationPolicy="immediate"
@@ -87,14 +88,14 @@
 						itemCreationPolicy="immediate"
 						/>
 		
-		<s:VGroup id="fileUploadedControlsContainer" gap="20"
+		<s:HGroup id="fileUploadedControlsContainer" gap="20"
 				  includeIn="fileUploaded"
 				  itemCreationPolicy="immediate"
 				  horizontalAlign="center"
 				  width="100%">
 			<s:Button id="downloadButton" label="{Message.get('global.download')}" />
 			<s:Button id="removeButton" label="{Message.get('global.delete')}" />
-		</s:VGroup>
-	</s:VGroup>
+		</s:HGroup>
+	</s:HGroup>
 	
 </input:InputField>

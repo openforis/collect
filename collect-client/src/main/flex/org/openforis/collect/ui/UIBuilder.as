@@ -54,6 +54,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CoordinateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
+	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.ImageInputField;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -360,8 +361,11 @@ package org.openforis.collect.ui {
 					inputField = new CodeInputField();
 				}
 			} else if(def is FileAttributeDefinitionProxy) {
-				//TODO use different input fields for text and image files
-				inputField = new ImageInputField();
+				if ( FileAttributeDefinitionProxy(def).imageContent ) {
+					inputField = new ImageInputField();
+				} else {
+					inputField = new FileInputField();
+				}
 			} else if(def is NumberAttributeDefinitionProxy) {
 				var numberAttributeDefn:NumberAttributeDefinitionProxy = NumberAttributeDefinitionProxy(def);
 				if (numberAttributeDefn.integer) {

@@ -51,7 +51,7 @@
 						   maxHeight="100" maxWidth="150"
 						   />
 	
-	<s:VGroup id="controlsContainer" 
+	<s:HGroup id="controlsContainer" 
 			  visible="{editable}" 
 			  includeInLayout="{editable}" 
 			  gap="20">
@@ -78,14 +78,14 @@
 						itemCreationPolicy="immediate"
 						/>
 		
-		<s:VGroup id="fileUploadedControlsContainer" gap="20"
+		<s:HGroup id="fileUploadedControlsContainer" gap="20"
 				  includeIn="fileUploaded"
 				  itemCreationPolicy="immediate"
 				  width="100%"
 				  horizontalAlign="center">
 			<s:Button id="downloadButton" label="{Message.get('global.download')}" />
 			<s:Button id="removeButton" label="{Message.get('global.delete')}" />
-		</s:VGroup>
-	</s:VGroup>
+		</s:HGroup>
+	</s:HGroup>
 		
 </input:FileInputField>

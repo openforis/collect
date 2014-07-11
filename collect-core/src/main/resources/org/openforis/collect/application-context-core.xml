@@ -101,12 +101,14 @@
 	<bean id="persistedRecordIndexManager" class="org.openforis.collect.manager.RecordIndexManager"
 		init-method="init" lazy-init="false" autowire="byName" />
 	<bean id="recordFileManager" 		class="org.openforis.collect.manager.RecordFileManager" 
-		init-method="init" scope="session" />
+		init-method="init" />
 	<bean id="recordManager" 			class="org.openforis.collect.manager.RecordManager" 
 		init-method="init" />	
 	<bean id="recordIndexManager" 		class="org.openforis.collect.manager.RecordIndexManager" 
 		lazy-init="false" init-method="init" />
 	<bean id="samplingDesignManager"    class="org.openforis.collect.manager.SamplingDesignManager" />
+	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager" 
+		init-method="init" scope="session" />
   	<bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" 
 		init-method="init" />

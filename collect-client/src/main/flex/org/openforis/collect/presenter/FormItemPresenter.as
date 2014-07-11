@@ -84,9 +84,11 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function removeEventListeners():void {
+			/*
 			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.removeEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.removeEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
+			*/
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {

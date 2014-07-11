@@ -50,8 +50,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function removedFromStageHandler(event:Event):void {
-			eventDispatcher.removeEventListener(InputFieldEvent.FOCUS_IN, fieldFocusInHandler);
-			eventDispatcher.removeEventListener(InputFieldEvent.FOCUS_OUT, fieldFocusOutHandler);
+			//eventDispatcher.removeEventListener(InputFieldEvent.FOCUS_IN, fieldFocusInHandler);
+			//eventDispatcher.removeEventListener(InputFieldEvent.FOCUS_OUT, fieldFocusOutHandler);
 		}
 		
 		protected function dragAnchorMouseMoveHandler(event:MouseEvent):void {

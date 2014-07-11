@@ -36,11 +36,6 @@ package org.openforis.collect.presenter
 			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
-		override protected function removeEventListeners():void {
-			super.removeEventListeners();
-			eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
-		}
-		
 		private function get view():MultipleEntityAsTableFormItem {
 			return MultipleEntityAsTableFormItem(_view);
 		}

@@ -50,9 +50,6 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function removedFromStageHandler(event:Event):void {
-			eventDispatcher.removeEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
-			eventDispatcher.removeEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
-			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 		}
 		
 		protected function initValidationDisplayManager():void {
