@@ -232,7 +232,7 @@ package org.openforis.collect.presenter
 			updateStatus();
 		}
 		
-		override protected function loadSummaries(offset:int=0, recordsPerPage:int = 20):void {
+		override protected function loadSummaries():void {
 			//do nothing
 		}
 		

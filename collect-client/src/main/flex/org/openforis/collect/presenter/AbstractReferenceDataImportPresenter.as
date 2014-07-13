@@ -54,6 +54,9 @@ package org.openforis.collect.presenter {
 		protected var _firstOpen:Boolean;
 		protected var _fileFilter:FileFilter;
 		
+		protected var _recordsOffset:int;
+		protected var _recordsPerPage:int;
+		
 		public function AbstractReferenceDataImportPresenter(view:AbstractReferenceDataImportView, messageKeys:ReferenceDataImportMessageKeys) {
 			this._view = view;
 			this._messageKeys = messageKeys;
@@ -67,10 +70,13 @@ package org.openforis.collect.presenter {
 			
 			super();
 			
+			_recordsOffset = 0;
+			_recordsPerPage = MAX_SUMMARIES_PER_PAGE
 			//try to see if there is a still running process
+			
 			_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
 			if ( _view.paginationBar != null ) {
-				_view.paginationBar.maxRecordsPerPage = MAX_SUMMARIES_PER_PAGE;
+				_view.paginationBar.maxRecordsPerPage = _recordsPerPage;
 			}
 			loadInitialData();
 		}
@@ -107,17 +113,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function summaryPageChangeHandler(event:PaginationBarEvent):void {
-			loadSummaries(event.offset, event.recordsPerPage);
+			this._recordsOffset = event.offset;
+			this._recordsPerPage = event.recordsPerPage;
+			loadSummaries();
 		}
 		
-		protected function loadSummaries(offset:int = 0, recordsPerPage:int = MAX_SUMMARIES_PER_PAGE):void {
-			if ( offset == 0 ) {
+		protected function loadSummaries():void {
+			if ( _recordsOffset == 0 ) {
 				_view.paginationBar.showPage(1);
 			}
 			_view.summaryDataGrid.dataProvider = null;
 			
 			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
-			performSummariesLoad(offset, recordsPerPage);
+			performSummariesLoad(_recordsOffset, _recordsPerPage);
 		}
 		
 		protected function performSummariesLoad(offset:int = 0, recordsPerPage:int = MAX_SUMMARIES_PER_PAGE):void {
@@ -333,7 +341,8 @@ package org.openforis.collect.presenter {
 		protected function updateViewProcessComplete():void {
 			AlertUtil.showMessage(_messageKeys.COMPLETED, [_state.processed, _state.total]);
 			backToDefaultView();
-			loadSummaries(0, _view.paginationBar.maxRecordsPerPage);
+			_recordsOffset = 0;
+			loadSummaries();
 		}
 		
 		protected function updateProgressBar(progressLabelResource:String):void {
@@ -354,6 +363,7 @@ package org.openforis.collect.presenter {
 		
 		protected function resetView():void {
 			_state = null;
+			_recordsOffset = 0;
 			backToDefaultView();
 			stopProgressTimer();
 		}
