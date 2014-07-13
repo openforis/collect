@@ -29,6 +29,10 @@ package org.openforis.collect.presenter {
 
 		public function SurveySelectionPresenter(view:SurveySelectionPopUp) {
 			super(view);
+		}
+		
+		override public function init():void {
+			super.init();
 			
 			var surveys:IList = Application.surveySummaries;
 			view.surveyDDL.dataProvider = surveys;

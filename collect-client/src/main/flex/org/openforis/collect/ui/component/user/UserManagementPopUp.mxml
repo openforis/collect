@@ -29,6 +29,7 @@
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new UserManagementPresenter(this);
+				_presenter.init();
 			}
 			
 		]]>

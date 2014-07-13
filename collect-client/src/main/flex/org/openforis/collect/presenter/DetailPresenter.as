@@ -36,28 +36,42 @@ package org.openforis.collect.presenter {
 	public class DetailPresenter extends AbstractPresenter {
 	
 		private var _dataClient:DataClient;
-		private var _view:DetailView;
 		private var _errorsListPopUp:ErrorListPopUp;
 		private var _rootEntityKeyTextChangeWatcher:ChangeWatcher;
 		
 		public function DetailPresenter(view:DetailView) {
-			this._view = view;
+			super(view);
 			this._dataClient = ClientFactory.dataClient;
-			super();
+		}
+		
+		private function get view():DetailView {
+			return DetailView(_view);
 		}
 		
 		override internal function initEventListeners():void {
-			_view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
-			_view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
-			_view.autoSaveCheckBox.addEventListener(MouseEvent.CLICK, autoSaveCheckBoxClickHandler);
-			_view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
-			_view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
-			_view.resizeBtn.addEventListener(MouseEvent.CLICK, toggleViewSizeClickHandler);
+			super.initEventListeners();
+			view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
+			view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);
+			view.autoSaveCheckBox.addEventListener(MouseEvent.CLICK, autoSaveCheckBoxClickHandler);
+			view.submitButton.addEventListener(MouseEvent.CLICK, submitButtonClickHandler);
+			view.rejectButton.addEventListener(MouseEvent.CLICK, rejectButtonClickHandler);
+			view.resizeBtn.addEventListener(MouseEvent.CLICK, toggleViewSizeClickHandler);
+	
+			view.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDownHandler);
+		}
+		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
-	
-			_view.stage.addEventListener(KeyboardEvent.KEY_DOWN, stageKeyDownHandler);
+		}
+		
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			eventDispatcher.removeEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
+			eventDispatcher.removeEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangedListener);
 		}
 		
 		/**
@@ -76,53 +90,53 @@ package org.openforis.collect.presenter {
 			} else {
 				_rootEntityKeyTextChangeWatcher.reset(rootEntity);
 			}
-			//_view.formVersionContainer.visible = version != null;
+			//view.formVersionContainer.visible = version != null;
 			if ( version != null ) {
-				//_view.formVersionText.text = version.getLabelText();
-				_view.footer.formVersion = version.getLabelText();
+				//view.formVersionText.text = version.getLabelText();
+				view.footer.formVersion = version.getLabelText();
 			} else {
-				_view.footer.formVersion = null;
+				view.footer.formVersion = null;
 			}
 			var step:CollectRecord$Step = activeRecord.step;
-			_view.currentPhaseText.text = getStepLabel(step);
+			view.currentPhaseText.text = getStepLabel(step);
 			
 			var user:UserProxy = Application.user;
 			var canSubmit:Boolean = !preview && user.canSubmit(activeRecord);
 			var canReject:Boolean = !preview && user.canReject(activeRecord);
 			var canSave:Boolean = !preview && Application.activeRecordEditable;
 			
-			_view.topButtonBar.visible = _view.topButtonBar.includeInLayout = !preview && !onlyOneRecordEdit;
-			_view.submitButton.visible = _view.submitButton.includeInLayout = canSubmit;
-			_view.rejectButton.visible = _view.rejectButton.includeInLayout = canReject;
+			view.topButtonBar.visible = view.topButtonBar.includeInLayout = !preview && !onlyOneRecordEdit;
+			view.submitButton.visible = view.submitButton.includeInLayout = canSubmit;
+			view.rejectButton.visible = view.rejectButton.includeInLayout = canReject;
 			if ( canReject ) {
-				_view.rejectButton.label = step == CollectRecord$Step.ANALYSIS ? Message.get("edit.unlock"): Message.get("edit.reject");
+				view.rejectButton.label = step == CollectRecord$Step.ANALYSIS ? Message.get("edit.unlock"): Message.get("edit.reject");
 			}
-			_view.saveButton.visible = canSave;
-			_view.updateStatusLabel.text = null;
-			_view.autoSaveCheckBox.visible = canSave;
-			_view.updateStatusLabel.visible = canSave;
+			view.saveButton.visible = canSave;
+			view.updateStatusLabel.text = null;
+			view.autoSaveCheckBox.visible = canSave;
+			view.updateStatusLabel.visible = canSave;
 			
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			//do not mantain more than one form in FormsContainer for performance issues
-			_view.currentState = DetailView.LOADING_STATE;
-			var form:FormContainer = _view.formsContainer.getForm(rootEntityDefn, version);
+			view.currentState = DetailView.LOADING_STATE;
+			var form:FormContainer = view.formsContainer.getForm(rootEntityDefn, version);
 			if ( form == null ) {
-				_view.formsContainer.reset();
+				view.formsContainer.reset();
 				form = UIBuilder.buildForm(rootEntityDefn, version);
-				_view.formsContainer.addForm(form, rootEntityDefn, version);
-				_view.formsContainer.selectedChild = form;
+				view.formsContainer.addForm(form, rootEntityDefn, version);
+				view.formsContainer.selectedChild = form;
 			}
-			_view.currentState = DetailView.EDIT_STATE;
+			view.currentState = DetailView.EDIT_STATE;
 			form.record = activeRecord;
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {
 			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
-			_view.messageDisplay.show(Message.get("edit.recordSaved", [rootEntityLabel]));
+			view.messageDisplay.show(Message.get("edit.recordSaved", [rootEntityLabel]));
 		}
 		
 		protected function autoSaveCheckBoxClickHandler(event:MouseEvent):void {
-			Application.autoSave = _view.autoSaveCheckBox.selected;
+			Application.autoSave = view.autoSaveCheckBox.selected;
 		}
 		
 		protected function updateRecordKeyLabel(event:Event = null):void {
@@ -134,7 +148,7 @@ package org.openforis.collect.presenter {
 			} else {
 				result = StringUtil.concat("  ", rootEntityLabel, keyText);
 			}
-			_view.recordKeyLabel.text = result;
+			view.recordKeyLabel.text = result;
 		}
 		
 		/**
@@ -279,7 +293,7 @@ package org.openforis.collect.presenter {
 			} else {
 				updateMessageKey = "edit.all_changes_saved";
 			}
-			_view.updateStatusLabel.text = Message.get(updateMessageKey);			
+			view.updateStatusLabel.text = Message.get(updateMessageKey);			
 		}
 		
 		protected function stageKeyDownHandler(event:KeyboardEvent):void {

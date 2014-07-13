@@ -15,9 +15,12 @@ package org.openforis.collect.presenter
 			super(view);
 		}
 		
+		private function get view():CoordinateAttributeRenderer {
+			return CoordinateAttributeRenderer(_view);
+		}
+		
 		override protected function initViewState():void {
-			var attrDefn:CoordinateAttributeDefinitionProxy = CoordinateAttributeDefinitionProxy(_view.attributeDefinition);
-			var view:CoordinateAttributeRenderer = CoordinateAttributeRenderer(_view);
+			var attrDefn:CoordinateAttributeDefinitionProxy = CoordinateAttributeDefinitionProxy(view.attributeDefinition);
 			if(attrDefn.parentLayout == UIUtil.LAYOUT_TABLE) {
 				if ( attrDefn.parent.direction == UIOptions$Direction.BY_COLUMNS ) {
 					if ( attrDefn.fieldsOrder == UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y ) {
@@ -36,7 +39,7 @@ package org.openforis.collect.presenter
 				if ( attrDefn.fieldsOrder == UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y ) {
 					view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_SRS_X_Y;
 				} else {
-					_view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_SRS_Y_X;
+					view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_SRS_Y_X;
 				}
 			}
 		}

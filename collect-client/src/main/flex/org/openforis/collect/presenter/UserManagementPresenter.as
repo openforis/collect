@@ -47,6 +47,10 @@ package org.openforis.collect.presenter {
 			
 			_userClient = ClientFactory.userClient;
 			_usersPerRoleMap = new Array();
+		}
+		
+		override public function init():void {
+			super.init();
 			initRoles();
 			loadAll();
 		}

@@ -24,20 +24,23 @@ package org.openforis.collect.presenter {
 		private static const UNIT_FIELD_IDX:int = 2;
 		
 		public function NumericAttributePresenter(view:NumericAttributeRenderer) {
-			_view = view;
-			initRestriction();
 			super(view);
 			view.numericInputField.applyChangesOnFocusOut = false;
-			//depends on view.currentState
-			if(view.unitInputField != null) {
-				view.unitInputField.applyChangesOnFocusOut = false;
-				view.unitInputField.dropDownList.addEventListener(Event.CHANGE, unitInputFieldChangeHandler);
-			}
+		}
+		
+		override public function init():void {
+			super.init();
+			initRestriction();
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			view.numericInputField.addEventListener(FocusEvent.FOCUS_OUT, numericInputFieldFocusOutHandler);
+			//depends on view.currentState
+			if(view.unitInputField != null) {
+				view.unitInputField.applyChangesOnFocusOut = false;
+				view.unitInputField.dropDownList.addEventListener(Event.CHANGE, unitInputFieldChangeHandler);
+			}
 		}
 		
 		protected function numericInputFieldFocusOutHandler(event:FocusEvent):void {

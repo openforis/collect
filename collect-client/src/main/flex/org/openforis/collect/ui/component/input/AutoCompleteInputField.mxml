@@ -15,6 +15,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new AutoCompleteInputFieldPresenter(this);
+				presenter.init();
 			}
 			
 		]]>

@@ -10,12 +10,17 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			
+			import org.openforis.collect.util.AlertUtil;
+			
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.MultipleEntityAsTableFormItemPresenter;
 			import org.openforis.collect.ui.Images;
+			
+			import spark.events.RendererExistenceEvent;
 			
 			public static const DIRECTION_BY_COLUMNS:String = "byColumns";
 			public static const DIRECTION_BY_ROWS:String = "byRows";
@@ -39,6 +44,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleEntityAsTableFormItemPresenter(this);
+				presenter.init();
 			}
 			
 			protected function updateCurrentState():void {
@@ -55,6 +61,7 @@
 				dispatchEvent(new Event("entitiesDirectionChange"));
 				updateCurrentState();
 			}
+			
 		]]>
 	</fx:Script>
 	

@@ -41,18 +41,22 @@ package org.openforis.collect.presenter {
 			label: Message.get('home.configuration'),
 			icon: Images.CONFIGURATION};
 
-		private var _view:HomePageView;
-		
 		public function HomePresenter(view:HomePageView) {
-			this._view = view;
-			super();
-			
-			_view.functionList.dataProvider = createFunctionsList();
+			super(view);
+		}
+		
+		private function get view():HomePageView {
+			return HomePageView(_view);
+		}
+		
+		override public function init():void {
+			super.init();
+			view.functionList.dataProvider = createFunctionsList();
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			_view.functionList.addEventListener(IndexChangeEvent.CHANGING, functionListChangingHandler);
+			view.functionList.addEventListener(IndexChangeEvent.CHANGING, functionListChangingHandler);
 		}
 		
 		protected function createFunctionsList():IList {
@@ -67,7 +71,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function functionListChangingHandler(event:IndexChangeEvent):void {
-			var items:IList = _view.functionList.dataProvider;
+			var items:IList = view.functionList.dataProvider;
 			var item:Object = items.getItemAt(event.newIndex);
 			event.preventDefault();
 			switch (item) {

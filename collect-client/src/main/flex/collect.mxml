@@ -34,6 +34,7 @@
 			
 			protected function applicationCompleteHandler(event:FlexEvent):void {
 				this._collectPresenter = new CollectPresenter(this);
+				this._collectPresenter.init();
 			}
 			
 			

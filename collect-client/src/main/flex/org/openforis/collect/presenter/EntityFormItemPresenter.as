@@ -16,9 +16,9 @@ package org.openforis.collect.presenter
 			super(view);
 		}
 		
-		override protected function onAfterCreation():void {
+		override public function init():void {
 			initNodeDefinitions();
-			super.onAfterCreation();
+			super.init();
 		}
 		
 		private function get view():EntityFormItem {

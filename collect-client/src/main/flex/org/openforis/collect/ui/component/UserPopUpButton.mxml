@@ -12,12 +12,12 @@
 			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.UserPopUpButtonPresenter;
-			import org.openforis.collect.ui.Images;
 			
 			private var _presenter:UserPopUpButtonPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new UserPopUpButtonPresenter(this);
+				_presenter.init();
 			}
 			
 		]]>

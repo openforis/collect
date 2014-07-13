@@ -22,10 +22,7 @@
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.util.AlertUtil;
 			
-			import spark.events.TextOperationEvent;
 			private var _initialized:Boolean;
-			
-			/* private var _presenter:SurveySelectionPresenter; */
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);

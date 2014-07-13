@@ -30,7 +30,6 @@ package org.openforis.collect.presenter
 	 */
 	public class FormItemPresenter extends AbstractPresenter {
 		
-		protected var _view:CollectFormItem;
 		protected var _validationDisplayManager:ValidationDisplayManager;
 		protected var _relevanceDisplayManager:RelevanceDisplayManager;
 		private var _contextMenu:FormItemContextMenu;
@@ -40,15 +39,17 @@ package org.openforis.collect.presenter
 		}
 		
 		public function FormItemPresenter(view:CollectFormItem) {
-			_view = view;
+			super(view);
 			_relevanceDisplayManager = new RelevanceDisplayManager(view);
-			updateRelevanceDisplayManager();
 			_contextMenu = new FormItemContextMenu(view);
-			super();
-			onAfterCreation();
 		}
 		
-		protected function onAfterCreation():void {
+		private function get view():CollectFormItem {
+			return CollectFormItem(_view);
+		}
+		
+		override public function init():void {
+			super.init();
 			updateView();
 		}
 		
@@ -71,32 +72,31 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
+			ChangeWatcher.watch(view, "parentEntity", parentEntityChangeHandler);
+			
+			view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
+		}
+		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
-			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
-			
-			_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
 		}
 		
-		protected function removedFromStageHandler(event:Event):void {
-			removeEventListeners();
-		}
-		
-		protected function removeEventListeners():void {
-			/*
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
 			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.removeEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.removeEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
-			*/
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			if(_view.parentEntity != null) {
+			if(view.parentEntity != null) {
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
 					if ( change is NodeChangeProxy && 
-							NodeChangeProxy(change).nodeId == _view.parentEntity.id) {
+							NodeChangeProxy(change).nodeId == view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						_contextMenu.updateItems();
@@ -125,7 +125,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function initValidationDisplayManager():void {
-			_validationDisplayManager = new ValidationDisplayManager(_view, _view);
+			_validationDisplayManager = new ValidationDisplayManager(view, view);
 		}
 		
 		protected function updateRelevanceDisplayManager():void {

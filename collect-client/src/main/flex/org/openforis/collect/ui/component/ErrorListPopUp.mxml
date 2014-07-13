@@ -27,6 +27,7 @@
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new ErrorListPopUpPresenter(this);
+				_presenter.init();
 			}
 		]]>
 	</fx:Script>

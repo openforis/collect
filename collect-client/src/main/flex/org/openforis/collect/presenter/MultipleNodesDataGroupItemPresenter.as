@@ -21,37 +21,41 @@ package org.openforis.collect.presenter {
 	 */
 	public class MultipleNodesDataGroupItemPresenter extends AbstractPresenter {
 		
-		protected var _view:MultipleNodesDataGroupItemRenderer;
 		private var _handCursor:int = -1;
 		
 		public function MultipleNodesDataGroupItemPresenter(view:MultipleNodesDataGroupItemRenderer) {
-			_view = view;
-			super();
+			super(view);
+		}
+		
+		private function get view():MultipleNodesDataGroupItemRenderer {
+			return MultipleNodesDataGroupItemRenderer(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			_view.addEventListener(DragEvent.DRAG_ENTER, dragEnterHandler);
-			_view.addEventListener(DragEvent.DRAG_EXIT, dragExitHandler);
-			_view.addEventListener(DragEvent.DRAG_OVER, dragOverHandler);
-			_view.addEventListener(DragEvent.DRAG_DROP, dragDropHandler);
-			_view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
-			_view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
-			_view.dragAnchor.addEventListener(MouseEvent.MOUSE_DOWN, dragAnchorMouseDownHandler);
-			_view.dragAnchor.addEventListener(MouseEvent.MOUSE_MOVE, dragAnchorMouseMoveHandler);
-			_view.dragAnchor.addEventListener(MouseEvent.MOUSE_OVER, dragAnchorMouseOverHandler);
-			_view.dragAnchor.addEventListener(MouseEvent.MOUSE_OUT, dragAnchorMouseOutHandler);
-			
-			eventDispatcher.addEventListener(InputFieldEvent.FOCUS_IN, fieldFocusInHandler);
-			eventDispatcher.addEventListener(InputFieldEvent.FOCUS_OUT, fieldFocusOutHandler);
-			
-			_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
+			view.addEventListener(DragEvent.DRAG_ENTER, dragEnterHandler);
+			view.addEventListener(DragEvent.DRAG_EXIT, dragExitHandler);
+			view.addEventListener(DragEvent.DRAG_OVER, dragOverHandler);
+			view.addEventListener(DragEvent.DRAG_DROP, dragDropHandler);
+			view.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
+			view.addEventListener(MouseEvent.MOUSE_OVER, mouseOverHandler);
+			view.dragAnchor.addEventListener(MouseEvent.MOUSE_DOWN, dragAnchorMouseDownHandler);
+			view.dragAnchor.addEventListener(MouseEvent.MOUSE_MOVE, dragAnchorMouseMoveHandler);
+			view.dragAnchor.addEventListener(MouseEvent.MOUSE_OVER, dragAnchorMouseOverHandler);
+			view.dragAnchor.addEventListener(MouseEvent.MOUSE_OUT, dragAnchorMouseOutHandler);
 		}
 		
-		protected function removedFromStageHandler(event:Event):void {
-			//eventDispatcher.removeEventListener(InputFieldEvent.FOCUS_IN, fieldFocusInHandler);
-			//eventDispatcher.removeEventListener(InputFieldEvent.FOCUS_OUT, fieldFocusOutHandler);
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
+			eventDispatcher.addEventListener(InputFieldEvent.FOCUS_IN, fieldFocusInHandler);
+			eventDispatcher.addEventListener(InputFieldEvent.FOCUS_OUT, fieldFocusOutHandler);
+		}
+		
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			eventDispatcher.removeEventListener(InputFieldEvent.FOCUS_IN, fieldFocusInHandler);
+			eventDispatcher.removeEventListener(InputFieldEvent.FOCUS_OUT, fieldFocusOutHandler);
 		}
 		
 		protected function dragAnchorMouseMoveHandler(event:MouseEvent):void {
@@ -84,10 +88,10 @@ package org.openforis.collect.presenter {
 			var dragInitiator:ItemRenderer = ItemRenderer(event.dragInitiator);
 			var indexFrom:int = dragInitiator.itemIndex;
 			var indexTo:int;
-			if ( isDropOnTopOfElement(_view, event.localY) ) {
-				indexTo = _view.itemIndex;
+			if ( isDropOnTopOfElement(view, event.localY) ) {
+				indexTo = view.itemIndex;
 			} else {
-				indexTo = _view.itemIndex + 1;
+				indexTo = view.itemIndex + 1;
 			}
 			if ( indexFrom < indexTo ) {
 				//the node in index from will be deleted and the other nodes will shift
@@ -113,10 +117,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function showDropIndicator(event:DragEvent):void {
-			if(isDropOnTopOfElement(_view, event.localY)) {
-				_view.currentState = MultipleNodesDataGroupItemRenderer.STATE_DROPPING_TOP;
+			if(isDropOnTopOfElement(view, event.localY)) {
+				view.currentState = MultipleNodesDataGroupItemRenderer.STATE_DROPPING_TOP;
 			} else {
-				_view.currentState = MultipleNodesDataGroupItemRenderer.STATE_DROPPING_BOTTOM;
+				view.currentState = MultipleNodesDataGroupItemRenderer.STATE_DROPPING_BOTTOM;
 			}
 		}
 		
@@ -125,31 +129,31 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function hideDropIndicator():void {
-			_view.currentState = MultipleNodesDataGroupItemRenderer.STATE_NORMAL;
+			view.currentState = MultipleNodesDataGroupItemRenderer.STATE_NORMAL;
 		}
 		
 		protected function mouseOverHandler(event:MouseEvent):void {
-			_view.dragAnchor.alpha = 0.5;
+			view.dragAnchor.alpha = 0.5;
 		}
 		
 		protected function mouseOutHandler(event:MouseEvent):void {
-			_view.dragAnchor.alpha = 0.0;
+			view.dragAnchor.alpha = 0.0;
 		}
 		
 		protected function dragAnchorMouseOverHandler(event:MouseEvent):void {
 			//draw pointer
-			_handCursor = _view.cursorManager.setCursor(Images.CURSOR_GRAB_OPEN, 2, -8, -8);
+			_handCursor = view.cursorManager.setCursor(Images.CURSOR_GRAB_OPEN, 2, -8, -8);
 		}
 		
 		protected function dragAnchorMouseOutHandler(event:MouseEvent):void {
 			if(_handCursor > 0) {
-				_view.cursorManager.removeCursor(_handCursor);
+				view.cursorManager.removeCursor(_handCursor);
 			}
 		}
 		
 		protected function dragAnchorMouseDownHandler(event:MouseEvent):void {
-			if(_view.focusManager.getFocus() != null) {
-				_view.dragAnchor.setFocus();
+			if(view.focusManager.getFocus() != null) {
+				view.dragAnchor.setFocus();
 			}
 		}
 		

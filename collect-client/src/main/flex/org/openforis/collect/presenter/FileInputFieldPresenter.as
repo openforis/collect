@@ -39,17 +39,23 @@ package org.openforis.collect.presenter {
 	 * @author S. Ricci
 	 * */
 	public class FileInputFieldPresenter extends InputFieldPresenter {
-		
-		private var _view:FileInputField;
-		
+
 		private var fileReference:FileReference;
 		private var fileFilter:FileFilter;
 		private var maxSizeDescription:String;
 		
 		public function FileInputFieldPresenter(inputField:FileInputField) {
-			_view = inputField;
-			fileReference = new FileReference();
 			super(inputField);
+			fileReference = new FileReference();
+		}
+		
+		private function get view():FileInputField {
+			return FileInputField(_view);
+		}
+		
+		override public function init():void {
+			super.init();
+			initFileFilter();
 		}
 		
 		override internal function initEventListeners():void {
@@ -60,15 +66,13 @@ package org.openforis.collect.presenter {
 			//fileReference.addEventListener(Event.COMPLETE, fileReferenceLoadComplete);
 			fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 			
-			_view.browseButton.addEventListener(MouseEvent.CLICK, browseClickHandler);
-			_view.downloadButton.addEventListener(MouseEvent.CLICK, downloadClickHandler);
-			_view.removeButton.addEventListener(MouseEvent.CLICK, removeClickHandler);
-			
-			initFileFilter();
+			view.browseButton.addEventListener(MouseEvent.CLICK, browseClickHandler);
+			view.downloadButton.addEventListener(MouseEvent.CLICK, downloadClickHandler);
+			view.removeButton.addEventListener(MouseEvent.CLICK, removeClickHandler);
 		}
 
 		private function initFileFilter():void {
-			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(_view.attributeDefinition);
+			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(view.attributeDefinition);
 			var extensions:IList = attrDefn.extensions;
 			if ( CollectionUtil.isEmpty(extensions) || 
 					extensions.length == 1 && StringUtil.isBlank(extensions.getItemAt(0) as String) ) {
@@ -93,40 +97,40 @@ package org.openforis.collect.presenter {
 			super.updateView();
 			var fileName:String = getFileName();
 			if ( StringUtil.isBlank(fileName) ) {
-				_view.currentState = FileInputField.STATE_DEFAULT;
+				view.currentState = FileInputField.STATE_DEFAULT;
 			} else {
-				_view.currentState = FileInputField.STATE_FILE_UPLOADED;
+				view.currentState = FileInputField.STATE_FILE_UPLOADED;
 			}
 			var hasRemarks:Boolean = false;
 			var remarks:String = getRemarks();
 			hasRemarks = StringUtil.isNotBlank(remarks);
-			_view.remarksPresent = hasRemarks;
+			view.remarksPresent = hasRemarks;
 			
 			updatePreview();
 		}
 		
 		protected function updatePreview():void {
-			if ( _view.previewContainer is Label ) {
+			if ( view.previewContainer is Label ) {
 				var fileName:String = getFileName();
 				var extension:String = fileName == null? null: fileName.substr(fileName.lastIndexOf("."));
-				_view.previewContainer.text = Message.get("edit.file.uploadedFileType", [extension]);
+				view.previewContainer.text = Message.get("edit.file.uploadedFileType", [extension]);
 			}
 		}
 		
 		protected function getFileName():String {
 			var fileName:String = null;
-			if ( _view.attribute != null ) {
-				var nameField:FieldProxy = _view.attribute.getField(0);
+			if ( view.attribute != null ) {
+				var nameField:FieldProxy = view.attribute.getField(0);
 				fileName = nameField.value as String;
 			}
 			return fileName;
 		}
 		
 		override protected function setFocusHandler(event:InputFieldEvent):void {
-			if ( _view.browseButton != null && _view.attribute != null && 
-				_view.attribute.id == event.attributeId && 
-				_view.fieldIndex == event.fieldIdx ) {
-				_view.browseButton.setFocus();
+			if ( view.browseButton != null && view.attribute != null && 
+				view.attribute.id == event.attributeId && 
+				view.fieldIndex == event.fieldIdx ) {
+				view.browseButton.setFocus();
 			}
 		}
 		
@@ -141,11 +145,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceProgressHandler(event:ProgressEvent):void {
-			_view.uploadProgressBar.setProgress(event.bytesLoaded, event.bytesTotal);
+			view.uploadProgressBar.setProgress(event.bytesLoaded, event.bytesTotal);
 		}
 		
 		protected function fileReferenceSelectHandler(event:Event):void {
-			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(_view.attributeDefinition);
+			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(view.attributeDefinition);
 			var maxSize:Number = attrDefn.maxSize;
 			if(fileReference.size > maxSize) {
 				var numberFormatter:spark.formatters.NumberFormatter = new NumberFormatter();
@@ -154,7 +158,7 @@ package org.openforis.collect.presenter {
 				var sizeFormatted:String = numberFormatter.format(fileReference.size);
 				AlertUtil.showError("edit.file.error.sizeExceedsMaximum", [sizeFormatted, maxSizeFormatted]);
 			} else {
-				_view.currentState = FileInputField.STATE_UPLOADING;
+				view.currentState = FileInputField.STATE_UPLOADING;
 				
 				var request:URLRequest = new URLRequest(ApplicationConstants.FILE_UPLOAD_URL);
 				request.method = URLRequestMethod.POST;
@@ -164,7 +168,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
-			_view.currentState = FileInputField.STATE_DEFAULT;
+			view.currentState = FileInputField.STATE_DEFAULT;
 			AlertUtil.showError("edit.file.error", [event.text]);
 		}
 		
@@ -180,11 +184,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function getDownloadUrlRequest():URLRequest {
-			if ( _view.attribute != null && ! _view.attribute.empty ) {
+			if ( view.attribute != null && ! view.attribute.empty ) {
 				var request:URLRequest = new URLRequest(ApplicationConstants.RECORD_FILE_DOWNLOAD_URL);
 				request.method = URLRequestMethod.POST;
 				var parameters:URLVariables = new URLVariables();
-				parameters.nodeId = _view.attribute.id;
+				parameters.nodeId = view.attribute.id;
 				request.data = parameters;
 				//timestamp parameter to avoid caching
 				request.data._r = new Date().getTime();
@@ -199,21 +203,21 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function performDelete():void {
-			var nodeId:Number = _view.attribute.id;
+			var nodeId:Number = view.attribute.id;
 			var request:NodeUpdateRequestProxy = createFileUpdateRequestOperation(null);
 			sendUpdateRequest(request);
 		}
 		
 		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
-			_view.currentState = FileInputField.STATE_DEFAULT;
-			var fileAttribute:AttributeProxy = _view.attribute;
+			view.currentState = FileInputField.STATE_DEFAULT;
+			var fileAttribute:AttributeProxy = view.attribute;
 			fileAttribute.getField(0).value = null;
 		}
 		
 		protected function createFileUpdateRequestOperation(fileWrapper:FileWrapper):NodeUpdateRequestProxy {
 			var r:AttributeUpdateRequestProxy = new AttributeUpdateRequestProxy();
-			var def:AttributeDefinitionProxy = _view.attributeDefinition;
-			r.nodeId = _view.attribute.id;
+			var def:AttributeDefinitionProxy = view.attributeDefinition;
+			r.nodeId = view.attribute.id;
 			r.value = fileWrapper;
 			r.symbol = null;
 			r.remarks = getRemarks();

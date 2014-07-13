@@ -1,21 +1,18 @@
 package org.openforis.collect.presenter {
 	
+	import flash.display.DisplayObject;
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	
-	import mx.rpc.Fault;
 	import mx.rpc.events.FaultEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.UIEvent;
-	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.ui.Images;
-	import org.openforis.collect.ui.component.BlockingMessagePopUp;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
-	import org.openforis.collect.util.StringUtil;
 
 	/**
 	 * @author Mino Togna
@@ -23,9 +20,16 @@ package org.openforis.collect.presenter {
 	internal class AbstractPresenter {
 
 		private static var _serverOffLineMessage:String;
+		private var _broadcastEventListenerInitialized:Boolean;
+		protected var _view:DisplayObject;
 		
-		public function AbstractPresenter() {
+		public function AbstractPresenter(view:DisplayObject) {
+			this._view = view;
+		}
+		
+		public function init():void {
 			initEventListeners();
+			initBroadcastEventListeners();
 		}
 		
 		internal static function get eventDispatcher():EventDispatcher {
@@ -75,7 +79,29 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		internal function initEventListeners():void {}
+		internal function initEventListeners():void {
+			if ( _view != null ) {
+				_view.addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
+				_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
+			}
+		}
 		
+		protected function addedToStageHandler(event:Event):void {
+			if ( ! _broadcastEventListenerInitialized ) {
+				initBroadcastEventListeners();
+			}
+		}
+		
+		protected function removedFromStageHandler(event:Event):void {
+			removeBroadcastEventListeners();
+		}
+		
+		protected function initBroadcastEventListeners():void {
+			_broadcastEventListenerInitialized = true;
+		}
+		
+		protected function removeBroadcastEventListeners():void {
+			_broadcastEventListenerInitialized = false;
+		};
 	}
 }

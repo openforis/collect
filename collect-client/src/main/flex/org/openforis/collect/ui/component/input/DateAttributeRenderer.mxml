@@ -16,6 +16,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new DateAttributePresenter(this);
+				presenter.init();
 			}
 			
 			[Bindable]

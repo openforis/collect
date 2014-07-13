@@ -12,6 +12,7 @@
 			
 			override protected function initPresenter():void {
 				_presenter = new CalculatedAttributeFieldPresenter(this);
+				_presenter.init();
 			}
 
 		]]>

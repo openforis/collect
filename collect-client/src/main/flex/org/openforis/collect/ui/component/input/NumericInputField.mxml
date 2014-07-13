@@ -15,6 +15,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new NumericInputFieldPresenter(this);
+				presenter.init();
 			}
 			
 			[Bindable]

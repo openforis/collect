@@ -24,42 +24,51 @@ package org.openforis.collect.presenter {
 	 * */
 	public class AttributePresenter extends AbstractPresenter {
 		
-		protected var _view:AttributeItemRenderer;
 		private var _validationDisplayManager:ValidationDisplayManager;
 		private var _updating:Boolean = false;
 		
 		public function AttributePresenter(view:AttributeItemRenderer) {
-			_view = view;
-			var inputField:InputField = _view.getElementAt(0) as InputField;
-			if(inputField != null) {
-				ChangeWatcher.watch(inputField, "visited", fieldVisitedHandler);
-				ChangeWatcher.watch(inputField, "updating", fieldUpdatingChangeHandler);
-			}
-			super();
+			super(view);
+		}
+		
+		private function get view():AttributeItemRenderer {
+			return AttributeItemRenderer(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
+			ChangeWatcher.watch(view, "attribute", attributeChangeHandler);
+			ChangeWatcher.watch(view, "attributes", attributesChangeHandler);
+			
+			var inputField:InputField = view.getElementAt(0) as InputField;
+			if(inputField != null) {
+				ChangeWatcher.watch(inputField, "visited", fieldVisitedHandler);
+				ChangeWatcher.watch(inputField, "updating", fieldUpdatingChangeHandler);
+			}
+		}
+		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
-			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
-			ChangeWatcher.watch(_view, "attributes", attributesChangeHandler);
-			
-			_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
 		}
 		
-		protected function removedFromStageHandler(event:Event):void {
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			eventDispatcher.removeEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
+			eventDispatcher.removeEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
+			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 		}
 		
 		protected function initValidationDisplayManager():void {
-			var inputField:InputField = _view.getElementAt(0) as InputField;
-			var validationStateDisplay:UIComponent = inputField != null ? inputField.validationStateDisplay: _view;
+			var inputField:InputField = view.getElementAt(0) as InputField;
+			var validationStateDisplay:UIComponent = inputField != null ? inputField.validationStateDisplay: view;
 			var validationToolTipTrigger:UIComponent = validationStateDisplay;
 			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
-			var attrDefn:AttributeDefinitionProxy = _view.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
 			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple || attrDefn is CodeAttributeDefinitionProxy;
-			if(_view.attribute != null) {
+			if(view.attribute != null) {
 				updateValidationDisplayManager();
 			}
 		}
@@ -73,7 +82,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			if(_view.parentEntity != null && _view.attribute != null || _view.attributes != null) {
+			if(view.parentEntity != null && view.attribute != null || view.attributes != null) {
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				if ( nodeUpdated(changeSet) ) {
 					updateView();
@@ -87,8 +96,8 @@ package org.openforis.collect.presenter {
 			for each (var change:NodeChangeProxy in changeSet.changes) {
 				if ( change is AttributeChangeProxy) {
 					var attrResp:AttributeChangeProxy = AttributeChangeProxy(change);
-					if (_view.attribute != null && _view.attribute.id == attrResp.nodeId ||
-					 	_view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", attrResp.nodeId) ) {
+					if (view.attribute != null && view.attribute.id == attrResp.nodeId ||
+					 	view.attributes != null && CollectionUtil.containsItemWith(view.attributes, "id", attrResp.nodeId) ) {
 						return true;
 					}
 				}
@@ -98,7 +107,7 @@ package org.openforis.collect.presenter {
 		
 		protected function parentEntityUpdated(changeSet:NodeChangeSetProxy):Boolean {
 			for each (var change:NodeChangeProxy in changeSet.changes) {
-				if ( change is EntityChangeProxy && EntityChangeProxy(change).nodeId == _view.parentEntity.id ) {
+				if ( change is EntityChangeProxy && EntityChangeProxy(change).nodeId == view.parentEntity.id ) {
 					return true;
 				}
 			}
@@ -106,9 +115,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
-			if(event.newValue == true && (_view.attribute != null || _view.attributeDefinition.multiple && _view.attributes != null)) {
-				var attributeName:String = _view.attributeDefinition.name;
-				_view.parentEntity.showErrorsOnChild(attributeName);
+			if(event.newValue == true && (view.attribute != null || view.attributeDefinition.multiple && view.attributes != null)) {
+				var attributeName:String = view.attributeDefinition.name;
+				view.parentEntity.showErrorsOnChild(attributeName);
 			}
 			updateValidationDisplayManager();
 		}
@@ -119,29 +128,29 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function attributeChangeHandler(event:PropertyChangeEvent):void {
-			_view.visited = false;
+			view.visited = false;
 			updateView();
 		}
 		
 		protected function attributesChangeHandler(event:PropertyChangeEvent):void {
-			_view.visited = false;
+			view.visited = false;
 			updateView();
 		}
 		
 		protected function updateValidationDisplayManager():void {
-			if(_view.parentEntity != null) {
+			if(view.parentEntity != null) {
 				if(_validationDisplayManager == null) {
 					initValidationDisplayManager();
 				}
-				var attributeName:String = _view.attributeDefinition.name;
-				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
-				var active:Boolean = visited && !_updating && (_view.attribute != null || _view.attributes != null);
+				var attributeName:String = view.attributeDefinition.name;
+				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(attributeName);
+				var active:Boolean = visited && !_updating && (view.attribute != null || view.attributes != null);
 				if(active) {
 					_validationDisplayManager.active = true;
-					if (_view.attribute != null ) {
-						_validationDisplayManager.displayAttributeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);
+					if (view.attribute != null ) {
+						_validationDisplayManager.displayAttributeValidation(view.parentEntity, view.attributeDefinition, view.attribute);
 					} else {
-						_validationDisplayManager.displayAttributesValidation(_view.parentEntity, _view.attributeDefinition);
+						_validationDisplayManager.displayAttributesValidation(view.parentEntity, view.attributeDefinition);
 					}
 				} else {
 					_validationDisplayManager.active = false;
@@ -152,11 +161,11 @@ package org.openforis.collect.presenter {
 		
 		protected function isErrorConfirmed():Boolean {
 			var result:Boolean = false;
-			if ( _view.parentEntity != null ) {
-				if ( _view.attribute != null ) {
-					result = _view.attribute.errorConfirmed;
-				} else if ( CollectionUtil.isNotEmpty(_view.attributes) ) {
-					for each (var a:AttributeProxy in _view.attributes) {
+			if ( view.parentEntity != null ) {
+				if ( view.attribute != null ) {
+					result = view.attribute.errorConfirmed;
+				} else if ( CollectionUtil.isNotEmpty(view.attributes) ) {
+					for each (var a:AttributeProxy in view.attributes) {
 						if ( a.errorConfirmed ) {
 							result = true;
 							break;
@@ -170,8 +179,8 @@ package org.openforis.collect.presenter {
 		/*
 		protected function isMissingValueApproved():Boolean {
 			var result:Boolean = false;
-			if ( _view.parentEntity != null && _view.attributeDefinition != null ) {
-				var attributeName:String = _view.attributeDefinition.name;
+			if ( view.parentEntity != null && view.attributeDefinition != null ) {
+				var attributeName:String = view.attributeDefinition.name;
 				//to do
 			}
 			return result;
@@ -180,7 +189,7 @@ package org.openforis.collect.presenter {
 		
 		protected function updateView():void {
 			//var errorConfirmed:Boolean = isErrorConfirmed();
-			//_view.approved = errorConfirmed;
+			//view.approved = errorConfirmed;
 			
 			updateValidationDisplayManager();
 		}

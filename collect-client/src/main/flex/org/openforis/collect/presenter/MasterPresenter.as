@@ -29,17 +29,22 @@ package org.openforis.collect.presenter {
 		
 		private static const CHECK_RECORDS_LOCK_FREQUENCY:Number = 30000;
 		
-		private var _view:MasterView;
 		private var _dataClient:DataClient;
 		private var _checkRecordsLockTimer:Timer;
 		private var _editingBlockPopup:BlockingMessagePopUp;
 		
 		public function MasterPresenter(view:MasterView) {
-			this._view = view;
-			super();
+			super(view);
 			this._dataClient = ClientFactory.dataClient;
-
-			_view.currentState = MasterView.LOADING_STATE;
+		}
+		
+		private function get view():MasterView {
+			return MasterView(_view);
+		}
+		
+		override public function init():void {
+			super.init();
+			view.currentState = MasterView.LOADING_STATE;
 			
 			_checkRecordsLockTimer = new Timer(CHECK_RECORDS_LOCK_FREQUENCY)
 			_checkRecordsLockTimer.addEventListener(TimerEvent.TIMER, checkRecordsLockTimeoutHandler);
@@ -55,7 +60,8 @@ package org.openforis.collect.presenter {
 			*/
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
 			//eventDispatcher.addEventListener(ApplicationEvent.APPLICATION_INITIALIZED, applicationInitializedHandler);
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			eventDispatcher.addEventListener(UIEvent.SHOW_ERROR_PAGE, showErrorPageHandler);
@@ -74,7 +80,7 @@ package org.openforis.collect.presenter {
 			
 			function isActiveSurveyRecordsLockedResultHandler(event:ResultEvent, token:Object = null):void {
 				var locked:Boolean = event.result as Boolean;
-				var blockingPopUpVisible:Boolean = (_view.currentState == MasterView.LIST_STATE ) && 
+				var blockingPopUpVisible:Boolean = (view.currentState == MasterView.LIST_STATE ) && 
 					locked && ! Application.serverOffline;
 				if ( blockingPopUpVisible ) {
 					if ( _editingBlockPopup == null ) {
@@ -111,22 +117,22 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function showSpeciesImportModuleHandler(event:UIEvent):void {
-			_view.currentState = MasterView.SPECIES_IMPORT_STATE;
-			_view.speciesImportView.surveyId = event.obj.surveyId;
-			_view.speciesImportView.work = event.obj.work;
+			view.currentState = MasterView.SPECIES_IMPORT_STATE;
+			view.speciesImportView.surveyId = event.obj.surveyId;
+			view.speciesImportView.work = event.obj.work;
 		}
 
 		protected function showCodeListImportModuleHandler(event:UIEvent):void {
-			_view.currentState = MasterView.CODE_LIST_IMPORT_STATE;
-			_view.codeListImportView.surveyId = event.obj.surveyId;
-			_view.codeListImportView.work = event.obj.work;
-			_view.codeListImportView.codeListId = event.obj.codeListId;
+			view.currentState = MasterView.CODE_LIST_IMPORT_STATE;
+			view.codeListImportView.surveyId = event.obj.surveyId;
+			view.codeListImportView.work = event.obj.work;
+			view.codeListImportView.codeListId = event.obj.codeListId;
 		}
 
 		protected function showSamplingDesignImportHandler(event:UIEvent):void {
-			_view.currentState = MasterView.SAMPLING_DESIGN_IMPORT_STATE;
-			_view.samplingDesignImportView.surveyId = event.obj.surveyId;
-			_view.samplingDesignImportView.work = event.obj.work;		
+			view.currentState = MasterView.SAMPLING_DESIGN_IMPORT_STATE;
+			view.samplingDesignImportView.surveyId = event.obj.surveyId;
+			view.samplingDesignImportView.work = event.obj.work;		
 		}
 
 		/**
@@ -182,7 +188,7 @@ package org.openforis.collect.presenter {
 				editable = user.canEdit(record);
 			}
 			Application.activeRecordEditable = editable;
-			_view.currentState = MasterView.DETAIL_STATE;
+			view.currentState = MasterView.DETAIL_STATE;
 			
 			var uiEvent:UIEvent = new UIEvent(UIEvent.ACTIVE_RECORD_CHANGED);
 			eventDispatcher.dispatchEvent(uiEvent);
@@ -196,7 +202,7 @@ package org.openforis.collect.presenter {
 		internal function rootEntitySelectedHandler(event:UIEvent):void {
 			var rootEntityDef:EntityDefinitionProxy = event.obj as EntityDefinitionProxy;
 			Application.activeRootEntity = rootEntityDef;
-			_view.currentState = MasterView.LIST_STATE;
+			view.currentState = MasterView.LIST_STATE;
 			
 			checkRecordsLockTimeoutHandler(null, onNotLocked);
 			
@@ -213,14 +219,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		internal function newRecordCreatedHandler(event:UIEvent):void {
-			_view.currentState = MasterView.DETAIL_STATE;
+			view.currentState = MasterView.DETAIL_STATE;
 		}
 		
 		internal function showErrorPageHandler(event:UIEvent):void {
 			Application.activeSurvey = null;
 			Application.activeRootEntity = null;
-			_view.currentState = MasterView.ERROR_STATE;
-			_view.errorView.errorLabel.text = String(event.obj);
+			view.currentState = MasterView.ERROR_STATE;
+			view.errorView.errorLabel.text = String(event.obj);
 			
 			refreshGlobalViewSize();
 		}
@@ -228,14 +234,14 @@ package org.openforis.collect.presenter {
 		internal function backToHomeHandler(event:UIEvent):void {
 			Application.activeSurvey = null;
 			Application.activeRootEntity = null;
-			_view.currentState = MasterView.HOME_STATE;
+			view.currentState = MasterView.HOME_STATE;
 
 			refreshGlobalViewSize();
 		}
 			
 		internal function backToListHandler(event:UIEvent):void {
 			//reload record summaries 
-			_view.currentState = MasterView.LIST_STATE;
+			view.currentState = MasterView.LIST_STATE;
 			var uiEvent:UIEvent = new UIEvent(UIEvent.RELOAD_RECORD_SUMMARIES);
 			eventDispatcher.dispatchEvent(uiEvent);
 			

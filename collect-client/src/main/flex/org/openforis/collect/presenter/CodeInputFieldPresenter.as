@@ -55,7 +55,6 @@ package org.openforis.collect.presenter {
 		private static var _allowedValuesPreviewPopUpOpened:Boolean;
 		private static var _lastLoadCodesAsyncToken:AsyncToken;
 		
-		private var _view:CodeInputField;
 		private var _items:IList;
 		
 		{
@@ -86,25 +85,33 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function CodeInputFieldPresenter(view:CodeInputField) {
-			_view = view;
-			_view.fieldIndex = -1;
-			initViewState();
 			super(view);
+			view = view;
+			view.fieldIndex = -1;
+		}
+		
+		private function get view():CodeInputField {
+			return CodeInputField(_view);
+		}
+		
+		override public function init():void {
+			super.init();
+			initViewState();
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			_view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
-			_view.openImage.addEventListener(KeyboardEvent.KEY_DOWN, openImageKeyDownHandler);
-			_view.openImage.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
+			view.openImage.addEventListener(MouseEvent.CLICK, openImageClickHandler);
+			view.openImage.addEventListener(KeyboardEvent.KEY_DOWN, openImageKeyDownHandler);
+			view.openImage.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
 		}
 		
 		protected function initViewState():void {
-			if(_view.attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
-				_view.currentState = CodeInputField.STATE_DEFAULT;
+			if(view.attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
+				view.currentState = CodeInputField.STATE_DEFAULT;
 			} else {
-				_view.currentState = CodeInputField.STATE_DESCRIPTION_VISIBLE;
+				view.currentState = CodeInputField.STATE_DESCRIPTION_VISIBLE;
 			}
 		}
 		
@@ -133,7 +140,7 @@ package org.openforis.collect.presenter {
 		 * Open the popup
 		 * */
 		protected function openImageClickHandler(event:Event):void {
-			openCodeListDialog(_view);
+			openCodeListDialog(view);
 		}
 		
 		protected static function openCodeListDialog(view:CodeInputField):void {
@@ -280,8 +287,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function getTextFromValue():String {
-			if(_view.attributeDefinition != null) {
-				return codeAttributeToText(_view.attribute);
+			if(view.attributeDefinition != null) {
+				return codeAttributeToText(view.attribute);
 			}
 			return "";
 		}
@@ -309,18 +316,18 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateDescription():void {
-			_view.description = "";
-			if ( ! CodeAttributeDefinitionProxy(_view.attributeDefinition).external && _view.attribute != null &&
-					_view.attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM) {
+			view.description = "";
+			if ( ! CodeAttributeDefinitionProxy(view.attributeDefinition).external && view.attribute != null &&
+					view.attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM) {
 				var codes:Array = [];
-				var attribute:AttributeProxy = _view.attribute;
+				var attribute:AttributeProxy = view.attribute;
 				var code:String = attribute.getField(0).value as String;
 				if( StringUtil.isNotBlank(code)) {
 					codes.push(code);
 				}
 				if(ArrayUtil.isNotEmpty(codes)) {
-					var parentEntityId:int = _view.parentEntity.id;
-					var name:String = _view.attributeDefinition.name;
+					var parentEntityId:int = view.parentEntity.id;
+					var name:String = view.attributeDefinition.name;
 					var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
 					
 					dataClient.getCodeListItems(responder, parentEntityId, name, codes);
@@ -330,7 +337,7 @@ package org.openforis.collect.presenter {
 		
 		protected function findItemsResultHandler(event:ResultEvent, token:Object = null):void {
 			_items = event.result as IList;
-			_view.description = getDescription();
+			view.description = getDescription();
 		}
 		
 		protected function getDescription():String {
@@ -350,7 +357,7 @@ package org.openforis.collect.presenter {
 			if ( event.keyCode == Keyboard.TAB && ! event.shiftKey ) {
 				preventDefaultHandler(event);
 				closeAllowedValuesPreviewPopUp();
-				_view.openImage.setFocus();
+				view.openImage.setFocus();
 				//dispatchFocusInEvent();
 			} else {
 				super.keyDownHandler(event);
@@ -361,7 +368,7 @@ package org.openforis.collect.presenter {
 			if ( event.keyCode == Keyboard.TAB && event.shiftKey ) {
 				preventDefaultHandler(event);
 				
-				_view.textInput.setFocus();
+				view.textInput.setFocus();
 			} else {
 				super.keyDownHandler(event);
 			}
@@ -369,16 +376,16 @@ package org.openforis.collect.presenter {
 		
 		override protected function focusInHandler(event:FocusEvent):void {
 			super.focusInHandler(event);
-			var attrDefn:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(_view.attributeDefinition);
+			var attrDefn:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(view.attributeDefinition);
 			if ( attrDefn.showAllowedValuesPreview && ! _popUpOpened && ! _allowedValuesPreviewPopUpOpened && ! attrDefn.external ) {
-				openAllowedValuesPreviewPopUp(_view);
+				openAllowedValuesPreviewPopUp(view);
 			}
 		}
 		
 		override protected function focusOutHandler(event:FocusEvent):void {
 			super.focusOutHandler(event);
 			var focussedElement:IFocusManagerComponent = FlexGlobals.topLevelApplication.focusManager.getFocus();
-			if ( _allowedValuesPreviewPopUpOpened && _view == _allowedValuesPreviewPopUp.codeInputField ) {
+			if ( _allowedValuesPreviewPopUpOpened && view == _allowedValuesPreviewPopUp.codeInputField ) {
 				//closeAllowedValuesPreviewPopUp();
 			}
 		}

@@ -42,7 +42,6 @@ package org.openforis.collect.presenter {
 		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;
 		private static const VERANCULAR_NAMES_SEPARATOR:String = ", ";
 		
-		protected var _view:AbstractReferenceDataImportView;
 		protected var _fileReference:FileReference;
 		protected var _progressTimer:Timer;
 		protected var _state:ReferenceDataImportStatusProxy;
@@ -58,27 +57,33 @@ package org.openforis.collect.presenter {
 		protected var _recordsPerPage:int;
 		
 		public function AbstractReferenceDataImportPresenter(view:AbstractReferenceDataImportView, messageKeys:ReferenceDataImportMessageKeys) {
-			this._view = view;
+			super(view);
 			this._messageKeys = messageKeys;
 			
 			_uploadUrl = ApplicationConstants.FILE_UPLOAD_URL;
 			_firstOpen = true;
 			_fileReference = new FileReference();
-			initFileFilter();
-			
 			_getStatusResponder = new AsyncResponder(getStatusResultHandler, faultHandler);
-			
-			super();
 			
 			_recordsOffset = 0;
 			_recordsPerPage = MAX_SUMMARIES_PER_PAGE
+
+			var description:String = ALLOWED_IMPORT_FILE_EXTENSIONS.join(", ");
+			_fileFilter = new FileFilter(description, ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
+		}
+		
+		override public function init():void {
+			super.init();
 			//try to see if there is a still running process
-			
-			_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
-			if ( _view.paginationBar != null ) {
-				_view.paginationBar.maxRecordsPerPage = _recordsPerPage;
+			view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
+			if ( view.paginationBar != null ) {
+				view.paginationBar.maxRecordsPerPage = MAX_SUMMARIES_PER_PAGE;
 			}
 			loadInitialData();
+		}
+		
+		private function get view():AbstractReferenceDataImportView {
+			return AbstractReferenceDataImportView(_view);
 		}
 		
 		protected function loadInitialData():void {
@@ -86,30 +91,26 @@ package org.openforis.collect.presenter {
 			loadSummaries();
 		}
 		
-		private function initFileFilter():void {
-			var description:String = ALLOWED_IMPORT_FILE_EXTENSIONS.join(", ");
-			_fileFilter = new FileFilter(description, ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
-		}
-		
 		override internal function initEventListeners():void {
+			super.initEventListeners();
 			_fileReference.addEventListener(Event.SELECT, fileReferenceSelectHandler);
 			_fileReference.addEventListener(ProgressEvent.PROGRESS, fileReferenceProgressHandler);
 			_fileReference.addEventListener(IOErrorEvent.IO_ERROR, fileReferenceIoErrorHandler);
 			_fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 			
-			_view.importButton.addEventListener(MouseEvent.CLICK, importButtonClickHandler);
-			if (_view.exportButton != null ) {
-				_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			view.importButton.addEventListener(MouseEvent.CLICK, importButtonClickHandler);
+			if (view.exportButton != null ) {
+				view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
 			}
-			_view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
-			if ( _view.paginationBar != null ) {
-				_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
+			view.cancelImportButton.addEventListener(MouseEvent.CLICK, cancelClickHandler);
+			if ( view.paginationBar != null ) {
+				view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
 			}
-			_view.errorsOkButton.addEventListener(MouseEvent.CLICK, errorsOkButtonClickHandler);
-			if ( _view.exportErrorsButton != null ) {
-				_view.exportErrorsButton.addEventListener(MouseEvent.CLICK, exportErrorsClickHandler);
+			view.errorsOkButton.addEventListener(MouseEvent.CLICK, errorsOkButtonClickHandler);
+			if ( view.exportErrorsButton != null ) {
+				view.exportErrorsButton.addEventListener(MouseEvent.CLICK, exportErrorsClickHandler);
 			}
-			_view.closeButton.addEventListener(MouseEvent.CLICK, closeButtonClickHandler);
+			view.closeButton.addEventListener(MouseEvent.CLICK, closeButtonClickHandler);
 		}
 		
 		protected function summaryPageChangeHandler(event:PaginationBarEvent):void {
@@ -120,11 +121,11 @@ package org.openforis.collect.presenter {
 		
 		protected function loadSummaries():void {
 			if ( _recordsOffset == 0 ) {
-				_view.paginationBar.showPage(1);
+				view.paginationBar.showPage(1);
 			}
-			_view.summaryDataGrid.dataProvider = null;
+			view.summaryDataGrid.dataProvider = null;
 			
-			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
+			view.paginationBar.currentState = PaginationBar.LOADING_STATE;
 			performSummariesLoad(_recordsOffset, _recordsPerPage);
 		}
 		
@@ -155,7 +156,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function cancelClickHandler(event:MouseEvent):void {
-			switch ( _view.currentState ) {
+			switch ( view.currentState ) {
 				case AbstractReferenceDataImportView.STATE_UPLOADING:
 					_fileReference.cancel();
 					break;
@@ -220,11 +221,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceProgressHandler(event:ProgressEvent):void {
-			_view.progressBar.setProgress(event.bytesLoaded, event.bytesTotal);
+			view.progressBar.setProgress(event.bytesLoaded, event.bytesTotal);
 		}
 		
 		protected function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
-			_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
+			view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
 			_uploadedTempFileName = event.data;
 			performProcessStart();
 			startProgressTimer();
@@ -286,7 +287,7 @@ package org.openforis.collect.presenter {
 				var step:ProcessStatus$Step = _state.step;
 				switch ( step ) {
 					case ProcessStatus$Step.INIT:
-						_view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
+						view.currentState = AbstractReferenceDataImportView.STATE_LOADING;
 						startProgressTimer();
 						break;
 					case ProcessStatus$Step.RUN:
@@ -313,18 +314,18 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function backToDefaultView():void {
-			_view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
+			view.currentState = AbstractReferenceDataImportView.STATE_DEFAULT;
 		}
 		
 		protected function updateViewForUploading():void {
-			_view.currentState = AbstractReferenceDataImportView.STATE_UPLOADING;
-			_view.progressTitleText = Message.get(_messageKeys.UPLOADING_FILE);
-			_view.progressLabelText = "";
+			view.currentState = AbstractReferenceDataImportView.STATE_UPLOADING;
+			view.progressTitleText = Message.get(_messageKeys.UPLOADING_FILE);
+			view.progressLabelText = "";
 		}
 		
 		protected function updateViewForRunning():void {
-			_view.currentState = AbstractReferenceDataImportView.STATE_IMPORTING;
-			_view.progressTitleText = Message.get(_messageKeys.IMPORTING);
+			view.currentState = AbstractReferenceDataImportView.STATE_IMPORTING;
+			view.progressTitleText = Message.get(_messageKeys.IMPORTING);
 			updateProgressBar(_messageKeys.IMPORTING_PROGRESS_LABEL);
 		}
 		
@@ -333,8 +334,8 @@ package org.openforis.collect.presenter {
 				AlertUtil.showError(_messageKeys.ERROR, [_state.errorMessage]);
 				backToDefaultView();
 			} else {
-				_view.currentState = AbstractReferenceDataImportView.STATE_ERROR;
-				_view.errorsDataGrid.dataProvider = _state.errors;
+				view.currentState = AbstractReferenceDataImportView.STATE_ERROR;
+				view.errorsDataGrid.dataProvider = _state.errors;
 			}
 		}
 		
@@ -353,12 +354,12 @@ package org.openforis.collect.presenter {
 				} else {
 					progressText = Message.get(_messageKeys.PROCESSING);
 				}
-				_view.progressBar.setProgress(0, 0);
+				view.progressBar.setProgress(0, 0);
 			} else {
 				progressText = Message.get(progressLabelResource, [_state.processed, _state.total]);
-				_view.progressBar.setProgress(_state.processed, _state.total);
+				view.progressBar.setProgress(_state.processed, _state.total);
 			}
-			_view.progressLabelText = progressText;
+			view.progressLabelText = progressText;
 		}
 		
 		protected function resetView():void {
@@ -369,7 +370,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function exportErrorsClickHandler(event:MouseEvent):void {
-			DataGrids.writeToCSV(_view.errorsDataGrid);
+			DataGrids.writeToCSV(view.errorsDataGrid);
 		}
 		
 	}

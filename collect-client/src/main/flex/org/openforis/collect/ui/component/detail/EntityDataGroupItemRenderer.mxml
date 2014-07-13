@@ -31,10 +31,10 @@
 			private var _modelVersion:ModelVersionProxy;
 			private var _entity:EntityProxy;
 			private var _nodesDirection:String = DIRECTION_HORIZONTAL;
-			private var _inited:Boolean = false;
 			
 			override protected function initPresenter():void {
 				_presenter = new EntityDataGroupItemPresenter(this);	
+				_presenter.init();
 			}
 
 			override protected function createChildren():void {
@@ -46,9 +46,10 @@
 			override public function set data(value:Object):void {
 				super.data = value;
 				entity = value as EntityProxy;
-				if ( ! _inited ) {
+				if ( entity == null ) {
+					nodeDefinitionsGroup.removeAllElements();
+				} else {
 					initNodeDefinitions();
-					_inited = true;
 				}
 			}
 			

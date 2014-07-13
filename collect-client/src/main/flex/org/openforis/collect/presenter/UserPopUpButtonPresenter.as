@@ -19,17 +19,22 @@ package org.openforis.collect.presenter
 		private const CHANGE_PASSWORD_MENU_ITEM:String = Message.get("usersManagement.changePassword");
 		private const LOGOUT_MENU_ITEM:String = Message.get("global.logout");
 		
-		private var _view:UserPopUpButton;
-		
 		public function UserPopUpButtonPresenter(view:UserPopUpButton) {
-			this._view = view;
+			super(view);
+		}
+		
+		override public function init():void {
+			super.init();
 			initUserPopUpMenu();
-			super();
+		}
+		
+		private function get view():UserPopUpButton {
+			return UserPopUpButton(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			_view.loggedPopUpButton.addEventListener(MenuEvent.ITEM_CLICK, loggedPopUpMenuItemClickHandler);
+			view.loggedPopUpButton.addEventListener(MenuEvent.ITEM_CLICK, loggedPopUpMenuItemClickHandler);
 		}
 		
 		protected function initUserPopUpMenu():void {
@@ -37,7 +42,7 @@ package org.openforis.collect.presenter
 			result.addItem(CHANGE_PASSWORD_MENU_ITEM);
 			result.addItem({type: 'separator'});
 			result.addItem(LOGOUT_MENU_ITEM);
-			_view.loggedPopUpButton.dataProvider = result;
+			view.loggedPopUpButton.dataProvider = result;
 		}
 		
 		protected function loggedPopUpMenuItemClickHandler(event:MenuEvent):void {

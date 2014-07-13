@@ -42,6 +42,7 @@
 
 			protected function initPresenter():void {
 				presenter = new AttributePresenter(this);
+				presenter.init();
 			}
 			
 			/**

@@ -32,25 +32,34 @@ package org.openforis.collect.presenter
 			super(view);
 		}
 		
+		private function get view():MultipleAttributeFormItem {
+			return MultipleAttributeFormItem(_view);
+		}
+		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
+		}
+		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
 			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
-		private function get view():MultipleAttributeFormItem {
-			return MultipleAttributeFormItem(_view);
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			super.updateResponseReceivedHandler(event);
-			if(_view.parentEntity != null) {
+			if(view.parentEntity != null) {
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
 					if( change is EntityChangeProxy && 
-							EntityChangeProxy(change).nodeId == _view.parentEntity.id) {
+							EntityChangeProxy(change).nodeId == view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						break;
@@ -123,9 +132,9 @@ package org.openforis.collect.presenter
 		
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
-			if(_view.parentEntity != null) {
+			if(view.parentEntity != null) {
 				var attributeName:String = view.attributeDefinition.name;
-				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
+				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(attributeName);
 				var active:Boolean = visited;
 				if(active) {
 					_validationDisplayManager.active = true;

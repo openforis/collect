@@ -20,47 +20,47 @@ package org.openforis.collect.presenter {
 		
 		private static const QUALIFIER_FIELD_IDX:int = 1;
 
-		private var _view:FixedCodeInputField;
-		
 		public function FixedCodeInputFieldPresenter(inputField:FixedCodeInputField) {
-			this._view = inputField;
-			
 			super(inputField);
 		}
 		
+		private function get view():FixedCodeInputField {
+			return FixedCodeInputField(_view);
+		}
+
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			_view.qualifierTextInput.addEventListener(FocusEvent.FOCUS_OUT, qualifierFocusOutHandler);
+			view.qualifierTextInput.addEventListener(FocusEvent.FOCUS_OUT, qualifierFocusOutHandler);
 		}
 		
 		override protected function updateView():void {
 			super.updateView();
 			var qualifiable:Boolean = false;
 			var qualifier:String = null;
-			var codeAttribute:CodeAttributeProxy = _view.attribute as CodeAttributeProxy;
+			var codeAttribute:CodeAttributeProxy = view.attribute as CodeAttributeProxy;
 			if(codeAttribute != null && codeAttribute.codeListItem != null) {
 				qualifiable = codeAttribute.codeListItem.qualifiable;
 				if(qualifiable) {
-					var qualifierField:FieldProxy = _view.attribute.getField(1);
+					var qualifierField:FieldProxy = view.attribute.getField(1);
 					if(qualifierField.value != null) {
 						qualifier = String(qualifierField.value);
 					}
 				}
 			}
-			_view.qualifiable = qualifiable;
-			_view.qualifierTextInput.text = qualifier;
-			if(_view.parentEntity) {
-				var entityName:String = _view.parentEntity.name;
-				var ancestorEntityId:Number = _view.parentEntity.parentId;
+			view.qualifiable = qualifiable;
+			view.qualifierTextInput.text = qualifier;
+			if(view.parentEntity) {
+				var entityName:String = view.parentEntity.name;
+				var ancestorEntityId:Number = view.parentEntity.parentId;
 				var ancestorEntity:EntityProxy = Application.activeRecord.getNode(ancestorEntityId) as EntityProxy;
-				var width:Number = UIBuilder.getEnumeratedCodeHeaderWidth(_view.attributeDefinition, ancestorEntity);
-				_view.width = width;
+				var width:Number = UIBuilder.getEnumeratedCodeHeaderWidth(view.attributeDefinition, ancestorEntity);
+				view.width = width;
 			}
 		}
 		
 		override protected function getTextFromValue():String {
 			var result:String = null;
-			var codeAttribute:CodeAttributeProxy = _view.attribute as CodeAttributeProxy;
+			var codeAttribute:CodeAttributeProxy = view.attribute as CodeAttributeProxy;
 			if(codeAttribute != null && codeAttribute.codeListItem != null) {
 				result = codeAttribute.codeListItem.getLabelText();
 			}
@@ -68,14 +68,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function qualifierFocusOutHandler(event:FocusEvent):void {
-			var value:String = _view.qualifierTextInput.text;
+			var value:String = view.qualifierTextInput.text;
 			value = StringUtil.trim(value);
 			applyQualifier(value);
 		}
 		
 		protected function applyQualifier(value:String):void {
 			var r:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
-			r.nodeId = _view.attribute.id;
+			r.nodeId = view.attribute.id;
 			r.fieldIndex = QUALIFIER_FIELD_IDX;
 			r.value = value;
 			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);

@@ -34,20 +34,20 @@ package org.openforis.collect.presenter
 		private var _samplingDesignImportClient:SamplingDesignImportClient;
 		
 		public function SamplingDesignImportPresenter(view:SamplingDesignImportView) {
+			super(view, new MessageKeys());
 			_samplingDesignClient = ClientFactory.samplingDesignClient;
 			_samplingDesignImportClient = ClientFactory.samplingDesignImportClient;
-			super(view, new MessageKeys());
 			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 			view.spatialReferenceSystems = Application.activeSurvey.spatialReferenceSystems;
+		}
+		
+		private function get view():SamplingDesignImportView {
+			return SamplingDesignImportView(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			view.downloadExampleButton.addEventListener(MouseEvent.CLICK, downloadExampleButtonClickHandler);
-		}
-		
-		private function get view():SamplingDesignImportView {
-			return SamplingDesignImportView(_view);
 		}
 		
 		private function get messageKeys():MessageKeys {
@@ -81,9 +81,9 @@ package org.openforis.collect.presenter
 		
 		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {
 			var result:SamplingDesignSummariesProxy = event.result as SamplingDesignSummariesProxy;
-			SamplingDesignImportView(_view).summaryContainer.selectedIndex = result.totalCount > 0 ? 1: 0;
-			_view.summaryDataGrid.dataProvider = result.records;
-			_view.paginationBar.totalRecords = result.totalCount;
+			view.summaryContainer.selectedIndex = result.totalCount > 0 ? 1: 0;
+			view.summaryDataGrid.dataProvider = result.records;
+			view.paginationBar.totalRecords = result.totalCount;
 		}
 		
 		override protected function performProcessStart():void {
@@ -119,7 +119,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function fileReferenceSelectHandler(event:Event):void {
-			if ( SamplingDesignImportView(_view).summaryContainer.selectedIndex == 0 ) {
+			if ( view.summaryContainer.selectedIndex == 0 ) {
 				startUpload();
 			} else {
 				super.fileReferenceSelectHandler(event);

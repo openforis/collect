@@ -17,6 +17,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new RangeAttributePresenter(this);
+				presenter.init();
 			}
 			
 			protected function unitLabelFunction(item:Object):String {

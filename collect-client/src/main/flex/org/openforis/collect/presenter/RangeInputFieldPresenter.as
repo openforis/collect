@@ -14,17 +14,22 @@ package org.openforis.collect.presenter
 		protected static const INTEGER_RESTRICT_PATTERN:String = "^(\\*|-|\\?|((-?\\d*)(-(-?\\d*))?))$";
 		protected static const SEPARATOR:String = "-";
 
-		private var _view:RangeInputField;
-		
 		public function RangeInputFieldPresenter(inputField:RangeInputField) {
-			_view = inputField;
-			_view.fieldIndex = -1;
 			super(inputField);
-			setRestriction();
+			view.fieldIndex = -1;
+		}
+		
+		override public function init():void {
+			super.init();
+			initFieldRestriction();
+		}
+		
+		private function get view():RangeInputField {
+			return RangeInputField(_view);
 		}
 		
 		override protected function getTextFromValue():String {
-			var attribute:AttributeProxy = _view.attribute;
+			var attribute:AttributeProxy = view.attribute;
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(0);
 				if(field.symbol != null) {
@@ -46,9 +51,9 @@ package org.openforis.collect.presenter
 			return "";
 		}
 		
-		protected function setRestriction():void {
-			var integer:Boolean = RangeAttributeDefinitionProxy(_view.attributeDefinition).integer;
-			_view.restrict = integer ? INTEGER_RESTRICT_PATTERN: RESTRICT_PATTERN;
+		protected function initFieldRestriction():void {
+			var integer:Boolean = RangeAttributeDefinitionProxy(view.attributeDefinition).integer;
+			view.restrict = integer ? INTEGER_RESTRICT_PATTERN: RESTRICT_PATTERN;
 		}
 		
 	}

@@ -41,8 +41,12 @@ package org.openforis.collect.presenter
 		private var _importClient:CSVDataImportClient;
 		
 		public function CSVDataImportPresenter(view:CSVDataImportView) {
-			_importClient = ClientFactory.csvDataImportClient;
 			super(view, new MessageKeys());
+			_importClient = ClientFactory.csvDataImportClient;
+		}
+		
+		override public function init():void {
+			super.init();
 			updateImportFileFormatInfoMessage();
 		}
 		
