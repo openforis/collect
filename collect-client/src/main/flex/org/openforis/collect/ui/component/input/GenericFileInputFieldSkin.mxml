@@ -63,17 +63,15 @@
 	<s:HGroup id="controlsContainer" 
 			  visible="{editable}" 
 			  includeInLayout="{editable}" 
-			  gap="20">
+			  gap="5">
 		
 		<s:Group excludeFrom="uploading"
 				 itemCreationPolicy="immediate"
 				 width="100%">
 			<s:Button id="browseButton" 
-					  styleName="uploadButton"
 					  useHandCursor="true"
 					  buttonMode="true"
-					  toolTip="{Message.get('edit.file.upload')}"
-					  toolTip.fileUploaded="{Message.get('edit.file.uploadAgain')}" />
+					  label="{Message.get('edit.file.upload')}" />
 			
 			<graphics:RemarksPresentIcon id="remarksPresentIcon"
 										 top="0"
@@ -95,16 +93,8 @@
 				  itemCreationPolicy="immediate"
 				  horizontalAlign="center"
 				  width="100%">
-			<s:Button id="downloadButton" 
-					  styleName="downloadButton" 
-					  useHandCursor="true"
-					  buttonMode="true"
-					  toolTip="{Message.get('global.download')}" />
-			<s:Button id="removeButton" 
-					  styleName="deleteButton" 
-					  useHandCursor="true"
-					  buttonMode="true"
-					  toolTip="{Message.get('global.delete')}" />
+			<s:Button id="downloadButton" label="{Message.get('global.download')}" />
+			<s:Button id="removeButton" label="{Message.get('global.delete')}" />
 		</s:HGroup>
 	</s:HGroup>
 	

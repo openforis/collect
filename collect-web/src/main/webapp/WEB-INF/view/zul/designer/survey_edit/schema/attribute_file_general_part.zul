@@ -9,7 +9,7 @@
       <row>
         <label value="${labels.survey.schema.attribute.file.max_size}:" />
         <fieldErrorHandler message="@load(vmsgs['maxSize'])">
-          <intbox width="150px" value="@bind(fx.maxSize)"
+          <intbox width="50px" value="@bind(fx.maxSize)"
             onChange="@command('applyChanges')" />
         </fieldErrorHandler>
       </row>

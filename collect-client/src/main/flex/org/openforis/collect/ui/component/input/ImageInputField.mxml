@@ -17,25 +17,6 @@
 			override protected function initPresenter():void {
 				presenter = new ImageInputFieldPresenter(this);
 			}
-			/*
-			override public function set mxmlContent(value:Array):void {
-				var adding:Boolean = true;
-				var index:int = 0;
-				while ( adding ) {
-					var ive:IVisualElement = null;
-					try {
-						ive = super.getElementAt(index);
-					} catch (e:Error) {}
-					if ( ive != null ) {
-						value.unshift(ive);
-						index++;
-					}else{
-						adding = false;
-					}
-				}
-				super.mxmlContent = value;
-			}
-			*/
 		]]>
 	</fx:Script>
 	
@@ -59,9 +40,11 @@
 				 itemCreationPolicy="immediate"
 				 width="100%">
 			<s:Button id="browseButton" 
-					  label="{Message.get('edit.file.upload')}"
-					  label.fileUploaded="{Message.get('edit.file.uploadAgain')}"
-					  />
+					  styleName="uploadButton"
+					  buttonMode="true"
+					  useHandCursor="true"
+					  toolTip="{Message.get('edit.file.upload')}"
+					  toolTip.fileUploaded="{Message.get('edit.file.uploadAgain')}" />
 			<graphics:RemarksPresentIcon id="remarksPresentIcon"
 										 top="0"
 										 right="0"
@@ -83,8 +66,16 @@
 				  itemCreationPolicy="immediate"
 				  width="100%"
 				  horizontalAlign="center">
-			<s:Button id="downloadButton" label="{Message.get('global.download')}" />
-			<s:Button id="removeButton" label="{Message.get('global.delete')}" />
+			<s:Button id="downloadButton" 
+					  styleName="downloadButton"
+					  buttonMode="true"
+					  useHandCursor="true"
+					  toolTip="{Message.get('global.download')}" />
+			<s:Button id="removeButton" 
+					  styleName="deleteButton"
+					  buttonMode="true"
+					  useHandCursor="true"
+					  toolTip="{Message.get('global.delete')}" />
 		</s:HGroup>
 	</s:HGroup>
 		

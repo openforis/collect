@@ -309,6 +309,14 @@ s|Button.errorButton {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.ErrorButtonSkin");
 }
 
+s|Button.uploadButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.UploadButtonSkin");
+}
+
+s|Button.downloadButton {
+	skin-class: ClassReference("org.openforis.collect.ui.skin.DownloadButtonSkin");
+}
+
 .dialogHeaderStyle {
 	font-size: 11;
 	font-weight: bold;

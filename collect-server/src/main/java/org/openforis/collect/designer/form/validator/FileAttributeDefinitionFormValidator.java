@@ -9,7 +9,7 @@ import org.zkoss.bind.ValidationContext;
  */
 public class FileAttributeDefinitionFormValidator extends AttributeDefinitionFormValidator {
 	
-	protected static final int MAX_FILE_SIZE = 10485760; //10MB
+	protected static final int MAX_FILE_SIZE = 1024; //in MB = 1GB
 	protected static final String MAX_SIZE_FIELD = "maxSize";
 	protected static final String EXTENSIONS_FIELD = "extensions";
 	protected static final String EXPRESSIONS_REGEX = "([a-zA-Z0-9]+\\s?)+";
@@ -32,8 +32,7 @@ public class FileAttributeDefinitionFormValidator extends AttributeDefinitionFor
 	}
 
 	protected boolean validateExtensions(ValidationContext ctx) {
-		String field = EXTENSIONS_FIELD;
-		return validateRegEx(ctx, EXPRESSIONS_REGEX, field, INVALID_EXTENSIONS_ERROR_KEY);
+		return validateRegEx(ctx, EXPRESSIONS_REGEX, EXTENSIONS_FIELD, INVALID_EXTENSIONS_ERROR_KEY);
 	}
 
 }
