@@ -343,11 +343,6 @@ package org.openforis.collect.presenter {
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
-		protected function preventDefaultHandler(event:Event):void {
-			event.preventDefault();
-			event.stopImmediatePropagation();
-		}
-		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(view.attribute != null) {
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);

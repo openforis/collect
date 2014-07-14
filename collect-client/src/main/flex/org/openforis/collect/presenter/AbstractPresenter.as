@@ -79,6 +79,15 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		protected static function preventDefaultHandler(event:Event):void {
+			event.preventDefault();
+		}
+		
+		protected static function preventDefaultHandlerAndPropagation(event:Event):void {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+		}
+		
 		internal function initEventListeners():void {
 			if ( _view != null ) {
 				_view.addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);

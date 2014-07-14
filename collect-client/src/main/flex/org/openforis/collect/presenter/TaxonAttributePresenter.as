@@ -20,10 +20,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.event.TaxonInputFieldEvent;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -70,17 +67,17 @@ package org.openforis.collect.presenter {
 			view.codeTextInput.applyChangesOnFocusOut = false;
 			view.codeTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			view.codeTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-			view.codeTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
+			view.codeTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler, false, 100);
 			//scientific name text input
 			view.scientificNameTextInput.applyChangesOnFocusOut = false;
 			view.scientificNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			view.scientificNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-			view.scientificNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
+			view.scientificNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler, false, 100);
 			//vernacular name text input
 			view.vernacularNameTextInput.applyChangesOnFocusOut = false;
 			view.vernacularNameTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
 			view.vernacularNameTextInput.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-			view.vernacularNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
+			view.vernacularNameTextInput.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler, false, 100);
 			//language code text input
 			//language variety text input
 			view.languageVarietyTextInput.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
@@ -139,28 +136,35 @@ package org.openforis.collect.presenter {
 		
 		protected function inputFieldKeyDownHandler(event:KeyboardEvent):void {
 			switch ( event.keyCode ) {
-				case Keyboard.DOWN:
-					if ( autoCompletePopUpOpened ) {
-						autoCompletePopUp.dataGrid.setFocus();
-						if ( CollectionUtil.isNotEmpty(autoCompleteLastResult) ) {
-							autoCompletePopUp.dataGrid.selectedIndex = 0;
-						}
+			case Keyboard.DOWN:
+				if ( autoCompletePopUpOpened ) {
+					preventDefaultHandlerAndPropagation(event);
+
+					autoCompletePopUp.dataGrid.setFocus();
+					if ( CollectionUtil.isNotEmpty(autoCompleteLastResult) ) {
+						autoCompletePopUp.dataGrid.selectedIndex = 0;
 					}
-					break;
-				case Keyboard.ESCAPE:
+				}
+				break;
+			case Keyboard.ESCAPE:
+				closeAutoCompletePopUp();
+				break;
+			case Keyboard.TAB:
+				if ( autoCompleteDataLoading ) {
+					preventDefaultHandlerAndPropagation(event);
+				} else if ( autoCompletePopUpOpened ) {
+					preventDefaultHandlerAndPropagation(event);
+					var matchingResult:Object = getMatchingResult();
+					if ( matchingResult == null ) {
+						//no matching result, cancel field editing
+						cancelAutoComplete();
+					} else {
+						//select matching result, if any
+						performSelectTaxon(matchingResult);
+					}
 					closeAutoCompletePopUp();
-					break;
-				case Keyboard.TAB:
-					if ( autoCompleteDataLoading ) {
-						event.preventDefault();
-					} else if ( autoCompletePopUpOpened ) {
-						var matchingResult:Object = getMatchingResult();
-						if ( matchingResult != null ) {
-							performSelectTaxon(matchingResult);
-						}
-						closeAutoCompletePopUp();
-					}
-					break;
+				}
+				break;
 			}
 		}
 		
@@ -239,7 +243,11 @@ package org.openforis.collect.presenter {
 			var keyCode:uint = event.keyCode;
 			switch(keyCode) {
 				case Keyboard.ENTER:
-					taxonSelectHandler();
+					var taxon:Object = autoCompletePopUp.dataGrid.selectedItem;
+					var renderer:TaxonAttributeRenderer = autoCompleteLastInputField.parentDocument as TaxonAttributeRenderer;
+					var presenter:TaxonAttributePresenter = renderer.presenter as TaxonAttributePresenter;
+					presenter.performSelectTaxon(taxon);
+					closeAutoCompletePopUp();
 					break;
 				case Keyboard.ESCAPE:
 					cancelAutoComplete();
@@ -261,16 +269,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function cancelAutoComplete():void {
+			if ( autoCompleteLastInputField.changed ) {
+				autoCompleteLastInputField.presenter.undoLastChange();
+			}
 			closeAutoCompletePopUp();
 		}
 		
 		protected static function taxonSelectHandler(event:TaxonInputFieldEvent = null):void {
-			var taxon:Object;
-			if(event != null) {
-				taxon = event.taxon;
-			} else {
-				taxon = autoCompletePopUp.dataGrid.selectedItem;
-			}
+			var taxon:Object = event.taxon;
 			if(taxon != null) {
 				var renderer:TaxonAttributeRenderer = autoCompleteLastInputField.parentDocument as TaxonAttributeRenderer;
 				var presenter:TaxonAttributePresenter = renderer.presenter as TaxonAttributePresenter;

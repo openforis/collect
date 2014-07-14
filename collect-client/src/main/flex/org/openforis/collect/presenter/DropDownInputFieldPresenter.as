@@ -4,9 +4,10 @@ package org.openforis.collect.presenter {
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	
-	import mx.binding.utils.BindingUtils;
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.InputFieldEvent;
@@ -53,8 +54,8 @@ package org.openforis.collect.presenter {
 			view.dropDownList.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangeHandler);
 			
-			BindingUtils.bindSetter(setDataProvider, view, "dataProvider");
-			BindingUtils.bindSetter(setDefaultValue, view, "defaultValue");
+			ChangeWatcher.watch(view, "dataProvider", dataProviderChangeHandler);
+			ChangeWatcher.watch(view, "defaultValue", defaultValueChangeHandler);
 		}
 		
 		override protected function changeHandler(event:Event):void {
@@ -77,12 +78,12 @@ package org.openforis.collect.presenter {
 			updateView();
 		}
 		
-		protected function setDataProvider(value:IList):void {
+		protected function dataProviderChangeHandler(event:PropertyChangeEvent):void {
 			initInternalDataProvider();
 			updateView();
 		}
 		
-		protected function setDefaultValue(value:String):void {
+		protected function defaultValueChangeHandler(event:PropertyChangeEvent):void {
 			updateView();
 		}
 		

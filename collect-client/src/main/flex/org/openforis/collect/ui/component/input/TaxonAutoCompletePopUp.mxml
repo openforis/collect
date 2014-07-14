@@ -21,9 +21,9 @@
 			private var _taxonAttributeDefinition:TaxonAttributeDefinitionProxy;
 			
 			public function itemClickHandler(event:MouseEvent=null):void {
-				if(dataGrid.selectedItem!=null) {
+				if ( dataGrid.selectedItem != null ) {
 					var taxonEvent:TaxonInputFieldEvent = new TaxonInputFieldEvent(TaxonInputFieldEvent.TAXON_SELECT);
-					taxonEvent.taxon = dataGrid.selectedItem as TaxonOccurrenceProxy;
+					taxonEvent.taxon = dataGrid.selectedItem;
 					dispatchEvent(taxonEvent);
 				}
 			}
