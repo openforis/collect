@@ -123,6 +123,7 @@
 												   'horizontal': 'vertical'}"
 											   nodeDefinitions="{nodeDefinitions}"
 											   parentEntity="{parentEntity}"
+											   entityDefinition="{entityDefinition}"
 											   labelsDirection="{entitiesDirection == MultipleEntityAsTableFormItem.DIRECTION_BY_ROWS ? 
 											   		DataGroupHeader.DIRECTION_HORIZONTAL: DataGroupHeader.DIRECTION_VERTICAL}"
 											   />
