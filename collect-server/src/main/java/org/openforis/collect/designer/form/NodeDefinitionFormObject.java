@@ -42,6 +42,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String pcPromptLabel;
 	//layout
 	private String tabName;
+	private int column;
 	
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
@@ -111,7 +112,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			requiredExpression = source.getRequiredExpression();
 		}
 		relevantExpression = source.getRelevantExpression();
-		hideWhenNotRelevant = getUIOptions(source).isHideWhenNotRelevant(source);
 		minCount = nodeMinCount;
 		if ( multiple ) {
 			maxCount = source.getMaxCount();
@@ -127,6 +127,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		handheldPromptLabel = source.getPrompt(Prompt.Type.HANDHELD, language);
 		pcPromptLabel = source.getPrompt(Prompt.Type.PC, language);
 		description = source.getDescription(language);
+		//layout
+		UIOptions uiOptions = getUIOptions(source);
+		hideWhenNotRelevant = uiOptions.isHideWhenNotRelevant(source);
+		column = uiOptions.getColumn(source);
 	}
 
 	@Override
@@ -154,7 +158,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
-		getUIOptions(dest).setHideWhenNotRelevant(dest, hideWhenNotRelevant);
+		//layout
+		UIOptions uiOptions = getUIOptions(dest);
+		uiOptions.setHideWhenNotRelevant(dest, hideWhenNotRelevant);
+		uiOptions.setColumn(dest, column);
 	}
 
 	@Override
@@ -304,4 +311,12 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.tabName = tabName;
 	}
 
+	public int getColumn() {
+		return column;
+	}
+	
+	public void setColumn(int column) {
+		this.column = column;
+	}
+	
 }
