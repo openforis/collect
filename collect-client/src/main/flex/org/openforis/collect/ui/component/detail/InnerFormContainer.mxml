@@ -6,57 +6,29 @@
 					creationComplete="creationCompleteHandler(event)">
 	<fx:Script>
 		<![CDATA[
-			import mx.binding.utils.BindingUtils;
 			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.InnerFormPresenter;
 			import org.openforis.collect.util.UIUtil;
 			
 			private var _entityDefinition:EntityDefinitionProxy;
 			private var _modelVersion:ModelVersionProxy;
 			private var _nodeDefinitions:IList;
 			private var _parentEntity:EntityProxy;
-			private var _enlarged:Boolean;
+			private var _occupyAllAvailableSpace:Boolean;
 			
 			public static const STATE_DEFAULT:String = "default";
 			public static const STATE_ENLARGED:String = "enlarged";
 			
+			private var _presenter:InnerFormPresenter;
+			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				BindingUtils.bindSetter(nodeDefinitionsSetter, this, "nodeDefinitions");
-			}
-			
-			protected function nodeDefinitionsSetter(value:IList):void {
-				updateCurrentState();
-			}
-			
-			protected function updateCurrentState():void {
-				enlarged = calculateContainsOnlyOneMultipleEntity()/* || isInsideFormLayoutEntity()*/;
-				currentState = enlarged ? STATE_ENLARGED: STATE_DEFAULT;
-			}
-			
-			protected function calculateContainsOnlyOneMultipleEntity():Boolean {
-				if(nodeDefinitions != null && nodeDefinitions.length == 1) {
-					var firstNode:Object = nodeDefinitions.getItemAt(0);
-					if(firstNode is EntityDefinitionProxy) {
-						var entity:EntityDefinitionProxy = EntityDefinitionProxy(firstNode);
-						if(entity.multiple /*&& entity.layout == UIUtil.LAYOUT_TABLE*/) {
-							return true;
-						}
-					}
-				}
-				return false;
-			}
-			
-			private function isInsideFormLayoutEntity():Boolean {
-				if ( entityDefinition != null && entityDefinition.parent != null && 
-					entityDefinition.parent.multiple && entityDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
-					return true;
-				} else {
-					return false;
-				}
+				_presenter = new InnerFormPresenter(this);
+				_presenter.init();
 			}
 			
 			public function resetScrollBars():void {
@@ -102,12 +74,12 @@
 			}
 			
 			[Bindable]
-			public function get enlarged():Boolean {
-				return _enlarged;
+			public function get occupyAllAvailableSpace():Boolean {
+				return _occupyAllAvailableSpace;
 			}
 			
-			public function set enlarged(value:Boolean):void {
-				_enlarged = value;
+			public function set occupyAllAvailableSpace(value:Boolean):void {
+				_occupyAllAvailableSpace = value;
 			}
 			
 		]]>
@@ -124,30 +96,20 @@
 				horizontalScrollPolicy.enlarged="off"
 				verticalScrollPolicy.enlarged="off">
 		<s:Group>
-			<s:DataGroup id="formDataGroup" 
-						 dataProvider="{nodeDefinitions}">
-				<s:layout>
-					<s:VerticalLayout gap="5" 
-									  paddingBottom="10" 
-									  paddingLeft="10" 
-									  paddingRight="10"
-									  paddingTop="10"
-									  paddingBottom.enlarged="0" 
-									  paddingLeft.enlarged="0" 
-									  paddingRight.enlarged="0" 
-									  paddingTop.enlarged="0" />
-				</s:layout>
-				<s:itemRenderer>
-					<fx:Component>
-						<detail:FormDataGroupItemRenderer
-							occupyEntirePage="{parentDocument.enlarged}"
-							width="{parentDocument.enlarged ? parentDocument.width: NaN}"
-							height="{parentDocument.enlarged ? parentDocument.height: NaN}"
-							modelVersion="{parentDocument.modelVersion}"
-							entity="{parentDocument.parentEntity}" />
-					</fx:Component>
-				</s:itemRenderer>
-			</s:DataGroup>
+			<mx:Grid id="grid"
+					 paddingBottom="10" 
+					 paddingLeft="10" 
+					 paddingRight="10"
+					 paddingTop="10"
+					 paddingBottom.enlarged="0" 
+					 paddingLeft.enlarged="0" 
+					 paddingRight.enlarged="0" 
+					 paddingTop.enlarged="0"
+					 width="{occupyAllAvailableSpace ? width: NaN}"
+					 height="{occupyAllAvailableSpace ? height: NaN}"
+					 >
+				<!-- to be built programmatically -->
+			</mx:Grid>
 		</s:Group>
 	</s:Scroller>
 	

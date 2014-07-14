@@ -30,5 +30,6 @@ public interface UIOptionsConstants {
 	String VISIBLE_FIELDS = "visibleFields";
 	String SHOW_ALLOWED_VALUES_PREVIEW = "showAllowedValuesPreview";
 	String SHOW_IN_UI = "showInUI";
+	String COLUMN = "column";
 	
 }
