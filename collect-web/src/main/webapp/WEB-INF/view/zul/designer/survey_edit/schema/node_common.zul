@@ -322,6 +322,15 @@
     				<column />
     			</columns>
     			<rows>
+    				<row>
+		  				<fieldErrorHandler message="@load(vmsgs['column'])">
+		  					<label value="${labels.survey.schema.node.layout.column}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['column'])">
+		  					<intbox value="@bind(fx.column)"
+		  						onChange="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+		  			</row>
     			</rows>
     		</grid>
 

@@ -655,6 +655,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public void setHideWhenNotRelevant(NodeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.HIDE_WHEN_NOT_RELEVANT, value);
 	}
+	
+	public int getColumn(NodeDefinition defn) {
+		return getAnnotationIntegerValue(defn, Annotation.COLUMN);
+	}
+	
+	public void setColumn(NodeDefinition defn, int value) {
+		setAnnotationValue(defn, Annotation.COLUMN, value);
+	}
 
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
@@ -666,12 +674,22 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 
-	private void setAnnotationValue(NodeDefinition defn, Annotation annotation, boolean value) {
+	private Integer getAnnotationIntegerValue(NodeDefinition defn, Annotation annotation) {
+		String annotationValue = defn.getAnnotation(annotation.getQName());
+		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {
+			Integer defaultValue = annotation.getDefaultValue();
+			return defaultValue;
+		} else {
+			return Integer.valueOf(annotationValue);
+		}
+	}
+	
+	private void setAnnotationValue(NodeDefinition defn, Annotation annotation, Object value) {
 		String annotationValue;
 		if ( annotation.getDefaultValue() != null && annotation.getDefaultValue().equals(value) ) {
 			annotationValue = null;
 		} else {
-			annotationValue = Boolean.toString(value);
+			annotationValue = value.toString();
 		}
 		defn.setAnnotation(annotation.getQName(), annotationValue);
 	}
