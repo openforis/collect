@@ -15,17 +15,18 @@ package org.openforis.collect.presenter {
 		private static const FALSE:String = Message.get("edit.booleanValue.false");
 		private static const RESTRICT_PATTERN:String = "^(\\*|-|\\?|" + TRUE + "|" + FALSE + ")$";
 		
-		private var _view:BooleanInputField;
-		
 		public function BooleanInputFieldPresenter(inputField:BooleanInputField) {
-			_view = inputField;
-			_view.restrict = RESTRICT_PATTERN;
 			super(inputField);
+			inputField.restrict = RESTRICT_PATTERN;
+		}
+		
+		private function get view():BooleanInputField {
+			return BooleanInputField(_view);
 		}
 		
 		override protected function textToRequestValue():String {
 			var value:String = null;
-			var text:String = StringUtil.trim(_view.text);
+			var text:String = StringUtil.trim(view.text);
 			switch(text) {
 				case TRUE:
 				case TRUE.toLowerCase():
@@ -42,7 +43,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function getTextFromValue():String {
-			var attribute:AttributeProxy = _view.attribute;
+			var attribute:AttributeProxy = view.attribute;
 			if(attribute != null) {
 				var field:FieldProxy = attribute.getField(0);
 				var value:Object = field.value;

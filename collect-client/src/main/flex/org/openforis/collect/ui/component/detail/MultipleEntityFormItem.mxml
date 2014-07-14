@@ -35,6 +35,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleEntityFormItemPresenter(this);
+				presenter.init();
 			}
 
 			[Bindable]

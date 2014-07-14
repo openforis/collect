@@ -22,6 +22,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new TaxonAttributePresenter(this);
+				presenter.init();
 			}
 		]]>
 	</fx:Script>

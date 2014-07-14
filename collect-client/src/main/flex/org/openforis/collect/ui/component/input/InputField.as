@@ -63,6 +63,7 @@ package org.openforis.collect.ui.component.input {
 		
 		protected function initPresenter():void {
 			this._presenter = new InputFieldPresenter(this);
+			this._presenter.init();
 		}
 		
 		public static function zeroPaddingFormatFunction(value:String, length:int):String {

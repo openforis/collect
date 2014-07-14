@@ -23,14 +23,8 @@ package org.openforis.collect.presenter {
 		private var UNIT_FIELD_IDX:int = 3;
 		
 		public function RangeAttributePresenter(view:RangeAttributeRenderer) {
-			_view = view;
 			super(view);
 			view.rangeInputField.applyChangesOnFocusOut = false;
-			//depends on view.currentState
-			if(view.unitInputField != null) {
-				view.unitInputField.applyChangesOnFocusOut = false;
-				view.unitInputField.dropDownList.addEventListener(Event.CHANGE, unitInputFieldChangeHandler);
-			}
 		}
 		
 		private function get view():RangeAttributeRenderer {
@@ -40,6 +34,11 @@ package org.openforis.collect.presenter {
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			view.rangeInputField.addEventListener(FocusEvent.FOCUS_OUT, rangeInputFieldFocusOutHandler);
+			//depends on view.currentState
+			if(view.unitInputField != null) {
+				view.unitInputField.applyChangesOnFocusOut = false;
+				view.unitInputField.dropDownList.addEventListener(Event.CHANGE, unitInputFieldChangeHandler);
+			}
 		}
 		
 		protected function rangeInputFieldFocusOutHandler(event:FocusEvent):void {

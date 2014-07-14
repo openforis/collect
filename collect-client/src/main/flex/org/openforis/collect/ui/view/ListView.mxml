@@ -31,6 +31,7 @@
 			override protected function initializationComplete():void {
 				super.initializationComplete();
 				_presenter = new ListPresenter(this);
+				_presenter.init();
 			}
 		]]>
 	</fx:Script>

@@ -10,20 +10,24 @@ package org.openforis.collect.presenter {
 	 */
 	public class TabbedFormPresenter extends AbstractPresenter {
 		
-		private var _view:TabbedFormContainer;
-		
 		public function TabbedFormPresenter(view:TabbedFormContainer) {
-			_view = view;
-			super();
+			super(view);
+		}
+		
+		private function get view():TabbedFormContainer {
+			return TabbedFormContainer(_view);
+		}
+		
+		override public function init():void {
 			buildView();
 		}
 		
 		protected function buildView():void {
-			if ( _view.entityDefinition != null && _view.uiTabSet != null ) {
-				if ( _view.uiTabSet is UITabProxy ) {
-					_view.definitionsPerCurrentTab = UIOptionsProxy.getDefinitionsPerTab(_view.entityDefinition, _view.modelVersion, UITabProxy(_view.uiTabSet));
+			if ( view.entityDefinition != null && view.uiTabSet != null ) {
+				if ( view.uiTabSet is UITabProxy ) {
+					view.definitionsPerCurrentTab = UIOptionsProxy.getDefinitionsPerTab(view.entityDefinition, view.modelVersion, UITabProxy(view.uiTabSet));
 				}
-				_view.innerUITabs = UIOptionsProxy.getInnerTabs(_view.entityDefinition, _view.modelVersion, _view.uiTabSet);
+				view.innerUITabs = UIOptionsProxy.getInnerTabs(view.entityDefinition, view.modelVersion, view.uiTabSet);
 			}
 		}
 	}

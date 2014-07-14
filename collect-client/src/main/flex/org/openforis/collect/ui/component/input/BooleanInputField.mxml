@@ -11,6 +11,7 @@
 			
 			override protected function initPresenter():void {
 				this.presenter = new BooleanInputFieldPresenter(this);
+				this.presenter.init();
 			}
 			
 		]]>

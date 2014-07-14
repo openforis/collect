@@ -52,9 +52,9 @@ package org.openforis.collect.presenter {
 		private var _taxonomyEditPopUp:TaxonomyEditPopUp; 
 		
 		public function SpeciesImportPresenter(view:SpeciesImportView) {
+			super(view, new MessageKeys());
 			_speciesImportClient = ClientFactory.speciesImportClient;
 			_speciesClient = ClientFactory.speciesClient;
-			super(view, new MessageKeys());
 			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		
@@ -92,7 +92,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function fileReferenceSelectHandler(event:Event):void {
-			if ( _view.summaryDataGrid.dataProvider.length > 0 ) {
+			if ( view.summaryDataGrid.dataProvider.length > 0 ) {
 				super.fileReferenceSelectHandler(event);
 			} else {
 				startUpload();
@@ -135,7 +135,7 @@ package org.openforis.collect.presenter {
 		
 		protected function listChangeHandler(event:IndexChangeEvent):void {
 			_selectedTaxonomy = event.target.selectedItem;
-			_view.paginationBar.showPage(1);
+			view.paginationBar.showPage(1);
 			loadSummaries();
 		}
 		
@@ -150,12 +150,12 @@ package org.openforis.collect.presenter {
 		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {
 			var result:TaxonSummariesProxy = event.result as TaxonSummariesProxy;
 			updateSummaryColumns(result.vernacularNamesLanguageCodes);
-			_view.summaryDataGrid.dataProvider = result.summaries;
-			_view.paginationBar.totalRecords = result.totalCount;
+			view.summaryDataGrid.dataProvider = result.summaries;
+			view.paginationBar.totalRecords = result.totalCount;
 		}
 		
 		protected function updateSummaryColumns(vernacularNamesLangCodes:IList):void {
-			var columns:IList = _view.summaryDataGrid.columns;
+			var columns:IList = view.summaryDataGrid.columns;
 			for (var i:int = columns.length - 1; i > FIXED_SUMMARY_COLUMNS_LENGTH - 1; i --) {
 				columns.removeItemAt(i);
 			}

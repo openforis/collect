@@ -23,13 +23,14 @@ package org.openforis.collect.presenter
 	 */
 	public class DataGroupHeaderPresenter extends AbstractPresenter {
 		
-		private var _view:DataGroupHeader;
-		
 		public function DataGroupHeaderPresenter(view:DataGroupHeader) {
-			this._view = view;
-			super();
+			super(view);
 			initNodeDefinitions();
 			updateChildrenVisibility();
+		}
+		
+		private function get view():DataGroupHeader {
+			return DataGroupHeader(_view);
 		}
 		
 		override internal function initEventListeners():void {
@@ -39,26 +40,26 @@ package org.openforis.collect.presenter
 		
 		protected function initNodeDefinitions():void {
 			var temp:IList = null;
-			if(_view.entityDefinition != null) {
-				temp = _view.entityDefinition.getDefinitionsInVersion(_view.modelVersion);
+			if(view.entityDefinition != null) {
+				temp = view.entityDefinition.getDefinitionsInVersion(view.modelVersion);
 			}
-			_view.nodeDefinitions = temp;
+			view.nodeDefinitions = temp;
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			if(_view.parentEntity != null && _view.entityDefinition.hasHideableDefinitions() ) {
+			if(view.parentEntity != null && view.entityDefinition.hasHideableDefinitions() ) {
 				var survey:SurveyProxy = Application.activeSurvey;
 				var record:RecordProxy = Application.activeRecord;
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
 					var node:NodeProxy = record.getNode(change.nodeId);
-					if ( _view.parentEntity.isAncestorOf(node) ) {
+					if ( view.parentEntity.isAncestorOf(node) ) {
 						if ( change is EntityChangeProxy ) {
 							updateChildrenVisibility();
 							break;
 						} else if ( change is AttributeChangeProxy ) {
 							var attributeChange:AttributeChangeProxy = AttributeChangeProxy(change);
-							var hideableDefinitions:IList = _view.entityDefinition.hideableDefinitions;
+							var hideableDefinitions:IList = view.entityDefinition.hideableDefinitions;
 							if ( hideableDefinitions.length > 0 && CollectionUtil.contains(hideableDefinitions, node.definition) ) {
 								updateChildVisibility(node.definition);
 							}
@@ -72,8 +73,8 @@ package org.openforis.collect.presenter
 			var childDefinitionsInVersion:IList = getChildDefinitionsInVersion();
 			var visibilityByChildIndex:ArrayCollection = new ArrayCollection();
 			CollectionUtil.fill(visibilityByChildIndex, true, childDefinitionsInVersion.length);
-			_view.visibilityByChildIndex = visibilityByChildIndex;
-			var hideableDefinitions:IList = _view.entityDefinition.hideableDefinitions;
+			view.visibilityByChildIndex = visibilityByChildIndex;
+			var hideableDefinitions:IList = view.entityDefinition.hideableDefinitions;
 			if ( hideableDefinitions.length > 0 ) {
 				for ( var idx:int = 0; idx < childDefinitionsInVersion.length; idx ++) {
 					var nodeDefn:NodeDefinitionProxy = NodeDefinitionProxy(childDefinitionsInVersion.getItemAt(idx));
@@ -83,8 +84,8 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function updateChildVisibility(nodeDefn:NodeDefinitionProxy):void {
-			var hideableDefinitions:IList = _view.entityDefinition.hideableDefinitions;
-			var entities:IList = _view.parentEntity.getChildren(_view.entityDefinition.name);
+			var hideableDefinitions:IList = view.entityDefinition.hideableDefinitions;
+			var entities:IList = view.parentEntity.getChildren(view.entityDefinition.name);
 			var visible:Boolean;
 			if ( CollectionUtil.contains(hideableDefinitions, nodeDefn, "id") ) {
 				if ( entities.length > 0 ) {
@@ -106,11 +107,11 @@ package org.openforis.collect.presenter
 			}
 			var childDefinitionsInVersion:IList = getChildDefinitionsInVersion();
 			var idx:int = childDefinitionsInVersion.getItemIndex(nodeDefn);
-			_view.visibilityByChildIndex.setItemAt(visible, idx);
+			view.visibilityByChildIndex.setItemAt(visible, idx);
 		}
 		
 		protected function getChildDefinitionsInVersion():IList {
-			return _view.entityDefinition.getDefinitionsInVersion(_view.modelVersion);
+			return view.entityDefinition.getDefinitionsInVersion(view.modelVersion);
 		}
 	}
 }

@@ -15,7 +15,6 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.HomePresenter;
 			import org.openforis.collect.ui.Images;
-			import org.openforis.collect.util.ApplicationConstants;
 			
 			public static const DEFAULT_STATE:String = "default";
 			public static const LOADING_STATE:String = "loading";
@@ -24,6 +23,7 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new HomePresenter(this);
+				_presenter.init();
 			}
 			
 		]]>

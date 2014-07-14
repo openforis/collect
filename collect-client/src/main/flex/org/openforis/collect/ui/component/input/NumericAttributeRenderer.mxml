@@ -19,6 +19,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new NumericAttributePresenter(this);
+				presenter.init();
 			}
 			
 			protected function unitLabelFunction(item:Object):String {

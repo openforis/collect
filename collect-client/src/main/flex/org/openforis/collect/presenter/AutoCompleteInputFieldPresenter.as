@@ -40,22 +40,24 @@ package org.openforis.collect.presenter
 		protected var popUpOpened:Boolean = false;
 		
 		private var _allowNotListedValues:Boolean;
-		private var _view:AutoCompleteInputField;
 		private var dataLoading:Boolean;
 		
 		public function AutoCompleteInputFieldPresenter(view:AutoCompleteInputField) {
-			_view = view;
+			super(view);
 			_minCharsToStartAutocomplete = 2;
 			_allowNotListedValues = true;
-			super(view);
+		}
+		
+		private function get view():AutoCompleteInputField {
+			return AutoCompleteInputField(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			_view.applyChangesOnFocusOut = false;
-			_view.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
-			_view.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
-			_view.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
+			view.applyChangesOnFocusOut = false;
+			view.addEventListener(InputFieldEvent.CHANGING, inputFieldChangingHandler);
+			view.addEventListener(FocusEvent.FOCUS_OUT, inputFieldFocusOutHandler);
+			view.textInput.addEventListener(KeyboardEvent.KEY_DOWN, inputFieldKeyDownHandler);
 		}
 		
 		protected function inputFieldKeyDownHandler(event:KeyboardEvent):void {
@@ -88,7 +90,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function getMatchingResult():* {
-			var searchText:String = _view.text;
+			var searchText:String = view.text;
 			var dataProvider:IList = popUp.listComponent.dataProvider;
 			for each (var item:String in dataProvider) {
 				if ( searchText.toUpperCase() == item.toUpperCase() ) {
@@ -102,7 +104,7 @@ package org.openforis.collect.presenter
 			var inputField:InputField = event.target.document;
 			if ( inputField != null && inputField.changed ) {
 				if ( ! popUpOpened ) {
-					if ( allowNotListedValues || _view.isEmpty() || FieldProxy.isShortCutForReasonBlank(_view.text) ) {
+					if ( allowNotListedValues || view.isEmpty() || FieldProxy.isShortCutForReasonBlank(view.text) ) {
 						inputField.presenter.updateValue();
 					} else {
 						inputField.presenter.undoLastChange();
@@ -112,7 +114,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function inputFieldChangingHandler(event:InputFieldEvent):void {
-			var text:String = (_view.textInput as TextInput).text;
+			var text:String = (view.textInput as TextInput).text;
 			if ( text.length > minCharsToStartAutocomplete ) {
 				loadAutoCompleteData();
 			} else {
@@ -122,13 +124,13 @@ package org.openforis.collect.presenter
 		
 		protected function loadAutoCompleteData():void {
 			dataLoading = true;
-			_view.currentState = AutoCompleteInputField.STATE_LOADING;
+			view.currentState = AutoCompleteInputField.STATE_LOADING;
 			var client:DataClient = ClientFactory.dataClient;
-			var searchText:String = _view.text;
+			var searchText:String = view.text;
 			var token:Object = {searchText: searchText};
 			var responder:IResponder = new AsyncResponder(searchResultHandler, searchFaultHandler, token);
-			var attributeDefnId:int = _view.attributeDefinition.id;
-			var fieldIndex:int = _view.fieldIndex;
+			var attributeDefnId:int = view.attributeDefinition.id;
+			var fieldIndex:int = view.fieldIndex;
 			client.searchAutoCompleteValues(responder, attributeDefnId, fieldIndex, searchText);
 		}
 		
@@ -143,7 +145,7 @@ package org.openforis.collect.presenter
 			if(! popUpOpened) {
 				PopUpManager.addPopUp(popUp, FlexGlobals.topLevelApplication as DisplayObject, false);
 				
-				PopUpUtil.alignToField(popUp, _view, 
+				PopUpUtil.alignToField(popUp, view, 
 					PopUpUtil.POSITION_BELOW, 
 					PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
 					PopUpUtil.HORIZONTAL_ALIGN_LEFT,
@@ -170,8 +172,8 @@ package org.openforis.collect.presenter
 		
 		protected function performSelectValue(selectedValue:*):void {
 			if ( selectedValue != null ) {
-				_view.text = selectedValue.toString();
-				_view.presenter.updateValue();
+				view.text = selectedValue.toString();
+				view.presenter.updateValue();
 			}
 			closePopUp();
 		}
@@ -196,7 +198,7 @@ package org.openforis.collect.presenter
 			if ( popUpOpened ) {
 				PopUpManager.removePopUp(popUp);
 				popUpOpened = false;
-				var textInput:TextInput = _view.textInput as TextInput;
+				var textInput:TextInput = view.textInput as TextInput;
 				textInput.setFocus();
 			}
 		}
@@ -212,7 +214,7 @@ package org.openforis.collect.presenter
 		
 		protected function handleSearchResult(data:IList):void {
 			dataLoading = false;
-			_view.currentState = AutoCompleteInputField.STATE_DEFAULT;
+			view.currentState = AutoCompleteInputField.STATE_DEFAULT;
 			if ( CollectionUtil.isEmpty(data) ) {
 				closePopUp();
 			} else {

@@ -30,9 +30,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function DateAttributePresenter(view:DateAttributeRenderer) {
-			
 			super(view);
-			
+		}
+		
+		override public function init():void {
+			super.init();
 			view.day.textFormatFunction = twoCharsZeroPaddingFormatFunction;
 			view.month.textFormatFunction = twoCharsZeroPaddingFormatFunction;
 			view.year.textFormatFunction = fourCharsZeroPaddingFormatFunction;

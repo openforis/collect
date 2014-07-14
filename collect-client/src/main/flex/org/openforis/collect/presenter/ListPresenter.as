@@ -58,7 +58,6 @@ package org.openforis.collect.presenter {
 		private const IMPORT_DATA_MENU_ITEM:String = Message.get("list.admin.importData");
 		private const VALIDATION_REPORT_MENU_ITEM:String = Message.get("list.admin.validationReport");
 		
-		private var _view:ListView;
 		private var _dataClient:DataClient;
 		
 		private var _selectVersionPopUp:SelectVersionPopUp;
@@ -80,30 +79,37 @@ package org.openforis.collect.presenter {
 		private const MAX_RECORDS_PER_PAGE:int = 20;
 		
 		public function ListPresenter(view:ListView) {
-			this._view = view;
+			super(view);
+			this._newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
 			this._dataClient = ClientFactory.dataClient;
-			this._view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
-			_newRecordResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
+		}
+		
+		private function get view():ListView {
+			return ListView(_view);
+		}
+		
+		override public function init():void {
+			super.init();
+			view.dataGrid.requestedRowCount = MAX_RECORDS_PER_PAGE;
+			view.paginationBar.maxRecordsPerPage = MAX_RECORDS_PER_PAGE;
 			createAdvancedFunctionMenu();
-			_view.paginationBar.maxRecordsPerPage = MAX_RECORDS_PER_PAGE;
-			super();
 		}
 
 		override internal function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 			eventDispatcher.addEventListener(UIEvent.RELOAD_RECORD_SUMMARIES, reloadRecordSummariesHandler);
 			
-			_view.backToMainMenuButton.addEventListener(MouseEvent.CLICK, backToMainMenuClickHandler);
-			_view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
-			_view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
-			_view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
-			_view.advancedFunctionsButton.addEventListener(MenuEvent.ITEM_CLICK, advancedFunctionItemClickHandler);
-			_view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
+			view.backToMainMenuButton.addEventListener(MouseEvent.CLICK, backToMainMenuClickHandler);
+			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
+			view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
+			view.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
+			view.advancedFunctionsButton.addEventListener(MenuEvent.ITEM_CLICK, advancedFunctionItemClickHandler);
+			view.openFilterPopUpButton.addEventListener(MouseEvent.CLICK, openFilterPopUpButtonClickHandler);
 			
-			_view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
+			view.dataGrid.addEventListener(GridSortEvent.SORT_CHANGING, dataGridSortChangingHandler);
 			
-			_view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
-			_view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
+			view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
+			view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
 		}
 		
 		protected function backToMainMenuClickHandler(event:Event):void {
@@ -147,7 +153,7 @@ package org.openforis.collect.presenter {
 				result.addItem(IMPORT_DATA_MENU_ITEM);
 				result.addItem(VALIDATION_REPORT_MENU_ITEM);
 			}
-			_view.advancedFunctionsButton.dataProvider = result;
+			view.advancedFunctionsButton.dataProvider = result;
 		}
 		
 		protected function advancedFunctionItemClickHandler(event:MenuEvent):void {
@@ -194,14 +200,14 @@ package org.openforis.collect.presenter {
 			var uiEvent:UIEvent = new UIEvent(UIEvent.RECORD_CREATED);
 			uiEvent.obj = record;
 			eventDispatcher.dispatchEvent(uiEvent);
-			PopUpManager.removePopUp(_view);
+			PopUpManager.removePopUp(view);
 		}
 		
 		/**
 		 * Edit Button clicked 
 		 * */
 		protected function editButtonClickHandler(event:MouseEvent):void {
-			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
+			var selectedRecord:RecordProxy = view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord == null) {
 				AlertUtil.showError("list.error.recordNotSelected");
 			} else {
@@ -216,7 +222,7 @@ package org.openforis.collect.presenter {
 		 * */
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
 			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
-			var selectedRecord:RecordProxy = _view.dataGrid.selectedItem as RecordProxy;
+			var selectedRecord:RecordProxy = view.dataGrid.selectedItem as RecordProxy;
 			if(selectedRecord == null) {
 				AlertUtil.showError("list.error.recordNotSelected");
 			} else if ( selectedRecord.step != CollectRecord$Step.ENTRY ) {
@@ -249,7 +255,7 @@ package org.openforis.collect.presenter {
 				openFilterPopUp();
 			} else {
 				resetCurrentFilter();
-				loadRecordSummaries(0, _view.paginationBar.maxRecordsPerPage);
+				loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
 			}
 		}
 		
@@ -275,7 +281,7 @@ package org.openforis.collect.presenter {
 	
 				PopUpManager.addPopUp(_filterPopUp, application);
 	
-				PopUpUtil.alignToField(_filterPopUp, _view.openFilterPopUpButton, 
+				PopUpUtil.alignToField(_filterPopUp, view.openFilterPopUpButton, 
 					PopUpUtil.POSITION_BELOW, 
 					PopUpUtil.VERTICAL_ALIGN_BOTTOM, 
 					PopUpUtil.HORIZONTAL_ALIGN_RIGHT);
@@ -283,7 +289,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function stageClickHandler(event:MouseEvent):void {
-			if ( event.target != _view.openFilterPopUpButton &&  _filterPopUp != null && 
+			if ( event.target != view.openFilterPopUpButton &&  _filterPopUp != null && 
 				! _filterPopUp.hitTestPoint( event.stageX, event.stageY ) ) {
 				closeFilterPopUp();
 			}
@@ -294,14 +300,14 @@ package org.openforis.collect.presenter {
 				PopUpManager.removePopUp(_filterPopUp);
 				_filterPopUp = null;
 			}
-			_view.openFilterPopUpButton.selected = currentKeyValuesFilter != null;
+			view.openFilterPopUpButton.selected = currentKeyValuesFilter != null;
 		}
 		
 		protected function filterPopUpCloseHandler(event:Event = null):void {
 			var oldFilter:Array = currentKeyValuesFilter;
 			currentKeyValuesFilter = null;
 			if(oldFilter != null) {
-				loadRecordSummaries(0, _view.paginationBar.maxRecordsPerPage);
+				loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
 			}
 			closeFilterPopUp();
 		}
@@ -321,7 +327,7 @@ package org.openforis.collect.presenter {
 			} else {
 				currentKeyValuesFilter = null;
 			}
-			loadRecordSummaries(0, _view.paginationBar.maxRecordsPerPage);
+			loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
 			closeFilterPopUp();
 		}
 		
@@ -334,9 +340,9 @@ package org.openforis.collect.presenter {
 			}
 			var surveyProjectName:String = Application.activeSurvey.getProjectName();
 			var rootEntityLabel:String = Application.activeRootEntity.getInstanceOrHeadingLabelText();
-			_view.titleLabel.text = Message.get("list.title", [surveyProjectName, rootEntityLabel]);
+			view.titleLabel.text = Message.get("list.title", [surveyProjectName, rootEntityLabel]);
 			updateDataGrid();
-			loadRecordSummaries(0, _view.paginationBar.maxRecordsPerPage);
+			loadRecordSummaries(0, view.paginationBar.maxRecordsPerPage);
 		}
 		
 		protected function reloadRecordSummariesHandler(event:UIEvent):void {
@@ -344,28 +350,28 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function reloadRecordSummaries():void {
-			loadRecordSummaries(_view.paginationBar.offset, _view.paginationBar.maxRecordsPerPage);
+			loadRecordSummaries(view.paginationBar.offset, view.paginationBar.maxRecordsPerPage);
 		}
 		
 		protected function resetCurrentFilter():void {
 			currentKeyValuesFilter = null;
-			_view.openFilterPopUpButton.selected = false;
+			view.openFilterPopUpButton.selected = false;
 		}
 		
 		protected function updateDataGrid():void {
 			var rootEntity:EntityDefinitionProxy = Application.activeRootEntity;
 			var columns:IList = UIBuilder.getRecordSummaryListColumns(rootEntity);
-			_view.dataGrid.columns = columns;
+			view.dataGrid.columns = columns;
 		}
 		
 		protected function loadRecordSummaries(offset:int = 0, recordsPerPage:int = MAX_RECORDS_PER_PAGE):void {
 			if ( offset == 0 ) {
-				_view.paginationBar.showPage(1);
+				view.paginationBar.showPage(1);
 			}
-			//_view.paginationBar.currentPageText.text = new String(currentPage);
+			//view.paginationBar.currentPageText.text = new String(currentPage);
 			
-			_view.currentState = ListView.INACTIVE_STATE;
-			_view.paginationBar.currentState = PaginationBar.LOADING_STATE;
+			view.currentState = ListView.INACTIVE_STATE;
+			view.paginationBar.currentState = PaginationBar.LOADING_STATE;
 			
 			var responder:IResponder = new AsyncResponder(getRecordsSummaryResultHandler, faultHandler);
 			var rootEntityName:String = Application.activeRootEntity.name;
@@ -377,11 +383,11 @@ package org.openforis.collect.presenter {
 		protected function getRecordsSummaryResultHandler(event:ResultEvent, token:Object = null):void {
 			var result:Object = event.result;
 			
-			_view.dataGrid.dataProvider = IList(result.records);
-			_view.dataGrid.setSortedColumns(currentSortFields);
-			_view.currentState = ListView.DEFAULT_STATE;
+			view.dataGrid.dataProvider = IList(result.records);
+			view.dataGrid.setSortedColumns(currentSortFields);
+			view.currentState = ListView.DEFAULT_STATE;
 			
-			_view.paginationBar.totalRecords = result.count;
+			view.paginationBar.totalRecords = result.count;
 			
 			if(result.totalCount == 0 && currentKeyValuesFilter != null) {
 				AlertUtil.showMessage("list.filter.noRecordsFound");

@@ -37,6 +37,7 @@
 
 			override protected function initPresenter():void {
 				_presenter = new MultipleAttributeDataGroupPresenter(this);
+				_presenter.init();
 			}
 
 		]]>

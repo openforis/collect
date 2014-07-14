@@ -32,6 +32,7 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new CodeListImportPresenter(this);
+				_presenter.init();
 			}
 
 			public function get codeListId():int {

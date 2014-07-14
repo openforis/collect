@@ -26,6 +26,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new MultipleAttributeFormItemPresenter(this);
+				presenter.init();
 			}
 			
 		]]>

@@ -22,20 +22,20 @@
 			import org.openforis.collect.Application;
 			import org.openforis.collect.presenter.CollectPresenter;
 			
-			private var _collectPresenter:CollectPresenter;
-			
 			public static const DEFAULT_STATE:String = "default";
 			public static const ENLARGED_STATE:String = "enlarged";
 			public static const FULL_SCREEN_STATE:String = "fullScreen";
+			
+			private var _presenter:CollectPresenter;
 			
 			protected function initializeHandler(event:FlexEvent):void {
 				org.openforis.collect.Application.init();
 			}
 			
 			protected function applicationCompleteHandler(event:FlexEvent):void {
-				this._collectPresenter = new CollectPresenter(this);
+				this._presenter = new CollectPresenter(this);
+				this._presenter.init();
 			}
-			
 			
 		]]>
 	</fx:Script>

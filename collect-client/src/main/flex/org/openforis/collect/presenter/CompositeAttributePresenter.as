@@ -13,25 +13,37 @@ package org.openforis.collect.presenter
 	public class CompositeAttributePresenter extends AttributePresenter {
 		
 		public function CompositeAttributePresenter(view:CompositeAttributeRenderer) {
+			super(view);
+		}
+		
+		override public function init():void {
+			super.init();
+			initViewState();
+		}
+		
+		private function get view():CompositeAttributeRenderer {
+			return CompositeAttributeRenderer(_view);
+		}
+		
+		override internal function initEventListeners():void {
+			super.initEventListeners();
 			var inputFields:Array = view.inputFields;
 			if(inputFields != null) {
 				for each (var f:InputField in inputFields) {
 					ChangeWatcher.watch(f, "visited", fieldVisitedHandler);
 				}
 			}
-			super(view);
-			initViewState();
 		}
 		
 		protected function initViewState():void {
-			if(_view.attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
-				if ( _view.attributeDefinition.parent.direction == UIOptions$Direction.BY_COLUMNS ) {
-					_view.currentState = CompositeAttributeRenderer.STATE_VERTICAL;
+			if(view.attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
+				if ( view.attributeDefinition.parent.direction == UIOptions$Direction.BY_COLUMNS ) {
+					view.currentState = CompositeAttributeRenderer.STATE_VERTICAL;
 				} else {
-					_view.currentState = CompositeAttributeRenderer.STATE_HORIZONTAL;
+					view.currentState = CompositeAttributeRenderer.STATE_HORIZONTAL;
 				}
 			} else {
-				_view.currentState = CompositeAttributeRenderer.STATE_VERTICAL_FORM;
+				view.currentState = CompositeAttributeRenderer.STATE_VERTICAL_FORM;
 			}
 		}
 	}

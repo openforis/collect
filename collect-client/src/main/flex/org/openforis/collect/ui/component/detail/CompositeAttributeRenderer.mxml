@@ -17,6 +17,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new CompositeAttributePresenter(this);
+				presenter.init();
 			}
 			
 			[Bindable]

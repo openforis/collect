@@ -72,7 +72,6 @@ package org.openforis.collect.presenter {
 		
 		private static const MOUSE_WHEEL_BUMP_DELTA:Number = 30;
 		
-		private var _view:collect;
 		private var _modelClient:ModelClient;
 		private var _sessionClient:SessionClient;
 		//private var _contextMenuPresenter:ContextMenuPresenter;
@@ -82,46 +81,24 @@ package org.openforis.collect.presenter {
 		private var _keepAliveRetryTimes:int;
 		
 		public function CollectPresenter(view:collect) {
-			this._view = view;
+			super(view);
+			
 			this._modelClient = ClientFactory.modelClient;
 			this._sessionClient = ClientFactory.sessionClient;
-
-			super();
-			
+		}
+		
+		private function get view():collect {
+			return collect(_view);
+		}
+		
+		override public function init():void {
+			super.init();
+			//init keep alive timer
 			_keepAliveRetryTimes = 0;
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
 			_keepAliveTimer.addEventListener(TimerEvent.TIMER, sendKeepAliveMessage);
 			_keepAliveTimer.start();
-			
-			//set language in session
-			init();
-		}
-		
-		override internal function initEventListeners():void {
-			//mouse wheel handler to increment scroll step size
-			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
-			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);
-			eventDispatcher.addEventListener(UIEvent.CHANGE_PASSWORD_CLICK, changePasswordClickHandler);
-			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
-			eventDispatcher.addEventListener(UIEvent.OPEN_SPECIES_IMPORT_POPUP, openSpeciesImportPopUpHandler);
-			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
-			eventDispatcher.addEventListener(UIEvent.TOGGLE_DETAIL_VIEW_SIZE, toggleDetailViewSizeHandler);
-			eventDispatcher.addEventListener(UIEvent.CHECK_VIEW_SIZE, checkViewSizeHandler);
-			
-			//add uncaught error hanlder
-			_view.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
-			
-			CONFIG::debugging {
-				_view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
-					//open FlexSpy popup pressing CTRL+i
-					if ( event.ctrlKey && event.charCode == 105 ) {
-						FlexSpy.show();
-					}
-				});
-			}
-		}
-		
-		internal function init():void {
+
 			var params:Object = FlexGlobals.topLevelApplication.parameters;
 			var preview:Boolean = params.preview == "true";
 			var edit:Boolean = params.edit == "true";
@@ -144,6 +121,30 @@ package org.openforis.collect.presenter {
 			} else {
 				var responder:IResponder = new AsyncResponder(initSessionResultHandler, faultHandler);
 				this._sessionClient.initSession(responder, localeString);
+			}
+		}
+		
+		override internal function initEventListeners():void {
+			//mouse wheel handler to increment scroll step size
+			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
+			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);
+			eventDispatcher.addEventListener(UIEvent.CHANGE_PASSWORD_CLICK, changePasswordClickHandler);
+			eventDispatcher.addEventListener(UIEvent.SHOW_LIST_OF_RECORDS, showListOfRecordsHandler);
+			eventDispatcher.addEventListener(UIEvent.OPEN_SPECIES_IMPORT_POPUP, openSpeciesImportPopUpHandler);
+			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
+			eventDispatcher.addEventListener(UIEvent.TOGGLE_DETAIL_VIEW_SIZE, toggleDetailViewSizeHandler);
+			eventDispatcher.addEventListener(UIEvent.CHECK_VIEW_SIZE, checkViewSizeHandler);
+			
+			//add uncaught error hanlder
+			view.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
+			
+			CONFIG::debugging {
+				view.addEventListener(KeyboardEvent.KEY_DOWN, function(event:KeyboardEvent):void {
+					//open FlexSpy popup pressing CTRL+i
+					if ( event.ctrlKey && event.charCode == 105 ) {
+						FlexSpy.show();
+					}
+				});
 			}
 		}
 		
@@ -226,7 +227,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initReferenceDataImport(token:ReferenceDataImportToken):void {
-			_view.currentState = collect.FULL_SCREEN_STATE;
+			view.currentState = collect.FULL_SCREEN_STATE;
 			if ( token == null ) {
 				AlertUtil.showError("referenceDataImport.saveSurveyBefore");
 			} else {
@@ -257,10 +258,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function checkViewSizeHandler(event:UIEvent):void {
-			if ( _view.masterView.currentState == MasterView.DETAIL_STATE && Application.extendedDetailView ) {
-				_view.currentState = collect.ENLARGED_STATE;
+			if ( view.masterView.currentState == MasterView.DETAIL_STATE && Application.extendedDetailView ) {
+				view.currentState = collect.ENLARGED_STATE;
 			} else {
-				_view.currentState = collect.DEFAULT_STATE;	
+				view.currentState = collect.DEFAULT_STATE;	
 			}
 		}
 		

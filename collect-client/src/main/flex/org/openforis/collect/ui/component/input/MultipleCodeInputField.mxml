@@ -17,6 +17,7 @@
 			
 			override protected function initPresenter():void {
 				this.presenter = new MultipleCodeInputFieldPresenter(this);
+				this.presenter.init();
 			}
 			
 			[Bindable]

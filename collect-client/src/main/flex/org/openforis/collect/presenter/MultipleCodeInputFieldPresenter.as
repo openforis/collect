@@ -31,17 +31,18 @@ package org.openforis.collect.presenter {
 	 * */
 	public class MultipleCodeInputFieldPresenter extends CodeInputFieldPresenter {
 		
-		private var _view:MultipleCodeInputField;
-		
 		public function MultipleCodeInputFieldPresenter(view:MultipleCodeInputField) {
-			_view = view;
-			_view.fieldIndex = -1;
 			super(view);
+			view.fieldIndex = -1;
 		}
 	
+		private function get view():MultipleCodeInputField {
+			return MultipleCodeInputField(_view);
+		}
+		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			ChangeWatcher.watch(_view, "attributes", attributesChangeHandler);
+			ChangeWatcher.watch(view, "attributes", attributesChangeHandler);
 		}
 		
 		protected function attributesChangeHandler(event:Event):void {
@@ -49,19 +50,19 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function setFocusHandler(event:InputFieldEvent):void {
-			if ( _view.textInput != null && _view.parentEntity != null && _view.attributeDefinition != null &&
-				_view.parentEntity.id == event.parentEntityId && _view.attributeDefinition.name == event.nodeName) {
-				_view.textInput.setFocus();
+			if ( view.textInput != null && view.parentEntity != null && view.attributeDefinition != null &&
+				view.parentEntity.id == event.parentEntityId && view.attributeDefinition.name == event.nodeName) {
+				view.textInput.setFocus();
 			}
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			if(_view.attributes != null) {
+			if(view.attributes != null) {
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
 					if ( change is AttributeChangeProxy ) {
 						var nodeId:int = AttributeChangeProxy(change).nodeId;
-						var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", nodeId) as AttributeProxy;
+						var attribute:AttributeProxy = CollectionUtil.getItem(view.attributes, "id", nodeId) as AttributeProxy;
 						if(attribute != null) {
 							updateView();
 							return;
@@ -72,9 +73,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function getTextFromValue():String {
-			if(_view.attributeDefinition != null) {
-				if(CollectionUtil.isNotEmpty(_view.attributes)) {
-					var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
+			if(view.attributeDefinition != null) {
+				if(CollectionUtil.isNotEmpty(view.attributes)) {
+					var firstAttribute:AttributeProxy = view.attributes.getItemAt(0) as AttributeProxy;
 					var field:FieldProxy = firstAttribute.getField(0);
 					if(field.symbol != null) {
 						var shortCut:String = FieldProxy.getShortCutForReasonBlank(field.symbol);
@@ -83,7 +84,7 @@ package org.openforis.collect.presenter {
 						}
 					}
 					var parts:Array = new Array();
-					for each (var attribute:AttributeProxy in _view.attributes) {
+					for each (var attribute:AttributeProxy in view.attributes) {
 						var part:String = codeAttributeToText(attribute);
 						parts.push(part);
 					}
@@ -99,7 +100,7 @@ package org.openforis.collect.presenter {
 			var removeAttributesOperations:ArrayCollection = new ArrayCollection();
 			var r:NodeUpdateRequestProxy;
 			//remove old attributes
-			for each (var a:AttributeProxy in _view.attributes) {
+			for each (var a:AttributeProxy in view.attributes) {
 				r = new NodeDeleteRequestProxy();
 				NodeDeleteRequestProxy(r).nodeId = a.id;
 				removeAttributesOperations.addItem(r);
@@ -141,8 +142,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function getRemarks():String {
-			if(CollectionUtil.isNotEmpty(_view.attributes)) {
-				var a:AttributeProxy = AttributeProxy(_view.attributes.getItemAt(0));
+			if(CollectionUtil.isNotEmpty(view.attributes)) {
+				var a:AttributeProxy = AttributeProxy(view.attributes.getItemAt(0));
 				var field:FieldProxy = FieldProxy(a.fields[0]);
 				return field.remarks;
 			}
@@ -150,20 +151,20 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function updateDescription():void {
-			_view.description = "";
-			if (  ! CodeAttributeDefinitionProxy(_view.attributeDefinition).external &&
-					_view.attributes != null && _view.attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
+			view.description = "";
+			if (  ! CodeAttributeDefinitionProxy(view.attributeDefinition).external &&
+					view.attributes != null && view.attributeDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
 				var codes:Array = [];
 				var code:String;
 				var attribute:AttributeProxy;
-				for each(attribute in _view.attributes) {
+				for each(attribute in view.attributes) {
 					code = attribute.getField(0).value as String;
 					if( StringUtil.isNotBlank(code)) {
 						codes.push(code);
 					}
 				}
-				var parentEntityId:int = _view.parentEntity.id;
-				var name:String = _view.attributeDefinition.name;
+				var parentEntityId:int = view.parentEntity.id;
+				var name:String = view.attributeDefinition.name;
 				var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
 				
 				dataClient.getCodeListItems(responder, parentEntityId, name, codes);
@@ -172,10 +173,10 @@ package org.openforis.collect.presenter {
 		
 		override protected function moveFocusOnNextField(horizontalMove:Boolean, offset:int):Boolean {
 			var focusChanged:Boolean = false;
-			var attributes:IList = _view.attributes;
+			var attributes:IList = view.attributes;
 			if ( CollectionUtil.isNotEmpty(attributes) ) {
 				var attribute:AttributeProxy = AttributeProxy(attributes.getItemAt(0));
-				var fieldIndex:int = _view.fieldIndex;
+				var fieldIndex:int = view.fieldIndex;
 				var field:FieldProxy = attribute.getField(fieldIndex);
 				focusChanged = CollectFocusManager.moveFocusOnNextField(field, horizontalMove, offset);
 			}

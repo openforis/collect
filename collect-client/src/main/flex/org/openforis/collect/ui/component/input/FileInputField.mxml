@@ -24,6 +24,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new FileInputFieldPresenter(this);
+				presenter.init();
 			}
 			
 			override public function isEmpty():Boolean {

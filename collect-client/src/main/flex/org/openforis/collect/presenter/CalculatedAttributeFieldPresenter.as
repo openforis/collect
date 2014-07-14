@@ -11,6 +11,10 @@ package org.openforis.collect.presenter
 			super(inputField);
 		}
 		
+		private function get view():CalculatedAttributeField {
+			return CalculatedAttributeField(_view);
+		}
+		
 		override protected function initContextMenu():void {
 			//do not initialize it
 		}

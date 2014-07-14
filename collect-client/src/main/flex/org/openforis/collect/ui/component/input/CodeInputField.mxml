@@ -21,6 +21,7 @@
 			
 			override protected function initPresenter():void {
 				this.presenter = new CodeInputFieldPresenter(this);
+				this.presenter.init();
 			}
 			
 			[Bindable]

@@ -6,7 +6,6 @@ package org.openforis.collect.presenter
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.events.CloseEvent;
-	import mx.managers.PopUpManager;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
@@ -31,17 +30,21 @@ package org.openforis.collect.presenter
 		
 		public function ErrorListPopUpPresenter(view:ErrorListPopUp) {
 			super(view);
-			ErrorListPopUp(_view).closeButton.visible = false;
+			view.closeButton.visible = false;
 			initListDataProvider();
+		}
+		
+		private function get view():ErrorListPopUp {
+			return ErrorListPopUp(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			ErrorListPopUp(_view).okButton.addEventListener(MouseEvent.CLICK, okButtonClickHandler);
+			view.okButton.addEventListener(MouseEvent.CLICK, okButtonClickHandler);
 		}
 		
 		protected function okButtonClickHandler(event:MouseEvent):void {
-			ErrorListPopUp(_view).dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
+			view.dispatchEvent(new CloseEvent(CloseEvent.CLOSE));
 		}
 		
 		protected function initListDataProvider():void {
@@ -69,7 +72,7 @@ package org.openforis.collect.presenter
 					queue.pushAll(children.toArray());
 				}
 			}
-			ErrorListPopUp(_view).dataGrid.dataProvider = dataProvider;
+			view.dataGrid.dataProvider = dataProvider;
 		}
 		
 		protected function createAttributeDataGridItem(attribute:AttributeProxy):Object {

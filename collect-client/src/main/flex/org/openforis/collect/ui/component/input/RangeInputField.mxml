@@ -12,6 +12,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new RangeInputFieldPresenter(this);
+				presenter.init();
 			}
 		]]>
 	</fx:Script>

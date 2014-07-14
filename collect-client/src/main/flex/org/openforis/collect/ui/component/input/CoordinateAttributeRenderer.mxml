@@ -24,6 +24,7 @@
 			
 			override protected function initPresenter():void {
 				this.presenter = new CoordinateAttributePresenter(this);
+				this.presenter.init();
 			}
 			
 			protected function srsLabelFunction(item:Object):String {

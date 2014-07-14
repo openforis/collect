@@ -17,18 +17,19 @@ package org.openforis.collect.presenter
 	 **/
 	public class ImageInputFieldPresenter extends FileInputFieldPresenter {
 		
-		private var _view:ImageInputField;
-		
 		public function ImageInputFieldPresenter(view:ImageInputField) {
-			_view = view;
 			super(view);
+		}
+		
+		private function get view():ImageInputField {
+			return ImageInputField(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			_view.imagePreview.addEventListener(ImageLoaderEvent.IMAGE_CLICK, imagePreviewClickHandler);
-			_view.browseButton.addEventListener(KeyboardEvent.KEY_DOWN, browseButtonKeyDownHandler);
+			view.imagePreview.addEventListener(ImageLoaderEvent.IMAGE_CLICK, imagePreviewClickHandler);
+			view.browseButton.addEventListener(KeyboardEvent.KEY_DOWN, browseButtonKeyDownHandler);
 		}
 		
 		protected function browseButtonKeyDownHandler(event:KeyboardEvent):void	{
@@ -42,9 +43,9 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updatePreview():void {
-			if ( _view.currentState == FileInputField.STATE_FILE_UPLOADED ) {
+			if ( view.currentState == FileInputField.STATE_FILE_UPLOADED ) {
 				var imageDownloadUrlRequest:URLRequest = getDownloadUrlRequest();
-				_view.imagePreview.load(imageDownloadUrlRequest);
+				view.imagePreview.load(imageDownloadUrlRequest);
 			}			
 		}
 		

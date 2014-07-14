@@ -36,6 +36,7 @@ package org.openforis.collect.ui.component.detail {
 		
 		protected function initPresenter():void {
 			_presenter = new FormItemPresenter(this);
+			_presenter.init();
 		}
 
 		[Bindable]

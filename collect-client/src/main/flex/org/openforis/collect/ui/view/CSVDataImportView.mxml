@@ -22,8 +22,6 @@
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.presenter.CSVDataImportPresenter;
-			import org.openforis.collect.util.ArrayUtil;
-			import org.openforis.collect.util.StringUtil;
 			
 			import spark.components.CheckBox;
 			import spark.components.DropDownList;
@@ -58,6 +56,7 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new CSVDataImportPresenter(this);
+				_presenter.init();
 			}
 			
 			override public function errorMessageLabelFunction(item:ParsingErrorProxy, gridColumn:GridColumn):String {

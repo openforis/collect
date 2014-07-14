@@ -59,6 +59,7 @@
 			
 			protected function initPresenter():void {
 				_presenter = new MultipleNodesDataGroupItemPresenter(this);	
+				_presenter.init();
 			}
 			
 			override protected function createChildren():void {

@@ -32,11 +32,11 @@ package org.openforis.collect.presenter
 		private var _codeListImportClient:CodeListImportClient;
 		
 		public function CodeListImportPresenter(view:CodeListImportView) {
+			super(view, new MessageKeys());
+
 			_codeListClient = ClientFactory.codeListClient;
 			_codeListImportClient = ClientFactory.codeListImportClient;
 
-			super(view, new MessageKeys());
-			
 			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		

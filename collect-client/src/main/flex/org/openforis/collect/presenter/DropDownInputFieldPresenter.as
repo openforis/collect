@@ -4,9 +4,10 @@ package org.openforis.collect.presenter {
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	
-	import mx.binding.utils.BindingUtils;
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.InputFieldEvent;
@@ -31,41 +32,44 @@ package org.openforis.collect.presenter {
 		public static const DASH_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.dashOnForm'), shortLabel: "-", shortCut: "-"};
 		public static const ILLEGIBLE_ITEM:Object = {label: Message.get('edit.dropDownList.illegible'), shortLabel: "?", shortCut: "?"};
 
-		private var _view:DropDownInputField;
-		
 		public function DropDownInputFieldPresenter(inputField:DropDownInputField) {
-			_view = inputField;
-			
 			super(inputField);
-			
+		}
+		
+		private function get view():DropDownInputField {
+			return DropDownInputField(_view);
+		}
+		
+		override public function init():void {
+			super.init();
 			initInternalDataProvider();
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			_view.dropDownList.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
-			_view.dropDownList.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
-			_view.dropDownList.addEventListener(Event.CHANGE, changeHandler);
-			_view.dropDownList.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+			view.dropDownList.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			view.dropDownList.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			view.dropDownList.addEventListener(Event.CHANGE, changeHandler);
+			view.dropDownList.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 			eventDispatcher.addEventListener(UIEvent.ACTIVE_RECORD_CHANGED, activeRecordChangeHandler);
 			
-			BindingUtils.bindSetter(setDataProvider, _view, "dataProvider");
-			BindingUtils.bindSetter(setDefaultValue, _view, "defaultValue");
+			ChangeWatcher.watch(view, "dataProvider", dataProviderChangeHandler);
+			ChangeWatcher.watch(view, "defaultValue", defaultValueChangeHandler);
 		}
 		
 		override protected function changeHandler(event:Event):void {
-			_view.changed = true;
-			if(_view.applyChangesOnFocusOut) {
+			view.changed = true;
+			if(view.applyChangesOnFocusOut) {
 				updateValue();
 			}
 		}
 		
 		override protected function setFocusHandler(event:InputFieldEvent):void {
-			if ( _view.dropDownList != null && _view.attribute != null && 
-				_view.attribute.id == event.attributeId && 
-				_view.fieldIndex == event.fieldIdx ) {
-				_view.dropDownList.setFocus();
+			if ( view.dropDownList != null && view.attribute != null && 
+				view.attribute.id == event.attributeId && 
+				view.fieldIndex == event.fieldIdx ) {
+				view.dropDownList.setFocus();
 			}
 		}
 		
@@ -74,31 +78,31 @@ package org.openforis.collect.presenter {
 			updateView();
 		}
 		
-		protected function setDataProvider(value:IList):void {
+		protected function dataProviderChangeHandler(event:PropertyChangeEvent):void {
 			initInternalDataProvider();
 			updateView();
 		}
 		
-		protected function setDefaultValue(value:String):void {
+		protected function defaultValueChangeHandler(event:PropertyChangeEvent):void {
 			updateView();
 		}
 		
 		protected function initInternalDataProvider():void {
 			var temp:ArrayCollection = new ArrayCollection();
 			temp.addItem(EMPTY_ITEM);
-			if(_view.dataProvider != null) {
-				temp.addAll(_view.dataProvider);
+			if(view.dataProvider != null) {
+				temp.addAll(view.dataProvider);
 			}
 			temp.addItem(BLANK_ON_FORM_ITEM);
 			temp.addItem(DASH_ON_FORM_ITEM);
 			temp.addItem(ILLEGIBLE_ITEM);
 			
-			_view.internalDataProvider = temp;
+			view.internalDataProvider = temp;
 		}
 		
 		override protected function textToRequestValue():String {
 			var result:String = null;
-			var selectedItem:* = _view.dropDownList.selectedItem;
+			var selectedItem:* = view.dropDownList.selectedItem;
 			if(selectedItem != null) {
 				switch(selectedItem) {
 					case EMPTY_ITEM:
@@ -109,7 +113,7 @@ package org.openforis.collect.presenter {
 						result = selectedItem.shortCut;
 						break;
 					default:
-						var value:* = ObjectUtil.getValue(selectedItem, _view.dataField);
+						var value:* = ObjectUtil.getValue(selectedItem, view.dataField);
 						if(value != null) {
 							result = String(value);
 						}
@@ -121,9 +125,9 @@ package org.openforis.collect.presenter {
 		override protected function updateView():void {
 			var item:Object = null;
 			var hasRemarks:Boolean = false;
-			var attribute:AttributeProxy = _view.attribute;
+			var attribute:AttributeProxy = view.attribute;
 			if(attribute != null) {
-				var field:FieldProxy = attribute.getField(_view.fieldIndex);
+				var field:FieldProxy = attribute.getField(view.fieldIndex);
 				hasRemarks = StringUtil.isNotBlank(getRemarks());
 				var value:Object = field.value;
 				if(field.symbol != null && FieldProxy.isReasonBlankSymbol(field.symbol)) {
@@ -142,12 +146,12 @@ package org.openforis.collect.presenter {
 					item = getItem(value);
 				}
 			}
-			if ( item == null && _view.defaultValue != null && (_view.attribute == null || _view.attribute.empty) ) {
-				item = getItem(_view.defaultValue);
+			if ( item == null && view.defaultValue != null && (view.attribute == null || view.attribute.empty) ) {
+				item = getItem(view.defaultValue);
 			}
-			_view.editable = Application.activeRecordEditable;
-			_view.dropDownList.selectedItem = item;
-			_view.hasRemarks = hasRemarks;
+			view.editable = Application.activeRecordEditable;
+			view.dropDownList.selectedItem = item;
+			view.hasRemarks = hasRemarks;
 			contextMenu.updateItems();
 		}
 		
@@ -170,15 +174,15 @@ package org.openforis.collect.presenter {
 						break;
 				}
 				if(item != null) {
-					_view.dropDownList.selectedItem = item;
+					view.dropDownList.selectedItem = item;
 					updateValue();
 				}
 			}
 		}
 
 		protected function getItem(value:*):Object {
-			var dataProvider:IList = _view.dropDownList.dataProvider;
-			var dataField:String = _view.dataField;
+			var dataProvider:IList = view.dropDownList.dataProvider;
+			var dataField:String = view.dataField;
 			var item:Object = CollectionUtil.getItem(dataProvider, dataField, value);
 			return item;
 		}

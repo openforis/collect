@@ -7,15 +7,16 @@ package org.openforis.collect.presenter {
 	 * */
 	public class NumericInputFieldPresenter extends InputFieldPresenter {
 		
-		private var _view:NumericInputField;
-		
 		public function NumericInputFieldPresenter(view:NumericInputField) {
-			_view = view;
 			super(view);
 		}
 		
+		private function get view():NumericInputField {
+			return NumericInputField(_view);
+		}
+		
 		override protected function textToRequestValue():String {
-			var text:String = _view.text;
+			var text:String = view.text;
 			if(text == ".") {
 				return "";
 			} else {

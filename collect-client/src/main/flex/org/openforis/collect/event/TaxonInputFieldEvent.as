@@ -12,7 +12,7 @@ package org.openforis.collect.event
 		public static const TAXON_AUTOCOMPLETE_POPUP_CLOSE:String = "taxonAutocompletePopUpClose";
 		public static const TAXON_SELECT:String = "taxonSelect";
 		
-		public var taxon:TaxonOccurrenceProxy;
+		public var taxon:Object;
 		
 		public function TaxonInputFieldEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{

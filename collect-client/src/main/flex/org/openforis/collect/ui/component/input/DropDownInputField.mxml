@@ -28,6 +28,7 @@
 			
 			override protected function initPresenter():void {
 				presenter = new DropDownInputFieldPresenter(this);
+				presenter.init();
 			}
 			
 			override public function set hasRemarks(value:Boolean):void {

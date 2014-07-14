@@ -33,6 +33,7 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new DataImportPresenter(this);
+				_presenter.init();
 			}
 			
 			[Bindable]

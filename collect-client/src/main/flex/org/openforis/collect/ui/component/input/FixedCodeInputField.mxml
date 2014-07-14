@@ -13,6 +13,7 @@
 			
 			override protected function initPresenter():void {
 				this.presenter = new FixedCodeInputFieldPresenter(this);
+				this.presenter.init();
 			}
 			
 			[Bindable]

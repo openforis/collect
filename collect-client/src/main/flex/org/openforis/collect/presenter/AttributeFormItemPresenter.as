@@ -28,7 +28,14 @@ package org.openforis.collect.presenter
 		
 		public function AttributeFormItemPresenter(view:AttributeFormItem) {
 			super(view);
-			
+		}
+		
+		private function get view():AttributeFormItem {
+			return AttributeFormItem(_view);
+		}
+		
+		override public function init():void {
+			super.init();
 			assignAttribute();
 		}
 		
@@ -51,10 +58,6 @@ package org.openforis.collect.presenter
 		
 		protected function attributeChangeHandler(event:Event):void {
 			updateView();
-		}
-		
-		private function get view():AttributeFormItem {
-			return AttributeFormItem(_view);
 		}
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {

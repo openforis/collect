@@ -16,6 +16,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
+	import flash.display.DisplayObject;
 
 	/**
 	 * 
@@ -33,7 +34,16 @@ package org.openforis.collect.presenter
 			
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
+		}
+		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
 			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
+		}
+		
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
 		private function get view():MultipleEntityAsTableFormItem {

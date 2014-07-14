@@ -34,6 +34,7 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new SamplingDesignImportPresenter(this);
+				_presenter.init();
 			}
 			
 			public function levelLabelFunction(item:SamplingDesignItemProxy, column:GridColumn):String {

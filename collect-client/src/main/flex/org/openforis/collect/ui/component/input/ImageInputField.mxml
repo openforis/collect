@@ -9,13 +9,12 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import mx.core.IVisualElement;
-			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.ImageInputFieldPresenter;
 			
 			override protected function initPresenter():void {
 				presenter = new ImageInputFieldPresenter(this);
+				presenter.init();
 			}
 		]]>
 	</fx:Script>

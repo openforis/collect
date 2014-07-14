@@ -23,10 +23,11 @@
 			public static const SAMPLING_DESIGN_IMPORT_STATE:String = "samplingDesignImport";
 			public static const CODE_LIST_IMPORT_STATE:String = "codeListImport";
 			
-			private var _masterPresenter:MasterPresenter;
+			private var _presenter:MasterPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				this._masterPresenter = new MasterPresenter(this); 
+				_presenter = new MasterPresenter(this); 
+				_presenter.init();
 			}
 		]]>
 	</fx:Script>

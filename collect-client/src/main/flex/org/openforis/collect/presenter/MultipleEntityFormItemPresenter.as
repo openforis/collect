@@ -41,8 +41,6 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
-			
 			view.addSection.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			view.addSection.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
 			view.addSection.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
@@ -50,9 +48,14 @@ package org.openforis.collect.presenter
 			view.addSection.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
 		}
 		
-		override protected function removeEventListeners():void {
-			super.removeEventListeners();
-			//eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
+			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
+		}
+		
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
 		private function get view():MultipleEntityFormItem {
@@ -174,7 +177,7 @@ package org.openforis.collect.presenter
 		protected function addResultHandler(event:ResultEvent, token:Object = null):void {
 			updateViewEntities();
 			//select the inserted entity
-			_view.callLater(function():void {
+			view.callLater(function():void {
 				var entities:IList = getEntities();
 				var lastEntity:EntityProxy = entities.getItemAt(entities.length -1) as EntityProxy;
 				selectEntity(lastEntity, true);

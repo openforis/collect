@@ -15,6 +15,7 @@
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new PopUpPresenter(this);
+				_presenter.init();
 			}
 			
 		]]>

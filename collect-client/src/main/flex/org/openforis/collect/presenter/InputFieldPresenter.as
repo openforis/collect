@@ -52,9 +52,8 @@ package org.openforis.collect.presenter {
 	 * */
 	public class InputFieldPresenter extends AbstractPresenter {
 		
-		private var _view:InputField;
 		private var _contextMenu:InputFieldContextMenu;
-		
+
 		private static var _dataClient:DataClient;
 		
 		/*
@@ -71,56 +70,64 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function InputFieldPresenter(inputField:InputField) {
-			_view = inputField;
+			super(inputField);
+		}
+		
+		override public function init():void {
+			super.init();
 			initContextMenu();
-			super();
 			updateView();
+		}
+		
+		private function get view():InputField {
+			return InputField(_view);
 		}
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-
-			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
-			eventDispatcher.addEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
 			
-			if(_view.textInput != null) {
-				_view.textInput.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
-				_view.textInput.addEventListener(Event.CHANGE, changeHandler);
-				_view.textInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
-				_view.textInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			if(view.textInput != null) {
+				view.textInput.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+				view.textInput.addEventListener(Event.CHANGE, changeHandler);
+				view.textInput.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+				view.textInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 				//key focus change managed by key down handler
-				_view.textInput.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
+				view.textInput.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
 			}
 			//key focus change managed by key down handler
-			_view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
+			view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
 			
-			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler);
-			
-			_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
+			ChangeWatcher.watch(view, "attribute", attributeChangeHandler);
 		}
 		
-		protected function removedFromStageHandler(event:Event):void {
-			//remove event listeners
-			//eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
-			//eventDispatcher.removeEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
+			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			eventDispatcher.addEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
+		}
+		
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+			eventDispatcher.removeEventListener(InputFieldEvent.SET_FOCUS, setFocusHandler);
 		}
 		
 		protected function initContextMenu():void {
-			_contextMenu = new InputFieldContextMenu(_view);
+			_contextMenu = new InputFieldContextMenu(view);
 		}
 		
 		protected function setFocusHandler(event:InputFieldEvent):void {
-			if ( _view.root != null && 
-					_view.textInput != null && 
-					_view.attribute != null && 
-					_view.attribute.id == event.attributeId && 
-					_view.fieldIndex == event.fieldIdx &&
-					_view.getFocus() != _view.textInput ) {
+			if ( view.root != null && 
+					view.textInput != null && 
+					view.attribute != null && 
+					view.attribute.id == event.attributeId && 
+					view.fieldIndex == event.fieldIdx &&
+					view.getFocus() != view.textInput ) {
 				
-				_view.textInput.setFocus();
+				view.textInput.setFocus();
 				
 				//adjust scroller view port if field is rendered in MultipleEntityAsTableFormItem
-				var scroller:Scroller = UIUtil.getFirstAncestor(_view, Scroller);
+				var scroller:Scroller = UIUtil.getFirstAncestor(view, Scroller);
 				if ( scroller != null && scroller.styleName == "multipleEntityScroller" && scroller.viewport != null ) {
 					if ( ! isNaN(scroller.viewport.verticalScrollPosition) ) {
 						var verticalAdjustment:Number = event.obj == null || event.obj.horizontalMove ? 0: event.obj.offset < 0 ? -5: 5;
@@ -336,18 +343,13 @@ package org.openforis.collect.presenter {
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
-		protected function preventDefaultHandler(event:Event):void {
-			event.preventDefault();
-			event.stopImmediatePropagation();
-		}
-		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			if(_view.attribute != null) {
+			if(view.attribute != null) {
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
 					if ( change is AttributeChangeProxy && 
-							AttributeChangeProxy(change).nodeId == _view.attribute.id) {
-						_view.changed = false
+							AttributeChangeProxy(change).nodeId == view.attribute.id) {
+						view.changed = false
 						updateView();
 						return;
 					}
@@ -356,17 +358,17 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function attributeChangeHandler(event:PropertyChangeEvent):void {
-			_view.changed = false;
-			_view.visited = false;
-			_view.updating = false;
+			view.changed = false;
+			view.visited = false;
+			view.updating = false;
 			updateView();
 		}
 		
 		protected function changeHandler(event:Event):void {
 			//TODO if autocomplete enabled show autocomplete popup...
-			_view.changed = true;
+			view.changed = true;
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.CHANGING);
-			_view.dispatchEvent(inputFieldEvent);
+			view.dispatchEvent(inputFieldEvent);
 		}
 		
 		protected function focusInHandler(event:FocusEvent):void {
@@ -377,30 +379,30 @@ package org.openforis.collect.presenter {
 		
 		protected function dispatchFocusInEvent():void {
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.FOCUS_IN);
-			inputFieldEvent.inputField = _view;
-			inputFieldEvent.parentEntityId = _view.parentEntity.id;
+			inputFieldEvent.inputField = view;
+			inputFieldEvent.parentEntityId = view.parentEntity.id;
 			eventDispatcher.dispatchEvent(inputFieldEvent);
 		}
 		
 		protected function focusOutHandler(event:FocusEvent):void {
-			if(_view.applyChangesOnFocusOut && _view.changed) {
+			if(view.applyChangesOnFocusOut && view.changed) {
 				updateValue();
 			}
-			_view.visited = true;
+			view.visited = true;
 			
 			//dispatch VISITED event
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.VISITED);
-			inputFieldEvent.inputField = _view;
+			inputFieldEvent.inputField = view;
 			eventDispatcher.dispatchEvent(inputFieldEvent);
 
 			dispatchFocusOutEvent();
 		}
 		
 		protected function dispatchFocusOutEvent():void {
-			if ( _view.parentEntity != null ) {
+			if ( view.parentEntity != null ) {
 				var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.FOCUS_OUT);
-				inputFieldEvent.inputField = _view;
-				inputFieldEvent.parentEntityId = _view.parentEntity.id;
+				inputFieldEvent.inputField = view;
+				inputFieldEvent.parentEntityId = view.parentEntity.id;
 				eventDispatcher.dispatchEvent(inputFieldEvent);
 			}
 		}
@@ -442,18 +444,18 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function moveFocusOnNextField(horizontalMove:Boolean, offset:int):Boolean {
-			var attribute:AttributeProxy = _view.attribute;
-			var fieldIndex:int = _view.fieldIndex;
+			var attribute:AttributeProxy = view.attribute;
+			var fieldIndex:int = view.fieldIndex;
 			var field:FieldProxy = attribute.getField(fieldIndex);
 			var focusChanged:Boolean = CollectFocusManager.moveFocusOnNextField(field, horizontalMove, offset);
 			if ( ! focusChanged ) {
-				focusChanged = UIUtil.moveFocus(offset < 0, _view.focusManager);
+				focusChanged = UIUtil.moveFocus(offset < 0, view.focusManager);
 			}
 			return focusChanged;
 		}
 
 		public function undoLastChange():void {
-			_view.changed = false;
+			view.changed = false;
 			updateView();
 		}
 		
@@ -464,8 +466,8 @@ package org.openforis.collect.presenter {
 		
 		public function createAttributeAddRequest(value:String = null, symbol:FieldSymbol = null, remarks:String = null):AttributeAddRequestProxy {
 			var r:AttributeAddRequestProxy = new AttributeAddRequestProxy();
-			r.parentEntityId = _view.parentEntity.id;
-			r.nodeName = _view.attributeDefinition.name;
+			r.parentEntityId = view.parentEntity.id;
+			r.nodeName = view.attributeDefinition.name;
 			r.value = value;
 			r.symbol = symbol;
 			r.remarks = remarks;
@@ -489,21 +491,21 @@ package org.openforis.collect.presenter {
 		protected function sendUpdateRequest(o:NodeUpdateRequestProxy):void {
 			var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(o);
 			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
-			_view.updating = true;
+			view.updating = true;
 		}
 		
 		protected function createSpecificValueUpdateRequest(value:String, symbol:FieldSymbol = null, remarks:String = null):NodeUpdateRequestProxy {
-			if ( _view.fieldIndex >= 0 ) {
+			if ( view.fieldIndex >= 0 ) {
 				var fieldUpdReq:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
-				fieldUpdReq.nodeId = _view.attribute.id;
-				fieldUpdReq.fieldIndex = _view.fieldIndex;
+				fieldUpdReq.nodeId = view.attribute.id;
+				fieldUpdReq.fieldIndex = view.fieldIndex;
 				fieldUpdReq.value = value;
 				fieldUpdReq.symbol = symbol;
 				fieldUpdReq.remarks = remarks;
 				return fieldUpdReq;
 			} else {
 				var attrUpdReq:AttributeUpdateRequestProxy = new AttributeUpdateRequestProxy();
-				attrUpdReq.nodeId = _view.attribute.id;
+				attrUpdReq.nodeId = view.attribute.id;
 				attrUpdReq.value = value;
 				attrUpdReq.symbol = symbol;
 				attrUpdReq.remarks = remarks;
@@ -512,15 +514,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateResultHandler(event:ResultEvent, token:Object = null):void {
-			_view.changed = false;
-			_view.updating = false;
-			//_view.currentState = InputField.STATE_SAVE_COMPLETE;
+			view.changed = false;
+			view.updating = false;
+			//view.currentState = InputField.STATE_SAVE_COMPLETE;
 		}
 		
 		protected function getTextFromValue():String {
-			var attribute:AttributeProxy = _view.attribute;
+			var attribute:AttributeProxy = view.attribute;
 			if(attribute != null) {
-				var field:FieldProxy = _view.attribute.getField(_view.fieldIndex);
+				var field:FieldProxy = view.attribute.getField(view.fieldIndex);
 				return field.getValueAsText();
 			} else {
 				return "";
@@ -529,7 +531,7 @@ package org.openforis.collect.presenter {
 
 		protected function textToRequestValue():String {
 			var result:String = null;
-			var text:String = _view.text;
+			var text:String = view.text;
 			if(StringUtil.isNotBlank(text)) {
 				result = StringUtil.trim(text);
 			}
@@ -540,7 +542,7 @@ package org.openforis.collect.presenter {
 			//update view according to attribute (generic text value)
 			var hasRemarks:Boolean = false;
 			var text:String = getTextFromValue();
-			_view.text = text;
+			view.text = text;
 			hasRemarks = StringUtil.isNotBlank(getRemarks());
 			_contextMenu.updateItems();
 			
@@ -551,19 +553,19 @@ package org.openforis.collect.presenter {
 			if ( ! Application.activeRecordEditable ) {
 				newStyles.push(InputField.READONLY_STYLE);	
 			}
-			UIUtil.replaceStyleNames(_view.validationStateDisplay, newStyles, 
+			UIUtil.replaceStyleNames(view.validationStateDisplay, newStyles, 
 				[InputField.REMARKS_PRESENT_STYLE, InputField.READONLY_STYLE] );
 			
-			_view.editable = Application.activeRecordEditable;
+			view.editable = Application.activeRecordEditable;
 		}
 		
 		protected function getField():FieldProxy {
-			if(_view.attribute != null) {
+			if(view.attribute != null) {
 				var fieldIndex:int = 0;
-				if(_view.fieldIndex >= 0) {
-					fieldIndex = _view.fieldIndex;
+				if(view.fieldIndex >= 0) {
+					fieldIndex = view.fieldIndex;
 				}
-				return _view.attribute.getField(fieldIndex);
+				return view.attribute.getField(fieldIndex);
 			}
 			return null;
 		}
@@ -588,10 +590,6 @@ package org.openforis.collect.presenter {
 			return _contextMenu;
 		}
 
-		protected function get view():InputField {
-			return _view;
-		}
-			
 		protected static function get dataClient():DataClient {
 			return _dataClient;
 		}

@@ -20,8 +20,6 @@ package org.openforis.collect.presenter
 	 **/
 	public class LanguageAutoCompletePresenter extends AutoCompleteInputFieldPresenter {
 		
-		private var _view:LanguageAutoComplete;
-		
 		private static var languages:ArrayCollection;
 		{
 			//init static vars
@@ -29,10 +27,13 @@ package org.openforis.collect.presenter
 		}
 		
 		public function LanguageAutoCompletePresenter(view:LanguageAutoComplete) {
-			this._view = view;
 			super(view);
 			minCharsToStartAutocomplete = 1;
 			allowNotListedValues = false;
+		}
+		
+		private function get view():LanguageAutoComplete {
+			return LanguageAutoComplete(_view);
 		}
 		
 		override protected function textToRequestValue():String {
@@ -59,7 +60,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function languagesFilterFunction(item:LanguageItem):Boolean {
-			var searchText:String = _view.text;
+			var searchText:String = view.text;
 			if ( StringUtil.isNotBlank(searchText) ) {
 				return StringUtil.startsWith(item.label, searchText, true);
 			} else {
@@ -68,7 +69,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function getMatchingResult():* {
-			var searchText:String = _view.text;
+			var searchText:String = view.text;
 			var list:IList = LanguageCodeAutoCompletePopUp(popUp).dataGrid.dataProvider;
 			for each (var item:LanguageItem in list) {
 				var compareToValue:String = item.label;
@@ -101,7 +102,7 @@ package org.openforis.collect.presenter
 		
 		override protected function performSelectValue(selectedValue:*):void {
 			if ( selectedValue != null ) {
-				_view.text = (selectedValue as LanguageItem).label;
+				view.text = (selectedValue as LanguageItem).label;
 				updateValue();
 			}
 			closePopUp();
