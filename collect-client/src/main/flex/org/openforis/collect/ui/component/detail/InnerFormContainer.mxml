@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				   	xmlns:s="library://ns.adobe.com/flex/spark" 
 				   	xmlns:mx="library://ns.adobe.com/flex/mx" 
 					xmlns:detail="org.openforis.collect.ui.component.detail.*"
@@ -85,32 +85,29 @@
 		]]>
 	</fx:Script>
  	
+	
 	<s:states>
 		<s:State name="default" />
 		<s:State name="enlarged" />
 	</s:states>
 	
+	<mx:Grid id="grid"
+			 includeIn="enlarged"
+			 width="{occupyAllAvailableSpace ? width: NaN}"
+			 height="{occupyAllAvailableSpace ? height: NaN}"
+			 horizontalGap="4"
+			 verticalGap="2"
+			 >
+		<!-- to be built programmatically -->
+	</mx:Grid>
+	
 	<s:Scroller id="scroller"
-				width.default="100%"
-				height.default="100%"
-				horizontalScrollPolicy.enlarged="off"
-				verticalScrollPolicy.enlarged="off">
+				includeIn="default"
+				width="100%"
+				height="100%">
 		<s:Group>
-			<mx:Grid id="grid"
-					 paddingBottom="10" 
-					 paddingLeft="10" 
-					 paddingRight="10"
-					 paddingTop="10"
-					 paddingBottom.enlarged="0" 
-					 paddingLeft.enlarged="0" 
-					 paddingRight.enlarged="0" 
-					 paddingTop.enlarged="0"
-					 width="{occupyAllAvailableSpace ? width: NaN}"
-					 height="{occupyAllAvailableSpace ? height: NaN}"
-					 >
-				<!-- to be built programmatically -->
-			</mx:Grid>
+			<fx:Reparent target="grid" includeIn="default" />
 		</s:Group>
 	</s:Scroller>
 	
-</s:NavigatorContent>
+</s:HGroup>

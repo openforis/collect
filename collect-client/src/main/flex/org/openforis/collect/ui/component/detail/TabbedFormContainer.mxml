@@ -150,7 +150,12 @@
 			parentEntity="{parentEntity}"
 			width.default="100%"
 			height.default="100%"
-			includeIn="default,complete" />
+			includeIn="default,complete"
+			paddingBottom="10"
+			paddingLeft="10"
+			paddingRight="10"
+			paddingTop="10"
+			/>
 		
 		<s:TabBar id="tabBar" 
 				  dataProvider="{viewStack}"

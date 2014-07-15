@@ -31,5 +31,6 @@ public interface UIOptionsConstants {
 	String SHOW_ALLOWED_VALUES_PREVIEW = "showAllowedValuesPreview";
 	String SHOW_IN_UI = "showInUI";
 	String COLUMN = "column";
+	String COLUMN_SPAN = "columnSpan";
 	
 }
