@@ -13,7 +13,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.InnerFormContainer;
@@ -30,10 +29,13 @@ package org.openforis.collect.presenter
 		private static const INDENTED_LABEL_WIDTH:int = DEFAULT_LABEL_WIDTH - INDENT_WIDTH;
 		
 		private var _formItems:IList;
-
+		
 		public function InnerFormPresenter(view:InnerFormContainer) {
 			super(view);
 			_formItems = new ArrayCollection();
+			if ( view.labelWidth == -1 ) {
+				view.labelWidth = DEFAULT_LABEL_WIDTH;
+			}
 		}
 		
 		private function get view():InnerFormContainer {
@@ -56,7 +58,7 @@ package org.openforis.collect.presenter
 			}
 			updateMultipleEntitiesMaxHeight(value);
 		}
-
+		
 		protected function setViewWidth(value:Number):void {
 			if ( view.occupyAllAvailableSpace ) {
 				var formItem:CollectFormItem = CollectFormItem(_formItems.getItemAt(0));
@@ -90,7 +92,7 @@ package org.openforis.collect.presenter
 				}
 			}
 		}
-
+		
 		protected function updateCurrentState():void {
 			view.occupyAllAvailableSpace = containsOnlyOneMultipleEntity/* || isInsideFormLayoutEntity()*/;
 			view.currentState = view.occupyAllAvailableSpace ? InnerFormContainer.STATE_ENLARGED: InnerFormContainer.STATE_DEFAULT;
@@ -126,17 +128,10 @@ package org.openforis.collect.presenter
 			var lastCell:GridItem = null;
 			var lastColPosition:int = 1;
 			
-			//display nodes inline when rendering a single entity inside a table
-			var displayInline:Boolean = 
-					! view.entityDefinition.multiple && 
-					view.entityDefinition.parentLayout == UIUtil.LAYOUT_TABLE &&
-					view.entityDefinition.direction == UIOptions$Direction.BY_ROWS;
-			
 			for each ( var nodeDefn:NodeDefinitionProxy in view.nodeDefinitions ) {
 				var colSpan:int = nodeDefn.columnSpan;
 				var colPosition:int = nodeDefn.column;
-				
-				if ( row == null || ( colPosition <= lastColPosition && ! displayInline ) ) {
+				if ( row == null || colPosition <= lastColPosition ) {
 					//change row
 					row = new GridRow();
 					view.grid.addElement(row);
@@ -154,10 +149,10 @@ package org.openforis.collect.presenter
 				var cell:GridItem = new GridItem();
 				cell.colSpan = colSpan;
 				var formItem:CollectFormItem = createFormItem(nodeDefn);
+				_formItems.addItem(formItem);
 				cell.addElement(formItem);
 				row.addElement(cell);
 				
-				_formItems.addItem(formItem);
 				lastCell = cell;
 				lastColPosition = colPosition + (colSpan - 1);
 			}
@@ -167,8 +162,8 @@ package org.openforis.collect.presenter
 			var formItem:CollectFormItem;
 			if ( defn is AttributeDefinitionProxy ) {
 				formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(defn));
-				formItem.labelWidth = ! (view.entityDefinition.multiple) && view.entityDefinition.parentLayout == UIUtil.LAYOUT_FORM ? 
-						INDENTED_LABEL_WIDTH : DEFAULT_LABEL_WIDTH;
+				
+				formItem.labelWidth = view.labelWidth;
 			} else {
 				formItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(defn));
 				BindingUtils.bindProperty(formItem, "modelVersion", _view, "modelVersion");
