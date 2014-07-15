@@ -11,11 +11,9 @@ package org.openforis.collect.presenter {
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.core.FlexGlobals;
-	import mx.core.IVisualElement;
 	import mx.core.UIComponent;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
-	import mx.managers.FocusManager;
 	import mx.managers.IFocusManagerComponent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
@@ -30,17 +28,13 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
-	import org.openforis.collect.ui.component.input.CodeListDialogItemRenderer;
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.ui.component.input.codelist.CodeListAllowedValuesPreviewDialog;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
-	
-	import spark.components.CheckBox;
 	
 	/**
 	 * 
@@ -357,8 +351,11 @@ package org.openforis.collect.presenter {
 			if ( event.keyCode == Keyboard.TAB && ! event.shiftKey ) {
 				preventDefaultHandler(event);
 				closeAllowedValuesPreviewPopUp();
-				view.openImage.setFocus();
-				//dispatchFocusInEvent();
+				if ( view.openImage.visible ) {
+					view.openImage.setFocus();
+				} else {
+					super.keyDownHandler(event);
+				}
 			} else {
 				super.keyDownHandler(event);
 			}

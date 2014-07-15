@@ -1,7 +1,10 @@
 package org.openforis.collect.presenter {
+	import flash.display.DisplayObject;
 	import flash.events.DataEvent;
 	import flash.events.Event;
+	import flash.events.FocusEvent;
 	import flash.events.IOErrorEvent;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
 	import flash.net.FileFilter;
@@ -10,9 +13,11 @@ package org.openforis.collect.presenter {
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.net.navigateToURL;
+	import flash.ui.Keyboard;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.managers.IFocusManagerComponent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.event.InputFieldEvent;
@@ -69,8 +74,53 @@ package org.openforis.collect.presenter {
 			view.browseButton.addEventListener(MouseEvent.CLICK, browseClickHandler);
 			view.downloadButton.addEventListener(MouseEvent.CLICK, downloadClickHandler);
 			view.removeButton.addEventListener(MouseEvent.CLICK, removeClickHandler);
+			
+			view.browseButton.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
+			view.removeButton.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
+			view.downloadButton.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
 		}
-
+		
+		protected function buttonKeyDownHandler(event:KeyboardEvent):void {
+			if ( event.keyCode == Keyboard.TAB ) {
+				preventDefaultHandler(event);
+				var focusChanged:Boolean = moveFocusToNextButton(event.shiftKey);
+				if ( ! focusChanged ) {
+					moveFocusOnNextField(false, event.shiftKey ? -1: 1);
+				}
+			}
+		}
+		
+		private function moveFocusToNextButton(backwards:Boolean):Boolean {
+			var focussedEl:IFocusManagerComponent = view.focusManager.getFocus();
+			var buttons:Array = getFocusableButtons();
+			if ( buttons.length > 0 && focussedEl != null ) {
+				var focussedElIdx:int = buttons.indexOf(focussedEl);
+				if ( focussedElIdx >= 0 ) {
+					var nextIdx:int = focussedElIdx + (backwards ? -1: 1);
+					if ( nextIdx >= 0 && nextIdx < buttons.length ) {
+						var nextBtn:IFocusManagerComponent = IFocusManagerComponent(buttons[nextIdx]);
+						nextBtn.setFocus();
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		
+		protected function getFocusableButtons():Array {
+			var buttons:Array = new Array();
+			if ( view.editable ) {
+				buttons.push(view.browseButton);
+			}
+			if ( ! view.attribute.empty ) {
+				buttons.push(view.downloadButton);
+				if ( view.editable ) {
+					buttons.push(view.removeButton);
+				}
+			}
+			return buttons;
+		}
+		
 		private function initFileFilter():void {
 			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(view.attributeDefinition);
 			var extensions:IList = attrDefn.extensions;
@@ -117,6 +167,15 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
+		override protected function focusInHandler(event:FocusEvent):void {
+			super.focusInHandler(event);
+			if ( view.editable ) {
+				view.browseButton.setFocus();
+			} else {
+				view.previewContainer.setFocus();
+			}
+		}
+		
 		protected function getFileName():String {
 			var fileName:String = null;
 			if ( view.attribute != null ) {
@@ -127,10 +186,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function setFocusHandler(event:InputFieldEvent):void {
-			if ( view.browseButton != null && view.attribute != null && 
+			if ( view.attribute != null && 
 				view.attribute.id == event.attributeId && 
 				view.fieldIndex == event.fieldIdx ) {
-				view.browseButton.setFocus();
+				//set focus on first focusable button
+				var buttons:Array = getFocusableButtons();
+				if ( buttons.length > 0 ) {
+					var button:IFocusManagerComponent = IFocusManagerComponent(buttons[0]);
+					button.setFocus();
+				}
 			}
 		}
 		
