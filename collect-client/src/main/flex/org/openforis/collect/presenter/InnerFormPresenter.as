@@ -154,10 +154,11 @@ package org.openforis.collect.presenter
 				var cell:GridItem = new GridItem();
 				cell.colSpan = colSpan;
 				var formItem:CollectFormItem = createFormItem(nodeDefn);
+				
+				_formItems.addItem(formItem);
 				cell.addElement(formItem);
 				row.addElement(cell);
 				
-				_formItems.addItem(formItem);
 				lastCell = cell;
 				lastColPosition = colPosition + (colSpan - 1);
 			}
