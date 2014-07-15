@@ -3,7 +3,8 @@
 				  xmlns:s="library://ns.adobe.com/flex/spark" 
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
-				  currentState="default" xmlns:graphics="org.openforis.collect.ui.skin.graphics.*"
+				  xmlns:graphics="org.openforis.collect.ui.skin.graphics.*"
+				  currentState="default" 
 				  >
 	<input:layout>
 		<s:HorizontalLayout />

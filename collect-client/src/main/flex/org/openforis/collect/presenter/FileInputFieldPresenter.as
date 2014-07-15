@@ -1,5 +1,4 @@
 package org.openforis.collect.presenter {
-	import flash.display.DisplayObject;
 	import flash.events.DataEvent;
 	import flash.events.Event;
 	import flash.events.FocusEvent;
@@ -34,7 +33,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
-	import org.openforis.collect.util.UIUtil;
 	
 	import spark.components.Label;
 	import spark.formatters.NumberFormatter;
@@ -68,25 +66,26 @@ package org.openforis.collect.presenter {
 			fileReference.addEventListener(Event.SELECT, fileReferenceSelectHandler);
 			fileReference.addEventListener(ProgressEvent.PROGRESS, fileReferenceProgressHandler);
 			fileReference.addEventListener(IOErrorEvent.IO_ERROR, fileReferenceIoErrorHandler);
-			//fileReference.addEventListener(Event.COMPLETE, fileReferenceLoadComplete);
 			fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 			
 			view.browseButton.addEventListener(MouseEvent.CLICK, browseClickHandler);
 			view.downloadButton.addEventListener(MouseEvent.CLICK, downloadClickHandler);
 			view.removeButton.addEventListener(MouseEvent.CLICK, removeClickHandler);
 			
-			view.browseButton.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
-			view.removeButton.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
-			view.downloadButton.addEventListener(KeyboardEvent.KEY_DOWN, buttonKeyDownHandler);
+			view.browseButton.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+			view.downloadButton.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+			view.removeButton.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 		}
 		
-		protected function buttonKeyDownHandler(event:KeyboardEvent):void {
+		override protected function keyDownHandler(event:KeyboardEvent):void {
 			if ( event.keyCode == Keyboard.TAB ) {
-				preventDefaultHandler(event);
+				preventDefaultHandlerAndPropagation(event);
 				var focusChanged:Boolean = moveFocusToNextButton(event.shiftKey);
 				if ( ! focusChanged ) {
-					moveFocusOnNextField(false, event.shiftKey ? -1: 1);
+					super.keyDownHandler(event);
 				}
+			} else {
+				super.keyDownHandler(event);
 			}
 		}
 		
@@ -189,12 +188,18 @@ package org.openforis.collect.presenter {
 			if ( view.attribute != null && 
 				view.attribute.id == event.attributeId && 
 				view.fieldIndex == event.fieldIdx ) {
-				//set focus on first focusable button
-				var buttons:Array = getFocusableButtons();
-				if ( buttons.length > 0 ) {
-					var button:IFocusManagerComponent = IFocusManagerComponent(buttons[0]);
-					button.setFocus();
-				}
+				setFocusOnFirstButton();
+			}
+		}
+		
+		/**
+		 * Sets the focus on first focusable button.
+		 */
+		protected function setFocusOnFirstButton():void {
+			var buttons:Array = getFocusableButtons();
+			if ( buttons.length > 0 ) {
+				var button:IFocusManagerComponent = IFocusManagerComponent(buttons[0]);
+				button.setFocus();
 			}
 		}
 		
@@ -270,6 +275,7 @@ package org.openforis.collect.presenter {
 			var nodeId:Number = view.attribute.id;
 			var request:NodeUpdateRequestProxy = createFileUpdateRequestOperation(null);
 			sendUpdateRequest(request);
+			setFocusOnFirstButton();
 		}
 		
 		protected function deleteResultHandler(event:ResultEvent, token:Object = null):void {
