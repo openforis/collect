@@ -21,7 +21,7 @@
 
 
 	<window id="calculatedAttributeFormulaPopUp" title="${title}"
-		width="500px" border="normal" position="center" closable="false"
+		width="550px" border="normal" position="center" closable="false"
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CalculatedAttributeFormulaVM')"
 		validationMessages="@id('vmsgs')"
@@ -44,7 +44,7 @@
 							value="${labels.survey.schema.attribute.calculated.formula.expression}:" />
 						<fieldErrorHandler
 							message="@load(vmsgs['expression'])">
-							<textbox width="150px"
+							<textbox width="300px"
 								value="@bind(fx.expression)"
 								onChange="@command('applyChanges')" />
 						</fieldErrorHandler>
@@ -54,7 +54,7 @@
 							value="${labels.survey.schema.attribute.calculated.formula.condition}:" />
 						<fieldErrorHandler
 							message="@load(vmsgs['condition'])">
-							<textbox width="150px"
+							<textbox width="200px"
 								value="@bind(fx.condition)" onChange="@command('applyChanges')" />
 						</fieldErrorHandler>
 					</row>
