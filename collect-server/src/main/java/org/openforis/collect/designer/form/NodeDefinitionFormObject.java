@@ -43,6 +43,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	//layout
 	private String tabName;
 	private int column;
+	private int columnSpan;
 	
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
@@ -131,6 +132,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		UIOptions uiOptions = getUIOptions(source);
 		hideWhenNotRelevant = uiOptions.isHideWhenNotRelevant(source);
 		column = uiOptions.getColumn(source);
+		columnSpan = uiOptions.getColumnSpan(source);
 	}
 
 	@Override
@@ -162,6 +164,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		UIOptions uiOptions = getUIOptions(dest);
 		uiOptions.setHideWhenNotRelevant(dest, hideWhenNotRelevant);
 		uiOptions.setColumn(dest, column);
+		uiOptions.setColumnSpan(dest, columnSpan);
 	}
 
 	@Override
@@ -317,6 +320,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setColumn(int column) {
 		this.column = column;
+	}
+	
+	public int getColumnSpan() {
+		return columnSpan;
+	}
+	
+	public void setColumnSpan(int columnSpan) {
+		this.columnSpan = columnSpan;
 	}
 	
 }

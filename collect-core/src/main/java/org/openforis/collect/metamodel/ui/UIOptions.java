@@ -664,6 +664,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		setAnnotationValue(defn, Annotation.COLUMN, value);
 	}
 
+	public int getColumnSpan(NodeDefinition defn) {
+		return getAnnotationIntegerValue(defn, Annotation.COLUMN_SPAN);
+	}
+	
+	public void setColumnSpan(NodeDefinition defn, int value) {
+		setAnnotationValue(defn, Annotation.COLUMN_SPAN, value);
+	}
+	
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {

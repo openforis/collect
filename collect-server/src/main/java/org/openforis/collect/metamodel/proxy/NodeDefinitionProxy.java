@@ -157,15 +157,19 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 
 	@ExternalizedProperty
 	public boolean isHideWhenNotRelevant() {
-		UIOptions uiOptions = getUIOptions();
-		boolean result = uiOptions.isHideWhenNotRelevant(nodeDefinition);
+		boolean result = getUIOptions().isHideWhenNotRelevant(nodeDefinition);
 		return result;
 	}
 
 	@ExternalizedProperty
 	public int getColumn() {
-		UIOptions uiOptions = getUIOptions();
-		int result = uiOptions.getColumn(nodeDefinition);
+		int result = getUIOptions().getColumn(nodeDefinition);
+		return result;
+	}
+
+	@ExternalizedProperty
+	public int getColumnSpan() {
+		int result = getUIOptions().getColumnSpan(nodeDefinition);
 		return result;
 	}
 

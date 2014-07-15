@@ -21,11 +21,13 @@ public class NodeDefinitionFormValidator extends FormValidator {
 	protected static final String 	DESCRIPTION_FIELD = "description";
 	protected static final String 	NAME_FIELD = "name";
 	protected static final String 	MULTIPLE_FIELD = "multiple";
-	private static final String 	MIN_COUNT_FIELD = "minCount";
+	protected static final String 	MIN_COUNT_FIELD = "minCount";
 	protected static final String 	MAX_COUNT_FIELD = "maxCount";
 	protected static final String 	TAB_NAME_FIELD = "tabName";
 	protected static final String 	REQUIRED_EXPR_FIELD = "requiredExpression";
 	protected static final String 	RELEVANT_EXPR_FIELD = "relevantExpression";
+	protected static final String 	COLUMN_FIELD = "column";
+	protected static final String 	COLUMN_SPAN_FIELD = "columnSpan";
 	
 	protected static final int 		MAX_COUNT_MIN_VALUE = 2;
 
@@ -38,6 +40,7 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		NodeDefinition contextNode = getEditedNode(ctx);
 		validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
 		validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
+		validateColumn(ctx);
 	}
 
 	protected boolean validateName(ValidationContext ctx) {
@@ -114,6 +117,11 @@ public class NodeDefinitionFormValidator extends FormValidator {
 		}
 	}
 
+	private void validateColumn(ValidationContext ctx) {
+		validateGreaterThan(ctx, COLUMN_FIELD, 1, false);
+		validateGreaterThan(ctx, COLUMN_SPAN_FIELD, 1, false);
+	}
+	
 	protected NodeDefinition getEditedNode(ValidationContext ctx) {
 		Object vmObject = getVM(ctx);
 		NodeDefinition editedNode;

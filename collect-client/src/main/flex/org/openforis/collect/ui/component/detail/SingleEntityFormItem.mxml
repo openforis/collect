@@ -51,31 +51,17 @@
 
 	<detail:FormItemLabel id="formItemLabel"
 		  				  nodeDefinition="{entityDefinition}" 
-						  includeIn="verticalFormLayout"
-						/>
-
-	<s:DataGroup 
-		dataProvider="{nodeDefinitions}">
-		<s:layout.horizontal>
-			<s:HorizontalLayout gap="4" />
-		</s:layout.horizontal>
-		<s:layout.vertical>
-			<s:VerticalLayout gap="2" />
-		</s:layout.vertical>
-		<s:layout.verticalFormLayout>
-			<s:VerticalLayout gap="2" 
-							  paddingLeft="20" 
-							  />
-		</s:layout.verticalFormLayout>
-		<s:itemRenderer>
-			<fx:Component>
-				<detail:FormDataGroupItemRenderer
-					modelVersion="{outerDocument.modelVersion}"
-					entity="{outerDocument.entity}"
-					labelWidth="130"
-					/>
-			</fx:Component>
-		</s:itemRenderer>
-	</s:DataGroup>
+						  includeIn="verticalFormLayout" />
 	
+	<s:HGroup 
+			paddingLeft.verticalFormLayout="20">
+		<detail:InnerFormContainer 
+			id="definitionsPerCurrentTabContainer"
+			entityDefinition="{entityDefinition}"
+			nodeDefinitions="{nodeDefinitions}"
+			parentEntity="{entity}"
+			modelVersion="{modelVersion}"
+			 />
+	</s:HGroup>
+
 </detail:EntityFormItem>

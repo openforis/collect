@@ -330,6 +330,13 @@
 		  					<intbox value="@bind(fx.column)"
 		  						onChange="@command('applyChanges')" />
 		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['columnSpan'])">
+		  					<label value="${labels.survey.schema.node.layout.column_span}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['columnSpan'])">
+		  					<intbox value="@bind(fx.columnSpan)"
+		  						onChange="@command('applyChanges')" />
+		  				</fieldErrorHandler>
 		  			</row>
     			</rows>
     		</grid>
