@@ -316,7 +316,7 @@
     <groupbox width="100%" closable="false" visible="@load(not vm.rootEntity)">
     	<caption label="${labels.survey.schema.node.layout.$}" />
     	<vlayout width="100%">
-    		<grid class="inner">
+    		<grid class="inner" visible="@load(not vm.insideTableEntity)">
     			<columns>
     				<column width="150px" />
     				<column />

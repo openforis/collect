@@ -10,8 +10,10 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -195,6 +197,13 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@DependsOn("editedItem")
 	public boolean isRootEntity() {
 		return editedItem != null && parentEntity == null;
+	}
+	
+	@DependsOn("editedItem")
+	public boolean isInsideTableEntity() {
+		UIOptions uiOptions = getSurvey().getUIOptions();
+		return editedItem != null && parentEntity != null && parentEntity.isMultiple() && 
+				uiOptions.getLayout(parentEntity) == Layout.TABLE; 
 	}
 	
 	public boolean isRequiredApplied() {
