@@ -64,7 +64,7 @@ package org.openforis.collect.presenter {
 					if ( ! ( ( target is UIComponent && UIUtil.hasStyleName(UIComponent(target), "openCodeListPopUpButton") ) || UIUtil.isDescendantOf(_popUp, target) ) 
 						//&& target != codeInputField.textInput 
 						) {
-						closePopupHandler(null, false);
+						popUpApplyHandler(null, false);
 					}
 				}
 				if ( _allowedValuesPreviewPopUpOpened ) {
@@ -274,10 +274,10 @@ package org.openforis.collect.presenter {
 			_popUp.codeInputField.presenter.updateValue();
 		}
 		
-		protected static function popUpApplyHandler(event:Event):void {
+		protected static function popUpApplyHandler(event:Event, setFocusOnInputField:Boolean = true):void {
 			var selectedItems:IList = _popUp.selectedItems;
 			applySelection(selectedItems);
-			closePopupHandler();
+			closePopupHandler(null, setFocusOnInputField);
 		}
 		
 		override protected function getTextFromValue():String {
