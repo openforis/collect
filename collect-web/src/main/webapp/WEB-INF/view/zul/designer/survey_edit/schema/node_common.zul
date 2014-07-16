@@ -320,18 +320,24 @@
     			<columns>
     				<column width="150px" />
     				<column />
+    				<column />
+    				<column />
     			</columns>
     			<rows>
     				<row>
 		  				<fieldErrorHandler message="@load(vmsgs['column'])">
-		  					<label value="${labels.survey.schema.node.layout.column}:" />
+		  					<label value="${labels.survey.schema.node.layout.column.$}:" />
+							<image popup="columnInfoTooltip" style="cursor:pointer"
+								src="/assets/images/info-small.png" />
 		  				</fieldErrorHandler>
 		  				<fieldErrorHandler message="@load(vmsgs['column'])">
 		  					<intbox value="@bind(fx.column)"
 		  						onChange="@command('applyChanges')" />
 		  				</fieldErrorHandler>
 		  				<fieldErrorHandler message="@load(vmsgs['columnSpan'])">
-		  					<label value="${labels.survey.schema.node.layout.column_span}:" />
+		  					<label value="${labels.survey.schema.node.layout.column_span.$}:" />
+							<image popup="columnSpanInfoTooltip" style="cursor:pointer"
+								src="/assets/images/info-small.png" />
 		  				</fieldErrorHandler>
 		  				<fieldErrorHandler message="@load(vmsgs['columnSpan'])">
 		  					<intbox value="@bind(fx.columnSpan)"
@@ -345,4 +351,15 @@
 
     	</vlayout>
     </groupbox>
+    
+    <popup id="columnInfoTooltip" width="500px">
+        <html><![CDATA[
+        	${labels.survey.schema.node.layout.column.info}
+        ]]></html>
+    </popup>
+    <popup id="columnSpanInfoTooltip" width="300px">
+        <html><![CDATA[
+    		${labels.survey.schema.node.layout.column_span.info}
+        ]]></html>
+    </popup>
 </zk>

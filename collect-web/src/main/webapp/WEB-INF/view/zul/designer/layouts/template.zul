@@ -49,8 +49,8 @@
       <borderlayout width="960px" vflex="true">
       	<north height="102px" border="none">
       		<absolutelayout id="header" sclass="header">
-	            <absolutechildren hflex="true" vflex="true">
-	        		<image id="headerImage" hflex="true" vflex="true" />
+	            <absolutechildren>
+	        		<image id="headerImage" width="974px" height="102px" />
 	            </absolutechildren>
 	            <absolutechildren width="100%" height="100%">
 	              <vlayout width="100%" height="100%" spacing="0px">
