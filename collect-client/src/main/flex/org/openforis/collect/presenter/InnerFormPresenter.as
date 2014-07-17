@@ -42,28 +42,21 @@ package org.openforis.collect.presenter
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			
-			BindingUtils.bindSetter(nodeDefinitionsSetter, _view, "nodeDefinitions");
 			BindingUtils.bindSetter(setViewHeight, _view, "height");
 			BindingUtils.bindSetter(setViewWidth, _view, "width");
+			BindingUtils.bindSetter(nodeDefinitionsSetter, _view, "nodeDefinitions");
 		}
 		
 		protected function setViewHeight(value:Number):void {
-			if ( view.occupyAllAvailableSpace ) {
-				var formItem:CollectFormItem = CollectFormItem(_formItems.getItemAt(0));
-				formItem.parent.height = value;
-				//formItem.height = value;
+			if ( view.useScroller ) {
+				updateMultipleEntitiesMaxHeight(value);
 			}
-			updateMultipleEntitiesMaxHeight(value);
 		}
 
 		protected function setViewWidth(value:Number):void {
-			if ( view.occupyAllAvailableSpace ) {
-				var formItem:CollectFormItem = CollectFormItem(_formItems.getItemAt(0));
-				formItem.parent.width = value;
-				//formItem.width = value;
+			if ( view.useScroller ) {
+				updateMultipleEntitiesMaxWidth(value);
 			}
-			updateMultipleEntitiesMaxWidth(value);
 		}
 		
 		protected function updateMultipleEntitiesMaxHeight(value:Number):void {
@@ -80,7 +73,7 @@ package org.openforis.collect.presenter
 		protected function updateMultipleEntitiesMaxWidth(value:Number):void {
 			var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(view);
 			if ( ! isNaN(maxAvailableWidth) ) {
-				if ( ! view.occupyAllAvailableSpace ) {
+				if ( view.useScroller ) {
 					maxAvailableWidth -= 15;
 				}
 				for each ( var formItem:CollectFormItem in _formItems) {
@@ -92,8 +85,8 @@ package org.openforis.collect.presenter
 		}
 
 		protected function updateCurrentState():void {
-			view.occupyAllAvailableSpace = containsOnlyOneMultipleEntity/* || isInsideFormLayoutEntity()*/;
-			view.currentState = view.occupyAllAvailableSpace ? InnerFormContainer.STATE_ENLARGED: InnerFormContainer.STATE_DEFAULT;
+			view.useScroller = ! containsOnlyOneMultipleEntity/* || isInsideFormLayoutEntity()*/;
+			view.currentState = view.useScroller ? InnerFormContainer.STATE_USE_SCROLLER: InnerFormContainer.STATE_DEFAULT;
 		}
 		
 		protected function get containsOnlyOneMultipleEntity():Boolean {
@@ -117,7 +110,9 @@ package org.openforis.collect.presenter
 		
 		protected function nodeDefinitionsSetter(value:IList):void {
 			updateCurrentState();
-			buildGrid();
+			if ( value != null ) {
+				buildGrid();
+			}
 		}
 		
 		private function buildGrid():void {
@@ -153,14 +148,27 @@ package org.openforis.collect.presenter
 				//create cell
 				var cell:GridItem = new GridItem();
 				cell.colSpan = colSpan;
+
 				var formItem:CollectFormItem = createFormItem(nodeDefn);
-				
-				_formItems.addItem(formItem);
 				cell.addElement(formItem);
+				
 				row.addElement(cell);
 				
+				_formItems.addItem(formItem);
 				lastCell = cell;
 				lastColPosition = colPosition + (colSpan - 1);
+			}
+			if ( view.useScroller ) {
+				view.scrollerContent.addElement(view.grid);
+			} else {
+				if ( lastCell != null ) {
+					row.percentHeight = 100;
+					row.percentWidth = 100;
+					lastCell.percentHeight = 100;
+					lastCell.percentWidth = 100;
+					
+				}
+				view.addElement(view.grid);
 			}
 		}
 		
@@ -175,7 +183,7 @@ package org.openforis.collect.presenter
 				BindingUtils.bindProperty(formItem, "modelVersion", _view, "modelVersion");
 			}
 			BindingUtils.bindProperty(formItem, "parentEntity", _view, "parentEntity");
-			BindingUtils.bindProperty(formItem, "occupyEntirePage", _view, "occupyAllAvailableSpace");
+			BindingUtils.bindProperty(formItem, "occupyEntirePage", _view, "notUsingScroller");
 			return formItem;
 		}
 		
