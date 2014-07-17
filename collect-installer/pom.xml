@@ -1,0 +1,190 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.openforis.collect</groupId>
+		<artifactId>collect</artifactId>
+		<version>3.2.0-a3-SNAPSHOT</version>
+	</parent>
+	<artifactId>collect-installer</artifactId>
+	<packaging>pom</packaging>
+	<name>Open Foris Collect Install Builder</name>
+	<description>Module to create the installers for Open Foris Collect.</description>
+	
+	<properties>
+		<!-- to avoid replacing relative path to images and other resources used by the installer -->
+		<installer-dir>src/main/installer</installer-dir>
+
+		<installbuilder-file-name>installbuilder.xml</installbuilder-file-name>
+
+		<!-- installer file names -->
+		<windows-installer-file-name>OpenForisCollect-${project.version}-windows-installer.exe</windows-installer-file-name>
+		<linux-installer-file-name>OpenForisCollect-${project.version}-linux-installer.run</linux-installer-file-name>
+		<osx-installer-file-name>OpenForisCollect-${project.version}-osx-installer.run</osx-installer-file-name>	
+	</properties>
+	
+	<profiles>
+		<profile>
+			<id>assembly</id>
+			<build>
+				<plugins>
+
+					<!-- 1. copy installbuilder-source-file -->
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>2.6</version>
+						<executions>
+
+							<execution>
+								<id>copy-installbuilder-source-file</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${installer-dir}</outputDirectory>
+									<resources>
+										<resource>
+											<directory>src/main/resources</directory>
+											<includes>
+								                <include>${installbuilder-file-name}</include>
+								            </includes>
+										</resource>
+									</resources>
+						            <overwrite>true</overwrite>
+								</configuration>
+							</execution>
+
+						</executions>
+					</plugin>
+
+					<!-- 2. replace application version into the xml installbuilder source file -->
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>maven-replacer-plugin</artifactId>
+						<version>1.4.0</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<includes>
+								<include>${installer-dir}/${installbuilder-file-name}</include>
+							</includes>
+							<regex>false</regex>
+							<!-- the name of the token to replace -->
+							<token>PROJECT_VERSION</token>
+							<!-- replace it with the Maven project version -->
+							<value>${project.version}</value>
+						</configuration>
+					</plugin>
+
+					<!-- 3. execute installbuilder to produce the installers -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+
+							<execution>
+								<id>linux-installer</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder-home}/bin/builder</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${basedir}/${installer-dir}/${installbuilder-file-name}</argument>
+										<argument>linux</argument>
+									</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<id>windows-installer</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder-home}/bin/builder</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${basedir}/${installer-dir}/${installbuilder-file-name}</argument>
+										<argument>windows</argument>
+									</arguments>
+								</configuration>
+							</execution>
+
+						</executions>
+					</plugin>
+
+					<!--  4. move the installers into the target folder -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>run-ant-rename</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<move file="${installbuilder-home}/output/${windows-installer-file-name}" 
+									    	tofile="${project.build.directory}/${windows-installer-file-name}" 
+									    	failonerror="false" />
+										<move file="${installbuilder-home}/output/${linux-installer-file-name}" 
+										    tofile="${project.build.directory}/${linux-installer-file-name}" 
+										    failonerror="false" />
+<!-- 										<move -->
+<!-- 											file="${installbuilder-home}/output/${osx-installer-file-name}" -->
+<!-- 											tofile="${project.build.directory}/${osx-installer-file-name}"  -->
+<!-- 											failonerror="false" /> -->
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+			    	<!-- 5. attach installers as artifact -->
+					<plugin>
+					    <groupId>org.codehaus.mojo</groupId>
+					    <artifactId>build-helper-maven-plugin</artifactId>
+					    <executions>
+					        <execution>
+					            <id>attach-installer-artifacts</id>
+					            <phase>package</phase>
+					            <goals>
+					                <goal>attach-artifact</goal>
+					            </goals>
+					            <configuration>
+					                <artifacts>
+					                    <artifact>
+					                        <file>${project.build.directory}/${windows-installer-file-name}</file>
+					                        <classifier>windows</classifier>
+					                        <type>exe</type>
+					                    </artifact>
+					                    <artifact>
+					                        <file>${project.build.directory}/${linux-installer-file-name}</file>
+					                        <classifier>linux</classifier>
+					                        <type>run</type>
+					                    </artifact>
+					                </artifacts>
+					            </configuration>
+					        </execution>
+					    </executions>
+					</plugin>
+
+				</plugins>
+			</build>		
+		</profile>
+	</profiles>
+
+</project>
