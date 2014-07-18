@@ -1,4 +1,4 @@
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,9 +11,7 @@ import org.openforis.idm.model.Node;
  * @author G. Miceli
  * @author S. Ricci
  * 
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class ColumnProviderChain implements ColumnProvider {
 	private List<ColumnProvider> providers;
 	private List<String> headings;

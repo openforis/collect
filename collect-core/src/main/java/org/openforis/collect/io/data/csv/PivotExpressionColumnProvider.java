@@ -1,4 +1,4 @@
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,9 +12,7 @@ import org.openforis.idm.model.expression.internal.MissingValueException;
 
 /**
  * @author G. Miceli
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class PivotExpressionColumnProvider extends ColumnProviderChain {
 	private ModelPathExpression expression;
 

@@ -1,17 +1,15 @@
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.openforis.collect.csv.ColumnProvider;
+import org.openforis.collect.io.data.csv.ColumnProvider;
 import org.openforis.idm.model.Node;
 
 /**
  * @author S. Ricci
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class NodePositionColumnProvider implements ColumnProvider {
 	private String headerName;
 

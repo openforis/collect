@@ -24,6 +24,7 @@ import org.zkoss.bind.annotation.Init;
 public class BooleanAttributeVM extends AttributeVM<BooleanAttributeDefinition> {
 
 	@Init(superclass=false)
+	@Override
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") BooleanAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {

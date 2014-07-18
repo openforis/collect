@@ -1,16 +1,14 @@
 /**
  * 
  */
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 
 /**
  * @author S. Ricci
  *
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class DateColumnProvider extends CompositeAttributeColumnProvider<DateAttributeDefinition> {
 	
 	public DateColumnProvider(DateAttributeDefinition defn) {

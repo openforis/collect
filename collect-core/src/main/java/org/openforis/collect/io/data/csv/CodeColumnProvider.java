@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +15,7 @@ import org.openforis.idm.model.CodeAttribute;
 
 /**
  * @author M. Togna
- * 
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAttributeDefinition> {
 
 	private static final String ITEM_POSITION_FIELD_NAME = "item_pos";

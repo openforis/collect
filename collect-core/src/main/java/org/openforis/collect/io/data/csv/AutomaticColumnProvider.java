@@ -1,4 +1,4 @@
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,15 +15,15 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * @author G. Miceli
  * @author M. Togna
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class AutomaticColumnProvider extends ColumnProviderChain {
 	
 	private static final Log LOG = LogFactory.getLog(AutomaticColumnProvider.class);
@@ -41,16 +41,16 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	}
 	
 	public AutomaticColumnProvider(String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
-		this(headingPrefix, entityDefinition, exclusions, false, false);
+		this(headingPrefix, entityDefinition, exclusions, false, false, true);
 	}
 	
 	public AutomaticColumnProvider(String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions, 
-			boolean includeCodeItemPositionColumn, boolean includeKMLColumnForCoordinates) {
-		super(headingPrefix, createProviders( entityDefinition, exclusions, includeCodeItemPositionColumn, includeKMLColumnForCoordinates));
+			boolean includeCodeItemPositionColumn, boolean includeKMLColumnForCoordinates, boolean includeEnumeratedEntities) {
+		super(headingPrefix, createProviders( entityDefinition, exclusions, includeCodeItemPositionColumn, includeKMLColumnForCoordinates, includeEnumeratedEntities));
 	}
 	
 	private static List<ColumnProvider> createProviders(EntityDefinition rowDefn, List<String> exclusions,
-			boolean includeItemPositionColumn, boolean includeKMLColumnForCoordinates) {
+			boolean includeItemPositionColumn, boolean includeKMLColumnForCoordinates, boolean includeEnumeratedEntities) {
 		List<ColumnProvider> cols = new ArrayList<ColumnProvider>();
 		CollectSurvey survey = (CollectSurvey) rowDefn.getSurvey();
 		CollectAnnotations surveyAnnotations = survey.getAnnotations();
@@ -58,7 +58,7 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		for (NodeDefinition childDefn : childDefinitions) {
 			if (includeChild(exclusions, childDefn)) {
 				if (childDefn instanceof EntityDefinition) {
-					createEntityProviders((EntityDefinition) childDefn, cols);
+					createEntityProviders((EntityDefinition) childDefn, cols, includeEnumeratedEntities);
 				} else if (childDefn instanceof AttributeDefinition && (
 					! (childDefn instanceof CalculatedAttributeDefinition) || 
 						surveyAnnotations.isIncludedInDataExport((CalculatedAttributeDefinition) childDefn) )
@@ -74,10 +74,10 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		return exclusions == null || !exclusions.contains(childDefn.getName());
 	}
 	
-	private static void createEntityProviders(EntityDefinition defn, List<ColumnProvider> cols) {
+	private static void createEntityProviders(EntityDefinition defn, List<ColumnProvider> cols, boolean includeEnumeratedEntities) {
 		String name = defn.getName();
 		if ( defn.isMultiple() ) {
-			if ( defn.isEnumerable() ) {
+			if ( defn.isEnumerable() && includeEnumeratedEntities ) {
 				LOG.info("Flatting enumerable multiple entity "+defn.getPath());
 				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(defn);
 				cols.add(p);
@@ -108,6 +108,10 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 			columnProvider = new CoordinateColumnProvider((CoordinateAttributeDefinition) defn, includeKMLColumnForCoordinates);
 		} else if(defn instanceof DateAttributeDefinition) {
 			columnProvider = new DateColumnProvider((DateAttributeDefinition) defn);
+		} else if(defn instanceof NumberAttributeDefinition){
+			columnProvider = new NumberColumnProvider((NumberAttributeDefinition) defn);
+		} else if(defn instanceof RangeAttributeDefinition){
+			columnProvider = new RangeColumnProvider((RangeAttributeDefinition) defn);
 		} else if(defn instanceof TaxonAttributeDefinition){
 			columnProvider = new TaxonColumnProvider((TaxonAttributeDefinition) defn);
 		} else if(defn instanceof TimeAttributeDefinition){

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,10 +15,7 @@ import org.openforis.idm.model.Node;
 
 /**
  * @author M. Togna
- * 
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public abstract class CompositeAttributeColumnProvider<T extends AttributeDefinition> implements ColumnProvider {
 
 	protected static final String FIELD_SEPARATOR = "_";

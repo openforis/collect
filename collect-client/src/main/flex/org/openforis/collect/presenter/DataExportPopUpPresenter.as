@@ -142,9 +142,10 @@ package org.openforis.collect.presenter {
 					entityId = selectedEntity.id;
 				}
 				var includeAllAncestorAttributes:Boolean = view.includeAllAncestorAttributesCheckBox.selected;
+				var includeEnumeratedEntities:Boolean = view.includeEnumeratedEntitiesCheckBox.selected;
 				
 				ClientFactory.dataExportClient.export(_exportResponder, rootEntity, stepNumber, entityId, 
-						includeAllAncestorAttributes, onlyOwnedRecords, rootEntityKeys);
+						includeAllAncestorAttributes, includeEnumeratedEntities, onlyOwnedRecords, rootEntityKeys);
 				
 				view.currentState = DataExportPopUp.STATE_EXPORTING;
 				view.progressBar.setProgress(0, 0);

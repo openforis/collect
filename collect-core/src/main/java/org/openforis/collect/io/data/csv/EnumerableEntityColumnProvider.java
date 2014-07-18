@@ -1,4 +1,4 @@
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +16,7 @@ import org.openforis.idm.model.Node;
 
 /**
  * @author G. Miceli
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 
 	// TODO Support multiple code keys 

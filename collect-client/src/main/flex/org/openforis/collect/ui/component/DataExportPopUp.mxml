@@ -198,6 +198,9 @@
 								selected="false" 
 								label="{Message.get('export.includeAllAncestorAttributes')}" />
 					
+					<s:CheckBox id="includeEnumeratedEntitiesCheckBox" 
+								selected="false" 
+								label="{Message.get('export.includeEnumeratedEntities')}" />
 				</s:HGroup>
 			</s:VGroup>
 

@@ -48,6 +48,7 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 	private Window precisionPopUp;
 	
 	@Init(superclass=false)
+	@Override
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") NumericAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {

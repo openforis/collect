@@ -1,16 +1,14 @@
 /**
  * 
  */
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * @author S. Ricci
  *
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class TimeColumnProvider extends CompositeAttributeColumnProvider<TimeAttributeDefinition> {
 	
 	public TimeColumnProvider(TimeAttributeDefinition defn) {

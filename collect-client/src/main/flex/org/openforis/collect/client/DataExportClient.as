@@ -31,8 +31,10 @@ package org.openforis.collect.client {
 		}
 		
 		public function export(responder:IResponder, rootEntityName:String, stepNumber:int, entityId:Number = NaN, 
-							   includeAllAncestorAttributes:Boolean = false, onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null):void {
-			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes, onlyOwnedRecords, rootEntityKeyValues);
+							   includeAllAncestorAttributes:Boolean = false, includeEnumeratedEntities:Boolean = false, 
+							   onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null):void {
+			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes, 
+					includeEnumeratedEntities, onlyOwnedRecords, rootEntityKeyValues);
 			token.addResponder(responder);
 		}
 		

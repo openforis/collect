@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,9 +13,7 @@ import org.openforis.idm.model.CoordinateAttribute;
 /**
  * @author M. Togna
  * 
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<CoordinateAttributeDefinition> {
 
 	private static final String KML_POINT_FORMAT = "<Point><coordinates>%f,%f,0.0</coordinates></Point>";

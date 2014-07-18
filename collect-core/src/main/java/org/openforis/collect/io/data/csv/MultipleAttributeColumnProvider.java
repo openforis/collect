@@ -1,4 +1,4 @@
-package org.openforis.collect.csv;
+package org.openforis.collect.io.data.csv;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,9 +12,7 @@ import org.openforis.idm.model.Node;
 
 /**
  * @author G. Miceli
- * @deprecated replaced with idm-transform api
  */
-@Deprecated
 public class MultipleAttributeColumnProvider implements ColumnProvider {
 
 	private String headerName;
