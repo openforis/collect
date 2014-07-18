@@ -27,23 +27,18 @@
     </box>
   </hbox>
 
-<!--   <hlayout width="100%"> -->
-<!--     <box hflex="30"> -->
-     
-<!--     </box> -->
-<!--     <box hflex="30" align="right"></box> -->
-<!--   </hlayout> -->
-
 	<timer id="surveysListUpdateTimer" delay="3000" repeats="true" /> 
 
   <listbox id="surveysListbox" 
     rows="8"
-    width="530px" 
+    width="830px" 
     model="@load(vm.surveySummaries)"
     selectedItem="@bind(vm.selectedSurvey)">
     <listhead>
       <listheader label="${labels.survey.name}" width="200px" 
         sort="auto(name)" />
+      <listheader label="${labels.survey.project_name}" width="300px" 
+        sort="auto(projectName)" />
       <listheader label="${labels.survey.modified}" width="70px"
         sort="auto(work, published, name)" />
       <listheader label="${labels.survey.published}" width="70px"
@@ -53,6 +48,8 @@
     <template name="model">
       <listitem>
         <listcell label="@load(each.name)"
+          onDoubleClick="@command('editSelectedSurvey')" />
+        <listcell label="@load(each.projectName)"
           onDoubleClick="@command('editSelectedSurvey')" />
         <listcell
           onDoubleClick="@command('editSelectedSurvey')">

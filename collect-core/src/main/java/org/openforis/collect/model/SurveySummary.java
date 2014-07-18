@@ -80,6 +80,10 @@ public class SurveySummary {
 	public String getProjectName() {
 		return projectName;
 	}
+	
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
 
 	public boolean isPublished() {
 		return published;
@@ -109,5 +113,5 @@ public class SurveySummary {
 	public boolean isOnlyWork() {
 		return work && publishedId == null;
 	}
-	
+
 }

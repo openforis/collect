@@ -355,7 +355,7 @@ public class SurveySelectVM extends BaseVM {
 			//skip survey list update
 			return;
 		}
-		List<SurveySummary> newSummaries = surveyManager.loadSummaries();
+		List<SurveySummary> newSummaries = surveyManager.loadSummaries(null, true);
 		if (summaries == null) {
 			summaries = newSummaries;
 		} else {
@@ -380,7 +380,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	private void loadSurveySummaries() {
-		summaries = surveyManager.loadSummaries();
+		summaries = surveyManager.loadSummaries(null, true);
 	}
 
 	private SurveySummary findSummary(List<SurveySummary> summaries2,

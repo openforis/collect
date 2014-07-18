@@ -479,10 +479,28 @@ public class SurveyManager {
 		surveyValidator.validateAgainstSchema(file);
 	}
 
+	/**
+	 * Loads published and temporary survey summaries into a single list.
+	 * Survey details like project name will be read using survey default language.
+	 * 
+	 * @return
+	 */
 	@Transactional
 	public List<SurveySummary> loadSummaries() {
-		List<SurveySummary> surveySummaries = getSurveySummaries(null);
-		List<SurveySummary> surveyWorkSummaries = loadWorkSummaries();
+		return loadSummaries(null, false);
+	}
+	
+	/**
+	 * Loads published and temporary survey summaries into a single list.
+	 * 
+	 * @param labelLang 	language code used to 
+	 * @param includeDetails if true, survey info like project name will be included in the summary (it makes the loading process slower).
+	 * @return list of published and temporary surveys.
+	 */
+	@Transactional
+	public List<SurveySummary> loadSummaries(String labelLang, boolean includeDetails) {
+		List<SurveySummary> surveySummaries = getSurveySummaries(labelLang);
+		List<SurveySummary> surveyWorkSummaries = loadWorkSummaries(labelLang, includeDetails);
 		List<SurveySummary> result = new ArrayList<SurveySummary>();
 		Map<String, SurveySummary> summariesByUri = new HashMap<String, SurveySummary>();
 		for (SurveySummary summary : surveyWorkSummaries) {
@@ -551,8 +569,18 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	protected List<SurveySummary> loadWorkSummaries() {
+	protected List<SurveySummary> loadWorkSummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> result = surveyWorkDao.loadSummaries();
+		if ( includeDetails ) {
+			for (SurveySummary summary : result) {
+				CollectSurvey survey = surveyWorkDao.load(summary.getId());
+				String projectName = survey.getProjectName(labelLang);
+				if ( projectName == null && labelLang != null && ! labelLang.equals(survey.getDefaultLanguage()) ) {
+					projectName = survey.getProjectName();
+				}
+				summary.setProjectName(projectName);
+			}
+		}
 		return result;
 	}
 	
