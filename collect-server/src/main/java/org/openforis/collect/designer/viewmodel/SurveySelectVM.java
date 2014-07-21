@@ -258,8 +258,9 @@ public class SurveySelectVM extends BaseVM {
 		} else {
 			surveyManager.deleteSurvey(selectedSurvey.getId());
 		}
+		selectedSurvey = null;
 		loadSurveySummaries();
-		notifyChange("surveySummaries");
+		notifyChange("selectedSurvey","surveySummaries");
 	}
 
 	protected boolean validateSurvey(CollectSurvey survey,

@@ -23,7 +23,9 @@ public class SurveyBackupInfoCreatorTask extends Task {
 	
 	@Override
 	protected void execute() throws Throwable {
-		SurveyBackupInfo info = new SurveyBackupInfo(survey.getUri());
+		SurveyBackupInfo info = new SurveyBackupInfo();
+		info.setSurveyUri(survey.getUri());
+		info.setSurveyName(survey.getName());
 		info.store(outputStream);
 	}
 	
