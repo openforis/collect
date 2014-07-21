@@ -132,14 +132,25 @@ public class DataRestoreTask extends Task {
 				ParseRecordResult parseRecordResult = parseRecord(reader);
 				CollectRecord parsedRecord = parseRecordResult.getRecord();
 				if (parsedRecord == null) {
+					//error parsing record
 					String message = parseRecordResult.getMessage();
 					addError(entryName, message);
 				} else {
+					//record parsed successfully
 					parsedRecord.setStep(step);
+					
 					if ( lastProcessedRecord == null ) {
 						CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
 						if (oldRecordSummary == null) {
 							//insert new record
+							if ( step != Step.ENTRY ) {
+								//insert previous steps data
+								for ( Step previousStep = Step.ENTRY; previousStep.getStepNumber() < step.getStepNumber(); previousStep = previousStep.getNext() ) {
+									parsedRecord.setStep(previousStep);
+									recordManager.save(parsedRecord);
+								}
+								parsedRecord.setStep(step);
+							}
 							recordManager.save(parsedRecord);
 							log().info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
 						} else {
@@ -160,13 +171,20 @@ public class DataRestoreTask extends Task {
 				}
 			}
 		}
-		//reset record step to the original one and revalidate the record
-		if ( lastProcessedRecord != null && originalRecordStep != null && originalRecordStep.compareTo(lastProcessedRecord.getStep()) > 0 ) {
-			CollectSurvey survey = (CollectSurvey) lastProcessedRecord.getSurvey();
-			CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep);
-			originalRecord.setStep(originalRecordStep);
-			validateRecord(originalRecord);
-			recordManager.save(originalRecord);
+		if ( lastProcessedRecord != null ) {
+			//if imported record step is less than the original one, reset record step to the original one and revalidate the record
+			//e.g. importing data from data entry step and the original record was in analysis step
+			if ( originalRecordStep != null && originalRecordStep.compareTo(lastProcessedRecord.getStep()) > 0 ) {
+				CollectSurvey survey = (CollectSurvey) lastProcessedRecord.getSurvey();
+				CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep);
+				originalRecord.setStep(originalRecordStep);
+				validateRecord(originalRecord);
+				recordManager.save(originalRecord);
+			} else {
+				//validate record and save the validation result
+				validateRecord(lastProcessedRecord);
+				recordManager.save(lastProcessedRecord);
+			}
 		}
 	}
 
