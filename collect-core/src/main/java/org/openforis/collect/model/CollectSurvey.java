@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.TheoreticalPoints;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
@@ -31,6 +32,8 @@ public class CollectSurvey extends Survey {
 	private boolean work;
 	
 	private CollectAnnotations annotations;
+	
+	private TheoreticalPoints theoreticalPoints;
 	
 	protected CollectSurvey(SurveyContext surveyContext) {
 		super(surveyContext);
@@ -118,4 +121,12 @@ public class CollectSurvey extends Survey {
 		this.work = work;
 	}
 
+	public TheoreticalPoints getTheoreticalPoints() {
+		return theoreticalPoints;
+	}
+	
+	public void setTheoreticalPoints(TheoreticalPoints theoreticalPoints) {
+		this.theoreticalPoints = theoreticalPoints;
+	}
+	
 }

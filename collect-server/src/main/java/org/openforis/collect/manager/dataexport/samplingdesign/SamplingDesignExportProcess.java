@@ -42,6 +42,8 @@ public class SamplingDesignExportProcess {
 			colNames.add(SamplingDesignFileColumn.X.getColumnName());
 			colNames.add(SamplingDesignFileColumn.Y.getColumnName());
 			colNames.add(SamplingDesignFileColumn.SRS_ID.getColumnName());
+			//TODO use survey theoretical points info property names
+			colNames.addAll(Arrays.asList(SamplingDesignFileColumn.INFO_COLUMN_NAMES));
 			writer.writeHeaders(colNames.toArray(new String[0]));
 			List<SamplingDesignItem> items = summaries.getRecords();
 			for (SamplingDesignItem item : items) {
@@ -56,6 +58,8 @@ public class SamplingDesignExportProcess {
 
 	protected void writeSummary(CsvWriter writer, SamplingDesignItem item) {
 		List<String> lineValues = new ArrayList<String>();
+		
+		//write level columns
 		List<String> levelCodes = item.getLevelCodes();
 		SamplingDesignFileColumn[] levelColumns = SamplingDesignFileColumn.LEVEL_COLUMNS;
 		for (int level = 1; level <= levelColumns.length; level++) {
@@ -65,6 +69,13 @@ public class SamplingDesignExportProcess {
 		lineValues.add(item.getX().toString());
 		lineValues.add(item.getY().toString());
 		lineValues.add(item.getSrsId());
+		
+		//write info columns
+		SamplingDesignFileColumn[] infoColumns = SamplingDesignFileColumn.INFO_COLUMNS;
+		for (int idx = 0; idx < infoColumns.length; idx++) {
+			String levelCode = idx < levelCodes.size() ? item.getInfo(idx): "";
+			lineValues.add(levelCode);
+		}
 		writer.writeNext(lineValues.toArray(new String[0]));
 	}
 

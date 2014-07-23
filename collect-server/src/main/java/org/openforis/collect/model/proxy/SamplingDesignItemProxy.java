@@ -25,7 +25,6 @@ public class SamplingDesignItemProxy implements Proxy {
 		srsId = item.getSrsId();
 		x = item.getX();
 		y = item.getY();
-		
 	}
 
 	public static List<SamplingDesignItemProxy> fromList(List<SamplingDesignItem> list) {
@@ -47,6 +46,11 @@ public class SamplingDesignItemProxy implements Proxy {
 	@ExternalizedProperty
 	public List<String> getLevelCodes() {
 		return item.getLevelCodes();
+	}
+	
+	@ExternalizedProperty
+	public List<String> getInfos() {
+		return item.getInfos();
 	}
 
 	public String getSrsId() {

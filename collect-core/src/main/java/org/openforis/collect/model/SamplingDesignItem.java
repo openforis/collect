@@ -19,7 +19,8 @@ public class SamplingDesignItem {
 	private String srsId;
 	private Double x;
 	private Double y;
-
+	private List<String> infos;
+	
 	public void addLevelCode(String code) {
 		if ( levelCodes == null ) {
 			levelCodes = new ArrayList<String>();
@@ -91,5 +92,26 @@ public class SamplingDesignItem {
 		this.y = y;
 	}
 
+	public void addInfo(String info) {
+		if ( infos == null ) {
+			infos = new ArrayList<String>();
+		}
+		infos.add(info);
+	}
 	
+	public String getInfo(int index) {
+		if ( infos == null ) {
+			return null;
+		} else {
+			return infos.get(index);
+		}
+	}
+	
+	public List<String> getInfos() {
+		return CollectionUtils.unmodifiableList(infos);
+	}
+
+	public void setInfos(List<String> infos) {
+		this.infos = infos;
+	}
 }

@@ -68,6 +68,7 @@ public class SamplingDesignExportTask extends Task {
 		colNames.add(SamplingDesignFileColumn.X.getColumnName());
 		colNames.add(SamplingDesignFileColumn.Y.getColumnName());
 		colNames.add(SamplingDesignFileColumn.SRS_ID.getColumnName());
+		colNames.addAll(Arrays.asList(SamplingDesignFileColumn.INFO_COLUMN_NAMES));
 		return colNames;
 	}
 
@@ -82,6 +83,13 @@ public class SamplingDesignExportTask extends Task {
 		lineValues.add(item.getX().toString());
 		lineValues.add(item.getY().toString());
 		lineValues.add(item.getSrsId());
+		
+		//write info columns
+		SamplingDesignFileColumn[] infoColumns = SamplingDesignFileColumn.INFO_COLUMNS;
+		for (int idx = 0; idx < infoColumns.length; idx++) {
+			String levelCode = idx < levelCodes.size() ? item.getInfo(idx): "";
+			lineValues.add(levelCode);
+		}
 		writer.writeNext(lineValues.toArray(new String[0]));
 	}
 

@@ -76,11 +76,31 @@
 								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.x')}" 
 											  dataField="x"
 											  sortable="false"
-											  width="100" />
+											  width="90" />
 								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.y')}" 
 											  dataField="y"
 											  sortable="false"
-											  width="100" />
+											  width="90" />
+								<s:GridColumn headerText="info1" 
+											  dataField="info_1"
+											  labelFunction="{hostComponent.infoLabelFunction}"
+											  width="70" />
+								<s:GridColumn headerText="info2" 
+											  dataField="info_2"
+											  labelFunction="{hostComponent.infoLabelFunction}"
+											  width="70" />
+								<s:GridColumn headerText="info3" 
+											  dataField="info_3"
+											  labelFunction="{hostComponent.infoLabelFunction}"
+											  width="70" />
+								<s:GridColumn headerText="info4" 
+											  dataField="info_4"
+											  labelFunction="{hostComponent.infoLabelFunction}"
+											  width="70" />
+								<s:GridColumn headerText="info5" 
+											  dataField="info_5"
+											  labelFunction="{hostComponent.infoLabelFunction}"
+											  width="70" />
 							</s:ArrayList>
 						</s:columns>
 					</s:DataGrid>

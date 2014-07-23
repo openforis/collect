@@ -56,6 +56,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
 		survey = loadSurvey();
+		survey.setWork(true);
 		surveyManager.saveSurveyWork(survey);
 	}
 	
@@ -97,7 +98,11 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		assertEquals(5, samplingDesignSummaries.getTotalCount());
 		
 		List<SamplingDesignItem> items = samplingDesignSummaries.getRecords();
-		assertNotNull(findItem(items, -10000d, 100000d, "1_01"));
+		{
+			SamplingDesignItem item = findItem(items, -10000d, 100000d, "1_01");
+			assertNotNull(item);
+			assertEquals(Arrays.asList("001", "002"), item.getInfos());
+		}
 		assertNotNull(findItem(items, 200000d, -2000000d, "1_02"));
 		assertNotNull(findItem(items, 806340d, 9320050d, "10_114"));
 		assertNotNull(findItem(items, 806680d, 9305020d, "10_117"));
