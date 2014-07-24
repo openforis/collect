@@ -19,7 +19,7 @@ public class SamplingDesignItem {
 	private String srsId;
 	private Double x;
 	private Double y;
-	private List<String> infos;
+	private List<String> infoAttributes;
 	
 	public void addLevelCode(String code) {
 		if ( levelCodes == null ) {
@@ -92,26 +92,26 @@ public class SamplingDesignItem {
 		this.y = y;
 	}
 
-	public void addInfo(String info) {
-		if ( infos == null ) {
-			infos = new ArrayList<String>();
+	public void addInfoAttribute(String info) {
+		if ( infoAttributes == null ) {
+			infoAttributes = new ArrayList<String>();
 		}
-		infos.add(info);
+		infoAttributes.add(info);
 	}
 	
-	public String getInfo(int index) {
-		if ( infos == null ) {
+	public String getInfoAttribute(int index) {
+		if ( infoAttributes == null ) {
 			return null;
 		} else {
-			return infos.get(index);
+			return infoAttributes.get(index);
 		}
 	}
 	
-	public List<String> getInfos() {
-		return CollectionUtils.unmodifiableList(infos);
+	public List<String> getInfoAttributes() {
+		return CollectionUtils.unmodifiableList(infoAttributes);
 	}
 
-	public void setInfos(List<String> infos) {
-		this.infos = infos;
+	public void setInfoAttributes(List<String> infos) {
+		this.infoAttributes = infos;
 	}
 }

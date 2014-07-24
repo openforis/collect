@@ -201,6 +201,7 @@ public class SurveyManager {
 		try {
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
 			survey.setName(name);
+			survey.setPublished(true);
 			surveyDao.importModel(survey);
 			addToCache(survey);
 			codeListManager.importCodeLists(survey, surveyFile);

@@ -1,10 +1,15 @@
 package org.openforis.collect.model.proxy;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignSummaries;
+import org.openforis.idm.metamodel.SamplingPoints;
+import org.openforis.idm.metamodel.SamplingPoints.Attribute;
 
 /**
  * 
@@ -14,9 +19,11 @@ import org.openforis.collect.model.SamplingDesignSummaries;
 public class SamplingDesignSummariesProxy implements Proxy {
 
 	private transient SamplingDesignSummaries summaries;
+	private transient CollectSurvey survey;
 	
-	public SamplingDesignSummariesProxy(SamplingDesignSummaries summaries) {
+	public SamplingDesignSummariesProxy(CollectSurvey survey, SamplingDesignSummaries summaries) {
 		super();
+		this.survey = survey;
 		this.summaries = summaries;
 	}
 
@@ -28,6 +35,21 @@ public class SamplingDesignSummariesProxy implements Proxy {
 	@ExternalizedProperty
 	public int getTotalCount() {
 		return summaries.getTotalCount();
+	}
+
+	@ExternalizedProperty
+	public List<String> getInfoAttributes() {
+		SamplingPoints samplingPoints = survey.getSamplingPoints();
+		if ( samplingPoints == null ) {
+			return Collections.emptyList();
+		} else {
+			List<String> result = new ArrayList<String>();
+			List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
+			for (Attribute attribute : infoAttributes) {
+				result.add(attribute.getName());
+			}
+			return result;
+		}
 	}
 	
 }

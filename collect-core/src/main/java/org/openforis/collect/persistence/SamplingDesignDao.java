@@ -262,7 +262,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 				Field<String> field = INFO_FIELDS[i];
 				String value = r.getValue(field);
 				if ( StringUtils.isNotBlank(value) ) {
-					s.addInfo(r.getValue(field));
+					s.addInfoAttribute(r.getValue(field));
 				} else {
 					break;
 				}
@@ -282,7 +282,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 				Field<String> field = LEVEL_CODE_FIELDS[i];
 				q.addValue(field, value);
 			}
-			List<String> infoValues = s.getInfos();
+			List<String> infoValues = s.getInfoAttributes();
 			for ( int i = 0; i < infoValues.size(); i++ ) {
 				String value = infoValues.get(i);
 				Field<String> field = INFO_FIELDS[i];
@@ -312,7 +312,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			//add info
 			Object[] infos = new Object[INFO_FIELDS.length];
 			Arrays.fill(infos, null);
-			List<String> itemInfos = item.getInfos();
+			List<String> itemInfos = item.getInfoAttributes();
 			for (int i = 0; i < itemInfos.size(); i++) {
 				String info = itemInfos.get(i);
 				infos[i] = info;

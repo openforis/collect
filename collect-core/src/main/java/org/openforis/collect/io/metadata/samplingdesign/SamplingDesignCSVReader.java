@@ -24,10 +24,33 @@ import org.openforis.commons.io.csv.CsvLine;
  */
 public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignLine> {
 
+	private List<String> infoColumnNames;
+	
 	public SamplingDesignCSVReader(File file) throws IOException, ParsingException {
 		super(file);
+		this.infoColumnNames = new ArrayList<String>();
 	}
 	
+	@Override
+	public void init() throws IOException, ParsingException {
+		super.init();
+		List<String> columnNames = csvReader.getColumnNames();
+		for (String col : columnNames) {
+			if ( isInfoAttribute(col) ) {
+				infoColumnNames.add(col);
+			}
+		}
+	}
+	
+	private boolean isInfoAttribute(String col) {
+		for (SamplingDesignFileColumn column : SamplingDesignFileColumn.values()) {
+			if ( column.getColumnName().equalsIgnoreCase(col) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	@Override
 	protected SamplingDesignCSVLineParser createLineParserInstance() {
 		SamplingDesignCSVLineParser lineParser = SamplingDesignCSVLineParser.createInstance(this, currentCSVLine);
@@ -41,7 +64,11 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 		return true;
 	}
 
-	public static class SamplingDesignCSVLineParser extends CSVLineParser<SamplingDesignLine> {
+	public List<String> getInfoColumnNames() {
+		return infoColumnNames;
+	}
+	
+	private static class SamplingDesignCSVLineParser extends CSVLineParser<SamplingDesignLine> {
 
 		SamplingDesignCSVLineParser(SamplingDesignCSVReader reader, CsvLine line) {
 			super(reader, line);
@@ -59,7 +86,7 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 			List<String> levelCodes = parseLevelCodes(line);
 			line.setLevelCodes(levelCodes);
 			Map<String, String> infos = parseInfos(line);
-			line.setInfos(infos);
+			line.setInfoAttributeByName(infos);
 			return line;
 		}
 
@@ -87,12 +114,11 @@ public class SamplingDesignCSVReader extends CSVDataImportReader<SamplingDesignL
 		
 		protected Map<String, String> parseInfos(SamplingDesignLine line) throws ParsingException {
 			Map<String, String> result = new HashMap<String, String>();
-			for (SamplingDesignFileColumn column : SamplingDesignFileColumn.INFO_COLUMNS) {
-				String value = getColumnValue(column.getColumnName(), false, String.class);
-				//TODO use survey theoretical points info names instead of default ones
+			SamplingDesignCSVReader reader = (SamplingDesignCSVReader) getReader();
+			for (String columnName : reader.infoColumnNames ) {
+				String value = getColumnValue(columnName, false, String.class);
 				if ( StringUtils.isNotBlank(value) ) {
-					String name = column.getColumnName();
-					result.put(name, value);
+					result.put(columnName, value);
 				}
 			}
 			return result;

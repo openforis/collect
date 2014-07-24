@@ -20,7 +20,7 @@ public class SamplingDesignLine extends Line {
 	private String x;
 	private String y;
 	private String srsId;
-	private Map<String, String> infos;
+	private Map<String, String> infoAttributeByName;
 	
 	public List<String> getLevelCodes() {
 		return CollectionUtils.unmodifiableList(levelCodes);
@@ -60,23 +60,23 @@ public class SamplingDesignLine extends Line {
 				&& getSrsId().equals(other.getSrsId());
 	}
 
-	public Map<String, String> getInfos() {
-		return CollectionUtils.unmodifiableMap(infos);
+	public Map<String, String> getInfoAttributeByName() {
+		return CollectionUtils.unmodifiableMap(infoAttributeByName);
 	}
 	
-	public String getInfo(String name) {
-		if ( infos == null ) {
+	public String getInfoAttribute(String name) {
+		if ( infoAttributeByName == null ) {
 			return null;
 		} else {
-			return infos.get(name);
+			return infoAttributeByName.get(name);
 		}
 	}
 	
-	public void setInfos(Map<String, String> infos) {
-		this.infos = infos;
+	public void setInfoAttributeByName(Map<String, String> infoAttributeByName) {
+		this.infoAttributeByName = infoAttributeByName;
 	}
 	
-	public SamplingDesignItem toSamplingDesignItem(CollectSurvey survey) {
+	public SamplingDesignItem toSamplingDesignItem(CollectSurvey survey, List<String> infoColumnNames) {
 		SamplingDesignItem item = new SamplingDesignItem();
 		Integer surveyId = survey.getId();
 		if ( survey.isWork() ) {
@@ -88,14 +88,13 @@ public class SamplingDesignLine extends Line {
 		item.setY(Double.parseDouble(y));
 		item.setSrsId(srsId);
 		item.setLevelCodes(getLevelCodes());
-		List<String> infos = new ArrayList<String>();
-		String[] columnNames = SamplingDesignFileColumn.INFO_COLUMN_NAMES;
-		for (int i = 0; i < columnNames.length; i++) {
-			infos.add(getInfo(columnNames[i]));
+		
+		List<String> infoAttributeNames = new ArrayList<String>();
+		for ( String colName : infoColumnNames ) {
+			infoAttributeNames.add(getInfoAttribute(colName));
 		}
-		item.setInfos(infos);
+		item.setInfoAttributes(infoAttributeNames);
 		return item;
 	}
 
-	
 }

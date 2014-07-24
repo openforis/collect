@@ -13,6 +13,8 @@ import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
+import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.idm.metamodel.SamplingPoints;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -197,7 +199,19 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 		throw new ParsingException(error);
 	}
 
-	protected void persistSamplingDesign() {
+	protected void persistSamplingDesign() throws SurveyImportException {
+		List<String> infoColumnNames = reader.getInfoColumnNames();
+		List<SamplingPoints.Attribute> attributes = SamplingPoints.Attribute.fromNames(infoColumnNames);
+		SamplingPoints samplingPoints;
+		if ( attributes.isEmpty() ) {
+			samplingPoints = null;
+		} else {
+			samplingPoints = new SamplingPoints();
+			samplingPoints.setAttributes(attributes);
+		}
+		survey.setSamplingPoints(samplingPoints);
+		//survey needs to be stored outside of this task...
+		
 		List<SamplingDesignItem> items = createItemsFromLines();
 		samplingDesignManager.insert(survey, items, overwriteAll);
 	}
@@ -205,14 +219,10 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	protected List<SamplingDesignItem> createItemsFromLines() {
 		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
 		for (SamplingDesignLine line : lines) {
-			SamplingDesignItem item = line.toSamplingDesignItem(survey);
+			SamplingDesignItem item = line.toSamplingDesignItem(survey, reader.getInfoColumnNames());
 			items.add(item);
 		}
 		return items;
-	}
-	
-	public SamplingDesignManager getSamplingDesignManager() {
-		return samplingDesignManager;
 	}
 	
 	public void setSamplingDesignManager(SamplingDesignManager samplingDesignManager) {

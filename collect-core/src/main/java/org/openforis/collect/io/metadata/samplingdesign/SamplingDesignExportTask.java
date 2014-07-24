@@ -9,8 +9,11 @@ import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.metamodel.SamplingPoints;
+import org.openforis.idm.metamodel.SamplingPoints.Attribute;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -45,10 +48,10 @@ public class SamplingDesignExportTask extends Task {
 			Integer surveyId = survey.getId();
 			boolean work = survey.isWork();
 			
-			CsvWriter writer = new CsvWriter(outputStream);
+			CsvWriter writer = new CsvWriter(outputStream, OpenForisIOUtils.UTF_8, ',', '"');
 			SamplingDesignSummaries summaries = work ? 
 					samplingDesignManager.loadBySurveyWork(surveyId): 
-						samplingDesignManager.loadBySurvey(surveyId);
+					samplingDesignManager.loadBySurvey(surveyId);
 					
 			ArrayList<String> colNames = getHeaders();
 			writer.writeHeaders(colNames.toArray(new String[0]));
@@ -68,7 +71,15 @@ public class SamplingDesignExportTask extends Task {
 		colNames.add(SamplingDesignFileColumn.X.getColumnName());
 		colNames.add(SamplingDesignFileColumn.Y.getColumnName());
 		colNames.add(SamplingDesignFileColumn.SRS_ID.getColumnName());
-		colNames.addAll(Arrays.asList(SamplingDesignFileColumn.INFO_COLUMN_NAMES));
+		
+		//info columns
+		SamplingPoints samplingPoints = survey.getSamplingPoints();
+		if ( samplingPoints != null ) {
+			List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
+			for (Attribute attribute : infoAttributes) {
+				colNames.add(attribute.getName());
+			}
+		}
 		return colNames;
 	}
 
@@ -85,11 +96,14 @@ public class SamplingDesignExportTask extends Task {
 		lineValues.add(item.getSrsId());
 		
 		//write info columns
-		SamplingDesignFileColumn[] infoColumns = SamplingDesignFileColumn.INFO_COLUMNS;
-		for (int idx = 0; idx < infoColumns.length; idx++) {
-			String levelCode = idx < levelCodes.size() ? item.getInfo(idx): "";
-			lineValues.add(levelCode);
+		SamplingPoints samplingPoints = survey.getSamplingPoints();
+		if ( samplingPoints != null ) {
+			List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
+			for (int i = 0; i < infoAttributes.size(); i++) {
+				lineValues.add(item.getInfoAttribute(i));
+			}
 		}
+		
 		writer.writeNext(lineValues.toArray(new String[0]));
 	}
 

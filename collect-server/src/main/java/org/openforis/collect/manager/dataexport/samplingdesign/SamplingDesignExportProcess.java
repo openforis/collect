@@ -10,9 +10,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignFileColumn;
 import org.openforis.collect.manager.SamplingDesignManager;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.commons.io.csv.CsvWriter;
+import org.openforis.idm.metamodel.SamplingPoints;
+import org.openforis.idm.metamodel.SamplingPoints.Attribute;
 
 /**
  * 
@@ -30,24 +33,33 @@ public class SamplingDesignExportProcess {
 		this.samplingDesignManager = samplingDesignManager;
 	}
 
-	public void exportToCSV(OutputStream out, int surveyId, boolean work) {
+	public void exportToCSV(OutputStream out, CollectSurvey survey) {
 		CsvWriter writer = null;
 		try {
 			writer = new CsvWriter(out);
-			SamplingDesignSummaries summaries = work ? 
-				samplingDesignManager.loadBySurveyWork(surveyId): 
-				samplingDesignManager.loadBySurvey(surveyId);;
+			SamplingDesignSummaries summaries = survey.isWork() ? 
+				samplingDesignManager.loadBySurveyWork(survey.getId()): 
+				samplingDesignManager.loadBySurvey(survey.getId());
+				
 			ArrayList<String> colNames = new ArrayList<String>();
 			colNames.addAll(Arrays.asList(SamplingDesignFileColumn.LEVEL_COLUMN_NAMES));
 			colNames.add(SamplingDesignFileColumn.X.getColumnName());
 			colNames.add(SamplingDesignFileColumn.Y.getColumnName());
 			colNames.add(SamplingDesignFileColumn.SRS_ID.getColumnName());
-			//TODO use survey theoretical points info property names
-			colNames.addAll(Arrays.asList(SamplingDesignFileColumn.INFO_COLUMN_NAMES));
+
+			//info columns
+			SamplingPoints samplingPoints = survey.getSamplingPoints();
+			if ( samplingPoints != null ) {
+				List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
+				for (Attribute attribute : infoAttributes) {
+					colNames.add(attribute.getName());
+				}
+			}
 			writer.writeHeaders(colNames.toArray(new String[0]));
+			
 			List<SamplingDesignItem> items = summaries.getRecords();
 			for (SamplingDesignItem item : items) {
-				writeSummary(writer, item);
+				writeSummary(writer, survey, item);
 			}
 		} catch (Exception e) {
 			log.error(e);
@@ -56,7 +68,7 @@ public class SamplingDesignExportProcess {
 		}
 	}
 
-	protected void writeSummary(CsvWriter writer, SamplingDesignItem item) {
+	protected void writeSummary(CsvWriter writer, CollectSurvey survey, SamplingDesignItem item) {
 		List<String> lineValues = new ArrayList<String>();
 		
 		//write level columns
@@ -71,10 +83,12 @@ public class SamplingDesignExportProcess {
 		lineValues.add(item.getSrsId());
 		
 		//write info columns
-		SamplingDesignFileColumn[] infoColumns = SamplingDesignFileColumn.INFO_COLUMNS;
-		for (int idx = 0; idx < infoColumns.length; idx++) {
-			String levelCode = idx < levelCodes.size() ? item.getInfo(idx): "";
-			lineValues.add(levelCode);
+		SamplingPoints samplingPoints = survey.getSamplingPoints();
+		if ( samplingPoints != null ) {
+			List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
+			for (int i = 0; i < infoAttributes.size(); i++) {
+				lineValues.add(item.getInfoAttribute(i));
+			}
 		}
 		writer.writeNext(lineValues.toArray(new String[0]));
 	}

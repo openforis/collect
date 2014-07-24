@@ -62,7 +62,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 	
 	public SamplingDesignImportProcess importCSVFile(String fileName) throws Exception {
 		File file = getTestFile(fileName);
-		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, survey, true, file, true);
+		SamplingDesignImportProcess process = new SamplingDesignImportProcess(samplingDesignManager, surveyManager, survey, file, true);
 		process.call();
 		return process;
 	}
@@ -101,7 +101,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		{
 			SamplingDesignItem item = findItem(items, -10000d, 100000d, "1_01");
 			assertNotNull(item);
-			assertEquals(Arrays.asList("001", "002"), item.getInfos());
+			assertEquals(Arrays.asList("001", "002"), item.getInfoAttributes());
 		}
 		assertNotNull(findItem(items, 200000d, -2000000d, "1_02"));
 		assertNotNull(findItem(items, 806340d, 9320050d, "10_114"));

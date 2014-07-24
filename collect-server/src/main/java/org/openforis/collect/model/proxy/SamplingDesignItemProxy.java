@@ -50,7 +50,7 @@ public class SamplingDesignItemProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public List<String> getInfos() {
-		return item.getInfos();
+		return item.getInfoAttributes();
 	}
 
 	public String getSrsId() {

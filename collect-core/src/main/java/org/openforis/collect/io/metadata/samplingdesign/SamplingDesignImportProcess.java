@@ -12,9 +12,12 @@ import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.manager.SamplingDesignManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
+import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.idm.metamodel.SamplingPoints;
 
 /**
  * 
@@ -31,6 +34,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	private static final String CSV = "csv";
 
 	private SamplingDesignManager samplingDesignManager;
+	private SurveyManager surveyManager;
 	private File file;
 	private boolean overwriteAll;
 	
@@ -39,13 +43,13 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	private List<SamplingDesignLine> lines;
 
 	private CollectSurvey survey;
-	private boolean work;
 	
-	public SamplingDesignImportProcess(SamplingDesignManager samplingDesignManager, CollectSurvey survey, boolean work, File file, boolean overwriteAll) {
+	public SamplingDesignImportProcess(SamplingDesignManager samplingDesignManager, SurveyManager surveyManager, 
+			CollectSurvey survey, File file, boolean overwriteAll) {
 		super();
 		this.samplingDesignManager = samplingDesignManager;
+		this.surveyManager = surveyManager;
 		this.survey = survey;
-		this.work = work;
 		this.file = file;
 		this.overwriteAll = overwriteAll;
 	}
@@ -211,18 +215,45 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		throw new ParsingException(error);
 	}
 
-	protected void persistSamplingDesign() {
+	protected void persistSamplingDesign() throws SurveyImportException {
+		List<String> infoColumnNames = reader.getInfoColumnNames();
+		List<SamplingPoints.Attribute> attributes = SamplingPoints.Attribute.fromNames(infoColumnNames);
+		SamplingPoints samplingPoints;
+		if ( attributes.isEmpty() ) {
+			samplingPoints = null;
+		} else {
+			samplingPoints = new SamplingPoints();
+			samplingPoints.setAttributes(attributes);
+		}
+		survey.setSamplingPoints(samplingPoints);
+		saveSurvey();
+
 		List<SamplingDesignItem> items = createItemsFromLines();
 		samplingDesignManager.insert(survey, items, overwriteAll);
+	}
+
+	private void saveSurvey() throws SurveyImportException {
+		if ( survey.isWork() ) {
+			surveyManager.saveSurveyWork(survey);
+		} else {
+			surveyManager.updateModel(survey);
+		}
 	}
 
 	protected List<SamplingDesignItem> createItemsFromLines() {
 		List<SamplingDesignItem> items = new ArrayList<SamplingDesignItem>();
 		for (SamplingDesignLine line : lines) {
-			SamplingDesignItem item = line.toSamplingDesignItem(survey);
+			SamplingDesignItem item = line.toSamplingDesignItem(survey, reader.getInfoColumnNames());
 			items.add(item);
 		}
 		return items;
 	}
 	
+	public List<String> getInfoColumnNames() {
+		return reader.getInfoColumnNames();
+	}
+	
+	public CollectSurvey getSurvey() {
+		return survey;
+	}
 }
