@@ -53,14 +53,14 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 	
 
 	@SuppressWarnings("rawtypes")
-	private static final TableField[] LEVEL_CODE_FIELDS = {
+	public static final TableField[] LEVEL_CODE_FIELDS = {
 		OFC_SAMPLING_DESIGN.LEVEL1, 
 		OFC_SAMPLING_DESIGN.LEVEL2, 
 		OFC_SAMPLING_DESIGN.LEVEL3
 	}; 
 	
 	@SuppressWarnings("rawtypes")
-	private static final TableField[] INFO_FIELDS = {
+	public static final TableField[] INFO_FIELDS = {
 		OFC_SAMPLING_DESIGN.INFO1, 
 		OFC_SAMPLING_DESIGN.INFO2, 
 		OFC_SAMPLING_DESIGN.INFO3,

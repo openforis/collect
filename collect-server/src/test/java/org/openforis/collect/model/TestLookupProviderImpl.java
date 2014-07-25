@@ -15,7 +15,7 @@ public class TestLookupProviderImpl implements LookupProvider {
 
 	@Override
 	public Object lookup(Survey survey, String name, String attribute, Object... keys) {
-		return LookupFunctionTest.TEST_COORDINATE;
+		return LookupFunctionTest.TEST_COORDINATE.toString();
 	}
 
 }
