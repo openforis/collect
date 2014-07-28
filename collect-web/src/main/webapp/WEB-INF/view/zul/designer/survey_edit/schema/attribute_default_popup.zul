@@ -5,7 +5,7 @@
   <custom-attributes newItem="${arg.newItem}" />
   <window id="attributeDefaultPopUp"
     title="${labels.survey.schema.attribute.attribute_default.popup.title}"
-    width="500px" border="normal" position="center" closable="false"
+    width="600px" border="normal" position="center" closable="false"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.AttributeDefaultVM')"
     validationMessages="@id('vmsgs')"
@@ -33,7 +33,7 @@
             <label
               value="${labels.survey.schema.attribute.attribute_default.expression}:" />
             <fieldErrorHandler message="@load(vmsgs['expression'])">
-              <textbox width="150px" value="@bind(fx.expression)"
+              <textbox width="300px" value="@bind(fx.expression)"
                 onChange="@command('applyChanges')" />
             </fieldErrorHandler>
           </row>
@@ -41,7 +41,7 @@
             <label
               value="${labels.survey.schema.attribute.attribute_default.condition}:" />
             <fieldErrorHandler message="@load(vmsgs['condition'])">
-              <textbox width="150px" value="@bind(fx.condition)"
+              <textbox width="300px" value="@bind(fx.condition)"
                 onChange="@command('applyChanges')" />
             </fieldErrorHandler>
           </row>

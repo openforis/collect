@@ -5,6 +5,7 @@ import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -32,6 +33,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean hideWhenNotRelevant;
 	private Integer minCount;
 	private Integer maxCount;
+	private boolean calculated;
+	
 	//labels
 	private String headingLabel;
 	private String instanceLabel;
@@ -71,8 +74,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			switch (attributeType) {
 			case BOOLEAN:
 				return new BooleanAttributeDefinitionFormObject(parentDefn);
-			case CALCULATED:
-				return new CalculatedAttributeDefinitionFormObject(parentDefn);
 			case CODE:
 				return new CodeAttributeDefinitionFormObject(parentDefn);
 			case COORDINATE:
@@ -119,6 +120,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		} else {
 			maxCount = null;
 		}
+		if ( source instanceof Calculable ) {
+			calculated = ((Calculable) source).isCalculated();
+		}
+
 		//labels
 		headingLabel = source.getLabel(Type.HEADING, language);
 		instanceLabel = source.getLabel(Type.INSTANCE, language);
@@ -160,6 +165,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
+		
+		if ( dest instanceof Calculable ) {
+			((Calculable) dest).setCalculated(calculated);
+		}
+		
 		//layout
 		UIOptions uiOptions = getUIOptions(dest);
 		uiOptions.setHideWhenNotRelevant(dest, hideWhenNotRelevant);
@@ -169,7 +179,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 
 	@Override
 	protected void reset() {
-		//TODO
+		calculated = false;
 	}
 	
 	protected UIOptions getUIOptions(NodeDefinition nodeDefn) {
@@ -184,6 +194,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public boolean isCalculated() {
+		return calculated;
+	}
+	
+	public void setCalculated(boolean calculated) {
+		this.calculated = calculated;
 	}
 	
 	public String getHeadingLabel() {

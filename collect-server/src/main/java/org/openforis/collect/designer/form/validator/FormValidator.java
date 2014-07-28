@@ -1,5 +1,12 @@
 package org.openforis.collect.designer.form.validator;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
@@ -10,6 +17,8 @@ import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.ValidationContext;
+import org.zkoss.bind.impl.BinderImpl;
+import org.zkoss.bind.sys.ValidationMessages;
 import org.zkoss.util.resource.Labels;
 
 /**
@@ -35,8 +44,36 @@ public abstract class FormValidator extends BaseValidator {
 	protected void afterValidate(ValidationContext ctx) {
 		Object vm = getVM(ctx);
 		if ( vm instanceof SurveyBaseVM) {
-			((SurveyBaseVM) vm).dispatchCurrentFormValidatedCommand(ctx.isValid(), blocking);
+			Map<String, List<String>> validationMessagesByField = getValidationMessagesByField(ctx);
+			((SurveyBaseVM) vm).dispatchCurrentFormValidatedCommand(ctx.isValid(), blocking, validationMessagesByField);
 		}
+	}
+
+	private Map<String, List<String>> getValidationMessagesByField(ValidationContext ctx) {
+		Map<String, List<String>> validationMessagesByField = new LinkedHashMap<String, List<String>>();
+		Set<String> fieldNames = getFieldNames(ctx);
+		ValidationMessages validationMessages = ((BinderImpl) ctx.getBindContext().getBinder()).getValidationMessages();
+		if ( validationMessages != null && validationMessages.getMessages() != null && validationMessages.getMessages().length > 0 ) {
+			for (String fieldName : fieldNames) {
+				List<String> notEmptyMessages = getNotEmptyStrings(validationMessages.getKeyMessages(fieldName));
+				if ( ! notEmptyMessages.isEmpty() ) {
+					validationMessagesByField.put(fieldName, notEmptyMessages);
+				}
+			}
+		}
+		return validationMessagesByField;
+	}
+
+	private List<String> getNotEmptyStrings(String[] messages) {
+		List<String> notEmptyMessages = new ArrayList<String>();
+		if ( messages != null ) {
+			for (String message : messages) {
+				if ( StringUtils.isNotEmpty(message) ) {
+					notEmptyMessages.add(message);
+				}
+			}
+		}
+		return notEmptyMessages;
 	}
 
 	protected abstract void internalValidate(ValidationContext ctx);
@@ -51,6 +88,12 @@ public abstract class FormValidator extends BaseValidator {
 		return vmObject;
 	}
 
+	protected Set<String> getFieldNames(ValidationContext ctx) {
+		Set<String> result = new HashSet<String>();
+		result.addAll(getProperties(ctx).keySet());
+		return result;
+	}
+	
 	protected ExpressionValidator getExpressionValidator(ValidationContext ctx) {
 		Object vm = getVM(ctx);
 		if ( vm instanceof SurveyBaseVM ) {

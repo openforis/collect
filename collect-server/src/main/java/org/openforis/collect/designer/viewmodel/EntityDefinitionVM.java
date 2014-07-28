@@ -30,7 +30,5 @@ public class EntityDefinitionVM extends NodeDefinitionVM<EntityDefinition> {
 		return (NodeDefinitionFormObject<EntityDefinition>) 
 				NodeDefinitionFormObject.newInstance(parentEntity, NodeType.ENTITY, null);
 	}
-
-	
 	
 }

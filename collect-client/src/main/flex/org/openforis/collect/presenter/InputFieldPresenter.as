@@ -539,6 +539,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateView():void {
+			view.editable = Application.activeRecordEditable && ! view.attributeDefinition.calculated;
+
 			//update view according to attribute (generic text value)
 			var hasRemarks:Boolean = false;
 			var text:String = getTextFromValue();
@@ -550,13 +552,11 @@ package org.openforis.collect.presenter {
 			if ( hasRemarks ) {
 				newStyles.push(InputField.REMARKS_PRESENT_STYLE);
 			}
-			if ( ! Application.activeRecordEditable ) {
+			if ( ! view.editable ) {
 				newStyles.push(InputField.READONLY_STYLE);	
 			}
 			UIUtil.replaceStyleNames(view.validationStateDisplay, newStyles, 
 				[InputField.REMARKS_PRESENT_STYLE, InputField.READONLY_STYLE] );
-			
-			view.editable = Application.activeRecordEditable;
 		}
 		
 		protected function getField():FieldProxy {

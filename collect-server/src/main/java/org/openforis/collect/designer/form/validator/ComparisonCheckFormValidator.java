@@ -5,7 +5,6 @@ package org.openforis.collect.designer.form.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 

@@ -53,7 +53,6 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.CalculatedAttribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
@@ -487,8 +486,8 @@ public class RecordManager {
 		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
 		
 		//add calculated attribute changes
-		Set<CalculatedAttribute<?,?>> dependantCalculatedAttributes = attribute.getDependantCalculatedAttributes();
-		for (CalculatedAttribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
+		Set<Attribute<?,?>> dependantCalculatedAttributes = attribute.getDependantCalculatedAttributes();
+		for (Attribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
 			AttributeChange change = changeMap.prepareAttributeChange(calculatedAttribute);
 			Map<Integer, Object> updatedFieldValues = createFieldValuesMap(calculatedAttribute);
 			change.setUpdatedFieldValues(updatedFieldValues);
@@ -711,8 +710,8 @@ public class RecordManager {
 			requiredDependencies.addAll(n.getRequiredDependencies());
 			if ( n instanceof Attribute ) {
 				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
-				Set<CalculatedAttribute<?, ?>> dependantCalculatedAttributes = n.getDependantCalculatedAttributes();
-				for (CalculatedAttribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
+				Set<Attribute<?, ?>> dependantCalculatedAttributes = n.getDependantCalculatedAttributes();
+				for (Attribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
 					calculatedAttribute.clearValue();
 					changeMap.prepareAttributeChange(calculatedAttribute);
 				}
@@ -1127,8 +1126,8 @@ public class RecordManager {
 	}
 	
 	private void clearDependantCalculatedValues(Node<?> node) {
-		Set<CalculatedAttribute<?, ?>> dependantCalculatedAttributes = node.getDependantCalculatedAttributes();
-		for ( CalculatedAttribute<?, ?> calculatedAttribute : dependantCalculatedAttributes ) {
+		Set<Attribute<?, ?>> dependantCalculatedAttributes = node.getDependantCalculatedAttributes();
+		for ( Attribute<?, ?> calculatedAttribute : dependantCalculatedAttributes ) {
 			calculatedAttribute.clearValue();
 		}
 	}

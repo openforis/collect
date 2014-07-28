@@ -5,59 +5,103 @@
       <column width="150px" />
       <column />
     </columns>
-    <rows>
-      <row>
-        <label value="${labels.survey.schema.attribute.code.key}:" />
-        <fieldErrorHandler message="@load(vmsgs['key'])">
-	        <checkbox checked="@load(fx.key eq true) @save(fx.key)"
-	        	onCheck="@command('keyChanged', key=self.checked)" />
-	    </fieldErrorHandler>
-      </row>
-      <row>
-        <label
-          value="${labels.survey.schema.attribute.code.code_list}:" />
-        <cell>
-          <hlayout>
-            <fieldErrorHandler message="@load(vmsgs['list'])">
-              <listbox width="150px" model="@load(vm.codeLists)"
-                selectedItem="@bind(fx.list)" mold="select"
-                onSelect="@command('onListChanged', list=self.selectedItem.value)">
-                <template name="model">
-                  <listitem label="@load(each.name)" />
-                </template>
-              </listbox>
-            </fieldErrorHandler>
-            <button sclass="icon"
-              tooltiptext="${labels.survey.code_list.manager.title}"
-              onClick="@global-command('openCodeListsManagerPopUp', 
+   	<rows>
+    	<row>
+    		<label value="${labels.survey.schema.attribute.key}:" />
+    		<fieldErrorHandler message="@load(vmsgs['key'])">
+    			<checkbox checked="@load(fx.key eq true) @save(fx.key)"
+    				disabled="@load(fx.calculated)"
+    				onCheck="@command('keyChanged', key=self.checked)" />
+    		</fieldErrorHandler>
+    	</row>
+    	<row>
+    		<label
+    			value="${labels.survey.schema.attribute.code.code_list}:" />
+    		<cell>
+    			<hlayout>
+    				<fieldErrorHandler message="@load(vmsgs['list'])">
+    					<listbox width="150px"
+    						model="@load(vm.codeLists)" selectedItem="@bind(fx.list)"
+    						mold="select"
+    						onSelect="@command('onListChanged', list=self.selectedItem.value)">
+    						<template name="model">
+    							<listitem label="@load(each.name)" />
+    						</template>
+    					</listbox>
+    				</fieldErrorHandler>
+    				<button sclass="icon"
+    					tooltiptext="${labels.survey.code_list.manager.title}"
+    					onClick="@global-command('openCodeListsManagerPopUp', 
               		editingAttribute=true, 
               		selectedCodeList=fx.list)"
-              image="/assets/images/edit-small.png" />
-          </hlayout>
-        </cell>
-      </row>
-      <row>
-        <label value="${labels.survey.schema.attribute.code.strict}:" />
-        <checkbox checked="@load(fx.strict eq true) @save(fx.strict)"
-          onCheck="@command('applyChanges')" />
-      </row>
-      <row visible="@load(fx.list.hierarchical)">
-        <label
-          value="${labels.survey.schema.attribute.code.parent_path}:" />
-        <cell>
-        	<hlayout>
-				<textbox width="150px" value="@load(fx.parentCodeAttributeDefinition.path)" readonly="true" />
-		        <button sclass="icon"
-		              tooltiptext="${labels.survey.schema.attribute.code.select_parent}"
-		              onClick="@command('openParentAttributeSelector')"
-		              image="/assets/images/tree-small.png" />
-        	</hlayout>	
-       	</cell>
-      </row>
-      <row visible="@load(fx.list.hierarchical)">
-        <label value="${labels.survey.schema.attribute.code.dependent_codes}:" />
-        <label value="@load(vm.dependentCodePaths)" />
-      </row>
+    					image="/assets/images/edit-small.png" />
+    			</hlayout>
+    		</cell>
+    	</row>
+    	<row>
+    		<label
+    			value="${labels.survey.schema.attribute.code.strict}:" />
+    		<checkbox
+    			checked="@load(fx.strict eq true) @save(fx.strict)"
+    			onCheck="@command('applyChanges')" />
+    	</row>
+    	<row visible="@load(fx.list.hierarchical)">
+    		<label
+    			value="${labels.survey.schema.attribute.code.parent_path}:" />
+    		<cell>
+    			<hlayout>
+    				<textbox width="150px"
+    					value="@load(fx.parentCodeAttributeDefinition.path)"
+    					readonly="true" />
+    				<button sclass="icon"
+    					tooltiptext="${labels.survey.schema.attribute.code.select_parent}"
+    					onClick="@command('openParentAttributeSelector')"
+    					image="/assets/images/tree-small.png" />
+    			</hlayout>
+    		</cell>
+    	</row>
+    	<row visible="@load(fx.list.hierarchical)">
+    		<label
+    			value="${labels.survey.schema.attribute.code.dependent_codes}:" />
+    		<label value="@load(vm.dependentCodePaths)" />
+    	</row>
+		<row visible="${vm.calculableAttribute}">
+    		<fieldErrorHandler message="@load(vmsgs['calculated'])">
+    			<label value="${labels.survey.schema.attribute.calculated.$}:" />
+				<image popup="calculatedInfoTooltip" style="cursor:pointer"
+					src="/assets/images/info-small.png" />
+    		</fieldErrorHandler>
+    		<fieldErrorHandler message="@load(vmsgs['calculated'])">
+    			<checkbox
+    				checked="@load(fx.calculated eq true) @save(fx.calculated)"
+    				onCheck="@command('calculatedChanged', changed=self.checked)" />
+    		</fieldErrorHandler>
+    	</row>
+      	<row visible="@load(fx.calculated)">
+			<fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+	        	<label value="${labels.survey.schema.attribute.include_in_data_export}:" />
+	        </fieldErrorHandler>
+	        <fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+		        <checkbox checked="@load(fx.includeInDataExport eq true) @save(fx.includeInDataExport)"
+		        	onCheck="@command('applyChanges')" />
+		    </fieldErrorHandler>
+	    </row>
+ 		<row visible="@load(fx.calculated)">
+	        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
+		    	<label value="${labels.survey.schema.attribute.show_in_ui}:" />
+	        </fieldErrorHandler>
+	        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
+		        <checkbox checked="@load(fx.showInUI eq true) @save(fx.showInUI)"
+		        	onCheck="@command('applyChanges')" />
+		    </fieldErrorHandler>
+	    </row>
     </rows>
   </grid>
+  
+  <popup id="calculatedInfoTooltip" width="300px">
+       <html><![CDATA[
+ 	  		${labels.survey.schema.attribute.calculated.info}
+       ]]></html>
+  </popup>
+  
 </zk>
