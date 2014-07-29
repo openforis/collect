@@ -21,7 +21,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -640,12 +639,12 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		defn.setAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName(), value ? Boolean.toString(value): null);
 	}
 	
-	public boolean isShownInUI(CalculatedAttributeDefinition defn) {
-		return getAnnotationBooleanValue(defn, Annotation.SHOW_IN_UI);
+	public boolean isHidden(NodeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.HIDE);
 	}
 	
-	public void setShowInUI(CalculatedAttributeDefinition defn, boolean value) {
-		setAnnotationValue(defn, Annotation.SHOW_IN_UI, value);
+	public void setHidden(NodeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.HIDE, value);
 	}
 
 	public boolean isHideWhenNotRelevant(NodeDefinition defn) {

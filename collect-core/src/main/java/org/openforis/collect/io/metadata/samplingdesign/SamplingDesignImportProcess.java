@@ -17,7 +17,9 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.idm.metamodel.SamplingPoints;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 
 /**
  * 
@@ -217,15 +219,20 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 
 	protected void persistSamplingDesign() throws SurveyImportException {
 		List<String> infoColumnNames = reader.getInfoColumnNames();
-		List<SamplingPoints.Attribute> attributes = SamplingPoints.Attribute.fromNames(infoColumnNames);
-		SamplingPoints samplingPoints;
+		List<ReferenceDataDefinition.Attribute> attributes = ReferenceDataDefinition.Attribute.fromNames(infoColumnNames);
+		SamplingPointDefinition samplingPoint;
 		if ( attributes.isEmpty() ) {
-			samplingPoints = null;
+			samplingPoint = null;
 		} else {
-			samplingPoints = new SamplingPoints();
-			samplingPoints.setAttributes(attributes);
+			samplingPoint = new SamplingPointDefinition();
+			samplingPoint.setAttributes(attributes);
 		}
-		survey.setSamplingPoints(samplingPoints);
+		ReferenceDataSchema referenceDataSchema = survey.getReferenceDataSchema();
+		if ( referenceDataSchema == null ) {
+			referenceDataSchema = new ReferenceDataSchema();
+			survey.setReferenceDataSchema(referenceDataSchema);
+		}
+		referenceDataSchema.setSamplingPointDefinition(samplingPoint);
 		saveSurvey();
 
 		List<SamplingDesignItem> items = createItemsFromLines();

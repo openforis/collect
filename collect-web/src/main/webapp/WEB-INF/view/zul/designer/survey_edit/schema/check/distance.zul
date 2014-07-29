@@ -57,7 +57,7 @@
 	            <label value="${labels.survey.schema.node.check.distance.sourcePointExpression}:" />
 	        </fieldErrorHandler>
             <fieldErrorHandler message="@load(vmsgs['sourcePointExpression'])">
-	            <textbox width="150px" value="@bind(fx.sourcePointExpression)"
+	            <textbox width="250px" value="@bind(fx.sourcePointExpression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>
@@ -66,7 +66,7 @@
 	            <label value="${labels.survey.schema.node.check.distance.destinationPointExpression}:" />
 	        </fieldErrorHandler>
             <fieldErrorHandler message="@load(vmsgs['destinationPointExpression'])">
-	            <textbox width="150px" value="@bind(fx.destinationPointExpression)"
+	            <textbox width="250px" value="@bind(fx.destinationPointExpression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>
@@ -75,7 +75,7 @@
 	            <label value="${labels.survey.schema.node.check.distance.minDistanceExpression}:" />
 			</fieldErrorHandler>
             <fieldErrorHandler message="@load(vmsgs['minDistanceExpression'])">
-	            <textbox width="150px" value="@bind(fx.minDistanceExpression)"
+	            <textbox width="100px" value="@bind(fx.minDistanceExpression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>
@@ -84,7 +84,7 @@
 	            <label value="${labels.survey.schema.node.check.distance.maxDistanceExpression}:" />
 			</fieldErrorHandler>
             <fieldErrorHandler message="@load(vmsgs['maxDistanceExpression'])">
-	            <textbox width="150px" value="@bind(fx.maxDistanceExpression)"
+	            <textbox width="100px" value="@bind(fx.maxDistanceExpression)"
 	                    onChange="@command('applyChanges')" />
           	</fieldErrorHandler>
         </row>

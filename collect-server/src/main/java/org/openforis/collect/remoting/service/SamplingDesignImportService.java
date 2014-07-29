@@ -11,6 +11,8 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -61,9 +63,18 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 	}
 
 	private void updateSessionSurvey() {
-		CollectSurvey survey = importProcess.getSurvey();
-		if ( survey.isWork() ) {
-			sessionManager.getActiveDesignerSurvey().setSamplingPoints(survey.getSamplingPoints());
+		CollectSurvey processSurvey = importProcess.getSurvey();
+		if ( processSurvey.isWork() ) {
+			ReferenceDataSchema processReferenceDataSchema = processSurvey.getReferenceDataSchema();
+			SamplingPointDefinition processSamplingPoint = processReferenceDataSchema == null ? null: processReferenceDataSchema.getSamplingPointDefinition();
+
+			CollectSurvey editedSurvey = sessionManager.getActiveDesignerSurvey();
+			ReferenceDataSchema referenceDataSchema = editedSurvey.getReferenceDataSchema();
+			if ( referenceDataSchema == null ) {
+				referenceDataSchema = new ReferenceDataSchema();
+				editedSurvey.setReferenceDataSchema(referenceDataSchema);
+			}
+			referenceDataSchema.setSamplingPointDefinition(processSamplingPoint);
 		}
 	}
 	

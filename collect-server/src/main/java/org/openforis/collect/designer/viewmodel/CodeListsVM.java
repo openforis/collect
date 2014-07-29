@@ -92,7 +92,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private CodeListManager codeListManager;
 	
 	public CodeListsVM() {
+		super();
 		formObject = createFormObject();
+		fieldLabelKeyPrefixes.addAll(0, Arrays.asList("survey.code_list"));
 	}
 	
 	@Init(superclass=false)

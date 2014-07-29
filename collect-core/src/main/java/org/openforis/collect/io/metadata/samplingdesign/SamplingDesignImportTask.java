@@ -14,7 +14,9 @@ import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.idm.metamodel.SamplingPoints;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -201,17 +203,21 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 
 	protected void persistSamplingDesign() throws SurveyImportException {
 		List<String> infoColumnNames = reader.getInfoColumnNames();
-		List<SamplingPoints.Attribute> attributes = SamplingPoints.Attribute.fromNames(infoColumnNames);
-		SamplingPoints samplingPoints;
+		List<ReferenceDataDefinition.Attribute> attributes = ReferenceDataDefinition.Attribute.fromNames(infoColumnNames);
+		SamplingPointDefinition samplingPoint;
 		if ( attributes.isEmpty() ) {
-			samplingPoints = null;
+			samplingPoint = null;
 		} else {
-			samplingPoints = new SamplingPoints();
-			samplingPoints.setAttributes(attributes);
+			samplingPoint = new SamplingPointDefinition();
+			samplingPoint.setAttributes(attributes);
 		}
-		survey.setSamplingPoints(samplingPoints);
-		//survey needs to be stored outside of this task...
-		
+		ReferenceDataSchema referenceDataSchema = survey.getReferenceDataSchema();
+		if ( referenceDataSchema == null ) {
+			referenceDataSchema = new ReferenceDataSchema();
+			survey.setReferenceDataSchema(referenceDataSchema);
+		}
+		referenceDataSchema.setSamplingPointDefinition(samplingPoint);
+
 		List<SamplingDesignItem> items = createItemsFromLines();
 		samplingDesignManager.insert(survey, items, overwriteAll);
 	}

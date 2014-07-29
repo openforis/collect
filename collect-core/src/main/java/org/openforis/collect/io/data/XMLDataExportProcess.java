@@ -24,7 +24,6 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.model.FileAttribute;

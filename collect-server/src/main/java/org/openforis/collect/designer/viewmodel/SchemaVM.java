@@ -5,6 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -130,6 +131,11 @@ public class SchemaVM extends SurveyBaseVM {
 
 	public enum TreeViewType {
 		ENTRY, DATA
+	}
+	
+	public SchemaVM() {
+		super();
+		fieldLabelKeyPrefixes.addAll(0, Arrays.asList("survey.schema.attribute","survey.schema.node","global.item"));
 	}
 	
 	@Override

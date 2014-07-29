@@ -31,8 +31,6 @@ import org.openforis.idm.metamodel.validation.PatternCheck;
 import org.openforis.idm.metamodel.validation.UniquenessCheck;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Form;
-import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -50,11 +48,6 @@ import org.zkoss.zul.Window;
  */
 public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDefinitionVM<T> {
 
-	private static final String ATTRIBUTE_DEFAULTS_FIELD = "attributeDefaults";
-	private static final String CHECKS_FIELD = null;
-	
-//	private EntityDefinition parentEntity;
-
 	private List<Check<?>> checks;
 	private boolean editingNewCheck;
 	private Check<?> editedCheck;
@@ -68,17 +61,21 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	private Window checkPopUp;
 	private Window attributeDefaultPopUp;
 
+	public AttributeVM() {
+		super();
+		fieldLabelKeyPrefixes.addAll(Arrays.asList("survey.schema.attribute"));
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected FormObject<T> createFormObject() {
 		AttributeType attributeTypeEnum = AttributeType.valueOf(editedItem);
 		formObject = (AttributeDefinitionFormObject<T>) NodeDefinitionFormObject.newInstance(parentEntity, attributeTypeEnum);
-		tempFormObject = new SimpleForm();
 		return formObject;
 	}
 
 	@Override
-	@NotifyChange({"editedItem","formObject","tempFormObject"})
+	@NotifyChange({"editedItem","formObject","tempFormObject","checks"})
 	public void setEditedItem(T editedItem) {
 		super.setEditedItem(editedItem);
 		initAttributeDefaults();
@@ -86,17 +83,13 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	}
 
 	protected void initChecks() {
-		if ( editedItem != null ) {
-			checks = new ArrayList<Check<?>>(editedItem.getChecks());
-			updateFormObjectChecks();
-		} else {
+		if ( editedItem == null ) {
 			checks = null;
+		} else {
+			checks = new ArrayList<Check<?>>(editedItem.getChecks());
+			((AttributeDefinitionFormObject<T>) formObject).setChecks(checks);
+			setTempFormObjectFieldValue(AttributeDefinitionFormObject.CHECKS_FIELD, checks);
 		}
-	}
-
-	protected void updateFormObjectChecks() {
-		((AttributeDefinitionFormObject<T>) formObject).setChecks(checks);
-		tempFormObject.setField(CHECKS_FIELD, checks);
 	}
 
 	@Override
@@ -146,12 +139,26 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	public void keyChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("key") boolean key ) {
 		dispatchApplyChangesCommand(binder);
+		dispatchKeyChangingCommand(key);
+	}
+
+	private void dispatchKeyChangingCommand(boolean key) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", editedItem);
 		args.put("key", key);
 		BindUtils.postGlobalCommand(null, null, "editedNodeKeyChanging", args);
 	}
 	
+	@Command
+	public void calculatedChanged(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("changed") boolean changed) {
+		setTempFormObjectFieldValue("key", false);
+		setTempFormObjectFieldValue("multiple", false);
+		setTempFormObjectFieldValue("showInUI", ! changed);
+		setTempFormObjectFieldValue("includeInDataExport", true);
+		dispatchKeyChangingCommand(false);
+		dispatchApplyChangesCommand(binder);
+	}
+
 	protected void openCheckEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentDefinition", editedItem);
@@ -191,18 +198,16 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	protected void initAttributeDefaults() {
 		if ( editedItem != null ) {
 			attributeDefaults =  new ArrayList<AttributeDefault>(editedItem.getAttributeDefaults());
-			updateFormObjectAttributeDefaults();
+			String field = AttributeDefinitionFormObject.ATTRIBUTE_DEFAULTS_FIELD;
+			tempFormObject.setField(field, attributeDefaults);
+			((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
+			BindUtils.postNotifyChange(null, null, formObject, field);
 		} else {
 			attributeDefaults = null;
 		}
-		notifyChange("attributeDefaults");
+		notifyChange("formObject", "tempFormObject", "attributeDefaults");
 	}
 
-	protected void updateFormObjectAttributeDefaults() {
-		tempFormObject.setField(ATTRIBUTE_DEFAULTS_FIELD, attributeDefaults);
-		((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
-	}
-	
 	@Command
 	@NotifyChange("attributeDefaults")
 	public void addAttributeDefault() {
@@ -326,10 +331,6 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		return attributeDefaults;
 	}
 	
-	public Form getTempFormObject() {
-		return tempFormObject;
-	}
-
 	public AttributeDefault getSelectedAttributeDefault() {
 		return selectedAttributeDefault;
 	}

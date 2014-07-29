@@ -14,7 +14,7 @@ import org.zkoss.util.resource.Labels;
  * @author S. Ricci
  * 
  */
-public class NodeDefinitionFormValidator extends FormValidator {
+public abstract class NodeDefinitionFormValidator extends FormValidator {
 
 	protected static final String NODE_NAME_ALREADY_DEFINED_MESSAGE_KEY = "survey.schema.node.validation.name_already_defined";
 

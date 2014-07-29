@@ -7,14 +7,15 @@
           <column />
         </columns>
         <rows>
-          <row>
-            <label value="${labels.survey.schema.attribute.number.key}:" />
-            <fieldErrorHandler message="@load(vmsgs['key'])">
-		        <checkbox checked="@load(fx.key eq true) @save(fx.key)"
-	    		      onCheck="@command('keyChanged', key=self.checked)" />
-	    	</fieldErrorHandler>
-          </row>
-        </rows>
+			<row>
+	    		<label value="${labels.survey.schema.attribute.key}:" />
+	    		<fieldErrorHandler message="@load(vmsgs['key'])">
+	    			<checkbox checked="@load(fx.key eq true) @save(fx.key)"
+	    				disabled="@load(fx.calculated)"
+	    				onCheck="@command('keyChanged', key=self.checked)" />
+	    		</fieldErrorHandler>
+	    	</row>
+		</rows>
       </grid>
       
       <include src="survey_edit/schema/attribute_numeric_common_other_general_form.zul" />

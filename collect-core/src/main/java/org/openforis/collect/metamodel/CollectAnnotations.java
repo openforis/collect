@@ -7,7 +7,6 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
@@ -35,7 +34,7 @@ public class CollectAnnotations {
 		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER)),
 		VISIBLE_FIELDS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.VISIBLE_FIELDS)),
 		SHOW_ALLOWED_VALUES_PREVIEW(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ALLOWED_VALUES_PREVIEW)),
-		SHOW_IN_UI(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_IN_UI), false),
+		HIDE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.HIDE), false),
 		HIDE_WHEN_NOT_RELEVANT(new QName(UI_NAMESPACE_URI, UIOptionsConstants.HIDE_WHEN_NOT_RELEVANT), false),
 		COLUMN(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COLUMN), 1),
 		COLUMN_SPAN(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COLUMN_SPAN), 1);
@@ -69,11 +68,11 @@ public class CollectAnnotations {
 		this.survey = survey;
 	}
 	
-	public boolean isIncludedInDataExport(CalculatedAttributeDefinition defn) {
+	public boolean isIncludedInDataExport(NodeDefinition defn) {
 		return getAnnotationBooleanValue(defn, Annotation.INCLUDE_IN_DATA_EXPORT);
 	}
 	
-	public void setIncludeInDataExport(CalculatedAttributeDefinition defn, boolean value) {
+	public void setIncludeInDataExport(NodeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.INCLUDE_IN_DATA_EXPORT, value);
 	}
 	

@@ -1,20 +1,20 @@
 package org.openforis.collect.model;
 
-import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.CodeListService;
+import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
-import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.expression.ExpressionFactory;
 
-public class TestSurveyContext implements SurveyContext {
+public class CollectTestSurveyContext implements SurveyContext {
 
 	private ExpressionFactory expressionFactory;
+	public TestLookupProviderImpl lookupProvider;
 
-	public TestSurveyContext() {
+	public CollectTestSurveyContext() {
 		expressionFactory = new ExpressionFactory();
-		LookupProvider lookupProvider = new TestLookupProviderImpl();
+		lookupProvider = new TestLookupProviderImpl();
 		expressionFactory.setLookupProvider(lookupProvider);
 	}
 

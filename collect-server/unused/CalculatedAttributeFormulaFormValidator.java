@@ -1,7 +1,7 @@
 package org.openforis.collect.designer.form.validator;
 
-import static org.openforis.collect.designer.viewmodel.CalculatedAttributeVM.*;
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
+import org.openforis.collect.designer.viewmodel.CalculatedAttributeFormulaVM;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.zkoss.bind.ValidationContext;
@@ -24,7 +24,7 @@ public class CalculatedAttributeFormulaFormValidator extends FormValidator {
 
 	private void validateExpression(ValidationContext ctx) {
 		if (validateRequired(ctx, EXPRESSION_FIELD)) {
-			CalculatedAttributeDefinition attrDefn = getAttributeDefinition(ctx);
+			AttributeDefinition attrDefn = getAttributeDefinition(ctx);
 			EntityDefinition parentEntityDefn = getParentEntityDefinition(ctx);
 			validateValueExpression(ctx, attrDefn, parentEntityDefn, EXPRESSION_FIELD);
 		}
@@ -35,14 +35,13 @@ public class CalculatedAttributeFormulaFormValidator extends FormValidator {
 		validateBooleanExpression(ctx, contextNode, CONDITION_FIELD);
 	}
 
-	private CalculatedAttributeDefinition getAttributeDefinition(
-			ValidationContext ctx) {
-		CalculatedAttributeDefinition result = (CalculatedAttributeDefinition) ctx.getValidatorArg(FORMULA_POPUP_ATTRIBUTE_DEFINITION_ARG);
+	private AttributeDefinition getAttributeDefinition(ValidationContext ctx) {
+		AttributeDefinition result = (AttributeDefinition) ctx.getValidatorArg(CalculatedAttributeFormulaVM.ATTRIBUTE_DEFINITION_ARG);
 		return result;
 	}
 
 	private EntityDefinition getParentEntityDefinition(ValidationContext ctx) {
-		EntityDefinition result = (EntityDefinition) ctx.getValidatorArg(FORMULA_POPUP_PARENT_ENTITY_DEFINITION_ARG);
+		EntityDefinition result = (EntityDefinition) ctx.getValidatorArg(CalculatedAttributeFormulaVM.PARENT_ENTITY_DEFINITION_ARG);
 		return result;
 	}
 

@@ -6,7 +6,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.CalculatedAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
@@ -175,7 +174,7 @@ package org.openforis.collect.ui {
 				return false;
 			} else if ( attrDefn is FileAttributeDefinitionProxy && field.index > 0 ) {
 				return false;
-			} else if ( attrDefn is CalculatedAttributeDefinitionProxy ) {
+			} else if ( attrDefn.calculated ) {
 				return false;
 			} else {
 				return true;

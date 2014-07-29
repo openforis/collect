@@ -7,8 +7,9 @@ import java.util.List;
 
 import org.openforis.collect.designer.form.CalculatedAttributeFormulaFormObject;
 import org.openforis.collect.designer.form.FormObject;
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition.Formula;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.Calculable;
+import org.openforis.idm.metamodel.Formula;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.Command;
@@ -25,14 +26,17 @@ public class CalculatedAttributeFormulaVM extends SurveyObjectBaseVM<Formula> {
 
 	private static final String APPLY_CHANGES_TO_EDITED_FORMULA_GLOBAL_COMMAND = "applyChangesToEditedFormula";
 	
-	protected CalculatedAttributeDefinition attributeDefinition;
+	public static final String PARENT_ENTITY_DEFINITION_ARG = "parentEntityDefinition";
+	public static final String ATTRIBUTE_DEFINITION_ARG = "attributeDefinition";
+
+	protected AttributeDefinition attributeDefinition;
 
 	public CalculatedAttributeFormulaVM() {
 		setCommitChangesOnApply(false);
 	}
 	
 	@Init(superclass=false)
-	public void init(@ExecutionArgParam(CalculatedAttributeVM.FORMULA_POPUP_ATTRIBUTE_DEFINITION_ARG) CalculatedAttributeDefinition attrDefn,
+	public void init(@ExecutionArgParam(ATTRIBUTE_DEFINITION_ARG) AttributeDefinition attrDefn,
 			@ExecutionArgParam("formula") Formula formula, @ExecutionArgParam("newItem") Boolean newItem) {
 		super.init();
 		this.attributeDefinition = attrDefn;
@@ -61,7 +65,7 @@ public class CalculatedAttributeFormulaVM extends SurveyObjectBaseVM<Formula> {
 
 	@Override
 	protected void addNewItemToSurvey() {
-		attributeDefinition.addFormula(editedItem);
+		((Calculable) attributeDefinition).addFormula(editedItem);
 	}
 
 	@Override

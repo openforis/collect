@@ -7,19 +7,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jooq.TableField;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NameValueEntry;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
-import org.openforis.idm.metamodel.SamplingPoints;
-import org.openforis.idm.metamodel.SamplingPoints.Attribute;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.LookupProvider;
+import org.openforis.idm.model.Coordinate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 
  * @author M. Togna
  * @author S. Ricci
+ * @author D. Wiell
  * 
  */
 public class DatabaseLookupProvider implements LookupProvider {
@@ -33,37 +37,66 @@ public class DatabaseLookupProvider implements LookupProvider {
 	@Override
 	public Object lookup(Survey survey, String name, String attribute, Object... columns) {
 		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
-		filters.addAll(Arrays.asList(NameValueEntry.fromKeyValuePairs(columns)));
-
 		if ( survey instanceof CollectSurvey ) {
-			CollectSurvey cs = (CollectSurvey) survey;
-			filters.add(createSurveyFilter(cs));
-			if ( name.equals(OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName()) ) {
-				convertSamplingDesignFilters(filters, cs);
-				attribute = convertSamplingDesignAttributeName(survey, attribute);
-			}
+			filters.add(createSurveyFilter((CollectSurvey) survey));
 		}
-		
+		filters.addAll(Arrays.asList(NameValueEntry.fromKeyValuePairs(columns)));
 		Object object = dynamicTableDao.loadValue(name, attribute, filters.toArray(new NameValueEntry[0]));
 		return object;
 	}
 	
-	private String convertSamplingDesignAttributeName(Survey survey, String attribute) {
-		SamplingPoints samplingPoints = survey.getSamplingPoints();
-		if ( samplingPoints != null ) {
-			List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
+	@Override
+	public Coordinate lookupSamplingPointCoordinate(Survey survey, String... keys) {
+		String valueColumnName = OfcSamplingDesign.OFC_SAMPLING_DESIGN.LOCATION.getName();
+		Object value = lookupSamplingPointColumnValue(survey, valueColumnName, keys);
+		Coordinate coordinate = Coordinate.parseCoordinate(value);
+		return coordinate;
+	}
+
+	@Override
+	public Object lookupSamplingPointData(Survey survey, String attribute, String... keys) {
+		String columnName = convertToSamplingPointColumnName(survey, attribute);
+		return lookupSamplingPointColumnValue(survey, columnName, keys);
+	}
+
+	private Object lookupSamplingPointColumnValue(Survey survey, String valueColumnName, String... keys) {
+		int maxKeys = SamplingDesignDao.LEVEL_CODE_FIELDS.length;
+		if ( keys == null || keys.length == 0 || keys.length > maxKeys ) {
+			throw new IllegalArgumentException(String.format("Invalid number of keys. It should be between 1 and %d", maxKeys));
+		}
+		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
+		
+		if ( survey instanceof CollectSurvey ) {
+			filters.add(createSurveyFilter((CollectSurvey) survey));
+		}
+		
+		String[] paddedKeys = Arrays.copyOf(keys, maxKeys);
+		for (int i = 0; i < paddedKeys.length; i++) {
+			String key = paddedKeys[i];
+			TableField<?, ?> keyField = SamplingDesignDao.LEVEL_CODE_FIELDS[i];
+			NameValueEntry filter = new NameValueEntry(keyField.getName(), key);
+			filters.add(filter);
+		}
+		Object value = dynamicTableDao.loadValue(OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName(), valueColumnName, filters.toArray(new NameValueEntry[0]));
+		return value;
+	}
+
+	private String convertToSamplingPointColumnName(Survey survey, String attribute) {
+		ReferenceDataSchema referenceDataSchema = survey.getReferenceDataSchema();
+		SamplingPointDefinition samplingPoint = referenceDataSchema == null ? null: referenceDataSchema.getSamplingPointDefinition();
+		if ( samplingPoint != null ) {
+			List<ReferenceDataDefinition.Attribute> infoAttributes = samplingPoint.getAttributes(false);
 			for (int i = 0; i < infoAttributes.size(); i++) {
-				Attribute infoAttr = infoAttributes.get(i);
+				ReferenceDataDefinition.Attribute infoAttr = infoAttributes.get(i);
 				if ( infoAttr.getName().equals(attribute) ) {
-					String newAttributeName = SamplingDesignDao.INFO_FIELDS[i].getName();
-					return newAttributeName;
+					return SamplingDesignDao.INFO_FIELDS[i].getName();
 				}
 			}
 		}
 		return attribute;
 	}
 
-	protected NameValueEntry createSurveyFilter(CollectSurvey survey) {
+	private NameValueEntry createSurveyFilter(CollectSurvey survey) {
 		Integer surveyId = survey.getId();
 		if ( surveyId != null ) {
 			String surveyIdFieldName = survey.isWork() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
@@ -72,32 +105,6 @@ public class DatabaseLookupProvider implements LookupProvider {
 		} else {
 			return null;
 		}
-	}
-
-	private void convertSamplingDesignFilters(List<NameValueEntry> filters, CollectSurvey cs) {
-		SamplingPoints samplingPoints = cs.getSamplingPoints();
-		if ( samplingPoints != null ) {
-			List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
-			for (int i = 0; i < infoAttributes.size(); i++) {
-				Attribute infoAttr = infoAttributes.get(i);
-				NameValueEntry entry = getEntry(filters, infoAttr.getName());
-				if ( entry != null ) {
-					String newKey = SamplingDesignDao.INFO_FIELDS[i].getName();
-					NameValueEntry newEntry = new NameValueEntry(newKey, entry.getValue());
-					filters.remove(entry);
-					filters.add(newEntry);
-				}
-			}
-		}
-	}
-
-	private NameValueEntry getEntry(List<NameValueEntry> filters, String name) {
-		for ( NameValueEntry entry : filters ) {
-			if ( entry.getKey().equals(name) ) {
-				return entry;
-			}
-		}
-		return null;
 	}
 
 }

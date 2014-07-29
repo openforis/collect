@@ -3,6 +3,7 @@ package org.openforis.collect.manager.dataexport.samplingdesign;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -14,8 +15,9 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
 import org.openforis.commons.io.csv.CsvWriter;
-import org.openforis.idm.metamodel.SamplingPoints;
-import org.openforis.idm.metamodel.SamplingPoints.Attribute;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 
 /**
  * 
@@ -48,12 +50,9 @@ public class SamplingDesignExportProcess {
 			colNames.add(SamplingDesignFileColumn.SRS_ID.getColumnName());
 
 			//info columns
-			SamplingPoints samplingPoints = survey.getSamplingPoints();
-			if ( samplingPoints != null ) {
-				List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
-				for (Attribute attribute : infoAttributes) {
-					colNames.add(attribute.getName());
-				}
+			List<ReferenceDataDefinition.Attribute> infoAttributes = getInfoAttributes(survey);
+			for (ReferenceDataDefinition.Attribute attribute : infoAttributes) {
+				colNames.add(attribute.getName());
 			}
 			writer.writeHeaders(colNames.toArray(new String[0]));
 			
@@ -83,14 +82,22 @@ public class SamplingDesignExportProcess {
 		lineValues.add(item.getSrsId());
 		
 		//write info columns
-		SamplingPoints samplingPoints = survey.getSamplingPoints();
-		if ( samplingPoints != null ) {
-			List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
-			for (int i = 0; i < infoAttributes.size(); i++) {
-				lineValues.add(item.getInfoAttribute(i));
-			}
+		List<ReferenceDataDefinition.Attribute> infoAttributes = getInfoAttributes(survey);
+		for (int i = 0; i < infoAttributes.size(); i++) {
+			lineValues.add(item.getInfoAttribute(i));
 		}
 		writer.writeNext(lineValues.toArray(new String[0]));
+	}
+
+	private List<ReferenceDataDefinition.Attribute> getInfoAttributes(CollectSurvey survey) {
+		ReferenceDataSchema referenceDataSchema = survey.getReferenceDataSchema();
+		SamplingPointDefinition samplingPoint = referenceDataSchema == null ? null: referenceDataSchema.getSamplingPointDefinition();
+		if ( samplingPoint == null ) {
+			return Collections.emptyList();
+		} else {
+			List<ReferenceDataDefinition.Attribute> infoAttributes = samplingPoint.getAttributes(false);
+			return infoAttributes;
+		}
 	}
 
 }

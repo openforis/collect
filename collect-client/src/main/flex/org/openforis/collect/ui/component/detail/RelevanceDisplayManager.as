@@ -3,7 +3,7 @@ package org.openforis.collect.ui.component.detail
 	import mx.collections.IList;
 	import mx.core.UIComponent;
 	
-	import org.openforis.collect.metamodel.proxy.CalculatedAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -62,7 +62,8 @@ package org.openforis.collect.ui.component.detail
 				}
 				var allNodesEmptyAndNotRelevant:Boolean = true;
 				for each (var node:NodeProxy in nodes) {
-					if ( node.relevant || (! defn is CalculatedAttributeDefinitionProxy && ! node.empty ) ) {
+					var calculated:Boolean = defn is AttributeDefinitionProxy && AttributeDefinitionProxy(defn).calculated;
+					if ( node.relevant || ( ! calculated && ! node.empty ) ) {
 						allNodesEmptyAndNotRelevant = false;
 						break;
 					}

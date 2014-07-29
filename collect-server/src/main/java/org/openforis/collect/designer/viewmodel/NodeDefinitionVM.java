@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,13 +16,14 @@ import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
+import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
+import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -45,9 +47,15 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	protected Form tempFormObject;
 	protected EntityDefinition parentEntity;
 
+	public NodeDefinitionVM() {
+		super();
+		fieldLabelKeyPrefixes.addAll(Arrays.asList("survey.schema.node"));
+	}
+	
 	@Init(superclass=false)
 	public void init(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
 		super.init();
+		tempFormObject = new SimpleForm();
 		if ( nodeDefn != null ) {
 			this.parentEntity = parentEntity;
 			this.newItem = newItem;
@@ -159,6 +167,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return tempFormObject;
 	}
 	
+	protected void setTempFormObjectFieldValue(String field, Object value) {
+		tempFormObject.setField(field, value);
+		BindUtils.postNotifyChange(null, null, tempFormObject, field);
+	}
+	
 	@DependsOn("editedItem")
 	public String getNodeType() {
 		if ( editedItem != null ) {
@@ -210,7 +223,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return true;
 	}
 	
-	public boolean isCalculatedAttribute() {
-		return editedItem != null && editedItem instanceof CalculatedAttributeDefinition;
+	public boolean isCalculableAttribute() {
+		return editedItem != null && editedItem instanceof Calculable;
 	}
 }

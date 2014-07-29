@@ -8,8 +8,9 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignSummaries;
-import org.openforis.idm.metamodel.SamplingPoints;
-import org.openforis.idm.metamodel.SamplingPoints.Attribute;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 
 /**
  * 
@@ -39,13 +40,14 @@ public class SamplingDesignSummariesProxy implements Proxy {
 
 	@ExternalizedProperty
 	public List<String> getInfoAttributes() {
-		SamplingPoints samplingPoints = survey.getSamplingPoints();
-		if ( samplingPoints == null ) {
+		ReferenceDataSchema referenceDataSchema = survey.getReferenceDataSchema();
+		SamplingPointDefinition samplingPoint = referenceDataSchema == null ? null: referenceDataSchema.getSamplingPointDefinition();
+		if ( samplingPoint == null ) {
 			return Collections.emptyList();
 		} else {
 			List<String> result = new ArrayList<String>();
-			List<Attribute> infoAttributes = samplingPoints.getAttributes(false);
-			for (Attribute attribute : infoAttributes) {
+			List<ReferenceDataDefinition.Attribute> infoAttributes = samplingPoint.getAttributes(false);
+			for (ReferenceDataDefinition.Attribute attribute : infoAttributes) {
 				result.add(attribute.getName());
 			}
 			return result;

@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.form;
 
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition.Formula;
+import org.openforis.idm.metamodel.Formula;
 
 /**
  * 

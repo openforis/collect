@@ -192,6 +192,15 @@ public abstract class BaseValidator extends AbstractValidator {
 		return getValue(ctx, fieldName, true);
 	}
 	
+	protected <T> T getValueWithDefault(ValidationContext ctx, String fieldName, T defaultValue) {
+		T value = getValue(ctx, fieldName, false);
+		if ( value == null ) {
+			return (T) defaultValue;
+		} else {
+			return value;
+		}
+	}
+		
 	@SuppressWarnings("unchecked")
 	protected <T> T getValue(ValidationContext ctx, String fieldName, boolean required) {
 		Object value;
