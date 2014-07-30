@@ -8,7 +8,6 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.model.expression.ModelPathExpression;
-import org.openforis.idm.model.expression.internal.MissingValueException;
 
 /**
  * @author G. Miceli
@@ -48,8 +47,6 @@ public class PivotExpressionColumnProvider extends ColumnProviderChain {
 			}
 		} catch (InvalidExpressionException e) {
 			throw new IllegalArgumentException(e);
-		} catch (MissingValueException e ) {
-			return emptyValues();
 		}
 	}
 }

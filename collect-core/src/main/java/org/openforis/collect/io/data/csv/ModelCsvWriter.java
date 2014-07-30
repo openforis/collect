@@ -10,7 +10,6 @@ import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.AbsoluteModelPathExpression;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.InvalidExpressionException;
-import org.openforis.idm.model.expression.internal.MissingValueException;
 
 /**
  * @author G. Miceli
@@ -39,15 +38,12 @@ public class ModelCsvWriter extends CsvWriter {
 
 	public int printData(Record record) throws InvalidExpressionException {
 		int cnt = 0;
-		try {
-			List<Node<?>> rowNodes = pivotExpression.iterate(record);
-			if ( rowNodes != null ) {
-				for (Node<?> n : rowNodes) {
-					printRow(n);
-					cnt++;
-				}
+		List<Node<?>> rowNodes = pivotExpression.iterate(record);
+		if ( rowNodes != null ) {
+			for (Node<?> n : rowNodes) {
+				printRow(n);
+				cnt++;
 			}
-		} catch ( MissingValueException e ) {
 		}
 		return cnt;
 	}

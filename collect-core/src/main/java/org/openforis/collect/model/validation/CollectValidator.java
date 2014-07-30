@@ -50,7 +50,7 @@ public class CollectValidator extends Validator {
 	public ValidationResults validate(Attribute<?, ?> attribute) {
 		ValidationResults results = new ValidationResults();
 
-		//skip validation for calculated attributes
+		// skip validation for calculated attributes
 		if ( attribute.getDefinition() instanceof Calculable && ((Calculable) attribute.getDefinition()).isCalculated() ) {
 			return results;
 		}
