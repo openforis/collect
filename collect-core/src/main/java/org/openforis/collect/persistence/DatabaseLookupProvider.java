@@ -17,7 +17,6 @@ import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Coordinate;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 
@@ -26,13 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author D. Wiell
  * 
  */
-public class DatabaseLookupProvider implements LookupProvider {
+public abstract class DatabaseLookupProvider implements LookupProvider {
 
 	private static final String SURVEY_ID_FIELD = "survey_id";
 	private static final String SURVEY_WORK_ID_FIELD = "survey_work_id";
-
-	@Autowired
-	private DynamicTableDao dynamicTableDao;
 
 	@Override
 	public Object lookup(Survey survey, String name, String attribute, Object... columns) {
@@ -41,9 +37,11 @@ public class DatabaseLookupProvider implements LookupProvider {
 			filters.add(createSurveyFilter((CollectSurvey) survey));
 		}
 		filters.addAll(Arrays.asList(NameValueEntry.fromKeyValuePairs(columns)));
-		Object object = dynamicTableDao.loadValue(name, attribute, filters.toArray(new NameValueEntry[0]));
+		Object object = loadValue(name, attribute, filters.toArray(new NameValueEntry[0]));
 		return object;
 	}
+	
+	protected abstract Object loadValue(String name, String attribute, NameValueEntry[] filters);
 	
 	@Override
 	public Coordinate lookupSamplingPointCoordinate(Survey survey, String... keys) {
@@ -77,7 +75,7 @@ public class DatabaseLookupProvider implements LookupProvider {
 			NameValueEntry filter = new NameValueEntry(keyField.getName(), key);
 			filters.add(filter);
 		}
-		Object value = dynamicTableDao.loadValue(OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName(), valueColumnName, filters.toArray(new NameValueEntry[0]));
+		Object value = loadValue(OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName(), valueColumnName, filters.toArray(new NameValueEntry[0]));
 		return value;
 	}
 
@@ -106,5 +104,5 @@ public class DatabaseLookupProvider implements LookupProvider {
 			return null;
 		}
 	}
-
+	
 }
