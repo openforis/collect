@@ -46,14 +46,13 @@
 			override public function set data(value:Object):void {
 				super.data = value;
 				entity = value as EntityProxy;
-				if ( entity == null ) {
-					nodeDefinitionsGroup.removeAllElements();
-				} else {
-					initNodeDefinitions();
+				modelVersion = Application.activeRecord.version;
+				if ( entity != null && nodeDefinitionsGroup.numElements == 0 ) {
+					initNodeDefinitionItemRenderers();
 				}
 			}
 			
-			protected function initNodeDefinitions():void {
+			protected function initNodeDefinitionItemRenderers():void {
 				modelVersion = Application.activeRecord.version;
 				entityDefinition = _entity.definition as EntityDefinitionProxy;
 				nodeDefinitions = _entityDefinition.getDefinitionsInVersion(_modelVersion);

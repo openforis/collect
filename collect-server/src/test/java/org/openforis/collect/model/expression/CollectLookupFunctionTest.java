@@ -13,7 +13,7 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.expression.DefaultValueExpression;
+import org.openforis.idm.model.expression.ValueExpression;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 
 /**
@@ -37,7 +37,7 @@ public class CollectLookupFunctionTest extends AbstractTest {
 
 		String expr = "idm:lookup('sampling_design', 'location','cluster', 'id','plot', 1)";
 
-		DefaultValueExpression expression = recordContext.getExpressionFactory().createDefaultValueExpression(expr);
+		ValueExpression expression = recordContext.getExpressionFactory().createValueExpression(expr);
 		Object object = expression.evaluate(cluster, null);
 		Assert.assertEquals(TEST_COORDINATE, object);
 	}
@@ -48,7 +48,7 @@ public class CollectLookupFunctionTest extends AbstractTest {
 		SurveyContext recordContext = record.getSurveyContext();
 
 		String expr = "idm:lookup('sampling_design', 'location','cluster' ,'id')";
-		DefaultValueExpression expression = recordContext.getExpressionFactory().createDefaultValueExpression(expr);
+		ValueExpression expression = recordContext.getExpressionFactory().createValueExpression(expr);
 		Object object = expression.evaluate(cluster, null);
 		Assert.assertEquals(TEST_COORDINATE, object);
 	}
@@ -61,7 +61,7 @@ public class CollectLookupFunctionTest extends AbstractTest {
 
 		String expr = "idm:lookup('sampling_design', 'location','cluster', id,'plot', '0')";
 
-		DefaultValueExpression expression = recordContext.getExpressionFactory().createDefaultValueExpression(expr);
+		ValueExpression expression = recordContext.getExpressionFactory().createValueExpression(expr);
 		Object object = expression.evaluate(cluster, null);
 		Assert.assertEquals(TEST_COORDINATE, object);
 	}

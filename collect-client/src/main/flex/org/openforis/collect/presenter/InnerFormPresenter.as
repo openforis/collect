@@ -48,42 +48,31 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function setViewHeight(value:Number):void {
-			if ( view.useScroller ) {
-				updateMultipleEntitiesMaxHeight(value);
-			}
+			limitTableFormItemsMaxSize();
 		}
 
 		protected function setViewWidth(value:Number):void {
-			if ( view.useScroller ) {
-				updateMultipleEntitiesMaxWidth(value);
+			limitTableFormItemsMaxSize();
+		}
+		
+		private function limitTableFormItemsMaxSize():void {
+			for each ( var formItem:CollectFormItem in _formItems) {
+				if ( formItem is MultipleEntityAsTableFormItem ) {
+					limitTableFormItemSize(MultipleEntityAsTableFormItem(formItem));
+				}
 			}
 		}
 		
-		protected function updateMultipleEntitiesMaxHeight(value:Number):void {
+		private function limitTableFormItemSize(formItem:CollectFormItem):void {
 			var maxAvailableHeight:Number = UIUtil.getMaxAvailableHeight(view);
-			if ( ! isNaN(maxAvailableHeight) ) {
-				for each ( var formItem:CollectFormItem in _formItems) {
-					if ( formItem is MultipleEntityAsTableFormItem ) {
-						formItem.maxHeight = maxAvailableHeight;
-					}
-				}
+			var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(view);
+			if ( ! isNaN(maxAvailableWidth) && view.useScroller ) {
+				maxAvailableWidth -= INDENT_WIDTH;
 			}
+			formItem.maxHeight = maxAvailableHeight;
+			formItem.maxWidth = maxAvailableWidth;
 		}
 		
-		protected function updateMultipleEntitiesMaxWidth(value:Number):void {
-			var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(view);
-			if ( ! isNaN(maxAvailableWidth) ) {
-				if ( view.useScroller ) {
-					maxAvailableWidth -= 15;
-				}
-				for each ( var formItem:CollectFormItem in _formItems) {
-					if ( formItem is MultipleEntityAsTableFormItem ) {
-						formItem.maxWidth = maxAvailableWidth;
-					}
-				}
-			}
-		}
-
 		protected function updateCurrentState():void {
 			view.useScroller = ! containsOnlyOneMultipleEntity/* || isInsideFormLayoutEntity()*/;
 			view.currentState = view.useScroller ? InnerFormContainer.STATE_USE_SCROLLER: InnerFormContainer.STATE_DEFAULT;
@@ -109,8 +98,8 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function nodeDefinitionsSetter(value:IList):void {
-			updateCurrentState();
 			if ( value != null ) {
+				updateCurrentState();
 				buildGrid();
 			}
 		}
@@ -184,6 +173,10 @@ package org.openforis.collect.presenter
 			}
 			BindingUtils.bindProperty(formItem, "parentEntity", _view, "parentEntity");
 			BindingUtils.bindProperty(formItem, "occupyEntirePage", _view, "notUsingScroller");
+			
+			if ( formItem is MultipleEntityAsTableFormItem ) {
+				limitTableFormItemSize(formItem);
+			}
 			return formItem;
 		}
 		

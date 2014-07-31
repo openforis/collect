@@ -2,8 +2,9 @@
 <s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:detail="org.openforis.collect.ui.component.detail.*" 
+		 xmlns:layout="org.openforis.collect.ui.layout.*"
 		 width="100%" height="100%" 
-		 xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:layout="org.openforis.collect.ui.layout.*"
 		 creationComplete="creationCompleteHandler(event)"
 		 currentState="{hasDefinitionsPerCurrentTab &amp;&amp; hasInnerUITabs ? STATE_COMPLETE: hasInnerUITabs ? STATE_INNER_TABS: STATE_DEFAULT}">
 	
@@ -140,47 +141,49 @@
 		<s:State name="complete" basedOn="innerTabs" />
 	</s:states>
 	
-	<s:VGroup width="100%" height="100%" 
-			  gap="0">
-		<detail:InnerFormContainer 
-			id="definitionsPerCurrentTabContainer"
-			modelVersion="{modelVersion}"
-			entityDefinition="{entityDefinition}"
-			nodeDefinitions="{definitionsPerCurrentTab}"
-			parentEntity="{parentEntity}"
-			width.default="100%"
-			height.default="100%"
-			includeIn="default,complete"
-			/>
+	<s:layout>
+		<s:VerticalLayout gap="0" />
+	</s:layout>
+	
+	<detail:InnerFormContainer 
+		id="definitionsPerCurrentTabContainer"
+		modelVersion="{modelVersion}"
+		entityDefinition="{entityDefinition}"
+		nodeDefinitions="{definitionsPerCurrentTab}"
+		parentEntity="{parentEntity}"
+		width.default="100%"
+		height.default="100%"
+		includeIn="default,complete"
+		/>
+	
+	<s:TabBar id="tabBar" 
+			  dataProvider="{viewStack}"
+			  width="100%"
+			  includeIn="innerTabs">
+		<s:layout>
+			<layout:FlowLayout />
+		</s:layout>
+	</s:TabBar>
+	
+	<s:BorderContainer
+		width="100%" 
+		height="100%"
+		styleName="entityForm"
+		includeIn="innerTabs">
 		
-		<s:TabBar id="tabBar" 
-				  dataProvider="{viewStack}"
-				  width="100%"
-				  includeIn="innerTabs">
-			<s:layout>
-				<layout:FlowLayout />
-			</s:layout>
-		</s:TabBar>
-		
-		<s:BorderContainer
-			width="100%" 
-			height="100%"
-			styleName="entityForm"
-			includeIn="innerTabs">
-			
-			<mx:ViewStack id="viewStack" width="100%" height="100%" 
-						  verticalGap="0" creationPolicy="auto">
-				<mx:Repeater id="tabsRP" dataProvider="{innerUITabs}">
-					<detail:TabbedFormContainer 
-						id="tabContentContainers"
-						modelVersion="{modelVersion}"
-						entityDefinition="{entityDefinition}"
-						parentEntity="{parentEntity}"
-						uiTabSet="{UITabProxy(tabsRP.currentItem)}"
-						label="{UITabProxy(tabsRP.currentItem).labelText}"
-						/>
-				</mx:Repeater>
-			</mx:ViewStack>
-		</s:BorderContainer>
-	</s:VGroup>
+		<mx:ViewStack id="viewStack" width="100%" height="100%" 
+					  verticalGap="0" creationPolicy="auto">
+			<mx:Repeater id="tabsRP" dataProvider="{innerUITabs}">
+				<detail:TabbedFormContainer 
+					id="tabContentContainers"
+					modelVersion="{modelVersion}"
+					entityDefinition="{entityDefinition}"
+					parentEntity="{parentEntity}"
+					uiTabSet="{UITabProxy(tabsRP.currentItem)}"
+					label="{UITabProxy(tabsRP.currentItem).labelText}"
+					/>
+			</mx:Repeater>
+		</mx:ViewStack>
+	</s:BorderContainer>
+
 </s:NavigatorContent>
