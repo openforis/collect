@@ -13,7 +13,6 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.CodeParentValidator;
@@ -51,7 +50,7 @@ public class CollectValidator extends Validator {
 		ValidationResults results = new ValidationResults();
 
 		// skip validation for calculated attributes
-		if ( attribute.getDefinition() instanceof Calculable && ((Calculable) attribute.getDefinition()).isCalculated() ) {
+		if ( attribute.getDefinition().isCalculated() ) {
 			return results;
 		}
 

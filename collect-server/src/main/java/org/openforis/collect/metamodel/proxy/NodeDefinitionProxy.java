@@ -15,7 +15,6 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -49,16 +48,11 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 		if (list != null) {
 			for (NodeDefinition n : list) {
 				NodeDefinitionProxy p = null;
-				if (n instanceof AttributeDefinition) {
-					boolean showInUI;
-					if ( n instanceof Calculable && ((Calculable) n).isCalculated() ) {
-						CollectSurvey survey = (CollectSurvey) n.getSurvey();
-						UIOptions uiOptions = survey.getUIOptions();
-						showInUI = ! uiOptions.isHidden(n);
-					} else {
-						showInUI = true;
-					}
-					if ( showInUI ) {
+				CollectSurvey survey = (CollectSurvey) n.getSurvey();
+				UIOptions uiOptions = survey.getUIOptions();
+				boolean hidden = uiOptions.isHidden(n);
+				if ( ! hidden ) {
+					if (n instanceof AttributeDefinition) {
 						if (n instanceof BooleanAttributeDefinition) {
 							p = new BooleanAttributeDefinitionProxy(parent, (BooleanAttributeDefinition) n);
 						} else if (n instanceof CodeAttributeDefinition) {
@@ -82,12 +76,12 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 						} else {
 							throw new RuntimeException("AttributeDefinition not supported: " + n.getClass().getSimpleName());
 						}
+					} else if (n instanceof EntityDefinition) {
+						p = new EntityDefinitionProxy(parent, (EntityDefinition) n);
 					}
-				} else if (n instanceof EntityDefinition) {
-					p = new EntityDefinitionProxy(parent, (EntityDefinition) n);
-				}
-				if ( p != null ) {
-					proxies.add(p);
+					if ( p != null ) {
+						proxies.add(p);
+					}
 				}
 			}
 		}

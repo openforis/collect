@@ -9,7 +9,6 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -59,8 +58,7 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 			if (includeChild(exclusions, childDefn)) {
 				if (childDefn instanceof EntityDefinition) {
 					createEntityProviders((EntityDefinition) childDefn, cols, includeEnumeratedEntities);
-				} else if (childDefn instanceof AttributeDefinition && (
-					! (childDefn instanceof Calculable) || surveyAnnotations.isIncludedInDataExport(childDefn) ) ) {
+				} else if (childDefn instanceof AttributeDefinition && surveyAnnotations.isIncludedInDataExport(childDefn) ) {
 					createAttributeProviders((AttributeDefinition) childDefn, cols, includeKMLColumnForCoordinates, includeItemPositionColumn);
 				}
 			}

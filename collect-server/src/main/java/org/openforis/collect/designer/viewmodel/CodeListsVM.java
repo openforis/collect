@@ -78,7 +78,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private boolean newChildItem;
 	private CodeListItem editedChildItem;
 	private CodeListItem editedChildItemParentItem;
-	private int editedChildItemLevel;
+	private int editedChildItemLevelIndex;
 	
 	private List<CodeListItem> selectedItemsPerLevel;
 	private Window codeListItemPopUp;
@@ -289,12 +289,12 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void addItemInLevel(@BindingParam("levelIndex") int levelIndex) {
 		if ( checkCanLeaveForm() ) {
 			newChildItem = true;
-			editedChildItemLevel = levelIndex;
+			editedChildItemLevelIndex = levelIndex;
 			editedChildItem = createChildItem();
-			if ( editedChildItemLevel == 0 ) {
+			if ( editedChildItemLevelIndex == 0 ) {
 				editedChildItemParentItem = null;
 			} else {
-				editedChildItemParentItem = selectedItemsPerLevel.get(editedChildItemLevel - 1);
+				editedChildItemParentItem = selectedItemsPerLevel.get(editedChildItemLevelIndex - 1);
 			}
 			openChildItemEditPopUp();
 		}
@@ -304,9 +304,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		if ( editedItem.isExternal() ) {
 			throw new UnsupportedOperationException("Cannot instantiate ExternalCodeListItem object");
 		} else if ( editedItem.isEmpty() ) {
-			return new PersistedCodeListItem(editedItem);
+			return new PersistedCodeListItem(editedItem, editedChildItemLevelIndex + 1);
 		} else {
-			return editedItem.createItem();
+			return editedItem.createItem(editedChildItemLevelIndex + 1);
 		}
 	}
 	
@@ -573,9 +573,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			//add item as a child of the edited parent item in the code list
 			editedChildItemParentItem.addChildItem(editedChildItem);
 		}
-		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(editedChildItemLevel);
+		List<CodeListItem> itemsForCurrentLevel = itemsPerLevel.get(editedChildItemLevelIndex);
 		itemsForCurrentLevel.add(editedChildItem);
-		deselectItemsAfterLevel(editedChildItemLevel);
+		deselectItemsAfterLevel(editedChildItemLevelIndex);
 		selectedItemsPerLevel.add(editedChildItem);
 		initItemsPerLevel();
 		notifyChange("itemsPerLevel","selectedItemsPerLevel");

@@ -12,14 +12,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
-import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.Calculable;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
@@ -43,7 +45,12 @@ import org.zkoss.zk.ui.Path;
 public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyObjectBaseVM<T> {
 
 	protected static final String FORM_CONTAINER_ID = "nodeFormContainer";
-	
+	public static final Class<?>[] SUPPORTED_CALCULABLE_ATTRIBUTE_TYPES = new Class<?>[] { 
+		CodeAttributeDefinition.class,
+		NumericAttributeDefinition.class,
+		TextAttributeDefinition.class
+	};
+
 	protected Form tempFormObject;
 	protected EntityDefinition parentEntity;
 
@@ -224,6 +231,15 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	public boolean isCalculableAttribute() {
-		return editedItem != null && editedItem instanceof Calculable;
+		if ( editedItem == null ) {
+			return false;
+		} else {
+			for (Class<?> type : SUPPORTED_CALCULABLE_ATTRIBUTE_TYPES) {
+				if ( type.isInstance(editedItem) ) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }

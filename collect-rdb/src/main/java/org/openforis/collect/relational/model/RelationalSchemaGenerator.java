@@ -15,7 +15,6 @@ import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -194,12 +193,12 @@ public class RelationalSchemaGenerator {
 				addDataObjects(rs, table, child, childPath);
 			}
 		} else if ( defn instanceof AttributeDefinition ) {
+			AttributeDefinition attrDefn = (AttributeDefinition) defn;
 			CollectSurvey survey = (CollectSurvey) defn.getSurvey();
 			CollectAnnotations annotations = survey.getAnnotations();
 			
 			//do not include if it's a calculated attribute and it has not to be included in data export
-			if ( ! (defn instanceof Calculable && ((Calculable) defn).isCalculated() ) || 
-					annotations.isIncludedInDataExport(defn) ) { 
+			if ( ! attrDefn.isCalculated() || annotations.isIncludedInDataExport(defn) ) { 
 				if ( defn.isMultiple() ) {
 					// Create table for multiple attributes
 					table = createDataTable(rs, table, defn, relativePath);

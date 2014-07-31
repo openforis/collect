@@ -182,7 +182,7 @@ public class CodeListManager {
 		if ( list.isExternal() ) {
 			throw new UnsupportedOperationException();
 		} else if ( persistedSurvey && list.isEmpty() ) {
-			return (List<T>) codeListItemDao.loadItems(list, level);
+			return (List<T>) codeListItemDao.loadItemsByLevel(list, level);
 		} else {
 			return (List<T>) list.getItems(level - 1);
 		}

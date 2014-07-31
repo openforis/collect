@@ -53,6 +53,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			OFC_CODE_LIST.CODE_LIST_ID,
 			OFC_CODE_LIST.ITEM_ID,
 			OFC_CODE_LIST.PARENT_ID,
+			OFC_CODE_LIST.LEVEL,
 			OFC_CODE_LIST.SORT_ORDER,
 			OFC_CODE_LIST.CODE,
 			OFC_CODE_LIST.QUALIFIABLE,
@@ -135,6 +136,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				OFC_CODE_LIST.CODE_LIST_ID,
 				OFC_CODE_LIST.ITEM_ID,
 				OFC_CODE_LIST.PARENT_ID.add(idGap),
+				OFC_CODE_LIST.LEVEL,
 				OFC_CODE_LIST.SORT_ORDER,
 				OFC_CODE_LIST.CODE,
 				OFC_CODE_LIST.QUALIFIABLE,
@@ -389,7 +391,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return jf.fromResult(result);
 	}
 	
-	public List<PersistedCodeListItem> loadItems(CodeList list, int level) {
+	public List<PersistedCodeListItem> loadItemsByLevel(CodeList list, int level) {
 		int currentLevel = 1;
 		List<PersistedCodeListItem> currentLevelItems = loadRootItems(list);;
 		List<PersistedCodeListItem> nextLevelItems;
@@ -594,14 +596,15 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			throw new UnsupportedOperationException();
 		}
 		
-		protected PersistedCodeListItem newEntity(int itemId) {
-			return new PersistedCodeListItem(codeList, itemId);
+		protected PersistedCodeListItem newEntity(int itemId, int level) {
+			return new PersistedCodeListItem(codeList, itemId, level);
 		}
 		
 		@Override
 		public PersistedCodeListItem fromRecord(Record record) {
 			int itemId = record.getValue(OFC_CODE_LIST.ITEM_ID);
-			PersistedCodeListItem entity = newEntity(itemId);
+			int level = record.getValue(OFC_CODE_LIST.LEVEL);
+			PersistedCodeListItem entity = newEntity(itemId, level);
 			fromRecord(record, entity);
 			return entity;
 		}
@@ -609,9 +612,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		@Override
 		public void fromRecord(Record r, PersistedCodeListItem i) {
 			i.setSystemId(r.getValue(OFC_CODE_LIST.ID));
+			i.setParentId(r.getValue(OFC_CODE_LIST.PARENT_ID));
 			i.setSortOrder(r.getValue(OFC_CODE_LIST.SORT_ORDER));
 			i.setCode(r.getValue(OFC_CODE_LIST.CODE));
-			i.setParentId(r.getValue(OFC_CODE_LIST.PARENT_ID));
 			i.setQualifiable(r.getValue(OFC_CODE_LIST.QUALIFIABLE));
 			i.setSinceVersion(extractModelVersion(r, i, OFC_CODE_LIST.SINCE_VERSION_ID));
 			i.setDeprecatedVersion(extractModelVersion(r, i, OFC_CODE_LIST.DEPRECATED_VERSION_ID));
@@ -670,6 +673,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				sortOrder = nextSortOrder(item);
 				item.setSortOrder(sortOrder);
 			}
+			q.addValue(OFC_CODE_LIST.LEVEL, item.getLevel());
 			q.addValue(OFC_CODE_LIST.SORT_ORDER, sortOrder);
 			q.addValue(OFC_CODE_LIST.CODE, item.getCode());
 			q.addValue(OFC_CODE_LIST.QUALIFIABLE, item.isQualifiable());
@@ -697,7 +701,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			ModelVersion deprecatedVersion = item.getDeprecatedVersion();
 			Integer deprecatedVersionId = deprecatedVersion == null ? null: deprecatedVersion.getId();
 			Object[] values = {item.getSystemId(), surveyWork ? null: surveyId, surveyWork ? surveyId: null, 
-					list.getId(), item.getId(), item.getParentId(), item.getSortOrder(), item.getCode(), 
+					list.getId(), item.getId(), item.getParentId(), item.getLevel(), item.getSortOrder(), item.getCode(), 
 					item.isQualifiable(), sinceVersionId, deprecatedVersionId};
 			Object[] labelValues = getLabelValues(item);
 			values = ArrayUtils.addAll(values, labelValues);

@@ -10,7 +10,6 @@ import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 
 /**
@@ -63,6 +62,6 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 	
 	@ExternalizedProperty
 	public boolean isCalculated() {
-		return attributeDefinition instanceof Calculable && ((Calculable) attributeDefinition).isCalculated();
+		return attributeDefinition.isCalculated();
 	}
 }

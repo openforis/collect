@@ -194,7 +194,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		}
 		result = getChildItem(parent, code);
 		if ( result == null ) {
-			result = codeList.createItem();
+			result = codeList.createItem(levelIdx + 1);
 			fillItem(result, code, labels);
 			if ( parent == null ) {
 				codeToRootItem.put(code, result);

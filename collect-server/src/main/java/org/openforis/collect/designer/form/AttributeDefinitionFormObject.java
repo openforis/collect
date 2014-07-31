@@ -11,7 +11,6 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.validation.Check;
 
@@ -67,16 +66,14 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
 		checks = new ArrayList<Check<?>>(source.getChecks());
 		
-		if ( source instanceof Calculable ) {
-			CollectSurvey survey = (CollectSurvey) source.getSurvey();
-			
-			//show in UI
-			UIOptions uiOptions = survey.getUIOptions();
-			showInUI = ! uiOptions.isHidden(source);
-			
-			CollectAnnotations annotations = survey.getAnnotations();
-			includeInDataExport = annotations.isIncludedInDataExport(source);
-		}
+		CollectSurvey survey = (CollectSurvey) source.getSurvey();
+		
+		//show in UI
+		UIOptions uiOptions = survey.getUIOptions();
+		showInUI = ! uiOptions.isHidden(source);
+		
+		CollectAnnotations annotations = survey.getAnnotations();
+		includeInDataExport = annotations.isIncludedInDataExport(source);
 	}
 	
 	@Override
