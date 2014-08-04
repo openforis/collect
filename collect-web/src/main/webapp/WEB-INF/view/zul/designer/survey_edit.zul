@@ -89,6 +89,7 @@
 					<!-- language selector -->
 					<hlayout id="languageSelector" hflex="1"
 						style="text-align: right;" sclass="controlBar">
+						<label value="${labels.survey.language.current_language}:" />
 						<listbox model="@load(vm.availableLanguages)"
 							selectedItem="@load(vm.currentLanguageCode)"
 							onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
