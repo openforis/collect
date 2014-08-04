@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -117,6 +118,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	public void nameChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("name") String name) {
 		name = adjustInternalName(name);
+		((NodeDefinitionFormObject<?>) formObject).setName(name);
 		dispatchApplyChangesCommand(binder);
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", editedItem);
@@ -127,6 +129,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@Command
 	public void singleInstanceLabelChange(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("label") String value) {
+		((NodeDefinitionFormObject<?>) formObject).setInstanceLabel(value);
 		String name = (String) tempFormObject.getField("name");
 		if ( StringUtils.isBlank(name) && StringUtils.isNotBlank(value) ) {
 			name = suggestInternalName(value);

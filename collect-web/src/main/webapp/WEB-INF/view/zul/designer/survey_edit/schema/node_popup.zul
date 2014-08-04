@@ -1,19 +1,36 @@
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
 	<window id="nodeEditPopUp" 
+		apply="org.zkoss.bind.BindComposer"
 		title="${arg.title}" 
 		width="500px" 
 		height="320px"
 		border="normal"
 		position="center" 
-		closable="true"
-		onClose="@command('closeNodeEditPopUp')">
+		closable="false">
 		
-		<include id="nodeFormInclude"
-			src="${arg.formLocation}"
-			parentEntity="${arg.parentEntity}"
-			item="${arg.item}"
-			newItem="${arg.newItem}"
-	 	/>
+		<borderlayout>
+			<center>
+				<include id="nodeFormInclude"
+					src="${arg.formLocation}"
+					parentEntity="${arg.parentEntity}"
+					item="${arg.item}"
+					newItem="${arg.newItem}"
+					doNotCommitChangesImmediately="true"
+			 	/>
+			</center>
+			<south>
+			 	<box width="100%" align="center">
+			 		<hbox>
+			 			<button label="${labels.global.apply}"
+			 				onClick="@global-command('applyChangesToEditedNodeInPopUp')" />
+			 			<separator width="30px" />
+			 			<button label="${labels.global.cancel}"
+			 				onClick="@global-command('cancelChangesToEditedNodeInPopUp')" />
+			 		</hbox>
+			 	</box>
+			</south>
+		</borderlayout>
+	 	
  	</window>
 </zk>

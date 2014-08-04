@@ -131,6 +131,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	@GlobalCommand
 	public void undoLastChanges(@ContextParam(ContextType.VIEW) Component view) {
+		undoLastChanges();
+	}
+	
+	public void undoLastChanges() {
 		dispatchCurrentFormValidatedCommand(true);
 	}
 	

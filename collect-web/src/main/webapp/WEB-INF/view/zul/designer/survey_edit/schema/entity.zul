@@ -1,5 +1,6 @@
 <zk>
 	<custom-attributes parentEntity="${arg.parentEntity}" />
+	<custom-attributes doNotCommitChangesImmediately="${arg.doNotCommitChangesImmediately}" />
 	
 	<vlayout id="nodeFormContainer" sclass="form"
 		apply="org.zkoss.bind.BindComposer"
