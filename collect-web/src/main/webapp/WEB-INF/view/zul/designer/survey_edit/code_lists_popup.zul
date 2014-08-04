@@ -9,12 +9,19 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListsPopUpVM')"
 		validationMessages="@id('vmsgs')"
-		closable="true"
-		onClose="@command('close')">
-		
-		<include src="survey_edit/code_lists.zul"
-			editingAttribute="${arg.editingAttribute}"
-			selectedCodeList="${arg.selectedCodeList}" />
-		
+		closable="false">
+		<borderlayout vflex="true" hflex="true">
+			<center>
+				<include id="codeListsInclude" 
+					src="survey_edit/code_lists.zul"
+					editingAttribute="${arg.editingAttribute}"
+					selectedCodeList="${arg.selectedCodeList}" />
+			</center>
+			<south>
+				<box align="center" width="100%">
+					<button label="${labels.global.apply}" onClick="@command('apply')" />
+				</box>
+			</south>
+		</borderlayout>
 	</window>
 </zk>

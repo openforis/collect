@@ -2,6 +2,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -92,6 +93,12 @@ public abstract class BaseVM {
 			Object value) {
 		form.setField(field, value);
 		BindUtils.postNotifyChange(null, null, form, field);
+	}
+	
+	protected String adjustInternalName(String name) {
+		String result = StringUtils.trimToEmpty(name);
+		result = result.toLowerCase();
+		return result;
 	}
 	
 }

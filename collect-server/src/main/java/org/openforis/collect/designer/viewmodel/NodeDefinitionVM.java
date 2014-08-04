@@ -89,7 +89,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	@Override
-	protected void commitChanges() {
+	public void commitChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		boolean editingRootEntity = parentEntity == null;
 		boolean wasNewItem = newItem;
@@ -116,11 +116,28 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@Command
 	public void nameChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("name") String name) {
+		name = adjustInternalName(name);
 		dispatchApplyChangesCommand(binder);
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", editedItem);
 		args.put("name", name);
 		BindUtils.postGlobalCommand(null, null, "editedNodeNameChanging", args);
+	}
+
+	@Command
+	public void singleInstanceLabelChange(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam("label") String value) {
+		String name = (String) tempFormObject.getField("name");
+		if ( StringUtils.isBlank(name) && StringUtils.isNotBlank(value) ) {
+			name = suggestInternalName(value);
+			nameChanged(binder, name);
+		}
+	}
+	
+	protected String adjustInternalName(String name) {
+		String result = super.adjustInternalName(name);
+		setTempFormObjectFieldValue("name", result);
+		return result;
 	}
 	
 	protected String getInstanceLabel(NodeDefinition nodeDefn) {

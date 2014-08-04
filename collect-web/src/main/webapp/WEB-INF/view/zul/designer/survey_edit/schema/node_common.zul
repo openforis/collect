@@ -136,7 +136,7 @@
       				message="@load(vmsgs['instanceLabel'])">
       				<textbox width="250px"
       					value="@bind(fx.instanceLabel)"
-      					onChange="@command('applyChanges')" />
+  						onChange="@command('singleInstanceLabelChange', label=self.value)" />
       			</fieldErrorHandler>
       		</row>
       		<row>

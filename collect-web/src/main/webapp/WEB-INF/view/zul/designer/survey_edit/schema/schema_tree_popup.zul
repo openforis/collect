@@ -9,8 +9,7 @@
 		position="center" 
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM')"
-		closable="true"
-		onClose="@global-command('closeSchemaNodeSelector')">
+		closable="false">
 
 		<vlayout hflex="true" vflex="true">
 			<tree id="tree" 
@@ -34,12 +33,15 @@
 			
 			<label value="${labels.survey.schema.tree.popup.info}" />
 			
-			<box hflex="true" align="center">
-		        <button id="okBtn" 
-		        	onClick="@command('onOk', selectedSurveyObject=tree.selectedItem.value.data.surveyObject)"
-		        	label="${labels.global.ok}" />
+			<box width="100%" align="center">
+				<hbox spacing="30px">
+					<button label="${labels.global.apply}"
+				        	onClick="@command('apply', selectedSurveyObject=tree.selectedItem.value.data.surveyObject)"/>
+					<button label="${labels.global.cancel}" 
+							onClick="@command('cancel')" />
+				</hbox>
 			</box>
-		
+    	
 		</vlayout>
 		
 	</window>

@@ -14,8 +14,6 @@ import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
 import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
-import org.zkoss.bind.BindContext;
-import org.zkoss.bind.Binder;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.bind.impl.BinderImpl;
 import org.zkoss.bind.sys.ValidationMessages;
@@ -77,16 +75,6 @@ public abstract class FormValidator extends BaseValidator {
 	}
 
 	protected abstract void internalValidate(ValidationContext ctx);
-
-	protected Object getVM(ValidationContext ctx) {
-		BindContext bindContext = ctx.getBindContext();
-		Binder binder = bindContext.getBinder();
-		Object vmObject = binder.getViewModel();
-		if ( vmObject == null ) {
-			throw new IllegalStateException("Unable to find view model instance");
-		}
-		return vmObject;
-	}
 
 	protected Set<String> getFieldNames(ValidationContext ctx) {
 		Set<String> result = new HashSet<String>();

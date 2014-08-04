@@ -490,7 +490,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@Override
-	protected void commitChanges() {
+	public void commitChanges() {
 		super.commitChanges();
 		dispatchCodeListsUpdatedCommand();
 	}

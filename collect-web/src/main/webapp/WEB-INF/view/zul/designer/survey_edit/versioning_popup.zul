@@ -8,8 +8,7 @@
 		height="300px"
 		border="normal"
 		position="center" 
-		closable="true"
-		onClose="@command('close')">
+		closable="false">
 		<borderlayout>
 			<north>
 				<box pack="center" align="center" height="30px" hflex="1">
@@ -130,6 +129,11 @@
 					</absolutechildren>
 				</absolutelayout>
 			</center>
+			<south>
+				<box align="center" width="100%">
+					<button label="${labels.global.apply}" onClick="@command('apply')" />
+				</box>
+			</south>
 		</borderlayout>
 	</window>
 </zk>
