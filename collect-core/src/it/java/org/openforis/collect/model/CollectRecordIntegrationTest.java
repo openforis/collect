@@ -339,7 +339,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	private CollectSurvey createMultipleLevelCodeListTestSurvey() {
-		CollectSurvey survey = surveyManager.createSurveyWork();
+		CollectSurvey survey = surveyManager.createSurveyWork("test", "en");
 		CodeList codeList = survey.createCodeList();
 		{
 			CodeListLevel codeListLevel = new CodeListLevel();

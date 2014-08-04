@@ -20,7 +20,7 @@
             <fieldErrorHandler message="@load(vmsgs['name'])">
               <textbox width="150px" value="@bind(fx.name)"
                 onChange="@command('applyChanges')" 
-                readonly="@load(fx.published)" />
+                readonly="true" />
             </fieldErrorHandler>
           </row>
           <row>

@@ -51,7 +51,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyManager {
 	
 	private static Log LOG = LogFactory.getLog(SurveyManager.class);
-
+	private static final String URI_PREFIX = "http://www.openforis.org/idm/";
+	
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
@@ -612,14 +613,21 @@ public class SurveyManager {
 		}
 	}
 	
-	public CollectSurvey createSurveyWork() {
+	public CollectSurvey createSurveyWork(String name, String language) {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
+		survey.setName(name);
+		survey.setUri(generateSurveyUri(name));
+		survey.addLanguage(language);
 		survey.setWork(true);
 		return survey;
 	}
 	
+	public String generateSurveyUri(String name) {
+		return URI_PREFIX + name;
+	}
+	
 	public String generateRandomSurveyUri() {
-		return collectSurveyContext.getUriPrefix() + UUID.randomUUID();
+		return generateSurveyUri(UUID.randomUUID().toString());
 	}
 
 	/**

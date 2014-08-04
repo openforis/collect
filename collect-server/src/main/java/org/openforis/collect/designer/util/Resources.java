@@ -55,7 +55,7 @@ public class Resources {
 		CONFIRM_SURVEY_ERRORS_POPUP("component/confirm_survey_errors_popup.zul"),
 		PROCESS_STATUS_POPUP("component/process_status_popup.zul"),
 		JOB_STATUS_POPUP("component/job_status_popup.zul"),
-		SELECT_TEMPLATE_POPUP("component/select_template_popup.zul"), 
+		NEW_SURVEY_PARAMETERS_POPUP("component/new_survey_parameters_popup.zul"), 
 		SURVEY_EXPORT_PARAMETERS_POPUP("component/survey_export_parameters_popup.zul"),
 		NODE_EDIT_POPUP("survey_edit/schema/node_popup.zul"),
 		SCHEMA_TREE_POPUP("survey_edit/schema/schema_tree_popup.zul");
