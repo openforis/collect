@@ -194,11 +194,6 @@
 			<artifactId>aspectjrt</artifactId>
 			<version>${aspectj.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjtools</artifactId>
-			<version>${aspectj.version}</version>
-		</dependency>
 		<!-- end of aspectj dependencies -->
 		<dependency>
 			<groupId>org.graniteds</groupId>
