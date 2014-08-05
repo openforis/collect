@@ -41,11 +41,11 @@
 								label="${labels.survey.species_import.$}" 
 								w:_sel="switchTab"
 								forward="onSwitchTab=onSwitchTab"
-								visible="@load(not vm.simpleEditor)" />
+								visible="@load(not vm.collectEarthEditor)" />
 							<tab id="samplingDesignImportTab"
 								label="${labels.survey.sampling_design_import.$}"
 								w:_sel="switchTab" forward="onSwitchTab=onSwitchTab"
-								visible="@load(not vm.simpleEditor)" />
+								visible="@load(not vm.collectEarthEditor)" />
 							<tab id="schemaTab"
 								label="${labels.survey.schema.$}" 
 								w:_sel="switchTab"

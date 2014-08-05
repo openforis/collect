@@ -22,6 +22,7 @@ import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
+import org.openforis.collect.io.metadata.CollectEarthProjectFileCreatorJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
@@ -92,8 +93,10 @@ public class SurveySelectVM extends BaseVM {
 
 	private Window surveyExportPopup;
 
-	@Init()
+	@Override
+	@Init(superclass=false)
 	public void init() {
+		super.init();
 		PageUtil.clearConfirmClose();
 		loadSurveySummaries();
 	}
@@ -129,10 +132,28 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void exportSelectedSurvey() throws IOException {
-		//set default parameters
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("survey", selectedSurvey);
-		surveyExportPopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
+		if ( collectEarthEditor ) {
+			CollectSurvey survey = loadSelectedSurvey();
+			
+			CollectEarthProjectFileCreatorJob job = springJobManager.createJob(CollectEarthProjectFileCreatorJob.class);
+			job.setSurvey(survey);
+			
+			springJobManager.start(job, false);
+			
+			if ( job.isCompleted() ) {
+				File file = job.getOutputFile();
+				
+				String contentType = URLConnection.guessContentTypeFromName(file.getName());
+				FileInputStream is = new FileInputStream(file);
+				Filedownload.save(is, contentType, survey.getName() + ".zip");
+			} else {
+				MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {job.getErrorMessage()});
+			}
+		} else {
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("survey", selectedSurvey);
+			surveyExportPopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
+		}
 	}
 	
 	@GlobalCommand

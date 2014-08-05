@@ -29,6 +29,16 @@ public abstract class BaseVM {
 	@WireVariable
 	private UserManager userManager;
 
+	//application context init parameters
+	protected boolean collectEarthEditor;
+	protected String collectEarhProjectPackageUrl;
+
+	void init() {
+		//read context init parameters
+		collectEarhProjectPackageUrl = getInitParameter("collect_earth.project_package_url");
+		collectEarthEditor = org.apache.commons.lang3.StringUtils.isNotBlank(collectEarhProjectPackageUrl);
+	}
+	
 	public String getComponentsPath() {
 		return Resources.COMPONENTS_BASE_PATH;
 	}
@@ -101,4 +111,9 @@ public abstract class BaseVM {
 		return result;
 	}
 	
+
+	public boolean isCollectEarthEditor() {
+		return collectEarthEditor;
+	}
 }
+

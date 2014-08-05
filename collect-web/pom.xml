@@ -113,7 +113,7 @@
 		<profile>
 			<id>jetty</id>
 			<build>
-				<finalName>collect-jetty</finalName>
+				<finalName>collect</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -139,6 +139,7 @@
 						<configuration>
 							<webXml>${basedir}/target/web.xml</webXml>
 							<failOnMissingWebXml>false</failOnMissingWebXml>
+							<classifier>jetty</classifier>
 						</configuration>
 					</plugin>
 					<plugin>
