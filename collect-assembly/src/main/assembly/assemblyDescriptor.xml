@@ -75,7 +75,7 @@
 		<dependencySet>
 			<outputDirectory>${output.directory}/tomcat/webapps/collect</outputDirectory>
 			<includes>
-				<include>org.openforis.collect:collect-web</include>
+				<include>org.openforis.collect:collect-webapp-tomcat</include>
 			</includes>
 			<unpack>true</unpack>
 		</dependencySet>
