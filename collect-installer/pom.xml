@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.2.0-a3-SNAPSHOT</version>
+		<version>3.2.0-a11-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
@@ -12,14 +12,16 @@
 	
 	<properties>
 		<!-- to avoid replacing relative path to images and other resources used by the installer -->
-		<installer-dir>src/main/installer</installer-dir>
+		<installer-dir>${project.build.directory}/installer</installer-dir>
 
 		<installbuilder-file-name>installbuilder.xml</installbuilder-file-name>
+
+		<jdk.version>1.8.0_05</jdk.version>
 
 		<!-- installer file names -->
 		<windows-installer-file-name>OpenForisCollect-${project.version}-windows-installer.exe</windows-installer-file-name>
 		<linux-installer-file-name>OpenForisCollect-${project.version}-linux-installer.run</linux-installer-file-name>
-		<osx-installer-file-name>OpenForisCollect-${project.version}-osx-installer.run</osx-installer-file-name>	
+		<osx-installer-file-name>OpenForisCollect-${project.version}-osx-installer.run</osx-installer-file-name>
 	</properties>
 	
 	<profiles>
@@ -27,13 +29,95 @@
 			<id>assembly</id>
 			<build>
 				<plugins>
-
+					 <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.6</version>
+                        <executions>
+                            <execution>
+                                <id>unpack-jdk</id>
+                                <phase>process-sources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+										<artifactItem>
+											<groupId>com.oracle.java</groupId>
+											<artifactId>jdk</artifactId>
+											<version>${jdk.version}</version>
+											<classifier>linux-i386</classifier>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}/</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.oracle.java</groupId>
+											<artifactId>jdk</artifactId>
+											<version>${jdk.version}</version>
+											<classifier>linux-x64</classifier>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}/</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.oracle.java</groupId>
+											<artifactId>jdk</artifactId>
+											<version>${jdk.version}</version>
+											<classifier>osx</classifier>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}/</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.oracle.java</groupId>
+											<artifactId>jdk</artifactId>
+											<version>${jdk.version}</version>
+											<classifier>windows-i386</classifier>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}/</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.oracle.java</groupId>
+											<artifactId>jdk</artifactId>
+											<version>${jdk.version}</version>
+											<classifier>windows-x64</classifier>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}/</outputDirectory>
+										</artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+								<id>copy-collect-assembly</id>
+								<phase>process-sources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.openforis.collect</groupId>
+											<artifactId>collect-assembly</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-dir}/</outputDirectory>
+											<destFileName>collect-server.zip</destFileName>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+                        </executions>
+                    </plugin>
+					
 					<!-- 1. copy installbuilder-source-file -->
 					<plugin>
 						<artifactId>maven-resources-plugin</artifactId>
 						<version>2.6</version>
 						<executions>
-
 							<execution>
 								<id>copy-installbuilder-source-file</id>
 								<phase>prepare-package</phase>
@@ -47,13 +131,14 @@
 											<directory>src/main/resources</directory>
 											<includes>
 								                <include>${installbuilder-file-name}</include>
+								                <include>java.xml</include>
+								                <include>images/**</include>
 								            </includes>
 										</resource>
 									</resources>
 						            <overwrite>true</overwrite>
 								</configuration>
 							</execution>
-
 						</executions>
 					</plugin>
 
@@ -88,7 +173,7 @@
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.1</version>
 						<executions>
-
+							<!-- Linux -->
 							<execution>
 								<id>linux-installer</id>
 								<phase>package</phase>
@@ -99,12 +184,12 @@
 									<executable>${installbuilder-home}/bin/builder</executable>
 									<arguments>
 										<argument>build</argument>
-										<argument>${basedir}/${installer-dir}/${installbuilder-file-name}</argument>
+										<argument>${installer-dir}/${installbuilder-file-name}</argument>
 										<argument>linux</argument>
 									</arguments>
 								</configuration>
 							</execution>
-
+							<!-- Windows -->
 							<execution>
 								<id>windows-installer</id>
 								<phase>package</phase>
@@ -115,12 +200,11 @@
 									<executable>${installbuilder-home}/bin/builder</executable>
 									<arguments>
 										<argument>build</argument>
-										<argument>${basedir}/${installer-dir}/${installbuilder-file-name}</argument>
+										<argument>${installer-dir}/${installbuilder-file-name}</argument>
 										<argument>windows</argument>
 									</arguments>
 								</configuration>
 							</execution>
-
 						</executions>
 					</plugin>
 

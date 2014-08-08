@@ -15,7 +15,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>JDK1.8/java-windows/*</origin>
+                    <origin>jdk${java.version}-windows/java-windows/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -30,7 +30,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>JDK1.8/java-linux/*</origin>
+                    <origin>jdk${java.version}-linux/java-linux/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -45,43 +45,43 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>JDK1.8/java-linux-x64/*</origin>
+                    <origin>jdk${java.version}-linux-x64/java-linux-x64/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
                 <isTrue value="${java_install_jre}"/>
             </ruleList>
         </folder>
-        <folder>
-            <description>Java binaries - Solaris Sparc</description>
-            <destination>${installdir}/java</destination>
-            <name>java_solaris_sparc</name>
-            <platforms>solaris-sparc</platforms>
-            <distributionFileList>
-                <distributionFile>
-                    <allowWildcards>1</allowWildcards>
-                    <origin>JDK1.8/java-solaris-sparc/*</origin>
-                </distributionFile>
-            </distributionFileList>
-            <ruleList>
-                <isTrue value="${java_install_jre}"/>
-            </ruleList>
-        </folder>
-        <folder>
-            <description>Java binaries - Solaris Intel</description>
-            <destination>${installdir}/java</destination>
-            <name>java_solaris_intel</name>
-            <platforms>solaris-intel</platforms>
-            <distributionFileList>
-                <distributionFile>
-                    <allowWildcards>1</allowWildcards>
-                    <origin>JDK1.8/java-solaris-intel/*</origin>
-                </distributionFile>
-            </distributionFileList>
-            <ruleList>
-                <isTrue value="${java_install_jre}"/>
-            </ruleList>
-        </folder>
+<!--         <folder> -->
+<!--             <description>Java binaries - Solaris Sparc</description> -->
+<!--             <destination>${installdir}/java</destination> -->
+<!--             <name>java_solaris_sparc</name> -->
+<!--             <platforms>solaris-sparc</platforms> -->
+<!--             <distributionFileList> -->
+<!--                 <distributionFile> -->
+<!--                     <allowWildcards>1</allowWildcards> -->
+<!--                     <origin>JDK1.8/java-solaris-sparc/*</origin> -->
+<!--                 </distributionFile> -->
+<!--             </distributionFileList> -->
+<!--             <ruleList> -->
+<!--                 <isTrue value="${java_install_jre}"/> -->
+<!--             </ruleList> -->
+<!--         </folder> -->
+<!--         <folder> -->
+<!--             <description>Java binaries - Solaris Intel</description> -->
+<!--             <destination>${installdir}/java</destination> -->
+<!--             <name>java_solaris_intel</name> -->
+<!--             <platforms>solaris-intel</platforms> -->
+<!--             <distributionFileList> -->
+<!--                 <distributionFile> -->
+<!--                     <allowWildcards>1</allowWildcards> -->
+<!--                     <origin>JDK1.8/java-solaris-intel/*</origin> -->
+<!--                 </distributionFile> -->
+<!--             </distributionFileList> -->
+<!--             <ruleList> -->
+<!--                 <isTrue value="${java_install_jre}"/> -->
+<!--             </ruleList> -->
+<!--         </folder> -->
         <folder>
             <description>Java binaries - Mac OS X</description>
             <destination>${installdir}/java</destination>
@@ -90,7 +90,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>JDK1.8/java-osx/*</origin>
+                    <origin>jdk${java.version}-osx/java-osx/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
@@ -129,20 +129,20 @@
             <allowEmptyValue>1</allowEmptyValue>
             <width>30</width>
         </stringParameter>
-        <stringParameter name="java_launcher_jar" value="OpenForisCalc.jar" ask="0">
+        <stringParameter name="java_launcher_jar" value="OpenForisCollect.jar" ask="0">
             <description></description>
             <explanation></explanation>
             <default></default>
             <allowEmptyValue>1</allowEmptyValue>
             <width>30</width>
         </stringParameter>
-        <stringParameter name="java_launcher_mainClass" value="org.openforis.calc.controlpanel.CalcControlPanel" ask="0">
-            <description></description>
-            <explanation></explanation>
-            <default></default>
-            <allowEmptyValue>1</allowEmptyValue>
-            <width>30</width>
-        </stringParameter>
+<!--         <stringParameter name="java_launcher_mainClass" value="org.openforis.calc.controlpanel.CalcControlPanel" ask="0"> -->
+<!--             <description></description> -->
+<!--             <explanation></explanation> -->
+<!--             <default></default> -->
+<!--             <allowEmptyValue>1</allowEmptyValue> -->
+<!--             <width>30</width> -->
+<!--         </stringParameter> -->
         <stringParameter name="java_launcher_classpath" value="" ask="0">
             <description></description>
             <explanation></explanation>
@@ -150,13 +150,13 @@
             <allowEmptyValue>1</allowEmptyValue>
             <width>30</width>
         </stringParameter>
-        <stringParameter name="java_launcher_startmenu_shortcut_name" value="OpenForisCalc Control Panel" ask="0">
-            <description></description>
-            <explanation></explanation>
-            <default></default>
-            <allowEmptyValue>1</allowEmptyValue>
-            <width>30</width>
-        </stringParameter>
+<!--         <stringParameter name="java_launcher_startmenu_shortcut_name" value="OpenForisCalc Control Panel" ask="0"> -->
+<!--             <description></description> -->
+<!--             <explanation></explanation> -->
+<!--             <default></default> -->
+<!--             <allowEmptyValue>1</allowEmptyValue> -->
+<!--             <width>30</width> -->
+<!--         </stringParameter> -->
         <booleanParameter name="java_launcher_add_to_win_startmenu" value="1" ask="0">
             <description></description>
             <explanation></explanation>
@@ -1094,7 +1094,7 @@
                     <runInConsole>0</runInConsole>
                     <usePropertiesFile>0</usePropertiesFile>
                     <vmParameters>${java_launcher_vm_parameters}</vmParameters>
-                    <windowsExecutableIcon>${installdir}/calc-server/tomcat/webapps/calc/img/of-logo-small-ico.ico</windowsExecutableIcon>
+                    <windowsExecutableIcon>${installdir}/collect-server/tomcat/webapps/collect/assets/images/of-logo-small-ico.ico</windowsExecutableIcon>
                     <windowsResourceFileVersion>${project.version}</windowsResourceFileVersion>
                     <workingDirectory>${java_launcher_destination}</workingDirectory>
                 </javaLauncher>
@@ -1138,7 +1138,7 @@
                             <runInTerminal>0</runInTerminal>
                             <windowsExec>${java_launcher_destination}/${java_launcher_binary_name}</windowsExec>
                             <windowsExecArgs></windowsExecArgs>
-                            <windowsIcon>${installdir}/calc-server/tomcat/webapps/calc/img/of-logo-small-ico.ico</windowsIcon>
+                            <windowsIcon>${installdir}/collect-server/tomcat/webapps/collect/assets/images/of-logo-small-ico.ico</windowsIcon>
                             <windowsPath>${java_launcher_destination}</windowsPath>
                         </startMenuShortcut>
                     </shortcutList>
