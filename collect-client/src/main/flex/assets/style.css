@@ -228,8 +228,8 @@ mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 	borderColor: #FF8800;
 }
 
-input|AttributeRenderer,
-	detail|CompositeAttributeRenderer {
+detail|AttributeItemRenderer,
+detail|CompositeAttributeRenderer {
 	skin-class: ClassReference("org.openforis.collect.ui.skin.SimpleBorderBoxSkin");
 	borderColor: #FFFFFF;
 	borderWeight: 1;

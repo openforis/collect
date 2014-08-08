@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.component;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.zkoss.zk.ui.Component;
@@ -22,23 +24,10 @@ public class FieldErrorHandler extends Div {
 	private FieldErrorTooltip tooltip;
 	private String message;
 
-	private XulElement field;
-	
 	public FieldErrorHandler() {
 		super();
 	}
 
-	@Override
-	public boolean insertBefore(Component newChild, Component refChild) {
-		boolean result = super.insertBefore(newChild, refChild);
-		if ( newChild instanceof XulElement ) {
-			field = (XulElement) newChild;
-			updateFieldStyle();
-		}
-		return result;
-	}
-	
-	
 	public String getMessage() {
 		return message;
 	}
@@ -50,7 +39,13 @@ public class FieldErrorHandler extends Div {
 	
 	protected void updateErrorFeedback() {
 		updateTooltip();
-		updateFieldStyle();
+		List<Component> children = getChildren();
+		for (Component child : children) {
+			if ( child instanceof XulElement ) {
+				setTooltipOnField((XulElement) child);
+				updateFieldStyle((XulElement) child);
+			}
+		}
 	}
 
 	protected void updateTooltip() {
@@ -65,12 +60,13 @@ public class FieldErrorHandler extends Div {
 		}
 	}
 
-	protected void updateFieldStyle() {
-		if ( field != null ) {
-			field.setTooltip(tooltip);
-			boolean hasError = StringUtils.isNotBlank(message);
-			ComponentUtil.toggleClass(field, FIELD_ERROR_SCLASS, hasError);
-		}
+	protected void setTooltipOnField(XulElement field) {
+		field.setTooltip(this.tooltip);
+	}
+	
+	protected void updateFieldStyle(XulElement field) {
+		boolean hasError = StringUtils.isNotBlank(message);
+		ComponentUtil.toggleClass(field, FIELD_ERROR_SCLASS, hasError);
 	}
 
 	protected void initTooltip() {
@@ -83,14 +79,6 @@ public class FieldErrorHandler extends Div {
 			this.removeChild(tooltip);
 			this.tooltip = null;
 		}
-	}
-	
-	public XulElement getField() {
-		return field;
-	}
-
-	public void setField(XulElement field) {
-		this.field = field;
 	}
 	
 }

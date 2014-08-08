@@ -49,6 +49,19 @@
 					return "";
 				}
 			}
+			
+			public function infoLabelFunction(item:SamplingDesignItemProxy, column:GridColumn):String {
+				var dataField:String = column.dataField;
+				var parts:Array = dataField.split("_");
+				var posString:String = parts[1];
+				var pos:int = int(posString);
+				if ( pos > 0 && pos <= item.infos.length ) {
+					var result:Object = item.infos.getItemAt(pos - 1);
+					return String(result);
+				} else {
+					return "";
+				}
+			}
 
 			public function srsLabelFunction(item:SpatialReferenceSystemProxy):String {
 				//TODO use label

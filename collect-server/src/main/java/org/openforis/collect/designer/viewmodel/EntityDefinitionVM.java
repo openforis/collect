@@ -16,12 +16,14 @@ import org.zkoss.bind.annotation.Init;
  */
 public class EntityDefinitionVM extends NodeDefinitionVM<EntityDefinition> {
 
-	@Override
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") EntityDefinition attributeDefn, 
-			@ExecutionArgParam("newItem") Boolean newItem) {
+			@ExecutionArgParam("newItem") Boolean newItem,
+			@ExecutionArgParam("doNotCommitChangesImmediately") Boolean doNotCommitChangesImmediately) {
 		super.init(parentEntity, attributeDefn, newItem);
+		boolean doNotCommitChangesImmediatelyBool = doNotCommitChangesImmediately == null ? false: doNotCommitChangesImmediately.booleanValue();
+		this.commitChangesOnApply = ! doNotCommitChangesImmediatelyBool;
 	}
 	
 	@Override
@@ -30,7 +32,5 @@ public class EntityDefinitionVM extends NodeDefinitionVM<EntityDefinition> {
 		return (NodeDefinitionFormObject<EntityDefinition>) 
 				NodeDefinitionFormObject.newInstance(parentEntity, NodeType.ENTITY, null);
 	}
-
-	
 	
 }

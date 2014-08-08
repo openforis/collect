@@ -1,0 +1,113 @@
+<?page title="Open Foris Collect Database Designer - Select Survey"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="layouts/template.zul"?>
+<?init class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./surveySelectBox"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
+
+<vbox id="surveySelectBox" self="@define(content)" 
+  height="100%"
+  width="100%" 
+  align="center" 
+  spacing="10px"
+  apply="org.openforis.collect.designer.composer.SurveySelectComposer"
+  viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectVM')">
+
+  <space height="10px" />
+  
+  <hbox hflex="1">
+    <box hflex="1">
+       <button id="goToIndexBtn"
+        image="/assets/images/back-small.png"
+        label="${labels.surveys_list.go_to_index_page}"
+        onClick="@command('goToIndex')" />
+    </box>
+    <box hflex="2" align="center">
+      <label sclass="mainTitle" value="${labels.designer_title}" />
+    </box>
+    <box hflex="1">
+    </box>
+  </hbox>
+
+	<timer id="surveysListUpdateTimer" delay="3000" repeats="true" /> 
+
+  <listbox id="surveysListbox" 
+    rows="8"
+    width="830px" 
+    model="@load(vm.surveySummaries)"
+    selectedItem="@bind(vm.selectedSurvey)">
+    <listhead>
+      <listheader label="${labels.survey.name}" width="200px" 
+        sort="auto(name)" />
+      <listheader label="${labels.survey.project_name}" width="300px" 
+        sort="auto(projectName)" />
+      <listheader label="${labels.survey.modified}" width="70px"
+        sort="auto(work, published, name)" />
+      <listheader label="${labels.survey.published}" width="70px"
+        sort="auto(published, work, name)" />
+      <listheader label="${labels.survey.records_validation_status}" />
+    </listhead>
+    <template name="model">
+      <listitem>
+        <listcell label="@load(each.name)"
+          onDoubleClick="@command('editSelectedSurvey')" />
+        <listcell label="@load(each.projectName)"
+          onDoubleClick="@command('editSelectedSurvey')" />
+        <listcell
+          onDoubleClick="@command('editSelectedSurvey')">
+          <box align="center" width="100%" visible="${each.work}">
+            <image src="/assets/images/tick-small.png" />
+          </box>
+        </listcell>
+        <listcell
+          onDoubleClick="@command('editSelectedSurvey')">
+          <box align="center" width="100%" visible="${each.published}">
+            <image src="/assets/images/tick-small.png" />
+          </box>
+        </listcell>
+        <listcell>
+        	<hlayout hflex="1" visible="@load(each.recordValidationInProgress)">
+	        	<label value="@load(each.recordValidationProgressPercent)" />
+	        	%
+	        	<progressmeter value="@load(each.recordValidationProgressPercent)" 
+	        		hflex="1" />
+        	</hlayout>
+        </listcell>
+      </listitem>
+    </template>
+  </listbox>
+
+  <hlayout spacing="50px">
+  	<button label="${labels.global.new_item}"
+  		onClick="@command('newSurvey')" />
+
+  	<button label="${labels.global.edit_item}"
+  		onClick="@command('editSelectedSurvey')"
+  		disabled="@load(vm.editingDisabled)" />
+
+  	<button label="${labels.survey.export.$}"
+  		onClick="@command('exportSelectedSurvey')"
+  		disabled="@load(vm.exportDisabled)" />
+
+  	<button label="${labels.survey.import_survey.$}"
+  		onClick="@command('openSurveyImportPopUp')" />
+
+  	<button label="${labels.survey.publish.$}"
+  		onClick="@command('publishSelectedSurvey')"
+  		disabled="@load(vm.publishDisabled)" />
+
+  	<button
+  		visible="@load(vm.selectedSurvey.published and not vm.selectedSurvey.recordValidationInProgress)"
+  		label="${labels.survey.validateAllRecords}"
+  		onClick="@command('validateAllRecords')" />
+
+  	<button
+  		visible="@load(vm.selectedSurvey.recordValidationInProgress)"
+  		label="${labels.survey.cancelRecordValidation}"
+  		onClick="@command('cancelRecordValidation')" />
+
+  	<button label="${labels.survey.delete.$}"
+  		onClick="@command('deleteSelectedSurvey')"
+  		disabled="@load(vm.editingDisabled)" />
+
+  </hlayout>
+
+</vbox>

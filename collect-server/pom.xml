@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.2.0-a3-SNAPSHOT</version>
+		<version>3.2.0-a11-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -192,11 +192,6 @@
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
-			<version>${aspectj.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjtools</artifactId>
 			<version>${aspectj.version}</version>
 		</dependency>
 		<!-- end of aspectj dependencies -->

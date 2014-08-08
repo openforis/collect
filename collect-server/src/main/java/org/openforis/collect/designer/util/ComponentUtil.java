@@ -33,6 +33,13 @@ public class ComponentUtil {
 		return binder;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static <T> T getViewModel(Component component) {
+		Binder binder = getBinder(component);
+		Object viewModel = binder.getViewModel();
+		return (T) viewModel;
+	}
+
 	public static void addClass(HtmlBasedComponent component, String className) {
 		String oldSclass = component.getSclass();
 		if ( oldSclass == null ) {

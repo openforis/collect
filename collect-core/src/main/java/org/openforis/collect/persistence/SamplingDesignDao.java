@@ -6,6 +6,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OF
 import java.sql.Connection;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,8 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem, SamplingDesignDao.JooqFactory> {
 	
 	@SuppressWarnings("rawtypes")
-	private static final TableField[] LEVEL_CODE_FIELDS = {OFC_SAMPLING_DESIGN.LEVEL1, OFC_SAMPLING_DESIGN.LEVEL2, OFC_SAMPLING_DESIGN.LEVEL3}; 
-	@SuppressWarnings("rawtypes")
 	private static final TableField[] FIELDS = {
 		OFC_SAMPLING_DESIGN.ID,
 		OFC_SAMPLING_DESIGN.SURVEY_ID,
@@ -44,8 +43,30 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		OFC_SAMPLING_DESIGN.LOCATION,
 		OFC_SAMPLING_DESIGN.LEVEL1,
 		OFC_SAMPLING_DESIGN.LEVEL2,
-		OFC_SAMPLING_DESIGN.LEVEL3
+		OFC_SAMPLING_DESIGN.LEVEL3,
+		OFC_SAMPLING_DESIGN.INFO1,
+		OFC_SAMPLING_DESIGN.INFO2,
+		OFC_SAMPLING_DESIGN.INFO3,
+		OFC_SAMPLING_DESIGN.INFO4,
+		OFC_SAMPLING_DESIGN.INFO5
 	};
+	
+
+	@SuppressWarnings("rawtypes")
+	public static final TableField[] LEVEL_CODE_FIELDS = {
+		OFC_SAMPLING_DESIGN.LEVEL1, 
+		OFC_SAMPLING_DESIGN.LEVEL2, 
+		OFC_SAMPLING_DESIGN.LEVEL3
+	}; 
+	
+	@SuppressWarnings("rawtypes")
+	public static final TableField[] INFO_FIELDS = {
+		OFC_SAMPLING_DESIGN.INFO1, 
+		OFC_SAMPLING_DESIGN.INFO2, 
+		OFC_SAMPLING_DESIGN.INFO3,
+		OFC_SAMPLING_DESIGN.INFO4,
+		OFC_SAMPLING_DESIGN.INFO5
+	}; 
 	
 	public SamplingDesignDao() {
 		super(SamplingDesignDao.JooqFactory.class);
@@ -175,6 +196,8 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 				OFC_SAMPLING_DESIGN.LOCATION
 			};
 		selectFields = ArrayUtils.addAll(selectFields, LEVEL_CODE_FIELDS);
+		selectFields = ArrayUtils.addAll(selectFields, INFO_FIELDS);
+		
 		TableField<OfcSamplingDesignRecord, Integer> oldSurveyIdField = getSurveyIdField(oldSurveyWork);
 		Select<?> select = jf.select(selectFields)
 			.from(OFC_SAMPLING_DESIGN)
@@ -207,12 +230,11 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 
 	protected static class JooqFactory extends MappingJooqFactory<SamplingDesignItem> {
 
-		private static final String LOCATION_FORMAT = "#";
-
 		private static final long serialVersionUID = 1L;
-		
-		private static final String LOCATION_FORMAT_PATTERN = "SRID={0};POINT({1} {2})";
-		
+
+		private static final String LOCATION_POINT_FORMAT = "#";
+		private static final String LOCATION_PATTERN = "SRID={0};POINT({1} {2})";
+
 		public JooqFactory(Connection connection) {
 			super(connection, OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ, SamplingDesignItem.class);
 		}
@@ -236,6 +258,15 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 					break;
 				}
 			}
+			for (int i = 0; i < INFO_FIELDS.length; i++) {
+				Field<String> field = INFO_FIELDS[i];
+				String value = r.getValue(field);
+				if ( StringUtils.isNotBlank(value) ) {
+					s.addInfoAttribute(r.getValue(field));
+				} else {
+					break;
+				}
+			}
 		}
 
 		@Override
@@ -246,9 +277,15 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			q.addValue(OFC_SAMPLING_DESIGN.SURVEY_WORK_ID, s.getSurveyWorkId());
 			q.addValue(OFC_SAMPLING_DESIGN.LOCATION, extractLocation(s));
 			String[] levelCodeValues = extractLevelCodeValues(s);
-			for ( int i = 0; i < LEVEL_CODE_FIELDS.length; i++ ) {
-				Field<String> field = LEVEL_CODE_FIELDS[i];
+			for ( int i = 0; i < levelCodeValues.length; i++ ) {
 				String value = levelCodeValues[i];
+				Field<String> field = LEVEL_CODE_FIELDS[i];
+				q.addValue(field, value);
+			}
+			List<String> infoValues = s.getInfoAttributes();
+			for ( int i = 0; i < infoValues.size(); i++ ) {
+				String value = infoValues.get(i);
+				Field<String> field = INFO_FIELDS[i];
 				q.addValue(field, value);
 			}
 		}
@@ -259,22 +296,36 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			return insertInto(OFC_SAMPLING_DESIGN, FIELDS).values(valuesPlaceholders);
 		}
 		
+		@SuppressWarnings("unchecked")
 		protected Object[] extractValues(SamplingDesignItem item) {
-			Object[] values = {
-					item.getId(), 
-					item.getSurveyId(),
-					item.getSurveyWorkId(),
-					extractLocation(item)
-					};
+			List<Object> values = new ArrayList<Object>();
+			values.addAll(Arrays.asList(
+				item.getId(), 
+				item.getSurveyId(),
+				item.getSurveyWorkId(),
+				extractLocation(item)
+			));
+			//add level codes
 			Object[] levelCodeValues = extractLevelCodeValues(item);
-			values = ArrayUtils.addAll(values, levelCodeValues);
-			return values;
+			values.addAll(Arrays.asList(levelCodeValues));
+			
+			//add info
+			Object[] infos = new Object[INFO_FIELDS.length];
+			Arrays.fill(infos, null);
+			List<String> itemInfos = item.getInfoAttributes();
+			for (int i = 0; i < itemInfos.size(); i++) {
+				String info = itemInfos.get(i);
+				infos[i] = info;
+			}
+			values.addAll(Arrays.asList(infos));
+			Object[] result = values.toArray(new Object[0]);
+			return result;
 		}
 
 		protected String[] extractLevelCodeValues(SamplingDesignItem item) {
 			List<String> levelCodes = item.getLevelCodes();
 			if ( levelCodes.size() > LEVEL_CODE_FIELDS.length ) {
-				throw new IllegalArgumentException("Only " + LEVEL_CODE_FIELDS.length + " code level are supported");
+				throw new IllegalArgumentException("Only " + LEVEL_CODE_FIELDS.length + " code levels are supported");
 			}
 			String[] result = new String[LEVEL_CODE_FIELDS.length];
 			for ( int i = 0; i < LEVEL_CODE_FIELDS.length; i++ ) {
@@ -298,8 +349,8 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			if ( i.getSrsId() == null || i.getX() == null || i.getY() == null ) {
 				return null;
 			} else {
-				DecimalFormat formatter = new DecimalFormat(LOCATION_FORMAT);
-				String result = MessageFormat.format(LOCATION_FORMAT_PATTERN, 
+				DecimalFormat formatter = new DecimalFormat(LOCATION_POINT_FORMAT);
+				String result = MessageFormat.format(LOCATION_PATTERN, 
 						i.getSrsId(), 
 						formatter.format(i.getX()),
 						formatter.format(i.getY())

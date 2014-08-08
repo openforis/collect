@@ -3,14 +3,19 @@ package org.openforis.collect.io.metadata.samplingdesign;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -45,10 +50,10 @@ public class SamplingDesignExportTask extends Task {
 			Integer surveyId = survey.getId();
 			boolean work = survey.isWork();
 			
-			CsvWriter writer = new CsvWriter(outputStream);
+			CsvWriter writer = new CsvWriter(outputStream, OpenForisIOUtils.UTF_8, ',', '"');
 			SamplingDesignSummaries summaries = work ? 
 					samplingDesignManager.loadBySurveyWork(surveyId): 
-						samplingDesignManager.loadBySurvey(surveyId);
+					samplingDesignManager.loadBySurvey(surveyId);
 					
 			ArrayList<String> colNames = getHeaders();
 			writer.writeHeaders(colNames.toArray(new String[0]));
@@ -68,7 +73,24 @@ public class SamplingDesignExportTask extends Task {
 		colNames.add(SamplingDesignFileColumn.X.getColumnName());
 		colNames.add(SamplingDesignFileColumn.Y.getColumnName());
 		colNames.add(SamplingDesignFileColumn.SRS_ID.getColumnName());
+		
+		//info columns
+		List<ReferenceDataDefinition.Attribute> infoAttributes = getSamplingPointInfoAttributes();
+		for (ReferenceDataDefinition.Attribute attribute : infoAttributes) {
+			colNames.add(attribute.getName());
+		}
 		return colNames;
+	}
+
+	private List<ReferenceDataDefinition.Attribute> getSamplingPointInfoAttributes() {
+		ReferenceDataSchema referenceDataSchema = survey.getReferenceDataSchema();
+		SamplingPointDefinition samplingPoint = referenceDataSchema == null ? null: referenceDataSchema.getSamplingPointDefinition();
+		if ( samplingPoint == null ) {
+			return Collections.emptyList();
+		} else {
+			List<ReferenceDataDefinition.Attribute> infoAttributes = samplingPoint.getAttributes(false);
+			return infoAttributes;
+		}
 	}
 
 	protected void writeSummary(CsvWriter writer, SamplingDesignItem item) {
@@ -82,6 +104,12 @@ public class SamplingDesignExportTask extends Task {
 		lineValues.add(item.getX().toString());
 		lineValues.add(item.getY().toString());
 		lineValues.add(item.getSrsId());
+		
+		//write info columns
+		List<ReferenceDataDefinition.Attribute> infoAttributes = getSamplingPointInfoAttributes();
+		for (int i = 0; i < infoAttributes.size(); i++) {
+			lineValues.add(item.getInfoAttribute(i));
+		}
 		writer.writeNext(lineValues.toArray(new String[0]));
 	}
 

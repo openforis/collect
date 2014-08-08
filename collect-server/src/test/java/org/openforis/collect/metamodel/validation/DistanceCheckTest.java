@@ -6,7 +6,9 @@ package org.openforis.collect.metamodel.validation;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.openforis.collect.model.CollectTestSurveyContext;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -20,6 +22,16 @@ import org.openforis.idm.model.EntityBuilder;
  * 
  */
 public class DistanceCheckTest extends ValidationTest {
+
+	public static Coordinate TEST_COORDINATE = Coordinate.parseCoordinate("SRID=EPSG:21035;POINT(805750 9333820)");
+	private static final String TEST_SAMPLING_POINT_DATA = "001";
+
+	@Before
+	public void setup() {
+		CollectTestSurveyContext surveyContext = (CollectTestSurveyContext) record.getSurveyContext();
+		surveyContext.lookupProvider.coordinate = TEST_COORDINATE;
+		surveyContext.lookupProvider.samplingPointData = TEST_SAMPLING_POINT_DATA;
+	}
 
 	@Test
 	public void testValidMaxDistance() {

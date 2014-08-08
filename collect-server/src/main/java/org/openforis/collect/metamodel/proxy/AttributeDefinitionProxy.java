@@ -60,4 +60,8 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 		return uiOptions.isVisibleField(attributeDefinition, field);
 	}
 	
+	@ExternalizedProperty
+	public boolean isCalculated() {
+		return attributeDefinition.isCalculated();
+	}
 }

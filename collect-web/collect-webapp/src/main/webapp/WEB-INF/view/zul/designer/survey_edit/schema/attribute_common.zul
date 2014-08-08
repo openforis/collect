@@ -1,0 +1,27 @@
+<?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<zk>
+	<custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}" />
+	<custom-attributes otherMinorGeneralDetailsForm="${arg.otherMinorGeneralDetailsForm}" />
+	<custom-attributes otherAttributesForm="${arg.otherAttributesForm}" />
+	<custom-attributes otherLayoutForm="${arg.otherLayoutForm}"/>
+  
+	<include id="nodeCommonInclude" src="survey_edit/schema/node_common.zul"
+		otherGeneralDetailsForm="${otherGeneralDetailsForm}"
+		otherMinorGeneralDetailsForm="${otherMinorGeneralDetailsForm}"
+		otherAttributesForm="${otherAttributesForm}"
+		otherLayoutForm="${otherLayoutForm}" />
+
+	<fieldErrorHandler message="@load(vmsgs['attributeDefaults'])">
+		<groupbox width="100%" closable="false" class="tableFieldSet">
+			<caption label="${labels.survey.schema.attribute.attribute_default.table_heading}" />
+			<include src="survey_edit/schema/attribute_defaults_list.zul" />
+		</groupbox>
+	</fieldErrorHandler>
+	
+	<fieldErrorHandler message="@load(vmsgs['checks'])">
+		<groupbox width="100%" closable="false" class="tableFieldSet">
+			<caption label="${labels.survey.schema.node.checks}:" />
+			<include src="survey_edit/schema/check/list.zul" />
+		</groupbox>
+	</fieldErrorHandler>
+</zk>

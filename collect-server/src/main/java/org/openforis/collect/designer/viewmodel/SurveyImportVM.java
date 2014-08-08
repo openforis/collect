@@ -72,6 +72,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private Map<String,String> form;
 	
 	private String uploadedSurveyUri;
+	private String uploadedSurveyName;
 	private File uploadedFile;
 	private String uploadedFileName;
 	private boolean xmlFileUploaded;
@@ -97,6 +98,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		}
 		uploadedFileName = null;
 		uploadedSurveyUri = null;
+		uploadedSurveyName = null;
 		xmlFileUploaded = false;
 		updatingExistingSurvey = false;
 		updatingPublishedSurvey = false;
@@ -300,6 +302,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		} else {
 			survey = summaryJob.getSurvey();
 			uploadedSurveyUri = info.getSurveyUri();
+			uploadedSurveyName = info.getSurveyName();
 			summaryJob = null;
 			
 			notifyChange("uploadedSurveyUri");
@@ -328,13 +331,18 @@ public class SurveyImportVM extends SurveyBaseVM {
 		if ( uploadedSurveyUri != null ) {
 			SurveySummary surveySummary = surveyManager.loadSummaryByUri(uploadedSurveyUri);
 			if ( surveySummary == null ) {
+				//new survey
 				updatingExistingSurvey = false;
-				surveyName = getFormSurveyName();
 				updatingPublishedSurvey = false;
+				surveyName = getFormSurveyName();
+				if ( StringUtils.isEmpty(surveyName) ) {
+					surveyName = uploadedSurveyName;
+				}
 				if ( StringUtils.isEmpty(surveyName) ) {
 					surveyName = suggestSurveyName(uploadedFileName);
 				}
 			} else {
+				//updating existing survey
 				updatingExistingSurvey = true;
 				updatingPublishedSurvey = ! surveySummary.isWork();
 				surveyName = surveySummary.getName();

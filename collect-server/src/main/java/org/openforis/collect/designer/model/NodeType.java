@@ -80,9 +80,6 @@ public enum NodeType {
 			case BOOLEAN:
 				result = schema.createBooleanAttributeDefinition();
 				break;
-			case CALCULATED:
-				result = schema.createCalculatedAttributeDefinition();
-				break;
 			case CODE:
 				result = schema.createCodeAttributeDefinition();
 				break;

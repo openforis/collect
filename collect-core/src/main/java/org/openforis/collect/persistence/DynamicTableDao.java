@@ -74,7 +74,7 @@ public class DynamicTableDao extends JooqDaoSupport {
 		addFilterConditions(lookupTable, select, filters);
 		addNotNullConditions(lookupTable, select, notNullColumns);
 		
-		List<Map<String, String>> result = new ArrayList<Map<String,String>>();
+		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 		Result<Record> selectResult = select.fetch();
 		if ( selectResult != null ) {
 			for (Record record : selectResult) {

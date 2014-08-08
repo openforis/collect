@@ -19,6 +19,7 @@ public enum SamplingDesignFileColumn {
 	
 	public static final String[] REQUIRED_COLUMN_NAMES;
 	public static final String[] LEVEL_COLUMN_NAMES;
+	
 	static {
 		REQUIRED_COLUMN_NAMES = getColumnNames(REQUIRED_COLUMNS);
 		LEVEL_COLUMN_NAMES = getColumnNames(LEVEL_COLUMNS);

@@ -19,6 +19,7 @@ import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -144,6 +145,20 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			IdmlImportTask t = (IdmlImportTask) task;
 			//get output survey and set it into job instance instance variable
 			this.survey = t.getSurvey();
+		} else if ( task instanceof SamplingDesignImportTask ) {
+			saveSurvey();
+		}
+	}
+
+	private void saveSurvey() {
+		try {
+			if ( survey.isWork() ) {
+				surveyManager.saveSurveyWork(survey);
+			} else {
+				surveyManager.updateModel(survey);
+			}
+		} catch (SurveyImportException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	

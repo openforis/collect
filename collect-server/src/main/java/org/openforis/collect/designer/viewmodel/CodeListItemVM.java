@@ -12,7 +12,10 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -35,6 +38,7 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 	public void init(@ExecutionArgParam(ITEM_ARG) CodeListItem item) {
 		super.init();
 		setEditedItem(item);
+		commitChangesOnApply = false;
 	}
 	
 	@Override
@@ -70,17 +74,32 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 	}
 
 	@Command
-	public void close() {
-		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				Map<String, Object> args = new HashMap<String, Object>();
-				args.put("undoChanges", confirmed);
-				BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND, args);
-			}
-		});
+	public void apply(@ContextParam(ContextType.BINDER) Binder binder) {
+		if ( isCurrentFormValid() ) {
+			commitChanges();
+			postClosePopUpCommand(false);
+		} else {
+			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+				@Override
+				public void onOk(boolean confirmed) {
+					postClosePopUpCommand(confirmed);
+				}
+			});
+		}
 	}
 	
+	@Command
+	public void cancel(@ContextParam(ContextType.BINDER) Binder binder) {
+		undoLastChanges(binder.getView());
+		postClosePopUpCommand(true);
+	}
+	
+	private void postClosePopUpCommand(boolean undoChanges) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("undoChanges", undoChanges);
+		BindUtils.postGlobalCommand(null, null, CodeListsVM.CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND, args);
+	}	
+
 	public CodeListManager getCodeListManager() {
 		return codeListManager;
 	}

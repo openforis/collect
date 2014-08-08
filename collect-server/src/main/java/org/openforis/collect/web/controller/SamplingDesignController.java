@@ -6,7 +6,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.manager.SamplingDesignManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.samplingdesign.SamplingDesignExportProcess;
+import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +24,8 @@ public class SamplingDesignController {
 	
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	
 	@RequestMapping(value = "/samplingdesign/export/work/{surveyId}", method = RequestMethod.GET)
 	public @ResponseBody String exportWorkSamplingDesign(HttpServletResponse response,
@@ -42,7 +46,8 @@ public class SamplingDesignController {
 		String fileName = SAMPLING_DESIGN_CSV_FILE_NAME;
 		response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
 		ServletOutputStream out = response.getOutputStream();
-		process.exportToCSV(out, surveyId, work);
+		CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);
+		process.exportToCSV(out, survey);
 		return "ok";
 	}
 	

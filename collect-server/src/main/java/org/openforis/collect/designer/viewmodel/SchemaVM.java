@@ -5,6 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
@@ -130,6 +132,11 @@ public class SchemaVM extends SurveyBaseVM {
 
 	public enum TreeViewType {
 		ENTRY, DATA
+	}
+	
+	public SchemaVM() {
+		super();
+		fieldLabelKeyPrefixes.addAll(0, Arrays.asList("survey.schema.attribute","survey.schema.node","global.item"));
 	}
 	
 	@Override
@@ -342,8 +349,8 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	@Override
-	@GlobalCommand
-	public void undoLastChanges(@ContextParam(ContextType.VIEW) Component view) {
+	public void undoLastChanges() {
+		super.undoLastChanges();
 		if ( editedNode != null ) {
 			if ( newNode ) {
 				treeModel.select(editedNode);
@@ -582,24 +589,62 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	@Command
 	public void editRootEntity() {
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+			@Override
+			public void onOk(boolean confirmed) {
+				if ( confirmed ) {
+					undoLastChanges();
+				}
+				openRootEntityEditPopUp();
+			}
+		});
+	}
+
+	private void openRootEntityEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("formLocation", Resources.Component.ENTITY.getLocation());
 		args.put("title", Labels.getLabel("survey.layout.root_entity"));
 		args.put("parentEntity", null);
 		args.put("item", selectedRootEntity);
 		args.put("newItem", false);
+		args.put("doNotCommitChangesImmediately", true);
 		rootEntityEditPopUp = openPopUp(Resources.Component.NODE_EDIT_POPUP.getLocation(), true, args);
 	}
 	
-	@Command
-	public void closeNodeEditPopUp() {
-		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				closePopUp(rootEntityEditPopUp);
-				rootEntityEditPopUp = null;
-			}
-		});
+	@GlobalCommand
+	public void applyChangesToEditedNodeInPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
+		Component nodeFormContainer = getNodeEditorForm();
+		NodeDefinitionVM<?> vm = ComponentUtil.getViewModel(nodeFormContainer);
+		vm.dispatchValidateCommand(ComponentUtil.getBinder(nodeFormContainer));
+		if ( vm.isCurrentFormValid() ) {
+			vm.commitChanges();
+			closeNodeEditPopUp();
+		} else {
+			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+				@Override
+				public void onOk(boolean confirmed) {
+					closeNodeEditPopUp();
+				}
+			});
+		}
+	}
+
+	private Component getNodeEditorForm() {
+		Component nodeFormContainer = rootEntityEditPopUp.getFellow("nodeFormInclude").getFellow("nodeFormContainer");
+		return nodeFormContainer;
+	}
+	
+	@GlobalCommand
+	public void cancelChangesToEditedNodeInPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
+		Component nodeFormContainer = getNodeEditorForm();
+		NodeDefinitionVM<?> vm = ComponentUtil.getViewModel(nodeFormContainer);
+		vm.undoLastChanges();
+		closeNodeEditPopUp();
+	}
+	
+	private void closeNodeEditPopUp() {
+		closePopUp(rootEntityEditPopUp);
+		rootEntityEditPopUp = null;
 	}
 	
 	@Command

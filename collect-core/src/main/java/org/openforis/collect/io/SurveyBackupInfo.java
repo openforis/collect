@@ -20,15 +20,16 @@ public class SurveyBackupInfo {
 	private static final String DATE_PROP = "date";
 	private static final String COLLECT_VERSION_PROP = "collect_version";
 	private static final String SURVEY_URI_PROP = "survey_uri";
+	private static final String SURVEY_NAME_PROP = "survey_name";
 	
 	private static final Version VERSION_3_0 = new Version("3.0"); //for backwards compatibility
 	
 	private Version collectVersion;
 	private Date date;
 	private String surveyUri;
+	private String surveyName;
 	
-	public SurveyBackupInfo(String surveyUri) {
-		this.surveyUri = surveyUri;
+	public SurveyBackupInfo() {
 		this.collectVersion = Collect.getVersion();
 		this.date = new Date();
 	}
@@ -43,6 +44,7 @@ public class SurveyBackupInfo {
 		props.setProperty(COLLECT_VERSION_PROP, collectVersion.toString());
 		props.setProperty(DATE_PROP, Dates.formatDateToXML(date));
 		props.setProperty(SURVEY_URI_PROP, surveyUri);
+		props.setProperty(SURVEY_NAME_PROP, surveyName);
 		return props;
 	}
 
@@ -54,15 +56,17 @@ public class SurveyBackupInfo {
 	}
 	
 	protected static SurveyBackupInfo parse(Properties props) {
-		String uri = props.getProperty(SURVEY_URI_PROP);
-		SurveyBackupInfo info = new SurveyBackupInfo(uri);
+		SurveyBackupInfo info = new SurveyBackupInfo();
+		info.surveyUri = props.getProperty(SURVEY_URI_PROP);
+		info.surveyName = props.getProperty(SURVEY_NAME_PROP);
 		info.collectVersion = new Version(props.getProperty(COLLECT_VERSION_PROP));
 		info.date = Dates.parseXMLDate(props.getProperty(DATE_PROP));
 		return info;
 	}
 	
 	public static SurveyBackupInfo createOldVersionInstance(String surveyUri) {
-		SurveyBackupInfo info = new SurveyBackupInfo(surveyUri);
+		SurveyBackupInfo info = new SurveyBackupInfo();
+		info.surveyUri = surveyUri;
 		info.setCollectVersion(VERSION_3_0);
 		info.setDate(null);
 		return info;
@@ -86,6 +90,14 @@ public class SurveyBackupInfo {
 	
 	public void setSurveyUri(String surveyUri) {
 		this.surveyUri = surveyUri;
+	}
+	
+	public String getSurveyName() {
+		return surveyName;
+	}
+	
+	public void setSurveyName(String surveyName) {
+		this.surveyName = surveyName;
 	}
 	
 	public Version getCollectVersion() {

@@ -1,7 +1,9 @@
 package org.openforis.collect.presenter
 {
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.ApplicationEvent;
@@ -35,7 +37,21 @@ package org.openforis.collect.presenter
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
+			ChangeWatcher.watch(view, "parentEntity", parentEntityChangeHandler);
+		}
+		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+		}
+		
+		override protected function removeBroadcastEventListeners():void {
+			super.removeBroadcastEventListeners();
+			eventDispatcher.removeEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
+		}
+		
+		protected function parentEntityChangeHandler(event:PropertyChangeEvent):void {
+			updateChildrenVisibility();
 		}
 		
 		protected function initNodeDefinitions():void {
@@ -53,7 +69,7 @@ package org.openforis.collect.presenter
 				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
 				for each (var change:NodeChangeProxy in changeSet.changes) {
 					var node:NodeProxy = record.getNode(change.nodeId);
-					if ( view.parentEntity.isAncestorOf(node) ) {
+					if ( node != null && view.parentEntity.isAncestorOf(node) ) {
 						if ( change is EntityChangeProxy ) {
 							updateChildrenVisibility();
 							break;
@@ -70,15 +86,17 @@ package org.openforis.collect.presenter
 		}
 		
 		private function updateChildrenVisibility():void {
-			var childDefinitionsInVersion:IList = getChildDefinitionsInVersion();
-			var visibilityByChildIndex:ArrayCollection = new ArrayCollection();
-			CollectionUtil.fill(visibilityByChildIndex, true, childDefinitionsInVersion.length);
-			view.visibilityByChildIndex = visibilityByChildIndex;
-			var hideableDefinitions:IList = view.entityDefinition.hideableDefinitions;
-			if ( hideableDefinitions.length > 0 ) {
-				for ( var idx:int = 0; idx < childDefinitionsInVersion.length; idx ++) {
-					var nodeDefn:NodeDefinitionProxy = NodeDefinitionProxy(childDefinitionsInVersion.getItemAt(idx));
-					updateChildVisibility(nodeDefn);
+			if ( view.parentEntity != null ) {
+				var childDefinitionsInVersion:IList = getChildDefinitionsInVersion();
+				var visibilityByChildIndex:ArrayCollection = new ArrayCollection();
+				CollectionUtil.fill(visibilityByChildIndex, true, childDefinitionsInVersion.length);
+				view.visibilityByChildIndex = visibilityByChildIndex;
+				var hideableDefinitions:IList = view.entityDefinition.hideableDefinitions;
+				if ( hideableDefinitions.length > 0 ) {
+					for ( var idx:int = 0; idx < childDefinitionsInVersion.length; idx ++) {
+						var nodeDefn:NodeDefinitionProxy = NodeDefinitionProxy(childDefinitionsInVersion.getItemAt(idx));
+						updateChildVisibility(nodeDefn);
+					}
 				}
 			}
 		}

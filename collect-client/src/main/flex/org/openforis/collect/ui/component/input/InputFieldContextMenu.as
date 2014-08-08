@@ -91,43 +91,49 @@ package org.openforis.collect.ui.component.input {
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var items:Array = new Array();
-
-			switch(step) {
-				case CollectRecord$Step.ENTRY:
-					// REASON BLANK ITEMS
-					if( ! ( _inputField.attributeDefinition is FileAttributeDefinitionProxy) && 
-						( _inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text) )) {
-						items.push( SET_STAR, SET_DASH, SET_ILLEGIBLE );
-					}
-					// CONFIRM ERROR ITEM
-					if( ! _inputField.isEmpty()) {
-						var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(_inputField.attributeDefinition.name);
-						if(hasErrors) {
-							var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(_inputField.attributeDefinition.name);
-							if(! hasConfirmedError) {
-								items.push(CONFIRM_ERROR);
+			var attrDefn:AttributeDefinitionProxy = _inputField.attributeDefinition;
+			var calculated:Boolean = attrDefn.calculated;
+			var editable:Boolean = ! calculated && step != CollectRecord$Step.ANALYSIS;
+			
+			if ( editable ) {
+				switch(step) {
+					case CollectRecord$Step.ENTRY:
+						// REASON BLANK ITEMS
+						if( ! ( attrDefn is FileAttributeDefinitionProxy) && 
+							( _inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text) )) {
+							items.push( SET_STAR, SET_DASH, SET_ILLEGIBLE );
+						}
+						// CONFIRM ERROR ITEM
+						if( ! _inputField.isEmpty()) {
+							var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(attrDefn.name);
+							if(hasErrors) {
+								var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(attrDefn.name);
+								if(! hasConfirmedError) {
+									items.push(CONFIRM_ERROR);
+								}
 							}
 						}
-					}
-					break;
-				case CollectRecord$Step.CLEANSING:
-					if(_inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text)) {
-						items.push(APPROVE_MISSING);
-						if ( _inputField.attributeDefinition.defaultValueApplicable ) {
-							items.push(APPLY_DEFAULT_VALUE);
+						break;
+					case CollectRecord$Step.CLEANSING:
+						if(_inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text)) {
+							items.push(APPROVE_MISSING);
+							if ( attrDefn.defaultValueApplicable ) {
+								items.push(APPLY_DEFAULT_VALUE);
+							}
 						}
-					}
-					break;
+						break;
+				}
 			}
-			//REMARKS
-			items.push(EDIT_REMARKS_MENU_ITEM);
+			if ( step != CollectRecord$Step.ANALYSIS ) {
+				//REMARKS
+				items.push(EDIT_REMARKS_MENU_ITEM);
+			}
 			
-			if(step != CollectRecord$Step.ANALYSIS) {
-				var def:AttributeDefinitionProxy = _inputField.attributeDefinition;
-				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
+			if( editable ) {
+				if(attrDefn.multiple && ! (attrDefn is CodeAttributeDefinitionProxy)) {
 					items.push(DELETE_ATTRIBUTE);
-				} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
-					var entityDef:EntityDefinitionProxy = def.parent;
+				} else if ( attrDefn.parentLayout == UIUtil.LAYOUT_TABLE) {
+					var entityDef:EntityDefinitionProxy = attrDefn.parent;
 					if(entityDef != null && entityDef.multiple) {
 						//var parentEntity:EntityProxy = _inputField.parentEntity;
 						switch(step) {

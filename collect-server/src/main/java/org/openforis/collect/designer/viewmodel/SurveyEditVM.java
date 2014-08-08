@@ -244,7 +244,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 			@Override
 			public void onOk(boolean confirmed) {
 				sessionStatus.setCurrentLanguageCode(selectedLanguageCode);
-				BindUtils.postGlobalCommand(null, null, SurveyLocaleVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
+				BindUtils.postGlobalCommand(null, null, SurveyLanguageVM.CURRENT_LANGUAGE_CHANGED_COMMAND, null);
 				currentLanguageCode = sessionStatus.getCurrentLanguageCode();
 			}
 		});
@@ -408,6 +408,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	@NotifyChange({"availableLanguages"})
 	public void surveyLanguagesChanged() {
+		closeSurveyLanguageSelectPopUp();
+	}
+	
+	@GlobalCommand
+	public void closeSurveyLanguageSelectPopUp() {
 		closePopUp(selectLanguagePopUp);
 		selectLanguagePopUp = null;
 	}

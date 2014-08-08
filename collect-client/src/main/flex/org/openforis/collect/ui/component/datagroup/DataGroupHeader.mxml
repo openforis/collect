@@ -42,6 +42,7 @@
 
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new DataGroupHeaderPresenter(this);
+				_presenter.init();
 			}
 			
 			protected function updateCurrentState():void {

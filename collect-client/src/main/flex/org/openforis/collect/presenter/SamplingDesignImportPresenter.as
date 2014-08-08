@@ -6,6 +6,7 @@ package org.openforis.collect.presenter
 	import flash.net.URLRequestMethod;
 	import flash.net.navigateToURL;
 	
+	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -21,6 +22,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.NavigationUtil;
 	
+	import spark.components.gridClasses.GridColumn;
+	
 	/**
 	 * 
 	 * @author Ricci, Stefano
@@ -29,6 +32,7 @@ package org.openforis.collect.presenter
 	public class SamplingDesignImportPresenter extends AbstractReferenceDataImportPresenter {
 		
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
+		private static const FIXED_COLUMNS_COUNT:int = 6;
 		
 		private var _samplingDesignClient:SamplingDesignClient;
 		private var _samplingDesignImportClient:SamplingDesignImportClient;
@@ -48,6 +52,22 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			view.downloadExampleButton.addEventListener(MouseEvent.CLICK, downloadExampleButtonClickHandler);
+		}
+		
+		private function initInfoColumns(infoAttributes:IList):void {
+			var columns:IList = view.summaryDataGrid.columns;
+			for(var i:int = columns.length - 1; i >= FIXED_COLUMNS_COUNT; i-- ) {
+				columns.removeItemAt(i);
+			}
+			for (var index:int = 0; index < infoAttributes.length; index ++) {
+				var attr:String = String(infoAttributes.getItemAt(index));
+				var col:GridColumn = new GridColumn();
+				col.dataField = "info_" + (index + 1);
+				col.headerText = attr;
+				col.labelFunction = view.infoLabelFunction;
+				col.width = 70;
+				columns.addItem(col);
+			}
 		}
 		
 		private function get messageKeys():MessageKeys {
@@ -81,6 +101,7 @@ package org.openforis.collect.presenter
 		
 		override protected function loadSummariesResultHandler(event:ResultEvent, token:Object=null):void {
 			var result:SamplingDesignSummariesProxy = event.result as SamplingDesignSummariesProxy;
+			initInfoColumns(result.infoAttributes);
 			view.summaryContainer.selectedIndex = result.totalCount > 0 ? 1: 0;
 			view.summaryDataGrid.dataProvider = result.records;
 			view.paginationBar.totalRecords = result.totalCount;

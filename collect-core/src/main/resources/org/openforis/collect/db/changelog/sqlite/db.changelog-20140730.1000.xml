@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-code-list-item-level" author="ricci" dbms="sqlite">
+		<comment>Add code list item level column</comment>
+		
+		<sql>
+			alter table ofc_code_list add column level integer;
+			
+			update ofc_code_list set level = 1 where id in 
+				(select id from ofc_code_list where parent_id is null);
+			
+			update ofc_code_list set level = 2 where id in 
+				(select l2.id 
+				from ofc_code_list l2 
+				join (select id 
+				      from ofc_code_list 
+				      where parent_id is null) l1 
+				on l1.id = l2.parent_id);
+			
+			update ofc_code_list set level = 3 where id in 
+				(select l3.id
+				from ofc_code_list l3 
+				join (select l2.id 
+				      from ofc_code_list l2
+				      join (select id 
+					    from ofc_code_list 
+					    where parent_id is null) l1 
+				      on l1.id = l2.parent_id) l2 
+				on l2.id = l3.parent_id);
+			
+			update ofc_code_list set level = 4 where id in 
+				(select l4.id
+				from ofc_code_list l4
+				join (
+					select l3.id
+					from ofc_code_list l3 
+					join (select l2.id 
+					      from ofc_code_list l2
+					      join (select id 
+						    from ofc_code_list 
+						    where parent_id is null) l1 
+					      on l1.id = l2.parent_id) l2 
+					on l2.id = l3.parent_id) l3
+				on l3.id = l4.parent_id);
+		</sql>
+	</changeSet>
+	
+</databaseChangeLog>

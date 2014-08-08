@@ -10,12 +10,14 @@ import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.idm.metamodel.CodeList;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
@@ -47,18 +49,26 @@ public class CodeListsPopUpVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
-		event.stopPropagation();
+	public void apply(@ContextParam(ContextType.BINDER) final Binder binder) {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
 				Map<String, Object> params = new HashMap<String, Object>();
 				params.put("editingAttribute", editingAttribute);
-				//TODO
-				params.put("selectedCodeList", null);
+				params.put("selectedCodeList", getSelectedCodeList(binder));
 				BindUtils.postGlobalCommand((String) null, (String) null, "closeCodeListsManagerPopUp", params);
 			}
 		});
+	}
+	
+	private CodeList getSelectedCodeList(Binder binder) {
+		Component view = binder.getView();
+		IdSpace spaceOwner = view.getSpaceOwner();
+		Component innerInclude = spaceOwner.getFellow("codeListsInclude");
+		Component managerContainer = innerInclude.getSpaceOwner().getFellow("codeListsManagerContainer");
+		CodeListsVM vm = (CodeListsVM) managerContainer.getAttribute("vm");
+		CodeList codeList = vm.getSelectedItem();
+		return codeList;
 	}
 	
 }

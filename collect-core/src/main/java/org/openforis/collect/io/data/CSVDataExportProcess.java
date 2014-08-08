@@ -19,15 +19,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.util.IOUtils;
-import org.openforis.collect.csv.AutomaticColumnProvider;
-import org.openforis.collect.csv.ColumnProvider;
-import org.openforis.collect.csv.ColumnProviderChain;
-import org.openforis.collect.csv.DataTransformation;
-import org.openforis.collect.csv.ModelCsvWriter;
-import org.openforis.collect.csv.NodePositionColumnProvider;
-import org.openforis.collect.csv.PivotExpressionColumnProvider;
-import org.openforis.collect.csv.SingleAttributeColumnProvider;
 import org.openforis.collect.io.data.DataExportStatus.Format;
+import org.openforis.collect.io.data.csv.AutomaticColumnProvider;
+import org.openforis.collect.io.data.csv.ColumnProvider;
+import org.openforis.collect.io.data.csv.ColumnProviderChain;
+import org.openforis.collect.io.data.csv.DataTransformation;
+import org.openforis.collect.io.data.csv.ModelCsvWriter;
+import org.openforis.collect.io.data.csv.NodePositionColumnProvider;
+import org.openforis.collect.io.data.csv.PivotExpressionColumnProvider;
+import org.openforis.collect.io.data.csv.SingleAttributeColumnProvider;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
@@ -67,12 +67,14 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private boolean includeAllAncestorAttributes;
 	private boolean includeKMLColumnForCoordinates;
 	private boolean includeCodeItemPositionColumn;
+	private boolean includeEnumeratedEntities;
 	private boolean alwaysGenerateZipFile;
 	
 	public CSVDataExportProcess() {
 		includeAllAncestorAttributes = false;
 		includeKMLColumnForCoordinates = false;
 		includeCodeItemPositionColumn = false;
+		includeEnumeratedEntities = true;
 		alwaysGenerateZipFile = false;
 	}
 	
@@ -168,6 +170,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 				break;
 			}
 		}
+		modelWriter.flush();
 	}
 	
 	private Collection<EntityDefinition> getEntitiesToExport() {
@@ -224,25 +227,11 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 
 	protected AutomaticColumnProvider createEntityColumnProvider(
 			EntityDefinition entityDefn) {
-		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider("", entityDefn, null, includeCodeItemPositionColumn, includeKMLColumnForCoordinates);
+		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider("", entityDefn, null, 
+				includeCodeItemPositionColumn, includeKMLColumnForCoordinates, includeEnumeratedEntities);
 		return entityColumnProvider;
 	}
 	
-	private DataTransformation getTransform() throws InvalidExpressionException {
-		CollectSurvey survey = recordFilter.getSurvey();
-		Schema schema = survey.getSchema();
-		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
-		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
-		columnProviders.addAll(createAncestorsColumnsProvider(entityDefn));
-		if ( isPositionColumnRequired(entityDefn) ) {
-			columnProviders.add(createPositionColumnProvider(entityDefn));
-		}
-		columnProviders.add(new AutomaticColumnProvider(entityDefn));
-		ColumnProvider provider = new ColumnProviderChain(columnProviders);
-		String axisPath = entityDefn.getPath();
-		return new DataTransformation(axisPath, provider);
-	}
-
 	private List<ColumnProvider> createAncestorsColumnsProvider(EntityDefinition entityDefn) {
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
 		EntityDefinition ancestorDefn = (EntityDefinition) entityDefn.getParentDefinition();
@@ -374,5 +363,13 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		this.includeCodeItemPositionColumn = includeCodeItemPositionColumn;
 	}
 
+	public boolean isIncludeEnumeratedEntities() {
+		return includeEnumeratedEntities;
+	}
+	
+	public void setIncludeEnumeratedEntities(boolean includeEnumeratedEntities) {
+		this.includeEnumeratedEntities = includeEnumeratedEntities;
+	}
+	
 }
 

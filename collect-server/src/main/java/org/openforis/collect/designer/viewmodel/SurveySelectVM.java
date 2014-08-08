@@ -88,7 +88,7 @@ public class SurveySelectVM extends BaseVM {
 	private SurveyBackupJob surveyBackupJob;
 
 	private Window jobStatusPopUp;
-	private Window newSurveyTemplatePopUp;
+	private Window newSurveyParametersPopUp;
 
 	private Window surveyExportPopup;
 
@@ -118,12 +118,12 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void newSurvey() throws IOException {
-		if ( newSurveyTemplatePopUp != null ) {
-			closePopUp(newSurveyTemplatePopUp);
-			newSurveyTemplatePopUp = null;
+		if ( newSurveyParametersPopUp != null ) {
+			closePopUp(newSurveyParametersPopUp);
+			newSurveyParametersPopUp = null;
 		}
-		newSurveyTemplatePopUp = openPopUp(
-				Resources.Component.SELECT_TEMPLATE_POPUP.getLocation(),
+		newSurveyParametersPopUp = openPopUp(
+				Resources.Component.NEW_SURVEY_PARAMETERS_POPUP.getLocation(),
 				true);
 	}
 
@@ -258,8 +258,9 @@ public class SurveySelectVM extends BaseVM {
 		} else {
 			surveyManager.deleteSurvey(selectedSurvey.getId());
 		}
+		selectedSurvey = null;
 		loadSurveySummaries();
-		notifyChange("surveySummaries");
+		notifyChange("selectedSurvey","surveySummaries");
 	}
 
 	protected boolean validateSurvey(CollectSurvey survey,
@@ -355,7 +356,7 @@ public class SurveySelectVM extends BaseVM {
 			//skip survey list update
 			return;
 		}
-		List<SurveySummary> newSummaries = surveyManager.loadSummaries();
+		List<SurveySummary> newSummaries = surveyManager.loadSummaries(null, true);
 		if (summaries == null) {
 			summaries = newSummaries;
 		} else {
@@ -380,7 +381,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	private void loadSurveySummaries() {
-		summaries = surveyManager.loadSummaries();
+		summaries = surveyManager.loadSummaries(null, true);
 	}
 
 	private SurveySummary findSummary(List<SurveySummary> summaries2,

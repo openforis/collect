@@ -32,11 +32,12 @@
 		<mx:StringValidator id="fNameV" 
 							required="true"
 							source="{nameTextInput}" 
+							maxLength="255"
 							property="text"/>
 		<mx:RegExpValidator id="fPasswordV"
 							required="true"
 							required.selected="false"
-							expression="\w\{5,\}"
+							expression="^\w\{5,255\}$"
 							noMatchError="{Message.get('usersManagement.error.invalidPassword')}"
 							source="{passwordTextInput}" 
 							property="text"/>

@@ -2,7 +2,6 @@ package org.openforis.collect.designer.model;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -20,13 +19,11 @@ import org.zkoss.util.resource.Labels;
  *
  */
 public enum AttributeType {
-	BOOLEAN, CALCULATED, CODE, COORDINATE, DATE, FILE, NUMBER, RANGE, TAXON, TEXT, TIME;
+	BOOLEAN, CODE, COORDINATE, DATE, FILE, NUMBER, RANGE, TAXON, TEXT, TIME;
 	
 	public static AttributeType valueOf(AttributeDefinition defn) {
 		if ( defn instanceof BooleanAttributeDefinition ) {
 			return BOOLEAN;
-		} else if ( defn instanceof CalculatedAttributeDefinition ) {
-			return CALCULATED;
 		} else if ( defn instanceof CodeAttributeDefinition ) {
 			return CODE;
 		} else if ( defn instanceof CoordinateAttributeDefinition ) {
@@ -55,9 +52,6 @@ public enum AttributeType {
 		switch (this) {
 		case BOOLEAN:
 			labelKey = "survey.schema.attribute.type.bool";
-			break;
-		case CALCULATED:
-			labelKey = "survey.schema.attribute.type.calculated";
 			break;
 		case CODE:
 			labelKey = "survey.schema.attribute.type.code";

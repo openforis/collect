@@ -188,17 +188,17 @@ public class DatabaseExternalCodeListProvider implements
 		return filters;
 	}
 	
-	protected ExternalCodeListItem parseRow(Map<String, String> row, CodeList list, int level) {
+	protected ExternalCodeListItem parseRow(Map<String, String> row, CodeList list, int levelIndex) {
 		if ( row == null ) {
 			return null;
 		}
 		String idValue = row.get(ID_COLUMN_NAME);
 		Integer id = Integer.valueOf(idValue);
 		
-		Map<String, String> parentKeysByLevel = createParentKeyByLevelMap(list, row, level);
-		ExternalCodeListItem item = new ExternalCodeListItem(list, id, parentKeysByLevel);
+		Map<String, String> parentKeysByLevel = createParentKeyByLevelMap(list, row, levelIndex);
+		ExternalCodeListItem item = new ExternalCodeListItem(list, id, parentKeysByLevel, levelIndex + 1);
 
-		String currentLevelKeyColName = getLevelKeyColumnName(list, level);
+		String currentLevelKeyColName = getLevelKeyColumnName(list, levelIndex);
 		String code = row.get(currentLevelKeyColName);
 		item.setCode(code);
 		
@@ -263,10 +263,10 @@ public class DatabaseExternalCodeListProvider implements
 		return result;
 	}
 	
-	protected Map<String, String> createParentKeyByLevelMap(CodeList list, Map<String, String> row, int level) {
+	protected Map<String, String> createParentKeyByLevelMap(CodeList list, Map<String, String> row, int levelIndex) {
 		Map<String, String> result = new HashMap<String, String>();
 		List<CodeListLevel> hierarchy = list.getHierarchy();
-		for (int i = 0; i < level - 1; i++) {
+		for (int i = 0; i < levelIndex - 1; i++) {
 			CodeListLevel l = hierarchy.get(i);
 			String levelName = l.getName();
 			result.put(levelName, row.get(levelName));

@@ -52,7 +52,8 @@ public class DataExportService {
 	private SurveyBackupJob backupJob;
 	
 	@Transactional
-	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes, boolean onlyOwnedRecords, String[] rootEntityKeyValues) throws IOException {
+	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes, 
+			boolean includeEnumeratedEntities, boolean onlyOwnedRecords, String[] rootEntityKeyValues) throws IOException {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			resetJobs();
 			
@@ -78,6 +79,7 @@ public class DataExportService {
 			process.setRecordFilter(recordFilter);
 			process.setEntityId(entityId);
 			process.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
+			process.setIncludeEnumeratedEntities(includeEnumeratedEntities);
 			process.setAlwaysGenerateZipFile(true);
 			
 			process.init();

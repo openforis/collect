@@ -13,6 +13,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import liquibase.util.StringUtils;
 
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
@@ -66,10 +70,13 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	private boolean currentFormBlocking;
 	private boolean currentFormValid;
+	private Map<String, List<String>> currentFormValidationMessages;
+	protected List<String> fieldLabelKeyPrefixes;
 
 	public SurveyBaseVM() {
 		currentFormValid = true;
 		currentFormBlocking = false;
+		fieldLabelKeyPrefixes = new ArrayList<String>();
 	}
 
 	@Init
@@ -114,14 +121,20 @@ public abstract class SurveyBaseVM extends BaseVM {
 	
 	@GlobalCommand
 	public void currentFormValidated(@BindingParam("valid") boolean valid, 
-			@BindingParam("blocking") Boolean blocking) {
+			@BindingParam("blocking") Boolean blocking,
+			@BindingParam("validationMessagesByField") Map<String, List<String>> validationMessagesByField) {
 		currentFormValid = valid;
 		currentFormBlocking = blocking != null && blocking.booleanValue();
+		currentFormValidationMessages = validationMessagesByField;
 		notifyChange("currentFormValid","currentFormBlocking");
 	}
 	
 	@GlobalCommand
 	public void undoLastChanges(@ContextParam(ContextType.VIEW) Component view) {
+		undoLastChanges();
+	}
+	
+	public void undoLastChanges() {
 		dispatchCurrentFormValidatedCommand(true);
 	}
 	
@@ -130,9 +143,14 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 
 	public void dispatchCurrentFormValidatedCommand(boolean valid, boolean blocking) {
+		dispatchCurrentFormValidatedCommand(valid, blocking, null);
+	}
+
+	public void dispatchCurrentFormValidatedCommand(boolean valid, boolean blocking, Map<String, List<String>> validationMessagesByField) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("valid", valid);
 		args.put("blocking", blocking);
+		args.put("validationMessagesByField", validationMessagesByField);
 		BindUtils.postGlobalCommand(null, null, "currentFormValidated", args);
 	}
 
@@ -181,11 +199,38 @@ public abstract class SurveyBaseVM extends BaseVM {
 							((CanLeaveFormCompleteConfirmHandler) confirmHandler).onCancel();
 						}
 					}
-				}, messageKey, (Object[]) null, "global.unsaved_changes", (Object[]) null, 
+				}, messageKey, new String[]{getValidationMessageSummary()}, "global.unsaved_changes", (Object[]) null, 
 						"global.continue_and_loose_changes", "global.stay_on_this_page");
 			}
 		}
 		return currentFormValid;
+	}
+
+	private String getValidationMessageSummary() {
+		StringBuilder sb = new StringBuilder();
+		Set<Entry<String,List<String>>> entrySet = currentFormValidationMessages.entrySet();
+		for (Entry<String, List<String>> entry : entrySet) {
+			String key = entry.getKey();
+			String fieldLabel = getFieldLabel(key);
+			List<String> messages = entry.getValue();
+			sb.append(" - ");
+			sb.append(fieldLabel);
+			sb.append(": ");
+			sb.append(StringUtils.join(messages, "; "));
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+
+	private String getFieldLabel(String key) {
+		for ( String prefix : fieldLabelKeyPrefixes ) {
+			String labelKey = prefix + "." + key; 
+			String label = Labels.getLabel(labelKey);
+			if ( label != null ) {
+				return label;
+			}
+		}
+		return key;
 	}
 
 	protected void initSurvey() {

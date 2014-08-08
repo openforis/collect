@@ -149,7 +149,7 @@ package org.openforis.collect.presenter {
 			if ( item == null && view.defaultValue != null && (view.attribute == null || view.attribute.empty) ) {
 				item = getItem(view.defaultValue);
 			}
-			view.editable = Application.activeRecordEditable;
+			view.editable = Application.activeRecordEditable && ! view.attributeDefinition.calculated;
 			view.dropDownList.selectedItem = item;
 			view.hasRemarks = hasRemarks;
 			contextMenu.updateItems();

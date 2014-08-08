@@ -3,7 +3,8 @@
 				   	xmlns:s="library://ns.adobe.com/flex/spark" 
 				   	xmlns:mx="library://ns.adobe.com/flex/mx" 
 					xmlns:detail="org.openforis.collect.ui.component.detail.*"
-					creationComplete="creationCompleteHandler(event)">
+					creationComplete="creationCompleteHandler(event)"
+					>
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
@@ -19,10 +20,13 @@
 			private var _modelVersion:ModelVersionProxy;
 			private var _nodeDefinitions:IList;
 			private var _parentEntity:EntityProxy;
-			private var _occupyAllAvailableSpace:Boolean;
+			/**
+			 * If true, this component needs to be rendered inside a Scroller managed outside of it
+			 */
+			private var _useScroller:Boolean;
 			
 			public static const STATE_DEFAULT:String = "default";
-			public static const STATE_ENLARGED:String = "enlarged";
+			public static const STATE_USE_SCROLLER:String = "useScroller";
 			
 			private var _presenter:InnerFormPresenter;
 			
@@ -73,41 +77,53 @@
 				_parentEntity = value;
 			}
 			
-			[Bindable]
-			public function get occupyAllAvailableSpace():Boolean {
-				return _occupyAllAvailableSpace;
+			[Bindable(event="useScrollerChange")]
+			public function get useScroller():Boolean {
+				return _useScroller;
 			}
 			
-			public function set occupyAllAvailableSpace(value:Boolean):void {
-				_occupyAllAvailableSpace = value;
+			public function set useScroller(value:Boolean):void {
+				_useScroller = value;
+				dispatchEvent(new Event("useScrollerChange"));
+			}
+			
+			[Bindable(event="useScrollerChange")]
+			public function get notUsingScroller():Boolean {
+				return ! useScroller;
 			}
 			
 		]]>
 	</fx:Script>
- 	
+	
+	<fx:Declarations>
+		<!-- to be built programmatically -->
+		<mx:Grid id="grid"
+				 width.default="100%"
+				 height.default="100%"
+				 horizontalGap="4"
+				 verticalGap="2"
+				 paddingBottom.default="0"
+				 paddingLeft.default="0"
+				 paddingRight.default="0"
+				 paddingTop.default="0"
+				 paddingBottom.useScroller="10"
+				 paddingLeft.useScroller="10"
+				 paddingRight.useScroller="10"
+				 paddingTop.useScroller="10"
+				 />
+	</fx:Declarations>
+	
 	
 	<s:states>
 		<s:State name="default" />
-		<s:State name="enlarged" />
+		<s:State name="useScroller" />
 	</s:states>
 	
-	<mx:Grid id="grid"
-			 includeIn="enlarged"
-			 width="{occupyAllAvailableSpace ? width: NaN}"
-			 height="{occupyAllAvailableSpace ? height: NaN}"
-			 horizontalGap="4"
-			 verticalGap="2"
-			 >
-		<!-- to be built programmatically -->
-	</mx:Grid>
-	
 	<s:Scroller id="scroller"
-				includeIn="default"
+				includeIn="useScroller"
 				width="100%"
 				height="100%">
-		<s:Group>
-			<fx:Reparent target="grid" includeIn="default" />
-		</s:Group>
+		<s:Group id="scrollerContent" />
 	</s:Scroller>
 	
 </s:HGroup>

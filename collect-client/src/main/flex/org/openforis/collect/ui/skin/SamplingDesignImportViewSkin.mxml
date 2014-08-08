@@ -76,11 +76,11 @@
 								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.x')}" 
 											  dataField="x"
 											  sortable="false"
-											  width="100" />
+											  width="90" />
 								<s:GridColumn headerText="{Message.get('samplingDesignImport.summaryList.y')}" 
 											  dataField="y"
 											  sortable="false"
-											  width="100" />
+											  width="90" />
 							</s:ArrayList>
 						</s:columns>
 					</s:DataGrid>

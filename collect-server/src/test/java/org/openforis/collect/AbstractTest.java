@@ -7,7 +7,7 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.TestSurveyContext;
+import org.openforis.collect.model.CollectTestSurveyContext;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
@@ -30,7 +30,7 @@ public abstract class AbstractTest {
 	public static void setUp() throws IOException, XmlParseException, IdmlParseException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
-		SurveyIdmlBinder binder = new SurveyIdmlBinder(new TestSurveyContext());
+		SurveyIdmlBinder binder = new SurveyIdmlBinder(new CollectTestSurveyContext());
 		survey = (CollectSurvey) binder.unmarshal(is);
 	}
 

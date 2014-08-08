@@ -6,6 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
@@ -18,7 +19,6 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
@@ -39,16 +39,15 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	protected T editedItem;
 	protected boolean changed;
 	protected FormObject<T> formObject;
-	private boolean commitChangesOnApply;
+	protected boolean commitChangesOnApply;
 	
 	public SurveyObjectBaseVM() {
 		commitChangesOnApply = true;
 	}
 	
 	@Override
-	@GlobalCommand
-	public void undoLastChanges(@ContextParam(ContextType.VIEW) Component view) {
-		super.undoLastChanges(view);
+	public void undoLastChanges() {
+		super.undoLastChanges();
 		resetEditedItem();
 	}
 	
@@ -117,7 +116,8 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		}
 	}
 
-	protected void commitChanges() {
+	@Command
+	public void commitChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		if ( newItem ) {
 			addNewItemToSurvey();
@@ -232,6 +232,12 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		notifyChange("formObject", "editedItem", "selectedItem");
 	}
 
+	protected String suggestInternalName(String label) {
+		String name = label.trim().toLowerCase().replaceAll("\\W", "_");
+		name = StringUtils.strip(name, "_");
+		return name;
+	}
+
 	protected abstract void deleteItemFromSurvey(T item);
 
 	public T getSelectedItem() {
@@ -280,5 +286,5 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	public void setCommitChangesOnApply(boolean commitChangesOnApply) {
 		this.commitChangesOnApply = commitChangesOnApply;
 	}
-	
+
 }

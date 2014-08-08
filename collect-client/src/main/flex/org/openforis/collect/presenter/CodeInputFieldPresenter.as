@@ -155,7 +155,7 @@ package org.openforis.collect.presenter {
 			}
 			_popUpOpened = true;
 			_popUp.codeInputField = view;
-			_popUp.editable = Application.activeRecordEditable;
+			_popUp.editable = view.editable;
 			_popUp.multiple = view.attributeDefinition.multiple;
 			_popUp.title = view.attributeDefinition.getInstanceOrHeadingLabelText();
 			

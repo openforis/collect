@@ -339,7 +339,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	private CollectSurvey createMultipleLevelCodeListTestSurvey() {
-		CollectSurvey survey = surveyManager.createSurveyWork();
+		CollectSurvey survey = surveyManager.createSurveyWork("test", "en");
 		CodeList codeList = survey.createCodeList();
 		{
 			CodeListLevel codeListLevel = new CodeListLevel();
@@ -357,130 +357,130 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			codeList.addLevel(codeListLevel);
 		}
 		{
-			CodeListItem item  = codeList.createItem();
+			CodeListItem item  = codeList.createItem(1);
 			item.setCode("A");
 			codeList.addItem(item);
 			{
-				CodeListItem child = codeList.createItem();
+				CodeListItem child = codeList.createItem(2);
 				child.setCode("1");
 				item.addChildItem(child);
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("a");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("b");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("c");
 					child.addChildItem(child2);
 				}
 			}
 			{
-				CodeListItem child = codeList.createItem();
+				CodeListItem child = codeList.createItem(2);
 				child.setCode("2");
 				item.addChildItem(child);
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("a");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("b");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("c");
 					child.addChildItem(child2);
 				}
 			}
 			{
-				CodeListItem child = codeList.createItem();
+				CodeListItem child = codeList.createItem(2);
 				child.setCode("3");
 				item.addChildItem(child);
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("a");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("b");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("c");
 					child.addChildItem(child2);
 				}
 			}
 		}
 		{
-			CodeListItem item  = codeList.createItem();
+			CodeListItem item  = codeList.createItem(1);
 			item.setCode("B");
 			codeList.addItem(item);
 			{
-				CodeListItem child = codeList.createItem();
+				CodeListItem child = codeList.createItem(2);
 				child.setCode("1");
 				item.addChildItem(child);
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("a");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("b");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("c");
 					child.addChildItem(child2);
 				}
 			}
 			{
-				CodeListItem child = codeList.createItem();
+				CodeListItem child = codeList.createItem(2);
 				child.setCode("2");
 				item.addChildItem(child);
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("a");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("b");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("c");
 					child.addChildItem(child2);
 				}
 			}
 			{
-				CodeListItem child = codeList.createItem();
+				CodeListItem child = codeList.createItem(2);
 				child.setCode("3");
 				item.addChildItem(child);
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("a");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("b");
 					child.addChildItem(child2);
 				}
 				{
-					CodeListItem child2 = codeList.createItem();
+					CodeListItem child2 = codeList.createItem(3);
 					child2.setCode("c");
 					child.addChildItem(child2);
 				}

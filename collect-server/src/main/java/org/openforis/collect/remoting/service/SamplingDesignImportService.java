@@ -6,10 +6,13 @@ import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportProcess;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportStatus;
 import org.openforis.collect.manager.SamplingDesignManager;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.remoting.service.samplingdesignimport.proxy.SamplingDesignImportStatusProxy;
+import org.openforis.idm.metamodel.ReferenceDataSchema;
+import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -24,6 +27,8 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
+	private SessionManager sessionManager;
 	
 	@Secured("ROLE_ADMIN")
 	public SamplingDesignImportStatusProxy start(String tempFileName, int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption, SurveyImportException {
@@ -33,7 +38,8 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 			if ( survey.getSamplingDesignCodeList() == null ) {
 				surveyManager.addSamplingDesignCodeList(survey);
 			}
-			importProcess = new SamplingDesignImportProcess(samplingDesignManager, survey, work, importFile, overwriteAll);
+			importProcess = new SamplingDesignImportProcess(samplingDesignManager, surveyManager, 
+					survey, importFile, overwriteAll);
 			importProcess.init();
 			SamplingDesignImportStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {
@@ -47,11 +53,29 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 	public SamplingDesignImportStatusProxy getStatus() {
 		if ( importProcess != null ) {
 			SamplingDesignImportStatus status = importProcess.getStatus();
+			if ( status.isComplete() ) {
+				updateSessionSurvey();
+			}
 			return new SamplingDesignImportStatusProxy(status);
 		} else {
 			return null;
 		}
 	}
-	
+
+	private void updateSessionSurvey() {
+		CollectSurvey processSurvey = importProcess.getSurvey();
+		if ( processSurvey.isWork() ) {
+			ReferenceDataSchema processReferenceDataSchema = processSurvey.getReferenceDataSchema();
+			SamplingPointDefinition processSamplingPoint = processReferenceDataSchema == null ? null: processReferenceDataSchema.getSamplingPointDefinition();
+
+			CollectSurvey editedSurvey = sessionManager.getActiveDesignerSurvey();
+			ReferenceDataSchema referenceDataSchema = editedSurvey.getReferenceDataSchema();
+			if ( referenceDataSchema == null ) {
+				referenceDataSchema = new ReferenceDataSchema();
+				editedSurvey.setReferenceDataSchema(referenceDataSchema);
+			}
+			referenceDataSchema.setSamplingPointDefinition(processSamplingPoint);
+		}
+	}
 	
 }

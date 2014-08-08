@@ -51,7 +51,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyManager {
 	
 	private static Log LOG = LogFactory.getLog(SurveyManager.class);
-
+	private static final String URI_PREFIX = "http://www.openforis.org/idm/";
+	
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
@@ -201,6 +202,7 @@ public class SurveyManager {
 		try {
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
 			survey.setName(name);
+			survey.setPublished(true);
 			surveyDao.importModel(survey);
 			addToCache(survey);
 			codeListManager.importCodeLists(survey, surveyFile);
@@ -479,10 +481,28 @@ public class SurveyManager {
 		surveyValidator.validateAgainstSchema(file);
 	}
 
+	/**
+	 * Loads published and temporary survey summaries into a single list.
+	 * Survey details like project name will be read using survey default language.
+	 * 
+	 * @return
+	 */
 	@Transactional
 	public List<SurveySummary> loadSummaries() {
-		List<SurveySummary> surveySummaries = getSurveySummaries(null);
-		List<SurveySummary> surveyWorkSummaries = loadWorkSummaries();
+		return loadSummaries(null, false);
+	}
+	
+	/**
+	 * Loads published and temporary survey summaries into a single list.
+	 * 
+	 * @param labelLang 	language code used to 
+	 * @param includeDetails if true, survey info like project name will be included in the summary (it makes the loading process slower).
+	 * @return list of published and temporary surveys.
+	 */
+	@Transactional
+	public List<SurveySummary> loadSummaries(String labelLang, boolean includeDetails) {
+		List<SurveySummary> surveySummaries = getSurveySummaries(labelLang);
+		List<SurveySummary> surveyWorkSummaries = loadWorkSummaries(labelLang, includeDetails);
 		List<SurveySummary> result = new ArrayList<SurveySummary>();
 		Map<String, SurveySummary> summariesByUri = new HashMap<String, SurveySummary>();
 		for (SurveySummary summary : surveyWorkSummaries) {
@@ -551,8 +571,18 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	protected List<SurveySummary> loadWorkSummaries() {
+	protected List<SurveySummary> loadWorkSummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> result = surveyWorkDao.loadSummaries();
+		if ( includeDetails ) {
+			for (SurveySummary summary : result) {
+				CollectSurvey survey = surveyWorkDao.load(summary.getId());
+				String projectName = survey.getProjectName(labelLang);
+				if ( projectName == null && labelLang != null && ! labelLang.equals(survey.getDefaultLanguage()) ) {
+					projectName = survey.getProjectName();
+				}
+				summary.setProjectName(projectName);
+			}
+		}
 		return result;
 	}
 	
@@ -583,14 +613,21 @@ public class SurveyManager {
 		}
 	}
 	
-	public CollectSurvey createSurveyWork() {
+	public CollectSurvey createSurveyWork(String name, String language) {
 		CollectSurvey survey = (CollectSurvey) collectSurveyContext.createSurvey();
+		survey.setName(name);
+		survey.setUri(generateSurveyUri(name));
+		survey.addLanguage(language);
 		survey.setWork(true);
 		return survey;
 	}
 	
+	public String generateSurveyUri(String name) {
+		return URI_PREFIX + name;
+	}
+	
 	public String generateRandomSurveyUri() {
-		return collectSurveyContext.getUriPrefix() + UUID.randomUUID();
+		return generateSurveyUri(UUID.randomUUID().toString());
 	}
 
 	/**

@@ -3,25 +3,30 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
-import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
+import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -41,13 +46,24 @@ import org.zkoss.zk.ui.Path;
 public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyObjectBaseVM<T> {
 
 	protected static final String FORM_CONTAINER_ID = "nodeFormContainer";
-	
+	public static final Class<?>[] SUPPORTED_CALCULABLE_ATTRIBUTE_TYPES = new Class<?>[] { 
+		CodeAttributeDefinition.class,
+		NumericAttributeDefinition.class,
+		TextAttributeDefinition.class
+	};
+
 	protected Form tempFormObject;
 	protected EntityDefinition parentEntity;
 
+	public NodeDefinitionVM() {
+		super();
+		fieldLabelKeyPrefixes.addAll(Arrays.asList("survey.schema.node"));
+	}
+	
 	@Init(superclass=false)
 	public void init(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
 		super.init();
+		tempFormObject = new SimpleForm();
 		if ( nodeDefn != null ) {
 			this.parentEntity = parentEntity;
 			this.newItem = newItem;
@@ -74,7 +90,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	@Override
-	protected void commitChanges() {
+	public void commitChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		boolean editingRootEntity = parentEntity == null;
 		boolean wasNewItem = newItem;
@@ -101,11 +117,30 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@Command
 	public void nameChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("name") String name) {
+		name = adjustInternalName(name);
+		((NodeDefinitionFormObject<?>) formObject).setName(name);
 		dispatchApplyChangesCommand(binder);
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("item", editedItem);
 		args.put("name", name);
 		BindUtils.postGlobalCommand(null, null, "editedNodeNameChanging", args);
+	}
+
+	@Command
+	public void singleInstanceLabelChange(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam("label") String value) {
+		((NodeDefinitionFormObject<?>) formObject).setInstanceLabel(value);
+		String name = (String) tempFormObject.getField("name");
+		if ( StringUtils.isBlank(name) && StringUtils.isNotBlank(value) ) {
+			name = suggestInternalName(value);
+			nameChanged(binder, name);
+		}
+	}
+	
+	protected String adjustInternalName(String name) {
+		String result = super.adjustInternalName(name);
+		setTempFormObjectFieldValue("name", result);
+		return result;
 	}
 	
 	protected String getInstanceLabel(NodeDefinition nodeDefn) {
@@ -159,6 +194,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return tempFormObject;
 	}
 	
+	protected void setTempFormObjectFieldValue(String field, Object value) {
+		tempFormObject.setField(field, value);
+		BindUtils.postNotifyChange(null, null, tempFormObject, field);
+	}
+	
 	@DependsOn("editedItem")
 	public String getNodeType() {
 		if ( editedItem != null ) {
@@ -210,7 +250,16 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		return true;
 	}
 	
-	public boolean isCalculatedAttribute() {
-		return editedItem != null && editedItem instanceof CalculatedAttributeDefinition;
+	public boolean isCalculableAttribute() {
+		if ( editedItem == null ) {
+			return false;
+		} else {
+			for (Class<?> type : SUPPORTED_CALCULABLE_ATTRIBUTE_TYPES) {
+				if ( type.isInstance(editedItem) ) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }

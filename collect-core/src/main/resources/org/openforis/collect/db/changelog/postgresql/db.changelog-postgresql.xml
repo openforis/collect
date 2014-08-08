@@ -13,5 +13,7 @@
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20131218.1600.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20131219.1000.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20140107.1000.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20140723.1000.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20140730.1000.xml" />
 
 </databaseChangeLog>

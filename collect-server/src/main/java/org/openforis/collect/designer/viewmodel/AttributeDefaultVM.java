@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.openforis.collect.designer.form.AttributeDefaultFormObject;
@@ -29,6 +30,7 @@ public class AttributeDefaultVM extends SurveyObjectBaseVM<AttributeDefault> {
 
 	public AttributeDefaultVM() {
 		setCommitChangesOnApply(false);
+		fieldLabelKeyPrefixes.addAll(0, Arrays.asList("survey.schema.attribute.attribute_default"));
 	}
 	
 	@Init(superclass=false)

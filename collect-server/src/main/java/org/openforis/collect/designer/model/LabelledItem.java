@@ -1,5 +1,8 @@
 package org.openforis.collect.designer.model;
 
+import java.util.Collection;
+import java.util.Comparator;
+
 /**
  * 
  * @author S. Ricci
@@ -7,9 +10,18 @@ package org.openforis.collect.designer.model;
  *
  */
 public class LabelledItem {
-	String code;
-	String label;
+	private String code;
+	private String label;
 
+	public static LabelledItem getByCode(Collection<LabelledItem> items, String code) {
+		for (LabelledItem item : items) {
+			if ( item.getCode().equals(code) ) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
 	public LabelledItem(String code, String label) {
 		this.code = code;
 		this.label = label;
@@ -31,4 +43,11 @@ public class LabelledItem {
 		this.label = label;
 	}
 	
+	public static class LabelComparator implements Comparator<LabelledItem> {
+		@Override
+		public int compare(LabelledItem item1, LabelledItem item2) {
+			return item1.getLabel().compareTo(item2.getLabel());
+		}
+	}
+
 }

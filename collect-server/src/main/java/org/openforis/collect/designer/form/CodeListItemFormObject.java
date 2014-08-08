@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.form;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeListItem;
 
 /**
@@ -26,9 +27,9 @@ public class CodeListItemFormObject extends VersionableItemFormObject<CodeListIt
 	@Override
 	public void saveTo(CodeListItem dest, String languageCode) {
 		super.saveTo(dest, languageCode);
-		dest.setCode(code);
-		dest.setLabel(languageCode, label);
-		dest.setDescription(languageCode, description);
+		dest.setCode(StringUtils.trimToNull(code));
+		dest.setLabel(languageCode, StringUtils.trimToNull(label));
+		dest.setDescription(languageCode, StringUtils.trimToNull(description));
 		dest.setQualifiable(qualifiable);
 	}
 

@@ -74,7 +74,7 @@ package org.openforis.collect.util
 					if(child is Container) {
 						resetScrollBars(child);
 					} else if(child is NavigatorContent && (child as NavigatorContent).numElements > 0 && 
-							(child as NavigatorContent).getElementAt(0) is Scroller) {
+						(child as NavigatorContent).getElementAt(0) is Scroller) {
 						resetScrollBars((child as NavigatorContent).getElementAt(0) as Scroller);
 					}
 				}
@@ -141,7 +141,7 @@ package org.openforis.collect.util
 			}
 			return componentStyleName;
 		}
-			
+		
 		public static function addStyleNames(component:UIComponent, styleNames:Array, applyImmediately:Boolean = true):String {
 			for each(var styleName:String in styleNames) {
 				addStyleName(component, styleName, applyImmediately);
@@ -175,7 +175,7 @@ package org.openforis.collect.util
 				return removeStyleName(component, styleName, applyImmediately);
 			}
 		}
-
+		
 		public static function hasStyleName(component:UIComponent, styleName:String):Boolean {
 			var componentStyleName:String = component.styleName as String;
 			if(componentStyleName != null) {
@@ -212,7 +212,7 @@ package org.openforis.collect.util
 			}
 			return result;
 		}
-
+		
 		public static function getMaxAvailableWidth(component:UIComponent):Number {
 			var paddingLeft:Number = component.getStyle("paddingLeft");
 			var paddingRight:Number = component.getStyle("paddingRight");
@@ -267,7 +267,7 @@ package org.openforis.collect.util
 			}
 			return focussed;
 		}
-
+		
 		public static function gridColumnDateTimeLabelFunction(item:Object, column:Object):String {
 			var result:String = null;
 			var value:* = org.openforis.collect.util.ObjectUtil.getValue(item, column.dataField);

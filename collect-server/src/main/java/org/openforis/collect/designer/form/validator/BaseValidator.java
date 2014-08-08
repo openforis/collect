@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.zkoss.bind.BindContext;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.Property;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.bind.validator.AbstractValidator;
@@ -192,6 +194,15 @@ public abstract class BaseValidator extends AbstractValidator {
 		return getValue(ctx, fieldName, true);
 	}
 	
+	protected <T> T getValueWithDefault(ValidationContext ctx, String fieldName, T defaultValue) {
+		T value = getValue(ctx, fieldName, false);
+		if ( value == null ) {
+			return (T) defaultValue;
+		} else {
+			return value;
+		}
+	}
+		
 	@SuppressWarnings("unchecked")
 	protected <T> T getValue(ValidationContext ctx, String fieldName, boolean required) {
 		Object value;
@@ -217,6 +228,16 @@ public abstract class BaseValidator extends AbstractValidator {
 		Object base = ctx.getProperty().getBase();
 		Map<String, Property> properties = ctx.getProperties(base);
 		return properties;
+	}
+
+	protected Object getVM(ValidationContext ctx) {
+		BindContext bindContext = ctx.getBindContext();
+		Binder binder = bindContext.getBinder();
+		Object vmObject = binder.getViewModel();
+		if ( vmObject == null ) {
+			throw new IllegalStateException("Unable to find view model instance");
+		}
+		return vmObject;
 	}
 
 }
