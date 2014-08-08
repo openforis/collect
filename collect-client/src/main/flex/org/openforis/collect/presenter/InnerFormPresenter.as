@@ -18,6 +18,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.InnerFormContainer;
 	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
+	import org.openforis.collect.ui.component.detail.TabbedFormContainer;
 	import org.openforis.collect.util.UIUtil;
 	
 	/**
@@ -64,8 +65,13 @@ package org.openforis.collect.presenter
 		}
 		
 		private function limitTableFormItemSize(formItem:CollectFormItem):void {
-			var maxAvailableHeight:Number = UIUtil.getMaxAvailableHeight(view);
-			var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(view);
+			var tabbedFormContainer:TabbedFormContainer = UIUtil.getFirstAncestor(view, TabbedFormContainer);
+			if ( tabbedFormContainer != null ) {
+				var maxAvailableHeight:Number = tabbedFormContainer.height;
+				var maxAvailableWidth:Number = tabbedFormContainer.width;
+			}
+			//var maxAvailableHeight:Number = UIUtil.getMaxAvailableHeight(view);
+			//var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(view);
 			if ( ! isNaN(maxAvailableWidth) && view.useScroller ) {
 				maxAvailableWidth -= INDENT_WIDTH;
 			}
@@ -74,7 +80,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function updateCurrentState():void {
-			view.useScroller = ! containsOnlyOneMultipleEntity/* || isInsideFormLayoutEntity()*/;
+			view.useScroller = ! (containsOnlyOneMultipleEntity || insideTable);
 			view.currentState = view.useScroller ? InnerFormContainer.STATE_USE_SCROLLER: InnerFormContainer.STATE_DEFAULT;
 		}
 		
@@ -88,13 +94,16 @@ package org.openforis.collect.presenter
 			}
 		}
 		
-		private function isInsideFormLayoutEntity():Boolean {
-			if ( view.entityDefinition != null && view.entityDefinition.parent != null && 
-				view.entityDefinition.parent.multiple && view.entityDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
-				return true;
-			} else {
-				return false;
-			}
+		private function get insideTable():Boolean {
+			return view.entityDefinition != null && view.entityDefinition.parentLayout == UIUtil.LAYOUT_TABLE;
+		}
+		
+		private function get insideMultipleForm():Boolean {
+			return view.entityDefinition != null && view.entityDefinition.multiple && view.entityDefinition.parentLayout == UIUtil.LAYOUT_FORM;
+		}
+		
+		private function get insideSingleEntityForm():Boolean {
+			return view.entityDefinition != null && ! view.entityDefinition.multiple && view.entityDefinition.parentLayout == UIUtil.LAYOUT_FORM;
 		}
 		
 		protected function nodeDefinitionsSetter(value:IList):void {
@@ -165,8 +174,7 @@ package org.openforis.collect.presenter
 			var formItem:CollectFormItem;
 			if ( defn is AttributeDefinitionProxy ) {
 				formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(defn));
-				formItem.labelWidth = ! (view.entityDefinition.multiple) && view.entityDefinition.parentLayout == UIUtil.LAYOUT_FORM ? 
-						INDENTED_LABEL_WIDTH : DEFAULT_LABEL_WIDTH;
+				formItem.labelWidth = insideSingleEntityForm ? INDENTED_LABEL_WIDTH : DEFAULT_LABEL_WIDTH;
 			} else {
 				formItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(defn));
 				BindingUtils.bindProperty(formItem, "modelVersion", _view, "modelVersion");
