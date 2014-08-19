@@ -261,11 +261,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			for (int i = 0; i < INFO_FIELDS.length; i++) {
 				Field<String> field = INFO_FIELDS[i];
 				String value = r.getValue(field);
-				if ( StringUtils.isNotBlank(value) ) {
-					s.addInfoAttribute(r.getValue(field));
-				} else {
-					break;
-				}
+				s.addInfoAttribute(value);
 			}
 		}
 

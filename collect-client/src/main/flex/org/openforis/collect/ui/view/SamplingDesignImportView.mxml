@@ -57,7 +57,7 @@
 				var pos:int = int(posString);
 				if ( pos > 0 && pos <= item.infos.length ) {
 					var result:Object = item.infos.getItemAt(pos - 1);
-					return String(result);
+					return result == null ? "": String(result);
 				} else {
 					return "";
 				}
