@@ -44,7 +44,8 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	private enum TemplateType {
 		BLANK,
-		IPCC
+		COLLECT_EARTH,
+		COLLECT_EARTH_IPCC
 		//BIOPHYSICAL, 
 		//SOCIOECONOMIC, 
 	}

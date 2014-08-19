@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<survey xmlns="http://www.openforis.org/idml/3.0" xmlns:collect="http://www.openforis.org/collect/3.0/collect"
+	xmlns:ui="http://www.openforis.org/collect/3.0/ui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openforis.org/idml/3.0 
+	https://raw.github.com/openforis/idm/master/idm-api/src/main/resources/idml3.xsd      
+	http://www.openforis.org/collect/3.0/ui 
+	https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
+	lastId="1000">
+	<project>Open Foris Collect Earth</project>
+	<uri>http://www.openforis.org/idm/collectEarth</uri>
+	<cycle>2013-2014</cycle>
+	<description></description>
+	<language>en</language>
+	<applicationOptions>
+		<options type="ui">
+			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="plot_tab_set">
+				<tab name="plot_tab">
+					<label>Plot</label>
+				</tab>
+			</tabSet>
+		</options>
+	</applicationOptions>
+	
+	<spatialReferenceSystems>
+		<spatialReferenceSystem srid="EPSG:4326">
+			<label xml:lang="en">WGS 84</label>
+			<description xml:lang="en">WGS 84</description>
+			<wkt><![CDATA[
+	        GEOGCS["WGS 84",
+		  		DATUM["WGS_1984",
+		  			SPHEROID["WGS 84",6378137,298.257223563, AUTHORITY["EPSG","7030"]],
+		        	AUTHORITY["EPSG","6326"]],
+	    		PRIMEM["Greenwich",0,
+	        		AUTHORITY["EPSG","8901"]],
+	    		UNIT["degree",0.01745329251994328,
+	        		AUTHORITY["EPSG","9122"]],
+	    		AUTHORITY["EPSG","4326"]]
+			]]></wkt>
+		</spatialReferenceSystem>
+	</spatialReferenceSystems>
+	
+	<schema>
+		<entity id="1" name="plot" ui:tabSet="plot_tab_set" ui:tab="plot_tab">
+			<label xml:lang="en">Plot</label>
+			<text id="2" name="id" required="true" key="true">
+				<label xml:lang="en">Id</label>
+			</text>
+			<coordinate id="3" name="location">
+				<label xml:lang="en">Location</label>
+				<label xml:lang="es">Posicion</label>
+				<label xml:lang="fr">Lieu</label>
+			</coordinate>
+			<text id="4" name="operator">
+				<label xml:lang="en">Operator</label>
+				<label xml:lang="es">Operador</label>
+				<label xml:lang="fr">Opérateur</label>
+			</text>
+			<number id="5" name="elevation" type="integer" >
+				<label xml:lang="en">Elevation</label>
+				<label xml:lang="es">Elevacion</label>
+				<label xml:lang="fr">Elevation</label>
+			</number>
+			<number id="6" name="aspect"  type="real">
+				<label xml:lang="en">Aspect</label>
+				<label xml:lang="es">Aspecto</label>
+				<label xml:lang="fr">Aspect</label>
+			</number>
+			<number id="7" name="slope" type="real" >
+				<label xml:lang="en">Slope</label>
+				<label xml:lang="es">Pendiente</label>
+				<label xml:lang="fr">Pente</label>
+			</number>
+			<boolean id="8" name="actively_saved">
+				<label xml:lang="en">Actively saved by user</label>
+				<label xml:lang="es">Guardado por el usuario activamente</label>
+				<label xml:lang="fr">Sauvé par l'utilisateur</label>
+			</boolean>
+			<text id="9" name="actively_saved_on" required="false"
+				relevant="false()">
+				<label xml:lang="en">Last saved on</label>
+				<label xml:lang="es">Guardado por ultima vez</label>
+				<label xml:lang="fr">Sauvé la dernière fois sur</label>
+			</text>
+			<text id="10" name="plot_file" required="false" relevant="false()">
+				<label xml:lang="en">CSV file that contains the plot</label>
+				<label xml:lang="es">Archivo CSV que contiene al plot</label>
+				<label xml:lang="fr">Fichier CSV qui contient le point</label>
+			</text>
+		</entity>
+	</schema>
+</survey>
