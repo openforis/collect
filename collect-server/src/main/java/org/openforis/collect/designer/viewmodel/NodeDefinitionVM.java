@@ -129,6 +129,8 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@Command
 	public void singleInstanceLabelChange(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("label") String value) {
+		dispatchApplyChangesCommand(binder);
+		
 		((NodeDefinitionFormObject<?>) formObject).setInstanceLabel(value);
 		String name = (String) tempFormObject.getField("name");
 		if ( StringUtils.isBlank(name) && StringUtils.isNotBlank(value) ) {
