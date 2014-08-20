@@ -450,13 +450,19 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 	private void setSRSIdField(Attribute<?, ?> attr, String value, long row,
 			String colName) {
-		Survey survey = attr.getSurvey();
-		SpatialReferenceSystem srs = survey.getSpatialReferenceSystem(value);
-		if ( srs == null ) {
-			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, SRS_NOT_FOUND_MESSAGE_KEY);
-			parsingError.setMessageArgs(new String[]{value});
-			status.addParsingError(parsingError);
-		} else {
+		boolean valid = true;
+		if ( StringUtils.isNotBlank(value) ) {
+			//check SRS id validity
+			Survey survey = attr.getSurvey();
+			SpatialReferenceSystem srs = survey.getSpatialReferenceSystem(value);
+			if ( srs == null ) {
+				ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, SRS_NOT_FOUND_MESSAGE_KEY);
+				parsingError.setMessageArgs(new String[]{value});
+				status.addParsingError(parsingError);
+				valid = false;
+			}
+		}
+		if ( valid ) {
 			((CoordinateAttribute) attr).getSrsIdField().setValue(value);
 		}
 	}
