@@ -13,11 +13,8 @@
 	<properties>
 		<!-- to avoid replacing relative path to images and other resources used by the installer -->
 		<installer-dir>${project.build.directory}/installer</installer-dir>
-
 		<installbuilder-file-name>installbuilder.xml</installbuilder-file-name>
-
-		<jdk.version>1.8.0_05</jdk.version>
-
+		<jre.version>1.8.0_11</jre.version>
 		<!-- installer file names -->
 		<windows-installer-file-name>OpenForisCollect-${project.version}-windows-installer.exe</windows-installer-file-name>
 		<linux-installer-file-name>OpenForisCollect-${project.version}-linux-installer.run</linux-installer-file-name>
@@ -35,7 +32,7 @@
                         <version>2.6</version>
                         <executions>
                             <execution>
-                                <id>unpack-jdk</id>
+                                <id>unpack-jre</id>
                                 <phase>process-sources</phase>
                                 <goals>
                                     <goal>unpack</goal>
@@ -44,48 +41,66 @@
                                     <artifactItems>
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
-											<artifactId>jdk</artifactId>
-											<version>${jdk.version}</version>
+											<artifactId>jre</artifactId>
+											<version>${jre.version}</version>
 											<classifier>linux-i386</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/</outputDirectory>
+											<outputDirectory>${installer-dir}/jre_files</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
-											<artifactId>jdk</artifactId>
-											<version>${jdk.version}</version>
+											<artifactId>jre</artifactId>
+											<version>${jre.version}</version>
 											<classifier>linux-x64</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/</outputDirectory>
+											<outputDirectory>${installer-dir}/jre_files</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
-											<artifactId>jdk</artifactId>
-											<version>${jdk.version}</version>
+											<artifactId>jre</artifactId>
+											<version>${jre.version}</version>
 											<classifier>osx</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/</outputDirectory>
+											<outputDirectory>${installer-dir}/jre_files</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
-											<artifactId>jdk</artifactId>
-											<version>${jdk.version}</version>
+											<artifactId>jre</artifactId>
+											<version>${jre.version}</version>
 											<classifier>windows-i386</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/</outputDirectory>
+											<outputDirectory>${installer-dir}/jre_files</outputDirectory>
 										</artifactItem>
 										<artifactItem>
 											<groupId>com.oracle.java</groupId>
-											<artifactId>jdk</artifactId>
-											<version>${jdk.version}</version>
+											<artifactId>jre</artifactId>
+											<version>${jre.version}</version>
 											<classifier>windows-x64</classifier>
 											<type>zip</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/</outputDirectory>
+											<outputDirectory>${installer-dir}/jre_files</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.oracle.java</groupId>
+											<artifactId>jre</artifactId>
+											<version>${jre.version}</version>
+											<classifier>solaris-intel</classifier>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-dir}/jre_files</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.oracle.java</groupId>
+											<artifactId>jre</artifactId>
+											<version>${jre.version}</version>
+											<classifier>solaris-sparc</classifier>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-dir}/jre_files</outputDirectory>
 										</artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -113,7 +128,7 @@
                         </executions>
                     </plugin>
 					
-					<!-- 1. copy installbuilder-source-file -->
+					<!-- 1. copy resource files -->
 					<plugin>
 						<artifactId>maven-resources-plugin</artifactId>
 						<version>2.6</version>
@@ -130,9 +145,7 @@
 										<resource>
 											<directory>src/main/resources</directory>
 											<includes>
-								                <include>${installbuilder-file-name}</include>
-								                <include>java.xml</include>
-								                <include>images/**</include>
+								                <include>**</include>
 								            </includes>
 										</resource>
 									</resources>
