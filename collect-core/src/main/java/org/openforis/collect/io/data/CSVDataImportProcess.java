@@ -343,7 +343,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private boolean setValuesInRecord(DataLine line, CollectRecord record, Step step) {
-		LOG.info("Setting values in record: " + record.getId() + "[" + record.getRootEntityKeyValues() + "]" + " step: " + step);
+		//LOG.info("Setting values in record: " + record.getId() + "[" + record.getRootEntityKeyValues() + "]" + " step: " + step);
 		record.setStep(step);
 		Entity parentEntity = getOrCreateParentEntity(record, line);
 		if ( parentEntity == null ) {

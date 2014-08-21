@@ -68,7 +68,7 @@ package org.openforis.collect.presenter
 				for each (var change:NodeChangeProxy in changeSet.changes) {
 					if ( change is AttributeChangeProxy ) {
 						var changedNode:NodeProxy = Application.activeRecord.getNode(change.nodeId);
-						if ( changedNode.definition.id == view.nodeDefinition.id && view.parentEntity.isDescendantCousin(changedNode) ) {
+						if ( changedNode != null && changedNode.definition.id == view.nodeDefinition.id && view.parentEntity.isDescendantCousin(changedNode) ) {
 							updateRelevanceDisplayManager();
 							break;
 						}
