@@ -1,6 +1,6 @@
 <project>
     <shortName>OpenForisCollect</shortName>
-    <fullName>OpenForis Collect</fullName>
+    <fullName>Open Foris Collect</fullName>
     <version>PROJECT_VERSION</version>
 
     <!--     <readmeFile>../../../README</readmeFile> 
