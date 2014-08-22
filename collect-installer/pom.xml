@@ -7,8 +7,8 @@
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
-	<name>Open Foris Collect Install Builder</name>
-	<description>Module to create the installers for Open Foris Collect.</description>
+	<name>Open Foris Collect Installer</name>
+	<description>Module to create the installers for Open Foris Collect</description>
 	
 	<properties>
 		<!-- to avoid replacing relative path to images and other resources used by the installer -->
