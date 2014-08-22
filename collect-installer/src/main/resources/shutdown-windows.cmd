@@ -1,2 +1,3 @@
 set JRE_HOME=install_directory/java
-install_directory/tomcat/bin/shutdown.bat
+cd "install_directory\collect-server\tomcat\bin"
+shutdown.bat
