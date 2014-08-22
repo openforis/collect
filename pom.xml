@@ -14,6 +14,7 @@
 		<module>collect-client</module>
 		<module>collect-web</module>
 		<module>collect-assembly</module>
+		<module>collect-installer</module>
 	</modules>
 
 	<properties>
@@ -202,6 +203,11 @@
 			<url>http://www.openforis.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
+			<id>openforis-3rd-party</id>
+			<name>Open Foris Repository</name>
+			<url>http://www.openforis.org/nexus/content/repositories/thirdparty/</url>
+		</repository>
+		<repository>
 			<id>flex-compiler</id>
 			<url>https://repository.sonatype.org/content/groups/flexgroup</url>
 			<releases>
@@ -257,6 +263,11 @@
 				<groupId>org.openforis.commons</groupId>
 				<artifactId>commons-versioning</artifactId>
 				<version>${openforis.commons.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.9</version>
 			</dependency>
 			<dependency>
 				<groupId>junit</groupId>
