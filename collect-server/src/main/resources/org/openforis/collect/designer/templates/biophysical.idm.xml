@@ -1,0 +1,677 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<survey lastId="1278" published="true" xmlns="http://www.openforis.org/idml/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rdb="http://www.openforis.org/collect/3.0/rdb" xmlns:ui="http://www.openforis.org/collect/3.0/ui">
+  <project>Biophysical Survey Sample</project>
+  <uri>http://www.openforis.org/idm/biophysical_sample</uri>
+  <cycle>2014-2015</cycle>
+  <language>en</language>
+  <applicationOptions>
+    <options type="ui">
+<n0:tabSet name="cluster" xmlns:n0="http://www.openforis.org/collect/3.0/ui">
+  <n0:tab name="cluster">
+    <n0:label>Cluster</n0:label>
+  </n0:tab>
+  <n0:tab name="plot">
+    <n0:label>Plot</n0:label>
+    <n0:tab name="plot_det">
+      <n0:label>Details</n0:label>
+    </n0:tab>
+    <n0:tab name="tree">
+      <n0:label>Trees</n0:label>
+    </n0:tab>
+  </n0:tab>
+</n0:tabSet>
+    </options>
+  </applicationOptions>
+  <codeLists>
+    <list id="394" name="measurement">
+      <label type="list">Remeasurement Codes</label>
+      <items>
+        <item id="395">
+          <code>P</code>
+          <label>Planned</label>
+          <description>Planned as part of original sampling design</description>
+        </item>
+        <item id="396">
+          <code>QA</code>
+          <label>Quality assurance</label>
+          <description>Revisiting plots for quality assurance</description>
+        </item>
+        <item id="397">
+          <code>U</code>
+          <label>Unplanned</label>
+          <description>Additional plots not included in original sampling design</description>
+        </item>
+      </items>
+    </list>
+    <list id="544" name="accessibility">
+      <label type="item">Accessibility</label>
+      <label type="list">Accessibility</label>
+      <items>
+        <item id="545">
+          <code>0</code>
+          <label>Accessible</label>
+          <description>Topographic and road or river network make it possible to reach the site</description>
+        </item>
+        <item id="546">
+          <code>1</code>
+          <label>Inaccessible - slope</label>
+          <description>Very steep hill making the field work dangerous</description>
+        </item>
+        <item id="547">
+          <code>2</code>
+          <label>Inaccessible - owner refusal</label>
+          <description>Owner does not allow one to enter the site either by fencing or by not giving permission</description>
+        </item>
+        <item id="548">
+          <code>3</code>
+          <label>Inaccessible - restricted area</label>
+          <description>E.g. military areas, border areas, land mines areas</description>
+        </item>
+        <item id="549">
+          <code>4</code>
+          <label>Inaccessible - water body</label>
+          <description>Water body does not allow to sample or reach the site</description>
+        </item>
+        <item id="550">
+          <code>99</code>
+          <label>Inaccessible - other reason</label>
+          <description>Specify in remarks</description>
+        </item>
+      </items>
+    </list>
+    <list id="551" name="land_use">
+      <label type="item">Land use</label>
+      <label type="list">Land Uses</label>
+      <items>
+        <item id="552">
+          <code>1</code>
+          <label>Production forest</label>
+          <description>Land designated for production and extraction of products (wood, fibre, bio-energy and/or non-wood forest products). Includes concessions, exploitation licenses, community forests etc.</description>
+        </item>
+        <item id="553">
+          <code>2</code>
+          <label>Protection forest</label>
+          <description>Protected forest lands. Including also nature reserves, soil conservation, water and watershed protection, protection against erosion and landslides.</description>
+        </item>
+        <item id="554">
+          <code>3</code>
+          <label>Wildlife reserve</label>
+          <description>National parks, game reserves, game controlled areas etc</description>
+        </item>
+        <item id="555">
+          <code>4</code>
+          <label>Shifting cultivation</label>
+        </item>
+        <item id="556">
+          <code>5</code>
+          <label>Agriculture</label>
+          <description>Incl. agro-forestry</description>
+        </item>
+        <item id="557">
+          <code>6</code>
+          <label>Grazing land</label>
+        </item>
+        <item id="558">
+          <code>7</code>
+          <label>Built-up areas</label>
+          <description>Urban or rural, or mixed. Including roads, buildings, ower lines, etc.</description>
+        </item>
+        <item id="559">
+          <code>8</code>
+          <label>Water body or swamp</label>
+          <description>Seasonal, Permanent or Swamp</description>
+        </item>
+        <item id="560" qualifiable="true">
+          <code>99</code>
+          <label>Other land</label>
+          <description>To be specified in Remarks</description>
+        </item>
+      </items>
+    </list>
+    <list id="561" name="ownership">
+      <label type="item">Ownership type</label>
+      <label type="list">Ownership Types</label>
+      <items>
+        <item id="562">
+          <code>1</code>
+          <label>Central government land</label>
+          <description>Owned by central government, or by government-owned institutions or corporations</description>
+        </item>
+        <item id="563">
+          <code>2</code>
+          <label>Local government land</label>
+          <description>Owned by local government (district)</description>
+        </item>
+        <item id="564">
+          <code>3</code>
+          <label>Village land</label>
+          <description>Owned by a collective, a group of co-owners, or a community who hold exclusive rights and share duties</description>
+        </item>
+        <item id="565">
+          <code>4</code>
+          <label>Private land</label>
+          <description>Owned by private enterprises, industries, individuals or families, private co-operatives, corporations, religious and educational institutions, pension or investment funds, NGOs, nature conservation societies or other private institutions</description>
+        </item>
+        <item id="566">
+          <code>5</code>
+          <label>General land</label>
+          <description>Public land that does not belong to any of the above categories</description>
+        </item>
+        <item id="567">
+          <code>90</code>
+          <label>Not known</label>
+          <description>No information available on the land ownership</description>
+        </item>
+      </items>
+    </list>
+    <list id="568" name="undergrowth">
+      <label type="item">Undergrowth type</label>
+      <label type="list">Undergrowth Types</label>
+      <items>
+        <item id="569">
+          <code>0</code>
+          <label>No undergrowth</label>
+        </item>
+        <item id="570">
+          <code>1</code>
+          <label>Bushes</label>
+        </item>
+        <item id="571">
+          <code>2</code>
+          <label>Elephant grass</label>
+        </item>
+        <item id="572">
+          <code>3</code>
+          <label>Grass</label>
+        </item>
+        <item id="573">
+          <code>4</code>
+          <label>Herbs</label>
+        </item>
+        <item id="574">
+          <code>5</code>
+          <label>New tree generation</label>
+        </item>
+        <item id="575" qualifiable="true">
+          <code>99</code>
+          <label>Other vegetation</label>
+          <description>To be specified in Remarks</description>
+        </item>
+      </items>
+    </list>
+    <list id="707" name="tree_health">
+      <label type="item">Tree health</label>
+      <items>
+        <item id="708">
+          <code>1</code>
+          <label>Healthy tree (Default)</label>
+          <description>A tree is healthy when it does not show symptoms of disease or other that have any substantial effect on the tree’s growth and vitality.</description>
+        </item>
+        <item id="709">
+          <code>2</code>
+          <label>Diseased tree</label>
+          <description>A tree is affected when it shows symptoms of disease or attack by insects that affect the tree’s growth and vitality.</description>
+        </item>
+        <item id="710">
+          <code>3</code>
+          <label>Burnt tree, will possibly recover</label>
+        </item>
+        <item id="711">
+          <code>4</code>
+          <label>Burnt tree, will possibly die</label>
+        </item>
+        <item id="712">
+          <code>5</code>
+          <label>Affected by Ficus sp.</label>
+          <description>Ficus which may eventually destroy its host.</description>
+        </item>
+        <item id="713">
+          <code>6</code>
+          <label>Other damage agent</label>
+          <description>Specify in Remarks</description>
+        </item>
+        <item id="714">
+          <code>7</code>
+          <label>Dead tree</label>
+          <description>Dead standing tree. Laying dead tree data is recorded on Dead Wood Form.</description>
+        </item>
+      </items>
+    </list>
+    <list id="956" name="vegetation_type">
+      <label type="item">Vegetation type</label>
+      <label type="list">Vegetation Types</label>
+      <items>
+        <item id="957">
+          <code>101</code>
+          <label>Forest: Humid Montane</label>
+          <description>Catchment forest, &gt; 800 m asl</description>
+        </item>
+        <item id="958">
+          <code>102</code>
+          <label>Forest: Lowland</label>
+          <description>Groundwater forests, some coastal forests, &lt; 800 m asl.</description>
+        </item>
+        <item id="959">
+          <code>103</code>
+          <label>Forest: Mangrove</label>
+          <description>Area of forest and other wooded land with mangrove vegetation.</description>
+        </item>
+        <item id="960">
+          <code>104</code>
+          <label>Forest: Plantation</label>
+          <description>Note: Detect Planting year in Plot data</description>
+        </item>
+        <item id="961">
+          <code>201</code>
+          <label>Woodland: Closed (&gt;40%)</label>
+          <description>Beekeeping, Hunting, Recreation, Grazing, Conservation, Timber production</description>
+        </item>
+        <item id="962">
+          <code>202</code>
+          <label>Woodland: Open (10-40%)</label>
+        </item>
+        <item id="963">
+          <code>203</code>
+          <label>Woodland: Scattered cropland (Unspecified density)</label>
+          <description>Shifting cultivation</description>
+        </item>
+        <item id="964">
+          <code>301</code>
+          <label>Bushland: Thicket</label>
+          <description>below 5 m</description>
+        </item>
+        <item id="965">
+          <code>302</code>
+          <label>Bushland: Dense</label>
+          <description>Grazing</description>
+        </item>
+        <item id="966">
+          <code>303</code>
+          <label>Bushland: Scattered cultivation</label>
+          <description>Shifting cultivation</description>
+        </item>
+        <item id="967">
+          <code>304</code>
+          <label>Bushland: Emergent trees</label>
+        </item>
+        <item id="968">
+          <code>305</code>
+          <label>Bushland: Thicket with emergent trees</label>
+        </item>
+        <item id="969">
+          <code>306</code>
+          <label>Bushland: Open</label>
+          <description>Hunting, Recreation, Grazing</description>
+        </item>
+        <item id="970">
+          <code>401</code>
+          <label>Grassland: Wooded</label>
+          <description>Hunting, Recreation, Grazing</description>
+        </item>
+        <item id="971">
+          <code>402</code>
+          <label>Grassland: Bushed</label>
+        </item>
+        <item id="972">
+          <code>403</code>
+          <label>Grassland: Scattered cropland</label>
+          <description>Cultivation</description>
+        </item>
+        <item id="973">
+          <code>404</code>
+          <label>Grassland: Open</label>
+          <description>Hunting, Recreation, Grazing</description>
+        </item>
+        <item id="974">
+          <code>501</code>
+          <label>Cultivated land: Agro-forestry system</label>
+          <description>Chagga home gardens with timber and fruit trees shading coffee, banana, beans, yams</description>
+        </item>
+        <item id="975">
+          <code>502</code>
+          <label>Cultivated land: Wooded crops</label>
+          <description>Monocultures of tea, cashewnuts, cloves, coffee</description>
+        </item>
+        <item id="976">
+          <code>503</code>
+          <label>Cultivated land: Herbaceous crops</label>
+          <description>Maize, wheat, rice, bananas, cotton, sisal</description>
+        </item>
+        <item id="977">
+          <code>504</code>
+          <label>Cultivated land: Mixed tree cropping</label>
+          <description>Fruit (coconut, mango, orange), cashew, grain vegetables</description>
+        </item>
+        <item id="978">
+          <code>506</code>
+          <label>Cultivated land: Grain crops</label>
+          <description>Various types of grass crops e.g., maize, wheat, millet, rice, sorghum.</description>
+        </item>
+        <item id="979">
+          <code>601</code>
+          <label>Open land: Bare soil</label>
+        </item>
+        <item id="980">
+          <code>602</code>
+          <label>Open land: Salt crusts</label>
+          <description>Mining for salt</description>
+        </item>
+        <item id="981">
+          <code>603</code>
+          <label>Open land: Rock outcrops</label>
+          <description>Recreation</description>
+        </item>
+        <item id="982">
+          <code>604</code>
+          <label>Open land: Ice-cap / snow</label>
+        </item>
+        <item id="983">
+          <code>701</code>
+          <label>Water: Ocean</label>
+        </item>
+        <item id="984">
+          <code>702</code>
+          <label>Water: Inland water</label>
+          <description>Lake, river, seasonal water body</description>
+        </item>
+        <item id="985">
+          <code>703</code>
+          <label>Water: Swamp</label>
+        </item>
+        <item id="986" qualifiable="true">
+          <code>800</code>
+          <label>Other areas</label>
+          <description>Urban and rural build-up areas, air fields, infrastructure (powerlines, railways, mining sites)</description>
+        </item>
+      </items>
+    </list>
+    <list id="1217" name="ofc_sampling_design" lookup="ofc_sampling_design">
+      <label type="item">Sample Ids</label>
+      <codingScheme scope="local" />
+      <hierarchy>
+        <level name="level1">
+          <label xml:lang="en">Cluster Id</label>
+        </level>
+        <level name="level2">
+          <label xml:lang="en">Plot Id</label>
+        </level>
+      </hierarchy>
+    </list>
+  </codeLists>
+  <units>
+    <unit id="1271" name="deg" dimension="angle">
+      <label xml:lang="en">degrees</label>
+      <abbreviation xml:lang="en">deg</abbreviation>
+    </unit>
+    <unit id="1272" name="m" dimension="length" conversionFactor="1.0">
+      <label xml:lang="en">metres</label>
+      <abbreviation xml:lang="en">m</abbreviation>
+    </unit>
+    <unit id="1273" name="cm" dimension="length" conversionFactor="0.01">
+      <label xml:lang="en">centimetres</label>
+      <abbreviation xml:lang="en">cm</abbreviation>
+    </unit>
+    <unit id="1274" name="km" dimension="length" conversionFactor="1000.0">
+      <label xml:lang="en">kilometre</label>
+      <abbreviation xml:lang="en">km</abbreviation>
+    </unit>
+    <unit id="1275" name="ac" dimension="area" conversionFactor="2.47105381">
+      <label xml:lang="en">acres</label>
+      <abbreviation xml:lang="en">ac</abbreviation>
+    </unit>
+    <unit id="1276" name="ha" dimension="area" conversionFactor="1.0">
+      <label xml:lang="en">hectares</label>
+      <abbreviation xml:lang="en">ha</abbreviation>
+    </unit>
+    <unit id="1277" name="percent" dimension="ratio" conversionFactor="0.01">
+      <label xml:lang="en">percent</label>
+      <abbreviation xml:lang="en">%</abbreviation>
+    </unit>
+    <unit id="1278" name="tsh" dimension="currency">
+      <label xml:lang="en">Tanzanian Shillings</label>
+      <abbreviation xml:lang="en">Tsh</abbreviation>
+    </unit>
+  </units>
+  <spatialReferenceSystems>
+    <spatialReferenceSystem srid="EPSG:21035">
+      <label xml:lang="en">UTM 35S</label>
+      <description xml:lang="en">Arc 1960 / UTM zone 35S</description>
+      <wkt><![CDATA[
+            PROJCS["Arc 1960 / UTM zone 35S",
+                GEOGCS["Arc 1960",
+                    DATUM["Arc_1960",
+                        SPHEROID["Clarke 1880 (RGS)",6378249.145,293.465,
+                            AUTHORITY["EPSG","7012"]],
+                        TOWGS84[-160.0, -6.0, -302.0, 0.0, 0.0, 0.0, 0.0],
+                        AUTHORITY["EPSG","6210"]],
+                    PRIMEM["Greenwich",0,
+                        AUTHORITY["EPSG","8901"]],
+                    UNIT["degree",0.01745329251994328,
+                        AUTHORITY["EPSG","9122"]],
+                    AUTHORITY["EPSG","4210"]],
+                UNIT["metre",1,
+                    AUTHORITY["EPSG","9001"]],
+                PROJECTION["Transverse_Mercator"],
+                PARAMETER["latitude_of_origin",0],
+                PARAMETER["central_meridian",27],
+                PARAMETER["scale_factor",0.9996],
+                PARAMETER["false_easting",500000],
+                PARAMETER["false_northing",10000000],
+                AUTHORITY["EPSG","21035"],
+                AXIS["Easting",EAST],
+                AXIS["Northing",NORTH]]            
+        
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ]]>
+      </wkt>
+    </spatialReferenceSystem>
+    <spatialReferenceSystem srid="EPSG:21036">
+      <label xml:lang="en">UTM 36S</label>
+      <description xml:lang="en">Arc 1960 / UTM zone 36S</description>
+      <wkt><![CDATA[
+            PROJCS["Arc 1960 / UTM zone 36S",
+                GEOGCS["Arc 1960",
+                    DATUM["Arc_1960",
+                        SPHEROID["Clarke 1880 (RGS)",6378249.145,293.465,
+                            AUTHORITY["EPSG","7012"]],
+                        TOWGS84[-160.0, -6.0, -302.0, 0.0, 0.0, 0.0, 0.0], 
+                        AUTHORITY["EPSG","6210"]],
+                    PRIMEM["Greenwich",0,
+                        AUTHORITY["EPSG","8901"]],
+                    UNIT["degree",0.01745329251994328,
+                        AUTHORITY["EPSG","9122"]],
+                    AUTHORITY["EPSG","4210"]],
+                UNIT["metre",1,
+                    AUTHORITY["EPSG","9001"]],
+                PROJECTION["Transverse_Mercator"],
+                PARAMETER["latitude_of_origin",0],
+                PARAMETER["central_meridian",33],
+                PARAMETER["scale_factor",0.9996],
+                PARAMETER["false_easting",500000],
+                PARAMETER["false_northing",10000000],
+                AUTHORITY["EPSG","21036"],
+                AXIS["Easting",EAST],
+                AXIS["Northing",NORTH]]
+        
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ]]>
+      </wkt>
+    </spatialReferenceSystem>
+    <spatialReferenceSystem srid="EPSG:21037">
+      <label xml:lang="en">UTM 37S</label>
+      <description xml:lang="en">Arc 1960 / UTM zone 37S</description>
+      <wkt><![CDATA[
+            PROJCS["Arc 1960 / UTM zone 37S",
+                GEOGCS["Arc 1960",
+                    DATUM["Arc_1960",
+                        SPHEROID["Clarke 1880 (RGS)",6378249.145,293.465,
+                            AUTHORITY["EPSG","7012"]],
+                        TOWGS84[-160.0, -6.0, -302.0, 0.0, 0.0, 0.0, 0.0], 
+                        AUTHORITY["EPSG","6210"]],
+                    PRIMEM["Greenwich",0,
+                        AUTHORITY["EPSG","8901"]],
+                    UNIT["degree",0.01745329251994328,
+                        AUTHORITY["EPSG","9122"]],
+                    AUTHORITY["EPSG","4210"]],
+                UNIT["metre",1,
+                    AUTHORITY["EPSG","9001"]],
+                PROJECTION["Transverse_Mercator"],
+                PARAMETER["latitude_of_origin",0],
+                PARAMETER["central_meridian",39],
+                PARAMETER["scale_factor",0.9996],
+                PARAMETER["false_easting",500000],
+                PARAMETER["false_northing",10000000],
+                AUTHORITY["EPSG","21037"],
+                AXIS["Easting",EAST],
+                AXIS["Northing",NORTH]]
+        
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      ]]>
+      </wkt>
+    </spatialReferenceSystem>
+  </spatialReferenceSystems>
+  <schema>
+    <entity id="172" name="cluster" ui:tab="cluster" ui:tabSet="cluster">
+      <label type="instance">Cluster</label>
+      <code id="276" name="cluster_id" required="true" key="true" strict="false" list="ofc_sampling_design">
+        <label type="instance">Id</label>
+      </code>
+      <code id="220" name="measurement" key="true" list="measurement">
+        <label type="instance">Measurement</label>
+        <default value="P" />
+      </code>
+      <entity id="235" name="plot" multiple="true" ui:layout="form" ui:tab="plot">
+        <label type="instance">Plot</label>
+        <code id="82" name="plot_no" ui:tab="plot_det" key="true" strict="false" list="ofc_sampling_design" parent="parent()/cluster_id">
+          <label type="instance">No.</label>
+        </code>
+        <text id="124" name="subplot" relevant="share &lt; 100" required="true" ui:tab="plot_det" type="short" key="true">
+          <label type="instance">Subplot</label>
+          <default value="A" />
+          <pattern flag="error" regex="[A-Z]">
+            <message xml:lang="en">Subplot letter must be a single letter (A-Z)</message>
+          </pattern>
+        </text>
+        <number id="265" name="share" ui:tab="plot_det" type="real">
+          <label type="instance">Share</label>
+          <default value="100" />
+          <compare flag="error" lte="100" gte="1" />
+          <precision decimalDigits="0" unit="percent" />
+        </number>
+        <boolean id="149" name="permanent" ui:tab="plot_det">
+          <label type="instance">Permanent plot</label>
+          <default value="false" />
+        </boolean>
+        <code id="2" name="accessibility" required="true" ui:tab="plot_det" list="accessibility">
+          <label type="instance">Accessibility</label>
+        </code>
+        <number id="38" name="slope" ui:tab="plot_det" type="real">
+          <label type="instance">Slope</label>
+          <default value="0" />
+          <compare flag="error" lte="200" gte="0" />
+          <precision decimalDigits="0" unit="percent" />
+        </number>
+        <coordinate id="192" name="location" required="true" ui:tab="plot_det">
+          <label type="instance">GPS reading</label>
+          <distance flag="error" max="100" to="idm:lookup('ofc_sampling_design', 'location','level1', parent()/id, 'level2', no)" />
+          <distance flag="warn" max="10" to="idm:lookup('ofc_sampling_design', 'location','level1', parent()/id, 'level2', no)" />
+        </coordinate>
+        <code id="108" name="land_use" required="true" ui:tab="plot_det" list="land_use">
+          <label type="instance">Land use</label>
+        </code>
+        <code id="75" name="vegetation_type" ui:tab="plot_det" list="vegetation_type">
+          <label type="instance">Vegetation</label>
+        </code>
+        <code id="107" name="ownership_type" ui:tab="plot_det" list="ownership">
+          <label type="instance">Ownership</label>
+        </code>
+        <code id="65" name="undergrowth_type" relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306" required="true" ui:tab="plot_det" list="undergrowth">
+          <label type="instance">Undergrowth</label>
+        </code>
+        <entity id="36" name="tree" relevant="accessibility = 0" multiple="true" ui:tab="tree">
+          <label type="instance">Tree Stem</label>
+          <number id="142" name="tree_no" required="true" type="integer" key="true">
+            <label type="instance">Tree no.</label>
+            <compare flag="error" gte="1" />
+          </number>
+          <number id="264" name="stem_no" type="integer" key="true">
+            <label type="instance">Stem no.</label>
+            <default value="1" />
+            <compare flag="error" gte="1" />
+          </number>
+          <taxon id="120" name="species" required="true" taxonomy="trees" highestRank="genus">
+            <label type="instance">Species</label>
+          </taxon>
+          <number id="223" name="dbh" required="true" type="real">
+            <label type="instance">DBH (cm)</label>
+            <description>Diameter at the breast height (1.3 m) measured above bark</description>
+            <compare flag="error" lte="700" gte="0.1" />
+            <check flag="warn" if="health = 1" expr="$this  &lt;= total_height * 8">
+              <message xml:lang="en">Unusual relationship between DBH and total height.</message>
+            </check>
+            <precision decimalDigits="1" unit="cm" />
+          </number>
+          <code id="166" name="health" required="true" list="tree_health">
+            <label type="instance">Health</label>
+          </code>
+          <number id="219" name="stump_diameter" type="real">
+            <label type="instance">Stump diameter</label>
+            <compare flag="error" lte="700" gte="0" />
+            <precision decimalDigits="1" unit="cm" />
+          </number>
+          <number id="148" name="stump_height" type="real">
+            <label type="instance">Stump height</label>
+            <compare flag="error" gte="0" />
+            <precision decimalDigits="0" unit="cm" />
+          </number>
+          <number id="56" name="total_height" type="real">
+            <label type="instance">Total height</label>
+            <compare flag="error" lte="70" gte="1.3" />
+            <check flag="warn" if="health = 1" expr="dbh &lt;= $this  * 8">
+              <message xml:lang="en">Unusual relationship between dbh and total height.</message>
+            </check>
+            <precision decimalDigits="1" unit="m" />
+          </number>
+          <number id="207" name="bole_height" relevant="dbh &gt;= 20" type="real">
+            <label type="instance">Bole height</label>
+            <compare flag="error" lte="70" gte="1" />
+            <precision decimalDigits="1" unit="m" />
+          </number>
+        </entity>
+      </entity>
+    </entity>
+  </schema>
+</survey>

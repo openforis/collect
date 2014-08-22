@@ -42,11 +42,13 @@ import org.zkoss.zul.ListModelList;
  */
 public class NewSurveyParametersPopUpVM extends BaseVM {
 
+	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
+
 	private enum TemplateType {
 		BLANK,
+		BIOPHYSICAL, 
 		COLLECT_EARTH,
-		COLLECT_EARTH_IPCC
-		//BIOPHYSICAL, 
+		COLLECT_EARTH_IPCC,
 		//SOCIOECONOMIC, 
 	}
 
@@ -146,7 +148,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	protected CollectSurvey createNewSurveyFromTemplate(String name, String langCode, String templateCode)
 			throws IdmlParseException, SurveyValidationException {
-		String templateFileName = "/org/openforis/collect/designer/templates/" + templateCode.toLowerCase() + ".idm.xml";
+		String templateFileName = String.format(IDM_TEMPLATE_FILE_NAME_FORMAT, templateCode.toLowerCase());
 		InputStream surveyFileIs = this.getClass().getResourceAsStream(templateFileName);
 		CollectSurvey survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
 		survey.setName(name);
