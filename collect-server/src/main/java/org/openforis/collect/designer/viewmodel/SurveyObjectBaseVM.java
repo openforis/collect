@@ -123,6 +123,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			addNewItemToSurvey();
 			setSelectedItem(editedItem);
 			newItem = false;
+			notifyChange("newItem");
 		}
 		notifyChange("items","selectedItem","changed");
 		dispatchSurveyChangedCommand();
@@ -279,6 +280,10 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		return changed;
 	}
 
+	public boolean isNewItem() {
+		return newItem;
+	}
+	
 	public boolean isCommitChangesOnApply() {
 		return commitChangesOnApply;
 	}

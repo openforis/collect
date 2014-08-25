@@ -235,11 +235,11 @@
 	      						<hbox spacing="100px">
 		       						<button
 		       							label="${labels.global.import_data}"
-		       							visible="@load(empty vm.editedItem.lookupTable)"
+		       							visible="@load(not vm.newItem and empty vm.editedItem.lookupTable)"
 		       							onClick="@command('openCodeListImportPopUp')" />
 		       						<button
 		       							label="${labels.global.export_data}"
-		       							visible="@load(empty vm.editedItem.lookupTable)"
+		       							visible="@load(not vm.newItem and empty vm.editedItem.lookupTable)"
 		       							onClick="@command('exportCodeList')" />
 		       					</hbox>
 	      					</box>
