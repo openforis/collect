@@ -117,6 +117,7 @@
 				<center border="none">
 					<box width="100%" align="center">
 						<button label="${labels.global.save_item}"
+							image="/assets/images/save-small.png"
 							onClick="@command('save')" />
 					</box>
 				</center>
