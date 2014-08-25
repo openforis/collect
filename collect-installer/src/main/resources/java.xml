@@ -31,7 +31,7 @@
             <distributionFileList>
                 <distributionFile>
                     <allowWildcards>1</allowWildcards>
-                    <origin>jre_files/jre1.8.0_11-windows-x64/java-windows-x64/*</origin>
+                    <origin>jre_files/jre1.8.0_11-windows-x64/java-windows/*</origin>
                 </distributionFile>
             </distributionFileList>
             <ruleList>
