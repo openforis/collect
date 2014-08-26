@@ -56,7 +56,7 @@ public class SurveyValidator {
 
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
-	private static final String IDML_XSD_3_1_FILE_NAME = "idml3.1.xsd";
+	private static final String IDML_XSD_3_1_1_FILE_NAME = "idml3.1.1.xsd";
 	private static final String IDML_UI_XSD_FILE_NAME = "idml3-ui.xsd";
 
 	private static final String[] SURVEY_XSD_3_0_FILE_NAMES = new String[] {
@@ -65,9 +65,9 @@ public class SurveyValidator {
 			IDML_UI_XSD_FILE_NAME 
 	};
 	
-	private static final String[] SURVEY_XSD_3_1_FILE_NAMES = new String[] {
+	private static final String[] SURVEY_LATEST_VERSION_XSD_FILE_NAMES = new String[] {
 		XML_XSD_FILE_NAME, 
-		IDML_XSD_3_1_FILE_NAME,
+		IDML_XSD_3_1_1_FILE_NAME,
 		IDML_UI_XSD_FILE_NAME 
 	};
 	
@@ -516,7 +516,7 @@ public class SurveyValidator {
 	
 	private String[] getSchemaFileNames(Version version) {
 		if ( version.compareTo(new Version("3.1")) >= 0 ) {
-			return SURVEY_XSD_3_1_FILE_NAMES;
+			return SURVEY_LATEST_VERSION_XSD_FILE_NAMES;
 		} else {
 			return SURVEY_XSD_3_0_FILE_NAMES;
 		}
