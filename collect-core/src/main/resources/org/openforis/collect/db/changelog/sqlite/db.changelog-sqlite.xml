@@ -9,5 +9,6 @@
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20131120.1600.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20140723.1000.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20140730.1000.xml" />
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20140826.1000.xml" />
   
 </databaseChangeLog>

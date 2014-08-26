@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="update-code-list-item-level" author="ricci" dbms="postgresql">
+		<comment>Update code list item level</comment>
+		
+		<sql>
+			update collect.ofc_code_list set level = 5 where id in (
+				select c.id 
+				from collect.ofc_code_list c 
+				 	join collect.ofc_code_list pc on c.parent_id = pc.id 
+				where c.level is null and pc.level = 4
+			);
+
+			update collect.ofc_code_list set level = 6 where id in (
+				select c.id 
+				from collect.ofc_code_list c 
+					join collect.ofc_code_list pc on c.parent_id = pc.id 
+				where c.level is null and pc.level = 5
+			);
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>
