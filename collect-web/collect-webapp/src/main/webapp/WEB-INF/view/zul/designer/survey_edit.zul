@@ -109,19 +109,26 @@
 		</center>
 		<south height="30px" border="none">
 			<borderlayout hflex="1">
-				<west border="none" size="40%">
+				<west border="none" size="20%">
 					<button label="${labels.survey.back_to_list}"
 						image="/assets/images/back-small.png"
 						onClick="@command('backToSurveysList')" />
 				</west>
 				<center border="none">
 					<box width="100%" align="center">
-						<button label="${labels.global.save_item}"
-							image="/assets/images/save-small.png"
-							onClick="@command('save')" />
+						<hlayout valign="middle"  width="300px">
+							<space width="110px" />
+							<button label="${labels.global.save_item}"
+								image="/assets/images/save-small.png"
+								onClick="@command('save')" />
+							<box width="110px">
+								<label value="${labels.global.unsaved_changes}" 
+									visible="@load(vm.changed)" />
+							</box>
+						</hlayout>
 					</box>
 				</center>
-				<east border="none" size="40%">
+				<east border="none" size="20%">
 					<box hflex="true" align="end">
 						<button label="${labels.survey.validate}"
 							onClick="@command('validate')" />

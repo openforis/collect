@@ -1,6 +1,8 @@
 package org.openforis.collect.designer.composer;
 
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
+import org.openforis.collect.designer.viewmodel.SurveyEditVM;
 import org.zkoss.bind.BindComposer;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.zk.ui.Component;
@@ -17,6 +19,7 @@ import org.zkoss.zul.Tabbox;
  */
 public class SurveyEditComposer extends BindComposer<Component> {
 
+	private static final String SAMPLING_DESIGN_IMPORT_TAB_ID = "samplingDesignImportTab";
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -27,14 +30,18 @@ public class SurveyEditComposer extends BindComposer<Component> {
 	
 	@Listen("onSwitchTab = tab")
 	public void onSwitchTab(Event event) throws InterruptedException {
-		SurveyBaseVM vm = (SurveyBaseVM) getViewModel();
+		SurveyEditVM vm = (SurveyEditVM) getViewModel();
 		final Tab tab = (Tab) event.getTarget();
-		vm.checkCanLeaveForm(new SurveyBaseVM.CanLeaveFormConfirmHandler() {
-			@Override
-			public void onOk(boolean confirmed) {
-				doSelectTab(tab, confirmed);
-			}
-		});
+		if ( SAMPLING_DESIGN_IMPORT_TAB_ID.equals(tab.getId()) && ( ! vm.isSurveyStored() || vm.isChanged() ) ) {
+			MessageUtil.showWarning("global.message.save_first");
+		} else {
+			vm.checkCanLeaveForm(new SurveyBaseVM.CanLeaveFormConfirmHandler() {
+				@Override
+				public void onOk(boolean confirmed) {
+					doSelectTab(tab, confirmed);
+				}
+			});
+		}
 	}
 	
 	protected void doSelectTab(final Tab tab, boolean undoChanges) {

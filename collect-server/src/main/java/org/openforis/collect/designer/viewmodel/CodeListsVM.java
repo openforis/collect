@@ -166,7 +166,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@Override
-	protected void moveSelectedItem(int indexTo) {
+	protected void moveSelectedItemInSurvey(int indexTo) {
 		survey.moveCodeList(selectedItem, indexTo);
 	}
 	

@@ -58,8 +58,8 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 	}
 	
 	@Override
-	protected void moveSelectedItem(int indexTo) {
-		//do nothing
+	protected void moveSelectedItemInSurvey(int indexTo) {
+		//managed by CodeListsVM
 	}
 	
 	@Override

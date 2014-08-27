@@ -16,11 +16,11 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
 /**
@@ -70,7 +70,7 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 	}
 	
 	@Override
-	protected void moveSelectedItem(int indexTo) {
+	protected void moveSelectedItemInSurvey(int indexTo) {
 		survey.moveSpatialReferenceSystem(selectedItem, indexTo);
 	}
 	
@@ -92,14 +92,20 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 	
 	@Command
 	public void addPredefinedSrs() {
-		CoordinateOperations coordinateOperations = getCoordinateOperations();
-		Set<String> languages = new HashSet<String>(survey.getLanguages());
-		
-		SpatialReferenceSystem srs = coordinateOperations.fetchSRS(selectedPredefinedSrsCode, languages);
-		
-		survey.addSpatialReferenceSystem(srs);
-		selectedPredefinedSrsCode = null;
-		notifyChange("items", "selectedPredefinedSrsCode", "availablePredefinedSRSs");
+		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
+			@Override
+			public void onOk(boolean confirmed) {
+				CoordinateOperations coordinateOperations = getCoordinateOperations();
+				Set<String> languages = new HashSet<String>(survey.getLanguages());
+				
+				SpatialReferenceSystem srs = coordinateOperations.fetchSRS(selectedPredefinedSrsCode, languages);
+				
+				survey.addSpatialReferenceSystem(srs);
+				selectedPredefinedSrsCode = null;
+				notifyChange("items", "selectedPredefinedSrsCode", "availablePredefinedSRSs");
+				dispatchSurveyChangedCommand();
+			}
+		});
 	}
 
 	private CoordinateOperations getCoordinateOperations() {
@@ -119,8 +125,7 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 	}
 	
 	@Command
-	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
-		event.stopPropagation();
+	public void apply(@ContextParam(ContextType.BINDER) final Binder binder) {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
@@ -128,5 +133,4 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 			}
 		});
 	}
-
 }

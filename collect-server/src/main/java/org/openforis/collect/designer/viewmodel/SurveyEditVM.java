@@ -64,8 +64,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private static final String PREVIEW_WINDOW_ID = "collect_survey_preview";
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	public static final String BACKGROUD_SAVE_GLOBAL_COMMAND = "backgroundSurveySave";
-	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
-//	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
 	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
 	
 	private static final String SCHEMA_SUMMARY_FILE_NAME_PATTERN = "%s_schema_summary_%s.%s";
@@ -255,7 +253,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		dispatchValidateAllCommand();
 		if ( checkCanSave() ) {
 			backgroundSurveySave();
-			MessageUtil.showInfo(SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY);
 		}
 	}
 	
@@ -265,8 +262,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 		surveyManager.saveSurveyWork(survey);
 		BindUtils.postNotifyChange(null, null, survey, "id");
 		BindUtils.postNotifyChange(null, null, survey, "published");
-		notifyChange("surveyStored","surveyId","surveyPublished");
 		changed = false;
+		notifyChange("surveyStored","surveyId","surveyPublished","changed");
 	}
 	
 	protected boolean checkCanSave() {
@@ -403,6 +400,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void surveyChanged() {
 		changed = true;
+		notifyChange("changed");
 	}
 
 	@GlobalCommand

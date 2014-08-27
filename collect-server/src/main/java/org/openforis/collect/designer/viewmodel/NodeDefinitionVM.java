@@ -82,6 +82,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	@Override
+	protected void moveSelectedItemInSurvey(int indexTo) {
+		//do nothing
+	}
+	
+	@Override
 	@GlobalCommand
 	public void currentLanguageChanged() {
 		super.currentLanguageChanged();
@@ -153,11 +158,6 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	@Override
 	protected List<T> getItemsInternal() {
 		return null;
-	}
-
-	@Override
-	protected void moveSelectedItem(int indexTo) {
-		//do nothing
 	}
 
 	@Override

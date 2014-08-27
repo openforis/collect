@@ -47,10 +47,24 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	// private static CoordinateOperationFactory CO_FACTORY;
 	// private static Map<String, CoordinateReferenceSystem> SYSTEMS;
 	private static Map<String, MathTransform> TO_WGS84_TRANSFORMS;
-	private static GeodeticCalculator CALCULATOR;
 
 	static {
 		init();
+	}
+
+	private static void init() {
+		try {
+			// SYSTEMS = new HashMap<String, CoordinateReferenceSystem>();
+			TO_WGS84_TRANSFORMS = new HashMap<String, MathTransform>();
+
+			MathTransform wgs84Transform = CRS.findMathTransform(WGS84, WGS84);
+			TO_WGS84_TRANSFORMS.put(WGS84_ID, wgs84Transform);
+		} catch (Exception e) {
+			if (LOG.isErrorEnabled()) {
+				LOG.error("Error while initializing CoordinateOperations", e);
+			}
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -61,26 +75,43 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	 * @return
 	 * @throws TransformException
 	 */
-	public synchronized double orthodromicDistance(Position startingPosition, Position destinationPosition) {
+	public double orthodromicDistance(Position startingPosition, Position destinationPosition) {
 		try {
-			CALCULATOR.setStartingPosition(startingPosition);
-			CALCULATOR.setDestinationPosition(destinationPosition);
-			double result = CALCULATOR.getOrthodromicDistance();
+			GeodeticCalculator calculator = new GeodeticCalculator();
+			calculator.setStartingPosition(startingPosition);
+			calculator.setDestinationPosition(destinationPosition);
+			double result = calculator.getOrthodromicDistance();
 			return result;
 		} catch (TransformException e) {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public boolean validate(Coordinate coordinate) {
+		try {
+			double x = coordinate.getX();
+			double y = coordinate.getY();
+			String srsId = coordinate.getSrsId();
+			Position position = toWgs84(x, y, srsId);
+			GeodeticCalculator calculator = new GeodeticCalculator();
+			//this will call methods checkLatidude and checkLongitude inside of GeodeticCalculator
+			calculator.setStartingPosition(position);
+			return true;
+		} catch ( Exception e ) {
+			return false;
+		}
+	}
 
 	@Override
-	public synchronized double orthodromicDistance(double startX, double startY, String startSRSId, double destX, double destY, String destSRSId) {
+	public double orthodromicDistance(double startX, double startY, String startSRSId, double destX, double destY, String destSRSId) {
 		Position startingPosition = toWgs84(startX, startY, startSRSId);
 		Position destinationPosition = toWgs84(destX, destY, destSRSId);
 		return orthodromicDistance(startingPosition, destinationPosition);
 	}
 
 	@Override
-	public synchronized double orthodromicDistance(Coordinate startingCoordinate, Coordinate destinationCoordinate) {
+	public double orthodromicDistance(Coordinate startingCoordinate, Coordinate destinationCoordinate) {
 		double startX = startingCoordinate.getX();
 		double startY = startingCoordinate.getY();
 		String startSRSId = startingCoordinate.getSrsId();
@@ -208,22 +239,6 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 				LOG.error("Error while parsing srsid " + srsId, t);
 			}
 			throw new RuntimeException(t);
-		}
-	}
-
-	private static void init() {
-		try {
-			// SYSTEMS = new HashMap<String, CoordinateReferenceSystem>();
-			TO_WGS84_TRANSFORMS = new HashMap<String, MathTransform>();
-			CALCULATOR = new GeodeticCalculator();
-
-			MathTransform wgs84Transform = CRS.findMathTransform(WGS84, WGS84);
-			TO_WGS84_TRANSFORMS.put(WGS84_ID, wgs84Transform);
-		} catch (Exception e) {
-			if (LOG.isErrorEnabled()) {
-				LOG.error("Error while initializing CoordinateOperations", e);
-			}
-			throw new RuntimeException(e);
 		}
 	}
 

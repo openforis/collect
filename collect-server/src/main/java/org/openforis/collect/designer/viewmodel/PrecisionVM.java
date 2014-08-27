@@ -51,10 +51,6 @@ public class PrecisionVM extends SurveyObjectBaseVM<Precision> {
 	}
 
 	@Override
-	protected void moveSelectedItem(int indexTo) {
-	}
-
-	@Override
 	protected Precision createItemInstance() {
 		return null;
 	}
@@ -66,8 +62,14 @@ public class PrecisionVM extends SurveyObjectBaseVM<Precision> {
 
 	@Override
 	protected void deleteItemFromSurvey(Precision item) {
+		//do nothing
 	}
-	
+
+	@Override
+	protected void moveSelectedItemInSurvey(int indexTo) {
+		//do nothing
+	}
+
 	@Command
 	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
 		dispatchApplyChangesCommand(binder);

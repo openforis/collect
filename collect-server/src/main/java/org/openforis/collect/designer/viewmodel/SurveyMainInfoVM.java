@@ -61,10 +61,10 @@ public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 
 	@Override
 	protected void deleteItemFromSurvey(CollectSurvey item) {}
-
-	@Override
-	protected void moveSelectedItem(int indexTo) {}
 	
+	@Override
+	protected void moveSelectedItemInSurvey(int indexTo) {}
+
 	public SurveyManager getSurveyManager() {
 		return surveyManager;
 	}
