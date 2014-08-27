@@ -95,7 +95,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		
 		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurveyWork(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
-		assertEquals(5, samplingDesignSummaries.getTotalCount());
+		assertEquals(6, samplingDesignSummaries.getTotalCount());
 		
 		List<SamplingDesignItem> items = samplingDesignSummaries.getRecords();
 		{
@@ -106,6 +106,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		assertNotNull(findItem(items, 200000d, -2000000d, "1_02"));
 		assertNotNull(findItem(items, 806340d, 9320050d, "10_114"));
 		assertNotNull(findItem(items, 806680d, 9305020d, "10_117"));
+		assertNotNull(findItem(items, 80.1234d, -6.908d, "10_115"));
 	}
 	
 	@Test
