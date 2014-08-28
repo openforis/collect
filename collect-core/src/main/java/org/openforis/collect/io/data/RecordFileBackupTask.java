@@ -8,6 +8,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
@@ -29,6 +32,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RecordFileBackupTask extends Task {
+	
+	private transient Log log = LogFactory.getLog(RecordFileBackupTask.class);
 
 	private RecordManager recordManager;
 	private RecordFileManager recordFileManager;
@@ -75,10 +80,10 @@ public class RecordFileBackupTask extends Task {
 		for (FileAttribute fileAttribute : fileAttributes) {
 			if ( ! fileAttribute.isEmpty() ) {
 				File file = recordFileManager.getRepositoryFile(fileAttribute);
-				if ( file == null ) {
-					String message = String.format("Missing file: %s attributeId: %d attributeName: %s", 
-							fileAttribute.getFilename(), fileAttribute.getInternalId(), fileAttribute.getName());
-					throw new RecordFileException(message);
+				if ( file == null || ! file.exists() ) {
+					log.error(String.format("Record file not found for record %s (%d) attribute %s (%d)", 
+							StringUtils.join(record.getRootEntityKeyValues(), ','), record.getId(), fileAttribute.getPath(), fileAttribute.getInternalId()));
+					//throw new RecordFileException(message);
 				} else {
 					String entryName = calculateRecordFileEntryName(fileAttribute);
 					writeFile(file, entryName);
