@@ -6,7 +6,9 @@
  */
 
 package org.openforis.collect.metamodel.proxy {
+	import org.openforis.collect.metamodel.TypedLanguageSpecificTextDelegator;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
+	import org.openforis.collect.util.TextUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy")]
@@ -18,6 +20,21 @@ package org.openforis.collect.metamodel.proxy {
 		
 		public function hasDirectionByColumns():Boolean {
 			return parent != null && parent.direction == UIOptions$Direction.BY_COLUMNS
+		}
+		
+		public function getFieldLabel(field:String):FieldLabelProxy {
+			var labelDelegator:TypedLanguageSpecificTextDelegator = new TypedLanguageSpecificTextDelegator(fieldLabels);
+			var result:TypedLanguageSpecificTextProxy = labelDelegator.getLabel(field);
+			return FieldLabelProxy(result);
+		}
+		
+		public function getFieldLabelText(field:String, defaultText:String = null):String {
+			var label:FieldLabelProxy = getFieldLabel(field);
+			if(label == null) {
+				return defaultText;
+			} else {
+				return TextUtil.trimLeadingWhitespace(label.text);
+			}
 		}
 		
     }

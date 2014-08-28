@@ -17,6 +17,9 @@ import org.openforis.idm.metamodel.EntityDefinition;
 public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttributeDefinition> extends AttributeDefinitionFormObject<T> {
 	
 	private String fieldsOrderValue;
+	private String xFieldLabel;
+	private String yFieldLabel;
+	private String srsFieldLabel;
 	
 	CoordinateAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -26,6 +29,9 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		saveFieldOrderValue(dest);
+		dest.setFieldLabel(CoordinateAttributeDefinition.X_FIELD_NAME, languageCode, xFieldLabel);
+		dest.setFieldLabel(CoordinateAttributeDefinition.Y_FIELD_NAME, languageCode, yFieldLabel);
+		dest.setFieldLabel(CoordinateAttributeDefinition.SRS_FIELD_NAME, languageCode, srsFieldLabel);
 	}
 
 	protected void saveFieldOrderValue(T dest) {
@@ -44,6 +50,9 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		loadFieldsOrderValue(source);
+		xFieldLabel = source.getFieldLabel(CoordinateAttributeDefinition.X_FIELD_NAME, languageCode);
+		yFieldLabel = source.getFieldLabel(CoordinateAttributeDefinition.Y_FIELD_NAME, languageCode);
+		srsFieldLabel = source.getFieldLabel(CoordinateAttributeDefinition.SRS_FIELD_NAME, languageCode);
 	}
 
 	protected void loadFieldsOrderValue(T source) {
@@ -60,5 +69,29 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	public void setFieldsOrderValue(String fieldsOrderValue) {
 		this.fieldsOrderValue = fieldsOrderValue;
 	};
+	
+	public String getxFieldLabel() {
+		return xFieldLabel;
+	}
+
+	public void setxFieldLabel(String xFieldLabel) {
+		this.xFieldLabel = xFieldLabel;
+	}
+
+	public String getyFieldLabel() {
+		return yFieldLabel;
+	}
+
+	public void setyFieldLabel(String yFieldLabel) {
+		this.yFieldLabel = yFieldLabel;
+	}
+
+	public String getSrsFieldLabel() {
+		return srsFieldLabel;
+	}
+
+	public void setSrsFieldLabel(String srsFieldLabel) {
+		this.srsFieldLabel = srsFieldLabel;
+	}
 
 }

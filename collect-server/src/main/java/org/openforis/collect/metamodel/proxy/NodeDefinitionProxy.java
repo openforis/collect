@@ -124,7 +124,7 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 
 	@ExternalizedProperty
 	public List<NodeLabelProxy> getLabels() {
-		return NodeLabelProxy.fromList(nodeDefinition.getLabels());
+		return NodeLabelProxy.fromNodeLabelList(nodeDefinition.getLabels());
 	}
 
 	@ExternalizedProperty
