@@ -4,6 +4,7 @@ package org.openforis.collect.ui.component.detail
 	import mx.core.UIComponent;
 	
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -60,6 +61,12 @@ package org.openforis.collect.ui.component.detail
 				} else {
 					nodes = parentEntity.getChildren(name);
 				}
+				//do not hide multiple entities renderer if they are relevant but no entities are defined or it will be impossible to add new entities
+				if ( defn is EntityDefinitionProxy && nodes.length == 0 ) {
+					var result:Boolean = ! parentEntity.childrenRelevanceMap.get(name);
+					return result;
+				}
+				//hide table columns when all the cells are not relevant and empty
 				var allNodesEmptyAndNotRelevant:Boolean = true;
 				for each (var node:NodeProxy in nodes) {
 					var calculated:Boolean = defn is AttributeDefinitionProxy && AttributeDefinitionProxy(defn).calculated;

@@ -177,7 +177,12 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		moveSelectedItem(indexTo);
 	}
 	
-	protected abstract void moveSelectedItem(int indexTo);
+	protected void moveSelectedItem(int indexTo) {
+		dispatchSurveyChangedCommand();
+		moveSelectedItemInSurvey(indexTo);
+	}
+	
+	protected abstract void moveSelectedItemInSurvey(int indexTo);
 
 	@DependsOn({"items","selectedItem"})
 	public boolean isMoveSelectedItemUpDisabled() {
@@ -224,6 +229,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			dispatchCurrentFormValidatedCommand(true);
 			notifyChange("currentFormValid");
 		}
+		dispatchSurveyChangedCommand();
 	}
 
 	protected void resetEditedItem() {

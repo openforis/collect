@@ -79,7 +79,7 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 	}
 	
 	@Override
-	protected void moveSelectedItem(int indexTo) {
+	protected void moveSelectedItemInSurvey(int indexTo) {
 		survey.moveUnit(selectedItem, indexTo);
 	}
 

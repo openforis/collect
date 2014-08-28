@@ -232,7 +232,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 
 		private static final long serialVersionUID = 1L;
 
-		private static final String LOCATION_POINT_FORMAT = "#";
+		private static final String LOCATION_POINT_FORMAT = "#.#######";
 		private static final String LOCATION_PATTERN = "SRID={0};POINT({1} {2})";
 
 		public JooqFactory(Connection connection) {

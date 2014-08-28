@@ -20,6 +20,7 @@ package org.openforis.collect.util {
 	import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.DateAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.FieldLabelProxy;
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
@@ -126,6 +127,7 @@ package org.openforis.collect.util {
 				EntityDefinitionProxy,
 				EntityChangeProxy,
 				EntityProxy,
+				FieldLabelProxy,
 				FieldProxy,
 				FileAttributeDefinitionProxy,
 				FileUnmarshallingErrorProxy,
@@ -135,10 +137,10 @@ package org.openforis.collect.util {
 				ModelVersionProxy,
 				NodeDefinitionSummary,
 				NodeDeleteChangeProxy,
-				NodeUnmarshallingErrorProxy,
 				NodeLabelProxy,
 				NodeLabelProxy$Type,
 				NodeProxy,
+				NodeUnmarshallingErrorProxy,
 				ProcessStatus,
 				ProcessStatus$Step,
 				PrecisionProxy,

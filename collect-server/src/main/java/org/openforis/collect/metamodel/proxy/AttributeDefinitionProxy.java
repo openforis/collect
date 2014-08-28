@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.metamodel.proxy;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
@@ -64,4 +66,10 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 	public boolean isCalculated() {
 		return attributeDefinition.isCalculated();
 	}
+
+	@ExternalizedProperty
+	public List<FieldLabelProxy> getFieldLabels() {
+		return FieldLabelProxy.fromFieldLabelList(attributeDefinition.getFieldLabels());
+	}
+	
 }

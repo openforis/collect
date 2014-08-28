@@ -53,10 +53,6 @@ public class AttributeDefaultVM extends SurveyObjectBaseVM<AttributeDefault> {
 	}
 
 	@Override
-	protected void moveSelectedItem(int indexTo) {
-	}
-
-	@Override
 	protected AttributeDefault createItemInstance() {
 		return null;
 	}
@@ -69,6 +65,11 @@ public class AttributeDefaultVM extends SurveyObjectBaseVM<AttributeDefault> {
 	@Override
 	protected void deleteItemFromSurvey(AttributeDefault item) {
 	}
+	
+	@Override
+	protected void moveSelectedItemInSurvey(int indexTo) {
+	}
+	
 	
 	@Command
 	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {

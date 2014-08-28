@@ -166,7 +166,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@Override
-	protected void moveSelectedItem(int indexTo) {
+	protected void moveSelectedItemInSurvey(int indexTo) {
 		survey.moveCodeList(selectedItem, indexTo);
 	}
 	
@@ -646,10 +646,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	
 	public String getWarnings(CodeList list) {
 		String messageKey;
-		if ( ! codeListManager.isInUse(list) ) {
-			messageKey = "survey.validation.error.unused_code_list";
-		} else if ( codeListManager.isEmpty(list) ) {
+		if ( codeListManager.isEmpty(list) ) {
 			messageKey = "survey.validation.error.empty_code_list";
+		} else if ( ! codeListManager.isInUse(list) ) {
+			messageKey = "survey.validation.error.unused_code_list";
 		} else {
 			messageKey = null;
 		}

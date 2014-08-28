@@ -485,15 +485,18 @@ public class RecordManager {
 		
 		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
 		
-		//add calculated attribute changes
-		Collection<Attribute<?, ?>> dependantCalculatedAttributes = attribute.getDependantCalculatedAttributes();
+		addCalculatedAttributeChanges(changeMap, attribute);
+
+		return new NodeChangeSet(changeMap.getChanges());
+	}
+
+	private <V extends Value> void addCalculatedAttributeChanges(NodeChangeMap changeMap, Node<?> node) {
+		Collection<Attribute<?, ?>> dependantCalculatedAttributes = node.getDependantCalculatedAttributes();
 		for (Attribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
 			AttributeChange change = changeMap.prepareAttributeChange(calculatedAttribute);
 			Map<Integer, Object> updatedFieldValues = createFieldValuesMap(calculatedAttribute);
 			change.setUpdatedFieldValues(updatedFieldValues);
 		}
-
-		return new NodeChangeSet(changeMap.getChanges());
 	}
 	
 	/**
@@ -541,8 +544,7 @@ public class RecordManager {
 	 * @param nodeName
 	 * @return Changes applied to the record 
 	 */
-	public NodeChangeSet addEntity(
-			Entity parentEntity, String nodeName) {
+	public NodeChangeSet addEntity(Entity parentEntity, String nodeName) {
 		Entity createdNode = performEntityAdd(parentEntity, nodeName);
 		
 		setMissingValueApproved(parentEntity, nodeName, false);
@@ -555,6 +557,8 @@ public class RecordManager {
 		relevanceRequiredDependencies.add(new NodePointer(createdNode.getParent(), nodeName));
 		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(createdNode);
 		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
+		
+		addCalculatedAttributeChanges(changeMap, createdNode);
 		return new NodeChangeSet(changeMap.getChanges());
 	}
 
@@ -710,12 +714,8 @@ public class RecordManager {
 			requiredDependencies.addAll(n.getRequiredDependencies());
 			if ( n instanceof Attribute ) {
 				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
-				Collection<Attribute<?, ?>> dependantCalculatedAttributes = n.getDependantCalculatedAttributes();
-				for (Attribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
-					calculatedAttribute.clearValue();
-					changeMap.prepareAttributeChange(calculatedAttribute);
-				}
 			}
+			addCalculatedAttributeChanges(changeMap, node);
 			performNodeDeletion(n);
 		}
 		//clear dependencies

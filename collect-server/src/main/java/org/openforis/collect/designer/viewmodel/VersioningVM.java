@@ -101,7 +101,7 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 	}
 
 	@Override
-	protected void moveSelectedItem(int indexTo) {
+	protected void moveSelectedItemInSurvey(int indexTo) {
 		CollectSurvey survey = getSurvey();
 		survey.moveVersion(selectedItem, indexTo);
 	}

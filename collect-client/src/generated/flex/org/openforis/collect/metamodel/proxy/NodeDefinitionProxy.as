@@ -10,6 +10,7 @@ package org.openforis.collect.metamodel.proxy {
 	import mx.collections.IList;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.metamodel.TypedLanguageSpecificTextDelegator;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.TextUtil;
@@ -71,40 +72,21 @@ package org.openforis.collect.metamodel.proxy {
 		}
 		
 		public function getLabel(type:NodeLabelProxy$Type):NodeLabelProxy {
-			if(CollectionUtil.isNotEmpty(labels)) {
-				var labelsPerType:IList = getLabelsByType(type);
-				var langCode:String = Application.localeLanguageCode;
-				var isDefaultLang:Boolean = langCode == Application.activeSurvey.defaultLanguageCode;
-				for each(var label:NodeLabelProxy in labelsPerType) {
-					if ( label.language == null && isDefaultLang || label.language == langCode) {
-						return label;
-					}
-				}
-				return getDefaultLanguageLabelByType(type);
-			} else {
-				return null;
-			}
+			var labelDelegator:TypedLanguageSpecificTextDelegator = new TypedLanguageSpecificTextDelegator(labels);
+			var result:TypedLanguageSpecificTextProxy = labelDelegator.getLabel(type);
+			return NodeLabelProxy(result);
 		}
 		
 		public function getLabelsByType(type:NodeLabelProxy$Type):IList {
-			var result:IList = new ArrayCollection();
-			for each(var label:NodeLabelProxy in labels) {
-				if(label.type == type) {
-					result.addItem(label);
-				}
-			}
+			var labelDelegator:TypedLanguageSpecificTextDelegator = new TypedLanguageSpecificTextDelegator(labels);
+			var result:IList = labelDelegator.getLabelsByType(type);
 			return result;
 		}
 		
 		public function getDefaultLanguageLabelByType(type:NodeLabelProxy$Type):NodeLabelProxy {
-			var labelsPerType:IList = getLabelsByType(type);
-			var defaultLangCode:String = Application.activeSurvey.defaultLanguageCode;
-			for each(var label:NodeLabelProxy in labelsPerType) {
-				if ( label.language == null || label.language == defaultLangCode) {
-					return label;
-				}
-			}
-			return null;
+			var labelDelegator:TypedLanguageSpecificTextDelegator = new TypedLanguageSpecificTextDelegator(labels);
+			var result:TypedLanguageSpecificTextProxy = labelDelegator.getDefaultLanguageLabelByType(type);
+			return NodeLabelProxy(result);
 		}
 		
 		public function getDescription():String {

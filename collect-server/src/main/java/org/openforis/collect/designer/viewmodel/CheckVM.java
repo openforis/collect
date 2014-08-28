@@ -35,10 +35,6 @@ public abstract class CheckVM<T extends Check<?>> extends SurveyObjectBaseVM<T> 
 	}
 
 	@Override
-	protected void moveSelectedItem(int indexTo) {
-	}
-
-	@Override
 	protected T createItemInstance() {
 		return null;
 	}
@@ -50,6 +46,12 @@ public abstract class CheckVM<T extends Check<?>> extends SurveyObjectBaseVM<T> 
 
 	@Override
 	protected void deleteItemFromSurvey(T item) {
+		//do nothing
+	}
+	
+	@Override
+	protected void moveSelectedItemInSurvey(int indexTo) {
+		//do nothing
 	}
 	
 	@GlobalCommand

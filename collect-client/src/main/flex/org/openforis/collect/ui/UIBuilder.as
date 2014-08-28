@@ -561,12 +561,15 @@ package org.openforis.collect.ui {
 		
 		private static function addCoordinateAttributeLabels(compositeAttributeLabelsGroup:Group, 
 															 defn:CoordinateAttributeDefinitionProxy, directionByColumns:Boolean):void {
-			var fieldsOrder:UIOptions$CoordinateAttributeFieldsOrder = CoordinateAttributeDefinitionProxy(defn).fieldsOrder; 
-			var srsLabel:Label = getLabel(Message.get('edit.coordinate.srs'), 100, HEADER_LABEL_STYLE, directionByColumns);
+			var fieldsOrder:UIOptions$CoordinateAttributeFieldsOrder = CoordinateAttributeDefinitionProxy(defn).fieldsOrder;
+			var srsLabelText:String = defn.getFieldLabelText("srs", Message.get('edit.coordinate.srs'));
+			var srsLabel:Label = getLabel(srsLabelText, 100, HEADER_LABEL_STYLE, directionByColumns);
 			srsLabel.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-			var xLabel:Label = getLabel(Message.get('edit.coordinate.x'), 70, HEADER_LABEL_STYLE, directionByColumns);
+			var xLabelText:String = defn.getFieldLabelText("x", Message.get('edit.coordinate.x'));
+			var xLabel:Label = getLabel(xLabelText, 70, HEADER_LABEL_STYLE, directionByColumns);
 			xLabel.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-			var yLabel:Label = getLabel(Message.get('edit.coordinate.y'), 70, HEADER_LABEL_STYLE, directionByColumns);
+			var yLabelText:String = defn.getFieldLabelText("y", Message.get('edit.coordinate.y'));
+			var yLabel:Label = getLabel(yLabelText, 70, HEADER_LABEL_STYLE, directionByColumns);
 			yLabel.height = ATTRIBUTE_INPUT_FIELD_HEIGHT;
 			switch(fieldsOrder) {
 				case UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y:

@@ -3,12 +3,14 @@
 	<custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}" />
 	<custom-attributes otherMinorGeneralDetailsForm="${arg.otherMinorGeneralDetailsForm}" />
 	<custom-attributes otherAttributesForm="${arg.otherAttributesForm}" />
-	<custom-attributes otherLayoutForm="${arg.otherLayoutForm}"/>
+	<custom-attributes otherLabelsForm="${arg.otherLabelsForm}"/>
+  	<custom-attributes otherLayoutForm="${arg.otherLayoutForm}"/>
   
 	<include id="nodeCommonInclude" src="survey_edit/schema/node_common.zul"
 		otherGeneralDetailsForm="${otherGeneralDetailsForm}"
 		otherMinorGeneralDetailsForm="${otherMinorGeneralDetailsForm}"
 		otherAttributesForm="${otherAttributesForm}"
+		otherLabelsForm="${otherLabelsForm}"
 		otherLayoutForm="${otherLayoutForm}" />
 
 	<fieldErrorHandler message="@load(vmsgs['attributeDefaults'])">

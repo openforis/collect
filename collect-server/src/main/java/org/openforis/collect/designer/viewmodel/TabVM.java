@@ -56,7 +56,7 @@ public class TabVM extends SurveyObjectBaseVM<UITab> {
 	}
 
 	@Override
-	protected void moveSelectedItem(int indexTo) {
+	protected void moveSelectedItemInSurvey(int indexTo) {
 	}
 
 	@Override
