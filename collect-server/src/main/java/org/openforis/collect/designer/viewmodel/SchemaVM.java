@@ -546,7 +546,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private void removeTreeNode(final SchemaNodeData data) {
 		if ( data.isDetached() ) {
-			performRemoveDetachedNode();
+			performRemoveSelectedTreeNode();
 		} else {
 			SurveyObject surveyObject = data.getSurveyObject();
 			if ( surveyObject instanceof NodeDefinition ) {
@@ -693,7 +693,7 @@ public class SchemaVM extends SurveyBaseVM {
 		dispatchSchemaChangedCommand();
 	}
 	
-	protected void performRemoveDetachedNode() {
+	protected void performRemoveSelectedTreeNode() {
 		treeModel.removeSelectedNode();
 		notifyChange("treeModel");
 		resetEditingStatus();
@@ -992,6 +992,8 @@ public class SchemaVM extends SurveyBaseVM {
 			return getEntityIcon((EntityDefinition) surveyObject);
 		} else if ( key ) {
 			return imagesRootPath + "key-small.png";
+		} else if ( surveyObject instanceof AttributeDefinition && ((AttributeDefinition) surveyObject).isCalculated() ) {
+			return imagesRootPath + "calculated-small.png";
 		} else {
 			AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) surveyObject);
 			return getAttributeIcon(attributeType.name());
@@ -1162,10 +1164,14 @@ public class SchemaVM extends SurveyBaseVM {
 			EntityDefinition parentDefn = nodeDefn.getParentEntityDefinition();
 			parentDefn.removeChildDefinition(nodeDefn);
 		}
+		performRemoveSelectedTreeNode();
+
 		UITabSet parent = tab.getParent();
 		parent.removeTab(tab);
-		treeModel.removeSelectedNode();
-		notifyChange("treeModel", "selectedTab");
+		
+		refreshTreeModel();
+		
+		dispatchSchemaChangedCommand();
 	}
 	
 	@Command

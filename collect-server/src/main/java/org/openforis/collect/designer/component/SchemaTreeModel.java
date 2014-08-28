@@ -235,6 +235,33 @@ public class SchemaTreeModel extends BasicTreeModel<SchemaTreeModel.SchemaNodeDa
 			return surveyObject;
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = prime * result
+					+ ((surveyObject == null) ? 0 : surveyObject.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			SchemaNodeData other = (SchemaNodeData) obj;
+			if (surveyObject == null) {
+				if (other.surveyObject != null)
+					return false;
+			} else if (!surveyObject.equals(other.surveyObject))
+				return false;
+			return true;
+		}
+		
+
 	}
 
 	public static class SchemaTreeNode extends AbstractNode<SchemaNodeData> {

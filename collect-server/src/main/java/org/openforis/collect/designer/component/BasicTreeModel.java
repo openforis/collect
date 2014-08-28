@@ -240,6 +240,43 @@ public abstract class BasicTreeModel<T> extends DefaultTreeModel<T> {
 			this.icon = icon;
 		}
 
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + (detached ? 1231 : 1237);
+			result = prime * result + ((icon == null) ? 0 : icon.hashCode());
+			result = prime * result + ((label == null) ? 0 : label.hashCode());
+			result = prime * result + (root ? 1231 : 1237);
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			SimpleNodeData other = (SimpleNodeData) obj;
+			if (detached != other.detached)
+				return false;
+			if (icon == null) {
+				if (other.icon != null)
+					return false;
+			} else if (!icon.equals(other.icon))
+				return false;
+			if (label == null) {
+				if (other.label != null)
+					return false;
+			} else if (!label.equals(other.label))
+				return false;
+			if (root != other.root)
+				return false;
+			return true;
+		}
+
 		/*
 		public void markAsDetached(boolean root) {
 			if ( label == null ) {
@@ -247,8 +284,7 @@ public abstract class BasicTreeModel<T> extends DefaultTreeModel<T> {
 			}
 		}
 		*/
+		
 	}
-
-
 
 }
