@@ -72,7 +72,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private static final String SURVEY_CODE_LIST_GENERATED_LEVEL_NAME_LABEL_KEY = "survey.code_list.generated_level_name";
 	public static final String CLOSE_CODE_LIST_ITEM_POP_UP_COMMAND = "closeCodeListItemPopUp";
 	public static final String CLOSE_CODE_LIST_IMPORT_POP_UP_COMMAND = "closeCodeListImportPopUp";
-	private static final String CSV_CONTENT_TYPE = null;
+	private static final String CSV_CONTENT_TYPE = "text/csv";
 	
 	private List<List<CodeListItem>> itemsPerLevel;
 	private boolean newChildItem;
@@ -542,13 +542,15 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	public void closeCodeListImportPopUp() {
 		closePopUp(codeListImportPopUp);
 		codeListImportPopUp = null;
-		boolean hasMultipleLevels = editedItem.getHierarchy().size() > 1;
-		Type type = hasMultipleLevels ? Type.HIERARCHICAL: Type.FLAT;
-		CodeListFormObject fo = (CodeListFormObject) formObject;
-		fo.setType(type.name());
-		selectedItemsPerLevel = new ArrayList<CodeListItem>();
-		initItemsPerLevel();
-		notifyChange("formObject","listLevels","selectedItemsPerLevel");
+		if ( editedItem != null ) {
+			boolean hasMultipleLevels = editedItem.getHierarchy().size() > 1;
+			Type type = hasMultipleLevels ? Type.HIERARCHICAL: Type.FLAT;
+			CodeListFormObject fo = (CodeListFormObject) formObject;
+			fo.setType(type.name());
+			selectedItemsPerLevel = new ArrayList<CodeListItem>();
+			initItemsPerLevel();
+			notifyChange("formObject","listLevels","selectedItemsPerLevel");
+		}
 	}
 	
 	@GlobalCommand
