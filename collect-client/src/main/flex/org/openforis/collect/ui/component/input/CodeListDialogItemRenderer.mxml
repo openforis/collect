@@ -18,6 +18,7 @@
 			import mx.managers.DragManager;
 			
 			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.util.UIUtil;
 			
 			public static const STATE_NORMAL:String = "normal";
@@ -41,6 +42,13 @@
 				var item:CodeListItemProxy = CodeListItemProxy(data);
 				var label:String = item.code + " - " + item.getLabelText();
 				return label;
+			}
+			
+			[Bindable(event="dataChange")]
+			public function get description():String {
+				var item:CodeListItemProxy = CodeListItemProxy(data);
+				var description:String = item.getDescriptionText();
+				return description;
 			}
 		
 			protected function mouseMoveHandler(event:MouseEvent):void {
@@ -179,6 +187,20 @@
 					keyDown="checkBoxKeyDownHandler(event)"
 					focusIn="checkBoxFocusInHandler(event)"
 					/>
+		
+		<s:Group id="descriptionIconContainer"
+				 width="20"
+				 height="100%"
+				 visible="{description != null}"
+				 includeInLayout="{description != null}"
+				 >
+			<s:Image id="descriptionIcon"
+					 source="{Images.INFO_VERY_SMALL}"
+					 toolTip="{description}"
+					 horizontalCenter="0"
+					 verticalCenter="0"
+					 />
+		</s:Group>
 		
 		<mx:TextInput height="20" id="textInput" 
 					  visible="{data.qualifiable}" 
