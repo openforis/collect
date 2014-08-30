@@ -70,12 +70,12 @@ public class AttributeDefaultVM extends SurveyObjectBaseVM<AttributeDefault> {
 	protected void moveSelectedItemInSurvey(int indexTo) {
 	}
 	
-	
+	@Override
 	@Command
 	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
 		dispatchApplyChangesCommand(binder);
 		if ( checkCanLeaveForm() ) {
-			super.commitChanges();
+			super.commitChanges(binder);
 			BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_ATTRIBUTE_DEFAULT_GLOBAL_COMMAND, null);
 		}
 	}

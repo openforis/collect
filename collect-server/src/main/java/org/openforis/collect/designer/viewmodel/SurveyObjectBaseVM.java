@@ -117,6 +117,10 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	}
 
 	@Command
+	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
+		commitChanges();
+	}
+	
 	public void commitChanges() {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		if ( newItem ) {
