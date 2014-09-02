@@ -169,7 +169,19 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 		int result = getUIOptions().getColumnSpan(nodeDefinition);
 		return result;
 	}
+	
+	@ExternalizedProperty
+	public Integer getWidth() {
+		Integer width = getUIOptions().getWidth(nodeDefinition);
+		return width;
+	}
 
+	@ExternalizedProperty
+	public Integer getLabelWidth() {
+		Integer width = getUIOptions().getLabelWidth(nodeDefinition);
+		return width;
+	}
+	
 	protected UIOptions getUIOptions() {
 		CollectSurvey survey = (CollectSurvey) nodeDefinition.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();

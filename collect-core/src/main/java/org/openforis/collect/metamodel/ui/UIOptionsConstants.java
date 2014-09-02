@@ -34,5 +34,6 @@ public interface UIOptionsConstants {
 	String HIDE = "hide";
 	String COLUMN = "column";
 	String COLUMN_SPAN = "columnSpan";
-	
+	String WIDTH = "width";
+	String LABEL_WIDTH = "labelWidth";
 }

@@ -347,6 +347,22 @@
 		  						onChange="@command('applyChanges')" />
 		  				</fieldErrorHandler>
 		  			</row>
+    				<row>
+		  				<fieldErrorHandler message="@load(vmsgs['width'])">
+		  					<label value="${labels.survey.schema.node.layout.width}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['width'])">
+		  					<intbox value="@bind(fx.width)"
+		  						onChange="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['labelWidth'])">
+		  					<label value="${labels.survey.schema.node.layout.label_width}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['labelWidth'])">
+		  					<intbox value="@bind(fx.labelWidth)"
+		  						onChange="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+		  			</row>
     			</rows>
     		</grid>
 

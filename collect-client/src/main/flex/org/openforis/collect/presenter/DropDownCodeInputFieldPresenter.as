@@ -1,6 +1,5 @@
 package org.openforis.collect.presenter
 {
-	import flash.events.Event;
 	import flash.events.FocusEvent;
 	import flash.events.KeyboardEvent;
 	
@@ -24,7 +23,6 @@ package org.openforis.collect.presenter
 			
 			view.dropDownList.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 			view.dropDownList.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
-			view.dropDownList.addEventListener(Event.CHANGE, changeHandler);
 			view.dropDownList.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
 		}
 		

@@ -23,6 +23,9 @@
 			import org.openforis.collect.util.StringUtil;
 			import org.openforis.collect.util.UIUtil;
 			
+			import spark.skins.spark.CheckBoxSkin;
+			import spark.skins.spark.RadioButtonSkin;
+			
 			public static const STATE_NORMAL:String = "normal";
 			public static const STATE_DROPPING_TOP:String = "droppingTop";
 			public static const STATE_DROPPING_BOTTOM:String = "droppingBottom";
@@ -172,6 +175,11 @@
 				CodeListItemsDataGroup(owner).dispatchEvent(new Event("apply"));
 			}
 			
+			[Bindable(event="dataChange")]
+			public function get checkBoxSkinClass():Class {
+				return CodeListItemsDataGroup(owner).multipleSelection ? CheckBoxSkin: RadioButtonSkin;
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -207,6 +215,7 @@
 					change="checkBoxChangeHandler(event)" 
 					keyDown="checkBoxKeyDownHandler(event)"
 					focusIn="checkBoxFocusInHandler(event)"
+					skinClass="{checkBoxSkinClass}"
 					/>
 		
 		<s:Group id="descriptionIconContainer"

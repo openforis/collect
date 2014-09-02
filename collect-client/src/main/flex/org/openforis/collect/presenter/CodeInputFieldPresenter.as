@@ -1,40 +1,13 @@
 package org.openforis.collect.presenter {
-	import flash.display.DisplayObject;
-	import flash.events.Event;
-	import flash.events.FocusEvent;
-	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
-	import flash.events.TimerEvent;
-	import flash.ui.Keyboard;
-	import flash.utils.Timer;
-	
-	import mx.collections.ArrayCollection;
-	import mx.collections.IList;
-	import mx.core.FlexGlobals;
-	import mx.core.UIComponent;
-	import mx.events.CloseEvent;
-	import mx.events.FlexEvent;
-	import mx.managers.IFocusManagerComponent;
-	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
-	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
-	import org.openforis.collect.ui.component.input.CodeListDialog;
-	import org.openforis.collect.ui.component.input.TextInput;
-	import org.openforis.collect.ui.component.input.codelist.CodeListAllowedValuesPreviewDialog;
-	import org.openforis.collect.util.ArrayUtil;
-	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -63,10 +36,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function getTextFromValue():String {
-			if(view.attributeDefinition != null) {
+			if(view.attributeDefinition == null) {
+				return "";
+			} else {
 				return codeAttributeToText(view.attribute);
 			}
-			return "";
 		}
 		
 		protected function codeAttributeToText(attribute:AttributeProxy):String {

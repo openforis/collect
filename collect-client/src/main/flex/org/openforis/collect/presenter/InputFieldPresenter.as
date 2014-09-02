@@ -490,6 +490,10 @@ package org.openforis.collect.presenter {
 
 		protected function sendUpdateRequest(o:NodeUpdateRequestProxy):void {
 			var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(o);
+			sendUpdateRequestSet(req);
+		}
+		
+		protected function sendUpdateRequestSet(req:NodeUpdateRequestSetProxy):void {
 			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
 			view.updating = true;
 		}

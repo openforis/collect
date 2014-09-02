@@ -17,6 +17,7 @@
 			
 			private var _editable:Boolean = true;
 			private var _sortable:Boolean = false;
+			private var _multipleSelection:Boolean = false;
 			private var _applyImmediately:Boolean = false;
 			private var _showCode:Boolean = true;
 			
@@ -64,6 +65,15 @@
 			
 			public function set showCode(value:Boolean):void {
 				_showCode = value;
+			}
+
+			[Bindable]
+			public function get multipleSelection():Boolean {
+				return _multipleSelection;
+			}
+			
+			public function set multipleSelection(value:Boolean):void {
+				_multipleSelection = value;
 			}
 		]]>
 	</fx:Script>

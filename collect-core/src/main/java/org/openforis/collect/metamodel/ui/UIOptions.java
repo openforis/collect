@@ -696,9 +696,27 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		setAnnotationValue(defn, Annotation.COLUMN_SPAN, value);
 	}
 	
+	public Integer getWidth(NodeDefinition defn) {
+		return getAnnotationIntegerValue(defn, Annotation.WIDTH);
+	}
+	
+	public void setWidth(NodeDefinition defn, Integer value) {
+		setAnnotationValue(defn, Annotation.WIDTH, value);
+	}
+	
+	public Integer getLabelWidth(NodeDefinition defn) {
+		return getAnnotationIntegerValue(defn, Annotation.LABEL_WIDTH);
+	}
+	
+	public void setLabelWidth(NodeDefinition defn, Integer value) {
+		setAnnotationValue(defn, Annotation.LABEL_WIDTH, value);
+	}
+	
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
-		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {
+		if ( StringUtils.isBlank(annotationValue) ) {
+			if( annotation.getDefaultValue() != null ) {
+		}
 			Boolean defaultValue = annotation.getDefaultValue();
 			return defaultValue.booleanValue();
 		} else {
@@ -708,8 +726,12 @@ public class UIOptions implements ApplicationOptions, Serializable {
 
 	private String getAnnotationStringValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
-		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {
-			return annotation.getDefaultValue();
+		if ( StringUtils.isBlank(annotationValue) ) {
+			if ( annotation.getDefaultValue() != null ) {
+				return annotation.getDefaultValue();
+			} else {
+				return null;
+			}
 		} else {
 			return annotationValue;
 		}
@@ -717,9 +739,13 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	private Integer getAnnotationIntegerValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
-		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {
-			Integer defaultValue = annotation.getDefaultValue();
-			return defaultValue;
+		if ( StringUtils.isBlank(annotationValue) ) {
+			if ( annotation.getDefaultValue() != null ) {
+				Integer defaultValue = annotation.getDefaultValue();
+				return defaultValue;
+			} else {
+				return null;
+			}
 		} else {
 			return Integer.valueOf(annotationValue);
 		}

@@ -10,6 +10,7 @@
 		<![CDATA[
 			import mx.core.UIComponent;
 			
+			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.event.UIEvent;
 			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 			import org.openforis.collect.presenter.DropDownCodeInputFieldPresenter;
@@ -23,7 +24,7 @@
 			}
 			
 			override public function get validationStateDisplay():UIComponent {
-				return dropDownList;
+				return this;
 			}
 			
 			[Bindable(event="selectedItemsChange")]
@@ -63,6 +64,8 @@
 					labelFunction="{labelFunction}"
 					selectedIndex="{selectedIndex}"
 					enabled="{editable}"
-					change="dropDownListChangeHandler(event)"/>
+					change="dropDownListChangeHandler(event)"
+					width="{CodeAttributeDefinitionProxy(attributeDefinition).width}"
+					/>
 	
 </input:PreloadedCodeInputField>

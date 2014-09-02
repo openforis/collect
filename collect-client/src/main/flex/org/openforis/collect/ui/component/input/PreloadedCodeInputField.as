@@ -21,6 +21,7 @@ package org.openforis.collect.ui.component.input
 		public static const STATE_DEFAULT:String = "default";
 		public static const STATE_VALUES_SORTING_ALLOWED:String = "valuesSortingAllowed";
 		
+		private var _attributes:IList;
 		private var _items:IList;
 		private var _selectedItems:IList;
 		private var _notSelectedItems:IList;
@@ -83,6 +84,15 @@ package org.openforis.collect.ui.component.input
 		}
 		
 		[Bindable]
+		public function get attributes():IList {
+			return _attributes;
+		}
+		
+		public function set attributes(value:IList):void {
+			_attributes = value;
+		}
+		
+		[Bindable]
 		public function get items():IList {
 			return _items;
 		}
@@ -137,27 +147,5 @@ package org.openforis.collect.ui.component.input
 			_direction = value;
 		}
 		
-		/*
-		[Bindable(event="selectedItemChange")]
-		public function get selectedIndex():int {
-			if ( CollectionUtil.isEmpty(dataProvider) ) {
-				return -1;
-			} else {
-				var idx:int = dataProvider.getItemIndex(selectedItem);
-				return idx;
-			}
-		}
-		
-		[Bindable(event="selectedItemChange")]
-		public function get selectedValue():String {
-			if ( selectedItem == null ) {
-				return null;
-			} else if ( selectedItem is CodeListItemProxy ) {
-				return CodeListItemProxy(selectedItem).code;
-			} else {
-				return String(selectedItem.shortCut);
-			}
-		}
-		*/
 	}
 }

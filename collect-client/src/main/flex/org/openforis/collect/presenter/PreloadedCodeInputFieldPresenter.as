@@ -1,8 +1,6 @@
 package org.openforis.collect.presenter
 {
 	import flash.events.Event;
-	import flash.events.FocusEvent;
-	import flash.events.KeyboardEvent;
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
@@ -13,11 +11,10 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.ui.component.input.DropDownCodeInputField;
+	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.PreloadedCodeInputField;
-	import org.openforis.collect.util.CollectionUtil;
-	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 
 	/**
@@ -38,51 +35,30 @@ package org.openforis.collect.presenter
 			initView();
 		}
 		
+		override protected function initEventListeners():void {
+			super.initEventListeners();
+			view.addEventListener("apply", applyEventHandler);
+		}
+		
+		protected function applyEventHandler(event:Event):void {
+			super.changeHandler(event);
+		}
+		
 		protected function initView():void {
 			view.multiple = view.attributeDefinition.multiple;
-			view.direction = "horizontal";
+			view.direction = CodeAttributeDefinitionProxy(view.attributeDefinition).layoutDirection;
 		}
 		
 		override protected function updateView():void {
 			if ( view.parentEntity != null ) {
-				initDataProvider(function():void {
-					/*
-					var item:Object = null;
-					var attribute:AttributeProxy = view.attribute;
-					if(attribute != null) {
-						var field:FieldProxy = attribute.getField(view.fieldIndex);
-						var value:Object = field.value;
-						if(field.symbol != null && FieldProxy.isReasonBlankSymbol(field.symbol)) {
-							switch(field.symbol) {
-								case FieldSymbol.BLANK_ON_FORM:
-									item = DropDownInputFieldPresenter.BLANK_ON_FORM_ITEM;
-									break;
-								case FieldSymbol.DASH_ON_FORM:
-									item = DropDownInputFieldPresenter.DASH_ON_FORM_ITEM;
-									break;
-								case FieldSymbol.ILLEGIBLE:
-									item = DropDownInputFieldPresenter.ILLEGIBLE_ITEM;
-									break;
-							}
-						} else if(value != null) {
-							item = getItemByCode(value);
-						}
-					}
-					setSelectedItem(item);
-					*/
-				});
+				initDataProvider();
 				var hasRemarks:Boolean = view.attribute == null ? false: StringUtil.isNotBlank(getRemarks());
 				view.editable = Application.activeRecordEditable && ! view.attributeDefinition.calculated;
 				view.hasRemarks = hasRemarks;
 				contextMenu.updateItems();
 			}
 		}
-		/*
-		protected function getItemByCode(code:*):Object {
-			var item:Object = CollectionUtil.getItem(values, "code", code);
-			return item;
-		}
-		*/
+
 		protected function initDataProvider(resultHandler:Function = null):void {
 			view.currentState = PreloadedCodeInputField.STATE_LOADING;
 			view.items = null;
@@ -134,11 +110,10 @@ package org.openforis.collect.presenter
 			loadCodes(view, loadCodesResultHandler);
 		}
 		
+		/*
 		override protected function textToRequestValue():String {
 			var reasonBlankSelectedItem:Object = getReasonBlankSelectedItem();
-			if(reasonBlankSelectedItem != null) {
-				return reasonBlankSelectedItem.shortCut;
-			} else {
+			if(reasonBlankSelectedItem == null) {
 				var parts:Array = new Array();
 				for each (var item:CodeListItemProxy in view.selectedItems ) { 
 					var codeStr:String = StringUtil.concat(": ", item.code, item.qualifier);
@@ -146,16 +121,45 @@ package org.openforis.collect.presenter
 				}
 				var result:String = StringUtil.concat(", ", parts);
 				return result;
+			} else {
+				return reasonBlankSelectedItem.shortCut;
 			}
+		}
+		*/
+		override public function updateValue():void {
+			var removeAttributesOperations:ArrayCollection = new ArrayCollection();
+			var r:NodeUpdateRequestProxy;
+			//remove old attributes
+			for each (var a:AttributeProxy in view.attributes) {
+				r = new NodeDeleteRequestProxy();
+				NodeDeleteRequestProxy(r).nodeId = a.id;
+				removeAttributesOperations.addItem(r);
+			}
+			//add new attributes
+			var addAttributesOperations:ArrayCollection = new ArrayCollection();
+			var remarks:String = getRemarks();
+			var symbol:FieldSymbol = null;
+			if(view.selectedItems.length > 0) {
+				for each (var item:CodeListItemProxy in view.selectedItems) {
+					r = createAttributeAddRequest(item.code, symbol, remarks);
+					addAttributesOperations.addItem(r);
+				}
+			} else if(StringUtil.isNotBlank(remarks)) {
+				//add empty attribute
+				r = createAttributeAddRequest(null, null, remarks);
+				addAttributesOperations.addItem(r);
+			}
+			var requests:ArrayCollection = new ArrayCollection();
+			requests.addAll(removeAttributesOperations);
+			requests.addAll(addAttributesOperations);
+			var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
+			req.requests = requests;
+			sendUpdateRequestSet(req);
 		}
 		
 		protected function getReasonBlankSelectedItem():Object {
 			//todo
 			return null;
-		}
-		
-		override protected function changeHandler(event:Event):void {
-			super.changeHandler(event);
 		}
 		
 	}

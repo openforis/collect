@@ -38,25 +38,6 @@ package org.openforis.collect.presenter
 			changeHandler(event);
 			updateValue();
 		}
-		
-		/*
-		override protected function getSelectedItem():Object {
-			var selectedValue:Object = view.radioButtonGroup.selectedValue;
-			if ( StringUtil.isBlank(selectedValue) ) {
-				return DropDownInputFieldPresenter.EMPTY_ITEM;
-			} else {
-				var selectedItem:Object = CollectionUtil.getItem(view.dataProvider, "code", selectedValue);
-				if(selectedItem == null) {
-					selectedItem = ArrayUtil.getItem([
-						DropDownInputFieldPresenter.BLANK_ON_FORM_ITEM,
-						DropDownInputFieldPresenter.DASH_ON_FORM_ITEM,
-						DropDownInputFieldPresenter.ILLEGIBLE_ITEM
-					], selectedValue, "shortCut");
-				}
-				return selectedItem;
-			}
-		}
-		*/
 
 	}
 }

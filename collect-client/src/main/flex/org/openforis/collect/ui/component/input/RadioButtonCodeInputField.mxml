@@ -47,6 +47,7 @@
 			applyImmediately="true"
 			currentState="{direction}"
 			showCode="{CodeAttributeDefinitionProxy(attributeDefinition).showCode}"
+			multipleSelection="{CodeAttributeDefinitionProxy(attributeDefinition).multiple}"
 			width="100%" 
 			/>
 	</s:Scroller>
@@ -69,6 +70,7 @@
 				apply="applyHandler(event)"
 				applyImmediately="true"
 				showCode="{CodeAttributeDefinitionProxy(attributeDefinition).showCode}"
+				multipleSelection="{CodeAttributeDefinitionProxy(attributeDefinition).multiple}"
 				currentState="{direction}"
 				width="100%" 
 				/>
@@ -92,40 +94,12 @@
 				applyImmediately="true"
 				currentState="{direction}"
 				showCode="{CodeAttributeDefinitionProxy(attributeDefinition).showCode}"
+				multipleSelection="{CodeAttributeDefinitionProxy(attributeDefinition).multiple}"
 				sortable="false"
 				width="100%" 
 				/>
 		</s:Scroller>
 		
 	</s:VGroup>
-	<!--	
-	<s:DataGroup id="dataGroup" 
-				 includeIn="default"
-				 itemCreationPolicy="immediate"
-				 dataProvider="{items}" >
-		<s:layout>
-			<s:HorizontalLayout gap="4" />
-		</s:layout>
-		<s:itemRenderer>
-			<fx:Component>
-				<s:ItemRenderer autoDrawBackground="false">
-					<fx:Script>
-						<![CDATA[
-							import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
-							override public function set data(value:Object):void {
-								if ( value != null ) {
-									radioButton.value = value is CodeListItemProxy ? CodeListItemProxy(value).code: value.shortCut;
-									radioButton.label = outerDocument.labelFunction(value);
-								}
-							}
-						]]>
-					</fx:Script>
-					<s:RadioButton id="radioButton" 
-								   group="{outerDocument.radioButtonGroup}"
-								   enabled="{outerDocument.editable}" />
-				</s:ItemRenderer>
-			</fx:Component>
-		</s:itemRenderer>
-	</s:DataGroup>
-	-->
+
 </input:PreloadedCodeInputField>

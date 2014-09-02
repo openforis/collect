@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -201,7 +200,7 @@ public class SurveySelectVM extends BaseVM {
 		String dateStr = Dates.formatDateTimeToXML(new Date());
 		String extension = surveyBackupJob.getOutputFormat().getOutputFileExtension();
 		String fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
-		String contentType = URLConnection.guessContentTypeFromName(fileName);
+		String contentType = "application/octet-stream";
 		try {
 			FileInputStream is = new FileInputStream(file);
 			Filedownload.save(is, contentType, fileName);
