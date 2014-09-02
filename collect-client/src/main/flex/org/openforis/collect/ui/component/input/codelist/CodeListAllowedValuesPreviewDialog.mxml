@@ -15,22 +15,22 @@
 			import org.openforis.collect.event.UIEvent;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
-			import org.openforis.collect.ui.component.input.CodeInputField;
+			import org.openforis.collect.ui.component.input.TextCodeInputField;
 			import org.openforis.collect.ui.component.input.InputField;
 			import org.openforis.collect.util.CollectionUtil;
 			
 			public static const STATE_LOADING:String = "loading";
 			public static const STATE_DEFAULT:String = "default";
 			
-			private var _codeInputField:CodeInputField;
+			private var _codeInputField:TextCodeInputField;
 			private var _items:IList = null;
 			
 			[Bindable]
-			public function get codeInputField():CodeInputField {
+			public function get codeInputField():TextCodeInputField {
 				return _codeInputField;
 			}
 			
-			public function set codeInputField(value:CodeInputField):void {
+			public function set codeInputField(value:TextCodeInputField):void {
 				_codeInputField = value;
 			}
 

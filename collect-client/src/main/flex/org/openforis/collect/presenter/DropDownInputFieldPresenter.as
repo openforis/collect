@@ -45,7 +45,7 @@ package org.openforis.collect.presenter {
 			initInternalDataProvider();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
 			view.dropDownList.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);

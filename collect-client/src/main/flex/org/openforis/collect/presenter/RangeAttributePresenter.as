@@ -31,7 +31,7 @@ package org.openforis.collect.presenter {
 			return RangeAttributeRenderer(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.rangeInputField.addEventListener(FocusEvent.FOCUS_OUT, rangeInputFieldFocusOutHandler);
 			//depends on view.currentState

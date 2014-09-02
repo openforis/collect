@@ -49,9 +49,9 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
 	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
-	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.CoordinateAttributeRenderer;
 	import org.openforis.collect.ui.component.input.DateAttributeRenderer;
+	import org.openforis.collect.ui.component.input.DropDownCodeInputField;
 	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.ui.component.input.ImageInputField;
@@ -61,10 +61,12 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.ui.component.input.NumericAttributeRenderer;
 	import org.openforis.collect.ui.component.input.NumericInputField;
+	import org.openforis.collect.ui.component.input.RadioButtonCodeInputField;
 	import org.openforis.collect.ui.component.input.RangeAttributeRenderer;
 	import org.openforis.collect.ui.component.input.RangeInputField;
 	import org.openforis.collect.ui.component.input.StringInputField;
 	import org.openforis.collect.ui.component.input.TaxonAttributeRenderer;
+	import org.openforis.collect.ui.component.input.TextCodeInputField;
 	import org.openforis.collect.ui.component.input.TimeAttributeRenderer;
 	import org.openforis.collect.util.UIUtil;
 	
@@ -349,10 +351,22 @@ package org.openforis.collect.ui {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
 				if(parentLayout == UIUtil.LAYOUT_TABLE && codeDef.parent.enumerable && codeDef.key) {
 					inputField = new FixedCodeInputField();
-				} else if(def.multiple) {
-					inputField = new MultipleCodeInputField();
 				} else {
-					inputField = new CodeInputField();
+					switch(codeDef.layoutType) {
+					case "text":
+						if ( def.multiple ) {
+							inputField = new MultipleCodeInputField();
+						} else {
+							inputField = new TextCodeInputField();
+						}
+						break;
+					case "dropdown":
+						inputField = new DropDownCodeInputField();
+						break;
+					case "radio":
+						inputField = new RadioButtonCodeInputField();
+						break;
+					}
 				}
 			} else if(def is FileAttributeDefinitionProxy) {
 				if ( FileAttributeDefinitionProxy(def).imageContent ) {

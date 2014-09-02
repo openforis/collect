@@ -66,7 +66,7 @@ package org.openforis.collect.presenter {
 			return MessageKeys(_messageKeys);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.listsDropDown.addEventListener(IndexChangeEvent.CHANGE, listChangeHandler);
 			view.newButton.addEventListener(MouseEvent.CLICK, newButtonClickHandler);

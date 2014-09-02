@@ -67,7 +67,7 @@ package org.openforis.collect.presenter {
 			updateStatus();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			BackupPopUp(_view).backupButton.addEventListener(MouseEvent.CLICK, backupButtonClickHandler);
 			BackupPopUp(_view).cancelButton.addEventListener(MouseEvent.CLICK, closeHandler);

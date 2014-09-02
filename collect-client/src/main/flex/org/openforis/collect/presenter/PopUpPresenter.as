@@ -27,7 +27,7 @@ package org.openforis.collect.presenter {
 			return PopUp(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.addEventListener(CloseEvent.CLOSE, closeHandler);
 			view.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);

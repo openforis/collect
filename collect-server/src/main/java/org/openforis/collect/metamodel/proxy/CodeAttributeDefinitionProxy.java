@@ -5,7 +5,6 @@ package org.openforis.collect.metamodel.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 
@@ -44,9 +43,27 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	}
 
 	@ExternalizedProperty
+	public String getLayoutType() {
+		UIOptions uiOptions = getUIOptions();
+		return uiOptions.getLayoutType(attributeDefinition);
+	}
+	
+	@ExternalizedProperty
+	public String getLayoutDirection() {
+		UIOptions uiOptions = getUIOptions();
+		return uiOptions.getLayoutDirection(attributeDefinition);
+	}
+	
+	@ExternalizedProperty
 	public boolean isShowAllowedValuesPreview() {
-		CollectSurvey survey = (CollectSurvey) attributeDefinition.getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
+		UIOptions uiOptions = getUIOptions();
 		return uiOptions.getShowAllowedValuesPreviewValue(attributeDefinition);
 	}
+
+	@ExternalizedProperty
+	public boolean isShowCode() {
+		UIOptions uiOptions = getUIOptions();
+		return uiOptions.getShowCode(attributeDefinition);
+	}
+
 }

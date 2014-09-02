@@ -59,7 +59,7 @@ package org.openforis.collect.presenter {
 			return UserManagementPopUp(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.tabBar.addEventListener(IndexChangeEvent.CHANGE, tabBarIndexChangeHandler);
 			view.usersListContainer.dataGrid.addEventListener(GridSelectionEvent.SELECTION_CHANGE, dataGridSelectionChangeHandler);

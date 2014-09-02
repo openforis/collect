@@ -86,7 +86,7 @@ package org.openforis.collect.presenter
 			_remarksPopUpPresenter = new RemarksPopUpPresenter();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
 			eventDispatcher.addEventListener(InputFieldEvent.INPUT_FIELD_MOUSE_OVER, inputFieldMouseOverHandler);

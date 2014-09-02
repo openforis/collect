@@ -48,7 +48,7 @@ package org.openforis.collect.presenter {
 			return DetailView(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.backToListButton.addEventListener(MouseEvent.CLICK, backToListButtonClickHandler);
 			view.saveButton.addEventListener(MouseEvent.CLICK, saveButtonClickHandler);

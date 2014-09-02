@@ -41,7 +41,7 @@ package org.openforis.collect.presenter
 			return InnerFormContainer(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			BindingUtils.bindSetter(setViewHeight, _view, "height");
 			BindingUtils.bindSetter(setViewWidth, _view, "width");

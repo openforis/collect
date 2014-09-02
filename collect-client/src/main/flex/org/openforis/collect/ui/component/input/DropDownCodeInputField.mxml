@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<input:PreloadedCodeInputField xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				  xmlns:s="library://ns.adobe.com/flex/spark" 
+				  xmlns:mx="library://ns.adobe.com/flex/mx" 
+				  xmlns:input="org.openforis.collect.ui.component.input.*"
+				  xmlns:component="org.openforis.collect.ui.component.*"
+				  currentState="loading"
+				  >
+	<fx:Script>
+		<![CDATA[
+			import mx.core.UIComponent;
+			
+			import org.openforis.collect.event.UIEvent;
+			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			import org.openforis.collect.presenter.DropDownCodeInputFieldPresenter;
+			import org.openforis.collect.util.CollectionUtil;
+			
+			import spark.events.IndexChangeEvent;
+
+			override protected function initPresenter():void {
+				this.presenter = new DropDownCodeInputFieldPresenter(this);
+				this.presenter.init();
+			}
+			
+			override public function get validationStateDisplay():UIComponent {
+				return dropDownList;
+			}
+			
+			[Bindable(event="selectedItemsChange")]
+			public function get selectedIndex():int {
+				if ( items != null && selectedItems != null && selectedItems.length == 1 ) {
+					var index:int = items.getItemIndex(selectedItems.getItemAt(0));
+					return index;
+				} else {
+					return -1;
+				}
+			}
+			
+			protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
+				var selectedItem:CodeListItemProxy = dropDownList.selectedItem as CodeListItemProxy;
+				if ( selectedItem != null ) {
+					selectedItem.selected = true;
+				}
+				var uiEvent:UIEvent = new UIEvent("selected");
+				uiEvent.obj = selectedItem;
+				selectionChangeHandler(uiEvent);
+			}
+			
+		]]>
+	</fx:Script>
+
+	<input:states>
+		<s:State name="loading" />
+		<s:State name="default" />
+	</input:states>
+	
+	<component:LoadingContent includeIn="loading" />
+	
+	<s:DropDownList id="dropDownList" 
+					includeIn="default"
+					itemCreationPolicy="immediate"
+					dataProvider="{items}" 
+					labelFunction="{labelFunction}"
+					selectedIndex="{selectedIndex}"
+					enabled="{editable}"
+					change="dropDownListChangeHandler(event)"/>
+	
+</input:PreloadedCodeInputField>

@@ -34,6 +34,7 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
@@ -332,6 +333,12 @@ public abstract class SurveyBaseVM extends BaseVM {
 			List<EntityDefinition> result = schema.getRootEntityDefinitions();
 			return result;
 		}
+	}
+	
+	@DependsOn("rootEntities")
+	public boolean isSingleRootEntityDefined() {
+		List<EntityDefinition> rootEntities = getRootEntities();
+		return rootEntities != null && rootEntities.size() == 1;
 	}
 	
 	public List<CodeList> getCodeLists() {

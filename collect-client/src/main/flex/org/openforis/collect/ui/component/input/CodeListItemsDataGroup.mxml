@@ -2,7 +2,7 @@
 <s:DataGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			 xmlns:s="library://ns.adobe.com/flex/spark" 
 			 xmlns:mx="library://ns.adobe.com/flex/mx"
-			 itemRenderer="org.openforis.collect.ui.component.input.CodeListDialogItemRenderer"
+			 itemRenderer="org.openforis.collect.ui.component.input.CodeListItemRenderer"
 			 >
 	<fx:Metadata>
 		[Event(name="selectionChange", type="org.openforis.collect.event.UIEvent")]
@@ -17,6 +17,8 @@
 			
 			private var _editable:Boolean = true;
 			private var _sortable:Boolean = false;
+			private var _applyImmediately:Boolean = false;
+			private var _showCode:Boolean = true;
 			
 			public function selectionChangeHandler(lastSelectedData:Object):void {
 				var event:UIEvent = new UIEvent('selectionChange');
@@ -46,11 +48,37 @@
 				_sortable = value;
 			}
 			
+			[Bindable]
+			public function get applyImmediately():Boolean {
+				return _applyImmediately;
+			}
+			
+			public function set applyImmediately(value:Boolean):void {
+				_applyImmediately = value;
+			}
+			
+			[Bindable]
+			public function get showCode():Boolean {
+				return _showCode;
+			}
+			
+			public function set showCode(value:Boolean):void {
+				_showCode = value;
+			}
 		]]>
 	</fx:Script>
 	
-	<s:layout>
-		<s:VerticalLayout gap="2" paddingLeft="2"/>
-	</s:layout>
+	<s:layout.horizontal>
+		<s:HorizontalLayout gap="2" />
+	</s:layout.horizontal>
+	
+	<s:layout.vertical>
+		<s:VerticalLayout gap="2" />
+	</s:layout.vertical>
+	
+	<s:states>
+		<s:State name="horizontal" />
+		<s:State name="vertical" />
+	</s:states>
 	
 </s:DataGroup>

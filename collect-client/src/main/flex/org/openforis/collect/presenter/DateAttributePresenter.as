@@ -40,7 +40,7 @@ package org.openforis.collect.presenter {
 			view.year.textFormatFunction = fourCharsZeroPaddingFormatFunction;
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
 			//dateField (calendar button)

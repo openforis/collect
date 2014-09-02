@@ -28,7 +28,7 @@ package org.openforis.collect.presenter {
 			return FixedCodeInputField(_view);
 		}
 
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.qualifierTextInput.addEventListener(FocusEvent.FOCUS_OUT, qualifierFocusOutHandler);
 		}

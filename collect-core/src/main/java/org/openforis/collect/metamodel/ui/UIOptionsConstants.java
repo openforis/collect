@@ -17,6 +17,7 @@ public interface UIOptionsConstants {
 	String TAB_SET_NAME = "tabSet";
 	String TAB = "tab";
 	String LAYOUT = "layout";
+	String LAYOUT_TYPE = "layoutType";
 	String DIRECTION = "direction";
 	String COUNT = "count";
 	String SHOW_ROW_NUMBERS = "showRowNumbers";
@@ -29,6 +30,7 @@ public interface UIOptionsConstants {
 	String HIDE_WHEN_NOT_RELEVANT = "hideWhenNotRelevant";
 	String VISIBLE_FIELDS = "visibleFields";
 	String SHOW_ALLOWED_VALUES_PREVIEW = "showAllowedValuesPreview";
+	String SHOW_CODE = "showCode";
 	String HIDE = "hide";
 	String COLUMN = "column";
 	String COLUMN_SPAN = "columnSpan";

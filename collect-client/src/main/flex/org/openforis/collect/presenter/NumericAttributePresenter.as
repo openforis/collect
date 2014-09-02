@@ -33,7 +33,7 @@ package org.openforis.collect.presenter {
 			initRestriction();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.numericInputField.addEventListener(FocusEvent.FOCUS_OUT, numericInputFieldFocusOutHandler);
 			//depends on view.currentState

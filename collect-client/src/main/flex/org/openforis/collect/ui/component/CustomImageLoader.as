@@ -23,7 +23,7 @@ package org.openforis.collect.ui.component
 		
 		private var _logo:Logo;
 		
-		public function CustomImageLoader(imageEl:Image, position:LogoPosition, defaultImage:Class = null, errorMessageKey = null) {
+		public function CustomImageLoader(imageEl:Image, position:LogoPosition, defaultImage:Class = null, errorMessageKey:String = null) {
 			this.imageEl = imageEl;
 			this.position = position;
 			this.defaultImage = defaultImage;

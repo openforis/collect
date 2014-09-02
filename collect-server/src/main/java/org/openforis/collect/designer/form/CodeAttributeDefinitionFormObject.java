@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.form;
 
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -20,13 +21,19 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	private CodeAttributeDefinition parentCodeAttributeDefinition;
 	private boolean strict;
 	private boolean allowValuesSorting;
+	private String layoutType;
 	private boolean showAllowedValuesPreview;
+	private String layoutDirection;
+	private boolean showCode;
 	
 	CodeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 		strict = true;
 		allowValuesSorting = false;
-		showAllowedValuesPreview = false;
+		showAllowedValuesPreview = Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue();
+		layoutType = Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE.getDefaultValue();
+		layoutDirection = Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION.getDefaultValue();
+		showCode = Annotation.CODE_ATTRIBUTE_SHOW_CODE.getDefaultValue();
 	}
 
 	@Override
@@ -41,6 +48,10 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
 		uiOptions.setShowAllowedValuesPreviewValue(dest, showAllowedValuesPreview);
+		
+		uiOptions.setLayoutType(dest, layoutType);
+		uiOptions.setLayoutDirection(dest, layoutDirection);
+		uiOptions.setShowCode(dest, showCode);
 	}
 	
 	@Override
@@ -55,6 +66,10 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		CollectSurvey survey = (CollectSurvey) source.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
 		showAllowedValuesPreview = uiOptions.getShowAllowedValuesPreviewValue(source);
+		
+		layoutType = uiOptions.getLayoutType(source);
+		layoutDirection = uiOptions.getLayoutDirection(source);
+		showCode = uiOptions.getShowCode(source);
 	}
 
 	public boolean isKey() {
@@ -97,6 +112,22 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		this.parentCodeAttributeDefinition = parentCodeAttributeDefinition;
 	}
 	
+	public String getLayoutDirection() {
+		return layoutDirection;
+	}
+	
+	public void setLayoutDirection(String layoutDirection) {
+		this.layoutDirection = layoutDirection;
+	}
+	
+	public String getLayoutType() {
+		return layoutType;
+	}
+	
+	public void setLayoutType(String layoutType) {
+		this.layoutType = layoutType;
+	}
+	
 	public boolean isShowAllowedValuesPreview() {
 		return showAllowedValuesPreview;
 	}
@@ -104,4 +135,13 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	public void setShowAllowedValuesPreview(boolean showAllowedValuesPreview) {
 		this.showAllowedValuesPreview = showAllowedValuesPreview;
 	}
+
+	public boolean isShowCode() {
+		return showCode;
+	}
+
+	public void setShowCode(boolean showCode) {
+		this.showCode = showCode;
+	}
+	
 }

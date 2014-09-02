@@ -22,7 +22,7 @@ package org.openforis.collect.presenter {
 			super(inputField);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			//hours
 			_view.hoursTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);

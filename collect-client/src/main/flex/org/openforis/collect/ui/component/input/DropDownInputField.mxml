@@ -116,7 +116,7 @@
 				super.editable = value;
 				dropDownList.enabled = value;
 			}
-
+			
 		]]>
 	</fx:Script>
 	

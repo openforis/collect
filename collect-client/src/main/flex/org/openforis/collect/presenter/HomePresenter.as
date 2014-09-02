@@ -54,7 +54,7 @@ package org.openforis.collect.presenter {
 			view.functionList.dataProvider = createFunctionsList();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.functionList.addEventListener(IndexChangeEvent.CHANGING, functionListChangingHandler);
 		}

@@ -95,7 +95,7 @@ package org.openforis.collect.presenter {
 			createAdvancedFunctionMenu();
 		}
 
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 			eventDispatcher.addEventListener(UIEvent.RELOAD_RECORD_SUMMARIES, reloadRecordSummariesHandler);
 			

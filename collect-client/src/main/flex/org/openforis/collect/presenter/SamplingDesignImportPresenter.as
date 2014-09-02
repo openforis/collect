@@ -49,7 +49,7 @@ package org.openforis.collect.presenter
 			return SamplingDesignImportView(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.downloadExampleButton.addEventListener(MouseEvent.CLICK, downloadExampleButtonClickHandler);
 		}
