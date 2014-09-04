@@ -137,7 +137,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		} catch (Exception e) {
 			status.error();
 			status.addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.getMessage()));
-			LOG.error("Error importing species CSV file", e);
+			LOG.error("Error importing sampling design CSV file", e);
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}
