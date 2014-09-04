@@ -219,9 +219,13 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			@Override
 			public void onOk() {
 				performDeleteItem(item);
-			}}, "global.item.confirm_remove");
+			}}, getConfirmDeleteMessageKey());
 		params.setOkLabelKey("global.delete_item");
 		MessageUtil.showConfirm(params);
+	}
+
+	protected String getConfirmDeleteMessageKey() {
+		return "global.item.confirm_remove";
 	}
 
 	protected void performDeleteItem(T item) {

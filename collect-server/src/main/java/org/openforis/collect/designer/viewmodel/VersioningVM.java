@@ -10,6 +10,7 @@ import java.util.Stack;
 import org.openforis.collect.designer.form.ModelVersionFormObject;
 import org.openforis.collect.designer.form.SurveyObjectFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -28,6 +29,7 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Window;
 
 /**
@@ -38,8 +40,11 @@ import org.zkoss.zul.Window;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 	
+	@WireVariable
+	private SurveyManager surveyManager;
+	
 	private Window confirmDeletePopUp;
-
+	
 	@Override
 	@Init(superclass=false)
 	public void init() {
@@ -67,7 +72,7 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 	@Override
 	protected void deleteItemFromSurvey(ModelVersion item) {
 		CollectSurvey survey = getSurvey();
-		survey.removeVersion(item);
+		surveyManager.removeVersion(survey, item);
 		dispatchVersionsUpdatedCommand();
 	}
 
@@ -93,6 +98,11 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 				}
 			});
 		}
+	}
+	
+	@Override
+	protected String getConfirmDeleteMessageKey() {
+		return "survey.versioning.delete.confirm_message";
 	}
 	
 	protected void closeConfirmDeletePopUp() {

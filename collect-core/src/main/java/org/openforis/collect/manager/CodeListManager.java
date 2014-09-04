@@ -492,6 +492,19 @@ public class CodeListManager {
 		codeListItemDao.deleteInvalidCodeListReferenceItems(survey);
 	}
 	
+	public void removeVersioningReference(CollectSurvey survey, ModelVersion version) {
+		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList codeList : codeLists) {
+			if ( codeList.isExternal() ) {
+				//TODO
+			} else if ( codeList.isEmpty() ) {
+				codeListItemDao.removeVersioningInfo(codeList, version);
+			} else {
+				codeList.removeVersioningRecursive(version);
+			}
+		}
+	}
+
 	public void deleteUnusedCodeLists(CollectSurvey survey) {
 		Set<CodeList> unusedCodeLists = getUnusedCodeLists(survey);
 		for (CodeList codeList : unusedCodeLists) {
@@ -559,6 +572,5 @@ public class CodeListManager {
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
 	}
-
 
 }
