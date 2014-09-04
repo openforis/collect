@@ -17,12 +17,16 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Form;
@@ -47,9 +51,13 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 
 	protected static final String FORM_CONTAINER_ID = "nodeFormContainer";
 	public static final Class<?>[] SUPPORTED_CALCULABLE_ATTRIBUTE_TYPES = new Class<?>[] { 
+		BooleanAttributeDefinition.class,
 		CodeAttributeDefinition.class,
+		CoordinateAttributeDefinition.class,
+		DateAttributeDefinition.class,
 		NumericAttributeDefinition.class,
-		TextAttributeDefinition.class
+		TextAttributeDefinition.class,
+		TimeAttributeDefinition.class
 	};
 
 	protected Form tempFormObject;
