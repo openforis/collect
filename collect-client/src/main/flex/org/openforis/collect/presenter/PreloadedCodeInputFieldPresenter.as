@@ -3,19 +3,25 @@ package org.openforis.collect.presenter
 	import flash.events.Event;
 	
 	import mx.collections.ArrayCollection;
-	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 	import org.openforis.collect.model.FieldSymbol;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.PreloadedCodeInputField;
+	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 
 	/**
@@ -42,7 +48,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function applyEventHandler(event:Event):void {
-			super.changeHandler(event);
+			updateValue();
 		}
 		
 		protected function initView():void {
@@ -127,36 +133,73 @@ package org.openforis.collect.presenter
 			}
 		}
 		*/
-		override public function updateValue():void {
-			var removeAttributesOperations:ArrayCollection = new ArrayCollection();
-			var r:NodeUpdateRequestProxy;
-			var attributes:IList = view.attributeDefinition.multiple ? view.attributes: new ArrayList([view.attribute]);
-			//remove old attributes
-			for each (var a:AttributeProxy in attributes) {
-				r = new NodeDeleteRequestProxy();
-				NodeDeleteRequestProxy(r).nodeId = a.id;
-				removeAttributesOperations.addItem(r);
+		
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			if ( view.attributeDefinition.multiple && view.attributes != null ) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if ( change is AttributeChangeProxy ) {
+						var nodeId:int = AttributeChangeProxy(change).nodeId;
+						var attribute:AttributeProxy = CollectionUtil.getItem(view.attributes, "id", nodeId) as AttributeProxy;
+						if(attribute != null) {
+							updateView();
+							return;
+						}
+					}
+				}
+			} else {
+				super.updateResponseReceivedHandler(event)
 			}
-			//add new attributes
-			var addAttributesOperations:ArrayCollection = new ArrayCollection();
-			var remarks:String = getRemarks();
-			var symbol:FieldSymbol = null;
-			if(view.selectedItems.length > 0) {
-				for each (var item:CodeListItemProxy in view.selectedItems) {
-					r = createAttributeAddRequest(item.code, symbol, remarks);
+		}
+		
+		override public function updateValue():void {
+			if ( view.attributeDefinition.multiple ) {
+				//multiple attribute
+				
+				var removeAttributesOperations:ArrayCollection = new ArrayCollection();
+				var r:NodeUpdateRequestProxy;
+				var attributes:IList = view.attributes;
+				
+				//remove old attributes
+				for each (var a:AttributeProxy in attributes) {
+					r = new NodeDeleteRequestProxy();
+					NodeDeleteRequestProxy(r).nodeId = a.id;
+					removeAttributesOperations.addItem(r);
+				}
+				
+				//add new attributes
+				var addAttributesOperations:ArrayCollection = new ArrayCollection();
+				var remarks:String = getRemarks();
+				var symbol:FieldSymbol = null;
+				if(view.selectedItems.length > 0) {
+					for each (var item:CodeListItemProxy in view.selectedItems) {
+						r = createAttributeAddRequest(getTextValue(item.code, item.qualifier), symbol, remarks);
+						addAttributesOperations.addItem(r);
+					}
+				} else if(StringUtil.isNotBlank(remarks)) {
+					//add empty attribute
+					r = createAttributeAddRequest(null, null, remarks);
 					addAttributesOperations.addItem(r);
 				}
-			} else if(StringUtil.isNotBlank(remarks)) {
-				//add empty attribute
-				r = createAttributeAddRequest(null, null, remarks);
-				addAttributesOperations.addItem(r);
+				var requests:ArrayCollection = new ArrayCollection();
+				requests.addAll(removeAttributesOperations);
+				requests.addAll(addAttributesOperations);
+				var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
+				req.requests = requests;
+				sendUpdateRequestSet(req);
+			} else {
+				//single attribute
+				var remarks:String = getRemarks(); //preserve old remarks
+				var value:String;
+				if ( view.selectedItems.length == 1 ) {
+					var selectedItem:CodeListItemProxy = view.selectedItems[0] as CodeListItemProxy;
+					value = getTextValue(selectedItem.code, selectedItem.qualifier);
+				} else {
+					value = null;
+				}
+				var r:NodeUpdateRequestProxy = createSpecificValueUpdateRequest(value, symbol, remarks);
+				sendUpdateRequest(r);
 			}
-			var requests:ArrayCollection = new ArrayCollection();
-			requests.addAll(removeAttributesOperations);
-			requests.addAll(addAttributesOperations);
-			var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
-			req.requests = requests;
-			sendUpdateRequestSet(req);
 		}
 		
 		protected function getReasonBlankSelectedItem():Object {

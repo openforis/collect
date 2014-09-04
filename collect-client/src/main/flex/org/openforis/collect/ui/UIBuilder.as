@@ -208,6 +208,10 @@ package org.openforis.collect.ui {
 		}
 		
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
+			var nodeDefnWidth:Number = def.width;
+			if ( ! isNaN(nodeDefnWidth) ) {
+				return nodeDefnWidth;
+			}
 			var parentLayout:String = def.parentLayout;
 			if(def is BooleanAttributeDefinitionProxy) {
 				var headerText:String = def.getInstanceOrHeadingLabelText();
@@ -307,10 +311,10 @@ package org.openforis.collect.ui {
 				return NaN;
 			} else {
 				var inputFieldWidth:Number = getInputFieldWidth(def);
-				if(!isNaN(inputFieldWidth)) {
-					return inputFieldWidth + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
-				} else {
+				if( isNaN(inputFieldWidth)) {
 					return NaN;
+				} else {
+					return inputFieldWidth + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
 				}
 			}
 		}

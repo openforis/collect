@@ -55,9 +55,13 @@ package org.openforis.collect.presenter {
 				var code:String = field.value as String;
 				var qualifierField:FieldProxy = attribute.getField(1);
 				var qualifier:String = qualifierField.value as String;
-				return StringUtil.concat(": ", code, qualifier);
+				return getTextValue(code, qualifier);
 			}
 			return "";
+		}
+		
+		protected function getTextValue(code:String, qualifier:String):String {
+			return StringUtil.concat(": ", code, qualifier);
 		}
 		
 	}
