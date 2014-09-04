@@ -31,7 +31,7 @@ package org.openforis.collect.presenter {
 			_view.srsDropDownList.dataProvider = Application.activeSurvey.spatialReferenceSystems;
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			_view.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 			//X

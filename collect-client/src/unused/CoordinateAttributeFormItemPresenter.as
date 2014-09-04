@@ -41,7 +41,7 @@ package org.openforis.collect.presenter {
 			return CoordinateAttributeFormItem(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
 			view.xTextInput.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);

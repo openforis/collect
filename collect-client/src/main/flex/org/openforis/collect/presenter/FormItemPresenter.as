@@ -71,7 +71,7 @@ package org.openforis.collect.presenter
 			//do nothing
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
 			ChangeWatcher.watch(view, "parentEntity", parentEntityChangeHandler);

@@ -712,7 +712,7 @@ public class SchemaVM extends SurveyBaseVM {
 			schema.removeRootEntityDefinition(nodeName);
 			selectedRootEntity = null;
 			rootTabSet = null;
-			notifyChange("selectedRootEntity");
+			notifyChange("selectedRootEntity","rootEntities");
 			refreshTreeModel();
 		} else {
 			if ( treeModel != null ) {
@@ -782,6 +782,8 @@ public class SchemaVM extends SurveyBaseVM {
 		rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
 		mainTab.setLabel(currentLanguageCode, DEFAULT_MAIN_TAB_LABEL);
+		
+		notifyChange("rootEntities");
 		
 		return rootEntity;
 	}

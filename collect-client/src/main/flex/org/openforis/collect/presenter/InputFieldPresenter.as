@@ -83,7 +83,7 @@ package org.openforis.collect.presenter {
 			return InputField(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
 			if(view.textInput != null) {
@@ -490,6 +490,10 @@ package org.openforis.collect.presenter {
 
 		protected function sendUpdateRequest(o:NodeUpdateRequestProxy):void {
 			var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(o);
+			sendUpdateRequestSet(req);
+		}
+		
+		protected function sendUpdateRequestSet(req:NodeUpdateRequestSetProxy):void {
 			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
 			view.updating = true;
 		}

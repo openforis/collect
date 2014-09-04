@@ -43,7 +43,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			_view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
 		}

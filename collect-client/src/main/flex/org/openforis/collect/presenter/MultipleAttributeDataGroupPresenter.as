@@ -23,7 +23,7 @@ package org.openforis.collect.presenter {
 			return MultipleAttributeDataGroupFormItem(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			view.openPopupImage.addEventListener(MouseEvent.CLICK, openPopupImageClickHandler);
 			view.popup.addEventListener(CloseEvent.CLOSE, closePopupHandler);
 		}

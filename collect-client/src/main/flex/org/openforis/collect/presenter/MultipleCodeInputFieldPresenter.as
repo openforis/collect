@@ -29,7 +29,7 @@ package org.openforis.collect.presenter {
 	 * 
 	 * @author S. Ricci
 	 * */
-	public class MultipleCodeInputFieldPresenter extends CodeInputFieldPresenter {
+	public class MultipleCodeInputFieldPresenter extends TextCodeInputFieldPresenter {
 		
 		public function MultipleCodeInputFieldPresenter(view:MultipleCodeInputField) {
 			super(view);
@@ -40,7 +40,7 @@ package org.openforis.collect.presenter {
 			return MultipleCodeInputField(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			ChangeWatcher.watch(view, "attributes", attributesChangeHandler);
 		}

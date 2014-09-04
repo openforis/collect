@@ -21,7 +21,7 @@
 			
 			private var _multiple:Boolean = false;
 			private var _editable:Boolean = true;
-			private var _codeInputField:CodeInputField;
+			private var _codeInputField:TextCodeInputField;
 			private var _items:IList = null;
 			private var _selectedItems:ArrayCollection = null;
 			private var _notSelectedItems:ArrayCollection = null;
@@ -59,11 +59,11 @@
 			}
 
 			[Bindable]
-			public function get codeInputField():CodeInputField {
+			public function get codeInputField():TextCodeInputField {
 				return _codeInputField;
 			}
 			
-			public function set codeInputField(value:CodeInputField):void {
+			public function set codeInputField(value:TextCodeInputField):void {
 				_codeInputField = value;
 			}
 
@@ -133,13 +133,14 @@
 	<s:Scroller includeIn="default" 
 				width="100%"
 				maxHeight="400">
-		<input:CodeListDialogDataGroup
+		<input:CodeListItemsDataGroup
 			id="dataGroup" 
 			dataProvider="{items}"
 			editable="{editable}"
 			sortable="false"
 			selectionChange="selectionChangeHandler(event)"
 			apply="applyHandler(event)"
+			currentState="vertical"
 			width="100%" 
 			/>
 	</s:Scroller>
@@ -151,13 +152,14 @@
 		<s:Scroller width="100%"
 					maxHeight="300"
 					id="selectedItemsDataGroupScroller">
-			<input:CodeListDialogDataGroup
+			<input:CodeListItemsDataGroup
 				id="selectedItemsDataGroup" 
 				dataProvider="{selectedItems}"
 				editable="{editable}"
 				sortable="true"
 				selectionChange="selectionChangeHandler(event)"
 				apply="applyHandler(event)"
+				currentState="vertical"
 				width="100%" 
 				/>
 		</s:Scroller>
@@ -171,33 +173,18 @@
 		<s:Scroller width="100%"
 					minHeight="30"
 					maxHeight="{400 - selectedItemsDataGroupScroller.height}">
-			<input:CodeListDialogDataGroup
+			<input:CodeListItemsDataGroup
 				id="notSelectedItemsDataGroup" 
 				dataProvider="{notSelectedItems}"
 				selectionChange="selectionChangeHandler(event)"
 				apply="applyHandler(event)"
 				editable="{editable}"
 				sortable="false"
+				currentState="vertical"
 				width="100%" 
 				/>
 		</s:Scroller>
 		
 	</s:VGroup>
 	
-	<!--
-	<s:HGroup includeIn="default, valuesSortingAllowed"
-			  itemCreationPolicy="immediate"
-			  width="100%" 
-			  horizontalAlign="center" 
-			  verticalAlign="middle" 
-			  gap="30">
-		<s:Button id="applyButton"
-				  useHandCursor="true" 
-				  buttonMode="true" 
-				  label="{Message.get('global.close')}"
-				  enabled="{editable}"
-				  click="applyHandler(event)"
-				  />
-	</s:HGroup>
-	-->
 </s:TitleWindow>

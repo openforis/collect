@@ -61,7 +61,7 @@ package org.openforis.collect.presenter {
 			initFileFilter();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			fileReference.addEventListener(Event.SELECT, fileReferenceSelectHandler);
 			fileReference.addEventListener(ProgressEvent.PROGRESS, fileReferenceProgressHandler);

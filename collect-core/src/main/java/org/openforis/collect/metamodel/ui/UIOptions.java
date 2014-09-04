@@ -630,15 +630,40 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), value ? Boolean.toString(value): null);
 	}
 	
+	public String getLayoutType(CodeAttributeDefinition defn) {
+		String annotationValue = getAnnotationStringValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE);
+		return annotationValue;
+	}
+	
+	public void setLayoutType(CodeAttributeDefinition defn, String value) {
+		setAnnotationValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE, value);
+	}
+	
+	public String getLayoutDirection(CodeAttributeDefinition defn) {
+		String annotationValue = getAnnotationStringValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION);
+		return annotationValue;
+	}
+	
+	public void setLayoutDirection(CodeAttributeDefinition defn, String value) {
+		setAnnotationValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION, value);
+	}
+	
 	public boolean getShowAllowedValuesPreviewValue(CodeAttributeDefinition defn) {
-		String annotationValue = defn.getAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName());
-		return Boolean.valueOf(annotationValue);
+		return getAnnotationBooleanValue(defn, Annotation.SHOW_ALLOWED_VALUES_PREVIEW);
 	}
 	
 	public void setShowAllowedValuesPreviewValue(CodeAttributeDefinition defn, boolean value) {
 		defn.setAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName(), value ? Boolean.toString(value): null);
 	}
 	
+	public boolean getShowCode(CodeAttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.CODE_ATTRIBUTE_SHOW_CODE);
+	}
+	
+	public void setShowCode(CodeAttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.CODE_ATTRIBUTE_SHOW_CODE, value);
+	}
+
 	public boolean isHidden(NodeDefinition defn) {
 		return getAnnotationBooleanValue(defn, Annotation.HIDE);
 	}
@@ -671,9 +696,27 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		setAnnotationValue(defn, Annotation.COLUMN_SPAN, value);
 	}
 	
+	public Integer getWidth(NodeDefinition defn) {
+		return getAnnotationIntegerValue(defn, Annotation.WIDTH);
+	}
+	
+	public void setWidth(NodeDefinition defn, Integer value) {
+		setAnnotationValue(defn, Annotation.WIDTH, value);
+	}
+	
+	public Integer getLabelWidth(NodeDefinition defn) {
+		return getAnnotationIntegerValue(defn, Annotation.LABEL_WIDTH);
+	}
+	
+	public void setLabelWidth(NodeDefinition defn, Integer value) {
+		setAnnotationValue(defn, Annotation.LABEL_WIDTH, value);
+	}
+	
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
-		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {
+		if ( StringUtils.isBlank(annotationValue) ) {
+			if( annotation.getDefaultValue() != null ) {
+		}
 			Boolean defaultValue = annotation.getDefaultValue();
 			return defaultValue.booleanValue();
 		} else {
@@ -681,11 +724,28 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 
+	private String getAnnotationStringValue(NodeDefinition defn, Annotation annotation) {
+		String annotationValue = defn.getAnnotation(annotation.getQName());
+		if ( StringUtils.isBlank(annotationValue) ) {
+			if ( annotation.getDefaultValue() != null ) {
+				return annotation.getDefaultValue();
+			} else {
+				return null;
+			}
+		} else {
+			return annotationValue;
+		}
+	}
+	
 	private Integer getAnnotationIntegerValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
-		if ( StringUtils.isBlank(annotationValue) && annotation.getDefaultValue() != null ) {
-			Integer defaultValue = annotation.getDefaultValue();
-			return defaultValue;
+		if ( StringUtils.isBlank(annotationValue) ) {
+			if ( annotation.getDefaultValue() != null ) {
+				Integer defaultValue = annotation.getDefaultValue();
+				return defaultValue;
+			} else {
+				return null;
+			}
 		} else {
 			return Integer.valueOf(annotationValue);
 		}
@@ -693,7 +753,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	private void setAnnotationValue(NodeDefinition defn, Annotation annotation, Object value) {
 		String annotationValue;
-		if ( annotation.getDefaultValue() != null && annotation.getDefaultValue().equals(value) ) {
+		if ( value == null || annotation.getDefaultValue() != null && annotation.getDefaultValue().equals(value) ) {
 			annotationValue = null;
 		} else {
 			annotationValue = value.toString();

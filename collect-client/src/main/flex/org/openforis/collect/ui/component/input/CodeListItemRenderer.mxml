@@ -17,9 +17,14 @@
 			import mx.events.DragEvent;
 			import mx.managers.DragManager;
 			
+			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.util.StringUtil;
 			import org.openforis.collect.util.UIUtil;
+			
+			import spark.skins.spark.CheckBoxSkin;
+			import spark.skins.spark.RadioButtonSkin;
 			
 			public static const STATE_NORMAL:String = "normal";
 			public static const STATE_DROPPING_TOP:String = "droppingTop";
@@ -31,17 +36,32 @@
 				data.qualifier = textInput.text;
 			}
 			
+			protected function textInputFocusOutHandler(event:FocusEvent):void {
+				if ( CodeListItemsDataGroup(owner).applyImmediately ) {
+					dispatchApplyEvent();
+				}
+			}
+			
 			private function checkBoxChangeHandler(event:Event):void {
 				var item:CodeListItemProxy = data as CodeListItemProxy;
 				item.selected = checkBox.selected;
-				CodeListDialogDataGroup(owner).selectionChangeHandler(item);
+				CodeListItemsDataGroup(owner).selectionChangeHandler(item);
 			}
 			
 			[Bindable(event="dataChange")]
 			override public function get label():String {
-				var item:CodeListItemProxy = CodeListItemProxy(data);
-				var label:String = item.code + " - " + item.getLabelText();
-				return label;
+				var showCode:Boolean = CodeListItemsDataGroup(owner).showCode;
+				var codeItem:CodeListItemProxy = CodeListItemProxy(data);
+				var label:String = codeItem.getLabelText();
+				var parts:Array = [];
+				if ( showCode || StringUtil.isBlank(label) ) {
+					parts.push(codeItem.code);
+				}
+				if ( StringUtil.isNotBlank(label) ) {
+					parts.push(label);
+				}
+				var result:String = StringUtil.concat(" - ", parts);
+				return result;
 			}
 			
 			[Bindable(event="dataChange")]
@@ -101,7 +121,7 @@
 				}
 				if ( indexFrom != indexTo ) {
 					var dragItem:CodeListItemProxy = CodeListItemProxy(dragInitiator.data);
-					CodeListDialogDataGroup(owner).itemsOrderChangeHandler(dragItem, indexTo);
+					CodeListItemsDataGroup(owner).itemsOrderChangeHandler(dragItem, indexTo);
 				}
 				hideDropIndicator();
 			}
@@ -123,7 +143,7 @@
 			}
 			
 			protected function mouseDownHandler(event:MouseEvent):void {
-				if (CodeListDialogDataGroup(owner).sortable && ! DragManager.isDragging ) {
+				if (CodeListItemsDataGroup(owner).sortable && ! DragManager.isDragging ) {
 					dragPrepared = true;
 				}
 			}
@@ -135,7 +155,7 @@
 			protected function checkBoxKeyDownHandler(event:KeyboardEvent):void {
 				switch ( event.keyCode ) {
 				case Keyboard.ENTER:
-					CodeListDialogDataGroup(owner).dispatchEvent(new Event("apply"));
+					dispatchApplyEvent();
 					break;
 				case Keyboard.DOWN:
 					var ckeckBox:CheckBox = CheckBox(event.target);
@@ -149,6 +169,15 @@
 			
 			protected function checkBoxFocusInHandler(event:FocusEvent):void {
 				UIUtil.ensureElementIsVisible(event.target);
+			}
+			
+			protected function dispatchApplyEvent():void {
+				CodeListItemsDataGroup(owner).dispatchEvent(new Event("apply"));
+			}
+			
+			[Bindable(event="dataChange")]
+			public function get checkBoxSkinClass():Class {
+				return CodeListItemsDataGroup(owner).multipleSelection ? CheckBoxSkin: RadioButtonSkin;
 			}
 			
 		]]>
@@ -186,6 +215,7 @@
 					change="checkBoxChangeHandler(event)" 
 					keyDown="checkBoxKeyDownHandler(event)"
 					focusIn="checkBoxFocusInHandler(event)"
+					skinClass="{checkBoxSkinClass}"
 					/>
 		
 		<s:Group id="descriptionIconContainer"
@@ -208,6 +238,7 @@
 					  enabled="{checkBox.selected}"
 					  text="{data.qualifier}"
 					  change="textInputChangeHandler(event)"
+					  focusOut="textInputFocusOutHandler(event)"
 					  />
 	</s:HGroup>
 	

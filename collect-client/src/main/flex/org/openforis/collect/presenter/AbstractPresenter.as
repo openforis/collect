@@ -88,7 +88,7 @@ package org.openforis.collect.presenter {
 			event.stopImmediatePropagation();
 		}
 		
-		internal function initEventListeners():void {
+		protected function initEventListeners():void {
 			if ( _view != null ) {
 				_view.addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
 				_view.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);

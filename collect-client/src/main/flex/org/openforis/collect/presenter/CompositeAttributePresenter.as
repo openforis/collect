@@ -25,7 +25,7 @@ package org.openforis.collect.presenter
 			return CompositeAttributeRenderer(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			var inputFields:Array = view.inputFields;
 			if(inputFields != null) {

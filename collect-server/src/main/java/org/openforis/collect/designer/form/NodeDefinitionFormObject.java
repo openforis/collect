@@ -47,6 +47,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String tabName;
 	private int column;
 	private int columnSpan;
+	private Integer width;
+	private Integer labelWidth;
 	
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
@@ -138,6 +140,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		hideWhenNotRelevant = uiOptions.isHideWhenNotRelevant(source);
 		column = uiOptions.getColumn(source);
 		columnSpan = uiOptions.getColumnSpan(source);
+		width = uiOptions.getWidth(source);
+		labelWidth = uiOptions.getLabelWidth(source);
 	}
 
 	@Override
@@ -175,6 +179,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		uiOptions.setHideWhenNotRelevant(dest, hideWhenNotRelevant);
 		uiOptions.setColumn(dest, column);
 		uiOptions.setColumnSpan(dest, columnSpan);
+		uiOptions.setWidth(dest, width);
+		uiOptions.setLabelWidth(dest, labelWidth);
 	}
 
 	@Override
@@ -346,6 +352,22 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setColumnSpan(int columnSpan) {
 		this.columnSpan = columnSpan;
+	}
+	
+	public Integer getWidth() {
+		return width;
+	}
+	
+	public void setWidth(Integer width) {
+		this.width = width;
+	}
+
+	public Integer getLabelWidth() {
+		return labelWidth;
+	}
+	
+	public void setLabelWidth(Integer labelWidth) {
+		this.labelWidth = labelWidth;
 	}
 	
 }

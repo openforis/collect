@@ -29,7 +29,7 @@ package org.openforis.collect.presenter
 			super(view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);

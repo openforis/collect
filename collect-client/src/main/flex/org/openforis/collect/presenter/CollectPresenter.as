@@ -124,7 +124,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
 			eventDispatcher.addEventListener(UIEvent.LOGOUT_CLICK, logoutClickHandler);

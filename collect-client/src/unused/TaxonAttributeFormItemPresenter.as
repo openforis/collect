@@ -61,7 +61,7 @@ package org.openforis.collect.presenter {
 			updateView();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
 			//id text input

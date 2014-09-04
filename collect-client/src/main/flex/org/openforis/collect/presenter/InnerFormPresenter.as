@@ -41,7 +41,7 @@ package org.openforis.collect.presenter
 			return InnerFormContainer(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			BindingUtils.bindSetter(setViewHeight, _view, "height");
 			BindingUtils.bindSetter(setViewWidth, _view, "width");
@@ -173,8 +173,12 @@ package org.openforis.collect.presenter
 		private function createFormItem(defn:NodeDefinitionProxy):CollectFormItem {
 			var formItem:CollectFormItem;
 			if ( defn is AttributeDefinitionProxy ) {
-				formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(defn));
-				formItem.labelWidth = insideSingleEntityForm ? INDENTED_LABEL_WIDTH : DEFAULT_LABEL_WIDTH;
+				var attrDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(defn);
+				formItem = UIBuilder.getAttributeFormItem(attrDefn);
+				var labelWidth:Number = isNaN(defn.labelWidth) ? 
+					(insideSingleEntityForm ? INDENTED_LABEL_WIDTH : DEFAULT_LABEL_WIDTH): 
+					defn.labelWidth;
+				formItem.labelWidth = labelWidth;
 			} else {
 				formItem = UIBuilder.getEntityFormItem(EntityDefinitionProxy(defn));
 				BindingUtils.bindProperty(formItem, "modelVersion", _view, "modelVersion");

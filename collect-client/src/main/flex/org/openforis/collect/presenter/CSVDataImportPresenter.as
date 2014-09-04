@@ -50,7 +50,7 @@ package org.openforis.collect.presenter
 			updateImportFileFormatInfoMessage();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.entitySelectionTree.addEventListener(ListEvent.ITEM_CLICK, entityTreeItemSelectHandler);
 			view.importType.addEventListener(Event.CHANGE, importTypeChangeHandler);

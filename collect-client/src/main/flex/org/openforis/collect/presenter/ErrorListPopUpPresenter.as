@@ -38,7 +38,7 @@ package org.openforis.collect.presenter
 			return ErrorListPopUp(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.okButton.addEventListener(MouseEvent.CLICK, okButtonClickHandler);
 		}

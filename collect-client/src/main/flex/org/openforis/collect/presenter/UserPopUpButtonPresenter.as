@@ -32,7 +32,7 @@ package org.openforis.collect.presenter
 			return UserPopUpButton(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.loggedPopUpButton.addEventListener(MenuEvent.ITEM_CLICK, loggedPopUpMenuItemClickHandler);
 		}

@@ -22,7 +22,7 @@ package org.openforis.collect.presenter {
 			super();
 		}
 		
-		override internal function initEventListeners():void{
+		override protected function initEventListeners():void{
 			eventDispatcher.addEventListener(UIEvent.SURVEY_SELECTED, surveySelectedHandler);
 			_view.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 		}

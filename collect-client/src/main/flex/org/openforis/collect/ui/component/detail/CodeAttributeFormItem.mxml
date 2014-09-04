@@ -11,7 +11,7 @@
 			import mx.binding.utils.BindingUtils;
 			
 			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
-			import org.openforis.collect.ui.component.input.MultipleCodeInputField;
+			import org.openforis.collect.ui.component.input.CodeInputField;
 			
 			override protected function createChildren():void {
 				if ( ! childrenAdded) {
@@ -21,8 +21,10 @@
 						attributeDefinition is CodeAttributeDefinitionProxy) {
 						
 						BindingUtils.bindProperty(renderer, "attributes", this, "attributes");
-						var codeInputField:MultipleCodeInputField = renderer.getElementAt(0) as MultipleCodeInputField;
-						BindingUtils.bindProperty(codeInputField, "attributes", renderer, "attributes");
+						var codeInputField:CodeInputField = renderer.getElementAt(0) as CodeInputField;
+						if ( codeInputField.hasOwnProperty("attributes") ) {
+							BindingUtils.bindProperty(codeInputField, "attributes", renderer, "attributes");
+						}
 					}
 				}
 			}

@@ -35,7 +35,7 @@ package org.openforis.collect.presenter {
 			return AttributeItemRenderer(_view);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			ChangeWatcher.watch(view, "attribute", attributeChangeHandler);
 			ChangeWatcher.watch(view, "attributes", attributesChangeHandler);

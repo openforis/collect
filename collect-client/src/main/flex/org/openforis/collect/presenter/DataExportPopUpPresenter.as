@@ -80,7 +80,7 @@ package org.openforis.collect.presenter {
 			initView();
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 			eventDispatcher.addEventListener(UIEvent.ROOT_ENTITY_SELECTED, rootEntitySelectedHandler);
 			view.closeButton1.addEventListener(MouseEvent.CLICK, closeHandler);

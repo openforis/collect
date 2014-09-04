@@ -36,7 +36,7 @@ package org.openforis.collect.presenter {
 			super(inputField);
 		}
 		
-		override internal function initEventListeners():void {
+		override protected function initEventListeners():void {
 			super.initEventListeners();
 
 			_view.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);

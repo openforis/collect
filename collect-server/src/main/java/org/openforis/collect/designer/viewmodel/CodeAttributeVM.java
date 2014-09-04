@@ -16,6 +16,7 @@ import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Predicate;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -172,6 +173,18 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		}
 	}
 
+	@Command
+	public void layoutTypeChange(@ContextParam(ContextType.BINDER) Binder binder, 
+			@BindingParam("layoutType") String layoutType) {
+		setTempFormObjectFieldValue("showAllowedValuesPreview", Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue());
+		String layoutDirection = null;
+		if ( "radio".equals(layoutType) ) {
+			layoutDirection = Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION.getDefaultValue();
+		}
+		setTempFormObjectFieldValue("layoutDirection", layoutDirection);
+		dispatchApplyChangesCommand(binder);
+	}
+	
 	public String getDependentCodePaths() {
 		if ( newItem ) {
 			return null;
