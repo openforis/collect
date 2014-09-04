@@ -346,6 +346,35 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 	}
 	
+	public void removeVersioningInfo(CodeList codeList, ModelVersion version) {
+		JooqFactory jf = getMappingJooqFactory(null);
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
+		int codeListId = codeList.getId();
+		jf.update(OFC_CODE_LIST)
+			.set(OFC_CODE_LIST.SINCE_VERSION_ID, (Integer) null)
+			.where(surveyIdField.eq(survey.getId())
+				.and(oppositeSurveyIdField.isNull())
+				.and(OFC_CODE_LIST.CODE_LIST_ID.eq(codeListId))
+				.and(OFC_CODE_LIST.SINCE_VERSION_ID.eq(version.getId()))
+				)
+			.execute();
+
+		jf.update(OFC_CODE_LIST)
+			.set(OFC_CODE_LIST.DEPRECATED_VERSION_ID, (Integer) null)
+			.where(surveyIdField.eq(survey.getId())
+				.and(oppositeSurveyIdField.isNull())
+				.and(OFC_CODE_LIST.CODE_LIST_ID.eq(codeListId))
+				.and(OFC_CODE_LIST.DEPRECATED_VERSION_ID.eq(version.getId()))
+				)
+			.execute();
+
+		if ( useCache ) {
+			cache.removeItemsByCodeList(survey.getId(), survey.isWork(), codeListId);
+		}
+	}
+
 	public void moveItemsToPublishedSurvey(int surveyWorkId, int publishedSurveyId) {
 		JooqFactory jf = getMappingJooqFactory(null);
 		jf.update(OFC_CODE_LIST)
@@ -796,5 +825,5 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			super.restartSequence(value);
 		}
 	}
-	
+
 }

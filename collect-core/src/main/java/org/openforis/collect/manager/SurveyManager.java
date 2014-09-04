@@ -37,6 +37,7 @@ import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -767,6 +768,12 @@ public class SurveyManager {
 		samplingDesignManager.deleteBySurveyWork(id);
 		codeListManager.deleteAllItemsBySurvey(id, true);
 		surveyWorkDao.delete(id);
+	}
+	
+	@Transactional
+	public void removeVersion(CollectSurvey survey, ModelVersion version) {
+		survey.removeVersion(version);
+		codeListManager.removeVersioningReference(survey, version);
 	}
 
 	protected ProcessStatus getRecordValidationProcessStatus(int surveyId) {

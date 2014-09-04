@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +53,8 @@ import org.zkoss.zul.Window;
  * 
  */
 public class SurveySelectVM extends BaseVM {
+
+	private static final String BINARY_CONTENT_TYPE = "application/octet-stream";
 
 	/**
 	 * Pattern for survey export file name (SURVEYNAME_DATE.OUTPUTFORMAT)
@@ -201,10 +202,9 @@ public class SurveySelectVM extends BaseVM {
 		String dateStr = Dates.formatDateTimeToXML(new Date());
 		String extension = surveyBackupJob.getOutputFormat().getOutputFileExtension();
 		String fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
-		String contentType = URLConnection.guessContentTypeFromName(fileName);
 		try {
 			FileInputStream is = new FileInputStream(file);
-			Filedownload.save(is, contentType, fileName);
+			Filedownload.save(is, BINARY_CONTENT_TYPE, fileName);
 		} catch (FileNotFoundException e) {
 			log.error(e);
 			MessageUtil.showError("survey.export_survey.error", new String[]{e.getMessage()});
