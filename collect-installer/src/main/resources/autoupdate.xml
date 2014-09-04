@@ -1,0 +1,8 @@
+<autoUpdateProject>
+	<fullName>Open Foris Collect]</fullName>
+	<shortName>OpenForisCollect</shortName>
+	<!-- <vendor>Open Foris</vendor> -->
+	<version>PROJECT_VERSION</version>
+	<singleInstanceCheck>1</singleInstanceCheck>
+	<requireInstallationByRootUser>0</requireInstallationByRootUser>
+</autoUpdateProject>
