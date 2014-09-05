@@ -6,9 +6,6 @@ package org.openforis.collect.designer.form;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.metamodel.CollectAnnotations;
-import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -27,9 +24,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		
 	private List<AttributeDefault> attributeDefaults;
 	private List<Check<?>> checks;
-	private boolean includeInDataExport;
-	private boolean showInUI;
-
+	
 	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
 	}
@@ -49,15 +44,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 				dest.addCheck(check);
 			}
 		}
-		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
-
-		//include in data export
-		CollectAnnotations annotations = survey.getAnnotations();
-		annotations.setIncludeInDataExport(dest, includeInDataExport);
-		
-		//show in ui
-		UIOptions uiOptions = survey.getUIOptions();
-		uiOptions.setHidden(dest, ! showInUI);
 	}
 	
 	@Override
@@ -65,15 +51,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		super.loadFrom(source, languageCode);
 		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
 		checks = new ArrayList<Check<?>>(source.getChecks());
-		
-		CollectSurvey survey = (CollectSurvey) source.getSurvey();
-		
-		//show in UI
-		UIOptions uiOptions = survey.getUIOptions();
-		showInUI = ! uiOptions.isHidden(source);
-		
-		CollectAnnotations annotations = survey.getAnnotations();
-		includeInDataExport = annotations.isIncludedInDataExport(source);
 	}
 	
 	@Override
@@ -81,8 +58,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		super.reset();
 		attributeDefaults = new ArrayList<AttributeDefault>();
 		checks = null;
-		showInUI = true;
-		includeInDataExport = true;
 	}
 
 	public List<AttributeDefault> getAttributeDefaults() {
@@ -101,19 +76,4 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		this.checks = checks;
 	}
 	
-	public boolean isIncludeInDataExport() {
-		return includeInDataExport;
-	}
-	
-	public void setIncludeInDataExport(boolean includeInDataExport) {
-		this.includeInDataExport = includeInDataExport;
-	}
-	
-	public boolean isShowInUI() {
-		return showInUI;
-	}
-	
-	public void setShowInUI(boolean showInUI) {
-		this.showInUI = showInUI;
-	}
 }

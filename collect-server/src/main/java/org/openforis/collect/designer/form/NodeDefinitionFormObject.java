@@ -3,6 +3,7 @@ package org.openforis.collect.designer.form;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Calculable;
@@ -34,7 +35,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Integer minCount;
 	private Integer maxCount;
 	private boolean calculated;
-	
+	private boolean includeInDataExport;
+	private boolean showInUI;
+
 	//labels
 	private String headingLabel;
 	private String instanceLabel;
@@ -105,6 +108,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	@Override
 	public void loadFrom(T source, String language) {
 		super.loadFrom(source, language);
+		CollectSurvey survey = (CollectSurvey) source.getSurvey();
+		UIOptions uiOptions = survey.getUIOptions();
+		
 		//generic
 		name = source.getName();
 		multiple = source.isMultiple();
@@ -124,6 +130,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		}
 		if ( source instanceof Calculable ) {
 			calculated = ((Calculable) source).isCalculated();
+			//show in UI
+			showInUI = ! uiOptions.isHidden(source);
+			
+			CollectAnnotations annotations = survey.getAnnotations();
+			includeInDataExport = annotations.isIncludedInDataExport(source);
 		}
 
 		//labels
@@ -136,7 +147,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		pcPromptLabel = source.getPrompt(Prompt.Type.PC, language);
 		description = source.getDescription(language);
 		//layout
-		UIOptions uiOptions = getUIOptions(source);
 		hideWhenNotRelevant = uiOptions.isHideWhenNotRelevant(source);
 		column = uiOptions.getColumn(source);
 		columnSpan = uiOptions.getColumnSpan(source);
@@ -172,6 +182,15 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		
 		if ( dest instanceof Calculable ) {
 			((Calculable) dest).setCalculated(calculated);
+			CollectSurvey survey = (CollectSurvey) dest.getSurvey();
+
+			//include in data export
+			CollectAnnotations annotations = survey.getAnnotations();
+			annotations.setIncludeInDataExport(dest, includeInDataExport);
+			
+			//show in ui
+			UIOptions uiOptions = survey.getUIOptions();
+			uiOptions.setHidden(dest, ! showInUI);
 		}
 		
 		//layout
@@ -186,6 +205,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	@Override
 	protected void reset() {
 		calculated = false;
+		showInUI = true;
+		includeInDataExport = true;
 	}
 	
 	protected UIOptions getUIOptions(NodeDefinition nodeDefn) {
@@ -208,6 +229,22 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setCalculated(boolean calculated) {
 		this.calculated = calculated;
+	}
+	
+	public boolean isIncludeInDataExport() {
+		return includeInDataExport;
+	}
+	
+	public void setIncludeInDataExport(boolean includeInDataExport) {
+		this.includeInDataExport = includeInDataExport;
+	}
+	
+	public boolean isShowInUI() {
+		return showInUI;
+	}
+	
+	public void setShowInUI(boolean showInUI) {
+		this.showInUI = showInUI;
 	}
 	
 	public String getHeadingLabel() {
