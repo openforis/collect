@@ -174,10 +174,16 @@
 								<include>${installbuilder-file-name}</include>
 							</includes>
 							<regex>false</regex>
-							<!-- the name of the token to replace -->
-							<token>PROJECT_VERSION</token>
-							<!-- replace it with the Maven project version -->
-							<value>${project.version}</value>
+							<replacements>
+			                    <replacement>
+			                        <token>PROJECT_VERSION</token>
+			                        <value>${project.version}</value>
+			                    </replacement>
+			                    <replacement>
+			                        <token>UPDATE_XML_URL</token>
+			                        <value>${collect.update.url}</value>
+			                    </replacement>
+			                </replacements>      
 						</configuration>
 					</plugin>
 
