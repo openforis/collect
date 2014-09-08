@@ -15,6 +15,7 @@ import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
 import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
 import org.openforis.collect.io.data.DataLine.EntityKeysIdentifierDefintion;
 import org.openforis.collect.io.data.DataLine.EntityPositionIdentifierDefinition;
+import org.openforis.collect.io.data.DataLine.FieldValueKey;
 import org.openforis.collect.io.data.DataLine.SingleEntityIdentifierDefinition;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.CSVDataImportReader;
@@ -162,6 +163,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return entityIdentifierDefns;
 		
 	}
+	
 	private List<String> getExpectedAncestorKeyColumnNames() {
 		List<EntityIdentifierDefinition> entityIdentifierDefns = getAncestorIdentifiers();
 		//validate ancestor key columns
@@ -233,11 +235,17 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			List<String> attrColNames = colNames.subList(expectedAncestorKeyColumnNames.size(), colNames.size());
 			for (String colName : attrColNames) {
 				String value = getColumnValue(colName, false, String.class);
-				FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
-				AttributeDefinition attrDefn = (AttributeDefinition) fieldDefn.getParentDefinition();
-				line.setFieldValue(attrDefn.getId(), fieldDefn.getName(), value);
-				line.setColumnNameByField(attrDefn.getId(), fieldDefn.getName(), colName);
+				FieldValueKey fieldValueKey = getFieldValueKey(colName);
+				line.setFieldValue(fieldValueKey, value);
+				line.setColumnNameByField(fieldValueKey, colName);
 			}
+		}
+
+		protected FieldValueKey getFieldValueKey(String colName) {
+			FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
+			AttributeDefinition attrDefn = (AttributeDefinition) fieldDefn.getParentDefinition();
+			FieldValueKey fieldValueKey = new DataLine.FieldValueKey(attrDefn.getId(), fieldDefn.getName());
+			return fieldValueKey;
 		}
 
 	}

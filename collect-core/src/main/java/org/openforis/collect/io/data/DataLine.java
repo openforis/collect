@@ -29,11 +29,21 @@ public class DataLine extends Line {
 	}
 	
 	public void setFieldValue(int attrDefnId, String fieldName, String value) {
-		fieldValues.put(new FieldValueKey(attrDefnId, fieldName), value);
+		FieldValueKey key = new FieldValueKey(attrDefnId, fieldName);
+		setFieldValue(key, value);
+	}
+	
+	public void setFieldValue(FieldValueKey key, String value) {
+		fieldValues.put(key, value);
 	}
 	
 	public void setColumnNameByField(int attrDefnId, String fieldName, String colName) {
-		columnNameByField.put(new FieldValueKey(attrDefnId, fieldName), colName);
+		FieldValueKey key = new FieldValueKey(attrDefnId, fieldName);
+		setColumnNameByField(key, colName);
+	}
+
+	public void setColumnNameByField(FieldValueKey key, String colName) {
+		columnNameByField.put(key, colName);
 	}
 	
 	public String[] getRecordKeyValues(EntityDefinition rootEntityDefn) {
