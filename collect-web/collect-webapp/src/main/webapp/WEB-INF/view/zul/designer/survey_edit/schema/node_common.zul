@@ -37,7 +37,37 @@
   			<column />
   		</columns>
   		<rows>
-  			<row visible="${not vm.rootEntity and not fx.calculated}">
+  			<row visible="${vm.calculableAttribute}">
+	    		<fieldErrorHandler message="@load(vmsgs['calculated'])">
+	    			<label value="${labels.survey.schema.attribute.calculated.$}:" />
+					<image popup="calculatedInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+	    		</fieldErrorHandler>
+	    		<fieldErrorHandler message="@load(vmsgs['calculated'])">
+	    			<checkbox
+	    				checked="@load(fx.calculated eq true) @save(fx.calculated)"
+	    				onCheck="@command('calculatedChanged', changed=self.checked)" />
+	    		</fieldErrorHandler>
+	    	</row>
+	      	<row visible="@load(vm.calculableAttribute and fx.calculated)">
+				<fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+		        	<label value="${labels.survey.schema.attribute.include_in_data_export}:" />
+		        </fieldErrorHandler>
+		        <fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+			        <checkbox checked="@load(fx.includeInDataExport eq true) @save(fx.includeInDataExport)"
+			        	onCheck="@command('applyChanges')" />
+			    </fieldErrorHandler>
+		    </row>
+	 		<row visible="@load(vm.calculableAttribute and fx.calculated)">
+		        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
+			    	<label value="${labels.survey.schema.attribute.show_in_ui}:" />
+		        </fieldErrorHandler>
+		        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
+			        <checkbox checked="@load(fx.showInUI eq true) @save(fx.showInUI)"
+			        	onCheck="@command('applyChanges')" />
+			    </fieldErrorHandler>
+		    </row>
+  			<row visible="${not vm.rootEntity and not (vm.calculableAttribute and fx.calculated)}">
   				<fieldErrorHandler message="@load(vmsgs['multiple'])">
 	  				<label use="org.openforis.collect.designer.component.FieldLabel" 
 	  					value="${labels.survey.schema.node.multiple}" />
@@ -50,7 +80,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and not fx.calculated and fx.multiple ne true and vm.requiredApplied and (empty fx.requiredExpression or fx.required))">
+  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple ne true and vm.requiredApplied and (empty fx.requiredExpression or fx.required))">
   				<fieldErrorHandler message="@load(vmsgs['required'])">
 	  				<label value="${labels.survey.schema.node.required}:" />
 	  			</fieldErrorHandler>
@@ -62,7 +92,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and not fx.calculated and fx.multiple ne true and (fx.required eq false || not empty fx.requiredExpression))">
+  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple ne true and (fx.required eq false || not empty fx.requiredExpression))">
   				<fieldErrorHandler
   					message="@load(vmsgs['requiredExpression'])">
 	  				<label
@@ -76,7 +106,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and not fx.calculated and fx.multiple eq true)">
+  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple eq true)">
   				<fieldErrorHandler message="@load(vmsgs['minCount'])">
   					<label value="${labels.survey.schema.node.min_count}:" />
   				</fieldErrorHandler>
@@ -86,7 +116,7 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and not fx.calculated and fx.multiple eq true)">
+  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple eq true)">
   				<fieldErrorHandler message="@load(vmsgs['maxCount'])">
 	  				<label value="${labels.survey.schema.node.max_count}:" />
 	  			</fieldErrorHandler>
@@ -381,6 +411,11 @@
     	</vlayout>
     </groupbox>
     
+   	<popup id="calculatedInfoTooltip" width="300px">
+		<html><![CDATA[
+      		${labels.survey.schema.attribute.calculated.info}
+      	]]></html>
+	</popup>
     <popup id="columnInfoTooltip" width="500px">
         <html><![CDATA[
         	${labels.survey.schema.node.layout.column.info}

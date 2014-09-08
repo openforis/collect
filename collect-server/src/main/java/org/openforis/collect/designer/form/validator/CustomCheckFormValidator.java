@@ -17,8 +17,10 @@ public class CustomCheckFormValidator extends CheckFormValidator {
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
-		NodeDefinition parentDefn = getContextNode(ctx);
-		validateBooleanExpression(ctx, parentDefn, EXPRESSION_FIELD);
+		if ( validateRequired(ctx, EXPRESSION_FIELD) ) {
+			NodeDefinition parentDefn = getContextNode(ctx);
+			validateBooleanExpression(ctx, parentDefn, EXPRESSION_FIELD);
+		}
 	}
 	
 }

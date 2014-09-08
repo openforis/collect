@@ -33,7 +33,7 @@ public class PatternCheckFormValidator extends CheckFormValidator {
 				return true;
 			}
 		} else {
-			return true;
+			return false;
 		}
 	}
 }
