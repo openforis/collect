@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.ReferenceDataImportStatus;
 import org.openforis.collect.io.data.DataLine.EntityIdentifier;
+import org.openforis.collect.io.data.DataLine.EntityIdentifierDefinition;
 import org.openforis.collect.io.data.DataLine.EntityKeysIdentifier;
 import org.openforis.collect.io.data.DataLine.EntityPositionIdentifier;
 import org.openforis.collect.io.data.DataLine.FieldValueKey;
@@ -41,6 +42,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -77,6 +79,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static final String MULTIPLE_RECORDS_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.multipleRecordsFound";
 	private static final String ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY = "csvDataImport.error.onlyNewRecordsAllowed";
 	private static final String MULTIPLE_PARENT_ENTITY_FOUND_MESSAGE_KEY = "csvDataImport.error.multipleParentEntityFound";
+	private static final String PARENT_ENTITY_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.noParentEntityFound";
 	private static final String UNIT_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.unitNotFound";
 	private static final String SRS_NOT_FOUND_MESSAGE_KEY = "csvDataImport.error.srsNotFound";
 	private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "csvDataImport.error.recordNotInSelectedStep";
@@ -120,12 +123,18 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	 * When insertNewRecords is true, it indicates the name of the model version used during new record creation
 	 */
 	private String newRecordVersionName;
+	
+	/**
+	 * If true, the process automatically creates ancestor multiple entities if they do not exist.
+	 */
+	private boolean createAncestorEntities;
 
 	//transient variables
 	private User adminUser;
 	private CollectRecord lastModifiedRecordSummary;
 	private CollectRecord lastModifiedRecord;
 	private String sessionId;
+
 
 	public CSVDataImportProcess() {
 		recordValidationEnabled = true;
@@ -567,7 +576,12 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				List<Entity> childEntities = findChildEntities(currentParent, ancestorName, identifier);
 				switch ( childEntities.size() ) {
 				case 0:
-					childEntity = createChildEntity(currentParent, ancestorName, identifier, line.getColumnNamesByField(), line.getLineNumber());
+					if ( createAncestorEntities || ancestorDefn == parentEntityDefn ) {
+						childEntity = createChildEntity(currentParent, ancestorName, identifier, line.getColumnNamesByField(), line.getLineNumber());
+					} else {
+						status.addParsingError(createParentEntitySearchError(record, line, identifier, PARENT_ENTITY_NOT_FOUND_MESSAGE_KEY));
+						return null;
+					}
 					break;
 				case 1:
 					childEntity = childEntities.get(0);
@@ -639,9 +653,11 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 	private ParsingError createParentEntitySearchError(CollectRecord record, DataLine line, 
 			EntityIdentifier<?> identifier, String messageKey) {
+		EntityIdentifierDefinition identifierDefn = identifier.getDefinition();
 		Survey survey = record.getSurvey();
 		Schema schema = survey.getSchema();
-		EntityDefinition parentEntityDefn = (EntityDefinition) schema.getDefinitionById(parentEntityDefinitionId);
+		EntityDefinition parentEntityDefn = (EntityDefinition) schema.getDefinitionById(identifierDefn.getEntityDefinitionId());
+
 		String[] colNames = DataCSVReader.getKeyAttributeColumnNames(parentEntityDefn, parentEntityDefn.getKeyAttributeDefinitions());
 		ParsingError error = new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), colNames, messageKey);
 		List<String> recordKeys = record.getRootEntityKeyValues();
@@ -739,6 +755,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	
 	public void setNewRecordVersionName(String newRecordVersionName) {
 		this.newRecordVersionName = newRecordVersionName;
+	}
+	
+	public boolean isCreateAncestorEntities() {
+		return createAncestorEntities;
+	}
+	
+	public void setCreateAncestorEntities(boolean createAncestorEntities) {
+		this.createAncestorEntities = createAncestorEntities;
 	}
 	
 	static class ImportException extends Exception {

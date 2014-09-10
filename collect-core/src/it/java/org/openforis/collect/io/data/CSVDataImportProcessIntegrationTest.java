@@ -103,8 +103,12 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional) throws Exception {
 		return importCSVFile(fileName, parentEntityDefinitionId, transactional, false, null);
 	}
-	
+
 	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, boolean insertNewRecords, String newRecordVersionName) throws Exception {
+		return importCSVFile(fileName, parentEntityDefinitionId, transactional, insertNewRecords, newRecordVersionName, true);
+	}
+	
+	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, boolean insertNewRecords, String newRecordVersionName, boolean createAncestorEntities) throws Exception {
 		File file = getTestFile(fileName);
 		CSVDataImportProcess process = (CSVDataImportProcess) beanFactory.getBean(
 				transactional ? "transactionalCsvDataImportProcess": "csvDataImportProcess");
@@ -114,6 +118,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		process.setStep(null);
 		process.setInsertNewRecords(insertNewRecords);
 		process.setNewRecordVersionName(newRecordVersionName);
+		process.setCreateAncestorEntities(createAncestorEntities);
 		process.init();
 		try {
 			process.call();
@@ -363,7 +368,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
 		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
 		EntityDefinition treeDefn = (EntityDefinition) plotDefn.getChildDefinition("tree");
-		CSVDataImportProcess process = importCSVFile(MISSING_PARENT_ENTITY_TEST_CSV, treeDefn.getId());
+		CSVDataImportProcess process = importCSVFile(MISSING_PARENT_ENTITY_TEST_CSV, treeDefn.getId(), true, false, null, true);
 		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
 		assertTrue(status.isComplete());
 		assertEquals(0, status.getRowsInError().size());
