@@ -145,5 +145,6 @@ package org.openforis.collect.util
 				return "";
 			}
 		}
+		
 	}
 }

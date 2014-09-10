@@ -370,7 +370,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function exportErrorsClickHandler(event:MouseEvent):void {
-			DataGrids.writeToCSV(view.errorsDataGrid);
+			DataGrids.writeToCSV(view.errorsDataGrid, "errors.csv");
 		}
 		
 	}

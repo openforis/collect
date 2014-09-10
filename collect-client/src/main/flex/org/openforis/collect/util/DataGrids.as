@@ -12,36 +12,26 @@ package org.openforis.collect.util
 
 	public class DataGrids {
 		
-		public static function writeToCSV(dataGrid:DataGrid):void {
-			var csv:CSV = new CSV();
-			csv.embededHeader = false;
-			
+		public static function writeToCSV(dataGrid:DataGrid, outputFileName:String):void {
 			//build header
 			var header:Array = new Array();
 			var columns:Array = dataGrid.columns.toArray();
 			for each (var c:GridColumn in columns) {
 				header.push(c.headerText);
 			}
-			csv.header = header;
 			
 			//build records
+			var rows:Array = new Array();
 			var dataProvider:IList = dataGrid.dataProvider;
 			for each (var item:Object in dataProvider) {
-				var values:Array = new Array();
+				var row:Array = new Array();
 				for each (var col:GridColumn in columns) {
 					var value:String = col.itemToLabel(item);
-					values.push(value);
+					row.push(value);
 				}
-				csv.addRecordSet(values);
+				rows.push(row);
 			}
-			csv.encode();
-
-			//download generated file
-			var data:ByteArray = new ByteArray();
-			data.writeUTFBytes(csv.data);
-			
-			var fileReference:FileReference = new FileReference();
-			fileReference.save(data, "errors.csv");
+			CSVUtils.saveToCsv(header, rows, outputFileName);
 		}
 	}
 }
