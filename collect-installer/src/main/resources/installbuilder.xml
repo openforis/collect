@@ -16,9 +16,9 @@
             <desktopShortcutList>
             	<shortcut>
 					<name>Startup Open Foris Collect</name>
-					<comment>Startup Open Foris Collect server</comment>
-					<exec>${installdir}/collect-server/startup-linux.sh</exec>
-					<path>${installdir}/collect-server</path>
+					<comment>Startup Open Foris Collect</comment>
+					<exec>${installdir}/startup-linux.sh</exec>
+					<path>${installdir}</path>
 					<icon>${installdir}/images/of-logo.png</icon>
 					<platforms>linux</platforms>
 					<runAsAdmin>0</runAsAdmin>
@@ -30,9 +30,9 @@
 				</shortcut>
 				<shortcut>
 					<name>Shutdown Open Foris Collect</name>
-					<comment>Shutdown Open Foris Collect server</comment>
-					<exec>${installdir}/collect-server/shutdown-linux.sh</exec>
-					<path>${installdir}/collect-server</path>
+					<comment>Shutdown Open Foris Collect</comment>
+					<exec>${installdir}/shutdown-linux.sh</exec>
+					<path>${installdir}</path>
 					<icon>${installdir}/images/of-logo.png</icon>
 					<platforms>linux</platforms>
 					<runAsAdmin>0</runAsAdmin>
@@ -53,9 +53,9 @@
                         <!--                         <distributionFile> 
                              <origin>../../../../collect-control-panel/target/OpenForisCollect.jar</origin> 
                          </distributionFile> -->
-                        <distributionFile>
-                            <origin>collect-server.zip</origin>
-                        </distributionFile>
+                        <distributionDirectory>
+                            <origin>collect-server/tomcat</origin>
+                        </distributionDirectory>
                         <distributionFile>
                             <origin>startup-linux.sh</origin>
                         </distributionFile>
@@ -103,21 +103,21 @@
                     <windowsPath>${installdir}/</windowsPath>
                 </startMenuShortcut>
                 <startMenuShortcut>
-                    <comment>Startup Open Foris Collect Server</comment>
+                    <comment>Startup Open Foris Collect</comment>
                     <name>Startup OF Collect</name>
                     <runAsAdmin>0</runAsAdmin>
                     <runInTerminal>0</runInTerminal>
-                    <windowsExec>${installdir}/collect-server/startup-windows.cmd</windowsExec>
+                    <windowsExec>${installdir}/startup-windows.cmd</windowsExec>
                     <windowsExecArgs></windowsExecArgs>
                     <windowsIcon>${installdir}/images/of-logo-small-ico.ico</windowsIcon>
                     <windowsPath></windowsPath>
                 </startMenuShortcut>
                 <startMenuShortcut>
-                    <comment>Shutdown Open Foris Collect Server</comment>
+                    <comment>Shutdown Open Foris Collect</comment>
                     <name>Shutdown OF Collect</name>
                     <runAsAdmin>0</runAsAdmin>
                     <runInTerminal>0</runInTerminal>
-                    <windowsExec>${installdir}/collect-server/shutdown-windows.cmd</windowsExec>
+                    <windowsExec>${installdir}/shutdown-windows.cmd</windowsExec>
                     <windowsExecArgs></windowsExecArgs>
                     <windowsIcon>${installdir}/images/of-logo-small-ico.ico</windowsIcon>
                     <windowsPath></windowsPath>
@@ -132,42 +132,42 @@
                 </startMenuLinkShortcut>
             </startMenuShortcutList>
         </component>
-<!--         <component> -->
-<!-- 		   <name>autoupdater</name> -->
-<!-- 			<description>includes tool to perform updates</description> -->
-<!-- 			<canBeEdited>0</canBeEdited> -->
-<!-- 			<selected>1</selected> -->
-<!-- 			<show>0</show> -->
-<!-- 			<folderList> -->
-<!-- 				<folder> -->
-<!-- 					<name>autoupdaterwin</name> -->
-<!-- 					<destination>${installdir}</destination> -->
-<!-- 					<platforms>windows</platforms> -->
-<!-- 					<distributionFileList> -->
-<!-- 						<distributionFile origin="autoupdater-windows.exe" /> -->
-<!-- 					</distributionFileList> -->
-<!-- 				</folder> -->
-<!-- 				<folder> -->
-<!-- 					<name>autoupdaterlinux</name> -->
-<!-- 					<destination>${installdir}</destination> -->
-<!-- 					<platforms>linux</platforms> -->
-<!-- 					<distributionFileList> -->
-<!-- 						<distributionFile origin="autoupdater-linux.run" /> -->
-<!-- 					</distributionFileList> -->
-<!-- 				</folder> -->
-<!-- 			</folderList> -->
-<!-- 			<postInstallationActionList> -->
-<!-- 				<writeFile> -->
-<!-- 					<path>${installdir}/update.ini</path> -->
-<!-- 					<text>[Update] -->
-<!-- 						url = UPDATE_XML_URL -->
-<!-- 						version_id = ${application_version_id} -->
-<!-- 						update_download_location = ${system_temp_directory} -->
-<!-- 						check_for_updates = 1 -->
-<!-- 					</text> -->
-<!-- 				</writeFile> -->
-<!-- 			</postInstallationActionList> -->
-<!-- 		</component> -->
+        <component>
+		   <name>autoupdater</name>
+			<description>includes tool to perform updates</description>
+			<canBeEdited>0</canBeEdited>
+			<selected>1</selected>
+			<show>0</show>
+			<folderList>
+				<folder>
+					<name>autoupdaterwin</name>
+					<destination>${installdir}</destination>
+					<platforms>windows</platforms>
+					<distributionFileList>
+						<distributionFile origin="autoupdate-windows.exe" />
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>autoupdaterlinux</name>
+					<destination>${installdir}</destination>
+					<platforms>linux</platforms>
+					<distributionFileList>
+						<distributionFile origin="autoupdate-linux.run" />
+					</distributionFileList>
+				</folder>
+			</folderList>
+			<postInstallationActionList>
+				<writeFile>
+					<path>${installdir}/update.ini</path>
+					<text>[Update]
+						url = UPDATE_XML_URL
+						version_id = PROJECT_VERSION
+						update_download_location = ${system_temp_directory}
+						check_for_updates = 1
+					</text>
+				</writeFile>
+			</postInstallationActionList>
+		</component>
         <include>
             <file>java.xml</file>
         </include>
@@ -175,7 +175,7 @@
     <preInstallationActionList>
         <setInstallerVariable>
             <name>installdir</name>
-            <value>${env(SYSTEMDRIVE)}/opt/${product_shortname}</value>
+            <value>${env(SYSTEMDRIVE)}/opt/openforis/collect</value>
         </setInstallerVariable>
     </preInstallationActionList>
     <postInstallationActionList>
@@ -184,47 +184,12 @@
              <scope>system</scope> 
              <value>${installdir}</value> 
          </addEnvironmentVariable> -->
-        <unzip>
-            <destinationDirectory>${installdir}</destinationDirectory>
-            <zipFile>${installdir}/collect-server.zip</zipFile>
-        </unzip>
-        <deleteFile>
-            <path>${installdir}/collect-server.zip</path>
-        </deleteFile>
         <changePermissions>
             <files>${installdir}/*.sh</files>
             <permissions>0555</permissions>
         </changePermissions>
-        <copyFile>
-            <destination>${installdir}/collect-server/startup-linux.sh</destination>
-            <origin>${installdir}/startup-linux.sh</origin>
-        </copyFile>
-        <copyFile>
-            <destination>${installdir}/collect-server/shutdown-linux.sh</destination>
-            <origin>${installdir}/shutdown-linux.sh</origin>
-        </copyFile>
-        <copyFile>
-            <destination>${installdir}/collect-server/shutdown-windows.cmd</destination>
-            <origin>${installdir}/shutdown-windows.cmd</origin>
-        </copyFile>
-        <copyFile>
-            <destination>${installdir}/collect-server/startup-windows.cmd</destination>
-            <origin>${installdir}/startup-windows.cmd</origin>
-        </copyFile>
-        <deleteFile>
-            <path>${installdir}/startup-linux.sh</path>
-        </deleteFile>
-        <deleteFile>
-            <path>${installdir}/shutdown-linux.sh</path>
-        </deleteFile>
-        <deleteFile>
-            <path>${installdir}/startup-windows.cmd</path>
-        </deleteFile>
-        <deleteFile>
-            <path>${installdir}/shutdown-windows.cmd</path>
-        </deleteFile>
         <substitute>
-            <files>${installdir}/collect-server/startup-linux.sh;${installdir}/collect-server/shutdown-linux.sh;${installdir}/collect-server/startup-windows.cmd;${installdir}/collect-server/shutdown-windows.cmd;</files>
+            <files>${installdir}/startup-linux.sh;${installdir}/shutdown-linux.sh;${installdir}/startup-windows.cmd;${installdir}/shutdown-windows.cmd;</files>
             <type>exact</type>
             <substitutionList>
                 <substitution>

@@ -19,6 +19,10 @@
 		<windows-installer-file-name>OpenForisCollect-${project.version}-windows-installer.exe</windows-installer-file-name>
 		<linux-installer-file-name>OpenForisCollect-${project.version}-linux-installer.run</linux-installer-file-name>
 		<osx-installer-file-name>OpenForisCollect-${project.version}-osx-installer.run</osx-installer-file-name>
+		<!-- autoupdate file names -->
+		<windows-autoupdater-file-name>autoupdate-windows.exe</windows-autoupdater-file-name>
+		<linux-autoupdater-file-name>autoupdate-linux.run</linux-autoupdater-file-name>
+		<osx-autoupdater-file-name>autoupdate-osx.run</osx-autoupdater-file-name>
 	</properties>
 	
 	<profiles>
@@ -102,11 +106,19 @@
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/jre_files</outputDirectory>
 										</artifactItem>
+										<artifactItem>
+											<groupId>org.openforis.collect</groupId>
+											<artifactId>collect-assembly</artifactId>
+											<version>${project.version}</version>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/</outputDirectory>
+										</artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
                             <execution>
-								<id>copy-collect-assembly</id>
+								<id>copy-autoupdater</id>
 								<phase>process-sources</phase>
 								<goals>
 									<goal>copy</goal>
@@ -115,12 +127,23 @@
 									<artifactItems>
 										<artifactItem>
 											<groupId>org.openforis.collect</groupId>
-											<artifactId>collect-assembly</artifactId>
+											<artifactId>collect-autoupdater</artifactId>
 											<version>${project.version}</version>
-											<type>zip</type>
+											<classifier>windows</classifier>
+											<type>exe</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${installer-build-path}/</outputDirectory>
-											<destFileName>collect-server.zip</destFileName>
+											<destFileName>${windows-autoupdater-file-name}</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.openforis.collect</groupId>
+											<artifactId>collect-autoupdater</artifactId>
+											<version>${project.version}</version>
+											<classifier>linux</classifier>
+											<type>run</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}/</outputDirectory>
+											<destFileName>${linux-autoupdater-file-name}</destFileName>
 										</artifactItem>
 									</artifactItems>
 								</configuration>
@@ -162,7 +185,7 @@
 						<version>1.4.0</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>prepare-package</phase>
 								<goals>
 									<goal>replace</goal>
 								</goals>
@@ -186,8 +209,8 @@
 			                </replacements>      
 						</configuration>
 					</plugin>
-
-					<!-- 3. execute installbuilder to produce the installers -->
+					
+					<!-- 5. execute installbuilder to produce the installers -->
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
@@ -227,33 +250,33 @@
 							</execution>
 						</executions>
 					</plugin>
-
-					<!--  4. move the installers into the target folder -->
+					
+					<!--  6. move generated installers into the target folder -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>run-ant-rename</id>
+								<id>run-ant-move-installer-files</id>
 								<phase>package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/output/${windows-installer-file-name}" tofile="${project.build.directory}/${windows-installer-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-installer-file-name}" tofile="${project.build.directory}/${linux-installer-file-name}" failonerror="false" />
-<!-- 										<move -->
-<!-- 											file="${installbuilder-home}/output/${osx-installer-file-name}" -->
-<!-- 											tofile="${project.build.directory}/${osx-installer-file-name}"  -->
-<!-- 											failonerror="false" /> -->
+										<move file="${installbuilder-home}/output/${windows-installer-file-name}"
+											tofile="${project.build.directory}/${windows-installer-file-name}"
+											failonerror="true" />
+										<move file="${installbuilder-home}/output/${linux-installer-file-name}"
+											tofile="${project.build.directory}/${linux-installer-file-name}"
+											failonerror="true" />
 									</tasks>
 								</configuration>
 							</execution>
 						</executions>
 					</plugin>
 
-			    	<!-- 5. attach installers as artifact -->
+			    	<!-- 7. attach installers as artifact -->
 					<plugin>
 					    <groupId>org.codehaus.mojo</groupId>
 					    <artifactId>build-helper-maven-plugin</artifactId>

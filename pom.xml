@@ -14,7 +14,9 @@
 		<module>collect-client</module>
 		<module>collect-web</module>
 		<module>collect-assembly</module>
+		<module>collect-autoupdater</module>
 		<module>collect-installer</module>
+		<module>collect-updater</module>
 	</modules>
 
 	<properties>
