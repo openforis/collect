@@ -47,7 +47,6 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -1192,13 +1191,11 @@ public class RecordManager {
 	//END OF RECORD UPDATE METHODS
 	
 	private void checkAllKeysSpecified(CollectRecord record) throws MissingRecordKeyException {
-		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		Schema schema = survey.getSchema();
 		Entity rootEntity = record.getRootEntity();
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
-		List<KeyAttributeDefinition> keyDefns = schema.getKeyAttributeDefinitions(rootEntity.getDefinition());
+		List<AttributeDefinition> keyDefns = rootEntity.getDefinition().getKeyAttributeDefinitions();
 		for (int i = 0; i < keyDefns.size(); i++) {
-			NodeDefinition keyDefn = (NodeDefinition) keyDefns.get(i);
+			AttributeDefinition keyDefn = keyDefns.get(i);
 			boolean required = keyDefn.getMinCount() != null && keyDefn.getMinCount() > 0;
 			if ( required ) {
 				String path = keyDefn.getPath();

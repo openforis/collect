@@ -124,7 +124,7 @@ public class SurveyValidator {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
 		for (EntityDefinition rootEntity : rootEntityDefinitions) {
-			List<KeyAttributeDefinition> keyAttributeDefinitions = schema.getKeyAttributeDefinitions(rootEntity);
+			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
 			if ( keyAttributeDefinitions.isEmpty() ) {
 				SurveyValidationResult validationResult = new SurveyValidationResult(rootEntity.getPath(), 
 						"survey.validation.error.key_attribute_not_specified");

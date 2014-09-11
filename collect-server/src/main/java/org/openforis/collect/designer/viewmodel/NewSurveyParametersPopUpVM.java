@@ -14,6 +14,7 @@ import org.openforis.collect.designer.model.LabelledItem.LabelComparator;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -155,6 +156,10 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		survey.setWork(true);
 		survey.setUri(surveyManager.generateSurveyUri(name));
 		survey.setDefaultLanguage(langCode);
+		
+		if ( survey.getSamplingDesignCodeList() == null ) {
+			survey.addSamplingDesignCodeList();
+		}
 		return survey;
 	}
 
@@ -171,6 +176,13 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		UITabSet rootTabSet = uiOptions.createRootTabSet((EntityDefinition) rootEntity);
 		UITab mainTab = uiOptions.getMainTab(rootTabSet);
 		mainTab.setLabel(langCode, SchemaVM.DEFAULT_MAIN_TAB_LABEL);
+		
+		SurveyObjectsGenerator surveyObjectsGenerator = new SurveyObjectsGenerator();
+		surveyObjectsGenerator.addPredefinedObjects(survey);
+		
+		if ( survey.getSamplingDesignCodeList() == null ) {
+			survey.addSamplingDesignCodeList();
+		}
 		return survey;
 	}
 	

@@ -349,7 +349,7 @@ package org.openforis.collect.presenter {
 				for each (var change:NodeChangeProxy in changeSet.changes) {
 					if ( change is AttributeChangeProxy && 
 							AttributeChangeProxy(change).nodeId == view.attribute.id) {
-						view.changed = false
+						view.changed = false;
 						updateView();
 						return;
 					}

@@ -567,6 +567,10 @@ public class SurveyManager {
 		if ( survey != null ) {
 			codeListManager.deleteInvalidCodeListReferenceItems(survey);
 			survey.getUIOptions().removeUnassignedTabs();
+			
+			if ( survey.getSamplingDesignCodeList() == null ) {
+				survey.addSamplingDesignCodeList();
+			}
 		}
 		return survey;
 	}
@@ -631,22 +635,6 @@ public class SurveyManager {
 		return generateSurveyUri(UUID.randomUUID().toString());
 	}
 
-	/**
-	 * Adds the system code list related to the sampling design and persist the changed into the database
-	 */
-	@Transactional
-	public void addSamplingDesignCodeList(CollectSurvey survey) throws SurveyImportException {
-		survey.addSamplingDesignCodeList();
-		if ( survey.getId() != null ) {
-			//persist changes
-			if ( survey.isWork() ) {
-				surveyWorkDao.update(survey);
-			} else {
-				surveyDao.updateModel(survey);
-			}
-		}
-	}
-	
 	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri) {
 		CollectSurvey survey = surveyDao.loadByUri(uri);
 //		CollectSurvey surveyWork = survey.clone();
@@ -686,6 +674,10 @@ public class SurveyManager {
 		samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
 		speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
 		codeListManager.cloneCodeLists(publishedSurvey, surveyWork);
+		
+		if ( surveyWork.getSamplingDesignCodeList() == null ) {
+			surveyWork.addSamplingDesignCodeList();
+		}
 		return surveyWork;
 	}
 	

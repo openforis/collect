@@ -27,6 +27,7 @@ import org.openforis.idm.metamodel.validation.ComparisonCheck;
 import org.openforis.idm.metamodel.validation.CoordinateValidator;
 import org.openforis.idm.metamodel.validation.DateValidator;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
+import org.openforis.idm.metamodel.validation.EntityKeyValidator;
 import org.openforis.idm.metamodel.validation.ExternalCodeValidator;
 import org.openforis.idm.metamodel.validation.IntegerRangeValidator;
 import org.openforis.idm.metamodel.validation.NumberValueUnitValidator;
@@ -181,6 +182,8 @@ public class ValidationMessageBuilder {
 			}
 		} else if(validator instanceof DistanceCheck) {
 			key = "validation.distanceError";
+		} else if(validator instanceof EntityKeyValidator) {
+			key = "validation.entityKeyUniquenessError";
 		} else if(validator instanceof ExternalCodeValidator) {
 			key = "validation.externalCodeError";
 		} else if(validator instanceof IntegerRangeValidator) {

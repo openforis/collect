@@ -41,8 +41,6 @@ import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.KeyAttributeDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -280,12 +278,11 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		EntityDefinition rootEntityDefn = record.getRootEntity().getDefinition();
 		String[] recordKeyValues = line.getRecordKeyValues(rootEntityDefn);
 
-		List<KeyAttributeDefinition> keyAttributeDefinitions = survey.getSchema().getKeyAttributeDefinitions(rootEntityDefn);
+		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefn.getKeyAttributeDefinitions();
 		for ( int i = 0; i < keyAttributeDefinitions.size(); i ++ ) {
-			KeyAttributeDefinition keyDefn = keyAttributeDefinitions.get(i);
-			AttributeDefinition keyAttrDefn = (AttributeDefinition) keyDefn;
-			Attribute<?, ?> keyAttr = (Attribute<?, ?>) record.getNodeByPath(keyAttrDefn.getPath() ); //for record key attributes, absolute path must be equal to relative path
-			setValueInField(keyAttr, keyAttrDefn.getMainFieldName(), recordKeyValues[i], line.getLineNumber(), null);
+			AttributeDefinition keyDefn = keyAttributeDefinitions.get(i);
+			Attribute<?, ?> keyAttr = (Attribute<?, ?>) record.getNodeByPath(keyDefn.getPath() ); //for record key attributes, absolute path must be equal to relative path
+			setValueInField(keyAttr, keyDefn.getMainFieldName(), recordKeyValues[i], line.getLineNumber(), null);
 		}
 	}
 

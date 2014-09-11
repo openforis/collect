@@ -5,10 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -319,11 +318,9 @@ public class CollectRecord extends Record {
 		Entity rootEntity = getRootEntity();
 		if(rootEntity != null) {
 			List<String> values = new ArrayList<String>();
-			CollectSurvey survey = (CollectSurvey) getSurvey();
-			Schema schema = survey.getSchema();
-			List<KeyAttributeDefinition> keyAttributeDefinitions = schema.getKeyAttributeDefinitions(rootEntity.getDefinition());
-			for (KeyAttributeDefinition keyDefn : keyAttributeDefinitions) {
-				Node<?> keyNode = this.getNodeByPath(((NodeDefinition) keyDefn).getPath());
+			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getDefinition().getKeyAttributeDefinitions();
+			for (AttributeDefinition keyDefn : keyAttributeDefinitions) {
+				Node<?> keyNode = this.getNodeByPath(keyDefn.getPath());
 				if ( keyNode == null || keyNode.isEmpty() ) {
 					//TODO throw error in this case?
 					values.add(null);
