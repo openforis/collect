@@ -8,13 +8,14 @@
 		</platformFile>
 		<platformFile>
 <!-- 			<filename>collect-updater-3.2.1-a7-linux.run</filename> -->
-			<filename>https://raw.githubusercontent.com/openforis/collect/autoupdater/collect-updater/src/main/resources/OpenForisCollectUpdater-3.2.1-a8-SNAPSHOT-linux-installer.run</filename>
+			<filename>OpenForisCollectUpdater-3.2.1-a8-SNAPSHOT-linux-installer.run</filename>
 			<platform>linux</platform>
 		</platformFile>
 	</platformFileList>
-<!-- 	<downloadLocationList> -->
-<!-- 		<downloadLocation> -->
+	<downloadLocationList>
+		<downloadLocation>
 <!-- 			<url>http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-installer/3.2.1-a7/</url> -->
-<!-- 		</downloadLocation> -->
-<!-- 	</downloadLocationList> -->
+				<url>https://raw.githubusercontent.com/openforis/collect/autoupdater/collect-updater/src/main/resources/</url>
+		</downloadLocation>
+	</downloadLocationList>
 </installerInformation>
