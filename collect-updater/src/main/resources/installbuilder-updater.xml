@@ -1,6 +1,6 @@
 <project>
 	<shortName>OpenForisCollectUpdater</shortName>
-	<fullName>Open Foris Collect Updater</fullName>
+	<fullName>Open Foris Collect</fullName>
 	<vendor>Open Foris Initiative</vendor>
 	<version>PROJECT_VERSION</version>
 	<logoImage>images/of-logo-small.png</logoImage>
@@ -13,17 +13,6 @@
 			<show>1</show>
 			<folderList>
 				<folder>
-					<name>programfiles</name>
-					<description>Program Files</description>
-					<destination>${installdir}</destination>
-					<platforms>all</platforms>
-					<distributionFileList>
-						<distributionFile>
-							<origin>update.ini</origin>
-						</distributionFile>
-					</distributionFileList>
-				</folder>
-				<folder>
 					<name>webapps</name>
 					<description>Tomcat Webapps</description>
 					<destination>${installdir}/tomcat/webapps</destination>
@@ -35,6 +24,17 @@
 					</distributionFileList>
 				</folder>
 			</folderList>
+			<postInstallationActionList>
+				<writeFile>
+					<path>${installdir}/update.ini</path>
+					<text>[Update]
+						url = UPDATE_XML_URL
+						version_id = PROJECT_VERSION
+						update_download_location = ${system_temp_directory}
+						check_for_updates = 1
+					</text>
+				</writeFile>
+			</postInstallationActionList>
 		</component>
 	</componentList>
 	<preInstallationActionList>

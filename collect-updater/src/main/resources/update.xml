@@ -1,19 +1,20 @@
 <installerInformation>
-	<versionId>200</versionId>
-	<version>2.0.0</version>
+<!-- 	<versionId>200</versionId> -->
+	<version>3.3.0</version>
 	<platformFileList>
 		<platformFile>
-			<filename>myapplication-installer-2.0.0.exe</filename>
+			<filename>collect-updater-3.2.1-a7-windows.exe</filename>
 			<platform>windows</platform>
 		</platformFile>
 		<platformFile>
-			<filename>myapplication-installer-2.0.0.run</filename>
+<!-- 			<filename>collect-updater-3.2.1-a7-linux.run</filename> -->
+			<filename>https://drive.google.com/file/d/0ByMwEaY7tf1bbEpiNDJLbHM5WG8/edit?usp=sharing</filename>
 			<platform>linux</platform>
 		</platformFile>
 	</platformFileList>
 	<downloadLocationList>
 		<downloadLocation>
-			<url>http://127.0.0.1:8080/downloads/</url>
+			<url>http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-installer/3.2.1-a7/</url>
 		</downloadLocation>
 	</downloadLocationList>
 </installerInformation>
