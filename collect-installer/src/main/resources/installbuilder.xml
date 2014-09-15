@@ -2,6 +2,7 @@
 	<shortName>OpenForisCollect</shortName>
 	<fullName>Open Foris Collect</fullName>
 	<version>PROJECT_VERSION</version>
+	<vendor>Open Foris</vendor>
 
 	<!-- <readmeFile>../../../README</readmeFile> <licenseFile>../../../../License.txt</licenseFile> -->
 	<logoImage>images/of-logo-small.png</logoImage>
@@ -33,6 +34,20 @@
 					<exec>${installdir}/shutdown-linux.sh</exec>
 					<path>${installdir}</path>
 					<icon>${installdir}/images/of-logo.png</icon>
+					<platforms>linux</platforms>
+					<runAsAdmin>0</runAsAdmin>
+					<runInTerminal>0</runInTerminal>
+					<windowsExec></windowsExec>
+					<windowsExecArgs></windowsExecArgs>
+					<windowsIcon></windowsIcon>
+					<windowsPath></windowsPath>
+				</shortcut>
+				<shortcut>
+					<name>Update Open Foris Collect</name>
+					<comment>Update Open Foris Collect</comment>
+					<exec>${installdir}/autoupdate/autoupdate-linux.run</exec>
+					<path>${installdir}/autoupdate</path>
+<!-- 					<icon>${installdir}/images/of-logo.png</icon> -->
 					<platforms>linux</platforms>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
@@ -107,7 +122,7 @@
 					<runInTerminal>0</runInTerminal>
 					<windowsExec>${installdir}/startup-windows.cmd</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
-					<windowsIcon>${installdir}/images/of-logo-small-ico.ico
+					<windowsIcon>${installdir}/images/of-logo-small.ico
 					</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
@@ -118,7 +133,7 @@
 					<runInTerminal>0</runInTerminal>
 					<windowsExec>${installdir}/shutdown-windows.cmd</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
-					<windowsIcon>${installdir}/images/of-logo-small-ico.ico
+					<windowsIcon>${installdir}/images/of-logo-small.ico
 					</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
@@ -129,6 +144,15 @@
 					<runInTerminal>0</runInTerminal>
 					<url>http://localhost:8080/collect</url>
 					<windowsIcon>${installdir}/images/browser.ico</windowsIcon>
+				</startMenuLinkShortcut>
+				<startMenuLinkShortcut>
+					<comment>Update Open Foris Collect</comment>
+					<name>Update OF Collect</name>
+					<runAsAdmin>0</runAsAdmin>
+					<runInTerminal>0</runInTerminal>
+					<windowsExec>${installdir}/autoupdate/autoupdate-windows.exe</windowsExec>
+					<windowsExecArgs></windowsExecArgs>
+<!-- 					<windowsIcon>${installdir}/images/of-logo-small-ico.ico</windowsIcon> -->
 				</startMenuLinkShortcut>
 			</startMenuShortcutList>
 		</component>
@@ -141,7 +165,7 @@
 			<folderList>
 				<folder>
 					<name>autoupdaterwin</name>
-					<destination>${installdir}</destination>
+					<destination>${installdir}/autoupdate</destination>
 					<platforms>windows</platforms>
 					<distributionFileList>
 						<distributionFile origin="autoupdate-windows.exe" />
@@ -149,7 +173,7 @@
 				</folder>
 				<folder>
 					<name>autoupdaterlinux</name>
-					<destination>${installdir}</destination>
+					<destination>${installdir}/autoupdate</destination>
 					<platforms>linux</platforms>
 					<distributionFileList>
 						<distributionFile origin="autoupdate-linux.run" />
@@ -158,7 +182,7 @@
 			</folderList>
 			<postInstallationActionList>
 				<writeFile>
-					<path>${installdir}/update.ini</path>
+					<path>${installdir}/autoupdate/update.ini</path>
 					<text>[Update]
 						url = UPDATE_XML_URL
 						version_id = PROJECT_VERSION
@@ -183,6 +207,10 @@
 			<value>${installdir}</value> </addEnvironmentVariable> -->
 		<changePermissions>
 			<files>${installdir}/*.sh</files>
+			<permissions>0555</permissions>
+		</changePermissions>
+		<changePermissions>
+			<files>${installdir}/autoupdate/*.run</files>
 			<permissions>0555</permissions>
 		</changePermissions>
 		<substitute>
@@ -223,10 +251,8 @@
 	<enableTimestamp>1</enableTimestamp>
 	<rebootRequired>0</rebootRequired>
 	<requireInstallationByRootUser>1</requireInstallationByRootUser>
-	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup
-	</rollbackBackupDirectory>
+	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
 	<saveRelativePaths>1</saveRelativePaths>
-	<vendor>Open Foris</vendor>
 	<parameterList>
 		<directoryParameter>
 			<name>installdir</name>

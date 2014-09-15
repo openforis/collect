@@ -6,4 +6,5 @@
 	<singleInstanceCheck>1</singleInstanceCheck>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
 	<logoImage>images/of-logo-small.png</logoImage>
+	<enableSslSupport>1</enableSslSupport>
 </autoUpdateProject>

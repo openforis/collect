@@ -15,7 +15,7 @@
 				<folder>
 					<name>webapps</name>
 					<description>Tomcat Webapps</description>
-					<destination>${installdir}/tomcat/webapps</destination>
+					<destination>../tomcat/webapps</destination>
 					<platforms>all</platforms>
 					<distributionFileList>
 						<distributionFile>
@@ -26,7 +26,7 @@
 			</folderList>
 			<postInstallationActionList>
 				<writeFile>
-					<path>${installdir}/update.ini</path>
+					<path>update.ini</path>
 					<text>[Update]
 						url = UPDATE_XML_URL
 						version_id = PROJECT_VERSION
@@ -37,15 +37,31 @@
 			</postInstallationActionList>
 		</component>
 	</componentList>
-	<preInstallationActionList>
+<!-- 	<initializationActionList> -->
+<!--         <registryGet> -->
+<!--             <key>HKEY_LOCAL_MACHINE\SOFTWARE\${project.vendor}\${project.fullName}</key> -->
+<!--             <name>InstallationPath</name> -->
+<!--             <variable>installdir</variable> -->
+<!--         </registryGet> -->
+<!--     </initializationActionList> -->
+    <preInstallationActionList>
 		<createTimeStamp>
 			<variable>timestamp</variable>
 		</createTimeStamp>
-		<createBackupFile>
-			<path>${installdir}/tomcat/webapps/collect.war</path>
-			<destination>${installdir}/backup/collect.${timestamp}.war</destination>
-		</createBackupFile>
 	</preInstallationActionList>
+	<readyToInstallActionList>
+		<createDirectory>
+			<path>../backup/${timestamp}</path>
+		</createDirectory>
+		<copyFile>
+			<origin>../tomcat/webapps/collect.war</origin>
+			<destination>../backup/${timestamp}/collect.war</destination>
+        </copyFile>
+        <copyFile>
+			<origin>../tomcat/data/collect.db</origin>
+			<destination>../backup/${timestamp}/collect.db</destination>
+        </copyFile>
+	</readyToInstallActionList>
 	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>
 	<defaultUnixFilePermissions>777</defaultUnixFilePermissions>
 	<enableRollback>1</enableRollback>

@@ -73,11 +73,12 @@
 		</dependencySet>
 		<!-- Add the actual Collect webapp (unpacked) -->
 		<dependencySet>
-			<outputDirectory>${output.directory}/tomcat/webapps/collect</outputDirectory>
+			<outputDirectory>${output.directory}/tomcat/webapps</outputDirectory>
 			<includes>
 				<include>org.openforis.collect:collect-webapp-tomcat</include>
 			</includes>
-			<unpack>true</unpack>
+			<unpack>false</unpack>
+			<outputFileNameMapping>collect.war</outputFileNameMapping>
 		</dependencySet>
 	</dependencySets>
 </assembly>

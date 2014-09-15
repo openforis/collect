@@ -1,6 +1,5 @@
 <installerInformation>
 	<versionId>200</versionId>
-	<version>3.3.0</version>
 	<platformFileList>
 		<platformFile>
 			<filename>collect-updater-3.2.1-a7-windows.exe</filename>
