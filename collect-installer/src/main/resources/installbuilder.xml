@@ -47,7 +47,7 @@
 					<comment>Update Open Foris Collect</comment>
 					<exec>${installdir}/autoupdate/autoupdate-linux.run</exec>
 					<path>${installdir}/autoupdate</path>
-<!-- 					<icon>${installdir}/images/of-logo.png</icon> -->
+					<icon>${installdir}/images/update.png</icon>
 					<platforms>linux</platforms>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
@@ -106,8 +106,8 @@
 			</folderList>
 			<startMenuShortcutList>
 				<startMenuShortcut>
-					<comment>Uninstall ${product_fullname}</comment>
 					<name>Uninstall ${product_fullname}</name>
+					<comment>Uninstall ${product_fullname}</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
 					<windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
@@ -116,43 +116,41 @@
 					<windowsPath>${installdir}/</windowsPath>
 				</startMenuShortcut>
 				<startMenuShortcut>
-					<comment>Startup Open Foris Collect</comment>
 					<name>Startup OF Collect</name>
+					<comment>Startup Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
 					<windowsExec>${installdir}/startup-windows.cmd</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
-					<windowsIcon>${installdir}/images/of-logo-small.ico
-					</windowsIcon>
+					<windowsIcon>${installdir}/images/of-logo-small.ico</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
 				<startMenuShortcut>
-					<comment>Shutdown Open Foris Collect</comment>
 					<name>Shutdown OF Collect</name>
+					<comment>Shutdown Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
 					<windowsExec>${installdir}/shutdown-windows.cmd</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
-					<windowsIcon>${installdir}/images/of-logo-small.ico
-					</windowsIcon>
+					<windowsIcon>${installdir}/images/of-logo-small.ico</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
-				<startMenuLinkShortcut>
-					<comment>Open your default browser</comment>
-					<name>Open OF Collect in browser </name>
-					<runAsAdmin>0</runAsAdmin>
-					<runInTerminal>0</runInTerminal>
-					<url>http://localhost:8080/collect</url>
-					<windowsIcon>${installdir}/images/browser.ico</windowsIcon>
-				</startMenuLinkShortcut>
-				<startMenuLinkShortcut>
-					<comment>Update Open Foris Collect</comment>
+				<startMenuShortcut>
 					<name>Update OF Collect</name>
+					<comment>Update Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
 					<windowsExec>${installdir}/autoupdate/autoupdate-windows.exe</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
-<!-- 					<windowsIcon>${installdir}/images/of-logo-small-ico.ico</windowsIcon> -->
+					<windowsIcon>${installdir}/images/update.ico</windowsIcon>
+				</startMenuShortcut>
+				<startMenuLinkShortcut>
+					<name>Open OF Collect in browser</name>
+					<comment>Open your default browser</comment>
+					<runAsAdmin>0</runAsAdmin>
+					<runInTerminal>0</runInTerminal>
+					<url>http://localhost:8080/collect</url>
+					<windowsIcon>${installdir}/images/browser.ico</windowsIcon>
 				</startMenuLinkShortcut>
 			</startMenuShortcutList>
 		</component>
@@ -203,8 +201,6 @@
 		</setInstallerVariable>
 	</preInstallationActionList>
 	<postInstallationActionList>
-		<!-- <addEnvironmentVariable> <name>COLLECT_HOME</name> <scope>system</scope> 
-			<value>${installdir}</value> </addEnvironmentVariable> -->
 		<changePermissions>
 			<files>${installdir}/*.sh</files>
 			<permissions>0555</permissions>

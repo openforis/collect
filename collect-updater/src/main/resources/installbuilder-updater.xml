@@ -50,6 +50,7 @@
 		</createTimeStamp>
 	</preInstallationActionList>
 	<readyToInstallActionList>
+		<!-- Backup old data and webapp -->
 		<createDirectory>
 			<path>../backup/${timestamp}</path>
 		</createDirectory>
@@ -61,6 +62,16 @@
 			<origin>../tomcat/data/collect.db</origin>
 			<destination>../backup/${timestamp}/collect.db</destination>
         </copyFile>
+        <!-- Delete temp files -->
+        <deleteFile>
+  			<path>../tomcat/webapps/collect</path>
+  		</deleteFile>
+  		<deleteFile>
+  			<path>../tomcat/temp</path>
+  		</deleteFile>
+  		<deleteFile>
+  			<path>../tomcat/work</path>
+  		</deleteFile>
 	</readyToInstallActionList>
 	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>
 	<defaultUnixFilePermissions>777</defaultUnixFilePermissions>
