@@ -18,6 +18,7 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.Unit.Dimension;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -25,7 +26,6 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.Window;
 
@@ -166,8 +166,7 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 	}
 	
 	@Command
-	public void close(@ContextParam(ContextType.TRIGGER_EVENT) Event event) {
-		event.stopPropagation();
+	public void apply(@ContextParam(ContextType.BINDER) final Binder binder) {
 		checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 			@Override
 			public void onOk(boolean confirmed) {
@@ -175,5 +174,6 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 			}
 		});
 	}
+	
 	
 }

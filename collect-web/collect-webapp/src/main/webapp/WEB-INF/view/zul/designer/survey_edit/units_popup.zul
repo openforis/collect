@@ -8,8 +8,7 @@
 		apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.UnitsVM')"
 		validationMessages="@id('vmsgs')"
-		closable="true"
-		onClose="@command('close')">
+		closable="false">
 		<borderlayout>
 			<west width="220px">
 				<borderlayout>
@@ -122,6 +121,11 @@
 					</absolutechildren>
 				</absolutelayout>
 			</center>
+			<south>
+				<box align="center" width="100%">
+					<button label="${labels.global.apply}" onClick="@command('apply')" />
+				</box>
+			</south>
 	    </borderlayout>
 	</window>
 </zk>
