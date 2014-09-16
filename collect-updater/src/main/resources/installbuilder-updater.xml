@@ -23,30 +23,32 @@
 						</distributionFile>
 					</distributionFileList>
 				</folder>
+				<folder>
+					<name>autoupdate</name>
+					<platforms>all</platforms>
+					<destination>.</destination>
+					<distributionFileList>
+						<distributionFile>
+							<origin>autoupdate/update.ini</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
 			</folderList>
 			<postInstallationActionList>
-				<writeFile>
-					<path>update.ini</path>
-					<text>[Update]
-						url = UPDATE_XML_URL
-						version_id = PROJECT_VERSION
-						update_download_location = ${system_temp_directory}
-						check_for_updates = 1
-					</text>
-				</writeFile>
+				<substitute>
+				    <files>update.ini</files>
+				    <type>exact</type>
+				    <substitutionList>
+				       <substitution pattern="SYSTEM_TEMP_DIRECTORY" value="${system_temp_directory}" />
+				    </substitutionList>
+				</substitute>
 			</postInstallationActionList>
 		</component>
 	</componentList>
-<!-- 	<initializationActionList> -->
-<!--         <registryGet> -->
-<!--             <key>HKEY_LOCAL_MACHINE\SOFTWARE\${project.vendor}\${project.fullName}</key> -->
-<!--             <name>InstallationPath</name> -->
-<!--             <variable>installdir</variable> -->
-<!--         </registryGet> -->
-<!--     </initializationActionList> -->
     <preInstallationActionList>
 		<createTimeStamp>
 			<variable>timestamp</variable>
+			<format>%Y%m%d%H%M%S</format>
 		</createTimeStamp>
 	</preInstallationActionList>
 	<readyToInstallActionList>
@@ -57,20 +59,30 @@
 		<copyFile>
 			<origin>../tomcat/webapps/collect.war</origin>
 			<destination>../backup/${timestamp}/collect.war</destination>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
         </copyFile>
         <copyFile>
 			<origin>../tomcat/data/collect.db</origin>
 			<destination>../backup/${timestamp}/collect.db</destination>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
         </copyFile>
         <!-- Delete temp files -->
         <deleteFile>
   			<path>../tomcat/webapps/collect</path>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
   		</deleteFile>
   		<deleteFile>
   			<path>../tomcat/temp</path>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
   		</deleteFile>
   		<deleteFile>
   			<path>../tomcat/work</path>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
   		</deleteFile>
 	</readyToInstallActionList>
 	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>

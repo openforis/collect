@@ -1,8 +1,8 @@
 <autoUpdateProject>
 	<fullName>Open Foris Collect</fullName>
 	<shortName>OpenForisCollect</shortName>
-	<!-- <vendor>Open Foris</vendor> -->
 	<version>PROJECT_VERSION</version>
+	<vendor>Open Foris</vendor>
 	<singleInstanceCheck>1</singleInstanceCheck>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
 	<logoImage>images/of-logo-small.png</logoImage>

@@ -135,7 +135,7 @@
 											<classifier>windows</classifier>
 											<type>exe</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/</outputDirectory>
+											<outputDirectory>${installer-build-path}</outputDirectory>
 											<destFileName>${windows-autoupdater-file-name}</destFileName>
 										</artifactItem>
 										<artifactItem>
@@ -145,7 +145,7 @@
 											<classifier>linux</classifier>
 											<type>run</type>
 											<overWrite>false</overWrite>
-											<outputDirectory>${installer-build-path}/</outputDirectory>
+											<outputDirectory>${installer-build-path}</outputDirectory>
 											<destFileName>${linux-autoupdater-file-name}</destFileName>
 										</artifactItem>
 									</artifactItems>
@@ -199,6 +199,7 @@
 							<basedir>${installer-build-path}</basedir>
 							<includes>
 								<include>${installbuilder-file-name}</include>
+								<include>autoupdate/update.ini</include>
 							</includes>
 							<regex>false</regex>
 							<replacements>

@@ -59,62 +59,50 @@
 			</desktopShortcutList>
 			<folderList>
 				<folder>
+					<name>programfiles</name>
 					<description>Program Files</description>
 					<destination>${installdir}</destination>
-					<name>programfiles</name>
 					<platforms>all</platforms>
 					<distributionFileList>
-						<!-- <distributionFile> <origin>../../../../collect-control-panel/target/OpenForisCollect.jar</origin> 
-							</distributionFile> -->
 						<distributionDirectory>
 							<origin>collect-server/tomcat</origin>
 						</distributionDirectory>
+						<distributionFile>
+							<allowWildcards>1</allowWildcards>
+							<origin>images</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>programfileslinux</name>
+					<description>Linux Program Files</description>
+					<destination>${installdir}</destination>
+					<platforms>linux</platforms>
+					<distributionFileList>
 						<distributionFile>
 							<origin>startup-linux.sh</origin>
 						</distributionFile>
 						<distributionFile>
 							<origin>shutdown-linux.sh</origin>
 						</distributionFile>
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>programfileswindows</name>
+					<description>Windows Program Files</description>
+					<destination>${installdir}</destination>
+					<platforms>windows</platforms>
+					<distributionFileList>
 						<distributionFile>
 							<origin>startup-windows.cmd</origin>
 						</distributionFile>
 						<distributionFile>
 							<origin>shutdown-windows.cmd</origin>
 						</distributionFile>
-						<distributionFile>
-							<allowWildcards>1</allowWildcards>
-							<origin>images</origin>
-						</distributionFile>
 					</distributionFileList>
-					<shortcutList>
-						<shortcut>
-							<comment>Uninstall</comment>
-							<exec>${installdir}/${uninstallerName}</exec>
-							<icon></icon>
-							<name>Uninstall ${product_fullname}</name>
-							<path>${installdir}</path>
-							<platforms>all</platforms>
-							<runAsAdmin>0</runAsAdmin>
-							<runInTerminal>0</runInTerminal>
-							<windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
-							<windowsExecArgs></windowsExecArgs>
-							<windowsIcon></windowsIcon>
-							<windowsPath>${installdir}</windowsPath>
-						</shortcut>
-					</shortcutList>
 				</folder>
 			</folderList>
 			<startMenuShortcutList>
-				<startMenuShortcut>
-					<name>Uninstall ${product_fullname}</name>
-					<comment>Uninstall ${product_fullname}</comment>
-					<runAsAdmin>0</runAsAdmin>
-					<runInTerminal>0</runInTerminal>
-					<windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
-					<windowsExecArgs></windowsExecArgs>
-					<windowsIcon></windowsIcon>
-					<windowsPath>${installdir}/</windowsPath>
-				</startMenuShortcut>
 				<startMenuShortcut>
 					<name>Startup OF Collect</name>
 					<comment>Startup Open Foris Collect</comment>
@@ -135,6 +123,14 @@
 					<windowsIcon>${installdir}/images/of-logo-small.ico</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
+				<startMenuLinkShortcut>
+					<name>Open OF Collect in browser</name>
+					<comment>Open your default browser</comment>
+					<runAsAdmin>0</runAsAdmin>
+					<runInTerminal>0</runInTerminal>
+					<url>http://localhost:8080/collect</url>
+					<windowsIcon>${installdir}/images/browser.ico</windowsIcon>
+				</startMenuLinkShortcut>
 				<startMenuShortcut>
 					<name>Update OF Collect</name>
 					<comment>Update Open Foris Collect</comment>
@@ -144,14 +140,16 @@
 					<windowsExecArgs></windowsExecArgs>
 					<windowsIcon>${installdir}/images/update.ico</windowsIcon>
 				</startMenuShortcut>
-				<startMenuLinkShortcut>
-					<name>Open OF Collect in browser</name>
-					<comment>Open your default browser</comment>
+				<startMenuShortcut>
+					<name>Uninstall ${product_fullname}</name>
+					<comment>Uninstall ${product_fullname}</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
-					<url>http://localhost:8080/collect</url>
-					<windowsIcon>${installdir}/images/browser.ico</windowsIcon>
-				</startMenuLinkShortcut>
+					<windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+					<windowsExecArgs></windowsExecArgs>
+					<windowsIcon></windowsIcon>
+					<windowsPath>${installdir}/</windowsPath>
+				</startMenuShortcut>
 			</startMenuShortcutList>
 		</component>
 		<component>
@@ -161,6 +159,16 @@
 			<selected>1</selected>
 			<show>0</show>
 			<folderList>
+				<folder>
+					<name>autoupdate</name>
+					<destination>${installdir}</destination>
+					<platforms>all</platforms>
+					<distributionFileList>
+						<distributionDirectory>
+							<origin>autoupdate</origin>
+						</distributionDirectory>
+					</distributionFileList>
+				</folder>
 				<folder>
 					<name>autoupdaterwin</name>
 					<destination>${installdir}/autoupdate</destination>
@@ -179,15 +187,13 @@
 				</folder>
 			</folderList>
 			<postInstallationActionList>
-				<writeFile>
-					<path>${installdir}/autoupdate/update.ini</path>
-					<text>[Update]
-						url = UPDATE_XML_URL
-						version_id = PROJECT_VERSION
-						update_download_location = ${system_temp_directory}
-						check_for_updates = 1
-					</text>
-				</writeFile>
+				<substitute>
+				    <files>${installdir}/autoupdate/update.ini</files>
+				    <type>exact</type>
+				    <substitutionList>
+				       <substitution pattern="SYSTEM_TEMP_DIRECTORY" value="${system_temp_directory}" />
+				    </substitutionList>
+				</substitute>
 			</postInstallationActionList>
 		</component>
 		<include>
