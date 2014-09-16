@@ -99,7 +99,6 @@
 							<basedir>${installer-build-path}</basedir>
 							<includes>
 								<include>${installbuilder-updater-file-name}</include>
-								<include>autoupdate/update.ini</include>
 							</includes>
 							<regex>false</regex>
 							<replacements>

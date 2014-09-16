@@ -160,16 +160,6 @@
 			<show>0</show>
 			<folderList>
 				<folder>
-					<name>autoupdate</name>
-					<destination>${installdir}</destination>
-					<platforms>all</platforms>
-					<distributionFileList>
-						<distributionDirectory>
-							<origin>autoupdate</origin>
-						</distributionDirectory>
-					</distributionFileList>
-				</folder>
-				<folder>
 					<name>autoupdaterwin</name>
 					<destination>${installdir}/autoupdate</destination>
 					<platforms>windows</platforms>
