@@ -1,0 +1,94 @@
+<project>
+	<shortName>OpenForisCollectUpdater</shortName>
+	<fullName>Open Foris Collect</fullName>
+	<vendor>Open Foris Initiative</vendor>
+	<version>PROJECT_VERSION</version>
+	<logoImage>images/of-logo-small.png</logoImage>
+	<componentList>
+		<component>
+			<name>default</name>
+			<description>Default Component</description>
+			<canBeEdited>1</canBeEdited>
+			<selected>1</selected>
+			<show>1</show>
+			<folderList>
+				<folder>
+					<name>webapps</name>
+					<description>Tomcat Webapps</description>
+					<destination>../tomcat/webapps</destination>
+					<platforms>all</platforms>
+					<distributionFileList>
+						<distributionFile>
+							<origin>collect.war</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+				<folder>
+					<name>autoupdate</name>
+					<platforms>all</platforms>
+					<destination>.</destination>
+					<distributionFileList>
+						<distributionFile>
+							<origin>autoupdate/update.ini</origin>
+						</distributionFile>
+					</distributionFileList>
+				</folder>
+			</folderList>
+			<postInstallationActionList>
+				<substitute>
+				    <files>update.ini</files>
+				    <type>exact</type>
+				    <substitutionList>
+				       <substitution pattern="SYSTEM_TEMP_DIRECTORY" value="${system_temp_directory}" />
+				    </substitutionList>
+				</substitute>
+			</postInstallationActionList>
+		</component>
+	</componentList>
+    <preInstallationActionList>
+		<createTimeStamp>
+			<variable>timestamp</variable>
+			<format>%Y%m%d%H%M%S</format>
+		</createTimeStamp>
+	</preInstallationActionList>
+	<readyToInstallActionList>
+		<!-- Backup old data and webapp -->
+		<createDirectory>
+			<path>../backup/${timestamp}</path>
+		</createDirectory>
+		<copyFile>
+			<origin>../tomcat/webapps/collect.war</origin>
+			<destination>../backup/${timestamp}/collect.war</destination>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+        </copyFile>
+        <copyFile>
+			<origin>../tomcat/data/collect.db</origin>
+			<destination>../backup/${timestamp}/collect.db</destination>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+        </copyFile>
+        <!-- Delete temp files -->
+        <deleteFile>
+  			<path>../tomcat/webapps/collect</path>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+  		</deleteFile>
+  		<deleteFile>
+  			<path>../tomcat/temp</path>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+  		</deleteFile>
+  		<deleteFile>
+  			<path>../tomcat/work</path>
+			<abortOnError>0</abortOnError>
+			<showMessageOnError>0</showMessageOnError>
+  		</deleteFile>
+	</readyToInstallActionList>
+	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>
+	<defaultUnixFilePermissions>777</defaultUnixFilePermissions>
+	<enableRollback>1</enableRollback>
+	<enableTimestamp>1</enableTimestamp>
+	<installationType>upgrade</installationType>
+	<overwritePolicy>always</overwritePolicy>
+</project>

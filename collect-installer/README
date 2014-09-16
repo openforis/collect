@@ -1,0 +1,11 @@
+Required Maven parameters:
+
+collect.update.url = Url of AutoUpdate tool update.xml file 
+
+To build the installer, use the "assembly" profile:
+
+mnv build -Passembly
+
+The installer will be generated in the "target" folder
+
+(see BitRock InstallBuilder AutoUpdate Tool for reference http://installbuilder.bitrock.com/docs/installbuilder-userguide/ar01s23.html) 
