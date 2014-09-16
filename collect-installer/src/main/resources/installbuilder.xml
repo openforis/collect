@@ -5,7 +5,7 @@
 	<vendor>Open Foris</vendor>
 
 	<!-- <readmeFile>../../../README</readmeFile> <licenseFile>../../../../License.txt</licenseFile> -->
-	<logoImage>images/of-logo-small.png</logoImage>
+	<logoImage>images/of-collect-logo-small.png</logoImage>
 	<componentList>
 		<component>
 			<name>default</name>
@@ -19,7 +19,7 @@
 					<comment>Startup Open Foris Collect</comment>
 					<exec>${installdir}/startup-linux.sh</exec>
 					<path>${installdir}</path>
-					<icon>${installdir}/images/of-logo.png</icon>
+					<icon>${installdir}/images/of-collect-logo.png</icon>
 					<platforms>linux</platforms>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
@@ -33,7 +33,7 @@
 					<comment>Shutdown Open Foris Collect</comment>
 					<exec>${installdir}/shutdown-linux.sh</exec>
 					<path>${installdir}</path>
-					<icon>${installdir}/images/of-logo.png</icon>
+					<icon>${installdir}/images/of-collect-logo.png</icon>
 					<platforms>linux</platforms>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
@@ -110,7 +110,7 @@
 					<runInTerminal>0</runInTerminal>
 					<windowsExec>${installdir}/startup-windows.cmd</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
-					<windowsIcon>${installdir}/images/of-logo-small.ico</windowsIcon>
+					<windowsIcon>${installdir}/images/of-collect-logo.ico</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
 				<startMenuShortcut>
@@ -120,7 +120,7 @@
 					<runInTerminal>0</runInTerminal>
 					<windowsExec>${installdir}/shutdown-windows.cmd</windowsExec>
 					<windowsExecArgs></windowsExecArgs>
-					<windowsIcon>${installdir}/images/of-logo-small.ico</windowsIcon>
+					<windowsIcon>${installdir}/images/of-collect-logo.ico</windowsIcon>
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
 				<startMenuLinkShortcut>
@@ -187,13 +187,14 @@
 				</folder>
 			</folderList>
 			<postInstallationActionList>
-				<substitute>
-				    <files>${installdir}/autoupdate/update.ini</files>
-				    <type>exact</type>
-				    <substitutionList>
-				       <substitution pattern="SYSTEM_TEMP_DIRECTORY" value="${system_temp_directory}" />
-				    </substitutionList>
-				</substitute>
+				<writeFile>
+					<path>${installdir}/autoupdate/update.ini</path>
+					<text>[Update]
+url = UPDATE_XML_URL
+version_id = PROJECT_VERSION
+update_download_location = ${system_temp_directory}
+check_for_updates = 1</text>
+				</writeFile>
 			</postInstallationActionList>
 		</component>
 		<include>

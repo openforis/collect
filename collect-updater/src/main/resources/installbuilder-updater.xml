@@ -3,7 +3,7 @@
 	<fullName>Open Foris Collect</fullName>
 	<vendor>Open Foris Initiative</vendor>
 	<version>PROJECT_VERSION</version>
-	<logoImage>images/of-logo-small.png</logoImage>
+	<logoImage>images/of-collect-logo-small.png</logoImage>
 	<componentList>
 		<component>
 			<name>default</name>
@@ -23,25 +23,16 @@
 						</distributionFile>
 					</distributionFileList>
 				</folder>
-				<folder>
-					<name>autoupdate</name>
-					<platforms>all</platforms>
-					<destination>.</destination>
-					<distributionFileList>
-						<distributionFile>
-							<origin>autoupdate/update.ini</origin>
-						</distributionFile>
-					</distributionFileList>
-				</folder>
 			</folderList>
 			<postInstallationActionList>
-				<substitute>
-				    <files>update.ini</files>
-				    <type>exact</type>
-				    <substitutionList>
-				       <substitution pattern="SYSTEM_TEMP_DIRECTORY" value="${system_temp_directory}" />
-				    </substitutionList>
-				</substitute>
+				<writeFile>
+					<path>update.ini</path>
+					<text>[Update]
+url = UPDATE_XML_URL
+version_id = PROJECT_VERSION
+update_download_location = ${system_temp_directory}
+check_for_updates = 1</text>
+				</writeFile>
 			</postInstallationActionList>
 		</component>
 	</componentList>
@@ -71,16 +62,6 @@
         <!-- Delete temp files -->
         <deleteFile>
   			<path>../tomcat/webapps/collect</path>
-			<abortOnError>0</abortOnError>
-			<showMessageOnError>0</showMessageOnError>
-  		</deleteFile>
-  		<deleteFile>
-  			<path>../tomcat/temp</path>
-			<abortOnError>0</abortOnError>
-			<showMessageOnError>0</showMessageOnError>
-  		</deleteFile>
-  		<deleteFile>
-  			<path>../tomcat/work</path>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>
   		</deleteFile>
