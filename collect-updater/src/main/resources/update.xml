@@ -2,11 +2,11 @@
 	<versionId>3.2.2-a2</versionId>
 	<platformFileList>
 		<platformFile>
-			<filename>collect-updater-3.2.2-a2-windows.run</filename>
+			<filename>collect-updater-3.2.2-a2-windows.exe</filename>
 			<platform>windows</platform>
 		</platformFile>
 		<platformFile>
-			<filename>collect-updater-3.2.2-a2-windows.run</filename>
+			<filename>collect-updater-3.2.2-a2-windows.exe</filename>
 			<platform>windows-x64</platform>
 		</platformFile>
 		<platformFile>
