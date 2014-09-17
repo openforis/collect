@@ -53,6 +53,7 @@
 				</absolutechildren>
 				<absolutechildren hflex="1" vflex="1">
 			        <borderlayout visible="@load(vm.editingItem)"
+			        	id="formContainer"
 			        	sclass="form compact" 
 			        	validationMessages="@id('vmsgs')"
 			        	form="@id('fx') 
@@ -76,7 +77,8 @@
 				        				</fieldErrorHandler>
 			        					<fieldErrorHandler
 			        						message="@load(vmsgs['name'])">
-			        						<textbox width="150px"
+			        						<textbox id="nameTextbox"
+			        							width="150px"
 			        							value="@bind(fx.name)"
 			        							onChange="@command('applyChanges')" />
 			        					</fieldErrorHandler>

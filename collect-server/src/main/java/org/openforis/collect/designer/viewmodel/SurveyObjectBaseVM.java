@@ -19,7 +19,12 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.HtmlBasedComponent;
+import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
 /**
@@ -30,6 +35,7 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
+	private static final String NAME_TEXTBOX_ID = "nameTextbox";
 	public static final String VALIDATE_COMMAND = "validate";
 	public static final String APPLY_CHANGES_COMMAND = "applyChanges";
 	public static final String COMMIT_CHANGES_COMMAND = "commitChanges";
@@ -41,8 +47,16 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	protected FormObject<T> formObject;
 	protected boolean commitChangesOnApply;
 	
+	@Wire
+	private Component formContainer;
+	
 	public SurveyObjectBaseVM() {
 		commitChangesOnApply = true;
+	}
+	
+	protected void doAfterCompose(@ContextParam(ContextType.VIEW) Component view){
+		Selectors.wireComponents(view, this, false);
+		Selectors.wireEventListeners(view, this);
 	}
 	
 	@Override
@@ -281,8 +295,25 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			} else {
 				formObject.loadFrom(editedItem, currentLanguageCode);
 			}
+			setFocusOnNameTextbox();
 		}
 		notifyChange("editedItem","formObject");
+	}
+
+	protected void setFocusOnNameTextbox() {
+		HtmlBasedComponent textbox = getNameTextbox();
+		if ( textbox != null ) {
+			textbox.setFocus(true);
+		}
+	}
+
+	protected HtmlBasedComponent getNameTextbox() {
+		if ( formContainer == null ) {
+			return null;
+		} else {
+			HtmlBasedComponent textbox = (HtmlBasedComponent) Path.getComponent(formContainer.getSpaceOwner(), NAME_TEXTBOX_ID);
+			return textbox;
+		}
 	}
 	
 	@DependsOn("editedItem")

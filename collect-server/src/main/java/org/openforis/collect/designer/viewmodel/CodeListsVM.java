@@ -40,6 +40,7 @@ import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.bind.Validator;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -50,6 +51,7 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -105,6 +107,12 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			selectionChanged(selectedCodeList);
 		}
 		this.editingAttribute = editingAttribute != null && editingAttribute.booleanValue();
+	}
+	
+	@Override
+	@AfterCompose
+	public void doAfterCompose(@ContextParam(ContextType.VIEW) Component view){
+		super.doAfterCompose(view);
 	}
 	
 	@Override

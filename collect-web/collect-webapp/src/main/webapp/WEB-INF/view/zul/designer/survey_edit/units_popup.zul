@@ -72,7 +72,7 @@
 											<label value="${labels.survey.unit.name}:" />
 										</fieldErrorHandler>
 		                                <fieldErrorHandler message="@load(vmsgs['name'])">
-											<textbox width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
+											<textbox id="nameTextbox" width="150px" value="@bind(fx.name)" onChange="@command('applyChanges')" />
 		                                </fieldErrorHandler>
 									</row>
 									<row>

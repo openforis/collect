@@ -19,6 +19,7 @@ import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.Unit.Dimension;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
+import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -26,6 +27,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.Window;
 
@@ -51,6 +53,12 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 	@Init(superclass=false)
 	public void init() {
 		super.init();
+	}
+	
+	@Override
+	@AfterCompose
+	public void doAfterCompose(@ContextParam(ContextType.VIEW) Component view){
+		super.doAfterCompose(view);
 	}
 	
 	@Override
