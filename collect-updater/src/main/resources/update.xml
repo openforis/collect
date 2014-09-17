@@ -6,8 +6,16 @@
 			<platform>windows</platform>
 		</platformFile>
 		<platformFile>
+			<filename>collect-updater-3.2.2-a2-windows.run</filename>
+			<platform>windows-x64</platform>
+		</platformFile>
+		<platformFile>
 			<filename>collect-updater-3.2.2-a2-linux.run</filename>
 			<platform>linux</platform>
+		</platformFile>
+		<platformFile>
+			<filename>collect-updater-3.2.2-a2-linux.run</filename>
+			<platform>linux-x64</platform>
 		</platformFile>
 	</platformFileList>
 	<downloadLocationList>
