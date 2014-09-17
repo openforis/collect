@@ -71,7 +71,9 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 public class RecordManager {
+
 //	private final Log log = LogFactory.getLog(RecordManager.class);
+	
 	private static final int DEFAULT_LOCK_TIMEOUT_MILLIS = 60000;
 	
 	@Autowired
@@ -474,6 +476,8 @@ public class RecordManager {
 
 	protected <V extends Value> NodeChangeSet afterAttributeInsertOrUpdate(
 			NodeChangeMap changeMap, Attribute<? extends NodeDefinition, V> attribute) {
+		addCalculatedAttributeChanges(changeMap, attribute);
+		
 		Set<NodePointer> relevanceRequiredDependencies = clearRelevanceRequiredDependencies(attribute);
 		relevanceRequiredDependencies.add(new NodePointer(attribute.getParent(), attribute.getName()));
 		
@@ -483,17 +487,15 @@ public class RecordManager {
 		List<NodePointer> cardinalityDependencies = createCardinalityNodePointers(attribute);
 		
 		prepareChange(changeMap, relevanceRequiredDependencies, checkDependencies, cardinalityDependencies);
-		
-		addCalculatedAttributeChanges(changeMap, attribute);
 
 		return new NodeChangeSet(changeMap.getChanges());
 	}
 
-	private <V extends Value> void addCalculatedAttributeChanges(NodeChangeMap changeMap, Node<?> node) {
-		Collection<Attribute<?, ?>> dependantCalculatedAttributes = node.getDependantCalculatedAttributes();
-		for (Attribute<?, ?> calculatedAttribute : dependantCalculatedAttributes) {
-			AttributeChange change = changeMap.prepareAttributeChange(calculatedAttribute);
-			Map<Integer, Object> updatedFieldValues = createFieldValuesMap(calculatedAttribute);
+	private void addCalculatedAttributeChanges(NodeChangeMap changeMap, Node<?> node) {
+		Collection<Attribute<?, ?>> dependantCalculatedAttributes = node.getDependentCalculatedAttributes(true);
+		for (Attribute<?, ?> calculatedAttr : dependantCalculatedAttributes) {
+			AttributeChange change = changeMap.prepareAttributeChange(calculatedAttr);
+			Map<Integer, Object> updatedFieldValues = createFieldValuesMap(calculatedAttr);
 			change.setUpdatedFieldValues(updatedFieldValues);
 		}
 	}
@@ -1090,12 +1092,27 @@ public class RecordManager {
 	}
 	
 	protected Set<NodePointer> clearRelevanceRequiredDependencies(Node<?> node){
+		Set<NodePointer> result = new HashSet<NodePointer>();
+
+		// clear relevant dependencies
 		Set<NodePointer> relevantDependencies = node.getRelevantDependencies();
 		clearRelevantDependencies(relevantDependencies);
+		
+		result.addAll(relevantDependencies);
+		
+		// clear required dependencies
 		Set<NodePointer> requiredDependencies = node.getRequiredDependencies();
-		requiredDependencies.addAll(relevantDependencies);
 		clearRequiredDependencies(requiredDependencies);
-		return requiredDependencies;
+		
+		result.addAll(requiredDependencies);
+		
+		// clear relevant and required dependencies in dependent calculated attributes
+		Collection<Attribute<?,?>> dependantCalculatedAttributes = node.getDependentCalculatedAttributes(true);
+		for (Attribute<?, ?> dependantCalculatedAttribute : dependantCalculatedAttributes) {
+			Set<NodePointer> calculatedAttributePointers = clearRelevanceRequiredDependencies(dependantCalculatedAttribute);
+			result.addAll(calculatedAttributePointers);
+		}
+		return result;
 	}
 	
 	protected void clearRelevantDependencies(Set<NodePointer> nodePointers) {
@@ -1125,7 +1142,7 @@ public class RecordManager {
 	}
 	
 	private void clearDependantCalculatedValues(Node<?> node) {
-		Collection<Attribute<?, ?>> dependantCalculatedAttributes = node.getDependantCalculatedAttributes();
+		Collection<Attribute<?, ?>> dependantCalculatedAttributes = node.getDependentCalculatedAttributes();
 		for ( Attribute<?, ?> calculatedAttribute : dependantCalculatedAttributes ) {
 			calculatedAttribute.clearValue();
 		}
