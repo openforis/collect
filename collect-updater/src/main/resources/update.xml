@@ -2,11 +2,11 @@
 	<versionId>3.2.2-a2</versionId>
 	<platformFileList>
 		<platformFile>
-			<filename>OpenForisCollectUpdater-3.2.2-a2-windows-installer.run</filename>
+			<filename>OpenForisCollectUpdater-3.2.2-a2-windows-updater.run</filename>
 			<platform>windows</platform>
 		</platformFile>
 		<platformFile>
-			<filename>OpenForisCollectUpdater-3.2.2-a2-linux-installer.run</filename>
+			<filename>OpenForisCollectUpdater-3.2.2-a2-linux-updater.run</filename>
 			<platform>linux</platform>
 		</platformFile>
 	</platformFileList>
