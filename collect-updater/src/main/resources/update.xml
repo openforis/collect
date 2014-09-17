@@ -1,18 +1,18 @@
 <installerInformation>
-	<versionId>3.2.2-a1</versionId>
+	<versionId>3.2.2-a2</versionId>
 	<platformFileList>
 		<platformFile>
-			<filename>OpenForisCollectUpdater-3.2.2-a1-windows-installer.run</filename>
+			<filename>OpenForisCollectUpdater-3.2.2-a2-windows-installer.run</filename>
 			<platform>windows</platform>
 		</platformFile>
 		<platformFile>
-			<filename>OpenForisCollectUpdater-3.2.2-a1-linux-installer.run</filename>
+			<filename>OpenForisCollectUpdater-3.2.2-a2-linux-installer.run</filename>
 			<platform>linux</platform>
 		</platformFile>
 	</platformFileList>
 	<downloadLocationList>
 		<downloadLocation>
-			<url>http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-updater/3.2.2-a1/</url>
+			<url>http://www.openforis.org/nexus/service/local/repositories/releases/content/org/openforis/collect/collect-updater/3.2.2-a2/</url>
 		</downloadLocation>
 	</downloadLocationList>
 </installerInformation>
