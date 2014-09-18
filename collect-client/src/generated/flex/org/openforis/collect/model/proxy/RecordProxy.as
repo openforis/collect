@@ -174,7 +174,9 @@ package org.openforis.collect.model.proxy {
 				}
 				a.errorConfirmed = false;
 				var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
-				parent.updateKeyText();
+				if ( parent != null ) {
+					parent.updateKeyText();
+				}
 			}
 		}
 		

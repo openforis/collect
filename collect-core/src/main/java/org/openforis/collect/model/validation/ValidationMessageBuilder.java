@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.MessageSource;
@@ -261,7 +262,7 @@ public class ValidationMessageBuilder {
 				Entity parentEntity = attribute.getParent();
 				EntityDefinition parentDefinition = parentEntity.getDefinition();
 				ModelPathExpression modelPathExpression = expressionFactory.createModelPathExpression(expression);
-				List<String> referencedPaths = modelPathExpression.getReferencedPaths();
+				Set<String> referencedPaths = modelPathExpression.getReferencedPaths();
 				for (String path : referencedPaths) {
 					String absolutePath = parentDefinition.getPath() + PATH_SEPARATOR + path;
 					NodeDefinition nodeDefinition = schema.getDefinitionByPath(absolutePath);
