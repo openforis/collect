@@ -22,8 +22,6 @@ import org.zkoss.util.resource.Labels;
 public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidator {
 	
 	private static final String CALCULATED_FIELD = "calculated";
-	private static final String SHOW_IN_UI_FIELD = "showInUI";
-	private static final String INCLUDE_IN_DATA_EXPORT_FIELD = "includeInDataExport";
 
 	protected static final String KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY = "survey.validation.attribute.key_attribute_cannot_be_multiple";
 	
@@ -33,7 +31,6 @@ public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidato
 		validateChecks(ctx);
 		validateAttributeDefaults(ctx);
 		validateMultipleAndKey(ctx);
-		validateShowInUIAndIncludeInDataExport(ctx);
 	}
 	
 	private void validateMultipleAndKey(ValidationContext ctx) {
@@ -42,19 +39,6 @@ public class AttributeDefinitionFormValidator extends NodeDefinitionFormValidato
 		if ( key != null && key && multiple ) {
 			addInvalidMessage(ctx, AttributeDefinitionFormObject.KEY_FIELD, Labels.getLabel(KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY));
 			addInvalidMessage(ctx, MULTIPLE_FIELD, Labels.getLabel(KEY_ATTRIBUTE_CANNOT_BE_MULTIPLE_MESSAGE_KEY));
-		}
-	}
-
-	private void validateShowInUIAndIncludeInDataExport(ValidationContext ctx) {
-		boolean calculated = isCalculated(ctx);
-		if ( calculated ) {
-			boolean includeInDataExport = getValueWithDefault(ctx, INCLUDE_IN_DATA_EXPORT_FIELD, false);
-			boolean showInUI = getValueWithDefault(ctx, SHOW_IN_UI_FIELD, false);
-			if ( ! includeInDataExport && ! showInUI ) {
-				String message = Labels.getLabel("survey.schema.attribute.calculated.error.must_specify_include_in_data_export_or_in_ui");
-				addInvalidMessage(ctx, INCLUDE_IN_DATA_EXPORT_FIELD, message);
-				addInvalidMessage(ctx, SHOW_IN_UI_FIELD, message);
-			}
 		}
 	}
 
