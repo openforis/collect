@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
 import org.jooq.Condition;
+import org.jooq.DeleteConditionStep;
 import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
@@ -255,20 +256,26 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	public void deleteByCodeList(CodeList list) {
+		DeleteConditionStep<OfcCodeListRecord> q = createDeleteQuery(list);
+		q.execute();
+		if ( useCache ) {
+			CollectSurvey survey = (CollectSurvey) list.getSurvey();
+			cache.removeItemsByCodeList(survey.getId(), survey.isWork(), list.getId());
+		}
+	}
+	
+	protected DeleteConditionStep<OfcCodeListRecord> createDeleteQuery(CodeList list) {
 		JooqFactory jf = getMappingJooqFactory(null);
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
 		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
-		jf.delete(OFC_CODE_LIST)
+		DeleteConditionStep<OfcCodeListRecord> q = jf.delete(OFC_CODE_LIST)
 			.where(
 					surveyIdField.equal(survey.getId()),
 					oppositeSurveyIdField.isNull(),
 					OFC_CODE_LIST.CODE_LIST_ID.equal(list.getId())
-			).execute();
-		
-		if ( useCache ) {
-			cache.removeItemsByCodeList(survey.getId(), survey.isWork(), list.getId());
-		}
+			);
+		return q;
 	}
 	
 	public void deleteBySurvey(int surveyId) {
@@ -420,20 +427,12 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return jf.fromResult(result);
 	}
 	
-	public List<PersistedCodeListItem> loadItemsByLevel(CodeList list, int level) {
-		int currentLevel = 1;
-		List<PersistedCodeListItem> currentLevelItems = loadRootItems(list);;
-		List<PersistedCodeListItem> nextLevelItems;
-		while ( currentLevel < level ) {
-			nextLevelItems = new ArrayList<PersistedCodeListItem>();
-			for (PersistedCodeListItem item : currentLevelItems) {
-				List<PersistedCodeListItem> childItems = loadChildItems(item);
-				nextLevelItems.addAll(childItems);
-			}
-			currentLevelItems = nextLevelItems;
-			currentLevel++;
-		}
-		return currentLevelItems;
+	public List<PersistedCodeListItem> loadItemsByLevel(CodeList list, int levelPosition) {
+		JooqFactory jf = getMappingJooqFactory(list);
+		SelectQuery q = createSelectFromCodeListQuery(jf, list);
+		q.addConditions(OFC_CODE_LIST.LEVEL.equal(levelPosition));
+		Result<Record> result = q.fetch();
+		return jf.fromResult(result);
 	}
 	
 	public boolean isEmpty(CodeList list) {
@@ -449,6 +448,22 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return count > 0;
 	}
 	
+	public boolean hasItemsInLevel(CodeList codeList, int level) {
+		JooqFactory jf = getMappingJooqFactory(codeList);
+		SelectQuery q = createSelectFromCodeListQuery(jf, codeList);
+		q.addSelect(Factory.count());
+		q.addConditions(OFC_CODE_LIST.LEVEL.equal(level));
+		Record record = q.fetchOne();
+		Integer count = (Integer) record.getValue(0);
+		return count > 0;
+	}
+	
+	public void removeItemsInLevel(CodeList list, int level) {
+		DeleteConditionStep<OfcCodeListRecord> q = createDeleteQuery(list);
+		q.and(OFC_CODE_LIST.LEVEL.equal(level));
+		q.execute();
+	}
+
 	public boolean hasQualifiableItems(CodeList codeList) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
 		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
@@ -499,17 +514,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	
 	public PersistedCodeListItem loadItem(CodeList codeList, String code, ModelVersion version) {
 		JooqFactory jf = getMappingJooqFactory(codeList);
-		SelectQuery q = jf.selectQuery();	
-		q.addFrom(OFC_CODE_LIST);
-		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
-		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
-		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
-		q.addConditions(
-				surveyIdField.equal(survey.getId()),
-				oppositeSurveyIdField.isNull(),
-				OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
-				OFC_CODE_LIST.CODE.equal(code)
-		);
+		SelectQuery q = createSelectFromCodeListQuery(jf, codeList);
+		q.addConditions(OFC_CODE_LIST.CODE.equal(code));
 		Result<Record> result = q.fetch();
 		List<PersistedCodeListItem> list = jf.fromResult(result);
 		List<PersistedCodeListItem> filteredByVersion = filterApplicableItems(list, version);
@@ -548,8 +554,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	protected static SelectQuery createSelectChildItemsQuery(JooqFactory jf, CodeList codeList, Integer parentItemId, boolean addOrderByClause) {
-		SelectQuery q = jf.selectQuery();	
-		q.addFrom(OFC_CODE_LIST);
+		SelectQuery q = createSelectFromCodeListQuery(jf, codeList);
 		addFilterByParentItemConditions(q, codeList, parentItemId);
 		if ( addOrderByClause ) {
 			q.addOrderBy(OFC_CODE_LIST.SORT_ORDER);
@@ -559,15 +564,23 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 
 	protected static void addFilterByParentItemConditions(SelectQuery select,
 			CodeList codeList, Integer parentItemId) {
+		select.addConditions(OFC_CODE_LIST.PARENT_ID.equal(parentItemId));
+	}
+	
+	protected static SelectQuery createSelectFromCodeListQuery(JooqFactory jf, CodeList codeList) {
+		SelectQuery select = jf.selectQuery();	
+		select.addFrom(OFC_CODE_LIST);
 		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
 		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
 		select.addConditions(
 				surveyIdField.equal(survey.getId()),
 				oppositeSurveyIdField.isNull(),
-				OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId()),
-				OFC_CODE_LIST.PARENT_ID.equal(parentItemId));
+				OFC_CODE_LIST.CODE_LIST_ID.equal(codeList.getId())
+				);
+		return select;
 	}
+	
 	
 	@Override
 	protected JooqFactory getMappingJooqFactory() {
@@ -740,9 +753,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 
 		private Integer nextSortOrder(PersistedCodeListItem item) {
-			SelectQuery select = selectQuery();
+			SelectQuery select = createSelectFromCodeListQuery(this, codeList);
 			select.addSelect(max(OFC_CODE_LIST.SORT_ORDER));
-			select.addFrom(OFC_CODE_LIST);
 			addFilterByParentItemConditions(select, codeList, item.getParentId());
 			Record record = select.fetchOne();
 			Integer max = (Integer) record.getValue(0);

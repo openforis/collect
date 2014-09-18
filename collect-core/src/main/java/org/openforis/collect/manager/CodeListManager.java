@@ -211,7 +211,31 @@ public class CodeListManager {
 			return (T) list.getItem(code, 0, version);
 		}
 	}
-
+	
+	public boolean hasChildItemsInLevel(CodeList list, int level) {
+		boolean persistedSurvey = list.getSurvey().getId() != null;
+		if ( list.isExternal() ) {
+			throw new UnsupportedOperationException();
+		} else if ( persistedSurvey && list.isEmpty() ) {
+			return codeListItemDao.hasItemsInLevel(list, level);
+		} else {
+			return list.hasItemsInLevel(level - 1);
+		}
+	}
+	
+	public void removeLevel(CodeList list, int level) {
+		boolean persistedSurvey = list.getSurvey().getId() != null;
+		if ( list.isExternal() ) {
+			throw new UnsupportedOperationException();
+		} else if ( persistedSurvey && list.isEmpty() ) {
+			codeListItemDao.removeItemsInLevel(list, level);
+			list.removeLevel(level - 1);
+		} else {
+			list.removeLevel(level - 1);
+		}
+		
+	}
+	
 	protected CodeListItem findCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
 		String adaptedCode = code.trim();
 		adaptedCode = adaptedCode.toUpperCase();
@@ -572,5 +596,6 @@ public class CodeListManager {
 	public void setCodeListItemDao(CodeListItemDao codeListItemDao) {
 		this.codeListItemDao = codeListItemDao;
 	}
+
 
 }

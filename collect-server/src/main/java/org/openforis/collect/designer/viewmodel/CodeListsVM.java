@@ -253,7 +253,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		final List<CodeListLevel> levels = editedItem.getHierarchy();
 		if ( ! levels.isEmpty() ) {
 			final int levelIndex = levels.size() - 1;
-			if ( editedItem.hasItemsInLevel(levelIndex) ) {
+			if ( codeListManager.hasChildItemsInLevel(editedItem, levelIndex + 1) ) {
 				ConfirmHandler handler = new ConfirmHandler() {
 					@Override
 					public void onOk() {
@@ -286,7 +286,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	protected void performRemoveLevel(int levelIndex) {
-		editedItem.removeLevel(levelIndex);
+		codeListManager.removeLevel(editedItem, levelIndex + 1);
 		deselectItemsAfterLevel(levelIndex);
 		initItemsPerLevel();
 		notifyChange("listLevels","selectedItemsPerLevel","itemsPerLevel");

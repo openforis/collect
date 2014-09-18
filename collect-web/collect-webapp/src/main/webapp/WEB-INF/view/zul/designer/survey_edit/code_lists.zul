@@ -120,12 +120,12 @@
 		 		        						selectedItem="@bind(fx.type)"
 		 		        						onCheck="@command('typeChanged', type=self.selectedItem.value)">
 		 		        						<radio
-		 		        							label="${labels.survey.code_list.type.hierarchical}"
-		 		        							value="HIERARCHICAL"
-		 		        							disabled="@load(vm.multipleLevelsPresent)" />
-		 		        						<radio
 		 		        							label="${labels.survey.code_list.type.flat}"
 		 		        							value="FLAT"
+		 		        							disabled="@load(vm.multipleLevelsPresent)" />
+		 		        						<radio
+		 		        							label="${labels.survey.code_list.type.hierarchical}"
+		 		        							value="HIERARCHICAL"
 		 		        							disabled="@load(vm.multipleLevelsPresent)" />
 		 		        					</radiogroup>
 			        				</row>
