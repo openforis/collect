@@ -90,6 +90,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		changed = false;
 		notifyChange("editedItem","formObject","items","selectedItem","changed");
 		validateForm(binder);
+		setFocusOnNameTextbox();
 	}
 
 	protected void validateForm(Binder binder) {
@@ -295,7 +296,6 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 			} else {
 				formObject.loadFrom(editedItem, currentLanguageCode);
 			}
-			setFocusOnNameTextbox();
 		}
 		notifyChange("editedItem","formObject");
 	}
