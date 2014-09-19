@@ -49,6 +49,7 @@
 			</fieldErrorHandler>
           <fieldErrorHandler message="@load(vmsgs['condition'])">
             <textbox width="150px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+            <image src="/assets/images/expression-small.png" />
           </fieldErrorHandler>
         </row>
         <row>

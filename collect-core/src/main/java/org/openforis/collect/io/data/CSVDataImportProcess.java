@@ -475,15 +475,19 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 	private void setUnitField(Attribute<?, ?> attr, String value, long row,
 			String colName) {
-		Survey survey = attr.getSurvey();
-		Unit unit = survey.getUnit(value);
-		NumericAttributeDefinition defn = (NumericAttributeDefinition) attr.getDefinition();
-		if ( unit == null || ! defn.getUnits().contains(unit) ) {
-			ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, UNIT_NOT_FOUND_MESSAGE_KEY);
-			parsingError.setMessageArgs(new String[]{value});
-			status.addParsingError(parsingError);
+		if ( StringUtils.isBlank(value) ) {
+			((NumberAttribute) attr).setUnit(null);
 		} else {
-			((NumberAttribute<?, ?>) attr).setUnit(unit);
+			Survey survey = attr.getSurvey();
+			Unit unit = survey.getUnit(value);
+			NumericAttributeDefinition defn = (NumericAttributeDefinition) attr.getDefinition();
+			if ( unit == null || ! defn.getUnits().contains(unit) ) {
+				ParsingError parsingError = new ParsingError(ErrorType.INVALID_VALUE, row, colName, UNIT_NOT_FOUND_MESSAGE_KEY);
+				parsingError.setMessageArgs(new String[]{value});
+				status.addParsingError(parsingError);
+			} else {
+				((NumberAttribute<?, ?>) attr).setUnit(unit);
+			}
 		}
 	}
 

@@ -103,6 +103,7 @@
   					<textbox width="250px"
   						value="@bind(fx.requiredExpression)"
   						onChange="@command('applyChanges')" />
+  					<image src="/assets/images/expression-small.png" />
   				</fieldErrorHandler>
   			</row>
   			<row
@@ -133,6 +134,7 @@
   					<textbox width="250px"
   						value="@bind(fx.relevantExpression)"
   						onChange="@command('applyChanges')" />
+  					<image src="/assets/images/expression-small.png" />
   					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />  					
   					<checkbox
   						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"

@@ -50,6 +50,7 @@
 	      </fieldErrorHandler>
           <fieldErrorHandler message="@load(vmsgs['condition'])">
             <textbox width="250px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+            <image src="/assets/images/expression-small.png" />
           </fieldErrorHandler>
         </row>
         <row>
@@ -59,6 +60,7 @@
             <fieldErrorHandler message="@load(vmsgs['sourcePointExpression'])">
 	            <textbox width="250px" value="@bind(fx.sourcePointExpression)"
 	                    onChange="@command('applyChanges')" />
+	            <image src="/assets/images/expression-small.png" />
           	</fieldErrorHandler>
         </row>
         <row>
@@ -68,6 +70,7 @@
             <fieldErrorHandler message="@load(vmsgs['destinationPointExpression'])">
 	            <textbox width="250px" value="@bind(fx.destinationPointExpression)"
 	                    onChange="@command('applyChanges')" />
+	           	<image src="/assets/images/expression-small.png" />
           	</fieldErrorHandler>
         </row>
         <row>
@@ -77,6 +80,7 @@
             <fieldErrorHandler message="@load(vmsgs['minDistanceExpression'])">
 	            <textbox width="100px" value="@bind(fx.minDistanceExpression)"
 	                    onChange="@command('applyChanges')" />
+	            <image src="/assets/images/expression-small.png" />
           	</fieldErrorHandler>
         </row>
         <row>
@@ -86,6 +90,7 @@
             <fieldErrorHandler message="@load(vmsgs['maxDistanceExpression'])">
 	            <textbox width="100px" value="@bind(fx.maxDistanceExpression)"
 	                    onChange="@command('applyChanges')" />
+	            <image src="/assets/images/expression-small.png" />
           	</fieldErrorHandler>
         </row>
       </rows>
