@@ -10,10 +10,18 @@ import org.openforis.idm.metamodel.validation.ComparisonCheck;
  */
 public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> {
 	
+	private enum LessThanType {
+		LT, LE
+	};
+	
+	private enum GreaterThanType {
+		GT, GE
+	};
+	
 	private String greaterThan;
-	private boolean greaterThanEqual;
 	private String lessThan;
-	private boolean lessThanEqual;
+	private GreaterThanType greaterThanType;
+	private LessThanType lessThanType;
 	
 	@Override
 	public void saveTo(ComparisonCheck dest, String languageCode) {
@@ -21,20 +29,21 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 		resetExpressions(dest);
 		String trimmedGreaterThanExpr = StringUtils.trimToNull(greaterThan);
 		String trimmedLessThanExpr = StringUtils.trimToNull(lessThan);
+		
 		if ( trimmedGreaterThanExpr != null && trimmedLessThanExpr != null && 
-				greaterThanEqual && lessThanEqual && 
+				greaterThanType == GreaterThanType.GE && lessThanType == LessThanType.LE && 
 				trimmedGreaterThanExpr.equals(trimmedLessThanExpr)) {
 			dest.setEqualsExpression(trimmedGreaterThanExpr);
 		} else {
 			if ( trimmedGreaterThanExpr != null ) {
-				if ( greaterThanEqual ) {
+				if ( greaterThanType == GreaterThanType.GE ) {
 					dest.setGreaterThanOrEqualsExpression(trimmedGreaterThanExpr);
 				} else {
 					dest.setGreaterThanExpression(trimmedGreaterThanExpr);
 				}
 			}
 			if ( trimmedLessThanExpr != null ) {
-				if ( lessThanEqual ) {
+				if ( lessThanType == LessThanType.LE ) {
 					dest.setLessThanOrEqualsExpression(trimmedLessThanExpr);
 				} else {
 					dest.setLessThanExpression(trimmedLessThanExpr);
@@ -48,21 +57,22 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 		super.loadFrom(source, languageCode);
 		if ( StringUtils.isNotBlank(source.getEqualsExpression()) ) {
 			greaterThan = lessThan = source.getEqualsExpression();
-			greaterThanEqual = lessThanEqual = true;
+			greaterThanType = GreaterThanType.GE;
+			lessThanType = LessThanType.LE;
 		} else {
 			if ( StringUtils.isNotBlank(source.getGreaterThanExpression()) ) {
 				greaterThan = source.getGreaterThanExpression();
-				greaterThanEqual = false;
+				greaterThanType = GreaterThanType.GT;
 			} else if ( StringUtils.isNotBlank(source.getGreaterThanOrEqualsExpression()) ) {
 				greaterThan = source.getGreaterThanOrEqualsExpression();
-				greaterThanEqual = true;
+				greaterThanType = GreaterThanType.GE;
 			}
 			if ( StringUtils.isNotBlank(source.getLessThanExpression()) ) {
 				lessThan = source.getLessThanExpression();
-				lessThanEqual = false;
+				lessThanType = LessThanType.LT;
 			} else if ( StringUtils.isNotBlank(source.getLessThanOrEqualsExpression()) ) {
 				lessThan = source.getLessThanOrEqualsExpression();
-				lessThanEqual = true;
+				lessThanType = LessThanType.LE;
 			}
 		}
 	}
@@ -71,7 +81,8 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 	protected void reset() {
 		super.reset();
 		greaterThan = lessThan = null;
-		greaterThanEqual = lessThanEqual = false;
+		greaterThanType = GreaterThanType.GT;
+		lessThanType = LessThanType.LT;
 	}
 	
 	protected void resetExpressions(ComparisonCheck dest) {
@@ -90,14 +101,14 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 		this.greaterThan = greaterThan;
 	}
 
-	public boolean isGreaterThanEqual() {
-		return greaterThanEqual;
+	public String getGreaterThanTypeCode() {
+		return greaterThanType.name();
 	}
-
-	public void setGreaterThanEqual(boolean greaterThanEqual) {
-		this.greaterThanEqual = greaterThanEqual;
+	
+	public void setGreaterThanTypeCode(String value) {
+		this.greaterThanType = GreaterThanType.valueOf(value);
 	}
-
+	
 	public String getLessThan() {
 		return lessThan;
 	}
@@ -106,12 +117,12 @@ public class ComparisonCheckFormObject extends CheckFormObject<ComparisonCheck> 
 		this.lessThan = lessThan;
 	}
 
-	public boolean isLessThanEqual() {
-		return lessThanEqual;
+	public String getLessThanTypeCode() {
+		return lessThanType.name();
 	}
-
-	public void setLessThanEqual(boolean lessThanEqual) {
-		this.lessThanEqual = lessThanEqual;
+	
+	public void setLessThanTypeCode(String value) {
+		this.lessThanType = LessThanType.valueOf(value);
 	}
-
+	
 }

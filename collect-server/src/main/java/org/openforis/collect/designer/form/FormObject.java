@@ -17,6 +17,10 @@ public abstract class FormObject<T> {
 		//init static variables
 		VERSION_EMPTY_SELECTION = new NamedObject(EMPTY_OPTION);
 	}
+	
+	public FormObject() {
+		reset();
+	}
 
 	private T source;
 	

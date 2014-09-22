@@ -3,6 +3,11 @@
   <custom-attributes parentDefinition="${arg.parentDefinition}"/>
   <custom-attributes check="${arg.check}"/>
   <custom-attributes newItem="${arg.newItem}"/>
+  <zscript language="Java"><![CDATA[
+		import org.openforis.idm.metamodel.AttributeDefinition;
+
+		String attrName = ((AttributeDefinition) arg.get("parentDefinition")).getName();
+    ]]></zscript>
   <vlayout
     id="formContainer"
     sclass="form"
@@ -43,39 +48,54 @@
           </fieldErrorHandler>
         </row>
         <row>
+        	<cell colspan="2" align="center">
+        		<hlayout>
+		          	<fieldErrorHandler message="@load(vmsgs['greaterThan'])">
+		            	<textbox width="150px" value="@bind(fx.greaterThan)" 
+		            		onChange="@command('applyChanges')"
+		            		multiline="true" />
+	            		<image src="/assets/images/expression-small.png" />
+		            </fieldErrorHandler>
+		            <listbox mold="select" 
+		            	selectedItem="@bind(fx.greaterThanTypeCode)"
+		            	onSelect="@command('applyChanges')">
+		            	<listitem value="GT" selected="true">
+		            		<attribute name="label"><![CDATA[<]]></attribute>
+		            	</listitem>
+		            	<listitem value="GE">
+		            		<attribute name="label"><![CDATA[≤]]></attribute>
+		            	</listitem>
+		            </listbox>
+		            <label value="${attrName}" />
+		            <listbox mold="select" 
+		            	selectedItem="@bind(fx.lessThanTypeCode)"
+		            	onSelect="@command('applyChanges')">
+		            	<listitem value="LT" selected="true">
+		            		<attribute name="label"><![CDATA[<]]></attribute>
+		            	</listitem>
+		            	<listitem value="LE">
+		            		<attribute name="label"><![CDATA[≤]]></attribute>
+		            	</listitem>
+		            </listbox>
+		            <fieldErrorHandler message="@load(vmsgs['lessThan'])">
+		            	<textbox width="150px" value="@bind(fx.lessThan)"
+		            		onChange="@command('applyChanges')"
+		            		multiline="true" />
+		            	<image src="/assets/images/expression-small.png" />
+		            </fieldErrorHandler>
+        		</hlayout>
+        	</cell>
+        </row>
+		<row>
           <fieldErrorHandler message="@load(vmsgs['condition'])">
 	          <label use="org.openforis.collect.designer.component.FieldLabel"
-	          	value="${labels.survey.schema.node.check.condition}:" />
+	          	value="${labels.survey.schema.node.check.condition}" />
 	      </fieldErrorHandler>
           <fieldErrorHandler message="@load(vmsgs['condition'])">
             <textbox width="250px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+            <image src="/assets/images/expression-small.png" />
           </fieldErrorHandler>
         </row>
-        <row>
-          <cell>
-            <label value="${labels.survey.schema.node.check.comparison.greaterThan}" />
-            <label value="(" />
-            <label value="${labels.survey.schema.node.check.comparison.equal}" />
-            <checkbox checked="@bind(fx.greaterThanEqual)" onCheck="@command('applyChanges')" />
-            <label value="):" />
-          </cell>
-          <fieldErrorHandler message="@load(vmsgs['greaterThan'])">
-            <textbox width="150px" value="@bind(fx.greaterThan)" onChange="@command('applyChanges')" />
-          </fieldErrorHandler>
-        </row>
-        <row>
-          <cell>
-            <label value="${labels.survey.schema.node.check.comparison.lessThan}" />
-            <label value="(" />
-            <label value="${labels.survey.schema.node.check.comparison.equal}" />
-            <checkbox checked="@bind(fx.lessThanEqual)" onCheck="@command('applyChanges')" />
-            <label value="):" />
-          </cell>
-          <fieldErrorHandler message="@load(vmsgs['lessThan'])">
-         	<textbox width="150px" value="@bind(fx.lessThan)"
-                    onChange="@command('applyChanges')" />
-          </fieldErrorHandler>
-        </row>            
       </rows>
     </grid>
   </vlayout>
