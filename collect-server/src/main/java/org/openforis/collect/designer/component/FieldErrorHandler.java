@@ -8,24 +8,26 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zul.Div;
+import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.impl.XulElement;
 
 /**
  * @author S. Ricci
  *
  */
-public class FieldErrorHandler extends Div {
+public class FieldErrorHandler extends Hlayout {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String FIELD_ERROR_SCLASS = "error";
+	private static final String SCLASS = "fielderrorhandler";
+	private static final String ERROR_SCLASS = "error";
 
 	private FieldErrorTooltip tooltip;
 	private String message;
 
 	public FieldErrorHandler() {
 		super();
+		ComponentUtil.addClass(this, SCLASS);
 	}
 
 	public String getMessage() {
@@ -66,7 +68,7 @@ public class FieldErrorHandler extends Div {
 	
 	protected void updateFieldStyle(XulElement field) {
 		boolean hasError = StringUtils.isNotBlank(message);
-		ComponentUtil.toggleClass(field, FIELD_ERROR_SCLASS, hasError);
+		ComponentUtil.toggleClass(field, ERROR_SCLASS, hasError);
 	}
 
 	protected void initTooltip() {

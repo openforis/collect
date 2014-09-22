@@ -102,7 +102,8 @@
   					message="@load(vmsgs['requiredExpression'])">
   					<textbox width="250px"
   						value="@bind(fx.requiredExpression)"
-  						onChange="@command('applyChanges')" />
+  						onChange="@command('applyChanges')"
+  						rows="4" />
   					<image src="/assets/images/expression-small.png" />
   				</fieldErrorHandler>
   			</row>
@@ -133,7 +134,8 @@
   				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
   					<textbox width="250px"
   						value="@bind(fx.relevantExpression)"
-  						onChange="@command('applyChanges')" />
+  						onChange="@command('applyChanges')"
+  						rows="4" />
   					<image src="/assets/images/expression-small.png" />
   					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />  					
   					<checkbox

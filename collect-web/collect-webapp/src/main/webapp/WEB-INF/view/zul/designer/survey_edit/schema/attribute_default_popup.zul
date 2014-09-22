@@ -34,7 +34,8 @@
               value="${labels.survey.schema.attribute.attribute_default.expression}:" />
             <fieldErrorHandler message="@load(vmsgs['expression'])">
               <textbox width="300px" value="@bind(fx.expression)"
-                onChange="@command('applyChanges')" />
+                onChange="@command('applyChanges')"
+                rows="4" />
               <image src="/assets/images/expression-small.png" />
             </fieldErrorHandler>
           </row>

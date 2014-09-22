@@ -218,23 +218,25 @@ package org.openforis.collect.presenter {
 				}
 			} else {
 				var attr:AttributeProxy = AttributeProxy(node);
-				var r:NodeUpdateRequestProxy;
-				var field:FieldProxy;
-				if ( isNaN(fieldIdx) || fieldIdx < 0 ) {
-					for(var index:int = 0; index < attr.fields.length; index ++) {
-						if ( visibleField(attr, index) ) {
-							field = attr.fields[index];
-							if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
-								r = createUpdateSymbolOperation(node, field, index, symbol);
-								updateRequestSet.addRequest(r);
+				if ( ! AttributeDefinitionProxy(attr.definition).calculated ) {
+					var r:NodeUpdateRequestProxy;
+					var field:FieldProxy;
+					if ( isNaN(fieldIdx) || fieldIdx < 0 ) {
+						for(var index:int = 0; index < attr.fields.length; index ++) {
+							if ( visibleField(attr, index) ) {
+								field = attr.fields[index];
+								if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
+									r = createUpdateSymbolOperation(node, field, index, symbol);
+									updateRequestSet.addRequest(r);
+								}
 							}
 						}
-					}
-				} else {
-					field = attr.fields[fieldIdx];
-					if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
-						r = createUpdateSymbolOperation(node, field, fieldIdx, symbol);
-						updateRequestSet.addRequest(r);
+					} else {
+						field = attr.fields[fieldIdx];
+						if ( applyToNonEmptyNodes || (field.value == null && field.symbol == null)) {
+							r = createUpdateSymbolOperation(node, field, fieldIdx, symbol);
+							updateRequestSet.addRequest(r);
+						}
 					}
 				}
 			}
