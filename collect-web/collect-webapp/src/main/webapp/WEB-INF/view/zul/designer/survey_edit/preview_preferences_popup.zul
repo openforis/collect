@@ -1,3 +1,4 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk>
   <window title="${labels.survey.preview.preferences.title}"
     width="300px"
@@ -12,7 +13,7 @@
         <column width="100%" />
       </columns>
       <rows>
-        <row>
+        <row visible="${c:length(vm.formVersions) > 0}" >
           <label value="${labels.survey.preview.preferences.form_version}:" />
           <listbox id="formVersionsList" width="150px" mold="select"
             model="@load(vm.formVersions)">
@@ -21,7 +22,7 @@
             </template>
           </listbox>
         </row>
-        <row>
+        <row visible="${c:length(vm.rootEntities) > 1}" >
           <label value="${labels.survey.layout.root_entity}:" />
           <listbox id="rootEntitiesList" width="150px" mold="select"
             model="@load(vm.rootEntities)">
@@ -35,7 +36,9 @@
 
     <box width="100%" align="center">
       <button id="okBtn" label="${labels.global.ok}"
-        onClick="@global-command('openPreviewPopUp', formVersion=formVersionsList.selectedItem.value, rootEntity=rootEntitiesList.selectedItem.value)" />
+        onClick="@global-command('openPreviewPopUp', 
+        	formVersion=formVersionsList.selectedItem.value, 
+        	rootEntity=rootEntitiesList.selectedItem.value)" />
     </box>
   </window>
 </zk>
