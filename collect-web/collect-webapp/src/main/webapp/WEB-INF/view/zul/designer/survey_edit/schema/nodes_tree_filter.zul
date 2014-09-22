@@ -53,12 +53,5 @@
       onClick="@global-command('openVersioningManagerPopUp')"
       image="/assets/images/edit-small.png" />
     
-    <button label="${labels.survey.preview.show_preview}"
-      onClick="@global-command('showPreview', formVersion=vm.selectedVersion, rootEntity=vm.selectedRootEntity)" />
-      
-    <space width="100px" />
-      
-	<button label="${labels.survey.schema.export_summary.$}"
-		onClick="@global-command('exportSchemaSummary')" />
   </hlayout>
 </zk>

@@ -130,8 +130,21 @@
 				</center>
 				<east border="none" size="20%">
 					<box hflex="true" align="end">
-						<button label="${labels.survey.validate}"
-							onClick="@command('validate')" />
+						<hlayout>
+							<button label="${labels.survey.preview.show_preview}"
+		    					  onClick="@command('showPreview')" />
+							<menubar>
+								<menu tooltiptext="${labels.global.advanced_functions}" 
+										image="/assets/images/settings-small.png">
+									<menupopup>
+										<menuitem label="${labels.survey.validate}"
+											onClick="@command('validate')" />
+										<menuitem  label="${labels.survey.schema.export_summary.$}"
+											onClick="@global-command('exportSchemaSummary')" />
+									</menupopup>
+								</menu>
+							</menubar>
+						</hlayout>
 					</box>
 				</east>
 			</borderlayout>

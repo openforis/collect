@@ -276,10 +276,12 @@ public class SurveySelectVM extends BaseVM {
 
 	@GlobalCommand
 	public void confirmValidationResultsPopUp() {
-		closePopUp(validationResultsPopUp);
-		validationResultsPopUp = null;
-		CollectSurvey survey = loadSelectedSurvey();
-		performSurveyPublishing(survey);
+		if ( validationResultsPopUp != null ) {
+			closePopUp(validationResultsPopUp);
+			validationResultsPopUp = null;
+			CollectSurvey survey = loadSelectedSurvey();
+			performSurveyPublishing(survey);
+		}
 	}
 	
 	@GlobalCommand

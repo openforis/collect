@@ -86,6 +86,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private Window validationResultsPopUp;
 	private Window jobStatusPopUp;
 
+	private boolean showingPreview;
+
 	@Init(superclass=false)
 	public void init(@QueryParam("temp_id") Integer tempId) {
 		super.init();
@@ -304,13 +306,32 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void validate() {
-		SurveyValidationResults results = surveyValidator.validate(survey);
-		if ( ! results.hasErrors() && ! results.hasWarnings() ) {
+		if ( checkValidity(false) ) {
 			MessageUtil.showInfo("survey.successfully_validated");
-		} else {
-			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, false);
 		}
 	}
+	
+	private boolean checkValidity(boolean showConfirm) {
+		SurveyValidationResults results = surveyValidator.validate(survey);
+		if ( ! results.hasErrors() && ! results.hasWarnings() ) {
+			return true;
+		} else {
+			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm);
+			return false;
+		}
+	}
+	
+	@GlobalCommand
+	public void confirmValidationResultsPopUp() {
+		if ( validationResultsPopUp != null ) {
+			closePopUp(validationResultsPopUp);
+			validationResultsPopUp = null;
+			if ( showingPreview ) {
+				openPreviewPopUp();
+			}
+		}
+	}
+	
 	
 	@GlobalCommand
 	public void closeValidationResultsPopUp() {
@@ -318,7 +339,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		validationResultsPopUp = null;
 	}
 	
-	@GlobalCommand
+	@Command
 	public void exportSchemaSummary() {
 		SchemaSummaryCSVExportJob job = new SchemaSummaryCSVExportJob();
 		job.setJobManager(jobManager);
@@ -353,9 +374,20 @@ public class SurveyEditVM extends SurveyBaseVM {
 		jobStatusPopUp = null;
 	}
 
+	private void openPreviewPopUp() {
+		if ( isSingleRootEntityDefined() && survey.getVersions().isEmpty() ) {
+			openPreviewPopUp(null, survey.getSchema().getRootEntityDefinitions().get(0));
+		} else {
+			openPreviewPreferencesPopUp();
+		}
+	}
+
 	@GlobalCommand
-	public void showPreview(@BindingParam("formVersion") ModelVersion formVersion, @BindingParam("rootEntity") EntityDefinition rootEntity) {
+	public void openPreviewPopUp(@BindingParam("formVersion") ModelVersion formVersion, @BindingParam("rootEntity") EntityDefinition rootEntity) {
 		if ( validateShowPreview(rootEntity, formVersion) ) {
+			if ( rootEntity == null ) {
+				rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
+			}
 			Map<String, String> params = createBasicModuleParameters();
 			params.put("preview", "true");
 			params.put("surveyId", Integer.toString(survey.getId()));
@@ -372,11 +404,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	protected boolean validateShowPreview(EntityDefinition rootEntityDefn, ModelVersion version) {
-		if ( rootEntityDefn == null ) {
+		if ( rootEntityDefn == null && ! isSingleRootEntityDefined() ) {
 			MessageUtil.showWarning(LabelKeys.PREVIEW_ROOT_ENTITY_NOT_SPECIFIED);
-			return false;
-		} else if (survey.getId() == null || changed)  {
-			MessageUtil.showWarning(LabelKeys.PREVIEW_ERROR_SAVE_SURVEY_FIRST);
 			return false;
 		} else if (version == null && survey.getVersions() != null && ! survey.getVersions().isEmpty() ) {
 			MessageUtil.showWarning(LabelKeys.PREVIEW_ERROR_VERSION_NOT_SPECIFIED);
@@ -387,7 +416,18 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void openPreviewPreferencesPopUp() {
+	public void showPreview() {
+		if (survey.getId() == null || changed)  {
+			MessageUtil.showWarning(LabelKeys.PREVIEW_ERROR_SAVE_SURVEY_FIRST);
+		} else {
+			showingPreview = true;
+			if ( checkValidity(true) ) {
+				openPreviewPopUp();
+			}
+		}
+	}
+
+	protected void openPreviewPreferencesPopUp() {
 		previewPreferencesPopUp = openPopUp(Resources.Component.PREVIEW_PREFERENCES_POP_UP.getLocation(), true);
 	}
 	
@@ -395,6 +435,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void closePreviewPreferencesPopUp() {
 		closePopUp(previewPreferencesPopUp);
 		previewPreferencesPopUp = null;
+		showingPreview = false;
 	}
 	
 	@GlobalCommand
