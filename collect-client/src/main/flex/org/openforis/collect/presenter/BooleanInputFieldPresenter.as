@@ -1,5 +1,10 @@
 package org.openforis.collect.presenter {
+	import flash.events.Event;
+	import flash.events.FocusEvent;
+	import flash.events.KeyboardEvent;
+	
 	import org.openforis.collect.i18n.Message;
+	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
@@ -23,6 +28,30 @@ package org.openforis.collect.presenter {
 		private function get view():BooleanInputField {
 			return BooleanInputField(_view);
 		}
+		
+		override public function init():void {
+			super.init();
+			initView();
+		}
+		
+		override protected function initEventListeners():void {
+			super.initEventListeners();
+			view.checkBox.addEventListener(KeyboardEvent.KEY_DOWN, keyDownHandler);
+			view.checkBox.addEventListener(Event.CHANGE, changeHandler);
+			view.checkBox.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
+			view.checkBox.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
+			//key focus change managed by key down handler
+			view.checkBox.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, preventDefaultHandler);
+		}
+		
+		private function initView():void {
+			if ( BooleanAttributeDefinitionProxy(view.attributeDefinition).affirmativeOnly ) {
+				view.currentState = BooleanInputField.CHECKBOX_STATE;
+			} else {
+				view.currentState = BooleanInputField.DEFAULT_STATE;
+			}
+		}
+		
 		
 		override protected function textToRequestValue():String {
 			var value:String = null;
@@ -63,6 +92,24 @@ package org.openforis.collect.presenter {
 				}
 			}
 			return "";
+		}
+		
+		override protected function setFocusOnInputField():void {
+			switch ( view.currentState ) {
+			case BooleanInputField.CHECKBOX_STATE:
+				view.checkBox.setFocus();
+				break;
+			case BooleanInputField.DEFAULT_STATE:
+				view.textInput.setFocus();
+				break;
+			default:
+			}
+		}
+		
+		override protected function changeHandler(event:Event):void {
+			super.changeHandler(event);
+			updateValue();
+			dispatchVisitedEvent();
 		}
 		
 	}

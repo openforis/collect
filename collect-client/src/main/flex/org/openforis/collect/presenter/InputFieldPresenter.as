@@ -117,14 +117,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function setFocusHandler(event:InputFieldEvent):void {
-			if ( view.root != null && 
-					view.textInput != null && 
-					view.attribute != null && 
-					view.attribute.id == event.attributeId && 
-					view.fieldIndex == event.fieldIdx &&
-					view.getFocus() != view.textInput ) {
-				
-				view.textInput.setFocus();
+			if ( isFocusEventRelativeToThisInputField(event) 
+				//&& view.getFocus() != view.textInput 
+				) {
+				setFocusOnInputField();
 				
 				//adjust scroller view port if field is rendered in MultipleEntityAsTableFormItem
 				var scroller:Scroller = UIUtil.getFirstAncestor(view, Scroller);
@@ -139,6 +135,18 @@ package org.openforis.collect.presenter {
 					}
 				}
 			}
+		}
+		
+		protected function isFocusEventRelativeToThisInputField(event:InputFieldEvent):Boolean {
+			return view.root != null && 
+				view.textInput != null && 
+				view.attribute != null && 
+				view.attribute.id == event.attributeId && 
+				view.fieldIndex == event.fieldIdx;
+		}
+		
+		protected function setFocusOnInputField():void {
+			view.textInput.setFocus();			
 		}
 		
 		protected static function approveMissingHandler(event:NodeEvent): void {
@@ -390,14 +398,15 @@ package org.openforis.collect.presenter {
 			if(view.applyChangesOnFocusOut && view.changed) {
 				updateValue();
 			}
+			dispatchVisitedEvent();
+			dispatchFocusOutEvent();
+		}
+		
+		protected function dispatchVisitedEvent():void {
 			view.visited = true;
-			
-			//dispatch VISITED event
 			var inputFieldEvent:InputFieldEvent = new InputFieldEvent(InputFieldEvent.VISITED);
 			inputFieldEvent.inputField = view;
 			eventDispatcher.dispatchEvent(inputFieldEvent);
-
-			dispatchFocusOutEvent();
 		}
 		
 		protected function dispatchFocusOutEvent():void {

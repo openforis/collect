@@ -23,6 +23,7 @@ import org.openforis.collect.model.NodeChangeMap;
 import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -33,6 +34,8 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.BooleanAttribute;
+import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
@@ -641,8 +644,9 @@ public class RecordUpdater {
 		if ( ! multipleEntityFormLayout ) {
 			while(count < toBeInserted) {
 				if(childDefn instanceof AttributeDefinition) {
-					Node<?> createNode = childDefn.createNode();
-					entity.add(createNode);
+					Node<?> createdNode = childDefn.createNode();
+					entity.add(createdNode);
+					setInitialValue((Attribute<?, ?>) createdNode);
 				} else if(childDefn instanceof EntityDefinition ) {
 					RecordUpdater recordUpdater = new RecordUpdater();
 					recordUpdater.performEntityAdd(entity, childName);
@@ -653,6 +657,13 @@ public class RecordUpdater {
 		return count;
 	}
 	
+	private void setInitialValue(Attribute<?, ?> attr) {
+		if ( attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly() ) {
+			BooleanAttribute boolAttr = (BooleanAttribute) attr;
+			boolAttr.setValue(new BooleanValue(false));
+		}
+	}
+
 	protected void addEmptyEnumeratedEntities(Entity parentEntity) {
 		Record record = parentEntity.getRecord();
 		CollectSurvey survey = (CollectSurvey) parentEntity.getSurvey();
