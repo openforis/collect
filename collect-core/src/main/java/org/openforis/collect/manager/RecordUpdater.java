@@ -324,18 +324,12 @@ public class RecordUpdater {
 	}
 	
 	private void evaluateCalculatedAttribute(NodeChangeMap changeMap, Attribute<?, ?> calcAttr) {
+		calcAttr.clearValue(false);
 		//force evaluation of calculated value after it has been already cleaned
 		calcAttr.getValue();
 		AttributeChange change = changeMap.prepareAttributeChange(calcAttr);
 		Map<Integer, Object> updatedFieldValues = createFieldValuesMap(calcAttr);
 		change.setUpdatedFieldValues(updatedFieldValues);
-	}
-	
-	private void evaluateDependentCalculatedAttributes(NodeChangeMap changeMap, Entity entity) {
-		List<Node<?>> descendants = entity.getDescendants();
-		for (Node<?> node : descendants) {
-			evaluateDependentCalculatedAttributes(changeMap, node);
-		}
 	}
 	
 	private void evaluateDependentCalculatedAttributes(NodeChangeMap changeMap, Node<?> node) {
