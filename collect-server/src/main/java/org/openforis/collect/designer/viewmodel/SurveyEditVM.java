@@ -375,8 +375,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	private void openPreviewPopUp() {
-		if ( isSingleRootEntityDefined() && survey.getVersions().isEmpty() ) {
-			openPreviewPopUp(null, survey.getSchema().getRootEntityDefinitions().get(0));
+		if ( isSingleRootEntityDefined() && survey.getVersions().size() <= 1 ) {
+			ModelVersion version = survey.getVersions().isEmpty() ? null: survey.getVersions().get(0);
+			openPreviewPopUp(version, survey.getSchema().getRootEntityDefinitions().get(0));
 		} else {
 			openPreviewPreferencesPopUp();
 		}
