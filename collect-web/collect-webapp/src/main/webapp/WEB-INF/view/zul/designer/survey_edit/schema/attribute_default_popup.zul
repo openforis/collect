@@ -43,8 +43,10 @@
             <label
               value="${labels.survey.schema.attribute.attribute_default.condition}:" />
             <fieldErrorHandler message="@load(vmsgs['condition'])">
-              <textbox width="300px" value="@bind(fx.condition)"
-                onChange="@command('applyChanges')" />
+              <textbox width="300px" 
+              	value="@bind(fx.condition)"
+                onChange="@command('applyChanges')"
+                rows="4" />
               <image src="/assets/images/expression-small.png" />
             </fieldErrorHandler>
           </row>
