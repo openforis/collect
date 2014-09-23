@@ -147,6 +147,22 @@
   	</grid>
 
   	<include src="${arg.otherMinorGeneralDetailsForm}" />
+  	
+  	<grid class="inner">
+  		<columns>
+  			<column width="150px" />
+  			<column />
+  		</columns>
+  		<rows>
+  			<row>
+    			<label value="${labels.survey.schema.node.referenced_node_paths}:" />
+	    			<textbox width="200px" maxlength="40"
+  						value="@load(vm.referencedNodePaths)"
+	    				rows="4" />
+	    		</fieldErrorHandler>
+	    	</row>
+	    </rows>
+	</grid>
   </groupbox>
 
   <include src="${arg.otherAttributesForm}" />
@@ -283,24 +299,11 @@
       						onChange="@command('applyChanges')" />
       				</fieldErrorHandler>
       			</row>
-<!--       			<row> -->
-<!--       				<fieldErrorHandler message="@load(vmsgs['pcPromptLabel'])"> -->
-<!-- 		  				<label -->
-<!-- 		  					use="org.openforis.collect.designer.component.FieldLabel" -->
-<!-- 		  					value="${labels.survey.schema.node.pc_prompt_label}"  -->
-<!--                       		languageCode="@load(vm.currentLanguageCode)" /> -->
-<!--                     </fieldErrorHandler> -->
-<!--       				<fieldErrorHandler message="@load(vmsgs['pcPromptLabel'])"> -->
-<!--                       	<textbox width="250px" value="@bind(fx.pcPromptLabel)"  -->
-<!--                                 onChange="@command('applyChanges')" /> -->
-<!--                     </fieldErrorHandler> -->
-<!--       			</row> -->
       		</rows>
       	</grid>
       	<include src="${arg.otherLabelsForm}" />
       </groupbox>
     </groupbox>
-    
 
     <groupbox width="100%" closable="false" visible="${not vm.rootEntity}">
       <caption label="${labels.survey.schema.node.versioning}"/>
