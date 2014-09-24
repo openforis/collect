@@ -156,10 +156,9 @@
   		<rows>
   			<row>
     			<label value="${labels.survey.schema.node.referenced_node_paths}:" />
-	    			<textbox width="200px" maxlength="40"
-  						value="@load(vm.referencedNodePaths)"
-	    				rows="4" />
-	    		</fieldErrorHandler>
+    			<textbox width="200px" maxlength="40"
+ 						value="@load(vm.referencedNodePaths)"
+    				rows="4" />
 	    	</row>
 	    </rows>
 	</grid>

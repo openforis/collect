@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -272,4 +273,22 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			return false;
 		}
 	}
+	
+	public String getReferencedNodePaths() {
+		List<String> result = new ArrayList<String>();
+		List<NodeDefinition> nodeDefns = getReferencedNodeDefinitions();
+		for (NodeDefinition nodeDefn : nodeDefns) {
+			result.add(nodeDefn.getPath());
+		}
+		return StringUtils.join(result, '\n');
+	}
+
+	public List<NodeDefinition> getReferencedNodeDefinitions() {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		result.addAll(editedItem.getRelevancyDependentDefinitions());
+		result.addAll(editedItem.getRequirenessDependentDefinitions());
+		result.addAll(editedItem.getCalculatedValueDependentDefinitions());
+		return result;
+	}
+	
 }
