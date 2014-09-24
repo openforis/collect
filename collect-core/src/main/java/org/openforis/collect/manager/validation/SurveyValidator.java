@@ -142,16 +142,18 @@ public class SurveyValidator {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList list : codeLists) {
-			if ( ! codeListManager.isInUse(list) ) {
-				//unused code list not allowed
-				SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
-						String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.unused_code_list");
-				results.add(validationResult);
-			} else if ( ! list.isExternal() && codeListManager.isEmpty(list) ) {
-				//empty code list not allowed
-				SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
-						String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.empty_code_list");
-				results.add(validationResult);
+			if ( survey.getSamplingDesignCodeList().getId() != list.getId() ) {
+				if ( ! codeListManager.isInUse(list) ) {
+					//unused code list not allowed
+					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
+							String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.unused_code_list");
+					results.add(validationResult);
+				} else if ( ! list.isExternal() && codeListManager.isEmpty(list) ) {
+					//empty code list not allowed
+					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
+							String.format(CODE_LIST_PATH_FORMAT, list.getName()), "survey.validation.error.empty_code_list");
+					results.add(validationResult);
+				}
 			}
 		}
 		return results;
