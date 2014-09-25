@@ -265,9 +265,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 		BindUtils.postNotifyChange(null, null, survey, "id");
 		BindUtils.postNotifyChange(null, null, survey, "published");
 		changed = false;
-		notifyChange("surveyStored","surveyId","surveyPublished","changed");
+		notifyChange("surveyStored","surveyId","surveyPublished","surveyChanged");
+		dispatchSurveySavedCommand();
 	}
 	
+	private void dispatchSurveySavedCommand() {
+		BindUtils.postGlobalCommand(null, null, SURVEY_SAVED_GLOBAL_COMMAND, null);
+	}
+
 	protected boolean checkCanSave() {
 		if ( checkCanLeaveForm() ) {
 			if ( ! checkSurveyNameUniqueness() ) {
@@ -442,7 +447,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void surveyChanged() {
 		changed = true;
-		notifyChange("changed");
+		notifyChange("surveyChanged");
 	}
 
 	@GlobalCommand
@@ -468,7 +473,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 		}
 	}
 
-	public boolean isChanged() {
+	@Override
+	public boolean isSurveyChanged() {
 		return changed;
 	}
 	

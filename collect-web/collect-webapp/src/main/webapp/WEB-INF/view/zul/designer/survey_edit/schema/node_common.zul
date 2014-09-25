@@ -148,20 +148,43 @@
 
   	<include src="${arg.otherMinorGeneralDetailsForm}" />
   	
-  	<grid class="inner">
-  		<columns>
-  			<column width="150px" />
-  			<column />
-  		</columns>
-  		<rows>
-  			<row>
-    			<label value="${labels.survey.schema.node.referenced_node_paths}:" />
-    			<textbox width="200px" maxlength="40"
- 						value="@load(vm.referencedNodePaths)"
-    				rows="4" />
-	    	</row>
-	    </rows>
-	</grid>
+  	 <groupbox closable="true" open="false" visible="@load(not vm.rootEntity)"
+      	sclass="collapsible"
+      	mold="3d" width="100%">
+      	<attribute name="onOpen"><![CDATA[
+      	    dependentPathsCaption.setSclass("open-" + self.isOpen());
+      	]]></attribute>
+      	<caption id="dependentPathsCaption" sclass="open-false">
+      		<div align="left">
+      			<label value="${labels.survey.schema.node.dependent_paths}" />
+      		</div>
+      	</caption>
+      	
+      	<box height="150px">
+	      	<box visible="@load(vm.surveyChanged)" pack="center" vflex="true">
+		      	<label value="${labels.survey.schema.node.dependent_paths_not_available}" />
+	      	</box>
+	
+			<listbox id="nodeReferencesListbox" visible="@load(not vm.surveyChanged)"
+				vflex="true"
+			    model="@load(vm.dependentNodes)">
+			    <listhead>
+			      <listheader label="${labels.survey.schema.node.dependent_node.type.$}" width="200px" 
+			        sort="auto(type)" />
+			      <listheader label="${labels.survey.schema.node.dependent_node.path}" width="300px" 
+			        sort="auto(path)" />
+			    </listhead>
+			    <template name="model">
+			      <listitem>
+			        <listcell label="${c:l('survey.schema.node.dependent_node.type.'.concat(each.type))}" />
+			        <listcell label="@load(each.path)" />
+			      </listitem>
+			    </template>
+			  </listbox>
+      	</box>
+      </groupbox>
+  	
+  	
   </groupbox>
 
   <include src="${arg.otherAttributesForm}" />

@@ -11,7 +11,10 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.zkoss.bind.Binder;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Execution;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.HtmlBasedComponent;
+import org.zkoss.zk.xel.impl.ExecutionResolver;
 
 /**
  * 
@@ -23,6 +26,18 @@ public class ComponentUtil {
 	public static final String COMPOSER_ID = "$composer";
 	private static final String BINDER_ID = "$BINDER$";
 
+	/**
+	 * Returns the component handled by the current {@link Execution} object
+	 * @return
+	 */
+	public static Component getCurrentComponent() {
+		Execution execution = Executions.getCurrent();
+		ExecutionResolver variableResolver = (ExecutionResolver) execution.getVariableResolver();
+		Object self = variableResolver.getSelf();
+		Component component = (Component) self;
+		return component;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static <T> T getComposer(Component view)  {
 		return (T) view.getAttribute(COMPOSER_ID);
@@ -38,6 +53,27 @@ public class ComponentUtil {
 		Binder binder = getBinder(component);
 		Object viewModel = binder.getViewModel();
 		return (T) viewModel;
+	}
+	
+	public static <T> T getAncestorViewModel(Class<T> viewModelClass) {
+		Component component = getCurrentComponent();
+		return component == null ? null: getAncestorViewModel(component, viewModelClass);
+	}
+		
+	@SuppressWarnings("unchecked")
+	public static <T> T getAncestorViewModel(Component component, Class<T> viewModelClass) {
+		Component currentParent = component.getParent();
+		while ( currentParent != null ) {
+			Binder binder = getBinder(currentParent);
+			if ( binder != null ) {
+				Object vm = binder.getViewModel();
+				if ( vm != null && viewModelClass.isAssignableFrom(vm.getClass()) ) {
+					return (T) vm;
+				}
+			}
+			currentParent = currentParent.getParent();
+		}
+		return null;
 	}
 
 	public static void addClass(HtmlBasedComponent component, String className) {

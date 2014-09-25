@@ -21,4 +21,5 @@ public class DefaultAttributeVM extends AttributeVM<AttributeDefinition> {
 			@ExecutionArgParam("newItem") Boolean newItem) {
 		super.init(parentEntity, attributeDefn, newItem);
 	}
+	
 }

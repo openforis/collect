@@ -123,7 +123,7 @@
 								onClick="@command('save')" />
 							<box width="110px">
 								<label value="${labels.global.unsaved_changes}" 
-									visible="@load(vm.changed)" />
+									visible="@load(vm.surveyChanged)" />
 							</box>
 						</hlayout>
 					</box>

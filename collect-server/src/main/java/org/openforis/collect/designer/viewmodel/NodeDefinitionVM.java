@@ -274,21 +274,25 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		}
 	}
 	
-	public String getReferencedNodePaths() {
-		List<String> result = new ArrayList<String>();
-		List<NodeDefinition> nodeDefns = getReferencedNodeDefinitions();
-		for (NodeDefinition nodeDefn : nodeDefns) {
-			result.add(nodeDefn.getPath());
-		}
-		return StringUtils.join(result, '\n');
-	}
-
-	public List<NodeDefinition> getReferencedNodeDefinitions() {
-		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
-		result.addAll(editedItem.getRelevancyDependentDefinitions());
-		result.addAll(editedItem.getRequirenessDependentDefinitions());
-		result.addAll(editedItem.getCalculatedValueDependentDefinitions());
+	public List<Map<String, String>> getDependentNodes() {
+		List<Map<String, String>> result = new ArrayList<Map<String,String>>();
+		result.addAll(getDependentNodeInfos("relevancy", editedItem.getRelevancyDependentDefinitions()));
+		result.addAll(getDependentNodeInfos("requireness", editedItem.getRequirenessDependentDefinitions()));
+		result.addAll(getDependentNodeInfos("calculated_value", editedItem.getCalculatedValueDependentDefinitions()));
 		return result;
 	}
-	
+
+	protected List<Map<String, String>> getDependentNodeInfos(String type, List<NodeDefinition> nodes) {
+		List<Map<String, String>> result = new ArrayList<Map<String,String>>();
+		for (NodeDefinition node : nodes) {
+			Map<String, String> nodeInfo = new HashMap<String, String>();
+			nodeInfo.put("type", type);
+			nodeInfo.put("path", node.getPath());
+			if ( ! result.contains(nodeInfo) ) {
+				result.add(nodeInfo);
+			}
+		}
+		return result;
+	}
+		
 }

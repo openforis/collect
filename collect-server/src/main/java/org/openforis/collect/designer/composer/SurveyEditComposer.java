@@ -19,8 +19,9 @@ import org.zkoss.zul.Tabbox;
  */
 public class SurveyEditComposer extends BindComposer<Component> {
 
-	private static final String SAMPLING_DESIGN_IMPORT_TAB_ID = "samplingDesignImportTab";
 	private static final long serialVersionUID = 1L;
+
+	private static final String SAMPLING_DESIGN_IMPORT_TAB_ID = "samplingDesignImportTab";
 
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -32,7 +33,7 @@ public class SurveyEditComposer extends BindComposer<Component> {
 	public void onSwitchTab(Event event) throws InterruptedException {
 		SurveyEditVM vm = (SurveyEditVM) getViewModel();
 		final Tab tab = (Tab) event.getTarget();
-		if ( SAMPLING_DESIGN_IMPORT_TAB_ID.equals(tab.getId()) && ( ! vm.isSurveyStored() || vm.isChanged() ) ) {
+		if ( SAMPLING_DESIGN_IMPORT_TAB_ID.equals(tab.getId()) && ( ! vm.isSurveyStored() || vm.isSurveyChanged() ) ) {
 			MessageUtil.showWarning("global.message.save_first");
 		} else {
 			vm.checkCanLeaveForm(new SurveyBaseVM.CanLeaveFormConfirmHandler() {

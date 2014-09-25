@@ -20,6 +20,7 @@ import liquibase.util.StringUtils;
 
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
@@ -54,6 +55,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public static final String VERSIONS_UPDATED_GLOBAL_COMMAND = "versionsUpdated";
 	public static final String UNDO_LAST_CHANGES_GLOBAL_COMMAND = "undoLastChanges";
 	public static final String SURVEY_CHANGED_GLOBAL_COMMAND = "surveyChanged";
+	public static final String SURVEY_SAVED_GLOBAL_COMMAND = "surveySaved";
 	public static final String VALIDATE_ALL_GLOBAL_COMMAND = "validateAll";
 
 	public static final String DATE_FORMAT = Labels.getLabel("global.date_format");
@@ -267,10 +269,29 @@ public abstract class SurveyBaseVM extends BaseVM {
 			return survey.isPublished();
 		}
 	}
+	
+	public boolean isSurveyChanged() {
+		SurveyEditVM rootVM = getRootVM();
+		return rootVM == null ? false : rootVM.isSurveyChanged();
+	}
+
+	protected SurveyEditVM getRootVM() {
+		return ComponentUtil.getAncestorViewModel(SurveyEditVM.class);
+	}
 
 	@GlobalCommand
 	public void currentLanguageChanged() {
 		initCurrentLanguageCode();
+	}
+
+	@GlobalCommand
+	public void surveyChanged() {
+		notifyChange("surveyChanged");
+	}
+
+	@GlobalCommand
+	public void surveySaved() {
+		notifyChange("surveyChanged");
 	}
 
 	public String getDateFormat() {
