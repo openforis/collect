@@ -31,7 +31,7 @@ public class RelationalSchemaConfig implements Cloneable {
 	private static final RelationalSchemaConfig DEFAULT;
 	static {
 		RelationalSchemaConfig config = new RelationalSchemaConfig();
-		config.idColumnSuffix = "_id";
+		config.idColumnSuffix = "_id_";
 		config.pkConstraintPrefix = "pk_";
 		config.fkConstraintPrefix = "fk_";
 		config.codeListTableSuffix = "_code";
