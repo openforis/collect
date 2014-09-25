@@ -86,23 +86,42 @@
 					</tabbox>
 				</absolutechildren>
 				<absolutechildren x="480" width="50%">
-					<!-- language selector -->
-					<hlayout id="languageSelector" hflex="1"
-						style="text-align: right;" sclass="controlBar">
-						<label value="${labels.survey.language.current_language}:" />
-						<listbox model="@load(vm.availableLanguages)"
-							selectedItem="@load(vm.currentLanguageCode)"
-							onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
-							mold="select">
-							<template name="model">
-								<listitem label="${c:l(each)}"
-									value="@load(each)" />
-							</template>
-						</listbox>
-						<button sclass="icon" height="24px"
-							tooltiptext="${labels.survey.language_manager}"
-							onClick="@command('openLanguageManagerPopUp')"
-							image="/assets/images/edit-language.png" />
+					<hlayout hflex="1"
+							spacing="20px" 
+							style="text-align: right;" 
+							sclass="controlBar">
+							
+						<!-- Language selector -->
+						<hlayout id="languageSelector"
+							sclass="controlBar">
+							<label value="${labels.survey.language.current_language}:" />
+							<listbox model="@load(vm.availableLanguages)"
+								selectedItem="@load(vm.currentLanguageCode)"
+								onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
+								mold="select">
+								<template name="model">
+									<listitem label="${c:l(each)}"
+										value="@load(each)" />
+								</template>
+							</listbox>
+							<button sclass="icon" height="24px"
+								tooltiptext="${labels.survey.language_manager}"
+								onClick="@command('openLanguageManagerPopUp')"
+								image="/assets/images/edit-language.png" />
+						</hlayout>
+						
+						<!-- Advanced options -->
+						<menubar sclass="transparentbackground" height="18px">
+							<menu tooltiptext="${labels.global.advanced_functions}" 
+									image="/assets/images/settings-small.png">
+								<menupopup>
+									<menuitem label="${labels.survey.validate}"
+										onClick="@command('validate')" />
+									<menuitem  label="${labels.survey.schema.export_summary.$}"
+										onClick="@global-command('exportSchemaSummary')" />
+								</menupopup>
+							</menu>
+						</menubar>
 					</hlayout>
 				</absolutechildren>
 			</absolutelayout>
@@ -129,23 +148,12 @@
 					</box>
 				</center>
 				<east border="none" size="20%">
-					<box hflex="true" align="end">
-						<hlayout>
-							<button label="${labels.survey.preview.show_preview}"
+					<hlayout hflex="1"
+							style="text-align: right;">
+						<!-- Preview -->
+						<button label="${labels.survey.preview.show_preview}"
 		    					  onClick="@command('showPreview')" />
-							<menubar>
-								<menu tooltiptext="${labels.global.advanced_functions}" 
-										image="/assets/images/settings-small.png">
-									<menupopup>
-										<menuitem label="${labels.survey.validate}"
-											onClick="@command('validate')" />
-										<menuitem  label="${labels.survey.schema.export_summary.$}"
-											onClick="@global-command('exportSchemaSummary')" />
-									</menupopup>
-								</menu>
-							</menubar>
-						</hlayout>
-					</box>
+		    		</hlayout>
 				</east>
 			</borderlayout>
 		</south>

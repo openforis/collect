@@ -228,6 +228,7 @@ button.icon {
 	display: none;
 }
 
-.fielderrorhandler {
-	
+.z-menubar-hor.transparentbackground {
+	background: transparent;
+	border-color: transparent;
 }
