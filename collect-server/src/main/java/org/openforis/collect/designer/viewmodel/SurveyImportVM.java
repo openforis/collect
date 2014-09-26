@@ -28,6 +28,7 @@ import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidation
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.commons.io.OpenForisIOUtils;
+import org.openforis.commons.versioning.Version.Significance;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
 import org.zkoss.bind.BindContext;
@@ -51,6 +52,7 @@ import org.zkoss.zul.Window;
  */
 public class SurveyImportVM extends SurveyBaseVM {
 
+	private static final Significance VERSION_SIGNIFICANCE = Significance.MINOR;
 	private static final String XML_FILE_EXTENSION = "xml";
 
 	private static final String[] ALLOWED_FILE_EXTENSIONS = ArrayUtils.addAll(
@@ -297,7 +299,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		SurveyBackupInfo info = summaryJob.getInfo();
 		
 		if ( Collect.getVersion() != null && 
-				Collect.getVersion().compareTo(info.getCollectVersion()) < 0 ) {
+				Collect.getVersion().compareTo(info.getCollectVersion(), VERSION_SIGNIFICANCE) < 0 ) {
 			MessageUtil.showError("survey.import_survey.error.outdated_system_version");
 		} else {
 			survey = summaryJob.getSurvey();

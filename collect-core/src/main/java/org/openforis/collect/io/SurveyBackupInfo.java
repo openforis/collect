@@ -17,6 +17,7 @@ import org.openforis.commons.versioning.Version;
  */
 public class SurveyBackupInfo {
 
+	private static final String TIMESTAMP_PROP = "timestamp";
 	private static final String DATE_PROP = "date";
 	private static final String COLLECT_VERSION_PROP = "collect_version";
 	private static final String SURVEY_URI_PROP = "survey_uri";
@@ -25,13 +26,13 @@ public class SurveyBackupInfo {
 	private static final Version VERSION_3_0 = new Version("3.0"); //for backwards compatibility
 	
 	private Version collectVersion;
-	private Date date;
+	private Date timestamp;
 	private String surveyUri;
 	private String surveyName;
 	
 	public SurveyBackupInfo() {
 		this.collectVersion = Collect.getVersion();
-		this.date = new Date();
+		this.timestamp = new Date();
 	}
 	
 	public void store(OutputStream os) throws IOException {
@@ -42,7 +43,7 @@ public class SurveyBackupInfo {
 	protected Properties toProperties() {
 		Properties props = new Properties();
 		props.setProperty(COLLECT_VERSION_PROP, collectVersion.toString());
-		props.setProperty(DATE_PROP, Dates.formatDateToXML(date));
+		props.setProperty(TIMESTAMP_PROP, Dates.formatDateTime(timestamp));
 		props.setProperty(SURVEY_URI_PROP, surveyUri);
 		props.setProperty(SURVEY_NAME_PROP, surveyName);
 		return props;
@@ -60,7 +61,12 @@ public class SurveyBackupInfo {
 		info.surveyUri = props.getProperty(SURVEY_URI_PROP);
 		info.surveyName = props.getProperty(SURVEY_NAME_PROP);
 		info.collectVersion = new Version(props.getProperty(COLLECT_VERSION_PROP));
-		info.date = Dates.parseXMLDate(props.getProperty(DATE_PROP));
+		String timestampString = props.getProperty(TIMESTAMP_PROP);
+		if ( timestampString == null ) {
+			info.timestamp = Dates.parseDate(props.getProperty(DATE_PROP));
+		} else {
+			info.timestamp = Dates.parseDateTime(timestampString);
+		}
 		return info;
 	}
 	
@@ -68,7 +74,7 @@ public class SurveyBackupInfo {
 		SurveyBackupInfo info = new SurveyBackupInfo();
 		info.surveyUri = surveyUri;
 		info.setCollectVersion(VERSION_3_0);
-		info.setDate(null);
+		info.setTimestamp(null);
 		return info;
 	}
 	
@@ -76,12 +82,12 @@ public class SurveyBackupInfo {
 		return VERSION_3_0.equals(collectVersion);
 	}
 	
-	public Date getDate() {
-		return date;
+	public Date getTimestamp() {
+		return timestamp;
 	}
 	
-	public void setDate(Date date) {
-		this.date = date;
+	public void setTimestamp(Date date) {
+		this.timestamp = date;
 	}
 	
 	public String getSurveyUri() {

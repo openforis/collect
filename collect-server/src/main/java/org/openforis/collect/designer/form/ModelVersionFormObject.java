@@ -22,7 +22,7 @@ public class ModelVersionFormObject extends SurveyObjectFormObject<ModelVersion>
 		name = source.getName();
 		label = source.getLabel(languageCode);
 		description = source.getDescription(languageCode);
-		date = Dates.parseXMLDateTime(source.getDate());
+		date = Dates.parseDateTime(source.getDate());
 	}
 	
 	@Override
@@ -30,7 +30,7 @@ public class ModelVersionFormObject extends SurveyObjectFormObject<ModelVersion>
 		dest.setName(name);
 		dest.setLabel(languageCode, label);
 		dest.setDescription(languageCode, description);
-		dest.setDate(Dates.formatDateToXML(date));
+		dest.setDate(Dates.formatDate(date));
 	}
 	
 	@Override

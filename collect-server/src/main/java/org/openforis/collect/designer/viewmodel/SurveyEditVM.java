@@ -361,7 +361,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if ( job instanceof SchemaSummaryCSVExportJob ) {
 			File file = ((SchemaSummaryCSVExportJob) job).getOutputFile();
 			String surveyName = survey.getName();
-			String dateStr = Dates.formatDateTimeToXML(new Date());
+			String dateStr = Dates.formatDateTime(new Date());
 			String fileName = String.format(SCHEMA_SUMMARY_FILE_NAME_PATTERN, surveyName, dateStr, "csv");
 			String contentType = URLConnection.guessContentTypeFromName(fileName);
 			try {

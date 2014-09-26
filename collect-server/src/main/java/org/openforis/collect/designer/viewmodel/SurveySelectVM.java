@@ -199,7 +199,7 @@ public class SurveySelectVM extends BaseVM {
 		File file = surveyBackupJob.getOutputFile();
 		CollectSurvey survey = surveyBackupJob.getSurvey();
 		String surveyName = survey.getName();
-		String dateStr = Dates.formatDateTimeToXML(new Date());
+		String dateStr = Dates.formatDateTime(new Date());
 		String extension = surveyBackupJob.getOutputFormat().getOutputFileExtension();
 		String fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
 		try {

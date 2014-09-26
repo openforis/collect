@@ -1,10 +1,8 @@
 package org.openforis.collect.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,58 +13,61 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Dates {
 
-	private static final String XML_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-	private static final String XML_DATE_FORMAT = "yyyy-MM-dd";
+	private static final String DATE_TIME_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss";
+	private static final String DATE_FORMAT 		= "yyyy-MM-dd";
 
-	public static Date parseXMLDateTime(String dateTime) {
-		if ( StringUtils.isNotBlank(dateTime) ) {
-			Calendar cal = DatatypeConverter.parseDateTime(dateTime);
-			Date result = cal.getTime();
-			return result;
-		} else {
+	public static Date parseDateTime(String dateTime) {
+		if ( StringUtils.isBlank(dateTime) ) {
 			return null;
 		}
+		dateTime = dateTime.trim();
+		if ( dateTime.length() == DATE_FORMAT.length() ) {
+			return parse(dateTime, DATE_FORMAT);
+		} else {
+			return parse(dateTime, DATE_TIME_FORMAT);
+		}
 	}
 	
-	public static Date parseXMLDate(String date) {
-		if ( StringUtils.isNotBlank(date) ) {
-			Calendar cal = DatatypeConverter.parseDate(date);
-			Date result = cal.getTime();
-			return result;
-		} else {
+	public static Date parseDate(String date) {
+		if ( StringUtils.isBlank(date) ) {
 			return null;
 		}
-	}
-	
-	public static String formatStringDate(String dateTimeStr, String format) {
-		String result = null;
-		if ( StringUtils.isNotBlank(dateTimeStr) ) {
-			Date dateTime = parseXMLDateTime(dateTimeStr);
-			result = formatDate(dateTime, format);
+		date = date.trim();
+		if ( date.length() > DATE_FORMAT.length() ) {
+			date = date.substring(0, DATE_FORMAT.length());
 		}
-		return result;
+		return parse(date, DATE_FORMAT);
 	}
 
-	public static String formatStringDateInXMLFormat(String dateTimeStr) {
-		return formatStringDate(dateTimeStr, XML_DATE_TIME_FORMAT);
+	private static Date parse(String dateString, String format) {
+		if ( dateString == null ) {
+			return null;
+		} else {
+			SimpleDateFormat formatter = new SimpleDateFormat(format);
+			try {
+				return formatter.parse(dateString);
+			} catch (ParseException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
-	public static String formatDate(Date dateTime, String format) {
-		if ( dateTime != null ) {
+	public static String formatDate(Date dateTime) {
+		return format(dateTime, DATE_FORMAT);
+	}
+	
+	public static String formatDateTime(Date dateTime) {
+		return format(dateTime, DATE_TIME_FORMAT);
+	}
+
+	private static String format(Date dateTime, String format) {
+		if ( dateTime == null ) {
+			return null;
+		} else {
 			SimpleDateFormat formatter = new SimpleDateFormat(format);
 			String result = formatter.format(dateTime);
 			return result;
-		} else {
-			return null;
 		}
 	}
 	
-	public static String formatDateToXML(Date dateTime) {
-		return formatDate(dateTime, XML_DATE_FORMAT);
-	}
-	
-	public static String formatDateTimeToXML(Date dateTime) {
-		return formatDate(dateTime, XML_DATE_TIME_FORMAT);
-	}
-
 }
