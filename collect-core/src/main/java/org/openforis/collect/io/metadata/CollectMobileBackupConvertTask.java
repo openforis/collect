@@ -12,6 +12,8 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.BackupFileExtractor;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyRestoreJob;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.JobManager;
@@ -28,6 +30,7 @@ public class CollectMobileBackupConvertTask extends Task {
 
 	private static final String SERVER_APPLICATION_CONTEXT_FILE_NAME = "org/openforis/collect/application-context-server.xml";
 	private static final String DATASOURCE_TEMPLATE_FILE_NAME = "org/openforis/collect/application-context-datasource-template.xml";
+	private static final String COLLECT_DB_FILE_NAME = "collect.db";
 	//input
 	private File collectBackupFile;
 	private String surveyName;
@@ -43,7 +46,6 @@ public class CollectMobileBackupConvertTask extends Task {
 	protected void initInternal() throws Throwable {
 		outputDbFile = File.createTempFile("collect_mobile_" + surveyName, ".db");
 
-		
 		//initialize application context
 		File dataSourceConfigFile = createDataSourceConfigFile();
 		
@@ -90,7 +92,6 @@ public class CollectMobileBackupConvertTask extends Task {
 		
 		if ( restoreJob.isCompleted() ) {
 			createOutpuFile();
-			
 			incrementItemsProcessed();
 		} else {
 			changeStatus(Status.FAILED);
@@ -107,9 +108,18 @@ public class CollectMobileBackupConvertTask extends Task {
 		try {
 			outputFile = File.createTempFile("collect_" + surveyName, ".zip");
 			zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
-			zipOutputStream.putNextEntry(new ZipEntry("collect.db"));
-			FileInputStream backupFileIS = new FileInputStream(outputDbFile);
-			IOUtils.copy(backupFileIS, zipOutputStream);
+
+			//include collect.db file
+			zipOutputStream.putNextEntry(new ZipEntry(COLLECT_DB_FILE_NAME));
+			FileInputStream dbFileIS = new FileInputStream(outputDbFile);
+			IOUtils.copy(dbFileIS, zipOutputStream);
+			zipOutputStream.closeEntry();
+			
+			//include info.properties file
+			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(collectBackupFile);
+			File infoFile = backupFileExtractor.extract(SurveyBackupJob.INFO_FILE_NAME);
+			zipOutputStream.putNextEntry(new ZipEntry(SurveyBackupJob.INFO_FILE_NAME));
+			IOUtils.copy(new FileInputStream(infoFile), zipOutputStream);
 			zipOutputStream.closeEntry();
 		} finally {
 			IOUtils.closeQuietly(zipOutputStream);

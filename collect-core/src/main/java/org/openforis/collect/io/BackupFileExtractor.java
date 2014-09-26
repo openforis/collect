@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
@@ -21,6 +22,10 @@ public class BackupFileExtractor {
 
 	private ZipFile zipFile;
 
+	public BackupFileExtractor(File file) throws ZipException, IOException {
+		this(new ZipFile(file));
+	}
+	
 	public BackupFileExtractor(ZipFile zipFile) {
 		this.zipFile = zipFile;
 	}
