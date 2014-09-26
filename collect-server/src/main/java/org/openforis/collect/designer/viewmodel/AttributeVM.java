@@ -218,9 +218,22 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@Command
 	@NotifyChange("attributeDefaults")
 	public void addAttributeDefault() {
-		editingNewAttributeDefault = true;
-		editedAttributeDefault = new AttributeDefault();
-		openAttributeDefaultEditPopUp();
+		if ( checkCanInsertAttributeDefault() ) {
+			editingNewAttributeDefault = true;
+			editedAttributeDefault = new AttributeDefault();
+			openAttributeDefaultEditPopUp();
+		}
+	}
+
+	protected boolean checkCanInsertAttributeDefault() {
+		if ( attributeDefaults != null && ! attributeDefaults.isEmpty() ) {
+			String lastItemCondition = attributeDefaults.get(attributeDefaults.size() - 1).getCondition(); 
+			if ( StringUtils.isBlank(lastItemCondition) || lastItemCondition.trim().equalsIgnoreCase("true()") ) {
+				MessageUtil.showWarning("survey.schema.attribute.attribute_default.cannot_insert.item_without_condition_found");
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	@Command
