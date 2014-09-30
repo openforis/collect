@@ -60,7 +60,7 @@ check_for_updates = 1</text>
 			<showMessageOnError>0</showMessageOnError>
         </copyFile>
         <copyFile>
-			<origin>../tomcat/conf/Catallina/localhost/collect.xml</origin>
+			<origin>../tomcat/conf/Catalina/localhost/collect.xml</origin>
 			<destination>../backup/${timestamp}/collect.xml</destination>
 			<abortOnError>0</abortOnError>
 			<showMessageOnError>0</showMessageOnError>

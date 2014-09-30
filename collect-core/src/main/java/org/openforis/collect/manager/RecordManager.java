@@ -178,8 +178,6 @@ public class RecordManager {
 			}
 			throw new RecordNotOwnedException(record.getOwner().getName());
 		}
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.addEmptyNodes(record);
 		validate(record);
 		return record;
 	}
@@ -213,9 +211,10 @@ public class RecordManager {
 			}
 		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
+		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
 		recordUpdater.addEmptyNodes(record);
-		recordConverter.convertToLatestVersion(record);
+		recordUpdater.evaluateCalculatedAttributes(record);
 		return record;
 	}
 	
