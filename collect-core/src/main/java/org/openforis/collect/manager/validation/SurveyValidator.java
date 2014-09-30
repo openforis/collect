@@ -285,6 +285,7 @@ public class SurveyValidator {
 		//validate required expression
 		addBooleanExpressionValidationResult(results, node, node.getRequiredExpression(), 
 				"survey.validation.node.error.invalid_required_expression");
+		
 		//validate required expression
 		addBooleanExpressionValidationResult(results, node, node.getRelevantExpression(), 
 				"survey.validation.node.error.invalid_relevant_expression");
@@ -364,7 +365,9 @@ public class SurveyValidator {
 	private void addBooleanExpressionValidationResult(
 			List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
-		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateBooleanExpression(node, expression) ) {
+		if ( StringUtils.isNotBlank(expression) && 
+				! expressionValidator.validateBooleanExpression(node, expression) &&
+				! expressionValidator.validateCircularReferenceAbsence(node, expression)) {
 			results.add(new SurveyValidationResult(node.getPath(), messageKey));
 		}
 	}
@@ -372,7 +375,9 @@ public class SurveyValidator {
 	private void addValueExpressionValidationResult(
 			List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
-		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateValueExpression(node, expression) ) {
+		if ( StringUtils.isNotBlank(expression) && 
+				! expressionValidator.validateValueExpression(node, expression) &&
+				! expressionValidator.validateCircularReferenceAbsence(node, expression)) {
 			results.add(new SurveyValidationResult(node.getPath(), messageKey));
 		}
 	}
@@ -380,7 +385,9 @@ public class SurveyValidator {
 	private void addSchemaPathExpressionValidationResult(
 			List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
-		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateSchemaPathExpression(node, expression) ) {
+		if ( StringUtils.isNotBlank(expression) && 
+				! expressionValidator.validateSchemaPathExpression(node, expression) &&
+				! expressionValidator.validateCircularReferenceAbsence(node, expression)) {
 			results.add(new SurveyValidationResult(node.getPath(), messageKey));
 		}
 	}

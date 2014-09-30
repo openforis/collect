@@ -98,11 +98,6 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 	
 	@GlobalCommand
-	public void schemaChanged() {
-		notifyChange("rootEntities");
-	}
-	
-	@GlobalCommand
 	public void versionsUpdated() {
 		notifyChange("formVersions","formVersionsWithEmptyOption","formVersionIdsWithEmptyOption");
 	}
@@ -287,6 +282,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	@GlobalCommand
 	public void surveyChanged() {
 		notifyChange("surveyChanged");
+		notifyChange("rootEntities");
 	}
 
 	@GlobalCommand

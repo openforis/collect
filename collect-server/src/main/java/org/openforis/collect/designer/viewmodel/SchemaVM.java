@@ -86,7 +86,6 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private static final String NODE_TYPES_IMAGES_PATH = "/assets/images/node_types/";
 
-	private static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	private static final String VALIDATE_COMMAND = "validate";
 	private static final String APPLY_CHANGES_COMMAND = "applyChanges";
 	
@@ -690,7 +689,7 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 		treeModel.moveSelectedNode(newIndexInTree);
 		notifyChange("treeModel","moveNodeUpDisabled","moveNodeDownDisabled");
-		dispatchSchemaChangedCommand();
+		dispatchSurveyChangedCommand();
 	}
 	
 	protected void performRemoveSelectedTreeNode() {
@@ -721,9 +720,10 @@ public class SchemaVM extends SurveyBaseVM {
 			}
 			parentDefn.removeChildDefinition(nodeDefn);
 		}
+		survey.refreshSurveyDependencies();
 		resetEditingStatus();
 		dispatchCurrentFormValidatedCommand(true);
-		dispatchSchemaChangedCommand();
+		dispatchSurveyChangedCommand();
 	}
 
 	@GlobalCommand
@@ -749,7 +749,6 @@ public class SchemaVM extends SurveyBaseVM {
 			//to be called when not notifying changes on treeModel
 			refreshSelectedTreeNode(view);
 		}
-		dispatchSchemaChangedCommand();
 	}
 
 	private void updateRootTabLabel(Component view, EntityDefinition rootEntity) {
@@ -792,10 +791,6 @@ public class SchemaVM extends SurveyBaseVM {
 		Schema schema = survey.getSchema();
 		EntityDefinition newNode = schema.createEntityDefinition();
 		return newNode;
-	}
-	
-	protected void dispatchSchemaChangedCommand() {
-		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
 	}
 	
 	public SchemaTreeModel getTreeModel() {
@@ -1173,7 +1168,7 @@ public class SchemaVM extends SurveyBaseVM {
 		
 		refreshTreeModel();
 		
-		dispatchSchemaChangedCommand();
+		dispatchSurveyChangedCommand();
 	}
 	
 	@Command

@@ -160,28 +160,22 @@
       		</div>
       	</caption>
       	
-      	<box height="150px">
-	      	<box visible="@load(vm.surveyChanged)" pack="center" vflex="true">
-		      	<label value="${labels.survey.schema.node.dependent_paths_not_available}" />
-	      	</box>
-	
-			<listbox id="nodeReferencesListbox" visible="@load(not vm.surveyChanged)"
-				vflex="true"
-			    model="@load(vm.dependentNodes)">
-			    <listhead>
-			      <listheader label="${labels.survey.schema.node.dependent_node.type.$}" width="200px" 
-			        sort="auto(type)" />
-			      <listheader label="${labels.survey.schema.node.dependent_node.path}" width="300px" 
-			        sort="auto(path)" />
-			    </listhead>
-			    <template name="model">
-			      <listitem>
-			        <listcell label="${c:l('survey.schema.node.dependent_node.type.'.concat(each.type))}" />
-			        <listcell label="@load(each.path)" />
-			      </listitem>
-			    </template>
-			  </listbox>
-      	</box>
+		<listbox id="dependentNodeListbox"
+			vflex="true" rows="4"
+		    model="@load(vm.dependentNodes)">
+		    <listhead>
+		      <listheader label="${labels.survey.schema.node.dependent_node.type.$}" width="200px" 
+		        sort="auto(type)" />
+		      <listheader label="${labels.survey.schema.node.dependent_node.path}" width="300px" 
+		        sort="auto(path)" />
+		    </listhead>
+		    <template name="model">
+		      <listitem>
+		        <listcell label="${c:l('survey.schema.node.dependent_node.type.'.concat(each.type))}" />
+		        <listcell label="@load(each.path)" />
+		      </listitem>
+		    </template>
+		</listbox>
       </groupbox>
   	
   	
