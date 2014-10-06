@@ -10,14 +10,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
-import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.RecordUpdater;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -49,28 +48,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	
 	@Autowired
-	private RecordManager recordManager;
+	private RecordUpdater recordUpdater;
 	
 	@Test
 	public void testAddMultipleEntity() throws Exception {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
-		NodeChangeSet changeSet = recordManager.addEntity(cluster, "plot");
+		NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "plot");
 		assertNotNull(changeSet);
 		assertEquals(2, changeSet.size());
-		List<NodeChange<?>> changes = changeSet.getChanges();
-		Iterator<NodeChange<?>> respIt = changes.iterator();
+		assertEquals(1, cluster.getCount("plot"));
 		{
-			NodeChange<?> plotUpdateChange = respIt.next();
+			Entity plot = (Entity) cluster.get("plot", 0);
+			NodeChange<?> plotUpdateChange = changeSet.getChange(plot);
 			assertTrue(plotUpdateChange instanceof NodeAddChange);
 			assertTrue(plotUpdateChange instanceof EntityAddChange);
-			Entity plot = ((EntityAddChange) plotUpdateChange).getNode();
-			assertNotNull(plot);
-			assertEquals("plot", plot.getName());
 		}
 		{
-			NodeChange<?> clusterChange = respIt.next();
+			NodeChange<?> clusterChange = changeSet.getChange(cluster);
 			assertTrue(clusterChange instanceof EntityChange);
 			EntityChange clusterEntityChange = (EntityChange) clusterChange;
 			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
@@ -88,20 +84,17 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
 		{
-			NodeChangeSet changeSet = recordManager.addEntity(cluster, "time_study");
-			List<NodeChange<?>> changes = changeSet.getChanges();
-			assertEquals(2, changes.size());
-			Iterator<NodeChange<?>> respIt = changes.iterator();
+			NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "time_study");
+			assertEquals(2, changeSet.size());
+			assertEquals(1, cluster.getCount("time_study"));
 			{
-				NodeChange<?> timeStudyChange = respIt.next();
+				Entity timeStudy = (Entity) cluster.get("time_study", 0);
+				NodeChange<?> timeStudyChange = changeSet.getChange(timeStudy); 
 				assertTrue(timeStudyChange instanceof NodeAddChange);
 				assertTrue(timeStudyChange instanceof EntityAddChange);
-				Entity timeStudy = ((EntityAddChange) timeStudyChange).getNode();
-				assertNotNull(timeStudy);
-				assertEquals("time_study", timeStudy.getName());
 			}
 			{
-				NodeChange<?> clusterChange = respIt.next();
+				NodeChange<?> clusterChange = changeSet.getChange(cluster);
 				assertTrue(clusterChange instanceof EntityChange);
 				EntityChange clusterEntityChange = (EntityChange) clusterChange;
 				Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
@@ -113,10 +106,9 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			}
 		}
 		{
-			NodeChangeSet changeSet = recordManager.addEntity(cluster, "time_study");
-			List<NodeChange<?>> changes = changeSet.getChanges();
-			assertEquals(2, changes.size());
-			NodeChange<?> clusterChange = changes.get(1);
+			NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "time_study");
+			assertEquals(2, changeSet.size());
+			NodeChange<?> clusterChange = changeSet.getChange(cluster);
 			EntityChange clusterEntityChange = (EntityChange) clusterChange;
 			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
 			ValidationResultFlag plotMinCountValid = childrenMinCountValid.get("time_study");
@@ -133,17 +125,16 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
 		Entity timeStudy = (Entity) cluster.get("time_study", 0);
-		NodeChangeSet changeSet = recordManager.deleteNode(timeStudy);
-		List<NodeChange<?>> changes = changeSet.getChanges();
-		assertEquals(2, changes.size());
+		NodeChangeSet changeSet = recordUpdater.deleteNode(timeStudy);
+		assertEquals(2, changeSet.size());
 		{
-			NodeChange<?> timeStudyDeleteChange = changes.get(0);
+			NodeChange<?> timeStudyDeleteChange = changeSet.getChange(timeStudy);
 			assertTrue(timeStudyDeleteChange instanceof NodeDeleteChange);
 			Node<?> deletedNode = timeStudyDeleteChange.getNode();
 			assertEquals(timeStudy.getInternalId(), deletedNode.getInternalId());
 		}
 		{
-			NodeChange<?> clusterChange = changes.get(1);
+			NodeChange<?> clusterChange = changeSet.getChange(cluster);
 			assertTrue(clusterChange instanceof EntityChange);
 			EntityChange clusterEntityChange = (EntityChange) clusterChange;
 			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
@@ -166,11 +157,10 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Entity timeStudy = (Entity) cluster.get("time_study", 0);
 		{
 			//delete node (min count error expected)
-			NodeChangeSet changeSet = recordManager.deleteNode(timeStudy);
-			List<NodeChange<?>> changes = changeSet.getChanges();
+			NodeChangeSet changeSet = recordUpdater.deleteNode(timeStudy);
 			int missingCount2 = cluster.getMissingCount("time_study");
 			assertEquals(1, missingCount2);
-			NodeChange<?> clusterChange = changes.get(1);
+			NodeChange<?> clusterChange = changeSet.getChange(cluster);
 			assertTrue(clusterChange instanceof EntityChange);
 			EntityChange clusterEntityChange = (EntityChange) clusterChange;
 			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
@@ -179,9 +169,8 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		}
 		{
 			//approve missing value (min count warning expected)
-			NodeChangeSet changeSet = recordManager.approveMissingValue(cluster, "time_study");
-			List<NodeChange<?>> changes = changeSet.getChanges();
-			NodeChange<?> clusterChange = changes.get(0);
+			NodeChangeSet changeSet = recordUpdater.approveMissingValue(cluster, "time_study");
+			NodeChange<?> clusterChange = changeSet.getChange(cluster);
 			assertTrue(clusterChange instanceof EntityChange);
 			assertEquals(cluster, clusterChange.getNode());
 			EntityChange clusterEntityChange = (EntityChange) clusterChange;
@@ -198,12 +187,12 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Entity cluster = record.getRootEntity();
 		CodeAttribute region = (CodeAttribute) cluster.get("region", 0);
 		{
-			NodeChangeSet nodeChangeSet = recordManager.updateAttribute(region, FieldSymbol.BLANK_ON_FORM);
+			NodeChangeSet nodeChangeSet = recordUpdater.updateAttribute(region, FieldSymbol.BLANK_ON_FORM);
 			assertTrue(region.isEmpty());
 			assertEquals(FieldSymbol.BLANK_ON_FORM, FieldSymbol.valueOf(region.getCodeField().getSymbol()));
 			assertEquals(FieldSymbol.BLANK_ON_FORM, FieldSymbol.valueOf(region.getQualifierField().getSymbol()));
 
-			NodeChange<?> regionChange = nodeChangeSet.getChanges().get(0);
+			NodeChange<?> regionChange = nodeChangeSet.getChange(region);
 			assertTrue(regionChange instanceof AttributeChange);
 			assertEquals(region, regionChange.getNode());
 			Map<Integer, Object> updatedFieldValues = ((AttributeChange) regionChange).getUpdatedFieldValues();
@@ -213,12 +202,12 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			assertEquals(expectedValues, updatedFieldValues);
 		}
 		{
-			NodeChangeSet nodeChangeSet = recordManager.updateAttribute(region, new Code("AAA"));
+			NodeChangeSet nodeChangeSet = recordUpdater.updateAttribute(region, new Code("AAA"));
 			assertFalse(region.isEmpty());
 			assertEquals(null, FieldSymbol.valueOf(region.getCodeField().getSymbol()));
 			assertEquals(null, FieldSymbol.valueOf(region.getQualifierField().getSymbol()));
 
-			NodeChange<?> regionChange = nodeChangeSet.getChanges().get(0);
+			NodeChange<?> regionChange = nodeChangeSet.getChange(region);
 			assertTrue(regionChange instanceof AttributeChange);
 			assertEquals(region, regionChange.getNode());
 			Map<Integer, Object> updatedFieldValues = ((AttributeChange) regionChange).getUpdatedFieldValues();
@@ -237,10 +226,9 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CodeAttribute region = (CodeAttribute) cluster.get("region", 0);
 		//add wrong value
 		{
-			NodeChangeSet changeSet = recordManager.updateAttribute(region, new Code("ZZZ"));
+			NodeChangeSet changeSet = recordUpdater.updateAttribute(region, new Code("ZZZ"));
 			assertFalse(changeSet.isEmpty());
-			List<NodeChange<?>> changes = changeSet.getChanges();
-			NodeChange<?> regionChange = changes.get(0);
+			NodeChange<?> regionChange = changeSet.getChange(region);
 			assertTrue(regionChange instanceof AttributeChange);
 			ValidationResults validationResults = ((AttributeChange) regionChange).getValidationResults();
 			List<ValidationResult> errors = validationResults.getErrors();
@@ -249,10 +237,9 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			assertTrue(warnings.isEmpty());
 		}
 		{
-			NodeChangeSet changeSet = recordManager.confirmError(region);
+			NodeChangeSet changeSet = recordUpdater.confirmError(region);
 			assertFalse(changeSet.isEmpty());
-			List<NodeChange<?>> changes = changeSet.getChanges();
-			NodeChange<?> regionChange = changes.get(0);
+			NodeChange<?> regionChange = changeSet.getChange(region);
 			assertTrue(regionChange instanceof AttributeChange);
 			ValidationResults validationResults = ((AttributeChange) regionChange).getValidationResults();
 			List<ValidationResult> errors = validationResults.getErrors();
@@ -265,7 +252,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void testMultipleCodeListLevelValidation() {
 		CollectRecord record = createTestMultipleCodeListLevelRecord();
-		recordManager.validate(record);
+		recordUpdater.validate(record);
 		assertEquals(Integer.valueOf(0), record.getErrors());
 		assertEquals(Integer.valueOf(0), record.getWarnings());
 		
@@ -275,7 +262,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CodeAttribute code2 = (CodeAttribute) rootEntity.get("code2", 0);
 		CodeAttribute code3 = (CodeAttribute) rootEntity.get("code3", 0);
 		
-		recordManager.updateAttribute(code1, new Code("WRONG"));
+		recordUpdater.updateAttribute(code1, new Code("WRONG"));
 		
 		assertEquals(Integer.valueOf(1), record.getErrors());
 		assertEquals(Integer.valueOf(2), record.getWarnings());
@@ -284,12 +271,12 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		checkHasWarning(record, code2.getInternalId(), CodeParentValidator.class);
 		checkHasWarning(record, code3.getInternalId(), CodeParentValidator.class);
 		
-		recordManager.updateAttribute(code1, new Code("A"));
+		recordUpdater.updateAttribute(code1, new Code("A"));
 		
 		assertEquals(Integer.valueOf(0), record.getErrors());
 		assertEquals(Integer.valueOf(0), record.getWarnings());
 		
-		recordManager.updateAttribute(code2, new Code("WRONG"));
+		recordUpdater.updateAttribute(code2, new Code("WRONG"));
 		
 		assertEquals(Integer.valueOf(1), record.getErrors());
 		assertEquals(Integer.valueOf(1), record.getWarnings());

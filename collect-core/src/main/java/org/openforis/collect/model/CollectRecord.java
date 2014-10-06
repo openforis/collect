@@ -143,25 +143,31 @@ public class CollectRecord extends Record {
 		errors = null;
 		warnings = null;
 		this.validationCache = new RecordValidationCache(this);
-		Entity rootEntity = getRootEntity();
-		if ( rootEntity != null ) {
-			rootEntity.traverse( new NodeVisitor() {
-				@Override
-				public void visit(Node<? extends NodeDefinition> node, int idx) {
-					if ( node instanceof Attribute ) {
-						((Attribute<?, ?>) node).clearValidationResults();
-					}
-				} 
-			});
-		}
+//		Entity rootEntity = getRootEntity();
+//		if ( rootEntity != null ) {
+//			rootEntity.traverse( new NodeVisitor() {
+//				@Override
+//				public void visit(Node<? extends NodeDefinition> node, int idx) {
+//					if ( node instanceof Attribute ) {
+//						((Attribute<?, ?>) node).clearValidationResults();
+//					}
+//				} 
+//			});
+//		}
 	}
 	
 	@Override
-	public void setRootEntity(Entity entity) {
-		super.setRootEntity(entity);
+	public void replaceRootEntity(Entity rootEntity) {
+		super.replaceRootEntity(rootEntity);
 		resetValidationInfo();
 	}
-
+	
+	@Override
+	protected void remove(Node<?> node) {
+		super.remove(node);
+		removeValidationCache(node);
+	}
+	
 	public Step getStep() {
 		return step;
 	}
@@ -330,34 +336,6 @@ public class CollectRecord extends Record {
 				}
 			}
 			rootEntityKeyValues = values;
-			/*
-			rootEntityKeyValues = new ArrayList<String>();
-			EntityDefinition rootEntityDefn = rootEntity.getDefinition();
-			List<AttributeDefinition> keyDefns = rootEntityDefn.getKeyAttributeDefinitions();
-			for (AttributeDefinition keyDefn : keyDefns) {
-				String keyValue = null;
-				Node<?> keyNode = rootEntity.get(keyDefn.getName(), 0);
-				if(keyNode instanceof CodeAttribute) {
-					Code code = ((CodeAttribute) keyNode).getValue();
-					if(code != null) {
-						keyValue = code.getCode();
-					}
-				} else if(keyNode instanceof TextAttribute) {
-					keyValue = ((TextAttribute) keyNode).getText();
-				} else if(keyNode instanceof NumberAttribute<?,?>) {
-					Number obj = ((NumberAttribute<?,?>) keyNode).getNumber();
-					if(obj != null) {
-						keyValue = obj.toString();
-					}
-				}
-				if(StringUtils.isNotEmpty(keyValue)){
-					rootEntityKeyValues.add(keyValue);
-				} else {
-					//todo throw error in this case?
-					rootEntityKeyValues.add(null);
-				}
-			}
-			*/
 		}
 	}
 
@@ -470,10 +448,14 @@ public class CollectRecord extends Record {
 		errors = null;
 		warnings = null;
 	}
-	
-	
-	public void removeValidationCache(Integer nodeId) {
+
+	protected void removeValidationCache(int nodeId) {
 		Node<?> node = this.getNodeByInternalId(nodeId);
+		removeValidationCache(node);
+	}
+	
+	
+	private void removeValidationCache(Node<?> node) {
 		validationCache.remove(node);
 		skipped = null;
 		missing = null;

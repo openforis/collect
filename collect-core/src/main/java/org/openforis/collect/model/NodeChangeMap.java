@@ -3,14 +3,19 @@
  */
 package org.openforis.collect.model;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.openforis.idm.metamodel.validation.ValidationResultFlag;
+import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.NodePointer;
 
 /**
  * Map of NodeChange objects.
@@ -18,7 +23,7 @@ import org.openforis.idm.model.Node;
  * @author S. Ricci
  *
  */
-public class NodeChangeMap {
+public class NodeChangeMap implements NodeChangeSet {
 	
 	private Map<Integer, NodeChange<?>> nodeIdToChange;
 	
@@ -26,12 +31,31 @@ public class NodeChangeMap {
 		nodeIdToChange = new LinkedHashMap<Integer, NodeChange<?>>();
 	}
 	
+	@Override
 	public int size() {
 		return nodeIdToChange.size();
 	}
 	
+	@Override
 	public boolean isEmpty() {
 		return nodeIdToChange.isEmpty();
+	}
+	
+	@Override
+	public Set<NodeChange<?>> getChanges() {
+		return new HashSet<NodeChange<?>>(nodeIdToChange.values());
+	}
+	
+	@Override
+	public NodeChange<?> getChange(Node<?> node) {
+		Integer nodeId = node.getInternalId();
+		return getChange(nodeId);
+	}
+
+	@Override
+	public NodeChange<?> getChange(int nodeId) {
+		NodeChange<?> c = nodeIdToChange.get(nodeId);
+		return c;
 	}
 	
 	/**
@@ -116,20 +140,6 @@ public class NodeChangeMap {
 		}
 	}
 	
-	public List<NodeChange<?>> getChanges() {
-		return new ArrayList<NodeChange<?>>(nodeIdToChange.values());
-	}
-
-	public NodeChange<?> getChange(Node<?> node) {
-		Integer nodeId = node.getInternalId();
-		return getChange(nodeId);
-	}
-
-	protected NodeChange<?> getChange(Integer nodeId) {
-		NodeChange<?> c = nodeIdToChange.get(nodeId);
-		return c;
-	}
-	
 	/**
 	 * Puts a change into the internal cache.
 	 * If a change associated to the node already exists and it is not a NodeDeleteChange,
@@ -152,6 +162,60 @@ public class NodeChangeMap {
 				nodeIdToChange.put(nodeId, change);
 			}
 		}
+	}
+
+	public void addValueChange(Attribute<?, ?> attribute) {
+		AttributeChange change = prepareAttributeChange(attribute);
+		
+		Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
+		int fieldCount = attribute.getFieldCount();
+		for (int idx = 0; idx < fieldCount; idx ++) {
+			Field<?> field = attribute.getField(idx);
+			fieldValues.put(idx, field.getValue());
+		}
+		
+		change.setUpdatedFieldValues(fieldValues);
+	}
+
+	public void addValueChanges(Set<Attribute<?, ?>> updatedCalculatedAttributes) {
+		for (Attribute<?, ?> updatedAttribute : updatedCalculatedAttributes) {
+			addValueChange(updatedAttribute);
+		}
+	}
+
+	public void addRelevanceChanges(Set<NodePointer> pointers) {
+		for (NodePointer nodePointer : pointers) {
+			EntityChange change = prepareEntityChange(nodePointer.getEntity());
+			change.setChildrenRelevance(nodePointer.getChildName(), nodePointer.areNodesRelevant());
+		}
+	}
+
+	public void addRequirenessChanges(Set<NodePointer> pointers) {
+		for (NodePointer nodePointer : pointers) {
+			EntityChange change = prepareEntityChange(nodePointer.getEntity());
+			change.setChildrenRequireness(nodePointer.getChildName(), nodePointer.areNodesRequired());
+		}
+	}
+
+	public void addMinCountValidationResultChange(NodePointer nodePointer, ValidationResultFlag minCountResult) {
+		EntityChange change = prepareEntityChange(nodePointer.getEntity());
+		change.setChildrenMinCountValidation(nodePointer.getChildName(), minCountResult);
+	}
+
+	public void addMaxCountValidationResultChange(NodePointer nodePointer, ValidationResultFlag maxCountResult) {
+		EntityChange change = prepareEntityChange(nodePointer.getEntity());
+		change.setChildrenMaxCountValidation(nodePointer.getChildName(), maxCountResult);
+		
+	}
+
+	public void addValidationResultChange(Attribute<?, ?> attribute, ValidationResults validationResults) {
+		AttributeChange change = prepareAttributeChange(attribute);
+		change.setValidationResults(validationResults);
+	}
+	
+	@Override
+	public String toString() {
+		return "Node change map for these nodes: " + nodeIdToChange.toString();
 	}
 	
 }

@@ -214,7 +214,10 @@ public class RecordManager {
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
 		recordUpdater.addEmptyNodes(record);
-		recordUpdater.evaluateCalculatedAttributes(record);
+		
+		//TODO recalculate attribute, validate all
+		
+//		recordUpdater.evaluateCalculatedAttributes(record);
 		return record;
 	}
 	
@@ -512,31 +515,7 @@ public class RecordManager {
 	 * @return 
 	 */
 	public void validate(final CollectRecord record) {
-		record.resetValidationInfo();
-		Entity rootEntity = record.getRootEntity();
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.addEmptyNodes(rootEntity);
-		rootEntity.traverse(new NodeVisitor() {
-			@Override
-			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				if ( node instanceof Attribute ) {
-					Attribute<?,?> attribute = (Attribute<?, ?>) node;
-					attribute.validateValue();
-				} else if ( node instanceof Entity ) {
-					Entity entity = (Entity) node;
-					ModelVersion version = record.getVersion();
-					EntityDefinition definition = entity.getDefinition();
-					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
-					for (NodeDefinition childDefinition : childDefinitions) {
-						if ( version == null || version.isApplicable(childDefinition) ) {
-							String childName = childDefinition.getName();
-							entity.validateMaxCount(childName);
-							entity.validateMinCount(childName);
-						}
-					}
-				}
-			}
-		});
+		updater.validate(record);
 	}
 
 	/**

@@ -22,6 +22,13 @@ public abstract class NodeChange<T extends Node<?>> {
 	}
 
 	@Override
+	public String toString() {
+		return String.format("%s for node %s", 
+				this.getClass().getSimpleName(), 
+				node.getPath());
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.CodeListManager;
@@ -227,12 +228,12 @@ public class DataService {
 		NodeChangeMap result = new NodeChangeMap();
 		for (NodeUpdateRequest req : opts) {
 			NodeChangeSet partialChangeSet = updateRecord(record, req);
-			List<NodeChange<?>> changes = partialChangeSet.getChanges();
+			Set<NodeChange<?>> changes = partialChangeSet.getChanges();
 			for (NodeChange<?> change : changes) {
 				result.addOrMergeChange(change);
 			}
 		}
-		return new NodeChangeSet(result.getChanges());
+		return result;
 	}
 	
 	@SuppressWarnings("unchecked")

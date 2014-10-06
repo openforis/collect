@@ -46,6 +46,14 @@ public class AttributeChange extends NodeChange<Attribute<?, ?>> {
 			ValidationResults validationResults) {
 		this.validationResults = validationResults;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("%s\tUpdated fields: %s\tValidation result: %s", 
+				super.toString(), 
+				updatedFieldValues.toString(), 
+				validationResults.toString());
+	}
 
 	@Override
 	public int hashCode() {
