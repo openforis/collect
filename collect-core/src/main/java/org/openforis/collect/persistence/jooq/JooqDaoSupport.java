@@ -6,11 +6,15 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jooq.DSLContext;
+import org.jooq.impl.DefaultDSLContext;
+import org.jooq.impl.DialectAwareJooqConfiguration;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 /**
  * @author G. Miceli
  * @author M. Togna
+ * @author S. Ricci
  */
 public abstract class JooqDaoSupport extends JdbcDaoSupport {
 	private final Log log = LogFactory.getLog(getClass());
@@ -19,9 +23,9 @@ public abstract class JooqDaoSupport extends JdbcDaoSupport {
 		return log;
 	}
 	
-	protected DialectAwareJooqFactory getJooqFactory() {
+	protected DSLContext dsl() {
 		Connection connection = getConnection();
-		return new DialectAwareJooqFactory(connection);
+		return new DefaultDSLContext(new DialectAwareJooqConfiguration(connection));
 	}
 
 	// TODO Move to MappingJooqFactory

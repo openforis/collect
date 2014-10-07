@@ -10,12 +10,13 @@ import org.jooq.Sequence;
 import org.jooq.TableField;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.conf.Settings;
+import org.jooq.impl.DSL;
 import org.jooq.impl.Factory;
 
 /**
  * @author G. Miceli
  */
-public class DialectAwareJooqFactory extends Factory {
+public class DialectAwareJooqFactory extends DSL {
 	
 	private static final long serialVersionUID = 1L;
 

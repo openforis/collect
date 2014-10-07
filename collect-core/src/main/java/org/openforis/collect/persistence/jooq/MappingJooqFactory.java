@@ -16,11 +16,12 @@ import org.jooq.TableField;
 import org.jooq.UpdatableTable;
 import org.jooq.UpdateQuery;
 import org.jooq.impl.Factory;
+import org.jooq.impl.TableImpl;
 
 /**
  * @author G. Miceli
  */
-public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
+public abstract class MappingJooqFactory<E> extends DialectAware {
 	private static final long serialVersionUID = 1L;
 	
 	private TableField<?,Integer> idField;
@@ -42,8 +43,8 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 	
 	protected abstract void fromObject(E object, StoreQuery<?> q);
 
-	public SimpleSelectQuery<?> selectByIdQuery(int id) {
-		SimpleSelectQuery<?> select = selectQuery(getTable());
+	public SelectQuery<?> selectByIdQuery(int id) {
+		SelectQuery<?> select = selectQuery(getTable());
 		select.addConditions(idField.equal(id));
 		return select;
 	}
@@ -95,8 +96,8 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 		return idSequence;
 	}
 	
-	public UpdatableTable<?> getTable() {
-		return (UpdatableTable<?>) idField.getTable();
+	public TableImpl<?> getTable() {
+		return (TableImpl<?>) idField.getTable();
 	}
 	
 	@SuppressWarnings({"rawtypes"})
@@ -121,7 +122,6 @@ public abstract class MappingJooqFactory<E> extends DialectAwareJooqFactory {
 	
 	@SuppressWarnings({"rawtypes"})
 	public UpdateQuery updateQuery(E object) {
-		
 		UpdateQuery update = updateQuery(getTable());
 		fromObject(object, update);
 		Integer id = getId(object);
