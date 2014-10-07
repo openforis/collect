@@ -16,7 +16,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
-import org.openforis.collect.manager.RecordUpdater;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;

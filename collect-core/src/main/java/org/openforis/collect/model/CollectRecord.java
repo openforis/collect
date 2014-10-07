@@ -326,7 +326,7 @@ public class CollectRecord extends Record {
 			List<String> values = new ArrayList<String>();
 			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getDefinition().getKeyAttributeDefinitions();
 			for (AttributeDefinition keyDefn : keyAttributeDefinitions) {
-				Node<?> keyNode = this.getNodeByPath(keyDefn.getPath());
+				Node<?> keyNode = this.findNodeByPath(keyDefn.getPath());
 				if ( keyNode == null || keyNode.isEmpty() ) {
 					//TODO throw error in this case?
 					values.add(null);
@@ -513,5 +513,5 @@ public class CollectRecord extends Record {
 			return false;
 		return true;
 	}
-	
+
 }

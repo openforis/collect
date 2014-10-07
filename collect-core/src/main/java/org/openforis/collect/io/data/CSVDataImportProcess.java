@@ -281,7 +281,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefn.getKeyAttributeDefinitions();
 		for ( int i = 0; i < keyAttributeDefinitions.size(); i ++ ) {
 			AttributeDefinition keyDefn = keyAttributeDefinitions.get(i);
-			Attribute<?, ?> keyAttr = (Attribute<?, ?>) record.getNodeByPath(keyDefn.getPath() ); //for record key attributes, absolute path must be equal to relative path
+			Attribute<?, ?> keyAttr = (Attribute<?, ?>) record.findNodeByPath(keyDefn.getPath() ); //for record key attributes, absolute path must be equal to relative path
 			setValueInField(keyAttr, keyDefn.getMainFieldName(), recordKeyValues[i], line.getLineNumber(), null);
 		}
 	}

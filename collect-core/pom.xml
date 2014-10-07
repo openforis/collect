@@ -273,6 +273,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.idm</groupId>
+			<artifactId>idm-api</artifactId>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.openforis.idm</groupId>
 			<artifactId>idm-api-protostuff</artifactId>
 		</dependency>
 		<dependency>
@@ -384,6 +390,7 @@
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.7.2</version>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
+		
 	</dependencies>
 </project>

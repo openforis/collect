@@ -109,7 +109,7 @@ public class NodeChangeMap implements NodeChangeSet {
 	 * @param entity
 	 * @return
 	 */
-	public NodeChange<?> prepareAddEntityChange(Entity entity) {
+	public NodeChange<?> addEntityAddChange(Entity entity) {
 		Integer nodeId = entity.getInternalId();
 		NodeChange<?> c = getChange(entity);
 		if ( c == null ) {
@@ -128,11 +128,11 @@ public class NodeChangeMap implements NodeChangeSet {
 	 * @param attribute
 	 * @return
 	 */
-	public NodeChange<?> prepareAddAttributeChange(Attribute<?, ?> node) {
-		Integer nodeId = node.getInternalId();
-		NodeChange<?> c = getChange(node);
+	public NodeChange<?> addAttributeAddChange(Attribute<?, ?> attribute) {
+		Integer nodeId = attribute.getInternalId();
+		NodeChange<?> c = getChange(attribute);
 		if ( c == null ) {
-			c = new AttributeAddChange(node);
+			c = new AttributeAddChange(attribute);
 			nodeIdToChange.put(nodeId, c);
 			return c;
 		} else {
