@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -187,10 +186,10 @@ public class RecordUpdater {
 
 	public NodeChangeSet approveMissingValue(Entity parentEntity, String nodeName) {
 		setMissingValueApproved(parentEntity, nodeName, true);
-		List<NodePointer> cardinalityNodePointers = createAncestorNodeDependencies(parentEntity);
-		cardinalityNodePointers.add(new NodePointer(parentEntity, nodeName));
+		Set<NodePointer> cardinalityPointers = getAncestorPointers(parentEntity);
+		cardinalityPointers.add(new NodePointer(parentEntity, nodeName));
 		NodeChangeMap changeMap = new NodeChangeMap();
-//		validateAll(changeMap, cardinalityNodePointers, false);
+		validateCardinality(parentEntity.getRecord(), cardinalityPointers, changeMap);
 		return changeMap;
 	}
 
@@ -201,7 +200,11 @@ public class RecordUpdater {
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.prepareAttributeChange(attribute);
-//		validateChecks(changeMap, checkDependencies);
+		
+		Set<Attribute<?, ?>> attributesToRevalidate = new HashSet<Attribute<?,?>>();
+		attributesToRevalidate.add(attribute);
+		
+		validateAttributes(attribute.getRecord(), attributesToRevalidate, changeMap);
 		return changeMap;
 	}
 	
@@ -306,7 +309,7 @@ public class RecordUpdater {
 		for (Attribute calcAttr : attributesToRecalculate) {
 			Value previousValue = calcAttr.getValue();
 			Value newValue = recalculateValue(calcAttr);
-			if ( ! Objects.equals(previousValue, newValue) ) {
+			if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
 				calcAttr.setValue(newValue);
 				updatedAttributes.add(calcAttr);
 			}
@@ -367,6 +370,9 @@ public class RecordUpdater {
 		
 		Set<Node<?>> nodesToBeDeleted = node.getDescendantsAndSelf();
 		Set<NodePointer> pointersToBeDeleted = nodesToPointers(nodesToBeDeleted);
+
+		NodePointer nodePointer = new NodePointer(node);
+		Set<NodePointer> ancestorPointers = getAncestorPointers(node);
 		
 		// calculated attributes
 		List<Attribute<?, ?>> dependentCalculatedAttributes = record.determineCalculatedAttributes(nodesToBeDeleted);
@@ -415,7 +421,8 @@ public class RecordUpdater {
 		// validate cardinality
 		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(updatedRequirenessPointers);
 		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
-		pointersToValidateCardinalityFor.addAll(getAncestorPointers(node));
+		pointersToValidateCardinalityFor.add(nodePointer);
+		pointersToValidateCardinalityFor.addAll(ancestorPointers);
 		validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
 		
 		// validate attributes
@@ -612,21 +619,6 @@ public class RecordUpdater {
 				}
 			}
 		}
-	}
-	
-	private List<NodePointer> createAncestorNodeDependencies(Node<?> node){
-		List<NodePointer> nodePointers = new ArrayList<NodePointer>();
-		
-		Entity parent = node.getParent();
-		String childName = node.getName();
-		while(parent != null){
-			NodePointer nodePointer = new NodePointer(parent, childName);
-			nodePointers.add(nodePointer);
-			
-			childName = parent.getName();
-			parent = parent.getParent();
-		}
-		return nodePointers;
 	}
 	
 	/**

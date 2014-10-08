@@ -213,10 +213,6 @@ public class RecordManager {
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
 		recordUpdater.initializeRecord(record);
-		
-		//TODO recalculate attribute, validate all
-		
-//		recordUpdater.evaluateCalculatedAttributes(record);
 		return record;
 	}
 	
@@ -323,7 +319,7 @@ public class RecordManager {
 		if ( lockingEnabled && sessionId == null ) {
 			throw new IllegalArgumentException("Lock session id not specified");
 		}
-		CollectRecord record = new CollectRecord(survey, modelVersionName);
+		CollectRecord record = survey.createRecord(modelVersionName);
 		record.createRootEntity(rootEntityName);
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);

@@ -16,7 +16,6 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
-import org.openforis.idm.model.Record;
 
 /**
  * @author M. Togna
@@ -40,7 +39,7 @@ public class CollectSurvey extends Survey {
 	}
 
 	@Override
-	public Record createRecord(String version) {
+	public CollectRecord createRecord(String version) {
 		return new CollectRecord(this, version);
 	}
 	

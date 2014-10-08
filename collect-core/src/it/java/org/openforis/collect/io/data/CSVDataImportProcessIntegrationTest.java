@@ -464,7 +464,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		List<CollectRecord> summaries = recordDao.loadSummaries(survey, "cluster", key);
 		assertEquals(1, summaries.size());
 		CollectRecord summary = summaries.get(0);
-		CollectRecord reloadedRecord = recordDao.load(survey, summary.getId(), summary.getStep().getStepNumber());
+		CollectRecord reloadedRecord = recordManager.load(survey, summary.getId(), summary.getStep());
 		return reloadedRecord;
 	}
 	

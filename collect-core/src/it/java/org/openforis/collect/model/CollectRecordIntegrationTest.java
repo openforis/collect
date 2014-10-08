@@ -3,20 +3,21 @@
  */
 package org.openforis.collect.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -46,8 +47,17 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	
+	private static final String SESSION_ID = "TEST";
+
 	@Autowired
+	private RecordManager recordManager;
+	
 	private RecordUpdater recordUpdater;
+	
+	@Before
+	public void init() {
+		recordUpdater = new RecordUpdater();
+	}
 	
 	@Test
 	public void testAddMultipleEntity() throws Exception {
@@ -56,24 +66,12 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Entity cluster = record.getRootEntity();
 		NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "plot");
 		assertNotNull(changeSet);
-		assertEquals(2, changeSet.size());
-		assertEquals(1, cluster.getCount("plot"));
+		assertEquals(84, changeSet.size());
+		assertEquals(3, cluster.getCount("plot"));
 		{
-			Entity plot = (Entity) cluster.get("plot", 0);
+			Entity plot = (Entity) cluster.get("plot", 2);
 			NodeChange<?> plotUpdateChange = changeSet.getChange(plot);
-			assertTrue(plotUpdateChange instanceof NodeAddChange);
 			assertTrue(plotUpdateChange instanceof EntityAddChange);
-		}
-		{
-			NodeChange<?> clusterChange = changeSet.getChange(cluster);
-			assertTrue(clusterChange instanceof EntityChange);
-			EntityChange clusterEntityChange = (EntityChange) clusterChange;
-			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
-			ValidationResultFlag plotMinCountValid = childrenMinCountValid.get("plot");
-			assertEquals(ValidationResultFlag.OK, plotMinCountValid);
-			Map<String, ValidationResultFlag> childrenMaxCountValid = clusterEntityChange.getChildrenMaxCountValidation();
-			ValidationResultFlag plotMaxCountValid = childrenMaxCountValid.get("plot");
-			assertEquals(ValidationResultFlag.OK, plotMaxCountValid);
 		}
 	}
 	
@@ -84,12 +82,13 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Entity cluster = record.getRootEntity();
 		{
 			NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "time_study");
-			assertEquals(2, changeSet.size());
-			assertEquals(1, cluster.getCount("time_study"));
+			assertEquals(4, changeSet.size());
+			
+			changeSet = recordUpdater.addEntity(cluster, "time_study");
+			assertEquals(5, changeSet.size());
 			{
-				Entity timeStudy = (Entity) cluster.get("time_study", 0);
+				Entity timeStudy = (Entity) cluster.get("time_study", 2);
 				NodeChange<?> timeStudyChange = changeSet.getChange(timeStudy); 
-				assertTrue(timeStudyChange instanceof NodeAddChange);
 				assertTrue(timeStudyChange instanceof EntityAddChange);
 			}
 			{
@@ -98,23 +97,11 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 				EntityChange clusterEntityChange = (EntityChange) clusterChange;
 				Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
 				ValidationResultFlag plotMinCountValid = childrenMinCountValid.get("time_study");
-				assertEquals(ValidationResultFlag.OK, plotMinCountValid);
+				assertNull(plotMinCountValid);
 				Map<String, ValidationResultFlag> childrenMaxCountValid = clusterEntityChange.getChildrenMaxCountValidation();
 				ValidationResultFlag plotMaxCountValid = childrenMaxCountValid.get("time_study");
-				assertEquals(ValidationResultFlag.OK, plotMaxCountValid);
+				assertEquals(ValidationResultFlag.ERROR, plotMaxCountValid);
 			}
-		}
-		{
-			NodeChangeSet changeSet = recordUpdater.addEntity(cluster, "time_study");
-			assertEquals(2, changeSet.size());
-			NodeChange<?> clusterChange = changeSet.getChange(cluster);
-			EntityChange clusterEntityChange = (EntityChange) clusterChange;
-			Map<String, ValidationResultFlag> childrenMinCountValid = clusterEntityChange.getChildrenMinCountValidation();
-			ValidationResultFlag plotMinCountValid = childrenMinCountValid.get("time_study");
-			assertEquals(ValidationResultFlag.OK, plotMinCountValid);
-			Map<String, ValidationResultFlag> childrenMaxCountValid = clusterEntityChange.getChildrenMaxCountValidation();
-			ValidationResultFlag plotMaxCountValid = childrenMaxCountValid.get("time_study");
-			assertEquals(ValidationResultFlag.ERROR, plotMaxCountValid);
 		}
 	}
 	
@@ -124,6 +111,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
 		Entity timeStudy = (Entity) cluster.get("time_study", 0);
+		
 		NodeChangeSet changeSet = recordUpdater.deleteNode(timeStudy);
 		assertEquals(2, changeSet.size());
 		{
@@ -141,7 +129,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			assertEquals(ValidationResultFlag.ERROR, timeStudyMinCountValid);
 			Map<String, ValidationResultFlag> childrenMaxCountValid = clusterEntityChange.getChildrenMaxCountValidation();
 			ValidationResultFlag timeStudyMaxCountValid = childrenMaxCountValid.get("time_study");
-			assertEquals(ValidationResultFlag.OK, timeStudyMaxCountValid);
+			assertNull(timeStudyMaxCountValid);
 		}
 	}
 	
@@ -306,21 +294,15 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Assert.fail();
 	}
 	
-	private CollectRecord createTestRecord(CollectSurvey survey) {
-		CollectRecord record = new CollectRecord(survey, "2.0");
-		Entity cluster = record.createRootEntity("cluster");
-		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
-		record.setStep(Step.ENTRY);
+	private CollectRecord createTestRecord(CollectSurvey survey) throws RecordPersistenceException {
+		CollectRecord record = survey.createRecord("2.0");
+		record.createRootEntity("cluster");
 		String id = "123_456";
-		
-		addTestValues(cluster, id);
-			
-		//set counts
-		record.getEntityCounts().add(2);
-		
-		//set keys
-		record.getRootEntityKeyValues().add(id);
-		
+		addTestValues(record.getRootEntity(), id);
+		record.setRootEntityKeyValues(Arrays.asList(id));
+		record.setEntityCounts(Arrays.asList(2));
+
+		recordUpdater.initializeRecord(record);
 		return record;
 	}
 	

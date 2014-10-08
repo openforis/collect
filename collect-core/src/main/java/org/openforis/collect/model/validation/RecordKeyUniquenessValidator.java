@@ -24,7 +24,9 @@ public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?,
 	@Override
 	public ValidationResultFlag evaluate(Attribute<?, ?> node) {
 		CollectRecord record = (CollectRecord) node.getRecord();
-
+		if ( record.getId() == null ) {
+			return ValidationResultFlag.OK;
+		}
 		boolean unique = recordManager.isUnique(record);
 		return ValidationResultFlag.valueOf(unique);
 	}

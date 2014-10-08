@@ -51,8 +51,8 @@ public class AttributeChange extends NodeChange<Attribute<?, ?>> {
 	public String toString() {
 		return String.format("%s\tUpdated fields: %s\tValidation result: %s", 
 				super.toString(), 
-				updatedFieldValues.toString(), 
-				validationResults.toString());
+				updatedFieldValues, 
+				validationResults);
 	}
 
 	@Override
