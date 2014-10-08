@@ -96,7 +96,7 @@ public class NodeChangeMap implements NodeChangeSet {
 	 * @param node
 	 * @return
 	 */
-	public NodeDeleteChange prepareDeleteNodeChange(Node<?> node) {
+	public NodeDeleteChange addNodeDeleteChange(Node<?> node) {
 		NodeDeleteChange c = new NodeDeleteChange(node);
 		nodeIdToChange.put(node.getInternalId(), c); //overwrite change if already present
 		return c;
@@ -217,5 +217,6 @@ public class NodeChangeMap implements NodeChangeSet {
 	public String toString() {
 		return "Node change map for these nodes: " + nodeIdToChange.toString();
 	}
+
 	
 }

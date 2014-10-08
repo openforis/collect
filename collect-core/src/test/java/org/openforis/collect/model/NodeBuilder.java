@@ -1,9 +1,11 @@
 package org.openforis.collect.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -28,14 +30,28 @@ public class NodeBuilder {
 	public static Record record(Survey survey, NodeBuilder... builders) {
 		List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
 		String rootEntityName = rootEntityDefs.get(rootEntityDefs.size() - 1).getName();
-		Record record = new Record(survey, null);
+		Record record = survey.createRecord();
 		Entity rootEntity = record.createRootEntity(rootEntityName);
 		addChildren(rootEntity, builders);
 		return record;
 	}
 	
+	public static Entity detachedEntity(Survey survey, final String name, NodeBuilder... builders) {
+		NodeBuilder builder = entity(name, builders);
+		final List<EntityDefinition> defs = new ArrayList<EntityDefinition>();
+		survey.getSchema().traverse(new NodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition definition) {
+				if(definition.getName().equals(name)) {
+					defs.add((EntityDefinition) definition);
+				}
+			}
+		});
+		return builder.createDetachedEntity(defs.get(0));
+	}
+	
 	public static NodeBuilder entity(String name, NodeBuilder... builders) {
-		return new NodeBuilder(false, name, null);
+		return new NodeBuilder(false, name, null, builders);
 	}
 	
 	public static NodeBuilder attribute(String name) {
@@ -48,9 +64,13 @@ public class NodeBuilder {
 	
 	private Entity createEntity(Entity parent) {
 		EntityDefinition def = (EntityDefinition) parent.getDefinition().getChildDefinition(name);
+		Entity entity = createDetachedEntity(def);
+		return entity;
+	}
+
+	protected Entity createDetachedEntity(EntityDefinition def) {
 		Entity entity = new Entity(def);
 		addChildren(entity, builders);
-		parent.add(entity);
 		return entity;
 	}
 

@@ -6,6 +6,7 @@ package org.openforis.collect.model;
 import java.io.Serializable;
 
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.model.validation.CollectValidator;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.Survey;
@@ -27,6 +28,10 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	private transient ExternalCodeListProvider externalCodeListProvider;
 	private transient CodeListService codeListService;
 
+	public CollectSurveyContext() {
+		this(new ExpressionFactory(), new CollectValidator());
+	}
+	
 	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
 		this.expressionFactory = expressionFactory;
 		this.validator = validator;

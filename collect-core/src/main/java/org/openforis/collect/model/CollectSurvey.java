@@ -16,6 +16,7 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.model.Record;
 
 /**
  * @author M. Togna
@@ -38,6 +39,11 @@ public class CollectSurvey extends Survey {
 		this.annotations = new CollectAnnotations(this);
 	}
 
+	@Override
+	public Record createRecord(String version) {
+		return new CollectRecord(this, version);
+	}
+	
 	public UIOptions createUIOptions() {
 		return new UIOptions(this);
 	}
