@@ -7,10 +7,8 @@ import static org.openforis.collect.model.CollectRecord.DEFAULT_APPLIED_POSITION
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,7 +39,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
-import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.BooleanExpression;
@@ -131,18 +128,6 @@ public class RecordUpdater {
 
 		NodeChangeMap changeMap = initializeEntity(entity);
 		return changeMap;
-		
-//		evaluateDependentCalculatedAttributes(changeMap, createdNode);
-//		
-//		Set<NodePointer> relevanceRequirenessDependencies = createdNode.getRelevantRequiredDependencies();
-//		relevanceRequirenessDependencies.add(new NodePointer(createdNode.getParent(), nodeName));
-//		Set<Attribute<?, ?>> checkDependencies = null;
-//		
-//		List<NodePointer> ancestorNodeDependencies = createAncestorNodeDependencies(createdNode);
-//
-//		prepareChange(changeMap, relevanceRequirenessDependencies, checkDependencies, ancestorNodeDependencies);
-//		return new NodeChangeSet(changeMap.getChanges());
-//		return null;
 	}
 
 	/**
@@ -220,7 +205,7 @@ public class RecordUpdater {
 		return afterAttributeUpdate(attribute);
 	}
 
-	private <V extends Value> void beforeAttributeUpdate(Attribute<?, V> attribute) {
+	private void beforeAttributeUpdate(Attribute<?, ?> attribute) {
 		Entity parentEntity = attribute.getParent();
 		setErrorConfirmed(attribute, false);
 		setMissingValueApproved(parentEntity, attribute.getName(), false);
@@ -233,13 +218,13 @@ public class RecordUpdater {
 		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 
-	private <V extends Value> NodeChangeSet afterAttributeUpdate(Attribute<?, V> attribute) {
+	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute) {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addValueChange(attribute);
 		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 	
-	private <V extends Value> NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, V> attribute) {
+	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute) {
 		Record record = attribute.getRecord();
 		
 		// calculated attributes
@@ -434,57 +419,6 @@ public class RecordUpdater {
 
 		validateAttributes(record, attributesToRevalidate, changeMap);
 		return changeMap;
-		
-		
-		
-//		Set<NodePointer> relevanceDependencies = new HashSet<NodePointer>();
-//		Set<NodePointer> requirenessDependencies = new HashSet<NodePointer>();
-//		List<Attribute<?, ?>> dependentCalculatedAttributes = new ArrayList<Attribute<?,?>>();
-//		
-//		HashSet<Attribute<?, ?>> checkDependencies = new HashSet<Attribute<?,?>>();
-//		
-//		NodeChangeMap changeMap = new NodeChangeMap();
-//		changeMap.prepareDeleteNodeChange(node);
-//
-//		List<NodePointer> ancestorNodeDependencies = createAncestorNodeDependencies(node);
-//
-//		List<Node<?>> nodesToDelete = new ArrayList<Node<?>>();
-//		if ( node instanceof Entity ) {
-//			List<Node<?>> descendants = ((Entity) node).getDescendants();
-//			nodesToDelete.addAll(descendants);
-//		}
-//		nodesToDelete.add(node);
-		
-//		for (Node<?> n : nodesToDelete) {
-//			relevanceDependencies.addAll(n.getRelevantDependencies());
-//			requirenessDependencies.addAll(n.getRequiredDependencies());
-//			if ( n instanceof Attribute ) {
-//				checkDependencies.addAll(((Attribute<?, ?>) n).getCheckDependencies());
-//			}
-//			node.clearDependencyStates();
-//			List<Attribute<?, ?>> nestedDependentCalculatedAttributes = node.getDependentCalculatedAttributes();
-//			for (Attribute<?, ?> calcAttr : nestedDependentCalculatedAttributes) {
-//				if ( dependentCalculatedAttributes.contains(calcAttr) ) {
-//					dependentCalculatedAttributes.add(calcAttr);
-//				}
-//			}
-//			performNodeDeletion(n);
-//		}
-
-		// evaluate calculated attributes
-//		for (int i = dependentCalculatedAttributes.size() - 1; i >= 0; i--) {
-//			Attribute<?,?> calcAttr = dependentCalculatedAttributes.get(i);
-//			if ( ! calcAttr.isDetached() ) {
-////				evaluateCalculatedAttribute(changeMap, calcAttr);
-//			}
-			
-//		}
-//		HashSet<NodePointer> relevanceAndRequirenessDependencies = new HashSet<NodePointer>();
-//		relevanceAndRequirenessDependencies.addAll(relevanceDependencies);
-//		relevanceAndRequirenessDependencies.addAll(requirenessDependencies);
-		
-//		prepareChange(changeMap, relevanceAndRequirenessDependencies, checkDependencies, ancestorNodeDependencies);
-//		return changeMap;
 	}
 
 	public void moveNode(CollectRecord record, int nodeId, int index) {
@@ -539,7 +473,7 @@ public class RecordUpdater {
 		}
 	}
 	
-	private <V> void setFieldSymbol(Field<V> field, FieldSymbol symbol){
+	private void setFieldSymbol(Field<?> field, FieldSymbol symbol){
 		Character symbolChar = null;
 		if (symbol != null) {
 			symbolChar = symbol.getCode();
@@ -547,27 +481,13 @@ public class RecordUpdater {
 		field.setSymbol(symbolChar);
 	}
 	
-	private Map<Integer, Object> createFieldValuesMap(Attribute<?, ?> attribute) {
-		Map<Integer, Object> fieldValues = new HashMap<Integer, Object>();
-		int fieldCount = attribute.getFieldCount();
-		for (int idx = 0; idx < fieldCount; idx ++) {
-			Field<?> field = attribute.getField(idx);
-			fieldValues.put(idx, field.getValue());
-		}
-		return fieldValues;
-	}
-
-	private <V extends Value> void setSymbolOnFields(
-			Attribute<? extends NodeDefinition, V> attribute,
-			FieldSymbol symbol) {
+	private void setSymbolOnFields(Attribute<?, ?> attribute, FieldSymbol symbol) {
 		for (Field<?> field : attribute.getFields()) {
 			setFieldSymbol(field, symbol);
 		}
 	}
 	
-	private <V extends Value> void setRemarksOnFirstField(
-			Attribute<? extends NodeDefinition, V> attribute,
-			String remarks) {
+	private void setRemarksOnFirstField(Attribute<?, ?> attribute, String remarks) {
 		Field<?> field = attribute.getField(0);
 		field.setRemarks(remarks);
 	}
@@ -629,30 +549,7 @@ public class RecordUpdater {
 	 */
 	public void validate(final CollectRecord record) {
 		record.resetValidationInfo();
-		Entity rootEntity = record.getRootEntity();
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.addEmptyNodes(rootEntity);
-		rootEntity.traverse(new NodeVisitor() {
-			@Override
-			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				if ( node instanceof Attribute ) {
-					Attribute<?,?> attribute = (Attribute<?, ?>) node;
-//					attribute.validateValue();
-				} else if ( node instanceof Entity ) {
-					Entity entity = (Entity) node;
-					ModelVersion version = record.getVersion();
-					EntityDefinition definition = entity.getDefinition();
-					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
-					for (NodeDefinition childDefinition : childDefinitions) {
-						if ( version == null || version.isApplicable(childDefinition) ) {
-							String childName = childDefinition.getName();
-//							entity.validateMaxCount(childName);
-//							entity.validateMinCount(childName);
-						}
-					}
-				}
-			}
-		});
+		initializeRecord(record);
 	}
 
 	private Attribute<?, ?> performAttributeAdd(Entity parentEntity, String nodeName, Value value, 

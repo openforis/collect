@@ -3,7 +3,11 @@
  */
 package org.openforis.collect.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.GregorianCalendar;
@@ -15,7 +19,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -39,19 +42,13 @@ import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author S. Ricci
  *
  */
 public class CollectRecordIntegrationTest extends CollectIntegrationTest {
-	
-	private static final String SESSION_ID = "TEST";
 
-	@Autowired
-	private RecordManager recordManager;
-	
 	private RecordUpdater recordUpdater;
 	
 	@Before

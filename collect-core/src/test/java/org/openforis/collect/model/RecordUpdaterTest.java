@@ -4,21 +4,15 @@
 package org.openforis.collect.model;
 
 import static org.junit.Assert.*;
-import static org.openforis.collect.model.NodeBuilder.attribute;
-import static org.openforis.collect.model.NodeBuilder.entity;
-import static org.openforis.collect.model.NodeBuilder.record;
-import static org.openforis.idm.metamodel.NodeDefinitionBuilder.attributeDef;
-import static org.openforis.idm.metamodel.NodeDefinitionBuilder.entityDef;
-import static org.openforis.idm.metamodel.NodeDefinitionBuilder.rootEntityDef;
+import static org.openforis.collect.model.NodeBuilder.*;
+import static org.openforis.idm.metamodel.NodeDefinitionBuilder.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
@@ -250,7 +244,7 @@ public class RecordUpdaterTest {
 		Entity tree2 = entityByPath("/root/tree[2]");
 		Entity tree3 = entityByPath("/root/tree[3]");
 		
-		NodeChangeSet changeSet = updater.deleteNode(tree2);
+		updater.deleteNode(tree2);
 		
 		Attribute<?, ?> treeNum1 = (Attribute<?, ?>) tree1.getChild("tree_num");
 		assertEquals(new TextValue("1"), treeNum1.getValue());

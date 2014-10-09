@@ -157,7 +157,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
-		dest.setName(name);
+		dest.rename(name);
 		dest.setLabel(Type.HEADING, languageCode, headingLabel);
 		dest.setLabel(Type.INSTANCE, languageCode, instanceLabel);
 		dest.setLabel(Type.NUMBER, languageCode, numberLabel);
