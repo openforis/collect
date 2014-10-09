@@ -39,6 +39,10 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
@@ -48,6 +52,7 @@ import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
@@ -378,8 +383,12 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
 			String colName = colNameByField.get(fieldValueKey);
 			if ( attrDefn.isMultiple() ) {
-				setValuesInMultipleAttribute(parentEntity, attrDefn, fieldName,
-						strValue, colName, row);
+				if ( attrDefn instanceof CodeAttributeDefinition ) {
+					setValuesInMultipleCodeAttribute(parentEntity, (CodeAttributeDefinition) attrDefn, fieldName, strValue, colName, row);
+				} else {
+					setValuesInMultipleAttribute(parentEntity, attrDefn, fieldName,
+							strValue, colName, row);
+				}
 			} else {
 				setValueInField(parentEntity, attrDefn, 0, fieldName,
 						strValue, colName, row);
@@ -387,6 +396,57 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
+	private void setValuesInMultipleCodeAttribute(Entity parentEntity,
+			CodeAttributeDefinition attrDefn, String fieldName, String strValues,
+			String colName, long row) {
+		if ( fieldName.equals(CodeAttributeDefinition.QUALIFIER_FIELD) ) {
+			CodeAttribute codeAttr = getQualifiableCodeAttribute(parentEntity, attrDefn);
+			if ( codeAttr == null ) {
+				setValuesInMultipleAttribute(parentEntity, (AttributeDefinition) attrDefn, fieldName, strValues, colName, row);
+			} else {
+				codeAttr.getQualifierField().setValue(strValues);
+			}
+		} else {
+			setValuesInMultipleAttribute(parentEntity, (AttributeDefinition) attrDefn, fieldName, strValues, colName, row);
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private CodeAttribute getQualifiableCodeAttribute(Entity parentEntity, CodeAttributeDefinition attrDefn) {
+		CodeListItem qualifiableItem = getQualifiableItem(attrDefn);
+		if ( qualifiableItem != null ) {
+			List attributes = parentEntity.getAll(attrDefn.getName());
+			CodeAttribute codeAttr = findCodeAttributeByCode(qualifiableItem.getCode(), attributes);
+			if ( codeAttr != null ) {
+				return codeAttr;
+			}
+		}
+		return null;
+	}
+
+	private CodeAttribute findCodeAttributeByCode(String code, List<CodeAttribute> attributes) {
+		for (CodeAttribute codeAttr: attributes) {
+			if ( code.equals(codeAttr.getValue().getCode()) ) {
+				return codeAttr;
+			}
+		}
+		return null;
+	}
+
+	private CodeListItem getQualifiableItem(CodeAttributeDefinition attrDefn) {
+		CodeListService codeListService = attrDefn.getSurvey().getContext().getCodeListService();
+		CodeList list = attrDefn.getList();
+		if(codeListService.hasQualifiableItems(list) ) {
+			List<CodeListItem> items = codeListService.loadRootItems(list);
+			for (CodeListItem item : items) {
+				if ( item.isQualifiable() ) {
+					return item;
+				}
+			}
+		}
+		return null;
+	}
+	
 	private void setValuesInMultipleAttribute(Entity parentEntity,
 			AttributeDefinition attrDefn, String fieldName, String strValues,
 			String colName, long row) {

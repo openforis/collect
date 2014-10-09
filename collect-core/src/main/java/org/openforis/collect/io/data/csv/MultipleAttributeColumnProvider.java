@@ -42,7 +42,8 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 				if ( i > 0 ) {
 					sb.append(delimiter);
 				}
-				String val = extractValue(entity, i);
+				String fieldName = defn.getMainFieldName();
+				String val = extractValue(entity, fieldName, i);
 				sb.append(val);
 			}
 			return Arrays.asList(sb.toString());
@@ -51,12 +52,12 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 		}
 	}
 
-	private String extractValue(Entity entity, int i) {
+	private String extractValue(Entity entity, String fieldName, int i) {
 		Attribute<?,?> attr = (Attribute<?, ?>) entity.get(defn.getName(), i);
 		if ( attr == null ) {
 			return ""; 
 		} else {
-			Field<?> fld = attr.getField(0);
+			Field<?> fld = attr.getField(fieldName);
 			Object v = fld.getValue();
 			return v == null ? "" : v.toString();
 		}
