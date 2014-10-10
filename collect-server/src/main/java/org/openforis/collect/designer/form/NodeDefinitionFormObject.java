@@ -157,7 +157,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
-		dest.rename(name);
+		if ( ! name.equals(dest.getName()) ) {
+			dest.rename(name);
+		}
 		dest.setLabel(Type.HEADING, languageCode, headingLabel);
 		dest.setLabel(Type.INSTANCE, languageCode, instanceLabel);
 		dest.setLabel(Type.NUMBER, languageCode, numberLabel);
@@ -180,6 +182,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
 		
+		UIOptions uiOptions = getUIOptions(dest);
+		
 		if ( dest instanceof Calculable ) {
 			((Calculable) dest).setCalculated(calculated);
 			CollectSurvey survey = (CollectSurvey) dest.getSurvey();
@@ -189,12 +193,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			annotations.setIncludeInDataExport(dest, includeInDataExport);
 			
 			//show in ui
-			UIOptions uiOptions = survey.getUIOptions();
 			uiOptions.setHidden(dest, ! showInUI);
 		}
-		
 		//layout
-		UIOptions uiOptions = getUIOptions(dest);
 		uiOptions.setHideWhenNotRelevant(dest, hideWhenNotRelevant);
 		uiOptions.setColumn(dest, column);
 		uiOptions.setColumnSpan(dest, columnSpan);
