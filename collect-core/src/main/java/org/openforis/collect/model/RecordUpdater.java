@@ -746,81 +746,6 @@ public class RecordUpdater {
 		}
 	}
 	
-	private class RelevanceUpdater {
-		private final List<NodePointer> pointersToUpdate;
-		private final Set<NodePointer> updatedNodePointers;
-		
-		RelevanceUpdater(List<NodePointer> pointersToUpdate) {
-			this.pointersToUpdate = pointersToUpdate;
-			this.updatedNodePointers = new HashSet<NodePointer>();
-		}
-		
-		Set<NodePointer> update() {
-			for (NodePointer nodePointer : pointersToUpdate) {
-				updatedNodePointers.addAll(update(nodePointer));
-			}
-			return updatedNodePointers;
-		}
-		
-		private Collection<NodePointer> update(NodePointer nodePointer) {
-			if (updatedNodePointers.contains(nodePointer)) {
-				return Collections.emptySet();
-			}
-
-			boolean relevance = calculateRelevance(nodePointer);
-			updatedNodePointers.addAll(setRelevance(nodePointer, relevance));
-			return updatedNodePointers;
-		}
-	
-		private Collection<NodePointer> setRelevance(NodePointer nodePointer, boolean relevant) {
-			Collection<NodePointer> changedNodePointers = new HashSet<NodePointer>();
-			
-			Entity entity = nodePointer.getEntity();
-			String childName = nodePointer.getChildName();
-			EntityDefinition entityDef = entity.getDefinition();
-			
-			if ( relevant != entity.isRelevant(childName) ) {
-				entity.setRelevant(childName, relevant);
-				changedNodePointers.add(nodePointer);
-				
-				NodeDefinition childDef = entityDef.getChildDefinition(childName);
-				if ( childDef instanceof EntityDefinition ) {
-					List<Node<?>> nodes = entity.getChildren(childName);
-					for (Node<?> node : nodes) {
-						Entity childEntity = (Entity) node;
-						EntityDefinition childEntityDef = childEntity.getDefinition();
-						for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitions()) {
-							NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef.getName());
-							if ( relevant ) {
-								changedNodePointers.addAll(update(nextNodePointer));
-							} else {
-								changedNodePointers.addAll(setRelevance(nextNodePointer, false));
-							}
-						}
-					}
-				}
-			}
-			return changedNodePointers;	
-		}
-		
-		private boolean calculateRelevance(NodePointer nodePointer) {
-			NodeDefinition childDef = nodePointer.getChildDefinition();
-			String expr = childDef.getRelevantExpression();
-			if (StringUtils.isBlank(expr)) {
-				throw new IllegalStateException(String.format("Expected relevant expression on node pointer %s", nodePointer.toString()));
-			}
-			try {
-				Entity entity = nodePointer.getEntity();
-				Survey survey = entity.getSurvey();
-				ExpressionFactory expressionFactory = survey.getContext().getExpressionFactory();
-				BooleanExpression relevanceExpr = expressionFactory.createBooleanExpression(expr);
-				return relevanceExpr.evaluate(entity, null);
-			} catch (InvalidExpressionException e) {
-				throw new IdmInterpretationError(childDef.getPath() + " - Unable to evaluate expression: " + expr, e);
-			}
-		}
-	}
-	
 	private boolean calculateRequireness(NodePointer nodePointer) {
 		Entity entity = nodePointer.getEntity();
 		if ( ! entity.isRelevant(nodePointer.getChildName()) ) {
@@ -912,5 +837,79 @@ public class RecordUpdater {
 		return result;
 	}
 
+	private static class RelevanceUpdater {
+		private final List<NodePointer> pointersToUpdate;
+		private final Set<NodePointer> updatedNodePointers;
+		
+		RelevanceUpdater(List<NodePointer> pointersToUpdate) {
+			this.pointersToUpdate = pointersToUpdate;
+			this.updatedNodePointers = new HashSet<NodePointer>();
+		}
+		
+		Set<NodePointer> update() {
+			for (NodePointer nodePointer : pointersToUpdate) {
+				updatedNodePointers.addAll(update(nodePointer));
+			}
+			return updatedNodePointers;
+		}
+		
+		private Collection<NodePointer> update(NodePointer nodePointer) {
+			if (updatedNodePointers.contains(nodePointer)) {
+				return Collections.emptySet();
+			}
 
+			boolean relevance = calculateRelevance(nodePointer);
+			updatedNodePointers.addAll(setRelevance(nodePointer, relevance));
+			return updatedNodePointers;
+		}
+	
+		private Collection<NodePointer> setRelevance(NodePointer nodePointer, boolean relevant) {
+			Collection<NodePointer> changedNodePointers = new HashSet<NodePointer>();
+			
+			Entity entity = nodePointer.getEntity();
+			String childName = nodePointer.getChildName();
+			EntityDefinition entityDef = entity.getDefinition();
+			
+			if ( relevant != entity.isRelevant(childName) ) {
+				entity.setRelevant(childName, relevant);
+				changedNodePointers.add(nodePointer);
+				
+				NodeDefinition childDef = entityDef.getChildDefinition(childName);
+				if ( childDef instanceof EntityDefinition ) {
+					List<Node<?>> nodes = entity.getChildren(childName);
+					for (Node<?> node : nodes) {
+						Entity childEntity = (Entity) node;
+						EntityDefinition childEntityDef = childEntity.getDefinition();
+						for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitions()) {
+							NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef.getName());
+							if ( relevant ) {
+								changedNodePointers.addAll(update(nextNodePointer));
+							} else {
+								changedNodePointers.addAll(setRelevance(nextNodePointer, false));
+							}
+						}
+					}
+				}
+			}
+			return changedNodePointers;	
+		}
+		
+		private boolean calculateRelevance(NodePointer nodePointer) {
+			NodeDefinition childDef = nodePointer.getChildDefinition();
+			String expr = childDef.getRelevantExpression();
+			if (StringUtils.isBlank(expr)) {
+				throw new IllegalStateException(String.format("Expected relevant expression on node pointer %s", nodePointer.toString()));
+			}
+			try {
+				Entity entity = nodePointer.getEntity();
+				Survey survey = entity.getSurvey();
+				ExpressionFactory expressionFactory = survey.getContext().getExpressionFactory();
+				BooleanExpression relevanceExpr = expressionFactory.createBooleanExpression(expr);
+				return relevanceExpr.evaluate(entity, null);
+			} catch (InvalidExpressionException e) {
+				throw new IdmInterpretationError(childDef.getPath() + " - Unable to evaluate expression: " + expr, e);
+			}
+		}
+	}
+	
 }

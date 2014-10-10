@@ -9,6 +9,8 @@ import static org.openforis.idm.metamodel.NodeDefinitionBuilder.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionBuilder;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
@@ -36,15 +38,35 @@ public class RecordUpdaterTest {
 	}
 	
 	@Test
-	public void testUpdateAttribute() {
-		rootEntityDef(survey, "root", 
-				attributeDef("attribute"));
-		
-		record = record(survey, 
-				attribute("attribute", "initial value")
+	public void testThisVariableCanReturnNodes() {
+		record(
+			rootEntityDef(
+				entityDef("tree",
+					attributeDef("tree_count")
+						.calculated("idm:position($this/parent())")
+				).multiple()
+			)
 		);
 		
-		updater.initializeRecord(record);
+		updater.addEntity(record.getRootEntity(), "tree");
+		
+		Attribute<?, ?> treeCount = findAttribute("/root/tree[1]/tree_count");
+		assertEquals(new TextValue("1"), treeCount.getValue());
+	}
+
+	protected EntityDefinition rootEntityDef(NodeDefinitionBuilder... builders) {
+		EntityDefinition rootEntityDef = NodeDefinitionBuilder.rootEntityDef(survey, "root", builders);
+		return rootEntityDef;
+	}
+
+	@Test
+	public void testUpdateAttribute() {
+		record(
+			rootEntityDef(
+				attributeDef("attribute")
+			),
+			attribute("attribute", "initial value")
+		);
 		
 		Attribute<?,?> attr = findAttribute("root/attribute[1]");
 		
@@ -60,32 +82,30 @@ public class RecordUpdaterTest {
 
 	@Test
 	public void testCardinalityValidatedOnRecordInitialization() {
-		rootEntityDef(survey, "root", 
-			entityDef("time_study",
+		record(
+			rootEntityDef(
+				entityDef("time_study",
 					attributeDef("start_time")
+				)
+				.multiple()
+				.required()
 			)
-			.multiple()
-			.required()
 		);
-		record = record(survey);
-		
-		updater.initializeRecord(record);
-		
 		Entity rootEntity = record.getRootEntity();
 		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("time_study"));
 	}
 	
 	@Test
 	public void testCardinalityValidatedOnAttributeUpdate() {
-		rootEntityDef(survey, "root", 
-			entityDef("time_study",
+		record(
+			rootEntityDef(
+				entityDef("time_study",
 					attributeDef("start_time")
+				)
+				.multiple()
+				.required()
 			)
-			.multiple()
-			.required()
 		);
-		record = record(survey);
-		updater.initializeRecord(record);
 		Entity rootEntity = record.getRootEntity();
 		Attribute<?, TextValue> startTime = (Attribute<?, TextValue>) record.findNodeByPath("/root/time_study[1]/start_time");
 		
@@ -98,15 +118,15 @@ public class RecordUpdaterTest {
 	
 	@Test
 	public void testRecordInitializationPreservesEntities() {
-		rootEntityDef(survey, "root", 
-			entityDef("time_study",
+		record(
+			rootEntityDef(
+				entityDef("time_study",
 					attributeDef("start_time")
-			)
-			.multiple()
-			.required()
-		);
-		
-		record = record(survey,
+				)
+				.multiple()
+				.required()
+			),
+			
 			entity("time_study", 
 				attribute("start_time", "start first")
 			),
@@ -114,7 +134,6 @@ public class RecordUpdaterTest {
 				attribute("start_time", "start second")
 			)
 		);
-		updater.initializeRecord(record);
 		Entity rootEntity = record.getRootEntity();
 		
 		assertEquals(2, rootEntity.getCount("time_study"));
@@ -122,15 +141,14 @@ public class RecordUpdaterTest {
 	
 	@Test
 	public void testRemoveEntity() {
-		rootEntityDef(survey, "root", 
-			entityDef("time_study",
+		record(
+			rootEntityDef(
+				entityDef("time_study",
 					attributeDef("start_time")
-			)
-			.multiple()
-			.required()
-		);
-		
-		record = record(survey,
+				)
+				.multiple()
+				.required()
+			),
 			entity("time_study", 
 				attribute("start_time", "start first")
 			),
@@ -138,8 +156,6 @@ public class RecordUpdaterTest {
 				attribute("start_time", "start second")
 			)
 		);
-		updater.initializeRecord(record);
-		
 		Entity timeStudy1 = entityByPath("/root/time_study[1]");
 		updater.deleteNode(timeStudy1);
 
@@ -154,15 +170,14 @@ public class RecordUpdaterTest {
 
 	@Test
 	public void testRemoveEntityGivesNodeDeleteChange() {
-		rootEntityDef(survey, "root", 
-			entityDef("time_study",
+		record(
+			rootEntityDef(
+				entityDef("time_study",
 					attributeDef("start_time")
-			)
-			.multiple()
-			.required()
-		);
-		
-		record = record(survey,
+				)
+				.multiple()
+				.required()
+			),
 			entity("time_study", 
 				attribute("start_time", "start first")
 			),
@@ -170,8 +185,6 @@ public class RecordUpdaterTest {
 				attribute("start_time", "start second")
 			)
 		);
-		updater.initializeRecord(record);
-		
 		Entity timeStudy1 = entityByPath("/root/time_study[1]");
 		NodeChangeSet changeSet = updater.deleteNode(timeStudy1);
 		
@@ -183,22 +196,19 @@ public class RecordUpdaterTest {
 	
 	@Test
 	public void testRemoveEntityWithCalculatedAttribute() {
-		rootEntityDef(survey, "root", 
-			entityDef("plot_details",
-				attributeDef("dbh_sum")
-					.calculated("sum(parent()/tree/dbh)"),
-				attributeDef("tree_health")
-					.relevant("dbh_sum > 0")
-					.required()
-			),
-			entityDef("tree",
+		record(
+			rootEntityDef(
+				entityDef("plot_details",
+					attributeDef("dbh_sum")
+						.calculated("sum(parent()/tree/dbh)"),
+					attributeDef("tree_health")
+						.relevant("dbh_sum > 0")
+						.required()
+				),
+				entityDef("tree",
 					attributeDef("dbh")
-			)
-			.multiple()
-//			.required()
-		);
-		
-		record = record(survey,
+				).multiple()
+			),
 			entity("plot_details", 
 				attribute("dbh_sum"),
 				attribute("tree_health")
@@ -207,14 +217,10 @@ public class RecordUpdaterTest {
 				attribute("dbh", "1")
 			)
 		);
-		updater.initializeRecord(record);
-		
 		Entity plotDetails = entityByPath("/root/plot_details");
 		Entity tree1 = entityByPath("/root/tree[1]");
 		
 		NodeChangeSet changeSet = updater.deleteNode(tree1);
-		
-//		assertEquals(1, changeSet.size());
 		
 		Attribute<?, ?> dbhSum = (Attribute<?, ?>) plotDetails.getChild("dbh_sum");
 		assertEquals(new TextValue("0.0"), dbhSum.getValue());
@@ -225,21 +231,18 @@ public class RecordUpdaterTest {
 	
 	@Test
 	public void testRemoveEntityUpdatesCalculatedPosition() {
-		rootEntityDef(survey, "root", 
-			entityDef("tree",
-				attributeDef("tree_num")
-					.calculated("idm:position()")
-			)
-			.multiple()
-		);
-		
-		record = record(survey,
+		record(
+			rootEntityDef(
+				entityDef("tree",
+					attributeDef("tree_num")
+						.calculated("idm:position()")
+				)
+				.multiple()
+			),
 			entity("tree"),
 			entity("tree"),
 			entity("tree")
 		);
-		updater.initializeRecord(record);
-		
 		Entity tree1 = entityByPath("/root/tree[1]");
 		Entity tree2 = entityByPath("/root/tree[2]");
 		Entity tree3 = entityByPath("/root/tree[3]");
@@ -251,6 +254,11 @@ public class RecordUpdaterTest {
 		
 		Attribute<?, ?> treeNum3 = (Attribute<?, ?>) tree3.getChild("tree_num");
 		assertEquals(new TextValue("2"), treeNum3.getValue());
+	}
+	
+	protected void record(EntityDefinition rootDef, NodeBuilder... builders) {
+		record = NodeBuilder.record(survey, builders);
+		updater.initializeRecord(record);
 	}
 	
 	protected Entity entityByPath(String path) {
