@@ -13,7 +13,6 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
 import org.openforis.collect.relational.jooq.JooqDatabaseExporter;
 import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
@@ -88,7 +87,7 @@ public class CollectRDBPublisher {
 	protected void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
 			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
 		int count = 0;
-		DatabaseExporter databaseExporter = new JooqDatabaseExporter(new DialectAwareJooqFactory(targetConn));
+		DatabaseExporter databaseExporter = new JooqDatabaseExporter(targetConn);
 		databaseExporter.insertReferenceData(targetSchema);
 		for (CollectRecord summary : summaries) {
 			if ( LOG.isInfoEnabled() ) {

@@ -19,9 +19,9 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
-import org.jooq.impl.Factory;
+import org.jooq.impl.DSL;
+import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
-import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonVernacularNameRecord;
 import org.openforis.idm.model.species.TaxonVernacularName;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.JooqFactory> {
+public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacularName, TaxonVernacularNameDao.TaxonVernacularNameDSLContext> {
 	
 	private static final TableField[] QUALIFIER_FIELDS = {OFC_TAXON_VERNACULAR_NAME.QUALIFIER1, OFC_TAXON_VERNACULAR_NAME.QUALIFIER2, OFC_TAXON_VERNACULAR_NAME.QUALIFIER3};
 
@@ -51,7 +51,7 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 	}
 
 	public TaxonVernacularNameDao() {
-		super(TaxonVernacularNameDao.JooqFactory.class);
+		super(TaxonVernacularNameDao.TaxonVernacularNameDSLContext.class);
 	}
 
 	@Override
@@ -79,15 +79,15 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 	}	
 	
 	public List<TaxonVernacularName> findByVernacularName(int taxonomyId, String searchString, String[] qualifierValues, int maxResults) {
-		JooqFactory jf = getMappingJooqFactory();
+		TaxonVernacularNameDSLContext dsl = dsl();
 		//find containing
 		searchString = "%" + searchString.toUpperCase() + "%";
 		
-		SelectConditionStep selectConditionStep = jf.select(OFC_TAXON_VERNACULAR_NAME.getFields())
+		SelectConditionStep selectConditionStep = dsl.select(OFC_TAXON_VERNACULAR_NAME.fields())
 			.from(OFC_TAXON_VERNACULAR_NAME)
 			.join(OFC_TAXON).on(OFC_TAXON.ID.equal(OFC_TAXON_VERNACULAR_NAME.TAXON_ID))
 			.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId)
-				.and(JooqFactory.upper(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME).like(searchString)));
+				.and(DSL.upper(OFC_TAXON_VERNACULAR_NAME.VERNACULAR_NAME).like(searchString)));
 		
 		if ( qualifierValues != null ) {
 			for (int i = 0; i < qualifierValues.length; i++) {
@@ -100,54 +100,59 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 		}
 		selectConditionStep.limit(maxResults);
 		Result<?> result = selectConditionStep.fetch();
-		List<TaxonVernacularName> entities = jf.fromResult(result);
+		List<TaxonVernacularName> entities = dsl.fromResult(result);
 		return entities;
 	}
 
 	public List<TaxonVernacularName> findByTaxon(int taxonId) {
-		JooqFactory jf = getMappingJooqFactory();
+		TaxonVernacularNameDSLContext dsl = dsl();
 		
-		SelectConditionStep selectConditionStep = jf.select(OFC_TAXON_VERNACULAR_NAME.getFields())
+		SelectConditionStep selectConditionStep = dsl.select(OFC_TAXON_VERNACULAR_NAME.fields())
 			.from(OFC_TAXON_VERNACULAR_NAME)
 			.where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.equal(taxonId));
 		
 		Result<?> result = selectConditionStep.fetch();
-		List<TaxonVernacularName> entities = jf.fromResult(result);
+		List<TaxonVernacularName> entities = dsl.fromResult(result);
 		return entities;
 	}
 
 	
 	public void deleteByTaxonomy(int taxonomyId) {
-		JooqFactory jf = getMappingJooqFactory();
-		SelectConditionStep selectTaxonIds = jf.select(OFC_TAXON.ID).from(OFC_TAXON).where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
-		jf.delete(OFC_TAXON_VERNACULAR_NAME).where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.in(selectTaxonIds)).execute();
+		TaxonVernacularNameDSLContext dsl = dsl();
+		SelectConditionStep selectTaxonIds = dsl
+				.select(OFC_TAXON.ID)
+				.from(OFC_TAXON)
+				.where(OFC_TAXON.TAXONOMY_ID.equal(taxonomyId));
+		dsl.delete(OFC_TAXON_VERNACULAR_NAME)
+			.where(OFC_TAXON_VERNACULAR_NAME.TAXON_ID.in(selectTaxonIds))
+			.execute();
 	}
 	
 	public void insert(List<TaxonVernacularName> items) {
 		if ( items != null && ! items.isEmpty() ) {
-			JooqFactory jf = getMappingJooqFactory();
-			int id = jf.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
+			TaxonVernacularNameDSLContext dsl = dsl();
+			int id = dsl.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
 			int maxId = id;
-			Insert<OfcTaxonVernacularNameRecord> query = jf.createInsertStatement();
-			BatchBindStep batch = jf.batch(query);
+			Insert<OfcTaxonVernacularNameRecord> query = dsl.createInsertStatement();
+			BatchBindStep batch = dsl.batch(query);
 			for (TaxonVernacularName item : items) {
 				if ( item.getId() == null ) {
 					item.setId(id++);
 				}
-				Object[] values = jf.extractValues(item);
+				Object[] values = dsl.extractValues(item);
 				batch.bind(values);
 				maxId = Math.max(maxId, item.getId());
 			}
 			batch.execute();
-			jf.restartSequence(OFC_TAXON_VERNACULAR_NAME_ID_SEQ, maxId + 1);
+			dsl.restartSequence(OFC_TAXON_VERNACULAR_NAME_ID_SEQ, maxId + 1);
 		}
 	}
 
 	public void duplicateVernacularNames(int oldTaxonomyId,
 			int taxonIdGap) {
-		JooqFactory jf = getMappingJooqFactory();
-		int nextId = jf.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
-		int minId = loadMinId(jf, oldTaxonomyId);
+		TaxonVernacularNameDSLContext dsl = dsl();
+		int nextId = dsl.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
+		int minId = loadMinId(dsl, oldTaxonomyId);
 		int idGap = nextId - minId;
 		Field<?>[] selectFields = {
 				OFC_TAXON_VERNACULAR_NAME.ID.add(idGap),
@@ -157,20 +162,20 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 				OFC_TAXON_VERNACULAR_NAME.LANGUAGE_VARIETY,
 				OFC_TAXON_VERNACULAR_NAME.STEP};
 		selectFields = ArrayUtils.addAll(selectFields, QUALIFIER_FIELDS);
-		Select<?> select = jf.select(selectFields)
+		Select<?> select = dsl.select(selectFields)
 				.from(OFC_TAXON_VERNACULAR_NAME)
 					.join(OFC_TAXON)
 					.on(OFC_TAXON.ID.equal(OFC_TAXON_VERNACULAR_NAME.TAXON_ID))
 				.where(OFC_TAXON.TAXONOMY_ID.equal(oldTaxonomyId))
 				.orderBy(OFC_TAXON_VERNACULAR_NAME.TAXON_ID, OFC_TAXON_VERNACULAR_NAME.ID);
-		Insert<?> insert = jf.insertInto(OFC_TAXON_VERNACULAR_NAME, TAXON_VERNACULAR_NAME_FIELDS).select(select);
+		Insert<?> insert = dsl.insertInto(OFC_TAXON_VERNACULAR_NAME, TAXON_VERNACULAR_NAME_FIELDS).select(select);
 		int insertedCount = insert.execute();
 		nextId = nextId + insertedCount;
-		jf.restartSequence(OFC_TAXON_VERNACULAR_NAME_ID_SEQ, nextId);
+		dsl.restartSequence(OFC_TAXON_VERNACULAR_NAME_ID_SEQ, nextId);
 	}
 	
-	protected int loadMinId(JooqFactory jf, int taxonomyId) {
-		Integer minId = jf.select(Factory.min(OFC_TAXON_VERNACULAR_NAME.ID))
+	protected int loadMinId(TaxonVernacularNameDSLContext jf, int taxonomyId) {
+		Integer minId = jf.select(DSL.min(OFC_TAXON_VERNACULAR_NAME.ID))
 				.from(OFC_TAXON_VERNACULAR_NAME)
 					.join(OFC_TAXON)
 					.on(OFC_TAXON.ID.equal(OFC_TAXON_VERNACULAR_NAME.TAXON_ID))
@@ -180,15 +185,14 @@ public class TaxonVernacularNameDao extends MappingJooqDaoSupport<TaxonVernacula
 	}
 
 	public int nextId() {
-		JooqFactory jf = getMappingJooqFactory();
-		return jf.nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
+		return dsl().nextId(OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ);
 	}
 
-	protected static class JooqFactory extends MappingJooqFactory<TaxonVernacularName> {
+	protected static class TaxonVernacularNameDSLContext extends MappingDSLContext<TaxonVernacularName> {
 
 		private static final long serialVersionUID = 1L;
 
-		public JooqFactory(Connection connection) {
+		public TaxonVernacularNameDSLContext(Connection connection) {
 			super(connection, OFC_TAXON_VERNACULAR_NAME.ID, OFC_TAXON_VERNACULAR_NAME_ID_SEQ, TaxonVernacularName.class);
 		}
 

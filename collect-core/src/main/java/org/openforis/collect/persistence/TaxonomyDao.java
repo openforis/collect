@@ -11,8 +11,8 @@ import org.jooq.Result;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.openforis.collect.model.CollectTaxonomy;
+import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
-import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
  * @author G. Miceli
  */
 @Transactional
-public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, TaxonomyDao.JooqFactory> {
+public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, TaxonomyDao.TaxonomyDSLContext> {
 
 	public TaxonomyDao() {
-		super(TaxonomyDao.JooqFactory.class);
+		super(TaxonomyDao.TaxonomyDSLContext.class);
 	}
 	
 	@Transactional
@@ -37,16 +37,16 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 	}
 	
 	protected CollectTaxonomy loadBySurvey(int surveyId, String name, boolean work) {
-		JooqFactory jf = getMappingJooqFactory();
 		TableField<OfcTaxonomyRecord, Integer> surveyIdField = work ? OFC_TAXONOMY.SURVEY_WORK_ID: OFC_TAXONOMY.SURVEY_ID;
-		Record r = jf.selectFrom(OFC_TAXONOMY)
+		TaxonomyDSLContext dsl = dsl();
+		Record r = dsl.selectFrom(OFC_TAXONOMY)
 				.where(surveyIdField.equal(surveyId))
 				.and(OFC_TAXONOMY.NAME.equal(name))
 				.fetchOne();
 		if ( r == null ) {
 			return null;
 		} else {
-			return jf.fromRecord(r);
+			return dsl.fromRecord(r);
 		}
 	}
 	
@@ -59,16 +59,16 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 	}
 	
 	protected List<CollectTaxonomy> loadBySurvey(int surveyId, boolean work) {
-		JooqFactory jf = getMappingJooqFactory();
+		TaxonomyDSLContext dsl = dsl();
 		TableField<OfcTaxonomyRecord, Integer> surveyIdField = work ? OFC_TAXONOMY.SURVEY_WORK_ID: OFC_TAXONOMY.SURVEY_ID;
-		Result<OfcTaxonomyRecord> r = jf.selectFrom(OFC_TAXONOMY)
+		Result<OfcTaxonomyRecord> r = dsl.selectFrom(OFC_TAXONOMY)
 				.where(surveyIdField.equal(surveyId))
 				.orderBy(OFC_TAXONOMY.NAME)
 				.fetch();
 		if ( r == null ) {
 			return null;
 		} else {
-			return jf.fromResult(r);
+			return dsl.fromResult(r);
 		}
 	}
 	
@@ -92,11 +92,11 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 		super.delete(id);
 	}
 
-	protected static class JooqFactory extends MappingJooqFactory<CollectTaxonomy> {
+	protected static class TaxonomyDSLContext extends MappingDSLContext<CollectTaxonomy> {
 
 		private static final long serialVersionUID = 1L;
 
-		public JooqFactory(Connection connection) {
+		public TaxonomyDSLContext(Connection connection) {
 			super(connection, OFC_TAXONOMY.ID, OFC_TAXONOMY_ID_SEQ, CollectTaxonomy.class);
 		}
 

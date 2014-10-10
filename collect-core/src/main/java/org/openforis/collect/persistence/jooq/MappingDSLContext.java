@@ -10,25 +10,26 @@ import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.Sequence;
-import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
-import org.jooq.UpdatableTable;
 import org.jooq.UpdateQuery;
-import org.jooq.impl.Factory;
+import org.jooq.impl.DSL;
 import org.jooq.impl.TableImpl;
 
 /**
- * @author G. Miceli
+ * 
+ * @author S. Ricci
+ *
  */
-public abstract class MappingJooqFactory<E> extends DialectAware {
+public abstract class MappingDSLContext<E> extends CollectDSLContext {
+
 	private static final long serialVersionUID = 1L;
 	
 	private TableField<?,Integer> idField;
 	private Sequence<? extends Number> idSequence;
 	private Class<E> clazz;
 	
-	public MappingJooqFactory(Connection conn, TableField<?,Integer> idField, Sequence<? extends Number> idSequence, Class<E> clazz) {
+	public MappingDSLContext(Connection conn, TableField<?,Integer> idField, Sequence<? extends Number> idSequence, Class<E> clazz) {
 		super(conn);
 		this.idField = idField;
 		this.idSequence = idSequence;
@@ -49,36 +50,36 @@ public abstract class MappingJooqFactory<E> extends DialectAware {
 		return select;
 	}
 
-	public <T> SimpleSelectQuery<?> selectByFieldQuery(TableField<?,T> field, T value) {
-		SimpleSelectQuery<?> select = selectQuery(getTable());
+	public <T> SelectQuery<?> selectByFieldQuery(TableField<?,T> field, T value) {
+		SelectQuery<?> select = selectQuery(getTable());
 		select.addConditions(field.equal(value));
 		return select;
 	}
 
-	public SelectQuery selectCountQuery() {
-		SelectQuery select = selectQuery();
-		select.addSelect(Factory.count());
+	public SelectQuery<?> selectCountQuery() {
+		SelectQuery<?> select = selectQuery();
+		select.addSelect(DSL.count());
 		select.addFrom(getTable());
 		return select;
 	}
 
-	public <T> SimpleSelectQuery<?> selectStartsWithQuery(TableField<?,String> field, String searchString) {
+	public <T> SelectQuery<?> selectStartsWithQuery(TableField<?,String> field, String searchString) {
 		if ( searchString == null || searchString.isEmpty() ) {
 			throw new IllegalArgumentException("Search string required");
 		}
-		SimpleSelectQuery<?> select = selectQuery(getTable());
+		SelectQuery<?> select = selectQuery(getTable());
 		searchString = searchString.toUpperCase() + "%";
-		select.addConditions(upper(field).like(searchString));
+		select.addConditions(DSL.upper(field).like(searchString));
 		return select;
 	}
 
-	public <T> SimpleSelectQuery<?> selectContainsQuery(TableField<?,String> field, String searchString) {
+	public <T> SelectQuery<?> selectContainsQuery(TableField<?,String> field, String searchString) {
 		if ( searchString == null || searchString.isEmpty() ) {
 			throw new IllegalArgumentException("Search string required");
 		}
-		SimpleSelectQuery<?> select = selectQuery(getTable());
+		SelectQuery<?> select = selectQuery(getTable());
 		searchString = "%" + searchString.toUpperCase() + "%";
-		select.addConditions(upper(field).like(searchString));
+		select.addConditions(DSL.upper(field).like(searchString));
 		return select;
 	}
 	
@@ -156,4 +157,5 @@ public abstract class MappingJooqFactory<E> extends DialectAware {
 			throw new RuntimeException(e);
 		}
 	}
+
 }

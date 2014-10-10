@@ -1,18 +1,18 @@
 package org.openforis.collect.relational.jooq;
 
-import static org.jooq.impl.Factory.fieldByName;
-import static org.jooq.impl.Factory.tableByName;
-
 import java.sql.BatchUpdateException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.DSLContext;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.exception.DataAccessException;
-import org.jooq.impl.Factory;
+import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
 import org.openforis.collect.relational.model.Column;
@@ -28,11 +28,14 @@ import org.openforis.collect.relational.model.Table;
  */
 public class JooqDatabaseExporter implements DatabaseExporter {
 
-	private Factory create;
+	private DSLContext dsl;
 	
-	public JooqDatabaseExporter(Factory create) {
-		super();
-		this.create = create;
+	public JooqDatabaseExporter(Connection connection) {
+		this(new CollectDSLContext(connection));
+	}
+
+	public JooqDatabaseExporter(DSLContext dsl) {
+		this.dsl = dsl;
 	}
 
 	@Override
@@ -55,18 +58,18 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 				Row row = rows.get(rowno);
 				Table<?> table = row.getTable();
 				List<Column<?>> cols = table.getColumns();
-				InsertQuery<Record> insert = create.insertQuery(getQualifiedTableName(schema, table));
+				InsertQuery<Record> insert = dsl.insertQuery(getQualifiedTableName(schema, table));
 				List<Object> values = row.getValues();
 				for (int colno = 0; colno < cols.size(); colno++) {
 					Object val = values.get(colno);
 					if ( val != null ) {
 						String col = cols.get(colno).getName();
-						insert.addValue(fieldByName(col), val);
+						insert.addValue(DSL.fieldByName(col), val);
 					}
 				}
 				inserts.add(insert);
 			}
-			create.batch(inserts).execute();
+			dsl.batch(inserts).execute();
 		} catch (DataAccessException e) {
 			Throwable e2 = e.getCause();
 			if ( e2 instanceof BatchUpdateException ) {
@@ -78,12 +81,12 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 	}
 
 	private org.jooq.Table<Record> getQualifiedTableName(RelationalSchema schema, Table<?> table) {
-		boolean isSchemaLessDB = create.getDialect() == SQLDialect.SQLITE;
+		boolean isSchemaLessDB = dsl.configuration().dialect() == SQLDialect.SQLITE;
 		
 		if ( isSchemaLessDB ) {
-			return tableByName(table.getName());
+			return DSL.tableByName(table.getName());
 		} else {
-			return tableByName(schema.getName(), table.getName());
+			return DSL.tableByName(schema.getName(), table.getName());
 		}
 	}
 }

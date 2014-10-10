@@ -6,21 +6,21 @@ import java.util.List;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.ResultQuery;
-import org.jooq.SimpleSelectQuery;
+import org.jooq.SelectQuery;
 import org.jooq.TableField;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  */
-public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends JooqDaoSupport {
-	private Class<J> jooqFactoryClass;
+public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends JooqDaoSupport {
+	private Class<C> jooqFactoryClass;
 
-	public MappingJooqDaoSupport(Class<J> jooqFactoryClass) {
+	public MappingJooqDaoSupport(Class<C> jooqFactoryClass) {
 		this.jooqFactoryClass = jooqFactoryClass;
 	}
 	
-	protected J getMappingJooqFactory() {
+	protected C dsl() {
 		Connection conn = getConnection();
 		try {
 			return jooqFactoryClass.getConstructor(Connection.class).newInstance(conn);
@@ -32,54 +32,54 @@ public class MappingJooqDaoSupport<E, J extends MappingJooqFactory<E>> extends J
 	}
 	
 	protected List<E> findStartingWith(TableField<?,String> field, String searchString, int maxResults) {
-		J jf = getMappingJooqFactory();
-		SimpleSelectQuery<?> query = jf.selectStartsWithQuery(field, searchString);
+		C dsl = dsl();
+		SelectQuery<?> query = dsl.selectStartsWithQuery(field, searchString);
 		query.addLimit(maxResults);
 		query.execute();
 		Result<?> result = query.getResult();
-		List<E> entities = jf.fromResult(result);
+		List<E> entities = dsl.fromResult(result);
 		return entities;
 
 	}
 	
 	protected List<E> findContaining(TableField<?,String> field, String searchString, int maxResults) {
-		J jf = getMappingJooqFactory();
-		SimpleSelectQuery<?> query = jf.selectContainsQuery(field, searchString);
+		C ds = dsl();
+		SelectQuery<?> query = ds.selectContainsQuery(field, searchString);
 		query.addLimit(maxResults);
 		query.execute();
 		Result<?> result = query.getResult();
-		List<E> entities = jf.fromResult(result);
+		List<E> entities = ds.fromResult(result);
 		return entities;
 
 	}
 	
 	@Transactional
 	protected E loadById(int id) {
-		J jf = getMappingJooqFactory();
-		ResultQuery<?> selectQuery = jf.selectByIdQuery(id);
+		C ds = dsl();
+		ResultQuery<?> selectQuery = ds.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
 		if ( r == null ) {
 			return null;
 		} else {
-			return jf.fromRecord(r);
+			return ds.fromRecord(r);
 		}
 	}
 	
 	@Transactional
 	protected void insert(E entity) {
-		J jf = getMappingJooqFactory();
-		jf.insertQuery(entity).execute();
+		C ds = dsl();
+		ds.insertQuery(entity).execute();
 	}
 	
 	@Transactional
 	protected void update(E entity) {
-		J jf = getMappingJooqFactory();
-		jf.updateQuery(entity).execute();
+		C ds = dsl();
+		ds.updateQuery(entity).execute();
 	}
 
 	@Transactional
 	protected void delete(int id) {
-		J jf = getMappingJooqFactory();
-		jf.deleteQuery(id).execute();
+		C ds = dsl();
+		ds.deleteQuery(id).execute();
 	}
 }

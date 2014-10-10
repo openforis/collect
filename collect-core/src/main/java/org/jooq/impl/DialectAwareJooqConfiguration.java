@@ -65,10 +65,7 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 	}
 	
 	private static Configuration createConfiguration(Connection connection) {
-		return createConfiguration(getDialect(connection));
-	}
-	
-	private static Configuration createConfiguration(SQLDialect dialect) {
+		SQLDialect dialect = getDialect(connection);
 		Settings settings = new Settings();
 		switch ( dialect ) {
 		case SQLITE:
@@ -82,6 +79,7 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 		DefaultConfiguration configuration = new DefaultConfiguration();
 		configuration.set(settings);
 		configuration.set(dialect);
+		configuration.set(connection);
 		return configuration;
 	}
 	
