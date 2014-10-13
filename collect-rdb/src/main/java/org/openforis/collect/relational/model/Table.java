@@ -24,8 +24,4 @@ public interface Table<T> {
 
 	List<ReferentialConstraint> getReferentialContraints();
 
-	Dataset extractData(T source);
-	
-	Row extractRow(T source);
-
 }

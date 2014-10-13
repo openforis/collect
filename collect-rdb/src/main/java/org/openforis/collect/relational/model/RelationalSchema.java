@@ -1,6 +1,7 @@
 package org.openforis.collect.relational.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,8 +13,6 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.Record;
 
 /**
  * 
@@ -51,6 +50,15 @@ public final class RelationalSchema {
 		return Collections.unmodifiableList(tableList);
 	}
 	
+	public Collection<DataTable> getDataTables() {
+		Collection<DataTable> tables = dataTablesById.values();
+		return tables;
+	}
+	
+	public Collection<DataTable> getRootDataTables() {
+		return rootDataTables.values();
+	}
+	
 	public Table<?> getTable(String name) {
 		Table<?> table = tables.get(name);
 		if ( table == null ) {
@@ -70,16 +78,6 @@ public final class RelationalSchema {
 		return codeListTables.get(key);
 	}
 
-	public Dataset getReferenceData() {
-		Dataset dataset = new Dataset();
-		List<CodeTable> codeListTables = getCodeListTables();
-		for (CodeTable codeListTable : codeListTables) {
-			Dataset codeListDataset = codeListTable.extractData();
-			dataset.addRows(codeListDataset.getRows());
-		}
-		return dataset;
-	}
-	
 	public boolean containsTable(String name) {
 		return tables.containsKey(name);
 	}
@@ -113,17 +111,6 @@ public final class RelationalSchema {
 				entityDefn = entityDefn.getParentEntityDefinition();
 		}
 		dataTablesById.put( nodeId, dataTablesById.get(entityDefn.getId()) );
-	}
-	
-	public Dataset createDataset(Record record) {
-		Entity root = record.getRootEntity();
-		EntityDefinition rootDefn = root.getDefinition();
-		String name = rootDefn.getName();
-		DataTable dataTable = rootDataTables.get(name);
-		if ( dataTable == null ) {
-			throw new IllegalArgumentException("Invalid root entity "+name);
-		}
-		return dataTable.extractData(root);
 	}
 
 	public DataTable getDataTable(NodeDefinition nodeDefinition) {

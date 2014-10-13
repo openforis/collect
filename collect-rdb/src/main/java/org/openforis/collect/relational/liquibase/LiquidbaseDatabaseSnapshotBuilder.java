@@ -33,8 +33,7 @@ class LiquidbaseDatabaseSnapshotBuilder {
 		UnsupportedDatabase db = new UnsupportedDatabase();
 		snapshot = new DatabaseSnapshot(db, null);
 
-		createCodeListTables();
-		createDataTables();
+		createTables();
 		
 		if( dbSupportsFKs ){
 			createForeignKeys();
@@ -45,12 +44,7 @@ class LiquidbaseDatabaseSnapshotBuilder {
 		return snapshot;
 	}
 
-	private void createCodeListTables() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void createDataTables() {
+	private void createTables() {
 		// Create table
 		for (org.openforis.collect.relational.model.Table<?> itable : schema.getTables()) {
 			Table ltable = new Table(itable.getName());

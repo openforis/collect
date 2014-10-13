@@ -8,7 +8,13 @@ import org.jooq.Configuration;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.conf.Settings;
+import org.jooq.impl.DefaultConfiguration;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 
 	private static final long serialVersionUID = 1L;
@@ -82,7 +88,5 @@ public class DialectAwareJooqConfiguration extends DefaultConfiguration {
 		configuration.set(connection);
 		return configuration;
 	}
-	
-	
 	
 }

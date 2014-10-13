@@ -2,6 +2,7 @@ package org.openforis.collect.persistence.jooq;
 
 import java.sql.Connection;
 
+import org.jooq.Configuration;
 import org.jooq.SQLDialect;
 import org.jooq.Schema;
 import org.jooq.Sequence;
@@ -10,14 +11,23 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultDSLContext;
 import org.jooq.impl.DialectAwareJooqConfiguration;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class CollectDSLContext extends DefaultDSLContext {
 
 	private static final long serialVersionUID = 1L;
 	
 	public CollectDSLContext(Connection connection) {
-		super(new DialectAwareJooqConfiguration(connection));
+		this(new DialectAwareJooqConfiguration(connection));
 	}
 	
+	public CollectDSLContext(Configuration conf) {
+		super(conf);
+	}
+
 	public int nextId(TableField<?, Integer> idField, Sequence<? extends Number> idSequence) {
 		if (isSQLite()){
 			Integer id = (Integer) select(DSL.max(idField))

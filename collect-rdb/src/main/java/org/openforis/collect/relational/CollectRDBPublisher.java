@@ -1,5 +1,7 @@
 package org.openforis.collect.relational;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -60,10 +62,11 @@ public class CollectRDBPublisher {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		
 		// Generate relational model
-		RelationalSchemaGenerator rsg = new RelationalSchemaGenerator(config);
-		RelationalSchema targetSchema = rsg.generateSchema(survey, targetSchemaName);
+		RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(config);
+		RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, targetSchemaName);
 		
-		createTargetDBSchema(targetSchema, targetConn);
+		RelationalSchemaCreator relationalSchemaCreator = new LiquibaseRelationalSchemaCreator();
+		relationalSchemaCreator.createRelationalSchema(relationalSchema, targetConn);
 		
 		// Insert data
 		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName, step);
@@ -71,40 +74,47 @@ public class CollectRDBPublisher {
 		if ( LOG.isInfoEnabled() ) {
 			LOG.info("Total records: " + total);
 		}
-		insertRecords(survey, summaries, step, targetSchema, targetConn);
+		insertRecords(survey, summaries, step, relationalSchema, targetConn);
 		if ( LOG.isInfoEnabled() ) {
 			LOG.info("\nAll records exported");
 		}
 	}
-
-	protected void createTargetDBSchema(RelationalSchema targetSchema, Connection targetConn)
-			throws CollectRdbException {
-		RelationalSchemaCreator relationalSchemaCreator = new LiquibaseRelationalSchemaCreator();
-		relationalSchemaCreator.createRelationalSchema(targetSchema, targetConn);
+	
+	public void exportToSQL(Writer writer, int surveyId, boolean work, String targetSchemaName, boolean includeData) throws CollectRdbException, IOException {
+		RelationalSchemaConfig config = RelationalSchemaConfig.createDefault();
+		CollectSurvey survey;
+		if ( work ) {
+			survey = surveyManager.loadSurveyWork(surveyId);
+		} else {
+			survey = surveyManager.getById(surveyId);
+		}
+		RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(config);
+		RelationalSchema schema = schemaGenerator.generateSchema(survey, targetSchemaName);
+		
+		new SQLRelationalSchemaCreator().writeRelationalSchema(writer, schema);
 	}
 	
 	@Transactional("rdbTransactionManager")
-	protected void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
+	private void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
 			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
-		int count = 0;
 		DatabaseExporter databaseExporter = new JooqDatabaseExporter(targetConn);
 		databaseExporter.insertReferenceData(targetSchema);
-		for (CollectRecord summary : summaries) {
-			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Exporting record #" + (++count) + " id: " + summary.getId());
-			}
+		for (int i = 0; i < summaries.size(); i++) {
+			CollectRecord summary = summaries.get(i);
+//			if ( LOG.isInfoEnabled() ) {
+//				LOG.info("Exporting record #" + (++i) + " id: " + summary.getId());
+//			}
 			CollectRecord record = recordManager.load(survey, summary.getId(), step);
 			databaseExporter.insertData(targetSchema, record);
 		}
 		try {
 			targetConn.commit();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException("Error inserting records into relational database", e);
 		}
 	}
 	
-	protected Connection getTargetConnection() {
+	private Connection getTargetConnection() {
 		DataSource targetDataSource = rdbDataSource == null ? dataSource: rdbDataSource;
 		Connection targetConn = DataSourceUtils.getConnection(targetDataSource);
 		return targetConn;
