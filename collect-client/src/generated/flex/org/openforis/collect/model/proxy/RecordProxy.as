@@ -149,6 +149,11 @@ package org.openforis.collect.model.proxy {
 			if ( change.deletedNodeId > 0 ) {
 				var node:NodeProxy = getNode(change.deletedNodeId);
 				if (node != null ) {
+					if ( node is EntityProxy ) {
+						EntityProxy(node).traverse(function(descendant:NodeProxy):void {
+							_nodesMap[descendant.id] = null;
+						});
+					}
 					var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
 					parent.removeChild(node);
 					_nodesMap[node.id] = null;
