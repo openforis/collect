@@ -12,10 +12,10 @@
     onClose="@global-command('closeValidationResultsPopUp')"
     >
     
-    <vbox align="center">
+    <vbox align="center" vflex="true">
       <listbox id="listbox" 
         rows="10"
-        width="710px" 
+        width="710px" vflex="true"
         model="@load(vm.results)">
         <listhead>
           <listheader label="${labels.survey.validation.severity}" width="90px" 

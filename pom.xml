@@ -318,6 +318,13 @@
 			</dependency>
 			<dependency>
 				<groupId>org.openforis.idm</groupId>
+				<artifactId>idm-api</artifactId>
+				<version>${idm.version}</version>
+				<type>test-jar</type>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.openforis.idm</groupId>
 				<artifactId>idm-api-protostuff</artifactId>
 				<version>${idm.version}</version>
 			</dependency>

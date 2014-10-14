@@ -64,7 +64,6 @@ public class DataHandler extends DefaultHandler {
 	private CollectSurvey recordSurvey;
 	private CollectSurvey currentSurvey;
 	private int ignoreLevels;
-	private boolean calculatedAttributeEvaluationEnabled;
 	
 	private Map<String, User> usersByName;
 	
@@ -72,25 +71,16 @@ public class DataHandler extends DefaultHandler {
 		this(null, survey);
 	}
 	
-	public DataHandler(CollectSurvey survey, boolean evaluateCalculatedAttributes) {
-		this(null, survey, survey, evaluateCalculatedAttributes);
-	}
-	
 	public DataHandler(UserManager userManager, CollectSurvey survey) {
-		this(userManager, survey, survey, true);
-	}
-
-	public DataHandler(UserManager userManager, CollectSurvey currentSurvey, CollectSurvey recordSurvey) {
-		this(userManager, currentSurvey, recordSurvey, true);
+		this(userManager, survey, survey);
 	}
 	
-	public DataHandler(UserManager userManager, CollectSurvey currentSurvey, CollectSurvey recordSurvey, boolean calculatedAttributeEvaluationEnabled) {
+	public DataHandler(UserManager userManager, CollectSurvey currentSurvey, CollectSurvey recordSurvey) {
 		super();
 		this.userManager = userManager;
 		this.currentSurvey = currentSurvey;
 		this.recordSurvey = recordSurvey;
 		this.usersByName = new HashMap<String, User>();
-		this.calculatedAttributeEvaluationEnabled = calculatedAttributeEvaluationEnabled;
 	}
 
 	@Override
@@ -155,7 +145,6 @@ public class DataHandler extends DefaultHandler {
 		} else {
 			String versionName = extractVersionName(attributes);
 			record = new CollectRecord(currentSurvey, versionName);
-			record.setCalculatedAttributeEvaluationEnabled(calculatedAttributeEvaluationEnabled);
 			String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
 			State state = State.fromCode(stateAttr);
 			record.setState(state);

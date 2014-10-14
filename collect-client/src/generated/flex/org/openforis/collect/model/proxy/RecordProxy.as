@@ -118,15 +118,17 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		private function applyChange(change:NodeChangeProxy):void {
-			if ( change is NodeAddChangeProxy ) {
-				processNodeAddResponse(NodeAddChangeProxy(change));
-			}
 			if ( change is NodeDeleteChangeProxy ) {
 				processNodeDeleteResponse(NodeDeleteChangeProxy(change));
-			} else if ( change is AttributeChangeProxy ) {
-				processAttributeUpdateResponse(AttributeChangeProxy(change));
-			} else if ( change is EntityChangeProxy ) {
-				processEntityUpdateResponse(EntityChangeProxy(change));
+			} else {
+				if ( change is NodeAddChangeProxy ) {
+					processNodeAddResponse(NodeAddChangeProxy(change));
+				}
+				if ( change is AttributeChangeProxy ) {
+					processAttributeUpdateResponse(AttributeChangeProxy(change));
+				} else if ( change is EntityChangeProxy ) {
+					processEntityUpdateResponse(EntityChangeProxy(change));
+				}
 			}
 		}
 		
@@ -149,6 +151,11 @@ package org.openforis.collect.model.proxy {
 			if ( change.deletedNodeId > 0 ) {
 				var node:NodeProxy = getNode(change.deletedNodeId);
 				if (node != null ) {
+					if ( node is EntityProxy ) {
+						EntityProxy(node).traverse(function(descendant:NodeProxy):void {
+							_nodesMap[descendant.id] = null;
+						});
+					}
 					var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
 					parent.removeChild(node);
 					_nodesMap[node.id] = null;

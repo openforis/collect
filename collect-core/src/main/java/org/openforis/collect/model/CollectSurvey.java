@@ -38,6 +38,11 @@ public class CollectSurvey extends Survey {
 		this.annotations = new CollectAnnotations(this);
 	}
 
+	@Override
+	public CollectRecord createRecord(String version) {
+		return new CollectRecord(this, version);
+	}
+	
 	public UIOptions createUIOptions() {
 		return new UIOptions(this);
 	}

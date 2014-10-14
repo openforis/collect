@@ -16,6 +16,7 @@ import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordLock;
 import org.openforis.collect.model.RecordSummarySortField;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
@@ -27,14 +28,12 @@ import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.RecordValidationInProgressException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -213,8 +212,7 @@ public class RecordManager {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.addEmptyNodes(record);
-		recordUpdater.evaluateCalculatedAttributes(record);
+		recordUpdater.initializeRecord(record);
 		return record;
 	}
 	
@@ -321,13 +319,13 @@ public class RecordManager {
 		if ( lockingEnabled && sessionId == null ) {
 			throw new IllegalArgumentException("Lock session id not specified");
 		}
-		CollectRecord record = new CollectRecord(survey, modelVersionName);
+		CollectRecord record = survey.createRecord(modelVersionName);
 		record.createRootEntity(rootEntityName);
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 
 		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.addEmptyNodes(record);
+		recordUpdater.initializeRecord(record);
 		return record;
 	}
 
@@ -345,7 +343,7 @@ public class RecordManager {
 		record.updateEntityCounts();
 
 		Integer id = record.getId();
-		// before save record in current step
+		// before promoting record, save it in current step
 		if( id == null ) {
 			recordDao.insert( record );
 		} else {
@@ -455,17 +453,25 @@ public class RecordManager {
 		return updater.updateField(field, symbol);
 	}
 	
+	public NodeChangeSet addNode(Entity parentEntity, String nodeName) {
+		return updater.addNode(parentEntity, nodeName);
+	}
+	
 	/**
 	 * Adds a new entity to a the record.
 	 * 
 	 * @param parentEntity
-	 * @param nodeName
+	 * @param entityName
 	 * @return Changes applied to the record 
 	 */
-	public NodeChangeSet addEntity(Entity parentEntity, String nodeName) {
-		return updater.addEntity(parentEntity, nodeName);
+	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
+		return updater.addEntity(parentEntity, entityName);
 	}
 
+	public NodeChangeSet addAttribute(Entity parentEntity, String attributeName) {
+		return updater.addAttribute(parentEntity, attributeName);
+	}
+	
 	/**
 	 * Adds a new attribute to a record.
 	 * This attribute can be immediately populated with a value or with a FieldSymbol, and remarks.
@@ -478,9 +484,7 @@ public class RecordManager {
 	 * @param remarks Remarks to set on each field of the attribute
 	 * @return Changes applied to the record 
 	 */
-	public NodeChangeSet addAttribute(
-			Entity parentEntity, String attributeName, Value value, FieldSymbol symbol, 
-			String remarks) {
+	public NodeChangeSet addAttribute(Entity parentEntity, String attributeName, Value value, FieldSymbol symbol, String remarks) {
 		return updater.addAttribute(parentEntity, attributeName, value, symbol, remarks);
 	}
 
@@ -512,31 +516,7 @@ public class RecordManager {
 	 * @return 
 	 */
 	public void validate(final CollectRecord record) {
-		record.resetValidationInfo();
-		Entity rootEntity = record.getRootEntity();
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.addEmptyNodes(rootEntity);
-		rootEntity.traverse(new NodeVisitor() {
-			@Override
-			public void visit(Node<? extends NodeDefinition> node, int idx) {
-				if ( node instanceof Attribute ) {
-					Attribute<?,?> attribute = (Attribute<?, ?>) node;
-					attribute.validateValue();
-				} else if ( node instanceof Entity ) {
-					Entity entity = (Entity) node;
-					ModelVersion version = record.getVersion();
-					EntityDefinition definition = entity.getDefinition();
-					List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
-					for (NodeDefinition childDefinition : childDefinitions) {
-						if ( version == null || version.isApplicable(childDefinition) ) {
-							String childName = childDefinition.getName();
-							entity.validateMaxCount(childName);
-							entity.validateMinCount(childName);
-						}
-					}
-				}
-			}
-		});
+		updater.validate(record);
 	}
 
 	/**
@@ -576,7 +556,7 @@ public class RecordManager {
 			boolean required = keyDefn.getMinCount() != null && keyDefn.getMinCount() > 0;
 			if ( required ) {
 				String path = keyDefn.getPath();
-				Node<?> keyNode = record.getNodeByPath(path);
+				Node<?> keyNode = record.findNodeByPath(path);
 				if ( keyNode == null ) {
 					throw new MissingRecordKeyException();
 				} else {
