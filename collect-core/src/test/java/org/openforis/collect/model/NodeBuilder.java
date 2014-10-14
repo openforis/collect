@@ -69,7 +69,7 @@ public class NodeBuilder {
 	}
 
 	protected Entity createDetachedEntity(EntityDefinition def) {
-		Entity entity = new Entity(def);
+		Entity entity = (Entity) def.createNode();
 		addChildren(entity, builders);
 		return entity;
 	}

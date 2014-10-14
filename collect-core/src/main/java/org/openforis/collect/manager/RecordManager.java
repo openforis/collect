@@ -343,7 +343,7 @@ public class RecordManager {
 		record.updateEntityCounts();
 
 		Integer id = record.getId();
-		// before save record in current step
+		// before promoting record, save it in current step
 		if( id == null ) {
 			recordDao.insert( record );
 		} else {
@@ -453,17 +453,25 @@ public class RecordManager {
 		return updater.updateField(field, symbol);
 	}
 	
+	public NodeChangeSet addNode(Entity parentEntity, String nodeName) {
+		return updater.addNode(parentEntity, nodeName);
+	}
+	
 	/**
 	 * Adds a new entity to a the record.
 	 * 
 	 * @param parentEntity
-	 * @param nodeName
+	 * @param entityName
 	 * @return Changes applied to the record 
 	 */
-	public NodeChangeSet addEntity(Entity parentEntity, String nodeName) {
-		return updater.addEntity(parentEntity, nodeName);
+	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
+		return updater.addEntity(parentEntity, entityName);
 	}
 
+	public NodeChangeSet addAttribute(Entity parentEntity, String attributeName) {
+		return updater.addAttribute(parentEntity, attributeName);
+	}
+	
 	/**
 	 * Adds a new attribute to a record.
 	 * This attribute can be immediately populated with a value or with a FieldSymbol, and remarks.
@@ -476,9 +484,7 @@ public class RecordManager {
 	 * @param remarks Remarks to set on each field of the attribute
 	 * @return Changes applied to the record 
 	 */
-	public NodeChangeSet addAttribute(
-			Entity parentEntity, String attributeName, Value value, FieldSymbol symbol, 
-			String remarks) {
+	public NodeChangeSet addAttribute(Entity parentEntity, String attributeName, Value value, FieldSymbol symbol, String remarks) {
 		return updater.addAttribute(parentEntity, attributeName, value, symbol, remarks);
 	}
 

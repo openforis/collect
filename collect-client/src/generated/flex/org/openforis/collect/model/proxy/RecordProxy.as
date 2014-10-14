@@ -118,15 +118,17 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		private function applyChange(change:NodeChangeProxy):void {
-			if ( change is NodeAddChangeProxy ) {
-				processNodeAddResponse(NodeAddChangeProxy(change));
-			}
 			if ( change is NodeDeleteChangeProxy ) {
 				processNodeDeleteResponse(NodeDeleteChangeProxy(change));
-			} else if ( change is AttributeChangeProxy ) {
-				processAttributeUpdateResponse(AttributeChangeProxy(change));
-			} else if ( change is EntityChangeProxy ) {
-				processEntityUpdateResponse(EntityChangeProxy(change));
+			} else {
+				if ( change is NodeAddChangeProxy ) {
+					processNodeAddResponse(NodeAddChangeProxy(change));
+				}
+				if ( change is AttributeChangeProxy ) {
+					processAttributeUpdateResponse(AttributeChangeProxy(change));
+				} else if ( change is EntityChangeProxy ) {
+					processEntityUpdateResponse(EntityChangeProxy(change));
+				}
 			}
 		}
 		

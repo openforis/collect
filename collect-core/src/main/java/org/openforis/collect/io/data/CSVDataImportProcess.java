@@ -36,6 +36,9 @@ import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.NodeAddChange;
+import org.openforis.collect.model.NodeChange;
+import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -50,7 +53,6 @@ import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
-import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
@@ -407,10 +409,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		int totalCount = parentEntity.getCount(attrName);
 		if ( totalCount > newValuesCount ) {
 			for (int i = totalCount - 1; i >= newValuesCount; i--) {
+				Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrName, i);
 				boolean toBeDeleted = false;
 				if ( i == 0 ) {
 					//do not delete attribute if it's empty but it has remarks or field symbols
-					Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrName, i);
 					if ( ! attr.hasData() )  {
 						toBeDeleted = true;
 					}
@@ -418,7 +420,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 					toBeDeleted = true;
 				}
 				if ( toBeDeleted ) {
-					parentEntity.remove(attrName, i);
+					recordManager.deleteNode(attr);
 				}
 			}
 		}
@@ -430,8 +432,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		String attrName = attrDefn.getName();
 		Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrName, index);
 		if ( attr == null ) {
-			attr = (Attribute<?, ?>) attrDefn.createNode();
-			parentEntity.add(attr);
+			attr = (Attribute<?, ?>) performNodeAdd(parentEntity, attrName);
 		}
 		try {
 			setValueInField(attr, fieldName, value, row, colName);
@@ -450,7 +451,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		} else {
 			@SuppressWarnings("unchecked")
 			Field<Object> field = (Field<Object>) attr.getField(fieldName);
-			field.setValueFromString(value);
+			Object fieldValue = field.parseValue(value);
+			recordManager.updateField(field, fieldValue);
 		}
 	}
 
@@ -469,7 +471,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			}
 		}
 		if ( valid ) {
-			((CoordinateAttribute) attr).getSrsIdField().setValue(value);
+			Field<String> field = ((CoordinateAttribute) attr).getSrsIdField();
+			recordManager.updateField(field, value);
 		}
 	}
 
@@ -486,7 +489,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				parsingError.setMessageArgs(new String[]{value});
 				status.addParsingError(parsingError);
 			} else {
-				((NumberAttribute<?, ?>) attr).setUnit(unit);
+				Field<Integer> field = ((NumberAttribute<?, ?>) attr).getUnitField();
+				recordManager.updateField(field, unit.getId());
 			}
 		}
 	}
@@ -635,7 +639,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		if ( identifier instanceof EntityPositionIdentifier ) {
 			int position = ((EntityPositionIdentifier) identifier).getPosition();
 			if ( position == currentParent.getCount(childName) + 1 ) {
-				Entity entity = EntityBuilder.addEntity(currentParent, childName);
+				Entity entity = (Entity) performNodeAdd(currentParent, childName);
 				return entity;
 			} else {
 				throw new IllegalArgumentException(
@@ -645,11 +649,21 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 								position));
 			}
 		} else {
-			Entity entity = EntityBuilder.addEntity(currentParent, childName);
+			Entity entity = (Entity) performNodeAdd(currentParent, childName);
 			String[] keyValues = ((EntityKeysIdentifier) identifier).getKeyValues();
 			setKeyValues(entity, keyValues, colNamesByField, row);
 			return entity;
 		}
+	}
+
+	private Node<?> performNodeAdd(Entity parent, String childName) {
+		NodeChangeSet changeSet = recordManager.addNode(parent, childName);
+		for (NodeChange<?> nodeChange : changeSet.getChanges()) {
+			if ( nodeChange instanceof NodeAddChange ) {
+				return nodeChange.getNode();
+			}
+		}
+		throw new RuntimeException(String.format("Error adding new entity with name %s to parent %s", childName, parent.getPath()));
 	}
 
 	private ParsingError createParentEntitySearchError(CollectRecord record, DataLine line, 

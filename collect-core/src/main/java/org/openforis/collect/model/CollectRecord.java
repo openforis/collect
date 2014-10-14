@@ -132,34 +132,22 @@ public class CollectRecord extends Record {
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
-		this.validationCache = new RecordValidationCache(this);
 	}
-
-	public void resetValidationInfo() {
+	
+	@Override
+	protected void resetValidationDependencies() {
+		super.resetValidationDependencies();
+		resetValidationInfo();
+	}
+	
+	protected void resetValidationInfo() {
+		validationCache = new RecordValidationCache(this);
 		skipped = null;
 		missing = null;
 		missingErrors = null;
 		missingWarnings = null;
 		errors = null;
 		warnings = null;
-		this.validationCache = new RecordValidationCache(this);
-//		Entity rootEntity = getRootEntity();
-//		if ( rootEntity != null ) {
-//			rootEntity.traverse( new NodeVisitor() {
-//				@Override
-//				public void visit(Node<? extends NodeDefinition> node, int idx) {
-//					if ( node instanceof Attribute ) {
-//						((Attribute<?, ?>) node).clearValidationResults();
-//					}
-//				} 
-//			});
-//		}
-	}
-	
-	@Override
-	public void replaceRootEntity(Entity rootEntity) {
-		super.replaceRootEntity(rootEntity);
-		resetValidationInfo();
 	}
 	
 	@Override
@@ -421,8 +409,8 @@ public class CollectRecord extends Record {
 		skipped = null;
 	}
 	
-	public void updateMinCountsValidationCache(Integer entityId, String childName, ValidationResultFlag flag) {
-		validationCache.updateMinCountInfo(entityId, childName, flag);
+	public void updateMinCountsValidationCache(Entity entity, String childName, ValidationResultFlag flag) {
+		validationCache.updateMinCountInfo(entity.getInternalId(), childName, flag);
 		this.missing = null;
 		this.missingErrors = null;
 		this.missingWarnings = null;
@@ -430,13 +418,15 @@ public class CollectRecord extends Record {
 		this.warnings = null;
 	}
 
-	public void updateMaxCountsValidationCache(Integer entityId, String childName, ValidationResultFlag flag) {
-		validationCache.updateMaxCountInfo(entityId, childName, flag);
+	public void updateMaxCountsValidationCache(Entity entity, String childName, ValidationResultFlag flag) {
+		validationCache.updateMaxCountInfo(entity.getInternalId(), childName, flag);
 		this.errors = null;
 		this.warnings = null;
 	}
 	
-	public void updateAttributeValidationCache(Integer attributeId, ValidationResults validationResults) {
+	public void updateAttributeValidationCache(Attribute<?, ?> attribute, ValidationResults validationResults) {
+		Integer attributeId = attribute.getInternalId();
+		
 		removeValidationCache(attributeId);
 		
 		int errorCounts = validationResults.getErrors().size();

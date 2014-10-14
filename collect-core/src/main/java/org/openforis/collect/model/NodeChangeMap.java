@@ -3,9 +3,10 @@
  */
 package org.openforis.collect.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,8 +43,8 @@ public class NodeChangeMap implements NodeChangeSet {
 	}
 	
 	@Override
-	public Set<NodeChange<?>> getChanges() {
-		return new HashSet<NodeChange<?>>(nodeIdToChange.values());
+	public List<NodeChange<?>> getChanges() {
+		return new ArrayList<NodeChange<?>>(nodeIdToChange.values());
 	}
 	
 	@Override
@@ -140,6 +141,12 @@ public class NodeChangeMap implements NodeChangeSet {
 		}
 	}
 	
+	public void addMergeChanges(NodeChangeSet changeSet) {
+		for (NodeChange<?> change : changeSet.getChanges()) {
+			addOrMergeChange(change);
+		}
+	}
+
 	/**
 	 * Puts a change into the internal cache.
 	 * If a change associated to the node already exists and it is not a NodeDeleteChange,
@@ -218,5 +225,4 @@ public class NodeChangeMap implements NodeChangeSet {
 		return "Node change map for these nodes: " + nodeIdToChange.toString();
 	}
 
-	
 }

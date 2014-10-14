@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.CodeListManager;
@@ -26,7 +25,6 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
-import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeChangeMap;
 import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordFilter;
@@ -228,10 +226,7 @@ public class DataService {
 		NodeChangeMap result = new NodeChangeMap();
 		for (NodeUpdateRequest req : opts) {
 			NodeChangeSet partialChangeSet = updateRecord(record, req);
-			Set<NodeChange<?>> changes = partialChangeSet.getChanges();
-			for (NodeChange<?> change : changes) {
-				result.addOrMergeChange(change);
-			}
+			result.addMergeChanges(partialChangeSet);
 		}
 		return result;
 	}

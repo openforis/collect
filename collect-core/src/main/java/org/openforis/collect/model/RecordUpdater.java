@@ -113,23 +113,36 @@ public class RecordUpdater {
 		
 		return afterAttributeUpdate(attribute);
 	}
+	
+	public NodeChangeSet addNode(Entity parentEntity, String nodeName) {
+		NodeDefinition nodeDef = parentEntity.getDefinition().getChildDefinition(nodeName);
+		if ( nodeDef instanceof EntityDefinition ) {
+			return addEntity(parentEntity, nodeName);
+		} else {
+			return addAttribute(parentEntity, nodeName);
+		}
+	}
 
 	/**
 	 * Adds a new entity to a the record.
 	 * 
 	 * @param parentEntity
-	 * @param nodeName
+	 * @param entityName
 	 * @return Changes applied to the record 
 	 */
-	public NodeChangeSet addEntity(Entity parentEntity, String nodeName) {
-		Entity entity = performEntityAdd(parentEntity, nodeName);
+	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
+		Entity entity = performEntityAdd(parentEntity, entityName);
 		
-		setMissingValueApproved(parentEntity, nodeName, false);
+		setMissingValueApproved(parentEntity, entityName, false);
 
 		NodeChangeMap changeMap = initializeEntity(entity);
 		return changeMap;
 	}
 
+	public NodeChangeSet addAttribute(Entity parentEntity, String attributeName) {
+		return addAttribute(parentEntity, attributeName, null, null, null);
+	}
+	
 	/**
 	 * Adds a new attribute to a record.
 	 * This attribute can be immediately populated with a value or with a FieldSymbol, and remarks.
@@ -580,7 +593,7 @@ public class RecordUpdater {
 	private Entity performEntityAdd(Entity parentEntity, String name, Integer idx) {
 		EntityDefinition parentDefn = parentEntity.getDefinition();
 		EntityDefinition defn = parentDefn.getChildDefinition(name, EntityDefinition.class);
-		Entity entity = new Entity(defn);
+		Entity entity = (Entity) defn.createNode();
 		if ( idx != null ) {
 			parentEntity.add(entity, idx);
 		} else {
