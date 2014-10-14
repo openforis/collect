@@ -13,5 +13,5 @@ public class AttributeAddChange extends AttributeChange implements NodeAddChange
 	public AttributeAddChange(Attribute<?, ?> node) {
 		super(node);
 	}
-
+	
 }

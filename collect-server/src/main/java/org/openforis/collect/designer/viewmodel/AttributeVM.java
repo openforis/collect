@@ -85,7 +85,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	@Override
 	public List<Map<String, String>> getDependentNodes() {
 		List<Map<String, String>> result = super.getDependentNodes();
-		result.addAll(getDependentNodeInfos("check", editedItem.getCheckDependentDefinitions()));
+		//result.addAll(getDependentNodeInfos("check", editedItem.getCheckDependentDefinitions()));
 		return result;
 	}
 

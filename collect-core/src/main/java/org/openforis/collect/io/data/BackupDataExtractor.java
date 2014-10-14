@@ -36,7 +36,6 @@ public class BackupDataExtractor implements Closeable {
 	protected ZipFile zipFile;
 	private CollectSurvey survey;
 	private Step step;
-	private boolean evaluateCalculatedAttributes;
 	
 	//transient
 	private boolean initialized;
@@ -46,15 +45,10 @@ public class BackupDataExtractor implements Closeable {
 	private boolean oldFormat;
 
 	public BackupDataExtractor(CollectSurvey survey, ZipFile zipFile, Step step) {
-		this(survey, zipFile, step, true);
-	}
-	
-	public BackupDataExtractor(CollectSurvey survey, ZipFile zipFile, Step step, boolean evaluateCalculatedAttributes) {
 		this.survey = survey;
 		this.zipFile = zipFile;
 		this.initialized = false;
 		this.step = step;
-		this.evaluateCalculatedAttributes = evaluateCalculatedAttributes;
 	}
 
 	public BackupDataExtractor(CollectSurvey survey, File file, Step step) throws ZipException, IOException {
@@ -64,7 +58,7 @@ public class BackupDataExtractor implements Closeable {
 	public void init() throws ZipException, IOException {
 		this.fileExtractor = new BackupFileExtractor(zipFile);
 		this.oldFormat = this.fileExtractor.isOldFormat();
-		this.dataUnmarshaller = new DataUnmarshaller(new DataHandler(survey, evaluateCalculatedAttributes));
+		this.dataUnmarshaller = new DataUnmarshaller(new DataHandler(survey));
 		this.zipEntries = zipFile.entries();
 		this.initialized = true;
 	}

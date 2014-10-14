@@ -30,10 +30,10 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		super(parentDefn);
 		strict = true;
 		allowValuesSorting = false;
-		showAllowedValuesPreview = Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue();
+		showAllowedValuesPreview = (Boolean) Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue();
 		layoutType = Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE.getDefaultValue();
 		layoutDirection = Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION.getDefaultValue();
-		showCode = Annotation.CODE_ATTRIBUTE_SHOW_CODE.getDefaultValue();
+		showCode = (Boolean) Annotation.CODE_ATTRIBUTE_SHOW_CODE.getDefaultValue();
 	}
 
 	@Override

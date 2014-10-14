@@ -260,7 +260,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@GlobalCommand
 	public void backgroundSurveySave() throws SurveyImportException {
-		survey.refreshSurveyDependencies();
+		//survey.refreshSurveyDependencies();
 		surveyManager.saveSurveyWork(survey);
 		BindUtils.postNotifyChange(null, null, survey, "id");
 		BindUtils.postNotifyChange(null, null, survey, "published");
@@ -318,11 +318,11 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	private boolean checkValidity(boolean showConfirm) {
 		SurveyValidationResults results = surveyValidator.validate(survey);
-		if ( ! results.hasErrors() && ! results.hasWarnings() ) {
-			return true;
-		} else {
+		if ( results.hasErrors() || results.hasWarnings() ) {
 			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm);
 			return false;
+		} else {
+			return true;
 		}
 	}
 	
@@ -336,7 +336,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 			}
 		}
 	}
-	
 	
 	@GlobalCommand
 	public void closeValidationResultsPopUp() {
@@ -394,6 +393,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 			if ( rootEntity == null ) {
 				rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
 			}
+			survey.refreshSurveyDependencies();
+			
 			Map<String, String> params = createBasicModuleParameters();
 			params.put("preview", "true");
 			params.put("surveyId", Integer.toString(survey.getId()));

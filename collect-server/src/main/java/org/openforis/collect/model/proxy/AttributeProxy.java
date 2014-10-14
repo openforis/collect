@@ -36,7 +36,10 @@ public class AttributeProxy extends NodeProxy {
 	public AttributeProxy( EntityProxy parent, Attribute attribute, Locale locale) {
 		super(parent, attribute, locale);
 		this.attribute = attribute;
-		ValidationResults validationRes = attribute.validateValue();
+		ValidationResults validationRes = attribute.getValidationResults();
+		if ( validationRes == null ) {
+			validationRes = new ValidationResults();
+		}
 		MessageSource messageSource = getMessageSource();
 		validationResults = new ValidationResultsProxy(messageSource, locale, attribute, validationRes);
 		CollectRecord record = (CollectRecord) attribute.getRecord();

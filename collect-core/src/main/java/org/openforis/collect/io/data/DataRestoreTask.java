@@ -249,7 +249,7 @@ public class DataRestoreTask extends Task {
 		toRecord.setModifiedDate(fromRecord.getModifiedDate());
 		toRecord.setStep(fromRecord.getStep());
 		toRecord.setState(fromRecord.getState());
-		toRecord.setRootEntity(fromRecord.getRootEntity());
+		toRecord.replaceRootEntity(fromRecord.getRootEntity());
 		toRecord.updateRootEntityKeyValues();
 		toRecord.updateEntityCounts();
 		validateRecord(toRecord);

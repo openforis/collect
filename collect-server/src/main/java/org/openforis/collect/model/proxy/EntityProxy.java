@@ -81,7 +81,7 @@ public class EntityProxy extends NodeProxy {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
-				ValidationResultFlag valid = entity.validateMinCount(childName);
+				ValidationResultFlag valid = entity.getMinCountValidationResult(childName);
 				map.put(childName, valid);
 			}
 		}
@@ -95,7 +95,7 @@ public class EntityProxy extends NodeProxy {
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
-				ValidationResultFlag valid = entity.validateMaxCount(childName);
+				ValidationResultFlag valid = entity.getMaxCountValidationResult(childName);
 				map.put(childName, valid);
 			}
 		}
