@@ -26,6 +26,7 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class AutomaticColumnProvider extends ColumnProviderChain {
 	
 	private static final Log LOG = LogFactory.getLog(AutomaticColumnProvider.class);
+	private static final String MULTIPLE_ATTRIBUTE_VALUES_DELIMITER = ", ";
 	
 	public AutomaticColumnProvider(EntityDefinition entityDefinition) {
 		this(entityDefinition, null);
@@ -95,9 +96,9 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 			boolean includeKMLColumnForCoordinates, boolean includeItemPositionColumn) {
 		String name = defn.getName();
 		ColumnProvider columnProvider;
-		if ( defn.isMultiple() ) {
+		if ( defn.isMultiple() && ! (defn instanceof CodeAttributeDefinition) ) {
 			LOG.info("Flatting multiple attribute "+defn.getPath());
-			columnProvider = new MultipleAttributeColumnProvider(defn, ", ", name);
+			columnProvider = new MultipleAttributeColumnProvider(defn, MULTIPLE_ATTRIBUTE_VALUES_DELIMITER, name);
 		} else if ( defn instanceof CodeAttributeDefinition ) {
 			columnProvider = new CodeColumnProvider((CodeAttributeDefinition) defn, includeItemPositionColumn);
 		} else if(defn instanceof CoordinateAttributeDefinition){
