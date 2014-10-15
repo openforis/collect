@@ -4,13 +4,14 @@
 package org.openforis.collect.model;
 
 import static org.junit.Assert.*;
-import static org.openforis.collect.model.NodeBuilder.*;
-import static org.openforis.idm.metamodel.NodeDefinitionBuilder.*;
+import static org.openforis.idm.testfixture.NodeBuilder.*;
+import static org.openforis.idm.testfixture.NodeDefinitionBuilder.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinitionBuilder;
+import org.openforis.idm.testfixture.NodeBuilder;
+import org.openforis.idm.testfixture.NodeDefinitionBuilder;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
@@ -26,7 +27,6 @@ import org.openforis.idm.model.Value;
  */
 @SuppressWarnings("unchecked")
 public class RecordUpdaterTest {
-
 	private RecordUpdater updater;
 	private Survey survey;
 	private Record record;
@@ -107,9 +107,9 @@ public class RecordUpdaterTest {
 			)
 		);
 		Entity rootEntity = record.getRootEntity();
-		Attribute<?, TextValue> startTime = (Attribute<?, TextValue>) record.findNodeByPath("/root/time_study[1]/start_time");
+		Attribute<?, ?> startTime = (Attribute<?, ?>) record.findNodeByPath("/root/time_study[1]/start_time");
 		
-		NodeChangeSet nodeChangeSet = updater.updateAttribute(startTime, new TextValue("updated"));
+		NodeChangeSet nodeChangeSet = update(startTime, "updated");
 		
 		assertNotNull(nodeChangeSet.getChange(startTime));
 		assertNotNull(nodeChangeSet.getChange(rootEntity));
@@ -256,6 +256,28 @@ public class RecordUpdaterTest {
 		assertEquals(new TextValue("2"), treeNum3.getValue());
 	}
 	
+	@Test
+	public void testChildrenRelevanceTriggered() {
+		record(
+			rootEntityDef(
+				attributeDef("tree_relevant"),
+				entityDef("tree",
+					attributeDef("tree_num")
+				)
+				.relevant("tree_relevant = 'yes'")
+				.multiple()
+			),
+			entity("tree")
+		);
+		Attribute<?, ?> treeNum = findAttribute("/root/tree[1]/tree_num");
+		
+		assertFalse(treeNum.isRelevant());
+
+		update("/root/tree_relevant", "yes");
+		
+		assertTrue(treeNum.isRelevant());
+	}
+	
 	protected void record(EntityDefinition rootDef, NodeBuilder... builders) {
 		record = NodeBuilder.record(survey, builders);
 		updater.initializeRecord(record);
@@ -271,6 +293,10 @@ public class RecordUpdaterTest {
 		return result;
 	}
 
+	protected NodeChangeSet update(String path, String value) {
+		return update(findAttribute(path), value);
+	}
+	
 	protected NodeChangeSet update(Attribute<?, ?> attr, String value) {
 		return updater.updateAttribute((Attribute<?, Value>) attr, new TextValue(value));
 	}
