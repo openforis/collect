@@ -52,6 +52,10 @@ import org.zkoss.zkplus.databind.BindingListModelList;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyBaseVM extends BaseVM {
 	
+	public enum SurveyType {
+		TEMPORARY, PUBLISHED
+	}
+	
 	public static final String VERSIONS_UPDATED_GLOBAL_COMMAND = "versionsUpdated";
 	public static final String UNDO_LAST_CHANGES_GLOBAL_COMMAND = "undoLastChanges";
 	public static final String SURVEY_CHANGED_GLOBAL_COMMAND = "surveyChanged";

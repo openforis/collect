@@ -1,7 +1,5 @@
 package org.openforis.collect.relational;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -78,20 +76,6 @@ public class CollectRDBPublisher {
 		if ( LOG.isInfoEnabled() ) {
 			LOG.info("\nAll records exported");
 		}
-	}
-	
-	public void exportToSQL(Writer writer, int surveyId, boolean work, String targetSchemaName, boolean includeData) throws CollectRdbException, IOException {
-		RelationalSchemaConfig config = RelationalSchemaConfig.createDefault();
-		CollectSurvey survey;
-		if ( work ) {
-			survey = surveyManager.loadSurveyWork(surveyId);
-		} else {
-			survey = surveyManager.getById(surveyId);
-		}
-		RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(config);
-		RelationalSchema schema = schemaGenerator.generateSchema(survey, targetSchemaName);
-		
-		new SQLRelationalSchemaCreator().writeRelationalSchema(writer, schema);
 	}
 	
 	@Transactional("rdbTransactionManager")

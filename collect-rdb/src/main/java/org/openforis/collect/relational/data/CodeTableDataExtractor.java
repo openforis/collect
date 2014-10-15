@@ -63,6 +63,10 @@ public class CodeTableDataExtractor extends DataExtractor {
 		return level;
 	}
 
+	public int getTotal() {
+		return total;
+	}
+
 	private CodeListService getCodeListService() {
 		CollectSurvey survey = (CollectSurvey) table.getCodeList().getSurvey();
 		SurveyContext context = survey.getContext();
@@ -111,4 +115,5 @@ public class CodeTableDataExtractor extends DataExtractor {
 		}
 		return row;
 	}
+
 }
