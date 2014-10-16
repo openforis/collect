@@ -18,6 +18,12 @@ import org.openforis.collect.relational.model.UniquenessConstraint;
  */
 public class RDBSchemaPrintTask extends RDBPrintTask {
 	
+	private boolean includeForeignKeysInCreateTable;
+	
+	public RDBSchemaPrintTask() {
+		this.includeForeignKeysInCreateTable = true;
+	}
+
 	@Override
 	protected void execute() throws Throwable {
 		if ( ! isSchemaless() ) {
@@ -29,7 +35,9 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 		for (Table<?> table : schema.getTables()) {
 			writeTable(table);
 		}
-		writeForeignKeys();
+		if ( ! includeForeignKeysInCreateTable ) {
+			writeAddForeignKeysWithAlterTable();
+		}
 	}
 
 	private void writeTable(Table<?> table) throws IOException {
@@ -43,13 +51,27 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 		writer.write('\n');
 		List<Column<?>> columns = table.getColumns();
 		for (int i = 0; i < columns.size(); i++) {
+			if ( i > 0 ) {
+				writer.write(',');
+				writer.write('\n');
+			}
 			Column<?> column = columns.get(i);
 			writeColumn(column);
-			if ( i < columns.size() - 1 ) {
-				writer.write(',');
-			}
-			writer.write('\n');
 		}
+		if ( includeForeignKeysInCreateTable && ! table.getReferentialContraints().isEmpty() ) {
+			writer.write(',');
+			writer.write('\n');
+			List<ReferentialConstraint> fks = table.getReferentialContraints();
+			for (int i = 0; i < fks.size(); i++) {
+				ReferentialConstraint fk = fks.get(i);
+				writer.write('\t');
+				writeForeignKeyConstraint(fk);
+				if ( i < fks.size() - 1 ) {
+					writer.write(", \n");
+				}
+			}
+		}
+		writer.write('\n');
 		writer.write(");");
 		writer.write('\n');
 	}
@@ -72,7 +94,7 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 		}
 	}
 
-	private void writeForeignKeys() throws IOException {
+	private void writeAddForeignKeysWithAlterTable() throws IOException {
 		for (Table<?> table : schema.getTables()) {
 			List<ReferentialConstraint> fks = table.getReferentialContraints();
 			if ( ! fks.isEmpty() ) {
@@ -82,7 +104,9 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 				for (int i = 0; i < fks.size(); i++) {
 					ReferentialConstraint fk = fks.get(i);
 					writer.write('\t');
-					writeAddForeignKeyConstraint(fk);
+					writer.write(" ADD CONSTRAINT ");
+					writer.write(fk.getName());
+					writeForeignKeyConstraint(fk);
 					if ( i < fks.size() - 1 ) {
 						writer.write(", \n");
 					} else {
@@ -94,9 +118,7 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 		}
 	}
 
-	private void writeAddForeignKeyConstraint(ReferentialConstraint fk) throws IOException {
-		writer.write(" ADD CONSTRAINT ");
-		writer.write(fk.getName());
+	private void writeForeignKeyConstraint(ReferentialConstraint fk) throws IOException {
 		writer.write(" FOREIGN KEY ");
 		writer.write('(');
 		writeColumnNameSet(fk.getColumns());
@@ -130,4 +152,7 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 		return sb.toString();
 	}
 
+	public void setIncludeForeignKeysInCreateTable(boolean includeForeignKeysInCreateTable) {
+		this.includeForeignKeysInCreateTable = includeForeignKeysInCreateTable;
+	}
 }

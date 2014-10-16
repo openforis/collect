@@ -37,6 +37,7 @@ public class RDBPrintJob extends Job {
 	private RecordIterator recordIterator;
 	private RdbDialect dialect;
 	private String dateTimeFormat;
+	private boolean includeForeignKeysInCreateTable;
 	
 	//output
 	private File outputFile;
@@ -44,6 +45,10 @@ public class RDBPrintJob extends Job {
 	private transient RelationalSchema schema;
 	private transient Writer writer;
 
+	public RDBPrintJob() {
+		this.includeForeignKeysInCreateTable = true;
+	}
+	
 	@Override
 	protected void initInternal() throws Throwable {
 		outputFile = File.createTempFile("rdb", ".sql");
@@ -73,7 +78,9 @@ public class RDBPrintJob extends Job {
 			t.setDialect(dialect);
 			t.setDateTimeFormat(dateTimeFormat);
 			
-			if ( task instanceof RecordDataPrintTask ) {
+			if(task instanceof RDBSchemaPrintTask) {
+				((RDBSchemaPrintTask) task).setIncludeForeignKeysInCreateTable(includeForeignKeysInCreateTable);
+			} else if(task instanceof RecordDataPrintTask) {
 				((RecordDataPrintTask) task).setRecordIterator(recordIterator);
 			}
 		}
@@ -124,6 +131,10 @@ public class RDBPrintJob extends Job {
 	
 	public void setDateTimeFormat(String dateTimeFormat) {
 		this.dateTimeFormat = dateTimeFormat;
+	}
+	
+	public void setIncludeForeignKeysInCreateTable(boolean includeForeignKeysInCreateTable) {
+		this.includeForeignKeysInCreateTable = includeForeignKeysInCreateTable;
 	}
 	
 	public File getOutputFile() {
