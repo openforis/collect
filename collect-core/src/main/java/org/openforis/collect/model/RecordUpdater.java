@@ -911,7 +911,7 @@ public class RecordUpdater {
 			NodeDefinition childDef = nodePointer.getChildDefinition();
 			String expr = childDef.getRelevantExpression();
 			if (StringUtils.isBlank(expr)) {
-				throw new IllegalStateException(String.format("Expected relevant expression on node pointer %s", nodePointer.toString()));
+				return true;
 			}
 			try {
 				Entity entity = nodePointer.getEntity();
