@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.idm.metamodel.CodeList;
@@ -24,7 +26,7 @@ public final class RelationalSchema {
 	private Survey survey;
 	private String name;
 	private LinkedHashMap<String, Table<?>> tables;
-	private Map<Integer, DataTable> dataTablesById;
+	private Map<Integer, DataTable> dataTableByNodeId;
 	private Map<CodeListTableKey, CodeTable> codeListTables;
 	private Map<String, DataTable> rootDataTables;
 	
@@ -34,7 +36,7 @@ public final class RelationalSchema {
 		this.tables = new LinkedHashMap<String, Table<?>>();
 		this.codeListTables = new LinkedHashMap<CodeListTableKey, CodeTable>();
 		this.rootDataTables = new HashMap<String, DataTable>();
-		this.dataTablesById = new HashMap<Integer, DataTable>();
+		this.dataTableByNodeId = new HashMap<Integer, DataTable>();
 	}
 
 	public Survey getSurvey() {
@@ -50,9 +52,16 @@ public final class RelationalSchema {
 		return Collections.unmodifiableList(tableList);
 	}
 	
-	public Collection<DataTable> getDataTables() {
-		Collection<DataTable> tables = dataTablesById.values();
-		return tables;
+	public List<DataTable> getDataTables() {
+		List<DataTable> result = new ArrayList<DataTable>();
+		Queue<DataTable> queue = new LinkedList<DataTable>();
+		queue.addAll(getRootDataTables());
+		while(!queue.isEmpty()) {
+			DataTable table = queue.poll();
+			result.add(table);
+			queue.addAll(table.getChildTables());
+		}
+		return result;
 	}
 	
 	public Collection<DataTable> getRootDataTables() {
@@ -93,7 +102,7 @@ public final class RelationalSchema {
 		if ( table instanceof DataTable ) {
 			DataTable dataTable = (DataTable) table;
 			NodeDefinition defn = dataTable.getNodeDefinition();
-			dataTablesById.put(defn.getId(), dataTable);
+			dataTableByNodeId.put(defn.getId(), dataTable);
 			if ( dataTable.getParent() == null ) {
 				rootDataTables.put(defn.getName(), dataTable);
 			}
@@ -110,12 +119,12 @@ public final class RelationalSchema {
 		while( ! entityDefn.isMultiple() ) {
 				entityDefn = entityDefn.getParentEntityDefinition();
 		}
-		dataTablesById.put( nodeId, dataTablesById.get(entityDefn.getId()) );
+		dataTableByNodeId.put( nodeId, dataTableByNodeId.get(entityDefn.getId()) );
 	}
 
 	public DataTable getDataTable(NodeDefinition nodeDefinition) {
 		int id = nodeDefinition.getId();
-		return dataTablesById.get(id);
+		return dataTableByNodeId.get(id);
 	}
 	
 	private static class CodeListTableKey {
