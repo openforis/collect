@@ -39,7 +39,7 @@
 	              	languageCode="@load(vm.currentLanguageCode)" />
 	      </fieldErrorHandler>
           <fieldErrorHandler message="@load(vmsgs['message'])">
-            	<textbox width="250px" value="@bind(fx.message)" 
+            	<textbox width="450px" value="@bind(fx.message)" 
                           onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
@@ -49,8 +49,9 @@
 			  		value="${labels.survey.schema.node.check.condition}" />
 	      </fieldErrorHandler>
           <fieldErrorHandler message="@load(vmsgs['condition'])">
-            <textbox width="250px" value="@bind(fx.condition)" 
-            	onChange="@command('applyChanges')" />
+            <textbox width="450px" value="@bind(fx.condition)" 
+            	onChange="@command('applyChanges')"
+            	multiline="true" rows="4"  />
             <image src="/assets/images/expression-small.png" />
           </fieldErrorHandler>
         </row>
@@ -60,8 +61,9 @@
 			  		value="${labels.survey.schema.node.check.custom.expression}" />
 			</fieldErrorHandler>
             <fieldErrorHandler message="@load(vmsgs['expression'])">
-	            <textbox width="250px" value="@bind(fx.expression)"
-	                    onChange="@command('applyChanges')" />
+	            <textbox width="450px" value="@bind(fx.expression)"
+	                    onChange="@command('applyChanges')"
+	                    multiline="true" rows="4" />
 	            <image src="/assets/images/expression-small.png" />
           	</fieldErrorHandler>
         </row>
