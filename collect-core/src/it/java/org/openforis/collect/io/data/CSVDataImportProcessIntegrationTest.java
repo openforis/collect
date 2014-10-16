@@ -558,8 +558,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 				EntityBuilder.addValue(tree, "dbh", 20.5d);
 			}
 		}
-		record.updateRootEntityKeyValues();
-		record.updateEntityCounts();
+		record.updateSummaryFields();
 		recordManager.validate(record);
 		return record;
 	}

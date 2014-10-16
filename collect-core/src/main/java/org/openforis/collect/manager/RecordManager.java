@@ -95,11 +95,10 @@ public class RecordManager {
 	
 	@Transactional
 	public void save(CollectRecord record, User lockingUser, String sessionId) throws RecordPersistenceException {
-		record.updateRootEntityKeyValues();
+		record.updateSummaryFields();
+
 		checkAllKeysSpecified(record);
 		
-		record.updateEntityCounts();
-
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
@@ -295,7 +294,7 @@ public class RecordManager {
 	 */
 	public boolean isUnique(CollectRecord record) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		record.updateRootEntityKeyValues();
+		record.updateSummaryFields();
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		
 		Entity rootEntity = record.getRootEntity();
@@ -338,9 +337,8 @@ public class RecordManager {
 		if( totalErrors > 0 ){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
 		}
-		record.updateRootEntityKeyValues();
+		record.updateSummaryFields();
 		checkAllKeysSpecified(record);
-		record.updateEntityCounts();
 
 		Integer id = record.getId();
 		// before promoting record, save it in current step
@@ -393,8 +391,6 @@ public class RecordManager {
 		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		validate(record);
-		record.updateRootEntityKeyValues();
-		record.updateEntityCounts();
 		recordDao.update(record);
 		if ( isLockingEnabled() ) {
 			lockManager.releaseLock(recordId);

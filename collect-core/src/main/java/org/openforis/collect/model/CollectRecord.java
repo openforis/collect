@@ -8,6 +8,7 @@ import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -132,6 +133,13 @@ public class CollectRecord extends Record {
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
+	}
+	
+	@Override
+	public void replaceRootEntity(Entity rootEntity) {
+		super.replaceRootEntity(rootEntity);
+		updateRootEntityKeyValues();
+		updateEntityCounts();
 	}
 	
 	@Override
@@ -308,7 +316,12 @@ public class CollectRecord extends Record {
 		return true;
 	}
 	
-	public void updateRootEntityKeyValues(){
+	public void updateSummaryFields() {
+		updateRootEntityKeyValues();
+		updateEntityCounts();
+	}
+	
+	private void updateRootEntityKeyValues(){
 		Entity rootEntity = getRootEntity();
 		if(rootEntity != null) {
 			List<String> values = new ArrayList<String>();
@@ -327,6 +340,16 @@ public class CollectRecord extends Record {
 		}
 	}
 
+	private void updateEntityCounts() {
+		List<Integer> counts = new ArrayList<Integer>();
+		List<EntityDefinition> countableDefns = getCountableEntitiesInList();
+		for (EntityDefinition defn : countableDefns) {
+			List<Node<?>> nodes = findNodesByPath(defn.getPath());
+			counts.add(nodes.size());
+		}
+		this.entityCounts = counts;
+	}
+	
 	private String getTextValue(Node<?> keyNode) {
 		if(keyNode instanceof CodeAttribute) {
 			Code code = ((CodeAttribute) keyNode).getValue();
@@ -341,20 +364,6 @@ public class CollectRecord extends Record {
 		}
 	}
 
-	public void updateEntityCounts() {
-		Entity rootEntity = getRootEntity();
-		List<EntityDefinition> countableDefns = getCountableEntitiesInList();
-		
-		//set counts
-		List<Integer> counts = new ArrayList<Integer>();
-		for (EntityDefinition defn : countableDefns) {
-			String name = defn.getName();
-			int count = rootEntity.getCount(name);
-			counts.add(count);
-		}
-		entityCounts = counts;
-	}
-	
 	/**
 	 * Returns first level entity definitions that have the attribute countInSummaryList set to true
 	 * 
@@ -362,18 +371,18 @@ public class CollectRecord extends Record {
 	 * @return 
 	 */
 	protected List<EntityDefinition> getCountableEntitiesInList() {
-		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		final List<EntityDefinition> result = new ArrayList<EntityDefinition>();
 		EntityDefinition rootEntityDefinition = getRootEntity().getDefinition();
-		List<NodeDefinition> childDefinitions = rootEntityDefinition .getChildDefinitions();
-		for (NodeDefinition childDefinition : childDefinitions) {
-			if(childDefinition instanceof EntityDefinition) {
-				EntityDefinition entityDefinition = (EntityDefinition) childDefinition;
-				String annotation = childDefinition.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
-				if(annotation != null && Boolean.parseBoolean(annotation)) {
-					result.add(entityDefinition);
+		rootEntityDefinition.traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if(def instanceof EntityDefinition) {
+					String annotation = def.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
+					if(Boolean.parseBoolean(annotation)) {
+						result.add((EntityDefinition) def);
+					}
 				}
 			}
-		}
+		});
 		return result;
 	}
 	

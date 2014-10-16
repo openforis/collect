@@ -551,8 +551,6 @@ public class XMLDataImportProcess implements Callable<Void> {
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
 			validateRecord(record);
-			record.updateRootEntityKeyValues();
-			record.updateEntityCounts();
 		}
 		return result;
 	}
@@ -573,8 +571,6 @@ public class XMLDataImportProcess implements Callable<Void> {
 		toRecord.setStep(fromRecord.getStep());
 		toRecord.setState(fromRecord.getState());
 		toRecord.replaceRootEntity(fromRecord.getRootEntity());
-		toRecord.updateRootEntityKeyValues();
-		toRecord.updateEntityCounts();
 		recordManager.validate(toRecord);
 	}
 
