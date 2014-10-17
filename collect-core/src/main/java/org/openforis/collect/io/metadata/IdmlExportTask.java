@@ -31,6 +31,10 @@ public class IdmlExportTask extends Task {
 		surveyManager.marshalSurvey(survey, outputStream, true, true, false);
 	}
 	
+	public void setSurveyManager(SurveyManager surveyManager) {
+		this.surveyManager = surveyManager;
+	}
+	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}

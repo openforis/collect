@@ -68,7 +68,9 @@ public class SurveyExportParametersVM extends BaseVM {
 	public boolean isIncludeDataDisabled() {
 		SurveyType type = SurveyType.valueOf(getTypeFormField());
 		OutputFormat outputFormat = OutputFormat.valueOf(getOutputFormatFormField());
-		return type == SurveyType.TEMPORARY || outputFormat == OutputFormat.MOBILE;
+		return type == SurveyType.TEMPORARY || 
+				outputFormat == OutputFormat.MOBILE || 
+				outputFormat == OutputFormat.EARTH;
 	}
 
 	@DependsOn("tempForm.includeData")
@@ -126,7 +128,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			TEMPORARY, PUBLISHED
 		}
 		public enum OutputFormat {
-			MOBILE, DESKTOP, RDB
+			MOBILE, DESKTOP, RDB, EARTH
 		}
 		
 		private String type;
