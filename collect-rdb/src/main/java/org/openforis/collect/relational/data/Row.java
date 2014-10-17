@@ -1,9 +1,12 @@
-package org.openforis.collect.relational.model;
+package org.openforis.collect.relational.data;
 
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.Table;
 
 /**
  * 

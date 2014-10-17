@@ -1,24 +1,24 @@
 package org.openforis.collect.relational.jooq;
 
-import static org.jooq.impl.Factory.fieldByName;
-import static org.jooq.impl.Factory.tableByName;
-
-import java.sql.BatchUpdateException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
-import org.jooq.exception.DataAccessException;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
+import org.openforis.collect.relational.data.CodeTableDataExtractor;
+import org.openforis.collect.relational.data.DataExtractor;
+import org.openforis.collect.relational.data.DataTableDataExtractor;
+import org.openforis.collect.relational.data.Row;
+import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
-import org.openforis.collect.relational.model.Dataset;
+import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
-import org.openforis.collect.relational.model.Row;
 import org.openforis.collect.relational.model.Table;
 
 /**
@@ -37,53 +37,92 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 
 	@Override
 	public void insertReferenceData(RelationalSchema schema) throws CollectRdbException {
-		Dataset dataset = schema.getReferenceData();
-		insertDataset(schema, dataset);
+		BatchInsertExecutor batchExecutor = new BatchInsertExecutor(schema);
+		for (CodeTable codeTable : schema.getCodeListTables()) {
+			CodeTableDataExtractor extractor = new CodeTableDataExtractor(codeTable);
+			batchExecutor.addInserts(extractor);
+		}
+		batchExecutor.flush();
 	}
 
 	@Override
 	public void insertData(RelationalSchema schema, CollectRecord record) throws CollectRdbException  {
-		Dataset dataset = schema.createDataset(record);
-		insertDataset(schema, dataset);
-	}
-
-	private void insertDataset(RelationalSchema schema, Dataset dataset) throws CollectRdbException {
-		List<Row> rows = dataset.getRows();
-		List<InsertQuery<Record>> inserts = new ArrayList<InsertQuery<Record>>(rows.size());
-		try {
-			for (int rowno = 0; rowno < rows.size(); rowno++) {
-				Row row = rows.get(rowno);
-				Table<?> table = row.getTable();
-				List<Column<?>> cols = table.getColumns();
-				InsertQuery<Record> insert = create.insertQuery(getQualifiedTableName(schema, table));
-				List<Object> values = row.getValues();
-				for (int colno = 0; colno < cols.size(); colno++) {
-					Object val = values.get(colno);
-					if ( val != null ) {
-						String col = cols.get(colno).getName();
-						insert.addValue(fieldByName(col), val);
-					}
-				}
-				inserts.add(insert);
-			}
-			create.batch(inserts).execute();
-		} catch (DataAccessException e) {
-			Throwable e2 = e.getCause();
-			if ( e2 instanceof BatchUpdateException ) {
-				throw new CollectRdbException("Batch insert failed", ((BatchUpdateException) e2).getNextException());
-			} else {
-				throw new CollectRdbException("Batch insert failed", e);
-			}
+		BatchInsertExecutor batchExecutor = new BatchInsertExecutor(schema);
+		Stack<DataTable> stack = new Stack<DataTable>();
+		stack.addAll(schema.getRootDataTables());
+		while ( ! stack.isEmpty() ) {
+			DataTable table = stack.pop();
+			DataTableDataExtractor extractor = new DataTableDataExtractor(table, record);
+			batchExecutor.addInserts(extractor);
+			stack.addAll(table.getChildTables());
 		}
+		batchExecutor.flush();
 	}
-
-	private org.jooq.Table<Record> getQualifiedTableName(RelationalSchema schema, Table<?> table) {
-		boolean isSchemaLessDB = create.getDialect() == SQLDialect.SQLITE;
+	
+	private class BatchInsertExecutor {
 		
-		if ( isSchemaLessDB ) {
-			return tableByName(table.getName());
-		} else {
-			return tableByName(schema.getName(), table.getName());
+		private static final int BATCH_MAX_SIZE = 10000;
+		
+		private List<InsertQuery<Record>> buffer;
+		private RelationalSchema schema;
+		
+		public BatchInsertExecutor(RelationalSchema schema) {
+			this.schema = schema;
+			this.buffer = new ArrayList<InsertQuery<Record>>();
 		}
+
+		public void addInserts(DataExtractor extractor) {
+			while(extractor.hasNext()) {
+				Row row = extractor.next();
+				addInsert(row);
+			}
+		}
+
+		public void addInsert(Row row) {
+			buffer.add(createInsertQuery(schema, row));
+			if ( buffer.size() == BATCH_MAX_SIZE ) {
+				flush();
+			}
+		}
+
+		public void flush() {
+			if ( buffer.isEmpty() ) {
+				return;
+			}
+			try {
+				create.batch(buffer).execute();
+				buffer.clear();
+			} catch(Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		private InsertQuery<Record> createInsertQuery(RelationalSchema schema, Row row) {
+			Table<?> table = row.getTable();
+			InsertQuery<Record> insert = create.insertQuery(getJooqTable(schema, table));
+			List<Object> values = row.getValues();
+			List<Column<?>> cols = table.getColumns();
+			for (int i = 0; i < cols.size(); i++) {
+				Object val = values.get(i);
+				if ( val != null ) {
+					String col = cols.get(i).getName();
+					insert.addValue(Factory.fieldByName(col), val);
+				}
+			}
+			return insert;
+		}
+		
+		private org.jooq.Table<Record> getJooqTable(RelationalSchema schema, Table<?> table) {
+			if ( isSchemaLess() ) {
+				return Factory.tableByName(table.getName());
+			} else {
+				return Factory.tableByName(schema.getName(), table.getName());
+			}
+		}
+		
+		private boolean isSchemaLess() {
+			return create.getDialect() == SQLDialect.SQLITE;
+		}
+
 	}
 }
