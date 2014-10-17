@@ -18,6 +18,7 @@
        <button id="goToIndexBtn"
         image="/assets/images/back-small.png"
         label="${labels.surveys_list.go_to_index_page}"
+        visible="@load(not vm.collectEarthEditor)"
         onClick="@command('goToIndex')" />
     </box>
     <box hflex="2" align="center">
@@ -35,15 +36,18 @@
     model="@load(vm.surveySummaries)"
     selectedItem="@bind(vm.selectedSurvey)">
     <listhead>
-      <listheader label="${labels.survey.name}" width="200px" 
+      <listheader label="${labels.survey.name}" width="250px"
         sort="auto(name)" />
-      <listheader label="${labels.survey.project_name}" width="300px" 
+      <listheader label="${labels.survey.project_name}"
         sort="auto(projectName)" />
       <listheader label="${labels.survey.modified}" width="70px"
+      	visible="@load(not vm.collectEarthEditor)"
         sort="auto(work, published, name)" />
       <listheader label="${labels.survey.published}" width="70px"
+      	visible="@load(not vm.collectEarthEditor)" 
         sort="auto(published, work, name)" />
-      <listheader label="${labels.survey.records_validation_status}" />
+      <listheader label="${labels.survey.records_validation_status}" width="150px"
+      	visible="@load(not vm.collectEarthEditor)" />
     </listhead>
     <template name="model">
       <listitem>
@@ -52,18 +56,21 @@
         <listcell label="@load(each.projectName)"
           onDoubleClick="@command('editSelectedSurvey')" />
         <listcell
+        	visible="@load(not vm.collectEarthEditor)"
           onDoubleClick="@command('editSelectedSurvey')">
           <box align="center" width="100%" visible="${each.work}">
             <image src="/assets/images/tick-small.png" />
           </box>
         </listcell>
         <listcell
+        	visible="@load(not vm.collectEarthEditor)"
           onDoubleClick="@command('editSelectedSurvey')">
           <box align="center" width="100%" visible="${each.published}">
             <image src="/assets/images/tick-small.png" />
           </box>
         </listcell>
-        <listcell>
+        <listcell 
+        	visible="@load(not vm.collectEarthEditor)">
         	<hlayout hflex="1" visible="@load(each.recordValidationInProgress)">
 	        	<label value="@load(each.recordValidationProgressPercent)" />
 	        	%
@@ -88,19 +95,21 @@
   		disabled="@load(vm.exportDisabled)" />
 
   	<button label="${labels.survey.import_survey.$}"
+  		visible="@load(not vm.collectEarthEditor)"
   		onClick="@command('openSurveyImportPopUp')" />
 
   	<button label="${labels.survey.publish.$}"
+  		visible="@load(not vm.collectEarthEditor)"
   		onClick="@command('publishSelectedSurvey')"
   		disabled="@load(vm.publishDisabled)" />
 
   	<button
-  		visible="@load(vm.selectedSurvey.published and not vm.selectedSurvey.recordValidationInProgress)"
+  		visible="@load(not vm.collectEarthEditor and vm.selectedSurvey.published and not vm.selectedSurvey.recordValidationInProgress)"
   		label="${labels.survey.validateAllRecords}"
   		onClick="@command('validateAllRecords')" />
 
   	<button
-  		visible="@load(vm.selectedSurvey.recordValidationInProgress)"
+  		visible="@load(not vm.collectEarthEditor and vm.selectedSurvey.recordValidationInProgress)"
   		label="${labels.survey.cancelRecordValidation}"
   		onClick="@command('cancelRecordValidation')" />
 

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -102,8 +103,10 @@ public class SurveySelectVM extends BaseVM {
 
 	private RDBPrintJob rdbExportJob;
 
-	@Init()
+	@Override
+	@Init(superclass=false)
 	public void init() {
+		super.init();
 		PageUtil.clearConfirmClose();
 		loadSurveySummaries();
 	}
@@ -139,7 +142,6 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void exportSelectedSurvey() throws IOException {
-		//set default parameters
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("survey", selectedSurvey);
 		surveyExportPopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
@@ -162,6 +164,16 @@ public class SurveySelectVM extends BaseVM {
 		
 		Job job;
 		switch(parameters.getOutputFormatEnum()) {
+		case EARTH:
+			try {
+				File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
+				String contentType = URLConnection.guessContentTypeFromName(file.getName());
+				FileInputStream is = new FileInputStream(file);
+				Filedownload.save(is, contentType, survey.getName() + ".zip");
+			} catch(Exception e) {
+				MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
+			}
+			return;
 		case RDB:
 			rdbExportJob = new RDBPrintJob();
 			rdbExportJob.setSurvey(survey);

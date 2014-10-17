@@ -13,7 +13,6 @@ import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
-import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.RecordIndexProcess;
 import org.openforis.collect.utils.ExecutorServiceUtil;

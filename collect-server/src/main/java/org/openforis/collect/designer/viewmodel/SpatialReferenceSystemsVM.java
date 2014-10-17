@@ -31,6 +31,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferenceSystem> {
 
+	private static final ServiceLoader<CoordinateOperations> COORDINATE_OPERATIONS_LOADER = ServiceLoader.load(CoordinateOperations.class);
 	private String selectedPredefinedSrsCode;
 
 	@Override
@@ -109,8 +110,7 @@ public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferen
 	}
 
 	private CoordinateOperations getCoordinateOperations() {
-		ServiceLoader<CoordinateOperations> serviceLoader = ServiceLoader.load(CoordinateOperations.class);
-		for (CoordinateOperations coordinateOperations : serviceLoader) {
+		for (CoordinateOperations coordinateOperations : COORDINATE_OPERATIONS_LOADER) {
 			return coordinateOperations;
 		}
 		return null;

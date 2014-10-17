@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
  * 
@@ -80,6 +81,14 @@ public class CollectAnnotations {
 	
 	public void setIncludeInDataExport(NodeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.INCLUDE_IN_DATA_EXPORT, value);
+	}
+	
+	public String getAutoCompleteGroup(TextAttributeDefinition def) {
+		return def.getAnnotation(Annotation.AUTOCOMPLETE.getQName());
+	}
+	
+	public void setAutoCompleteGroup(TextAttributeDefinition def, String value) {
+		def.setAnnotation(Annotation.AUTOCOMPLETE.getQName(), value);
 	}
 	
 	public CollectSurvey getSurvey() {
