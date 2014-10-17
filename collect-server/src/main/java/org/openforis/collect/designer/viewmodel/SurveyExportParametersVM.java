@@ -3,7 +3,10 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
+import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.Command;
@@ -17,11 +20,8 @@ import org.zkoss.bind.annotation.Init;
  *
  */
 public class SurveyExportParametersVM extends BaseVM {
-
-	private static final String TEMPORARY_TYPE = "temporary";
-	private static final String PUBLISHED_TYPE = "published";
-	private static final String MOBILE_OUTPUT_FORMAT = "MOBILE";
-	private static final String DESKTOP_OUTPUT_FORMAT = "DESKTOP";
+	
+	private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	
 	private SurveySummary survey;
 	private SurveyExportParametersFormObject formObject;
@@ -35,13 +35,11 @@ public class SurveyExportParametersVM extends BaseVM {
 	public void init(@ExecutionArgParam("survey") SurveySummary survey) {
 		this.formObject = new SurveyExportParametersFormObject();
 		this.survey = survey;
-		this.formObject.setOutputFormat(DESKTOP_OUTPUT_FORMAT);
-//		
-		if ( this.survey.isOnlyWork() ) {
-			this.formObject.setType(TEMPORARY_TYPE);
-		} else {
-			this.formObject.setType(PUBLISHED_TYPE);
-		}
+		this.formObject.setOutputFormat(OutputFormat.DESKTOP.name());
+		this.formObject.setType(survey.isOnlyWork() ? SurveyType.TEMPORARY.name(): SurveyType.PUBLISHED.name());
+		this.formObject.setRdbDialect(RdbDialect.STANDARD.name());
+		this.formObject.setRdbDateTimeFormat(DEFAULT_DATE_TIME_FORMAT);
+		this.formObject.setRdbTargetSchemaName(survey.getName());
 	}
 	
 	@Command
@@ -68,10 +66,9 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	@DependsOn({"tempForm.type","tempForm.outputFormat"})
 	public boolean isIncludeDataDisabled() {
-		String type = getTypeFormField();
-		String outputFormat = getOutputFormatFormField();
-		return TEMPORARY_TYPE.equals(type) || 
-				MOBILE_OUTPUT_FORMAT.equals(outputFormat);
+		SurveyType type = SurveyType.valueOf(getTypeFormField());
+		OutputFormat outputFormat = OutputFormat.valueOf(getOutputFormatFormField());
+		return type == SurveyType.TEMPORARY || outputFormat == OutputFormat.MOBILE;
 	}
 
 	@DependsOn("tempForm.includeData")
@@ -101,9 +98,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	}
 	
 	private void checkEnabledFields() {
-		String type = getTypeFormField();
-		String outputFormat = getOutputFormatFormField();
-		if ( TEMPORARY_TYPE.equals(type) || MOBILE_OUTPUT_FORMAT.equals(outputFormat) ) {
+		if ( isIncludeDataDisabled() ) {
 			tempForm.setField("includeData", false);
 			BindUtils.postNotifyChange(null, null, tempForm, "includeData");
 		}
@@ -127,13 +122,27 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	public static class SurveyExportParametersFormObject {
 		
+		public enum SurveyType {
+			TEMPORARY, PUBLISHED
+		}
+		public enum OutputFormat {
+			MOBILE, DESKTOP, RDB
+		}
+		
 		private String type;
 		private boolean includeData;
 		private boolean includeUploadedFiles;
 		private String outputFormat;
+		private String rdbDialect;
+		private String rdbDateTimeFormat;
+		private String rdbTargetSchemaName;
 		
 		public String getType() {
 			return type;
+		}
+		
+		public SurveyType getTypeEnum() {
+			return SurveyType.valueOf(type);
 		}
 		
 		public void setType(String type) {
@@ -160,10 +169,41 @@ public class SurveyExportParametersVM extends BaseVM {
 			return outputFormat;
 		}
 		
+		public OutputFormat getOutputFormatEnum() {
+			return OutputFormat.valueOf(outputFormat);
+		}
+		
 		public void setOutputFormat(String outputFormat) {
 			this.outputFormat = outputFormat;
 		}
 
+		public String getRdbDialect() {
+			return rdbDialect;
+		}
+
+		public RdbDialect getRdbDialectEnum() {
+			return RdbDialect.valueOf(rdbDialect);
+		}
+		
+		public void setRdbDialect(String rdbDialect) {
+			this.rdbDialect = rdbDialect;
+		}
+
+		public String getRdbDateTimeFormat() {
+			return rdbDateTimeFormat;
+		}
+
+		public void setRdbDateTimeFormat(String rdbDateTimeFormat) {
+			this.rdbDateTimeFormat = rdbDateTimeFormat;
+		}
+
+		public String getRdbTargetSchemaName() {
+			return rdbTargetSchemaName;
+		}
+		
+		public void setRdbTargetSchemaName(String rdbTargetSchemaName) {
+			this.rdbTargetSchemaName = rdbTargetSchemaName;
+		}
 	}
 
 	

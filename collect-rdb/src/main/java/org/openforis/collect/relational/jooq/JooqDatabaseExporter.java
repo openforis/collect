@@ -2,7 +2,6 @@ package org.openforis.collect.relational.jooq;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.jooq.InsertQuery;
 import org.jooq.Record;
@@ -48,13 +47,9 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 	@Override
 	public void insertData(RelationalSchema schema, CollectRecord record) throws CollectRdbException  {
 		BatchInsertExecutor batchExecutor = new BatchInsertExecutor(schema);
-		Stack<DataTable> stack = new Stack<DataTable>();
-		stack.addAll(schema.getRootDataTables());
-		while ( ! stack.isEmpty() ) {
-			DataTable table = stack.pop();
+		for (DataTable table : schema.getDataTables()) {
 			DataTableDataExtractor extractor = new DataTableDataExtractor(table, record);
 			batchExecutor.addInserts(extractor);
-			stack.addAll(table.getChildTables());
 		}
 		batchExecutor.flush();
 	}

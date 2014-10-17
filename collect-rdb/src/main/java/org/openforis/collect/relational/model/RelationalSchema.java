@@ -52,6 +52,9 @@ public final class RelationalSchema {
 		return Collections.unmodifiableList(tableList);
 	}
 	
+	/**
+	 * Returns a list of data tables hierarchically sorted (BFS)
+	 */
 	public List<DataTable> getDataTables() {
 		List<DataTable> result = new ArrayList<DataTable>();
 		Queue<DataTable> queue = new LinkedList<DataTable>();
