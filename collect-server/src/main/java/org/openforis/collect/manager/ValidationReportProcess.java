@@ -120,7 +120,6 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	}
 
 	protected void writeValidationReport(CollectRecord record) throws IOException {
-		recordManager.validate(record);
 		RecordValidationReportGenerator reportGenerator = new RecordValidationReportGenerator(record);
 		List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(
 				ValidationResultFlag.ERROR, includeConfirmedErrors);
