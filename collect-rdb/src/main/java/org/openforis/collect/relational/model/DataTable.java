@@ -80,41 +80,11 @@ public class DataTable extends AbstractTable<Node<?>> {
 	void addChildTable(DataTable table) {
 		childTables.add(table);
 	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public Row extractRow(Node<?> source) {
-		List<Column<?>> columns = getColumns();
-		Row row = new Row(this);
-		for (int i=0; i < columns.size(); i++) {
-			Column col = columns.get(i);
-			Object val = col.extractValue(source);
-			row.setValue(i, val);
-		}
-		return row;
-	}
-
-	@Override
-	public Dataset extractData(Node<?> source) {
-		Dataset data = new Dataset();
-		extractDataInternal(source, data);
-		return data;
-	}
-
-	private void extractDataInternal(Node<?> source, Dataset data) {
-		// Extract data from this node
-		Row row = extractRow(source);
-		data.addRow(row);
-		// Extract data from descendants
-		for (DataTable childTable : childTables) {
-			Path path = childTable.getRelativePath();
-			List<Node<?>> children = path.evaluate(source);
-			for (Node<?> child : children) {
-				childTable.extractDataInternal(child, data);
-			}
-		}
-	}
 	
+	public List<DataTable> getChildTables() {
+		return childTables;
+	}
+
 	public DataPrimaryKeyColumn getPrimaryKeyColumn() {
 		List<Column<?>> columns = getColumns();
 		for (Column<?> c : columns) {

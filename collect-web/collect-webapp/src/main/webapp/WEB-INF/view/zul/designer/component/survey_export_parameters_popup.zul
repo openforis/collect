@@ -12,7 +12,7 @@
 			@load(vm.formObject) 
 			@save(vm.formObject, before={'export'})"
 		title="${c:l2('survey.export.popup.title', titleArgs)}"
-		width="500px"
+		width="600px"
 		border="normal" 
 		position="center" 
 		closable="true">
@@ -28,9 +28,9 @@
 					<radiogroup id="typeRadiogroup" orient="horizontal" 
 							onCheck="@command('typeChanged')"
 							selectedItem="@bind(fx.type)">
-						<radio id="publishedTypeRadio" label="${labels.survey.export.type.published}" value="published"
+						<radio id="publishedTypeRadio" label="${labels.survey.export.type.published}" value="PUBLISHED"
 								disabled="@load(vm.survey.onlyWork)" />
-						<radio id="temporaryTypeRadio" label="${labels.survey.export.type.temporary}" value="temporary" 
+						<radio id="temporaryTypeRadio" label="${labels.survey.export.type.temporary}" value="TEMPORARY" 
 								disabled="@load(! vm.survey.work)" />
 					</radiogroup>
 				</row>
@@ -53,11 +53,42 @@
 							onCheck="@command('outputFormatChanged')">
 						<radio label="${labels.survey.export.outputFormat.desktop}" value="DESKTOP" selected="true" />
 						<radio label="${labels.survey.export.outputFormat.mobile}" value="MOBILE" />
+						<radio label="${labels.survey.export.outputFormat.rdb}" value="RDB" />
 					</radiogroup>
 				</row>
 			</rows>
 		</grid>
-
+		
+		<grid visible="@bind(fx.outputFormat eq 'RDB')">
+			<columns>
+				<column width="170px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.export.rdb.dialect.$}:" />
+					<listbox id="dialectListbox" mold="select" 
+						selectedItem="@bind(fx.rdbDialect)">
+						<listitem value="STANDARD" 
+									label="${labels.survey.export.rdb.dialect.standard}" />
+						<listitem value="SQLITE" 
+							label="${labels.survey.export.rdb.dialect.sqlite}" />
+   					</listbox>
+				</row>
+				<row>
+					<label value="${labels.survey.export.rdb.target_schema_name}:" />
+					<textbox width="200px" maxlength="40"
+  						value="@bind(fx.rdbTargetSchemaName)"
+  						disabled="@bind(fx.rdbDialect eq 'SQLITE')" />
+				</row>
+				<row>
+					<label value="${labels.survey.export.rdb.format.datetime}:" />
+					<textbox width="200px" maxlength="40"
+  						value="@bind(fx.rdbDateTimeFormat)" />
+				</row>
+			</rows>
+		</grid>
+		
 		<box width="100%" align="center">
 			<button id="okButton" onClick="@command('export')" label="${labels.survey.export.$}" />
 		</box>

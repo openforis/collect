@@ -1,4 +1,4 @@
-package org.openforis.collect.relational.model;
+package org.openforis.collect.relational.data;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
