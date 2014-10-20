@@ -73,13 +73,10 @@ package org.openforis.collect.model.proxy {
 			var result:Boolean = false;
 			switch ( step ) {
 				case CollectRecord$Step.ENTRY:
-					result = hasEffectiveRole(UserProxy.ROLE_ENTRY) || 
-							hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
-							hasEffectiveRole(UserProxy.ROLE_ADMIN);
+					result = hasEffectiveRole(ROLE_ENTRY);
 					break;
 				case CollectRecord$Step.CLEANSING:
-					result = hasEffectiveRole(UserProxy.ROLE_CLEANSING) || 
-							hasEffectiveRole(UserProxy.ROLE_ADMIN);
+					result = hasEffectiveRole(UserProxy.ROLE_CLEANSING);
 					break;
 				case CollectRecord$Step.ANALYSIS:
 					result = false
@@ -89,15 +86,15 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get canDeleteNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_CLEANSING);
+			return hasEffectiveRole(ROLE_ADMIN);
 		}
 		
 		public function get canEditNotOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_CLEANSING);
+			return hasEffectiveRole(ROLE_ADMIN);
 		}
 		
 		public function get canViewDifferentOwnedRecords():Boolean {
-			return hasEffectiveRole(ROLE_CLEANSING);
+			return hasEffectiveRole(ROLE_ADMIN);
 		}
 		
 	}

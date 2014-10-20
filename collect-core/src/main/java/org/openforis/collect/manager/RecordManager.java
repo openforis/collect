@@ -352,9 +352,9 @@ public class RecordManager {
 		//change step and update the record
 		Step currentStep = record.getStep();
 		Step nextStep = currentStep.getNext();
-		Date now = new Date();
-		record.setModifiedBy( user );
-		record.setModifiedDate( now );
+		record.setModifiedBy(user);
+		record.setOwner(null);
+		record.setModifiedDate(new Date());
 		record.setState( null );
 		
 		/**
@@ -376,6 +376,7 @@ public class RecordManager {
 		record.setModifiedBy( user );
 		record.setModifiedDate( new Date() );
 		record.setStep( prevStep );
+		record.setOwner(null);
 		record.setState( State.REJECTED );
 		validate(record);
 		recordDao.update( record );
