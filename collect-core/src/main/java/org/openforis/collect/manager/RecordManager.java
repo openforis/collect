@@ -176,7 +176,6 @@ public class RecordManager {
 			}
 			throw new RecordNotOwnedException(record.getOwner().getName());
 		}
-		validate(record);
 		return record;
 	}
 	
@@ -315,9 +314,6 @@ public class RecordManager {
 	}
 	
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
-		if ( lockingEnabled && sessionId == null ) {
-			throw new IllegalArgumentException("Lock session id not specified");
-		}
 		CollectRecord record = survey.createRecord(modelVersionName);
 		record.createRootEntity(rootEntityName);
 		record.setCreationDate(new Date());

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
@@ -135,16 +134,13 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private boolean createAncestorEntities;
 
 	//transient variables
-	private User adminUser;
 	private CollectRecord lastModifiedRecordSummary;
 	private CollectRecord lastModifiedRecord;
-	private String sessionId;
-
+	private User adminUser;
 
 	public CSVDataImportProcess() {
 		recordValidationEnabled = true;
 		insertNewRecords = false;
-		sessionId = UUID.randomUUID().toString();
 	}
 	
 	@Override
@@ -240,7 +236,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			if ( insertNewRecords ) {
 				//create new record
 				EntityDefinition rootEntityDefn = survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId);
-				CollectRecord record = recordManager.create(survey, rootEntityDefn.getName(), adminUser, newRecordVersionName, sessionId);
+				CollectRecord record = recordManager.create(survey, rootEntityDefn.getName(), adminUser, newRecordVersionName);
 				setRecordKeys(line, record);
 				setValuesInRecord(line, record, Step.ENTRY);
 				insertRecord(record);
@@ -250,7 +246,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				//set values in each step data
 				for (Step currentStep : Step.values()) {
 					if ( currentStep.compareTo(originalRecordStep) <= 0  ) {
-						CollectRecord record = recordManager.checkout(survey, adminUser, recordSummary.getId(), currentStep, sessionId, true);
+						CollectRecord record = recordManager.load(survey, recordSummary.getId(), currentStep);
 						setValuesInRecord(line, record, currentStep);
 						//always save record when updating multiple record steps in the same process
 						updateRecord(record, originalRecordStep, currentStep);
@@ -266,7 +262,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 						if ( lastModifiedRecordSummary != null ) {
 							saveLastModifiedRecord();
 						}
-						record = recordManager.checkout(survey, adminUser, recordSummary.getId(), step, sessionId, true);
+						record = recordManager.load(survey, recordSummary.getId(), step);
 					} else {
 						record = lastModifiedRecord;
 					}
@@ -300,7 +296,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		
 		if ( step.compareTo(originalStep) < 0 ) {
 			//reset record step to the original one
-			CollectRecord record = recordManager.checkout(survey, adminUser, lastModifiedRecordSummary.getId(), originalStep, sessionId, true);
+			CollectRecord record = recordManager.load(survey, lastModifiedRecordSummary.getId(), originalStep);
 			record.setStep(originalStep);
 			
 			updateRecord(record, originalStep, originalStep);
@@ -344,15 +340,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		List<CollectRecord> recordSummaries = recordManager.loadSummaries(survey, rootEntityDefn.getName(), recordKeyValues);
 		CollectRecord recordSummary = recordSummaries.get(0);
 		return recordSummary;
-	}
-
-	private void validateRecord(CollectRecord record) {
-		try {
-			recordManager.validate(record);
-		} catch ( Exception e ) {
-			LOG.warn(String.format("Error validating record (id: %d, key: %s)", 
-				record.getId(), record.getRootEntityKeyValues()), e);
-		}
 	}
 
 	private boolean setValuesInRecord(DataLine line, CollectRecord record, Step step) {
@@ -586,24 +573,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		
 		if ( dataStep == Step.ANALYSIS ) {
 			record.setStep(Step.CLEANSING);
-			recordManager.save(record, sessionId);
+			recordManager.save(record);
 			record.setStep(Step.ANALYSIS);
 		}
-		if ( recordValidationEnabled && originalRecordStep == dataStep ) {
-			validateRecord(record);
-		}
-		recordManager.save(record, adminUser, sessionId);
-
-		//release lock
-		recordManager.releaseLock(record.getId());
+		recordManager.save(record);
 	}
 	
 	private void insertRecord(CollectRecord record) throws RecordPersistenceException {
-		if ( recordValidationEnabled ) {
-			validateRecord(record);
-		}
 		recordManager.save(record);
-		recordManager.releaseLock(record.getId());
 	}
 	
 //	@SuppressWarnings("unchecked")

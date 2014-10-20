@@ -46,12 +46,12 @@
 		<s:State name="multipleUnits" />
 	</detail:states>
 	
-	<s:HGroup gap="2">
+	<s:HGroup gap="2" width="100%">
 		<input:RangeInputField id="rangeInputField" 
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
-								 width="120"
+								 width="100%"
 								 />
 		
 		<input:DropDownInputField id="unitInputField" 

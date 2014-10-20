@@ -39,7 +39,7 @@
 	              	languageCode="@load(vm.currentLanguageCode)" />
 			</fieldErrorHandler>
           <fieldErrorHandler message="@load(vmsgs['message'])">
-            <textbox width="150px" value="@bind(fx.message)" 
+            <textbox width="450px" value="@bind(fx.message)" 
                           onChange="@command('applyChanges')" />
           </fieldErrorHandler>
         </row>
@@ -48,7 +48,8 @@
 	          <label value="${labels.survey.schema.node.check.condition}:" />
 			</fieldErrorHandler>
           <fieldErrorHandler message="@load(vmsgs['condition'])">
-            <textbox width="150px" value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+            <textbox width="450px" multiline="true" rows="4"
+            	value="@bind(fx.condition)" onChange="@command('applyChanges')" />
             <image src="/assets/images/expression-small.png" />
           </fieldErrorHandler>
         </row>
@@ -57,7 +58,7 @@
 	            <label value="${labels.survey.schema.node.check.pattern.regularExpression}:" />
 			</fieldErrorHandler>
             <fieldErrorHandler message="@load(vmsgs['regularExpression'])">
-	            <textbox width="150px"
+	            <textbox width="450px" multiline="true" rows="4"
                   value="@bind(fx.regularExpression)"
 	              onChange="@command('applyChanges')" />
           	</fieldErrorHandler>

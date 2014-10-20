@@ -17,6 +17,7 @@ import org.openforis.idm.metamodel.SurveyContext;
  * @author ste
  *
  */
+//TODO do not extract all code list items in level with a single query
 public class CodeTableDataExtractor extends DataExtractor {
 
 	private CodeTable table;

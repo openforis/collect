@@ -12,7 +12,7 @@
 			@load(vm.formObject) 
 			@save(vm.formObject, before={'export'})"
 		title="${c:l2('survey.export.popup.title', titleArgs)}"
-		width="600px"
+		width="400px"
 		border="normal" 
 		position="center" 
 		closable="true">
@@ -47,13 +47,15 @@
 						disabled="@load(vm.includeUploadedFilesDisabled)" />
 				</row>
 				<row>
-					<label value="${labels.survey.export.outputFormat.$}:" />
-					<radiogroup id="outputFormatRadiogroup" orient="horizontal" 
+					<label value="${labels.survey.export.output_format.$}:" />
+					<radiogroup id="outputFormatRadiogroup" orient="vertical" 
 							selectedItem="@bind(fx.outputFormat)"
 							onCheck="@command('outputFormatChanged')">
-						<radio label="${labels.survey.export.outputFormat.desktop}" value="DESKTOP" selected="true" />
-						<radio label="${labels.survey.export.outputFormat.mobile}" value="MOBILE" />
-						<radio label="${labels.survey.export.outputFormat.rdb}" value="RDB" />
+						<radio label="${labels.survey.export.output_format.desktop}" value="DESKTOP" selected="true" />
+						<radio label="${labels.survey.export.output_format.mobile}" value="MOBILE" />
+						<radio label="${labels.survey.export.output_format.collect_earth}" value="EARTH"
+							visible="@load(vm.collectEarthEditor)" />
+						<radio label="${labels.survey.export.output_format.rdb}" value="RDB" />
 					</radiogroup>
 				</row>
 			</rows>
@@ -67,13 +69,13 @@
 			<rows>
 				<row>
 					<label value="${labels.survey.export.rdb.dialect.$}:" />
-					<radiogroup id="dialectRadiogroup" orient="horizontal" 
+					<listbox id="dialectListbox" mold="select" 
 						selectedItem="@bind(fx.rdbDialect)">
-						<radio id="standardDialectRadio" value="STANDARD" selected="true" 
-							label="${labels.survey.export.rdb.dialect.standard}" />
-						<radio id="sqliteDialectRadio" value="SQLITE" 
+						<listitem value="STANDARD" 
+									label="${labels.survey.export.rdb.dialect.standard}" />
+						<listitem value="SQLITE" 
 							label="${labels.survey.export.rdb.dialect.sqlite}" />
-					</radiogroup>
+   					</listbox>
 				</row>
 				<row>
 					<label value="${labels.survey.export.rdb.target_schema_name}:" />

@@ -108,13 +108,8 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		//record.setCreatedBy("ModelDaoIntegrationTest");
 		record.setStep(Step.ENTRY);
-
 		addTestValues(cluster);
-
-		//update counts and keys
-		record.updateRootEntityKeyValues();
-		record.updateEntityCounts();
-		
+		record.updateSummaryFields();
 		return record;
 	}
 	

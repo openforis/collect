@@ -50,13 +50,14 @@
 	</detail:states>
 	
 	<s:HGroup gap="2" 
-			  verticalAlign="middle">
+			  verticalAlign="middle"
+			  width="100%">
 		<input:NumericInputField id="numericInputField" 
 								 attributeDefinition="{attributeDefinition}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="0"
-								 width="70"
+								 width="100%"
 								 />
 		
 		<input:DropDownInputField id="unitInputField" 

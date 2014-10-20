@@ -6,7 +6,7 @@ import java.util.Map;
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.relational.RDBPrintJob.RdbDialect;
+import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.Command;
@@ -68,7 +68,9 @@ public class SurveyExportParametersVM extends BaseVM {
 	public boolean isIncludeDataDisabled() {
 		SurveyType type = SurveyType.valueOf(getTypeFormField());
 		OutputFormat outputFormat = OutputFormat.valueOf(getOutputFormatFormField());
-		return type == SurveyType.TEMPORARY || outputFormat == OutputFormat.MOBILE;
+		return type == SurveyType.TEMPORARY || 
+				outputFormat == OutputFormat.MOBILE || 
+				outputFormat == OutputFormat.EARTH;
 	}
 
 	@DependsOn("tempForm.includeData")
@@ -126,7 +128,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			TEMPORARY, PUBLISHED
 		}
 		public enum OutputFormat {
-			MOBILE, DESKTOP, RDB
+			MOBILE, DESKTOP, RDB, EARTH
 		}
 		
 		private String type;

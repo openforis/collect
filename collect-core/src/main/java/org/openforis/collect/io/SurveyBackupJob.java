@@ -2,9 +2,7 @@ package org.openforis.collect.io;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -25,8 +23,6 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
-import org.openforis.concurrency.WorkerStatusChangeEvent;
-import org.openforis.concurrency.WorkerStatusChangeListener;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -143,7 +139,7 @@ public class SurveyBackupJob extends Job {
 		SurveyBackupInfoCreatorTask task = createTask(SurveyBackupInfoCreatorTask.class);
 		task.setOutputStream(zipOutputStream);
 		task.setSurvey(survey);
-		task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(INFO_FILE_NAME));
+		task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, INFO_FILE_NAME));
 		addTask(task);
 	}
 
@@ -151,7 +147,7 @@ public class SurveyBackupJob extends Job {
 		IdmlExportTask task = createTask(IdmlExportTask.class);
 		task.setSurvey(survey);
 		task.setOutputStream(zipOutputStream);
-		task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(SURVEY_XML_ENTRY_NAME));
+		task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, SURVEY_XML_ENTRY_NAME));
 		addTask(task);
 	}
 	
@@ -161,7 +157,7 @@ public class SurveyBackupJob extends Job {
 			task.setSamplingDesignManager(samplingDesignManager);
 			task.setSurvey(survey);
 			task.setOutputStream(zipOutputStream);
-			task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(SAMPLING_DESIGN_ENTRY_NAME));
+			task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, SAMPLING_DESIGN_ENTRY_NAME));
 			addTask(task);
 		}
 	}
@@ -180,7 +176,7 @@ public class SurveyBackupJob extends Job {
 				task.setOutputStream(zipOutputStream);
 				task.setTaxonomyId(taxonomy.getId());
 				String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
-				task.addStatusChangeListener(new EntryCreatorTaskStatusChangeListener(entryName));
+				task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, entryName));
 				addTask(task);
 			}
 		}
@@ -285,34 +281,6 @@ public class SurveyBackupJob extends Job {
 	
 	public void setIncludeRecordFiles(boolean includeRecordFiles) {
 		this.includeRecordFiles = includeRecordFiles;
-	}
-	
-	private class EntryCreatorTaskStatusChangeListener implements WorkerStatusChangeListener {
-		
-		private String entryName;
-
-		public EntryCreatorTaskStatusChangeListener(String entryName) {
-			this.entryName = entryName;
-		}
-		
-		@Override
-		public void statusChanged(WorkerStatusChangeEvent event) {
-			try {
-				switch ( event.getTo() ) {
-				case RUNNING:
-					zipOutputStream.putNextEntry(new ZipEntry(entryName));
-					break;
-				case COMPLETED:
-					zipOutputStream.closeEntry();
-					break;
-				default:
-					break;
-				}
-			} catch ( IOException e ) {
-				throw new RuntimeException("Error creating or closing the zip entry: " + e.getMessage(), e);
-			}
-		}
-
 	}
 
 }

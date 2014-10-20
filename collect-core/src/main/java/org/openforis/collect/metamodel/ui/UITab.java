@@ -27,6 +27,13 @@ public class UITab extends UITabSet {
 
 	private LanguageSpecificTextMap labels;
 
+	@Override
+	public void detatch() {
+		super.detatch();
+		uiOptions.removeTabAssociation(this);
+		parent = null;
+	}
+
 	public List<LanguageSpecificText> getLabels() {
 		if ( labels == null ) {
 			return Collections.emptyList();
@@ -103,11 +110,15 @@ public class UITab extends UITabSet {
 		return sb.toString();
 	}
 
-	@Override
-	public void detatch() {
-		super.detatch();
-		uiOptions.removeTabAssociation(this);
-		parent = null;
+	public boolean isDescendantOf(UITab parentTab) {
+		UITabSet currentParent = this.parent;
+		while ( currentParent != null ) {
+			if ( currentParent instanceof UITab && currentParent == parentTab ) {
+				return true;
+			}
+			currentParent = currentParent.parent;
+		}
+		return false;
 	}
 	
 	@Override
