@@ -37,7 +37,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean calculated;
 	private boolean includeInDataExport;
 	private boolean showInUI;
-
+	private String phaseToApplyDefaultValue;
+	
 	//labels
 	private String headingLabel;
 	private String instanceLabel;
@@ -368,6 +369,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.maxCount = maxCount;
 	}
 
+	public String getPhaseToApplyDefaultValue() {
+		return phaseToApplyDefaultValue;
+	}
+	
+	public void setParentDefinition(EntityDefinition parentDefinition) {
+		this.parentDefinition = parentDefinition;
+	}
+	
 	public String getTabName() {
 		return tabName;
 	}
