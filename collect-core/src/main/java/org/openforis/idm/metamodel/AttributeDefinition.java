@@ -1,0 +1,218 @@
+/**
+ * 
+ */
+package org.openforis.idm.metamodel;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.validation.Check;
+import org.openforis.idm.model.Value;
+
+/**
+ * @author G. Miceli
+ * @author M. Togna
+ * @author S. Ricci
+ * 
+ */
+public abstract class AttributeDefinition extends NodeDefinition implements Calculable {
+	
+	private static final long serialVersionUID = 1L;
+
+	private List<Check<?>> checks;
+	private List<AttributeDefault> attributeDefaults;
+	private boolean calculated;
+	/**
+	 * Custom field labels
+	 */
+	private FieldLabelMap fieldLabels;
+	
+	AttributeDefinition(Survey survey, int id) {
+		super(survey, id);
+		this.calculated = false;
+	}
+
+	@Override
+	public boolean isCalculated() {
+		return calculated;
+	}
+	
+	public void setCalculated(boolean calculated) {
+		this.calculated = calculated;
+	}
+	
+	public List<Check<?>> getChecks() {
+		return CollectionUtils.unmodifiableList(this.checks);
+	}
+	
+	public void addCheck(Check<?> check) {
+		if ( checks == null ) {
+			checks = new ArrayList<Check<?>>();
+		}
+		checks.add(check);
+	}
+	
+	public void removeAllChecks() {
+		if ( checks != null ) {
+			checks.clear();
+		}
+	}
+	
+	public void removeCheck(Check<?> check) {
+		checks.remove(check);
+	}
+
+	public List<AttributeDefault> getAttributeDefaults() {
+		return CollectionUtils.unmodifiableList(this.attributeDefaults);
+	}
+
+	public void addAttributeDefault(AttributeDefault def) {
+		if ( attributeDefaults == null ) {
+			attributeDefaults = new ArrayList<AttributeDefault>();
+		}
+		attributeDefaults.add(def);
+	}
+	
+	public void removeAllAttributeDefaults() {
+		if ( attributeDefaults != null ) {
+			attributeDefaults.clear();
+		}
+	}
+	public void removeAttributeDefault(AttributeDefault def) {
+		attributeDefaults.remove(def);
+	}
+	
+	public void moveAttributeDefault(AttributeDefault def, int toIndex) {
+		CollectionUtils.shiftItem(attributeDefaults, def, toIndex);
+	}
+
+	public abstract <V extends Value> V createValue(String string);
+
+//	public Set<NodePathPointer> getCheckDependencyPaths() {
+//		Survey survey = getSurvey();
+//		return survey.getCheckDependencies(this);
+//	}
+	
+	public abstract List<FieldDefinition<?>> getFieldDefinitions();
+	
+	public List<String> getFieldNames() {
+		List<String> result = new ArrayList<String>();
+		for (FieldDefinition<?> fieldDefinition : getFieldDefinitions()) {
+			result.add(fieldDefinition.getName());
+		}
+		return Collections.unmodifiableList(result);
+	}
+	
+	public FieldDefinition<?> getFieldDefinition(String name) {
+		List<FieldDefinition<?>> defns = getFieldDefinitions();
+		for (FieldDefinition<?> fieldDefinition : defns) {
+			if ( fieldDefinition.getName().equals(name) ) {
+				return fieldDefinition;
+			}
+		}
+		return null;
+	}
+
+	public List<FieldLabel> getFieldLabels() {
+		if ( this.fieldLabels == null ) {
+			return Collections.emptyList();
+		} else {
+			return fieldLabels.values();
+		}
+	}
+	
+	public String getFieldLabel(String field) {
+		String defaultLanguage = getSurvey().getDefaultLanguage();
+		return getFieldLabel(field, defaultLanguage);
+	}
+	
+	public String getFieldLabel(String field, String language) {
+		return fieldLabels == null ? null: fieldLabels.getText(field, language);
+	}
+	
+	public void setFieldLabel(String field, String language, String text) {
+		if ( fieldLabels == null ) {
+			fieldLabels = new FieldLabelMap();
+		}
+		fieldLabels.setText(field, language, text);
+	}
+
+	public void addFieldLabel(FieldLabel label) {
+		if ( fieldLabels == null ) {
+			fieldLabels = new FieldLabelMap();
+		}
+		fieldLabels.add(label);
+	}
+
+	public void removeFieldLabel(String field, String language) {
+		if (fieldLabels != null ) {
+			fieldLabels.remove(field, language);
+		}
+	}
+	
+	public abstract String getMainFieldName();
+	
+	public abstract Class<? extends Value> getValueType();
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((attributeDefaults == null) ? 0 : attributeDefaults.hashCode());
+		result = prime * result + ((checks == null) ? 0 : checks.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		AttributeDefinition other = (AttributeDefinition) obj;
+		if (attributeDefaults == null) {
+			if (other.attributeDefaults != null)
+				return false;
+		} else if (!attributeDefaults.equals(other.attributeDefaults))
+			return false;
+		if (checks == null) {
+			if (other.checks != null)
+				return false;
+		} else if (!checks.equals(other.checks))
+			return false;
+		return true;
+	}
+
+	/**
+	 * Build name prefixing all names of ancestor single entities
+	 * @return
+	 */
+	public String getCompoundName() {
+		StringBuilder sb = new StringBuilder(getName());
+		NodeDefinition ancestor = getParentDefinition();
+		while ( ancestor != null && !ancestor.isMultiple() ) {
+			sb.insert(0, "_");
+			sb.insert(0, ancestor.getName());
+			ancestor = ancestor.getParentDefinition();
+		}
+		return sb.toString();
+	}
+	
+	public static class FieldLabel extends TypedLanguageSpecificText<String> {
+
+		private static final long serialVersionUID = 1L;
+
+		public FieldLabel(String field, String language, String text) {
+			super(field, language, text);
+		}
+
+	}
+	
+	public static class FieldLabelMap extends TypedLanguageSpecificTextAbstractMap<FieldLabel, String> {
+		private static final long serialVersionUID = 1L;
+	}
+}

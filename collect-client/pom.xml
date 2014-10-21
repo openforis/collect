@@ -272,12 +272,6 @@
 			<type>jar</type>
 		</dependency>
 		<dependency>
-			<groupId>org.openforis.idm</groupId>
-			<artifactId>idm-api</artifactId>
-			<scope>provided</scope>
-			<type>jar</type>
-		</dependency>
-		<dependency>
 			<groupId>com.adobe.flex.framework</groupId>
 			<artifactId>flex-framework</artifactId>
 			<version>${flex.framework.version}</version>
