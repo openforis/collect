@@ -168,4 +168,8 @@ public class SessionRecordFileManager implements Serializable {
 		return result;
 	}
 	
+	public void setRecordFileManager(RecordFileManager recordFileManager) {
+		this.recordFileManager = recordFileManager;
+	}
+	
 }

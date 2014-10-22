@@ -50,7 +50,7 @@ public class RecordUpdaterTest {
 		
 		updater.addEntity(record.getRootEntity(), "tree");
 		
-		Attribute<?, ?> treeCount = findAttribute("/root/tree[1]/tree_count");
+		Attribute<?, ?> treeCount = attributeByPath("/root/tree[1]/tree_count");
 		assertEquals(new TextValue("1"), treeCount.getValue());
 	}
 
@@ -68,7 +68,7 @@ public class RecordUpdaterTest {
 			attribute("attribute", "initial value")
 		);
 		
-		Attribute<?,?> attr = findAttribute("root/attribute[1]");
+		Attribute<?,?> attr = attributeByPath("root/attribute[1]");
 		
 		NodeChangeSet result = update(attr, "new value");
 		
@@ -94,7 +94,22 @@ public class RecordUpdaterTest {
 		Entity rootEntity = record.getRootEntity();
 		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("time_study"));
 	}
-	
+
+
+	@Test
+	public void testMinCountValidationResultOnEntityWhenRequiredAttributeIsEmpty() {
+		record(
+			rootEntityDef(
+				entityDef("time_study",
+						attributeDef("start_time").required()
+				)
+			)
+		);
+		Entity timeStudy = entityByPath("/root/time_study");
+		ValidationResultFlag timeStartValidationResult = timeStudy.getMinCountValidationResult("start_time");
+		assertEquals(ValidationResultFlag.ERROR, timeStartValidationResult);
+	}
+
 	@Test
 	public void testCardinalityValidatedOnAttributeUpdate() {
 		record(
@@ -269,7 +284,7 @@ public class RecordUpdaterTest {
 			),
 			entity("tree")
 		);
-		Attribute<?, ?> treeNum = findAttribute("/root/tree[1]/tree_num");
+		Attribute<?, ?> treeNum = attributeByPath("/root/tree[1]/tree_num");
 		
 		assertFalse(treeNum.isRelevant());
 
@@ -288,20 +303,20 @@ public class RecordUpdaterTest {
 	}
 	
 	protected NodeChangeSet updateAttribute(String path, String value) {
-		Attribute<?,?> attr = findAttribute(path);
+		Attribute<?,?> attr = attributeByPath(path);
 		NodeChangeSet result = update(attr, value);
 		return result;
 	}
 
 	protected NodeChangeSet update(String path, String value) {
-		return update(findAttribute(path), value);
+		return update(attributeByPath(path), value);
 	}
 	
 	protected NodeChangeSet update(Attribute<?, ?> attr, String value) {
 		return updater.updateAttribute((Attribute<?, Value>) attr, new TextValue(value));
 	}
 
-	protected Attribute<?,?>  findAttribute(String path) {
+	protected Attribute<?,?> attributeByPath(String path) {
 		return (Attribute<?, ?>) record.findNodeByPath(path);
 	}
 	

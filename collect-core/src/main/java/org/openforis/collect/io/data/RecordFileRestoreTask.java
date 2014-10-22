@@ -37,7 +37,6 @@ public class RecordFileRestoreTask extends Task {
 	//managers
 	private RecordManager recordManager;
 	private RecordFileManager recordFileManager;
-	private SessionRecordFileManager sessionRecordFileManager;
 	
 	//input
 	private ZipFile zipFile;
@@ -46,9 +45,20 @@ public class RecordFileRestoreTask extends Task {
 	private boolean overwriteAll;
 	
 	//temporary instance variables
+	private SessionRecordFileManager sessionRecordFileManager;
 	private List<Integer> processedRecords;
 	private BackupFileExtractor backupFileExtractor;
 	private boolean oldBackupFormat;
+	
+	public RecordFileRestoreTask() {
+		sessionRecordFileManager = new SessionRecordFileManager();
+	}
+	
+	@Override
+	protected void initInternal() throws Throwable {
+		super.initInternal();
+		sessionRecordFileManager.setRecordFileManager(recordFileManager);
+	}
 	
 	@Override
 	protected void execute() throws Throwable {
