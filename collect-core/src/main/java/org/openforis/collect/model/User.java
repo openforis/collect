@@ -37,13 +37,9 @@ public class User {
 	}
 	
 	public boolean hasRole(UserRole role) {
-		return hasRole(role.getCode());
-	}
-	
-	private boolean hasRole(String role) {
 		return roles.contains(role);
 	}
-
+	
 	public boolean hasEffectiveRole(UserRole role) {
 		int maxHiearachicalOrder = calculateHighestRoleHierarchicalOrder();
 		return role.getHierarchicalOrder() <= maxHiearachicalOrder;
@@ -55,6 +51,14 @@ public class User {
 			max = Math.max(max, role.getHierarchicalOrder());
 		}
 		return max;
+	}
+	
+	public List<String> getRoleCodes() {
+		List<String> codes = new ArrayList<String>(getRoles().size());
+		for (UserRole role : getRoles()) {
+			codes.add(role.getCode());
+		}
+		return codes;
 	}
 	
 	public Boolean getEnabled() {

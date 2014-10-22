@@ -16,8 +16,8 @@ public class RecordAccessControlManager {
 		return record.getOwner() == null || record.getOwner().getId().equals(user.getId()) || user.hasRole(UserRole.ADMIN);
 	}
 	
-	public boolean isOwnerToBeResetAfterPromoting(User user, Step currentStep) {
-		return currentStep != Step.ENTRY || ! user.hasEffectiveRole(UserRole.CLEANSING);
+	public boolean isOwnerToBeResetAfterPromoting(User user, Step step) {
+		return step != Step.ENTRY || ! user.hasEffectiveRole(UserRole.CLEANSING);
 	}
 
 }

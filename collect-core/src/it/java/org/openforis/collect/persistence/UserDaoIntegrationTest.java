@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -33,8 +34,8 @@ public class UserDaoIntegrationTest {
 		user.setEnabled(Boolean.TRUE);
 		user.setName("user1");
 		user.setPassword("pass1");
-		user.addRole("role1");
-		user.addRole("role2");
+		user.addRole(UserRole.ENTRY);
+		user.addRole(UserRole.CLEANSING);
 		
 		userDao.insert(user);
 		Integer id = user.getId();
