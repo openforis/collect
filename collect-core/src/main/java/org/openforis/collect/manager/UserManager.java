@@ -131,7 +131,7 @@ public class UserManager {
 	public User insertUser(String name, String password, UserRole role) throws UserPersistenceException {
 		User user = new User(name);
 		user.setPassword(name);
-		user.addRole(role.getCode());
+		user.addRole(role);
 		save(user);
 		return user;
 	}

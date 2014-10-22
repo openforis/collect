@@ -60,6 +60,8 @@ public class RecordManager {
 	private long lockTimeoutMillis;
 	private boolean lockingEnabled;
 	private RecordLockManager lockManager;
+
+	private RecordAccessControlManager accessControlManager;
 	
 	public RecordManager() {
 		this(true);
@@ -71,6 +73,7 @@ public class RecordManager {
 		this.lockTimeoutMillis = DEFAULT_LOCK_TIMEOUT_MILLIS;
 		this.updater = new RecordUpdater();
 		this.recordConverter = new RecordConverter();
+		this.accessControlManager = new RecordAccessControlManager();
 	}
 
 	protected void init() {
@@ -170,8 +173,7 @@ public class RecordManager {
 			lockManager.lock(recordId, user, sessionId, forceUnlock);
 		}
 		CollectRecord record = load(survey, recordId, step);
-		if ( step == Step.ENTRY && record.getOwner() != null && ! record.getOwner().getId().equals(user.getId())
-				&& ! ( user.hasRole("ROLE_ADMIN") || user.hasRole("ROLE_ANALYSIS") || user.hasRole("ROLE_CLEANSING")) ) {
+		if ( ! accessControlManager.canEdit(user, record) ) {
 			if ( isLockingEnabled() ) {
 				releaseLock(recordId);
 			}
@@ -179,7 +181,7 @@ public class RecordManager {
 		}
 		return record;
 	}
-	
+
 	private void checkSurveyRecordValidationNotInProgress(CollectSurvey survey) throws RecordValidationInProgressException {
 		if ( survey.isPublished() && ! survey.isWork() && surveyManager.isRecordValidationInProgress(survey.getId()) ) {
 			throw new RecordValidationInProgressException();
@@ -353,7 +355,9 @@ public class RecordManager {
 		Step currentStep = record.getStep();
 		Step nextStep = currentStep.getNext();
 		record.setModifiedBy(user);
-		record.setOwner(null);
+		if ( accessControlManager.isOwnerToBeResetAfterPromoting(user, currentStep) ) {
+			record.setOwner(null);
+		}
 		record.setModifiedDate(new Date());
 		record.setState( null );
 		

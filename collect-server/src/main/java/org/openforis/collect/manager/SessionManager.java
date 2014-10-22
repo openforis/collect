@@ -1,6 +1,5 @@
 package org.openforis.collect.manager;
 
-import java.util.Collection;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
@@ -21,7 +20,6 @@ import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -152,12 +150,7 @@ public class SessionManager {
 			if (user == null) {
 				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 				String name = authentication.getName();
-				Integer userId = userManager.getUserId(name);
-				user = new User(userId, name);
-				Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-				for (GrantedAuthority grantedAuthority : authorities) {
-					user.addRole(grantedAuthority.getAuthority());
-				}
+				user = userManager.loadByUserName(name);
 			}
 			return user;
 		} else {

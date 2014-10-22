@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -48,9 +49,8 @@ public class CollectUserDetailsService implements UserDetailsService {
 
 	private Collection<GrantedAuthority> getAuthorities(User user) {
 		List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>(2);
-		List<String> roles = user.getRoles();
-		for (String role : roles) {
-			authList.add(new SimpleGrantedAuthority(role));
+		for (UserRole role : user.getRoles()) {
+			authList.add(new SimpleGrantedAuthority(role.getCode()));
 		}
 		return authList;
 	}

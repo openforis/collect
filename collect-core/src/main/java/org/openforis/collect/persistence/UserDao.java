@@ -18,6 +18,7 @@ import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.impl.Factory;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.UserDao.JooqFactory;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.MappingJooqFactory;
@@ -151,9 +152,10 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 			SimpleSelectQuery<OfcUserRoleRecord> query = selectQuery(OFC_USER_ROLE);
 			query.addConditions(OFC_USER_ROLE.USER_ID.equal(user.getId()));
 			Result<OfcUserRoleRecord> result = query.fetch();
-			List<String> roles = new ArrayList<String>();
+			List<UserRole> roles = new ArrayList<UserRole>();
 			for (OfcUserRoleRecord ofcUserRoleRecord : result) {
-				String role = ofcUserRoleRecord.getRole();
+				String roleCode = ofcUserRoleRecord.getRole();
+				UserRole role = UserRole.fromCode(roleCode);
 				roles.add(role);
 			}
 			user.setRoles(roles);
@@ -162,14 +164,14 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 		protected void saveRoles(User user) {
 			Integer userId = user.getId();
 			deleteRoles(userId);
-			List<String> roles = user.getRoles();
-			for (String role : roles) {
+			List<UserRole> roles = user.getRoles();
+			for (UserRole role : roles) {
 				int userRoleId = nextId(OFC_USER_ROLE.ID, OFC_USER_ROLE_ID_SEQ);
 				insertInto(OFC_USER_ROLE, 
 							OFC_USER_ROLE.ID, 
 							OFC_USER_ROLE.USER_ID, 
 							OFC_USER_ROLE.ROLE)
-					.values(userRoleId, userId, role)
+					.values(userRoleId, userId, role.getCode())
 					.execute();
 			}
 		}

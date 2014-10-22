@@ -14,12 +14,12 @@ public class User {
 
 	private Boolean enabled;
 	private Integer id;
-	private List<String> roles;
+	private List<UserRole> roles;
 	private String name;
 	private String password;
 	
 	public User() {
-		roles = new ArrayList<String>();
+		roles = new ArrayList<UserRole>();
 	}
 
 	public User(String name) {
@@ -32,14 +32,31 @@ public class User {
 		this.id = id;
 	}
 
-	public void addRole(String role) {
+	public void addRole(UserRole role) {
 		roles.add(role);
 	}
 	
-	public boolean hasRole(String role) {
+	public boolean hasRole(UserRole role) {
+		return hasRole(role.getCode());
+	}
+	
+	private boolean hasRole(String role) {
 		return roles.contains(role);
 	}
 
+	public boolean hasEffectiveRole(UserRole role) {
+		int maxHiearachicalOrder = calculateHighestRoleHierarchicalOrder();
+		return role.getHierarchicalOrder() <= maxHiearachicalOrder;
+	}
+
+	private int calculateHighestRoleHierarchicalOrder() {
+		int max = -1;
+		for (UserRole role : roles) {
+			max = Math.max(max, role.getHierarchicalOrder());
+		}
+		return max;
+	}
+	
 	public Boolean getEnabled() {
 		return enabled;
 	}
@@ -52,7 +69,7 @@ public class User {
 	 * Returns an unmodifiable list of user roles
 	 * @return
 	 */
-	public List<String> getRoles() {
+	public List<UserRole> getRoles() {
 		return Collections.unmodifiableList(roles);
 	}
 
@@ -60,7 +77,7 @@ public class User {
 		return name;
 	}
 
-	public void setRoles(List<String> roles) {
+	public void setRoles(List<UserRole> roles) {
 		this.roles = roles;
 	}
 

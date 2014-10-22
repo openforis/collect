@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import org.openforis.collect.model.RecordLock;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordLockedByActiveUserException;
 import org.openforis.collect.persistence.RecordLockedException;
@@ -70,7 +71,7 @@ public class RecordLockManager {
 	}
 
 	private boolean isForceUnlockAllowed(User user, RecordLock lock) {
-		boolean isAdmin = user.hasRole("ROLE_ADMIN");
+		boolean isAdmin = user.hasRole(UserRole.ADMIN);
 		Integer userId = user.getId();
 		User lockUser = lock.getUser();
 		return isAdmin || userId.equals(lockUser.getId());
