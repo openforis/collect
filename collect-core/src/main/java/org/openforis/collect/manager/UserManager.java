@@ -130,7 +130,7 @@ public class UserManager {
 	@Transactional
 	public User insertUser(String name, String password, UserRole role) throws UserPersistenceException {
 		User user = new User(name);
-		user.setPassword(name);
+		user.setPassword(password);
 		user.addRole(role);
 		save(user);
 		return user;

@@ -40,6 +40,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class DataHandler extends DefaultHandler {
 	
+	private static final String NEW_USER_PASSWORD = "password";
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 	private static final String XML_DATE_TIME_FORMAT = "yyyy-MM-d'T'HH:mm:ss";
 	private static final String ATTRIBUTE_VERSION = "version";
@@ -176,7 +177,7 @@ public class DataHandler extends DefaultHandler {
 			if ( user == null ) {
 				//create a user with data entry role and password equal to the user name
 				try {
-					user = userManager.insertUser(name, name, UserRole.ENTRY);
+					user = userManager.insertUser(name, NEW_USER_PASSWORD, UserRole.ENTRY);
 				} catch (UserPersistenceException e) {
 					throw new RuntimeException("Error creating new user with username '" + name + "'", e);
 				}
