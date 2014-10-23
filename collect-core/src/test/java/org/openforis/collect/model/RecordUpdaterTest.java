@@ -293,6 +293,35 @@ public class RecordUpdaterTest {
 		assertTrue(treeNum.isRelevant());
 	}
 	
+	@Test
+	public void testConstantRelevanceEvaluated() {
+		record(
+			rootEntityDef(
+				attributeDef("attr")
+					.relevant("false()"),
+				entityDef("tree",
+					attributeDef("not_relevant")
+						.relevant("false()")
+				)
+				.relevant("attr = 'yes'")
+				.multiple()
+			),
+			entity("tree")
+		);
+		Entity tree = entityByPath("/root/tree[1]");
+		Attribute<?, ?> attr = attributeByPath("/root/attr");
+		Attribute<?, ?> notRelevantAttr = attributeByPath("/root/tree[1]/not_relevant");
+		
+		assertFalse(tree.isRelevant());
+		assertFalse(attr.isRelevant());
+		assertFalse(notRelevantAttr.isRelevant());
+
+		update("/root/attr", "yes");
+		
+		assertTrue(tree.isRelevant());
+		assertFalse(notRelevantAttr.isRelevant());
+	}
+	
 	protected void record(EntityDefinition rootDef, NodeBuilder... builders) {
 		record = NodeBuilder.record(survey, builders);
 		updater.initializeRecord(record);

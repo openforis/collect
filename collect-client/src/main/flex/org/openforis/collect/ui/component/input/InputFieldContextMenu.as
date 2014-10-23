@@ -248,12 +248,9 @@ package org.openforis.collect.ui.component.input {
 			var parent:EntityProxy = node.parent;
 			var label:String = nodeDefn.getInstanceOrHeadingLabelText();
 			var count:int = parent.getCount(nodeDefn.name);
-			var minCount:Number = nodeDefn.minCount;
-			if((isNaN(minCount) || minCount == 0) && node.parent.isRequired(nodeDefn.name)) {
-				minCount = 1;
-			}
-			if(count == minCount) {
-				AlertUtil.showMessage("global.cannotDelete", [label, minCount], "global.cannotDeleteTitle");
+			var effectiveMinCount:Number = node.parent.getEffectiveMinCount(nodeDefn.name);
+			if(count == effectiveMinCount) {
+				AlertUtil.showMessage("global.cannotDelete", [label, effectiveMinCount], "global.cannotDeleteTitle");
 				return false;
 			} else {
 				return true;

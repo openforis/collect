@@ -61,7 +61,7 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 
 	@Before
 	public void init() throws UserPersistenceException {
-		userManager.insertUser("entry", "pass", UserRole.ENTRY);
+		userManager.insertUser("entry", "pass1", UserRole.ENTRY);
 	}
 	
 	@Test

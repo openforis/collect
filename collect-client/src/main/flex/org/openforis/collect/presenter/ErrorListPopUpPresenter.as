@@ -95,10 +95,11 @@ package org.openforis.collect.presenter
 				var maxCountValid:ValidationResultFlag = entity.childrenMaxCountValidationMap.get(childName);
 				if(minCountValid == ValidationResultFlag.ERROR || maxCountValid == ValidationResultFlag.ERROR) {
 					if ( minCountValid == ValidationResultFlag.ERROR ) {
-						if ( childDefn.minCount == 1 ) {
+						var effectiveMinCount:int = entity.getEffectiveMinCount(childName);
+						if ( effectiveMinCount == 1 ) {
 							messages = [Message.get("edit.validation.requiredField")];
 						} else {
-							messages = [Message.get("edit.validation.minCount", [childDefn.minCount])];
+							messages = [Message.get("edit.validation.minCount", [effectiveMinCount])];
 						}
 					} else {
 						messages = [Message.get("edit.validation.maxCount", [childDefn.maxCount > 0 ? childDefn.maxCount: 1])];

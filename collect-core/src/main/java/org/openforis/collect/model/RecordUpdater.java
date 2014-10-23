@@ -608,6 +608,9 @@ public class RecordUpdater {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected NodeChangeMap initializeEntity(Entity entity) {
+		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
+		entityAsList.add(entity);
+
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addEntityAddChange(entity);
 		
@@ -625,10 +628,9 @@ public class RecordUpdater {
 		
 		//relevance
 		
-		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
-		entityAsList.add(entity);
-		List<NodePointer> relevanceDependentNodes = record.determineRelevanceDependentNodes(entityAsList);
-		Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(relevanceDependentNodes).update();
+		List<NodePointer> relevancePointers = record.determineConstantRelevancePointers(entity);
+		relevancePointers.addAll(record.determineRelevanceDependentNodes(entityAsList));
+		Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(relevancePointers).update();
 		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
 		//requireness

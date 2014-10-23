@@ -391,6 +391,15 @@ package org.openforis.collect.model.proxy {
 			return required == true;
 		}
 		
+		public function getEffectiveMinCount(childName:String):int {
+			var childDef:NodeDefinitionProxy = EntityDefinitionProxy(definition).getChildDefinition(childName);
+			if((isNaN(childDef.minCount) || childDef.minCount == 0) && isRequired(childName) ) {
+				return 1;
+			} else {
+				return childDef.minCount;
+			}
+		}
+		
 		public function get childDefinitionNames():IList {
 			//taken from showChildrenErrorsMap that is fully populated from the server
 			//with an entry for each child definition
