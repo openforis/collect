@@ -346,24 +346,25 @@ public class RecordManager {
 			recordDao.update( record );
 		}
 
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.applyDefaultValues(record);
-		
-		//change step and update the record
-		Step currentStep = record.getStep();
-		Step nextStep = currentStep.getNext();
-		Date now = new Date();
-		record.setModifiedBy( user );
-		record.setModifiedDate( now );
-		record.setState( null );
-		
 		/**
 		 * 1. clear node states
 		 * 2. update record step
 		 * 3. update all validation states
 		 */
+		record.setModifiedBy(user);
+		record.setModifiedDate(new Date());
+		record.setState(null);
+		
 		record.clearNodeStates();
+
+		//change step and update the record
+		Step currentStep = record.getStep();
+		Step nextStep = currentStep.getNext();
 		record.setStep( nextStep );
+
+		RecordUpdater recordUpdater = new RecordUpdater();
+		recordUpdater.applyDefaultValues(record);
+
 		validate(record);
 		
 		recordDao.update( record );

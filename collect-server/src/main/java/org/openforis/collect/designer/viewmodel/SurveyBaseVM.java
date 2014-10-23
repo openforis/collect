@@ -466,8 +466,8 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 	}
 
-	public List<Step> getEditableRecordSteps() {
-		return Arrays.asList(Step.ENTRY, Step.CLEANSING);
+	public List<String> getEditableRecordStepNames() {
+		return Arrays.asList(Step.ENTRY.name(), Step.CLEANSING.name());
 	}
 	
 }

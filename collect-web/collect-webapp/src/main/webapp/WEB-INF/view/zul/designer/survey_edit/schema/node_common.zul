@@ -143,25 +143,6 @@
   						onCheck="@command('applyChanges')" />
   				</fieldErrorHandler>
   			</row>
-  			<row
-  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated))">
-  				<fieldErrorHandler message="@load(vmsgs['phaseToApplyDefaultValue'])">
-	  				<label value="${labels.survey.schema.node.phase_to_apply_default_value}:" />
-	  			</fieldErrorHandler>
-  				<fieldErrorHandler message="@load(vmsgs['phaseToApplyDefaultValue'])">
-  					<listbox mold="select" 
-						selectedItem="@bind(fx.phaseToApplyDefaultValue)"
-						model="@load(vm.editableRecordsSteps)">
-						<template name="model">
-							<listitem value="@load(each.name())" 
-									label="${c:l('survey.workflow.phase.'.concat(each.name().lower()))}" />
-						</template>
-   					</listbox>
-  					<checkbox
-  						checked="@load(fx.phaseToApplyDefaultValue eq true) @save(fx.phaseToApplyDefaultValue)"
-  						onCheck="@command('applyChanges')" />
-  				</fieldErrorHandler>
-  			</row>
   		</rows>
   	</grid>
 

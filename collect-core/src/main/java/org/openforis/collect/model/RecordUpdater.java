@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -477,7 +479,7 @@ public class RecordUpdater {
 		for (Node<?> child: children) {
 			if ( child instanceof Attribute ) {
 				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
-				if ( attribute.isEmpty() ) {
+				if ( isDefaultValueToBeApplied(attribute) ) {
 					performDefaultValueApply(attribute);
 				}
 			} else if ( child instanceof Entity ) {
@@ -536,20 +538,18 @@ public class RecordUpdater {
 	private <V extends Value> void performDefaultValueApply(Attribute<?, V> attribute) {
 		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
 		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
-		if ( defaults != null && defaults.size() > 0 ) {
-			for (AttributeDefault attributeDefault : defaults) {
-				try {
-					if ( attributeDefault.evaluateCondition(attribute) ) {
-						V value = attributeDefault.evaluate(attribute);
-						if ( value != null ) {
-							attribute.setValue(value);
-							setDefaultValueApplied(attribute, true);
-							break;
-						}
+		for (AttributeDefault attributeDefault : defaults) {
+			try {
+				if ( attributeDefault.evaluateCondition(attribute) ) {
+					V value = attributeDefault.evaluate(attribute);
+					if ( value != null ) {
+						attribute.setValue(value);
+						setDefaultValueApplied(attribute, true);
+						break;
 					}
-				} catch (InvalidExpressionException e) {
-					throw new RuntimeException("Error applying default value for attribute " + attributeDefn.getPath());
 				}
+			} catch (InvalidExpressionException e) {
+				throw new RuntimeException("Error applying default value for attribute " + attributeDefn.getPath());
 			}
 		}
 	}
@@ -707,9 +707,25 @@ public class RecordUpdater {
 	}
 	
 	private void setInitialValue(Attribute<?, ?> attr) {
-		if ( attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly() ) {
+		if(isDefaultValueToBeApplied(attr)) {
+			performDefaultValueApply(attr);
+		}
+		if(attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly() && attr.isEmpty()) {
 			BooleanAttribute boolAttr = (BooleanAttribute) attr;
 			boolAttr.setValue(new BooleanValue(false));
+		}
+	}
+
+	private boolean isDefaultValueToBeApplied(Attribute<?, ?> attr) {
+		Survey survey = attr.getSurvey();
+		if(survey instanceof CollectSurvey) {
+			CollectAnnotations annotations = ((CollectSurvey) survey).getAnnotations();
+			Step step = ((CollectRecord) attr.getRecord()).getStep();
+			AttributeDefinition def = attr.getDefinition();
+			Step phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue(def);
+			return step == phaseToApplyDefaultValue;
+		} else {
+			return false;
 		}
 	}
 

@@ -8,11 +8,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
-import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
  * @author M. Togna
@@ -43,25 +42,26 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 	
 	@ExternalizedProperty
 	public boolean isAutocomplete() {
-		String autocompleteStrValue = attributeDefinition.getAnnotation(Annotation.AUTOCOMPLETE.getQName());
-		boolean autocomplete = StringUtils.isNotBlank(autocompleteStrValue);
-		return autocomplete;
+		if ( attributeDefinition instanceof TextAttributeDefinition ) {
+			String autoCompleteGroup = getAnnotations().getAutoCompleteGroup((TextAttributeDefinition) attributeDefinition);
+			return StringUtils.isNotBlank(autoCompleteGroup);
+		} else {
+			return false;
+		}
 	}
 	
 	@ExternalizedProperty
 	public String[] getVisibleFields() {
-		CollectSurvey survey = (CollectSurvey) attributeDefinition.getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
+		UIOptions uiOptions = getUIOptions();
 		String[] result = uiOptions.getVisibleFields(attributeDefinition);
 		return result;
 	}
 	
 	protected boolean isFieldVisible(String field) {
-		CollectSurvey survey = (CollectSurvey) attributeDefinition.getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
+		UIOptions uiOptions = getUIOptions();
 		return uiOptions.isVisibleField(attributeDefinition, field);
 	}
-	
+
 	@ExternalizedProperty
 	public boolean isCalculated() {
 		return attributeDefinition.isCalculated();
@@ -72,4 +72,9 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 		return FieldLabelProxy.fromFieldLabelList(attributeDefinition.getFieldLabels());
 	}
 	
+	@ExternalizedProperty
+	public boolean isEditable() {
+		return getAnnotations().isEditable(attributeDefinition);
+	}
+
 }

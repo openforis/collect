@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
@@ -182,14 +183,17 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 		return width;
 	}
 	
-	protected UIOptions getUIOptions() {
-		CollectSurvey survey = (CollectSurvey) nodeDefinition.getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
-		return uiOptions;
-	}
-	
 	public EntityDefinitionProxy getParent() {
 		return parent;
 	}
 
+	protected UIOptions getUIOptions() {
+		CollectSurvey survey = (CollectSurvey) nodeDefinition.getSurvey();
+		return survey.getUIOptions();
+	}
+	
+	protected CollectAnnotations getAnnotations() {
+		CollectSurvey survey = (CollectSurvey) nodeDefinition.getSurvey();
+		return survey.getAnnotations();
+	}
 }
