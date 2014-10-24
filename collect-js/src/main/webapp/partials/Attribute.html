@@ -1,0 +1,6 @@
+<div class="form-group">
+    <label for="attribute-{{node.id}}">{{node.label}}</label>
+    <input ng-model="node.value"
+           ng-blur="attributeUpdated(node)"
+           class="form-control" id="attribute-{{node.id}}">
+</div>
