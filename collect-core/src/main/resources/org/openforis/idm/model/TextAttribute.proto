@@ -1,0 +1,9 @@
+package org.openforis.idm.model;
+
+option optimize_for = LITE_RUNTIME;
+option java_package = "com.example.foo";
+
+message TextAttribute {
+	optional int32 definitionId = 1;
+	repeated Field fields = 2;
+}

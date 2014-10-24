@@ -28,7 +28,7 @@ public abstract class AbstractTest {
 
 	@BeforeClass
 	public static void setUp() throws IOException, XmlParseException, IdmlParseException {
-		URL idm = ClassLoader.getSystemResource("test.idm.xml");
+		URL idm = AbstractTest.class.getResource("/test.idm.xml");
 		InputStream is = idm.openStream();
 		SurveyIdmlBinder binder = new SurveyIdmlBinder(new CollectTestSurveyContext());
 		survey = (CollectSurvey) binder.unmarshal(is);

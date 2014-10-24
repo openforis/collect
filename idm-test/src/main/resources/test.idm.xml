@@ -1,0 +1,5446 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<survey xmlns="http://www.openforis.org/idml/3.0" 
+	xmlns:collect="http://www.openforis.org/collect/3.0/collect"
+	xmlns:ui="http://www.openforis.org/collect/3.0/ui" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.openforis.org/idml/3.0 ../../../../idm-api/src/main/resources/idml3.1.2.xsd
+		http://www.openforis.org/collect/3.0/ui 
+		https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
+	lastId="1066">
+  <!-- 
+  	https://raw.github.com/openforis/idm/master/idm-api/src/main/resources/idml3.1.xsd
+  	http://www.openforis.org/idml/3.0 ../../../../idm-api/src/main/resources/idml3.xsd 
+    http://www.openforis.org/collect/3.0/ui ../../../../../collect/collect-core/src/main/resources/idml3-ui.xsd -->
+	<project>Archenland NFI</project>
+	<uri>http://www.openforis.org/idm/archenland</uri>
+	<cycle>1</cycle>
+	<description>First inventory of the Kingdom of Archenland (1015-1020)</description>
+	<language>en</language>
+	<applicationOptions>
+		<options type="ui">
+			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="cluster">
+				<tab name="cluster">
+					<label>Cluster</label>
+				</tab>
+				<tab name="plot">
+					<label>Plot</label>
+					<tab name="plot_det">
+						<label>Details (2)</label>
+					</tab>
+					<tab name="shrubs_regen">
+						<label>Shrubs &amp; Regeneration (3)</label>
+					</tab>
+					<tab name="tree">
+						<label>Trees (4)</label>
+					</tab>
+					<tab name="dead_wood">
+						<label>Dead Wood (5a)</label>
+					</tab>
+					<tab name="stump">
+						<label>Stumps (5b)</label>
+					</tab>
+					<tab name="bamboo">
+						<label>Bamboo (6)</label>
+					</tab>
+				</tab>
+				<tab name="informant">
+					<label>Informant Interviews</label>
+				</tab>
+			</tabSet>
+			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="household">
+				<tab name="hs_general">
+					<label>General (A/B/C)</label>
+				</tab>
+				<tab name="hs_assets">
+					<label>Assets (D)</label>
+				</tab>
+				<tab name="hs_foodsecurity">
+					<label>Food Security (E)</label>
+				</tab>
+				<tab name="hs_income_opinions">
+					<label>Income &amp; Opinions (F/G)</label>
+				</tab>
+				<tab name="hs_forest_products">
+					<label>Forest Products &amp; Services (H)</label>
+				</tab>
+				<tab name="hs_org_comments">
+					<label>Organizations &amp; Comments (I/J)</label>
+				</tab>
+				<tab name="hs_forest_governance">
+					<label>Forest Governance (K)</label>
+				</tab>
+				<tab name="hs_comments">
+					<label>Comments</label>
+				</tab>
+			</tabSet>
+		</options>
+	</applicationOptions>
+	<versioning>
+		<version id="1" name="1.0">
+			<label>BP 1.3.1015</label>
+			<description>Original forms used during pilot and for most of first year</description>
+			<date>1015-03-01</date>
+		</version>
+		<version id="2" name="1.1">
+			<label>BP 6.11.1015 - SE 25.2.1015</label>
+			<description>Added crown density measurements measured at five points and soil table added.</description>
+			<date>1015-11-06</date>
+		</version>
+		<version id="3" name="2.0">
+			<label>BP 28.12.1015 - SE 26.12.1015</label>
+			<description>Revised forms for 1016 survey</description>
+			<date>1016-12-28</date>
+		</version>
+	</versioning>
+	<codeLists>
+		<list id="4" name="measurement" since="2.0">
+			<label type="list">Remeasurement Codes</label>
+			<items>
+				<item id="5">
+					<code>P</code>
+					<label>Planned</label>
+					<description>Planned as part of original sampling design</description>
+				</item>
+				<item id="6">
+					<code>QA</code>
+					<label>Quality assurance</label>
+					<description>Revisiting plots for quality assurance</description>
+				</item>
+				<item id="7">
+					<code>U</code>
+					<label>Unplanned</label>
+					<description>Additional plots not included in original
+            sampling design</description>
+				</item>
+			</items>
+		</list>
+		<list id="8" name="bp_data_task" since="2.0">
+			<label type="list">Biophysical data processing tasks</label>
+			<items>
+				<item id="9">
+					<code>formFilled</code>
+					<label>Form filled out</label>
+				</item>
+				<item id="10">
+					<code>formChecked</code>
+					<label>Form checked</label>
+				</item>
+				<item id="11">
+					<code>dataEntered</code>
+					<label>Data entered</label>
+				</item>
+				<item id="12">
+					<code>dataCleaned</code>
+					<label>Data cleaned</label>
+				</item>
+			</items>
+		</list>
+		<list id="13" name="admin_unit">
+			<label type="item">Administrative unit</label>
+			<label type="list">Administrative Units</label>
+			<codingScheme scope="local" />
+			<hierarchy>
+				<level name="region">
+					<label>Region</label>
+				</level>
+				<level name="district">
+					<label>Locality</label>
+				</level>
+			</hierarchy>
+			<items>
+				<item id="14">
+					<code>001</code>
+					<label>Anvard</label>
+					<item id="15">
+						<code>001</code>
+						<label>Castle Anvard</label>
+					</item>
+					<item id="16">
+						<code>002</code>
+						<label>Anvard Plains</label>
+					</item>
+					<item id="17">
+						<code>003</code>
+						<label>Anvard Forest</label>
+					</item>
+				</item>
+				<item id="18">
+					<code>002</code>
+					<label>Winding Arrow</label>
+					<item id="19">
+						<code>001</code>
+						<label>Winding Arrow Town</label>
+					</item>
+					<item id="20">
+						<code>002</code>
+						<label>Arrow Cliffs</label>
+					</item>
+					<item id="21">
+						<code>003</code>
+						<label>Riverside</label>
+					</item>
+				</item>
+				<item id="22">
+					<code>003</code>
+					<label>Colin</label>
+					<item id="23">
+						<code>001</code>
+						<label>South Colin</label>
+					</item>
+					<item id="24">
+						<code>002</code>
+						<label>Muddy Banks</label>
+					</item>
+					<item id="25">
+						<code>003</code>
+						<label>West Colin</label>
+					</item>
+				</item>
+				<item id="26">
+					<code>004</code>
+					<label>Hermit's Retreat</label>
+					<item id="27">
+						<code>001</code>
+						<label>Cavetowm</label>
+					</item>
+					<item id="28">
+						<code>002</code>
+						<label>Olvin Pass</label>
+					</item>
+				</item>
+				<item id="29">
+					<code>005</code>
+					<label>Olvin</label>
+					<item id="30">
+						<code>001</code>
+						<label>Middleton</label>
+					</item>
+					<item id="31">
+						<code>002</code>
+						<label>Olvin Hills</label>
+					</item>
+					<item id="32">
+						<code>003</code>
+						<label>Olvin Forest</label>
+					</item>
+				</item>
+				<item id="33">
+					<code>006</code>
+					<label>Bulgies</label>
+					<item id="34">
+						<code>001</code>
+						<label>Bulgies Forest</label>
+					</item>
+					<item id="35">
+						<code>002</code>
+						<label>Cornerstone</label>
+					</item>
+					<item id="36">
+						<code>003</code>
+						<label>Nain Pass</label>
+					</item>
+				</item>
+				<item id="37">
+					<code>007</code>
+					<label>Vale</label>
+					<item id="38">
+						<code>001</code>
+						<label>Archengate</label>
+					</item>
+					<item id="39">
+						<code>002</code>
+						<label>Ravenvale</label>
+					</item>
+					<item id="40">
+						<code>003</code>
+						<label>Sharvale</label>
+					</item>
+				</item>
+				<item id="41">
+					<code>008</code>
+					<label>Corin</label>
+					<item id="42">
+						<code>001</code>
+						<label>Corin Beach</label>
+					</item>
+					<item id="43">
+						<code>002</code>
+						<label>Border Bay</label>
+					</item>
+					<item id="44">
+						<code>003</code>
+						<label>Narnia Pass</label>
+					</item>
+				</item>
+			</items>
+		</list>
+		<list id="45" name="accessibility">
+			<label type="item">Accessibility</label>
+			<label type="list">Accessibility</label>
+			<items>
+				<item id="46">
+					<code>0</code>
+					<label>Accessible</label>
+					<description>Topographic and road or river network make it
+            possible to reach the site </description>
+				</item>
+				<item id="47">
+					<code>1</code>
+					<label>Inaccessible - slope</label>
+					<description>Very steep hill making the field work dangerous</description>
+				</item>
+				<item id="48">
+					<code>2</code>
+					<label>Inaccessible - owner refusal</label>
+					<description>Owner does not allow one to enter the site
+            either by fencing or by not giving permission</description>
+				</item>
+				<item id="49">
+					<code>3</code>
+					<label>Inaccessible - restricted area</label>
+					<description>E.g. military areas, border areas, land mines
+            areas</description>
+				</item>
+				<item id="50">
+					<code>4</code>
+					<label>Inaccessible - water body</label>
+					<description>Water body does not allow to sample or reach
+            the site</description>
+				</item>
+				<item id="51">
+					<code>99</code>
+					<label>Inaccessible - other reason</label>
+					<description>Specify in remarks</description>
+				</item>
+			</items>
+		</list>
+		<list id="52" name="land_use">
+			<label type="item">Land use</label>
+			<label type="list">Land Uses</label>
+			<items>
+				<item id="53">
+					<code>1</code>
+					<label>Production forest</label>
+					<description>Land designated for production and extraction
+            of products (wood, fibre, bio-energy and/or non-wood
+            forest products). Includes concessions, exploitation
+            licenses, community forests etc.</description>
+				</item>
+				<item id="54">
+					<code>2</code>
+					<label>Protection forest</label>
+					<description>Protected forest lands. Including also nature
+            reserves, soil conservation, water and watershed
+            protection, protection against erosion and landslides.</description>
+				</item>
+				<item id="55">
+					<code>3</code>
+					<label>Wildlife reserve</label>
+					<description>National parks, game reserves, game controlled
+            areas etc</description>
+				</item>
+				<item id="56">
+					<code>4</code>
+					<label>Shifting cultivation</label>
+					<description />
+				</item>
+				<item id="57">
+					<code>5</code>
+					<label>Agriculture</label>
+					<description>Incl. agro-forestry</description>
+				</item>
+				<item id="58">
+					<code>6</code>
+					<label>Grazing land</label>
+					<description />
+				</item>
+				<item id="59">
+					<code>7</code>
+					<label>Built-up areas</label>
+					<description>Urban or rural, or mixed. Including roads,
+            buildings, ower lines, etc.</description>
+				</item>
+				<item id="60">
+					<code>8</code>
+					<label>Water body or swamp</label>
+					<description>Seasonal, Permanent or Swamp</description>
+				</item>
+				<item id="61" qualifiable="true">
+					<code>99</code>
+					<label>Other land</label>
+					<description>To be specified in Remarks</description>
+				</item>
+			</items>
+		</list>
+		<list id="62" name="ownership">
+			<label type="item">Ownership type</label>
+			<label type="list">Ownership Types</label>
+			<items>
+				<item id="63">
+					<code>1</code>
+					<label>Central government land</label>
+					<description>Owned by central government, or by
+            government-owned institutions or corporations</description>
+				</item>
+				<item id="64">
+					<code>2</code>
+					<label>Local government land</label>
+					<description>Owned by local government (district)</description>
+				</item>
+				<item id="65">
+					<code>3</code>
+					<label>Village land</label>
+					<description>Owned by a collective, a group of co-owners, or
+            a community who hold exclusive rights and share duties</description>
+				</item>
+				<item id="66">
+					<code>4</code>
+					<label>Private land</label>
+					<description>Owned by private enterprises, industries,
+            individuals or families, private co-operatives,
+            corporations, religious and educational institutions,
+            pension or investment funds, NGOs, nature conservation
+            societies or other private institutions</description>
+				</item>
+				<item id="67">
+					<code>5</code>
+					<label>General land</label>
+					<description>Public land that does not belong to any of the
+            above categories</description>
+				</item>
+				<item id="68">
+					<code>90</code>
+					<label>Not known</label>
+					<description>No information available on the land ownership</description>
+				</item>
+			</items>
+		</list>
+		<list id="69" name="undergrowth">
+			<label type="item">Undergrowth type</label>
+			<label type="list">Undergrowth Types</label>
+			<items>
+				<item id="70">
+					<code>0</code>
+					<label>No undergrowth</label>
+					<description />
+				</item>
+				<item id="71">
+					<code>1</code>
+					<label>Bushes</label>
+					<description />
+				</item>
+				<item id="72">
+					<code>2</code>
+					<label>Elephant grass</label>
+					<description />
+				</item>
+				<item id="73">
+					<code>3</code>
+					<label>Grass</label>
+					<description />
+				</item>
+				<item id="74">
+					<code>4</code>
+					<label>Herbs</label>
+					<description />
+				</item>
+				<item id="75">
+					<code>5</code>
+					<label>New tree generation</label>
+					<description />
+				</item>
+				<item id="76" qualifiable="true">
+					<code>99</code>
+					<label>Other vegetation</label>
+					<description>To be specified in Remarks</description>
+				</item>
+			</items>
+		</list>
+		<list id="77" name="damage_type">
+			<label type="item">Damage type</label>
+			<label type="list">Damage Types</label>
+			<items>
+				<item id="78">
+					<code>0</code>
+					<label>No damage</label>
+					<description>Naturally open area, or normal tree vegetation
+            where
+            might be some individual trees damaged by insects, fungus or other
+            reason
+            but otherwise forest is in good condition</description>
+				</item>
+				<item id="79">
+					<code>1</code>
+					<label>Fire</label>
+					<description>Disturbance caused by fire</description>
+				</item>
+				<item id="80">
+					<code>2</code>
+					<label>Insects, fungus or diseases</label>
+					<description>Disturbance caused by insect pests or by
+            fungus. Disturbance caused by diseases attributable to
+            pathogens, such as bacteria, fungi, phytoplasma or virus.</description>
+				</item>
+				<item id="81">
+					<code>3</code>
+					<label>Other biotic agents</label>
+					<description>Disturbance caused by biotic agents other than
+            insects or diseases, such as wildlife browsing, grazing,
+            physical damage by animals, etc. Specify in Remarks.</description>
+				</item>
+				<item id="82">
+					<code>4</code>
+					<label>Wind or other abiotic factor</label>
+					<description>Disturbances caused by abiotic factors, such as
+            storm, drought, air pollution, etc. Specify in Remarks.</description>
+				</item>
+				<item id="83">
+					<code>5</code>
+					<label>Human activities</label>
+					<description>Cuttings, firewood collecting, debarking, other
+            human-made damages</description>
+				</item>
+			</items>
+		</list>
+		<list id="84" name="damage_severity">
+			<label type="item">Damage severity</label>
+			<items>
+				<item id="85">
+					<code>0</code>
+					<label>None</label>
+					<description>No damages</description>
+				</item>
+				<item id="86">
+					<code>1</code>
+					<label>Slight</label>
+					<description>Evidences of damages are visible, but not
+            causing long-term damages. Only few trees are affected</description>
+				</item>
+				<item id="87">
+					<code>2</code>
+					<label>Serious</label>
+					<description>Damages are clearly visible, probably causing
+            long-term damages or loss of growth. Several trees are
+            affected</description>
+				</item>
+				<item id="88">
+					<code>3</code>
+					<label>Very serious</label>
+					<description>Damage is finally causing wide mortality of
+            trees, or hinders them growing. Mortality is likely to
+            remain high for a long time</description>
+				</item>
+			</items>
+		</list>
+		<list id="89" name="soil_texture">
+			<label type="item">Soil texture</label>
+			<items>
+				<item id="90">
+					<code>0</code>
+					<label>No soil</label>
+					<description>E.g. built-up area, water</description>
+				</item>
+				<item id="91">
+					<code>1</code>
+					<label>Sand</label>
+					<description>Soil having mostly sand particles. A wet sample
+            does not stain hands.</description>
+				</item>
+				<item id="92">
+					<code>2</code>
+					<label>Loamy sand</label>
+					<description>Soil in which sand particles are predominant
+            but also containing silt. Slightly sticky, but no ribbons
+            can be formed.</description>
+				</item>
+				<item id="93">
+					<code>3</code>
+					<label>Sandy loam + Sandy clay loam + Sandy clay</label>
+					<description>Makes a sound, when rubbed between the fingers
+            close to the ear. Allows to be formed into a stick of
+            cigarette size.</description>
+				</item>
+				<item id="94">
+					<code>4</code>
+					<label>Loam</label>
+					<description>Soil having mostly silt and with some clay.
+            Only a relatively thick ribbon can be formed which will
+            break soon after formation from its own weight. Rubbing
+            between fingers makes a very light sound only.</description>
+				</item>
+				<item id="95">
+					<code>5</code>
+					<label>Clay loam</label>
+					<description>Soil having higher percentage of clay loam
+				            particles but also having some sand and silt. Forms a thin
+				            ribbon which will readily break from its own weight when
+				            about 2-4 cm long. No sound when rubbed between fingers.</description>
+				</item>
+				<item id="96">
+					<code>6</code>
+					<label>Clay</label>
+					<description>Soil contains mostly clay particles. Highly
+				            plastic and slippery when handled. Allows to be formed
+				            into a thin string.</description>
+				</item>
+				<item id="97">
+					<code>7</code>
+					<label>Silt + Silt loam + Silty clay loam + Silty clay</label>
+					<description>Substrate particles smaller than sand and
+				            larger than clay. Silt is easily transported in water or
+				            other liquids and is fine enough to be carried long
+				            distances by air as 'dust'</description>
+				</item>
+				<item id="98">
+					<code>8</code>
+					<label>Rock</label>
+					<description />
+				</item>
+				<item id="99" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+					<description>To be specified in Remarks</description>
+				</item>
+			</items>
+		</list>
+		<list id="100" name="soil_structure">
+			<label type="item">Soil structure</label>
+			<items>
+				<item id="101">
+					<code>0</code>
+					<label>No soil</label>
+					<description />
+				</item>
+				<item id="102">
+					<code>1</code>
+					<label>Granular</label>
+					<description>If the topsoil is granular, the water enters
+    				        easily and the seed germination is possible.</description>
+				</item>
+				<item id="103">
+					<code>2</code>
+					<label>Blocky</label>
+					<description>Blocky soil looks like irregularly-shaped
+    				        blocks. Movement of the water is moderate.</description>
+				</item>
+				<item id="104">
+					<code>3</code>
+					<label>Prismatic</label>
+					<description>Movement of the water in the soil is
+				            predominantly vertical and therefore the supply of water
+				            to the plant roots is usually poor.</description>
+				</item>
+				<item id="105">
+					<code>4</code>
+					<label>Platy</label>
+					<description>When present in the topsoil, a platy structure
+				            blocks the entrance of water; seed germination is
+				            difficult due to poor aeration.</description>
+				</item>
+				<item id="106" since="2.0">
+					<code>5</code>
+					<label>Massive</label>
+					<description>Soil particles occur in solid masses and do not
+				            break aprt easily under light pressure. This structure
+				            blocks the entrance of water and seed germination is
+				            difficult due to poor aeration associated with very finely
+				            textured soils, like clay.</description>
+				</item>
+				<item id="107" since="2.0">
+					<code>6</code>
+					<label>Single grain</label>
+					<description>Soil particles exist as individual soil grains
+     				       that do not stick together and generally remain
+    				        loosely-packed. This structure is found in sandy soils.</description>
+				</item>
+			</items>
+		</list>
+		<list id="108" name="soil_depth_class">
+			<label type="item">Soil depth class</label>
+			<items>
+				<item id="109">
+					<code>0-10</code>
+					<label>0-10</label>
+				</item>
+				<item id="110">
+					<code>10-20</code>
+					<label>10-20</label>
+				</item>
+				<item id="111">
+					<code>20-30</code>
+					<label>20-30</label>
+				</item>
+			</items>
+		</list>
+		<list id="112" name="stone_proportion">
+			<label type="item">Proportion of stones</label>
+			<items>
+				<item id="113">
+					<code>0</code>
+					<label>&lt;10%</label>
+				</item>
+				<item id="114">
+					<code>1</code>
+					<label>10-20%</label>
+				</item>
+				<item id="115">
+					<code>2</code>
+					<label>20-30%</label>
+				</item>
+				<item id="116">
+					<code>3</code>
+					<label>30-40%</label>
+				</item>
+				<item id="117">
+					<code>4</code>
+					<label>40-50%</label>
+				</item>
+				<item id="118">
+					<code>5</code>
+					<label>50-60%</label>
+				</item>
+				<item id="119">
+					<code>6</code>
+					<label>60-70%</label>
+				</item>
+				<item id="120">
+					<code>7</code>
+					<label>70-80%</label>
+				</item>
+				<item id="121">
+					<code>8</code>
+					<label>80-90%</label>
+				</item>
+				<item id="122">
+					<code>9</code>
+					<label>90-100%</label>
+				</item>
+			</items>
+		</list>
+		<list id="123" name="soil_colour">
+			<label type="item">Munsell Soil Colour Book Code</label>
+			<items>
+				<item id="124">
+					<code>0-10</code>
+				</item>
+				<item id="125">
+					<code>10-20</code>
+				</item>
+				<item id="126">
+					<code>20-30</code>
+				</item>
+			</items>
+		</list>
+		<list id="127" name="erosion_intensity">
+			<label type="item">Erosion</label>
+			<items>
+				<item id="128">
+					<code>0</code>
+					<label>No erosion</label>
+					<description>No evidence of soil erosion</description>
+				</item>
+				<item id="129">
+					<code>1</code>
+					<label>Light erosion</label>
+					<description>Slight erosion where only surface erosion has
+   				         taken place.</description>
+				</item>
+				<item id="130">
+					<code>2</code>
+					<label>Moderate erosion</label>
+					<description>Where mild gullies and rills are formed on the
+   				         top surface of the soil.</description>
+				</item>
+				<item id="131">
+					<code>3</code>
+					<label>Heavy erosion</label>
+					<description>Areas which have deep guillies, ravines, land
+    			        slips etc.</description>
+				</item>
+			</items>
+		</list>
+		<list id="132" name="grazing_activity">
+			<label type="item">Grazing activity</label>
+			<items>
+				<item id="133">
+					<code>0</code>
+					<label>No grazing</label>
+					<description>There is no evidence of grazing</description>
+				</item>
+				<item id="134">
+					<code>1</code>
+					<label>Occasional</label>
+					<description>Only choice plants and areas show use. There is
+   				         no use of poor forage plants</description>
+				</item>
+				<item id="135">
+					<code>2</code>
+					<label>Frequent</label>
+					<description>Most range shows use. 1/3 – 2/3 of primary
+  				          forage plants showing use</description>
+				</item>
+				<item id="136">
+					<code>3</code>
+					<label>Extensive</label>
+					<description>Lands can be severely hedged. There is evidence
+				            of life-stock trailing to forage. More than 2/3 of primary
+				            forage plants showing use</description>
+				</item>
+			</items>
+		</list>
+		<list id="137" name="catchment_value">
+			<label type="item">Water catchment value</label>
+			<items>
+				<item id="138">
+					<code>0</code>
+					<label>Bare land</label>
+					<description>No water catchment value</description>
+				</item>
+				<item id="139">
+					<code>1</code>
+					<label>Low</label>
+					<description>The area has vegetation but it is not a
+     				       particular source of water</description>
+				</item>
+				<item id="140">
+					<code>2</code>
+					<label>Medium</label>
+					<description>Seasonal rivers providing water to lower land
+ 				           areas</description>
+				</item>
+				<item id="141">
+					<code>3</code>
+					<label>High</label>
+					<description>Area contains lakes, ponds, rivers, or it is a
+  				          forest land which collects/feeds water to lower land areas</description>
+				</item>
+			</items>
+		</list>
+		<list id="142" name="human_impact">
+			<label type="item">Human impact</label>
+			<items>
+				<item id="143">
+					<code>0</code>
+					<label>No impact</label>
+					<description>No cutting or other impact, or the cutting has
+  				          happened more than 5 years ago</description>
+				</item>
+				<item id="144">
+					<code>1</code>
+					<label>Selection cutting (commercial)</label>
+					<description />
+				</item>
+				<item id="145">
+					<code>2</code>
+					<label>Selection cutting (domestic use)</label>
+					<description />
+				</item>
+				<item id="146">
+					<code>3</code>
+					<label>Clear felling</label>
+					<description>Removal of all trees has been carried out. The
+				            generation of forest is done by planting, seeding or
+				            coppicing.</description>
+				</item>
+				<item id="147">
+					<code>4</code>
+					<label>Shifting cultivation</label>
+					<description />
+				</item>
+				<item id="148">
+					<code>5</code>
+					<label>Silvicultural treatment</label>
+					<description>e.g. pruning, planting, climber cutting,
+ 				           weeding, boundary clearing, fire line construction</description>
+				</item>
+				<item id="149">
+					<code>6</code>
+					<label>Illegal cutting</label>
+					<description />
+				</item>
+				<item id="150">
+					<code>7</code>
+					<label>Burning or/and ringbarking</label>
+					<description />
+				</item>
+				<item id="151">
+					<code>8</code>
+					<label>Charcoal production</label>
+					<description />
+				</item>
+				<item id="152">
+					<code>9</code>
+					<label>Timber sawing</label>
+					<description />
+				</item>
+				<item id="153">
+					<code>10</code>
+					<label>Honey hunting</label>
+					<description />
+				</item>
+				<item id="154">
+					<code>11</code>
+					<label>Medicinal activities</label>
+					<description>Collecting of medicinal plants (e.g. leaves,
+				            bark, roots) used in traditional medicine and/or for
+				            pharmaceutical companies</description>
+				</item>
+				<item id="155">
+					<code>12</code>
+					<label>Sacred place</label>
+					<description />
+				</item>
+				<item id="156">
+					<code>13</code>
+					<label>Land-use change (from forest, woodland or bushland)</label>
+					<description>Specify previous Land use class in Remarks</description>
+				</item>
+				<item id="157">
+					<code>14</code>
+					<label>Afforestation</label>
+					<description>Establishment of forest through planting and/or
+				            deliberate seeding on land that, until then, was not
+				            classified as forest. Implies a transformation of land use
+				            from non-forest to forest. Specify previous Land use type
+				            in Remarks</description>
+				</item>
+				<item id="158">
+					<code>15</code>
+					<label>Mining, Sand collection</label>
+					<description>Mining and land extraction activities</description>
+				</item>
+				<item id="159">
+					<code>16</code>
+					<label>Ringbarking</label>
+				</item>
+				<item id="160">
+					<code>17</code>
+					<label>Agriculture</label>
+				</item>
+				<item id="161" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+					<description>Specify in Remarks</description>
+				</item>
+			</items>
+		</list>
+		<list id="162" name="nwfp">
+			<label type="item">Non-wood forest product/service</label>
+			<items>
+				<item id="163">
+					<code>0</code>
+					<label>No data</label>
+					<description />
+				</item>
+				<item id="164">
+					<code>1</code>
+					<label>Fruits, nuts, seeds, roots, berries, etc</label>
+					<description>Vegetable foodstuffs and beverages provided by
+				            fruits, nuts, seeds, roots, etc. </description>
+				</item>
+				<item id="165">
+					<code>2</code>
+					<label>Mushrooms</label>
+					<description>Foodstuffs provided by mushrooms.</description>
+				</item>
+				<item id="166">
+					<code>3</code>
+					<label>Fodder</label>
+					<description>Animal and bee fodder provided by leaves,
+				            fruits, etc</description>
+				</item>
+				<item id="167">
+					<code>4</code>
+					<label>Rattan</label>
+					<description />
+				</item>
+				<item id="168">
+					<code>5</code>
+					<label>Plant medicines</label>
+					<description>Medicinal plants (e.g. leaves, bark, roots)
+				            used in traditional medicine and/or for pharmaceutical
+				            companies.</description>
+				</item>
+				<item id="169">
+					<code>6</code>
+					<label>Herbs and spices</label>
+					<description />
+				</item>
+				<item id="170">
+					<code>7</code>
+					<label>Dying / tanning</label>
+					<description>Plant material (bark and leaves) providing
+				            tannins and other plant parts (especially leaves and
+				            fruits) used as colorants.</description>
+				</item>
+				<item id="171">
+					<code>8</code>
+					<label>Other plant products</label>
+					<description>Specify in Remarks</description>
+				</item>
+				<item id="172">
+					<code>9</code>
+					<label>Wildlife</label>
+					<description>Provides habitat for wildlife</description>
+				</item>
+				<item id="173">
+					<code>10</code>
+					<label>Beekeeping activities</label>
+					<description />
+				</item>
+				<item id="174">
+					<code>11</code>
+					<label>Windbreaks</label>
+					<description>Acts as a windbreaker</description>
+				</item>
+				<item id="175">
+					<code>12</code>
+					<label>Shade</label>
+					<description>Provides shade</description>
+				</item>
+				<item id="176">
+					<code>13</code>
+					<label>Aesthetic</label>
+					<description>Provides landscape beauty</description>
+				</item>
+				<item id="177">
+					<code>14</code>
+					<label>Recreation and tourism potential</label>
+					<description>Including ecotourism, hunting or fishing as
+            leisure activity. Unique feature.</description>
+				</item>
+				<item id="178">
+					<code>15</code>
+					<label>Cultural heritage potential</label>
+					<description>Including religious / spiritual potential</description>
+				</item>
+				<item id="179" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+					<description>Specify in Remarks</description>
+				</item>
+			</items>
+		</list>
+		<list id="180" name="mgmt_proposal">
+			<label type="item">Management proposal</label>
+			<items>
+				<item id="181">
+					<code>0</code>
+					<label>No treatment</label>
+					<description />
+				</item>
+				<item id="182">
+					<code>1</code>
+					<label>Selection cutting (commercial)</label>
+					<description />
+				</item>
+				<item id="183">
+					<code>2</code>
+					<label>Selection cutting (domestic use)</label>
+					<description />
+				</item>
+				<item id="184">
+					<code>3</code>
+					<label>Thinning</label>
+					<description>In the case of plantation</description>
+				</item>
+				<item id="185">
+					<code>4</code>
+					<label>Clear felling</label>
+					<description />
+				</item>
+				<item id="186">
+					<code>5</code>
+					<label>Silvicultural treatment</label>
+					<description>e.g. pruning, planting, climber cutting,
+            weeding, boundary clearing, fire line construction</description>
+				</item>
+				<item id="187">
+					<code>6</code>
+					<label>Law enforcement</label>
+					<description />
+				</item>
+				<item id="188">
+					<code>7</code>
+					<label>Change status</label>
+					<description>E.g. productive to protective or vice versa.
+            Explain in Remarks.</description>
+				</item>
+			</items>
+		</list>
+		<list id="189" name="biodiversity">
+			<label type="item">Biodiversity type</label>
+			<items>
+				<item id="190">
+					<code>0</code>
+					<label>No data</label>
+					<description />
+				</item>
+				<item id="191">
+					<code>1</code>
+					<label>Big mammals</label>
+					<description>Lion, elephant, rhino, etc</description>
+				</item>
+				<item id="192">
+					<code>2</code>
+					<label>Other mammals</label>
+					<description />
+				</item>
+				<item id="193">
+					<code>3</code>
+					<label>Reptiles</label>
+					<description />
+				</item>
+				<item id="194">
+					<code>4</code>
+					<label>Birds</label>
+					<description />
+				</item>
+				<item id="195">
+					<code>5</code>
+					<label>Insects, Butterflies</label>
+					<description />
+				</item>
+				<item id="196">
+					<code>6</code>
+					<label>Climbers</label>
+					<description />
+				</item>
+				<item id="197">
+					<code>7</code>
+					<label>Plants (excl. trees and bamboos)</label>
+					<description />
+				</item>
+				<item id="198">
+					<code>8</code>
+					<label>Epiphytes</label>
+					<description />
+				</item>
+				<item id="199">
+					<code>9</code>
+					<label>Fungus</label>
+					<description />
+				</item>
+				<item id="200">
+					<code>10</code>
+					<label>Rare biotope</label>
+					<description>e.g. spring, oasis</description>
+				</item>
+				<item id="201" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="202" name="shrub_coverage">
+			<label type="item">Shrub coverage</label>
+			<items>
+				<item id="203">
+					<code>0</code>
+					<label>No data / Not applicable</label>
+					<description />
+				</item>
+				<item id="204">
+					<code>1</code>
+					<label>&lt;10%</label>
+					<description>Sparse shrub canopy cover</description>
+				</item>
+				<item id="205">
+					<code>2</code>
+					<label>10% - 39%</label>
+					<description>Very open shrub canopy cover</description>
+				</item>
+				<item id="206">
+					<code>3</code>
+					<label>40% - 69%</label>
+					<description>Open shrub canopy cover</description>
+				</item>
+				<item id="207">
+					<code>4</code>
+					<label>&gt; 70%</label>
+					<description>Closed shrub canopy cover</description>
+				</item>
+			</items>
+		</list>
+		<list id="208" name="tree_health">
+			<label type="item">Tree health</label>
+			<items>
+				<item id="209">
+					<code>1</code>
+					<label>Healthy tree (Default)</label>
+					<description>A tree is healthy when it does not show
+            symptoms of disease or other that have any substantial
+            effect on the tree’s growth and vitality.</description>
+				</item>
+				<item id="210">
+					<code>2</code>
+					<label>Diseased tree</label>
+					<description>A tree is affected when it shows symptoms of
+            disease or attack by insects that affect the tree’s growth
+            and vitality.</description>
+				</item>
+				<item id="211">
+					<code>3</code>
+					<label>Burnt tree, will possibly recover</label>
+					<description />
+				</item>
+				<item id="212">
+					<code>4</code>
+					<label>Burnt tree, will possibly die</label>
+					<description />
+				</item>
+				<item id="213">
+					<code>5</code>
+					<label>Affected by Ficus sp.</label>
+					<description>Ficus which may eventually destroy its host.</description>
+				</item>
+				<item id="214">
+					<code>6</code>
+					<label>Other damage agent</label>
+					<description>Specify in Remarks</description>
+				</item>
+				<item id="215">
+					<code>7</code>
+					<label>Dead tree</label>
+					<description>Dead standing tree. Laying dead tree data is
+            recorded on Dead Wood Form.</description>
+				</item>
+			</items>
+		</list>
+		<list id="216" name="tree_origin">
+			<label type="item">Tree Origin</label>
+			<items>
+				<item id="217">
+					<code>N</code>
+					<label>Natural</label>
+				</item>
+				<item id="218">
+					<code>P</code>
+					<label>Planted</label>
+				</item>
+				<item id="219">
+					<code>C</code>
+					<label>Coppiced</label>
+				</item>
+			</items>
+		</list>
+		<list id="220" name="deadwood_decay">
+			<label type="item">Dead wood decay</label>
+			<items>
+				<item id="221">
+					<code>S</code>
+					<label>Solid wood material</label>
+				</item>
+				<item id="222">
+					<code>R</code>
+					<label>Fully or partially rotten wood material</label>
+				</item>
+			</items>
+		</list>
+		<list id="223" name="bamboo_health">
+			<label type="item">Bamboo health</label>
+			<items>
+				<item id="224">
+					<code>A</code>
+					<label>Alive</label>
+				</item>
+				<item id="225">
+					<code>D</code>
+					<label>Dead</label>
+				</item>
+			</items>
+		</list>
+		<!-- INFORMANT INTERVIEW LISTS -->
+		<list id="226" name="informant_role">
+			<label type="item">Informant role</label>
+			<items>
+				<item id="227">
+					<code>O</code>
+					<label>Owner</label>
+					<description>Owner of a plot or part of a plot within the SU</description>
+				</item>
+				<item id="228">
+					<code>E</code>
+					<label>Employee</label>
+					<description>Person working in the SU</description>
+				</item>
+				<item id="229">
+					<code>M</code>
+					<label>Manager of the site</label>
+					<description>Person responsible for natural resources
+            management in the SU</description>
+				</item>
+				<item id="230">
+					<code>S</code>
+					<label>Settler</label>
+					<description>Person living in the SU or user from
+            sorroundings</description>
+				</item>
+				<item id="231">
+					<code>I</code>
+					<label>Internal key informant</label>
+					<description>Individual living inside the area, but with
+            in-depth knowledge of the local settings, use of land and
+            natural resources</description>
+				</item>
+				<item id="232">
+					<code>X</code>
+					<label>External key informant</label>
+					<description>Individual living outside the area, but with
+            particular knowledge about the site, the land/natural
+            resource use and the local community (e.g. local
+            government officials, leaders of local organizations...)</description>
+				</item>
+			</items>
+		</list>
+		<list id="233" name="population_health">
+			<label type="item">Population health condition</label>
+			<items>
+				<item id="234">
+					<code>a</code>
+					<label>Much below average</label>
+					<description />
+				</item>
+				<item id="235">
+					<code>b</code>
+					<label>A bit below average</label>
+					<description />
+				</item>
+				<item id="236">
+					<code>c</code>
+					<label>Average</label>
+					<description />
+				</item>
+				<item id="237">
+					<code>d</code>
+					<label>Above average</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="238" name="rules_origin">
+			<label type="item">Origin of rules</label>
+			<items>
+				<item id="239">
+					<code>a</code>
+					<label>Private owner dictates the conditions for access and
+						use</label>
+					<description />
+				</item>
+				<item id="240">
+					<code>b</code>
+					<label>Local community norms and customs (no formal rules)</label>
+					<description />
+				</item>
+				<item id="241">
+					<code>c</code>
+					<label>Local community rules/bylaws (formal rules, often
+						written
+						down)</label>
+					<description />
+				</item>
+				<item id="242">
+					<code>d</code>
+					<label>Local Government ordinances</label>
+					<description />
+				</item>
+				<item id="243">
+					<code>e</code>
+					<label>Central government rules and regulations</label>
+					<description />
+				</item>
+				<item id="244">
+					<code>f</code>
+					<label>Open-access (law of the jungle)</label>
+					<description />
+				</item>
+				<item id="245" qualifiable="true">
+					<code>g</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="246" name="settlement_years">
+			<label type="item">Years since settlement</label>
+			<items>
+				<item id="247">
+					<code>0</code>
+					<label>Not applicable</label>
+					<description />
+				</item>
+				<item id="248">
+					<code>1</code>
+					<label>&lt;5 years</label>
+					<description />
+				</item>
+				<item id="249">
+					<code>2</code>
+					<label>5-10 years</label>
+					<description />
+				</item>
+				<item id="250">
+					<code>3</code>
+					<label>10-20 years</label>
+					<description />
+				</item>
+				<item id="251">
+					<code>4</code>
+					<label>20-50 years</label>
+					<description />
+				</item>
+				<item id="252">
+					<code>5</code>
+					<label>&gt; years</label>
+					<description />
+				</item>
+				<item id="253">
+					<code>90</code>
+					<label>Not known</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="254" name="population_dynamic">
+			<label type="list">Population trends</label>
+			<items>
+				<item id="255">
+					<code>0</code>
+					<label>Not applicable</label>
+					<description>No inhabitants in the site of surroundings</description>
+				</item>
+				<item id="256">
+					<code>1</code>
+					<label>Decreasing</label>
+					<description>The population living in the site decreased
+				            during the last 5 years</description>
+				</item>
+				<item id="257">
+					<code>2</code>
+					<label>Stable</label>
+					<description>The number of people living in the site
+ 				           remained stable during the last 5 years</description>
+				</item>
+				<item id="258">
+					<code>3</code>
+					<label>Increasing</label>
+					<description>The population living in the site increased
+   					         during the last 5 years</description>
+				</item>
+				<item id="259">
+					<code>90</code>
+					<label>Not known</label>
+					<description>There is not enough information to estimate
+      				      this trend</description>
+				</item>
+			</items>
+		</list>
+		<list id="260" name="settlement_history">
+			<label type="item">Settlement history</label>
+			<description>Major historical events that have affected the
+			        local people and land use in the area</description>
+			<items>
+				<item id="261">
+					<code>0</code>
+					<label>Not applicable</label>
+					<description>No inhabitants in the SU or surroundings</description>
+				</item>
+				<item id="262">
+					<code>1</code>
+					<label>Wars</label>
+					<description />
+				</item>
+				<item id="263">
+					<code>2</code>
+					<label>Insecurity, ethnic, conflict</label>
+					<description />
+				</item>
+				<item id="264">
+					<code>3</code>
+					<label>Change of ownership, land tenure</label>
+					<description />
+				</item>
+				<item id="265">
+					<code>4</code>
+					<label>Expansion of agriculture</label>
+					<description />
+				</item>
+				<item id="266">
+					<code>5</code>
+					<label>Urban development</label>
+					<description />
+				</item>
+				<item id="267">
+					<code>6</code>
+					<label>Infrasctructure, electric power</label>
+					<description />
+				</item>
+				<item id="268">
+					<code>7</code>
+					<label>Economic crisis</label>
+					<description />
+				</item>
+				<item id="269">
+					<code>8</code>
+					<label>Natural disaster</label>
+					<description />
+				</item>
+				<item id="270">
+					<code>9</code>
+					<label>Human diseases</label>
+					<description />
+				</item>
+				<item id="271">
+					<code>10</code>
+					<label>Rural-to-urban migration</label>
+					<description />
+				</item>
+				<item id="272">
+					<code>11</code>
+					<label>Urban-to-rural migration</label>
+					<description />
+				</item>
+				<item id="273" since="2.0">
+					<code>12</code>
+					<label>Urban-to-rural migration</label>
+					<description />
+				</item>
+				<item id="274" qualifiable="true" since="2.0">
+					<code>13</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="275" name="mgmt_leader">
+			<label type="item">Leader of forest management</label>
+			<codingScheme scope="scheme" />
+			<items>
+				<item id="276">
+					<!--<code scheme="old">h</code> -->
+					<code>a</code>
+					<label>NGO</label>
+					<description />
+				</item>
+				<item id="277">
+					<!--<code scheme="old">i</code> -->
+					<code>b</code>
+					<label>Local community</label>
+					<description />
+				</item>
+				<item id="278">
+					<!--<code scheme="old">j</code> -->
+					<code>c</code>
+					<label>Private owner</label>
+					<description />
+				</item>
+				<item id="279">
+					<!--<code scheme="old">k</code> -->
+					<code>d</code>
+					<label>Local Government</label>
+					<description />
+				</item>
+				<item id="280">
+					<!--<code scheme="old">l</code> -->
+					<code>e</code>
+					<label>National Government</label>
+					<description />
+				</item>
+				<item id="281">
+					<!--<code scheme="old">m</code> -->
+					<code>f</code>
+					<label>Corporation</label>
+					<description />
+				</item>
+				<item id="282">
+					<!--<code scheme="old">n</code> -->
+					<code>g</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="283" name="mgmt_success">
+			<label type="list">Management success codes</label>
+			<items>
+				<item id="284">
+					<code>a</code>
+					<label>Very unsuccessful</label>
+				</item>
+				<item id="285">
+					<code>b</code>
+					<label>Not very successful</label>
+				</item>
+				<item id="286">
+					<code>c</code>
+					<label>Somewhat successful</label>
+				</item>
+				<item id="287">
+					<code>d</code>
+					<label>Very successful</label>
+				</item>
+			</items>
+		</list>
+		<list id="288" name="mgmt_plan">
+			<label type="item">Management plan</label>
+			<items>
+				<item id="289" since="2.0">
+					<code>0</code>
+					<label>None</label>
+					<description>There are currently no management plans for any
+ 				           area of the SU</description>
+				</item>
+				<item id="290">
+					<code>1</code>
+					<label>Formal</label>
+					<description>Formal management plan formulated and
+				            implemented</description>
+				</item>
+				<item id="291">
+					<code>2</code>
+					<label>Traditional</label>
+					<description>No formal management plan formulated or formal
+				            management plan formulated but not implemented</description>
+				</item>
+				<item id="292">
+					<code>90</code>
+					<label>Not known</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="293" name="mgmt_agreement">
+			<label type="item">Management agreement</label>
+			<items>
+				<item id="294">
+					<code>1</code>
+					<label>Owner is the exclusive manager</label>
+					<description>The owner retains management rights and
+				            responabilities within the limits specified by the
+				            legislation</description>
+				</item>
+				<item id="295">
+					<code>2</code>
+					<label>Joint management with communities</label>
+					<description>Management decisions remain with the owner and
+				            the management activities are executed by local
+				            communities (including indigenous and tribal communities),
+				            according to an agreement. The agreement allocates
+				            temporary exploitation rights for specific products or
+				            activities. Are included lands allocated for exctration
+				            porposes through licences or concessions</description>
+				</item>
+				<item id="296">
+					<code>3</code>
+					<label>Joint management with private companies/private
+						sectors</label>
+					<description>Management decisions remain with the owner and
+            the management activities are executed by private
+            companies, according to an agreement. The agreement
+            allocates temporary exploitation rights for porposes
+            through licences or concessions</description>
+				</item>
+				<item id="297">
+					<code>4</code>
+					<!-- <label deprecated="2.0">Devolution of management rights to communities</label> 
+						<label since="2.0">Community managed, owner not involved in management</label> -->
+					<label>Community managed, owner not involved in management</label>
+					<description>The owner devolves land management to the local
+				            communities (including indigenous and tribal communities),
+				            according to leases or management agreement</description>
+				</item>
+				<item id="298">
+					<code>5</code>
+					<!-- <label deprecated="2.0">Devolution of management rights to private 
+						companies/private sectors</label> <label since="2.0">Managed by private sector, 
+						owner not involved in management</label> -->
+					<label>Managed by private sector, owner not involved in management</label>
+					<description>The owner devolves land management to the
+				            private companies/private sector/individuals, according to
+				            leases or management agreement, including rental</description>
+				</item>
+				<item id="299">
+					<code>90</code>
+					<label>Not known</label>
+					<description>There is not enough information to obtain
+				            management agreement</description>
+				</item>
+				<item id="300" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+					<description>To be specified in notes</description>
+				</item>
+			</items>
+		</list>
+		<list id="301" name="land_owner" since="2.0">
+			<label type="item">Land owner</label>
+			<items>
+				<item id="302">
+					<code>1</code>
+					<label>Individual</label>
+				</item>
+				<item id="303">
+					<code>2</code>
+					<label>Industries</label>
+				</item>
+				<item id="304">
+					<code>3</code>
+					<label>Local communities</label>
+				</item>
+				<item id="305">
+					<code>4</code>
+					<label>Others private</label>
+				</item>
+				<item id="306">
+					<code>5</code>
+					<label>State</label>
+				</item>
+				<item id="307">
+					<code>6</code>
+					<label>Local government</label>
+				</item>
+				<item id="308">
+					<code>90</code>
+					<label>Not known</label>
+				</item>
+				<item id="309" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="310" name="illegal_activity_effect_extent">
+			<label type="list">Extend affected by illegal activities</label>
+			<items>
+				<item id="311">
+					<code>a</code>
+					<label>Not at all</label>
+				</item>
+				<item id="312">
+					<code>b</code>
+					<label>Not much</label>
+				</item>
+				<item id="313">
+					<code>c</code>
+					<label>Quite a bit</label>
+				</item>
+				<item id="314">
+					<code>d</code>
+					<label>Very much</label>
+				</item>
+			</items>
+		</list>
+		<list id="315" name="law_enforcement_likelihood">
+			<label type="list">Likelihood illegal activities stopped or
+				detected</label>
+			<items>
+				<item id="316">
+					<code>a</code>
+					<label>Extremely unlikely</label>
+				</item>
+				<item id="317">
+					<code>b</code>
+					<label>Not so likely</label>
+				</item>
+				<item id="318">
+					<code>c</code>
+					<label>Quite likely a bit</label>
+				</item>
+				<item id="319">
+					<code>d</code>
+					<label>Very likely</label>
+				</item>
+			</items>
+		</list>
+		<!-- HOUSEHOLD SURVEY LISTS -->
+		<list id="320" name="se_data_task" since="2.0">
+			<label type="list">Socio-economic data processing tasks</label>
+			<items>
+				<item id="321">
+					<code>fieldInterview</code>
+					<label>Field interview</label>
+					<description>Field interview completed</description>
+				</item>
+				<item id="322">
+					<code>questionnaireChecked</code>
+					<label>Questionnaire checked</label>
+					<description>Checking questionnaire</description>
+				</item>
+				<item id="323">
+					<code>dataEntry</code>
+					<label>Data entry</label>
+					<description>Entering data into database</description>
+				</item>
+				<item id="324">
+					<code>dataCleaned</code>
+					<label>Data cleaned</label>
+					<description>Checking and approving data entry</description>
+				</item>
+			</items>
+		</list>
+		<list id="325" name="household_position">
+			<label type="item">Position in household</label>
+			<items>
+				<item id="326">
+					<code>head</code>
+					<label>Head</label>
+				</item>
+				<item id="327">
+					<code>spouse</code>
+					<label>Spouse</label>
+				</item>
+				<item id="328" qualifiable="true">
+					<code>other</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="329" name="education_level">
+			<label type="item">Education level</label>
+			<items>
+				<item id="330">
+					<code>1</code>
+					<label>None</label>
+				</item>
+				<item id="331">
+					<code>2</code>
+					<label>Primary school</label>
+				</item>
+				<item id="332">
+					<code>3</code>
+					<label>Secondary school</label>
+				</item>
+				<item id="333">
+					<code>4</code>
+					<label>College/university</label>
+				</item>
+				<item id="334" qualifiable="true">
+					<code>5</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="335" name="gender">
+			<label type="item">Gender</label>
+			<items>
+				<item id="336">
+					<code>0</code>
+					<label>Male</label>
+				</item>
+				<item id="337">
+					<code>1</code>
+					<label>Female</label>
+				</item>
+			</items>
+		</list>
+		<list id="338" name="wall_material">
+			<label type="item">Household Assets (wall)</label>
+			<items>
+				<item id="339">
+					<code>1</code>
+					<label>Mud and poles/withies</label>
+					<description />
+				</item>
+				<item id="340">
+					<code>2</code>
+					<label>Wooden (boards)</label>
+					<description />
+				</item>
+				<item id="341">
+					<code>3</code>
+					<label>Iron (or other metal) sheets</label>
+					<description />
+				</item>
+				<item id="342">
+					<code>4</code>
+					<label>Mud bricks</label>
+					<description />
+				</item>
+				<item id="343">
+					<code>5</code>
+					<label>Burnt bricks</label>
+					<description />
+				</item>
+				<item id="344">
+					<code>6</code>
+					<label>Concrete bricks, or concrete</label>
+					<description />
+				</item>
+				<item id="345">
+					<code>7</code>
+					<label>Reeds/straw/grass/fiber</label>
+					<description />
+				</item>
+				<item id="346" qualifiable="true">
+					<code>9</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="347" name="roof_material">
+			<label type="item">Roof material</label>
+			<items>
+				<item id="348">
+					<code>1</code>
+					<label>Thatch</label>
+					<description />
+				</item>
+				<item id="349">
+					<code>2</code>
+					<label>Iron or other metal sheets</label>
+					<description />
+				</item>
+				<item id="350">
+					<code>3</code>
+					<label>Tiles</label>
+					<description />
+				</item>
+				<item id="351" qualifiable="true">
+					<code>9</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="352" name="asset">
+			<label type="item">Asset</label>
+			<items>
+				<item id="353">
+					<code>cattle</code>
+					<label>Cattle (excluding oxen)</label>
+				</item>
+				<item id="354">
+					<code>goat_sheep</code>
+					<label>Goat/Sheep</label>
+				</item>
+				<item id="355">
+					<code>poultry</code>
+					<label>Poultry</label>
+				</item>
+				<item id="356">
+					<code>pig</code>
+					<label>Pig</label>
+				</item>
+				<item id="357">
+					<code>draught_animals</code>
+					<label>Draught animals (oxen, donkey, etc)</label>
+				</item>
+				<item id="358">
+					<code>car_truck</code>
+					<label>Car/truck</label>
+				</item>
+				<item id="359">
+					<code>plow</code>
+					<label>Plow</label>
+				</item>
+				<item id="360">
+					<code>carts_wheel_barrow</code>
+					<label>Carts/wheel barrow</label>
+				</item>
+				<item id="361">
+					<code>bicycle</code>
+					<label>Bicycle</label>
+				</item>
+				<item id="362">
+					<code>motorcycle</code>
+					<label>Motorcycle</label>
+				</item>
+				<item id="363">
+					<code>phone</code>
+					<label>Phone</label>
+				</item>
+				<item id="364">
+					<code>tv</code>
+					<label>TV</label>
+				</item>
+				<item id="365">
+					<code>radio</code>
+					<label>Radio</label>
+				</item>
+				<item id="366" qualifiable="true">
+					<code>other</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="367" name="energy_source">
+			<label type="item">Energy source</label>
+			<label type="list">Energy Sources</label>
+			<items>
+				<item id="368">
+					<code>firewood</code>
+					<label>Firewood (headloads)</label>
+				</item>
+				<item id="369">
+					<code>charcoal</code>
+					<label>Charcoal (bags)</label>
+				</item>
+				<item id="370">
+					<code>gas</code>
+					<label>Gas (kg)</label>
+				</item>
+				<item id="371">
+					<code>kerosene</code>
+					<label>Kerosene (l)</label>
+				</item>
+				<item id="372">
+					<code>electricity</code>
+					<label>Electricity (Tsh)</label>
+				</item>
+				<item id="373" qualifiable="true">
+					<code>other</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="374" name="energy_acquisition_method">
+			<label type="item">Energy acquisition method</label>
+			<items>
+				<item id="375">
+					<code>1</code>
+					<label>Own collection</label>
+					<description />
+				</item>
+				<item id="376">
+					<code>2</code>
+					<label>Purchase</label>
+					<description />
+				</item>
+				<item id="377" qualifiable="true">
+					<code>3</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="378" name="energy_end_purpose">
+			<label type="item">Energy end purpose</label>
+			<items>
+				<item id="379">
+					<code>1</code>
+					<label>Cooking</label>
+					<description />
+				</item>
+				<item id="380">
+					<code>2</code>
+					<label>Lighting</label>
+					<description />
+				</item>
+				<item id="381">
+					<code>3</code>
+					<label>Heating</label>
+					<description />
+				</item>
+				<item id="382" qualifiable="true">
+					<code>4</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="383" name="alt_energy_source">
+			<label type="item">Alternative energy source</label>
+			<label type="list">Alternative Energy Sources</label>
+			<items>
+				<item id="384">
+					<code>1</code>
+					<label>Gas</label>
+				</item>
+				<item id="385">
+					<code>2</code>
+					<label>Electricity</label>
+				</item>
+				<item id="386">
+					<code>3</code>
+					<label>Kerosene</label>
+				</item>
+				<item id="387">
+					<code>4</code>
+					<label>Solar panels</label>
+				</item>
+				<item id="388" qualifiable="true">
+					<code>5</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="389" name="reason_for_not_using_energy_source">
+			<label type="item">Reason energy source not used</label>
+			<items>
+				<item id="390">
+					<code>1</code>
+					<label>Too expensive</label>
+					<description />
+				</item>
+				<item id="391">
+					<code>2</code>
+					<label>Different preferences</label>
+					<description />
+				</item>
+				<item id="392" qualifiable="true">
+					<code>3</code>
+					<label>Other reasons</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="393" name="land_category">
+			<label type="list">Land categories (for land access)</label>
+			<items>
+				<item id="394">
+					<code>unirrigatedCropland</code>
+					<label>Cropland (unirrigated)</label>
+				</item>
+				<item id="395">
+					<code>irrigatedCropland</code>
+					<label>Cropland (irrigated)</label>
+				</item>
+				<item id="396">
+					<code>pasture</code>
+					<label>Pasture (natural or planted)</label>
+				</item>
+				<item id="397">
+					<code>forested</code>
+					<label>Forested land (incl. woodlots, silvipasture, etc.)</label>
+				</item>
+				<item id="398" qualifiable="true">
+					<code>other</code>
+					<label>Other land</label>
+				</item>
+				<item id="399">
+					<code>rented</code>
+					<label>Land rented or borrwed</label>
+				</item>
+			</items>
+		</list>
+		<list id="400" name="private_property_change">
+			<label type="item">Energy acquisition methods</label>
+			<items>
+				<item id="401">
+					<code>A</code>
+					<label>Yes, increased</label>
+					<description />
+				</item>
+				<item id="402">
+					<code>B</code>
+					<label>Yes, decreased</label>
+					<description />
+				</item>
+				<item id="403">
+					<code>C</code>
+					<label>No change</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="404" name="food_source">
+			<label type="item">Food source</label>
+			<items>
+				<item id="405">
+					<code>1</code>
+					<label>Food grown on land owned and cultivated by household</label>
+				</item>
+				<item id="406">
+					<code>2</code>
+					<label>Food grown on land cultivated but not owned by
+						household
+						(e.g. land rented)</label>
+				</item>
+				<item id="407">
+					<code>3</code>
+					<label>Food purchased from the market</label>
+				</item>
+				<item id="408">
+					<code>4</code>
+					<label>Food from forest (mushroom, fruits, bushmeat, etc.)</label>
+				</item>
+				<item id="409">
+					<code>5</code>
+					<label>Food given as gift or food aid</label>
+				</item>
+				<item id="410" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="411" name="month">
+			<label type="list">Months</label>
+			<items>
+				<item id="412">
+					<code>1</code>
+					<label>January</label>
+				</item>
+				<item id="413">
+					<code>2</code>
+					<label>February</label>
+				</item>
+				<item id="414">
+					<code>3</code>
+					<label>March</label>
+				</item>
+				<item id="415">
+					<code>4</code>
+					<label>April</label>
+				</item>
+				<item id="416">
+					<code>5</code>
+					<label>May</label>
+				</item>
+				<item id="417">
+					<code>6</code>
+					<label>June</label>
+				</item>
+				<item id="418">
+					<code>7</code>
+					<label>July</label>
+				</item>
+				<item id="419">
+					<code>8</code>
+					<label>August</label>
+				</item>
+				<item id="420">
+					<code>9</code>
+					<label>September</label>
+				</item>
+				<item id="421">
+					<code>10</code>
+					<label>October</label>
+				</item>
+				<item id="422">
+					<code>11</code>
+					<label>November</label>
+				</item>
+				<item id="423">
+					<code>12</code>
+					<label>December</label>
+				</item>
+			</items>
+		</list>
+		<list id="424" name="supplemental_nwfp_unit">
+			<label type="list">Supplement NWFP Units</label>
+			<items>
+				<item id="425">
+					<code>A</code>
+					<label>headloads</label>
+				</item>
+				<item id="426">
+					<code>B</code>
+					<label>bags</label>
+				</item>
+				<item id="427">
+					<code>C</code>
+					<label>kg</label>
+				</item>
+				<item id="428">
+					<code>D</code>
+					<label>litres</label>
+				</item>
+				<item id="429">
+					<code>E</code>
+					<label>baskets</label>
+				</item>
+				<item id="430">
+					<code>F</code>
+					<label>buckets</label>
+				</item>
+				<item id="431" qualifiable="true">
+					<code>G</code>
+					<label>other</label>
+				</item>
+			</items>
+		</list>
+		<list id="432" name="shortfall_cause_response">
+			<label type="list">Shortfall causes</label>
+			<description>Reason for causes of shortfall</description>
+			<items>
+				<item id="433">
+					<code>1</code>
+					<label>Harvest more forest products</label>
+					<description />
+				</item>
+				<item id="434">
+					<code>2</code>
+					<label>Harvest more wild foods not found in forest</label>
+					<description />
+				</item>
+				<item id="435">
+					<code>3</code>
+					<label>Harvest more agricultural products</label>
+					<description />
+				</item>
+				<item id="436">
+					<code>4</code>
+					<label>Spend cash savings</label>
+					<description />
+				</item>
+				<item id="437">
+					<code>5</code>
+					<label>Sell assets (e.g. land, livestock)</label>
+					<description />
+				</item>
+				<item id="438">
+					<code>6</code>
+					<label>Perform extra casual labour</label>
+					<description />
+				</item>
+				<item id="439">
+					<code>7</code>
+					<label>Assistance from friends and/or relatives</label>
+					<description />
+				</item>
+				<item id="440">
+					<code>8</code>
+					<label>Assistance from NGO, community/religious organization or
+						similar</label>
+					<description />
+				</item>
+				<item id="441">
+					<code>9</code>
+					<label>Loan from money lender, credit associations, bank,
+						etc.</label>
+					<description />
+				</item>
+				<item id="442">
+					<code>10</code>
+					<label>Attempt to reduce household spending</label>
+					<description />
+				</item>
+				<item id="443">
+					<code>11</code>
+					<label>Did nothing in particular</label>
+					<description />
+				</item>
+				<item id="444" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="445" name="forest_disturbance_response">
+			<label type="item">Forest disturbance response</label>
+			<description>Response to major disturbances in local forests
+        				decreasing forest product availability</description>
+			<items>
+				<item id="446">
+					<code>1</code>
+					<label>By harvesting fewer forest products</label>
+					<description />
+				</item>
+				<item id="447">
+					<code>2</code>
+					<label>By harvesting more of other forest products</label>
+					<description />
+				</item>
+				<item id="448">
+					<code>3</code>
+					<label>No change in harvesting</label>
+					<description />
+				</item>
+				<item id="449">
+					<code>4</code>
+					<label>By harvesting from a different forest</label>
+					<description />
+				</item>
+				<item id="450" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="451" name="agreement">
+			<label type="item">Agreement</label>
+			<items>
+				<item id="452">
+					<code>1</code>
+					<label>Completely disagree</label>
+					<description />
+				</item>
+				<item id="453">
+					<code>2</code>
+					<label>Somewhat disagree</label>
+					<description />
+				</item>
+				<item id="454">
+					<code>3</code>
+					<label>Neither agree nor disagree</label>
+					<description />
+				</item>
+				<item id="455">
+					<code>4</code>
+					<label>Somewhat agree</label>
+					<description />
+				</item>
+				<item id="456">
+					<code>5</code>
+					<label>Fully agree</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="457" name="vegetation_type">
+			<label type="item">Vegetation type</label>
+			<label type="list">Vegetation Types</label>
+			<items>
+				<item id="458">
+					<code>101</code>
+					<!-- <code>Fhm</code> -->
+					<label>Forest: Humid Montane</label>
+					<description>Catchment forest, &gt; 800 m asl</description>
+				</item>
+				<item id="459">
+					<code>102</code>
+					<!-- <code>Fl</code> -->
+					<label>Forest: Lowland</label>
+					<description>Groundwater forests, some coastal forests, &lt;
+            				800 m asl.</description>
+				</item>
+				<item id="460">
+					<code>103</code>
+					<!-- <code>Fm</code> -->
+					<label>Forest: Mangrove</label>
+					<description>Area of forest and other wooded land with
+            				mangrove vegetation.</description>
+				</item>
+				<item id="461">
+					<code>104</code>
+					<!-- <code>Fp</code> -->
+					<label>Forest: Plantation</label>
+					<description>Note: Detect Planting year in Plot data</description>
+				</item>
+				<item id="462">
+					<code>201</code>
+					<!-- <code>Wc</code> -->
+					<label>Woodland: Closed (&gt;40%)</label>
+					<description>Beekeeping, Hunting, Recreation, Grazing,
+            				Conservation, Timber production</description>
+				</item>
+				<item id="463">
+					<code>202</code>
+					<!-- <code>Wo</code> -->
+					<label>Woodland: Open (10-40%)</label>
+					<description />
+				</item>
+				<item id="464">
+					<code>203</code>
+					<!-- <code>Wsc</code> -->
+					<label>Woodland: Scattered cropland (Unspecified density)</label>
+					<description>Shifting cultivation</description>
+				</item>
+				<item id="465">
+					<code>301</code>
+					<!-- <code>Bt</code> -->
+					<label>Bushland: Thicket</label>
+					<description>below 5 m</description>
+				</item>
+				<item id="466">
+					<code>302</code>
+					<!-- <code>Bd</code> -->
+					<label>Bushland: Dense</label>
+					<description>Grazing</description>
+				</item>
+				<item id="467">
+					<code>303</code>
+					<!-- <code>BSc</code> -->
+					<label>Bushland: Scattered cultivation</label>
+					<description>Shifting cultivation</description>
+				</item>
+				<item id="468">
+					<code>304</code>
+					<!-- <code>B(et)</code> -->
+					<label>Bushland: Emergent trees</label>
+					<description />
+				</item>
+				<item id="469">
+					<code>305</code>
+					<!-- <code>Bt(et)</code> -->
+					<label>Bushland: Thicket with emergent trees</label>
+					<description />
+				</item>
+				<item id="470">
+					<code>306</code>
+					<!-- <code>Bo</code> -->
+					<label>Bushland: Open</label>
+					<description>Hunting, Recreation, Grazing</description>
+				</item>
+				<item id="471">
+					<code>401</code>
+					<!-- <code>Gw</code> -->
+					<label>Grassland: Wooded</label>
+					<description>Hunting, Recreation, Grazing</description>
+				</item>
+				<item id="472">
+					<code>402</code>
+					<!-- <code>Gb</code> -->
+					<label>Grassland: Bushed</label>
+					<description />
+				</item>
+				<item id="473">
+					<code>403</code>
+					<!-- <code>Gsc</code> -->
+					<label>Grassland: Scattered cropland</label>
+					<description>Cultivation</description>
+				</item>
+				<item id="474">
+					<code>404</code>
+					<!-- <code>Go</code> -->
+					<label>Grassland: Open</label>
+					<description>Hunting, Recreation, Grazing</description>
+				</item>
+				<item id="475">
+					<code>501</code>
+					<!-- <code>Caf</code> -->
+					<label>Cultivated land: Agro-forestry system</label>
+					<description>Chagga home gardens with timber and fruit trees
+           					 shading coffee, banana, beans, yams</description>
+				</item>
+				<item id="476">
+					<code>502</code>
+					<!-- <code>Cwc</code> -->
+					<label>Cultivated land: Wooded crops</label>
+					<description>Monocultures of tea, cashewnuts, cloves, coffee</description>
+				</item>
+				<item id="477">
+					<code>503</code>
+					<!-- <code>Cbc</code> -->
+					<label>Cultivated land: Herbaceous crops</label>
+					<description>Maize, wheat, rice, bananas, cotton, sisal</description>
+				</item>
+				<item deprecated="1.1" id="478">
+					<code>504</code>
+					<!-- <code>Cmc</code> -->
+					<label>Cultivated land: Mixed tree cropping</label>
+					<description>Fruit (coconut, mango, orange), cashew, grain
+				            vegetables</description>
+				</item>
+				<item id="479" since="1.1">
+					<code>506</code>
+					<label>Cultivated land: Grain crops</label>
+					<description>Various types of grass crops e.g., maize,
+				            wheat, millet, rice, sorghum.</description>
+				</item>
+				<item id="480">
+					<code>601</code>
+					<!-- <code>Bsl</code> -->
+					<label>Open land: Bare soil</label>
+					<description />
+				</item>
+				<item id="481">
+					<code>602</code>
+					<!-- <code>Sc</code> -->
+					<label>Open land: Salt crusts</label>
+					<description>Mining for salt</description>
+				</item>
+				<item id="482">
+					<code>603</code>
+					<!-- <code>Ro</code> -->
+					<label>Open land: Rock outcrops</label>
+					<description>Recreation</description>
+				</item>
+				<item id="483">
+					<code>604</code>
+					<!-- <code>Ice</code> -->
+					<label>Open land: Ice-cap / snow</label>
+					<description />
+				</item>
+				<item id="484">
+					<code>701</code>
+					<!-- <code>Wo</code> -->
+					<label>Water: Ocean</label>
+					<description />
+				</item>
+				<item id="485">
+					<code>702</code>
+					<!-- <code>Wi</code> -->
+					<label>Water: Inland water</label>
+					<description>Lake, river, seasonal water body</description>
+				</item>
+				<item id="486">
+					<code>703</code>
+					<!-- <code>Wsc</code> -->
+					<label>Water: Swamp</label>
+					<description />
+				</item>
+				<item id="487" qualifiable="true">
+					<code>800</code>
+					<!-- <code>Others</code> -->
+					<label>Other areas</label>
+					<description>Urban and rural build-up areas, air fields,
+            infrastructure (powerlines, railways, mining sites)</description>
+				</item>
+			</items>
+		</list>
+		<list id="488" name="respect_for_boundaries">
+			<label type="item">Respect for boundaries</label>
+			<items>
+				<item id="489">
+					<code>1</code>
+					<label>Yes, everybody</label>
+				</item>
+				<item id="490">
+					<code>2</code>
+					<label>Most people</label>
+				</item>
+				<item id="491">
+					<code>3</code>
+					<label>Most do not respect</label>
+				</item>
+				<item id="492">
+					<code>NA</code>
+					<label>Not applicable</label>
+				</item>
+			</items>
+		</list>
+		<list id="493" name="yes1_no2">
+			<label type="item">Yes=1, No=2</label>
+			<items>
+				<item id="494">
+					<code>1</code>
+					<label>Yes</label>
+				</item>
+				<item id="495">
+					<code>2</code>
+					<label>No</label>
+				</item>
+			</items>
+		</list>
+		<list id="496" name="supplemental_nwfp">
+			<label type="item">Supplement household food supplies type</label>
+			<items>
+				<item id="497">
+					<code>1</code>
+					<label>Tubers</label>
+				</item>
+				<item id="498">
+					<code>2</code>
+					<label>Wild vegetables</label>
+				</item>
+				<item id="499">
+					<code>3</code>
+					<label>Mushrooms</label>
+				</item>
+				<item id="500">
+					<code>4</code>
+					<label>Honey</label>
+				</item>
+				<item id="501">
+					<code>5</code>
+					<label>Fruits</label>
+				</item>
+				<item id="502" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="503" name="shortfall_cause">
+			<label type="item" />
+			<items>
+				<item id="504">
+					<code>1</code>
+					<label>Serious crop failure (drought, pests, floods)</label>
+				</item>
+				<item id="505">
+					<code>2</code>
+					<label>Serious illness or disability in family</label>
+				</item>
+				<item id="506">
+					<code>3</code>
+					<label>Death of productive age-group adult</label>
+				</item>
+				<item id="507">
+					<code>4</code>
+					<label>Land loss (expropriation, etc.)</label>
+				</item>
+				<item id="508">
+					<code>5</code>
+					<label>Major livestock loss (theft, drought, etc.)</label>
+				</item>
+				<item id="509">
+					<code>6</code>
+					<label>Social events (Wedding, funeral, religious events)</label>
+				</item>
+				<item id="510" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="511" name="forest_disturbance">
+			<label type="item">Forest Disturbance</label>
+			<items>
+				<item id="512">
+					<code>1</code>
+					<label>Fire</label>
+				</item>
+				<item id="513">
+					<code>2</code>
+					<label>Disease</label>
+				</item>
+				<item id="514">
+					<code>3</code>
+					<label>Lumbering</label>
+				</item>
+				<item id="515">
+					<code>4</code>
+					<label>Encroachment</label>
+				</item>
+				<item id="516">
+					<code>5</code>
+					<label>Grazing</label>
+				</item>
+				<item id="517">
+					<code>6</code>
+					<label>Charcoal making</label>
+				</item>
+				<item id="518" qualifiable="true">
+					<code>99</code>
+					<label>Other, (describe)</label>
+				</item>
+			</items>
+		</list>
+		<list id="519" name="income_source">
+			<label type="item">Forest Disturbance</label>
+			<items>
+				<item id="520">
+					<code>1</code>
+					<label>Forest products (timber, game, charcoal, etc)</label>
+				</item>
+				<item id="521">
+					<code>2</code>
+					<label>Agriculture</label>
+				</item>
+				<item id="522">
+					<code>3</code>
+					<label>Livestock</label>
+				</item>
+				<item id="523">
+					<code>4</code>
+					<label>Wage income</label>
+				</item>
+				<item id="524">
+					<code>5</code>
+					<label>Income from own business</label>
+				</item>
+				<item id="525">
+					<code>6</code>
+					<label>Remittances</label>
+				</item>
+				<item id="526" qualifiable="true">
+					<code>99</code>
+					<label>Other sources</label>
+				</item>
+			</items>
+		</list>
+		<list id="527" name="product_category">
+			<label type="item">Product category</label>
+			<items>
+				<item id="528">
+					<code>101</code>
+					<label>Production Wood</label>
+				</item>
+				<item id="529">
+					<code>102</code>
+					<label>Firewood</label>
+				</item>
+				<item id="530">
+					<code>103</code>
+					<label>Charcoal</label>
+				</item>
+				<item id="531">
+					<code>104</code>
+					<label>Wood Carvings</label>
+				</item>
+				<item id="532">
+					<code>201</code>
+					<label>Human plant food</label>
+				</item>
+				<item id="533">
+					<code>202</code>
+					<label>Fodder</label>
+				</item>
+				<item id="534">
+					<code>203</code>
+					<label>Plant medicines</label>
+				</item>
+				<item id="535">
+					<code>204</code>
+					<label>Soap/cosmetics</label>
+				</item>
+				<item id="536">
+					<code>205</code>
+					<label>Dying/tanning</label>
+				</item>
+				<item id="537">
+					<code>206</code>
+					<label>Herbs and spices</label>
+				</item>
+				<item id="538">
+					<code>207</code>
+					<label>Exudates</label>
+				</item>
+				<item id="539">
+					<code>208</code>
+					<label>Utensils, handicrafts</label>
+				</item>
+				<item id="540">
+					<code>209</code>
+					<label>Construction material</label>
+				</item>
+				<item id="541">
+					<code>210</code>
+					<label>Ornamentals</label>
+				</item>
+				<item id="542">
+					<code>211</code>
+					<label>Seeds</label>
+				</item>
+				<item id="543">
+					<code>212</code>
+					<label>Fuel</label>
+				</item>
+				<item id="544">
+					<code>213</code>
+					<label>Fibre</label>
+				</item>
+				<item id="545">
+					<code>214</code>
+					<label>Fertilizer</label>
+				</item>
+				<item id="546">
+					<code>299</code>
+					<label>Other plant products</label>
+				</item>
+				<item id="547">
+					<code>301</code>
+					<label>Living animals</label>
+				</item>
+				<item id="548">
+					<code>302</code>
+					<label>Honey, beeswax</label>
+				</item>
+				<item id="549">
+					<code>303</code>
+					<label>Bush meat</label>
+				</item>
+				<item id="550">
+					<code>398</code>
+					<label>Other edible animal products</label>
+				</item>
+				<item id="551">
+					<code>304</code>
+					<label>Hides / skins</label>
+				</item>
+				<item id="552">
+					<code>305</code>
+					<label>Medicines from animals</label>
+				</item>
+				<item id="553">
+					<code>306</code>
+					<label>Colorants</label>
+				</item>
+				<item id="554">
+					<code>307</code>
+					<label>Fuel</label>
+				</item>
+				<item id="555">
+					<code>399</code>
+					<label>Other non-edible animal products</label>
+				</item>
+			</items>
+		</list>
+		<list id="556" name="product_used_land_use">
+			<label type="item">Product land use</label>
+			<items>
+				<item id="557">
+					<code>1</code>
+					<label>Forest land</label>
+					<description />
+				</item>
+				<item id="558">
+					<code>2</code>
+					<label>Pasture</label>
+					<description />
+				</item>
+				<item id="559">
+					<code>3</code>
+					<label>Fallow</label>
+					<description />
+				</item>
+				<item id="560">
+					<code>4</code>
+					<label>Garden</label>
+					<description />
+				</item>
+				<item id="561" qualifiable="true">
+					<code>5</code>
+					<label>Other</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="562" name="distance_to_product_source">
+			<label type="item">Distance to source</label>
+			<items>
+				<item id="563">
+					<code>1</code>
+					<label>Less than 1 km from HH</label>
+				</item>
+				<item id="564">
+					<code>2</code>
+					<label>Between 1-2 km from HH</label>
+				</item>
+				<item id="565">
+					<code>3</code>
+					<label>Between 2 and 5 km from the HH</label>
+				</item>
+				<item id="566">
+					<code>4</code>
+					<label>Between 5-10 km from HH</label>
+				</item>
+				<item id="567">
+					<code>6</code>
+					<label>More than 10 km from HH</label>
+				</item>
+			</items>
+		</list>
+		<list id="568" name="harvester">
+			<label type="list">Harvester gender balance</label>
+			<items>
+				<item id="569">
+					<code>0</code>
+					<label>No women</label>
+					<description />
+				</item>
+				<item id="570">
+					<code>1</code>
+					<label>&lt;30% women</label>
+					<description />
+				</item>
+				<item id="571">
+					<code>2</code>
+					<label>30-70% women</label>
+					<description />
+				</item>
+				<item id="572">
+					<code>3</code>
+					<label>&gt;70% women</label>
+					<description />
+				</item>
+				<item id="573">
+					<code>4</code>
+					<label>Only women</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="574" name="harvesting_change">
+			<label type="item">Harvest change</label>
+			<label type="list">Harvest Changes</label>
+			<items>
+				<item id="575">
+					<code>0</code>
+					<label>Not Applicable</label>
+					<description>Timber, beams, poles for construction, etc</description>
+				</item>
+				<item id="576">
+					<code>1</code>
+					<label>Decreasing</label>
+					<description>When quantity harvested has decreased</description>
+				</item>
+				<item id="577">
+					<code>2</code>
+					<label>No Change</label>
+					<description>When the quantity harvested has not changed</description>
+				</item>
+				<item id="578">
+					<code>3</code>
+					<label>Increasing</label>
+					<description>When quantity harvested has increased </description>
+				</item>
+			</items>
+		</list>
+		<list id="579" name="harvest_unit">
+			<label type="list">Units for harvested forest products</label>
+			<items>
+				<item id="580">
+					<code>A</code>
+					<label>headloads</label>
+				</item>
+				<item id="581">
+					<code>B</code>
+					<label>bags</label>
+				</item>
+				<item id="582">
+					<code>C</code>
+					<label>kg</label>
+				</item>
+				<item id="583">
+					<code>D</code>
+					<label>litres</label>
+				</item>
+				<item id="584">
+					<code>E</code>
+					<label>baskets</label>
+				</item>
+				<item id="585">
+					<code>F</code>
+					<label>buckets</label>
+				</item>
+				<item id="586" qualifiable="true">
+					<code>G</code>
+					<label>other</label>
+				</item>
+			</items>
+		</list>
+		<list id="587" name="forest_product_end_use">
+			<label type="list">End uses for forest products</label>
+			<items>
+				<item id="588">
+					<code>0</code>
+					<label>Only domestic use</label>
+					<description />
+				</item>
+				<item id="589">
+					<code>1</code>
+					<label>&lt;25% commercial use</label>
+					<description />
+				</item>
+				<item id="590">
+					<code>2</code>
+					<label>25-50% commercial use</label>
+					<description />
+				</item>
+				<item id="591">
+					<code>3</code>
+					<label>50-75% commercial use</label>
+					<description />
+				</item>
+				<item id="592">
+					<code>4</code>
+					<label>&gt;75% commercial use</label>
+					<description />
+				</item>
+				<item id="593">
+					<code>5</code>
+					<label>Only commercial use</label>
+					<description />
+				</item>
+				<item id="594">
+					<code>90</code>
+					<label>Not known</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="595" name="harvest_rights">
+			<label type="list">Harvest rights</label>
+			<description>User rights to harvest the product</description>
+			<items>
+				<item id="596">
+					<code>1</code>
+					<label>Individual right</label>
+					<description />
+				</item>
+				<item id="597">
+					<code>2</code>
+					<label>Rent</label>
+					<description />
+				</item>
+				<item id="598">
+					<code>3</code>
+					<label>Product lease</label>
+					<description />
+				</item>
+				<item id="599">
+					<code>4</code>
+					<label>Land lease</label>
+					<description />
+				</item>
+				<item id="600">
+					<code>5</code>
+					<label>Customary or common rights</label>
+					<description />
+				</item>
+				<item id="601">
+					<code>6</code>
+					<label>Open access</label>
+					<description />
+				</item>
+				<item id="602">
+					<code>7</code>
+					<label>No right</label>
+					<description />
+				</item>
+				<item id="603">
+					<code>90</code>
+					<label>Not known</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="604" name="conflicts_existence_product">
+			<label type="list">Conflicts</label>
+			<items>
+				<item id="605">
+					<code>1</code>
+					<label>No</label>
+					<description />
+				</item>
+				<item id="606">
+					<code>2</code>
+					<label>Yes</label>
+					<description />
+				</item>
+				<item id="607">
+					<code>90</code>
+					<label>Not known</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="608" name="local_rules">
+			<label type="list">Local rules</label>
+			<items>
+				<item id="609">
+					<code>0</code>
+					<label>No</label>
+					<description>No local rules exist that regulate use of product</description>
+				</item>
+				<item id="610">
+					<code>1</code>
+					<label>Yes, but not enforced</label>
+					<description />
+				</item>
+				<item id="611">
+					<code>2</code>
+					<label>Yes, and enforced</label>
+					<description />
+				</item>
+			</items>
+		</list>
+		<list id="612" name="leg_enforcement">
+			<label type="item">Legislation Enforcement</label>
+			<items>
+				<item id="613">
+					<code>0</code>
+					<label>Not at all</label>
+				</item>
+				<item id="614">
+					<code>1</code>
+					<label>Weakly</label>
+				</item>
+				<item id="615">
+					<code>2</code>
+					<label>More or less</label>
+				</item>
+				<item id="616">
+					<code>3</code>
+					<label>Strongly</label>
+				</item>
+			</items>
+		</list>
+		<list id="617" name="forest_service">
+			<label type="item" />
+			<items>
+				<item id="618">
+					<code>0</code>
+					<label>Fresh water/water conservation</label>
+				</item>
+				<item id="619">
+					<code>1</code>
+					<label>Climate regulation</label>
+				</item>
+				<item id="620">
+					<code>2</code>
+					<label>Windbreak</label>
+				</item>
+				<item id="621">
+					<code>3</code>
+					<label>Recreation/Tourism</label>
+				</item>
+				<item id="622">
+					<code>4</code>
+					<label>Soil protection</label>
+				</item>
+				<item id="623">
+					<code>6</code>
+					<label>Shade</label>
+				</item>
+				<item id="624">
+					<code>7</code>
+					<label>Aesthetic</label>
+				</item>
+				<item id="625">
+					<code>8</code>
+					<label>Employment</label>
+				</item>
+				<item id="626" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="627" name="payment_source">
+			<label type="item">Source of payment</label>
+			<label type="list">Sources of Payment</label>
+			<items>
+				<item id="628">
+					<code>0</code>
+					<label>Not applicable</label>
+					<description>No payment was received from anybody</description>
+				</item>
+				<item id="629">
+					<code>1</code>
+					<label>Central Government</label>
+					<description>Central government office and its agencies</description>
+				</item>
+				<item id="630">
+					<code>2</code>
+					<label>NGOs</label>
+					<description>Non-governmental Organization</description>
+				</item>
+				<item id="631">
+					<code>3</code>
+					<label>Individual</label>
+					<description>An individual has paid for the environmental
+            				service, i.e. tourists paying a visitor's fee </description>
+				</item>
+				<item id="632" qualifiable="true">
+					<code>9</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="633" name="land_use_characteristic">
+			<label type="item">Land Use</label>
+			<items>
+				<item id="634">
+					<code>0</code>
+					<label>Cultivated land</label>
+				</item>
+				<item id="635">
+					<code>1</code>
+					<label>Forest land</label>
+				</item>
+				<item id="636">
+					<code>2</code>
+					<label>Natural surface water (excluding man-made reservoirs)</label>
+				</item>
+			</items>
+		</list>
+		<list id="637" name="land_use_change">
+			<label type="item">Land use change</label>
+			<items>
+				<item id="638">
+					<code>1</code>
+					<label>Decrease</label>
+				</item>
+				<item id="639">
+					<code>2</code>
+					<label>Stable</label>
+				</item>
+				<item id="640">
+					<code>3</code>
+					<label>Increase</label>
+				</item>
+			</items>
+		</list>
+		<list id="641" name="group_participation_benefit">
+			<label type="item" />
+			<items>
+				<item id="642">
+					<code>1</code>
+					<label>Large negative effect</label>
+				</item>
+				<item id="643">
+					<code>2</code>
+					<label>Small negative effect</label>
+				</item>
+				<item id="644">
+					<code>3</code>
+					<label>No effect</label>
+				</item>
+				<item id="645">
+					<code>4</code>
+					<label>Small positive effect</label>
+				</item>
+				<item id="646">
+					<code>5</code>
+					<label>Large positive effect</label>
+				</item>
+			</items>
+		</list>
+		<list id="647" name="frequency">
+			<label type="item" />
+			<items>
+				<item id="648">
+					<code>0</code>
+					<label>Never</label>
+				</item>
+				<item id="649">
+					<code>1</code>
+					<label>Hardly ever</label>
+				</item>
+				<item id="650">
+					<code>2</code>
+					<label>Regularly (&gt;1 time/month)</label>
+				</item>
+				<item id="651">
+					<code>3</code>
+					<label>Frequently (&gt;1 time/week)</label>
+				</item>
+			</items>
+		</list>
+		<list id="652" name="violators_caught">
+			<label type="item">Violators caught per year</label>
+			<items>
+				<item id="653">
+					<code>0</code>
+					<label>none</label>
+				</item>
+				<item id="654">
+					<code>1</code>
+					<label>&lt;5</label>
+				</item>
+				<item id="655">
+					<code>2</code>
+					<label>5-10</label>
+				</item>
+				<item id="656">
+					<code>3</code>
+					<label>10-20</label>
+				</item>
+				<item id="657">
+					<code>4</code>
+					<label>&gt;20</label>
+				</item>
+			</items>
+		</list>
+		<list id="658" name="punishment_decider">
+			<label type="item" />
+			<items>
+				<item id="659">
+					<code>1</code>
+					<label>Local community group that made the rules</label>
+				</item>
+				<item id="660">
+					<code>2</code>
+					<label>Village council</label>
+				</item>
+				<item id="661">
+					<code>3</code>
+					<label>District government</label>
+				</item>
+				<item id="662">
+					<code>4</code>
+					<label>Central government</label>
+				</item>
+				<item id="663">
+					<code>5</code>
+					<label>Court of law</label>
+				</item>
+				<item id="664" qualifiable="true">
+					<code>6</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="665" name="org_type">
+			<label type="item" />
+			<items>
+				<item id="666">
+					<code>0</code>
+					<label>National Government</label>
+				</item>
+				<item id="667">
+					<code>1</code>
+					<label>District Government</label>
+				</item>
+				<item id="668">
+					<code>2</code>
+					<label>Village government</label>
+				</item>
+				<item id="669" qualifiable="true">
+					<code>3</code>
+					<label>NGO</label>
+				</item>
+				<item id="670" qualifiable="true">
+					<code>99</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="671" name="frequency_of_interaction">
+			<label type="item">Frequency of interaction</label>
+			<items>
+				<item id="672">
+					<code>0</code>
+					<label>None</label>
+				</item>
+				<item id="673">
+					<code>1</code>
+					<label>1-5 times/yr</label>
+				</item>
+				<item id="674">
+					<code>2</code>
+					<label>5-10 times/yr</label>
+				</item>
+				<item id="675">
+					<code>3</code>
+					<label>10-15 times/yr</label>
+				</item>
+				<item id="676">
+					<code>4</code>
+					<label>15-20 times/yr</label>
+				</item>
+				<item id="677">
+					<code>5</code>
+					<label>&gt;20</label>
+				</item>
+			</items>
+		</list>
+		<!-- K. Governance codes -->
+		<list id="678" name="assistance_response">
+			<label type="list">Responses to request for assistance</label>
+			<items>
+				<item id="679">
+					<code>0</code>
+					<label>Unaccomodating</label>
+				</item>
+				<item id="680">
+					<code>1</code>
+					<label>Accomodating with follow up action, to solve
+						problem</label>
+				</item>
+				<item id="681">
+					<code>2</code>
+					<label>Accommodating without follow up action</label>
+				</item>
+				<item id="682" qualifiable="true">
+					<code>9</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="683" name="forum">
+			<label type="list">Conflict resolution forums</label>
+			<items>
+				<item id="684">
+					<code>0</code>
+					<label>No forum was used</label>
+				</item>
+				<item id="685">
+					<code>1</code>
+					<label>Central Government</label>
+				</item>
+				<item id="686">
+					<code>2</code>
+					<label>Local Government</label>
+				</item>
+				<item id="687">
+					<code>3</code>
+					<label>NGO</label>
+				</item>
+				<item id="688">
+					<code>4</code>
+					<label>Court</label>
+				</item>
+				<item id="689">
+					<code>5</code>
+					<label>Meeting arranged by involved parties</label>
+				</item>
+				<item id="690">
+					<code>6</code>
+					<label>Individuals outside the dispute</label>
+				</item>
+				<item id="691">
+					<code>7</code>
+					<label>Religious institution</label>
+				</item>
+				<item id="692">
+					<code>9</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="693" name="forum_effective">
+			<label type="item">Effectiveness of conflict resolution forum</label>
+			<items>
+				<item id="694">
+					<code>0</code>
+					<label>No</label>
+				</item>
+				<item id="695">
+					<code>1</code>
+					<label>Yes conflict is solved</label>
+				</item>
+				<item id="696">
+					<code>2</code>
+					<label>The solving of the conflict is still ongoing</label>
+				</item>
+				<item id="697" qualifiable="true">
+					<code>9</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="698" name="first_contact">
+			<label type="item" />
+			<items>
+				<item id="699">
+					<code>1</code>
+					<label>Police</label>
+				</item>
+				<item id="700">
+					<code>2</code>
+					<label>Central Government</label>
+				</item>
+				<item id="701">
+					<code>3</code>
+					<label>Local Government</label>
+				</item>
+				<item id="702">
+					<code>4</code>
+					<label>Village Chief Executive</label>
+				</item>
+				<item id="703">
+					<code>5</code>
+					<label>Court</label>
+				</item>
+				<item id="704">
+					<code>6</code>
+					<label>NGO</label>
+				</item>
+				<item id="705">
+					<code>9</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="706" name="first_contact_reason">
+			<label type="item" />
+			<items>
+				<item id="707">
+					<code>1</code>
+					<label>Local Presence</label>
+				</item>
+				<item id="708">
+					<code>2</code>
+					<label>Capacity to take active response</label>
+				</item>
+				<item id="709">
+					<code>3</code>
+					<label>Knowledge of activities in the area</label>
+				</item>
+				<item id="710">
+					<code>4</code>
+					<label>Lack of alternatives</label>
+				</item>
+				<item id="711" qualifiable="true">
+					<code>5</code>
+					<label>Other</label>
+				</item>
+			</items>
+		</list>
+		<list id="712" name="share_code">
+			<label type="item" />
+			<items>
+				<item id="713">
+					<code>1</code>
+					<label>Share is much lower than it should be</label>
+				</item>
+				<item id="714">
+					<code>2</code>
+					<label>Share is somewhat lower than it should be</label>
+				</item>
+				<item id="715">
+					<code>3</code>
+					<label>Share is fair</label>
+				</item>
+				<item id="716">
+					<code>4</code>
+					<label>Share is somewhat higher than it should be</label>
+				</item>
+				<item id="717">
+					<code>5</code>
+					<label>Share is much higher than it should be</label>
+				</item>
+			</items>
+		</list>
+		<list id="718" lookup="ofc_sampling_design" name="sampling_design">
+			<label type="item">Sample Ids</label>
+			<codingScheme scope="local" />
+			<hierarchy>
+				<level name="level1">
+					<label>Cluster Id</label>
+				</level>
+				<level name="level2">
+					<label>Plot Id</label>
+				</level>
+			</hierarchy>
+		</list>
+	</codeLists>
+	<units>
+		<unit dimension="angle" id="719" name="deg">
+			<label>degrees</label>
+			<abbreviation>deg</abbreviation>
+		</unit>
+		<unit conversionFactor="1.0" dimension="length" id="720" name="m">
+			<label>metres</label>
+			<abbreviation>m</abbreviation>
+		</unit>
+		<unit conversionFactor="0.01" dimension="length" id="721" name="cm">
+			<label>centimetres</label>
+			<abbreviation>cm</abbreviation>
+		</unit>
+		<unit conversionFactor="1000" dimension="length" id="722" name="km">
+			<label>kilometre</label>
+			<abbreviation>km</abbreviation>
+		</unit>
+		<unit conversionFactor="2.47105381" dimension="area" id="723"
+			name="ac">
+			<label>acres</label>
+			<abbreviation>ac</abbreviation>
+		</unit>
+		<unit conversionFactor="1.0" dimension="area" id="724" name="ha">
+			<label>hectares</label>
+			<abbreviation>ha</abbreviation>
+		</unit>
+		<unit conversionFactor="0.01" dimension="ratio" id="725" name="percent">
+			<label>percent</label>
+			<abbreviation>%</abbreviation>
+		</unit>
+		<unit dimension="currency" id="726" name="tsh">
+			<label>Archenland Lunes</label>
+			<abbreviation>Arl</abbreviation>
+		</unit>
+	</units>
+	<spatialReferenceSystems>
+		<spatialReferenceSystem srid="EPSG:21035">
+			<label xml:lang="en">35S</label>
+			<description xml:lang="en">Arc 1960 / UTM zone 35S</description>
+			<wkt><![CDATA[
+          PROJCS["Arc 1960 / UTM zone 35S",
+              GEOGCS["Arc 1960",
+                  DATUM["Arc_1960",
+                      SPHEROID["Clarke 1880 (RGS)",6378249.145,293.465,
+                          AUTHORITY["EPSG","7012"]],
+                      TOWGS84[-160.0, -6.0, -302.0, 0.0, 0.0, 0.0, 0.0],
+                      AUTHORITY["EPSG","6210"]],
+                  PRIMEM["Greenwich",0,
+                      AUTHORITY["EPSG","8901"]],
+                  UNIT["degree",0.01745329251994328,
+                      AUTHORITY["EPSG","9122"]],
+                  AUTHORITY["EPSG","4210"]],
+              UNIT["metre",1,
+                  AUTHORITY["EPSG","9001"]],
+              PROJECTION["Transverse_Mercator"],
+              PARAMETER["latitude_of_origin",0],
+              PARAMETER["central_meridian",27],
+              PARAMETER["scale_factor",0.9996],
+              PARAMETER["false_easting",500000],
+              PARAMETER["false_northing",10000000],
+              AUTHORITY["EPSG","21035"],
+              AXIS["Easting",EAST],
+              AXIS["Northing",NORTH]]]]></wkt>
+		</spatialReferenceSystem>
+		<spatialReferenceSystem srid="EPSG:21036">
+			<label xml:lang="en">36S</label>
+			<description xml:lang="en">Arc 1960 / UTM zone 36S</description>
+			<wkt><![CDATA[
+          PROJCS["Arc 1960 / UTM zone 36S",
+              GEOGCS["Arc 1960",
+                  DATUM["Arc_1960",
+                      SPHEROID["Clarke 1880 (RGS)",6378249.145,293.465,
+                          AUTHORITY["EPSG","7012"]],
+                      TOWGS84[-160.0, -6.0, -302.0, 0.0, 0.0, 0.0, 0.0], 
+                      AUTHORITY["EPSG","6210"]],
+                  PRIMEM["Greenwich",0,
+                      AUTHORITY["EPSG","8901"]],
+                  UNIT["degree",0.01745329251994328,
+                      AUTHORITY["EPSG","9122"]],
+                  AUTHORITY["EPSG","4210"]],
+              UNIT["metre",1,
+                  AUTHORITY["EPSG","9001"]],
+              PROJECTION["Transverse_Mercator"],
+              PARAMETER["latitude_of_origin",0],
+              PARAMETER["central_meridian",33],
+              PARAMETER["scale_factor",0.9996],
+              PARAMETER["false_easting",500000],
+              PARAMETER["false_northing",10000000],
+              AUTHORITY["EPSG","21036"],
+              AXIS["Easting",EAST],
+              AXIS["Northing",NORTH]]]]></wkt>
+		</spatialReferenceSystem>
+		<spatialReferenceSystem srid="EPSG:21037">
+			<label xml:lang="en">37S</label>
+			<description xml:lang="en">Arc 1960 / UTM zone 37S</description>
+			<wkt><![CDATA[
+          PROJCS["Arc 1960 / UTM zone 37S",
+              GEOGCS["Arc 1960",
+                  DATUM["Arc_1960",
+                      SPHEROID["Clarke 1880 (RGS)",6378249.145,293.465,
+                          AUTHORITY["EPSG","7012"]],
+                      TOWGS84[-160.0, -6.0, -302.0, 0.0, 0.0, 0.0, 0.0], 
+                      AUTHORITY["EPSG","6210"]],
+                  PRIMEM["Greenwich",0,
+                      AUTHORITY["EPSG","8901"]],
+                  UNIT["degree",0.01745329251994328,
+                      AUTHORITY["EPSG","9122"]],
+                  AUTHORITY["EPSG","4210"]],
+              UNIT["metre",1,
+                  AUTHORITY["EPSG","9001"]],
+              PROJECTION["Transverse_Mercator"],
+              PARAMETER["latitude_of_origin",0],
+              PARAMETER["central_meridian",39],
+              PARAMETER["scale_factor",0.9996],
+              PARAMETER["false_easting",500000],
+              PARAMETER["false_northing",10000000],
+              AUTHORITY["EPSG","21037"],
+              AXIS["Easting",EAST],
+              AXIS["Northing",NORTH]]]]></wkt>
+		</spatialReferenceSystem>
+	</spatialReferenceSystems>
+	<referenceDataSchema>
+		<samplingPoint>
+<!-- 			<attribute name="cluster_id" key="true" /> -->
+<!-- 			<attribute name="plot_no" key="true" /> -->
+			<attribute name="region" />
+			<attribute name="district" />
+		</samplingPoint>
+		<taxon>
+			<attribute name="region" />
+		</taxon>
+	</referenceDataSchema>
+	<schema>
+		<entity id="727" name="cluster" ui:tab="cluster" ui:tabSet="cluster">
+			<label>Cluster</label>
+			<entity id="728" multiple="true" name="task" since="2.0">
+				<label type="heading">Quality assurance field</label>
+				<code id="729" key="true" list="bp_data_task" name="type">
+					<label>Task</label>
+				</code>
+				<text id="730" name="person">
+					<label>Person</label>
+				</text>
+				<date id="731" name="date">
+					<label>Date</label>
+				</date>
+			</entity>
+			<code id="732" key="true" list="sampling_design" name="id"
+				required="true" strict="false">
+				<label>Id</label>
+			</code>
+			<code id="733" list="admin_unit" name="region" required="true">
+				<label>Region</label>
+			</code>
+			<code id="734" list="admin_unit" name="district" parent="region"
+				required="true">
+				<label>District</label>
+			</code>
+			<text id="1066" name="region_district" calculated="true">
+				<label>Region-District code</label>
+				<default expr="concat(region, district)" />
+			</text>
+			<number id="735" name="crew_no" type="integer">
+				<label>Crew no.</label>
+				<compare flag="error" gte="1" />
+			</number>
+			<text id="736" maxCount="3" name="map_sheet">
+				<label>Map sheet</label>
+				<label type="heading">Map sheet(s)</label>
+				<unique expr="map_sheet" flag="error" />
+			</text>
+			<code id="737" list="accessibility" name="accessibility" required="true">
+				<label>Accessibility</label>
+			</code>
+			<coordinate id="738" name="vehicle_location" required="true">
+				<label>Vehicle location</label>
+				<distance flag="error" max="100000"
+					to="idm:samplingPointCoordinate(id)" />
+				<distance flag="warn" max="50000"
+					to="idm:samplingPointCoordinate(id)" />
+			</coordinate>
+			<text id="739" name="gps_model" ui:autocomplete="gps_model">
+				<label>GPS model</label>
+			</text>
+			<boolean id="740" name="gps_realtime">
+				<label>High precision GPS</label>
+				<default value="false" />
+			</boolean>
+			<number id="741" name="plot_direction" type="real">
+				<label>Direction to 1st plot</label>
+				<default value="0" />
+				<precision decimalDigits="0" unit="deg" />
+				<compare flag="error" gte="0" lte="359" />
+			</number>
+			<number id="742" name="plot_distance" type="real">
+				<label>Distance to 1st plot</label>
+				<default value="0" />
+				<precision decimalDigits="0" default="true" unit="m" />
+				<precision decimalDigits="0" unit="cm" />
+				<precision decimalDigits="0" unit="km" />
+				<compare flag="error" gte="0" lte="20000" />
+			</number>
+			<entity id="743" maxCount="2" name="time_study" required="true">
+				<label>Time study</label>
+				<description>Date, start time and end time of visit to the
+		          cluster.</description>
+				<date id="744" name="date">
+					<label>Date</label>
+				</date>
+				<time id="745" name="start_time" required="true">
+					<label>Start time</label>
+				</time>
+				<time id="746" name="end_time" required="true">
+					<label>End time</label>
+					<compare flag="error" gt="start_time" />
+				</time>
+			</entity>
+			<text id="747" name="remarks" type="memo">
+				<label>Remarks</label>
+			</text>
+			<entity collect:count="true" id="748" multiple="true" name="plot"
+				ui:layout="form" ui:tab="plot">
+				<label>Plot</label>
+				<code id="749" key="true" list="sampling_design" name="no"
+					parent="parent()/id" strict="false" ui:tab="plot_det">
+					<label>No.</label>
+				</code>
+				<text id="750" key="true" name="subplot" requiredIf="share &lt; 100"
+					ui:tab="plot_det">
+					<label>Subplot</label>
+					<default value="A" />
+					<pattern flag="error" regex="[A-Z]">
+						<message>Subplot letter must be a single letter (A-Z)</message>
+					</pattern>
+				</text>
+				<entity id="751" name="time_study" required="true" ui:tab="plot_det">
+					<label>Time study</label>
+					<date id="752" name="date">
+						<label>Date</label>
+					</date>
+					<time id="753" name="start_time" required="true">
+						<label>Start time</label>
+					</time>
+					<time id="754" name="end_time" required="true">
+						<label>End time</label>
+						<compare flag="error" gt="start_time" />
+					</time>
+				</entity>
+				<number id="755" name="share" type="real" ui:tab="plot_det">
+					<label>Share</label>
+					<default value="100" />
+					<precision decimalDigits="0" unit="percent" />
+					<compare flag="error" gte="1" lte="100" />
+				</number>
+				<boolean id="756" name="permanent" ui:tab="plot_det">
+					<label>Permanent plot</label>
+					<default value="false" />
+				</boolean>
+				<text id="757" name="group_leader" ui:tab="plot_det">
+					<label>Group leader</label>
+				</text>
+				<code id="758" list="accessibility" name="accessibility"
+					required="true" ui:tab="plot_det">
+					<label>Accessibility</label>
+				</code>
+				<code id="759" list="admin_unit" name="region" required="true"
+					ui:tab="plot_det">
+					<label>Region</label>
+				</code>
+				<code id="760" list="admin_unit" name="district" parent="region"
+					required="true" ui:tab="plot_det">
+					<label>District</label>
+				</code>
+				<text id="761" name="division" required="true" ui:tab="plot_det">
+					<label>Division</label>
+				</text>
+				<text id="762" name="ward" required="true" ui:autocomplete="ward"
+					ui:tab="plot_det">
+					<label>Ward</label>
+				</text>
+				<text id="763" name="village" required="true" ui:autocomplete="village"
+					ui:tab="plot_det">
+					<label>Village</label>
+				</text>
+				<text id="764" name="forest" ui:autocomplete="forest" ui:tab="plot_det">
+					<label>Forest or area name</label>
+				</text>
+				<number id="765" name="slope" type="real" ui:tab="plot_det">
+					<label>Slope</label>
+					<default value="0" />
+					<precision decimalDigits="0" unit="percent" />
+					<compare flag="error" gte="0" lte="200" />
+				</number>
+				<coordinate id="766" name="location" required="true"
+					ui:tab="plot_det">
+					<label>GPS reading</label>
+					<distance flag="error"
+						from="idm:samplingPointCoordinate(parent()/id, no)"
+						max="100" to="transform($this , centre/dir, centre/dist)" />
+					<distance flag="warn"
+						from="idm:samplingPointCoordinate(parent()/id, no)"
+						max="10" to="transform($this , centre/dir, centre/dist)" />
+				</coordinate>
+				<entity id="767" name="centre" ui:tab="plot_det">
+					<label>Plot centre</label>
+					<number id="768" name="dir" type="real">
+						<label>Direction</label>
+						<default value="0" />
+						<precision decimalDigits="0" unit="deg" />
+						<compare flag="error" gte="0" lt="360" />
+					</number>
+					<number id="769" name="dist" relevant="dir" required="true"
+						type="real">
+						<label>Distance</label>
+						<precision decimalDigits="0" />
+						<compare flag="error" gte="0" lte="100" />
+					</number>
+					<text id="770" name="desc" type="memo">
+						<label>Description</label>
+					</text>
+				</entity>
+				<code id="771" list="land_use" name="land_use" required="true"
+					ui:tab="plot_det">
+					<label>Land use</label>
+				</code>
+				<code id="772" list="vegetation_type" name="vegetation_type"
+					ui:tab="plot_det">
+					<label>Vegetation</label>
+				</code>
+				<code id="773" list="ownership" name="ownership_type" ui:tab="plot_det">
+					<label>Ownership</label>
+				</code>
+				<number deprecated="1.1" id="774" name="canopy_cover"
+					relevant="accessibility = 0 and vegetation_type &gt;= 101 and vegetation_type &lt;= 306"
+					type="real" ui:tab="plot_det">
+					<label>Canopy</label>
+					<default value="0" />
+					<precision decimalDigits="0" unit="percent" />
+					<compare flag="error" gte="0" lte="100" />
+				</number>
+				<entity id="775" name="canopy_coverage"
+					relevant="accessibility = 0 and vegetation_type &gt;= 101 and vegetation_type &lt;= 306"
+					since="1.1" ui:tab="plot_det">
+					<label xml:lang="en">Canopy coverage</label>
+					<number id="776" name="centre" type="integer">
+						<label>C</label>
+						<default value="0" />
+						<compare flag="error" gte="0" lte="24" />
+					</number>
+					<number id="777" name="north" type="integer">
+						<label>N</label>
+						<default value="0" />
+						<compare flag="error" gte="0" lte="24" />
+					</number>
+					<number id="778" name="east" type="integer">
+						<label>E</label>
+						<default value="0" />
+						<compare flag="error" gte="0" lte="24" />
+					</number>
+					<number id="779" name="south" type="integer">
+						<label>S</label>
+						<default value="0" />
+						<compare flag="error" gte="0" lte="24" />
+					</number>
+					<number id="780" name="west" type="integer">
+						<label>W</label>
+						<default value="0" />
+						<compare flag="error" gte="0" lte="24" />
+					</number>
+				</entity>
+				<code id="781" list="undergrowth" name="undergrowth_type"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306"
+					required="true" ui:tab="plot_det">
+					<label>Undergrowth</label>
+				</code>
+				<entity id="782" maxCount="2" name="damage"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306"
+					ui:tab="plot_det">
+					<label>Damage</label>
+					<code id="783" list="damage_type" name="type" required="true">
+						<label>Type</label>
+					</code>
+					<code id="784" list="damage_severity" name="severity" required="true">
+						<label>Severity</label>
+					</code>
+				</entity>
+				<number id="785" name="planting_year"
+					relevant="accessibility = 0 and vegetation_type='104'" type="integer"
+					ui:tab="plot_det">
+					<label>Planting year</label>
+					<compare flag="error" gte="1900" lte="2015" />
+				</number>
+				<entity id="786" name="soil" relevant="accessibility = 0 and permanent"
+					ui:tab="plot_det">
+					<label>Soil</label>
+					<entity id="787" multiple="true" name="layer" since="1.1">
+						<label type="heading">Layers</label>
+						<code id="788" key="true" list="soil_depth_class" name="depth">
+							<label>Depth</label>
+						</code>
+						<boolean affirmativeOnly="true" id="789" name="north_sampled">
+							<label>N</label>
+						</boolean>
+						<boolean affirmativeOnly="true" id="790" name="east_sampled">
+							<label>E</label>
+						</boolean>
+						<boolean affirmativeOnly="true" id="791" name="south_sampled">
+							<label>S</label>
+						</boolean>
+						<boolean affirmativeOnly="true" id="792" name="west_sampled">
+							<label>W</label>
+						</boolean>
+						<text id="793" name="colour" relevant="false()">
+							<label>Colour</label>
+							<pattern flag="error"
+								regex="(((2.5|5|7.5|10)(R|YR|Y|GY|G|BG|B|PB|P|RP))|GLEY1|GLEY2)/1?[0-9]/([1-2]?[0-9])">
+								<message>Must correspond to colour codes indicated in
+									Munsell Soil Colour Book in the form
+									hue/value/chroma.
+								</message>
+							</pattern>
+						</text>
+						<code deprecated="1.1" id="794" list="soil_texture" name="texture">
+							<label>Texture</label>
+						</code>
+						<code id="795" list="soil_structure" name="structure">
+							<label>Structure</label>
+						</code>
+						<code id="796" list="stone_proportion" name="stones">
+							<label>Stones</label>
+							<prompt type="pc">Proportion of stones</prompt>
+						</code>
+					</entity>
+					<code deprecated="1.1" id="797" list="soil_structure" name="structure">
+						<label>Structure</label>
+					</code>
+					<number id="798" name="depth" since="1.1" type="real">
+						<label>Depth of organic layer</label>
+						<precision decimalDigits="0" unit="cm" />
+						<compare flag="error" gte="0" />
+					</number>
+					<text deprecated="1.1" id="799" name="colour">
+						<label>Colour</label>
+					</text>
+					<code deprecated="1.1" id="800" list="soil_texture" name="texture">
+						<label>Texture</label>
+					</code>
+					<boolean deprecated="1.1" id="801" name="sample">
+						<label>Sample collected</label>
+					</boolean>
+				</entity>
+				<code id="802" list="erosion_intensity" name="erosion" relevant="accessibility = 0"
+					required="true" ui:tab="plot_det">
+					<label>Erosion</label>
+				</code>
+				<code id="803" list="grazing_activity" name="grazing"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306"
+					required="true" ui:tab="plot_det">
+					<label>Grazing</label>
+				</code>
+				<code id="804" list="catchment_value" name="catchment" relevant="accessibility = 0"
+					required="true" ui:tab="plot_det">
+					<label>Water catchment</label>
+				</code>
+				<entity id="805" maxCount="3" minCount="1" name="human_impact"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306"
+					ui:tab="plot_det">
+					<label>Human impact</label>
+					<code id="806" list="human_impact" multiple="true" name="type"
+						required="true">
+						<label>Code</label>
+					</code>
+					<number id="807" name="years_ago" relevant="type &gt; 0" type="integer">
+						<label>Years ago</label>
+						<compare flag="error" gte="0" lte="200" />
+					</number>
+				</entity>
+				<code id="808" list="nwfp" maxCount="3" name="nwfp"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306"
+					required="true" ui:tab="plot_det">
+					<label>NWFP</label>
+				</code>
+				<code id="809" list="mgmt_proposal" maxCount="2" name="mgmt_proposal"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=203"
+					ui:tab="plot_det">
+					<label>Management proposal</label>
+				</code>
+				<entity id="810" maxCount="6" name="biodiversity"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306"
+					ui:tab="plot_det">
+					<label>Biodiversity observed</label>
+					<label type="heading">Biodiversity</label>
+					<code id="811" list="biodiversity" name="type">
+						<label>Code</label>
+					</code>
+					<text id="812" name="desc">
+						<label>Description</label>
+					</text>
+				</entity>
+				<text id="813" name="remarks" type="memo" ui:tab="plot_det">
+					<label>Remarks</label>
+				</text>
+				<boolean id="814" name="slope_correction_applied" relevant="accessibility = 0"
+					requiredIf="slope &gt;= 5" since="1.1" ui:tab="plot_det">
+					<label>Slope correction applied</label>
+				</boolean>
+				<entity id="815" name="shrubs"
+					relevant="accessibility = 0 and vegetation_type &gt;= 101 and vegetation_type &lt;= 306"
+					ui:tab="shrubs_regen">
+					<label>Shrub</label>
+					<label type="heading">Shrubs</label>
+					<description>Inside the plot (within 15 m of plot centre)</description>
+					<code id="816" list="shrub_coverage" name="coverage">
+						<label>Coverage class</label>
+						<default value="0" />
+					</code>
+					<number id="817" name="avg_height" requiredIf="coverage &gt; 0"
+						type="real">
+						<label>Mean height</label>
+						<precision decimalDigits="2" unit="m" />
+						<compare flag="error" gte="0" lte="10" />
+					</number>
+				</entity>
+				<entity id="818" multiple="true" name="regen"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306"
+					ui:tab="shrubs_regen">
+					<label>Regeneration</label>
+					<taxon highestRank="genus" id="819" name="species" required="true"
+						taxonomy="trees">
+						<label>Species</label>
+					</taxon>
+					<number id="820" name="count" required="true" type="integer">
+						<label>Count</label>
+						<description>Number of seedlings and saplings &gt;10cm
+			              tall and with DBH&lt;1cm</description>
+						<compare flag="error" gte="0" />
+					</number>
+				</entity>
+				<text id="821" name="regen_remarks"
+					relevant="accessibility = 0 and vegetation_type &gt;=101 and vegetation_type &lt;=306"
+					type="memo" ui:tab="shrubs_regen">
+					<label>Remarks</label>
+				</text>
+				<entity id="822" multiple="true" name="tree" relevant="accessibility = 0"
+					ui:tab="tree">
+					<label>Tree Stem</label>
+					<number id="823" key="true" name="tree_no" required="true"
+						type="integer">
+						<label>Tree no.</label>
+						<compare flag="error" gte="1" />
+					</number>
+					<number id="824" key="true" name="stem_no" type="integer">
+						<label>Stem no.</label>
+						<default value="1" />
+						<compare flag="error" gte="1" />
+					</number>
+					<taxon highestRank="genus" id="825" name="species" required="true"
+						taxonomy="trees">
+						<label>Species</label>
+					</taxon>
+					<number id="826" name="dbh" required="true" type="real">
+						<label>DBH</label>
+						<description>Diameter at the breast height (1.3 m)
+			              measured above bark</description>
+						<precision decimalDigits="1" unit="cm" />
+						<compare flag="error" gte="0.1" lte="700" />
+						<check expr="$this  &lt;= total_height * 8" flag="warn" if="health = 1">
+							<message>Unusual relationship between DBH and total
+								height.
+							</message>
+						</check>
+					</number>
+					<code id="827" list="tree_health" name="health" required="true">
+						<label>Health</label>
+					</code>
+					<code id="828" list="tree_origin" name="origin" required="true">
+						<label>Origin</label>
+					</code>
+					<number id="829" name="stump_diameter" type="real">
+						<label>Stump diameter</label>
+						<precision decimalDigits="1" unit="cm" />
+						<compare flag="error" gte="0" lte="700" />
+					</number>
+					<number id="830" name="stump_height" type="real">
+						<label>Stump height</label>
+						<precision decimalDigits="0" unit="cm" />
+						<compare flag="error" gte="0" />
+					</number>
+					<number id="831" name="total_height" type="real">
+						<label>Total height</label>
+						<precision decimalDigits="1" unit="m" />
+						<compare flag="error" gte="1" lte="70" />
+						<check expr="dbh &lt;= $this  * 8" flag="warn" if="health = 1">
+							<message>Unusual relationship between dbh and total
+								height.
+							</message>
+						</check>
+					</number>
+					<number id="832" name="bole_height" relevant="dbh &gt;= 20"
+						type="real">
+						<label>Bole height</label>
+						<precision decimalDigits="1" unit="m" />
+						<compare flag="error" gte="1" lte="70" />
+					</number>
+					<text id="833" name="remarks">
+						<label>Remarks</label>
+					</text>
+					<boolean id="834" name="marked">
+						<label>Painted</label>
+						<default value="false" />
+					</boolean>
+				</entity>
+				<entity id="835" multiple="true" name="dead_wood"
+					relevant="accessibility = 0 and vegetation_type &gt;= 101 and vegetation_type &lt;= 306"
+					ui:showPosition="true" ui:tab="dead_wood">
+					<label>Dead Wood</label>
+					<taxon id="836" name="species" required="true" taxonomy="trees">
+						<label>Species</label>
+					</taxon>
+					<number id="837" name="diameter1" required="true" type="real">
+						<label>Diameter 1</label>
+						<precision decimalDigits="1" unit="cm" />
+						<compare flag="error" gt="0" />
+						<compare flag="warn" lte="500" />
+					</number>
+					<number id="838" name="diameter2" required="true" type="real">
+						<label>Diameter 2</label>
+						<precision decimalDigits="1" unit="cm" />
+						<compare flag="error" gt="0" />
+						<compare flag="warn" lte="500" />
+					</number>
+					<number id="839" name="length" required="true" type="real">
+						<label>Length</label>
+						<precision decimalDigits="1" unit="m" />
+						<compare flag="error" gt="0" />
+						<compare flag="warn" lte="500" />
+					</number>
+					<number id="840" name="stem_cnt" type="integer">
+						<label>Stem count</label>
+						<compare flag="error" gte="0" />
+					</number>
+					<code id="841" list="deadwood_decay" name="decay">
+						<label>Decay</label>
+						<default value="S" />
+					</code>
+					<text id="842" name="remarks">
+						<label>Remarks</label>
+					</text>
+				</entity>
+				<entity id="843" multiple="true" name="stump" relevant="accessibility = 0"
+					ui:showPosition="true" ui:tab="stump">
+					<label>Stump</label>
+					<taxon id="844" name="species" required="true" taxonomy="trees">
+						<label>Species</label>
+					</taxon>
+					<number id="845" name="diameter" required="true" type="real">
+						<label>Diameter</label>
+						<precision decimalDigits="1" unit="cm" />
+						<compare flag="error" gte="5" lte="500" />
+					</number>
+					<number id="846" name="height" type="real">
+						<label>Height</label>
+						<default value="15" />
+						<precision decimalDigits="0" unit="cm" />
+						<compare flag="error" gt="0" lte="300" />
+					</number>
+					<number id="847" name="approx_year" type="integer">
+						<label>Years ago</label>
+						<description>Number of years ago when tree was felled. If
+			              year is missing, it is
+			              assumed that the tree well felled more than three years ago.</description>
+						<compare flag="error" gte="0" />
+					</number>
+					<text id="848" name="possible_uses">
+						<label>Possible uses</label>
+					</text>
+				</entity>
+				<entity id="849" multiple="true" name="bamboo"
+					relevant="accessibility = 0 and vegetation_type &gt;= 101 and vegetation_type &lt;= 306"
+					ui:tab="bamboo">
+					<label>Bamboo</label>
+					<taxon id="850" name="species" required="true" taxonomy="bamboo">
+						<label>Species</label>
+					</taxon>
+					<code id="851" list="bamboo_health" name="living">
+						<label>Alive/Dead</label>
+						<default value="A" />
+					</code>
+					<number id="852" name="avg_diameter" required="true" type="real">
+						<label>Average diameter</label>
+						<precision decimalDigits="1" unit="cm" />
+						<compare flag="error" gt="0" lte="30" />
+					</number>
+					<number id="853" name="avg_height" required="true" type="real">
+						<label>Average height</label>
+						<precision decimalDigits="1" unit="m" />
+						<compare flag="error" gte="0.5" lte="50" />
+						<compare flag="warn" lte="15" />
+					</number>
+					<number id="854" name="stem_cnt" required="true" type="integer">
+						<label>Stem count</label>
+						<compare flag="error" gte="1" />
+					</number>
+				</entity>
+				<text id="855" name="bamboo_remarks" type="memo" ui:tab="bamboo">
+					<label>Remarks</label>
+				</text>
+      		</entity>
+			<entity id="856" multiple="true" name="informant" ui:layout="form" ui:tab="informant">
+        		<label>Key Informant Interview</label>
+			<entity id="857" multiple="true" name="task" since="2.0">
+				<label type="heading">Control information</label>
+				<code id="858" key="true" list="se_data_task" name="type">
+					<label>Task</label>
+				</code>
+				<date id="859" name="date">
+					<label>Date</label>
+				</date>
+				<text id="860" name="person">
+					<label>Person</label>
+				</text>
+			</entity>
+			<code id="861" list="informant_role" multiple="true" name="role"
+				required="true">
+				<label type="number">1</label>
+				<label type="heading">Informant role(s)</label>
+				<prompt type="interview">Who is the Informant?</prompt>
+			</code>
+			<number id="862" name="household_count" required="true" type="integer">
+				<label type="number">2</label>
+				<label>Nearby households</label>
+				<prompt type="interview">What is the total number of households
+					that reside within boundaries of 2km sampling unit?
+				</prompt>
+				<compare flag="error" gte="1" />
+			</number>
+			<code id="863" list="population_health" name="population_health"
+				required="true">
+				<label type="number">3</label>
+				<label>Health condition</label>
+				<prompt type="interview">Compared to the rest of the population
+					in the district, how would you characterize the general
+					health condition of the population living near and inside
+					the Sampling Unit?
+				</prompt>
+			</code>
+			<text id="864" maxCount="3" multiple="true" name="product">
+				<label type="number">4</label>
+				<label type="heading">Most important product(s) harvested</label>
+				<prompt type="interview">Which are the three most important
+					products that most local people harvest from this area
+					(refer to area within SU-- point to 2km circle on
+					map/image)?
+				</prompt>
+			</text>
+			<number id="865" name="beneficiary_household_count" type="integer">
+				<label type="number">5</label>
+				<label>Harvesting households</label>
+				<prompt type="interview">Approximately how many households
+					(regardless of where they live) regularly harvest products
+					from this particular area (refer to area within SU-- point
+					to 2km circle on map/image)?
+				</prompt>
+				<compare flag="error" gte="1" />
+			</number>
+			<boolean id="866" name="rules_exist">
+				<label type="number">6</label>
+				<label>Product use rules</label>
+				<prompt type="interview">Are there any rules (informal or formal)
+					that constrain local households' uses of products?
+				</prompt>
+				<default value="false" />
+			</boolean>
+			<code id="867" list="rules_origin" multiple="true" name="rule_origin"
+				relevant="rules_exist">
+				<label type="number">7</label>
+				<label type="heading">Origin(s) of rules</label>
+				<prompt type="interview">If yes, what is the origin of these
+					rules?
+				</prompt>
+			</code>
+			<number id="868" name="all_weather_road_distance" type="real">
+				<label type="number">8a</label>
+				<label>Nearest all-weather road distance</label>
+				<precision decimalDigits="1" unit="km" />
+				<compare flag="error" gte="0" />
+			</number>
+			<number id="869" name="seasonal_road_distance" type="real">
+				<label type="number">8b</label>
+				<label>Nearest seasonal road distance</label>
+				<precision decimalDigits="1" unit="km" />
+				<compare flag="error" gte="0" />
+			</number>
+			<number id="870" name="village_distance" type="real">
+				<label type="number">8c</label>
+				<label>Nearest village distance</label>
+				<precision decimalDigits="1" unit="km" />
+				<compare flag="error" gte="0" />
+			</number>
+			<number id="871" name="health_centre_distance" type="real">
+				<label type="number">8d</label>
+				<label>Nearest health centre distance</label>
+				<precision decimalDigits="1" unit="km" />
+				<compare flag="error" gte="0" />
+			</number>
+			<number id="872" name="school_distance" type="real">
+				<label type="number">8e</label>
+				<label>Nearest school distance</label>
+				<precision decimalDigits="1" unit="km" />
+				<compare flag="error" gte="0" />
+			</number>
+			<number id="873" name="food_market_distance" type="real">
+				<label type="number">8f</label>
+				<label>Nearest food market place distance</label>
+				<precision decimalDigits="0" unit="km" />
+				<compare flag="error" gte="0" />
+			</number>
+			<code id="874" list="settlement_years" name="settlement_est"
+				required="true">
+				<label type="number">9</label>
+				<label>Settlement established</label>
+				<prompt type="interview">When was this settlement established
+					(when did the local household dwellings arrive to the
+					area)?
+				</prompt>
+			</code>
+			<code id="875" list="population_dynamic" name="population_change"
+				required="true">
+				<label type="number">10</label>
+				<label>Population trend</label>
+				<prompt type="interview">What is the population trend for the
+					past 5 years for this area?
+				</prompt>
+			</code>
+			<code id="876" list="settlement_history" multiple="true" name="major_event">
+				<label type="number">11</label>
+				<label type="heading">Major historical event(s)</label>
+				<prompt type="interview">What are some of the major historical
+					events that have affected local people and their land use
+					in this area?
+				</prompt>
+			</code>
+			<boolean id="877" name="mgmt_exists">
+				<label type="number">12</label>
+				<label>Forest management efforts</label>
+				<prompt type="interview">Have there been any efforts to manage or
+					somehow organize the forest resource use within this area?
+				</prompt>
+			</boolean>
+			<entity id="878" name="mgmt_gender_composition" relevant="mgmt_exists"
+				since="2.0">
+				<label>Forest management gender composition</label>
+				<prompt type="interview">If yes, what is the gender composition
+					of the group?
+				</prompt>
+				<number id="879" name="percent_male" type="real">
+					<label>Male</label>
+					<precision decimalDigits="0" unit="percent" />
+					<compare flag="error" gte="0" lte="100" />
+				</number>
+				<number id="880" name="percent_female" type="real">
+					<label>Female</label>
+					<precision decimalDigits="0" unit="percent" />
+					<compare flag="error" gte="0" lte="100" />
+					<check expr=". + percent_male = 100" flag="error">
+						<message>Male and female gender compositions should add
+							up to 100%</message>
+					</check>
+				</number>
+			</entity>
+			<code id="881" list="mgmt_leader" multiple="true" name="mgmt_leader"
+				relevant="mgmt_exists">
+				<label type="number">13</label>
+				<label>Management effort leader</label>
+				<prompt type="interview">If yes, was there a particular leader of
+					this effort?
+				</prompt>
+			</code>
+			<boolean id="882" name="mgmt_ongoing" relevant="mgmt_exists">
+				<label type="number">14</label>
+				<label>Management ongoing</label>
+				<prompt type="interview">Is this effort still ongoing?</prompt>
+			</boolean>
+			<code id="883" list="mgmt_success" name="mgmt_success" relevant="mgmt_exists">
+				<label type="number">15</label>
+				<label>Management success</label>
+				<prompt type="interview">In your opinion, would you consider the
+					efforts to manage and order forest use in this area to
+					have been successful?
+				</prompt>
+			</code>
+			<code id="884" list="mgmt_plan" name="mgmt_plan">
+				<label type="number">16</label>
+				<label>Active management plan</label>
+				<prompt type="interview">Does this area have an active forest
+					management plan?
+				</prompt>
+				<default value="90" />
+			</code>
+			<code id="885" list="mgmt_agreement" name="mgmt_agreement">
+				<label type="number">17</label>
+				<label>Management arrangement</label>
+				<prompt type="interview">Which management arrangement exist
+					between the land owner and other groups?
+				</prompt>
+				<default value="90" />
+			</code>
+			<code id="886" list="land_owner" name="land_owner" since="2.0">
+				<label type="number">17b</label>
+				<label>Land owner</label>
+				<prompt type="interview">Who owns the land?</prompt>
+				<default value="90" />
+			</code>
+			<code id="887" list="illegal_activity_effect_extent" name="illegal_activity">
+				<label type="number">18</label>
+				<label>Extent affected by illegal activities</label>
+				<prompt type="interview">To what extent is this particular area
+					affected by large-scale, illegal forestry activities?
+				</prompt>
+			</code>
+			<code id="888" list="law_enforcement_likelihood" name="large_scale_law_enforcement">
+				<label type="number">19</label>
+				<label>Large-scale illegal activity stopped</label>
+				<prompt type="interview">If a local person engages in large-scale
+					illegal activities, (i.e. large timber operation,
+					industrial charcoal making, etc) in this area, what is the
+					likelihood of anybody detecting or stopping this activity?
+				</prompt>
+			</code>
+			<code id="889" list="law_enforcement_likelihood" name="small_scale_law_enforcement">
+				<label type="number">20</label>
+				<label>Small-scale illegal activity stopped</label>
+				<prompt type="interview">If a local person engages in a
+					small-scale illegal activities, (i.e. cutting of timber,
+					charcoal making for local markets, etc), what is the
+					likelihood of anybody detecting or stopping this activity?
+				</prompt>
+			</code>
+			<boolean id="890" name="local_forest_leadership_exists">
+				<label type="number">21</label>
+				<label>Local forest leadership</label>
+				<prompt type="interview">Are there any local individuals who have
+					shown leadership to organize forest activities among
+					forest users in this area?
+				</prompt>
+			</boolean>
+			<text id="891" name="most_active_forest_org">
+				<label type="number">22</label>
+				<label>Most active forest organization</label>
+				<prompt type="interview">Which is the most active forestry
+					organization in this area? (write name)
+				</prompt>
+			</text>
+			<number id="892" name="org_nearest_office" type="real">
+				<label type="number">23</label>
+				<label>Distance to nearest office</label>
+				<prompt type="interview">If applicable, how far away from this SU
+					does this forestry organization (mentioned in Q22) have
+					its nearest office?
+				</prompt>
+				<precision decimalDigits="1" unit="km" />
+				<compare flag="error" gte="0" />
+			</number>
+			<text id="893" name="enumerators_comments" since="1.1" type="memo">
+				<label>Enumerator's Comments</label>
+			</text>
+		</entity>
+    </entity>
+    <entity id="894" name="household" ui:layout="form" ui:tab="hs_general" ui:tabSet="household">
+		<label>Household Survey</label>
+		<label type="heading">Household Surveys</label>
+		<!--- A. Control information -->
+		<entity id="895" multiple="true" name="task" since="2.0">
+			<label type="heading">Control information</label>
+			<code id="896" key="true" list="se_data_task" name="type">
+				<label>Task</label>
+			</code>
+			<date id="897" name="date">
+				<label>Date</label>
+			</date>
+			<text id="898" name="person">
+				<label>Person</label>
+			</text>
+		</entity>
+		<entity deprecated="2.0" id="899" name="log">
+			<label type="heading">Log</label>
+			<entity id="900" name="task" maxCount="5" >
+				<label>Task</label>
+				<text id="901" name="type">
+					<label>Task</label>
+				</text>
+				<date id="902" name="date">
+					<label>Date</label>
+				</date>
+				<text id="903" name="actor">
+					<label>Person</label>
+				</text>
+				<text id="904" name="status">
+					<label>Status</label>
+				</text>
+			</entity>
+		</entity>
+		<!-- B. Identification and Location of Household -->
+		<boolean id="905" name="sampling_unit">
+			<label>Outside 2 km Sampling Unit</label>
+		</boolean>
+		<text id="906" key="true" name="id">
+			<label>Household no.</label>
+			<pattern flag="error" regex="(X-)?[1-9][0-9]*" />
+		</text>
+		<number id="907" name="distance_to_forest" required="true" type="real">
+			<label>Distance to nearest forest</label>
+			<precision decimalDigits="1" unit="m" />
+			<compare flag="error" gte="0" />
+		</number>
+		<number id="908" name="distance_to_su_centre" required="true"
+			since="2.0" type="real">
+			<label>Distance to SU centre</label>
+			<precision decimalDigits="1" unit="m" />
+			<compare flag="error" gte="0" lte="50000" />
+		</number>
+		<text id="909" name="village" required="true">
+			<label>Village</label>
+		</text>
+		<text id="910" name="ward" required="true">
+			<label>Ward</label>
+		</text>
+		<text id="911" name="district" required="true">
+			<label>District</label>
+		</text>
+		<coordinate id="912" name="location" required="true">
+			<label>Household location</label>
+		</coordinate>
+		<entity id="913" name="time_study" required="true">
+			<label>Time study</label>
+			<time id="914" name="start_time" required="true">
+				<label>Start time</label>
+			</time>
+			<time id="915" name="end_time">
+				<label>End time</label>
+				<compare flag="error" gt="start_time" />
+			</time>
+		</entity>
+		<!-- C. Household Characteristics -->
+		<number id="916" name="household_member_count" type="integer">
+			<label type="number">1</label>
+			<label>Household members</label>
+			<prompt type="interview">How many members are there in this
+				household (people who share meals on a daily basis)?
+			</prompt>
+			<compare flag="error" gte="0" />
+		</number>
+		<number id="917" name="prev_household_member_count" type="integer">
+			<label type="number">2</label>
+			<label>Household members 5 years ago</label>
+			<prompt type="interview">How many members did this household have
+				five years ago?
+			</prompt>
+			<compare flag="error" gte="1" />
+		</number>
+		<number id="918" name="head_years_at_location" type="integer">
+			<label type="number">3</label>
+			<label>Head of household years at location</label>
+			<prompt type="interview">For how long has the head of this
+				household lived in this location?
+			</prompt>
+			<compare flag="error" gte="0" />
+		</number>
+		<text id="919" name="head_birthplace">
+			<label type="number">4</label>
+			<label>Head of household birthplace</label>
+			<prompt type="interview">What is the birthplace of the head of the
+				household? (name of district)
+			</prompt>
+		</text>
+		<entity id="920" multiple="true" name="head">
+			<label type="number">5</label>
+			<label type="heading">Head(s) of household</label>
+			<prompt type="interview">Who are the heads of the household (head
+				of household and spouse)?
+			</prompt>
+			<code id="921" key="true" list="household_position" name="position">
+				<label>Position in household</label>
+			</code>
+			<boolean id="922" name="interviewed">
+				<label>Person interviewed</label>
+			</boolean>
+			<number id="923" name="age" type="integer">
+				<label>Age</label>
+				<compare flag="error" gte="2" />
+			</number>
+			<code id="924" list="gender" name="gender">
+				<label>Sex</label>
+			</code>
+			<code id="925" list="education_level" name="education">
+				<label>Education</label>
+				<prompt type="interview">Education (highest level attained)</prompt>
+			</code>
+		</entity>
+		<!-- D. Household Assets -->
+		<entity id="926" name="house" ui:tab="hs_assets">
+			<label type="number">1</label>
+			<prompt type="interview">Describe the house in which this household
+				lives (Enumerator’s observation)
+			</prompt>
+			<code id="927" list="wall_material" name="wall_material" ui:tab="hs_assets">
+				<label type="number">a</label>
+				<label>Wall material</label>
+				<prompt type="interview">What is the type of material of (most
+					of) the walls?
+				</prompt>
+			</code>
+			<code id="928" list="roof_material" name="roof_material" ui:tab="hs_assets">
+				<label type="number">b</label>
+				<label>Roof material</label>
+				<prompt type="interview">What is the type of material of (most
+					of) the roof?
+				</prompt>
+			</code>
+		</entity>
+		<entity id="929" multiple="true" name="asset" ui:tab="hs_assets">
+			<label type="number">2</label>
+			<label type="heading">Assets</label>
+			<label>Asset</label>
+			<prompt type="interview">Please indicate the number of the
+				following items that are owned by the household:
+			</prompt>
+			<code id="930" key="true" list="asset" name="type">
+				<label>Item</label>
+			</code>
+			<number id="931" name="count" type="integer">
+				<label>Count</label>
+				<default value="0" />
+				<compare flag="error" gte="0" />
+			</number>
+		</entity>
+		<entity id="932" multiple="true" name="energy_source" ui:tab="hs_assets">
+			<label type="number">3</label>
+			<label>Main energy source</label>
+			<prompt type="interview">Please indicate the household's main
+				sources of energy and how they are acquired.
+			</prompt>
+			<code id="933" key="true" list="energy_source" name="type">
+				<label>Energy source used</label>
+			</code>
+			<code id="934" list="energy_acquisition_method" multiple="true"
+				name="acquisition_method">
+				<label type="heading">Acquisition method(s)</label>
+			</code>
+			<range id="935" name="monthly_consumption" type="real">
+				<label>Qty/mo consumed</label>
+				<compare flag="error" gt="0" />
+			</range>
+			<text id="936" name="monthly_consumption_unit" relevant="type='other'">
+				<label>Other Unit</label>
+			</text>
+			<code id="937" list="energy_end_purpose" multiple="true" name="end_purpose">
+				<label type="heading">End purpose(s)</label>
+			</code>
+		</entity>
+		<boolean id="938" name="alt_energy_source_available" ui:tab="hs_assets">
+			<label type="number">3a</label>
+			<label>Alt. energy sources</label>
+			<prompt type="interview">Are there any alternatives to
+				firewood/charcoal that are available here but not used?
+			</prompt>
+		</boolean>
+		<entity id="939" multiple="true" name="alt_energy_source"
+			relevant="alt_energy_source_available" ui:tab="hs_assets">
+			<label type="number">3b</label>
+			<label type="heading">Alternative energy sources</label>
+			<code id="940" key="true" list="alt_energy_source" name="type">
+				<label>Energy source</label>
+			</code>
+			<boolean id="941" name="available" required="true">
+				<label>Available</label>
+			</boolean>
+			<code id="942" list="reason_for_not_using_energy_source" name="reason_not_used"
+				relevant="available" required="true">
+				<label>Reason(s) for not using</label>
+			</code>
+		</entity>
+		<entity id="943" multiple="true" name="land_access" ui:tab="hs_assets">
+			<label type="number">4</label>
+			<label type="heading">Land access and ownership</label>
+			<prompt type="interview">Please indicate the amount of land that
+				you currently own and have access to:
+			</prompt>
+			<code id="944" key="true" list="land_category" name="type">
+				<label>Category</label>
+			</code>
+			<entity id="945" name="individually_owned">
+				<label>Individually owned</label>
+				<range id="946" name="area" required="true">
+					<label>Area</label>
+					<precision decimalDigits="0" unit="ha" />
+					<precision decimalDigits="0" unit="ac" />
+					<compare flag="error" gte="0" />
+				</range>
+				<code id="947" list="respect_for_boundaries" name="boundaries_respected"
+					relevant="area">
+					<label>Boundaries respected</label>
+					<prompt type="interview">Do outsiders respect boundaries?</prompt>
+					<default value="NA" />
+				</code>
+			</entity>
+			<entity id="948" name="communally_owned">
+				<label>Communally owned</label>
+				<range id="949" name="area" required="true">
+					<label>Area</label>
+					<precision decimalDigits="0" default="true" unit="ac" />
+					<precision decimalDigits="0" unit="ha" />
+				</range>
+				<code id="950" list="respect_for_boundaries" name="boundaries_respected"
+					relevant="area">
+					<label>Boundaries respected</label>
+					<prompt type="interview">Do outsiders respect boundaries?</prompt>
+					<default value="NA" />
+				</code>
+			</entity>
+		</entity>
+		<entity id="951" name="private_property_change" ui:tab="hs_assets">
+			<label>Private property change</label>
+			<prompt type="interview">Has the household's private land property
+				changed over the last five years?
+			</prompt>
+			<code id="952" list="private_property_change" name="type"
+				required="true">
+				<label type="number">5</label>
+				<label>Change</label>
+			</code>
+			<number id="953" name="amount" relevant="type='A' or type='B'"
+				required="true" type="real">
+				<label type="number">6</label>
+				<label>Amount</label>
+				<precision decimalDigits="0" unit="ha" />
+				<precision decimalDigits="0" unit="ac" />
+				<compare flag="error" gte="0" />
+			</number>
+			<text id="954" name="reasons" relevant="type='A' or type='B'"
+				required="true" type="memo">
+				<label type="number">7</label>
+				<label>Reason(s)</label>
+				<prompt type="interview">Why did this change occur? (text to
+					indicate source cause of change)
+				</prompt>
+			</text>
+		</entity>
+		<!-- E. Household food security and risk -->
+		<entity id="955" multiple="true" name="food_source" ui:tab="hs_foodsecurity">
+			<label type="number">1</label>
+			<label>Food source</label>
+			<label type="heading">Food source(s)</label>
+			<prompt type="interview">In the past year, where did the
+				household’s food come from?
+			</prompt>
+			<code id="956" key="true" list="food_source" name="type">
+				<label>Source</label>
+			</code>
+			<number id="957" name="duration" type="integer">
+				<label>Months food lasts</label>
+				<compare flag="error" gte="0" />
+			</number>
+		</entity>
+		<number deprecated="2.0" id="958" name="food_shortage_month_count"
+			type="integer" ui:tab="hs_foodsecurity">
+			<label type="number">2</label>
+			<label>Food shortage months</label>
+			<compare flag="error" gte="0" />
+		</number>
+		<code id="959" list="month" multiple="true" name="food_shortage_month"
+			since="2.0" ui:tab="hs_foodsecurity">
+			<label type="number">2</label>
+			<label>Food shortage months</label>
+			<prompt type="interview" />
+		</code>
+		<boolean id="960" name="supplemental_nwfp_used" ui:tab="hs_foodsecurity">
+			<label type="number">3</label>
+			<label>Supplemental NWFP used</label>
+			<prompt type="interview">During critical food shortage months does
+				your household use forest products to meet food needs?
+			</prompt>
+		</boolean>
+		<entity id="961" multiple="true" name="supplemental_nwfp"
+			relevant="supplemental_nwfp_used" ui:tab="hs_foodsecurity">
+			<label type="number">4</label>
+			<label>Supplemental NWFP</label>
+			<label type="heading">Supplemental NWFPs</label>
+			<prompt type="interview">If yes, please indicate the forest
+				products that are
+				collected to supplement household food supplies during periods of food
+				shortage:
+			</prompt>
+			<code id="962" key="true" list="supplemental_nwfp" name="type">
+				<label>Product</label>
+			</code>
+			<text id="963" name="species">
+				<label>Species</label>
+			</text>
+			<number id="964" name="quantity" type="real">
+				<label>Qty/week</label>
+				<prompt type="interview">Quantity collected/week</prompt>
+				<precision decimalDigits="0" />
+				<compare flag="error" gte="0" />
+			</number>
+			<text deprecated="2.0" id="965" name="unit">
+				<label>Unit</label>
+			</text>
+			<code id="966" list="supplemental_nwfp_unit" name="quantity_unit"
+				since="2.0">
+				<label>Unit</label>
+			</code>
+			<number id="967" name="rank" type="integer">
+				<label>Rank</label>
+				<prompt type="interview">Rank (1-5)</prompt>
+				<compare flag="error" gte="1" lte="5" />
+			</number>
+		</entity>
+		<boolean id="968" name="unexpected_expense_incurred" required="true"
+			ui:tab="hs_foodsecurity">
+			<label type="number">5</label>
+			<label>Large expenditures</label>
+			<prompt type="interview">Has your household faced any unexpectedly
+				large expenditures during the past 12 months?
+			</prompt>
+		</boolean>
+		<entity id="969" multiple="true" name="shortfall_cause"
+			relevant="unexpected_expense_incurred" ui:tab="hs_foodsecurity">
+			<label type="number">6</label>
+			<label type="heading">Cause(s) of shortfall</label>
+			<prompt type="interview">If yes, what event(s) caused this
+				shortfall (fill in table below-multiple answers possible):
+			</prompt>
+			<code id="970" key="true" list="shortfall_cause" name="type">
+				<label>Event</label>
+			</code>
+			<boolean id="971" name="existence" required="true">
+				<label>Exists</label>
+			</boolean>
+			<code id="972" list="shortfall_cause_response" multiple="true"
+				name="response" relevant="existence" required="true">
+				<label>Response</label>
+			</code>
+		</entity>
+		<boolean id="973" name="forest_disturbances_occured" required="true"
+			ui:tab="hs_foodsecurity">
+			<label type="number">7</label>
+			<label>Recent disturbances</label>
+			<prompt type="interview">In the last 5 years have there been any
+				major disturbances to the local forests that decreased the
+				availability of forest products?
+			</prompt>
+		</boolean>
+		<entity id="974" multiple="true" name="forest_disturbance"
+			relevant="forest_disturbances_occured" ui:tab="hs_foodsecurity">
+			<label type="number">8</label>
+			<label type="heading">Response to food disturbances</label>
+			<prompt type="interview">If yes, what were these events and how did
+				your household cope with this shortfall?
+			</prompt>
+			<code id="975" key="true" list="forest_disturbance" name="type">
+				<label>Event</label>
+			</code>
+			<boolean id="976" name="existence" required="true">
+				<label>Exists</label>
+			</boolean>
+			<code id="977" list="forest_disturbance_response" multiple="true"
+				name="response" relevant="existence">
+				<label>Response</label>
+			</code>
+		</entity>
+		<entity id="978" multiple="true" name="income_source" ui:tab="hs_income_opinions">
+			<label type="number">1</label>
+			<label type="heading">Income sources</label>
+			<prompt type="interview">In the past 12 months, which have been the
+				most important sources of income for the household?
+			</prompt>
+			<code id="979" key="true" list="income_source" name="type">
+				<label>Income source</label>
+			</code>
+			<boolean id="980" name="subsistence" relevant="type!='other'"
+				required="true">
+				<label>Source of substinence</label>
+			</boolean>
+			<number id="981" name="rank" relevant="subsistence" type="integer">
+				<label>Rank</label>
+				<compare flag="error" gte="1" />
+			</number>
+			<boolean id="982" name="cash_income" relevant="type!='other'"
+				required="true">
+				<label>Source of cash income</label>
+			</boolean>
+			<number id="983" name="cash_income_amount" relevant="cash_income"
+				type="real">
+				<label>Cash income</label>
+				<prompt type="interview">Cash income during last 12 months (T.
+					Shs)
+				</prompt>
+				<precision decimalDigits="0" unit="tsh" />
+				<compare flag="warn" gte="0" />
+			</number>
+		</entity>
+		<!-- G. Household opinions -->
+		<entity id="984" name="can_reduce_consumption" ui:tab="hs_income_opinions">
+			<label type="number">1</label>
+			<label>Consumption reduction</label>
+			<prompt type="interview">Can nearby households reduce their forest
+				product consumption?
+			</prompt>
+			<boolean id="985" name="flag">
+				<label>Can reduce</label>
+			</boolean>
+			<text id="986" name="comments" type="memo">
+				<label>Comments</label>
+			</text>
+		</entity>
+		<entity id="987" name="can_protect_forests_better" ui:tab="hs_income_opinions">
+			<label type="number">2</label>
+			<label>Community protection</label>
+			<prompt type="interview">Do you think that local communities in
+				this area are more effective in protecting forests than
+				government officials?
+			</prompt>
+			<boolean id="988" name="flag">
+				<label>More effective</label>
+			</boolean>
+			<text id="989" name="comments" type="memo">
+				<label>Comments</label>
+			</text>
+		</entity>
+		<entity id="990" name="rules_fair" ui:tab="hs_income_opinions">
+			<label type="number">3</label>
+			<label>Rules</label>
+			<prompt type="interview">Do you think that the rules regarding the
+				use of forest resources in this area are fair to everyone?
+			</prompt>
+			<boolean id="991" name="flag">
+				<label>Fair</label>
+			</boolean>
+			<text id="992" name="comments" type="memo">
+				<label>Comments</label>
+			</text>
+		</entity>
+		<entity id="993" name="penalties_fair" ui:tab="hs_income_opinions">
+			<label type="number">4</label>
+			<label>Penalties</label>
+			<prompt type="interview">4. Do you think that the penalties for
+				breaking forest use rules in this area are fair to everyone?
+			</prompt>
+			<boolean id="994" name="flag">
+				<label>Fair</label>
+			</boolean>
+			<text id="995" name="comments" type="memo">
+				<label>Comments</label>
+			</text>
+		</entity>
+		<!-- H. Forest Products and Services -->
+		<entity id="996" multiple="true" name="product_used" ui:tab="hs_forest_products">
+			<label type="number">1</label>
+			<label>Forest product</label>
+			<prompt type="interview">Please list all tree and forest products
+				used in the past 12 months. For the three most important
+				products for the households, please characterize demand,
+				supply etc (variables in shaded portionsthe right hand side
+				of the table).)
+			</prompt>
+			<code id="997" list="product_category" name="category">
+				<label>Category</label>
+				<prompt type="interview">Product Category</prompt>
+			</code>
+			<text id="998" name="species">
+				<label>Species name(s)</label>
+				<prompt type="interview">Species names + language</prompt>
+			</text>
+			<code id="999" list="product_used_land_use" multiple="true" name="land_use">
+				<label>Land use(s)</label>
+			</code>
+			<number id="1000" name="rank" type="integer">
+				<label>Rank</label>
+				<compare flag="error" gte="1" />
+			</number>
+			<code id="1001" list="distance_to_product_source" name="distance_to_source">
+				<label>Distance to source</label>
+			</code>
+			<code id="1002" list="harvester" name="harvester">
+				<label>Harvester gender</label>
+				<prompt type="interview">Who harvests?</prompt>
+			</code>
+			<code id="1003" list="harvesting_change" name="harvesting_change">
+				<label>Harvesting change</label>
+			</code>
+			<number id="1004" name="harvested_amount" type="real">
+				<label>Qty. harvested</label>
+				<precision decimalDigits="0" />
+				<compare flag="error" gte="0" />
+			</number>
+			<code id="1005" list="harvest_unit" name="harvested_unit">
+				<label>Unit</label>
+			</code>
+			<code id="1006" list="forest_product_end_use" name="end_use">
+				<label>End Use</label>
+			</code>
+			<code id="1007" list="harvest_rights" name="rights">
+				<label>Rights</label>
+			</code>
+			<code id="1008" list="conflicts_existence_product" name="conflicts">
+				<label>Conflicts</label>
+			</code>
+			<code id="1009" list="local_rules" name="local_rules">
+				<label>Local rules</label>
+			</code>
+			<boolean id="1010" name="leg_awareness">
+				<label>Leg. awareness</label>
+			</boolean>
+			<code id="1011" list="leg_enforcement" name="leg_enforcement">
+				<label>Leg. enforcement</label>
+			</code>
+		</entity>
+		<entity id="1012" multiple="true" name="service_used" ui:tab="hs_forest_products">
+			<label type="number">2</label>
+			<label type="heading">Environmental services used</label>
+			<prompt type="interview">Please list all forest-related services
+				that the household has benefited from in the past 12 months
+			</prompt>
+			<code id="1013" key="true" list="forest_service" name="type">
+				<label>Service type</label>
+			</code>
+			<boolean id="1014" name="exists">
+				<label>Exists</label>
+			</boolean>
+			<number id="1015" name="rank" relevant="exists" type="integer">
+				<label>Rank</label>
+				<compare flag="error" gte="1" />
+			</number>
+			<entity id="1016" name="payment" relevant="exists">
+				<label>Payment</label>
+				<boolean id="1017" name="received">
+					<label>Received</label>
+				</boolean>
+				<code id="1018" list="payment_source" name="source" relevant="received">
+					<label>From</label>
+				</code>
+				<number id="1019" name="amount" relevant="received" type="real">
+					<label>Amount</label>
+					<precision decimalDigits="0" unit="tsh" />
+					<compare flag="error" gte="0" />
+				</number>
+			</entity>
+		</entity>
+		<entity id="1020" multiple="true" name="land_use_change" ui:tab="hs_forest_products">
+			<label type="number">3</label>
+			<label>Land use change</label>
+			<prompt type="interview">During the last five years, how have the
+				following land use characteristics changed in this locality?
+			</prompt>
+			<code id="1021" key="true" list="land_use_characteristic" name="type">
+				<label>Land use</label>
+			</code>
+			<code id="1022" list="land_use_change" name="change" required="true">
+				<label>Change</label>
+			</code>
+		</entity>
+		<!-- I. Participation in Organizations and Forest User Groups -->
+		<entity id="1023" name="group_participation" ui:tab="hs_org_comments">
+			<label type="number">I</label>
+			<label type="heading">Parcipation in Organizations and Forest User
+				Groups
+			</label>
+			<prompt type="interview">We are interested in learning about your
+				household’s involvement in groups that seek to improve
+				forest use (i.e. these can be either formal or informal
+				groups that undertake forest use activities)
+			</prompt>
+			<boolean id="1024" name="aware_of_pfm">
+				<label type="number">1</label>
+				<label>Aware of PFM</label>
+				<prompt type="interview">Are you aware of any initiatives related
+					to Participatory Forest Management?
+				</prompt>
+			</boolean>
+			<boolean id="1025" name="aware_of_other">
+				<label type="number">2</label>
+				<label>Other forest initiatives</label>
+				<prompt type="interview">Are there any other initiatives in this
+					area that work on forest-related issues?
+				</prompt>
+			</boolean>
+			<boolean id="1026" name="involvement" relevant="aware_of_other">
+				<label type="number">3</label>
+				<label>Involvement</label>
+				<prompt type="interview">Are you or any member of your household
+					involved in a group that organizes activities related to
+					management of the forest (i.e. fire fighting, patrolling,
+					tourism, tree planting, etc)?
+				</prompt>
+			</boolean>
+			<text id="1027" name="names" relevant="involvement">
+				<label type="number">4</label>
+				<label>Name(s) of group(s)</label>
+				<prompt type="interview">What is the name of the group(s) your
+					household is involved with?
+				</prompt>
+			</text>
+			<code id="1028" list="group_participation_benefit" name="benefit_effects"
+				relevant="involvement">
+				<label type="number">5</label>
+				<label>Effects</label>
+				<prompt type="interview">Overall, how would you say the existence
+					of the organization has affected the benefits that the
+					household gets from the forest?
+				</prompt>
+			</code>
+			<code id="1029" list="frequency" name="patrol_frequency"
+				relevant="involvement">
+				<label type="number">6</label>
+				<label>Patrol frequency</label>
+				<prompt type="interview">How frequently does the group/community
+					that you belong to actively monitor and patrol the forests
+					to detect intruders and thieves of forest products?
+				</prompt>
+			</code>
+			<code id="1030" list="frequency" name="govt_visit_frequency">
+				<label type="number">7</label>
+				<label>Gov't visit frequency</label>
+				<prompt type="interview">How frequently do government officials
+					(district, region, central) visit the forest area?
+				</prompt>
+			</code>
+			<code id="1031" list="violators_caught" name="violators_caught">
+				<label type="number">8</label>
+				<label>Violators caught</label>
+				<prompt type="interview">In the past 12 months, approximately how
+					many individuals have been caught breaking the established
+					rules of forest use?
+				</prompt>
+			</code>
+			<code id="1032" list="punishment_decider" name="punishment_decider">
+				<label type="number">9</label>
+				<label>Punishment decider</label>
+				<prompt type="interview">Who decided which punishment these
+					individuals should receive?
+				</prompt>
+			</code>
+		</entity>
+      <!-- J. Relationships with forestry organizations -->
+      <entity id="1033" name="org_relationships" ui:tab="hs_org_comments">
+			<label type="number">J</label>
+			<label>Relationships with forestry organizations</label>
+			<boolean affirmativeOnly="true" id="1034" name="org_na">
+				<label>N/A</label>
+			</boolean>
+			<entity id="1035" name="org" relevant="org_na" multiple="true">
+				<label type="number">1</label>
+				<label>Organization</label>
+				<prompt type="interview">Which organizations do you consider to
+					be the most important for your participation in
+					forest-related activities? (if the respondent perceives no
+					organization to be important, please mark ‘NA’ above
+					table)
+				</prompt>
+				<code id="1036" key="true" list="org_type" name="type">
+					<label>Type</label>
+					<prompt type="interview">Type of Organization</prompt>
+				</code>
+				<number id="1037" name="rank" type="integer">
+					<label>Rank</label>
+					<compare flag="error" gte="1" lte="3" />
+				</number>
+				<code id="1038" list="frequency_of_interaction" name="frequency">
+					<label>Frequency of Interaction</label>
+				</code>
+			</entity>
+		</entity>
+		<entity id="1039" name="forest_governance" since="2.0"
+			ui:tab="hs_forest_governance">
+			<label type="number">K</label>
+			<label>Forest Governance</label>
+			<entity id="1040" name="accountability">
+			<label>Accountability</label>
+			<boolean id="1041" name="problems_experienced">
+				<label type="number">1</label>
+				<label>Usage problems</label>
+				<prompt type="interview">In the past 12 months, have you
+					experienced any
+					problems relating to the use of land, water, forests or any other
+					local
+					natural resource?</prompt>
+			</boolean>
+			<boolean id="1042" name="assistance_requested" relevant="problems_experienced">
+				<label type="number">2</label>
+				<label>Assistance requested</label>
+				<prompt type="interview">If yes, have you asked any government
+					representative (local or national) for assistance or
+					help of any kind to help solve the problem?</prompt>
+			</boolean>
+			<code id="1043" list="assistance_response" name="assistance_response"
+				relevant="assistance_requested">
+				<label type="number">3</label>
+				<label>Assistance response</label>
+				<prompt type="interview">If yes, what was the response?</prompt>
+			</code>
+		</entity>
+		<entity id="1044" name="conflict_dispute_mgmt">
+			<label>Conflict and dispute management</label>
+			<boolean id="1045" name="conflict_experienced">
+				<label type="number">4</label>
+				<label>Conflicts experienced</label>
+				<prompt type="interview">In the past 12 months, have you or
+					your neighbours experienced any disputes or conflict related to the use
+					of
+					land, water, forests or any other local natural
+					resource?
+				</prompt>
+			</boolean>
+			<boolean id="1046" name="resolution_attempted" relevant="conflict_experienced">
+				<label type="number">5</label>
+				<label>Resolution attempted</label>
+				<prompt type="interview">If yes, have you attempted to solve
+					the conflict?
+				</prompt>
+			</boolean>
+			<code id="1047" list="forum" name="forum_used" relevant="resolution_attempted">
+				<label type="number">6</label>
+				<label>Forum used</label>
+				<prompt type="interview">If yes, which forum did you use for
+					solving conflict?
+				</prompt>
+			</code>
+			<code id="1048" list="forum_effective" name="forum_effective"
+				relevant="forum_used &gt; 0">
+				<label type="number">7</label>
+				<label>Forum effective</label>
+				<prompt type="interview">Was the forum effective in solving the
+					conflict?
+				</prompt>
+			</code>
+			<boolean id="1049" name="conflict_ongoing" relevant="forum_effective = 0">
+				<label type="number">8</label>
+				<label>Conflict ongoing</label>
+				<prompt type="interview">If no, does conflict still prevail?</prompt>
+			</boolean>
+        </entity>
+        <entity id="1050" name="monitoring_enforcement">
+			<label>Monitoring and enforcement</label>
+			<code id="1051" list="first_contact" name="first_contact">
+				<label type="number">9</label>
+				<label>First contact</label>
+				<prompt type="interview">In case you or other community members
+					detect a
+					legal infraction by an outsider related to the use of land, water,
+					forests or any other local natural resource, whom do you
+					first
+					contact?
+				</prompt>
+			</code>
+			<code id="1052" list="first_contact_reason" name="reason">
+				<label type="number">10</label>
+				<label>Reason</label>
+				<prompt type="interview">Why?</prompt>
+			</code>
+			<boolean id="1053" name="necessary">
+				<label type="number">11</label>
+				<label>Necessary</label>
+				<prompt type="interview">Has this been necessary during the
+					last 12 months?
+				</prompt>
+			</boolean>
+		</entity>
+		<entity id="1054" name="transparency">
+			<label>Transparency</label>
+			<boolean id="1055" name="denied_free_services">
+				<label type="number">12</label>
+				<label>Denied services</label>
+				<prompt type="interview">In the last 12 months, in your
+					interactions with
+					Government officials, related to the use of land, water, forests or any
+					other local natural resource, have you ever been denied
+					the free
+					services that you are entitled to receive and asked to provide a side
+					payment for the services?
+				</prompt>
+			</boolean>
+			<number id="1056" name="requests" relevant="denied_free_services"
+				type="integer">
+				<label type="number">13</label>
+				<label>Number of requests</label>
+				<prompt type="interview">Within the last 12 months how often
+					have you
+					been met with such requests? (state number of times)
+				</prompt>
+				<compare flag="error" gte="0" />
+			</number>
+		</entity>
+		<entity id="1057" name="equity">
+			<label>Equity</label>
+			<boolean id="1058" name="pfm_participation">
+				<label type="number">14</label>
+				<label>PFM participation</label>
+				<prompt type="interview">1In the past 12 months has your
+					householdparticipated in Participatory Forest Management
+					activities?
+				</prompt>
+			</boolean>
+			<boolean id="1059" name="pfm_benefits" relevant="pfm_participation">
+				<label type="number">15</label>
+				<label>Benefits</label>
+				<prompt type="interview">If yes, have you received any benefits
+					from such participation?
+				</prompt>
+			</boolean>
+			<code id="1060" list="share_code" name="fair_share" relevant="pfm_benefits">
+				<label type="number">16</label>
+				<label>Fair share</label>
+				<prompt type="interview">If yes, do you think you receive a
+					fair share of the total benefits awarded to the
+					community?
+				</prompt>
+			</code>
+		</entity>
+		<entity id="1061" name="govt_assistance">
+			<label>Access to government assistance, incentives for land
+				use alternatives
+			</label>
+			<boolean id="1062" name="assistance_received">
+				<label type="number">17</label>
+				<label>Benefited from assistance</label>
+				<prompt type="interview">In the past 12 months, has your
+					household
+					benefited from technical assistance or training, related to the use of
+					land, water, forests or any other local natural
+					resource?
+				</prompt>
+			</boolean>
+			<text id="1063" multiple="true" name="training_subject" relevant="assistance_received">
+				<label type="number">18</label>
+				<label>Training subject</label>
+				<label type="heading">Training subjects</label>
+				<prompt type="interview">If yes, please indicate the subject of
+					the assistance/training?
+				</prompt>
+			</text>
+			<number id="1064" name="total_days" relevant="assistance_received"
+				type="integer">
+				<label type="number">19</label>
+				<label>Total days</label>
+				<prompt type="interview">Please indicate the total number of
+					days you were receiving the support/training)
+				</prompt>
+				<compare flag="error" gte="1" />
+			</number>
+		</entity>
+      	</entity>
+			<text id="1065" name="comments" type="memo" ui:tab="hs_comments">
+				<label>Enumerator's Comments</label>
+			</text>
+		</entity>
+	</schema>
+</survey>

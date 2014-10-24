@@ -10,7 +10,7 @@ import java.util.List;
  * @author S. Ricci
  * 
  */
-public class User {
+public class User implements org.openforis.collect.api.User {
 
 	private Boolean enabled;
 	private Integer id;
@@ -32,6 +32,11 @@ public class User {
 		this.id = id;
 	}
 
+	@Override
+	public String getUsername() {
+		return getName();
+	}
+	
 	public void addRole(UserRole role) {
 		roles.add(role);
 	}

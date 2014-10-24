@@ -8,10 +8,12 @@
 	<packaging>pom</packaging>
 
 	<modules>
+		<module>idm-test</module>
 		<module>collect-core</module>
 		<module>collect-rdb</module>
 		<module>collect-server</module>
 		<module>collect-client</module>
+		<module>collect-js</module>
 		<module>collect-web</module>
 		<module>collect-assembly</module>
 		<module>collect-autoupdater</module>
@@ -22,7 +24,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<idm.version>3.2.3-SNAPSHOT</idm.version>
 		<openforis.commons.version>0.0.14</openforis.commons.version>
 		<spring.version>3.2.8.RELEASE</spring.version>
 		<spring-security.version>3.2.4.RELEASE</spring-security.version>
@@ -210,6 +211,14 @@
 			<url>http://www.openforis.org/nexus/content/repositories/thirdparty/</url>
 		</repository>
 		<repository>
+			<id>open-foris-maven-releases</id>
+			<url>https://github.com/openforis/mvn-repo/raw/master/releases</url>
+		</repository>
+		<repository>
+			<id>open-foris-maven-snapshots</id>
+			<url>https://github.com/openforis/mvn-repo/raw/master/snapshots</url>
+		</repository>
+		<repository>
 			<id>flex-compiler</id>
 			<url>https://repository.sonatype.org/content/groups/flexgroup</url>
 			<releases>
@@ -310,29 +319,6 @@
 				<groupId>commons-vfs</groupId>
 				<artifactId>commons-vfs</artifactId>
 				<version>1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.openforis.idm</groupId>
-				<artifactId>idm-api</artifactId>
-				<version>${idm.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.openforis.idm</groupId>
-				<artifactId>idm-api</artifactId>
-				<version>${idm.version}</version>
-				<type>test-jar</type>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.openforis.idm</groupId>
-				<artifactId>idm-api-protostuff</artifactId>
-				<version>${idm.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.openforis.idm</groupId>
-				<artifactId>idm-test</artifactId>
-				<version>${idm.version}</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>

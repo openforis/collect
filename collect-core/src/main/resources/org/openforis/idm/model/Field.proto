@@ -1,0 +1,11 @@
+package org.openforis.idm.model;
+
+option optimize_for = LITE_RUNTIME;
+option java_package = "com.example.foo";
+
+message Field {
+	optional bytes value = 1;
+	optional string remarks = 2;
+	optional string symbol = 3;
+	optional bytes valueType = 4;
+}
