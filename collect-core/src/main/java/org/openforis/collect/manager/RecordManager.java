@@ -46,7 +46,7 @@ public class RecordManager {
 
 //	private final Log log = LogFactory.getLog(RecordManager.class);
 	
-	private static final int DEFAULT_LOCK_TIMEOUT_MILLIS = 60000;
+	private static final int DEFAULT_LOCK_TIMEOUT_MILLIS = 300000;
 	
 	@Autowired
 	private RecordDao recordDao;
@@ -167,7 +167,7 @@ public class RecordManager {
 	
 	@Transactional
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
-		if ( isLockingEnabled() ) {
+		if(isLockingEnabled()) {
 			checkSurveyRecordValidationNotInProgress(survey);
 			lockManager.isLockAllowed(user, recordId, sessionId, forceUnlock);
 			lockManager.lock(recordId, user, sessionId, forceUnlock);
@@ -178,6 +178,10 @@ public class RecordManager {
 				releaseLock(recordId);
 			}
 			throw new RecordNotOwnedException(record.getOwner().getName());
+		}
+		if(isLockingEnabled()) {
+			//refresh lock because record loading can be time consuming
+			lockManager.lock(recordId, user, sessionId);
 		}
 		return record;
 	}
@@ -196,20 +200,11 @@ public class RecordManager {
 	}
 	
 	public CollectRecord load(CollectSurvey survey, int recordId) {
-		return load(survey, recordId, (Step) null);
+		Step lastStep = determineLastStep(survey, recordId);
+		return load(survey, recordId, lastStep);
 	}
-	
+
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
-		if ( step == null ) {
-			//fetch last record step
-			RecordFilter filter = new RecordFilter(survey);
-			filter.setRecordId(recordId);
-			List<CollectRecord> summaries = recordDao.loadSummaries(filter, null);
-			if ( ! summaries.isEmpty() ) {
-				CollectRecord summary = summaries.get(0);
-				step = summary.getStep();
-			}
-		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
@@ -568,7 +563,20 @@ public class RecordManager {
 			}
 		}
 	}
-
+	
+	private Step determineLastStep(CollectSurvey survey, int recordId) {
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRecordId(recordId);
+		List<CollectRecord> summaries = recordDao.loadSummaries(filter, null);
+		if ( summaries.isEmpty() ) {
+			return null;
+		} else {
+			CollectRecord summary = summaries.get(0);
+			Step lastStep = summary.getStep();
+			return lastStep;
+		}
+	}
+	
 	public void checkIsLocked(int recordId, User user, String lockId) throws RecordUnlockedException {
 		if ( lockingEnabled ) {
 			lockManager.checkIsLocked(recordId, user, lockId);
