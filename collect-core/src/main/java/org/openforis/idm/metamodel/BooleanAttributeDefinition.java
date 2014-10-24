@@ -3,10 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.openforis.idm.model.BooleanAttribute;
 import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Node;
@@ -23,9 +19,9 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 
 	public static final String VALUE_FIELD = "value";
 	
-	private final FieldDefinition<?>[] FIELD_DEFINITIONS = {
-			new FieldDefinition<Boolean>(VALUE_FIELD, "v", null, Boolean.class, this)
-	};
+	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
+		new FieldDefinition<Boolean>(VALUE_FIELD, "v", null, Boolean.class, this)
+	);
 	
 	private boolean affirmativeOnly;
 
@@ -54,10 +50,10 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		return Collections.unmodifiableList(Arrays.asList(FIELD_DEFINITIONS));
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		return fieldDefinitionByName;
 	}
-
+	
 	@Override
 	public String getMainFieldName() {
 		return VALUE_FIELD;

@@ -23,12 +23,6 @@
 			<version>2.0.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>idm-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>

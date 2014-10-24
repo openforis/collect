@@ -4,12 +4,16 @@
 package org.openforis.idm.model;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -243,6 +247,23 @@ public class Record {
 		return dependenciesFor;
 	}
 
+	public List<NodePointer> determineConstantRelevancePointers(Node<?> node) {
+		final Set<NodePointer> result = new LinkedHashSet<NodePointer>();
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.push(node);
+		while(!stack.isEmpty()) {
+			Node<?> n = stack.pop();
+			NodeDefinition def = n.getDefinition();
+			if ( StringUtils.isNotBlank(def.getRelevantExpression()) && survey.getRelevanceSources(def).isEmpty() ) {
+				result.add(new NodePointer(n));
+			}
+			if(n instanceof Entity) {
+				stack.addAll(((Entity) n).getChildren());
+			}
+		}
+		return new ArrayList<NodePointer>(result);
+	}
+	
 	public List<NodePointer> determineRelevanceDependentNodes(Collection<Node<?>> nodes) {
 		List<NodePointer> result = relevanceDependencies.dependenciesFor(nodes);
 		return result;

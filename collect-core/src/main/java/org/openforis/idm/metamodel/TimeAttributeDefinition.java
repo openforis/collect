@@ -3,10 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Time;
@@ -24,10 +20,10 @@ public class TimeAttributeDefinition extends AttributeDefinition {
 	public static final String MINUTE_FIELD = "minute";
 	public static final String HOUR_FIELD = "hour";
 
-	private final FieldDefinition<?>[] FIELD_DEFINITIONS = {
-			new FieldDefinition<Integer>(HOUR_FIELD, "h", "h", Integer.class, this), 
-			new FieldDefinition<Integer>(MINUTE_FIELD, "m", "m", Integer.class, this)
-	};
+	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
+		new FieldDefinition<Integer>(HOUR_FIELD, "h", "h", Integer.class, this), 
+		new FieldDefinition<Integer>(MINUTE_FIELD, "m", "m", Integer.class, this)
+	);
 	
 	protected TimeAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
@@ -49,10 +45,10 @@ public class TimeAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		return Collections.unmodifiableList(Arrays.asList(FIELD_DEFINITIONS));
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		return fieldDefinitionByName;
 	}
-
+	
 	@Override
 	public String getMainFieldName() {
 		throw new IllegalArgumentException("Main field not defined");

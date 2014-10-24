@@ -66,7 +66,10 @@ public class NodePointer {
 	
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(getEntityPath()).append(childName).toHashCode();
+		return new HashCodeBuilder()
+			.append(entity)
+			.append(childName)
+			.toHashCode();
 	}
 
 	@Override
@@ -79,7 +82,7 @@ public class NodePointer {
 			return false;
 		NodePointer other = (NodePointer) obj;
 		return new EqualsBuilder()
-				.append(getEntityPath(), other.getEntityPath())
+				.append(entity, other.entity)
 				.append(childName, other.childName)
 				.isEquals();
 	}

@@ -2,7 +2,6 @@ package org.openforis.idm.model;
 
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,22 +28,11 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 		this.definition = definition;
 		this.valueType = valueType;
 		this.attribute = attribute;
-		state = new State();
+		this.state = new State();
 	}
 	
 	public Field(FieldDefinition<T> definition, Class<T> valueType) {
 		this(definition, valueType, null);
-	}
-	
-	@Override
-	public int getIndex() {
-		if ( attribute != null ) {
-			List<Field<?>> siblings = attribute.getFields();
-			int result = siblings.indexOf(this);
-			return result;
-		} else {
-			return -1;
-		}
 	}
 	
 	public T getValue() {

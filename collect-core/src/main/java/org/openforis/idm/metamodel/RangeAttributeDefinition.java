@@ -3,7 +3,7 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +26,18 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 	
 	public static final String FROM_FIELD = "from";
 	public static final String TO_FIELD = "to";
+
+	private final FieldDefinition<Integer> integerFromField = new FieldDefinition<Integer>(FROM_FIELD, "f", FROM_FIELD, Integer.class, this);
+	private final FieldDefinition<Integer> integerToField = new FieldDefinition<Integer>(TO_FIELD, "t", TO_FIELD, Integer.class, this);
+	private final FieldDefinition<Double> realFromField = new FieldDefinition<Double>(FROM_FIELD, "f", FROM_FIELD, Double.class, this);
+	private final FieldDefinition<Double> realToField = new FieldDefinition<Double>(TO_FIELD, "t", TO_FIELD, Double.class, this);
+	private final FieldDefinition<String> unitNameField = new FieldDefinition<String>(UNIT_NAME_FIELD, "u_name", "unit", String.class, this);;
+	private final FieldDefinition<Integer> unitIdField = new FieldDefinition<Integer>(UNIT_FIELD, "u", "unit_id", Integer.class, this);;
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private final List integerTypeFieldDefinitions = Collections.unmodifiableList(Arrays.asList(integerFromField, integerToField, unitNameField, unitIdField));
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private final List realTypeFieldDefinitions = Collections.unmodifiableList(Arrays.asList(realFromField, realToField, unitNameField, unitIdField));
 	
 	RangeAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
@@ -59,25 +71,27 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		throw new RuntimeException("Invalid range type " + getType());
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<FieldDefinition<?>> getFieldDefinitions() {
-		List<FieldDefinition<?>> result = new ArrayList<FieldDefinition<?>>(2);
-		Type type = getType();
-		switch (type) {
+		switch (getType()) {
 		case INTEGER:
-			result.add(new FieldDefinition<Integer>(FROM_FIELD, "f", FROM_FIELD, Integer.class, this));
-			result.add(new FieldDefinition<Integer>(TO_FIELD, "t", TO_FIELD, Integer.class, this));
-			break;
+			return integerTypeFieldDefinitions;
 		case REAL:
-			result.add(new FieldDefinition<Double>(FROM_FIELD, "f", FROM_FIELD, Double.class, this));
-			result.add(new FieldDefinition<Double>(TO_FIELD, "t", TO_FIELD, Double.class, this));
-			break;
+			return realTypeFieldDefinitions;
 		default:
 			throw new UnsupportedOperationException("Unknown type");
 		}
-		result.add(new FieldDefinition<String>(UNIT_NAME_FIELD, "u_name", "unit", String.class, this));
-		result.add(new FieldDefinition<Integer>(UNIT_FIELD, "u", "unit_id", Integer.class, this));
-		return Collections.unmodifiableList(result);
+	}
+	
+	@Override
+	public FieldDefinition<?> getFieldDefinition(String name) {
+		for (FieldDefinition<?> def : getFieldDefinitions()) {
+			if(def.getName().equals(name)) {
+				return def;
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -97,4 +111,10 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 	public String getMainFieldName() {
 		throw new IllegalArgumentException("Main field not defined");
 	}
+	
+	@Override
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		throw new UnsupportedOperationException();
+	}
+	
 }

@@ -273,12 +273,6 @@
 			<groupId>org.openforis.commons</groupId>
 			<artifactId>commons-versioning</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.openforis.collect</groupId>
-			<artifactId>idm-test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
 		<!-- Apache commons -->
 		<dependency>
 			<groupId>commons-logging</groupId>

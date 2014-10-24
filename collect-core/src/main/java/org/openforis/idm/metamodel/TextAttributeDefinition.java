@@ -3,10 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
@@ -22,9 +18,9 @@ public class TextAttributeDefinition extends AttributeDefinition implements KeyA
 	
 	private static final String VALUE_FIELD = "value";
 	
-	private final FieldDefinition<?>[] FIELD_DEFINITIONS = {
-			new FieldDefinition<String>(VALUE_FIELD, "v", null, String.class, this)
-	};
+	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
+		new FieldDefinition<String>(VALUE_FIELD, "v", null, String.class, this)
+	);
 	
 	public enum Type {
 		SHORT, MEMO
@@ -67,8 +63,8 @@ public class TextAttributeDefinition extends AttributeDefinition implements KeyA
 	}
 	
 	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		return Collections.unmodifiableList(Arrays.asList(FIELD_DEFINITIONS));
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		return fieldDefinitionByName;
 	}
 	
 	@Override

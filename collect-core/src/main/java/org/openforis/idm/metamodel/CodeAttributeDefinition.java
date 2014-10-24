@@ -4,7 +4,6 @@
 package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,11 +28,11 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 	public static final String CODE_FIELD = "code";
 	public static final String QUALIFIER_FIELD = "qualifier";
 	
-	private final FieldDefinition<?>[] FIELD_DEFINITIONS = {
-		new FieldDefinition<String>(CODE_FIELD, "c", null, String.class, this), 
+	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
+		new FieldDefinition<String>(CODE_FIELD, "c", null, String.class, this),
 		new FieldDefinition<String>(QUALIFIER_FIELD, "q", "other", String.class, this)
-	};
-
+	);
+	
 	private boolean key;
 	private boolean allowUnlisted;
 	private CodeList list;
@@ -290,10 +289,10 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 	}
 	
 	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		return Collections.unmodifiableList(Arrays.asList(FIELD_DEFINITIONS));
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		return fieldDefinitionByName;
 	}
-
+	
 	@Override
 	public String getMainFieldName() {
 		return CODE_FIELD;

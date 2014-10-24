@@ -6,7 +6,9 @@ package org.openforis.idm.model;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.openforis.commons.collection.CollectionUtils;
@@ -24,6 +26,7 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	private static final long serialVersionUID = 1L;
 
 	private Field[] fields;
+	private Map<String, Field> fieldByName;
 	private transient ValidationResults validationResults;
 	
 	protected Attribute(D definition) {
@@ -46,11 +49,14 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	private void initFields() {
 		List<FieldDefinition<?>> fieldsDefinitions = definition.getFieldDefinitions();
 		this.fields = new Field[fieldsDefinitions.size()];
+		this.fieldByName = new HashMap<String, Field>(fieldsDefinitions.size());
 		for (int i = 0; i < fieldsDefinitions.size(); i++) {
 			FieldDefinition fieldDefn = fieldsDefinitions.get(i);
 			Field<?> field = (Field) fieldDefn.createNode();
 			field.setAttribute(this);
+			field.index = i;
 			this.fields[i] = field;
+			this.fieldByName.put(fieldDefn.getName(), field);
 		}
 	}
 	
@@ -63,25 +69,9 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	 * @return the field requested, or null if field name is invalid
 	 */
 	public Field<?> getField(String name) {
-		Integer index = getFieldIndex(name);
-		if ( index == null ) {
-			return null;
-		} else {
-			return getField(index);
-		}
+		return fieldByName.get(name);
 	}
 
-	private Integer getFieldIndex(String name) {
-		List<FieldDefinition<?>> fieldsDefinitions = definition.getFieldDefinitions();
-		for (int i = 0; i < fieldsDefinitions.size(); i++) {
-			FieldDefinition fieldDefn = fieldsDefinitions.get(i);
-			if (fieldDefn.getName().equals(name)) {
-				return i;
-			}
-		}
-		return null;
-	}
-	
 	public List<Field<?>> getFields() {
 		List<Field<?>> list = new ArrayList<Field<?>>();
 		for (Field<?> field : fields) {

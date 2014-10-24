@@ -33,13 +33,13 @@ public class Entity extends Node<EntityDefinition> {
 
 	private static final long serialVersionUID = 1L;
 	
-	Map<String, ArrayList<Node<? extends NodeDefinition>>> childrenByName;
+	Map<String, List<Node<?>>> childrenByName;
 	private ValidationState derivedStateCache;
 	Map<String, State> childStates;
 	
 	public Entity(EntityDefinition definition) {
 		super(definition);
-		this.childrenByName = new HashMap<String, ArrayList<Node<? extends NodeDefinition>>>();
+		this.childrenByName = new HashMap<String, List<Node<?>>>();
 		this.derivedStateCache = new ValidationState();
 		this.childStates = new HashMap<String, State>();
 	}
@@ -85,7 +85,7 @@ public class Entity extends Node<EntityDefinition> {
 	 */
 	@Override
 	public boolean isEmpty() {
-		Collection<ArrayList<Node<?>>> childLists = childrenByName.values();
+		Collection<List<Node<?>>> childLists = childrenByName.values();
 		for (List<Node<?>> list : childLists) {
 			for (Node<?> node : list) {
 				if (!node.isEmpty()) {
@@ -108,7 +108,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public Node<? extends NodeDefinition> get(String name, int index) {
-		List<Node<? extends NodeDefinition>> list = childrenByName.get(name);
+		List<Node<?>> list = childrenByName.get(name);
 		if (list == null || index >= list.size()) {
 			return null;
 		} else {
@@ -285,19 +285,23 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public void move(String name, int oldIndex, int newIndex) {
-		List<Node<? extends NodeDefinition>> list = childrenByName.get(name);
+		List<Node<?>> list = childrenByName.get(name);
 		if (list != null) {
-			Node<? extends NodeDefinition> obj = list.remove(oldIndex);
+			Node<?> obj = list.remove(oldIndex);
+			decreaseNodeIndexes(list, oldIndex);
 			list.add(newIndex, obj);
+			increaseNodeIndexes(list, newIndex);
 		}
 	}
 
 	public Node<? extends NodeDefinition> remove(String name, int index) {
-		List<Node<? extends NodeDefinition>> list = childrenByName.get(name);
+		List<Node<?>> list = childrenByName.get(name);
 		if (list == null) {
 			return null;
 		} else {
-			Node<? extends NodeDefinition> node = list.remove(index);
+			Node<?> node = list.remove(index);
+			
+			decreaseNodeIndexes(list, index);
 			
 			if( node instanceof Entity ) {
 				Entity entity = (Entity)node;
@@ -326,18 +330,21 @@ public class Entity extends Node<EntityDefinition> {
 		String name = child.getName();
 
 		// Get or create list containing children
-		ArrayList<Node<? extends NodeDefinition>> children = childrenByName.get(name);
+		List<Node<?>> children = childrenByName.get(name);
 		if (children == null) {
-			children = new ArrayList<Node<? extends NodeDefinition>>();
+			children = new ArrayList<Node<?>>();
 			childrenByName.put(name, children);
 		}
 		// Add item
 		if (idx == null) {
 			children.add(child);
+			child.index = children.size() -1;
 		} else {
 			children.add(idx, child);
+			child.index = idx;
+			
+			increaseNodeIndexes(children, idx + 1);
 		}
-
 		child.parent = this;
 		
 		if ( record != null ) {
@@ -359,7 +366,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public List<Node<? extends NodeDefinition>> getAll(String name) {
-		List<Node<? extends NodeDefinition>> children = childrenByName.get(name);
+		List<Node<?>> children = childrenByName.get(name);
 		return  CollectionUtils.unmodifiableList(children);
 	}
 
@@ -381,9 +388,9 @@ public class Entity extends Node<EntityDefinition> {
 		sw.append(":\n");
 		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
 		for (NodeDefinition defn : definitions) {
-			List<Node<? extends NodeDefinition>> children = childrenByName.get(defn.getName());
+			List<Node<?>> children = childrenByName.get(defn.getName());
 			if (children != null) {
-				for (Node<? extends NodeDefinition> child : children) {
+				for (Node<?> child : children) {
 					child.write(sw, indent + 1);
 					sw.append("\n");
 				}
@@ -398,10 +405,10 @@ public class Entity extends Node<EntityDefinition> {
 		// While there are still nodes to insert
 		while (!stack.isEmpty()) {
 			// Pop the next list of nodes to insert
-			List<Node<? extends NodeDefinition>> nodes = stack.pop();
+			List<Node<?>> nodes = stack.pop();
 			// Insert this list in order
 			for (int i = 0; i < nodes.size(); i++) {
-				Node<? extends NodeDefinition> node = nodes.get(i);
+				Node<?> node = nodes.get(i);
 
 				if ( node == null ) {
 					throw new IllegalStateException("Null node in entity children list");
@@ -415,7 +422,7 @@ public class Entity extends Node<EntityDefinition> {
 					List<NodeDefinition> childDefns = defn.getChildDefinitions();
 					for (NodeDefinition childDefn : childDefns) {
 						String childName = childDefn.getName();
-						List<Node<? extends NodeDefinition>> children = entity.getAll(childName);
+						List<Node<?>> children = entity.getAll(childName);
 						if (children != null) {
 							stack.push(children);
 						}
@@ -424,12 +431,32 @@ public class Entity extends Node<EntityDefinition> {
 			}
 		}
 	}
+	
+	/**
+	 * Decrease nodes' index for each node after the specified index (included)
+	 */
+	private void decreaseNodeIndexes(List<Node<?>> nodes, int afterIndexInclusive) {
+		for(int i = afterIndexInclusive; i < nodes.size(); i++) {
+			Node<?> n = nodes.get(i);
+			n.index--;
+		}
+	}
+	
+	/**
+	 * Increment nodes' index for each node after the specified index
+	 */
+	private void increaseNodeIndexes(List<Node<?>> nodes, int afterIndexInclusive) {
+		for(int i = afterIndexInclusive; i < nodes.size(); i++) {
+			Node<?> n = nodes.get(i);
+			n.index++;
+		}
+	}
 
 	private class NodeStack extends Stack<List<Node<? extends NodeDefinition>>> {
 		private static final long serialVersionUID = 1L;
 
 		public NodeStack(Entity root) {
-			ArrayList<Node<? extends NodeDefinition>> rootList = new ArrayList<Node<? extends NodeDefinition>>(1);
+			List<Node<?>> rootList = new ArrayList<Node<?>>(1);
 			rootList.add(root);
 			push(rootList);
 		}
@@ -490,7 +517,7 @@ public class Entity extends Node<EntityDefinition> {
 	 *         order.
 	 */
 	public List<Node<? extends NodeDefinition>> getChildren() {
-		List<Node<? extends NodeDefinition>> result = new ArrayList<Node<? extends NodeDefinition>>();
+		List<Node<?>> result = new ArrayList<Node<?>>();
 		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
 		for (NodeDefinition defn : definitions) {
 			String childName = defn.getName();
@@ -500,10 +527,10 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public List<Node<?>> getChildren(String childName) {
-		List<Node<? extends NodeDefinition>> result = new ArrayList<Node<? extends NodeDefinition>>();
-		List<Node<? extends NodeDefinition>> children = childrenByName.get(childName);
+		List<Node<?>> result = new ArrayList<Node<?>>();
+		List<Node<?>> children = childrenByName.get(childName);
 		if (children != null) {
-			for (Node<? extends NodeDefinition> child : children) {
+			for (Node<?> child : children) {
 				result.add(child);
 			}
 		}
@@ -522,8 +549,8 @@ public class Entity extends Node<EntityDefinition> {
 			result.add(0, n);
 			if(n instanceof Entity){
 				Entity entity = (Entity) n;
-				List<Node<? extends NodeDefinition>> children = entity.getChildren();
-				for (Node<? extends NodeDefinition> child : children) {
+				List<Node<?>> children = entity.getChildren();
+				for (Node<?> child : children) {
 					stack.push(child);
 				}
 			}
@@ -560,14 +587,14 @@ public class Entity extends Node<EntityDefinition> {
 			}
 			Set<String> childNames = childrenByName.keySet();
 			for (String childName : childNames) {
-				ArrayList<Node<? extends NodeDefinition>> children = childrenByName.get(childName);
-				ArrayList<Node<? extends NodeDefinition>> otherChildren = other.childrenByName.get(childName);
+				List<Node<?>> children = childrenByName.get(childName);
+				List<Node<?>> otherChildren = other.childrenByName.get(childName);
 				if ( children.size() != otherChildren.size() ) {
 					return false;
 				}
 				for (int i = 0; i < children.size(); i++) {
-					Node<? extends NodeDefinition> child = children.get(i);
-					Node<? extends NodeDefinition> otherChild = otherChildren.get(i);
+					Node<?> child = children.get(i);
+					Node<?> otherChild = otherChildren.get(i);
 					if ( ! child.deepEquals(otherChild) ) {
 						return false;
 					}
@@ -607,11 +634,11 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	protected void normalizeChildrenByName() {
-		Set<Entry<String, ArrayList<Node<?>>>> entrySet = childrenByName.entrySet();
-		Iterator<Entry<String, ArrayList<Node<?>>>> iterator = entrySet.iterator();
+		Set<Entry<String, List<Node<?>>>> entrySet = childrenByName.entrySet();
+		Iterator<Entry<String, List<Node<?>>>> iterator = entrySet.iterator();
 		while ( iterator.hasNext() ) {
-			Entry<String, ArrayList<Node<?>>> entry = iterator.next();
-			ArrayList<Node<?>> nodes = entry.getValue();
+			Entry<String, List<Node<?>>> entry = iterator.next();
+			List<Node<?>> nodes = entry.getValue();
 			if ( nodes == null || nodes.isEmpty()) {
 				iterator.remove();
 			}

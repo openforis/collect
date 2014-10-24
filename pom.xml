@@ -8,12 +8,10 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>idm-test</module>
 		<module>collect-core</module>
 		<module>collect-rdb</module>
 		<module>collect-server</module>
 		<module>collect-client</module>
-		<module>collect-js</module>
 		<module>collect-web</module>
 		<module>collect-assembly</module>
 		<module>collect-autoupdater</module>

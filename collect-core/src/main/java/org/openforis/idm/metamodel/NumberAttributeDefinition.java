@@ -3,7 +3,7 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +26,16 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition implem
 	
 	public static final String VALUE_FIELD = "value";
 
+	private final FieldDefinition<Integer> integerValueField = new FieldDefinition<Integer>(VALUE_FIELD, "v", null, Integer.class, this);
+	private final FieldDefinition<Double> realValueField = new FieldDefinition<Double>(VALUE_FIELD, "v", null, Double.class, this);
+	private final FieldDefinition<String> unitNameField = new FieldDefinition<String>(UNIT_NAME_FIELD, "u_name", UNIT_NAME_FIELD, String.class, this);
+	private final FieldDefinition<Integer> unitIdField = new FieldDefinition<Integer>(UNIT_FIELD, "u", "unit_id", Integer.class, this);
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private final List integerTypeFieldDefinitions = Collections.unmodifiableList(Arrays.asList(integerValueField, unitNameField, unitIdField));
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private final List realTypeFieldDefinitions = Collections.unmodifiableList(Arrays.asList(realValueField, unitNameField, unitIdField));
+	
 	private boolean key;
 
 	NumberAttributeDefinition(Survey survey, int id) {
@@ -70,25 +80,35 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition implem
 		throw new RuntimeException("Invalid type " + getType());
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<FieldDefinition<?>> getFieldDefinitions() {
-		List<FieldDefinition<?>> result = new ArrayList<FieldDefinition<?>>(2);
 		Type type = getType();
 		switch (type) {
 		case INTEGER:
-			result.add(new FieldDefinition<Integer>(VALUE_FIELD, "v", null, Integer.class, this));
-			break;
+			return integerTypeFieldDefinitions;
 		case REAL:
-			result.add(new FieldDefinition<Double>(VALUE_FIELD, "v", null, Double.class, this));
-			break;
+			return realTypeFieldDefinitions;
 		default:
 			throw new UnsupportedOperationException("Unknown type");
 		}
-		result.add(new FieldDefinition<String>(UNIT_NAME_FIELD, "u_name", UNIT_NAME_FIELD, String.class, this));
-		result.add(new FieldDefinition<Integer>(UNIT_FIELD, "u", "unit_id", Integer.class, this));
-		return Collections.unmodifiableList(result);
+	}
+	
+	@Override
+	public FieldDefinition<?> getFieldDefinition(String name) {
+		for (FieldDefinition<?> def : getFieldDefinitions()) {
+			if(def.getName().equals(name)) {
+				return def;
+			}
+		}
+		return null;
 	}
 
+	@Override
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		throw new UnsupportedOperationException();
+	}
+	
 	@Override
 	public Class<? extends Value> getValueType() {
 		Type type = getType();

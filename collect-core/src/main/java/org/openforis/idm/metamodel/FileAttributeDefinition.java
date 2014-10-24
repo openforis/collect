@@ -4,8 +4,6 @@
 package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
@@ -25,10 +23,10 @@ public class FileAttributeDefinition extends AttributeDefinition {
 	private static final String FILE_NAME_FIELD = "file_name";
 	private static final String FILE_SIZE_FIELD = "file_size";
 
-	private final FieldDefinition<?>[] FIELD_DEFINITIONS = {
-			new FieldDefinition<String>(FILE_NAME_FIELD, "f", null, String.class, this),
-			new FieldDefinition<Long>(FILE_SIZE_FIELD, "s", "size", Long.class, this)
-	};
+	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
+		new FieldDefinition<String>(FILE_NAME_FIELD, "f", null, String.class, this),
+		new FieldDefinition<Long>(FILE_SIZE_FIELD, "s", "size", Long.class, this)
+	);
 	
 	private Integer maxSize;
 	private List<String> extensions;
@@ -94,8 +92,8 @@ public class FileAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		return Collections.unmodifiableList(Arrays.asList(FIELD_DEFINITIONS));
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		return fieldDefinitionByName;
 	}
 	
 	@Override

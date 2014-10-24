@@ -251,10 +251,10 @@ public abstract class DependencyGraph<T> {
 		
 		public GraphSorter(Set<GraphNode> nodes) {
 			this.nodes = nodes;
-			results = new LinkedList<T>();
-			this.permanentlyMarkedNodeIds = new HashSet<Object>();
-			this.temporarilyMarkedNodeIds = new HashSet<Object>();
-			this.unmarkedNodes = new HashSet<GraphNode>(this.nodes);
+			this.results = new LinkedList<T>();
+			this.permanentlyMarkedNodeIds = new LinkedHashSet<Object>(nodes.size());
+			this.temporarilyMarkedNodeIds = new LinkedHashSet<Object>(nodes.size());
+			this.unmarkedNodes = new LinkedHashSet<GraphNode>(this.nodes);
 		}
 		
 		public List<T> sort() {

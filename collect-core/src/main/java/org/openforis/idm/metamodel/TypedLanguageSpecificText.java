@@ -1,7 +1,5 @@
 package org.openforis.idm.metamodel;
 
-import javax.xml.bind.annotation.XmlAttribute;
-
 
 /**
  * 
@@ -12,7 +10,6 @@ public class TypedLanguageSpecificText<T extends Object> extends LanguageSpecifi
 
 	private static final long serialVersionUID = 1L;
 	
-	@XmlAttribute(name = "type")
 	private T type;
 
 	public TypedLanguageSpecificText(T type, String language, String text) {

@@ -31,10 +31,12 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	transient Integer id;
 	transient Integer internalId;
 	transient Entity parent;
+	transient int index;
 	
 	Integer definitionId;
 
 	protected Node() {
+		this.index = 0;
 	}
 	
 	public Node(D definition) {
@@ -102,18 +104,7 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	}
 	
 	public int getIndex() {
-		if ( parent == null ) {
-			return 0;
-		} else {
-			String name = getName();
-			List<Node<?>> children = parent.getAll(name);
-			for (int i=0; i<children.size(); i++) {
-				if (children.get(i)==this) {
-					return i;
-				}
-			}
-			throw new IllegalStateException("Node parent relationship broken");
-		}
+		return index;
 	}
 	
 	public boolean isRelevant() {

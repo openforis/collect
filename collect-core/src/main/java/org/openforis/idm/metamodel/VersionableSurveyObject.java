@@ -1,22 +1,16 @@
 package org.openforis.idm.metamodel;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * @author G. Miceli
  * @author M. Togna
  * @author S. Ricci
  */
-@XmlTransient
 public abstract class VersionableSurveyObject extends IdentifiableSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 
-	@XmlTransient
 	private ModelVersion sinceVersion;
-
-	@XmlTransient
 	private ModelVersion deprecatedVersion;
 
 	protected VersionableSurveyObject(Survey survey, int id) {
@@ -37,7 +31,6 @@ public abstract class VersionableSurveyObject extends IdentifiableSurveyObject {
 		return sinceVersion == null ? null : sinceVersion.getName();
 	}
 	
-	@XmlAttribute(name = "since")
 	public void setSinceVersionByName(String name) {
 		this.sinceVersion = name == null ? null : findVersion(name);
 	}
@@ -46,7 +39,6 @@ public abstract class VersionableSurveyObject extends IdentifiableSurveyObject {
 		return deprecatedVersion == null ? null : deprecatedVersion.getName();
 	}
 	
-	@XmlAttribute(name = "deprecated")
 	public void setDeprecatedVersionByName(String name) {
 		this.deprecatedVersion = name == null ? null : findVersion(name);
 	}

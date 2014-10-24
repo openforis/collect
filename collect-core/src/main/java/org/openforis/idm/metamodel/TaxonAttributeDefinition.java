@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlTransient;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.TaxonAttribute;
@@ -36,14 +34,13 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 
 	private String qualifiers;
 	
-	@XmlTransient
-	private final FieldDefinition<?>[] FIELD_DEFINITIONS = {
-			new FieldDefinition<String>(CODE_FIELD_NAME, "c", "code", String.class, this), 
-			new FieldDefinition<String>(SCIENTIFIC_NAME_FIELD_NAME, "s", "name", String.class, this), 
-			new FieldDefinition<String>(VERNACULAR_NAME_FIELD_NAME, "v", "vn", String.class, this), 
-			new FieldDefinition<String>(LANGUAGE_CODE_FIELD_NAME, "l", "lang", String.class, this), 
-			new FieldDefinition<String>(LANGUAGE_VARIETY_FIELD_NAME, "lv", "lang_var", String.class, this)
-	};
+	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
+		new FieldDefinition<String>(CODE_FIELD_NAME, "c", "code", String.class, this), 
+		new FieldDefinition<String>(SCIENTIFIC_NAME_FIELD_NAME, "s", "name", String.class, this), 
+		new FieldDefinition<String>(VERNACULAR_NAME_FIELD_NAME, "v", "vn", String.class, this),
+		new FieldDefinition<String>(LANGUAGE_CODE_FIELD_NAME, "l", "lang", String.class, this),
+		new FieldDefinition<String>(LANGUAGE_VARIETY_FIELD_NAME, "lv", "lang_var", String.class, this)
+	);
 	
 	private String taxonomy;
 	private TaxonRank highestTaxonRank;
@@ -64,10 +61,10 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		return Collections.unmodifiableList(Arrays.asList(FIELD_DEFINITIONS));
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		return fieldDefinitionByName;
 	}
-
+	
 	@Override
 	public Class<? extends Value> getValueType() {
 		return TaxonOccurrence.class;

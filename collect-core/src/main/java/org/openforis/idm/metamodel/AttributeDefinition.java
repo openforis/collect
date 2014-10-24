@@ -5,6 +5,7 @@ package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
@@ -95,7 +96,7 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 //		return survey.getCheckDependencies(this);
 //	}
 	
-	public abstract List<FieldDefinition<?>> getFieldDefinitions();
+	protected abstract FieldDefinitionMap getFieldDefinitionMap();
 	
 	public List<String> getFieldNames() {
 		List<String> result = new ArrayList<String>();
@@ -105,14 +106,12 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		return Collections.unmodifiableList(result);
 	}
 	
+	public List<FieldDefinition<?>> getFieldDefinitions() {
+		return getFieldDefinitionMap().listValues();
+	}
+	
 	public FieldDefinition<?> getFieldDefinition(String name) {
-		List<FieldDefinition<?>> defns = getFieldDefinitions();
-		for (FieldDefinition<?> fieldDefinition : defns) {
-			if ( fieldDefinition.getName().equals(name) ) {
-				return fieldDefinition;
-			}
-		}
-		return null;
+		return getFieldDefinitionMap().get(name);
 	}
 
 	public List<FieldLabel> getFieldLabels() {
@@ -214,5 +213,37 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	
 	public static class FieldLabelMap extends TypedLanguageSpecificTextAbstractMap<FieldLabel, String> {
 		private static final long serialVersionUID = 1L;
+	}
+	
+	static class FieldDefinitionMap extends LinkedHashMap<String, FieldDefinition<?>> {
+		
+		private static final long serialVersionUID = 1L;
+		
+
+		public FieldDefinitionMap(FieldDefinition<?>... fieldDefs) {
+			for (FieldDefinition<?> def : fieldDefs) {
+				super.put(def.getName(), def);
+			}
+		}
+		
+		public List<FieldDefinition<?>> listValues() {
+			return Collections.unmodifiableList(new ArrayList<FieldDefinition<?>>(values()));
+		}
+		
+		@Override
+		public FieldDefinition<?> put(String key, FieldDefinition<?> value) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public FieldDefinition<?> remove(Object key) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public void clear() {
+			throw new UnsupportedOperationException();
+		}
+		
 	}
 }

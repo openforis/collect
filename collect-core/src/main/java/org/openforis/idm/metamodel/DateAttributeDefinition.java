@@ -3,10 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.DateAttribute;
@@ -25,12 +21,11 @@ public class DateAttributeDefinition extends AttributeDefinition {
 	public static final String MONTH_FIELD_NAME = "month";
 	public static final String DAY_FIELD_NAME = "day";
 
-	private final FieldDefinition<?>[] FIELD_DEFINITIONS = {
-			new FieldDefinition<Integer>(YEAR_FIELD_NAME, "y", "y", Integer.class, this),
-			new FieldDefinition<Integer>(MONTH_FIELD_NAME, "m", "m", Integer.class, this),
-			new FieldDefinition<Integer>(DAY_FIELD_NAME, "d", "d", Integer.class, this)
-	};
-	
+	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
+		new FieldDefinition<Integer>(YEAR_FIELD_NAME, "y", "y", Integer.class, this),
+		new FieldDefinition<Integer>(MONTH_FIELD_NAME, "m", "m", Integer.class, this),
+		new FieldDefinition<Integer>(DAY_FIELD_NAME, "d", "d", Integer.class, this)
+	);
 	
 	DateAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
@@ -52,10 +47,10 @@ public class DateAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		return Collections.unmodifiableList(Arrays.asList(FIELD_DEFINITIONS));
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		return fieldDefinitionByName;
 	}
-
+	
 	@Override
 	public String getMainFieldName() {
 		throw new IllegalArgumentException("Main field not defined");
