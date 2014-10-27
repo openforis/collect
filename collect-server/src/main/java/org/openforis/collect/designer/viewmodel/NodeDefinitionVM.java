@@ -251,6 +251,11 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	@DependsOn("editedItem")
+	public boolean isAttribute() {
+		return editedItem != null && editedItem instanceof AttributeDefinition;
+	}
+	
+	@DependsOn("editedItem")
 	public boolean isInsideTableEntity() {
 		UIOptions uiOptions = getSurvey().getUIOptions();
 		return editedItem != null && parentEntity != null && parentEntity.isMultiple() && 

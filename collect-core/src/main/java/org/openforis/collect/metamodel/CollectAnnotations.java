@@ -6,7 +6,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
@@ -23,6 +25,8 @@ public class CollectAnnotations {
 	public enum Annotation {
 		//collect namespace
 		INCLUDE_IN_DATA_EXPORT(new QName(COLLECT_NAMESPACE_URI, "includeInDataExport"), true),
+		PHASE_TO_APPLY_DEFAULT_VALUE(new QName(COLLECT_NAMESPACE_URI, "phaseToApplyDefaultValue"), Step.ENTRY),
+		EDITABLE(new QName(COLLECT_NAMESPACE_URI, "editable"), true),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -91,8 +95,39 @@ public class CollectAnnotations {
 		def.setAnnotation(Annotation.AUTOCOMPLETE.getQName(), value);
 	}
 	
-	public CollectSurvey getSurvey() {
-		return survey;
+	public Step getPhaseToApplyDefaultValue(AttributeDefinition def) {
+		return getAnnotaionEnumValue(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE);
+	}
+
+	public void setPhaseToApplyDefaultValue(AttributeDefinition def, Step value) {
+		setAnnotationEnumValue(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE, value);
+	}
+
+	public boolean isEditable(AttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.EDITABLE);
+	}
+	
+	public void setEditable(AttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.EDITABLE, value);
+	}
+	
+	private Step getAnnotaionEnumValue(AttributeDefinition def, Annotation annotation) {
+		String enumName = def.getAnnotation(annotation.getQName());
+		if(StringUtils.isBlank(enumName)) {
+			return annotation.getDefaultValue();
+		} else {
+			return Step.valueOf(enumName);
+		}
+	}
+	
+	private void setAnnotationEnumValue(NodeDefinition def, Annotation annotation, Enum<?> value) {
+		String enumName;
+		if ( value == null || value == annotation.getDefaultValue() ) {
+			enumName = null;
+		} else {
+			enumName = value.name();
+		}
+		def.setAnnotation(annotation.getQName(), enumName);
 	}
 	
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
@@ -113,6 +148,10 @@ public class CollectAnnotations {
 			annotationValue = Boolean.toString(value);
 		}
 		defn.setAnnotation(annotation.getQName(), annotationValue);
+	}
+	
+	public CollectSurvey getSurvey() {
+		return survey;
 	}
 	
 }

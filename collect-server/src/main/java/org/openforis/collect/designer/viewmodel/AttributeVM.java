@@ -18,6 +18,8 @@ import org.openforis.collect.designer.model.CheckType;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
@@ -161,11 +163,13 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		setTempFormObjectFieldValue("key", false);
 		setTempFormObjectFieldValue("multiple", false);
 		setTempFormObjectFieldValue("showInUI", ! changed);
-		setTempFormObjectFieldValue("includeInDataExport", true);
+		setTempFormObjectFieldValue("includeInDataExport", Annotation.INCLUDE_IN_DATA_EXPORT.getDefaultValue());
+		setTempFormObjectFieldValue("editable", Annotation.EDITABLE.getDefaultValue());
+		setTempFormObjectFieldValue("phaseToApplyDefaultValue", ((Step) Annotation.PHASE_TO_APPLY_DEFAULT_VALUE.getDefaultValue()).name());
 		dispatchKeyChangingCommand(false);
 		dispatchApplyChangesCommand(binder);
 	}
-
+	
 	protected void openCheckEditPopUp() {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentDefinition", editedItem);

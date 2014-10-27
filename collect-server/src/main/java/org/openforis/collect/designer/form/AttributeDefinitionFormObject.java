@@ -6,6 +6,10 @@ package org.openforis.collect.designer.form;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -23,7 +27,10 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public static final String KEY_FIELD = "key";
 		
 	private List<AttributeDefault> attributeDefaults;
+	private String phaseToApplyDefaultValue;
+	private boolean editable;
 	private List<Check<?>> checks;
+
 	
 	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -32,12 +39,20 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
+		
+		//save attribute defaults
 		dest.removeAllAttributeDefaults();
 		if ( attributeDefaults != null ) {
 			for (AttributeDefault attrDefault : attributeDefaults) {
 				dest.addAttributeDefault(attrDefault);
 			}
 		}
+		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		annotations.setPhaseToApplyDefaultValue((AttributeDefinition) dest, Step.valueOf(phaseToApplyDefaultValue));
+		annotations.setEditable((AttributeDefinition) dest, editable);
+		
+		//save checks
 		dest.removeAllChecks();
 		if ( checks != null ) {
 			for (Check<?> check : checks) {
@@ -50,6 +65,13 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
 		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
+		
+		CollectSurvey survey = (CollectSurvey) source.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		
+		phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue((AttributeDefinition) source).name();
+		editable = annotations.isEditable((AttributeDefinition) source);
+		
 		checks = new ArrayList<Check<?>>(source.getChecks());
 	}
 	
@@ -57,6 +79,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	protected void reset() {
 		super.reset();
 		attributeDefaults = new ArrayList<AttributeDefault>();
+		phaseToApplyDefaultValue = ((Step) Annotation.PHASE_TO_APPLY_DEFAULT_VALUE.getDefaultValue()).name();
 		checks = null;
 	}
 
@@ -66,6 +89,22 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	
 	public void setAttributeDefaults(List<AttributeDefault> attributeDefaults) {
 		this.attributeDefaults = attributeDefaults;
+	}
+	
+	public String getPhaseToApplyDefaultValue() {
+		return phaseToApplyDefaultValue;
+	}
+	
+	public void setPhaseToApplyDefaultValue(String phaseToApplyDefaultValue) {
+		this.phaseToApplyDefaultValue = phaseToApplyDefaultValue;
+	}
+	
+	public boolean isEditable() {
+		return editable;
+	}
+	
+	public void setEditable(boolean editable) {
+		this.editable = editable;
 	}
 
 	public List<Check<?>> getChecks() {

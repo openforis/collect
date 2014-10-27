@@ -554,7 +554,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateView():void {
-			view.editable = Application.activeRecordEditable && ! view.attributeDefinition.calculated;
+			view.editable = Application.activeRecordEditable && ! view.attributeDefinition.calculated && view.attributeDefinition.editable;
 
 			//update view according to attribute (generic text value)
 			var hasRemarks:Boolean = false;

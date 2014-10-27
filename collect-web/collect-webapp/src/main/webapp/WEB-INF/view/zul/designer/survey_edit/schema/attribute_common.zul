@@ -16,6 +16,35 @@
 	<fieldErrorHandler message="@load(vmsgs['attributeDefaults'])">
 		<groupbox width="100%" closable="false" class="tableFieldSet">
 			<caption label="${labels.survey.schema.attribute.attribute_default.table_heading}" />
+			<grid class="inner">
+		  		<columns>
+		  			<column width="200px" />
+		  			<column />
+		  		</columns>
+		  		<rows>
+					<row
+		  				visible="@load(vm.attribute and not (vm.calculableAttribute and fx.calculated))">
+		  				<fieldErrorHandler message="@load(vmsgs['phaseToApplyDefaultValue'])">
+			  				<label value="${labels.survey.schema.attribute.phase_to_apply_default_value}:" />
+			  			</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['phaseToApplyDefaultValue'])">
+		  					<listbox mold="select" 
+								selectedItem="@bind(fx.phaseToApplyDefaultValue)"
+								onSelect="@command('applyChanges')"
+								model="@load(vm.editableRecordStepNames)">
+								<template name="model">
+									<listitem  value="@load(each)" 
+											label="${c:l('workflow.phase.'.concat(each.toLowerCase()))}" />
+								</template>
+		   					</listbox>
+		   					<label value="${labels.survey.schema.attribute.editable}:" />
+		  					<checkbox 
+		  						checked="@load(fx.editable eq true) @save(fx.editable)"
+		  						onCheck="@command('applyChanges')" />
+		  				</fieldErrorHandler>
+		  			</row>
+				</rows>
+			</grid>
 			<include src="survey_edit/schema/attribute_defaults_list.zul" />
 		</groupbox>
 	</fieldErrorHandler>

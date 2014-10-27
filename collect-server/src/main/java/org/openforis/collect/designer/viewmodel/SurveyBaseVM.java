@@ -8,6 +8,7 @@ import static org.openforis.collect.designer.model.LabelKeys.EMPTY_OPTION;
 import static org.openforis.collect.designer.model.LabelKeys.ERRORS_IN_PAGE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.idm.metamodel.CodeList;
@@ -464,4 +466,8 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 	}
 
+	public List<String> getEditableRecordStepNames() {
+		return Arrays.asList(Step.ENTRY.name(), Step.CLEANSING.name());
+	}
+	
 }

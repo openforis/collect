@@ -37,7 +37,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean calculated;
 	private boolean includeInDataExport;
 	private boolean showInUI;
-
+	
 	//labels
 	private String headingLabel;
 	private String instanceLabel;
@@ -128,15 +128,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		} else {
 			maxCount = null;
 		}
-		if ( source instanceof Calculable ) {
-			calculated = ((Calculable) source).isCalculated();
-			//show in UI
-			showInUI = ! uiOptions.isHidden(source);
-			
-			CollectAnnotations annotations = survey.getAnnotations();
-			includeInDataExport = annotations.isIncludedInDataExport(source);
-		}
-
+		
 		//labels
 		headingLabel = source.getLabel(Type.HEADING, language);
 		instanceLabel = source.getLabel(Type.INSTANCE, language);
@@ -152,6 +144,16 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		columnSpan = uiOptions.getColumnSpan(source);
 		width = uiOptions.getWidth(source);
 		labelWidth = uiOptions.getLabelWidth(source);
+
+		CollectAnnotations annotations = survey.getAnnotations();
+
+		if ( source instanceof Calculable ) {
+			calculated = ((Calculable) source).isCalculated();
+			//show in UI
+			showInUI = ! uiOptions.isHidden(source);
+			
+			includeInDataExport = annotations.isIncludedInDataExport(source);
+		}
 	}
 
 	@Override
@@ -182,25 +184,26 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		}
 		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
 		
-		UIOptions uiOptions = getUIOptions(dest);
+		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
+		CollectAnnotations annotations = survey.getAnnotations();
+		UIOptions uiOptions = survey.getUIOptions();
 		
-		if ( dest instanceof Calculable ) {
-			((Calculable) dest).setCalculated(calculated);
-			CollectSurvey survey = (CollectSurvey) dest.getSurvey();
-
-			//include in data export
-			CollectAnnotations annotations = survey.getAnnotations();
-			annotations.setIncludeInDataExport(dest, includeInDataExport);
-			
-			//show in ui
-			uiOptions.setHidden(dest, ! showInUI);
-		}
 		//layout
 		uiOptions.setHideWhenNotRelevant(dest, hideWhenNotRelevant);
 		uiOptions.setColumn(dest, column);
 		uiOptions.setColumnSpan(dest, columnSpan);
 		uiOptions.setWidth(dest, width);
 		uiOptions.setLabelWidth(dest, labelWidth);
+
+		if ( dest instanceof Calculable ) {
+			((Calculable) dest).setCalculated(calculated);
+			
+			//include in data export
+			annotations.setIncludeInDataExport(dest, includeInDataExport);
+			
+			//show in ui
+			uiOptions.setHidden(dest, ! showInUI);
+		}
 	}
 
 	@Override
@@ -216,6 +219,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		return uiOptions;
 	}
 	
+	public void setParentDefinition(EntityDefinition parentDefinition) {
+		this.parentDefinition = parentDefinition;
+	}
+
 	public String getName() {
 		return name;
 	}
