@@ -16,6 +16,7 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
@@ -322,6 +323,34 @@ public class RecordUpdaterTest {
 		assertFalse(notRelevantAttr.isRelevant());
 	}
 	
+	@Test
+	public void testInitializeRelevanceDependencyInNestedNode() {
+		record(
+			rootEntityDef(
+				entityDef("details",
+					attributeDef("accessibility")
+				),
+				entityDef("tree",
+					attributeDef("dbh")
+						.relevant("parent()/details/accessibility = 'true'")
+				).multiple()
+			),
+			entity("details",
+				NodeBuilder.attribute("accessibility", "false")
+			),
+			entity("tree")
+		);
+		
+		Node<?> dbh = record.findNodeByPath("/root/tree[1]/dbh");
+		
+		assertFalse(dbh.isRelevant());
+		
+		Attribute<?, ?> accessibility = (Attribute<?, ?>) record.findNodeByPath("/root/details/accessibility");
+		update(accessibility, "true");
+		
+		assertTrue(dbh.isRelevant());
+	}
+
 	protected void record(EntityDefinition rootDef, NodeBuilder... builders) {
 		record = NodeBuilder.record(survey, builders);
 		updater.initializeRecord(record);

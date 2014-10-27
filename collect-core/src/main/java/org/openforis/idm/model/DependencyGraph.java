@@ -126,7 +126,8 @@ public abstract class DependencyGraph<T> {
 	protected List<T> dependenciesForItems(Collection<T> items) {
 		Set<GraphNode> nodes = new HashSet<GraphNode>();
 		for (T item : items) {
-			DependencyGraph<T>.GraphNode graphNode = graphNodeById.get(getId(item));
+			Object id = getId(item);
+			GraphNode graphNode = graphNodeById.get(id);
 			if ( graphNode != null ) {
 				nodes.add(graphNode);
 			}

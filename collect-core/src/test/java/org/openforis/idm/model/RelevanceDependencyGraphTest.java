@@ -1,12 +1,15 @@
 package org.openforis.idm.model;
 
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
+import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
+import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-import static org.openforis.idm.testfixture.NodeDefinitionBuilder.*;
+import org.junit.Test;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.testfixture.NodeDefinitionBuilder;
 
 /**
  * @author S. Ricci
@@ -23,10 +26,10 @@ public class RelevanceDependencyGraphTest extends NodePointerDependencyGraphTest
 
 	@Test
 	public void testSingleDependency() {
-		rootEntityDef(survey, "root",
-				attributeDef("health"),
-				attributeDef("dbh")
-						.relevant("health = 1")
+		rootEntityDef(
+			attributeDef("health"),
+			attributeDef("dbh")
+				.relevant("health = 1")
 		);
 		createTestRecord();
 
@@ -38,14 +41,14 @@ public class RelevanceDependencyGraphTest extends NodePointerDependencyGraphTest
 
 	@Test
 	public void testSingleNestedDependency() {
-		rootEntityDef(survey, "plot",
-				entityDef("details",
-						attributeDef("accessibility")
-				),
-				entityDef("tree",
-						attributeDef("dbh")
-								.relevant("parent()/details/accessibility = 1")
-				)
+		rootEntityDef(
+			entityDef("details",
+				attributeDef("accessibility")
+			),
+			entityDef("tree",
+				attributeDef("dbh")
+					.relevant("parent()/details/accessibility = 1")
+			)
 		);
 
 		createTestRecord();
@@ -61,13 +64,13 @@ public class RelevanceDependencyGraphTest extends NodePointerDependencyGraphTest
 
 	@Test
 	public void testDependencyWithMultipleSources() {
-		rootEntityDef(survey, "root",
-				attributeDef("source1"),
-				attributeDef("relevant1")
-						.relevant("source1 = 1"),
-				attributeDef("source2"),
-				attributeDef("relevant2")
-						.relevant("source2 = 1")
+		rootEntityDef(
+			attributeDef("source1"),
+			attributeDef("relevant1")
+				.relevant("source1 = 1"),
+			attributeDef("source2"),
+			attributeDef("relevant2")
+				.relevant("source2 = 1")
 		);
 		createTestRecord();
 
@@ -85,14 +88,14 @@ public class RelevanceDependencyGraphTest extends NodePointerDependencyGraphTest
 
 	@Test
 	public void testRemoveDependent() {
-		rootEntityDef(survey, "root",
-				entityDef("details",
-						attributeDef("accessibility")
-				),
-				entityDef("tree",
-						attributeDef("dbh")
-								.relevant("parent()/details/accessibility")
-				)
+		rootEntityDef(
+			entityDef("details",
+				attributeDef("accessibility")
+			),
+			entityDef("tree",
+				attributeDef("dbh")
+					.relevant("parent()/details/accessibility")
+			)
 		);
 
 		createTestRecord();
@@ -115,17 +118,17 @@ public class RelevanceDependencyGraphTest extends NodePointerDependencyGraphTest
 
 		assertDependentNodePointers(accessibility);
 	}
-
+	
 	@Test
 	public void testRemoveDependentInMultipleEntity() {
-		rootEntityDef(survey, "root",
-				entityDef("details",
-						attributeDef("accessibility")
-				),
-				entityDef("tree",
-						attributeDef("dbh")
-								.relevant("parent()/details/accessibility")
-				).multiple()
+		rootEntityDef(
+			entityDef("details",
+					attributeDef("accessibility")
+			),
+			entityDef("tree",
+					attributeDef("dbh")
+							.relevant("parent()/details/accessibility")
+			).multiple()
 		);
 
 		createTestRecord();
@@ -153,5 +156,9 @@ public class RelevanceDependencyGraphTest extends NodePointerDependencyGraphTest
 		return record.relevanceDependencies.dependenciesFor(sources);
 	}
 
-
+	protected EntityDefinition rootEntityDef(NodeDefinitionBuilder... builders) {
+		EntityDefinition rootEntityDef = NodeDefinitionBuilder.rootEntityDef(survey, "root", builders);
+		return rootEntityDef;
+	}
+	
 }
