@@ -48,15 +48,10 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
-	import org.openforis.collect.model.proxy.CodeProxy;
-	import org.openforis.collect.model.proxy.CoordinateProxy;
-	import org.openforis.collect.model.proxy.DateProxy;
 	import org.openforis.collect.model.proxy.EntityAddChangeProxy;
 	import org.openforis.collect.model.proxy.EntityChangeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.FileProxy;
-	import org.openforis.collect.model.proxy.IntegerRangeProxy;
 	import org.openforis.collect.model.proxy.NodeAddChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
@@ -64,15 +59,11 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RealRangeProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignItemProxy;
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
-	import org.openforis.collect.model.proxy.TaxonProxy;
-	import org.openforis.collect.model.proxy.TaxonVernacularNameProxy;
 	import org.openforis.collect.model.proxy.TaxonomyProxy;
-	import org.openforis.collect.model.proxy.TimeProxy;
 	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
@@ -113,16 +104,13 @@ package org.openforis.collect.util {
 				CodeListProxy,
 				CodeListProxy$CodeScope,
 				CodeListProxy$CodeType,
-				CodeProxy,
 				CoordinateAttributeDefinitionProxy,
-				CoordinateProxy,
 				DataExportStatus$Format,
 				DataExportStatusProxy,
 				DataImportStateProxy,
 				DataImportSummaryProxy,
 				DataImportSummaryItemProxy,
 				DateAttributeDefinitionProxy,
-				DateProxy,
 				EntityAddChangeProxy,
 				EntityDefinitionProxy,
 				EntityChangeProxy,
@@ -131,8 +119,6 @@ package org.openforis.collect.util {
 				FieldProxy,
 				FileAttributeDefinitionProxy,
 				FileUnmarshallingErrorProxy,
-				FileProxy,
-				IntegerRangeProxy,
 				LanguageSpecificTextProxy,
 				ModelVersionProxy,
 				NodeDefinitionSummary,
@@ -147,7 +133,6 @@ package org.openforis.collect.util {
 				PromptProxy,
 				PromptProxy$Type,
 				RangeAttributeDefinitionProxy,
-				RealRangeProxy,
 				RecordProxy,
 				NodeAddChangeProxy,
 				NodeChangeProxy,
@@ -166,14 +151,11 @@ package org.openforis.collect.util {
 				TaxonAttributeDefinitionProxy,
 				TaxonOccurrenceProxy,
 				TaxonomyProxy,
-				TaxonProxy,
 				TaxonSummariesProxy,
 				TaxonSummaryProxy,
-				TaxonVernacularNameProxy,
 				TextAttributeDefinitionProxy,
 				TextAttributeDefinitionProxy$Type,
 				TimeAttributeDefinitionProxy,
-				TimeProxy,
 				UIOptionsProxy,
 				UITabSetProxy,
 				UITabProxy,

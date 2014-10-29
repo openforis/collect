@@ -176,6 +176,7 @@ public class EntityBuilder {
 			entity.add(attr);
 		}
 		attr.setValue(value);
+		attr.updateSummaryInfo();
 		return attr;
 	}
 

@@ -74,7 +74,7 @@ public class RecordValidationReportGenerator {
 		Set<Integer> skippedNodeIds = validationCache.getSkippedNodeIds();
 		for (Integer nodeId : skippedNodeIds) {
 			Attribute<?, ?> attr = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-			String path = attr.getPath(false);
+			String path = getPath(attr);
 			String prettyFormatPath = messageBuilder.getPrettyFormatPath(attr, locale);
 			String message = messageBuilder.getReasonBlankNotSpecifiedMessage(locale);
 			RecordValidationReportItem recordValidationItem = new RecordValidationReportItem(nodeId, path, prettyFormatPath, ValidationResultFlag.ERROR, message);
@@ -155,7 +155,7 @@ public class RecordValidationReportGenerator {
 	private RecordValidationReportItem createCardinalityValidationItem(
 			final Locale locale, Entity entity,
 			String childName, ValidationResultFlag flag, boolean minCount) {
-		String path = entity.getPath(false) + "/" + childName;
+		String path = getPath(entity) + "/" + childName;
 		String prettyFormatPath = messageBuilder.getPrettyFormatPath(entity, childName, locale);
 		String message = minCount ? messageBuilder.getMinCountValidationMessage(entity, childName, locale):
 			messageBuilder.getMaxCountValidationMessage(entity, childName, locale);
@@ -182,7 +182,7 @@ public class RecordValidationReportGenerator {
 		ValidationResults validationResults = validationCache.getAttributeValidationResults(attrId);
 		List<ValidationResult> failed = validationResults.getFailed();
 		if ( CollectionUtils.isNotEmpty(failed) ) {
-			String path = attr.getPath(false);
+			String path = getPath(attr);
 			String prettyFormatPath = messageBuilder.getPrettyFormatPath(attr, locale);
 			for (ValidationResult validationResult : failed) {
 				ValidationResultFlag flag = validationResult.getFlag();
@@ -194,6 +194,12 @@ public class RecordValidationReportGenerator {
 			}
 		}
 		return items;
+	}
+
+	private String getPath(Node<?> node) {
+		String path = node.getPath();
+		path = path.replaceFirst("\\w*/", "");
+		return path;
 	}
 	
 	private boolean isInLevel(ValidationResultFlag flag,

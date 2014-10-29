@@ -134,6 +134,11 @@ public class CollectRecord extends Record {
 		this.entityCounts = new ArrayList<Integer>();
 	}
 	
+	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName) {
+		this(survey, versionName);
+		createRootEntity(rootEntityName);
+	}
+	
 	@Override
 	protected void resetValidationDependencies() {
 		super.resetValidationDependencies();

@@ -12,6 +12,10 @@ public abstract class NumberValue<T extends Number> implements Value {
 	private T value;
 	private Unit unit;
 	
+	public NumberValue(T value) {
+		this(value, null);
+	}
+	
 	public NumberValue(T value, Unit unit) {
 		this.value = value;
 		this.unit = unit;

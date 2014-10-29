@@ -64,19 +64,19 @@ class StateDependencyMap {
 		set.add(value);
 	}
 	
-	void addDependency(NodeDefinition sourceNode, String pathToDependentParent, String dependentNodeName) {
-		NodePathPointer nodePointer = new NodePathPointer(pathToDependentParent, dependentNodeName);
+	void addDependency(NodeDefinition sourceNode, String pathToDependentParent, NodeDefinition dependentNodeDef) {
+		NodePathPointer nodePointer = new NodePathPointer(pathToDependentParent, dependentNodeDef);
 		addDependency(sourceNode.getPath(), nodePointer);
 	}
 		
-	void addSource(NodeDefinition context, String dependentParentEntityPath, String dependentName) {
+	void addSource(NodeDefinition context, String dependentParentEntityPath, NodeDefinition dependentNodeDef) {
 		String path = context.getPath();
 		Set<NodePathPointer> set = sourcesByDependent.get(path);
 		if(set == null){
 			set = new HashSet<NodePathPointer>();
 			sourcesByDependent.put(path, set);
 		}
-		set.add(new NodePathPointer(dependentParentEntityPath, dependentName));
+		set.add(new NodePathPointer(dependentParentEntityPath, dependentNodeDef));
 	}
 
 	void registerDependencies(NodeDefinition nodeDefinition, NodeDefinition dependentDefinition) {
@@ -136,9 +136,9 @@ class StateDependencyMap {
 			pathToDependentParentSB.append(commonAncestor.getRelativePath(dependentParentDef));
 		}
 		if ( source ) {
-			addSource(sourceDef, pathToDependentParentSB.toString(), dependentDef.getName());
+			addSource(sourceDef, pathToDependentParentSB.toString(), dependentDef);
 		} else {
-			addDependency(sourceDef, pathToDependentParentSB.toString(), dependentDef.getName());
+			addDependency(sourceDef, pathToDependentParentSB.toString(), dependentDef);
 		}
 	}
 

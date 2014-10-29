@@ -3,8 +3,10 @@ package org.openforis.idm.model;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -38,8 +40,8 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 	}
 
 	@Override
-	protected Object getId(NodePointer node) {
-		return node.getEntity().getInternalId() + "_" + node.getChildName();
+	protected NodePointerId getId(NodePointer pointer) {
+		return new NodePointerId(pointer.getEntityId(), pointer.getChildDefinitionId());
 	}
 
 	@Override
@@ -53,43 +55,87 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 		if (node instanceof Entity) {
 			EntityDefinition def = (EntityDefinition) node.getDefinition();
 			for (NodeDefinition childDef : def.getChildDefinitions()) {
-				NodePointer nodePointer = new NodePointer((Entity) node, childDef.getName());
-				result.add(nodePointer);
-			}
-			List<Node<?>> children = ((Entity) node).getChildren();
-			for (Node<?> child : children) {
-				result.addAll(toItems(child));
+				result.add(new NodePointer((Entity) node, childDef));
 			}
 		} else if ( node.getParent() != null ) {
-			NodePointer nodePointer = new NodePointer(node.getParent(), node.getName());
-			result.add(nodePointer);
+			result.add(new NodePointer(node));
 		}
 		return result;
 	}
 
 	@Override
-	protected Set<NodePointer> determineRelatedItems(NodePointer pointer, String relatedChildName,
+	protected Set<NodePointer> determineRelatedItems(NodePointer pointer, NodeDefinition relatedChildDef,
 			String relatedParentEntityPath) throws InvalidExpressionException {
 		Set<NodePointer> result = new HashSet<NodePointer>();
 		Entity pointerEntity = pointer.getEntity();
 		List<Node<?>> relatedParentEntities = Path.parse(relatedParentEntityPath).evaluate(pointerEntity);
 		for (Node<?> relatedParentNode : relatedParentEntities) {
-			result.add(new NodePointer((Entity) relatedParentNode, relatedChildName));
+			result.add(new NodePointer((Entity) relatedParentNode, relatedChildDef));
 		}
 		return result;
 	}
 
 	@Override
-	protected Set<NodePointer> determineRelatedItems(NodePointer pointer, String childName) {
+	protected Set<NodePointer> determineRelatedItems(NodePointer pointer, NodeDefinition childDef) {
 		Entity pointerEntity = pointer.getEntity();
-		NodePointer nodePointer = new NodePointer(pointerEntity, childName);
-		Set<NodePointer> result = new HashSet<NodePointer>();
-		result.add(nodePointer);
-		return result;
+		NodePointer nodePointer = new NodePointer(pointerEntity, childDef);
+		return Collections.singleton(nodePointer);
+	}
+	
+	@Override
+	public List<NodePointer> dependenciesFor(Collection<Node<?>> nodes) {
+		Set<NodePointer> items = new LinkedHashSet<NodePointer>();
+		Stack<Node<?>> stack = new Stack<Node<?>>();
+		stack.addAll(nodes);
+		while(!stack.isEmpty()) {
+			Node<?> node = stack.pop();
+			items.addAll(toItems(node));
+			if(node instanceof Entity) {
+				stack.addAll(((Entity) node).getChildren());
+			}
+		}
+		return dependenciesForItems(items);
 	}
 	
 	public List<NodePointer> dependenciesForPointers(Collection<NodePointer> pointers) {
 		return super.dependenciesForItems(pointers);
 	}
 
+	static class NodePointerId {
+		
+		private int entityId;
+		private int childDefinitionId;
+
+		public NodePointerId(int entityId, int childDefinitionId) {
+			this.entityId = entityId;
+			this.childDefinitionId = childDefinitionId;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + childDefinitionId;
+			result = prime * result + entityId;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			NodePointerId other = (NodePointerId) obj;
+			if (childDefinitionId != other.childDefinitionId)
+				return false;
+			if (entityId != other.entityId)
+				return false;
+			return true;
+		}
+
+	}
+	
 }

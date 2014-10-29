@@ -49,19 +49,17 @@ public class AttributeSchema<T extends Attribute<?,?>> extends SchemaSupport<T> 
 	@Override
 	public void mergeFrom(Input input, T attr) throws IOException {
 		int cnt = attr.getFieldCount();
-        for(int number = input.readFieldNumber(this), i=0;;
-        		number = input.readFieldNumber(this), i++)
-        {
-        	if ( number == 0 ) {
-        		break;
-        	} else if ( i >= cnt ) {
+        for(int number = input.readFieldNumber(this), fieldIndex=0; number > 0;
+        		number = input.readFieldNumber(this), fieldIndex++) {
+        	if ( fieldIndex >= cnt ) {
             	throw new ProtostuffException("Too many attribute fields");
         	} else if ( number != 1 ) {
             	throw new ProtostuffException("Unexpected field number");
         	} else {
-    			Field<?> fld = attr.getField(i);
+    			Field<?> fld = attr.getField(fieldIndex);
     			input.mergeObject(fld, ATTRIBUTE_FIELD_SCHEMA);
             }
         }
+        attr.updateSummaryInfo();
 	}
 }

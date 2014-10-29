@@ -2,74 +2,84 @@ package org.openforis.idm.model;
 
 import java.util.List;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * 
  * @author M. Togna
+ * @author S. Ricci
+ * @author D. Wiell
  * 
  */
 public class NodePointer {
 	
 	private Entity entity;
-	private String childName;
-
+	private NodeDefinition childDefinition;
+	
 	public NodePointer(Node<?> node) {
-		this(node.getParent(), node.getName());
+		this(node.getParent(), node.getDefinition());
 	}
 	
-	public NodePointer(Entity entity, String childName) {
+	public NodePointer(Entity entity, NodeDefinition childDef) {
 		if(entity == null) {
 			throw new IllegalArgumentException("Entity cannot be null");
 		}
 		this.entity = entity;
-		this.childName = childName;
+		this.childDefinition = childDef;
+	}
+	
+	public NodePointer(Entity entity, String childName) {
+		this(entity, entity.getDefinition().getChildDefinition(childName));
 	}
 
 	public Entity getEntity() {
 		return entity;
 	}
 
-	public String getChildName() {
-		return childName;
-	}
-
 	public String getEntityPath() {
 		return entity.getPath();
 	}
 	
-	public List<Node<?>> getNodes() {
-		return entity.getChildren(childName);
+	public int getEntityId() {
+		return entity.getInternalId();
 	}
 	
 	public NodeDefinition getChildDefinition() {
-		EntityDefinition entityDefn = entity.getDefinition();
-		NodeDefinition result = entityDefn.getChildDefinition(childName);
-		return result;
+		return childDefinition;
+	}
+	
+	public int getChildDefinitionId() {
+		return childDefinition.getId();
+	}
+	
+	public String getChildName() {
+		return childDefinition.getName();
+	}
+
+	public List<Node<?>> getNodes() {
+		return entity.getChildren(getChildName());
 	}
 	
 	public boolean areNodesRelevant() {
-		return entity.isRelevant(childName);
+		return entity.isRelevant(getChildName());
 	}
 	
 	public Boolean areNodesRequired() {
-		return entity.isRequired(childName);
+		return entity.isRequired(getChildName());
 	}
 	
 	@Override
 	public String toString() {
-		return getEntityPath() + "/" + childName;
+		return getEntityPath() + "/" + getChildName();
 	}
-	
+
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(entity)
-			.append(childName)
-			.toHashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((entity == null) ? 0 : entity.hashCode());
+		result = prime * result + getChildDefinitionId();
+		return result;
 	}
 
 	@Override
@@ -81,10 +91,15 @@ public class NodePointer {
 		if (getClass() != obj.getClass())
 			return false;
 		NodePointer other = (NodePointer) obj;
-		return new EqualsBuilder()
-				.append(entity, other.entity)
-				.append(childName, other.childName)
-				.isEquals();
+		if (entity == null) {
+			if (other.entity != null)
+				return false;
+		} else if (!entity.equals(other.entity))
+			return false;
+		if (getChildDefinitionId() != other.getChildDefinitionId())
+			return false;
+		return true;
 	}
-
+	
+	
 }

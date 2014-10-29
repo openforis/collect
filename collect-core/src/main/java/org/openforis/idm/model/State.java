@@ -12,7 +12,12 @@ import org.apache.commons.lang3.StringUtils;
  * 
  */
 public class State {
+	
+	private static final char TRUE_SYMBOL = '1';
+	private static final char FALSE_SYMBOL = '0';
+
 	private static final int N_BITS = 8;
+	private static final double MAX_VALUE = Math.pow( 2, N_BITS );
 
 	private transient BitSet bitSet;
 	
@@ -21,18 +26,12 @@ public class State {
 	}
 
 	public void set(int position, boolean state) {
-		if( position < 0 || position >= N_BITS ) {
-			throw new IllegalArgumentException("Posion must be greather than 0 and less that  " + (N_BITS-1) );
-		}
-		
+		ensurePositionInRange(position);
 		bitSet.set(position, state);
 	}
 
 	public boolean get(int position) {
-		if( position < 0 || position >= N_BITS ) {
-			throw new IllegalArgumentException("Posion must be greather than 0 and less that  " + (N_BITS-1) );
-		}
-		
+		ensurePositionInRange(position);
 		return bitSet.get(position);
 	}
 
@@ -45,24 +44,22 @@ public class State {
 		StringBuilder str = new StringBuilder(N_BITS);
 		for (int i = N_BITS - 1; i >= 0; i--) {
 			boolean b = bitSet.get(i);
-			str.append( b ? "1" : "0" );
+			str.append( b ? TRUE_SYMBOL : FALSE_SYMBOL );
 		}
-		String booleanString = str.toString();
-		return booleanString;
+		return str.toString();
 	}
 
 	public void set(int value) {
-		if ( value > Math.pow( 2, N_BITS ) ) {
-			throw new IllegalArgumentException("Value cannot be grater than " + Math.pow( 2, N_BITS )+ ", but it was " + value);
+		if ( value > MAX_VALUE ) {
+			throw new IllegalArgumentException("Value cannot be grater than " + MAX_VALUE + ", but it was " + value);
 		}
-		
 		String binaryString = Integer.toBinaryString(value);
-		binaryString = StringUtils.leftPad(binaryString, N_BITS, "0");
+		binaryString = StringUtils.leftPad(binaryString, N_BITS, FALSE_SYMBOL);
 		char[] charArray = binaryString.toCharArray();
 
 		int pos = binaryString.length();
 		for ( char c : charArray ) {
-			set(--pos, c == '1' ? true : false);
+			set(--pos, c == TRUE_SYMBOL);
 		}
 	}
 	
@@ -72,6 +69,12 @@ public class State {
 		return state;
 	}
 	
+	private void ensurePositionInRange(int position) {
+		if( position < 0 || position >= N_BITS ) {
+			throw new IllegalArgumentException("Posion must be greather than 0 and less that  " + (N_BITS-1) );
+		}
+	}
+
 	@Override
 	public String toString() {
 		return getBooleanString();

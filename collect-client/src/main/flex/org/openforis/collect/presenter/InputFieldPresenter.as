@@ -269,9 +269,7 @@ package org.openforis.collect.presenter {
 				return false;
 			} else {
 				var defn:AttributeDefinitionProxy = AttributeDefinitionProxy(attr.definition);
-				var visibleFields:Array = defn.visibleFields;
-				var field:FieldProxy = FieldProxy(attr.fields.getItemAt(index));
-				return ArrayUtil.contains(visibleFields, field.name);
+				return ArrayUtil.contains(defn.visibleFieldIndexes, index);
 			}
 		}
 				

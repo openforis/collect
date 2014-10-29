@@ -102,7 +102,8 @@ public class RecordUpdaterTest {
 		record(
 			rootEntityDef(
 				entityDef("time_study",
-						attributeDef("start_time").required()
+						attributeDef("start_time")
+							.required()
 				)
 			)
 		);

@@ -92,14 +92,13 @@ public abstract class NumberAttribute<N extends Number, T extends NumberValue<N>
 	}
 	
 	@Override
-	public boolean isFilled() {
-		return getNumberField().hasValue();
+	protected boolean calculateHasData() {
+		return getNumberField().hasData();
 	}
-	
+
 	@Override
-	public boolean isEmpty() {
+	protected boolean calculateIsEmpty() {
 		return ! getNumberField().hasValue();
 	}
-	
 	
 }

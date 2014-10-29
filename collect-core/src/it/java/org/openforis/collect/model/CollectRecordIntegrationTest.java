@@ -26,13 +26,13 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.validation.CodeParentValidator;
 import org.openforis.idm.metamodel.validation.CodeValidator;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
+import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Coordinate;
@@ -481,26 +481,16 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		return survey;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private CollectRecord createTestMultipleCodeListLevelRecord() {
 		CollectSurvey survey = createMultipleLevelCodeListTestSurvey();
-		CollectRecord record = new CollectRecord(survey, null);
-		Entity root = record.createRootEntity("root");
+		CollectRecord record = new CollectRecord(survey, null, "root");
 		record.setCreationDate(new GregorianCalendar(2011, 11, 31, 23, 59).getTime());
 		record.setStep(Step.ENTRY);
-		Schema schema = survey.getSchema();
-		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition("root");
-		NodeDefinition code1Defn = rootEntityDefn.getChildDefinition("code1");
-		CodeAttribute code1 = (CodeAttribute) code1Defn.createNode();
-		code1.setValue(new Code("A"));
-		root.add(code1);
-		NodeDefinition code2Defn = rootEntityDefn.getChildDefinition("code2");
-		CodeAttribute code2 = (CodeAttribute) code2Defn.createNode();
-		code2.setValue(new Code("2"));
-		root.add(code2);
-		NodeDefinition code3Defn = rootEntityDefn.getChildDefinition("code3");
-		CodeAttribute code3 = (CodeAttribute) code3Defn.createNode();
-		code3.setValue(new Code("b"));
-		root.add(code3);
+		recordUpdater.initializeRecord(record);
+		recordUpdater.updateAttribute((Attribute<?, Code>) record.findNodeByPath("root/code1"), new Code("A"));
+		recordUpdater.updateAttribute((Attribute<?, Code>) record.findNodeByPath("root/code2"), new Code("2"));
+		recordUpdater.updateAttribute((Attribute<?, Code>) record.findNodeByPath("root/code3"), new Code("b"));
 		return record;
 	}
 	

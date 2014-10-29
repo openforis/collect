@@ -342,10 +342,9 @@ public class Entity extends Node<EntityDefinition> {
 		} else {
 			children.add(idx, child);
 			child.index = idx;
-			
 			increaseNodeIndexes(children, idx + 1);
 		}
-		child.parent = this;
+		child.setParent(this);
 		
 		if ( record != null ) {
 			record.put(child);
@@ -438,7 +437,7 @@ public class Entity extends Node<EntityDefinition> {
 	private void decreaseNodeIndexes(List<Node<?>> nodes, int afterIndexInclusive) {
 		for(int i = afterIndexInclusive; i < nodes.size(); i++) {
 			Node<?> n = nodes.get(i);
-			n.index--;
+			n.setIndex(n.getIndex() - 1);
 		}
 	}
 	
@@ -448,10 +447,18 @@ public class Entity extends Node<EntityDefinition> {
 	private void increaseNodeIndexes(List<Node<?>> nodes, int afterIndexInclusive) {
 		for(int i = afterIndexInclusive; i < nodes.size(); i++) {
 			Node<?> n = nodes.get(i);
-			n.index++;
+			n.setIndex(n.getIndex() + 1);
 		}
 	}
 
+	@Override
+	protected void resetPath() {
+		super.resetPath();
+		for (Node<?> child : getChildren()) {
+			child.resetPath();
+		}
+	}
+	
 	private class NodeStack extends Stack<List<Node<? extends NodeDefinition>>> {
 		private static final long serialVersionUID = 1L;
 

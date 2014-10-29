@@ -19,6 +19,10 @@ public final class RealRange extends NumericRange<Double> {
 		super(value, value, unit);
 	}
 
+	public RealRange(Double from, Double to) {
+		super(from, to, null);
+	}
+	
 	public RealRange(Double from, Double to, Unit unit) {
 		super(from, to, unit);
 	}

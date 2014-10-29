@@ -30,6 +30,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	private NodeLabelMap labels;
 	private PromptMap prompts;
 	private LanguageSpecificTextMap descriptions;
+	private String path;
 	
 	NodeDefinition(Survey survey, int id) {
 		super(survey, id);
@@ -68,6 +69,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 			parent.renameChild(oldName, newName);
 		}
 		this.name = newName;
+		resetPath();
 	}
 
 	public String getName() {
@@ -219,22 +221,33 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	}
 	
 	public String getPath() {
-		NodeDefinition defn = this;
-		StringBuilder sb = new StringBuilder(64);
-		while (defn!=null) {
-			sb.insert(0, defn.getName());
-			sb.insert(0, "/");
-			defn = defn.getParentDefinition();
-		} 
-		return sb.toString();
+		if ( path == null ) {
+			updatePath();
+		}
+		return path;
 	}
-
+	
+	protected void updatePath() {
+		StringBuilder sb = new StringBuilder(64);
+		if ( parentDefinition != null ) {
+			sb.append(parentDefinition.getPath());
+		}
+		sb.append('/');
+		sb.append(getName());
+		this.path = sb.toString();
+	}
+	
+	protected void resetPath() {
+		this.path = null;
+	}
+	
 	public NodeDefinition getParentDefinition() {
 		return this.parentDefinition;
 	}
 	
 	protected void setParentDefinition(NodeDefinition parentDefinition) {
 		this.parentDefinition = parentDefinition;
+		resetPath();
 	}
 	
 	public EntityDefinition getRootEntity() {
@@ -319,8 +332,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	public List<NodeDefinition> getRelevancyDependentDefinitions() {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		for (NodePathPointer nodePathPointer : this.getRelevantExpressionDependencies()) {
-			NodeDefinition referencedDefn = nodePathPointer.getReferencedNodeDefinition(this);
-			result.add(referencedDefn);
+			result.add(nodePathPointer.getReferencedNodeDefinition());
 		}
 		return result;
 	}
@@ -333,8 +345,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	public List<NodeDefinition> getRequirenessDependentDefinitions() {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		for (NodePathPointer nodePathPointer : this.getRequiredExpressionDependencies()) {
-			NodeDefinition referencedDefn = nodePathPointer.getReferencedNodeDefinition(this);
-			result.add(referencedDefn);
+			result.add(nodePathPointer.getReferencedNodeDefinition());
 		}
 		return result;
 	}
@@ -347,8 +358,7 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	public List<NodeDefinition> getCalculatedValueDependentDefinitions() {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		for (NodePathPointer nodePathPointer : this.getCalculatedValueDependencies()) {
-			NodeDefinition referencedDefn = nodePathPointer.getReferencedNodeDefinition(this);
-			result.add(referencedDefn);
+			result.add(nodePathPointer.getReferencedNodeDefinition());
 		}
 		return result;
 	}
@@ -361,16 +371,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	public List<NodeDefinition> getCheckDependentDefinitions() {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		for (NodePathPointer nodePathPointer : this.getCheckDependencies()) {
-			NodeDefinition referencedDefn = nodePathPointer.getReferencedNodeDefinition(this);
-			result.add(referencedDefn);
+			result.add(nodePathPointer.getReferencedNodeDefinition());
 		}
 		return result;
 	}
 	
 	public void setName(String name) {
 		this.name = name;
+		resetPath();
 	}
-	
+
 	public void setRelevantExpression(String relevantExpression) {
 		this.relevantExpression = relevantExpression;
 	}

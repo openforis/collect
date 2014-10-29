@@ -13,6 +13,7 @@ import org.openforis.idm.path.Path;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class NodePropertyHandler implements DynamicPropertyHandler {
@@ -47,9 +48,10 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 	}
 
 	private Object extractNonEmptyChildren(String propertyName, Entity entity) {
-		List<Node<?>> list = new ArrayList<Node<?>>();
+		List<Node<?>> children = entity.getAll(propertyName);
+		List<Node<?>> list = new ArrayList<Node<?>>(children.size());
 		
-		for (Node<?> childNode : entity.getAll(propertyName)) {
+		for (Node<?> childNode : children) {
 			if( childNode instanceof Entity || ( ! childNode.isEmpty()) ) {
 				list.add(childNode);
 			}

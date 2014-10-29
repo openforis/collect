@@ -1,10 +1,6 @@
 package org.openforis.idm.model;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.path.Path;
 
 /**
  * @author G. Miceli
@@ -13,44 +9,38 @@ import org.openforis.idm.path.Path;
 public class NodePathPointer {
 	
 	private String entityPath;
-	private String childName;
+	private NodeDefinition referencedNodeDefinition;
 	
-	public NodePathPointer(String entityPath, String childName) {
+	public NodePathPointer(String entityPath, NodeDefinition childDef) {
 		this.entityPath = entityPath;
-		this.childName = childName;
-	}
-
-	public NodeDefinition getReferencedNodeDefinition(NodeDefinition context) {
-		String entityDefinitionRelativePath = Path.getAbsolutePath(entityPath);
-		EntityDefinition entityDefn = (EntityDefinition) context.getDefinitionByPath(entityDefinitionRelativePath);
-		NodeDefinition referencedDefn = entityDefn.getChildDefinition(childName);
-		return referencedDefn;
+		this.referencedNodeDefinition = childDef;
 	}
 	
 	public String getEntityPath() {
 		return entityPath;
 	}
-
-	public void setEntityPath(String entityPath) {
-		this.entityPath = entityPath;
+	
+	public NodeDefinition getReferencedNodeDefinition() {
+		return referencedNodeDefinition;
 	}
 
 	public String getChildName() {
-		return childName;
-	}
-
-	public void setChildName(String childName) {
-		this.childName = childName;
-	}
-
-	@Override
-	public String toString() {
-		return entityPath + "/" + childName;
+		return referencedNodeDefinition.getName();
 	}
 	
 	@Override
+	public String toString() {
+		return entityPath + "/" + getChildName();
+	}
+
+	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(entityPath).append(childName).toHashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((entityPath == null) ? 0 : entityPath.hashCode());
+		result = prime * result + referencedNodeDefinition.getId();
+		return result;
 	}
 
 	@Override
@@ -62,7 +52,15 @@ public class NodePathPointer {
 		if (getClass() != obj.getClass())
 			return false;
 		NodePathPointer other = (NodePathPointer) obj;
-		return new EqualsBuilder().append(childName, other.childName).append(entityPath, other.entityPath).isEquals();
+		if (entityPath == null) {
+			if (other.entityPath != null)
+				return false;
+		} else if (!entityPath.equals(other.entityPath))
+			return false;
+		if (referencedNodeDefinition.getId() != other.referencedNodeDefinition.getId())
+			return false;
+		return true;
 	}
-
+	
+	
 }

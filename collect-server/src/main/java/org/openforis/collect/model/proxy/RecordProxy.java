@@ -14,6 +14,9 @@ import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.User;
+import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.model.Entity;
 
 /**
  * @author M. Togna
@@ -52,8 +55,7 @@ public class RecordProxy implements Proxy {
 		List<RecordProxy> result = new ArrayList<RecordProxy>();
 		if ( records != null ) {
 			for (CollectRecord collectRecord : records) {
-				RecordProxy proxy = new RecordProxy(collectRecord, locale);
-				result.add(proxy);
+				result.add(new RecordProxy(collectRecord, locale));
 			}
 		}
 		return result;
@@ -76,9 +78,8 @@ public class RecordProxy implements Proxy {
 
 	@ExternalizedProperty
 	public UserProxy getCreatedBy() {
-		if(record.getCreatedBy() != null) {
-			return new UserProxy(record.getCreatedBy());
-		} else return null;
+		User createdBy = record.getCreatedBy();
+		return createdBy == null ? null: new UserProxy(createdBy);
 	}
 
 	@ExternalizedProperty
@@ -93,29 +94,20 @@ public class RecordProxy implements Proxy {
 
 	@ExternalizedProperty
 	public UserProxy getModifiedBy() {
-		if(record.getModifiedBy() != null) {
-			return new UserProxy(record.getModifiedBy());
-		} else {
-			return null;
-		}
+		User modifiedBy = record.getModifiedBy();
+		return modifiedBy == null ? null: new UserProxy(modifiedBy);
 	}
 	
 	@ExternalizedProperty
 	public EntityProxy getRootEntity() {
-		if(record.getRootEntity() != null) {
-			return new EntityProxy(null, record.getRootEntity(), locale);
-		} else {
-			return null;
-		}
+		Entity rootEntity = record.getRootEntity();
+		return rootEntity == null ? null: new EntityProxy(null, record.getRootEntity(), locale);
 	}
 
 	@ExternalizedProperty
 	public ModelVersionProxy getVersion() {
-		if(record.getVersion() != null) {
-			return new ModelVersionProxy(record.getVersion());
-		} else {
-			return null;
-		}
+		ModelVersion version = record.getVersion();
+		return version == null ? null: new ModelVersionProxy(version);
 	}
 
 	@ExternalizedProperty

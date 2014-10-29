@@ -129,7 +129,7 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 		EntityBuilder.addValue(cluster, "map_sheet", "value 2");
 		EntityBuilder.addValue(cluster, "vehicle_location", new Coordinate((double)432423423l, (double)4324324l, "srs"));
 		EntityBuilder.addValue(cluster, "gps_model", "TomTom 1.232");
-		cluster.setChildState("accessibility", 1);
+		recordManager.approveMissingValue(cluster, "accessibility");
 		{
 			Entity ts = EntityBuilder.addEntity(cluster, "time_study");
 			EntityBuilder.addValue(ts, "date", new Date(2011,2,14));
@@ -151,8 +151,8 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 			EntityBuilder.addValue(tree1, "total_height", 2.0);
 //			EntityBuilder.addValue(tree1, "bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			RealAttribute boleHeight = EntityBuilder.addValue(tree1, "bole_height", (Double) null);
-			boleHeight.getField(0).setSymbol(FieldSymbol.BLANK_ON_FORM.getCode());
-			boleHeight.getField(0).setRemarks("No value specified");
+			recordManager.updateAttribute(boleHeight, FieldSymbol.BLANK_ON_FORM);
+			recordManager.updateRemarks(boleHeight.getNumberField(), "No value specified");
 			Entity tree2 = EntityBuilder.addEntity(plot, "tree");
 			EntityBuilder.addValue(tree2, "tree_no", 2);
 			EntityBuilder.addValue(tree2, "dbh", 82.8);

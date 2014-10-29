@@ -82,19 +82,19 @@ public class NodeProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public Integer getDefinitionId() {
-		if(node.getDefinition() != null) {
-			return node.getDefinition().getId();
-		} else {
+		if(node.getDefinition() == null) {
 			return null;
+		} else {
+			return node.getDefinition().getId();
 		}
 	}
 	
 	@ExternalizedProperty
 	public Integer getParentId() {
-		if(node.getParent() != null) {
-			return node.getParent().getInternalId();
-		} else {
+		if(node.getParent() == null) {
 			return null;
+		} else {
+			return node.getParent().getInternalId();
 		}
 	}
 	

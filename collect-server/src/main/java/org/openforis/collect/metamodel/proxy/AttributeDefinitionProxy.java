@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.metamodel.proxy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
@@ -51,9 +53,14 @@ public abstract class AttributeDefinitionProxy extends NodeDefinitionProxy imple
 	}
 	
 	@ExternalizedProperty
-	public String[] getVisibleFields() {
+	public List<Integer> getVisibleFieldIndexes() {
+		List<Integer> result = new ArrayList<Integer>();
 		UIOptions uiOptions = getUIOptions();
-		String[] result = uiOptions.getVisibleFields(attributeDefinition);
+		String[] fieldNames = uiOptions.getVisibleFields(attributeDefinition);
+		for (String fieldName : fieldNames) {
+			FieldDefinition<?> field = attributeDefinition.getFieldDefinition(fieldName);
+			result.add(field.getIndex());
+		}
 		return result;
 	}
 	

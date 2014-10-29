@@ -19,7 +19,7 @@ public abstract class NodePointerDependencyGraphTest extends
 	}
 
 	protected NodePointer toPointer(Node<?> node) {
-		return new NodePointer(node.getParent(), node.getName());
+		return new NodePointer(node);
 	}
 
 	@Override

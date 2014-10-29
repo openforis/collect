@@ -240,6 +240,8 @@ public class RecordUpdater {
 	}
 	
 	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute) {
+		attribute.updateSummaryInfo();
+		
 		Record record = attribute.getRecord();
 		
 		// calculated attributes
@@ -257,7 +259,7 @@ public class RecordUpdater {
 		
 		// requireness
 		Collection<NodePointer> pointersToCheckRequirenessFor = new HashSet<NodePointer>(updatedRelevancePointers);
-		NodePointer attributeNodePointer = new NodePointer(attribute.getParent(), attribute.getName());
+		NodePointer attributeNodePointer = new NodePointer(attribute);
 		pointersToCheckRequirenessFor.add(attributeNodePointer);
 		pointersToCheckRequirenessFor.addAll(nodesToPointers(updatedCalculatedAttributes));
 		
@@ -638,7 +640,7 @@ public class RecordUpdater {
 		//for root entity there is no node pointer so we iterate over its children
 		Set<NodePointer> entityChildrenPointers = new HashSet<NodePointer>();
 		for (NodeDefinition childDef : entity.getDefinition().getChildDefinitions()) {
-			entityChildrenPointers.add(new NodePointer(entity, childDef.getName()));
+			entityChildrenPointers.add(new NodePointer(entity, childDef));
 		}
 		Collection<NodePointer> requirenessDependentNodes = record.determineRequirenessDependentNodes(entityChildrenPointers);
 		Set<NodePointer> updatedRequirenessPointers = updateRequireness(requirenessDependentNodes);
@@ -826,7 +828,7 @@ public class RecordUpdater {
 		EntityDefinition definition = entity.getDefinition();
 		for (NodeDefinition childDef : definition.getChildDefinitions()) {
 			String childName = childDef.getName();
-			pointers.add(new NodePointer(entity, childName));
+			pointers.add(new NodePointer(entity, childDef));
 			if ( childDef instanceof EntityDefinition ) {
 				for (Node<?> childEntity : entity.getAll(childName)) {
 					pointers.addAll(getDescendantNodePointers((Entity) childEntity));
@@ -912,7 +914,7 @@ public class RecordUpdater {
 						Entity childEntity = (Entity) node;
 						EntityDefinition childEntityDef = childEntity.getDefinition();
 						for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitions()) {
-							NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef.getName());
+							NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef);
 							if ( relevant ) {
 								changedNodePointers.addAll(update(nextNodePointer));
 							} else {

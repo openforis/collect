@@ -88,6 +88,7 @@ public class NodeBuilder {
 		Attribute<?, TextValue> attr = (Attribute<?, TextValue>) def.createNode();
 		if ( value != null ) {
 			attr.setValue(new TextValue(value));
+			attr.updateSummaryInfo();
 		}
 		return attr;
 	}

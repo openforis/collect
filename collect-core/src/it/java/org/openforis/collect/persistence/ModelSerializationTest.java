@@ -4,11 +4,14 @@ import java.util.GregorianCalendar;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
@@ -19,7 +22,15 @@ import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.Time;
 
 public class ModelSerializationTest extends CollectIntegrationTest {
+
 //	private final Log log = LogFactory.getLog(ModelSerializationTest.class);
+	
+	private RecordUpdater updater;
+	
+	@Before
+	public void init() {
+		updater = new RecordUpdater();
+	}
 	
 	@Test
 	public void testProto() throws Exception {
@@ -89,8 +100,8 @@ public class ModelSerializationTest extends CollectIntegrationTest {
 			EntityBuilder.addValue(tree1, "total_height", 2.0);
 //			EntityBuilder.addValue(tree1, "bole_height", (Double) null).setMetadata(new CollectAttributeMetadata('*',null,"No value specified"));
 			RealAttribute boleHeight = EntityBuilder.addValue(tree1, "bole_height", (Double) null);
-			boleHeight.getField(0).setSymbol('*');
-			boleHeight.getField(0).setRemarks("No value specified");
+			updater.updateAttribute(boleHeight, FieldSymbol.BLANK_ON_FORM);
+			updater.updateRemarks(boleHeight.getNumberField(), "No value specified");
 			Entity tree2 = EntityBuilder.addEntity(plot, "tree");
 			EntityBuilder.addValue(tree2, "tree_no", 2);
 			EntityBuilder.addValue(tree2, "dbh", 82.8);

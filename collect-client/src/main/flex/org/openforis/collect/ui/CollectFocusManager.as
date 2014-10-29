@@ -165,7 +165,7 @@ package org.openforis.collect.ui {
 		
 		public static function isFieldFocusable(field:FieldProxy):Boolean {
 			var attrDefn:AttributeDefinitionProxy = AttributeDefinitionProxy(field.parent.definition);
-			if ( ArrayUtil.notContains( attrDefn.visibleFields, field.name ) ) {
+			if ( ArrayUtil.notContains( attrDefn.visibleFieldIndexes, field.index) ) {
 				return false;
 			} else if ( attrDefn is CodeAttributeDefinitionProxy && 
 					( CodeAttributeDefinitionProxy(attrDefn).enumeratingAttribute || field.index > 0 ) ) {

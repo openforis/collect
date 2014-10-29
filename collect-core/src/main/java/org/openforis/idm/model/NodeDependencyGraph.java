@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.path.Path;
@@ -55,21 +56,21 @@ public abstract class NodeDependencyGraph extends DependencyGraph<Node<?>> {
 	}
 
 	@Override
-	protected Set<Node<?>> determineRelatedItems(Node<?> node, String relatedChildName, String relatedParentEntityPath) throws InvalidExpressionException {
+	protected Set<Node<?>> determineRelatedItems(Node<?> node, NodeDefinition relatedChildDef, String relatedParentEntityPath) throws InvalidExpressionException {
 		Set<Node<?>> relatedNodes = new HashSet<Node<?>>();
 		Entity parent = node.getParent();
 		List<Node<?>> relatedParentEntities = new ArrayList<Node<?>>();
 		relatedParentEntities = Path.parse(relatedParentEntityPath).evaluate(parent);
 		for (Node<?> relatedParentEntity : relatedParentEntities) {
-			List<Node<?>> dependentNodes = ((Entity) relatedParentEntity).getAll(relatedChildName);
+			List<Node<?>> dependentNodes = ((Entity) relatedParentEntity).getAll(relatedChildDef.getName());
 			relatedNodes.addAll(dependentNodes);
 		}
 		return relatedNodes;
 	}
 
 	@Override
-	protected Set<Node<?>> determineRelatedItems(Node<?> node, String childName) {
-		List<Node<?>> dependentNodes = node.getParent().getAll(childName);
+	protected Set<Node<?>> determineRelatedItems(Node<?> node, NodeDefinition childDef) {
+		List<Node<?>> dependentNodes = node.getParent().getAll(childDef.getName());
 		Set<Node<?>> relatedNodes = new HashSet<Node<?>>();
 		relatedNodes.addAll(dependentNodes);
 		return relatedNodes;

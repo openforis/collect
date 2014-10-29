@@ -106,12 +106,12 @@ public abstract class NumericRangeAttribute<T extends NumericRange<N>,N extends 
 	}
 	
 	@Override
-	public boolean isFilled() {
-		return getField(0).hasValue() && getField(1).hasValue(); 
+	protected boolean calculateAllFieldsFilled() {
+		return getFromField().hasValue() && getToField().hasValue(); 
 	}
 	
 	@Override
-	public boolean isEmpty() {
+	protected boolean calculateIsEmpty() {
 		return getFromField().getValue() == null && getToField().getValue() == null;
 	}
 	

@@ -32,6 +32,7 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	transient Integer internalId;
 	transient Entity parent;
 	transient int index;
+	transient String path;
 	
 	Integer definitionId;
 
@@ -81,32 +82,38 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	}
 
 	public String getPath() {
-		return getPath(true);
-	}
-	
-	public String getPath(boolean includeRoot) {
-		StringBuilder sb = new StringBuilder();
-		getPath(sb, includeRoot);
-		return sb.toString();
-	}
-	
-	protected void getPath(StringBuilder sb, boolean includeRoot) {
-		if ( parent !=null && ( includeRoot || parent.parent != null ) ) {
-			parent.getPath(sb, includeRoot);
+		if ( path == null ) {
+			updatePath();
 		}
-		String name = getName();
-		int idx = getIndex();
-		sb.append("/");
-		sb.append(name);
-		sb.append("[");
-		sb.append(idx+1);
-		sb.append("]");
+		return path;
+	}
+
+	protected void resetPath() {
+		this.path = null;
 	}
 	
+	private void updatePath() {
+		StringBuilder sb = new StringBuilder();
+		if ( parent != null ) {
+			sb.append(parent.getPath());
+		}
+		sb.append("/");
+		sb.append(getName());
+		sb.append("[");
+		sb.append(getIndex() + 1);
+		sb.append("]");
+		path = sb.toString();
+	}
+
 	public int getIndex() {
 		return index;
 	}
 	
+	protected void setIndex(int index) {
+		this.index = index;
+		resetPath();
+	}
+
 	public boolean isRelevant() {
 		return parent == null ? true : parent.isRelevant(getName());
 	}
@@ -155,6 +162,11 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 		return this.parent;
 	}
 
+	protected void setParent(Entity parent) {
+		this.parent = parent;
+		resetPath();
+	}
+	
 	public boolean deepEquals(Object obj) {
 		return equals(obj);
 	}

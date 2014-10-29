@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
@@ -30,7 +31,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	private String phaseToApplyDefaultValue;
 	private boolean editable;
 	private List<Check<?>> checks;
-
+	private String[] visibleFields;
 	
 	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -59,6 +60,9 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 				dest.addCheck(check);
 			}
 		}
+		
+		UIOptions uiOptions = getUIOptions(dest);
+		uiOptions.setVisibleFields(dest, visibleFields);
 	}
 	
 	@Override
@@ -73,6 +77,9 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		editable = annotations.isEditable((AttributeDefinition) source);
 		
 		checks = new ArrayList<Check<?>>(source.getChecks());
+		
+		UIOptions uiOptions = getUIOptions(source);
+		visibleFields = uiOptions.getVisibleFields(source);
 	}
 	
 	@Override
@@ -115,4 +122,12 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		this.checks = checks;
 	}
 	
+	public String[] getVisibleFields() {
+		return visibleFields;
+	}
+	
+	public void setVisibleFields(String[] visibleFields) {
+		this.visibleFields = visibleFields;
+	}
+
 }

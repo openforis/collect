@@ -99,12 +99,14 @@ public class DefaultValueTest {
 			NodeDefinition qtyDefn = itemDefn.getChildDefinition("qty");
 			IntegerAttribute qty = (IntegerAttribute) qtyDefn.createNode();
 			qty.setValue(new IntegerValue(qtyValue, null));
+			qty.updateSummaryInfo();
 			item.add(qty);
 		}
 		if ( priceValue != null ) {
 			NumericAttributeDefinition priceDefn = (NumericAttributeDefinition) itemDefn.getChildDefinition("price");
 			RealAttribute price = (RealAttribute) priceDefn.createNode();
 			price.setValue(new RealValue(priceValue, null));
+			price.updateSummaryInfo();
 			item.add(price);
 		}
 		NumericAttributeDefinition totalDefn = (NumericAttributeDefinition) itemDefn.getChildDefinition("total");

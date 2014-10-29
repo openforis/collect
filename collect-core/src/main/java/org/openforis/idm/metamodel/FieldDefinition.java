@@ -39,6 +39,10 @@ public final class FieldDefinition<T> extends NodeDefinition {
 		return suffix;
 	}
 	
+	public int getIndex() {
+		return ((AttributeDefinition) getParentDefinition()).getFieldDefinitions().indexOf(this);
+	}
+	
 	@Override
 	public Node<?> createNode() {
 		return new Field<T>(this, valueType); 

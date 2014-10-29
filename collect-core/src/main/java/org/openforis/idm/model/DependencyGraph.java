@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 
@@ -157,18 +158,18 @@ public abstract class DependencyGraph<T> {
 		for (NodePathPointer nodePathPointer : pointers) {
 			String entityPath = nodePathPointer.getEntityPath();
 			if ( StringUtils.isBlank(entityPath) ) {
-				result.addAll(determineRelatedItems(item, nodePathPointer.getChildName()));
+				result.addAll(determineRelatedItems(item, nodePathPointer.getReferencedNodeDefinition()));
 			} else {
-				result.addAll(determineRelatedItems(item, nodePathPointer.getChildName(), entityPath));
+				result.addAll(determineRelatedItems(item, nodePathPointer.getReferencedNodeDefinition(), entityPath));
 			}
 		}
 		return result;
 	}
 
-	protected abstract Set<T> determineRelatedItems(T item, String childName);
+	protected abstract Set<T> determineRelatedItems(T item, NodeDefinition childDef);
 
 	protected abstract Set<T> determineRelatedItems(T item,
-			String relatedChildName,
+			NodeDefinition relatedChildDef,
 			String entityPath)
 			throws InvalidExpressionException;
 	

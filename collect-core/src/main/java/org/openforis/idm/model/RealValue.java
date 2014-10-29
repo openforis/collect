@@ -9,6 +9,10 @@ import org.openforis.idm.metamodel.Unit;
  */
 public class RealValue extends NumberValue<Double> {
 
+	public RealValue(Double value) {
+		super(value);
+	}
+	
 	public RealValue(Double value, Unit unit) {
 		super(value, unit);
 	}

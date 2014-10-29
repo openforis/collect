@@ -92,15 +92,17 @@ public class ProtostuffSerializationTest  {
 	private void addTestValues(Entity cluster, String id) {
 		EntityBuilder.addValue(cluster, "id", new Code(id));
 		EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
-		EntityBuilder.addValue(cluster, "region", new Code("001", "aqualiferxxxxxxxxxxxx"));
-		cluster.getChildState("region").set(0, true);
+		CodeAttribute region = EntityBuilder.addValue(cluster, "region", new Code("001", "aqualiferxxxxxxxxxxxx"));
+		region.getCodeField().getState().set(0,true);
+		region.updateSummaryInfo();
 		EntityBuilder.addValue(cluster, "district", new Code("002"));
 		EntityBuilder.addValue(cluster, "crew_no", 10);
 		EntityBuilder.addValue(cluster, "map_sheet", "value 1");
 		EntityBuilder.addValue(cluster, "map_sheet", "value 2");
 		EntityBuilder.addValue(cluster, "vehicle_location", new Coordinate((double) 12345, (double) 67890, "srs"));
 		TextAttribute gpsModel = EntityBuilder.addValue(cluster, "gps_model", "TomTom 1.232");
-		gpsModel.getField(0).getState().set(0,true);
+		gpsModel.getTextField().getState().set(0,true);
+		gpsModel.updateSummaryInfo();
 		cluster.setChildState("accessibility", 1);
 		
 		{
@@ -128,6 +130,7 @@ public class ProtostuffSerializationTest  {
 					(Double) null);
 			boleHeight.getField(0).setSymbol('B');
 			boleHeight.getField(0).setRemarks("No value specified");
+			boleHeight.updateSummaryInfo();
 			Entity tree2 = EntityBuilder.addEntity(plot, "tree");
 			EntityBuilder.addValue(tree2, "tree_no", 2);
 			EntityBuilder.addValue(tree2, "dbh", 82.8);

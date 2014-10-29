@@ -1,8 +1,9 @@
 package org.openforis.idm.metamodel;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
@@ -15,24 +16,34 @@ public class NodeDefinitionTest extends AbstractTest {
 	@Test
 	public void testGetPathAtRoot() {
 		NodeDefinition mock = mock(NodeDefinition.class);
-		when(mock.getName()).thenReturn("cluster");
-		when(mock.getPath()).thenCallRealMethod();
-
-		String path = mock.getPath();
-		assertEquals("/cluster", path);
+		doCallRealMethod().when(mock).getName();
+		doCallRealMethod().when(mock).getPath();
+		doCallRealMethod().when(mock).setName(anyString());
+		doCallRealMethod().when(mock).updatePath();
+		mock.setName("cluster");
+		assertEquals("/cluster", mock.getPath());
 	}
 
 	@Test
 	public void testGetPathAtSecondLevel() {
 		EntityDefinition parentMock = mock(EntityDefinition.class);
-		NodeDefinition mock = mock(NodeDefinition.class);
-		when(parentMock.getName()).thenReturn("cluster");
-		when(mock.getName()).thenReturn("plot");
-		when(mock.getParentDefinition()).thenReturn(parentMock);
-		when(mock.getPath()).thenCallRealMethod();
+		doCallRealMethod().when(parentMock).getName();
+		doCallRealMethod().when(parentMock).getPath();
+		doCallRealMethod().when(parentMock).setName(anyString());
+		doCallRealMethod().when(parentMock).updatePath();
+		parentMock.setName("cluster");
 
-		String path = mock.getPath();
-		assertEquals("/cluster/plot", path);
+		NodeDefinition mock = mock(NodeDefinition.class);
+		doCallRealMethod().when(mock).getName();
+		doCallRealMethod().when(mock).getPath();
+		doCallRealMethod().when(mock).setName(anyString());
+		doCallRealMethod().when(mock).updatePath();
+		doCallRealMethod().when(mock).getParentDefinition();
+		doCallRealMethod().when(mock).setParentDefinition(any(NodeDefinition.class));
+
+		mock.setName("plot");
+		mock.setParentDefinition(parentMock);
+		assertEquals("/cluster/plot", mock.getPath());
 	}
 	
 	@Test
