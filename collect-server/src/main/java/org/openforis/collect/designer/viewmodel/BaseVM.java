@@ -1,6 +1,8 @@
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -119,6 +121,15 @@ public abstract class BaseVM {
 	public boolean isCollectEarthEditor() {
 		return COLLECT_EARTH_EDITOR;
 	}
+	
+	public String joinValues(String[] values, String separator) {
+		return joinList(Arrays.asList(values), separator);
+	}
+	
+	public String joinList(List<String> values, String separator) {
+		return StringUtils.join(values, separator);
+	}
+
 	
 }
 

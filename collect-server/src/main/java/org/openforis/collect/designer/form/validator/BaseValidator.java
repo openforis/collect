@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.openforis.idm.metamodel.Survey;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.Binder;
 import org.zkoss.bind.Property;
@@ -23,8 +24,6 @@ import org.zkoss.util.resource.Labels;
  */
 public abstract class BaseValidator extends AbstractValidator {
 
-	protected static final String INTERNAL_NAME_REGEX = "[a-z][a-z0-9_]*";
-	
 	protected static final String INTERNAL_NAME_INVALID_VALUE_ERROR_KEY = "global.validation.internal_name.invalid_value";
 	protected static final String FIELD_REQUIRED_MESSAGE_KEY = "global.item.validation.required_field";
 	protected static final String INVALID_URI_MESSAGE_KEY = "global.item.validation.invalid_uri";
@@ -61,7 +60,7 @@ public abstract class BaseValidator extends AbstractValidator {
 	}
 	
 	protected boolean validateInternalName(ValidationContext ctx, String fieldName, String validationMessageKey) {
-		return validateRegEx(ctx, INTERNAL_NAME_REGEX, fieldName, INTERNAL_NAME_INVALID_VALUE_ERROR_KEY, validationMessageKey);
+		return validateRegEx(ctx, Survey.INTERNAL_NAME_REGEX, fieldName, INTERNAL_NAME_INVALID_VALUE_ERROR_KEY, validationMessageKey);
 	}
 	
 	protected boolean validateRegEx(ValidationContext ctx, String regex,

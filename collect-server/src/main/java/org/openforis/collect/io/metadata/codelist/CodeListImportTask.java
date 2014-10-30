@@ -1,14 +1,13 @@
 package org.openforis.collect.io.metadata.codelist;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,6 +19,7 @@ import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.codelistimport.CodeListCSVReader;
 import org.openforis.collect.manager.codelistimport.CodeListLine;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -34,13 +34,12 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 
 	private static Log LOG = LogFactory.getLog(CodeListImportTask.class);
 
-	private static final String CSV = "csv";
-	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "codeListImport.error.internalErrorImportingFile";
 	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";
 	
 	//input
 	private CodeListManager codeListManager;
-	private File file;
+	private String entryName;
+	private InputStream inputStream;
 	private CodeList codeList;
 	private boolean overwriteData;
 	
@@ -51,27 +50,13 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 
 	@Override
 	protected void initInternal() throws Throwable {
-		validateParameters();
-		codeToRootItem = new LinkedHashMap<String, CodeListItem>();
 		super.initInternal();
-	}
-	
-	protected void validateParameters() {
-		if ( ! file.exists() && ! file.canRead() ) {
-			setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
-		}
+		codeToRootItem = new LinkedHashMap<String, CodeListItem>();
 	}
 	
 	@Override
 	protected void execute() throws Throwable {
-		String fileName = file.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if ( CSV.equalsIgnoreCase(extension) ) {
-			parseCSVLines(file);
-		} else {
-			String errorMessage = "File type not supported" + extension;
-			setErrorMessage(errorMessage);
-		}
+		parseCSVLines();
 		if (hasErrors()) {
 			changeStatus(Status.FAILED);
 		} else if (isRunning()) {
@@ -79,7 +64,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		}
 	}
 
-	protected void saveData() {
+	private void saveData() {
 		if ( overwriteData ) {
 			codeList.removeAllLevels();
 		}
@@ -88,25 +73,15 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		codeListManager.deleteAllItems(codeList);
 		List<CodeListItem> rootItems = new ArrayList<CodeListItem>(codeToRootItem.values());
 		codeListManager.saveItemsAndDescendants(rootItems);
-		//saveItemsAndDescendants(rootItems, null);
 	}
 
-//	protected void saveItemsAndDescendants(Collection<CodeListItem> items,
-//			Integer parentItemId) {
-//		for (CodeListItem item : items) {
-//			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
-//			persistedChildItem.setParentId(parentItemId);
-//			codeListManager.save(persistedChildItem);
-//			saveItemsAndDescendants(item.getChildItems(), persistedChildItem.getSystemId());
-//		}
-//	}
-
-	protected void parseCSVLines(File file) {
+	private void parseCSVLines() {
 		long currentRowNumber = 0;
 		try {
 			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 			List<String> languages = survey.getLanguages();
 			String defaultLanguage = survey.getDefaultLanguage();
+			File file = OpenForisIOUtils.copyToTempFile(inputStream);
 			reader = new CodeListCSVReader(file, languages, defaultLanguage);
 			reader.init();
 			levels = reader.getLevels();
@@ -140,7 +115,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		} catch (Exception e) {
 			changeStatus(Status.FAILED);
 			addParsingError(currentRowNumber, new ParsingError(ErrorType.IOERROR, e.toString()));
-			LOG.error("Error importing species CSV file", e);
+			LOG.error("Error importing code list CSV file", e);
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}
@@ -159,13 +134,9 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		}
 		//validate labels
 		List<LanguageSpecificText> labels = line.getLabelItems(levelIdx);
-		if ( CollectionUtils.isEmpty(labels) ) {
-			addMissingDefaultLanguageLabelError(line, levelIdx);
-		} else {
-			for (LanguageSpecificText label : labels) {
-				if ( hasDifferentLabel(code, label, parent)) {
-					addDifferentLabelError(line, levelIdx, label.getLanguage());
-				}
+		for (LanguageSpecificText label : labels) {
+			if ( hasDifferentLabel(code, label, parent)) {
+				addDifferentLabelError(line, levelIdx, label.getLanguage());
 			}
 		}
 		result = getChildItem(parent, code);
@@ -221,7 +192,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		return duplicateItem;
 	}
 	
-	protected void addEmptyCodeColumnError(CodeListLine line, int levelIdx) {
+	private void addEmptyCodeColumnError(CodeListLine line, int levelIdx) {
 		String level = levels.get(levelIdx);
 		String column = level + CodeListCSVReader.CODE_COLUMN_SUFFIX;
 		long lineNumber = line.getLineNumber();
@@ -229,7 +200,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		addParsingError(lineNumber, error);
 	}
 	
-	protected void addDuplicateCodeError(CodeListLine line,	int levelIdx) {
+	private void addDuplicateCodeError(CodeListLine line,	int levelIdx) {
 		String level = levels.get(levelIdx);
 		String column = level + CodeListCSVReader.CODE_COLUMN_SUFFIX;
 		long lineNumber = line.getLineNumber();
@@ -237,7 +208,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		addParsingError(lineNumber, error);
 	}
 	
-	protected void addDifferentLabelError(CodeListLine line, int levelIdx, String lang) {
+	private void addDifferentLabelError(CodeListLine line, int levelIdx, String lang) {
 		String level = levels.get(levelIdx);
 		String column = level + CodeListCSVReader.LABEL_COLUMN_SUFFIX + "_" + lang;
 		long lineNumber = line.getLineNumber();
@@ -245,14 +216,6 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		addParsingError(lineNumber, error);
 	}
 
-	protected void addMissingDefaultLanguageLabelError(CodeListLine line, int levelIdx) {
-		String level = levels.get(levelIdx);
-		String column = level + CodeListCSVReader.LABEL_COLUMN_SUFFIX;
-		long lineNumber = line.getLineNumber();
-		ParsingError error = new ParsingError(ErrorType.EMPTY, lineNumber, column);
-		addParsingError(lineNumber, error);
-	}
-	
 	protected CodeListItem getCodeListItemInDescendants(String code) {
 		Stack<CodeListItem> stack = new Stack<CodeListItem>();
 		stack.addAll(codeToRootItem.values());
@@ -266,14 +229,14 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		}
 		return null;
 	}
-	protected void fillItem(CodeListItem item, String code, List<LanguageSpecificText> labelItems) {
+	private void fillItem(CodeListItem item, String code, List<LanguageSpecificText> labelItems) {
 		item.setCode(code);
 		for (LanguageSpecificText labelItem : labelItems) {
 			item.setLabel(labelItem.getLanguage(), labelItem.getText());
 		}
 	}
 
-	protected void addLevelsToCodeList() {
+	private void addLevelsToCodeList() {
 		if ( levels != null && levels.size() > 1 ) {
 			for (String levelName : levels) {
 				CodeListLevel level = new CodeListLevel();
@@ -291,12 +254,20 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 		this.codeList = codeList;
 	}
 	
-	public void setFile(File file) {
-		this.file = file;
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
 	}
 	
 	public void setOverwriteData(boolean overwriteData) {
 		this.overwriteData = overwriteData;
+	}
+
+	public String getEntryName() {
+		return entryName;
+	}
+	
+	public void setEntryName(String entryName) {
+		this.entryName = entryName;
 	}
 	
 }

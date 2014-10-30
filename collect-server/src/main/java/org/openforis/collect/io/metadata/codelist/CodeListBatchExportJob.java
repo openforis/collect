@@ -13,13 +13,12 @@ import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.CodeList;
 
-
 /**
  * 
  * @author S. Ricci
  *
  */
-public class BatchCodeListExportJob extends Job {
+public class CodeListBatchExportJob extends Job {
 
 	//input
 	private CollectSurvey survey;
@@ -38,8 +37,12 @@ public class BatchCodeListExportJob extends Job {
 	
 	@Override
 	protected void buildTasks() throws Throwable {
+		CodeList samplingDesignCodeList = survey.getSamplingDesignCodeList();
+		
 		for (CodeList codeList : survey.getCodeLists()) {
-			addCodeListExportTask(codeList);
+			if (codeList.getId() != samplingDesignCodeList.getId()) {
+				addCodeListExportTask(codeList);
+			}
 		}
 	}
 

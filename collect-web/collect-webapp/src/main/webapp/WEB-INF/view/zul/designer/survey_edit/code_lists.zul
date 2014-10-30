@@ -42,7 +42,7 @@
 						</toolbar>
 						<hlayout width="100%">
 							<button label="${labels.survey.code_list.batch_import}"
-								onClick="@command('openBatchImportPopUp')" />
+								upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />
 							<space hflex="true" />
 							<button label="${labels.survey.code_list.batch_export}"
 								onClick="@command('batchExport')" />

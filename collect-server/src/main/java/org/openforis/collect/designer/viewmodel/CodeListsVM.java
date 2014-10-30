@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.CodeListFormObject;
 import org.openforis.collect.designer.form.CodeListFormObject.Type;
 import org.openforis.collect.designer.form.FormObject;
@@ -23,12 +25,16 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.io.metadata.codelist.BatchCodeListExportJob;
+import org.openforis.collect.designer.viewmodel.referencedata.ReferenceDataImportErrorPopUpVM;
+import org.openforis.collect.io.metadata.codelist.CodeListBatchExportJob;
+import org.openforis.collect.io.metadata.codelist.CodeListBatchImportJob;
+import org.openforis.collect.io.metadata.codelist.CodeListImportTask;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -54,10 +60,12 @@ import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.UploadEvent;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
@@ -99,7 +107,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@WireVariable
 	private SpringJobManager springJobManager;
 	private Window jobStatusPopUp;
-	private BatchCodeListExportJob batchExportJob;
+	private CodeListBatchExportJob batchExportJob;
+	private CodeListBatchImportJob batchImportJob;
+	private Window dataImportErrorPopUp;
 	
 	public CodeListsVM() {
 		super();
@@ -390,14 +400,27 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		openChildItemEditPopUp();
 	}
 	
+	
 	@Command
-	public void openBatchImportPopUp() {
-		
+	public void batchImportFileUploaded(@ContextParam(ContextType.TRIGGER_EVENT) UploadEvent event) {
+ 		Media media = event.getMedia();
+		String fileName = media.getName();
+		String extension = FilenameUtils.getExtension(fileName);
+		File tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), extension);
+
+		batchImportJob = new CodeListBatchImportJob();
+		batchImportJob.setJobManager(springJobManager);
+		batchImportJob.setCodeListManager(codeListManager);
+		batchImportJob.setSurvey(survey);
+		batchImportJob.setOverwriteData(true);
+		batchImportJob.setFile(tempFile);
+		springJobManager.start(batchImportJob);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.batch_import"), batchImportJob, true);
 	}
 	
 	@Command
 	public void batchExport() {
-		batchExportJob = new BatchCodeListExportJob();
+		batchExportJob = new CodeListBatchExportJob();
 		batchExportJob.setJobManager(springJobManager);
 		batchExportJob.setCodeListManager(codeListManager);
 		batchExportJob.setSurvey(survey);
@@ -413,27 +436,33 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@GlobalCommand
 	public void jobAborted(@BindingParam("job") Job job) {
 		closeJobStatusPopUp();
-		batchExportJob = null;
+		clearJob(job);
 	}
-	
+
 	@GlobalCommand
 	public void jobFailed(@BindingParam("job") Job job) {
 		closeJobStatusPopUp();
-		if ( job == batchExportJob ) {
-			batchExportJob = null;
-			String errorMessage = job.getErrorMessage();
+		if (job instanceof CodeListBatchImportJob && job.getCurrentTask() != null) {
+			CodeListImportTask lastTask = (CodeListImportTask) ((CodeListBatchImportJob) job).getCurrentTask();
+			dataImportErrorPopUp = ReferenceDataImportErrorPopUpVM.showPopUp(lastTask.getErrors(), 
+					Labels.getLabel("survey.code_list.import_data.error_popup.title", new String[]{lastTask.getEntryName()}));
+		} else {
+			String errorMessageKey = job.getErrorMessage();
+			String errorMessage = StringUtils.defaultIfBlank(Labels.getLabel(errorMessageKey), errorMessageKey);
 			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
 		}
+		clearJob(job);
 	}
 	
 	@GlobalCommand
 	public void jobCompleted(@BindingParam("job") Job job) {
 		closeJobStatusPopUp();
-		if ( job == batchExportJob ) {
-			File file = batchExportJob.getOutputFile();
-			downloadFile(file, survey.getName() + "_code_lists.zip");
-			batchExportJob = null;
+		if (job == batchExportJob) {
+			downloadFile(batchExportJob.getOutputFile(), survey.getName() + "_code_lists.zip");
+		} else if (job == batchImportJob) {
+			notifyChange("items");
 		}
+		clearJob(job);
 	}
 
 	private void downloadFile(File file, String fileName) {
@@ -444,6 +473,14 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		}
 	}
 
+	private void clearJob(Job job) {
+		if (job == batchExportJob) {
+			batchExportJob = null;
+		} else if (job == batchImportJob) {
+			batchImportJob = null;
+		}
+	}
+	
 	protected String generateItemCode(CodeListItem item) {
 		return "item_" + item.getId();
 	}
@@ -588,6 +625,12 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		Filedownload.save(tempFile, CSV_CONTENT_TYPE);
 	}
 
+	@GlobalCommand
+	public void closeReferenceDataImportErrorPopUp() {
+		closePopUp(dataImportErrorPopUp);
+		dataImportErrorPopUp = null;
+	}
+	
 	protected boolean canImportCodeList() {
 		return ! editedItem.isExternal() && ! isUsedAsEnumeratorInPublishedSurvey();
 	}

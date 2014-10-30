@@ -23,6 +23,8 @@ import org.openforis.idm.model.Record;
 public class Survey implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final String INTERNAL_NAME_REGEX = "[a-z][a-z0-9_]*";
 
 	private Integer id;
 	private String name;

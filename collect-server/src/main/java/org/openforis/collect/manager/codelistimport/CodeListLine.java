@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.io.metadata.parsing.Line;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 
 
@@ -39,7 +40,7 @@ public class CodeListLine extends Line {
 	}
 	
 	public List<LanguageSpecificText> getLabelItems(int levelIdx) {
-		return levelToLocalizedText.get(levelIdx);
+		return CollectionUtils.unmodifiableList(levelToLocalizedText.get(levelIdx));
 	}
 	
 	public List<String> getLevelCodes() {

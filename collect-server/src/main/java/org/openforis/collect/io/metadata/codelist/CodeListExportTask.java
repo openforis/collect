@@ -1,5 +1,6 @@
 package org.openforis.collect.io.metadata.codelist;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -46,11 +47,19 @@ public class CodeListExportTask extends Task {
 		initHeaders();
 		List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
 		for (CodeListItem item : rootItems) {
-			List<CodeListItem> ancestors = Collections.emptyList();
-			writeItem(item, ancestors);
+			writeItem(item, Collections.<CodeListItem>emptyList());
 		}
 	}
 
+	@Override
+	protected void onCompleted() {
+		super.onCompleted();
+		try {
+			writer.flush();
+		} catch (IOException e) {
+		}
+	}
+	
 	private void initHeaders() {
 		ArrayList<String> colNames = new ArrayList<String>();
 		List<CodeListLevel> levels = list.getHierarchy();
@@ -71,7 +80,7 @@ public class CodeListExportTask extends Task {
 				colNames.add(levelName + CodeListCSVReader.LABEL_COLUMN_SUFFIX + "_" + lang);
 			}
 		}
-		writer.writeHeaders(colNames.toArray(new String[0]));
+		writer.writeHeaders(colNames.toArray(new String[colNames.size()]));
 	}
 
 	protected void writeItem(CodeListItem item, List<CodeListItem> ancestors) {
@@ -79,7 +88,7 @@ public class CodeListExportTask extends Task {
 		addAncestorsLineValues(lineValues, ancestors);
 		addItemLineValues(lineValues, item);
 
-		writer.writeNext(lineValues.toArray(new String[0]));
+		writer.writeNext(lineValues.toArray(new String[lineValues.size()]));
 		
 		List<CodeListItem> children = codeListManager.loadChildItems(item);
 		List<CodeListItem> childAncestors = new ArrayList<CodeListItem>(ancestors);

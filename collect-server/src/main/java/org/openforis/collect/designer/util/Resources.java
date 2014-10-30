@@ -52,6 +52,7 @@ public class Resources {
 		FORMULA_POPUP("survey_edit/schema/attribute/calculated_formula_popup.zul"), 
 		PRECISION_POPUP("survey_edit/schema/precision_popup.zul"),
 		SURVEY_VALIDATION_RESULTS_POPUP("survey_validation_results_popup.zul"),
+		REFERENCE_DATA_IMPORT_ERROR_POPUP("survey_edit/reference_data/reference_data_import_error_popup.zul"),
 		CONFIRM_SURVEY_ERRORS_POPUP("component/confirm_survey_errors_popup.zul"),
 		PROCESS_STATUS_POPUP("component/process_status_popup.zul"),
 		JOB_STATUS_POPUP("component/job_status_popup.zul"),
