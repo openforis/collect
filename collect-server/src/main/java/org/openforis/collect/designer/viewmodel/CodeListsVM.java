@@ -4,6 +4,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,11 +23,14 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.io.metadata.codelist.BatchCodeListExportJob;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.concurrency.Job;
+import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
@@ -92,6 +96,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private SurveyManager surveyManager;
 	@WireVariable
 	private CodeListManager codeListManager;
+	@WireVariable
+	private SpringJobManager springJobManager;
+	private Window jobStatusPopUp;
+	private BatchCodeListExportJob batchExportJob;
 	
 	public CodeListsVM() {
 		super();
@@ -382,6 +390,60 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		openChildItemEditPopUp();
 	}
 	
+	@Command
+	public void openBatchImportPopUp() {
+		
+	}
+	
+	@Command
+	public void batchExport() {
+		batchExportJob = new BatchCodeListExportJob();
+		batchExportJob.setJobManager(springJobManager);
+		batchExportJob.setCodeListManager(codeListManager);
+		batchExportJob.setSurvey(survey);
+		springJobManager.start(batchExportJob);
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.batch_export"), batchExportJob, true);
+	}
+	
+	protected void closeJobStatusPopUp() {
+		closePopUp(jobStatusPopUp);
+		jobStatusPopUp = null;
+	}
+
+	@GlobalCommand
+	public void jobAborted(@BindingParam("job") Job job) {
+		closeJobStatusPopUp();
+		batchExportJob = null;
+	}
+	
+	@GlobalCommand
+	public void jobFailed(@BindingParam("job") Job job) {
+		closeJobStatusPopUp();
+		if ( job == batchExportJob ) {
+			batchExportJob = null;
+			String errorMessage = job.getErrorMessage();
+			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
+		}
+	}
+	
+	@GlobalCommand
+	public void jobCompleted(@BindingParam("job") Job job) {
+		closeJobStatusPopUp();
+		if ( job == batchExportJob ) {
+			File file = batchExportJob.getOutputFile();
+			downloadFile(file, survey.getName() + "_code_lists.zip");
+			batchExportJob = null;
+		}
+	}
+
+	private void downloadFile(File file, String fileName) {
+		try {
+			Filedownload.save(new FileInputStream(file), "application/zip", fileName);
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	protected String generateItemCode(CodeListItem item) {
 		return "item_" + item.getId();
 	}

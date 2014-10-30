@@ -14,7 +14,7 @@ import org.openforis.idm.metamodel.CodeList;
  * @author S. Ricci
  *
  */
-public class SingleCodeListImportJob extends Job {
+public class CodeListImportJob extends Job {
 
 	//input
 	private CodeListManager codeListManager;

@@ -1,0 +1,94 @@
+package org.openforis.collect.io.metadata.codelist;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.concurrency.Job;
+import org.openforis.concurrency.Task;
+import org.openforis.idm.metamodel.CodeList;
+
+
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
+public class BatchCodeListExportJob extends Job {
+
+	//input
+	private CollectSurvey survey;
+	private CodeListManager codeListManager;
+	
+	//output
+	private File outputFile;
+	private ZipOutputStream zipOutputStream;
+
+	@Override
+	protected void initInternal() throws Throwable {
+		outputFile = File.createTempFile("batch_code_list_export", ".zip");
+		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
+		super.initInternal();
+	}
+	
+	@Override
+	protected void buildTasks() throws Throwable {
+		for (CodeList codeList : survey.getCodeLists()) {
+			addCodeListExportTask(codeList);
+		}
+	}
+
+	private void addCodeListExportTask(CodeList codeList) {
+		CodeListExportTask t = new CodeListExportTask();
+		t.setOut(zipOutputStream);
+		t.setList(codeList);
+		t.setCodeListManager(codeListManager);
+		addTask(t);
+	}
+	
+	@Override
+	protected void prepareTask(Task task) {
+		CodeList codeList = ((CodeListExportTask) task).getList();
+		String zipEntryName = codeList.getName() + ".csv";
+		try {
+			zipOutputStream.putNextEntry(new ZipEntry(zipEntryName));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		super.prepareTask(task);
+	}
+	
+	@Override
+	protected void onTaskCompleted(Task task) {
+		super.onTaskCompleted(task);
+		try {
+			zipOutputStream.closeEntry();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Override
+	protected void onCompleted() {
+		super.onCompleted();
+		IOUtils.closeQuietly(zipOutputStream);
+	}
+	
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
+	}
+	
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
+	}
+	
+	public File getOutputFile() {
+		return outputFile;
+	}
+	
+}

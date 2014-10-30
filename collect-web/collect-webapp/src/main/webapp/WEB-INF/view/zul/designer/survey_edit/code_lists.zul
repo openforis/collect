@@ -40,6 +40,13 @@
 								disabled="@load(empty vm.selectedItem)"
 								onClick="@command('deleteItem', item=vm.selectedItem)" />
 						</toolbar>
+						<hlayout width="100%">
+							<button label="${labels.survey.code_list.batch_import}"
+								onClick="@command('openBatchImportPopUp')" />
+							<space hflex="true" />
+							<button label="${labels.survey.code_list.batch_export}"
+								onClick="@command('batchExport')" />
+						</hlayout>
 					</vlayout>
 				</center>
 			</borderlayout>
