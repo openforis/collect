@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -613,6 +614,8 @@ public class RecordUpdater {
 		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
 		entityAsList.add(entity);
 
+		Set<NodePointer> entityDescendantPointers = getDescendantNodePointers(entity);
+
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addEntityAddChange(entity);
 		
@@ -630,29 +633,24 @@ public class RecordUpdater {
 		
 		//relevance
 		
-		List<NodePointer> relevancePointers = record.determineConstantRelevancePointers(entity);
-		relevancePointers.addAll(record.determineRelevanceDependentNodes(entityAsList));
+		List<NodePointer> relevancePointers = new ArrayList<NodePointer>(entityDescendantPointers);
 		Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(relevancePointers).update();
 		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
 		//requireness
 		
-		//for root entity there is no node pointer so we iterate over its children
-		Set<NodePointer> entityChildrenPointers = new HashSet<NodePointer>();
-		for (NodeDefinition childDef : entity.getDefinition().getChildDefinitions()) {
-			entityChildrenPointers.add(new NodePointer(entity, childDef));
-		}
-		Collection<NodePointer> requirenessDependentNodes = record.determineRequirenessDependentNodes(entityChildrenPointers);
+		//for root entity there is no node pointer so we iterate over its descendants
+		Collection<NodePointer> requirenessDependentNodes = record.determineRequirenessDependentNodes(entityDescendantPointers);
 		Set<NodePointer> updatedRequirenessPointers = updateRequireness(requirenessDependentNodes);
 		changeMap.addRequirenessChanges(updatedRequirenessPointers);
+
+		//cardinality
 		
-		Set<NodePointer> nodePointersToCheckCardinalityFor = getDescendantNodePointers(entity);
+		Set<NodePointer> nodePointersToCheckCardinalityFor = new HashSet<NodePointer>(entityDescendantPointers);
 		if ( entity.getParent() != null ) {
 			nodePointersToCheckCardinalityFor.add(new NodePointer(entity));
 		}
-		
-		//cardinality
-		validateCardinality(record, new HashSet<NodePointer>(nodePointersToCheckCardinalityFor), changeMap);
+		validateCardinality(record, nodePointersToCheckCardinalityFor, changeMap);
 		
 		//validate attributes
 		Set<Attribute<?, ?>> attributes = record.determineValidationDependentNodes(entityAsList);
@@ -824,13 +822,12 @@ public class RecordUpdater {
 	}
 
 	private Set<NodePointer> getDescendantNodePointers(Entity entity) {
-		Set<NodePointer> pointers = new HashSet<NodePointer>();
+		Set<NodePointer> pointers = new LinkedHashSet<NodePointer>();
 		EntityDefinition definition = entity.getDefinition();
 		for (NodeDefinition childDef : definition.getChildDefinitions()) {
-			String childName = childDef.getName();
 			pointers.add(new NodePointer(entity, childDef));
 			if ( childDef instanceof EntityDefinition ) {
-				for (Node<?> childEntity : entity.getAll(childName)) {
+				for (Node<?> childEntity : entity.getAll(childDef.getName())) {
 					pointers.addAll(getDescendantNodePointers((Entity) childEntity));
 				}
 			}

@@ -3,10 +3,8 @@ package org.openforis.idm.model;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -80,21 +78,6 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 		Entity pointerEntity = pointer.getEntity();
 		NodePointer nodePointer = new NodePointer(pointerEntity, childDef);
 		return Collections.singleton(nodePointer);
-	}
-	
-	@Override
-	public List<NodePointer> dependenciesFor(Collection<Node<?>> nodes) {
-		Set<NodePointer> items = new LinkedHashSet<NodePointer>();
-		Stack<Node<?>> stack = new Stack<Node<?>>();
-		stack.addAll(nodes);
-		while(!stack.isEmpty()) {
-			Node<?> node = stack.pop();
-			items.addAll(toItems(node));
-			if(node instanceof Entity) {
-				stack.addAll(((Entity) node).getChildren());
-			}
-		}
-		return dependenciesForItems(items);
 	}
 	
 	public List<NodePointer> dependenciesForPointers(Collection<NodePointer> pointers) {

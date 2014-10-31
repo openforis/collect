@@ -96,6 +96,29 @@ public class RecordUpdaterTest {
 		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("time_study"));
 	}
 
+	@Test
+	public void testRequirenessUpdatedInNestedNodesOnRecordInitialization() {
+		record(
+			rootEntityDef(
+				entityDef("plot",
+					entityDef("tree",
+						attributeDef("health"),
+						attributeDef("start_time")
+							.required("health = '1'")
+					)
+					.multiple()
+				)
+				.multiple()
+			), 
+			entity("plot", 
+				entity("tree", 
+					attribute("health", "1")),
+				entity("tree")
+			)
+		);
+		Entity tree = (Entity) record.findNodeByPath("/root/plot[1]/tree[1]");
+		assertTrue(tree.isRequired("start_time"));
+	}
 
 	@Test
 	public void testMinCountValidationResultOnEntityWhenRequiredAttributeIsEmpty() {
@@ -105,11 +128,11 @@ public class RecordUpdaterTest {
 						attributeDef("start_time")
 							.required()
 				)
-			)
+			),
+			entity("time_study")
 		);
 		Entity timeStudy = entityByPath("/root/time_study");
-		ValidationResultFlag timeStartValidationResult = timeStudy.getMinCountValidationResult("start_time");
-		assertEquals(ValidationResultFlag.ERROR, timeStartValidationResult);
+		assertEquals(ValidationResultFlag.ERROR, timeStudy.getMinCountValidationResult("start_time"));
 	}
 
 	@Test
