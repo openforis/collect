@@ -2,6 +2,7 @@ package org.openforis.collect.presenter {
 	import flash.events.FocusEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -10,6 +11,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.input.FixedCodeInputField;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	
 	/**
 	 * 
@@ -53,8 +55,7 @@ package org.openforis.collect.presenter {
 				var entityName:String = view.parentEntity.name;
 				var ancestorEntityId:Number = view.parentEntity.parentId;
 				var ancestorEntity:EntityProxy = Application.activeRecord.getNode(ancestorEntityId) as EntityProxy;
-				var width:Number = UIBuilder.getEnumeratedCodeHeaderWidth(view.attributeDefinition, ancestorEntity);
-				view.width = width;
+				view.width = UIBuilder.getEnumeratedCodeHeaderWidth(view.attributeDefinition, ancestorEntity);
 			}
 		}
 		
@@ -62,7 +63,9 @@ package org.openforis.collect.presenter {
 			var result:String = null;
 			var codeAttribute:CodeAttributeProxy = view.attribute as CodeAttributeProxy;
 			if(codeAttribute != null && codeAttribute.codeListItem != null) {
-				result = codeAttribute.codeListItem.getLabelText();
+				var def:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(view.attributeDefinition);
+				var item:CodeListItemProxy = codeAttribute.codeListItem;
+				result = (def.showCode ? (item.code + " - "): "") + item.getLabelText();
 			}
 			return result;
 		}

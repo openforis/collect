@@ -332,6 +332,7 @@ package org.openforis.collect.ui {
 				}
 			} else {
 				result = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+				
 			}
 			result += VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
 			return result;
@@ -341,8 +342,11 @@ package org.openforis.collect.ui {
 			var parentEntityDefn:EntityDefinitionProxy = def.parent;
 			var enumeratedCodeWidth:Number = ancestorEntity.getEnumeratedCodeWidth(parentEntityDefn.name);
 			var headerText:String = def.getNumberAndHeadingLabelText();
-			var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
-			var width:Number = Math.max(headerWidth, enumeratedCodeWidth);
+			var width:Number = def.width;
+			if (isNaN(width)) {
+				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
+				width = Math.max(headerWidth, enumeratedCodeWidth);
+			}
 			return width;
 		}
 		

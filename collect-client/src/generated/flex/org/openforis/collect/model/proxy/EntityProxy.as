@@ -14,6 +14,7 @@ package org.openforis.collect.model.proxy {
 	
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
@@ -22,6 +23,7 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
+	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 
 	/**
 	 * @author S. Ricci
@@ -55,10 +57,11 @@ package org.openforis.collect.model.proxy {
 					var maxWidth:Number = _enumeratedEntitiesCodeWidths[name];
 					var keyAttribute:CodeAttributeProxy = e.getKeyAttribute();
 					if(keyAttribute != null && keyAttribute.codeListItem != null) {
-						var label:String = keyAttribute.codeListItem.getLabelText();
-						//var width:Number = label.length * 7;
-						var width:Number = UIUtil.measureFixedCodeWidth(label);
-						if(keyAttribute.codeListItem.qualifiable) {
+						var def:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(keyAttribute.definition);
+						var item:CodeListItemProxy = keyAttribute.codeListItem;
+						var label:String = (def.showCode ? (item.code + " - "): "") + item.getLabelText();
+						var width:Number = UIUtil.measureFixedCodeWidth(label) + 10;
+						if(item.qualifiable) {
 							width += 104; //space for qualifier text input
 						}
 						if(!isNaN(maxWidth)) {

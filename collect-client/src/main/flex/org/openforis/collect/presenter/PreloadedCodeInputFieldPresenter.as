@@ -56,7 +56,9 @@ package org.openforis.collect.presenter
 		
 		override protected function updateView():void {
 			if ( view.parentEntity != null ) {
-				initDataProvider();
+				if (! view.updating) {
+					initDataProvider();
+				}
 				var hasRemarks:Boolean = view.attribute == null ? false: StringUtil.isNotBlank(getRemarks());
 				view.editable = Application.activeRecordEditable && ! view.attributeDefinition.calculated;
 				view.hasRemarks = hasRemarks;

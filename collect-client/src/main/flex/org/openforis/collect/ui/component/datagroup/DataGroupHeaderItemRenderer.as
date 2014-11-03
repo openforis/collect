@@ -1,6 +1,5 @@
 package org.openforis.collect.ui.component.datagroup
 {
-	import mx.containers.utilityClasses.ConstraintColumn;
 	import mx.core.IVisualElement;
 	import mx.events.FlexEvent;
 	
@@ -32,11 +31,6 @@ package org.openforis.collect.ui.component.datagroup
 				super.createChildren();
 				var elem:IVisualElement = UIBuilder.getDataGroupHeader(data as NodeDefinitionProxy, parentEntity);
 				addElement(elem);
-				/*
-				var constraintColumns:Vector.<ConstraintColumn> = outerDocument.constraintLayout.constraintColumns;
-				var constraintColumn:ConstraintColumn = constraintColumns[super.itemIndex];
-				elem.x = constraintColumn.x;
-				*/
 			}
 		}
 		
