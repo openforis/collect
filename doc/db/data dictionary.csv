@@ -1,0 +1,20 @@
+TABLE_NAME,TABLE_COMMENT
+databasechangelog,"Managed by Liquibase (database migration tool)"
+databasechangeloglock,"Managed by Liquibase (database migration tool)"
+ofc_application_info,"(Deprecated) Stores informations about the version of Collect used to store the data into the DB"
+ofc_code_list,"Coded variable values"
+ofc_config,"Stores a generic list of key-value couples that are managed by Open Foris Collect as a Configuration object"
+ofc_logo,"Stores a list of images used by the application to customize the user interface"
+ofc_record,"Stores the records collected by the appliation using a published survey.
+The complete set of variables collected in each X step (X = 1:ENTRY or 2:CLEANSING ) is stored in binary format into the dataX column."
+ofc_sampling_design,"Sampling point data associated to a survey (published or temporary).
+For each point there will be a coordinate and (optionally) a set of extra properties.
+The sampling point is identified by the levelX columns, depending on its level in the hierarchy.
+E.g. level1=cluster, level2=plot, level3=tree. The cluster points will be identified by the cluster id (level1), plot points will be identified by cluster id (level1) + plot number (level2), tree points will be identified by cluster id (level1), plot number (level2) and tree number (level3)."
+ofc_survey,"Stores the published surveys (available for data entry)"
+ofc_survey_work,"Stores the surveys that have not been published already"
+ofc_taxon,"Stores the taxon elements associated to a taxonomy (species list))"
+ofc_taxon_vernacular_name,"Taxon common names"
+ofc_taxonomy,"Hierarchical species list table"
+ofc_user,"User of the application"
+ofc_user_role,"Role associated to one user"
