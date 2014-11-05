@@ -29,24 +29,25 @@
 								</listitem>
 							</template>
 						</listbox>
-						<toolbar>
-							<toolbarbutton
+						<menubar sclass="withicons">
+							<menuitem 
 								tooltiptext="${labels.global.add_item}"
 								image="/assets/images/add.png" 
 								onClick="@command('newItem')" />
-							<toolbarbutton
+							<menuitem
 								tooltiptext="${labels.global.delete_item}"
 								image="/assets/images/delete.png"
 								disabled="@load(empty vm.selectedItem)"
 								onClick="@command('deleteItem', item=vm.selectedItem)" />
-						</toolbar>
-						<hlayout width="100%">
-							<button label="${labels.survey.code_list.batch_import}"
-								upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />
-							<space hflex="true" />
-							<button label="${labels.survey.code_list.batch_export}"
-								onClick="@command('batchExport')" />
-						</hlayout>
+							<menu image="/assets/images/settings-small.png">
+								<menupopup>
+									<menuitem label="${labels.survey.code_list.batch_import}"
+										upload="true,maxsize=-1" onUpload="@command('batchImportFileUploaded')"  />
+									<menuitem label="${labels.survey.code_list.batch_export}"
+										onClick="@command('batchExport')" />
+								</menupopup>
+							</menu>
+						</menubar>
 					</vlayout>
 				</center>
 			</borderlayout>
