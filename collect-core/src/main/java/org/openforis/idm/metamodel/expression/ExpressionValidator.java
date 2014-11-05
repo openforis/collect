@@ -1,15 +1,15 @@
 package org.openforis.idm.metamodel.expression;
 
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.expression.BooleanExpression;
 import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.model.expression.ValueExpression;
-
-import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Verifies that the expressions defined in a survey are valid
@@ -77,7 +77,6 @@ public class ExpressionValidator {
 		}
 	}
 
-	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public boolean validateRegularExpression(String regEx) {
 		try {
 			Pattern.compile(regEx);
