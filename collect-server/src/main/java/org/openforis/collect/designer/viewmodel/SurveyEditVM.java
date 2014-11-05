@@ -142,11 +142,15 @@ public class SurveyEditVM extends SurveyBaseVM {
 			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
 			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
-			dispatchCurrentFormValidatedCommand(true);
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
-			args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
-			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
+			if (selectedCodeList == survey.getSamplingDesignCodeList()) {
+				MessageUtil.showWarning("survey.code_list.alert.cannot_edit_sampling_design_list");
+			} else {
+				dispatchCurrentFormValidatedCommand(true);
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
+				args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
+				codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
+			}
 		}
 	}
 
