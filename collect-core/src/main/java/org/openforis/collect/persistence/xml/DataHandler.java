@@ -389,6 +389,7 @@ public class DataHandler extends DefaultHandler {
 		if ( stateValue != null && stateValue > 0 ) {
 			fld.getState().set(stateValue);
 		}
+		fld.getAttribute().updateSummaryInfo();
 	}
 
 	private Integer getNodeState() {

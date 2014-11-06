@@ -126,12 +126,12 @@ public abstract class NodeDefinitionBuilder {
 	public static class AttributeDefinitionBuilder extends NodeDefinitionBuilder {
 
 		private boolean key;
-		private List<String> calculatedExpressions;
+		private List<AttributeDefault> defaultValues;
 		private String validationExpression;
 
 		private AttributeDefinitionBuilder(String name) {
 			super(name);
-			calculatedExpressions = new ArrayList<String>();
+			defaultValues = new ArrayList<AttributeDefault>();
 		}
 		
 		@Override
@@ -145,7 +145,11 @@ public abstract class NodeDefinitionBuilder {
 		}
 		
 		public AttributeDefinitionBuilder calculated(String expression) {
-			this.calculatedExpressions.add(expression);
+			return calculated(expression, null);
+		}
+		
+		public AttributeDefinitionBuilder calculated(String expression, String condition) {
+			this.defaultValues.add(new AttributeDefault(expression, condition));
 			return this;
 		}
 		
@@ -171,9 +175,8 @@ public abstract class NodeDefinitionBuilder {
 			if ( def instanceof KeyAttributeDefinition) {
 				((KeyAttributeDefinition) def).setKey(key);
 			}
-			def.setCalculated(! calculatedExpressions.isEmpty());
-			for (String calculatedExpression : calculatedExpressions) {
-				AttributeDefault attributeDefault = new AttributeDefault(calculatedExpression);
+			def.setCalculated(! defaultValues.isEmpty());
+			for (AttributeDefault attributeDefault : defaultValues) {
 				def.addAttributeDefault(attributeDefault);
 			}
 			if ( validationExpression != null ) {

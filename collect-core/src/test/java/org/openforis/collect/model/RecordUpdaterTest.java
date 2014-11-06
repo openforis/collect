@@ -3,23 +3,29 @@
  */
 package org.openforis.collect.model;
 
-import static org.junit.Assert.*;
-import static org.openforis.idm.testfixture.NodeBuilder.*;
-import static org.openforis.idm.testfixture.NodeDefinitionBuilder.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.openforis.idm.testfixture.NodeBuilder.attribute;
+import static org.openforis.idm.testfixture.NodeBuilder.entity;
+import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
+import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.testfixture.NodeBuilder;
-import org.openforis.idm.testfixture.NodeDefinitionBuilder;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
+import org.openforis.idm.testfixture.NodeBuilder;
+import org.openforis.idm.testfixture.NodeDefinitionBuilder;
 
 /**
  * @author D. Wiell
@@ -375,6 +381,32 @@ public class RecordUpdaterTest {
 		assertTrue(dbh.isRelevant());
 	}
 
+	@Test
+	public void testInitializeCalculatedAttributeInNestedNode() {
+		record(
+			rootEntityDef(
+				entityDef("details",
+					attributeDef("accessibility")
+				),
+				entityDef("tree",
+					attributeDef("angle"),
+					attributeDef("height")
+						.calculated("number(angle) * 2"),
+					attributeDef("double_height")
+						.calculated("number(height) * 2", "parent()/details/accessibility = 'true'")
+				).multiple()
+			),
+			entity("details",
+				NodeBuilder.attribute("accessibility", "true")
+			),
+			entity("tree", NodeBuilder.attribute("angle", "10"))
+		);
+		
+		TextAttribute doubleHeight = (TextAttribute) record.findNodeByPath("/root/tree[1]/double_height");
+		
+		assertEquals("40.0", ((TextValue) doubleHeight.getValue()).getValue());
+	}
+	
 	protected void record(EntityDefinition rootDef, NodeBuilder... builders) {
 		record = NodeBuilder.record(survey, builders);
 		updater.initializeRecord(record);

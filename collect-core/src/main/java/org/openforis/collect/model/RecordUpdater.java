@@ -246,7 +246,7 @@ public class RecordUpdater {
 		Record record = attribute.getRecord();
 		
 		// calculated attributes
-		Set<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(attribute);
+		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(attribute);
 		changeMap.addValueChanges(updatedCalculatedAttributes);
 		
 		// relevance
@@ -300,20 +300,21 @@ public class RecordUpdater {
 		}
 	}
 
-	private Set<Attribute<?, ?>> recalculateDependentCalculatedAttributes(Attribute<?, ?> attribute) {
-		Record record = attribute.getRecord();
-		List<Attribute<?, ?>> attributesToRecalculate = record.determineCalculatedAttributes(attribute);
+	private List<Attribute<?, ?>> recalculateDependentCalculatedAttributes(Node<?> node) {
+		Record record = node.getRecord();
+		List<Attribute<?, ?>> attributesToRecalculate = record.determineCalculatedAttributes(node);
 		return recalculateValues(attributesToRecalculate);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Set<Attribute<?, ?>> recalculateValues(List<Attribute<?, ?>> attributesToRecalculate) {
-		Set<Attribute<?, ?>> updatedAttributes = new HashSet<Attribute<?,?>>();
+	private List<Attribute<?, ?>> recalculateValues(List<Attribute<?, ?>> attributesToRecalculate) {
+		List<Attribute<?, ?>> updatedAttributes = new ArrayList<Attribute<?,?>>();
 		for (Attribute calcAttr : attributesToRecalculate) {
 			Value previousValue = calcAttr.getValue();
 			Value newValue = recalculateValue(calcAttr);
 			if ( ! ( (previousValue == newValue) || (previousValue != null && previousValue.equals(newValue)) ) ) {
 				calcAttr.setValue(newValue);
+				calcAttr.updateSummaryInfo();
 				updatedAttributes.add(calcAttr);
 			}
 		}
@@ -398,7 +399,7 @@ public class RecordUpdater {
 		changeMap.addNodeDeleteChange(node);
 
 		// calculated attributes
-		Set<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
+		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
 		changeMap.addValueChanges(updatedCalculatedAttributes);
 		
 		// relevance
@@ -548,6 +549,7 @@ public class RecordUpdater {
 					if ( value != null ) {
 						attribute.setValue(value);
 						setDefaultValueApplied(attribute, true);
+						attribute.updateSummaryInfo();
 						break;
 					}
 				}
@@ -609,7 +611,6 @@ public class RecordUpdater {
 		initializeEntity(record.getRootEntity());
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected NodeChangeMap initializeEntity(Entity entity) {
 		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
 		entityAsList.add(entity);
@@ -624,12 +625,8 @@ public class RecordUpdater {
 		Record record = entity.getRecord();
 		
 		//recalculate attributes
-		List<Attribute<?, ?>> calculatedAttributes = record.determineCalculatedAttributes(entity);
-		for (Attribute attribute : calculatedAttributes) {
-			Value value = recalculateValue(attribute);
-			attribute.setValue(value);
-		}
-		changeMap.addValueChanges(new HashSet<Attribute<?,?>>(calculatedAttributes));
+		List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
+		changeMap.addValueChanges(calculatedAttributes);
 		
 		//relevance
 		
@@ -709,12 +706,15 @@ public class RecordUpdater {
 	}
 	
 	private void setInitialValue(Attribute<?, ?> attr) {
-		if(isDefaultValueToBeApplied(attr)) {
-			performDefaultValueApply(attr);
-		}
-		if(attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly() && attr.isEmpty()) {
-			BooleanAttribute boolAttr = (BooleanAttribute) attr;
-			boolAttr.setValue(new BooleanValue(false));
+		if (! attr.getDefinition().isCalculated()) {
+			if(isDefaultValueToBeApplied(attr)) {
+				performDefaultValueApply(attr);
+			}
+			if(attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly() && attr.isEmpty()) {
+				BooleanAttribute boolAttr = (BooleanAttribute) attr;
+				boolAttr.setValue(new BooleanValue(false));
+				boolAttr.updateSummaryInfo();
+			}
 		}
 	}
 
@@ -859,7 +859,7 @@ public class RecordUpdater {
 		return result;
 	}
 	
-	private Set<NodePointer> nodesToPointers(Set<? extends Node<?>> nodes) {
+	private Set<NodePointer> nodesToPointers(Collection<? extends Node<?>> nodes) {
 		Set<NodePointer> result = new HashSet<NodePointer>();
 		for (Node<?> n : nodes) {
 			result.add(new NodePointer(n));

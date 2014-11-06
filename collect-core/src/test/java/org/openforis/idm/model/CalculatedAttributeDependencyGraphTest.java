@@ -255,6 +255,33 @@ public class CalculatedAttributeDependencyGraphTest extends DependencyGraphTest 
 		assertCalculatedDependentsInAnyOrder(value2, sum1, sum2);
 	}
 
+	@Test
+	public void testConditionEvaluation() {
+		rootEntityDef(survey, "root",
+				attributeDef("region"),
+				entityDef("tree",
+						attributeDef("value")
+							.calculated("parent()/region"),
+						attributeDef("sum")
+							.calculated("sum(parent()/tree/value)", "value = '001'")
+				).multiple()
+		);
+
+		createTestRecord();
+
+		Attribute<?, ?> region = attribute(rootEntity, "region");
+		
+		Entity tree1 = entity(rootEntity, "tree");
+		Attribute<?, ?> value1 = attribute(tree1, "value");
+		Attribute<?, ?> sum1 = attribute(tree1, "sum");
+
+		Entity tree2 = entity(rootEntity, "tree");
+		Attribute<?, ?> value2 = attribute(tree2, "value");
+		Attribute<?, ?> sum2 = attribute(tree2, "sum");
+
+		assertCalculatedDependentsInAnyOrder(region, value1, value2, sum1, sum2);
+	}
+
 	@Override
 	protected List<?> determineDependents(Node<?> source) {
 		List<?> dependencies = source.getRecord().determineCalculatedAttributes(source);

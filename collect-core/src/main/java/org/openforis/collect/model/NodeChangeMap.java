@@ -4,6 +4,7 @@
 package org.openforis.collect.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -184,9 +185,9 @@ public class NodeChangeMap implements NodeChangeSet {
 		change.setUpdatedFieldValues(fieldValues);
 	}
 
-	public void addValueChanges(Set<Attribute<?, ?>> updatedCalculatedAttributes) {
-		for (Attribute<?, ?> updatedAttribute : updatedCalculatedAttributes) {
-			addValueChange(updatedAttribute);
+	public void addValueChanges(Collection<Attribute<?, ?>> attributes) {
+		for (Attribute<?, ?> attribute : attributes) {
+			addValueChange(attribute);
 		}
 	}
 
