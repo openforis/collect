@@ -426,6 +426,22 @@
 		  						onChange="@command('applyChanges')" />
 		  				</fieldErrorHandler>
 		  			</row>
+			  		<row>
+		  				<fieldErrorHandler message="@load(vmsgs['labelOrientation'])">
+		  					<label value="${labels.survey.schema.node.layout.label_orientation.$}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['labelOrientation'])">
+		  					<radiogroup selectedItem="@bind(fx.labelOrientation)"
+								onCheck="@command('applyChanges')">
+								<radio 
+									label="${labels.survey.schema.node.layout.label_orientation.horizontal}"
+									value="HORIZONTAL" />
+								<radio
+									label="${labels.survey.schema.node.layout.label_orientation.vertical}"
+									value="VERTICAL" />
+							</radiogroup>
+		  				</fieldErrorHandler>
+		  			</row>
     			</rows>
     		</grid>
 

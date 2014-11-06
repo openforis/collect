@@ -5,6 +5,7 @@ import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -52,6 +53,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private int columnSpan;
 	private Integer width;
 	private Integer labelWidth;
+	private String labelOrientation;
 	
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
@@ -144,6 +146,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		columnSpan = uiOptions.getColumnSpan(source);
 		width = uiOptions.getWidth(source);
 		labelWidth = uiOptions.getLabelWidth(source);
+		labelOrientation = uiOptions.getLabelOrientation(source).name();
 
 		CollectAnnotations annotations = survey.getAnnotations();
 
@@ -194,7 +197,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		uiOptions.setColumnSpan(dest, columnSpan);
 		uiOptions.setWidth(dest, width);
 		uiOptions.setLabelWidth(dest, labelWidth);
-
+		uiOptions.setLabelOrientation(dest, Orientation.valueOf(labelOrientation));
+		
 		if ( dest instanceof Calculable ) {
 			((Calculable) dest).setCalculated(calculated);
 			
@@ -413,6 +417,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setLabelWidth(Integer labelWidth) {
 		this.labelWidth = labelWidth;
+	}
+	
+	public String getLabelOrientation() {
+		return labelOrientation;
+	}
+	
+	public void setLabelOrientation(String labelOrientation) {
+		this.labelOrientation = labelOrientation;
 	}
 	
 }

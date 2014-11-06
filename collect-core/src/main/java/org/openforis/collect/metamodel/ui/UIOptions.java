@@ -50,18 +50,19 @@ public class UIOptions implements ApplicationOptions, Serializable {
 				CODE_FIELD_NAME,
 				SCIENTIFIC_NAME_FIELD_NAME,
 				VERNACULAR_NAME_FIELD_NAME
-		}
-		,
+		},
 		new String[] {
 				CODE_FIELD_NAME,
 				SCIENTIFIC_NAME_FIELD_NAME
-		}
-		,
+		},
 		new String[] {
 				CODE_FIELD_NAME,
 				VERNACULAR_NAME_FIELD_NAME
-		}
-		,
+		},
+		new String[] {
+				SCIENTIFIC_NAME_FIELD_NAME,
+				VERNACULAR_NAME_FIELD_NAME
+		},
 		new String[] {
 				VERNACULAR_NAME_FIELD_NAME
 		}
@@ -103,6 +104,10 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		public String getValue() {
 			return value;
 		}
+	}
+	
+	public enum Orientation {
+		HORIZONTAL, VERTICAL
 	}
 	
 	private CollectSurvey survey;
@@ -712,13 +717,22 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		setAnnotationValue(defn, Annotation.LABEL_WIDTH, value);
 	}
 	
+	public Orientation getLabelOrientation(NodeDefinition defn) {
+		return getAnnotationEnumValue(defn, Annotation.LABEL_ORIENTATION, Orientation.class);
+	}
+	
+	public void setLabelOrientation(NodeDefinition defn, Orientation value) {
+		setAnnotationValue(defn, Annotation.LABEL_ORIENTATION, value);
+	}
+	
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
-			if( annotation.getDefaultValue() != null ) {
-		}
-			Boolean defaultValue = annotation.getDefaultValue();
-			return defaultValue.booleanValue();
+			if( annotation.getDefaultValue() == null ) {
+				return false;
+			} else {
+				return annotation.<Boolean>getDefaultValue().booleanValue();
+			}
 		} else {
 			return Boolean.valueOf(annotationValue);
 		}
@@ -727,10 +741,10 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private String getAnnotationStringValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
-			if ( annotation.getDefaultValue() != null ) {
-				return annotation.getDefaultValue();
-			} else {
+			if ( annotation.getDefaultValue() == null ) {
 				return null;
+			} else {
+				return annotation.getDefaultValue();
 			}
 		} else {
 			return annotationValue;
@@ -740,14 +754,27 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private Integer getAnnotationIntegerValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
-			if ( annotation.getDefaultValue() != null ) {
+			if ( annotation.getDefaultValue() == null ) {
+				return null;
+			} else {
 				Integer defaultValue = annotation.getDefaultValue();
 				return defaultValue;
-			} else {
-				return null;
 			}
 		} else {
 			return Integer.valueOf(annotationValue);
+		}
+	}
+	
+	private <E extends Enum<E>> E getAnnotationEnumValue(NodeDefinition defn, Annotation annotation, Class<E> enumType) {
+		String annotationValue = defn.getAnnotation(annotation.getQName());
+		if ( StringUtils.isBlank(annotationValue) ) {
+			if ( annotation.getDefaultValue() == null ) {
+				return null;
+			} else {
+				return annotation.<E>getDefaultValue();
+			}
+		} else {
+			return Enum.valueOf(enumType, annotationValue);
 		}
 	}
 	

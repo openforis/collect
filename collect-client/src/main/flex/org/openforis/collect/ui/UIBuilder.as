@@ -29,6 +29,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$CoordinateAttributeFieldsOrder;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
+	import org.openforis.collect.metamodel.ui.UIOptions$Orientation;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordOwnerColumnItemRenderer;
@@ -523,6 +524,7 @@ package org.openforis.collect.ui {
 			
 			var l:Label;
 			var defnLabel:String = defn.getNumberAndHeadingLabelText();
+			var labelRotation:Number = defn.labelOrientation == UIOptions$Orientation.VERTICAL ? 270: NaN;
 			if(defn is TaxonAttributeDefinitionProxy) {
 				var taxonAttr:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(defn);
 				//attribute label
@@ -573,9 +575,11 @@ package org.openforis.collect.ui {
 				}
 				var labStr:String = defnLabel + " (" + defaultUnit.getAbbreviation() + ")";
 				l = getLabel(labStr, width, HEADER_LABEL_STYLE, directionByColumns);
+				l.rotation = labelRotation;
 				result.addElement(l);
 			} else {
 				l = getLabel(defnLabel, width, HEADER_LABEL_STYLE, directionByColumns);
+				l.rotation = labelRotation;
 				result.addElement(l);
 			}
 			return result;

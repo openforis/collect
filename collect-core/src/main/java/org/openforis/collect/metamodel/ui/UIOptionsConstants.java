@@ -36,4 +36,6 @@ public interface UIOptionsConstants {
 	String COLUMN_SPAN = "columnSpan";
 	String WIDTH = "width";
 	String LABEL_WIDTH = "labelWidth";
+	String LABEL_ORIENTATION = "labelOrientation";
+	
 }

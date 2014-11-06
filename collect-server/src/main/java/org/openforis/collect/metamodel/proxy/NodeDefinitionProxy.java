@@ -13,6 +13,7 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -181,6 +182,12 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 	public Integer getLabelWidth() {
 		Integer width = getUIOptions().getLabelWidth(nodeDefinition);
 		return width;
+	}
+	
+	@ExternalizedProperty
+	public Orientation getLabelOrientation() {
+		Orientation orientation = getUIOptions().getLabelOrientation(nodeDefinition);
+		return orientation;
 	}
 	
 	public EntityDefinitionProxy getParent() {
