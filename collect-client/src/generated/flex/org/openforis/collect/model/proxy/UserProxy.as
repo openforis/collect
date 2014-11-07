@@ -93,7 +93,7 @@ package org.openforis.collect.model.proxy {
 			return hasEffectiveRole(ROLE_ADMIN);
 		}
 		
-		public function get canViewDifferentOwnedRecords():Boolean {
+		public function get canViewNotOwnedRecords():Boolean {
 			return hasEffectiveRole(ROLE_ADMIN);
 		}
 		

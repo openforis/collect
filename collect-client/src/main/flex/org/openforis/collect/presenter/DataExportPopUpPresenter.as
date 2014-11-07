@@ -352,7 +352,7 @@ package org.openforis.collect.presenter {
 		
 		protected function checkEnabledFields():void {
 			//only owned records checkbox
-			if ( Application.user.canViewDifferentOwnedRecords ) {
+			if ( Application.user.canViewNotOwnedRecords ) {
 				view.onlyOwnedRecordsCheckBox.enabled = true;
 				view.onlyOwnedRecordsCheckBox.selected = false;
 			} else {
