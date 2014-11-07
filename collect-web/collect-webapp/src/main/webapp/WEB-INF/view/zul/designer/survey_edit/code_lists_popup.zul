@@ -17,8 +17,8 @@
 					editingAttribute="${arg.editingAttribute}"
 					selectedCodeList="${arg.selectedCodeList}" />
 			</center>
-			<south>
-				<box align="center" width="100%">
+			<south height="40px">
+				<box align="center" pack="end" height="100%" width="100%">
 					<button label="${labels.global.apply}" onClick="@command('apply')" />
 				</box>
 			</south>

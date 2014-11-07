@@ -365,9 +365,9 @@ public class SurveyValidator {
 	private void addBooleanExpressionValidationResult(
 			List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
-		if ( StringUtils.isNotBlank(expression) && 
-				! expressionValidator.validateBooleanExpression(node, expression) &&
-				! expressionValidator.validateCircularReferenceAbsence(node, expression)) {
+		if ( StringUtils.isNotBlank(expression) 
+				&& ! (expressionValidator.validateBooleanExpression(node, expression) 
+					&& expressionValidator.validateCircularReferenceAbsence(node, expression))) {
 			results.add(new SurveyValidationResult(node.getPath(), messageKey));
 		}
 	}
@@ -376,8 +376,8 @@ public class SurveyValidator {
 			List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
 		if ( StringUtils.isNotBlank(expression) && 
-				! expressionValidator.validateValueExpression(node, expression) &&
-				! expressionValidator.validateCircularReferenceAbsence(node, expression)) {
+				! (expressionValidator.validateValueExpression(node, expression) 
+					&& expressionValidator.validateCircularReferenceAbsence(node, expression))) {
 			results.add(new SurveyValidationResult(node.getPath(), messageKey));
 		}
 	}
@@ -386,8 +386,8 @@ public class SurveyValidator {
 			List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
 		if ( StringUtils.isNotBlank(expression) && 
-				! expressionValidator.validateSchemaPathExpression(node, expression) &&
-				! expressionValidator.validateCircularReferenceAbsence(node, expression)) {
+				! (expressionValidator.validateSchemaPathExpression(node, expression) 
+					&& expressionValidator.validateCircularReferenceAbsence(node, expression))) {
 			results.add(new SurveyValidationResult(node.getPath(), messageKey));
 		}
 	}

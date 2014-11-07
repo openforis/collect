@@ -232,3 +232,12 @@ button.icon {
 	background: transparent;
 	border-color: transparent;
 }
+
+.z-menubar-hor.withicons .z-menuitem-btn {
+	height: 26px;
+	width: 26px;
+}
+
+.z-menubar-hor.withicons .z-menuitem-body-over {
+	background-image: none;
+}
