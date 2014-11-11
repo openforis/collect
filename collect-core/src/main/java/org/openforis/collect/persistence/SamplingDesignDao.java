@@ -5,10 +5,12 @@ import static org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OF
 
 import java.sql.Connection;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -356,6 +358,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 				return null;
 			} else {
 				DecimalFormat formatter = new DecimalFormat(LOCATION_POINT_FORMAT);
+				formatter.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 				String result = MessageFormat.format(LOCATION_PATTERN, 
 						i.getSrsId(), 
 						formatter.format(i.getX()),

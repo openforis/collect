@@ -1,5 +1,6 @@
 package org.openforis.idm.model;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,6 +103,6 @@ public final class Coordinate implements Value{
 
 	@Override
 	public String toString() {
-		return String.format(TO_STRING_FORMAT, srsId, x, y);
+		return String.format(Locale.ENGLISH, TO_STRING_FORMAT, srsId, x, y);
 	}
 }

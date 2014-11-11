@@ -8,6 +8,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Locale;
+
 import org.junit.Test;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
@@ -28,9 +30,9 @@ public class MathFunctionsTest extends AbstractExpressionTest {
 	@Test
 	public void testDegreesToRadiansToDegrees() throws InvalidExpressionException{
 		Double angle = 45d;
-		Double radians = (Double) evaluateExpression(cluster, String.format("math:rad(%f)", angle));
+		Double radians = (Double) evaluateExpression(cluster, String.format(Locale.ENGLISH, "math:rad(%f)", angle));
 		assertEquals(Double.valueOf(Math.toRadians(angle)), radians);
-		Double degrees = (Double) evaluateExpression(cluster, String.format("math:deg(%f)", radians));
+		Double degrees = (Double) evaluateExpression(cluster, String.format(Locale.ENGLISH, "math:deg(%f)", radians));
 		//assertEquals(Double.valueOf(Math.toDegrees(radians)), degrees);
 		assertNotNull(degrees);
 	}
