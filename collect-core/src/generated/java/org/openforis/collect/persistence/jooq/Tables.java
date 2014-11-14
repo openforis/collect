@@ -28,6 +28,26 @@ public final class Tables {
 	public static final org.openforis.collect.persistence.jooq.tables.OfcConfig OFC_CONFIG = org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG;
 
 	/**
+	 * The table collect.ofc_data_error_query
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery OFC_DATA_ERROR_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;
+
+	/**
+	 * The table collect.ofc_data_error_report
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport OFC_DATA_ERROR_REPORT = org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport.OFC_DATA_ERROR_REPORT;
+
+	/**
+	 * The table collect.ofc_data_error_report_item
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem OFC_DATA_ERROR_REPORT_ITEM = org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM;
+
+	/**
+	 * The table collect.ofc_data_error_type
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorType OFC_DATA_ERROR_TYPE = org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC_DATA_ERROR_TYPE;
+
+	/**
 	 * The table collect.ofc_logo
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcLogo OFC_LOGO = org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO;

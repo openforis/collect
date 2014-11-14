@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="data-cleansing-toolkit" author="ricci" dbms="sqlite">
+
+	    <preConditions onFail="MARK_RAN">
+	    	<not>
+		    	<tableExists tableName="ofc_data_error_query" />
+	    	</not>
+	    </preConditions>
+	    
+	    <comment>Data error query storage table</comment>
+	    
+	    <createSequence sequenceName="ofc_data_error_query_id_seq" />
+	  
+	    <createTable tableName="ofc_data_error_type">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_type_pkey" />
+			</column>
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_type_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="code" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="label" type="VARCHAR(255)" />
+			<column name="description" type="VARCHAR(255)" />
+		</createTable>
+		
+	    <createTable tableName="ofc_data_error_query">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_query_pkey" />
+			</column>
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP" />
+			<column name="error_type_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_data_error_type_fkey" 
+					references="ofc_data_error_type(id)" />
+			</column>
+			<column name="entity_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="attribute_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="conditions" type="TEXT" />
+	    </createTable>
+
+		<createTable tableName="ofc_data_error_report">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_report_pkey" />
+			</column>
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_report_query_fkey" 
+					references="ofc_data_error_query(id)" />
+			</column>
+			<column name="creation_date" type="TIMESTAMP" />
+		</createTable>
+		
+		<createTable tableName="ofc_data_error_report_item">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_report_item_pkey" />
+			</column>
+			<column name="report_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_report_item_report_fkey" 
+					references="ofc_data_error_report(id)" />
+			</column>
+			<column name="value" type="VARCHAR(255)" />
+			<column name="status" type="CHAR(1)" />
+		</createTable>
+		
+	</changeSet>
+	
+</databaseChangeLog>

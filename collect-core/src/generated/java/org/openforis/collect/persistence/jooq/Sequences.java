@@ -18,6 +18,11 @@ public final class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> OFC_CODE_LIST_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_code_list_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
 
 	/**
+	 * The sequence collect.ofc_data_error_query_id_seq
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_ERROR_QUERY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_error_query_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
+
+	/**
 	 * The sequence collect.ofc_record_id_seq
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> OFC_RECORD_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_record_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT);
