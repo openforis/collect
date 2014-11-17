@@ -48,17 +48,18 @@ package org.openforis.collect.presenter
 		private var _items:IList;
 		
 		{
-			FlexGlobals.topLevelApplication.stage.addEventListener(MouseEvent.CLICK, globalClickHandler);
+			FlexGlobals.topLevelApplication.stage.addEventListener(MouseEvent.MOUSE_DOWN, globalMouseDownHandler);
 		}
 		
-		public static function globalClickHandler(event:MouseEvent):void {
-			var codeInputField:TextCodeInputField;
+		public static function globalMouseDownHandler(event:MouseEvent):void {
 			//if popup is opened and user clicks outside of it, close it
 			var target:DisplayObject = event.target as DisplayObject;
 			if ( target != null ) {
+				var codeInputField:TextCodeInputField;
 				if ( _popUpOpened ) {
 					codeInputField = _popUp.codeInputField;
-					if ( ! ( ( target is UIComponent && UIUtil.hasStyleName(UIComponent(target), "openCodeListPopUpButton") ) || UIUtil.isDescendantOf(_popUp, target) ) 
+					if ( ! ( ( target is UIComponent && UIUtil.hasStyleName(UIComponent(target), "openCodeListPopUpButton") ) 
+						|| UIUtil.isDescendantOf(_popUp, target) ) 
 						//&& target != codeInputField.textInput 
 					) {
 						popUpApplyHandler(null, false);
