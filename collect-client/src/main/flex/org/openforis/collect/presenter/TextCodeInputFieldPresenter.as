@@ -120,6 +120,7 @@ package org.openforis.collect.presenter
 				}
 				_popUpOpened = false;
 				PopUpManager.removePopUp(_popUp);
+				resetPopUp();
 			}
 		}
 		
@@ -164,10 +165,16 @@ package org.openforis.collect.presenter
 			_popUp.setFocus();
 			
 			_popUp.currentState = CodeListDialog.STATE_LOADING;
-			
+
 			PopUpManager.centerPopUp(_popUp);
 			
 			CodeInputFieldPresenter(view.presenter).loadCodes(view, loadListDialogDataResultHandler);
+		}
+		
+		private static function resetPopUp():void {
+			_popUp.items = null;
+			_popUp.selectedItems = null;
+			_popUp.notSelectedItems = null;
 		}
 		
 		protected static function openAllowedValuesPreviewPopUp(view:TextCodeInputField):void {
