@@ -25,10 +25,13 @@ public class IdmlExportTask extends Task {
 	//parameters
 	private CollectSurvey survey;
 	private OutputStream outputStream;
+
+	public IdmlExportTask() {
+	}
 	
 	@Override
 	protected void execute() throws Throwable {
-		surveyManager.marshalSurvey(survey, outputStream, true, true, false);
+		surveyManager.marshalSurvey(survey, outputStream, true,	true, false);
 	}
 	
 	public void setSurveyManager(SurveyManager surveyManager) {

@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
@@ -28,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class SurveyDao extends SurveyBaseDao {
-	private final Log LOG = LogFactory.getLog(SurveyDao.class);
+//	private final Log LOG = LogFactory.getLog(SurveyDao.class);
 
 	@Transactional
 	public void importModel(Survey survey) throws SurveyImportException {

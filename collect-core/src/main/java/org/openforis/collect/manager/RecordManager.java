@@ -205,14 +205,10 @@ public class RecordManager {
 	}
 
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
-		Date start = new Date();
-		System.out.println("Record load started");
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
 		recordUpdater.initializeRecord(record);
-		Date end = new Date();
-		System.out.println("Record load completed in " + (end.getTime() - start.getTime()) + " ms");
 		return record;
 	}
 	
