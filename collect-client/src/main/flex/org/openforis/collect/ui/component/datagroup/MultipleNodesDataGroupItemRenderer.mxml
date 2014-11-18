@@ -80,7 +80,8 @@
 		]]>
 	</fx:Script>
 	
-	<s:Rect id="selectedBackgroundObject" top="0" bottom="0" left="0" right="0" 
+	<s:Rect id="selectedBackgroundObject" 
+			top="0" bottom="0" left="0" right="0" 
 			visible="false">
 		<s:fill>
 			<s:SolidColor color="#A3FFA3" />
