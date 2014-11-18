@@ -62,7 +62,7 @@ package org.openforis.collect.presenter
 						|| UIUtil.isDescendantOf(_popUp, target) ) 
 						//&& target != codeInputField.textInput 
 					) {
-						popUpApplyHandler(null, false);
+						popUpCloseHandler(null, false);
 					}
 				}
 				if ( _allowedValuesPreviewPopUpOpened ) {
@@ -112,7 +112,7 @@ package org.openforis.collect.presenter
 		/**
 		 * Close the popup
 		 * */
-		internal static function closePopupHandler(event:Event = null, setFocusOnInputField:Boolean = true):void {
+		internal static function popUpCloseHandler(event:Event = null, setFocusOnInputField:Boolean = true):void {
 			if ( _popUpOpened ) {
 				if ( setFocusOnInputField ) {
 					var inputField:TextCodeInputField = _popUp.codeInputField;
@@ -128,7 +128,7 @@ package org.openforis.collect.presenter
 			//todo cancel async request
 			//if(_lastLoadCodesAsyncToken != null) {
 			//}
-			closePopupHandler();
+			popUpCloseHandler();
 		}
 		
 		/**
@@ -141,18 +141,16 @@ package org.openforis.collect.presenter
 		protected static function openCodeListDialog(view:TextCodeInputField):void {
 			if(_popUp == null) {
 				_popUp = new CodeListDialog();
-				_popUp.addEventListener(CloseEvent.CLOSE, popUpApplyHandler);
+				_popUp.addEventListener(CloseEvent.CLOSE, popUpCloseHandler);
 				_popUp.cancelLoading.addEventListener(MouseEvent.CLICK, cancelLoadingHandler);
 				_popUp.addEventListener("apply", popUpApplyHandler);
 				_popUp.addEventListener(KeyboardEvent.KEY_DOWN, popUpKeyDownHandler);
 				
 				function popUpKeyDownHandler(event:KeyboardEvent):void {
 					if (event.keyCode == Keyboard.ESCAPE) {
-						closePopupHandler();
+						popUpCloseHandler();
 					}
 				}
-				//_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
-				//_popUp.addEventListener("selectionChange", popupItemSelectionChangeHandler);
 			}
 			_popUpOpened = true;
 			_popUp.codeInputField = view;
@@ -276,7 +274,7 @@ package org.openforis.collect.presenter
 		protected static function popUpApplyHandler(event:Event, setFocusOnInputField:Boolean = true):void {
 			var selectedItems:IList = _popUp.selectedItems;
 			applySelection(selectedItems);
-			closePopupHandler(null, setFocusOnInputField);
+			popUpCloseHandler(null, setFocusOnInputField);
 		}
 		
 		protected function updateDescription():void {
