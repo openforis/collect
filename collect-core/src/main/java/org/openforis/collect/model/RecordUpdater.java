@@ -5,6 +5,7 @@ import static org.openforis.collect.model.CollectRecord.CONFIRMED_ERROR_POSITION
 import static org.openforis.collect.model.CollectRecord.DEFAULT_APPLIED_POSITION;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -630,7 +631,7 @@ public class RecordUpdater {
 		
 		//relevance
 		
-		List<NodePointer> relevancePointers = new ArrayList<NodePointer>(entityDescendantPointers);
+		List<NodePointer> relevancePointers = getChildNodePointers(entity);
 		Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(relevancePointers).update();
 		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
@@ -758,8 +759,8 @@ public class RecordUpdater {
 			Survey survey = record.getSurvey();
 			CodeListService codeListService = survey.getContext().getCodeListService();
 			List<CodeListItem> items = codeListService.loadRootItems(list);
-			for (int i = 0; i < items.size(); i++) {
-				CodeListItem item = items.get(i);
+			int i = 0;
+			for (CodeListItem item : items) {
 				if(version == null || version.isApplicable(item)) {
 					String code = item.getCode();
 					Entity enumeratedEntity = parentEntity.getEnumeratedEntity(enumerableEntityDefn, enumeratingCodeDefn, code);
@@ -769,9 +770,10 @@ public class RecordUpdater {
 						//set the value of the key CodeAttribute
 						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn.getName(), 0);
 						addedCode.setValue(new Code(code));
-					} else {
+					} else if (enumeratedEntity.getIndex() != i) {
 						parentEntity.move(enumeratedEntityName, enumeratedEntity.getIndex(), i);
 					}
+					i++;
 				}
 			}
 		}
@@ -821,6 +823,15 @@ public class RecordUpdater {
 		return uiOptions;
 	}
 
+	private List<NodePointer> getChildNodePointers(Entity entity) {
+		List<NodePointer> pointers = new ArrayList<NodePointer>();
+		EntityDefinition definition = entity.getDefinition();
+		for (NodeDefinition childDef : definition.getChildDefinitions()) {
+			pointers.add(new NodePointer(entity, childDef));
+		}
+		return pointers;
+	}
+	
 	private Set<NodePointer> getDescendantNodePointers(Entity entity) {
 		Set<NodePointer> pointers = new LinkedHashSet<NodePointer>();
 		EntityDefinition definition = entity.getDefinition();
@@ -900,7 +911,8 @@ public class RecordUpdater {
 			String childName = nodePointer.getChildName();
 			EntityDefinition entityDef = entity.getDefinition();
 			
-			if ( relevant != entity.isRelevant(childName) ) {
+			Boolean oldRelevance = entity.getRelevance(childName);
+			if ( oldRelevance == null || oldRelevance.booleanValue() != relevant ) {
 				entity.setRelevant(childName, relevant);
 				changedNodePointers.add(nodePointer);
 				

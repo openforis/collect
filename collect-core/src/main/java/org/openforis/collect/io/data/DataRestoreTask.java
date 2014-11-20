@@ -238,7 +238,7 @@ public class DataRestoreTask extends Task {
 		try {
 			recordManager.validate(record);
 		} catch (Exception e) {
-			log().info("Error validating record: " + record.getRootEntityKeyValues());
+			log().warn("Error validating record: " + record.getRootEntityKeyValues(), e);
 		}
 	}
 

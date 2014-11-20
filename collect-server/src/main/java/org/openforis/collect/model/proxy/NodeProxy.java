@@ -29,9 +29,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class NodeProxy implements Proxy {
 
-	private EntityProxy parent;
 	private transient Node<?> node;
-	private Locale locale;
+	private transient Locale locale;
 	
 	public static NodeProxy fromNode(Node<?> node, Locale locale) {
 		if (node instanceof Attribute<?, ?>) {
@@ -44,7 +43,6 @@ public class NodeProxy implements Proxy {
 	
 	public NodeProxy(EntityProxy parent, Node<?> node, Locale locale) {
 		super();
-		this.parent = parent;
 		this.node = node;
 		this.locale = locale;
 	}
@@ -76,11 +74,6 @@ public class NodeProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
-	public String getName() {
-		return node.getName();
-	}
-	
-	@ExternalizedProperty
 	public Integer getDefinitionId() {
 		if(node.getDefinition() == null) {
 			return null;
@@ -111,15 +104,7 @@ public class NodeProxy implements Proxy {
 		return bean;
 	}
 
-	public EntityProxy getParent() {
-		return parent;
-	}
-	
-	public void setParent(EntityProxy parent) {
-		this.parent = parent;
-	}
-	
-	public Locale getLocale() {
+	protected Locale getLocale() {
 		return locale;
 	}
 }

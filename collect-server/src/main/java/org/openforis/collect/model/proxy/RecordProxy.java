@@ -26,6 +26,7 @@ import org.openforis.idm.model.Entity;
 public class RecordProxy implements Proxy {
 
 	private transient CollectRecord record;
+	private transient Locale locale;
 
 	private Integer errors;
 	private Integer skipped;
@@ -34,8 +35,6 @@ public class RecordProxy implements Proxy {
 	private Integer missingWarnings;
 	private Integer warnings;
 	private UserProxy owner;
-
-	private Locale locale;
 	
 	public RecordProxy(CollectRecord record, Locale locale) {
 		this.record = record;

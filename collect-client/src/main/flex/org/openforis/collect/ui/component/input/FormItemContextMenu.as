@@ -87,7 +87,7 @@ package org.openforis.collect.ui.component.input {
 					if ( _formItem.nodeDefinition is AttributeDefinitionProxy && ! nodeDefinition.multiple ) {
 						var attribute:AttributeProxy = parentEntity.getSingleAttribute(nodeDefinition.name);
 						var hasErrors:Boolean = attribute != null && attribute.hasErrors() &&
-							! CollectionUtil.containsItemWith(attribute.validationResults.errors, "ruleName", "SpecifiedValidator");
+							! attribute.validationResults.specifiedErrorPresent;
 						if(hasErrors) {
 							var hasConfirmedError:Boolean = parentEntity.hasConfirmedError(nodeDefinition.name);
 							if(! hasConfirmedError) {

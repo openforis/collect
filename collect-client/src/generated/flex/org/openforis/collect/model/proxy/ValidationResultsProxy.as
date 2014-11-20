@@ -23,17 +23,7 @@ package org.openforis.collect.model.proxy {
 			} else if(CollectionUtil.isNotEmpty(warnings)) {
 				results = warnings;
 			}
-			var messages:IList = null;
-			if(results != null) {
-				messages = new ArrayCollection();
-				for each (var r:ValidationResultProxy in results) {
-					var message:String = r.validationMessage;
-					if ( ! ArrayUtil.contains(messages, message) ) {
-						messages.addItem(message);
-					}
-				}
-			}
-			return messages;
+			return results;
 		}
     }
 }

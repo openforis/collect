@@ -209,14 +209,6 @@
 			<url>http://www.openforis.org/nexus/content/repositories/thirdparty/</url>
 		</repository>
 		<repository>
-			<id>open-foris-maven-releases</id>
-			<url>https://github.com/openforis/mvn-repo/raw/master/releases</url>
-		</repository>
-		<repository>
-			<id>open-foris-maven-snapshots</id>
-			<url>https://github.com/openforis/mvn-repo/raw/master/snapshots</url>
-		</repository>
-		<repository>
 			<id>flex-compiler</id>
 			<url>https://repository.sonatype.org/content/groups/flexgroup</url>
 			<releases>
