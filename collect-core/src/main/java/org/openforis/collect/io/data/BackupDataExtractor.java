@@ -15,7 +15,6 @@ import java.util.zip.ZipFile;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.exception.DataParsingExeption;
-import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.DataHandler;
@@ -89,11 +88,6 @@ public class BackupDataExtractor implements Closeable {
 	private ParseRecordResult parse(InputStream inputStream) throws IOException {
 		InputStreamReader reader = OpenForisIOUtils.toReader(inputStream);
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
-		if ( result.isSuccess() ) {
-			CollectRecord record = result.getRecord();
-			record.updateRootEntityKeyValues();
-			record.updateEntityCounts();
-		}
 		return result;
 	}
 

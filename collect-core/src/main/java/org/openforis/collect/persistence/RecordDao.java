@@ -18,10 +18,9 @@ import org.jooq.JoinType;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
-import org.jooq.SimpleSelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
-import org.jooq.impl.Factory;
+import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -29,9 +28,9 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.RecordSummarySortField;
 import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.RecordDao.JooqFactory;
+import org.openforis.collect.persistence.RecordDao.RecordDSLContext;
+import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
-import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -49,7 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SuppressWarnings("rawtypes")
 @Transactional
-public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory> {
+public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLContext> {
 	
 	private static final TableField[] KEY_FIELDS = 
 		{OFC_RECORD.KEY1, OFC_RECORD.KEY2, OFC_RECORD.KEY3};
@@ -63,11 +62,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	     OFC_RECORD.COUNT1, OFC_RECORD.COUNT2, OFC_RECORD.COUNT3, OFC_RECORD.COUNT4, OFC_RECORD.COUNT5};
 
 	public RecordDao() {
-		super(JooqFactory.class);
+		super(RecordDSLContext.class);
 	}
 	
 	public CollectRecord load(CollectSurvey survey, int id, int step) {
-		JooqFactory jf = getMappingJooqFactory(survey, step);
+		RecordDSLContext jf = getMappingJooqFactory(survey, step);
 		SelectQuery query = jf.selectRecordQuery(id);
 		Record r = query.fetchOne();
 		if ( r == null ) {
@@ -78,7 +77,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 	
 	public byte[] loadBinaryData(CollectSurvey survey, int id, int step) {
-		JooqFactory jf = getMappingJooqFactory(survey, step);
+		RecordDSLContext jf = getMappingJooqFactory(survey, step);
 		SelectQuery query = jf.selectRecordQuery(id);
 		Record r = query.fetchOne();
 		if ( r == null ) {
@@ -89,12 +88,12 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		}
 	}
 
-	private JooqFactory getMappingJooqFactory(CollectSurvey survey) {
-		return new JooqFactory(getConnection(), survey);
+	private RecordDSLContext getMappingJooqFactory(CollectSurvey survey) {
+		return new RecordDSLContext(getConnection(), survey);
 	}
 
-	private JooqFactory getMappingJooqFactory(CollectSurvey survey, int step) {
-		return new JooqFactory(getConnection(), survey, step);
+	private RecordDSLContext getMappingJooqFactory(CollectSurvey survey, int step) {
+		return new RecordDSLContext(getConnection(), survey, step);
 	}
 	
 	@Deprecated
@@ -108,8 +107,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 
 	@Transactional
 	public boolean hasAssociatedRecords(int userId) {
-		JooqFactory f = getMappingJooqFactory();
-		SelectQuery q = f.selectCountQuery();
+		SelectQuery q = dsl().selectCountQuery();
 		q.addConditions(OFC_RECORD.CREATED_BY_ID.equal(userId)
 				.or(OFC_RECORD.MODIFIED_BY_ID.equal(userId)));
 		Record r = q.fetchOne();
@@ -161,8 +159,8 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		CollectSurvey survey = filter.getSurvey();
 		
-		JooqFactory jf = getMappingJooqFactory(survey);
-		SelectQuery q = jf.selectQuery();	
+		RecordDSLContext jf = getMappingJooqFactory(survey);
+		SelectQuery<Record> q = jf.selectQuery();	
 		
 		q.addSelect(SUMMARY_FIELDS);
 		Field<String> ownerNameField = OFC_USER.USERNAME.as(RecordSummarySortField.Sortable.OWNER_NAME.name());
@@ -241,8 +239,8 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	}
 	
 	public int countRecords(RecordFilter filter) {
-		JooqFactory jf = getMappingJooqFactory();
-		SelectQuery q = jf.selectCountQuery();
+		RecordDSLContext dsl = dsl();
+		SelectQuery q = dsl.selectCountQuery();
 		
 		q.addConditions(OFC_RECORD.SURVEY_ID.equal(filter.getSurveyId()));
 		
@@ -256,7 +254,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			addFilterByKeyConditions(q, filter.getKeyValues().toArray(new String[0]));
 		}
 		Record record = q.fetchOne();
-		int result = record.getValue(Factory.count());
+		int result = record.getValue(DSL.count());
 		return result;
 	}
 
@@ -280,7 +278,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		}
 	}
 
-	private void addOrderBy(SelectQuery q, RecordSummarySortField sortField, Field<String> ownerNameField) {
+	private void addOrderBy(SelectQuery<Record> q, RecordSummarySortField sortField, Field<String> ownerNameField) {
 		Field<?> orderBy = null;
 		if(sortField != null) {
 			switch(sortField.getField()) {
@@ -340,14 +338,14 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	@Override
 	public void update(CollectRecord record) {
 		Survey survey = record.getSurvey();
-		JooqFactory jf = getMappingJooqFactory((CollectSurvey) survey);
+		RecordDSLContext jf = getMappingJooqFactory((CollectSurvey) survey);
 		jf.updateQuery(record).execute();
 	}
 
 	@Override
 	public void insert(CollectRecord record) {
 		Survey survey = record.getSurvey();
-		JooqFactory jf = getMappingJooqFactory((CollectSurvey) survey);
+		RecordDSLContext jf = getMappingJooqFactory((CollectSurvey) survey);
 		jf.insertQuery(record).execute();
 	}
 	
@@ -358,32 +356,30 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 
 	@Transactional
 	public void assignOwner(int recordId, Integer ownerId) {
-		JooqFactory jf = getMappingJooqFactory();
-		jf.update(OFC_RECORD)
+		dsl().update(OFC_RECORD)
 			.set(OFC_RECORD.OWNER_ID, ownerId)
 			.where(OFC_RECORD.ID.eq(recordId))
 			.execute();
 	}
 
 	public void deleteBySurvey(int id) {
-		JooqFactory jf = getMappingJooqFactory();
-		jf.delete(OFC_RECORD)
+		dsl().delete(OFC_RECORD)
 			.where(OFC_RECORD.SURVEY_ID.equal(id))
 			.execute();
 	}
 
-	public static class JooqFactory extends MappingJooqFactory<CollectRecord> {
+	public static class RecordDSLContext extends MappingDSLContext<CollectRecord> {
 
 		private static final long serialVersionUID = 1L;
 		private static final int SERIALIZATION_BUFFER_SIZE = 50000;
 		private CollectSurvey survey;
 		private Field<byte[]> dataAlias;
 		
-		public JooqFactory(Connection conn) {
+		public RecordDSLContext(Connection conn) {
 			super(conn, OFC_RECORD.ID, OFC_RECORD_ID_SEQ, CollectRecord.class);
 		}
 
-		public JooqFactory(Connection conn, CollectSurvey survey, int step) {
+		public RecordDSLContext(Connection conn, CollectSurvey survey, int step) {
 			this(conn, survey);
 			if ( step < 1 || step > 3 ) {
 				throw new IllegalArgumentException("Invalid step "+step);
@@ -391,13 +387,13 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			this.dataAlias = (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as("DATA");
 		}
 
-		public JooqFactory(Connection conn, CollectSurvey survey) {
+		public RecordDSLContext(Connection conn, CollectSurvey survey) {
 			this(conn);
 			this.survey = survey;
 		}
 
 		public SelectQuery selectRecordQuery(int id) {
-			SelectQuery query = selectQuery();
+			SelectQuery<Record> query = selectQuery();
 			query.addSelect(SUMMARY_FIELDS);
 			query.addSelect(dataAlias);
 			query.addFrom(OFC_RECORD);
@@ -417,8 +413,8 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 
 		@Override
 		public CollectRecord fromRecord(Record r) {
-			int rootEntityId = r.getValueAsInteger(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
-			String version = r.getValueAsString(OFC_RECORD.MODEL_VERSION);
+			int rootEntityId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
+			String version = r.getValue(OFC_RECORD.MODEL_VERSION);
 			Schema schema = survey.getSchema();
 			NodeDefinition rootEntityDefn = schema.getDefinitionById(rootEntityId);
 			if (rootEntityDefn == null) {
@@ -429,6 +425,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			return record;
 		}
 		
+		@SuppressWarnings("unchecked")
 		@Override
 		protected void fromRecord(Record r, CollectRecord c) {
 			c.setId(r.getValue(OFC_RECORD.ID));
@@ -455,14 +452,14 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			// create list of entity counts
 			List<Integer> counts = new ArrayList<Integer>(COUNT_FIELDS.length);
 			for (TableField tableField : COUNT_FIELDS) {
-				counts.add(r.getValueAsInteger(tableField));
+				counts.add((Integer) r.getValue(tableField));
 			}
 			c.setEntityCounts(counts);
 
 			// create list of keys
 			List<String> keys = new ArrayList<String>(KEY_FIELDS.length);
 			for (TableField tableField : KEY_FIELDS) {
-				keys.add(r.getValueAsString(tableField));
+				keys.add((String) r.getValue(tableField));
 			}
 			c.setRootEntityKeyValues(keys);
 
@@ -481,7 +478,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			if ( userId == null ) {
 				return null;
 			}
-			SimpleSelectQuery<OfcUserRecord> userSelect = selectQuery(OFC_USER);
+			SelectQuery<OfcUserRecord> userSelect = selectQuery(OFC_USER);
 			userSelect.addConditions(OFC_USER.ID.equal(userId));
 			OfcUserRecord userRecord = userSelect.fetchOne();
 			User user = new User();

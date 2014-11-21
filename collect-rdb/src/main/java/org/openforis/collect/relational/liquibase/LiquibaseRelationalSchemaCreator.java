@@ -32,7 +32,6 @@ import org.openforis.collect.relational.model.RelationalSchema;
  *
  */
 public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator {
-
 	
 	@Override
 	public void createRelationalSchema(RelationalSchema schema, Connection targetConn) throws CollectRdbException {
@@ -89,4 +88,5 @@ public class LiquibaseRelationalSchemaCreator implements RelationalSchemaCreator
 		}
 		return rdb;
 	}
+
 }

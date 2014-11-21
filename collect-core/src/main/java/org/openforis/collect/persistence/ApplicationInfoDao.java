@@ -3,8 +3,7 @@ package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo.OFC_APPLICATION_INFO;
 
-import org.jooq.Record;
-import org.jooq.impl.Factory;
+import org.jooq.DSLContext;
 import org.openforis.collect.model.ApplicationInfo;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +19,14 @@ public class ApplicationInfoDao extends JooqDaoSupport {
 	}
 
 	public ApplicationInfo load() {
-		Factory jf = getJooqFactory();
-		Record record = jf.select()
+		DSLContext dsl = dsl();
+		if ( dsl.select()
 				.from(OFC_APPLICATION_INFO)
-				.fetchOne();
-		if ( record != null ) {
+				.fetchOne() != null ) {
 			ApplicationInfo i = new ApplicationInfo();
-			String version = record.getValue(OFC_APPLICATION_INFO.VERSION);
+			String version = dsl.select()
+					.from(OFC_APPLICATION_INFO)
+					.fetchOne().getValue(OFC_APPLICATION_INFO.VERSION);
 			i.setVersion(version);
 			return i;
 		} else {
@@ -35,12 +35,12 @@ public class ApplicationInfoDao extends JooqDaoSupport {
 	}
 
 	public void save(ApplicationInfo info) {
-		Factory jf = getJooqFactory();
+		DSLContext dsl = dsl();
 		//delete old record
-		jf.delete(OFC_APPLICATION_INFO).execute();
+		dsl.delete(OFC_APPLICATION_INFO).execute();
 		//insert new record
 		String version = info.getVersion();
-		jf.insertInto(OFC_APPLICATION_INFO)
+		dsl.insertInto(OFC_APPLICATION_INFO)
 			.set(OFC_APPLICATION_INFO.VERSION, version)
 			.execute();
 	}

@@ -7,8 +7,8 @@ import java.util.Set;
 
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.impl.Factory;
 import org.openforis.collect.model.Configuration;
+import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +24,8 @@ public class ConfigurationDao extends JooqDaoSupport {
 
 	public Configuration load() {
 		Configuration c = new Configuration();
-		Factory jf = getJooqFactory();
-		Result<Record> fetch = jf.select()
+		CollectDSLContext dsl = dsl();
+		Result<Record> fetch = dsl.select()
 				.from(OFC_CONFIG)
 				.fetch();
 		for (Record record : fetch) {
@@ -37,14 +37,14 @@ public class ConfigurationDao extends JooqDaoSupport {
 	}
 	
 	public void save(Configuration config) {
-		Factory jf = getJooqFactory();
+		CollectDSLContext dsl = dsl();
 		//delete old records
-		jf.delete(OFC_CONFIG).execute();
+		dsl.delete(OFC_CONFIG).execute();
 		//insert new records
 		Set<String> keySet = config.getProperties();
 		for (String name : keySet) {
 			String value = config.get(name);
-			jf.insertInto(OFC_CONFIG)
+			dsl.insertInto(OFC_CONFIG)
 				.set(OFC_CONFIG.NAME, name)
 				.set(OFC_CONFIG.VALUE, value)
 				.execute();

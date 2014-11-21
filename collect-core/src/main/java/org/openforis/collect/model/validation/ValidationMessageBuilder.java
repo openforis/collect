@@ -343,7 +343,7 @@ public class ValidationMessageBuilder {
 	}
 	
 	public String getRecordKey(CollectRecord record) {
-		record.updateRootEntityKeyValues();
+		record.updateSummaryFields();
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		List<String> cleanedKeys = new ArrayList<String>();
 		for (String key : rootEntityKeyValues) {

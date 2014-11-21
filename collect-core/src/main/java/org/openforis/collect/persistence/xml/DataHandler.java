@@ -300,8 +300,7 @@ public class DataHandler extends DefaultHandler {
 	}
 	
 	protected void endRecordElement() {
-		this.record.updateRootEntityKeyValues();
-		this.record.updateEntityCounts();
+		this.record.updateSummaryFields();
 	}
 	
 	protected void endEntityElement() {

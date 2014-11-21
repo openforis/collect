@@ -10,7 +10,7 @@ import java.util.Map;
 import org.jooq.DataType;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
-import org.jooq.impl.UpdatableTableImpl;
+import org.jooq.impl.TableImpl;
 import org.openforis.collect.persistence.jooq.Collect;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
 
@@ -18,7 +18,7 @@ import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
  * @author M. Togna
  * 
  */
-public class Lookup extends UpdatableTableImpl<LookupRecord> {
+public class Lookup extends TableImpl<LookupRecord> {
 
 	private static final long serialVersionUID = 1L;
 	private static Map<String, Lookup> nameToLookup;
@@ -34,14 +34,6 @@ public class Lookup extends UpdatableTableImpl<LookupRecord> {
 		}
 		return lookup;
 	}
-
-	// public Lookup(String name, Schema schema, Table<LookupRecord> aliased) {
-	// super(name, schema, aliased);
-	// }
-	//
-	// public Lookup(String name, Schema schema) {
-	// super(name, schema);
-	// }
 
 	private Lookup(String name) {
 		super(name, Collect.COLLECT);
@@ -65,7 +57,7 @@ public class Lookup extends UpdatableTableImpl<LookupRecord> {
 		return createField(name, getDataType(sqlDataType), this);
 	}
 
-	private SQLDataType<?> getDataType(int sqlDataType) {
+	private DataType<?> getDataType(int sqlDataType) {
 		switch(sqlDataType) {
 		case Types.INTEGER:
 			return SQLDataType.INTEGER;

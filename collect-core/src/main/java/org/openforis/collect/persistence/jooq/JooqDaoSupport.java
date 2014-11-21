@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 /**
  * @author G. Miceli
  * @author M. Togna
+ * @author S. Ricci
  */
 public abstract class JooqDaoSupport extends JdbcDaoSupport {
 	private final Log log = LogFactory.getLog(getClass());
@@ -19,9 +20,9 @@ public abstract class JooqDaoSupport extends JdbcDaoSupport {
 		return log;
 	}
 	
-	protected DialectAwareJooqFactory getJooqFactory() {
+	protected CollectDSLContext dsl() {
 		Connection connection = getConnection();
-		return new DialectAwareJooqFactory(connection);
+		return new CollectDSLContext(connection);
 	}
 
 	// TODO Move to MappingJooqFactory

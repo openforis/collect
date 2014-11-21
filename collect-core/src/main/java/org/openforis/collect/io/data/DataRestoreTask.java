@@ -226,11 +226,6 @@ public class DataRestoreTask extends Task {
 
 	private ParseRecordResult parseRecord(Reader reader) throws IOException {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
-		if ( result.isSuccess() ) {
-			CollectRecord record = result.getRecord();
-			record.updateRootEntityKeyValues();
-			record.updateEntityCounts();
-		}
 		return result;
 	}
 
@@ -250,8 +245,6 @@ public class DataRestoreTask extends Task {
 		toRecord.setStep(fromRecord.getStep());
 		toRecord.setState(fromRecord.getState());
 		toRecord.replaceRootEntity(fromRecord.getRootEntity());
-		toRecord.updateRootEntityKeyValues();
-		toRecord.updateEntityCounts();
 		validateRecord(toRecord);
 	}
 	
