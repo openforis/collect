@@ -5,13 +5,12 @@ import static org.openforis.collect.model.CollectRecord.CONFIRMED_ERROR_POSITION
 import static org.openforis.collect.model.CollectRecord.DEFAULT_APPLIED_POSITION;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
@@ -884,56 +883,51 @@ public class RecordUpdater {
 		
 		RelevanceUpdater(List<NodePointer> pointersToUpdate) {
 			this.pointersToUpdate = pointersToUpdate;
-			this.updatedNodePointers = new HashSet<NodePointer>();
+			this.updatedNodePointers = new LinkedHashSet<NodePointer>();
 		}
 		
 		Set<NodePointer> update() {
 			for (NodePointer nodePointer : pointersToUpdate) {
-				updatedNodePointers.addAll(update(nodePointer));
+				updatePointerAndDescendantsRelevance(nodePointer);
 			}
 			return updatedNodePointers;
 		}
 		
-		private Collection<NodePointer> update(NodePointer nodePointer) {
-			if (updatedNodePointers.contains(nodePointer)) {
-				return Collections.emptySet();
-			}
-
-			boolean relevance = calculateRelevance(nodePointer);
-			updatedNodePointers.addAll(setRelevance(nodePointer, relevance));
-			return updatedNodePointers;
-		}
-	
-		private Collection<NodePointer> setRelevance(NodePointer nodePointer, boolean relevant) {
-			Collection<NodePointer> changedNodePointers = new HashSet<NodePointer>();
+		private void updatePointerAndDescendantsRelevance(NodePointer rootPointer) {
+			Stack<NodePointer> stack = new Stack<NodePointer>();
+			stack.push(rootPointer);
 			
-			Entity entity = nodePointer.getEntity();
-			String childName = nodePointer.getChildName();
-			EntityDefinition entityDef = entity.getDefinition();
-			
-			Boolean oldRelevance = entity.getRelevance(childName);
-			if ( oldRelevance == null || oldRelevance.booleanValue() != relevant ) {
-				entity.setRelevant(childName, relevant);
-				changedNodePointers.add(nodePointer);
+			while (!stack.isEmpty()) {
+				NodePointer nodePointer = stack.pop();
+				if (updatedNodePointers.contains(nodePointer)) {
+					continue;
+				}
+				Entity entity = nodePointer.getEntity();
 				
-				NodeDefinition childDef = entityDef.getChildDefinition(childName);
-				if ( childDef instanceof EntityDefinition ) {
-					List<Node<?>> nodes = entity.getChildren(childName);
-					for (Node<?> node : nodes) {
-						Entity childEntity = (Entity) node;
-						EntityDefinition childEntityDef = childEntity.getDefinition();
-						for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitions()) {
-							NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef);
-							if ( relevant ) {
-								changedNodePointers.addAll(update(nextNodePointer));
-							} else {
-								changedNodePointers.addAll(setRelevance(nextNodePointer, false));
+				boolean parentRelevance = entity.getParent() == null || entity.isRelevant();
+				
+				boolean relevant = parentRelevance ? calculateRelevance(nodePointer): false;
+
+				NodeDefinition childDef = nodePointer.getChildDefinition();
+				String childName = childDef.getName();
+				Boolean oldRelevance = entity.getRelevance(childName);
+				
+				if ( oldRelevance == null || oldRelevance.booleanValue() != relevant ) {
+					entity.setRelevant(childName, relevant);
+					updatedNodePointers.add(nodePointer);
+					if ( childDef instanceof EntityDefinition ) {
+						List<Node<?>> nodes = entity.getChildren(childName);
+						for (Node<?> node : nodes) {
+							Entity childEntity = (Entity) node;
+							EntityDefinition childEntityDef = childEntity.getDefinition();
+							for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitions()) {
+								NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef);
+								stack.push(nextNodePointer);
 							}
 						}
 					}
 				}
 			}
-			return changedNodePointers;	
 		}
 		
 		private boolean calculateRelevance(NodePointer nodePointer) {
