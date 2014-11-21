@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Field;
@@ -22,22 +20,19 @@ import org.openforis.idm.model.Field;
  * */
 public class AttributeProxy extends NodeProxy {
 
-	private transient Attribute<? extends AttributeDefinition, ?> attribute;
+	private transient Attribute<?, ?> attribute;
 	private ValidationResultsProxy validationResults;
 	private boolean errorConfirmed;
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public AttributeProxy( EntityProxy parent, Attribute attribute, Locale locale) {
+	public AttributeProxy(EntityProxy parent, Attribute<?, ?> attribute, Locale locale) {
 		super(parent, attribute, locale);
 		this.attribute = attribute;
 		ValidationResults validationRes = attribute.getValidationResults();
 		if ( validationRes == null ) {
 			validationRes = new ValidationResults();
 		}
-		MessageSource messageSource = getMessageSource();
-		validationResults = new ValidationResultsProxy(messageSource, locale, attribute, validationRes);
-		CollectRecord record = (CollectRecord) attribute.getRecord();
-		errorConfirmed = record.isErrorConfirmed(attribute);
+		this.validationResults = new ValidationResultsProxy(getMessageSource(), locale, attribute, validationRes);
+		this.errorConfirmed = ((CollectRecord) attribute.getRecord()).isErrorConfirmed(attribute);
 	}
 
 	public ValidationResultsProxy getValidationResults(){
@@ -45,7 +40,7 @@ public class AttributeProxy extends NodeProxy {
 	}
 
 	public void setValidationResults(ValidationResultsProxy value) {
-		validationResults = value;
+		this.validationResults = value;
 	}
 
 	@ExternalizedProperty
@@ -63,7 +58,7 @@ public class AttributeProxy extends NodeProxy {
 	}
 	
 	public void setErrorConfirmed(boolean value) {
-		errorConfirmed = value;
+		this.errorConfirmed = value;
 	}
 
 }

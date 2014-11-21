@@ -84,6 +84,13 @@
 					foreignKeyName="ofc_data_error_report_item_report_fkey" 
 					references="ofc_data_error_report(id)" />
 			</column>
+			<column name="node_definition_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="parent_entity_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="node_index" type="INTEGER" />
 			<column name="value" type="VARCHAR(255)" />
 			<column name="status" type="CHAR(1)" />
 		</createTable>

@@ -9,18 +9,18 @@ import org.jooq.Record;
 import org.jooq.StoreQuery;
 import org.openforis.collect.model.Logo;
 import org.openforis.collect.model.LogoPosition;
+import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
-import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
 @Transactional
-public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.JooqFactory> {
+public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.LogoDSLContext> {
 	
 	public LogoDao() {
-		super(LogoDao.JooqFactory.class);
+		super(LogoDao.LogoDSLContext.class);
 	}
 
 	@Override
@@ -84,11 +84,11 @@ public class LogoDao extends MappingJooqDaoSupport<Logo, LogoDao.JooqFactory> {
 		}
 	}
 
-	protected static class JooqFactory extends MappingJooqFactory<Logo> {
+	protected static class LogoDSLContext extends MappingDSLContext<Logo> {
 
 		private static final long serialVersionUID = 1L;
 
-		public JooqFactory(Connection connection) {
+		public LogoDSLContext(Connection connection) {
 			super(connection, OFC_LOGO.POS, null, Logo.class);
 		}
 

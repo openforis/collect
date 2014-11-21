@@ -366,7 +366,7 @@ public class Entity extends Node<EntityDefinition> {
 
 	public List<Node<? extends NodeDefinition>> getAll(String name) {
 		List<Node<?>> children = childrenByName.get(name);
-		return  CollectionUtils.unmodifiableList(children);
+		return CollectionUtils.unmodifiableList(children);
 	}
 
 	@Override
@@ -471,6 +471,10 @@ public class Entity extends Node<EntityDefinition> {
 
 	public boolean isRelevant(String childName) {
 		return derivedStateCache.isRelevant(childName);
+	}
+	
+	public Boolean getRelevance(String childName) {
+		return derivedStateCache.getRelevance(childName);
 	}
 
 	public void setRelevant(String childName, boolean relevant) {
@@ -680,6 +684,10 @@ public class Entity extends Node<EntityDefinition> {
 		private boolean isRelevant(String childName) {
 			Boolean value = childRelevance.get(childName);
 			return value == null ? true: value;
+		}
+		
+		private Boolean getRelevance(String childName) {
+			return childRelevance.get(childName);
 		}
 
 		private void setRelevant(String childName, boolean flag) {

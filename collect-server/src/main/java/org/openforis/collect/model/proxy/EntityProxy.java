@@ -48,12 +48,12 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public Map<String, Boolean> getChildrenRelevanceMap(){
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
-				boolean relevant = entity.isRelevant(childName );
+				boolean relevant = entity.isRelevant(childName);
 				map.put(childName, relevant);
 			}
 		}
@@ -62,8 +62,8 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public Map<String, Boolean> getChildrenRequiredMap(){
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
@@ -76,8 +76,8 @@ public class EntityProxy extends NodeProxy {
 	
 	@ExternalizedProperty
 	public Map<String, ValidationResultFlag> getChildrenMinCountValidationMap(){
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
@@ -90,8 +90,8 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public Map<String, ValidationResultFlag> getChildrenMaxCountValidationMap(){
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();
@@ -104,8 +104,8 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public Map<String, Boolean> getShowChildrenErrorsMap() {
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		Map<String, Boolean> map = new HashMap<String, Boolean>();
+		List<NodeDefinition> childDefinitions = getChildDefinitions();
 		for (NodeDefinition childDefinition : childDefinitions) {
 			if ( isAppliable(childDefinition) ) {
 				String childName = childDefinition.getName();

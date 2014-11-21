@@ -1,10 +1,7 @@
 package org.openforis.collect.persistence;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
@@ -12,7 +9,6 @@ import org.apache.commons.io.IOUtils;
 import org.jooq.Record;
 import org.openforis.collect.manager.SurveyMigrator;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
@@ -27,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 abstract class SurveyBaseDao extends JooqDaoSupport {
 	
 	@Autowired
-	protected CollectSurveyContext surveyContext;
+	protected CollectSurveyIdmlBinder surveySerializer;
 	
 	public void init() {
 	}
@@ -60,9 +56,8 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 	
 	public CollectSurvey unmarshalIdml(Reader reader, boolean includeCodeListItems) throws IdmlParseException {
-		CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
 		try {
-			CollectSurvey survey = (CollectSurvey) binder.unmarshal(reader, includeCodeListItems);
+			CollectSurvey survey = (CollectSurvey) surveySerializer.unmarshal(reader, includeCodeListItems);
 			SurveyMigrator migrator = getSurveyMigrator();
 			migrator.migrate(survey);
 			return survey;
@@ -72,42 +67,19 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 	}
 
 	public String marshalSurvey(Survey survey) throws SurveyImportException {
-		try {
-			// Serialize Survey to XML
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			marshalSurvey(survey, os);
-			return os.toString("UTF-8");
-		} catch (IOException e) {
-			throw new SurveyImportException("Error marshalling survey", e);
-		}
-	}
-	
-	public void marshalSurvey(Survey survey, OutputStream os) throws SurveyImportException {
-		marshalSurvey(survey, os, true, false, false);
-	}
-	
-	public void marshalSurvey(Survey survey, OutputStream os,
-			boolean marshalCodeLists, boolean marshalPersistedCodeLists,
-			boolean marshalExternalCodeLists) throws SurveyImportException {
-		try {
-			CollectSurveyIdmlBinder binder = new CollectSurveyIdmlBinder(surveyContext);
-			binder.marshal(survey, os, marshalCodeLists,
-					marshalPersistedCodeLists, marshalExternalCodeLists);
-		} catch (IOException e) {
-			throw new SurveyImportException("Error marshalling survey", e);
-		}
+		return surveySerializer.marshal(survey);
 	}
 	
 	protected SurveyMigrator getSurveyMigrator() {
 		return new SurveyMigrator();
 	}
 	
-	public CollectSurveyContext getSurveyContext() {
-		return surveyContext;
+	public CollectSurveyIdmlBinder getSurveySerializer() {
+		return surveySerializer;
 	}
 	
-	public void setSurveyContext(CollectSurveyContext surveyContext) {
-		this.surveyContext = surveyContext;
+	public void setSurveySerializer(CollectSurveyIdmlBinder surveySerializer) {
+		this.surveySerializer = surveySerializer;
 	}
 	
 }

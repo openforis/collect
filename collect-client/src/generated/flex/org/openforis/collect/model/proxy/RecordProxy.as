@@ -140,7 +140,6 @@ package org.openforis.collect.model.proxy {
 			}
 			var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
 			parent.addChild(node);
-			node.parent = parent;
 			initNode(node);
 			if(node is EntityProxy) {
 				EntityProxy(node).traverse(initNode);

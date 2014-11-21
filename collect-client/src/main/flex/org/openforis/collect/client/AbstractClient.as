@@ -13,7 +13,7 @@ package org.openforis.collect.client {
 		internal static const CONCURRENCY_MULTIPLE:String = Concurrency.MULTIPLE;
 		internal static const CONCURRENCY_SINGLE:String = Concurrency.SINGLE;
 		internal static const CONCURRENCY_LAST:String = Concurrency.LAST;
-		internal static const TIMEOUT_SECONDS:int = 120;
+		internal static const TIMEOUT_SECONDS:int = 300;
 		
 		internal var _remoteObject:RemoteObject;
 		

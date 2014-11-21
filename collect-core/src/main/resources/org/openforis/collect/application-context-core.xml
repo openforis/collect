@@ -135,7 +135,11 @@
 	    <property name="externalCodeListProvider" ref="externalCodeListProvider" />
    		<property name="codeListService" ref="codeListService" />
 	</bean>
-	
+
+	<bean id="collectSurveySerializer" class="org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder">
+		 <constructor-arg ref="collectSurveyContext" />
+	</bean>
+		
 	<!-- XML DataMarshaller -->
 	<bean id="dataMarshaller" class="org.openforis.collect.persistence.xml.DataMarshaller" lazy-init="false" autowire-candidate="true" autowire="byName" />
 	

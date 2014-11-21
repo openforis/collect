@@ -17,11 +17,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.SelectJoinStep;
 import org.jooq.TableField;
 import org.openforis.collect.model.NameValueEntry;
-import org.openforis.collect.persistence.jooq.DialectAwareJooqFactory;
+import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.Lookup;
 import org.openforis.collect.persistence.jooq.tables.records.LookupRecord;
@@ -67,9 +68,9 @@ public class DynamicTableDao extends JooqDaoSupport {
 	public List<Map<String, String>> loadRows(String table, NameValueEntry[] filters, String[] notNullColumns) {
 		Lookup lookupTable = Lookup.getInstance(table);
 		initTable(table);
-		DialectAwareJooqFactory factory = getJooqFactory();
-		List<Field<?>> fields = lookupTable.getFields();
-		SelectJoinStep select = factory.select(fields).from(lookupTable);
+		CollectDSLContext dsl = dsl();
+		Field<?>[] fields = lookupTable.fields();
+		SelectJoinStep<Record> select = dsl.select(fields).from(lookupTable);
 		
 		addFilterConditions(lookupTable, select, filters);
 		addNotNullConditions(lookupTable, select, notNullColumns);
@@ -89,8 +90,7 @@ public class DynamicTableDao extends JooqDaoSupport {
 	public boolean exists(String table, NameValueEntry[] filters, String[] notNullColumns) {
 		Lookup lookupTable = Lookup.getInstance(table);
 		initTable(table);
-		DialectAwareJooqFactory factory = getJooqFactory();
-		SelectJoinStep select = factory.selectCount().from(lookupTable);
+		SelectJoinStep<Record1<Integer>> select = dsl().selectCount().from(lookupTable);
 		addFilterConditions(lookupTable, select, filters);
 		addNotNullConditions(lookupTable, select, notNullColumns);
 		Record record = select.fetchOne();
@@ -99,15 +99,15 @@ public class DynamicTableDao extends JooqDaoSupport {
 	}
 	
 	protected void addFilterConditions(Lookup lookupTable,
-			SelectJoinStep select, NameValueEntry[] filters) {
+			SelectJoinStep<? extends Record> select, NameValueEntry[] filters) {
 		for (NameValueEntry filter : filters) {
 			String colName = filter.getKey();
 			@SuppressWarnings("unchecked")
-			TableField<LookupRecord, Object> tableField = (TableField<LookupRecord, Object>) lookupTable.getField(colName);
+			TableField<LookupRecord, Object> tableField = (TableField<LookupRecord, Object>) lookupTable.field(colName);
 			if ( tableField != null ) {
 				Object filterValue = filter.getValue();
 				Condition condition;
-				if ( tableField.getType() == String.class && 
+				if ( (tableField.getType().equals(String.class) ) && 
 						(filterValue == null || filterValue instanceof String && StringUtils.isEmpty((String) filterValue)) ) {
 					condition = tableField.isNull().or(tableField.trim().equal(""));
 				} else if ( filterValue == null ) {
@@ -123,10 +123,10 @@ public class DynamicTableDao extends JooqDaoSupport {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected void addNotNullConditions(Lookup lookupTable, SelectJoinStep select, String[] columns) {
+	protected void addNotNullConditions(Lookup lookupTable, SelectJoinStep<? extends Record> select, String[] columns) {
 		if ( columns != null ) {
 			for (String colName : columns) {
-				Field<?> tableField = lookupTable.getField(colName);
+				Field<?> tableField = lookupTable.field(colName);
 				if ( tableField != null ) {
 					select.where(tableField.isNotNull().and(((Field<String>) tableField).notEqual("")));
 				} else {
@@ -141,7 +141,7 @@ public class DynamicTableDao extends JooqDaoSupport {
 		Collection<Map<String, ?>> colsMetadata = getColumnsMetadata(table);
 		for (Map<String, ?> colMetadata : colsMetadata) {
 			String colName = (String) colMetadata.get("COLUMN_NAME");
-			if ( lookupTable.getField(colName) == null ) {
+			if ( lookupTable.field(colName) == null ) {
 				Integer dataType = (Integer) colMetadata.get("DATA_TYPE");
 				lookupTable.createField(colName, dataType);
 			}
@@ -152,8 +152,8 @@ public class DynamicTableDao extends JooqDaoSupport {
 	private List<Map<String, ?>> getColumnsMetadata(String table) {
 		List<Map<String, ?>> result = new ArrayList<Map<String,?>>();
 		try { 
-			DialectAwareJooqFactory factory = getJooqFactory();
-			Connection connection = factory.getConnection();
+			CollectDSLContext dsl = dsl();
+			Connection connection = dsl.configuration().connectionProvider().acquire();
 			DatabaseMetaData metaData = connection.getMetaData();
 			ResultSet columnRs = metaData.getColumns(null, null, table, null);
 			while (columnRs.next()) {
@@ -168,12 +168,12 @@ public class DynamicTableDao extends JooqDaoSupport {
 		return result;
 	}
 
-	protected Map<String, String> parseRecord(Record record, List<Field<?>> fields) {
+	protected Map<String, String> parseRecord(Record record, Field<?>[] fields) {
 		Map<String, String> rowMap = new HashMap<String, String>();
 		for (Field<?> field : fields) {
 			String key = field.getName();
-			String value = record.getValueAsString(key);
-			rowMap.put(key, value);
+			Object val = record.getValue(field);
+			rowMap.put(key, val == null ? null: val.toString());
 		}
 		return rowMap;
 	}

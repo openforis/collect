@@ -98,11 +98,10 @@ public class RecordManager {
 	
 	@Transactional
 	public void save(CollectRecord record, User lockingUser, String sessionId) throws RecordPersistenceException {
-		record.updateRootEntityKeyValues();
+		record.updateSummaryFields();
+
 		checkAllKeysSpecified(record);
 		
-		record.updateEntityCounts();
-
 		Integer id = record.getId();
 		if(id == null) {
 			recordDao.insert(record);
@@ -205,14 +204,10 @@ public class RecordManager {
 	}
 
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
-		Date start = new Date();
-		System.out.println("Record load started");
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
 		recordUpdater.initializeRecord(record);
-		Date end = new Date();
-		System.out.println("Record load completed in " + (end.getTime() - start.getTime()) + " ms");
 		return record;
 	}
 	
@@ -295,7 +290,7 @@ public class RecordManager {
 	 */
 	public boolean isUnique(CollectRecord record) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		record.updateRootEntityKeyValues();
+		record.updateSummaryFields();
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		
 		Entity rootEntity = record.getRootEntity();
@@ -335,9 +330,8 @@ public class RecordManager {
 		if( totalErrors > 0 ){
 			throw new RecordPromoteException("Record cannot be promoted becuase it contains errors.");
 		}
-		record.updateRootEntityKeyValues();
+		record.updateSummaryFields();
 		checkAllKeysSpecified(record);
-		record.updateEntityCounts();
 
 		Integer id = record.getId();
 		// before promoting record, save it in current step
@@ -396,8 +390,9 @@ public class RecordManager {
 			lockManager.lock(recordId, user, sessionId, true);
 		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
-		record.updateRootEntityKeyValues();
-		record.updateEntityCounts();
+
+		validate(record);
+
 		recordDao.update(record);
 		if ( isLockingEnabled() ) {
 			lockManager.releaseLock(recordId);

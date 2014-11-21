@@ -133,6 +133,7 @@
 											   entityDefinition="{entityDefinition}"
 											   labelsDirection="{entitiesDirection == MultipleEntityAsTableFormItem.DIRECTION_BY_ROWS ? 
 											   		DataGroupHeader.DIRECTION_HORIZONTAL: DataGroupHeader.DIRECTION_VERTICAL}"
+											   width="{dataGroup.contentWidth}"
 											   />
 					<!-- spacer that ensures the correct alignment of the headerScroller with the dataGroup scroller -->
 					<s:Spacer 

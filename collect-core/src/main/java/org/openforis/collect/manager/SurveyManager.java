@@ -6,6 +6,7 @@ package org.openforis.collect.manager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -33,6 +34,7 @@ import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.SurveyWorkDao;
+import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.io.OpenForisIOUtils;
@@ -72,6 +74,8 @@ public class SurveyManager {
 	private SurveyValidator surveyValidator;
 	@Autowired
 	private ApplicationContext applicationContext;
+	@Autowired
+	protected CollectSurveyIdmlBinder surveySerializer;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
@@ -418,9 +422,9 @@ public class SurveyManager {
 			boolean marshalCodeLists, boolean marshalPersistedCodeLists,
 			boolean marshalExternalCodeLists) {
 		try {
-			surveyDao.marshalSurvey(survey, os, marshalCodeLists,
+			surveySerializer.marshal(survey, os, marshalCodeLists,
 					marshalPersistedCodeLists, marshalExternalCodeLists);
-		} catch (SurveyImportException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}

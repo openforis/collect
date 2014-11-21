@@ -79,11 +79,15 @@
 	</fx:Script>
 	
 	<s:layout.horizontal>
-		<s:HorizontalLayout gap="2" />
+		<s:HorizontalLayout gap="2"
+							paddingRight="10"
+							useVirtualLayout="true" />
 	</s:layout.horizontal>
 	
 	<s:layout.vertical>
-		<s:VerticalLayout gap="2" />
+		<s:VerticalLayout gap="2"
+						  paddingRight="10"
+						  useVirtualLayout="true" />
 	</s:layout.vertical>
 	
 	<s:states>

@@ -187,4 +187,21 @@
 		
 	</s:VGroup>
 	
+	
+	<s:HGroup excludeFrom="loading" 
+			  itemCreationPolicy="immediate" 
+			  horizontalAlign="center" 
+			  verticalAlign="middle"
+			  width="100%" gap="30"
+			  >
+		<s:Button id="applyButton" 
+				  label="{Message.get('global.apply')}" 
+				  enabled="{editable}" 
+				  click="applyHandler(event)" 
+				  buttonMode="true"
+				  useHandCursor="true"
+				  />
+	</s:HGroup>
+	
+	
 </s:TitleWindow>

@@ -6,6 +6,7 @@ package org.openforis.collect.persistence;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -131,9 +132,12 @@ public class DatabaseExternalCodeListProvider implements
 	@Override
 	public List<ExternalCodeListItem> getChildItems(ExternalCodeListItem item) {
 		CodeList list = item.getCodeList();
-		List<NameValueEntry> filters = createChildItemsFilters(item);
 		int itemLevel = item.getLevel();
 		int childrenLevel = itemLevel + 1;
+		if (childrenLevel > list.getHierarchy().size()) {
+			return Collections.emptyList();
+		}
+		List<NameValueEntry> filters = createChildItemsFilters(item);
 		String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
 		String[] notNullColumns = new String[]{childrenKeyColName};
 		List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 

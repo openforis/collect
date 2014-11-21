@@ -111,9 +111,7 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 
 		addTestValues(cluster);
 
-		//update counts and keys
-		record.updateRootEntityKeyValues();
-		record.updateEntityCounts();
+		record.updateSummaryFields();
 		
 		return record;
 	}

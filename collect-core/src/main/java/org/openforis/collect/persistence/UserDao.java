@@ -13,15 +13,14 @@ import java.util.List;
 import org.jooq.DeleteQuery;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.SimpleSelectConditionStep;
-import org.jooq.SimpleSelectQuery;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectQuery;
 import org.jooq.StoreQuery;
-import org.jooq.impl.Factory;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
-import org.openforis.collect.persistence.UserDao.JooqFactory;
+import org.openforis.collect.persistence.UserDao.UserDSLContext;
+import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
-import org.openforis.collect.persistence.jooq.MappingJooqFactory;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRoleRecord;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,86 +32,83 @@ import org.springframework.transaction.annotation.Transactional;
  * 
  */
 @Transactional
-public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
+public class UserDao extends MappingJooqDaoSupport<User, UserDSLContext> {
 
 	public UserDao() {
-		super(UserDao.JooqFactory.class);
+		super(UserDao.UserDSLContext.class);
 	}
 
 	@Transactional
 	public User loadById(int id){
-		JooqFactory jf = getMappingJooqFactory();
-		SimpleSelectQuery<?> query = jf.selectByIdQuery(id);
+		UserDSLContext dsl = dsl();
+		SelectQuery<?> query = dsl.selectByIdQuery(id);
 		Record r = query.fetchOne();
-		User user = r != null ? jf.fromRecord(r): null;
+		User user = r != null ? dsl.fromRecord(r): null;
 		return user;
 	}
 	
 	@Transactional
 	public User loadByUserName(String userName, Boolean enabled){
-		JooqFactory jf = getMappingJooqFactory();
-		SimpleSelectConditionStep<OfcUserRecord> query = 
-				jf.selectFrom(OFC_USER)
+		UserDSLContext dsl = dsl();
+		SelectConditionStep<OfcUserRecord> query = 
+				dsl.selectFrom(OFC_USER)
 				.where(OFC_USER.USERNAME.equal(userName));
 		if ( enabled != null ) {
 			String enabledFlag = enabled ? "Y": "N";
 			query.and(OFC_USER.ENABLED.equal(enabledFlag));
 		}
 		Record r = query.fetchOne();
-		User user = r != null ? jf.fromRecord(r): null;
+		User user = r != null ? dsl.fromRecord(r): null;
 		return user;
 	}
 	
 	@Transactional
 	public List<User> loadAll() {
-		JooqFactory jf = getMappingJooqFactory();
+		UserDSLContext dsl = dsl();
 		Result<OfcUserRecord> r = 
-				jf.selectFrom(OFC_USER)
+				dsl.selectFrom(OFC_USER)
 				.orderBy(OFC_USER.USERNAME)
 				.fetch();
 		
-		List<User> users = r != null ? jf.fromResult(r): null;
+		List<User> users = r != null ? dsl.fromResult(r): null;
 		return users;
 	}
 	
 	@Transactional
 	public int getUserId(String username) {
-		Factory jf = getJooqFactory();
+		UserDSLContext jf = dsl();
 		Record record =
 				jf.select(OFC_USER.ID)
 				.from(OFC_USER)
 				.where(OFC_USER.USERNAME.equal(username))
 				.fetchOne();
-		Integer id = record.getValueAsInteger(OFC_USER.ID);
+		Integer id = record.getValue(OFC_USER.ID);
 		return id;
 	}
 
 	@Override
 	public void insert(User user) {
 		super.insert(user);
-		JooqFactory jf = getMappingJooqFactory();
-		jf.saveRoles(user);
+		dsl().saveRoles(user);
 	}
 
 	@Override
 	public void update(User user) {
 		super.update(user);
-		JooqFactory jf = getMappingJooqFactory();
-		jf.saveRoles(user);
+		dsl().saveRoles(user);
 	}
 
 	@Override
 	public void delete(int id) {
-		JooqFactory jf = getMappingJooqFactory();
-		jf.deleteRoles(id);
+		dsl().deleteRoles(id);
 		super.delete(id);
 	}
 	
-	public static class JooqFactory extends MappingJooqFactory<User> {
+	public static class UserDSLContext extends MappingDSLContext<User> {
 
 		private static final long serialVersionUID = 1L;
 
-		public JooqFactory(Connection conn) {
+		public UserDSLContext(Connection conn) {
 			super(conn, OFC_USER.ID, OFC_USER_ID_SEQ, User.class);
 		}
 
@@ -131,9 +127,9 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 			String enabledFlag = r.getValue(OFC_USER.ENABLED);
 			boolean enabled = "Y".equals(enabledFlag);
 			user.setEnabled(enabled);
-			user.setId(r.getValueAsInteger(OFC_USER.ID));
-			user.setName(r.getValueAsString(OFC_USER.USERNAME));
-			user.setPassword(r.getValueAsString(OFC_USER.PASSWORD));
+			user.setId(r.getValue(OFC_USER.ID));
+			user.setName(r.getValue(OFC_USER.USERNAME));
+			user.setPassword(r.getValue(OFC_USER.PASSWORD));
 			
 			loadRoles(user);
 		}
@@ -149,7 +145,7 @@ public class UserDao extends MappingJooqDaoSupport<User, JooqFactory> {
 		}
 		
 		protected void loadRoles(User user) {
-			SimpleSelectQuery<OfcUserRoleRecord> query = selectQuery(OFC_USER_ROLE);
+			SelectQuery<OfcUserRoleRecord> query = selectQuery(OFC_USER_ROLE);
 			query.addConditions(OFC_USER_ROLE.USER_ID.equal(user.getId()));
 			Result<OfcUserRoleRecord> result = query.fetch();
 			List<UserRole> roles = new ArrayList<UserRole>();

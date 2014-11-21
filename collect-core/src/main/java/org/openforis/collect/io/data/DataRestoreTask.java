@@ -226,11 +226,6 @@ public class DataRestoreTask extends Task {
 
 	private ParseRecordResult parseRecord(Reader reader) throws IOException {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
-		if ( result.isSuccess() ) {
-			CollectRecord record = result.getRecord();
-			record.updateRootEntityKeyValues();
-			record.updateEntityCounts();
-		}
 		return result;
 	}
 
@@ -238,7 +233,7 @@ public class DataRestoreTask extends Task {
 		try {
 			recordManager.validate(record);
 		} catch (Exception e) {
-			log().info("Error validating record: " + record.getRootEntityKeyValues());
+			log().warn("Error validating record: " + record.getRootEntityKeyValues(), e);
 		}
 	}
 
@@ -250,8 +245,6 @@ public class DataRestoreTask extends Task {
 		toRecord.setStep(fromRecord.getStep());
 		toRecord.setState(fromRecord.getState());
 		toRecord.replaceRootEntity(fromRecord.getRootEntity());
-		toRecord.updateRootEntityKeyValues();
-		toRecord.updateEntityCounts();
 		validateRecord(toRecord);
 	}
 	

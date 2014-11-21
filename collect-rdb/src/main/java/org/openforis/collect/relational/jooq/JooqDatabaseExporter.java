@@ -1,13 +1,17 @@
 package org.openforis.collect.relational.jooq;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
-import org.jooq.impl.Factory;
+import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
 import org.openforis.collect.relational.data.CodeTableDataExtractor;
@@ -23,15 +27,23 @@ import org.openforis.collect.relational.model.Table;
 /**
  * 
  * @author G. Miceli
+ * @author S. Ricci
  *
  */
 public class JooqDatabaseExporter implements DatabaseExporter {
 
-	private Factory create;
+	private DSLContext dsl;
 	
-	public JooqDatabaseExporter(Factory create) {
-		super();
-		this.create = create;
+	public JooqDatabaseExporter(Connection connection) {
+		this(new CollectDSLContext(connection));
+	}
+
+	public JooqDatabaseExporter(Configuration conf) {
+		this(new CollectDSLContext(conf));
+	}
+	
+	public JooqDatabaseExporter(DSLContext dsl) {
+		this.dsl = dsl;
 	}
 
 	@Override
@@ -85,7 +97,7 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 				return;
 			}
 			try {
-				create.batch(buffer).execute();
+				dsl.batch(buffer).execute();
 				buffer.clear();
 			} catch(Exception e) {
 				throw new RuntimeException(e);
@@ -94,14 +106,14 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 		
 		private InsertQuery<Record> createInsertQuery(RelationalSchema schema, Row row) {
 			Table<?> table = row.getTable();
-			InsertQuery<Record> insert = create.insertQuery(getJooqTable(schema, table));
+			InsertQuery<Record> insert = dsl.insertQuery(getJooqTable(schema, table));
 			List<Object> values = row.getValues();
 			List<Column<?>> cols = table.getColumns();
 			for (int i = 0; i < cols.size(); i++) {
 				Object val = values.get(i);
 				if ( val != null ) {
 					String col = cols.get(i).getName();
-					insert.addValue(Factory.fieldByName(col), val);
+					insert.addValue(DSL.fieldByName(col), val);
 				}
 			}
 			return insert;
@@ -109,15 +121,16 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 		
 		private org.jooq.Table<Record> getJooqTable(RelationalSchema schema, Table<?> table) {
 			if ( isSchemaLess() ) {
-				return Factory.tableByName(table.getName());
+				return DSL.tableByName(table.getName());
 			} else {
-				return Factory.tableByName(schema.getName(), table.getName());
+				return DSL.tableByName(schema.getName(), table.getName());
 			}
 		}
 		
 		private boolean isSchemaLess() {
-			return create.getDialect() == SQLDialect.SQLITE;
+			return dsl.configuration().dialect() == SQLDialect.SQLITE;
 		}
 
 	}
+	
 }

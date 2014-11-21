@@ -48,20 +48,21 @@ package org.openforis.collect.presenter
 		private var _items:IList;
 		
 		{
-			FlexGlobals.topLevelApplication.stage.addEventListener(MouseEvent.CLICK, globalClickHandler);
+			FlexGlobals.topLevelApplication.stage.addEventListener(MouseEvent.MOUSE_DOWN, globalMouseDownHandler);
 		}
 		
-		public static function globalClickHandler(event:MouseEvent):void {
-			var codeInputField:TextCodeInputField;
+		public static function globalMouseDownHandler(event:MouseEvent):void {
 			//if popup is opened and user clicks outside of it, close it
 			var target:DisplayObject = event.target as DisplayObject;
 			if ( target != null ) {
+				var codeInputField:TextCodeInputField;
 				if ( _popUpOpened ) {
 					codeInputField = _popUp.codeInputField;
-					if ( ! ( ( target is UIComponent && UIUtil.hasStyleName(UIComponent(target), "openCodeListPopUpButton") ) || UIUtil.isDescendantOf(_popUp, target) ) 
+					if ( ! ( ( target is UIComponent && UIUtil.hasStyleName(UIComponent(target), "openCodeListPopUpButton") ) 
+						|| UIUtil.isDescendantOf(_popUp, target) ) 
 						//&& target != codeInputField.textInput 
 					) {
-						popUpApplyHandler(null, false);
+						popUpCloseHandler(null, false);
 					}
 				}
 				if ( _allowedValuesPreviewPopUpOpened ) {
@@ -111,7 +112,7 @@ package org.openforis.collect.presenter
 		/**
 		 * Close the popup
 		 * */
-		internal static function closePopupHandler(event:Event = null, setFocusOnInputField:Boolean = true):void {
+		internal static function popUpCloseHandler(event:Event = null, setFocusOnInputField:Boolean = true):void {
 			if ( _popUpOpened ) {
 				if ( setFocusOnInputField ) {
 					var inputField:TextCodeInputField = _popUp.codeInputField;
@@ -119,6 +120,7 @@ package org.openforis.collect.presenter
 				}
 				_popUpOpened = false;
 				PopUpManager.removePopUp(_popUp);
+				resetPopUp();
 			}
 		}
 		
@@ -126,7 +128,7 @@ package org.openforis.collect.presenter
 			//todo cancel async request
 			//if(_lastLoadCodesAsyncToken != null) {
 			//}
-			closePopupHandler();
+			popUpCloseHandler();
 		}
 		
 		/**
@@ -139,18 +141,16 @@ package org.openforis.collect.presenter
 		protected static function openCodeListDialog(view:TextCodeInputField):void {
 			if(_popUp == null) {
 				_popUp = new CodeListDialog();
-				_popUp.addEventListener(CloseEvent.CLOSE, popUpApplyHandler);
+				_popUp.addEventListener(CloseEvent.CLOSE, popUpCloseHandler);
 				_popUp.cancelLoading.addEventListener(MouseEvent.CLICK, cancelLoadingHandler);
 				_popUp.addEventListener("apply", popUpApplyHandler);
 				_popUp.addEventListener(KeyboardEvent.KEY_DOWN, popUpKeyDownHandler);
 				
 				function popUpKeyDownHandler(event:KeyboardEvent):void {
 					if (event.keyCode == Keyboard.ESCAPE) {
-						closePopupHandler();
+						popUpCloseHandler();
 					}
 				}
-				//_popUp.cancelButton.addEventListener(MouseEvent.CLICK, closePopupHandler);
-				//_popUp.addEventListener("selectionChange", popupItemSelectionChangeHandler);
 			}
 			_popUpOpened = true;
 			_popUp.codeInputField = view;
@@ -163,10 +163,16 @@ package org.openforis.collect.presenter
 			_popUp.setFocus();
 			
 			_popUp.currentState = CodeListDialog.STATE_LOADING;
-			
+
 			PopUpManager.centerPopUp(_popUp);
 			
 			CodeInputFieldPresenter(view.presenter).loadCodes(view, loadListDialogDataResultHandler);
+		}
+		
+		private static function resetPopUp():void {
+			_popUp.items = null;
+			_popUp.selectedItems = null;
+			_popUp.notSelectedItems = null;
 		}
 		
 		protected static function openAllowedValuesPreviewPopUp(view:TextCodeInputField):void {
@@ -268,7 +274,7 @@ package org.openforis.collect.presenter
 		protected static function popUpApplyHandler(event:Event, setFocusOnInputField:Boolean = true):void {
 			var selectedItems:IList = _popUp.selectedItems;
 			applySelection(selectedItems);
-			closePopupHandler(null, setFocusOnInputField);
+			popUpCloseHandler(null, setFocusOnInputField);
 		}
 		
 		protected function updateDescription():void {

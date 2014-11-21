@@ -382,6 +382,29 @@ public class RecordUpdaterTest {
 	}
 
 	@Test
+	public void testInitializeRelevanceDependencyWithEmptyAttribute() {
+		record(
+			rootEntityDef(
+				entityDef("plot",
+					attributeDef("accessibility"),
+					entityDef("plot_details",
+						attributeDef("plot_no")
+					).relevant("accessibility = 'true'")
+				).multiple()
+			)
+		);
+		
+		updater.addEntity(record.getRootEntity(), "plot");
+		Node<?> plotDetails = record.findNodeByPath("/root/plot[1]/plot_details");
+		assertFalse(plotDetails.isRelevant());
+		
+		Attribute<?, ?> accessibility = (Attribute<?, ?>) record.findNodeByPath("/root/plot[1]/accessibility");
+		update(accessibility, "true");
+		
+		assertTrue(plotDetails.isRelevant());
+	}
+	
+	@Test
 	public void testInitializeCalculatedAttributeInNestedNode() {
 		record(
 			rootEntityDef(
