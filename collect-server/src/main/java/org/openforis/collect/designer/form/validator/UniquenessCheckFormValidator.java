@@ -25,9 +25,9 @@ public class UniquenessCheckFormValidator extends CheckFormValidator {
 	private boolean validateExpression(ValidationContext ctx) {
 		if ( validateRequired(ctx, EXPRESSION_FIELD) ) {
 			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
-			NodeDefinition parentDefn = getContextNode(ctx);
+			NodeDefinition contextNode = getContextNode(ctx);
 			String expression = getValue(ctx, EXPRESSION_FIELD);
-			if ( ! expressionValidator.validateUniquenessExpression(parentDefn, null, expression)) {
+			if ( ! expressionValidator.validateUniquenessExpression(contextNode.getParentDefinition(), contextNode, expression)) {
 				addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
 				return false;
 			} else {
