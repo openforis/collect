@@ -12,13 +12,12 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.expression.ValueExpression;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 
 /**
@@ -89,21 +88,20 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 				beforeExecute(coordinateAttr);
 
 				Entity parentEntity = coordinateAttr.getParent();
-				SurveyContext recordContext = coordinateAttr.getRecord().getSurveyContext();
-				Coordinate from = getCoordinate(recordContext, getSourcePointExpression(), parentEntity, coordinateAttr, coordinateAttr.getValue());
-				Coordinate to = getCoordinate(recordContext, getDestinationPointExpression(), parentEntity, coordinateAttr, null);
+				Coordinate from = evaluateCoordinate(getSourcePointExpression(), parentEntity, coordinateAttr, coordinateAttr.getValue());
+				Coordinate to = evaluateCoordinate(getDestinationPointExpression(), parentEntity, coordinateAttr, null);
 
 				if ( !(from == null || to == null) ) {
 					double distance = COORDINATE_OPERATIONS.orthodromicDistance(from, to);
 
 					if (maxDistanceExpression != null) {
-						double maxDistance = evaluateDistanceExpression(recordContext, parentEntity, coordinateAttr, maxDistanceExpression);
+						double maxDistance = evaluateDistance(parentEntity, coordinateAttr, maxDistanceExpression);
 						if (distance > maxDistance) {
 							valid = false;
 						}
 					}
 					if ( valid && minDistanceExpression != null) {
-						double minDistance = evaluateDistanceExpression(recordContext, parentEntity, coordinateAttr, minDistanceExpression);
+						double minDistance = evaluateDistance(parentEntity, coordinateAttr, minDistanceExpression);
 						if (distance < minDistance) {
 							valid = false;
 						}
@@ -121,18 +119,18 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 		}
 	}
 
-	private double evaluateDistanceExpression(SurveyContext recordContext, Entity context, Attribute<?, ?> thisNode, String expression) throws InvalidExpressionException {
-		ValueExpression defaultValueExpression = recordContext.getExpressionFactory().createValueExpression(expression);
-		Double value = (Double) defaultValueExpression.evaluate(context, thisNode);
+	private double evaluateDistance(Entity context, Attribute<?, ?> thisNode, String expression) throws InvalidExpressionException {
+		ExpressionEvaluator expressionEvaluator = context.getSurvey().getContext().getExpressionEvaluator();
+		Double value = (Double) expressionEvaluator.evaluateValue(context, thisNode, expression);
 		return value;
 	}
 
-	private Coordinate getCoordinate(SurveyContext recordContext, String expression, Node<?> context, Attribute<?, ?> thisNode, Coordinate defaultCoordinate) throws InvalidExpressionException {
+	private Coordinate evaluateCoordinate(String expression, Node<?> context, Attribute<?, ?> thisNode, Coordinate defaultCoordinate) throws InvalidExpressionException {
 		if (expression == null) {
 			return defaultCoordinate;
 		} else {
-			ValueExpression valueExpression = recordContext.getExpressionFactory().createValueExpression(expression);
-			Coordinate coordinate = (Coordinate) valueExpression.evaluate(context, thisNode);
+			ExpressionEvaluator expressionEvaluator = context.getSurvey().getContext().getExpressionEvaluator();
+			Coordinate coordinate = (Coordinate) expressionEvaluator.evaluateValue(context, thisNode, expression);
 			return coordinate;
 		}
 	}

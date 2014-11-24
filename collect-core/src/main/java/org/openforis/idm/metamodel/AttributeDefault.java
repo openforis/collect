@@ -12,11 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
-import org.openforis.idm.model.expression.BooleanExpression;
-import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
-import org.openforis.idm.model.expression.ModelPathExpression;
-import org.openforis.idm.model.expression.ValueExpression;
 
 /**
  * @author G. Miceli
@@ -83,17 +80,15 @@ public class AttributeDefault implements Serializable {
 		if ( StringUtils.isBlank(condition) ) {
 			return true;
 		} else {
-			ExpressionFactory expressionFactory = getExpressionFactory(attrib);
-			BooleanExpression expr = expressionFactory.createBooleanExpression(condition);
-			return expr.evaluate(attrib.getParent(), attrib);
+			ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(attrib);
+			return expressionEvaluator.evaluateBoolean(attrib.getParent(), attrib, condition);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	private <V extends Value> V evaluateExpression(Attribute<?, V> attrib) throws InvalidExpressionException {
-		ExpressionFactory expressionFactory = getExpressionFactory(attrib);
-		ValueExpression defaultValueExpression = expressionFactory.createValueExpression(expression);
-		Object object = defaultValueExpression.evaluate(attrib.getParent(), attrib);
+		ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(attrib);
+		Object object = expressionEvaluator.evaluateValue(attrib.getParent(), attrib, expression);
 		if ( object == null ) {
 			return null;
 		} else {
@@ -124,19 +119,18 @@ public class AttributeDefault implements Serializable {
 		if ( StringUtils.isBlank(expr) ) {
 			return Collections.emptySet();
 		}
-		ModelPathExpression modelPathExpression = getExpressionFactory(context).createModelPathExpression(expr);
-		Set<NodeDefinition> referencedNodes = modelPathExpression.getReferencedNodeDefinitions(context);
+		Set<NodeDefinition> referencedNodes = getExpressionEvaluator(context).determineReferencedNodeDefinitions(context, expr);
 		return referencedNodes;
 	}
 	
-	private ExpressionFactory getExpressionFactory(Node<?> node) {
+	private ExpressionEvaluator getExpressionEvaluator(Node<?> node) {
 		SurveyContext context = node.getSurvey().getContext();
-		return context.getExpressionFactory();
+		return context.getExpressionEvaluator();
 	}
 	
-	private ExpressionFactory getExpressionFactory(SurveyObject surveyObj) {
+	private ExpressionEvaluator getExpressionEvaluator(SurveyObject surveyObj) {
 		SurveyContext context = surveyObj.getSurvey().getContext();
-		return context.getExpressionFactory();
+		return context.getExpressionEvaluator();
 	}
 
 	@Override

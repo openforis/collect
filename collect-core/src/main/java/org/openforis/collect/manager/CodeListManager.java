@@ -40,8 +40,7 @@ import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.expression.ModelPathExpression;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -314,19 +313,19 @@ public class CodeListManager {
 	
 	protected CodeAttribute getCodeParent(Entity context, CodeAttributeDefinition def) {
 		try {
-			Record record = context.getRecord();
-			SurveyContext surveyContext = record.getSurveyContext();
-			ExpressionFactory expressionFactory = surveyContext.getExpressionFactory();
+			Survey survey = context.getSurvey();
+			SurveyContext surveyContext = survey.getContext();
+			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 			String parentExpr = def.getParentExpression();
-			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpr);
-			Node<?> parentNode = expression.evaluate(context, null);
+			Node<?> parentNode = expressionEvaluator.evaluateNode(context, null, parentExpr);
 			if (parentNode != null && parentNode instanceof CodeAttribute) {
 				return (CodeAttribute) parentNode;
+			} else {
+				return null;
 			}
 		} catch (Exception e) {
-			// return null;
+			return null;
 		}
-		return null;
 	}
 	
 	@SuppressWarnings("unchecked")

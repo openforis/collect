@@ -14,8 +14,7 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.expression.BooleanExpression;
-import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 
 /**
@@ -89,9 +88,8 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 			try {
 				Record record = context.getRecord();
 				SurveyContext surveyContext = record.getSurveyContext();
-				ExpressionFactory expressionFactory = surveyContext.getExpressionFactory();
-				BooleanExpression expression = expressionFactory.createBooleanExpression(condition);
-				return expression.evaluate(context.getParent(), context);
+				ExpressionEvaluator evaluator = surveyContext.getExpressionEvaluator();
+				return evaluator.evaluateBoolean(context.getParent(), context, condition);
 			} catch (InvalidExpressionException e) {
 				throw new IdmInterpretationError("Unable to evaluate condition " + condition, e);
 			}

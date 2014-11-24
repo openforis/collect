@@ -14,9 +14,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.idm.metamodel.expression.SchemaPathExpression;
 import org.openforis.idm.model.NodePathPointer;
-import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
-import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.path.Path;
 
 /**
@@ -27,12 +26,12 @@ class StateDependencyMap {
 	
 	private static final Log LOG = LogFactory.getLog(StateDependencyMap.class);
 	
-	private ExpressionFactory expressionFactory;
+	private ExpressionEvaluator expressionEvaluator;
 	private Map<String, Set<NodePathPointer>> dependentsBySource;
 	private Map<String, Set<NodePathPointer>> sourcesByDependent;
 
-	StateDependencyMap(ExpressionFactory expressionFactory) {
-		this.expressionFactory = expressionFactory;
+	StateDependencyMap(ExpressionEvaluator expressionEvaluator) {
+		this.expressionEvaluator = expressionEvaluator;
 		this.dependentsBySource = new HashMap<String, Set<NodePathPointer>>();
 		this.sourcesByDependent = new HashMap<String, Set<NodePathPointer>>();
 	}
@@ -159,8 +158,8 @@ class StateDependencyMap {
 		if (StringUtils.isBlank(expression)) {
 			return Collections.emptySet();
 		} else {
-			ModelPathExpression pathExpression = expressionFactory.createModelPathExpression(expression);
-			return pathExpression.getReferencedPaths();
+			Set<String> paths = expressionEvaluator.determineReferencedPaths(expression);
+			return paths;
 		}
 	}
 

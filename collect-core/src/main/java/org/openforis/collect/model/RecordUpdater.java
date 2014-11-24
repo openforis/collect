@@ -44,8 +44,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
-import org.openforis.idm.model.expression.BooleanExpression;
-import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 
 /**
@@ -792,10 +791,9 @@ public class RecordUpdater {
 			throw new IllegalStateException(String.format("Expected required expression or min count on node pointer %s", nodePointer.toString()));
 		}
 		try {
-			SurveyContext context = defn.getSurvey().getContext();
-			ExpressionFactory expressionFactory = context.getExpressionFactory();
-			BooleanExpression expr = expressionFactory.createBooleanExpression(requiredExpression);
-			return expr.evaluate(entity, null);
+			SurveyContext surveyContext = defn.getSurvey().getContext();
+			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
+			return expressionEvaluator.evaluateBoolean(entity, null, requiredExpression);
 		} catch (InvalidExpressionException e) {
 			throw new IdmInterpretationError("Error evaluating required expression", e);
 		}
@@ -939,9 +937,8 @@ public class RecordUpdater {
 			try {
 				Entity entity = nodePointer.getEntity();
 				Survey survey = entity.getSurvey();
-				ExpressionFactory expressionFactory = survey.getContext().getExpressionFactory();
-				BooleanExpression relevanceExpr = expressionFactory.createBooleanExpression(expr);
-				return relevanceExpr.evaluate(entity, null);
+				ExpressionEvaluator expressionEvaluator = survey.getContext().getExpressionEvaluator();
+				return expressionEvaluator.evaluateBoolean(entity, null, expr);
 			} catch (InvalidExpressionException e) {
 				throw new IdmInterpretationError(childDef.getPath() + " - Unable to evaluate expression: " + expr, e);
 			}

@@ -4,6 +4,7 @@
 package org.openforis.idm.metamodel;
 
 import org.openforis.idm.metamodel.validation.Validator;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.ExpressionFactory;
 
 /**
@@ -14,6 +15,8 @@ import org.openforis.idm.model.expression.ExpressionFactory;
 public interface SurveyContext {
 
 	ExpressionFactory getExpressionFactory();
+	
+	ExpressionEvaluator getExpressionEvaluator();
 
 	Validator getValidator();
 	

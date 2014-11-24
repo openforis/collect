@@ -11,6 +11,7 @@ import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TestSurveyContext;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 
 /**
  * @author G. Miceli
@@ -19,6 +20,7 @@ import org.openforis.idm.model.TestSurveyContext;
 public abstract class AbstractTest {
 
 	protected static Survey survey;
+	protected static ExpressionEvaluator expressionEvaluator;
 	protected Entity cluster;
 	protected Entity household;
 	protected Record record;
@@ -26,6 +28,7 @@ public abstract class AbstractTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		survey = createTestSurvey();
+		expressionEvaluator = survey.getContext().getExpressionEvaluator();
 	}
 
 	protected static Survey createTestSurvey() throws IdmlParseException {

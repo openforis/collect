@@ -3,19 +3,35 @@
  */
 package org.openforis.idm.model.expression;
 
-import org.apache.commons.jxpath.*;
+import static java.util.Arrays.asList;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.jxpath.FunctionLibrary;
+import org.apache.commons.jxpath.JXPathContext;
+import org.apache.commons.jxpath.JXPathContextFactory;
+import org.apache.commons.jxpath.JXPathIntrospector;
+import org.apache.commons.jxpath.JXPathInvalidSyntaxException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.apache.commons.jxpath.ri.model.NodePointerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.expression.internal.*;
+import org.openforis.idm.model.expression.internal.CustomFunctions;
+import org.openforis.idm.model.expression.internal.IDMFunctions;
+import org.openforis.idm.model.expression.internal.MathFunctions;
+import org.openforis.idm.model.expression.internal.ModelJXPathCompiledExpression;
+import org.openforis.idm.model.expression.internal.ModelJXPathContext;
+import org.openforis.idm.model.expression.internal.ModelNodePointerFactory;
+import org.openforis.idm.model.expression.internal.NodePropertyHandler;
+import org.openforis.idm.model.expression.internal.RecordPropertyHandler;
+import org.openforis.idm.model.expression.internal.ReferencedPathEvaluator;
 import org.openforis.idm.path.Path;
-
-import java.util.*;
-
-import static java.util.Arrays.asList;
 
 /**
  * @author M. Togna
@@ -99,7 +115,7 @@ public class ExpressionFactory {
 		return lookupProvider;
 	}
 
-	public boolean isFunction(String namespace, String functionName) {
+	public boolean isValidFunction(String namespace, String functionName) {
 		boolean inDefaultNamespace = StringUtils.isBlank(namespace);
 		if (inDefaultNamespace) {
 			return CORE_FUNCTION_NAMES.contains(functionName);
@@ -147,8 +163,8 @@ public class ExpressionFactory {
 		return compiled;
 	}
 
-	private static String expressionKey(String expression, boolean normalizeNumber) {
-		return expression + "|||" + normalizeNumber;
+	private static String expressionKey(String expression, boolean normalizeNumbers) {
+		return expression + "|||" + normalizeNumbers;
 	}
 
 	private static class ExpressionCache extends LinkedHashMap<String, ModelJXPathCompiledExpression> {

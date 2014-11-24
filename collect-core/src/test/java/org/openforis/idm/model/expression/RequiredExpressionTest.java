@@ -58,9 +58,7 @@ public class RequiredExpressionTest extends AbstractTest {
 	}
 
 	private boolean evaluateExpression(String expr, Node<? extends NodeDefinition> context) throws InvalidExpressionException {
-		BooleanExpression expression = context.getRecord().getSurveyContext().getExpressionFactory().createBooleanExpression(expr);
-		boolean b = expression.evaluate(context, null);
-		return b;
+		return expressionEvaluator.evaluateBoolean(context, null, expr);
 	}
 
 }

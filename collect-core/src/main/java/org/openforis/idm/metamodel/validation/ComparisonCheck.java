@@ -8,8 +8,7 @@ import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.expression.BooleanExpression;
-import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 
 /**
@@ -115,11 +114,10 @@ public class ComparisonCheck extends Check<Attribute<?,?>> {
 	public ValidationResultFlag evaluate(Attribute<?, ?> node) {
 		Record record = node .getRecord();
 		SurveyContext recordContext = record.getSurveyContext();
+		ExpressionEvaluator expressionEvaluator = recordContext.getExpressionEvaluator();
 		String expr = getExpression();
 		try {
-			ExpressionFactory expressionFactory = recordContext.getExpressionFactory();
-			BooleanExpression checkExpr = expressionFactory.createBooleanExpression(expr, true);
-			boolean valid = checkExpr.evaluate(node.getParent(), node);
+			boolean valid = expressionEvaluator.evaluateBoolean(node.getParent(), node, expr, true);
 			return ValidationResultFlag.valueOf(valid, this.getFlag());
 		} catch (InvalidExpressionException e) {
 			throw new IdmInterpretationError("Error evaluating comparison check", e);

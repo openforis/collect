@@ -36,9 +36,6 @@ public class CheckConditionExpressionTest extends AbstractTest {
 	}
 
 	private boolean evaluateExpression(String expr, Attribute<?,?> thisNode) throws InvalidExpressionException {
-		ExpressionFactory expressionFactory = thisNode.getRecord().getSurveyContext().getExpressionFactory();
-		BooleanExpression expression = expressionFactory.createBooleanExpression(expr);
-		boolean b = expression.evaluate(thisNode.getParent(), thisNode);
-		return b;
+		return expressionEvaluator.evaluateBoolean(thisNode.getParent(), thisNode, expr);
 	}
 }

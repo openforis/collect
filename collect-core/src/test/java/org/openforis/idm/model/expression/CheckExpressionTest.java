@@ -57,8 +57,6 @@ public class CheckExpressionTest extends AbstractTest {
 	}
 	
 	private boolean evaluateExpression(String expr, Node<? extends NodeDefinition> thisNode) throws InvalidExpressionException {
-		BooleanExpression expression = cluster.getRecord().getSurveyContext().getExpressionFactory().createBooleanExpression(expr);
-		boolean b = expression.evaluate(thisNode.getParent(), thisNode);
-		return b;
+		return expressionEvaluator.evaluateBoolean(thisNode.getParent(), thisNode, expr);
 	}
 }
