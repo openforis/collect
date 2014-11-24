@@ -355,7 +355,7 @@ public class SurveyValidator {
 			}
 		} else if ( check instanceof UniquenessCheck ) {
 			String expression = ((UniquenessCheck) check).getExpression();
-			if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateUniquenessExpression(node, expression) ) {
+			if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateUniquenessExpression(node.getParentEntityDefinition(), node, expression) ) {
 				results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.uniqueness.error.invalid_uniqueness_expression"));
 			}
 		}

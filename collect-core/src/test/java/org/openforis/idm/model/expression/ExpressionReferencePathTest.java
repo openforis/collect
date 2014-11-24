@@ -10,15 +10,13 @@ public class ExpressionReferencePathTest extends AbstractTest {
 
 	@Test
 	public void testReferencePath() throws InvalidExpressionException {
-		ExpressionFactory ef = cluster.getRecord().getSurveyContext().getExpressionFactory();
-
 		String expression = "$this  <= ../../total_height * 8";
-		BooleanExpression expr = ef.createBooleanExpression(expression);
-		Set<String> paths = expr.getReferencedPaths();
+
+		Set<String> paths = expressionEvaluator.determineReferencedPaths(expression);
 
 		Assert.assertEquals(1, paths.size());
+		
 		String resultPath = paths.iterator().next();
 		Assert.assertEquals("../../total_height", resultPath);
-
 	}
 }

@@ -11,7 +11,7 @@ import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
-import org.openforis.idm.metamodel.validation.Validator;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.ExpressionFactory;
 
 /**
@@ -24,7 +24,8 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private transient ExpressionFactory expressionFactory;
-	private transient Validator validator;
+	private transient ExpressionEvaluator expressionEvaluator;
+	private transient CollectValidator validator;
 	private transient ExternalCodeListProvider externalCodeListProvider;
 	private transient CodeListService codeListService;
 
@@ -32,8 +33,9 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		this(new ExpressionFactory(), new CollectValidator());
 	}
 	
-	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
+	public CollectSurveyContext(ExpressionFactory expressionFactory, CollectValidator validator) {
 		this.expressionFactory = expressionFactory;
+		this.expressionEvaluator = new ExpressionEvaluator(expressionFactory);
 		this.validator = validator;
 	}
 	
@@ -50,17 +52,18 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	public ExpressionFactory getExpressionFactory() {
 		return expressionFactory;
 	}
-
-	public void setExpressionFactory(ExpressionFactory expressionFactory) {
-		this.expressionFactory = expressionFactory;
-	}
-
+	
 	@Override
-	public Validator getValidator() {
+	public ExpressionEvaluator getExpressionEvaluator() {
+		return expressionEvaluator;
+	}
+	
+	@Override
+	public CollectValidator getValidator() {
 		return validator;
 	}
 
-	public void setValidator(Validator validator) {
+	public void setValidator(CollectValidator validator) {
 		this.validator = validator;
 	}
 
@@ -78,8 +81,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		return codeListService;
 	}
 	
-	public void setCodeListService(
-			CodeListService codeListService) {
+	public void setCodeListService(CodeListService codeListService) {
 		this.codeListService = codeListService;
 	}
 

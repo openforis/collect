@@ -12,7 +12,7 @@ import org.openforis.idm.metamodel.validation.CustomCheck;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.metamodel.validation.UniquenessCheck;
 import org.openforis.idm.model.NodePathPointer;
-import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 
 /*
 Ax: = ancestors of x
@@ -55,12 +55,12 @@ class SurveyDependencies {
 	SurveyDependencies(Survey survey) {
 		this.survey = survey;
 		SurveyContext surveyContext = this.survey.getContext();
-		ExpressionFactory expressionFactory = surveyContext.getExpressionFactory();
+		ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 		
-		relevanceDependencies = new StateDependencyMap(expressionFactory);
-		requiredDependencies = new StateDependencyMap(expressionFactory);
-		validationDependencies = new StateDependencyMap(expressionFactory);
-		calculatedValueDependencies = new StateDependencyMap(expressionFactory);
+		relevanceDependencies = new StateDependencyMap(expressionEvaluator);
+		requiredDependencies = new StateDependencyMap(expressionEvaluator);
+		validationDependencies = new StateDependencyMap(expressionEvaluator);
+		calculatedValueDependencies = new StateDependencyMap(expressionEvaluator);
 		
 		registerDependencies();
 	}

@@ -9,6 +9,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
@@ -65,10 +66,10 @@ public class AbsoluteModelPathExpressionTest extends AbstractTest {
 
 		iterateExpression("/plot/no", record);
 	}
+
 	private List<Node<?>> iterateExpression(String expr, Record record) throws InvalidExpressionException {
-		ExpressionFactory expressionFactory = record.getSurveyContext().getExpressionFactory();
-		AbsoluteModelPathExpression expression = expressionFactory.createAbsoluteModelPathExpression(expr);
-		List<Node<?>> l = expression.iterate(record);
-		return l;
+		SurveyContext surveyContext = record.getSurveyContext();
+		ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
+		return expressionEvaluator.evaluateAbsolutePath(record, expr);
 	}
 }

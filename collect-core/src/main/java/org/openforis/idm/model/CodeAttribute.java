@@ -10,8 +10,7 @@ import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SurveyContext;
-import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.expression.ModelPathExpression;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 
 /**
  * @author G. Miceli
@@ -92,13 +91,13 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 				return null;
 			}
 			SurveyContext recordContext = getRecord().getSurveyContext();
-			ExpressionFactory expressionFactory = recordContext.getExpressionFactory();
-			ModelPathExpression expression = expressionFactory.createModelPathExpression(parentExpr);
-			Node<?> parentNode = expression.evaluate(getParent(), this);
+			ExpressionEvaluator expressionEvaluator = recordContext.getExpressionEvaluator();
+			Node<?> parentNode = expressionEvaluator.evaluateNode(getParent(), this, parentExpr);
 			if (parentNode != null && parentNode instanceof CodeAttribute) {
 				return (CodeAttribute) parentNode;
+			} else {
+				return null;
 			}
-			return null;
 		} catch (Exception e) {
 			throw new RuntimeException("Error while getting parent code " + e);
 		}

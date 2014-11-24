@@ -96,9 +96,6 @@ public class ComparisonExpressionTest extends AbstractTest {
 	}
 
 	private boolean evaluateExpression(Node<?> context, String expr) throws InvalidExpressionException {
-		ExpressionFactory expressionFactory = context.getRecord().getSurveyContext().getExpressionFactory();
-		ValueExpression expression = expressionFactory.createValueExpression(expr);
-		Object object = expression.evaluate(context, null);
-		return (Boolean) object;
+		return expressionEvaluator.evaluateBoolean(context, null, expr);
 	}
 }

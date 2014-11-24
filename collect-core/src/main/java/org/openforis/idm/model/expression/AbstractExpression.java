@@ -3,6 +3,13 @@
  */
 package org.openforis.idm.model.expression;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathInvalidSyntaxException;
 import org.apache.commons.jxpath.JXPathNotFoundException;
@@ -18,18 +25,13 @@ import org.openforis.idm.model.expression.internal.ModelJXPathContext;
 import org.openforis.idm.model.expression.internal.ModelNodePointer;
 import org.openforis.idm.path.Path;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * @author M. Togna
  * @author G. Miceli
  */
-abstract class AbstractExpression {
+public abstract class AbstractExpression {
 
 	private static final String THIS_VARIABLE_NAME = "this";
-	private static final Pattern FUNCTION_NAME_PATTERN = Pattern.compile("((\\w+):)?(\\w+)");
 	private static final QName THIS = new QName(THIS_VARIABLE_NAME);
 	private ModelJXPathContext jxPathContext;
 	private ModelJXPathCompiledExpression compiledExpression;
@@ -46,7 +48,6 @@ abstract class AbstractExpression {
 		Set<String> paths = compiledExpression.getReferencedPaths();
 		return CollectionUtils.unmodifiableSet(paths);
 	}
-
 
 	public Set<NodeDefinition> getReferencedNodeDefinitions(NodeDefinition context) throws InvalidExpressionException {
 		Set<NodeDefinition> result = new HashSet<NodeDefinition>();
@@ -68,6 +69,10 @@ abstract class AbstractExpression {
 		return definition;
 	}
 
+	public Set<String> getFunctionNames() {
+		return compiledExpression.getFunctionNames();
+	}
+	
 	protected Object evaluateSingle(Node<?> contextNode, Node<?> thisNode) throws InvalidExpressionException {
 		try {
 			JXPathContext jxPathContext = createJXPathContext(contextNode, thisNode);
@@ -115,16 +120,6 @@ abstract class AbstractExpression {
 		}
 	}
 
-	/**
-	 * Verifies that the reference paths of this expression matches the contextNodeDefinition
-	 *
-	 * @throws InvalidExpressionException if the path is invalid
-	 */
-	private void verifyPaths(NodeDefinition context) throws InvalidExpressionException {
-		//try to get referenced node definitions
-		getReferencedNodeDefinitions(context);
-	}
-
 	private NodeDefinition getChildDefinition(NodeDefinition parent, String pathSection) throws InvalidExpressionException {
 		if (Path.NORMALIZED_PARENT_FUNCTION.equals(pathSection)) {
 			return parent.getParentDefinition();
@@ -154,40 +149,6 @@ abstract class AbstractExpression {
 			variables.declareVariable(THIS_VARIABLE_NAME, thisNode);
 		}
 		return jxPathContext;
-	}
-
-	public boolean isSyntaxValid(NodeDefinition contextNodeDef) {
-		try {
-			ExpressionFactory expressionFactory = contextNodeDef.getSurvey().getContext().getExpressionFactory();
-			verifyFunctionNames(expressionFactory);
-			verifyPaths(contextNodeDef);
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	private void verifyFunctionNames(ExpressionFactory expressionFactory) throws InvalidExpressionException {
-		Set<String> names = compiledExpression.getFunctionNames();
-		for (String name : names) {
-			verifyFunctionName(name, expressionFactory);
-		}
-	}
-
-	private void verifyFunctionName(String name, ExpressionFactory expressionFactory)
-			throws InvalidExpressionException {
-		Matcher matcher = FUNCTION_NAME_PATTERN.matcher(name);
-		boolean valid;
-		if (matcher.matches()) {
-			String namespace = matcher.group(2);
-			String functionName = matcher.group(3);
-			valid = expressionFactory.isFunction(namespace, functionName);
-		} else {
-			valid = false;
-		}
-		if (!valid) {
-			throw new InvalidExpressionException(String.format("Invalid function '%s' in %s", name, compiledExpression.toString()));
-		}
 	}
 
 }

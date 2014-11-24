@@ -46,10 +46,8 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TaxonAttribute;
-import org.openforis.idm.model.expression.ExpressionFactory;
-import org.openforis.idm.model.expression.ModelPathExpression;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
 
 /**
  * 
@@ -253,16 +251,14 @@ public class ValidationMessageBuilder {
 	protected String getComparisonCheckMessageArg(Attribute<?,?> attribute, String expression, Locale locale) {
 		if ( StringUtils.isNotBlank(expression) ) {
 			String result = expression;
-			Record record = attribute.getRecord();
-			Survey survey = record.getSurvey();
+			Survey survey = attribute.getSurvey();
 			Schema schema = survey.getSchema();
-			SurveyContext recordContext = record.getSurveyContext();
-			ExpressionFactory expressionFactory = recordContext.getExpressionFactory();
+			SurveyContext surveyContext = survey.getContext();
+			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 			try {
 				Entity parentEntity = attribute.getParent();
 				EntityDefinition parentDefinition = parentEntity.getDefinition();
-				ModelPathExpression modelPathExpression = expressionFactory.createModelPathExpression(expression);
-				Set<String> referencedPaths = modelPathExpression.getReferencedPaths();
+				Set<String> referencedPaths = expressionEvaluator.determineReferencedPaths(expression);
 				for (String path : referencedPaths) {
 					String absolutePath = parentDefinition.getPath() + PATH_SEPARATOR + path;
 					NodeDefinition nodeDefinition = schema.getDefinitionByPath(absolutePath);
