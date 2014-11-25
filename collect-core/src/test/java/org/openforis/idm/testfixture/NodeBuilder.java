@@ -3,11 +3,16 @@ package org.openforis.idm.testfixture;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.*;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Record;
+import org.openforis.idm.model.Value;
 
 public class NodeBuilder {
 	
@@ -26,6 +31,10 @@ public class NodeBuilder {
 	public static Record record(Survey survey, NodeBuilder... builders) {
 		List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
 		String rootEntityName = rootEntityDefs.get(rootEntityDefs.size() - 1).getName();
+		return record(survey, rootEntityName, builders);
+	}
+	
+	public static Record record(Survey survey, String rootEntityName, NodeBuilder... builders) {
 		Record record = survey.createRecord();
 		Entity rootEntity = record.createRootEntity(rootEntityName);
 		addChildren(rootEntity, builders);
@@ -83,11 +92,12 @@ public class NodeBuilder {
 	}
 	
 	private Attribute<?, ?> createAttribute(Entity parent) {
-		NodeDefinition def = parent.getDefinition().getChildDefinition(name);
+		AttributeDefinition def = (AttributeDefinition) parent.getDefinition().getChildDefinition(name);
 		@SuppressWarnings("unchecked")
-		Attribute<?, TextValue> attr = (Attribute<?, TextValue>) def.createNode();
+		Attribute<?, Value> attr = (Attribute<?, Value>) def.createNode();
 		if ( value != null ) {
-			attr.setValue(new TextValue(value));
+			Value val = def.createValue(value);
+			attr.setValue(val);
 			attr.updateSummaryInfo();
 		}
 		return attr;

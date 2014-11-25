@@ -69,6 +69,10 @@ public class RecordFilter {
 		return rootEntityId;
 	}
 	
+	public void setRootEntityId(Integer rootEntityId) {
+		this.rootEntityId = rootEntityId;
+	}
+	
 	public Integer getRecordId() {
 		return recordId;
 	}

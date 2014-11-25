@@ -43,6 +43,7 @@ public abstract class CollectIntegrationTest {
 		return survey;
 	}
 
+	@SuppressWarnings("deprecation")
 	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException {
 		CollectSurvey survey = (CollectSurvey) loadSurvey();
 		surveyManager.importModel(survey);

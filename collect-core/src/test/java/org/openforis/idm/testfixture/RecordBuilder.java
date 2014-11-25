@@ -6,7 +6,7 @@ import org.openforis.idm.model.Record;
 public class RecordBuilder {
 	private final NodeBuilder[] nodeBuilders;
 
-	private  RecordBuilder(NodeBuilder[] nodeBuilders) {
+	private RecordBuilder(NodeBuilder[] nodeBuilders) {
 		this.nodeBuilders = nodeBuilders;
 	}
 
@@ -15,6 +15,10 @@ public class RecordBuilder {
 	}
 
 	public Record build(Survey survey) {
-		return NodeBuilder.record(survey, nodeBuilders);
+		return build(survey, null);
+	}
+
+	public Record build(Survey survey, String rootEntityName) {
+		return NodeBuilder.record(survey, rootEntityName, nodeBuilders);
 	}
 }

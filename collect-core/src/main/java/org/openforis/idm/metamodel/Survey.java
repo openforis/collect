@@ -72,7 +72,13 @@ public class Survey implements Serializable {
 	}
 	
 	public Record createRecord() {
-		return createRecord(null);
+		String version;
+		if (getVersions().isEmpty()) {
+			version = null;
+		} else {
+			version = modelVersions.get(modelVersions.size() - 1).getName();
+		}
+		return createRecord(version);
 	}
 	
 	public Record createRecord(String version) {
