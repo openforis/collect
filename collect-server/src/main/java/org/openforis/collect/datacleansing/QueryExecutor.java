@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
-import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +22,12 @@ public class QueryExecutor {
 	@Autowired
 	private RecordManager recordManager;
 	
-	public QueryResultIterator execute(Object query) {
-		CollectSurvey survey = null;
-		Integer rootEntityId = null;
-		Step step = Step.CLEANSING;
+	public QueryResultIterator execute(Query query) {
+		CollectSurvey survey = query.getSurvey();
+		EntityDefinition entityDef = (EntityDefinition) survey.getSchema().getDefinitionById(query.getEntityDefinitionId());
+		EntityDefinition rootEntityDef = entityDef.getRootEntity();
+		Integer rootEntityId = rootEntityDef.getId();
+		Step step = query.getStep();
 		
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setStep(step);
@@ -36,7 +39,7 @@ public class QueryExecutor {
 		return result;
 	}
 
-	private QueryEvaluator createQueryEvaluator(Object query) {
+	private QueryEvaluator createQueryEvaluator(Query query) {
 		return new XPathQueryEvaluator(query);
 	}
 	

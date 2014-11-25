@@ -15,7 +15,7 @@ import org.openforis.idm.model.Node;
  */
 public class QueryResultIterator implements Iterator<Node<?>> {
 
-	private Object query;
+	private Query query;
 	private QueryEvaluator queryEvaluator;
 	
 	private RecordManager recordManager;
@@ -27,7 +27,7 @@ public class QueryResultIterator implements Iterator<Node<?>> {
 	private int currentNodeIndex = 0;
 	
 	public QueryResultIterator(RecordManager recordManager, List<CollectRecord> recordSummaries, 
-			Object query, QueryEvaluator queryEvaluator) {
+			Query query, QueryEvaluator queryEvaluator) {
 		this.recordManager = recordManager;
 		this.recordSummaries = recordSummaries;
 		this.query = query;
@@ -39,7 +39,7 @@ public class QueryResultIterator implements Iterator<Node<?>> {
 		if (currentRecordIndex > recordSummaries.size()) {
 			return false;
 		} else {
-			if (currentRecord == null || currentNodeIndex > currentNodes.size()) {
+			if (currentRecord == null || currentNodeIndex >= currentNodes.size()) {
 				fetchNextRecord();
 			}
 			return currentRecord != null;

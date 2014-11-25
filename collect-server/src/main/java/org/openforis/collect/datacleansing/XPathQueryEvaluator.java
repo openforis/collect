@@ -17,9 +17,9 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  */
 public class XPathQueryEvaluator implements QueryEvaluator {
 	
-	private Object query;
+	private Query query;
 	
-	public XPathQueryEvaluator(Object query) {
+	public XPathQueryEvaluator(Query query) {
 		this.query = query;
 	}
 
@@ -27,9 +27,8 @@ public class XPathQueryEvaluator implements QueryEvaluator {
 	public List<Node<?>> evaluate(CollectRecord record) {
 		List<Node<?>> result = new ArrayList<Node<?>>();
 		
-		//TODO get these items from query
-		String condition = null;
-		AttributeDefinition attrDef = null;
+		String condition = query.getConditions();
+		AttributeDefinition attrDef = query.getAttributeDefinition();
 		
 		SurveyContext surveyContext = record.getSurveyContext();
 		ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
