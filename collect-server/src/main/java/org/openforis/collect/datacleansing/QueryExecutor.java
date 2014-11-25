@@ -30,9 +30,14 @@ public class QueryExecutor {
 		filter.setStep(step);
 		filter.setRootEntityId(rootEntityId);
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
-		XPathQueryEvaluator queryEvaluator = new XPathQueryEvaluator(query);
+		QueryEvaluator queryEvaluator = createQueryEvaluator(query);
+		
 		QueryResultIterator result = new QueryResultIterator(recordManager, summaries, query, queryEvaluator);
 		return result;
+	}
+
+	private QueryEvaluator createQueryEvaluator(Object query) {
+		return new XPathQueryEvaluator(query);
 	}
 	
 }
