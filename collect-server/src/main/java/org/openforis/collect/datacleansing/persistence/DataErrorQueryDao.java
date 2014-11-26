@@ -1,4 +1,4 @@
-package org.openforis.collect.persistence;
+package org.openforis.collect.datacleansing.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_QUERY_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;

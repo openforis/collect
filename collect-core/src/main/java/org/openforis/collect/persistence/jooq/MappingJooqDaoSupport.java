@@ -43,43 +43,40 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 	}
 	
 	protected List<E> findContaining(TableField<?,String> field, String searchString, int maxResults) {
-		C ds = dsl();
-		SelectQuery<?> query = ds.selectContainsQuery(field, searchString);
+		C dsl = dsl();
+		SelectQuery<?> query = dsl.selectContainsQuery(field, searchString);
 		query.addLimit(maxResults);
 		query.execute();
 		Result<?> result = query.getResult();
-		List<E> entities = ds.fromResult(result);
+		List<E> entities = dsl.fromResult(result);
 		return entities;
 
 	}
 	
 	@Transactional
 	protected E loadById(int id) {
-		C ds = dsl();
-		ResultQuery<?> selectQuery = ds.selectByIdQuery(id);
+		C dsl = dsl();
+		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
 		if ( r == null ) {
 			return null;
 		} else {
-			return ds.fromRecord(r);
+			return dsl.fromRecord(r);
 		}
 	}
 	
 	@Transactional
-	protected void insert(E entity) {
-		C ds = dsl();
-		ds.insertQuery(entity).execute();
+	public void insert(E entity) {
+		dsl().insertQuery(entity).execute();
 	}
 	
 	@Transactional
-	protected void update(E entity) {
-		C ds = dsl();
-		ds.updateQuery(entity).execute();
+	public void update(E entity) {
+		dsl().updateQuery(entity).execute();
 	}
 
 	@Transactional
-	protected void delete(int id) {
-		C ds = dsl();
-		ds.deleteQuery(id).execute();
+	public void delete(int id) {
+		dsl().deleteQuery(id).execute();
 	}
 }
