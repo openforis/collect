@@ -392,7 +392,7 @@ public class RecordManager {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 
 		validate(record);
-
+		
 		recordDao.update(record);
 		if ( isLockingEnabled() ) {
 			lockManager.releaseLock(recordId);
