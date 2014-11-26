@@ -34,7 +34,7 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
-	private QueryExecutor queryExecutor;
+	private DataQueryExecutor queryExecutor;
 	
 	private CollectSurvey survey;
 	
@@ -47,7 +47,7 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void testSimpleQuery() {
 		//select region from tree where dbh > 20
-		Query query = new Query(survey);
+		DataQuery query = new DataQuery(survey);
 		EntityDefinition treeDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree");
 		AttributeDefinition dbhDef = (AttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/dbh");
 		query.setEntityDefinition(treeDef);
@@ -55,7 +55,7 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 		query.setStep(Step.ENTRY);
 		query.setConditions("dbh > 20");
 		
-		QueryResultIterator it = queryExecutor.execute(query);
+		DataQueryResultIterator it = queryExecutor.execute(query);
 		assertTrue(it.hasNext());
 		
 		//first result

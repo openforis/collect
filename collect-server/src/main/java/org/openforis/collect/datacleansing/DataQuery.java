@@ -14,7 +14,7 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
  * @author S. Ricci
  *
  */
-public class Query extends PersistedSurveyObject {
+public class DataQuery extends PersistedSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -26,7 +26,7 @@ public class Query extends PersistedSurveyObject {
 	private Step step;
 	private String conditions;
 
-	public Query(CollectSurvey survey) {
+	public DataQuery(CollectSurvey survey) {
 		super(survey);
 	}
 	

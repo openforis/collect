@@ -11,28 +11,29 @@ import org.openforis.idm.metamodel.PersistedObject;
  * @author A. Modragon
  *
  */
-public class ErrorReport extends PersistedObject {
+public class DataErrorReport extends PersistedObject {
 	
-	private Query query;
+	private DataQuery query;
 	private Date creationDate;	
-	private List<ErrorReportItem> items;
+	private List<DataErrorReportItem> items;
 	
-	public void addItem(ErrorReportItem item) {
-		if (items == null) {
-			items = new ArrayList<ErrorReportItem>();
-		}
+	public DataErrorReport() {
+		items = new ArrayList<DataErrorReportItem>();
+	}
+	
+	public void addItem(DataErrorReportItem item) {
 		items.add(item);
 	}
 	
-	public void removeItem(ErrorReportItem item) {
+	public void removeItem(DataErrorReportItem item) {
 		items.remove(item);
 	}
 	
-	public Query getQuery() {
+	public DataQuery getQuery() {
 		return query;
 	}
 
-	public void setQuery(Query query) {
+	public void setQuery(DataQuery query) {
 		this.query = query;
 	}
 	
@@ -44,11 +45,11 @@ public class ErrorReport extends PersistedObject {
 		this.creationDate = creationDate;
 	}
 
-	public List<ErrorReportItem> getItems() {
+	public List<DataErrorReportItem> getItems() {
 		return items;
 	}
 
-	public void setItems(List<ErrorReportItem> items) {
+	public void setItems(List<DataErrorReportItem> items) {
 		this.items = items;
 	}
 
