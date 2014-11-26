@@ -9,6 +9,7 @@ public class ErrorReportItem {
 	
 	private Integer id;
 	private ErrorReport report;
+	private int recordId;
 	private int parentEntityId;
 	private int nodeIndex;
 	private String value;
@@ -28,6 +29,14 @@ public class ErrorReportItem {
 
 	public void setReport(ErrorReport report) {
 		this.report = report;
+	}
+	
+	public int getRecordId() {
+		return recordId;
+	}
+	
+	public void setRecordId(int recordId) {
+		this.recordId = recordId;
 	}
 
 	public int getParentEntityId() {

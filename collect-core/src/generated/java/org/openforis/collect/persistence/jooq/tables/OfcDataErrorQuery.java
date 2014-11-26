@@ -11,7 +11,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataErrorQuery extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord> {
 
-	private static final long serialVersionUID = 1112503690;
+	private static final long serialVersionUID = 245600373;
 
 	/**
 	 * The singleton instance of <code>collect.ofc_data_error_query</code>
@@ -32,9 +32,9 @@ public class OfcDataErrorQuery extends org.jooq.impl.TableImpl<org.openforis.col
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>collect.ofc_data_error_query.survey_id</code>.
+	 * The column <code>collect.ofc_data_error_query.error_type_id</code>.
 	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.Integer> SURVEY_ID = createField("survey_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.Integer> ERROR_TYPE_ID = createField("error_type_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_error_query.title</code>.
@@ -47,14 +47,14 @@ public class OfcDataErrorQuery extends org.jooq.impl.TableImpl<org.openforis.col
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
+	 * The column <code>collect.ofc_data_error_query.record_step</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.Integer> RECORD_STEP = createField("record_step", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
 	 * The column <code>collect.ofc_data_error_query.creation_date</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.sql.Timestamp> CREATION_DATE = createField("creation_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_error_query.error_type_id</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.Integer> ERROR_TYPE_ID = createField("error_type_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_error_query.entity_id</code>.
@@ -114,7 +114,7 @@ public class OfcDataErrorQuery extends org.jooq.impl.TableImpl<org.openforis.col
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_DATA_ERROR_QUERY__OFC_DATA_ERROR_QUERY_SURVEY_FKEY, org.openforis.collect.persistence.jooq.Keys.OFC_DATA_ERROR_QUERY__OFC_DATA_ERROR_QUERY_DATA_ERROR_TYPE_FKEY);
+		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_DATA_ERROR_QUERY__OFC_DATA_ERROR_QUERY_DATA_ERROR_TYPE_FKEY);
 	}
 
 	/**

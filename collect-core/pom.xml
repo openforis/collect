@@ -55,7 +55,10 @@
 						<database>
 							<name>org.jooq.util.postgres.PostgresDatabase</name>
 							<includes>.*</includes>
-							<excludes />
+							<excludes>
+								  collect.databasechangelog
+								| collect.databasechangeloglock
+							</excludes>
 							<inputSchema>collect</inputSchema>
 						</database>
 						<generate>

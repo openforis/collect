@@ -29,8 +29,9 @@ public abstract class SurveyObject implements Serializable, Annotatable{
 		this.survey = survey;
 	}
 
-	public final Survey getSurvey() {
-		return survey;
+	@SuppressWarnings("unchecked")
+	public final <S extends Survey> S getSurvey() {
+		return (S) survey;
 	}
 
 	public final Schema getSchema() {

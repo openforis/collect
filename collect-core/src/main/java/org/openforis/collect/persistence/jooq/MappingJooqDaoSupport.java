@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author G. Miceli
  */
 public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends JooqDaoSupport {
-	private Class<C> jooqFactoryClass;
+	protected Class<C> jooqFactoryClass;
 
 	public MappingJooqDaoSupport(Class<C> jooqFactoryClass) {
 		this.jooqFactoryClass = jooqFactoryClass;

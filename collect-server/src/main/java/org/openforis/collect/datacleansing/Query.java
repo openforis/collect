@@ -7,11 +7,18 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.SurveyObject;
 
-public class Query {
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
+public class Query extends SurveyObject {
 
+	private static final long serialVersionUID = 1L;
+	
 	private Integer id;
-	private CollectSurvey survey;
 	private Date creationDate;
 	private String title;
 	private String description;
@@ -21,16 +28,16 @@ public class Query {
 	private String conditions;
 
 	public Query(CollectSurvey survey) {
-		this.survey = survey;
+		super(survey);
 	}
-
+	
 	public EntityDefinition getEntityDefinition() {
-		NodeDefinition def = survey.getSchema().getDefinitionById(entityDefinitionId);
+		NodeDefinition def = getSurvey().getSchema().getDefinitionById(entityDefinitionId);
 		return (EntityDefinition) def;
 	}
 	
 	public AttributeDefinition getAttributeDefinition() {
-		NodeDefinition def = survey.getSchema().getDefinitionById(attributeDefinitionId);
+		NodeDefinition def = getSurvey().getSchema().getDefinitionById(attributeDefinitionId);
 		return (AttributeDefinition) def;
 	}
 	
@@ -48,10 +55,6 @@ public class Query {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public CollectSurvey getSurvey() {
-		return survey;
 	}
 
 	public Date getCreationDate() {

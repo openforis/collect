@@ -11,7 +11,7 @@ package org.openforis.collect.persistence.jooq.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataErrorReportItemRecord extends org.jooq.impl.UpdatableRecordImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportItemRecord> implements org.jooq.Record7<java.lang.Integer, java.lang.Integer, java.lang.Integer, java.lang.Integer, java.lang.Integer, java.lang.String, java.lang.String> {
 
-	private static final long serialVersionUID = 763873329;
+	private static final long serialVersionUID = 650079802;
 
 	/**
 	 * Setter for <code>collect.ofc_data_error_report_item.id</code>.
@@ -42,16 +42,16 @@ public class OfcDataErrorReportItemRecord extends org.jooq.impl.UpdatableRecordI
 	}
 
 	/**
-	 * Setter for <code>collect.ofc_data_error_report_item.node_definition_id</code>.
+	 * Setter for <code>collect.ofc_data_error_report_item.record_id</code>.
 	 */
-	public void setNodeDefinitionId(java.lang.Integer value) {
+	public void setRecordId(java.lang.Integer value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>collect.ofc_data_error_report_item.node_definition_id</code>.
+	 * Getter for <code>collect.ofc_data_error_report_item.record_id</code>.
 	 */
-	public java.lang.Integer getNodeDefinitionId() {
+	public java.lang.Integer getRecordId() {
 		return (java.lang.Integer) getValue(2);
 	}
 
@@ -164,7 +164,7 @@ public class OfcDataErrorReportItemRecord extends org.jooq.impl.UpdatableRecordI
 	 */
 	@Override
 	public org.jooq.Field<java.lang.Integer> field3() {
-		return org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM.NODE_DEFINITION_ID;
+		return org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID;
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class OfcDataErrorReportItemRecord extends org.jooq.impl.UpdatableRecordI
 	 */
 	@Override
 	public java.lang.Integer value3() {
-		return getNodeDefinitionId();
+		return getRecordId();
 	}
 
 	/**
@@ -278,7 +278,7 @@ public class OfcDataErrorReportItemRecord extends org.jooq.impl.UpdatableRecordI
 	 */
 	@Override
 	public OfcDataErrorReportItemRecord value3(java.lang.Integer value) {
-		setNodeDefinitionId(value);
+		setRecordId(value);
 		return this;
 	}
 
@@ -340,12 +340,12 @@ public class OfcDataErrorReportItemRecord extends org.jooq.impl.UpdatableRecordI
 	/**
 	 * Create a detached, initialised OfcDataErrorReportItemRecord
 	 */
-	public OfcDataErrorReportItemRecord(java.lang.Integer id, java.lang.Integer reportId, java.lang.Integer nodeDefinitionId, java.lang.Integer parentEntityId, java.lang.Integer nodeIndex, java.lang.String value, java.lang.String status) {
+	public OfcDataErrorReportItemRecord(java.lang.Integer id, java.lang.Integer reportId, java.lang.Integer recordId, java.lang.Integer parentEntityId, java.lang.Integer nodeIndex, java.lang.String value, java.lang.String status) {
 		super(org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM);
 
 		setValue(0, id);
 		setValue(1, reportId);
-		setValue(2, nodeDefinitionId);
+		setValue(2, recordId);
 		setValue(3, parentEntityId);
 		setValue(4, nodeIndex);
 		setValue(5, value);

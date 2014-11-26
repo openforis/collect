@@ -11,7 +11,7 @@ package org.openforis.collect.persistence.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -946150579;
+	private static final long serialVersionUID = -1828409034;
 
 	/**
 	 * The singleton instance of <code>collect</code>
@@ -36,6 +36,9 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 		return java.util.Arrays.<org.jooq.Sequence<?>>asList(
 			org.openforis.collect.persistence.jooq.Sequences.OFC_CODE_LIST_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_QUERY_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_REPORT_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_REPORT_ITEM_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_TYPE_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_SAMPLING_DESIGN_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ,

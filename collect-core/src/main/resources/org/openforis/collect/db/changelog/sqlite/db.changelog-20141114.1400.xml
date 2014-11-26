@@ -37,21 +37,17 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_error_query_pkey" />
 			</column>
-			<column name="survey_id" type="INTEGER">
+			<column name="error_type_id" type="INTEGER">
 				<constraints nullable="false" 
-					foreignKeyName="ofc_data_error_query_survey_fkey" 
-					references="ofc_survey(id)" />
+					foreignKeyName="ofc_data_error_query_data_error_type_fkey" 
+					references="ofc_data_error_type(id)" />
 			</column>
 			<column name="title" type="VARCHAR(255)">
 				<constraints nullable="false" />
 			</column>
 			<column name="description" type="VARCHAR(255)" />
 			<column name="creation_date" type="TIMESTAMP" />
-			<column name="error_type_id" type="INTEGER">
-				<constraints nullable="false" 
-					foreignKeyName="ofc_data_error_query_data_error_type_fkey" 
-					references="ofc_data_error_type(id)" />
-			</column>
+			<column name="record_step" type="INTEGER" />
 			<column name="entity_id" type="INTEGER">
 				<constraints nullable="false" />
 			</column>
@@ -84,8 +80,10 @@
 					foreignKeyName="ofc_data_error_report_item_report_fkey" 
 					references="ofc_data_error_report(id)" />
 			</column>
-			<column name="node_definition_id" type="INTEGER">
-				<constraints nullable="false" />
+			<column name="record_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_report_item_record_fkey" 
+					references="ofc_record(id)" />
 			</column>
 			<column name="parent_entity_id" type="INTEGER">
 				<constraints nullable="false" />

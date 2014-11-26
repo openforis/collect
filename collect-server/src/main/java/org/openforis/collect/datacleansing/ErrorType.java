@@ -3,34 +3,32 @@
  */
 package org.openforis.collect.datacleansing;
 
-import org.openforis.idm.metamodel.Survey;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.SurveyObject;
 
 /**
  * @author A. Modragon
  *
  */
-public class ErrorType {
+public class ErrorType extends SurveyObject {
 
+	private static final long serialVersionUID = 1L;
+	
 	private Integer id;
-	private Survey survey;
 	private String code;
 	private String label;
 	private String description;
 	
+	public ErrorType(CollectSurvey survey) {
+		super(survey);
+	}
+
 	public Integer getId() {
 		return id;
 	}
 	
 	public void setId(Integer id) {
 		this.id = id;
-	}
-	
-	public Survey getSurvey() {
-		return survey;
-	}
-	
-	public void setSurvey(Survey survey) {
-		this.survey = survey;
 	}
 	
 	public String getCode() {
@@ -56,7 +54,5 @@ public class ErrorType {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
-	
 	
 }
