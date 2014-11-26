@@ -15,7 +15,6 @@ import org.openforis.idm.model.Node;
  */
 public class QueryResultIterator implements Iterator<Node<?>> {
 
-	private Query query;
 	private QueryEvaluator queryEvaluator;
 	
 	private RecordManager recordManager;
@@ -27,10 +26,9 @@ public class QueryResultIterator implements Iterator<Node<?>> {
 	private int currentNodeIndex = 0;
 	
 	public QueryResultIterator(RecordManager recordManager, List<CollectRecord> recordSummaries, 
-			Query query, QueryEvaluator queryEvaluator) {
+			QueryEvaluator queryEvaluator) {
 		this.recordManager = recordManager;
 		this.recordSummaries = recordSummaries;
-		this.query = query;
 		this.queryEvaluator = queryEvaluator;
 	}
 

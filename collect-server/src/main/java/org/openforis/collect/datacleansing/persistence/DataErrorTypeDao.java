@@ -1,17 +1,21 @@
-package org.openforis.collect.persistence;
+package org.openforis.collect.datacleansing.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_TYPE_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC_DATA_ERROR_TYPE;
 
 import java.sql.Connection;
+import java.util.List;
 
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.ResultQuery;
+import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.ErrorType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
+import org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorTypeRecord;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -25,10 +29,18 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<ErrorTyp
 	}
 
 	public ErrorType loadById(CollectSurvey survey, int id) {
-		JooqDSLContext jf = dsl(survey);
-		ResultQuery<?> selectQuery = jf.selectByIdQuery(id);
+		JooqDSLContext dsl = dsl(survey);
+		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
-		return r == null ? null : jf.fromRecord(r);
+		return r == null ? null : dsl.fromRecord(r);
+	}
+
+	public List<ErrorType> loadBySurvey(CollectSurvey survey) {
+		JooqDSLContext dsl = dsl(survey);
+		Select<OfcDataErrorTypeRecord> select = dsl.selectFrom(OFC_DATA_ERROR_TYPE)
+			.where(OFC_DATA_ERROR_TYPE.SURVEY_ID.eq(survey.getId()));
+		Result<OfcDataErrorTypeRecord> result = select.fetch();
+		return dsl.fromResult(result);
 	}
 
 	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<ErrorType> {

@@ -35,7 +35,7 @@ public class QueryExecutor {
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
 		QueryEvaluator queryEvaluator = createQueryEvaluator(query);
 		
-		QueryResultIterator result = new QueryResultIterator(recordManager, summaries, query, queryEvaluator);
+		QueryResultIterator result = new QueryResultIterator(recordManager, summaries, queryEvaluator);
 		return result;
 	}
 
