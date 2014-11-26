@@ -7,18 +7,17 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.SurveyObject;
+import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class Query extends SurveyObject {
+public class Query extends PersistedSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Integer id;
 	private Date creationDate;
 	private String title;
 	private String description;
@@ -49,14 +48,6 @@ public class Query extends SurveyObject {
 		entityDefinitionId = def.getId();
 	}
 	
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
 	public Date getCreationDate() {
 		return creationDate;
 	}

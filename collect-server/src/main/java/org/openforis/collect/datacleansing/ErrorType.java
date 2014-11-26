@@ -4,17 +4,16 @@
 package org.openforis.collect.datacleansing;
 
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.SurveyObject;
+import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
  * @author A. Modragon
  *
  */
-public class ErrorType extends SurveyObject {
+public class ErrorType extends PersistedSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Integer id;
 	private String code;
 	private String label;
 	private String description;
@@ -23,14 +22,6 @@ public class ErrorType extends SurveyObject {
 		super(survey);
 	}
 
-	public Integer getId() {
-		return id;
-	}
-	
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	
 	public String getCode() {
 		return code;
 	}
