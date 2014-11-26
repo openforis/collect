@@ -8,14 +8,14 @@ import org.openforis.collect.model.CollectSurvey;
  * @author A. Modragon
  *
  */
-public class ErrorQuery extends Query {
+public class DataErrorQuery extends DataQuery {
 
 	private static final long serialVersionUID = 1L;
 	
 	private Integer typeId;
-	private ErrorType type;
+	private DataErrorType type;
 	
-	public ErrorQuery(CollectSurvey survey) {
+	public DataErrorQuery(CollectSurvey survey) {
 		super(survey);
 	}
 
@@ -27,11 +27,11 @@ public class ErrorQuery extends Query {
 		this.typeId = typeId;
 	}
 	
-	public ErrorType getType() {
+	public DataErrorType getType() {
 		return type;
 	}
 	
-	public void setType(ErrorType type) {
+	public void setType(DataErrorType type) {
 		this.type = type;
 	}
 	

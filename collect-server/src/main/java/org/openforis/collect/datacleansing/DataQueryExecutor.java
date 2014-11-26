@@ -17,12 +17,12 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class QueryExecutor {
+public class DataQueryExecutor {
 
 	@Autowired
 	private RecordManager recordManager;
 	
-	public QueryResultIterator execute(Query query) {
+	public DataQueryResultIterator execute(DataQuery query) {
 		CollectSurvey survey = query.getSurvey();
 		EntityDefinition entityDef = (EntityDefinition) survey.getSchema().getDefinitionById(query.getEntityDefinitionId());
 		EntityDefinition rootEntityDef = entityDef.getRootEntity();
@@ -33,14 +33,14 @@ public class QueryExecutor {
 		filter.setStep(step);
 		filter.setRootEntityId(rootEntityId);
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
-		QueryEvaluator queryEvaluator = createQueryEvaluator(query);
+		DataQueryEvaluator queryEvaluator = createQueryEvaluator(query);
 		
-		QueryResultIterator result = new QueryResultIterator(recordManager, summaries, queryEvaluator);
+		DataQueryResultIterator result = new DataQueryResultIterator(recordManager, summaries, queryEvaluator);
 		return result;
 	}
 
-	private QueryEvaluator createQueryEvaluator(Query query) {
-		return new XPathQueryEvaluator(query);
+	private DataQueryEvaluator createQueryEvaluator(DataQuery query) {
+		return new XPathDataQueryEvaluator(query);
 	}
 	
 }

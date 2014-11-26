@@ -1,33 +1,26 @@
 package org.openforis.collect.datacleansing;
 
+import org.openforis.idm.metamodel.PersistedObject;
+
 /**
  * 
  * @author A. Modragon
  *
  */
-public class ErrorReportItem {
+public class DataErrorReportItem extends PersistedObject {
 	
-	private Integer id;
-	private ErrorReport report;
+	private DataErrorReport report;
 	private int recordId;
 	private int parentEntityId;
 	private int nodeIndex;
 	private String value;
 	private char status;
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public ErrorReport getReport() {
+	public DataErrorReport getReport() {
 		return report;
 	}
 
-	public void setReport(ErrorReport report) {
+	public void setReport(DataErrorReport report) {
 		this.report = report;
 	}
 	

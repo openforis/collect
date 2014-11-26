@@ -15,11 +15,11 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  * @author S. Ricci
  *
  */
-public class XPathQueryEvaluator implements QueryEvaluator {
+public class XPathDataQueryEvaluator implements DataQueryEvaluator {
 	
-	private Query query;
+	private DataQuery query;
 	
-	public XPathQueryEvaluator(Query query) {
+	public XPathDataQueryEvaluator(DataQuery query) {
 		this.query = query;
 	}
 
