@@ -7,10 +7,10 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC
 import java.sql.Connection;
 import java.util.List;
 
+import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Result;
-import org.jooq.ResultQuery;
 import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorQuery;
@@ -30,24 +30,20 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 	public DataErrorQueryDao() {
 		super(DataErrorQueryDao.JooqDSLContext.class);
 	}
-
-	public DataErrorQuery loadById(CollectSurvey survey, int id) {
-		JooqDSLContext jf = dsl(survey);
-		ResultQuery<?> selectQuery = jf.selectByIdQuery(id);
-		Record r = selectQuery.fetchOne();
-		return r == null ? null : jf.fromRecord(r);
-	}
 	
-	public List<DataErrorQuery> loadBySurvey(CollectSurvey survey) {
-		JooqDSLContext dsl = dsl(survey);
-		Select<Record1<Integer>> errorQueryIdsSelect = 
+	public static Select<Record1<Integer>> createErrorTypeIdsSelect(DSLContext dsl, CollectSurvey survey) {
+		Select<Record1<Integer>> select = 
 			dsl.select(OFC_DATA_ERROR_TYPE.ID)
 				.from(OFC_DATA_ERROR_TYPE)
 				.where(OFC_DATA_ERROR_TYPE.SURVEY_ID.eq(survey.getId()));
-		
+		return select;
+	}
+
+	public List<DataErrorQuery> loadBySurvey(CollectSurvey survey) {
+		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorQueryRecord> select = 
 			dsl.selectFrom(OFC_DATA_ERROR_QUERY)
-				.where(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID.in(errorQueryIdsSelect));
+				.where(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID.in(createErrorTypeIdsSelect(dsl, survey)));
 		
 		Result<OfcDataErrorQueryRecord> result = select.fetch();
 		return dsl.fromResult(result);
@@ -67,20 +63,22 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 		}
 		
 		@Override
-		protected void fromRecord(Record r, DataErrorQuery object) {
-			object.setAttributeDefinitionId(r.getValue(OFC_DATA_ERROR_QUERY.ATTRIBUTE_ID));
-			object.setConditions(r.getValue(OFC_DATA_ERROR_QUERY.CONDITIONS));
-			object.setCreationDate(r.getValue(OFC_DATA_ERROR_QUERY.CREATION_DATE));
-			object.setDescription(r.getValue(OFC_DATA_ERROR_QUERY.DESCRIPTION));
-			object.setEntityDefinitionId(r.getValue(OFC_DATA_ERROR_QUERY.ENTITY_ID));
+		protected void fromRecord(Record r, DataErrorQuery o) {
+			super.fromRecord(r, o);
+			o.setAttributeDefinitionId(r.getValue(OFC_DATA_ERROR_QUERY.ATTRIBUTE_ID));
+			o.setConditions(r.getValue(OFC_DATA_ERROR_QUERY.CONDITIONS));
+			o.setCreationDate(r.getValue(OFC_DATA_ERROR_QUERY.CREATION_DATE));
+			o.setDescription(r.getValue(OFC_DATA_ERROR_QUERY.DESCRIPTION));
+			o.setEntityDefinitionId(r.getValue(OFC_DATA_ERROR_QUERY.ENTITY_ID));
 			Integer stepNumber = r.getValue(OFC_DATA_ERROR_QUERY.RECORD_STEP);
-			object.setStep(stepNumber == null ? null: Step.valueOf(stepNumber));
-			object.setTitle(r.getValue(OFC_DATA_ERROR_QUERY.TITLE));
-			object.setTypeId(r.getValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID));
+			o.setStep(stepNumber == null ? null: Step.valueOf(stepNumber));
+			o.setTitle(r.getValue(OFC_DATA_ERROR_QUERY.TITLE));
+			o.setTypeId(r.getValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID));
 		}
 		
 		@Override
 		protected void fromObject(DataErrorQuery o, StoreQuery<?> q) {
+			super.fromObject(o, q);
 			q.addValue(OFC_DATA_ERROR_QUERY.ATTRIBUTE_ID, o.getAttributeDefinitionId());
 			q.addValue(OFC_DATA_ERROR_QUERY.CONDITIONS, o.getConditions());
 			q.addValue(OFC_DATA_ERROR_QUERY.CREATION_DATE, toTimestamp(o.getCreationDate()));
@@ -91,16 +89,6 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 			q.addValue(OFC_DATA_ERROR_QUERY.TITLE, o.getTitle());
 		}
 
-		@Override
-		protected void setId(DataErrorQuery entity, int id) {
-			entity.setId(id);
-		}
-
-		@Override
-		protected Integer getId(DataErrorQuery entity) {
-			return entity.getId();
-		}
-		
 	}
 }
 

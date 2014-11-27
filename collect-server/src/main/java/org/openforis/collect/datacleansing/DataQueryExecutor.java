@@ -2,6 +2,7 @@ package org.openforis.collect.datacleansing;
 
 import java.util.List;
 
+import org.openforis.collect.datacleansing.xpath.XPathDataQueryEvaluator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;

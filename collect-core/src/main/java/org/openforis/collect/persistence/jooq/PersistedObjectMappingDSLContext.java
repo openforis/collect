@@ -9,24 +9,20 @@ import org.jooq.Record;
 import org.jooq.Sequence;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
-import org.openforis.collect.model.CollectSurvey;
-import org.openforis.idm.metamodel.PersistedSurveyObject;
+import org.openforis.idm.metamodel.PersistedObject;
 
 /**
  * @author S. Ricci
  *
  */
-public abstract class SurveyObjectMappingDSLContext<T extends PersistedSurveyObject> extends MappingDSLContext<T> {
+public abstract class PersistedObjectMappingDSLContext<T extends PersistedObject> extends MappingDSLContext<T> {
 
 	private static final long serialVersionUID = 1L;
 	
-	private CollectSurvey survey;
-
-	public SurveyObjectMappingDSLContext(Connection conn,
+	public PersistedObjectMappingDSLContext(Connection conn,
 			TableField<?, Integer> idField,
-			Sequence<? extends Number> idSequence, Class<T> clazz, CollectSurvey survey) {
+			Sequence<? extends Number> idSequence, Class<T> clazz) {
 		super(conn, idField, idSequence, clazz);
-		this.survey = survey;
 	}
 
 	@Override
@@ -46,10 +42,6 @@ public abstract class SurveyObjectMappingDSLContext<T extends PersistedSurveyObj
 	@Override
 	protected Integer getId(T entity) {
 		return entity.getId();
-	}
-	
-	public CollectSurvey getSurvey() {
-		return survey;
 	}
 	
 }

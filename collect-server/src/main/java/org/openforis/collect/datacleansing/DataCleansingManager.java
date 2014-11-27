@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.datacleansing.persistence.DataErrorQueryDao;
+import org.openforis.collect.datacleansing.persistence.DataErrorReportDao;
+import org.openforis.collect.datacleansing.persistence.DataErrorReportItemDao;
 import org.openforis.collect.datacleansing.persistence.DataErrorTypeDao;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  *
  */
+@Component
 @Transactional
 public class DataCleansingManager {
 
@@ -23,6 +27,10 @@ public class DataCleansingManager {
 	private DataErrorTypeDao errorTypeDao;
 	@Autowired
 	private DataErrorQueryDao errorQueryDao;
+	@Autowired
+	private DataErrorReportDao errorReportDao;
+	@Autowired
+	private DataErrorReportItemDao errorReportItemDao;
 	
 	private ErrorTypeCache errorTypeCache;
 	
@@ -30,6 +38,7 @@ public class DataCleansingManager {
 		errorTypeCache = new ErrorTypeCache();
 	}
 	
+	//Start of DataErrorType methods
 	public List<DataErrorType> getErrorTypesBySurvey(CollectSurvey survey) {
 		List<DataErrorType> types = errorTypeCache.getBySurvey(survey);
 		if (types == null) {
@@ -57,17 +66,20 @@ public class DataCleansingManager {
 	public void save(DataErrorType errorType) {
 		if (errorType.getId() == null) {
 			errorTypeDao.insert(errorType);
+			errorTypeCache.put(errorType);
 		} else {
 			errorTypeDao.update(errorType);
+			errorTypeCache.update(errorType);
 		}
-		errorTypeCache.update(errorType);
 	}
 	
 	public void delete(DataErrorType errorType) {
 		errorTypeDao.delete(errorType.getId());
 		errorTypeCache.remove(errorType);
 	}
+	//End of DataErrorType methods
 	
+	//Start of DataErrorQuery methods
 	public List<DataErrorQuery> loadErrorQueriesBySurvey(CollectSurvey survey) {
 		List<DataErrorQuery> queries = errorQueryDao.loadBySurvey(survey);
 		if (queries != null) {
@@ -100,6 +112,33 @@ public class DataCleansingManager {
 		DataErrorType errorType = getErrorTypeById(survey, q.getTypeId());
 		q.setType(errorType);
 	}
+	//End of DataErrorQuery methods
+	
+	//Start of DataErrorReport methods
+	public DataErrorReport loadReport(int id) {
+		DataErrorReport report = errorReportDao.loadById(id);
+		List<DataErrorReportItem> items = errorReportItemDao.loadByReport(report);
+		report.setItems(items);
+		return report;
+	}
+	
+	public void save(DataErrorReport report) {
+		if (report.getId() == null) {
+			errorReportDao.insert(report);
+		} else {
+			errorReportDao.update(report);
+		}
+	}
+
+	public void saveReportItems(DataErrorReport report, List<DataErrorReportItem> items) {
+		errorReportItemDao.insert(report, items);
+	}
+	
+	public List<DataErrorReportItem> loadReportItems(DataErrorReport report) {
+		return errorReportItemDao.loadByReport(report);
+	}
+	
+	//End of DataErrorReport methods
 	
 	private static class ErrorTypeCache {
 		
@@ -141,5 +180,5 @@ public class DataCleansingManager {
 			list.remove(e);
 		}
 	}
-	
+
 }

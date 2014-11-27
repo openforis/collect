@@ -1,47 +1,122 @@
 package org.openforis.collect.datacleansing;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.openforis.idm.testfixture.NodeBuilder.attribute;
+import static org.openforis.idm.testfixture.NodeBuilder.entity;
+import static org.openforis.idm.testfixture.RecordBuilder.record;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Node;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * 
+ * @author A. Modragon
+ * @author S. Ricci
+ *
+ */
 public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationTest {
 
-	private CollectSurvey survey;
 	@Autowired
-	private DataQueryExecutor queryExecutor;
+	private DataErrorReportGenerator reportGenerator;
+	@Autowired
+	private DataCleansingManager dataCleansingManager;
 	@Autowired
 	private RecordManager recordManager;
 	
+	private CollectSurvey survey;
+	private DataErrorType invalidAttributeErrorType;
+	
+	@Before
+	public void init() throws SurveyImportException, IdmlParseException {
+		survey = importModel();
+		initRecords();
+		invalidAttributeErrorType = new DataErrorType(survey);
+		invalidAttributeErrorType.setCode("invalid");
+		invalidAttributeErrorType.setLabel("Invalid attribute");
+		dataCleansingManager.save(invalidAttributeErrorType);
+	}
+	
+	@Test
 	public void testSimpleQuery() {
-		//select region from tree where dbh > 20
-		DataQuery query = new DataQuery(survey);
+		DataErrorQuery query = new DataErrorQuery(survey);
+		query.setType(invalidAttributeErrorType);
 		EntityDefinition treeDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree");
 		AttributeDefinition dbhDef = (AttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/dbh");
+		query.setTitle("Find trees with invalid DBH");
 		query.setEntityDefinition(treeDef);
 		query.setAttributeDefinition(dbhDef);
 		query.setStep(Step.ENTRY);
 		query.setConditions("dbh > 20");
 		
-		DataQueryResultIterator it = queryExecutor.execute(query);
-		assertTrue(it.hasNext());
+		dataCleansingManager.save(query);
 		
-		//first result
-		Node<?> node = it.next();
-		assertTrue(node instanceof Attribute);
-		CollectRecord record = (CollectRecord) node.getRecord();
+		DataErrorReport report = reportGenerator.generate(query);
+		
+		DataErrorReport reloadedReport = dataCleansingManager.loadReport(report.getId());
+		
+		List<DataErrorReportItem> items = dataCleansingManager.loadReportItems(reloadedReport);
+		
+		assertFalse(items.isEmpty());
+		
+		assertEquals(1, items.size());
+		
+		DataErrorReportItem item = items.get(0);
+		CollectRecord record = recordManager.load(survey, item.getRecordId());
 		assertEquals(Arrays.asList("10_117"), record.getRootEntityKeyValues());
+		assertEquals(Double.valueOf(30.0), Double.valueOf(item.getValue()));
 	}
-	
+
+	private void initRecords() {
+		{
+			CollectRecord record = (CollectRecord) record(
+				attribute("id", "10_114"),
+				attribute("region", "001"),
+				attribute("district", "002"),
+				entity("plot",
+					attribute("no", "1"),
+					entity("tree",
+						attribute("tree_no", "1"),
+						attribute("dbh", "10")
+					),
+					entity("tree",
+						attribute("tree_no", "2"),
+						attribute("dbh", "20")
+					)
+				)
+			).build(survey, "cluster");
+			recordManager.save(record);
+		}
+		{
+			CollectRecord record = (CollectRecord) record(
+				attribute("id", "10_117"),
+				attribute("region", "002"),
+				attribute("district", "003"),
+				entity("plot",
+					attribute("no", "1"),
+					entity("tree",
+						attribute("tree_no", "1"),
+						attribute("dbh", "20")
+					),
+					entity("tree",
+						attribute("tree_no", "2"),
+						attribute("dbh", "30")
+					)
+				)
+			).build(survey, "cluster");
+			recordManager.save(record);
+		}
+	}
 }

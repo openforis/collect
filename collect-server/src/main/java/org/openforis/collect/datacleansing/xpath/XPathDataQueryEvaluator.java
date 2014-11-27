@@ -1,8 +1,10 @@
-package org.openforis.collect.datacleansing;
+package org.openforis.collect.datacleansing.xpath;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.datacleansing.DataQuery;
+import org.openforis.collect.datacleansing.DataQueryEvaluator;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.SurveyContext;

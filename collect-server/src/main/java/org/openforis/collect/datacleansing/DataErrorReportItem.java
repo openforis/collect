@@ -9,12 +9,42 @@ import org.openforis.idm.metamodel.PersistedObject;
  */
 public class DataErrorReportItem extends PersistedObject {
 	
+	public enum Status {
+		PENDING('p'),
+		FIXED('f');
+		
+		public static Status fromCode(char code) {
+			for (Status status : values()) {
+				if (status.code == code) {
+					return status;
+				}
+			}
+			return null;
+		}
+		
+		private char code;
+
+		Status(char code) {
+			this.code = code;
+		}
+		
+		public char getCode() {
+			return code;
+		}
+		
+	}
+	
 	private DataErrorReport report;
 	private int recordId;
 	private int parentEntityId;
 	private int nodeIndex;
 	private String value;
-	private char status;
+	private Status status;
+
+	public DataErrorReportItem(DataErrorReport report) {
+		super();
+		this.report = report;
+	}
 
 	public DataErrorReport getReport() {
 		return report;
@@ -56,11 +86,11 @@ public class DataErrorReportItem extends PersistedObject {
 		this.value = value;
 	}
 
-	public char getStatus() {
+	public Status getStatus() {
 		return status;
 	}
 
-	public void setStatus(char status) {
+	public void setStatus(Status status) {
 		this.status = status;
 	}
 	

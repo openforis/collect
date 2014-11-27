@@ -25,6 +25,24 @@
 	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager"
 		scope="session" />
 	
+	<!-- Data Cleansing Toolkit -->
+	<bean id="dataErrorQueryDao" class="org.openforis.collect.datacleansing.persistence.DataErrorQueryDao"
+		lazy-init="false" depends-on="liquibase">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="dataErrorReportDao" class="org.openforis.collect.datacleansing.persistence.DataErrorReportDao"
+		lazy-init="false" depends-on="liquibase">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="dataErrorReportItemDao" class="org.openforis.collect.datacleansing.persistence.DataErrorReportItemDao"
+		lazy-init="false" depends-on="liquibase">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="dataErrorTypeDao" class="org.openforis.collect.datacleansing.persistence.DataErrorTypeDao"
+		lazy-init="false" depends-on="liquibase">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
 	<!-- ===================================== -->
 	<!-- GraniteDs services -->
 	<!-- ===================================== -->

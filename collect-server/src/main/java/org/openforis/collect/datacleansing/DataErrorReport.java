@@ -13,11 +13,13 @@ import org.openforis.idm.metamodel.PersistedObject;
  */
 public class DataErrorReport extends PersistedObject {
 	
+	private int queryId;
 	private DataQuery query;
 	private Date creationDate;	
 	private List<DataErrorReportItem> items;
 	
 	public DataErrorReport() {
+		creationDate = new Date();
 		items = new ArrayList<DataErrorReportItem>();
 	}
 	
@@ -29,12 +31,21 @@ public class DataErrorReport extends PersistedObject {
 		items.remove(item);
 	}
 	
+	public int getQueryId() {
+		return queryId;
+	}
+	
+	public void setQueryId(int queryId) {
+		this.queryId = queryId;
+	}
+	
 	public DataQuery getQuery() {
 		return query;
 	}
 
 	public void setQuery(DataQuery query) {
 		this.query = query;
+		this.queryId = query.getId();
 	}
 	
 	public Date getCreationDate() {

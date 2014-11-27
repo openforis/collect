@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.ResultQuery;
 import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorType;
@@ -26,13 +25,6 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErro
 
 	public DataErrorTypeDao() {
 		super(DataErrorTypeDao.JooqDSLContext.class);
-	}
-
-	public DataErrorType loadById(CollectSurvey survey, int id) {
-		JooqDSLContext dsl = dsl(survey);
-		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
-		Record r = selectQuery.fetchOne();
-		return r == null ? null : dsl.fromRecord(r);
 	}
 
 	public List<DataErrorType> loadBySurvey(CollectSurvey survey) {
@@ -57,29 +49,21 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErro
 		}
 		
 		@Override
-		protected void fromRecord(Record r, DataErrorType object) {
-			object.setCode(r.getValue(OFC_DATA_ERROR_TYPE.CODE));
-			object.setDescription(r.getValue(OFC_DATA_ERROR_TYPE.DESCRIPTION));
-			object.setLabel(r.getValue(OFC_DATA_ERROR_TYPE.LABEL));
+		protected void fromRecord(Record r, DataErrorType o) {
+			super.fromRecord(r, o);
+			o.setCode(r.getValue(OFC_DATA_ERROR_TYPE.CODE));
+			o.setDescription(r.getValue(OFC_DATA_ERROR_TYPE.DESCRIPTION));
+			o.setLabel(r.getValue(OFC_DATA_ERROR_TYPE.LABEL));
 		}
 		
 		@Override
-		protected void fromObject(DataErrorType object, StoreQuery<?> q) {
-			q.addValue(OFC_DATA_ERROR_TYPE.CODE, object.getCode());
-			q.addValue(OFC_DATA_ERROR_TYPE.DESCRIPTION, object.getDescription());
-			q.addValue(OFC_DATA_ERROR_TYPE.LABEL, object.getLabel());
-			q.addValue(OFC_DATA_ERROR_TYPE.SURVEY_ID, object.getSurvey().getId());
+		protected void fromObject(DataErrorType o, StoreQuery<?> q) {
+			super.fromObject(o, q);
+			q.addValue(OFC_DATA_ERROR_TYPE.CODE, o.getCode());
+			q.addValue(OFC_DATA_ERROR_TYPE.DESCRIPTION, o.getDescription());
+			q.addValue(OFC_DATA_ERROR_TYPE.LABEL, o.getLabel());
+			q.addValue(OFC_DATA_ERROR_TYPE.SURVEY_ID, o.getSurvey().getId());
 		}
 
-		@Override
-		protected void setId(DataErrorType entity, int id) {
-			entity.setId(id);
-		}
-
-		@Override
-		protected Integer getId(DataErrorType entity) {
-			return entity.getId();
-		}
-		
 	}
 }

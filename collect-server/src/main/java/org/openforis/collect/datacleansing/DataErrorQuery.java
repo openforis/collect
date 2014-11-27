@@ -20,7 +20,7 @@ public class DataErrorQuery extends DataQuery {
 	}
 
 	public Integer getTypeId() {
-		return typeId;
+		return type == null ? typeId: type.getId();
 	}
 	
 	public void setTypeId(Integer typeId) {
@@ -33,6 +33,7 @@ public class DataErrorQuery extends DataQuery {
 	
 	public void setType(DataErrorType type) {
 		this.type = type;
+		this.typeId = type == null ? null: type.getId();
 	}
 	
 }

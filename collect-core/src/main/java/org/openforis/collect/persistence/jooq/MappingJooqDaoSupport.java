@@ -31,7 +31,7 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 		}
 	}
 	
-	protected List<E> findStartingWith(TableField<?,String> field, String searchString, int maxResults) {
+	public List<E> findStartingWith(TableField<?,String> field, String searchString, int maxResults) {
 		C dsl = dsl();
 		SelectQuery<?> query = dsl.selectStartsWithQuery(field, searchString);
 		query.addLimit(maxResults);
@@ -42,7 +42,7 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 
 	}
 	
-	protected List<E> findContaining(TableField<?,String> field, String searchString, int maxResults) {
+	public List<E> findContaining(TableField<?,String> field, String searchString, int maxResults) {
 		C dsl = dsl();
 		SelectQuery<?> query = dsl.selectContainsQuery(field, searchString);
 		query.addLimit(maxResults);
@@ -54,7 +54,7 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 	}
 	
 	@Transactional
-	protected E loadById(int id) {
+	public E loadById(int id) {
 		C dsl = dsl();
 		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
