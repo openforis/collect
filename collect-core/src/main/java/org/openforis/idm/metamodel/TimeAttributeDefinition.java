@@ -3,7 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.TimeAttribute;
@@ -37,11 +36,7 @@ public class TimeAttributeDefinition extends AttributeDefinition {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Time createValue(String string) {
-		if ( StringUtils.isBlank(string) ) {
-			return null;
-		} else {
-			return Time.parseTime(string);
-		}
+		return Time.parseTime(string);
 	}
 	
 	@Override

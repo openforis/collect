@@ -54,10 +54,10 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 		return new TaxonAttribute(this);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings("unchecked")
 	public TaxonOccurrence createValue(String string) {
-		throw new UnsupportedOperationException();
+		return TaxonOccurrence.parseJSON(string);
 	}
 	
 	@Override

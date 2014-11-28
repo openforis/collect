@@ -3,7 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Node;
@@ -36,14 +35,10 @@ public class DateAttributeDefinition extends AttributeDefinition {
 		return new DateAttribute(this);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings("unchecked")
 	public Date createValue(String string) {
-		if ( StringUtils.isBlank(string) ) {
-			return null;
-		} else {
-			return Date.parse(string);
-		}
+		return Date.parse(string);
 	}
 	
 	@Override

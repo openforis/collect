@@ -1,14 +1,20 @@
 package org.openforis.idm.model;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openforis.idm.metamodel.Unit;
 
 /**
  * @author G. Miceli
  * @author M. Togna
  */
-public abstract class NumericRange<T extends Number> implements Value {
+public abstract class NumericRange<T extends Number> extends AbstractValue {
 
+	protected static final String FROM_FIELD = "from";
+	protected static final String TO_FIELD = "to";
+	protected static final String UNIT_ID_FIELD = "unit_id";
+	
 	private final T from;
 	private final T to;
 	private final Unit unit;
@@ -31,6 +37,16 @@ public abstract class NumericRange<T extends Number> implements Value {
 
 	public Unit getUnit() {
 		return unit;
+	}
+	
+	@Override
+	@SuppressWarnings("serial")
+	protected Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(FROM_FIELD, from);
+			put(TO_FIELD, to);
+			put(UNIT_ID_FIELD, unit == null ? null: unit.getId());
+		}};
 	}
 	
 	@Override
@@ -65,12 +81,4 @@ public abstract class NumericRange<T extends Number> implements Value {
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return new ToStringBuilder(this)
-			.append("from", from)
-			.append("to", to)
-			.append("unit", unit)
-			.toString();
-	}
 }

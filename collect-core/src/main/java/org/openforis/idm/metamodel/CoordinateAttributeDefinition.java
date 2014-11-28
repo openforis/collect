@@ -3,7 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Node;
@@ -39,11 +38,7 @@ public class CoordinateAttributeDefinition extends AttributeDefinition  {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Coordinate createValue(String string) {
-		if ( StringUtils.isBlank(string) ) {
-			return null;
-		} else {
-			return Coordinate.parseCoordinate(string);
-		}
+		return Coordinate.parseCoordinate(string);
 	}
 	
 	@Override

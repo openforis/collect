@@ -88,7 +88,7 @@ public class FileAttributeDefinition extends AttributeDefinition {
 	@SuppressWarnings("unchecked")
 	@Override
 	public File createValue(String string) {
-		throw new UnsupportedOperationException();
+		return File.parse(string);
 	}
 	
 	@Override

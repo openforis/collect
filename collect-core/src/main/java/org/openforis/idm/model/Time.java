@@ -3,17 +3,20 @@ package org.openforis.idm.model;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * @author G. Miceli
  * @author M. Togna
  */
-public final class Time implements Value {
+public final class Time extends AbstractValue {
 	/**
 	 * Internal string format for Time value ("hhss")
 	 */
@@ -60,14 +63,6 @@ public final class Time implements Value {
 		this.minute = minute;
 	}
 	
-	public Integer getHour() {
-		return hour;
-	}
-
-	public Integer getMinute() {
-		return minute;
-	}
-	
 	public Calendar toCalendar() {
 		if (hour == null || minute == null) {
 			return null;
@@ -81,6 +76,23 @@ public final class Time implements Value {
 		}
 	}
 
+	@Override
+	@SuppressWarnings("serial")
+	protected Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(TimeAttributeDefinition.HOUR_FIELD, hour);
+			put(TimeAttributeDefinition.MINUTE_FIELD, minute);
+		}};
+	}
+	
+	public Integer getHour() {
+		return hour;
+	}
+
+	public Integer getMinute() {
+		return minute;
+	}
+	
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)

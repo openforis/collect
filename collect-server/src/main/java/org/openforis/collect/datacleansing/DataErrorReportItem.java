@@ -1,6 +1,12 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.List;
+
+import org.json.simple.JSONObject;
 import org.openforis.idm.metamodel.PersistedObject;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Field;
+import org.openforis.idm.model.Value;
 
 /**
  * 
@@ -44,6 +50,23 @@ public class DataErrorReportItem extends PersistedObject {
 	public DataErrorReportItem(DataErrorReport report) {
 		super();
 		this.report = report;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void setAttributeValue(Attribute<?, ?> attr) {
+		if (attr.isEmpty()) {
+			value = null;
+		}
+		JSONObject jsonObj = new JSONObject();
+		List<Field<?>> fields = attr.getFields();
+		for (Field<?> field : fields) {
+			jsonObj.put(field.getName(), field.getValue());
+		}
+		value = jsonObj.toJSONString();
+	}
+	
+	public Value getAttributeValue() {
+		
 	}
 
 	public DataErrorReport getReport() {

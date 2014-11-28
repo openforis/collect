@@ -278,14 +278,10 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 		return new CodeAttribute(this);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings("unchecked")
 	public Code createValue(String string) {
-		if ( StringUtils.isBlank(string) ) {
-			return null;
-		} else {
-			return new Code(string);
-		}
+		return Code.parse(string);
 	}
 	
 	@Override

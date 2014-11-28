@@ -12,4 +12,5 @@ public class IntegerValue extends NumberValue<Integer> {
 	public IntegerValue(Integer value, Unit unit) {
 		super(value, unit);
 	}
+	
 }

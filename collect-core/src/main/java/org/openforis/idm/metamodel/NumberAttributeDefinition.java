@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.Node;
@@ -67,15 +66,11 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition implem
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public NumberValue<? extends Number> createValue(String string) {
-		if ( StringUtils.isBlank(string) ) {
-			return null;
-		} 
-		Unit unit = getDefaultUnit();
+	public NumberValue<? extends Number> createValue(String stringValue) {
 		if(isInteger()){
-			return new IntegerValue(Double.valueOf(string).intValue(), unit);
+			return IntegerValue.parse(this, stringValue);
 		} else if(isReal()) {
-			return new RealValue(Double.valueOf(string), unit);
+			return RealValue.parse(this, stringValue);
 		}
 		throw new RuntimeException("Invalid type " + getType());
 	}
