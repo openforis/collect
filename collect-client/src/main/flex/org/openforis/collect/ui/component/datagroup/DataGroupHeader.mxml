@@ -135,7 +135,7 @@
 		<s:layout.vertical>
 			<s:VerticalLayout 
 				gap="2"
-				verticalAlign="middle" />
+				verticalAlign="bottom" />
 		</s:layout.vertical>
 		<s:itemRenderer>
 			<fx:Component>

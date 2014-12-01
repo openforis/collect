@@ -379,7 +379,7 @@ s|Label.indent {
 }
 
 .dataGroupHeader.vertical {
-	verticalAlign: top;
+	verticalAlign: bottom;
 }
 
 s|Label.dataGroupHeader {
