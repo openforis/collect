@@ -13,6 +13,7 @@ import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.openforis.idm.model.expression.ModelPathExpression;
 import org.openforis.idm.model.expression.ValueExpression;
+import org.openforis.idm.path.Path;
 
 /**
  * Verifies that the expressions defined in a survey are valid
@@ -185,7 +186,7 @@ public class ExpressionValidator {
 //	}
 //	
 	private String getNormalizedPath(String path) {
-		return path.replaceAll("\\$this/", "");
+		return Path.removeThisVariableToken(path);
 	}
 
 }
