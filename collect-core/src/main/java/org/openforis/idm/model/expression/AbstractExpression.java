@@ -123,7 +123,7 @@ public abstract class AbstractExpression {
 	private NodeDefinition getChildDefinition(NodeDefinition parent, String pathSection) throws InvalidExpressionException {
 		if (Path.NORMALIZED_PARENT_FUNCTION.equals(pathSection)) {
 			return parent.getParentDefinition();
-		} else if ("$this".equals(pathSection)) {
+		} else if (Path.THIS_ALIASES.contains(pathSection)) {
 			return parent;
 		} else {
 			String childName = pathSection.replaceAll("\\[.+]", "");
