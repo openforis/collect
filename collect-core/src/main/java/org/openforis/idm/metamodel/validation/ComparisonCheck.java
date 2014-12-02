@@ -10,6 +10,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.InvalidExpressionException;
+import org.openforis.idm.path.Path;
 
 /**
  * @author M. Togna
@@ -141,7 +142,7 @@ public class ComparisonCheck extends Check<Attribute<?,?>> {
 				expression.append("and");
 				expression.append(" ");
 			}
-			expression.append("$this");
+			expression.append(Path.THIS_VARIABLE);
 			expression.append(" ");
 			expression.append(o.xpathOperator);
 			expression.append(" ");
