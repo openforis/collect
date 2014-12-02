@@ -67,10 +67,11 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition implem
 	@SuppressWarnings("unchecked")
 	@Override
 	public NumberValue<? extends Number> createValue(String stringValue) {
+		Unit defaultUnit = getDefaultUnit();
 		if(isInteger()){
-			return IntegerValue.parse(this, stringValue);
+			return new IntegerValue(Integer.parseInt(stringValue), defaultUnit);
 		} else if(isReal()) {
-			return RealValue.parse(this, stringValue);
+			return new RealValue(Double.parseDouble(stringValue), defaultUnit);
 		}
 		throw new RuntimeException("Invalid type " + getType());
 	}

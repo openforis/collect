@@ -9,8 +9,8 @@ import java.util.Map;
  */
 public final class File extends AbstractValue {
 
-	protected static final String FILENAME_FIELD = "filename";
-	protected static final String SIZE_FIELD = "size";
+	public static final String FILENAME_FIELD = "filename";
+	public static final String SIZE_FIELD = "size";
 	
 	private final String filename;
 	private final Long size;

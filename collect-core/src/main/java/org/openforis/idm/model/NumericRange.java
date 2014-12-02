@@ -11,9 +11,9 @@ import org.openforis.idm.metamodel.Unit;
  */
 public abstract class NumericRange<T extends Number> extends AbstractValue {
 
-	protected static final String FROM_FIELD = "from";
-	protected static final String TO_FIELD = "to";
-	protected static final String UNIT_ID_FIELD = "unit_id";
+	public static final String FROM_FIELD = "from";
+	public static final String TO_FIELD = "to";
+	public static final String UNIT_ID_FIELD = "unit_id";
 	
 	private final T from;
 	private final T to;

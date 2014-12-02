@@ -13,8 +13,8 @@ import org.openforis.idm.metamodel.Unit;
  */
 public abstract class NumberValue<T extends Number> extends AbstractValue {
 
-	protected static final String VALUE_FIELD = "value";
-	protected static final String UNIT_ID_FIELD = "unit_id";
+	public static final String VALUE_FIELD = "value";
+	public static final String UNIT_ID_FIELD = "unit_id";
 	
 	private T value;
 	private Unit unit;

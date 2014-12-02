@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class BooleanValue extends AbstractValue {
 
-	protected static final String VALUE_FIELD = "value";
+	public static final String VALUE_FIELD = "value";
 	
 	private Boolean value;
 	

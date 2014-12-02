@@ -1,6 +1,7 @@
 package org.openforis.collect.datacleansing;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;
@@ -16,9 +17,10 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.openforis.idm.model.RealValue;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -54,7 +56,7 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		DataErrorQuery query = new DataErrorQuery(survey);
 		query.setType(invalidAttributeErrorType);
 		EntityDefinition treeDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree");
-		AttributeDefinition dbhDef = (AttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/dbh");
+		NumberAttributeDefinition dbhDef = (NumberAttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/dbh");
 		query.setTitle("Find trees with invalid DBH");
 		query.setEntityDefinition(treeDef);
 		query.setAttributeDefinition(dbhDef);
@@ -65,7 +67,7 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		
 		DataErrorReport report = reportGenerator.generate(query);
 		
-		DataErrorReport reloadedReport = dataCleansingManager.loadReport(report.getId());
+		DataErrorReport reloadedReport = dataCleansingManager.loadReport(survey, report.getId());
 		
 		List<DataErrorReportItem> items = dataCleansingManager.loadReportItems(reloadedReport);
 		
@@ -76,7 +78,7 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		DataErrorReportItem item = items.get(0);
 		CollectRecord record = recordManager.load(survey, item.getRecordId());
 		assertEquals(Arrays.asList("10_117"), record.getRootEntityKeyValues());
-		assertEquals(Double.valueOf(30.0), Double.valueOf(item.getValue()));
+		assertEquals(new RealValue(30.0d, dbhDef.getDefaultUnit()), item.extractAttributeValue());
 	}
 
 	private void initRecords() {

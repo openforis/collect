@@ -1,4 +1,4 @@
-package org.openforis.idm.model;
+package org.openforis.collect.datacleansing.json;
 
 import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.SRS_FIELD_NAME;
 import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.X_FIELD_NAME;
@@ -16,21 +16,75 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.JSONParser;
+import org.openforis.collect.datacleansing.ValueParser;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
+import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.Unit;
+import org.openforis.idm.model.BooleanValue;
+import org.openforis.idm.model.Code;
+import org.openforis.idm.model.Coordinate;
+import org.openforis.idm.model.Date;
+import org.openforis.idm.model.File;
+import org.openforis.idm.model.IntegerRange;
+import org.openforis.idm.model.IntegerValue;
+import org.openforis.idm.model.NumberValue;
+import org.openforis.idm.model.RealRange;
+import org.openforis.idm.model.RealValue;
+import org.openforis.idm.model.TaxonOccurrence;
+import org.openforis.idm.model.Time;
+import org.openforis.idm.model.Value;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class JSONValueParser {
+public class JSONValueParser implements ValueParser {
+	
+	@Override
+	public Value parseValue(AttributeDefinition def, String value) {
+		if (def instanceof BooleanAttributeDefinition) {
+			return parseBoolean(value);
+		} else if (def instanceof CodeAttributeDefinition) {
+			return parseCode(value);
+		} else if (def instanceof CoordinateAttributeDefinition) {
+			return parseCoordinate(value);
+		} else if (def instanceof DateAttributeDefinition) {
+			return parseDate(value);
+		} else if (def instanceof FileAttributeDefinition) {
+			return parseFile(value);
+		} else if (def instanceof NumberAttributeDefinition) {
+			if (((NumberAttributeDefinition) def).getType() == Type.INTEGER) {
+				return parseInteger((NumberAttributeDefinition) def, value);
+			} else {
+				return parseReal((NumberAttributeDefinition) def, value);
+			}
+		} else if (def instanceof RangeAttributeDefinition) {
+			if (((RangeAttributeDefinition) def).getType() == Type.INTEGER) {
+				return parseIntegerRange((RangeAttributeDefinition) def, value);
+			} else {
+				return parseRealRange((RangeAttributeDefinition) def, value);
+			}
+		} else if (def instanceof TaxonAttributeDefinition) {
+			return parseTaxonOccurrence(value);
+		} else if (def instanceof TimeAttributeDefinition) {
+			return parseTime(value);
+		} else {
+			throw new UnsupportedOperationException("Attribute type not supported: " + def.getClass());
+		}
+	}
 
 	public BooleanValue parseBoolean(String value) {
-		Map<String, Object> map = parseJSONToMap(value, CodeAttributeDefinition.CODE_FIELD);
+		Map<String, Object> map = parseJSONToMap(value, BooleanValue.VALUE_FIELD);
 		return map == null ? null: new BooleanValue((String) map.get(BooleanValue.VALUE_FIELD));
 	}
 	
@@ -44,10 +98,7 @@ public class JSONValueParser {
 	
 	public Coordinate parseCoordinate(String value) {
 		Map<String, Object> map = parseJSONToMap(value);
-		if (map == null) {
-			return null;
-		}
-		return new Coordinate(
+		return map == null ? null: new Coordinate(
 				getDouble(map, X_FIELD_NAME), 
 				getDouble(map, Y_FIELD_NAME), 
 				(String) map.get(SRS_FIELD_NAME)
@@ -56,10 +107,7 @@ public class JSONValueParser {
 	
 	public Date parseDate(String value) {
 		Map<String, Object> map = parseJSONToMap(value, null);
-		if (map == null) {
-			return null;
-		}
-		return new Date(
+		return map == null ? null: new Date(
 				getInteger(map, Date.YEAR_FIELD), 
 				getInteger(map, Date.MONTH_FIELD), 
 				getInteger(map, Date.DAY_FIELD)
@@ -68,10 +116,7 @@ public class JSONValueParser {
 	
 	public File parseFile(String value) {
 		Map<String, Object> map = parseJSONToMap(value, File.FILENAME_FIELD);
-		if (map == null) {
-			return null;
-		}
-		return new File(
+		return map == null ? null: new File(
 				(String) map.get(File.FILENAME_FIELD), 
 				getLong(map, File.SIZE_FIELD)
 		);
@@ -129,10 +174,7 @@ public class JSONValueParser {
 	
 	public TaxonOccurrence parseTaxonOccurrence(String value) {
 		Map<String, Object> map = parseJSONToMap(value, TaxonAttributeDefinition.CODE_FIELD_NAME);
-		if (map == null) {
-			return null;
-		}
-		return new TaxonOccurrence(
+		return map == null ? null: new TaxonOccurrence(
 				(String) map.get(CODE_FIELD_NAME), 
 				(String) map.get(SCIENTIFIC_NAME_FIELD_NAME), 
 				(String) map.get(VERNACULAR_NAME_FIELD_NAME), 
@@ -143,10 +185,7 @@ public class JSONValueParser {
 
 	public Time parseTime(String value) {
 		Map<String, Object> map = parseJSONToMap(value);
-		if (map == null) {
-			return null;
-		}
-		return new Time(getInteger(map, HOUR_FIELD), getInteger(map, MINUTE_FIELD));
+		return map == null ? null: new Time(getInteger(map, HOUR_FIELD), getInteger(map, MINUTE_FIELD));
 	}
 	
 	private Map<String, Object> parseJSONToMap(final String value) {

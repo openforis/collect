@@ -3,10 +3,9 @@ package org.openforis.collect.datacleansing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.simple.JSONObject;
 import org.openforis.collect.datacleansing.DataErrorReportItem.Status;
+import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,7 +42,8 @@ public class DataErrorReportGenerator {
 		DataErrorReportItem item = new DataErrorReportItem(report);
 		item.setRecordId(attr.getRecord().getId());
 		item.setParentEntityId(attr.getParent().getInternalId());
-		item.setAttributeValue(attr);
+		item.setNodeIndex(attr.getIndex());
+		item.setValue(new JSONValueFormatter().formatValue(attr));
 		item.setStatus(Status.PENDING);
 		return item;
 	}

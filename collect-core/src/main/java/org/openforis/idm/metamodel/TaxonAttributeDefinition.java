@@ -57,7 +57,7 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	@Override
 	@SuppressWarnings("unchecked")
 	public TaxonOccurrence createValue(String string) {
-		return TaxonOccurrence.parseJSON(string);
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override

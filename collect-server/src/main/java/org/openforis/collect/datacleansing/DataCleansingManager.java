@@ -115,8 +115,10 @@ public class DataCleansingManager {
 	//End of DataErrorQuery methods
 	
 	//Start of DataErrorReport methods
-	public DataErrorReport loadReport(int id) {
+	public DataErrorReport loadReport(CollectSurvey survey, int id) {
 		DataErrorReport report = errorReportDao.loadById(id);
+		DataErrorQuery query = errorQueryDao.loadById(survey, report.getQueryId());
+		report.setQuery(query);
 		List<DataErrorReportItem> items = errorReportItemDao.loadByReport(report);
 		report.setItems(items);
 		return report;

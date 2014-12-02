@@ -1,11 +1,9 @@
 package org.openforis.collect.datacleansing;
 
-import java.util.List;
-
-import org.json.simple.JSONObject;
+import org.openforis.collect.datacleansing.json.JSONValueParser;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.PersistedObject;
-import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Field;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Value;
 
 /**
@@ -52,31 +50,23 @@ public class DataErrorReportItem extends PersistedObject {
 		this.report = report;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void setAttributeValue(Attribute<?, ?> attr) {
-		if (attr.isEmpty()) {
-			value = null;
-		}
-		JSONObject jsonObj = new JSONObject();
-		List<Field<?>> fields = attr.getFields();
-		for (Field<?> field : fields) {
-			jsonObj.put(field.getName(), field.getValue());
-		}
-		value = jsonObj.toJSONString();
+	public AttributeDefinition getAttributeDefinition() {
+		DataQuery query = report.getQuery();
+		Schema schema = query.getSchema();
+		AttributeDefinition def = (AttributeDefinition) schema.getDefinitionById(query.getAttributeDefinitionId());
+		return def;
 	}
 	
-	public Value getAttributeValue() {
-		
+	public Value extractAttributeValue() {
+		AttributeDefinition def = getAttributeDefinition();
+		Value val = new JSONValueParser().parseValue(def, value);
+		return val;
 	}
 
 	public DataErrorReport getReport() {
 		return report;
 	}
 
-	public void setReport(DataErrorReport report) {
-		this.report = report;
-	}
-	
 	public int getRecordId() {
 		return recordId;
 	}

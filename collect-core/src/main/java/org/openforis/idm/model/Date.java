@@ -20,9 +20,9 @@ public final class Date extends AbstractValue {
 	private static final Pattern INTERNAL_STRING_FORMAT = Pattern.compile("(\\d{4})(\\d{2})(\\d{2})");
 	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("(\\d{4})\\-(\\d{2})\\-(\\d{2})");
 	
-	protected static final String YEAR_FIELD = "year";
-	protected static final String MONTH_FIELD = "month";
-	protected static final String DAY_FIELD = "day";
+	public static final String YEAR_FIELD = "year";
+	public static final String MONTH_FIELD = "month";
+	public static final String DAY_FIELD = "day";
 	
 	private final Integer day;
 	private final Integer month;
