@@ -15,9 +15,9 @@
 		<installer-build-path>${project.build.directory}/installer</installer-build-path>
 		<installbuilder-updater-file-name>installbuilder-updater.xml</installbuilder-updater-file-name>
 		<!-- updater file names -->
-		<windows-updater-file-name>OpenForisCollectUpdater-${project.version}-windows-installer.exe</windows-updater-file-name>
-		<linux-updater-file-name>OpenForisCollectUpdater-${project.version}-linux-installer.run</linux-updater-file-name>
-		<osx-updater-file-name>OpenForisCollectUpdater-${project.version}-osx-installer.run</osx-updater-file-name>
+		<windows-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-windows-installer.exe</windows-updater-file-name>
+		<linux-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-installer.run</linux-updater-file-name>
+		<osx-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-osx-installer.run</osx-updater-file-name>
 	</properties>
 	
 	<profiles>
@@ -99,12 +99,17 @@
 							<basedir>${installer-build-path}</basedir>
 							<includes>
 								<include>${installbuilder-updater-file-name}</include>
+								<include>update.xml</include>
 							</includes>
 							<regex>false</regex>
 							<replacements>
-			                    <replacement>
+								<replacement>
 			                        <token>PROJECT_VERSION</token>
 			                        <value>${project.version}</value>
+			                    </replacement>
+			                    <replacement>
+			                        <token>VERSION_ID</token>
+			                        <value>${installer-version-id}</value>
 			                    </replacement>
 			                    <replacement>
 			                        <token>UPDATE_XML_URL</token>
