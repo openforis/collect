@@ -453,16 +453,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function moveFocusOnNextField(horizontalMove:Boolean, offset:int):Boolean {
-			var attribute:AttributeProxy = view.attribute;
-			var fieldIndex:int = view.fieldIndex;
-			var field:FieldProxy = attribute.getField(fieldIndex);
+			var field:FieldProxy = getField();
 			var focusChanged:Boolean = CollectFocusManager.moveFocusOnNextField(field, horizontalMove, offset);
 			if ( ! focusChanged ) {
 				focusChanged = UIUtil.moveFocus(offset < 0, view.focusManager);
 			}
 			return focusChanged;
 		}
-
+		
 		public function undoLastChange():void {
 			view.changed = false;
 			updateView();
