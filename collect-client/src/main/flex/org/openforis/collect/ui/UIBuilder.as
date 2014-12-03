@@ -310,8 +310,6 @@ package org.openforis.collect.ui {
 				return width + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
 			} else if ( directionByColumns ) {
 				return NaN;
-			} else if (def.labelOrientation == UIOptions$Orientation.HORIZONTAL && ! isNaN(def.labelWidth)) {
-				return def.labelWidth;
 			} else {
 				var inputFieldWidth:Number = getInputFieldWidth(def);
 				if( isNaN(inputFieldWidth)) {
@@ -326,12 +324,6 @@ package org.openforis.collect.ui {
 			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			if ( directionByColumns ) {
 				return NaN;
-			} else if (defn.labelOrientation == UIOptions$Orientation.VERTICAL) {
-				if (isNaN(defn.labelWidth)) {
-					return NaN;
-				} else {
-					return defn.labelWidth;
-				}
 			} else {
 				var result:Number;
 				if ( directionByColumns ) {
@@ -513,19 +505,28 @@ package org.openforis.collect.ui {
 		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
 			var result:SkinnableContainer = new SkinnableContainer();
 			result.styleName = DATA_GROUP_HEADER_STYLE;
+			var horizontalOrientation:Boolean = defn.labelOrientation == UIOptions$Orientation.HORIZONTAL;
+			//width
 			var width:Number = getAttributeDataGroupHeaderWidth(defn, parentEntity);
 			result.width = width;
+			var labelWidth:Number = defn.labelWidth;
+			if (isNaN(labelWidth) && horizontalOrientation) {
+				labelWidth = width;
+			}
 			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			if ( directionByColumns ) {
 				var layout:HorizontalLayout = new HorizontalLayout();
 				layout.paddingTop = GROUPING_LABEL_PADDING_TOP;
 				result.layout = layout;
 			}
-			var height:Number = getAttributeDataGroupHeaderHeight(defn, parentEntity);
-			if (isNaN(height) && defn.labelOrientation == UIOptions$Orientation.HORIZONTAL) {
-				result.percentHeight = 100;
+			//height
+		 	if (horizontalOrientation) {
+				result.height = getAttributeDataGroupHeaderHeight(defn, parentEntity);
+				if (isNaN(result.height)) {
+					result.percentHeight = 100;
+				}
 			} else {
-				result.height = height;
+				result.height = defn.labelWidth;
 			}
 			var compositeAttributeLabelsGroup:Group;
 			if ( directionByColumns ) {
@@ -589,11 +590,11 @@ package org.openforis.collect.ui {
 					defaultUnit = RangeAttributeDefinitionProxy(defn).defaultUnit;
 				}
 				var labStr:String = defnLabel + " (" + defaultUnit.getAbbreviation() + ")";
-				l = getLabel(labStr, width, HEADER_LABEL_STYLE, directionByColumns);
+				l = getLabel(labStr, labelWidth, HEADER_LABEL_STYLE, directionByColumns || ! horizontalOrientation);
 				l.rotation = labelRotation;
 				result.addElement(l);
 			} else {
-				l = getLabel(defnLabel, width, HEADER_LABEL_STYLE, directionByColumns);
+				l = getLabel(defnLabel, labelWidth, HEADER_LABEL_STYLE, directionByColumns || ! horizontalOrientation);
 				l.rotation = labelRotation;
 				result.addElement(l);
 			}
@@ -651,8 +652,8 @@ package org.openforis.collect.ui {
 			l.styleName = styleName;
 			if ( displayOneRow ) {
 				l.maxDisplayedLines = 1;
-				l.showTruncationTip = showTruncationTip;
 			}
+			l.showTruncationTip = showTruncationTip;
 			return l;
 		}
 
