@@ -18,7 +18,6 @@ package org.openforis.collect.presenter
 	import mx.managers.IFocusManagerComponent;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AsyncResponder;
-	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
@@ -26,6 +25,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.ui.component.input.CodeListDialog;
+	import org.openforis.collect.ui.component.input.CodeListItemRenderer;
 	import org.openforis.collect.ui.component.input.TextCodeInputField;
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.ui.component.input.codelist.CodeListAllowedValuesPreviewDialog;
@@ -39,6 +39,8 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 */
 	public class TextCodeInputFieldPresenter extends CodeInputFieldPresenter {
+		
+		private static const MAX_POPUP_WIDTH:Number = 1000;
 		
 		private static var _popUp:CodeListDialog;
 		private static var _popUpOpened:Boolean;
@@ -240,6 +242,17 @@ package org.openforis.collect.presenter
 				notSelectedItems.refresh();
 			}
 			_popUp.items = data;
+			var maxItemWidth:Number = 0;
+			for each(var item:CodeListItemProxy in data) {
+				var text:String = item.code + "-" + item.getLabelText();
+				var width:Number = UIUtil.measureFixedCodeWidth(text);
+				if (item.qualifiable) {
+					width += CodeListItemRenderer.QUALIFIER_TEXT_INPUT_WIDTH;
+				}
+				maxItemWidth = Math.max(width, maxItemWidth);
+			}
+			_popUp.width = Math.min(maxItemWidth + 170, MAX_POPUP_WIDTH);
+			
 			_popUp.selectedItems = selectedItems;
 			_popUp.notSelectedItems = notSelectedItems;
 			
