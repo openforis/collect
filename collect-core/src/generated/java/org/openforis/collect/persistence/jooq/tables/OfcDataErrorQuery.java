@@ -11,7 +11,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataErrorQuery extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord> {
 
-	private static final long serialVersionUID = 245600373;
+	private static final long serialVersionUID = 1923386737;
 
 	/**
 	 * The singleton instance of <code>collect.ofc_data_error_query</code>
@@ -45,11 +45,6 @@ public class OfcDataErrorQuery extends org.jooq.impl.TableImpl<org.openforis.col
 	 * The column <code>collect.ofc_data_error_query.description</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_error_query.record_step</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.Integer> RECORD_STEP = createField("record_step", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_error_query.creation_date</code>.

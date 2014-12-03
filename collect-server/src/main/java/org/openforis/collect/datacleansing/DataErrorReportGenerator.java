@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openforis.collect.datacleansing.DataErrorReportItem.Status;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.model.Attribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,11 +23,11 @@ public class DataErrorReportGenerator {
 	@Autowired
 	private DataCleansingManager dataCleansingManager;
 	
-	public DataErrorReport generate(DataErrorQuery query){
+	public DataErrorReport generate(DataErrorQuery query, Step recordStep){
 		DataErrorReport report = new DataErrorReport();
 		report.setQuery(query);
 		dataCleansingManager.save(report);
-		DataQueryResultIterator it = queryExecutor.execute(query);
+		DataQueryResultIterator it = queryExecutor.execute(query, recordStep);
 		ItemBatchPersister batchPersister = new ItemBatchPersister(report);
 		while (it.hasNext()) {
 			Attribute<?, ?> attr = (Attribute<?, ?>) it.next();

@@ -60,12 +60,11 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		query.setTitle("Find trees with invalid DBH");
 		query.setEntityDefinition(treeDef);
 		query.setAttributeDefinition(dbhDef);
-		query.setStep(Step.ENTRY);
 		query.setConditions("dbh > 20");
 		
 		dataCleansingManager.save(query);
 		
-		DataErrorReport report = reportGenerator.generate(query);
+		DataErrorReport report = reportGenerator.generate(query, Step.ENTRY);
 		
 		DataErrorReport reloadedReport = dataCleansingManager.loadReport(survey, report.getId());
 		

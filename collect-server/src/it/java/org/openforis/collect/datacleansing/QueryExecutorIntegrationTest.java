@@ -52,10 +52,9 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 		AttributeDefinition dbhDef = (AttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/dbh");
 		query.setEntityDefinition(treeDef);
 		query.setAttributeDefinition(dbhDef);
-		query.setStep(Step.ENTRY);
 		query.setConditions("dbh > 20");
 		
-		DataQueryResultIterator it = queryExecutor.execute(query);
+		DataQueryResultIterator it = queryExecutor.execute(query, Step.ENTRY);
 		assertTrue(it.hasNext());
 		
 		//first result

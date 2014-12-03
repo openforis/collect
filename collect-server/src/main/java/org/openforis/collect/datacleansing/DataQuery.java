@@ -2,7 +2,6 @@ package org.openforis.collect.datacleansing;
 
 import java.util.Date;
 
-import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -23,7 +22,6 @@ public class DataQuery extends PersistedSurveyObject {
 	private String description;
 	private int entityDefinitionId;
 	private int attributeDefinitionId;
-	private Step step;
 	private String conditions;
 
 	public DataQuery(CollectSurvey survey) {
@@ -88,14 +86,6 @@ public class DataQuery extends PersistedSurveyObject {
 		this.attributeDefinitionId = attributeDefinitionId;
 	}
 
-	public Step getStep() {
-		return step;
-	}
-	
-	public void setStep(Step step) {
-		this.step = step;
-	}
-	
 	public String getConditions() {
 		return conditions;
 	}
