@@ -33,9 +33,7 @@ public abstract class DatabaseLookupProvider implements LookupProvider {
 	@Override
 	public Object lookup(Survey survey, String name, String attribute, Object... columns) {
 		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
-		if ( survey instanceof CollectSurvey ) {
-			filters.add(createSurveyFilter((CollectSurvey) survey));
-		}
+		addSurveyFilter(filters, survey);
 		filters.addAll(Arrays.asList(NameValueEntry.fromKeyValuePairs(columns)));
 		Object object = loadValue(name, attribute, filters.toArray(new NameValueEntry[0]));
 		return object;
@@ -64,9 +62,7 @@ public abstract class DatabaseLookupProvider implements LookupProvider {
 		}
 		List<NameValueEntry> filters = new ArrayList<NameValueEntry>();
 		
-		if ( survey instanceof CollectSurvey ) {
-			filters.add(createSurveyFilter((CollectSurvey) survey));
-		}
+		addSurveyFilter(filters, survey);
 		
 		String[] paddedKeys = Arrays.copyOf(keys, maxKeys);
 		for (int i = 0; i < paddedKeys.length; i++) {
@@ -75,7 +71,7 @@ public abstract class DatabaseLookupProvider implements LookupProvider {
 			NameValueEntry filter = new NameValueEntry(keyField.getName(), key);
 			filters.add(filter);
 		}
-		Object value = loadValue(OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName(), valueColumnName, filters.toArray(new NameValueEntry[0]));
+		Object value = loadValue(OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName(), valueColumnName, filters.toArray(new NameValueEntry[filters.size()]));
 		return value;
 	}
 
@@ -94,15 +90,15 @@ public abstract class DatabaseLookupProvider implements LookupProvider {
 		return attribute;
 	}
 
-	private NameValueEntry createSurveyFilter(CollectSurvey survey) {
-		Integer surveyId = survey.getId();
-		if ( surveyId != null ) {
-			String surveyIdFieldName = survey.isWork() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
-			NameValueEntry keyValue = new NameValueEntry(surveyIdFieldName, surveyId.toString());
-			return keyValue;
-		} else {
-			return null;
+	private void addSurveyFilter(List<NameValueEntry> filters, Survey survey) {
+		if ( survey instanceof CollectSurvey ) {
+			Integer surveyId = survey.getId();
+			if ( surveyId != null ) {
+				String surveyIdFieldName = ((CollectSurvey) survey).isWork() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
+				NameValueEntry keyValue = new NameValueEntry(surveyIdFieldName, surveyId.toString());
+				filters.add(keyValue);
+			}
 		}
 	}
-	
+
 }

@@ -1,20 +1,21 @@
 package org.openforis.idm.model.expression.internal;
 
 
+import static java.util.Arrays.asList;
+import static org.openforis.idm.path.Path.THIS_SYMBOL;
+
+import java.util.Arrays;
+
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Time;
-
-import java.util.Arrays;
-
-import static java.util.Arrays.asList;
-import static org.openforis.idm.path.Path.THIS_SYMBOL;
 
 /**
  * Custom xpath functions allowed into IDM
@@ -93,6 +94,12 @@ public class IDMFunctions extends CustomFunctions {
 				String[] keys = Arrays.copyOfRange(strings, 1, strings.length);
 				String attribute = strings[0];
 				return samplingPointDataLookup(expressionContext, attribute, keys);
+			}
+		});
+		
+		register("distance", 2, new CustomFunction() {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return distance(expressionContext, objects[0], objects[1]);
 			}
 		});
 	}
@@ -203,6 +210,23 @@ public class IDMFunctions extends CustomFunctions {
 		return true;
 	}
 
+	/**
+	 * Calculates the orthodromic distance between 2 coordinates (in meters)
+	 */
+	private static Double distance(ExpressionContext context, Object from, Object to) {
+		if (from == null || to == null) {
+			return null;
+		}
+		Coordinate fromC = from instanceof Coordinate ? (Coordinate) from: Coordinate.parseCoordinate(from);
+		Coordinate toC = to instanceof Coordinate ? (Coordinate) to: Coordinate.parseCoordinate(to);
+		if (! fromC.isComplete() || ! toC.isComplete()) {
+			return null;
+		}
+		CoordinateOperations coordinateOperations = getSurvey(context).getContext().getCoordinateOperations();
+		double distance = coordinateOperations.orthodromicDistance(fromC, toC);
+		return distance;
+	}
+	
 	private static LookupProvider getLookupProvider(ExpressionContext context) {
 		ModelJXPathContext jxPathContext = (ModelJXPathContext) context.getJXPathContext();
 		LookupProvider lookupProvider = jxPathContext.getLookupProvider();

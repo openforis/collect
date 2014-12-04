@@ -61,7 +61,7 @@ public class UIOptionsMigratorTest extends CollectIntegrationTest {
 			{
 				Form form = forms.get(0);
 				List<FormComponent> children = form.getChildren();
-				assertEquals(15, children.size());
+				assertEquals(16, children.size());
 				{
 					//task
 					FormComponent component = children.get(0);

@@ -52,6 +52,10 @@ public final class Coordinate implements Value{
 		this.srsId = srsId;
 	}
 
+	public boolean isComplete() {
+		return x != null && y != null && srsId != null;
+	}
+
 	public Double getX() {
 		return x;
 	}
@@ -105,4 +109,5 @@ public final class Coordinate implements Value{
 	public String toString() {
 		return String.format(Locale.ENGLISH, TO_STRING_FORMAT, srsId, x, y);
 	}
+
 }
