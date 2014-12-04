@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.model.NodePathPointer;
 import org.openforis.idm.model.Record;
 
@@ -58,6 +59,11 @@ public class Survey implements Serializable {
 	 * To be called after survey unmarshalling process is complete.
 	 */
 	public void init() {
+		initSchemaDefinitions();
+		initCoordinateOperations();
+	}
+
+	private void initSchemaDefinitions() {
 		Schema schema = getSchema();
 		if ( schema != null ) {
 			for (EntityDefinition entityDefinition : schema.getRootEntityDefinitions()) {
@@ -68,6 +74,13 @@ public class Survey implements Serializable {
 					}
 				});
 			}
+		}
+	}
+	
+	private void initCoordinateOperations() {
+		CoordinateOperations coordinateOperations = getContext().getCoordinateOperations();
+		if (coordinateOperations != null) {
+			coordinateOperations.parseSRS(getSpatialReferenceSystems());
 		}
 	}
 	
@@ -586,8 +599,9 @@ public class Survey implements Serializable {
 	
 	public void refreshSurveyDependencies() {
 		surveyDependencies = new SurveyDependencies(this);
+		initCoordinateOperations();
 	}
-	
+
 	private SurveyDependencies getSurveyDependencies() {
 		if(surveyDependencies == null){
 			surveyDependencies = new SurveyDependencies(this);

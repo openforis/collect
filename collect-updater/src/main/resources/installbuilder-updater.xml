@@ -2,7 +2,7 @@
 	<shortName>OpenForisCollectUpdater</shortName>
 	<fullName>Open Foris Collect</fullName>
 	<vendor>Open Foris Initiative</vendor>
-	<version>PROJECT_VERSION</version>
+	<version>VERSION_ID</version>
 	<logoImage>images/of-collect-logo-small.png</logoImage>
 	<componentList>
 		<component>
@@ -29,7 +29,7 @@
 					<path>update.ini</path>
 					<text>[Update]
 url = UPDATE_XML_URL
-version_id = PROJECT_VERSION
+version_id = VERSION_ID
 update_download_location = ${system_temp_directory}
 check_for_updates = 1</text>
 				</writeFile>

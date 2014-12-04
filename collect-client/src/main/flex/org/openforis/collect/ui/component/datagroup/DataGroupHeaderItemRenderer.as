@@ -8,6 +8,7 @@ package org.openforis.collect.ui.component.datagroup
 	import org.openforis.collect.ui.UIBuilder;
 	
 	import spark.components.supportClasses.ItemRenderer;
+	import spark.layouts.VerticalLayout;
 	
 	/**
 	 * 
@@ -23,6 +24,9 @@ package org.openforis.collect.ui.component.datagroup
 			super();
 			
 			autoDrawBackground = false;
+			var vLayout:VerticalLayout = new VerticalLayout();
+			vLayout.verticalAlign = "bottom";
+			layout = vLayout;
 			addEventListener(FlexEvent.DATA_CHANGE, dataChangeHandler);
 		}
 		

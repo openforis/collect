@@ -91,14 +91,14 @@ package org.openforis.collect.util
 				scroller.horizontalScrollBar.value = 0;
 		} 
 		
-		public static function getFirstAncestor(field:Object, clazz:Class):* {
+		public static function getFirstAncestor(object:Object, clazz:Class):* {
 			var result:* = null;
-			var currentContainer:Object = field;
-			var parent:Object = currentContainer;
+			var currentObj:Object = object;
+			var parent:Object = currentObj;
 			while(parent != null) {
-				currentContainer = parent;
-				if(currentContainer.hasOwnProperty("parent")) {
-					parent = currentContainer.parent;
+				currentObj = parent;
+				if(currentObj.hasOwnProperty("parent")) {
+					parent = currentObj.parent;
 					if(parent is clazz) {
 						result = parent;
 						break;

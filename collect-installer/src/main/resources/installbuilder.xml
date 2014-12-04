@@ -1,7 +1,7 @@
 <project>
 	<shortName>OpenForisCollect</shortName>
 	<fullName>Open Foris Collect</fullName>
-	<version>PROJECT_VERSION</version>
+	<version>VERSION_ID</version>
 	<vendor>Open Foris</vendor>
 
 	<!-- <readmeFile>../../../README</readmeFile> <licenseFile>../../../../License.txt</licenseFile> -->
@@ -181,7 +181,7 @@
 					<path>${installdir}/autoupdate/update.ini</path>
 					<text>[Update]
 url = UPDATE_XML_URL
-version_id = PROJECT_VERSION
+version_id = VERSION_ID
 update_download_location = ${system_temp_directory}
 check_for_updates = 1</text>
 				</writeFile>

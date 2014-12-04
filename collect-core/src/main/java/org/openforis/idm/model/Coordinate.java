@@ -67,6 +67,10 @@ public final class Coordinate extends AbstractValue {
 		}};
 	}
 
+	public boolean isComplete() {
+		return x != null && y != null && srsId != null;
+	}
+
 	public Double getX() {
 		return x;
 	}
@@ -120,4 +124,5 @@ public final class Coordinate extends AbstractValue {
 	public String toString() {
 		return String.format(Locale.ENGLISH, TO_STRING_FORMAT, srsId, x, y);
 	}
+
 }

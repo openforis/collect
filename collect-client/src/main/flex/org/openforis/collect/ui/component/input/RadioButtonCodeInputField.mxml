@@ -10,8 +10,10 @@
 		<![CDATA[
 			import mx.core.UIComponent;
 			
+			import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.presenter.RadioButtonCodeInputFieldPresenter;
+			import org.openforis.collect.util.UIUtil;
 
 			override protected function initPresenter():void {
 				this.presenter = new RadioButtonCodeInputFieldPresenter(this);
@@ -19,7 +21,7 @@
 			}
 			
 			override public function get validationStateDisplay():UIComponent {
-				return dataGroup;
+				return UIUtil.getFirstAncestor(this, AttributeItemRenderer);
 			}
 			
 		]]>

@@ -62,15 +62,25 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initValidationDisplayManager():void {
-			var inputField:InputField = view.getElementAt(0) as InputField;
-			var validationStateDisplay:UIComponent = inputField != null ? inputField.validationStateDisplay: view;
+			var validationStateDisplay:UIComponent = getValidationStateDisplay();
 			var validationToolTipTrigger:UIComponent = validationStateDisplay;
 			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
 			var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
 			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple || attrDefn is CodeAttributeDefinitionProxy;
-			if(view.attribute != null) {
+			if(view.attribute != null || CollectionUtil.isNotEmpty(view.attributes)) {
 				updateValidationDisplayManager();
 			}
+		}
+		
+		protected function getValidationStateDisplay():UIComponent {
+			var inputField:InputField = view.getElementAt(0) as InputField;
+			var validationStateDisplay:UIComponent; 
+			if (inputField == null || inputField.validationStateDisplay == null) { 
+				validationStateDisplay = view;
+			} else {
+				validationStateDisplay = inputField.validationStateDisplay;
+			}
+			return validationStateDisplay;
 		}
 		
 		protected function recordSavedHandler(event:ApplicationEvent):void {

@@ -230,7 +230,7 @@ mx|ToolTip.warning, mx|ToolTip.warningConfirmedError {
 
 detail|AttributeItemRenderer,
 detail|CompositeAttributeRenderer {
-	skin-class: ClassReference("org.openforis.collect.ui.skin.SimpleBorderBoxSkin");
+	skin-class: ClassReference("org.openforis.collect.ui.skin.AttributeItemRendererSkin");
 	borderColor: #FFFFFF;
 	borderWeight: 1;
 }
@@ -240,7 +240,9 @@ detail|CompositeAttributeRenderer {
 	borderWeight: 1;
 }
 
-detail|CompositeAttributeRenderer.error,
+
+detail|CodeAttributeFormItem detail|AttributeItemRenderer.error,
+	detail|CompositeAttributeRenderer.error,
 	detail|MultipleAttributeFormItem.error .externalBorder,
 	detail|MultipleEntityAsTableFormItem.error .externalBorder {
 	borderColor: #FF0000;
@@ -274,7 +276,7 @@ input|TextInput.warning, mx|TextArea.warning {
 	borderColor: #FFAA00;
 }
 
-input|TextInput.remarksPresent, mx|TextArea.remarksPresent {
+.remarksPresent {
 	remarksPresentIconVisible: true;
 }
 
@@ -379,7 +381,7 @@ s|Label.indent {
 }
 
 .dataGroupHeader.vertical {
-	verticalAlign: top;
+	verticalAlign: bottom;
 }
 
 s|Label.dataGroupHeader {
