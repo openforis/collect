@@ -553,14 +553,11 @@ package org.openforis.collect.presenter {
 			view.editable = Application.activeRecordEditable && ! view.attributeDefinition.calculated && view.attributeDefinition.editable;
 
 			//update view according to attribute (generic text value)
-			var hasRemarks:Boolean = false;
-			var text:String = getTextFromValue();
-			view.text = text;
-			hasRemarks = StringUtil.isNotBlank(getRemarks());
+			view.text = getTextFromValue();
 			_contextMenu.updateItems();
 			
 			var newStyles:Array = [];
-			if ( hasRemarks ) {
+			if ( StringUtil.isNotBlank(getRemarks()) ) {
 				newStyles.push(InputField.REMARKS_PRESENT_STYLE);
 			}
 			if ( ! view.editable ) {
