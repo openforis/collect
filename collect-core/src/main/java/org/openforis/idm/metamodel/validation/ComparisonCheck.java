@@ -30,66 +30,14 @@ public class ComparisonCheck extends Check<Attribute<?,?>> {
 		}
 	}
 
-	private String expression;
 	private String lessThanExpression;
 	private String lessThanOrEqualsExpression;
 	private String greaterThanExpression;
 	private String greaterThanOrEqualsExpression;
 	private String equalsExpression;
 
-	public String getLessThanExpression() {
-		return this.lessThanExpression;
-	}
-
-	public String getLessThanOrEqualsExpression() {
-		return this.lessThanOrEqualsExpression;
-	}
-
-	public String getGreaterThanExpression() {
-		return this.greaterThanExpression;
-	}
-
-	public String getGreaterThanOrEqualsExpression() {
-		return this.greaterThanOrEqualsExpression;
-	}
-
-	public String getEqualsExpression() {
-		return this.equalsExpression;
-	}
-			
-	public String getExpression() {
-		if ( expression == null ) {
-			expression = buildExpression();
-		}
-		return expression;
-	}
-	
-	public void setLessThanExpression(String lessThanExpression) {
-		this.lessThanExpression = lessThanExpression;
-		this.expression = null;
-	}
-
-	public void setLessThanOrEqualsExpression(String lessThanOrEqualsExpression) {
-		this.lessThanOrEqualsExpression = lessThanOrEqualsExpression;
-		this.expression = null;
-	}
-
-	public void setGreaterThanExpression(String greaterThanExpression) {
-		this.greaterThanExpression = greaterThanExpression;
-		this.expression = null;
-	}
-
-	public void setGreaterThanOrEqualsExpression(String greaterThanOrEqualsExpression) {
-		this.greaterThanOrEqualsExpression = greaterThanOrEqualsExpression;
-		this.expression = null;
-	}
-
-	public void setEqualsExpression(String equalsExpression) {
-		this.equalsExpression = equalsExpression;
-		this.expression = null;
-	}
-
-	private String buildExpression() {
+	@Override
+	protected String buildExpression() {
 		ExpressionBuilder expressionBuilder = new ExpressionBuilder();
 
 		if (StringUtils.isNotBlank(greaterThanExpression)) {
@@ -123,6 +71,51 @@ public class ComparisonCheck extends Check<Attribute<?,?>> {
 		} catch (InvalidExpressionException e) {
 			throw new IdmInterpretationError("Error evaluating comparison check", e);
 		}
+	}
+
+	public String getLessThanExpression() {
+		return this.lessThanExpression;
+	}
+
+	public String getLessThanOrEqualsExpression() {
+		return this.lessThanOrEqualsExpression;
+	}
+
+	public String getGreaterThanExpression() {
+		return this.greaterThanExpression;
+	}
+
+	public String getGreaterThanOrEqualsExpression() {
+		return this.greaterThanOrEqualsExpression;
+	}
+
+	public String getEqualsExpression() {
+		return this.equalsExpression;
+	}
+			
+	public void setLessThanExpression(String lessThanExpression) {
+		this.lessThanExpression = lessThanExpression;
+		resetExpression();
+	}
+
+	public void setLessThanOrEqualsExpression(String lessThanOrEqualsExpression) {
+		this.lessThanOrEqualsExpression = lessThanOrEqualsExpression;
+		resetExpression();
+	}
+
+	public void setGreaterThanExpression(String greaterThanExpression) {
+		this.greaterThanExpression = greaterThanExpression;
+		resetExpression();
+	}
+
+	public void setGreaterThanOrEqualsExpression(String greaterThanOrEqualsExpression) {
+		this.greaterThanOrEqualsExpression = greaterThanOrEqualsExpression;
+		resetExpression();
+	}
+
+	public void setEqualsExpression(String equalsExpression) {
+		this.equalsExpression = equalsExpression;
+		resetExpression();
 	}
 
 	private class ExpressionBuilder {

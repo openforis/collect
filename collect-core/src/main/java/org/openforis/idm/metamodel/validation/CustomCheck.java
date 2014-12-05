@@ -26,14 +26,6 @@ public class CustomCheck extends Check<Attribute<?,?>> {
 		this.expression = expression;
 	}
 
-	public String getExpression() {
-		return this.expression;
-	}
-
-	public void setExpression(String expression) {
-		this.expression = expression;
-	}
-	
 	@Override
 	public ValidationResultFlag evaluate(Attribute<?,?> node) {
 		try {
@@ -43,6 +35,20 @@ public class CustomCheck extends Check<Attribute<?,?>> {
 		} catch (InvalidExpressionException e) {
 			throw new IdmInterpretationError("Error evaluating custom check", e);
 		}
+	}
+	
+	@Override
+	public String getExpression() {
+		return this.expression;
+	}
+
+	public void setExpression(String expression) {
+		this.expression = expression;
+	}
+	
+	@Override
+	protected String buildExpression() {
+		return null;
 	}
 	
 }

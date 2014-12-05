@@ -3,58 +3,57 @@
  */
 package org.openforis.idm.metamodel.validation;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.TextValue;
+import org.openforis.idm.model.expression.ExpressionEvaluator;
+import org.openforis.idm.model.expression.ExpressionFactory;
+import org.openforis.idm.model.expression.InvalidExpressionException;
+import org.openforis.idm.path.Path;
 
 /**
  * @author G. Miceli
  * @author M. Togna
+ * @author S. Ricci
  */
 public class PatternCheck extends Check<Attribute<?,?>> {
 
 	private static final long serialVersionUID = 1L;
 
-	private Pattern pattern;
 	private String regularExpression;
 
+	@Override
+	public String buildExpression() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(ExpressionFactory.REGEX_PREFIX);
+		sb.append(':');
+		sb.append("test");
+		sb.append('(');
+		sb.append(Path.THIS_VARIABLE);
+		sb.append(',');
+		sb.append('\'');
+		sb.append(regularExpression);
+		sb.append('\'');
+		sb.append(')');
+		return sb.toString();
+	}
+	
+	@Override
+	public ValidationResultFlag evaluate(Attribute<?,?> node) {
+		ExpressionEvaluator expressionEvaluator = node.getSurveyContext().getExpressionEvaluator();
+		try {
+			boolean result = expressionEvaluator.evaluateBoolean(node, node, getExpression());
+			return ValidationResultFlag.valueOf(result, this.getFlag());
+		} catch (InvalidExpressionException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public String getRegularExpression() {
 		return this.regularExpression;
 	}
 
 	public void setRegularExpression(String regularExpression) {
 		this.regularExpression = regularExpression;
-		initPattern();
-	}
-	
-	private Pattern getPattern() {
-		if (pattern == null) {
-			initPattern();
-		}
-		return pattern;
-	}
-
-	private void initPattern() {
-		this.pattern = Pattern.compile(regularExpression);
-	}
-
-	@Override
-	public ValidationResultFlag evaluate(Attribute<?,?> node) {
-		Object value = node.getValue();
-		String string = null;
-		if (value instanceof TextValue) {
-			string = ((TextValue) value).getValue();
-		} else if (value instanceof Code) {
-			string = ((Code) value).getCode();
-		} else {
-			throw new IllegalArgumentException("Pattern check cannot be applied to value type " + value.getClass().getName());
-		}
-		Matcher matcher = getPattern().matcher(string);
-		boolean matches = matcher.matches();
-		return ValidationResultFlag.valueOf(matches, this.getFlag());
+		resetExpression();
 	}
 
 }

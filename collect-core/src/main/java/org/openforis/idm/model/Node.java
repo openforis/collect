@@ -13,6 +13,7 @@ import java.util.Set;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.SurveyContext;
 
 
 /**
@@ -105,6 +106,11 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 		path = sb.toString();
 	}
 
+	public <C extends SurveyContext> C getSurveyContext() {
+		Survey survey = getSurvey();
+		return survey.getContext();
+	}
+	
 	public int getIndex() {
 		return index;
 	}

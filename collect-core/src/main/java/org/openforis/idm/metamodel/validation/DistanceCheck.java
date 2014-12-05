@@ -6,13 +6,12 @@ package org.openforis.idm.metamodel.validation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.idm.geospatial.CoordinateOperations;
-import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
-import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
+import org.openforis.idm.model.expression.ExpressionFactory;
 import org.openforis.idm.model.expression.InvalidExpressionException;
+import org.openforis.idm.path.Path;
 
 /**
  * @author G. Miceli
@@ -30,38 +29,25 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 	private String maxDistanceExpression;
 	private String sourcePointExpression;
 
-	public String getDestinationPointExpression() {
-		return destinationPointExpression;
+	@Override
+	public String buildExpression() {
+		StringBuilder sb = new StringBuilder();
+		if (maxDistanceExpression != null) {
+			sb.append(createDistanceExpression());
+			sb.append(" < ");
+			sb.append(maxDistanceExpression);
+		}
+		if (minDistanceExpression != null) {
+			if (sb.length() > 0) {
+				sb.append(" and ");
+			}
+			sb.append(createDistanceExpression());
+			sb.append(" > ");
+			sb.append(minDistanceExpression);
+		}
+		return sb.toString();
 	}
-
-	public String getMinDistanceExpression() {
-		return minDistanceExpression;
-	}
-
-	public String getMaxDistanceExpression() {
-		return maxDistanceExpression;
-	}
-
-	public String getSourcePointExpression() {
-		return sourcePointExpression;
-	}
-
-	public void setDestinationPointExpression(String destinationPointExpression) {
-		this.destinationPointExpression = destinationPointExpression;
-	}
-
-	public void setMinDistanceExpression(String minDistanceExpression) {
-		this.minDistanceExpression = minDistanceExpression;
-	}
-
-	public void setMaxDistanceExpression(String maxDistanceExpression) {
-		this.maxDistanceExpression = maxDistanceExpression;
-	}
-
-	public void setSourcePointExpression(String sourcePointExpression) {
-		this.sourcePointExpression = sourcePointExpression;
-	}
-
+	
 	@Override
 	public ValidationResultFlag evaluate(CoordinateAttribute coordinateAttr) {
 		CoordinateOperations coordinateOperations = getCoordinateOperations(coordinateAttr);
@@ -69,61 +55,76 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 			return ValidationResultFlag.OK;
 		}
 		try {
-			boolean valid = true;
-
-			Entity parentEntity = coordinateAttr.getParent();
-			Coordinate from = evaluateCoordinate(getSourcePointExpression(), parentEntity, coordinateAttr, coordinateAttr.getValue());
-			Coordinate to = evaluateCoordinate(getDestinationPointExpression(), parentEntity, coordinateAttr, null);
-
-			if ( !(from == null || to == null) ) {
-				double distance = coordinateOperations.orthodromicDistance(from, to);
-
-				if (maxDistanceExpression != null) {
-					double maxDistance = evaluateDistance(parentEntity, coordinateAttr, maxDistanceExpression);
-					if (distance > maxDistance) {
-						valid = false;
-					}
-				}
-				if ( valid && minDistanceExpression != null) {
-					double minDistance = evaluateDistance(parentEntity, coordinateAttr, minDistanceExpression);
-					if (distance < minDistance) {
-						valid = false;
-					}
-				}
-			}
-
+			ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(coordinateAttr);
+			boolean valid = expressionEvaluator.evaluateBoolean(coordinateAttr.getParent(), coordinateAttr, getExpression());
 			return ValidationResultFlag.valueOf(valid, this.getFlag());
-		} catch (Exception e) {
-//			throw new IdmInterpretationError("Unable to execute distance check", e);
+		} catch (InvalidExpressionException e) {
 			if( LOG.isInfoEnabled() ){
 				LOG.info("Unable to evaluate distance check " , e);
 			}
 			return ValidationResultFlag.OK;
 		}
 	}
-
-	private double evaluateDistance(Entity context, Attribute<?, ?> thisNode, String expression) throws InvalidExpressionException {
-		ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(context);
-		Double value = (Double) expressionEvaluator.evaluateValue(context, thisNode, expression);
-		return value;
-	}
-
-	private Coordinate evaluateCoordinate(String expression, Node<?> context, Attribute<?, ?> thisNode, Coordinate defaultCoordinate) throws InvalidExpressionException {
-		if (expression == null) {
-			return defaultCoordinate;
+	
+	private String createDistanceExpression() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(ExpressionFactory.IDM_PREFIX);
+		sb.append(':');
+		sb.append("distance");
+		sb.append('(');
+		if (sourcePointExpression == null) {
+			sb.append(Path.THIS_VARIABLE);
 		} else {
-			ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(context);
-			Coordinate coordinate = (Coordinate) expressionEvaluator.evaluateValue(context, thisNode, expression);
-			return coordinate;
+			sb.append(sourcePointExpression);
 		}
+		sb.append(',');
+		sb.append(destinationPointExpression);
+		sb.append(')');
+		return sb.toString();
 	}
 
-	public ExpressionEvaluator getExpressionEvaluator(Node<?> context) {
-		return context.getSurvey().getContext().getExpressionEvaluator();
+	private ExpressionEvaluator getExpressionEvaluator(Node<?> node) {
+		return node.getSurveyContext().getExpressionEvaluator();
 	}
 	
-	public CoordinateOperations getCoordinateOperations(Node<?> context) {
-		return context.getSurvey().getContext().getCoordinateOperations();
+	private CoordinateOperations getCoordinateOperations(Node<?> node) {
+		return node.getSurveyContext().getCoordinateOperations();
+	}
+
+	public String getDestinationPointExpression() {
+		return destinationPointExpression;
+	}
+
+	public void setDestinationPointExpression(String destinationPointExpression) {
+		this.destinationPointExpression = destinationPointExpression;
+		resetExpression();
+	}
+	
+	public String getMinDistanceExpression() {
+		return minDistanceExpression;
+	}
+
+	public void setMinDistanceExpression(String minDistanceExpression) {
+		this.minDistanceExpression = minDistanceExpression;
+		resetExpression();
+	}
+	
+	public String getMaxDistanceExpression() {
+		return maxDistanceExpression;
+	}
+
+	public void setMaxDistanceExpression(String maxDistanceExpression) {
+		this.maxDistanceExpression = maxDistanceExpression;
+		resetExpression();
+	}
+
+	public String getSourcePointExpression() {
+		return sourcePointExpression;
+	}
+
+	public void setSourcePointExpression(String sourcePointExpression) {
+		this.sourcePointExpression = sourcePointExpression;
+		resetExpression();
 	}
 
 }
