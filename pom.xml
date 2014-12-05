@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.3.12-SNAPSHOT</version>
+	<version>3.3.13-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -21,7 +21,7 @@
 
 	<properties>
 		<!-- install builder application version id (used by auto updater): it must be a progressive number -->
-		<installer-version-id>30312</installer-version-id> 
+		<installer-version-id>30313</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<openforis.commons.version>0.0.14</openforis.commons.version>

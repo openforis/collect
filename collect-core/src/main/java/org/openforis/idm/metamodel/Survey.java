@@ -552,8 +552,9 @@ public class Survey implements Serializable {
 		CollectionUtils.shiftItem(languages, language, index);
 	}
 	
-	public SurveyContext getContext() {
-		return surveyContext;
+	@SuppressWarnings("unchecked")
+	public <C extends SurveyContext> C getContext() {
+		return (C) surveyContext;
 	}
 	
 	public ReferenceDataSchema getReferenceDataSchema() {
