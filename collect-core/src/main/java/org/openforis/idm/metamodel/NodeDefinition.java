@@ -25,8 +25,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	private String relevantExpression;
 	private String requiredExpression;
 	private boolean multiple;
-	private Integer minCount;
-	private Integer maxCount;
+	private String minCountExpression;
+	private String maxCountExpression;
 	private NodeLabelMap labels;
 	private PromptMap prompts;
 	private LanguageSpecificTextMap descriptions;
@@ -91,22 +91,22 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return multiple;
 	}
 
-	public Integer getMinCount() {
-		return minCount;
+	public String getMinCountExpression() {
+		return minCountExpression;
 	}
 
 	public boolean hasMinCount() {
-		return minCount != null && minCount > 0;
+		return minCountExpression != null;
 	}
 	
-	public Integer getMaxCount() {
-		if ( !multiple ) {
-			return 1;
-		} else {
-			return maxCount;
-		}
+	public String getMaxCountExpression() {
+		return maxCountExpression;
 	}
-
+	
+	public boolean hasMaxCount() {
+		return maxCountExpression != null;
+	}
+	
 	public List<NodeLabel> getLabels() {
 		if ( this.labels == null ) {
 			return Collections.emptyList();
@@ -397,15 +397,20 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		this.multiple = multiple;
 	}
 
-	public void setMinCount(Integer minCount) {
-		this.minCount = minCount;
+	public void setMinCountExpression(String expression) {
+		this.minCountExpression = expression;
 	}
 
-	public void setMaxCount(Integer maxCount) {
-		this.maxCount = maxCount;
-		if ( maxCount != null && maxCount > 1 ) {
-			this.multiple = true;
-		}
+	public void setMaxCountExpression(String expression) {
+		this.maxCountExpression = expression;
+	}
+	
+	public boolean isAlwaysRequired() {
+		return minCountExpression != null && "1".equals(minCountExpression);
+	}
+	
+	public void setAlwaysRequired() {
+		this.minCountExpression = "1";
 	}
 	
 	@Override
@@ -420,8 +425,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		result = prime * result + ((descriptions == null) ? 0 : descriptions.hashCode());
 		result = prime * result + getId();
 		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
-		result = prime * result + ((maxCount == null) ? 0 : maxCount.hashCode());
-		result = prime * result + ((minCount == null) ? 0 : minCount.hashCode());
+		result = prime * result + ((maxCountExpression == null) ? 0 : maxCountExpression.hashCode());
+		result = prime * result + ((minCountExpression == null) ? 0 : minCountExpression.hashCode());
 		result = prime * result + (multiple ? 1231 : 1237);
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((prompts == null) ? 0 : prompts.hashCode());
@@ -451,15 +456,15 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 				return false;
 		} else if (!labels.equals(other.labels))
 			return false;
-		if (maxCount == null) {
-			if (other.maxCount != null)
+		if (maxCountExpression == null) {
+			if (other.maxCountExpression != null)
 				return false;
-		} else if (!maxCount.equals(other.maxCount))
+		} else if (!maxCountExpression.equals(other.maxCountExpression))
 			return false;
-		if (minCount == null) {
-			if (other.minCount != null)
+		if (minCountExpression == null) {
+			if (other.minCountExpression != null)
 				return false;
-		} else if (!minCount.equals(other.minCount))
+		} else if (!minCountExpression.equals(other.minCountExpression))
 			return false;
 		if (multiple!=other.multiple)
 			return false;

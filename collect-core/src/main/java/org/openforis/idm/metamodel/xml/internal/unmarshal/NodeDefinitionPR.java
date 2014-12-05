@@ -58,7 +58,7 @@ abstract class NodeDefinitionPR extends IdmlPullReader {
 		Boolean required = getBooleanAttribute(REQUIRED, false);
 		String requiredIf = getAttribute(REQUIRED_IF, false);
 		String relevant = getAttribute(RELEVANT, false);
-		Integer minCount = getIntegerAttribute(MIN_COUNT, false);
+		String minCountExpression = getAttribute(MIN_COUNT, false);
 		Boolean multiple = getBooleanAttribute(MULTIPLE, false);
 		if ( parentDefinition == null ) {
 			if ( multiple != null ) {
@@ -70,17 +70,17 @@ abstract class NodeDefinitionPR extends IdmlPullReader {
 		}
 		// TODO maxCount should be required for multiple attributes
 //		Integer maxCount = getIntegerAttribute("maxCount", multiple && defn instanceof AttributeDefinition);
-		Integer maxCount = getIntegerAttribute(MAX_COUNT, false);
+		String maxCountExpression = getAttribute(MAX_COUNT, false);
 		definition.setMultiple(multiple);
 		definition.setName(name);
 		definition.setSinceVersionByName(since);
 		definition.setDeprecatedVersionByName(deprecated);
-		if ( minCount == null && required != null && required ) {
-			definition.setMinCount(1);
+		if ( minCountExpression == null && required != null && required ) {
+			definition.setAlwaysRequired();
 		} else {
-			definition.setMinCount(minCount);
+			definition.setMinCountExpression(minCountExpression);
 		}
-		definition.setMaxCount(maxCount);
+		definition.setMaxCountExpression(maxCountExpression);
 		definition.setRequiredExpression(requiredIf);
 		definition.setRelevantExpression(relevant);
 		

@@ -32,9 +32,9 @@ public abstract class NodeDefinitionXS<T extends NodeDefinition, P> extends Vers
 		if ( defn.getParentDefinition() != null ) {
 			if ( defn.isMultiple() ) {
 				attribute(MULTIPLE, true);
-				attribute(MIN_COUNT, defn.getMinCount());
-				attribute(MAX_COUNT, defn.getMaxCount());
-			} else if ( defn.getMinCount() != null && defn.getMinCount() > 0 ){
+				attribute(MIN_COUNT, defn.getMinCountExpression());
+				attribute(MAX_COUNT, defn.getMaxCountExpression());
+			} else if ( defn.isAlwaysRequired() ){
 				attribute(REQUIRED, true);
 			}
 		}

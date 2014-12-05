@@ -664,7 +664,7 @@ public class RecordUpdater {
 			if(version == null || version.isApplicable(childDefn)) {
 				String childName = childDefn.getName();
 				if(entity.getCount(childName) == 0) {
-					int toBeInserted = entity.getEffectiveMinCount(childName);
+					int toBeInserted = entity.getMinCount(childDefn);
 					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
 						//insert at least one node
 						toBeInserted = 1;

@@ -33,8 +33,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String requiredExpression;
 	private String relevantExpression;
 	private boolean hideWhenNotRelevant;
-	private Integer minCount;
-	private Integer maxCount;
+	private String minCountExpression;
+	private String maxCountExpression;
 	private boolean calculated;
 	private boolean includeInDataExport;
 	private boolean showInUI;
@@ -116,7 +116,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		//generic
 		name = source.getName();
 		multiple = source.isMultiple();
-		Integer nodeMinCount = source.getMinCount();
+		String nodeMinCountExpression = source.getMinCountExpression();
 		required = nodeMinCount != null && nodeMinCount.intValue() > 0;
 		if ( required ) {
 			requiredExpression = null;
@@ -124,12 +124,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 			requiredExpression = source.getRequiredExpression();
 		}
 		relevantExpression = source.getRelevantExpression();
-		minCount = nodeMinCount;
-		if ( multiple ) {
-			maxCount = source.getMaxCount();
-		} else {
-			maxCount = null;
-		}
+		minCountExpression = nodeMinCountExpression;
+		maxCountExpression = multiple ? source.getMaxCountExpression(): null;
 		
 		//labels
 		headingLabel = source.getLabel(Type.HEADING, language);
@@ -174,14 +170,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		dest.setPrompt(Prompt.Type.PC, languageCode, pcPromptLabel);
 		dest.setDescription(languageCode, description);
 		dest.setMultiple(multiple);
-		dest.setMinCount(null);
-		dest.setMaxCount(null);
+		dest.setMinCountExpression(null);
+		dest.setMaxCountExpression(null);
 		dest.setRequiredExpression(null);
 		if ( multiple ) {
-			dest.setMinCount(minCount);
-			dest.setMaxCount(maxCount);
+			dest.setMinCountExpression(StringUtils.trimToNull(minCountExpression));
+			dest.setMaxCountExpression(StringUtils.trimToNull(maxCountExpression));
 		} else if (required) {
-			dest.setMinCount(1);
+			dest.setAlwaysRequired();
 		} else {
 			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
 		}
@@ -364,19 +360,19 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	}
 	
 	public Integer getMinCount() {
-		return minCount;
+		return minCountExpression;
 	}
 
 	public void setMinCount(Integer minCount) {
-		this.minCount = minCount;
+		this.minCountExpression = minCount;
 	}
 
 	public Integer getMaxCount() {
-		return maxCount;
+		return maxCountExpression;
 	}
 
 	public void setMaxCount(Integer maxCount) {
-		this.maxCount = maxCount;
+		this.maxCountExpression = maxCount;
 	}
 
 	public String getTabName() {

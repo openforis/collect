@@ -36,12 +36,16 @@ public class Entity extends Node<EntityDefinition> {
 	Map<String, List<Node<?>>> childrenByName;
 	private ValidationState derivedStateCache;
 	Map<String, State> childStates;
+	Map<Integer, Integer> minCountByChildId;
+	Map<Integer, Integer> maxCountByChildId;
 	
 	public Entity(EntityDefinition definition) {
 		super(definition);
 		this.childrenByName = new HashMap<String, List<Node<?>>>();
 		this.derivedStateCache = new ValidationState();
 		this.childStates = new HashMap<String, State>();
+		this.minCountByChildId = new HashMap<Integer, Integer>();
+		this.maxCountByChildId = new HashMap<Integer, Integer>();
 	}
 
 	@Override
@@ -114,6 +118,10 @@ public class Entity extends Node<EntityDefinition> {
 		} else {
 			return list.get(index);
 		}
+	}
+	
+	public Node<? extends NodeDefinition> getChild(NodeDefinition childDef) {
+		return getChild(childDef.getName());
 	}
 	
 	public Node<? extends NodeDefinition> getChild(String name) {
@@ -505,6 +513,30 @@ public class Entity extends Node<EntityDefinition> {
 		derivedStateCache.setMaxCountValidationResult(childName, value);
 	}
 	
+	public int getMinCount(NodeDefinition defn) {
+		return getMinCount(defn.getId());
+	}
+	
+	public int getMinCount(int childId) {
+		return minCountByChildId.get(childId);
+	}
+
+	public void setMinCount(int childId, int count) {
+		minCountByChildId.put(childId, count);
+	}
+
+	public Integer getMaxCount(NodeDefinition defn) {
+		return getMaxCount(defn.getId());
+	}
+	
+	public Integer getMaxCount(int childId) {
+		return maxCountByChildId.get(childId);
+	}
+
+	public void setMaxCount(int childId, Integer count) {
+		maxCountByChildId.put(childId, count);
+	}
+	
 	/**
 	 * 
 	 * @param childName
@@ -513,13 +545,14 @@ public class Entity extends Node<EntityDefinition> {
 	 */
 	public int getEffectiveMinCount(String childName) {
 		NodeDefinition defn = definition.getChildDefinition(childName);
-		Integer minCount = defn.getMinCount();
-		// requiredExpression is only considered if minCount and required are not set
-		if ( minCount==null ) {
-			return isRequired(childName) ? 1 : 0;
-		} else {
-			return minCount;
-		}
+		return getMinCount(defn);
+//		Integer minCount = defn.getMinCount();
+//		// requiredExpression is only considered if minCount and required are not set
+//		if ( minCount==null ) {
+//			return isRequired(childName) ? 1 : 0;
+//		} else {
+//			return minCount;
+//		}
 	}
 
 	/**

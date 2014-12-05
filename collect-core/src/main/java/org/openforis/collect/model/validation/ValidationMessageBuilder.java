@@ -136,18 +136,14 @@ public class ValidationMessageBuilder {
 		return result;
 	}
 	
-	public String getMaxCountValidationMessage(NodeDefinition defn, Locale locale) {
-		Integer maxCount = defn.getMaxCount();
+	public String getMaxCountValidationMessage(Entity parentEntity, String childName, Locale locale) {
+		EntityDefinition defn = parentEntity.getDefinition();
+		NodeDefinition childDefn = defn.getChildDefinition(childName);
+		Integer maxCount = parentEntity.getMaxCount(childDefn);
 		Object[] args = new Integer[]{maxCount > 0 ? maxCount: 1};
 		String surveyDefaultLanguage = defn.getSurvey().getDefaultLanguage();
 		String message = getMessage(surveyDefaultLanguage, locale, "validation.maxCount", args);
 		return message;
-	}
-
-	public String getMaxCountValidationMessage(Entity parentEntity, String childName, Locale locale) {
-		EntityDefinition defn = parentEntity.getDefinition();
-		NodeDefinition childDefn = defn.getChildDefinition(childName);
-		return getMaxCountValidationMessage(childDefn, locale);
 	}
 
 	public String getMinCountValidationMessage(Entity parentEntity, String childName, Locale locale) {
