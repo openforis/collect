@@ -8,6 +8,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.validation.Check;
 
 /**
  * 
@@ -38,5 +39,37 @@ public class DataErrorQueryGenerator {
 		});
 		return result;
 	}
+	
+	public List<DataErrorQuery> generateValidationCheckQueries(CollectSurvey survey) {
+		final List<DataErrorQuery> result = new ArrayList<DataErrorQuery>();
+		survey.getSchema().traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if (def instanceof AttributeDefinition) {
+					for (Check<?> check : ((AttributeDefinition) def).getChecks()) {
+						DataErrorQuery query = createQuery(def, check);
+						result.add(query);
+					}
+				}
+			}
+		});
+		return result;
+	}
 
+	private DataErrorQuery createQuery(NodeDefinition def, Check<?> check) {
+		StringBuilder sb = new StringBuilder();
+		if (StringUtils.isNotBlank(check.getCondition())) {
+			sb.append(check.getCondition());
+			sb.append(" and ");
+		}
+		sb.append(check.getExpression());
+		DataErrorQuery query = new DataErrorQuery((CollectSurvey) def.getSurvey());
+		//TODO
+		query.setTitle("");
+//				query.setType(type);
+		query.setAttributeDefinition((AttributeDefinition) def);
+		query.setEntityDefinition(def.getParentEntityDefinition());
+		query.setConditions(sb.toString());
+		return query;
+	}
+	
 }
