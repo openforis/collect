@@ -25,11 +25,11 @@ public class EntityChange extends NodeChange<Entity> {
 	
 	public EntityChange(Entity node) {
 		super(node);
-		relevanceByChildName = new HashMap<String, Boolean>();
 		minCountByChildDefinitionId = new HashMap<Integer, Integer>();
 		maxCountByChildDefinitionId = new HashMap<Integer, Integer>();
 		minCountValidationByChildName = new HashMap<String, ValidationResultFlag>();
 		maxCountValidationByChildName = new HashMap<String, ValidationResultFlag>();
+		relevanceByChildName = new HashMap<String, Boolean>();
 	}
 	
 	public void merge(EntityChange newChange) {

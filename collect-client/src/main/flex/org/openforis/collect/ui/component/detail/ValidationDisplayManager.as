@@ -125,20 +125,19 @@ package org.openforis.collect.ui.component.detail
 			var name:String = defn.name;
 			var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
 			var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
-			if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
-				if(minCountValid != ValidationResultFlag.OK) {
-					flag = minCountValid;
-					var minCount:int = parentEntity.getMinCount(defn);
-					if ( minCount == 1 ) {
-						validationMessages = new ArrayCollection([Message.get("edit.validation.requiredField")]);
-					} else {
-						validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [minCount])]);
-					}
+			if(minCountValid != ValidationResultFlag.OK) {
+				flag = minCountValid;
+				var minCount:int = parentEntity.getMinCount(defn);
+				if ( minCount == 1 ) {
+					validationMessages = new ArrayCollection([Message.get("edit.validation.requiredField")]);
 				} else {
-					flag = maxCountValid;
-					var maxCount:int = parentEntity.getMaxCount(defn);
-					validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [maxCount > 0 ? maxCount: 1])]);
+					validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [minCount])]);
 				}
+				apply(flag, validationMessages);
+			} else if(maxCountValid != ValidationResultFlag.OK) {
+				flag = maxCountValid;
+				var maxCount:int = parentEntity.getMaxCount(defn);
+				validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [maxCount > 0 ? maxCount: 1])]);
 				apply(flag, validationMessages);
 			} else {
 				reset();

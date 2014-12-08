@@ -277,6 +277,9 @@ public class RecordUpdater {
 		Set<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
 		changeMap.addMaxCountChanges(updatedMaxCountPointers);
 		
+		Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
+		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
+
 		// validate cardinality
 		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(updatedMinCountPointers.size() + updatedMaxCountPointers.size());
 		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
@@ -290,6 +293,7 @@ public class RecordUpdater {
 		Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(updatedCalculatedAttributes);
 		nodesToCheckValidationFor.add(attribute);
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
+		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 		
 		Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
 
@@ -363,7 +367,8 @@ public class RecordUpdater {
 		return updatedPointers;
 	}
 
-	private void validateCardinality(Record record, Set<NodePointer> pointers, NodeChangeMap changeMap) {
+	private Set<NodePointer> validateCardinality(Record record, Set<NodePointer> pointers, NodeChangeMap changeMap) {
+		Set<NodePointer> updatedPointers = new HashSet<NodePointer>();
 		Validator validator = record.getSurveyContext().getValidator();
 		for (NodePointer nodePointer : pointers) {
 			Entity entity = nodePointer.getEntity();
@@ -380,12 +385,15 @@ public class RecordUpdater {
 			if ( entity.getMinCountValidationResult(childName) != minCountResult ) {
 				entity.setMinCountValidationResult(childName, minCountResult);
 				changeMap.addMinCountValidationResultChange(nodePointer, minCountResult);
+				updatedPointers.add(nodePointer);
 			}
 			if ( entity.getMaxCountValidationResult(childName) != maxCountResult ) {
 				entity.setMaxCountValidationResult(childName, maxCountResult);
 				changeMap.addMaxCountValidationResultChange(nodePointer, maxCountResult);
+				updatedPointers.add(nodePointer);
 			}
 		}
+		return updatedPointers;
 	}
 
 	/**
@@ -459,6 +467,9 @@ public class RecordUpdater {
 		Set<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
 		changeMap.addMinCountChanges(updatedMaxCountPointers);
 		
+		Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
+		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
+
 		// validate cardinality
 		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(updatedMinCountPointers.size() + updatedMaxCountPointers.size());
 		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
@@ -472,6 +483,7 @@ public class RecordUpdater {
 		Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(validationDependenciesToDeleted);
 		nodesToCheckValidationFor.addAll(updatedCalculatedAttributes);
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
+		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 		
 		Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
 
@@ -680,6 +692,9 @@ public class RecordUpdater {
 		Collection<NodePointer> maxCountDependentNodes = record.determineMaxCountDependentNodes(entityDescendantPointers);
 		Set<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountDependentNodes);
 		changeMap.addMaxCountChanges(updatedMaxCountPointers);
+		
+		Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
+		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
 
 		//recalculate attributes
 		List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
@@ -700,8 +715,12 @@ public class RecordUpdater {
 		validateCardinality(record, nodePointersToCheckCardinalityFor, changeMap);
 		
 		//validate attributes
-		Set<Attribute<?, ?>> attributes = record.determineValidationDependentNodes(entityAsList);
-		validateAttributes(record, attributes, changeMap);
+		Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>();
+		nodesToCheckValidationFor.add(entity);
+		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
+		
+		Set<Attribute<?, ?>> attributesToValidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
+		validateAttributes(record, attributesToValidate, changeMap);
 		return changeMap;
 	}
 
