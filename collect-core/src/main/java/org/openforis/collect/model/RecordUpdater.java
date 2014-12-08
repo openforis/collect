@@ -43,6 +43,7 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePointer;
+import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
@@ -167,7 +168,12 @@ public class RecordUpdater {
 		
 		setMissingValueApproved(parentEntity, attributeName, false);
 		
-		return afterAttributeInsert(attribute);
+		applyInitialValue(attribute);
+		
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.addAttributeAddChange(attribute);
+		
+		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 
 	/**
@@ -226,12 +232,6 @@ public class RecordUpdater {
 		setErrorConfirmed(attribute, false);
 		setMissingValueApproved(parentEntity, attribute.getName(), false);
 		setDefaultValueApplied(attribute, false);
-	}
-
-	private NodeChangeSet afterAttributeInsert(Attribute<?, ?> attribute) {
-		NodeChangeMap changeMap = new NodeChangeMap();
-		changeMap.addAttributeAddChange(attribute);
-		return afterAttributeInsertOrUpdate(changeMap, attribute);
 	}
 
 	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute) {
@@ -589,8 +589,9 @@ public class RecordUpdater {
 	 * The condition of the corresponding DefaultValue will be verified.
 	 *  
 	 * @param attribute
+	 * @return 
 	 */
-	private <V extends Value> void performDefaultValueApply(Attribute<?, V> attribute) {
+	private <V extends Value> V performDefaultValueApply(Attribute<?, V> attribute) {
 		AttributeDefinition attributeDefn = (AttributeDefinition) attribute.getDefinition();
 		List<AttributeDefault> defaults = attributeDefn.getAttributeDefaults();
 		for (AttributeDefault attributeDefault : defaults) {
@@ -601,13 +602,14 @@ public class RecordUpdater {
 						attribute.setValue(value);
 						setDefaultValueApplied(attribute, true);
 						attribute.updateSummaryInfo();
-						break;
+						return value;
 					}
 				}
 			} catch (InvalidExpressionException e) {
 				throw new RuntimeException("Error applying default value for attribute " + attributeDefn.getPath());
 			}
 		}
+		return null;
 	}
 	
 	/**
@@ -681,6 +683,8 @@ public class RecordUpdater {
 		updateMaxCount(entityDescendantPointers);
 
 		addEmptyNodes(entity);
+		
+		applyInitialValues(entity);
 		
 		//min/max count
 		
@@ -763,7 +767,6 @@ public class RecordUpdater {
 				if(childDefn instanceof AttributeDefinition) {
 					Node<?> createdNode = childDefn.createNode();
 					entity.add(createdNode);
-					setInitialValue((Attribute<?, ?>) createdNode);
 				} else if(childDefn instanceof EntityDefinition ) {
 					Entity childEntity = performEntityAdd(entity, childName);
 					addEmptyNodes(childEntity);
@@ -774,17 +777,36 @@ public class RecordUpdater {
 		return count;
 	}
 	
-	private void setInitialValue(Attribute<?, ?> attr) {
+	private List<Attribute<?, ?>> applyInitialValues(Entity entity) {
+		final List<Attribute<?, ?>> attributes = new ArrayList<Attribute<?,?>>();
+		entity.traverse(new NodeVisitor() {
+			public void visit(Node<?> node, int idx) {
+				if (node instanceof Attribute && node.isEmpty()) {
+					Attribute<?, ?> attr = (Attribute<?, ?>) node;
+					Value value = applyInitialValue(attr);
+					if (value != null) {
+						attributes.add(attr);
+					}
+				}
+			}
+		});
+		return attributes;
+	}
+
+	private Value applyInitialValue(Attribute<?, ?> attr) {
+		Value value = null;
 		if (! attr.getDefinition().isCalculated()) {
 			if(isDefaultValueToBeApplied(attr)) {
-				performDefaultValueApply(attr);
+				value = performDefaultValueApply(attr);
 			}
 			if(attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly() && attr.isEmpty()) {
 				BooleanAttribute boolAttr = (BooleanAttribute) attr;
-				boolAttr.setValue(new BooleanValue(false));
+				value = new BooleanValue(false);
+				boolAttr.setValue((BooleanValue) value);
 				boolAttr.updateSummaryInfo();
 			}
 		}
+		return value;
 	}
 
 	private boolean isDefaultValueToBeApplied(Attribute<?, ?> attr) {
