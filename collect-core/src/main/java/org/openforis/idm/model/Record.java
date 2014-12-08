@@ -258,8 +258,9 @@ public class Record {
 		return dependenciesFor;
 	}
 
-	public List<NodePointer> determineRelevanceDependentNodes(Collection<Node<?>> nodes) {
-		List<NodePointer> result = relevanceDependencies.dependenciesFor(nodes);
+	public <N extends Node<?>> List<NodePointer> determineRelevanceDependentNodes(Collection<N> nodes) {
+		@SuppressWarnings("unchecked")
+		List<NodePointer> result = relevanceDependencies.dependenciesFor((Collection<Node<?>>) nodes);
 		return result;
 	}
 

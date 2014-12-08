@@ -705,9 +705,13 @@ public class RecordUpdater {
 		changeMap.addValueChanges(calculatedAttributes);
 		
 		//relevance
+		List<NodePointer> childNodePointers = getChildNodePointers(entity);
+		List<NodePointer> relevanceDependentPointers = record.determineRelevanceDependentNodes(calculatedAttributes);
 		
-		List<NodePointer> relevancePointers = getChildNodePointers(entity);
-		Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(relevancePointers).update();
+		Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>(childNodePointers);
+		pointersToRecalculateRelevanceFor.addAll(relevanceDependentPointers);
+		
+		Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
 		changeMap.addRelevanceChanges(updatedRelevancePointers);
 		
 		//cardinality

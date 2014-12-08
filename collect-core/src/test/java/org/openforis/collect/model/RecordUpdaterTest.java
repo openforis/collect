@@ -400,6 +400,56 @@ public class RecordUpdaterTest {
 	}
 	
 	@Test
+	public void testRelevanceUpdatedFromNestedNode() {
+		record(
+			rootEntityDef(
+				entityDef("tree",
+					attributeDef("tree_no"),
+					attributeDef("total_height")
+						.calculated("tree_no * 2")
+				),
+				attributeDef("test")
+					.relevant("tree[1]/total_height > 4")
+			),
+			entity("tree",
+				attribute("tree_no", "1")
+			),
+			attribute("test")
+		);
+		
+		Attribute<?, ?> test = record.findNodeByPath("/root/test");
+		assertFalse(test.isRelevant());
+		
+		Attribute<?, ?> treeNo = record.findNodeByPath("/root/tree[1]/tree_no");
+		update(treeNo, "3");
+		
+		assertTrue(test.isRelevant());
+	}
+
+	@Test
+	public void testRelevanceUpdatedFromNestedNodeWhenEntityIsAdded() {
+		record(
+			rootEntityDef(
+				entityDef("tree",
+					attributeDef("tree_pos")
+						.calculated("idm:position()"),
+					attributeDef("total_height")
+						.calculated("tree_pos * 2")
+				),
+				attributeDef("test")
+					.relevant("tree[2]/total_height > 3")
+			)
+		);
+		
+		Attribute<?, ?> test = record.findNodeByPath("/root/test");
+		assertFalse(test.isRelevant());
+		
+		updater.addEntity(record.getRootEntity(), "tree");
+		
+		assertTrue(test.isRelevant());
+	}
+	
+	@Test
 	public void testInitializeCalculatedAttributeInNestedNode() {
 		record(
 			rootEntityDef(
