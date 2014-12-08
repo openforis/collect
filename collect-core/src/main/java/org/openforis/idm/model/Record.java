@@ -4,16 +4,13 @@
 package org.openforis.idm.model;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -41,9 +38,12 @@ public class Record {
 	boolean toBeUpdated; //if true, enables validation dependency graph
 	NodeDependencyGraph calculatedAttributeDependencies;
 	RelevanceDependencyGraph relevanceDependencies;
-	RequirenessDependencyGraph requirenessDependencies;
+	MinCountDependencyGraph minCountDependencies;
+	MaxCountDependencyGraph maxCountDependencies;
 	ValidationDependencyGraph validationDependencies;
 
+	List<DependencyGraph<?>> dependencyGraphs;
+	
 	public Record(Survey survey, String version) {
 		this(survey, version, true);
 	}
@@ -105,11 +105,21 @@ public class Record {
 		resetValidationDependencies();
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void resetValidationDependencies() {
 		this.calculatedAttributeDependencies = new CalculatedAttributeDependencyGraph(survey);
+		this.minCountDependencies = new MinCountDependencyGraph(survey);
+		this.maxCountDependencies = new MaxCountDependencyGraph(survey);
 		this.relevanceDependencies = new RelevanceDependencyGraph(survey);
-		this.requirenessDependencies = new RequirenessDependencyGraph(survey);
 		this.validationDependencies = new ValidationDependencyGraph(survey);
+		
+		this.dependencyGraphs = Arrays.asList(
+				calculatedAttributeDependencies,
+				minCountDependencies,
+				maxCountDependencies,
+				relevanceDependencies,
+				validationDependencies
+				);
 	}
 
 	public Integer getId() {
@@ -189,19 +199,18 @@ public class Record {
 	void put(Node<?> node) {
 		initialize(node);
 		if ( toBeUpdated ) {
-			initDependecyGraph(node);
+			initDependecyGraphs(node);
 		}
 	}
 
-	protected void initDependecyGraph(Node<?> node) {
-		calculatedAttributeDependencies.add(node);
-		relevanceDependencies.add(node);
-		requirenessDependencies.add(node);
-		validationDependencies.add(node);
+	protected void initDependecyGraphs(Node<?> node) {
+		for (DependencyGraph<?> graph : dependencyGraphs) {
+			graph.add(node);
+		}
 
 		if (node instanceof Entity) {
 			for (Node<?> child : ((Entity) node).getChildren()) {
-				initDependecyGraph(child);
+				initDependecyGraphs(child);
 			}
 		}
 	}
@@ -225,10 +234,9 @@ public class Record {
 		node.setRecord(null);
 		nodesByInternalId.remove(node.internalId);
 
-		calculatedAttributeDependencies.remove(node);
-		relevanceDependencies.remove(node);
-		requirenessDependencies.remove(node);
-		validationDependencies.remove(node);
+		for (DependencyGraph<?> graph : dependencyGraphs) {
+			graph.remove(node);
+		}
 	}
 
 	int nextId() {
@@ -247,30 +255,18 @@ public class Record {
 		return dependenciesFor;
 	}
 
-	public List<NodePointer> determineConstantRelevancePointers(Node<?> node) {
-		final Set<NodePointer> result = new LinkedHashSet<NodePointer>();
-		Stack<Node<?>> stack = new Stack<Node<?>>();
-		stack.push(node);
-		while(!stack.isEmpty()) {
-			Node<?> n = stack.pop();
-			NodeDefinition def = n.getDefinition();
-			if ( StringUtils.isNotBlank(def.getRelevantExpression()) && survey.getRelevanceSources(def).isEmpty() ) {
-				result.add(new NodePointer(n));
-			}
-			if(n instanceof Entity) {
-				stack.addAll(((Entity) n).getChildren());
-			}
-		}
-		return new ArrayList<NodePointer>(result);
-	}
-	
 	public List<NodePointer> determineRelevanceDependentNodes(Collection<Node<?>> nodes) {
 		List<NodePointer> result = relevanceDependencies.dependenciesFor(nodes);
 		return result;
 	}
 
-	public Collection<NodePointer> determineRequirenessDependentNodes(Collection<NodePointer> nodePointers) {
-		Collection<NodePointer> result = requirenessDependencies.dependenciesForNodePointers(nodePointers);
+	public Collection<NodePointer> determineMinCountDependentNodes(Collection<NodePointer> nodePointers) {
+		Collection<NodePointer> result = minCountDependencies.dependenciesForNodePointers(nodePointers);
+		return result;
+	}
+
+	public Collection<NodePointer> determineMaxCountDependentNodes(Collection<NodePointer> nodePointers) {
+		Collection<NodePointer> result = maxCountDependencies.dependenciesForNodePointers(nodePointers);
 		return result;
 	}
 

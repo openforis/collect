@@ -128,15 +128,16 @@ package org.openforis.collect.ui.component.detail
 			if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
 				if(minCountValid != ValidationResultFlag.OK) {
 					flag = minCountValid;
-					var effectiveMinCount:int = parentEntity.getEffectiveMinCount(defn.name);
-					if ( effectiveMinCount == 1 ) {
+					var minCount:int = parentEntity.getMinCount(defn);
+					if ( minCount == 1 ) {
 						validationMessages = new ArrayCollection([Message.get("edit.validation.requiredField")]);
 					} else {
-						validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [effectiveMinCount])]);
+						validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [minCount])]);
 					}
 				} else {
 					flag = maxCountValid;
-					validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [defn.maxCount > 0 ? defn.maxCount: 1])]);
+					var maxCount:int = parentEntity.getMaxCount(defn);
+					validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [maxCount > 0 ? maxCount: 1])]);
 				}
 				apply(flag, validationMessages);
 			} else {

@@ -32,6 +32,14 @@ public class NodePointer {
 		this(entity, entity.getDefinition().getChildDefinition(childName));
 	}
 
+	public int getNodesMinCount() {
+		return entity.getMinCount(childDefinition);
+	}
+	
+	public int getNodesMaxCount() {
+		return entity.getMaxCount(childDefinition);
+	}
+	
 	public Entity getEntity() {
 		return entity;
 	}
@@ -62,10 +70,6 @@ public class NodePointer {
 	
 	public boolean areNodesRelevant() {
 		return entity.isRelevant(getChildName());
-	}
-	
-	public Boolean areNodesRequired() {
-		return entity.isRequired(getChildName());
 	}
 	
 	@Override
@@ -100,6 +104,5 @@ public class NodePointer {
 			return false;
 		return true;
 	}
-	
-	
+
 }

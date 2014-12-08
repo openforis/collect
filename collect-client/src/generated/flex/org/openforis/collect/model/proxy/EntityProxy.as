@@ -15,6 +15,7 @@ package org.openforis.collect.model.proxy {
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
@@ -23,7 +24,6 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
-	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 
 	/**
 	 * @author S. Ricci
@@ -376,8 +376,12 @@ package org.openforis.collect.model.proxy {
 			updateMap(childrenRelevanceMap, map);
 		}
 
-		public function updateChildrenRequiredMap(map:IMap):void {
-			updateMap(childrenRequiredMap, map);
+		public function updateMinCountByChild(map:IMap):void {
+			updateMap(minCountByChildDefinitionId, map);
+		}
+		
+		public function updateMaxCountByChild(map:IMap):void {
+			updateMap(maxCountByChildDefinitionId, map);
 		}
 		
 		public function showErrorsOnChild(name:String):void {
@@ -389,18 +393,18 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		public function isRequired(childName:String):Boolean {
-			var required:Boolean = childrenRequiredMap.get(childName);
-			return required == true;
+		public function isRequired(childDef:NodeDefinitionProxy):Boolean {
+			return getMinCount(childDef) > 0;
 		}
 		
-		public function getEffectiveMinCount(childName:String):int {
-			var childDef:NodeDefinitionProxy = EntityDefinitionProxy(definition).getChildDefinition(childName);
-			if((isNaN(childDef.minCount) || childDef.minCount == 0) && isRequired(childName) ) {
-				return 1;
-			} else {
-				return childDef.minCount;
-			}
+		public function getMinCount(childDef:NodeDefinitionProxy):int {
+			var count:int = minCountByChildDefinitionId.get(childDef.id);
+			return count;
+		}
+		
+		public function getMaxCount(childDef:NodeDefinitionProxy):int {
+			var count:int = maxCountByChildDefinitionId.get(childDef.id);
+			return count;
 		}
 		
 		public function get childDefinitionNames():IList {

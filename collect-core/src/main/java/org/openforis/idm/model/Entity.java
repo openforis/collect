@@ -36,16 +36,12 @@ public class Entity extends Node<EntityDefinition> {
 	Map<String, List<Node<?>>> childrenByName;
 	private ValidationState derivedStateCache;
 	Map<String, State> childStates;
-	Map<Integer, Integer> minCountByChildId;
-	Map<Integer, Integer> maxCountByChildId;
 	
 	public Entity(EntityDefinition definition) {
 		super(definition);
 		this.childrenByName = new HashMap<String, List<Node<?>>>();
 		this.derivedStateCache = new ValidationState();
 		this.childStates = new HashMap<String, State>();
-		this.minCountByChildId = new HashMap<Integer, Integer>();
-		this.maxCountByChildId = new HashMap<Integer, Integer>();
 	}
 
 	@Override
@@ -275,7 +271,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public int getMissingCount(String name) {
-		int minCount = getEffectiveMinCount(name);
+		int minCount = getMinCount(name);
 		int specified = getNonEmptyCount(name);
 		if(minCount > specified) {
 			return minCount - specified;
@@ -490,11 +486,45 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public boolean isRequired(String childName) {
-		return derivedStateCache.getRequired(childName);
+		NodeDefinition childDef = definition.getChildDefinition(childName);
+		return isRequired(childDef);
 	}
 	
-	public void setRequired(String childName, boolean required) {
-		derivedStateCache.setRequired(childName, required);
+	public boolean isRequired(NodeDefinition def) {
+		Integer minCount = getMinCount(def);
+		return minCount != null && minCount > 0;
+	}
+	
+	public Integer getMinCount(NodeDefinition defn) {
+		return getMinCount(defn.getId());
+	}
+	
+	public Integer getMinCount(int childDefinitionId) {
+		return derivedStateCache.getMinCount(childDefinitionId);
+	}
+	
+	public void setMinCount(NodeDefinition childDefn, int count) {
+		setMinCount(childDefn.getId(), count);
+	}
+
+	public void setMinCount(int childDefinitionId, int count) {
+		derivedStateCache.setMinCount(childDefinitionId, count);
+	}
+
+	public Integer getMaxCount(NodeDefinition defn) {
+		return getMaxCount(defn.getId());
+	}
+	
+	public Integer getMaxCount(int childDefinitionId) {
+		return derivedStateCache.getMaxCount(childDefinitionId);
+	}
+	
+	public void setMaxCount(NodeDefinition childDefn, Integer count) {
+		setMaxCount(childDefn.getId(), count);
+	}
+
+	public void setMaxCount(int childDefinitionId, Integer count) {
+		derivedStateCache.setMaxCount(childDefinitionId, count);
 	}
 
 	public ValidationResultFlag getMinCountValidationResult(String childName) {
@@ -513,46 +543,15 @@ public class Entity extends Node<EntityDefinition> {
 		derivedStateCache.setMaxCountValidationResult(childName, value);
 	}
 	
-	public int getMinCount(NodeDefinition defn) {
-		return getMinCount(defn.getId());
-	}
-	
-	public int getMinCount(int childId) {
-		return minCountByChildId.get(childId);
-	}
-
-	public void setMinCount(int childId, int count) {
-		minCountByChildId.put(childId, count);
-	}
-
-	public Integer getMaxCount(NodeDefinition defn) {
-		return getMaxCount(defn.getId());
-	}
-	
-	public Integer getMaxCount(int childId) {
-		return maxCountByChildId.get(childId);
-	}
-
-	public void setMaxCount(int childId, Integer count) {
-		maxCountByChildId.put(childId, count);
-	}
-	
 	/**
 	 * 
 	 * @param childName
 	 * @return minimum number of non-empty child nodes, based on minCount, required and 
 	 * requiredExpression properties
 	 */
-	public int getEffectiveMinCount(String childName) {
+	public int getMinCount(String childName) {
 		NodeDefinition defn = definition.getChildDefinition(childName);
 		return getMinCount(defn);
-//		Integer minCount = defn.getMinCount();
-//		// requiredExpression is only considered if minCount and required are not set
-//		if ( minCount==null ) {
-//			return isRequired(childName) ? 1 : 0;
-//		} else {
-//			return minCount;
-//		}
 	}
 
 	/**
@@ -690,57 +689,67 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	private static class ValidationState {
-		/** Set of children dynamic required states */
-		private Map<String, Boolean> childRequiredStates;
+		/** Set of children dynamic min count */
+		private Map<Integer, Integer> minCountByChildDefinition;
+		/** Set of children dynamic max count */
+		private Map<Integer, Integer> maxCountByChildDefinition;
 		/** Set of children relevance states */
-		private Map<String, Boolean> childRelevance;
+		private Map<String, Boolean> relevanceByChildName;
 		
-		private Map<String, ValidationResultFlag> minCountValidationResult;
-		private Map<String, ValidationResultFlag> maxCountValidationResult;
+		private Map<String, ValidationResultFlag> minCountValidationResultByChildName;
+		private Map<String, ValidationResultFlag> maxCountValidationResultByChildName;
 
 		public ValidationState() {
-			childRequiredStates = new HashMap<String, Boolean>();
-			childRelevance = new HashMap<String, Boolean>();
-			minCountValidationResult = new HashMap<String, ValidationResultFlag>();
-			maxCountValidationResult = new HashMap<String, ValidationResultFlag>();
+			minCountByChildDefinition = new HashMap<Integer, Integer>();
+			maxCountByChildDefinition = new HashMap<Integer, Integer>();
+			relevanceByChildName = new HashMap<String, Boolean>();
+			minCountValidationResultByChildName = new HashMap<String, ValidationResultFlag>();
+			maxCountValidationResultByChildName = new HashMap<String, ValidationResultFlag>();
 		}
 
-		private boolean getRequired(String childName) {
-			Boolean value = childRequiredStates.get(childName);
-			return value == null ? false: value;
+		private Integer getMinCount(int childDefinitionId) {
+			return minCountByChildDefinition.get(childDefinitionId);
 		}
-
-		private void setRequired(String childName, boolean flag) {
-			childRequiredStates.put(childName, flag);
+		
+		private void setMinCount(int childDefinitionId, int count) {
+			minCountByChildDefinition.put(childDefinitionId, count);
 		}
-
+		
+		private Integer getMaxCount(int childDefinitionId) {
+			return maxCountByChildDefinition.get(childDefinitionId);
+		}
+		
+		private void setMaxCount(int childDefinitionId, Integer count) {
+			maxCountByChildDefinition.put(childDefinitionId, count);
+		}
+		
 		private boolean isRelevant(String childName) {
-			Boolean value = childRelevance.get(childName);
+			Boolean value = relevanceByChildName.get(childName);
 			return value == null ? true: value;
 		}
 		
 		private Boolean getRelevance(String childName) {
-			return childRelevance.get(childName);
+			return relevanceByChildName.get(childName);
 		}
 
 		private void setRelevant(String childName, boolean flag) {
-			childRelevance.put(childName, flag);
+			relevanceByChildName.put(childName, flag);
 		}
 		
 		private ValidationResultFlag getMinCountValidationResult(String childName) {
-			return minCountValidationResult.get(childName);
+			return minCountValidationResultByChildName.get(childName);
 		}
 
 		private ValidationResultFlag setMinCountValidationResult(String childName, ValidationResultFlag value) {
-			return minCountValidationResult.put(childName, value);
+			return minCountValidationResultByChildName.put(childName, value);
 		}
 
 		private ValidationResultFlag getMaxCountValidationResult(String childName) {
-			return maxCountValidationResult.get(childName);
+			return maxCountValidationResultByChildName.get(childName);
 		}
 
 		private ValidationResultFlag setMaxCountValidationResult(String childName, ValidationResultFlag value) {
-			return maxCountValidationResult.put(childName, value);
+			return maxCountValidationResultByChildName.put(childName, value);
 		}
 
 	}

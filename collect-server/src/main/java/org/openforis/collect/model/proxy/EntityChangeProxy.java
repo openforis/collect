@@ -24,8 +24,13 @@ public class EntityChangeProxy extends NodeChangeProxy<EntityChange> {
 	}
 
 	@ExternalizedProperty
-	public Map<String, Boolean> getRequired() {
-		return change.getChildrenRequireness();
+	public Map<Integer, Integer> getMinCountByChildDefinitionId() {
+		return change.getMinCountByChildDefinitionId();
+	}
+
+	@ExternalizedProperty
+	public Map<Integer, Integer> getMaxCountByChildDefinitionId() {
+		return change.getMaxCountByChildDefinitionId();
 	}
 
 	@ExternalizedProperty

@@ -113,28 +113,23 @@ public abstract class BaseValidator extends AbstractValidator {
 	
 	protected boolean validateGreaterThan(ValidationContext ctx, String fieldName, 
 			String compareFieldName, String compareFieldLabel, boolean strict) {
-		Integer compareValue = getValue(ctx, compareFieldName);
+		Double compareValue = getNumericValue(ctx, compareFieldName);
 		return validateGreaterThan(ctx, fieldName, compareValue, compareFieldLabel, strict);
 	}
 
 	protected boolean validateGreaterThan(ValidationContext ctx,
 			String fieldName, Number compareValue, String compareValueLabel, boolean strict) {
-		Object fieldValue = getValue(ctx, fieldName);
-		if ( fieldValue == null ) {
+		Double value = getNumericValue(ctx, fieldName);
+		if ( value == null ) {
 			return true;
 		}
-		if ( ! (fieldValue instanceof Number) ) {
-			throw new IllegalArgumentException("Number field value expected: " + fieldName);				
+		if ( value < compareValue.doubleValue() || strict && value == compareValue.doubleValue()) {
+			String message = createCompareMessage(GREATER_THAN_MESSAGE_KEY, GREATER_THAN_EQUAL_MESSAGE_KEY, strict, 
+					compareValue, compareValueLabel);
+			addInvalidMessage(ctx, fieldName, message );
+			return false;
 		} else {
-			double fieldDoubleValue = ((Number) fieldValue).doubleValue();
-			if ( fieldDoubleValue < compareValue.doubleValue() || strict && fieldDoubleValue == compareValue.doubleValue()) {
-				String message = createCompareMessage(GREATER_THAN_MESSAGE_KEY, GREATER_THAN_EQUAL_MESSAGE_KEY, strict, 
-						compareValue, compareValueLabel);
-				addInvalidMessage(ctx, fieldName, message );
-				return false;
-			} else {
-				return true;
-			}
+			return true;
 		}
 	}
 	
@@ -155,22 +150,17 @@ public abstract class BaseValidator extends AbstractValidator {
 
 	protected boolean validateLessThan(ValidationContext ctx,
 			String fieldName, Number compareValue, String compareValueLabel, boolean strict) {
-		Object fieldValue = getValue(ctx, fieldName);
-		if ( fieldValue == null ) {
+		Double value = getNumericValue(ctx, fieldName);
+		if ( value == null ) {
 			return true;
 		}
-		if ( ! (fieldValue instanceof Number) ) {
-			throw new IllegalArgumentException("Number field value expected: " + fieldName);				
+		if ( value > compareValue.doubleValue() || strict && value == compareValue.doubleValue()) {
+			String message = createCompareMessage(LESS_THAN_MESSAGE_KEY, LESS_THAN_EQUAL_MESSAGE_KEY, strict, 
+					compareValue, compareValueLabel);
+			addInvalidMessage(ctx, fieldName, message );
+			return false;
 		} else {
-			double fieldDoubleValue = ((Number) fieldValue).doubleValue();
-			if ( fieldDoubleValue > compareValue.doubleValue() || strict && fieldDoubleValue == compareValue.doubleValue()) {
-				String message = createCompareMessage(LESS_THAN_MESSAGE_KEY, LESS_THAN_EQUAL_MESSAGE_KEY, strict, 
-						compareValue, compareValueLabel);
-				addInvalidMessage(ctx, fieldName, message );
-				return false;
-			} else {
-				return true;
-			}
+			return true;
 		}
 	}
 	
@@ -221,6 +211,37 @@ public abstract class BaseValidator extends AbstractValidator {
 			}
 		}
 		return (T) value;
+	}
+	
+	protected Double getNumericValue(ValidationContext ctx, String field) {
+		Object value = getValue(ctx, field);
+		if (value == null) {
+			return null;
+		}
+		double doubleValue;
+		if ( value instanceof Number ) {
+			doubleValue = ((Number) value).doubleValue();
+		} else {
+			doubleValue = Double.parseDouble(value.toString());
+		}
+		return doubleValue;
+	}
+
+	protected boolean isNumber(ValidationContext ctx, String field) {
+		Object value = getValue(ctx, field);
+		return isNumber(value);
+	}
+
+	protected boolean isNumber(Object value) {
+		if (value instanceof Number) {
+			return true;
+		}
+		try {
+			Double.parseDouble(value.toString());
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 
 	protected Map<String, Property> getProperties(ValidationContext ctx) {

@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -21,8 +22,8 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 	protected static final String 	DESCRIPTION_FIELD = "description";
 	protected static final String 	NAME_FIELD = "name";
 	protected static final String 	MULTIPLE_FIELD = "multiple";
-	protected static final String 	MIN_COUNT_FIELD = "minCount";
-	protected static final String 	MAX_COUNT_FIELD = "maxCount";
+	protected static final String 	MIN_COUNT_EXPRESSION_FIELD = "minCountExpression";
+	protected static final String 	MAX_COUNT_EXPRESSION_FIELD = "maxCountExpression";
 	protected static final String 	TAB_NAME_FIELD = "tabName";
 	protected static final String 	REQUIRED_EXPR_FIELD = "requiredExpression";
 	protected static final String 	RELEVANT_EXPR_FIELD = "relevantExpression";
@@ -35,11 +36,12 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 	protected void internalValidate(ValidationContext ctx) {
 		validateName(ctx);
 		validateDescription(ctx);
-		validateMinCount(ctx);
 		validateMaxCount(ctx);
 		NodeDefinition contextNode = getEditedNode(ctx);
 		validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
 		validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
+		validateValueExpression(ctx, contextNode, MIN_COUNT_EXPRESSION_FIELD);
+		validateValueExpression(ctx, contextNode, MAX_COUNT_EXPRESSION_FIELD);
 		validateColumn(ctx);
 	}
 
@@ -87,36 +89,29 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 		// Object value = getValue(ctx, DESCRIPTION_FIELD);
 	}
 
-	protected void validateMinCount(ValidationContext ctx) {
-		Boolean multiple = (Boolean) getValue(ctx, MULTIPLE_FIELD);
-		if (multiple != null && multiple.booleanValue()) {
-			validateGreaterThan(ctx, MIN_COUNT_FIELD, 0, false);
-		}
-	}
-
 	protected void validateMaxCount(ValidationContext ctx) {
 		Boolean multiple = (Boolean) getValue(ctx, MULTIPLE_FIELD);
 		if (multiple != null && multiple.booleanValue()) {
 			NodeDefinition editedNode = getEditedNode(ctx);
 			boolean result = true;
 			if ( editedNode instanceof AttributeDefinition ) {
-				result = validateRequired(ctx, MAX_COUNT_FIELD);
+				result = validateRequired(ctx, MAX_COUNT_EXPRESSION_FIELD);
 			}
 			if ( result ) {
-				Integer maxCount = getValue(ctx, MAX_COUNT_FIELD);
-				if ( maxCount != null ) {
-					Integer minCount = getValue(ctx, MIN_COUNT_FIELD);
-					if ( minCount == null || minCount.intValue() < MAX_COUNT_MIN_VALUE ) {
-						validateGreaterThan(ctx, MAX_COUNT_FIELD, MAX_COUNT_MIN_VALUE, false);
-					} else {
+				Object maxCountVal = getValue(ctx, MAX_COUNT_EXPRESSION_FIELD);
+				if (maxCountVal != null && isNumber(maxCountVal)) {
+					String minCountVal = getValue(ctx, MIN_COUNT_EXPRESSION_FIELD);
+					if ( StringUtils.isBlank(minCountVal) || isNumber(minCountVal) && Double.parseDouble(minCountVal.toString()) < MAX_COUNT_MIN_VALUE ) {
+						validateGreaterThan(ctx, MAX_COUNT_EXPRESSION_FIELD, MAX_COUNT_MIN_VALUE, false);
+					} else if (isNumber(minCountVal)) {
 						String minCountLabel = Labels.getLabel(LabelKeys.NODE_MIN_COUNT);
-						validateGreaterThan(ctx, MAX_COUNT_FIELD, MIN_COUNT_FIELD, minCountLabel, false);
+						validateGreaterThan(ctx, MAX_COUNT_EXPRESSION_FIELD, MIN_COUNT_EXPRESSION_FIELD, minCountLabel, false);
 					}
 				}
 			}
 		}
 	}
-
+	
 	private void validateColumn(ValidationContext ctx) {
 		validateGreaterThan(ctx, COLUMN_FIELD, 1, false);
 		validateGreaterThan(ctx, COLUMN_SPAN_FIELD, 1, false);

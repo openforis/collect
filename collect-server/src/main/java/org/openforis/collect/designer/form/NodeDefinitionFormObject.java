@@ -116,15 +116,10 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		//generic
 		name = source.getName();
 		multiple = source.isMultiple();
-		String nodeMinCountExpression = source.getMinCountExpression();
-		required = nodeMinCount != null && nodeMinCount.intValue() > 0;
-		if ( required ) {
-			requiredExpression = null;
-		} else {
-			requiredExpression = source.getRequiredExpression();
-		}
+		required = source.isAlwaysRequired();
+		requiredExpression = required ? null: source.extractRequiredExpression();
 		relevantExpression = source.getRelevantExpression();
-		minCountExpression = nodeMinCountExpression;
+		minCountExpression = source.getMinCountExpression();
 		maxCountExpression = multiple ? source.getMaxCountExpression(): null;
 		
 		//labels
@@ -359,20 +354,20 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.hideWhenNotRelevant = hideWhenNotRelevant;
 	}
 	
-	public Integer getMinCount() {
+	public String getMinCountExpression() {
 		return minCountExpression;
 	}
 
-	public void setMinCount(Integer minCount) {
-		this.minCountExpression = minCount;
+	public void setMinCountExpression(String expression) {
+		this.minCountExpression = expression;
 	}
 
-	public Integer getMaxCount() {
+	public String getMaxCountExpression() {
 		return maxCountExpression;
 	}
 
-	public void setMaxCount(Integer maxCount) {
-		this.maxCountExpression = maxCount;
+	public void setMaxCountExpression(String expression) {
+		this.maxCountExpression = expression;
 	}
 
 	public String getTabName() {

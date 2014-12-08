@@ -248,7 +248,7 @@ package org.openforis.collect.ui.component.input {
 			var parent:EntityProxy = node.parent;
 			var label:String = nodeDefn.getInstanceOrHeadingLabelText();
 			var count:int = parent.getCount(nodeDefn.name);
-			var effectiveMinCount:Number = node.parent.getEffectiveMinCount(nodeDefn.name);
+			var effectiveMinCount:Number = node.parent.getMinCount(nodeDefn);
 			if(count == effectiveMinCount) {
 				AlertUtil.showMessage("global.cannotDelete", [label, effectiveMinCount], "global.cannotDeleteTitle");
 				return false;

@@ -61,20 +61,6 @@ public class EntityProxy extends NodeProxy {
 	}
 
 	@ExternalizedProperty
-	public Map<String, Boolean> getChildrenRequiredMap(){
-		Map<String, Boolean> map = new HashMap<String, Boolean>();
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
-		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( isAppliable(childDefinition) ) {
-				String childName = childDefinition.getName();
-				boolean required = entity.isRequired(childName );
-				map.put(childName, required);
-			}
-		}
-		return map;
-	}
-	
-	@ExternalizedProperty
 	public Map<String, ValidationResultFlag> getChildrenMinCountValidationMap(){
 		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
 		List<NodeDefinition> childDefinitions = getChildDefinitions();
@@ -97,6 +83,30 @@ public class EntityProxy extends NodeProxy {
 				String childName = childDefinition.getName();
 				ValidationResultFlag valid = entity.getMaxCountValidationResult(childName);
 				map.put(childName, valid);
+			}
+		}
+		return map;
+	}
+	
+	@ExternalizedProperty
+	public Map<Integer, Integer> getMinCountByChildDefinitionId(){
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		for (NodeDefinition childDefinition : getChildDefinitions()) {
+			if ( isAppliable(childDefinition) ) {
+				int count = entity.getMinCount(childDefinition);
+				map.put(childDefinition.getId(), count);
+			}
+		}
+		return map;
+	}
+
+	@ExternalizedProperty
+	public Map<Integer, Integer> getMaxCountByChildDefinitionId(){
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		for (NodeDefinition childDefinition : getChildDefinitions()) {
+			if ( isAppliable(childDefinition) ) {
+				Integer count = entity.getMaxCount(childDefinition);
+				map.put(childDefinition.getId(), count);
 			}
 		}
 		return map;

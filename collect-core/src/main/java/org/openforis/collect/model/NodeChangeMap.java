@@ -194,25 +194,32 @@ public class NodeChangeMap implements NodeChangeSet {
 	public void addRelevanceChanges(Set<NodePointer> pointers) {
 		for (NodePointer nodePointer : pointers) {
 			EntityChange change = prepareEntityChange(nodePointer.getEntity());
-			change.setChildrenRelevance(nodePointer.getChildName(), nodePointer.areNodesRelevant());
+			change.setRelevance(nodePointer.getChildName(), nodePointer.areNodesRelevant());
 		}
 	}
 
-	public void addRequirenessChanges(Set<NodePointer> pointers) {
+	public void addMinCountChanges(Set<NodePointer> pointers) {
 		for (NodePointer nodePointer : pointers) {
 			EntityChange change = prepareEntityChange(nodePointer.getEntity());
-			change.setChildrenRequireness(nodePointer.getChildName(), nodePointer.areNodesRequired());
+			change.setMinCount(nodePointer.getChildDefinitionId(), nodePointer.getNodesMinCount());
+		}
+	}
+
+	public void addMaxCountChanges(Set<NodePointer> pointers) {
+		for (NodePointer nodePointer : pointers) {
+			EntityChange change = prepareEntityChange(nodePointer.getEntity());
+			change.setMaxCount(nodePointer.getChildDefinitionId(), nodePointer.getNodesMaxCount());
 		}
 	}
 
 	public void addMinCountValidationResultChange(NodePointer nodePointer, ValidationResultFlag minCountResult) {
 		EntityChange change = prepareEntityChange(nodePointer.getEntity());
-		change.setChildrenMinCountValidation(nodePointer.getChildName(), minCountResult);
+		change.setMinCountValidation(nodePointer.getChildName(), minCountResult);
 	}
 
 	public void addMaxCountValidationResultChange(NodePointer nodePointer, ValidationResultFlag maxCountResult) {
 		EntityChange change = prepareEntityChange(nodePointer.getEntity());
-		change.setChildrenMaxCountValidation(nodePointer.getChildName(), maxCountResult);
+		change.setMaxCountValidation(nodePointer.getChildName(), maxCountResult);
 		
 	}
 

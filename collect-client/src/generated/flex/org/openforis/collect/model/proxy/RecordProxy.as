@@ -198,8 +198,11 @@ package org.openforis.collect.model.proxy {
 			if ( change.relevant != null && change.relevant.length > 0 ) {
 				e.updateChildrenRelevanceMap(change.relevant);
 			}
-			if ( change.required != null && change.required.length > 0 ) {
-				e.updateChildrenRequiredMap(change.required);
+			if ( change.minCountByChildDefinitionId != null && change.minCountByChildDefinitionId.length > 0 ) {
+				e.updateMinCountByChild(change.minCountByChildDefinitionId);
+			}
+			if ( change.maxCountByChildDefinitionId != null && change.maxCountByChildDefinitionId.length > 0 ) {
+				e.updateMaxCountByChild(change.maxCountByChildDefinitionId);
 			}
 		}
 		

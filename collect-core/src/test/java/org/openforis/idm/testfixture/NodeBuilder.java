@@ -3,30 +3,42 @@ package org.openforis.idm.testfixture;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Survey;
-import org.openforis.idm.model.*;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Record;
+import org.openforis.idm.model.Value;
 
 public class NodeBuilder {
 	
 	private boolean buildsAttribute;
 	private String name;
-	private String value;
+	private Object value;
 	private NodeBuilder[] builders;
 	
-	private NodeBuilder(boolean buildsAttribute, String name, String value, NodeBuilder... builders) {
+	private NodeBuilder(boolean buildsAttribute, String name, Object value, NodeBuilder... builders) {
 		this.buildsAttribute = buildsAttribute;
 		this.name = name;
 		this.value = value;
 		this.builders = builders;
 	}
 
-	public static Record record(Survey survey, NodeBuilder... builders) {
-		List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
-		String rootEntityName = rootEntityDefs.get(rootEntityDefs.size() - 1).getName();
-		Record record = survey.createRecord();
+	public static <R extends Record> R record(Survey survey, NodeBuilder... builders) {
+		return record(survey, (String) null, (String) null, builders);
+	}
+	
+	public static <R extends Record> R record(Survey survey, String rootEntityName, String versionName, NodeBuilder... builders) {
+		if (rootEntityName == null) {
+			List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
+			rootEntityName = rootEntityDefs.get(rootEntityDefs.size() - 1).getName();
+		}
+		@SuppressWarnings("unchecked")
+		R record = (R) survey.createRecord(versionName);
 		Entity rootEntity = record.createRootEntity(rootEntityName);
 		addChildren(rootEntity, builders);
 		return record;
@@ -54,7 +66,7 @@ public class NodeBuilder {
 		return attribute(name, null);
 	}
 	
-	public static NodeBuilder attribute(String name, String value) {
+	public static NodeBuilder attribute(String name, Object value) {
 		return new NodeBuilder(true, name, value);
 	}
 	
@@ -83,11 +95,15 @@ public class NodeBuilder {
 	}
 	
 	private Attribute<?, ?> createAttribute(Entity parent) {
-		NodeDefinition def = parent.getDefinition().getChildDefinition(name);
+		AttributeDefinition def = (AttributeDefinition) parent.getDefinition().getChildDefinition(name);
 		@SuppressWarnings("unchecked")
-		Attribute<?, TextValue> attr = (Attribute<?, TextValue>) def.createNode();
+		Attribute<?, Value> attr = (Attribute<?, Value>) def.createNode();
 		if ( value != null ) {
-			attr.setValue(new TextValue(value));
+			if (value instanceof Value) {
+				attr.setValue((Value) value);
+			} else {
+				attr.setValue(def.<Value>createValue(value.toString()));
+			}
 			attr.updateSummaryInfo();
 		}
 		return attr;

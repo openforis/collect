@@ -576,12 +576,20 @@ public class Survey implements Serializable {
 		return getSurveyDependencies().getRelevanceSources(definition);
 	}
 
-	public Set<NodePathPointer> getRequiredDependencies(NodeDefinition definition) {
-		return getSurveyDependencies().getRequiredDependencies(definition);
+	public Set<NodePathPointer> getMinCountDependencies(NodeDefinition definition) {
+		return getSurveyDependencies().getMinCountDependencies(definition);
 	}
 	
-	public Set<NodePathPointer> getRequiredSources(NodeDefinition definition) {
-		return getSurveyDependencies().getRequiredSources(definition);
+	public Set<NodePathPointer> getMinCountSources(NodeDefinition definition) {
+		return getSurveyDependencies().getMinCountSources(definition);
+	}
+	
+	public Set<NodePathPointer> getMaxCountDependencies(NodeDefinition definition) {
+		return getSurveyDependencies().getMaxCountDependencies(definition);
+	}
+	
+	public Set<NodePathPointer> getMaxCountSources(NodeDefinition definition) {
+		return getSurveyDependencies().getMaxCountSources(definition);
 	}
 	
 	public Set<NodePathPointer> getCalculatedValueDependencies(NodeDefinition definition) {

@@ -18,6 +18,8 @@ public abstract class NodeDefinitionBuilder {
 	protected boolean required;
 	private String relevantExpression;
 	private String requiredExpression;
+	private String minCountExpression;
+	private String maxCountExpression;
 
 	public NodeDefinitionBuilder(String name) {
 		this.name = name;
@@ -43,6 +45,16 @@ public abstract class NodeDefinitionBuilder {
 		return this;
 	}
 
+	public NodeDefinitionBuilder minCount(String expression) {
+		this.minCountExpression = expression;
+		return this;
+	}
+	
+	public NodeDefinitionBuilder maxCount(String expression) {
+		this.maxCountExpression = expression;
+		return this;
+	}
+	
 	public static EntityDefinition rootEntityDef(Survey survey, String name, NodeDefinitionBuilder... builders) {
 		EntityDefinitionBuilder entityBuilder = new EntityDefinitionBuilder(name, builders);
 		EntityDefinition rootEntityDef = (EntityDefinition) entityBuilder.buildInternal(survey);
@@ -72,11 +84,14 @@ public abstract class NodeDefinitionBuilder {
 	protected void initNodeDefinition(NodeDefinition def) {
 		def.setName(name);
 		def.setMultiple(multiple);
-		if ( requiredExpression == null && required ) {
-			def.setMinCount(1);
-		} else {
+		if ( requiredExpression != null) {
 			def.setRequiredExpression(requiredExpression);
+		} else if( required ) {
+			def.setAlwaysRequired();
+		} else if (minCountExpression != null) {
+			def.setMinCountExpression(minCountExpression);
 		}
+		def.setMaxCountExpression(maxCountExpression);
 		def.setRelevantExpression(relevantExpression);
 	}
 	

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePathPointer;
@@ -18,12 +20,15 @@ import org.openforis.idm.path.Path;
  * @author M. Togna
  */
 public abstract class NodeDefinition extends VersionableSurveyObject {
+
+	private static final Pattern MIN_COUNT_FROM_REQUIRED_EXPRESSION_PATTERN = Pattern.compile("number\\((.+)\\)");
+	private static final String MIN_COUNT_FROM_REQUIRED_EXPRESSION_FORMAT = "number(%s)";
+
 	private static final long serialVersionUID = 1L;
 
 	private NodeDefinition parentDefinition;
 	private String name;
 	private String relevantExpression;
-	private String requiredExpression;
 	private boolean multiple;
 	private String minCountExpression;
 	private String maxCountExpression;
@@ -80,10 +85,6 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return this.relevantExpression;
 	}
 
-	public String getRequiredExpression() {
-		return requiredExpression;
-	}
-
 	/**
 	 * This property must be true for root entities
 	 */
@@ -95,16 +96,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return minCountExpression;
 	}
 
-	public boolean hasMinCount() {
-		return minCountExpression != null;
-	}
-	
 	public String getMaxCountExpression() {
 		return maxCountExpression;
-	}
-	
-	public boolean hasMaxCount() {
-		return maxCountExpression != null;
 	}
 	
 	public List<NodeLabel> getLabels() {
@@ -337,19 +330,32 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return result;
 	}
 
-	public Set<NodePathPointer> getRequiredExpressionDependencies() {
+	public Set<NodePathPointer> getMinCountDependencies() {
 		Survey survey = getSurvey();
-		return survey.getRequiredDependencies(this);
+		return survey.getMinCountDependencies(this);
 	}
 
-	public List<NodeDefinition> getRequirenessDependentDefinitions() {
+	public Set<NodePathPointer> getMaxCountDependencies() {
+		Survey survey = getSurvey();
+		return survey.getMaxCountDependencies(this);
+	}
+	
+	public List<NodeDefinition> getMinCountDependentDefinitions() {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
-		for (NodePathPointer nodePathPointer : this.getRequiredExpressionDependencies()) {
+		for (NodePathPointer nodePathPointer : getMinCountDependencies()) {
 			result.add(nodePathPointer.getReferencedNodeDefinition());
 		}
 		return result;
 	}
 	
+	public List<NodeDefinition> getMaxCountDependentDefinitions() {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		for (NodePathPointer nodePathPointer : getMaxCountDependencies()) {
+			result.add(nodePathPointer.getReferencedNodeDefinition());
+		}
+		return result;
+	}
+
 	public Set<NodePathPointer> getCalculatedValueDependencies() {
 		Survey survey = getSurvey();
 		return survey.getCalculatedValueDependencies(this);
@@ -385,8 +391,25 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		this.relevantExpression = relevantExpression;
 	}
 
+	public String extractRequiredExpression() {
+		if (minCountExpression == null) {
+			return null;
+		}
+		Matcher matcher = MIN_COUNT_FROM_REQUIRED_EXPRESSION_PATTERN.matcher(minCountExpression);
+		if (matcher.matches()) {
+			String expression = matcher.group(1);
+			return expression;
+		} else {
+			return null;
+		}
+	}
+	
 	public void setRequiredExpression(String requiredExpression) {
-		this.requiredExpression = requiredExpression;
+		if (requiredExpression == null) {
+			this.minCountExpression = null;
+		} else {
+			this.minCountExpression = String.format(MIN_COUNT_FROM_REQUIRED_EXPRESSION_FORMAT, requiredExpression);
+		}
 	}
 
 	/**
@@ -431,7 +454,6 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((prompts == null) ? 0 : prompts.hashCode());
 		result = prime * result + ((relevantExpression == null) ? 0 : relevantExpression.hashCode());
-		result = prime * result + ((requiredExpression == null) ? 0 : requiredExpression.hashCode());
 		return result;
 	}
 
@@ -482,11 +504,6 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 			if (other.relevantExpression != null)
 				return false;
 		} else if (!relevantExpression.equals(other.relevantExpression))
-			return false;
-		if (requiredExpression == null) {
-			if (other.requiredExpression != null)
-				return false;
-		} else if (!requiredExpression.equals(other.requiredExpression))
 			return false;
 		return true;
 	}

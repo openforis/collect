@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -12,6 +13,7 @@ import org.openforis.idm.metamodel.Prompt;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
+
 import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
@@ -60,28 +62,30 @@ abstract class NodeDefinitionPR extends IdmlPullReader {
 		String relevant = getAttribute(RELEVANT, false);
 		String minCountExpression = getAttribute(MIN_COUNT, false);
 		Boolean multiple = getBooleanAttribute(MULTIPLE, false);
+		String maxCountExpression = getAttribute(MAX_COUNT, false);
+
 		if ( parentDefinition == null ) {
 			if ( multiple != null ) {
 				throw new XmlParseException(getParser(), "attribute 'multiple' not allowed for root entity");
 			}
-			multiple = true;
-		} else {
-			multiple = multiple==null ? false : multiple;
+			multiple = true; //root entity is always multiple
+		} else if (multiple == null) {
+			multiple = StringUtils.isNotBlank(maxCountExpression);
 		}
-		// TODO maxCount should be required for multiple attributes
-//		Integer maxCount = getIntegerAttribute("maxCount", multiple && defn instanceof AttributeDefinition);
-		String maxCountExpression = getAttribute(MAX_COUNT, false);
 		definition.setMultiple(multiple);
 		definition.setName(name);
 		definition.setSinceVersionByName(since);
 		definition.setDeprecatedVersionByName(deprecated);
-		if ( minCountExpression == null && required != null && required ) {
-			definition.setAlwaysRequired();
+		if ( minCountExpression == null) {
+			if (required != null && required ) {
+				definition.setAlwaysRequired();
+			} else {
+				definition.setRequiredExpression(requiredIf);
+			}
 		} else {
 			definition.setMinCountExpression(minCountExpression);
 		}
 		definition.setMaxCountExpression(maxCountExpression);
-		definition.setRequiredExpression(requiredIf);
 		definition.setRelevantExpression(relevant);
 		
 		onStartDefinition();
