@@ -42,7 +42,7 @@ public class ExpressionEvaluator {
 			return Double.parseDouble(expression);
 		} else {
 			Object val = evaluateValue(context, thisNode, expression);
-			return (Number) val;
+			return val == null ? null: val instanceof Number ?(Number) val: Double.parseDouble(val.toString());
 		}
 	}
 

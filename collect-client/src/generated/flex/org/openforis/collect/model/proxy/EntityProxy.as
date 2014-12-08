@@ -7,7 +7,6 @@
 
 package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
-	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.collections.Sort;

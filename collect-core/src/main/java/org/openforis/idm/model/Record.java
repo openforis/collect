@@ -158,21 +158,24 @@ public class Record {
 		return this.nodesByInternalId.get(id);
 	}
 
-	public Node<?> findNodeByPath(String path) {
+	public <N extends Node<?>> N findNodeByPath(String path) {
 		List<Node<?>> nodes = findNodesByPath(path);
 		if ( nodes.size() == 0 ) {
 			return null;
 		} else if ( nodes.size() == 1 ) {
-			return nodes.get(0);
+			@SuppressWarnings("unchecked")
+			N n = (N) nodes.get(0);
+			return n;
 		} else {
 			throw new IllegalArgumentException(
 					"Multiple nodes found for path: " + path);
 		}
 	}
 
-	public List<Node<?>> findNodesByPath(String path) {
+	public <N extends Node<?>> List<N> findNodesByPath(String path) {
 		Path p = Path.parse(path);
-		List<Node<?>> result = p.evaluate(this);
+		@SuppressWarnings("unchecked")
+		List<N> result = (List<N>) p.evaluate(this);
 		return result;
 	}
 	

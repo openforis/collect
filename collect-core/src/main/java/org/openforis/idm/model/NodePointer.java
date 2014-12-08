@@ -32,11 +32,11 @@ public class NodePointer {
 		this(entity, entity.getDefinition().getChildDefinition(childName));
 	}
 
-	public int getNodesMinCount() {
+	public Integer getNodesMinCount() {
 		return entity.getMinCount(childDefinition);
 	}
 	
-	public int getNodesMaxCount() {
+	public Integer getNodesMaxCount() {
 		return entity.getMaxCount(childDefinition);
 	}
 	

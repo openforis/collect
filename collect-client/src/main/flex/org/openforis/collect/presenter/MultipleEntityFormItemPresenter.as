@@ -121,7 +121,7 @@ package org.openforis.collect.presenter
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var entities:IList = getEntities();
 			var maxCount:Number = view.parentEntity.getMaxCount(view.entityDefinition);
-			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
+			if(CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
 				var r:EntityAddRequestProxy = new EntityAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
 				r.nodeName = view.entityDefinition.name;

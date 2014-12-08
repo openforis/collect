@@ -100,7 +100,7 @@ package org.openforis.collect.presenter
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var attributes:IList = getAttributes();
 			var maxCount:Number = view.parentEntity.getMaxCount(view.attributeDefinition);
-			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
+			if(CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
 				var r:AttributeAddRequestProxy = new AttributeAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
 				r.nodeName = view.attributeDefinition.name;

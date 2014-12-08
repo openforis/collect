@@ -519,11 +519,11 @@ public class Entity extends Node<EntityDefinition> {
 		return derivedStateCache.getMaxCount(childDefinitionId);
 	}
 	
-	public void setMaxCount(NodeDefinition childDefn, Integer count) {
+	public void setMaxCount(NodeDefinition childDefn, int count) {
 		setMaxCount(childDefn.getId(), count);
 	}
 
-	public void setMaxCount(int childDefinitionId, Integer count) {
+	public void setMaxCount(int childDefinitionId, int count) {
 		derivedStateCache.setMaxCount(childDefinitionId, count);
 	}
 

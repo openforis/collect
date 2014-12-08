@@ -354,7 +354,7 @@ public class RecordUpdater {
 			Entity entity = nodePointer.getEntity();
 			int childDefId = nodePointer.getChildDefinitionId();
 			Integer oldCount = entity.getMaxCount(childDefId);
-			Integer newCount  = calculateMaxCount(nodePointer);
+			int newCount  = calculateMaxCount(nodePointer);
 			entity.setMaxCount(childDefId, newCount);
 			if ( ! ObjectUtils.equals(oldCount, newCount) ) {
 				updatedPointers.add(nodePointer);
@@ -847,24 +847,20 @@ public class RecordUpdater {
 		}
 	}
 
-	private Integer calculateMaxCount(NodePointer nodePointer) {
+	private int calculateMaxCount(NodePointer nodePointer) {
 		return calculateMaxCount(nodePointer.getEntity(), nodePointer.getChildDefinition());
 	}
 
-	private Integer calculateMaxCount(Entity entity, NodeDefinition defn) {
+	private int calculateMaxCount(Entity entity, NodeDefinition defn) {
 		String expression = defn.getMaxCountExpression();
 		if ( ! entity.isRelevant(defn.getName()) || StringUtils.isBlank(expression) ) {
-			if (defn.isMultiple()) {
-				return null;
-			} else {
-				return 1;
-			}
+			return defn.isMultiple() ? Integer.MAX_VALUE: 1;
 		}
 		try {
 			SurveyContext surveyContext = defn.getSurvey().getContext();
 			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 			Number value = expressionEvaluator.evaluateNumericValue(entity, null, expression);
-			return value == null ? null: value.intValue();
+			return value == null ? Integer.MAX_VALUE: value.intValue();
 		} catch (InvalidExpressionException e) {
 			throw new IdmInterpretationError("Error evaluating required expression", e);
 		}
