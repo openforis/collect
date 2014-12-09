@@ -116,7 +116,7 @@ public class DataMarshaller {
 	}
 
 	private void writeChildren(XmlSerializer serializer, Entity rootEntity) throws IOException {
-		List<Node<?>> children = rootEntity.getChildren();
+		List<Node<?>> children = rootEntity.getAll();
 		for (Node<?> node : children) {
 			write(serializer, node);
 		}

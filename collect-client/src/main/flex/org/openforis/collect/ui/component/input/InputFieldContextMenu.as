@@ -105,9 +105,9 @@ package org.openforis.collect.ui.component.input {
 						}
 						// CONFIRM ERROR ITEM
 						if( ! _inputField.isEmpty()) {
-							var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(attrDefn.name);
+							var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(attrDefn);
 							if(hasErrors) {
-								var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(attrDefn.name);
+								var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(attrDefn);
 								if(! hasConfirmedError) {
 									items.push(CONFIRM_ERROR);
 								}
@@ -230,7 +230,7 @@ package org.openforis.collect.ui.component.input {
 			var event:NodeEvent = new NodeEvent(type);
 			var attrDefn:AttributeDefinitionProxy = inputField.attributeDefinition;
 			if(attrDefn.multiple && inputField is TextCodeInputField) {
-				event.nodes = inputField.parentEntity.getChildren(attrDefn.name);
+				event.nodes = inputField.parentEntity.getChildren(attrDefn);
 			} else {
 				event.node = inputField.attribute;
 				event.fieldIdx = inputField.fieldIndex;
@@ -247,7 +247,7 @@ package org.openforis.collect.ui.component.input {
 		private static function checkCanDelete(node:NodeProxy, nodeDefn:NodeDefinitionProxy):Boolean {
 			var parent:EntityProxy = node.parent;
 			var label:String = nodeDefn.getInstanceOrHeadingLabelText();
-			var count:int = parent.getCount(nodeDefn.name);
+			var count:int = parent.getCount(nodeDefn);
 			var effectiveMinCount:Number = node.parent.getMinCount(nodeDefn);
 			if(count == effectiveMinCount) {
 				AlertUtil.showMessage("global.cannotDelete", [label, effectiveMinCount], "global.cannotDeleteTitle");

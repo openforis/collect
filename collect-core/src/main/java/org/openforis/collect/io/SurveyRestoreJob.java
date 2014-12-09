@@ -150,6 +150,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private void saveSurvey() {
 		try {
 			if ( survey.isWork() ) {

@@ -42,7 +42,7 @@ public abstract class NodeDependencyGraph extends DependencyGraph<Node<?>> {
 	@Override
 	protected List<Node<?>> getChildren(Node<?> node) {
 		if ( node instanceof Entity ) {
-			return ((Entity) node).getChildren();
+			return ((Entity) node).getAll();
 		} else {
 			return Collections.emptyList();
 		}
@@ -62,7 +62,7 @@ public abstract class NodeDependencyGraph extends DependencyGraph<Node<?>> {
 		List<Node<?>> relatedParentEntities = new ArrayList<Node<?>>();
 		relatedParentEntities = Path.parse(relatedParentEntityPath).evaluate(parent);
 		for (Node<?> relatedParentEntity : relatedParentEntities) {
-			List<Node<?>> dependentNodes = ((Entity) relatedParentEntity).getAll(relatedChildDef.getName());
+			List<Node<?>> dependentNodes = ((Entity) relatedParentEntity).getAll(relatedChildDef);
 			relatedNodes.addAll(dependentNodes);
 		}
 		return relatedNodes;
@@ -70,7 +70,7 @@ public abstract class NodeDependencyGraph extends DependencyGraph<Node<?>> {
 
 	@Override
 	protected Set<Node<?>> determineRelatedItems(Node<?> node, NodeDefinition childDef) {
-		List<Node<?>> dependentNodes = node.getParent().getAll(childDef.getName());
+		List<Node<?>> dependentNodes = node.getParent().getAll(childDef);
 		Set<Node<?>> relatedNodes = new HashSet<Node<?>>();
 		relatedNodes.addAll(dependentNodes);
 		return relatedNodes;

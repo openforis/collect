@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -246,7 +247,8 @@ public class RecordValidationCache {
 			Entity entity = (Entity) record.getNodeByInternalId(id);
 			Set<String> set = minCounts.get(id);
 			for (String childName : set) {
-				int missingCount = entity.getMissingCount(childName);
+				NodeDefinition childDef = entity.getDefinition().getChildDefinition(childName);
+				int missingCount = entity.getMissingCount(childDef);
 				result += missingCount;
 			}
 		}

@@ -126,8 +126,8 @@ package org.openforis.collect.presenter {
 		
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
 			if(event.newValue == true && (view.attribute != null || view.attributeDefinition.multiple && view.attributes != null)) {
-				var attributeName:String = view.attributeDefinition.name;
-				view.parentEntity.showErrorsOnChild(attributeName);
+				var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
+				view.parentEntity.showErrorsOnChild(attrDefn);
 			}
 			updateValidationDisplayManager();
 		}
@@ -152,15 +152,15 @@ package org.openforis.collect.presenter {
 				if(_validationDisplayManager == null) {
 					initValidationDisplayManager();
 				}
-				var attributeName:String = view.attributeDefinition.name;
-				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(attributeName);
+				var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
+				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(attrDefn);
 				var active:Boolean = visited && !_updating && (view.attribute != null || view.attributes != null);
 				if(active) {
 					_validationDisplayManager.active = true;
 					if (view.attribute != null ) {
-						_validationDisplayManager.displayAttributeValidation(view.parentEntity, view.attributeDefinition, view.attribute);
+						_validationDisplayManager.displayAttributeValidation(view.parentEntity, attrDefn, view.attribute);
 					} else {
-						_validationDisplayManager.displayAttributesValidation(view.parentEntity, view.attributeDefinition);
+						_validationDisplayManager.displayAttributesValidation(view.parentEntity, attrDefn);
 					}
 				} else {
 					_validationDisplayManager.active = false;

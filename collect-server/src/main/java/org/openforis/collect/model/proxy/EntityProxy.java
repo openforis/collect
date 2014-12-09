@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.model.proxy;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,100 +33,92 @@ public class EntityProxy extends NodeProxy {
 		this.entity = entity;
 	}
 	
+
 	@ExternalizedProperty
-	public Map<String, List<NodeProxy>> getChildrenByName() {
-		Map<String, List<NodeProxy>> result = new HashMap<String, List<NodeProxy>>();
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
+	public Map<Integer, List<NodeProxy>> getChildrenByDefinitionId() {
+		Map<Integer, List<NodeProxy>> result = new HashMap<Integer, List<NodeProxy>>();
+		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( isAppliable(childDefinition) ) {
-				String name = childDefinition.getName();
-				List<Node<?>> childrenByName = this.entity.getAll(name);
-				List<NodeProxy> proxies = NodeProxy.fromList(this, childrenByName, getLocale());
-				result.put(name, proxies);
-			}
+			List<Node<?>> nodes = this.entity.getAll(childDefinition);
+			List<NodeProxy> proxies = NodeProxy.fromList(this, nodes, getLocale());
+			result.put(childDefinition.getId(), proxies);
 		}
 		return result;
 	}
 
 	@ExternalizedProperty
-	public Map<String, Boolean> getChildrenRelevanceMap(){
-		Map<String, Boolean> map = new HashMap<String, Boolean>();
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
+	public List<Boolean> getChildrenRelevance() {
+		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
+		List<Boolean> result = new ArrayList<Boolean>(childDefinitions.size());
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( isAppliable(childDefinition) ) {
-				String childName = childDefinition.getName();
-				boolean relevant = entity.isRelevant(childName);
-				map.put(childName, relevant);
-			}
+			boolean relevant = entity.isRelevant(childDefinition);
+			result.add(relevant);
 		}
-		return map;
+		return result;
 	}
 
 	@ExternalizedProperty
-	public Map<String, ValidationResultFlag> getChildrenMinCountValidationMap(){
-		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
+	public List<ValidationResultFlag> getChildrenMinCountValidation() {
+		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
+		List<ValidationResultFlag> result = new ArrayList<ValidationResultFlag>(childDefinitions.size());
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( isAppliable(childDefinition) ) {
-				String childName = childDefinition.getName();
-				ValidationResultFlag valid = entity.getMinCountValidationResult(childName);
-				map.put(childName, valid);
-			}
+			ValidationResultFlag valid = entity.getMinCountValidationResult(childDefinition);
+			result.add(valid);
 		}
-		return map;
+		return result;
 	}
 
 	@ExternalizedProperty
-	public Map<String, ValidationResultFlag> getChildrenMaxCountValidationMap(){
-		Map<String, ValidationResultFlag> map = new HashMap<String, ValidationResultFlag>();
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
+	public List<ValidationResultFlag> getChildrenMaxCountValidation() {
+		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
+		List<ValidationResultFlag> result = new ArrayList<ValidationResultFlag>(childDefinitions.size());
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( isAppliable(childDefinition) ) {
-				String childName = childDefinition.getName();
-				ValidationResultFlag valid = entity.getMaxCountValidationResult(childName);
-				map.put(childName, valid);
-			}
+			ValidationResultFlag valid = entity.getMaxCountValidationResult(childDefinition);
+			result.add(valid);
 		}
-		return map;
+		return result;
 	}
 	
 	@ExternalizedProperty
-	public Map<Integer, Integer> getMinCountByChildDefinitionId(){
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-		for (NodeDefinition childDefinition : getChildDefinitions()) {
-			if ( isAppliable(childDefinition) ) {
-				int count = entity.getMinCount(childDefinition);
-				map.put(childDefinition.getId(), count);
-			}
-		}
-		return map;
-	}
-
-	@ExternalizedProperty
-	public Map<Integer, Integer> getMaxCountByChildDefinitionId(){
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-		for (NodeDefinition childDefinition : getChildDefinitions()) {
-			if ( isAppliable(childDefinition) ) {
-				Integer count = entity.getMaxCount(childDefinition);
-				map.put(childDefinition.getId(), count);
-			}
-		}
-		return map;
-	}
-
-	@ExternalizedProperty
-	public Map<String, Boolean> getShowChildrenErrorsMap() {
-		Map<String, Boolean> map = new HashMap<String, Boolean>();
-		List<NodeDefinition> childDefinitions = getChildDefinitions();
+	public List<Integer> getChildrenMinCount() {
+		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
+		List<Integer> result = new ArrayList<Integer>(childDefinitions.size());
 		for (NodeDefinition childDefinition : childDefinitions) {
-			if ( isAppliable(childDefinition) ) {
-				String childName = childDefinition.getName();
-				map.put(childName, Boolean.FALSE);
-			}
+			int count = entity.getMinCount(childDefinition);
+			result.add(count);
 		}
-		return map;
+		return result;
 	}
 
+	@ExternalizedProperty
+	public List<Integer> getChildrenMaxCount() {
+		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
+		List<Integer> result = new ArrayList<Integer>(childDefinitions.size());
+		for (NodeDefinition childDefinition : getChildDefinitionsInVersion()) {
+			Integer count = entity.getMaxCount(childDefinition);
+			result.add(count);
+		}
+		return result;
+	}
+
+	@ExternalizedProperty
+	public List<Boolean> getChildrenErrorVisible() {
+		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
+		List<Boolean> result = new ArrayList<Boolean>(childDefinitions.size());
+		Collections.fill(result, Boolean.FALSE);
+		return result;
+	}
+
+	private List<NodeDefinition> getChildDefinitionsInVersion() {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		for (NodeDefinition childDefinition : getChildDefinitions()) {
+			if ( isAppliable(childDefinition) ) {
+				result.add(childDefinition);
+			}
+		}
+		return result;
+	}
+	
 	protected boolean isAppliable(NodeDefinition childDefinition) {
 		Record record = entity.getRecord();
 		ModelVersion version = record.getVersion();

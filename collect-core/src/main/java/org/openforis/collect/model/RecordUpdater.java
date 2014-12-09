@@ -341,10 +341,10 @@ public class RecordUpdater {
 		Set<NodePointer> updatedPointers = new HashSet<NodePointer>();
 		for (NodePointer nodePointer : nodePointers) {
 			Entity entity = nodePointer.getEntity();
-			int childDefId = nodePointer.getChildDefinitionId();
-			Integer oldCount = entity.getMinCount(childDefId);
+			NodeDefinition childDef = nodePointer.getChildDefinition();
+			Integer oldCount = entity.getMinCount(childDef);
 			int newCount  = calculateMinCount(nodePointer);
-			entity.setMinCount(childDefId, newCount);
+			entity.setMinCount(childDef, newCount);
 			if ( oldCount == null || oldCount.intValue() != newCount ) {
 				updatedPointers.add(nodePointer);
 			}
@@ -356,10 +356,10 @@ public class RecordUpdater {
 		Set<NodePointer> updatedPointers = new HashSet<NodePointer>();
 		for (NodePointer nodePointer : nodePointers) {
 			Entity entity = nodePointer.getEntity();
-			int childDefId = nodePointer.getChildDefinitionId();
-			Integer oldCount = entity.getMaxCount(childDefId);
+			NodeDefinition childDef = nodePointer.getChildDefinition();
+			Integer oldCount = entity.getMaxCount(childDef);
 			int newCount  = calculateMaxCount(nodePointer);
-			entity.setMaxCount(childDefId, newCount);
+			entity.setMaxCount(childDef, newCount);
 			if ( ! ObjectUtils.equals(oldCount, newCount) ) {
 				updatedPointers.add(nodePointer);
 			}
@@ -372,23 +372,23 @@ public class RecordUpdater {
 		Validator validator = record.getSurveyContext().getValidator();
 		for (NodePointer nodePointer : pointers) {
 			Entity entity = nodePointer.getEntity();
-			String childName = nodePointer.getChildName();
+			NodeDefinition childDef = nodePointer.getChildDefinition();
 			
 			ValidationResultFlag minCountResult, maxCountResult;
 			
-			if ( entity.isRelevant(childName) ) {
-				minCountResult = validator.validateMinCount(entity, childName);
-				maxCountResult = validator.validateMaxCount(entity, childName);
+			if ( entity.isRelevant(childDef) ) {
+				minCountResult = validator.validateMinCount(entity, childDef);
+				maxCountResult = validator.validateMaxCount(entity, childDef);
 			} else {
 				minCountResult = maxCountResult = ValidationResultFlag.OK;
 			}
-			if ( entity.getMinCountValidationResult(childName) != minCountResult ) {
-				entity.setMinCountValidationResult(childName, minCountResult);
+			if ( entity.getMinCountValidationResult(childDef) != minCountResult ) {
+				entity.setMinCountValidationResult(childDef, minCountResult);
 				changeMap.addMinCountValidationResultChange(nodePointer, minCountResult);
 				updatedPointers.add(nodePointer);
 			}
-			if ( entity.getMaxCountValidationResult(childName) != maxCountResult ) {
-				entity.setMaxCountValidationResult(childName, maxCountResult);
+			if ( entity.getMaxCountValidationResult(childDef) != maxCountResult ) {
+				entity.setMaxCountValidationResult(childDef, maxCountResult);
 				changeMap.addMaxCountValidationResultChange(nodePointer, maxCountResult);
 				updatedPointers.add(nodePointer);
 			}
@@ -494,10 +494,9 @@ public class RecordUpdater {
 	public void moveNode(CollectRecord record, int nodeId, int index) {
 		Node<?> node = record.getNodeByInternalId(nodeId);
 		Entity parent = node.getParent();
-		String name = node.getName();
-		List<Node<?>> siblings = parent.getAll(name);
+		List<Node<?>> siblings = parent.getAll(node.getDefinition());
 		int oldIndex = siblings.indexOf(node);
-		parent.move(name, oldIndex, index);
+		parent.move(node.getDefinition(), oldIndex, index);
 	}
 	
 	private Node<?> performNodeDeletion(Node<?> node) {
@@ -506,7 +505,7 @@ public class RecordUpdater {
 		}
 		Entity parentEntity = node.getParent();
 		int index = node.getIndex();
-		Node<?> deletedNode = parentEntity.remove(node.getName(), index);
+		Node<?> deletedNode = parentEntity.remove(node.getDefinition(), index);
 		return deletedNode;
 	}
 
@@ -530,7 +529,7 @@ public class RecordUpdater {
 	 * @throws InvalidExpressionException 
 	 */
 	private void applyDefaultValues(Entity entity) {
-		List<Node<?>> children = entity.getChildren();
+		List<Node<?>> children = entity.getAll();
 		for (Node<?> child: children) {
 			if ( child instanceof Attribute ) {
 				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
@@ -740,8 +739,7 @@ public class RecordUpdater {
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {
 			if(version == null || version.isApplicable(childDefn)) {
-				String childName = childDefn.getName();
-				if(entity.getCount(childName) == 0) {
+				if(entity.getCount(childDefn) == 0) {
 					int toBeInserted = entity.getMinCount(childDefn);
 					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
 						//insert at least one node
@@ -749,7 +747,7 @@ public class RecordUpdater {
 					}
 					addEmptyChildren(entity, childDefn, toBeInserted);
 				} else {
-					List<Node<?>> children = entity.getAll(childName);
+					List<Node<?>> children = entity.getAll(childDefn);
 					for (Node<?> child : children) {
 						if(child instanceof Entity) {
 							addEmptyNodes((Entity) child);
@@ -862,10 +860,10 @@ public class RecordUpdater {
 						Entity addedEntity = performEntityAdd(parentEntity, enumeratedEntityName, i);
 						addEmptyNodes(addedEntity);
 						//set the value of the key CodeAttribute
-						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn.getName(), 0);
+						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn, 0);
 						addedCode.setValue(new Code(code));
 					} else if (enumeratedEntity.getIndex() != i) {
-						parentEntity.move(enumeratedEntityName, enumeratedEntity.getIndex(), i);
+						parentEntity.move(enumerableEntityDefn, enumeratedEntity.getIndex(), i);
 					}
 					i++;
 				}
@@ -879,7 +877,7 @@ public class RecordUpdater {
 
 	private int calculateMinCount(Entity entity, NodeDefinition defn) {
 		String expression = defn.getMinCountExpression();
-		if ( ! entity.isRelevant(defn.getName()) || StringUtils.isBlank(expression) ) {
+		if ( ! entity.isRelevant(defn) || StringUtils.isBlank(expression) ) {
 			return 0;
 		}
 		try {
@@ -898,7 +896,7 @@ public class RecordUpdater {
 
 	private int calculateMaxCount(Entity entity, NodeDefinition defn) {
 		String expression = defn.getMaxCountExpression();
-		if ( ! entity.isRelevant(defn.getName()) || StringUtils.isBlank(expression) ) {
+		if ( ! entity.isRelevant(defn) || StringUtils.isBlank(expression) ) {
 			return defn.isMultiple() ? Integer.MAX_VALUE: 1;
 		}
 		try {
@@ -947,7 +945,7 @@ public class RecordUpdater {
 		for (NodeDefinition childDef : definition.getChildDefinitions()) {
 			pointers.add(new NodePointer(entity, childDef));
 			if ( childDef instanceof EntityDefinition ) {
-				for (Node<?> childEntity : entity.getAll(childDef.getName())) {
+				for (Node<?> childEntity : entity.getAll(childDef)) {
 					pointers.addAll(getDescendantNodePointers((Entity) childEntity));
 				}
 			}
@@ -1019,14 +1017,13 @@ public class RecordUpdater {
 				boolean relevant = parentRelevance ? calculateRelevance(nodePointer): false;
 
 				NodeDefinition childDef = nodePointer.getChildDefinition();
-				String childName = childDef.getName();
-				Boolean oldRelevance = entity.getRelevance(childName);
+				Boolean oldRelevance = entity.getRelevance(childDef);
 				
 				if ( oldRelevance == null || oldRelevance.booleanValue() != relevant ) {
-					entity.setRelevant(childName, relevant);
+					entity.setRelevant(childDef, relevant);
 					updatedNodePointers.add(nodePointer);
 					if ( childDef instanceof EntityDefinition ) {
-						List<Node<?>> nodes = entity.getChildren(childName);
+						List<Node<?>> nodes = entity.getAll(childDef);
 						for (Node<?> node : nodes) {
 							Entity childEntity = (Entity) node;
 							EntityDefinition childEntityDef = childEntity.getDefinition();

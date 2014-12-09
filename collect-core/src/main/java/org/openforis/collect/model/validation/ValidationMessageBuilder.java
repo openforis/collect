@@ -424,7 +424,7 @@ public class ValidationMessageBuilder {
 			List<String> shortKeyParts = new ArrayList<String>();
 			List<String> fullKeyParts = new ArrayList<String>();
 			for (AttributeDefinition keyDefn : keyDefns) {
-				Attribute<?, ?> keyAttr = (Attribute<?, ?>) entity.get(keyDefn.getName(), 0);
+				Attribute<?, ?> keyAttr = (Attribute<?, ?>) entity.get(keyDefn, 0);
 				if ( keyAttr != null ) {
 					Object keyValue = getKeyLabelPart(keyAttr);
 					if ( keyValue != null && StringUtils.isNotBlank(keyValue.toString()) ) {

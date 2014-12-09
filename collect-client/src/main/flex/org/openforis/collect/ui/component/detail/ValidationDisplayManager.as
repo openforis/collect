@@ -85,7 +85,7 @@ package org.openforis.collect.ui.component.detail
 			if(parentEntity != null && defn != null) {
 				var errorMessages:ArrayCollection = new ArrayCollection();
 				var warningMessages:ArrayCollection = new ArrayCollection();
-				var attributes:IList = parentEntity.getChildren(defn.name);
+				var attributes:IList = parentEntity.getChildren(defn);
 				var confirmedError:Boolean = false;
 				for each (var a:AttributeProxy in attributes) {
 					if (a.hasErrors()) {
@@ -122,9 +122,8 @@ package org.openforis.collect.ui.component.detail
 		public function displayMinMaxCountValidationErrors(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
 			var flag:ValidationResultFlag = null;
 			var validationMessages:IList = null;
-			var name:String = defn.name;
-			var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
-			var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
+			var minCountValid:ValidationResultFlag = parentEntity.getMinCountValidation(defn);
+			var maxCountValid:ValidationResultFlag = parentEntity.getMaxCountValidation(defn);
 			if(minCountValid != ValidationResultFlag.OK) {
 				flag = minCountValid;
 				var minCount:int = parentEntity.getMinCount(defn);

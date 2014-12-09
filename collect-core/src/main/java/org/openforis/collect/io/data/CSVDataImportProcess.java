@@ -404,7 +404,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private CodeAttribute getQualifiableCodeAttribute(Entity parentEntity, CodeAttributeDefinition attrDefn) {
 		CodeListItem qualifiableItem = getQualifiableItem(attrDefn);
 		if ( qualifiableItem != null ) {
-			List attributes = parentEntity.getAll(attrDefn.getName());
+			List attributes = parentEntity.getAll(attrDefn);
 			CodeAttribute codeAttr = findCodeAttributeByCode(qualifiableItem.getCode(), attributes);
 			if ( codeAttr != null ) {
 				return codeAttr;
@@ -452,11 +452,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			}
 		}
 		//remove old attributes
-		String attrName = attrDefn.getName();
-		int totalCount = parentEntity.getCount(attrName);
+		int totalCount = parentEntity.getCount(attrDefn);
 		if ( totalCount > newValuesCount ) {
 			for (int i = totalCount - 1; i >= newValuesCount; i--) {
-				Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrName, i);
+				Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrDefn, i);
 				boolean toBeDeleted = false;
 				if ( i == 0 ) {
 					//do not delete attribute if it's empty but it has remarks or field symbols
@@ -477,7 +476,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			AttributeDefinition attrDefn, int index, String fieldName,
 			String value, String colName, long row) {
 		String attrName = attrDefn.getName();
-		Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrName, index);
+		Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrDefn, index);
 		if ( attr == null ) {
 			attr = (Attribute<?, ?>) performNodeAdd(parentEntity, attrName);
 		}
@@ -526,7 +525,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private void setUnitField(Attribute<?, ?> attr, String value, long row,
 			String colName) {
 		if ( StringUtils.isBlank(value) ) {
-			((NumberAttribute) attr).setUnit(null);
+			((NumberAttribute<?, ?>) attr).setUnit(null);
 		} else {
 			Survey survey = attr.getSurvey();
 			Unit unit = survey.getUnit(value);
@@ -554,13 +553,12 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			Entity currentParent = ancestorEntity;
 			List<EntityDefinition> nearestAncestors = attributeAncestors.subList(indexOfAncestorEntity + 1, attributeAncestors.size());
 			for (EntityDefinition ancestor : nearestAncestors) {
-				String ancestorName = ancestor.getName();
-				if ( currentParent.getCount(ancestorName) == 0 ) {
+				if ( currentParent.getCount(ancestor) == 0 ) {
 					Entity newNode = (Entity) ancestor.createNode();
 					currentParent.add(newNode);
 					currentParent = newNode;
 				} else {
-					currentParent = (Entity) currentParent.getChild(ancestorName);
+					currentParent = (Entity) currentParent.getChild(ancestor);
 				}
 			}
 			return currentParent;
@@ -634,11 +632,11 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 					return null;
 				}
 			} else {
-				if ( currentParent.getCount(ancestorName) == 0 ) {
+				if ( currentParent.getCount(ancestorDefn) == 0 ) {
 					Node<?> newNode = ancestorDefn.createNode();
 					currentParent.add(newNode);
 				}
-				childEntity = (Entity) currentParent.getChild(ancestorName);
+				childEntity = (Entity) currentParent.getChild(ancestorDefn);
 			}
 			currentParent = childEntity;
 		}

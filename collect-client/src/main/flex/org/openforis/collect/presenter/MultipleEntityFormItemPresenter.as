@@ -23,6 +23,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.events.IndexChangeEvent;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 
 
 	/**
@@ -87,10 +88,10 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function getEntities():IList {
-			var name:String = view.entityDefinition.name;
+			var entityDef:EntityDefinitionProxy = view.entityDefinition;
 			var entities:IList = null;
 			if(view.parentEntity != null) {
-				entities = view.parentEntity.getChildren(name);
+				entities = view.parentEntity.getChildren(entityDef);
 			}
 			return entities;
 		}
@@ -161,12 +162,12 @@ package org.openforis.collect.presenter
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
 			if(view.parentEntity != null) {
-				var name:String = view.entityDefinition.name;
-				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(name);
+				var entityDefn:EntityDefinitionProxy = view.entityDefinition;
+				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(entityDefn);
 				var active:Boolean = visited;
 				if(active) {
 					_validationDisplayManager.active = true;
-					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, view.entityDefinition);
+					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, entityDefn);
 				} else {
 					_validationDisplayManager.active = false;
 					_validationDisplayManager.reset();

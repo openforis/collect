@@ -10,9 +10,11 @@ package org.openforis.collect.model.proxy {
 	
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.collections.ListCollectionView;
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.util.ArrayUtil;
@@ -190,19 +192,19 @@ package org.openforis.collect.model.proxy {
 			var node:NodeProxy = getNode(change.nodeId);
 			var e:EntityProxy = node as EntityProxy;
 			if ( change.maxCountValidation != null && change.maxCountValidation.length > 0 ) {
-				e.updateChildrenMaxCountValiditationMap(change.maxCountValidation);
+				e.updateChildrenMaxCountValiditation(change.maxCountValidation);
 			}
 			if ( change.minCountValidation != null && change.minCountValidation.length > 0 ) {
-				e.updateChildrenMinCountValiditationMap(change.minCountValidation);
+				e.updateChildrenMinCountValiditation(change.minCountValidation);
 			}
 			if ( change.relevant != null && change.relevant.length > 0 ) {
-				e.updateChildrenRelevanceMap(change.relevant);
+				e.updateChildrenRelevance(change.relevant);
 			}
 			if ( change.minCountByChildDefinitionId != null && change.minCountByChildDefinitionId.length > 0 ) {
-				e.updateMinCountByChild(change.minCountByChildDefinitionId);
+				e.updateChildrenMinCount(change.minCountByChildDefinitionId);
 			}
 			if ( change.maxCountByChildDefinitionId != null && change.maxCountByChildDefinitionId.length > 0 ) {
-				e.updateMaxCountByChild(change.maxCountByChildDefinitionId);
+				e.updateChildrenMaxCount(change.maxCountByChildDefinitionId);
 			}
 		}
 		
@@ -211,9 +213,10 @@ package org.openforis.collect.model.proxy {
 			stack.push(rootEntity);
 			while ( stack.length > 0 ) {
 				var entity:EntityProxy = stack.pop();
-				var childDefinitionNames:IList = entity.childDefinitionNames;
-				for each (var name:String in childDefinitionNames) {
-					entity.showChildrenErrorsMap.put(name, true);
+				var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(entity.definition);
+				var childDefinitions:ListCollectionView = entityDef.childDefinitions
+				for each (var childDef:NodeDefinitionProxy in childDefinitions) {
+					entity.showErrorsOnChild(childDef);
 				}
 				var childrenEntities:IList = entity.getChildEntities();
 				ArrayUtil.addAll(stack, childrenEntities.toArray());

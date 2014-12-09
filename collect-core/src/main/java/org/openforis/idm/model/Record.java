@@ -212,7 +212,7 @@ public class Record {
 		}
 
 		if (node instanceof Entity) {
-			for (Node<?> child : ((Entity) node).getChildren()) {
+			for (Node<?> child : ((Entity) node).getAll()) {
 				initDependecyGraphs(child);
 			}
 		}
@@ -226,7 +226,7 @@ public class Record {
 		nodesByInternalId.put(id, node);
 
 		if (node instanceof Entity) {
-			for (Node<?> child : ((Entity) node).getChildren()) {
+			for (Node<?> child : ((Entity) node).getAll()) {
 				initialize(child);
 			}
 		}

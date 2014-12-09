@@ -57,8 +57,8 @@ package org.openforis.collect.model.proxy {
 			if ( parent == null ) {
 				return 0;
 			} else {
-				var children:IList = parent.getChildren(name);
-				var idx:int = children.getItemIndex(this);
+				var siblings:IList = getSiblings();
+				var idx:int = siblings.getItemIndex(this);
 				return idx;
 			}
 		}
@@ -131,11 +131,10 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function getSiblings():IList {
-			if ( parent != null ) {
-				var result:IList = parent.getChildren(name);
-				return result;
-			} else {
+			if ( parent == null ) {
 				return null;
+			} else {
+				return parent.getChildren(definition);
 			}
 		}
 
@@ -146,7 +145,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get relevant():Boolean {
-			var result:Boolean = parent.childrenRelevanceMap.get(name);
+			var result:Boolean = parent.isRelevant(definition);
 			return result;
 		}
 		

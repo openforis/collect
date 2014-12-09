@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
@@ -23,7 +24,7 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 		if (propertyName.equals(Path.NORMALIZED_PARENT_FUNCTION)) {
 			return ((Node<?>) object).getParent();
 		} else if (object instanceof Entity) {
-			return extractNonEmptyChildren(propertyName, (Entity) object);
+			return extractNonEmptyChildren((Entity) object, propertyName);
 		} else if ( object instanceof Attribute ) {
 			return object;
 		} else {
@@ -47,8 +48,9 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 		throw new UnsupportedOperationException("setProperty() not supported in " + this.getClass().getSimpleName());
 	}
 
-	private Object extractNonEmptyChildren(String propertyName, Entity entity) {
-		List<Node<?>> children = entity.getAll(propertyName);
+	private Object extractNonEmptyChildren(Entity entity, String childName) {
+		NodeDefinition childDef = entity.getDefinition().getChildDefinition(childName);
+		List<Node<?>> children = entity.getAll(childDef);
 		List<Node<?>> list = new ArrayList<Node<?>>(children.size());
 		
 		for (Node<?> childNode : children) {

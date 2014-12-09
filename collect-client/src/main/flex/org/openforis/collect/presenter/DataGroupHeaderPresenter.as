@@ -103,7 +103,7 @@ package org.openforis.collect.presenter
 		
 		protected function updateChildVisibility(nodeDefn:NodeDefinitionProxy):void {
 			var hideableDefinitions:IList = view.entityDefinition.hideableDefinitions;
-			var entities:IList = view.parentEntity.getChildren(view.entityDefinition.name);
+			var entities:IList = view.parentEntity.getChildren(view.entityDefinition);
 			var visible:Boolean;
 			if ( CollectionUtil.contains(hideableDefinitions, nodeDefn, "id") ) {
 				if ( entities.length > 0 ) {

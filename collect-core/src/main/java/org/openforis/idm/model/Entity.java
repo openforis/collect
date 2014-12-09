@@ -33,13 +33,13 @@ public class Entity extends Node<EntityDefinition> {
 
 	private static final long serialVersionUID = 1L;
 	
-	Map<String, List<Node<?>>> childrenByName;
+	Map<Integer, List<Node<?>>> childrenByDefinitionId;
 	private ValidationState derivedStateCache;
 	Map<String, State> childStates;
 	
 	public Entity(EntityDefinition definition) {
 		super(definition);
-		this.childrenByName = new HashMap<String, List<Node<?>>>();
+		this.childrenByDefinitionId = new HashMap<Integer, List<Node<?>>>();
 		this.derivedStateCache = new ValidationState();
 		this.childStates = new HashMap<String, State>();
 	}
@@ -47,7 +47,7 @@ public class Entity extends Node<EntityDefinition> {
 	@Override
 	protected void setRecord(Record record) {
 		super.setRecord(record);
-		List<Node<?>> children = getChildren();
+		List<Node<?>> children = getAll();
 		for (Node<?> node : children) {
 			node.setRecord(record);
 		}
@@ -85,7 +85,7 @@ public class Entity extends Node<EntityDefinition> {
 	 */
 	@Override
 	public boolean isEmpty() {
-		Collection<List<Node<?>>> childLists = childrenByName.values();
+		Collection<List<Node<?>>> childLists = childrenByDefinitionId.values();
 		for (List<Node<?>> list : childLists) {
 			for (Node<?> node : list) {
 				if (!node.isEmpty()) {
@@ -98,7 +98,7 @@ public class Entity extends Node<EntityDefinition> {
 	
 	@Override
 	public boolean hasData() {
-		List<Node<?>> children = getChildren();
+		List<Node<?>> children = getAll();
 		for ( Node<?> child : children ) {
 			if( child.hasData() ){
 				return true;
@@ -107,8 +107,8 @@ public class Entity extends Node<EntityDefinition> {
 		return false;
 	}
 
-	public Node<? extends NodeDefinition> get(String name, int index) {
-		List<Node<?>> list = childrenByName.get(name);
+	public Node<? extends NodeDefinition> get(NodeDefinition nodeDef, int index) {
+		List<Node<?>> list = childrenByDefinitionId.get(nodeDef.getId());
 		if (list == null || index >= list.size()) {
 			return null;
 		} else {
@@ -116,16 +116,21 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 	
+	public Node<? extends NodeDefinition> get(String name, int index) {
+		NodeDefinition childDefn = definition.getChildDefinition(name);
+		return get(childDefn, index);
+	}
+	
 	public Node<? extends NodeDefinition> getChild(NodeDefinition childDef) {
-		return getChild(childDef.getName());
+		if ( childDef.isMultiple() ) {
+			throw new IllegalArgumentException("Single child definition expected for " + childDef.getPath());
+		}
+		return get(childDef, 0);
 	}
 	
 	public Node<? extends NodeDefinition> getChild(String name) {
 		NodeDefinition childDefn = definition.getChildDefinition(name);
-		if ( childDefn.isMultiple() ) {
-			throw new IllegalArgumentException("Single child definition expected for " + getDefinition().getPath() + "/" + name);
-		}
-		return get(name, 0);
+		return getChild(childDefn);
 	}
 	
 	public List<Entity> findChildEntitiesByKeys(String childName, String... keys) {
@@ -245,7 +250,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	private Code getCodeAttributeValue(CodeAttributeDefinition def) {
-		Node<?> node = get(def.getName(), 0);
+		Node<?> node = get(def, 0);
 		return node == null ? null: ((CodeAttribute)node).getValue();
 	}
 	
@@ -253,13 +258,23 @@ public class Entity extends Node<EntityDefinition> {
 	 * public Set<String> getChildNames() { Set<String> childNames = childrenByName.keySet(); return Collections.unmodifiableSet(childNames); }
 	 */
 	public int getCount(String name) {
-		List<Node<?>> list = childrenByName.get(name);
+		NodeDefinition childDef = definition.getChildDefinition(name);
+		return getCount(childDef);
+	}
+	
+	public int getCount(NodeDefinition childDef) {
+		List<Node<?>> list = childrenByDefinitionId.get(childDef.getId());
 		return list == null ? 0 : list.size();
 	}
 	
 	public int getNonEmptyCount(String name) {
+		NodeDefinition childDef = definition.getChildDefinition(name);
+		return getNonEmptyCount(childDef);
+	}
+	
+	public int getNonEmptyCount(NodeDefinition childDef) {
 		int count = 0;
-		List<Node<?>> list = childrenByName.get(name);
+		List<Node<?>> list = childrenByDefinitionId.get(childDef.getId());
 		if(list != null && list.size() > 0) {
 			for (Node<?> node : list) {
 				if(! node.isEmpty()) {
@@ -269,27 +284,37 @@ public class Entity extends Node<EntityDefinition> {
 		}
 		return count;
 	}
-	
+
 	public int getMissingCount(String name) {
-		int minCount = getMinCount(name);
-		int specified = getNonEmptyCount(name);
+		NodeDefinition childDef = definition.getChildDefinition(name);
+		return getMissingCount(childDef);
+	}
+	
+	public int getMissingCount(NodeDefinition childDef) {
+		int minCount = getMinCount(childDef);
+		int specified = getNonEmptyCount(childDef);
 		if(minCount > specified) {
 			return minCount - specified;
 		} else {
 			return 0;
 		}
 	}
-	
+
 	/**
 	 * Returns the number of children
 	 * @return
 	 */
 	public int size(){
-		return childrenByName.size();
+		return childrenByDefinitionId.size();
 	}
 
 	public void move(String name, int oldIndex, int newIndex) {
-		List<Node<?>> list = childrenByName.get(name);
+		NodeDefinition childDef = definition.getChildDefinition(name);
+		move(childDef, oldIndex, newIndex);
+	}
+
+	public void move(NodeDefinition childDef, int oldIndex, int newIndex) {
+		List<Node<?>> list = childrenByDefinitionId.get(childDef.getId());
 		if (list != null) {
 			Node<?> obj = list.remove(oldIndex);
 			decreaseNodeIndexes(list, oldIndex);
@@ -299,7 +324,12 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public Node<? extends NodeDefinition> remove(String name, int index) {
-		List<Node<?>> list = childrenByName.get(name);
+		NodeDefinition childDef = definition.getChildDefinition(name);
+		return remove(childDef, index);
+	}
+
+	public Node<? extends NodeDefinition> remove(NodeDefinition childDef, int index) {
+		List<Node<?>> list = childrenByDefinitionId.get(childDef.getId());
 		if (list == null) {
 			return null;
 		} else {
@@ -330,14 +360,14 @@ public class Entity extends Node<EntityDefinition> {
 	 * @param idx
 	 */
 	private <T extends Node<?>> T addInternal(T child, Integer idx) {
-		verifyChildCanBeAdded(child);
-		String name = child.getName();
+		NodeDefinition def = child.getDefinition();
+		int defId = def.getId();
 
 		// Get or create list containing children
-		List<Node<?>> children = childrenByName.get(name);
+		List<Node<?>> children = childrenByDefinitionId.get(defId);
 		if (children == null) {
 			children = new ArrayList<Node<?>>();
-			childrenByName.put(name, children);
+			childrenByDefinitionId.put(defId, children);
 		}
 		// Add item
 		if (idx == null) {
@@ -356,21 +386,38 @@ public class Entity extends Node<EntityDefinition> {
 		return child;
 	}
 
-	private <T extends Node<?>> void verifyChildCanBeAdded(T o) {
-		NodeDefinition defn = o.getDefinition();
-		String name = defn.getName();
-		// Get child's definition and check schema object definition is the same
-		NodeDefinition childDefn = getDefinition().getChildDefinition(name);
-		if ( childDefn == null ) {
-			throw new IllegalArgumentException("'"+name+"' not allowed in '"+getName()+"'");			
-		} else if (defn != childDefn) {
-			throw new IllegalArgumentException("'"+name+"' in '"+getName()+"' wrong type");
+	/**
+	 * 
+	 * @return Unmodifiable list of child instances, sorted by their schema
+	 *         order.
+	 */
+	public List<Node<? extends NodeDefinition>> getAll() {
+		List<Node<?>> result = new ArrayList<Node<?>>();
+		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
+		for (NodeDefinition defn : definitions) {
+			result.addAll(getAll(defn));
 		}
+		return Collections.unmodifiableList(result);
+	}
+	
+	public List<Node<? extends NodeDefinition>> getAll(NodeDefinition childDef) {
+		List<Node<?>> children = childrenByDefinitionId.get(childDef.getId());
+		return CollectionUtils.unmodifiableList(children);
 	}
 
 	public List<Node<? extends NodeDefinition>> getAll(String name) {
-		List<Node<?>> children = childrenByName.get(name);
-		return CollectionUtils.unmodifiableList(children);
+		NodeDefinition childDef = definition.getChildDefinition(name);
+		return getAll(childDef);
+	}
+
+	@Deprecated
+	public List<Node<? extends NodeDefinition>> getChildren(String name) {
+		return getAll(name);
+	}
+	
+	@Deprecated
+	public List<Node<? extends NodeDefinition>> getChildren() {
+		return getAll();
 	}
 
 	@Override
@@ -391,7 +438,7 @@ public class Entity extends Node<EntityDefinition> {
 		sw.append(":\n");
 		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
 		for (NodeDefinition defn : definitions) {
-			List<Node<?>> children = childrenByName.get(defn.getName());
+			List<Node<?>> children = childrenByDefinitionId.get(defn.getId());
 			if (children != null) {
 				for (Node<?> child : children) {
 					child.write(sw, indent + 1);
@@ -458,7 +505,7 @@ public class Entity extends Node<EntityDefinition> {
 	@Override
 	protected void resetPath() {
 		super.resetPath();
-		for (Node<?> child : getChildren()) {
+		for (Node<?> child : getAll()) {
 			child.resetPath();
 		}
 	}
@@ -474,20 +521,27 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public boolean isRelevant(String childName) {
-		return derivedStateCache.isRelevant(childName);
+		return isRelevant(definition.getChildDefinition(childName));
 	}
 	
-	public Boolean getRelevance(String childName) {
-		return derivedStateCache.getRelevance(childName);
+	public boolean isRelevant(NodeDefinition childDef) {
+		return derivedStateCache.isRelevant(childDef.getId());
+	}
+	
+	public Boolean getRelevance(NodeDefinition childDef) {
+		return derivedStateCache.getRelevance(childDef.getId());
 	}
 
 	public void setRelevant(String childName, boolean relevant) {
-		derivedStateCache.setRelevant(childName, relevant);
+		setRelevant(definition.getChildDefinition(childName), relevant);
+	}
+	
+	public void setRelevant(NodeDefinition childDef, boolean relevant) {
+		derivedStateCache.setRelevant(childDef.getId(), relevant);
 	}
 	
 	public boolean isRequired(String childName) {
-		NodeDefinition childDef = definition.getChildDefinition(childName);
-		return isRequired(childDef);
+		return isRequired(definition.getChildDefinition(childName));
 	}
 	
 	public boolean isRequired(NodeDefinition def) {
@@ -496,51 +550,51 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public Integer getMinCount(NodeDefinition defn) {
-		return getMinCount(defn.getId());
-	}
-	
-	public Integer getMinCount(int childDefinitionId) {
-		return derivedStateCache.getMinCount(childDefinitionId);
+		return derivedStateCache.getMinCount(defn.getId());
 	}
 	
 	public void setMinCount(NodeDefinition childDefn, int count) {
-		setMinCount(childDefn.getId(), count);
-	}
-
-	public void setMinCount(int childDefinitionId, int count) {
-		derivedStateCache.setMinCount(childDefinitionId, count);
+		derivedStateCache.setMinCount(childDefn.getId(), count);
 	}
 
 	public Integer getMaxCount(NodeDefinition defn) {
-		return getMaxCount(defn.getId());
-	}
-	
-	public Integer getMaxCount(int childDefinitionId) {
-		return derivedStateCache.getMaxCount(childDefinitionId);
+		return derivedStateCache.getMaxCount(defn.getId());
 	}
 	
 	public void setMaxCount(NodeDefinition childDefn, int count) {
-		setMaxCount(childDefn.getId(), count);
-	}
-
-	public void setMaxCount(int childDefinitionId, int count) {
-		derivedStateCache.setMaxCount(childDefinitionId, count);
+		derivedStateCache.setMaxCount(childDefn.getId(), count);
 	}
 
 	public ValidationResultFlag getMinCountValidationResult(String childName) {
-		return derivedStateCache.getMinCountValidationResult(childName);
+		return getMinCountValidationResult(definition.getChildDefinition(childName));
+	}
+	
+	public ValidationResultFlag getMinCountValidationResult(NodeDefinition childDef) {
+		return derivedStateCache.getMinCountValidationResult(childDef.getId());
 	}
 	
 	public void setMinCountValidationResult(String childName, ValidationResultFlag value) {
-		derivedStateCache.setMinCountValidationResult(childName, value);
+		setMinCountValidationResult(definition.getChildDefinition(childName), value);
+	}
+	
+	public void setMinCountValidationResult(NodeDefinition childDef, ValidationResultFlag value) {
+		derivedStateCache.setMinCountValidationResult(childDef.getId(), value);
 	}
 	
 	public ValidationResultFlag getMaxCountValidationResult(String childName) {
-		return derivedStateCache.getMaxCountValidationResult(childName);
+		return getMaxCountValidationResult(definition.getChildDefinition(childName));
+	}
+	
+	public ValidationResultFlag getMaxCountValidationResult(NodeDefinition childDef) {
+		return derivedStateCache.getMaxCountValidationResult(childDef.getId());
 	}
 	
 	public void setMaxCountValidationResult(String childName, ValidationResultFlag value) {
-		derivedStateCache.setMaxCountValidationResult(childName, value);
+		setMaxCountValidationResult(definition.getChildDefinition(childName), value);
+	}
+	
+	public void setMaxCountValidationResult(NodeDefinition childDef, ValidationResultFlag value) {
+		derivedStateCache.setMaxCountValidationResult(childDef.getId(), value);
 	}
 	
 	/**
@@ -555,44 +609,18 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	/**
-	 * 
-	 * @return Unmodifiable list of child instances, sorted by their schema
-	 *         order.
-	 */
-	public List<Node<? extends NodeDefinition>> getChildren() {
-		List<Node<?>> result = new ArrayList<Node<?>>();
-		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
-		for (NodeDefinition defn : definitions) {
-			String childName = defn.getName();
-			result.addAll(getChildren(childName));
-		}
-		return Collections.unmodifiableList(result);
-	}
-
-	public List<Node<?>> getChildren(String childName) {
-		List<Node<?>> result = new ArrayList<Node<?>>();
-		List<Node<?>> children = childrenByName.get(childName);
-		if (children != null) {
-			for (Node<?> child : children) {
-				result.add(child);
-			}
-		}
-		return result;
-	}
-
-	/**
 	 * Returns all the descendants in depth-first order
 	 */
 	public List<Node<?>> getDescendants() {
 		List<Node<?>> result = new Stack<Node<?>>();
 		Stack<Node<?>> stack = new Stack<Node<?>>();
-		stack.addAll(this.getChildren());
+		stack.addAll(this.getAll());
 		while(!stack.isEmpty()){
 			Node<?> n = stack.pop();
 			result.add(0, n);
 			if(n instanceof Entity){
 				Entity entity = (Entity) n;
-				List<Node<?>> children = entity.getChildren();
+				List<Node<?>> children = entity.getAll();
 				for (Node<?> child : children) {
 					stack.push(child);
 				}
@@ -618,20 +646,20 @@ public class Entity extends Node<EntityDefinition> {
 		if (! isChildStatesEquals(other) ) {
 			return false;
 		}
-		if (childrenByName == null && other.childrenByName != null || 
-				childrenByName != null && other.childrenByName == null) {
+		if (childrenByDefinitionId == null && other.childrenByDefinitionId != null || 
+				childrenByDefinitionId != null && other.childrenByDefinitionId == null) {
 			return false;
 		} else {
 			//custom check
-			normalizeChildrenByName();
-			other.normalizeChildrenByName();
-			if ( childrenByName.size() != other.childrenByName.size() ) {
+			removeEmptyChildren();
+			other.removeEmptyChildren();
+			if ( childrenByDefinitionId.size() != other.childrenByDefinitionId.size() ) {
 				return false;
 			}
-			Set<String> childNames = childrenByName.keySet();
-			for (String childName : childNames) {
-				List<Node<?>> children = childrenByName.get(childName);
-				List<Node<?>> otherChildren = other.childrenByName.get(childName);
+			Set<Integer> childDefIds = childrenByDefinitionId.keySet();
+			for (Integer childDefId : childDefIds) {
+				List<Node<?>> children = childrenByDefinitionId.get(childDefId);
+				List<Node<?>> otherChildren = other.childrenByDefinitionId.get(childDefId);
 				if ( children.size() != otherChildren.size() ) {
 					return false;
 				}
@@ -676,11 +704,11 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 	
-	protected void normalizeChildrenByName() {
-		Set<Entry<String, List<Node<?>>>> entrySet = childrenByName.entrySet();
-		Iterator<Entry<String, List<Node<?>>>> iterator = entrySet.iterator();
+	protected void removeEmptyChildren() {
+		Set<Entry<Integer, List<Node<?>>>> entrySet = childrenByDefinitionId.entrySet();
+		Iterator<Entry<Integer, List<Node<?>>>> iterator = entrySet.iterator();
 		while ( iterator.hasNext() ) {
-			Entry<String, List<Node<?>>> entry = iterator.next();
+			Entry<Integer, List<Node<?>>> entry = iterator.next();
 			List<Node<?>> nodes = entry.getValue();
 			if ( nodes == null || nodes.isEmpty()) {
 				iterator.remove();
@@ -694,17 +722,17 @@ public class Entity extends Node<EntityDefinition> {
 		/** Set of children dynamic max count */
 		private Map<Integer, Integer> maxCountByChildDefinition;
 		/** Set of children relevance states */
-		private Map<String, Boolean> relevanceByChildName;
+		private Map<Integer, Boolean> relevanceByChildDefinition;
 		
-		private Map<String, ValidationResultFlag> minCountValidationResultByChildName;
-		private Map<String, ValidationResultFlag> maxCountValidationResultByChildName;
+		private Map<Integer, ValidationResultFlag> minCountValidationResultByChildDefinition;
+		private Map<Integer, ValidationResultFlag> maxCountValidationResultByChildDefinition;
 
 		public ValidationState() {
 			minCountByChildDefinition = new HashMap<Integer, Integer>();
 			maxCountByChildDefinition = new HashMap<Integer, Integer>();
-			relevanceByChildName = new HashMap<String, Boolean>();
-			minCountValidationResultByChildName = new HashMap<String, ValidationResultFlag>();
-			maxCountValidationResultByChildName = new HashMap<String, ValidationResultFlag>();
+			relevanceByChildDefinition = new HashMap<Integer, Boolean>();
+			minCountValidationResultByChildDefinition = new HashMap<Integer, ValidationResultFlag>();
+			maxCountValidationResultByChildDefinition = new HashMap<Integer, ValidationResultFlag>();
 		}
 
 		private Integer getMinCount(int childDefinitionId) {
@@ -723,33 +751,33 @@ public class Entity extends Node<EntityDefinition> {
 			maxCountByChildDefinition.put(childDefinitionId, count);
 		}
 		
-		private boolean isRelevant(String childName) {
-			Boolean value = relevanceByChildName.get(childName);
+		private boolean isRelevant(int childDefinitionId) {
+			Boolean value = relevanceByChildDefinition.get(childDefinitionId);
 			return value == null ? true: value;
 		}
 		
-		private Boolean getRelevance(String childName) {
-			return relevanceByChildName.get(childName);
+		private Boolean getRelevance(int childDefinitionId) {
+			return relevanceByChildDefinition.get(childDefinitionId);
 		}
 
-		private void setRelevant(String childName, boolean flag) {
-			relevanceByChildName.put(childName, flag);
+		private void setRelevant(int childDefinitionId, boolean flag) {
+			relevanceByChildDefinition.put(childDefinitionId, flag);
 		}
 		
-		private ValidationResultFlag getMinCountValidationResult(String childName) {
-			return minCountValidationResultByChildName.get(childName);
+		private ValidationResultFlag getMinCountValidationResult(int childDefinitionId) {
+			return minCountValidationResultByChildDefinition.get(childDefinitionId);
 		}
 
-		private ValidationResultFlag setMinCountValidationResult(String childName, ValidationResultFlag value) {
-			return minCountValidationResultByChildName.put(childName, value);
+		private ValidationResultFlag setMinCountValidationResult(int childDefinitionId, ValidationResultFlag value) {
+			return minCountValidationResultByChildDefinition.put(childDefinitionId, value);
 		}
 
-		private ValidationResultFlag getMaxCountValidationResult(String childName) {
-			return maxCountValidationResultByChildName.get(childName);
+		private ValidationResultFlag getMaxCountValidationResult(int childDefinitionId) {
+			return maxCountValidationResultByChildDefinition.get(childDefinitionId);
 		}
 
-		private ValidationResultFlag setMaxCountValidationResult(String childName, ValidationResultFlag value) {
-			return maxCountValidationResultByChildName.put(childName, value);
+		private ValidationResultFlag setMaxCountValidationResult(int childDefinitionId, ValidationResultFlag value) {
+			return maxCountValidationResultByChildDefinition.put(childDefinitionId, value);
 		}
 
 	}

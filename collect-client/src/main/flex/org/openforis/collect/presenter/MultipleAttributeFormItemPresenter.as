@@ -20,6 +20,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 
 	/**
 	 * 
@@ -85,8 +86,8 @@ package org.openforis.collect.presenter
 
 		protected function getAttributes():IList {
 			if(view.dataGroup != null && view.parentEntity != null) {
-				var name:String = view.attributeDefinition.name;
-				var attributes:IList = view.parentEntity.getChildren(name);
+				var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
+				var attributes:IList = view.parentEntity.getChildren(attrDefn);
 				return attributes;
 			} else {
 				return null;
@@ -133,12 +134,12 @@ package org.openforis.collect.presenter
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
 			if(view.parentEntity != null) {
-				var attributeName:String = view.attributeDefinition.name;
-				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(attributeName);
+				var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
+				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(attrDefn);
 				var active:Boolean = visited;
 				if(active) {
 					_validationDisplayManager.active = true;
-					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, view.attributeDefinition);
+					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, attrDefn);
 				} else {
 					_validationDisplayManager.active = false;
 					_validationDisplayManager.reset();

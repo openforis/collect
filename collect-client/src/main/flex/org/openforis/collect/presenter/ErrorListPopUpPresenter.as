@@ -90,9 +90,8 @@ package org.openforis.collect.presenter
 			var childDefinitions:ListCollectionView = entityDefn.childDefinitions;
 			var messages:Array
 			for each (var childDefn:NodeDefinitionProxy in childDefinitions) {
-				var childName:String = childDefn.name;
-				var minCountValid:ValidationResultFlag = entity.childrenMinCountValidationMap.get(childName);
-				var maxCountValid:ValidationResultFlag = entity.childrenMaxCountValidationMap.get(childName);
+				var minCountValid:ValidationResultFlag = entity.getMinCountValidation(childDefn);
+				var maxCountValid:ValidationResultFlag = entity.getMaxCountValidation(childDefn);
 				if(minCountValid == ValidationResultFlag.ERROR || maxCountValid == ValidationResultFlag.ERROR) {
 					if ( minCountValid == ValidationResultFlag.ERROR ) {
 						var minCount:int = entity.getMinCount(childDefn);

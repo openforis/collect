@@ -3,6 +3,7 @@
  */
 package org.openforis.idm.metamodel.expression.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -14,27 +15,19 @@ import org.openforis.idm.path.Path;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class NodeDefinitionPropertyHandler implements DynamicPropertyHandler {
 
 	@Override
 	public String[] getPropertyNames(Object object) {
-		String[] array;
+		List<String> names = new ArrayList<String>();
 		if (object instanceof EntityDefinition) {
-			EntityDefinition entityDef = (EntityDefinition) object;
-			List<NodeDefinition> childDefs = entityDef.getChildDefinitions();
-			array = new String[childDefs.size()+1];
-			int i = 0;
-			for (NodeDefinition def : childDefs) {
-				array[i++] = def.getName();
-			}
-		} else {
-			array = new String[1];
+			names.addAll(((EntityDefinition) object).getChildDefinitionNames());
 		}
-		int last = array.length -1;
-		array[last] = Path.NORMALIZED_PARENT_FUNCTION;
-		return array;
+		names.add(Path.NORMALIZED_PARENT_FUNCTION);
+		return names.toArray(new String[names.size()]);
 	}
 
 	@Override
