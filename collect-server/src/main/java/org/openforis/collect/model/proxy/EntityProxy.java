@@ -4,7 +4,6 @@
 package org.openforis.collect.model.proxy;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -105,7 +104,9 @@ public class EntityProxy extends NodeProxy {
 	public List<Boolean> getChildrenErrorVisible() {
 		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
 		List<Boolean> result = new ArrayList<Boolean>(childDefinitions.size());
-		Collections.fill(result, Boolean.FALSE);
+		for (int i = 0; i < childDefinitions.size(); i++) {
+			result.add(Boolean.FALSE);
+		}
 		return result;
 	}
 

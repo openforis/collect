@@ -387,13 +387,11 @@ package org.openforis.collect.model.proxy {
 		
 		public function showErrorsOnChild(childDef:NodeDefinitionProxy):void {
 			var index:int = getChildDefinitionIndex(childDef);
-			checkIndexInSize(childrenErrorVisible, index, childDef);
 			childrenErrorVisible.setItemAt(true, index);
 		}
 		
 		public function isErrorOnChildVisible(childDef:NodeDefinitionProxy):Boolean {
 			var index:int = getChildDefinitionIndex(childDef);
-			checkIndexInSize(childrenErrorVisible, index, childDef);
 			var result:Boolean = childrenErrorVisible.getItemAt(index);
 			return result;
 		}
@@ -404,33 +402,28 @@ package org.openforis.collect.model.proxy {
 		
 		public function getMinCount(childDef:NodeDefinitionProxy):int {
 			var index:int = getChildDefinitionIndex(childDef);
-			checkIndexInSize(childrenMinCount, index, childDef);
 			var count:int = childrenMinCount.getItemAt(index) as int;
 			return count;
 		}
 		
 		public function getMaxCount(childDef:NodeDefinitionProxy):int {
 			var index:int = getChildDefinitionIndex(childDef);
-			checkIndexInSize(childrenMaxCount, index, childDef);
 			var count:int = childrenMaxCount.getItemAt(index) as int;
 			return count;
 		}
 		
 		public function getMinCountValidation(childDef:NodeDefinitionProxy):ValidationResultFlag {
 			var index:int = getChildDefinitionIndex(childDef);
-			checkIndexInSize(childrenMinCountValidation, index, childDef);
 			return childrenMinCountValidation.getItemAt(index) as ValidationResultFlag;
 		}
 		
 		public function getMaxCountValidation(childDef:NodeDefinitionProxy):ValidationResultFlag {
 			var index:int = getChildDefinitionIndex(childDef);
-			checkIndexInSize(childrenMaxCountValidation, index, childDef);
 			return childrenMaxCountValidation.getItemAt(index) as ValidationResultFlag;
 		}
 		
 		public function isRelevant(childDef:NodeDefinitionProxy):Boolean {
 			var index:int = getChildDefinitionIndex(childDef);
-			checkIndexInSize(childrenRelevance, index, childDef);
 			return childrenRelevance.getItemAt(index) as Boolean;
 		}
 		
