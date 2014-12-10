@@ -664,7 +664,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				String key = ((EntityKeysIdentifier) identifier).getKeyValue(keyDefn.getId());
 				keys[i] = key;
 			}
-			return currentParent.findChildEntitiesByKeys(childName, keys);
+			return currentParent.findChildEntitiesByKeys(childDefn, keys);
 		}
 	}
 	

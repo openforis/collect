@@ -35,13 +35,15 @@ public class Entity extends Node<EntityDefinition> {
 	
 	Map<Integer, List<Node<?>>> childrenByDefinitionId;
 	private ValidationState derivedStateCache;
-	Map<String, State> childStates;
+	Map<Integer, State> childStates;
 	
 	public Entity(EntityDefinition definition) {
 		super(definition);
-		this.childrenByDefinitionId = new HashMap<Integer, List<Node<?>>>();
-		this.derivedStateCache = new ValidationState();
-		this.childStates = new HashMap<String, State>();
+		List<NodeDefinition> childDefs = definition.getChildDefinitions();
+		int numChildren = childDefs.size();
+		this.childrenByDefinitionId = new HashMap<Integer, List<Node<?>>>(numChildren);
+		this.derivedStateCache = new ValidationState(numChildren);
+		this.childStates = new HashMap<Integer, State>(numChildren);
 	}
 
 	@Override
@@ -61,24 +63,42 @@ public class Entity extends Node<EntityDefinition> {
 		addInternal(node, idx);
 	}
 	
+	public State getChildState(String childName) {
+		return getChildState(definition.getChildDefinition(childName));
+	}
+		
+	public State getChildState(NodeDefinition childDef) {
+		int childDefId = childDef.getId();
+		State state = childStates.get(childDefId);
+		if (state == null) {
+			state = new State();
+			childStates.put(childDefId, state);
+		}
+		return state;
+	}
+	
 	public void setChildState(String childName, int intState) {
-		State childState = getChildState(childName);
+		setChildState(definition.getChildDefinition(childName), intState);
+	}
+	
+	public void setChildState(NodeDefinition childDef, int intState) {
+		State childState = getChildState(childDef);
 		childState.set(intState);
 	}
 	
 	public void setChildState(String childName, int position, boolean value) {
-		State childState = getChildState(childName);
+		setChildState(definition.getChildDefinition(childName), position, value);
+	}
+	
+	public void setChildState(NodeDefinition childDef, int position, boolean value) {
+		State childState = getChildState(childDef);
 		childState.set(position, value);
 	}
 	
-	public State getChildState(String childName){
-		State state = childStates.get(childName);
-		if (state == null) {
-			state = new State();
-			childStates.put(childName, state);
-		}
-		return state;
+	public void setChildState(NodeDefinition childDef, State state) {
+		childStates.put(childDef.getId(), state);
 	}
+		
 	
 	/**
 	 * @return true if any descendant is a non-blank value
@@ -134,8 +154,12 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public List<Entity> findChildEntitiesByKeys(String childName, String... keys) {
+		return findChildEntitiesByKeys(definition.getChildDefinition(childName), keys);
+	}
+
+	public List<Entity> findChildEntitiesByKeys(NodeDefinition childDef, String... keys) {
 		List<Entity> result = new ArrayList<Entity>();
-		List<Node<?>> siblings = getAll(childName);
+		List<Node<?>> siblings = getAll(childDef);
 		for (Node<?> sibling : siblings) {
 			String[] keyValues = ((Entity) sibling).getKeyValues();
 			if ( compareKeys(keyValues, keys) == 0 ) {
@@ -183,7 +207,9 @@ public class Entity extends Node<EntityDefinition> {
 	public String[] getKeyValues() {
 		EntityDefinition defn = getDefinition();
 		List<AttributeDefinition> keyDefns = defn.getKeyAttributeDefinitions();
-		if ( keyDefns.size() > 0 ) {
+		if ( keyDefns.isEmpty() ) {
+			return null;
+		} else {
 			String[] result = new String[keyDefns.size()];
 			for (int i = 0; i < keyDefns.size(); i++) {
 				AttributeDefinition keyDefn = keyDefns.get(i);
@@ -192,8 +218,6 @@ public class Entity extends Node<EntityDefinition> {
 				result[i] = keyValue;
 			}
 			return result;
-		} else {
-			return null;
 		}
 	}
 
@@ -630,7 +654,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public void clearChildStates() {
-		this.childStates = new HashMap<String, State>();
+		this.childStates = new HashMap<Integer, State>();
 	}
 
 	@Override
@@ -692,10 +716,10 @@ public class Entity extends Node<EntityDefinition> {
 	
 	protected void removeEmptyChildStates() {
 		if ( childStates != null ) {
-			Set<Entry<String,State>> entrySet = childStates.entrySet();
-			Iterator<Entry<String, State>> iterator = entrySet.iterator();
+			Set<Entry<Integer, State>> entrySet = childStates.entrySet();
+			Iterator<Entry<Integer, State>> iterator = entrySet.iterator();
 			while ( iterator.hasNext() ) {
-				Entry<String, State> entry = iterator.next();
+				Entry<Integer, State> entry = iterator.next();
 				State childState = entry.getValue();
 				if ( childState.intValue() == 0 ) {
 					iterator.remove();
@@ -727,12 +751,12 @@ public class Entity extends Node<EntityDefinition> {
 		private Map<Integer, ValidationResultFlag> minCountValidationResultByChildDefinition;
 		private Map<Integer, ValidationResultFlag> maxCountValidationResultByChildDefinition;
 
-		public ValidationState() {
-			minCountByChildDefinition = new HashMap<Integer, Integer>();
-			maxCountByChildDefinition = new HashMap<Integer, Integer>();
-			relevanceByChildDefinition = new HashMap<Integer, Boolean>();
-			minCountValidationResultByChildDefinition = new HashMap<Integer, ValidationResultFlag>();
-			maxCountValidationResultByChildDefinition = new HashMap<Integer, ValidationResultFlag>();
+		public ValidationState(int numChildren) {
+			minCountByChildDefinition = new HashMap<Integer, Integer>(numChildren);
+			maxCountByChildDefinition = new HashMap<Integer, Integer>(numChildren);
+			relevanceByChildDefinition = new HashMap<Integer, Boolean>(numChildren);
+			minCountValidationResultByChildDefinition = new HashMap<Integer, ValidationResultFlag>(numChildren);
+			maxCountValidationResultByChildDefinition = new HashMap<Integer, ValidationResultFlag>(numChildren);
 		}
 
 		private Integer getMinCount(int childDefinitionId) {

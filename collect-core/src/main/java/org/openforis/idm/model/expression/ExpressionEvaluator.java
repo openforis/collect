@@ -17,6 +17,9 @@ import org.openforis.idm.model.Record;
 public class ExpressionEvaluator {
 	
 	private static final Pattern NUMBER_PATTERN = Pattern.compile("^-?\\d*(\\.\\d+)?$");
+	private static final String TRUE_FUNCTION = "true()";
+	private static final String FALSE_FUNCTION = "false()";
+	
 	private ExpressionFactory expressionFactory;
 
 	public ExpressionEvaluator(ExpressionFactory expressionFactory) {
@@ -28,6 +31,11 @@ public class ExpressionEvaluator {
 	}
 
 	public boolean evaluateBoolean(Node<?> context, Node<?> thisNode, String expression, boolean normalizeNumbers) throws InvalidExpressionException {
+		if (TRUE_FUNCTION.equals(expression)) {
+			return true;
+		} else if (FALSE_FUNCTION.equals(expression)) {
+			return false;
+		}
 		BooleanExpression expr = expressionFactory.createBooleanExpression(expression, normalizeNumbers);
 		return expr.evaluate(context, thisNode);
 	}

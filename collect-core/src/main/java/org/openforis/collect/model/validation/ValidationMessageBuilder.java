@@ -239,7 +239,7 @@ public class ValidationMessageBuilder {
 					args.add(arg);
 				}
 			}
-			result = args.toArray(new String[0]);
+			result = args.toArray(new String[args.size()]);
 		}
 		return result;
 	}

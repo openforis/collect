@@ -99,11 +99,7 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	protected abstract FieldDefinitionMap getFieldDefinitionMap();
 	
 	public List<String> getFieldNames() {
-		List<String> result = new ArrayList<String>();
-		for (FieldDefinition<?> fieldDefinition : getFieldDefinitions()) {
-			result.add(fieldDefinition.getName());
-		}
-		return Collections.unmodifiableList(result);
+		return getFieldDefinitionMap().getFieldNames();
 	}
 	
 	public List<FieldDefinition<?>> getFieldDefinitions() {
@@ -218,7 +214,6 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	static class FieldDefinitionMap extends LinkedHashMap<String, FieldDefinition<?>> {
 		
 		private static final long serialVersionUID = 1L;
-		
 
 		public FieldDefinitionMap(FieldDefinition<?>... fieldDefs) {
 			for (FieldDefinition<?> def : fieldDefs) {
@@ -226,6 +221,10 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 			}
 		}
 		
+		public List<String> getFieldNames() {
+			return Collections.unmodifiableList(new ArrayList<String>(keySet()));
+		}
+
 		public List<FieldDefinition<?>> listValues() {
 			return Collections.unmodifiableList(new ArrayList<FieldDefinition<?>>(values()));
 		}

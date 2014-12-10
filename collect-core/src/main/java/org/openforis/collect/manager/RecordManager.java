@@ -294,7 +294,7 @@ public class RecordManager {
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		
 		Entity rootEntity = record.getRootEntity();
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity.getName(), rootEntityKeyValues.toArray(new String[0]));
+		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity.getName(), rootEntityKeyValues.toArray(new String[rootEntityKeyValues.size()]));
 		for (CollectRecord collectRecord : summaries) {
 			if ( ! collectRecord.getId().equals(record.getId()) ) {
 				return false;

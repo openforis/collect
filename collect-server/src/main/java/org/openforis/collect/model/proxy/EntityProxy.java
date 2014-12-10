@@ -26,18 +26,19 @@ import org.openforis.idm.model.Record;
 public class EntityProxy extends NodeProxy {
 
 	private transient Entity entity;
+	private transient List<NodeDefinition> childDefinitionsInVersion;
 	
 	public EntityProxy(EntityProxy parent, Entity entity, Locale locale) {
 		super(parent, entity, locale);
 		this.entity = entity;
+		this.childDefinitionsInVersion = getChildDefinitionsInVersion();
 	}
 	
 
 	@ExternalizedProperty
 	public Map<Integer, List<NodeProxy>> getChildrenByDefinitionId() {
 		Map<Integer, List<NodeProxy>> result = new HashMap<Integer, List<NodeProxy>>();
-		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
-		for (NodeDefinition childDefinition : childDefinitions) {
+		for (NodeDefinition childDefinition : childDefinitionsInVersion) {
 			List<Node<?>> nodes = this.entity.getAll(childDefinition);
 			List<NodeProxy> proxies = NodeProxy.fromList(this, nodes, getLocale());
 			result.put(childDefinition.getId(), proxies);
@@ -47,9 +48,8 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public List<Boolean> getChildrenRelevance() {
-		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
-		List<Boolean> result = new ArrayList<Boolean>(childDefinitions.size());
-		for (NodeDefinition childDefinition : childDefinitions) {
+		List<Boolean> result = new ArrayList<Boolean>(childDefinitionsInVersion.size());
+		for (NodeDefinition childDefinition : childDefinitionsInVersion) {
 			boolean relevant = entity.isRelevant(childDefinition);
 			result.add(relevant);
 		}
@@ -58,9 +58,8 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public List<ValidationResultFlag> getChildrenMinCountValidation() {
-		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
-		List<ValidationResultFlag> result = new ArrayList<ValidationResultFlag>(childDefinitions.size());
-		for (NodeDefinition childDefinition : childDefinitions) {
+		List<ValidationResultFlag> result = new ArrayList<ValidationResultFlag>(childDefinitionsInVersion.size());
+		for (NodeDefinition childDefinition : childDefinitionsInVersion) {
 			ValidationResultFlag valid = entity.getMinCountValidationResult(childDefinition);
 			result.add(valid);
 		}
@@ -69,9 +68,8 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public List<ValidationResultFlag> getChildrenMaxCountValidation() {
-		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
-		List<ValidationResultFlag> result = new ArrayList<ValidationResultFlag>(childDefinitions.size());
-		for (NodeDefinition childDefinition : childDefinitions) {
+		List<ValidationResultFlag> result = new ArrayList<ValidationResultFlag>(childDefinitionsInVersion.size());
+		for (NodeDefinition childDefinition : childDefinitionsInVersion) {
 			ValidationResultFlag valid = entity.getMaxCountValidationResult(childDefinition);
 			result.add(valid);
 		}
@@ -80,9 +78,8 @@ public class EntityProxy extends NodeProxy {
 	
 	@ExternalizedProperty
 	public List<Integer> getChildrenMinCount() {
-		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
-		List<Integer> result = new ArrayList<Integer>(childDefinitions.size());
-		for (NodeDefinition childDefinition : childDefinitions) {
+		List<Integer> result = new ArrayList<Integer>(childDefinitionsInVersion.size());
+		for (NodeDefinition childDefinition : childDefinitionsInVersion) {
 			int count = entity.getMinCount(childDefinition);
 			result.add(count);
 		}
@@ -91,8 +88,7 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public List<Integer> getChildrenMaxCount() {
-		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
-		List<Integer> result = new ArrayList<Integer>(childDefinitions.size());
+		List<Integer> result = new ArrayList<Integer>(childDefinitionsInVersion.size());
 		for (NodeDefinition childDefinition : getChildDefinitionsInVersion()) {
 			Integer count = entity.getMaxCount(childDefinition);
 			result.add(count);
@@ -102,9 +98,8 @@ public class EntityProxy extends NodeProxy {
 
 	@ExternalizedProperty
 	public List<Boolean> getChildrenErrorVisible() {
-		List<NodeDefinition> childDefinitions = getChildDefinitionsInVersion();
-		List<Boolean> result = new ArrayList<Boolean>(childDefinitions.size());
-		for (int i = 0; i < childDefinitions.size(); i++) {
+		List<Boolean> result = new ArrayList<Boolean>(childDefinitionsInVersion.size());
+		for (int i = 0; i < childDefinitionsInVersion.size(); i++) {
 			result.add(Boolean.FALSE);
 		}
 		return result;

@@ -12,14 +12,13 @@ package org.openforis.collect.model.proxy {
 	import mx.collections.Sort;
 	
 	import org.granite.collections.IMap;
-	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
-	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.ObjectUtil;
@@ -385,6 +384,12 @@ package org.openforis.collect.model.proxy {
 			updateList(childrenMaxCount, map);
 		}
 		
+		public function showErrorsOnChildren():void {
+			for (var i:int; i < childrenErrorVisible.length; i++) {
+				childrenErrorVisible.setItemAt(true, i);
+			}
+		}
+		
 		public function showErrorsOnChild(childDef:NodeDefinitionProxy):void {
 			var index:int = getChildDefinitionIndex(childDef);
 			childrenErrorVisible.setItemAt(true, index);
@@ -568,18 +573,10 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		private function getChildDefinitionIndex(childDefn:NodeDefinitionProxy):int {
-			var defs:IList = EntityDefinitionProxy(definition).getDefinitionsInVersion(Application.activeRecord.version)
+			var version:ModelVersionProxy = this.record.version;
+			var defs:IList = EntityDefinitionProxy(definition).getDefinitionsInVersion(version);
 			var index:int = defs.getItemIndex(childDefn);
 			return index;
-		}
-		
-		private function checkIndexInSize(list:IList, index:int, childDef:NodeDefinitionProxy):Boolean {
-			if (index >= list.length) {
-				AlertUtil.showMessage("Index " + index + " is greater than size " + list.length + " in " + childDef.path);
-				return false;
-			} else {
-				return true;
-			}
 		}
 		
 		/*

@@ -58,6 +58,7 @@ package org.openforis.collect.model.proxy {
 		
 		protected function initNode(node:NodeProxy):void {
 			_nodesMap[node.id] = node;
+			node.record = this;
 			node.init();
 		}
 		
@@ -209,18 +210,11 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function showErrors():void {
-			var stack:Array = new Array();
-			stack.push(rootEntity);
-			while ( stack.length > 0 ) {
-				var entity:EntityProxy = stack.pop();
-				var entityDef:EntityDefinitionProxy = EntityDefinitionProxy(entity.definition);
-				var childDefinitions:ListCollectionView = entityDef.childDefinitions
-				for each (var childDef:NodeDefinitionProxy in childDefinitions) {
-					entity.showErrorsOnChild(childDef);
+			traverse(function (node:NodeProxy):void {
+				if (node instanceof EntityProxy) {
+					EntityProxy(node).showErrorsOnChildren();
 				}
-				var childrenEntities:IList = entity.getChildEntities();
-				ArrayUtil.addAll(stack, childrenEntities.toArray());
-			}
+			});
 		}
 		
 		public function get unassigned():Boolean {

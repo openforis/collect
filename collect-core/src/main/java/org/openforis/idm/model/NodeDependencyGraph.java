@@ -50,9 +50,7 @@ public abstract class NodeDependencyGraph extends DependencyGraph<Node<?>> {
 
 	@Override
 	protected Collection<Node<?>> toItems(Node<?> node) {
-		ArrayList<Node<?>> result = new ArrayList<Node<?>>();
-		result.add(node);
-		return result;
+		return Collections.<Node<?>>singleton(node);
 	}
 
 	@Override

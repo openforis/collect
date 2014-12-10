@@ -1,9 +1,11 @@
 package org.openforis.collect.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Entity;
 
@@ -25,11 +27,13 @@ public class EntityChange extends NodeChange<Entity> {
 	
 	public EntityChange(Entity node) {
 		super(node);
-		minCountByChildDefinitionId = new HashMap<Integer, Integer>();
-		maxCountByChildDefinitionId = new HashMap<Integer, Integer>();
-		minCountValidationByChildName = new HashMap<String, ValidationResultFlag>();
-		maxCountValidationByChildName = new HashMap<String, ValidationResultFlag>();
-		relevanceByChildName = new HashMap<String, Boolean>();
+		List<NodeDefinition> childDefs = node.getDefinition().getChildDefinitions();
+		int numChildren = childDefs.size();
+		minCountByChildDefinitionId = new HashMap<Integer, Integer>(numChildren);
+		maxCountByChildDefinitionId = new HashMap<Integer, Integer>(numChildren);
+		minCountValidationByChildName = new HashMap<String, ValidationResultFlag>(numChildren);
+		maxCountValidationByChildName = new HashMap<String, ValidationResultFlag>(numChildren);
+		relevanceByChildName = new HashMap<String, Boolean>(numChildren);
 	}
 	
 	public void merge(EntityChange newChange) {

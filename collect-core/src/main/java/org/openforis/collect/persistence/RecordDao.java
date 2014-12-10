@@ -200,7 +200,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 		//record keys
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
-			addFilterByKeyConditions(q, filter.getKeyValues().toArray(new String[0]));
+			addFilterByKeyConditions(q, filter.getKeyValues());
 		}
 
 		//add ordering fields
@@ -251,7 +251,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			q.addConditions(OFC_RECORD.STEP.ge(filter.getStepGreaterOrEqual().getStepNumber()));
 		}
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
-			addFilterByKeyConditions(q, filter.getKeyValues().toArray(new String[0]));
+			addFilterByKeyConditions(q, filter.getKeyValues());
 		}
 		Record record = q.fetchOne();
 		int result = record.getValue(DSL.count());
@@ -263,6 +263,10 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		RecordFilter filter = new RecordFilter(survey, rootDefinitionId);
 		filter.setKeyValues(keyValues);
 		return countRecords(filter);
+	}
+	
+	private void addFilterByKeyConditions(SelectQuery q, List<String> keyValues) {
+		addFilterByKeyConditions(q, keyValues.toArray(new String[keyValues.size()]));
 	}
 	
 	private void addFilterByKeyConditions(SelectQuery q, String... keyValues) {

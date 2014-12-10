@@ -1,8 +1,8 @@
 package org.openforis.idm.model.expression.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -34,10 +34,14 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 
 	@Override
 	public String[] getPropertyNames(Object object) {
-		List<String> result = new ArrayList<String>();
+		List<String> result;
 		if (object instanceof Entity) {
 			EntityDefinition def = ((Entity) object).getDefinition();
-			result.addAll(def.getChildDefinitionNames());
+			Set<String> defNames = def.getChildDefinitionNames();
+			result = new ArrayList<String>(defNames.size() + 1);
+			result.addAll(defNames);
+		} else {
+			result = new ArrayList<String>(1);
 		}
 		result.add(Path.NORMALIZED_PARENT_FUNCTION);
 		return result.toArray(new String[result.size()]);
@@ -51,6 +55,7 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 	private Object extractNonEmptyChildren(Entity entity, String childName) {
 		NodeDefinition childDef = entity.getDefinition().getChildDefinition(childName);
 		List<Node<?>> children = entity.getAll(childDef);
+
 		List<Node<?>> list = new ArrayList<Node<?>>(children.size());
 		
 		for (Node<?> childNode : children) {
@@ -60,8 +65,9 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 		}
 		if (list.isEmpty()) {
 			return null;
+		} else {
+			return list;
 		}
-		return Collections.unmodifiableList(list);
 	}
 
 }

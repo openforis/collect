@@ -5,6 +5,7 @@ package org.openforis.idm.metamodel.validation;
 
 import java.util.List;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 
@@ -17,18 +18,21 @@ public class EntityKeyValidator implements ValidationRule<Attribute<?, ?>> {
 	public ValidationResultFlag evaluate(Attribute<?, ?> keyAttribute) {
 		Entity multipleEntity = keyAttribute.getNearestAncestorMultipleEntity();
 		
-		if ( multipleEntity.getDefinition().isRoot() ) {
+		EntityDefinition multipleEntityDef = multipleEntity.getDefinition();
+		
+		if ( multipleEntityDef.isRoot() ) {
 			return ValidationResultFlag.OK;
+		}
+		String[] keyValues = multipleEntity.getKeyValues();
+		if (keyValues == null) {
+			return null;
+		}
+		List<Entity> entities = multipleEntity.getParent().findChildEntitiesByKeys(multipleEntityDef, keyValues);
+		
+		if ( entities.size() > 1 ) {
+			return ValidationResultFlag.ERROR;
 		} else {
-			String[] keyValues = multipleEntity.getKeyValues();
-
-			List<Entity> entities = multipleEntity.getParent().findChildEntitiesByKeys(multipleEntity.getName(), keyValues);
-			
-			if ( entities.size() > 1 ) {
-				return ValidationResultFlag.ERROR;
-			} else {
-				return ValidationResultFlag.OK;
-			}
+			return ValidationResultFlag.OK;
 		}
 	}
 

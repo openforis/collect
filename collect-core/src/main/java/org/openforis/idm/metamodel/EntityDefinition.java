@@ -163,9 +163,8 @@ public class EntityDefinition extends NodeDefinition {
 	 * The key attribute definitions can even be defined inside nested single entities.
 	 */
 	public List<AttributeDefinition> getKeyAttributeDefinitions() {
-		List<AttributeDefinition> result = new ArrayList<AttributeDefinition>();
-		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
-		queue.addAll(getChildDefinitions());
+		List<AttributeDefinition> result = new LinkedList<AttributeDefinition>();
+		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>(getChildDefinitions());
 		while ( ! queue.isEmpty() ) {
 			NodeDefinition nodeDefn = queue.remove();
 			if ( nodeDefn instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDefn).isKey() ) {
