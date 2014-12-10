@@ -120,24 +120,21 @@ package org.openforis.collect.ui.component.detail
 		}
 		
 		public function displayMinMaxCountValidationErrors(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
-			var flag:ValidationResultFlag = null;
 			var validationMessages:IList = null;
 			var minCountValid:ValidationResultFlag = parentEntity.getMinCountValidation(defn);
 			var maxCountValid:ValidationResultFlag = parentEntity.getMaxCountValidation(defn);
 			if(minCountValid != ValidationResultFlag.OK) {
-				flag = minCountValid;
 				var minCount:int = parentEntity.getMinCount(defn);
 				if ( minCount == 1 ) {
 					validationMessages = new ArrayCollection([Message.get("edit.validation.requiredField")]);
 				} else {
 					validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [minCount])]);
 				}
-				apply(flag, validationMessages);
+				apply(minCountValid, validationMessages);
 			} else if(maxCountValid != ValidationResultFlag.OK) {
-				flag = maxCountValid;
 				var maxCount:int = parentEntity.getMaxCount(defn);
 				validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [maxCount > 0 ? maxCount: 1])]);
-				apply(flag, validationMessages);
+				apply(maxCountValid, validationMessages);
 			} else {
 				reset();
 			}

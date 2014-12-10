@@ -137,6 +137,16 @@ package org.openforis.collect.model.proxy {
 				return parent.getChildren(definition);
 			}
 		}
+		
+		public function getAncestors():IList {
+			var result:IList = new ArrayCollection();
+			var currentParent:EntityProxy = parent;
+			while (currentParent != null) {
+				result.addItemAt(currentParent, 0);
+				currentParent = currentParent.parent;
+			}
+			return result;
+		}
 
 		public function getIndex():int {
 			var siblings:IList = getSiblings();
