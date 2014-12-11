@@ -18,24 +18,27 @@ public class NodeBuilder {
 	
 	private boolean buildsAttribute;
 	private String name;
-	private String value;
+	private Object value;
 	private NodeBuilder[] builders;
 	
-	private NodeBuilder(boolean buildsAttribute, String name, String value, NodeBuilder... builders) {
+	private NodeBuilder(boolean buildsAttribute, String name, Object value, NodeBuilder... builders) {
 		this.buildsAttribute = buildsAttribute;
 		this.name = name;
 		this.value = value;
 		this.builders = builders;
 	}
 
-	public static Record record(Survey survey, NodeBuilder... builders) {
-		List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
-		String rootEntityName = rootEntityDefs.get(rootEntityDefs.size() - 1).getName();
-		return record(survey, rootEntityName, builders);
+	public static <R extends Record> R record(Survey survey, NodeBuilder... builders) {
+		return record(survey, (String) null, (String) null, builders);
 	}
 	
-	public static Record record(Survey survey, String rootEntityName, NodeBuilder... builders) {
-		Record record = survey.createRecord();
+	public static <R extends Record> R record(Survey survey, String rootEntityName, String versionName, NodeBuilder... builders) {
+		if (rootEntityName == null) {
+			List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
+			rootEntityName = rootEntityDefs.get(rootEntityDefs.size() - 1).getName();
+		}
+		@SuppressWarnings("unchecked")
+		R record = (R) survey.createRecord(versionName);
 		Entity rootEntity = record.createRootEntity(rootEntityName);
 		addChildren(rootEntity, builders);
 		return record;
@@ -63,7 +66,7 @@ public class NodeBuilder {
 		return attribute(name, null);
 	}
 	
-	public static NodeBuilder attribute(String name, String value) {
+	public static NodeBuilder attribute(String name, Object value) {
 		return new NodeBuilder(true, name, value);
 	}
 	
@@ -96,8 +99,11 @@ public class NodeBuilder {
 		@SuppressWarnings("unchecked")
 		Attribute<?, Value> attr = (Attribute<?, Value>) def.createNode();
 		if ( value != null ) {
-			Value val = def.createValue(value);
-			attr.setValue(val);
+			if (value instanceof Value) {
+				attr.setValue((Value) value);
+			} else {
+				attr.setValue(def.<Value>createValue(value.toString()));
+			}
 			attr.updateSummaryInfo();
 		}
 		return attr;

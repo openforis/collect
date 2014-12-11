@@ -16,7 +16,7 @@ import org.junit.Test;
  * @author D. Wiell
  *
  */
-public class RequirenessDependencyGraphTest extends NodePointerDependencyGraphTest {
+public class MinCountDependencyGraphTest extends NodePointerDependencyGraphTest {
 
 	@Test
 	public void testNoRequiness() {
@@ -153,11 +153,11 @@ public class RequirenessDependencyGraphTest extends NodePointerDependencyGraphTe
 
 	@Override
 	protected List<NodePointer> determineDependents(List<Node<?>> sources) {
-		return record.requirenessDependencies.dependenciesFor(sources);
+		return record.minCountDependencies.dependenciesFor(sources);
 	}
 	
 	protected void assertRequiredDependents(List<NodePointer> sources, NodePointer... expectedDependents) {
-		List<NodePointer> dependents = record.requirenessDependencies.dependenciesForPointers(sources);
+		List<NodePointer> dependents = record.minCountDependencies.dependenciesForPointers(sources);
 		assertEquals(toPointerPaths(Arrays.asList(expectedDependents)), toPointerPaths(dependents));
 	}
 	

@@ -14,9 +14,9 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  * @author D. Wiell
  *
  */
-public class RequirenessDependencyGraph extends NodePointerDependencyGraph {
+public class MinCountDependencyGraph extends NodePointerDependencyGraph {
 	
-	public RequirenessDependencyGraph(Survey survey) {
+	public MinCountDependencyGraph(Survey survey) {
 		super(survey);
 	}
 
@@ -24,7 +24,7 @@ public class RequirenessDependencyGraph extends NodePointerDependencyGraph {
 	protected Set<NodePathPointer> determineSources(NodePointer dependent) throws InvalidExpressionException {
 		NodeDefinition def = dependent.getChildDefinition();
 		Survey survey = def.getSurvey();
-		Set<NodePathPointer> sourcePointers = survey.getRequiredSources(def);
+		Set<NodePathPointer> sourcePointers = survey.getMinCountSources(def);
 		return sourcePointers;
 	}
 	
@@ -32,18 +32,18 @@ public class RequirenessDependencyGraph extends NodePointerDependencyGraph {
 	protected Set<NodePathPointer> determineDependents(NodePointer source) throws InvalidExpressionException {
 		NodeDefinition def = source.getChildDefinition();
 		Survey survey = def.getSurvey();
-		Set<NodePathPointer> dependentPointers = survey.getRequiredDependencies(def);
+		Set<NodePathPointer> dependentPointers = survey.getMinCountDependencies(def);
 		return dependentPointers;
 	}
 
 	@Override
 	protected boolean isDependentItemIncluded(NodePointer node) {
 		NodeDefinition nodeDef = node.getChildDefinition();
-		return nodeDef.hasMinCount() || StringUtils.isNotBlank(nodeDef.getRequiredExpression());
+		return StringUtils.isNotBlank(nodeDef.getMinCountExpression());
 	}
 
 	public Collection<NodePointer> dependenciesForNodePointers(Collection<NodePointer> nodePointers) {
 		return super.dependenciesForItems(nodePointers);
 	}
-		
+
 }

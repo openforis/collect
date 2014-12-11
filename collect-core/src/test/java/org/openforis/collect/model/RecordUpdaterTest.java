@@ -61,11 +61,6 @@ public class RecordUpdaterTest {
 		assertEquals(new TextValue("1"), treeCount.getValue());
 	}
 
-	protected EntityDefinition rootEntityDef(NodeDefinitionBuilder... builders) {
-		EntityDefinition rootEntityDef = NodeDefinitionBuilder.rootEntityDef(survey, "root", builders);
-		return rootEntityDef;
-	}
-
 	@Test
 	public void testUpdateAttribute() {
 		record(
@@ -405,6 +400,56 @@ public class RecordUpdaterTest {
 	}
 	
 	@Test
+	public void testRelevanceUpdatedFromNestedNode() {
+		record(
+			rootEntityDef(
+				entityDef("tree",
+					attributeDef("tree_no"),
+					attributeDef("total_height")
+						.calculated("tree_no * 2")
+				),
+				attributeDef("test")
+					.relevant("tree[1]/total_height > 4")
+			),
+			entity("tree",
+				attribute("tree_no", "1")
+			),
+			attribute("test")
+		);
+		
+		Attribute<?, ?> test = record.findNodeByPath("/root/test");
+		assertFalse(test.isRelevant());
+		
+		Attribute<?, ?> treeNo = record.findNodeByPath("/root/tree[1]/tree_no");
+		update(treeNo, "3");
+		
+		assertTrue(test.isRelevant());
+	}
+
+	@Test
+	public void testRelevanceUpdatedFromNestedNodeWhenEntityIsAdded() {
+		record(
+			rootEntityDef(
+				entityDef("tree",
+					attributeDef("tree_pos")
+						.calculated("idm:position()"),
+					attributeDef("total_height")
+						.calculated("tree_pos * 2")
+				),
+				attributeDef("test")
+					.relevant("tree[2]/total_height > 3")
+			)
+		);
+		
+		Attribute<?, ?> test = record.findNodeByPath("/root/test");
+		assertFalse(test.isRelevant());
+		
+		updater.addEntity(record.getRootEntity(), "tree");
+		
+		assertTrue(test.isRelevant());
+	}
+	
+	@Test
 	public void testInitializeCalculatedAttributeInNestedNode() {
 		record(
 			rootEntityDef(
@@ -430,11 +475,106 @@ public class RecordUpdaterTest {
 		assertEquals("40.0", ((TextValue) doubleHeight.getValue()).getValue());
 	}
 	
+	@Test
+	public void testCardinalityRevalidatedOnAttributeUpdate() {
+		record(
+			rootEntityDef(
+				attributeDef("min_time_study"),
+				entityDef("time_study",
+					attributeDef("start_time")
+				)
+				.multiple()
+				.minCount("min_time_study")
+			),
+			attribute("min_time_study", "2"),
+			entity("time_study", 
+				attribute("start_time", "2011")
+			),
+			entity("time_study", 
+				attribute("start_time", "2012")
+			)
+		);
+		Entity rootEntity = record.getRootEntity();
+		assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult("time_study"));
+
+		Attribute<?, ?> minTimeStudy = record.findNodeByPath("/root/min_time_study");
+
+		NodeChangeSet nodeChangeSet = update(minTimeStudy, "3");
+		assertNotNull(nodeChangeSet.getChange(rootEntity));
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("time_study"));
+	}
+	
+	@Test
+	public void testCardinalityRevalidatedOnRequiredAttributeUpdate() {
+		record(
+			rootEntityDef(
+				attributeDef("source"),
+				attributeDef("dependent")
+					.required("source = 1")
+			),
+			attribute("source", "2"),
+			attribute("dependent", null)
+		);
+		Entity rootEntity = record.getRootEntity();
+		assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult("dependent"));
+
+		Attribute<?, ?> source = record.findNodeByPath("/root/source");
+
+		NodeChangeSet nodeChangeSet = update(source, "1");
+		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(rootEntity);
+		assertNotNull(rootEntityChange);
+		ValidationResultFlag dependentValidationResult = rootEntityChange.getChildrenMinCountValidation().get("dependent");
+		assertEquals(ValidationResultFlag.ERROR, dependentValidationResult);
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("dependent"));
+	}
+	
+	@Test
+	public void testCardinalityRevalidatedOnDelete() {
+		record(
+			rootEntityDef(
+				attributeDef("max_time_study"),
+				entityDef("time_study",
+					attributeDef("start_time")
+				)
+				.multiple()
+				.maxCount("max_time_study")
+			),
+			attribute("max_time_study", "2"),
+			entity("time_study", 
+				attribute("start_time", "2011")
+			),
+			entity("time_study", 
+				attribute("start_time", "2012")
+			),
+			entity("time_study", 
+				attribute("start_time", "2013")
+			)
+		);
+		Entity rootEntity = record.getRootEntity();
+		
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMaxCountValidationResult("time_study"));
+		
+//		EntityDefinition timeStudyDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/root/time_study");
+//		Integer timeStudyMaxCount = rootEntityChange.getMaxCountByChildDefinitionId().get(timeStudyDef);
+		
+		NodeChangeSet changeSet = updater.deleteNode(record.findNodeByPath("/root/time_study[1]"));
+		EntityChange rootEntityChange = (EntityChange) changeSet.getChange(rootEntity);
+		assertNotNull(rootEntityChange);
+		ValidationResultFlag maxTimeStudyCountValidation = rootEntityChange.getChildrenMaxCountValidation().get("time_study");
+		assertEquals(ValidationResultFlag.OK, maxTimeStudyCountValidation);
+		assertEquals(ValidationResultFlag.OK, rootEntity.getMaxCountValidationResult("time_study"));
+	}
+	
 	protected void record(EntityDefinition rootDef, NodeBuilder... builders) {
 		record = NodeBuilder.record(survey, builders);
 		updater.initializeRecord(record);
 	}
 	
+	protected EntityDefinition rootEntityDef(NodeDefinitionBuilder... builders) {
+		EntityDefinition rootEntityDef = NodeDefinitionBuilder.rootEntityDef(survey, "root", builders);
+		return rootEntityDef;
+	}
+
 	protected Entity entityByPath(String path) {
 		return (Entity) record.findNodeByPath(path);
 	}

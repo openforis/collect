@@ -37,7 +37,7 @@ package org.openforis.collect.presenter
 			var entity:EntityProxy = null;
 			if(view.parentEntity != null && view.entityDefinition != null && ! view.entityDefinition.multiple) {
 				//assign entity
-				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
+				entity = view.parentEntity.getChild(view.entityDefinition, 0) as EntityProxy;
 			}
 			view.entity = entity;
 			super.updateView();

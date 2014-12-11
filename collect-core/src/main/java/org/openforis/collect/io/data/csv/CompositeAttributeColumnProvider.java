@@ -51,7 +51,7 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	@Override
 	public List<String> extractValues(Node<?> axis) {
 		checkValidAxis(axis);
-		List<Node<?>> attributes = ((Entity) axis).getAll(defn.getName());
+		List<Node<?>> attributes = ((Entity) axis).getAll(defn);
 		if (attributes.isEmpty()) {
 			List<String> emptyValues = new ArrayList<String>(fieldNames.length);
 			for (int i = 0; i < fieldNames.length; i++) {

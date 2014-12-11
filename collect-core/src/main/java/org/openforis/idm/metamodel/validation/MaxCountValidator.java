@@ -31,7 +31,7 @@ public class MaxCountValidator implements ValidationRule<Entity> {
 		if ( nodeDefinition instanceof Calculable && ((Calculable) nodeDefinition).isCalculated() ) {
 			return OK;
 		}
-		Integer maxCount = nodeDefinition.getMaxCount();
+		Integer maxCount = entity.getMaxCount(nodeDefinition);
 		if (maxCount == null) {
 			return OK;
 		} else {

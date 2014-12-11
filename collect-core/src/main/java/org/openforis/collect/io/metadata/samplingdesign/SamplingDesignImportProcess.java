@@ -239,6 +239,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		samplingDesignManager.insert(survey, items, overwriteAll);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void saveSurvey() throws SurveyImportException {
 		if ( survey.isWork() ) {
 			surveyManager.saveSurveyWork(survey);

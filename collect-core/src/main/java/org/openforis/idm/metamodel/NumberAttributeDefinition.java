@@ -3,10 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.Node;
@@ -30,10 +26,8 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition implem
 	private final FieldDefinition<String> unitNameField = new FieldDefinition<String>(UNIT_NAME_FIELD, "u_name", UNIT_NAME_FIELD, String.class, this);
 	private final FieldDefinition<Integer> unitIdField = new FieldDefinition<Integer>(UNIT_FIELD, "u", "unit_id", Integer.class, this);
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private final List integerTypeFieldDefinitions = Collections.unmodifiableList(Arrays.asList(integerValueField, unitNameField, unitIdField));
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private final List realTypeFieldDefinitions = Collections.unmodifiableList(Arrays.asList(realValueField, unitNameField, unitIdField));
+	private final FieldDefinitionMap integerFieldDefinitionByName = new FieldDefinitionMap(integerValueField, unitNameField, unitIdField);
+	private final FieldDefinitionMap realFieldDefinitionByName = new FieldDefinitionMap(realValueField, unitNameField, unitIdField);
 	
 	private boolean key;
 
@@ -76,39 +70,21 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition implem
 		throw new RuntimeException("Invalid type " + getType());
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		Type type = getType();
-		switch (type) {
+	protected FieldDefinitionMap getFieldDefinitionMap() {
+		switch (getType()) {
 		case INTEGER:
-			return integerTypeFieldDefinitions;
+			return integerFieldDefinitionByName;
 		case REAL:
-			return realTypeFieldDefinitions;
+			return realFieldDefinitionByName;
 		default:
 			throw new UnsupportedOperationException("Unknown type");
 		}
 	}
 	
 	@Override
-	public FieldDefinition<?> getFieldDefinition(String name) {
-		for (FieldDefinition<?> def : getFieldDefinitions()) {
-			if(def.getName().equals(name)) {
-				return def;
-			}
-		}
-		return null;
-	}
-
-	@Override
-	protected FieldDefinitionMap getFieldDefinitionMap() {
-		throw new UnsupportedOperationException();
-	}
-	
-	@Override
 	public Class<? extends Value> getValueType() {
-		Type type = getType();
-		switch (type) {
+		switch (getType()) {
 		case INTEGER:
 			return IntegerValue.class;
 		case REAL:

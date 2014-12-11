@@ -85,7 +85,7 @@ package org.openforis.collect.ui.component.detail
 			if(parentEntity != null && defn != null) {
 				var errorMessages:ArrayCollection = new ArrayCollection();
 				var warningMessages:ArrayCollection = new ArrayCollection();
-				var attributes:IList = parentEntity.getChildren(defn.name);
+				var attributes:IList = parentEntity.getChildren(defn);
 				var confirmedError:Boolean = false;
 				for each (var a:AttributeProxy in attributes) {
 					if (a.hasErrors()) {
@@ -120,25 +120,21 @@ package org.openforis.collect.ui.component.detail
 		}
 		
 		public function displayMinMaxCountValidationErrors(parentEntity:EntityProxy, defn:NodeDefinitionProxy):void {
-			var flag:ValidationResultFlag = null;
 			var validationMessages:IList = null;
-			var name:String = defn.name;
-			var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(name);
-			var maxCountValid:ValidationResultFlag = parentEntity.childrenMaxCountValidationMap.get(name);
-			if(minCountValid != ValidationResultFlag.OK || maxCountValid != ValidationResultFlag.OK) {
-				if(minCountValid != ValidationResultFlag.OK) {
-					flag = minCountValid;
-					var effectiveMinCount:int = parentEntity.getEffectiveMinCount(defn.name);
-					if ( effectiveMinCount == 1 ) {
-						validationMessages = new ArrayCollection([Message.get("edit.validation.requiredField")]);
-					} else {
-						validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [effectiveMinCount])]);
-					}
+			var minCountValid:ValidationResultFlag = parentEntity.getMinCountValidation(defn);
+			var maxCountValid:ValidationResultFlag = parentEntity.getMaxCountValidation(defn);
+			if(minCountValid != ValidationResultFlag.OK) {
+				var minCount:int = parentEntity.getMinCount(defn);
+				if ( minCount == 1 ) {
+					validationMessages = new ArrayCollection([Message.get("edit.validation.requiredField")]);
 				} else {
-					flag = maxCountValid;
-					validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [defn.maxCount > 0 ? defn.maxCount: 1])]);
+					validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [minCount])]);
 				}
-				apply(flag, validationMessages);
+				apply(minCountValid, validationMessages);
+			} else if(maxCountValid != ValidationResultFlag.OK) {
+				var maxCount:int = parentEntity.getMaxCount(defn);
+				validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [maxCount > 0 ? maxCount: 1])]);
+				apply(maxCountValid, validationMessages);
 			} else {
 				reset();
 			}

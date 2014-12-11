@@ -25,8 +25,7 @@ public class DataErrorQueryGenerator {
 		survey.getSchema().traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
 				if (def instanceof AttributeDefinition) {
-					if ((def.getMinCount() != null && def.getMinCount() > 0) 
-							|| StringUtils.isNotBlank(def.getRequiredExpression())) {
+					if (StringUtils.isNotBlank(def.getMinCountExpression())) {
 						DataErrorQuery query = new DataErrorQuery(survey);
 						query.setTitle(String.format(MISSING_DATA_QUERY_TITLE_FORMAT, def.getName()));
 						query.setType(type);

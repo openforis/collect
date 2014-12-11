@@ -3,10 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.IntegerRange;
 import org.openforis.idm.model.IntegerRangeAttribute;
@@ -34,10 +30,8 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 	private final FieldDefinition<String> unitNameField = new FieldDefinition<String>(UNIT_NAME_FIELD, "u_name", "unit", String.class, this);;
 	private final FieldDefinition<Integer> unitIdField = new FieldDefinition<Integer>(UNIT_FIELD, "u", "unit_id", Integer.class, this);;
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private final List integerTypeFieldDefinitions = Collections.unmodifiableList(Arrays.asList(integerFromField, integerToField, unitNameField, unitIdField));
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private final List realTypeFieldDefinitions = Collections.unmodifiableList(Arrays.asList(realFromField, realToField, unitNameField, unitIdField));
+	private final FieldDefinitionMap integerFieldDefinitionByName = new FieldDefinitionMap(integerFromField, integerToField, unitNameField, unitIdField);
+	private final FieldDefinitionMap realFieldDefinitionByName = new FieldDefinitionMap(realFromField, realToField, unitNameField, unitIdField);
 	
 	RangeAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
@@ -71,19 +65,6 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		throw new RuntimeException("Invalid range type " + getType());
 	}
 	
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<FieldDefinition<?>> getFieldDefinitions() {
-		switch (getType()) {
-		case INTEGER:
-			return integerTypeFieldDefinitions;
-		case REAL:
-			return realTypeFieldDefinitions;
-		default:
-			throw new UnsupportedOperationException("Unknown type");
-		}
-	}
-	
 	@Override
 	public FieldDefinition<?> getFieldDefinition(String name) {
 		for (FieldDefinition<?> def : getFieldDefinitions()) {
@@ -114,7 +95,14 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
-		throw new UnsupportedOperationException();
+		switch (getType()) {
+		case INTEGER:
+			return integerFieldDefinitionByName;
+		case REAL:
+			return realFieldDefinitionByName;
+		default:
+			throw new UnsupportedOperationException("Unknown type");
+		}
 	}
 	
 }

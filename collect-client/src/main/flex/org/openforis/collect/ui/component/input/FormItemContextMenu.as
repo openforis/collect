@@ -67,12 +67,12 @@ package org.openforis.collect.ui.component.input {
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var nodeDefinition:NodeDefinitionProxy = _formItem.nodeDefinition;
+			var nodeDefId:int = nodeDefinition.id;
 			var parentEntity:EntityProxy = _formItem.parentEntity;
 			var items:Array = new Array();
 			if(parentEntity != null) {
-				var nodeName:String = nodeDefinition.name;
-				var count:int = parentEntity.getCount(nodeName);
-				var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(nodeName);
+				var count:int = parentEntity.getCount(nodeDefinition);
+				var minCountValid:ValidationResultFlag = parentEntity.getMinCountValidation(nodeDefinition);
 				if(count == 0 || minCountValid == ValidationResultFlag.ERROR) {
 					switch(step) {
 						/*case CollectRecord$Step.ENTRY:
@@ -85,11 +85,11 @@ package org.openforis.collect.ui.component.input {
 				}
 				if(step == CollectRecord$Step.ENTRY) {
 					if ( _formItem.nodeDefinition is AttributeDefinitionProxy && ! nodeDefinition.multiple ) {
-						var attribute:AttributeProxy = parentEntity.getSingleAttribute(nodeDefinition.name);
+						var attribute:AttributeProxy = parentEntity.getSingleAttribute(nodeDefinition);
 						var hasErrors:Boolean = attribute != null && attribute.hasErrors() &&
 							! attribute.validationResults.specifiedErrorPresent;
 						if(hasErrors) {
-							var hasConfirmedError:Boolean = parentEntity.hasConfirmedError(nodeDefinition.name);
+							var hasConfirmedError:Boolean = parentEntity.hasConfirmedError(nodeDefinition);
 							if(! hasConfirmedError) {
 								items.push(CONFIRM_ERROR);
 							}
@@ -123,7 +123,7 @@ package org.openforis.collect.ui.component.input {
 								nodeEvent.node = AttributeFormItem(formItem).attribute;
 							} else {
 								nodeEvent.parentEntity = parentEntity;
-								nodeEvent.nodes = parentEntity.getChildren(nodeDefinition.name);
+								nodeEvent.nodes = parentEntity.getChildren(nodeDefinition);
 							}
 						}
 					}

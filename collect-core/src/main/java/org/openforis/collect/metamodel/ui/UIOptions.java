@@ -599,7 +599,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		String value = defn.getAnnotation(Annotation.VISIBLE_FIELDS.getQName());
 		if ( StringUtils.isBlank(value) ) {
 			//when no annotation is specified, all fields are visible
-			return defn.getFieldNames().toArray(new String[0]);
+			List<String> fieldNames = defn.getFieldNames();
+			return fieldNames.toArray(new String[fieldNames.size()]);
 		} else {
 			String[] fields = value.split(VISIBLE_FIELDS_SEPARATOR);
 			return fields;

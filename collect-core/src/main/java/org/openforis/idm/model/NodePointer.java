@@ -32,6 +32,14 @@ public class NodePointer {
 		this(entity, entity.getDefinition().getChildDefinition(childName));
 	}
 
+	public Integer getNodesMinCount() {
+		return entity.getMinCount(childDefinition);
+	}
+	
+	public Integer getNodesMaxCount() {
+		return entity.getMaxCount(childDefinition);
+	}
+	
 	public Entity getEntity() {
 		return entity;
 	}
@@ -57,15 +65,11 @@ public class NodePointer {
 	}
 
 	public List<Node<?>> getNodes() {
-		return entity.getChildren(getChildName());
+		return entity.getAll(childDefinition);
 	}
 	
 	public boolean areNodesRelevant() {
 		return entity.isRelevant(getChildName());
-	}
-	
-	public Boolean areNodesRequired() {
-		return entity.isRequired(getChildName());
 	}
 	
 	@Override
@@ -100,6 +104,5 @@ public class NodePointer {
 			return false;
 		return true;
 	}
-	
-	
+
 }

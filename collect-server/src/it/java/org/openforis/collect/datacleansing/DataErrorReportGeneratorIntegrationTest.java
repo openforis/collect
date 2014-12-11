@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -40,9 +41,11 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 	
 	private CollectSurvey survey;
 	private DataErrorType invalidAttributeErrorType;
+	private RecordUpdater updater;
 	
 	@Before
 	public void init() throws SurveyImportException, IdmlParseException {
+		updater = new RecordUpdater();
 		survey = importModel();
 		initRecords();
 		invalidAttributeErrorType = new DataErrorType(survey);
@@ -97,7 +100,8 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 						attribute("dbh", "20")
 					)
 				)
-			).build(survey, "cluster");
+			).build(survey, "cluster", "2.0");
+			updater.initializeRecord(record);
 			recordManager.save(record);
 		}
 		{
@@ -116,7 +120,8 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 						attribute("dbh", "30")
 					)
 				)
-			).build(survey, "cluster");
+			).build(survey, "cluster", "2.0");
+			updater.initializeRecord(record);
 			recordManager.save(record);
 		}
 	}

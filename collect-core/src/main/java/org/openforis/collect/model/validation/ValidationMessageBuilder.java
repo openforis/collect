@@ -136,22 +136,18 @@ public class ValidationMessageBuilder {
 		return result;
 	}
 	
-	public String getMaxCountValidationMessage(NodeDefinition defn, Locale locale) {
-		Integer maxCount = defn.getMaxCount();
+	public String getMaxCountValidationMessage(Entity parentEntity, String childName, Locale locale) {
+		EntityDefinition defn = parentEntity.getDefinition();
+		NodeDefinition childDefn = defn.getChildDefinition(childName);
+		Integer maxCount = parentEntity.getMaxCount(childDefn);
 		Object[] args = new Integer[]{maxCount > 0 ? maxCount: 1};
 		String surveyDefaultLanguage = defn.getSurvey().getDefaultLanguage();
 		String message = getMessage(surveyDefaultLanguage, locale, "validation.maxCount", args);
 		return message;
 	}
 
-	public String getMaxCountValidationMessage(Entity parentEntity, String childName, Locale locale) {
-		EntityDefinition defn = parentEntity.getDefinition();
-		NodeDefinition childDefn = defn.getChildDefinition(childName);
-		return getMaxCountValidationMessage(childDefn, locale);
-	}
-
 	public String getMinCountValidationMessage(Entity parentEntity, String childName, Locale locale) {
-		int effectiveMinCount = parentEntity.getEffectiveMinCount(childName);
+		int effectiveMinCount = parentEntity.getMinCount(childName);
 		Object[] args = new Integer[]{effectiveMinCount};
 		String surveyDefaultLanguage = parentEntity.getSurvey().getDefaultLanguage();
 		String message = getMessage(surveyDefaultLanguage, locale, "validation.minCount", args);
@@ -243,7 +239,7 @@ public class ValidationMessageBuilder {
 					args.add(arg);
 				}
 			}
-			result = args.toArray(new String[0]);
+			result = args.toArray(new String[args.size()]);
 		}
 		return result;
 	}
@@ -428,7 +424,7 @@ public class ValidationMessageBuilder {
 			List<String> shortKeyParts = new ArrayList<String>();
 			List<String> fullKeyParts = new ArrayList<String>();
 			for (AttributeDefinition keyDefn : keyDefns) {
-				Attribute<?, ?> keyAttr = (Attribute<?, ?>) entity.get(keyDefn.getName(), 0);
+				Attribute<?, ?> keyAttr = (Attribute<?, ?>) entity.get(keyDefn, 0);
 				if ( keyAttr != null ) {
 					Object keyValue = getKeyLabelPart(keyAttr);
 					if ( keyValue != null && StringUtils.isNotBlank(keyValue.toString()) ) {

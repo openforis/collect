@@ -47,56 +47,26 @@ class SurveyDependencies {
 
 	private Survey survey;
 
-	private StateDependencyMap relevanceDependencies;
-	private StateDependencyMap requiredDependencies;
-	private StateDependencyMap validationDependencies;
 	private StateDependencyMap calculatedValueDependencies;
+	private StateDependencyMap minCountDependencies;
+	private StateDependencyMap maxCountDependencies;
+	private StateDependencyMap relevanceDependencies;
+	private StateDependencyMap validationDependencies;
 
 	SurveyDependencies(Survey survey) {
 		this.survey = survey;
 		SurveyContext surveyContext = this.survey.getContext();
 		ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
 		
-		relevanceDependencies = new StateDependencyMap(expressionEvaluator);
-		requiredDependencies = new StateDependencyMap(expressionEvaluator);
-		validationDependencies = new StateDependencyMap(expressionEvaluator);
-		calculatedValueDependencies = new StateDependencyMap(expressionEvaluator);
+		this.calculatedValueDependencies = new StateDependencyMap(expressionEvaluator);
+		this.minCountDependencies = new StateDependencyMap(expressionEvaluator);
+		this.maxCountDependencies = new StateDependencyMap(expressionEvaluator);
+		this.relevanceDependencies = new StateDependencyMap(expressionEvaluator);
+		this.validationDependencies = new StateDependencyMap(expressionEvaluator);
 		
 		registerDependencies();
 	}
 
-	Set<NodePathPointer> getValidationDependencies(NodeDefinition definition) {
-		return validationDependencies.getDependencySet(definition.getPath());
-	}
-	
-	Set<NodePathPointer> getValidationSources(NodeDefinition definition) {
-		return validationDependencies.getSources(definition.getPath());
-	}
-
-	Set<NodePathPointer> getRelevanceDependencies(NodeDefinition definition) {
-		return relevanceDependencies.getDependencySet(definition.getPath());
-	}
-	
-	Set<NodePathPointer> getRelevanceSources(NodeDefinition definition) {
-		return relevanceDependencies.getSources(definition.getPath());
-	}
-
-	Set<NodePathPointer> getRequiredDependencies(NodeDefinition definition) {
-		return requiredDependencies.getDependencySet(definition.getPath());
-	}
-	
-	Set<NodePathPointer> getRequiredSources(NodeDefinition definition) {
-		return requiredDependencies.getSources(definition.getPath());
-	}
-	
-	Set<NodePathPointer> getCalculatedValueDependencies(NodeDefinition definition) {
-		return calculatedValueDependencies.getDependencySet(definition.getPath());
-	}
-	
-	Set<NodePathPointer> getCalculatedValueSources(NodeDefinition definition) {
-		return calculatedValueDependencies.getSources(definition.getPath());
-	}
-	
 	private void registerDependencies() {
 		Schema schema = survey.getSchema();
 		
@@ -125,7 +95,8 @@ class SurveyDependencies {
 		List<NodeDefinition> childDefinitions = entityDefinition.getChildDefinitions();
 		for (NodeDefinition nodeDefinition : childDefinitions) {
 			relevanceDependencies.registerDependencies(nodeDefinition, nodeDefinition.getRelevantExpression());
-			requiredDependencies.registerDependencies(nodeDefinition, nodeDefinition.getRequiredExpression());
+			minCountDependencies.registerDependencies(nodeDefinition, nodeDefinition.getMinCountExpression());
+			maxCountDependencies.registerDependencies(nodeDefinition, nodeDefinition.getMaxCountExpression());
 
 			if (nodeDefinition instanceof AttributeDefinition) {
 				registerDependencies((AttributeDefinition) nodeDefinition);
@@ -195,6 +166,46 @@ class SurveyDependencies {
 				validationDependencies.registerSource(ancestorMultipleEntity, keyDefn, otherKeyDefn);
 			}
 		}
+	}
+
+	Set<NodePathPointer> getCalculatedValueDependencies(NodeDefinition definition) {
+		return calculatedValueDependencies.getDependencySet(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getCalculatedValueSources(NodeDefinition definition) {
+		return calculatedValueDependencies.getSources(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getMinCountDependencies(NodeDefinition definition) {
+		return minCountDependencies.getDependencySet(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getMinCountSources(NodeDefinition definition) {
+		return minCountDependencies.getSources(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getMaxCountDependencies(NodeDefinition definition) {
+		return maxCountDependencies.getDependencySet(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getMaxCountSources(NodeDefinition definition) {
+		return maxCountDependencies.getSources(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getRelevanceDependencies(NodeDefinition definition) {
+		return relevanceDependencies.getDependencySet(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getRelevanceSources(NodeDefinition definition) {
+		return relevanceDependencies.getSources(definition.getPath());
+	}
+
+	Set<NodePathPointer> getValidationDependencies(NodeDefinition definition) {
+		return validationDependencies.getDependencySet(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getValidationSources(NodeDefinition definition) {
+		return validationDependencies.getSources(definition.getPath());
 	}
 
 }

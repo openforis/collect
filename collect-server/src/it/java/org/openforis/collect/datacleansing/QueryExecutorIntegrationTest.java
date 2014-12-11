@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -37,9 +38,11 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 	private DataQueryExecutor queryExecutor;
 	
 	private CollectSurvey survey;
+	private RecordUpdater updater;
 	
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
+		updater = new RecordUpdater();
 		survey = importModel();
 		initRecords();
  	}
@@ -81,7 +84,8 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 						attribute("dbh", "20")
 					)
 				)
-			).build(survey, "cluster");
+			).build(survey, "cluster", "2.0");
+			updater.initializeRecord(record);
 			recordManager.save(record);
 		}
 		{
@@ -100,7 +104,8 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 						attribute("dbh", "30")
 					)
 				)
-			).build(survey, "cluster");
+			).build(survey, "cluster", "2.0");
+			updater.initializeRecord(record);
 			recordManager.save(record);
 		}
 	}

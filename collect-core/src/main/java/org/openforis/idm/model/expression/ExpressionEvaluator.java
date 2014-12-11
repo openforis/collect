@@ -2,6 +2,8 @@ package org.openforis.idm.model.expression;
 
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
@@ -14,6 +16,10 @@ import org.openforis.idm.model.Record;
  */
 public class ExpressionEvaluator {
 	
+	private static final Pattern NUMBER_PATTERN = Pattern.compile("^-?\\d*(\\.\\d+)?$");
+	private static final String TRUE_FUNCTION = "true()";
+	private static final String FALSE_FUNCTION = "false()";
+	
 	private ExpressionFactory expressionFactory;
 
 	public ExpressionEvaluator(ExpressionFactory expressionFactory) {
@@ -25,6 +31,11 @@ public class ExpressionEvaluator {
 	}
 
 	public boolean evaluateBoolean(Node<?> context, Node<?> thisNode, String expression, boolean normalizeNumbers) throws InvalidExpressionException {
+		if (TRUE_FUNCTION.equals(expression)) {
+			return true;
+		} else if (FALSE_FUNCTION.equals(expression)) {
+			return false;
+		}
 		BooleanExpression expr = expressionFactory.createBooleanExpression(expression, normalizeNumbers);
 		return expr.evaluate(context, thisNode);
 	}
@@ -34,6 +45,15 @@ public class ExpressionEvaluator {
 		return expr.evaluate(context, thisNode);
 	}
 	
+	public Number evaluateNumericValue(Node<?> context, Node<?> thisNode, String expression) throws InvalidExpressionException {
+		if (isNumeric(expression)) {
+			return Double.parseDouble(expression);
+		} else {
+			Object val = evaluateValue(context, thisNode, expression);
+			return val == null ? null: val instanceof Number ?(Number) val: Double.parseDouble(val.toString());
+		}
+	}
+
 	public Node<?> evaluateNode(Node<?> context, Node<?> thisNode, String expression) throws InvalidExpressionException {
 		ModelPathExpression expr = expressionFactory.createModelPathExpression(expression);
 		Node<?> node = expr.evaluate(context, thisNode);
@@ -63,4 +83,9 @@ public class ExpressionEvaluator {
 		return referencedDefs;
 	}
 
+	private static boolean isNumeric(String expression) {
+		Matcher matcher = NUMBER_PATTERN.matcher(expression);
+		return matcher.matches();
+	}
+	
 }

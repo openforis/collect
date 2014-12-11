@@ -28,6 +28,7 @@ public class EntityDefinition extends NodeDefinition {
 
 	private List<NodeDefinition> childDefinitions;
     private Map<String, NodeDefinition> childDefinitionByName;
+    private Map<Integer, NodeDefinition> childDefinitionById;
 
 	public enum TraversalType {
 		DFS //depth first search
@@ -38,6 +39,7 @@ public class EntityDefinition extends NodeDefinition {
 	EntityDefinition(Survey survey, int id) {
 		super(survey, id);
         childDefinitionByName = new HashMap<String, NodeDefinition>();
+        childDefinitionById = new HashMap<Integer, NodeDefinition>();
 	}
 
 	void renameChild(String oldName, String newName) {
@@ -74,15 +76,13 @@ public class EntityDefinition extends NodeDefinition {
     }
 
 	public NodeDefinition getChildDefinition(int id) {
-		if (childDefinitions != null) {
-			for (NodeDefinition childDefinition : childDefinitions) {
-				if (childDefinition.getId() == id) {
-					return childDefinition;
-				}
-			}
+		NodeDefinition childDef = childDefinitionById.get(id);
+		if (childDef == null) {
+			throw new IllegalArgumentException("Child definition with id " + id +
+					" not found in " + getPath());
+		} else {
+			return childDef;
 		}
-		throw new IllegalArgumentException("Child definition with id " + id +
-				" not found in " + getPath());
 	}
 
 	/**
@@ -127,6 +127,7 @@ public class EntityDefinition extends NodeDefinition {
 		}
 		childDefinitions.add(defn);
         childDefinitionByName.put(defn.getName(), defn);
+        childDefinitionById.put(defn.getId(), defn);
 		defn.setParentDefinition(this);
 	}
 
@@ -142,6 +143,7 @@ public class EntityDefinition extends NodeDefinition {
 	protected void removeChildDefinition(NodeDefinition defn, boolean detach) {
 		childDefinitions.remove(defn);
         childDefinitionByName.remove(defn.getName());
+        childDefinitionById.remove(defn.getId());
 		if ( detach ) {
 			defn.detach();
 		}
@@ -161,9 +163,8 @@ public class EntityDefinition extends NodeDefinition {
 	 * The key attribute definitions can even be defined inside nested single entities.
 	 */
 	public List<AttributeDefinition> getKeyAttributeDefinitions() {
-		List<AttributeDefinition> result = new ArrayList<AttributeDefinition>();
-		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
-		queue.addAll(getChildDefinitions());
+		List<AttributeDefinition> result = new LinkedList<AttributeDefinition>();
+		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>(getChildDefinitions());
 		while ( ! queue.isEmpty() ) {
 			NodeDefinition nodeDefn = queue.remove();
 			if ( nodeDefn instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDefn).isKey() ) {

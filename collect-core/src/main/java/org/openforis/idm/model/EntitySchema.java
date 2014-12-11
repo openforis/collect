@@ -36,7 +36,7 @@ public class EntitySchema extends SchemaSupport<Entity> {
 
 	@Override
 	public void writeTo(Output out, Entity entity) throws IOException {
-		List<Node<? extends NodeDefinition>> children = entity.getChildren();
+		List<Node<? extends NodeDefinition>> children = entity.getAll();
         for(Node<?> node : children) {
         	if(isNodeToBeSaved(node)) {
 				out.writeUInt32(FIELD_DEFINITION_ID, node.definitionId, false);
@@ -46,8 +46,7 @@ public class EntitySchema extends SchemaSupport<Entity> {
         EntityDefinition definition = entity.getDefinition();
         List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
         for (NodeDefinition childDefinition : childDefinitions) {
-        	String childName = childDefinition.getName();
-        	State childState = entity.getChildState(childName);
+        	State childState = entity.getChildState(childDefinition);
         	out.writeInt32(FIELD_CHILD_NODE_STATE, childState.intValue(), false);
         	out.writeInt32(FIELD_CHILD_DEFINITION_ID, childDefinition.getId(), false);
         }
@@ -83,7 +82,7 @@ public class EntitySchema extends SchemaSupport<Entity> {
         		Schema schema = entity.getSchema();
         		NodeDefinition childDefn = schema.getDefinitionById(childDefnId);
         		if ( childDefn != null ) {
-        			entity.childStates.put(childDefn.getName(), state);
+        			entity.setChildState(childDefn, state);
         		}
         	} else {
             	throw new ProtostuffException("Unexpected field number");

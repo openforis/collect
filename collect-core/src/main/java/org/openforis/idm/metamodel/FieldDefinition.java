@@ -94,8 +94,8 @@ public final class FieldDefinition<T> extends NodeDefinition {
 	
 
 	@Override
-	public Integer getMaxCount() {
-		return 1;
+	public String getMaxCountExpression() {
+		return "1";
 	}
 	
 	public AttributeDefinition getAttributeDefinition() {

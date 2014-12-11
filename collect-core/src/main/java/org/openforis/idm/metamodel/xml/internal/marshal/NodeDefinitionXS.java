@@ -28,17 +28,18 @@ public abstract class NodeDefinitionXS<T extends NodeDefinition, P> extends Vers
 	protected void attributes(T defn) throws IOException {
 		attribute(ID, defn.getId());
 		attribute(NAME, defn.getName());
-		attribute(RELEVANT, defn.getRelevantExpression());
 		if ( defn.getParentDefinition() != null ) {
+			attribute(RELEVANT, defn.getRelevantExpression());
 			if ( defn.isMultiple() ) {
 				attribute(MULTIPLE, true);
-				attribute(MIN_COUNT, defn.getMinCount());
-				attribute(MAX_COUNT, defn.getMaxCount());
-			} else if ( defn.getMinCount() != null && defn.getMinCount() > 0 ){
+				attribute(MIN_COUNT, defn.getMinCountExpression());
+				attribute(MAX_COUNT, defn.getMaxCountExpression());
+			} else if ( defn.isAlwaysRequired() ){
 				attribute(REQUIRED, true);
+			} else {
+				attribute(REQUIRED_IF, defn.extractRequiredExpression());
 			}
 		}
-		attribute(REQUIRED_IF, defn.getRequiredExpression());
 		super.attributes(defn);
 	}
 	

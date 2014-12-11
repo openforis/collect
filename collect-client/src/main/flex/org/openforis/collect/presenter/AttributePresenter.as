@@ -2,15 +2,18 @@ package org.openforis.collect.presenter {
 	import flash.events.Event;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.IList;
 	import mx.core.UIComponent;
 	import mx.events.PropertyChangeEvent;
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityChangeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
@@ -126,8 +129,13 @@ package org.openforis.collect.presenter {
 		
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
 			if(event.newValue == true && (view.attribute != null || view.attributeDefinition.multiple && view.attributes != null)) {
-				var attributeName:String = view.attributeDefinition.name;
-				view.parentEntity.showErrorsOnChild(attributeName);
+				var currentChildDef:NodeDefinitionProxy = view.attributeDefinition;
+				var currentParent:EntityProxy = view.parentEntity;
+				while (currentParent != null) {
+					currentParent.showErrorsOnChild(currentChildDef);
+					currentChildDef = currentParent.definition;
+					currentParent = currentParent.parent;
+				}
 			}
 			updateValidationDisplayManager();
 		}
@@ -152,15 +160,15 @@ package org.openforis.collect.presenter {
 				if(_validationDisplayManager == null) {
 					initValidationDisplayManager();
 				}
-				var attributeName:String = view.attributeDefinition.name;
-				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(attributeName);
+				var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
+				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(attrDefn);
 				var active:Boolean = visited && !_updating && (view.attribute != null || view.attributes != null);
 				if(active) {
 					_validationDisplayManager.active = true;
 					if (view.attribute != null ) {
-						_validationDisplayManager.displayAttributeValidation(view.parentEntity, view.attributeDefinition, view.attribute);
+						_validationDisplayManager.displayAttributeValidation(view.parentEntity, attrDefn, view.attribute);
 					} else {
-						_validationDisplayManager.displayAttributesValidation(view.parentEntity, view.attributeDefinition);
+						_validationDisplayManager.displayAttributesValidation(view.parentEntity, attrDefn);
 					}
 				} else {
 					_validationDisplayManager.active = false;

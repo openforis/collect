@@ -36,7 +36,7 @@ package org.openforis.collect.ui.component.detail
 				} else {
 					_display.visible = true;
 					_display.includeInLayout = true;
-					var relevant:Boolean = parentEntity.childrenRelevanceMap.get(defn.name);
+					var relevant:Boolean = parentEntity.isRelevant(defn);
 					UIUtil.toggleStyleName(_display, STYLE_NAME_NOT_RELEVANT, ! relevant);
 				}
 			}
@@ -53,17 +53,16 @@ package org.openforis.collect.ui.component.detail
 		
 		private function canBeHidden(parentEntity:EntityProxy, defn:NodeDefinitionProxy):Boolean {
 			if ( defn.hideWhenNotRelevant ) {
-				var name:String = defn.name;
 				var nodes:IList;
 				//if nearest parent entity is table, hide fields when all cousins are not relevant and empty
 				if ( defn.nearestParentMultipleEntity.layout == UIUtil.LAYOUT_TABLE ) {
 					nodes = parentEntity.getDescendantCousins(defn);
 				} else {
-					nodes = parentEntity.getChildren(name);
+					nodes = parentEntity.getChildren(defn);
 				}
 				//do not hide multiple entities renderer if they are relevant but no entities are defined or it will be impossible to add new entities
 				if ( defn is EntityDefinitionProxy && nodes.length == 0 ) {
-					var result:Boolean = ! parentEntity.childrenRelevanceMap.get(name);
+					var result:Boolean = ! parentEntity.isRelevant(defn);
 					return result;
 				}
 				//hide table columns when all the cells are not relevant and empty

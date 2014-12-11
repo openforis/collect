@@ -51,15 +51,21 @@ public class Validator {
 	}
 	
 	public ValidationResultFlag validateMinCount(Entity entity, String childName) {
-		NodeDefinition childDefn = getChildDefinition(entity, childName);
-		MinCountValidator v = getMinCountValidator(childDefn);
+		return validateMinCount(entity, getChildDefinition(entity, childName));
+	}
+		
+	public ValidationResultFlag validateMinCount(Entity entity, NodeDefinition childDef) {
+		MinCountValidator v = getMinCountValidator(childDef);
 		ValidationResultFlag result = v.evaluate(entity);
 		return result;
 	}
 	
 	public ValidationResultFlag validateMaxCount(Entity entity, String childName) {
-		NodeDefinition childDefn = getChildDefinition(entity, childName);
-		MaxCountValidator v = getMaxCountValidator(childDefn);
+		return validateMaxCount(entity, getChildDefinition(entity, childName));
+	}
+	
+	public ValidationResultFlag validateMaxCount(Entity entity, NodeDefinition childDef) {
+		MaxCountValidator v = getMaxCountValidator(childDef);
 		ValidationResultFlag result = v.evaluate(entity);
 		return result;
 	}

@@ -3,6 +3,12 @@ package org.openforis.idm.testfixture;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Record;
 
+/**
+ * 
+ * @author D. Wiell
+ * @author S. Ricci
+ *
+ */
 public class RecordBuilder {
 	private final NodeBuilder[] nodeBuilders;
 
@@ -14,11 +20,15 @@ public class RecordBuilder {
 		return new RecordBuilder(nodeBuilders);
 	}
 
-	public Record build(Survey survey) {
-		return build(survey, null);
+	public <R extends Record> R build(Survey survey) {
+		return build(survey, (String) null, (String) null);
 	}
 
-	public Record build(Survey survey, String rootEntityName) {
-		return NodeBuilder.record(survey, rootEntityName, nodeBuilders);
+	public <R extends Record> R build(Survey survey, String rootEntityName) {
+		return build(survey, rootEntityName, (String) null);
+	}
+	
+	public <R extends Record> R build(Survey survey, String rootEntityName, String versionName) {
+		return NodeBuilder.record(survey, rootEntityName, versionName, nodeBuilders);
 	}
 }
