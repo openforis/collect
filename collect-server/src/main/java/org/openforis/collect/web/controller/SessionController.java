@@ -1,6 +1,8 @@
 package org.openforis.collect.web.controller;
 
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,13 +23,21 @@ public class SessionController {
 	
 	@Autowired
 	private SessionManager sessionManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	
 	@RequestMapping(value = "/keepSessionAlive.htm", method = RequestMethod.GET)
-	public @ResponseBody String keepSessionAlive(@RequestParam( value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
+	public @ResponseBody String keepSessionAlive(@RequestParam(value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
 		if ( editing ) {
 			sessionManager.checkIsActiveRecordLocked();
 		}
 		return "ok";
+	}
+	
+	@RequestMapping(value = "/setActiveSurvey.json", method = RequestMethod.GET)
+	public @ResponseBody void setSurveyActiveSurvey(@RequestParam String surveyName) {
+		CollectSurvey survey = surveyManager.get(surveyName);
+		sessionManager.setActiveSurvey(survey);
 	}
 	
 }

@@ -24,7 +24,7 @@
 		<installer-version-id>${buildNumber}</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.0.14</openforis.commons.version>
+		<openforis.commons.version>0.0.15-SNAPSHOT</openforis.commons.version>
 		<spring.version>3.2.8.RELEASE</spring.version>
 		<spring-security.version>3.2.4.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
@@ -293,6 +293,12 @@
 				<artifactId>commons-versioning</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.openforis.commons</groupId>
+				<artifactId>commons-web</artifactId>
+				<version>${openforis.commons.version}</version>
+			</dependency>
+			
 			<dependency>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>

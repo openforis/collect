@@ -126,6 +126,11 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.openforis.commons</groupId>
+			<artifactId>commons-web</artifactId>
+		</dependency>
+		
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>

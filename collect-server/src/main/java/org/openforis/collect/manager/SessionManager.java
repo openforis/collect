@@ -82,6 +82,11 @@ public class SessionManager {
 		sessionState.keepActiveRecordAlive();
 	}
 
+	public void setActiveSurvey(CollectSurvey survey) {
+		SessionState sessionState = getSessionState();
+		sessionState.setActiveSurvey(survey);
+	}
+	
 	public void clearActiveRecord() {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(null);
