@@ -648,6 +648,7 @@ public class RecordUpdater {
 	}
 	
 	private Entity performEntityAdd(Entity parentEntity, String name, Integer idx) {
+		ModelVersion version = parentEntity.getRecord().getVersion();
 		EntityDefinition parentDefn = parentEntity.getDefinition();
 		EntityDefinition defn = parentDefn.getChildDefinition(name, EntityDefinition.class);
 		Entity entity = (Entity) defn.createNode();
@@ -656,7 +657,7 @@ public class RecordUpdater {
 		} else {
 			parentEntity.add(entity);
 		}
-		for (NodeDefinition childDef : defn.getChildDefinitions()) {
+		for (NodeDefinition childDef : defn.getChildDefinitionsInVersion(version)) {
 			entity.setMinCount(childDef, calculateMinCount(entity, childDef));
 			entity.setMaxCount(childDef, calculateMaxCount(entity, childDef));
 		}
@@ -736,22 +737,20 @@ public class RecordUpdater {
 		ModelVersion version = record.getVersion();
 		addEmptyEnumeratedEntities(entity);
 		EntityDefinition entityDefn = entity.getDefinition();
-		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
+		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitionsInVersion(version);
 		for (NodeDefinition childDefn : childDefinitions) {
-			if(version == null || version.isApplicable(childDefn)) {
-				if(entity.getCount(childDefn) == 0) {
-					int toBeInserted = entity.getMinCount(childDefn);
-					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
-						//insert at least one node
-						toBeInserted = 1;
-					}
-					addEmptyChildren(entity, childDefn, toBeInserted);
-				} else {
-					List<Node<?>> children = entity.getAll(childDefn);
-					for (Node<?> child : children) {
-						if(child instanceof Entity) {
-							addEmptyNodes((Entity) child);
-						}
+			if(entity.getCount(childDefn) == 0) {
+				int toBeInserted = entity.getMinCount(childDefn);
+				if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
+					//insert at least one node
+					toBeInserted = 1;
+				}
+				addEmptyChildren(entity, childDefn, toBeInserted);
+			} else {
+				List<Node<?>> children = entity.getAll(childDefn);
+				for (Node<?> child : children) {
+					if(child instanceof Entity) {
+						addEmptyNodes((Entity) child);
 					}
 				}
 			}
@@ -829,9 +828,9 @@ public class RecordUpdater {
 		UIOptions uiOptions = getUIOptions(parentEntity.getSurvey());
 		ModelVersion version = record.getVersion();
 		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-		List<NodeDefinition> childDefinitions = parentEntityDefn.getChildDefinitions();
+		List<NodeDefinition> childDefinitions = parentEntityDefn.getChildDefinitionsInVersion(version);
 		for (NodeDefinition childDefn : childDefinitions) {
-			if ( childDefn instanceof EntityDefinition && (version == null || version.isApplicable(childDefn)) ) {
+			if ( childDefn instanceof EntityDefinition ) {
 				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
 				boolean tableLayout = uiOptions == null || uiOptions.getLayout(childEntityDefn) == Layout.TABLE;
 				if(childEntityDefn.isMultiple() && childEntityDefn.isEnumerable() && tableLayout) {
@@ -931,18 +930,20 @@ public class RecordUpdater {
 	}
 
 	private List<NodePointer> getChildNodePointers(Entity entity) {
+		ModelVersion version = entity.getRecord().getVersion();
 		List<NodePointer> pointers = new ArrayList<NodePointer>();
 		EntityDefinition definition = entity.getDefinition();
-		for (NodeDefinition childDef : definition.getChildDefinitions()) {
+		for (NodeDefinition childDef : definition.getChildDefinitionsInVersion(version)) {
 			pointers.add(new NodePointer(entity, childDef));
 		}
 		return pointers;
 	}
 	
 	private Set<NodePointer> getDescendantNodePointers(Entity entity) {
+		ModelVersion version = entity.getRecord().getVersion();
 		Set<NodePointer> pointers = new LinkedHashSet<NodePointer>();
 		EntityDefinition definition = entity.getDefinition();
-		for (NodeDefinition childDef : definition.getChildDefinitions()) {
+		for (NodeDefinition childDef : definition.getChildDefinitionsInVersion(version)) {
 			pointers.add(new NodePointer(entity, childDef));
 			if ( childDef instanceof EntityDefinition ) {
 				for (Node<?> childEntity : entity.getAll(childDef)) {
@@ -1011,6 +1012,7 @@ public class RecordUpdater {
 					continue;
 				}
 				Entity entity = nodePointer.getEntity();
+				ModelVersion version = entity.getRecord().getVersion();
 				
 				boolean parentRelevance = entity.getParent() == null || entity.isRelevant();
 				
@@ -1027,7 +1029,7 @@ public class RecordUpdater {
 						for (Node<?> node : nodes) {
 							Entity childEntity = (Entity) node;
 							EntityDefinition childEntityDef = childEntity.getDefinition();
-							for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitions()) {
+							for (NodeDefinition nextChildDef : childEntityDef.getChildDefinitionsInVersion(version)) {
 								NodePointer nextNodePointer = new NodePointer(childEntity, nextChildDef);
 								stack.push(nextNodePointer);
 							}

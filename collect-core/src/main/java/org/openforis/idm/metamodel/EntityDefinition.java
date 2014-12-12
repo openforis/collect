@@ -38,7 +38,8 @@ public class EntityDefinition extends NodeDefinition {
 
 	EntityDefinition(Survey survey, int id) {
 		super(survey, id);
-        childDefinitionByName = new HashMap<String, NodeDefinition>();
+		childDefinitions = new ArrayList<NodeDefinition>();
+		childDefinitionByName = new HashMap<String, NodeDefinition>();
         childDefinitionById = new HashMap<Integer, NodeDefinition>();
 	}
 
@@ -61,6 +62,16 @@ public class EntityDefinition extends NodeDefinition {
 	
 	public List<NodeDefinition> getChildDefinitions() {
 		return CollectionUtils.unmodifiableList(childDefinitions);
+	}
+	
+	public List<NodeDefinition> getChildDefinitionsInVersion(ModelVersion version) {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>(childDefinitions.size());
+		for (NodeDefinition nodeDef : childDefinitions) {
+			if (version == null || version.isApplicable(nodeDef)) {
+				result.add(nodeDef);
+			}
+		}
+		return result;
 	}
 
 	public NodeDefinition getChildDefinition(String name) {
@@ -120,10 +131,6 @@ public class EntityDefinition extends NodeDefinition {
 
 		if ( defn.isDetached() ) {
 			throw new IllegalArgumentException("Detached definitions cannot be added");
-		}
-
-		if (childDefinitions == null) {
-			childDefinitions = new ArrayList<NodeDefinition>();
 		}
 		childDefinitions.add(defn);
         childDefinitionByName.put(defn.getName(), defn);

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.Survey;
@@ -36,6 +37,12 @@ public class NodeBuilder {
 		if (rootEntityName == null) {
 			List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
 			rootEntityName = rootEntityDefs.get(rootEntityDefs.size() - 1).getName();
+		}
+		if (versionName == null) {
+			List<ModelVersion> versions = survey.getVersions();
+			if (! versions.isEmpty()) {
+				versionName = versions.get(versions.size() - 1).getName();
+			}
 		}
 		@SuppressWarnings("unchecked")
 		R record = (R) survey.createRecord(versionName);

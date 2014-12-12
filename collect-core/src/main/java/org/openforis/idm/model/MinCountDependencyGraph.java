@@ -24,16 +24,16 @@ public class MinCountDependencyGraph extends NodePointerDependencyGraph {
 	protected Set<NodePathPointer> determineSources(NodePointer dependent) throws InvalidExpressionException {
 		NodeDefinition def = dependent.getChildDefinition();
 		Survey survey = def.getSurvey();
-		Set<NodePathPointer> sourcePointers = survey.getMinCountSources(def);
-		return sourcePointers;
+		Set<NodePathPointer> minCountSources = survey.getMinCountSources(def);
+		return filterByVersion(minCountSources, dependent.getModelVersion());
 	}
 	
 	@Override
 	protected Set<NodePathPointer> determineDependents(NodePointer source) throws InvalidExpressionException {
 		NodeDefinition def = source.getChildDefinition();
 		Survey survey = def.getSurvey();
-		Set<NodePathPointer> dependentPointers = survey.getMinCountDependencies(def);
-		return dependentPointers;
+		Set<NodePathPointer> minCountDependencies = survey.getMinCountDependencies(def);
+		return filterByVersion(minCountDependencies, source.getModelVersion());
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class MaxCountDependencyGraph extends NodePointerDependencyGraph {
 		NodeDefinition def = dependent.getChildDefinition();
 		Survey survey = def.getSurvey();
 		Set<NodePathPointer> sourcePointers = survey.getMaxCountSources(def);
-		return sourcePointers;
+		return filterByVersion(sourcePointers, dependent.getModelVersion());
 	}
 	
 	@Override
@@ -33,7 +33,7 @@ public class MaxCountDependencyGraph extends NodePointerDependencyGraph {
 		NodeDefinition def = source.getChildDefinition();
 		Survey survey = def.getSurvey();
 		Set<NodePathPointer> dependentPointers = survey.getMaxCountDependencies(def);
-		return dependentPointers;
+		return filterByVersion(dependentPointers, source.getModelVersion());
 	}
 
 	@Override
