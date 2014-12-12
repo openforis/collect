@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.3.13-SNAPSHOT</version>
+		<version>3.3.14-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-updater</artifactId>
 	<packaging>pom</packaging>
@@ -14,6 +14,7 @@
 		<!-- to avoid replacing relative path to images and other resources used by the installer -->
 		<installer-build-path>${project.build.directory}/installer</installer-build-path>
 		<installbuilder-updater-file-name>installbuilder-updater.xml</installbuilder-updater-file-name>
+		<autoupdate-xml-file-name>update.xml</autoupdate-xml-file-name>
 		<!-- updater file names -->
 		<windows-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-windows-installer.exe</windows-updater-file-name>
 		<linux-updater-file-name>OpenForisCollectUpdater-${installer-version-id}-linux-installer.run</linux-updater-file-name>
@@ -89,7 +90,7 @@
 						<version>1.4.0</version>
 						<executions>
 							<execution>
-								<phase>package</phase>
+								<phase>prepare-package</phase>
 								<goals>
 									<goal>replace</goal>
 								</goals>
@@ -128,7 +129,7 @@
 							<!-- Linux -->
 							<execution>
 								<id>linux-installer</id>
-								<phase>package</phase>
+								<phase>prepare-package</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
@@ -144,7 +145,7 @@
 							<!-- Windows -->
 							<execution>
 								<id>windows-installer</id>
-								<phase>package</phase>
+								<phase>prepare-package</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
@@ -166,8 +167,8 @@
 						<artifactId>maven-antrun-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>run-ant-rename</id>
-								<phase>package</phase>
+								<id>run-ant-move-installers-into-build-directory</id>
+								<phase>prepare-package</phase>
 								<goals>
 									<goal>run</goal>
 								</goals>
@@ -178,7 +179,37 @@
 									</tasks>
 								</configuration>
 							</execution>
+							<!-- 7 Upload the XML file that defines the presence of updates to the FTP directory -->
+							<execution>
+								<phase>install</phase>
+								<configuration>
+									<target>
+										<property name="host" value="${collect.autoupdater.ftp.host}" />
+										<property name="username" value="${collect.autoupdater.ftp.username}" />
+										<property name="password" value="${collect.autoupdater.ftp.password}" />
+										<property name="remote_folder" value="${collect.autoupdater.ftp.remotefolder}" />
+										<property name="local_folder" value="${installer-build-path}" />
+										<property name="file_name" value="${autoupdate-xml-file-name}" />
+										<ant antfile="${installer-build-path}/ant_ftp_upload.xml" />
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
 						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>com.jcraft</groupId>
+								<artifactId>jsch</artifactId>
+								<version>0.1.51</version>
+							</dependency>
+							<dependency>
+								<groupId>org.apache.ant</groupId>
+								<artifactId>ant-jsch</artifactId>
+								<version>1.9.4</version>
+							</dependency>
+						</dependencies>
 					</plugin>
 
 			    	<!-- 6. attach installers as artifact -->
@@ -209,7 +240,7 @@
 					        </execution>
 					    </executions>
 					</plugin>
-
+					
 				</plugins>
 			</build>		
 		</profile>

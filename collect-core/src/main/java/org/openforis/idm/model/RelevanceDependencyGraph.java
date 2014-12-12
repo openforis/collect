@@ -30,16 +30,16 @@ public class RelevanceDependencyGraph extends NodePointerDependencyGraph {
 	protected Set<NodePathPointer> determineSources(NodePointer dependent) throws InvalidExpressionException {
 		NodeDefinition def = dependent.getChildDefinition();
 		Survey survey = def.getSurvey();
-		Set<NodePathPointer> sourcePointers = survey.getRelevanceSources(def);
-		return sourcePointers;
+		Set<NodePathPointer> relevanceSources = survey.getRelevanceSources(def);
+		return filterByVersion(relevanceSources, dependent.getModelVersion());
 	}
 	
 	@Override
 	protected Set<NodePathPointer> determineDependents(NodePointer source) throws InvalidExpressionException {
 		NodeDefinition def = source.getChildDefinition();
 		Survey survey = def.getSurvey();
-		Set<NodePathPointer> dependentPointers = survey.getRelevanceDependencies(def);
-		return dependentPointers;
+		Set<NodePathPointer> relevanceDependencies = survey.getRelevanceDependencies(def);
+		return filterByVersion(relevanceDependencies, source.getModelVersion());
 	}
 
 	@Override
@@ -48,5 +48,4 @@ public class RelevanceDependencyGraph extends NodePointerDependencyGraph {
 		return StringUtils.isNotBlank(nodeDef.getRelevantExpression());
 	}
 
-	
 }

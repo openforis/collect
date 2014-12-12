@@ -3,10 +3,7 @@
  */
 package org.openforis.collect.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
@@ -15,6 +12,7 @@ import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
@@ -450,6 +448,29 @@ public class RecordUpdaterTest {
 	}
 	
 	@Test
+	public void testRelevanceNotUpdatedInAttributesNotInVersion() {
+		record(
+			rootEntityDef(
+				attributeDef("trigger"),
+				attributeDef("dependent")
+					.relevant("trigger > 1"),
+				attributeDef("deprecated")
+					.relevant("trigger > 3")
+					.deprecated("1.0"),
+				attributeDef("since")
+					.relevant("trigger > 3")
+					.since("3.0")
+			),
+			"2.0"
+		);
+		Attribute<?, ?> trigger = record.findNodeByPath("/root/trigger");
+		NodeChangeSet nodeChangeSet = update(trigger, "5");
+		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(record.getRootEntity());
+		assertNull(rootEntityChange.getChildrenRelevance().get("deprecated"));
+		assertNull(rootEntityChange.getChildrenRelevance().get("since"));
+	}
+	
+	@Test
 	public void testInitializeCalculatedAttributeInNestedNode() {
 		record(
 			rootEntityDef(
@@ -570,6 +591,11 @@ public class RecordUpdaterTest {
 		updater.initializeRecord(record);
 	}
 	
+	protected void record(EntityDefinition rootDef, String versionName, NodeBuilder... builders) {
+		record = NodeBuilder.record(survey, rootDef.getName(), versionName, builders);
+		updater.initializeRecord(record);
+	}
+	
 	protected EntityDefinition rootEntityDef(NodeDefinitionBuilder... builders) {
 		EntityDefinition rootEntityDef = NodeDefinitionBuilder.rootEntityDef(survey, "root", builders);
 		return rootEntityDef;
@@ -600,6 +626,24 @@ public class RecordUpdaterTest {
 	private CollectSurvey createTestSurvey() {
 		CollectSurveyContext surveyContext = new CollectSurveyContext();
 		CollectSurvey survey = (CollectSurvey) surveyContext.createSurvey();
+		{
+			ModelVersion version = survey.createModelVersion();
+			version.setName("1.0");
+			version.setDate("2014-12-01");
+			survey.addVersion(version);
+		}
+		{
+			ModelVersion version = survey.createModelVersion();
+			version.setName("2.0");
+			version.setDate("2014-12-02");
+			survey.addVersion(version);
+		}
+		{
+			ModelVersion version = survey.createModelVersion();
+			version.setName("3.0");
+			version.setDate("2014-12-03");
+			survey.addVersion(version);
+		}
 		return survey;
 	}
 	

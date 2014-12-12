@@ -2,6 +2,7 @@ package org.openforis.idm.model;
 
 import java.util.List;
 
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
@@ -70,6 +71,11 @@ public class NodePointer {
 	
 	public boolean areNodesRelevant() {
 		return entity.isRelevant(getChildName());
+	}
+	
+	public ModelVersion getModelVersion() {
+		Record record = entity.getRecord();
+		return record.getVersion();
 	}
 	
 	@Override

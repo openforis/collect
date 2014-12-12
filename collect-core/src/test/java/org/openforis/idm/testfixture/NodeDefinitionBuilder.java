@@ -20,6 +20,8 @@ public abstract class NodeDefinitionBuilder {
 	private String requiredExpression;
 	private String minCountExpression;
 	private String maxCountExpression;
+	private String deprecatedVersion;
+	private String sinceVersion;
 
 	public NodeDefinitionBuilder(String name) {
 		this.name = name;
@@ -52,6 +54,16 @@ public abstract class NodeDefinitionBuilder {
 	
 	public NodeDefinitionBuilder maxCount(String expression) {
 		this.maxCountExpression = expression;
+		return this;
+	}
+	
+	public NodeDefinitionBuilder deprecated(String versionName) {
+		this.deprecatedVersion = versionName;
+		return this;
+	}
+	
+	public NodeDefinitionBuilder since(String versionName) {
+		this.sinceVersion = versionName;
 		return this;
 	}
 	
@@ -93,6 +105,8 @@ public abstract class NodeDefinitionBuilder {
 		}
 		def.setMaxCountExpression(maxCountExpression);
 		def.setRelevantExpression(relevantExpression);
+		def.setDeprecatedVersionByName(deprecatedVersion);
+		def.setSinceVersionByName(sinceVersion);
 	}
 	
 	public static class EntityDefinitionBuilder extends NodeDefinitionBuilder {
@@ -123,7 +137,6 @@ public abstract class NodeDefinitionBuilder {
 		public EntityDefinitionBuilder required(String expression) {
 			return (EntityDefinitionBuilder) super.required(expression);
 		}
-		
 		
 		@Override
 		protected NodeDefinition buildInternal(Survey survey) {
@@ -171,6 +184,16 @@ public abstract class NodeDefinitionBuilder {
 		public AttributeDefinitionBuilder validate(String expression) {
 			this.validationExpression = expression;
 			return this;
+		}
+		
+		@Override
+		public AttributeDefinitionBuilder deprecated(String versionName) {
+			return (AttributeDefinitionBuilder) super.deprecated(versionName);
+		}
+		
+		@Override
+		public AttributeDefinitionBuilder since(String versionName) {
+			return (AttributeDefinitionBuilder) super.since(versionName);
 		}
 		
 		@Override
