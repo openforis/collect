@@ -294,7 +294,7 @@ public class RecordManager {
 		List<String> rootEntityKeyValues = record.getRootEntityKeyValues();
 		
 		Entity rootEntity = record.getRootEntity();
-		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity.getName(), rootEntityKeyValues.toArray(new String[0]));
+		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity.getName(), rootEntityKeyValues.toArray(new String[rootEntityKeyValues.size()]));
 		for (CollectRecord collectRecord : summaries) {
 			if ( ! collectRecord.getId().equals(record.getId()) ) {
 				return false;
@@ -392,7 +392,7 @@ public class RecordManager {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 
 		validate(record);
-
+		
 		recordDao.update(record);
 		if ( isLockingEnabled() ) {
 			lockManager.releaseLock(recordId);
@@ -551,10 +551,15 @@ public class RecordManager {
 		List<AttributeDefinition> keyDefns = rootEntity.getDefinition().getKeyAttributeDefinitions();
 		for (int i = 0; i < keyDefns.size(); i++) {
 			AttributeDefinition keyDefn = keyDefns.get(i);
-			boolean required = keyDefn.getMinCount() != null && keyDefn.getMinCount() > 0;
+			EntityDefinition keyParentDefn = keyDefn.getParentEntityDefinition();
+			Entity keyParent = (Entity) record.findNodeByPath(keyParentDefn.getPath());
+			if (keyParent == null) {
+				throw new MissingRecordKeyException();
+			}
+			int minCount = keyParent.getMinCount(keyDefn);
+			boolean required = minCount > 0;
 			if ( required ) {
-				String path = keyDefn.getPath();
-				Node<?> keyNode = record.findNodeByPath(path);
+				Node<?> keyNode = keyParent.getChild(keyDefn);
 				if ( keyNode == null ) {
 					throw new MissingRecordKeyException();
 				} else {

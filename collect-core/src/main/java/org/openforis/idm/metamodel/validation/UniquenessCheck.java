@@ -23,12 +23,18 @@ public class UniquenessCheck extends Check<Attribute<?, ?>> {
 
 	private String expression;
 
+	@Override
 	public String getExpression() {
 		return this.expression;
 	}
 	
 	public void setExpression(String expression) {
 		this.expression = expression;
+	}
+	
+	@Override
+	protected String buildExpression() {
+		return null;
 	}
 	
 	@Override

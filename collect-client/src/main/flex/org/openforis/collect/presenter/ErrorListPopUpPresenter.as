@@ -90,19 +90,19 @@ package org.openforis.collect.presenter
 			var childDefinitions:ListCollectionView = entityDefn.childDefinitions;
 			var messages:Array
 			for each (var childDefn:NodeDefinitionProxy in childDefinitions) {
-				var childName:String = childDefn.name;
-				var minCountValid:ValidationResultFlag = entity.childrenMinCountValidationMap.get(childName);
-				var maxCountValid:ValidationResultFlag = entity.childrenMaxCountValidationMap.get(childName);
+				var minCountValid:ValidationResultFlag = entity.getMinCountValidation(childDefn);
+				var maxCountValid:ValidationResultFlag = entity.getMaxCountValidation(childDefn);
 				if(minCountValid == ValidationResultFlag.ERROR || maxCountValid == ValidationResultFlag.ERROR) {
 					if ( minCountValid == ValidationResultFlag.ERROR ) {
-						var effectiveMinCount:int = entity.getEffectiveMinCount(childName);
-						if ( effectiveMinCount == 1 ) {
+						var minCount:int = entity.getMinCount(childDefn);
+						if ( minCount == 1 ) {
 							messages = [Message.get("edit.validation.requiredField")];
 						} else {
-							messages = [Message.get("edit.validation.minCount", [effectiveMinCount])];
+							messages = [Message.get("edit.validation.minCount", [minCount])];
 						}
 					} else {
-						messages = [Message.get("edit.validation.maxCount", [childDefn.maxCount > 0 ? childDefn.maxCount: 1])];
+						var maxCount:int = entity.getMaxCount(childDefn)
+						messages = [Message.get("edit.validation.maxCount", [maxCount > 0 ? maxCount: 1])];
 					}
 					var message:String = StringUtil.concat(", ", messages);
 					var label:String = (entity.parent != null ? createNodeLabel(entity) + " / ": "") + childDefn.getInstanceOrHeadingLabelText();

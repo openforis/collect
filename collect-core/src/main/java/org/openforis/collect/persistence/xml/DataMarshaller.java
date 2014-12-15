@@ -116,7 +116,7 @@ public class DataMarshaller {
 	}
 
 	private void writeChildren(XmlSerializer serializer, Entity rootEntity) throws IOException {
-		List<Node<?>> children = rootEntity.getChildren();
+		List<Node<?>> children = rootEntity.getAll();
 		for (Node<?> node : children) {
 			write(serializer, node);
 		}
@@ -126,7 +126,7 @@ public class DataMarshaller {
 	private void writeState(XmlSerializer serializer, Node<?> node) throws IOException {
 		Entity parent = node.getParent();
 		if ( parent != null ) {
-			State s = parent.getChildState(node.getName());
+			State s = parent.getChildState(node.getDefinition());
 			int state = s.intValue();
 			if (state > 0) {
 				serializer.attribute(null, STATE_ATTRIBUTE, Integer.toString(state));
@@ -147,7 +147,7 @@ public class DataMarshaller {
 		for (NodeDefinition childDefn : childDefns) {
 			String childName = childDefn.getName();
 			if (entity.getCount(childName) == 0 ) {
-				State childState = entity.getChildState(childName);
+				State childState = entity.getChildState(childDefn);
 				int childStateInt = childState.intValue();
 				if (childStateInt > 0) {
 					serializer.startTag(null, childName);

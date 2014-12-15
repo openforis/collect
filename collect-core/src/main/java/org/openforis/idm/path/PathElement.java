@@ -64,14 +64,10 @@ public class PathElement implements Axis {
 			if ( parent == null ) { 
 				return Collections.emptyList();
 			} else {
-				List<Node<?>> results = new ArrayList<Node<?>>(1);
-				results.add(parent);
-				return Collections.unmodifiableList(results);
+				return Collections.<Node<?>>singletonList(parent);
 			}
 		} else if ( isThisFunction(name) ) {
-			List<Node<?>> results = new ArrayList<Node<?>>(1);
-			results.add(context);
-			return Collections.unmodifiableList(results);
+			return Collections.<Node<?>>singletonList(context);
 		} else if ( context instanceof Entity ) {
 			return evaluateInternal((Entity) context);
 		} if ( context instanceof Attribute ) {

@@ -24,7 +24,8 @@ public abstract class SurveyObjectMappingDSLContext<T extends PersistedSurveyObj
 
 	public SurveyObjectMappingDSLContext(Connection conn,
 			TableField<?, Integer> idField,
-			Sequence<? extends Number> idSequence, Class<T> clazz, CollectSurvey survey) {
+			Sequence<? extends Number> idSequence, 
+			Class<T> clazz, CollectSurvey survey) {
 		super(conn, idField, idSequence, clazz);
 		this.survey = survey;
 	}

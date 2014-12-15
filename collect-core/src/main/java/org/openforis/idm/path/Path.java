@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -22,9 +23,11 @@ public final class Path implements Axis, Iterable<PathElement> {
 
 	public static final String THIS_FUNCTION = "this()";
 	public static final String THIS_SYMBOL = ".";
+	public static final String THIS_VARIABLE = "$this";
 	public static final Set<String> THIS_ALIASES = new HashSet<String>(Arrays.asList(
 													THIS_FUNCTION, 
-													THIS_SYMBOL));
+													THIS_SYMBOL,
+													THIS_VARIABLE));
 	public static final String PARENT_FUNCTION = "parent()";
 	public static final String PARENT_SYMBOL = "..";
 	public static final String NORMALIZED_PARENT_FUNCTION = "__parent";
@@ -194,6 +197,10 @@ public final class Path implements Axis, Iterable<PathElement> {
 		} else {
 			return pathBuilder.toString();
 		}
+	}
+	
+	public static String removeThisVariableToken(String path) {
+		return path.replaceAll(Pattern.quote(Path.THIS_VARIABLE) + "/", "");
 	}
 	
 	public static String getNormalizedPath(String path) {

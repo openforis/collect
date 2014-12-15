@@ -321,22 +321,25 @@ package org.openforis.collect.ui {
 		}
 
 		public static function getAttributeDataGroupHeaderHeight(defn:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
-			var result:Number;
 			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			if ( directionByColumns ) {
-				if ( defn is CoordinateAttributeDefinitionProxy ) {
-					result = 3 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 3 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
-				} else if ( defn is TaxonAttributeDefinitionProxy ) {
-					result = 5 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 4 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
+				return NaN;
+			} else {
+				var result:Number;
+				if ( directionByColumns ) {
+					if ( defn is CoordinateAttributeDefinitionProxy ) {
+						result = 3 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 3 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
+					} else if ( defn is TaxonAttributeDefinitionProxy ) {
+						result = 5 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 4 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
+					} else {
+						result = ATTRIBUTE_INPUT_FIELD_HEIGHT;
+					}
 				} else {
 					result = ATTRIBUTE_INPUT_FIELD_HEIGHT;
 				}
-			} else {
-				result = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-				
+				result += VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
+				return result;
 			}
-			result += VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
-			return result;
 		}
 		
 		public static function getEnumeratedCodeHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
@@ -502,16 +505,28 @@ package org.openforis.collect.ui {
 		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
 			var result:SkinnableContainer = new SkinnableContainer();
 			result.styleName = DATA_GROUP_HEADER_STYLE;
+			var horizontalOrientation:Boolean = defn.labelOrientation == UIOptions$Orientation.HORIZONTAL;
+			//width
 			var width:Number = getAttributeDataGroupHeaderWidth(defn, parentEntity);
 			result.width = width;
+			var labelWidth:Number = defn.labelWidth;
+			if (isNaN(labelWidth) && horizontalOrientation) {
+				labelWidth = width;
+			}
 			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			if ( directionByColumns ) {
-				result.height = getAttributeDataGroupHeaderHeight(defn, parentEntity);
 				var layout:HorizontalLayout = new HorizontalLayout();
 				layout.paddingTop = GROUPING_LABEL_PADDING_TOP;
 				result.layout = layout;
+			}
+			//height
+		 	if (horizontalOrientation) {
+				result.height = getAttributeDataGroupHeaderHeight(defn, parentEntity);
+				if (isNaN(result.height)) {
+					result.percentHeight = 100;
+				}
 			} else {
-				result.percentHeight = 100;
+				result.height = defn.labelWidth;
 			}
 			var compositeAttributeLabelsGroup:Group;
 			if ( directionByColumns ) {
@@ -525,6 +540,7 @@ package org.openforis.collect.ui {
 			var l:Label;
 			var defnLabel:String = defn.getNumberAndHeadingLabelText();
 			var labelRotation:Number = defn.labelOrientation == UIOptions$Orientation.VERTICAL ? 270: NaN;
+			var showTrunctationTip:Boolean = defn.labelOrientation == UIOptions$Orientation.HORIZONTAL;
 			if(defn is TaxonAttributeDefinitionProxy) {
 				var taxonAttr:TaxonAttributeDefinitionProxy = TaxonAttributeDefinitionProxy(defn);
 				//attribute label
@@ -574,11 +590,11 @@ package org.openforis.collect.ui {
 					defaultUnit = RangeAttributeDefinitionProxy(defn).defaultUnit;
 				}
 				var labStr:String = defnLabel + " (" + defaultUnit.getAbbreviation() + ")";
-				l = getLabel(labStr, width, HEADER_LABEL_STYLE, directionByColumns);
+				l = getLabel(labStr, labelWidth, HEADER_LABEL_STYLE, directionByColumns || ! horizontalOrientation);
 				l.rotation = labelRotation;
 				result.addElement(l);
 			} else {
-				l = getLabel(defnLabel, width, HEADER_LABEL_STYLE, directionByColumns);
+				l = getLabel(defnLabel, labelWidth, HEADER_LABEL_STYLE, directionByColumns || ! horizontalOrientation);
 				l.rotation = labelRotation;
 				result.addElement(l);
 			}
@@ -629,15 +645,15 @@ package org.openforis.collect.ui {
 			return c;
 		}
 
-		public static function getLabel(text:String, width:Number = NaN, styleName:String = null, displayOneRow:Boolean = false):Label {
+		public static function getLabel(text:String, width:Number = NaN, styleName:String = null, displayOneRow:Boolean = false, showTruncationTip:Boolean = true):Label {
 			var l:Label = new Label();
 			l.text = text;
 			l.width = width;
 			l.styleName = styleName;
 			if ( displayOneRow ) {
 				l.maxDisplayedLines = 1;
-				l.showTruncationTip = true;
 			}
+			l.showTruncationTip = showTruncationTip;
 			return l;
 		}
 

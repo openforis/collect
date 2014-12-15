@@ -12,8 +12,7 @@ import org.openforis.idm.metamodel.Unit;
  */
 public final class RealRange extends NumericRange<Double> {
 
-	private static final String REGEX = "(-?\\d+(\\.\\d+)?)(-(-?\\d+(\\.\\d+)?))?";
-	private static final Pattern PATTERN = Pattern.compile(REGEX);
+	private static final Pattern PATTERN = Pattern.compile("(-?\\d+(\\.\\d+)?)(-(-?\\d+(\\.\\d+)?))?");
 
 	public RealRange(Double value, Unit unit) {
 		super(value, value, unit);

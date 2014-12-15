@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePathPointer;
@@ -18,15 +20,18 @@ import org.openforis.idm.path.Path;
  * @author M. Togna
  */
 public abstract class NodeDefinition extends VersionableSurveyObject {
+
+	private static final Pattern MIN_COUNT_FROM_REQUIRED_EXPRESSION_PATTERN = Pattern.compile("number\\((.+)\\)");
+	private static final String MIN_COUNT_FROM_REQUIRED_EXPRESSION_FORMAT = "number(%s)";
+
 	private static final long serialVersionUID = 1L;
 
 	private NodeDefinition parentDefinition;
 	private String name;
 	private String relevantExpression;
-	private String requiredExpression;
 	private boolean multiple;
-	private Integer minCount;
-	private Integer maxCount;
+	private String minCountExpression;
+	private String maxCountExpression;
 	private NodeLabelMap labels;
 	private PromptMap prompts;
 	private LanguageSpecificTextMap descriptions;
@@ -80,10 +85,6 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return this.relevantExpression;
 	}
 
-	public String getRequiredExpression() {
-		return requiredExpression;
-	}
-
 	/**
 	 * This property must be true for root entities
 	 */
@@ -91,22 +92,14 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return multiple;
 	}
 
-	public Integer getMinCount() {
-		return minCount;
+	public String getMinCountExpression() {
+		return minCountExpression;
 	}
 
-	public boolean hasMinCount() {
-		return minCount != null && minCount > 0;
+	public String getMaxCountExpression() {
+		return maxCountExpression;
 	}
 	
-	public Integer getMaxCount() {
-		if ( !multiple ) {
-			return 1;
-		} else {
-			return maxCount;
-		}
-	}
-
 	public List<NodeLabel> getLabels() {
 		if ( this.labels == null ) {
 			return Collections.emptyList();
@@ -337,19 +330,32 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return result;
 	}
 
-	public Set<NodePathPointer> getRequiredExpressionDependencies() {
+	public Set<NodePathPointer> getMinCountDependencies() {
 		Survey survey = getSurvey();
-		return survey.getRequiredDependencies(this);
+		return survey.getMinCountDependencies(this);
 	}
 
-	public List<NodeDefinition> getRequirenessDependentDefinitions() {
+	public Set<NodePathPointer> getMaxCountDependencies() {
+		Survey survey = getSurvey();
+		return survey.getMaxCountDependencies(this);
+	}
+	
+	public List<NodeDefinition> getMinCountDependentDefinitions() {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
-		for (NodePathPointer nodePathPointer : this.getRequiredExpressionDependencies()) {
+		for (NodePathPointer nodePathPointer : getMinCountDependencies()) {
 			result.add(nodePathPointer.getReferencedNodeDefinition());
 		}
 		return result;
 	}
 	
+	public List<NodeDefinition> getMaxCountDependentDefinitions() {
+		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
+		for (NodePathPointer nodePathPointer : getMaxCountDependencies()) {
+			result.add(nodePathPointer.getReferencedNodeDefinition());
+		}
+		return result;
+	}
+
 	public Set<NodePathPointer> getCalculatedValueDependencies() {
 		Survey survey = getSurvey();
 		return survey.getCalculatedValueDependencies(this);
@@ -385,8 +391,25 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		this.relevantExpression = relevantExpression;
 	}
 
+	public String extractRequiredExpression() {
+		if (minCountExpression == null) {
+			return null;
+		}
+		Matcher matcher = MIN_COUNT_FROM_REQUIRED_EXPRESSION_PATTERN.matcher(minCountExpression);
+		if (matcher.matches()) {
+			String expression = matcher.group(1);
+			return expression;
+		} else {
+			return null;
+		}
+	}
+	
 	public void setRequiredExpression(String requiredExpression) {
-		this.requiredExpression = requiredExpression;
+		if (requiredExpression == null) {
+			this.minCountExpression = null;
+		} else {
+			this.minCountExpression = String.format(MIN_COUNT_FROM_REQUIRED_EXPRESSION_FORMAT, requiredExpression);
+		}
 	}
 
 	/**
@@ -397,15 +420,20 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		this.multiple = multiple;
 	}
 
-	public void setMinCount(Integer minCount) {
-		this.minCount = minCount;
+	public void setMinCountExpression(String expression) {
+		this.minCountExpression = expression;
 	}
 
-	public void setMaxCount(Integer maxCount) {
-		this.maxCount = maxCount;
-		if ( maxCount != null && maxCount > 1 ) {
-			this.multiple = true;
-		}
+	public void setMaxCountExpression(String expression) {
+		this.maxCountExpression = expression;
+	}
+	
+	public boolean isAlwaysRequired() {
+		return minCountExpression != null && "1".equals(minCountExpression);
+	}
+	
+	public void setAlwaysRequired() {
+		this.minCountExpression = "1";
 	}
 	
 	@Override
@@ -420,13 +448,12 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		result = prime * result + ((descriptions == null) ? 0 : descriptions.hashCode());
 		result = prime * result + getId();
 		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
-		result = prime * result + ((maxCount == null) ? 0 : maxCount.hashCode());
-		result = prime * result + ((minCount == null) ? 0 : minCount.hashCode());
+		result = prime * result + ((maxCountExpression == null) ? 0 : maxCountExpression.hashCode());
+		result = prime * result + ((minCountExpression == null) ? 0 : minCountExpression.hashCode());
 		result = prime * result + (multiple ? 1231 : 1237);
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result + ((prompts == null) ? 0 : prompts.hashCode());
 		result = prime * result + ((relevantExpression == null) ? 0 : relevantExpression.hashCode());
-		result = prime * result + ((requiredExpression == null) ? 0 : requiredExpression.hashCode());
 		return result;
 	}
 
@@ -451,15 +478,15 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 				return false;
 		} else if (!labels.equals(other.labels))
 			return false;
-		if (maxCount == null) {
-			if (other.maxCount != null)
+		if (maxCountExpression == null) {
+			if (other.maxCountExpression != null)
 				return false;
-		} else if (!maxCount.equals(other.maxCount))
+		} else if (!maxCountExpression.equals(other.maxCountExpression))
 			return false;
-		if (minCount == null) {
-			if (other.minCount != null)
+		if (minCountExpression == null) {
+			if (other.minCountExpression != null)
 				return false;
-		} else if (!minCount.equals(other.minCount))
+		} else if (!minCountExpression.equals(other.minCountExpression))
 			return false;
 		if (multiple!=other.multiple)
 			return false;
@@ -477,11 +504,6 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 			if (other.relevantExpression != null)
 				return false;
 		} else if (!relevantExpression.equals(other.relevantExpression))
-			return false;
-		if (requiredExpression == null) {
-			if (other.requiredExpression != null)
-				return false;
-		} else if (!requiredExpression.equals(other.requiredExpression))
 			return false;
 		return true;
 	}

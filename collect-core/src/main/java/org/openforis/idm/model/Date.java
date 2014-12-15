@@ -3,6 +3,8 @@ package org.openforis.idm.model;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,10 +15,14 @@ import org.apache.commons.lang3.StringUtils;
  * @author M. Togna
  * @author S. Ricci
  */
-public final class Date implements Value {
+public final class Date extends AbstractValue {
 
 	private static final Pattern INTERNAL_STRING_FORMAT = Pattern.compile("(\\d{4})(\\d{2})(\\d{2})");
 	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("(\\d{4})\\-(\\d{2})\\-(\\d{2})");
+	
+	public static final String YEAR_FIELD = "year";
+	public static final String MONTH_FIELD = "month";
+	public static final String DAY_FIELD = "day";
 	
 	private final Integer day;
 	private final Integer month;
@@ -31,19 +37,18 @@ public final class Date implements Value {
 	public static Date parse(String string){
 		if ( StringUtils.isBlank(string) ) {
 			return null;
-		} else {
-			Matcher matcher = PRETTY_STRING_FORMAT.matcher(string);
-			if ( ! matcher.matches() ) {
-				matcher = INTERNAL_STRING_FORMAT.matcher(string);
-				if ( ! matcher.matches() ) {
-					throw new IllegalArgumentException("Invalid date " + string);
-				}
-			}
-			int year = Integer.parseInt(matcher.group(1));
-			int month = Integer.parseInt(matcher.group(2));
-			int day = Integer.parseInt(matcher.group(3));
-			return new Date(year, month, day);
 		}
+		Matcher matcher = PRETTY_STRING_FORMAT.matcher(string);
+		if ( ! matcher.matches() ) {
+			matcher = INTERNAL_STRING_FORMAT.matcher(string);
+			if ( ! matcher.matches() ) {
+				throw new IllegalArgumentException("Invalid date " + string);
+			}
+		}
+		int year = Integer.parseInt(matcher.group(1));
+		int month = Integer.parseInt(matcher.group(2));
+		int day = Integer.parseInt(matcher.group(3));
+		return new Date(year, month, day);
 	}
 	
 	public static Date parse(java.util.Date date) {
@@ -57,6 +62,16 @@ public final class Date implements Value {
 		    int day = cal.get(Calendar.DAY_OF_MONTH);
 		    return new Date(year, month + 1, day);
 		}
+	}
+	
+	@Override
+	@SuppressWarnings("serial")
+	protected Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(YEAR_FIELD, year);
+			put(MONTH_FIELD, month);
+			put(DAY_FIELD, day);
+		}};
 	}
 	
 	public Integer getDay() {
@@ -96,11 +111,6 @@ public final class Date implements Value {
 		return result;
 	}
 	
-	@Override
-	public String toString() {
-		return String.format("year: %d\tmonth: %d\tday: %d", year, month, day);
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

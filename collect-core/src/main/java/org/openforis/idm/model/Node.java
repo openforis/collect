@@ -10,9 +10,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.metamodel.SurveyContext;
 
 
 /**
@@ -105,6 +107,11 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 		path = sb.toString();
 	}
 
+	public <C extends SurveyContext> C getSurveyContext() {
+		Survey survey = getSurvey();
+		return survey.getContext();
+	}
+	
 	public int getIndex() {
 		return index;
 	}
@@ -124,6 +131,10 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	
 	public Schema getSchema() {
 		return getSurvey() == null ? null : getSurvey().getSchema();
+	}
+	
+	public ModelVersion getModelVersion() {
+		return record == null ? null: record.getVersion();
 	}
 
 	public boolean isDetached() {

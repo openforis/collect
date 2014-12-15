@@ -48,7 +48,6 @@
 				<constraints nullable="false" />
 			</column>
 			<column name="description" type="VARCHAR(255)" />
-			<column name="record_step" type="INTEGER" />
 			<column name="creation_date" type="TIMESTAMP" />
 			<column name="entity_id" type="INTEGER">
 				<constraints nullable="false" />

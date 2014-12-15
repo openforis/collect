@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.expression.InvalidExpressionException;
@@ -52,7 +53,8 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 		Set<NodePointer> result = new HashSet<NodePointer>();
 		if (node instanceof Entity) {
 			EntityDefinition def = (EntityDefinition) node.getDefinition();
-			for (NodeDefinition childDef : def.getChildDefinitions()) {
+			List<NodeDefinition> defs = def.getChildDefinitionsInVersion(node.getModelVersion());
+			for (NodeDefinition childDef : defs) {
 				result.add(new NodePointer((Entity) node, childDef));
 			}
 		} else if ( node.getParent() != null ) {
@@ -82,6 +84,16 @@ public abstract class NodePointerDependencyGraph extends DependencyGraph<NodePoi
 	
 	public List<NodePointer> dependenciesForPointers(Collection<NodePointer> pointers) {
 		return super.dependenciesForItems(pointers);
+	}
+	
+	protected Set<NodePathPointer> filterByVersion(Set<NodePathPointer> pointers, ModelVersion version) {
+		Set<NodePathPointer> result = new HashSet<NodePathPointer>(pointers.size());
+		for (NodePathPointer pointer : pointers) {
+			if (version == null || version.isApplicable(pointer.getReferencedNodeDefinition())) {
+				result.add(pointer);
+			}
+		}
+		return result;
 	}
 
 	static class NodePointerId {

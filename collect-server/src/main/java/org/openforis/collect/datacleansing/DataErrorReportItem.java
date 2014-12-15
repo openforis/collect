@@ -1,6 +1,10 @@
 package org.openforis.collect.datacleansing;
 
+import org.openforis.collect.datacleansing.json.JSONValueParser;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.PersistedObject;
+import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.model.Value;
 
 /**
  * 
@@ -45,15 +49,24 @@ public class DataErrorReportItem extends PersistedObject {
 		super();
 		this.report = report;
 	}
+	
+	public AttributeDefinition getAttributeDefinition() {
+		DataQuery query = report.getQuery();
+		Schema schema = query.getSchema();
+		AttributeDefinition def = (AttributeDefinition) schema.getDefinitionById(query.getAttributeDefinitionId());
+		return def;
+	}
+	
+	public Value extractAttributeValue() {
+		AttributeDefinition def = getAttributeDefinition();
+		Value val = new JSONValueParser().parseValue(def, value);
+		return val;
+	}
 
 	public DataErrorReport getReport() {
 		return report;
 	}
 
-	public void setReport(DataErrorReport report) {
-		this.report = report;
-	}
-	
 	public int getRecordId() {
 		return recordId;
 	}

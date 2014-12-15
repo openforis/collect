@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.model.NodePathPointer;
 import org.openforis.idm.model.Record;
 
@@ -58,6 +59,11 @@ public class Survey implements Serializable {
 	 * To be called after survey unmarshalling process is complete.
 	 */
 	public void init() {
+		initSchemaDefinitions();
+		initCoordinateOperations();
+	}
+
+	private void initSchemaDefinitions() {
 		Schema schema = getSchema();
 		if ( schema != null ) {
 			for (EntityDefinition entityDefinition : schema.getRootEntityDefinitions()) {
@@ -68,6 +74,13 @@ public class Survey implements Serializable {
 					}
 				});
 			}
+		}
+	}
+	
+	private void initCoordinateOperations() {
+		CoordinateOperations coordinateOperations = getContext().getCoordinateOperations();
+		if (coordinateOperations != null) {
+			coordinateOperations.parseSRS(getSpatialReferenceSystems());
 		}
 	}
 	
@@ -539,8 +552,9 @@ public class Survey implements Serializable {
 		CollectionUtils.shiftItem(languages, language, index);
 	}
 	
-	public SurveyContext getContext() {
-		return surveyContext;
+	@SuppressWarnings("unchecked")
+	public <C extends SurveyContext> C getContext() {
+		return (C) surveyContext;
 	}
 	
 	public ReferenceDataSchema getReferenceDataSchema() {
@@ -568,12 +582,20 @@ public class Survey implements Serializable {
 		return getSurveyDependencies().getRelevanceSources(definition);
 	}
 
-	public Set<NodePathPointer> getRequiredDependencies(NodeDefinition definition) {
-		return getSurveyDependencies().getRequiredDependencies(definition);
+	public Set<NodePathPointer> getMinCountDependencies(NodeDefinition definition) {
+		return getSurveyDependencies().getMinCountDependencies(definition);
 	}
 	
-	public Set<NodePathPointer> getRequiredSources(NodeDefinition definition) {
-		return getSurveyDependencies().getRequiredSources(definition);
+	public Set<NodePathPointer> getMinCountSources(NodeDefinition definition) {
+		return getSurveyDependencies().getMinCountSources(definition);
+	}
+	
+	public Set<NodePathPointer> getMaxCountDependencies(NodeDefinition definition) {
+		return getSurveyDependencies().getMaxCountDependencies(definition);
+	}
+	
+	public Set<NodePathPointer> getMaxCountSources(NodeDefinition definition) {
+		return getSurveyDependencies().getMaxCountSources(definition);
 	}
 	
 	public Set<NodePathPointer> getCalculatedValueDependencies(NodeDefinition definition) {
@@ -586,8 +608,9 @@ public class Survey implements Serializable {
 	
 	public void refreshSurveyDependencies() {
 		surveyDependencies = new SurveyDependencies(this);
+		initCoordinateOperations();
 	}
-	
+
 	private SurveyDependencies getSurveyDependencies() {
 		if(surveyDependencies == null){
 			surveyDependencies = new SurveyDependencies(this);

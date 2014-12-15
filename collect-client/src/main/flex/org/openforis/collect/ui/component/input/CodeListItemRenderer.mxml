@@ -26,6 +26,8 @@
 			import spark.skins.spark.CheckBoxSkin;
 			import spark.skins.spark.RadioButtonSkin;
 			
+			public static var QUALIFIER_TEXT_INPUT_WIDTH:Number = 150;
+
 			public static const STATE_NORMAL:String = "normal";
 			public static const STATE_DROPPING_TOP:String = "droppingTop";
 			public static const STATE_DROPPING_BOTTOM:String = "droppingBottom";

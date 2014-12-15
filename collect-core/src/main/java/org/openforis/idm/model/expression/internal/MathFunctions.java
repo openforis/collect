@@ -96,6 +96,7 @@ public class MathFunctions extends CustomFunctions {
 		return Math.abs(value.doubleValue());
 	}
 
+	@SuppressWarnings("unchecked")
 	private static Object pow(Object base, Object exponent) {
 		if (base == null || exponent == null) {
 			return null;
@@ -105,11 +106,11 @@ public class MathFunctions extends CustomFunctions {
 		}
 		Number exponentValue = (Number) exponent;
 		return base instanceof Iterable
-				? powForCollectionOfBases((Iterable) base, exponentValue)
+				? powForCollectionOfBases((Iterable<Object>) base, exponentValue)
 				: powForSingleBase(base, exponentValue);
 	}
 
-	private static Iterable<Number> powForCollectionOfBases(Iterable base, Number exponent) {
+	private static Iterable<Number> powForCollectionOfBases(Iterable<Object> base, Number exponent) {
 		List<Number> result = new ArrayList<Number>();
 		for (Object number : base) {
 			result.add(
@@ -205,16 +206,17 @@ public class MathFunctions extends CustomFunctions {
 
 
 	private abstract static class SingleArgMathFunction extends CustomFunction {
+		@SuppressWarnings("unchecked")
 		public final Object invoke(ExpressionContext context, Object[] objects) {
 			Object numberOrNumbers = objects[0];
 			return numberOrNumbers instanceof Iterable
-					? executeOnNumbers((Iterable) numberOrNumbers)
+					? executeOnNumbers((Iterable<Object>) numberOrNumbers)
 					: executeOnNumber(numberOrNumbers);
 		}
 
 		public abstract Number execute(Number number);
 
-		private Iterable<Number> executeOnNumbers(Iterable numbers) {
+		private Iterable<Number> executeOnNumbers(Iterable<Object> numbers) {
 			List<Number> result = new ArrayList<Number>();
 			for (Object number : numbers)
 				result.add(

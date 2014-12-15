@@ -110,18 +110,18 @@ public class CollectValidator extends Validator {
 	}
 	
 	@Override
-	public ValidationResultFlag validateMinCount(Entity entity, String childName) {
-		ValidationResultFlag flag = super.validateMinCount(entity, childName);
+	public ValidationResultFlag validateMinCount(Entity entity, NodeDefinition childDef) {
+		ValidationResultFlag flag = super.validateMinCount(entity, childDef);
 		CollectRecord record = (CollectRecord) entity.getRecord();
-		record.updateMinCountsValidationCache(entity, childName, flag);
+		record.updateMinCountsValidationCache(entity, childDef.getName(), flag);
 		return flag;
 	}
 	
 	@Override
-	public ValidationResultFlag validateMaxCount(Entity entity, String childName) {
-		ValidationResultFlag flag = super.validateMaxCount(entity, childName);
+	public ValidationResultFlag validateMaxCount(Entity entity, NodeDefinition childDef) {
+		ValidationResultFlag flag = super.validateMaxCount(entity, childDef);
 		CollectRecord record = (CollectRecord) entity.getRecord();
-		record.updateMaxCountsValidationCache(entity, childName, flag);
+		record.updateMaxCountsValidationCache(entity, childDef.getName(), flag);
 		return flag;
 	}
 	

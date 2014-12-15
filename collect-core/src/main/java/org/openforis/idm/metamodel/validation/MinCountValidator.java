@@ -36,7 +36,7 @@ public class MinCountValidator implements ValidationRule<Entity> {
 		}
 		String childName = nodeDefinition.getName();
 		if( entity.isRelevant(childName) ) {
-			int minCount = entity.getEffectiveMinCount(childName);
+			int minCount = entity.getMinCount(childName);
 			if ( minCount == 0 ) {
 				return OK;
 			} else {

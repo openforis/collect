@@ -64,7 +64,6 @@ package org.openforis.collect.util {
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.model.proxy.TaxonOccurrenceProxy;
 	import org.openforis.collect.model.proxy.TaxonomyProxy;
-	import org.openforis.collect.model.proxy.ValidationResultProxy;
 	import org.openforis.collect.model.proxy.ValidationResultsProxy;
 	import org.openforis.collect.remoting.service.codelistimport.proxy.CodeListImportStatusProxy;
 	import org.openforis.collect.remoting.service.dataimport.DataImportStateProxy;
@@ -161,7 +160,6 @@ package org.openforis.collect.util {
 				UITabProxy,
 				UnitProxy,
 				ValidationResultsProxy,
-				ValidationResultProxy,
 				ValidationResultFlag
 			];
 		}

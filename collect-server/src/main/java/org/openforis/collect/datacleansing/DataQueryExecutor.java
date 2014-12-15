@@ -23,12 +23,11 @@ public class DataQueryExecutor {
 	@Autowired
 	private RecordManager recordManager;
 	
-	public DataQueryResultIterator execute(DataQuery query) {
+	public DataQueryResultIterator execute(DataQuery query, Step step) {
 		CollectSurvey survey = query.getSurvey();
 		EntityDefinition entityDef = (EntityDefinition) survey.getSchema().getDefinitionById(query.getEntityDefinitionId());
 		EntityDefinition rootEntityDef = entityDef.getRootEntity();
 		Integer rootEntityId = rootEntityDef.getId();
-		Step step = query.getStep();
 		
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setStep(step);

@@ -10,7 +10,6 @@ import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.TaxonSummary;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Task;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

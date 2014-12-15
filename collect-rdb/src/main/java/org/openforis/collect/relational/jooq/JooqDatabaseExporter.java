@@ -65,7 +65,7 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 		}
 		batchExecutor.flush();
 	}
-	
+
 	private class BatchInsertExecutor {
 		
 		private static final int BATCH_MAX_SIZE = 10000;

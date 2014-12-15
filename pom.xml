@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.3.11-SNAPSHOT</version>
+	<version>3.3.14-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -20,9 +20,11 @@
 	</modules>
 
 	<properties>
+		<!-- install builder application version id (used by auto updater): it must be a progressive number -->
+		<installer-version-id>${buildNumber}</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.0.14</openforis.commons.version>
+		<openforis.commons.version>0.0.15-SNAPSHOT</openforis.commons.version>
 		<spring.version>3.2.8.RELEASE</spring.version>
 		<spring-security.version>3.2.4.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
@@ -50,6 +52,27 @@
 	
 	<build>
 		<plugins>
+			<!--  Create a build number to use for the InstallBuilder auto updater and set a ${buildNumber} variable --> 
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+						<format>{0,date,yyyyMMddHHmm}</format>
+						<items>
+							<item>timestamp</item>
+						</items>
+					</configuration>
+			</plugin>
+			
 			<!--  Set Eclipse project text encoding to UTF-8 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -188,6 +211,11 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>1.7</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -265,6 +293,12 @@
 				<artifactId>commons-versioning</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.openforis.commons</groupId>
+				<artifactId>commons-web</artifactId>
+				<version>${openforis.commons.version}</version>
+			</dependency>
+			
 			<dependency>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>

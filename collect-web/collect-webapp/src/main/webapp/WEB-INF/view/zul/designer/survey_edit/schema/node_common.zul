@@ -109,22 +109,26 @@
   			</row>
   			<row
   				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple eq true)">
-  				<fieldErrorHandler message="@load(vmsgs['minCount'])">
+  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
   					<label value="${labels.survey.schema.node.min_count}:" />
   				</fieldErrorHandler>
-  				<fieldErrorHandler message="@load(vmsgs['minCount'])">
-  					<intbox value="@bind(fx.minCount)"
+  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
+  					<textbox value="@bind(fx.minCountExpression)"
+  						multiline="true"
   						onChange="@command('applyChanges')" />
+  					<image src="/assets/images/expression-small.png" />
   				</fieldErrorHandler>
   			</row>
   			<row
   				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple eq true)">
-  				<fieldErrorHandler message="@load(vmsgs['maxCount'])">
+  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
 	  				<label value="${labels.survey.schema.node.max_count}:" />
 	  			</fieldErrorHandler>
-  				<fieldErrorHandler message="@load(vmsgs['maxCount'])">
-  					<intbox value="@bind(fx.maxCount)"
+  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
+  					<textbox value="@bind(fx.maxCountExpression)"
+  						multiline="true"
   						onChange="@command('applyChanges')" />
+  					<image src="/assets/images/expression-small.png" />
   				</fieldErrorHandler>
   			</row>
   			<row visible="@load(not vm.rootEntity)">

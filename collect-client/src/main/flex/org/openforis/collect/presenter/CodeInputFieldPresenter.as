@@ -1,4 +1,5 @@
 package org.openforis.collect.presenter {
+	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
@@ -7,6 +8,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
+	import org.openforis.collect.util.CollectionUtil;
+	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	
 	/**
@@ -64,5 +67,20 @@ package org.openforis.collect.presenter {
 			return StringUtil.concat(": ", code, qualifier);
 		}
 		
+		override protected function getField():FieldProxy {
+			if (view.hasOwnProperty("attributes")) {
+				var attributes:IList = ObjectUtil.getValue(view, "attributes");
+				if (CollectionUtil.isEmpty(attributes)) {
+					return super.getField();
+				} else {
+					var attr:AttributeProxy = AttributeProxy(attributes.getItemAt(0));
+					var field:FieldProxy = attr.getField(0);
+					return field;
+				}
+			} else {
+				return super.getField();
+			}
+		}
+
 	}
 }

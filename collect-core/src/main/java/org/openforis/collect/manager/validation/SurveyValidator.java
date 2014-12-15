@@ -282,9 +282,14 @@ public class SurveyValidator {
 
 	private List<SurveyValidationResult> validateGenericNodeExpressions(NodeDefinition node) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
-		//validate required expression
-		addBooleanExpressionValidationResult(results, node, node.getRequiredExpression(), 
-				"survey.validation.node.error.invalid_required_expression");
+
+		// validate min count expression
+		addValueExpressionValidationResult(results, node, node.getMinCountExpression(), 
+				"survey.validation.node.error.invalid_min_count_expression");
+		
+		// validate max count expression
+		addValueExpressionValidationResult(results, node, node.getMaxCountExpression(), 
+				"survey.validation.node.error.invalid_max_count_expression");
 		
 		//validate required expression
 		addBooleanExpressionValidationResult(results, node, node.getRelevantExpression(), 

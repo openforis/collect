@@ -53,7 +53,7 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 	}
 
 	private String extractValue(Entity entity, String fieldName, int i) {
-		Attribute<?,?> attr = (Attribute<?, ?>) entity.get(defn.getName(), i);
+		Attribute<?,?> attr = (Attribute<?, ?>) entity.get(defn, i);
 		if ( attr == null ) {
 			return ""; 
 		} else {

@@ -1,5 +1,9 @@
 package org.openforis.idm.metamodel;
 
+import java.util.Iterator;
+import java.util.ServiceLoader;
+
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.Coordinate;
@@ -11,6 +15,16 @@ import org.openforis.idm.model.expression.ExpressionFactory;
  * @author S. Ricci
  */
 public class DefaultSurveyContext implements SurveyContext {
+
+	private static CoordinateOperations COORDINATE_OPERATIONS;
+
+	static {
+		ServiceLoader<CoordinateOperations> loader = ServiceLoader.load(CoordinateOperations.class);
+		Iterator<CoordinateOperations> it = loader.iterator();
+		if ( it.hasNext() ) {
+			COORDINATE_OPERATIONS = it.next();
+		}
+	}
 
 	private ExpressionFactory expressionFactory;
 	private ExpressionEvaluator expressionEvaluator;
@@ -45,6 +59,11 @@ public class DefaultSurveyContext implements SurveyContext {
 	@Override
 	public CodeListService getCodeListService() {
 		throw new UnsupportedOperationException();
+	}
+	
+	@Override
+	public CoordinateOperations getCoordinateOperations() {
+		return COORDINATE_OPERATIONS;
 	}
 
 	@Override

@@ -2,6 +2,8 @@ package org.openforis.idm.model;
 
 import java.io.Serializable;
 import java.io.StringWriter;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -80,6 +82,10 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 		return attribute;
 	}
 	
+	public void setAttribute(Attribute<?, ?> attribute) {
+		this.attribute = attribute;
+	}	
+
 	@SuppressWarnings("unchecked")
 	public T parseValue(String s) {
 		if ( StringUtils.isBlank(s) ) {
@@ -112,12 +118,32 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 		this.symbol = null;
 	}
 	
+	public String getStringValue() {
+		if (value == null) {
+			return null;
+		}
+		if (value instanceof String) {
+			return (String) value;
+		} else if (value instanceof Number) {
+			NumberFormat formatter = NumberFormat.getInstance(Locale.ENGLISH);
+			return formatter.format(value);
+		} else {
+			return value.toString();
+		}
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public int compareTo(Field<T> o) {
 		return ObjectUtils.compare((Comparable<Object>) value, (Comparable<Object>) o.value);
 	}
 
+	@Override
+	@Deprecated
+	protected void write(StringWriter sw, int indent) {
+		sw.append(String.valueOf(value));
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -168,13 +194,4 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 		return true;
 	}
 
-	@Override
-	@Deprecated
-	protected void write(StringWriter sw, int indent) {
-		sw.append(String.valueOf(value));
-	}
-	
-	public void setAttribute(Attribute<?, ?> attribute) {
-		this.attribute = attribute;
-	}	
 }

@@ -1,13 +1,17 @@
 package org.openforis.idm.model;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author G. Miceli
  * @author M. Togna
  */
-public final class File implements Value {
+public final class File extends AbstractValue {
 
+	public static final String FILENAME_FIELD = "filename";
+	public static final String SIZE_FIELD = "size";
+	
 	private final String filename;
 	private final Long size;
 
@@ -24,6 +28,15 @@ public final class File implements Value {
 		return size;
 	}
 
+	@Override
+	@SuppressWarnings("serial")
+	protected Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(FILENAME_FIELD, filename);
+			put(SIZE_FIELD, size);
+		}};
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -56,11 +69,4 @@ public final class File implements Value {
 		return true;
 	}
 	
-	@Override
-	public String toString() {
-		return new ToStringBuilder(this)
-			.append("filename", filename)
-			.append("size", size)
-			.toString();
-	}
 }

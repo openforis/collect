@@ -283,7 +283,8 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		List<Map<String, String>> result = new ArrayList<Map<String,String>>();
 		try {
 			result.addAll(getDependentNodeInfos("relevancy", editedItem.getRelevancyDependentDefinitions()));
-			result.addAll(getDependentNodeInfos("requireness", editedItem.getRequirenessDependentDefinitions()));
+			result.addAll(getDependentNodeInfos("min_count", editedItem.getMinCountDependentDefinitions()));
+			result.addAll(getDependentNodeInfos("max_count", editedItem.getMaxCountDependentDefinitions()));
 			result.addAll(getDependentNodeInfos("calculated_value", editedItem.getCalculatedValueDependentDefinitions()));
 		} catch(Exception e) {
 			//ignore

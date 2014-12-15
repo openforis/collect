@@ -15,7 +15,6 @@ import org.openforis.commons.collection.CollectionUtils;
  * @author S. Ricci
  *
  */
-@Deprecated
 public class ReferenceDataImportStatus<E extends ParsingError> extends ProcessStatus {
 	
 	private Map<Long, List<E>> rowToErrors;

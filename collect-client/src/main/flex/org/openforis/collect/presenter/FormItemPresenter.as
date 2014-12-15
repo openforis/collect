@@ -23,6 +23,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.FormItemContextMenu;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.UIUtil;
 
 	/**

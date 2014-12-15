@@ -7,7 +7,7 @@
 		http://www.openforis.org/idml/3.0 ../../../../idm-api/src/main/resources/idml3.1.2.xsd
 		http://www.openforis.org/collect/3.0/ui 
 		https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
-	lastId="1066">
+	lastId="1067">
   <!-- 
   	https://raw.github.com/openforis/idm/master/idm-api/src/main/resources/idml3.1.xsd
   	http://www.openforis.org/idml/3.0 ../../../../idm-api/src/main/resources/idml3.xsd 
@@ -3760,6 +3760,9 @@
 			<code id="737" list="accessibility" name="accessibility" required="true">
 				<label>Accessibility</label>
 			</code>
+			<coordinate id="1067" name="cluster_location" calculated="true">
+				<default expr="idm:samplingPointCoordinate(id)" />
+			</coordinate>
 			<coordinate id="738" name="vehicle_location" required="true">
 				<label>Vehicle location</label>
 				<distance flag="error" max="100000"

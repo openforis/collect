@@ -32,18 +32,6 @@
     ]]>
     </fx:Metadata> 
     
-	<fx:Script>
-		<![CDATA[
-			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
-				var verticalAlign:String = getStyle("verticalAlign");
-				if ( verticalAlign != null ) {
-					contentLayout.verticalAlign = verticalAlign;
-				}
-				super.updateDisplayList(unscaledWidth, unscaledHeight);
-			}
-		]]>
-	</fx:Script>
-	
     <s:states>
         <s:State name="normal" />
         <s:State name="disabled" />
@@ -57,19 +45,6 @@
 	</s:Rect>
 	
 	<!-- background fill -->
-	<!--
-	<s:Rect id="background" left="1" top="1" right="1" bottom="1" rotation="90">
-		<s:fill>
-			<s:LinearGradient>
-				<s:entries>
-					<s:GradientEntry color="0xFFFFFF" ratio="0" alpha="1"/>
-					<s:GradientEntry color="0xEEEEEE" ratio=".33" alpha="1"/>
-					<s:GradientEntry color="0xDDDDDD" ratio=".66" alpha="1"/>
-				</s:entries>
-			</s:LinearGradient>            
-		</s:fill>
-	</s:Rect>
-	-->
     <!--- Defines the appearance of the SkinnableContainer class's background.-->
     <s:Rect id="background" left="0" right="0" top="0" bottom="0">
         <s:fill>
@@ -83,11 +58,13 @@
         more about it here: http://bugs.adobe.com/jira/browse/SDK-21143
     -->
     <!--- @copy spark.components.SkinnableContainer#contentGroup -->
-    <s:Group id="contentGroup" left="0" right="0" top="0" bottom="0" minWidth="0" minHeight="0">
-        <s:layout>
+    <s:Group id="contentGroup"
+			 left="0" right="0" top="0" bottom="0" 
+			 minWidth="0" minHeight="0">
+		<s:layout>
             <s:VerticalLayout id="contentLayout" 
-							  verticalAlign="bottom"
 							  paddingTop="4"
+							  verticalAlign="bottom"
 							  />
         </s:layout>
     </s:Group>

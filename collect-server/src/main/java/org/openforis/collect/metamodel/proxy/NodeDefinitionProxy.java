@@ -100,28 +100,8 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 	}
 
 	@ExternalizedProperty
-	public String getRelevantExpression() {
-		return nodeDefinition.getRelevantExpression();
-	}
-
-	@ExternalizedProperty
-	public String getRequiredExpression() {
-		return nodeDefinition.getRequiredExpression();
-	}
-
-	@ExternalizedProperty
 	public boolean isMultiple() {
 		return nodeDefinition.isMultiple();
-	}
-
-	@ExternalizedProperty
-	public Integer getMinCount() {
-		return nodeDefinition.getMinCount();
-	}
-
-	@ExternalizedProperty
-	public Integer getMaxCount() {
-		return nodeDefinition.getMaxCount();
 	}
 
 	@ExternalizedProperty

@@ -15,7 +15,7 @@ import org.openforis.idm.model.Node;
  * @author M. Togna
  */
 public class SingleAttributeColumnProvider implements ColumnProvider {
-	private String attributeName;
+	private AttributeDefinition attributeDefinition;
 	private String headerName;
 
 	public SingleAttributeColumnProvider(AttributeDefinition defn) {
@@ -23,7 +23,7 @@ public class SingleAttributeColumnProvider implements ColumnProvider {
 	}
 	
 	public SingleAttributeColumnProvider(AttributeDefinition defn, String headerName) {
-		this.attributeName = defn.getName();
+		this.attributeDefinition = defn;
 		this.headerName = headerName;
 	}
 	
@@ -35,7 +35,8 @@ public class SingleAttributeColumnProvider implements ColumnProvider {
 		if ( axis == null ) {
 			throw new NullPointerException("Axis must be non-null");
 		} else if ( axis instanceof Entity ) {
-			Attribute<?,?> attr = (Attribute<?, ?>) ((Entity) axis).get(attributeName, 0);
+			Entity entity = (Entity) axis;
+			Attribute<?,?> attr = (Attribute<?, ?>) entity.get(attributeDefinition, 0);
 			if ( attr == null ) {
 				return Arrays.asList(""); 
 			} else {

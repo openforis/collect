@@ -7,7 +7,6 @@
 
 package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
-	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.collections.Sort;
@@ -15,7 +14,9 @@ package org.openforis.collect.model.proxy {
 	import org.granite.collections.IMap;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.util.ArrayUtil;
@@ -23,7 +24,7 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.util.ObjectUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
-	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 	/**
 	 * @author S. Ricci
@@ -112,14 +113,14 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		public function getSingleAttribute(attributeName:String):AttributeProxy {
-			var attributes:IList = childrenByName.get(attributeName);
+		public function getSingleAttribute(def:NodeDefinitionProxy):AttributeProxy {
+			var attributes:IList = getChildren(def);
 			if(attributes != null) {
 				if(attributes.length == 1) {
 					var attribute:AttributeProxy = attributes.getItemAt(0) as AttributeProxy;
 					return attribute;
 				} else if (attributes.length > 1) {
-					var message:String = "Single attribute expected but multiple values found: " + attributeName;
+					var message:String = "Single attribute expected but multiple values found: " + def.name;
 					throw new Error(message);
 				}
 			}
@@ -136,15 +137,15 @@ package org.openforis.collect.model.proxy {
 			return null;
 		}
 		
-		public function getChildren(nodeName:String = null):IList {
+		public function getChildren(childDefinition:NodeDefinitionProxy = null):IList {
 			var result:ArrayCollection;
-			if(nodeName != null) {
-				result = childrenByName.get(nodeName);
+			if(childDefinition != null) {
+				result = childrenByDefinitionId.get(childDefinition.id);
 			} else {
 				result = new ArrayCollection();
 				var childDefns:IList = EntityDefinitionProxy(definition).childDefinitions;
 				for each (var childDefn:NodeDefinitionProxy in childDefns) {
-					var childrenPart:IList = childrenByName.get(childDefn.name);
+					var childrenPart:IList = childrenByDefinitionId.get(childDefn.id);
 					if ( CollectionUtil.isNotEmpty(childrenPart) ) {
 						result.addAll(childrenPart);
 					}
@@ -231,8 +232,8 @@ package org.openforis.collect.model.proxy {
 			return partialCompareResult;
 		}
 		
-		public function getChild(nodeName:String, index:int):NodeProxy {
-			var children:IList = getChildren(nodeName);
+		public function getChild(childDef:NodeDefinitionProxy, index:int):NodeProxy {
+			var children:IList = getChildren(childDef);
 			if(children != null && children.length > index) {
 				return children.getItemAt(index) as NodeProxy;
 			} else {
@@ -242,7 +243,7 @@ package org.openforis.collect.model.proxy {
 		
 		public function getChildEntities():IList {
 			var entities:IList = new ArrayCollection();
-			var values:IList = childrenByName.values;
+			var values:IList = childrenByDefinitionId.values;
 			for each (var childList:IList in values) {
 				for each (var child:NodeProxy in childList) {
 					if(child is EntityProxy) {
@@ -254,51 +255,50 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function addChild(node:NodeProxy):void {
-			var name:String = node.name;
-			var children:ArrayCollection = childrenByName.get(name);
+			var childDef:NodeDefinitionProxy = node.definition
+			var children:IList = getChildren(childDef);
 			if(children == null) {
 				children = new ArrayCollection();
-				childrenByName.put(name, children);
+				childrenByDefinitionId.put(childDef.id, children);
 			}
 			node.parent = this;
 			node.init();
 			children.addItem(node);
-			showErrorsOnChild(name);
+			showErrorsOnChild(childDef);
 			
-			if ( node is EntityProxy && CollectionUtil.isEmpty(EntityDefinitionProxy(node.definition).keyAttributeDefinitions)) {
-				var siblings:IList = getChildren(node.name);
-				for each (var sibling:EntityProxy in siblings) {
+			if ( node is EntityProxy && CollectionUtil.isEmpty(EntityDefinitionProxy(childDef).keyAttributeDefinitions)) {
+				for each (var sibling:EntityProxy in children) {
 					sibling.updateKeyText();
 				}
 			}
 		}
 		
 		public function removeChild(node:NodeProxy):void {
-			var name:String = node.name;
-			var children:IList = childrenByName.get(name);
+			var childDef:NodeDefinitionProxy = node.definition;
+			var children:IList = getChildren(childDef);
 			var index:int = children.getItemIndex(node);
 			if(index >= 0) {
 				children.removeItemAt(index);
 			}
-			showErrorsOnChild(name);
+			showErrorsOnChild(childDef);
 			
-			if ( node is EntityProxy && CollectionUtil.isEmpty(EntityDefinitionProxy(node.definition).keyAttributeDefinitions)) {
-				var siblings:IList = getChildren(node.name);
-				for each (var sibling:EntityProxy in siblings) {
+			if ( childDef is EntityDefinitionProxy && CollectionUtil.isEmpty(EntityDefinitionProxy(childDef).keyAttributeDefinitions)) {
+				for each (var sibling:EntityProxy in children) {
 					sibling.updateKeyText();
 				}
 			}
 		}
 		
 		public function replaceChild(oldNode:NodeProxy, newNode:NodeProxy):void {
-			var name:String = oldNode.name;
-			var children:ArrayCollection = childrenByName.get(name);
+			var childDef:NodeDefinitionProxy = oldNode.definition;
+			var children:IList = getChildren(childDef);
 			var index:int = children.getItemIndex(oldNode);
 			children.setItemAt(newNode, index);
 		}
 		
 		public function moveChild(node:NodeProxy, index:int):void {
-			var children:IList = getChildren(node.name);
+			var childDef:NodeDefinitionProxy = node.definition;
+			var children:IList = getChildren(childDef);
 			CollectionUtil.moveItem(children, node, index);
 			for each (var child:NodeProxy in children){
 				child.updateIndex();
@@ -311,7 +311,7 @@ package org.openforis.collect.model.proxy {
 				var shortKeyParts:Array = new Array();
 				var fullKeyParts:Array = new Array();
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
-					var keyAttr:AttributeProxy = getSingleAttribute(def.name);
+					var keyAttr:AttributeProxy = getSingleAttribute(def);
 					if(keyAttr != null) {
 						var keyValue:Object = getKeyLabelPart(def, keyAttr);
 						if(keyValue != null && StringUtil.isNotBlank(keyValue.toString())) {
@@ -325,7 +325,7 @@ package org.openforis.collect.model.proxy {
 				keyText = StringUtil.concat(KEY_LABEL_SEPARATOR, shortKeyParts);
 				fullKeyText = StringUtil.concat(FULL_KEY_LABEL_SEPARATOR, fullKeyParts);
 			} else if(parent != null) {
-				var siblings:IList = parent.getChildren(name);
+				var siblings:IList = getSiblings();
 				var itemIndex:int = siblings.getItemIndex(this);
 				keyText = String(itemIndex + 1);
 				fullKeyText = keyText;
@@ -337,7 +337,7 @@ package org.openforis.collect.model.proxy {
 			var keyDefs:IList = EntityDefinitionProxy(definition).keyAttributeDefinitions;
 			if(keyDefs.length > 0) {
 				for each (var def:AttributeDefinitionProxy in keyDefs) {
-					var keyAttr:AttributeProxy = getSingleAttribute(def.name);
+					var keyAttr:AttributeProxy = getSingleAttribute(def);
 					var keyValue:Object = getKeyLabelPart(def, keyAttr);
 					result.push(keyValue);
 				}
@@ -364,50 +364,72 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		public function updateChildrenMinCountValiditationMap(map:IMap):void {
-			updateMap(childrenMinCountValidationMap, map);
+		public function updateChildrenMinCountValiditation(map:IMap):void {
+			updateList(childrenMinCountValidation, map);
 		}
 		
-		public function updateChildrenMaxCountValiditationMap(map:IMap):void {
-			updateMap(childrenMaxCountValidationMap, map);
+		public function updateChildrenMaxCountValiditation(map:IMap):void {
+			updateList(childrenMaxCountValidation, map);
 		}
 
-		public function updateChildrenRelevanceMap(map:IMap):void {
-			updateMap(childrenRelevanceMap, map);
+		public function updateChildrenRelevance(map:IMap):void {
+			updateList(childrenRelevance, map);
 		}
 
-		public function updateChildrenRequiredMap(map:IMap):void {
-			updateMap(childrenRequiredMap, map);
+		public function updateChildrenMinCount(map:IMap):void {
+			updateList(childrenMinCount, map);
 		}
 		
-		public function showErrorsOnChild(name:String):void {
-			showChildrenErrorsMap.put(name, true);
+		public function updateChildrenMaxCount(map:IMap):void {
+			updateList(childrenMaxCount, map);
 		}
 		
-		public function isErrorOnChildVisible(name:String):Boolean {
-			var result:Boolean = showChildrenErrorsMap.get(name);
-			return result;
-		}
-		
-		public function isRequired(childName:String):Boolean {
-			var required:Boolean = childrenRequiredMap.get(childName);
-			return required == true;
-		}
-		
-		public function getEffectiveMinCount(childName:String):int {
-			var childDef:NodeDefinitionProxy = EntityDefinitionProxy(definition).getChildDefinition(childName);
-			if((isNaN(childDef.minCount) || childDef.minCount == 0) && isRequired(childName) ) {
-				return 1;
-			} else {
-				return childDef.minCount;
+		public function showErrorsOnChildren():void {
+			for (var i:int; i < childrenErrorVisible.length; i++) {
+				childrenErrorVisible.setItemAt(true, i);
 			}
 		}
 		
-		public function get childDefinitionNames():IList {
-			//taken from showChildrenErrorsMap that is fully populated from the server
-			//with an entry for each child definition
-			var names:ArrayCollection = showChildrenErrorsMap.keySet;
-			return names;
+		public function showErrorsOnChild(childDef:NodeDefinitionProxy):void {
+			var index:int = getChildDefinitionIndex(childDef);
+			childrenErrorVisible.setItemAt(true, index);
+		}
+		
+		public function isErrorOnChildVisible(childDef:NodeDefinitionProxy):Boolean {
+			var index:int = getChildDefinitionIndex(childDef);
+			var result:Boolean = childrenErrorVisible.getItemAt(index);
+			return result;
+		}
+		
+		public function isRequired(childDef:NodeDefinitionProxy):Boolean {
+			return getMinCount(childDef) > 0;
+		}
+		
+		public function getMinCount(childDef:NodeDefinitionProxy):int {
+			var index:int = getChildDefinitionIndex(childDef);
+			var count:int = childrenMinCount.getItemAt(index) as int;
+			return count;
+		}
+		
+		public function getMaxCount(childDef:NodeDefinitionProxy):int {
+			var index:int = getChildDefinitionIndex(childDef);
+			var count:int = childrenMaxCount.getItemAt(index) as int;
+			return count;
+		}
+		
+		public function getMinCountValidation(childDef:NodeDefinitionProxy):ValidationResultFlag {
+			var index:int = getChildDefinitionIndex(childDef);
+			return childrenMinCountValidation.getItemAt(index) as ValidationResultFlag;
+		}
+		
+		public function getMaxCountValidation(childDef:NodeDefinitionProxy):ValidationResultFlag {
+			var index:int = getChildDefinitionIndex(childDef);
+			return childrenMaxCountValidation.getItemAt(index) as ValidationResultFlag;
+		}
+		
+		public function isRelevant(childDef:NodeDefinitionProxy):Boolean {
+			var index:int = getChildDefinitionIndex(childDef);
+			return childrenRelevance.getItemAt(index) as Boolean;
 		}
 		
 		override public function hasErrors():Boolean {
@@ -420,8 +442,8 @@ package org.openforis.collect.model.proxy {
 			return false;
 		}
 		
-		public function childContainsErrors(childName:String):Boolean {
-			var children:IList = getChildren(childName);
+		public function childContainsErrors(childDef:NodeDefinitionProxy):Boolean {
+			var children:IList = getChildren(childDef);
 			for each(var child:NodeProxy in children){
 				if( child.hasErrors() ) {
 					return true;
@@ -430,8 +452,8 @@ package org.openforis.collect.model.proxy {
 			return false;
 		}
 		
-		public function hasConfirmedError(childName:String):Boolean {
-			var children:IList = getChildren(childName);
+		public function hasConfirmedError(childDef:NodeDefinitionProxy):Boolean {
+			var children:IList = getChildren(childDef);
 			for each(var child:NodeProxy in children){
 				if(child is AttributeProxy){
 					var attr:AttributeProxy = child as AttributeProxy;
@@ -450,8 +472,8 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
-		public function getCount(childName:String):int {
-			var children:IList = getChildren(childName);
+		public function getCount(childDef:NodeDefinitionProxy):int {
+			var children:IList = getChildren(childDef);
 			return children.length;
 		}
 		
@@ -493,7 +515,8 @@ package org.openforis.collect.model.proxy {
 				var part:String = parts[count];
 				for each (var currentParentEntity:EntityProxy in currentParentEntities ) {
 					var currentParentEntityDefn:EntityDefinitionProxy = EntityDefinitionProxy(currentParentEntity.definition);
-					var currentChildren:IList = currentParentEntity.getChildren(part);
+					var partNodeDef:NodeDefinitionProxy = currentParentEntityDefn.getChildDefinition(part);
+					var currentChildren:IList = currentParentEntity.getChildren(partNodeDef);
 					CollectionUtil.addAll(currentLevelChildren, currentChildren);
 				}
 				if ( currentLevelChildren.length == 0 ) {
@@ -535,16 +558,25 @@ package org.openforis.collect.model.proxy {
 			return false;
 		}
 		
-		protected function updateMap(map:IMap, newMap:IMap):void {
-			if(map != null && newMap != null) {
-				var newKeys:ArrayCollection = newMap.keySet;
-				for each (var key:* in newKeys) {
-					var value:* = newMap.get(key);
-					if(value != null) {
-						map.put(key, value);
+		protected function updateList(list:IList, newMap:IMap):void {
+			if(list != null && newMap != null) {
+				var defIds:IList = newMap.keySet;
+				for each(var defId:int in defIds) {
+					var childDef:NodeDefinitionProxy = EntityDefinitionProxy(definition).getChildDefinitionById(defId);
+					var index:int = getChildDefinitionIndex(childDef);
+					var value:Object = newMap.get(defId);
+					if (value != null) {
+						list.setItemAt(value, index);
 					}
 				}
 			}
+		}
+		
+		private function getChildDefinitionIndex(childDefn:NodeDefinitionProxy):int {
+			var version:ModelVersionProxy = this.record.version;
+			var defs:IList = EntityDefinitionProxy(definition).getDefinitionsInVersion(version);
+			var index:int = defs.getItemIndex(childDefn);
+			return index;
 		}
 		
 		/*

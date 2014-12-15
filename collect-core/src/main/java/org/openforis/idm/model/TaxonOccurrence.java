@@ -1,6 +1,10 @@
 package org.openforis.idm.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
 
@@ -9,7 +13,7 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  * @author M. Togna
  * @author S. Ricci
  */
-public final class TaxonOccurrence implements Value {
+public final class TaxonOccurrence extends AbstractValue {
 
 	private Integer taxonId;
 	private String code;
@@ -60,6 +64,18 @@ public final class TaxonOccurrence implements Value {
 		this(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName(), 
 					vernacularName.getVernacularName(), vernacularName.getLanguageCode(),
 					vernacularName.getLanguageVariety());
+	}
+	
+	@Override
+	@SuppressWarnings("serial")
+	protected Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(TaxonAttributeDefinition.CODE_FIELD_NAME, code);
+			put(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME, scientificName);
+			put(TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME, vernacularName);
+			put(TaxonAttributeDefinition.LANGUAGE_CODE_FIELD_NAME, languageCode);
+			put(TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME, languageVariety);
+		}};
 	}
 	
 	public Integer getTaxonId() {

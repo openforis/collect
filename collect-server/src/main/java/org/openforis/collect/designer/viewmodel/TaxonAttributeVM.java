@@ -147,7 +147,8 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	
 	public List<String[]> getVisibleFieldsTemplates() {
 		List<String[]> result = new ArrayList<String[]>(UIOptions.TAXON_VISIBLE_FIELDS_TEMPLATES);
-		result.add(0, editedItem.getFieldNames().toArray(new String[0])); //show all fields option
+		List<String> fieldNames = editedItem.getFieldNames();
+		result.add(0, fieldNames.toArray(new String[fieldNames.size()])); //show all fields option
 		return result;
 	}
 	

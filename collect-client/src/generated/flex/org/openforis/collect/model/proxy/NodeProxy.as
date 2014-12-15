@@ -20,6 +20,7 @@ package org.openforis.collect.model.proxy {
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeProxy")]
     public class NodeProxy extends NodeProxyBase {
 		
+		private var _record:RecordProxy;
 		private var _definition:NodeDefinitionProxy;
 		private var _parent:EntityProxy;
 		private var _index:int;
@@ -29,6 +30,14 @@ package org.openforis.collect.model.proxy {
 			setParentReferencesOnChildren();
 		}
 
+		public function get record():RecordProxy {
+			return _record;
+		}
+		
+		public function set record(record:RecordProxy):void {
+			_record = record;
+		}
+		
 		public function get name():String {
 			return _definition.name;
 		}
@@ -57,8 +66,8 @@ package org.openforis.collect.model.proxy {
 			if ( parent == null ) {
 				return 0;
 			} else {
-				var children:IList = parent.getChildren(name);
-				var idx:int = children.getItemIndex(this);
+				var siblings:IList = getSiblings();
+				var idx:int = siblings.getItemIndex(this);
 				return idx;
 			}
 		}
@@ -131,12 +140,21 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function getSiblings():IList {
-			if ( parent != null ) {
-				var result:IList = parent.getChildren(name);
-				return result;
-			} else {
+			if ( parent == null ) {
 				return null;
+			} else {
+				return parent.getChildren(definition);
 			}
+		}
+		
+		public function get ancestors():IList {
+			var result:IList = new ArrayCollection();
+			var currentParent:EntityProxy = parent;
+			while (currentParent != null) {
+				result.addItemAt(currentParent, 0);
+				currentParent = currentParent.parent;
+			}
+			return result;
 		}
 
 		public function getIndex():int {
@@ -146,7 +164,7 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		public function get relevant():Boolean {
-			var result:Boolean = parent.childrenRelevanceMap.get(name);
+			var result:Boolean = parent.isRelevant(definition);
 			return result;
 		}
 		

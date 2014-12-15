@@ -32,6 +32,20 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 	private Flag flag;
 	private String condition;
 	private LanguageSpecificTextMap messages;
+	private String expression;
+	
+	protected abstract String buildExpression();
+
+	public String getExpression() {
+		if (expression == null) {
+			expression = buildExpression();
+		}
+		return expression;
+	}
+	
+	public void resetExpression() {
+		this.expression = null;
+	}
 
 	public Flag getFlag() {
 		return flag == null ? Flag.ERROR : flag;

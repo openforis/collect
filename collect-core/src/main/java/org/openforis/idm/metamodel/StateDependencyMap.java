@@ -164,8 +164,7 @@ class StateDependencyMap {
 	}
 
 	private String getNormalizedPath(String path) {
-		//remove "$this" token
-		String result = path.replaceAll("\\$this/", "");
+		String result = Path.removeThisVariableToken(path);
 		//transform to absolute path
 		result = Path.getAbsolutePath(result);
 		return result;

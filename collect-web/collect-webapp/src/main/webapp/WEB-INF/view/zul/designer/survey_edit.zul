@@ -118,7 +118,7 @@
 									<menuitem label="${labels.survey.validate}"
 										onClick="@command('validate')" />
 									<menuitem  label="${labels.survey.schema.export_summary.$}"
-										onClick="@global-command('exportSchemaSummary')" />
+										onClick="@command('exportSchemaSummary')" />
 								</menupopup>
 							</menu>
 						</menubar>

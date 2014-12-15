@@ -13,11 +13,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.NodeEvent;
-	import org.openforis.collect.model.CollectRecord$Step;
-	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.ui.component.input.TextCodeInputField;
+	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;
 	import org.openforis.collect.util.CollectionUtil;
@@ -26,6 +24,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.components.RadioButton;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	
 	/**
 	 * 
@@ -138,9 +137,9 @@ package org.openforis.collect.presenter {
 				var remarks:String = StringUtil.trim(view.remarksTextArea.text);
 				var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
 				nodeEvent.remarks = remarks;
-				if(_inputField.attributeDefinition.multiple && _inputField is TextCodeInputField) {
-					var attrName:String = _inputField.attributeDefinition.name;
-					nodeEvent.nodes = _inputField.parentEntity.getChildren(attrName);
+				if(_inputField.attributeDefinition.multiple && _inputField is CodeInputField) {
+					var attrDef:AttributeDefinitionProxy = _inputField.attributeDefinition;
+					nodeEvent.nodes = _inputField.parentEntity.getChildren(attrDef);
 				} else {
 					nodeEvent.node = _inputField.attribute;
 					nodeEvent.fieldIdx = _inputField.fieldIndex;

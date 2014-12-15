@@ -24,7 +24,7 @@ public class AttributeChange extends NodeChange<Attribute<?, ?>> {
 	public void merge(AttributeChange newChange) {
 		if ( updatedFieldValues == null ) {
 			updatedFieldValues = newChange.updatedFieldValues;
-		} else {
+		} else if (newChange.updatedFieldValues != null) {
 			updatedFieldValues.putAll(newChange.updatedFieldValues);
 		}
 		this.validationResults = newChange.validationResults;

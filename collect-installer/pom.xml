@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.3.11-SNAPSHOT</version>
+		<version>3.3.14-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
@@ -17,9 +17,9 @@
 		<installbuilder-file-name>installbuilder.xml</installbuilder-file-name>
 		<jre.version>1.8.0_11</jre.version>
 		<!-- installer file names -->
-		<windows-installer-file-name>OpenForisCollect-${project.version}-windows-installer.exe</windows-installer-file-name>
-		<linux-installer-file-name>OpenForisCollect-${project.version}-linux-installer.run</linux-installer-file-name>
-		<osx-installer-file-name>OpenForisCollect-${project.version}-osx-installer.run</osx-installer-file-name>
+		<windows-installer-file-name>OpenForisCollect-${installer-version-id}-windows-installer.exe</windows-installer-file-name>
+		<linux-installer-file-name>OpenForisCollect-${installer-version-id}-linux-installer.run</linux-installer-file-name>
+		<osx-installer-file-name>OpenForisCollect-${installer-version-id}-osx-installer.run</osx-installer-file-name>
 		<!-- autoupdate file names -->
 		<windows-autoupdater-file-name>autoupdate-windows.exe</windows-autoupdater-file-name>
 		<linux-autoupdater-file-name>autoupdate-linux.run</linux-autoupdater-file-name>
@@ -202,8 +202,8 @@
 							<regex>false</regex>
 							<replacements>
 								<replacement>
-									<token>PROJECT_VERSION</token>
-									<value>${project.version}</value>
+									<token>VERSION_ID</token>
+									<value>${installer-version-id}</value>
 								</replacement>
 								<replacement>
 									<token>UPDATE_XML_URL</token>

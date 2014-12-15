@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.3.11-SNAPSHOT</version>
+		<version>3.3.14-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -123,6 +123,11 @@
 			<version>${project.version}</version>
 			<type>test-jar</type>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.openforis.commons</groupId>
+			<artifactId>commons-web</artifactId>
 		</dependency>
 		
 		<dependency>

@@ -16,6 +16,7 @@ import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Code;
+import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
 import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.IntegerRange;
@@ -95,6 +96,8 @@ public class ModelNodePointer extends DynamicPointer {
 		} else if (value instanceof TaxonOccurrence) {
 			TaxonOccurrence taxonOcc = (TaxonOccurrence) value;
 			return taxonOcc.getCode();
+		} else if (value instanceof Coordinate) {
+			return value;
 		} else {
 			throw new UnsupportedOperationException("Unsupported value type of "+attribute.getClass());
 		}

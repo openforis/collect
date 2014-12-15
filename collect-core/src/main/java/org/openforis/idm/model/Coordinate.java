@@ -1,6 +1,12 @@
 package org.openforis.idm.model;
 
+import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.SRS_FIELD_NAME;
+import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.X_FIELD_NAME;
+import static org.openforis.idm.metamodel.CoordinateAttributeDefinition.Y_FIELD_NAME;
+
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author G. Miceli
  * @author M. Togna
  */
-public final class Coordinate implements Value{
+public final class Coordinate extends AbstractValue {
 
 	private static final Pattern PATTERN = Pattern.compile("SRID=(.+);POINT\\((-?\\d+(\\.\\d+)?)\\s(-?\\d+(\\.\\d+)?)\\)");
 	private static final String TO_STRING_FORMAT = "SRID=%s;POINT(%f %f)";
@@ -18,7 +24,6 @@ public final class Coordinate implements Value{
 	private Double x;
 	private Double y;
 	private String srsId;
-
 
 	/**
 	 * Returns a Coordinate parsed from the string in input the string representation is based on posgis data type
@@ -50,6 +55,20 @@ public final class Coordinate implements Value{
 		this.x = x;
 		this.y = y;
 		this.srsId = srsId;
+	}
+	
+	@Override
+	@SuppressWarnings("serial")
+	protected Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(X_FIELD_NAME, x);
+			put(Y_FIELD_NAME, y);
+			put(SRS_FIELD_NAME, srsId);
+		}};
+	}
+
+	public boolean isComplete() {
+		return x != null && y != null && srsId != null;
 	}
 
 	public Double getX() {
@@ -105,4 +124,5 @@ public final class Coordinate implements Value{
 	public String toString() {
 		return String.format(Locale.ENGLISH, TO_STRING_FORMAT, srsId, x, y);
 	}
+
 }

@@ -70,7 +70,7 @@ public class SpecifiedValidator implements ValidationRule<Attribute<?,?>> {
 
 	private boolean isRequired(Attribute<?, ?> attribute) {
 		Entity parent = attribute.getParent();
-		return parent.isRequired(attribute.getName());
+		return parent.getMinCount(attribute.getDefinition()) > 0;
 	}
 
 	private boolean isRelevant(Attribute<?, ?> attribute) {

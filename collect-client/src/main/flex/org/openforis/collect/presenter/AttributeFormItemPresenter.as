@@ -18,6 +18,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 
 	/**
 	 * 
@@ -91,13 +92,13 @@ package org.openforis.collect.presenter
 		 * get the attribute (or attributes) from the parentEntity
 		 */
 		protected function assignAttribute():void {
-			if (view.parentEntity != null && view.attributeDefinition != null) {
-				var name:String = view.attributeDefinition.name;
+			var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
+			if (view.parentEntity != null && attrDefn != null) {
 				if (view.attributeDefinition.multiple) {
-					var attributes:IList = view.parentEntity.getChildren(name);
+					var attributes:IList = view.parentEntity.getChildren(attrDefn);
 					view.attributes = attributes;
 				} else {
-					var attribute:AttributeProxy = view.parentEntity.getSingleAttribute(name);
+					var attribute:AttributeProxy = view.parentEntity.getSingleAttribute(attrDefn);
 					view.attribute = attribute;
 				}
 			} else {
