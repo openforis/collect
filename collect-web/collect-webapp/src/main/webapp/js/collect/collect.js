@@ -11,6 +11,10 @@ Collect.prototype.init = function() {
 	selectSurveyDialogController.open();
 };
 
+Collect.prototype.setActiveSurvey = function(survey) {
+	collect.activeSurvey = survey;
+};
+
 Collect.prototype.error = function(jqXHR, status, errorThrown) {
 	alert(status);
 };

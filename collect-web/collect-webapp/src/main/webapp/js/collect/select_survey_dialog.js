@@ -12,8 +12,8 @@ Collect.SelectSurveyDialogController.prototype.applyHandler = function() {
 	var surveyId = $this.surveySelectPicker.val();
 	collect.sessionService.setActiveSurvey(surveyId, function() {
 		var survey = OpenForis.Arrays.findItem($this.surveySummaries, "id", surveyId);
-		collect.activeSurvey = survey;
 		$this.close();
+		collect.setActiveSurvey(survey);
 	});
 };
 
@@ -40,4 +40,5 @@ Collect.SelectSurveyDialogController.prototype.open = function() {
 
 Collect.SelectSurveyDialogController.prototype.close = function() {
 	this.content.modal('hide');
+	this.content.remove();
 };
