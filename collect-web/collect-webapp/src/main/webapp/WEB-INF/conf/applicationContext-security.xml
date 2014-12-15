@@ -53,6 +53,7 @@
 
 		<intercept-url pattern="/*" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/**/*.swf" access="hasRole('ROLE_USER')" />
+		<intercept-url pattern="/datacleansing/*" access="hasRole('ROLE_USER')" />
 		<!-- <intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" 
 			/> -->
 
