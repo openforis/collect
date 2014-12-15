@@ -4,6 +4,7 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.commons.web.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -35,10 +36,10 @@ public class SessionController {
 	}
 	
 	@RequestMapping(value = "/setActiveSurvey.json", method = RequestMethod.GET)
-	public @ResponseBody String setSurveyActiveSurvey(@RequestParam String surveyName) {
-		CollectSurvey survey = surveyManager.get(surveyName);
+	public @ResponseBody Response setSurveyActiveSurvey(@RequestParam int surveyId) {
+		CollectSurvey survey = surveyManager.getById(surveyId);
 		sessionManager.setActiveSurvey(survey);
-		return "ok";
+		return new Response();
 	}
 	
 }

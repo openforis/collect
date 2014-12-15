@@ -1,14 +1,15 @@
 Collect.SurveyService = function() {
-	this.contextPath = "/surveys/";
+	this.contextPath = "/collect/surveys/";
 };
 
 Collect.SurveyService.prototype.loadSummaries = function(callback) {
+	var $this = this;
 	$.ajax({
-		url: contextPath + "summaries.json",
+		url: $this.contextPath + "summaries.json",
 		dataType:"json"
-	}).done(function(response){
-		callback(response);
+	}).done(function(summaries){
+		callback(summaries);
 	}).error( function() {
-		Collect.error.apply( this , arguments );
+		collect.error.apply(this, arguments);
 	});
 };
