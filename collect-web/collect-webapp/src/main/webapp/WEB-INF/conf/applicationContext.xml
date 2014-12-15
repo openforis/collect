@@ -25,9 +25,11 @@
 	
 	<mvc:resources mapping="collect.swf" location="collect.swf" />
 	<mvc:resources mapping="/assets/**" location="/assets/" />
+	<mvc:resources mapping="/datacleansing/**" location="/datacleansing/" />
 	<mvc:resources mapping="/images/**" location="/images/" />
-	<mvc:resources mapping="/script/**" location="/script/" />
+	<mvc:resources mapping="/js/**" location="/js/" />
 	<mvc:resources mapping="/org/**" location="/org/" />
+	<mvc:resources mapping="/script/**" location="/script/" />
 
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />

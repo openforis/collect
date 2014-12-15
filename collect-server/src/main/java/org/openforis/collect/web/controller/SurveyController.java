@@ -6,6 +6,8 @@ import java.util.Locale;
 
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.metamodel.SurveyViewGenerator;
+import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
@@ -27,6 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
+@RequestMapping("/surveys/")
 public class SurveyController {
 	
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
@@ -36,13 +39,22 @@ public class SurveyController {
 	@Autowired
 	private SurveyManager surveyManager;
 
-	@RequestMapping(value = "/surveys/summaries.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "summaries.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SurveySummary> loadSummaries(@RequestParam(value="include_record_ids", required=false) boolean includeRecordIds) throws Exception {
 		List<SurveySummary> surveys = surveyManager.getSurveySummaries(Locale.ENGLISH.getLanguage());
 		return surveys;
 	}
 
+	@RequestMapping(value = "{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	SurveyView loadSurvey(@PathVariable int id) throws Exception {
+		CollectSurvey survey = surveyManager.getById(id);
+		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH);
+		SurveyView view = viewGenerator.generateView(survey);
+		return view;
+	}
+	
 	protected List<Integer> getRecordIds(SurveySummary s) {
 		List<Integer> recordIds = new ArrayList<Integer>();
 		CollectSurvey survey = surveyManager.getById(s.getId());
@@ -56,13 +68,13 @@ public class SurveyController {
 		return recordIds;
 	}
 	
-	@RequestMapping(value = "/survey/temp/{surveyId}/edit.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "temp/{surveyId}/edit.htm", method = RequestMethod.GET)
 	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("temp_id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	@RequestMapping(value = "/survey/{surveyId}/edit.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "{surveyId}/edit.htm", method = RequestMethod.GET)
 	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);

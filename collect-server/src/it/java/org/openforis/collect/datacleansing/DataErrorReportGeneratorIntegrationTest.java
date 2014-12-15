@@ -12,11 +12,14 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
+import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
+import org.openforis.collect.datacleansing.manager.DataErrorTypeManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
@@ -35,7 +38,11 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 	@Autowired
 	private DataErrorReportGenerator reportGenerator;
 	@Autowired
-	private DataCleansingManager dataCleansingManager;
+	private DataErrorTypeManager dataErrorTypeManager;
+	@Autowired
+	private DataErrorQueryManager dataErrorQueryManager;
+	@Autowired
+	private DataErrorReportManager dataErrorReportManager;
 	@Autowired
 	private RecordManager recordManager;
 	
@@ -51,7 +58,7 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		invalidAttributeErrorType = new DataErrorType(survey);
 		invalidAttributeErrorType.setCode("invalid");
 		invalidAttributeErrorType.setLabel("Invalid attribute");
-		dataCleansingManager.save(invalidAttributeErrorType);
+		dataErrorTypeManager.save(invalidAttributeErrorType);
 	}
 	
 	@Test
@@ -65,13 +72,13 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		query.setAttributeDefinition(dbhDef);
 		query.setConditions("dbh > 20");
 		
-		dataCleansingManager.save(query);
+		dataErrorQueryManager.save(query);
 		
 		DataErrorReport report = reportGenerator.generate(query, Step.ENTRY);
 		
-		DataErrorReport reloadedReport = dataCleansingManager.loadReport(survey, report.getId());
+		DataErrorReport reloadedReport = dataErrorReportManager.loadById(survey, report.getId());
 		
-		List<DataErrorReportItem> items = dataCleansingManager.loadReportItems(reloadedReport);
+		List<DataErrorReportItem> items = dataErrorReportManager.loadItems(reloadedReport);
 		
 		assertFalse(items.isEmpty());
 		

@@ -1,18 +1,37 @@
-package org.openforis.collect.web.datacleansing.form;
+package org.openforis.collect.datacleansing.form;
+
+import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.commons.web.PersistedObjectForm;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataErrorQueryForm {
+public class DataErrorQueryForm extends PersistedObjectForm<DataErrorQuery> {
 
+	private int typeId;
 	private String title;
 	private String description;
 	private int entityDefinitionId;
 	private int attributeDefinitionId;
 	private String conditions;
 
+	public DataErrorQueryForm() {
+	}
+	
+	public DataErrorQueryForm(DataErrorQuery query) {
+		super(query);
+	}
+	
+	public int getTypeId() {
+		return typeId;
+	}
+	
+	public void setTypeId(int typeId) {
+		this.typeId = typeId;
+	}
+	
 	public String getTitle() {
 		return title;
 	}

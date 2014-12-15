@@ -52,6 +52,10 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 
 		private static final long serialVersionUID = 1L;
 		
+		public JooqDSLContext(Connection connection) {
+			this(connection, null);
+		}
+		
 		public JooqDSLContext(Connection connection, CollectSurvey survey) {
 			super(connection, OFC_DATA_ERROR_QUERY.ID, OFC_DATA_ERROR_QUERY_ID_SEQ, DataErrorQuery.class, survey);
 		}

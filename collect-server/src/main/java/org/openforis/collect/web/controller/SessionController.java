@@ -35,9 +35,10 @@ public class SessionController {
 	}
 	
 	@RequestMapping(value = "/setActiveSurvey.json", method = RequestMethod.GET)
-	public @ResponseBody void setSurveyActiveSurvey(@RequestParam String surveyName) {
+	public @ResponseBody String setSurveyActiveSurvey(@RequestParam String surveyName) {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		sessionManager.setActiveSurvey(survey);
+		return "ok";
 	}
 	
 }
