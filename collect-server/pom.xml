@@ -349,7 +349,12 @@
 		    <artifactId>jackson-databind</artifactId>
 		    <version>2.4.0</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+				
 		<dependency>
 			<groupId>org.xerial</groupId>
 			<artifactId>sqlite-jdbc</artifactId>
