@@ -5,24 +5,66 @@
 		<title>Open Foris Collect - Data Cleansing Toolkit</title>
 		<script type="text/javascript" src="/collect/js/eventbus.js" ></script>
 		<script type="text/javascript" src="/collect/js/jquery/jquery-2.1.1.min.js" ></script>
+		<script type="text/javascript" src="/collect/js/jquery/jquery-ui-1.11.2.min.js" ></script>
 		<script type="text/javascript" src="/collect/js/bootstrap/bootstrap.js" ></script>
-		<script type="text/javascript" src="/collect/js/bootstrap/bootstrap-select/bootstrap-select.min.js" ></script>
+		<script type="text/javascript" src="/collect/js/bootstrap-select/bootstrap-select.min.js" ></script>
+		<script type="text/javascript" src="/collect/js/bootstrap-table/bootstrap-table.min.js" ></script>
 		
 		<script type="text/javascript" src="/collect/js/openforis/openforis.js" ></script>
 		<script type="text/javascript" src="/collect/js/openforis/openforis-arrays.js" ></script>
 		<script type="text/javascript" src="/collect/js/openforis/openforis-ui.js" ></script>
 		<script type="text/javascript" src="/collect/js/openforis/openforis-ui-form.js" ></script>
 		<script type="text/javascript" src="/collect/js/openforis/openforis-async.js" ></script>
+		
 		<script type="text/javascript" src="/collect/js/collect/collect.js" ></script>
+		
+		<script type="text/javascript" src="/collect/js/collect/service/abstract_service.js" ></script>
+		<script type="text/javascript" src="/collect/js/collect/service/data_error_query_service.js" ></script>
+		<script type="text/javascript" src="/collect/js/collect/service/data_error_type_service.js" ></script>
 		<script type="text/javascript" src="/collect/js/collect/service/session_service.js" ></script>
 		<script type="text/javascript" src="/collect/js/collect/service/survey_service.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/select_survey_dialog.js" ></script>
+		
+		<script type="text/javascript" src="/collect/js/collect/abstract_item_edit_dialog.js" ></script>
+		<script type="text/javascript" src="/collect/js/collect/survey_select_dialog.js" ></script>
+		<script type="text/javascript" src="/collect/js/collect/datacleansing/data_error_type_dialog.js" ></script>
+		<script type="text/javascript" src="/collect/js/collect/datacleansing/data_error_query_dialog.js" ></script>
 		
 		<link rel="stylesheet" href="/collect/css/bootstrap/bootstrap.min.css">
-		<link rel="stylesheet" href="/collect/css/bootstrap/bootstrap-select/bootstrap-select.min.css">
-		<link rel="stylesheet" href="data:text/css;charset=utf-8," data-href="/collect/css/bootstrap/bootstrap-theme.min.css" id="bs-theme-stylesheet">
+		<link rel="stylesheet" href="data:text/css;charset=utf-8," 
+			data-href="/collect/css/bootstrap/bootstrap-theme.min.css" id="bs-theme-stylesheet">
+		<link rel="stylesheet" href="/collect/css/bootstrap-select/bootstrap-select.min.css">
+		<link rel="stylesheet" href="/collect/css/bootstrap-table/bootstrap-table.min.css">
+		<link rel="stylesheet" href="/collect/css/jquery/jquery-ui.min.css">
+		
 	</head>
+	
 	<body>
+	
+		<div role="tabpanel">
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="active">
+					<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Home</a>
+				</li>
+				<li role="presentation">
+					<a href="#dataErrorQueriesPanel" aria-controls="dataErrorQueriesPanel" 
+						role="tab" data-toggle="tab">Data Error Queries</a>
+				</li>
+				<li role="presentation">
+					<a href="#dataErrorTypesPanel" aria-controls="dataErrorTypesPanel" 
+						role="tab" data-toggle="tab">Data Error Types</a>
+				</li>
+			</ul>
+	
+			<!-- Tab panes -->
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane active" id="homePanel">...</div>
+				<div role="tabpanel" class="tab-pane" id="dataErrorQueriesPanel">
+				</div>
+				<div role="tabpanel" class="tab-pane" id="dataErrorTypesPanel">
+					<div id="dataerrortypegrid"></div>
+				</div>
+			</div>
+		</div>
 		
 	</body>
 </html>
