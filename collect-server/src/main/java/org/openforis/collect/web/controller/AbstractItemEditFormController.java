@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author S. Ricci
  *
  */
-public abstract class AbstractFormController<T extends PersistedSurveyObject, 
+public abstract class AbstractItemEditFormController<T extends PersistedSurveyObject, 
 											F extends PersistedObjectForm<T>, 
 											M extends AbstractSurveyObjectManager<T, ?>> {
 	
