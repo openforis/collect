@@ -17,7 +17,7 @@ Collect.SurveySelectDialogController.prototype.loadInstanceVariables = function(
 Collect.SurveySelectDialogController.prototype.initFormElements = function() {
 	var $this = this;
 	var select = $this.content.find('.survey-select');
-	OpenForis.UI.Form.populateSelect(select, $this.surveySummaries, "id", "projectName", true);
+	OF.UI.Forms.populateSelect(select, $this.surveySummaries, "id", "projectName", true);
 	$this.surveySelectPicker = select.selectpicker();
 };
 
@@ -26,7 +26,7 @@ Collect.SurveySelectDialogController.prototype.applyHandler = function() {
 	if ($this.validateForm()) {
 		var surveyId = $this.surveySelectPicker.val();
 		collect.sessionService.setActiveSurvey(surveyId, function() {
-			var survey = OpenForis.Arrays.findItem($this.surveySummaries, "id", surveyId);
+			var survey = OF.Arrays.findItem($this.surveySummaries, "id", surveyId);
 			$this.close();
 			collect.setActiveSurvey(survey);
 		});

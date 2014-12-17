@@ -21,6 +21,9 @@ Collect.AbstractItemEditDialogController.prototype.open = function(item) {
 	$this.item = item;
 	
 	function doOpen() {
+		if (item) {
+			OF.UI.Forms.fill($this.form, item);
+		}
 		$this.content.modal('show');
 	};
 	if ($this.initialized) {
@@ -52,7 +55,7 @@ Collect.AbstractItemEditDialogController.prototype.initContent = function(callba
 
 Collect.AbstractItemEditDialogController.prototype.loadContent = function(callback) {
 	var $this = this;
-	OpenForis.Async.loadHtml($this.contentUrl, function(content) {
+	OF.Remote.loadHtml($this.contentUrl, function(content) {
 			$this.content = content;
 			callback();
 		}, function() {
@@ -77,7 +80,7 @@ Collect.AbstractItemEditDialogController.prototype.initEventListeners = function
 Collect.AbstractItemEditDialogController.prototype.applyHandler = function() {
 	var $this = this;
 	if ($this.validateForm()) {
-		var item = OpenForis.UI.Form.toJSON($this.form);
+		var item = $this.extractJSONItem();
 		$this.itemEditService.save(item, function() {
 			$this.dispatchItemSavedEvent();
 			$this.close();
@@ -94,7 +97,10 @@ Collect.AbstractItemEditDialogController.prototype.validateForm = function() {
 };
 
 Collect.AbstractItemEditDialogController.prototype.extractJSONItem = function() {
-	var item = OpenForis.UI.Form.toJSON($this.form);
+	var $this = this;
+	var oldItem = $this.item;
+	var item = OF.UI.Forms.toJSON($this.form);
+	item.id = oldItem == null ? null: oldItem.id;
 	return item;
 };
 

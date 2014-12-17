@@ -31,12 +31,33 @@ Collect.prototype.initDataErrorTypePanel = function() {
 		var dialogController = new Collect.DataErrorTypeDialogController();
 		dialogController.open();
 	}, this));
+	
 	$('#editDataErrorTypeBtn').click($.proxy(function() {
 		var $this = this;
-		var selections = $this.dataErrorTypeDataGrid.getSelections();
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
 		var dialogController = new Collect.DataErrorTypeDialogController();
-		dialogController.open();
+		dialogController.open(selectedItem);
 	}, this));
+	
+	$('#deleteDataErrorTypeBtn').click($.proxy(function() {
+		var $this = this;
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
+		OF.UI.confirm("Do you want to delete this Data Error Type?", function() {
+			collect.dataErrorTypeService.remove(selectedItem.id);
+		});
+	}, this));
+	
+	function getSelectedItem() {
+		var $this = this;
+		var selections = $this.dataErrorTypeDataGrid.getSelections();
+		return selections.length == 0 ? null : selections[0];
+	}
 };
 
 Collect.prototype.initDataErrorTypeGrid = function() {
@@ -44,10 +65,12 @@ Collect.prototype.initDataErrorTypeGrid = function() {
 	$('#dataerrortypegrid').bootstrapTable({
 	    url: "/collect/datacleansing/dataerrortypes/list.json",
 	    cache: false,
+	    clickToSelect: true,
 	    columns: [
+          	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
 			{field: "code", title: "Code"},
-			{field: "title", title: "Title"},
+			{field: "label", title: "Label"},
 			{field: "description", title: "Description"}
 		]
 	});

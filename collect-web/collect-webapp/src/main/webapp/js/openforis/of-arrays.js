@@ -1,9 +1,9 @@
-OpenForis.Arrays = function() {};
+OF.Arrays = function() {};
 
 /**
  * Removes the specified item from the specified array, if found
  */
-OpenForis.Arrays.removeItem = function(array, item) {
+OF.Arrays.removeItem = function(array, item) {
 	var index = array.indexOf(item);
 	if ( index >= 0 ) {
 		array.splice(index, 1);
@@ -13,14 +13,14 @@ OpenForis.Arrays.removeItem = function(array, item) {
 /**
  * Returns true if the array contains the specified item 
  */
-OpenForis.Arrays.contains = function(array, item) {
+OF.Arrays.contains = function(array, item) {
 	return array.indexOf(item) >= 0;
 };
 
 /**
  * Returns the item that has the specified property equals to the specified value 
  */
-OpenForis.Arrays.findItem = function(array, propertyName, value) {
+OF.Arrays.findItem = function(array, propertyName, value) {
 	for(var i=0; i < array.length; i++) {
 		var item = array[i];
 		if ( item.hasOwnProperty(propertyName) ) {
@@ -36,14 +36,14 @@ OpenForis.Arrays.findItem = function(array, propertyName, value) {
 /**
  * Returns a copy of the given array
  */
-OpenForis.Arrays.clone = function(array) {
+OF.Arrays.clone = function(array) {
 	return array.slice(0);
 };
 
 /**
  * Changes the item position in the given array
  */
-OpenForis.Arrays.shiftItem = function ( array, item, toIndex ) {
+OF.Arrays.shiftItem = function ( array, item, toIndex ) {
 	var oldIndex = array.indexOf(item);
 	
 	if ( oldIndex < 0 ) {
