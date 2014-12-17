@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.io.metadata.CollectEarthProjectFileCreator;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
 import org.springframework.security.core.Authentication;

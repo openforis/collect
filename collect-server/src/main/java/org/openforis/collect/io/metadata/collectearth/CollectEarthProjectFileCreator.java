@@ -1,4 +1,4 @@
-package org.openforis.collect.io.metadata;
+package org.openforis.collect.io.metadata.collectearth;
 
 import java.io.File;
 
