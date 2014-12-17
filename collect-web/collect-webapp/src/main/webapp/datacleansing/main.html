@@ -57,11 +57,19 @@
 	
 			<!-- Tab panes -->
 			<div class="tab-content">
-				<div role="tabpanel" class="tab-pane active" id="homePanel">...</div>
-				<div role="tabpanel" class="tab-pane" id="dataErrorQueriesPanel">
+				<div id="homePanel" role="tabpanel" class="tab-pane active" >
+					...
 				</div>
-				<div role="tabpanel" class="tab-pane" id="dataErrorTypesPanel">
+				<div id="dataErrorQueriesPanel" role="tabpanel" class="tab-pane active" >
+					...
+				</div>
+				<div id="dataErrorTypesPanel" role="tabpanel" class="tab-pane active" >
 					<div id="dataerrortypegrid"></div>
+					
+					<div class="btn-group" role="group" aria-label="...">
+						<button id="newDataErrorTypeBtn" type="button" class="btn btn-default">New</button>
+						<button id="editDataErrorTypeBtn" type="button" class="btn btn-default">Edit</button>
+					</div>
 				</div>
 			</div>
 		</div>

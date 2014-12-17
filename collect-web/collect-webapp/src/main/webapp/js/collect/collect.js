@@ -1,6 +1,6 @@
 Collect = function() {
 	this.activeSurvey = null;
-}
+};
 
 Collect.prototype.init = function() {
 	this.activeSurvey = null;
@@ -10,10 +10,32 @@ Collect.prototype.init = function() {
 	this.dataErrorTypeService = new Collect.DataErrorTypeService();
 	
 	var surveySelectDialogController = new Collect.SurveySelectDialogController();
-	surveySelectDialogController.open();
+	surveySelectDialogController.initialize(function() {
+		surveySelectDialogController.open();
+	});
+	
+	this.initDataErrorTypePanel();
+};
+
+Collect.prototype.initDataErrorTypePanel = function() {
+	$('#newDataErrorTypeBtn').click($.proxy(function() {
+		var dialogController = new Collect.DataErrorTypeDialogController();
+		dialogController.initialize(function() {
+			dialogController.open();
+		});
+	}, this));
+	$('#editDataErrorTypeBtn').click($.proxy(function() {
+		var $this = this;
+		var selections = $this.dataErrorTypeDataGrid.getSelections();
+		var dialogController = new Collect.DataErrorTypeDialogController();
+		dialogController.initialize(function() {
+			dialogController.open();
+		});
+	}, this));
 };
 
 Collect.prototype.initDataErrorTypeGrid = function() {
+	var $this = this;
 	$('#dataerrortypegrid').bootstrapTable({
 	    url: "/collect/datacleansing/dataerrortypes/list.json",
 	    cache: false,
@@ -23,15 +45,13 @@ Collect.prototype.initDataErrorTypeGrid = function() {
 			{field: "title", title: "Title"}
 		],
 	});
+	$this.dataErrorTypeDataGrid = $('#dataerrortypegrid').data('bootstrap.table');
 };
 
 Collect.prototype.setActiveSurvey = function(survey) {
 	collect.activeSurvey = survey;
 	
 	this.initDataErrorTypeGrid();
-
-	var dataErrorQueryDialogController = new Collect.DataErrorQueryDialogController();
-	dataErrorQueryDialogController.open();
 };
 
 Collect.prototype.error = function(jqXHR, status, errorThrown) {

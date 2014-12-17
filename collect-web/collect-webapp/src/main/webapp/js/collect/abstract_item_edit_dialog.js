@@ -2,13 +2,18 @@ Collect.AbstractItemEditDialogController = function() {
 	this.contentUrl = "to be defined by subclass";
 };
 
-Collect.AbstractItemEditDialogController.prototype.open = function() {
+Collect.AbstractItemEditDialogController.prototype.initialize = function(callback) {
 	var $this = this;
 	$this.loadInstanceVariables(function() {
-		$this.initContent(function() {
-			$this.content.modal('show');
+		$this.initializeContent(function() {
+			callback();
 		});
 	});
+};
+
+Collect.AbstractItemEditDialogController.prototype.open = function() {
+	var $this = this;
+	$this.content.modal('show');
 };
 
 Collect.AbstractItemEditDialogController.prototype.close = function() {
@@ -20,11 +25,11 @@ Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables = funct
 	callback();
 };
 
-Collect.AbstractItemEditDialogController.prototype.initContent = function(callback) {
+Collect.AbstractItemEditDialogController.prototype.initializeContent = function(callback) {
 	var $this = this;
 	$this.loadContent(function() {
-		$this.initFormElements();
-		$this.initEventListeners();
+		$this.initializeFormElements();
+		$this.initializeEventListeners();
 		callback();
 	});
 };
@@ -35,15 +40,15 @@ Collect.AbstractItemEditDialogController.prototype.loadContent = function(callba
 			$this.content = content;
 			callback();
 		}, function() {
-			collect.error.apply(this, arguments)
+			collect.error.apply(this, arguments);
 		}
 	);
 };
 
-Collect.AbstractItemEditDialogController.prototype.initFormElements = function() {
+Collect.AbstractItemEditDialogController.prototype.initializeFormElements = function() {
 };
 
-Collect.AbstractItemEditDialogController.prototype.initEventListeners = function() {
+Collect.AbstractItemEditDialogController.prototype.initializeEventListeners = function() {
 	var $this = this;
 	var applyBtn = $this.content.find(".apply-btn");
 	applyBtn.click($.proxy(this.applyHandler, $this));
