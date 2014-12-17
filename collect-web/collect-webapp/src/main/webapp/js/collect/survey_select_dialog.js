@@ -14,7 +14,7 @@ Collect.SurveySelectDialogController.prototype.loadInstanceVariables = function(
 	});
 };
 
-Collect.SurveySelectDialogController.prototype.initializeFormElements = function() {
+Collect.SurveySelectDialogController.prototype.initFormElements = function() {
 	var $this = this;
 	var select = $this.content.find('.survey-select');
 	OpenForis.UI.Form.populateSelect(select, $this.surveySummaries, "id", "projectName", true);

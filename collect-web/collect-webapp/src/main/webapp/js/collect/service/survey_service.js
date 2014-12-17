@@ -6,5 +6,5 @@ Collect.SurveyService = function() {
 Collect.SurveyService.prototype = Object.create(Collect.AbstractService.prototype);
 
 Collect.SurveyService.prototype.loadSummaries = function(onSuccess, onError) {
-	this.send("summaries.json", null, onSuccess, onError);
+	this.send("summaries.json", null, "GET",  onSuccess, onError);
 };

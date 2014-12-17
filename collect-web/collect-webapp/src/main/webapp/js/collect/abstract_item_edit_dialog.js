@@ -1,19 +1,35 @@
 Collect.AbstractItemEditDialogController = function() {
 	this.contentUrl = "to be defined by subclass";
+	this.initialized = false;
+	this.content = null;
+	this.form = null;
+	this.itemEditService = null;
+	this.item = null;
 };
 
-Collect.AbstractItemEditDialogController.prototype.initialize = function(callback) {
+Collect.AbstractItemEditDialogController.prototype.init = function(callback) {
 	var $this = this;
 	$this.loadInstanceVariables(function() {
-		$this.initializeContent(function() {
+		$this.initContent(function() {
 			callback();
 		});
 	});
 };
 
-Collect.AbstractItemEditDialogController.prototype.open = function() {
+Collect.AbstractItemEditDialogController.prototype.open = function(item) {
 	var $this = this;
-	$this.content.modal('show');
+	$this.item = item;
+	
+	function doOpen() {
+		$this.content.modal('show');
+	};
+	if ($this.initialized) {
+		doOpen();
+	} else {
+		$this.init(function() {
+			doOpen();
+		})
+	}
 };
 
 Collect.AbstractItemEditDialogController.prototype.close = function() {
@@ -25,11 +41,11 @@ Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables = funct
 	callback();
 };
 
-Collect.AbstractItemEditDialogController.prototype.initializeContent = function(callback) {
+Collect.AbstractItemEditDialogController.prototype.initContent = function(callback) {
 	var $this = this;
 	$this.loadContent(function() {
-		$this.initializeFormElements();
-		$this.initializeEventListeners();
+		$this.initFormElements();
+		$this.initEventListeners();
 		callback();
 	});
 };
@@ -45,10 +61,12 @@ Collect.AbstractItemEditDialogController.prototype.loadContent = function(callba
 	);
 };
 
-Collect.AbstractItemEditDialogController.prototype.initializeFormElements = function() {
+Collect.AbstractItemEditDialogController.prototype.initFormElements = function() {
+	var $this = this;
+	$this.form = $this.content.find("form");
 };
 
-Collect.AbstractItemEditDialogController.prototype.initializeEventListeners = function() {
+Collect.AbstractItemEditDialogController.prototype.initEventListeners = function() {
 	var $this = this;
 	var applyBtn = $this.content.find(".apply-btn");
 	applyBtn.click($.proxy(this.applyHandler, $this));
@@ -57,6 +75,14 @@ Collect.AbstractItemEditDialogController.prototype.initializeEventListeners = fu
 };
 
 Collect.AbstractItemEditDialogController.prototype.applyHandler = function() {
+	var $this = this;
+	if ($this.validateForm()) {
+		var item = OpenForis.UI.Form.toJSON($this.form);
+		$this.itemEditService.save(item, function() {
+			$this.dispatchItemSavedEvent();
+			$this.close();
+		});
+	}
 };
 
 Collect.AbstractItemEditDialogController.prototype.cancelHandler = function() {
@@ -66,3 +92,12 @@ Collect.AbstractItemEditDialogController.prototype.cancelHandler = function() {
 Collect.AbstractItemEditDialogController.prototype.validateForm = function() {
 	return true;
 };
+
+Collect.AbstractItemEditDialogController.prototype.extractJSONItem = function() {
+	var item = OpenForis.UI.Form.toJSON($this.form);
+	return item;
+};
+
+Collect.AbstractItemEditDialogController.prototype.dispatchItemSavedEvent = function() {
+};
+

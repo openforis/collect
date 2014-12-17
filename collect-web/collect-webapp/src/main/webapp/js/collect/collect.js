@@ -9,28 +9,33 @@ Collect.prototype.init = function() {
 	this.dataErrorQueryService = new Collect.DataErrorQueryService();
 	this.dataErrorTypeService = new Collect.DataErrorTypeService();
 	
+	//survey select dialog
 	var surveySelectDialogController = new Collect.SurveySelectDialogController();
-	surveySelectDialogController.initialize(function() {
-		surveySelectDialogController.open();
-	});
+	surveySelectDialogController.open();
 	
+	//data error type panel
 	this.initDataErrorTypePanel();
+	
+	this.initGlobalEventHandlers();
+};
+
+Collect.prototype.initGlobalEventHandlers = function() {
+	var $this = this;
+	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED, function() {
+		$this.dataErrorTypeDataGrid.refresh()
+	});
 };
 
 Collect.prototype.initDataErrorTypePanel = function() {
 	$('#newDataErrorTypeBtn').click($.proxy(function() {
 		var dialogController = new Collect.DataErrorTypeDialogController();
-		dialogController.initialize(function() {
-			dialogController.open();
-		});
+		dialogController.open();
 	}, this));
 	$('#editDataErrorTypeBtn').click($.proxy(function() {
 		var $this = this;
 		var selections = $this.dataErrorTypeDataGrid.getSelections();
 		var dialogController = new Collect.DataErrorTypeDialogController();
-		dialogController.initialize(function() {
-			dialogController.open();
-		});
+		dialogController.open();
 	}, this));
 };
 
@@ -42,8 +47,9 @@ Collect.prototype.initDataErrorTypeGrid = function() {
 	    columns: [
 			{field: "id", title: "Id", visible: false},
 			{field: "code", title: "Code"},
-			{field: "title", title: "Title"}
-		],
+			{field: "title", title: "Title"},
+			{field: "description", title: "Description"}
+		]
 	});
 	$this.dataErrorTypeDataGrid = $('#dataerrortypegrid').data('bootstrap.table');
 };

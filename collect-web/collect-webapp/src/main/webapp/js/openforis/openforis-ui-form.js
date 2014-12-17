@@ -44,3 +44,12 @@ OpenForis.UI.Form.populateDropdown = function($dropdownContainer, items, valueKe
 		dropdownMenu.append(item);
 	});
 };
+
+OpenForis.UI.Form.toJSON = function($form) {
+	var result = {};
+	var array = $form.serializeArray();
+    $.each(array, function() {
+    	result[this.name] = this.value || '';
+    });
+    return result;
+};
