@@ -5,5 +5,5 @@ Collect.SessionService = function() {
 Collect.SessionService.prototype = Object.create(Collect.AbstractService.prototype);
 
 Collect.SessionService.prototype.setActiveSurvey = function(surveyId, onSuccess, onError) {
-	this.send("setActiveSurvey.json", {surveyId: surveyId}, onSuccess, onError);
+	this.send("setActiveSurvey.json", {surveyId: surveyId}, "GET", onSuccess, onError);
 }

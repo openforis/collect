@@ -1,14 +1,38 @@
 Collect.AbstractItemEditDialogController = function() {
 	this.contentUrl = "to be defined by subclass";
+	this.initialized = false;
+	this.content = null;
+	this.form = null;
+	this.itemEditService = null;
+	this.item = null;
 };
 
-Collect.AbstractItemEditDialogController.prototype.open = function() {
+Collect.AbstractItemEditDialogController.prototype.init = function(callback) {
 	var $this = this;
 	$this.loadInstanceVariables(function() {
 		$this.initContent(function() {
-			$this.content.modal('show');
+			callback();
 		});
 	});
+};
+
+Collect.AbstractItemEditDialogController.prototype.open = function(item) {
+	var $this = this;
+	$this.item = item;
+	
+	function doOpen() {
+		if (item) {
+			OF.UI.Forms.fill($this.form, item);
+		}
+		$this.content.modal('show');
+	};
+	if ($this.initialized) {
+		doOpen();
+	} else {
+		$this.init(function() {
+			doOpen();
+		})
+	}
 };
 
 Collect.AbstractItemEditDialogController.prototype.close = function() {
@@ -31,16 +55,18 @@ Collect.AbstractItemEditDialogController.prototype.initContent = function(callba
 
 Collect.AbstractItemEditDialogController.prototype.loadContent = function(callback) {
 	var $this = this;
-	OpenForis.Async.loadHtml($this.contentUrl, function(content) {
+	OF.Remote.loadHtml($this.contentUrl, function(content) {
 			$this.content = content;
 			callback();
 		}, function() {
-			collect.error.apply(this, arguments)
+			collect.error.apply(this, arguments);
 		}
 	);
 };
 
 Collect.AbstractItemEditDialogController.prototype.initFormElements = function() {
+	var $this = this;
+	$this.form = $this.content.find("form");
 };
 
 Collect.AbstractItemEditDialogController.prototype.initEventListeners = function() {
@@ -52,6 +78,14 @@ Collect.AbstractItemEditDialogController.prototype.initEventListeners = function
 };
 
 Collect.AbstractItemEditDialogController.prototype.applyHandler = function() {
+	var $this = this;
+	if ($this.validateForm()) {
+		var item = $this.extractJSONItem();
+		$this.itemEditService.save(item, function() {
+			$this.dispatchItemSavedEvent();
+			$this.close();
+		});
+	}
 };
 
 Collect.AbstractItemEditDialogController.prototype.cancelHandler = function() {
@@ -61,3 +95,15 @@ Collect.AbstractItemEditDialogController.prototype.cancelHandler = function() {
 Collect.AbstractItemEditDialogController.prototype.validateForm = function() {
 	return true;
 };
+
+Collect.AbstractItemEditDialogController.prototype.extractJSONItem = function() {
+	var $this = this;
+	var oldItem = $this.item;
+	var item = OF.UI.Forms.toJSON($this.form);
+	item.id = oldItem == null ? null: oldItem.id;
+	return item;
+};
+
+Collect.AbstractItemEditDialogController.prototype.dispatchItemSavedEvent = function() {
+};
+

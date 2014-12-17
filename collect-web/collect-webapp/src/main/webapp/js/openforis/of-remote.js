@@ -1,9 +1,9 @@
-OpenForis.Async = function() {};
+OF.Remote = function() {};
 
 /**
  * Loads a HTML resource and pass the loaded content as an element to the onSuccess function.
  */
-OpenForis.Async.loadHtml = function(pageUrl, onSuccess, onError) {
+OF.Remote.loadHtml = function(pageUrl, onSuccess, onError) {
 	$.ajax({
 		url: pageUrl,
 		dataType:"html"

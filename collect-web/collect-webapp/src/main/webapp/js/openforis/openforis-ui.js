@@ -1,1 +1,0 @@
-OpenForis.UI = function() {};
