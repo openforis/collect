@@ -22,7 +22,10 @@ Collect.prototype.init = function() {
 Collect.prototype.initGlobalEventHandlers = function() {
 	var $this = this;
 	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED, function() {
-		$this.dataErrorTypeDataGrid.refresh()
+		$this.dataErrorTypeDataGrid.refresh();
+	});
+	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_DELETED, function() {
+		$this.dataErrorTypeDataGrid.refresh();
 	});
 };
 
@@ -49,7 +52,9 @@ Collect.prototype.initDataErrorTypePanel = function() {
 			return;
 		}
 		OF.UI.confirm("Do you want to delete this Data Error Type?", function() {
-			collect.dataErrorTypeService.remove(selectedItem.id);
+			collect.dataErrorTypeService.remove(selectedItem.id, function() {
+				EventBus.dispatch(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_DELETED, $this);
+			});
 		});
 	}, this));
 	

@@ -8,6 +8,7 @@ Collect.DataErrorTypeDialogController = function() {
 Collect.DataErrorTypeDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
 
 Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED = "dataErrorTypeSaved";
+Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_DELETED = "dataErrorTypeDeleted";
 
 Collect.DataErrorTypeDialogController.prototype.dispatchItemSavedEvent = function() {
 	EventBus.dispatch(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED, this);

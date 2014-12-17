@@ -62,15 +62,21 @@ public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorT
 
 	@Override
 	public void save(DataErrorType obj) {
+		boolean newItem = obj.getId() == null;
 		super.save(obj);
-		cache.put(obj);
+		if (newItem) {
+			cache.put(obj);
+		} else {
+			cache.update(obj);
+		}
 	}
 	
 	@Override
-	public void delete(DataErrorType obj) {
-		super.delete(obj);
-		cache.remove(obj);
-	}
+	public void delete(int id) {
+		DataErrorType errorType = cache.get(id);
+		super.delete(errorType.getId());
+		cache.remove(errorType);
+	} 
 	
 	private static class ErrorTypeCache {
 		
@@ -91,6 +97,11 @@ public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorT
 				typesBySurvey.put(surveyId, surveyErrorTypes);
 			}
 			surveyErrorTypes.add(e);
+		}
+		
+		public void update(DataErrorType t) {
+			remove(t);
+			put(t);
 		}
 		
 		public DataErrorType get(int id) {
