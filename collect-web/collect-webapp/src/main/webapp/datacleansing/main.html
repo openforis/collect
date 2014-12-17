@@ -45,9 +45,7 @@
 				<li role="presentation" class="active">
 					<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Home</a>
 				</li>
-				<li role="presentation">
-					<a href="#dataErrorReportPanel" aria-controls="dataErrorReportPanel"	role="tab" data-toggle="tab">Data Report</a>
-				</li>
+				
 				<li role="presentation">
 					<a href="#dataErrorQueriesPanel" aria-controls="dataErrorQueriesPanel" 
 						role="tab" data-toggle="tab">Data Error Queries</a>
@@ -61,26 +59,23 @@
 			<!-- Tab panes -->
 			<div class="tab-content">
 				<div id="homePanel" role="tabpanel" class="tab-pane active" >
-					...
-				</div>
-				<div role="tabpanel" class="tab-pane" id="dataErrorReportPanel">Adeir
-			
-					<!-- Tabla-->
-					<table data-url="tabla_data.json" data-toggle="table" data-height="299" data-sort-name="name" data-sort-order="desc">
-					    <thead>
-					        <tr>
+				<!-- Tabla-->
+				 ERROR REPORTS
+					<table data-url="tabla_data.json" data-toggle="table" data-height="350" data-sort-name="name" data-sort-order="desc">
+					    <thead>					    	
+					        <tr>					        	
 					            <th data-field="id" data-align="right" data-sortable="true">Item ID</th>
-					            <th data-field="name" data-align="center" data-sortable="true">Item Name</th>
-					            <th data-field="price" data-sortable="true">Item Price</th>
+					            <th data-field="name" data-align="center" data-sortable="true">Error List</th>
+					            <th data-field="price" data-sortable="true">Quantity</th>
 					        </tr>
 					    </thead>
 				   </table>
 			
 				</div>
-				<div id="dataErrorQueriesPanel" role="tabpanel" class="tab-pane active" >
+				<div id="dataErrorQueriesPanel" role="tabpanel" class="tab-pane " >
 					...
 				</div>
-				<div id="dataErrorTypesPanel" role="tabpanel" class="tab-pane active" >
+				<div id="dataErrorTypesPanel" role="tabpanel" class="tab-pane " >
 					<div id="dataerrortypegrid"></div>
 					
 					<div class="btn-group" role="group" aria-label="...">
