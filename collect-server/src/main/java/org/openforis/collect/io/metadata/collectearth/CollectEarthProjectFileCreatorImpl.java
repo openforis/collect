@@ -23,7 +23,7 @@ import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator{
 
 	private static final String PLACEMARK_FILE_NAME = "placemark.idml.xml";
-	private static final String BALOON_FILE_NAME = "baloon.html";
+	private static final String BALLOON_FILE_NAME = "balloon.html";
 	private static final String CUBE_FILE_NAME = "collect_cube.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	
@@ -34,7 +34,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		
 		File projectProperties = generateProjectProperties(survey);
 		File cube = generateCube(survey);
-		File baloon = generateBaloon(survey);
+		File balloon = generateBalloon(survey);
 		
 		// create output zip file
 		File outputFile = File.createTempFile("openforis-collect-earth-temp", ".zip");
@@ -43,7 +43,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		ZipFile zipFile = new net.lingala.zip4j.core.ZipFile(outputFile);
 		
 		addFileToZip(zipFile, placemarkFile, PLACEMARK_FILE_NAME);
-		addFileToZip(zipFile, baloon, BALOON_FILE_NAME);
+		addFileToZip(zipFile, balloon, BALLOON_FILE_NAME);
 		addFileToZip(zipFile, cube, CUBE_FILE_NAME);
 		addFileToZip(zipFile, projectProperties, PROJECT_PROPERTIES_FILE_NAME);
 			
@@ -82,8 +82,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return file;
 	}
 
-	private File generateBaloon(CollectSurvey survey) throws IOException {
-		CollectEarthBaloonGenerator generator = new CollectEarthBaloonGenerator(survey);
+	private File generateBalloon(CollectSurvey survey) throws IOException {
+		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey);
 		String html = generator.generateHTML();
 		return writeToTempFile(html);
 	}

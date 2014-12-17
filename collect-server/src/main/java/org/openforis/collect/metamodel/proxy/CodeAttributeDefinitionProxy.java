@@ -45,7 +45,7 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 	@ExternalizedProperty
 	public String getLayoutType() {
 		UIOptions uiOptions = getUIOptions();
-		return uiOptions.getLayoutType(attributeDefinition);
+		return uiOptions.getLayoutType(attributeDefinition).toString();
 	}
 	
 	@ExternalizedProperty

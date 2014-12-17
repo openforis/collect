@@ -6,6 +6,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
+import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -45,7 +46,7 @@ public class CollectAnnotations {
 		COLUMN(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COLUMN), 1),
 		COLUMN_SPAN(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COLUMN_SPAN), 1),
 		CODE_ATTRIBUTE_LAYOUT_DIRECTION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DIRECTION), "vertical"),
-		CODE_ATTRIBUTE_LAYOUT_TYPE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT_TYPE), "text"),
+		CODE_ATTRIBUTE_LAYOUT_TYPE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT_TYPE), CodeAttributeLayoutType.TEXT),
 		CODE_ATTRIBUTE_SHOW_CODE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_CODE), true),
 		WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.WIDTH)),
 		LABEL_WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_WIDTH)),

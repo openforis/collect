@@ -5,6 +5,7 @@ package org.openforis.collect.designer.form;
 
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
@@ -49,7 +50,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		UIOptions uiOptions = survey.getUIOptions();
 		uiOptions.setShowAllowedValuesPreviewValue(dest, showAllowedValuesPreview);
 		
-		uiOptions.setLayoutType(dest, layoutType);
+		uiOptions.setLayoutType(dest, CodeAttributeLayoutType.valueOf(layoutType.toUpperCase()));
 		uiOptions.setLayoutDirection(dest, layoutDirection);
 		uiOptions.setShowCode(dest, showCode);
 	}
@@ -67,7 +68,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		UIOptions uiOptions = survey.getUIOptions();
 		showAllowedValuesPreview = uiOptions.getShowAllowedValuesPreviewValue(source);
 		
-		layoutType = uiOptions.getLayoutType(source);
+		layoutType = uiOptions.getLayoutType(source).toString();
 		layoutDirection = uiOptions.getLayoutDirection(source);
 		showCode = uiOptions.getShowCode(source);
 	}
