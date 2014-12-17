@@ -15,7 +15,7 @@ Collect.AbstractService.prototype.save = function(data, onSuccess, onError) {
 };
 
 Collect.AbstractService.prototype.remove = function(id, onSuccess, onError) {
-	this.send(id + ".json", data, "DELETE", onSuccess, onError);
+	this.send(id + ".json", null, "DELETE", onSuccess, onError);
 };
 
 Collect.AbstractService.prototype.send = function(url, data, method, onSuccess, onError) {
