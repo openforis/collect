@@ -36,35 +36,35 @@ Collect.DataErrorQueryDialogController.prototype.initFormElements = function() {
 };
 
 Collect.DataErrorQueryDialogController.prototype.extractJSONItem = function() {
-	var getSelectedNodeId = function(tree) {
-		var selectedTreeNodeIds = tree.get_selected()
-		if (selectedTreeNodeIds == null || selectedTreeNodeIds.length == 0) {
-			return null;
-		} else {
-			var treeNode = tree.get_node(selectedTreeNodeIds[0]);
-			return treeNode.data.nodeId;
-		}
-	}
 	var item = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
 	item.typeId = this.errorTypeSelectPicker.val();
-	item.entityDefinitionId = getSelectedNodeId(this.entityTree);
-	item.attributeDefinitionId = getSelectedNodeId(this.attributeTree);
+	item.entityDefinitionId = this.getSelectedNodeId(this.entityTree);
+	item.attributeDefinitionId = this.getSelectedNodeId(this.attributeTree);
 	return item;
 };
 
 Collect.DataErrorQueryDialogController.prototype.initEntityTree = function() {
+	var $this = this;
 	var disabledFilterFunction = function(node) {
 		return node.type == "ATTRIBUTE";
 	};
-	this.entityTree = this.initNodeTree('.entity-tree', collect.activeSurvey, disabledFilterFunction);
+	$this.entityTree = $this.initNodeTree('.entity-tree', collect.activeSurvey, disabledFilterFunction);
+	$this.entityTree.element.on('select_node.jstree', function() {
+		$this.initAttributeTree();
+	});
 };
 
 Collect.DataErrorQueryDialogController.prototype.initAttributeTree = function() {
 	var disabledFilterFunction = function(node) {
 		return node.type == "ENTITY";
 	};
-	var selectedEntityDefId = getSelectedNodeId(this.entityTree);
-	this.attributeTree = this.initNodeTree('.attribute-tree', collect.activeSurvey, disabledFilterFunction, selectedEntityDefId);
+	if (this.attributeTree) {
+		this.attributeTree.destroy();
+	}
+	var selectedEntityDefId = this.entityTree ? this.getSelectedNodeId(this.entityTree): null;
+	if (selectedEntityDefId != null) {
+		this.attributeTree = this.initNodeTree('.attribute-tree', collect.activeSurvey, disabledFilterFunction, selectedEntityDefId);
+	}
 };
 
 Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDivId, survey, disabledFilterFunction, startFromEntityId) {
@@ -76,7 +76,7 @@ Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDiv
 		var treeNode = {
 			data: {nodeId: node.id},
 			text: text, 
-			state: {disabled: disabledFilterFunction ? disabledFilterFunction : false}
+			state: {disabled: disabledFilterFunction ? disabledFilterFunction(node) : false}
 		};
 		if (node.type == "ENTITY") {
 			var children = new Array();
@@ -113,3 +113,12 @@ Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDiv
 	return tree;
 };
 
+Collect.DataErrorQueryDialogController.prototype.getSelectedNodeId = function(tree) {
+	var selectedTreeNodeIds = tree.get_selected()
+	if (selectedTreeNodeIds == null || selectedTreeNodeIds.length == 0) {
+		return null;
+	} else {
+		var treeNode = tree.get_node(selectedTreeNodeIds[0]);
+		return treeNode.data.nodeId;
+	}
+};
