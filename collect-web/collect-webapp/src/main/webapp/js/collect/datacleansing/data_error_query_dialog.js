@@ -67,6 +67,12 @@ Collect.DataErrorQueryDialogController.prototype.initAttributeTree = function() 
 	}
 };
 
+Collect.DataErrorQueryDialogController.prototype.fillForm = function() {
+	Collect.AbstractItemEditDialogController.prototype.fillForm.apply(this, arguments);
+	var $this = this;
+	$this.selectTreeNode($this.entityTree, $this.item.entityDefinitionId);
+};
+
 Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDivId, survey, disabledFilterFunction, startFromEntityId) {
 	var createTreeNode = function(node) {
 		var text = "[" + node.name + "]";
@@ -74,9 +80,9 @@ Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDiv
 			text += " - " + node.label;
 		}
 		var treeNode = {
-			data: {nodeId: node.id},
-			text: text, 
-			state: {disabled: disabledFilterFunction ? disabledFilterFunction(node) : false}
+			id: 	"" + node.id,
+			text: 	text, 
+			state: 	{disabled: disabledFilterFunction ? disabledFilterFunction(node) : false}
 		};
 		if (node.type == "ENTITY") {
 			var children = new Array();
@@ -90,18 +96,17 @@ Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDiv
 		return treeNode;
 	};
 	var $this = this;
-	var rootTreeNodes = new Array();
+	var rootNodes;
 	if (startFromEntityId) {
 		var startFromEntity = survey.getDefinition(startFromEntityId);
-		for (var idx = 0; idx < startFromEntity.children.length; idx++) {
-			var child = startFromEntity.children[idx];
-			rootTreeNodes.push(createTreeNode(child));
-		}
+		rootNodes = startFromEntity.children;
 	} else {
-		for (var idx = 0; idx < survey.rootEntities.length; idx++) {
-			var rootEntity = survey.rootEntities[idx];
-			rootTreeNodes.push(createTreeNode(rootEntity));
-		}
+		rootNodes = survey.rootEntities;
+	}
+	var rootTreeNodes = new Array();
+	for (var idx = 0; idx < rootNodes.length; idx++) {
+		var rootEntity = rootNodes[idx];
+		rootTreeNodes.push(createTreeNode(rootEntity));
 	}
 	var treeDiv = $this.content.find(treeDivId);
 	var jstree = treeDiv.jstree({
@@ -113,12 +118,15 @@ Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDiv
 	return tree;
 };
 
+Collect.DataErrorQueryDialogController.prototype.selectTreeNode = function(tree, nodeId) {
+	tree.select_node("" + nodeId);
+};
+
 Collect.DataErrorQueryDialogController.prototype.getSelectedNodeId = function(tree) {
 	var selectedTreeNodeIds = tree.get_selected()
 	if (selectedTreeNodeIds == null || selectedTreeNodeIds.length == 0) {
 		return null;
 	} else {
-		var treeNode = tree.get_node(selectedTreeNodeIds[0]);
-		return treeNode.data.nodeId;
+		return selectedTreeNodeIds[0];
 	}
 };

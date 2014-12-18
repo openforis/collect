@@ -22,7 +22,7 @@ Collect.AbstractItemEditDialogController.prototype.open = function(item) {
 	
 	function doOpen() {
 		if (item) {
-			OF.UI.Forms.fill($this.form, item);
+			$this.fillForm();
 		}
 		$this.content.modal('show');
 	};
@@ -94,6 +94,11 @@ Collect.AbstractItemEditDialogController.prototype.cancelHandler = function() {
 
 Collect.AbstractItemEditDialogController.prototype.validateForm = function() {
 	return true;
+};
+
+Collect.AbstractItemEditDialogController.prototype.fillForm = function() {
+	var $this = this;
+	OF.UI.Forms.fill($this.form, $this.item);
 };
 
 Collect.AbstractItemEditDialogController.prototype.extractJSONItem = function() {
