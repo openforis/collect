@@ -141,11 +141,13 @@ Collect.prototype.initDataErrorQueryGrid = function() {
 	$this.dataErrorQueryDataGrid = $('#dataerrorquerygrid').data('bootstrap.table');
 };
 
-Collect.prototype.setActiveSurvey = function(survey) {
-	collect.activeSurvey = survey;
-	
-	this.initDataErrorTypeGrid();
-	this.initDataErrorQueryGrid();
+Collect.prototype.setActiveSurvey = function(surveySummary) {
+	var $this = this;
+	$this.surveyService.loadById(surveySummary.id, function(survey) {
+		$this.activeSurvey = survey;
+		$this.initDataErrorTypeGrid();
+		$this.initDataErrorQueryGrid();
+	});
 };
 
 Collect.prototype.error = function(jqXHR, status, errorThrown) {

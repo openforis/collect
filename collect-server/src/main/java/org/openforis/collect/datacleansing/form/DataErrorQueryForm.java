@@ -1,5 +1,7 @@
 package org.openforis.collect.datacleansing.form;
 
+import javax.validation.constraints.NotNull;
+
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.commons.web.PersistedObjectForm;
 
@@ -10,25 +12,31 @@ import org.openforis.commons.web.PersistedObjectForm;
  */
 public class DataErrorQueryForm extends PersistedObjectForm<DataErrorQuery> {
 
-	private int typeId;
+	@NotNull
+	private Integer typeId;
+	@NotNull
 	private String title;
 	private String description;
-	private int entityDefinitionId;
-	private int attributeDefinitionId;
+	@NotNull
+	private Integer entityDefinitionId;
+	@NotNull
+	private Integer attributeDefinitionId;
+	@NotNull
 	private String conditions;
 
 	public DataErrorQueryForm() {
+		super();
 	}
 	
 	public DataErrorQueryForm(DataErrorQuery query) {
 		super(query);
 	}
 	
-	public int getTypeId() {
+	public Integer getTypeId() {
 		return typeId;
 	}
 	
-	public void setTypeId(int typeId) {
+	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 	
@@ -48,19 +56,19 @@ public class DataErrorQueryForm extends PersistedObjectForm<DataErrorQuery> {
 		this.description = description;
 	}
 
-	public int getEntityDefinitionId() {
+	public Integer getEntityDefinitionId() {
 		return entityDefinitionId;
 	}
 
-	public void setEntityDefinitionId(int entityDefinitionId) {
+	public void setEntityDefinitionId(Integer entityDefinitionId) {
 		this.entityDefinitionId = entityDefinitionId;
 	}
 
-	public int getAttributeDefinitionId() {
+	public Integer getAttributeDefinitionId() {
 		return attributeDefinitionId;
 	}
 
-	public void setAttributeDefinitionId(int attributeDefinitionId) {
+	public void setAttributeDefinitionId(Integer attributeDefinitionId) {
 		this.attributeDefinitionId = attributeDefinitionId;
 	}
 
