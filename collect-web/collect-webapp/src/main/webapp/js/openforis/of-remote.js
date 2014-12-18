@@ -6,7 +6,8 @@ OF.Remote = function() {};
 OF.Remote.loadHtml = function(pageUrl, onSuccess, onError) {
 	$.ajax({
 		url: pageUrl,
-		dataType:"html"
+		dataType: "html",
+		cache: false
 	}).done(function(response) {
 		var content = $(response);
 		onSuccess(content);

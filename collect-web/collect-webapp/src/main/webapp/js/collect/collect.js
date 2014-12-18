@@ -13,8 +13,8 @@ Collect.prototype.init = function() {
 	var surveySelectDialogController = new Collect.SurveySelectDialogController();
 	surveySelectDialogController.open();
 	
-	//data error type panel
 	this.initDataErrorTypePanel();
+	this.initDataErrorQueryPanel();
 	
 	this.initGlobalEventHandlers();
 };
@@ -26,6 +26,13 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	});
 	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_DELETED, function() {
 		$this.dataErrorTypeDataGrid.refresh();
+	});
+	
+	EventBus.addEventListener(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_SAVED, function() {
+		$this.dataErrorQueryDataGrid.refresh();
+	});
+	EventBus.addEventListener(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_DELETED, function() {
+		$this.dataErrorQueryDataGrid.refresh();
 	});
 };
 
@@ -65,6 +72,42 @@ Collect.prototype.initDataErrorTypePanel = function() {
 	}
 };
 
+Collect.prototype.initDataErrorQueryPanel = function() {
+	$('#new-data-error-query-btn').click($.proxy(function() {
+		var dialogController = new Collect.DataErrorQueryDialogController();
+		dialogController.open();
+	}, this));
+	
+	$('#edit-data-error-query-btn').click($.proxy(function() {
+		var $this = this;
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
+		var dialogController = new Collect.DataErrorQueryDialogController();
+		dialogController.open(selectedItem);
+	}, this));
+	
+	$('#delete-data-error-query-btn').click($.proxy(function() {
+		var $this = this;
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
+		OF.UI.confirm("Do you want to delete this Data Error Type?", function() {
+			collect.dataErrorQueryService.remove(selectedItem.id, function() {
+				EventBus.dispatch(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_DELETED, $this);
+			});
+		});
+	}, this));
+	
+	function getSelectedItem() {
+		var $this = this;
+		var selections = $this.dataErrorQueryDataGrid.getSelections();
+		return selections.length == 0 ? null : selections[0];
+	}
+};
+
 Collect.prototype.initDataErrorTypeGrid = function() {
 	var $this = this;
 	$('#dataerrortypegrid').bootstrapTable({
@@ -82,10 +125,27 @@ Collect.prototype.initDataErrorTypeGrid = function() {
 	$this.dataErrorTypeDataGrid = $('#dataerrortypegrid').data('bootstrap.table');
 };
 
+Collect.prototype.initDataErrorQueryGrid = function() {
+	var $this = this;
+	$('#dataerrorquerygrid').bootstrapTable({
+	    url: "/collect/datacleansing/dataerrorqueries/list.json",
+	    cache: false,
+	    clickToSelect: true,
+	    columns: [
+          	{field: "selected", title: "", radio: true},
+			{field: "id", title: "Id", visible: false},
+			{field: "title", title: "Title"},
+			{field: "description", title: "Description"}
+		]
+	});
+	$this.dataErrorQueryDataGrid = $('#dataerrorquerygrid').data('bootstrap.table');
+};
+
 Collect.prototype.setActiveSurvey = function(survey) {
 	collect.activeSurvey = survey;
 	
 	this.initDataErrorTypeGrid();
+	this.initDataErrorQueryGrid();
 };
 
 Collect.prototype.error = function(jqXHR, status, errorThrown) {
