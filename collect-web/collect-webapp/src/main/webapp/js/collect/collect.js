@@ -144,7 +144,7 @@ Collect.prototype.initDataErrorQueryGrid = function() {
 Collect.prototype.setActiveSurvey = function(surveySummary) {
 	var $this = this;
 	$this.surveyService.loadById(surveySummary.id, function(survey) {
-		$this.activeSurvey = survey;
+		$this.activeSurvey = new Collect.Metamodel.Survey(survey);
 		$this.initDataErrorTypeGrid();
 		$this.initDataErrorQueryGrid();
 	});

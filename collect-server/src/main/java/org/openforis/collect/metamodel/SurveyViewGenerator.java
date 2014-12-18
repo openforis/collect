@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.openforis.collect.designer.model.AttributeType;
+import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
@@ -39,7 +42,7 @@ public class SurveyViewGenerator {
 				if (def instanceof EntityDefinition) {
 					view = new EntityDefView(id, name, label);
 				} else {
-					view = new AttributeDefView(id, name, label, def.getClass().getSimpleName());
+					view = new AttributeDefView(id, name, label, AttributeType.valueOf((AttributeDefinition) def));
 				}
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
@@ -59,9 +62,9 @@ public class SurveyViewGenerator {
 		private int id;
 		private String name;
 		private String label;
-		private String type;
+		private NodeType type;
 		
-		public NodeDefView(int id, String name, String label, String type) {
+		public NodeDefView(int id, String name, String label, NodeType type) {
 			super();
 			this.id = id;
 			this.name = name;
@@ -85,7 +88,7 @@ public class SurveyViewGenerator {
 			return label;
 		}
 
-		public String getType() {
+		public NodeType getType() {
 			return type;
 		}
 		
@@ -96,7 +99,7 @@ public class SurveyViewGenerator {
 		private List<NodeDefView> children;
 		
 		public EntityDefView(int id, String name, String label) {
-			super(id, name, label, EntityDefinition.class.getSimpleName());
+			super(id, name, label, NodeType.ENTITY);
 			children = new ArrayList<NodeDefView>();
 		}
 
@@ -116,10 +119,16 @@ public class SurveyViewGenerator {
 	
 	public static class AttributeDefView extends NodeDefView {
 
-		public AttributeDefView(int id, String name, String label, String type) {
-			super(id, name, label, type);
+		private AttributeType attributeType;
+		
+		public AttributeDefView(int id, String name, String label, AttributeType type) {
+			super(id, name, label, NodeType.ATTRIBUTE);
+			this.attributeType = type;
 		}
 		
+		public AttributeType getAttributeType() {
+			return attributeType;
+		}
 	}
 	
 	public static class SurveyView {
