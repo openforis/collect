@@ -3,6 +3,9 @@ Collect.DataErrorQueryDialogController = function() {
 	this.contentUrl = "/collect/datacleansing/data_error_query_dialog.html";
 	this.surveySummaries = null;
 	this.itemEditService = collect.dataErrorQueryService;
+	this.entityTree = null;
+	this.attributeTree = null;
+	this.errorTypeSelectPicker = null;
 };
 
 Collect.DataErrorQueryDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
@@ -24,37 +27,43 @@ Collect.DataErrorQueryDialogController.prototype.loadInstanceVariables = functio
 	}]);
 };
 
-Collect.DataErrorQueryDialogController.prototype.initFormElements = function() {
-	Collect.AbstractItemEditDialogController.prototype.initFormElements.apply(this, arguments);
+Collect.DataErrorQueryDialogController.prototype.initFormElements = function(callback) {
 	var $this = this;
-	var select = $this.content.find('select[name="errorTypeId"]');
-	OF.UI.Forms.populateSelect(select, $this.errorTypes, "id", "code", true);
-	$this.errorTypeSelectPicker = select.selectpicker();
-	
-	$this.initEntityTree();
-	$this.initAttributeTree();
+	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
+		var select = $this.content.find('select[name="typeId"]');
+		OF.UI.Forms.populateSelect(select, $this.errorTypes, "id", "code", true);
+		select.selectpicker();
+		$this.errorTypeSelectPicker = select.data().selectpicker;
+		
+		$this.initEntityTree(function() {
+			$this.initAttributeTree(function() {
+				callback();
+			});
+		});
+	});
 };
 
 Collect.DataErrorQueryDialogController.prototype.extractJSONItem = function() {
 	var item = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
-	item.typeId = this.errorTypeSelectPicker.val();
 	item.entityDefinitionId = this.getSelectedNodeId(this.entityTree);
 	item.attributeDefinitionId = this.getSelectedNodeId(this.attributeTree);
 	return item;
 };
 
-Collect.DataErrorQueryDialogController.prototype.initEntityTree = function() {
+Collect.DataErrorQueryDialogController.prototype.initEntityTree = function(callback) {
 	var $this = this;
 	var disabledFilterFunction = function(node) {
 		return node.type == "ATTRIBUTE";
 	};
 	$this.entityTree = $this.initNodeTree('.entity-tree', collect.activeSurvey, disabledFilterFunction);
+	$this.runWhenTreeIsReady($this.entityTree, callback);
+	
 	$this.entityTree.element.on('select_node.jstree', function() {
 		$this.initAttributeTree();
 	});
 };
 
-Collect.DataErrorQueryDialogController.prototype.initAttributeTree = function() {
+Collect.DataErrorQueryDialogController.prototype.initAttributeTree = function(callback) {
 	var disabledFilterFunction = function(node) {
 		return node.type == "ENTITY";
 	};
@@ -64,18 +73,30 @@ Collect.DataErrorQueryDialogController.prototype.initAttributeTree = function() 
 	var selectedEntityDefId = this.entityTree ? this.getSelectedNodeId(this.entityTree): null;
 	if (selectedEntityDefId != null) {
 		this.attributeTree = this.initNodeTree('.attribute-tree', collect.activeSurvey, disabledFilterFunction, selectedEntityDefId);
+		if (callback) $this.runWhenTreeIsReady(this.attributeTree, callback);
+	} else {
+		if (callback) callback();
 	}
 };
 
-Collect.DataErrorQueryDialogController.prototype.fillForm = function() {
-	Collect.AbstractItemEditDialogController.prototype.fillForm.apply(this, arguments);
+Collect.DataErrorQueryDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
-	setTimeout(function() {
+	$this.errorTypeSelectPicker.val($this.item.typeId);
+	
+	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
+		//1. select entity definition in tree
 		$this.selectTreeNode($this.entityTree, $this.item.entityDefinitionId);
-		setTimeout(function() {
+		
+		//2. wait for attribute tree loading (ready event will be triggered)
+		$this.runWhenTreeIsReady($this.attributeTree, function() {
+			
+			//3. select attribute definition in tree
 			$this.selectTreeNode($this.attributeTree, $this.item.attributeDefinitionId);
-		}, 500);
-	}, 500);
+			
+			//4. call callback function
+			callback();
+		});
+	});
 };
 
 Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDivId, survey, disabledFilterFunction, startFromEntityId) {
@@ -134,4 +155,12 @@ Collect.DataErrorQueryDialogController.prototype.getSelectedNodeId = function(tr
 	} else {
 		return selectedTreeNodeIds[0];
 	}
+};
+
+Collect.DataErrorQueryDialogController.prototype.runWhenTreeIsReady = function(tree, callback) {
+	var treeReadyHandler = function() {
+		tree.element.off("ready.jstree", treeReadyHandler);
+		callback();
+	};
+	tree.element.on("ready.jstree", treeReadyHandler);
 };

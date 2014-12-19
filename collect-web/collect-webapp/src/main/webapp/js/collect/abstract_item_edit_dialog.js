@@ -20,12 +20,22 @@ Collect.AbstractItemEditDialogController.prototype.open = function(item) {
 	var $this = this;
 	$this.item = item;
 	
-	function doOpen() {
+	function beforeOpen(callback) {
 		if (item) {
-			$this.fillForm();
+			$this.fillForm(function() {
+				callback();
+			});
+		} else {
+			callback();
 		}
-		$this.content.modal('show');
 	};
+	
+	function doOpen() {
+		beforeOpen(function() {
+			$this.content.modal('show');
+		});
+	};
+	
 	if ($this.initialized) {
 		doOpen();
 	} else {
@@ -47,9 +57,10 @@ Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables = funct
 Collect.AbstractItemEditDialogController.prototype.initContent = function(callback) {
 	var $this = this;
 	$this.loadContent(function() {
-		$this.initFormElements();
-		$this.initEventListeners();
-		callback();
+		$this.initFormElements(function() {
+			$this.initEventListeners();
+			callback();
+		});
 	});
 };
 
@@ -66,9 +77,12 @@ Collect.AbstractItemEditDialogController.prototype.loadContent = function(callba
 	);
 };
 
-Collect.AbstractItemEditDialogController.prototype.initFormElements = function() {
+Collect.AbstractItemEditDialogController.prototype.initFormElements = function(callback) {
 	var $this = this;
 	$this.form = $this.content.find("form");
+	if (callback) {
+		callback();
+	}
 };
 
 Collect.AbstractItemEditDialogController.prototype.initEventListeners = function() {
@@ -88,7 +102,7 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function() {
 				$this.dispatchItemSavedEvent();
 				$this.close();
 			} else {
-				alert("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
+				OF.UI.showError("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
 				OF.UI.Forms.Validation.updateErrors($this.form, response.errors);
 			}
 		});
@@ -103,9 +117,10 @@ Collect.AbstractItemEditDialogController.prototype.validateForm = function() {
 	return true;
 };
 
-Collect.AbstractItemEditDialogController.prototype.fillForm = function() {
+Collect.AbstractItemEditDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	OF.UI.Forms.fill($this.form, $this.item);
+	callback();
 };
 
 Collect.AbstractItemEditDialogController.prototype.extractJSONItem = function() {

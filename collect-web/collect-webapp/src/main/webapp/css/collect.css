@@ -1,0 +1,25 @@
+/**
+* Custom Open Foris Collect style
+*
+* @author Stefano Ricci
+*/
+@CHARSET "UTF-8";
+
+.alert {
+	z-index: 1100;
+	position: fixed;
+	font-size: small;
+	top: 15px;
+	left: 0;
+	right: 0;
+	text-align: center;
+}
+
+/** Error Tooltip */
+.tooltip.error .tooltip-inner {
+	background: #e74c3c;
+}
+
+.tooltip.top.error .tooltip-arrow {
+	border-top-color: #e74c3c;
+}

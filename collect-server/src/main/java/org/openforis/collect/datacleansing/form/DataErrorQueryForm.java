@@ -2,6 +2,7 @@ package org.openforis.collect.datacleansing.form;
 
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.commons.web.PersistedObjectForm;
 
@@ -14,15 +15,19 @@ public class DataErrorQueryForm extends PersistedObjectForm<DataErrorQuery> {
 
 	@NotNull
 	private Integer typeId;
-	@NotNull
+	@NotBlank
 	private String title;
+	
 	private String description;
 	@NotNull
 	private Integer entityDefinitionId;
 	@NotNull
 	private Integer attributeDefinitionId;
-	@NotNull
+	@NotBlank
 	private String conditions;
+	
+	//calculated members
+	private String typeCode;
 
 	public DataErrorQueryForm() {
 		super();
@@ -30,6 +35,11 @@ public class DataErrorQueryForm extends PersistedObjectForm<DataErrorQuery> {
 	
 	public DataErrorQueryForm(DataErrorQuery query) {
 		super(query);
+		typeCode = query == null ? null: query.getType() == null ? null: query.getType().getCode();
+	}
+	
+	public String getTypeCode() {
+		return typeCode;
 	}
 	
 	public Integer getTypeId() {

@@ -78,7 +78,14 @@ OF.UI.Forms.Validation.createErrorTooltip = function ($field, error, fieldLabel)
 	if ( ! fieldLabel ) {
 		fieldLabel = OF.UI.Forms.getFieldLabel($field);
 	}
-	var errorMessage = typeof error == "string" ? error: error.hasOwnProperty("defaultMessage") ? error.defaultMessage: "error";
+	var errorMessage;
+	if (typeof error == "string") {
+		errorMessage = error;
+	} else if (error.hasOwnProperty("defaultMessage")) {
+		errorMessage = error.defaultMessage;
+	} else {
+		errorMessage = "error";
+	}
 	var message = fieldLabel + " " + errorMessage;
 	
 	var $parentModal = $field.closest('.modal');

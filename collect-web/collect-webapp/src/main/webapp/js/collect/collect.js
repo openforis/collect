@@ -134,6 +134,7 @@ Collect.prototype.initDataErrorQueryGrid = function() {
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
+			{field: "typeCode", title: "Error Type"},
 			{field: "title", title: "Title"},
 			{field: "description", title: "Description"}
 		]

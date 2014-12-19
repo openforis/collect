@@ -14,11 +14,15 @@ Collect.SurveySelectDialogController.prototype.loadInstanceVariables = function(
 	});
 };
 
-Collect.SurveySelectDialogController.prototype.initFormElements = function() {
+Collect.SurveySelectDialogController.prototype.initFormElements = function(callback) {
 	var $this = this;
-	var select = $this.content.find('.survey-select');
-	OF.UI.Forms.populateSelect(select, $this.surveySummaries, "id", "projectName", true);
-	$this.surveySelectPicker = select.selectpicker();
+	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
+		var select = $this.content.find('.survey-select');
+		OF.UI.Forms.populateSelect(select, $this.surveySummaries, "id", "projectName", true);
+		$this.surveySelectPicker = select.selectpicker();
+		
+		callback();
+	});
 };
 
 Collect.SurveySelectDialogController.prototype.applyHandler = function() {

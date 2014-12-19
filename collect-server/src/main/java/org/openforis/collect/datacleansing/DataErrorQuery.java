@@ -25,6 +25,7 @@ public class DataErrorQuery extends DataQuery {
 	
 	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
+		this.type = null;
 	}
 	
 	public DataErrorType getType() {

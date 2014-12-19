@@ -1,5 +1,15 @@
 OF.UI = function() {};
 
+OF.UI._MESSAGE_CONTAINER_TEMPLATE = 
+	'<div class="col-md-4 col-md-offset-4 alert alert-dismissable" style="display: none;">' +
+		'<button type="button" class="close no-background" data-dismiss="messageContainer">×</button>' +
+		'<span></span>' +
+	'</div>';
+
+OF.UI._messageContainer = null;
+
+
+
 /**
  * Opens a confirm dialog.
  * The dialog will appear in the fixed position specified or it will be horizontally and vertically centered. 
@@ -52,4 +62,65 @@ OF.UI.confirm = function(message, yesHandler, noHandler, position) {
 		 });
 	 }
 	 $("body").append(dialog);
+ };
+
+/**
+ * Shows application error message
+ */
+ OF.UI.showError = function( message, hide ) {
+	 OF.UI.showMessage("error", message, hide);
+};
+
+ /**
+  * Shows application warning message
+  */
+OF.UI.showWarning = function( message, hide ) {
+	OF.UI.showMessage("warning", message, hide);
+};
+
+ /**
+  * Shows application success  message
+  */
+OF.UI.showSuccess = function(message, hide) {
+	OF.UI.showMessage("success", message, hide);
+};
+
+/**
+ * Shows application message
+ */
+OF.UI.showMessage = function(type, message, autoHide) {
+	var container = OF.UI._messageContainer;
+	if (container == null) {
+		container = $(OF.UI._MESSAGE_CONTAINER_TEMPLATE);
+		$(document.body).append(container);
+		
+		container.find(".close")
+			.click(function(e){	
+				container.fadeOut(800);
+			});
+		OF.UI._messageContainer = container;
+	}
+	container.removeClass("alert-danger alert-warning alert-success");
+ 	
+ 	switch ( type ) {
+ 	case "error":
+ 		alertClass = "alert-danger";
+ 		break;
+ 	case "warning":
+ 		alertClass = "alert-warning";
+ 		break;
+ 	default:
+ 		alertClass = "alert-success";
+ 	}
+ 	
+ 	container.addClass(alertClass);
+
+ 	container.find("span").html( message );
+ 	
+ 	container.fadeIn( 400 );
+ 	
+ 	if ( autoHide == true ) {
+ 		// fade out after 2 seconds
+ 		container.delay( 2000 ).fadeOut( 800 );
+ 	}
  };
