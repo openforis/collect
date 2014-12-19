@@ -45,13 +45,17 @@
 	</head>
 	
 	<body>
-	
-		<div role="tabpanel">
+		
+			<div class="home-survey-selector">
+				<label>Survey: </label>
+				<button id="home-survey-selector-button" type="button" class="btn btn-default"></button>
+			</div>
+		
+			<div role="tabpanel">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active">
 					<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Home</a>
 				</li>
-				
 				<li role="presentation">
 					<a href="#dataErrorQueriesPanel" aria-controls="dataErrorQueriesPanel" 
 						role="tab" data-toggle="tab">Data Error Queries</a>
@@ -61,7 +65,7 @@
 						role="tab" data-toggle="tab">Data Error Types</a>
 				</li>
 			</ul>
-	
+			
 			<!-- Tab panes -->
 			<div class="tab-content">
 				<div id="homePanel" role="tabpanel" class="tab-pane active" >

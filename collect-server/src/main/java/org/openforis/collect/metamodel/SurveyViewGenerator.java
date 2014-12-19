@@ -30,7 +30,7 @@ public class SurveyViewGenerator {
 	}
 
 	public SurveyView generateView(CollectSurvey survey) {
-		final SurveyView surveyView = new SurveyView();
+		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName());
 		final String langCode = locale.getLanguage();
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();;
 		survey.getSchema().traverse(new NodeDefinitionVisitor() {
@@ -133,10 +133,22 @@ public class SurveyViewGenerator {
 	
 	public static class SurveyView {
 		
+		private Integer id;
+		private String name;
 		private List<EntityDefView> rootEntities;
 		
-		public SurveyView() {
-			rootEntities = new ArrayList<EntityDefView>();
+		public SurveyView(Integer id, String name) {
+			this.id = id;
+			this.name = name;
+			this.rootEntities = new ArrayList<EntityDefView>();
+		}
+		
+		public Integer getId() {
+			return id;
+		}
+		
+		public String getName() {
+			return name;
 		}
 		
 		public void addRootEntity(EntityDefView rootEntity) {

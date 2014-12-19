@@ -23,3 +23,9 @@
 .tooltip.top.error .tooltip-arrow {
 	border-top-color: #e74c3c;
 }
+
+.home-survey-selector {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}

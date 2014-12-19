@@ -2,32 +2,53 @@ Collect = function() {
 	this.activeSurvey = null;
 };
 
+Collect.SURVEY_CHANGED = "surveyChanged";
+
 Collect.prototype.init = function() {
+	var $this = this;
 	this.activeSurvey = null;
 	this.sessionService = new Collect.SessionService();
 	this.surveyService = new Collect.SurveyService();
 	this.dataErrorQueryService = new Collect.DataErrorQueryService();
 	this.dataErrorTypeService = new Collect.DataErrorTypeService();
 	
-	//survey select dialog
-	var surveySelectDialogController = new Collect.SurveySelectDialogController();
-	surveySelectDialogController.open();
-	
 	this.initDataErrorTypePanel();
 	this.initDataErrorQueryPanel();
 	
 	this.initGlobalEventHandlers();
+	
+	this.checkActiveSurveySelected();
+};
+
+Collect.prototype.checkActiveSurveySelected = function() {
+	var $this = this;
+	this.sessionService.getActiveSurvey(function(survey) {
+		if (survey == null) {
+			var surveySelectDialogController = new Collect.SurveySelectDialogController();
+			surveySelectDialogController.open();
+		} else {
+			$this.activeSurvey = new Collect.Metamodel.Survey(survey);
+			EventBus.dispatch(Collect.SURVEY_CHANGED, $this);
+		}
+	});
 };
 
 Collect.prototype.initGlobalEventHandlers = function() {
 	var $this = this;
+	$("#home-survey-selector-button").click(function() {
+		new Collect.SurveySelectDialogController().open();
+	});
+	EventBus.addEventListener(Collect.SURVEY_CHANGED, function() {
+		$this.initDataErrorTypeGrid();
+		$this.initDataErrorQueryGrid();
+		$("#home-survey-selector-button").text($this.activeSurvey.name);
+	});
 	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED, function() {
 		$this.dataErrorTypeDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_DELETED, function() {
 		$this.dataErrorTypeDataGrid.refresh();
 	});
-	
 	EventBus.addEventListener(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_SAVED, function() {
 		$this.dataErrorQueryDataGrid.refresh();
 	});
@@ -146,8 +167,7 @@ Collect.prototype.setActiveSurvey = function(surveySummary) {
 	var $this = this;
 	$this.surveyService.loadById(surveySummary.id, function(survey) {
 		$this.activeSurvey = new Collect.Metamodel.Survey(survey);
-		$this.initDataErrorTypeGrid();
-		$this.initDataErrorQueryGrid();
+		EventBus.dispatch(Collect.SURVEY_CHANGED, $this);
 	});
 };
 

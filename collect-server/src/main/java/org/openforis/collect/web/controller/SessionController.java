@@ -1,7 +1,11 @@
 package org.openforis.collect.web.controller;
 
+import java.util.Locale;
+
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.metamodel.SurveyViewGenerator;
+import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.commons.web.Response;
@@ -35,11 +39,22 @@ public class SessionController {
 		return "ok";
 	}
 	
-	@RequestMapping(value = "/setActiveSurvey.json", method = RequestMethod.GET)
-	public @ResponseBody Response setSurveyActiveSurvey(@RequestParam int surveyId) {
+	@RequestMapping(value = "/active_survey.json", method = RequestMethod.POST)
+	public @ResponseBody Response setActiveSurvey(@RequestParam int surveyId) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		sessionManager.setActiveSurvey(survey);
 		return new Response();
+	}
+	
+	@RequestMapping(value = "/active_survey.json", method = RequestMethod.GET)
+	public @ResponseBody SurveyView getActiveSurvey() {
+		CollectSurvey survey = sessionManager.getActiveSurvey();
+		Locale locale = sessionManager.getSessionState().getLocale();
+		if (locale == null) {
+			locale = Locale.ENGLISH;
+		}
+		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
+		return survey == null ? null : viewGenerator.generateView(survey);
 	}
 	
 }
