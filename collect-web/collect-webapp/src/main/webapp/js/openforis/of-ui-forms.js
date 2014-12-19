@@ -110,3 +110,15 @@ OF.UI.Forms.getInputType = function(inputField) {
 	}
 	return type;
 };
+
+/**
+ * Returns the label associated to the specified field 
+ * 
+ * @param $field
+ * @returns
+ */
+OF.UI.Forms.getFieldLabel = function($field) {
+	$formGroup = $field.closest('.form-group');
+	$labelEl = $formGroup.find('.control-label');
+	return $labelEl == null ? "": $labelEl.text();
+};

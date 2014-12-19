@@ -31,7 +31,7 @@ Collect.AbstractItemEditDialogController.prototype.open = function(item) {
 	} else {
 		$this.init(function() {
 			doOpen();
-		})
+		});
 	}
 };
 
@@ -55,10 +55,12 @@ Collect.AbstractItemEditDialogController.prototype.initContent = function(callba
 
 Collect.AbstractItemEditDialogController.prototype.loadContent = function(callback) {
 	var $this = this;
-	OF.Remote.loadHtml($this.contentUrl, function(content) {
+	OF.Remote.loadHtml($this.contentUrl, 
+		function(content) {
 			$this.content = content;
 			callback();
-		}, function() {
+		}, 
+		function() {
 			collect.error.apply(this, arguments);
 		}
 	);
@@ -81,9 +83,14 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function() {
 	var $this = this;
 	if ($this.validateForm()) {
 		var item = $this.extractJSONItem();
-		$this.itemEditService.save(item, function() {
-			$this.dispatchItemSavedEvent();
-			$this.close();
+		$this.itemEditService.save(item, function(response) {
+			if (response.statusOk) {
+				$this.dispatchItemSavedEvent();
+				$this.close();
+			} else {
+				alert("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
+				OF.UI.Forms.Validation.updateErrors($this.form, response.errors);
+			}
 		});
 	}
 };

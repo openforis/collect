@@ -70,7 +70,12 @@ Collect.DataErrorQueryDialogController.prototype.initAttributeTree = function() 
 Collect.DataErrorQueryDialogController.prototype.fillForm = function() {
 	Collect.AbstractItemEditDialogController.prototype.fillForm.apply(this, arguments);
 	var $this = this;
-	$this.selectTreeNode($this.entityTree, $this.item.entityDefinitionId);
+	setTimeout(function() {
+		$this.selectTreeNode($this.entityTree, $this.item.entityDefinitionId);
+		setTimeout(function() {
+			$this.selectTreeNode($this.attributeTree, $this.item.attributeDefinitionId);
+		}, 500);
+	}, 500);
 };
 
 Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDivId, survey, disabledFilterFunction, startFromEntityId) {
@@ -80,7 +85,7 @@ Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDiv
 			text += " - " + node.label;
 		}
 		var treeNode = {
-			id: 	"" + node.id,
+			id: 	node.id,
 			text: 	text, 
 			state: 	{disabled: disabledFilterFunction ? disabledFilterFunction(node) : false}
 		};
@@ -88,7 +93,7 @@ Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDiv
 			var children = new Array();
 			for (var idx = 0; idx < node.children.length; idx++) {
 				var child = node.children[idx];
-				var childTreeNode = createTreeNode(child)
+				var childTreeNode = createTreeNode(child);
 				children.push(childTreeNode);
 			}
 			treeNode.children = children;
@@ -119,11 +124,11 @@ Collect.DataErrorQueryDialogController.prototype.initNodeTree = function(treeDiv
 };
 
 Collect.DataErrorQueryDialogController.prototype.selectTreeNode = function(tree, nodeId) {
-	tree.select_node("" + nodeId);
+	tree.select_node(nodeId);
 };
 
 Collect.DataErrorQueryDialogController.prototype.getSelectedNodeId = function(tree) {
-	var selectedTreeNodeIds = tree.get_selected()
+	var selectedTreeNodeIds = tree.get_selected();
 	if (selectedTreeNodeIds == null || selectedTreeNodeIds.length == 0) {
 		return null;
 	} else {
