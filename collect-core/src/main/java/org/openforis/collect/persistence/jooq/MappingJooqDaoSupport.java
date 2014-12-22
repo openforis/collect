@@ -65,6 +65,14 @@ public class MappingJooqDaoSupport<E, C extends MappingDSLContext<E>> extends Jo
 		}
 	}
 	
+	public List<E> loadAll() {
+		C dsl = dsl();
+		SelectQuery<?> query = dsl.selectQuery(dsl.getTable());
+		Result<?> result = query.fetch();
+		List<E> entities = dsl.fromResult(result);
+		return entities;
+	}
+	
 	@Transactional
 	public void insert(E entity) {
 		dsl().insertQuery(entity).execute();

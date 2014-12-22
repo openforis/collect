@@ -9,11 +9,13 @@ Collect.prototype.init = function() {
 	this.activeSurvey = null;
 	this.sessionService = new Collect.SessionService();
 	this.surveyService = new Collect.SurveyService();
-	this.dataErrorQueryService = new Collect.DataErrorQueryService();
 	this.dataErrorTypeService = new Collect.DataErrorTypeService();
+	this.dataErrorQueryService = new Collect.DataErrorQueryService();
+	this.dataErrorReportService = new Collect.DataErrorReportService();
 	
 	this.initDataErrorTypePanel();
 	this.initDataErrorQueryPanel();
+	this.initDataErrorReportsPanel();
 	
 	this.initGlobalEventHandlers();
 	
@@ -22,14 +24,19 @@ Collect.prototype.init = function() {
 
 Collect.prototype.checkActiveSurveySelected = function() {
 	var $this = this;
+	var openSurveySelectDialog = function() {
+		var surveySelectDialogController = new Collect.SurveySelectDialogController();
+		surveySelectDialogController.open();
+	};
 	this.sessionService.getActiveSurvey(function(survey) {
 		if (survey == null) {
-			var surveySelectDialogController = new Collect.SurveySelectDialogController();
-			surveySelectDialogController.open();
+			openSurveySelectDialog();
 		} else {
 			$this.activeSurvey = new Collect.Metamodel.Survey(survey);
 			EventBus.dispatch(Collect.SURVEY_CHANGED, $this);
 		}
+	}, function() {
+		openSurveySelectDialog();
 	});
 };
 
@@ -41,6 +48,7 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	EventBus.addEventListener(Collect.SURVEY_CHANGED, function() {
 		$this.initDataErrorTypeGrid();
 		$this.initDataErrorQueryGrid();
+		$this.initDataErrorReportGrid();
 		$("#home-survey-selector-button").text($this.activeSurvey.name);
 	});
 	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED, function() {
@@ -55,6 +63,43 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	EventBus.addEventListener(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_DELETED, function() {
 		$this.dataErrorQueryDataGrid.refresh();
 	});
+};
+
+Collect.prototype.initDataErrorReportsPanel = function() {
+	var openDialog = function(item, itemRequired) {
+		if (itemRequired && ! item) {
+			return;
+		}
+		var dialogController = new Collect.DataErrorReportDialogController();
+		dialogController.open(item);
+	};
+	
+	$('#new-data-error-report-btn').click($.proxy(function() {
+		openDialog();
+	}, this));
+	
+	$('#view-data-error-report-btn').click($.proxy(function() {
+		openDialog($.proxy(getSelectedItem, this)(), true);
+	}, this));
+	
+	$('#delete-data-error-report-btn').click($.proxy(function() {
+		var $this = this;
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
+		OF.UI.confirm("Do you want to delete this Data Error Report?", function() {
+			collect.dataErrorReportService.remove(selectedItem.id, function() {
+				EventBus.dispatch(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_DELETED, $this);
+			});
+		});
+	}, this));
+	
+	function getSelectedItem() {
+		var $this = this;
+		var selections = $this.dataErrorReportDataGrid.getSelections();
+		return selections.length == 0 ? null : selections[0];
+	}
 };
 
 Collect.prototype.initDataErrorTypePanel = function() {
@@ -115,7 +160,7 @@ Collect.prototype.initDataErrorQueryPanel = function() {
 		if (selectedItem == null) {
 			return;
 		}
-		OF.UI.confirm("Do you want to delete this Data Error Type?", function() {
+		OF.UI.confirm("Do you want to delete this Data Error Query?", function() {
 			collect.dataErrorQueryService.remove(selectedItem.id, function() {
 				EventBus.dispatch(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_DELETED, $this);
 			});
@@ -161,6 +206,24 @@ Collect.prototype.initDataErrorQueryGrid = function() {
 		]
 	});
 	$this.dataErrorQueryDataGrid = $('#dataerrorquerygrid').data('bootstrap.table');
+};
+
+Collect.prototype.initDataErrorReportGrid = function() {
+	var $this = this;
+	var el = $('#data-error-report-grid');
+	el.bootstrapTable({
+	    url: "/collect/datacleansing/dataerrorreports/list.json",
+	    cache: false,
+	    clickToSelect: true,
+	    columns: [
+          	{field: "selected", title: "", radio: true},
+			{field: "id", title: "Id", visible: false},
+			{field: "queryTitle", title: "Query"},
+			{field: "typeCode", title: "Error Type"},
+			{field: "creationDate", title: "Date"}
+		]
+	});
+	$this.dataErrorReportDataGrid = el.data('bootstrap.table');
 };
 
 Collect.prototype.setActiveSurvey = function(surveySummary) {

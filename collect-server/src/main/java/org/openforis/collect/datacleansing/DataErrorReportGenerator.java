@@ -7,6 +7,7 @@ import org.openforis.collect.datacleansing.DataErrorReportItem.Status;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.model.Attribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,8 +25,9 @@ public class DataErrorReportGenerator {
 	@Autowired
 	private DataErrorReportManager reportManager;
 	
-	public DataErrorReport generate(DataErrorQuery query, Step recordStep){
-		DataErrorReport report = new DataErrorReport();
+	public DataErrorReport generate(DataErrorQuery query, Step recordStep) {
+		CollectSurvey survey = query.getSurvey();
+		DataErrorReport report = new DataErrorReport(survey);
 		report.setQuery(query);
 		reportManager.save(report);
 		DataQueryResultIterator it = queryExecutor.execute(query, recordStep);

@@ -4,21 +4,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.openforis.idm.metamodel.PersistedObject;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
  * 
  * @author A. Modragon
  *
  */
-public class DataErrorReport extends PersistedObject {
+public class DataErrorReport extends PersistedSurveyObject {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private int queryId;
-	private DataQuery query;
+	private DataErrorQuery query;
 	private Date creationDate;	
 	private List<DataErrorReportItem> items;
 	
-	public DataErrorReport() {
+	public DataErrorReport(CollectSurvey survey) {
+		super(survey);
 		creationDate = new Date();
 		items = new ArrayList<DataErrorReportItem>();
 	}
@@ -39,11 +43,11 @@ public class DataErrorReport extends PersistedObject {
 		this.queryId = queryId;
 	}
 	
-	public DataQuery getQuery() {
+	public DataErrorQuery getQuery() {
 		return query;
 	}
 
-	public void setQuery(DataQuery query) {
+	public void setQuery(DataErrorQuery query) {
 		this.query = query;
 		this.queryId = query.getId();
 	}

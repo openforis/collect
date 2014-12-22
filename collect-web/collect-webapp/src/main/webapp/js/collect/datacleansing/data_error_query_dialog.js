@@ -1,8 +1,8 @@
 Collect.DataErrorQueryDialogController = function() {
 	Collect.AbstractItemEditDialogController.apply(this, arguments);
 	this.contentUrl = "/collect/datacleansing/data_error_query_dialog.html";
-	this.surveySummaries = null;
 	this.itemEditService = collect.dataErrorQueryService;
+	this.errorTypes = null;
 	this.entityTree = null;
 	this.attributeTree = null;
 	this.errorTypeSelectPicker = null;
@@ -81,9 +81,9 @@ Collect.DataErrorQueryDialogController.prototype.initAttributeTree = function(ca
 
 Collect.DataErrorQueryDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
-	$this.errorTypeSelectPicker.val($this.item.typeId);
-	
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
+		$this.errorTypeSelectPicker.val($this.item.typeId);
+
 		//1. select entity definition in tree
 		$this.selectTreeNode($this.entityTree, $this.item.entityDefinitionId);
 		

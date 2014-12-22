@@ -1,19 +1,15 @@
 package org.openforis.idm.metamodel;
 
 /**
- * A survey object that will be persisted in a database
- * (so it will have a unique identifier)
+ * An object that will be persisted in a database, so it will be identifiable
+ * using a unique integer identifier
  * 
  * @author A. Modragon
+ *
  */
-public abstract class PersistedSurveyObject extends SurveyObject implements PersistedObject {
-	private static final long serialVersionUID = 1L;
-	
+public class AbstractPersistedObject implements Identifiable, PersistedObject {
+
 	private Integer id;
-	
-	protected PersistedSurveyObject(Survey survey) {
-		super(survey);
-	}
 
 	@Override
 	public Integer getId() {
@@ -28,8 +24,8 @@ public abstract class PersistedSurveyObject extends SurveyObject implements Pers
 	@Override
 	public int hashCode() {
 		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + id;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -37,13 +33,17 @@ public abstract class PersistedSurveyObject extends SurveyObject implements Pers
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (obj == null)
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PersistedSurveyObject other = (PersistedSurveyObject) obj;
-		if (id != other.id)
+		AbstractPersistedObject other = (AbstractPersistedObject) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
+
 }

@@ -16,8 +16,8 @@ import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
-import org.openforis.collect.persistence.jooq.PersistedObjectMappingDSLContext;
+import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
+import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 @Transactional
-public class DataErrorReportDao extends MappingJooqDaoSupport<DataErrorReport, DataErrorReportDao.JooqDSLContext> {
+public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataErrorReport, DataErrorReportDao.JooqDSLContext> {
 
 	public DataErrorReportDao() {
 		super(DataErrorReportDao.JooqDSLContext.class);
@@ -42,7 +42,7 @@ public class DataErrorReportDao extends MappingJooqDaoSupport<DataErrorReport, D
 	}
 
 	public List<DataErrorReport> loadBySurvey(CollectSurvey survey) {
-		JooqDSLContext dsl = dsl();
+		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorReportRecord> select = dsl
 			.selectFrom(OFC_DATA_ERROR_REPORT)
 			.where(OFC_DATA_ERROR_REPORT.QUERY_ID
@@ -53,7 +53,8 @@ public class DataErrorReportDao extends MappingJooqDaoSupport<DataErrorReport, D
 	}
 
 	public List<DataErrorReport> loadByQuery(DataErrorQuery query) {
-		JooqDSLContext dsl = dsl();
+		CollectSurvey survey = (CollectSurvey) query.getSurvey();
+		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorReportRecord> select = dsl
 			.selectFrom(OFC_DATA_ERROR_REPORT)
 			.where(OFC_DATA_ERROR_REPORT.QUERY_ID
@@ -63,17 +64,17 @@ public class DataErrorReportDao extends MappingJooqDaoSupport<DataErrorReport, D
 		return dsl.fromResult(result);
 	}
 	
-	protected static class JooqDSLContext extends PersistedObjectMappingDSLContext<DataErrorReport> {
+	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataErrorReport> {
 
 		private static final long serialVersionUID = 1L;
 		
-		public JooqDSLContext(Connection connection) {
-			super(connection, OFC_DATA_ERROR_REPORT.ID, OFC_DATA_ERROR_REPORT_ID_SEQ, DataErrorReport.class);
+		public JooqDSLContext(Connection connection, CollectSurvey survey) {
+			super(connection, OFC_DATA_ERROR_REPORT.ID, OFC_DATA_ERROR_REPORT_ID_SEQ, DataErrorReport.class, survey);
 		}
 		
 		@Override
 		protected DataErrorReport newEntity() {
-			return new DataErrorReport();
+			return new DataErrorReport(survey);
 		}
 		
 		@Override

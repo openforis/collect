@@ -20,7 +20,7 @@ public abstract class SurveyObjectMappingDSLContext<T extends PersistedSurveyObj
 
 	private static final long serialVersionUID = 1L;
 	
-	private CollectSurvey survey;
+	protected CollectSurvey survey;
 
 	public SurveyObjectMappingDSLContext(Connection conn,
 			TableField<?, Integer> idField,

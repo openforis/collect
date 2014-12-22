@@ -2,7 +2,7 @@ package org.openforis.collect.datacleansing;
 
 import org.openforis.collect.datacleansing.json.JSONValueParser;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.PersistedObject;
+import org.openforis.idm.metamodel.AbstractPersistedObject;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Value;
 
@@ -11,7 +11,7 @@ import org.openforis.idm.model.Value;
  * @author A. Modragon
  *
  */
-public class DataErrorReportItem extends PersistedObject {
+public class DataErrorReportItem extends AbstractPersistedObject {
 	
 	public enum Status {
 		PENDING('p'),

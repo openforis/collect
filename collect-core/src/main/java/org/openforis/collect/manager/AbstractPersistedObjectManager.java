@@ -1,5 +1,7 @@
 package org.openforis.collect.manager;
 
+import java.util.List;
+
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.idm.metamodel.PersistedObject;
 
@@ -10,7 +12,11 @@ import org.openforis.idm.metamodel.PersistedObject;
  */
 public abstract class AbstractPersistedObjectManager<T extends PersistedObject, D extends MappingJooqDaoSupport<T, ?>> {
 
-	private D dao;
+	protected D dao;
+	
+	public List<T> loadAll() {
+		return dao.loadAll();
+	}
 	
 	public T loadById(int id) {
 		T obj = dao.loadById(id);
@@ -26,7 +32,11 @@ public abstract class AbstractPersistedObjectManager<T extends PersistedObject, 
 	}
 	
 	public void delete(T obj) {
-		dao.delete(obj.getId());
+		delete(obj.getId());
+	}
+
+	public void delete(int id) {
+		dao.delete(id);
 	}
 	
 	public D getDao() {

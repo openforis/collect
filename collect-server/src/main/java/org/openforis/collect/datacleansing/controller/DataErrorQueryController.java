@@ -4,7 +4,7 @@ import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.form.DataErrorQueryForm;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.web.controller.AbstractItemEditFormController;
+import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -14,7 +14,7 @@ import org.springframework.web.context.WebApplicationContext;
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
 @RequestMapping(value = "/datacleansing/dataerrorqueries")
-public class DataErrorQueryController extends AbstractItemEditFormController<DataErrorQuery, DataErrorQueryForm, DataErrorQueryManager> {
+public class DataErrorQueryController extends AbstractSurveyObjectEditFormController<DataErrorQuery, DataErrorQueryForm, DataErrorQueryManager> {
 	
 	@Autowired
 	@Override
@@ -27,6 +27,7 @@ public class DataErrorQueryController extends AbstractItemEditFormController<Dat
 		return new DataErrorQueryForm(item);
 	}
 	
+	@Override
 	protected DataErrorQuery createItemInstance(CollectSurvey survey) {
 		return new DataErrorQuery(survey);
 	};
