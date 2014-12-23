@@ -78,7 +78,7 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		
 		DataErrorReport reloadedReport = dataErrorReportManager.loadById(survey, report.getId());
 		
-		List<DataErrorReportItem> items = dataErrorReportManager.loadItems(reloadedReport);
+		List<DataErrorReportItem> items = dataErrorReportManager.loadItems(reloadedReport, 0, 100);
 		
 		assertFalse(items.isEmpty());
 		
