@@ -3,6 +3,8 @@ package org.openforis.collect.datacleansing.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportGenerator;
@@ -17,6 +19,7 @@ import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormControll
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker.Status;
 import org.openforis.concurrency.spring.SpringJobManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -84,13 +87,14 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		return result;
 	}
 	
-	@RequestMapping(value="currentGenerationJob.json", method = RequestMethod.GET)
+	@RequestMapping(value="generate/job.json", method = RequestMethod.GET)
 	public @ResponseBody
-	JobView getCurrentGenearationJob() {
+	JobView getCurrentGenearationJob(HttpServletResponse response) {
 		if (generationJob == null) {
-			return new JobView(generationJob);
-		} else {
+			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 			return null;
+		} else {
+			return new JobView(generationJob);
 		}
 	}
 	
@@ -135,13 +139,19 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	private static class JobView {
 		
 		private int progressPercent;
+		private Status status;
 
 		public JobView(Job job) {
 			progressPercent = job.getProgressPercent();
+			status = job.getStatus();
 		}
 		
 		public int getProgressPercent() {
 			return progressPercent;
+		}
+		
+		public Status getStatus() {
+			return status;
 		}
 		
 	}

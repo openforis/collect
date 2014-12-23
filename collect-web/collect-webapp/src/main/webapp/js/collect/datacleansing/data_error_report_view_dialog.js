@@ -13,15 +13,6 @@ Collect.DataErrorReportViewDialogController.prototype = Object.create(Collect.Ab
 Collect.DataErrorReportViewDialogController.prototype.initEventListeners = function() {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initEventListeners.call(this);
-	$this.content.find('.generate-btn').click(function() {
-		if ($this.validateForm()) {
-			var item = $this.extractJSONItem();
-			collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
-				alert("Report Generation Started");
-				$this.close();
-			});
-		}
-	});
 };
 
 Collect.DataErrorReportViewDialogController.prototype.loadInstanceVariables = function(callback) {

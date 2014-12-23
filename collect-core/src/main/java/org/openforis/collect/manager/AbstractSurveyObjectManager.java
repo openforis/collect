@@ -5,12 +5,14 @@ import java.util.List;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
  * @author S. Ricci
  *
  */
+@Transactional
 public abstract class AbstractSurveyObjectManager
 		<T extends PersistedSurveyObject, D extends SurveyObjectMappingJooqDaoSupport<T, ?>> 
 		extends AbstractPersistedObjectManager<T, D> {

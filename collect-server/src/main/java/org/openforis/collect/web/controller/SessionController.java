@@ -34,7 +34,7 @@ public class SessionController {
 	@Autowired
 	private SurveyManager surveyManager;
 	
-	@RequestMapping(value = "/keepSessionAlive.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "/ping", method = RequestMethod.GET)
 	public @ResponseBody String keepSessionAlive(@RequestParam(value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
 		if ( editing ) {
 			sessionManager.checkIsActiveRecordLocked();

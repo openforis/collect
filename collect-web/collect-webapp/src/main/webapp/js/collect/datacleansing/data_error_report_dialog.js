@@ -18,7 +18,7 @@ Collect.DataErrorReportDialogController.prototype.initEventListeners = function(
 		if ($this.validateForm()) {
 			var item = $this.extractJSONItem();
 			collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
-				alert("Report Generation Started");
+				new OF.UI.JobDialog("datacleansing/dataerrorreports/generate/job.json").open();
 				$this.close();
 			});
 		}
