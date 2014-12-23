@@ -16,7 +16,7 @@ Collect.DataErrorReportDialogController.prototype.initEventListeners = function(
 	Collect.AbstractItemEditDialogController.prototype.initEventListeners.call(this);
 	$this.content.find('.generate-btn').click(function() {
 		if ($this.validateForm()) {
-			var item = $this.extractJSONItem()
+			var item = $this.extractJSONItem();
 			collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
 				alert("Report Generation Started");
 				$this.close();

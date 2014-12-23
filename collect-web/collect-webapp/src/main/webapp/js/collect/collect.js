@@ -66,20 +66,14 @@ Collect.prototype.initGlobalEventHandlers = function() {
 };
 
 Collect.prototype.initDataErrorReportsPanel = function() {
-	var openDialog = function(item, itemRequired) {
-		if (itemRequired && ! item) {
-			return;
-		}
-		var dialogController = new Collect.DataErrorReportDialogController();
-		dialogController.open(item);
-	};
-	
 	$('#new-data-error-report-btn').click($.proxy(function() {
-		openDialog();
+		var dialogController = new Collect.DataErrorReportDialogController();
+		dialogController.open();
 	}, this));
 	
 	$('#view-data-error-report-btn').click($.proxy(function() {
-		openDialog($.proxy(getSelectedItem, this)(), true);
+		var dialogController = new Collect.DataErrorReportViewDialogController();
+		dialogController.open($.proxy(getSelectedItem, this)());
 	}, this));
 	
 	$('#delete-data-error-report-btn').click($.proxy(function() {

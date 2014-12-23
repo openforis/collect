@@ -1,9 +1,14 @@
 package org.openforis.collect.datacleansing.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportGenerator;
+import org.openforis.collect.datacleansing.DataErrorReportItem;
 import org.openforis.collect.datacleansing.form.DataErrorReportForm;
+import org.openforis.collect.datacleansing.form.DataErrorReportItemForm;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -17,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,6 +68,20 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		springJobManager.start(generationJob);
 		Response response = new Response();
 		return response;
+	}
+	
+	@RequestMapping(value="{reportId}/items.json", method = RequestMethod.GET)
+	public @ResponseBody
+	List<DataErrorReportItemForm> loadItems(@PathVariable int reportId, 
+			@RequestParam int offset, @RequestParam int limit) {
+		CollectSurvey survey = sessionManager.getActiveSurvey();
+		DataErrorReport report = itemManager.loadById(survey, reportId);
+		List<DataErrorReportItem> items = itemManager.loadItems(report, offset, limit);
+		List<DataErrorReportItemForm> result = new ArrayList<DataErrorReportItemForm>(items.size());
+		for (DataErrorReportItem item : items) {
+			result.add(new DataErrorReportItemForm(item));
+		}
+		return result;
 	}
 	
 	@RequestMapping(value="currentGenerationJob.json", method = RequestMethod.GET)

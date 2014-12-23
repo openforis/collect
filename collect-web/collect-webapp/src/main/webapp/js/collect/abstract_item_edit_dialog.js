@@ -11,7 +11,7 @@ Collect.AbstractItemEditDialogController.prototype.init = function(callback) {
 	var $this = this;
 	$this.loadInstanceVariables(function() {
 		$this.initContent(function() {
-			callback();
+			callback.call($this);
 		});
 	});
 };
@@ -23,10 +23,10 @@ Collect.AbstractItemEditDialogController.prototype.open = function(item) {
 	function beforeOpen(callback) {
 		if (item) {
 			$this.fillForm(function() {
-				callback();
+				callback.call($this);
 			});
 		} else {
-			callback();
+			callback.call($this);
 		}
 	};
 	
@@ -51,7 +51,7 @@ Collect.AbstractItemEditDialogController.prototype.close = function() {
 };
 
 Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables = function(callback) {
-	callback();
+	callback.call(this);
 };
 
 Collect.AbstractItemEditDialogController.prototype.initContent = function(callback) {
@@ -59,7 +59,7 @@ Collect.AbstractItemEditDialogController.prototype.initContent = function(callba
 	$this.loadContent(function() {
 		$this.initFormElements(function() {
 			$this.initEventListeners();
-			callback();
+			callback.call($this);
 		});
 	});
 };
@@ -81,7 +81,7 @@ Collect.AbstractItemEditDialogController.prototype.initFormElements = function(c
 	var $this = this;
 	$this.form = $this.content.find("form");
 	if (callback) {
-		callback();
+		callback.call($this);
 	}
 };
 
@@ -120,7 +120,7 @@ Collect.AbstractItemEditDialogController.prototype.validateForm = function() {
 Collect.AbstractItemEditDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	OF.UI.Forms.fill($this.form, $this.item);
-	callback();
+	callback.call($this);
 };
 
 Collect.AbstractItemEditDialogController.prototype.extractJSONItem = function() {

@@ -42,11 +42,12 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		super(DataErrorReportItemDao.JooqDSLContext.class);
 	}
 
-	public List<DataErrorReportItem> loadByReport(DataErrorReport report) {
+	public List<DataErrorReportItem> loadByReport(DataErrorReport report, int offset, int limit) {
 		JooqDSLContext dsl = dsl(report);
 		Select<OfcDataErrorReportItemRecord> select = dsl
 			.selectFrom(OFC_DATA_ERROR_REPORT_ITEM)
-			.where(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()));
+			.where(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()))
+			.limit(offset, limit);
 		Result<OfcDataErrorReportItemRecord> result = select.fetch();
 		return dsl.fromResult(result);
 	}

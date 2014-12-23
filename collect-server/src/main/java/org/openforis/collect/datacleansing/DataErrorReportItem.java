@@ -1,9 +1,13 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.List;
+
 import org.openforis.collect.datacleansing.json.JSONValueParser;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.AbstractPersistedObject;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Value;
 
 /**
@@ -39,6 +43,7 @@ public class DataErrorReportItem extends AbstractPersistedObject {
 	}
 	
 	private DataErrorReport report;
+	private CollectRecord record;
 	private int recordId;
 	private int parentEntityId;
 	private int nodeIndex;
@@ -63,6 +68,25 @@ public class DataErrorReportItem extends AbstractPersistedObject {
 		return val;
 	}
 
+	public List<String> getRecordKeyValues() {
+		return record == null ? null: record.getRootEntityKeyValues();
+	}
+	
+	public String extractNodePath() {
+		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
+		String path = parentEntity.getPath();
+		path += "[" + nodeIndex + "]";
+		return path;
+	}
+	
+	public CollectRecord getRecord() {
+		return record;
+	}
+	
+	public void setRecord(CollectRecord record) {
+		this.record = record;
+	}
+	
 	public DataErrorReport getReport() {
 		return report;
 	}
