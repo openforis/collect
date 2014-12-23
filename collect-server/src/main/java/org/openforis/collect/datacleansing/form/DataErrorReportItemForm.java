@@ -8,7 +8,7 @@ import org.openforis.collect.datacleansing.DataErrorReportItem;
 import org.openforis.collect.datacleansing.DataErrorType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.commons.web.PersistedObjectForm;
-import org.openforis.idm.model.Value;
+import org.openforis.idm.model.AbstractValue;
 
 /**
  * 
@@ -36,8 +36,8 @@ public class DataErrorReportItemForm extends PersistedObjectForm<DataErrorReport
 		DataErrorQuery query = report.getQuery();
 		DataErrorType type = query.getType();
 		nodePath = obj.extractNodePath();
-		Value val = obj.extractAttributeValue();
-		attributeValue = val == null ? null : val.toString();
+		AbstractValue val = (AbstractValue) obj.extractAttributeValue();
+		attributeValue = val == null ? null : val.toPrettyFormatString();
 		if (record != null) {
 			List<String> keyValues = record.getRootEntityKeyValues();
 			for (int i = 0; i < keyValues.size() && i < 5; i++) {

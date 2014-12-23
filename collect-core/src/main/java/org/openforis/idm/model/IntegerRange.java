@@ -42,4 +42,9 @@ public final class IntegerRange extends NumericRange<Integer> {
 			}
 		}
 	}
+	
+	@Override
+	public String toPrettyFormatString() {
+		return String.format("%d - %d", getFrom(), getTo());
+	}
 }

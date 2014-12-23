@@ -37,6 +37,11 @@ public abstract class NumberValue<T extends Number> extends AbstractValue {
 	}
 
 	@Override
+	public String toPrettyFormatString() {
+		return getValue() == null ? null: getValue().toString();
+	}
+
+	@Override
 	@SuppressWarnings("serial")
 	protected Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{

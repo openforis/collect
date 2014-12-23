@@ -66,7 +66,7 @@ public final class Coordinate extends AbstractValue {
 			put(SRS_FIELD_NAME, srsId);
 		}};
 	}
-
+	
 	public boolean isComplete() {
 		return x != null && y != null && srsId != null;
 	}
@@ -81,6 +81,16 @@ public final class Coordinate extends AbstractValue {
 
 	public String getSrsId() {
 		return srsId;
+	}
+
+	@Override
+	public String toPrettyFormatString() {
+		return String.format(Locale.ENGLISH, TO_STRING_FORMAT, srsId, x, y);
+	}
+
+	@Override
+	public String toString() {
+		return toPrettyFormatString();
 	}
 
 	@Override
@@ -118,11 +128,6 @@ public final class Coordinate extends AbstractValue {
 		} else if (!y.equals(other.y))
 			return false;
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		return String.format(Locale.ENGLISH, TO_STRING_FORMAT, srsId, x, y);
 	}
 
 }

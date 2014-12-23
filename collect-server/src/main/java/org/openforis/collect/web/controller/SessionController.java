@@ -2,6 +2,8 @@ package org.openforis.collect.web.controller;
 
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
@@ -24,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @Controller
 @Scope(WebApplicationContext.SCOPE_SESSION)
+@RequestMapping(value = "/session")
 public class SessionController {
 	
 	@Autowired
@@ -39,22 +42,28 @@ public class SessionController {
 		return "ok";
 	}
 	
-	@RequestMapping(value = "/active_survey.json", method = RequestMethod.POST)
+	@RequestMapping(value = "/survey.json", method = RequestMethod.POST)
 	public @ResponseBody Response setActiveSurvey(@RequestParam int surveyId) {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		sessionManager.setActiveSurvey(survey);
 		return new Response();
 	}
 	
-	@RequestMapping(value = "/active_survey.json", method = RequestMethod.GET)
-	public @ResponseBody SurveyView getActiveSurvey() {
+	@RequestMapping(value = "/survey.json", method = RequestMethod.GET)
+	public @ResponseBody SurveyView getActiveSurvey(HttpServletResponse response) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		Locale locale = sessionManager.getSessionState().getLocale();
 		if (locale == null) {
 			locale = Locale.ENGLISH;
 		}
 		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
-		return survey == null ? null : viewGenerator.generateView(survey);
+		if (survey == null) {
+			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			return null;
+		} else {
+			SurveyView view = viewGenerator.generateView(survey);
+			return view;
+		}
 	}
 	
 }

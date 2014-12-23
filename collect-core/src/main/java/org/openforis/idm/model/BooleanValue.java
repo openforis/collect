@@ -51,9 +51,14 @@ public final class BooleanValue extends AbstractValue {
 	
 	@Override
 	public String toString() {
-		return value == null ? null: value.toString();
+		return toPrettyFormatString();
 	}
 
+	@Override
+	public String toPrettyFormatString() {
+		return value == null ? null: value.toString();
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

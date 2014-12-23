@@ -24,6 +24,7 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
@@ -40,6 +41,7 @@ import org.openforis.idm.model.NumberValue;
 import org.openforis.idm.model.RealRange;
 import org.openforis.idm.model.RealValue;
 import org.openforis.idm.model.TaxonOccurrence;
+import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.Value;
 
@@ -76,6 +78,8 @@ public class JSONValueParser implements ValueParser {
 			}
 		} else if (def instanceof TaxonAttributeDefinition) {
 			return parseTaxonOccurrence(value);
+		} else if (def instanceof TextAttributeDefinition) {
+			return parseText(value);
 		} else if (def instanceof TimeAttributeDefinition) {
 			return parseTime(value);
 		} else {
@@ -181,6 +185,11 @@ public class JSONValueParser implements ValueParser {
 				(String) map.get(LANGUAGE_CODE_FIELD_NAME), 
 				(String) map.get(LANGUAGE_VARIETY_FIELD_NAME)
 		);
+	}
+
+	private TextValue parseText(String value) {
+		Map<String, Object> map = parseJSONToMap(value);
+		return map == null ? null: new TextValue((String) map.get(TextValue.VALUE_FIELD));
 	}
 
 	public Time parseTime(String value) {

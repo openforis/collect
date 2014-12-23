@@ -17,8 +17,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class Date extends AbstractValue {
 
-	private static final Pattern INTERNAL_STRING_FORMAT = Pattern.compile("(\\d{4})(\\d{2})(\\d{2})");
-	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("(\\d{4})\\-(\\d{2})\\-(\\d{2})");
+	private static final Pattern INTERNAL_STRING_PATTERN = Pattern.compile("(\\d{4})(\\d{2})(\\d{2})");
+	private static final Pattern PRETTY_STRING_PATTERN = Pattern.compile("(\\d{4})\\-(\\d{2})\\-(\\d{2})");
+	private static final String PRETTY_FORMAT = "%02d/%02d/%04d";
 	
 	public static final String YEAR_FIELD = "year";
 	public static final String MONTH_FIELD = "month";
@@ -38,9 +39,9 @@ public final class Date extends AbstractValue {
 		if ( StringUtils.isBlank(string) ) {
 			return null;
 		}
-		Matcher matcher = PRETTY_STRING_FORMAT.matcher(string);
+		Matcher matcher = PRETTY_STRING_PATTERN.matcher(string);
 		if ( ! matcher.matches() ) {
-			matcher = INTERNAL_STRING_FORMAT.matcher(string);
+			matcher = INTERNAL_STRING_PATTERN.matcher(string);
 			if ( ! matcher.matches() ) {
 				throw new IllegalArgumentException("Invalid date " + string);
 			}
@@ -72,6 +73,11 @@ public final class Date extends AbstractValue {
 			put(MONTH_FIELD, month);
 			put(DAY_FIELD, day);
 		}};
+	}
+	
+	@Override
+	public String toPrettyFormatString() {
+		return String.format(PRETTY_FORMAT, day, month, year);
 	}
 	
 	public Integer getDay() {

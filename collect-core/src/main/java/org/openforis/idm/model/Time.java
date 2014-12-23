@@ -17,22 +17,25 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
  * @author M. Togna
  */
 public final class Time extends AbstractValue {
+
 	/**
 	 * Internal string format for Time value ("hhss")
 	 */
-	private static final Pattern INTERNAL_STRING_FORMAT = Pattern.compile("([01]|[0-9]|2[0-3])([0-5][0-9])");
+	private static final Pattern INTERNAL_STRING_PATTERN = Pattern.compile("([01]|[0-9]|2[0-3])([0-5][0-9])");
 	/**
 	 * Generic string format for Time value ("hh:mm" or "hh:mm:ss" . Please note that seconds will be ignored by the Time attribute)
 	 */
-	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("([01]|[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
+	private static final Pattern PRETTY_STRING_PATTERN = Pattern.compile("([01]|[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
 
+	private static final String PRETTY_FORMAT = "%02d:%02d";
+	
 	public static Time parseTime(String string) {
 		if ( StringUtils.isBlank(string) ) {
 			return null;
 		} else {
-			Matcher matcher = PRETTY_STRING_FORMAT.matcher(string);
+			Matcher matcher = PRETTY_STRING_PATTERN.matcher(string);
 			if ( ! matcher.matches() ) {
-				matcher = INTERNAL_STRING_FORMAT.matcher(string);
+				matcher = INTERNAL_STRING_PATTERN.matcher(string);
 				if ( ! matcher.matches() ) {
 					throw new IllegalArgumentException("Invalid date " + string);
 				}
@@ -113,6 +116,11 @@ public final class Time extends AbstractValue {
 		}
 	}
 
+	@Override
+	public String toPrettyFormatString() {
+		return String.format(PRETTY_FORMAT, hour, minute);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -36,4 +36,6 @@ public abstract class AbstractValue implements Value {
 		return toJSONString();
 	}
 	
+	public abstract String toPrettyFormatString();
+	
 }

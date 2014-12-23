@@ -6,7 +6,9 @@ import org.openforis.collect.datacleansing.json.JSONValueParser;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.AbstractPersistedObject;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Value;
 
@@ -73,9 +75,11 @@ public class DataErrorReportItem extends AbstractPersistedObject {
 	}
 	
 	public String extractNodePath() {
+		Survey survey = record.getSurvey();
+		DataErrorQuery query = report.getQuery();
+		NodeDefinition attrDefn = survey.getSchema().getDefinitionById(query.getAttributeDefinitionId());
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
-		String path = parentEntity.getPath();
-		path += "[" + nodeIndex + "]";
+		String path = String.format("%s/%s[%d]", parentEntity.getPath(), attrDefn.getName(), nodeIndex + 1);
 		return path;
 	}
 	

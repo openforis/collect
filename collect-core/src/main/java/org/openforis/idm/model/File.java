@@ -38,6 +38,11 @@ public final class File extends AbstractValue {
 	}
 	
 	@Override
+	public String toPrettyFormatString() {
+		return filename;
+	}
+	
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

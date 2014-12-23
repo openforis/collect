@@ -48,6 +48,11 @@ public final class Code extends AbstractValue {
 		}};
 	}
 	
+	@Override
+	public String toPrettyFormatString() {
+		return code == null ? null: code + (qualifier == null ? "": ": " + qualifier);
+	}
+	
 	public String getCode() {
 		return code;
 	}

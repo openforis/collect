@@ -46,4 +46,9 @@ public final class RealRange extends NumericRange<Double> {
 		}
 	}
 	
+	@Override
+	public String toPrettyFormatString() {
+		return String.format("%f - %f", getFrom(), getTo());
+	}
+	
 }

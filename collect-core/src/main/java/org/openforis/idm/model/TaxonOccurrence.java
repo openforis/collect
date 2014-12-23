@@ -3,7 +3,6 @@ package org.openforis.idm.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -107,17 +106,10 @@ public final class TaxonOccurrence extends AbstractValue {
 	}
 
 	@Override
-	public String toString() {
-		return new ToStringBuilder(this)
-			.append("taxonId", taxonId)
-			.append("code", code)
-			.append("scientificName", scientificName)
-			.append("vernacularName", vernacularName)
-			.append("languageCode", languageCode)
-			.append("languageVariety", languageVariety)
-			.toString();
+	public String toPrettyFormatString() {
+		return code;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

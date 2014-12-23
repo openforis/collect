@@ -55,7 +55,7 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 		{
 			var el = $this.content.find('.data-error-report-items-grid');
 			el.bootstrapTable({
-			    url: "/collect/datacleansing/dataerrorreport/" + $this.item.id + "/items.json",
+			    url: "/collect/datacleansing/dataerrorreports/" + $this.item.id + "/items.json",
 			    cache: false,
 			    clickToSelect: true,
 			    columns: [
@@ -64,7 +64,7 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 					{field: "key1", title: "Key1"},
 					{field: "key2", title: "Key2"},
 					{field: "key3", title: "Key3"},
-					{field: "attributePath", title: "Path"},
+					{field: "nodePath", title: "Path"},
 					{field: "attributeValue", title: "Value"}
 				]
 			});

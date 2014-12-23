@@ -1,16 +1,29 @@
 package org.openforis.idm.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 
  * @author G. Miceli
  *
  */
-public final class TextValue implements Value {
+public final class TextValue extends AbstractValue {
 
+	public static final String VALUE_FIELD = "value";
+	
 	private String value;
 	
 	public TextValue(String value) {
 		this.value = value;
+	}
+	
+	@Override
+	@SuppressWarnings("serial")
+	protected Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(VALUE_FIELD, value);
+		}};
 	}
 	
 	public String getValue() {
@@ -19,6 +32,11 @@ public final class TextValue implements Value {
 
 	@Override
 	public String toString() {
+		return toPrettyFormatString();
+	}
+	
+	@Override
+	public String toPrettyFormatString() {
 		return value;
 	}
 	
