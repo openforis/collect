@@ -22,6 +22,7 @@ import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker.Status;
 import org.openforis.concurrency.spring.SpringJobManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -99,6 +100,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	}
 	
 	@Component
+	@Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	private static class ReportGenerationJob extends Job {
 
 		@Autowired

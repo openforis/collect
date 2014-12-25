@@ -1,6 +1,6 @@
 Collect.DataErrorReportDialogController = function() {
 	Collect.AbstractItemEditDialogController.apply(this, arguments);
-	this.contentUrl = "/collect/datacleansing/data_error_report_dialog.html";
+	this.contentUrl = "datacleansing/data_error_report_dialog.html";
 	this.itemEditService = collect.dataErrorReportService;
 	this.queries = null;
 	this.querySelectPicker = null;
@@ -10,19 +10,26 @@ Collect.DataErrorReportDialogController = function() {
 Collect.DataErrorReportDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
 
 Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_DELETED = "dataErrorReportDeleted";
+Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_CREATED = "dataErrorReportCreated";
 
 Collect.DataErrorReportDialogController.prototype.initEventListeners = function() {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initEventListeners.call(this);
-	$this.content.find('.generate-btn').click(function() {
-		if ($this.validateForm()) {
-			var item = $this.extractJSONItem();
-			collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
-				new OF.UI.JobDialog("datacleansing/dataerrorreports/generate/job.json").open();
-				$this.close();
-			});
-		}
-	});
+	$this.content.find('.generate-btn').click(
+		$.proxy(Collect.AbstractItemEditDialogController.prototype.generateClickHandler, $this)
+	);
+};
+
+Collect.AbstractItemEditDialogController.prototype.generateClickHandler = function() {
+	var $this = this;
+	if ($this.validateForm()) {
+		var item = $this.extractJSONItem();
+		collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
+			new OF.JobMonitor("datacleansing/dataerrorreports/generate/job.json");
+			new OF.UI.JobDialog();
+			$this.close();
+		});
+	}
 };
 
 Collect.DataErrorReportDialogController.prototype.loadInstanceVariables = function(callback) {

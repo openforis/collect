@@ -1,6 +1,6 @@
 Collect.DataErrorReportService = function() {
 	Collect.AbstractService.apply(this, arguments);
-	this.contextPath = "/collect/datacleansing/dataerrorreports/";
+	this.contextPath = "datacleansing/dataerrorreports/";
 };
 
 Collect.DataErrorReportService.prototype = Object.create(Collect.AbstractService.prototype);

@@ -1,6 +1,6 @@
 Collect.DataErrorReportViewDialogController = function() {
 	Collect.AbstractItemEditDialogController.apply(this, arguments);
-	this.contentUrl = "/collect/datacleansing/data_error_report_view_dialog.html";
+	this.contentUrl = "datacleansing/data_error_report_view_dialog.html";
 	this.itemEditService = collect.dataErrorReportService;
 	this.queries = null;
 	this.querySelectPicker = null;
@@ -46,7 +46,7 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 		{
 			var el = $this.content.find('.data-error-report-items-grid');
 			el.bootstrapTable({
-			    url: "/collect/datacleansing/dataerrorreports/" + $this.item.id + "/items.json",
+			    url: "datacleansing/dataerrorreports/" + $this.item.id + "/items.json",
 			    cache: false,
 			    clickToSelect: true,
 			    columns: [

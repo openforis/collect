@@ -1,6 +1,6 @@
 Collect.SurveySelectDialogController = function() {
 	Collect.AbstractItemEditDialogController.apply(this, arguments);
-	this.contentUrl = "/collect/datacleansing/survey_select_dialog.html";
+	this.contentUrl = "datacleansing/survey_select_dialog.html";
 	this.surveySummaries = null;
 };
 

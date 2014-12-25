@@ -5,7 +5,6 @@ Collect = function() {
 Collect.SURVEY_CHANGED = "surveyChanged";
 
 Collect.prototype.init = function() {
-	var $this = this;
 	this.activeSurvey = null;
 	this.sessionService = new Collect.SessionService();
 	this.surveyService = new Collect.SurveyService();
@@ -26,7 +25,7 @@ Collect.prototype.checkActiveSurveySelected = function() {
 	var $this = this;
 	var openSurveySelectDialog = function() {
 		var surveySelectDialogController = new Collect.SurveySelectDialogController();
-		surveySelectDialogController.open();
+		surveySelectDialogController.open(null, true);
 	};
 	this.sessionService.getActiveSurvey(function(survey) {
 		if (survey == null) {
@@ -63,9 +62,17 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	EventBus.addEventListener(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_DELETED, function() {
 		$this.dataErrorQueryDataGrid.refresh();
 	});
+	EventBus.addEventListener(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_CREATED, function() {
+		$this.dataErrorReportDataGrid.refresh();
+	});
+	EventBus.addEventListener(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_DELETED, function() {
+		$this.dataErrorReportDataGrid.refresh();
+	});
 };
 
 Collect.prototype.initDataErrorReportsPanel = function() {
+	var $this = this;
+
 	$('#new-data-error-report-btn').click($.proxy(function() {
 		var dialogController = new Collect.DataErrorReportDialogController();
 		dialogController.open();
@@ -90,7 +97,6 @@ Collect.prototype.initDataErrorReportsPanel = function() {
 	}, this));
 	
 	function getSelectedItem() {
-		var $this = this;
 		var selections = $this.dataErrorReportDataGrid.getSelections();
 		return selections.length == 0 ? null : selections[0];
 	}
@@ -171,7 +177,7 @@ Collect.prototype.initDataErrorQueryPanel = function() {
 Collect.prototype.initDataErrorTypeGrid = function() {
 	var $this = this;
 	$('#dataerrortypegrid').bootstrapTable({
-	    url: "/collect/datacleansing/dataerrortypes/list.json",
+	    url: "datacleansing/dataerrortypes/list.json",
 	    cache: false,
 	    clickToSelect: true,
 	    columns: [
@@ -188,7 +194,7 @@ Collect.prototype.initDataErrorTypeGrid = function() {
 Collect.prototype.initDataErrorQueryGrid = function() {
 	var $this = this;
 	$('#dataerrorquerygrid').bootstrapTable({
-	    url: "/collect/datacleansing/dataerrorqueries/list.json",
+	    url: "datacleansing/dataerrorqueries/list.json",
 	    cache: false,
 	    clickToSelect: true,
 	    columns: [
@@ -206,7 +212,7 @@ Collect.prototype.initDataErrorReportGrid = function() {
 	var $this = this;
 	var el = $('#data-error-report-grid');
 	el.bootstrapTable({
-	    url: "/collect/datacleansing/dataerrorreports/list.json",
+	    url: "datacleansing/dataerrorreports/list.json",
 	    cache: false,
 	    clickToSelect: true,
 	    columns: [

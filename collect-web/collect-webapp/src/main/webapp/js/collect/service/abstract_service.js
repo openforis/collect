@@ -1,5 +1,5 @@
 Collect.AbstractService = function() {
-	this.contextPath = "/collect/";
+	this.contextPath = "./";
 };
 
 Collect.AbstractService.prototype.loadAll = function(onSuccess, onError) {

@@ -1,6 +1,6 @@
 Collect.DataErrorQueryDialogController = function() {
 	Collect.AbstractItemEditDialogController.apply(this, arguments);
-	this.contentUrl = "/collect/datacleansing/data_error_query_dialog.html";
+	this.contentUrl = "datacleansing/data_error_query_dialog.html";
 	this.itemEditService = collect.dataErrorQueryService;
 	this.errorTypes = null;
 	this.entityTree = null;

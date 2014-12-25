@@ -3,48 +3,53 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Open Foris Collect - Data Cleansing Toolkit</title>
-		<script type="text/javascript" src="/collect/js/eventbus.js" ></script>
-		<script type="text/javascript" src="/collect/js/jquery/jquery-2.1.1.js" ></script>
-		<script type="text/javascript" src="/collect/js/jquery/jquery-ui-1.11.2.js" ></script>
-		<script type="text/javascript" src="/collect/js/bootstrap/bootstrap.js" ></script>
-		<script type="text/javascript" src="/collect/js/bootstrap-select/bootstrap-select.min.js" ></script>
-		<script type="text/javascript" src="/collect/js/bootstrap-table/bootstrap-table.min.js" ></script>
-		<script type="text/javascript" src="/collect/js/jstree/jstree.js"></script>
 		
-		<script type="text/javascript" src="/collect/js/openforis/of.js" ></script>
-		<script type="text/javascript" src="/collect/js/openforis/of-arrays.js" ></script>
-		<script type="text/javascript" src="/collect/js/openforis/of-remote.js" ></script>
-		<script type="text/javascript" src="/collect/js/openforis/of-ui.js" ></script>
-		<script type="text/javascript" src="/collect/js/openforis/of-ui-forms.js" ></script>
-		<script type="text/javascript" src="/collect/js/openforis/of-ui-forms-validation.js" ></script>
-		<script type="text/javascript" src="/collect/js/openforis/of-ui-job-dialog.js" ></script>
+		<base href="../"></base>
 		
-		<script type="text/javascript" src="/collect/js/collect/collect.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/metamodel/survey.js" ></script>
+		<script type="text/javascript" src="js/eventbus.js" ></script>
+		<script type="text/javascript" src="js/jquery/jquery-2.1.1.js" ></script>
+		<script type="text/javascript" src="js/jquery/jquery-ui-1.11.2.js" ></script>
+		<script type="text/javascript" src="js/bootstrap/bootstrap.js" ></script>
+		<script type="text/javascript" src="js/bootstrap-select/bootstrap-select.min.js" ></script>
+		<script type="text/javascript" src="js/bootstrap-table/bootstrap-table.min.js" ></script>
+		<script type="text/javascript" src="js/jstree/jstree.js"></script>
 		
-		<script type="text/javascript" src="/collect/js/collect/service/abstract_service.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/service/session_service.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/service/survey_service.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/service/data_error_query_service.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/service/data_error_type_service.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/service/data_error_report_service.js" ></script>
+		<script type="text/javascript" src="script/sessionping.js" ></script>
+		<script type="text/javascript" src="js/openforis/of.js" ></script>
+		<script type="text/javascript" src="js/openforis/of-arrays.js" ></script>
+		<script type="text/javascript" src="js/openforis/of-remote.js" ></script>
+		<script type="text/javascript" src="js/openforis/of-job-monitor.js" ></script>
+		<script type="text/javascript" src="js/openforis/of-ui.js" ></script>
+		<script type="text/javascript" src="js/openforis/of-ui-forms.js" ></script>
+		<script type="text/javascript" src="js/openforis/of-ui-forms-validation.js" ></script>
+		<script type="text/javascript" src="js/openforis/of-ui-job-dialog.js" ></script>
 		
-		<script type="text/javascript" src="/collect/js/collect/abstract_item_edit_dialog.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/survey_select_dialog.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/datacleansing/data_error_type_dialog.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/datacleansing/data_error_query_dialog.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/datacleansing/data_error_report_dialog.js" ></script>
-		<script type="text/javascript" src="/collect/js/collect/datacleansing/data_error_report_view_dialog.js" ></script>
+		<script type="text/javascript" src="js/collect/collect.js" ></script>
+		<script type="text/javascript" src="js/collect/metamodel/survey.js" ></script>
 		
-		<link rel="stylesheet" href="/collect/css/bootstrap/bootstrap.min.css">
+		<script type="text/javascript" src="js/collect/service/abstract_service.js" ></script>
+		<script type="text/javascript" src="js/collect/service/session_service.js" ></script>
+		<script type="text/javascript" src="js/collect/service/survey_service.js" ></script>
+		<script type="text/javascript" src="js/collect/service/data_error_query_service.js" ></script>
+		<script type="text/javascript" src="js/collect/service/data_error_type_service.js" ></script>
+		<script type="text/javascript" src="js/collect/service/data_error_report_service.js" ></script>
+		
+		<script type="text/javascript" src="js/collect/abstract_item_edit_dialog.js" ></script>
+		<script type="text/javascript" src="js/collect/survey_select_dialog.js" ></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_error_type_dialog.js" ></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_dialog.js" ></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_dialog.js" ></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_view_dialog.js" ></script>
+		
+		<link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
 		<link rel="stylesheet" href="data:text/css;charset=utf-8," 
-			data-href="/collect/css/bootstrap/bootstrap-theme.min.css" id="bs-theme-stylesheet">
-		<link rel="stylesheet" href="/collect/css/bootstrap-select/bootstrap-select.min.css">
-		<link rel="stylesheet" href="/collect/css/bootstrap-table/bootstrap-table.min.css">
-		<link rel="stylesheet" href="/collect/css/jquery/jquery-ui.min.css">
-		<link rel="stylesheet" href="/collect/css/jstree/themes/default/style.min.css" />
+			data-href="css/bootstrap/bootstrap-theme.min.css" id="bs-theme-stylesheet">
+		<link rel="stylesheet" href="css/bootstrap-select/bootstrap-select.min.css">
+		<link rel="stylesheet" href="css/bootstrap-table/bootstrap-table.min.css">
+		<link rel="stylesheet" href="css/jquery/jquery-ui.min.css">
+		<link rel="stylesheet" href="css/jstree/themes/default/style.min.css" />
 		
-		<link rel="stylesheet" href="/collect/css/collect.css">
+		<link rel="stylesheet" href="css/collect.css">
 		
 	</head>
 	
@@ -79,7 +84,7 @@
 				<div id="homePanel" role="tabpanel" class="tab-pane active" >
 				<!-- Tabla-->
 				 ERROR REPORTS
-					<table data-url="tabla_data.json" data-toggle="table" data-height="350" data-sort-name="name" data-sort-order="desc">
+					<table data-url="datacleansing/tabla_data.json" data-toggle="table" data-height="350" data-sort-name="name" data-sort-order="desc">
 					    <thead>					    	
 					        <tr>					        	
 					            <th data-field="id" data-align="right" data-sortable="true">Item ID</th>

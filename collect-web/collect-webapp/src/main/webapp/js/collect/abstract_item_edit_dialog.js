@@ -5,6 +5,7 @@ Collect.AbstractItemEditDialogController = function() {
 	this.form = null;
 	this.itemEditService = null;
 	this.item = null;
+	this.doNotAllowCancel = false;
 };
 
 Collect.AbstractItemEditDialogController.prototype.init = function(callback) {
@@ -16,12 +17,25 @@ Collect.AbstractItemEditDialogController.prototype.init = function(callback) {
 	});
 };
 
-Collect.AbstractItemEditDialogController.prototype.open = function(item) {
+Collect.AbstractItemEditDialogController.prototype.open = function(item, doNotAllowCancel) {
 	var $this = this;
 	$this.item = item;
+	$this.doNotAllowCancel = doNotAllowCancel;
+	
+	if ($this.initialized) {
+		$this.doOpen();
+	} else {
+		$this.init(function() {
+			$this.doOpen();
+		});
+	}
+};
+
+Collect.AbstractItemEditDialogController.prototype.doOpen = function() {
+	var $this = this;
 	
 	function beforeOpen(callback) {
-		if (item) {
+		if ($this.item) {
 			$this.fillForm(function() {
 				callback.call($this);
 			});
@@ -29,20 +43,9 @@ Collect.AbstractItemEditDialogController.prototype.open = function(item) {
 			callback.call($this);
 		}
 	};
-	
-	function doOpen() {
-		beforeOpen(function() {
-			$this.content.modal('show');
-		});
-	};
-	
-	if ($this.initialized) {
-		doOpen();
-	} else {
-		$this.init(function() {
-			doOpen();
-		});
-	}
+	beforeOpen(function() {
+		$this.content.modal($this.doNotAllowCancel ? {backdrop: "static", keyboard: false} : 'show');
+	});
 };
 
 Collect.AbstractItemEditDialogController.prototype.close = function() {
@@ -57,6 +60,10 @@ Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables = funct
 Collect.AbstractItemEditDialogController.prototype.initContent = function(callback) {
 	var $this = this;
 	$this.loadContent(function() {
+		if ($this.doNotAllowCancel) {
+			$this.content.find(".close").hide();
+			$this.content.find(".cancel-btn").hide();
+		}
 		$this.initFormElements(function() {
 			$this.initEventListeners();
 			callback.call($this);

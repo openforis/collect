@@ -1,6 +1,6 @@
 Collect.DataErrorTypeService = function() {
 	Collect.AbstractService.apply(this, arguments);
-	this.contextPath = "/collect/datacleansing/dataerrortypes/";
+	this.contextPath = "datacleansing/dataerrortypes/";
 };
 
 Collect.DataErrorTypeService.prototype = Object.create(Collect.AbstractService.prototype);

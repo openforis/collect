@@ -1,6 +1,6 @@
 Collect.DataErrorTypeDialogController = function() {
 	Collect.AbstractItemEditDialogController.apply(this, arguments);
-	this.contentUrl = "/collect/datacleansing/data_error_type_dialog.html";
+	this.contentUrl = "datacleansing/data_error_type_dialog.html";
 	this.itemEditService = collect.dataErrorTypeService;
 };
 
