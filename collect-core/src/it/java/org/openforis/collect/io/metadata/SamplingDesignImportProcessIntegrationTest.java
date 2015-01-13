@@ -115,18 +115,14 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		SamplingDesignImportStatus status = process.getStatus();
 		assertTrue(status.isError());
 		List<ParsingError> errors = status.getErrors();
-		assertEquals(10, errors.size());
+		assertEquals(6, errors.size());
 		
 		assertTrue(containsError(errors, 3, SamplingDesignFileColumn.LEVEL_2, ErrorType.DUPLICATE_VALUE));
 		assertTrue(containsError(errors, 4, SamplingDesignFileColumn.LEVEL_2, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 11, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 13, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 14, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 17, SamplingDesignFileColumn.LEVEL_2, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 20, SamplingDesignFileColumn.LEVEL_1, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 21, SamplingDesignFileColumn.LOCATION_COLUMNS, ErrorType.DUPLICATE_VALUE));
-		assertTrue(containsError(errors, 25, SamplingDesignFileColumn.X, ErrorType.EMPTY));
-		assertTrue(containsError(errors, 26, SamplingDesignFileColumn.Y, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 14, SamplingDesignFileColumn.LEVEL_2, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 17, SamplingDesignFileColumn.LEVEL_1, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 22, SamplingDesignFileColumn.X, ErrorType.EMPTY));
+		assertTrue(containsError(errors, 23, SamplingDesignFileColumn.Y, ErrorType.EMPTY));
 	}
 
 	protected boolean containsError(List<ParsingError> errors, long row, SamplingDesignFileColumn column, ErrorType type) {

@@ -18,6 +18,7 @@ import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordPersistenceException;
@@ -137,6 +138,7 @@ public class DataRestoreTask extends Task {
 					addError(entryName, message);
 				} else {
 					//record parsed successfully
+					new RecordUpdater().initializeRecord(parsedRecord);
 					parsedRecord.setStep(step);
 					
 					if ( lastProcessedRecord == null ) {

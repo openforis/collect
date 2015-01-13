@@ -322,24 +322,20 @@ package org.openforis.collect.ui {
 
 		public static function getAttributeDataGroupHeaderHeight(defn:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
 			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
+			var result:Number;
 			if ( directionByColumns ) {
-				return NaN;
-			} else {
-				var result:Number;
-				if ( directionByColumns ) {
-					if ( defn is CoordinateAttributeDefinitionProxy ) {
-						result = 3 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 3 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
-					} else if ( defn is TaxonAttributeDefinitionProxy ) {
-						result = 5 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 4 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
-					} else {
-						result = ATTRIBUTE_INPUT_FIELD_HEIGHT;
-					}
+				if ( defn is CoordinateAttributeDefinitionProxy ) {
+					result = 3 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 3 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
+				} else if ( defn is TaxonAttributeDefinitionProxy ) {
+					result = 5 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 4 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
 				} else {
 					result = ATTRIBUTE_INPUT_FIELD_HEIGHT;
 				}
-				result += VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
-				return result;
+			} else {
+				result = NaN;
 			}
+			result += VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
+			return result;
 		}
 		
 		public static function getEnumeratedCodeHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {

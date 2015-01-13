@@ -8,6 +8,7 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.EntityAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
@@ -16,8 +17,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.UIUtil;
-	import flash.display.DisplayObject;
-	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 
 	/**
 	 * 

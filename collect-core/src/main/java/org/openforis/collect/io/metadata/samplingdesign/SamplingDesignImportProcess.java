@@ -173,9 +173,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	protected void checkDuplicateLine(SamplingDesignLine line) throws ParsingException {
 		for (SamplingDesignLine currentLine : lines) {
 			if ( currentLine.getLineNumber() != line.getLineNumber() ) {
-				if ( isDuplicateLocation(line, currentLine) ) {
-					throwDuplicateLineException(line, currentLine, SamplingDesignFileColumn.LOCATION_COLUMNS);
-				} else if ( line.getLevelCodes().equals(currentLine.getLevelCodes()) ) {
+				if ( line.getLevelCodes().equals(currentLine.getLevelCodes()) ) {
 					SamplingDesignFileColumn lastLevelCol = SamplingDesignFileColumn.LEVEL_COLUMNS[line.getLevelCodes().size() - 1];
 					throwDuplicateLineException(line, currentLine, new SamplingDesignFileColumn[]{lastLevelCol});
 				}
@@ -183,24 +181,6 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		}
 	}
 	
-	protected boolean isDuplicateLocation(SamplingDesignLine line1, SamplingDesignLine line2) throws ParsingException {
-		List<String> line1LevelCodes = line1.getLevelCodes();
-		List<String> line2LevelCodes = line2.getLevelCodes();
-		if ( line1.hasEqualLocation(line2) ) {
-			if ( line2LevelCodes.size() == line1LevelCodes.size()) {
-				return true;
-			} else {
-				int minLevelPosition = Math.min(line1LevelCodes.size(), line2LevelCodes.size());
-				List<String> firstLevelCodes1 = line1LevelCodes.subList(0, minLevelPosition);
-				List<String> firstLevelCodes2 = line2LevelCodes.subList(0, minLevelPosition);
-				if ( ! firstLevelCodes1.equals(firstLevelCodes2) ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	protected void throwDuplicateLineException(SamplingDesignLine line, SamplingDesignLine duplicateLine, 
 			SamplingDesignFileColumn[] columns) throws ParsingException {
 		String[] colNames = new String[columns.length];
