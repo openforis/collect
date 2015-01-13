@@ -81,7 +81,7 @@ public final class Time extends AbstractValue {
 
 	@Override
 	@SuppressWarnings("serial")
-	protected Map<String, Object> toMap() {
+	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(TimeAttributeDefinition.HOUR_FIELD, hour);
 			put(TimeAttributeDefinition.MINUTE_FIELD, minute);

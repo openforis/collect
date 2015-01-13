@@ -43,7 +43,7 @@ public abstract class NumberValue<T extends Number> extends AbstractValue {
 
 	@Override
 	@SuppressWarnings("serial")
-	protected Map<String, Object> toMap() {
+	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(VALUE_FIELD, value);
 			put(UNIT_ID_FIELD, unit == null ? null: unit.getId());

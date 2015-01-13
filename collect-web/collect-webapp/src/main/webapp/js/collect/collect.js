@@ -8,6 +8,7 @@ Collect.prototype.init = function() {
 	this.activeSurvey = null;
 	this.sessionService = new Collect.SessionService();
 	this.surveyService = new Collect.SurveyService();
+	this.dataQueryService = new Collect.DataQueryService();
 	this.dataErrorTypeService = new Collect.DataErrorTypeService();
 	this.dataErrorQueryService = new Collect.DataErrorQueryService();
 	this.dataErrorReportService = new Collect.DataErrorReportService();
@@ -48,6 +49,7 @@ Collect.prototype.initGlobalEventHandlers = function() {
 		$this.initDataErrorTypeGrid();
 		$this.initDataErrorQueryGrid();
 		$this.initDataErrorReportGrid();
+		$this.initDataQueryPanel();
 		$("#home-survey-selector-button").text($this.activeSurvey.name);
 	});
 	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED, function() {
@@ -67,6 +69,22 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	});
 	EventBus.addEventListener(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_DELETED, function() {
 		$this.dataErrorReportDataGrid.refresh();
+	});
+};
+
+Collect.prototype.initDataQueryPanel = function() {
+	var $this = this;
+	var container = $("#data-query-panel");
+	var form = container.find("form");
+	var formController = new Collect.DataQueryFormController(form);
+	formController.init(function() {
+		container.find(".query-btn").click($.proxy(function() {
+			var query = formController.extractJSONItem();
+			$this.dataQueryService.start(query, function() {
+				new OF.JobMonitor("datacleansing/dataquery/job.json");
+				new OF.UI.JobDialog();
+			});
+		}, $this));
 	});
 };
 

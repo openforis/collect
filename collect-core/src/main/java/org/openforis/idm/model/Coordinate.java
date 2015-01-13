@@ -59,7 +59,7 @@ public final class Coordinate extends AbstractValue {
 	
 	@Override
 	@SuppressWarnings("serial")
-	protected Map<String, Object> toMap() {
+	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(X_FIELD_NAME, x);
 			put(Y_FIELD_NAME, y);

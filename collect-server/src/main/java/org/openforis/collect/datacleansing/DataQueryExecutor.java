@@ -1,5 +1,6 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.openforis.collect.datacleansing.xpath.XPathDataQueryEvaluator;
@@ -24,6 +25,10 @@ public class DataQueryExecutor {
 	private RecordManager recordManager;
 	
 	public DataQueryResultIterator execute(DataQuery query, Step step) {
+		return execute(query, step, 0, Integer.MAX_VALUE);
+	}
+	
+	public DataQueryResultIterator execute(DataQuery query, Step step, int recordOffset, int maxRecords) {
 		CollectSurvey survey = query.getSurvey();
 		EntityDefinition entityDef = (EntityDefinition) survey.getSchema().getDefinitionById(query.getEntityDefinitionId());
 		EntityDefinition rootEntityDef = entityDef.getRootEntity();
@@ -33,9 +38,14 @@ public class DataQueryExecutor {
 		filter.setStep(step);
 		filter.setRootEntityId(rootEntityId);
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
+		List<CollectRecord> evaluatedSummaries;
+		if (summaries.isEmpty() || recordOffset >= summaries.size()) {
+			evaluatedSummaries = Collections.emptyList();
+		} else {
+			evaluatedSummaries = summaries.subList(recordOffset, Math.min(recordOffset + maxRecords, summaries.size()));
+		}
 		DataQueryEvaluator queryEvaluator = createQueryEvaluator(query);
-		
-		DataQueryResultIterator result = new DataQueryResultIterator(recordManager, summaries, queryEvaluator);
+		DataQueryResultIterator result = new DataQueryResultIterator(recordManager, evaluatedSummaries, queryEvaluator);
 		return result;
 	}
 

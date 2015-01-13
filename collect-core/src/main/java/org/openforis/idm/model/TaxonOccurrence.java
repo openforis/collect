@@ -67,7 +67,7 @@ public final class TaxonOccurrence extends AbstractValue {
 	
 	@Override
 	@SuppressWarnings("serial")
-	protected Map<String, Object> toMap() {
+	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(TaxonAttributeDefinition.CODE_FIELD_NAME, code);
 			put(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME, scientificName);

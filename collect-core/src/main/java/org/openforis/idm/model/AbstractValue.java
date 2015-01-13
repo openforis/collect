@@ -16,8 +16,10 @@ import org.json.simple.JSONObject;
  */
 public abstract class AbstractValue implements Value {
 
-	protected abstract Map<String, Object> toMap();
+	public abstract Map<String, Object> toMap();
 
+	public abstract String toPrettyFormatString();
+	
 	@SuppressWarnings("unchecked")
 	public String toJSONString() {
 		JSONObject jsonObj = new JSONObject();
@@ -35,7 +37,5 @@ public abstract class AbstractValue implements Value {
 	public String toString() {
 		return toJSONString();
 	}
-	
-	public abstract String toPrettyFormatString();
 	
 }

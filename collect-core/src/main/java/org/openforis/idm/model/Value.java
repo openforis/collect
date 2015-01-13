@@ -1,5 +1,7 @@
 package org.openforis.idm.model;
 
+import java.util.Map;
+
 /**
  * @author G. Miceli
  * @author M. Togna
@@ -7,4 +9,6 @@ package org.openforis.idm.model;
  */
 public interface Value {
 
+	Map<String, Object> toMap();
+	
 }

@@ -30,12 +30,14 @@
 		<script type="text/javascript" src="js/collect/service/abstract_service.js" ></script>
 		<script type="text/javascript" src="js/collect/service/session_service.js" ></script>
 		<script type="text/javascript" src="js/collect/service/survey_service.js" ></script>
+		<script type="text/javascript" src="js/collect/service/data_query_service.js" ></script>
 		<script type="text/javascript" src="js/collect/service/data_error_query_service.js" ></script>
 		<script type="text/javascript" src="js/collect/service/data_error_type_service.js" ></script>
 		<script type="text/javascript" src="js/collect/service/data_error_report_service.js" ></script>
 		
 		<script type="text/javascript" src="js/collect/abstract_item_edit_dialog.js" ></script>
 		<script type="text/javascript" src="js/collect/survey_select_dialog.js" ></script>
+		<script type="text/javascript" src="js/collect/datacleansing/query_form_controller.js" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_type_dialog.js" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_dialog.js" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_dialog.js" ></script>
@@ -55,12 +57,12 @@
 	
 	<body>
 		
-			<div class="home-survey-selector">
-				<label>Survey: </label>
-				<button id="home-survey-selector-button" type="button" class="btn btn-default"></button>
-			</div>
-		
-			<div role="tabpanel">
+		<div class="home-survey-selector">
+			<label>Survey: </label>
+			<button id="home-survey-selector-button" type="button" class="btn btn-default"></button>
+		</div>
+	
+		<div role="tabpanel">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active">
 					<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Home</a>
@@ -68,6 +70,10 @@
 				<li role="presentation">
 					<a href="#data-error-reports-panel" aria-controls="data-error-reports-panel" 
 						role="tab" data-toggle="tab">Data Error Reports</a>
+				</li>
+				<li role="presentation">
+					<a href="#data-query-panel" aria-controls="data-query-panel" 
+						role="tab" data-toggle="tab">Query the data</a>
 				</li>
 				<li role="presentation">
 					<a href="#dataErrorQueriesPanel" aria-controls="dataErrorQueriesPanel" 
@@ -102,6 +108,39 @@
 						<button id="new-data-error-report-btn" type="button" class="btn btn-default">New</button>
 						<button id="view-data-error-report-btn" type="button" class="btn btn-default">View</button>
 						<button id="delete-data-error-report-btn" type="button" class="btn btn-default">Delete</button>
+					</div>
+				</div>
+				<div id="data-query-panel" role="tabpanel" class="tab-pane" >
+					<div class="container-fluid">
+						<div class="row">
+							<div class="col-md-offset-3 col-md-6">
+								<form role="form">
+									<div class="form-group">
+								   		<label class="control-label">Entity</label>
+										<div class="entity-tree" style="height: 150px; overflow: auto;"></div>
+									</div>
+									<div class="form-group">
+								   		<label class="control-label">Attribute</label>
+										<div class="attribute-tree" style="height: 150px; overflow: auto;"></div>
+									</div>
+									<div class="form-group">
+								   		<label class="control-label">Conditions</label>
+										<textarea class="form-control" name="conditions" rows="5"></textarea>
+									</div>
+									<div class="form-group">
+							    		<label class="control-label">Record step</label>
+										<select class="form-control selectpicker" name="recordStep"></select>
+									</div>
+								</form>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-offset-5 col-md-1">
+								<div class="btn-group" role="group" aria-label="...">
+									<button type="button" class="btn btn-default query-btn">Query</button>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div id="dataErrorQueriesPanel" role="tabpanel" class="tab-pane" >

@@ -41,7 +41,7 @@ public abstract class NumericRange<T extends Number> extends AbstractValue {
 	
 	@Override
 	@SuppressWarnings("serial")
-	protected Map<String, Object> toMap() {
+	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(FROM_FIELD, from);
 			put(TO_FIELD, to);

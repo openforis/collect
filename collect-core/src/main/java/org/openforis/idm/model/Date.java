@@ -67,7 +67,7 @@ public final class Date extends AbstractValue {
 	
 	@Override
 	@SuppressWarnings("serial")
-	protected Map<String, Object> toMap() {
+	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(YEAR_FIELD, year);
 			put(MONTH_FIELD, month);

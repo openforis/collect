@@ -20,7 +20,7 @@ public final class TextValue extends AbstractValue {
 	
 	@Override
 	@SuppressWarnings("serial")
-	protected Map<String, Object> toMap() {
+	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(VALUE_FIELD, value);
 		}};

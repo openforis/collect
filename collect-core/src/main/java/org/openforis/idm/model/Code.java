@@ -41,7 +41,7 @@ public final class Code extends AbstractValue {
 	
 	@Override
 	@SuppressWarnings("serial")
-	protected Map<String, Object> toMap() {
+	public Map<String, Object> toMap() {
 		return new HashMap<String, Object>() {{
 			put(CODE_FIELD, code);
 			put(QUALIFIER_FIELD, qualifier);
