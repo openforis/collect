@@ -8,6 +8,8 @@ OF.JobMonitor = function(jobRetrievalUrl) {
 
 //Events
 OF.JobMonitor.JOB_PROGRESS = "jobProgress";
+//Events
+OF.JobMonitor.CANCEL_JOB = "cancelJob";
 //internal
 OF.JobMonitor._JOB_UPDATE_INTERVAL = 2000;
 
@@ -25,6 +27,8 @@ OF.JobMonitor.prototype.init = function() {
 		}, OF.JobMonitor._JOB_UPDATE_INTERVAL);
 	};
 	startTimer();
+	
+	EventBus.addEventListener(OF.JobMonitor.CANCEL_JOB, $.proxy($this.cancelJobHandler, $this));
 };
 
 OF.JobMonitor.prototype.loadJob = function(onSuccess) {
@@ -32,5 +36,12 @@ OF.JobMonitor.prototype.loadJob = function(onSuccess) {
 	$this.service.send($this.jobRetrievalUrl, null, "GET", function(job) {
 		$this.job = job;
 		onSuccess();
+	});
+};
+
+OF.JobMonitor.prototype.cancelJobHandler = function() {
+	var $this = this;
+	$this.service.send($this.jobRetrievalUrl, null, "DELETE", function() {
+		EventBus.removeEventListener(OF.JobMonitor.CANCEL_JOB, $this.cancelJobHandler);
 	});
 };

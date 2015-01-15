@@ -93,6 +93,18 @@ public class DataQueryController {
 		}
 	}
 	
+	@RequestMapping(value="job.json", method = RequestMethod.DELETE)
+	public @ResponseBody
+	JobView cancelCurrentGenearationJob(HttpServletResponse response) {
+		if (executorJob == null) {
+			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			return null;
+		} else {
+			executorJob.abort();
+			return new JobView(executorJob);
+		}
+	}
+	
 	@Component
 	@Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 	private static class QueryExecutorJob extends Job {

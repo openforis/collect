@@ -1,7 +1,10 @@
-OF.UI.JobDialog = function() {
+OF.UI.JobDialog = function(doNotAllowCancel) {
+	this.doNotAllowCancel = doNotAllowCancel;
 	this.job = null;
 	this.content = null;
 	this.progressBarEl = null;
+	this.okBtn = null;
+	this.cancelBtn = null;
 	this.init();
 };
 
@@ -18,14 +21,30 @@ OF.UI.JobDialog._CONTENT_TEMPLATE =
 				    '</div>' +
 			    '</div>' +
 			    '<div class="modal-footer">' + 
+			    	'<button type="button" class="btn btn-primary ok-btn">Ok</button>' +
+			    	'<button type="button" class="btn btn-default cancel-btn">Cancel</button>' +
 			    '</div>' +
 		    '</div>' +
 		'</div>' +
 	'</div>';
 
 OF.UI.JobDialog.prototype.init = function() {
+	var $this = this;
 	this.initContent();
-	this.content.modal("show");
+	if (this.doNotAllowCancel) {
+		this.cancelBtn.hide();
+	} else {
+		this.cancelBtn.click(function() {
+			EventBus.dispatch(OF.JobMonitor.CANCEL_JOB);
+			$this.content.modal('hide');
+			$this.content.remove();
+		});
+	}
+	this.okBtn.click(function() {
+		$this.content.modal('hide');
+		$this.content.remove();
+	});
+	this.content.modal({backdrop: "static", keyboard: false});
 	
 	EventBus.addEventListener(OF.JobMonitor.JOB_PROGRESS, function(event, job) {
 		this.updateUI(job);
@@ -37,6 +56,7 @@ OF.UI.JobDialog.prototype.updateUI = function(job) {
 
 	var styleName = null;
 	var percentWidth = null;
+	var running = false;
 	
 	switch(job.status) {
 	case "PENDING":
@@ -46,6 +66,7 @@ OF.UI.JobDialog.prototype.updateUI = function(job) {
 	case "RUNNING":
 		styleName = "progress-bar-info";
 		percentWidth = job.progressPercent;
+		running = true;
 		break;
 	case "COMPLETED":
 		styleName = "progress-bar-success";
@@ -60,13 +81,23 @@ OF.UI.JobDialog.prototype.updateUI = function(job) {
 		percentWidth = 100;
 		break;
 	}
+	if (running) {
+		this.okBtn.hide();
+		this.cancelBtn.show();
+	} else {
+		this.okBtn.show();
+		this.cancelBtn.hide();
+	}
 	$this.progressBarEl.css("width", percentWidth + "%");
 	$this.progressBarEl.removeClass("progress-bar-info progress-bar-striped");
 	$this.progressBarEl.addClass(styleName);
 };
 
 OF.UI.JobDialog.prototype.initContent = function() {
-	var $this = this;
-	$this.content = $(OF.UI.JobDialog._CONTENT_TEMPLATE);
-	$this.progressBarEl = $this.content.find(".progress-bar");
+	this.content = $(OF.UI.JobDialog._CONTENT_TEMPLATE);
+	this.progressBarEl = $this.content.find(".progress-bar");
+	this.cancelBtn = $this.content.find(".cancel-btn");
+	this.okBtn = $this.content.find(".ok-btn");
+	this.okBtn.hide();
+	this.cancelBtn.hide();
 };

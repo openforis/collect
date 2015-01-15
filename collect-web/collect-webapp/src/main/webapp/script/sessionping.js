@@ -6,7 +6,7 @@
 			timeout = null,
 			defaults = {
 				time: 60 * 1000, // time in milliseconds
-				address: "session/ping"
+				address: "session/ping.json"
 			},
 			settings;
 
