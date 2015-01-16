@@ -13,9 +13,12 @@ Collect.prototype.init = function() {
 	this.dataErrorQueryService = new Collect.DataErrorQueryService();
 	this.dataErrorReportService = new Collect.DataErrorReportService();
 	
+	this.dataQueryTestResultDataGrid = null;
+	
 	this.initDataErrorTypePanel();
 	this.initDataErrorQueryPanel();
 	this.initDataErrorReportsPanel();
+	this.initMapPanel();
 	
 	this.initGlobalEventHandlers();
 	
@@ -78,14 +81,45 @@ Collect.prototype.initDataQueryPanel = function() {
 	var form = container.find("form");
 	var formController = new Collect.DataQueryFormController(form);
 	formController.init(function() {
-		container.find(".query-btn").click($.proxy(function() {
+		container.find(".test-btn").click($.proxy(function() {
 			var query = formController.extractJSONItem();
-			$this.dataQueryService.start(query, function() {
-				new OF.JobMonitor("datacleansing/dataquery/job.json");
-				new OF.UI.JobDialog();
+			$this.dataQueryService.startTest(query, function() {
+				var jobDialog = new OF.UI.JobDialog();
+				new OF.JobMonitor("datacleansing/dataquery/test-job.json", function() {
+					jobDialog.close();
+					$this.dataQueryTestResultDataGrid.refresh();
+					$this.dataQueryTestResultDataGrid.$container.show();
+				});
+			});
+		}, $this));
+		container.find(".export-btn").click($.proxy(function() {
+			var query = formController.extractJSONItem();
+			$this.dataQueryService.startExport(query, function() {
+				var jobDialog = new OF.UI.JobDialog();
+				new OF.JobMonitor("datacleansing/dataquery/export-job.json", function() {
+					jobDialog.close();
+					$this.dataQueryService.downloadResult();
+				});
 			});
 		}, $this));
 	});
+	
+	var testResultGridContainer = container.find(".test-result-grid");
+	testResultGridContainer.bootstrapTable({
+	    url: "datacleansing/dataquery/test-result.json",
+	    cache: false,
+	    clickToSelect: true,
+	    height: 200,
+	    columns: [
+			{field: "key1", title: "Key1"},
+			{field: "key2", title: "Key2"},
+			{field: "key3", title: "Key3"},
+			{field: "nodePath", title: "Path"},
+			{field: "attributeValue", title: "Value"}
+		]
+	});
+	$this.dataQueryTestResultDataGrid = testResultGridContainer.data('bootstrap.table');
+	$this.dataQueryTestResultDataGrid.$container.hide();
 };
 
 Collect.prototype.initDataErrorReportsPanel = function() {
@@ -242,6 +276,17 @@ Collect.prototype.initDataErrorReportGrid = function() {
 		]
 	});
 	$this.dataErrorReportDataGrid = el.data('bootstrap.table');
+};
+
+Collect.prototype.initMapPanel = function() {
+	var container = $("#map-panel");
+	var mapCanvas = container.find(".map-canvas")[0];
+	var mapOptions = {
+		center : new google.maps.LatLng(44.5403, -78.5463),
+		zoom : 8,
+		mapTypeId : google.maps.MapTypeId.SATELLITE
+	}
+	var map = new google.maps.Map(mapCanvas, mapOptions);
 };
 
 Collect.prototype.setActiveSurvey = function(surveySummary) {

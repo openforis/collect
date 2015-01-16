@@ -5,6 +5,11 @@
 */
 @CHARSET "UTF-8";
 
+html, body {
+	height: 100%;
+	width: 100%;
+}
+
 .alert {
 	z-index: 1100;
 	position: fixed;

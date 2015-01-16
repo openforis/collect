@@ -41,8 +41,7 @@ OF.UI.JobDialog.prototype.init = function() {
 		});
 	}
 	this.okBtn.click(function() {
-		$this.content.modal('hide');
-		$this.content.remove();
+		$this.close();
 	});
 	this.content.modal({backdrop: "static", keyboard: false});
 	
@@ -95,9 +94,14 @@ OF.UI.JobDialog.prototype.updateUI = function(job) {
 
 OF.UI.JobDialog.prototype.initContent = function() {
 	this.content = $(OF.UI.JobDialog._CONTENT_TEMPLATE);
-	this.progressBarEl = $this.content.find(".progress-bar");
-	this.cancelBtn = $this.content.find(".cancel-btn");
-	this.okBtn = $this.content.find(".ok-btn");
+	this.progressBarEl = this.content.find(".progress-bar");
+	this.cancelBtn = this.content.find(".cancel-btn");
+	this.okBtn = this.content.find(".ok-btn");
 	this.okBtn.hide();
 	this.cancelBtn.hide();
+};
+
+OF.UI.JobDialog.prototype.close = function() {
+	this.content.modal('hide');
+	this.content.remove();
 };

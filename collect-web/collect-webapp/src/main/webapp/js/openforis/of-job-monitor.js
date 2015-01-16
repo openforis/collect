@@ -1,5 +1,7 @@
-OF.JobMonitor = function(jobRetrievalUrl) {
+OF.JobMonitor = function(jobRetrievalUrl, onComplete) {
 	this.jobRetrievalUrl = jobRetrievalUrl;
+	this.onComplete = onComplete;
+	
 	this.service = new Collect.AbstractService();
 	this.job = null;
 	this.timer = null;
@@ -20,9 +22,17 @@ OF.JobMonitor.prototype.init = function() {
 			$this.loadJob(function() {
 				var job = $this.job;
 				EventBus.dispatch(OF.JobMonitor.JOB_PROGRESS, $this, job);
-				if (job.status == "RUNNING") {
+				switch(job.status) {
+				case "RUNNING":
 					startTimer();
+					break;
+				case "COMPLETED":
+					if ($this.onComplete) {
+						$this.onComplete();
+					}
+					break;
 				}
+				
 			});
 		}, OF.JobMonitor._JOB_UPDATE_INTERVAL);
 	};

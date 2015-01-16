@@ -14,6 +14,8 @@
 		<script type="text/javascript" src="js/bootstrap-table/bootstrap-table.min.js" ></script>
 		<script type="text/javascript" src="js/jstree/jstree.js"></script>
 		
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
+		
 		<script type="text/javascript" src="script/sessionping.js" ></script>
 		<script type="text/javascript" src="js/openforis/of.js" ></script>
 		<script type="text/javascript" src="js/openforis/of-arrays.js" ></script>
@@ -62,7 +64,7 @@
 			<button id="home-survey-selector-button" type="button" class="btn btn-default"></button>
 		</div>
 	
-		<div role="tabpanel">
+		<div role="tabpanel" style="height: 100%; width: 100%">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active">
 					<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Home</a>
@@ -83,10 +85,14 @@
 					<a href="#dataErrorTypesPanel" aria-controls="dataErrorTypesPanel" 
 						role="tab" data-toggle="tab">Data Error Types</a>
 				</li>
+				<li role="presentation">
+					<a href="#map-panel" aria-controls="map-panel" 
+						role="tab" data-toggle="tab">Map</a>
+				</li>
 			</ul>
 			
 			<!-- Tab panes -->
-			<div class="tab-content">
+			<div class="tab-content" style="height: 100%; width: 100%">
 				<div id="homePanel" role="tabpanel" class="tab-pane active" >
 				<!-- Tabla-->
 				 ERROR REPORTS
@@ -135,10 +141,16 @@
 							</div>
 						</div>
 						<div class="row">
-							<div class="col-md-offset-5 col-md-1">
+							<div class="col-md-offset-5 col-md-2">
 								<div class="btn-group" role="group" aria-label="...">
-									<button type="button" class="btn btn-default query-btn">Query</button>
+									<button type="button" class="btn btn-default test-btn">Test</button>
+									<button type="button" class="btn btn-default export-btn">Export to CSV</button>
 								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-offset-2 col-md-8">
+								<div class="test-result-grid"></div>
 							</div>
 						</div>
 					</div>
@@ -160,6 +172,9 @@
 						<button id="editDataErrorTypeBtn" type="button" class="btn btn-default">Edit</button>
 						<button id="deleteDataErrorTypeBtn" type="button" class="btn btn-default">Delete</button>
 					</div>
+				</div>
+				<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">
+					<div class="map-canvas" style="height: 100%; width: 100%"></div>
 				</div>
 			</div>
 		</div>

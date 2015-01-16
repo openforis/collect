@@ -1,6 +1,7 @@
 package org.openforis.collect.datacleansing.controller;
 
 import java.io.BufferedInputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,6 +22,7 @@ import org.openforis.collect.datacleansing.DataQueryExecutor;
 import org.openforis.collect.datacleansing.DataQueryResultItem;
 import org.openforis.collect.datacleansing.DataQueryResultIterator;
 import org.openforis.collect.datacleansing.form.DataQueryForm;
+import org.openforis.collect.datacleansing.form.DataQueryResultItemForm;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
@@ -60,48 +62,99 @@ public class DataQueryController {
 	@Autowired
 	private SpringJobManager springJobManager;
 	
-	private QueryExecutorJob executorJob;
+	private CSVWriterDataQueryResultItemProcessor csvExportItemProcessor;
+	private QueryExecutorJob exportJob;
+	private QueryExecutorJob testJob;
 	
-	@RequestMapping(value="start.json", method = RequestMethod.POST)
+	@RequestMapping(value="start-export.json", method = RequestMethod.POST)
 	public @ResponseBody
-	Response startQuery(@Validated DataQueryForm form, @RequestParam Step recordStep) {
+	Response startExport(@Validated DataQueryForm form, @RequestParam Step recordStep) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataQuery query = new DataQuery(survey);
 		form.copyTo(query);
-		executorJob = springJobManager.createJob(QueryExecutorJob.class);
-		executorJob.setQuery(query);
-		executorJob.setRecordStep(recordStep);
-		springJobManager.start(executorJob);
+		csvExportItemProcessor = new CSVWriterDataQueryResultItemProcessor(query);
+		exportJob = springJobManager.createJob(QueryExecutorJob.class);
+		exportJob.setQuery(query);
+		exportJob.setRecordStep(recordStep);
+		exportJob.setResultItemProcessor(csvExportItemProcessor);
+		springJobManager.start(exportJob);
+		Response response = new Response();
+		return response;
+	}
+	
+	@RequestMapping(value="start-test.json", method = RequestMethod.POST)
+	public @ResponseBody
+	Response startTest(@Validated DataQueryForm form, @RequestParam Step recordStep) {
+		CollectSurvey survey = sessionManager.getActiveSurvey();
+		DataQuery query = new DataQuery(survey);
+		form.copyTo(query);
+		testJob = springJobManager.createJob(QueryExecutorJob.class);
+		testJob.setQuery(query);
+		testJob.setRecordStep(recordStep);
+		testJob.setResultItemProcessor(new MemoryStoreDataQueryResultItemProcessor());
+		springJobManager.start(testJob);
 		Response response = new Response();
 		return response;
 	}
 	
 	@RequestMapping(value="result.csv", method = RequestMethod.GET)
 	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
-		File file = executorJob.getOutputFile();
+		File file = csvExportItemProcessor.getOutputFile();
 		writeFileToResponse(file, "text/csv", response, "collect-query.csv");
 	}
 	
-	@RequestMapping(value="job.json", method = RequestMethod.GET)
-	public @ResponseBody
-	JobView getCurrentGenearationJob(HttpServletResponse response) {
-		if (executorJob == null) {
+	@RequestMapping(value = "test-result.json", method = RequestMethod.GET)
+	public @ResponseBody List<DataQueryResultItemForm> downloadTestResult(HttpServletResponse response)
+			throws FileNotFoundException, IOException {
+		if (testJob == null) {
 			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 			return null;
-		} else {
-			return new JobView(executorJob);
 		}
+		List<DataQueryResultItem> items = ((MemoryStoreDataQueryResultItemProcessor) testJob
+				.getResultItemProcessor()).getItems();
+		List<DataQueryResultItemForm> result = new ArrayList<DataQueryResultItemForm>(items.size());
+		for (DataQueryResultItem item : items) {
+			result.add(new DataQueryResultItemForm(item));
+		}
+		return result;
 	}
 	
-	@RequestMapping(value="job.json", method = RequestMethod.DELETE)
+	@RequestMapping(value="export-job.json", method = RequestMethod.GET)
 	public @ResponseBody
-	JobView cancelCurrentGenearationJob(HttpServletResponse response) {
-		if (executorJob == null) {
+	JobView getExportJob(HttpServletResponse response) {
+		return createJobView(response, exportJob);
+	}
+
+	@RequestMapping(value="export-job.json", method = RequestMethod.DELETE)
+	public @ResponseBody
+	JobView cancelExportJob(HttpServletResponse response) {
+		if (exportJob != null) {
+			exportJob.abort();
+		}
+		return createJobView(response, exportJob);
+	}
+	
+	@RequestMapping(value="test-job.json", method = RequestMethod.GET)
+	public @ResponseBody
+	JobView getTestJob(HttpServletResponse response) {
+		return createJobView(response, testJob);
+	}
+
+	@RequestMapping(value="test-job.json", method = RequestMethod.DELETE)
+	public @ResponseBody
+	JobView cancelTestJob(HttpServletResponse response) {
+		if (testJob != null) {
+			testJob.abort();
+		}
+		return createJobView(response, testJob);
+	}
+	
+	private JobView createJobView(HttpServletResponse response, Job job) {
+		if (job == null) {
 			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 			return null;
 		} else {
-			executorJob.abort();
-			return new JobView(executorJob);
+			return new JobView(job);
 		}
 	}
 	
@@ -112,28 +165,18 @@ public class DataQueryController {
 		@Autowired
 		private DataQueryExecutor queryExecutor;
 		
+		private DataQueryResultItemProcessor resultItemProcessor;
+		
 		//input
 		private DataQuery query;
 		private Step recordStep;
 		
-		//output
-		private File tempFile;
-		
 		@Override
 		protected void buildTasks() throws Throwable {
 			addTask(new Task() {
-				private CsvWriter csvWriter;
-
-				@Override
-				protected void initInternal() throws Throwable {
-					tempFile = File.createTempFile("collect-data-cleansing-query", ".csv");
-					csvWriter = new CsvWriter(new FileOutputStream(tempFile));
-					super.initInternal();
-				}
-				
 				protected void execute() throws Throwable {
 					try {
-						writeCSVHeader();
+						resultItemProcessor.init();
 						DataQueryResultIterator it = queryExecutor.execute(query, recordStep);
 						while(isRunning() && it.hasNext()) {
 							Node<?> node = it.next();
@@ -144,55 +187,24 @@ public class DataQueryController {
 							item.setNodeIndex(node.getIndex());
 							item.setParentEntityId(node.getParent().getInternalId());
 							item.setValue(new JSONValueFormatter().formatValue((Attribute<?, ?>) node));
-							writeCSVLine(item);
+							resultItemProcessor.process(item);
 						}
 					} finally {
-						csvWriter.close();
+						resultItemProcessor.close();
 					}
 				}
 
-				private void writeCSVLine(DataQueryResultItem item) {
-					List<String> lineValues = new ArrayList<String>();
-					lineValues.addAll(item.getRecordKeyValues());
-					lineValues.add(item.extractNodePath());
-					Value value = item.extractAttributeValue();
-					AttributeDefinition attrDef = item.getAttributeDefinition();
-					Map<String, Object> valueMap = value.toMap();
-					List<String> fieldNames = attrDef.getFieldNames();
-					for (String fieldName : fieldNames) {
-						Object fieldValue = valueMap.get(fieldName);
-						lineValues.add(fieldValue == null ? "": fieldValue.toString());
-					}
-					csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
-				}
-
-				private void writeCSVHeader() {
-					List<String> headers = new ArrayList<String>();
-					EntityDefinition rootEntity = query.getEntityDefinition().getRootEntity();
-					List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
-					for (AttributeDefinition def : keyAttributeDefinitions) {
-						String keyLabel = def.getLabel(Type.INSTANCE);
-						if (StringUtils.isBlank(keyLabel)) {
-							keyLabel = def.getName();
-						}
-						headers.add(keyLabel);
-					}
-					headers.add("Path");
-					AttributeDefinition attrDef = (AttributeDefinition) query.getSchema().getDefinitionById(query.getAttributeDefinitionId());
-					String attrName = attrDef.getName();
-					List<String> fieldNames = attrDef.getFieldNames();
-					if (fieldNames.size() > 1) {
-						for (String fieldName : fieldNames) {
-							headers.add(attrName + "_" + fieldName);
-						}
-					} else {
-						headers.add(attrName);
-					}
-					csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
-				}
 			});
 		}
 		
+		public DataQueryResultItemProcessor getResultItemProcessor() {
+			return resultItemProcessor;
+		}
+		
+		public void setResultItemProcessor(DataQueryResultItemProcessor resultItemProcessor) {
+			this.resultItemProcessor = resultItemProcessor;
+		}
+
 		public void setQuery(DataQuery query) {
 			this.query = query;
 		}
@@ -201,6 +213,101 @@ public class DataQueryController {
 			this.recordStep = recordStep;
 		}
 		
+	}
+	
+	private static interface DataQueryResultItemProcessor extends Closeable {
+		void init() throws Exception;
+		void process(DataQueryResultItem item) throws Exception;
+	}
+	
+	private static class MemoryStoreDataQueryResultItemProcessor implements DataQueryResultItemProcessor {
+		private List<DataQueryResultItem> items;
+		
+		@Override
+		public void close() throws IOException {
+		}
+		
+		@Override
+		public void init() throws Exception {
+			items = new ArrayList<DataQueryResultItem>();
+		}
+		
+		@Override
+		public void process(DataQueryResultItem item) throws Exception {
+			items.add(item);
+		}
+		
+		public List<DataQueryResultItem> getItems() {
+			return items;
+		}
+	}
+	
+	private static class CSVWriterDataQueryResultItemProcessor implements DataQueryResultItemProcessor {
+		
+		private CsvWriter csvWriter;
+		
+		private DataQuery query;
+		
+		//output
+		private File tempFile;
+		
+		public CSVWriterDataQueryResultItemProcessor(DataQuery query) {
+			this.query = query;
+		}
+		
+		@Override
+		public void init() throws Exception {
+			tempFile = File.createTempFile("collect-data-cleansing-query", ".csv");
+			csvWriter = new CsvWriter(new FileOutputStream(tempFile));
+			writeCSVHeader();
+		}
+		
+		private void writeCSVHeader() {
+			List<String> headers = new ArrayList<String>();
+			EntityDefinition rootEntity = query.getEntityDefinition().getRootEntity();
+			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
+			for (AttributeDefinition def : keyAttributeDefinitions) {
+				String keyLabel = def.getLabel(Type.INSTANCE);
+				if (StringUtils.isBlank(keyLabel)) {
+					keyLabel = def.getName();
+				}
+				headers.add(keyLabel);
+			}
+			headers.add("Path");
+			AttributeDefinition attrDef = (AttributeDefinition) query.getSchema().getDefinitionById(query.getAttributeDefinitionId());
+			String attrName = attrDef.getName();
+			List<String> fieldNames = attrDef.getFieldNames();
+			if (fieldNames.size() > 1) {
+				for (String fieldName : fieldNames) {
+					headers.add(attrName + "_" + fieldName);
+				}
+			} else {
+				headers.add(attrName);
+			}
+			csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
+		}
+
+		@Override
+		public void process(DataQueryResultItem item) {
+			List<String> lineValues = new ArrayList<String>();
+			lineValues.addAll(item.getRecordKeyValues());
+			lineValues.add(item.extractNodePath());
+			Value value = item.extractAttributeValue();
+			AttributeDefinition attrDef = item.getAttributeDefinition();
+			Map<String, Object> valueMap = value.toMap();
+			List<String> fieldNames = attrDef.getFieldNames();
+			for (String fieldName : fieldNames) {
+				Object fieldValue = valueMap.get(fieldName);
+				lineValues.add(fieldValue == null ? "": fieldValue.toString());
+			}
+			csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
+		}
+		
+		@Override
+		public void close() throws IOException {
+			csvWriter.close();
+		}
+
 		public File getOutputFile() {
 			return tempFile;
 		}
