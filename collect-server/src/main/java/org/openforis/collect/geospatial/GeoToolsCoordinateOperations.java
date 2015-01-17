@@ -204,6 +204,13 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 			TO_WGS84_TRANSFORMS.put(srsId, transform);
 		}
 	}
+	
+	@Override
+	public Coordinate convertToWgs84(Coordinate coordinate) {
+		Position position = toWgs84(coordinate.getX(), coordinate.getY(), coordinate.getSrsId());
+		DirectPosition directPosition = position.getDirectPosition();
+		return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), WGS84_ID);
+	}
 
 	private static Position toWgs84(double x, double y, String srsId) {
 		try {

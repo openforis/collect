@@ -18,7 +18,7 @@ Collect.prototype.init = function() {
 	this.initDataErrorTypePanel();
 	this.initDataErrorQueryPanel();
 	this.initDataErrorReportsPanel();
-	this.initMapPanel();
+	new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
 	
 	this.initGlobalEventHandlers();
 	
@@ -276,17 +276,6 @@ Collect.prototype.initDataErrorReportGrid = function() {
 		]
 	});
 	$this.dataErrorReportDataGrid = el.data('bootstrap.table');
-};
-
-Collect.prototype.initMapPanel = function() {
-	var container = $("#map-panel");
-	var mapCanvas = container.find(".map-canvas")[0];
-	var mapOptions = {
-		center : new google.maps.LatLng(44.5403, -78.5463),
-		zoom : 8,
-		mapTypeId : google.maps.MapTypeId.SATELLITE
-	}
-	var map = new google.maps.Map(mapCanvas, mapOptions);
 };
 
 Collect.prototype.setActiveSurvey = function(surveySummary) {
