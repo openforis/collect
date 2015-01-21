@@ -15,7 +15,7 @@ A specific usage or instance of the IDMM is called an inventory data model (IDM)
 
 Other features include versioning, which allow data models to evolve over time in a managed way.  New elements may be added and old ones deprecated, however operations which would compromise data integraty and comparability are inherently prohibited.  This also facilitates creation of easy-to-use tools for data and database management.  Custom expressions are represented in the W3C standard XPath language.  String patterns may also be specified using standard POSIX-like regular expressions.  
 
-© Copyright 2013 Food and Agriculture Organization of the United Nations
+© Copyright 2013 Open Foris
 
 G. Miceli, M. Togna, S. Ricci, A. Pekkarinen
 
