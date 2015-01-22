@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -65,8 +66,44 @@ public class GeoDataController {
 		return featureCollection;
 	}
 
+	@RequestMapping(value = "samplingpointbounds.json", method = RequestMethod.GET)
+	public @ResponseBody Bounds loadSamplingPointBounds() {
+		CollectSurvey survey = sessionManager.getActiveSurvey();
+		CollectSurveyContext surveyContext = survey.getContext();
+		CoordinateOperations coordinateOperations = surveyContext.getCoordinateOperations();
+
+		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId());
+		List<SamplingDesignItem> samplingDesignItems = samplingDesignSummaries.getRecords();
+		Bounds bounds = new Bounds();
+		for (SamplingDesignItem item : samplingDesignItems) {
+			Coordinate coordinate = new Coordinate(item.getX(), item.getY(), item.getSrsId());
+			LngLatAlt lngLatAlt = createLngLatAlt(coordinateOperations, coordinate);
+			if (lngLatAlt != null) {
+				if (bounds.topLeft == null) {
+					bounds.topLeft = bounds.topRight = bounds.bottomLeft = bounds.bottomRight = lngLatAlt;
+				} else {
+					if (lngLatAlt.getLatitude() < bounds.topLeft.getLatitude() && 
+						lngLatAlt.getLongitude() < bounds.topLeft.getLongitude()) {
+						bounds.topLeft = lngLatAlt;
+					} else if (lngLatAlt.getLatitude() < bounds.topRight.getLatitude() && 
+						lngLatAlt.getLongitude() > bounds.topRight.getLongitude()) {
+						bounds.topRight = lngLatAlt;
+					} else if (lngLatAlt.getLatitude() > bounds.bottomRight.getLatitude() && 
+						lngLatAlt.getLongitude() > bounds.bottomRight.getLongitude()) {
+						bounds.bottomRight = lngLatAlt;
+					} else if (lngLatAlt.getLatitude() > bounds.bottomLeft.getLatitude() && 
+						lngLatAlt.getLongitude() > bounds.bottomLeft.getLongitude()) {
+						bounds.bottomLeft = lngLatAlt;
+					}
+				}
+			}
+		}
+		return bounds;
+	}
+	
 	@RequestMapping(value = "coordinatevalues.json", method = RequestMethod.GET)
-	public @ResponseBody List<LngLatAlt> loadCoordinateValues(int recordOffset, int maxNumberOfRecords, int coordinateAttributeId) {
+	public @ResponseBody List<LngLatAlt> loadCoordinateValues(@RequestParam int recordOffset, @RequestParam int maxNumberOfRecords, 
+			@RequestParam int coordinateAttributeId) {
 		List<LngLatAlt> result = new ArrayList<LngLatAlt>();
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
@@ -76,20 +113,38 @@ public class GeoDataController {
 		filter.setOffset(recordOffset);
 		filter.setMaxNumberOfRecords(maxNumberOfRecords);
 		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
-		for (CollectRecord record : summaries) {
+		for (CollectRecord summary : summaries) {
+			CollectRecord record = recordManager.load(survey, summary.getId());
 			List<Node<?>> nodes = record.findNodesByPath(coordAttrDef.getPath());
 			for (Node<?> node : nodes) {
 				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
 				Coordinate coordinate = coordAttr.getValue();
-				result.add(createLngLatAlt(coordinateOperations, coordinate));
+				LngLatAlt lngLatAlt = createLngLatAlt(coordinateOperations, coordinate);
+				if (lngLatAlt != null) {
+					result.add(lngLatAlt);
+				}
 			}
 		}
 		return result;
 	}
 
 	private LngLatAlt createLngLatAlt(CoordinateOperations coordOpts, Coordinate coord) {
-		Coordinate wgs84Coord = coordOpts.convertToWgs84(coord);
-		LngLatAlt lngLatAlt = new LngLatAlt(wgs84Coord.getX(), wgs84Coord.getY());
-		return lngLatAlt;
+		try {
+			Coordinate wgs84Coord = coordOpts.convertToWgs84(coord);
+			LngLatAlt lngLatAlt = new LngLatAlt(wgs84Coord.getX(), wgs84Coord.getY());
+			return lngLatAlt;
+		} catch(Exception e) {
+			return null;
+		}
+	}
+	
+	private static class Bounds {
+		
+		private LngLatAlt topRight;
+		private LngLatAlt topLeft;
+		private LngLatAlt bottomRight;
+		private LngLatAlt bottomLeft;
+		
+		
 	}
 }
