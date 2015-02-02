@@ -21,20 +21,14 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 	
 	private static final String KML_COLUMN_SUFFIX = "kml";
 
-	private boolean includeKMLColumn;
 	private String kmlFormat;
 	
-	public CoordinateColumnProvider(CoordinateAttributeDefinition defn) {
-		this(defn, false);
-	}
-
-	public CoordinateColumnProvider(CoordinateAttributeDefinition defn, boolean includeKMLColumn) {
-		this(defn, includeKMLColumn, KML_POINT_FORMAT);
+	public CoordinateColumnProvider(CSVExportConfiguration config,CoordinateAttributeDefinition defn) {
+		this(config, defn, KML_POINT_FORMAT);
 	}
 	
-	public CoordinateColumnProvider(CoordinateAttributeDefinition defn, boolean includeKMLColumn, String kmlFormat) {
-		super(defn);
-		this.includeKMLColumn = includeKMLColumn;
+	public CoordinateColumnProvider(CSVExportConfiguration config,CoordinateAttributeDefinition defn, String kmlFormat) {
+		super(config, defn);
 		this.kmlFormat = kmlFormat;
 	}
 	
@@ -44,7 +38,7 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 		result.add(CoordinateAttributeDefinition.SRS_FIELD_NAME); 
 		result.add(CoordinateAttributeDefinition.X_FIELD_NAME);
 		result.add(CoordinateAttributeDefinition.Y_FIELD_NAME);
-		if ( includeKMLColumn ) {
+		if ( getConfig().isIncludeKMLColumnForCoordinates() ) {
 			result.add(KML_FIELD_NAME);
 		}
 		return result.toArray(new String[]{});
@@ -53,7 +47,7 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 	@Override
 	protected String getFieldHeading(String fieldName) {
 		if ( KML_FIELD_NAME.equals(fieldName) ) {
-			return "_" + getAttributeName() + FIELD_SEPARATOR + KML_COLUMN_SUFFIX;
+			return "_" + getAttributeName() + getConfig().getFieldHeadingSeparator() + KML_COLUMN_SUFFIX;
 		} else {
 			return super.getFieldHeading(fieldName);
 		}

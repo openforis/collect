@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodePathPointer;
 import org.openforis.idm.path.InvalidPathException;
@@ -36,6 +37,9 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	private PromptMap prompts;
 	private LanguageSpecificTextMap descriptions;
 	private String path;
+	private transient Integer fixedMaxCount;
+	private transient Integer fixedMinCount;
+	private transient boolean alwaysRequired;
 	
 	NodeDefinition(Survey survey, int id) {
 		super(survey, id);
@@ -422,20 +426,57 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 
 	public void setMinCountExpression(String expression) {
 		this.minCountExpression = expression;
+		updateMinCountRelativeFields();
 	}
 
 	public void setMaxCountExpression(String expression) {
 		this.maxCountExpression = expression;
+		updateMaxCountRelativeFields();
 	}
 	
 	public boolean isAlwaysRequired() {
-		return minCountExpression != null && "1".equals(minCountExpression);
+		return alwaysRequired;
 	}
 	
 	public void setAlwaysRequired() {
-		this.minCountExpression = "1";
+		setMinCountExpression("1");
 	}
 	
+	public Integer getFixedMinCount() {
+		return fixedMinCount;
+	}
+	
+	public Integer getFixedMaxCount() {
+		return fixedMaxCount;
+	}
+	
+	protected void updateMaxCountRelativeFields() {
+		if (StringUtils.isBlank(maxCountExpression)) {
+			fixedMaxCount = null;
+		} else {
+			fixedMaxCount = extractInteger(maxCountExpression);
+		}
+	}
+
+	protected void updateMinCountRelativeFields() {
+		if (StringUtils.isBlank(minCountExpression)) {
+			fixedMinCount = null;
+		} else if ("1".equals(minCountExpression)) {
+			alwaysRequired = true;
+		} else {
+			alwaysRequired = false;
+			fixedMinCount = extractInteger(minCountExpression);
+		}
+	}
+
+	private Integer extractInteger(String expression) {
+		try {
+			return Integer.parseInt(expression);
+		} catch(NumberFormatException e) {
+			return null;
+		}
+	}
+
 	@Override
 	public String toString() {
 		return name;

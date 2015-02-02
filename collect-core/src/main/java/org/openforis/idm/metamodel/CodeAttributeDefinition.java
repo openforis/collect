@@ -294,6 +294,11 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 	}
 	
 	@Override
+	public boolean hasMainField() {
+		return true;
+	}
+	
+	@Override
 	public String getMainFieldName() {
 		return CODE_FIELD;
 	}

@@ -89,6 +89,11 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 	}
 	
 	@Override
+	public boolean hasMainField() {
+		return false;
+	}
+	
+	@Override
 	public String getMainFieldName() {
 		throw new IllegalArgumentException("Main field not defined");
 	}

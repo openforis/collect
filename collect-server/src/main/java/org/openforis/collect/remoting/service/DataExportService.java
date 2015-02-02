@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.CSVDataExportProcess;
+import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 import org.openforis.collect.manager.RecordManager;
@@ -78,9 +79,11 @@ public class DataExportService {
 			process.setOutputFile(outputFile);
 			process.setRecordFilter(recordFilter);
 			process.setEntityId(entityId);
-			process.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
-			process.setIncludeEnumeratedEntities(includeEnumeratedEntities);
 			process.setAlwaysGenerateZipFile(true);
+			CSVExportConfiguration config = new CSVExportConfiguration();
+			config.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
+			config.setIncludeEnumeratedEntities(includeEnumeratedEntities);
+			process.setConfig(config);
 			
 			process.init();
 			
