@@ -362,6 +362,23 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private void setValuesInAttributes(Entity ancestorEntity, Map<FieldValueKey, String> fieldValues, 
 			Map<FieldValueKey, String> colNameByField, long row) {
 		Set<Entry<FieldValueKey,String>> entrySet = fieldValues.entrySet();
+		//delete all multiple attributes
+		for (Entry<FieldValueKey, String> entry : entrySet) {
+			FieldValueKey fieldValueKey = entry.getKey();
+			EntityDefinition ancestorDefn = ancestorEntity.getDefinition();
+			Schema schema = ancestorDefn.getSchema();
+			AttributeDefinition attrDefn = (AttributeDefinition) schema.getDefinitionById(fieldValueKey.getAttributeDefinitionId());
+			Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
+			if (attrDefn.isMultiple()) {
+				List<Node<?>> attributes = parentEntity.getAll(attrDefn);
+				int tot = attributes.size();
+				for (int i = 0; i < tot; i++) {
+					Node<?> node = attributes.get(0);
+					recordManager.deleteNode(node);
+				}
+			}
+		}
+		//set values
 		for (Entry<FieldValueKey, String> entry : entrySet) {
 			FieldValueKey fieldValueKey = entry.getKey();
 			String strValue = entry.getValue();
@@ -371,17 +388,9 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			String fieldName = fieldValueKey.getFieldName();
 			Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
 			String colName = colNameByField.get(fieldValueKey);
-			if ( attrDefn.isMultiple() ) {
-				if ( attrDefn instanceof CodeAttributeDefinition ) {
-					setValuesInMultipleCodeAttribute(parentEntity, (CodeAttributeDefinition) attrDefn, fieldName, strValue, colName, row);
-				} else {
-					setValuesInMultipleAttribute(parentEntity, attrDefn, fieldName,
-							strValue, colName, row);
-				}
-			} else {
-				setValueInField(parentEntity, attrDefn, 0, fieldName,
-						strValue, colName, row);
-			}
+			int attrPos = fieldValueKey.getAttributePosition();
+			setValueInField(parentEntity, attrDefn, attrPos - 1, fieldName,
+					strValue, colName, row);
 		}
 	}
 

@@ -29,11 +29,15 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 
 	public CompositeAttributeColumnProvider(CSVExportConfiguration config, T defn) {
 		super(config, defn);
+		init();
+	}
+
+	protected void init() {
 		this.fieldNames = getFieldNames();
 	}
 
 	@Override
-	public List<String> getColumnHeadings() {
+	public List<String> generateColumnHeadings() {
 		int maxAttrValues = getMaxAttributeValues();
 		int fieldsSize = isMergedValueSupported() ? 1: getFieldNames().length;
 		List<String> headings = new ArrayList<String>(fieldsSize * maxAttrValues);

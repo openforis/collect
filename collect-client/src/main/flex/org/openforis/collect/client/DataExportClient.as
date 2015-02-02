@@ -32,9 +32,10 @@ package org.openforis.collect.client {
 		
 		public function export(responder:IResponder, rootEntityName:String, stepNumber:int, entityId:Number = NaN, 
 							   includeAllAncestorAttributes:Boolean = false, includeEnumeratedEntities:Boolean = false, 
+							   codeAttributeExpanded:Boolean = false,
 							   onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null):void {
 			var token:AsyncToken = this._exportOperation.send(rootEntityName, stepNumber, entityId, includeAllAncestorAttributes, 
-					includeEnumeratedEntities, onlyOwnedRecords, rootEntityKeyValues);
+					includeEnumeratedEntities, codeAttributeExpanded, onlyOwnedRecords, rootEntityKeyValues);
 			token.addResponder(responder);
 		}
 		

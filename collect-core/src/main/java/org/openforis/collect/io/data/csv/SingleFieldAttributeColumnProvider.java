@@ -28,7 +28,8 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 		this.headerName = headerName;
 	}
 	
-	public List<String> getColumnHeadings() {
+	@Override
+	public List<String> generateColumnHeadings() {
 		if (attributeDefinition.isMultiple()) {
 			int maxAttrValues = getMaxAttributeValues();
 			List<String> headings = new ArrayList<String>(maxAttrValues);

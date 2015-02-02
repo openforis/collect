@@ -54,7 +54,7 @@ public class DataExportService {
 	
 	@Transactional
 	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes, 
-			boolean includeEnumeratedEntities, boolean onlyOwnedRecords, String[] rootEntityKeyValues) throws IOException {
+			boolean includeEnumeratedEntities, boolean codeAttributeExpanded, boolean onlyOwnedRecords, String[] rootEntityKeyValues) throws IOException {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			resetJobs();
 			
@@ -83,6 +83,7 @@ public class DataExportService {
 			CSVExportConfiguration config = new CSVExportConfiguration();
 			config.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
 			config.setIncludeEnumeratedEntities(includeEnumeratedEntities);
+			config.setCodeAttributeExpanded(codeAttributeExpanded);
 			process.setConfig(config);
 			
 			process.init();

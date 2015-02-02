@@ -202,6 +202,11 @@
 								selected="false" 
 								label="{Message.get('export.includeEnumeratedEntities')}" />
 				</s:HGroup>
+				<s:HGroup>
+					<s:CheckBox id="expandCodeAttributesCheckBox" 
+								selected="false" 
+								label="{Message.get('export.expandCodeAttributes')}" />
+				</s:HGroup>
 			</s:VGroup>
 
 		</s:VGroup>
