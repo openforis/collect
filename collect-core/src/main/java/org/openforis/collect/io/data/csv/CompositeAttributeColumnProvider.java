@@ -86,9 +86,11 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	}
 	
 	protected boolean isMergedValueSupported() {
-		return attributeDefinition instanceof CoordinateAttributeDefinition
+		return getConfig().isIncludeCompositeAttributeMergedColumn() && (
+				attributeDefinition instanceof CoordinateAttributeDefinition
 				|| attributeDefinition instanceof DateAttributeDefinition
-				|| attributeDefinition instanceof TimeAttributeDefinition;
+				|| attributeDefinition instanceof TimeAttributeDefinition
+				);
 	}
 	
 	protected String extractMergedValue(Attribute<?, ?> attr) {

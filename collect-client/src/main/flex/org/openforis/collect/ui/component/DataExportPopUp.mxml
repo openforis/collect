@@ -8,7 +8,7 @@
 				 xmlns:input="org.openforis.collect.ui.component.input.*"
 				 width="600" height="600" 
 				 title="{Message.get('export.popUp.title')}" 
-				 currentState="{STATE_LOADING}"
+				 currentState="{STATE_LOADING}" xmlns:layout="org.openforis.collect.ui.layout.*"
 				 >
 	
 	<fx:Script>
@@ -200,21 +200,25 @@
 					</mx:Repeater>
 				</mx:HBox>
 				
-				<s:HGroup visible="false" 
+				<s:VGroup visible="false" 
 						  visible.partialExportParametersSelection="true"
 						  includeInLayout="false" 
 						  includeInLayout.partialExportParametersSelection="true"
 						  gap="10">
 					<s:CheckBox id="includeAllAncestorAttributesCheckBox" 
 								selected="false" 
-								label="{Message.get('export.includeAllAncestorAttributes')}" />
+								label="{Message.get('export.includeAllAncestorAttributes')}*" />
 					<s:CheckBox id="includeEnumeratedEntitiesCheckBox" 
 								selected="false" 
-								label="{Message.get('export.includeEnumeratedEntities')}" />
+								label="{Message.get('export.includeEnumeratedEntities')}*" />
+					<s:CheckBox id="includeCompositeAttributeMergedColumnCheckBox" 
+								selected="false" 
+								label="{Message.get('export.includeCompositeAttributeMergedColumn')}*" />
 					<s:CheckBox id="expandCodeAttributesCheckBox" 
 								selected="false" 
-								label="{Message.get('export.expandCodeAttributes')}" />
-				</s:HGroup>
+								label="{Message.get('export.expandCodeAttributes')}*" />
+					<s:Label text="* = {Message.get('export.notCompatibleWithDataImport')}" />
+				</s:VGroup>
 			</container:CollapsiblePanel>
 
 		</s:VGroup>
