@@ -10,12 +10,17 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.presenter.PopUpPresenter;
+
 			
 			private var _presenter:PopUpPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				_presenter = new PopUpPresenter(this);
+				_presenter = createPresenter();
 				_presenter.init();
+			}
+			
+			protected function createPresenter():PopUpPresenter {
+				return new PopUpPresenter(this);
 			}
 			
 		]]>

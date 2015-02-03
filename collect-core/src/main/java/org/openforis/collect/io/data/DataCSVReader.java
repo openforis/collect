@@ -36,6 +36,7 @@ import org.openforis.idm.metamodel.Schema;
  */
 public class DataCSVReader extends CSVDataImportReader<DataLine> {
 
+	private static final Pattern MULTIPLE_ATTRIBUTE_COLUMN_NAME_PATTERN = Pattern.compile("^.*\\[(\\d+)\\]$");
 	private static final String ATTRIBUTE_FIELD_SEPARATOR = "_";
 	private static final String POSITION_COLUMN_FORMAT = "_%s_position";
 
@@ -108,8 +109,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	}
 	
 	private int extractAttributePosition(EntityDefinition parentEntityDefn, String colName) {
-		Pattern pattern = Pattern.compile("^.*\\[(\\d+)\\]$");
-		Matcher matcher = pattern.matcher(colName);
+		Matcher matcher = MULTIPLE_ATTRIBUTE_COLUMN_NAME_PATTERN.matcher(colName);
 		if (matcher.matches()) {
 			String posStr = matcher.group(1);
 			int pos = Integer.parseInt(posStr);
@@ -128,8 +128,13 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			if ( absoluteColName.equals(childName) ) {
 				if ( childDefn instanceof AttributeDefinition ) {
 					AttributeDefinition attrDefn = (AttributeDefinition) childDefn;
-					String mainFieldName = attrDefn.getMainFieldName();
-					return attrDefn.getFieldDefinition(mainFieldName);
+					if (attrDefn.hasMainField()) {
+						String mainFieldName = attrDefn.getMainFieldName();
+						return attrDefn.getFieldDefinition(mainFieldName);
+					} else {
+						//it is a composite attribute without a "main" field (date, time, coordinate, taxon)
+						return null;
+					}
 				} else {
 					//column name matches an entity name: error
 					return null;
@@ -302,8 +307,20 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
 				if ( fieldDefn == null ) {
 					//attribute definition not found
-					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName);
+					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, 
+							"csvDataImport.error.fieldDefinitionNotFound");
 					throw new ParsingException(error);
+				} else {
+					AttributeDefinition attrDefn = fieldDefn.getAttributeDefinition();
+					if (attrDefn.isMultiple()) {
+						Matcher matcher = MULTIPLE_ATTRIBUTE_COLUMN_NAME_PATTERN.matcher(colName);
+						if (! matcher.matches()) {
+							//node position not specified for a multiple attribute
+							ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, 
+									"csvDataImport.error.nodePositionNotSpecified");
+							throw new ParsingException(error);
+						}
+					}
 				}
 			}
 		}

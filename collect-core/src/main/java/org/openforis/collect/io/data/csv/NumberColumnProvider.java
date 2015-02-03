@@ -32,11 +32,11 @@ public class NumberColumnProvider extends CompositeAttributeColumnProvider<Numbe
 	}
 	
 	@Override
-	protected String getFieldHeading(String fieldName) {
+	protected String generateFieldHeading(String fieldName) {
 		if ( NumberAttributeDefinition.VALUE_FIELD.equals(fieldName) ) {
 			return attributeDefinition.getName();
 		} else {
-			return super.getFieldHeading(fieldName);
+			return super.generateFieldHeading(fieldName);
 		}
 	}
 	

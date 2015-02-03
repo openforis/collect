@@ -18,6 +18,7 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.CollectRecord$Step;
 			import org.openforis.collect.presenter.DataExportPopUpPresenter;
+			import org.openforis.collect.presenter.PopUpPresenter;
 			
 			public static const STATE_LOADING:String = "loading";
 			public static const STATE_TYPE_SELECTION:String = "typeSelection";
@@ -29,10 +30,8 @@
 			private var _presenter:DataExportPopUpPresenter;
 			private var _rootEntityKeyDefinitions:IList;
 			
-			override protected function initializationComplete():void {
-				super.initializationComplete();
-				_presenter = new DataExportPopUpPresenter(this);
-				_presenter.init();
+			override protected function createPresenter():PopUpPresenter {
+				return new DataExportPopUpPresenter(this);
 			}
 			
 			protected function stepLabelFunction(step:Object):String {
@@ -97,6 +96,7 @@
 			 width="100%" height="100%">
 		<component:LoadingContent />
 	</s:Group>
+	
 	<s:VGroup includeIn="typeSelection"
 			  itemCreationPolicy="immediate"
 			  horizontalAlign="center"
@@ -144,33 +144,6 @@
 								/>
 			</s:HGroup>
 			
-			<s:VGroup>
-				<s:CheckBox id="onlyOwnedRecordsCheckBox" 
-							selected="false" 
-							label="{Message.get('export.includeOnlyOwnedRecords')}" />
-				
-				
-				<s:CheckBox id="includeRecordFilesCheckBox"
-							label="{Message.get('export.includeRecordFiles')}"
-							visible="true" 
-							includeInLayout="true" 
-							visible.partialExportParametersSelection="false"
-							includeInLayout.partialExportParametersSelection="false"
-							/>
-			</s:VGroup>
-			
-			<mx:HBox verticalAlign="middle">
-				<s:Label text="{Message.get('export.recordKeys')}:" styleName="formLabel"/>
-				
-				<mx:Repeater id="rootEntityKeysRp" dataProvider="{rootEntityKeyDefinitions}">
-					<mx:HBox>
-						<detail:FormItemLabel nodeDefinition="{NodeDefinitionProxy(rootEntityKeysRp.currentItem)}" />
-						
-						<input:TextInput id="rootEntityKeyTextInput" width="80" />
-					</mx:HBox>
-				</mx:Repeater>
-			</mx:HBox>
-			
 			<s:VGroup visible="false" 
 					  visible.partialExportParametersSelection="true"
 					  includeInLayout="false" 
@@ -193,21 +166,56 @@
 				
 				<s:HGroup>
 					<s:CheckBox id="exportAllCheckBox" label="{Message.get('export.exportAll')}" />
+				</s:HGroup>
+			</s:VGroup>
+			
+			<container:CollapsiblePanel width="100%" collapsed="true" 
+										title="{Message.get('export.additionalOptions')}" 
+										creationPolicy="all">
+				<container:layout>
+					<s:VerticalLayout paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
+				</container:layout>
+				<s:VGroup>
+					<s:CheckBox id="onlyOwnedRecordsCheckBox" 
+								selected="false" 
+								label="{Message.get('export.includeOnlyOwnedRecords')}" />
 					
+					<s:CheckBox id="includeRecordFilesCheckBox"
+								label="{Message.get('export.includeRecordFiles')}"
+								visible="true" 
+								includeInLayout="true" 
+								visible.partialExportParametersSelection="false"
+								includeInLayout.partialExportParametersSelection="false" />
+				</s:VGroup>
+				
+				<mx:HBox verticalAlign="middle" creationPolicy="all">
+					<s:Label text="{Message.get('export.recordKeys')}:" styleName="formLabel"/>
+					
+					<mx:Repeater id="rootEntityKeysRp" dataProvider="{rootEntityKeyDefinitions}">
+						<mx:HBox>
+							<detail:FormItemLabel nodeDefinition="{NodeDefinitionProxy(rootEntityKeysRp.currentItem)}" />
+							
+							<input:TextInput id="rootEntityKeyTextInput" width="80" />
+						</mx:HBox>
+					</mx:Repeater>
+				</mx:HBox>
+				
+				<s:HGroup visible="false" 
+						  visible.partialExportParametersSelection="true"
+						  includeInLayout="false" 
+						  includeInLayout.partialExportParametersSelection="true"
+						  gap="10">
 					<s:CheckBox id="includeAllAncestorAttributesCheckBox" 
 								selected="false" 
 								label="{Message.get('export.includeAllAncestorAttributes')}" />
-					
 					<s:CheckBox id="includeEnumeratedEntitiesCheckBox" 
 								selected="false" 
 								label="{Message.get('export.includeEnumeratedEntities')}" />
-				</s:HGroup>
-				<s:HGroup>
 					<s:CheckBox id="expandCodeAttributesCheckBox" 
 								selected="false" 
 								label="{Message.get('export.expandCodeAttributes')}" />
 				</s:HGroup>
-			</s:VGroup>
+			</container:CollapsiblePanel>
 
 		</s:VGroup>
 		

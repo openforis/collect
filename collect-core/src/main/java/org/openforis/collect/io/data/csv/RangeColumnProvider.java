@@ -31,7 +31,7 @@ public class RangeColumnProvider extends CompositeAttributeColumnProvider<RangeA
 	}
 	
 	@Override
-	protected String getFieldHeading(String fieldName) {
-		return super.getFieldHeading(fieldName);
+	protected String generateFieldHeading(String fieldName) {
+		return super.generateFieldHeading(fieldName);
 	}
 }

@@ -8,11 +8,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.BooleanAttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
@@ -43,46 +40,54 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 		List<String> headings = new ArrayList<String>(fieldsSize * maxAttrValues);
 		if (attributeDefinition.isMultiple()) {
 			for (int attrIdx = 0; attrIdx < maxAttrValues; attrIdx++) {
-				headings.addAll(getAttributeHeadings(attrIdx));
+				headings.addAll(generateAttributeHeadings(attrIdx));
 			}
 		} else {
-			headings.addAll(getSingleAttributeHeadings());
+			headings.addAll(generateSingleAttributeHeadings());
 		}
 		return headings;
 	}
 
-	private List<String> getSingleAttributeHeadings() {
-		return getAttributeHeadings(0);
+	private List<String> generateSingleAttributeHeadings() {
+		return generateAttributeHeadings(0);
 	}
 	
-	private List<String> getAttributeHeadings(int attributeIdx) {
+	private List<String> generateAttributeHeadings(int attributeIdx) {
 		List<String> headings = new ArrayList<String>();
-		String attrPosSuffix = attributeDefinition.isMultiple() ? "[" + (attributeIdx + 1) + "]": "";
 		if (isMergedValueSupported()) {
-			headings.add(getMergedValueHeading() + attrPosSuffix);
+			headings.add(generateMergedValueHeading(attributeIdx));
 		}
+		headings.addAll(generateAttributeFieldHeadings(attributeIdx));
+		return headings;
+	}
+
+	protected String generateAttributePositionSuffix(int attributeIdx) {
+		return attributeDefinition.isMultiple() ? "[" + (attributeIdx + 1) + "]": "";
+	}
+
+	protected List<String> generateAttributeFieldHeadings(int attributeIdx) {
+		String attrPosSuffix = generateAttributePositionSuffix(attributeIdx);
+		List<String> headings = new ArrayList<String>();
 		for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
-			headings.add(getFieldHeading(fieldNames[fieldIdx]) + attrPosSuffix);
+			headings.add(generateFieldHeading(fieldNames[fieldIdx]) + attrPosSuffix);
 		}
 		return headings;
 	}
 
 	protected abstract String[] getFieldNames();
 	
-	protected String getMergedValueHeading() {
-		return attributeDefinition.getName();
+	protected String generateMergedValueHeading(int attributeIdx) {
+		String attrPosSuffix = generateAttributePositionSuffix(attributeIdx);
+		return attributeDefinition.getName() + attrPosSuffix;
 	}
 
-	protected String getFieldHeading(String fieldName) {
+	protected String generateFieldHeading(String fieldName) {
 		return attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + fieldName;
 	}
 	
 	protected boolean isMergedValueSupported() {
-		return attributeDefinition instanceof BooleanAttributeDefinition 
-				|| attributeDefinition instanceof CodeAttributeDefinition
-				|| attributeDefinition instanceof CoordinateAttributeDefinition
+		return attributeDefinition instanceof CoordinateAttributeDefinition
 				|| attributeDefinition instanceof DateAttributeDefinition
-				|| attributeDefinition instanceof TextAttributeDefinition
 				|| attributeDefinition instanceof TimeAttributeDefinition;
 	}
 	

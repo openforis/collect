@@ -335,14 +335,14 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function resetView():void {
+			stopProgressTimer();
 			_job = null;
 			view.currentState = DataExportPopUp.STATE_TYPE_SELECTION;
 			view.typeGroup.selection = null;
-			stopProgressTimer();
+			checkEnabledFields();
 		}
 		
 		protected function initView():void {
-			checkEnabledFields();
 			initEntitiesTree();
 			initStepsDropDown();
 			//try to see if there is an export still running
@@ -393,10 +393,12 @@ package org.openforis.collect.presenter {
 		
 		private function getInsertedKeyValues():Array {
 			var result:Array = new Array();
-			for (var idx:int = 0; idx < Application.activeRootEntity.keyAttributeDefinitions.length; idx++) {
-				var textInput:TextInput = TextInput(view.rootEntityKeyTextInput[idx]);
-				var value:String = org.openforis.collect.util.StringUtil.trimToNull(textInput.text);
-				result.push(value);
+			if (view.rootEntityKeyTextInput != null) {
+				for (var idx:int = 0; idx < Application.activeRootEntity.keyAttributeDefinitions.length; idx++) {
+					var textInput:TextInput = TextInput(view.rootEntityKeyTextInput[idx]);
+					var value:String = org.openforis.collect.util.StringUtil.trimToNull(textInput.text);
+					result.push(value);
+				}
 			}
 			return result;
 		}

@@ -41,10 +41,6 @@ import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
@@ -54,7 +50,6 @@ import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -89,9 +84,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private static final String RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY= "csvDataImport.error.recordNotInSelectedStep";
 	private static final String NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY = "csvDataImport.error.noRootEntitySelected";
 	private static final String NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY = "csvDataImport.error.noModelVersionFound";
-
-	private static final String MULTIPLE_ATTRIBUTE_VALUES_SEPARATOR = ",";
-
 
 	@Autowired
 	private RecordManager recordManager;
@@ -394,105 +386,21 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void setValuesInMultipleCodeAttribute(Entity parentEntity,
-			CodeAttributeDefinition attrDefn, String fieldName, String strValues,
-			String colName, long row) {
-		if ( fieldName.equals(CodeAttributeDefinition.QUALIFIER_FIELD) ) {
-			CodeAttribute codeAttr = getQualifiableCodeAttribute(parentEntity, attrDefn);
-			if ( codeAttr == null ) {
-				setValuesInMultipleAttribute(parentEntity, (AttributeDefinition) attrDefn, fieldName, strValues, colName, row);
-			} else {
-				codeAttr.getQualifierField().setValue(strValues);
-			}
-		} else {
-			setValuesInMultipleAttribute(parentEntity, (AttributeDefinition) attrDefn, fieldName, strValues, colName, row);
-		}
-	}
-	
-	@SuppressWarnings("rawtypes")
-	private CodeAttribute getQualifiableCodeAttribute(Entity parentEntity, CodeAttributeDefinition attrDefn) {
-		CodeListItem qualifiableItem = getQualifiableItem(attrDefn);
-		if ( qualifiableItem != null ) {
-			List attributes = parentEntity.getAll(attrDefn);
-			CodeAttribute codeAttr = findCodeAttributeByCode(qualifiableItem.getCode(), attributes);
-			if ( codeAttr != null ) {
-				return codeAttr;
-			}
-		}
-		return null;
-	}
-
-	private CodeAttribute findCodeAttributeByCode(String code, List<CodeAttribute> attributes) {
-		for (CodeAttribute codeAttr: attributes) {
-			if ( code.equals(codeAttr.getValue().getCode()) ) {
-				return codeAttr;
-			}
-		}
-		return null;
-	}
-
-	private CodeListItem getQualifiableItem(CodeAttributeDefinition attrDefn) {
-		CodeListService codeListService = attrDefn.getSurvey().getContext().getCodeListService();
-		CodeList list = attrDefn.getList();
-		if(codeListService.hasQualifiableItems(list) ) {
-			List<CodeListItem> items = codeListService.loadRootItems(list);
-			for (CodeListItem item : items) {
-				if ( item.isQualifiable() ) {
-					return item;
-				}
-			}
-		}
-		return null;
-	}
-	
-	private void setValuesInMultipleAttribute(Entity parentEntity,
-			AttributeDefinition attrDefn, String fieldName, String strValues,
-			String colName, long row) {
-		int newValuesCount;
-		if ( StringUtils.isBlank(strValues) ) {
-			newValuesCount = 0;
-		} else {
-			String[] splittedValues = strValues.split(MULTIPLE_ATTRIBUTE_VALUES_SEPARATOR);
-			newValuesCount = splittedValues.length;
-			for (int i = 0; i < newValuesCount; i++) {
-				String strVal = splittedValues[i].trim();
-				setValueInField(parentEntity, attrDefn, i, fieldName,
-						strVal, colName, row);
-			}
-		}
-		//remove old attributes
-		int totalCount = parentEntity.getCount(attrDefn);
-		if ( totalCount > newValuesCount ) {
-			for (int i = totalCount - 1; i >= newValuesCount; i--) {
-				Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrDefn, i);
-				boolean toBeDeleted = false;
-				if ( i == 0 ) {
-					//do not delete attribute if it's empty but it has remarks or field symbols
-					if ( ! attr.hasData() )  {
-						toBeDeleted = true;
-					}
-				} else {
-					toBeDeleted = true;
-				}
-				if ( toBeDeleted ) {
-					recordManager.deleteNode(attr);
-				}
-			}
-		}
-	}
-
 	private void setValueInField(Entity parentEntity,
 			AttributeDefinition attrDefn, int index, String fieldName,
 			String value, String colName, long row) {
 		String attrName = attrDefn.getName();
 		Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrDefn, index);
-		if ( attr == null ) {
+		boolean emptyValue = StringUtils.isEmpty(value);
+		if ( attr == null && ! emptyValue) {
 			attr = (Attribute<?, ?>) performNodeAdd(parentEntity, attrName);
 		}
-		try {
-			setValueInField(attr, fieldName, value, row, colName);
-		} catch ( Exception e) {
-			status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName));
+		if (attr != null) {
+			try {
+				setValueInField(attr, fieldName, value, row, colName);
+			} catch ( Exception e) {
+				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, row, colName));
+			}
 		}
 	}
 	

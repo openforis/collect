@@ -45,11 +45,11 @@ public class CoordinateColumnProvider extends CompositeAttributeColumnProvider<C
 	}
 
 	@Override
-	protected String getFieldHeading(String fieldName) {
+	protected String generateFieldHeading(String fieldName) {
 		if ( KML_FIELD_NAME.equals(fieldName) ) {
 			return "_" + getAttributeName() + getConfig().getFieldHeadingSeparator() + KML_COLUMN_SUFFIX;
 		} else {
-			return super.getFieldHeading(fieldName);
+			return super.generateFieldHeading(fieldName);
 		}
 	}
 	

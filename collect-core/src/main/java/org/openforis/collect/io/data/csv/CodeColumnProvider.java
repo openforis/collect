@@ -12,7 +12,10 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
 
 /**
  * @author M. Togna
@@ -24,7 +27,6 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	
 	private boolean hasExpandedItems = false;
 	private List<CodeListItem> expandedItems = null;
-	private List<String> expandedItemsFields = null;
 	
 	public CodeColumnProvider(CSVExportConfiguration config, CodeAttributeDefinition defn) {
 		super(config, defn);
@@ -40,7 +42,6 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 			List<CodeListItem> items = codeListService.loadItems(list, levelPosition);
 			hasExpandedItems = items.size() <= getConfig().getMaxExpandedCodeAttributeItems();
 			expandedItems = hasExpandedItems ? items: null;
-			expandedItemsFields = hasExpandedItems ? extractExpandedItemsFields(): null;
 		}
 		super.init();
 	}
@@ -59,21 +60,66 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 		if ( getConfig().isIncludeCodeItemPositionColumn() && ! list.isExternal() ) {
 			result.add(ITEM_POSITION_FIELD_NAME);
 		}
-		if (hasExpandedItems) {
-			for (CodeListItem item : expandedItems) {
-				result.add(item.getCode());
-			}
-		}
 		return result.toArray(new String[result.size()]);
 	}
 
 	@Override
-	protected String getFieldHeading(String fieldName) {
-		if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
+	public List<String> generateColumnHeadings() {
+		List<String> headings = super.generateColumnHeadings();
+		if (hasExpandedItems) {
+			headings.addAll(generateExpandedItemsHeadings());
+		}
+		return headings;
+	}
+
+	private List<String> generateExpandedItemsHeadings() {
+		List<String> headings = new ArrayList<String>();
+		for (CodeListItem item : expandedItems) {
+			String heading = attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + item.getCode();
+			headings.add(heading);
+			if (item.isQualifiable()) {
+				headings.add(heading + getConfig().getFieldHeadingSeparator() + CodeAttributeDefinition.QUALIFIER_FIELD);
+			}
+		}
+		return headings;
+	}
+	
+	@Override
+	protected String generateFieldHeading(String fieldName) {
+		if ( CodeAttributeDefinition.CODE_FIELD.equals(fieldName) ) {
+			return attributeDefinition.getName();
+		} else if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
 			return "_" + attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + ITEM_POSITION_SUFFIX;
 		} else {
-			return super.getFieldHeading(fieldName);
+			return super.generateFieldHeading(fieldName);
 		}
+	}
+	
+	@Override
+	public List<String> extractValues(Node<?> axis) {
+		List<String> values = super.extractValues(axis);
+		if (hasExpandedItems) {
+			List<Node<?>> attributes = ((Entity) axis).getAll(attributeDefinition);
+			for (CodeListItem item : expandedItems) {
+				CodeAttribute attr = findAttributeByCode(attributes, item.getCode());
+				values.add(Boolean.valueOf(attr != null).toString());
+				if (item.isQualifiable()) {
+					values.add(attr == null ? "": attr.getValue().getQualifier());
+				}
+			}
+		}
+		return values;
+	}
+
+	protected CodeAttribute findAttributeByCode(List<Node<?>> attributes, String code) {
+		for (Node<?> attr : attributes) {
+			CodeAttribute codeAttr = (CodeAttribute) attr;
+			Code val = codeAttr.getValue();
+			if (val != null && code.equals(val.getCode())) {
+				return codeAttr;
+			}
+		}
+		return null;
 	}
 	
 	@Override
@@ -88,9 +134,6 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 				int position = items.indexOf(item) + 1;
 				return Integer.toString(position);
 			}
-		} else if (hasExpandedItems && expandedItemsFields.contains(fieldName)) {
-			CodeListItem item = getCodeListService().loadItem((CodeAttribute) attr);
-			return Boolean.valueOf(item != null && fieldName.equals(item.getCode())).toString();
 		} else {
 			return super.extractValue(attr, fieldName);
 		}
@@ -107,12 +150,4 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 		return codeListService;
 	}
 	
-	private List<String> extractExpandedItemsFields() {
-		List<String> fields = new ArrayList<String>(expandedItems.size());
-		for (CodeListItem item : expandedItems) {
-			fields.add(item.getCode()); 
-		}
-		return fields;
-	}
-
 }
