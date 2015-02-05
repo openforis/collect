@@ -358,7 +358,7 @@ public class RecordUpdater {
 			Entity entity = nodePointer.getEntity();
 			NodeDefinition childDef = nodePointer.getChildDefinition();
 			Integer oldCount = entity.getMaxCount(childDef);
-			int newCount  = calculateMaxCount(nodePointer);
+			int newCount = calculateMaxCount(nodePointer);
 			entity.setMaxCount(childDef, newCount);
 			if ( ! ObjectUtils.equals(oldCount, newCount) ) {
 				updatedPointers.add(nodePointer);

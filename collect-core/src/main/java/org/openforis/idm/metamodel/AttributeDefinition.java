@@ -147,6 +147,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		}
 	}
 	
+	public abstract boolean hasMainField();
+	
 	public abstract String getMainFieldName();
 	
 	public abstract Class<? extends Value> getValueType();

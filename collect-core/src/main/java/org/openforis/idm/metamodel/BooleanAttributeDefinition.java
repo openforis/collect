@@ -55,6 +55,11 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
+	public boolean hasMainField() {
+		return true;
+	}
+	
+	@Override
 	public String getMainFieldName() {
 		return VALUE_FIELD;
 	}

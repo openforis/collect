@@ -11,8 +11,8 @@ import org.openforis.idm.metamodel.DateAttributeDefinition;
  */
 public class DateColumnProvider extends CompositeAttributeColumnProvider<DateAttributeDefinition> {
 	
-	public DateColumnProvider(DateAttributeDefinition defn) {
-		super(defn);
+	public DateColumnProvider(CSVExportConfiguration config, DateAttributeDefinition defn) {
+		super(config, defn);
 	}
 
 	@Override

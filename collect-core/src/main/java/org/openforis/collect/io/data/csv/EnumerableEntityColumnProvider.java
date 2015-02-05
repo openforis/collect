@@ -24,11 +24,11 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 	// TODO Check that list is not lookup
 	// TODO support hierarchical lists!
 	
-	public EnumerableEntityColumnProvider(EntityDefinition defn) {
-		super(defn.getName()+"_", createProviders(defn));
+	public EnumerableEntityColumnProvider(CSVExportConfiguration config, EntityDefinition defn) {
+		super(config, defn.getName()+"_", createProviders(config, defn));
 	}
 
-	private static List<ColumnProvider> createProviders(EntityDefinition defn) {
+	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition defn) {
 		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
 		List<AttributeDefinition> keyDefs = defn.getKeyAttributeDefinitions();
 		CodeAttributeDefinition keyDef = (CodeAttributeDefinition) keyDefs.get(0);
@@ -40,20 +40,20 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 		for (CodeListItem item : items) {
 			String code = item.getCode();
 			String keyName = keyDef.getName();
-			PerCodeColumnProvider p = new PerCodeColumnProvider(defn, keyName, code);
+			EnumeratedCodeItemColumnProvider p = new EnumeratedCodeItemColumnProvider(config, defn, keyName, code);
 			providers.add(p);
 		}
 		return providers;
 	}
 
-	private static class PerCodeColumnProvider extends AutomaticColumnProvider {
+	private static class EnumeratedCodeItemColumnProvider extends AutomaticColumnProvider {
 
 		private EntityDefinition entityDefinition;
 		private String keyName;
 		private String code;
 
-		public PerCodeColumnProvider(EntityDefinition defn, String keyName, String code) {
-			super(code + "_", defn);
+		public EnumeratedCodeItemColumnProvider(CSVExportConfiguration config, EntityDefinition defn, String keyName, String code) {
+			super(config, code + "_", defn);
 			this.entityDefinition = defn;
 			this.keyName = keyName;
 			this.code = code;

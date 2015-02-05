@@ -75,21 +75,32 @@ public class DataLine extends Line {
 	public static class FieldValueKey {
 		
 		private int attributeDefinitionId;
+		private int attributePosition;
 		private String fieldName;
 		
 		public FieldValueKey(AttributeDefinition defn) {
-			this(defn.getId(), defn.getMainFieldName());
+			this(defn.getId(), 1, defn.getMainFieldName());
 		}
 		
-		public FieldValueKey(int attributeDefinitionId,
+		public FieldValueKey(int attributeDefinitionId, 
 				String fieldName) {
+			this(attributeDefinitionId, 1, fieldName);
+		}
+		
+		public FieldValueKey(int attributeDefinitionId, 
+				int attributePosition, String fieldName) {
 			super();
 			this.attributeDefinitionId = attributeDefinitionId;
+			this.attributePosition = attributePosition;
 			this.fieldName = fieldName;
 		}
 
 		public int getAttributeDefinitionId() {
 			return attributeDefinitionId;
+		}
+		
+		public int getAttributePosition() {
+			return attributePosition;
 		}
 		
 		public String getFieldName() {
@@ -101,6 +112,7 @@ public class DataLine extends Line {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + attributeDefinitionId;
+			result = prime * result + attributePosition;
 			result = prime * result
 					+ ((fieldName == null) ? 0 : fieldName.hashCode());
 			return result;
@@ -117,6 +129,8 @@ public class DataLine extends Line {
 			FieldValueKey other = (FieldValueKey) obj;
 			if (attributeDefinitionId != other.attributeDefinitionId)
 				return false;
+			if (attributePosition != other.attributePosition)
+				return false;
 			if (fieldName == null) {
 				if (other.fieldName != null)
 					return false;
@@ -124,7 +138,7 @@ public class DataLine extends Line {
 				return false;
 			return true;
 		}
-
+		
 	}
 	
 	public static class EntityIdentifierDefinition {

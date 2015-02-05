@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.data.DataLine.EntityIdentifier;
@@ -34,6 +36,7 @@ import org.openforis.idm.metamodel.Schema;
  */
 public class DataCSVReader extends CSVDataImportReader<DataLine> {
 
+	private static final Pattern MULTIPLE_ATTRIBUTE_COLUMN_NAME_PATTERN = Pattern.compile("^.*\\[(\\d+)\\]$");
 	private static final String ATTRIBUTE_FIELD_SEPARATOR = "_";
 	private static final String POSITION_COLUMN_FORMAT = "_%s_position";
 
@@ -105,25 +108,43 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return result;
 	}
 	
+	private int extractAttributePosition(EntityDefinition parentEntityDefn, String colName) {
+		Matcher matcher = MULTIPLE_ATTRIBUTE_COLUMN_NAME_PATTERN.matcher(colName);
+		if (matcher.matches()) {
+			String posStr = matcher.group(1);
+			int pos = Integer.parseInt(posStr);
+			return pos;
+		} else {
+			return 1;
+		}
+	}
+	
 	private FieldDefinition<?> extractFieldDefinition(EntityDefinition parentEntityDefn, String colName) {
+		String absoluteColName = getAbsoluteColName(colName);
+		
 		List<NodeDefinition> childDefns = parentEntityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefns) {
 			String childName = childDefn.getName();
-			if ( colName.equals(childName) ) {
+			if ( absoluteColName.equals(childName) ) {
 				if ( childDefn instanceof AttributeDefinition ) {
 					AttributeDefinition attrDefn = (AttributeDefinition) childDefn;
-					String mainFieldName = attrDefn.getMainFieldName();
-					return attrDefn.getFieldDefinition(mainFieldName);
+					if (attrDefn.hasMainField()) {
+						String mainFieldName = attrDefn.getMainFieldName();
+						return attrDefn.getFieldDefinition(mainFieldName);
+					} else {
+						//it is a composite attribute without a "main" field (date, time, coordinate, taxon)
+						return null;
+					}
 				} else {
 					//column name matches an entity name: error
 					return null;
 				}
-			} else if ( colName.startsWith(childName + ATTRIBUTE_FIELD_SEPARATOR) ) {
+			} else if ( absoluteColName.startsWith(childName + ATTRIBUTE_FIELD_SEPARATOR) ) {
 				if ( childDefn instanceof EntityDefinition ) {
 					if ( childDefn.isMultiple() ) {
 						//ignore it
 					} else {
-						String colNamePart = colName.substring(childName.length() + ATTRIBUTE_FIELD_SEPARATOR.length());
+						String colNamePart = absoluteColName.substring(childName.length() + ATTRIBUTE_FIELD_SEPARATOR.length());
 						FieldDefinition<?> nestedFieldDefn = extractFieldDefinition((EntityDefinition) childDefn, colNamePart);
 						if ( nestedFieldDefn != null ) {
 							return nestedFieldDefn;
@@ -132,7 +153,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				} else {
 					List<FieldDefinition<?>> fieldDefns = ((AttributeDefinition) childDefn).getFieldDefinitions();
 					for (FieldDefinition<?> fieldDefn : fieldDefns) {
-						if ( colName.equals(childName + ATTRIBUTE_FIELD_SEPARATOR + fieldDefn.getName() ) ) {
+						if ( absoluteColName.equals(childName + ATTRIBUTE_FIELD_SEPARATOR + fieldDefn.getName() ) ) {
 							return fieldDefn;
 						}
 					}
@@ -140,6 +161,13 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Removes the relative attribute index at the end of the column name
+	 */
+	private String getAbsoluteColName(String colName) {
+		return colName.replaceAll("\\[\\d+\\]$", "");
 	}
 	
 	private List<EntityIdentifierDefinition> getAncestorIdentifiers() {
@@ -235,16 +263,17 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 			List<String> attrColNames = colNames.subList(expectedAncestorKeyColumnNames.size(), colNames.size());
 			for (String colName : attrColNames) {
 				String value = getColumnValue(colName, false, String.class);
-				FieldValueKey fieldValueKey = getFieldValueKey(colName);
+				FieldValueKey fieldValueKey = extractFieldValueKey(colName);
 				line.setFieldValue(fieldValueKey, value);
 				line.setColumnNameByField(fieldValueKey, colName);
 			}
 		}
 
-		protected FieldValueKey getFieldValueKey(String colName) {
+		protected FieldValueKey extractFieldValueKey(String colName) {
 			FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
 			AttributeDefinition attrDefn = (AttributeDefinition) fieldDefn.getParentDefinition();
-			FieldValueKey fieldValueKey = new DataLine.FieldValueKey(attrDefn.getId(), fieldDefn.getName());
+			int attrPos = extractAttributePosition(parentEntityDefinition, colName);
+			FieldValueKey fieldValueKey = new DataLine.FieldValueKey(attrDefn.getId(), attrPos, fieldDefn.getName());
 			return fieldValueKey;
 		}
 
@@ -278,8 +307,20 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 				FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
 				if ( fieldDefn == null ) {
 					//attribute definition not found
-					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName);
+					ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, 
+							"csvDataImport.error.fieldDefinitionNotFound");
 					throw new ParsingException(error);
+				} else {
+					AttributeDefinition attrDefn = fieldDefn.getAttributeDefinition();
+					if (attrDefn.isMultiple()) {
+						Matcher matcher = MULTIPLE_ATTRIBUTE_COLUMN_NAME_PATTERN.matcher(colName);
+						if (! matcher.matches()) {
+							//node position not specified for a multiple attribute
+							ParsingError error = new ParsingError(ErrorType.WRONG_COLUMN_NAME, 1, colName, 
+									"csvDataImport.error.nodePositionNotSpecified");
+							throw new ParsingException(error);
+						}
+					}
 				}
 			}
 		}

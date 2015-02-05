@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -25,32 +23,26 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
  */
 public class AutomaticColumnProvider extends ColumnProviderChain {
 	
-	private static final Log LOG = LogFactory.getLog(AutomaticColumnProvider.class);
-	private static final String MULTIPLE_ATTRIBUTE_VALUES_DELIMITER = ", ";
+//	private static final Log LOG = LogFactory.getLog(AutomaticColumnProvider.class);
+//	private static final String MULTIPLE_ATTRIBUTE_VALUES_DELIMITER = ", ";
 	
-	public AutomaticColumnProvider(EntityDefinition entityDefinition) {
-		this(entityDefinition, null);
+	public AutomaticColumnProvider(CSVExportConfiguration config, EntityDefinition entityDefinition) {
+		this(config, entityDefinition, null);
 	}
 	
-	public AutomaticColumnProvider(EntityDefinition entityDefinition, List<String> exclusions) {
-		this("", entityDefinition, exclusions);
+	public AutomaticColumnProvider(CSVExportConfiguration config, EntityDefinition entityDefinition, List<String> exclusions) {
+		this(config, "", entityDefinition, exclusions);
 	}
 
-	public AutomaticColumnProvider(String headingPrefix, EntityDefinition entityDefinition) {
-		this(headingPrefix, entityDefinition, null);
+	public AutomaticColumnProvider(CSVExportConfiguration config, String headingPrefix, EntityDefinition entityDefinition) {
+		this(config, headingPrefix, entityDefinition, null);
 	}
 	
-	public AutomaticColumnProvider(String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
-		this(headingPrefix, entityDefinition, exclusions, false, false, true);
+	public AutomaticColumnProvider(CSVExportConfiguration config, String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions) {
+		super(config, headingPrefix, createProviders(config, entityDefinition, exclusions));
 	}
 	
-	public AutomaticColumnProvider(String headingPrefix, EntityDefinition entityDefinition, List<String> exclusions, 
-			boolean includeCodeItemPositionColumn, boolean includeKMLColumnForCoordinates, boolean includeEnumeratedEntities) {
-		super(headingPrefix, createProviders( entityDefinition, exclusions, includeCodeItemPositionColumn, includeKMLColumnForCoordinates, includeEnumeratedEntities));
-	}
-	
-	private static List<ColumnProvider> createProviders(EntityDefinition rowDefn, List<String> exclusions,
-			boolean includeItemPositionColumn, boolean includeKMLColumnForCoordinates, boolean includeEnumeratedEntities) {
+	private static List<ColumnProvider> createProviders(CSVExportConfiguration config, EntityDefinition rowDefn, List<String> exclusions) {
 		List<ColumnProvider> cols = new ArrayList<ColumnProvider>();
 		CollectSurvey survey = (CollectSurvey) rowDefn.getSurvey();
 		CollectAnnotations surveyAnnotations = survey.getAnnotations();
@@ -58,9 +50,9 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		for (NodeDefinition childDefn : childDefinitions) {
 			if (includeChild(exclusions, childDefn)) {
 				if (childDefn instanceof EntityDefinition) {
-					createEntityProviders((EntityDefinition) childDefn, cols, includeEnumeratedEntities);
+					createEntityProviders(config, (EntityDefinition) childDefn, cols);
 				} else if (childDefn instanceof AttributeDefinition && surveyAnnotations.isIncludedInDataExport(childDefn) ) {
-					createAttributeProviders((AttributeDefinition) childDefn, cols, includeKMLColumnForCoordinates, includeItemPositionColumn);
+					createAttributeProviders(config, (AttributeDefinition) childDefn, cols);
 				}
 			}
 		}
@@ -71,50 +63,45 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 		return exclusions == null || !exclusions.contains(childDefn.getName());
 	}
 	
-	private static void createEntityProviders(EntityDefinition defn, List<ColumnProvider> cols, boolean includeEnumeratedEntities) {
+	private static void createEntityProviders(CSVExportConfiguration config, EntityDefinition defn, List<ColumnProvider> cols) {
 		String name = defn.getName();
 		if ( defn.isMultiple() ) {
-			if ( defn.isEnumerable() && includeEnumeratedEntities ) {
-				LOG.info("Flatting enumerable multiple entity "+defn.getPath());
-				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(defn);
+			if ( defn.isEnumerable() && config.isIncludeEnumeratedEntities() ) {
+				EnumerableEntityColumnProvider p = new EnumerableEntityColumnProvider(config, defn);
 				cols.add(p);
-			} else {
-				LOG.info("Skipping multiple entity "+defn.getPath());
 			}
 		} else {
-			LOG.info("Flatting single entity "+defn.getPath());
-			ColumnProvider p = new AutomaticColumnProvider(defn);
+			ColumnProvider p = new AutomaticColumnProvider(config, defn);
 			List<ColumnProvider> childCols = Arrays.asList(p);
 			String pivotExpression = name;
 			String headingPrefix = name + "_";
-			PivotExpressionColumnProvider col = new PivotExpressionColumnProvider(pivotExpression, headingPrefix, childCols);
+			PivotExpressionColumnProvider col = new PivotExpressionColumnProvider(config, pivotExpression, headingPrefix, childCols);
 			cols.add(col);
 		}
 	}
 
-	private static void createAttributeProviders(AttributeDefinition defn, List<ColumnProvider> cols, 
-			boolean includeKMLColumnForCoordinates, boolean includeItemPositionColumn) {
+	private static void createAttributeProviders(CSVExportConfiguration config, AttributeDefinition defn, List<ColumnProvider> cols) {
 		String name = defn.getName();
 		ColumnProvider columnProvider;
-		if ( defn.isMultiple() && ! (defn instanceof CodeAttributeDefinition) ) {
-			LOG.info("Flatting multiple attribute "+defn.getPath());
-			columnProvider = new MultipleAttributeColumnProvider(defn, MULTIPLE_ATTRIBUTE_VALUES_DELIMITER, name);
-		} else if ( defn instanceof CodeAttributeDefinition ) {
-			columnProvider = new CodeColumnProvider((CodeAttributeDefinition) defn, includeItemPositionColumn);
+//		if ( defn.isMultiple() && ! (defn instanceof CodeAttributeDefinition) ) {
+//			columnProvider = new MultipleAttributeColumnProvider(defn, MULTIPLE_ATTRIBUTE_VALUES_DELIMITER, name);
+//		} else 
+		if ( defn instanceof CodeAttributeDefinition ) {
+			columnProvider = new CodeColumnProvider(config, (CodeAttributeDefinition) defn);
 		} else if(defn instanceof CoordinateAttributeDefinition){
-			columnProvider = new CoordinateColumnProvider((CoordinateAttributeDefinition) defn, includeKMLColumnForCoordinates);
+			columnProvider = new CoordinateColumnProvider(config, (CoordinateAttributeDefinition) defn);
 		} else if(defn instanceof DateAttributeDefinition) {
-			columnProvider = new DateColumnProvider((DateAttributeDefinition) defn);
+			columnProvider = new DateColumnProvider(config, (DateAttributeDefinition) defn);
 		} else if(defn instanceof NumberAttributeDefinition){
-			columnProvider = new NumberColumnProvider((NumberAttributeDefinition) defn);
+			columnProvider = new NumberColumnProvider(config, (NumberAttributeDefinition) defn);
 		} else if(defn instanceof RangeAttributeDefinition){
-			columnProvider = new RangeColumnProvider((RangeAttributeDefinition) defn);
+			columnProvider = new RangeColumnProvider(config, (RangeAttributeDefinition) defn);
 		} else if(defn instanceof TaxonAttributeDefinition){
-			columnProvider = new TaxonColumnProvider((TaxonAttributeDefinition) defn);
+			columnProvider = new TaxonColumnProvider(config, (TaxonAttributeDefinition) defn);
 		} else if(defn instanceof TimeAttributeDefinition){
-			columnProvider = new TimeColumnProvider((TimeAttributeDefinition) defn);
+			columnProvider = new TimeColumnProvider(config, (TimeAttributeDefinition) defn);
 		} else {
-			columnProvider = new SingleAttributeColumnProvider(defn, name);
+			columnProvider = new SingleFieldAttributeColumnProvider(config, defn, name);
 		}
 		cols.add(columnProvider);
 	}

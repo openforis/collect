@@ -11,8 +11,8 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
  */
 public class TimeColumnProvider extends CompositeAttributeColumnProvider<TimeAttributeDefinition> {
 	
-	public TimeColumnProvider(TimeAttributeDefinition defn) {
-		super(defn);
+	public TimeColumnProvider(CSVExportConfiguration config, TimeAttributeDefinition defn) {
+		super(config, defn);
 	}
 
 	@Override

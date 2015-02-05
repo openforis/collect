@@ -97,6 +97,11 @@ public class FileAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
+	public boolean hasMainField() {
+		return true;
+	}
+	
+	@Override
 	public String getMainFieldName() {
 		return FILE_NAME_FIELD;
 	}

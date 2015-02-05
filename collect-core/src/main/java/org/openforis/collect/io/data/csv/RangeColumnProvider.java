@@ -14,8 +14,8 @@ import org.openforis.idm.metamodel.RangeAttributeDefinition;
  */
 public class RangeColumnProvider extends CompositeAttributeColumnProvider<RangeAttributeDefinition> {
 	
-	public RangeColumnProvider(RangeAttributeDefinition defn) {
-		super(defn);
+	public RangeColumnProvider(CSVExportConfiguration config, RangeAttributeDefinition defn) {
+		super(config, defn);
 	}
 
 
@@ -24,14 +24,14 @@ public class RangeColumnProvider extends CompositeAttributeColumnProvider<RangeA
 		List<String> result = new ArrayList<String>();
 		result.add(RangeAttributeDefinition.FROM_FIELD);
 		result.add(RangeAttributeDefinition.TO_FIELD);
-		if ( ! defn.getUnits().isEmpty() ) {
+		if ( ! attributeDefinition.getUnits().isEmpty() ) {
 			result.add(RangeAttributeDefinition.UNIT_FIELD);
 		}
 		return result.toArray(new String[0]);
 	}
 	
 	@Override
-	protected String getFieldHeading(String fieldName) {
-		return super.getFieldHeading(fieldName);
+	protected String generateFieldHeading(String fieldName) {
+		return super.generateFieldHeading(fieldName);
 	}
 }

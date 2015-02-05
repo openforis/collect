@@ -99,6 +99,11 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition implem
 	}
 	
 	@Override
+	public boolean hasMainField() {
+		return true;
+	}
+	
+	@Override
 	public String getMainFieldName() {
 		return VALUE_FIELD;
 	}
