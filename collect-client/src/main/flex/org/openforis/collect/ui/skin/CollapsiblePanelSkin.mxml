@@ -78,8 +78,8 @@ in accordance with the terms of the license agreement accompanying it.
 	</s:transitions>
 	
 	<!-- drop shadow -->
-	<s:RectangularDropShadow id="shadow" blurX="20" blurY="20" alpha="0.32" distance="11" 
-							 angle="90" color="#000000" left="0" top="0" right="0" bottom="0"/>
+	<!--<s:RectangularDropShadow id="shadow" blurX="20" blurY="20" alpha="0.32" distance="11" 
+							 angle="90" color="#000000" left="0" top="0" right="0" bottom="0"/>-->
 	
 	<!-- layer 2: background fill -->
 	<!--- Defines the appearance of the PanelSkin class's background. -->
@@ -156,7 +156,8 @@ in accordance with the terms of the license agreement accompanying it.
 	more about it here: http://bugs.adobe.com/jira/browse/SDK-21143
 	-->
 	<s:Group id="contentGroup" left="1" right="1" top="32" bottom="1" minWidth="0" minHeight="0" 
-			 visible.normal="true" visible.collapsed="false" excludeFrom="collapsed">
+			 visible.normal="true" visible.collapsed="false" excludeFrom="collapsed"
+			 itemCreationPolicy="immediate">
 	</s:Group>
 	
 </s:SparkSkin>

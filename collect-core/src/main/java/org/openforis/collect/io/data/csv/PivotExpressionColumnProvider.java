@@ -15,16 +15,16 @@ import org.openforis.idm.model.expression.ModelPathExpression;
 public class PivotExpressionColumnProvider extends ColumnProviderChain {
 	private ModelPathExpression expression;
 
-	public PivotExpressionColumnProvider(String expression, ColumnProvider... providers) {
-		this(expression, "", Arrays.asList(providers));
+	public PivotExpressionColumnProvider(CSVExportConfiguration config, String expression, ColumnProvider... providers) {
+		this(config, expression, "", Arrays.asList(providers));
 	}
 
-	public PivotExpressionColumnProvider(String expression, String headingPrefix, ColumnProvider... providers) {
-		this(expression, headingPrefix, Arrays.asList(providers));
+	public PivotExpressionColumnProvider(CSVExportConfiguration config, String expression, String headingPrefix, ColumnProvider... providers) {
+		this(config, expression, headingPrefix, Arrays.asList(providers));
 	}
 	
-	public PivotExpressionColumnProvider(String expression, String headingPrefix, List<ColumnProvider> providers) {
-		super(headingPrefix, providers);
+	public PivotExpressionColumnProvider(CSVExportConfiguration config, String expression, String headingPrefix, List<ColumnProvider> providers) {
+		super(config, headingPrefix, providers);
 		try {
 			ExpressionFactory ef = new ExpressionFactory();
 			this.expression = ef.createModelPathExpression(expression);

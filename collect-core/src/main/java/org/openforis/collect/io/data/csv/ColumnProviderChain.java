@@ -12,30 +12,31 @@ import org.openforis.idm.model.Node;
  * @author S. Ricci
  * 
  */
-public class ColumnProviderChain implements ColumnProvider {
+public class ColumnProviderChain extends BasicColumnProvider {
 	private List<ColumnProvider> providers;
 	private List<String> headings;
 
-	public ColumnProviderChain(String headingPrefix, List<ColumnProvider> providers) {
+	public ColumnProviderChain(CSVExportConfiguration config, String headingPrefix, ColumnProvider... providers) {
+		this(config, headingPrefix, Arrays.asList(providers));
+	}
+	
+	public ColumnProviderChain(CSVExportConfiguration config, List<ColumnProvider> providers) {
+		this(config, "", providers);
+	}
+
+	public ColumnProviderChain(CSVExportConfiguration config, ColumnProvider... providers) {
+		this(config, Arrays.asList(providers));
+	}
+
+	public ColumnProviderChain(CSVExportConfiguration config, String headingPrefix, List<ColumnProvider> providers) {
 //		if ( providers == null || providers.isEmpty() ) {
 //			throw new IllegalArgumentException("Providers may not be null or empty");
 //		}
+		super(config);
 		this.providers = providers;
 		this.headings = getColumnHeadingsInternal(headingPrefix);
 	}
-
-	public ColumnProviderChain(String headingPrefix, ColumnProvider... providers) {
-		this(headingPrefix, Arrays.asList(providers));
-	}
-
-	public ColumnProviderChain(List<ColumnProvider> providers) {
-		this("", providers);
-	}
-
-	public ColumnProviderChain(ColumnProvider... providers) {
-		this(Arrays.asList(providers));
-	}
-
+	
 	public List<String> getColumnHeadings() {
 		return headings;
 	}

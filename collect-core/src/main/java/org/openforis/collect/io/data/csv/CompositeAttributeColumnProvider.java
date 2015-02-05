@@ -4,11 +4,13 @@
 package org.openforis.collect.io.data.csv;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -16,70 +18,116 @@ import org.openforis.idm.model.Node;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  */
-public abstract class CompositeAttributeColumnProvider<T extends AttributeDefinition> implements ColumnProvider {
+public abstract class CompositeAttributeColumnProvider<T extends AttributeDefinition> extends BasicAttributeColumnProvider<T> {
 
-	protected static final String FIELD_SEPARATOR = "_";
-	private static final String MULTIPLE_ATTRIBUTE_VALUE_SEPARATOR = ", ";
-
-	protected T defn;
 	private String[] fieldNames;
 
-	public CompositeAttributeColumnProvider(T defn) {
-		this.defn = defn;
+	public CompositeAttributeColumnProvider(CSVExportConfiguration config, T defn) {
+		super(config, defn);
+		init();
+	}
+
+	protected void init() {
 		this.fieldNames = getFieldNames();
 	}
 
 	@Override
-	public List<String> getColumnHeadings() {
-		String[] fields = getFieldNames();
-		String[] headings = new String[fields.length];
-		
-		for (int i = 0; i < fields.length; i++) {
-			String field = fields[i];
-			headings[i] = getFieldHeading(field);
+	public List<String> generateColumnHeadings() {
+		int maxAttrValues = getMaxAttributeValues();
+		int fieldsSize = isMergedValueSupported() ? 1: getFieldNames().length;
+		List<String> headings = new ArrayList<String>(fieldsSize * maxAttrValues);
+		if (attributeDefinition.isMultiple()) {
+			for (int attrIdx = 0; attrIdx < maxAttrValues; attrIdx++) {
+				headings.addAll(generateAttributeHeadings(attrIdx));
+			}
+		} else {
+			headings.addAll(generateSingleAttributeHeadings());
 		}
-		return Arrays.asList(headings);
+		return headings;
+	}
+
+	private List<String> generateSingleAttributeHeadings() {
+		return generateAttributeHeadings(0);
+	}
+	
+	private List<String> generateAttributeHeadings(int attributeIdx) {
+		List<String> headings = new ArrayList<String>();
+		if (isMergedValueSupported()) {
+			headings.add(generateMergedValueHeading(attributeIdx));
+		}
+		headings.addAll(generateAttributeFieldHeadings(attributeIdx));
+		return headings;
+	}
+
+	protected String generateAttributePositionSuffix(int attributeIdx) {
+		return attributeDefinition.isMultiple() ? "[" + (attributeIdx + 1) + "]": "";
+	}
+
+	protected List<String> generateAttributeFieldHeadings(int attributeIdx) {
+		String attrPosSuffix = generateAttributePositionSuffix(attributeIdx);
+		List<String> headings = new ArrayList<String>();
+		for (int fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
+			headings.add(generateFieldHeading(fieldNames[fieldIdx]) + attrPosSuffix);
+		}
+		return headings;
 	}
 
 	protected abstract String[] getFieldNames();
 	
-	protected String getFieldHeading(String fieldName) {
-		return defn.getName() + FIELD_SEPARATOR + fieldName;
+	protected String generateMergedValueHeading(int attributeIdx) {
+		String attrPosSuffix = generateAttributePositionSuffix(attributeIdx);
+		return attributeDefinition.getName() + attrPosSuffix;
+	}
+
+	protected String generateFieldHeading(String fieldName) {
+		return attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + fieldName;
+	}
+	
+	protected boolean isMergedValueSupported() {
+		return getConfig().isIncludeCompositeAttributeMergedColumn() && (
+				attributeDefinition instanceof CoordinateAttributeDefinition
+				|| attributeDefinition instanceof DateAttributeDefinition
+				|| attributeDefinition instanceof TimeAttributeDefinition
+				);
+	}
+	
+	protected String extractMergedValue(Attribute<?, ?> attr) {
+		if (attr == null) {
+			return "";
+		}
+		CSVValueFormatter valueFormatter = new CSVValueFormatter();
+		String value = valueFormatter.format(attributeDefinition, attr.getValue());
+		return value;
 	}
 	
 	@Override
 	public List<String> extractValues(Node<?> axis) {
 		checkValidAxis(axis);
-		List<Node<?>> attributes = ((Entity) axis).getAll(defn);
-		if (attributes.isEmpty()) {
-			List<String> emptyValues = new ArrayList<String>(fieldNames.length);
-			for (int i = 0; i < fieldNames.length; i++) {
-				emptyValues.add("");
-			}
-			return emptyValues;
-		} else {
-			String[] fields = fieldNames;
-			List<String> values = new ArrayList<String>(fields.length);
-			for (String fieldName : fields) {
-				values.add(extractMergedValue(attributes, fieldName));
-			}
-			return values;
-		}
-	}
-
-	protected String extractMergedValue(List<Node<?>> attributes, String fieldName) {
-		StringBuffer sb = new StringBuffer();
-		for (Node<?> node : attributes) {
-			String val = extractValue((Attribute<?, ?>) node, fieldName);
-			if ( StringUtils.isNotBlank(val) ) {
-				if ( sb.length() > 0 ) {
-					sb.append(MULTIPLE_ATTRIBUTE_VALUE_SEPARATOR);
+		List<Node<?>> attributes = ((Entity) axis).getAll(attributeDefinition);
+		int maxAttributeValues = getMaxAttributeValues();
+		int totHeadings = fieldNames.length * maxAttributeValues;
+		List<String> values = new ArrayList<String>(totHeadings);
+		if (! attributes.isEmpty()) {
+			for (int attrIdx = 0; attrIdx < maxAttributeValues; attrIdx ++) {
+				Attribute<?, ?> attr = attrIdx < attributes.size() ? (Attribute<?, ?>) attributes.get(attrIdx): null;
+				if (isMergedValueSupported()) {
+					String val = extractMergedValue(attr);
+					values.add(val);
 				}
-				sb.append(val);
-			}				
+				for (String fieldName : fieldNames) {
+					String val;
+					if (attr == null) {
+						val = "";
+					} else {
+						val = extractValue(attr, fieldName);
+					}
+					values.add(val);
+				}
+			}
 		}
-		return sb.toString();
+		return values;
 	}
 
 	protected void checkValidAxis(Node<?> axis) {
@@ -98,10 +146,6 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	protected String extractValue(Attribute<?, ?> attr, String fieldName) {
 		Field<?> field = attr.getField(fieldName);
 		return extractValue(field);
-	}
-	
-	protected String getAttributeName() {
-		return defn.getName();
 	}
 	
 }
