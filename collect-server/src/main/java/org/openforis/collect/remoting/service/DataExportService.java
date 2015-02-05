@@ -86,7 +86,7 @@ public class DataExportService {
 			config.setIncludeEnumeratedEntities(includeEnumeratedEntities);
 			config.setIncludeCompositeAttributeMergedColumn(includeCompositeAttributeMergedColumn);
 			config.setCodeAttributeExpanded(codeAttributeExpanded);
-			process.setConfig(config);
+			process.setConfiguration(config);
 			
 			process.init();
 			

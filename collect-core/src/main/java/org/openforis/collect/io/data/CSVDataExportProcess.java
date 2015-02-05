@@ -66,11 +66,11 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private RecordFilter recordFilter;
 	private Integer entityId;
 	private boolean alwaysGenerateZipFile;
-	private CSVExportConfiguration config;
+	private CSVExportConfiguration configuration;
 	
 	public CSVDataExportProcess() {
 		alwaysGenerateZipFile = false;
-		config = new CSVExportConfiguration();
+		configuration = new CSVExportConfiguration();
 	}
 	
 	@Override
@@ -215,13 +215,13 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		columnProviders.add(entityColumnProvider);
 		
 		//create data transformation
-		ColumnProvider provider = new ColumnProviderChain(config, columnProviders);
+		ColumnProvider provider = new ColumnProviderChain(configuration, columnProviders);
 		String axisPath = entityDefn.getPath();
 		return new DataTransformation(axisPath, provider);
 	}
 
 	protected AutomaticColumnProvider createEntityColumnProvider(EntityDefinition entityDefn) {
-		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(config, "", entityDefn, null);
+		AutomaticColumnProvider entityColumnProvider = new AutomaticColumnProvider(configuration, "", entityDefn, null);
 		return entityColumnProvider;
 	}
 	
@@ -241,15 +241,15 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private ColumnProvider createAncestorColumnProvider(EntityDefinition entityDefn, int depth) {
 		List<ColumnProvider> providers = new ArrayList<ColumnProvider>();
 		String pivotExpression = StringUtils.repeat("parent()", "/", depth);
-		if ( config.isIncludeAllAncestorAttributes() ) {
-			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(config, entityDefn.getName() + "_", entityDefn);
+		if ( configuration.isIncludeAllAncestorAttributes() ) {
+			AutomaticColumnProvider ancestorEntityColumnProvider = new AutomaticColumnProvider(configuration, entityDefn.getName() + "_", entityDefn);
 			providers.add(0, ancestorEntityColumnProvider);
 		} else {
 			//include only key attributes
 			List<AttributeDefinition> keyAttrDefns = entityDefn.getKeyAttributeDefinitions();
 			for (AttributeDefinition keyDefn : keyAttrDefns) {
 				String columnName = calculateAncestorKeyColumnName(keyDefn, false);
-				SingleFieldAttributeColumnProvider keyColumnProvider = new SingleFieldAttributeColumnProvider(config, keyDefn, columnName);
+				SingleFieldAttributeColumnProvider keyColumnProvider = new SingleFieldAttributeColumnProvider(configuration, keyDefn, columnName);
 				providers.add(keyColumnProvider);
 			}
 			if ( isPositionColumnRequired(entityDefn) ) {
@@ -257,7 +257,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 				providers.add(positionColumnProvider);
 			}
 		}
-		ColumnProvider result = new PivotExpressionColumnProvider(config, pivotExpression, providers.toArray(new ColumnProvider[0]));
+		ColumnProvider result = new PivotExpressionColumnProvider(configuration, pivotExpression, providers.toArray(new ColumnProvider[0]));
 		return result;
 	}
 	
@@ -322,12 +322,12 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		this.entityId = entityId;
 	}
 	
-	public CSVExportConfiguration getConfig() {
-		return config;
+	public CSVExportConfiguration getConfiguration() {
+		return configuration;
 	}
 	
-	public void setConfig(CSVExportConfiguration config) {
-		this.config = config;
+	public void setConfiguration(CSVExportConfiguration configuration) {
+		this.configuration = configuration;
 	}
 
 	public boolean isAlwaysGenerateZipFile() {
