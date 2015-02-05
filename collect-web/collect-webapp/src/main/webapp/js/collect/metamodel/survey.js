@@ -10,20 +10,27 @@ Collect.Metamodel.Survey = function(json) {
 };
 
 Collect.Metamodel.Survey.prototype.init = function() {
-	var stack = new Array();
-	stack = stack.concat(this.rootEntities);
-	while (stack.length > 0) {
-		var node = stack.pop();
-		
-		this.nodeById[node.id] = node;
-		
-		if (node.type == "ENTITY") {
-			stack = stack.concat(node.children);
-		}
-	}
+	var $this = this;
+	this.traverse(function(nodeDef) {
+		$this.nodeById[nodeDef.id] = nodeDef;
+	});
 };
 
 Collect.Metamodel.Survey.prototype.getDefinition = function(id) {
 	var node = this.nodeById[id];
 	return node;
+};
+
+Collect.Metamodel.Survey.prototype.traverse = function(fun) {
+	var stack = new Array();
+	stack = stack.concat(this.rootEntities);
+	while (stack.length > 0) {
+		var nodeDef = stack.pop();
+		fun(nodeDef);
+		if (nodeDef.type == "ENTITY") {
+			nodeDef.children.forEach(function(childDef) {
+				stack.push(childDef);
+			});
+		}
+	}
 };
