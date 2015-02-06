@@ -50,12 +50,15 @@ Collect.DataCleansing.MapPanelComposer.prototype.loadLayers = function() {
 			coordinateAttrDefs.push(nodeDef);
 		}
 	});
+	var bounds = new google.maps.LatLngBounds();
+	
 	coordinateAttrDefs.forEach(function(coordAttrDef) {
 		var layerOverlay = new LayerOverlay();
 		collect.geoDataService.loadCoordinateValues(surveyName, coordAttrDef.id, 0, 1000000, function(lngLats) {
-			lngLats.forEach(function(lngLat) {
+			lngLats.forEach(function(lngLatItem) {
+				var latLng = new google.maps.LatLng(lngLatItem[1], lngLatItem[0]);
 				var point = new google.maps.Circle({
-					center : new google.maps.LatLng(lngLat[1], lngLat[0]),
+					center : latLng,
 					radius : 200,
 					strokeColor : "#00FF00",
 					strokeOpacity : 0.8,
@@ -65,8 +68,10 @@ Collect.DataCleansing.MapPanelComposer.prototype.loadLayers = function() {
 					map: $this.map
 				});
 				layerOverlay.addOverlay(point);
+				bounds.extend(latLng);
 			});
 		});
+		$this.map.fitBounds(bounds);
 		layerOverlay.setMap($this.map);
 		
 //		var layer = new google.maps.KmlLayer("http://168.202.56.188:8080/collect/geo/data/" + surveyName + "/" + coordAttrDef.id + "/coordinates.kml?_r=" + new Date().getTime(),
