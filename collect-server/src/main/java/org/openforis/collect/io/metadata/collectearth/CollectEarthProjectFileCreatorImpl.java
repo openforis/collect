@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -11,8 +15,13 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 
 /**
  * 
@@ -22,8 +31,10 @@ import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
  */
 public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator{
 
+	private static final String KML_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collect_earth_kml_template.txt";
 	private static final String PLACEMARK_FILE_NAME = "placemark.idml.xml";
 	private static final String BALLOON_FILE_NAME = "balloon.html";
+	private static final String KML_TEMPLATE_FILE_NAME = "kml_template.fmt";
 	private static final String CUBE_FILE_NAME = "collect_cube.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	
@@ -33,8 +44,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		File placemarkFile = createPlacemark(survey);
 		
 		File projectProperties = generateProjectProperties(survey);
-		File cube = generateCube(survey);
 		File balloon = generateBalloon(survey);
+		File cube = generateCube(survey);
+		File kmlTemplate = generateKMLTemplate(survey);
 		
 		// create output zip file
 		File outputFile = File.createTempFile("openforis-collect-earth-temp", ".zip");
@@ -42,10 +54,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		
 		ZipFile zipFile = new net.lingala.zip4j.core.ZipFile(outputFile);
 		
+		addFileToZip(zipFile, projectProperties, PROJECT_PROPERTIES_FILE_NAME);
 		addFileToZip(zipFile, placemarkFile, PLACEMARK_FILE_NAME);
 		addFileToZip(zipFile, balloon, BALLOON_FILE_NAME);
 		addFileToZip(zipFile, cube, CUBE_FILE_NAME);
-		addFileToZip(zipFile, projectProperties, PROJECT_PROPERTIES_FILE_NAME);
+		addFileToZip(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME);
 			
 		return outputFile;
 	}
@@ -86,6 +99,39 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey);
 		String html = generator.generateHTML();
 		return writeToTempFile(html);
+	}
+	
+	private File generateKMLTemplate(CollectSurvey survey) throws IOException {
+		//copy the template txt file into a String
+		InputStream is = getClass().getClassLoader().getResourceAsStream(KML_TEMPLATE_TXT);
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(is, writer, "UTF-8");
+		String templateContent = writer.toString();
+		
+		//find "fromCSV" attributes
+		final CollectAnnotations annotations = survey.getAnnotations();
+		final List<AttributeDefinition> fromCsvAttributes = new ArrayList<AttributeDefinition>();
+		survey.getSchema().traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if (def instanceof AttributeDefinition) {
+					AttributeDefinition attrDef = (AttributeDefinition) def;
+					if (annotations.isFromCollectEarthCSV(attrDef)) {
+						fromCsvAttributes.add(attrDef);
+					}
+				}
+			}
+		});
+		//write the dynamic content to be replaced into the template
+		StringBuffer sb = new StringBuffer();
+		int extraInfoIndex = 0;
+		for (AttributeDefinition attrDef : fromCsvAttributes) {
+			sb.append("<Data name=\"" + attrDef.getName() + "\">\n");
+			sb.append("<value>${placemark.extraInfo[" + extraInfoIndex + "]}</value>\n");
+		    sb.append("</Data>\n");
+		    extraInfoIndex ++;
+		}
+		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, sb.toString());
+		return writeToTempFile(content);
 	}
 	
 	private File generateCube(CollectSurvey survey) throws IOException {

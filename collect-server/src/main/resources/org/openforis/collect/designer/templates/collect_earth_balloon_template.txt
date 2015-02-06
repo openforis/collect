@@ -971,16 +971,16 @@
 			name="collect_code_rs_satellite"  />
 			
 			
-		<input type="hidden" id="collect_integer_elevation" 
-			name="collect_integer_elevation" value="$[elevation]" />
-		<input type="hidden" id="collect_real_aspect" 
-			name="collect_real_aspect" value="$[aspect]" />
-		<input type="hidden" id="collect_real_slope" 
-			name="collect_real_slope" value="$[slope]" />
-			
-		<input type="hidden" id="collect_text_region" 
-			name="collect_text_region" value="$[region]" />
+<!-- DO NOT REMOVE THIS LINE - IT GENERATES THE EXTRA FIELDS FROM THE CSV-BALLOON INTEGRATION -->
+<!-- ---------------------------------------------------------------------------------------- -->
+PLACEHOLDER_FOR_EXTRA_CSV_DATA
+<!-- ---------------------------------------------------------------------------------------- -->
 		
+<!-- DO NOT REMOVE THIS LINE - IT GENERATES THE DYNAMIC FIELDS FROM THE SURVEY DEFINITION -->
+<!-- ------------------------------------------------------------------------------------ -->
+PLACEHOLDER_FOR_DYNAMIC_FIELDS
+<!-- ------------------------------------------------------------------------------------ -->
+
 		<input type="hidden" id="collect_boolean_actively_saved"
 			name="collect_boolean_actively_saved" value="false" />
 

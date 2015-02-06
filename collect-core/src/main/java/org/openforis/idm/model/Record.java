@@ -158,6 +158,14 @@ public class Record {
 		return this.nodesByInternalId.get(id);
 	}
 
+	/**
+	 * @deprecated use {@link #findNodeByPath()} instead.  
+	 */
+	@Deprecated
+	public Node<?> getNodeByPath(String path) {
+		return findNodeByPath(path);
+	}
+	
 	public <N extends Node<?>> N findNodeByPath(String path) {
 		List<Node<?>> nodes = findNodesByPath(path);
 		if ( nodes.size() == 0 ) {

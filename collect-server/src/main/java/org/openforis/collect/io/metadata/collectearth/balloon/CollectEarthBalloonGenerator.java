@@ -1,19 +1,28 @@
-package org.openforis.collect.io.metadata.collectearth;
+package org.openforis.collect.io.metadata.collectearth.balloon;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
+import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
@@ -35,26 +44,87 @@ import org.openforis.idm.model.NodePathPointer;
  */
 public class CollectEarthBalloonGenerator {
 	
+	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collect_earth_balloon_template.txt";
+	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
+
 	private CollectSurvey survey;
 	private Map<String, CEComponent> componentByName;
+	
+	private BalloonInputFieldsUtils balloonInputFieldsUtils;
+	private Map<NodeDefinition, String> htmlParameterNameByNodeDef;
 
 	public CollectEarthBalloonGenerator(CollectSurvey survey) {
 		this.survey = survey;
 		this.componentByName = new HashMap<String, CEComponent>();
+		this.balloonInputFieldsUtils = new BalloonInputFieldsUtils();
+		this.htmlParameterNameByNodeDef = balloonInputFieldsUtils.getHtmlParameterNameByNodeDef(getRootEntity());
 	}
 
-	public String generateHTML() {
-		CEComponent rootComponent = generateRootComponent();
+	public String generateHTML() throws IOException {
+		String htmlTemplate = getHTMLTemplate();
+		String result = fillWithExtraCSVFields(htmlTemplate);
+		result = fillWithSurveyDefinitionFields(result);
+		return result;
+	}
+
+	private String fillWithSurveyDefinitionFields(String template) {
+		CEComponentHTMLBuilder htmlBuilder = new CEComponentHTMLBuilder();
 		
+		CEEntity rootComponent = generateRootComponent();
 		
-		
-		return "";
+		List<CEComponent> children = rootComponent.getChildren();
+		for (CEComponent child : children) {
+			htmlBuilder.append(child);
+		}
+		String dynamicContent = htmlBuilder.toString();
+		String result = template.replace(PLACEHOLDER_FOR_DYNAMIC_FIELDS, dynamicContent);
+		return result;
+	}
+
+	private String getHTMLTemplate() throws IOException {
+		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(is, writer, "UTF-8");
+		String template = writer.toString();
+		return template;
+	}
+
+	private String fillWithExtraCSVFields(String templateContent) {
+		List<AttributeDefinition> nodesFromCSV = getNodesFromCSV();
+		StringBuilder sb = new StringBuilder();
+		for (AttributeDefinition def : nodesFromCSV) {
+			sb.append("<input type=\"hidden\" id=\"");
+			String name = htmlParameterNameByNodeDef.get(def);
+			sb.append(name);
+			sb.append("\" name=\"");
+			sb.append(name);
+			sb.append("\" value=\"$[");
+			sb.append(def.getName());
+			sb.append("]\" />");
+			sb.append('\n');
+		}
+		String result = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, sb.toString());
+		return result;
 	}
 	
-	private CEComponent generateRootComponent() {
+	private List<AttributeDefinition> getNodesFromCSV() {
+		final List<AttributeDefinition> nodesFromCSV = new ArrayList<AttributeDefinition>();
+		final CollectAnnotations annotations = survey.getAnnotations();
 		Schema schema = survey.getSchema();
-		EntityDefinition rootEntityDef = schema.getRootEntityDefinitions().get(0);
-		CEComponent rootComponent = createComponent(rootEntityDef);
+		schema.traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition definition) {
+				if (definition instanceof AttributeDefinition && 
+						annotations.isFromCollectEarthCSV((AttributeDefinition) definition)) {
+					nodesFromCSV.add((AttributeDefinition) definition);
+				}
+			}
+		});
+		return nodesFromCSV;
+	}
+	
+	private CEEntity generateRootComponent() {
+		EntityDefinition rootEntityDef = getRootEntity();
+		CEEntity rootComponent = (CEEntity) createComponent(rootEntityDef);
 		
 		rootEntityDef.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
@@ -72,6 +142,12 @@ public class CollectEarthBalloonGenerator {
 		
 		return rootComponent;
 	}
+
+	private EntityDefinition getRootEntity() {
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDef = schema.getRootEntityDefinitions().get(0);
+		return rootEntityDef;
+	}
 	
 	private CEComponent createComponent(NodeDefinition def) {
 		String label = def.getLabel(Type.INSTANCE);
@@ -87,7 +163,8 @@ public class CollectEarthBalloonGenerator {
 			}
 			comp = ceEntity;
 		} else {
-			CEField.CEFieldType type = getFieldType(def);
+			String htmlParameterName = htmlParameterNameByNodeDef.get(def);
+			CEFieldType type = getFieldType(def);
 			boolean key = def instanceof KeyAttributeDefinition ? ((KeyAttributeDefinition) def).isKey(): false;
 			if (def instanceof CodeAttributeDefinition) {
 				CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
@@ -103,9 +180,9 @@ public class CollectEarthBalloonGenerator {
 					}
 				}
 				String parentName = parentCodeAttributeDef == null ? null: parentCodeAttributeDef.getName();
-				comp = new CECodeField(def.getName(), label, type, multiple, key, codeItemsByParentCode, parentName);
+				comp = new CECodeField(htmlParameterName, def.getName(), label, type, multiple, key, codeItemsByParentCode, parentName);
 			} else {
-				comp = new CEField(def.getName(), label, multiple, type, key);
+				comp = new CEField(htmlParameterName, def.getName(), label, multiple, type, key);
 			}
 		}
 		comp.hideWhenNotRelevant = hideWhenNotRelevant;
@@ -113,130 +190,39 @@ public class CollectEarthBalloonGenerator {
 		return comp;
 	}
 	
-	private CEField.CEFieldType getFieldType(NodeDefinition def) {
+	private CEFieldType getFieldType(NodeDefinition def) {
 		if (def instanceof BooleanAttributeDefinition) {
-			return CEField.CEFieldType.BOOLEAN;
+			return CEFieldType.BOOLEAN;
 		} else if (def instanceof CodeAttributeDefinition) {
 			UIOptions uiOptions = ((CollectSurvey) def.getSurvey()).getUIOptions();
 			CodeAttributeLayoutType layoutType = uiOptions.getLayoutType((CodeAttributeDefinition) def);
 			switch (layoutType) {
 			case DROPDOWN:
-				return CEField.CEFieldType.CODE_SELECT;
+				return CEFieldType.CODE_SELECT;
 			default:
-				return CEField.CEFieldType.CODE_BUTTON_GROUP;
+				return CEFieldType.CODE_BUTTON_GROUP;
 			}
+		} else if (def instanceof CoordinateAttributeDefinition) {
+			return CEFieldType.COORDINATE;
 		} else if (def instanceof DateAttributeDefinition) {
-			return CEField.CEFieldType.DATE;
+			return CEFieldType.DATE;
 		} else if (def instanceof NumberAttributeDefinition) {
 			if (((NumericAttributeDefinition) def).getType() == NumericAttributeDefinition.Type.INTEGER) {
-				return CEField.CEFieldType.INTEGER;
+				return CEFieldType.INTEGER;
 			} else {
-				return CEField.CEFieldType.REAL;
+				return CEFieldType.REAL;
 			}
 		} else if (def instanceof TextAttributeDefinition) {
 			if (((TextAttributeDefinition) def).getType() == TextAttributeDefinition.Type.SHORT) {
-				return CEField.CEFieldType.SHORT_TEXT;
+				return CEFieldType.SHORT_TEXT;
 			} else {
-				return CEField.CEFieldType.LONG_TEXT;
+				return CEFieldType.LONG_TEXT;
 			}
 		} else if (def instanceof TimeAttributeDefinition) {
-			return CEField.CEFieldType.TIME;
+			return CEFieldType.TIME;
 		} else {
 			throw new IllegalArgumentException("Attribute type not supported: " + def.getClass().getName());
 		}
-	}
-
-	private static class CEComponent {
-
-		private String name;
-		private String label;
-		private boolean multiple;
-		private List<CEComponent> relevanceSources = new ArrayList<CEComponent>();
-		private boolean hideWhenNotRelevant = false;
-
-		public CEComponent(String name, String label, boolean multiple) {
-			super();
-			this.name = name;
-			this.label = label;
-			this.multiple = multiple;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public String getLabel() {
-			return label;
-		}
-
-		public boolean isMultiple() {
-			return multiple;
-		}
-	}
-	
-	private static class CEEntity extends CEComponent {
-
-		private List<CEComponent> children = new ArrayList<CEComponent>();
-		
-		public CEEntity(String name, String label, boolean multiple) {
-			super(name, label, multiple);
-		}
-		
-		public void addChild(CEComponent child) {
-			children.add(child);
-		}
-		
-		public List<CEComponent> getChildren() {
-			return children;
-		}
-		
-	}
-	
-	private static class CEField extends CEComponent {
-		
-		public enum CEFieldType {
-			BOOLEAN, CODE_SELECT, CODE_BUTTON_GROUP, DATE, INTEGER, REAL, SHORT_TEXT, LONG_TEXT, TIME
-		}
-		
-		private CEFieldType type;
-		private boolean key;
-		
-		public CEField(String name, String label, boolean multiple, CEFieldType type, boolean key) {
-			super(name, label, multiple);
-			this.type = type;
-			this.key = key;
-		}
-
-		public CEFieldType getType() {
-			return type;
-		}
-
-		public boolean isKey() {
-			return key;
-		}
-		
-	}
-	
-	private static class CECodeField extends CEField {
-		
-		private CodeList listName;
-		private String parentName;
-		private Map<String, List<CodeListItem>> codeItemsByParentCode = new HashMap<String, List<CodeListItem>>();
-
-		public CECodeField(String name, String label, CEFieldType type, boolean multiple, boolean key, Map<String, List<CodeListItem>> codeItemsByParentCode, String parentName) {
-			super(name, label, multiple, type, key);
-			this.codeItemsByParentCode = codeItemsByParentCode;
-			this.parentName = parentName;
-		}
-		
-		public Map<String, List<CodeListItem>> getCodeItemsByParentCode() {
-			return codeItemsByParentCode;
-		}
-		
-		public String getParentName() {
-			return parentName;
-		}
-		
 	}
 
 }

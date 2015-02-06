@@ -434,12 +434,10 @@ public class Entity extends Node<EntityDefinition> {
 		return getAll(childDef);
 	}
 
-	@Deprecated
 	public List<Node<? extends NodeDefinition>> getChildren(String name) {
 		return getAll(name);
 	}
 	
-	@Deprecated
 	public List<Node<? extends NodeDefinition>> getChildren() {
 		return getAll();
 	}

@@ -171,6 +171,7 @@ public class SurveySelectVM extends BaseVM {
 				FileInputStream is = new FileInputStream(file);
 				Filedownload.save(is, contentType, survey.getName() + ".zip");
 			} catch(Exception e) {
+				log.error(e);
 				MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
 			}
 			return;

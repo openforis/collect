@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2">
+
+<NetworkLinkControl>
+<expires>${expiration}</expires>
+</NetworkLinkControl>
+
+<Document>
+	<name>Collect Earth</name>
+
+<Style id="placemark-balloon-style">
+    <BalloonStyle>
+      <text>
+       
+<![CDATA[
+
+
+${html_for_balloon}
+
+
+]]>
+
+      </text>
+    </BalloonStyle>
+	<PolyStyle>
+		<fill>0</fill>
+	</PolyStyle>
+	<LineStyle>
+		<color>FF00FFFF</color>
+		<colorMode>normal</colorMode>
+		<width>2</width>      
+	</LineStyle>
+</Style>
+
+	<Style id="red-line-style">
+		<LineStyle>
+			<color>#a00000ff</color>
+			 <colorMode>normal</colorMode>
+			<width>3</width>      
+		</LineStyle>
+	</Style>
+	
+ <LookAt>
+      <longitude>${region_center_X}</longitude>
+      <latitude>${region_center_Y}</latitude>
+      <altitude>0</altitude>
+      <range>150000</range>
+      <tilt>0</tilt>
+      <heading>0</heading>
+      <altitudeMode>relativeToGround</altitudeMode>
+ </LookAt>
+ 
+ 
+ 	 <#-- Iterate over placemarks, store values in variable placemark -- START -->
+	<#list placemarks as placemark >
+
+<Folder id="folder_${placemark.placemarkId}">
+	<name>  ${placemark_index+1} - ID# : ${placemark.placemarkId}</name>
+	<description></description>
+	<open>0</open>
+	<Style>
+		<ListStyle >
+			<listItemType>checkHideChildren</listItemType>
+			<ItemIcon id="icon_${placemark.placemarkId}">
+			   <state>open</state>
+			   <href>${host}placemarkIcon?collect_text_id=${placemark.placemarkId}&amp;listView=true<#if randomNumber??>&amp;forceUpdate=${randomNumber}</#if></href>
+			</ItemIcon>
+		</ListStyle>
+	</Style>
+
+	<Folder >
+
+		<Region>
+			<LatLonAltBox>
+				<south>${placemark.region.south}</south>
+				<north>${placemark.region.north}</north>
+			  	<west>${placemark.region.west}</west>
+			  	<east>${placemark.region.east}</east> 
+				<minAltitude>0</minAltitude>
+				<maxAltitude>0</maxAltitude>
+			</LatLonAltBox>
+			<Lod>
+				<minLodPixels>32</minLodPixels>
+				<maxLodPixels>-1</maxLodPixels>
+				<minFadeExtent>0</minFadeExtent>
+				<maxFadeExtent>0</maxFadeExtent>
+			</Lod>
+		</Region>
+	</Folder>
+	
+	<LookAt>
+      <longitude>${placemark.coord.longitude}</longitude>
+      <latitude>${placemark.coord.latitude}</latitude>
+      <altitude>0</altitude>
+      <range>400</range>
+      <tilt>0</tilt>
+      <heading>0</heading>
+      <altitudeMode>relativeToGround</altitudeMode>
+    </LookAt>
+    
+    <#if placemark.samplePointOutlined?? >
+	    <Placemark>
+	    	<styleUrl>#red-line-style</styleUrl>	
+			<LineString>
+	          <coordinates>
+		          <#list placemark.points[ placemark.samplePointOutlined ].shape as squareCorners>
+		          	${squareCorners.longitude},${squareCorners.latitude},0
+		          </#list>
+	          </coordinates>
+			</LineString>
+	    </Placemark>
+    </#if>
+    
+	<Placemark id="${placemark.placemarkId}">
+		<name>${placemark.placemarkId}</name>
+		<ExtendedData>
+		      <Data name="longitude">
+		        <value>${placemark.coord.longitude}</value>
+		      </Data>
+		      <Data name="latitude">
+		        <value>${placemark.coord.latitude}</value>
+		      </Data>
+		      <Data name="next_id">
+		        <value>${placemark.nextPlacemarkId}</value>
+		      </Data>
+		      <#-- host can be an empty String if the URLs are relative -->
+		      <Data name="host">
+		        <value>${host}</value>
+		      </Data>
+			   <Data name="local_port">
+		        <value>${local_port}</value>
+		      </Data>
+		      <Data name="plot_file">
+		        <value>${plotFileName}</value>
+		      </Data>
+		      
+<!-- DO NOT REMOVE THIS LINE - IT GENERATES THE EXTRA FIELDS FROM THE CSV-BALLOON INTEGRATION -->
+<!-- ---------------------------------------------------------------------------------------- -->
+PLACEHOLDER_FOR_EXTRA_CSV_DATA
+<!-- ---------------------------------------------------------------------------------------- -->
+
+     	</ExtendedData>
+     	<gx:balloonVisibility>0</gx:balloonVisibility>
+  		
+		<LookAt>
+	      <longitude>${placemark.coord.longitude}</longitude>
+	      <latitude>${placemark.coord.latitude}</latitude>
+	      <altitude>0</altitude>
+	      <range>400</range>
+	      <tilt>0</tilt>
+	      <heading>0</heading>
+	      <altitudeMode>relativeToGround</altitudeMode>
+	    </LookAt>
+	    
+		<styleUrl>#placemark-balloon-style</styleUrl>
+   
+        <Polygon id="poly_${placemark.placemarkId}">
+        	<outerBoundaryIs>
+				<LinearRing>
+					<extrude>0</extrude>
+   					
+					<coordinates>
+					<#-- Iterate over shape coordinates, store values in variable placemark -- START -->
+					<#list placemark.shape as coord>
+						${coord.longitude},${coord.latitude},0
+					</#list>  
+					<#-- Iterate over shape points -- END -->
+					</coordinates>
+				</LinearRing>
+			</outerBoundaryIs>
+			<innerBoundaryIs>
+			<#list placemark.points as square>
+
+		        <LinearRing>
+		          <coordinates>
+		          <#list square.shape as squareCorners>
+		           ${squareCorners.longitude},${squareCorners.latitude},0
+		           </#list>
+		          </coordinates>
+		        </LinearRing>
+		     
+		      </#list>  
+		       </innerBoundaryIs>
+   		</Polygon>
+	</Placemark>
+	
+	</Folder>
+	</#list>  
+	<#-- Iterate over placemarks -- END -->
+</Document>
+</kml>
