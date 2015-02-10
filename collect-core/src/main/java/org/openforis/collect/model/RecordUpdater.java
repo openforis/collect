@@ -147,6 +147,10 @@ public class RecordUpdater {
 		return addAttribute(parentEntity, attributeName, null, null, null);
 	}
 	
+	public NodeChangeSet addAttribute(Entity parentEntity, String attributeName, Value value) {
+		return addAttribute(parentEntity, attributeName, value, null, null);
+	}
+	
 	/**
 	 * Adds a new attribute to a record.
 	 * This attribute can be immediately populated with a value or with a FieldSymbol, and remarks.

@@ -32,7 +32,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		strict = true;
 		allowValuesSorting = false;
 		showAllowedValuesPreview = (Boolean) Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue();
-		layoutType = Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE.getDefaultValue();
+		layoutType = ((CodeAttributeLayoutType) Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE.getDefaultValue()).name();
 		layoutDirection = Annotation.CODE_ATTRIBUTE_LAYOUT_DIRECTION.getDefaultValue();
 		showCode = (Boolean) Annotation.CODE_ATTRIBUTE_SHOW_CODE.getDefaultValue();
 	}

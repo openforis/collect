@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
@@ -67,19 +68,6 @@ public class CollectEarthBalloonGenerator {
 		return result;
 	}
 
-	private String fillWithSurveyDefinitionFields(String template) {
-		CEComponentHTMLBuilder htmlBuilder = new CEComponentHTMLBuilder();
-		
-		CEEntity rootComponent = generateRootComponent();
-		
-		List<CEComponent> children = rootComponent.getChildren();
-		for (CEComponent child : children) {
-			htmlBuilder.append(child);
-		}
-		String dynamicContent = htmlBuilder.toString();
-		String result = template.replace(PLACEHOLDER_FOR_DYNAMIC_FIELDS, dynamicContent);
-		return result;
-	}
 
 	private String getHTMLTemplate() throws IOException {
 		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
@@ -89,6 +77,27 @@ public class CollectEarthBalloonGenerator {
 		return template;
 	}
 
+	private String fillWithSurveyDefinitionFields(String template) {
+		List<String> nodeNamesFromCSV = getNodeNamesFromCSV();
+		
+		CEComponentHTMLFormatter htmlFormatter = new CEComponentHTMLFormatter();
+		
+		CEEntity rootComponent = generateRootComponent();
+		
+		StringBuilder sb = new StringBuilder();
+		List<CEComponent> children = rootComponent.getChildren();
+		for (CEComponent child : children) {
+			//only produce the input field if it was not already part of the CSV hidden input data
+			if (! nodeNamesFromCSV.contains(child.getName())) {
+				String html = htmlFormatter.format(child);
+				sb.append(html);
+			}
+		}
+		String dynamicContent = sb.toString();
+		String result = template.replace(PLACEHOLDER_FOR_DYNAMIC_FIELDS, dynamicContent);
+		return result;
+	}
+	
 	private String fillWithExtraCSVFields(String templateContent) {
 		List<AttributeDefinition> nodesFromCSV = getNodesFromCSV();
 		StringBuilder sb = new StringBuilder();
@@ -122,6 +131,15 @@ public class CollectEarthBalloonGenerator {
 		return nodesFromCSV;
 	}
 	
+	private List<String> getNodeNamesFromCSV() {
+		List<AttributeDefinition> nodes = getNodesFromCSV();
+		List<String> names = new ArrayList<String>(nodes.size());
+		for (AttributeDefinition def : nodes) {
+			names.add(def.getName());
+		}
+		return names;
+	}
+	
 	private CEEntity generateRootComponent() {
 		EntityDefinition rootEntityDef = getRootEntity();
 		CEEntity rootComponent = (CEEntity) createComponent(rootEntityDef);
@@ -150,7 +168,8 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private CEComponent createComponent(NodeDefinition def) {
-		String label = def.getLabel(Type.INSTANCE);
+		String label = ObjectUtils.defaultIfNull(def.getLabel(Type.INSTANCE), def.getName());
+		
 		boolean multiple = def.isMultiple();
 		UIOptions uiOptions = survey.getUIOptions();
 		boolean hideWhenNotRelevant = uiOptions.isHideWhenNotRelevant(def);

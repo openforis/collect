@@ -1089,7 +1089,7 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 									<td valign="top">
 										<div class="control-group" >
 			
-											<div class="btn-group independentToggle btnSubcategoryType" data-toggle="buttons-radio">
+				  							<div class="btn-group independentToggle btnSubcategoryType" data-toggle="buttons-radio">
 												<button type="button"
 													class="btn btn-info toggleLandDevelopment collect_code_land_use_category_dependant"
 													id="FLtoFL" value="FLtoFL" title="Forest Land remaining Forest Land">F &gt; F</button>
