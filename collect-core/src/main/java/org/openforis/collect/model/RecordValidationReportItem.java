@@ -32,6 +32,16 @@ public class RecordValidationReportItem {
 		this.message = message;
 	}
 
+	public String getParentEntityPath() {
+		int lastIndexOfSlash = path.lastIndexOf('/');
+		return path.substring(0, lastIndexOfSlash > 0 ? lastIndexOfSlash: path.length());
+	}
+
+	public String getNodeName() {
+		int lastIndexOfSlash = path.lastIndexOf('/');
+		return path.substring(lastIndexOfSlash + 1);
+	}
+	
 	public Integer getNodeId() {
 		return nodeId;
 	}
