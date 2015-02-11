@@ -52,13 +52,13 @@ public class CollectEarthBalloonGenerator {
 	private Map<String, CEComponent> componentByName;
 	
 	private BalloonInputFieldsUtils balloonInputFieldsUtils;
-	private Map<NodeDefinition, String> htmlParameterNameByNodeDef;
+	private Map<String, String> htmlParameterNameByNodePath;
 
 	public CollectEarthBalloonGenerator(CollectSurvey survey) {
 		this.survey = survey;
 		this.componentByName = new HashMap<String, CEComponent>();
 		this.balloonInputFieldsUtils = new BalloonInputFieldsUtils();
-		this.htmlParameterNameByNodeDef = balloonInputFieldsUtils.getHtmlParameterNameByNodeDef(getRootEntity());
+		this.htmlParameterNameByNodePath = balloonInputFieldsUtils.getHtmlParameterNameByNodePath(getRootEntity());
 	}
 
 	public String generateHTML() throws IOException {
@@ -103,7 +103,7 @@ public class CollectEarthBalloonGenerator {
 		StringBuilder sb = new StringBuilder();
 		for (AttributeDefinition def : nodesFromCSV) {
 			sb.append("<input type=\"hidden\" id=\"");
-			String name = htmlParameterNameByNodeDef.get(def);
+			String name = htmlParameterNameByNodePath.get(def.getPath());
 			sb.append(name);
 			sb.append("\" name=\"");
 			sb.append(name);
@@ -182,7 +182,7 @@ public class CollectEarthBalloonGenerator {
 			}
 			comp = ceEntity;
 		} else {
-			String htmlParameterName = htmlParameterNameByNodeDef.get(def);
+			String htmlParameterName = htmlParameterNameByNodePath.get(def);
 			CEFieldType type = getFieldType(def);
 			boolean key = def instanceof KeyAttributeDefinition ? ((KeyAttributeDefinition) def).isKey(): false;
 			if (def instanceof CodeAttributeDefinition) {

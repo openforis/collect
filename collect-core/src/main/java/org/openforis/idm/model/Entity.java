@@ -154,12 +154,12 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public List<Entity> findChildEntitiesByKeys(String childName, String... keys) {
-		return findChildEntitiesByKeys(definition.getChildDefinition(childName), keys);
+		return findChildEntitiesByKeys((EntityDefinition) definition.getChildDefinition(childName), keys);
 	}
 
-	public List<Entity> findChildEntitiesByKeys(NodeDefinition childDef, String... keys) {
+	public List<Entity> findChildEntitiesByKeys(EntityDefinition childEntityDef, String... keys) {
 		List<Entity> result = new ArrayList<Entity>();
-		List<Node<?>> siblings = getAll(childDef);
+		List<Node<?>> siblings = getAll(childEntityDef);
 		for (Node<?> sibling : siblings) {
 			String[] keyValues = ((Entity) sibling).getKeyValues();
 			if ( compareKeys(keyValues, keys) == 0 ) {

@@ -556,8 +556,7 @@ public class RecordManager {
 			if (keyParent == null) {
 				throw new MissingRecordKeyException();
 			}
-			int minCount = keyParent.getMinCount(keyDefn);
-			boolean required = minCount > 0;
+			boolean required = keyParent.isRequired(keyDefn);
 			if ( required ) {
 				Node<?> keyNode = keyParent.getChild(keyDefn);
 				if ( keyNode == null ) {
