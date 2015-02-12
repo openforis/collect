@@ -126,6 +126,10 @@ package org.openforis.collect.ui.component.input {
 			dispatchEvent(new Event("editablePropertyChange")); 
 		}
 		
+		public function get hasRemarks():Boolean {
+			return UIUtil.hasStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE);
+		}
+		
 		public function set hasRemarks(value:Boolean):void {
 			UIUtil.toggleStyleName(validationStateDisplay, REMARKS_PRESENT_STYLE, value);
 		}

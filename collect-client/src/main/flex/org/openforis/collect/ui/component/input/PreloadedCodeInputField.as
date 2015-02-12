@@ -8,7 +8,6 @@ package org.openforis.collect.ui.component.input
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 	import org.openforis.collect.presenter.DropDownInputFieldPresenter;
-	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 
@@ -23,23 +22,20 @@ package org.openforis.collect.ui.component.input
 		
 		private var _attributes:IList;
 		private var _items:IList;
+		private var _selectableItems:IList;
 		private var _selectedItems:IList;
 		private var _notSelectedItems:IList;
 		private var _reasonBlankItems:IList;
 		private var _multiple:Boolean;
 		private var _direction:String;
+		private var _multipleSelectionAllowed:Boolean;
 		
 		public function PreloadedCodeInputField() {
 			super();
 		}
 		
 		public function labelFunction(item:Object):String {
-			if ( ArrayUtil.contains([
-				DropDownInputFieldPresenter.EMPTY_ITEM, 
-				DropDownInputFieldPresenter.BLANK_ON_FORM_ITEM,
-				DropDownInputFieldPresenter.DASH_ON_FORM_ITEM,
-				DropDownInputFieldPresenter.ILLEGIBLE_ITEM
-			], item) ) {
+			if ( DropDownInputFieldPresenter.isMissingValueItem(item) ) {
 				return item.label;
 			} else {
 				var codeItem:CodeListItemProxy = CodeListItemProxy(item);
@@ -57,22 +53,48 @@ package org.openforis.collect.ui.component.input
 		}
 		
 		public function selectionChangeHandler(event:UIEvent):void {
-			var item:CodeListItemProxy = CodeListItemProxy(event.obj);
-			if ( ! multiple ) {
-				for each(var itm:Object in items) {
-					if(itm != item) {
+			var selectedItem:Object = event.obj;
+			if ( ! multiple || ! multipleSelectionAllowed) {
+				for each(var itm:Object in selectedItems) {
+					if (itm != selectedItem) {
 						//reset selection
-						itm.selected = false;
+						if (itm.hasOwnProperty("selected")) {
+							itm.selected = false;
+						}
 						CollectionUtil.removeItem(selectedItems, itm);
 					}
 				}
 			}
-			if ( item.selected ) {
-				selectedItems.addItem(item);
+			if ( ! CollectionUtil.contains(selectedItems, selectedItem) && (! selectedItem.hasOwnProperty("selected") || selectedItem.selected) ) {
+				selectedItems.addItem(selectedItem);
 			} else {
-				CollectionUtil.removeItem(selectedItems, item);
+				CollectionUtil.removeItem(selectedItems, selectedItem);
 			}
 			dispatchEvent(new Event("apply"));
+		}
+		
+		[Bindable(event="selectedItemsChange")]
+		public function get selectedIndex():int {
+			trace("attribute: " + attributeDefinition.name);
+			if ( selectableItems != null && selectedItems != null && selectedItems.length == 1 ) {
+				var selectedItem:Object = selectedItems.getItemAt(0);
+				var index:int = getSelectableItemIndex(selectedItem);
+				return index;
+			} else {
+				return -1;
+			}
+		}
+		
+		private function getSelectableItemIndex(item:Object):int {
+			var index:int;
+			if (item is CodeListItemProxy) {
+				index = CollectionUtil.getItemIndex(selectableItems, "code", item.code);
+			} else if (DropDownInputFieldPresenter.isMissingValueItem(item)) { 
+				index = CollectionUtil.getItemIndex(selectableItems, "shortCut", item.shortCut);
+			} else {
+				index = -1;
+			}
+			return index;
 		}
 		
 		protected function applyHandler(event:Event):void {
@@ -99,6 +121,15 @@ package org.openforis.collect.ui.component.input
 		
 		public function set items(value:IList):void {
 			_items = value;
+		}
+		
+		[Bindable]
+		public function get selectableItems():IList {
+			return _selectableItems;
+		}
+		
+		public function set selectableItems(value:IList):void {
+			_selectableItems = value;
 		}
 		
 		[Bindable(event="selectedItemsChange")]
@@ -145,6 +176,15 @@ package org.openforis.collect.ui.component.input
 		
 		public function set direction(value:String):void {
 			_direction = value;
+		}
+		
+		[Bindable]
+		public function get multipleSelectionAllowed():Boolean {
+			return _multipleSelectionAllowed;
+		}
+		
+		public function set multipleSelectionAllowed(value:Boolean):void {
+			_multipleSelectionAllowed = value;
 		}
 		
 	}

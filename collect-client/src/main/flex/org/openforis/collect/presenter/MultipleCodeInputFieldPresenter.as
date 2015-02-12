@@ -1,7 +1,4 @@
 package org.openforis.collect.presenter {
-	import flash.events.Event;
-	
-	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
@@ -38,15 +35,6 @@ package org.openforis.collect.presenter {
 	
 		private function get view():MultipleCodeInputField {
 			return MultipleCodeInputField(_view);
-		}
-		
-		override protected function initEventListeners():void {
-			super.initEventListeners();
-			ChangeWatcher.watch(view, "attributes", attributesChangeHandler);
-		}
-		
-		protected function attributesChangeHandler(event:Event):void {
-			updateView();
 		}
 		
 		override protected function setFocusHandler(event:InputFieldEvent):void {

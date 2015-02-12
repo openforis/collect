@@ -5,6 +5,7 @@
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
 				  xmlns:component="org.openforis.collect.ui.component.*"
 				  currentState="loading"
+				  multipleSelectionAllowed="true"
 				  >
 	<fx:Script>
 		<![CDATA[

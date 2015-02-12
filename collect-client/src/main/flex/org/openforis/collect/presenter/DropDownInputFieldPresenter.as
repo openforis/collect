@@ -27,11 +27,22 @@ package org.openforis.collect.presenter {
 	 * */
 	public class DropDownInputFieldPresenter extends InputFieldPresenter {
 		
-		public static const EMPTY_ITEM:Object = {label: Message.get('global.dropDownEmpty'), shortLabel: "", separator: false};
-		public static const BLANK_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.blankOnForm'), shortLabel: "*", shortCut: "*", separator: true};
-		public static const DASH_ON_FORM_ITEM:Object = {label: Message.get('edit.dropDownList.dashOnForm'), shortLabel: "-", shortCut: "-"};
-		public static const ILLEGIBLE_ITEM:Object = {label: Message.get('edit.dropDownList.illegible'), shortLabel: "?", shortCut: "?"};
+		public static const EMPTY_ITEM:Object = {name: "", label: Message.get('global.dropDownEmpty'), shortLabel: "", shortCut: "", separator: false};
+		public static const BLANK_ON_FORM_ITEM:Object = {name: FieldSymbol.BLANK_ON_FORM.name, label: Message.get('edit.dropDownList.blankOnForm'), shortLabel: "*", shortCut: "*", separator: true};
+		public static const DASH_ON_FORM_ITEM:Object = {name: FieldSymbol.DASH_ON_FORM.name, label: Message.get('edit.dropDownList.dashOnForm'), shortLabel: "-", shortCut: "-"};
+		public static const ILLEGIBLE_ITEM:Object = {name: FieldSymbol.ILLEGIBLE.name, label: Message.get('edit.dropDownList.illegible'), shortLabel: "?", shortCut: "?"};
 
+		public static const REASON_BLANK_ITEMS:Array = [BLANK_ON_FORM_ITEM, DASH_ON_FORM_ITEM, ILLEGIBLE_ITEM];
+		public static const MISSING_VALUE_ITEMS:Array = [EMPTY_ITEM, BLANK_ON_FORM_ITEM, DASH_ON_FORM_ITEM, ILLEGIBLE_ITEM];
+		
+		public static function isReasonBlankItem(item:Object):Boolean {
+			return REASON_BLANK_ITEMS.indexOf(item) >= 0;
+		}
+		
+		public static function isMissingValueItem(item:Object):Boolean {
+			return MISSING_VALUE_ITEMS.indexOf(item) >= 0;
+		}
+		
 		public function DropDownInputFieldPresenter(inputField:DropDownInputField) {
 			super(inputField);
 		}
