@@ -4,19 +4,20 @@
 				  xmlns:mx="library://ns.adobe.com/flex/mx" 
 				  xmlns:input="org.openforis.collect.ui.component.input.*"
 				  xmlns:component="org.openforis.collect.ui.component.*"
-				  currentState="loading"
+				  currentState="loading" xmlns:graphics="org.openforis.collect.ui.skin.graphics.*"
 				  >
 	<fx:Script>
 		<![CDATA[
 			import mx.core.UIComponent;
 			
-			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.event.UIEvent;
-			import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 			import org.openforis.collect.presenter.DropDownCodeInputFieldPresenter;
 			import org.openforis.collect.util.CollectionUtil;
 			
 			import spark.events.IndexChangeEvent;
+			
+			private var _hasRemarks:Boolean;
 
 			override protected function initPresenter():void {
 				this.presenter = new DropDownCodeInputFieldPresenter(this);
@@ -26,20 +27,23 @@
 			override public function get validationStateDisplay():UIComponent {
 				return this;
 			}
+
+			[Bindable]
+			override public function get hasRemarks():Boolean {
+				return _hasRemarks;
+			}
 			
-			[Bindable(event="selectedItemsChange")]
-			public function get selectedIndex():int {
-				if ( items != null && selectedItems != null && selectedItems.length == 1 ) {
-					var index:int = items.getItemIndex(selectedItems.getItemAt(0));
-					return index;
-				} else {
-					return -1;
-				}
+			override public function set hasRemarks(value:Boolean):void {
+				_hasRemarks = value;
+			}
+			
+			override public function isEmpty():Boolean {
+				return CollectionUtil.isEmpty(selectedItems);
 			}
 			
 			protected function dropDownListChangeHandler(event:IndexChangeEvent):void {
-				var selectedItem:CodeListItemProxy = dropDownList.selectedItem as CodeListItemProxy;
-				if ( selectedItem != null ) {
+				var selectedItem:Object = dropDownList.selectedItem;
+				if ( selectedItem != null && selectedItem.hasOwnProperty("selected")) {
 					selectedItem.selected = true;
 				}
 				var uiEvent:UIEvent = new UIEvent("selected");
@@ -55,17 +59,34 @@
 		<s:State name="default" />
 	</input:states>
 	
+	<input:layout>
+		<s:BasicLayout />
+	</input:layout>
+	
 	<component:LoadingContent includeIn="loading" />
 	
 	<s:DropDownList id="dropDownList" 
 					includeIn="default"
 					itemCreationPolicy="immediate"
-					dataProvider="{items}" 
+					dataProvider="{selectableItems}" 
 					labelFunction="{labelFunction}"
 					selectedIndex="{selectedIndex}"
 					enabled="{editable}"
 					change="dropDownListChangeHandler(event)"
 					width="{CodeAttributeDefinitionProxy(attributeDefinition).width}"
-					/>
+					>
+		<s:itemRenderer>
+			<fx:Component>
+				<input:SeparableItemRenderer labelFunction="{outerDocument.labelFunction}" />
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DropDownList>
 	
+	<graphics:RemarksPresentIcon id="remarksPresentIcon"
+								 top="0"
+								 right="0"
+								 visible="{hasRemarks}"
+								 includeIn="default"
+								 itemCreationPolicy="immediate"
+								 />
 </input:PreloadedCodeInputField>

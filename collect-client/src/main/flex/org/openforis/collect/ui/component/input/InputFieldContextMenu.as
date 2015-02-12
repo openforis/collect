@@ -229,6 +229,7 @@ package org.openforis.collect.ui.component.input {
 		private static function createNodeEvent(type:String, inputField:InputField):NodeEvent {
 			var event:NodeEvent = new NodeEvent(type);
 			var attrDefn:AttributeDefinitionProxy = inputField.attributeDefinition;
+			event.nodeDefinition = attrDefn;
 			if(attrDefn.multiple && inputField is TextCodeInputField) {
 				event.nodes = inputField.parentEntity.getChildren(attrDefn);
 			} else {
