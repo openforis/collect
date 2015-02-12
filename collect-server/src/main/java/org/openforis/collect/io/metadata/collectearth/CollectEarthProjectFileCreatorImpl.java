@@ -31,7 +31,7 @@ import org.openforis.idm.metamodel.NodeDefinitionVisitor;
  */
 public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator{
 
-	private static final String KML_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collect_earth_kml_template.txt";
+	private static final String KML_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
 	private static final String PLACEMARK_FILE_NAME = "placemark.idml.xml";
 	private static final String BALLOON_FILE_NAME = "balloon.html";
 	private static final String KML_TEMPLATE_FILE_NAME = "kml_template.fmt";

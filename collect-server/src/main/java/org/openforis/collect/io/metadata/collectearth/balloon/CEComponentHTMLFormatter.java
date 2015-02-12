@@ -34,9 +34,9 @@ public class CEComponentHTMLFormatter {
 			sb.append("<button class=\"btn btn-default\" disabled=\"disabled\">");
 			sb.append(StringEscapeUtils.escapeHtml4(comp.getLabel()));
 			sb.append("</button>\n");
-			sb.append("<select id=\"collect_select_");
+			sb.append("<select id=\"collect_code_");
 			sb.append(comp.getName());
-			sb.append("\" name=\"collect_select_");
+			sb.append("\" name=\"collect_code_");
 			sb.append(comp.getName());
 			sb.append("\" class=\"selectboxit show-menu-arrow show-tick\""); 
 			sb.append(" data-width=\"75px\" title=\"N/A\">\n");
@@ -95,6 +95,16 @@ public class CEComponentHTMLFormatter {
 				sb.append("\" name=\"");
 				sb.append(comp.getHtmlParameterName());
 				sb.append("\" value=\"0\"/>\n");
+				break;
+			case BOOLEAN:
+				break;
+			case COORDINATE:
+				break;
+			case DATE:
+				break;
+			case TIME:
+				break;
+			default:
 				break;
 			}
 		}

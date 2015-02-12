@@ -95,7 +95,6 @@
   		disabled="@load(vm.exportDisabled)" />
 
   	<button label="${labels.survey.import_survey.$}"
-  		visible="@load(not vm.collectEarthEditor)"
   		onClick="@command('openSurveyImportPopUp')" />
 
   	<button label="${labels.survey.publish.$}"

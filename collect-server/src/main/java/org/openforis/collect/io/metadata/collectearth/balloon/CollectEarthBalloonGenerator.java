@@ -45,7 +45,7 @@ import org.openforis.idm.model.NodePathPointer;
  */
 public class CollectEarthBalloonGenerator {
 	
-	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collect_earth_balloon_template.txt";
+	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt";
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
 
 	private CollectSurvey survey;
@@ -67,7 +67,6 @@ public class CollectEarthBalloonGenerator {
 		result = fillWithSurveyDefinitionFields(result);
 		return result;
 	}
-
 
 	private String getHTMLTemplate() throws IOException {
 		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
