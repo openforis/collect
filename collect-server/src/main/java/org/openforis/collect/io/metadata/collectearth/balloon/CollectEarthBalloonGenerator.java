@@ -45,6 +45,7 @@ import org.openforis.idm.model.NodePathPointer;
  */
 public class CollectEarthBalloonGenerator {
 	
+	private static final String ID_ATTRIBUTE_NAME = "id";
 	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt";
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
 
@@ -86,8 +87,9 @@ public class CollectEarthBalloonGenerator {
 		StringBuilder sb = new StringBuilder();
 		List<CEComponent> children = rootComponent.getChildren();
 		for (CEComponent child : children) {
+			String childName = child.getName();
 			//only produce the input field if it was not already part of the CSV hidden input data
-			if (! nodeNamesFromCSV.contains(child.getName())) {
+			if (! ID_ATTRIBUTE_NAME.equals(childName) && ! nodeNamesFromCSV.contains(child.getName())) {
 				String html = htmlFormatter.format(child);
 				sb.append(html);
 			}
@@ -101,8 +103,8 @@ public class CollectEarthBalloonGenerator {
 		List<AttributeDefinition> nodesFromCSV = getNodesFromCSV();
 		StringBuilder sb = new StringBuilder();
 		for (AttributeDefinition def : nodesFromCSV) {
+			String name = getHtmlParameterName(def);
 			sb.append("<input type=\"hidden\" id=\"");
-			String name = htmlParameterNameByNodePath.get(def.getPath());
 			sb.append(name);
 			sb.append("\" name=\"");
 			sb.append(name);
@@ -181,7 +183,7 @@ public class CollectEarthBalloonGenerator {
 			}
 			comp = ceEntity;
 		} else {
-			String htmlParameterName = htmlParameterNameByNodePath.get(def);
+			String htmlParameterName = getHtmlParameterName(def);
 			CEFieldType type = getFieldType(def);
 			boolean key = def instanceof KeyAttributeDefinition ? ((KeyAttributeDefinition) def).isKey(): false;
 			if (def instanceof CodeAttributeDefinition) {
@@ -206,6 +208,10 @@ public class CollectEarthBalloonGenerator {
 		comp.hideWhenNotRelevant = hideWhenNotRelevant;
 		componentByName.put(comp.getName(), comp);
 		return comp;
+	}
+
+	private String getHtmlParameterName(NodeDefinition def) {
+		return htmlParameterNameByNodePath.get(def.getPath());
 	}
 	
 	private CEFieldType getFieldType(NodeDefinition def) {

@@ -665,7 +665,8 @@
 	
 <body>
 
-	<form id="formAll" method="POST" action="$[host]saveDataExpanded">
+<!-- 	<form id="formAll" method="POST" action="$[host]saveDataExpanded"> -->
+	<form id="formAll" method="POST" action="http://127.0.0.1:8028/earth/saveDataExpanded">
 		<div id="ScrollingDiv" style="overflow :visible;" class="earthDiv">
 			<div id="contentDiv"  style="height:600px;width:100%;">
 			

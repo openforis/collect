@@ -55,6 +55,10 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 	
+	public boolean isRoot() {
+		return this == record.getRootEntity();
+	}
+	
 	public void add(Node<?> node) {
 		addInternal(node, null);
 	}

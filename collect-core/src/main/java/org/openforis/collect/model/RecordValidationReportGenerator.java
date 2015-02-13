@@ -198,7 +198,7 @@ public class RecordValidationReportGenerator {
 
 	private String getPath(Node<?> node) {
 		String path = node.getPath();
-		path = path.replaceFirst("\\w*/", "");
+//		path = path.replaceFirst("\\w*/", "");
 		return path;
 	}
 	
