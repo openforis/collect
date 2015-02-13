@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +48,9 @@ import org.openforis.idm.model.NodePathPointer;
  */
 public class CollectEarthBalloonGenerator {
 	
-	private static final String ID_ATTRIBUTE_NAME = "id";
+	private static final Set<String> FIXED_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+			"id", "operator", "location", "plot_file", "actively_saved")));
+	
 	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt";
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
 
@@ -89,7 +94,8 @@ public class CollectEarthBalloonGenerator {
 		for (CEComponent child : children) {
 			String childName = child.getName();
 			//only produce the input field if it was not already part of the CSV hidden input data
-			if (! ID_ATTRIBUTE_NAME.equals(childName) && ! nodeNamesFromCSV.contains(child.getName())) {
+			boolean includeHtmlElement = ! FIXED_ATTRIBUTE_NAMES.contains(childName) && ! nodeNamesFromCSV.contains(child.getName());
+			if (includeHtmlElement) {
 				String html = htmlFormatter.format(child);
 				sb.append(html);
 			}

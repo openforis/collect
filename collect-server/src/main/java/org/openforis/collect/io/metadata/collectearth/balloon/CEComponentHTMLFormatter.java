@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
 import org.openforis.idm.metamodel.CodeListItem;
 
 
@@ -32,10 +33,15 @@ public class CEComponentHTMLFormatter {
 		
 		//start of external container
 		String elId = comp.getHtmlParameterName();
+		String elLabel = StringEscapeUtils.escapeHtml4(comp.getLabel());
+		
 		sb.append("<div class=\"form-group\">\n");
-		sb.append("<label for=\"" + elId + "\">");
-		sb.append(StringEscapeUtils.escapeHtml4(comp.getLabel()));
-		sb.append("</label>\n");
+		if (isLabelIncluded(comp)) {
+			sb.append("<label for=\"" + elId + "\" class=\"control-label col-sm-4\">");
+			sb.append(elLabel);
+			sb.append("</label>\n");
+			sb.append("<div class=\"col-sm-8\">");
+		}
 		
 		if (comp instanceof CECodeField) {
 //			sb.append("<div class=\"capsuleCat ui-corner-all\" style=\"position: relative;\">\n");
@@ -48,7 +54,7 @@ public class CEComponentHTMLFormatter {
 			sb.append("\" name=\"");
 			sb.append(elId);
 			sb.append("\" class=\"form-control selectboxit show-menu-arrow show-tick\""); 
-			sb.append(" data-width=\"75px\" title=\"" + NOT_AVAILABLE_ITEM_LABEL + "\">\n");
+			sb.append(" data-width=\"75px\">\n");
 			sb.append("<option value=\"" + NOT_AVAILABLE_ITEM_CODE + "\">" + NOT_AVAILABLE_ITEM_LABEL + "</option>\n");
 
 			Map<String, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentCode();
@@ -105,12 +111,25 @@ public class CEComponentHTMLFormatter {
 				sb.append("\" value=\"0\"/>\n");
 				break;
 			case BOOLEAN:
+				sb.append("<input type=\"checkbox\" class=\"form-control\" id=\"");
+				sb.append(elId);
+				sb.append("\" name=\"");
+				sb.append(elId);
+				sb.append("\"/>");
 				break;
 			case COORDINATE:
 				break;
 			case DATE:
-				break;
 			case TIME:
+				String className = ((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker";
+				sb.append("<div class='input-group date " + className + "'>\n");
+				sb.append("<input type=\"text\" class=\"form-control\" id=\"");
+				sb.append(elId);
+				sb.append("\" name=\"");
+				sb.append(elId);
+				sb.append("\"/>\n");
+				sb.append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-time\"></span></span>\n");
+				sb.append("</div>\n");
 				break;
 			default:
 				break;
@@ -118,7 +137,13 @@ public class CEComponentHTMLFormatter {
 		}
 		//end of external container
 		sb.append("</div>\n");
+		sb.append("</div>\n");
 		return sb.toString();
+	}
+
+	private boolean isLabelIncluded(CEComponent comp) {
+		return true;
+//		return comp instanceof CEField && ((CEField) comp).getType() != CEFieldType.BOOLEAN;
 	}
 	
 }

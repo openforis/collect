@@ -17,11 +17,11 @@ public final class Time implements Value {
 	/**
 	 * Internal string format for Time value ("hhss")
 	 */
-	private static final Pattern INTERNAL_STRING_FORMAT = Pattern.compile("([01]|[0-9]|2[0-3])([0-5][0-9])");
+	private static final Pattern INTERNAL_STRING_FORMAT = Pattern.compile("([01][0-9]|2[0-3])([0-5][0-9])");
 	/**
 	 * Generic string format for Time value ("hh:mm" or "hh:mm:ss" . Please note that seconds will be ignored by the Time attribute)
 	 */
-	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("([01]|[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
+	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("(0?[0-9]|[01][0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
 
 	public static Time parseTime(String string) {
 		if ( StringUtils.isBlank(string) ) {
@@ -31,7 +31,7 @@ public final class Time implements Value {
 			if ( ! matcher.matches() ) {
 				matcher = INTERNAL_STRING_FORMAT.matcher(string);
 				if ( ! matcher.matches() ) {
-					throw new IllegalArgumentException("Invalid date " + string);
+					throw new IllegalArgumentException("Invalid time " + string);
 				}
 			}
 			int hour = Integer.parseInt(matcher.group(1));
@@ -47,6 +47,9 @@ public final class Time implements Value {
 			Calendar cal = Calendar.getInstance();
 		    cal.setTime(date);
 		    int hour = cal.get(Calendar.HOUR);
+		    if (cal.get(Calendar.AM_PM) == Calendar.PM) {
+		    	hour += 12;
+		    }
 		    int minute = cal.get(Calendar.MINUTE);
 		    return new Time(hour, minute);
 		}
@@ -75,7 +78,10 @@ public final class Time implements Value {
 			GregorianCalendar cal = new GregorianCalendar();
 			cal.clear();
 			cal.setLenient(false);
-			cal.set(Calendar.HOUR, hour);
+			boolean pm = hour > 12;
+			int calHour = pm ? hour - 12: hour;
+			cal.set(Calendar.AM_PM, pm ? Calendar.PM: Calendar.AM);
+			cal.set(Calendar.HOUR, calHour);
 			cal.set(Calendar.MINUTE, minute);
 			return cal;
 		}
