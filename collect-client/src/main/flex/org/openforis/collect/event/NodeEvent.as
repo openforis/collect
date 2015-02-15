@@ -2,6 +2,7 @@ package org.openforis.collect.event {
 	import mx.collections.IList;
 	
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
@@ -24,6 +25,7 @@ package org.openforis.collect.event {
 		public static const MOVE:String = "move";
 		
 		private var _inputField:InputField;
+		private var _nodeDefinition:NodeDefinitionProxy;
 		private var _parentEntity:EntityProxy;
 		private var _nodeName:String;
 		private var _node:NodeProxy;
@@ -44,6 +46,14 @@ package org.openforis.collect.event {
 		
 		public function set inputField(value:InputField):void {
 			_inputField = value;
+		}
+		
+		public function get nodeDefinition():NodeDefinitionProxy {
+			return _nodeDefinition;
+		}
+		
+		public function set nodeDefinition(value:NodeDefinitionProxy):void {
+			_nodeDefinition = value;
 		}
 		
 		public function get symbol():FieldSymbol {

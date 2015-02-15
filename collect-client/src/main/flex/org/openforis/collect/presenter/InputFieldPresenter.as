@@ -5,6 +5,7 @@ package org.openforis.collect.presenter {
 	import flash.ui.Keyboard;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
 	import mx.events.PropertyChangeEvent;
 	import mx.rpc.events.ResultEvent;
@@ -213,8 +214,23 @@ package org.openforis.collect.presenter {
 		
 		protected static function updateSymbolHandler(event:NodeEvent): void {
 			var updRequestSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
-			prepareUpdateSymbolRequests(updRequestSet, event.node, event.symbol, event.fieldIdx, event.applyToNonEmptyNodes);
+			var nodes:IList;
+			if (event.nodeDefinition.multiple) {
+				nodes = event.nodes;
+			} else {
+				nodes = new ArrayCollection();
+				if (event.node != null) {
+					nodes.addItem(event.node);
+				}
+			}
+			prepareUpdateSymbolRequestsPerNodes(updRequestSet, nodes, event.symbol, event.fieldIdx, event.applyToNonEmptyNodes);
 			_dataClient.updateActiveRecord(updRequestSet, null, faultHandler);
+		}
+		
+		protected static function prepareUpdateSymbolRequestsPerNodes(updateRequestSet:NodeUpdateRequestSetProxy, nodes:IList, symbol:FieldSymbol, fieldIdx:Number, applyToNonEmptyNodes:Boolean = false):void {
+			for each (var node:NodeProxy in nodes) {
+				prepareUpdateSymbolRequests(updateRequestSet, node, symbol, fieldIdx, applyToNonEmptyNodes);
+			}
 		}
 		
 		protected static function prepareUpdateSymbolRequests(updateRequestSet:NodeUpdateRequestSetProxy, node:NodeProxy, symbol:FieldSymbol, fieldIdx:Number, applyToNonEmptyNodes:Boolean = false):void {
@@ -580,18 +596,12 @@ package org.openforis.collect.presenter {
 		
 		protected function getRemarks():String {
 			var f:FieldProxy = getField();
-			if(f != null) {
-				return f.remarks;
-			} 
-			return null;
+			return f == null ? null: f.remarks;
 		}
 		
 		protected function getSymbol():FieldSymbol {
 			var f:FieldProxy = getField();
-			if(f != null) {
-				return f.symbol;
-			} 
-			return null;
+			return f == null ? null: f.symbol;
 		}
 		
 		protected function get contextMenu():InputFieldContextMenu {

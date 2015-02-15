@@ -1,5 +1,7 @@
 package org.openforis.collect.presenter {
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
@@ -29,13 +31,18 @@ package org.openforis.collect.presenter {
 		private function get view():CodeInputField {
 			return CodeInputField(_view);
 		}
+
+		override protected function initEventListeners():void {
+			super.initEventListeners();
+			ChangeWatcher.watch(view, "attributes", attributesChangeHandler);
+		}
 		
 		public function loadCodes(view:CodeInputField, resultHandler:Function):void {
 			var codeAttributeDef:CodeAttributeDefinitionProxy = view.attributeDefinition as CodeAttributeDefinitionProxy;
-			var attribute:String = codeAttributeDef.name;
+			var attributeName:String = codeAttributeDef.name;
 			var parentEntityId:int = view.parentEntity.id;
 			var responder:IResponder = new AsyncResponder(resultHandler, faultHandler);
-			_lastLoadCodesAsyncToken = dataClient.findAssignableCodeListItems(responder, parentEntityId, attribute);
+			_lastLoadCodesAsyncToken = dataClient.findAssignableCodeListItems(responder, parentEntityId, attributeName);
 		}
 		
 		override protected function getTextFromValue():String {
@@ -82,5 +89,11 @@ package org.openforis.collect.presenter {
 			}
 		}
 
+		protected function attributesChangeHandler(event:PropertyChangeEvent):void {
+			view.changed = false;
+			view.visited = false;
+			view.updating = false;
+			updateView();
+		}
 	}
 }

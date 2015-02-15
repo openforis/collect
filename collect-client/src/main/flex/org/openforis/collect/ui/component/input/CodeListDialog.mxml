@@ -139,6 +139,7 @@
 			editable="{editable}"
 			sortable="false"
 			selectionChange="selectionChangeHandler(event)"
+			multipleSelection="{multiple}"
 			apply="applyHandler(event)"
 			currentState="vertical"
 			width="100%" 

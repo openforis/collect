@@ -13,6 +13,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeChangeProxy;
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
@@ -55,7 +56,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
-			if ( view.parentEntity != null ) {
+			if ( view.parentEntity != null && (view.attribute != null || view.attributes != null)) {
 				if (! view.updating) {
 					initDataProvider();
 				}
@@ -75,8 +76,9 @@ package org.openforis.collect.presenter
 				
 				var selectedItems:ArrayCollection;
 				var notSelectedItems:ArrayCollection;
-				if ( data == null ) {
-					selectedItems = notSelectedItems = new ArrayCollection();
+				if ( CollectionUtil.isEmpty(data) ) {
+					selectedItems = new ArrayCollection();
+					notSelectedItems = new ArrayCollection();
 				} else {
 					selectedItems = new ArrayCollection();
 					for each (var item:CodeListItemProxy in data) {
@@ -91,17 +93,27 @@ package org.openforis.collect.presenter
 					notSelectedItems.refresh();
 				}
 				view.items = data;
-				view.selectedItems = selectedItems;
-				view.notSelectedItems = notSelectedItems;
-				
+
 				var reasonBlankItems:ArrayCollection = new ArrayCollection();
 				//TODO enable by attribute definition
-				reasonBlankItems.addItem(DropDownInputFieldPresenter.EMPTY_ITEM);
+				//reasonBlankItems.addItem(DropDownInputFieldPresenter.EMPTY_ITEM);
 				reasonBlankItems.addItem(DropDownInputFieldPresenter.BLANK_ON_FORM_ITEM);
 				reasonBlankItems.addItem(DropDownInputFieldPresenter.DASH_ON_FORM_ITEM);
 				reasonBlankItems.addItem(DropDownInputFieldPresenter.ILLEGIBLE_ITEM);
-
 				view.reasonBlankItems = reasonBlankItems;
+				
+				var selectableItems:ArrayCollection = new ArrayCollection();
+				selectableItems.addAll(data);
+				selectableItems.addAll(reasonBlankItems);
+				view.selectableItems = selectableItems;
+
+				//select reason blank, if specified
+				var symbol:FieldSymbol = getSymbol();
+				if (symbol != null) {
+					selectedItems.addItem(CollectionUtil.getItem(reasonBlankItems, "name", symbol.name));
+				}
+				view.selectedItems = selectedItems;
+				view.notSelectedItems = notSelectedItems;
 				
 				if ( CodeAttributeDefinitionProxy(view.attributeDefinition).allowValuesSorting ) {
 					view.currentState = PreloadedCodeInputField.STATE_VALUES_SORTING_ALLOWED;
@@ -152,6 +164,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override public function updateValue():void {
+			var remarks:String = getRemarks();
 			if ( view.attributeDefinition.multiple ) {
 				//multiple attribute
 				
@@ -168,12 +181,16 @@ package org.openforis.collect.presenter
 				
 				//add new attributes
 				var addAttributesOperations:ArrayCollection = new ArrayCollection();
-				var remarks:String = getRemarks();
-				var symbol:FieldSymbol = null;
 				if(view.selectedItems.length > 0) {
-					for each (var item:CodeListItemProxy in view.selectedItems) {
-						r = createAttributeAddRequest(getTextValue(item.code, item.qualifier), symbol, remarks);
-						addAttributesOperations.addItem(r);
+					for each (var item:Object in view.selectedItems) {
+						if (item is CodeListItemProxy) {
+							var codeListItem = CodeListItemProxy(item);
+							r = createAttributeAddRequest(getTextValue(codeListItem.code, codeListItem.qualifier), null, remarks);
+							addAttributesOperations.addItem(r);
+						} else if (DropDownInputFieldPresenter.isReasonBlankItem(item)) {
+							r = createAttributeAddRequest(null, FieldProxy.parseShortCutForReasonBlank(item.shortCut), remarks);
+							addAttributesOperations.addItem(r);
+						}
 					}
 				} else if(StringUtil.isNotBlank(remarks)) {
 					//add empty attribute
@@ -188,15 +205,19 @@ package org.openforis.collect.presenter
 				sendUpdateRequestSet(req);
 			} else {
 				//single attribute
-				var remarks:String = getRemarks(); //preserve old remarks
 				var value:String;
 				if ( view.selectedItems.length == 1 ) {
-					var selectedItem:CodeListItemProxy = view.selectedItems[0] as CodeListItemProxy;
-					value = getTextValue(selectedItem.code, selectedItem.qualifier);
+					var selectedItem:Object = view.selectedItems[0];
+					if (selectedItem is CodeListItemProxy) {
+						var codeListItem = CodeListItemProxy(selectedItem);
+						value = getTextValue(codeListItem.code, codeListItem.qualifier);
+					} else {
+						value = selectedItem.shortCut;
+					}
 				} else {
 					value = null;
 				}
-				var r:NodeUpdateRequestProxy = createSpecificValueUpdateRequest(value, symbol, remarks);
+				var r:NodeUpdateRequestProxy = createSpecificValueUpdateRequest(value, null, remarks);
 				sendUpdateRequest(r);
 			}
 		}
