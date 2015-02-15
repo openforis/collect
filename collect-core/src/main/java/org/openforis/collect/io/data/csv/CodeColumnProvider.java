@@ -12,7 +12,10 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
 
 /**
  * @author M. Togna
@@ -21,17 +24,26 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 
 	private static final String ITEM_POSITION_FIELD_NAME = "item_pos";
 	private static final String ITEM_POSITION_SUFFIX = "class";
-	private static final String QUALIFIER_SUFFIX = "qualifier";
 	
-	private boolean includeItemPositionColumn;
+	private boolean hasExpandedItems = false;
+	private List<CodeListItem> expandedItems = null;
 	
-	public CodeColumnProvider(CodeAttributeDefinition defn) {
-		this(defn, false);
+	public CodeColumnProvider(CSVExportConfiguration config, CodeAttributeDefinition defn) {
+		super(config, defn);
+		init();
 	}
 
-	public CodeColumnProvider(CodeAttributeDefinition defn, boolean includeItemPositionColumn) {
-		super(defn);
-		this.includeItemPositionColumn = includeItemPositionColumn;
+	@Override
+	protected void init() {
+		if (getConfig().isCodeAttributeExpanded()) {
+			CodeList list = attributeDefinition.getList();
+			int levelPosition = attributeDefinition.getLevelPosition();
+			CodeListService codeListService = getCodeListService();
+			List<CodeListItem> items = codeListService.loadItems(list, levelPosition);
+			hasExpandedItems = items.size() <= getConfig().getMaxExpandedCodeAttributeItems();
+			expandedItems = hasExpandedItems ? items: null;
+		}
+		super.init();
 	}
 	
 	@Override
@@ -40,40 +52,85 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 		//code field
 		result.add(CodeAttributeDefinition.CODE_FIELD);
 		//qualifier field
-		CodeList list = defn.getList();
+		CodeList list = attributeDefinition.getList();
 		if ( hasQualifiableItems(list) ) {
 			result.add(CodeAttributeDefinition.QUALIFIER_FIELD);
 		}
 		//item position field
-		if ( includeItemPositionColumn && ! list.isExternal() ) {
+		if ( getConfig().isIncludeCodeItemPositionColumn() && ! list.isExternal() ) {
 			result.add(ITEM_POSITION_FIELD_NAME);
 		}
-		return result.toArray(new String[]{});
+		return result.toArray(new String[result.size()]);
 	}
 
 	@Override
-	protected String getFieldHeading(String fieldName) {
-		if ( CodeAttributeDefinition.CODE_FIELD.equals(fieldName) ) {
-			return defn.getName();
-		} else if ( CodeAttributeDefinition.QUALIFIER_FIELD.equals(fieldName) ) {
-			return defn.getName() + FIELD_SEPARATOR + QUALIFIER_SUFFIX;
-		} else if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
-			return "_" + defn.getName() + FIELD_SEPARATOR + ITEM_POSITION_SUFFIX;
-		} else {
-			return super.getFieldHeading(fieldName);
+	public List<String> generateColumnHeadings() {
+		List<String> headings = super.generateColumnHeadings();
+		if (hasExpandedItems) {
+			headings.addAll(generateExpandedItemsHeadings());
 		}
+		return headings;
+	}
+
+	private List<String> generateExpandedItemsHeadings() {
+		List<String> headings = new ArrayList<String>();
+		for (CodeListItem item : expandedItems) {
+			String heading = attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + item.getCode();
+			headings.add(heading);
+			if (item.isQualifiable()) {
+				headings.add(heading + getConfig().getFieldHeadingSeparator() + CodeAttributeDefinition.QUALIFIER_FIELD);
+			}
+		}
+		return headings;
+	}
+	
+	@Override
+	protected String generateFieldHeading(String fieldName) {
+		if ( CodeAttributeDefinition.CODE_FIELD.equals(fieldName) ) {
+			return attributeDefinition.getName();
+		} else if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
+			return "_" + attributeDefinition.getName() + getConfig().getFieldHeadingSeparator() + ITEM_POSITION_SUFFIX;
+		} else {
+			return super.generateFieldHeading(fieldName);
+		}
+	}
+	
+	@Override
+	public List<String> extractValues(Node<?> axis) {
+		List<String> values = super.extractValues(axis);
+		if (hasExpandedItems) {
+			List<Node<?>> attributes = ((Entity) axis).getAll(attributeDefinition);
+			for (CodeListItem item : expandedItems) {
+				CodeAttribute attr = findAttributeByCode(attributes, item.getCode());
+				values.add(Boolean.valueOf(attr != null).toString());
+				if (item.isQualifiable()) {
+					values.add(attr == null ? "": attr.getValue().getQualifier());
+				}
+			}
+		}
+		return values;
+	}
+
+	protected CodeAttribute findAttributeByCode(List<Node<?>> attributes, String code) {
+		for (Node<?> attr : attributes) {
+			CodeAttribute codeAttr = (CodeAttribute) attr;
+			Code val = codeAttr.getValue();
+			if (val != null && code.equals(val.getCode())) {
+				return codeAttr;
+			}
+		}
+		return null;
 	}
 	
 	@Override
 	protected String extractValue(Attribute<?, ?> attr, String fieldName) {
 		if ( ITEM_POSITION_FIELD_NAME.equals(fieldName) ) {
-			SurveyContext context = defn.getSurvey().getContext();
-			CodeListService codeListService = context.getCodeListService();
+			CodeListService codeListService = getCodeListService();
 			CodeListItem item = codeListService.loadItem((CodeAttribute) attr);
 			if ( item == null ) {
 				return "";
 			} else {
-				List<CodeListItem> items = codeListService.loadItems(defn.getList(), defn.getLevelPosition());
+				List<CodeListItem> items = codeListService.loadItems(attributeDefinition.getList(), attributeDefinition.getLevelPosition());
 				int position = items.indexOf(item) + 1;
 				return Integer.toString(position);
 			}
@@ -83,8 +140,14 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	}
 
 	private boolean hasQualifiableItems(CodeList list) {
-		CodeListService codeListService = defn.getSurvey().getContext().getCodeListService();
+		CodeListService codeListService = getCodeListService();
 		return codeListService.hasQualifiableItems(list);
+	}
+	
+	private CodeListService getCodeListService() {
+		SurveyContext context = attributeDefinition.getSurvey().getContext();
+		CodeListService codeListService = context.getCodeListService();
+		return codeListService;
 	}
 	
 }

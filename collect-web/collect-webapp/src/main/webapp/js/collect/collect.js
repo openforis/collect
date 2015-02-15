@@ -12,13 +12,14 @@ Collect.prototype.init = function() {
 	this.dataErrorTypeService = new Collect.DataErrorTypeService();
 	this.dataErrorQueryService = new Collect.DataErrorQueryService();
 	this.dataErrorReportService = new Collect.DataErrorReportService();
+	this.geoDataService = new Collect.GeoDataService();
 	
 	this.dataQueryTestResultDataGrid = null;
 	
 	this.initDataErrorTypePanel();
 	this.initDataErrorQueryPanel();
 	this.initDataErrorReportsPanel();
-	new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
+	this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
 	
 	this.initGlobalEventHandlers();
 	
@@ -53,6 +54,7 @@ Collect.prototype.initGlobalEventHandlers = function() {
 		$this.initDataErrorQueryGrid();
 		$this.initDataErrorReportGrid();
 		$this.initDataQueryPanel();
+		$this.initMapPanel();
 		$("#home-survey-selector-button").text($this.activeSurvey.name);
 	});
 	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED, function() {
@@ -224,6 +226,10 @@ Collect.prototype.initDataErrorQueryPanel = function() {
 		var selections = $this.dataErrorQueryDataGrid.getSelections();
 		return selections.length == 0 ? null : selections[0];
 	}
+};
+
+Collect.prototype.initMapPanel = function() {
+	this.mapPanelComposer.init();
 };
 
 Collect.prototype.initDataErrorTypeGrid = function() {

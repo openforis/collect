@@ -90,7 +90,7 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	}
 
 	public abstract <V extends Value> V createValue(String string);
-	
+
 //	public Set<NodePathPointer> getCheckDependencyPaths() {
 //		Survey survey = getSurvey();
 //		return survey.getCheckDependencies(this);
@@ -146,6 +146,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 			fieldLabels.remove(field, language);
 		}
 	}
+	
+	public abstract boolean hasMainField();
 	
 	public abstract String getMainFieldName();
 	

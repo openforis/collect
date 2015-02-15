@@ -1,7 +1,10 @@
 package org.openforis.collect.datacleansing.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
@@ -10,6 +13,7 @@ import org.geojson.MultiPoint;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
@@ -24,19 +28,25 @@ import org.openforis.idm.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
+
+import de.micromata.opengis.kml.v_2_2_0.Document;
+import de.micromata.opengis.kml.v_2_2_0.Kml;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
 @RequestMapping(value = "/geo/data/")
 public class GeoDataController {
 
+	private static final String KML_CONTENT_TYPE = "application/vnd.google-earth.kml+xml";
 	@Autowired
 	private SessionManager sessionManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
@@ -101,11 +111,13 @@ public class GeoDataController {
 		return bounds;
 	}
 	
-	@RequestMapping(value = "coordinatevalues.json", method = RequestMethod.GET)
-	public @ResponseBody List<LngLatAlt> loadCoordinateValues(@RequestParam int recordOffset, @RequestParam int maxNumberOfRecords, 
-			@RequestParam int coordinateAttributeId) {
+	@RequestMapping(value = "{surveyName}/{coordinateAttributeId}/coordinatevalues.json", method = RequestMethod.GET)
+	public @ResponseBody List<LngLatAlt> loadCoordinateValues(
+			@PathVariable("surveyName") String surveyName, 
+			@PathVariable("coordinateAttributeId") int coordinateAttributeId, 
+			int recordOffset, int maxNumberOfRecords) {
 		List<LngLatAlt> result = new ArrayList<LngLatAlt>();
-		CollectSurvey survey = sessionManager.getActiveSurvey();
+		CollectSurvey survey = surveyManager.get(surveyName);
 		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
 		CoordinateAttributeDefinition coordAttrDef = (CoordinateAttributeDefinition) survey.getSchema().getDefinitionById(coordinateAttributeId);
 
@@ -128,6 +140,40 @@ public class GeoDataController {
 		return result;
 	}
 
+	@RequestMapping(value = "{surveyName}/{coordinateAttributeId}/coordinates.kml", method = RequestMethod.GET, produces = KML_CONTENT_TYPE)
+	public void createCoordinateValuesKML(
+			@PathVariable("surveyName") String surveyName, 
+			@PathVariable("coordinateAttributeId") int coordinateAttributeId, 
+			HttpServletResponse response) throws IOException {
+		Kml kml = new Kml();
+		
+		CollectSurvey survey = surveyManager.get(surveyName);
+		
+		Document kmlDoc = kml.createAndSetDocument().withName(surveyName);
+
+		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
+		CoordinateAttributeDefinition coordAttrDef = (CoordinateAttributeDefinition) 
+				survey.getSchema().getDefinitionById(coordinateAttributeId);
+
+		RecordFilter filter = new RecordFilter(survey);
+		List<CollectRecord> summaries = recordManager.loadSummaries(filter);
+		for (CollectRecord summary : summaries) {
+			CollectRecord record = recordManager.load(survey, summary.getId());
+			List<Node<?>> nodes = record.findNodesByPath(coordAttrDef.getPath());
+			for (Node<?> node : nodes) {
+				CoordinateAttribute coordAttr = (CoordinateAttribute) node;
+				Coordinate coordinate = coordAttr.getValue();
+				Coordinate wgs84Coord = coordinateOperations.convertToWgs84(coordinate);
+				kmlDoc.createAndAddPlacemark()
+					.withName(record.getRootEntityKeyValues().toString())
+					.withOpen(Boolean.TRUE)
+					.createAndSetPoint()
+					.addToCoordinates(wgs84Coord.getY(), wgs84Coord.getX());
+			}
+		}
+		kml.marshal(response.getOutputStream());
+	}
+	
 	private LngLatAlt createLngLatAlt(CoordinateOperations coordOpts, Coordinate coord) {
 		try {
 			Coordinate wgs84Coord = coordOpts.convertToWgs84(coord);

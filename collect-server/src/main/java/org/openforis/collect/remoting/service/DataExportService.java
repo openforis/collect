@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.CSVDataExportProcess;
+import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 import org.openforis.collect.manager.RecordManager;
@@ -53,7 +54,8 @@ public class DataExportService {
 	
 	@Transactional
 	public Proxy export(String rootEntityName, int stepNumber, Integer entityId, boolean includeAllAncestorAttributes, 
-			boolean includeEnumeratedEntities, boolean onlyOwnedRecords, String[] rootEntityKeyValues) throws IOException {
+			boolean includeEnumeratedEntities, boolean includeCompositeAttributeMergedColumn, 
+			boolean codeAttributeExpanded, boolean onlyOwnedRecords, String[] rootEntityKeyValues) throws IOException {
 		if ( dataExportProcess == null || ! dataExportProcess.getStatus().isRunning() ) {
 			resetJobs();
 			
@@ -78,9 +80,13 @@ public class DataExportService {
 			process.setOutputFile(outputFile);
 			process.setRecordFilter(recordFilter);
 			process.setEntityId(entityId);
-			process.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
-			process.setIncludeEnumeratedEntities(includeEnumeratedEntities);
 			process.setAlwaysGenerateZipFile(true);
+			CSVExportConfiguration config = new CSVExportConfiguration();
+			config.setIncludeAllAncestorAttributes(includeAllAncestorAttributes);
+			config.setIncludeEnumeratedEntities(includeEnumeratedEntities);
+			config.setIncludeCompositeAttributeMergedColumn(includeCompositeAttributeMergedColumn);
+			config.setCodeAttributeExpanded(codeAttributeExpanded);
+			process.setConfiguration(config);
 			
 			process.init();
 			

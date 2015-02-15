@@ -12,6 +12,7 @@ import org.openforis.idm.model.Node;
 
 /**
  * @author G. Miceli
+ * @deprecated
  */
 public class MultipleAttributeColumnProvider implements ColumnProvider {
 
@@ -42,8 +43,11 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 				if ( i > 0 ) {
 					sb.append(delimiter);
 				}
-				String fieldName = defn.getMainFieldName();
-				String val = extractValue(entity, fieldName, i);
+				String mainFieldName = null;
+				if (defn.hasMainField()) {
+					mainFieldName = defn.getMainFieldName();
+				}
+				String val = extractValue(entity, mainFieldName, i);
 				sb.append(val);
 			}
 			return Arrays.asList(sb.toString());
@@ -57,8 +61,13 @@ public class MultipleAttributeColumnProvider implements ColumnProvider {
 		if ( attr == null ) {
 			return ""; 
 		} else {
-			Field<?> fld = attr.getField(fieldName);
-			Object v = fld.getValue();
+			Object v;
+			if (fieldName == null) {
+				v = attr.getValue();
+			} else {
+				Field<?> fld = attr.getField(fieldName);
+				v = fld.getValue();
+			}
 			return v == null ? "" : v.toString();
 		}
 	}

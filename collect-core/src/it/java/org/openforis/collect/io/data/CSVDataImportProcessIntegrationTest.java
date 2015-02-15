@@ -25,7 +25,6 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -84,12 +83,10 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	private Unit centimeterUnit;
 	private Unit kilometerUnit;
 	private BeanFactory beanFactory;
-	private RecordUpdater recordUpdater;
 	
 	@SuppressWarnings("deprecation")
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
-		recordUpdater = new RecordUpdater();
 		survey = loadSurvey();
 		survey.setWork(false);
 		surveyManager.importModel(survey);

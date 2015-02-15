@@ -12,8 +12,8 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
  */
 public class TaxonColumnProvider extends CompositeAttributeColumnProvider<TaxonAttributeDefinition> {
 
-	public TaxonColumnProvider(TaxonAttributeDefinition defn) {
-		super(defn);
+	public TaxonColumnProvider(CSVExportConfiguration config, TaxonAttributeDefinition defn) {
+		super(config, defn);
 	}
 
 	@Override
