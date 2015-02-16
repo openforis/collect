@@ -58,6 +58,8 @@ public class CodeAttributeDependencyGraph extends NodeDependencyGraph {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Set<CodeAttribute> dependentCodeAttributes(CodeAttribute codeAttr) {
 		List dependencies = super.dependenciesFor(codeAttr);
+		//TODO check if the same node has to be included in the dependenciesFor method result
+		dependencies.remove(codeAttr);
 		return new HashSet(dependencies);
 	}
 	
