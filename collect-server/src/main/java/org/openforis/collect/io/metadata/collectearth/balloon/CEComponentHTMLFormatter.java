@@ -89,14 +89,14 @@ public class CEComponentHTMLFormatter {
 		} else if (comp instanceof CEField) {
 			switch (((CEField) comp).getType()) {
 			case SHORT_TEXT:
-				sb.append("<input type=\"text\" style=\"width: 50px\" class=\"form-control\" id=\"");
+				sb.append("<input type=\"text\" class=\"form-control\" id=\"");
 				sb.append(elId);
 				sb.append("\" name=\"");
 				sb.append(elId);
 				sb.append("\"/>\n");
 				break;
 			case LONG_TEXT:
-				sb.append("<textarea rows=\"3\"  id=\"");
+				sb.append("<textarea rows=\"3\" class=\"form-control\" id=\"");
 				sb.append(elId);
 				sb.append("\" name=\"");
 				sb.append(elId);
@@ -104,7 +104,7 @@ public class CEComponentHTMLFormatter {
 				break;
 			case INTEGER:
 			case REAL:
-				sb.append("<input type=\"text\" style=\"width: 50px\" class=\"form-control\" id=\"");
+				sb.append("<input type=\"text\" class=\"form-control numeric\" id=\"");
 				sb.append(elId);
 				sb.append("\" name=\"");
 				sb.append(elId);
