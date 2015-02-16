@@ -12,7 +12,7 @@ class CEField extends CEComponent {
 		BOOLEAN, COORDINATE, CODE_SELECT, CODE_BUTTON_GROUP, DATE, INTEGER, REAL, SHORT_TEXT, LONG_TEXT, TIME
 	}
 	
-	private CEField.CEFieldType type;
+	private CEFieldType type;
 	private boolean key;
 	
 	public CEField(String htmlParameterName, String name, String label, boolean multiple, CEField.CEFieldType type, boolean key) {
@@ -21,7 +21,7 @@ class CEField extends CEComponent {
 		this.key = key;
 	}
 
-	public CEField.CEFieldType getType() {
+	public CEFieldType getType() {
 		return type;
 	}
 

@@ -133,17 +133,4 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 	</div>
 	<iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/openAuxiliaryWindows?latLongCoordinates=$[latitude],$[longitude]" height="0" width="0"></iframe>
 </body>
-<script>
-//http://jqueryui.com/tooltip/
-$(document).tooltip({
-	 show: null,
-	 position: {
-	 my: "left top",
-	 at: "left bottom"
-	 },
-	 open: function( event, ui ) {
-	 ui.tooltip.animate({ top: ui.tooltip.position().top + 10 }, "fast" );
-	 }
-	 }); 
-</script>
 </html>

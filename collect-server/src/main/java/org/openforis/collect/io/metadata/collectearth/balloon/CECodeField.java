@@ -15,6 +15,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 class CECodeField extends CEField {
 	
 //	private CodeList listName;
+	
 	private String parentName;
 	private Map<String, List<CodeListItem>> codeItemsByParentCode = new HashMap<String, List<CodeListItem>>();
 

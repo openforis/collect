@@ -198,14 +198,14 @@ public class CollectEarthBalloonGenerator {
 				Map<String, List<CodeListItem>> codeItemsByParentCode = new HashMap<String, List<CodeListItem>>();
 				List<CodeListItem> rootCodeItems = codeListService.loadRootItems(((CodeAttributeDefinition) def).getList());
 				if (parentCodeAttributeDef == null) {
-					codeItemsByParentCode.put("", rootCodeItems);
+					codeItemsByParentCode.put("", rootCodeItems); //root items
 				} else {
 					for (CodeListItem rootCodeItem : rootCodeItems) {
 						List<CodeListItem> childItems = codeListService.loadChildItems(rootCodeItem);
 						codeItemsByParentCode.put(rootCodeItem.getCode(), childItems);
 					}
 				}
-				String parentName = parentCodeAttributeDef == null ? null: parentCodeAttributeDef.getName();
+				String parentName = parentCodeAttributeDef == null ? null: getHtmlParameterName(parentCodeAttributeDef);
 				comp = new CECodeField(htmlParameterName, def.getName(), label, type, multiple, key, codeItemsByParentCode, parentName);
 			} else {
 				comp = new CEField(htmlParameterName, def.getName(), label, multiple, type, key);
