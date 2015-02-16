@@ -152,7 +152,23 @@ public abstract class DependencyGraph<T> {
 		}
 		return result;
 	}
+	
+	protected List<T> sourcesForItem(T item) {
+		Object graphNodeId = getId(item);
+		GraphNode graphNode = graphNodeById.get(graphNodeId);
+		if ( graphNode == null ) {
+			return Collections.emptyList();
+		} else {
+			return getSourceNodes(graphNode);
+		}
+	}
 
+	private List<T> getSourceNodes(GraphNode node) {
+		Set<GraphNode> sourceGraphNodes = node.getUnsortedSources();
+		List<T> items = extractItems(sourceGraphNodes);
+		return items;
+	}
+	
 	private Set<T> getRelatedItems(T item, Set<NodePathPointer> pointers) throws InvalidExpressionException {
 		Set<T> result = new HashSet<T>();
 		for (NodePathPointer nodePathPointer : pointers) {
@@ -224,6 +240,24 @@ public abstract class DependencyGraph<T> {
 				GraphNode childGrapNode = graphNodeById.get(getId(child));
 				result.add(childGrapNode);
 				result.addAll(childGrapNode.getUnsortedDependents(visited));
+			}
+			return result;
+		}
+		
+		private Set<GraphNode> getUnsortedSources() {
+			return getUnsortedSources(new HashSet<GraphNode>());
+		}
+		
+		private Set<GraphNode> getUnsortedSources(Set<GraphNode> visited) {
+			if ( visited.contains(this) ) {
+				return Collections.emptySet();
+			}
+			visited.add(this);
+			
+			Set<GraphNode> result = new HashSet<GraphNode>();
+			for (GraphNode graphNode : sources) {
+				result.add(graphNode);
+				result.addAll(graphNode.getUnsortedSources(visited));
 			}
 			return result;
 		}

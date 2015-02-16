@@ -3,14 +3,13 @@ package org.openforis.idm.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.SurveyContext;
-import org.openforis.idm.model.expression.ExpressionEvaluator;
 
 /**
  * @author G. Miceli
@@ -85,22 +84,12 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 	}
 	
 	public CodeAttribute getCodeParent() {
-		try {
-			String parentExpr = definition.getParentExpression();
-			if (StringUtils.isBlank(parentExpr)) {
-				return null;
-			}
-			SurveyContext recordContext = getRecord().getSurveyContext();
-			ExpressionEvaluator expressionEvaluator = recordContext.getExpressionEvaluator();
-			Node<?> parentNode = expressionEvaluator.evaluateNode(getParent(), this, parentExpr);
-			if (parentNode != null && parentNode instanceof CodeAttribute) {
-				return (CodeAttribute) parentNode;
-			} else {
-				return null;
-			}
-		} catch (Exception e) {
-			throw new RuntimeException("Error while getting parent code " + e);
+		String parentExpr = definition.getParentExpression();
+		if (StringUtils.isBlank(parentExpr)) {
+			return null;
 		}
+		CodeAttribute parentNode = getRecord().determineParentCodeAttribute(this);
+		return parentNode;
 	}
 	
 	/**
@@ -117,6 +106,11 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 			parent = parent.getCodeParent();
 		}
 		return Collections.unmodifiableList(result);
+	}
+	
+	public Set<CodeAttribute> getDependentCodeAttributes() {
+		Set<CodeAttribute> dependents = getRecord().determineDependentCodeAttributes(this);
+		return dependents;
 	}
 
 	private CodeListItem findCodeListItem(List<CodeListItem> list, String value, ModelVersion version) {
