@@ -52,6 +52,7 @@ class SurveyDependencies {
 	private StateDependencyMap maxCountDependencies;
 	private StateDependencyMap relevanceDependencies;
 	private StateDependencyMap validationDependencies;
+	private StateDependencyMap parentCodeDependencies;
 
 	SurveyDependencies(Survey survey) {
 		this.survey = survey;
@@ -63,6 +64,7 @@ class SurveyDependencies {
 		this.maxCountDependencies = new StateDependencyMap(expressionEvaluator);
 		this.relevanceDependencies = new StateDependencyMap(expressionEvaluator);
 		this.validationDependencies = new StateDependencyMap(expressionEvaluator);
+		this.parentCodeDependencies = new StateDependencyMap(expressionEvaluator);
 		
 		registerDependencies();
 	}
@@ -119,7 +121,9 @@ class SurveyDependencies {
 			// register parent code dependencies
 			CodeAttributeDefinition currentCodeDefn = (CodeAttributeDefinition) defn;
 			while ( currentCodeDefn != null ) {
-				validationDependencies.registerDependencies(defn, currentCodeDefn.getParentExpression());
+				String parentCodeExpression = currentCodeDefn.getParentExpression();
+				validationDependencies.registerDependencies(defn, parentCodeExpression);
+				parentCodeDependencies.registerDependencies(defn, parentCodeExpression);
 				currentCodeDefn = currentCodeDefn.getParentCodeAttributeDefinition();
 			}
 		}
@@ -206,6 +210,14 @@ class SurveyDependencies {
 	
 	Set<NodePathPointer> getValidationSources(NodeDefinition definition) {
 		return validationDependencies.getSources(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getRelatedCodeDependencies(CodeAttributeDefinition definition) {
+		return parentCodeDependencies.getDependencySet(definition.getPath());
+	}
+	
+	Set<NodePathPointer> getRelatedCodeSources(CodeAttributeDefinition definition) {
+		return parentCodeDependencies.getSources(definition.getPath());
 	}
 
 }

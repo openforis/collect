@@ -185,7 +185,7 @@ public class NodeChangeMap implements NodeChangeSet {
 		change.setUpdatedFieldValues(fieldValues);
 	}
 
-	public void addValueChanges(Collection<Attribute<?, ?>> attributes) {
+	public void addValueChanges(Collection<? extends Attribute<?, ?>> attributes) {
 		for (Attribute<?, ?> attribute : attributes) {
 			addValueChange(attribute);
 		}
