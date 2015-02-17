@@ -22,15 +22,6 @@ public class CEComponentHTMLFormatter {
 
 	public String format(CEComponent comp) {
 		StringBuilder sb = new StringBuilder();
-//		if (comp instanceof CEField) {
-//			String parameterName = comp.getHtmlParameterName();
-//			sb.append("<input type=\"hidden\" id=\"");
-//			sb.append(parameterName);
-//			sb.append("\" name=\"");
-//			sb.append(parameterName);
-//			sb.append("\"  />");
-//			sb.append('\n');
-//		}
 		
 		//start of external container
 		String elId = comp.getHtmlParameterName();
@@ -45,11 +36,6 @@ public class CEComponentHTMLFormatter {
 		sb.append("<div class=\"col-sm-8\">\n");
 		
 		if (comp instanceof CECodeField) {
-//			sb.append("<div class=\"capsuleCat ui-corner-all\" style=\"position: relative;\">\n");
-//			sb.append("<div class=\"input-prepend btn-group\">\n");
-//			sb.append("<button class=\"btn btn-default\" disabled=\"disabled\">");
-//			sb.append(StringEscapeUtils.escapeHtml4(comp.getLabel()));
-//			sb.append("</button>\n");
 			switch(((CEField) comp).getType()) {
 			case CODE_BUTTON_GROUP:
 				appendCodeButtonGroup(sb, (CECodeField) comp);
@@ -120,9 +106,16 @@ public class CEComponentHTMLFormatter {
 		
 		sb.append("<select id=\"");
 		sb.append(elId);
-		sb.append("\" name=\" data-field-type=\"code\"");
+		sb.append("\" name=\"");
 		sb.append(elId);
-		sb.append("\" class=\"form-control selectboxit show-menu-arrow show-tick\""); 
+		sb.append("\"");
+		sb.append(" data-field-type=\"");
+		sb.append(comp.getType().name());
+		sb.append("\"");
+		sb.append(" data-parent-code-field-id=\"");
+		sb.append(comp.getParentName());
+		sb.append("\"");
+		sb.append(" class=\"form-control selectboxit show-menu-arrow show-tick\""); 
 		sb.append(" data-width=\"75px\">\n");
 		sb.append("<option value=\"" + NOT_AVAILABLE_ITEM_CODE + "\">" + NOT_AVAILABLE_ITEM_LABEL + "</option>\n");
 		
@@ -150,9 +143,16 @@ public class CEComponentHTMLFormatter {
 		sb.append("\" class=\"code-items-group\">\n");
 		
 		//hidden field that stores the actual value
-		sb.append("<input type=\"hidden\" class=\"form-control\" data-field-type=\"code\" data-parent-code-field=\"");
-		sb.append(comp.getParentName());
-		sb.append("\" id=\"");
+		sb.append("<input type=\"hidden\" class=\"form-control\"");
+		sb.append(" data-field-type=\"");
+		sb.append(comp.getType().name());
+		sb.append("\"");
+		if (comp.getParentName() != null) {
+			sb.append(" data-parent-code-field-id=\"");
+			sb.append(comp.getParentName());
+			sb.append("\"");
+		}
+		sb.append(" id=\"");
 		sb.append(elId);
 		sb.append("\" name=\"");
 		sb.append(elId);
@@ -165,7 +165,12 @@ public class CEComponentHTMLFormatter {
 			String itemsGroupId = groupId + "_" + parentCode;
 			sb.append("<div id=\"");
 			sb.append(itemsGroupId);
-			sb.append("\" class=\"code-items\">\n");
+			sb.append("\"");
+			sb.append(" class=\"code-items\"");
+			sb.append(" data-toggle=\"buttons-radio\"");
+			sb.append(" data-parent-code=\"");
+			sb.append(parentCode);
+			sb.append("\">\n");
 			List<CodeListItem> items = entry.getValue();
 			if (items != null) {
 				for (CodeListItem item : items) {
