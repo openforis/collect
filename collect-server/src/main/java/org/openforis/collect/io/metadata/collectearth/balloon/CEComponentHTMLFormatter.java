@@ -1,12 +1,16 @@
 package org.openforis.collect.io.metadata.collectearth.balloon;
 
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
 import org.openforis.idm.metamodel.CodeListItem;
+
+import com.jamesmurty.utils.XMLBuilder;
 
 
 /**
@@ -21,171 +25,180 @@ public class CEComponentHTMLFormatter {
 	private static final String NOT_AVAILABLE_ITEM_CODE = "-1";
 
 	public String format(CEComponent comp) {
-		StringBuilder sb = new StringBuilder();
-		
 		//start of external container
 		String elId = comp.getHtmlParameterName();
-		String label = StringEscapeUtils.escapeHtml4(comp.getLabel());
 		
-		sb.append("<div class=\"form-group\">\n");
-		if (isLabelIncluded(comp)) {
-			sb.append("<label for=\"" + elId + "\" class=\"control-label col-sm-4\">");
-			sb.append(label);
-			sb.append("</label>\n");
-		}
-		sb.append("<div class=\"col-sm-8\">\n");
-		
-		if (comp instanceof CECodeField) {
-			switch(((CEField) comp).getType()) {
-			case CODE_BUTTON_GROUP:
-				appendCodeButtonGroup(sb, (CECodeField) comp);
-				break;
-			case CODE_SELECT:
-				appendCodeSelect(sb, (CECodeField) comp);
-				break;
-			default:
-				break;
+		try {
+			//external form-group container
+			XMLBuilder formGroupBuilder = XMLBuilder.create("div");
+			formGroupBuilder.a("class", "form-group");
+			if (isLabelIncluded(comp)) {
+				//label element
+				formGroupBuilder.e("label")
+					.a("for", elId)
+					.a("class", "control-label col-sm-4")
+					.t(comp.getLabel());
 			}
-		} else if (comp instanceof CEField) {
-			switch (((CEField) comp).getType()) {
-			case SHORT_TEXT:
-				sb.append("<input type=\"text\" class=\"form-control\" id=\"");
-				sb.append(elId);
-				sb.append("\" name=\"");
-				sb.append(elId);
-				sb.append("\"/>\n");
-				break;
-			case LONG_TEXT:
-				sb.append("<textarea rows=\"3\" class=\"form-control\" id=\"");
-				sb.append(elId);
-				sb.append("\" name=\"");
-				sb.append(elId);
-				sb.append("\"></textarea>\n");
-				break;
-			case INTEGER:
-			case REAL:
-				sb.append("<input type=\"text\" class=\"form-control numeric\" id=\"");
-				sb.append(elId);
-				sb.append("\" name=\"");
-				sb.append(elId);
-				sb.append("\" value=\"0\"/>\n");
-				break;
-			case BOOLEAN:
-				sb.append("<input type=\"checkbox\" class=\"form-control\" id=\"");
-				sb.append(elId);
-				sb.append("\" name=\"");
-				sb.append(elId);
-				sb.append("\"/>");
-				break;
-			case COORDINATE:
-				break;
-			case DATE:
-			case TIME:
-				String className = ((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker";
-				sb.append("<div class='input-group date " + className + "'>\n");
-				sb.append("<input type=\"text\" class=\"form-control\" id=\"");
-				sb.append(elId);
-				sb.append("\" name=\"");
-				sb.append(elId);
-				sb.append("\"/>\n");
-				sb.append("<span class=\"input-group-addon\"><span class=\"glyphicon glyphicon-time\"></span></span>\n");
-				sb.append("</div>\n");
-				break;
-			default:
-				break;
+			//form control external container (for grid alignment)
+			XMLBuilder formControlContainer = formGroupBuilder.e("div")
+					.a("class", "col-sm-8");
+			
+			if (comp instanceof CECodeField) {
+				switch(((CEField) comp).getType()) {
+				case CODE_BUTTON_GROUP:
+					buildCodeButtonGroup(formControlContainer, (CECodeField) comp);
+					break;
+				case CODE_SELECT:
+					buildCodeSelect(formControlContainer, (CECodeField) comp);
+					break;
+				default:
+					break;
+				}
+			} else if (comp instanceof CEField) {
+				switch (((CEField) comp).getType()) {
+				case SHORT_TEXT:
+					formControlContainer.e("input")
+						.a("id", elId)
+						.a("name", elId)
+						.a("type", "text")
+						.a("class", "form-control");
+					break;
+				case LONG_TEXT:
+					formControlContainer.e("textarea")
+						.a("id", elId)
+						.a("rows", "3")
+						.a("name", elId)
+						.a("class", "form-control")
+						.t(" ");
+					break;
+				case INTEGER:
+				case REAL:
+					formControlContainer.e("input")
+						.a("id", elId)
+						.a("name", elId)
+						.a("type", "text")
+						.a("value", "0")
+						.a("class", "form-control numeric");
+					break;
+				case BOOLEAN:
+					formControlContainer.e("input")
+						.a("id", elId)
+						.a("name", elId)
+						.a("type", "checkbox")
+						.a("class", "form-control numeric");
+					break;
+				case COORDINATE:
+					break;
+				case DATE:
+				case TIME:
+					formControlContainer.e("div")
+						.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker"))
+						.e("input")
+							.a("id", elId)
+							.a("name", elId)
+							.a("class", "form-control")
+							.up()
+						.e("span")
+							.a("class", "input-group-addon")
+							.e("span")
+								.a("class", "glyphicon glyphicon-time")
+						;
+					break;
+				default:
+					break;
+				}
 			}
+			
+			StringWriter writer = new StringWriter();
+			@SuppressWarnings("serial")
+			Properties outputProperties = new Properties(){{
+				put(javax.xml.transform.OutputKeys.INDENT, "yes");
+				put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+				put(javax.xml.transform.OutputKeys.STANDALONE, "yes");
+			}};
+			formGroupBuilder.toWriter(writer, outputProperties);
+			String result = writer.toString();
+			return result;
+		} catch(Exception e) {
+			throw new RuntimeException(e);
 		}
-		//end of external container
-		sb.append("</div>\n");
-		sb.append("</div>\n");
-		return sb.toString();
 	}
 
-	private void appendCodeSelect(StringBuilder sb, CECodeField comp) {
+	private void buildCodeSelect(XMLBuilder builder, CECodeField comp) {
 		String elId = comp.getHtmlParameterName();
 		
-		sb.append("<select id=\"");
-		sb.append(elId);
-		sb.append("\" name=\"");
-		sb.append(elId);
-		sb.append("\"");
-		sb.append(" data-field-type=\"");
-		sb.append(comp.getType().name());
-		sb.append("\"");
-		sb.append(" data-parent-code-field-id=\"");
-		sb.append(comp.getParentName());
-		sb.append("\"");
-		sb.append(" class=\"form-control selectboxit show-menu-arrow show-tick\""); 
-		sb.append(" data-width=\"75px\">\n");
-		sb.append("<option value=\"" + NOT_AVAILABLE_ITEM_CODE + "\">" + NOT_AVAILABLE_ITEM_LABEL + "</option>\n");
+		//build select
+		XMLBuilder selectBuilder = builder.e("select")
+			.a("id", elId)
+			.a("name", elId)
+			.a("data-field-type", comp.getType().name())
+			.a("class", "form-control selectboxit show-menu-arrow show-tick")
+			.a("data-width", "75px");
+		if (comp.getParentName() != null) {
+			selectBuilder.a("data-parent-code-field-id", comp.getParentName());
+		}
+		//add empty option
+		selectBuilder.e("option")
+			.a("value", NOT_AVAILABLE_ITEM_CODE)
+			.t(NOT_AVAILABLE_ITEM_LABEL);
 		
+		//add root items, if any
 		Map<String, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentCode();
 		List<CodeListItem> rootItems = itemsByParentCode.get("");
 		if (rootItems != null) {
 			for (CodeListItem item : rootItems) {
-				sb.append("<option value=\"");
-				sb.append(item.getCode());
-				sb.append("\">");
-				sb.append(StringEscapeUtils.escapeHtml4(item.getLabel()));
-				sb.append("</option>\n");
+				selectBuilder.e("option")
+					.a("value", item.getCode())
+					.t(item.getLabel());
 			}
 		}
-		sb.append("</select>\n");
 	}
 
-	private void appendCodeButtonGroup(StringBuilder sb, CECodeField comp) {
+	private void buildCodeButtonGroup(XMLBuilder formControlContainer, CECodeField comp) {
 		String elId = comp.getHtmlParameterName();
 		
 		//button groups external container
 		String groupId = elId + "_group";
-		sb.append("<div id=\"");
-		sb.append(groupId);
-		sb.append("\" class=\"code-items-group\">\n");
 		
-		//hidden field that stores the actual value
-		sb.append("<input type=\"hidden\" class=\"form-control\"");
-		sb.append(" data-field-type=\"");
-		sb.append(comp.getType().name());
-		sb.append("\"");
+		XMLBuilder itemsGroupExternalContainer = formControlContainer.e("div")
+			.a("id", groupId)
+			.a("class", "code-items-group");
+		
+		XMLBuilder hiddenInputField = itemsGroupExternalContainer.e("input")
+				.a("id", elId)
+				.a("name", elId)
+				.a("type", "hidden")
+				.a("class", "form-control")
+				.a("data-field-type", comp.getType().name());
+		
 		if (comp.getParentName() != null) {
-			sb.append(" data-parent-code-field-id=\"");
-			sb.append(comp.getParentName());
-			sb.append("\"");
+			hiddenInputField.a("data-parent-code-field-id", comp.getParentName());
 		}
-		sb.append(" id=\"");
-		sb.append(elId);
-		sb.append("\" name=\"");
-		sb.append(elId);
-		sb.append("\"/>\n");
 		
 		Map<String, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentCode();
 		for (Entry<String, List<CodeListItem>> entry : itemsByParentCode.entrySet()) {
 			//one button group for every list of codes by parent code
 			String parentCode = entry.getKey();
 			String itemsGroupId = groupId + "_" + parentCode;
-			sb.append("<div id=\"");
-			sb.append(itemsGroupId);
-			sb.append("\"");
-			sb.append(" class=\"code-items\"");
-			sb.append(" data-toggle=\"buttons-radio\"");
-			sb.append(" data-parent-code=\"");
-			sb.append(parentCode);
-			sb.append("\">\n");
+			XMLBuilder buttonsGroup = itemsGroupExternalContainer.e("div")
+				.a("id", itemsGroupId)
+				.a("class", "code-items")
+				.a("data-toggle", "buttons-radio")
+				.a("data-parent-code", parentCode);
 			List<CodeListItem> items = entry.getValue();
 			if (items != null) {
 				for (CodeListItem item : items) {
-					sb.append("<button type=\"button\" class=\"btn btn-info code-item\" value=\"");
-					sb.append(item.getCode());
-					sb.append("\" title=\"");
-					sb.append(item.getDescription());
-					sb.append("\">");
-					sb.append(StringEscapeUtils.escapeHtml4(item.getLabel()));
-					sb.append("</button>\n");
+					XMLBuilder buttonItemBuilder = buttonsGroup.e("button")
+						.a("type", "button")
+						.a("class", "btn btn-info code-item")
+						.a("value", item.getCode())
+						.t(item.getLabel());
+					if (StringUtils.isNotBlank(item.getDescription())) {
+						buttonItemBuilder.a("title", item.getDescription());
+					}
 				}
 			}
-			sb.append("</div>\n");
 		}
-		sb.append("</div>\n");
 	}
 
 	private boolean isLabelIncluded(CEComponent comp) {
