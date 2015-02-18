@@ -76,6 +76,8 @@ public class SurveySelectVM extends BaseVM {
 
 	public static final String UPDATE_SURVEY_LIST_COMMAND = "updateSurveyList";
 
+	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = ".cep";
+
 	@WireVariable
 	private SurveyManager surveyManager;
 	@WireVariable
@@ -169,7 +171,7 @@ public class SurveySelectVM extends BaseVM {
 				File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
 				String contentType = URLConnection.guessContentTypeFromName(file.getName());
 				FileInputStream is = new FileInputStream(file);
-				Filedownload.save(is, contentType, survey.getName() + ".zip");
+				Filedownload.save(is, contentType, survey.getName() + COLLECT_EARTH_PROJECT_FILE_EXTENSION);
 			} catch(Exception e) {
 				log.error(e);
 				MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
