@@ -13,7 +13,7 @@
 
 	<properties>
 <!-- 		<geotools.version>2.6.5</geotools.version> -->
-		<collectearth.version>1.0.25-SNAPSHOT</collectearth.version>
+		<collectearth.version>1.0.39-SNAPSHOT</collectearth.version>
 		<geotools.version>10.4</geotools.version>
 		<graniteds.version>2.3.0.GA</graniteds.version>
 		<aspectj.version>1.8.0</aspectj.version>

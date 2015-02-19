@@ -25,7 +25,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<openforis.commons.version>0.0.14</openforis.commons.version>
-		<spring.version>3.2.8.RELEASE</spring.version>
+		<spring.version>3.2.13.RELEASE</spring.version>
 		<spring-security.version>3.2.4.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
 	</properties>
@@ -66,11 +66,11 @@
 					</execution>
 				</executions>
 				<configuration>
-						<format>{0,date,yyyyMMddHHmm}</format>
-						<items>
-							<item>timestamp</item>
-						</items>
-					</configuration>
+					<format>{0,date,yyyyMMddHHmm}</format>
+					<items>
+						<item>timestamp</item>
+					</items>
+				</configuration>
 			</plugin>
 			
 			<!--  Set Eclipse project text encoding to UTF-8 -->
@@ -160,6 +160,11 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<version>1.4</version>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+		    </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -307,6 +312,11 @@
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<version>1.2.12</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId>
+				<version>2.1</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-logging</groupId>
