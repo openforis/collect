@@ -331,6 +331,7 @@ public class RecordUpdater {
 		for (CodeAttribute dependendAttr : dependentCodeAttributes) {
 			if (! dependendAttr.isEmpty()) {
 				dependendAttr.clearValue();
+				dependendAttr.updateSummaryInfo();
 				updatedCodeAttributes.add(dependendAttr);
 			}
 		}
