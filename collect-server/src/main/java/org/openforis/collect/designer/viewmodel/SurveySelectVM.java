@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyE
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
@@ -78,30 +80,36 @@ public class SurveySelectVM extends BaseVM {
 
 	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = ".cep";
 
+	private static final CollectEarthProjectFileCreator COLLECT_EARTH_PROJECT_FILE_CREATOR;
+	static {
+		Iterator<CollectEarthProjectFileCreator> it = COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER.iterator();
+		COLLECT_EARTH_PROJECT_FILE_CREATOR = it.hasNext() ? it.next(): null;
+	}
+	
 	@WireVariable
 	private SurveyManager surveyManager;
 	@WireVariable
 	private RecordManager recordManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
-
 	@WireVariable
 	private SpringJobManager springJobManager;
-
-	private SurveySummary selectedSurvey;
 
 	private Window surveyImportPopUp;
 
 	private Window validationResultsPopUp;
 
-	private List<SurveySummary> summaries;
-
-	private SurveyBackupJob surveyBackupJob;
-
 	private Window jobStatusPopUp;
+	
 	private Window newSurveyParametersPopUp;
 
 	private Window surveyExportPopup;
+
+	private SurveySummary selectedSurvey;
+
+	private List<SurveySummary> summaries;
+
+	private SurveyBackupJob surveyBackupJob;
 
 	private RDBPrintJob rdbExportJob;
 
