@@ -52,6 +52,9 @@
 			[SkinPart(required="true", type="spark.compoenents.CheckBox")]
 			public var validateRecordsCheckBox:CheckBox;
 			
+			[SkinPart(required="true", type="spark.compoenents.CheckBox")]
+			public var deleteExistingEntitiesCheckBox:CheckBox;
+			
 			private var _presenter:CSVDataImportPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {

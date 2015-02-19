@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.ReferenceDataImportStatus;
+import org.openforis.collect.io.data.CSVDataImportProcess.CSVDataImportSettings;
 import org.openforis.collect.io.data.CSVDataImportProcess.ImportException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
@@ -108,6 +109,14 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	}
 	
 	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, boolean insertNewRecords, String newRecordVersionName, boolean createAncestorEntities) throws Exception {
+		CSVDataImportSettings settings = new CSVDataImportProcess.CSVDataImportSettings();
+		settings.setInsertNewRecords(insertNewRecords);
+		settings.setNewRecordVersionName(newRecordVersionName);
+		settings.setCreateAncestorEntities(createAncestorEntities);
+		return importCSVFile(fileName, parentEntityDefinitionId, transactional, settings);
+	}
+	
+	public CSVDataImportProcess importCSVFile(String fileName, int parentEntityDefinitionId, boolean transactional, CSVDataImportProcess.CSVDataImportSettings settings) throws Exception {
 		File file = getTestFile(fileName);
 		CSVDataImportProcess process = (CSVDataImportProcess) beanFactory.getBean(
 				transactional ? "transactionalCsvDataImportProcess": "csvDataImportProcess");
@@ -115,9 +124,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		process.setSurvey(survey);
 		process.setParentEntityDefinitionId(parentEntityDefinitionId);
 		process.setStep(null);
-		process.setInsertNewRecords(insertNewRecords);
-		process.setNewRecordVersionName(newRecordVersionName);
-		process.setCreateAncestorEntities(createAncestorEntities);
+		process.setSettings(settings);
 		process.init();
 		try {
 			process.call();
@@ -235,6 +242,39 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(3, status.getProcessed());
+		
+		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY.getStepNumber());
+		Entity reloadedCluster = reloadedRecord.getRootEntity();
+		{
+			Entity plot = reloadedCluster.findChildEntitiesByKeys("plot", "1", "A").get(0);
+			CodeAttribute landUse = (CodeAttribute) plot.getChild("land_use");
+			assertEquals("2", landUse.getValue().getCode());
+		}
+		{
+			Entity plot = reloadedCluster.findChildEntitiesByKeys("plot", "2", "B").get(0);
+			CodeAttribute landUse = (CodeAttribute) plot.getChild("land_use");
+			assertEquals("3", landUse.getValue().getCode());
+		}
+	}
+	
+	@Test
+	public void validDeleteExistingEntitiesTest() throws Exception {
+		CollectRecord record = createTestRecord(survey, "10_114");
+		recordDao.insert(record);
+		EntityDefinition clusterDefn = survey.getSchema().getRootEntityDefinition("cluster");
+		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
+		
+		assertEquals(3, record.getRootEntity().getCount(plotDefn));
+		
+		CSVDataImportSettings settings = new CSVDataImportSettings();
+		settings.setDeleteExistingEntities(true);
+		CSVDataImportProcess process = importCSVFile(VALID_NESTED_ENTITY_TEST_CSV, plotDefn.getId(), true, settings);
+		ReferenceDataImportStatus<ParsingError> status = process.getStatus();
+		assertTrue(status.isComplete());
+		assertTrue(status.getSkippedRows().isEmpty());
+		assertEquals(3, status.getProcessed());
+		
+		assertEquals(2, record.getRootEntity().getCount(plotDefn));
 		
 		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY.getStepNumber());
 		Entity reloadedCluster = reloadedRecord.getRootEntity();

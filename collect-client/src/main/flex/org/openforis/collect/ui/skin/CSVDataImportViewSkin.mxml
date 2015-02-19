@@ -81,13 +81,16 @@
 								/>
 			</s:HGroup>
 			
-			<s:HGroup verticalAlign="middle">
+			<s:VGroup verticalAlign="middle">
 				<s:CheckBox id="transactionalCheckBox" 
 							label="{Message.get('csvDataImport.processInTransaction')}" />
 				
 				<s:CheckBox id="validateRecordsCheckBox" 
 							label="{Message.get('csvDataImport.validateRecords')}" />
-			</s:HGroup>
+				
+				<s:CheckBox id="deleteExistingEntitiesCheckBox" 
+							label="{Message.get('csvDataImport.deleteExistingEntities')}" />
+			</s:VGroup>
 			
 			<s:VGroup horizontalAlign="center"
 					  gap="4"
