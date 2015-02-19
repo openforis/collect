@@ -6,12 +6,14 @@ package org.openforis.collect.service;
 import java.util.List;
 
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -39,6 +41,12 @@ public class CollectCodeListService implements CodeListService {
 		return codeListManager.loadItems(codeList, level);
 	}
 
+	@Override
+	public <T extends CodeListItem> List<T> loadValidItems(Entity parent,
+			CodeAttributeDefinition attrDef) {
+		return codeListManager.loadValidItems(parent, attrDef);
+	}
+	
 	@Override
 	public <T extends CodeListItem> T loadParentItem(T item) {
 		return codeListManager.loadParentItem(item);

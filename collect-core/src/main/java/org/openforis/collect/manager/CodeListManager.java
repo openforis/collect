@@ -277,8 +277,8 @@ public class CodeListManager {
 		return CollectionUtils.unmodifiableList(result);
 	}
 
-	public List<CodeListItem> loadValidItems(Entity parent, CodeAttributeDefinition def) {
-		List<? extends CodeListItem> items = null;
+	public <T extends CodeListItem> List<T> loadValidItems(Entity parent, CodeAttributeDefinition def) {
+		List<T> items = null;
 		CodeList list = def.getList();
 		if ( StringUtils.isEmpty(def.getParentExpression()) ) {
 			items = loadRootItems(list);
@@ -296,12 +296,12 @@ public class CodeListManager {
 		return filterApplicableItems(items, version);
 	}
 
-	protected List<CodeListItem> filterApplicableItems(
-			List<? extends CodeListItem> items, ModelVersion version) {
+	protected <T extends CodeListItem> List<T> filterApplicableItems(
+			List<T> items, ModelVersion version) {
 		if ( items == null ) {
 			return Collections.emptyList();
 		} else {
-			List<? extends CodeListItem> result;
+			List<T> result;
 			if ( version == null ) {
 				result = items;
 			} else {

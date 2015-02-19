@@ -161,6 +161,14 @@ public class Record {
 		return this.nodesByInternalId.get(id);
 	}
 
+	/**
+	 * @deprecated Use {@link #findNodeByPath(String)} instead
+	 */
+	@Deprecated
+	public <N extends Node<?>> N getNodeByPath(String path) {
+		return findNodeByPath(path);
+	}
+	
 	public <N extends Node<?>> N findNodeByPath(String path) {
 		List<Node<?>> nodes = findNodesByPath(path);
 		if ( nodes.size() == 0 ) {
@@ -175,6 +183,14 @@ public class Record {
 		}
 	}
 
+	/**
+	 * @deprecated Use {@link #findNodesByPath(String)} instead
+	 */
+	@Deprecated
+	public <N extends Node<?>> List<N> getNodesByPath(String path) {
+		return findNodesByPath(path);
+	}
+	
 	public <N extends Node<?>> List<N> findNodesByPath(String path) {
 		Path p = Path.parse(path);
 		@SuppressWarnings("unchecked")
