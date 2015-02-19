@@ -3,6 +3,7 @@ package org.openforis.collect.remoting.service;
 import java.io.File;
 
 import org.openforis.collect.io.data.CSVDataImportProcess;
+import org.openforis.collect.io.data.CSVDataImportProcess.CSVDataImportSettings;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.process.ProcessStatus;
@@ -32,7 +33,8 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 	@Secured("ROLE_ADMIN")
 	public ReferenceDataImportStatusProxy start(String tempFileName, int parentEntityId, CollectRecord.Step step, 
 			boolean transactional, boolean validateRecords, 
-			boolean insertNewRecords, String newRecordVersionName) throws DataImportExeption {
+			boolean insertNewRecords, String newRecordVersionName,
+			boolean deleteExistingEntities) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = new File(tempFileName);
 			SessionState sessionState = sessionManager.getSessionState();
@@ -43,9 +45,12 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 			importProcess.setSurvey(survey);
 			importProcess.setParentEntityDefinitionId(parentEntityId);
 			importProcess.setStep(step);
-			importProcess.setRecordValidationEnabled(validateRecords);
-			importProcess.setInsertNewRecords(insertNewRecords);
-			importProcess.setNewRecordVersionName(newRecordVersionName);
+			CSVDataImportSettings settings = new CSVDataImportProcess.CSVDataImportSettings();
+			settings.setRecordValidationEnabled(validateRecords);
+			settings.setInsertNewRecords(insertNewRecords);
+			settings.setNewRecordVersionName(newRecordVersionName);
+			settings.setDeleteExistingEntities(deleteExistingEntities);
+			importProcess.setSettings(settings);
 			importProcess.init();
 			ProcessStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

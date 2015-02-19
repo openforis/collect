@@ -20,9 +20,10 @@ package org.openforis.collect.client {
 		
 		public function start(responder:IResponder, tempFileName:String, parentEntityId:int, step:CollectRecord$Step = null, 
 							  transactional:Boolean = true, validateRecords:Boolean = true,
-							  insertNewRecords:Boolean = false, newRecordModelVersion:String = null):void {
+							  insertNewRecords:Boolean = false, newRecordModelVersion:String = null,
+							  deleteExistingEntities:Boolean = false):void {
 			var token:AsyncToken = _startOperation.send(tempFileName, parentEntityId, step, transactional, validateRecords, 
-														insertNewRecords, newRecordModelVersion);
+														insertNewRecords, newRecordModelVersion, deleteExistingEntities);
 			token.addResponder(responder);
 		}
 
