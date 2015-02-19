@@ -274,9 +274,10 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(3, status.getProcessed());
 		
-		assertEquals(2, record.getRootEntity().getCount(plotDefn));
-		
 		CollectRecord reloadedRecord = recordDao.load(survey, record.getId(), Step.ENTRY.getStepNumber());
+		
+		assertEquals(2, reloadedRecord.getRootEntity().getCount(plotDefn));
+		
 		Entity reloadedCluster = reloadedRecord.getRootEntity();
 		{
 			Entity plot = reloadedCluster.findChildEntitiesByKeys("plot", "1", "A").get(0);

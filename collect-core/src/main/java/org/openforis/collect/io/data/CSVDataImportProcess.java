@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -115,8 +116,11 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private CollectRecord lastModifiedRecord;
 	private User adminUser;
 
+	private Set<RecordStepKey> deletedEntitiesRecordKeys;
+
 	public CSVDataImportProcess() {
 		settings = new CSVDataImportSettings();
+		deletedEntitiesRecordKeys = new HashSet<RecordStepKey>();
 	}
 	
 	@Override
@@ -222,7 +226,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				//set values in each step data
 				for (Step currentStep : Step.values()) {
 					if ( currentStep.compareTo(originalRecordStep) <= 0  ) {
-						CollectRecord record = recordManager.load(survey, recordSummary.getId(), currentStep);
+						CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
 						setValuesInRecord(line, record, currentStep);
 						//always save record when updating multiple record steps in the same process
 						updateRecord(record, originalRecordStep, currentStep);
@@ -231,21 +235,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			} else {
 				CollectRecord recordSummary = loadRecordSummary(line);
 				Step originalRecordStep = recordSummary.getStep();
-				if ( step.compareTo(originalRecordStep) <= 0  ) {
+				if ( step.compareTo(originalRecordStep) <= 0 ) {
 					CollectRecord record;
 					if ( lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() ) ) {
 						//record changed
 						if ( lastModifiedRecordSummary != null ) {
 							saveLastModifiedRecord();
 						}
-						record = recordManager.load(survey, recordSummary.getId(), step);
-						if (settings.isDeleteExistingEntities()) {
-							String parentEntitiesPath = getParentEntityDefinition().getPath();
-							List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
-							for (Entity entity : entitiesToBeDeleted) {
-								recordManager.deleteNode(entity);
-							}
-						}
+						record = loadRecord(recordSummary.getId(), this.step);
 					} else {
 						record = lastModifiedRecord;
 					}
@@ -257,6 +254,25 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				}
 			}
 			status.addProcessedRow(line.getLineNumber());
+		}
+	}
+
+	private CollectRecord loadRecord(Integer recordId, Step step) {
+		CollectRecord record = recordManager.load(survey, recordId, step);
+		//delete existing entities
+		RecordStepKey recordStepKey = new RecordStepKey(record.getId(), step);
+		if (settings.isDeleteExistingEntities() && ! deletedEntitiesRecordKeys.contains(recordStepKey) && ! getParentEntityDefinition().isRoot()) {
+			deleteAllParentEntities(record);
+			deletedEntitiesRecordKeys.add(recordStepKey);
+		}
+		return record;
+	}
+
+	private void deleteAllParentEntities(CollectRecord record) {
+		String parentEntitiesPath = getParentEntityDefinition().getPath();
+		List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
+		for (Entity entity : entitiesToBeDeleted) {
+			recordManager.deleteNode(entity);
 		}
 	}
 
@@ -724,7 +740,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to specify settings value.  
 	 */
 	public void setInsertNewRecords(boolean insertNewRecords) {
-		this.setInsertNewRecords(insertNewRecords);
+		this.settings.setInsertNewRecords(insertNewRecords);
 	}
 	
 	/**
@@ -738,7 +754,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to specify settings value.  
 	 */
 	public void setNewRecordVersionName(String newRecordVersionName) {
-		this.setNewRecordVersionName(newRecordVersionName);
+		this.settings.setNewRecordVersionName(newRecordVersionName);
 	}
 	
 	/**
@@ -777,6 +793,42 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			super();
 		}
 		
+	}
+	
+	private static class RecordStepKey {
+		private int id;
+		private Step step;
+		
+		public RecordStepKey(int id, Step step) {
+			super();
+			this.id = id;
+			this.step = step;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + id;
+			result = prime * result + ((step == null) ? 0 : step.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			RecordStepKey other = (RecordStepKey) obj;
+			if (id != other.id)
+				return false;
+			if (step != other.step)
+				return false;
+			return true;
+		}
 	}
 	
 	public static class CSVDataImportSettings {

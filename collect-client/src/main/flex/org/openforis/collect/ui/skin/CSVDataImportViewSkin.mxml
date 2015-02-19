@@ -89,7 +89,11 @@
 							label="{Message.get('csvDataImport.validateRecords')}" />
 				
 				<s:CheckBox id="deleteExistingEntitiesCheckBox" 
-							label="{Message.get('csvDataImport.deleteExistingEntities')}" />
+							label="{Message.get('csvDataImport.deleteExistingEntities')}"
+							visible="false"
+							visible.updateExistingRecords="true"
+							includeInLayout="false"
+							includeInLayout.updateExistingRecords="true" />
 			</s:VGroup>
 			
 			<s:VGroup horizontalAlign="center"
