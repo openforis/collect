@@ -32,6 +32,7 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	private boolean editable;
 	private List<Check<?>> checks;
 	private String[] visibleFields;
+	private boolean fromCollectEarthCSV;
 	
 	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -50,8 +51,9 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		}
 		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
-		annotations.setPhaseToApplyDefaultValue((AttributeDefinition) dest, Step.valueOf(phaseToApplyDefaultValue));
-		annotations.setEditable((AttributeDefinition) dest, editable);
+		annotations.setPhaseToApplyDefaultValue(dest, Step.valueOf(phaseToApplyDefaultValue));
+		annotations.setEditable(dest, editable);
+		annotations.setFromCollectEarthCSV(dest, fromCollectEarthCSV);
 		
 		//save checks
 		dest.removeAllChecks();
@@ -73,8 +75,9 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		CollectSurvey survey = (CollectSurvey) source.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
 		
-		phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue((AttributeDefinition) source).name();
-		editable = annotations.isEditable((AttributeDefinition) source);
+		phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue(source).name();
+		editable = annotations.isEditable(source);
+		fromCollectEarthCSV = annotations.isFromCollectEarthCSV(source);
 		
 		checks = new ArrayList<Check<?>>(source.getChecks());
 		
@@ -129,5 +132,13 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public void setVisibleFields(String[] visibleFields) {
 		this.visibleFields = visibleFields;
 	}
-
+	
+	public boolean isFromCollectEarthCSV() {
+		return fromCollectEarthCSV;
+	}
+	
+	public void setFromCollectEarthCSV(boolean fromCollectEarthCSV) {
+		this.fromCollectEarthCSV = fromCollectEarthCSV;
+	}
+	
 }

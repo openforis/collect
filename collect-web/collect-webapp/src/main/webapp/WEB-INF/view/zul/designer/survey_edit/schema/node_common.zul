@@ -454,7 +454,38 @@
     	</vlayout>
     </groupbox>
     
-   	<popup id="calculatedInfoTooltip" width="300px">
+	<groupbox closable="true" open="false" visible="@load(vm.attribute)"
+      	sclass="collapsible"
+      	mold="3d" width="100%">
+      	<attribute name="onOpen"><![CDATA[
+      	    collectEarthSectionCaption.setSclass("open-" + self.isOpen());
+      	]]></attribute>
+      	<caption id="collectEarthSectionCaption" sclass="open-false">
+      		<div align="left">
+      			<label value="${labels.survey.schema.attribute.collect_earth.section_title}" />
+      		</div>
+      	</caption>
+    	<grid class="inner">
+    		<columns>
+    			<column width="150px" />
+    			<column />
+    		</columns>
+    		<rows>
+    			<row>
+					<fieldErrorHandler message="@load(vmsgs['fromCollectEarthCSV'])">
+		    			<label value="${labels.survey.schema.attribute.collect_earth.fromcsv}:" />
+		    		</fieldErrorHandler>
+		    		<fieldErrorHandler message="@load(vmsgs['fromCsv'])">
+		    			<checkbox
+		    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" />
+		    		</fieldErrorHandler>
+	    				
+    			</row>
+    		</rows>
+    	</grid>
+    </groupbox>
+
+    <popup id="calculatedInfoTooltip" width="300px">
 		<html><![CDATA[
       		${labels.survey.schema.attribute.calculated.info}
       	]]></html>
