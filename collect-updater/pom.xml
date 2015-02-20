@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.3.17-SNAPSHOT</version>
+		<version>3.3.17</version>
 	</parent>
 	<artifactId>collect-updater</artifactId>
 	<packaging>pom</packaging>
@@ -190,12 +190,9 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/output/${windows-updater-file-name}" 
-											tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${linux-updater-file-name}" 
-											tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
-										<move file="${installbuilder-home}/output/${osx-updater-file-name}" 
-											tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${windows-updater-file-name}" tofile="${project.build.directory}/${windows-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${linux-updater-file-name}" tofile="${project.build.directory}/${linux-updater-file-name}" failonerror="false" />
+										<move file="${installbuilder-home}/output/${osx-updater-file-name}" tofile="${project.build.directory}/${osx-updater-file-name}" failonerror="false" />
 									</tasks>
 								</configuration>
 							</execution>
