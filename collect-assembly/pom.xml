@@ -48,6 +48,11 @@
     <profiles>
         <profile>
             <id>assembly</id>
+			<activation>
+				<property>
+					<name>release</name>
+				</property>
+			</activation>
             <build>
                 <plugins>
                     <plugin>
