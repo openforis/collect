@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.3.16-SNAPSHOT</version>
+		<version>3.3.18-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
@@ -19,11 +19,11 @@
 		<!-- installer file names -->
 		<windows-installer-file-name>OpenForisCollect-${installer-version-id}-windows-installer.exe</windows-installer-file-name>
 		<linux-installer-file-name>OpenForisCollect-${installer-version-id}-linux-installer.run</linux-installer-file-name>
-		<osx-installer-file-name>OpenForisCollect-${installer-version-id}-osx-installer.run</osx-installer-file-name>
+		<osx-installer-file-name>OpenForisCollect-${installer-version-id}-osx-installer.app.zip</osx-installer-file-name>
 		<!-- autoupdate file names -->
 		<windows-autoupdater-file-name>autoupdate-windows.exe</windows-autoupdater-file-name>
 		<linux-autoupdater-file-name>autoupdate-linux.run</linux-autoupdater-file-name>
-		<osx-autoupdater-file-name>autoupdate-osx.run</osx-autoupdater-file-name>
+		<osx-autoupdater-file-name>autoupdate-osx.app.zip</osx-autoupdater-file-name>
 	</properties>
 
 	<profiles>
@@ -147,6 +147,16 @@
 											<outputDirectory>${installer-build-path}</outputDirectory>
 											<destFileName>${linux-autoupdater-file-name}</destFileName>
 										</artifactItem>
+										<artifactItem>
+											<groupId>org.openforis.collect</groupId>
+											<artifactId>collect-autoupdater</artifactId>
+											<version>${project.version}</version>
+											<classifier>osx</classifier>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${installer-build-path}</outputDirectory>
+											<destFileName>${osx-autoupdater-file-name}</destFileName>
+										</artifactItem>
 									</artifactItems>
 								</configuration>
 							</execution>
@@ -251,6 +261,22 @@
 									</arguments>
 								</configuration>
 							</execution>
+							<!-- OS X -->
+							<execution>
+								<id>osx-installer</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>${installbuilder-home}/bin/builder</executable>
+									<arguments>
+										<argument>build</argument>
+										<argument>${installer-build-path}/${installbuilder-file-name}</argument>
+										<argument>osx</argument>
+									</arguments>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 
@@ -269,6 +295,7 @@
 									<tasks>
 										<move file="${installbuilder-home}/output/${windows-installer-file-name}" tofile="${project.build.directory}/${windows-installer-file-name}" failonerror="true" />
 										<move file="${installbuilder-home}/output/${linux-installer-file-name}" tofile="${project.build.directory}/${linux-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${osx-installer-file-name}" tofile="${project.build.directory}/${osx-installer-file-name}" failonerror="true" />
 									</tasks>
 								</configuration>
 							</execution>
@@ -297,6 +324,11 @@
 											<file>${project.build.directory}/${linux-installer-file-name}</file>
 											<classifier>linux</classifier>
 											<type>run</type>
+										</artifact>
+										<artifact>
+											<file>${project.build.directory}/${osx-installer-file-name}</file>
+											<classifier>osx</classifier>
+											<type>zip</type>
 										</artifact>
 									</artifacts>
 								</configuration>

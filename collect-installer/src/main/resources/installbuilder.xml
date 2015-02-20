@@ -246,6 +246,7 @@ check_for_updates = 1</text>
 	<requireInstallationByRootUser>1</requireInstallationByRootUser>
 	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
 	<saveRelativePaths>1</saveRelativePaths>
+	<createOsxBundleZip>1</createOsxBundleZip>
 	<parameterList>
 		<directoryParameter>
 			<name>installdir</name>

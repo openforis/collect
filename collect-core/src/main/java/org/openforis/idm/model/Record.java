@@ -165,7 +165,7 @@ public class Record {
 	 * @deprecated use {@link #findNodeByPath()} instead.  
 	 */
 	@Deprecated
-	public Node<?> getNodeByPath(String path) {
+	public <N extends Node<?>> N getNodeByPath(String path) {
 		return findNodeByPath(path);
 	}
 	
@@ -183,6 +183,14 @@ public class Record {
 		}
 	}
 
+	/**
+	 * @deprecated Use {@link #findNodesByPath(String)} instead
+	 */
+	@Deprecated
+	public <N extends Node<?>> List<N> getNodesByPath(String path) {
+		return findNodesByPath(path);
+	}
+	
 	public <N extends Node<?>> List<N> findNodesByPath(String path) {
 		Path p = Path.parse(path);
 		@SuppressWarnings("unchecked")

@@ -64,6 +64,14 @@ public class CollectSurvey extends Survey {
 		return annotations;
 	}
 	
+	/**
+	 * Returns true if the specified list is not user defined (e.g. sampling data code list)
+	 */
+	public boolean isPredefinedCodeList(CodeList list) {
+		CodeList samplingDesignCodeList = ((CollectSurvey) list.getSurvey()).getSamplingDesignCodeList();
+		return samplingDesignCodeList != null && samplingDesignCodeList.getId() == list.getId();
+	}
+	
 	public CodeList getSamplingDesignCodeList() {
 		for (CodeList list : getCodeLists()) {
 			if ( OfcSamplingDesign.OFC_SAMPLING_DESIGN.getName().equals(list.getLookupTable()) ) {

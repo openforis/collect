@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -107,32 +108,19 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	 * Entity definition that should be considered as the parent of each attribute in the csv file
 	 */
 	private int parentEntityDefinitionId;
-	/**
-	 * If true, records are validated after insert or update
-	 */
-	private boolean recordValidationEnabled;
-	/**
-	 * If true, only new records will be inserted and only root entities can be added
-	 */
-	private boolean insertNewRecords;
-	/**
-	 * When insertNewRecords is true, it indicates the name of the model version used during new record creation
-	 */
-	private String newRecordVersionName;
 	
-	/**
-	 * If true, the process automatically creates ancestor multiple entities if they do not exist.
-	 */
-	private boolean createAncestorEntities;
+	private CSVDataImportSettings settings;
 
 	//transient variables
 	private CollectRecord lastModifiedRecordSummary;
 	private CollectRecord lastModifiedRecord;
 	private User adminUser;
 
+	private Set<RecordStepKey> deletedEntitiesRecordKeys;
+
 	public CSVDataImportProcess() {
-		recordValidationEnabled = true;
-		insertNewRecords = false;
+		settings = new CSVDataImportSettings();
+		deletedEntitiesRecordKeys = new HashSet<RecordStepKey>();
 	}
 	
 	@Override
@@ -151,13 +139,13 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		if ( ! file.exists() || ! file.canRead() ) {
 			status.error();
 			status.setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
-		} else if ( insertNewRecords && survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId) == null ) {
+		} else if ( settings.isInsertNewRecords() && survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId) == null ) {
 			status.error();
 			status.setErrorMessage(NO_ROOT_ENTITY_SELECTED_ERROR_MESSAGE_KEY);
-		} else if ( insertNewRecords && newRecordVersionName != null && survey.getVersion(newRecordVersionName) == null ) {
+		} else if ( settings.isInsertNewRecords() && settings.getNewRecordVersionName() != null && survey.getVersion(settings.getNewRecordVersionName()) == null ) {
 			status.error();
 			status.setErrorMessage(NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY);
-			status.setErrorMessageArgs(new String[]{newRecordVersionName});
+			status.setErrorMessageArgs(new String[]{settings.getNewRecordVersionName()});
 		} else {
 			String fileName = file.getName();
 			String extension = FilenameUtils.getExtension(fileName);
@@ -225,10 +213,10 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 	private void processLine(DataLine line) throws RecordPersistenceException {
 		if ( validateRecordKey(line) ) {
-			if ( insertNewRecords ) {
+			if ( settings.isInsertNewRecords() ) {
 				//create new record
 				EntityDefinition rootEntityDefn = survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId);
-				CollectRecord record = recordManager.create(survey, rootEntityDefn.getName(), adminUser, newRecordVersionName);
+				CollectRecord record = recordManager.create(survey, rootEntityDefn.getName(), adminUser, settings.getNewRecordVersionName());
 				setRecordKeys(line, record);
 				setValuesInRecord(line, record, Step.ENTRY);
 				insertRecord(record);
@@ -238,7 +226,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				//set values in each step data
 				for (Step currentStep : Step.values()) {
 					if ( currentStep.compareTo(originalRecordStep) <= 0  ) {
-						CollectRecord record = recordManager.load(survey, recordSummary.getId(), currentStep);
+						CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
 						setValuesInRecord(line, record, currentStep);
 						//always save record when updating multiple record steps in the same process
 						updateRecord(record, originalRecordStep, currentStep);
@@ -247,14 +235,14 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			} else {
 				CollectRecord recordSummary = loadRecordSummary(line);
 				Step originalRecordStep = recordSummary.getStep();
-				if ( step.compareTo(originalRecordStep) <= 0  ) {
+				if ( step.compareTo(originalRecordStep) <= 0 ) {
 					CollectRecord record;
 					if ( lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() ) ) {
 						//record changed
 						if ( lastModifiedRecordSummary != null ) {
 							saveLastModifiedRecord();
 						}
-						record = recordManager.load(survey, recordSummary.getId(), step);
+						record = loadRecord(recordSummary.getId(), this.step);
 					} else {
 						record = lastModifiedRecord;
 					}
@@ -266,6 +254,25 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				}
 			}
 			status.addProcessedRow(line.getLineNumber());
+		}
+	}
+
+	private CollectRecord loadRecord(Integer recordId, Step step) {
+		CollectRecord record = recordManager.load(survey, recordId, step);
+		//delete existing entities
+		RecordStepKey recordStepKey = new RecordStepKey(record.getId(), step);
+		if (settings.isDeleteExistingEntities() && ! deletedEntitiesRecordKeys.contains(recordStepKey) && ! getParentEntityDefinition().isRoot()) {
+			deleteAllParentEntities(record);
+			deletedEntitiesRecordKeys.add(recordStepKey);
+		}
+		return record;
+	}
+
+	private void deleteAllParentEntities(CollectRecord record) {
+		String parentEntitiesPath = getParentEntityDefinition().getPath();
+		List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
+		for (Entity entity : entitiesToBeDeleted) {
+			recordManager.deleteNode(entity);
 		}
 	}
 
@@ -305,7 +312,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				parentEntityDefn,
 				rootEntityDefn.getKeyAttributeDefinitions());
 		String errorMessageKey = null;
-		if ( insertNewRecords ) {
+		if ( settings.isInsertNewRecords() ) {
 			if ( ! recordSummaries.isEmpty() ) {
 				errorMessageKey = ONLY_NEW_RECORDS_ALLOWED_MESSAGE_KEY;
 			}
@@ -533,7 +540,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				List<Entity> childEntities = findChildEntities(currentParent, ancestorName, identifier);
 				switch ( childEntities.size() ) {
 				case 0:
-					if ( createAncestorEntities || ancestorDefn == parentEntityDefn ) {
+					if ( settings.isCreateAncestorEntities() || ancestorDefn == parentEntityDefn ) {
 						childEntity = createChildEntity(currentParent, ancestorName, identifier, line.getColumnNamesByField(), line.getLineNumber());
 					} else {
 						status.addParsingError(createParentEntitySearchError(record, line, identifier, PARENT_ENTITY_NOT_FOUND_MESSAGE_KEY));
@@ -700,36 +707,82 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		this.parentEntityDefinitionId = parentEntityDefinitionId;
 	}
 	
-	public boolean isRecordValidationEnabled() {
-		return recordValidationEnabled;
+	public CSVDataImportSettings getSettings() {
+		return settings;
 	}
 	
+	public void setSettings(CSVDataImportSettings settings) {
+		this.settings = settings;
+	}
+	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to retrieve settings value.  
+	 */
+	public boolean isRecordValidationEnabled() {
+		return settings.isRecordValidationEnabled();
+	}
+	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to specify settings value.  
+	 */
 	public void setRecordValidationEnabled(boolean recordValidationEnabled) {
-		this.recordValidationEnabled = recordValidationEnabled;
+		this.settings.setRecordValidationEnabled(recordValidationEnabled);
 	}
 
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to retrieve settings value.  
+	 */
 	public boolean isInsertNewRecords() {
-		return insertNewRecords;
+		return settings.isInsertNewRecords();
 	}
 	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to specify settings value.  
+	 */
 	public void setInsertNewRecords(boolean insertNewRecords) {
-		this.insertNewRecords = insertNewRecords;
+		this.settings.setInsertNewRecords(insertNewRecords);
 	}
 	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to retrieve settings value.  
+	 */
 	public String getNewRecordVersionName() {
-		return newRecordVersionName;
+		return settings.getNewRecordVersionName();
 	}
 	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to specify settings value.  
+	 */
 	public void setNewRecordVersionName(String newRecordVersionName) {
-		this.newRecordVersionName = newRecordVersionName;
+		this.settings.setNewRecordVersionName(newRecordVersionName);
 	}
 	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to retrieve settings value.  
+	 */
 	public boolean isCreateAncestorEntities() {
-		return createAncestorEntities;
+		return settings.isCreateAncestorEntities();
 	}
 	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to specify settings value.  
+	 */
 	public void setCreateAncestorEntities(boolean createAncestorEntities) {
-		this.createAncestorEntities = createAncestorEntities;
+		this.settings.setCreateAncestorEntities(createAncestorEntities);
+	}
+	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to retrieve settings value.  
+	 */
+	public boolean isDeleteExistingEntities() {
+		return settings.isDeleteExistingEntities();
+	}
+	
+	/**
+	 * @deprecated use {@link #CSVDataImportProcess.CSVDataImportSettings} class to specify settings value.  
+	 */
+	public void setDeleteExistingEntities(boolean deleteExistingEntities) {
+		this.settings.setDeleteExistingEntities(deleteExistingEntities);;
 	}
 	
 	static class ImportException extends Exception {
@@ -740,5 +793,113 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			super();
 		}
 		
+	}
+	
+	private static class RecordStepKey {
+		private int id;
+		private Step step;
+		
+		public RecordStepKey(int id, Step step) {
+			super();
+			this.id = id;
+			this.step = step;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + id;
+			result = prime * result + ((step == null) ? 0 : step.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			RecordStepKey other = (RecordStepKey) obj;
+			if (id != other.id)
+				return false;
+			if (step != other.step)
+				return false;
+			return true;
+		}
+	}
+	
+	public static class CSVDataImportSettings {
+		
+		/**
+		 * If true, records are validated after insert or update
+		 */
+		private boolean recordValidationEnabled;
+		/**
+		 * If true, only new records will be inserted and only root entities can be added
+		 */
+		private boolean insertNewRecords;
+		/**
+		 * When insertNewRecords is true, it indicates the name of the model version used during new record creation
+		 */
+		private String newRecordVersionName;
+		
+		/**
+		 * If true, the process automatically creates ancestor multiple entities if they do not exist.
+		 */
+		private boolean createAncestorEntities;
+		
+		/**
+		 * If true, the process automatically delete all entities with the specified definition id before importing the new ones.
+		 */
+		private boolean deleteExistingEntities;
+		
+		public CSVDataImportSettings() {
+			recordValidationEnabled = true;
+			insertNewRecords = false;
+			deleteExistingEntities = false;
+		}
+		
+		public boolean isRecordValidationEnabled() {
+			return recordValidationEnabled;
+		}
+		
+		public void setRecordValidationEnabled(boolean recordValidationEnabled) {
+			this.recordValidationEnabled = recordValidationEnabled;
+		}
+
+		public boolean isInsertNewRecords() {
+			return insertNewRecords;
+		}
+		
+		public void setInsertNewRecords(boolean insertNewRecords) {
+			this.insertNewRecords = insertNewRecords;
+		}
+		
+		public String getNewRecordVersionName() {
+			return newRecordVersionName;
+		}
+		
+		public void setNewRecordVersionName(String newRecordVersionName) {
+			this.newRecordVersionName = newRecordVersionName;
+		}
+		
+		public boolean isCreateAncestorEntities() {
+			return createAncestorEntities;
+		}
+		
+		public void setCreateAncestorEntities(boolean createAncestorEntities) {
+			this.createAncestorEntities = createAncestorEntities;
+		}
+		
+		public boolean isDeleteExistingEntities() {
+			return deleteExistingEntities;
+		}
+		
+		public void setDeleteExistingEntities(boolean deleteExistingEntities) {
+			this.deleteExistingEntities = deleteExistingEntities;
+		}
 	}
 }

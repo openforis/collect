@@ -7,4 +7,5 @@
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
 	<logoImage>images/of-collect-logo-small.png</logoImage>
 	<enableSslSupport>1</enableSslSupport>
+	<createOsxBundleZip>1</createOsxBundleZip>
 </autoUpdateProject>

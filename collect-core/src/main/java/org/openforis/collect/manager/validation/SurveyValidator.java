@@ -140,10 +140,8 @@ public class SurveyValidator {
 	
 	private List<SurveyValidationResult> validateCodeLists(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
-		List<CodeList> codeLists = survey.getCodeLists();
-		for (CodeList list : codeLists) {
-			// Collect Earth does not have a sampling design, a null pointer exception should be avoided
-			if ( survey.getSamplingDesignCodeList()!=null && survey.getSamplingDesignCodeList().getId() != list.getId() ) {
+		for (CodeList list : survey.getCodeLists()) {
+			if ( ! survey.isPredefinedCodeList(list) ) {
 				if ( ! codeListManager.isInUse(list) ) {
 					//unused code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 

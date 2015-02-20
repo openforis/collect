@@ -184,6 +184,7 @@ package org.openforis.collect.presenter
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
 			var transactional:Boolean = view.transactionalCheckBox.selected;
 			var validateRecords:Boolean = view.validateRecordsCheckBox.selected;
+			var deleteExistingEntities:Boolean = view.deleteExistingEntitiesCheckBox.selected;
 			
 			var entityId:int;
 			var selectedStep:CollectRecord$Step = null;
@@ -203,7 +204,7 @@ package org.openforis.collect.presenter
 				var selectedStepItem:* = view.stepDropDownList.selectedItem;
 				selectedStep = selectedStepItem == ALL_STEPS_ITEM ? null: selectedStepItem as CollectRecord$Step;
 			}
-			_importClient.start(responder, _uploadedTempFileName, entityId, selectedStep, transactional, validateRecords, insertNewRecords, newRecordModelVersion);
+			_importClient.start(responder, _uploadedTempFileName, entityId, selectedStep, transactional, validateRecords, insertNewRecords, newRecordModelVersion, deleteExistingEntities);
 		}
 		
 		override protected function performImportCancel():void {

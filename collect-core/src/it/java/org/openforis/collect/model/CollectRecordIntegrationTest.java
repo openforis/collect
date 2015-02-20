@@ -236,7 +236,6 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void testMultipleCodeListLevelValidation() {
 		CollectRecord record = createTestMultipleCodeListLevelRecord();
-		recordUpdater.validate(record);
 		assertEquals(Integer.valueOf(0), record.getErrors());
 		assertEquals(Integer.valueOf(0), record.getWarnings());
 		

@@ -245,7 +245,7 @@ public abstract class DependencyGraph<T> {
 		}
 		
 		private Set<GraphNode> getUnsortedSources() {
-			return getUnsortedSources(new HashSet<GraphNode>());
+			return getUnsortedSources(new LinkedHashSet<GraphNode>());
 		}
 		
 		private Set<GraphNode> getUnsortedSources(Set<GraphNode> visited) {
@@ -254,7 +254,7 @@ public abstract class DependencyGraph<T> {
 			}
 			visited.add(this);
 			
-			Set<GraphNode> result = new HashSet<GraphNode>();
+			Set<GraphNode> result = new LinkedHashSet<GraphNode>();
 			for (GraphNode graphNode : sources) {
 				result.add(graphNode);
 				result.addAll(graphNode.getUnsortedSources(visited));
