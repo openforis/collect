@@ -78,4 +78,5 @@ check_for_updates = 1</text>
 	<enableTimestamp>1</enableTimestamp>
 	<installationType>upgrade</installationType>
 	<overwritePolicy>always</overwritePolicy>
+	<createOsxBundleZip>1</createOsxBundleZip>
 </project>
