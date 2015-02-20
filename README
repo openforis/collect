@@ -1,1 +1,14 @@
+Available Maven profiles:
+
+- assembly: 	builds a zip file containing Tomcat + collect-webapp among its webapps
+- autoupdater: 	builds the auto-udpater executable file
+- installer:	builds the installers
+- updater: 		builds the updaters (used by the autoupdater)
+- publish:		publish the udpate using the specified parameters (
+ 
+Activate all the profiles during the release, spcifying the "release" property (value does not matter):
+
+mvn release:prepare -Drelease
+mvn release:perform -Drelease
+
 See http://www.openforis.org/wiki/index.php/Open_Foris_Collect_Development_Environment for detailed instructions/

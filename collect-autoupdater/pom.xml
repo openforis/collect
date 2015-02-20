@@ -23,7 +23,12 @@
 
 	<profiles>
 		<profile>
-			<id>assembly</id>
+			<id>autoupdater</id>
+			<activation>
+				<property>
+					<name>release</name>
+				</property>
+			</activation>
 			<build>
 				<plugins>
 					<!-- 1. copy resource files -->

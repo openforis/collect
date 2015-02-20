@@ -28,7 +28,12 @@
 
 	<profiles>
 		<profile>
-			<id>assembly</id>
+			<id>installer</id>
+			<activation>
+				<property>
+					<name>release</name>
+				</property>
+			</activation>
 			<build>
 				<plugins>
 					<!-- 1. extract jre and collect-assembly into build folder  -->
@@ -293,9 +298,12 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/output/${windows-installer-file-name}" tofile="${project.build.directory}/${windows-installer-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/output/${linux-installer-file-name}" tofile="${project.build.directory}/${linux-installer-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/output/${osx-installer-file-name}" tofile="${project.build.directory}/${osx-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${windows-installer-file-name}" 
+											tofile="${project.build.directory}/${windows-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${linux-installer-file-name}" 
+											tofile="${project.build.directory}/${linux-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${osx-installer-file-name}" 
+											tofile="${project.build.directory}/${osx-installer-file-name}" failonerror="true" />
 									</tasks>
 								</configuration>
 							</execution>

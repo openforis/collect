@@ -23,7 +23,12 @@
 	
 	<profiles>
 		<profile>
-			<id>assembly</id>
+			<id>updater</id>
+			<activation>
+				<property>
+					<name>release</name>
+				</property>
+			</activation>
 			<build>
 				<plugins>
 					
@@ -196,37 +201,7 @@
 									</tasks>
 								</configuration>
 							</execution>
-							<!-- 7 Upload the XML file that defines the presence of updates to the FTP directory -->
-							<execution>
-								<phase>install</phase>
-								<configuration>
-									<target>
-										<property name="host" value="${collect.autoupdater.ftp.host}" />
-										<property name="username" value="${collect.autoupdater.ftp.username}" />
-										<property name="password" value="${collect.autoupdater.ftp.password}" />
-										<property name="remote_folder" value="${collect.autoupdater.ftp.remotefolder}" />
-										<property name="local_folder" value="${installer-build-path}" />
-										<property name="file_name" value="${autoupdate-xml-file-name}" />
-										<ant antfile="${installer-build-path}/ant_ftp_upload.xml" />
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
 						</executions>
-						<dependencies>
-							<dependency>
-								<groupId>com.jcraft</groupId>
-								<artifactId>jsch</artifactId>
-								<version>0.1.51</version>
-							</dependency>
-							<dependency>
-								<groupId>org.apache.ant</groupId>
-								<artifactId>ant-jsch</artifactId>
-								<version>1.9.4</version>
-							</dependency>
-						</dependencies>
 					</plugin>
 
 			    	<!-- 6. attach installers as artifact -->
@@ -265,6 +240,54 @@
 					
 				</plugins>
 			</build>		
+		</profile>
+		<profile>
+			<id>publish</id>
+			<activation>
+				<property>
+					<name>release</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<!-- 7 Upload the XML file that defines the presence of updates to the FTP directory -->
+							<execution>
+								<phase>install</phase>
+								<configuration>
+									<target>
+										<property name="host" value="${collect.autoupdater.ftp.host}" />
+										<property name="username" value="${collect.autoupdater.ftp.username}" />
+										<property name="password" value="${collect.autoupdater.ftp.password}" />
+										<property name="remote_folder" value="${collect.autoupdater.ftp.remotefolder}" />
+										<property name="local_folder" value="${installer-build-path}" />
+										<property name="file_name" value="${autoupdate-xml-file-name}" />
+										<ant antfile="${installer-build-path}/ant_ftp_upload.xml" />
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>com.jcraft</groupId>
+								<artifactId>jsch</artifactId>
+								<version>0.1.51</version>
+							</dependency>
+							<dependency>
+								<groupId>org.apache.ant</groupId>
+								<artifactId>ant-jsch</artifactId>
+								<version>1.9.4</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 

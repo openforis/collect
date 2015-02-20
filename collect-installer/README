@@ -2,9 +2,13 @@ Required Maven parameters:
 
 collect.update.url = Url of AutoUpdate tool update.xml file 
 
-To build the installer, use the "assembly" profile:
+To build the installer, use the "installer" profile:
 
-mnv build -Passembly
+mnv build -Pinstaller
+
+or specify the "release" property (value does not matter):
+
+mvn build -Drelease
 
 The installer will be generated in the "target" folder
 
