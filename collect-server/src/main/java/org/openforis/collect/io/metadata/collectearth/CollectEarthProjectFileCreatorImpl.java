@@ -9,8 +9,12 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -42,6 +46,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String KML_TEMPLATE_FILE_NAME = "kml_template.fmt";
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
+	
+	private static final Set<String> FIXED_CSV_ATTRIBUTES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+			"elevation", "aspect", "slope")));
 	
 	@Override
 	public File create(CollectSurvey survey) throws Exception {
@@ -135,8 +142,17 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		StringBuffer sb = new StringBuffer();
 		int extraInfoIndex = 0;
 		for (AttributeDefinition attrDef : fromCsvAttributes) {
-			sb.append("<Data name=\"" + attrDef.getName() + "\">\n");
-			sb.append("<value>${placemark.extraInfo[" + extraInfoIndex + "]}</value>\n");
+			String attrName = attrDef.getName();
+			sb.append("<Data name=\"" + attrName + "\">\n");
+			String value;
+			if (FIXED_CSV_ATTRIBUTES.contains(attrName)) {
+				value = "${placemark." + attrName + "}";
+			} else {
+				value = "${placemark.extraInfo[" + extraInfoIndex + "]}";
+			}
+			sb.append("<value>");
+			sb.append(value);
+			sb.append("</value>\n");
 		    sb.append("</Data>\n");
 		    extraInfoIndex ++;
 		}

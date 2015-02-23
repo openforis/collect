@@ -63,6 +63,14 @@
 	 * Other inputs: earth_skip_filled
 	 * 
 	 */
+	 
+ 	/**
+ 	* STATIC CONSTANTS 
+ 	* DO NOT REMOVE THIS LINE
+ 	*/
+ 	var NEXT_ID = "$[next_id]";
+ 	var HOST = "$[host]";
+	 
 	</script>
 	
 	<link href="earthFiles/jquery/jquery-ui.css" rel="stylesheet" />
@@ -131,8 +139,6 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 			</form>
 		</div>
 	</div>
-	<!-- <iframe style="display: none" src="http://127.0.0.1:$[local_port]/earth/openAuxiliaryWindows?latLongCoordinates=$[latitude],$[longitude]" height="0" width="0"></iframe> -->
-	
-	<iframe style="display: none" src="$[host]:$[local_port]/earth/openAuxiliaryWindows?latLongCoordinates=$[latitude],$[longitude]" height="0" width="0"></iframe>
+	<iframe style="display: none" src="127.0.0.1:$[local_port]/earth/openAuxiliaryWindows?latLongCoordinates=$[latitude],$[longitude]" height="0" width="0"></iframe>
 </body>
 </html>
