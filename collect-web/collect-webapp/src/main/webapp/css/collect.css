@@ -34,3 +34,34 @@ html, body {
 	top: 5px;
 	right: 5px;
 }
+/*
+.tab-external-panel {
+	height: 100%;
+	width: 100%;
+}
+
+.tab-pane {
+	height: 100%;
+	width: 100%;
+	overflow: auto;
+	position: relative;
+}
+
+.tab-external-panel:before, 
+.tab-external-panel:after, 
+.tab-content:before, 
+.tab-content:after, 
+.tab-pane:before, 
+.tab-pane:after 
+{
+    display: none;
+}
+
+.tab-external-panel:after,
+.tab-content:after, 
+.tab-pane:after {
+    content: '';
+    display: block;
+    clear: left;
+}
+*/

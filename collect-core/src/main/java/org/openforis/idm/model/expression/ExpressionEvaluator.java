@@ -5,9 +5,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.Value;
 
 /**
  * 
@@ -43,6 +45,27 @@ public class ExpressionEvaluator {
 	public Object evaluateValue(Node<?> context, Node<?> thisNode, String expression) throws InvalidExpressionException {
 		ValueExpression expr = expressionFactory.createValueExpression(expression);
 		return expr.evaluate(context, thisNode);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <V extends Value> V evaluateAttributeValue(Node<?> context, Node<?> thisNode, AttributeDefinition defn, String expression) throws InvalidExpressionException {
+		Object object = evaluateValue(context, thisNode, expression);
+		if ( object == null ) {
+			return null;
+		} else {
+			Class<? extends Value> expectedValueType = defn.getValueType();
+			if ( object instanceof Value ) {
+				if ( expectedValueType.isAssignableFrom(object.getClass()) ) {
+					return (V) object;
+				} else {
+					throw new IllegalArgumentException(String.format("Unexpected value type. Found %s expected %s", expectedValueType.getName(), object.getClass().getName()));
+				}
+			} else {
+				String stringValue = object.toString();
+				V value = defn.createValue(stringValue);
+				return value;
+			}
+		}
 	}
 	
 	public Number evaluateNumericValue(Node<?> context, Node<?> thisNode, String expression) throws InvalidExpressionException {

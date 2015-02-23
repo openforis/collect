@@ -19,7 +19,8 @@ Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
 	      shape: ""
 	    };
 	});
-	map.data.loadGeoJson('geo/data/samplingpoints.json');
+	//TODO
+	//map.data.loadGeoJson('geo/data/samplingpoints.json');
 	
 	var bound = new google.maps.LatLngBounds();
 
@@ -29,7 +30,9 @@ Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
 //	}
 
 	this.map = map;
-	
+	//TODO
+//	this.loadLayers();
+
 //	collect.geoDataService.loadCoordinateValues(3341, 0, 10, function(lngLats) {
 //		lngLats.forEach(function(lngLat) {
 //			var point = new google.maps.Circle({
@@ -45,7 +48,6 @@ Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
 //		});
 //	});
 	
-	this.loadLayers();
 };
 
 Collect.DataCleansing.MapPanelComposer.prototype.loadLayers = function() {

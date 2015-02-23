@@ -28,6 +28,7 @@
 		<script type="text/javascript" src="js/openforis/google_maps_extensions/layer_overlay.js" ></script>
 		
 		<script type="text/javascript" src="js/collect/collect.js" ></script>
+		<script type="text/javascript" src="js/collect/node_tree.js" ></script>
 		<script type="text/javascript" src="js/collect/metamodel/survey.js" ></script>
 		
 		<script type="text/javascript" src="js/collect/service/abstract_service.js" ></script>
@@ -37,6 +38,7 @@
 		<script type="text/javascript" src="js/collect/service/data_error_query_service.js" ></script>
 		<script type="text/javascript" src="js/collect/service/data_error_type_service.js" ></script>
 		<script type="text/javascript" src="js/collect/service/data_error_report_service.js" ></script>
+		<script type="text/javascript" src="js/collect/service/data_update_service.js" ></script>
 		<script type="text/javascript" src="js/collect/service/geo_data_service.js" ></script>
 		
 		<script type="text/javascript" src="js/collect/abstract_item_edit_dialog.js" ></script>
@@ -45,6 +47,7 @@
 
 		<script type="text/javascript" src="js/collect/datacleansing/datacleansing.js" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/map_panel_composer.js" ></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_update_panel_composer.js" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/query_form_controller.js" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_type_dialog.js" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_dialog.js" ></script>
@@ -70,7 +73,7 @@
 			<button id="home-survey-selector-button" type="button" class="btn btn-default"></button>
 		</div>
 	
-		<div role="tabpanel" style="height: 100%; width: 100%">
+		<div role="tabpanel" class="tab-external-panel container-fluid">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active">
 					<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Home</a>
@@ -82,6 +85,10 @@
 				<li role="presentation">
 					<a href="#data-query-panel" aria-controls="data-query-panel" 
 						role="tab" data-toggle="tab">Query the data</a>
+				</li>
+				<li role="presentation">
+					<a href="#data-update-panel" aria-controls="data-update-panel" 
+						role="tab" data-toggle="tab">Data update</a>
 				</li>
 				<li role="presentation">
 					<a href="#dataErrorQueriesPanel" aria-controls="dataErrorQueriesPanel" 
@@ -98,19 +105,8 @@
 			</ul>
 			
 			<!-- Tab panes -->
-			<div class="tab-content" style="height: 100%; width: 100%">
+			<div class="tab-content container-fluid">
 				<div id="homePanel" role="tabpanel" class="tab-pane active" >
-				<!-- Tabla-->
-				 ERROR REPORTS
-					<table data-url="datacleansing/tabla_data.json" data-toggle="table" data-height="350" data-sort-name="name" data-sort-order="desc">
-					    <thead>					    	
-					        <tr>					        	
-					            <th data-field="id" data-align="right" data-sortable="true">Item ID</th>
-					            <th data-field="name" data-align="center" data-sortable="true">Error List</th>
-					            <th data-field="price" data-sortable="true">Quantity</th>
-					        </tr>
-					    </thead>
-				   </table>
 			
 				</div>
 				<div id="data-error-reports-panel" role="tabpanel" class="tab-pane" >
@@ -177,6 +173,41 @@
 						<button id="newDataErrorTypeBtn" type="button" class="btn btn-default">New</button>
 						<button id="editDataErrorTypeBtn" type="button" class="btn btn-default">Edit</button>
 						<button id="deleteDataErrorTypeBtn" type="button" class="btn btn-default">Delete</button>
+					</div>
+				</div>
+				<div id="data-update-panel" role="tabpanel" class="tab-pane">
+					<div class="container-fluid">
+						<form role="form">
+							<div class="row">
+								<div class="form-group col-md-4">
+							   		<label class="control-label">Entity</label>
+									<div class="entity-tree" style="height: 150px; overflow: auto;"></div>
+								</div>
+								<div class="form-group col-md-4">
+							   		<label class="control-label">Attribute</label>
+									<div class="attribute-tree" style="height: 150px; overflow: auto;"></div>
+								</div>
+								<div class="form-group col-md-4">
+							   		<label class="control-label">Field</label>
+							   		<select class="form-control selectpicker" name="field"></select>
+								</div>
+							</div>
+							<div class="form-group">
+						   		<label class="control-label">Conditions</label>
+								<input type="text" class="form-control" name="conditions" />
+							</div>
+							<div class="form-group">
+						   		<label class="control-label">Update with</label>
+								<input type="text" class="form-control" name="updateExpression" />
+							</div>
+							<div class="form-group">
+					    		<label class="control-label">Record step</label>
+								<select class="form-control selectpicker" name="recordStep"></select>
+							</div>
+							<div class="btn-group" role="group" aria-label="...">
+								<button type="button" class="btn btn-default run-btn">Run</button>
+							</div>
+						</form>
 					</div>
 				</div>
 				<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">

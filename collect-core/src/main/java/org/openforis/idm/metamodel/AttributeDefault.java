@@ -85,27 +85,10 @@ public class AttributeDefault implements Serializable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private <V extends Value> V evaluateExpression(Attribute<?, V> attrib) throws InvalidExpressionException {
 		ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(attrib);
-		Object object = expressionEvaluator.evaluateValue(attrib.getParent(), attrib, expression);
-		if ( object == null ) {
-			return null;
-		} else {
-			AttributeDefinition defn = attrib.getDefinition();
-			Class<? extends Value> expectedValueType = defn.getValueType();
-			if ( object instanceof Value ) {
-				if ( expectedValueType.isAssignableFrom(object.getClass()) ) {
-					return (V) object;
-				} else {
-					throw new IllegalArgumentException(String.format("Unexpected value type. Found %s expected %s", expectedValueType.getName(), object.getClass().getName()));
-				}
-			} else {
-				String stringValue = object.toString();
-				V value = defn.createValue(stringValue);
-				return value;
-			}
-		}
+		V val = expressionEvaluator.evaluateAttributeValue(attrib.getParent(), attrib, attrib.getDefinition(), expression);
+		return val;
 	}
 
 	public Set<NodeDefinition> determineReferencedNodes(NodeDefinition context) throws InvalidExpressionException {
