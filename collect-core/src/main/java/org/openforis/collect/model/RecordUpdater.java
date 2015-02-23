@@ -58,56 +58,61 @@ public class RecordUpdater {
 	
 	/**
 	 * Updates an attribute with a new value
-	 * 
-	 * @param attribute
-	 * @param value
-	 * @return
 	 */
 	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value) {
+		return updateAttribute(attribute, value, false);
+	}
+	
+	/**
+	 * Updates an attribute with a new value
+	 */
+	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value, boolean clearChildCodeAttributes) {
 		beforeAttributeUpdate(attribute);
 		attribute.setValue(value);
-		return afterAttributeUpdate(attribute);
+		return afterAttributeUpdate(attribute, clearChildCodeAttributes);
+	}
+	
+	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol) {
+		return updateAttribute(attribute, symbol, false);
 	}
 	
 	/**
 	 * Updates an attribute and sets the specified FieldSymbol on every field
-	 * 
-	 * @param attribute
-	 * @param value
-	 * @return
 	 */
-	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol) {
+	public NodeChangeSet updateAttribute(Attribute<?, ?> attribute,	FieldSymbol symbol, boolean clearDependentCodeAttributes) {
 		beforeAttributeUpdate(attribute);
 		attribute.clearValue();
 		setSymbolOnFields(attribute, symbol);
-		return afterAttributeUpdate(attribute);
+		return afterAttributeUpdate(attribute, clearDependentCodeAttributes);
+	}
+	
+	public <V> NodeChangeSet updateField(Field<V> field, V value) {
+		return updateField(field, value, false);
 	}
 	
 	/**
 	 * Updates a field with a new value.
 	 * The value will be parsed according to field data type.
-	 * 
-	 * @param field
-	 * @param value 
-	 * @return
+	 * @param clearDependentCodeAttributes 
 	 */
-	public <V> NodeChangeSet updateField(Field<V> field, V value) {
+	public <V> NodeChangeSet updateField(Field<V> field, V value, boolean clearDependentCodeAttributes) {
 		Attribute<?, ?> attribute = field.getAttribute();
 		beforeAttributeUpdate(attribute);
 		
 		field.setValue(value);
 		
-		return afterAttributeUpdate(attribute);
+		return afterAttributeUpdate(attribute, clearDependentCodeAttributes);
 	}
 
+	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol) {
+		return updateField(field, symbol, false);
+	}
+	
 	/**
 	 * Updates a field with a new symbol.
-	 * 
-	 * @param field
-	 * @param symbol 
-	 * @return
+	 * @param clearChildCodeAttributes 
 	 */
-	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol) {
+	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol, boolean clearChildCodeAttributes) {
 		Attribute<?, ?> attribute = field.getAttribute();
 
 		beforeAttributeUpdate(attribute);
@@ -115,7 +120,7 @@ public class RecordUpdater {
 		field.setValue(null);
 		setFieldSymbol(field, symbol);
 		
-		return afterAttributeUpdate(attribute);
+		return afterAttributeUpdate(attribute, clearChildCodeAttributes);
 	}
 	
 	public NodeChangeSet addNode(Entity parentEntity, String nodeName) {
@@ -147,6 +152,12 @@ public class RecordUpdater {
 		return addAttribute(parentEntity, attributeName, null, null, null);
 	}
 	
+	public NodeChangeSet addAttribute(Entity parentEntity, 
+			  String attributeName, 
+			  Value value) {
+		return addAttribute(parentEntity, attributeName, value, null, null);
+	}
+	
 	/**
 	 * Adds a new attribute to a record.
 	 * This attribute can be immediately populated with a value or with a FieldSymbol, and remarks.
@@ -173,7 +184,7 @@ public class RecordUpdater {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addAttributeAddChange(attribute);
 		
-		return afterAttributeInsertOrUpdate(changeMap, attribute);
+		return afterAttributeInsertOrUpdate(changeMap, attribute, false);
 	}
 
 	/**
@@ -224,23 +235,27 @@ public class RecordUpdater {
 	 */
 	public NodeChangeSet applyDefaultValue(Attribute<?, ?> attribute) {
 		performDefaultValueApply(attribute);
-		return afterAttributeUpdate(attribute);
+		return afterAttributeUpdate(attribute, false);
 	}
 
 	private void beforeAttributeUpdate(Attribute<?, ?> attribute) {
+		beforeAttributeUpdate(attribute, false);
+	}
+	
+	private void beforeAttributeUpdate(Attribute<?, ?> attribute, boolean clearChildCodeAttributes) {
 		Entity parentEntity = attribute.getParent();
 		setErrorConfirmed(attribute, false);
 		setMissingValueApproved(parentEntity, attribute.getName(), false);
 		setDefaultValueApplied(attribute, false);
 	}
 
-	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute) {
+	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute, boolean clearDependentCodeAttributes) {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addValueChange(attribute);
-		return afterAttributeInsertOrUpdate(changeMap, attribute);
+		return afterAttributeInsertOrUpdate(changeMap, attribute, clearDependentCodeAttributes);
 	}
 	
-	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute) {
+	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute, boolean clearDependentCodeAttributes) {
 		attribute.updateSummaryInfo();
 
 		Record record = attribute.getRecord();
@@ -250,9 +265,17 @@ public class RecordUpdater {
 		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateDependentCalculatedAttributes(attribute);
 		changeMap.addValueChanges(updatedCalculatedAttributes);
 		
+		// dependent code attributes
+		Set<CodeAttribute> updatedCodeAttributes = new HashSet<CodeAttribute>();
+		if (attribute instanceof CodeAttribute && clearDependentCodeAttributes) {
+			updatedCodeAttributes.addAll(clearDependentCodeAttributes(attribute));
+		}
+		changeMap.addValueChanges(updatedCodeAttributes);
+		
 		// relevance
 		Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
 		nodesToCheckRelevanceFor.add(attribute);
+		nodesToCheckRelevanceFor.addAll(updatedCodeAttributes);
 		
 		List<NodePointer> relevanceToUpdate = record.determineRelevanceDependentNodes(nodesToCheckRelevanceFor);
 		RelevanceUpdater relevanceUpdater = new RelevanceUpdater(relevanceToUpdate);
@@ -263,6 +286,7 @@ public class RecordUpdater {
 		Collection<NodePointer> pointersToCheckMinCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
 		pointersToCheckMinCountFor.add(attributeNodePointer);
 		pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
+		pointersToCheckMinCountFor.addAll(nodesToPointers(updatedCodeAttributes));
 		
 		Collection<NodePointer> minCountPointersToUpdate = record.determineMinCountDependentNodes(pointersToCheckMinCountFor);
 		Set<NodePointer> updatedMinCountPointers = updateMinCount(minCountPointersToUpdate);
@@ -272,6 +296,7 @@ public class RecordUpdater {
 		Collection<NodePointer> pointersToCheckMaxCountFor = new HashSet<NodePointer>(updatedRelevancePointers);
 		pointersToCheckMaxCountFor.add(attributeNodePointer);
 		pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCalculatedAttributes));
+		pointersToCheckMaxCountFor.addAll(nodesToPointers(updatedCodeAttributes));
 		
 		Collection<NodePointer> maxCountPointersToUpdate = record.determineMaxCountDependentNodes(pointersToCheckMaxCountFor);
 		Set<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountPointersToUpdate);
@@ -292,6 +317,7 @@ public class RecordUpdater {
 		// validate attributes
 		Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>(updatedCalculatedAttributes);
 		nodesToCheckValidationFor.add(attribute);
+		nodesToCheckValidationFor.addAll(updatedCodeAttributes);
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedRelevancePointers));
 		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
 		
@@ -299,6 +325,18 @@ public class RecordUpdater {
 
 		validateAttributes(record, attributesToRevalidate, changeMap);
 		return changeMap;
+	}
+
+	private Set<CodeAttribute> clearDependentCodeAttributes(Attribute<?, ?> attribute) {
+		Set<CodeAttribute> updatedCodeAttributes = new HashSet<CodeAttribute>();
+		Set<CodeAttribute> dependentCodeAttributes = ((CodeAttribute) attribute).getDependentCodeAttributes();
+		for (CodeAttribute dependendAttr : dependentCodeAttributes) {
+			if (! dependendAttr.isEmpty()) {
+				dependendAttr.clearValue();
+				updatedCodeAttributes.add(dependendAttr);
+			}
+		}
+		return updatedCodeAttributes;
 	}
 
 	private void validateAttributes(Record record, Set<Attribute<?, ?>> attributes, NodeChangeMap changeMap) {

@@ -606,6 +606,15 @@ public class Survey implements Serializable {
 		return getSurveyDependencies().getCalculatedValueSources(definition);
 	}
 	
+	public Set<NodePathPointer> getRelatedCodeDependencies(CodeAttributeDefinition definition) {
+		return getSurveyDependencies().getRelatedCodeDependencies(definition);
+	}
+	
+	public Set<NodePathPointer> getRelatedCodeSources(CodeAttributeDefinition definition) {
+		return getSurveyDependencies().getRelatedCodeSources(definition);
+	}
+	
+	
 	public void refreshSurveyDependencies() {
 		surveyDependencies = new SurveyDependencies(this);
 		initCoordinateOperations();

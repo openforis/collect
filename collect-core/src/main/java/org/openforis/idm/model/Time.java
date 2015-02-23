@@ -25,8 +25,8 @@ public final class Time extends AbstractValue {
 	/**
 	 * Generic string format for Time value ("hh:mm" or "hh:mm:ss" . Please note that seconds will be ignored by the Time attribute)
 	 */
-	private static final Pattern PRETTY_STRING_PATTERN = Pattern.compile("([01]|[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
-
+	private static final Pattern PRETTY_STRING_PATTERN = Pattern.compile("([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
+	
 	private static final String PRETTY_FORMAT = "%02d:%02d";
 	
 	public static Time parseTime(String string) {

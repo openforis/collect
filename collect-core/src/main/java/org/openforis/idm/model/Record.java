@@ -41,6 +41,7 @@ public class Record {
 	MinCountDependencyGraph minCountDependencies;
 	MaxCountDependencyGraph maxCountDependencies;
 	ValidationDependencyGraph validationDependencies;
+	CodeAttributeDependencyGraph codeAttributeDependencies;
 
 	List<DependencyGraph<?>> dependencyGraphs;
 	
@@ -112,13 +113,15 @@ public class Record {
 		this.maxCountDependencies = new MaxCountDependencyGraph(survey);
 		this.relevanceDependencies = new RelevanceDependencyGraph(survey);
 		this.validationDependencies = new ValidationDependencyGraph(survey);
+		this.codeAttributeDependencies = new CodeAttributeDependencyGraph(survey);
 		
 		this.dependencyGraphs = Arrays.asList(
 				calculatedAttributeDependencies,
 				minCountDependencies,
 				maxCountDependencies,
 				relevanceDependencies,
-				validationDependencies
+				validationDependencies,
+				codeAttributeDependencies
 				);
 	}
 
@@ -158,6 +161,14 @@ public class Record {
 		return this.nodesByInternalId.get(id);
 	}
 
+	/**
+	 * @deprecated Use {@link #findNodeByPath(String)} instead
+	 */
+	@Deprecated
+	public <N extends Node<?>> N getNodeByPath(String path) {
+		return findNodeByPath(path);
+	}
+	
 	public <N extends Node<?>> N findNodeByPath(String path) {
 		List<Node<?>> nodes = findNodesByPath(path);
 		if ( nodes.size() == 0 ) {
@@ -172,6 +183,14 @@ public class Record {
 		}
 	}
 
+	/**
+	 * @deprecated Use {@link #findNodesByPath(String)} instead
+	 */
+	@Deprecated
+	public <N extends Node<?>> List<N> getNodesByPath(String path) {
+		return findNodesByPath(path);
+	}
+	
 	public <N extends Node<?>> List<N> findNodesByPath(String path) {
 		Path p = Path.parse(path);
 		@SuppressWarnings("unchecked")
@@ -278,7 +297,17 @@ public class Record {
 		Set<Attribute<?, ?>> result = validationDependencies.dependentAttributes(nodes);
 		return result;
 	}
-
+	
+	public Set<CodeAttribute> determineDependentCodeAttributes(CodeAttribute codeAttr) {
+		Set<CodeAttribute> result = codeAttributeDependencies.dependentCodeAttributes(codeAttr);
+		return result;
+	}
+	
+	public CodeAttribute determineParentCodeAttribute(CodeAttribute codeAttr) {
+		CodeAttribute result = codeAttributeDependencies.parentCodeAttribute(codeAttr);
+		return result;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -175,8 +175,19 @@
 						<distributionFile origin="autoupdate-linux.run" />
 					</distributionFileList>
 				</folder>
+				<folder>
+					<name>autoupdaterosx</name>
+					<destination>${installdir}/autoupdate</destination>
+					<platforms>osx</platforms>
+					<distributionFileList>
+						<distributionFile origin="autoupdate-osx.app.zip" />
+					</distributionFileList>
+				</folder>
 			</folderList>
 			<postInstallationActionList>
+				<createDirectory>
+					<path>${installdir}/autoupdate</path>
+				</createDirectory>
 				<writeFile>
 					<path>${installdir}/autoupdate/update.ini</path>
 					<text>[Update]
@@ -246,6 +257,7 @@ check_for_updates = 1</text>
 	<requireInstallationByRootUser>1</requireInstallationByRootUser>
 	<rollbackBackupDirectory>${system_temp_directory}/${product_shortname}/backup</rollbackBackupDirectory>
 	<saveRelativePaths>1</saveRelativePaths>
+	<createOsxBundleZip>1</createOsxBundleZip>
 	<parameterList>
 		<directoryParameter>
 			<name>installdir</name>

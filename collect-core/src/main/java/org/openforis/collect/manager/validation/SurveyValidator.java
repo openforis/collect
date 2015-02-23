@@ -140,9 +140,9 @@ public class SurveyValidator {
 	
 	private List<SurveyValidationResult> validateCodeLists(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
-		List<CodeList> codeLists = survey.getCodeLists();
-		for (CodeList list : codeLists) {
-			if ( survey.getSamplingDesignCodeList().getId() != list.getId() ) {
+		CodeList samplingDesignCodeList = survey.getSamplingDesignCodeList();
+		for (CodeList list : survey.getCodeLists()) {
+			if ( samplingDesignCodeList == null || samplingDesignCodeList.getId() != list.getId() ) {
 				if ( ! codeListManager.isInUse(list) ) {
 					//unused code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 

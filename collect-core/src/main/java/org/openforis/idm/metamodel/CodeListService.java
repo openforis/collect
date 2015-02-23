@@ -3,6 +3,7 @@ package org.openforis.idm.metamodel;
 import java.util.List;
 
 import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Entity;
 
 /**
  * 
@@ -20,6 +21,9 @@ public interface CodeListService {
 	<T extends CodeListItem> List<T> loadChildItems(T parentItem);
 	
 	<T extends CodeListItem> List<T> loadItems(CodeList codeList, int level);
+
+	<T extends CodeListItem> List<T> loadValidItems(Entity parent,
+			CodeAttributeDefinition attrDef);
 
 	<T extends CodeListItem> T loadParentItem(T item);
 	
