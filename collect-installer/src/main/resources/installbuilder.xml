@@ -175,8 +175,19 @@
 						<distributionFile origin="autoupdate-linux.run" />
 					</distributionFileList>
 				</folder>
+				<folder>
+					<name>autoupdaterosx</name>
+					<destination>${installdir}/autoupdate</destination>
+					<platforms>osx</platforms>
+					<distributionFileList>
+						<distributionFile origin="autoupdate-osx.app.zip" />
+					</distributionFileList>
+				</folder>
 			</folderList>
 			<postInstallationActionList>
+				<createDirectory>
+					<path>${installdir}/autoupdate</path>
+				</createDirectory>
 				<writeFile>
 					<path>${installdir}/autoupdate/update.ini</path>
 					<text>[Update]
