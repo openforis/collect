@@ -6,8 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,16 +15,14 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.io.ZipInputStream;
-import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.model.ZipParameters;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
+import org.openforis.collect.utils.RemoteFiles;
+import org.openforis.collect.utils.ZipFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
@@ -176,53 +172,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			IOUtils.closeQuietly(writer);
 		}
 		return file;
-	}
-
-	private static class RemoteFiles {
-		
-		public static File download(String url) throws IOException {
-			File tempFile = File.createTempFile("collect-temp-file", ".zip");
-			return download(url, tempFile);
-		}
-
-		private static File download(String fileAddress, File destFile) throws IOException {
-			FileOutputStream fos = null;
-			try {
-				URL url = new URL(fileAddress);
-				HttpURLConnection urlconn = (HttpURLConnection) url.openConnection();
-		        urlconn.setConnectTimeout(100000);
-		        urlconn.setReadTimeout(10000);
-		        urlconn.setRequestMethod("GET");
-		        urlconn.connect();
-		        fos = new FileOutputStream(destFile);
-		        IOUtils.copy(urlconn.getInputStream(), fos);
-				return destFile;
-			} finally {
-				IOUtils.closeQuietly(fos);
-			}
-		}
-	}
-
-	private static class ZipFiles {
-		
-		@SuppressWarnings("unchecked")
-		public static void copyFiles(ZipFile sourceFile, ZipFile destFile) throws ZipException, IOException {
-			for (FileHeader header : (List<FileHeader>) sourceFile.getFileHeaders()) {
-				if (! header.isDirectory()) {
-					ZipInputStream is = sourceFile.getInputStream(header);
-					File tempFile = File.createTempFile("temp_folder", "");
-					IOUtils.copy(is, new FileOutputStream(tempFile));
-					addFile(destFile, tempFile, header.getFileName());
-				}
-			}
-		}
-		
-		public static void addFile(ZipFile destFile, File file, String fileNameInZip) throws ZipException {
-			ZipParameters zipParameters = new ZipParameters();
-			zipParameters.setSourceExternalStream(true);
-			zipParameters.setFileNameInZip(fileNameInZip);
-			destFile.addFile(file, zipParameters);
-		}
 	}
 	
 
