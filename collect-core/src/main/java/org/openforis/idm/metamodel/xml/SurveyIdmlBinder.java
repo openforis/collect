@@ -105,15 +105,16 @@ public class SurveyIdmlBinder {
 	}
 	
 	public Survey unmarshal(InputStream is, boolean includeCodeListItems) throws IdmlParseException {
+		Survey survey = null;
 		try {
 			SurveyUnmarshaller unmarshaller = new SurveyUnmarshaller(this, includeCodeListItems);
 			unmarshaller.parse(is, UTF8_ENCODING);
-			Survey survey = unmarshaller.getSurvey();
+			survey = unmarshaller.getSurvey();
 			survey.init();
 			return survey;
-		} catch (XmlParseException e) {
-			throw new IdmlParseException(e);
-		} catch (IOException e) {
+		} catch (IdmlParseException e) {
+			throw e;
+		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
 	}
@@ -123,16 +124,27 @@ public class SurveyIdmlBinder {
 	}
 	
 	public Survey unmarshal(Reader r, boolean includeCodeListItems) throws IdmlParseException {
+		Survey survey = null;
 		try {
 			SurveyUnmarshaller unmarshaller = new SurveyUnmarshaller(this, includeCodeListItems);
 			unmarshaller.parse(r);
-			Survey survey = unmarshaller.getSurvey();
-			survey.init();
+			survey = unmarshaller.getSurvey();
+			initializeSurvey(survey);
 			return survey;
-		} catch (XmlParseException e) {
-			throw new IdmlParseException(e);
-		} catch (IOException e) {
+		} catch (IdmlParseException e) {
+			throw e;
+		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
-	}		
+	}
+	
+	private void initializeSurvey(Survey survey) throws IdmlParseException {
+		try {
+			survey.init();
+		} catch (Exception e) {
+			String message = String.format("Error initializing survey with uri %s", survey.getUri());
+			throw new IdmlParseException(message, e);
+		}
+	}
+	
 }

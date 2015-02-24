@@ -104,6 +104,11 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	}
 
 	@Override
+	public void validateWKT(String wkt) throws Exception {
+		parseWKT(wkt);
+	}
+	
+	@Override
 	public double orthodromicDistance(double startX, double startY, String startSRSId, double destX, double destY, String destSRSId) {
 		Position startingPosition = toWgs84(startX, startY, startSRSId);
 		Position destinationPosition = toWgs84(destX, destY, destSRSId);
@@ -123,13 +128,6 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		return orthodromicDistance(startX, startY, startSRSId, destX, destY, destSRSId);
 	}
 
-	@Override
-	public void parseSRS(List<SpatialReferenceSystem> list) {
-		for (SpatialReferenceSystem srs : list) {
-			parseSRS(srs);
-		}
-	}
-	
 	@Override
 	public SpatialReferenceSystem fetchSRS(String code) {
 		return fetchSRS(code, new HashSet<String>(Arrays.asList("en")));
@@ -195,13 +193,26 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	}
 	
 	@Override
+	public void parseSRS(List<SpatialReferenceSystem> srss) {
+		for (SpatialReferenceSystem srs : srss) {
+			parseSRS(srs);
+		}
+	}
+	
+	@Override
 	public void parseSRS(SpatialReferenceSystem srs) {
 		String srsId = srs.getId();
 		MathTransform transform = TO_WGS84_TRANSFORMS.get(srsId);
 		if (transform == null) {
 			String wkt = srs.getWellKnownText();
-			transform = findMathTransform(srsId, wkt);
-			TO_WGS84_TRANSFORMS.put(srsId, transform);
+			try {
+				transform = findMathTransform(wkt);
+				TO_WGS84_TRANSFORMS.put(srsId, transform);
+			} catch (Exception e) {
+				if (LOG.isErrorEnabled()) {
+					LOG.error(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
+				}
+			}
 		}
 	}
 
@@ -227,18 +238,15 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		}
 	}
 
-	private static MathTransform findMathTransform(String srsId, String wkt) {
+	private static MathTransform findMathTransform(String wkt) throws Exception {
 		try {
 			CoordinateReferenceSystem crs = parseWKT(wkt);
 			// SYSTEMS.put(srsId, crs);
 			MathTransform mathTransform = CRS.findMathTransform(crs, WGS84);
 			// TO_WGS84_TRANSFORMS.put(srsId, mathTransform);
 			return mathTransform;
-		} catch (Throwable t) {
-			if (LOG.isErrorEnabled()) {
-				LOG.error("Error while parsing srsid " + srsId, t);
-			}
-			throw new RuntimeException(t);
+		} catch (Exception t) {
+			throw t;
 		}
 	}
 
