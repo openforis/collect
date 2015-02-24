@@ -111,9 +111,7 @@ public class SurveyIdmlBinder {
 			Survey survey = unmarshaller.getSurvey();
 			survey.init();
 			return survey;
-		} catch (XmlParseException e) {
-			throw new IdmlParseException(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
 	}
@@ -129,10 +127,9 @@ public class SurveyIdmlBinder {
 			Survey survey = unmarshaller.getSurvey();
 			survey.init();
 			return survey;
-		} catch (XmlParseException e) {
-			throw new IdmlParseException(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
-	}		
-}
+	}
+	
+	}

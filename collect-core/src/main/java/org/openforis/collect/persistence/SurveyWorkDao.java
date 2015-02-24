@@ -137,18 +137,22 @@ public class SurveyWorkDao extends SurveyBaseDao {
 
 	@Override
 	protected CollectSurvey processSurveyRow(Record row) {
+		if (row == null) {
+			return null;
+		}
+		String name = null;
+		Integer id = null;
 		try {
-			if (row == null) {
-				return null;
-			}
+			id = row.getValue(OFC_SURVEY_WORK.ID);
+			name = row.getValue(OFC_SURVEY_WORK.NAME);
 			String idml = row.getValue(OFC_SURVEY_WORK.IDML);
 			CollectSurvey survey = unmarshalIdml(idml);
-			survey.setId(row.getValue(OFC_SURVEY_WORK.ID));
-			survey.setName(row.getValue(OFC_SURVEY_WORK.NAME));
+			survey.setId(id);
+			survey.setName(name);
 			survey.setWork(true);
 			return survey;
 		} catch (IdmlParseException e) {
-			throw new RuntimeException("Error deserializing IDML from database", e);
+			throw new RuntimeException(String.format("Error deserializing temporary survey from database (id=%d, name=%s)", id, name), e);
 		}
 	}
 	
