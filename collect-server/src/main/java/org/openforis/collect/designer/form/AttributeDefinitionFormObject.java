@@ -32,7 +32,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	private boolean editable;
 	private List<Check<?>> checks;
 	private String[] visibleFields;
-	private boolean fromCollectEarthCSV;
 	
 	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -53,7 +52,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		CollectAnnotations annotations = survey.getAnnotations();
 		annotations.setPhaseToApplyDefaultValue(dest, Step.valueOf(phaseToApplyDefaultValue));
 		annotations.setEditable(dest, editable);
-		annotations.setFromCollectEarthCSV(dest, fromCollectEarthCSV);
 		
 		//save checks
 		dest.removeAllChecks();
@@ -77,7 +75,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		
 		phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue(source).name();
 		editable = annotations.isEditable(source);
-		fromCollectEarthCSV = annotations.isFromCollectEarthCSV(source);
 		
 		checks = new ArrayList<Check<?>>(source.getChecks());
 		
@@ -131,14 +128,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	
 	public void setVisibleFields(String[] visibleFields) {
 		this.visibleFields = visibleFields;
-	}
-	
-	public boolean isFromCollectEarthCSV() {
-		return fromCollectEarthCSV;
-	}
-	
-	public void setFromCollectEarthCSV(boolean fromCollectEarthCSV) {
-		this.fromCollectEarthCSV = fromCollectEarthCSV;
 	}
 	
 }

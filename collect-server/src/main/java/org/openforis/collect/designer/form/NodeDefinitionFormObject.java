@@ -7,6 +7,7 @@ import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.Calculable;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -38,7 +39,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean calculated;
 	private boolean includeInDataExport;
 	private boolean showInUI;
-	
+	private boolean fromCollectEarthCSV;
+
 	//labels
 	private String headingLabel;
 	private String instanceLabel;
@@ -54,6 +56,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Integer width;
 	private Integer labelWidth;
 	private String labelOrientation;
+
 	
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
@@ -140,7 +143,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		labelOrientation = uiOptions.getLabelOrientation(source).name();
 
 		CollectAnnotations annotations = survey.getAnnotations();
-
+		
+		if (source instanceof AttributeDefinition) {
+			fromCollectEarthCSV = annotations.isFromCollectEarthCSV((AttributeDefinition) source);
+		}
+		
 		if ( source instanceof Calculable ) {
 			calculated = ((Calculable) source).isCalculated();
 			//show in UI
@@ -180,6 +187,11 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		
 		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
+		
+		if (dest instanceof AttributeDefinition) {
+			annotations.setFromCollectEarthCSV((AttributeDefinition) dest, fromCollectEarthCSV);
+		}
+		
 		UIOptions uiOptions = survey.getUIOptions();
 		
 		//layout
@@ -416,6 +428,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setLabelOrientation(String labelOrientation) {
 		this.labelOrientation = labelOrientation;
+	}
+	
+	public boolean isFromCollectEarthCSV() {
+		return fromCollectEarthCSV;
+	}
+	
+	public void setFromCollectEarthCSV(boolean fromCollectEarthCSV) {
+		this.fromCollectEarthCSV = fromCollectEarthCSV;
 	}
 	
 }
