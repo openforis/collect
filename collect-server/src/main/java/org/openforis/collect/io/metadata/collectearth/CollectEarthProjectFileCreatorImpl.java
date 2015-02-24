@@ -1,6 +1,7 @@
 package org.openforis.collect.io.metadata.collectearth;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,7 +22,7 @@ import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloo
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
-import org.openforis.collect.utils.RemoteFiles;
+import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -35,8 +36,8 @@ import org.openforis.idm.metamodel.NodeDefinitionVisitor;
  */
 public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator{
 
-	private static final String DEFAULT_EARTH_FILES_ZIP_URL = "http://www.openforis.org/collect-earth-files/1.0/earth-files-1_0.zip";
-	private static final String KML_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
+	private static final String EARTH_FILES_ZIP_FILE_PATH = "org/openforis/collect/designer/templates/collectearth/earth-files-1_0.zip";
+	private static final String KML_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
 	private static final String PLACEMARK_FILE_NAME = "placemark.idm.xml";
 	private static final String BALLOON_FILE_NAME = "balloon.html";
 	private static final String KML_TEMPLATE_FILE_NAME = "kml_template.fmt";
@@ -48,17 +49,16 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	
 	@Override
 	public File create(CollectSurvey survey) throws Exception {
+		// create output zip file
+		File outputFile = File.createTempFile("openforis-collect-earth-temp", ".zip");
+		outputFile.delete(); //prevent exception creating zip file with zip4j
+		
 		// create placemark
 		File placemarkFile = createPlacemark(survey);
-		
 		File projectProperties = generateProjectProperties(survey);
 		File balloon = generateBalloon(survey);
 		File cube = generateCube(survey);
 		File kmlTemplate = generateKMLTemplate(survey);
-		
-		// create output zip file
-		File outputFile = File.createTempFile("openforis-collect-earth-temp", ".zip");
-		outputFile.delete(); //prevent exception creating zip file with zip4j
 		
 		ZipFile zipFile = new ZipFile(outputFile);
 		
@@ -69,7 +69,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		ZipFiles.addFile(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME);
 		
 		// include earthFiles assets folder (js, css, etc.)
-		File earthFilesZip = RemoteFiles.download(DEFAULT_EARTH_FILES_ZIP_URL);
+		File earthFilesZip = getEarthFilesZipFile();
 		ZipFile sourceZipFile = new ZipFile(earthFilesZip);
 		ZipFiles.copyFiles(sourceZipFile, zipFile);
 		
@@ -111,12 +111,12 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private File generateBalloon(CollectSurvey survey) throws IOException {
 		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey);
 		String html = generator.generateHTML();
-		return writeToTempFile(html);
+		return Files.writeToTempFile(html, "collect-earth-project-file-creator", ".html");
 	}
 	
 	private File generateKMLTemplate(CollectSurvey survey) throws IOException {
 		//copy the template txt file into a String
-		InputStream is = getClass().getClassLoader().getResourceAsStream(KML_TEMPLATE_TXT);
+		InputStream is = getClass().getClassLoader().getResourceAsStream(KML_TEMPLATE_PATH);
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(is, writer, "UTF-8");
 		String templateContent = writer.toString();
@@ -153,26 +153,21 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		    extraInfoIndex ++;
 		}
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, sb.toString());
-		return writeToTempFile(content);
+		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");
 	}
 	
 	private File generateCube(CollectSurvey survey) throws IOException {
 		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey);
 		String xmlSchema = cubeGenerator.generateXMLSchema();
-		return writeToTempFile(xmlSchema);
+		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
 	}
 
-	private File writeToTempFile(String text) throws IOException {
-		File file = File.createTempFile("collect-earth-project-file-creator", ".xml");
-		FileWriter writer = null;
-		try {
-			writer = new FileWriter(file);
-			writer.write(text);
-		} finally {
-			IOUtils.closeQuietly(writer);
-		}
-		return file;
+	private File getEarthFilesZipFile() throws IOException, FileNotFoundException {
+		InputStream is = getClass().getClassLoader().getResourceAsStream(EARTH_FILES_ZIP_FILE_PATH);
+		File earthFilesZip = File.createTempFile("earth-files", ".zip");
+		FileOutputStream fos = new FileOutputStream(earthFilesZip);
+		IOUtils.copy(is, fos);
+		return earthFilesZip;
 	}
-	
 
 }
