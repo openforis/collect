@@ -58,7 +58,7 @@ public class Survey implements Serializable {
 	 * Initializes internal variables.
 	 * To be called after survey unmarshalling process is complete.
 	 */
-	public void init() throws Exception {
+	public void init() {
 		initSchemaDefinitions();
 		initCoordinateOperations();
 	}

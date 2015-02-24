@@ -29,28 +29,6 @@ public class SurveyIdmlBinder {
 		this.optionsBinders = new ArrayList<ApplicationOptionsBinder<?>>();
 	}
 
-//	public static void main(String[] args) {
-//		try {
-//			File f = new File("../idm-test/src/main/resources/test.idm.xml");
-////			File f = new File("~/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-//			InputStream is = new FileInputStream(f);
-//			SurveyContext ctx = new DefaultSurveyContext();
-//			SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
-//			PlainTextApplicationOptionsBinder textAOB = new PlainTextApplicationOptionsBinder();
-//			binder.addApplicationOptionsBinder(textAOB);
-//			
-//			Survey survey = binder.unmarshal(is);
-//			
-//			FileOutputStream fos = new FileOutputStream("test.idm.out.xml");
-//			// Write
-//			binder.marshal(survey, fos);
-//			fos.flush();
-//			fos.close();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-
 	public void addApplicationOptionsBinder(ApplicationOptionsBinder<?> binder) {
 		optionsBinders.add(binder);
 	}
@@ -105,15 +83,12 @@ public class SurveyIdmlBinder {
 	}
 	
 	public Survey unmarshal(InputStream is, boolean includeCodeListItems) throws IdmlParseException {
-		Survey survey = null;
 		try {
 			SurveyUnmarshaller unmarshaller = new SurveyUnmarshaller(this, includeCodeListItems);
 			unmarshaller.parse(is, UTF8_ENCODING);
-			survey = unmarshaller.getSurvey();
+			Survey survey = unmarshaller.getSurvey();
 			survey.init();
 			return survey;
-		} catch (IdmlParseException e) {
-			throw e;
 		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
@@ -124,27 +99,15 @@ public class SurveyIdmlBinder {
 	}
 	
 	public Survey unmarshal(Reader r, boolean includeCodeListItems) throws IdmlParseException {
-		Survey survey = null;
 		try {
 			SurveyUnmarshaller unmarshaller = new SurveyUnmarshaller(this, includeCodeListItems);
 			unmarshaller.parse(r);
-			survey = unmarshaller.getSurvey();
-			initializeSurvey(survey);
+			Survey survey = unmarshaller.getSurvey();
+			survey.init();
 			return survey;
-		} catch (IdmlParseException e) {
-			throw e;
 		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
 	}
 	
-	private void initializeSurvey(Survey survey) throws IdmlParseException {
-		try {
-			survey.init();
-		} catch (Exception e) {
-			String message = String.format("Error initializing survey with uri %s", survey.getUri());
-			throw new IdmlParseException(message, e);
-		}
 	}
-	
-}
