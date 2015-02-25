@@ -88,39 +88,48 @@
 			image="/assets/images/upload-small.png"
 			onClick="@command('openSurveyImportPopUp')" />
 		
-		<space width="10px" />
+		<hlayout width="600px">
+			<hlayout visible="@load(vm.surveySelected)" spacing="30px">
+				<button label="${labels.global.edit_item}"
+					image="/assets/images/edit-small.png"
+					onClick="@command('editSelectedSurvey')"
+					disabled="@load(vm.editingDisabled)" />
 		
-		<button label="${labels.global.edit_item}"
-			image="/assets/images/edit-small.png"
-			onClick="@command('editSelectedSurvey')"
-			disabled="@load(vm.editingDisabled)" />
-
-		<button label="${labels.survey.export.$}"
-			onClick="@command('exportSelectedSurvey')"
-			image="/assets/images/download-small.png"
-			disabled="@load(vm.exportDisabled)" />
-
-		<button label="${labels.survey.publish.$}"
-			onClick="@command('publishSelectedSurvey')"
-			disabled="@load(vm.publishDisabled)" />
-
-		<hlayout width="150px">
-			<button
-				visible="@load(not vm.selectedSurvey.recordValidationInProgress)"
-				disabled="@load(not vm.selectedSurvey.published)"
-				label="${labels.survey.validateAllRecords}"
-				onClick="@command('validateAllRecords')" />
-	
-			<button
-				visible="@load(vm.selectedSurvey.recordValidationInProgress)"
-				label="${labels.survey.cancelRecordValidation}"
-				onClick="@command('cancelRecordValidation')" />
+				<button label="${labels.survey.export.$}"
+					onClick="@command('exportSelectedSurvey')"
+					image="/assets/images/download-small.png"
+					disabled="@load(vm.exportDisabled)" />
+		
+				<hlayout width="100px">
+					<button label="${labels.survey.publish.$}"
+						onClick="@command('publishSelectedSurvey')"
+						visible="@load(not vm.publishDisabled)" />
+			
+					<button label="${labels.survey.unpublish.$}"
+						onClick="@command('unpublishSelectedSurvey')"
+						visible="@load(not vm.unpublishDisabled)" />
+				</hlayout>
+			
+				<hlayout width="150px">
+					<button
+						visible="@load(not vm.selectedSurvey.recordValidationInProgress)"
+						disabled="@load(not vm.selectedSurvey.published)"
+						label="${labels.survey.validateAllRecords}"
+						onClick="@command('validateAllRecords')" />
+			
+					<button
+						visible="@load(vm.selectedSurvey.recordValidationInProgress)"
+						label="${labels.survey.cancelRecordValidation}"
+						onClick="@command('cancelRecordValidation')" />
+				</hlayout>
+		
+				<button label="${labels.survey.delete.$}"
+					image="/assets/images/delete-small.png"
+					onClick="@command('deleteSelectedSurvey')"
+					disabled="@load(vm.editingDisabled)" />
+			</hlayout>
 		</hlayout>
-
-		<button label="${labels.survey.delete.$}"
-			image="/assets/images/delete-small.png"
-			onClick="@command('deleteSelectedSurvey')"
-			disabled="@load(vm.editingDisabled)" />
+		
 
 	</hlayout>
 	

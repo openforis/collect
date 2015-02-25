@@ -17,6 +17,7 @@ import java.util.Map;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
@@ -276,6 +277,31 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	@Command
+	public void unpublishSelectedSurvey() throws IOException {
+		final String surveyName = selectedSurvey.getName();
+		//ask for a confirmation about survey unpublishing
+		String messageKey = selectedSurvey.isWork() ? "survey.unpublish_overwrite_temporary.confirm" : "survey.unpublish.confirm";
+		MessageUtil.ConfirmParams confirmParams = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
+			public void onOk() {
+				//ask for a second confirmation about records deletion
+				ConfirmParams confirmParams2 = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
+					public void onOk() {
+						performSelectedSurveyUnpublishing();
+					}
+				});
+				confirmParams2.setMessage("survey.delete_records.confirm", surveyName);
+				confirmParams2.setOkLabelKey("survey.unpublish");
+				confirmParams2.setTitle("survey.unpublish.confirm_title", surveyName);
+				MessageUtil.showConfirm(confirmParams2);
+			}
+		}, messageKey);
+		confirmParams.setMessage(messageKey, surveyName);
+		confirmParams.setOkLabelKey("survey.unpublish");
+		confirmParams.setTitle("survey.unpublish.confirm_title", surveyName);
+		MessageUtil.showConfirm(confirmParams);
+	}
+	
+	@Command
 	public void deleteSelectedSurvey() {
 		String messageKey;
 		if (selectedSurvey.isWork()) {
@@ -288,9 +314,19 @@ public class SurveySelectVM extends BaseVM {
 			messageKey = "survey.delete.confirm.message";
 		}
 		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
-			@Override
 			public void onOk() {
-				performSelectedSurveyDeletion();
+				if (selectedSurvey.isPublished()) {
+					//show a second confirmation about deleting all the records associated
+					MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+						public void onOk() {
+							performSelectedSurveyDeletion();
+						}
+					}, "survey.delete_records.confirm", new String[] { selectedSurvey.getName() }, 
+					"survey.delete.confirm.title", (String[]) null, 
+					"global.delete_item", "global.cancel");
+				} else {
+					performSelectedSurveyDeletion();
+				}
 			}
 		}, messageKey, new String[] { selectedSurvey.getName() }, 
 			"survey.delete.confirm.title", (String[]) null, 
@@ -339,7 +375,8 @@ public class SurveySelectVM extends BaseVM {
 		try {
 			surveyManager.publish(survey);
 			loadSurveySummaries();
-			notifyChange("surveySummaries");
+			selectedSurvey = null;
+			notifyChange("selectedSurvey", "surveySummaries");
 			Object[] args = new String[] { survey.getName() };
 			MessageUtil.showInfo("survey.successfully_published", args);
 			User user = getLoggedUser();
@@ -349,6 +386,16 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 
+	private void performSelectedSurveyUnpublishing() {
+		Integer publishedSurveyId = selectedSurvey.isWork() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
+		CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
+		loadSurveySummaries();
+		selectedSurvey = null;
+		notifyChange("selectedSurvey", "surveySummaries");
+		Object[] args = new String[] { temporarySurvey.getName() };
+		MessageUtil.showInfo("survey.successfully_unpublished", args);
+	}
+	
 	@Command
 	public void goToIndex() {
 		Executions.sendRedirect(Page.INDEX.getLocation());
@@ -496,7 +543,12 @@ public class SurveySelectVM extends BaseVM {
 	public boolean isPublishDisabled() {
 		return this.selectedSurvey == null || !this.selectedSurvey.isWork();
 	}
-	
+
+	@DependsOn("selectedSurvey")
+	public boolean isUnpublishDisabled() {
+		return this.selectedSurvey == null || !this.selectedSurvey.isPublished();
+	}
+
 	private class RecordManagerRecordIterator implements RecordIterator {
 		
 		private List<CollectRecord> summaries;
