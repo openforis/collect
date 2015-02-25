@@ -29,28 +29,6 @@ public class SurveyIdmlBinder {
 		this.optionsBinders = new ArrayList<ApplicationOptionsBinder<?>>();
 	}
 
-//	public static void main(String[] args) {
-//		try {
-//			File f = new File("../idm-test/src/main/resources/test.idm.xml");
-////			File f = new File("~/workspace/faofin/tz/naforma-idm/tanzania-naforma.idm.xml");
-//			InputStream is = new FileInputStream(f);
-//			SurveyContext ctx = new DefaultSurveyContext();
-//			SurveyIdmlBinder binder = new SurveyIdmlBinder(ctx);
-//			PlainTextApplicationOptionsBinder textAOB = new PlainTextApplicationOptionsBinder();
-//			binder.addApplicationOptionsBinder(textAOB);
-//			
-//			Survey survey = binder.unmarshal(is);
-//			
-//			FileOutputStream fos = new FileOutputStream("test.idm.out.xml");
-//			// Write
-//			binder.marshal(survey, fos);
-//			fos.flush();
-//			fos.close();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-
 	public void addApplicationOptionsBinder(ApplicationOptionsBinder<?> binder) {
 		optionsBinders.add(binder);
 	}
@@ -111,9 +89,7 @@ public class SurveyIdmlBinder {
 			Survey survey = unmarshaller.getSurvey();
 			survey.init();
 			return survey;
-		} catch (XmlParseException e) {
-			throw new IdmlParseException(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
 	}
@@ -129,10 +105,9 @@ public class SurveyIdmlBinder {
 			Survey survey = unmarshaller.getSurvey();
 			survey.init();
 			return survey;
-		} catch (XmlParseException e) {
-			throw new IdmlParseException(e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
-	}		
-}
+	}
+	
+	}

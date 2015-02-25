@@ -1,9 +1,11 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.XmlParseException;
+
 import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
@@ -63,7 +65,7 @@ class VersioningPR extends IdmlPullReader {
 			
 			@Override
 			protected void processText(String text) {
-				version.setDate(text);
+				version.setDate(Dates.parseDate(text));
 			}
 		}
 	

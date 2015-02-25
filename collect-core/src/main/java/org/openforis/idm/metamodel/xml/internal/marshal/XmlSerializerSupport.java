@@ -31,7 +31,7 @@ public abstract class XmlSerializerSupport<T, P> {
 	private XmlSerializerSupport<?, ?> parentMarshaller;
 	
 	protected XmlSerializerSupport() {
-		this(IdmlConstants.IDML3_NAMESPACE_URI, null);
+		this(null);
 	}
 	
 	protected XmlSerializerSupport(String tag) {

@@ -15,7 +15,9 @@ import org.openforis.idm.model.Coordinate;
  */
 public interface CoordinateOperations {
 
-	void parseSRS(List<SpatialReferenceSystem> list);
+	void validateWKT(String wkt) throws Exception;
+	
+	void parseSRS(List<SpatialReferenceSystem> srss);
 
 	void parseSRS(SpatialReferenceSystem srs);
 

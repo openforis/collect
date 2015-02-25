@@ -2,7 +2,9 @@ package org.openforis.collect.designer.form.validator;
 
 import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -14,6 +16,7 @@ import org.zkoss.util.resource.Labels;
 public class SRSFormValidator extends FormValidator {
 	
 	protected static final String ID_FIELD = "id";
+	protected static final String WKT_FIELD = "wellKnownText";
 	
 	private static final String ITEM_ID_ALREADY_DEFINED_MESSAGE_KEY = "survey.srs.validation.id_already_defined";
 	
@@ -26,6 +29,11 @@ public class SRSFormValidator extends FormValidator {
 		boolean result = validateRequired(ctx, ID_FIELD);
 		if ( result ) {
 			result = validateIdUniqueness(ctx);
+		}
+		if (validateRequired(ctx, WKT_FIELD)) {
+			result = result && validateWKT(ctx);
+		} else {
+			result = false;
 		}
 		return result;
 	}
@@ -43,6 +51,27 @@ public class SRSFormValidator extends FormValidator {
 		} else {
 			return true;
 		}
+	}
+	
+	private boolean validateWKT(ValidationContext ctx) {
+		String wkt = (String) getValue(ctx, WKT_FIELD);
+		CollectSurvey survey = getSurvey(ctx);
+		SurveyContext context = survey.getContext();
+		CoordinateOperations coordinateOperations = context.getCoordinateOperations();
+		try {
+			coordinateOperations.validateWKT(wkt);
+			return true;
+		} catch (Exception e) {
+			String message = Labels.getLabel("survey.srs.validation.error.invalid_wkt", new String[]{e.getMessage()});
+			addInvalidMessage(ctx, WKT_FIELD, message);
+			return false;
+		}
+	}
+	
+	private CollectSurvey getSurvey(ValidationContext ctx) {
+		SurveyObjectBaseVM<SpatialReferenceSystem> viewModel = getSurveyItemEditVM(ctx);
+		CollectSurvey survey = viewModel.getSurvey();
+		return survey;
 	}
 	
 	@SuppressWarnings("unchecked")
