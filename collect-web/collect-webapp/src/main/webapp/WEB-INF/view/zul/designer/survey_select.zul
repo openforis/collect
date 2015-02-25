@@ -17,7 +17,6 @@
 			<button id="goToIndexBtn"
 				image="/assets/images/back-small.png"
 				label="${labels.surveys_list.go_to_index_page}"
-				visible="@load(not vm.collectEarthEditor)"
 				onClick="@command('goToIndex')" />
 		</box>
 		<box hflex="2" align="center">
@@ -35,14 +34,11 @@
 			<listheader label="${labels.survey.project_name}"
 				sort="auto(projectName)" />
 			<listheader label="${labels.survey.modified}" width="70px"
-				visible="@load(not vm.collectEarthEditor)"
 				sort="auto(work, published, name)" />
 			<listheader label="${labels.survey.published}" width="70px"
-				visible="@load(not vm.collectEarthEditor)"
 				sort="auto(published, work, name)" />
 			<listheader
-				label="${labels.survey.records_validation_status}" width="150px"
-				visible="@load(not vm.collectEarthEditor)" />
+				label="${labels.survey.records_validation_status}" width="150px" />
 		</listhead>
 		<template name="model">
 			<listitem>
@@ -50,21 +46,21 @@
 					onDoubleClick="@command('editSelectedSurvey')" />
 				<listcell label="@load(each.projectName)"
 					onDoubleClick="@command('editSelectedSurvey')" />
-				<listcell visible="@load(not vm.collectEarthEditor)"
+				<listcell
 					onDoubleClick="@command('editSelectedSurvey')">
 					<box align="center" width="100%"
 						visible="${each.work}">
 						<image src="/assets/images/tick-small.png" />
 					</box>
 				</listcell>
-				<listcell visible="@load(not vm.collectEarthEditor)"
+				<listcell 
 					onDoubleClick="@command('editSelectedSurvey')">
 					<box align="center" width="100%"
 						visible="${each.published}">
 						<image src="/assets/images/tick-small.png" />
 					</box>
 				</listcell>
-				<listcell visible="@load(not vm.collectEarthEditor)">
+				<listcell>
 					<hlayout hflex="1"
 						visible="@load(each.recordValidationInProgress)">
 						<label
@@ -78,58 +74,67 @@
 		</template>
 	</listbox>
 	
-	<hlayout spacing="50px" width="900px">
+	<hlayout spacing="100px" width="850px">
 		<button label="${labels.global.new_item}"
 			image="/assets/images/add-small.png"
 			onClick="@command('newSurvey')" />
 		
 		<button label="${labels.survey.import_survey.$}"
-			visible="@load(not vm.collectEarthEditor)"
 			image="/assets/images/upload-small.png"
 			onClick="@command('openSurveyImportPopUp')" />
 		
-		<hlayout width="600px">
-			<hlayout visible="@load(vm.surveySelected)" spacing="30px">
+		<hlayout hflex="true">
+			<hlayout visible="@load(vm.surveySelected)" hflex="true" spacing="80px">
+				<button label="${labels.survey.export.$}"
+					onClick="@command('exportSelectedSurvey')"
+					image="/assets/images/download-small.png"
+					disabled="@load(vm.exportDisabled)" />
+				
 				<button label="${labels.global.edit_item}"
 					image="/assets/images/edit-small.png"
 					onClick="@command('editSelectedSurvey')"
 					disabled="@load(vm.editingDisabled)" />
 		
-				<button label="${labels.survey.export.$}"
-					onClick="@command('exportSelectedSurvey')"
-					image="/assets/images/download-small.png"
-					disabled="@load(vm.exportDisabled)" />
-		
-				<hlayout width="100px">
-					<button label="${labels.survey.publish.$}"
-						onClick="@command('publishSelectedSurvey')"
-						visible="@load(not vm.publishDisabled)" />
-			
-					<button label="${labels.survey.unpublish.$}"
-						onClick="@command('unpublishSelectedSurvey')"
-						visible="@load(not vm.unpublishDisabled)" />
-				</hlayout>
-			
-				<hlayout width="150px">
-					<button
-						visible="@load(not vm.selectedSurvey.recordValidationInProgress)"
-						disabled="@load(not vm.selectedSurvey.published)"
-						label="${labels.survey.validateAllRecords}"
-						onClick="@command('validateAllRecords')" />
-			
-					<button
-						visible="@load(vm.selectedSurvey.recordValidationInProgress)"
-						label="${labels.survey.cancelRecordValidation}"
-						onClick="@command('cancelRecordValidation')" />
-				</hlayout>
-		
-				<button label="${labels.survey.delete.$}"
-					image="/assets/images/delete-small.png"
-					onClick="@command('deleteSelectedSurvey')"
-					disabled="@load(vm.editingDisabled)" />
+				<!-- Advanced options -->
+				<combobutton label="${labels.survey.advanced_functions}" 
+							image="/assets/images/settings-small.png">
+					<menupopup>
+						<menuitem label="${labels.survey.publish_latest_changes}"
+							onClick="@command('publishSelectedSurvey')"
+							visible="@load(not vm.publishDisabled and vm.selectedSurvey.work and not vm.selectedSurvey.onlyWork)" />
+							
+						<menuitem label="${labels.survey.publish.$}"
+							onClick="@command('publishSelectedSurvey')"
+							visible="@load(not vm.publishDisabled and vm.selectedSurvey.onlyWork)" />
+				
+						<menuseparator visible="@load(not vm.publishDisabled)" />
+						
+						<menuitem label="${labels.survey.unpublish.$}"
+							onClick="@command('unpublishSelectedSurvey')"
+							visible="@load(not vm.unpublishDisabled)" />
+							
+						<menuseparator visible="@load(not vm.unpublishDisabled)" />
+						
+						<menuitem
+							visible="@load(vm.selectedSurvey.published and not vm.selectedSurvey.recordValidationInProgress)"
+							label="${labels.survey.validateAllRecords}"
+							onClick="@command('validateAllRecords')" />
+				
+						<menuitem
+							visible="@load(vm.selectedSurvey.recordValidationInProgress)"
+							label="${labels.survey.cancelRecordValidation}"
+							onClick="@command('cancelRecordValidation')" />
+							
+						<menuseparator />
+						
+						<menuitem label="${labels.survey.delete.$}"
+							image="/assets/images/delete-small.png"
+							onClick="@command('deleteSelectedSurvey')" />
+					</menupopup>
+				</combobutton>
+				
 			</hlayout>
 		</hlayout>
-		
 
 	</hlayout>
 	
