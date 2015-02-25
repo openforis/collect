@@ -4,7 +4,7 @@
 <?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver"?>
 
 <vbox id="surveySelectBox" self="@define(content)" 
-	height="100%" width="100%" align="center" spacing="10px"
+	vflex="true" hflex="true" align="center" spacing="10px"
 	apply="org.openforis.collect.designer.composer.SurveySelectComposer"
 	viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SurveySelectVM')">
 
@@ -26,7 +26,7 @@
 		<box hflex="1"></box>
 	</hbox>
 	
-	<listbox id="surveysListbox" width="830px"
+	<listbox id="surveysListbox" width="830px" vflex="true"
 		model="@load(vm.surveySummaries)"
 		selectedItem="@bind(vm.selectedSurvey)">
 		<listhead>
@@ -123,5 +123,7 @@
 			disabled="@load(vm.editingDisabled)" />
 
 	</hlayout>
+	
+	<space height="10px" />
 	
 </vbox>
