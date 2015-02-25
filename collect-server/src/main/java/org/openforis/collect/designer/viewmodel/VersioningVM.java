@@ -54,7 +54,7 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 	@Override
 	protected List<ModelVersion> getItemsInternal() {
 		CollectSurvey survey = getSurvey();
-		List<ModelVersion> versions = survey.getVersions();
+		List<ModelVersion> versions = survey.getSortedVersions();
 		return versions;
 	}
 	

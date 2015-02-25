@@ -3,12 +3,14 @@ package org.openforis.idm.metamodel;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.openforis.collect.utils.Dates;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.model.NodePathPointer;
@@ -213,6 +215,22 @@ public class Survey implements Serializable {
 		descriptions.remove(language);
 	}
 
+	/**
+	 * Returns the list of model versions sorted by date.
+	 */
+	public List<ModelVersion> getSortedVersions() {
+		if (this.modelVersions == null) {
+			return Collections.emptyList();
+		}
+		List<ModelVersion> versions = new ArrayList<ModelVersion>(this.modelVersions);
+		Collections.sort(versions, new Comparator<ModelVersion>() {
+			public int compare(ModelVersion v1, ModelVersion v2) {
+				return Dates.compareDateOnly(v1.getDate(), v2.getDate());
+			}
+		});
+		return CollectionUtils.unmodifiableList(versions);
+	}
+	
 	public List<ModelVersion> getVersions() {
 		return CollectionUtils.unmodifiableList(this.modelVersions);
 	}

@@ -3,7 +3,9 @@
  */
 package org.openforis.collect.metamodel.proxy;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
@@ -17,6 +19,7 @@ import org.openforis.idm.metamodel.ModelVersion;
 public class ModelVersionProxy extends IdentifiableSurveyObjectProxy {
 
 	private transient ModelVersion version;
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	public ModelVersionProxy(ModelVersion version) {
 		super(version);
@@ -50,7 +53,8 @@ public class ModelVersionProxy extends IdentifiableSurveyObjectProxy {
 
 	@ExternalizedProperty
 	public String getDate() {
-		return version.getDate();
+		Date date = version.getDate();
+		return date == null ? null: DATE_FORMAT.format(date);
 	}
 
 }

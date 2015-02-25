@@ -640,11 +640,16 @@ public class SurveyManager {
 	}
 
 	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri) {
+		return duplicatePublishedSurveyAsWork(uri, true);
+	}
+
+	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri,
+			boolean temporarySurveyPublishedState) {
 		CollectSurvey survey = surveyDao.loadByUri(uri);
 //		CollectSurvey surveyWork = survey.clone();
 		CollectSurvey surveyWork = survey;
 		surveyWork.setId(null);
-		surveyWork.setPublished(true);
+		surveyWork.setPublished(temporarySurveyPublishedState);
 		surveyWork.setWork(true);
 		try {
 			surveyWorkDao.insert(surveyWork);
@@ -709,6 +714,26 @@ public class SurveyManager {
 			removeFromCache(oldPublishedSurvey);
 		}
 		addToCache(survey);
+	}
+	
+	/**
+	 * Removes the temporary survey associated to the published one (if any) and
+	 * duplicates the published survey into a temporary one, then removes the pusblished one.
+	 */
+	@Transactional
+	public CollectSurvey unpublish(int surveyId) {
+		CollectSurvey oldPublishedSurvey = getById(surveyId);
+		String uri = oldPublishedSurvey.getUri();
+		
+		SurveySummary existingSurveyWork = surveyWorkDao.loadSurveySummaryByUri(uri);
+		if (existingSurveyWork != null) {
+			surveyWorkDao.delete(existingSurveyWork.getId());
+		}
+		CollectSurvey surveyWork = duplicatePublishedSurveyAsWork(uri, false);
+		
+		deleteSurvey(surveyId);
+		
+		return surveyWork;
 	}
 	
 	public void cancelRecordValidation(int surveyId) {

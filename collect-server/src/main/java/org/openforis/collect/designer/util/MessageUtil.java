@@ -196,11 +196,25 @@ public class MessageUtil {
 		private String okLabelKey;
 		private String cancelLabelKey;
 		
+		public ConfirmParams(ConfirmHandler confirmHandler) {
+			this(confirmHandler, null);
+		}
+		
 		public ConfirmParams(ConfirmHandler confirmHandler, String messageKey) {
 			this.confirmHandler = confirmHandler;
 			this.messageKey = messageKey;
 		}
 
+		public void setMessage(String key, Object... args) {
+			this.messageKey = key;
+			this.messageArgs = args;
+		}
+		
+		public void setTitle(String key, Object... args) {
+			this.titleKey = key;
+			this.titleArgs = args;
+		}
+		
 		public ConfirmHandler getConfirmHandler() {
 			return confirmHandler;
 		}

@@ -3,8 +3,10 @@ package org.openforis.idm.metamodel.xml.internal.marshal;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
+import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
 
@@ -67,7 +69,8 @@ class VersioningXS extends XmlSerializerSupport<ModelVersion, Survey> {
 		
 		@Override
 		protected void marshalInstances(ModelVersion version) throws IOException {
-			marshal(version.getDate());
+			String dateStr = Dates.formatDate(version.getDate());
+			marshal(dateStr);
 		}
 	}
 }

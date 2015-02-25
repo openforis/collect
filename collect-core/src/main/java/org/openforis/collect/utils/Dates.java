@@ -2,6 +2,7 @@ package org.openforis.collect.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
@@ -68,6 +69,22 @@ public class Dates {
 			String result = formatter.format(dateTime);
 			return result;
 		}
+	}
+
+	public static int compareDateOnly(Date date1, Date date2) {
+		Date onlyDate1 = toOnlyDate(date1);
+		Date onlyDate2 = toOnlyDate(date2);
+		return onlyDate1.compareTo(onlyDate2);
+	}
+
+	public static Date toOnlyDate(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.set(Calendar.MINUTE, 0);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
 	}
 	
 }

@@ -297,26 +297,19 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 
 	public List<ModelVersion> getFormVersions() {
-		CollectSurvey survey = getSurvey();
-		if ( survey == null ) {
-			//TODO session expired...?
-			return null;
-		} else {
-			List<ModelVersion> result = new ArrayList<ModelVersion>(survey.getVersions());
-			return new BindingListModelList<ModelVersion>(result, false);
-		}
+		List<ModelVersion> versions = getSurveyFormVersions();
+		return new BindingListModelList<ModelVersion>(versions, false);
 	}
 
 	public List<Object> getFormVersionsWithEmptyOption() {
-		CollectSurvey survey = getSurvey();
-		List<Object> result = new ArrayList<Object>(survey.getVersions());
+		List<ModelVersion> versions = getSurveyFormVersions();
+		List<Object> result = new ArrayList<Object>(versions);
 		result.add(0, FormObject.VERSION_EMPTY_SELECTION);
 		return new BindingListModelList<Object>(result, false);
 	}
 	
 	public List<Integer> getFormVersionIdsWithEmptyOption() {
-		CollectSurvey survey = getSurvey();
-		List<ModelVersion> versions = survey.getVersions();
+		List<ModelVersion> versions = getSurveyFormVersions();
 		List<Integer> result = new ArrayList<Integer>();
 		result.add(0, -1);
 		for (ModelVersion modelVersion : versions) {
@@ -324,7 +317,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 		return new BindingListModelList<Integer>(result, false);
 	}
-	
+
 	public String getVersionLabel(int id) {
 		if ( id > 0 ) {
 			CollectSurvey survey = getSurvey();
@@ -468,6 +461,16 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	public List<String> getEditableRecordStepNames() {
 		return Arrays.asList(Step.ENTRY.name(), Step.CLEANSING.name());
+	}
+
+	private List<ModelVersion> getSurveyFormVersions() {
+		CollectSurvey survey = getSurvey();
+		if (survey == null) {
+			//TODO session expired...?
+			return Collections.emptyList();
+		} else {
+			return survey.getSortedVersions();
+		}
 	}
 	
 }

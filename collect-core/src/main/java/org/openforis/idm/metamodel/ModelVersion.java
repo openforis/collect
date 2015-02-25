@@ -5,6 +5,7 @@ package org.openforis.idm.metamodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public class ModelVersion extends IdentifiableSurveyObject implements Comparable
 	private String name;
 	private LanguageSpecificTextMap labels;
 	private LanguageSpecificTextMap descriptions;
-	private String date;
+	private Date date;
 
 	ModelVersion(Survey survey, int id) {
 		super(survey, id);
@@ -98,11 +99,11 @@ public class ModelVersion extends IdentifiableSurveyObject implements Comparable
 		descriptions.remove(language);
 	}
 
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 	
-	public void setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 
