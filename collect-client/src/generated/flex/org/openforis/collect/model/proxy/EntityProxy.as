@@ -141,6 +141,9 @@ package org.openforis.collect.model.proxy {
 			var result:ArrayCollection;
 			if(childDefinition != null) {
 				result = childrenByDefinitionId.get(childDefinition.id);
+				if (result == null) {
+					result = new ArrayCollection();
+				}
 			} else {
 				result = new ArrayCollection();
 				var childDefns:IList = EntityDefinitionProxy(definition).childDefinitions;

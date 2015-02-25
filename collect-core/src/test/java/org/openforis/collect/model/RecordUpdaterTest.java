@@ -11,6 +11,7 @@ import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.Survey;
@@ -626,25 +627,17 @@ public class RecordUpdaterTest {
 	private CollectSurvey createTestSurvey() {
 		CollectSurveyContext surveyContext = new CollectSurveyContext();
 		CollectSurvey survey = (CollectSurvey) surveyContext.createSurvey();
-		{
-			ModelVersion version = survey.createModelVersion();
-			version.setName("1.0");
-			version.setDate("2014-12-01");
-			survey.addVersion(version);
-		}
-		{
-			ModelVersion version = survey.createModelVersion();
-			version.setName("2.0");
-			version.setDate("2014-12-02");
-			survey.addVersion(version);
-		}
-		{
-			ModelVersion version = survey.createModelVersion();
-			version.setName("3.0");
-			version.setDate("2014-12-03");
-			survey.addVersion(version);
-		}
+		addModelVersion(survey, "1.0", "2014-12-01");
+		addModelVersion(survey, "2.0", "2014-12-02");
+		addModelVersion(survey, "3.0", "2014-12-03");
 		return survey;
+	}
+
+	private void addModelVersion(CollectSurvey survey, String name, String date) {
+		ModelVersion version = survey.createModelVersion();
+		version.setName(name);
+		version.setDate(Dates.parseDate(date));
+		survey.addVersion(version);
 	}
 	
 }
