@@ -236,13 +236,9 @@
 				</plugins>
 			</build>		
 		</profile>
+		
 		<profile>
-			<id>publish</id>
-			<activation>
-				<property>
-					<name>release</name>
-				</property>
-			</activation>
+			<id>publishupdater</id>
 			<build>
 				<plugins>
 					<plugin>
