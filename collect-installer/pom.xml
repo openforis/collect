@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.3.19-SNAPSHOT</version>
+		<version>3.3.18-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-installer</artifactId>
 	<packaging>pom</packaging>
@@ -298,9 +298,12 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<move file="${installbuilder-home}/output/${windows-installer-file-name}" tofile="${project.build.directory}/${windows-installer-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/output/${linux-installer-file-name}" tofile="${project.build.directory}/${linux-installer-file-name}" failonerror="true" />
-										<move file="${installbuilder-home}/output/${osx-installer-file-name}" tofile="${project.build.directory}/${osx-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${windows-installer-file-name}" 
+											tofile="${project.build.directory}/${windows-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${linux-installer-file-name}" 
+											tofile="${project.build.directory}/${linux-installer-file-name}" failonerror="true" />
+										<move file="${installbuilder-home}/output/${osx-installer-file-name}" 
+											tofile="${project.build.directory}/${osx-installer-file-name}" failonerror="true" />
 									</tasks>
 								</configuration>
 							</execution>
