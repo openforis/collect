@@ -24,11 +24,6 @@
 	<profiles>
 		<profile>
 			<id>updater</id>
-			<activation>
-				<property>
-					<name>release</name>
-				</property>
-			</activation>
 			<build>
 				<plugins>
 					
