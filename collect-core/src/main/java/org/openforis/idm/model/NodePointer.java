@@ -70,7 +70,7 @@ public class NodePointer {
 	}
 	
 	public boolean areNodesRelevant() {
-		return entity.isRelevant(getChildName());
+		return entity.isRelevant(childDefinition);
 	}
 	
 	public ModelVersion getModelVersion() {
