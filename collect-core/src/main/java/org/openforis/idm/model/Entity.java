@@ -574,7 +574,8 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public Integer getMinCount(NodeDefinition defn) {
-		return derivedStateCache.getMinCount(defn.getId());
+		Integer fixedCount = defn.getFixedMinCount();
+		return fixedCount == null ? derivedStateCache.getMinCount(defn.getId()): fixedCount;
 	}
 	
 	public void setMinCount(NodeDefinition childDefn, int count) {
@@ -582,7 +583,8 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public Integer getMaxCount(NodeDefinition defn) {
-		return derivedStateCache.getMaxCount(defn.getId());
+		Integer fixedCount = defn.getFixedMaxCount();
+		return fixedCount == null ? derivedStateCache.getMaxCount(defn.getId()): fixedCount;
 	}
 	
 	public void setMaxCount(NodeDefinition childDefn, int count) {

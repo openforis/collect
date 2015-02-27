@@ -703,9 +703,14 @@ public class RecordUpdater {
 	}
 
 	public void initializeRecord(Record record) {
+		initializeRecord(record, true);
+	}
+	
+	public void initializeRecord(Record record, boolean validate) {
+		//TODO
 		initializeEntity(record.getRootEntity());
 	}
-
+	
 	protected NodeChangeMap initializeEntity(Entity entity) {
 		Record record = entity.getRecord();
 		
@@ -1093,5 +1098,5 @@ public class RecordUpdater {
 			}
 		}
 	}
-	
+
 }

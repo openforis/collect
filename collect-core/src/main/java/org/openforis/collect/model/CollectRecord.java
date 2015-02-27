@@ -128,16 +128,22 @@ public class CollectRecord extends Record {
 	private RecordValidationCache validationCache;
 
 	public CollectRecord(CollectSurvey survey, String versionName) {
-		super(survey, versionName);
+		this(survey, versionName, null);
+	}
+	
+	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName) {
+		this(survey, versionName, rootEntityName, true);
+	}
+
+	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean toBeUpdated) {
+		super(survey, versionName, toBeUpdated);
 		this.step = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();
 		this.entityCounts = new ArrayList<Integer>();
-	}
-	
-	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName) {
-		this(survey, versionName);
-		createRootEntity(rootEntityName);
+		if (rootEntityName != null) {
+			createRootEntity(rootEntityName);
+		}
 	}
 	
 	@Override

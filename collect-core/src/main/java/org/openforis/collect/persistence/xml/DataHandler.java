@@ -65,6 +65,7 @@ public class DataHandler extends DefaultHandler {
 	private CollectSurvey recordSurvey;
 	private CollectSurvey currentSurvey;
 	private int ignoreLevels;
+	private boolean validationEnabled;
 	
 	private Map<String, User> usersByName;
 	
@@ -75,13 +76,18 @@ public class DataHandler extends DefaultHandler {
 	public DataHandler(UserManager userManager, CollectSurvey survey) {
 		this(userManager, survey, survey);
 	}
-	
+
 	public DataHandler(UserManager userManager, CollectSurvey currentSurvey, CollectSurvey recordSurvey) {
+		this(userManager, currentSurvey, recordSurvey, true);
+	}
+	
+	public DataHandler(UserManager userManager, CollectSurvey currentSurvey, CollectSurvey recordSurvey, boolean validationEnabled) {
 		super();
 		this.userManager = userManager;
 		this.currentSurvey = currentSurvey;
 		this.recordSurvey = recordSurvey;
 		this.usersByName = new HashMap<String, User>();
+		this.validationEnabled = validationEnabled;
 	}
 
 	@Override
@@ -139,31 +145,25 @@ public class DataHandler extends DefaultHandler {
 	}
 
 	public void startRecord(String localName, Attributes attributes) {
-		Schema schema = currentSurvey.getSchema();
-		EntityDefinition defn = schema.getRootEntityDefinition(localName);
-		if ( defn == null ) {
-			fail("Unknown root entity: "+localName);
-		} else {
-			String versionName = extractVersionName(attributes);
-			record = new CollectRecord(currentSurvey, versionName);
-			String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
-			State state = State.fromCode(stateAttr);
-			record.setState(state);
+		String versionName = extractVersionName(attributes);
+		record = new CollectRecord(currentSurvey, versionName, localName, validationEnabled);
+		String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
+		State state = State.fromCode(stateAttr);
+		record.setState(state);
 
-			Date created = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
-			Date modified = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
-			record.setCreationDate(created);
-			record.setModifiedDate(modified);
+		Date created = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
+		Date modified = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
+		record.setCreationDate(created);
+		record.setModifiedDate(modified);
 
-			String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);
-			User createdBy = fetchUser(createdByUserName);
-			record.setCreatedBy(createdBy);
-			String modifiedByUserName = attributes.getValue(ATTRIBUTE_MODIFIED_BY);
-			User modifiedBy = fetchUser(modifiedByUserName);
-			record.setModifiedBy(modifiedBy);
-
-			node = record.createRootEntity(localName);
-		}
+		String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);
+		User createdBy = fetchUser(createdByUserName);
+		record.setCreatedBy(createdBy);
+		String modifiedByUserName = attributes.getValue(ATTRIBUTE_MODIFIED_BY);
+		User modifiedBy = fetchUser(modifiedByUserName);
+		record.setModifiedBy(modifiedBy);
+		
+		node = record.getRootEntity();
 	}
 	
 	private User fetchUser(String name) {
