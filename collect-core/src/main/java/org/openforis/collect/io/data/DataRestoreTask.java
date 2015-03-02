@@ -18,12 +18,11 @@ import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
@@ -150,7 +149,6 @@ public class DataRestoreTask extends Task {
 					addError(entryName, message);
 				} else {
 					//record parsed successfully
-					new RecordUpdater().initializeRecord(parsedRecord);
 					parsedRecord.setStep(step);
 					
 					if ( lastProcessedRecord == null ) {
@@ -158,14 +156,7 @@ public class DataRestoreTask extends Task {
 						if (oldRecordSummary == null) {
 							//insert new record
 							parsedRecord.setId(nextRecordId ++);
-							switch(step) {
-							case ENTRY:
-								parsedRecord.setStep(Step.ENTRY);
-								queryBuffer.append(recordManager.createInsertQuery(parsedRecord));
-								break;
-							default:
-								insertPreviousStepsRecordData(parsedRecord, step);
-							}
+							insertRecordDataUntilStep(parsedRecord, step);
 						} else {
 							//overwrite existing record
 							originalRecordStep = oldRecordSummary.getStep();
@@ -178,33 +169,41 @@ public class DataRestoreTask extends Task {
 						queryBuffer.append(recordManager.createUpdateQuery(lastProcessedRecord));
 					}
 //					if ( parseRecordResult.hasWarnings() ) {
-//							addWarnings(entryName, parseRecordResult.getWarnings());
+//						addWarnings(entryName, parseRecordResult.getWarnings());
 //					}
 				}
 			}
 		}
 		if ( lastProcessedRecord != null ) {
-			//if imported record step is less than the original one, reset record step to the original one and revalidate the record
+			//if the original record step is after the imported record one, 
+			//restore record step to the original one and revalidate the record
 			//e.g. importing data from data entry step and the original record was in analysis step
-			if ( originalRecordStep != null && originalRecordStep.compareTo(lastProcessedRecord.getStep()) > 0 ) {
-				CollectSurvey survey = (CollectSurvey) lastProcessedRecord.getSurvey();
-				CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep);
-				originalRecord.setStep(originalRecordStep);
-				validateRecord(originalRecord);
-				queryBuffer.append(recordManager.createUpdateQuery(originalRecord));
+			if ( originalRecordStep != null && originalRecordStep.after(lastProcessedRecord.getStep()) ) {
+				restoreRecordStep(lastProcessedRecord, originalRecordStep);
 			} else {
 				//validate record and save the validation result
-				//TODO check if it is necessary
 				validateRecord(lastProcessedRecord);
 				queryBuffer.append(recordManager.createUpdateQuery(lastProcessedRecord));
 			}
 		}
 	}
 
-	private void insertPreviousStepsRecordData(CollectRecord record, Step step) {
-		for ( Step previousStep = Step.ENTRY; 
-				previousStep.getStepNumber() <= step.getStepNumber(); 
-				previousStep = previousStep.getNext() ) {
+	private void restoreRecordStep(CollectRecord record, Step originalRecordStep) {
+		CollectSurvey survey = (CollectSurvey) record.getSurvey();
+		CollectRecord originalRecord = recordManager.load(survey, record.getId(), originalRecordStep);
+		originalRecord.setStep(originalRecordStep);
+		validateRecord(originalRecord);
+		queryBuffer.append(recordManager.createUpdateQuery(originalRecord));
+	}
+
+	private void insertRecordDataUntilStep(CollectRecord record, Step step) {
+		List<Step> previousSteps = new ArrayList<Step>();
+		for (Step s : Step.values()) {
+			if (s.beforeEqual(step)) {
+				previousSteps.add(s);
+			}
+		}
+		for (Step previousStep : previousSteps) {
 			record.setStep(previousStep);
 			switch(previousStep) {
 			case ENTRY:

@@ -59,6 +59,16 @@ public class CollectRecord extends Record {
 			return null;
 		}
 		
+		public boolean hasNext() {
+			switch(this) {
+			case ENTRY:
+			case CLEANSING:
+				return true;
+			default:
+				return false;
+			}
+		}
+		
 		public Step getNext() {
 			switch(this) {
 				case ENTRY:
@@ -66,7 +76,18 @@ public class CollectRecord extends Record {
 				case CLEANSING:
 					return ANALYSIS;
 				default:
-					throw new IllegalArgumentException("This record cannot be promoted.");
+					throw new IllegalStateException(String.format(
+							"The step %s is the last step of the workflow and does not have a next one.", this.name()));
+			}
+		}
+		
+		public boolean hasPrevious() {
+			switch(this) {
+			case CLEANSING:
+			case ANALYSIS:
+				return true;
+			default:
+				return false;
 			}
 		}
 		
@@ -77,10 +98,28 @@ public class CollectRecord extends Record {
 				case ANALYSIS:
 					return Step.CLEANSING;
 				default:
-					throw new IllegalArgumentException("This record cannot be promoted.");
+					throw new IllegalStateException(String.format(
+							"The step %s is the first of the workflow and does not have a previous one.", this.name()));
 			}
 		}
 		
+		public boolean before(Step step) {
+			return this.compareTo(step) < 0;
+		}
+		
+		public boolean beforeEqual(Step step) {
+			return this.compareTo(step) <= 0;
+		}
+		
+		
+		public boolean after(Step step) {
+			return this.compareTo(step) > 0;
+		}
+
+		public boolean afterEqual(Step step) {
+			return this.compareTo(step) >= 0;
+		}
+
 	}
 
 	public enum State {
