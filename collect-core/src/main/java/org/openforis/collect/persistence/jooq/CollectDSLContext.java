@@ -44,24 +44,32 @@ public class CollectDSLContext extends DefaultDSLContext {
 	}
 
 	public void restartSequence(Sequence<?> sequence, Number restartValue) {
-		String name = sequence.getName();
-		String qualifiedName;
-		if ( sequence.getSchema() != null && configuration().settings().isRenderSchema() ) {
-			Schema schema = sequence.getSchema();
-			String schemaName = schema.getName();
-			qualifiedName = schemaName + "." + name;
-		} else {
-			qualifiedName = name;
+		if (isSequenceSupported()) {
+			String name = sequence.getName();
+			String qualifiedName;
+			if ( sequence.getSchema() != null && configuration().settings().isRenderSchema() ) {
+				Schema schema = sequence.getSchema();
+				String schemaName = schema.getName();
+				qualifiedName = schemaName + "." + name;
+			} else {
+				qualifiedName = name;
+			}
+			switch (configuration().dialect()) {
+			case POSTGRES:
+				execute("ALTER SEQUENCE " +  qualifiedName + " RESTART WITH " + restartValue);
+				break;
+			default:
+				throw new RuntimeException("DB dialeg not supported : " + configuration().dialect());
+			}
 		}
+	}
+	
+	private boolean isSequenceSupported() {
 		switch (configuration().dialect()) {
-		case POSTGRES:
-			execute("ALTER SEQUENCE " +  qualifiedName + " RESTART WITH " + restartValue);
-			break;
 		case SQLITE:
-			//sequences not handled
-			break;
+			return false;
 		default:
-			break;
+			return true;
 		}
 	}
 

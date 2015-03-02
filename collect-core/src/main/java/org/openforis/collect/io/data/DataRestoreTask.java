@@ -23,6 +23,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
@@ -47,7 +48,7 @@ public class DataRestoreTask extends Task {
 
 	//input
 	private ZipFile zipFile;
-
+	
 	private CollectSurvey packagedSurvey;
 	private CollectSurvey existingSurvey;
 	private List<Integer> entryIdsToImport;
@@ -59,12 +60,15 @@ public class DataRestoreTask extends Task {
 	private HashMap<String, String> errorByEntryName;
 	private BackupFileExtractor backupFileExtractor;
 	private boolean oldBackupFormat;
+	private QueryBuffer queryBuffer;
+	private Integer nextRecordId;
 	
 	public DataRestoreTask() {
 		super();
 		this.processedRecords = new ArrayList<Integer>();
 		this.errorByEntryName = new HashMap<String, String>();
 		this.oldBackupFormat = false;
+		this.queryBuffer = new QueryBuffer();
 	}
 
 	@Override
@@ -109,14 +113,22 @@ public class DataRestoreTask extends Task {
 	@Override
 	protected void execute() throws Throwable {
 		processedRecords = new ArrayList<Integer>();
-		List<Integer> idsToImport = calculateEntryIdsToImport();
-		for (Integer entryId : idsToImport) {
-			if ( isRunning() && ! processedRecords.contains(entryId) ) {
-				importEntries(entryId);
-				processedRecords.add(entryId);
-				incrementItemsProcessed();
-			} else {
-				break;
+		nextRecordId = recordManager.nextId();
+		try {
+			List<Integer> idsToImport = calculateEntryIdsToImport();
+			for (Integer entryId : idsToImport) {
+				if ( isRunning() && ! processedRecords.contains(entryId) ) {
+					importEntries(entryId);
+					processedRecords.add(entryId);
+					incrementItemsProcessed();
+				} else {
+					break;
+				}
+			}
+			queryBuffer.flush();
+		} finally {
+			if (nextRecordId != null) {
+				recordManager.restartIdSequence(nextRecordId);
 			}
 		}
 	}
@@ -145,31 +157,29 @@ public class DataRestoreTask extends Task {
 						CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
 						if (oldRecordSummary == null) {
 							//insert new record
-							if ( step != Step.ENTRY ) {
-								//insert previous steps data
-								for ( Step previousStep = Step.ENTRY; previousStep.getStepNumber() < step.getStepNumber(); previousStep = previousStep.getNext() ) {
-									parsedRecord.setStep(previousStep);
-									recordManager.save(parsedRecord);
-								}
-								parsedRecord.setStep(step);
+							parsedRecord.setId(nextRecordId ++);
+							switch(step) {
+							case ENTRY:
+								parsedRecord.setStep(Step.ENTRY);
+								queryBuffer.append(recordManager.createInsertQuery(parsedRecord));
+								break;
+							default:
+								insertPreviousStepsRecordData(parsedRecord, step);
 							}
-							recordManager.save(parsedRecord);
-							log().info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
 						} else {
 							//overwrite existing record
 							originalRecordStep = oldRecordSummary.getStep();
 							parsedRecord.setId(oldRecordSummary.getId());
-							recordManager.save(parsedRecord);
-							log().info("Updated: " + oldRecordSummary.getId() + " (from file " + entryName  + ")");
+							queryBuffer.append(recordManager.createUpdateQuery(parsedRecord));
 						}
 						lastProcessedRecord = parsedRecord;
 					} else {
 						replaceData(parsedRecord, lastProcessedRecord);
-						recordManager.save(lastProcessedRecord);
+						queryBuffer.append(recordManager.createUpdateQuery(lastProcessedRecord));
 					}
-					if ( parseRecordResult.hasWarnings() ) {
+//					if ( parseRecordResult.hasWarnings() ) {
 //							addWarnings(entryName, parseRecordResult.getWarnings());
-					}
+//					}
 				}
 			}
 		}
@@ -181,14 +191,31 @@ public class DataRestoreTask extends Task {
 				CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep);
 				originalRecord.setStep(originalRecordStep);
 				validateRecord(originalRecord);
-				recordManager.save(originalRecord);
+				queryBuffer.append(recordManager.createUpdateQuery(originalRecord));
 			} else {
 				//validate record and save the validation result
+				//TODO check if it is necessary
 				validateRecord(lastProcessedRecord);
-				recordManager.save(lastProcessedRecord);
+				queryBuffer.append(recordManager.createUpdateQuery(lastProcessedRecord));
 			}
 		}
 	}
+
+	private void insertPreviousStepsRecordData(CollectRecord record, Step step) {
+		for ( Step previousStep = Step.ENTRY; 
+				previousStep.getStepNumber() <= step.getStepNumber(); 
+				previousStep = previousStep.getNext() ) {
+			record.setStep(previousStep);
+			switch(previousStep) {
+			case ENTRY:
+				queryBuffer.append(recordManager.createInsertQuery(record));
+				break;
+			default:
+				queryBuffer.append(recordManager.createUpdateQuery(record));
+			}
+		}
+	}
+
 
 	protected String getBackupEntryName(int entryId, Step step) {
 		if ( oldBackupFormat ) {
@@ -312,5 +339,34 @@ public class DataRestoreTask extends Task {
 	
 	public void setOldBackupFormat(boolean oldBackupFormat) {
 		this.oldBackupFormat = oldBackupFormat;
+	}
+	
+	private class QueryBuffer {
+		
+		private static final int DEFAULT_BATCH_SIZE = 100;
+		
+		private int bufferSize;
+		private List<RecordStoreQuery> buffer;
+		
+		public QueryBuffer() {
+			this(DEFAULT_BATCH_SIZE);
+		}
+		
+		public QueryBuffer(int size) {
+			this.bufferSize = size;
+			this.buffer = new ArrayList<RecordStoreQuery>(size);
+		}
+		
+		void append(RecordStoreQuery query) {
+			buffer.add(query);
+			if (buffer.size() == bufferSize) {
+				flush();
+			}
+		}
+
+		void flush() {
+			recordManager.execute(buffer);
+			buffer.clear();
+		}
 	}
 }

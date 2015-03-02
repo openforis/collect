@@ -922,6 +922,9 @@ public class RecordUpdater {
 		if ( ! entity.isRelevant(defn) || StringUtils.isBlank(expression) ) {
 			return 0;
 		}
+		if (defn.getFixedMinCount() != null) {
+			return defn.getFixedMinCount();
+		}
 		try {
 			SurveyContext surveyContext = defn.getSurvey().getContext();
 			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
@@ -940,6 +943,9 @@ public class RecordUpdater {
 		String expression = defn.getMaxCountExpression();
 		if ( ! entity.isRelevant(defn) || StringUtils.isBlank(expression) ) {
 			return defn.isMultiple() ? Integer.MAX_VALUE: 1;
+		}
+		if (defn.getFixedMaxCount() != null) {
+			return defn.getFixedMaxCount();
 		}
 		try {
 			SurveyContext surveyContext = defn.getSurvey().getContext();

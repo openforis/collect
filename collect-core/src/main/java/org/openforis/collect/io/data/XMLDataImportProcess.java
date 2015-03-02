@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.data.DataImportState.MainStep;
@@ -112,7 +113,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 
 	private List<RecordStoreQuery> queryBuffer;
 
-	private int nextRecordId;
+	private Integer nextRecordId;
 
 	public XMLDataImportProcess() {
 		super();
@@ -388,14 +389,11 @@ public class XMLDataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.ERROR);
 			LOG.error("Error during data export", e);
 		} finally {
-			state.setRunning(false);
-			if ( zipFile != null ) {
-				try {
-					zipFile.close();
-				} catch (IOException e) {
-					LOG.error(e.getMessage(), e);
-				}
+			if (nextRecordId != null) {
+				recordManager.restartIdSequence(nextRecordId);
 			}
+			state.setRunning(false);
+			IOUtils.closeQuietly(zipFile);
 		}
 	}
 	

@@ -388,6 +388,10 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return dsl().nextId();
 	}
 	
+	public void restartIdSequence(Number value) {
+		dsl().restartSequence(value);
+	}
+	
 	@Override
 	public void delete(int id) {
 		super.delete(id);
@@ -605,6 +609,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		@Override
 		protected int nextId() {
 			return super.nextId();
+		}
+		
+		@Override
+		protected void restartSequence(Number value) {
+			super.restartSequence(value);
 		}
 		
 	}

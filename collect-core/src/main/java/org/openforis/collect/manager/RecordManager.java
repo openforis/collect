@@ -122,6 +122,10 @@ public class RecordManager {
 	public int nextId() {
 		return recordDao.nextId();
 	}
+	
+	public void restartIdSequence(Number value) {
+		recordDao.restartIdSequence(value);
+	}
 
 	public RecordStoreQuery createInsertQuery(CollectRecord record) {
 		return recordDao.createInsertQuery(record);
