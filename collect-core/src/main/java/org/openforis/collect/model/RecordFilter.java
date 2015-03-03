@@ -13,8 +13,8 @@ import org.openforis.collect.model.CollectRecord.Step;
  */
 public class RecordFilter {
 
-	private int offset;
-	private int maxNumberOfRecords;
+	private Integer offset;
+	private Integer maxNumberOfRecords;
 	private CollectSurvey survey;
 	private int surveyId;
 	private Integer rootEntityId;
@@ -24,12 +24,11 @@ public class RecordFilter {
 	private Date modifiedSince;
 	private Integer ownerId;
 	private List<String> keyValues;
+	private boolean caseSensitiveKeyValues;
 	
 	public RecordFilter(int surveyId, Integer rootEntityId) {
 		this.surveyId = surveyId;
 		this.rootEntityId = rootEntityId;
-		this.offset = 0;
-		this.maxNumberOfRecords = Integer.MAX_VALUE;
 	}
 	
 	public RecordFilter(CollectSurvey survey) {
@@ -39,21 +38,22 @@ public class RecordFilter {
 	public RecordFilter(CollectSurvey survey, Integer rootEntityId) {
 		this(survey.getId(), rootEntityId);
 		this.survey = survey;
+		this.caseSensitiveKeyValues = true;
 	}
 
-	public int getOffset() {
+	public Integer getOffset() {
 		return offset;
 	}
 	
-	public void setOffset(int offset) {
+	public void setOffset(Integer offset) {
 		this.offset = offset;
 	}
 	
-	public int getMaxNumberOfRecords() {
+	public Integer getMaxNumberOfRecords() {
 		return maxNumberOfRecords;
 	}
 	
-	public void setMaxNumberOfRecords(int maxNumberOfRecords) {
+	public void setMaxNumberOfRecords(Integer maxNumberOfRecords) {
 		this.maxNumberOfRecords = maxNumberOfRecords;
 	}
 	
@@ -122,5 +122,13 @@ public class RecordFilter {
 			setKeyValues(Arrays.asList(keyValues));
 		}
 	}
-	
+
+	public boolean isCaseSensitiveKeyValues() {
+		return caseSensitiveKeyValues;
+	}
+
+	public void setCaseSensitiveKeyValues(boolean caseSensitiveKeyValues) {
+		this.caseSensitiveKeyValues = caseSensitiveKeyValues;
+	}
+
 }

@@ -134,14 +134,25 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
-		return loadSummaries(survey, rootEntity, step, (Date) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
+		return loadSummaries(survey, rootEntity, step, null, null, null, null);
 	}
 
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
-		return loadSummaries(survey, rootEntity, (Step) null, (Date) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, keyValues);
+		return loadSummaries(survey, rootEntity, true, keyValues);
 	}
 
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, boolean caseSensitiveKeys, String... keyValues) {
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
+		
+		RecordFilter filter = new RecordFilter(survey, rootEntityDefn.getId());
+		filter.setCaseSensitiveKeyValues(caseSensitiveKeys);
+		filter.setKeyValues(keyValues);
+		return loadSummaries(filter, null);
+	}
+	
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
@@ -149,11 +160,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	}
 	
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Date modifiedSince) {
-		return loadSummaries(survey, rootEntity, (Step) null, modifiedSince, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
+		return loadSummaries(survey, rootEntity, (Step) null, modifiedSince, (Integer) null, (Integer) null, (List<RecordSummarySortField>) null, (String[]) null);
 	}
 
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, Date modifiedSince, int offset, int maxRecords, 
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, Date modifiedSince, Integer offset, Integer maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
@@ -212,7 +223,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 		//record keys
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
-			addFilterByKeyConditions(q, filter.getKeyValues());
+			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.getKeyValues());
 		}
 
 		//add ordering fields
@@ -222,11 +233,12 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			}
 		}
 		
-		//always order by ID to avoid pagination issues
-		q.addOrderBy(OFC_RECORD.ID);
-		
 		//add limit
-		q.addLimit(filter.getOffset(), filter.getMaxNumberOfRecords());
+		if (filter.getOffset() != null && filter.getMaxNumberOfRecords() != null) {
+			q.addLimit(filter.getOffset(), filter.getMaxNumberOfRecords());
+			//always order by ID to avoid pagination issues
+			q.addOrderBy(OFC_RECORD.ID);
+		}
 		
 		//fetch results
 		Result<Record> result = q.fetch();
@@ -278,17 +290,25 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	}
 	
 	private void addFilterByKeyConditions(SelectQuery q, List<String> keyValues) {
-		addFilterByKeyConditions(q, keyValues.toArray(new String[keyValues.size()]));
+		addFilterByKeyConditions(q, true, keyValues);
 	}
 	
-	private void addFilterByKeyConditions(SelectQuery q, String... keyValues) {
+	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, List<String> keyValues) {
+		addFilterByKeyConditions(q, caseSensitiveKeyValues, keyValues.toArray(new String[keyValues.size()]));
+	}
+	
+	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, String... keyValues) {
 		if ( keyValues != null && keyValues.length > 0 ) {
 			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
 				String key = keyValues[i];
 				if(StringUtils.isNotBlank(key)) {
 					@SuppressWarnings("unchecked")
 					Field<String> keyField = (Field<String>) KEY_FIELDS[i];
-					q.addConditions(keyField.upper().equal(key.toUpperCase()));
+					if (caseSensitiveKeyValues) {
+						q.addConditions(keyField.equal(key));
+					} else {
+						q.addConditions(keyField.upper().equal(key.toUpperCase()));
+					}
 				}
 			}
 		}
