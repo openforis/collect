@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import javax.xml.transform.TransformerException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -30,20 +28,44 @@ public class CEComponentHTMLFormatter {
 		if (comp instanceof CEField) {
 			return format((CEField) comp);
 		} else {
-			return format((CEEntity) comp);
+			return format((CETable) comp);
 		}
 	}
 	
-	public String format(CEEntity comp) {
+	public String format(CETable comp) {
 		XMLBuilder rootBuilder;
 		try {
-			if (comp instanceof CEEnumeratedEntity) {
+			if (comp instanceof CEEnumeratedEntityTable) {
 				rootBuilder = XMLBuilder.create("fieldset");
 				rootBuilder.e("legend").t(comp.getLabel());
-				XMLBuilder rowBuilder = rootBuilder.e("div");
-				List<String> enumeratingCodes = ((CEEnumeratedEntity) comp).getEnumeratingCodes();
-				for (String enumeratingCode : enumeratingCodes) {
-					
+				XMLBuilder tableBuilder = rootBuilder.e("table").a("class", "table");
+				XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr");
+				for (String heading : comp.getHeadings()) {
+					headerBuilder.e("th").t(heading);
+				}
+				XMLBuilder bodyBuilder = tableBuilder.e("tbody");
+				List<CETableRow> rows = comp.getRows();
+				for (CETableRow row : rows) {
+					XMLBuilder rowBuilder = bodyBuilder.e("tr");
+					for (CEComponent child : row.getChildren()) {
+						XMLBuilder cellBuilder = rowBuilder.e("td");
+						if (child instanceof CEFixedValueField) {
+							String elId = child.getHtmlParameterName();
+							cellBuilder
+								.e("label")
+									.a("class", "control-label col-sm-4")
+									.t(row.getLabel())
+								.up()
+								.e("input")
+									.a("id", elId)
+									.a("name", elId)
+									.a("type", "hidden")
+									.a("class", "form-control")
+									.a("data-field-type", ((CEField) child).getType().name());	
+						} else if (child instanceof CEField) {
+							createBuilder((CEField) child, false, cellBuilder);
+						}
+					}
 				}
 			} else {
 				rootBuilder = XMLBuilder.create("fieldset");
@@ -59,12 +81,21 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	public String format(CEField comp, boolean includeLabel) {
+		XMLBuilder builder = createBuilder(comp, includeLabel);
+		return writeToString(builder);
+	}
+	
+	private XMLBuilder createBuilder(CEField comp, boolean includeLabel) {
+		return createBuilder(comp, includeLabel, null);
+	}
+	
+	private XMLBuilder createBuilder(CEField comp, boolean includeLabel, XMLBuilder rootBuilder) {
 		//start of external container
 		String elId = comp.getHtmlParameterName();
 		
 		try {
 			//external form-group container
-			XMLBuilder formGroupBuilder = XMLBuilder.create("div");
+			XMLBuilder formGroupBuilder = rootBuilder == null ? XMLBuilder.create("div") : rootBuilder.e("div");
 			formGroupBuilder.a("class", "form-group");
 			if (includeLabel) {
 				//label element
@@ -88,6 +119,13 @@ public class CEComponentHTMLFormatter {
 				default:
 					break;
 				}
+			} else if (comp instanceof CEFixedValueField) {
+				formControlContainer.e("input")
+						.a("id", elId)
+						.a("name", elId)
+						.a("type", "hidden")
+						.a("class", "form-control")
+						.a("data-field-type", comp.getType().name());
 			} else if (comp instanceof CEField) {
 				switch (((CEField) comp).getType()) {
 				case SHORT_TEXT:
@@ -142,24 +180,27 @@ public class CEComponentHTMLFormatter {
 					break;
 				}
 			}
-			return writeToString(formGroupBuilder);
+			return formGroupBuilder;
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	private String writeToString(XMLBuilder builder)
-			throws TransformerException {
-		StringWriter writer = new StringWriter();
-		@SuppressWarnings("serial")
-		Properties outputProperties = new Properties(){{
-			put(javax.xml.transform.OutputKeys.INDENT, "yes");
-			put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
-			put(javax.xml.transform.OutputKeys.STANDALONE, "yes");
-		}};
-		builder.toWriter(writer, outputProperties);
-		String result = writer.toString();
-		return result;
+	private String writeToString(XMLBuilder builder) {
+		try {
+			StringWriter writer = new StringWriter();
+			@SuppressWarnings("serial")
+			Properties outputProperties = new Properties(){{
+				put(javax.xml.transform.OutputKeys.INDENT, "yes");
+				put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+				put(javax.xml.transform.OutputKeys.STANDALONE, "yes");
+			}};
+			builder.toWriter(writer, outputProperties);
+			String result = writer.toString();
+			return result;
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void buildCodeSelect(XMLBuilder builder, CECodeField comp) {

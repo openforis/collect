@@ -6,17 +6,16 @@ import java.util.List;
 /**
  * 
  * @author S. Ricci
- * @author A. Sanchez-Paus Diaz
  *
  */
-class CEEntity extends CEComponent {
+public class CEFieldSet extends CEComponent {
 
 	private List<CEComponent> children = new ArrayList<CEComponent>();
 	
-	public CEEntity(String name, String label, boolean multiple) {
-		super(null, name, label, multiple);
+	public CEFieldSet(String name, String label) {
+		super(null, name, label, false);
 	}
-	
+
 	public void addChild(CEComponent child) {
 		children.add(child);
 	}

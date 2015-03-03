@@ -248,7 +248,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 					if ( result == null ) {
 						//try to find tab among main tab children
 						UITab mainTab = getMainTab(rootTabSet);
-						result = mainTab.getTab(tabName);
+						result = mainTab == null ? null : mainTab.getTab(tabName);
 					}
 				} else {
 					UITab parentTab = getAssignedTab(parentDefn);

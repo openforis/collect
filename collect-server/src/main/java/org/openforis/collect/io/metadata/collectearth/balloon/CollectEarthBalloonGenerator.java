@@ -87,7 +87,7 @@ public class CollectEarthBalloonGenerator {
 		
 		CEComponentHTMLFormatter htmlFormatter = new CEComponentHTMLFormatter();
 		
-		CEEntity rootComponent = generateRootComponent();
+		CEFieldSet rootComponent = generateRootComponent();
 		
 		StringBuilder sb = new StringBuilder();
 		List<CEComponent> children = rootComponent.getChildren();
@@ -147,9 +147,9 @@ public class CollectEarthBalloonGenerator {
 		return names;
 	}
 	
-	private CEEntity generateRootComponent() {
+	private CEFieldSet generateRootComponent() {
 		EntityDefinition rootEntityDef = getRootEntity();
-		CEEntity rootComponent = (CEEntity) createComponent(rootEntityDef);
+		CEFieldSet rootComponent = (CEFieldSet) createComponent(rootEntityDef);
 		
 		rootEntityDef.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
@@ -175,6 +175,10 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private CEComponent createComponent(NodeDefinition def) {
+		return createComponent(def, 1);
+	}
+	
+	private CEComponent createComponent(NodeDefinition def, int entityPosition) {
 		String label = ObjectUtils.defaultIfNull(def.getLabel(Type.INSTANCE), def.getName());
 		
 		boolean multiple = def.isMultiple();
@@ -182,17 +186,52 @@ public class CollectEarthBalloonGenerator {
 		boolean hideWhenNotRelevant = uiOptions.isHideWhenNotRelevant(def);
 		CEComponent comp;
 		if (def instanceof EntityDefinition) {
-			CEEntity ceEntity = new CEEntity(def.getName(), label, def.isMultiple());
-			List<NodeDefinition> childDefinitions = ((EntityDefinition) def).getChildDefinitions();
-			for (NodeDefinition child : childDefinitions) {
-				ceEntity.addChild(createComponent(child));
+			if (def.isMultiple() && ((EntityDefinition) def).isEnumerable()) {
+				CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label);
+				for (NodeDefinition child : ((EntityDefinition) def).getChildDefinitions()) {
+					String heading = child.getLabel(Type.HEADING);
+					if (heading == null) {
+						heading = child.getLabel(Type.INSTANCE);
+						if (heading == null) {
+							heading = child.getName();
+						}
+					}
+					ceTable.addHeading(heading);
+				}
+				CodeAttributeDefinition enumeratingCodeAttribute = ((EntityDefinition) def).getEnumeratingKeyCodeAttribute();
+				CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
+				List<CodeListItem> codeItems = codeListService.loadRootItems(enumeratingCodeAttribute.getList());
+				int codeItemIdx = 0;
+				for (CodeListItem item : codeItems) {
+					String key = item.getCode();
+					CETableRow row = new CETableRow(key, item.getLabel());
+					for (NodeDefinition child : ((EntityDefinition) def).getChildDefinitions()) {
+						row.addChild(createComponent(child, codeItemIdx + 1));
+					}
+					ceTable.addRow(row);
+					codeItemIdx ++;
+				}
+				comp = ceTable;
+			} else {
+				CEFieldSet fieldSet = new CEFieldSet(def.getName(), label);
+				for (NodeDefinition child : ((EntityDefinition) def).getChildDefinitions()) {
+					fieldSet.addChild(createComponent(child));
+				}
+				comp = fieldSet;
 			}
-			comp = ceEntity;
 		} else {
-			String htmlParameterName = getHtmlParameterName(def);
+			String htmlParameterName;
+			boolean insideEnumeratedEntity = def.getParentEntityDefinition().isEnumerable();
+			if (insideEnumeratedEntity) {
+				htmlParameterName = getEnumeratedEntityComponentHtmlParameterName(def.getParentEntityDefinition(), entityPosition, def);
+			} else {
+				htmlParameterName = getHtmlParameterName(def);
+			}
 			CEFieldType type = getFieldType(def);
 			boolean key = def instanceof KeyAttributeDefinition ? ((KeyAttributeDefinition) def).isKey(): false;
-			if (def instanceof CodeAttributeDefinition) {
+			if (insideEnumeratedEntity && key) {
+				comp = new CEFixedValueField(htmlParameterName, def.getName(), label, multiple, type, key);
+			} else if (def instanceof CodeAttributeDefinition) {
 				CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
 				CodeAttributeDefinition parentCodeAttributeDef = ((CodeAttributeDefinition) def).getParentCodeAttributeDefinition();
 				Map<String, List<CodeListItem>> codeItemsByParentCode = new HashMap<String, List<CodeListItem>>();
@@ -218,6 +257,11 @@ public class CollectEarthBalloonGenerator {
 
 	private String getHtmlParameterName(NodeDefinition def) {
 		return htmlParameterNameByNodePath.get(def.getPath());
+	}
+	
+	private String getEnumeratedEntityComponentHtmlParameterName(EntityDefinition entityDef, int entityPosition, NodeDefinition childDef) {
+		String nodePath = entityDef.getPath() + "[" + entityPosition + "]/" + childDef.getName();
+		return htmlParameterNameByNodePath.get(nodePath);
 	}
 	
 	private CEFieldType getFieldType(NodeDefinition def) {
