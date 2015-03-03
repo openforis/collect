@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -25,6 +27,38 @@ public class CEComponentHTMLFormatter {
 	private static final String NOT_AVAILABLE_ITEM_CODE = "-1";
 
 	public String format(CEComponent comp) {
+		if (comp instanceof CEField) {
+			return format((CEField) comp);
+		} else {
+			return format((CEEntity) comp);
+		}
+	}
+	
+	public String format(CEEntity comp) {
+		XMLBuilder rootBuilder;
+		try {
+			if (comp instanceof CEEnumeratedEntity) {
+				rootBuilder = XMLBuilder.create("fieldset");
+				rootBuilder.e("legend").t(comp.getLabel());
+				XMLBuilder rowBuilder = rootBuilder.e("div");
+				List<String> enumeratingCodes = ((CEEnumeratedEntity) comp).getEnumeratingCodes();
+				for (String enumeratingCode : enumeratingCodes) {
+					
+				}
+			} else {
+				rootBuilder = XMLBuilder.create("fieldset");
+			}
+			return writeToString(rootBuilder);
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public String format(CEField comp) {
+		return format(comp, true);
+	}
+	
+	public String format(CEField comp, boolean includeLabel) {
 		//start of external container
 		String elId = comp.getHtmlParameterName();
 		
@@ -32,7 +66,7 @@ public class CEComponentHTMLFormatter {
 			//external form-group container
 			XMLBuilder formGroupBuilder = XMLBuilder.create("div");
 			formGroupBuilder.a("class", "form-group");
-			if (isLabelIncluded(comp)) {
+			if (includeLabel) {
 				//label element
 				formGroupBuilder.e("label")
 					.a("for", elId)
@@ -108,20 +142,24 @@ public class CEComponentHTMLFormatter {
 					break;
 				}
 			}
-			
-			StringWriter writer = new StringWriter();
-			@SuppressWarnings("serial")
-			Properties outputProperties = new Properties(){{
-				put(javax.xml.transform.OutputKeys.INDENT, "yes");
-				put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
-				put(javax.xml.transform.OutputKeys.STANDALONE, "yes");
-			}};
-			formGroupBuilder.toWriter(writer, outputProperties);
-			String result = writer.toString();
-			return result;
+			return writeToString(formGroupBuilder);
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private String writeToString(XMLBuilder builder)
+			throws TransformerException {
+		StringWriter writer = new StringWriter();
+		@SuppressWarnings("serial")
+		Properties outputProperties = new Properties(){{
+			put(javax.xml.transform.OutputKeys.INDENT, "yes");
+			put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+			put(javax.xml.transform.OutputKeys.STANDALONE, "yes");
+		}};
+		builder.toWriter(writer, outputProperties);
+		String result = writer.toString();
+		return result;
 	}
 
 	private void buildCodeSelect(XMLBuilder builder, CECodeField comp) {
@@ -201,9 +239,4 @@ public class CEComponentHTMLFormatter {
 		}
 	}
 
-	private boolean isLabelIncluded(CEComponent comp) {
-		return true;
-//		return comp instanceof CEField && ((CEField) comp).getType() != CEFieldType.BOOLEAN;
-	}
-	
 }
