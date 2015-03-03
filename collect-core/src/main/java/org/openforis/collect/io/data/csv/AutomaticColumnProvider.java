@@ -24,7 +24,6 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class AutomaticColumnProvider extends ColumnProviderChain {
 	
 //	private static final Log LOG = LogFactory.getLog(AutomaticColumnProvider.class);
-//	private static final String MULTIPLE_ATTRIBUTE_VALUES_DELIMITER = ", ";
 	
 	public AutomaticColumnProvider(CSVExportConfiguration config, EntityDefinition entityDefinition) {
 		this(config, entityDefinition, null);
@@ -83,9 +82,6 @@ public class AutomaticColumnProvider extends ColumnProviderChain {
 	private static void createAttributeProviders(CSVExportConfiguration config, AttributeDefinition defn, List<ColumnProvider> cols) {
 		String name = defn.getName();
 		ColumnProvider columnProvider;
-//		if ( defn.isMultiple() && ! (defn instanceof CodeAttributeDefinition) ) {
-//			columnProvider = new MultipleAttributeColumnProvider(defn, MULTIPLE_ATTRIBUTE_VALUES_DELIMITER, name);
-//		} else 
 		if ( defn instanceof CodeAttributeDefinition ) {
 			columnProvider = new CodeColumnProvider(config, (CodeAttributeDefinition) defn);
 		} else if(defn instanceof CoordinateAttributeDefinition){

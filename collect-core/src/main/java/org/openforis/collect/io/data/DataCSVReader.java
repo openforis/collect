@@ -108,7 +108,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		return result;
 	}
 	
-	private int extractAttributePosition(EntityDefinition parentEntityDefn, String colName) {
+	private int extractAttributePosition(String colName) {
 		Matcher matcher = MULTIPLE_ATTRIBUTE_COLUMN_NAME_PATTERN.matcher(colName);
 		if (matcher.matches()) {
 			String posStr = matcher.group(1);
@@ -272,7 +272,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 		protected FieldValueKey extractFieldValueKey(String colName) {
 			FieldDefinition<?> fieldDefn = extractFieldDefinition(parentEntityDefinition, colName);
 			AttributeDefinition attrDefn = (AttributeDefinition) fieldDefn.getParentDefinition();
-			int attrPos = extractAttributePosition(parentEntityDefinition, colName);
+			int attrPos = extractAttributePosition(colName);
 			FieldValueKey fieldValueKey = new DataLine.FieldValueKey(attrDefn.getId(), attrPos, fieldDefn.getName());
 			return fieldValueKey;
 		}

@@ -15,6 +15,10 @@
 	
 	<import resource="classpath:org/openforis/collect/application-context-core.xml"/>
 	
+	<!-- Override scope for Collect core sessionRecordFileManager bean, use "session" scope -->
+	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager" 
+		init-method="init" />
+	
 	<!-- RDB -->
 	<bean id="rdbPublisher" class="org.openforis.collect.relational.CollectRDBPublisher" />
 	

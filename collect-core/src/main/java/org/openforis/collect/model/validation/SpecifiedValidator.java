@@ -12,7 +12,6 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationRule;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.FileAttribute;
 
 /**
@@ -28,9 +27,9 @@ public class SpecifiedValidator implements ValidationRule<Attribute<?,?>> {
 		Step step = record.getStep();
 		
 		if ( Step.ENTRY == step ) {
-			if ( isRelevant(attribute) && attribute.isEmpty() && ! (attribute instanceof FileAttribute) ) {
+			if ( attribute.isRelevant() && attribute.isEmpty() && ! (attribute instanceof FileAttribute) ) {
 				if ( isReasonBlankAlwaysSpecified(attribute) ) {
-					if ( isRequired(attribute) ) {
+					if ( attribute.isRequired() ) {
 						return WARNING;
 					} else {
 						return OK;
@@ -46,35 +45,4 @@ public class SpecifiedValidator implements ValidationRule<Attribute<?,?>> {
 		return OK;
 	}
 
-//	private boolean isReasonBlankAlwaysSpecified(Attribute<?, ?> attribute) {
-//		int fieldCount = 0;
-//		//ignore unit for numeric attributes
-//		if ( attribute instanceof NumberAttribute) {
-//			fieldCount = 1; 
-//		} else if ( attribute instanceof NumericRangeAttribute ) {
-//			fieldCount = 2; 
-//		} else {
-//			fieldCount = attribute.getFieldCount();
-//		}
-//		
-//		for (int i = 0; i < fieldCount; i++) {
-//			Field<?> field = attribute.getField(i);
-//			Character symbolCode = field.getSymbol();
-//			FieldSymbol symbol = FieldSymbol.valueOf(symbolCode);
-//			if ( !(symbol == BLANK_ON_FORM || symbol == DASH_ON_FORM || symbol == ILLEGIBLE) ) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
-
-	private boolean isRequired(Attribute<?, ?> attribute) {
-		Entity parent = attribute.getParent();
-		return parent.getMinCount(attribute.getDefinition()) > 0;
-	}
-
-	private boolean isRelevant(Attribute<?, ?> attribute) {
-		Entity parent = attribute.getParent();
-		return parent.isRelevant(attribute.getName());
-	}
 }

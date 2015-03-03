@@ -34,14 +34,13 @@ public class MinCountValidator implements ValidationRule<Entity> {
 		if ( nodeDefinition instanceof Calculable && ((Calculable) nodeDefinition).isCalculated() ) {
 			return OK;
 		}
-		String childName = nodeDefinition.getName();
-		if( entity.isRelevant(childName) ) {
-			int minCount = entity.getMinCount(childName);
+		if( entity.isRelevant(nodeDefinition) ) {
+			int minCount = entity.getMinCount(nodeDefinition);
 			if ( minCount == 0 ) {
 				return OK;
 			} else {
 				int nonEmptyCount = 0;
-				List<Node<?>> childNodes = entity.getAll(childName);
+				List<Node<?>> childNodes = entity.getAll(nodeDefinition);
 				for ( Node<?> child : childNodes ) {
 					if ( !isEmpty(child) ) {
 						nonEmptyCount++;

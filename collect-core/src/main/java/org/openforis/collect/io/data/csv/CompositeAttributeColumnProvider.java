@@ -34,25 +34,17 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	}
 
 	@Override
-	public List<String> generateColumnHeadings() {
-		int maxAttrValues = getMaxAttributeValues();
-		int fieldsSize = isMergedValueSupported() ? 1: getFieldNames().length;
-		List<String> headings = new ArrayList<String>(fieldsSize * maxAttrValues);
-		if (attributeDefinition.isMultiple()) {
-			for (int attrIdx = 0; attrIdx < maxAttrValues; attrIdx++) {
-				headings.addAll(generateAttributeHeadings(attrIdx));
-			}
-		} else {
-			headings.addAll(generateSingleAttributeHeadings());
-		}
-		return headings;
+	protected int getNumberOfColumnsPerAttribute() {
+		return isMergedValueSupported() ? 1: getFieldNames().length;
 	}
 
-	private List<String> generateSingleAttributeHeadings() {
-		return generateAttributeHeadings(0);
+	@Override
+	protected List<String> generateSingleAttributeColumnHeadings() {
+		return generateAttributeColumnHeadings(0);
 	}
 	
-	private List<String> generateAttributeHeadings(int attributeIdx) {
+	@Override
+	protected List<String> generateAttributeColumnHeadings(int attributeIdx) {
 		List<String> headings = new ArrayList<String>();
 		if (isMergedValueSupported()) {
 			headings.add(generateMergedValueHeading(attributeIdx));

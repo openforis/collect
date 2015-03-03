@@ -29,17 +29,18 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 	}
 	
 	@Override
-	public List<String> generateColumnHeadings() {
-		if (attributeDefinition.isMultiple()) {
-			int maxAttrValues = getMaxAttributeValues();
-			List<String> headings = new ArrayList<String>(maxAttrValues);
-			for (int i = 0; i < maxAttrValues; i++) {
-				headings.add(headerName + "[" + (i + 1) + "]");
-			}
-			return headings;
-		} else {
-			return Collections.unmodifiableList(Arrays.asList(headerName));
-		}
+	protected int getNumberOfColumnsPerAttribute() {
+		return 1;
+	}
+	
+	@Override
+	protected List<String> generateSingleAttributeColumnHeadings() {
+		return Collections.unmodifiableList(Arrays.asList(headerName));
+	}
+	
+	@Override
+	protected List<String> generateAttributeColumnHeadings(int i) {
+		return Arrays.asList(headerName + "[" + (i + 1) + "]");
 	}
 
 	public List<String> extractValues(Node<?> axis) {
@@ -73,4 +74,5 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 		String stringVal = v == null ? "" : v.toString();
 		return stringVal;
 	}
+
 }

@@ -204,8 +204,13 @@ public class SurveyManager {
 
 	@Transactional
 	public CollectSurvey importModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
+		return importModel(surveyFile, name, validate, false);
+	}
+	
+	@Transactional
+	public CollectSurvey importModel(File surveyFile, String name, boolean validate, boolean includeCodeLists) throws SurveyImportException, SurveyValidationException {
 		try {
-			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
+			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, includeCodeLists);
 			survey.setName(name);
 			survey.setPublished(true);
 			surveyDao.importModel(survey);
@@ -229,6 +234,12 @@ public class SurveyManager {
 		}
 	}
 
+	@Transactional
+	public CollectSurvey updateModel(File surveyFile, boolean validate)
+			throws SurveyValidationException, SurveyImportException {
+		return updateModel(surveyFile, validate, false);
+	}
+	
 	/**
 	 * Updates a published or a work survey and overwrites it with the specified one.
 	 * The existing survey will be searched by his URI.
@@ -236,11 +247,11 @@ public class SurveyManager {
 	 * than it will be overwritten with the passed one, otherwise the published survey will be overwritten.
 	 */
 	@Transactional
-	public CollectSurvey updateModel(File surveyFile, boolean validate)
+	public CollectSurvey updateModel(File surveyFile, boolean validate, boolean includeCodeLists)
 			throws SurveyValidationException, SurveyImportException {
 		CollectSurvey parsedSurvey;
 		try {
-			parsedSurvey = unmarshalSurvey(surveyFile, validate, false);
+			parsedSurvey = unmarshalSurvey(surveyFile, validate, includeCodeLists);
 		} catch (IdmlParseException e) {
 			throw new SurveyImportException(e);
 		}

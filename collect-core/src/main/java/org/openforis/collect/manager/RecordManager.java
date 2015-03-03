@@ -26,6 +26,7 @@ import org.openforis.collect.persistence.RecordNotOwnedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.RecordValidationInProgressException;
+import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -106,7 +107,7 @@ public class RecordManager {
 		if(id == null) {
 			recordDao.insert(record);
 			id = record.getId();
-			//todo fix: concurrency problem may occur..
+			//TODO fix: concurrency problem may occur..
 			if ( sessionId != null && isLockingEnabled() ) {
 				lockManager.lock(id, lockingUser, sessionId);
 			}
@@ -117,7 +118,27 @@ public class RecordManager {
 			recordDao.update(record);
 		}
 	}
+	
+	public int nextId() {
+		return recordDao.nextId();
+	}
+	
+	public void restartIdSequence(Number value) {
+		recordDao.restartIdSequence(value);
+	}
 
+	public RecordStoreQuery createInsertQuery(CollectRecord record) {
+		return recordDao.createInsertQuery(record);
+	}
+	
+	public RecordStoreQuery createUpdateQuery(CollectRecord record) {
+		return recordDao.createUpdateQuery(record);	
+	}
+	
+	public void execute(List<RecordStoreQuery> queries) {
+		recordDao.execute(queries);
+	}
+	
 	@Transactional
 	public void delete(int recordId) throws RecordPersistenceException {
 		if ( isLockingEnabled() && lockManager.isLocked(recordId) ) {
@@ -204,10 +225,14 @@ public class RecordManager {
 	}
 
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
-		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
+		return load(survey, recordId, step, true);
+	}
+	
+	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate) {
+		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber(), validate);
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.initializeRecord(record);
+		recordUpdater.initializeRecord(record, validate);
 		return record;
 	}
 	

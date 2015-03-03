@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.io.data.csv;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -42,5 +43,23 @@ public abstract class BasicAttributeColumnProvider<T extends AttributeDefinition
 		return columnHeadings;
 	}
 
-	protected abstract List<String> generateColumnHeadings();
+	protected List<String> generateColumnHeadings() {
+		if (attributeDefinition.isMultiple()) {
+			int maxAttrValues = getMaxAttributeValues();
+			int numberOfColumnsPerAttribute = getNumberOfColumnsPerAttribute();
+			List<String> headings = new ArrayList<String>(maxAttrValues * numberOfColumnsPerAttribute);
+			for (int i = 0; i < maxAttrValues; i++) {
+				headings.addAll(generateAttributeColumnHeadings(i));
+			}
+			return headings;
+		} else {
+			return generateSingleAttributeColumnHeadings();
+		}
+	}
+
+	protected abstract int getNumberOfColumnsPerAttribute();
+
+	protected abstract List<String> generateSingleAttributeColumnHeadings();
+
+	protected abstract List<String> generateAttributeColumnHeadings(int i);
 }

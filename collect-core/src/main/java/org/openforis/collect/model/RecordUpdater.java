@@ -702,9 +702,16 @@ public class RecordUpdater {
 	}
 
 	public void initializeRecord(Record record) {
-		initializeEntity(record.getRootEntity());
+		initializeRecord(record, true);
 	}
-
+	
+	public void initializeRecord(Record record, boolean validate) {
+		//TODO improve it
+		if (validate) {
+			initializeEntity(record.getRootEntity());
+		}
+	}
+	
 	protected NodeChangeMap initializeEntity(Entity entity) {
 		Record record = entity.getRecord();
 		
@@ -916,6 +923,9 @@ public class RecordUpdater {
 		if ( ! entity.isRelevant(defn) || StringUtils.isBlank(expression) ) {
 			return 0;
 		}
+		if (defn.getFixedMinCount() != null) {
+			return defn.getFixedMinCount();
+		}
 		try {
 			SurveyContext surveyContext = defn.getSurvey().getContext();
 			ExpressionEvaluator expressionEvaluator = surveyContext.getExpressionEvaluator();
@@ -934,6 +944,9 @@ public class RecordUpdater {
 		String expression = defn.getMaxCountExpression();
 		if ( ! entity.isRelevant(defn) || StringUtils.isBlank(expression) ) {
 			return defn.isMultiple() ? Integer.MAX_VALUE: 1;
+		}
+		if (defn.getFixedMaxCount() != null) {
+			return defn.getFixedMaxCount();
 		}
 		try {
 			SurveyContext surveyContext = defn.getSurvey().getContext();
@@ -1092,5 +1105,5 @@ public class RecordUpdater {
 			}
 		}
 	}
-	
+
 }

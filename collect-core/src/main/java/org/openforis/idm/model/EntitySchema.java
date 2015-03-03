@@ -93,7 +93,7 @@ public class EntitySchema extends SchemaSupport<Entity> {
 	protected boolean isNodeToBeSaved(Node<?> node) {
 		if ( node instanceof Attribute<?, ?> && ! (((AttributeDefinition) node.getDefinition()).isCalculated() ) ) {
 			Entity parent = node.getParent();
-    		int count = parent.getCount(node.getName());
+    		int count = parent.getCount(node.getDefinition());
     		if ( count == 1 && ! ((Attribute<?, ?>) node).hasData() ) {
     			return false;
     		}
