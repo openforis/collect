@@ -257,6 +257,11 @@ public class RecordManager {
 	}
 	
 	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, boolean caseSensitiveKeys, String... keys) {
+		return recordDao.loadSummaries(survey, rootEntity, caseSensitiveKeys, keys);
+	}
+	
+	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
 		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, keyValues);
 		return summaries;
