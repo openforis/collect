@@ -707,8 +707,10 @@ public class RecordUpdater {
 	}
 	
 	public void initializeRecord(Record record, boolean validate) {
-		//TODO
-		initializeEntity(record.getRootEntity());
+		//TODO improve it
+		if (validate) {
+			initializeEntity(record.getRootEntity());
+		}
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity) {
