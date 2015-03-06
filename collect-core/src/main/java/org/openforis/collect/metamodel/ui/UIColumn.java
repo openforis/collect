@@ -10,14 +10,14 @@ import org.openforis.idm.metamodel.NodeDefinition;
  * @author S. Ricci
  *
  */
-public class Column extends TableHeadingComponent implements NodeDefinitionUIComponent {
+public class UIColumn extends UITableHeadingComponent implements NodeDefinitionUIComponent {
 
 	private static final long serialVersionUID = 1L;
 	
 	private Integer attributeDefinitionId;
 	private AttributeDefinition attributeDefinition;
 	
-	Column(TableHeadingContainer parent, int id) {
+	UIColumn(UITableHeadingContainer parent, int id) {
 		super(parent, id);
 	}
 
@@ -67,7 +67,7 @@ public class Column extends TableHeadingComponent implements NodeDefinitionUICom
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Column other = (Column) obj;
+		UIColumn other = (UIColumn) obj;
 		if (attributeDefinitionId != other.attributeDefinitionId)
 			return false;
 		return true;

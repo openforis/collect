@@ -12,7 +12,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
  * @author S. Ricci
  *
  */
-public class Field extends UIModelObject implements FormComponent, NodeDefinitionUIComponent {
+public class UIField extends UIModelObject implements UIFormComponent, NodeDefinitionUIComponent {
 
 	private static final long serialVersionUID = 1L;
 
@@ -21,8 +21,9 @@ public class Field extends UIModelObject implements FormComponent, NodeDefinitio
 	private String autoCompleteGroup;
 	private Enum<?> fieldsOrder;
 	private List<String> visibleFields;
+	private boolean hidden;
 	
-	<P extends FormContentContainer> Field(P parent, int id) {
+	<P extends UIFormContentContainer> UIField(P parent, int id) {
 		super(parent, id);
 	}
 	
@@ -77,6 +78,24 @@ public class Field extends UIModelObject implements FormComponent, NodeDefinitio
 	}
 	
 	@Override
+	public boolean isHidden() {
+		return this.hidden;
+	}
+	
+	@Override
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+	
+	public Enum<?> getFieldsOrder() {
+		return fieldsOrder;
+	}
+
+	public void setFieldsOrder(Enum<?> fieldsOrder) {
+		this.fieldsOrder = fieldsOrder;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -96,13 +115,8 @@ public class Field extends UIModelObject implements FormComponent, NodeDefinitio
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Field other = (Field) obj;
+		UIField other = (UIField) obj;
 		if (attributeDefinitionId != other.attributeDefinitionId)
-			return false;
-		if (autoCompleteGroup == null) {
-			if (other.autoCompleteGroup != null)
-				return false;
-		} else if (!autoCompleteGroup.equals(other.autoCompleteGroup))
 			return false;
 		return true;
 	}
@@ -110,14 +124,6 @@ public class Field extends UIModelObject implements FormComponent, NodeDefinitio
 	@Override
 	public String toString() {
 		return "Attribute: " + getAttributeDefinition().getPath();
-	}
-
-	public Enum<?> getFieldsOrder() {
-		return fieldsOrder;
-	}
-
-	public void setFieldsOrder(Enum<?> fieldsOrder) {
-		this.fieldsOrder = fieldsOrder;
 	}
 
 }

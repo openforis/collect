@@ -35,16 +35,16 @@ public abstract class UIModelObject implements Serializable, Identifiable {
 		return result;
 	}
 	
-	public FormSet getFormSet() {
+	public UIFormSet getRootFormSet() {
 		UIModelObject currentObject = this;
 		while ( currentObject.getParent() != null ) {
 			currentObject = currentObject.getParent();
 		}
-		return (FormSet) currentObject;
+		return (UIFormSet) currentObject;
 	}
 	
 	public UIConfiguration getUIConfiguration() {
-		FormSet formSet = getFormSet();
+		UIFormSet formSet = getRootFormSet();
 		return formSet.getUIConfiguration();
 	}
 	

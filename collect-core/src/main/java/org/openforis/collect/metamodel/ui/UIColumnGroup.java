@@ -14,15 +14,15 @@ import org.openforis.idm.metamodel.NodeDefinition;
  * @author S. Ricci
  *
  */
-public class ColumnGroup extends TableHeadingComponent implements TableHeadingContainer, NodeDefinitionUIComponent {
+public class UIColumnGroup extends UITableHeadingComponent implements UITableHeadingContainer, NodeDefinitionUIComponent {
 
 	private static final long serialVersionUID = 1L;
 	
 	private Integer entityDefinitionId;
 	private EntityDefinition entityDefinition;
-	private List<TableHeadingComponent> headingComponents;
+	private List<UITableHeadingComponent> headingComponents;
 
-	public ColumnGroup(TableHeadingContainer parent, int id) {
+	public UIColumnGroup(UITableHeadingContainer parent, int id) {
 		super(parent, id);
 	}
 	
@@ -57,45 +57,45 @@ public class ColumnGroup extends TableHeadingComponent implements TableHeadingCo
 	}
 	
 	@Override
-	public List<TableHeadingComponent> getHeadingComponents() {
+	public List<UITableHeadingComponent> getHeadingComponents() {
 		return CollectionUtils.unmodifiableList(headingComponents);
 	}
 	
 	@Override
-	public void addHeadingComponent(TableHeadingComponent component) {
+	public void addHeadingComponent(UITableHeadingComponent component) {
 		if ( headingComponents == null ) {
-			headingComponents = new ArrayList<TableHeadingComponent>();
+			headingComponents = new ArrayList<UITableHeadingComponent>();
 		}
 		headingComponents.add(component);
 		getUIConfiguration().attachItem(component);
 	}
 	
 	@Override
-	public void removeHeadingComponent(TableHeadingComponent component) {
+	public void removeHeadingComponent(UITableHeadingComponent component) {
 		headingComponents.remove(component);
 		getUIConfiguration().detachItem(component);
 	}
 	
 	@Override
-	public Column createColumn() {
+	public UIColumn createColumn() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createColumn(uiOptions.nextId());
 	}
 	
 	@Override
-	public Column createColumn(int id) {
-		return new Column(this, id);
+	public UIColumn createColumn(int id) {
+		return new UIColumn(this, id);
 	}
 	
 	@Override
-	public ColumnGroup createColumnGroup() {
+	public UIColumnGroup createColumnGroup() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createColumnGroup(uiOptions.nextId());
 	}
 	
 	@Override
-	public ColumnGroup createColumnGroup(int id) {
-		return new ColumnGroup(this, id);
+	public UIColumnGroup createColumnGroup(int id) {
+		return new UIColumnGroup(this, id);
 	}
 	
 	@Override
@@ -114,7 +114,7 @@ public class ColumnGroup extends TableHeadingComponent implements TableHeadingCo
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ColumnGroup other = (ColumnGroup) obj;
+		UIColumnGroup other = (UIColumnGroup) obj;
 		if (headingComponents == null) {
 			if (other.headingComponents != null)
 				return false;

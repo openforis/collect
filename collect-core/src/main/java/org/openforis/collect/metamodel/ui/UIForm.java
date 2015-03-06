@@ -13,13 +13,13 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  * @author S. Ricci
  *
  */
-public class Form extends FormContentContainer {
+public class UIForm extends UIFormContentContainer {
 
 	private static final long serialVersionUID = 1L;
 
 	private LanguageSpecificTextMap labels;
 	
-	public <P extends FormContentContainer> Form(P parent, int id) {
+	public <P extends UIFormContentContainer> UIForm(P parent, int id) {
 		super(parent, id);
 	}
 

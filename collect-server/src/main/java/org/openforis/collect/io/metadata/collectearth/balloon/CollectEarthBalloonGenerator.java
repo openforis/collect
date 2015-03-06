@@ -18,8 +18,15 @@ import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.ui.NodeDefinitionUIComponent;
+import org.openforis.collect.metamodel.ui.UIField;
+import org.openforis.collect.metamodel.ui.UIForm;
+import org.openforis.collect.metamodel.ui.UIFormComponent;
+import org.openforis.collect.metamodel.ui.UIFormSet;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
+import org.openforis.collect.metamodel.ui.UITable;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -82,13 +89,15 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private String fillWithSurveyDefinitionFields(String template) {
-		List<String> nodeNamesFromCSV = getNodeNamesFromCSV();
-		
 		CEComponentHTMLFormatter htmlFormatter = new CEComponentHTMLFormatter();
 		
-		CEFieldSet rootComponent = generateRootComponent();
+		CETabSet rootComponent = generateRootComponent();
 		
 		StringBuilder sb = new StringBuilder();
+		
+		String dynamicFieldsHtml = htmlFormatter.format(rootComponent);
+		sb.append(dynamicFieldsHtml);
+		/*
 		List<CEComponent> children = rootComponent.getChildren();
 		for (CEComponent child : children) {
 			String childName = child.getName();
@@ -99,8 +108,8 @@ public class CollectEarthBalloonGenerator {
 				sb.append(html);
 			}
 		}
-		String dynamicContent = sb.toString();
-		String result = template.replace(PLACEHOLDER_FOR_DYNAMIC_FIELDS, dynamicContent);
+		*/
+		String result = template.replace(PLACEHOLDER_FOR_DYNAMIC_FIELDS, sb.toString());
 		return result;
 	}
 	
@@ -146,12 +155,56 @@ public class CollectEarthBalloonGenerator {
 		return names;
 	}
 	
-	private CEFieldSet generateRootComponent() {
+	private CETabSet generateRootComponent() {
 		EntityDefinition rootEntityDef = getRootEntity();
 		
-		CEFieldSet rootComponent = (CEFieldSet) createComponent(rootEntityDef);
+		UIOptions uiOptions = survey.getUIOptions();
+		UIConfiguration uiConfiguration = ((CollectSurvey) rootEntityDef.getSurvey()).getUIConfiguration();
+		if (uiConfiguration == null || uiConfiguration.getFormSets().isEmpty()) {
+			//no ui configuration defined
+			CETabSet tabSet = new CETabSet("", "");
+			CETab tab = new CETab(rootEntityDef.getName(), "");
+			for (NodeDefinition childDef : rootEntityDef.getChildDefinitions()) {
+				if (! uiOptions.isHidden(childDef)) {
+					tab.addChild(createComponent(childDef));
+				}
+			}
+			return tabSet;
+		} else {
+			CETabSet tabSet = new CETabSet("", "");
+			UIFormSet formSet = uiConfiguration.getMainFormSet();
+			for (UIForm form : formSet.getForms()) {
+				boolean main = tabSet.getTabs().isEmpty();
+				CETab tab = createTabComponent(rootEntityDef, form, main);
+				tabSet.addTab(tab);
+			}
+			return tabSet;
+		}
+	}
+
+	private CETab createTabComponent(EntityDefinition rootEntityDef, UIForm form, boolean main) {
+		List<String> nodeNamesFromCSV = getNodeNamesFromCSV();
 		
-		return rootComponent;
+		CETab tab = new CETab(rootEntityDef.getName(), form.getLabel("en"));
+		tab.setMain(main); //consider the first tab as the main one
+		for (UIFormComponent formComponent : form.getChildren()) {
+			if (formComponent instanceof NodeDefinitionUIComponent) {
+				NodeDefinition nodeDef = ((NodeDefinitionUIComponent) formComponent).getNodeDefinition();
+				if (formComponent instanceof UIField) {
+					String nodeName = nodeDef.getName();
+					boolean includeInHTML = ! FIXED_ATTRIBUTE_NAMES.contains(nodeName) && ! nodeNamesFromCSV.contains(nodeName) 
+							&& ! formComponent.isHidden();
+					if (includeInHTML) {
+						CEComponent component = createComponent(nodeDef);
+						tab.addChild(component);
+					}
+				} else if (formComponent instanceof UITable) {
+					CEComponent component = createComponent(nodeDef);
+					tab.addChild(component);
+				}
+			}
+		}
+		return tab;
 	}
 
 	private EntityDefinition getRootEntity() {
@@ -173,33 +226,7 @@ public class CollectEarthBalloonGenerator {
 		CEComponent comp;
 		if (def instanceof EntityDefinition) {
 			if (def.isMultiple() && ((EntityDefinition) def).isEnumerable()) {
-				CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label);
-				for (NodeDefinition child : ((EntityDefinition) def).getChildDefinitions()) {
-					String heading = child.getLabel(Type.HEADING);
-					if (heading == null) {
-						heading = child.getLabel(Type.INSTANCE);
-						if (heading == null) {
-							heading = child.getName();
-						}
-					}
-					ceTable.addHeading(heading);
-				}
-				CodeAttributeDefinition enumeratingCodeAttribute = ((EntityDefinition) def).getEnumeratingKeyCodeAttribute();
-				CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
-				List<CodeListItem> codeItems = codeListService.loadRootItems(enumeratingCodeAttribute.getList());
-				int codeItemIdx = 0;
-				for (CodeListItem item : codeItems) {
-					String key = item.getCode();
-					CETableRow row = new CETableRow(key, item.getLabel());
-					for (NodeDefinition child : ((EntityDefinition) def).getChildDefinitions()) {
-						if (! uiOptions.isHidden(child)) {
-							row.addChild(createComponent(child, codeItemIdx + 1));
-						}
-					}
-					ceTable.addRow(row);
-					codeItemIdx ++;
-				}
-				comp = ceTable;
+				comp = createEnumeratedEntityComponent((EntityDefinition) def);
 			} else {
 				CEFieldSet fieldSet = new CEFieldSet(def.getName(), label);
 				for (NodeDefinition child : ((EntityDefinition) def).getChildDefinitions()) {
@@ -243,6 +270,39 @@ public class CollectEarthBalloonGenerator {
 		comp.hideWhenNotRelevant = hideWhenNotRelevant;
 		componentByName.put(comp.getName(), comp);
 		return comp;
+	}
+
+	private CEComponent createEnumeratedEntityComponent(EntityDefinition def) {
+		String label = ObjectUtils.defaultIfNull(def.getLabel(Type.INSTANCE), def.getName());
+		UIOptions uiOptions = survey.getUIOptions();
+		
+		CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label);
+		for (NodeDefinition child : def.getChildDefinitions()) {
+			String heading = child.getLabel(Type.HEADING);
+			if (heading == null) {
+				heading = child.getLabel(Type.INSTANCE);
+				if (heading == null) {
+					heading = child.getName();
+				}
+			}
+			ceTable.addHeading(heading);
+		}
+		CodeAttributeDefinition enumeratingCodeAttribute = def.getEnumeratingKeyCodeAttribute();
+		CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
+		List<CodeListItem> codeItems = codeListService.loadRootItems(enumeratingCodeAttribute.getList());
+		int codeItemIdx = 0;
+		for (CodeListItem item : codeItems) {
+			String key = item.getCode();
+			CETableRow row = new CETableRow(key, item.getLabel());
+			for (NodeDefinition child : def.getChildDefinitions()) {
+				if (! uiOptions.isHidden(child)) {
+					row.addChild(createComponent(child, codeItemIdx + 1));
+				}
+			}
+			ceTable.addRow(row);
+			codeItemIdx ++;
+		}
+		return ceTable;
 	}
 
 	private String getHtmlParameterName(NodeDefinition def) {

@@ -9,7 +9,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
  * @author S. Ricci
  *
  */
-public class FormSet extends FormContentContainer implements NodeDefinitionUIComponent {
+public class UIFormSet extends UIFormContentContainer implements NodeDefinitionUIComponent {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -17,7 +17,7 @@ public class FormSet extends FormContentContainer implements NodeDefinitionUICom
 	private EntityDefinition rootEntityDefinition;
 	private UIConfiguration uiConfiguration;
 
-	FormSet(UIConfiguration uiConfiguration, int id) {
+	UIFormSet(UIConfiguration uiConfiguration, int id) {
 		super(null, id);
 		this.uiConfiguration = uiConfiguration;
 	}

@@ -10,14 +10,15 @@ import org.openforis.idm.metamodel.NodeDefinition;
  * @author S. Ricci
  *
  */
-public class FormSection extends FormContentContainer implements FormComponent, NodeDefinitionUIComponent {
+public class UIFormSection extends UIFormContentContainer implements UIFormComponent, NodeDefinitionUIComponent {
 
 	private static final long serialVersionUID = 1L;
 
 	private Integer entityDefinitionId;
 	private EntityDefinition entityDefinition;
+	private boolean hidden;
 	
-	public <P extends FormContentContainer> FormSection(P parent, int id) {
+	public <P extends UIFormContentContainer> UIFormSection(P parent, int id) {
 		super(parent, id);
 	}
 
@@ -56,4 +57,13 @@ public class FormSection extends FormContentContainer implements FormComponent, 
 		this.entityDefinitionId = entityDefinition == null ? null: entityDefinition.getId();
 	}
 
+	@Override
+	public boolean isHidden() {
+		return this.hidden;
+	}
+	
+	@Override
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
 }

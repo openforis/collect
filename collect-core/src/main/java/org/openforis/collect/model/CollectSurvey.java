@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
@@ -31,6 +32,7 @@ public class CollectSurvey extends Survey {
 	private boolean work;
 	
 	private CollectAnnotations annotations;
+	private UIConfiguration uiConfiguration;
 	
 	protected CollectSurvey(SurveyContext surveyContext) {
 		super(surveyContext);
@@ -43,15 +45,6 @@ public class CollectSurvey extends Survey {
 		return new CollectRecord(this, version);
 	}
 	
-	public UIOptions createUIOptions() {
-		return new UIOptions(this);
-	}
-	
-	public UIOptions getUIOptions() {
-		ApplicationOptions applicationOptions = getApplicationOptions(UIOptionsConstants.UI_TYPE);
-		return (UIOptions) applicationOptions;
-	}
-	
 	@Override
 	public void addApplicationOptions(ApplicationOptions options) {
 		super.addApplicationOptions(options);
@@ -60,8 +53,18 @@ public class CollectSurvey extends Survey {
 		}
 	}
 
-	public CollectAnnotations getAnnotations() {
-		return annotations;
+	@Override
+	public List<CodeList> getCodeLists() {
+		return getCodeLists(true);
+	}
+	
+	public UIOptions createUIOptions() {
+		return new UIOptions(this);
+	}
+	
+	public UIOptions getUIOptions() {
+		ApplicationOptions applicationOptions = getApplicationOptions(UIOptionsConstants.UI_TYPE);
+		return (UIOptions) applicationOptions;
 	}
 	
 	/**
@@ -100,11 +103,6 @@ public class CollectSurvey extends Survey {
 		return list;
 	}
 	
-	@Override
-	public List<CodeList> getCodeLists() {
-		return getCodeLists(true);
-	}
-	
 	public List<CodeList> getCodeLists(boolean includeSamplingDesignList) {
 		List<CodeList> codeLists = new ArrayList<CodeList>(super.getCodeLists());
 		if ( ! includeSamplingDesignList ) {
@@ -123,6 +121,10 @@ public class CollectSurvey extends Survey {
 		return codeLists;
 	}
 	
+	public CollectAnnotations getAnnotations() {
+		return annotations;
+	}
+	
 	public boolean isWork() {
 		return work;
 	}
@@ -130,5 +132,13 @@ public class CollectSurvey extends Survey {
 	public void setWork(boolean work) {
 		this.work = work;
 	}
-
+	
+	public UIConfiguration getUIConfiguration() {
+		return uiConfiguration;
+	}
+	
+	public void setUIConfiguration(UIConfiguration uiConfiguration) {
+		this.uiConfiguration = uiConfiguration;
+	}
+	
 }

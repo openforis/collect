@@ -53,64 +53,64 @@ public class UIOptionsMigratorTest extends CollectIntegrationTest {
 		Schema schema = survey.getSchema();
 		{
 			EntityDefinition cluster = schema.getRootEntityDefinition("cluster");
-			FormSet formSet = uiModel.getFormSetByRootEntityId(cluster.getId());
-			List<Form> forms = formSet.getForms();
+			UIFormSet formSet = uiModel.getFormSetByRootEntityId(cluster.getId());
+			List<UIForm> forms = formSet.getForms();
 			assertEquals(3, forms.size());
 			
 			//cluster form
 			{
-				Form form = forms.get(0);
-				List<FormComponent> children = form.getChildren();
+				UIForm form = forms.get(0);
+				List<UIFormComponent> children = form.getChildren();
 				assertEquals(16, children.size());
 				{
 					//task
-					FormComponent component = children.get(0);
-					assertTrue(component instanceof Table);
-					Table taskTable = (Table) component;
+					UIFormComponent component = children.get(0);
+					assertTrue(component instanceof UITable);
+					UITable taskTable = (UITable) component;
 					assertNotNull(taskTable.getEntityDefinition());
 					assertEquals("task", taskTable.getEntityDefinition().getName());
 					
 					//task/task
 					assertEquals(3, taskTable.getHeadingComponents().size());
-					TableHeadingComponent heading = taskTable.getHeadingComponents().get(0);
-					assertTrue(heading instanceof Column);
-					Column col = (Column) heading;
+					UITableHeadingComponent heading = taskTable.getHeadingComponents().get(0);
+					assertTrue(heading instanceof UIColumn);
+					UIColumn col = (UIColumn) heading;
 					assertEquals(Integer.valueOf(729), col.getAttributeDefinitionId());
 				}
 			}
 			//plot form
 			{
-				Form plotForm = forms.get(1);
-				List<FormComponent> plotFormChildren = plotForm.getChildren();
+				UIForm plotForm = forms.get(1);
+				List<UIFormComponent> plotFormChildren = plotForm.getChildren();
 				assertEquals(1, plotFormChildren.size());
-				FormComponent plotMultipleEntityComponent = plotFormChildren.get(0);
-				assertTrue(plotMultipleEntityComponent instanceof FormSection);
+				UIFormComponent plotMultipleEntityComponent = plotFormChildren.get(0);
+				assertTrue(plotMultipleEntityComponent instanceof UIFormSection);
 				
-				FormSection plotMultipleEntityFormSection = (FormSection) plotMultipleEntityComponent;
+				UIFormSection plotMultipleEntityFormSection = (UIFormSection) plotMultipleEntityComponent;
 				
-				List<Form> subforms = plotMultipleEntityFormSection.getForms();
+				List<UIForm> subforms = plotMultipleEntityFormSection.getForms();
 				assertEquals(6, subforms.size());
-				Form detailForm = subforms.get(0);
-				List<FormComponent> children = detailForm.getChildren();
+				UIForm detailForm = subforms.get(0);
+				List<UIFormComponent> children = detailForm.getChildren();
 				assertEquals(34, children.size());
 				{
 					//plot_no
 					{
-						FormComponent component = children.get(0);
-						assertTrue(component instanceof Field);
-						Field plotNoField = (Field) component;
+						UIFormComponent component = children.get(0);
+						assertTrue(component instanceof UIField);
+						UIField plotNoField = (UIField) component;
 						assertEquals(Integer.valueOf(749), plotNoField.getAttributeDefinitionId());
 					}
 					//time study (single entity -> form section)
 					{
-						FormComponent component = children.get(2);
-						assertTrue(component instanceof FormSection);
-						FormSection section = (FormSection) component;
+						UIFormComponent component = children.get(2);
+						assertTrue(component instanceof UIFormSection);
+						UIFormSection section = (UIFormSection) component;
 						assertEquals(3, section.getChildren().size());
 						//start time
-						FormComponent startTimeComp = section.getChildren().get(1);
-						assertTrue(startTimeComp instanceof Field);
-						Field startTimeField = (Field) startTimeComp;
+						UIFormComponent startTimeComp = section.getChildren().get(1);
+						assertTrue(startTimeComp instanceof UIField);
+						UIField startTimeField = (UIField) startTimeComp;
 						assertEquals(Integer.valueOf(753), startTimeField.getAttributeDefinitionId());
 					}
 				}

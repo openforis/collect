@@ -10,83 +10,83 @@ import org.openforis.commons.collection.CollectionUtils;
  * @author S. Ricci
  *
  */
-public abstract class FormContentContainer extends UIModelObject {
+public abstract class UIFormContentContainer extends UIModelObject {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<FormComponent> children;
-	private List<Form> forms;
+	private List<UIFormComponent> children;
+	private List<UIForm> forms;
 	
-	FormContentContainer(UIModelObject parent, int id) {
+	UIFormContentContainer(UIModelObject parent, int id) {
 		super(parent, id);
 	}
 	
-	public List<FormComponent> getChildren() {
+	public List<UIFormComponent> getChildren() {
 		return CollectionUtils.unmodifiableList(children);
 	}
 	
-	public void addChild(FormComponent child) {
+	public void addChild(UIFormComponent child) {
 		if ( children == null ) {
-			children = new ArrayList<FormComponent>();
+			children = new ArrayList<UIFormComponent>();
 		}
 		children.add(child);
 		getUIConfiguration().attachItem(child);
 	}
 	
-	public void removeChild(FormComponent child) {
+	public void removeChild(UIFormComponent child) {
 		children.remove(child);
 		getUIConfiguration().detachItem(child);
 	}
 
-	public FormSection createFormSection() {
+	public UIFormSection createFormSection() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createFormSection(uiOptions.nextId());
 	}
 	
-	public FormSection createFormSection(int id) {
-		return new FormSection(this, id);
+	public UIFormSection createFormSection(int id) {
+		return new UIFormSection(this, id);
 	}
 	
-	public Field createField() {
+	public UIField createField() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createField(uiOptions.nextId());
 	}
 	
-	public Field createField(int id) {
-		return new Field(this, id);
+	public UIField createField(int id) {
+		return new UIField(this, id);
 	}
 
-	public Table createTable() {
+	public UITable createTable() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createTable(uiOptions.nextId());
 	}
 	
-	public Table createTable(int id) {
-		return new Table(this, id);
+	public UITable createTable(int id) {
+		return new UITable(this, id);
 	}
 	
-	public Form createForm() {
+	public UIForm createForm() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createForm(uiOptions.nextId());
 	}
 	
-	public Form createForm(int id) {
-		return new Form(this, id);
+	public UIForm createForm(int id) {
+		return new UIForm(this, id);
 	}
 
-	public List<Form> getForms() {
+	public List<UIForm> getForms() {
 		return CollectionUtils.unmodifiableList(forms);
 	}
 	
-	public void addForm(Form form) {
+	public void addForm(UIForm form) {
 		if ( forms == null ) {
-			forms = new ArrayList<Form>();
+			forms = new ArrayList<UIForm>();
 		}
 		forms.add(form);
 		getUIConfiguration().attachItem(form);
 	}
 	
-	public void removeForm(Form form) {
+	public void removeForm(UIForm form) {
 		forms.remove(form);
 		getUIConfiguration().detachItem(form);
 	}

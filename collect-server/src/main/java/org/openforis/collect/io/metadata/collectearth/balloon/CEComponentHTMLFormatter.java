@@ -24,166 +24,197 @@ public class CEComponentHTMLFormatter {
 	private static final String NOT_AVAILABLE_ITEM_LABEL = "N/A";
 	private static final String NOT_AVAILABLE_ITEM_CODE = "-1";
 
-	public String format(CEComponent comp) {
-		if (comp instanceof CEField) {
-			return format((CEField) comp);
-		} else {
-			return format((CETable) comp);
-		}
-	}
+//	public String format(CEComponent comp) {
+//		try {
+//			if (comp instanceof CEField) {
+//				return format((CEField) comp);
+//			} else {
+//				return format((CETable) comp);
+//			}
+//		} catch(Exception e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
+//	
 	
-	public String format(CETable comp) {
-		XMLBuilder rootBuilder;
+	public String format(CETabSet tabSet) {
 		try {
-			if (comp instanceof CEEnumeratedEntityTable) {
-				rootBuilder = XMLBuilder.create("fieldset");
-				rootBuilder.e("legend").t(comp.getLabel());
-				XMLBuilder tableBuilder = rootBuilder.e("table").a("class", "table");
-				XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr");
-				for (String heading : comp.getHeadings()) {
-					headerBuilder.e("th").t(heading);
-				}
-				XMLBuilder bodyBuilder = tableBuilder.e("tbody");
-				List<CETableRow> rows = comp.getRows();
-				for (CETableRow row : rows) {
-					XMLBuilder rowBuilder = bodyBuilder.e("tr");
-					for (CEComponent child : row.getChildren()) {
-						XMLBuilder cellBuilder = rowBuilder.e("td");
-						if (child instanceof CEEnumeratingCodeField) {
-							String elId = child.getHtmlParameterName();
-							cellBuilder
-								.e("label")
-									.a("class", "control-label col-sm-4")
-									.t(row.getLabel())
-								.up()
-								.e("input")
-									.a("id", elId)
-									.a("name", elId)
-									.a("type", "hidden")
-									.a("class", "form-control")
-									.a("data-field-type", ((CEField) child).getType().name());	
-						} else if (child instanceof CEField) {
-							createBuilder((CEField) child, false, cellBuilder);
-						}
-					}
-				}
-			} else {
-				rootBuilder = XMLBuilder.create("fieldset");
-			}
-			return writeToString(rootBuilder);
+			XMLBuilder builder = createBuilder(tabSet, null);
+			return writeToString(builder);
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	public String format(CEField comp) {
-		return format(comp, true);
+	private XMLBuilder createBuilder(CETabSet tabSet, XMLBuilder parentBuilder) throws Exception {
+		XMLBuilder tabSetBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div");
+		tabSetBuilder.a("class", "tabset");
+		for (CETab tab : tabSet.getTabs()) {
+			createBuilder(tab, tabSetBuilder);
+		}
+		return tabSetBuilder;
 	}
 	
-	public String format(CEField comp, boolean includeLabel) {
+	private XMLBuilder createBuilder(CETab tab, XMLBuilder parentBuilder) throws Exception {
+		XMLBuilder tabBuilder;
+		if (parentBuilder == null) {
+			tabBuilder = XMLBuilder.create("div");
+		} else if (tab.isMain()) {
+			//append elements to the root builder
+			tabBuilder = parentBuilder;
+		} else {
+			tabBuilder = parentBuilder.e("div");
+		}
+		if (! tab.isMain()) {
+			tabBuilder.a("class", "tab");
+			//TODO add legend/title
+			tabBuilder.e("legend").t(tab.getLabel());
+		}
+		for (CEComponent component : tab.getChildren()) {
+			if (component instanceof CEField) {
+				createBuilder((CEField) component, true, tabBuilder);
+			} else if (component instanceof CEEnumeratedEntityTable) {
+				createBuilder((CEEnumeratedEntityTable) component, tabBuilder);
+			}
+		}
+		return tabBuilder;
+	}
+	
+	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
+		XMLBuilder builder =  parentBuilder.e("fieldset");
+		builder.e("legend").t(comp.getLabel());
+		XMLBuilder tableBuilder = builder.e("table").a("class", "table");
+		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr");
+		for (String heading : comp.getHeadings()) {
+			headerBuilder.e("th").t(heading);
+		}
+		XMLBuilder bodyBuilder = tableBuilder.e("tbody");
+		List<CETableRow> rows = comp.getRows();
+		for (CETableRow row : rows) {
+			XMLBuilder rowBuilder = bodyBuilder.e("tr");
+			for (CEComponent child : row.getChildren()) {
+				XMLBuilder cellBuilder = rowBuilder.e("td");
+				if (child instanceof CEEnumeratingCodeField) {
+					String elId = child.getHtmlParameterName();
+					cellBuilder
+						.e("label")
+							.a("class", "control-label col-sm-4")
+							.t(row.getLabel())
+						.up()
+						.e("input")
+							.a("id", elId)
+							.a("name", elId)
+							.a("type", "hidden")
+							.a("class", "form-control")
+							.a("data-field-type", ((CEField) child).getType().name());	
+				} else if (child instanceof CEField) {
+					createBuilder((CEField) child, false, cellBuilder);
+				}
+			}
+		}
+		return builder;
+	}
+	
+	public String format(CEField comp, boolean includeLabel) throws Exception {
 		XMLBuilder builder = createBuilder(comp, includeLabel);
 		return writeToString(builder);
 	}
 	
-	private XMLBuilder createBuilder(CEField comp, boolean includeLabel) {
+	private XMLBuilder createBuilder(CEField comp, boolean includeLabel) throws Exception {
 		return createBuilder(comp, includeLabel, null);
 	}
 	
-	private XMLBuilder createBuilder(CEField comp, boolean includeLabel, XMLBuilder rootBuilder) {
+	private XMLBuilder createBuilder(CEField comp, boolean includeLabel, XMLBuilder parentBuilder) throws Exception {
 		//start of external container
 		String elId = comp.getHtmlParameterName();
 		
-		try {
-			//external form-group container
-			XMLBuilder formGroupBuilder = rootBuilder == null ? XMLBuilder.create("div") : rootBuilder.e("div");
-			formGroupBuilder.a("class", "form-group");
-			if (includeLabel) {
-				//label element
-				formGroupBuilder.e("label")
-					.a("for", elId)
-					.a("class", "control-label col-sm-4")
-					.t(comp.getLabel());
-			}
-			//form control external container (for grid alignment)
-			XMLBuilder formControlContainer = formGroupBuilder.e("div")
-					.a("class", "col-sm-8");
-			
-			if (comp instanceof CECodeField) {
-				switch(((CEField) comp).getType()) {
-				case CODE_BUTTON_GROUP:
-					buildCodeButtonGroup(formControlContainer, (CECodeField) comp);
-					break;
-				case CODE_SELECT:
-					buildCodeSelect(formControlContainer, (CECodeField) comp);
-					break;
-				default:
-					break;
-				}
-			} else if (comp instanceof CEEnumeratingCodeField) {
-				formControlContainer.e("input")
-						.a("id", elId)
-						.a("name", elId)
-						.a("type", "hidden")
-						.a("class", "form-control")
-						.a("data-field-type", comp.getType().name());
-			} else if (comp instanceof CEField) {
-				switch (((CEField) comp).getType()) {
-				case SHORT_TEXT:
-					formControlContainer.e("input")
-						.a("id", elId)
-						.a("name", elId)
-						.a("type", "text")
-						.a("class", "form-control");
-					break;
-				case LONG_TEXT:
-					formControlContainer.e("textarea")
-						.a("id", elId)
-						.a("rows", "3")
-						.a("name", elId)
-						.a("class", "form-control")
-						.t(" ");
-					break;
-				case INTEGER:
-				case REAL:
-					formControlContainer.e("input")
-						.a("id", elId)
-						.a("name", elId)
-						.a("type", "text")
-						.a("value", "0")
-						.a("class", "form-control numeric");
-					break;
-				case BOOLEAN:
-					formControlContainer.e("input")
-						.a("id", elId)
-						.a("name", elId)
-						.a("type", "checkbox")
-						.a("class", "form-control numeric");
-					break;
-				case COORDINATE:
-					break;
-				case DATE:
-				case TIME:
-					formControlContainer.e("div")
-						.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker"))
-						.e("input")
-							.a("id", elId)
-							.a("name", elId)
-							.a("class", "form-control")
-							.up()
-						.e("span")
-							.a("class", "input-group-addon")
-							.e("span")
-								.a("class", "glyphicon glyphicon-time")
-						;
-					break;
-				default:
-					break;
-				}
-			}
-			return formGroupBuilder;
-		} catch(Exception e) {
-			throw new RuntimeException(e);
+		//external form-group container
+		XMLBuilder formGroupBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div");
+		formGroupBuilder.a("class", "form-group");
+		if (includeLabel) {
+			//label element
+			formGroupBuilder.e("label")
+				.a("for", elId)
+				.a("class", "control-label col-sm-4")
+				.t(comp.getLabel());
 		}
+		//form control external container (for grid alignment)
+		XMLBuilder formControlContainer = formGroupBuilder.e("div")
+				.a("class", "col-sm-8");
+		
+		if (comp instanceof CECodeField) {
+			switch(((CEField) comp).getType()) {
+			case CODE_BUTTON_GROUP:
+				buildCodeButtonGroup(formControlContainer, (CECodeField) comp);
+				break;
+			case CODE_SELECT:
+				buildCodeSelect(formControlContainer, (CECodeField) comp);
+				break;
+			default:
+				break;
+			}
+		} else if (comp instanceof CEEnumeratingCodeField) {
+			formControlContainer.e("input")
+					.a("id", elId)
+					.a("name", elId)
+					.a("type", "hidden")
+					.a("class", "form-control")
+					.a("data-field-type", comp.getType().name());
+		} else if (comp instanceof CEField) {
+			switch (((CEField) comp).getType()) {
+			case SHORT_TEXT:
+				formControlContainer.e("input")
+					.a("id", elId)
+					.a("name", elId)
+					.a("type", "text")
+					.a("class", "form-control");
+				break;
+			case LONG_TEXT:
+				formControlContainer.e("textarea")
+					.a("id", elId)
+					.a("rows", "3")
+					.a("name", elId)
+					.a("class", "form-control")
+					.t(" ");
+				break;
+			case INTEGER:
+			case REAL:
+				formControlContainer.e("input")
+					.a("id", elId)
+					.a("name", elId)
+					.a("type", "text")
+					.a("value", "0")
+					.a("class", "form-control numeric");
+				break;
+			case BOOLEAN:
+				formControlContainer.e("input")
+					.a("id", elId)
+					.a("name", elId)
+					.a("type", "checkbox")
+					.a("class", "form-control numeric");
+				break;
+			case COORDINATE:
+				break;
+			case DATE:
+			case TIME:
+				formControlContainer.e("div")
+					.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker"))
+					.e("input")
+						.a("id", elId)
+						.a("name", elId)
+						.a("class", "form-control")
+						.up()
+					.e("span")
+						.a("class", "input-group-addon")
+						.e("span")
+							.a("class", "glyphicon glyphicon-time")
+					;
+				break;
+			default:
+				break;
+			}
+		}
+		return formGroupBuilder;
 	}
 
 	private String writeToString(XMLBuilder builder) {
@@ -265,7 +296,9 @@ public class CEComponentHTMLFormatter {
 				.a("data-toggle", "buttons-radio")
 				.a("data-parent-code", parentCode);
 			List<CodeListItem> items = entry.getValue();
-			if (items != null) {
+			if (items == null || items.isEmpty()) {
+				buttonsGroup.t(" "); //always use close tag
+			} else {
 				for (CodeListItem item : items) {
 					XMLBuilder buttonItemBuilder = buttonsGroup.e("button")
 						.a("type", "button")

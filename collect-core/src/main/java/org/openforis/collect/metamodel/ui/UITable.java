@@ -12,7 +12,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
  * @author S. Ricci
  *
  */
-public class Table extends UIModelObject implements NodeDefinitionUIComponent, FormComponent, TableHeadingContainer {
+public class UITable extends UIModelObject implements NodeDefinitionUIComponent, UIFormComponent, UITableHeadingContainer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,35 +33,36 @@ public class Table extends UIModelObject implements NodeDefinitionUIComponent, F
 	
 	private Integer entityDefinitionId;
 	private EntityDefinition entityDefinition;
-	private List<TableHeadingComponent> headingComponents;
+	private List<UITableHeadingComponent> headingComponents;
 	private boolean showRowNumbers;
 	private boolean countInSummaryList;
 	private Direction direction;
+	private boolean hidden;
 	
-	<P extends FormContentContainer> Table(P parent, int id) {
+	<P extends UIFormContentContainer> UITable(P parent, int id) {
 		super(parent, id);
 	}
 	
 	@Override
-	public Column createColumn() {
+	public UIColumn createColumn() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createColumn(uiOptions.nextId());
 	}
 	
 	@Override
-	public Column createColumn(int id) {
-		return new Column(this, id);
+	public UIColumn createColumn(int id) {
+		return new UIColumn(this, id);
 	}
 	
 	@Override
-	public ColumnGroup createColumnGroup() {
+	public UIColumnGroup createColumnGroup() {
 		UIConfiguration uiOptions = getUIConfiguration();
 		return createColumnGroup(uiOptions.nextId());
 	}
 	
 	@Override
-	public ColumnGroup createColumnGroup(int id) {
-		return new ColumnGroup(this, id);
+	public UIColumnGroup createColumnGroup(int id) {
+		return new UIColumnGroup(this, id);
 	}
 	
 	@Override
@@ -94,19 +95,19 @@ public class Table extends UIModelObject implements NodeDefinitionUIComponent, F
 		this.entityDefinitionId = entityDefinition == null ? null: entityDefinition.getId();
 	}
 	
-	public List<TableHeadingComponent> getHeadingComponents() {
+	public List<UITableHeadingComponent> getHeadingComponents() {
 		return CollectionUtils.unmodifiableList(headingComponents);
 	}
 	
-	public void addHeadingComponent(TableHeadingComponent component) {
+	public void addHeadingComponent(UITableHeadingComponent component) {
 		if ( headingComponents == null ) {
-			headingComponents = new ArrayList<TableHeadingComponent>();
+			headingComponents = new ArrayList<UITableHeadingComponent>();
 		}
 		headingComponents.add(component);
 		getUIConfiguration().attachItem(component);
 	}
 	
-	public void removeHeadingComponent(TableHeadingComponent component) {
+	public void removeHeadingComponent(UITableHeadingComponent component) {
 		headingComponents.remove(component);
 		getUIConfiguration().detachItem(component);
 	}
@@ -136,6 +137,16 @@ public class Table extends UIModelObject implements NodeDefinitionUIComponent, F
 	}
 
 	@Override
+	public boolean isHidden() {
+		return this.hidden;
+	}
+	
+	@Override
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+	
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
@@ -156,7 +167,7 @@ public class Table extends UIModelObject implements NodeDefinitionUIComponent, F
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Table other = (Table) obj;
+		UITable other = (UITable) obj;
 		if (headingComponents == null) {
 			if (other.headingComponents != null)
 				return false;
