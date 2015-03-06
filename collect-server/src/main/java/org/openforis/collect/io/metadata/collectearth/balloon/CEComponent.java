@@ -1,7 +1,5 @@
 package org.openforis.collect.io.metadata.collectearth.balloon;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
@@ -15,7 +13,6 @@ class CEComponent {
 	private String name;
 	private String label;
 	private boolean multiple;
-	List<CEComponent> relevanceSources = new ArrayList<CEComponent>();
 	boolean hideWhenNotRelevant = false;
 
 	public CEComponent(String htmlParameterName, String name, String label, boolean multiple) {

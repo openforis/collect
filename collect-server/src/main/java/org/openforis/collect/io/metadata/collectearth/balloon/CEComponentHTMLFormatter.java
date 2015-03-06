@@ -49,7 +49,7 @@ public class CEComponentHTMLFormatter {
 					XMLBuilder rowBuilder = bodyBuilder.e("tr");
 					for (CEComponent child : row.getChildren()) {
 						XMLBuilder cellBuilder = rowBuilder.e("td");
-						if (child instanceof CEFixedValueField) {
+						if (child instanceof CEEnumeratingCodeField) {
 							String elId = child.getHtmlParameterName();
 							cellBuilder
 								.e("label")
@@ -119,7 +119,7 @@ public class CEComponentHTMLFormatter {
 				default:
 					break;
 				}
-			} else if (comp instanceof CEFixedValueField) {
+			} else if (comp instanceof CEEnumeratingCodeField) {
 				formControlContainer.e("input")
 						.a("id", elId)
 						.a("name", elId)

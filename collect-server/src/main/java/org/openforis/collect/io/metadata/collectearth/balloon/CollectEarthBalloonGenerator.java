@@ -38,7 +38,6 @@ import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
-import org.openforis.idm.model.NodePathPointer;
 
 /**
  * 
@@ -149,21 +148,8 @@ public class CollectEarthBalloonGenerator {
 	
 	private CEFieldSet generateRootComponent() {
 		EntityDefinition rootEntityDef = getRootEntity();
-		CEFieldSet rootComponent = (CEFieldSet) createComponent(rootEntityDef);
 		
-		rootEntityDef.traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition def) {
-				Set<NodePathPointer> relevanceSourceDefs = survey.getRelevanceSources(def);
-				if (! relevanceSourceDefs.isEmpty()) {
-					CEComponent comp = componentByName.get(def.getName());
-					for (NodePathPointer relevancePointer : relevanceSourceDefs) {
-						NodeDefinition referencedDef = relevancePointer.getReferencedNodeDefinition();
-						CEComponent referencedComp = componentByName.get(referencedDef.getName());
-						comp.relevanceSources.add(referencedComp);
-					}
-				}
-			}
-		});
+		CEFieldSet rootComponent = (CEFieldSet) createComponent(rootEntityDef);
 		
 		return rootComponent;
 	}
@@ -206,7 +192,9 @@ public class CollectEarthBalloonGenerator {
 					String key = item.getCode();
 					CETableRow row = new CETableRow(key, item.getLabel());
 					for (NodeDefinition child : ((EntityDefinition) def).getChildDefinitions()) {
-						row.addChild(createComponent(child, codeItemIdx + 1));
+						if (! uiOptions.isHidden(child)) {
+							row.addChild(createComponent(child, codeItemIdx + 1));
+						}
 					}
 					ceTable.addRow(row);
 					codeItemIdx ++;
@@ -215,7 +203,9 @@ public class CollectEarthBalloonGenerator {
 			} else {
 				CEFieldSet fieldSet = new CEFieldSet(def.getName(), label);
 				for (NodeDefinition child : ((EntityDefinition) def).getChildDefinitions()) {
-					fieldSet.addChild(createComponent(child));
+					if (! uiOptions.isHidden(child)) {
+						fieldSet.addChild(createComponent(child));
+					}
 				}
 				comp = fieldSet;
 			}
@@ -230,7 +220,7 @@ public class CollectEarthBalloonGenerator {
 			CEFieldType type = getFieldType(def);
 			boolean key = def instanceof KeyAttributeDefinition ? ((KeyAttributeDefinition) def).isKey(): false;
 			if (insideEnumeratedEntity && key) {
-				comp = new CEFixedValueField(htmlParameterName, def.getName(), label, multiple, type, key);
+				comp = new CEEnumeratingCodeField(htmlParameterName, def.getName(), label, multiple, type, key);
 			} else if (def instanceof CodeAttributeDefinition) {
 				CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
 				CodeAttributeDefinition parentCodeAttributeDef = ((CodeAttributeDefinition) def).getParentCodeAttributeDefinition();
