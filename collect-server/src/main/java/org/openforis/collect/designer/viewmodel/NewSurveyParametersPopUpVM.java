@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.openforis.collect.designer.form.validator.BaseValidator;
+import org.openforis.collect.designer.form.validator.SurveyNameValidator;
 import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.model.LabelledItem.LabelComparator;
 import org.openforis.collect.designer.session.SessionStatus;
@@ -20,13 +20,11 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.SurveySummary;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
-import org.zkoss.bind.ValidationContext;
 import org.zkoss.bind.Validator;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.Init;
@@ -44,6 +42,7 @@ import org.zkoss.zul.ListModelList;
 public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	private static final String IDM_TEMPLATE_FILE_NAME_FORMAT = "/org/openforis/collect/designer/templates/%s.idm.xml";
+	private static final String SURVEY_NAME_FIELD = "name";
 
 	private enum TemplateType {
 		BLANK,
@@ -53,10 +52,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		//SOCIOECONOMIC, 
 	}
 
-	protected static final String SURVEY_NAME_FIELD = "name";;
-	protected static final String DUPLICATE_NAME_MESSAGE_KEY = "survey.validation.error.duplicate_name";
-	
-	@WireVariable
+	@WireVariable 
 	private SurveyManager surveyManager;
 	
 	private Map<String, Object> form;
@@ -69,32 +65,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	@Init
 	public void init() {
 		form = new HashMap<String, Object>();
-		nameValidator = new BaseValidator() {
-			@Override
-			public void validate(ValidationContext ctx) {
-				if ( validateRequired(ctx, SURVEY_NAME_FIELD) && validateInternalName(ctx, SURVEY_NAME_FIELD) ) {
-					validateNameUniqueness(ctx);
-				}
-			}
-			
-			private boolean validateNameUniqueness(ValidationContext ctx) {
-				String name = getValue(ctx, SURVEY_NAME_FIELD);
-				SurveySummary existingSurveySummary = loadExistingSurveySummaryByName(ctx, name);
-				if ( existingSurveySummary != null ) {
-					this.addInvalidMessage(ctx, SURVEY_NAME_FIELD, Labels.getLabel(DUPLICATE_NAME_MESSAGE_KEY));
-					return false;
-				} else {
-					return true;
-				}
-			}
-			
-			private SurveySummary loadExistingSurveySummaryByName(ValidationContext ctx, String name) {
-				NewSurveyParametersPopUpVM vm = (NewSurveyParametersPopUpVM) getVM(ctx);
-				SurveySummary summary = vm.surveyManager.loadSummaryByName(name);
-				return summary;
-			}
-
-		};
+		nameValidator = new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, true);
 		initLanguageModel();
 		initTemplatesModel();
 	}
