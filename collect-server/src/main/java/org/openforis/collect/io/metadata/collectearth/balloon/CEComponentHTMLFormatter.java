@@ -48,7 +48,7 @@ public class CEComponentHTMLFormatter {
 	
 	private XMLBuilder createBuilder(CETabSet tabSet, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder tabSetBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div");
-		tabSetBuilder.a("class", "tabset");
+		tabSetBuilder.a("class", "steps");
 		for (CETab tab : tabSet.getTabs()) {
 			createBuilder(tab, tabSetBuilder);
 		}
@@ -56,28 +56,19 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CETab tab, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder tabBuilder;
-		if (parentBuilder == null) {
-			tabBuilder = XMLBuilder.create("div");
-		} else if (tab.isMain()) {
-			//append elements to the root builder
-			tabBuilder = parentBuilder;
-		} else {
-			tabBuilder = parentBuilder.e("div");
-		}
-		if (! tab.isMain()) {
-			tabBuilder.a("class", "tab");
-			//TODO add legend/title
-			tabBuilder.e("legend").t(tab.getLabel());
-		}
+		parentBuilder.e("h3").t(tab.getLabel());
+
+		XMLBuilder bodyContentBuilder = parentBuilder.e("section");
+		bodyContentBuilder.a("class", "step");
+
 		for (CEComponent component : tab.getChildren()) {
 			if (component instanceof CEField) {
-				createBuilder((CEField) component, true, tabBuilder);
+				createBuilder((CEField) component, true, bodyContentBuilder);
 			} else if (component instanceof CEEnumeratedEntityTable) {
-				createBuilder((CEEnumeratedEntityTable) component, tabBuilder);
+				createBuilder((CEEnumeratedEntityTable) component, bodyContentBuilder);
 			}
 		}
-		return tabBuilder;
+		return bodyContentBuilder;
 	}
 	
 	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
