@@ -154,12 +154,7 @@ public class CEComponentHTMLFormatter {
 				break;
 			}
 		} else if (comp instanceof CEEnumeratingCodeField) {
-			formControlContainer.e("input")
-					.a("id", elId)
-					.a("name", elId)
-					.a("type", "hidden")
-					.a("class", "form-control")
-					.a("data-field-type", comp.getType().name());
+			// skip it
 		} else if (comp instanceof CEField) {
 			switch (((CEField) comp).getType()) {
 			case SHORT_TEXT:

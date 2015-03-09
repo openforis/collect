@@ -192,8 +192,11 @@ public class CollectEarthBalloonGenerator {
 				NodeDefinition nodeDef = ((NodeDefinitionUIComponent) formComponent).getNodeDefinition();
 				if (formComponent instanceof UIField) {
 					String nodeName = nodeDef.getName();
-					boolean includeInHTML = ! FIXED_ATTRIBUTE_NAMES.contains(nodeName) && ! nodeNamesFromCSV.contains(nodeName) 
-							&& ! formComponent.isHidden();
+					boolean includeInHTML = ! (
+							FIXED_ATTRIBUTE_NAMES.contains(nodeName) 
+							|| nodeNamesFromCSV.contains(nodeName) 
+							|| ((UIField) formComponent).isHidden()
+							);
 					if (includeInHTML) {
 						CEComponent component = createComponent(nodeDef);
 						tab.addChild(component);

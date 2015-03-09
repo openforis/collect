@@ -17,6 +17,7 @@ public abstract class UIModelObject implements Serializable, Identifiable {
 	
 	private UIModelObject parent;
 	private int id;
+	private boolean hidden;
 
 	UIModelObject(UIModelObject parent, int id) {
 		super();
@@ -55,5 +56,13 @@ public abstract class UIModelObject implements Serializable, Identifiable {
 	@Override
 	public int getId() {
 		return id;
+	}
+	
+	public boolean isHidden() {
+		return this.hidden;
+	}
+	
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
 	}
 }

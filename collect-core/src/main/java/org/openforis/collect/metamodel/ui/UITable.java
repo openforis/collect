@@ -37,7 +37,6 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 	private boolean showRowNumbers;
 	private boolean countInSummaryList;
 	private Direction direction;
-	private boolean hidden;
 	
 	<P extends UIFormContentContainer> UITable(P parent, int id) {
 		super(parent, id);
@@ -136,16 +135,6 @@ public class UITable extends UIModelObject implements NodeDefinitionUIComponent,
 		this.direction = direction;
 	}
 
-	@Override
-	public boolean isHidden() {
-		return this.hidden;
-	}
-	
-	@Override
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
-	}
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
