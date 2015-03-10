@@ -135,9 +135,6 @@ PLACEHOLDER_FOR_DYNAMIC_FIELDS
 <!-- ------------------------------------------------------------------------------------ -->
 <!-- END OF DYNAMIC FIELDS -------------------------------------------------------------- -->
 <!-- ------------------------------------------------------------------------------------ -->
-				<div class="earthDiv">
-					<button type="submit" class="btn btn-success" style="margin-left:25%;margin-right:25%;margin-top:3px;">SUBMIT &amp; VALIDATE</button>
-				</div>
 			</form>
 		</div>
 	</div>
