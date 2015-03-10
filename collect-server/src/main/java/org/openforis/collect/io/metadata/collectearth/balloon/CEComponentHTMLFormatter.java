@@ -24,19 +24,6 @@ public class CEComponentHTMLFormatter {
 	private static final String NOT_AVAILABLE_ITEM_LABEL = "N/A";
 	private static final String NOT_AVAILABLE_ITEM_CODE = "-1";
 
-//	public String format(CEComponent comp) {
-//		try {
-//			if (comp instanceof CEField) {
-//				return format((CEField) comp);
-//			} else {
-//				return format((CETable) comp);
-//			}
-//		} catch(Exception e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
-//	
-	
 	public String format(CETabSet tabSet) {
 		try {
 			XMLBuilder builder = createBuilder(tabSet, null);
@@ -86,33 +73,16 @@ public class CEComponentHTMLFormatter {
 			for (CEComponent child : row.getChildren()) {
 				XMLBuilder cellBuilder = rowBuilder.e("td");
 				if (child instanceof CEEnumeratingCodeField) {
-					String elId = child.getHtmlParameterName();
 					cellBuilder
 						.e("label")
 							.a("class", "control-label col-sm-4")
-							.t(row.getLabel())
-						.up()
-						.e("input")
-							.a("id", elId)
-							.a("name", elId)
-							.a("type", "hidden")
-							.a("class", "form-control")
-							.a("data-field-type", ((CEField) child).getType().name());	
+							.t(row.getLabel());
 				} else if (child instanceof CEField) {
 					createBuilder((CEField) child, false, cellBuilder);
 				}
 			}
 		}
 		return builder;
-	}
-	
-	public String format(CEField comp, boolean includeLabel) throws Exception {
-		XMLBuilder builder = createBuilder(comp, includeLabel);
-		return writeToString(builder);
-	}
-	
-	private XMLBuilder createBuilder(CEField comp, boolean includeLabel) throws Exception {
-		return createBuilder(comp, includeLabel, null);
 	}
 	
 	private XMLBuilder createBuilder(CEField comp, boolean includeLabel, XMLBuilder parentBuilder) throws Exception {
@@ -203,23 +173,6 @@ public class CEComponentHTMLFormatter {
 		return formGroupBuilder;
 	}
 
-	private String writeToString(XMLBuilder builder) {
-		try {
-			StringWriter writer = new StringWriter();
-			@SuppressWarnings("serial")
-			Properties outputProperties = new Properties(){{
-				put(javax.xml.transform.OutputKeys.INDENT, "yes");
-				put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
-				put(javax.xml.transform.OutputKeys.STANDALONE, "yes");
-			}};
-			builder.toWriter(writer, outputProperties);
-			String result = writer.toString();
-			return result;
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	private void buildCodeSelect(XMLBuilder builder, CECodeField comp) {
 		String elId = comp.getHtmlParameterName();
 		
@@ -276,26 +229,45 @@ public class CEComponentHTMLFormatter {
 			//one button group for every list of codes by parent code
 			String parentCode = entry.getKey();
 			String itemsGroupId = groupId + "_" + parentCode;
-			XMLBuilder buttonsGroup = itemsGroupExternalContainer.e("div")
-				.a("id", itemsGroupId)
-				.a("class", "code-items")
-				.a("data-toggle", "buttons-radio")
-				.a("data-parent-code", parentCode);
+			XMLBuilder buttonsGroup = itemsGroupExternalContainer
+				.e("div")
+					.a("id", itemsGroupId)
+					.a("class", "code-items")
+					.a("data-toggle", "buttons-radio")
+					.a("data-parent-code", parentCode);
 			List<CodeListItem> items = entry.getValue();
 			if (items == null || items.isEmpty()) {
 				buttonsGroup.t(" "); //always use close tag
 			} else {
 				for (CodeListItem item : items) {
-					XMLBuilder buttonItemBuilder = buttonsGroup.e("button")
-						.a("type", "button")
-						.a("class", "btn btn-info code-item")
-						.a("value", item.getCode())
-						.t(item.getLabel());
+					XMLBuilder buttonItemBuilder = buttonsGroup
+						.e("button")
+							.a("type", "button")
+							.a("class", "btn btn-info code-item")
+							.a("value", item.getCode())
+							.t(item.getLabel());
 					if (StringUtils.isNotBlank(item.getDescription())) {
 						buttonItemBuilder.a("title", item.getDescription());
 					}
 				}
 			}
+		}
+	}
+
+	private String writeToString(XMLBuilder builder) {
+		try {
+			StringWriter writer = new StringWriter();
+			@SuppressWarnings("serial")
+			Properties outputProperties = new Properties(){{
+				put(javax.xml.transform.OutputKeys.INDENT, "yes");
+				put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+				put(javax.xml.transform.OutputKeys.STANDALONE, "yes");
+				put(javax.xml.transform.OutputKeys.METHOD, "html");
+			}};
+			builder.toWriter(writer, outputProperties);
+			return writer.toString();
+		} catch(Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 
