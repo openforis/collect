@@ -190,7 +190,7 @@ public abstract class DependencyGraph<T> {
 			throws InvalidExpressionException;
 	
 	protected List<T> extractItems(Collection<GraphNode> nodes) {
-		List<T> result = new ArrayList<T>();
+		List<T> result = new ArrayList<T>(nodes.size());
 		for (GraphNode graphNode : nodes) {
 			result.add(graphNode.item);
 		}

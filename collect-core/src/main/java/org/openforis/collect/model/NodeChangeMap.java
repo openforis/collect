@@ -220,7 +220,6 @@ public class NodeChangeMap implements NodeChangeSet {
 	public void addMaxCountValidationResultChange(NodePointer nodePointer, ValidationResultFlag maxCountResult) {
 		EntityChange change = prepareEntityChange(nodePointer.getEntity());
 		change.setMaxCountValidation(nodePointer.getChildName(), maxCountResult);
-		
 	}
 
 	public void addValidationResultChange(Attribute<?, ?> attribute, ValidationResults validationResults) {
