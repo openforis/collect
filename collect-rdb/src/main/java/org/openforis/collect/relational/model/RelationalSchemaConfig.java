@@ -11,6 +11,7 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  */
 public class RelationalSchemaConfig implements Cloneable {
 
+	private String idColumnPrefix;
 	private String idColumnSuffix;
 	private String pkConstraintPrefix;
 	private String fkConstraintPrefix;
@@ -31,6 +32,7 @@ public class RelationalSchemaConfig implements Cloneable {
 	private static final RelationalSchemaConfig DEFAULT;
 	static {
 		RelationalSchemaConfig config = new RelationalSchemaConfig();
+		config.idColumnPrefix = "";
 		config.idColumnSuffix = "_id_";
 		config.pkConstraintPrefix = "pk_";
 		config.fkConstraintPrefix = "fk_";
@@ -71,6 +73,14 @@ public class RelationalSchemaConfig implements Cloneable {
 		} else {
 			return defaultCodeLabels.getText(langCode);
 		}
+	}
+	
+	public String getIdColumnPrefix() {
+		return idColumnPrefix;
+	}
+	
+	public void setIdColumnPrefix(String idColumnPrefix) {
+		this.idColumnPrefix = idColumnPrefix;
 	}
 	
 	public String getIdColumnSuffix() {
