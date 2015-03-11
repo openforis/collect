@@ -54,7 +54,7 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 
 	private Object extractNonEmptyChildren(Entity entity, String childName) {
 		NodeDefinition childDef = entity.getDefinition().getChildDefinition(childName);
-		List<Node<?>> children = entity.getAll(childDef);
+		List<Node<?>> children = entity.getChildren(childDef);
 
 		List<Node<?>> list = new ArrayList<Node<?>>(children.size());
 		

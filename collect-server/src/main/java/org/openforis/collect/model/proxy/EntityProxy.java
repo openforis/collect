@@ -40,7 +40,7 @@ public class EntityProxy extends NodeProxy {
 	public Map<Integer, List<NodeProxy>> getChildrenByDefinitionId() {
 		Map<Integer, List<NodeProxy>> result = new HashMap<Integer, List<NodeProxy>>();
 		for (NodeDefinition childDefinition : availableChildDefinitions) {
-			List<Node<?>> nodes = this.entity.getAll(childDefinition);
+			List<Node<?>> nodes = this.entity.getChildren(childDefinition);
 			List<NodeProxy> proxies = NodeProxy.fromList(this, nodes, getLocale());
 			result.put(childDefinition.getId(), proxies);
 		}

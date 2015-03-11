@@ -99,7 +99,7 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	public List<String> extractValues(Node<?> axis) {
 		List<String> values = super.extractValues(axis);
 		if (hasExpandedItems) {
-			List<Node<?>> attributes = ((Entity) axis).getAll(attributeDefinition);
+			List<Node<?>> attributes = ((Entity) axis).getChildren(attributeDefinition);
 			for (CodeListItem item : expandedItems) {
 				CodeAttribute attr = findAttributeByCode(attributes, item.getCode());
 				values.add(Boolean.valueOf(attr != null).toString());

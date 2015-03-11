@@ -54,7 +54,7 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 			for (int attrIdx = 0; attrIdx < maxAttrValues; attrIdx++) {
 				String val;
 				if (attrIdx < attrCount) {
-					Attribute<?, ?> attr = (Attribute<?, ?>) entity.get(attributeDefinition, attrIdx);
+					Attribute<?, ?> attr = (Attribute<?, ?>) entity.getChild(attributeDefinition, attrIdx);
 					val = extractValue(attr);
 				} else {
 					val = "";
