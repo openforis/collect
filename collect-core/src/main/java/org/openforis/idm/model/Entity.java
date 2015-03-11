@@ -255,7 +255,7 @@ public class Entity extends Node<EntityDefinition> {
 			keyAttrParent = this;
 		}
 		@SuppressWarnings("unchecked")
-		Attribute<?, Value> keyAttr = (Attribute<?, Value>) keyAttrParent.getChild(keyDefn.getName());
+		Attribute<?, Value> keyAttr = (Attribute<?, Value>) keyAttrParent.getChild(keyDefn);
 		return keyAttr;
 	}
 	
@@ -454,9 +454,8 @@ public class Entity extends Node<EntityDefinition> {
 
 	public List<Node<? extends NodeDefinition>> getChildren() {
 		List<Node<?>> result = new ArrayList<Node<?>>();
-		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
-		for (NodeDefinition defn : definitions) {
-			result.addAll(getChildren(defn));
+		for (List<Node<?>> list : childrenByDefinitionId.values()) {
+			result.addAll(list);
 		}
 		return Collections.unmodifiableList(result);
 	}
