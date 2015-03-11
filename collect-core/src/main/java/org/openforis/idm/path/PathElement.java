@@ -78,7 +78,7 @@ public class PathElement implements Axis {
 	}
 
 	private List<Node<?>> evaluateInternal(Entity parent) {
-		List<Node<?>> children = parent.getAll(name);
+		List<Node<?>> children = parent.getChildren(name);
 		if ( index == null ) {					//  /cluster[1]/plot[2]/location
 			return children;
 		} else {								//  /cluster[1]/plot[2]/location[1]

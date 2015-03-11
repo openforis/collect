@@ -414,7 +414,7 @@ public class DataService {
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
 		List<CodeListItem> items = codeListManager.loadValidItems(parent, def);
 		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
-		List<Node<?>> selectedCodes = parent.getAll(attrName);
+		List<Node<?>> selectedCodes = parent.getChildren(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
 		return result;
 	}

@@ -97,7 +97,7 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 	@Override
 	public List<String> extractValues(Node<?> axis) {
 		checkValidAxis(axis);
-		List<Node<?>> attributes = ((Entity) axis).getAll(attributeDefinition);
+		List<Node<?>> attributes = ((Entity) axis).getChildren(attributeDefinition);
 		int maxAttributeValues = getMaxAttributeValues();
 		int totHeadings = fieldNames.length * maxAttributeValues;
 		List<String> values = new ArrayList<String>(totHeadings);

@@ -531,7 +531,7 @@ public class RecordUpdater {
 	public void moveNode(CollectRecord record, int nodeId, int index) {
 		Node<?> node = record.getNodeByInternalId(nodeId);
 		Entity parent = node.getParent();
-		List<Node<?>> siblings = parent.getAll(node.getDefinition());
+		List<Node<?>> siblings = parent.getChildren(node.getDefinition());
 		int oldIndex = siblings.indexOf(node);
 		parent.move(node.getDefinition(), oldIndex, index);
 	}
@@ -566,7 +566,7 @@ public class RecordUpdater {
 	 * @throws InvalidExpressionException 
 	 */
 	private void applyDefaultValues(Entity entity) {
-		List<Node<?>> children = entity.getAll();
+		List<Node<?>> children = entity.getChildren();
 		for (Node<?> child: children) {
 			if ( child instanceof Attribute ) {
 				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
@@ -791,7 +791,7 @@ public class RecordUpdater {
 				}
 				addEmptyChildren(entity, childDefn, toBeInserted);
 			} else {
-				List<Node<?>> children = entity.getAll(childDefn);
+				List<Node<?>> children = entity.getChildren(childDefn);
 				for (Node<?> child : children) {
 					if(child instanceof Entity) {
 						addEmptyNodes((Entity) child);
@@ -903,7 +903,7 @@ public class RecordUpdater {
 						Entity addedEntity = performEntityAdd(parentEntity, enumeratedEntityName, i);
 						addEmptyNodes(addedEntity);
 						//set the value of the key CodeAttribute
-						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn, 0);
+						CodeAttribute addedCode = (CodeAttribute) addedEntity.getChild(enumeratingCodeDefn, 0);
 						addedCode.setValue(new Code(code));
 						addedCode.updateSummaryInfo();
 					} else if (enumeratedEntity.getIndex() != i) {
@@ -997,7 +997,7 @@ public class RecordUpdater {
 		for (NodeDefinition childDef : definition.getChildDefinitionsInVersion(version)) {
 			pointers.add(new NodePointer(entity, childDef));
 			if ( childDef instanceof EntityDefinition ) {
-				for (Node<?> childEntity : entity.getAll(childDef)) {
+				for (Node<?> childEntity : entity.getChildren(childDef)) {
 					pointers.addAll(getDescendantNodePointers((Entity) childEntity));
 				}
 			}
@@ -1076,7 +1076,7 @@ public class RecordUpdater {
 					entity.setRelevant(childDef, relevant);
 					updatedNodePointers.add(nodePointer);
 					if ( childDef instanceof EntityDefinition ) {
-						List<Node<?>> nodes = entity.getAll(childDef);
+						List<Node<?>> nodes = entity.getChildren(childDef);
 						for (Node<?> node : nodes) {
 							Entity childEntity = (Entity) node;
 							EntityDefinition childEntityDef = childEntity.getDefinition();

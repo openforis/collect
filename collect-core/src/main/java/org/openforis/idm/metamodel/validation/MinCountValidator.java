@@ -40,7 +40,7 @@ public class MinCountValidator implements ValidationRule<Entity> {
 				return OK;
 			} else {
 				int nonEmptyCount = 0;
-				List<Node<?>> childNodes = entity.getAll(nodeDefinition);
+				List<Node<?>> childNodes = entity.getChildren(nodeDefinition);
 				for ( Node<?> child : childNodes ) {
 					if ( !isEmpty(child) ) {
 						nonEmptyCount++;

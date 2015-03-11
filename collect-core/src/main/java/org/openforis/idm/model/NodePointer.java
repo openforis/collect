@@ -66,7 +66,7 @@ public class NodePointer {
 	}
 
 	public List<Node<?>> getNodes() {
-		return entity.getAll(childDefinition);
+		return entity.getChildren(childDefinition);
 	}
 	
 	public boolean areNodesRelevant() {

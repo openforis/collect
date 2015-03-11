@@ -62,7 +62,7 @@ public class EnumerableEntityColumnProvider extends ColumnProviderChain {
 		@Override
 		public List<String> extractValues(Node<?> axis) {
 			Entity parentEntity = (Entity) axis;
-			List<Node<?>> children = parentEntity.getAll(entityDefinition);
+			List<Node<?>> children = parentEntity.getChildren(entityDefinition);
 			for (Node<?> child : children) {
 				Entity childEntity = (Entity) child;
 				Code childCode = (Code) childEntity.getValue(keyName, 0);
