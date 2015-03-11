@@ -905,6 +905,7 @@ public class RecordUpdater {
 						//set the value of the key CodeAttribute
 						CodeAttribute addedCode = (CodeAttribute) addedEntity.get(enumeratingCodeDefn, 0);
 						addedCode.setValue(new Code(code));
+						addedCode.updateSummaryInfo();
 					} else if (enumeratedEntity.getIndex() != i) {
 						parentEntity.move(enumerableEntityDefn, enumeratedEntity.getIndex(), i);
 					}
