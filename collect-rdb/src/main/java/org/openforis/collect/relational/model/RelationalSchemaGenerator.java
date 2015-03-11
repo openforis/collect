@@ -248,7 +248,7 @@ public class RelationalSchemaGenerator {
 	}
 
 	private String getTablePKColumnName(AbstractTable<?> table) {
-		String result = String.format(DATA_TABLE_PK_FORMAT, table.getName(), config.getIdColumnSuffix());
+		String result = String.format(DATA_TABLE_PK_FORMAT, config.getIdColumnPrefix(), table.getName(), config.getIdColumnSuffix());
 		return result;
 	}
 	
