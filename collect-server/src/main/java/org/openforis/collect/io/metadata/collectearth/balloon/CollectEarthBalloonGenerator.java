@@ -54,8 +54,8 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
  */
 public class CollectEarthBalloonGenerator {
 	
-	private static final Set<String> FIXED_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"id", "operator", "location", "plot_file", "actively_saved", "actively_saved_on")));
+	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+			"id", "operator", "location", "plot_file", "actively_saved", "actively_saved_on", "elevation", "slope", "aspect")));
 	
 	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt";
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
@@ -193,7 +193,7 @@ public class CollectEarthBalloonGenerator {
 				if (formComponent instanceof UIField) {
 					String nodeName = nodeDef.getName();
 					boolean includeInHTML = ! (
-							FIXED_ATTRIBUTE_NAMES.contains(nodeName) 
+							HIDDEN_ATTRIBUTE_NAMES.contains(nodeName) 
 							|| nodeNamesFromCSV.contains(nodeName) 
 							|| ((UIField) formComponent).isHidden()
 							);
