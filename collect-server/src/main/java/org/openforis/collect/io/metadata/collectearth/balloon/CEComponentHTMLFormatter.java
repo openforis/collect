@@ -225,7 +225,7 @@ public class CEComponentHTMLFormatter {
 				.e("div")
 					.a("id", itemsGroupId)
 					.a("class", "code-items")
-					.a("data-toggle", "buttons-radio")
+					.a("data-toggle", comp.isMultiple() ? "buttons": "buttons-radio")
 					.a("data-parent-code", parentCode);
 			List<CodeListItem> items = entry.getValue();
 			if (items == null || items.isEmpty()) {
