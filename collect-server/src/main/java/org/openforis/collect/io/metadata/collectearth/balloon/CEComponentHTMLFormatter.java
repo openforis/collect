@@ -21,9 +21,6 @@ import com.jamesmurty.utils.XMLBuilder;
  */
 public class CEComponentHTMLFormatter {
 
-	private static final String NOT_AVAILABLE_ITEM_LABEL = "N/A";
-	private static final String NOT_AVAILABLE_ITEM_CODE = "-1";
-
 	public String format(CETabSet tabSet) {
 		try {
 			XMLBuilder builder = createBuilder(tabSet, null);
@@ -186,11 +183,6 @@ public class CEComponentHTMLFormatter {
 		if (comp.getParentName() != null) {
 			selectBuilder.a("data-parent-code-field-id", comp.getParentName());
 		}
-		//add empty option
-		selectBuilder.e("option")
-			.a("value", NOT_AVAILABLE_ITEM_CODE)
-			.t(NOT_AVAILABLE_ITEM_LABEL);
-		
 		//add root items, if any
 		Map<String, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentCode();
 		List<CodeListItem> rootItems = itemsByParentCode.get("");
