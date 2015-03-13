@@ -241,9 +241,7 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	private static MathTransform findMathTransform(String wkt) throws Exception {
 		try {
 			CoordinateReferenceSystem crs = parseWKT(wkt);
-			// SYSTEMS.put(srsId, crs);
-			MathTransform mathTransform = CRS.findMathTransform(crs, WGS84);
-			// TO_WGS84_TRANSFORMS.put(srsId, mathTransform);
+			MathTransform mathTransform = CRS.findMathTransform(crs, WGS84,true);
 			return mathTransform;
 		} catch (Exception t) {
 			throw t;
