@@ -50,6 +50,8 @@ public class CEComponentHTMLFormatter {
 				createBuilder((CEField) component, true, bodyContentBuilder);
 			} else if (component instanceof CEEnumeratedEntityTable) {
 				createBuilder((CEEnumeratedEntityTable) component, bodyContentBuilder);
+			} else if (component instanceof CEFieldSet) {
+				createBuilder((CEFieldSet) component, bodyContentBuilder);
 			}
 		}
 		return bodyContentBuilder;
@@ -80,6 +82,19 @@ public class CEComponentHTMLFormatter {
 			}
 		}
 		return builder;
+	}
+	
+	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
+		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset");
+		fieldSetBuilder.e("legend").t(comp.getLabel());
+		for (CEComponent child : comp.getChildren()) {
+			if (child instanceof CEField) {
+				createBuilder((CEField) child, true, fieldSetBuilder);
+			} else {
+				throw new IllegalArgumentException("Only attribute fields supported inside single entity");
+			}
+		}
+		return fieldSetBuilder;
 	}
 	
 	private XMLBuilder createBuilder(CEField comp, boolean includeLabel, XMLBuilder parentBuilder) throws Exception {
@@ -140,11 +155,28 @@ public class CEComponentHTMLFormatter {
 					.a("class", "form-control numeric");
 				break;
 			case BOOLEAN:
-				formControlContainer.e("input")
+//				formControlContainer.e("input")
+//					.a("id", elId)
+//					.a("name", elId)
+//					.a("type", "checkbox")
+//					.a("class", "form-control numeric");
+				XMLBuilder container = formControlContainer.e("div").a("class", "boolean-group");
+				container.e("input")
 					.a("id", elId)
 					.a("name", elId)
-					.a("type", "checkbox")
-					.a("class", "form-control numeric");
+					.a("type", "hidden")
+					.a("class", "form-control")
+					.a("data-field-type", comp.getType().name());
+				container.e("button")
+					.a("type", "button")
+					.a("class", "btn btn-info")
+					.a("value", "true")
+					.t("Yes");
+				container.e("button")
+					.a("type", "button")
+					.a("class", "btn btn-info")
+					.a("value", "false")
+					.t("No");
 				break;
 			case COORDINATE:
 				break;

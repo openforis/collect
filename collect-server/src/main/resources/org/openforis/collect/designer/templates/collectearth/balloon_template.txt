@@ -6,7 +6,7 @@
 	<script src="earthFiles/jquery/jquery-ui.js"></script>
 	<script src="earthFiles/jquery/jquery.blockUI.js"></script>
 	<script src="earthFiles/jquery/jquery.selectBoxIt.min.js"></script>
-	<script src="earthFiles/jquery/jquery.steps.min.js"></script>
+	<script src="earthFiles/jquery/jquery.steps.openforis.js"></script>
 	<script src="earthFiles/bootstrap/bootstrap.min.js"></script>
 	<script src="earthFiles/bootstrap/moment.js"></script>
 	<script src="earthFiles/bootstrap/bootstrap-datetimepicker.min.js"></script>

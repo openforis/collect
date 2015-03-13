@@ -22,6 +22,7 @@ import org.openforis.collect.metamodel.ui.NodeDefinitionUIComponent;
 import org.openforis.collect.metamodel.ui.UIField;
 import org.openforis.collect.metamodel.ui.UIForm;
 import org.openforis.collect.metamodel.ui.UIFormComponent;
+import org.openforis.collect.metamodel.ui.UIFormSection;
 import org.openforis.collect.metamodel.ui.UIFormSet;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -201,9 +202,11 @@ public class CollectEarthBalloonGenerator {
 						CEComponent component = createComponent(nodeDef);
 						tab.addChild(component);
 					}
-				} else if (formComponent instanceof UITable) {
+				} else if (formComponent instanceof UITable || formComponent instanceof UIFormSection) {
 					CEComponent component = createComponent(nodeDef);
 					tab.addChild(component);
+				} else {
+					throw new IllegalArgumentException("Form component not supported: " + formComponent.getClass().getName());
 				}
 			}
 		}

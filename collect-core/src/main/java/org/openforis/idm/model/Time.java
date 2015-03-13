@@ -78,7 +78,7 @@ public final class Time implements Value {
 			GregorianCalendar cal = new GregorianCalendar();
 			cal.clear();
 			cal.setLenient(false);
-			boolean pm = hour > 12;
+			boolean pm = hour > 12 || (hour == 12 && minute > 0);
 			int calHour = pm ? hour - 12: hour;
 			cal.set(Calendar.AM_PM, pm ? Calendar.PM: Calendar.AM);
 			cal.set(Calendar.HOUR, calHour);
