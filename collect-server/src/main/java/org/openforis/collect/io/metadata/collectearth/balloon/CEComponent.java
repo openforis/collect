@@ -1,5 +1,7 @@
 package org.openforis.collect.io.metadata.collectearth.balloon;
 
+import org.apache.commons.lang3.StringUtils;
+
 
 /**
  * 
@@ -21,6 +23,10 @@ class CEComponent {
 		this.name = name;
 		this.label = label;
 		this.multiple = multiple;
+	}
+
+	public String getLabelOrName() {
+		return StringUtils.isBlank(label) ? name: label;
 	}
 
 	public String getHtmlParameterName() {

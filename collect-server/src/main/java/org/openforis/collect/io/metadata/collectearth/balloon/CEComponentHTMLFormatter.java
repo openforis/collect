@@ -59,7 +59,8 @@ public class CEComponentHTMLFormatter {
 	
 	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder builder =  parentBuilder.e("fieldset");
-		builder.e("legend").t(comp.getLabel());
+		String legend = comp.getLabelOrName();
+		builder.e("legend").t(legend);
 		XMLBuilder tableBuilder = builder.e("table").a("class", "table");
 		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr");
 		for (String heading : comp.getHeadings()) {
@@ -75,7 +76,7 @@ public class CEComponentHTMLFormatter {
 					cellBuilder
 						.e("label")
 							.a("class", "control-label col-sm-4")
-							.t(row.getLabel());
+							.t(row.getLabelOrName());
 				} else if (child instanceof CEField) {
 					createBuilder((CEField) child, false, cellBuilder);
 				}
@@ -86,7 +87,7 @@ public class CEComponentHTMLFormatter {
 	
 	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset");
-		fieldSetBuilder.e("legend").t(comp.getLabel());
+		fieldSetBuilder.e("legend").t(comp.getLabelOrName());
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
 				createBuilder((CEField) child, true, fieldSetBuilder);
@@ -109,7 +110,7 @@ public class CEComponentHTMLFormatter {
 			formGroupBuilder.e("label")
 				.a("for", elId)
 				.a("class", "control-label col-sm-4")
-				.t(comp.getLabel());
+				.t(comp.getLabelOrName());
 		}
 		//form control external container (for grid alignment)
 		XMLBuilder formControlContainer = formGroupBuilder.e("div")
@@ -220,9 +221,10 @@ public class CEComponentHTMLFormatter {
 		List<CodeListItem> rootItems = itemsByParentCode.get("");
 		if (rootItems != null) {
 			for (CodeListItem item : rootItems) {
+				String itemLabel = getItemLabel(item);
 				selectBuilder.e("option")
 					.a("value", item.getCode())
-					.t(item.getLabel());
+					.t(itemLabel);
 			}
 		}
 	}
@@ -264,12 +266,13 @@ public class CEComponentHTMLFormatter {
 				buttonsGroup.t(" "); //always use close tag
 			} else {
 				for (CodeListItem item : items) {
+					String itemLabel = getItemLabel(item);
 					XMLBuilder buttonItemBuilder = buttonsGroup
 						.e("button")
 							.a("type", "button")
 							.a("class", "btn btn-info code-item")
 							.a("value", item.getCode())
-							.t(item.getLabel());
+							.t(itemLabel);
 					if (StringUtils.isNotBlank(item.getDescription())) {
 						buttonItemBuilder.a("title", item.getDescription());
 					}
@@ -293,6 +296,14 @@ public class CEComponentHTMLFormatter {
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	private String getItemLabel(CodeListItem item) {
+		String itemLabel = item.getLabel();
+		if (StringUtils.isBlank(itemLabel)) {
+			itemLabel = item.getCode();
+		}
+		return itemLabel;
 	}
 
 }
