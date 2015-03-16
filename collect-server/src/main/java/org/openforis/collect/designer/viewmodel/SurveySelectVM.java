@@ -29,6 +29,7 @@ import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectRecord;
@@ -93,6 +94,8 @@ public class SurveySelectVM extends BaseVM {
 	private RecordManager recordManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
+	@WireVariable
+	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 	@WireVariable
 	private SpringJobManager springJobManager;
 
@@ -176,14 +179,16 @@ public class SurveySelectVM extends BaseVM {
 		Job job;
 		switch(parameters.getOutputFormatEnum()) {
 		case EARTH:
-			try {
-				File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
-				String contentType = URLConnection.guessContentTypeFromName(file.getName());
-				FileInputStream is = new FileInputStream(file);
-				Filedownload.save(is, contentType, survey.getName() + COLLECT_EARTH_PROJECT_FILE_EXTENSION);
-			} catch(Exception e) {
-				log.error(e);
-				MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
+			if (validateCollectEarthSurvey(survey)) {
+				try {
+					File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
+					String contentType = URLConnection.guessContentTypeFromName(file.getName());
+					FileInputStream is = new FileInputStream(file);
+					Filedownload.save(is, contentType, survey.getName() + COLLECT_EARTH_PROJECT_FILE_EXTENSION);
+				} catch(Exception e) {
+					log.error(e);
+					MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
+				}
 			}
 			return;
 		case RDB:
@@ -365,7 +370,17 @@ public class SurveySelectVM extends BaseVM {
 			return false;
 		}
 	}
-
+	
+	protected boolean validateCollectEarthSurvey(CollectSurvey survey) {
+		SurveyValidationResults validationResults = collectEarthSurveyValidator.validate(survey);
+		if (validationResults.isOk()) {
+			return true;
+		} else {
+			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(validationResults, ! validationResults.hasErrors());
+			return false;
+		}
+	}
+	
 	@GlobalCommand
 	public void confirmValidationResultsPopUp() {
 		if ( validationResultsPopUp != null ) {
