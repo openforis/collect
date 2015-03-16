@@ -161,7 +161,10 @@ public class CEComponentHTMLFormatter {
 //					.a("name", elId)
 //					.a("type", "checkbox")
 //					.a("class", "form-control numeric");
-				XMLBuilder container = formControlContainer.e("div").a("class", "boolean-group");
+				XMLBuilder container = formControlContainer
+					.e("div")
+					.a("class", "boolean-group")
+					.a("data-toggle", "buttons-radio");
 				container.e("input")
 					.a("id", elId)
 					.a("name", elId)
@@ -260,7 +263,8 @@ public class CEComponentHTMLFormatter {
 					.a("id", itemsGroupId)
 					.a("class", "code-items")
 					.a("data-toggle", comp.isMultiple() ? "buttons": "buttons-radio")
-					.a("data-parent-code", parentCode);
+					.a("data-parent-code", parentCode)
+					.a("style", "display: none;");
 			List<CodeListItem> items = entry.getValue();
 			if (items == null || items.isEmpty()) {
 				buttonsGroup.t(" "); //always use close tag

@@ -66,18 +66,21 @@ public class MondrianCubeGenerator {
 		
 		List<NodeDefinition> children = rootEntityDef.getChildDefinitions();
 		for (NodeDefinition nodeDef : children) {
+			String nodeName = nodeDef.getName();
 			if (nodeDef instanceof AttributeDefinition) {
 				Dimension dimension = generateDimension(nodeDef);
 				
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
+					measure.column = "_" + rootEntityDef.getName() + nodeName;
 					measure.caption = extractLabel(rootEntityDef) + " Count";
 					measure.aggregator = "distinct count";
 					measure.datatype = "Integer";
 					cube.measures.add(measure);
 				} else if (nodeDef instanceof NumberAttributeDefinition) {
 					for (String aggregator : MEASURE_AGGREGATORS) {
-						Measure measure = new Measure(nodeDef.getName() + "_" + aggregator);
+						Measure measure = new Measure(nodeName + "_" + aggregator);
+						measure.column = nodeName;
 						measure.caption = extractLabel(nodeDef) + " " + aggregator;
 						measure.aggregator = aggregator;
 						measure.datatype = "Integer";
@@ -88,7 +91,7 @@ public class MondrianCubeGenerator {
 			} else {
 				String rootEntityIdColumnName = rdbConfig.getIdColumnPrefix() + rootEntityDef.getName() + rdbConfig.getIdColumnSuffix();
 				
-				String entityName = nodeDef.getName();
+				String entityName = nodeName;
 				String entityLabel = extractLabel(nodeDef);
 				
 				for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
@@ -118,8 +121,70 @@ public class MondrianCubeGenerator {
 				}
 			}
 		}
-		
+		//add predefined dimensions
+		cube.dimensions.addAll(generatePredefinedDimensions());
 		return cube;
+	}
+
+	private List<Dimension> generatePredefinedDimensions() {
+		List<Dimension> dimensions = new ArrayList<Dimension>();
+		//Slope category
+		{
+			Dimension d = new Dimension("Slope category");
+			d.foreignKey = "slope_id";
+			d.highCardinality = "false";
+			Hierarchy h = new Hierarchy();
+			h.table = new Table("slope_category");
+			Level l = new Level("Slope_category");
+			l.table = "slope_category";
+			l.column = "slope_id";
+			l.nameColumn = "slope_caption";
+			l.type = "String";
+			l.levelType = "Regular";
+			l.uniqueMembers = "false";
+			h.levels.add(l);
+			d.hierarchy = h;
+			dimensions.add(d);
+		}
+		//Initial Land Use
+		{
+			Dimension d = new Dimension("Initial Land Use");
+			d.foreignKey = "dynamics_id";
+			d.highCardinality = "false";
+			Hierarchy h = new Hierarchy();
+			h.table = new Table("dynamics_category");
+			Level l = new Level("Initial_land_use");
+			l.table = "dynamics_category";
+			l.column = "dynamics_id";
+			l.nameColumn = "dynamics_caption";
+			l.type = "String";
+			l.levelType = "Regular";
+			l.uniqueMembers = "false";
+			l.hideMemberIf = "Never";
+			h.levels.add(l);
+			d.hierarchy = h;
+			dimensions.add(d);
+		}
+		//Initial Land Use
+		{
+			Dimension d = new Dimension("Elevation range");
+			d.foreignKey = "elevation_id";
+			d.highCardinality = "false";
+			Hierarchy h = new Hierarchy();
+			h.table = new Table("elevation_category");
+			Level l = new Level("Elevation_range");
+			l.table = "elevation_category";
+			l.column = "elevation_id";
+			l.nameColumn = "elevation_caption";
+			l.type = "String";
+			l.levelType = "Regular";
+			l.uniqueMembers = "false";
+			l.hideMemberIf = "Never";
+			h.levels.add(l);
+			d.hierarchy = h;
+			dimensions.add(d);
+		}
+		return dimensions;
 	}
 
 	private Dimension generateDimension(NodeDefinition nodeDef) {
@@ -251,6 +316,15 @@ public class MondrianCubeGenerator {
 		@XStreamAsAttribute
 		private String foreignKey;
 		
+		@XStreamAsAttribute
+		public String type = "StandardDimension";
+
+		@XStreamAsAttribute
+		public String visible = "true";
+
+		@XStreamAsAttribute
+		public String highCardinality;
+
 		@XStreamAlias("Hierarchy")
 		private Hierarchy hierarchy = new Hierarchy(null);
 		
@@ -278,8 +352,18 @@ public class MondrianCubeGenerator {
 		@XStreamAlias("Join")
 		private Join join;
 		
+		@XStreamAsAttribute
+		private String visible = "true";
+		
+		@XStreamAsAttribute
+		private String hasAll = "true";
+		
 		@XStreamImplicit
 		private List<Level> levels = new ArrayList<Level>();
+		
+		public Hierarchy() {
+			this(null);
+		}
 		
 		public Hierarchy(String name) {
 			super(name);
@@ -308,6 +392,9 @@ public class MondrianCubeGenerator {
 		@XStreamAsAttribute
 		private String type;
 		
+		@XStreamAsAttribute
+		public String hideMemberIf;
+
 		public Level(String name) {
 			super(name);
 		}
