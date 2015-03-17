@@ -72,7 +72,7 @@ public class MondrianCubeGenerator {
 				
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
-					measure.column = "_" + rootEntityDef.getName() + nodeName;
+					measure.column = "_" + rootEntityDef.getName() + "_" + nodeName;
 					measure.caption = extractLabel(rootEntityDef) + " Count";
 					measure.aggregator = "distinct count";
 					measure.datatype = "Integer";
