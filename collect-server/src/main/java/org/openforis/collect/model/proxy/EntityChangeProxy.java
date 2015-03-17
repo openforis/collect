@@ -9,6 +9,7 @@ import java.util.Set;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.model.EntityChange;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
 /**
@@ -53,7 +54,8 @@ public class EntityChangeProxy extends NodeChangeProxy<EntityChange> {
 		Set<Entry<String, V>> entries = from.entrySet();
 		for (Entry<String, V> entry : entries) {
 			String childName = entry.getKey();
-			Integer childDefId = entityDef.getChildDefinition(childName).getId();
+			NodeDefinition childDef = entityDef.getChildDefinition(childName);
+			Integer childDefId = childDef.getId();
 			map.put(childDefId, entry.getValue());
 		}
 		return map;
