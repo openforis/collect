@@ -262,9 +262,12 @@ public class CEComponentHTMLFormatter {
 				.e("div")
 					.a("id", itemsGroupId)
 					.a("class", "code-items")
-					.a("data-toggle", comp.isMultiple() ? "buttons": "buttons-radio")
+					.a("data-toggle", comp.isMultiple() ? "buttons": "buttons-radio");
+			if (StringUtils.isNotBlank(parentCode)) {
+				buttonsGroup
 					.a("data-parent-code", parentCode)
 					.a("style", "display: none;");
+			}
 			List<CodeListItem> items = entry.getValue();
 			if (items == null || items.isEmpty()) {
 				buttonsGroup.t(" "); //always use close tag
