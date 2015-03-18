@@ -30,12 +30,12 @@ public class SurveyObjectsGenerator {
 		
 		//ANGLE
 		addUnit(survey, "deg", Dimension.ANGLE, null,
-				Arrays.asList("Degrees"), 
+				Arrays.asList("degrees"), 
 				Arrays.asList("deg"),
 				labelLanguages);
 		//LENGTH
 		addUnit(survey, "m", Dimension.LENGTH, 1.0,
-				Arrays.asList("metres"), 
+				Arrays.asList("meters"), 
 				Arrays.asList("m"),
 				labelLanguages);
 		
