@@ -22,6 +22,7 @@ import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.GeodeticCalculator;
 import org.geotools.referencing.crs.AbstractSingleCRS;
+import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.SpatialReferenceSystem;
 import org.openforis.idm.model.Coordinate;
@@ -75,15 +76,15 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	 * @return
 	 * @throws TransformException
 	 */
-	public double orthodromicDistance(Position startingPosition, Position destinationPosition) {
+	public double orthodromicDistance(Position startingPosition, Position destinationPosition) throws CoordinateOperationException {
 		try {
 			GeodeticCalculator calculator = new GeodeticCalculator();
 			calculator.setStartingPosition(startingPosition);
 			calculator.setDestinationPosition(destinationPosition);
 			double result = calculator.getOrthodromicDistance();
 			return result;
-		} catch (TransformException e) {
-			throw new RuntimeException(e);
+		} catch (Exception e) {
+			throw new CoordinateOperationException("Failed to determine distance from " + startingPosition + " to " + destinationPosition, e);
 		}
 	}
 	
@@ -109,14 +110,14 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	}
 	
 	@Override
-	public double orthodromicDistance(double startX, double startY, String startSRSId, double destX, double destY, String destSRSId) {
+	public double orthodromicDistance(double startX, double startY, String startSRSId, double destX, double destY, String destSRSId) throws CoordinateOperationException {
 		Position startingPosition = toWgs84(startX, startY, startSRSId);
 		Position destinationPosition = toWgs84(destX, destY, destSRSId);
 		return orthodromicDistance(startingPosition, destinationPosition);
 	}
 
 	@Override
-	public double orthodromicDistance(Coordinate startingCoordinate, Coordinate destinationCoordinate) {
+	public double orthodromicDistance(Coordinate startingCoordinate, Coordinate destinationCoordinate) throws CoordinateOperationException {
 		double startX = startingCoordinate.getX();
 		double startY = startingCoordinate.getY();
 		String startSRSId = startingCoordinate.getSrsId();
@@ -209,6 +210,8 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 				transform = findMathTransform(wkt);
 				TO_WGS84_TRANSFORMS.put(srsId, transform);
 			} catch (Exception e) {
+				//TODO throw exception
+				//throw new CoordinateOperationException(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
 				if (LOG.isErrorEnabled()) {
 					LOG.error(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
 				}
