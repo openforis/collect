@@ -61,6 +61,11 @@ public class CollectEarthBalloonGenerator {
 	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt";
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
 
+	private static final String OF_JS_VERSION_PLACEHOLDER = "OF_JS_VERSION";
+	private static final String COLLECT_EARTH_JS_VERSION_PLACEHOLDER = "COLLECT_EARTH_JS_VERSION";
+	private static final String OF_JS_VERSION = "1.0.0";
+	private static final String COLLECT_EARTH_JS_VERSION = "1.0.0";
+
 	private CollectSurvey survey;
 	private Map<String, CEComponent> componentByName;
 	
@@ -76,8 +81,15 @@ public class CollectEarthBalloonGenerator {
 
 	public String generateHTML() throws IOException {
 		String htmlTemplate = getHTMLTemplate();
-		String result = fillWithExtraCSVFields(htmlTemplate);
+		String result = fillVersionNumbers(htmlTemplate);
+		result = fillWithExtraCSVFields(result);
 		result = fillWithSurveyDefinitionFields(result);
+		return result;
+	}
+
+	private String fillVersionNumbers(String htmlTemplate) {
+		String result = htmlTemplate.replaceAll(OF_JS_VERSION_PLACEHOLDER, OF_JS_VERSION);
+		result = result.replaceAll(COLLECT_EARTH_JS_VERSION_PLACEHOLDER, COLLECT_EARTH_JS_VERSION);
 		return result;
 	}
 

@@ -2,23 +2,7 @@
 <html>
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="earthFiles/jquery/jquery.js"></script>
-	<script src="earthFiles/jquery/jquery-ui.js"></script>
-	<script src="earthFiles/jquery/jquery.blockUI.js"></script>
-	<script src="earthFiles/jquery/jquery.selectBoxIt.min.js"></script>
-	<script src="earthFiles/jquery/jquery.steps.openforis.js"></script>
-	<script src="earthFiles/bootstrap/bootstrap.min.js"></script>
-	<script src="earthFiles/bootstrap/moment.js"></script>
-	<script src="earthFiles/bootstrap/bootstrap-datetimepicker.min.js"></script>
 
-	<script src="earthFiles/openforis/of.js"></script>
-	<script src="earthFiles/openforis/of-arrays.js"></script>
-	<script src="earthFiles/openforis/of-ui.js"></script>
-	<script src="earthFiles/openforis/of-ui-forms.js"></script>
-	<script src="earthFiles/openforis/of-ui-forms-validation.js"></script>
-	
-	<script src="earthFiles/js/earth.js"></script>
-	
 	<script type="text/javascript">
 	/**
 	 * 
@@ -69,10 +53,27 @@
  	* STATIC CONSTANTS 
  	* DO NOT REMOVE THIS LINE
  	*/
+	var DEBUG = false; // if set to true, log messages will appear in a box in the bottom part of the balloon
  	var NEXT_ID = "$[next_id]";
  	var HOST = "$[host]";
-	 
 	</script>
+	
+	<script src="earthFiles/jquery/jquery.js"></script>
+	<script src="earthFiles/jquery/jquery-ui.js"></script>
+	<script src="earthFiles/jquery/jquery.blockUI.js"></script>
+	<script src="earthFiles/jquery/jquery.selectBoxIt.min.js"></script>
+	<script src="earthFiles/jquery/jquery.steps.openforis.js"></script>
+	<script src="earthFiles/bootstrap/bootstrap.min.js"></script>
+	<script src="earthFiles/bootstrap/moment.js"></script>
+	<script src="earthFiles/bootstrap/bootstrap-datetimepicker.min.js"></script>
+
+	<script src="earthFiles/openforis/of.js?v=OF_JS_VERSION"></script>
+	<script src="earthFiles/openforis/of-arrays.js?v=OF_JS_VERSION"></script>
+	<script src="earthFiles/openforis/of-ui.js?v=OF_JS_VERSION"></script>
+	<script src="earthFiles/openforis/of-ui-forms.js?v=OF_JS_VERSION"></script>
+	<script src="earthFiles/openforis/of-ui-forms-validation.js?v=OF_JS_VERSION"></script>
+	
+	<script src="earthFiles/js/earth.js?v=COLLECT_EARTH_JS_VERSION"></script>
 	
 	<link href="earthFiles/jquery/jquery-ui.css" rel="stylesheet" />
 	<link href="earthFiles/jquery/jquery.selectBoxIt.css" rel="stylesheet" />
@@ -80,7 +81,7 @@
 	<link href="earthFiles/bootstrap/bootstrap.css" rel="stylesheet" />
 	<link href="earthFiles/bootstrap/bootstrap-datetimepicker.min.css" rel="stylesheet"  />
 	
-	<link href="earthFiles/css/earth.css" rel="stylesheet" />
+	<link href="earthFiles/css/earth.css?v=COLLECT_EARTH_JS_VERSION" rel="stylesheet" />
 	
 </head>
 
