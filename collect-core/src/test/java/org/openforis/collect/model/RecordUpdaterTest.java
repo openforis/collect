@@ -551,6 +551,32 @@ public class RecordUpdaterTest {
 	}
 	
 	@Test
+	public void testCardinalityRevalidatedWhenBecomesRelevant() {
+		record(
+			rootEntityDef(
+				attributeDef("source"),
+				attributeDef("dependent")
+					.multiple()
+					.relevant("source = '1'")
+					.minCount("1")
+			),
+			attribute("source", "2"),
+			attribute("dependent", null)
+		);
+		Entity rootEntity = record.getRootEntity();
+		assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult("dependent"));
+
+		Attribute<?, ?> source = record.findNodeByPath("/root/source");
+
+		NodeChangeSet nodeChangeSet = update(source, "1");
+		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(rootEntity);
+		assertNotNull(rootEntityChange);
+		ValidationResultFlag dependentValidationResult = rootEntityChange.getChildrenMinCountValidation().get("dependent");
+		assertEquals(ValidationResultFlag.ERROR, dependentValidationResult);
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("dependent"));
+	}
+	
+	@Test
 	public void testCardinalityRevalidatedOnDelete() {
 		record(
 			rootEntityDef(

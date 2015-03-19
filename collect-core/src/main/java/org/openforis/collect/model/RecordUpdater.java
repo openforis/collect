@@ -304,12 +304,18 @@ public class RecordUpdater {
 		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
 
 		// validate cardinality
-		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(updatedMinCountPointers.size() + updatedMaxCountPointers.size());
+		Set<NodePointer> ancestorsAndSelfPointers = getAncestorsAndSelfPointers(attribute);
+		Set<NodePointer> pointersToValidateCardinalityFor = new HashSet<NodePointer>(
+				updatedMinCountPointers.size() + 
+				updatedMaxCountPointers.size() + 
+				updatedRelevancePointers.size() + 
+				ancestorsAndSelfPointers.size());
 		pointersToValidateCardinalityFor.addAll(updatedMinCountPointers);
 		pointersToValidateCardinalityFor.addAll(updatedMaxCountPointers);
+		pointersToValidateCardinalityFor.addAll(updatedRelevancePointers);
 		
 		// validate cardinality on ancestor node pointers because we are considering empty nodes as missing nodes
-		pointersToValidateCardinalityFor.addAll(getAncestorsAndSelfPointers(attribute));
+		pointersToValidateCardinalityFor.addAll(ancestorsAndSelfPointers);
 		validateCardinality(record, pointersToValidateCardinalityFor, changeMap);
 		
 		// validate attributes
