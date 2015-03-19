@@ -6,10 +6,12 @@ package org.openforis.collect.io.data.csv;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Code;
@@ -37,11 +39,17 @@ public class CodeColumnProvider extends CompositeAttributeColumnProvider<CodeAtt
 	protected void init() {
 		if (getConfig().isCodeAttributeExpanded()) {
 			CodeList list = attributeDefinition.getList();
-			int levelPosition = attributeDefinition.getLevelPosition();
-			CodeListService codeListService = getCodeListService();
-			List<CodeListItem> items = codeListService.loadItems(list, levelPosition);
-			hasExpandedItems = items.size() <= getConfig().getMaxExpandedCodeAttributeItems();
-			expandedItems = hasExpandedItems ? items: null;
+			CollectSurvey survey = (CollectSurvey) list.getSurvey();
+			if (survey.isPredefinedCodeList(list)) {
+				hasExpandedItems = false;
+				expandedItems = null;
+			} else {
+				int levelPosition = attributeDefinition.getLevelPosition();
+				CodeListService codeListService = getCodeListService();
+				List<CodeListItem> items = codeListService.loadItems(list, levelPosition);
+				hasExpandedItems = items.size() <= getConfig().getMaxExpandedCodeAttributeItems();
+				expandedItems = hasExpandedItems ? items: null;
+			}
 		}
 		super.init();
 	}
