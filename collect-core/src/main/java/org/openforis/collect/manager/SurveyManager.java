@@ -75,7 +75,7 @@ public class SurveyManager {
 	@Autowired
 	private ApplicationContext applicationContext;
 	@Autowired
-	protected CollectSurveyIdmlBinder surveySerializer;
+	private CollectSurveyIdmlBinder surveySerializer;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
@@ -876,6 +876,14 @@ public class SurveyManager {
 	
 	public void setSurveyValidator(SurveyValidator validator) {
 		this.surveyValidator = validator;
+	}
+
+	public CollectSurveyIdmlBinder getSurveySerializer() {
+		return surveySerializer;
+	}
+	
+	public void setSurveySerializer(CollectSurveyIdmlBinder surveySerializer) {
+		this.surveySerializer = surveySerializer;
 	}
 	
 }
