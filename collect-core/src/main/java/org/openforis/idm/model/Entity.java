@@ -464,6 +464,22 @@ public class Entity extends Node<EntityDefinition> {
 		return Collections.unmodifiableList(result);
 	}
 	
+	/**
+	 * Returns a list of children with the same sorting as the children node definitions
+	 * @return List of children
+	 */
+	public List<Node<? extends NodeDefinition>> getSortedChildren() {
+		List<Node<?>> result = new ArrayList<Node<?>>();
+		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
+		for (NodeDefinition defn : definitions) {
+			List<Node<?>> tempChildren = childrenByDefinitionId.get(defn.getId());
+			if (tempChildren != null) {
+				result.addAll(tempChildren);
+			}
+		}
+		return Collections.unmodifiableList(result);
+	}
+	
 	public List<Node<? extends NodeDefinition>> getChildren(NodeDefinition childDef) {
 		List<Node<?>> children = childrenByDefinitionId.get(childDef.getId());
 		return CollectionUtils.unmodifiableList(children);
