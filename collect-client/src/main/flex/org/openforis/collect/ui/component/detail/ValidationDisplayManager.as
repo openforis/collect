@@ -123,7 +123,7 @@ package org.openforis.collect.ui.component.detail
 			var validationMessages:IList = null;
 			var minCountValid:ValidationResultFlag = parentEntity.getMinCountValidation(defn);
 			var maxCountValid:ValidationResultFlag = parentEntity.getMaxCountValidation(defn);
-			if(minCountValid != ValidationResultFlag.OK) {
+			if(minCountValid.name != ValidationResultFlag.OK.name) {
 				var minCount:int = parentEntity.getMinCount(defn);
 				if ( minCount == 1 ) {
 					validationMessages = new ArrayCollection([Message.get("edit.validation.requiredField")]);
@@ -131,7 +131,7 @@ package org.openforis.collect.ui.component.detail
 					validationMessages = new ArrayCollection([Message.get("edit.validation.minCount", [minCount])]);
 				}
 				apply(minCountValid, validationMessages);
-			} else if(maxCountValid != ValidationResultFlag.OK) {
+			} else if(maxCountValid.name != ValidationResultFlag.OK.name) {
 				var maxCount:int = parentEntity.getMaxCount(defn);
 				validationMessages = new ArrayCollection([Message.get("edit.validation.maxCount", [maxCount > 0 ? maxCount: 1])]);
 				apply(maxCountValid, validationMessages);
@@ -143,12 +143,12 @@ package org.openforis.collect.ui.component.detail
 		protected function apply(flag:ValidationResultFlag, messages:IList, confirmedError:Boolean = false):void {
 			if(_active) {
 				var newStyleName:String;
-				switch(flag) {
-					case ValidationResultFlag.ERROR:
+				switch(flag.name) {
+					case ValidationResultFlag.ERROR.name:
 						_toolTipStyleName = ToolTipUtil.STYLE_NAME_ERROR;
 						newStyleName = STYLE_NAME_ERROR;
 						break;
-					case ValidationResultFlag.WARNING:
+					case ValidationResultFlag.WARNING.name:
 						if ( confirmedError ) {
 							_toolTipStyleName = ToolTipUtil.STYLE_NAME_WARNING_CONFIRMED_ERROR;
 						} else {
