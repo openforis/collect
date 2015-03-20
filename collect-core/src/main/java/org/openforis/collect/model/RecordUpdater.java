@@ -712,13 +712,14 @@ public class RecordUpdater {
 	}
 	
 	public void initializeRecord(Record record, boolean validate) {
-		//TODO improve it
-		if (validate) {
-			initializeEntity(record.getRootEntity());
-		}
+		initializeEntity(record.getRootEntity(), validate);
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity) {
+		return initializeEntity(entity, true);
+	}
+	
+	protected NodeChangeMap initializeEntity(Entity entity, boolean validate) {
 		Record record = entity.getRecord();
 		
 		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
@@ -736,49 +737,51 @@ public class RecordUpdater {
 		
 		applyInitialValues(entity);
 		
-		//min/max count
-		
-		//for root entity there is no node pointer so we iterate over its descendants
-		Collection<NodePointer> minCountDependentNodes = record.determineMinCountDependentNodes(entityDescendantPointers);
-		Set<NodePointer> updatedMinCountPointers = updateMinCount(minCountDependentNodes);
-		changeMap.addMinCountChanges(updatedMinCountPointers);
-		
-		Collection<NodePointer> maxCountDependentNodes = record.determineMaxCountDependentNodes(entityDescendantPointers);
-		Set<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountDependentNodes);
-		changeMap.addMaxCountChanges(updatedMaxCountPointers);
-		
-		Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
-		updatedCardinalityPointers.addAll(updatedMaxCountPointers);
-
-		//recalculate attributes
-		List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
-		changeMap.addValueChanges(calculatedAttributes);
-		
-		//relevance
-		List<NodePointer> childNodePointers = getChildNodePointers(entity);
-		List<NodePointer> relevanceDependentPointers = record.determineRelevanceDependentNodes(calculatedAttributes);
-		
-		Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>(childNodePointers);
-		pointersToRecalculateRelevanceFor.addAll(relevanceDependentPointers);
-		
-		Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
-		changeMap.addRelevanceChanges(updatedRelevancePointers);
-		
-		//cardinality
-		
-		Set<NodePointer> nodePointersToCheckCardinalityFor = new HashSet<NodePointer>(entityDescendantPointers);
-		if ( entity.getParent() != null ) {
-			nodePointersToCheckCardinalityFor.add(new NodePointer(entity));
+		if (validate) {
+			//min/max count
+			
+			//for root entity there is no node pointer so we iterate over its descendants
+			Collection<NodePointer> minCountDependentNodes = record.determineMinCountDependentNodes(entityDescendantPointers);
+			Set<NodePointer> updatedMinCountPointers = updateMinCount(minCountDependentNodes);
+			changeMap.addMinCountChanges(updatedMinCountPointers);
+			
+			Collection<NodePointer> maxCountDependentNodes = record.determineMaxCountDependentNodes(entityDescendantPointers);
+			Set<NodePointer> updatedMaxCountPointers = updateMaxCount(maxCountDependentNodes);
+			changeMap.addMaxCountChanges(updatedMaxCountPointers);
+			
+			Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
+			updatedCardinalityPointers.addAll(updatedMaxCountPointers);
+	
+			//recalculate attributes
+			List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
+			changeMap.addValueChanges(calculatedAttributes);
+			
+			//relevance
+			List<NodePointer> childNodePointers = getChildNodePointers(entity);
+			List<NodePointer> relevanceDependentPointers = record.determineRelevanceDependentNodes(calculatedAttributes);
+			
+			Set<NodePointer> pointersToRecalculateRelevanceFor = new HashSet<NodePointer>(childNodePointers);
+			pointersToRecalculateRelevanceFor.addAll(relevanceDependentPointers);
+			
+			Set<NodePointer> updatedRelevancePointers = new RelevanceUpdater(new ArrayList<NodePointer>(pointersToRecalculateRelevanceFor)).update();
+			changeMap.addRelevanceChanges(updatedRelevancePointers);
+			
+			//cardinality
+			
+			Set<NodePointer> nodePointersToCheckCardinalityFor = new HashSet<NodePointer>(entityDescendantPointers);
+			if ( entity.getParent() != null ) {
+				nodePointersToCheckCardinalityFor.add(new NodePointer(entity));
+			}
+			validateCardinality(record, nodePointersToCheckCardinalityFor, changeMap);
+			
+			//validate attributes
+			Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>();
+			nodesToCheckValidationFor.add(entity);
+			nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
+			
+			Set<Attribute<?, ?>> attributesToValidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
+			validateAttributes(record, attributesToValidate, changeMap);
 		}
-		validateCardinality(record, nodePointersToCheckCardinalityFor, changeMap);
-		
-		//validate attributes
-		Set<Node<?>> nodesToCheckValidationFor = new HashSet<Node<?>>();
-		nodesToCheckValidationFor.add(entity);
-		nodesToCheckValidationFor.addAll(pointersToNodes(updatedCardinalityPointers));
-		
-		Set<Attribute<?, ?>> attributesToValidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
-		validateAttributes(record, attributesToValidate, changeMap);
 		return changeMap;
 	}
 
