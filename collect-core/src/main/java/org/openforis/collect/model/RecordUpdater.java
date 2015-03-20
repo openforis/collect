@@ -737,6 +737,11 @@ public class RecordUpdater {
 		
 		applyInitialValues(entity);
 		
+		//recalculate attributes
+		//TODO exclude this when exporting for backup (not for Calc)
+		List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
+		changeMap.addValueChanges(calculatedAttributes);
+		
 		if (validate) {
 			//min/max count
 			
@@ -752,10 +757,6 @@ public class RecordUpdater {
 			Set<NodePointer> updatedCardinalityPointers = new HashSet<NodePointer>(updatedMinCountPointers);
 			updatedCardinalityPointers.addAll(updatedMaxCountPointers);
 	
-			//recalculate attributes
-			List<Attribute<?, ?>> calculatedAttributes = recalculateDependentCalculatedAttributes(entity);
-			changeMap.addValueChanges(calculatedAttributes);
-			
 			//relevance
 			List<NodePointer> childNodePointers = getChildNodePointers(entity);
 			List<NodePointer> relevanceDependentPointers = record.determineRelevanceDependentNodes(calculatedAttributes);
