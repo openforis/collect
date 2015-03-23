@@ -136,6 +136,20 @@ public class RecordUpdaterTest {
 	}
 
 	@Test
+	public void testMinCountValidationInitializedOnNestedEntity() {
+		record(
+			rootEntityDef(
+				entityDef("time_study",
+						attributeDef("start_time")
+							.required()
+				).minCount("1")
+			)
+		);
+		Entity timeStudy = entityByPath("/root/time_study");
+		assertEquals(ValidationResultFlag.ERROR, timeStudy.getMinCountValidationResult("start_time"));
+	}
+
+	@Test
 	public void testCardinalityValidatedOnAttributeUpdate() {
 		record(
 			rootEntityDef(

@@ -744,6 +744,7 @@ public class RecordUpdater {
 		
 		if (validate) {
 			//min/max count
+			entityDescendantPointers = getDescendantNodePointers(entity);
 			
 			//for root entity there is no node pointer so we iterate over its descendants
 			Collection<NodePointer> minCountDependentNodes = record.determineMinCountDependentNodes(entityDescendantPointers);
