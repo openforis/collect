@@ -83,9 +83,11 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function clearActiveRecord(responder:IResponder):void {
+		public function clearActiveRecord(responder:IResponder = null):void {
 			var token:AsyncToken = this._clearActiveRecordOperation.send();
-			token.addResponder(responder);
+			if (responder != null) {
+				token.addResponder(responder);
+			}
 		}
 		
 		public function updateActiveRecord(requestSet:NodeUpdateRequestSetProxy, resultHandler:Function = null, faultHandler:Function = null):void {

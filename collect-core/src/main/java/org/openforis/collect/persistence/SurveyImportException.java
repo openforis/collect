@@ -3,7 +3,7 @@ package org.openforis.collect.persistence;
 /**
  * @author G. Miceli
  */
-public class SurveyImportException extends Exception {
+public class SurveyImportException extends SurveyStoreException {
 
 	private static final long serialVersionUID = 1L;
 

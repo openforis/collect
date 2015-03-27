@@ -37,7 +37,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.relational.data.RecordIterator;
 import org.openforis.collect.relational.print.RDBPrintJob;
 import org.openforis.collect.utils.Dates;
@@ -407,19 +407,23 @@ public class SurveySelectVM extends BaseVM {
 			MessageUtil.showInfo("survey.successfully_published", args);
 			User user = getLoggedUser();
 			surveyManager.validateRecords(survey.getId(), user);
-		} catch (SurveyImportException e) {
+		} catch (SurveyStoreException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private void performSelectedSurveyUnpublishing() {
-		Integer publishedSurveyId = selectedSurvey.isWork() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
-		CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
-		loadSurveySummaries();
-		selectedSurvey = null;
-		notifyChange("selectedSurvey", "surveySummaries");
-		Object[] args = new String[] { temporarySurvey.getName() };
-		MessageUtil.showInfo("survey.successfully_unpublished", args);
+		try {
+			Integer publishedSurveyId = selectedSurvey.isWork() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
+			CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
+			loadSurveySummaries();
+			selectedSurvey = null;
+			notifyChange("selectedSurvey", "surveySummaries");
+			Object[] args = new String[] { temporarySurvey.getName() };
+			MessageUtil.showInfo("survey.successfully_unpublished", args);
+		} catch (SurveyStoreException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Command
