@@ -9,6 +9,7 @@ package org.openforis.collect.presenter {
 	import mx.rpc.events.FaultEvent;
 	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.util.AlertUtil;
@@ -75,6 +76,9 @@ package org.openforis.collect.presenter {
 					"Client.Error.MessageSend"
 					"Client.Error.DeliveryInDoubt"
 				default:
+					ClientFactory.sessionClient.cancelLastKeepAliveOperation();
+					ClientFactory.dataClient.clearActiveRecord();
+
 					AlertUtil.showBlockingMessage("global.faultHandlerMsg", event.fault);
 			}
 		}
