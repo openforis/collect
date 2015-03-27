@@ -161,7 +161,6 @@ package org.openforis.collect.ui.component.input {
 			var attribute:AttributeProxy = inputField.attribute;
 			var parentEntity:EntityProxy = inputField.parentEntity;
 			var parentEntityDefn:EntityDefinitionProxy = attrDefn.parent;
-			
 			var nodeEvent:NodeEvent = null; 
 			switch(event.target) {
 				case SET_STAR:
