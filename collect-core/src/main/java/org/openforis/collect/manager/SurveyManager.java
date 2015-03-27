@@ -33,6 +33,7 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.persistence.SurveyWorkDao;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.ExecutorServiceUtil;
@@ -650,27 +651,6 @@ public class SurveyManager {
 		return generateSurveyUri(UUID.randomUUID().toString());
 	}
 
-	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri) {
-		return duplicatePublishedSurveyAsWork(uri, true);
-	}
-
-	protected CollectSurvey duplicatePublishedSurveyAsWork(String uri,
-			boolean temporarySurveyPublishedState) {
-		CollectSurvey survey = surveyDao.loadByUri(uri);
-//		CollectSurvey surveyWork = survey.clone();
-		CollectSurvey surveyWork = survey;
-		surveyWork.setId(null);
-		surveyWork.setPublished(temporarySurveyPublishedState);
-		surveyWork.setWork(true);
-		try {
-			surveyWorkDao.insert(surveyWork);
-		} catch (SurveyImportException e) {
-			//it should never enter here, we are duplicating an already existing survey
-			throw new RuntimeException(e);
-		}
-		return surveyWork;
-	}
-	
 	@Transactional
 	public void saveSurveyWork(CollectSurvey survey) throws SurveyImportException {
 		Integer id = survey.getId();
@@ -683,22 +663,38 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey duplicatePublishedSurveyForEdit(String uri) {
-		SurveySummary existingSurveyWork = surveyWorkDao.loadSurveySummaryByUri(uri);
-		if ( existingSurveyWork != null ) {
-			throw new IllegalArgumentException("Survey work already existing");
+		return duplicatePublishedSurveyForEdit(uri, true);
+	}
+	
+	@Transactional
+	public CollectSurvey duplicatePublishedSurveyForEdit(String uri, boolean markCopyAsPublished) {
+		try {
+			SurveySummary existingSurveyWork = surveyWorkDao.loadSurveySummaryByUri(uri);
+			if ( existingSurveyWork != null ) {
+				throw new IllegalArgumentException("Survey work with uri " + uri + " already existing");
+			}
+			CollectSurvey survey = surveyDao.loadByUri(uri);
+			CollectSurvey surveyWork = survey;
+			surveyWork.setId(null);
+			surveyWork.setPublished(markCopyAsPublished);
+			surveyWork.setWork(true);
+			if ( surveyWork.getSamplingDesignCodeList() == null ) {
+				surveyWork.addSamplingDesignCodeList();
+			}
+			surveyWorkDao.insert(surveyWork);
+			
+			CollectSurvey publishedSurvey = getByUri(uri);
+			int surveyWorkId = surveyWork.getId();
+			int publishedSurveyId = publishedSurvey.getId();
+			samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
+			speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
+			codeListManager.cloneCodeLists(publishedSurvey, surveyWork);
+			
+			return surveyWork;
+		} catch (SurveyImportException e) {
+			//it should never enter here, we are duplicating an already existing survey
+			throw new RuntimeException(e);
 		}
-		CollectSurvey surveyWork = duplicatePublishedSurveyAsWork(uri);
-		CollectSurvey publishedSurvey = getByUri(uri);
-		int surveyWorkId = surveyWork.getId();
-		int publishedSurveyId = publishedSurvey.getId();
-		samplingDesignManager.duplicateSamplingDesignForWork(publishedSurveyId, surveyWorkId);
-		speciesManager.duplicateTaxonomyForWork(publishedSurveyId, surveyWorkId);
-		codeListManager.cloneCodeLists(publishedSurvey, surveyWork);
-		
-		if ( surveyWork.getSamplingDesignCodeList() == null ) {
-			surveyWork.addSamplingDesignCodeList();
-		}
-		return surveyWork;
 	}
 	
 	@Transactional
@@ -728,20 +724,24 @@ public class SurveyManager {
 	}
 	
 	/**
-	 * Removes the temporary survey associated to the published one (if any) and
-	 * duplicates the published survey into a temporary one, then removes the pusblished one.
+	 * If no temporary survey is associated to the published one with the specified id, 
+	 * it duplicates the published survey into a temporary one, then removes the published one.
 	 */
 	@Transactional
-	public CollectSurvey unpublish(int surveyId) {
+	public CollectSurvey unpublish(int surveyId) throws SurveyStoreException {
 		CollectSurvey oldPublishedSurvey = getById(surveyId);
 		String uri = oldPublishedSurvey.getUri();
 		
 		SurveySummary existingSurveyWork = surveyWorkDao.loadSurveySummaryByUri(uri);
-		if (existingSurveyWork != null) {
-			surveyWorkDao.delete(existingSurveyWork.getId());
+		CollectSurvey surveyWork;
+		if (existingSurveyWork == null) {
+			surveyWork = duplicatePublishedSurveyForEdit(uri, false);
+		} else {
+			surveyWork = loadSurveyWork(existingSurveyWork.getId());
+			surveyWork.setPublished(false);
+			saveSurveyWork(surveyWork);
 		}
-		CollectSurvey surveyWork = duplicatePublishedSurveyAsWork(uri, false);
-		
+		//delete published survey
 		deleteSurvey(surveyId);
 		
 		return surveyWork;
