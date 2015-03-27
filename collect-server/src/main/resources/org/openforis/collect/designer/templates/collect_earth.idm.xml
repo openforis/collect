@@ -11,14 +11,17 @@
 	lastId="1000">
 	<project>Open Foris Collect Earth</project>
 	<uri>http://www.openforis.org/idm/collectEarth</uri>
-	<cycle>2013-2014</cycle>
 	<description></description>
 	<language>en</language>
+	<language>es</language>
+	<language>fr</language>
 	<applicationOptions>
 		<options type="ui">
 			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="plot_tab_set">
 				<tab name="plot_tab">
-					<label>Plot</label>
+					<label xml:lang="en">Plot</label>
+					<label xml:lang="es">Parcela</label>
+					<label xml:lang="fr">Parcelle</label>
 				</tab>
 			</tabSet>
 		</options>
@@ -45,8 +48,12 @@
 	<schema>
 		<entity id="1" name="plot" ui:tabSet="plot_tab_set" ui:tab="plot_tab">
 			<label xml:lang="en">Plot</label>
+			<label xml:lang="es">Parcela</label>
+			<label xml:lang="fr">Parcelle</label>
 			<text id="2" name="id" required="true" key="true">
 				<label xml:lang="en">Id</label>
+				<label xml:lang="es">Id</label>
+				<label xml:lang="fr">Id</label>
 			</text>
 			<coordinate id="3" name="location">
 				<label xml:lang="en">Location</label>
@@ -65,7 +72,7 @@
 			</number>
 			<number id="6" name="aspect"  type="real" collectearth:fromcsv="true">
 				<label xml:lang="en">Aspect</label>
-				<label xml:lang="es">Aspecto</label>
+				<label xml:lang="es">Exposicion</label>
 				<label xml:lang="fr">Aspect</label>
 			</number>
 			<number id="7" name="slope" type="real" collectearth:fromcsv="true">
