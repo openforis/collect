@@ -145,12 +145,13 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 				value = "${placemark." + attrName + "}";
 			} else {
 				value = "${placemark.extraInfo[" + extraInfoIndex + "]}";
+				extraInfoIndex ++;
 			}
 			sb.append("<value>");
 			sb.append(value);
 			sb.append("</value>\n");
 		    sb.append("</Data>\n");
-		    extraInfoIndex ++;
+		    
 		}
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, sb.toString());
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");

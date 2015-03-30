@@ -97,26 +97,39 @@ public class MondrianCubeGenerator {
 				for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
 					String childLabel = entityLabel + " - " + extractLabel(childDef);
 					Dimension dimension = new Dimension(childLabel);
-					dimension.foreignKey = rootEntityIdColumnName;
-					
 					Hierarchy hierarchy = new Hierarchy(childLabel);
-					hierarchy.primaryKey = rootEntityIdColumnName;
-					hierarchy.primaryKeyTable = entityName;
 					
-					if (childDef instanceof CodeAttributeDefinition) {
-						Join join = new Join(null);
-						String codeListName = ((CodeAttributeDefinition) childDef).getList().getName();
-						join.leftKey = childDef.getName() + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
-						join.rightKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
-						join.tables = Arrays.asList(
-								new Table(entityName), 
-								new Table(codeListName + rdbConfig.getCodeListTableSuffix())
-						);
-						hierarchy.join = join;
+					if( childDef.isMultiple() ){
+						dimension.foreignKey = rootEntityIdColumnName;
+						hierarchy.primaryKey = rootEntityIdColumnName;
+						hierarchy.primaryKeyTable = entityName;
+						
+						if (childDef instanceof CodeAttributeDefinition) {
+							
+							Join join = new Join(null);
+							String codeListName = ((CodeAttributeDefinition) childDef).getList().getName();
+							join.leftKey = childDef.getName() + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+							join.rightKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+							
+							join.tables = Arrays.asList(
+									new Table(entityName), 
+									new Table(codeListName + rdbConfig.getCodeListTableSuffix())
+							);
+							
+							hierarchy.join = join;
+							
+						}						
+						
+						hierarchy.levels.add(generateLevel(childDef));
+						
+						dimension.hierarchy = hierarchy;
+						
+					}else{
+						dimension = generateDimension(childDef);
 					}
-					hierarchy.levels.add(generateLevel(childDef));
 					
-					dimension.hierarchy = hierarchy;
+
+				
 					cube.dimensions.add(dimension);
 				}
 			}
@@ -201,12 +214,15 @@ public class MondrianCubeGenerator {
 		}
 		
 		if (nodeDef instanceof DateAttributeDefinition) {
+			dimension.type = "";
 			hierarchy.type = "TimeDimension";
+			hierarchy.allMemberName = "attrLabel";
 			String[] levelNames = new String[] {"Year", "Month", "Day"};
 			for (String levelName : levelNames) {
 				Level level = new Level(attrLabel + " - " + levelName);
 				level.column = nodeDef.getName() + "_" + levelName.toLowerCase();
 				level.levelType = String.format("Time%ss", levelName);
+				level.type = "Numeric";
 				hierarchy.levels.add(level);
 			}
 		} else {
@@ -339,6 +355,9 @@ public class MondrianCubeGenerator {
 		
 		@XStreamAsAttribute
 		public String type;
+		
+		@XStreamAsAttribute
+		public String allMemberName;
 
 		@XStreamAsAttribute
 		private String primaryKey;

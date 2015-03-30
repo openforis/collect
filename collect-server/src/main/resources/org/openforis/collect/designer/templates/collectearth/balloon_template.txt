@@ -119,6 +119,7 @@
 				<input type="hidden" id="collect_boolean_actively_saved"
 					name="collect_boolean_actively_saved" value="false" />
 					
+				<!-- NOT NECESSARY // FILLED BY THE SCRIPT!
 				<input type="hidden" id="collect_integer_elevation"
 					name="collect_integer_elevation" value="$[elevation]" />
 
@@ -127,6 +128,7 @@
 
 				<input type="hidden" id="collect_integer_aspect"
 					name="collect_real_aspect" value="$[aspect]" />
+				-->
 
 <!-- DO NOT REMOVE THIS LINE - IT GENERATES THE EXTRA FIELDS FROM THE CSV-BALLOON INTEGRATION -->
 <!-- START OF EXTRA CSV DATA -->

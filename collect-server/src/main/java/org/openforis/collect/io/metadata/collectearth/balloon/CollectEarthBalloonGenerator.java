@@ -43,6 +43,7 @@ import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
+import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TimeAttributeDefinition;
@@ -362,7 +363,15 @@ public class CollectEarthBalloonGenerator {
 			}
 		} else if (def instanceof TimeAttributeDefinition) {
 			return CEFieldType.TIME;
-		} else {
+		} else if (def instanceof RangeAttributeDefinition) {
+			if(( (RangeAttributeDefinition ) def).getType().equals(org.openforis.idm.metamodel.NumericAttributeDefinition.Type.INTEGER) ){
+				return CEFieldType.CODE_RANGE;
+			}else{
+				// SLIDER NOT SUPPRTED YET!
+				throw new IllegalArgumentException("REAL TYPE RANGES NOT SUPPRTED YET!");
+			}
+			
+		}  else {
 			throw new IllegalArgumentException("Attribute type not supported: " + def.getClass().getName());
 		}
 	}

@@ -9,7 +9,7 @@ package org.openforis.collect.io.metadata.collectearth.balloon;
 class CEField extends CEComponent {
 	
 	public enum CEFieldType {
-		BOOLEAN, COORDINATE, CODE_SELECT, CODE_BUTTON_GROUP, DATE, INTEGER, REAL, SHORT_TEXT, LONG_TEXT, TIME
+		BOOLEAN, COORDINATE, CODE_SELECT, CODE_BUTTON_GROUP, DATE, INTEGER, REAL, SHORT_TEXT, LONG_TEXT, TIME, CODE_RANGE
 	}
 	
 	private CEFieldType type;
