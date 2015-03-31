@@ -16,7 +16,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
@@ -87,12 +86,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return outputFile;
 	}
 	
-	private void zipFileParametrized( ZipFile zipFile, File sourceFile, String fileNameInZip, ZipParameters zipParameters ) throws ZipException{
-		zipParameters.setSourceExternalStream(true);
-		zipParameters.setFileNameInZip(fileNameInZip);
-		zipFile.addFile(sourceFile, zipParameters);
-	}
-
 	private File createPlacemark(CollectSurvey survey) throws IOException {
 		File file = File.createTempFile("collect-earth-placemark.idm", ".xml");
 		FileOutputStream os = new FileOutputStream(file);
