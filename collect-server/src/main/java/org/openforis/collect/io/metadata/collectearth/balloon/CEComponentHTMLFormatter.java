@@ -226,13 +226,28 @@ public class CEComponentHTMLFormatter {
 		Map<String, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentCode();
 		List<CodeListItem> rootItems = itemsByParentCode.get("");
 		if (rootItems != null) {
-			selectBuilder.e("option").a("value", "").t("Nothing selected");
+			
+			boolean hasNAoption = false;
+			for (CodeListItem item : rootItems) {
+				if( 
+						item.getCode().equalsIgnoreCase("na") || 
+						item.getCode().equalsIgnoreCase("n/a")
+				){
+					hasNAoption=true;	
+				}
+			}
+			
+			if(!hasNAoption){
+				selectBuilder.e("option").a("value", "").t("Nothing selected");
+			}
+			
 			for (CodeListItem item : rootItems) {
 				String itemLabel = getItemLabel(item);
 				selectBuilder.e("option")
 					.a("value", item.getCode())
 					.t(itemLabel);
 			}
+			
 		}
 	}
 	

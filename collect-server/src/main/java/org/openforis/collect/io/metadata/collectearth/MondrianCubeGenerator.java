@@ -9,6 +9,8 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
@@ -99,7 +101,7 @@ public class MondrianCubeGenerator {
 					Dimension dimension = new Dimension(childLabel);
 					Hierarchy hierarchy = new Hierarchy(childLabel);
 					
-					if( childDef.isMultiple() ){
+					if( nodeDef.isMultiple() ){
 						dimension.foreignKey = rootEntityIdColumnName;
 						hierarchy.primaryKey = rootEntityIdColumnName;
 						hierarchy.primaryKeyTable = entityName;
@@ -178,7 +180,7 @@ public class MondrianCubeGenerator {
 			d.hierarchy = h;
 			dimensions.add(d);
 		}
-		//Initial Land Use
+		//Elevation Range
 		{
 			Dimension d = new Dimension("Elevation range");
 			d.foreignKey = "elevation_id";
@@ -208,8 +210,9 @@ public class MondrianCubeGenerator {
 		Hierarchy hierarchy = dimension.hierarchy;
 		
 		if (nodeDef instanceof CodeAttributeDefinition) {
-			String codeTableName = extractCodeListTableName((CodeAttributeDefinition) nodeDef);
-			dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDef;
+			String codeTableName = extractCodeListTableName(codeAttrDef);
+			dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();						
 			hierarchy.table = new Table(codeTableName);
 		}
 		
@@ -232,9 +235,20 @@ public class MondrianCubeGenerator {
 		return dimension;
 	}
 
-	private String extractCodeListTableName(CodeAttributeDefinition nodeDef) {
-		String codeListName = nodeDef.getList().getName();
-		return codeListName + rdbConfig.getCodeListTableSuffix();
+	private String extractCodeListTableName(CodeAttributeDefinition codeAttrDef) {
+		StringBuffer codeListName = new StringBuffer( codeAttrDef.getList().getName() );
+		
+		int levelIdx = codeAttrDef.getLevelIndex();
+		if ( levelIdx != -1 ) {
+			CodeList codeList = codeAttrDef.getList();
+			List<CodeListLevel> codeHierarchy = codeList.getHierarchy();
+			if( !codeHierarchy.isEmpty() ){
+				CodeListLevel currentLevel = codeHierarchy.get(levelIdx);
+				codeListName.append("_");
+				codeListName.append(currentLevel.getName());
+			}
+		}
+		return codeListName.append(rdbConfig.getCodeListTableSuffix()).toString();
 	}
 	
 	private Level generateLevel(NodeDefinition nodeDef) {
@@ -248,10 +262,11 @@ public class MondrianCubeGenerator {
 		}
 		level.levelType = "Regular";
 		if (nodeDef instanceof CodeAttributeDefinition) {
-			String codeTableName = extractCodeListTableName((CodeAttributeDefinition) nodeDef);
+			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
+			String codeTableName = extractCodeListTableName(codeDef);
 			level.table = codeTableName;
 			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
-			level.nameColumn = codeTableName + "_label_" + survey.getDefaultLanguage();
+			level.nameColumn = codeTableName.substring(0, codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + survey.getDefaultLanguage();
 		} else {
 			level.column = attrName;
 		}
