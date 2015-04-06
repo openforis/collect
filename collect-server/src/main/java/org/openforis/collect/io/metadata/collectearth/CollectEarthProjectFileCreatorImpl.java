@@ -16,6 +16,8 @@ import java.util.Properties;
 import java.util.Set;
 
 import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
@@ -62,20 +64,28 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		
 		ZipFile zipFile = new ZipFile(outputFile);
 		
-		ZipFiles.addFile(zipFile, projectProperties, PROJECT_PROPERTIES_FILE_NAME);
-		ZipFiles.addFile(zipFile, placemarkFile, PLACEMARK_FILE_NAME);
-		ZipFiles.addFile(zipFile, balloon, BALLOON_FILE_NAME);
-		ZipFiles.addFile(zipFile, cube, CUBE_FILE_NAME);
-		ZipFiles.addFile(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME);
+		ZipParameters zipParameters = new ZipParameters();
+
+		// COMP_DEFLATE is for compression
+		// COMp_STORE no compression
+		zipParameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+		// DEFLATE_LEVEL_ULTRA = maximum compression
+		zipParameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_ULTRA);
+		
+		ZipFiles.addFile(zipFile, projectProperties, PROJECT_PROPERTIES_FILE_NAME, zipParameters);
+		ZipFiles.addFile(zipFile, placemarkFile, PLACEMARK_FILE_NAME, zipParameters);
+		ZipFiles.addFile(zipFile, balloon, BALLOON_FILE_NAME, zipParameters);
+		ZipFiles.addFile(zipFile, cube, CUBE_FILE_NAME, zipParameters);
+		ZipFiles.addFile(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME, zipParameters);
 		
 		// include earthFiles assets folder (js, css, etc.)
 		File earthFilesZip = getEarthFilesZipFile();
 		ZipFile sourceZipFile = new ZipFile(earthFilesZip);
-		ZipFiles.copyFiles(sourceZipFile, zipFile);
+		ZipFiles.copyFiles(sourceZipFile, zipFile, zipParameters);
 		
 		return outputFile;
 	}
-
+	
 	private File createPlacemark(CollectSurvey survey) throws IOException {
 		File file = File.createTempFile("collect-earth-placemark.idm", ".xml");
 		FileOutputStream os = new FileOutputStream(file);
@@ -102,6 +112,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("inner_point_side", "2");
 		p.put("open_bing_maps", "true");
 		p.put("open_earth_engine", "true");
+		p.put("open_here_maps", "true");
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
 		p.store(writer, null);
@@ -145,12 +156,13 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 				value = "${placemark." + attrName + "}";
 			} else {
 				value = "${placemark.extraInfo[" + extraInfoIndex + "]}";
+				extraInfoIndex ++;
 			}
 			sb.append("<value>");
 			sb.append(value);
 			sb.append("</value>\n");
 		    sb.append("</Data>\n");
-		    extraInfoIndex ++;
+		    
 		}
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, sb.toString());
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");

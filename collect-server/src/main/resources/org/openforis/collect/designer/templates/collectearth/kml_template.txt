@@ -133,6 +133,9 @@ ${html_for_balloon}
 		      <Data name="plot_file">
 		        <value>${plotFileName}</value>
 		      </Data>
+		      <Data name="randomNumber">
+		        <value><#if randomNumber??>${randomNumber}<#else>1</#if></value>
+		      </Data>
 		      
 <!-- DO NOT REMOVE THIS LINE - IT GENERATES THE EXTRA FIELDS FROM THE CSV-BALLOON INTEGRATION -->
 PLACEHOLDER_FOR_EXTRA_CSV_DATA

@@ -124,6 +124,9 @@ public class CEComponentHTMLFormatter {
 			case CODE_SELECT:
 				buildCodeSelect(formControlContainer, (CECodeField) comp);
 				break;
+			case CODE_RANGE:
+				buildCodeRange(formControlContainer, (CERangeField) comp);
+				break;
 			default:
 				break;
 			}
@@ -223,12 +226,48 @@ public class CEComponentHTMLFormatter {
 		Map<String, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentCode();
 		List<CodeListItem> rootItems = itemsByParentCode.get("");
 		if (rootItems != null) {
+			
+			boolean hasNAoption = false;
+			for (CodeListItem item : rootItems) {
+				if( 
+						item.getCode().equalsIgnoreCase("na") || 
+						item.getCode().equalsIgnoreCase("n/a")
+				){
+					hasNAoption=true;	
+				}
+			}
+			
+			if(!hasNAoption){
+				selectBuilder.e("option").a("value", "").t("Nothing selected");
+			}
+			
 			for (CodeListItem item : rootItems) {
 				String itemLabel = getItemLabel(item);
 				selectBuilder.e("option")
 					.a("value", item.getCode())
 					.t(itemLabel);
 			}
+			
+		}
+	}
+	
+	private void buildCodeRange(XMLBuilder builder, CERangeField comp) {
+		String elId = comp.getHtmlParameterName();
+		
+		//build select
+		XMLBuilder selectBuilder = builder.e("select")
+			.a("id", elId)
+			.a("name", elId)
+			.a("data-field-type", comp.getType().name())
+			.a("class", "form-control selectboxit show-menu-arrow show-tick")
+			.a("data-width", "75px");
+	
+		//add root items, if any
+		for( int i=comp.getFrom(); i<comp.getTo(); i++ ){
+				String item = i+"";
+				selectBuilder.e("option")
+					.a("value", item)
+					.t(item);
 		}
 	}
 

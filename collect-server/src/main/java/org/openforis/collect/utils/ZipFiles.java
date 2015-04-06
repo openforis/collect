@@ -21,19 +21,18 @@ import org.apache.commons.io.IOUtils;
 public class ZipFiles {
 	
 	@SuppressWarnings("unchecked")
-	public static void copyFiles(ZipFile sourceFile, ZipFile destFile) throws ZipException, IOException {
+	public static void copyFiles(ZipFile sourceFile, ZipFile destFile, ZipParameters zipParameters) throws ZipException, IOException {
 		for (FileHeader header : (List<FileHeader>) sourceFile.getFileHeaders()) {
 			if (! header.isDirectory()) {
 				ZipInputStream is = sourceFile.getInputStream(header);
 				File tempFile = File.createTempFile("temp_folder", "");
 				IOUtils.copy(is, new FileOutputStream(tempFile));
-				addFile(destFile, tempFile, header.getFileName());
+				addFile(destFile, tempFile, header.getFileName(), zipParameters);
 			}
 		}
 	}
 	
-	public static void addFile(ZipFile destFile, File file, String fileNameInZip) throws ZipException {
-		ZipParameters zipParameters = new ZipParameters();
+	public static void addFile(ZipFile destFile, File file, String fileNameInZip, ZipParameters zipParameters ) throws ZipException {
 		zipParameters.setSourceExternalStream(true);
 		zipParameters.setFileNameInZip(fileNameInZip);
 		destFile.addFile(file, zipParameters);
