@@ -102,6 +102,10 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 	public void setValueFromString(String s) {
 		this.value = parseValue(s);
 	}
+	
+	public Class<T> getValueType() {
+		return valueType;
+	}
 
 	/**
 	 * Reset all properties (value, remarks and symbol)

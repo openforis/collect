@@ -140,11 +140,15 @@ public class RecordUpdater {
 	 * @return Changes applied to the record 
 	 */
 	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
+		return addEntity(parentEntity, entityName, true);
+	}
+	
+	public NodeChangeSet addEntity(Entity parentEntity, String entityName, boolean addEmptyMultipleEntities) {
 		Entity entity = performEntityAdd(parentEntity, entityName);
 		
 		setMissingValueApproved(parentEntity, entityName, false);
 
-		NodeChangeMap changeMap = initializeEntity(entity);
+		NodeChangeMap changeMap = initializeEntity(entity, true, addEmptyMultipleEntities);
 		return changeMap;
 	}
 
@@ -712,7 +716,11 @@ public class RecordUpdater {
 	}
 	
 	public void initializeRecord(Record record, boolean validate) {
-		initializeEntity(record.getRootEntity(), validate);
+		initializeRecord(record, validate, true);
+	}
+	
+	public void initializeRecord(Record record, boolean validate, boolean addEmptyMultipleEntities) {
+		initializeEntity(record.getRootEntity(), validate, addEmptyMultipleEntities);
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity) {
@@ -720,6 +728,10 @@ public class RecordUpdater {
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity, boolean validate) {
+		return initializeEntity(entity, validate, true);
+	}
+	
+	protected NodeChangeMap initializeEntity(Entity entity, boolean validate, boolean addEmptyMultipleEntities) {
 		Record record = entity.getRecord();
 		
 		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
@@ -733,7 +745,7 @@ public class RecordUpdater {
 		updateMinCount(entityDescendantPointers);
 		updateMaxCount(entityDescendantPointers);
 
-		addEmptyNodes(entity);
+		addEmptyNodes(entity, addEmptyMultipleEntities);
 		
 		applyInitialValues(entity);
 		
@@ -788,6 +800,10 @@ public class RecordUpdater {
 	}
 
 	private void addEmptyNodes(Entity entity) {
+		addEmptyNodes(entity, true);
+	}
+	
+	private void addEmptyNodes(Entity entity, boolean addEmptyMultipleEntities) {
 		Record record = entity.getRecord();
 		ModelVersion version = record.getVersion();
 		addEmptyEnumeratedEntities(entity);
@@ -795,24 +811,26 @@ public class RecordUpdater {
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitionsInVersion(version);
 		for (NodeDefinition childDefn : childDefinitions) {
 			if(entity.getCount(childDefn) == 0) {
-				int toBeInserted = entity.getMinCount(childDefn);
-				if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
-					//insert at least one node
-					toBeInserted = 1;
+				if (addEmptyMultipleEntities || ! (childDefn instanceof EntityDefinition && childDefn.isMultiple())) {
+					int toBeInserted = entity.getMinCount(childDefn);
+					if ( toBeInserted <= 0 && childDefn instanceof AttributeDefinition || ! childDefn.isMultiple() ) {
+						//insert at least one node
+						toBeInserted = 1;
+					}
+					addEmptyChildren(entity, childDefn, toBeInserted, addEmptyMultipleEntities);
 				}
-				addEmptyChildren(entity, childDefn, toBeInserted);
 			} else {
 				List<Node<?>> children = entity.getChildren(childDefn);
 				for (Node<?> child : children) {
 					if(child instanceof Entity) {
-						addEmptyNodes((Entity) child);
+						addEmptyNodes((Entity) child, addEmptyMultipleEntities);
 					}
 				}
 			}
 		}
 	}
 
-	private int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted) {
+	private int addEmptyChildren(Entity entity, NodeDefinition childDefn, int toBeInserted, boolean addEmptyMultipleEntities) {
 		String childName = childDefn.getName();
 		UIOptions uiOptions = getUIOptions(entity.getSurvey());
 		int count = 0;
@@ -825,7 +843,7 @@ public class RecordUpdater {
 					entity.add(createdNode);
 				} else if(childDefn instanceof EntityDefinition ) {
 					Entity childEntity = performEntityAdd(entity, childName);
-					addEmptyNodes(childEntity);
+					addEmptyNodes(childEntity, addEmptyMultipleEntities);
 				}
 				count ++;
 			}

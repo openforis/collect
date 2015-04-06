@@ -229,10 +229,14 @@ public class RecordManager {
 	}
 	
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate) {
+		return load(survey, recordId, step, validate, true);
+	}
+	
+	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate, boolean addEmptyMultipleEntities) {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber(), validate);
 		recordConverter.convertToLatestVersion(record);
 		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.initializeRecord(record, validate);
+		recordUpdater.initializeRecord(record, validate, addEmptyMultipleEntities);
 		return record;
 	}
 	
@@ -493,9 +497,13 @@ public class RecordManager {
 	 * @return Changes applied to the record 
 	 */
 	public NodeChangeSet addEntity(Entity parentEntity, String entityName) {
-		return updater.addEntity(parentEntity, entityName);
+		return addEntity(parentEntity, entityName, true);
 	}
 
+	public NodeChangeSet addEntity(Entity parentEntity, String entityName, boolean addEmptyMultipleEntities) {
+		return updater.addEntity(parentEntity, entityName, addEmptyMultipleEntities);
+	}
+	
 	public NodeChangeSet addAttribute(Entity parentEntity, String attributeName) {
 		return updater.addAttribute(parentEntity, attributeName);
 	}
