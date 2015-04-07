@@ -313,14 +313,16 @@ public class CEComponentHTMLFormatter {
 			} else {
 				for (CodeListItem item : items) {
 					String itemLabel = getItemLabel(item);
-					XMLBuilder buttonItemBuilder = buttonsGroup
+					XMLBuilder itemBuilder = buttonsGroup
 						.e("button")
 							.a("type", "button")
 							.a("class", "btn btn-info code-item")
 							.a("value", item.getCode())
 							.t(itemLabel);
 					if (StringUtils.isNotBlank(item.getDescription())) {
-						buttonItemBuilder.a("title", item.getDescription());
+						itemBuilder
+							.a("title", item.getDescription())
+							.a("data-html", "true");
 					}
 				}
 			}
