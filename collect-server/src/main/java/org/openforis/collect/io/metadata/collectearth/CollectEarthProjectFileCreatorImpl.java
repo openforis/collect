@@ -40,9 +40,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 
 	private static final String EARTH_FILES_ZIP_FILE_PATH = "org/openforis/collect/designer/templates/collectearth/earth-files-1_0.zip";
 	private static final String KML_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
+	private static final String TEST_PLOTS_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/test_plots.ced.template";
 	private static final String PLACEMARK_FILE_NAME = "placemark.idm.xml";
 	private static final String BALLOON_FILE_NAME = "balloon.html";
 	private static final String KML_TEMPLATE_FILE_NAME = "kml_template.fmt";
+	private static final String TEST_PLOTS_FILE_NAME = "test_plots.ced";
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	
@@ -61,6 +63,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		File balloon = generateBalloon(survey);
 		File cube = generateCube(survey);
 		File kmlTemplate = generateKMLTemplate(survey);
+		File testPlotsCSVFile = generateTestPlotsCSVFile(survey);
 		
 		ZipFile zipFile = new ZipFile(outputFile);
 		
@@ -77,6 +80,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		ZipFiles.addFile(zipFile, balloon, BALLOON_FILE_NAME, zipParameters);
 		ZipFiles.addFile(zipFile, cube, CUBE_FILE_NAME, zipParameters);
 		ZipFiles.addFile(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME, zipParameters);
+		ZipFiles.addFile(zipFile, testPlotsCSVFile, TEST_PLOTS_FILE_NAME, zipParameters);
 		
 		// include earthFiles assets folder (js, css, etc.)
 		File earthFilesZip = getEarthFilesZipFile();
@@ -133,18 +137,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		String templateContent = writer.toString();
 		
 		//find "fromCSV" attributes
-		final CollectAnnotations annotations = survey.getAnnotations();
-		final List<AttributeDefinition> fromCsvAttributes = new ArrayList<AttributeDefinition>();
-		survey.getSchema().traverse(new NodeDefinitionVisitor() {
-			public void visit(NodeDefinition def) {
-				if (def instanceof AttributeDefinition) {
-					AttributeDefinition attrDef = (AttributeDefinition) def;
-					if (annotations.isFromCollectEarthCSV(attrDef)) {
-						fromCsvAttributes.add(attrDef);
-					}
-				}
-			}
-		});
+		List<AttributeDefinition> fromCsvAttributes = getFromCSVAttributes(survey);
+		
 		//write the dynamic content to be replaced into the template
 		StringBuffer sb = new StringBuffer();
 		int extraInfoIndex = 0;
@@ -166,6 +160,45 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		}
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, sb.toString());
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");
+	}
+
+	private List<AttributeDefinition> getFromCSVAttributes(CollectSurvey survey) {
+		final CollectAnnotations annotations = survey.getAnnotations();
+		final List<AttributeDefinition> fromCsvAttributes = new ArrayList<AttributeDefinition>();
+		survey.getSchema().traverse(new NodeDefinitionVisitor() {
+			public void visit(NodeDefinition def) {
+				if (def instanceof AttributeDefinition) {
+					AttributeDefinition attrDef = (AttributeDefinition) def;
+					if (annotations.isFromCollectEarthCSV(attrDef)) {
+						fromCsvAttributes.add(attrDef);
+					}
+				}
+			}
+		});
+		return fromCsvAttributes;
+	}
+	
+	private File generateTestPlotsCSVFile(CollectSurvey survey) throws IOException {
+		//copy the template txt file into a String
+		InputStream is = getClass().getClassLoader().getResourceAsStream(TEST_PLOTS_TEMPLATE_PATH);
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(is, writer, "UTF-8");
+		String templateContent = writer.toString();
+		
+		//find "fromCSV" attributes
+		List<AttributeDefinition> fromCsvAttributes = getFromCSVAttributes(survey);
+		
+		//write the dynamic content to be replaced into the template
+		StringBuffer headerSB = new StringBuffer();
+		StringBuffer valuesSB = new StringBuffer();
+		for (AttributeDefinition attrDef : fromCsvAttributes) {
+			String attrName = attrDef.getName();
+			headerSB.append(",\"" + attrName + "\"");
+			valuesSB.append(",\"value_" + attrName + "\"");
+		}
+		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER, headerSB.toString());
+		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES, valuesSB.toString());
+		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".ced");
 	}
 	
 	private File generateCube(CollectSurvey survey) throws IOException {

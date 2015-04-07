@@ -1,4 +1,3 @@
-<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
   <custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
@@ -477,7 +476,8 @@
 		    		</fieldErrorHandler>
 		    		<fieldErrorHandler message="@load(vmsgs['fromCsv'])">
 		    			<checkbox
-		    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" />
+		    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" 
+		    				onCheck="@command('applyChanges')" />
 		    		</fieldErrorHandler>
 	    				
     			</row>
