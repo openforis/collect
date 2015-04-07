@@ -545,7 +545,7 @@ public class Entity extends Node<EntityDefinition> {
 					EntityDefinition defn = entity.getDefinition();
 					List<NodeDefinition> childDefns = defn.getChildDefinitions();
 					for (NodeDefinition childDefn : childDefns) {
-						List<Node<?>> children = entity.getChildren(childDefn);
+						List<Node<?>> children = entity.childrenByDefinitionId.get(childDefn.getId());
 						if (children != null && ! children.isEmpty()) {
 							stack.push(children);
 						}
