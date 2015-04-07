@@ -173,8 +173,11 @@ public class CollectEarthBalloonGenerator {
 		EntityDefinition rootEntityDef = getRootEntity();
 		
 		UIOptions uiOptions = survey.getUIOptions();
-		UIConfiguration uiConfiguration = ((CollectSurvey) rootEntityDef.getSurvey()).getUIConfiguration();
-		if (uiConfiguration == null || uiConfiguration.getFormSets().isEmpty()) {
+		UIConfiguration uiConfiguration = survey.getUIConfiguration();
+		if (uiConfiguration == null) {
+			throw new IllegalStateException("Error unmarshalling the survey");
+		}
+		if (uiConfiguration.getFormSets().isEmpty()) {
 			//no ui configuration defined
 			CETabSet tabSet = new CETabSet("", "");
 			CETab tab = new CETab(rootEntityDef.getName(), "");
@@ -183,6 +186,7 @@ public class CollectEarthBalloonGenerator {
 					tab.addChild(createComponent(childDef));
 				}
 			}
+			tabSet.addTab(tab);
 			return tabSet;
 		} else {
 			CETabSet tabSet = new CETabSet("", "");
