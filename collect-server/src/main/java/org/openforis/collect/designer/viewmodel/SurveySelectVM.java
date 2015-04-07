@@ -601,7 +601,7 @@ public class SurveySelectVM extends BaseVM {
 		@Override
 		public CollectRecord next() {
 			CollectRecord summary = summaries.get(nextRecordIndex++);
-			CollectRecord record = recordManager.load(survey, summary.getId());
+			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep());
 			return record;
 		}
 

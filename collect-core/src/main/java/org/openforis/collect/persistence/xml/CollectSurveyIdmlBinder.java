@@ -3,6 +3,8 @@ package org.openforis.collect.persistence.xml;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
 import org.openforis.collect.model.CollectSurvey;
@@ -19,6 +21,8 @@ import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
  */
 public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 
+	private final Log log = LogFactory.getLog(CollectSurveyIdmlBinder.class);
+	
 	public CollectSurveyIdmlBinder(SurveyContext surveyContext) {
 		super(surveyContext);
 		addApplicationOptionsBinder(new UIOptionsBinder());
@@ -44,7 +48,7 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 				UIConfiguration uiConfiguration = new UIOptionsMigrator().migrateToUIConfiguration(collectSurvey.getUIOptions());
 				collectSurvey.setUIConfiguration(uiConfiguration);
 			} catch(Exception e) {
-				//ignore it
+				log.error(e);
 			}
 		}
 	}

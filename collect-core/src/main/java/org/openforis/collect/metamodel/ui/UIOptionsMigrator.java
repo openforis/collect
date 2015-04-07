@@ -57,7 +57,7 @@ public class UIOptionsMigrator {
 //		serializer.write(uiConfig, writer);
 //		System.out.println(writer.toString());
 //		
-		CollectSurvey survey = uiConfig.getSurvey();
+		final CollectSurvey survey = uiConfig.getSurvey();
 		Schema schema = survey.getSchema();
 		schema.traverse(new NodeDefinitionVisitor() {
 			@Override
@@ -65,7 +65,8 @@ public class UIOptionsMigrator {
 				int nodeId = definition.getId();
 				UIModelObject uiModelObj = uiConfig.getModelObjectByNodeDefinitionId(nodeId);
 				if ( uiModelObj == null ) {
-					throw new IllegalStateException(String.format("No UI model object found for node with id %d", nodeId));
+					throw new IllegalStateException(String.format("No UI model object found for node with id %d in %s survey with uri %s", nodeId, 
+							survey.isWork() ? "temporary": "published", survey.getUri()));
 				}
 			}
 		});
