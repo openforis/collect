@@ -5,7 +5,7 @@
 
 	<window id="codeListItemManagerPopUp"
 		title="${labels.survey.code_list.item.manager.title}" width="600px"
-		height="350px" border="normal" position="center"
+		height="450px" border="normal" position="center"
 		sclass="form" apply="org.zkoss.bind.BindComposer"
 		viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.CodeListItemVM')"
 		validationMessages="@id('vmsgs')"
@@ -15,7 +15,7 @@
             @validator('org.openforis.collect.designer.form.validator.CodeListItemFormValidator', codeListManager=vm.codeListManager, parentItem=parentItem)"
         closable="false">
         <borderlayout>
-        	<center>
+        	<center autoscroll="true">
 				<grid>
 					<columns>
 						<column width="150px" />
@@ -70,6 +70,30 @@
 								message="@load(vmsgs['qualifiable'])">
 								<checkbox checked="@bind(fx.qualifiable)"
 									onCheck="@command('validate')" />
+							</fieldErrorHandler>
+						</row>
+						<row>
+							<fieldErrorHandler
+								message="@load(vmsgs['image'])">
+								<label value="${labels.survey.code_list.image.$}" />
+							</fieldErrorHandler>
+							<fieldErrorHandler
+								message="@load(vmsgs['image'])">
+								<vlayout height="100px" width="150px"
+									visible="@load(empty vm.image)">
+									<label value="${labels.survey.code_list.no_image_uploaded}" />
+								</vlayout>
+								<image content="@bind(vm.image)" 
+									width="150px" 
+									visible="@load(not empty vm.image)" />
+								<vlayout spacing="20px">
+									<button upload="true,maxsize=300000" 
+											onUpload="@command('imageUpload', media=event.media)"
+											label="${labels.global.upload}" />
+									<button label="${labels.global.remove_item}"
+										onClick="@command('removeImage')"
+										visible="@load(not empty vm.image)" />
+								</vlayout>
 							</fieldErrorHandler>
 						</row>
 						<row>

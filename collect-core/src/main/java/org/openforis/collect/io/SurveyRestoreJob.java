@@ -11,10 +11,12 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
+import org.openforis.collect.io.metadata.CodeListImagesImportTask;
 import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupImportTask;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -45,7 +47,9 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	private transient SpeciesManager speciesManager;
 	@Autowired
 	private transient SamplingDesignManager samplingDesignManager;
-
+	@Autowired
+	private transient CodeListManager codeListManager;
+	
 	//output
 	private SurveyBackupInfo backupInfo;
 
@@ -84,6 +88,8 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		
 		addTask(IdmlImportTask.class);
 		
+		addTask(CodeListImagesImportTask.class);
+		
 		//add sampling design task
 		ZipEntry samplingDesignEntry = backupFileExtractor.findEntry(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
 		if ( samplingDesignEntry != null && samplingDesignEntry.getSize() > 0 ) {
@@ -116,6 +122,11 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setSurveyName(surveyName);
 			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
 			t.setValidate(validateSurvey);
+		} else if (task instanceof CodeListImagesImportTask) {
+			CodeListImagesImportTask t = (CodeListImagesImportTask) task;
+			t.setCodeListManager(codeListManager);
+			t.setZipFile(zipFile);
+			t.setSurvey(survey);
 		} else if ( task instanceof SamplingDesignImportTask ) {
 			SamplingDesignImportTask t = (SamplingDesignImportTask) task;
 			File samplingDesignFile = backupFileExtractor.extract(SurveyBackupJob.SAMPLING_DESIGN_ENTRY_NAME);
@@ -212,6 +223,10 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	
 	public void setSpeciesManager(SpeciesManager speciesManager) {
 		this.speciesManager = speciesManager;
+	}
+	
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
 	}
 	
 	public File getFile() {

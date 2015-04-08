@@ -11,7 +11,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcCodeList extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord> {
 
-	private static final long serialVersionUID = 1719719355;
+	private static final long serialVersionUID = -1531933910;
 
 	/**
 	 * The singleton instance of <code>collect.ofc_code_list</code>
@@ -115,6 +115,16 @@ public class OfcCodeList extends org.jooq.impl.TableImpl<org.openforis.collect.p
 	 * The column <code>collect.ofc_code_list.level</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord, java.lang.Integer> LEVEL = createField("level", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>collect.ofc_code_list.image_content</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord, byte[]> IMAGE_CONTENT = createField("image_content", org.jooq.impl.SQLDataType.BLOB, this, "");
+
+	/**
+	 * The column <code>collect.ofc_code_list.image_file_name</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord, java.lang.String> IMAGE_FILE_NAME = createField("image_file_name", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_code_list</code> table reference

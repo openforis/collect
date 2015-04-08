@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.CodeListItemDao;
 import org.openforis.collect.persistence.DatabaseExternalCodeListProvider;
 import org.openforis.collect.service.CollectCodeListService;
@@ -25,10 +26,10 @@ import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVerifier;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -78,6 +79,18 @@ public class CodeListManager {
 			throw new CodeListImportException(e);
 		} finally {
 			IOUtils.closeQuietly(is);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T extends CodeListItem> T loadItem(CodeList list, int itemId) {
+		boolean persistedSurvey = list.getSurvey().getId() != null;
+		if ( list.isExternal() ) {
+			throw new UnsupportedOperationException();
+		} else if ( persistedSurvey && list.isEmpty() ) {
+			return (T) codeListItemDao.loadItem(list, itemId);
+		} else {
+			return (T) list.getItem(itemId);
 		}
 	}
 	
@@ -563,24 +576,37 @@ public class CodeListManager {
 		return result;
 	}
 	
-	public boolean isInUse(CodeList list) {
+	public boolean isInUse(final CodeList list) {
 		Survey survey = list.getSurvey();
 		Schema schema = survey.getSchema();
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
-		stack.addAll(schema.getRootEntityDefinitions());
-		while ( ! stack.isEmpty() ) {
-			NodeDefinition node = stack.pop();
-			if ( node instanceof CodeAttributeDefinition ) {
-				if ( list.equals(((CodeAttributeDefinition) node).getList()) ) {
-					return true;
-				}
-			} else if ( node instanceof EntityDefinition ) {
-				for (NodeDefinition nodeDefinition : ((EntityDefinition) node).getChildDefinitions()) {
-					stack.add(nodeDefinition);
-				}
-			} 
-		}
-		return false;
+		NodeDefinition attrDefnUsingCodeList = schema.findNodeDefinition(new NodeDefinitionVerifier() {
+			@Override
+			public boolean verify(NodeDefinition definition) {
+				return definition instanceof CodeAttributeDefinition 
+						&& list.getId() == ((CodeAttributeDefinition) definition).getList().getId();
+			}
+		});
+		return attrDefnUsingCodeList != null;
+	}
+	
+	public void persistCodeListItems(CodeList list) {
+		List<CodeListItem> items = list.getItems();
+		
+		saveItemsAndDescendants(items);
+		
+		list.removeAllItems();
+	}
+	
+	public FileWrapper loadImageContent(PersistedCodeListItem item) {
+		return codeListItemDao.loadImageContent(item);
+	}
+
+	public void saveImageContent(PersistedCodeListItem item, FileWrapper fileWrapper) {
+		codeListItemDao.saveImageContent(item, fileWrapper);
+	}
+	
+	public void deleteImageContent(PersistedCodeListItem item) {
+		codeListItemDao.deleteImageContent(item);
 	}
 	
 	public int nextSystemId() {

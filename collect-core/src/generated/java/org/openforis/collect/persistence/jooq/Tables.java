@@ -14,6 +14,16 @@ package org.openforis.collect.persistence.jooq;
 public class Tables {
 
 	/**
+	 * The table collect.databasechangelog
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.Databasechangelog DATABASECHANGELOG = org.openforis.collect.persistence.jooq.tables.Databasechangelog.DATABASECHANGELOG;
+
+	/**
+	 * The table collect.databasechangeloglock
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.Databasechangeloglock DATABASECHANGELOGLOCK = org.openforis.collect.persistence.jooq.tables.Databasechangeloglock.DATABASECHANGELOGLOCK;
+
+	/**
 	 * The table collect.ofc_application_info
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo OFC_APPLICATION_INFO = org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo.OFC_APPLICATION_INFO;

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-code-list-item-image" author="ricci" dbms="postgresql">
+		<comment>Add code list item image column</comment>
+		
+		<addColumn tableName="ofc_code_list">
+            <column name="image_content" type="bytea" />
+            <column name="image_file_name" type="varchar(255)" />
+	    </addColumn>
+	        
+	</changeSet>
+  
+</databaseChangeLog>

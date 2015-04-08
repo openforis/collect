@@ -26,6 +26,7 @@ import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord;
@@ -43,30 +44,47 @@ import org.springframework.transaction.annotation.Transactional;
 public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem, CodeListItemDao.JooqDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
-	private static final TableField[] LABEL_FIELDS = {OFC_CODE_LIST.LABEL1, OFC_CODE_LIST.LABEL2, OFC_CODE_LIST.LABEL3}; 
+	private static final TableField[] LABEL_FIELDS = {
+		OFC_CODE_LIST.LABEL1, 
+		OFC_CODE_LIST.LABEL2, 
+		OFC_CODE_LIST.LABEL3
+	}; 
+	
 	@SuppressWarnings("rawtypes")
-	private static final TableField[] DESCRIPTION_FIELDS = {OFC_CODE_LIST.DESCRIPTION1, OFC_CODE_LIST.DESCRIPTION2, OFC_CODE_LIST.DESCRIPTION3}; 
-	@SuppressWarnings("rawtypes")
-	private static final TableField[] FIELDS = {
-			OFC_CODE_LIST.ID,
-			OFC_CODE_LIST.SURVEY_ID,
-			OFC_CODE_LIST.SURVEY_WORK_ID,
-			OFC_CODE_LIST.CODE_LIST_ID,
-			OFC_CODE_LIST.ITEM_ID,
-			OFC_CODE_LIST.PARENT_ID,
-			OFC_CODE_LIST.LEVEL,
-			OFC_CODE_LIST.SORT_ORDER,
-			OFC_CODE_LIST.CODE,
-			OFC_CODE_LIST.QUALIFIABLE,
-			OFC_CODE_LIST.SINCE_VERSION_ID,
-			OFC_CODE_LIST.DEPRECATED_VERSION_ID,
-			OFC_CODE_LIST.LABEL1, 
-			OFC_CODE_LIST.LABEL2, 
-			OFC_CODE_LIST.LABEL3,
-			OFC_CODE_LIST.DESCRIPTION1, 
-			OFC_CODE_LIST.DESCRIPTION2, 
-			OFC_CODE_LIST.DESCRIPTION3
+	private static final TableField[] DESCRIPTION_FIELDS = {
+		OFC_CODE_LIST.DESCRIPTION1, 
+		OFC_CODE_LIST.DESCRIPTION2, 
+		OFC_CODE_LIST.DESCRIPTION3
 	};
+	
+	@SuppressWarnings("rawtypes")
+	private static final TableField[] POJO_FIELDS = {
+		OFC_CODE_LIST.ID,
+		OFC_CODE_LIST.SURVEY_ID,
+		OFC_CODE_LIST.SURVEY_WORK_ID,
+		OFC_CODE_LIST.CODE_LIST_ID,
+		OFC_CODE_LIST.ITEM_ID,
+		OFC_CODE_LIST.PARENT_ID,
+		OFC_CODE_LIST.LEVEL,
+		OFC_CODE_LIST.SORT_ORDER,
+		OFC_CODE_LIST.CODE,
+		OFC_CODE_LIST.QUALIFIABLE,
+		OFC_CODE_LIST.SINCE_VERSION_ID,
+		OFC_CODE_LIST.DEPRECATED_VERSION_ID,
+		OFC_CODE_LIST.IMAGE_FILE_NAME,
+		OFC_CODE_LIST.LABEL1, 
+		OFC_CODE_LIST.LABEL2, 
+		OFC_CODE_LIST.LABEL3,
+		OFC_CODE_LIST.DESCRIPTION1, 
+		OFC_CODE_LIST.DESCRIPTION2, 
+		OFC_CODE_LIST.DESCRIPTION3
+	};
+	
+	@SuppressWarnings("rawtypes")
+	private static final TableField[] ALL_FIELDS = ArrayUtils.addAll(
+		POJO_FIELDS, 
+		OFC_CODE_LIST.IMAGE_CONTENT
+	);
 	
 	private boolean useCache;
 	private CodeListItemCache cache;
@@ -78,16 +96,51 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 
 	public PersistedCodeListItem loadById(CodeList list, int id) {
-		JooqDSLContext jf = dsl(list);
-		ResultQuery<?> selectQuery = jf.selectByIdQuery(id);
+		JooqDSLContext dsl = dsl(list);
+		ResultQuery<?> selectQuery = dsl.selectByIdQuery(id);
 		Record r = selectQuery.fetchOne();
 		if ( r == null ) {
 			return null;
 		} else {
-			return jf.fromRecord(r);
+			return dsl.fromRecord(r);
+		}
+	}
+	
+	public FileWrapper loadImageContent(PersistedCodeListItem item) {
+		JooqDSLContext dsl = dsl(item.getCodeList());
+		ResultQuery<?> selectQuery = dsl.selectByIdQuery(item.getSystemId());
+		Record r = selectQuery.fetchOne();
+		if ( r == null ) {
+			return null;
+		} else {
+			byte[] content = r.getValue(OFC_CODE_LIST.IMAGE_CONTENT);
+			if (content == null) {
+				return null;
+			} else {
+				String fileName = r.getValue(OFC_CODE_LIST.IMAGE_FILE_NAME);
+				return new FileWrapper(content, fileName);
+			}
 		}
 	}
 
+	public void saveImageContent(PersistedCodeListItem item, FileWrapper fileWrapper) {
+		JooqDSLContext dsl = dsl(item.getCodeList());
+		dsl.update(dsl.getTable())
+			.set(OFC_CODE_LIST.IMAGE_CONTENT, fileWrapper.getContent())
+			.set(OFC_CODE_LIST.IMAGE_FILE_NAME, fileWrapper.getFileName())
+			.where(OFC_CODE_LIST.ID.eq(((PersistedCodeListItem) item).getSystemId()))
+			.execute();
+	}
+	
+	public void deleteImageContent(PersistedCodeListItem item) {
+		JooqDSLContext dsl = dsl(item.getCodeList());
+		dsl.update(dsl.getTable())
+			.set(OFC_CODE_LIST.IMAGE_CONTENT, (byte[]) null)
+			.set(OFC_CODE_LIST.IMAGE_FILE_NAME, (String) null)
+			.where(OFC_CODE_LIST.ID.eq(((PersistedCodeListItem) item).getSystemId()))
+			.execute();
+	}
+	
 	@Override
 	public void insert(PersistedCodeListItem item) {
 		JooqDSLContext jf = dsl(item.getCodeList());
@@ -114,8 +167,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 					id = nextId++;
 					item.setSystemId(id);
 				}
-				Object[] values = jf.extractValues(item);
-				batch.bind(values);
+				List<Object> values = jf.extractValues(item);
+				batch.bind(values.toArray(new Object[values.size()]));
 				maxId = Math.max(maxId, id);
 			}
 			batch.execute();
@@ -130,7 +183,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		int idGap = nextId - minId;
 		Integer selectSurveyIdValue = newSurveyWork ? null: newSurveyId;
 		Integer selectSurveyWorkIdValue = newSurveyWork ? newSurveyId: null;
-		Field<?>[] selectFields = {
+		List<Field<?>> selectFields = new ArrayList<Field<?>>(ALL_FIELDS.length);
+		selectFields.addAll(Arrays.<Field<?>>asList(
 				OFC_CODE_LIST.ID.add(idGap),
 				DSL.val(selectSurveyIdValue, OFC_CODE_LIST.SURVEY_ID),
 				DSL.val(selectSurveyWorkIdValue, OFC_CODE_LIST.SURVEY_WORK_ID),
@@ -142,10 +196,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				OFC_CODE_LIST.CODE,
 				OFC_CODE_LIST.QUALIFIABLE,
 				OFC_CODE_LIST.SINCE_VERSION_ID,
-				OFC_CODE_LIST.DEPRECATED_VERSION_ID
-			};
-		selectFields = ArrayUtils.addAll(selectFields, LABEL_FIELDS);
-		selectFields = ArrayUtils.addAll(selectFields, DESCRIPTION_FIELDS);
+				OFC_CODE_LIST.DEPRECATED_VERSION_ID,
+				OFC_CODE_LIST.IMAGE_FILE_NAME
+		));
+		selectFields.addAll(Arrays.<Field<?>>asList(LABEL_FIELDS));
+		selectFields.addAll(Arrays.<Field<?>>asList(DESCRIPTION_FIELDS));
+		selectFields.addAll(Arrays.<Field<?>>asList(OFC_CODE_LIST.IMAGE_CONTENT));
+		
 		TableField<OfcCodeListRecord, Integer> oldSurveyIdField = getSurveyIdField(oldSurveyWork);
 		TableField<OfcCodeListRecord, Integer> oppositeOldSurveyIdField = getSurveyIdField(! oldSurveyWork);
 		Select<?> select = jf.select(selectFields)
@@ -153,7 +210,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.where(oldSurveyIdField.equal(oldSurveyId)
 					.and(oppositeOldSurveyIdField.isNull()))
 			.orderBy(OFC_CODE_LIST.PARENT_ID, OFC_CODE_LIST.ID);
-		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, FIELDS).select(select);
+		Insert<OfcCodeListRecord> insert = jf.insertInto(OFC_CODE_LIST, ALL_FIELDS).select(select);
 		insert.execute();
 		restartIdSequence(jf);
 	}
@@ -515,6 +572,14 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		return item;
 	}
 	
+	public PersistedCodeListItem loadItem(CodeList codeList, int itemId) {
+		JooqDSLContext dsl = dsl(codeList);
+		SelectQuery<Record> q = createSelectFromCodeListQuery(dsl, codeList);
+		q.addConditions(OFC_CODE_LIST.ITEM_ID.equal(itemId));
+		Record record = q.fetchOne();
+		return record == null ? null : dsl.fromRecord(record);
+	}
+	
 	public PersistedCodeListItem loadItem(CodeList codeList, String code, ModelVersion version) {
 		JooqDSLContext jf = dsl(codeList);
 		SelectQuery<Record> q = createSelectFromCodeListQuery(jf, codeList);
@@ -659,6 +724,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			i.setQualifiable(r.getValue(OFC_CODE_LIST.QUALIFIABLE));
 			i.setSinceVersion(extractModelVersion(r, i, OFC_CODE_LIST.SINCE_VERSION_ID));
 			i.setDeprecatedVersion(extractModelVersion(r, i, OFC_CODE_LIST.DEPRECATED_VERSION_ID));
+			i.setImageFileName(r.getValue(OFC_CODE_LIST.IMAGE_FILE_NAME));
 			extractLabels(r, i);
 			extractDescriptions(r, i);
 		}
@@ -724,17 +790,18 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			q.addValue(OFC_CODE_LIST.SINCE_VERSION_ID, sinceVersionId);
 			Integer deprecatedVersionId = item.getDeprecatedVersion() == null ? null: item.getDeprecatedVersion().getId();
 			q.addValue(OFC_CODE_LIST.DEPRECATED_VERSION_ID, deprecatedVersionId);
+			q.addValue(OFC_CODE_LIST.IMAGE_FILE_NAME, item.getImageFileName());
 			addLabelValues(q, item);
 			addDescriptionValues(q, item);
 		}
 		
 		public Insert<OfcCodeListRecord> createInsertStatement() {
-			Object[] valuesPlaceholders = new String[FIELDS.length];
+			Object[] valuesPlaceholders = new String[POJO_FIELDS.length];
 			Arrays.fill(valuesPlaceholders, "?");
-			return insertInto(OFC_CODE_LIST, FIELDS).values(valuesPlaceholders);
+			return insertInto(OFC_CODE_LIST, POJO_FIELDS).values(valuesPlaceholders);
 		}
 		
-		protected Object[] extractValues(PersistedCodeListItem item) {
+		protected List<Object> extractValues(PersistedCodeListItem item) {
 			CodeList list = item.getCodeList();
 			CollectSurvey survey = (CollectSurvey) item.getSurvey();
 			Integer surveyId = survey.getId();
@@ -743,13 +810,12 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			Integer sinceVersionId = sinceVersion == null ? null: sinceVersion.getId();
 			ModelVersion deprecatedVersion = item.getDeprecatedVersion();
 			Integer deprecatedVersionId = deprecatedVersion == null ? null: deprecatedVersion.getId();
-			Object[] values = {item.getSystemId(), surveyWork ? null: surveyId, surveyWork ? surveyId: null, 
+			List<Object> values = new ArrayList<Object>(POJO_FIELDS.length);
+			values.addAll(Arrays.<Object>asList(item.getSystemId(), surveyWork ? null: surveyId, surveyWork ? surveyId: null, 
 					list.getId(), item.getId(), item.getParentId(), item.getLevel(), item.getSortOrder(), item.getCode(), 
-					item.isQualifiable(), sinceVersionId, deprecatedVersionId};
-			Object[] labelValues = getLabelValues(item);
-			values = ArrayUtils.addAll(values, labelValues);
-			Object[] descriptionValues = getDescriptionValues(item);
-			values = ArrayUtils.addAll(values, descriptionValues);
+					item.isQualifiable(), sinceVersionId, deprecatedVersionId, item.getImageFileName()));
+			values.addAll(getLabelValues(item));
+			values.addAll(getDescriptionValues(item));
 			return values;
 		}
 
@@ -763,18 +829,18 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		}
 
 		protected void addLabelValues(StoreQuery<?> q, PersistedCodeListItem item) {
-			String[] values = getLabelValues(item);
+			List<String> values = getLabelValues(item);
 			for (int i = 0; i < LABEL_FIELDS.length; i++) {
 				@SuppressWarnings("unchecked")
 				TableField<?, String> field = LABEL_FIELDS[i];
-				String label = values[i];
+				String label = values.get(i);
 				q.addValue(field, label);
 			}
 		}
 		
-		protected String[] getLabelValues(PersistedCodeListItem item) {
+		protected List<String> getLabelValues(PersistedCodeListItem item) {
 			int size = LABEL_FIELDS.length;
-			String[] result = new String[size];
+			List<String> result = new ArrayList<String>(size);
 			Survey survey = item.getSurvey();
 			List<String> languages = survey.getLanguages();
 			for (int i = 0; i < size; i++) {
@@ -785,24 +851,24 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				} else {
 					label = null;
 				}
-				result[i] = label;
+				result.add(label);
 			}
 			return result;
 		}
 
 		protected void addDescriptionValues(StoreQuery<?> q, PersistedCodeListItem item) {
-			String[] values = getDescriptionValues(item);
+			List<String> values = getDescriptionValues(item);
 			for (int i = 0; i < DESCRIPTION_FIELDS.length; i++) {
 				@SuppressWarnings("unchecked")
 				TableField<?, String> field = DESCRIPTION_FIELDS[i];
-				String description = values[i];
+				String description = values.get(i);
 				q.addValue(field, description);
 			}
 		}
 
-		protected String[] getDescriptionValues(PersistedCodeListItem item) {
+		protected List<String> getDescriptionValues(PersistedCodeListItem item) {
 			int size = DESCRIPTION_FIELDS.length;
-			String[] result = new String[size];
+			List<String> result = new ArrayList<String>(size);
 			Survey survey = item.getSurvey();
 			List<String> languages = survey.getLanguages();
 			for (int i = 0; i < size; i++) {
@@ -813,7 +879,7 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				} else {
 					description = null;
 				}
-				result[i] = description;
+				result.add(description);
 			}
 			return result;
 		}

@@ -265,7 +265,7 @@ public class SurveySelectVM extends BaseVM {
 	
 	private void downloadFile(File file, CollectSurvey survey, String extension, String contentType) {
 		String surveyName = survey.getName();
-		String dateStr = Dates.formatDateTime(new Date());
+		String dateStr = Dates.formatLocalDateTime(new Date());
 		String fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
 		try {
 			Filedownload.save(new FileInputStream(file), contentType, fileName);
