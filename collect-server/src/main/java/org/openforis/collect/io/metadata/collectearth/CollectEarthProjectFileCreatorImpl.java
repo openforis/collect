@@ -14,21 +14,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Stack;
 
 import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
 
 /**
  * 
@@ -50,6 +58,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	
 	private static final Set<String> FIXED_CSV_ATTRIBUTES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			"elevation", "aspect", "slope")));
+	
+	private CodeListManager codeListManager;
 	
 	@Override
 	public File create(CollectSurvey survey) throws Exception {
@@ -82,10 +92,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		ZipFiles.addFile(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME, zipParameters);
 		ZipFiles.addFile(zipFile, testPlotsCSVFile, TEST_PLOTS_FILE_NAME, zipParameters);
 		
+		addCodeListImages(zipFile, survey, zipParameters);
+		
 		// include earthFiles assets folder (js, css, etc.)
 		File earthFilesZip = getEarthFilesZipFile();
-		ZipFile sourceZipFile = new ZipFile(earthFilesZip);
-		ZipFiles.copyFiles(sourceZipFile, zipFile, zipParameters);
+		ZipFiles.copyFiles(new ZipFile(earthFilesZip), zipFile, zipParameters);
 		
 		return outputFile;
 	}
@@ -215,4 +226,49 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return earthFilesZip;
 	}
 
+	private void addCodeListImages(ZipFile zipFile, CollectSurvey survey, ZipParameters zipParameters) throws FileNotFoundException, IOException, ZipException {
+		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList codeList : codeLists) {
+			Stack<CodeListItem> stack = new Stack<CodeListItem>();
+			List<CodeListItem> rootItems = codeListManager.loadRootItems(codeList);
+			stack.addAll(rootItems);
+			while (! stack.isEmpty()) {
+				CodeListItem item = stack.pop();
+				if (item.hasUploadedImage()) {
+					FileWrapper imageFileWrapper = codeListManager.loadImageContent((PersistedCodeListItem) item);
+					byte[] content = imageFileWrapper.getContent();
+					
+					File imageFile = copyToTempFile(content, item.getImageFileName());
+					
+					String zipImageFileName = getCodeListImageFilePath(item);
+					
+					ZipFiles.addFile(zipFile, imageFile, zipImageFileName, zipParameters);
+				}
+				List<CodeListItem> childItems = codeListManager.loadChildItems(item);
+				for (CodeListItem childItem : childItems) {
+					stack.push(childItem);
+				}
+			}
+		}
+	}
+
+	public static String getCodeListImageFilePath(CodeListItem item) {
+		CodeList codeList = item.getCodeList();
+		@SuppressWarnings("unchecked")
+		String zipImageFileName = StringUtils.join(Arrays.asList(
+				"earthFiles", "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
+		return zipImageFileName;
+	}
+
+	private File copyToTempFile(byte[] content, String fileName) throws IOException, FileNotFoundException {
+		File imageFile = File.createTempFile("collect-earth-project-file-creator", fileName);
+		FileOutputStream fos = new FileOutputStream(imageFile);
+		fos.write(content);
+		fos.close();
+		return imageFile;
+	}
+
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
+	}
 }

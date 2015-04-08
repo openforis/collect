@@ -32,7 +32,7 @@ public class CollectEarthSurveyValidator {
 		new CollectEarthField("id", TextAttributeDefinition.class),
 		new CollectEarthField("operator", TextAttributeDefinition.class),
 		new CollectEarthField("location", CoordinateAttributeDefinition.class),
-		new CollectEarthField("plot_file", CoordinateAttributeDefinition.class),
+		new CollectEarthField("plot_file", TextAttributeDefinition.class),
 		new CollectEarthField("actively_saved", BooleanAttributeDefinition.class),
 		new CollectEarthField("actively_saved_on", DateAttributeDefinition.class),
 		new CollectEarthField("elevation", NumberAttributeDefinition.class),

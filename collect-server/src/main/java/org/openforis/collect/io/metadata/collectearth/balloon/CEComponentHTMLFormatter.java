@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreatorImpl;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
 import org.openforis.idm.metamodel.CodeListItem;
 
@@ -320,9 +322,16 @@ public class CEComponentHTMLFormatter {
 							.a("value", item.getCode())
 							.t(itemLabel);
 					if (StringUtils.isNotBlank(item.getDescription())) {
-						itemBuilder
-							.a("title", item.getDescription())
-							.a("data-html", "true");
+						String description = item.getDescription();
+						if (item.hasUploadedImage()) {
+							String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
+							String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"150\">" + StringEscapeUtils.escapeHtml4(description) + "</span>";
+							itemBuilder
+								.a("title", htmlTitle)
+								.a("data-html", "true");
+						} else {
+							itemBuilder.a("title", description);
+						}
 					}
 				}
 			}
