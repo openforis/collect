@@ -3,16 +3,12 @@ package org.openforis.collect.persistence.xml;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.User;
+import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
@@ -186,25 +182,8 @@ public class DataMarshaller {
 		}
 	}
 	
-	private String dateToString(Date date) {
-		String result = null;
-		if ( date != null ) {
-			try {
-				GregorianCalendar cal = new GregorianCalendar();
-				cal.setTime(date);
-				XMLGregorianCalendar xmlCal;
-				DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
-				xmlCal = datatypeFactory.newXMLGregorianCalendar(cal);
-				result = xmlCal.toString();
-			} catch (DatatypeConfigurationException e) {
-				//nothing to do
-			}
-		}
-		return result;
-	}
-	
 	private void addDateAttribute(XmlSerializer serializer, String attributeName, Date date) throws IllegalArgumentException, IllegalStateException, IOException {
-		String dateString = dateToString(date);
+		String dateString = Dates.formatDateTime(date);
 		if ( dateString != null ) {
 			serializer.attribute(null, attributeName, dateString);
 		}

@@ -14,7 +14,8 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class Dates {
 
-	private static final String DATE_TIME_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss";
+	private static final String LOCAL_DATE_TIME_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss";
+	private static final String DATE_TIME_FORMAT 	= "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	private static final String DATE_FORMAT 		= "yyyy-MM-dd";
 
 	public static Date parseDateTime(String dateTime) {
@@ -22,11 +23,20 @@ public class Dates {
 			return null;
 		}
 		dateTime = dateTime.trim();
-		if ( dateTime.length() == DATE_FORMAT.length() ) {
+		int length = dateTime.length();
+		if ( length == DATE_FORMAT.length() ) {
 			return parse(dateTime, DATE_FORMAT);
+		} else if (length > LOCAL_DATE_TIME_FORMAT.length()) {
+			return parseDateTimeInternal(dateTime);
 		} else {
-			return parse(dateTime, DATE_TIME_FORMAT);
+			return parse(dateTime, LOCAL_DATE_TIME_FORMAT);
 		}
+	}
+
+	private static Date parseDateTimeInternal(String dateTime) {
+		int lastIndexOfC = dateTime.lastIndexOf(":");
+		dateTime = dateTime.substring(0, lastIndexOfC) + dateTime.substring(lastIndexOfC + 1, dateTime.length());
+		return parse(dateTime, DATE_TIME_FORMAT);
 	}
 	
 	public static Date parseDate(String date) {
@@ -57,8 +67,17 @@ public class Dates {
 		return format(dateTime, DATE_FORMAT);
 	}
 	
+	public static String formatLocalDateTime(Date dateTime) {
+		return format(dateTime, LOCAL_DATE_TIME_FORMAT);
+	}
+	
 	public static String formatDateTime(Date dateTime) {
-		return format(dateTime, DATE_TIME_FORMAT);
+		String value = format(dateTime, DATE_TIME_FORMAT);
+		if (value == null) {
+			return null;
+		}
+		value = value.substring(0, value.length() - 2) + ":" + value.substring(value.length() - 2, value.length());
+		return value;
 	}
 
 	private static String format(Date dateTime, String format) {
