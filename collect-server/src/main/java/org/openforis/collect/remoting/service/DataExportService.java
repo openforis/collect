@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 
 import org.openforis.collect.Proxy;
 import org.openforis.collect.io.SurveyBackupJob;
+import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.CSVDataExportProcess;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
@@ -108,6 +109,7 @@ public class DataExportService {
 			RecordFilter filter = createRecordFilter(null, onlyOwnedRecords, rootEntityKeyValues);
 			
 			SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
+			job.setOutputFormat(OutputFormat.ONLY_DATA);
 			job.setSurvey(survey);
 			job.setIncludeData(true);
 			job.setIncludeRecordFiles(includeRecordFiles);

@@ -6,6 +6,7 @@ package org.openforis.collect.presenter {
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
 	import flash.events.TimerEvent;
+	import flash.net.FileFilter;
 	import flash.net.FileReference;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestMethod;
@@ -117,7 +118,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function uploadButtonClickHandler(event:MouseEvent):void {
-			_fileReference.browse();
+			var collectDataFilter:FileFilter = new FileFilter("Collect Data", "*.collect-data");
+			_fileReference.browse([collectDataFilter]);
 		}
 		
 		protected function cancelButtonClickHandler(event:MouseEvent):void {

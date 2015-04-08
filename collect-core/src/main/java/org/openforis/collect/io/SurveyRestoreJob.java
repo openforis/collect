@@ -36,11 +36,8 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 
-	private static final String ZIP_EXTENSION = "zip";
-	
 	public static final String[] COMPLETE_BACKUP_FILE_EXTENSIONS = new String[] {
-		SurveyBackupJob.OutputFormat.DESKTOP.getOutputFileExtension(),
-		ZIP_EXTENSION
+		SurveyBackupJob.OutputFormat.DESKTOP.getOutputFileExtension()
 	};
 
 	@Autowired

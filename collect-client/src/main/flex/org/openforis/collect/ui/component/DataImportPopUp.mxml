@@ -25,8 +25,8 @@
 			<s:DropDownList id="typeDropDownList" selectedIndex="0" width="150">
 				<mx:ArrayCollection>
 					<fx:String>-- Select one --</fx:String>
-					<fx:String>From XML (Backup)</fx:String>
-					<fx:String>From CSV</fx:String>
+					<fx:String>From .collect-data file</fx:String>
+					<fx:String>From CSV file</fx:String>
 				</mx:ArrayCollection>
 			</s:DropDownList>
 		</s:HGroup>

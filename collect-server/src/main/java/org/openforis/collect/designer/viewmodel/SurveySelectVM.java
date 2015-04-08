@@ -27,6 +27,8 @@ import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyE
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreatorImpl;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
@@ -92,6 +94,8 @@ public class SurveySelectVM extends BaseVM {
 	private SurveyManager surveyManager;
 	@WireVariable
 	private RecordManager recordManager;
+	@WireVariable
+	private CodeListManager codeListManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
 	@WireVariable
@@ -181,6 +185,7 @@ public class SurveySelectVM extends BaseVM {
 		case EARTH:
 			if (validateCollectEarthSurvey(survey)) {
 				try {
+					((CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR).setCodeListManager(codeListManager);
 					File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
 					String contentType = URLConnection.guessContentTypeFromName(file.getName());
 					FileInputStream is = new FileInputStream(file);

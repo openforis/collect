@@ -30,7 +30,8 @@ import org.zkoss.zul.Window;
  */
 public abstract class BaseVM {
 	
-	protected static final ServiceLoader<CollectEarthProjectFileCreator> COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER = ServiceLoader.load(CollectEarthProjectFileCreator.class);
+	protected static final ServiceLoader<CollectEarthProjectFileCreator> COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER = 
+			ServiceLoader.load(CollectEarthProjectFileCreator.class);
 
 	@WireVariable
 	private UserManager userManager;

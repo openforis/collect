@@ -56,7 +56,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private static final String[] ALLOWED_FILE_EXTENSIONS = ArrayUtils.addAll(
 			SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS,
 			new String[] {XML_FILE_EXTENSION}
-			);
+	);
 	
 	private static final String SURVEY_NAME_FIELD = "surveyName";
 	

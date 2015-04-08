@@ -52,7 +52,8 @@ public class SurveyBackupJob extends Job {
 	
 	public enum OutputFormat {
 		DESKTOP("collect"), 
-		MOBILE("collect-mobile");
+		MOBILE("collect-mobile"),
+		ONLY_DATA("collect-data");
 		
 		public static final OutputFormat DEFAULT = DESKTOP;
 		
@@ -184,7 +185,7 @@ public class SurveyBackupJob extends Job {
 			taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
 		}
 		for (CollectTaxonomy taxonomy : taxonomies) {
-			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
+//			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
 				SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
 				task.setSpeciesManager(speciesManager);
 				task.setOutputStream(zipOutputStream);
@@ -192,7 +193,7 @@ public class SurveyBackupJob extends Job {
 				String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
 				task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, entryName));
 				addTask(task);
-			}
+//			}
 		}
 	}
 	
