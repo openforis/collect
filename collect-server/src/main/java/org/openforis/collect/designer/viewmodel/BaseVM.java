@@ -1,7 +1,6 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -10,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
-import org.openforis.collect.io.metadata.CollectEarthProjectFileCreator;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.User;
 import org.springframework.security.core.Authentication;
@@ -31,13 +30,8 @@ import org.zkoss.zul.Window;
  */
 public abstract class BaseVM {
 	
-	protected static final ServiceLoader<CollectEarthProjectFileCreator> COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER = ServiceLoader.load(CollectEarthProjectFileCreator.class);
-	protected static final CollectEarthProjectFileCreator COLLECT_EARTH_PROJECT_FILE_CREATOR;
-	static {
-		Iterator<CollectEarthProjectFileCreator> it = COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER.iterator();
-		COLLECT_EARTH_PROJECT_FILE_CREATOR = it.hasNext() ? it.next(): null;
-	}
-	protected static final boolean COLLECT_EARTH_EDITOR = COLLECT_EARTH_PROJECT_FILE_CREATOR != null;
+	protected static final ServiceLoader<CollectEarthProjectFileCreator> COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER = 
+			ServiceLoader.load(CollectEarthProjectFileCreator.class);
 
 	@WireVariable
 	private UserManager userManager;
@@ -118,10 +112,6 @@ public abstract class BaseVM {
 		return result;
 	}
 	
-	public boolean isCollectEarthEditor() {
-		return COLLECT_EARTH_EDITOR;
-	}
-	
 	public String joinValues(String[] values, String separator) {
 		return joinList(Arrays.asList(values), separator);
 	}
@@ -129,7 +119,6 @@ public abstract class BaseVM {
 	public String joinList(List<String> values, String separator) {
 		return StringUtils.join(values, separator);
 	}
-
 	
 }
 

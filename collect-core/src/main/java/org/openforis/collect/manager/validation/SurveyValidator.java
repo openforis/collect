@@ -140,9 +140,8 @@ public class SurveyValidator {
 	
 	private List<SurveyValidationResult> validateCodeLists(CollectSurvey survey) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
-		CodeList samplingDesignCodeList = survey.getSamplingDesignCodeList();
 		for (CodeList list : survey.getCodeLists()) {
-			if ( samplingDesignCodeList == null || samplingDesignCodeList.getId() != list.getId() ) {
+			if ( ! survey.isPredefinedCodeList(list) ) {
 				if ( ! codeListManager.isInUse(list) ) {
 					//unused code list not allowed
 					SurveyValidationResult validationResult = new SurveyValidationResult(Flag.WARNING, 
@@ -618,16 +617,18 @@ public class SurveyValidator {
 		private Flag flag;
 		private String path;
 		private String messageKey;
+		private String[] messageArgs;
 
-		public SurveyValidationResult(String path, String messageKey) {
-			this(Flag.ERROR, path, messageKey);
+		public SurveyValidationResult(String path, String messageKey, String... messageArgs) {
+			this(Flag.ERROR, path, messageKey, messageArgs);
 		}
-			
-		public SurveyValidationResult(Flag flag, String path, String messageKey) {
+		
+		public SurveyValidationResult(Flag flag, String path, String messageKey, String... messageArgs) {
 			super();
 			this.flag = flag;
 			this.path = path;
 			this.messageKey = messageKey;
+			this.messageArgs = messageArgs;
 		}
 
 		public Flag getFlag() {
@@ -642,6 +643,10 @@ public class SurveyValidator {
 			return messageKey;
 		}
 
+		public String[] getMessageArgs() {
+			return messageArgs;
+		}
+		
 	}
 	
 	public static abstract class SurveyValidationNodeDefinitionVisitor implements NodeDefinitionVisitor {

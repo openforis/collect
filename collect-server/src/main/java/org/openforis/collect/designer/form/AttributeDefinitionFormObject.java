@@ -50,8 +50,8 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		}
 		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
-		annotations.setPhaseToApplyDefaultValue((AttributeDefinition) dest, Step.valueOf(phaseToApplyDefaultValue));
-		annotations.setEditable((AttributeDefinition) dest, editable);
+		annotations.setPhaseToApplyDefaultValue(dest, Step.valueOf(phaseToApplyDefaultValue));
+		annotations.setEditable(dest, editable);
 		
 		//save checks
 		dest.removeAllChecks();
@@ -73,8 +73,8 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 		CollectSurvey survey = (CollectSurvey) source.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
 		
-		phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue((AttributeDefinition) source).name();
-		editable = annotations.isEditable((AttributeDefinition) source);
+		phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue(source).name();
+		editable = annotations.isEditable(source);
 		
 		checks = new ArrayList<Check<?>>(source.getChecks());
 		
@@ -129,5 +129,5 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public void setVisibleFields(String[] visibleFields) {
 		this.visibleFields = visibleFields;
 	}
-
+	
 }

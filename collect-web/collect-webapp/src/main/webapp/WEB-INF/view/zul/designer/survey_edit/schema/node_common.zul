@@ -1,4 +1,3 @@
-<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
   <custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
@@ -80,32 +79,31 @@
   				</fieldErrorHandler>
   			</row>
   			<row
-  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple ne true and vm.requiredApplied and (empty fx.requiredExpression or fx.required))">
-  				<fieldErrorHandler message="@load(vmsgs['required'])">
-	  				<label value="${labels.survey.schema.node.required}:" />
-	  			</fieldErrorHandler>
-  				<fieldErrorHandler
-  					message="@load(vmsgs['required'])">
-  					<checkbox
-  						checked="@load(fx.required eq true) @save(fx.required)"
-  						onCheck="@command('applyChanges')" />
-  				</fieldErrorHandler>
-  			</row>
-  			<row
-  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple ne true and (fx.required eq false || not empty fx.requiredExpression))">
-  				<fieldErrorHandler
-  					message="@load(vmsgs['requiredExpression'])">
-	  				<label
-	  					value="${labels.survey.schema.node.required_expression}:" />
-	  			</fieldErrorHandler>
-  				<fieldErrorHandler
-  					message="@load(vmsgs['requiredExpression'])">
-  					<textbox width="250px"
-  						value="@bind(fx.requiredExpression)"
-  						onChange="@command('applyChanges')"
-  						rows="4" />
-  					<image src="/assets/images/expression-small.png" />
-  				</fieldErrorHandler>
+  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple ne true)">
+  				<label value="${labels.survey.schema.node.required}:" />
+  				<vlayout>
+	  				<radiogroup selectedItem="@bind(fx.requirenessType)"
+							onCheck="@command('applyChanges')">
+						<radio 
+							label="${labels.survey.schema.node.not_required}"
+							value="NOT_REQUIRED" />
+						<radio
+							label="${labels.survey.schema.node.always_required}"
+							value="ALWAYS_REQUIRED" />
+						<radio
+							label="${labels.survey.schema.node.required_when}"
+							value="REQUIRED_WHEN" />
+	  				</radiogroup>
+					<fieldErrorHandler
+						visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')"
+	  					message="@load(vmsgs['requiredWhenExpression'])">
+	  					<textbox width="250px"
+	  						value="@bind(fx.requiredWhenExpression)"
+	  						onChange="@command('applyChanges')"
+	  						rows="4" />
+	  					<image src="/assets/images/expression-small.png" />
+	  				</fieldErrorHandler>
+  				</vlayout>
   			</row>
   			<row
   				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple eq true)">
@@ -132,20 +130,31 @@
   				</fieldErrorHandler>
   			</row>
   			<row visible="@load(not vm.rootEntity)">
-  				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
-	  				<label value="${labels.survey.schema.node.relevant_expression}:" />
-	  			</fieldErrorHandler>
-  				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
-  					<textbox width="250px"
-  						value="@bind(fx.relevantExpression)"
-  						onChange="@command('applyChanges')"
-  						rows="4" />
-  					<image src="/assets/images/expression-small.png" />
-  					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />  					
-  					<checkbox
-  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
-  						onCheck="@command('applyChanges')" />
-  				</fieldErrorHandler>
+  				<label value="${labels.survey.schema.node.relevant}:" />
+  				<vlayout>
+	  				<radiogroup selectedItem="@bind(fx.relevanceType)"
+							onCheck="@command('applyChanges')">
+						<radio 
+							label="${labels.survey.schema.node.always_relevant}"
+							value="ALWAYS_RELEVANT" />
+						<radio
+							label="${labels.survey.schema.node.relevant_when}"
+							value="RELEVANT_WHEN" />
+	  				</radiogroup>
+	  				<hlayout visible="@load(fx.relevanceType eq 'RELEVANT_WHEN')">
+		  				<fieldErrorHandler message="@load(vmsgs['relevantExpression'])">
+		  					<textbox width="250px"
+		  						value="@bind(fx.relevantExpression)"
+		  						onChange="@command('applyChanges')"
+		  						rows="4" />
+		  					<image src="/assets/images/expression-small.png" />
+		  				</fieldErrorHandler>
+	  					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />  					
+	  					<checkbox
+	  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
+	  						onCheck="@command('applyChanges')" />
+	  				</hlayout>
+	  			</vlayout>
   			</row>
   		</rows>
   	</grid>
@@ -454,7 +463,39 @@
     	</vlayout>
     </groupbox>
     
-   	<popup id="calculatedInfoTooltip" width="300px">
+	<groupbox closable="true" open="false" visible="@load(vm.attribute)"
+      	sclass="collapsible"
+      	mold="3d" width="100%">
+      	<attribute name="onOpen"><![CDATA[
+      	    collectEarthSectionCaption.setSclass("open-" + self.isOpen());
+      	]]></attribute>
+      	<caption id="collectEarthSectionCaption" sclass="open-false">
+      		<div align="left">
+      			<label value="${labels.survey.schema.attribute.collect_earth.section_title}" />
+      		</div>
+      	</caption>
+    	<grid class="inner">
+    		<columns>
+    			<column width="150px" />
+    			<column />
+    		</columns>
+    		<rows>
+    			<row>
+					<fieldErrorHandler message="@load(vmsgs['fromCollectEarthCSV'])">
+		    			<label value="${labels.survey.schema.attribute.collect_earth.fromcsv}:" />
+		    		</fieldErrorHandler>
+		    		<fieldErrorHandler message="@load(vmsgs['fromCsv'])">
+		    			<checkbox
+		    				checked="@load(fx.fromCollectEarthCSV eq true) @save(fx.fromCollectEarthCSV)" 
+		    				onCheck="@command('applyChanges')" />
+		    		</fieldErrorHandler>
+	    				
+    			</row>
+    		</rows>
+    	</grid>
+    </groupbox>
+
+    <popup id="calculatedInfoTooltip" width="300px">
 		<html><![CDATA[
       		${labels.survey.schema.attribute.calculated.info}
       	]]></html>

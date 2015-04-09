@@ -1,7 +1,5 @@
 package org.openforis.collect.persistence.xml;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +16,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.model.User;
 import org.openforis.collect.model.UserRole;
+import org.openforis.collect.utils.Dates;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -41,8 +40,6 @@ import org.xml.sax.helpers.DefaultHandler;
 public class DataHandler extends DefaultHandler {
 	
 	private static final String NEW_USER_PASSWORD = "password";
-	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
-	private static final String XML_DATE_TIME_FORMAT = "yyyy-MM-d'T'HH:mm:ss";
 	private static final String ATTRIBUTE_VERSION = "version";
 	private static final String ATTRIBUTE_MODIFIED_BY = "modified_by";
 	private static final String ATTRIBUTE_CREATED_BY = "created_by";
@@ -65,6 +62,7 @@ public class DataHandler extends DefaultHandler {
 	private CollectSurvey recordSurvey;
 	private CollectSurvey currentSurvey;
 	private int ignoreLevels;
+	private boolean validationEnabled;
 	
 	private Map<String, User> usersByName;
 	
@@ -75,13 +73,18 @@ public class DataHandler extends DefaultHandler {
 	public DataHandler(UserManager userManager, CollectSurvey survey) {
 		this(userManager, survey, survey);
 	}
-	
+
 	public DataHandler(UserManager userManager, CollectSurvey currentSurvey, CollectSurvey recordSurvey) {
+		this(userManager, currentSurvey, recordSurvey, true);
+	}
+	
+	public DataHandler(UserManager userManager, CollectSurvey currentSurvey, CollectSurvey recordSurvey, boolean validationEnabled) {
 		super();
 		this.userManager = userManager;
 		this.currentSurvey = currentSurvey;
 		this.recordSurvey = recordSurvey;
 		this.usersByName = new HashMap<String, User>();
+		this.validationEnabled = validationEnabled;
 	}
 
 	@Override
@@ -139,31 +142,25 @@ public class DataHandler extends DefaultHandler {
 	}
 
 	public void startRecord(String localName, Attributes attributes) {
-		Schema schema = currentSurvey.getSchema();
-		EntityDefinition defn = schema.getRootEntityDefinition(localName);
-		if ( defn == null ) {
-			fail("Unknown root entity: "+localName);
-		} else {
-			String versionName = extractVersionName(attributes);
-			record = new CollectRecord(currentSurvey, versionName);
-			String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
-			State state = State.fromCode(stateAttr);
-			record.setState(state);
+		String versionName = extractVersionName(attributes);
+		record = new CollectRecord(currentSurvey, versionName, localName, validationEnabled);
+		String stateAttr = attributes.getValue(ATTRIBUTE_STATE);
+		State state = State.fromCode(stateAttr);
+		record.setState(state);
 
-			Date created = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
-			Date modified = parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
-			record.setCreationDate(created);
-			record.setModifiedDate(modified);
+		Date created = Dates.parseDateTime(attributes.getValue(ATTRIBUTE_DATE_CREATED));
+		Date modified =  Dates.parseDateTime(attributes.getValue(ATTRIBUTE_DATE_MODIFIED));
+		record.setCreationDate(created);
+		record.setModifiedDate(modified);
 
-			String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);
-			User createdBy = fetchUser(createdByUserName);
-			record.setCreatedBy(createdBy);
-			String modifiedByUserName = attributes.getValue(ATTRIBUTE_MODIFIED_BY);
-			User modifiedBy = fetchUser(modifiedByUserName);
-			record.setModifiedBy(modifiedBy);
-
-			node = record.createRootEntity(localName);
-		}
+		String createdByUserName = attributes.getValue(ATTRIBUTE_CREATED_BY);
+		User createdBy = fetchUser(createdByUserName);
+		record.setCreatedBy(createdBy);
+		String modifiedByUserName = attributes.getValue(ATTRIBUTE_MODIFIED_BY);
+		User modifiedBy = fetchUser(modifiedByUserName);
+		record.setModifiedBy(modifiedBy);
+		
+		node = record.getRootEntity();
 	}
 	
 	private User fetchUser(String name) {
@@ -409,31 +406,6 @@ public class DataHandler extends DefaultHandler {
 		}
 	}
 	
-	protected Date parseDateTime(String dateTime) {
-		Date result = null;
-		if(StringUtils.isNotBlank(dateTime)) {
-			result = parseDateTime(dateTime, XML_DATE_TIME_FORMAT);
-			if ( result == null ) {
-				result = parseDateTime(dateTime, DATE_TIME_FORMAT);
-				if ( result == null ) {
-					throw new IllegalArgumentException("Invalid format expected for datetime: " + dateTime);
-				}
-			}
-		}
-		return result;
-	}
-	
-	protected Date parseDateTime(String dateTime, String format) {
-		SimpleDateFormat sdf = new SimpleDateFormat(format);
-		Date result = null;
-		try {
-			result = sdf.parse(dateTime);
-		} catch (ParseException e) {
-			//ignore
-		}
-		return result;
-	}
-
 	protected Map<String, String> createAttributesMap(Attributes attributes) {
 		HashMap<String, String> result = new HashMap<String, String>();
 		int length = attributes.getLength();

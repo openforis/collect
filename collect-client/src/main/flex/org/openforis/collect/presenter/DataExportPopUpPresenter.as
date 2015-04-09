@@ -53,7 +53,7 @@ package org.openforis.collect.presenter {
 		private static const TYPE_FULL:String = "full";
 		private static const TYPE_PARTIAL:String = "partial";
 		
-		private static const XML_EXPORT_FILE_NAME_FORMAT:String = "{0}_{1}.collect";
+		private static const XML_EXPORT_FILE_NAME_FORMAT:String = "{0}_{1}.collect-data";
 		private static const CSV_EXPORT_FILE_NAME_FORMAT:String = "collect_csv_data_{0}_{1}.zip";
 		
 		private var _cancelResponder:IResponder;

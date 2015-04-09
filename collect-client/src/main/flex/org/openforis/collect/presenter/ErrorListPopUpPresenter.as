@@ -87,13 +87,13 @@ package org.openforis.collect.presenter
 			var result:IList = new ArrayCollection();
 			var schema:SchemaProxy = Application.activeSurvey.schema;
 			var entityDefn:EntityDefinitionProxy = EntityDefinitionProxy(schema.getDefinitionById(entity.definitionId));
-			var childDefinitions:ListCollectionView = entityDefn.childDefinitions;
-			var messages:Array
+			var childDefinitions:IList = entityDefn.getDefinitionsInVersion(entity.record.version);
+			var messages:Array;
 			for each (var childDefn:NodeDefinitionProxy in childDefinitions) {
 				var minCountValid:ValidationResultFlag = entity.getMinCountValidation(childDefn);
 				var maxCountValid:ValidationResultFlag = entity.getMaxCountValidation(childDefn);
-				if(minCountValid == ValidationResultFlag.ERROR || maxCountValid == ValidationResultFlag.ERROR) {
-					if ( minCountValid == ValidationResultFlag.ERROR ) {
+				if(minCountValid.name == ValidationResultFlag.ERROR.name || maxCountValid.name == ValidationResultFlag.ERROR.name) {
+					if ( minCountValid.name == ValidationResultFlag.ERROR.name ) {
 						var minCount:int = entity.getMinCount(childDefn);
 						if ( minCount == 1 ) {
 							messages = [Message.get("edit.validation.requiredField")];

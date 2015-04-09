@@ -369,7 +369,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			AttributeDefinition attrDefn = (AttributeDefinition) schema.getDefinitionById(fieldValueKey.getAttributeDefinitionId());
 			Entity parentEntity = getOrCreateParentEntity(ancestorEntity, attrDefn);
 			if (attrDefn.isMultiple()) {
-				List<Node<?>> attributes = parentEntity.getAll(attrDefn);
+				List<Node<?>> attributes = parentEntity.getChildren(attrDefn);
 				int tot = attributes.size();
 				for (int i = 0; i < tot; i++) {
 					Node<?> node = attributes.get(0);
@@ -397,7 +397,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			AttributeDefinition attrDefn, int index, String fieldName,
 			String value, String colName, long row) {
 		String attrName = attrDefn.getName();
-		Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.get(attrDefn, index);
+		Attribute<?, ?> attr = (Attribute<?, ?>) parentEntity.getChild(attrDefn, index);
 		boolean emptyValue = StringUtils.isEmpty(value);
 		if ( attr == null && ! emptyValue) {
 			attr = (Attribute<?, ?>) performNodeAdd(parentEntity, attrName);
@@ -572,7 +572,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			int position = ((EntityPositionIdentifier) identifier).getPosition();
 			if ( currentParent.getCount(childName) >= position ) {
 				ArrayList<Entity> result = new ArrayList<Entity>();
-				Entity child = (Entity) currentParent.get(childName, position - 1);
+				Entity child = (Entity) currentParent.getChild(childName, position - 1);
 				result.add(child);
 				return result;
 			} else {

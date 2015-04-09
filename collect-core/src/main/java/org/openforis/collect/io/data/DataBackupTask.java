@@ -88,7 +88,7 @@ public class DataBackupTask extends Task {
 	private void backup(CollectRecord summary, Step step) {
 		Integer id = summary.getId();
 		try {
-			CollectRecord record = recordManager.load(survey, id, step);
+			CollectRecord record = recordManager.load(survey, id, step, false);
 			BackupRecordEntry recordEntry = new BackupRecordEntry(step, id);
 			ZipEntry entry = new ZipEntry(recordEntry.getName());
 			zipOutputStream.putNextEntry(entry);
@@ -96,8 +96,7 @@ public class DataBackupTask extends Task {
 			dataMarshaller.write(record, writer);
 			zipOutputStream.closeEntry();
 		} catch (Exception e) {
-			String message = "Error while backing up " + id + " " + e.getMessage();
-			throw new RuntimeException(message, e);
+			throw new RuntimeException("Error while backing up record with id " + id + ": " + e.getMessage(), e);
 		}
 	}
 	

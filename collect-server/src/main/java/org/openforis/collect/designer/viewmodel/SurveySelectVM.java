@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +26,12 @@ import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyE
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
+import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreatorImpl;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectRecord;
@@ -34,7 +39,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.model.User;
-import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.relational.data.RecordIterator;
 import org.openforis.collect.relational.print.RDBPrintJob;
 import org.openforis.collect.utils.Dates;
@@ -77,30 +82,42 @@ public class SurveySelectVM extends BaseVM {
 
 	public static final String UPDATE_SURVEY_LIST_COMMAND = "updateSurveyList";
 
+	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = ".cep";
+
+	private static final CollectEarthProjectFileCreator COLLECT_EARTH_PROJECT_FILE_CREATOR;
+	static {
+		Iterator<CollectEarthProjectFileCreator> it = COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER.iterator();
+		COLLECT_EARTH_PROJECT_FILE_CREATOR = it.hasNext() ? it.next(): null;
+	}
+	
 	@WireVariable
 	private SurveyManager surveyManager;
 	@WireVariable
 	private RecordManager recordManager;
 	@WireVariable
+	private CodeListManager codeListManager;
+	@WireVariable
 	private SurveyValidator surveyValidator;
-
+	@WireVariable
+	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 	@WireVariable
 	private SpringJobManager springJobManager;
-
-	private SurveySummary selectedSurvey;
 
 	private Window surveyImportPopUp;
 
 	private Window validationResultsPopUp;
 
-	private List<SurveySummary> summaries;
-
-	private SurveyBackupJob surveyBackupJob;
-
 	private Window jobStatusPopUp;
+	
 	private Window newSurveyParametersPopUp;
 
 	private Window surveyExportPopup;
+
+	private SurveySummary selectedSurvey;
+
+	private List<SurveySummary> summaries;
+
+	private SurveyBackupJob surveyBackupJob;
 
 	private RDBPrintJob rdbExportJob;
 
@@ -166,13 +183,17 @@ public class SurveySelectVM extends BaseVM {
 		Job job;
 		switch(parameters.getOutputFormatEnum()) {
 		case EARTH:
-			try {
-				File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
-				String contentType = URLConnection.guessContentTypeFromName(file.getName());
-				FileInputStream is = new FileInputStream(file);
-				Filedownload.save(is, contentType, survey.getName() + ".zip");
-			} catch(Exception e) {
-				MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
+			if (validateCollectEarthSurvey(survey)) {
+				try {
+					((CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR).setCodeListManager(codeListManager);
+					File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
+					String contentType = URLConnection.guessContentTypeFromName(file.getName());
+					FileInputStream is = new FileInputStream(file);
+					Filedownload.save(is, contentType, survey.getName() + COLLECT_EARTH_PROJECT_FILE_EXTENSION);
+				} catch(Exception e) {
+					log.error(e);
+					MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
+				}
 			}
 			return;
 		case RDB:
@@ -249,7 +270,7 @@ public class SurveySelectVM extends BaseVM {
 	
 	private void downloadFile(File file, CollectSurvey survey, String extension, String contentType) {
 		String surveyName = survey.getName();
-		String dateStr = Dates.formatDateTime(new Date());
+		String dateStr = Dates.formatLocalDateTime(new Date());
 		String fileName = String.format(SURVEY_EXPORT_FILE_NAME_PATTERN, surveyName, dateStr, extension);
 		try {
 			Filedownload.save(new FileInputStream(file), contentType, fileName);
@@ -354,7 +375,17 @@ public class SurveySelectVM extends BaseVM {
 			return false;
 		}
 	}
-
+	
+	protected boolean validateCollectEarthSurvey(CollectSurvey survey) {
+		SurveyValidationResults validationResults = collectEarthSurveyValidator.validate(survey);
+		if (validationResults.isOk()) {
+			return true;
+		} else {
+			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(validationResults, ! validationResults.hasErrors());
+			return false;
+		}
+	}
+	
 	@GlobalCommand
 	public void confirmValidationResultsPopUp() {
 		if ( validationResultsPopUp != null ) {
@@ -381,19 +412,23 @@ public class SurveySelectVM extends BaseVM {
 			MessageUtil.showInfo("survey.successfully_published", args);
 			User user = getLoggedUser();
 			surveyManager.validateRecords(survey.getId(), user);
-		} catch (SurveyImportException e) {
+		} catch (SurveyStoreException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private void performSelectedSurveyUnpublishing() {
-		Integer publishedSurveyId = selectedSurvey.isWork() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
-		CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
-		loadSurveySummaries();
-		selectedSurvey = null;
-		notifyChange("selectedSurvey", "surveySummaries");
-		Object[] args = new String[] { temporarySurvey.getName() };
-		MessageUtil.showInfo("survey.successfully_unpublished", args);
+		try {
+			Integer publishedSurveyId = selectedSurvey.isWork() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
+			CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
+			loadSurveySummaries();
+			selectedSurvey = null;
+			notifyChange("selectedSurvey", "surveySummaries");
+			Object[] args = new String[] { temporarySurvey.getName() };
+			MessageUtil.showInfo("survey.successfully_unpublished", args);
+		} catch (SurveyStoreException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	@Command
@@ -571,7 +606,7 @@ public class SurveySelectVM extends BaseVM {
 		@Override
 		public CollectRecord next() {
 			CollectRecord summary = summaries.get(nextRecordIndex++);
-			CollectRecord record = recordManager.load(survey, summary.getId());
+			CollectRecord record = recordManager.load(survey, summary.getId(), summary.getStep());
 			return record;
 		}
 

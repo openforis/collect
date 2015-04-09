@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.3.18-SNAPSHOT</version>
+		<version>3.4.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -12,7 +12,7 @@
 	<packaging>jar</packaging>
 
 	<properties>
-<!-- 		<geotools.version>2.6.5</geotools.version> -->
+		<collectearth.version>1.0.43</collectearth.version>
 		<geotools.version>10.4</geotools.version>
 		<graniteds.version>2.3.0.GA</graniteds.version>
 		<aspectj.version>1.8.0</aspectj.version>
@@ -116,6 +116,11 @@
 			<groupId>org.openforis.collect</groupId>
 			<artifactId>collect-rdb</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openforis.collect.earth</groupId>
+			<artifactId>collect-earth-core</artifactId>
+			<version>${collectearth.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
@@ -353,6 +358,16 @@
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
 		    <version>2.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+		<dependency>
+			<groupId>com.jamesmurty.utils</groupId>
+			<artifactId>java-xmlbuilder</artifactId>
+			<version>1.1</version>
 		</dependency>
 		
 		<dependency>

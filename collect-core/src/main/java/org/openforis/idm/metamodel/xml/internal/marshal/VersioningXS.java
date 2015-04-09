@@ -3,7 +3,6 @@ package org.openforis.idm.metamodel.xml.internal.marshal;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.utils.Dates;

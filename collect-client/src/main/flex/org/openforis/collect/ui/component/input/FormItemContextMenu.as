@@ -73,7 +73,7 @@ package org.openforis.collect.ui.component.input {
 			if(parentEntity != null) {
 				var count:int = parentEntity.getCount(nodeDefinition);
 				var minCountValid:ValidationResultFlag = parentEntity.getMinCountValidation(nodeDefinition);
-				if(count == 0 || minCountValid == ValidationResultFlag.ERROR) {
+				if(count == 0 || minCountValid.name == ValidationResultFlag.ERROR.name) {
 					switch(step) {
 						/*case CollectRecord$Step.ENTRY:
 							items.push(SET_BLANK_ON_FORM);

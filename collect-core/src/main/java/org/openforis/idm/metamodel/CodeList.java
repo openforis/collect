@@ -226,6 +226,18 @@ public class CodeList extends VersionableSurveyObject {
 		}
 	}
 
+	public CodeListItem getItem(int itemId) {
+		Stack<CodeListItem> stack = new Stack<CodeListItem>();
+		stack.addAll(getItems());
+		while (! stack.isEmpty()) {
+			CodeListItem item = stack.pop();
+			if (item.getId() == itemId) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
 	public CodeListItem getItem(String code) {
 		return getItem(code, null);
 	}
@@ -283,6 +295,9 @@ public class CodeList extends VersionableSurveyObject {
 	 * 
 	 */
 	public void removeAllItems() {
+		if (items != null) {
+			items.clear();
+		}
 		items = null;
 	}
 	
@@ -293,6 +308,7 @@ public class CodeList extends VersionableSurveyObject {
 				CodeListItem item = it.next();
 				if ( item.getId() == id ) {
 					it.remove();
+					break;
 				}
 			}
 		}

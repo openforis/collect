@@ -101,9 +101,11 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 		}
 		sb.append("/");
 		sb.append(getName());
-		sb.append("[");
-		sb.append(getIndex() + 1);
-		sb.append("]");
+		if (this.definition.isMultiple() && ! (this instanceof Entity && ((Entity) this).isRoot())) {
+			sb.append("[");
+			sb.append(getIndex() + 1);
+			sb.append("]");
+		}
 		path = sb.toString();
 	}
 
@@ -122,7 +124,11 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	}
 
 	public boolean isRelevant() {
-		return parent == null ? true : parent.isRelevant(getName());
+		return parent == null ? true : parent.isRelevant(getDefinition());
+	}
+	
+	public boolean isRequired() {
+		return parent == null ? true : parent.isRequired(getDefinition());
 	}
 	
 	public Survey getSurvey() {

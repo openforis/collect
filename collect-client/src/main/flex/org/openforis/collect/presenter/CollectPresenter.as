@@ -472,6 +472,10 @@ package org.openforis.collect.presenter {
 				error = new Error(event.error);
 				error.name = "unknown";
 			}
+			if (Application.isEditingRecord()) {
+				ClientFactory.sessionClient.cancelLastKeepAliveOperation();
+				ClientFactory.dataClient.clearActiveRecord();
+			}
 			AlertUtil.showBlockingMessage("global.error.uncaught", error);
 		}
 

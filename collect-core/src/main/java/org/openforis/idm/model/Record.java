@@ -162,7 +162,7 @@ public class Record {
 	}
 
 	/**
-	 * @deprecated Use {@link #findNodeByPath(String)} instead
+	 * @deprecated use {@link #findNodeByPath()} instead.  
 	 */
 	@Deprecated
 	public <N extends Node<?>> N getNodeByPath(String path) {
@@ -221,19 +221,29 @@ public class Record {
 	void put(Node<?> node) {
 		initialize(node);
 		if ( toBeUpdated ) {
-			initDependecyGraphs(node);
+			registerInAllDependencyGraphs(node);
+		} else {
+			//register only calculated attribute dependencies
+			registerInDependencyGraph(calculatedAttributeDependencies, node);
 		}
 	}
 
-	protected void initDependecyGraphs(Node<?> node) {
-		for (DependencyGraph<?> graph : dependencyGraphs) {
+	private void registerInDependencyGraph(final DependencyGraph<?> graph, Node<?> node) {
+		if (node instanceof Entity) {
+			((Entity) node).traverse(new NodeVisitor() {
+				@Override
+				public void visit(Node<? extends NodeDefinition> node, int idx) {
+					graph.add(node);
+				}
+			});
+		} else {
 			graph.add(node);
 		}
+	}
 
-		if (node instanceof Entity) {
-			for (Node<?> child : ((Entity) node).getAll()) {
-				initDependecyGraphs(child);
-			}
+	protected void registerInAllDependencyGraphs(Node<?> node) {
+		for (DependencyGraph<?> graph : dependencyGraphs) {
+			registerInDependencyGraph(graph, node);
 		}
 	}
 
@@ -245,7 +255,7 @@ public class Record {
 		nodesByInternalId.put(id, node);
 
 		if (node instanceof Entity) {
-			for (Node<?> child : ((Entity) node).getAll()) {
+			for (Node<?> child : ((Entity) node).getChildren()) {
 				initialize(child);
 			}
 		}

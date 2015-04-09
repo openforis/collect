@@ -5,7 +5,6 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
@@ -14,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.Collect;
-import org.openforis.collect.designer.form.validator.FormValidator;
+import org.openforis.collect.designer.form.validator.SurveyNameValidator;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -33,7 +32,6 @@ import org.openforis.concurrency.Job;
 import org.openforis.concurrency.JobManager;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
-import org.zkoss.bind.ValidationContext;
 import org.zkoss.bind.Validator;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
@@ -58,7 +56,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private static final String[] ALLOWED_FILE_EXTENSIONS = ArrayUtils.addAll(
 			SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS,
 			new String[] {XML_FILE_EXTENSION}
-			);
+	);
 	
 	private static final String SURVEY_NAME_FIELD = "surveyName";
 	
@@ -134,14 +132,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 	}
 	
 	protected boolean validateForm(BindContext ctx) {
-		String surveyName = getFormSurveyName();
 		String messageKey = null;
-		if (StringUtils.isBlank(surveyName ) ) {
-			messageKey = "survey.import_survey.specify_name";
-		} else if ( uploadedFile == null ) {
+		if ( uploadedFile == null ) {
 			messageKey = "survey.import_survey.upload_a_file";
-		} else if ( ! updatingExistingSurvey && existsSurveyWithName(surveyName) ) {
-			messageKey = "survey.import_survey.error.duplicate_name";
 		}
 		if ( messageKey == null ) {
 			return true;
@@ -151,31 +144,12 @@ public class SurveyImportVM extends SurveyBaseVM {
 		}
 	}
 	
-	protected boolean existsSurveyWithName(String name) {
-		List<SurveySummary> summaries = surveyManager.loadSummaries();
-		for (SurveySummary summary : summaries) {
-			String summaryName = summary.getName();
-			if ( summaryName.equals(name) ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private String getFormSurveyName() {
 		return (String) form.get(SURVEY_NAME_FIELD);
 	}
 	
 	public Validator getNameValidator() {
-		return new FormValidator() {
-			@Override
-			protected void internalValidate(ValidationContext ctx) {
-				boolean result = validateRequired(ctx, SURVEY_NAME_FIELD);
-				if ( result ) {
-					result = validateInternalName(ctx, SURVEY_NAME_FIELD);
-				}
-			}
-		};
+		return new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, ! updatingExistingSurvey);
 	}
 
 	@Command

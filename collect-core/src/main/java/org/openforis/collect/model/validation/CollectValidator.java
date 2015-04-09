@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author M. Togna
+ * @author S. Ricci
  * 
  */
 public class CollectValidator extends Validator {
@@ -44,7 +45,13 @@ public class CollectValidator extends Validator {
 	private RecordManager recordManager;
 	@Autowired
 	private CodeListManager codeListManager;
+	
+	private boolean validateSpecified;
 
+	public CollectValidator() {
+		validateSpecified = true;
+	}
+	
 	@Override
 	public ValidationResults validate(Attribute<?, ?> attribute) {
 		ValidationResults results = new ValidationResults();
@@ -57,20 +64,16 @@ public class CollectValidator extends Validator {
 		CollectRecord record = (CollectRecord) attribute.getRecord();
 
 		// check if attribute has been specified
-		SpecifiedValidator specifiedValidator = new SpecifiedValidator();
-		ValidationResultFlag specifiedResultFlag = specifiedValidator.evaluate(attribute);
-		results.addResult(specifiedValidator, specifiedResultFlag);
-
-		if ( specifiedResultFlag.isError() ) {
-			record.updateSkippedCount(attribute.getInternalId());
-		} else {
+		boolean specifiedValid = validateSpecified ? validateSpecified(attribute, results) : true;
+		
+		if ( specifiedValid ) {
 			Step step = record.getStep();
-
+			
 			// validate root entity keys
 			if ( isRootEntityKey(attribute) ) {
 				validateRootEntityKey(attribute, results);
 			}
-
+			
 			/*
 			 * if the attribute is not empty and 'reason blank' has not been specified than validate it
 			 */
@@ -80,13 +83,23 @@ public class CollectValidator extends Validator {
 					validateAttributeChecks(attribute, results);
 				}
 			}
-
+			
 			if (step == Step.ENTRY) {
 				results = adjustErrorsForEntryPhase(results, attribute);
 			}
 			record.updateAttributeValidationCache(attribute, results);
+		} else {
+			record.updateSkippedCount(attribute.getInternalId());
 		}
 		return results;
+	}
+
+	private boolean validateSpecified(Attribute<?, ?> attribute,
+			ValidationResults results) {
+		SpecifiedValidator specifiedValidator = new SpecifiedValidator();
+		ValidationResultFlag specifiedResultFlag = specifiedValidator.evaluate(attribute);
+		results.addResult(specifiedValidator, specifiedResultFlag);
+		return ! specifiedResultFlag.isError();
 	}
 
 	@Override
@@ -209,5 +222,13 @@ public class CollectValidator extends Validator {
 	
 	public void setCodeListManager(CodeListManager codeListManager) {
 		this.codeListManager = codeListManager;
+	}
+	
+	public boolean isValidateSpecified() {
+		return validateSpecified;
+	}
+	
+	public void setValidateSpecified(boolean validateSpecified) {
+		this.validateSpecified = validateSpecified;
 	}
 }

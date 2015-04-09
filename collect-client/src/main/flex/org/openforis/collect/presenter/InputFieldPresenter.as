@@ -214,8 +214,11 @@ package org.openforis.collect.presenter {
 		
 		protected static function updateSymbolHandler(event:NodeEvent): void {
 			var updRequestSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
+			var isMultipleAttribute:Boolean = event.nodeDefinition != null && 
+									event.nodeDefinition is AttributeDefinitionProxy && 
+									event.nodeDefinition.multiple;
 			var nodes:IList;
-			if (event.nodeDefinition.multiple) {
+			if (isMultipleAttribute) {
 				nodes = event.nodes;
 			} else {
 				nodes = new ArrayCollection();

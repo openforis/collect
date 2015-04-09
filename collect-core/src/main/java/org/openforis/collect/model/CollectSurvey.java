@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
@@ -31,6 +32,7 @@ public class CollectSurvey extends Survey {
 	private boolean work;
 	
 	private CollectAnnotations annotations;
+	private UIConfiguration uiConfiguration;
 	
 	protected CollectSurvey(SurveyContext surveyContext) {
 		super(surveyContext);
@@ -43,6 +45,19 @@ public class CollectSurvey extends Survey {
 		return new CollectRecord(this, version);
 	}
 	
+	@Override
+	public void addApplicationOptions(ApplicationOptions options) {
+		super.addApplicationOptions(options);
+		if ( options instanceof UIOptions ) {
+			((UIOptions) options).setSurvey(this);
+		}
+	}
+
+	@Override
+	public List<CodeList> getCodeLists() {
+		return getCodeLists(true);
+	}
+	
 	public UIOptions createUIOptions() {
 		return new UIOptions(this);
 	}
@@ -52,16 +67,12 @@ public class CollectSurvey extends Survey {
 		return (UIOptions) applicationOptions;
 	}
 	
-	@Override
-	public void addApplicationOptions(ApplicationOptions options) {
-		super.addApplicationOptions(options);
-		if ( options instanceof UIOptions ) {
-			((UIOptions) options).setSurvey(this);
-		}
-	}
-
-	public CollectAnnotations getAnnotations() {
-		return annotations;
+	/**
+	 * Returns true if the specified list is not user defined (e.g. sampling data code list)
+	 */
+	public boolean isPredefinedCodeList(CodeList list) {
+		CodeList samplingDesignCodeList = ((CollectSurvey) list.getSurvey()).getSamplingDesignCodeList();
+		return samplingDesignCodeList != null && samplingDesignCodeList.getId() == list.getId();
 	}
 	
 	public CodeList getSamplingDesignCodeList() {
@@ -92,11 +103,6 @@ public class CollectSurvey extends Survey {
 		return list;
 	}
 	
-	@Override
-	public List<CodeList> getCodeLists() {
-		return getCodeLists(true);
-	}
-	
 	public List<CodeList> getCodeLists(boolean includeSamplingDesignList) {
 		List<CodeList> codeLists = new ArrayList<CodeList>(super.getCodeLists());
 		if ( ! includeSamplingDesignList ) {
@@ -115,6 +121,10 @@ public class CollectSurvey extends Survey {
 		return codeLists;
 	}
 	
+	public CollectAnnotations getAnnotations() {
+		return annotations;
+	}
+	
 	public boolean isWork() {
 		return work;
 	}
@@ -122,5 +132,13 @@ public class CollectSurvey extends Survey {
 	public void setWork(boolean work) {
 		this.work = work;
 	}
-
+	
+	public UIConfiguration getUIConfiguration() {
+		return uiConfiguration;
+	}
+	
+	public void setUIConfiguration(UIConfiguration uiConfiguration) {
+		this.uiConfiguration = uiConfiguration;
+	}
+	
 }

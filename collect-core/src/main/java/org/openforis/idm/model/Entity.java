@@ -49,10 +49,14 @@ public class Entity extends Node<EntityDefinition> {
 	@Override
 	protected void setRecord(Record record) {
 		super.setRecord(record);
-		List<Node<?>> children = getAll();
+		List<Node<?>> children = getChildren();
 		for (Node<?> node : children) {
 			node.setRecord(record);
 		}
+	}
+	
+	public boolean isRoot() {
+		return this == record.getRootEntity();
 	}
 	
 	public void add(Node<?> node) {
@@ -118,7 +122,7 @@ public class Entity extends Node<EntityDefinition> {
 	
 	@Override
 	public boolean hasData() {
-		List<Node<?>> children = getAll();
+		List<Node<?>> children = getChildren();
 		for ( Node<?> child : children ) {
 			if( child.hasData() ){
 				return true;
@@ -127,7 +131,24 @@ public class Entity extends Node<EntityDefinition> {
 		return false;
 	}
 
-	public Node<? extends NodeDefinition> get(NodeDefinition nodeDef, int index) {
+	public Node<? extends NodeDefinition> getChild(String name) {
+		NodeDefinition childDefn = definition.getChildDefinition(name);
+		return getChild(childDefn);
+	}
+	
+	public Node<? extends NodeDefinition> getChild(String name, int index) {
+		NodeDefinition childDefn = definition.getChildDefinition(name);
+		return getChild(childDefn, index);
+	}
+	
+	public Node<? extends NodeDefinition> getChild(NodeDefinition childDef) {
+		if ( childDef.isMultiple() ) {
+			throw new IllegalArgumentException("Single child definition expected for " + childDef.getPath());
+		}
+		return getChild(childDef, 0);
+	}
+	
+	public Node<? extends NodeDefinition> getChild(NodeDefinition nodeDef, int index) {
 		List<Node<?>> list = childrenByDefinitionId.get(nodeDef.getId());
 		if (list == null || index >= list.size()) {
 			return null;
@@ -136,30 +157,29 @@ public class Entity extends Node<EntityDefinition> {
 		}
 	}
 	
+	/**
+	 * @deprecated Use {@link #getChild(String, int)}  instead.
+	 */
+	@Deprecated
 	public Node<? extends NodeDefinition> get(String name, int index) {
-		NodeDefinition childDefn = definition.getChildDefinition(name);
-		return get(childDefn, index);
+		return getChild(name, index);
 	}
 	
-	public Node<? extends NodeDefinition> getChild(NodeDefinition childDef) {
-		if ( childDef.isMultiple() ) {
-			throw new IllegalArgumentException("Single child definition expected for " + childDef.getPath());
-		}
-		return get(childDef, 0);
-	}
-	
-	public Node<? extends NodeDefinition> getChild(String name) {
-		NodeDefinition childDefn = definition.getChildDefinition(name);
-		return getChild(childDefn);
-	}
-	
-	public List<Entity> findChildEntitiesByKeys(String childName, String... keys) {
-		return findChildEntitiesByKeys(definition.getChildDefinition(childName), keys);
+	/**
+	 * @deprecated Use {@link #getChild(NodeDefinition, int)}  instead.
+	 */
+	@Deprecated
+	public Node<? extends NodeDefinition> get(NodeDefinition nodeDef, int index) {
+		return getChild(nodeDef, index);
 	}
 
-	public List<Entity> findChildEntitiesByKeys(NodeDefinition childDef, String... keys) {
+	public List<Entity> findChildEntitiesByKeys(String childName, String... keys) {
+		return findChildEntitiesByKeys((EntityDefinition) definition.getChildDefinition(childName), keys);
+	}
+
+	public List<Entity> findChildEntitiesByKeys(EntityDefinition childEntityDef, String... keys) {
 		List<Entity> result = new ArrayList<Entity>();
-		List<Node<?>> siblings = getAll(childDef);
+		List<Node<?>> siblings = getChildren(childEntityDef);
 		for (Node<?> sibling : siblings) {
 			String[] keyValues = ((Entity) sibling).getKeyValues();
 			if ( compareKeys(keyValues, keys) == 0 ) {
@@ -194,7 +214,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public Object getValue(String name, int index) {
-		Node<?> node = get(name, index);
+		Node<?> node = getChild(name, index);
 		if ( node instanceof Attribute ) {
 			return ((Attribute<?,?>) node).getValue();
 		} else if ( node == null ) {
@@ -233,13 +253,13 @@ public class Entity extends Node<EntityDefinition> {
 			keyAttrParent = this;
 			String[] parts = relativePath.split("/");
 			for (String part : parts) {
-				keyAttrParent = (Entity) keyAttrParent.get(part, 0);
+				keyAttrParent = (Entity) keyAttrParent.getChild(part, 0);
 			}
 		} else {
 			keyAttrParent = this;
 		}
 		@SuppressWarnings("unchecked")
-		Attribute<?, Value> keyAttr = (Attribute<?, Value>) keyAttrParent.getChild(keyDefn.getName());
+		Attribute<?, Value> keyAttr = (Attribute<?, Value>) keyAttrParent.getChild(keyDefn);
 		return keyAttr;
 	}
 	
@@ -262,7 +282,7 @@ public class Entity extends Node<EntityDefinition> {
 
     public Entity getEnumeratedEntity(EntityDefinition childEntityDefn,
 			CodeAttributeDefinition enumeratingCodeAttributeDef, String enumeratingCode) {
-		List<Node<?>> children = getAll(childEntityDefn.getName());
+		List<Node<?>> children = getChildren(childEntityDefn);
 		for (Node<?> child : children) {
 			Entity entity = (Entity) child;
 			Code code = entity.getCodeAttributeValue(enumeratingCodeAttributeDef);
@@ -274,7 +294,7 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	private Code getCodeAttributeValue(CodeAttributeDefinition def) {
-		Node<?> node = get(def, 0);
+		Node<?> node = getChild(def, 0);
 		return node == null ? null: ((CodeAttribute)node).getValue();
 	}
 	
@@ -411,37 +431,67 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	/**
-	 * 
+	 * @deprecated Use {@link Entity#getChildren()} instead.
 	 * @return Unmodifiable list of child instances, sorted by their schema
 	 *         order.
 	 */
+	@Deprecated
 	public List<Node<? extends NodeDefinition>> getAll() {
+		return getChildren();
+	}
+	
+	/**
+	 * @deprecated Use {@link Entity#getChildren(NodeDefinition)} instead.
+	 */
+	@Deprecated
+	public List<Node<? extends NodeDefinition>> getAll(NodeDefinition childDef) {
+		return getChildren(childDef);
+	}
+
+	/**
+	 * @deprecated Use {@link Entity#getChildren(String)} instead.
+	 */
+	@Deprecated
+	public List<Node<? extends NodeDefinition>> getAll(String name) {
+		return getChildren(name);
+	}
+
+	public List<Node<? extends NodeDefinition>> getChildren() {
 		List<Node<?>> result = new ArrayList<Node<?>>();
-		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
-		for (NodeDefinition defn : definitions) {
-			result.addAll(getAll(defn));
+		for (List<Node<?>> list : childrenByDefinitionId.values()) {
+			result.addAll(list);
 		}
 		return Collections.unmodifiableList(result);
 	}
 	
-	public List<Node<? extends NodeDefinition>> getAll(NodeDefinition childDef) {
+	/**
+	 * Returns a list of children with the same sorting as the children node definitions
+	 * @return List of children
+	 */
+	public List<Node<? extends NodeDefinition>> getSortedChildren() {
+		List<Node<?>> result = new ArrayList<Node<?>>();
+		List<NodeDefinition> definitions = getDefinition().getChildDefinitions();
+		for (NodeDefinition defn : definitions) {
+			List<Node<?>> tempChildren = childrenByDefinitionId.get(defn.getId());
+			if (tempChildren != null) {
+				result.addAll(tempChildren);
+			}
+		}
+		return Collections.unmodifiableList(result);
+	}
+	
+	public List<Node<? extends NodeDefinition>> getChildren(NodeDefinition childDef) {
 		List<Node<?>> children = childrenByDefinitionId.get(childDef.getId());
 		return CollectionUtils.unmodifiableList(children);
 	}
 
-	public List<Node<? extends NodeDefinition>> getAll(String name) {
-		NodeDefinition childDef = definition.getChildDefinition(name);
-		return getAll(childDef);
-	}
-
-	@Deprecated
+	/**
+	 * Returns the children related to the child definition with the given name.
+	 * It's preferable to use {@link #getChildren(NodeDefinition)} because it's more efficient.
+	 */
 	public List<Node<? extends NodeDefinition>> getChildren(String name) {
-		return getAll(name);
-	}
-	
-	@Deprecated
-	public List<Node<? extends NodeDefinition>> getChildren() {
-		return getAll();
+		NodeDefinition childDef = definition.getChildDefinition(name);
+		return getChildren(childDef);
 	}
 
 	@Override
@@ -495,9 +545,8 @@ public class Entity extends Node<EntityDefinition> {
 					EntityDefinition defn = entity.getDefinition();
 					List<NodeDefinition> childDefns = defn.getChildDefinitions();
 					for (NodeDefinition childDefn : childDefns) {
-						String childName = childDefn.getName();
-						List<Node<?>> children = entity.getAll(childName);
-						if (children != null) {
+						List<Node<?>> children = entity.childrenByDefinitionId.get(childDefn.getId());
+						if (children != null && ! children.isEmpty()) {
 							stack.push(children);
 						}
 					}
@@ -529,7 +578,7 @@ public class Entity extends Node<EntityDefinition> {
 	@Override
 	protected void resetPath() {
 		super.resetPath();
-		for (Node<?> child : getAll()) {
+		for (Node<?> child : getChildren()) {
 			child.resetPath();
 		}
 	}
@@ -574,7 +623,8 @@ public class Entity extends Node<EntityDefinition> {
 	}
 	
 	public Integer getMinCount(NodeDefinition defn) {
-		return derivedStateCache.getMinCount(defn.getId());
+		Integer fixedCount = defn.getFixedMinCount();
+		return fixedCount == null ? derivedStateCache.getMinCount(defn.getId()): fixedCount;
 	}
 	
 	public void setMinCount(NodeDefinition childDefn, int count) {
@@ -582,7 +632,8 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public Integer getMaxCount(NodeDefinition defn) {
-		return derivedStateCache.getMaxCount(defn.getId());
+		Integer fixedCount = defn.getFixedMaxCount();
+		return fixedCount == null ? derivedStateCache.getMaxCount(defn.getId()): fixedCount;
 	}
 	
 	public void setMaxCount(NodeDefinition childDefn, int count) {
@@ -638,13 +689,13 @@ public class Entity extends Node<EntityDefinition> {
 	public List<Node<?>> getDescendants() {
 		List<Node<?>> result = new Stack<Node<?>>();
 		Stack<Node<?>> stack = new Stack<Node<?>>();
-		stack.addAll(this.getAll());
+		stack.addAll(this.getChildren());
 		while(!stack.isEmpty()){
 			Node<?> n = stack.pop();
 			result.add(0, n);
 			if(n instanceof Entity){
 				Entity entity = (Entity) n;
-				List<Node<?>> children = entity.getAll();
+				List<Node<?>> children = entity.getChildren();
 				for (Node<?> child : children) {
 					stack.push(child);
 				}

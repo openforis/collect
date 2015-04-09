@@ -91,6 +91,16 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		FORM, TABLE
 	}
 	
+	public enum CodeAttributeLayoutType {
+		RADIO, DROPDOWN, TEXT;
+		
+		@Override
+		public String toString() {
+			return name().toLowerCase();
+		}
+		
+	}
+	
 	public enum Direction {
 		BY_ROWS("byRows"), 
 		BY_COLUMNS("byColumns");
@@ -238,7 +248,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 					if ( result == null ) {
 						//try to find tab among main tab children
 						UITab mainTab = getMainTab(rootTabSet);
-						result = mainTab.getTab(tabName);
+						result = mainTab == null ? null : mainTab.getTab(tabName);
 					}
 				} else {
 					UITab parentTab = getAssignedTab(parentDefn);
@@ -636,12 +646,12 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), value ? Boolean.toString(value): null);
 	}
 	
-	public String getLayoutType(CodeAttributeDefinition defn) {
-		String annotationValue = getAnnotationStringValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE);
-		return annotationValue;
+	public CodeAttributeLayoutType getLayoutType(CodeAttributeDefinition defn) {
+		CodeAttributeLayoutType value = getAnnotationEnumValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE, CodeAttributeLayoutType.class);
+		return value;
 	}
 	
-	public void setLayoutType(CodeAttributeDefinition defn, String value) {
+	public void setLayoutType(CodeAttributeDefinition defn, CodeAttributeLayoutType value) {
 		setAnnotationValue(defn, Annotation.CODE_ATTRIBUTE_LAYOUT_TYPE, value);
 	}
 	
@@ -775,7 +785,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 				return annotation.<E>getDefaultValue();
 			}
 		} else {
-			return Enum.valueOf(enumType, annotationValue);
+			return Enum.valueOf(enumType, annotationValue.toUpperCase());
 		}
 	}
 	

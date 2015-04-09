@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="improve-record-search-performance" author="ricci" dbms="sqlite">
+		<comment>Add indexes to ofc_record table to optimize search performances</comment>
+		
+		<createIndex 
+		    indexName="ofc_record_key1_idx"
+			tableName="ofc_record" 
+			unique="false">
+			<column name="survey_id" type="INTEGER" />
+			<column name="root_entity_definition_id" type="INTEGER" />
+			<column name="key1" type="VARCHAR" />
+		</createIndex>
+		
+		<createIndex 
+		    indexName="ofc_record_key2_idx"
+			tableName="ofc_record" 
+			unique="false">
+			<column name="survey_id" type="INTEGER" />
+			<column name="root_entity_definition_id" type="INTEGER" />
+			<column name="key1" type="VARCHAR" />
+			<column name="key2" type="VARCHAR" />
+		</createIndex>
+		
+		<createIndex 
+		    indexName="ofc_record_key3_idx"
+			tableName="ofc_record" 
+			unique="false">
+			<column name="survey_id" type="INTEGER" />
+			<column name="root_entity_definition_id" type="INTEGER" />
+			<column name="key1" type="VARCHAR" />
+			<column name="key2" type="VARCHAR" />
+			<column name="key3" type="VARCHAR" />
+		</createIndex>
+		
+		<createIndex 
+		    indexName="ofc_record_date_modified_idx"
+			tableName="ofc_record" 
+			unique="false">
+			<column name="survey_id" type="INTEGER" />
+			<column name="root_entity_definition_id" type="INTEGER" />
+			<column name="date_modified" type="TIMESTAMP" />
+		</createIndex>
+		
+	</changeSet>
+	
+</databaseChangeLog>

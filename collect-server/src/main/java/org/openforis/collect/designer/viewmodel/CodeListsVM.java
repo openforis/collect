@@ -33,6 +33,7 @@ import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.FileWrapper;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Job;
@@ -148,7 +149,6 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		dispatchCodeListsUpdatedCommand();
 		dispatchSurveySaveCommand();
 		initItemsPerLevel();
-		notifyChange("itemsPerLevel");
 	}
 
 	@Override
@@ -307,7 +307,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		codeListManager.removeLevel(editedItem, levelIndex + 1);
 		deselectItemsAfterLevel(levelIndex);
 		initItemsPerLevel();
-		notifyChange("listLevels","selectedItemsPerLevel","itemsPerLevel");
+		notifyChange("listLevels","selectedItemsPerLevel");
 	}
 	
 	@Command
@@ -371,7 +371,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			deselectItemsAfterLevel(itemLevelIndex);
 		}
 		initItemsPerLevel();
-		notifyChange("itemsPerLevel","selectedItemsPerLevel");
+		notifyChange("selectedItemsPerLevel");
 		BindUtils.postNotifyChange(null, null, editedItem, ".");
 	}
 	
@@ -578,7 +578,9 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@GlobalCommand
-	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges) {
+	public void closeCodeListItemPopUp(@BindingParam("undoChanges") boolean undoChanges, 
+			@BindingParam("imageModified") boolean imageModified, 
+			@BindingParam("imageFileWrapper") FileWrapper imageFileWrapper) {
 		closePopUp(codeListItemPopUp);
 		codeListItemPopUp = null;
 		if ( undoChanges ) {
@@ -592,6 +594,24 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 					codeListManager.save((PersistedCodeListItem) editedChildItem);
 				}
 				BindUtils.postNotifyChange(null, null, editedChildItem, "*");
+			}
+			if (imageModified) {
+				PersistedCodeListItem persistedItem;
+				if (editedChildItem instanceof PersistedCodeListItem) {
+					persistedItem = (PersistedCodeListItem) editedChildItem;
+				} else {
+					CodeList codeList = editedChildItem.getCodeList();
+					codeListManager.persistCodeListItems(codeList);
+					reloadSelectedItems();
+					initItemsPerLevel();
+					
+					persistedItem = codeListManager.loadItem(codeList, editedChildItem.getId());
+				}
+				if (imageFileWrapper == null) {
+					codeListManager.deleteImageContent(persistedItem);
+				} else {
+					codeListManager.saveImageContent(persistedItem, imageFileWrapper);
+				}
 			}
 		}
 	}
@@ -693,8 +713,18 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		deselectItemsAfterLevel(editedChildItemLevelIndex);
 		selectedItemsPerLevel.add(editedChildItem);
 		initItemsPerLevel();
-		notifyChange("itemsPerLevel","selectedItemsPerLevel");
+		notifyChange("selectedItemsPerLevel");
 		BindUtils.postNotifyChange(null, null, editedItem, ".");
+	}
+
+	private void reloadSelectedItems() {
+		List<CodeListItem> newItems = new ArrayList<CodeListItem>(selectedItemsPerLevel.size());
+		for (CodeListItem item : selectedItemsPerLevel) {
+			CodeListItem newItem = codeListManager.loadItem(item.getCodeList(), item.getId());
+			newItems.add(newItem);
+		}
+		selectedItemsPerLevel = newItems;
+		notifyChange("selectedItemsPerLevel");
 	}
 
 	protected void initItemsPerLevel() {
@@ -710,6 +740,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 			//add empty root items list
 			itemsPerLevel.add(new ArrayList<CodeListItem>());
 		}
+		notifyChange("itemsPerLevel");
 	}
 	
 	public List<CodeListLevel> getListLevels() {

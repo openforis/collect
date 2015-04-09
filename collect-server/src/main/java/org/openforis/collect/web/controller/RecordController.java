@@ -7,16 +7,23 @@ import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.proxy.RecordProxy;
+import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -25,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
  * 
  */
 @Controller
+@Scope(WebApplicationContext.SCOPE_SESSION)
 public class RecordController extends BasicController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -35,8 +43,10 @@ public class RecordController extends BasicController implements Serializable {
 	private RecordManager recordManager;
 	@Autowired
 	private SurveyManager surveyManager;
-
-	@RequestMapping(value = "/survey/{survey_id}/record/{record_id}/step/{step}/data.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Autowired
+	private SessionManager sessionManager;
+	
+	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/binary_data.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	Map<String, Object> loadData(@PathVariable(value="survey_id") int surveyId,
 			@PathVariable(value="record_id") int recordId,
@@ -52,7 +62,7 @@ public class RecordController extends BasicController implements Serializable {
  		return map;
 	}
 
-	@RequestMapping(value = "/survey/{survey_id}/record/{record_id}/edit.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/edit.htm", method = RequestMethod.GET)
 	public ModelAndView editRecord(@PathVariable(value="survey_id") int surveyId,
 			@PathVariable(value="record_id") int recordId ) throws Exception {
 		URIBuilder uriBuilder = new URIBuilder("redirect:/index.htm");
@@ -62,6 +72,18 @@ public class RecordController extends BasicController implements Serializable {
 		String url = uriBuilder.toString();
 		//String url = String.format("redirect:/index.htm?edit=true&surveyId=%d&recordId=%d", surveyId, recordId);
 		return new ModelAndView(url);
+	}
+	
+	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/content.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	RecordProxy loadRecord(
+			@PathVariable(value="survey_id") int surveyId, 
+			@PathVariable(value="record_id") int recordId,
+			@PathVariable(value="step") int stepNumber) throws RecordPersistenceException {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectRecord record = recordManager.checkout(survey, sessionState.getUser(), recordId, Step.valueOf(stepNumber), sessionState.getSessionId(), true);
+		return new RecordProxy(record, sessionState.getLocale());
 	}
 	
 }

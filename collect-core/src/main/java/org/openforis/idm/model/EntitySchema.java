@@ -36,7 +36,7 @@ public class EntitySchema extends SchemaSupport<Entity> {
 
 	@Override
 	public void writeTo(Output out, Entity entity) throws IOException {
-		List<Node<? extends NodeDefinition>> children = entity.getAll();
+		List<Node<? extends NodeDefinition>> children = entity.getChildren();
         for(Node<?> node : children) {
         	if(isNodeToBeSaved(node)) {
 				out.writeUInt32(FIELD_DEFINITION_ID, node.definitionId, false);
@@ -93,7 +93,7 @@ public class EntitySchema extends SchemaSupport<Entity> {
 	protected boolean isNodeToBeSaved(Node<?> node) {
 		if ( node instanceof Attribute<?, ?> && ! (((AttributeDefinition) node.getDefinition()).isCalculated() ) ) {
 			Entity parent = node.getParent();
-    		int count = parent.getCount(node.getName());
+    		int count = parent.getCount(node.getDefinition());
     		if ( count == 1 && ! ((Attribute<?, ?>) node).hasData() ) {
     			return false;
     		}

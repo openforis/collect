@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.data.DataImportState.MainStep;
@@ -33,6 +34,7 @@ import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidation
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.xml.DataHandler;
@@ -61,6 +63,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Deprecated
 public class XMLDataImportProcess implements Callable<Void> {
+
+	private static final int MAX_QUERY_BUFFER_SIZE = 100;
 
 	private static Log LOG = LogFactory.getLog(XMLDataImportProcess.class);
 
@@ -104,6 +108,12 @@ public class XMLDataImportProcess implements Callable<Void> {
 	private boolean includesRecordFiles;
 	
 	private Predicate<CollectRecord> includeRecordPredicate;
+	
+	private boolean validateRecords;
+
+	private List<RecordStoreQuery> queryBuffer;
+
+	private Integer nextRecordId;
 
 	public XMLDataImportProcess() {
 		super();
@@ -111,6 +121,8 @@ public class XMLDataImportProcess implements Callable<Void> {
 		this.processedRecords = new ArrayList<Integer>();
 		this.entryIdsToImport = new ArrayList<Integer>();
 		this.includeRecordPredicate = null;
+		this.validateRecords = true;
+		this.queryBuffer = new ArrayList<RecordStoreQuery>();
 	}
 
 	public DataImportState getState() {
@@ -357,6 +369,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			state.resetCount();
 			zipFile = new ZipFile(file);
 			state.setRunning(true);
+			nextRecordId = recordManager.nextId();
 			for (Integer entryId : entryIdsToImport) {
 				if ( state.getSubStep() == SubStep.RUNNING && ! processedRecords.contains(entryId) ) {
 					importEntries(zipFile, entryId);
@@ -367,6 +380,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 				}
 			}
 			if ( state.getSubStep() == SubStep.RUNNING ) {
+				flushQueryBuffer();
 				state.setSubStep(SubStep.COMPLETE);
 			}
 		} catch (Exception e) {
@@ -375,14 +389,11 @@ public class XMLDataImportProcess implements Callable<Void> {
 			state.setSubStep(SubStep.ERROR);
 			LOG.error("Error during data export", e);
 		} finally {
-			state.setRunning(false);
-			if ( zipFile != null ) {
-				try {
-					zipFile.close();
-				} catch (IOException e) {
-					LOG.error(e.getMessage(), e);
-				}
+			if (nextRecordId != null) {
+				recordManager.restartIdSequence(nextRecordId);
 			}
+			state.setRunning(false);
+			IOUtils.closeQuietly(zipFile);
 		}
 	}
 	
@@ -403,44 +414,56 @@ public class XMLDataImportProcess implements Callable<Void> {
 					state.addError(entryName, message);
 				} else {
 					parsedRecord.setStep(step);
+					RecordStoreQuery query;
 					if ( lastProcessedRecord == null ) {
 						CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
-						if (oldRecordSummary == null) {
-							//insert new record
-							recordManager.save(parsedRecord);
-							LOG.info("Inserted: " + parsedRecord.getId() + " (from file " + entryName + ")");
-						} else {
+						if (oldRecordSummary != null) {
 							//overwrite existing record
 							originalRecordStep = oldRecordSummary.getStep();
 							parsedRecord.setId(oldRecordSummary.getId());
 							if ( includesRecordFiles ) {
 								recordFileManager.deleteAllFiles(parsedRecord);
 							}
-							recordManager.save(parsedRecord);
-							LOG.info("Updated: " + oldRecordSummary.getId() + " (from file " + entryName  + ")");
+							query = recordManager.createUpdateQuery(parsedRecord);
+						} else {
+							parsedRecord.setId(nextRecordId ++);
+							query = recordManager.createInsertQuery(parsedRecord);
 						}
 						lastProcessedRecord = parsedRecord;
 					} else {
 						replaceData(parsedRecord, lastProcessedRecord);
-						recordManager.save(lastProcessedRecord);
+						query = recordManager.createUpdateQuery(lastProcessedRecord);
 					}
-					if ( parseRecordResult.hasWarnings() ) {
-						//state.addWarnings(entryName, parseRecordResult.getWarnings());
-					}
+					appendQuery(query);
+//					if ( parseRecordResult.hasWarnings() ) {
+//						state.addWarnings(entryName, parseRecordResult.getWarnings());
+//					}
 				}
 			}
 		}
 		if ( lastProcessedRecord != null && originalRecordStep != null && originalRecordStep.compareTo(lastProcessedRecord.getStep()) > 0 ) {
 			//reset the step to the original one and revalidate the record
 			CollectSurvey survey = (CollectSurvey) lastProcessedRecord.getSurvey();
-			CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep);
+			CollectRecord originalRecord = recordManager.load(survey, lastProcessedRecord.getId(), originalRecordStep, validateRecords);
 			originalRecord.setStep(originalRecordStep);
-			validateRecord(originalRecord);
-			recordManager.save(originalRecord);
+			afterRecordUpdate(originalRecord);
+			appendQuery(recordManager.createUpdateQuery(originalRecord));
 		}
 		if ( includesRecordFiles ) {
 			importRecordFiles(zipFile, lastProcessedRecord);
 		}
+	}
+
+	private void appendQuery(RecordStoreQuery query) {
+		queryBuffer.add(query);
+		if (queryBuffer.size() == MAX_QUERY_BUFFER_SIZE) {
+			flushQueryBuffer();
+		}
+	}
+
+	private void flushQueryBuffer() {
+		recordManager.execute(queryBuffer);
+		queryBuffer.clear();
 	}
 
 	private void importRecordFiles(ZipFile zipFile, CollectRecord record) throws IOException, RecordPersistenceException {
@@ -496,7 +519,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 
 	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
 		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
-		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey);
+		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey, validateRecords);
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
 		return dataUnmarshaller;
 	}
@@ -550,16 +573,18 @@ public class XMLDataImportProcess implements Callable<Void> {
 		ParseRecordResult result = dataUnmarshaller.parse(reader);
 		if ( result.isSuccess() ) {
 			CollectRecord record = result.getRecord();
-			validateRecord(record);
+			afterRecordUpdate(record);
 		}
 		return result;
 	}
 
-	private void validateRecord(CollectRecord record) {
-		try {
-			recordManager.validate(record);
-		} catch (Exception e) {
-			LOG.info("Error validating record: " + record.getRootEntityKeyValues());
+	private void afterRecordUpdate(CollectRecord record) {
+		if (validateRecords) {
+			try {
+				recordManager.validate(record);
+			} catch (Exception e) {
+				LOG.info("Error validating record: " + record.getRootEntityKeyValues());
+			}
 		}
 	}
 
@@ -644,6 +669,14 @@ public class XMLDataImportProcess implements Callable<Void> {
 	
 	public void setIncludeRecordPredicate(Predicate<CollectRecord> includeRecordPredicate) {
 		this.includeRecordPredicate = includeRecordPredicate;
+	}
+
+	public boolean isValidateRecords() {
+		return validateRecords;
+	}
+
+	public void setValidateRecords(boolean validateRecords) {
+		this.validateRecords = validateRecords;
 	}
 	
 }

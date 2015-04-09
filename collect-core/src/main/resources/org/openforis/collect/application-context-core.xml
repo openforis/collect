@@ -108,7 +108,7 @@
 		lazy-init="false" init-method="init" />
 	<bean id="samplingDesignManager"    class="org.openforis.collect.manager.SamplingDesignManager" />
 	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager" 
-		init-method="init" scope="session" />
+		init-method="init" />
   	<bean id="speciesManager"           class="org.openforis.collect.manager.SpeciesManager" />
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" 
 		init-method="init" />

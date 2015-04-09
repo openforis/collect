@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.collection.CollectionUtils;
 
 /**
@@ -30,6 +31,7 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 	private CodeList list;
 	private CodeListItem parentItem;
 	private final int level;
+	private String imageFileName;
 
 	protected CodeListItem(CodeList codeList, int id, int level) {
 		super(codeList.getSurvey(), id);
@@ -290,7 +292,19 @@ public class CodeListItem extends VersionableSurveyObject implements Serializabl
 			}
 		}
 	}
-
+	
+	public boolean hasUploadedImage() {
+		return StringUtils.isNotBlank(imageFileName);
+	}
+	
+	public String getImageFileName() {
+		return imageFileName;
+	}
+	
+	public void setImageFileName(String imageFileName) {
+		this.imageFileName = imageFileName;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

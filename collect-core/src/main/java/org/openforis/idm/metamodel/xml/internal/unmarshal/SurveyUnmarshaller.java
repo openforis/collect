@@ -73,6 +73,11 @@ public class SurveyUnmarshaller extends IdmlPullReader {
 		survey.setPublished(published == null ? false : published);
 		readNamepaceDeclarations();
 	}
+	
+	@Override
+	protected void onEndTag() throws XmlParseException {
+		super.onEndTag();
+	}
 
 	protected void initSurvey() {
 		SurveyIdmlBinder surveyBinder = getSurveyBinder();

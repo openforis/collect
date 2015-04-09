@@ -40,13 +40,13 @@ public class CollectCodeListService implements CodeListService {
 	public <T extends CodeListItem> List<T> loadItems(CodeList codeList, int level) {
 		return codeListManager.loadItems(codeList, level);
 	}
-
+	
 	@Override
 	public <T extends CodeListItem> List<T> loadValidItems(Entity parent,
-			CodeAttributeDefinition attrDef) {
-		return codeListManager.loadValidItems(parent, attrDef);
+			CodeAttributeDefinition def) {
+		return codeListManager.loadValidItems(parent, def);
 	}
-	
+
 	@Override
 	public <T extends CodeListItem> T loadParentItem(T item) {
 		return codeListManager.loadParentItem(item);

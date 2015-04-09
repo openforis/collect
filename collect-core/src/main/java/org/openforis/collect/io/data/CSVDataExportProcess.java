@@ -158,7 +158,7 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
 		for (CollectRecord s : summaries) {
 			if ( status.isRunning() ) {
-				CollectRecord record = recordManager.load(survey, s.getId(), step);
+				CollectRecord record = recordManager.load(survey, s.getId(), step, false);
 				modelWriter.printData(record);
 				status.incrementProcessed();
 			} else {

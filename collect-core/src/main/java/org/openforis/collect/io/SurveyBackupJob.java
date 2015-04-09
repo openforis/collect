@@ -9,10 +9,12 @@ import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.data.RecordFileBackupTask;
 import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
+import org.openforis.collect.io.metadata.CodeListImagesExportTask;
 import org.openforis.collect.io.metadata.CollectMobileBackupConvertTask;
 import org.openforis.collect.io.metadata.IdmlExportTask;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignExportTask;
 import org.openforis.collect.io.metadata.species.SpeciesBackupExportTask;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
@@ -45,11 +47,13 @@ public class SurveyBackupJob extends Job {
 	public static final String SPECIES_ENTRY_FORMAT = SPECIES_FOLDER + ZIP_FOLDER_SEPARATOR + "%s.csv";
 	public static final String INFO_FILE_NAME = "info.properties";
 	public static final String DATA_FOLDER = "data";
+	public static final String CODE_LIST_IMAGES_FOLDER = "code_list_images";
 	public static final String UPLOADED_FILES_FOLDER = "upload";
 	
 	public enum OutputFormat {
 		DESKTOP("collect"), 
-		MOBILE("collect-mobile");
+		MOBILE("collect-mobile"),
+		ONLY_DATA("collect-data");
 		
 		public static final OutputFormat DEFAULT = DESKTOP;
 		
@@ -74,6 +78,8 @@ public class SurveyBackupJob extends Job {
 	private SpeciesManager speciesManager;
 	@Autowired
 	private SamplingDesignManager samplingDesignManager;
+	@Autowired
+	private CodeListManager codeListManager;
 	
 	//input
 	private CollectSurvey survey;
@@ -105,6 +111,7 @@ public class SurveyBackupJob extends Job {
 	protected void buildTasks() throws Throwable {
 		addInfoPropertiesCreatorTask();
 		addIdmlExportTask();
+		addCodeListImagesExportTask();
 		addSamplingDesignExportTask();
 		addSpeciesExportTask();
 		if ( includeData && ! survey.isWork() ) {
@@ -151,6 +158,14 @@ public class SurveyBackupJob extends Job {
 		addTask(task);
 	}
 	
+	private void addCodeListImagesExportTask() {
+		CodeListImagesExportTask task = createTask(CodeListImagesExportTask.class);
+		task.setSurvey(survey);
+		task.setZipOutputStream(zipOutputStream);
+		task.setCodeListManager(codeListManager);
+		addTask(task);
+	}
+	
 	private void addSamplingDesignExportTask() {
 		if ( samplingDesignManager.hasSamplingDesign(survey) ) {
 			SamplingDesignExportTask task = createTask(SamplingDesignExportTask.class);
@@ -170,7 +185,7 @@ public class SurveyBackupJob extends Job {
 			taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
 		}
 		for (CollectTaxonomy taxonomy : taxonomies) {
-			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
+//			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
 				SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);
 				task.setSpeciesManager(speciesManager);
 				task.setOutputStream(zipOutputStream);
@@ -178,7 +193,7 @@ public class SurveyBackupJob extends Job {
 				String entryName = String.format(SPECIES_ENTRY_FORMAT, taxonomy.getName());
 				task.addStatusChangeListener(new ZipEntryCreatorTaskStatusChangeListener(zipOutputStream, entryName));
 				addTask(task);
-			}
+//			}
 		}
 	}
 	
@@ -219,16 +234,12 @@ public class SurveyBackupJob extends Job {
 		super.prepareTask(task);
 	}
 
-	public RecordManager getRecordManager() {
-		return recordManager;
-	}
-	
 	public void setRecordManager(RecordManager recordManager) {
 		this.recordManager = recordManager;
 	}
 	
-	public DataMarshaller getDataMarshaller() {
-		return dataMarshaller;
+	public void setCodeListManager(CodeListManager codeListManager) {
+		this.codeListManager = codeListManager;
 	}
 	
 	public void setDataMarshaller(DataMarshaller dataMarshaller) {

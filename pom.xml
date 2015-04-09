@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.3.18-SNAPSHOT</version>
+	<version>3.4.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -24,7 +24,7 @@
 		<installer-version-id>${buildNumber}</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.0.15-SNAPSHOT</openforis.commons.version>
+		<openforis.commons.version>0.0.16</openforis.commons.version>
 		<spring.version>3.2.8.RELEASE</spring.version>
 		<spring-security.version>3.2.4.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
@@ -132,7 +132,11 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5</version>
+				<version>2.5.1</version>
+				<configuration>
+					<!-- During release:perform, enable these profiles -->
+					<releaseProfiles>assembly,autoupdater,installer,updater,publishupdater</releaseProfiles>
+				</configuration>
 	    	</plugin>
 <!-- 	    	<plugin> -->
 <!-- 				<groupId>com.soebes.maven.plugins.mlv</groupId> -->
@@ -160,6 +164,11 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<version>1.4</version>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+		    </plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -215,6 +224,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
 					<version>1.7</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>1.9</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -298,7 +312,7 @@
 				<artifactId>commons-web</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -313,6 +327,11 @@
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
 				<version>1.2.12</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-digester</groupId>
+				<artifactId>commons-digester</artifactId>
+				<version>2.1</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-logging</groupId>

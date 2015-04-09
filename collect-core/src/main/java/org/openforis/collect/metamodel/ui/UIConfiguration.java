@@ -23,7 +23,7 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private CollectSurvey survey;
-	private List<FormSet> formSets;
+	private List<UIFormSet> formSets;
 	private Map<Integer, UIModelObject> modelObjectsById;
 	private Map<Integer, UIModelObject> modelObjectsByNodeDefinitionId;
 	private int lastId;
@@ -56,21 +56,29 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 		return ++lastId;
 	}
 	
-	public FormSet createFormSet() {
+	public UIFormSet createFormSet() {
 		return createFormSet(nextId());
 	}
 	
-	public FormSet createFormSet(int id) {
-		return new FormSet(this, id);
+	public UIFormSet createFormSet(int id) {
+		return new UIFormSet(this, id);
 	}
 
-	public List<FormSet> getFormSets() {
+	public List<UIFormSet> getFormSets() {
 		return CollectionUtils.unmodifiableList(formSets);
 	}
 	
-	public FormSet getFormSetByRootEntityId(int entityId) {
+	public UIFormSet getMainFormSet() {
+		if ( formSets == null || formSets.isEmpty()) {
+			return null;
+		} else {
+			return formSets.get(0);
+		}
+	}
+	
+	public UIFormSet getFormSetByRootEntityId(int entityId) {
 		if ( formSets != null ) {
-			for (FormSet formSet : formSets) {
+			for (UIFormSet formSet : formSets) {
 				if ( formSet.getRootEntityDefinition().getId() == entityId ) {
 					return formSet;
 				}
@@ -79,15 +87,15 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 		return null;
 	}
 	
-	public void addFormSet(FormSet formSet) {
+	public void addFormSet(UIFormSet formSet) {
 		if ( formSets == null ) {
-			formSets = new ArrayList<FormSet>();
+			formSets = new ArrayList<UIFormSet>();
 		}
 		formSets.add(formSet);
 		attachItem(formSet);
 	}
 	
-	public void removeFormSet(FormSet formSet) {
+	public void removeFormSet(UIFormSet formSet) {
 		formSets.remove(formSet);
 		detachItem(formSet);
 	}
@@ -117,20 +125,20 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 				break;
 			}
 			
-			if ( obj instanceof FormSection ) {
-				FormSection section = (FormSection) obj;
-				List<FormComponent> children = section.getChildren();
-				for (FormComponent child : children) {
+			if ( obj instanceof UIFormSection ) {
+				UIFormSection section = (UIFormSection) obj;
+				List<UIFormComponent> children = section.getChildren();
+				for (UIFormComponent child : children) {
 					stack.push((UIModelObject) child);
 				}
-				List<Form> forms = section.getForms();
-				for (Form form : forms) {
+				List<UIForm> forms = section.getForms();
+				for (UIForm form : forms) {
 					stack.push(form);
 				}
 			}
-			if ( obj instanceof TableHeadingContainer ) {
-				List<TableHeadingComponent> headingComponents = ((TableHeadingContainer) obj).getHeadingComponents();
-				for (TableHeadingComponent tableHeadingComponent : headingComponents) {
+			if ( obj instanceof UITableHeadingContainer ) {
+				List<UITableHeadingComponent> headingComponents = ((UITableHeadingContainer) obj).getHeadingComponents();
+				for (UITableHeadingComponent tableHeadingComponent : headingComponents) {
 					stack.push(tableHeadingComponent);
 				}
 			}

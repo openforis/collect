@@ -3,21 +3,25 @@
 	xmlns:collect="http://www.openforis.org/collect/3.0/collect"
 	xmlns:ui="http://www.openforis.org/collect/3.0/ui" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth"
 	xsi:schemaLocation="http://www.openforis.org/idml/3.0 
 		https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd      
 		http://www.openforis.org/collect/3.0/ui 
 		https://raw.github.com/openforis/collect/master/collect-core/src/main/resources/idml3-ui.xsd"
 	lastId="1000">
-	<project>Open Foris Collect Earth</project>
+	<project>Open Foris Collect Earth - IPCC</project>
 	<uri>http://www.openforis.org/idm/earth</uri>
-	<cycle>2013-2014</cycle>
 	<description></description>
 	<language>en</language>
+	<language>es</language>
+	<language>fr</language>
 	<applicationOptions>
 		<options type="ui">
 			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="plot_tab_set">
 				<tab name="plot_tab">
-					<label>Plot</label>
+					<label xml:lang="en">Plot</label>
+					<label xml:lang="es">Parcela</label>
+					<label xml:lang="fr">Parcelle</label>
 				</tab>
 			</tabSet>
 		</options>
@@ -29,16 +33,20 @@
 			<codingScheme scope="local" />
 			<hierarchy>
 				<level name="use">
-					<label>Use</label>
+					<label xml:lang="en">Use</label>
+					<label xml:lang="es">Uso</label>
 				</level>
 				<level name="type">
-					<label>Type</label>
+					<label xml:lang="en">Type</label>
+					<label xml:lang="es">Tipo</label>
 				</level>
 			</hierarchy>
 			<items>
 				<item id="101">
 					<code>forest</code>
-					<label>Forest</label>
+					<label xml:lang="en">Forest</label>
+					<label xml:lang="es">Tierras forestales</label>
+					<label xml:lang="fr">Foret</label>
 					<item id="102">
 						<code>forest_subdivision</code>
 						<label>Forest subdivision (example)</label>
@@ -50,7 +58,9 @@
 				</item>
 				<item id="220">
 					<code>cropland</code>
-					<label>Cropland</label>
+					<label xml:lang="en">Cropland</label>
+					<label xml:lang="es">Tierras de cultivo</label>
+					<label xml:lang="fr">Terres cultivées</label>
 					<item id="221">
 						<code>crop_subdivision</code>
 						<label>Crop subdivision (example)</label>
@@ -62,7 +72,9 @@
 				</item>
 				<item id="130">
 					<code>grassland</code>
-					<label>Grassland</label>
+					 <label xml:lang="fr">Prairie</label>
+					<label xml:lang="en">Grassland</label>
+					<label xml:lang="es">Pastizales</label>
 					<item id="131">
 						<code>grassland_subdivision</code>
 						<label>Grassland subdivision (example)</label>
@@ -74,7 +86,9 @@
 				</item>
 				<item id="140">
 					<code>settlement</code>
-					<label>Settlement</label>
+					<label xml:lang="en">Settlement</label>
+					<label xml:lang="es">Asentamientos</label>
+					<label xml:lang="fr">Etablissemens</label>
 					<item id="141">
 						<code>settlement_example</code>
 						<label>Settlement (example)</label>
@@ -86,7 +100,9 @@
 				</item>
 				<item id="150">
 					<code>otherLand</code>
-					<label>Other Land</label>
+					<label xml:lang="en">Other Land</label>
+					<label xml:lang="es">Otras tierras</label>
+					<label xml:lang="fr">Autres terres</label>
 					<item id="151">
 						<code>other_example</code>
 						<label>Other (example)</label>
@@ -94,7 +110,9 @@
 				</item>
 				<item id="180">
 					<code>wetLand</code>
-					<label>Wet Land</label>
+					<label xml:lang="en">Wet Land</label>
+					<label xml:lang="es">Humedales</label>
+					<label xml:lang="fr">Terres humides</label>
 					<item id="181">
 						<code>wetland_example</code>
 						<label>Wetland example</label>
@@ -106,25 +124,37 @@
 				</item>
 				<item id="170">
 					<code>noData</code>
-					<label>No data reason</label>	
+					<label xml:lang="en">No data</label>
+					<label xml:lang="fr">Pas dedonnées</label> 
+					<label xml:lang="es">Sin datos</label>	
 					<item id="171">
 						<code>sea</code>
-						<label>Sea</label>
+						<label xml:lang="en">Sea</label>
+						<label xml:lang="fr">Mer</label>
+						<label xml:lang="es">Mar</label>
 					</item>
 					<item id="172">
 						<code>clouds</code>
-						<label>Clouds</label>
+						<label xml:lang="en">Clouds</label>
+						<label xml:lang="fr">Nuages</label>
+						<label xml:lang="es">Nubes</label>
 					</item>		
 					<item id="173">
 						<code>other_reason</code>
-						<label>Other reason</label>
+						<label xml:lang="en">Other reason</label>
+						<label xml:lang="fr">Autre</label>
+						<label xml:lang="es">Otra razón</label>
 					</item>
 				</item>
 			</items>
 		</list>
 		<list id="200" name="site_accessibility">
-			<label type="item">Accessibility</label>
-			<label type="list">Accessibility</label>
+			<label type="item" xml:lang="en">Accessibility</label>
+			<label type="item" xml:lang="es">Accesibilidad</label>
+			<label type="list" xml:lang="en">Accessibility</label>
+			<label type="list" xml:lang="es">Accesibilidad</label>
+			<label type="item" xml:lang="fr">Accessibilité</label>
+			<label type="list" xml:lang="fr">Accessibilité</label>
 			<codingScheme scope="local" />
 			<items>
 				<item id="201">
@@ -158,8 +188,10 @@
 			</items>
 		</list>
 		<list id="350" name="land_use_subcategory">
-			<label type="item">Land Use Sub-category</label>
-			<label type="list">Sub-Categories</label>
+			<label type="item" xml:lang="en">Land Use Sub-category</label>
+			<label type="item" xml:lang="es">Subcategorias del uso de la tierra</label>
+			<label type="list" xml:lang="en">Sub-Categories</label>
+			<label type="list" xml:lang="es">Subcategorias</label>
 			<items>
 				<item id="351" >
 				    <code>FLtoFL</code>
@@ -308,8 +340,10 @@
 			</items>
 		</list>
 		<list id="300" name="topographical_elements">
-			<label type="item">Element</label>
-			<label type="list">Elements</label>
+			<label type="item"  xml:lang="en">Element</label>
+			<label type="item" xml:lang="es">Elemento</label>
+			<label type="list" xml:lang="en">Elements</label>
+			<label type="list" xml:lang="es">Elementos</label>
 			<items>
 				<item id="301" >
 				    <code>road</code>
@@ -343,8 +377,10 @@
 			
 		</list>
 		<list id="400" name="topographical_elements_coverage">
-			<label type="item">Coverage</label>
-			<label type="list">Coverages</label>
+			<label type="item" xml:lang="en">Coverage</label>
+			<label type="item" xml:lang="es">Area cbuierta</label>
+			<label type="list" xml:lang="en">Coverages</label>
+			<label type="list" xml:lang="es">Coberturas</label>
 				<items>
 				<item id="401">
 						<code>0-10</code>
@@ -369,8 +405,10 @@
 			</items>
 		</list>
 		<list id="500" name="human_impact_type">
-			<label type="item">Human Impact Type</label>
-			<label type="list">Human Impact Types</label>
+			<label type="item" xml:lang="en">Human Impact Type</label>
+			<label type="item" xml:lang="es">Tipo de impacto humano</label>
+			<label type="list" xml:lang="en">Human Impact Types</label>
+			<label type="list" xml:lang="es">Tipos de impacto humano</label>
 			<items>
 				<item id="501">
 						<code>logging</code>
@@ -399,8 +437,10 @@
 			</items>
 		</list>
 		<list id="600" name="human_impact_grade">
-			<label type="item">Human Impact Grade</label>
-			<label type="list">Human Impact Grades</label>
+			<label type="item" xml:lang="en">Human Impact Grade</label>
+			<label type="item" xml:lang="es">Grado de impacto humano</label>
+			<label type="list" xml:lang="en">Human Impact Grades</label>
+			<label type="list" xml:lang="es">Grados de Impacto humano</label>
 			<items>
 				<item id="601">
 						<code>low</code>
@@ -417,8 +457,11 @@
 			</items>
 		</list>
 		<list id="700" name="rs_satellite">
-			<label type="item">Satellite</label>
-			<label type="list">Satellites</label>
+			<label type="item" xml:lang="en">Satellite</label>
+			<label type="item" xml:lang="es">Satelite</label>
+			<label type="list" xml:lang="es">Satelites</label>
+			<label type="list" xml:lang="en">Satellites</label>
+			
 			<items>
 				<item id="701">
 						<code>landsat</code>
@@ -443,7 +486,8 @@
 			</items>
 		</list>
 		<list id="800" name="canopy_cover_list">
-			<label type="list">Canopy Cover</label>
+			<label type="list" xml:lang="en">Canopy Cover</label>
+			<label type="list" xml:lang="es">Cubierta de copas</label>
 			<items>
 				<item id="801">
 					<code>0</code>
@@ -472,7 +516,8 @@
 			</items>
 		</list>
 		<list id="810" name="deforestation_reason">
-			<label type="list">Reasons for no cover</label>
+			<label type="list" xml:lang="en">Reasons for no cover</label>
+			<label type="list" xml:lang="es">Razones de falta de cubierta</label>
 			<items>		
 				<item id="811">
 					<code>burnt</code>
@@ -486,8 +531,10 @@
 		</list>
 
 		<list id="900" name="canopy_type_list">
-			<label type="item">Canopy Type</label>
-			<label type="list">Canopy Type</label>
+			<label type="item" xml:lang="en">Canopy Type</label>
+			<label type="item" xml:lang="es">Tipo de cubierta</label>
+			<label type="list" xml:lang="es">Tipo de cubierta</label>
+			<label type="list" xml:lang="en">Canopy Type</label>
 			<items>
 				<item id="901">
 					<code>sparse</code>
@@ -514,7 +561,8 @@
 		
 		
 		<list id="920" name="bearing">
-		    <label type="item">Bearing</label>
+		    <label type="item" xml:lang="en">Bearing</label>
+		    <label type="item" xml:lang="es">Rumbo</label>
 			<items>
 				<item id="921">
 					<code>N</code>
@@ -573,105 +621,147 @@
 	<schema>
 		<entity id="1" name="plot" ui:tabSet="plot_tab_set" ui:tab="plot_tab">
 			<label xml:lang="en">Plot</label>
+			<label xml:lang="es">Parcela</label>
+			<label xml:lang="fr">Parcelle</label>
 			<text id="2" name="id" required="true" key="true">
 				<label xml:lang="en">Id</label>
+				<label xml:lang="es">Id</label>
+				<label xml:lang="fr">Id</label>
 			</text>
 			<coordinate id="3" name="location">
 				<label xml:lang="en">Location</label>
+				<label xml:lang="es">Posicion</label>
+				<label xml:lang="fr">Lieu</label>
 			</coordinate>
 			<text id="4" name="operator">
 				<label xml:lang="en">Operator</label>
+				<label xml:lang="es">Operador</label>
+				<label xml:lang="fr">Opérateur</label>
 			</text>
 			<code id="5" name="land_use_category" list="land_use">
 				<label xml:lang="en">Land use</label>
+				<label xml:lang="es">Uso de la tierra</label>
 			</code>
 			<boolean id="6" name="land_use_category_accuracy" relevant="land_use_category!='noData'">
 				<label xml:lang="en">Land use Category interpretation accuracy</label>
+				<label xml:lang="es">Precisión de la interpretación del uso de la tierra</label>
 			</boolean>
 			<code id="7" name="land_use_subcategory" relevant="land_use_category!='noData'" list="land_use_subcategory">
 				<label xml:lang="en">Land use Sub-Category</label>
+				<label xml:lang="es">Subcategoría del Uso de la Tierra</label>
 			</code>
 			<boolean id="8" name="land_use_subcategory_accuracy" relevant="land_use_category!='noData'">
 				<label xml:lang="en">Land use Sub-Category interpretation accuracy</label>
+				<label xml:lang="es">Precisión de la interpretación de la Subcategoria del Uso de la tierra</label>
 			</boolean>
 			<number id="33" type="integer" name="land_use_subcategory_year_of_change" required="false" relevant="false()">
 				<label xml:lang="en">Land use Sub-Category - year of change</label>
+				<label xml:lang="es">Subcategoría del Uso de la Tierra - año del cambio</label>
 			</number>
 			<code id="9" name="land_use_subdivision" list="land_use" parent="land_use_category" >
 				<label xml:lang="en">Land use Sub-Division</label>
+				<label xml:lang="es">Subdivisión del Uso de la Tierra</label>
 			</code>
 			
 			<boolean id="10" name="land_use_subdivision_accuracy" relevant="land_use_category!='noData'" >
 				<label xml:lang="en">Land Use Sub-Division interpretation accuracy</label>
+				<label xml:lang="es">Precisión de la interpretación de la Subcategoria del Uso de la tierra</label>
 			</boolean>
 			<code id="11" name="site_accessibility" list="site_accessibility" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland'">
 				<label xml:lang="en">Accessibility</label>
+				<label xml:lang="es">Accesibilidad</label>
 			</code>
 			<code id="12" name="site_bearing" list="bearing" relevant="land_use_category!='noData' and land_use_category!='settlement' and land_use_category!='cropland' and site_accessibility!='inaccesible'" >
 				<label xml:lang="en">Bearing</label>
+				<label xml:lang="es">Rumbo</label>
 			</code>
 			<text name="site_directions" id="13" required="false" relevant="false()">
 			    <label xml:lang="en">Directions</label>
+			    <label xml:lang="es">Indicaciones</label>
 			</text>
 			<entity id="14" name="topography" multiple="true" >
 			    <label xml:lang="en">Topography</label>
 				<code id="15" name="element" list="topographical_elements" key="true">
 					<label xml:lang="en">Element</label>
+					<label xml:lang="es">Elemento</label>
 				</code>
 				<code id="16" name="coverage" list="topographical_elements_coverage">
 					<label xml:lang="en">Coverage</label>
+					<label xml:lang="es">Cobertura</label>
 				</code>
 			</entity>
 			<code id="17" name="human_impact_type" list="human_impact_type"
 				multiple="true" relevant="land_use_category!='settlement' and land_use_category!='cropland' and land_use_category!='noData'">
 				<label xml:lang="en">Human Impact Type</label>
+				<label xml:lang="es">Tipo de Impacto Humano</label>
 			</code>
 			<code id="18" name="human_impact_grade" list="human_impact_grade" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'">
 				<label xml:lang="en">Human Impact Grade</label>
+				<label xml:lang="es">Grado del Impacto Humano</label>
 			</code>
 			<number id="19" name="human_impact_year" type="integer" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'">
 				<label xml:lang="en">Human Impact Year</label>
+				<label xml:lang="es">Año del Impacto Humano</label>
 			</number>
 			<boolean id="30" name="human_impact_accuracy" relevant="land_use_category!='noData' and land_use_category!='cropland' and land_use_category!='settlement' and human_impact_type!='none'">
 				<label xml:lang="en">Human Impact interpretation accuracy</label>
+				<label xml:lang="es">Precision de la interpretación del Impacto Humano</label>
 			</boolean>
 			
 			<date id="20" name="rs_date" relevant="land_use_category!='noData'">
 				<label xml:lang="en">RS Date</label>
+				<label xml:lang="es">Fecha teleobservación</label>
 			</date>
 			<code id="21" name="rs_satellite" list="rs_satellite" relevant="land_use_category!='noData'">
 				<label xml:lang="en">RS Satellite</label>
+				<label xml:lang="es">Satélite</label>
 			</code>
 			<code id="22" name="canopy_cover" list="canopy_cover_list" relevant="land_use_category='forest'" >
 				<label xml:lang="en">Canopy cover</label>
+				<label xml:lang="es">Cubierta de copas</label>
 			</code>
 			<boolean id="31" name="canopy_cover_accuracy" relevant="land_use_category='forest'" >
 				<label xml:lang="en">Canopy cover interpretation accuracy</label>
+				<label xml:lang="es">Precision de la interpretación de la cubierta de copas</label>
 			</boolean>
 			<code id="23" name="canopy_type" list="canopy_type_list" relevant="land_use_category='forest' and canopy_cover!='0'">
 				<label xml:lang="en">Canopy Type</label>
+				<label xml:lang="es">Tipo de copas</label>
 			</code>
 			<code id="24" name="deforestation_reason" list="deforestation_reason" relevant="land_use_category='forest' and canopy_cover='0'" >
 				<label xml:lang="en">Deforestation reason</label>
+				<label xml:lang="es">Razón para la deforestación</label>
 			</code>
 			<number id="25" name="elevation" type="integer" >
 				<label xml:lang="en">Elevation</label>
+				<label xml:lang="es">Elevacion</label>
+				<label xml:lang="fr">Elevation</label>
 			</number>
 			<number id="26" name="aspect"  type="real">
 				<label xml:lang="en">Aspect</label>
+				<label xml:lang="es">Exposicion</label>
+				<label xml:lang="fr">Aspect</label>
 			</number>
 			<number id="27" name="slope" type="real" >
 				<label xml:lang="en">Slope</label>
+				<label xml:lang="es">Pendiente</label>
+				<label xml:lang="fr">Pente</label>
 			</number>
 			<boolean id="28" name="actively_saved">
 				<label xml:lang="en">Actively saved by user</label>
+				<label xml:lang="es">Guardado por el usuario activamente</label>
+				<label xml:lang="fr">Sauvé par l'utilisateur</label>
 			</boolean>
 			<text id="32" name="actively_saved_on" required="false"
 				relevant="false()">
 				<label xml:lang="en">Last saved on</label>
+				<label xml:lang="es">Guardado por ultima vez</label>
+				<label xml:lang="fr">Sauvé la dernière fois sur</label>
 			</text>
 			<text id="34" name="plot_file" required="false" relevant="false()">
-				<label xml:lang="en">CSV file that conatins the plot</label>
+				<label xml:lang="en">CSV file that contains the plot</label>
+				<label xml:lang="es">Archivo CSV que contiene al plot</label>
+				<label xml:lang="fr">Fichier CSV qui contient le point</label>
 			</text>
 		</entity>
 	</schema>

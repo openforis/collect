@@ -87,13 +87,13 @@ public class SurveyIdmlBinder {
 			SurveyUnmarshaller unmarshaller = new SurveyUnmarshaller(this, includeCodeListItems);
 			unmarshaller.parse(is, UTF8_ENCODING);
 			Survey survey = unmarshaller.getSurvey();
-			survey.init();
+			onUnmarshallingComplete(survey);
 			return survey;
 		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
 	}
-	
+
 	public Survey unmarshal(Reader r) throws IdmlParseException {
 		return unmarshal(r, true);
 	}
@@ -103,11 +103,15 @@ public class SurveyIdmlBinder {
 			SurveyUnmarshaller unmarshaller = new SurveyUnmarshaller(this, includeCodeListItems);
 			unmarshaller.parse(r);
 			Survey survey = unmarshaller.getSurvey();
-			survey.init();
+			onUnmarshallingComplete(survey);
 			return survey;
 		} catch (Exception e) {
 			throw new IdmlParseException(e);
 		}
 	}
-	
+
+	protected void onUnmarshallingComplete(Survey survey) {
+		survey.init();
 	}
+	
+}

@@ -293,6 +293,34 @@ public class Schema extends SurveyObject {
 		}
 	}
 	
+	public NodeDefinition findNodeDefinition(NodeDefinitionVerifier verifier) {
+		List<NodeDefinition> nodeDefns = findNodeDefinitions(verifier, true);
+		return nodeDefns.isEmpty() ? null: nodeDefns.get(0);
+	}
+	
+	public List<NodeDefinition> findNodeDefinitions(NodeDefinitionVerifier verifier) {
+		return findNodeDefinitions(verifier, false);
+	}
+	
+	public List<NodeDefinition> findNodeDefinitions(NodeDefinitionVerifier verifier, boolean stopAfterFirstFound) {
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		List<NodeDefinition> foundNodeDefns = new ArrayList<NodeDefinition>();
+		stack.addAll(rootEntityDefinitions);
+		while (!stack.isEmpty()) {
+			NodeDefinition defn = stack.pop();
+			if (verifier.verify(defn)) {
+				foundNodeDefns.add(defn);
+				if (stopAfterFirstFound) {
+					break;
+				}
+			}
+			if (defn instanceof EntityDefinition ) {
+				stack.addAll(((EntityDefinition) defn).getChildDefinitions());
+			}
+		}
+		return foundNodeDefns;
+	}
+
 	public void changeParentEntity(NodeDefinition node, EntityDefinition newParent) {
 		EntityDefinition oldParent = node.getParentEntityDefinition();
 		oldParent.removeChildDefinition(node, false);

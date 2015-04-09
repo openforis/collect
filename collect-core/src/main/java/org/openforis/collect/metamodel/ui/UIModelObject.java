@@ -17,6 +17,7 @@ public abstract class UIModelObject implements Serializable, Identifiable {
 	
 	private UIModelObject parent;
 	private int id;
+	private boolean hidden;
 
 	UIModelObject(UIModelObject parent, int id) {
 		super();
@@ -35,16 +36,16 @@ public abstract class UIModelObject implements Serializable, Identifiable {
 		return result;
 	}
 	
-	public FormSet getFormSet() {
+	public UIFormSet getRootFormSet() {
 		UIModelObject currentObject = this;
 		while ( currentObject.getParent() != null ) {
 			currentObject = currentObject.getParent();
 		}
-		return (FormSet) currentObject;
+		return (UIFormSet) currentObject;
 	}
 	
 	public UIConfiguration getUIConfiguration() {
-		FormSet formSet = getFormSet();
+		UIFormSet formSet = getRootFormSet();
 		return formSet.getUIConfiguration();
 	}
 	
@@ -55,5 +56,13 @@ public abstract class UIModelObject implements Serializable, Identifiable {
 	@Override
 	public int getId() {
 		return id;
+	}
+	
+	public boolean isHidden() {
+		return this.hidden;
+	}
+	
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
 	}
 }

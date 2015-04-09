@@ -11,7 +11,7 @@ package org.openforis.collect.persistence.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -1828409034;
+	private static final long serialVersionUID = 1119164275;
 
 	/**
 	 * The singleton instance of <code>collect</code>
@@ -59,6 +59,8 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 
 	private final java.util.List<org.jooq.Table<?>> getTables0() {
 		return java.util.Arrays.<org.jooq.Table<?>>asList(
+			org.openforis.collect.persistence.jooq.tables.Databasechangelog.DATABASECHANGELOG,
+			org.openforis.collect.persistence.jooq.tables.Databasechangeloglock.DATABASECHANGELOGLOCK,
 			org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo.OFC_APPLICATION_INFO,
 			org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE_LIST,
 			org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG,

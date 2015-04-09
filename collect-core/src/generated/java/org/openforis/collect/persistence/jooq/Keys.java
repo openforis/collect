@@ -23,6 +23,8 @@ public class Keys {
 	// UNIQUE and PRIMARY KEY definitions
 	// -------------------------------------------------------------------------
 
+	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.DatabasechangelogRecord> PK_DATABASECHANGELOG = UniqueKeys0.PK_DATABASECHANGELOG;
+	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.DatabasechangeloglockRecord> PK_DATABASECHANGELOGLOCK = UniqueKeys0.PK_DATABASECHANGELOGLOCK;
 	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord> OFC_CODE_LIST_PKEY = UniqueKeys0.OFC_CODE_LIST_PKEY;
 	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcConfigRecord> OFC_CONFIG_PKEY = UniqueKeys0.OFC_CONFIG_PKEY;
 	public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord> OFC_DATA_ERROR_QUERY_PKEY = UniqueKeys0.OFC_DATA_ERROR_QUERY_PKEY;
@@ -79,6 +81,8 @@ public class Keys {
 	// -------------------------------------------------------------------------
 
 	private static class UniqueKeys0 extends org.jooq.impl.AbstractKeys {
+		public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.DatabasechangelogRecord> PK_DATABASECHANGELOG = createUniqueKey(org.openforis.collect.persistence.jooq.tables.Databasechangelog.DATABASECHANGELOG, org.openforis.collect.persistence.jooq.tables.Databasechangelog.DATABASECHANGELOG.ID, org.openforis.collect.persistence.jooq.tables.Databasechangelog.DATABASECHANGELOG.AUTHOR, org.openforis.collect.persistence.jooq.tables.Databasechangelog.DATABASECHANGELOG.FILENAME);
+		public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.DatabasechangeloglockRecord> PK_DATABASECHANGELOGLOCK = createUniqueKey(org.openforis.collect.persistence.jooq.tables.Databasechangeloglock.DATABASECHANGELOGLOCK, org.openforis.collect.persistence.jooq.tables.Databasechangeloglock.DATABASECHANGELOGLOCK.ID);
 		public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord> OFC_CODE_LIST_PKEY = createUniqueKey(org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE_LIST, org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE_LIST.ID);
 		public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcConfigRecord> OFC_CONFIG_PKEY = createUniqueKey(org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG, org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG.NAME);
 		public static final org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord> OFC_DATA_ERROR_QUERY_PKEY = createUniqueKey(org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY, org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY.ID);

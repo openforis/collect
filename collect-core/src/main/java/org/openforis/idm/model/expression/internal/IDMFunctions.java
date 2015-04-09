@@ -9,6 +9,7 @@ import java.util.Arrays;
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.LookupProvider;
@@ -223,8 +224,13 @@ public class IDMFunctions extends CustomFunctions {
 			return null;
 		}
 		CoordinateOperations coordinateOperations = getSurvey(context).getContext().getCoordinateOperations();
-		double distance = coordinateOperations.orthodromicDistance(fromC, toC);
-		return distance;
+		
+		try {
+			double distance = coordinateOperations.orthodromicDistance(fromC, toC);
+			return distance;
+		} catch (CoordinateOperationException e) {
+			return null;
+		}
 	}
 	
 	private static LookupProvider getLookupProvider(ExpressionContext context) {

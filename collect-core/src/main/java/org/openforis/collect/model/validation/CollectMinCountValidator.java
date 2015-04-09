@@ -49,7 +49,7 @@ public class CollectMinCountValidator extends MinCountValidator {
 	}
 
 	protected boolean isEmpty(Entity entity) {
-		List<Node<?>> children = entity.getAll();
+		List<Node<?>> children = entity.getChildren();
 		for (Node<?> child : children) {
 			if (!isEmpty(child)) {
 				return false;

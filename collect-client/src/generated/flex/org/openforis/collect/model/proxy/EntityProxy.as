@@ -566,10 +566,13 @@ package org.openforis.collect.model.proxy {
 				var defIds:IList = newMap.keySet;
 				for each(var defId:int in defIds) {
 					var childDef:NodeDefinitionProxy = EntityDefinitionProxy(definition).getChildDefinitionById(defId);
-					var index:int = getChildDefinitionIndex(childDef);
-					var value:Object = newMap.get(defId);
-					if (value != null) {
-						list.setItemAt(value, index);
+					//childDef can be null if the node is hidden in the ui or not applicable for the current model version
+					if (childDef != null) {
+						var index:int = getChildDefinitionIndex(childDef);
+						var value:Object = newMap.get(defId);
+						if (value != null) {
+							list.setItemAt(value, index);
+						}
 					}
 				}
 			}

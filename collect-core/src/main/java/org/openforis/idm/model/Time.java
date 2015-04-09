@@ -37,7 +37,7 @@ public final class Time extends AbstractValue {
 			if ( ! matcher.matches() ) {
 				matcher = INTERNAL_STRING_PATTERN.matcher(string);
 				if ( ! matcher.matches() ) {
-					throw new IllegalArgumentException("Invalid date " + string);
+					throw new IllegalArgumentException("Invalid time " + string);
 				}
 			}
 			int hour = Integer.parseInt(matcher.group(1));
@@ -53,6 +53,9 @@ public final class Time extends AbstractValue {
 			Calendar cal = Calendar.getInstance();
 		    cal.setTime(date);
 		    int hour = cal.get(Calendar.HOUR);
+		    if (cal.get(Calendar.AM_PM) == Calendar.PM) {
+		    	hour += 12;
+		    }
 		    int minute = cal.get(Calendar.MINUTE);
 		    return new Time(hour, minute);
 		}
@@ -73,7 +76,10 @@ public final class Time extends AbstractValue {
 			GregorianCalendar cal = new GregorianCalendar();
 			cal.clear();
 			cal.setLenient(false);
-			cal.set(Calendar.HOUR, hour);
+			boolean pm = hour > 12 || (hour == 12 && minute > 0);
+			int calHour = pm ? hour - 12: hour;
+			cal.set(Calendar.AM_PM, pm ? Calendar.PM: Calendar.AM);
+			cal.set(Calendar.HOUR, calHour);
 			cal.set(Calendar.MINUTE, minute);
 			return cal;
 		}

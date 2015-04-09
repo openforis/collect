@@ -2,6 +2,7 @@
 <survey xmlns="http://www.openforis.org/idml/3.0" 
 	xmlns:collect="http://www.openforis.org/collect/3.0/collect"
 	xmlns:ui="http://www.openforis.org/collect/3.0/ui" 
+	xmlns:collectearth="http://www.openforis.org/collect/3.0/collectearth" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.openforis.org/idml/3.0 
 		https://raw.github.com/openforis/ollect/master/collect-core/src/main/resources/idml3.xsd      
@@ -10,14 +11,17 @@
 	lastId="1000">
 	<project>Open Foris Collect Earth</project>
 	<uri>http://www.openforis.org/idm/collectEarth</uri>
-	<cycle>2013-2014</cycle>
 	<description></description>
 	<language>en</language>
+	<language>es</language>
+	<language>fr</language>
 	<applicationOptions>
 		<options type="ui">
 			<tabSet xmlns="http://www.openforis.org/collect/3.0/ui" name="plot_tab_set">
 				<tab name="plot_tab">
-					<label>Plot</label>
+					<label xml:lang="en">Plot</label>
+					<label xml:lang="es">Parcela</label>
+					<label xml:lang="fr">Parcelle</label>
 				</tab>
 			</tabSet>
 		</options>
@@ -44,8 +48,12 @@
 	<schema>
 		<entity id="1" name="plot" ui:tabSet="plot_tab_set" ui:tab="plot_tab">
 			<label xml:lang="en">Plot</label>
+			<label xml:lang="es">Parcela</label>
+			<label xml:lang="fr">Parcelle</label>
 			<text id="2" name="id" required="true" key="true">
 				<label xml:lang="en">Id</label>
+				<label xml:lang="es">Id</label>
+				<label xml:lang="fr">Id</label>
 			</text>
 			<coordinate id="3" name="location">
 				<label xml:lang="en">Location</label>
@@ -57,17 +65,17 @@
 				<label xml:lang="es">Operador</label>
 				<label xml:lang="fr">Opérateur</label>
 			</text>
-			<number id="5" name="elevation" type="integer" >
+			<number id="5" name="elevation" type="integer" collectearth:fromcsv="true">
 				<label xml:lang="en">Elevation</label>
 				<label xml:lang="es">Elevacion</label>
 				<label xml:lang="fr">Elevation</label>
 			</number>
-			<number id="6" name="aspect"  type="real">
+			<number id="6" name="aspect"  type="real" collectearth:fromcsv="true">
 				<label xml:lang="en">Aspect</label>
-				<label xml:lang="es">Aspecto</label>
+				<label xml:lang="es">Exposicion</label>
 				<label xml:lang="fr">Aspect</label>
 			</number>
-			<number id="7" name="slope" type="real" >
+			<number id="7" name="slope" type="real" collectearth:fromcsv="true">
 				<label xml:lang="en">Slope</label>
 				<label xml:lang="es">Pendiente</label>
 				<label xml:lang="fr">Pente</label>
@@ -77,12 +85,12 @@
 				<label xml:lang="es">Guardado por el usuario activamente</label>
 				<label xml:lang="fr">Sauvé par l'utilisateur</label>
 			</boolean>
-			<text id="9" name="actively_saved_on" required="false"
+			<date id="9" name="actively_saved_on" required="false"
 				relevant="false()">
 				<label xml:lang="en">Last saved on</label>
 				<label xml:lang="es">Guardado por ultima vez</label>
 				<label xml:lang="fr">Sauvé la dernière fois sur</label>
-			</text>
+			</date>
 			<text id="10" name="plot_file" required="false" relevant="false()">
 				<label xml:lang="en">CSV file that contains the plot</label>
 				<label xml:lang="es">Archivo CSV que contiene al plot</label>

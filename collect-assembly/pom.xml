@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.3.18-SNAPSHOT</version>
+		<version>3.4.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>collect-assembly</artifactId>
 	<packaging>pom</packaging>
@@ -48,11 +48,6 @@
     <profiles>
         <profile>
             <id>assembly</id>
-			<activation>
-				<property>
-					<name>release</name>
-				</property>
-			</activation>
             <build>
                 <plugins>
                     <plugin>

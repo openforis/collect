@@ -136,6 +136,20 @@ public class RecordUpdaterTest {
 	}
 
 	@Test
+	public void testMinCountValidationInitializedOnNestedEntity() {
+		record(
+			rootEntityDef(
+				entityDef("time_study",
+						attributeDef("start_time")
+							.required()
+				).minCount("1")
+			)
+		);
+		Entity timeStudy = entityByPath("/root/time_study");
+		assertEquals(ValidationResultFlag.ERROR, timeStudy.getMinCountValidationResult("start_time"));
+	}
+
+	@Test
 	public void testCardinalityValidatedOnAttributeUpdate() {
 		record(
 			rootEntityDef(
@@ -533,6 +547,32 @@ public class RecordUpdaterTest {
 				attributeDef("source"),
 				attributeDef("dependent")
 					.required("source = 1")
+			),
+			attribute("source", "2"),
+			attribute("dependent", null)
+		);
+		Entity rootEntity = record.getRootEntity();
+		assertEquals(ValidationResultFlag.OK, rootEntity.getMinCountValidationResult("dependent"));
+
+		Attribute<?, ?> source = record.findNodeByPath("/root/source");
+
+		NodeChangeSet nodeChangeSet = update(source, "1");
+		EntityChange rootEntityChange = (EntityChange) nodeChangeSet.getChange(rootEntity);
+		assertNotNull(rootEntityChange);
+		ValidationResultFlag dependentValidationResult = rootEntityChange.getChildrenMinCountValidation().get("dependent");
+		assertEquals(ValidationResultFlag.ERROR, dependentValidationResult);
+		assertEquals(ValidationResultFlag.ERROR, rootEntity.getMinCountValidationResult("dependent"));
+	}
+	
+	@Test
+	public void testCardinalityRevalidatedWhenBecomesRelevant() {
+		record(
+			rootEntityDef(
+				attributeDef("source"),
+				attributeDef("dependent")
+					.multiple()
+					.relevant("source = '1'")
+					.minCount("1")
 			),
 			attribute("source", "2"),
 			attribute("dependent", null)

@@ -13,13 +13,17 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.Batch;
 import org.jooq.Field;
+import org.jooq.InsertQuery;
 import org.jooq.JoinType;
+import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
+import org.jooq.UpdateQuery;
 import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.State;
@@ -66,7 +70,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	}
 	
 	public CollectRecord load(CollectSurvey survey, int id, int step) {
-		RecordDSLContext jf = getMappingJooqFactory(survey, step);
+		return load(survey, id, step, true);
+	}
+	
+	public CollectRecord load(CollectSurvey survey, int id, int step, boolean toBeUpdated) {
+		RecordDSLContext jf = createDSLContext(survey, step, toBeUpdated);
 		SelectQuery query = jf.selectRecordQuery(id);
 		Record r = query.fetchOne();
 		if ( r == null ) {
@@ -77,7 +85,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	}
 	
 	public byte[] loadBinaryData(CollectSurvey survey, int id, int step) {
-		RecordDSLContext jf = getMappingJooqFactory(survey, step);
+		RecordDSLContext jf = createDSLContext(survey, step);
 		SelectQuery query = jf.selectRecordQuery(id);
 		Record r = query.fetchOne();
 		if ( r == null ) {
@@ -88,12 +96,16 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 	}
 
-	private RecordDSLContext getMappingJooqFactory(CollectSurvey survey) {
+	private RecordDSLContext createDSLContext(CollectSurvey survey) {
 		return new RecordDSLContext(getConnection(), survey);
 	}
 
-	private RecordDSLContext getMappingJooqFactory(CollectSurvey survey, int step) {
-		return new RecordDSLContext(getConnection(), survey, step);
+	private RecordDSLContext createDSLContext(CollectSurvey survey, int step) {
+		return createDSLContext(survey, step, true);
+	}
+
+	private RecordDSLContext createDSLContext(CollectSurvey survey, int step, boolean recordToBeUpdated) {
+		return new RecordDSLContext(getConnection(), survey, step, recordToBeUpdated);
 	}
 	
 	@Deprecated
@@ -122,14 +134,25 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
-		return loadSummaries(survey, rootEntity, step, (Date) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
+		return loadSummaries(survey, rootEntity, step, null, null, null, null);
 	}
 
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
-		return loadSummaries(survey, rootEntity, (Step) null, (Date) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, keyValues);
+		return loadSummaries(survey, rootEntity, true, keyValues);
 	}
 
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, boolean caseSensitiveKeys, String... keyValues) {
+		Schema schema = survey.getSchema();
+		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
+		
+		RecordFilter filter = new RecordFilter(survey, rootEntityDefn.getId());
+		filter.setCaseSensitiveKeyValues(caseSensitiveKeys);
+		filter.setKeyValues(keyValues);
+		return loadSummaries(filter, null);
+	}
+	
 	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
@@ -137,11 +160,11 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	}
 	
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Date modifiedSince) {
-		return loadSummaries(survey, rootEntity, (Step) null, modifiedSince, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
+		return loadSummaries(survey, rootEntity, (Step) null, modifiedSince, (Integer) null, (Integer) null, (List<RecordSummarySortField>) null, (String[]) null);
 	}
 
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, Date modifiedSince, int offset, int maxRecords, 
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, Date modifiedSince, Integer offset, Integer maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
@@ -159,7 +182,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		CollectSurvey survey = filter.getSurvey();
 		
-		RecordDSLContext jf = getMappingJooqFactory(survey);
+		RecordDSLContext jf = createDSLContext(survey);
 		SelectQuery<Record> q = jf.selectQuery();	
 		
 		q.addSelect(SUMMARY_FIELDS);
@@ -200,7 +223,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 		//record keys
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
-			addFilterByKeyConditions(q, filter.getKeyValues());
+			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.getKeyValues());
 		}
 
 		//add ordering fields
@@ -210,11 +233,12 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			}
 		}
 		
-		//always order by ID to avoid pagination issues
-		q.addOrderBy(OFC_RECORD.ID);
-		
 		//add limit
-		q.addLimit(filter.getOffset(), filter.getMaxNumberOfRecords());
+		if (filter.getOffset() != null && filter.getMaxNumberOfRecords() != null) {
+			q.addLimit(filter.getOffset(), filter.getMaxNumberOfRecords());
+			//always order by ID to avoid pagination issues
+			q.addOrderBy(OFC_RECORD.ID);
+		}
 		
 		//fetch results
 		Result<Record> result = q.fetch();
@@ -266,17 +290,25 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	}
 	
 	private void addFilterByKeyConditions(SelectQuery q, List<String> keyValues) {
-		addFilterByKeyConditions(q, keyValues.toArray(new String[keyValues.size()]));
+		addFilterByKeyConditions(q, true, keyValues);
 	}
 	
-	private void addFilterByKeyConditions(SelectQuery q, String... keyValues) {
+	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, List<String> keyValues) {
+		addFilterByKeyConditions(q, caseSensitiveKeyValues, keyValues.toArray(new String[keyValues.size()]));
+	}
+	
+	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, String... keyValues) {
 		if ( keyValues != null && keyValues.length > 0 ) {
 			for (int i = 0; i < keyValues.length && i < KEY_FIELDS.length; i++) {
 				String key = keyValues[i];
 				if(StringUtils.isNotBlank(key)) {
 					@SuppressWarnings("unchecked")
 					Field<String> keyField = (Field<String>) KEY_FIELDS[i];
-					q.addConditions(keyField.upper().equal(key.toUpperCase()));
+					if (caseSensitiveKeyValues) {
+						q.addConditions(keyField.equal(key));
+					} else {
+						q.addConditions(keyField.upper().equal(key.toUpperCase()));
+					}
 				}
 			}
 		}
@@ -341,16 +373,43 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 
 	@Override
 	public void update(CollectRecord record) {
+		createUpdateQuery(record).getInternalQuery().execute();
+	}
+	
+	public RecordStoreQuery createUpdateQuery(CollectRecord record) {
 		Survey survey = record.getSurvey();
-		RecordDSLContext jf = getMappingJooqFactory((CollectSurvey) survey);
-		jf.updateQuery(record).execute();
+		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey);
+		UpdateQuery q = dsl.updateQuery(record);
+		return new RecordStoreQuery(q);
 	}
 
 	@Override
 	public void insert(CollectRecord record) {
+		createInsertQuery(record).getInternalQuery().execute();
+	}
+	
+	public RecordStoreQuery createInsertQuery(CollectRecord record) {
 		Survey survey = record.getSurvey();
-		RecordDSLContext jf = getMappingJooqFactory((CollectSurvey) survey);
-		jf.insertQuery(record).execute();
+		RecordDSLContext dsl = createDSLContext((CollectSurvey) survey);
+		InsertQuery q = dsl.insertQuery(record);
+		return new RecordStoreQuery(q);
+	}
+	
+	public void execute(List<RecordStoreQuery> queries) {
+		List<Query> internalQueries = new ArrayList<Query>(queries.size());
+		for (RecordStoreQuery recordStoreQuery : queries) {
+			internalQueries.add(recordStoreQuery.getInternalQuery());
+		}
+		Batch batch = dsl().batch(internalQueries);
+		batch.execute();
+	}
+	
+	public int nextId() {
+		return dsl().nextId();
+	}
+	
+	public void restartIdSequence(Number value) {
+		dsl().restartSequence(value);
 	}
 	
 	@Override
@@ -377,23 +436,29 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		private static final long serialVersionUID = 1L;
 		private static final int SERIALIZATION_BUFFER_SIZE = 50000;
 		private CollectSurvey survey;
+		private boolean recordToBeUpdated;
 		private Field<byte[]> dataAlias;
 		
 		public RecordDSLContext(Connection conn) {
-			super(conn, OFC_RECORD.ID, OFC_RECORD_ID_SEQ, CollectRecord.class);
-		}
-
-		public RecordDSLContext(Connection conn, CollectSurvey survey, int step) {
-			this(conn, survey);
-			if ( step < 1 || step > 3 ) {
-				throw new IllegalArgumentException("Invalid step "+step);
-			}
-			this.dataAlias = (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as("DATA");
+			this(conn, null);
 		}
 
 		public RecordDSLContext(Connection conn, CollectSurvey survey) {
-			this(conn);
+			this(conn, survey, null);
+		}
+		
+		public RecordDSLContext(Connection conn, CollectSurvey survey, Integer step) {
+			this(conn, survey, step, true);
+		}
+		
+		public RecordDSLContext(Connection conn, CollectSurvey survey, Integer step, boolean recordToBeUpdated) {
+			super(conn, OFC_RECORD.ID, OFC_RECORD_ID_SEQ, CollectRecord.class);
 			this.survey = survey;
+			this.recordToBeUpdated = recordToBeUpdated;
+			if ( step != null && (step < 1 || step > 3) ) {
+				throw new IllegalArgumentException("Invalid step "+step);
+			}
+			this.dataAlias = step == null ? null: (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as("DATA");
 		}
 
 		public SelectQuery selectRecordQuery(int id) {
@@ -424,7 +489,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			if (rootEntityDefn == null) {
 				throw new DataInconsistencyException("Unknown root entity id " + rootEntityId);
 			}
-			CollectRecord record = new CollectRecord(survey, version);
+			CollectRecord record = new CollectRecord(survey, version, null, recordToBeUpdated);
 			fromRecord(r, record);
 			return record;
 		}
@@ -435,7 +500,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			c.setId(r.getValue(OFC_RECORD.ID));
 			c.setCreationDate(r.getValue(OFC_RECORD.DATE_CREATED));
 			c.setModifiedDate(r.getValue(OFC_RECORD.DATE_MODIFIED));
-			
 			c.setCreatedBy(loadUser(r.getValue(OFC_RECORD.CREATED_BY_ID)));
 			c.setModifiedBy(loadUser(r.getValue(OFC_RECORD.MODIFIED_BY_ID)));
 			c.setOwner(loadUser(r.getValue(OFC_RECORD.OWNER_ID)));
@@ -561,6 +625,32 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		private ModelSerializer getSerializer() {
 			return new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
 		}
+		
+		@Override
+		public int nextId() {
+			return super.nextId();
+		}
+		
+		@Override
+		public void restartSequence(Number value) {
+			super.restartSequence(value);
+		}
+		
+	}
+
+	public static class RecordStoreQuery {
+		
+		private Query internalQuery;
+
+		public RecordStoreQuery(Query internalQuery) {
+			super();
+			this.internalQuery = internalQuery;
+		}
+		
+		public Query getInternalQuery() {
+			return internalQuery;
+		}
+		
 	}
 
 }

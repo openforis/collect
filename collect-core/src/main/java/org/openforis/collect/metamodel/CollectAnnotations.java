@@ -6,6 +6,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
+import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -23,6 +24,9 @@ public class CollectAnnotations {
 	public static String COLLECT_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/collect";
 	public static String COLLECT_PREFIX = "collect";
 
+	public static String COLLECT_EARTH_NAMESPACE_URI = "http://www.openforis.org/collect/3.0/collectearth";
+	public static String COLLECT_EARTH_PREFIX = "collectearth";
+	
 	public enum Annotation {
 		//collect namespace
 		INCLUDE_IN_DATA_EXPORT(new QName(COLLECT_NAMESPACE_URI, "includeInDataExport"), true),
@@ -45,11 +49,14 @@ public class CollectAnnotations {
 		COLUMN(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COLUMN), 1),
 		COLUMN_SPAN(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COLUMN_SPAN), 1),
 		CODE_ATTRIBUTE_LAYOUT_DIRECTION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DIRECTION), "vertical"),
-		CODE_ATTRIBUTE_LAYOUT_TYPE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT_TYPE), "text"),
+		CODE_ATTRIBUTE_LAYOUT_TYPE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LAYOUT_TYPE), CodeAttributeLayoutType.TEXT),
 		CODE_ATTRIBUTE_SHOW_CODE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_CODE), true),
 		WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.WIDTH)),
 		LABEL_WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_WIDTH)),
-		LABEL_ORIENTATION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_ORIENTATION), Orientation.HORIZONTAL)
+		LABEL_ORIENTATION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_ORIENTATION), Orientation.HORIZONTAL),
+		
+		//collect earth
+		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
 		;
 		
 		private QName qName;
@@ -111,6 +118,14 @@ public class CollectAnnotations {
 	
 	public void setEditable(AttributeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.EDITABLE, value);
+	}
+	
+	public boolean isFromCollectEarthCSV(AttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_FROM_CSV);
+	}
+	
+	public void setFromCollectEarthCSV(AttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.COLLECT_EARTH_FROM_CSV, value);
 	}
 	
 	private Step getAnnotaionEnumValue(AttributeDefinition def, Annotation annotation) {

@@ -29,7 +29,7 @@
           <listitem>
             <listcell label="@load(each.flag)" />
             <listcell label="@load(each.path)" />
-            <listcell label="${c:l(each.messageKey)}" />
+            <listcell label="${c:l2(each.messageKey, each.messageArgs)}" />
           </listitem>
         </template>
       </listbox>
