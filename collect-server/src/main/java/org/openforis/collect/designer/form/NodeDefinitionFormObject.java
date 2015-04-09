@@ -23,6 +23,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public static final String REQUIRED_FIELD = "required";
 	
+	public enum RequirenessType {
+		NOT_REQUIRED, ALWAYS_REQUIRED, REQUIRED_WHEN
+	}
+	
+	public enum RelevanceType {
+		ALWAYS_RELEVANT, RELEVANT_WHEN
+	}
+	
 	@SuppressWarnings("unused")
 	private EntityDefinition parentDefinition;
 	
@@ -30,8 +38,9 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private String name;
 	private String description;
 	private boolean multiple;
-	private boolean required;
-	private String requiredExpression;
+	private String requirenessType;
+	private String requiredWhenExpression;
+	private String relevanceType;
 	private String relevantExpression;
 	private boolean hideWhenNotRelevant;
 	private String minCountExpression;
@@ -119,8 +128,18 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		//generic
 		name = source.getName();
 		multiple = source.isMultiple();
-		required = source.isAlwaysRequired();
-		requiredExpression = required ? null: source.extractRequiredExpression();
+		if (source.isAlwaysRequired()) {
+			requirenessType = RequirenessType.ALWAYS_REQUIRED.name();
+		} else {
+			requiredWhenExpression = source.extractRequiredExpression();
+			if (requiredWhenExpression == null) {
+				requirenessType = RequirenessType.NOT_REQUIRED.name();
+			} else {
+				requirenessType = RequirenessType.REQUIRED_WHEN.name();
+			}
+		}
+		
+		relevanceType = source.getRelevantExpression() == null ? RelevanceType.ALWAYS_RELEVANT.name(): RelevanceType.RELEVANT_WHEN.name();
 		relevantExpression = source.getRelevantExpression();
 		minCountExpression = source.getMinCountExpression();
 		maxCountExpression = multiple ? source.getMaxCountExpression(): null;
@@ -178,24 +197,41 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( multiple ) {
 			dest.setMinCountExpression(StringUtils.trimToNull(minCountExpression));
 			dest.setMaxCountExpression(StringUtils.trimToNull(maxCountExpression));
-		} else if (required) {
-			dest.setAlwaysRequired();
 		} else {
-			dest.setRequiredExpression(StringUtils.trimToNull(requiredExpression));
+			RequirenessType requirenessTypeEnum = RequirenessType.valueOf(requirenessType);
+			switch(requirenessTypeEnum) {
+			case ALWAYS_REQUIRED:
+				dest.setAlwaysRequired();
+				break;
+			case REQUIRED_WHEN:
+				dest.setRequiredExpression(StringUtils.trimToNull(requiredWhenExpression));
+				break;
+			default:
+				break;
+			}
 		}
-		dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
 		
 		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
 		CollectAnnotations annotations = survey.getAnnotations();
+		
+		UIOptions uiOptions = survey.getUIOptions();
+		
+		RelevanceType relevanceTypeEnum = RelevanceType.valueOf(relevanceType);
+		switch (relevanceTypeEnum) {
+		case RELEVANT_WHEN:
+			dest.setRelevantExpression(StringUtils.trimToNull(relevantExpression));
+			uiOptions.setHideWhenNotRelevant(dest, hideWhenNotRelevant);
+			break;
+		default:
+			dest.setRelevantExpression(null);
+			uiOptions.setHideWhenNotRelevant(dest, false);
+		}
 		
 		if (dest instanceof AttributeDefinition) {
 			annotations.setFromCollectEarthCSV((AttributeDefinition) dest, fromCollectEarthCSV);
 		}
 		
-		UIOptions uiOptions = survey.getUIOptions();
-		
 		//layout
-		uiOptions.setHideWhenNotRelevant(dest, hideWhenNotRelevant);
 		uiOptions.setColumn(dest, column);
 		uiOptions.setColumnSpan(dest, columnSpan);
 		uiOptions.setWidth(dest, width);
@@ -334,22 +370,30 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		this.pcPromptLabel = pcPromptLabel;
 	}
 
-	public boolean isRequired() {
-		return required;
+	public String getRequirenessType() {
+		return requirenessType;
 	}
-
-	public void setRequired(boolean required) {
-		this.required =  required;
+	
+	public void setRequirenessType(String requirenessType) {
+		this.requirenessType = requirenessType;
 	}
-
-	public String getRequiredExpression() {
-		return requiredExpression;
+	
+	public String getRequiredWhenExpression() {
+		return requiredWhenExpression;
 	}
-
-	public void setRequiredExpression(String requiredExpression) {
-		this.requiredExpression = requiredExpression;
+	
+	public void setRequiredWhenExpression(String requiredWhenExpression) {
+		this.requiredWhenExpression = requiredWhenExpression;
 	}
-
+	
+	public String getRelevanceType() {
+		return relevanceType;
+	}
+	
+	public void setRelevanceType(String relevanceType) {
+		this.relevanceType = relevanceType;
+	}
+	
 	public String getRelevantExpression() {
 		return relevantExpression;
 	}

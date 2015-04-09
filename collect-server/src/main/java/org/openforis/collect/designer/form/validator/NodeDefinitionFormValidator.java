@@ -1,6 +1,8 @@
 package org.openforis.collect.designer.form.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.designer.form.NodeDefinitionFormObject.RelevanceType;
+import org.openforis.collect.designer.form.NodeDefinitionFormObject.RequirenessType;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -25,7 +27,9 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 	protected static final String 	MIN_COUNT_EXPRESSION_FIELD = "minCountExpression";
 	protected static final String 	MAX_COUNT_EXPRESSION_FIELD = "maxCountExpression";
 	protected static final String 	TAB_NAME_FIELD = "tabName";
-	protected static final String 	REQUIRED_EXPR_FIELD = "requiredExpression";
+	protected static final String 	REQUIRENESS_TYPE_FIELD = "requirenessType";
+	protected static final String 	REQUIRED_EXPR_FIELD = "requiredWhenExpression";
+	protected static final String 	RELEVANCE_TYPE_FIELD = "relevanceType";
 	protected static final String 	RELEVANT_EXPR_FIELD = "relevantExpression";
 	protected static final String 	COLUMN_FIELD = "column";
 	protected static final String 	COLUMN_SPAN_FIELD = "columnSpan";
@@ -37,9 +41,18 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 		validateName(ctx);
 		validateDescription(ctx);
 		validateMaxCount(ctx);
+		
 		NodeDefinition contextNode = getEditedNode(ctx);
-		validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
-		validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
+		String requirenessTypeVal = getValue(ctx, REQUIRENESS_TYPE_FIELD);
+		RequirenessType requirenessType = RequirenessType.valueOf(requirenessTypeVal);
+		if (requirenessType == RequirenessType.REQUIRED_WHEN) {
+			validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
+		}
+		String relevanceTypeVal = getValue(ctx, RELEVANCE_TYPE_FIELD);
+		RelevanceType relevanceType = RelevanceType.valueOf(relevanceTypeVal);
+		if (relevanceType == RelevanceType.RELEVANT_WHEN) {
+			validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
+		}
 		validateValueExpression(ctx, contextNode, MIN_COUNT_EXPRESSION_FIELD);
 		validateValueExpression(ctx, contextNode, MAX_COUNT_EXPRESSION_FIELD);
 		validateColumn(ctx);
