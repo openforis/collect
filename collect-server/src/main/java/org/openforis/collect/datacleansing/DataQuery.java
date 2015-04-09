@@ -18,6 +18,7 @@ public class DataQuery extends PersistedSurveyObject {
 	private static final long serialVersionUID = 1L;
 	
 	private Date creationDate;
+	private Date modifiedDate;
 	private String title;
 	private String description;
 	private int entityDefinitionId;
@@ -54,6 +55,14 @@ public class DataQuery extends PersistedSurveyObject {
 		this.creationDate = creationDate;
 	}
 
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+	
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+	
 	public String getTitle() {
 		return title;
 	}

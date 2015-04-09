@@ -69,25 +69,15 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 		@Override
 		protected void fromRecord(Record r, DataErrorQuery o) {
 			super.fromRecord(r, o);
-			o.setAttributeDefinitionId(r.getValue(OFC_DATA_ERROR_QUERY.ATTRIBUTE_ID));
-			o.setConditions(r.getValue(OFC_DATA_ERROR_QUERY.CONDITIONS));
-			o.setCreationDate(r.getValue(OFC_DATA_ERROR_QUERY.CREATION_DATE));
-			o.setDescription(r.getValue(OFC_DATA_ERROR_QUERY.DESCRIPTION));
-			o.setEntityDefinitionId(r.getValue(OFC_DATA_ERROR_QUERY.ENTITY_ID));
-			o.setTitle(r.getValue(OFC_DATA_ERROR_QUERY.TITLE));
 			o.setTypeId(r.getValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID));
+			o.setQueryId(r.getValue(OFC_DATA_ERROR_QUERY.QUERY_ID));
 		}
 		
 		@Override
 		protected void fromObject(DataErrorQuery o, StoreQuery<?> q) {
 			super.fromObject(o, q);
-			q.addValue(OFC_DATA_ERROR_QUERY.ATTRIBUTE_ID, o.getAttributeDefinitionId());
-			q.addValue(OFC_DATA_ERROR_QUERY.CONDITIONS, o.getConditions());
-			q.addValue(OFC_DATA_ERROR_QUERY.CREATION_DATE, toTimestamp(o.getCreationDate()));
-			q.addValue(OFC_DATA_ERROR_QUERY.DESCRIPTION, o.getDescription());
-			q.addValue(OFC_DATA_ERROR_QUERY.ENTITY_ID, o.getEntityDefinitionId());
 			q.addValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID, o.getTypeId());
-			q.addValue(OFC_DATA_ERROR_QUERY.TITLE, o.getTitle());
+			q.addValue(OFC_DATA_ERROR_QUERY.QUERY_ID, o.getQueryId());
 		}
 
 	}

@@ -12,6 +12,8 @@ public class DataErrorQuery extends DataQuery {
 
 	private static final long serialVersionUID = 1L;
 	
+	private Integer queryId;
+	private DataQuery query;
 	private Integer typeId;
 	private DataErrorType type;
 	
@@ -19,6 +21,24 @@ public class DataErrorQuery extends DataQuery {
 		super(survey);
 	}
 
+	public Integer getQueryId() {
+		return query == null ? queryId: query.getId();
+	}
+	
+	public void setQueryId(Integer queryId) {
+		this.queryId = queryId;
+		this.query = null;
+	}
+	
+	public DataQuery getQuery() {
+		return query;
+	}
+	
+	public void setQuery(DataQuery query) {
+		this.query = query;
+		this.queryId = query == null ? null: query.getId();
+	}
+	
 	public Integer getTypeId() {
 		return type == null ? typeId: type.getId();
 	}

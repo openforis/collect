@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorType;
+import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.persistence.DataErrorQueryDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -24,6 +25,9 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 	private DataErrorTypeManager dataErrorTypeManager;
 	
 	@Autowired
+	private DataQueryManager dataQueryManager;
+	
+	@Autowired
 	@Override
 	public void setDao(DataErrorQueryDao dao) {
 		super.setDao(dao);
@@ -34,6 +38,7 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 		List<DataErrorQuery> result = super.loadBySurvey(survey);
 		if (result != null) {
 			for (DataErrorQuery q : result) {
+				initializeQuery(survey, q);
 				initializeErrorType(survey, q);
 			}
 		}
@@ -50,5 +55,10 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 	private void initializeErrorType(CollectSurvey survey, DataErrorQuery q) {
 		DataErrorType errorType = dataErrorTypeManager.loadById(survey, q.getTypeId());
 		q.setType(errorType);
+	}
+	
+	private void initializeQuery(CollectSurvey survey, DataErrorQuery q) {
+		DataQuery query = dataQueryManager.loadById(survey, q.getQueryId());
+		q.setQuery(query);
 	}
 }
