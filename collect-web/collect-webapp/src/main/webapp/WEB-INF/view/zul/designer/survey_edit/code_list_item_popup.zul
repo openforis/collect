@@ -50,7 +50,7 @@
 								message="@load(vmsgs['description'])">
 								<label
 				  					use="org.openforis.collect.designer.component.FieldLabel"
-									value="${labels.global.item.description}"
+									value="${labels.survey.code_list.item.tooltip_text}"
 									languageCode="@load(vm.currentLanguageCode)" />
 							</fieldErrorHandler>
 							<fieldErrorHandler
