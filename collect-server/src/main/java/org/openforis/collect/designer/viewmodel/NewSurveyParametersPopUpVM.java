@@ -140,6 +140,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		//add default root entity
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntity = schema.createEntityDefinition();
+		rootEntity.setMultiple(true);
 		rootEntity.setName(SchemaVM.DEFAULT_ROOT_ENTITY_NAME);
 		schema.addRootEntityDefinition(rootEntity);
 		//create root tab set

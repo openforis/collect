@@ -46,12 +46,16 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 		String requirenessTypeVal = getValue(ctx, REQUIRENESS_TYPE_FIELD);
 		RequirenessType requirenessType = RequirenessType.valueOf(requirenessTypeVal);
 		if (requirenessType == RequirenessType.REQUIRED_WHEN) {
-			validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
+			if (validateRequired(ctx, REQUIRED_EXPR_FIELD)) {
+				validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
+			}
 		}
 		String relevanceTypeVal = getValue(ctx, RELEVANCE_TYPE_FIELD);
 		RelevanceType relevanceType = RelevanceType.valueOf(relevanceTypeVal);
 		if (relevanceType == RelevanceType.RELEVANT_WHEN) {
-			validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
+			if (validateRequired(ctx, RELEVANT_EXPR_FIELD)) {
+				validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
+			}
 		}
 		validateValueExpression(ctx, contextNode, MIN_COUNT_EXPRESSION_FIELD);
 		validateValueExpression(ctx, contextNode, MAX_COUNT_EXPRESSION_FIELD);
