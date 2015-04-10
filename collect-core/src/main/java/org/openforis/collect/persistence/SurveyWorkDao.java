@@ -40,6 +40,13 @@ public class SurveyWorkDao extends SurveyBaseDao {
 		return survey;
 	}
 	
+	public CollectSurvey loadByName(String name) {
+		Record record = dsl().select().from(OFC_SURVEY_WORK)
+				.where(OFC_SURVEY_WORK.NAME.equal(name)).fetchOne();
+		CollectSurvey survey = processSurveyRow(record);
+		return survey;
+	}
+	
 	@Transactional
 	public List<CollectSurvey> loadAll() {
 		List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();

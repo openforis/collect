@@ -77,6 +77,13 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
+	public CollectSurvey loadByName(String name) {
+		Record record = dsl().select().from(OFC_SURVEY)
+				.where(OFC_SURVEY.NAME.equal(name)).fetchOne();
+		CollectSurvey survey = processSurveyRow(record);
+		return survey;
+	}
+	
 	@Transactional
 	public List<SurveySummary> loadSummaries() {
 		List<SurveySummary> surveys = new ArrayList<SurveySummary>();

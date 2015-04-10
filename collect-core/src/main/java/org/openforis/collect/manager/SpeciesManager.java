@@ -348,13 +348,28 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
-	public void duplicateTaxonomyForWork(int publishedSurveyId, Integer surveyWorkId) {
-		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(publishedSurveyId);
+	public void duplicateTaxonomyForWork(int publishedSurveyId, int surveyWorkId) {
+		duplicateTaxonomy(publishedSurveyId, false, surveyWorkId, true);
+	}
+	
+	@Transactional
+	public void duplicateWorkTaxonomyForWork(int oldSurveyWorkId, int newSurveyWorkId) {
+		duplicateTaxonomy(oldSurveyWorkId, true, newSurveyWorkId, true);
+	}
+	
+	@Transactional
+	public void duplicateTaxonomy(int oldSurveyId, boolean oldSurveyWork, int newSurveyId, boolean newSurveyWork) {
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(oldSurveyId);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			int oldTaxonomyId = taxonomy.getId();
 			taxonomy.setId(null);
-			taxonomy.setSurveyId(null);
-			taxonomy.setSurveyWorkId(surveyWorkId);
+			if (newSurveyWork) {
+				taxonomy.setSurveyId(null);
+				taxonomy.setSurveyWorkId(newSurveyId);
+			} else {
+				taxonomy.setSurveyId(newSurveyId);
+				taxonomy.setSurveyWorkId(null);
+			}
 			taxonomyDao.insert(taxonomy);
 			Integer newTaxonomyId = taxonomy.getId();
 			duplicateTaxons(oldTaxonomyId, newTaxonomyId);

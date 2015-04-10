@@ -164,7 +164,14 @@ public class SurveySelectVM extends BaseVM {
 		args.put("survey", selectedSurvey);
 		surveyExportPopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
 	}
-	
+
+	@Command
+	public void cloneSelectedSurvey() throws IOException {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("originalSurvey", selectedSurvey);
+		surveyClonePopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
+	}
+
 	@GlobalCommand
 	public void performSelectedSurveyExport(@BindingParam("parameters") SurveyExportParametersFormObject parameters) {
 		rdbExportJob = null;

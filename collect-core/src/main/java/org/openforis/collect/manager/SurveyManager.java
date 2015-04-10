@@ -698,6 +698,55 @@ public class SurveyManager {
 	}
 	
 	@Transactional
+	public CollectSurvey duplicateSurveyForEdit(String originalSurveyName, boolean originalSurveyIsWork, String newName) {
+		try {
+			CollectSurvey oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsWork);
+			int oldSurveyId = oldSurvey.getId();
+
+			//TODO : clone it
+			CollectSurvey newSurvey = oldSurvey;
+			newSurvey.setId(null);
+			newSurvey.setPublished(false);
+			newSurvey.setWork(true);
+			newSurvey.setName(newName);
+			newSurvey.setUri(generateSurveyUri(newName));
+
+			if ( newSurvey.getSamplingDesignCodeList() == null ) {
+				newSurvey.addSamplingDesignCodeList();
+			}
+			surveyWorkDao.insert(newSurvey);
+			int newSurveyId = newSurvey.getId();
+			
+			//reload old survey, it has been modified previously
+			oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsWork);
+			
+			if (originalSurveyIsWork) {
+				samplingDesignManager.duplicateWorkSamplingDesignForWork(oldSurveyId, newSurveyId);
+				speciesManager.duplicateWorkTaxonomyForWork(oldSurveyId, newSurveyId);
+			} else {
+				samplingDesignManager.duplicateSamplingDesignForWork(oldSurveyId, newSurveyId);
+				speciesManager.duplicateTaxonomyForWork(oldSurveyId, newSurveyId);
+			}
+			codeListManager.cloneCodeLists(oldSurvey, newSurvey);
+			
+			return newSurvey;
+		} catch (SurveyImportException e) {
+			//it should never enter here, we are duplicating an already existing survey
+			throw new RuntimeException(e);
+		}
+	}
+
+	private CollectSurvey loadSurvey(String name, boolean work) {
+		CollectSurvey oldSurvey;
+		if (work) {
+			oldSurvey = surveyWorkDao.loadByName(name);
+		} else {
+			oldSurvey = surveyDao.loadByName(name);
+		}
+		return oldSurvey;
+	}
+	
+	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		codeListManager.deleteInvalidCodeListReferenceItems(survey);
 		
