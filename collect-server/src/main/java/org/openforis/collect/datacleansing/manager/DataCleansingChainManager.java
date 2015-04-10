@@ -7,11 +7,7 @@ import java.util.List;
 
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
-import org.openforis.collect.datacleansing.DataErrorQuery;
-import org.openforis.collect.datacleansing.DataErrorType;
-import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.persistence.DataCleansingChainDao;
-import org.openforis.collect.datacleansing.persistence.DataErrorQueryDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +20,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataCleansingChain, DataCleansingChainDao> {
 
-	@Autowired
-	private DataErrorTypeManager dataErrorTypeManager;
-	
-	@Autowired
-	private DataQueryManager dataQueryManager;
-	
 	@Autowired
 	private DataCleansingStepManager dataCleansingStepManager;
 	
@@ -65,8 +55,4 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 		}
 	}
 	
-	private void initializeQuery(CollectSurvey survey, DataCleansingStep q) {
-		DataQuery query = dataQueryManager.loadById(survey, q.getQueryId());
-		q.setQuery(query);
-	}
 }
