@@ -9,11 +9,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Stack;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -32,10 +29,13 @@ import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
 
 /**
@@ -56,8 +56,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	
-	private static final Set<String> FIXED_CSV_ATTRIBUTES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"elevation", "aspect", "slope")));
 	
 	private CodeListManager codeListManager;
 	
@@ -157,12 +155,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			String attrName = attrDef.getName();
 			sb.append("<Data name=\"" + attrName + "\">\n");
 			String value;
-			if (FIXED_CSV_ATTRIBUTES.contains(attrName)) {
-				value = "${placemark." + attrName + "}";
-			} else {
-				value = "${placemark.extraInfo[" + extraInfoIndex + "]}";
-				extraInfoIndex ++;
-			}
+			value = "${placemark.extraColumns[" + extraInfoIndex + "]}";
+			extraInfoIndex ++;
+			
 			sb.append("<value>");
 			sb.append(value);
 			sb.append("</value>\n");
@@ -205,7 +200,16 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		for (AttributeDefinition attrDef : fromCsvAttributes) {
 			String attrName = attrDef.getName();
 			headerSB.append(",\"" + attrName + "\"");
-			valuesSB.append(",\"value_" + attrName + "\"");
+			String value;
+			if (attrDef instanceof NumericAttributeDefinition || 
+					attrDef instanceof BooleanAttributeDefinition) {
+				value = "0";
+			} else if (attrDef instanceof DateAttributeDefinition) {
+				value = "1/1/2000";
+			} else {
+				value = "value_" + attrName;
+			}
+			valuesSB.append(",\"").append(value).append("\"");
 		}
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER, headerSB.toString());
 		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES, valuesSB.toString());
