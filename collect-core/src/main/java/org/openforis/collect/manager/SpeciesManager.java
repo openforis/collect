@@ -359,7 +359,12 @@ public class SpeciesManager {
 	
 	@Transactional
 	public void duplicateTaxonomy(int oldSurveyId, boolean oldSurveyWork, int newSurveyId, boolean newSurveyWork) {
-		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(oldSurveyId);
+		List<CollectTaxonomy> taxonomies;
+		if (oldSurveyWork) {
+			taxonomies = taxonomyDao.loadAllBySurveyWork(oldSurveyId);
+		} else {
+			taxonomies = taxonomyDao.loadAllBySurvey(oldSurveyId);
+		}
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			int oldTaxonomyId = taxonomy.getId();
 			taxonomy.setId(null);
