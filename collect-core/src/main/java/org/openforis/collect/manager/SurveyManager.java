@@ -714,6 +714,8 @@ public class SurveyManager {
 			newSurvey.setWork(true);
 			newSurvey.setName(newName);
 			newSurvey.setUri(generateSurveyUri(newName));
+			newSurvey.setCreationDate(new Date());
+			newSurvey.setModifiedDate(new Date());
 
 			if ( newSurvey.getSamplingDesignCodeList() == null ) {
 				newSurvey.addSamplingDesignCodeList();

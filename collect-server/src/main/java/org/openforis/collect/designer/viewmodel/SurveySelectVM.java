@@ -164,7 +164,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	@Command
-	public void exportSelectedSurvey1() throws IOException {
+	public void exportSelectedSurvey() throws IOException {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("survey", selectedSurvey);
 		surveyExportPopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
