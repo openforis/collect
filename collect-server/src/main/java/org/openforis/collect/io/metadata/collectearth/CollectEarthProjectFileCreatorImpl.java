@@ -126,6 +126,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_bing_maps", "true");
 		p.put("open_earth_engine", "true");
 		p.put("open_here_maps", "true");
+		p.put("open_gee_playground", "true");
+		p.put("db_driver", "SQLITE");
+
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
 		p.store(writer, null);
