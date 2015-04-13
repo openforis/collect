@@ -99,6 +99,9 @@
 				<combobutton label="${labels.survey.advanced_functions}" 
 							image="/assets/images/settings-small.png">
 					<menupopup>
+						<menuitem label="${labels.survey.clone.$}"
+							onClick="@command('cloneSelectedSurvey')" />
+							
 						<menuitem label="${labels.survey.publish_latest_changes}"
 							onClick="@command('publishSelectedSurvey')"
 							visible="@load(not vm.publishDisabled and vm.selectedSurvey.work and not vm.selectedSurvey.onlyWork)" />

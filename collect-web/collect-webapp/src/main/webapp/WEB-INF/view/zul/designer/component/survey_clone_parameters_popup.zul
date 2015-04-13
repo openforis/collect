@@ -20,7 +20,7 @@
 					<label value="${labels.survey.clone.original_name}:" />
 					<textbox width="300px"
             			disabled="true"
-            			value="@load(vm.originalSurveyName)" />
+            			value="@load(vm.originalSurvey.name)" />
 				</row>
 				<row>
 					<label value="${labels.survey.clone.original_type.$}:" />
@@ -36,7 +36,7 @@
 				</row>
 				<row>
 					<fieldErrorHandler message="@load(vmsgs['name'])">
-						<label value="${labels.survey.name}:" />
+						<label value="${labels.survey.clone.new_name}:" />
 					</fieldErrorHandler>
 					<fieldErrorHandler message="@load(vmsgs['name'])">
 						<textbox width="150px" value="@bind(fx.name) @validator(vm.nameValidator)" />
