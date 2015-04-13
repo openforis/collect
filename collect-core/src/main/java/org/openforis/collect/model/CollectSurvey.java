@@ -7,11 +7,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.openforis.collect.Collect;
 import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
+import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.ApplicationOptions;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -30,6 +33,8 @@ public class CollectSurvey extends Survey {
 	public static final String SAMPLING_DESIGN_CODE_LIST_NAME = "sampling_design";
 	
 	private boolean work;
+	private Version collectVersion;
+	private SurveyTarget target;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -37,6 +42,8 @@ public class CollectSurvey extends Survey {
 	protected CollectSurvey(SurveyContext surveyContext) {
 		super(surveyContext);
 		this.work = false;
+		this.target = SurveyTarget.COLLECT_DESKTOP;
+		this.collectVersion = Collect.getVersion();
 		this.annotations = new CollectAnnotations(this);
 	}
 
@@ -131,6 +138,28 @@ public class CollectSurvey extends Survey {
 
 	public void setWork(boolean work) {
 		this.work = work;
+	}
+	
+	public SurveyTarget getTarget() {
+		return target;
+	}
+	
+	public void setTarget(SurveyTarget target) {
+		this.target = target;
+		if (annotations.getSurveyTarget() != target) {
+			annotations.setSurveyTarget(target);
+		}
+	}
+	
+	public Version getCollectVersion() {
+		return collectVersion;
+	}
+	
+	public void setCollectVersion(Version collectVersion) {
+		this.collectVersion = collectVersion;
+		if (! annotations.getCollectVersion().equals(collectVersion)) {
+			annotations.setCollectVersion(collectVersion);
+		}
 	}
 	
 	public UIConfiguration getUIConfiguration() {

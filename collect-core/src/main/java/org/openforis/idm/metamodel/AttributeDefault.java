@@ -20,7 +20,7 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  * @author M. Togna
  * @author S. Ricci
  */
-public class AttributeDefault implements Serializable {
+public class AttributeDefault implements Serializable, DeepComparable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -134,17 +134,7 @@ public class AttributeDefault implements Serializable {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((condition == null) ? 0 : condition.hashCode());
-		result = prime * result + ((expression == null) ? 0 : expression.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)

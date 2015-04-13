@@ -16,6 +16,7 @@ import java.util.Stack;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.util.DeepEquals;
 
 /**
  * @author G. Miceli
@@ -304,18 +305,10 @@ public class EntityDefinition extends NodeDefinition {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((childDefinitions == null) ? 0 : childDefinitions.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -323,7 +316,7 @@ public class EntityDefinition extends NodeDefinition {
 		if (childDefinitions == null) {
 			if (other.childDefinitions != null)
 				return false;
-		} else if (!childDefinitions.equals(other.childDefinitions))
+		} else if (! DeepEquals.deepEquals(childDefinitions, other.childDefinitions))
 			return false;
 		return true;
 	}

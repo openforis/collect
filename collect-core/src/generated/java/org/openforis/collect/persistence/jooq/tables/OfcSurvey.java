@@ -11,7 +11,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurvey extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord> {
 
-	private static final long serialVersionUID = -805263697;
+	private static final long serialVersionUID = -606926003;
 
 	/**
 	 * The singleton instance of <code>collect.ofc_survey</code>
@@ -45,6 +45,26 @@ public class OfcSurvey extends org.jooq.impl.TableImpl<org.openforis.collect.per
 	 * The column <code>collect.ofc_survey.idml</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord, java.lang.String> IDML = createField("idml", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_survey.target</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord, java.lang.String> TARGET = createField("target", org.jooq.impl.SQLDataType.VARCHAR.length(5).defaulted(true), this, "");
+
+	/**
+	 * The column <code>collect.ofc_survey.date_created</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord, java.sql.Timestamp> DATE_CREATED = createField("date_created", org.jooq.impl.SQLDataType.TIMESTAMP.defaulted(true), this, "");
+
+	/**
+	 * The column <code>collect.ofc_survey.date_modified</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord, java.sql.Timestamp> DATE_MODIFIED = createField("date_modified", org.jooq.impl.SQLDataType.TIMESTAMP.defaulted(true), this, "");
+
+	/**
+	 * The column <code>collect.ofc_survey.collect_version</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord, java.lang.String> COLLECT_VERSION = createField("collect_version", org.jooq.impl.SQLDataType.VARCHAR.length(55).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_survey</code> table reference

@@ -1,10 +1,12 @@
 package org.openforis.idm.metamodel.xml.internal.marshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.CREATED;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.CYCLE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.IDML3_NAMESPACE_URI;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.LANGUAGE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.LAST_ID;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.MODIFIED;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.PROJECT;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.PUBLISHED;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.SURVEY;
@@ -15,6 +17,9 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
+import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 import org.xmlpull.v1.XmlSerializer;
@@ -97,6 +102,12 @@ public class SurveyMarshaller extends XmlSerializerSupport<Survey, Void>{
 	protected void attributes(Survey survey) throws IOException {
 		attribute(LAST_ID, survey.getLastId());
 		attribute(PUBLISHED, survey.isPublished() ? true : null);
+		attribute(CREATED, Dates.formatDateTime(survey.getCreationDate()));
+		attribute(MODIFIED, Dates.formatDateTime(survey.getModifiedDate()));
+		for (QName qname : survey.getAnnotationNames()) {
+			String value = survey.getAnnotation(qname);
+			attribute(qname.getNamespaceURI(), qname.getLocalPart(), value);
+		}
 	}
 	
 	@Override

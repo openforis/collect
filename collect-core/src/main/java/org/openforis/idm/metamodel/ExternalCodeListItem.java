@@ -60,22 +60,10 @@ public class ExternalCodeListItem extends CodeListItem {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime
-				* result
-				+ ((parentKeyByLevel == null) ? 0 : parentKeyByLevel.hashCode());
-		result = prime * result
-				+ ((systemId == null) ? 0 : systemId.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;

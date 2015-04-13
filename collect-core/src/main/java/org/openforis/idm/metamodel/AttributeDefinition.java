@@ -11,6 +11,7 @@ import java.util.List;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.model.Value;
+import org.openforis.idm.util.DeepEquals;
 
 /**
  * @author G. Miceli
@@ -154,19 +155,10 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	public abstract Class<? extends Value> getValueType();
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((attributeDefaults == null) ? 0 : attributeDefaults.hashCode());
-		result = prime * result + ((checks == null) ? 0 : checks.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -174,12 +166,12 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		if (attributeDefaults == null) {
 			if (other.attributeDefaults != null)
 				return false;
-		} else if (!attributeDefaults.equals(other.attributeDefaults))
+		} else if (! DeepEquals.deepEquals(attributeDefaults, other.attributeDefaults))
 			return false;
 		if (checks == null) {
 			if (other.checks != null)
 				return false;
-		} else if (!checks.equals(other.checks))
+		} else if (! DeepEquals.deepEquals(checks, other.checks))
 			return false;
 		return true;
 	}

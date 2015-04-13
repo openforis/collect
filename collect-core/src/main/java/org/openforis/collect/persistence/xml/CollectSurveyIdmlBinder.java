@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
 import org.openforis.collect.model.CollectSurvey;
@@ -43,6 +44,10 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 	protected void onUnmarshallingComplete(Survey survey) {
 		super.onUnmarshallingComplete(survey);
 		CollectSurvey collectSurvey = (CollectSurvey) survey;
+		CollectAnnotations annotations = collectSurvey.getAnnotations();
+		collectSurvey.setTarget(annotations.getSurveyTarget());
+		collectSurvey.setCollectVersion(annotations.getCollectVersion());
+		
 		if (collectSurvey.getUIOptions() != null) {
 			try {
 				UIConfiguration uiConfiguration = new UIOptionsMigrator().migrateToUIConfiguration(collectSurvey.getUIOptions());

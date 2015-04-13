@@ -59,7 +59,9 @@ abstract class SurveyBaseDao extends JooqDaoSupport {
 		try {
 			CollectSurvey survey = (CollectSurvey) surveySerializer.unmarshal(reader, includeCodeListItems);
 			SurveyMigrator migrator = getSurveyMigrator();
-			migrator.migrate(survey);
+			if (migrator.isMigrationNeeded(survey)) {
+				migrator.migrate(survey);
+			}
 			return survey;
 		} finally {
 			IOUtils.closeQuietly(reader);

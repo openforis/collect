@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.Collect;
 import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
@@ -653,6 +655,8 @@ public class SurveyManager {
 
 	@Transactional
 	public void saveSurveyWork(CollectSurvey survey) throws SurveyImportException {
+		survey.setModifiedDate(new Date());
+		survey.setCollectVersion(Collect.getVersion());
 		Integer id = survey.getId();
 		if ( id == null ) {
 			surveyWorkDao.insert(survey);
@@ -704,6 +708,9 @@ public class SurveyManager {
 		Integer surveyWorkId = survey.getId();
 		survey.setWork(false);
 		survey.setPublished(true);
+		survey.setModifiedDate(new Date());
+		survey.setCollectVersion(Collect.getVersion());
+		
 		CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
 		if ( oldPublishedSurvey == null ) {
 			surveyDao.importModel(survey);

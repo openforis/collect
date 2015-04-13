@@ -5,11 +5,13 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.metamodel.ui.UIOptions.Orientation;
+import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.versioning.Version;
+import org.openforis.idm.metamodel.Annotatable;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
@@ -32,6 +34,8 @@ public class CollectAnnotations {
 		INCLUDE_IN_DATA_EXPORT(new QName(COLLECT_NAMESPACE_URI, "includeInDataExport"), true),
 		PHASE_TO_APPLY_DEFAULT_VALUE(new QName(COLLECT_NAMESPACE_URI, "phaseToApplyDefaultValue"), Step.ENTRY),
 		EDITABLE(new QName(COLLECT_NAMESPACE_URI, "editable"), true),
+		TARGET(new QName(COLLECT_NAMESPACE_URI, "target"), SurveyTarget.COLLECT_DESKTOP),
+		COLLECT_VERSION(new QName(COLLECT_NAMESPACE_URI, "collectVersion"), "3.4.0"),
 		
 		//ui namespace
 		TAB_SET(new QName(UI_NAMESPACE_URI, UIOptionsConstants.TAB_SET_NAME)),
@@ -104,6 +108,32 @@ public class CollectAnnotations {
 		def.setAnnotation(Annotation.AUTOCOMPLETE.getQName(), value);
 	}
 	
+	public Version getCollectVersion() {
+		String versionStr = survey.getAnnotation(Annotation.COLLECT_VERSION.getQName());
+		if (StringUtils.isBlank(versionStr)) {
+			versionStr = Annotation.COLLECT_VERSION.getDefaultValue();
+		}
+		return new Version(versionStr);
+	}
+
+	public void setCollectVersion(Version version) {
+		setAnnotationValue(survey, Annotation.COLLECT_VERSION, version.toString());
+	}
+	
+	public SurveyTarget getSurveyTarget() {
+		String val = survey.getAnnotation(Annotation.TARGET.getQName());
+		if (StringUtils.isBlank(val)) {
+			return (SurveyTarget) Annotation.TARGET.defaultValue;
+		} else {
+			return SurveyTarget.fromCode(val);
+		}
+	}
+	
+	public void setSurveyTarget(SurveyTarget target) {
+		String val = target == null || target == Annotation.TARGET.defaultValue ? null: target.getCode();
+		survey.setAnnotation(Annotation.TARGET.getQName(), val);
+	}
+
 	public Step getPhaseToApplyDefaultValue(AttributeDefinition def) {
 		return getAnnotaionEnumValue(def, Annotation.PHASE_TO_APPLY_DEFAULT_VALUE);
 	}
@@ -137,7 +167,7 @@ public class CollectAnnotations {
 		}
 	}
 	
-	private void setAnnotationEnumValue(NodeDefinition def, Annotation annotation, Enum<?> value) {
+	private void setAnnotationEnumValue(Annotatable def, Annotation annotation, Enum<?> value) {
 		String enumName;
 		if ( value == null || value == annotation.getDefaultValue() ) {
 			enumName = null;
@@ -165,6 +195,16 @@ public class CollectAnnotations {
 			annotationValue = Boolean.toString(value);
 		}
 		defn.setAnnotation(annotation.getQName(), annotationValue);
+	}
+	
+	private void setAnnotationValue(Annotatable annotatable, Annotation annotation, Object value) {
+		String annotationValue;
+		if ( annotation.getDefaultValue().equals(value) ) {
+			annotationValue = null;
+		} else {
+			annotationValue = value.toString();
+		}
+		annotatable.setAnnotation(annotation.getQName(), annotationValue);
 	}
 	
 	public CollectSurvey getSurvey() {

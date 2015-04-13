@@ -76,19 +76,10 @@ public abstract class VersionableSurveyObject extends IdentifiableSurveyObject {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((deprecatedVersion == null) ? 0 : deprecatedVersion.hashCode());
-		result = prime * result + ((sinceVersion == null) ? 0 : sinceVersion.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
@@ -96,12 +87,12 @@ public abstract class VersionableSurveyObject extends IdentifiableSurveyObject {
 		if (deprecatedVersion == null) {
 			if (other.deprecatedVersion != null)
 				return false;
-		} else if (!deprecatedVersion.equals(other.deprecatedVersion))
+		} else if (!deprecatedVersion.deepEquals(other.deprecatedVersion))
 			return false;
 		if (sinceVersion == null) {
 			if (other.sinceVersion != null)
 				return false;
-		} else if (!sinceVersion.equals(other.sinceVersion))
+		} else if (!sinceVersion.deepEquals(other.sinceVersion))
 			return false;
 		return true;
 	}
