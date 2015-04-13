@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
@@ -50,11 +51,12 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 			Entity entity = (Entity) axis;
 			int maxAttrValues = getMaxAttributeValues();
 			List<String> values = new ArrayList<String>(maxAttrValues);
-			int attrCount = entity.getCount(attributeDefinition);
+			Entity nearestParentEntity = getParentEntity(entity);
+			int attrCount = nearestParentEntity.getCount(attributeDefinition);
 			for (int attrIdx = 0; attrIdx < maxAttrValues; attrIdx++) {
 				String val;
 				if (attrIdx < attrCount) {
-					Attribute<?, ?> attr = (Attribute<?, ?>) entity.getChild(attributeDefinition, attrIdx);
+					Attribute<?, ?> attr = (Attribute<?, ?>) nearestParentEntity.getChild(attributeDefinition, attrIdx);
 					val = extractValue(attr);
 				} else {
 					val = "";
@@ -65,6 +67,24 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 		} else {
 			throw new UnsupportedOperationException("Axis must be an Entity");
 		}
+	}
+
+	/**
+	 * Attribute definition can be inside nested single entities inside the axis.
+	 * This method will look for the nearest parent entity for attributes to extract value for.
+	 */
+	private Entity getParentEntity(Entity axis) {
+		EntityDefinition entityDef = axis.getDefinition();
+		List<EntityDefinition> ancestorEntityDefinitions = attributeDefinition.getAncestorEntityDefinitions();
+		int indexOfAxis = ancestorEntityDefinitions.indexOf(entityDef);
+		Entity nearestParentEntity = axis;
+		if (indexOfAxis + 1 < ancestorEntityDefinitions.size()) {
+			List<EntityDefinition> relativeSingleEntityDefs = ancestorEntityDefinitions.subList(indexOfAxis + 1, ancestorEntityDefinitions.size());
+			for (EntityDefinition parentSingleEntityDef : relativeSingleEntityDefs) {
+				nearestParentEntity = (Entity) nearestParentEntity.getChild(parentSingleEntityDef);
+			}
+		}
+		return nearestParentEntity;
 	}
 
 	private String extractValue(Attribute<?, ?> attr) {
