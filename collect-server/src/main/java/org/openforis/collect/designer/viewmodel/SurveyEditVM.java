@@ -23,6 +23,7 @@ import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
@@ -45,7 +46,6 @@ import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.bind.annotation.QueryParam;
 import org.zkoss.util.logging.Log;
 import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
@@ -61,7 +61,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private static final Log log = Log.lookup(SurveySelectVM.class);
 
 	private static final String TEXT_XML = "text/xml";
-	private static final String PREVIEW_WINDOW_ID = "collect_survey_preview";
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	public static final String BACKGROUD_SAVE_GLOBAL_COMMAND = "backgroundSurveySave";
 	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
@@ -399,18 +398,21 @@ public class SurveyEditVM extends SurveyBaseVM {
 			}
 			survey.refreshSurveyDependencies();
 			
-			Map<String, String> params = createBasicModuleParameters();
-			params.put("preview", "true");
-			params.put("surveyId", Integer.toString(survey.getId()));
-			params.put("work", "true");
-			params.put("rootEntityId", Integer.toString(rootEntity.getId()));
-			if ( formVersion != null ) {
-				params.put("versionId", Integer.toString(formVersion.getId()));
+			if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+				openPopUp(Resources.Component.COLLECT_EARTH_PREVIEW_POPUP.getLocation(), true);
+			} else {
+				Map<String, String> params = createBasicModuleParameters();
+				params.put("preview", "true");
+				params.put("surveyId", Integer.toString(survey.getId()));
+				params.put("work", "true");
+				params.put("rootEntityId", Integer.toString(rootEntity.getId()));
+				if ( formVersion != null ) {
+					params.put("versionId", Integer.toString(formVersion.getId()));
+				}
+				openPopUp(Resources.Component.PREVIEW_POP_UP.getLocation(), true, params);
+
+				closePreviewPreferencesPopUp();
 			}
-			String url = ComponentUtil.createUrl(Resources.Page.PREVIEW_PATH.getLocation(), params);
-			Execution current = Executions.getCurrent();
-			current.sendRedirect(url, PREVIEW_WINDOW_ID);
-			closePreviewPreferencesPopUp();
 		}
 	}
 	

@@ -174,7 +174,7 @@ public class SessionManager {
 			}
 		}
 		if ( result == null ) {
-			throw new IllegalStateException("Error getting session info");
+			throw new IllegalStateException("Error getting session attribute: " + attributeName);
 		} else {
 			return result;
 		}

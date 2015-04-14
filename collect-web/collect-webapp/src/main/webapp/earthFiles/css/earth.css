@@ -1,0 +1,242 @@
+#toolbar {
+	padding: 4px;
+	display: inline-block;
+	margin: 1px;
+	width: 100%;
+}
+
+body {
+	font-family: "Trebuchet MS", "Helvetica", "Arial", "Verdana",
+		"sans-serif";
+}
+
+.capsuleCat {
+	/* border: 1px solid #AED0EA; */
+	color: #222222;
+	font-weight: bold;
+	background-color: #e9f3f9;
+}
+
+.label-over {
+	background-color: #EEEEEE;
+	border: 1px solid #CCCCCC;
+	display: inline-block;
+	font-size: 12px;
+	font-weight: normal;
+	/*height: 12px; */
+	line-height: 10px;
+	min-width: 16px;
+	padding: 10px 10px;
+	text-align: center;
+	text-shadow: 0 1px 0 #FFFFFF;
+	width: auto;
+	margin-bottom: 5px;
+	margin-top: 5px;
+	border-top-left-radius: 8px;
+	border-top-right-radius: 8px;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+	display: inline-block;
+}
+
+.add-on {
+	width: 60px !important;
+}
+
+.input-prepend .add-on, .input-prepend .btn {
+	margin-left: 4px;
+}
+
+label {
+	display: inline;
+}
+
+hr {
+	margin: 5px;
+}
+
+.bootstrap-select:not ([class*="span"] ) {
+	width: 170px;
+}
+
+.ui-dialog-titlebar-close {
+	background-image: url(../img/close.png) !important;
+	background-position: left top !important;
+}
+
+.btn-info {
+	padding-left: 8px;
+	padding-right: 8px;
+	background-color: #5bc0de;
+	border-color: #46b8da;
+}
+
+.btn-info.active, .btn-inverse.active {
+	color: rgba(255, 255, 255, 1) !important;
+	background-color: #306878;
+	border-color: #1c4c5a;
+}
+
+.btn-warning.active {
+	color: rgba(255, 255, 255, 1) !important;
+	background-color: #755426;
+	border-color: #755426;
+}
+
+.btn-danger.active {
+	color: rgba(255, 255, 255, 1) !important;
+	background-color: #632422;
+	border-color: #632422;
+}
+
+.btn-success.active {
+	color: rgba(255, 255, 255, 1) !important;
+	background-color: #2d5f2d;
+	border-color: #2d5f2d;
+}
+
+.btn-group {
+	margin-bottom: 4px;
+}
+
+.btn:active, .btn.active {
+	box-shadow: inset 2px 2px 0 0 rgba(255, 255, 255, 0.8), inset -2px -2px
+		0 0 rgba(255, 255, 255, 0.8), inset 4px 4px 0 0 rgba(0, 0, 0, 0.8),
+		inset -4px -4px 0 0 rgba(0, 0, 0, 0.8), inset 5px 5px 5px 5px
+		rgba(0, 0, 0, 0.8), inset -5px -5px 5px 5px rgba(0, 0, 0, 0.8);
+	color: rgba(255, 255, 255, 1) !important;
+	text-shadow: 0px 0px 6px rgba(0, 0, 0, 1);
+}
+
+.earthDiv {
+	width: 400px;
+}
+
+.btn-lg {
+	padding: 10px 16px;
+	font-size: 18px;
+	line-height: 1.33;
+	border-radius: 6px;
+}
+
+.firstElementToggle {
+	border-bottom-left-radius: 4px !important;
+	border-top-left-radius: 4px !important;
+	margin-left: 0 !important;
+}
+
+.lastElementToggle {
+	border-bottom-right-radius: 4px !important;
+	border-top-right-radius: 4px !important;
+}
+
+table.independentToggle button, .independentToggle button {
+	font-size: 12px;
+	border-bottom-left-radius: 4px !important;
+	border-top-left-radius: 4px !important;
+	margin-left: 0 !important;
+	border-bottom-right-radius: 4px !important;
+	border-top-right-radius: 4px !important;
+}
+
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2,
+	.col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3,
+	.col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5,
+	.col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6,
+	.col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8,
+	.col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9,
+	.col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11,
+	.col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12
+	{
+	padding: 0px 4px 0px 4px;
+}
+
+/** Tooltip */
+.tooltip {
+	z-index: 100;
+	position: fixed;
+}
+
+.tooltip-inner {
+	background-color: gray;
+}
+
+/** Error Tooltip */
+.tooltip.error .tooltip-inner {
+	background-color: #e74c3c;
+}
+
+.tooltip.top.error .tooltip-arrow {
+	border-top-color: #e74c3c;
+}
+
+/** Form elements */
+.form-horizontal .control-label {
+	padding-top: 4px;
+	margin-left: 5px;
+}
+
+.form-group {
+	margin-bottom: 2px;
+}
+
+form input[type='text'] {
+	width: 200px;
+}
+
+form input[type='checkbox'] {
+	width: 20px;
+	height: 20px;
+}
+
+form input[type='text'].numeric {
+	width: 100px;
+}
+
+form textarea {
+	width: 250px;
+}
+
+fieldset legend {
+	font-size: medium;
+}
+
+table.table td {
+	padding: 4px !important;
+}
+
+.step {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.notrelevant {
+	display: none;
+}
+
+a.btn-finish, 
+a.btn-finish:hover, 
+a.btn-finish:active {
+	color: #fff !important;
+	background-color: #449d44 !important;
+  	border-color: #398439 !important;
+}
+
+.code-items {
+}
+
+.code-item {
+	width: 45%;
+	margin: 2px;
+	white-space: normal;
+	height: 27px;
+	font-size: 12px;
+}
+
+div.content{
+	padding-left:12px !important;
+}
+
+div.actions.clearfix{
+	background-image: url("../img/bottombanner.png");
+}

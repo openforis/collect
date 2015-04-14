@@ -32,7 +32,9 @@ public class Resources {
 	
 	public enum Component {
 		SELECT_LANGUAGE_POP_UP("survey_edit/select_language_popup.zul"),
+		COLLECT_EARTH_PREVIEW_POPUP("survey_edit/collect_earth_preview_popup.zul"),
 		PREVIEW_PREFERENCES_POP_UP("survey_edit/preview_preferences_popup.zul"),
+		PREVIEW_POP_UP("survey_edit/preview_popup.zul"),
 		TABSGROUP("survey_edit/schema_layout/tabsgroup.zul"),
 		TAB_LABEL_POPUP("survey_edit/schema_layout/tab_label_popup.zul"),
 		TABSGROUP_LIST_OF_NODES("survey_edit/schema_layout/editablenodeslist.zul"),

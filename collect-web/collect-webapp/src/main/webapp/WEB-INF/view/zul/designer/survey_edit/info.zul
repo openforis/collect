@@ -18,7 +18,7 @@
           <row>
             <label value="${labels.survey.name}:" />
             <fieldErrorHandler message="@load(vmsgs['name'])">
-              <textbox width="150px" value="@bind(fx.name)"
+              <textbox width="350px" value="@bind(fx.name)"
                 onChange="@command('applyChanges')" 
                 readonly="true" />
             </fieldErrorHandler>
@@ -31,7 +31,7 @@
 	              	languageCode="@load(vm.currentLanguageCode)" />
 	        </fieldErrorHandler>
             <fieldErrorHandler message="@load(vmsgs['projectName'])">
-              <textbox width="150px" value="@bind(fx.projectName)"
+              <textbox width="350px" value="@bind(fx.projectName)"
                 onChange="@command('applyChanges')" />
             </fieldErrorHandler>
           </row>
