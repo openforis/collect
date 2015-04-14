@@ -84,14 +84,18 @@ public class SurveyController extends BasicController {
 	
 	@RequestMapping(value = "/collectearthpreview.html", method = RequestMethod.GET)
 	public void showCollectEarthBalloonPreview(HttpServletResponse response, @RequestParam("surveyId") Integer surveyId)  {
+		PrintWriter writer = null;
 		try {
 			CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
 			CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey);
 			String html = generator.generateHTML();
-			PrintWriter writer = new PrintWriter(response.getOutputStream());
+			writer = new PrintWriter(response.getOutputStream());
 			writer.print(html);
+			writer.flush();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			writer.close();
 		}
 	}
 }
