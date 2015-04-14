@@ -21,7 +21,7 @@ import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -166,7 +166,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			} else {
 				surveyManager.updateModel(survey);
 			}
-		} catch (SurveyImportException e) {
+		} catch (SurveyStoreException e) {
 			throw new RuntimeException(e);
 		}
 	}

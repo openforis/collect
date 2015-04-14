@@ -16,7 +16,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
-import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.ReferenceDataSchema;
 import org.openforis.idm.metamodel.ReferenceDataSchema.ReferenceDataDefinition;
 import org.openforis.idm.metamodel.ReferenceDataSchema.SamplingPointDefinition;
@@ -197,7 +197,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 		throw new ParsingException(error);
 	}
 
-	protected void persistSamplingDesign() throws SurveyImportException {
+	protected void persistSamplingDesign() throws SurveyStoreException {
 		List<String> infoColumnNames = reader.getInfoColumnNames();
 		List<ReferenceDataDefinition.Attribute> attributes = ReferenceDataDefinition.Attribute.fromNames(infoColumnNames);
 		SamplingPointDefinition samplingPoint;
@@ -220,7 +220,7 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	}
 
 	@SuppressWarnings("deprecation")
-	private void saveSurvey() throws SurveyImportException {
+	private void saveSurvey() throws SurveyStoreException {
 		if ( survey.isWork() ) {
 			surveyManager.saveSurveyWork(survey);
 		} else {

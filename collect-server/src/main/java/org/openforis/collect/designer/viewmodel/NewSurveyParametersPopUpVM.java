@@ -21,6 +21,7 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
@@ -101,7 +102,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	}
 	
 	@Command
-	public void ok() throws IdmlParseException, SurveyValidationException {
+	public void ok() throws IdmlParseException, SurveyValidationException, SurveyStoreException {
 		String name = (String) form.get("name");
 		String langCode = ((LabelledItem) form.get("language")).getCode();
 		String templateCode = ((LabelledItem) form.get("template")).getCode();
@@ -115,6 +116,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		default:
 			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
+		surveyManager.saveSurveyWork(survey);
 		//put survey in session and redirect into survey edit page
 		SessionStatus sessionStatus = getSessionStatus();
 		sessionStatus.setSurvey(survey);

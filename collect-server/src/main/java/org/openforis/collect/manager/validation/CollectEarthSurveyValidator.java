@@ -14,7 +14,6 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.springframework.stereotype.Component;
@@ -34,10 +33,7 @@ public class CollectEarthSurveyValidator {
 		new CollectEarthField("location", CoordinateAttributeDefinition.class),
 		new CollectEarthField("plot_file", TextAttributeDefinition.class),
 		new CollectEarthField("actively_saved", BooleanAttributeDefinition.class),
-		new CollectEarthField("actively_saved_on", DateAttributeDefinition.class),
-		new CollectEarthField("elevation", NumberAttributeDefinition.class),
-		new CollectEarthField("slope", NumberAttributeDefinition.class),
-		new CollectEarthField("aspect", NumberAttributeDefinition.class)
+		new CollectEarthField("actively_saved_on", DateAttributeDefinition.class)
 	};
 	
 	private static class CollectEarthField {
