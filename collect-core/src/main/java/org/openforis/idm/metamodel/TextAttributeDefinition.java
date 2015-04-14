@@ -83,19 +83,10 @@ public class TextAttributeDefinition extends AttributeDefinition implements KeyA
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((key == null) ? 0 : key.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;

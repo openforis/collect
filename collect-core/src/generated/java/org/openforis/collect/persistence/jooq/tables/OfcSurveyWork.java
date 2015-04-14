@@ -11,7 +11,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurveyWork extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyWorkRecord> {
 
-	private static final long serialVersionUID = 1386460917;
+	private static final long serialVersionUID = 271688859;
 
 	/**
 	 * The singleton instance of <code>collect.ofc_survey_work</code>
@@ -45,6 +45,26 @@ public class OfcSurveyWork extends org.jooq.impl.TableImpl<org.openforis.collect
 	 * The column <code>collect.ofc_survey_work.idml</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyWorkRecord, java.lang.String> IDML = createField("idml", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_survey_work.target</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyWorkRecord, java.lang.String> TARGET = createField("target", org.jooq.impl.SQLDataType.VARCHAR.length(5).defaulted(true), this, "");
+
+	/**
+	 * The column <code>collect.ofc_survey_work.date_created</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyWorkRecord, java.sql.Timestamp> DATE_CREATED = createField("date_created", org.jooq.impl.SQLDataType.TIMESTAMP.defaulted(true), this, "");
+
+	/**
+	 * The column <code>collect.ofc_survey_work.date_modified</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyWorkRecord, java.sql.Timestamp> DATE_MODIFIED = createField("date_modified", org.jooq.impl.SQLDataType.TIMESTAMP.defaulted(true), this, "");
+
+	/**
+	 * The column <code>collect.ofc_survey_work.collect_version</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSurveyWorkRecord, java.lang.String> COLLECT_VERSION = createField("collect_version", org.jooq.impl.SQLDataType.VARCHAR.length(55).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_survey_work</code> table reference

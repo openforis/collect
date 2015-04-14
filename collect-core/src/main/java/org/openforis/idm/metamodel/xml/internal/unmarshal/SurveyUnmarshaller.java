@@ -1,14 +1,10 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
-import static org.openforis.idm.metamodel.xml.IdmlConstants.CYCLE;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.DESCRIPTION;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.LANGUAGE;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.LAST_ID;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.PROJECT;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.PUBLISHED;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.SURVEY;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.URI;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
+import javax.xml.namespace.QName;
+
+import org.openforis.collect.utils.Dates;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
@@ -69,14 +65,27 @@ public class SurveyUnmarshaller extends IdmlPullReader {
 		initSurvey();
 		String lastId = getAttribute(LAST_ID, true);
 		Boolean published = getBooleanAttribute(PUBLISHED, false);
+		String creationDate = getAttribute(CREATED, false);
+		String modifiedDate = getAttribute(MODIFIED, false);
 		survey.setLastId(Integer.valueOf(lastId));
 		survey.setPublished(published == null ? false : published);
+		if (creationDate != null) {
+			survey.setCreationDate(Dates.parseDateTime(creationDate));
+		}
+		if (modifiedDate != null) {
+			survey.setModifiedDate(Dates.parseDateTime(modifiedDate));
+		}
 		readNamepaceDeclarations();
 	}
 	
 	@Override
 	protected void onEndTag() throws XmlParseException {
 		super.onEndTag();
+	}
+	
+	@Override
+	protected void handleAnnotation(QName qName, String value) {
+		survey.setAnnotation(qName, value);
 	}
 
 	protected void initSurvey() {

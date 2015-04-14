@@ -7,15 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
+import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
+import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,11 +46,22 @@ public class SurveyDao extends SurveyBaseDao {
 		// Insert into OFC_SURVEY table
 		CollectDSLContext dsl = dsl();
 		int surveyId = dsl.nextId(OFC_SURVEY.ID, OFC_SURVEY_ID_SEQ);
-		dsl.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId)				
+		InsertSetMoreStep<OfcSurveyRecord> insert = dsl.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId);
+		insert
 				.set(OFC_SURVEY.NAME, survey.getName())
 				.set(OFC_SURVEY.URI, survey.getUri())
 				.set(OFC_SURVEY.IDML, DSL.val(idml, SQLDataType.CLOB))
-				.execute();
+				;
+		if (survey instanceof CollectSurvey) {
+			CollectSurvey cs = (CollectSurvey) survey;
+			insert
+				.set(OFC_SURVEY.TARGET, cs.getTarget().getCode())
+				.set(OFC_SURVEY.COLLECT_VERSION, cs.getCollectVersion().toString())
+				.set(OFC_SURVEY.DATE_CREATED, toTimestamp(cs.getCreationDate()))
+				.set(OFC_SURVEY.DATE_MODIFIED, toTimestamp(cs.getModifiedDate()))
+				;
+		}
+		insert.execute();
 
 		survey.setId(surveyId);
 	}
@@ -73,6 +88,13 @@ public class SurveyDao extends SurveyBaseDao {
 	public CollectSurvey loadByUri(String uri) {
 		Record record = dsl().select().from(OFC_SURVEY)
 				.where(OFC_SURVEY.URI.equal(uri)).fetchOne();
+		CollectSurvey survey = processSurveyRow(record);
+		return survey;
+	}
+	
+	public CollectSurvey loadByName(String name) {
+		Record record = dsl().select().from(OFC_SURVEY)
+				.where(OFC_SURVEY.NAME.equal(name)).fetchOne();
 		CollectSurvey survey = processSurveyRow(record);
 		return survey;
 	}
@@ -148,6 +170,10 @@ public class SurveyDao extends SurveyBaseDao {
 
 		dsl.update(OFC_SURVEY)
 				.set(OFC_SURVEY.IDML, DSL.val(idml, SQLDataType.CLOB))
+				.set(OFC_SURVEY.TARGET, survey.getTarget().getCode())
+				.set(OFC_SURVEY.COLLECT_VERSION, survey.getCollectVersion().toString())
+				.set(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()))
+				.set(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()))
 				.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
 	}
 
@@ -174,6 +200,10 @@ public class SurveyDao extends SurveyBaseDao {
 			CollectSurvey survey = unmarshalIdml(idml);
 			survey.setId(row.getValue(OFC_SURVEY.ID));
 			survey.setName(row.getValue(OFC_SURVEY.NAME));
+			survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
+			survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
+			survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
+			survey.setCollectVersion(new Version(row.getValue(OFC_SURVEY.COLLECT_VERSION)));
 			return survey;
 		} catch (IdmlParseException e) {
 			throw new RuntimeException("Error deserializing IDML from database", e);
@@ -189,6 +219,9 @@ public class SurveyDao extends SurveyBaseDao {
 		String name = row.getValue(OFC_SURVEY.NAME);
 		String uri = row.getValue(OFC_SURVEY.URI);
 		SurveySummary survey = new SurveySummary(id, name, uri);
+		survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
+		survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
+		survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
 		return survey;
 	}
 }

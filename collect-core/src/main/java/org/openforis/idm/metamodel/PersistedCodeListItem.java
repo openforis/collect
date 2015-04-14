@@ -75,23 +75,10 @@ public class PersistedCodeListItem extends CodeListItem {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result
-				+ ((parentId == null) ? 0 : parentId.hashCode());
-		result = prime * result
-				+ ((sortOrder == null) ? 0 : sortOrder.hashCode());
-		result = prime * result
-				+ ((systemId == null) ? 0 : systemId.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;

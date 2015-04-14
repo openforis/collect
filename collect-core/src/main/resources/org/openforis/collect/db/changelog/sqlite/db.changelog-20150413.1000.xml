@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-survey-info-columns" author="ricci" dbms="sqlite">
+		<comment>Add survey info columns</comment>
+		
+		<sql>
+			alter table ofc_survey add column target varchar(5) default 'CD';
+			alter table ofc_survey add column date_created timestamp;
+			alter table ofc_survey add column date_modified timestamp;
+			alter table ofc_survey add column collect_version varchar(55) default '3.4.0';
+
+			alter table ofc_survey_work add column target varchar(5) default 'CD';
+			alter table ofc_survey_work add column date_created timestamp;
+			alter table ofc_survey_work add column date_modified timestamp;
+			alter table ofc_survey_work add column collect_version varchar(55) default '3.4.0';
+			
+			update ofc_survey set date_created = CURRENT_TIMESTAMP;
+			update ofc_survey set date_modified = CURRENT_TIMESTAMP;
+			
+			update ofc_survey_work set date_created = CURRENT_TIMESTAMP;
+			update ofc_survey_work set date_modified = CURRENT_TIMESTAMP;
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>

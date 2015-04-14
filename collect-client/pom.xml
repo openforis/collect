@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.4.5-SNAPSHOT</version>
+		<version>3.4.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-client</artifactId>
@@ -96,6 +96,7 @@
                                 <includeClass>org.openforis.collect.manager.process.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.manager.referencedataimport.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.NodeDefinitionSummary</includeClass>
+                                <includeClass>org.openforis.collect.metamodel.SurveyTarget</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.ui.UIOptions$CoordinateAttributeFieldsOrder</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.ui.UIOptions$Direction</includeClass>
@@ -106,7 +107,7 @@
                                 <includeClass>org.openforis.collect.model.Logo</includeClass>
                                 <includeClass>org.openforis.collect.model.LogoPosition</includeClass>
                                 <includeClass>org.openforis.collect.model.RecordSummarySortField</includeClass>
-                                <includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>
+                                <includeClass>org.openforis.collect.model.RecordSummarySortField$Sortable</includeClass>\
                                 <includeClass>org.openforis.collect.model.SurveySummary</includeClass>
                                 <includeClass>org.openforis.collect.model.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.model.FieldSymbol</includeClass>

@@ -12,6 +12,8 @@ public interface Annotatable {
 	
 	String getAnnotation(QName qname);
 	
+	void setAnnotation(QName qname, String value);
+
 	Set<QName> getAnnotationNames();
 	
 }

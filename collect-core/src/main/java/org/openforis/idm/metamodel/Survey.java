@@ -4,17 +4,23 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import javax.xml.namespace.QName;
+
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.utils.Dates;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.model.NodePathPointer;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.util.DeepEquals;
 
 
 /**
@@ -23,7 +29,7 @@ import org.openforis.idm.model.Record;
  * @author S. Ricci
  * @author E. Suprapto Wibowo
  */
-public class Survey implements Serializable {
+public class Survey implements Serializable, Annotatable, DeepComparable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -46,7 +52,11 @@ public class Survey implements Serializable {
 	private Map<String, String> namespaces;
 	private ReferenceDataSchema referenceDataSchema;
 	private int lastId;
+	private Map<QName,String> annotations;
 
+	private Date creationDate;
+	private Date modifiedDate;
+	
 	private transient SurveyContext surveyContext;
 	private transient SurveyDependencies surveyDependencies;
 	
@@ -54,6 +64,7 @@ public class Survey implements Serializable {
 		this.surveyContext = surveyContext;
 		this.schema = new Schema(this);
 		this.lastId = 1;
+		this.creationDate = this.modifiedDate = new Date();
 	}
 	
 	/**
@@ -99,6 +110,32 @@ public class Survey implements Serializable {
 			throw new IllegalArgumentException("lastId cannot be decreased");
 		}
 		this.lastId = lastId;
+	}
+	
+	@Override
+	public String getAnnotation(QName qname) {
+		return annotations == null ? null : annotations.get(qname);
+	}
+
+	@Override
+	public void setAnnotation(QName qname, String value) {
+		if ( annotations == null ) {
+			annotations = new HashMap<QName, String>();
+		}
+		if (StringUtils.isNotBlank(value)) {
+			annotations.put(qname, value);
+		} else {
+			annotations.remove(qname);
+		}
+	}
+	
+	@Override
+	public Set<QName> getAnnotationNames() {
+		if ( annotations == null ) {
+			return Collections.emptySet();
+		} else {
+			return Collections.unmodifiableSet(annotations.keySet());
+		}
 	}
 	
 	public Integer getId() {
@@ -640,27 +677,7 @@ public class Survey implements Serializable {
 	}
 	
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((codeLists == null) ? 0 : codeLists.hashCode());
-		result = prime * result + ((applicationOptionsMap == null) ? 0 : applicationOptionsMap.hashCode());
-		result = prime * result + ((cycle == null) ? 0 : cycle.hashCode());
-		result = prime * result + ((descriptions == null) ? 0 : descriptions.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((modelVersions == null) ? 0 : modelVersions.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((projectNames == null) ? 0 : projectNames.hashCode());
-		result = prime * result + ((referenceDataSchema == null) ? 0 : referenceDataSchema.hashCode());
-		result = prime * result + ((schema == null) ? 0 : schema.hashCode());
-		result = prime * result + ((spatialReferenceSystems == null) ? 0 : spatialReferenceSystems.hashCode());
-		result = prime * result + ((units == null) ? 0 : units.hashCode());
-		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -671,7 +688,7 @@ public class Survey implements Serializable {
 		if (codeLists == null) {
 			if (other.codeLists != null)
 				return false;
-		} else if (!codeLists.equals(other.codeLists))
+		} else if (! DeepEquals.deepEquals(codeLists, other.codeLists))
 			return false;
 		if (applicationOptionsMap == null) {
 			if (other.applicationOptionsMap != null)
@@ -696,7 +713,7 @@ public class Survey implements Serializable {
 		if (modelVersions == null) {
 			if (other.modelVersions != null)
 				return false;
-		} else if (!modelVersions.equals(other.modelVersions))
+		} else if (! DeepEquals.deepEquals(modelVersions, other.modelVersions))
 			return false;
 		if (name == null) {
 			if (other.name != null)
@@ -716,7 +733,7 @@ public class Survey implements Serializable {
 		if (schema == null) {
 			if (other.schema != null)
 				return false;
-		} else if (!schema.equals(other.schema))
+		} else if (!schema.deepEquals(other.schema))
 			return false;
 		if (spatialReferenceSystems == null) {
 			if (other.spatialReferenceSystems != null)
@@ -726,7 +743,7 @@ public class Survey implements Serializable {
 		if (units == null) {
 			if (other.units != null)
 				return false;
-		} else if (!units.equals(other.units))
+		} else if (!DeepEquals.deepEquals(units,  other.units))
 			return false;
 		if (uri == null) {
 			if (other.uri != null)
@@ -744,6 +761,22 @@ public class Survey implements Serializable {
 	synchronized 
 	public int getLastId() {
 		return lastId;
+	}
+	
+	public Date getCreationDate() {
+		return creationDate;
+	}
+	
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+	
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+	
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
 	}
 	
 	public ModelVersion createModelVersion(int id) {
