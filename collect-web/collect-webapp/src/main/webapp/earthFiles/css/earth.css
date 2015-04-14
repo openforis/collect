@@ -210,6 +210,10 @@ table.table td {
 	overflow-x: hidden;
 }
 
+.steps .actions li.disabled {
+	display: none;
+}
+
 .notrelevant {
 	display: none;
 }
