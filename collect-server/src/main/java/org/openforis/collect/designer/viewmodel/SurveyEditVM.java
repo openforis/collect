@@ -25,7 +25,7 @@ import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
-import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.spring.SpringJobManager;
@@ -255,7 +255,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void save(@ContextParam(ContextType.BINDER) Binder binder) throws SurveyImportException {
+	public void save(@ContextParam(ContextType.BINDER) Binder binder) throws SurveyStoreException {
 		dispatchValidateAllCommand();
 		if ( checkCanSave() ) {
 			backgroundSurveySave();
@@ -263,7 +263,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	@GlobalCommand
-	public void backgroundSurveySave() throws SurveyImportException {
+	public void backgroundSurveySave() throws SurveyStoreException {
 		//survey.refreshSurveyDependencies();
 		surveyManager.saveSurveyWork(survey);
 		BindUtils.postNotifyChange(null, null, survey, "id");

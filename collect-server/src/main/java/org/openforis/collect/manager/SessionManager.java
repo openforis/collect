@@ -15,7 +15,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordUnlockedException;
-import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.web.session.InvalidSessionException;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +97,7 @@ public class SessionManager {
 			} else {
 				throw new IllegalArgumentException("Active designer survey should be a 'work' survey");
 			}
-		} catch ( SurveyImportException e ) {
+		} catch ( SurveyStoreException e ) {
 			LOG.error("Error updating taxonomy related attributes.", e);
 		}
 	}

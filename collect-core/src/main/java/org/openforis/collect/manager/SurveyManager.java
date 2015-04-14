@@ -182,7 +182,8 @@ public class SurveyManager {
 	 * Duplicates a published survey into a work survey and import the survey file into this new survey work
 	 */
 	@Transactional
-	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
+	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) 
+			throws SurveyStoreException, SurveyValidationException {
 		duplicatePublishedSurveyForEdit(uri);
 		CollectSurvey newSurveyWork = updateWorkModel(surveyFile, validate);
 		return newSurveyWork;
@@ -306,7 +307,7 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey updateWorkModel(File surveyFile, boolean validate)
-			throws SurveyValidationException, SurveyImportException {
+			throws SurveyValidationException, SurveyStoreException {
 		CollectSurvey parsedSurvey;
 		try {
 			parsedSurvey = unmarshalSurvey(surveyFile, validate, false);
@@ -654,7 +655,7 @@ public class SurveyManager {
 	}
 
 	@Transactional
-	public void saveSurveyWork(CollectSurvey survey) throws SurveyImportException {
+	public void saveSurveyWork(CollectSurvey survey) throws SurveyStoreException {
 		survey.setModifiedDate(new Date());
 		survey.setCollectVersion(Collect.getVersion());
 		Integer id = survey.getId();

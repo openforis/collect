@@ -25,7 +25,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SamplingDesignItem;
 import org.openforis.collect.model.SamplingDesignSummaries;
-import org.openforis.collect.persistence.SurveyImportException;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -54,7 +54,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 	private CollectSurvey survey;
 	
 	@Before
-	public void init() throws IdmlParseException, IOException, SurveyImportException {
+	public void init() throws IdmlParseException, IOException, SurveyStoreException {
 		survey = loadSurvey();
 		survey.setWork(true);
 		surveyManager.saveSurveyWork(survey);
