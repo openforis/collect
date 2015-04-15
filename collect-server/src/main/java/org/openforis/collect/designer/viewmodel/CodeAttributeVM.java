@@ -57,30 +57,39 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	@Command
 	public void onListChanged(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("list") final CodeList list) {
-		if ( editedItem.hasDependentCodeAttributeDefinitions() ) {
-			ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.CompleteConfirmHandler() {
-				@Override
-				public void onOk() {
-					performListChange(binder, list);
-				}
-				@Override
-				public void onCancel() {
-					Form form = getForm(binder);
-					CodeList oldList = editedItem.getList();
-					setValueOnFormField(form, "list", oldList);
-				}
-			}, "survey.schema.attribute.code.confirm_change_list_on_referenced_node.message");
-			confirmParams.setOkLabelKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.ok");
-			confirmParams.setTitleKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.title");
-			List<String> dependentAttributePaths = new ArrayList<String>();
-			for (CodeAttributeDefinition codeAttributeDefinition : editedItem.getDependentCodeAttributeDefinitions()) {
-				dependentAttributePaths.add(codeAttributeDefinition.getPath());
+		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
+		CodeList oldList = fo.getList();
+		boolean listChanged = oldList != null && ! oldList.equals(list);
+		if (oldList == null || listChanged) {
+			if (listChanged && editedItem.hasDependentCodeAttributeDefinitions() ) {
+				confirmParentCodeListChange(binder, list);
+			} else {
+				performListChange(binder, list);
 			}
-			confirmParams.setMessageArgs(new String[]{StringUtils.join(dependentAttributePaths, ", ")});
-			MessageUtil.showConfirm(confirmParams);
-		} else {
-			performListChange(binder, list);
 		}
+	}
+
+	private void confirmParentCodeListChange(final Binder binder, final CodeList list) {
+		ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.CompleteConfirmHandler() {
+			@Override
+			public void onOk() {
+				performListChange(binder, list);
+			}
+			@Override
+			public void onCancel() {
+				Form form = getForm(binder);
+				CodeList oldList = editedItem.getList();
+				setValueOnFormField(form, "list", oldList);
+			}
+		}, "survey.schema.attribute.code.confirm_change_list_on_referenced_node.message");
+		confirmParams.setOkLabelKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.ok");
+		confirmParams.setTitleKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.title");
+		List<String> dependentAttributePaths = new ArrayList<String>();
+		for (CodeAttributeDefinition codeAttributeDefinition : editedItem.getDependentCodeAttributeDefinitions()) {
+			dependentAttributePaths.add(codeAttributeDefinition.getPath());
+		}
+		confirmParams.setMessageArgs(new String[]{StringUtils.join(dependentAttributePaths, ", ")});
+		MessageUtil.showConfirm(confirmParams);
 	}
 	
 	private void performListChange(final Binder binder,
