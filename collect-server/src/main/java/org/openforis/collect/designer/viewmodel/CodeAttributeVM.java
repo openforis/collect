@@ -60,13 +60,31 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
 		CodeList oldList = fo.getList();
 		boolean listChanged = oldList != null && ! oldList.equals(list);
-		if (oldList == null || listChanged) {
-			if (listChanged && editedItem.hasDependentCodeAttributeDefinitions() ) {
+		if (oldList == null) {
+			performListChange(binder, list);
+		} else if (listChanged) {
+			if (editedItem.hasDependentCodeAttributeDefinitions() ) {
 				confirmParentCodeListChange(binder, list);
 			} else {
 				performListChange(binder, list);
 			}
 		}
+	}
+
+	private void confirmCodeListChange(final Binder binder, final CodeList list) {
+		ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performListChange(binder, list);
+			}
+		}, "survey.schema.attribute.code.confirm_change_list.message");
+		confirmParams.setOkLabelKey("global.change");
+		confirmParams.setCancelLabelKey("global.leave_original_value");
+		
+		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
+		CodeList oldList = fo.getList();
+		confirmParams.setMessageArgs(new String[] {oldList.getName(), list.getName()});
+		MessageUtil.showConfirm(confirmParams);
 	}
 
 	private void confirmParentCodeListChange(final Binder binder, final CodeList list) {
@@ -121,7 +139,11 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
 			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( editingAttribute ) {
-			if ( selectedCodeList != null ) {
+			CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
+			CodeList oldList = fo.getList();
+			if (oldList != null && ! oldList.equals(selectedCodeList)) {
+				confirmCodeListChange(binder, selectedCodeList);
+			} else if ( selectedCodeList != null ) {
 				onListChanged(binder, selectedCodeList);
 			}
 			validateForm(binder);
