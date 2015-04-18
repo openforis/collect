@@ -293,16 +293,17 @@ public class Schema extends SurveyObject {
 		}
 	}
 	
-	public NodeDefinition findNodeDefinition(NodeDefinitionVerifier verifier) {
-		List<NodeDefinition> nodeDefns = findNodeDefinitions(verifier, true);
+	public <N extends NodeDefinition> N findNodeDefinition(NodeDefinitionVerifier verifier) {
+		@SuppressWarnings("unchecked")
+		List<N> nodeDefns = (List<N>) findNodeDefinitions(verifier, true);
 		return nodeDefns.isEmpty() ? null: nodeDefns.get(0);
 	}
 	
-	public List<NodeDefinition> findNodeDefinitions(NodeDefinitionVerifier verifier) {
+	public List<? extends NodeDefinition> findNodeDefinitions(NodeDefinitionVerifier verifier) {
 		return findNodeDefinitions(verifier, false);
 	}
 	
-	public List<NodeDefinition> findNodeDefinitions(NodeDefinitionVerifier verifier, boolean stopAfterFirstFound) {
+	public List<? extends NodeDefinition> findNodeDefinitions(NodeDefinitionVerifier verifier, boolean stopAfterFirstFound) {
 		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
 		List<NodeDefinition> foundNodeDefns = new ArrayList<NodeDefinition>();
 		stack.addAll(rootEntityDefinitions);

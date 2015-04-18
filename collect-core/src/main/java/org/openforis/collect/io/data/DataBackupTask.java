@@ -1,6 +1,7 @@
 package org.openforis.collect.io.data;
 
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -35,11 +36,13 @@ public class DataBackupTask extends Task {
 	private CollectSurvey survey;
 	private Step[] steps;
 	private RecordFilter recordFilter;
+	private List<DataBackupError> errors;
 	
 	public DataBackupTask() {
 		super();
 		//export all steps by default
 		this.steps = Step.values();
+		this.errors = new ArrayList<DataBackupError>();
 	}
 	
 	@Override
@@ -96,7 +99,10 @@ public class DataBackupTask extends Task {
 			dataMarshaller.write(record, writer);
 			zipOutputStream.closeEntry();
 		} catch (Exception e) {
-			throw new RuntimeException("Error while backing up record with id " + id + ": " + e.getMessage(), e);
+			DataBackupError error = new DataBackupError(summary.getId(), summary.getRootEntityKeyValues(), 
+					summary.getStep(), e.getMessage());
+			errors.add(error);
+			log().error(error.toString(), e);
 		}
 	}
 	
@@ -148,4 +154,49 @@ public class DataBackupTask extends Task {
 		this.zipOutputStream = zipOutputStream;
 	}
 
+	public List<DataBackupError> getErrors() {
+		return errors;
+	}
+	
+	public static class DataBackupError {
+		
+		private int recordId;
+		private Step recordStep;
+		private List<String> recordKeys;
+		private String errorMessage;
+
+		public DataBackupError(int recordId, List<String> recordKeys, Step recordStep,
+				String errorMessage) {
+			super();
+			this.recordId = recordId;
+			this.recordKeys = recordKeys;
+			this.recordStep = recordStep;
+			this.errorMessage = errorMessage;
+		}
+
+		public int getRecordId() {
+			return recordId;
+		}
+
+		public List<String> getRecordKeys() {
+			return recordKeys;
+		}
+
+		public Step getRecordStep() {
+			return recordStep;
+		}
+		
+		public String getErrorMessage() {
+			return errorMessage;
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("Error while backing up record with id %d keys %s step %s: %s", 
+					recordId, recordKeys.toString(), recordStep.name(), errorMessage);
+
+		}
+		
+	}
+	
 }

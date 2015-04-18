@@ -515,23 +515,10 @@ public class CollectRecord extends Record {
 	}
 	
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
-		result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
-		result = prime * result + ((modifiedBy == null) ? 0 : modifiedBy.hashCode());
-		result = prime * result + ((modifiedDate == null) ? 0 : modifiedDate.hashCode());
-		result = prime * result + ((state == null) ? 0 : state.hashCode());
-		result = prime * result + ((step == null) ? 0 : step.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
