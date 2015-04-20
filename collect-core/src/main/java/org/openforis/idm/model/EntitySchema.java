@@ -102,15 +102,8 @@ public class EntitySchema extends SchemaSupport<Entity> {
 	}
 
 	protected void skipNode(Input input) throws IOException, ProtostuffException {
-		for(int field = input.readFieldNumber(this); field > 0; field = input.readFieldNumber(this)) {
-			switch (field) {
-			case NODE_FIELD_NUMBER:
-				input.handleUnknownField(field, this);
-				return;
-			default:
-				input.readString();
-			}
-		}
+		readAndCheckFieldNumber(input, NODE_FIELD_NUMBER);
+		input.handleUnknownField(NODE_FIELD_NUMBER, this);
 	}
 
 }
