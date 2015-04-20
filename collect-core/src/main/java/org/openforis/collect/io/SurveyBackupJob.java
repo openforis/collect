@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.data.DataBackupTask;
-import org.openforis.collect.io.data.DataBackupTask.DataBackupError;
 import org.openforis.collect.io.data.RecordFileBackupTask;
 import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
 import org.openforis.collect.io.metadata.CodeListImagesExportTask;
@@ -93,10 +93,10 @@ public class SurveyBackupJob extends Job {
 	
 	//output
 	private File outputFile;
+	private List<DataBackupError> dataBackupErrors;
 	
 	//temporary instance variable
 	private ZipOutputStream zipOutputStream;
-	private List<DataBackupError> dataBackupErrors;
 	
 	public SurveyBackupJob() {
 		outputFormat = OutputFormat.DEFAULT;

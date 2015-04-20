@@ -26,6 +26,7 @@ import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyE
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
+import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreatorImpl;
 import org.openforis.collect.manager.CodeListManager;
@@ -290,6 +291,10 @@ public class SurveySelectVM extends BaseVM {
 			CollectSurvey survey = surveyBackupJob.getSurvey();
 			String extension = surveyBackupJob.getOutputFormat().getOutputFileExtension();
 			downloadFile(file, survey, extension, BINARY_CONTENT_TYPE);
+			final List<DataBackupError> dataBackupErrors = surveyBackupJob.getDataBackupErrors();
+			if (! dataBackupErrors.isEmpty()) {
+				DataExportErrorsPopUpVM.showPopUp(dataBackupErrors);
+			}
 			surveyBackupJob = null;
 		} else if ( job == rdbExportJob ) {
 			File file = rdbExportJob.getOutputFile();
