@@ -135,6 +135,7 @@ public class RecordManager {
 		return recordDao.createUpdateQuery(record);	
 	}
 	
+	@Transactional
 	public void execute(List<RecordStoreQuery> queries) {
 		recordDao.execute(queries);
 	}
