@@ -74,6 +74,34 @@ public class ProtostuffSerializationTest  {
 		Assert.assertTrue(record1.getRootEntity().deepEquals(record2.getRootEntity()));
 	}
 	
+	@Test
+	public void testSkipRemovedAttribute() throws Exception {
+		// Set up
+		Survey survey = getTestSurvey();
+		//assignFakeNodeDefinitionIds(survey.getSchema());
+		Record record1 = createTestRecord(survey);
+		Entity cluster1 = record1.getRootEntity();
+		
+		// Write
+		ModelSerializer ser = new ModelSerializer(10000);
+		byte[] data = ser.toByteArray(cluster1);
+		
+		//remove attribute from record before comparing it with the new one
+		cluster1.remove("crew_no", 0);
+
+		//remove node definition from schema
+		Schema schema = survey.getSchema();
+		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
+		NodeDefinition crewNumDefn = clusterDefn.getChildDefinition("crew_no");
+		clusterDefn.removeChildDefinition(crewNumDefn);
+		
+		Record record2 = new Record(survey, "2.0");
+		Entity cluster2 = record2.createRootEntity("cluster");
+		ser.mergeFrom(data, cluster2);
+		
+		// Compare
+		Assert.assertTrue(record1.getRootEntity().deepEquals(record2.getRootEntity()));
+	}
 	private Survey getTestSurvey() throws IOException, IdmlParseException {
 		URL idm = ClassLoader.getSystemResource("test.idm.xml");
 		InputStream is = idm.openStream();
