@@ -280,14 +280,14 @@ public class CollectEarthBalloonGenerator {
 	private Map<Integer, List<CodeListItem>> getCodeListItemsByParentId(CodeList list, Integer listLevelIndex) {
 		CodeListService codeListService = list.getSurvey().getContext().getCodeListService();
 		Map<Integer, List<CodeListItem>> codeItemsByParentCodeItemId = new HashMap<Integer, List<CodeListItem>>();
-		List<CodeListItem> rootCodeItems = codeListService.loadRootItems(list);
 		if (listLevelIndex == null || listLevelIndex == 0) {
+			List<CodeListItem> rootCodeItems = codeListService.loadRootItems(list);
 			codeItemsByParentCodeItemId.put(0, rootCodeItems); //root items
 		} else {
 			int listLevelPosition = listLevelIndex + 1;
 			List<CodeListItem> parentLevelItems; 
 			if (listLevelPosition == 2) {
-				parentLevelItems = rootCodeItems;
+				parentLevelItems = codeListService.loadRootItems(list);
 			} else {
 				parentLevelItems = codeListService.loadItems(list, listLevelPosition - 1);
 			}

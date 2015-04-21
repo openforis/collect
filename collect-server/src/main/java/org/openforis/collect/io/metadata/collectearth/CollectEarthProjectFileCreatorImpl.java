@@ -39,6 +39,9 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
  * 
@@ -48,7 +51,8 @@ import org.openforis.idm.metamodel.PersistedCodeListItem;
  */
 public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator{
 
-	private static final String EARTH_FILES_ZIP_FILE_PATH = "org/openforis/collect/designer/templates/collectearth/earth-files-1_0.zip";
+	private static final String EARTH_FILES_RESOURCE_PATH = "org/openforis/collect/designer/templates/collectearth/earthFiles/";
+	private static final String EARTH_FILES_FOLDER_NAME = "earthFiles";
 	private static final String KML_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
 	private static final String TEST_PLOTS_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/test_plots.ced.template";
 	private static final String PLACEMARK_FILE_NAME = "placemark.idm.xml";
@@ -57,7 +61,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String TEST_PLOTS_FILE_NAME = "test_plots.ced";
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
-	
 	
 	private CodeListManager codeListManager;
 	
@@ -94,11 +97,21 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		
 		addCodeListImages(zipFile, survey, zipParameters);
 		
-		// include earthFiles assets folder (js, css, etc.)
-		File earthFilesZip = getEarthFilesZipFile();
-		ZipFiles.copyFiles(new ZipFile(earthFilesZip), zipFile, zipParameters);
+		includeEarthFiles(zipFile, zipParameters);
 		
 		return outputFile;
+	}
+
+	private void includeEarthFiles(ZipFile zipFile, ZipParameters zipParameters)
+			throws IOException, ZipException {
+		Resource[] earthFileResources = new PathMatchingResourcePatternResolver().getResources(EARTH_FILES_RESOURCE_PATH + "**");
+		for (Resource resource : earthFileResources) {
+			if (resource.exists() && resource.isReadable() && StringUtils.isNotBlank(resource.getFilename())) {
+				String path = ((ClassPathResource) resource).getPath();
+				String relativePath = StringUtils.removeStart(path, EARTH_FILES_RESOURCE_PATH);
+				ZipFiles.addFile(zipFile, resource.getInputStream(), EARTH_FILES_FOLDER_NAME + "/" + relativePath, zipParameters);
+			}
+		}
 	}
 	
 	private File createPlacemark(CollectSurvey survey) throws IOException {
@@ -131,6 +144,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_gee_playground", "true");
 		p.put("db_driver", "SQLITE");
 		p.put("use_browser", "chrome");
+		p.put("ui_language", survey.getDefaultLanguage());
 
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
@@ -250,14 +264,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
 	}
 
-	private File getEarthFilesZipFile() throws IOException, FileNotFoundException {
-		InputStream is = getClass().getClassLoader().getResourceAsStream(EARTH_FILES_ZIP_FILE_PATH);
-		File earthFilesZip = File.createTempFile("earth-files", ".zip");
-		FileOutputStream fos = new FileOutputStream(earthFilesZip);
-		IOUtils.copy(is, fos);
-		return earthFilesZip;
-	}
-
 	private void addCodeListImages(ZipFile zipFile, CollectSurvey survey, ZipParameters zipParameters) throws FileNotFoundException, IOException, ZipException {
 		List<CodeList> codeLists = survey.getCodeLists();
 		for (CodeList codeList : codeLists) {
@@ -288,7 +294,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		CodeList codeList = item.getCodeList();
 		@SuppressWarnings("unchecked")
 		String zipImageFileName = StringUtils.join(Arrays.asList(
-				"earthFiles", "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
+				EARTH_FILES_FOLDER_NAME, "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
 		return zipImageFileName;
 	}
 
