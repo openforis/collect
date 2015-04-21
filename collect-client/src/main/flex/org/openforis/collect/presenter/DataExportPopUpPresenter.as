@@ -313,6 +313,9 @@ package org.openforis.collect.presenter {
 						case JobProxy$Status.COMPLETED:
 							view.currentState = DataExportPopUp.STATE_COMPLETE;
 							stopProgressTimer();
+							if (SurveyBackupJobProxy(job).dataBackupErrorsFound) { 
+								AlertUtil.showError("export.complete_with_errors");
+							}
 							break;
 						case JobProxy$Status.FAILED:
 							AlertUtil.showError("export.error");

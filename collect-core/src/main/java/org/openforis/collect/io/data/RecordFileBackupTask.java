@@ -19,6 +19,8 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVerifier;
 import org.openforis.idm.model.FileAttribute;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -49,18 +51,30 @@ public class RecordFileBackupTask extends Task {
 
 	@Override
 	protected long countTotalItems() {
-		List<CollectRecord> recordSummaries = loadAllSummaries();
-		return recordSummaries.size();
+		if (hasFileAttributeDefinitions()) {
+			List<CollectRecord> recordSummaries = loadAllSummaries();
+			return recordSummaries.size();
+		} else {
+			return 0;
+		}
 	}
 	
 	@Override
 	protected void execute() throws Throwable {
+		if (! hasFileAttributeDefinitions()) {
+			return;
+		}
 		List<CollectRecord> recordSummaries = loadAllSummaries();
 		if ( recordSummaries != null ) {
 			for (CollectRecord summary : recordSummaries) {
 				if ( isRunning() ) {
-					backup(summary);
-					incrementItemsProcessed();
+					try {
+						backup(summary);
+						incrementItemsProcessed();
+					} catch(Exception e) {
+						log.error(String.format("Error backing up record files for record with id %d and keys %s", 
+								summary.getId(), summary.getRootEntityKeyValues().toString()));
+					}
 				} else {
 					break;
 				}
@@ -71,6 +85,18 @@ public class RecordFileBackupTask extends Task {
 	private List<CollectRecord> loadAllSummaries() {
 		List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntityName);
 		return summaries;
+	}
+	
+	private boolean hasFileAttributeDefinitions() {
+		@SuppressWarnings("unchecked")
+		List<FileAttributeDefinition> defs = (List<FileAttributeDefinition>) 
+				survey.getSchema().findNodeDefinitions(new NodeDefinitionVerifier() {
+			@Override
+			public boolean verify(NodeDefinition definition) {
+				return definition instanceof FileAttributeDefinition;
+			}
+		});
+		return ! defs.isEmpty();
 	}
 	
 	private void backup(CollectRecord summary) throws RecordFileException, IOException {
