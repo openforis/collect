@@ -30,8 +30,10 @@ import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
@@ -128,6 +130,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_here_maps", "true");
 		p.put("open_gee_playground", "true");
 		p.put("db_driver", "SQLITE");
+		p.put("use_browser", "chrome");
 
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
@@ -209,6 +212,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 				value = "0";
 			} else if (attrDef instanceof DateAttributeDefinition) {
 				value = "1/1/2000";
+			} else if (attrDef instanceof CodeAttributeDefinition) {
+				CodeListItem firstAvailableItem = getFirstAvailableCodeItem(attrDef);
+				value = firstAvailableItem == null ? "0": firstAvailableItem.getCode();
 			} else {
 				value = "value_" + attrName;
 			}
@@ -217,6 +223,25 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER, headerSB.toString());
 		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES, valuesSB.toString());
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".ced");
+	}
+
+	private CodeListItem getFirstAvailableCodeItem(AttributeDefinition attrDef) {
+		CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) attrDef;
+		CodeList list = codeDefn.getList();
+		CodeListService codeListService = attrDef.getSurvey().getContext().getCodeListService();
+		Integer levelIndex = codeDefn.getListLevelIndex();
+		int levelPosition = levelIndex == null ? 1: levelIndex + 1;
+		List<CodeListItem> items;
+		if (levelPosition == 1) {
+			items = codeListService.loadRootItems(list);
+		} else {
+			items = codeListService.loadItems(list, levelPosition);
+		}
+		if (items.isEmpty()) {
+			return null;
+		} else {
+			return items.get(0);
+		}
 	}
 	
 	private File generateCube(CollectSurvey survey) throws IOException {
