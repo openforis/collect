@@ -17,16 +17,17 @@ class CECodeField extends CEField {
 //	private CodeList listName;
 	
 	private String parentName;
-	private Map<String, List<CodeListItem>> codeItemsByParentCode = new HashMap<String, List<CodeListItem>>();
+	private Map<Integer, List<CodeListItem>> codeItemsByParentId = new HashMap<Integer, List<CodeListItem>>();
 
-	public CECodeField(String htmlParameterName, String name, String label, CEFieldType type, boolean multiple, boolean key, Map<String, List<CodeListItem>> codeItemsByParentCode, String parentName) {
+	public CECodeField(String htmlParameterName, String name, String label, CEFieldType type, boolean multiple, 
+			boolean key, Map<Integer, List<CodeListItem>> codeItemsByParentCode, String parentName) {
 		super(htmlParameterName, name, label, multiple, type, key);
-		this.codeItemsByParentCode = codeItemsByParentCode;
+		this.codeItemsByParentId = codeItemsByParentCode;
 		this.parentName = parentName;
 	}
 	
-	public Map<String, List<CodeListItem>> getCodeItemsByParentCode() {
-		return codeItemsByParentCode;
+	public Map<Integer, List<CodeListItem>> getCodeItemsByParentId() {
+		return codeItemsByParentId;
 	}
 	
 	public String getParentName() {
