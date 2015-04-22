@@ -87,7 +87,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 
 	@Override
-	@Init(superclass=false)
+	@Init
 	public void init() {
 		super.init();
 		initSurvey();

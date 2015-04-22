@@ -36,7 +36,6 @@ public abstract class BaseVM {
 	@WireVariable
 	private UserManager userManager;
 
-	
 	void init() {
 	}
 	

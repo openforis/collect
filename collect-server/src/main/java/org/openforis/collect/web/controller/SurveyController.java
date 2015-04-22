@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -95,7 +96,7 @@ public class SurveyController extends BasicController {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
-			writer.close();
+			IOUtils.closeQuietly(writer);
 		}
 	}
 }

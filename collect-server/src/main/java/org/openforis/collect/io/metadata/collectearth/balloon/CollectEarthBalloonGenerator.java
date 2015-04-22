@@ -19,12 +19,12 @@ import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCre
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.NodeDefinitionUIComponent;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIField;
 import org.openforis.collect.metamodel.ui.UIForm;
 import org.openforis.collect.metamodel.ui.UIFormComponent;
 import org.openforis.collect.metamodel.ui.UIFormSection;
 import org.openforis.collect.metamodel.ui.UIFormSet;
-import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.metamodel.ui.UITable;
@@ -32,6 +32,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
@@ -57,15 +58,10 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class CollectEarthBalloonGenerator {
 	
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"id", "operator", "location", "plot_file", "actively_saved", "actively_saved_on", "elevation", "slope", "aspect")));
+			"id", "operator", "location", "plot_file", "actively_saved", "actively_saved_on")));
 	
 	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt";
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
-
-	private static final String OF_JS_VERSION_PLACEHOLDER = "OF_JS_VERSION";
-	private static final String COLLECT_EARTH_JS_VERSION_PLACEHOLDER = "COLLECT_EARTH_JS_VERSION";
-	private static final String OF_JS_VERSION = "1.0.0";
-	private static final String COLLECT_EARTH_JS_VERSION = "1.0.0";
 
 	private CollectSurvey survey;
 	private Map<String, CEComponent> componentByName;
@@ -82,15 +78,8 @@ public class CollectEarthBalloonGenerator {
 
 	public String generateHTML() throws IOException {
 		String htmlTemplate = getHTMLTemplate();
-		String result = fillVersionNumbers(htmlTemplate);
-		result = fillWithExtraCSVFields(result);
+		String result = fillWithExtraCSVFields(htmlTemplate);
 		result = fillWithSurveyDefinitionFields(result);
-		return result;
-	}
-
-	private String fillVersionNumbers(String htmlTemplate) {
-		String result = htmlTemplate.replaceAll(OF_JS_VERSION_PLACEHOLDER, OF_JS_VERSION);
-		result = result.replaceAll(COLLECT_EARTH_JS_VERSION_PLACEHOLDER, COLLECT_EARTH_JS_VERSION);
 		return result;
 	}
 
@@ -272,20 +261,13 @@ public class CollectEarthBalloonGenerator {
 			if (insideEnumeratedEntity && key) {
 				comp = new CEEnumeratingCodeField(htmlParameterName, def.getName(), label, multiple, type, key);
 			} else if (def instanceof CodeAttributeDefinition) {
-				CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
-				CodeAttributeDefinition parentCodeAttributeDef = ((CodeAttributeDefinition) def).getParentCodeAttributeDefinition();
-				Map<String, List<CodeListItem>> codeItemsByParentCode = new HashMap<String, List<CodeListItem>>();
-				List<CodeListItem> rootCodeItems = codeListService.loadRootItems(((CodeAttributeDefinition) def).getList());
-				if (parentCodeAttributeDef == null) {
-					codeItemsByParentCode.put("", rootCodeItems); //root items
-				} else {
-					for (CodeListItem rootCodeItem : rootCodeItems) {
-						List<CodeListItem> childItems = codeListService.loadChildItems(rootCodeItem);
-						codeItemsByParentCode.put(rootCodeItem.getCode(), childItems);
-					}
-				}
+				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) def;
+				CodeList list = codeAttrDef.getList();
+				Integer listLevelIndex = codeAttrDef.getListLevelIndex();
+				Map<Integer, List<CodeListItem>> codeItemsByParentCodeItemId = getCodeListItemsByParentId(list, listLevelIndex);
+				CodeAttributeDefinition parentCodeAttributeDef = codeAttrDef.getParentCodeAttributeDefinition();
 				String parentName = parentCodeAttributeDef == null ? null: getHtmlParameterName(parentCodeAttributeDef);
-				comp = new CECodeField(htmlParameterName, def.getName(), label, type, multiple, key, codeItemsByParentCode, parentName);
+				comp = new CECodeField(htmlParameterName, def.getName(), label, type, multiple, key, codeItemsByParentCodeItemId, parentName);
 			} else {
 				comp = new CEField(htmlParameterName, def.getName(), label, multiple, type, key);
 			}
@@ -293,6 +275,30 @@ public class CollectEarthBalloonGenerator {
 		comp.hideWhenNotRelevant = hideWhenNotRelevant;
 		componentByName.put(comp.getName(), comp);
 		return comp;
+	}
+
+	private Map<Integer, List<CodeListItem>> getCodeListItemsByParentId(CodeList list, Integer listLevelIndex) {
+		CodeListService codeListService = list.getSurvey().getContext().getCodeListService();
+		Map<Integer, List<CodeListItem>> codeItemsByParentCodeItemId = new HashMap<Integer, List<CodeListItem>>();
+		if (listLevelIndex == null || listLevelIndex == 0) {
+			List<CodeListItem> rootCodeItems = codeListService.loadRootItems(list);
+			codeItemsByParentCodeItemId.put(0, rootCodeItems); //root items
+		} else {
+			int listLevelPosition = listLevelIndex + 1;
+			List<CodeListItem> parentLevelItems; 
+			if (listLevelPosition == 2) {
+				parentLevelItems = codeListService.loadRootItems(list);
+			} else {
+				parentLevelItems = codeListService.loadItems(list, listLevelPosition - 1);
+			}
+			for (CodeListItem parentItem : parentLevelItems) {
+				List<CodeListItem> childItems = codeListService.loadChildItems(parentItem);
+				if (! childItems.isEmpty()) {
+					codeItemsByParentCodeItemId.put(parentItem.getId(), childItems);
+				}
+			}
+		}
+		return codeItemsByParentCodeItemId;
 	}
 
 	private CEComponent createEnumeratedEntityComponent(EntityDefinition def) {

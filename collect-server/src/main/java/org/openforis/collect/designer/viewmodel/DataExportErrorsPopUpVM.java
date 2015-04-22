@@ -1,5 +1,6 @@
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,6 @@ public class DataExportErrorsPopUpVM {
 	}
 	
 	public List<DataBackupError> getErrors() {
-		return errors;
+		return new ArrayList<DataBackupError>(errors);
 	}
 }

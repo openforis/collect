@@ -130,17 +130,34 @@ public class MondrianCubeGenerator {
 						dimension = generateDimension(childDef);
 					}
 					
-
-				
 					cube.dimensions.add(dimension);
 				}
 			}
 		}
 		//add predefined dimensions
 		cube.dimensions.addAll(generatePredefinedDimensions());
+		//add predefined measures
+		cube.measures.addAll(0, generatePredefinedMeasures());
 		return cube;
 	}
-
+	
+	
+	private List<Measure> generatePredefinedMeasures() {
+		List<Measure> measures = new ArrayList<Measure>();
+		//Expansion factor - Area
+		{
+			Measure measure = new Measure("Area (HA)");
+			measure.column = "expansion_factor";
+			measure.caption = "Area (HA)";
+			measure.aggregator = "sum";
+			measure.datatype = "Integer";
+			measure.formatString = "#,###";
+			measures.add(measure);
+		}
+		
+		return measures;
+	}
+	
 	private List<Dimension> generatePredefinedDimensions() {
 		List<Dimension> dimensions = new ArrayList<Dimension>();
 		//Slope category
@@ -448,6 +465,9 @@ public class MondrianCubeGenerator {
 		
 		@XStreamAsAttribute
 		private String caption;
+		
+		@XStreamAsAttribute
+		private String formatString;
 		
 		
 		public Measure(String name) {
