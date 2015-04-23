@@ -13,8 +13,8 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	private static final long serialVersionUID = 1L;
 	
 	private Integer queryId;
-	private DataQuery query;
 	private String fixExpression;
+	private transient DataQuery query;
 	
 	public DataCleansingStep(Survey survey) {
 		super(survey);
