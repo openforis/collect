@@ -3,6 +3,13 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.designer.model.AttributeType.BOOLEAN;
+import static org.openforis.collect.designer.model.AttributeType.CODE;
+import static org.openforis.collect.designer.model.AttributeType.DATE;
+import static org.openforis.collect.designer.model.AttributeType.NUMBER;
+import static org.openforis.collect.designer.model.AttributeType.TEXT;
+import static org.openforis.collect.designer.model.AttributeType.TIME;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,6 +75,8 @@ import org.zkoss.zul.TreeNode;
 import org.zkoss.zul.Treeitem;
 import org.zkoss.zul.Window;
 
+import com.google.common.collect.Sets;
+
 /**
  * 
  * @author S. Ricci
@@ -94,6 +103,8 @@ public class SchemaVM extends SurveyBaseVM {
 	private static final String CONFIRM_REMOVE_NODE_WITH_DEPENDENCIES_MESSAGE_KEY = "survey.schema.confirm_remove_node_with_dependencies";
 	private static final String CONFIRM_REMOVE_NODE_TITLE_KEY = "survey.schema.confirm_remove_node_title";
 
+	private static final Set<AttributeType> SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES = Sets.immutableEnumSet(BOOLEAN, CODE, DATE, NUMBER, TEXT, TIME);
+	
 	private SchemaNodeData selectedTreeNode;
 	private SurveyObject editedNode;
 	private boolean newNode;
@@ -956,9 +967,20 @@ public class SchemaVM extends SurveyBaseVM {
 		List<String> result = new ArrayList<String>();
 		AttributeType[] values = AttributeType.values();
 		for (AttributeType type : values) {
-			result.add(type.name());
+			if (isSupported(type)) {
+				result.add(type.name());
+			}
 		}
 		return result;
+	}
+
+	private boolean isSupported(AttributeType type) {
+		switch (survey.getTarget()) {
+		case COLLECT_EARTH:
+			return SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES.contains(type);
+		default:
+			return true;
+		}
 	}
 	
 	public String getAttributeTypeLabelFromDefinition(AttributeDefinition attrDefn) {

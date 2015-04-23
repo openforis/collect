@@ -16,10 +16,12 @@ import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.exception.SurveyValidationException;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
 import org.openforis.idm.metamodel.Languages.Standard;
@@ -100,17 +102,21 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	}
 	
 	@Command
-	public void ok() throws IdmlParseException, SurveyValidationException {
+	public void ok() throws IdmlParseException, SurveyValidationException, SurveyStoreException {
 		String name = (String) form.get("name");
 		String langCode = ((LabelledItem) form.get("language")).getCode();
 		String templateCode = ((LabelledItem) form.get("template")).getCode();
-
+		TemplateType templateType = TemplateType.valueOf(templateCode);
+		
 		CollectSurvey survey;
-		if ( templateCode.equals(TemplateType.BLANK.name())) {
+		switch (templateType) {
+		case BLANK:
 			survey = createEmptySurvey(name, langCode);
-		} else {
-			survey = createNewSurveyFromTemplate(name, langCode, templateCode);
+			break;
+		default:
+			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
+		surveyManager.saveSurveyWork(survey);
 		//put survey in session and redirect into survey edit page
 		SessionStatus sessionStatus = getSessionStatus();
 		sessionStatus.setSurvey(survey);
@@ -118,15 +124,25 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 	}
 
-	protected CollectSurvey createNewSurveyFromTemplate(String name, String langCode, String templateCode)
+	protected CollectSurvey createNewSurveyFromTemplate(String name, String langCode, TemplateType templateType)
 			throws IdmlParseException, SurveyValidationException {
-		String templateFileName = String.format(IDM_TEMPLATE_FILE_NAME_FORMAT, templateCode.toLowerCase());
+		String templateFileName = String.format(IDM_TEMPLATE_FILE_NAME_FORMAT, templateType.name().toLowerCase());
 		InputStream surveyFileIs = this.getClass().getResourceAsStream(templateFileName);
 		CollectSurvey survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
 		survey.setName(name);
 		survey.setWork(true);
 		survey.setUri(surveyManager.generateSurveyUri(name));
 		survey.setDefaultLanguage(langCode);
+		SurveyTarget target;
+		switch (templateType) {
+		case COLLECT_EARTH:
+		case COLLECT_EARTH_IPCC:
+			target = SurveyTarget.COLLECT_EARTH;
+			break;
+		default:
+			target = SurveyTarget.COLLECT_DESKTOP;
+		}
+		survey.setTarget(target);
 		
 		if ( survey.getSamplingDesignCodeList() == null ) {
 			survey.addSamplingDesignCodeList();
@@ -140,6 +156,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		//add default root entity
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntity = schema.createEntityDefinition();
+		rootEntity.setMultiple(true);
 		rootEntity.setName(SchemaVM.DEFAULT_ROOT_ENTITY_NAME);
 		schema.addRootEntityDefinition(rootEntity);
 		//create root tab set

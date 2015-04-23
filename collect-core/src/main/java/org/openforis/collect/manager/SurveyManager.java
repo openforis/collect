@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.Collect;
 import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
@@ -180,7 +182,8 @@ public class SurveyManager {
 	 * Duplicates a published survey into a work survey and import the survey file into this new survey work
 	 */
 	@Transactional
-	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) throws SurveyImportException, SurveyValidationException {
+	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) 
+			throws SurveyStoreException, SurveyValidationException {
 		duplicatePublishedSurveyForEdit(uri);
 		CollectSurvey newSurveyWork = updateWorkModel(surveyFile, validate);
 		return newSurveyWork;
@@ -304,7 +307,7 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey updateWorkModel(File surveyFile, boolean validate)
-			throws SurveyValidationException, SurveyImportException {
+			throws SurveyValidationException, SurveyStoreException {
 		CollectSurvey parsedSurvey;
 		try {
 			parsedSurvey = unmarshalSurvey(surveyFile, validate, false);
@@ -652,7 +655,9 @@ public class SurveyManager {
 	}
 
 	@Transactional
-	public void saveSurveyWork(CollectSurvey survey) throws SurveyImportException {
+	public void saveSurveyWork(CollectSurvey survey) throws SurveyStoreException {
+		survey.setModifiedDate(new Date());
+		survey.setCollectVersion(Collect.getVersion());
 		Integer id = survey.getId();
 		if ( id == null ) {
 			surveyWorkDao.insert(survey);
@@ -698,12 +703,66 @@ public class SurveyManager {
 	}
 	
 	@Transactional
+	public CollectSurvey duplicateSurveyForEdit(String originalSurveyName, boolean originalSurveyIsWork, String newName) {
+		try {
+			CollectSurvey oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsWork);
+			int oldSurveyId = oldSurvey.getId();
+
+			//TODO : clone it
+			CollectSurvey newSurvey = oldSurvey;
+			newSurvey.setId(null);
+			newSurvey.setPublished(false);
+			newSurvey.setWork(true);
+			newSurvey.setName(newName);
+			newSurvey.setUri(generateSurveyUri(newName));
+			newSurvey.setCreationDate(new Date());
+			newSurvey.setModifiedDate(new Date());
+
+			if ( newSurvey.getSamplingDesignCodeList() == null ) {
+				newSurvey.addSamplingDesignCodeList();
+			}
+			surveyWorkDao.insert(newSurvey);
+			int newSurveyId = newSurvey.getId();
+			
+			//reload old survey, it has been modified previously
+			oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsWork);
+			
+			if (originalSurveyIsWork) {
+				samplingDesignManager.duplicateWorkSamplingDesignForWork(oldSurveyId, newSurveyId);
+				speciesManager.duplicateWorkTaxonomyForWork(oldSurveyId, newSurveyId);
+			} else {
+				samplingDesignManager.duplicateSamplingDesignForWork(oldSurveyId, newSurveyId);
+				speciesManager.duplicateTaxonomyForWork(oldSurveyId, newSurveyId);
+			}
+			codeListManager.cloneCodeLists(oldSurvey, newSurvey);
+			
+			return newSurvey;
+		} catch (SurveyImportException e) {
+			//it should never enter here, we are duplicating an already existing survey
+			throw new RuntimeException(e);
+		}
+	}
+
+	private CollectSurvey loadSurvey(String name, boolean work) {
+		CollectSurvey oldSurvey;
+		if (work) {
+			oldSurvey = surveyWorkDao.loadByName(name);
+		} else {
+			oldSurvey = surveyDao.loadByName(name);
+		}
+		return oldSurvey;
+	}
+	
+	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		codeListManager.deleteInvalidCodeListReferenceItems(survey);
 		
 		Integer surveyWorkId = survey.getId();
 		survey.setWork(false);
 		survey.setPublished(true);
+		survey.setModifiedDate(new Date());
+		survey.setCollectVersion(Collect.getVersion());
+		
 		CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
 		if ( oldPublishedSurvey == null ) {
 			surveyDao.importModel(survey);

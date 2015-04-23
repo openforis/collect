@@ -36,7 +36,6 @@ public abstract class BaseVM {
 	@WireVariable
 	private UserManager userManager;
 
-	
 	void init() {
 	}
 	
@@ -81,7 +80,7 @@ public abstract class BaseVM {
 		return openPopUp(url, modal, null);
 	}
 	
-	protected static Window openPopUp(String url, boolean modal, Map<String, Object> args) {
+	protected static Window openPopUp(String url, boolean modal, Map<?, ?> args) {
 		return PopUpUtil.openPopUp(url, modal, args);
 	}
 	

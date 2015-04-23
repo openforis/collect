@@ -42,7 +42,7 @@ public class XmlBindingIntegrationTest {
 		StringReader sr = new StringReader(idml2);
 		Survey survey2 = binder.unmarshal(sr);
 		
-		Assert.assertEquals(survey, survey2);
+		Assert.assertTrue(survey.deepEquals(survey2));
 // TODO			
 			new File("target/test/output").mkdirs();
 			FileOutputStream fos = new FileOutputStream("target/test/output/marshalled.idm.xml");

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openforis.collect.Collect;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -20,14 +21,17 @@ public class SurveyMigrator {
 	
 	protected static final String INTERNAL_NAME_REGEX = "[a-z][a-z0-9_]*";
 	
+//	private static final String MIGRATION_NEEDED_COLLECT_VERSION = "3.4.0";
+	
 	public void migrate(CollectSurvey survey) {
-		if ( isMigrationNeeded(survey) ) { 
-			fixCodeListHierarchyLevelNames(survey);
-		}
+		fixCodeListHierarchyLevelNames(survey);
+		
+		survey.setCollectVersion(Collect.getVersion());
 	}
 	
-	protected boolean isMigrationNeeded(CollectSurvey survey) {
-		//TODO
+	public boolean isMigrationNeeded(CollectSurvey survey) {
+		//TODO check this
+//		return survey.getCollectVersion().compareTo(new Version(MIGRATION_NEEDED_COLLECT_VERSION)) <= 0;
 		return true;
 	}
 

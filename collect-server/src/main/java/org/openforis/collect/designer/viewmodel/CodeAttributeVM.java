@@ -47,6 +47,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
 	private Window parentSelectorPopUp;
 
+	@Override
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") CodeAttributeDefinition attributeDefn, 
@@ -57,30 +58,57 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	@Command
 	public void onListChanged(@ContextParam(ContextType.BINDER) final Binder binder,
 			@BindingParam("list") final CodeList list) {
-		if ( editedItem.hasDependentCodeAttributeDefinitions() ) {
-			ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.CompleteConfirmHandler() {
-				@Override
-				public void onOk() {
-					performListChange(binder, list);
-				}
-				@Override
-				public void onCancel() {
-					Form form = getForm(binder);
-					CodeList oldList = editedItem.getList();
-					setValueOnFormField(form, "list", oldList);
-				}
-			}, "survey.schema.attribute.code.confirm_change_list_on_referenced_node.message");
-			confirmParams.setOkLabelKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.ok");
-			confirmParams.setTitleKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.title");
-			List<String> dependentAttributePaths = new ArrayList<String>();
-			for (CodeAttributeDefinition codeAttributeDefinition : editedItem.getDependentCodeAttributeDefinitions()) {
-				dependentAttributePaths.add(codeAttributeDefinition.getPath());
-			}
-			confirmParams.setMessageArgs(new String[]{StringUtils.join(dependentAttributePaths, ", ")});
-			MessageUtil.showConfirm(confirmParams);
-		} else {
+		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
+		CodeList oldList = fo.getList();
+		boolean listChanged = oldList != null && ! oldList.equals(list);
+		if (oldList == null) {
 			performListChange(binder, list);
+		} else if (listChanged) {
+			if (editedItem.hasDependentCodeAttributeDefinitions() ) {
+				confirmParentCodeListChange(binder, list);
+			} else {
+				performListChange(binder, list);
+			}
 		}
+	}
+
+	private void confirmCodeListChange(final Binder binder, final CodeList list) {
+		ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performListChange(binder, list);
+			}
+		}, "survey.schema.attribute.code.confirm_change_list.message");
+		confirmParams.setOkLabelKey("global.change");
+		confirmParams.setCancelLabelKey("global.leave_original_value");
+		
+		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
+		CodeList oldList = fo.getList();
+		confirmParams.setMessageArgs(new String[] {oldList.getName(), list.getName()});
+		MessageUtil.showConfirm(confirmParams);
+	}
+
+	private void confirmParentCodeListChange(final Binder binder, final CodeList list) {
+		ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.CompleteConfirmHandler() {
+			@Override
+			public void onOk() {
+				performListChange(binder, list);
+			}
+			@Override
+			public void onCancel() {
+				Form form = getForm(binder);
+				CodeList oldList = editedItem.getList();
+				setValueOnFormField(form, "list", oldList);
+			}
+		}, "survey.schema.attribute.code.confirm_change_list_on_referenced_node.message");
+		confirmParams.setOkLabelKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.ok");
+		confirmParams.setTitleKey("survey.schema.attribute.code.confirm_change_list_on_referenced_node.title");
+		List<String> dependentAttributePaths = new ArrayList<String>();
+		for (CodeAttributeDefinition codeAttributeDefinition : editedItem.getDependentCodeAttributeDefinitions()) {
+			dependentAttributePaths.add(codeAttributeDefinition.getPath());
+		}
+		confirmParams.setMessageArgs(new String[]{StringUtils.join(dependentAttributePaths, ", ")});
+		MessageUtil.showConfirm(confirmParams);
 	}
 	
 	private void performListChange(final Binder binder,
@@ -112,7 +140,11 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
 			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( editingAttribute ) {
-			if ( selectedCodeList != null ) {
+			CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
+			CodeList oldList = fo.getList();
+			if (oldList != null && ! oldList.equals(selectedCodeList)) {
+				confirmCodeListChange(binder, selectedCodeList);
+			} else if ( selectedCodeList != null ) {
 				onListChanged(binder, selectedCodeList);
 			}
 			validateForm(binder);

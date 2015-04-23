@@ -21,7 +21,7 @@
 					<treeitem draggable="false" 
 						disabled="@load(each.disabled)"
 						onClick="@command('nodeSelected', node=self.value.data.surveyObject)"
-						onDoubleClick="@command('onOk', selectedSurveyObject=self.value.data.surveyObject)">
+						onDoubleClick="@command('apply', selectedSurveyObject=self.value.data.surveyObject)">
 						<treerow>
 							<treecell image="@load(each.icon)"
 								label="@load(each.data.label)"

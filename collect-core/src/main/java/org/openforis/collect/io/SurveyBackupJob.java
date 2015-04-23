@@ -2,10 +2,12 @@ package org.openforis.collect.io;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.data.RecordFileBackupTask;
 import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
@@ -23,6 +25,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -90,6 +93,7 @@ public class SurveyBackupJob extends Job {
 	
 	//output
 	private File outputFile;
+	private List<DataBackupError> dataBackupErrors;
 	
 	//temporary instance variable
 	private ZipOutputStream zipOutputStream;
@@ -101,10 +105,23 @@ public class SurveyBackupJob extends Job {
 	@Override
 	protected void initInternal() throws Throwable {
 		if ( outputFile == null ) {
-			outputFile = File.createTempFile("collect_survey_export", ".zip");
+			createOutputFile();
 		}
 		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
 		super.initInternal();
+	}
+
+	private void createOutputFile() throws IOException {
+		String outputFileExtension;
+		switch (outputFormat) {
+		case MOBILE:
+			//temporary file will be of type "desktop", then it will be converted into collect-mobile format
+			outputFileExtension = OutputFormat.DESKTOP.getOutputFileExtension();
+			break;
+		default:
+			outputFileExtension = outputFormat.getOutputFileExtension();
+		}
+		outputFile = File.createTempFile("collect_survey_export", "." + outputFileExtension);
 	}
 	
 	@Override
@@ -120,11 +137,8 @@ public class SurveyBackupJob extends Job {
 				addRecordFilesBackupTask();
 			}
 		}
-		switch ( outputFormat ) {
-		case MOBILE:
+		if (outputFormat == OutputFormat.MOBILE) {
 			addCollectMobileBackupConverterTask();
-			break;
-		default:
 		}
 	}
 	
@@ -135,7 +149,9 @@ public class SurveyBackupJob extends Job {
 	
 	@Override
 	protected void onTaskCompleted(Task task) {
-		if ( task instanceof CollectMobileBackupConvertTask ) {
+		if (task instanceof DataBackupTask) {
+			this.dataBackupErrors = ((DataBackupTask) task).getErrors();
+		} else if ( task instanceof CollectMobileBackupConvertTask ) {
 			this.zipOutputStream = null;
 			this.outputFile = ((CollectMobileBackupConvertTask) task).getOutputFile();
 		}
@@ -294,4 +310,7 @@ public class SurveyBackupJob extends Job {
 		this.includeRecordFiles = includeRecordFiles;
 	}
 
+	public List<DataBackupError> getDataBackupErrors() {
+		return CollectionUtils.unmodifiableList(dataBackupErrors);
+	}
 }

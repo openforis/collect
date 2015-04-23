@@ -23,6 +23,7 @@ import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
@@ -86,7 +87,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 
 	@Override
-	@Init(superclass=false)
+	@Init
 	public void init() {
 		super.init();
 		initSurvey();
@@ -253,6 +254,10 @@ public abstract class SurveyBaseVM extends BaseVM {
 		} else {
 			return survey.getId();
 		}
+	}
+	
+	public boolean isCollectEarthSurvey() {
+		return survey != null && survey.getTarget() == SurveyTarget.COLLECT_EARTH;
 	}
 	
 	public boolean isSurveyStored() {

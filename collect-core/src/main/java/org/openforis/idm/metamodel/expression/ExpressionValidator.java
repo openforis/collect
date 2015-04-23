@@ -22,7 +22,7 @@ import org.openforis.idm.path.Path;
  */
 public class ExpressionValidator {
 
-	private static final Pattern FUNCTION_NAME_PATTERN = Pattern.compile("((\\w+):)?(\\w+)");
+	private static final Pattern FUNCTION_NAME_PATTERN = Pattern.compile("((\\w+):)?([a-zA-Z0-9-_]+)");
 	
 	private ExpressionFactory expressionFactory;
 

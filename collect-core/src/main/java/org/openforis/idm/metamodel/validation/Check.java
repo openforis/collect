@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.metamodel.DeepComparable;
 import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
@@ -21,7 +22,7 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  * @author G. Miceli
  * @author M. Togna
  */
-public abstract class Check<T extends Attribute<?, ?>> implements Serializable, ValidationRule<T> {
+public abstract class Check<T extends Attribute<?, ?>> implements Serializable, ValidationRule<T>, DeepComparable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -111,17 +112,7 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 	}
 	
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((condition == null) ? 0 : condition.hashCode());
-		result = prime * result + ((flag == null) ? 0 : flag.hashCode());
-		result = prime * result + ((messages == null) ? 0 : messages.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -143,6 +134,5 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 			return false;
 		return true;
 	}
-	
 	
 }

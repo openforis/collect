@@ -3,6 +3,7 @@ package org.openforis.collect.utils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -32,9 +33,15 @@ public class ZipFiles {
 		}
 	}
 	
-	public static void addFile(ZipFile destFile, File file, String fileNameInZip, ZipParameters zipParameters ) throws ZipException {
+	public static void addFile(ZipFile destFile, File file, String fileNameInZip, ZipParameters zipParameters) throws ZipException {
 		zipParameters.setSourceExternalStream(true);
 		zipParameters.setFileNameInZip(fileNameInZip);
 		destFile.addFile(file, zipParameters);
+	}
+	
+	public static void addFile(ZipFile destFile, InputStream inputStream, String fileNameInZip, ZipParameters zipParameters) throws ZipException {
+		zipParameters.setSourceExternalStream(true);
+		zipParameters.setFileNameInZip(fileNameInZip);
+		destFile.addStream(inputStream, zipParameters);
 	}
 }

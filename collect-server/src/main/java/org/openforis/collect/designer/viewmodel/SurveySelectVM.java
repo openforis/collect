@@ -26,6 +26,7 @@ import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyE
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
+import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreatorImpl;
 import org.openforis.collect.manager.CodeListManager;
@@ -44,6 +45,7 @@ import org.openforis.collect.relational.data.RecordIterator;
 import org.openforis.collect.relational.print.RDBPrintJob;
 import org.openforis.collect.utils.Dates;
 import org.openforis.concurrency.Job;
+import org.openforis.concurrency.Task;
 import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.zkoss.bind.BindUtils;
@@ -82,7 +84,7 @@ public class SurveySelectVM extends BaseVM {
 
 	public static final String UPDATE_SURVEY_LIST_COMMAND = "updateSurveyList";
 
-	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = ".cep";
+	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = "cep";
 
 	private static final CollectEarthProjectFileCreator COLLECT_EARTH_PROJECT_FILE_CREATOR;
 	static {
@@ -113,6 +115,8 @@ public class SurveySelectVM extends BaseVM {
 
 	private Window surveyExportPopup;
 
+	private Window surveyClonePopup;
+
 	private SurveySummary selectedSurvey;
 
 	private List<SurveySummary> summaries;
@@ -120,6 +124,8 @@ public class SurveySelectVM extends BaseVM {
 	private SurveyBackupJob surveyBackupJob;
 
 	private RDBPrintJob rdbExportJob;
+
+	private SurveyCloneJob surveyCloneJob;
 
 	@Override
 	@Init(superclass=false)
@@ -164,7 +170,7 @@ public class SurveySelectVM extends BaseVM {
 		args.put("survey", selectedSurvey);
 		surveyExportPopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
 	}
-	
+
 	@GlobalCommand
 	public void performSelectedSurveyExport(@BindingParam("parameters") SurveyExportParametersFormObject parameters) {
 		rdbExportJob = null;
@@ -189,7 +195,8 @@ public class SurveySelectVM extends BaseVM {
 					File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
 					String contentType = URLConnection.guessContentTypeFromName(file.getName());
 					FileInputStream is = new FileInputStream(file);
-					Filedownload.save(is, contentType, survey.getName() + COLLECT_EARTH_PROJECT_FILE_EXTENSION);
+					String outputFileName = String.format("%s_%s.%s", survey.getName(), Dates.formatLocalDateTime(survey.getModifiedDate()), COLLECT_EARTH_PROJECT_FILE_EXTENSION);
+					Filedownload.save(is, contentType, outputFileName);
 				} catch(Exception e) {
 					log.error(e);
 					MessageUtil.showError("survey.export.error_generating_collect_earth_project_file", new String[] {e.getMessage()});
@@ -234,6 +241,33 @@ public class SurveySelectVM extends BaseVM {
 		jobStatusPopUp = null;
 	}
 
+	@Command
+	public void cloneSelectedSurvey() throws IOException {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("originalSurvey", selectedSurvey);
+		surveyClonePopup = openPopUp(Resources.Component.SURVEY_CLONE_PARAMETERS_POPUP.getLocation(), true, args);
+	}
+
+	@GlobalCommand
+	public void performSelectedSurveyClone(
+			@BindingParam("newName") String newName, 
+			@BindingParam("originalSurveyIsWork") Boolean originalSurveyIsWork) {
+		surveyCloneJob = new SurveyCloneJob();
+		surveyCloneJob.setOriginalSurvey(selectedSurvey);
+		surveyCloneJob.setNewName(newName);
+		surveyCloneJob.setOriginalSurveyIsWork(originalSurveyIsWork);
+		springJobManager.start(surveyCloneJob);
+		
+		closePopUp(surveyClonePopup);
+		
+		openSurveyCloneStatusPopUp(selectedSurvey.getName(), newName, surveyCloneJob);
+	}
+	
+	protected void openSurveyCloneStatusPopUp(String originalSurveyName, String newSurveyName, Job job) {
+		String title = Labels.getLabel("survey.clone.process_status_popup.message", new String[] { originalSurveyName, newSurveyName });
+		jobStatusPopUp = JobStatusPopUpVM.openPopUp(title, job, true);
+	}
+	
 	@GlobalCommand
 	public void jobAborted(@BindingParam("job") Job job) {
 		closeJobStatusPopUp();
@@ -258,6 +292,10 @@ public class SurveySelectVM extends BaseVM {
 			CollectSurvey survey = surveyBackupJob.getSurvey();
 			String extension = surveyBackupJob.getOutputFormat().getOutputFileExtension();
 			downloadFile(file, survey, extension, BINARY_CONTENT_TYPE);
+			final List<DataBackupError> dataBackupErrors = surveyBackupJob.getDataBackupErrors();
+			if (! dataBackupErrors.isEmpty()) {
+				DataExportErrorsPopUpVM.showPopUp(dataBackupErrors);
+			}
 			surveyBackupJob = null;
 		} else if ( job == rdbExportJob ) {
 			File file = rdbExportJob.getOutputFile();
@@ -265,6 +303,14 @@ public class SurveySelectVM extends BaseVM {
 			String extension = "sql";
 			downloadFile(file, survey, extension, "test/plain");
 			rdbExportJob = null;
+		} else if (job == surveyCloneJob) {
+			CollectSurvey survey = surveyCloneJob.getOutputSurvey();
+			//put survey in session and redirect into survey edit page
+			SessionStatus sessionStatus = getSessionStatus();
+			sessionStatus.setSurvey(survey);
+			sessionStatus.setCurrentLanguageCode(survey.getDefaultLanguage());
+			Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
+			surveyCloneJob = null;
 		}
 	}
 	
@@ -619,5 +665,42 @@ public class SurveySelectVM extends BaseVM {
 			return summaries.size();
 		}
 		
+	}
+	
+	private class SurveyCloneJob extends Job {
+		//input
+		private SurveySummary originalSurvey;
+		private boolean originalSurveyIsWork;
+		private String newName;
+		
+		//ouptut
+		private CollectSurvey outputSurvey;
+		
+		@Override
+		protected void buildTasks() throws Throwable {
+			addTask(new Task() {
+				
+				@Override
+				protected void execute() throws Throwable {
+					outputSurvey = surveyManager.duplicateSurveyForEdit(originalSurvey.getName(), originalSurveyIsWork, newName);
+				}
+			});
+		}
+		
+		public void setOriginalSurvey(SurveySummary originalSurvey) {
+			this.originalSurvey = originalSurvey;
+		}
+		
+		public void setOriginalSurveyIsWork(boolean originalSurveyIsWork) {
+			this.originalSurveyIsWork = originalSurveyIsWork;
+		}
+		
+		public void setNewName(String newName) {
+			this.newName = newName;
+		}
+		
+		public CollectSurvey getOutputSurvey() {
+			return outputSurvey;
+		}
 	}
 }

@@ -222,11 +222,11 @@ public class CEComponentHTMLFormatter {
 			.a("class", "form-control selectboxit show-menu-arrow show-tick")
 			.a("data-width", "75px");
 		if (comp.getParentName() != null) {
-			selectBuilder.a("data-parent-code-field-id", comp.getParentName());
+			selectBuilder.a("data-parent-id-field-id", comp.getParentName());
 		}
 		//add root items, if any
-		Map<String, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentCode();
-		List<CodeListItem> rootItems = itemsByParentCode.get("");
+		Map<Integer, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentId();
+		List<CodeListItem> rootItems = itemsByParentCode.get(0);
 		if (rootItems != null) {
 			
 			boolean hasNAoption = false;
@@ -291,22 +291,22 @@ public class CEComponentHTMLFormatter {
 				.a("data-field-type", comp.getType().name());
 		
 		if (comp.getParentName() != null) {
-			hiddenInputField.a("data-parent-code-field-id", comp.getParentName());
+			hiddenInputField.a("data-parent-id-field-id", comp.getParentName());
 		}
 		
-		Map<String, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentCode();
-		for (Entry<String, List<CodeListItem>> entry : itemsByParentCode.entrySet()) {
+		Map<Integer, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentId();
+		for (Entry<Integer, List<CodeListItem>> entry : itemsByParentCode.entrySet()) {
 			//one button group for every list of codes by parent code
-			String parentCode = entry.getKey();
-			String itemsGroupId = groupId + "_" + parentCode;
+			Integer parentId = entry.getKey();
+			String itemsGroupId = groupId + "_" + parentId;
 			XMLBuilder buttonsGroup = itemsGroupExternalContainer
 				.e("div")
 					.a("id", itemsGroupId)
 					.a("class", "code-items")
 					.a("data-toggle", comp.isMultiple() ? "buttons": "buttons-radio");
-			if (StringUtils.isNotBlank(parentCode)) {
+			if (parentId != 0) {
 				buttonsGroup
-					.a("data-parent-code", parentCode)
+					.a("data-parent-id", parentId.toString())
 					.a("style", "display: none;");
 			}
 			List<CodeListItem> items = entry.getValue();
@@ -319,6 +319,7 @@ public class CEComponentHTMLFormatter {
 						.e("button")
 							.a("type", "button")
 							.a("class", "btn btn-info code-item")
+							.a("data-code-item-id", String.valueOf(item.getId()))
 							.a("value", item.getCode())
 							.t(itemLabel);
 					if (StringUtils.isNotBlank(item.getDescription())) {

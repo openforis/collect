@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.SurveyType;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.zkoss.bind.BindUtils;
@@ -35,7 +36,13 @@ public class SurveyExportParametersVM extends BaseVM {
 	public void init(@ExecutionArgParam("survey") SurveySummary survey) {
 		this.formObject = new SurveyExportParametersFormObject();
 		this.survey = survey;
-		this.formObject.setOutputFormat(OutputFormat.DESKTOP.name());
+		String outputFormat;
+		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+			outputFormat = OutputFormat.EARTH.name();
+		} else {
+			outputFormat = OutputFormat.DESKTOP.name();
+		}
+		this.formObject.setOutputFormat(outputFormat);
 		this.formObject.setType(survey.isOnlyWork() ? SurveyType.TEMPORARY.name(): SurveyType.PUBLISHED.name());
 		this.formObject.setRdbDialect(RdbDialect.STANDARD.name());
 		this.formObject.setRdbDateTimeFormat(DEFAULT_DATE_TIME_FORMAT);

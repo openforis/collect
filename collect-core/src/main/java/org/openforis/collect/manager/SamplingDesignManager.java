@@ -127,6 +127,11 @@ public class SamplingDesignManager {
 	}
 
 	@Transactional
+	public void duplicateWorkSamplingDesignForWork(int oldSurveyWorkId, int newSurveyWorkId) {
+		samplingDesignDao.duplicateItems(oldSurveyWorkId, true, newSurveyWorkId, true);
+	}
+
+	@Transactional
 	public void insert(CollectSurvey survey, List<SamplingDesignItem> items, boolean overwriteAll) {
 		if ( overwriteAll ) {
 			Integer surveyId = survey.getId();

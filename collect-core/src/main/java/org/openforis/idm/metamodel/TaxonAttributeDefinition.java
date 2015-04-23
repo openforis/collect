@@ -125,24 +125,10 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime
-				* result
-				+ ((highestTaxonRank == null) ? 0 : highestTaxonRank.hashCode());
-		result = prime * result
-				+ ((qualifiers == null) ? 0 : qualifiers.hashCode());
-		result = prime * result
-				+ ((taxonomy == null) ? 0 : taxonomy.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;

@@ -55,7 +55,9 @@ package org.openforis.collect.ui.component.detail
 			if ( defn.hideWhenNotRelevant ) {
 				var nodes:IList;
 				//if nearest parent entity is table, hide fields when all cousins are not relevant and empty
-				if ( defn.nearestParentMultipleEntity.layout == UIUtil.LAYOUT_TABLE ) {
+				var nearestParentMultipleEntity:EntityDefinitionProxy = defn.nearestParentMultipleEntity;
+				
+				if ( nearestParentMultipleEntity.layout == UIUtil.LAYOUT_TABLE ) {
 					nodes = parentEntity.getDescendantCousins(defn);
 				} else {
 					nodes = parentEntity.getChildren(defn);

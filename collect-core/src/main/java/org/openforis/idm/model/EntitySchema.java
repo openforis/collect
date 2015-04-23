@@ -20,10 +20,10 @@ import com.dyuproject.protostuff.ProtostuffException;
 @SuppressWarnings("unchecked")
 public class EntitySchema extends SchemaSupport<Entity> {
 
-	private static final int FIELD_DEFINITION_ID = 1;
-	private static final int FIELD_NODE = 2;
-	private static final int FIELD_CHILD_NODE_STATE = 3;
-	private static final int FIELD_CHILD_DEFINITION_ID = 4;
+	private static final int DEFINITION_ID_FIELD_NUMBER = 1;
+	private static final int NODE_FIELD_NUMBER = 2;
+	private static final int CHILD_NODE_STATE_FIELD_NUMBER = 3;
+	private static final int CHILD_DEFINITION_ID_FIELD_NUMBER = 4;
 
 	public EntitySchema() {
 		super(Entity.class, "children", "childStates");
@@ -39,26 +39,24 @@ public class EntitySchema extends SchemaSupport<Entity> {
 		List<Node<? extends NodeDefinition>> children = entity.getChildren();
         for(Node<?> node : children) {
         	if(isNodeToBeSaved(node)) {
-				out.writeUInt32(FIELD_DEFINITION_ID, node.definitionId, false);
-				out.writeObject(FIELD_NODE, node, getSchema(node.getClass()), false);
+				out.writeUInt32(DEFINITION_ID_FIELD_NUMBER, node.definitionId, false);
+				out.writeObject(NODE_FIELD_NUMBER, node, getSchema(node.getClass()), false);
         	}
         }
         EntityDefinition definition = entity.getDefinition();
         List<NodeDefinition> childDefinitions = definition.getChildDefinitions();
         for (NodeDefinition childDefinition : childDefinitions) {
         	State childState = entity.getChildState(childDefinition);
-        	out.writeInt32(FIELD_CHILD_NODE_STATE, childState.intValue(), false);
-        	out.writeInt32(FIELD_CHILD_DEFINITION_ID, childDefinition.getId(), false);
+        	out.writeInt32(CHILD_NODE_STATE_FIELD_NUMBER, childState.intValue(), false);
+        	out.writeInt32(CHILD_DEFINITION_ID_FIELD_NUMBER, childDefinition.getId(), false);
         }
 	}
 
 	@Override
 	public void mergeFrom(Input input, Entity entity) throws IOException {
-        for(int number = input.readFieldNumber(this); ; number = input.readFieldNumber(this))
-        {
-        	if ( number == 0 ) {
-        		break;
-        	} else if ( number == FIELD_DEFINITION_ID ) {
+        for(int number = input.readFieldNumber(this); number > 0 ; number = input.readFieldNumber(this)) {
+        	switch (number) {
+        	case DEFINITION_ID_FIELD_NUMBER:
         		Schema idmSchema = entity.getSchema();
         		
         		// Definition id
@@ -70,21 +68,23 @@ public class EntitySchema extends SchemaSupport<Entity> {
 	        		Node<?> node = defn.createNode();
 	        		entity.add(node);
 	        		// Node
-	        		readAndCheckFieldNumber(input, FIELD_NODE);
+	        		readAndCheckFieldNumber(input, NODE_FIELD_NUMBER);
 	        		input.mergeObject(node, getSchema(node.getClass()));
         		}
-        	} else if ( number == FIELD_CHILD_NODE_STATE ){
+        		break;
+        	case CHILD_NODE_STATE_FIELD_NUMBER:
         		//Node state
         		int intState = input.readInt32();
         		State state = State.parseState(intState);
-        		readAndCheckFieldNumber(input, FIELD_CHILD_DEFINITION_ID);
+        		readAndCheckFieldNumber(input, CHILD_DEFINITION_ID_FIELD_NUMBER);
         		int childDefnId = input.readInt32();
         		Schema schema = entity.getSchema();
         		NodeDefinition childDefn = schema.getDefinitionById(childDefnId);
         		if ( childDefn != null ) {
         			entity.setChildState(childDefn, state);
         		}
-        	} else {
+        		break;
+        	default:
             	throw new ProtostuffException("Unexpected field number");
             }
         }
@@ -102,8 +102,8 @@ public class EntitySchema extends SchemaSupport<Entity> {
 	}
 
 	protected void skipNode(Input input) throws IOException, ProtostuffException {
-		readAndCheckFieldNumber(input, FIELD_NODE);
-		input.handleUnknownField(FIELD_NODE, this);
+		readAndCheckFieldNumber(input, NODE_FIELD_NUMBER);
+		input.handleUnknownField(NODE_FIELD_NUMBER, this);
 	}
 
 }

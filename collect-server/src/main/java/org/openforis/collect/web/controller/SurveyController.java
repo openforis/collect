@@ -1,9 +1,14 @@
 package org.openforis.collect.web.controller;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
@@ -30,8 +35,8 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 @RequestMapping("/surveys/")
-public class SurveyController {
-	
+public class SurveyController extends BasicController {
+
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
 
 	@Autowired
@@ -80,5 +85,20 @@ public class SurveyController {
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-
+	@RequestMapping(value = "/collectearthpreview.html", method = RequestMethod.GET)
+	public void showCollectEarthBalloonPreview(HttpServletResponse response, @RequestParam("surveyId") Integer surveyId)  {
+		PrintWriter writer = null;
+		try {
+			CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
+			CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey);
+			String html = generator.generateHTML();
+			writer = new PrintWriter(response.getOutputStream());
+			writer.print(html);
+			writer.flush();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			IOUtils.closeQuietly(writer);
+		}
+	}
 }

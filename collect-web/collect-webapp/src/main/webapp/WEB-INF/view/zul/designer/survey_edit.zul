@@ -40,9 +40,11 @@
 							<tab id="speciesImportTab"
 								label="${labels.survey.species_import.$}" 
 								w:_sel="switchTab"
+								visible="@load(not vm.collectEarthSurvey)"
 								forward="onSwitchTab=onSwitchTab" />
 							<tab id="samplingDesignImportTab"
 								label="${labels.survey.sampling_design_import.$}"
+								visible="@load(not vm.collectEarthSurvey)"
 								w:_sel="switchTab" forward="onSwitchTab=onSwitchTab" />
 							<tab id="schemaTab"
 								label="${labels.survey.schema.$}" 
@@ -58,7 +60,7 @@
 								<include id="codeListsInclude"
 									src="survey_edit/code_lists.zul" />
 							</tabpanel>
-							<tabpanel>
+							<tabpanel visible="@load(not vm.collectEarthSurvey)">
 								<label
 									value="${labels.survey.species_import.save_survey_before}"
 									visible="@load(empty vm.surveyId)" />
@@ -67,7 +69,7 @@
 									height="100%" width="100%"
 									visible="@load(not empty vm.surveyId)" />
 							</tabpanel>
-							<tabpanel>
+							<tabpanel visible="@load(not vm.collectEarthSurvey)">
 								<label
 									value="${labels.survey.sampling_design_import.save_survey_before}"
 									visible="@load(empty vm.surveyId)" />

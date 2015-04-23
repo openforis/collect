@@ -122,19 +122,7 @@ public class Unit extends IdentifiableSurveyObject {
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((abbreviations == null) ? 0 : abbreviations.hashCode());
-		result = prime * result + ((conversionFactor == null) ? 0 : conversionFactor.hashCode());
-		result = prime * result + ((dimension == null) ? 0 : dimension.hashCode());
-		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -169,6 +157,5 @@ public class Unit extends IdentifiableSurveyObject {
 			return false;
 		return true;
 	}
-	
 	
 }

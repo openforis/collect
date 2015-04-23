@@ -3,7 +3,10 @@
  */
 package org.openforis.collect.model;
 
+import java.util.Date;
+
 import org.openforis.collect.manager.process.ProcessStatus;
+import org.openforis.collect.metamodel.SurveyTarget;
 
 /**
  * @author M. Togna
@@ -19,6 +22,9 @@ public class SurveySummary {
 	private String projectName;
 	private boolean work;
 	private boolean published;
+	private Date creationDate;
+	private Date modifiedDate;
+	private SurveyTarget target;
 	private ProcessStatus recordValidationProcessStatus;
 	
 	public SurveySummary(Integer id, String name, String uri) {
@@ -46,6 +52,9 @@ public class SurveySummary {
 		String uri = survey.getUri();
 		SurveySummary summary = new SurveySummary(id, name, uri, projectName);
 		summary.setWork(survey.isWork());
+		summary.setCreationDate(survey.getCreationDate());
+		summary.setModifiedDate(survey.getModifiedDate());
+		summary.setTarget(survey.getTarget());
 		return summary;
 	}
 	
@@ -112,6 +121,30 @@ public class SurveySummary {
 	
 	public boolean isOnlyWork() {
 		return work && publishedId == null;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
+	}
+
+	public SurveyTarget getTarget() {
+		return target;
+	}
+
+	public void setTarget(SurveyTarget target) {
+		this.target = target;
 	}
 
 }

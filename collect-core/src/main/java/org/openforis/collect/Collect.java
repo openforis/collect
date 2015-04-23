@@ -47,7 +47,4 @@ public class Collect {
 		return VERSION;
 	}
 	
-	public static void main(String[] args) {
-		System.out.println("Open Foris Collect " + Collect.getVersion());
-	}
 }

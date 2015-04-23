@@ -132,5 +132,7 @@ public interface IdmlConstants {
 	static String IF = "if";
 	static String CODE = "code";
 	static String TYPE = "type";
+	static String CREATED = "created";
+	static String MODIFIED = "modified";
 
 }

@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author G. Miceli
  * @author M. Togna
  */
-public abstract class SurveyObject implements Serializable, Annotatable{
+public abstract class SurveyObject implements Serializable, Annotatable, DeepComparable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,10 +38,12 @@ public abstract class SurveyObject implements Serializable, Annotatable{
 		return survey == null ? null : survey.getSchema();
 	}
 	
+	@Override
 	public String getAnnotation(QName qname) {
 		return annotations == null ? null : annotations.get(qname);
 	}
 
+	@Override
 	public void setAnnotation(QName qname, String value) {
 		if ( annotations == null ) {
 			annotations = new HashMap<QName, String>();
@@ -53,7 +55,7 @@ public abstract class SurveyObject implements Serializable, Annotatable{
 		}
 	}
 
-	
+	@Override
 	public Set<QName> getAnnotationNames() {
 		if ( annotations == null ) {
 			return Collections.emptySet();
@@ -71,15 +73,7 @@ public abstract class SurveyObject implements Serializable, Annotatable{
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -94,4 +88,5 @@ public abstract class SurveyObject implements Serializable, Annotatable{
 			return false;
 		return true;
 	}
+	
 }

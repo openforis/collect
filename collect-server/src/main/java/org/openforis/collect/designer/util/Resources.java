@@ -32,7 +32,9 @@ public class Resources {
 	
 	public enum Component {
 		SELECT_LANGUAGE_POP_UP("survey_edit/select_language_popup.zul"),
+		COLLECT_EARTH_PREVIEW_POPUP("survey_edit/collect_earth_preview_popup.zul"),
 		PREVIEW_PREFERENCES_POP_UP("survey_edit/preview_preferences_popup.zul"),
+		PREVIEW_POP_UP("survey_edit/preview_popup.zul"),
 		TABSGROUP("survey_edit/schema_layout/tabsgroup.zul"),
 		TAB_LABEL_POPUP("survey_edit/schema_layout/tab_label_popup.zul"),
 		TABSGROUP_LIST_OF_NODES("survey_edit/schema_layout/editablenodeslist.zul"),
@@ -58,6 +60,8 @@ public class Resources {
 		JOB_STATUS_POPUP("component/job_status_popup.zul"),
 		NEW_SURVEY_PARAMETERS_POPUP("component/new_survey_parameters_popup.zul"), 
 		SURVEY_EXPORT_PARAMETERS_POPUP("component/survey_export_parameters_popup.zul"),
+		DATA_EXPORT_ERRORS_POPUP("component/data_export_errors_popup.zul"),
+		SURVEY_CLONE_PARAMETERS_POPUP("component/survey_clone_parameters_popup.zul"),
 		NODE_EDIT_POPUP("survey_edit/schema/node_popup.zul"),
 		SCHEMA_TREE_POPUP("survey_edit/schema/schema_tree_popup.zul");
 		

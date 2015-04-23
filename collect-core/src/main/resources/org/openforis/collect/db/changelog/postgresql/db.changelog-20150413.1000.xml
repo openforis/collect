@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-survey-info-columns" author="ricci" dbms="postgresql">
+		<comment>Add survey info columns</comment>
+		
+		<addColumn tableName="ofc_survey">
+            <column name="target" 
+            		type="varchar(5)" 
+            		defaultValue="CD" />
+            <column name="date_created" 
+            		type="TIMESTAMP" 
+            		defaultValue="now()" />
+            <column name="date_modified" 
+            		type="TIMESTAMP" 
+            		defaultValue="now()" />
+            <column name="collect_version" 
+            		type="varchar(55)" 
+            		defaultValue="3.4.0" />
+	    </addColumn>
+	    
+	    <addColumn tableName="ofc_survey_work">
+            <column name="target" 
+            		type="varchar(5)" 
+            		defaultValue="CD" />
+            <column name="date_created" 
+            		type="TIMESTAMP" 
+            		defaultValue="now()" />
+            <column name="date_modified" 
+            		type="TIMESTAMP" 
+            		defaultValue="now()" />
+            <column name="collect_version" 
+            		type="varchar(55)" 
+            		defaultValue="3.4.0" />
+	    </addColumn>
+	    
+	</changeSet>
+  
+</databaseChangeLog>

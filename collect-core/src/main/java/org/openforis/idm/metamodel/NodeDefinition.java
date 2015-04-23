@@ -486,26 +486,10 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	}
 	
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((descriptions == null) ? 0 : descriptions.hashCode());
-		result = prime * result + getId();
-		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
-		result = prime * result + ((maxCountExpression == null) ? 0 : maxCountExpression.hashCode());
-		result = prime * result + ((minCountExpression == null) ? 0 : minCountExpression.hashCode());
-		result = prime * result + (multiple ? 1231 : 1237);
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((prompts == null) ? 0 : prompts.hashCode());
-		result = prime * result + ((relevantExpression == null) ? 0 : relevantExpression.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;

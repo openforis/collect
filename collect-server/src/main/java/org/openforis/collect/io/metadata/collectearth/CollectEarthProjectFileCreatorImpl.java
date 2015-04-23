@@ -9,11 +9,8 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Stack;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -32,11 +29,19 @@ import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.ZipFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
+import org.openforis.idm.metamodel.CodeListService;
+import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
  * 
@@ -46,7 +51,8 @@ import org.openforis.idm.metamodel.PersistedCodeListItem;
  */
 public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator{
 
-	private static final String EARTH_FILES_ZIP_FILE_PATH = "org/openforis/collect/designer/templates/collectearth/earth-files-1_0.zip";
+	private static final String EARTH_FILES_RESOURCE_PATH = "org/openforis/collect/designer/templates/collectearth/earthFiles/";
+	private static final String EARTH_FILES_FOLDER_NAME = "earthFiles";
 	private static final String KML_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
 	private static final String TEST_PLOTS_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/test_plots.ced.template";
 	private static final String PLACEMARK_FILE_NAME = "placemark.idm.xml";
@@ -55,9 +61,6 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String TEST_PLOTS_FILE_NAME = "test_plots.ced";
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
-	
-	private static final Set<String> FIXED_CSV_ATTRIBUTES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"elevation", "aspect", "slope")));
 	
 	private CodeListManager codeListManager;
 	
@@ -94,11 +97,21 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		
 		addCodeListImages(zipFile, survey, zipParameters);
 		
-		// include earthFiles assets folder (js, css, etc.)
-		File earthFilesZip = getEarthFilesZipFile();
-		ZipFiles.copyFiles(new ZipFile(earthFilesZip), zipFile, zipParameters);
+		includeEarthFiles(zipFile, zipParameters);
 		
 		return outputFile;
+	}
+
+	private void includeEarthFiles(ZipFile zipFile, ZipParameters zipParameters)
+			throws IOException, ZipException {
+		Resource[] earthFileResources = new PathMatchingResourcePatternResolver().getResources(EARTH_FILES_RESOURCE_PATH + "**");
+		for (Resource resource : earthFileResources) {
+			if (resource.exists() && resource.isReadable() && StringUtils.isNotBlank(resource.getFilename())) {
+				String path = ((ClassPathResource) resource).getPath();
+				String relativePath = StringUtils.removeStart(path, EARTH_FILES_RESOURCE_PATH);
+				ZipFiles.addFile(zipFile, resource.getInputStream(), EARTH_FILES_FOLDER_NAME + "/" + relativePath, zipParameters);
+			}
+		}
 	}
 	
 	private File createPlacemark(CollectSurvey survey) throws IOException {
@@ -128,6 +141,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_bing_maps", "true");
 		p.put("open_earth_engine", "true");
 		p.put("open_here_maps", "true");
+		p.put("open_gee_playground", "true");
+		p.put("db_driver", "SQLITE");
+		p.put("use_browser", "chrome");
+		p.put("ui_language", survey.getDefaultLanguage());
+
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
 		p.store(writer, null);
@@ -157,12 +175,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			String attrName = attrDef.getName();
 			sb.append("<Data name=\"" + attrName + "\">\n");
 			String value;
-			if (FIXED_CSV_ATTRIBUTES.contains(attrName)) {
-				value = "${placemark." + attrName + "}";
-			} else {
-				value = "${placemark.extraInfo[" + extraInfoIndex + "]}";
-				extraInfoIndex ++;
-			}
+			value = "${placemark.extraColumns[" + extraInfoIndex + "]}";
+			extraInfoIndex ++;
+			
 			sb.append("<value>");
 			sb.append(value);
 			sb.append("</value>\n");
@@ -205,25 +220,48 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		for (AttributeDefinition attrDef : fromCsvAttributes) {
 			String attrName = attrDef.getName();
 			headerSB.append(",\"" + attrName + "\"");
-			valuesSB.append(",\"value_" + attrName + "\"");
+			String value;
+			if (attrDef instanceof NumericAttributeDefinition || 
+					attrDef instanceof BooleanAttributeDefinition) {
+				value = "0";
+			} else if (attrDef instanceof DateAttributeDefinition) {
+				value = "1/1/2000";
+			} else if (attrDef instanceof CodeAttributeDefinition) {
+				CodeListItem firstAvailableItem = getFirstAvailableCodeItem(attrDef);
+				value = firstAvailableItem == null ? "0": firstAvailableItem.getCode();
+			} else {
+				value = "value_" + attrName;
+			}
+			valuesSB.append(",\"").append(value).append("\"");
 		}
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER, headerSB.toString());
 		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES, valuesSB.toString());
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".ced");
+	}
+
+	private CodeListItem getFirstAvailableCodeItem(AttributeDefinition attrDef) {
+		CodeAttributeDefinition codeDefn = (CodeAttributeDefinition) attrDef;
+		CodeList list = codeDefn.getList();
+		CodeListService codeListService = attrDef.getSurvey().getContext().getCodeListService();
+		Integer levelIndex = codeDefn.getListLevelIndex();
+		int levelPosition = levelIndex == null ? 1: levelIndex + 1;
+		List<CodeListItem> items;
+		if (levelPosition == 1) {
+			items = codeListService.loadRootItems(list);
+		} else {
+			items = codeListService.loadItems(list, levelPosition);
+		}
+		if (items.isEmpty()) {
+			return null;
+		} else {
+			return items.get(0);
+		}
 	}
 	
 	private File generateCube(CollectSurvey survey) throws IOException {
 		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey);
 		String xmlSchema = cubeGenerator.generateXMLSchema();
 		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
-	}
-
-	private File getEarthFilesZipFile() throws IOException, FileNotFoundException {
-		InputStream is = getClass().getClassLoader().getResourceAsStream(EARTH_FILES_ZIP_FILE_PATH);
-		File earthFilesZip = File.createTempFile("earth-files", ".zip");
-		FileOutputStream fos = new FileOutputStream(earthFilesZip);
-		IOUtils.copy(is, fos);
-		return earthFilesZip;
 	}
 
 	private void addCodeListImages(ZipFile zipFile, CollectSurvey survey, ZipParameters zipParameters) throws FileNotFoundException, IOException, ZipException {
@@ -256,7 +294,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		CodeList codeList = item.getCodeList();
 		@SuppressWarnings("unchecked")
 		String zipImageFileName = StringUtils.join(Arrays.asList(
-				"earthFiles", "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
+				EARTH_FILES_FOLDER_NAME, "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
 		return zipImageFileName;
 	}
 

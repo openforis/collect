@@ -20,6 +20,11 @@ public class SurveyBackupJobProxy extends JobProxy {
 	}
 	
 	@ExternalizedProperty
+	public boolean isDataBackupErrorsFound() {
+		return ! ((SurveyBackupJob) this.getJob()).getDataBackupErrors().isEmpty();
+	}
+	
+	@ExternalizedProperty
 	public String getOutputFileName() {
 		SurveyBackupJob job = (SurveyBackupJob) this.getJob();
 		File outputFile = job.getOutputFile();

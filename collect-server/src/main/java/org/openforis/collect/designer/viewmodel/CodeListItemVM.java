@@ -87,7 +87,8 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 	@Override
 	public void setEditedItem(CodeListItem editedItem) {
 		super.setEditedItem(editedItem);
-		if (editedItem != null && editedItem instanceof PersistedCodeListItem) {
+		if (editedItem != null && editedItem instanceof PersistedCodeListItem && 
+				((PersistedCodeListItem) editedItem).getSystemId() != null) {
 			FileWrapper fileWrapper = codeListManager.loadImageContent((PersistedCodeListItem) editedItem);
 			if (fileWrapper != null) {
 				try {

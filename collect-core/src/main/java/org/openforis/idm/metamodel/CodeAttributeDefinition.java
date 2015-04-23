@@ -353,25 +353,10 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + (allowUnlisted ? 1231 : 1237);
-		result = prime * result + (allowValuesSorting ? 1231 : 1237);
-		result = prime * result + (key ? 1231 : 1237);
-		result = prime * result + ((list == null) ? 0 : list.hashCode());
-		result = prime
-				* result
-				+ ((parentCodeAttributeDefinition == null) ? 0
-						: parentCodeAttributeDefinition.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
+	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.deepEquals(obj))
 			return false;
 		if (getClass() != obj.getClass())
 			return false;

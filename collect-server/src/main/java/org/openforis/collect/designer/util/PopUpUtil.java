@@ -16,7 +16,7 @@ public abstract class PopUpUtil {
 		return openPopUp(url, modal, null);
 	}
 	
-	public static Window openPopUp(String url, boolean modal, Map<String, Object> args) {
+	public static Window openPopUp(String url, boolean modal, Map<?, ?> args) {
 		Window result = (Window) Executions.createComponents(
 				url, null, args);
 		if ( modal ) {
