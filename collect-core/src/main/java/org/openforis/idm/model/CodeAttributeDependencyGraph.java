@@ -28,9 +28,8 @@ public class CodeAttributeDependencyGraph extends NodeDependencyGraph {
 
 	@Override
 	protected List<Node<?>> getSortedDependentItems(GraphNode node, Set<GraphNode> unsortedDependents) {
-		Set<GraphNode> nodes = new HashSet<GraphNode>(unsortedDependents);
-		nodes.add(node);
-		return extractItems(nodes);
+		List<Node<?>> result = new GraphSorter(unsortedDependents).sort();
+		return result;
 	}
 
 	@Override
@@ -63,8 +62,15 @@ public class CodeAttributeDependencyGraph extends NodeDependencyGraph {
 		return new HashSet(dependencies);
 	}
 	
+	@Override
+	protected List<Node<?>> getSortedSourceItems(Set<GraphNode> toSort) {
+		List<Node<?>> result = new GraphSorter(toSort).sort();
+		Collections.reverse(result);
+		return result;
+	}
+	
 	public CodeAttribute parentCodeAttribute(CodeAttribute codeAttr) {
-		List<Node<?>> sources = sourcesForItem(codeAttr);
+		List<Node<?>> sources = sourcesForItem(codeAttr, true);
 		if (sources.isEmpty()) {
 			return null;
 		} else {

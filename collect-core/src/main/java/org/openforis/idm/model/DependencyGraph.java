@@ -152,18 +152,29 @@ public abstract class DependencyGraph<T> {
 		}
 		return result;
 	}
-	
+
 	protected List<T> sourcesForItem(T item) {
+		return sourcesForItem(item, false);
+	}
+	
+	protected List<T> sourcesForItem(T item, boolean sort) {
 		Object graphNodeId = getId(item);
 		GraphNode graphNode = graphNodeById.get(graphNodeId);
 		if ( graphNode == null ) {
 			return Collections.emptyList();
+		} else if (sort) {
+			return getSortedSourceItems(graphNode);
 		} else {
-			return getSourceNodes(graphNode);
+			return getSourceItems(graphNode);
 		}
 	}
 
-	private List<T> getSourceNodes(GraphNode node) {
+	protected List<T> getSortedSourceItems(GraphNode node) {
+		Set<GraphNode> sourceGraphNodes = node.getUnsortedSources();
+		return getSortedSourceItems(sourceGraphNodes);
+	}
+
+	protected List<T> getSourceItems(GraphNode node) {
 		Set<GraphNode> sourceGraphNodes = node.getUnsortedSources();
 		List<T> items = extractItems(sourceGraphNodes);
 		return items;
@@ -198,6 +209,10 @@ public abstract class DependencyGraph<T> {
 	}
 	
 	protected List<T> getSortedDependentItems(Set<GraphNode> toSort) {
+		return extractItems(toSort);
+	}
+
+	protected List<T> getSortedSourceItems(Set<GraphNode> toSort) {
 		return extractItems(toSort);
 	}
 
