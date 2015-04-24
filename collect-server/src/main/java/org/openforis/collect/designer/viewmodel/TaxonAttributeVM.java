@@ -52,7 +52,7 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") TaxonAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.init(parentEntity, attributeDefn, newItem);
+		super.internalInit(parentEntity, attributeDefn, newItem);
 	}
 	
 	@Command

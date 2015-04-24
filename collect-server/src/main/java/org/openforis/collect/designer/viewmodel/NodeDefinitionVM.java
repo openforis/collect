@@ -38,7 +38,6 @@ import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
-import org.zkoss.bind.annotation.Init;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
@@ -69,8 +68,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		fieldLabelKeyPrefixes.addAll(Arrays.asList("survey.schema.node"));
 	}
 	
-	@Init(superclass=false)
-	public void init(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
+	protected void internalInit(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
 		super.init();
 		tempFormObject = new SimpleForm();
 		if ( nodeDefn != null ) {

@@ -47,12 +47,11 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
 	private Window parentSelectorPopUp;
 
-	@Override
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") CodeAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.init(parentEntity, attributeDefn, newItem);
+		super.internalInit(parentEntity, attributeDefn, newItem);
 	}
 
 	@Command
