@@ -26,6 +26,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	private boolean showAllowedValuesPreview;
 	private String layoutDirection;
 	private boolean showCode;
+	private String hierarchicalLevel;
 	
 	CodeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
 		super(parentDefn);
@@ -61,6 +62,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		key = source.isKey();
 		list = source.getList();
 		parentCodeAttributeDefinition = source.getParentCodeAttributeDefinition();
+		hierarchicalLevel = list == null ? null : source.getHierarchicalLevel();
 		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 		
@@ -72,7 +74,7 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		layoutDirection = uiOptions.getLayoutDirection(source);
 		showCode = uiOptions.getShowCode(source);
 	}
-
+	
 	public boolean isKey() {
 		return key;
 	}
@@ -113,6 +115,14 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		this.parentCodeAttributeDefinition = parentCodeAttributeDefinition;
 	}
 	
+	public String getHierarchicalLevel() {
+		return hierarchicalLevel;
+	}
+	
+	public void setHierarchicalLevel(String hierarchicalLevel) {
+		this.hierarchicalLevel = hierarchicalLevel;
+	}
+
 	public String getLayoutDirection() {
 		return layoutDirection;
 	}

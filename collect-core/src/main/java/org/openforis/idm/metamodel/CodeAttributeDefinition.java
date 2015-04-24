@@ -272,6 +272,16 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 			return null;
 		}
 	}
+	
+	public String getHierarchicalLevel() {
+		Integer levelIndex = getListLevelIndex();
+		if (levelIndex == null) {
+			return null;
+		} else {
+			CodeListLevel level = list.getHierarchy().get(levelIndex);
+			return level.getName();
+		}
+	}
 
 	@Override
 	public Node<?> createNode() {
