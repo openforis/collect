@@ -57,6 +57,9 @@ package org.openforis.collect.presenter {
 		private const EXPORT_DATA_MENU_ITEM:String = Message.get("list.admin.exportData");
 		private const IMPORT_DATA_MENU_ITEM:String = Message.get("list.admin.importData");
 		private const VALIDATION_REPORT_MENU_ITEM:String = Message.get("list.admin.validationReport");
+		private const PROMOTE_ENTRY_RECORDS_MENU_ITEM:String = Message.get("list.admin.promote_entry_records");
+		private const PROMOTE_CLEANSING_RECORDS_MENU_ITEM:String = Message.get("list.admin.promote_cleansing_records");
+		private const DEMOTE_ANALYSIS_RECORDS_MENU_ITEM:String = Message.get("list.admin.demote_analysis_records");
 		
 		private var _dataClient:DataClient;
 		
@@ -151,29 +154,52 @@ package org.openforis.collect.presenter {
 			result.addItem(EXPORT_DATA_MENU_ITEM);
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(IMPORT_DATA_MENU_ITEM);
+				result.addItem({type: "separator"});
 				result.addItem(VALIDATION_REPORT_MENU_ITEM);
+				result.addItem({type: "separator"});
+				result.addItem(PROMOTE_ENTRY_RECORDS_MENU_ITEM);
+				result.addItem(PROMOTE_CLEANSING_RECORDS_MENU_ITEM);
+				result.addItem(DEMOTE_ANALYSIS_RECORDS_MENU_ITEM);
 			}
 			view.advancedFunctionsButton.dataProvider = result;
 		}
 		
 		protected function advancedFunctionItemClickHandler(event:MenuEvent):void {
 			switch ( event.item ) {
-				case IMPORT_DATA_MENU_ITEM:
-					PopUpUtil.createPopUp(DataImportPopUp, true);
-					break;
-				case EXPORT_DATA_MENU_ITEM:
-					PopUpUtil.createPopUp(DataExportPopUp, true);
-					break;
-				case VALIDATION_REPORT_MENU_ITEM:
-					var url:String = ApplicationConstants.VALIDATION_REPORT_URL;
-					var req:URLRequest = new URLRequest(url);
-					var params:URLVariables = new URLVariables();
-					params.s = Application.activeSurvey.name;
-					params.r = Application.activeRootEntity.name;
-					params.locale = Application.localeString;
-					req.data = params;
-					navigateToURL(req, "_new");
-					break;
+			case IMPORT_DATA_MENU_ITEM:
+				PopUpUtil.createPopUp(DataImportPopUp, true);
+				break;
+			case EXPORT_DATA_MENU_ITEM:
+				PopUpUtil.createPopUp(DataExportPopUp, true);
+				break;
+			case VALIDATION_REPORT_MENU_ITEM:
+				var url:String = ApplicationConstants.VALIDATION_REPORT_URL;
+				var req:URLRequest = new URLRequest(url);
+				var params:URLVariables = new URLVariables();
+				params.s = Application.activeSurvey.name;
+				params.r = Application.activeRootEntity.name;
+				params.locale = Application.localeString;
+				req.data = params;
+				navigateToURL(req, "_new");
+				break;
+			case PROMOTE_ENTRY_RECORDS_MENU_ITEM:
+				AlertUtil.showConfirm("list.admin.promote_entry_records.confirm", null, null, function():void {
+					ClientFactory.dataClient.moveRecords(Application.activeRootEntity.name, CollectRecord$Step.ENTRY, true);
+					AlertUtil.showMessage("list.admin.record_process_started");
+				}); 
+				break;
+			case PROMOTE_CLEANSING_RECORDS_MENU_ITEM:
+				AlertUtil.showConfirm("list.admin.promote_cleansing_records.confirm", null, null, function():void {
+					ClientFactory.dataClient.moveRecords(Application.activeRootEntity.name, CollectRecord$Step.CLEANSING, true);
+					AlertUtil.showMessage("list.admin.record_process_started");
+				}); 
+				break;
+			case DEMOTE_ANALYSIS_RECORDS_MENU_ITEM:
+				AlertUtil.showConfirm("list.admin.demote_analysis_records.confirm", null, null, function():void {
+					ClientFactory.dataClient.moveRecords(Application.activeRootEntity.name, CollectRecord$Step.ANALYSIS, false);
+					AlertUtil.showMessage("list.admin.record_process_started");
+				}); 
+				break;
 			}
 		}
 		

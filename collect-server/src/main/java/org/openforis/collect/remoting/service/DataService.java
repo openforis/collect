@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.io.data.BulkRecordMoveJob;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
@@ -47,6 +48,7 @@ import org.openforis.collect.remoting.service.NodeUpdateRequest.NodeDeleteReques
 import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateRequest;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
 import org.openforis.collect.web.session.SessionState;
+import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -77,7 +79,9 @@ public class DataService {
 	private transient SessionRecordFileManager sessionFileManager;
 	@Autowired
 	private transient RecordIndexService recordIndexService;
-
+	@Autowired
+	private transient SpringJobManager springJobManager;
+	
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
 	 */
@@ -454,6 +458,18 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		recordManager.assignOwner(sessionState.getActiveSurvey(), 
 				recordId, ownerId, sessionState.getUser(), sessionState.getSessionId());
+	}
+	
+	@Secured("ROLE_ADMIN")
+	public void moveRecords(String rootEntity, int fromStepNumber, boolean promote) {
+		BulkRecordMoveJob job = springJobManager.createJob(BulkRecordMoveJob.class);
+		SessionState sessionState = getSessionState();
+		job.setSurvey(sessionState.getActiveSurvey());
+		job.setRootEntity(rootEntity);
+		job.setPromote(promote);
+		job.setFromStep(Step.valueOf(fromStepNumber));
+		job.setAdminUser(sessionState.getUser());
+		springJobManager.start(job);
 	}
 
 	protected CollectRecord getActiveRecord() {

@@ -305,7 +305,13 @@ public class RecordManager {
 	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId, int dataStepNumber) {
 		return recordDao.countRecords(survey, rootEntityDefinitionId, dataStepNumber);
 	}
-	
+
+	@Transactional
+	public int countRecords(CollectSurvey survey, String rootEntityDefinition, Step step) {
+		EntityDefinition rootDef = survey.getSchema().getRootEntityDefinition(rootEntityDefinition);
+		return countRecords(survey, rootDef.getId(), step.getStepNumber());
+	}
+
 	@Transactional
 	public int countRecords(RecordFilter filter) {
 		return recordDao.countRecords(filter);
@@ -356,6 +362,16 @@ public class RecordManager {
 		return record;
 	}
 
+
+	@Transactional
+	public void promote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPromoteException, MissingRecordKeyException {
+		CollectRecord record = load(survey, recordId, currentStep);
+		performPromote(record, user);
+	}
+	
+	/**
+	 * Saves a record and promotes it to the next phase
+	 */
 	@Transactional
 	public void promote(CollectRecord record, User user) throws RecordPromoteException, MissingRecordKeyException {
 		Integer errors = record.getErrors();
@@ -375,7 +391,11 @@ public class RecordManager {
 		} else {
 			recordDao.update( record );
 		}
+		
+		performPromote(record, user);
+	}
 
+	private void performPromote(CollectRecord record, User user) {
 		/**
 		 * 1. clear node states
 		 * 2. update record step
