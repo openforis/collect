@@ -5,12 +5,11 @@ package org.openforis.collect.io.data;
 
 import java.util.List;
 
+import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
-import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -23,13 +22,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class BulkRecordMoveJob extends Job {
+public class BulkRecordMoveJob extends SurveyLockingJob {
 
 	@Autowired
 	private RecordManager recordManager;
 	
 	//input
-	private CollectSurvey survey;
 	private String rootEntity;
 	private User adminUser;
 	private Step fromStep;
@@ -40,10 +38,6 @@ public class BulkRecordMoveJob extends Job {
 		addTask(new BulkRecordMoveTask());
 	}
 
-	public void setSurvey(CollectSurvey survey) {
-		this.survey = survey;
-	}
-	
 	public void setRootEntity(String rootEntity) {
 		this.rootEntity = rootEntity;
 	}

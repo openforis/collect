@@ -8,6 +8,7 @@
 @namespace container "org.openforis.collect.ui.container.*";
 @namespace user "org.openforis.collect.ui.component.user.*";
 @namespace codelist "org.openforis.collect.ui.component.input.codelist.*";
+@namespace concurrency "org.openforis.collect.concurrency.*";
 
 container|CollapsiblePanel {
 	skin-class: ClassReference('org.openforis.collect.ui.skin.CollapsiblePanelSkin');
@@ -149,7 +150,8 @@ mx|Alert {
 
 }*/
 
-component|BlockingMessagePopUp, 
+component|BlockingMessagePopUp,
+	concurrency|CollectJobStatusPopUp,
 	component|BackupPopUp, component|DataExportPopUp, component|DataImportPopUp, 
 	component|SelectVersionPopUp, component|SpeciesImportPopUp, 
 	component|SurveySelectionPopUp,
@@ -167,7 +169,8 @@ component|BlockingMessagePopUp,
 	background-alpha: 1.0;
 }
 
-component|BlockingMessagePopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, component|DataExportPopUp, component|BackupPopUp, component|SpeciesImportPopUp {
+component|BlockingMessagePopUp, concurrency|CollectJobStatusPopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, 
+	component|DataExportPopUp, component|BackupPopUp, component|SpeciesImportPopUp {
 	showCloseButton: false;
 }
 

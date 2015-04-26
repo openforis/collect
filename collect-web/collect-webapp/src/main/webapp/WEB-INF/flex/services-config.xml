@@ -34,6 +34,14 @@
 				</properties>
 			</destination>
 			
+			<destination id="collectJobService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>collectJobService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
+			
 			<destination id="configurationService">
 				<properties>
 					<factory>springFactory</factory>

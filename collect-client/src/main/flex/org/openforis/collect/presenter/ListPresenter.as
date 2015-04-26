@@ -25,15 +25,19 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.DataClient;
+	import org.openforis.collect.concurrency.CollectJobStatusPopUp;
+	import org.openforis.collect.event.CollectJobEvent;
 	import org.openforis.collect.event.PaginationBarEvent;
 	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
+	import org.openforis.collect.model.CollectRecord$State;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
+	import org.openforis.collect.remoting.service.concurrency.proxy.SurveyLockingJobProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.DataExportPopUp;
 	import org.openforis.collect.ui.component.DataImportPopUp;
@@ -101,7 +105,8 @@ package org.openforis.collect.presenter {
 		override protected function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 			eventDispatcher.addEventListener(UIEvent.RELOAD_RECORD_SUMMARIES, reloadRecordSummariesHandler);
-			
+			eventDispatcher.addEventListener(CollectJobEvent.COLLECT_JOB_COMPLETE, jobCompleteHandler);
+
 			view.backToMainMenuButton.addEventListener(MouseEvent.CLICK, backToMainMenuClickHandler);
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			view.editButton.addEventListener(MouseEvent.CLICK, editButtonClickHandler);
@@ -113,6 +118,12 @@ package org.openforis.collect.presenter {
 			
 			view.paginationBar.addEventListener(PaginationBarEvent.PAGE_CHANGE, summaryPageChangeHandler);
 			view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
+		}
+		
+		private function jobCompleteHandler(event:CollectJobEvent):void {
+			if (event.job is SurveyLockingJobProxy && event.job.completed) {
+				reloadRecordSummaries();
+			}
 		}
 		
 		protected function backToMainMenuClickHandler(event:Event):void {
@@ -183,21 +194,32 @@ package org.openforis.collect.presenter {
 				navigateToURL(req, "_new");
 				break;
 			case PROMOTE_ENTRY_RECORDS_MENU_ITEM:
-				AlertUtil.showConfirm("list.admin.promote_entry_records.confirm", null, null, function():void {
-					ClientFactory.dataClient.moveRecords(Application.activeRootEntity.name, CollectRecord$Step.ENTRY, true);
-					AlertUtil.showMessage("list.admin.record_process_started");
-				}); 
-				break;
 			case PROMOTE_CLEANSING_RECORDS_MENU_ITEM:
-				AlertUtil.showConfirm("list.admin.promote_cleansing_records.confirm", null, null, function():void {
-					ClientFactory.dataClient.moveRecords(Application.activeRootEntity.name, CollectRecord$Step.CLEANSING, true);
-					AlertUtil.showMessage("list.admin.record_process_started");
-				}); 
-				break;
 			case DEMOTE_ANALYSIS_RECORDS_MENU_ITEM:
-				AlertUtil.showConfirm("list.admin.demote_analysis_records.confirm", null, null, function():void {
-					ClientFactory.dataClient.moveRecords(Application.activeRootEntity.name, CollectRecord$Step.ANALYSIS, false);
-					AlertUtil.showMessage("list.admin.record_process_started");
+				var confirmMessageKey:String = null;
+				var initialStep:CollectRecord$Step = null;
+				var promote:Boolean = true;
+				switch(event.item) {
+					case PROMOTE_ENTRY_RECORDS_MENU_ITEM:
+						confirmMessageKey = "list.admin.promote_entry_records.confirm";
+						initialStep = CollectRecord$Step.ENTRY;
+						break;
+					case PROMOTE_CLEANSING_RECORDS_MENU_ITEM:
+						confirmMessageKey = "list.admin.promote_cleansing_records.confirm";
+						initialStep = CollectRecord$Step.CLEANSING;
+						break;
+					case DEMOTE_ANALYSIS_RECORDS_MENU_ITEM:
+						confirmMessageKey = "list.admin.demote_analysis_records.confirm";
+						initialStep = CollectRecord$Step.ANALYSIS;
+						promote = false;
+						break;
+				}
+				var responder:IResponder = new AsyncResponder(function(result:ResultEvent, token:Object = null):void {
+					CollectJobStatusPopUp.openPopUp();
+				}, faultHandler);
+				AlertUtil.showConfirm(confirmMessageKey, null, null, function():void {
+					ClientFactory.dataClient.moveRecords(Application.activeRootEntity.name, initialStep, promote, responder);
+					//AlertUtil.showMessage("list.admin.record_process_started");
 				}); 
 				break;
 			}

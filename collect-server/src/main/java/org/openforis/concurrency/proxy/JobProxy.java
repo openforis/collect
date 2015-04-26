@@ -11,7 +11,7 @@ import org.openforis.concurrency.Job;
  */
 public class JobProxy implements Proxy {
 	
-	private transient Job job;
+	protected transient Job job;
 
 	public enum Status {
 		PENDING, RUNNING, COMPLETED, FAILED, ABORTED;
@@ -24,6 +24,11 @@ public class JobProxy implements Proxy {
 
 	protected Job getJob() {
 		return job;
+	}
+	
+	@ExternalizedProperty
+	public String getId() {
+		return job.getId().toString();
 	}
 	
 	@ExternalizedProperty
@@ -64,6 +69,11 @@ public class JobProxy implements Proxy {
 	@ExternalizedProperty
 	public String getErrorMessage() {
 		return job.getErrorMessage();
+	}
+
+	@ExternalizedProperty
+	public String getName() {
+		return job.getName();
 	}
 
 }
