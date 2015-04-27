@@ -40,7 +40,6 @@ import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
-import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -87,7 +86,6 @@ public abstract class SurveyBaseVM extends BaseVM {
 	}
 
 	@Override
-	@Init
 	public void init() {
 		super.init();
 		initSurvey();

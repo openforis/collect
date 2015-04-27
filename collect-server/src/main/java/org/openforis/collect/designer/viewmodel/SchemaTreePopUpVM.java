@@ -74,8 +74,8 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	
 	@Command
 	public void apply(@BindingParam("selectedSurveyObject") SurveyObject selectedSurveyObject) {
-		if ( selectedSurveyObject != null 
-				&& ( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
+		if ( selectedSurveyObject == null || 
+				( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
 				&& ( selectableNodePredicate == null || selectableNodePredicate.evaluate(selectedSurveyObject) ) ) {
 			Map<String, Object> args = new HashMap<String, Object>();
 			args.put("node", selectedSurveyObject);

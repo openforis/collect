@@ -9,6 +9,7 @@ package org.openforis.collect.client {
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.RecordProxy;
 	
 	/**
 	 * 
@@ -35,6 +36,7 @@ package org.openforis.collect.client {
 		private var _findAssignableCodeListItemsOperation:Operation;
 		private var _searchAutoCompleteValuesOperation:Operation;
 		private var _assignOwnerOperation:Operation;
+		private var _moveRecordsOperation:Operation;
 		
 		public function DataClient() {
 			super("dataService");
@@ -56,6 +58,7 @@ package org.openforis.collect.client {
 			this._findAssignableCodeListItemsOperation = getOperation("findAssignableCodeListItems", CONCURRENCY_MULTIPLE);
 			this._searchAutoCompleteValuesOperation = getOperation("searchAutoCompleteValues", CONCURRENCY_LAST, false);
 			this._assignOwnerOperation = getOperation("assignOwner", CONCURRENCY_MULTIPLE, false);
+			this._moveRecordsOperation = getOperation("moveRecords");
 		}
 		
 		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String):void {
@@ -146,6 +149,13 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 
+		public function moveRecords(rootEntity:String, fromStep:CollectRecord$Step, promote:Boolean, responder:IResponder = null):void {
+			var token:AsyncToken = this._moveRecordsOperation.send(rootEntity, Application.getRecordStepNumber(fromStep), promote);
+			if (responder != null) {
+				token.addResponder(responder);
+			}
+		}
+		
 		protected function queueResultHandler(event:ResultEvent, token:Object = null):void {
 			var lastCall:RemoteCallWrapper = _queueProcessor.lastCall;
 			if(lastCall != null) {

@@ -146,6 +146,9 @@ package org.openforis.collect.presenter {
 					}
 				});
 			}
+			
+			var collectJobMonitor:CollectJobMonitor = new CollectJobMonitor();
+			collectJobMonitor.startProgressTimer();
 		}
 		
 		protected function initPreview(params:Object, localeString:String):void {

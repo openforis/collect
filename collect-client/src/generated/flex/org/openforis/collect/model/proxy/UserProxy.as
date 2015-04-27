@@ -97,5 +97,8 @@ package org.openforis.collect.model.proxy {
 			return hasEffectiveRole(ROLE_ADMIN);
 		}
 		
+		public function get canCancelApplicationLockingJob():Boolean {
+			return hasEffectiveRole(ROLE_ADMIN);
+		}
 	}
 }

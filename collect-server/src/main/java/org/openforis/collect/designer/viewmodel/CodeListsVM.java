@@ -196,9 +196,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		survey.moveCodeList(selectedItem, indexTo);
 	}
 	
-	@Override
 	@Command
-	public void deleteItem(@BindingParam("item") final CodeList item) {
+	public void deleteCodeList(@BindingParam("item") final CodeList item) {
 		List<NodeDefinition> references = getReferences(item);
 		if ( ! references.isEmpty() ) {
 			String title = Labels.getLabel("global.message.title.warning");

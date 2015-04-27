@@ -38,7 +38,7 @@
                         <toolbarbutton tooltiptext="${labels.global.delete_item}"
                             image="/assets/images/delete.png"
                             disabled="@load(empty vm.selectedItem)"
-                            onClick="@command('deleteItem', item=vm.selectedItem)" />
+                            onClick="@command('deleteUnit', item=vm.selectedItem)" />
                       </toolbar>
                     </south>
                 </borderlayout>

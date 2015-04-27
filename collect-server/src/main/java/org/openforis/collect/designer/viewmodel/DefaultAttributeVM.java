@@ -14,12 +14,11 @@ import org.zkoss.bind.annotation.Init;
  */
 public class DefaultAttributeVM extends AttributeVM<AttributeDefinition> {
 
-	@Override
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") AttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.init(parentEntity, attributeDefn, newItem);
+		super.internalInit(parentEntity, attributeDefn, newItem);
 	}
 	
 }

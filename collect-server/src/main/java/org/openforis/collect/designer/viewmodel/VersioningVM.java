@@ -76,9 +76,8 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 		dispatchVersionsUpdatedCommand();
 	}
 
-	@Override
 	@Command
-	public void deleteItem(@BindingParam("item") final ModelVersion item) {
+	public void deleteVersioning(@BindingParam("item") final ModelVersion item) {
 		List<VersionableSurveyObject> references = getReferences(item);
 		if ( references.isEmpty() ) {
 			super.deleteItem(item);

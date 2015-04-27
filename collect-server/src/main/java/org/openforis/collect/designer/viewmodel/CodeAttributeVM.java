@@ -20,6 +20,7 @@ import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
+import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.SurveyObject;
 import org.zkoss.bind.BindUtils;
@@ -47,12 +48,11 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
 	private Window parentSelectorPopUp;
 
-	@Override
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") CodeAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.init(parentEntity, attributeDefn, newItem);
+		super.internalInit(parentEntity, attributeDefn, newItem);
 	}
 
 	@Command
@@ -121,6 +121,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		setValueOnFormField(form, "list", list);
 		setValueOnFormField(form, "list.hierarchical", list != null && list.isHierarchical());
 		setValueOnFormField(form, "parentCodeAttributeDefinition.path", null);
+		setValueOnFormField(form, "hierarchicalLevel", null);
 		dispatchApplyChangesCommand(binder);
 		notifyChange("dependentCodePaths");
 		
@@ -175,7 +176,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			Predicate<SurveyObject> disabledNodePredicate = new Predicate<SurveyObject>() {
 				@Override
 				public boolean evaluate(SurveyObject item) {
-					return item instanceof UITab;
+					return ! (item instanceof CodeAttributeDefinition);
 				}
 			};
 			parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title,
@@ -196,12 +197,26 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	@GlobalCommand
 	public void schemaTreeNodeSelected(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("node") SurveyObject surveyObject) {
 		if ( parentSelectorPopUp != null ) {
-			CodeAttributeDefinition parentAttrDefn = (CodeAttributeDefinition) surveyObject;
-			((CodeAttributeDefinitionFormObject) formObject).setParentCodeAttributeDefinition(parentAttrDefn);
+			CodeAttributeDefinition parentAttrDefn = surveyObject == null ? null : (CodeAttributeDefinition) surveyObject;
+			CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) formObject;
+			fo.setParentCodeAttributeDefinition(parentAttrDefn);
+			String hierarchicalLevel = getHierarchicalLevelName(parentAttrDefn);
+			fo.setHierarchicalLevel(hierarchicalLevel);
 			notifyChange("formObject");
 			dispatchApplyChangesCommand(binder);
 			closeSchemaNodeSelector();
 			notifyChange("dependentCodePaths");
+		}
+	}
+
+	private String getHierarchicalLevelName(CodeAttributeDefinition parentAttrDefn) {
+		if (parentAttrDefn == null) {
+			return null;
+		} else {
+			Integer parentLevelIndex = parentAttrDefn.getListLevelIndex();
+			int levelIndex = parentLevelIndex + 1;
+			CodeListLevel level = parentAttrDefn.getList().getHierarchy().get(levelIndex);
+			return level.getName();
 		}
 	}
 

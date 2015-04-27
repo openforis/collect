@@ -108,9 +108,8 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 		BindUtils.postGlobalCommand(null, null, UNITS_UPDATED_GLOBAL_COMMAND, null);
 	}
 	
-	@Override
 	@Command
-	public void deleteItem(@BindingParam("item") final Unit item) {
+	public void deleteUnit(@BindingParam("item") final Unit item) {
 		List<NodeDefinition> references = getReferences(item);
 		if ( references.isEmpty() ) {
 			super.deleteItem(item);

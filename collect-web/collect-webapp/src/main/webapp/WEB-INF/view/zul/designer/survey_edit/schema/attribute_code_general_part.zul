@@ -32,8 +32,8 @@
     				<button sclass="icon"
     					tooltiptext="${labels.survey.code_list.manager.title}"
     					onClick="@global-command('openCodeListsManagerPopUp', 
-              		editingAttribute=true, 
-              		selectedCodeList=fx.list)"
+		              		editingAttribute=true, 
+		              		selectedCodeList=fx.list)"
     					image="/assets/images/edit-small.png" />
     			</hlayout>
     		</cell>
@@ -57,6 +57,12 @@
     					tooltiptext="${labels.survey.schema.attribute.code.select_parent}"
     					onClick="@command('openParentAttributeSelector')"
     					image="/assets/images/tree-small.png" />
+    				<space width="20px" />
+		    		<label
+		    			value="${labels.survey.schema.attribute.code.hierarchical_level}:" />
+    				<textbox width="150px"
+    					value="@load(fx.hierarchicalLevel)"
+    					readonly="true" />
     			</hlayout>
     		</cell>
     	</row>
