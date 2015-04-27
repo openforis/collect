@@ -66,6 +66,9 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 		protected void execute() throws Throwable {
 			List<CollectRecord> summaries = recordManager.loadSummaries(survey, rootEntity, fromStep);
 			for (CollectRecord summary : summaries) {
+				if (isAborted()) {
+					break;
+				}
 				if (promote) {
 					recordManager.promote(survey, summary.getId(), summary.getStep(), adminUser);
 				} else {

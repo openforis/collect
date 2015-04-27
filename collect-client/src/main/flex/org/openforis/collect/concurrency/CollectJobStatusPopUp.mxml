@@ -30,7 +30,7 @@
 			private var _autoclose:Boolean;
 			private static var _instance:CollectJobStatusPopUp;
 			
-			public static function openPopUp(autoclose:Boolean = true):void {
+			public static function openPopUp(autoclose:Boolean = false):void {
 				if (_instance == null) {
 					var popUp:CollectJobStatusPopUp = new CollectJobStatusPopUp();
 					popUp._autoclose = autoclose;
@@ -44,6 +44,10 @@
 					PopUpManager.removePopUp(_instance);
 					_instance = null;
 				}
+			}
+			
+			public static function get popUpOpen():Boolean {
+				return _instance != null;
 			}
 			
 			override protected function createPresenter():PopUpPresenter {
