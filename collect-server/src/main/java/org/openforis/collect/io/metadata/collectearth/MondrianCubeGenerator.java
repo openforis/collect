@@ -146,9 +146,20 @@ public class MondrianCubeGenerator {
 		List<Measure> measures = new ArrayList<Measure>();
 		//Expansion factor - Area
 		{
-			Measure measure = new Measure("Area (HA)");
+			Measure measure = new Measure("area");
 			measure.column = "expansion_factor";
 			measure.caption = "Area (HA)";
+			measure.aggregator = "sum";
+			measure.datatype = "Integer";
+			measure.formatString = "#,###";
+			measures.add(measure);
+		}
+		
+		// Plot weight
+		{
+			Measure measure = new Measure("plot_weight");
+			measure.column = "plot_weight";
+			measure.caption = "Plot Weight";
 			measure.aggregator = "sum";
 			measure.datatype = "Integer";
 			measure.formatString = "#,###";
