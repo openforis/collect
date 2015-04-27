@@ -20,11 +20,13 @@ import org.openforis.collect.datacleansing.DataErrorReportItem.Status;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.PersistedObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportItemRecord;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
+@Component("dataErrorReportItemDao")
 @Transactional
 public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorReportItem, DataErrorReportItemDao.JooqDSLContext> {
 

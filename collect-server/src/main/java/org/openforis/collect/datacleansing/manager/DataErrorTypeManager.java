@@ -13,6 +13,7 @@ import org.openforis.collect.datacleansing.persistence.DataErrorTypeDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,8 +29,9 @@ public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorT
 		cache = new ErrorTypeCache();
 	}
 	
-	@Autowired
 	@Override
+	@Autowired
+	@Qualifier("dataErrorTypeDao")
 	public void setDao(DataErrorTypeDao dao) {
 		super.setDao(dao);
 	}

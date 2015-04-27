@@ -17,11 +17,13 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingChainRecord;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
+@Component("dataCleansingChainDao")
 @Transactional
 public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<DataCleansingChain, DataCleansingChainDao.JooqDSLContext> {
 
@@ -70,11 +72,20 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		@Override
 		protected void fromRecord(Record r, DataCleansingChain o) {
 			super.fromRecord(r, o);
+			o.setCreationDate(r.getValue(OFC_DATA_CLEANSING_CHAIN.CREATION_DATE));
+			o.setDescription(r.getValue(OFC_DATA_CLEANSING_CHAIN.DESCRIPTION));
+			o.setModifiedDate(r.getValue(OFC_DATA_CLEANSING_CHAIN.MODIFIED_DATE));
+			o.setTitle(r.getValue(OFC_DATA_CLEANSING_CHAIN.TITLE));
 		}
 		
 		@Override
 		protected void fromObject(DataCleansingChain o, StoreQuery<?> q) {
 			super.fromObject(o, q);
+			q.addValue(OFC_DATA_CLEANSING_CHAIN.SURVEY_ID, o.getSurvey().getId());
+			q.addValue(OFC_DATA_CLEANSING_CHAIN.CREATION_DATE, toTimestamp(o.getCreationDate()));
+			q.addValue(OFC_DATA_CLEANSING_CHAIN.DESCRIPTION, o.getDescription());
+			q.addValue(OFC_DATA_CLEANSING_CHAIN.MODIFIED_DATE, toTimestamp(o.getCreationDate()));
+			q.addValue(OFC_DATA_CLEANSING_CHAIN.TITLE, o.getTitle());
 		}
 
 	}

@@ -1,6 +1,7 @@
 package org.openforis.collect.datacleansing;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 
 /**
@@ -8,7 +9,7 @@ import org.openforis.collect.model.CollectSurvey;
  * @author A. Modragon
  *
  */
-public class DataErrorQuery extends DataQuery {
+public class DataErrorQuery extends PersistedSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 	

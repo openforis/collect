@@ -15,18 +15,20 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorTypeRecord;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
+@Component("dataErrorTypeDao")
 @Transactional
 public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErrorType, DataErrorTypeDao.JooqDSLContext> {
 
 	public DataErrorTypeDao() {
 		super(DataErrorTypeDao.JooqDSLContext.class);
 	}
-
+	
 	public List<DataErrorType> loadBySurvey(CollectSurvey survey) {
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorTypeRecord> select = dsl.selectFrom(OFC_DATA_ERROR_TYPE)

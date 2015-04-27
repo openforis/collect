@@ -5,6 +5,7 @@ import java.util.Date;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorType;
+import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.commons.web.PersistedObjectForm;
 
 /**
@@ -26,9 +27,10 @@ public class DataErrorReportForm extends PersistedObjectForm<DataErrorReport> {
 
 	public DataErrorReportForm(DataErrorReport obj) {
 		super(obj);
-		DataErrorQuery query = obj.getQuery();
+		DataErrorQuery dataErrorQuery = obj.getQuery();
+		DataQuery query = dataErrorQuery.getQuery();
 		this.queryTitle = query.getTitle();
-		DataErrorType type = query.getType();
+		DataErrorType type = dataErrorQuery.getType();
 		this.typeCode = type.getCode();
 	}
 

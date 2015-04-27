@@ -3,12 +3,15 @@
  */
 package org.openforis.collect.datacleansing.manager;
 
+import java.util.Date;
+
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.persistence.DataCleansingStepDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +25,7 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	private DataQueryManager dataQueryManager;
 	
 	@Autowired
+	@Qualifier("dataCleansingStepDao")
 	@Override
 	public void setDao(DataCleansingStepDao dao) {
 		super.setDao(dao);
@@ -32,6 +36,15 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 		DataCleansingStep step = super.loadById(survey, id);
 		initializeQuery(step);
 		return step;
+	}
+	
+	@Override
+	public void save(DataCleansingStep step) {
+		step.setModifiedDate(new Date());
+		if (step.getId() == null) {
+			step.setCreationDate(new Date());
+		}
+		super.save(step);
 	}
 	
 	private void initializeQuery(DataCleansingStep q) {

@@ -12,6 +12,7 @@ import org.openforis.collect.datacleansing.persistence.DataErrorQueryDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,12 +24,12 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 
 	@Autowired
 	private DataErrorTypeManager dataErrorTypeManager;
-	
 	@Autowired
 	private DataQueryManager dataQueryManager;
 	
-	@Autowired
 	@Override
+	@Autowired
+	@Qualifier("dataErrorQueryDao")
 	public void setDao(DataErrorQueryDao dao) {
 		super.setDao(dao);
 	}
@@ -38,20 +39,24 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 		List<DataErrorQuery> result = super.loadBySurvey(survey);
 		if (result != null) {
 			for (DataErrorQuery q : result) {
-				initializeQuery(survey, q);
-				initializeErrorType(survey, q);
+				initializeItem(survey, q);
 			}
 		}
 		return result;
 	}
-	
+
 	@Override
 	public DataErrorQuery loadById(CollectSurvey survey, int id) {
 		DataErrorQuery obj = super.loadById(survey, id);
-		initializeErrorType(survey, obj);
+		initializeItem(survey, obj);
 		return obj;
 	}
 
+	private void initializeItem(CollectSurvey survey, DataErrorQuery q) {
+		initializeQuery(survey, q);
+		initializeErrorType(survey, q);
+	}
+	
 	private void initializeErrorType(CollectSurvey survey, DataErrorQuery q) {
 		DataErrorType errorType = dataErrorTypeManager.loadById(survey, q.getTypeId());
 		q.setType(errorType);

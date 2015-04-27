@@ -17,6 +17,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,8 +34,9 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 	@Autowired
 	private DataErrorReportItemDao errorReportItemDao;
 
-	@Autowired
 	@Override
+	@Autowired
+	@Qualifier("dataErrorReportDao")
 	public void setDao(DataErrorReportDao dao) {
 		super.setDao(dao);
 	}

@@ -15,6 +15,7 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.datacleansing.manager.DataErrorTypeManager;
+import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -38,6 +39,8 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 	@Autowired
 	private DataErrorReportGenerator reportGenerator;
 	@Autowired
+	private DataQueryManager dataQueryManager;
+	@Autowired
 	private DataErrorTypeManager dataErrorTypeManager;
 	@Autowired
 	private DataErrorQueryManager dataErrorQueryManager;
@@ -55,6 +58,10 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		updater = new RecordUpdater();
 		survey = importModel();
 		initRecords();
+		initDataErrorTypes();
+	}
+
+	private void initDataErrorTypes() {
 		invalidAttributeErrorType = new DataErrorType(survey);
 		invalidAttributeErrorType.setCode("invalid");
 		invalidAttributeErrorType.setLabel("Invalid attribute");
@@ -63,8 +70,7 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 	
 	@Test
 	public void testSimpleQuery() {
-		DataErrorQuery query = new DataErrorQuery(survey);
-		query.setType(invalidAttributeErrorType);
+		DataQuery query = new DataQuery(survey);
 		EntityDefinition treeDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree");
 		NumberAttributeDefinition dbhDef = (NumberAttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/dbh");
 		query.setTitle("Find trees with invalid DBH");
@@ -72,9 +78,15 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		query.setAttributeDefinition(dbhDef);
 		query.setConditions("dbh > 20");
 		
-		dataErrorQueryManager.save(query);
+		dataQueryManager.save(query);
 		
-		DataErrorReport report = reportGenerator.generate(query, Step.ENTRY);
+		DataErrorQuery dataErrorQuery = new DataErrorQuery(survey);
+		dataErrorQuery.setQuery(query);
+		dataErrorQuery.setType(invalidAttributeErrorType);
+		
+		dataErrorQueryManager.save(dataErrorQuery);
+		
+		DataErrorReport report = reportGenerator.generate(dataErrorQuery, Step.ENTRY);
 		
 		DataErrorReport reloadedReport = dataErrorReportManager.loadById(survey, report.getId());
 		

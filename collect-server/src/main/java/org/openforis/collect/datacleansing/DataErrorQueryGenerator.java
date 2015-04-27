@@ -21,17 +21,20 @@ public class DataErrorQueryGenerator {
 	private static final String MISSING_DATA_CONDITION_FORMAT = "idm:blank(%s)";
 
 	public List<DataErrorQuery> generateMissingDataQueries(final CollectSurvey survey, final DataErrorType type) {
-		List<DataErrorQuery> result = new ArrayList<DataErrorQuery>();
+		final List<DataErrorQuery> result = new ArrayList<DataErrorQuery>();
 		survey.getSchema().traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
 				if (def instanceof AttributeDefinition) {
 					if (StringUtils.isNotBlank(def.getMinCountExpression())) {
-						DataErrorQuery query = new DataErrorQuery(survey);
+						DataQuery query = new DataQuery(survey);
 						query.setTitle(String.format(MISSING_DATA_QUERY_TITLE_FORMAT, def.getName()));
-						query.setType(type);
 						query.setAttributeDefinition((AttributeDefinition) def);
 						query.setEntityDefinition(def.getParentEntityDefinition());
 						query.setConditions(String.format(MISSING_DATA_CONDITION_FORMAT, def.getName()));
+						DataErrorQuery dataErrorQuery = new DataErrorQuery(survey);
+						dataErrorQuery.setQuery(query);
+						dataErrorQuery.setType(type);
+						result.add(dataErrorQuery);
 					}
 				}
 			}
@@ -61,14 +64,17 @@ public class DataErrorQueryGenerator {
 			sb.append(" and ");
 		}
 		sb.append(check.getExpression());
-		DataErrorQuery query = new DataErrorQuery((CollectSurvey) def.getSurvey());
+		CollectSurvey survey = (CollectSurvey) def.getSurvey();
+		DataQuery query = new DataQuery(survey);
 		//TODO
 		query.setTitle("");
-//				query.setType(type);
 		query.setAttributeDefinition((AttributeDefinition) def);
 		query.setEntityDefinition(def.getParentEntityDefinition());
 		query.setConditions(sb.toString());
-		return query;
+		DataErrorQuery dataErrorQuery = new DataErrorQuery(survey);
+		dataErrorQuery.setQuery(query);
+//		dataErrorQuery.setType(type);
+		return dataErrorQuery;
 	}
 	
 }

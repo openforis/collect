@@ -18,11 +18,13 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
+@Component("dataErrorQueryDao")
 @Transactional
 public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErrorQuery, DataErrorQueryDao.JooqDSLContext> {
 

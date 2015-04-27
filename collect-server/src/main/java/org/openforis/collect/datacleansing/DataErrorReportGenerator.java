@@ -30,7 +30,7 @@ public class DataErrorReportGenerator {
 		DataErrorReport report = new DataErrorReport(survey);
 		report.setQuery(query);
 		reportManager.save(report);
-		DataQueryResultIterator it = queryExecutor.execute(query, recordStep);
+		DataQueryResultIterator it = queryExecutor.execute(query.getQuery(), recordStep);
 		ItemBatchPersister batchPersister = new ItemBatchPersister(report);
 		while (it.hasNext()) {
 			Attribute<?, ?> attr = (Attribute<?, ?>) it.next();

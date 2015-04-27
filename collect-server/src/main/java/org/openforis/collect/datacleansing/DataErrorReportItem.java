@@ -37,7 +37,7 @@ public class DataErrorReportItem extends DataQueryResultItem {
 	private Status status;
 
 	public DataErrorReportItem(DataErrorReport report) {
-		super(report.getQuery());
+		super(report.getQuery().getQuery());
 		this.report = report;
 	}
 	
