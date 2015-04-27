@@ -221,36 +221,6 @@
       		</row>
       		<row>
       			<fieldErrorHandler
-      				message="@load(vmsgs['headingLabel'])">
-      				<label
-      					use="org.openforis.collect.designer.component.FieldLabel"
-      					value="${labels.survey.schema.node.heading_label}"
-      					languageCode="@load(vm.currentLanguageCode)" />
-      			</fieldErrorHandler>
-      			<fieldErrorHandler
-      				message="@load(vmsgs['headingLabel'])">
-      				<textbox width="250px"
-      					value="@bind(fx.headingLabel)"
-      					onChange="@command('applyChanges')" />
-      			</fieldErrorHandler>
-      		</row>
-      		<row visible="${not vm.rootEntity}">
-      			<fieldErrorHandler
-      				message="@load(vmsgs['numberLabel'])">
-      				<label
-      					use="org.openforis.collect.designer.component.FieldLabel"
-      					value="${labels.survey.schema.node.number_label}"
-      					languageCode="@load(vm.currentLanguageCode)" />
-      			</fieldErrorHandler>
-      			<fieldErrorHandler
-      				message="@load(vmsgs['numberLabel'])">
-      				<textbox width="250px"
-      					value="@bind(fx.numberLabel)"
-      					onChange="@command('applyChanges')" />
-      			</fieldErrorHandler>
-      		</row>
-      		<row>
-      			<fieldErrorHandler
       				message="@load(vmsgs['description'])">
       				<label
       					use="org.openforis.collect.designer.component.FieldLabel"
@@ -283,6 +253,36 @@
       			<column />
       		</columns>
       		<rows>
+      			<row>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['headingLabel'])">
+	      				<label
+	      					use="org.openforis.collect.designer.component.FieldLabel"
+	      					value="${labels.survey.schema.node.heading_label}"
+	      					languageCode="@load(vm.currentLanguageCode)" />
+	      			</fieldErrorHandler>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['headingLabel'])">
+	      				<textbox width="250px"
+	      					value="@bind(fx.headingLabel)"
+	      					onChange="@command('applyChanges')" />
+	      			</fieldErrorHandler>
+	      		</row>
+	      		<row visible="${not vm.rootEntity}">
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['numberLabel'])">
+	      				<label
+	      					use="org.openforis.collect.designer.component.FieldLabel"
+	      					value="${labels.survey.schema.node.number_label}"
+	      					languageCode="@load(vm.currentLanguageCode)" />
+	      			</fieldErrorHandler>
+	      			<fieldErrorHandler
+	      				message="@load(vmsgs['numberLabel'])">
+	      				<textbox width="250px"
+	      					value="@bind(fx.numberLabel)"
+	      					onChange="@command('applyChanges')" />
+	      			</fieldErrorHandler>
+	      		</row>
       			<row>
 	                <fieldErrorHandler
 	                	message="@load(vmsgs['interviewPromptLabel'])">
