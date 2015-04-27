@@ -6,6 +6,7 @@ package org.openforis.collect.concurrency {
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.CollectJobEvent;
 	import org.openforis.collect.event.EventDispatcherFactory;
@@ -86,8 +87,8 @@ package org.openforis.collect.concurrency {
 				if ( job.running && progress <= 100 ) {
 					view.currentState = CollectJobStatusPopUp.STATE_RUNNING;
 					view.progressBar.setProgress(progress, 100);
-					var progressText:String = Message.get("job.running");
-					view.progressLabel.text = progressText;
+					view.progressLabel.text = Message.get("job.running");
+					view.cancelButton.visible = view.cancelButton.includeInLayout = Application.user.canCancelApplicationLockingJob;
 				} else {
 					switch ( job.status ) {
 						case JobProxy$Status.COMPLETED:

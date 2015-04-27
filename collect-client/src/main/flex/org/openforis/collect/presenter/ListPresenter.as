@@ -121,7 +121,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function jobCompleteHandler(event:CollectJobEvent):void {
-			if (event.job is SurveyLockingJobProxy && event.job.completed) {
+			if (event.job is SurveyLockingJobProxy) {
 				reloadRecordSummaries();
 			}
 		}

@@ -55,13 +55,9 @@ public class DataImportService {
 			resetJobs();
 			this.summaryJob = job;
 			
-			log.info("Starting summary creation job");
-
 			jobManager.start(job);
-			
-			log.info("Summary creation Job started");
 		} else {
-			log.info("Summary creation job already running");
+			log.warn("Summary creation job already running");
 		}
 		return getCurrentJob();
 	}
@@ -81,11 +77,9 @@ public class DataImportService {
 			resetJobs();
 			this.dataRestoreJob = job;
 			
-			log.info("Starting data restore job");
 			jobManager.start(job);
-			log.info("Data restore job started");
 		} else {
-			log.info("Data restore job already running");
+			log.warn("Data restore job already running");
 		}
 		return getCurrentJob();
 	}
@@ -94,13 +88,10 @@ public class DataImportService {
 	public JobProxy getCurrentJob() {
 		JobProxy proxy = null;
 		if ( summaryJob != null ) {
-			log.info("Active job: summary");
 			proxy = new DataRestoreSummaryJobProxy(summaryJob);
 		} else if ( dataRestoreJob != null) {
-			log.info("Active job: data restore");
 			proxy = new DataRestoreJobProxy(dataRestoreJob);
 		}
-		log.info("Job status: " + (proxy == null ? " inactive": proxy.getStatus()));
 		return proxy;
 	}
 	
