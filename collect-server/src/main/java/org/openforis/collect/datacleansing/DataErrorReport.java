@@ -1,7 +1,6 @@
 package org.openforis.collect.datacleansing;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.model.CollectSurvey;
@@ -18,12 +17,10 @@ public class DataErrorReport extends PersistedSurveyObject {
 	
 	private int queryId;
 	private DataErrorQuery query;
-	private Date creationDate;	
 	private List<DataErrorReportItem> items;
 	
 	public DataErrorReport(CollectSurvey survey) {
 		super(survey);
-		creationDate = new Date();
 		items = new ArrayList<DataErrorReportItem>();
 	}
 	
@@ -52,14 +49,6 @@ public class DataErrorReport extends PersistedSurveyObject {
 		this.queryId = query.getId();
 	}
 	
-	public Date getCreationDate() {
-		return creationDate;
-	}
-
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
-
 	public List<DataErrorReportItem> getItems() {
 		return items;
 	}

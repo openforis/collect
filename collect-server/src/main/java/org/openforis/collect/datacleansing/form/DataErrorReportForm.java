@@ -1,22 +1,17 @@
 package org.openforis.collect.datacleansing.form;
 
-import java.util.Date;
-
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorType;
 import org.openforis.collect.datacleansing.DataQuery;
-import org.openforis.commons.web.PersistedObjectForm;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataErrorReportForm extends PersistedObjectForm<DataErrorReport> {
+public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> {
 
-	private Date creationDate;	
-	
 	//calculated members
 	private String typeCode;
 	private String queryTitle;
@@ -42,8 +37,4 @@ public class DataErrorReportForm extends PersistedObjectForm<DataErrorReport> {
 		return queryTitle;
 	}
 
-	public Date getCreationDate() {
-		return creationDate;
-	}
-	
 }

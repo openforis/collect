@@ -2,32 +2,24 @@ package org.openforis.collect.datacleansing.form;
 
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.openforis.collect.datacleansing.DataErrorQuery;
-import org.openforis.commons.web.PersistedObjectForm;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataErrorQueryForm extends PersistedObjectForm<DataErrorQuery> {
+public class DataErrorQueryForm extends DataCleansingItemForm<DataErrorQuery> {
 
 	@NotNull
 	private Integer typeId;
-	@NotBlank
-	private String title;
-	
-	private String description;
 	@NotNull
-	private Integer entityDefinitionId;
-	@NotNull
-	private Integer attributeDefinitionId;
-	@NotBlank
-	private String conditions;
+	private Integer queryId;
 	
 	//calculated members
 	private String typeCode;
+	private String queryTitle;
+	private String queryDescription;
 
 	public DataErrorQueryForm() {
 		super();
@@ -36,10 +28,20 @@ public class DataErrorQueryForm extends PersistedObjectForm<DataErrorQuery> {
 	public DataErrorQueryForm(DataErrorQuery query) {
 		super(query);
 		typeCode = query == null ? null: query.getType() == null ? null: query.getType().getCode();
+		queryTitle = query == null ? null: query.getQuery().getTitle();
+		queryDescription = query == null ? null: query.getQuery().getDescription();
 	}
 	
 	public String getTypeCode() {
 		return typeCode;
+	}
+	
+	public String getQueryTitle() {
+		return queryTitle;
+	}
+	
+	public String getQueryDescription() {
+		return queryDescription;
 	}
 	
 	public Integer getTypeId() {
@@ -50,44 +52,12 @@ public class DataErrorQueryForm extends PersistedObjectForm<DataErrorQuery> {
 		this.typeId = typeId;
 	}
 	
-	public String getTitle() {
-		return title;
+	public Integer getQueryId() {
+		return queryId;
 	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	
+	public void setQueryId(Integer queryId) {
+		this.queryId = queryId;
 	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Integer getEntityDefinitionId() {
-		return entityDefinitionId;
-	}
-
-	public void setEntityDefinitionId(Integer entityDefinitionId) {
-		this.entityDefinitionId = entityDefinitionId;
-	}
-
-	public Integer getAttributeDefinitionId() {
-		return attributeDefinitionId;
-	}
-
-	public void setAttributeDefinitionId(Integer attributeDefinitionId) {
-		this.attributeDefinitionId = attributeDefinitionId;
-	}
-
-	public String getConditions() {
-		return conditions;
-	}
-
-	public void setConditions(String conditions) {
-		this.conditions = conditions;
-	}
-
+	
 }

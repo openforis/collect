@@ -2,6 +2,8 @@ Collect = function() {
 	this.activeSurvey = null;
 };
 
+Collect.VERSION = "${PROJECT_VERSION}";
+
 Collect.SURVEY_CHANGED = "surveyChanged";
 
 Collect.prototype.init = function() {
@@ -14,14 +16,14 @@ Collect.prototype.init = function() {
 	this.dataErrorReportService = new Collect.DataErrorReportService();
 	this.geoDataService = new Collect.GeoDataService();
 	this.dataUpdateService = new Collect.DataUpdateService();
+	this.dataCleansingStepService = new Collect.DataCleansingStepService();
 	
-	this.dataQueryTestResultDataGrid = null;
-	
+	this.initDataQueryPanel();
 	this.initDataErrorTypePanel();
 	this.initDataErrorQueryPanel();
 	this.initDataErrorReportsPanel();
+	this.initDataUpdatePanel();
 	this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
-	this.dataUpdateComposer = null;
 	
 	this.initGlobalEventHandlers();
 	
@@ -55,9 +57,9 @@ Collect.prototype.initGlobalEventHandlers = function() {
 		$this.initDataErrorTypeGrid();
 		$this.initDataErrorQueryGrid();
 		$this.initDataErrorReportGrid();
-		$this.initDataQueryPanel();
+		$this.initDataQueryGrid();
+		$this.initDataCleansingStepGrid();
 		$this.initMapPanel();
-		$this.dataUpdateComposer = new Collect.DataCleansing.DataUpdatePanelComposer($("#data-update-panel"));
 		$("#home-survey-selector-button").text($this.activeSurvey.name);
 	});
 	EventBus.addEventListener(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_SAVED, function() {
@@ -78,53 +80,94 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	EventBus.addEventListener(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_DELETED, function() {
 		$this.dataErrorReportDataGrid.refresh();
 	});
+	EventBus.addEventListener(Collect.DataQueryDialogController.DATA_QUERY_SAVED, function() {
+		$this.dataQueryDataGrid.refresh();
+	});
+	EventBus.addEventListener(Collect.DataQueryDialogController.DATA_QUERY_DELETED, function() {
+		$this.dataQueryDataGrid.refresh();
+	});
+	EventBus.addEventListener(Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_SAVED, function() {
+		$this.dataCleansingStepDataGrid.refresh();
+	});
+	EventBus.addEventListener(Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_DELETED, function() {
+		$this.dataCleansingStepDataGrid.refresh();
+	});
 };
 
 Collect.prototype.initDataQueryPanel = function() {
 	var $this = this;
-	var container = $("#data-query-panel");
-	var form = container.find("form");
-	var formController = new Collect.DataQueryFormController(form);
-	formController.init(function() {
-		container.find(".test-btn").click($.proxy(function() {
-			var query = formController.extractJSONItem();
-			$this.dataQueryService.startTest(query, function() {
-				var jobDialog = new OF.UI.JobDialog();
-				new OF.JobMonitor("datacleansing/dataquery/test-job.json", function() {
-					jobDialog.close();
-					$this.dataQueryTestResultDataGrid.refresh();
-					$this.dataQueryTestResultDataGrid.$container.show();
-				});
-			});
-		}, $this));
-		container.find(".export-btn").click($.proxy(function() {
-			var query = formController.extractJSONItem();
-			$this.dataQueryService.startExport(query, function() {
-				var jobDialog = new OF.UI.JobDialog();
-				new OF.JobMonitor("datacleansing/dataquery/export-job.json", function() {
-					jobDialog.close();
-					$this.dataQueryService.downloadResult();
-				});
-			});
-		}, $this));
-	});
+	var panel = $("#data-query-panel");
+	panel.find(".new-btn").click($.proxy(function() {
+		var dialogController = new Collect.DataQueryDialogController();
+		dialogController.open();
+	}, this));
 	
-	var testResultGridContainer = container.find(".test-result-grid");
-	testResultGridContainer.bootstrapTable({
-	    url: "datacleansing/dataquery/test-result.json",
-	    cache: false,
-	    clickToSelect: true,
-	    height: 200,
-	    columns: [
-			{field: "key1", title: "Key1"},
-			{field: "key2", title: "Key2"},
-			{field: "key3", title: "Key3"},
-			{field: "nodePath", title: "Path"},
-			{field: "attributeValue", title: "Value"}
-		]
-	});
-	$this.dataQueryTestResultDataGrid = testResultGridContainer.data('bootstrap.table');
-	$this.dataQueryTestResultDataGrid.$container.hide();
+	panel.find(".edit-btn").click($.proxy(function() {
+		var $this = this;
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
+		var dialogController = new Collect.DataQueryDialogController();
+		dialogController.open(selectedItem);
+	}, this));
+	
+	panel.find(".delete-btn").click($.proxy(function() {
+		var $this = this;
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
+		OF.UI.confirm("Do you want to delete this Data Query?", function() {
+			collect.dataQueryService.remove(selectedItem.id, function() {
+				EventBus.dispatch(Collect.DataQueryDialogController.DATA_QUERY_DELETED, $this);
+			});
+		});
+	}, this));
+	
+	function getSelectedItem() {
+		var $this = this;
+		var selections = $this.dataQueryDataGrid.getSelections();
+		return selections.length == 0 ? null : selections[0];
+	}
+};
+
+Collect.prototype.initDataUpdatePanel = function() {
+	var $this = this;
+	var panel = $("#data-update-panel");
+	panel.find(".new-btn").click($.proxy(function() {
+		var dialogController = new Collect.DataCleansingStepDialogController();
+		dialogController.open();
+	}, this));
+	
+	panel.find(".edit-btn").click($.proxy(function() {
+		var $this = this;
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
+		var dialogController = new Collect.DataCleansingStepDialogController();
+		dialogController.open(selectedItem);
+	}, this));
+	
+	panel.find(".delete-btn").click($.proxy(function() {
+		var $this = this;
+		var selectedItem = $.proxy(getSelectedItem, $this)();
+		if (selectedItem == null) {
+			return;
+		}
+		OF.UI.confirm("Do you want to delete this Data Cleansing Step?", function() {
+			collect.dataCleansingStepService.remove(selectedItem.id, function() {
+				EventBus.dispatch(Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_DELETED, $this);
+			});
+		});
+	}, this));
+	
+	function getSelectedItem() {
+		var $this = this;
+		var selections = $this.dataCleansingStepDataGrid.getSelections();
+		return selections.length == 0 ? null : selections[0];
+	}
 };
 
 Collect.prototype.initDataErrorReportsPanel = function() {
@@ -235,9 +278,49 @@ Collect.prototype.initMapPanel = function() {
 	this.mapPanelComposer.init();
 };
 
+Collect.prototype.initDataQueryGrid = function() {
+	var $this = this;
+	var gridId = 'dataquerygrid';
+	var gridContainer = $("#" + gridId);
+	gridContainer.bootstrapTable({
+	    url: "datacleansing/dataqueries/list.json",
+	    cache: false,
+	    clickToSelect: true,
+	    columns: [
+          	{field: "selected", title: "", radio: true},
+			{field: "id", title: "Id", visible: false},
+			{field: "title", title: "Title"},
+			{field: "creationDate", title: "Creation Date"},
+			{field: "modifiedDate", title: "Modified Date"}
+		]
+	});
+	$this.dataQueryDataGrid = gridContainer.data('bootstrap.table');
+};
+
+Collect.prototype.initDataCleansingStepGrid = function() {
+	var $this = this;
+	var gridId = 'datacleansingstepgrid';
+	var gridContainer = $("#" + gridId);
+	gridContainer.bootstrapTable({
+	    url: "datacleansing/datacleansingsteps/list.json",
+	    cache: false,
+	    clickToSelect: true,
+	    columns: [
+          	{field: "selected", title: "", radio: true},
+			{field: "id", title: "Id", visible: false},
+			{field: "title", title: "Title"},
+			{field: "creationDate", title: "Creation Date"},
+			{field: "modifiedDate", title: "Modified Date"}
+		]
+	});
+	$this.dataCleansingStepDataGrid = gridContainer.data('bootstrap.table');
+};
+
 Collect.prototype.initDataErrorTypeGrid = function() {
 	var $this = this;
-	$('#dataerrortypegrid').bootstrapTable({
+	var gridId = 'dataerrortypegrid';
+	var gridContainer = $("#" + gridId);
+	gridContainer.bootstrapTable({
 	    url: "datacleansing/dataerrortypes/list.json",
 	    cache: false,
 	    clickToSelect: true,
@@ -249,12 +332,14 @@ Collect.prototype.initDataErrorTypeGrid = function() {
 			{field: "description", title: "Description"}
 		]
 	});
-	$this.dataErrorTypeDataGrid = $('#dataerrortypegrid').data('bootstrap.table');
+	$this.dataErrorTypeDataGrid = gridContainer.data('bootstrap.table');
 };
 
 Collect.prototype.initDataErrorQueryGrid = function() {
 	var $this = this;
-	$('#dataerrorquerygrid').bootstrapTable({
+	var gridId = 'dataerrorquerygrid';
+	var gridContainer = $("#" + gridId);
+	gridContainer.bootstrapTable({
 	    url: "datacleansing/dataerrorqueries/list.json",
 	    cache: false,
 	    clickToSelect: true,
@@ -262,17 +347,20 @@ Collect.prototype.initDataErrorQueryGrid = function() {
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
 			{field: "typeCode", title: "Error Type"},
-			{field: "title", title: "Title"},
-			{field: "description", title: "Description"}
+			{field: "queryTitle", title: "Query Title"},
+			{field: "queryDescription", title: "Query Description"},
+			{field: "creationDate", title: "Creation Date"},
+			{field: "modifiedDate", title: "Modified Date"}
 		]
 	});
-	$this.dataErrorQueryDataGrid = $('#dataerrorquerygrid').data('bootstrap.table');
+	$this.dataErrorQueryDataGrid = gridContainer.data('bootstrap.table');
 };
 
 Collect.prototype.initDataErrorReportGrid = function() {
 	var $this = this;
-	var el = $('#data-error-report-grid');
-	el.bootstrapTable({
+	var gridId = 'data-error-report-grid';
+	var gridContainer = $("#" + gridId);
+	gridContainer.bootstrapTable({
 	    url: "datacleansing/dataerrorreports/list.json",
 	    cache: false,
 	    clickToSelect: true,
@@ -284,7 +372,7 @@ Collect.prototype.initDataErrorReportGrid = function() {
 			{field: "creationDate", title: "Date"}
 		]
 	});
-	$this.dataErrorReportDataGrid = el.data('bootstrap.table');
+	$this.dataErrorReportDataGrid = gridContainer.data('bootstrap.table');
 };
 
 Collect.prototype.setActiveSurvey = function(surveySummary) {

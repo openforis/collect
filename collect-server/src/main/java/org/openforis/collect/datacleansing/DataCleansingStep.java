@@ -1,7 +1,5 @@
 package org.openforis.collect.datacleansing;
 
-import java.util.Date;
-
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.openforis.idm.metamodel.Survey;
 
@@ -16,11 +14,9 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	
 	private String title;
 	private String description;
-	private Date creationDate;
-	private Date modifiedDate;
-	
 	private Integer queryId;
 	private String fixExpression;
+	
 	private transient DataQuery query;
 	
 	public DataCleansingStep(Survey survey) {
@@ -52,22 +48,6 @@ public class DataCleansingStep extends PersistedSurveyObject {
 		this.description = description;
 	}
 
-	public Date getCreationDate() {
-		return creationDate;
-	}
-
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
-
-	public Date getModifiedDate() {
-		return modifiedDate;
-	}
-
-	public void setModifiedDate(Date modifiedDate) {
-		this.modifiedDate = modifiedDate;
-	}
-	
 	public void setQueryId(Integer queryId) {
 		this.queryId = queryId;
 	}

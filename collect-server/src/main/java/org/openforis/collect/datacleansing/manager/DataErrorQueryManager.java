@@ -3,8 +3,6 @@
  */
 package org.openforis.collect.datacleansing.manager;
 
-import java.util.List;
-
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorType;
 import org.openforis.collect.datacleansing.DataQuery;
@@ -19,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @author S. Ricci
  *
  */
-@Component
+@Component("dataErrorQueryManager")
 public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataErrorQuery, DataErrorQueryDao> {
 
 	@Autowired
@@ -35,35 +33,19 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 	}
 	
 	@Override
-	public List<DataErrorQuery> loadBySurvey(CollectSurvey survey) {
-		List<DataErrorQuery> result = super.loadBySurvey(survey);
-		if (result != null) {
-			for (DataErrorQuery q : result) {
-				initializeItem(survey, q);
-			}
-		}
-		return result;
-	}
-
-	@Override
-	public DataErrorQuery loadById(CollectSurvey survey, int id) {
-		DataErrorQuery obj = super.loadById(survey, id);
-		initializeItem(survey, obj);
-		return obj;
-	}
-
-	private void initializeItem(CollectSurvey survey, DataErrorQuery q) {
-		initializeQuery(survey, q);
-		initializeErrorType(survey, q);
+	protected void initializeItem(DataErrorQuery q) {
+		super.initializeItem(q);
+		initializeQuery(q);
+		initializeErrorType(q);
 	}
 	
-	private void initializeErrorType(CollectSurvey survey, DataErrorQuery q) {
-		DataErrorType errorType = dataErrorTypeManager.loadById(survey, q.getTypeId());
+	private void initializeErrorType(DataErrorQuery q) {
+		DataErrorType errorType = dataErrorTypeManager.loadById((CollectSurvey) q.getSurvey(), q.getTypeId());
 		q.setType(errorType);
 	}
 	
-	private void initializeQuery(CollectSurvey survey, DataErrorQuery q) {
-		DataQuery query = dataQueryManager.loadById(survey, q.getQueryId());
+	private void initializeQuery(DataErrorQuery q) {
+		DataQuery query = dataQueryManager.loadById((CollectSurvey) q.getSurvey(), q.getQueryId());
 		q.setQuery(query);
 	}
 }

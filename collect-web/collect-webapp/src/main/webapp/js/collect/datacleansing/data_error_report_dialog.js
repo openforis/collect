@@ -53,10 +53,7 @@ Collect.DataErrorReportDialogController.prototype.initFormElements = function(ca
 		}
 		{
 			var select = $this.content.find('select[name="recordStep"]');
-			OF.UI.Forms.populateSelect(select, [{name: "ENTRY", label: "Data Entry"}, 
-			                                    {name: "CLEANSING", label: "Data Cleansing"},
-			                                    {name: "ANALYSIS", label: "Data Analysis"}
-			                                    ], "name", "label");
+			OF.UI.Forms.populateSelect(select, Collect.DataCleansing.WORKFLOW_STEPS, "name", "label");
 			select.selectpicker();
 			$this.recordStepSelectPicker = select.data().selectpicker;
 		}

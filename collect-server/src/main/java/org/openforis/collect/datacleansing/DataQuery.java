@@ -1,7 +1,5 @@
 package org.openforis.collect.datacleansing;
 
-import java.util.Date;
-
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -17,8 +15,6 @@ public class DataQuery extends PersistedSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Date creationDate;
-	private Date modifiedDate;
 	private String title;
 	private String description;
 	private int entityDefinitionId;
@@ -45,22 +41,6 @@ public class DataQuery extends PersistedSurveyObject {
 	
 	public void setEntityDefinition(EntityDefinition def) {
 		entityDefinitionId = def.getId();
-	}
-	
-	public Date getCreationDate() {
-		return creationDate;
-	}
-
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
-
-	public Date getModifiedDate() {
-		return modifiedDate;
-	}
-	
-	public void setModifiedDate(Date modifiedDate) {
-		this.modifiedDate = modifiedDate;
 	}
 	
 	public String getTitle() {

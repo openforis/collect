@@ -41,21 +41,6 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 		super.setDao(dao);
 	}
 	
-	public DataErrorReport loadById(CollectSurvey survey, int id) {
-		DataErrorReport report = super.loadById(survey, id);
-		initQuery(survey, report);
-		return report;
-	}
-
-	@Override
-	public List<DataErrorReport> loadBySurvey(CollectSurvey survey) {
-		List<DataErrorReport> reports = super.loadBySurvey(survey);
-		for (DataErrorReport report : reports) {
-			initQuery(survey, report);
-		}
-		return reports;
-	}
-	
 	public void saveItems(DataErrorReport report, List<DataErrorReportItem> items) {
 		errorReportItemDao.insert(report, items);
 	}
@@ -76,8 +61,14 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 		return items;
 	}
 
-	private void initQuery(CollectSurvey survey, DataErrorReport report) {
-		DataErrorQuery query = errorQueryManager.loadById(survey, report.getQueryId());
+	@Override
+	protected void initializeItem(DataErrorReport i) {
+		super.initializeItem(i);
+		initQuery(i);
+	}
+	
+	private void initQuery(DataErrorReport report) {
+		DataErrorQuery query = errorQueryManager.loadById((CollectSurvey) report.getSurvey(), report.getQueryId());
 		report.setQuery(query);
 	}
 	

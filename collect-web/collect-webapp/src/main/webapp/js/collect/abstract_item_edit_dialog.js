@@ -73,7 +73,7 @@ Collect.AbstractItemEditDialogController.prototype.initContent = function(callba
 
 Collect.AbstractItemEditDialogController.prototype.loadContent = function(callback) {
 	var $this = this;
-	OF.Remote.loadHtml($this.contentUrl, 
+	OF.Remote.loadHtml($this.contentUrl + "?v=" + Collect.VERSION, 
 		function(content) {
 			$this.content = content;
 			callback();

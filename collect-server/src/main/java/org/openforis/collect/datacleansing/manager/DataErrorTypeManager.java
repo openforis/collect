@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * @author S. Ricci
  *
  */
-@Component
+@Component("dataErrorTypeManager")
 public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorType, DataErrorTypeDao> {
 	
 	private ErrorTypeCache cache;

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @author S. Ricci
  *
  */
-@Component
+@Component("dataQueryManager")
 public class DataQueryManager extends AbstractSurveyObjectManager<DataQuery, DataQueryDao> {
 
 	@Override

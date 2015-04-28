@@ -1,5 +1,6 @@
 package org.openforis.collect.manager;
 
+import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.model.CollectSurvey;
@@ -31,21 +32,32 @@ public abstract class AbstractSurveyObjectManager
 	
 	public T loadById(CollectSurvey survey, int id) {
 		T obj = dao.loadById(survey, id);
+		initializeItem(obj);
 		return obj;
 	}
 
 	public List<T> loadBySurvey(CollectSurvey survey) {
 		List<T> result = dao.loadBySurvey(survey);
+		for (T item : result) {
+			initializeItem(item);
+		}
 		return result;
 	}
 	
+	protected void initializeItem(T i) {
+	}
+
 	@Override
 	public void save(T obj) {
+		Date now = new Date();
+		obj.setModifiedDate(now);
 		if (obj.getId() == null) {
+			obj.setCreationDate(now);
 			dao.insert(obj);
 		} else {
 			dao.update(obj);
 		}
+		initializeItem(obj);
 	}
 	
 	@Override

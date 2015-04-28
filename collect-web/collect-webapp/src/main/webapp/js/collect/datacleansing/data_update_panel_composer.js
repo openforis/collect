@@ -12,10 +12,7 @@ Collect.DataCleansing.DataUpdatePanelComposer.prototype.init = function(callback
 	//init record step select picker
 	{
 		var select = $this.form.find('select[name="recordStep"]');
-		OF.UI.Forms.populateSelect(select, [{name: "ENTRY", label: "Data Entry"}, 
-		                                    {name: "CLEANSING", label: "Data Cleansing"},
-		                                    {name: "ANALYSIS", label: "Data Analysis"}
-		                                    ], "name", "label");
+		OF.UI.Forms.populateSelect(select, Collect.DataCleansing.WORKFLOW_STEPS, "name", "label");
 		select.selectpicker();
 		$this.recordStepSelectPicker = select.data().selectpicker;
 	}

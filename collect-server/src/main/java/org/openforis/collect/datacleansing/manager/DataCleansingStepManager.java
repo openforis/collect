@@ -3,8 +3,6 @@
  */
 package org.openforis.collect.datacleansing.manager;
 
-import java.util.Date;
-
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.persistence.DataCleansingStepDao;
@@ -32,24 +30,14 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	}
 	
 	@Override
-	public DataCleansingStep loadById(CollectSurvey survey, int id) {
-		DataCleansingStep step = super.loadById(survey, id);
-		initializeQuery(step);
-		return step;
+	protected void initializeItem(DataCleansingStep i) {
+		super.initializeItem(i);
+		initializeQuery(i);
 	}
 	
-	@Override
-	public void save(DataCleansingStep step) {
-		step.setModifiedDate(new Date());
-		if (step.getId() == null) {
-			step.setCreationDate(new Date());
-		}
-		super.save(step);
-	}
-	
-	private void initializeQuery(DataCleansingStep q) {
-		DataQuery query = dataQueryManager.loadById((CollectSurvey) q.getSurvey(), q.getQueryId());
-		q.setQuery(query);
+	private void initializeQuery(DataCleansingStep step) {
+		DataQuery query = dataQueryManager.loadById((CollectSurvey) step.getSurvey(), step.getQueryId());
+		step.setQuery(query);
 	}
 
 }

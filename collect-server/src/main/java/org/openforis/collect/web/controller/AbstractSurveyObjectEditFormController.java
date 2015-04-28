@@ -28,6 +28,8 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 			M extends AbstractSurveyObjectManager<T, ?>>  
 			extends AbstractPersistedObjectEditFormController<T, F, M> {
 	
+	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate"};
+	
 	@Autowired
 	protected SessionManager sessionManager;
 	
@@ -75,7 +77,7 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 			} else {
 				item = itemManager.loadById(survey, form.getId());
 			}
-			form.copyTo(item);
+			form.copyTo(item, IGNORE_FIELDS);
 			itemManager.save(item);
 			F responseForm = createFormInstance(item);
 			response = new SimpleFormUpdateResponse(responseForm);

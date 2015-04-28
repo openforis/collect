@@ -5,17 +5,25 @@
 				<button type="button" class="close" data-dismiss="modal">
 					<span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
 				</button>
-				<h4 class="modal-title">Data Error Query</h4>
+				<h4 class="modal-title">Data Cleansing Step</h4>
 			</div>
 			<div class="modal-body">
 				<form role="form">
 					<div class="form-group">
-			    		<label class="control-label">Error type</label>
-						<select class="form-control selectpicker" name="typeId"></select>
+				   		<label class="control-label">Title</label>
+						<input type="text" class="form-control" name="title" />
+					</div>
+					<div class="form-group">
+				   		<label class="control-label">Description</label>
+						<input type="text" class="form-control" name="description" />
 					</div>
 					<div class="form-group">
 			    		<label class="control-label">Query</label>
 						<select class="form-control selectpicker" name="queryId"></select>
+					</div>
+					<div class="form-group">
+				   		<label class="control-label">Update With Value</label>
+						<textarea class="form-control" name="fixExpression" rows="5"></textarea>
 					</div>
 				</form>
 			</div>

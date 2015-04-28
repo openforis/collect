@@ -4,21 +4,24 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.openforis.collect.datacleansing.DataQuery;
-import org.openforis.commons.web.SimpleObjectForm;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataQueryForm extends SimpleObjectForm<DataQuery> {
+public class DataQueryForm extends DataCleansingItemForm<DataQuery> {
 
+	@NotBlank
+	private String title;
 	@NotNull
 	private Integer entityDefinitionId;
 	@NotNull
 	private Integer attributeDefinitionId;
 	@NotBlank
 	private String conditions;
+
+	private String description;
 	
 	public DataQueryForm() {
 		super();
@@ -26,6 +29,14 @@ public class DataQueryForm extends SimpleObjectForm<DataQuery> {
 	
 	public DataQueryForm(DataQuery query) {
 		super(query);
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String title) {
+		this.title = title;
 	}
 	
 	public Integer getEntityDefinitionId() {
@@ -51,5 +62,13 @@ public class DataQueryForm extends SimpleObjectForm<DataQuery> {
 	public void setConditions(String conditions) {
 		this.conditions = conditions;
 	}
-
+	
+	public String getDescription() {
+		return description;
+	}
+	
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 }

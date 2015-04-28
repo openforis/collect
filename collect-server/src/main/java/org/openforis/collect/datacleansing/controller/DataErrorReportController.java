@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportGenerator;
@@ -20,8 +21,8 @@ import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker.Status;
-import org.openforis.concurrency.spring.SpringJobManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -39,9 +40,10 @@ import org.springframework.web.context.WebApplicationContext;
 public class DataErrorReportController extends AbstractSurveyObjectEditFormController<DataErrorReport, DataErrorReportForm, DataErrorReportManager> {
 	
 	@Autowired
+	@Qualifier("dataErrorQueryManager")
 	private DataErrorQueryManager dataErrorQueryManager;
 	@Autowired
-	private SpringJobManager springJobManager;
+	private CollectJobManager collectJobManager;
 	
 	private ReportGenerationJob generationJob;
 	
@@ -66,10 +68,10 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	Response generate(@RequestParam int queryId, @RequestParam Step recordStep) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataErrorQuery query = dataErrorQueryManager.loadById(survey, queryId);
-		generationJob = springJobManager.createJob(ReportGenerationJob.class);
+		generationJob = collectJobManager.createJob(ReportGenerationJob.class);
 		generationJob.setQuery(query);
 		generationJob.setRecordStep(recordStep);
-		springJobManager.start(generationJob);
+		collectJobManager.start(generationJob);
 		Response response = new Response();
 		return response;
 	}

@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.DataQueryExecutor;
 import org.openforis.collect.datacleansing.DataQueryResultIterator;
@@ -21,7 +22,6 @@ import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker.Status;
-import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
@@ -47,7 +47,7 @@ public class DataUpdateController extends BasicController {
 	@Autowired
 	protected SessionManager sessionManager;
 	@Autowired
-	private SpringJobManager springJobManager;
+	private CollectJobManager collectJobManager;
 	
 	private DataUpdateAttributeProcessor itemProcessor;
 	private DataUpdateJob upadteJob;
@@ -60,11 +60,11 @@ public class DataUpdateController extends BasicController {
 		form.copyTo(query);
 		
 		itemProcessor = new DataUpdateAttributeProcessor(query, form.getUpdateExpression());
-		upadteJob = springJobManager.createJob(DataUpdateJob.class);
+		upadteJob = collectJobManager.createJob(DataUpdateJob.class);
 		upadteJob.setQuery(query);
 		upadteJob.setRecordStep(form.getRecordStep());
 		upadteJob.setResultItemProcessor(itemProcessor);
-		springJobManager.start(upadteJob);
+		collectJobManager.start(upadteJob);
 		Response response = new Response();
 		return response;
 	}

@@ -1,5 +1,7 @@
 package org.openforis.idm.metamodel;
 
+import java.util.Date;
+
 /**
  * A survey object that will be persisted in a database
  * (so it will have a unique identifier)
@@ -10,9 +12,12 @@ public abstract class PersistedSurveyObject extends SurveyObject implements Pers
 	private static final long serialVersionUID = 1L;
 	
 	private Integer id;
+	private Date creationDate;
+	private Date modifiedDate;
 	
 	protected PersistedSurveyObject(Survey survey) {
 		super(survey);
+		this.creationDate = new Date();
 	}
 
 	@Override
@@ -23,6 +28,22 @@ public abstract class PersistedSurveyObject extends SurveyObject implements Pers
 	@Override
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getModifiedDate() {
+		return modifiedDate;
+	}
+
+	public void setModifiedDate(Date modifiedDate) {
+		this.modifiedDate = modifiedDate;
 	}
 
 	@Override

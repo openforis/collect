@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.DataQueryExecutor;
 import org.openforis.collect.datacleansing.DataQueryResultItem;
@@ -24,16 +25,17 @@ import org.openforis.collect.datacleansing.DataQueryResultIterator;
 import org.openforis.collect.datacleansing.form.DataQueryForm;
 import org.openforis.collect.datacleansing.form.DataQueryResultItemForm;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
+import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker.Status;
-import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -41,6 +43,7 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -54,17 +57,34 @@ import org.springframework.web.context.WebApplicationContext;
 
 @Controller
 @Scope(value=WebApplicationContext.SCOPE_SESSION)
-@RequestMapping(value = "/datacleansing/dataquery/")
-public class DataQueryController {
+@RequestMapping(value = "/datacleansing/dataqueries/")
+public class DataQueryController extends AbstractSurveyObjectEditFormController<DataQuery, DataQueryForm, DataQueryManager> {
 
 	@Autowired
 	protected SessionManager sessionManager;
 	@Autowired
-	private SpringJobManager springJobManager;
+	private CollectJobManager collectJobManager;
 	
 	private CSVWriterDataQueryResultItemProcessor csvExportItemProcessor;
 	private QueryExecutorJob exportJob;
 	private QueryExecutorJob testJob;
+	
+	@Override
+	@Autowired
+	@Qualifier("dataQueryManager")
+	public void setItemManager(DataQueryManager itemManager) {
+		super.setItemManager(itemManager);
+	}
+	
+	@Override
+	protected DataQuery createItemInstance(CollectSurvey survey) {
+		return new DataQuery(survey);
+	}
+
+	@Override
+	protected DataQueryForm createFormInstance(DataQuery item) {
+		return new DataQueryForm(item);
+	}
 	
 	@RequestMapping(value="start-export.json", method = RequestMethod.POST)
 	public @ResponseBody
@@ -73,11 +93,11 @@ public class DataQueryController {
 		DataQuery query = new DataQuery(survey);
 		form.copyTo(query);
 		csvExportItemProcessor = new CSVWriterDataQueryResultItemProcessor(query);
-		exportJob = springJobManager.createJob(QueryExecutorJob.class);
+		exportJob = collectJobManager.createJob(QueryExecutorJob.class);
 		exportJob.setQuery(query);
 		exportJob.setRecordStep(recordStep);
 		exportJob.setResultItemProcessor(csvExportItemProcessor);
-		springJobManager.start(exportJob);
+		collectJobManager.start(exportJob);
 		Response response = new Response();
 		return response;
 	}
@@ -88,11 +108,11 @@ public class DataQueryController {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataQuery query = new DataQuery(survey);
 		form.copyTo(query);
-		testJob = springJobManager.createJob(QueryExecutorJob.class);
+		testJob = collectJobManager.createJob(QueryExecutorJob.class);
 		testJob.setQuery(query);
 		testJob.setRecordStep(recordStep);
 		testJob.setResultItemProcessor(new MemoryStoreDataQueryResultItemProcessor());
-		springJobManager.start(testJob);
+		collectJobManager.start(testJob);
 		Response response = new Response();
 		return response;
 	}
@@ -358,4 +378,5 @@ public class DataQueryController {
 			IOUtils.closeQuietly(is);
 		}
 	}
+
 }

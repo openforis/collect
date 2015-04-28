@@ -6,6 +6,7 @@ import org.openforis.collect.datacleansing.manager.DataErrorTypeManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +17,9 @@ import org.springframework.web.context.WebApplicationContext;
 @RequestMapping(value = "/datacleansing/dataerrortypes")
 public class DataErrorTypeController extends AbstractSurveyObjectEditFormController<DataErrorType, DataErrorTypeForm, DataErrorTypeManager> {
 	
-	@Autowired
 	@Override
+	@Autowired
+	@Qualifier("dataErrorTypeManager")
 	public void setItemManager(DataErrorTypeManager itemManager) {
 		super.setItemManager(itemManager);
 	}

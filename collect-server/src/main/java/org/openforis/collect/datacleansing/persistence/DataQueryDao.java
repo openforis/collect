@@ -77,6 +77,7 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 			q.addValue(OFC_DATA_QUERY.CREATION_DATE, toTimestamp(o.getCreationDate()));
 			q.addValue(OFC_DATA_QUERY.DESCRIPTION, o.getDescription());
 			q.addValue(OFC_DATA_QUERY.ENTITY_ID, o.getEntityDefinitionId());
+			q.addValue(OFC_DATA_QUERY.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
 			q.addValue(OFC_DATA_QUERY.SURVEY_ID, o.getSurvey().getId());
 			q.addValue(OFC_DATA_QUERY.TITLE, o.getTitle());
 		}

@@ -1,14 +1,13 @@
 package org.openforis.collect.datacleansing.form;
 
 import org.openforis.collect.datacleansing.DataErrorType;
-import org.openforis.commons.web.PersistedObjectForm;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataErrorTypeForm extends PersistedObjectForm<DataErrorType> {
+public class DataErrorTypeForm extends DataCleansingItemForm<DataErrorType> {
 
 	private String code;
 	private String label;
