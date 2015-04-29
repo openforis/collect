@@ -94,20 +94,27 @@ Collect.AbstractItemEditDialogController.prototype.initFormElements = function(c
 
 Collect.AbstractItemEditDialogController.prototype.initEventListeners = function() {
 	var $this = this;
-	var applyBtn = $this.content.find(".apply-btn");
-	applyBtn.click($.proxy(this.applyHandler, $this));
-	var cancelBtn = $this.content.find(".cancel-btn");
-	cancelBtn.click($.proxy(this.cancelHandler, $this));
+	$this.content.find(".apply-btn").click(
+		$.proxy(this.applyHandler, $this, false)
+	);
+	$this.content.find(".save-and-close-btn").click(
+		$.proxy(this.applyHandler, $this, true)
+	);
+	$this.content.find(".cancel-btn").click(
+		$.proxy(this.cancelHandler, $this)
+	);
 };
 
-Collect.AbstractItemEditDialogController.prototype.applyHandler = function() {
+Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close) {
 	var $this = this;
 	if ($this.validateForm()) {
 		var item = $this.extractJSONItem();
 		$this.itemEditService.save(item, function(response) {
 			if (response.statusOk) {
 				$this.dispatchItemSavedEvent();
-				$this.close();
+				if (close) {
+					$this.close();
+				}
 			} else {
 				OF.UI.showError("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
 				OF.UI.Forms.Validation.updateErrors($this.form, response.errors);

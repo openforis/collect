@@ -309,6 +309,7 @@ Collect.prototype.initDataCleansingStepGrid = function() {
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title"},
+			{field: "queryTitle", title: "Query Title"},
 			{field: "creationDate", title: "Creation Date"},
 			{field: "modifiedDate", title: "Modified Date"}
 		]

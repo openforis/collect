@@ -26,16 +26,18 @@ import org.openforis.collect.datacleansing.form.DataQueryForm;
 import org.openforis.collect.datacleansing.form.DataQueryResultItemForm;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
+import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
-import org.openforis.concurrency.Worker.Status;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -60,6 +62,7 @@ import org.springframework.web.context.WebApplicationContext;
 @RequestMapping(value = "/datacleansing/dataqueries/")
 public class DataQueryController extends AbstractSurveyObjectEditFormController<DataQuery, DataQueryForm, DataQueryManager> {
 
+	private static final int TEST_MAX_RECORDS = 100;
 	@Autowired
 	protected SessionManager sessionManager;
 	@Autowired
@@ -111,6 +114,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		testJob = collectJobManager.createJob(QueryExecutorJob.class);
 		testJob.setQuery(query);
 		testJob.setRecordStep(recordStep);
+		testJob.setMaxRecords(TEST_MAX_RECORDS);
 		testJob.setResultItemProcessor(new MemoryStoreDataQueryResultItemProcessor());
 		collectJobManager.start(testJob);
 		Response response = new Response();
@@ -184,22 +188,44 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 
 		@Autowired
 		private DataQueryExecutor queryExecutor;
+		@Autowired
+		private RecordManager recordManager;
 		
 		private DataQueryResultItemProcessor resultItemProcessor;
 		
 		//input
 		private DataQuery query;
 		private Step recordStep;
+		private Integer maxRecords;
 		
 		@Override
 		protected void buildTasks() throws Throwable {
 			addTask(new Task() {
+				
+				private DataQueryResultIterator resultIterator;
+
+				@Override
+				protected long countTotalItems() {
+					RecordFilter filter = new RecordFilter((CollectSurvey) query.getSurvey());
+					filter.setRootEntityId(query.getEntityDefinition().getRootEntity().getId());
+					filter.setMaxNumberOfRecords(maxRecords);
+					filter.setStep(recordStep);
+					int total = recordManager.countRecords(filter);
+					if (maxRecords == null) {
+						return total;
+					} else {
+						return Math.min(maxRecords, total);
+					}
+				}
+				
+				@Override
 				protected void execute() throws Throwable {
 					try {
 						resultItemProcessor.init();
-						DataQueryResultIterator it = queryExecutor.execute(query, recordStep);
-						while(isRunning() && it.hasNext()) {
-							Node<?> node = it.next();
+						int lastRecordId = -1;
+						resultIterator = queryExecutor.execute(query, recordStep, maxRecords);
+						while(isRunning() && resultIterator.hasNext()) {
+							Node<?> node = resultIterator.next();
 							CollectRecord record = (CollectRecord) node.getRecord();
 							DataQueryResultItem item = new DataQueryResultItem(query);
 							item.setRecord(record);
@@ -208,12 +234,20 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 							item.setParentEntityId(node.getParent().getInternalId());
 							item.setValue(new JSONValueFormatter().formatValue((Attribute<?, ?>) node));
 							resultItemProcessor.process(item);
+							if (lastRecordId != node.getRecord().getId().intValue()) {
+								incrementItemsProcessed();
+							}
 						}
 					} finally {
 						resultItemProcessor.close();
 					}
 				}
-
+				
+				@Override
+				public void abort() {
+					super.abort();
+					resultIterator.deactivate();
+				}
 			});
 		}
 		
@@ -231,6 +265,10 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		
 		public void setRecordStep(Step recordStep) {
 			this.recordStep = recordStep;
+		}
+		
+		public void setMaxRecords(Integer maxRecords) {
+			this.maxRecords = maxRecords;
 		}
 		
 	}
@@ -331,26 +369,6 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		public File getOutputFile() {
 			return tempFile;
 		}
-	}
-	
-	private static class JobView {
-		
-		private int progressPercent;
-		private Status status;
-
-		public JobView(Job job) {
-			progressPercent = job.getProgressPercent();
-			status = job.getStatus();
-		}
-		
-		public int getProgressPercent() {
-			return progressPercent;
-		}
-		
-		public Status getStatus() {
-			return status;
-		}
-		
 	}
 	
 	private void writeFileToResponse(File file, String contentType, HttpServletResponse response,

@@ -24,6 +24,7 @@ public class DataQueryResultIterator implements Iterator<Node<?>> {
 	private CollectRecord currentRecord;
 	private List<Node<?>> currentNodes;
 	private int currentNodeIndex = 0;
+	private boolean active = true;
 	
 	public DataQueryResultIterator(RecordManager recordManager, List<CollectRecord> recordSummaries, 
 			DataQueryEvaluator queryEvaluator) {
@@ -34,6 +35,7 @@ public class DataQueryResultIterator implements Iterator<Node<?>> {
 
 	@Override
 	public boolean hasNext() {
+		checkActive();
 		if (currentRecordIndex > recordSummaries.size()) {
 			return false;
 		} else {
@@ -41,6 +43,12 @@ public class DataQueryResultIterator implements Iterator<Node<?>> {
 				fetchNextRecord();
 			}
 			return currentRecord != null;
+		}
+	}
+
+	private void checkActive() {
+		if (! active) {
+			throw new IllegalStateException("The query result iterator has been deactivated.");
 		}
 	}
 
@@ -58,7 +66,7 @@ public class DataQueryResultIterator implements Iterator<Node<?>> {
 		currentNodes = null;
 		currentNodeIndex = 0;
 		
-		while (currentRecordIndex < recordSummaries.size()) {
+		while (active && currentRecordIndex < recordSummaries.size()) {
 			CollectRecord summary = recordSummaries.get(currentRecordIndex ++);
 			CollectRecord record = recordManager.load((CollectSurvey) summary.getSurvey(), summary.getId());
 			
@@ -68,6 +76,18 @@ public class DataQueryResultIterator implements Iterator<Node<?>> {
 				currentNodes = nodes;
 			}
 		}
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+	
+	public void deactivate() {
+		setActive(false);
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 	@Override

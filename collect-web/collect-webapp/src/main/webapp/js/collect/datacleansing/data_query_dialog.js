@@ -42,26 +42,31 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 		$this.testResultDataGrid = testResultGridContainer.data('bootstrap.table');
 		$this.testResultDataGrid.$container.hide();
 		
+		var monitorJob = function(jobMonitorUrl, complete) {
+			var jobDialog = new OF.UI.JobDialog();
+			new OF.JobMonitor(jobMonitorUrl, function() {
+				jobDialog.close();
+				complete();
+			});
+		};
+		
 		$this.content.find(".test-btn").click($.proxy(function() {
 			var query = $this.extractJSONItem();
 			query.recordStep = $this.recordStepSelectPicker.val();
 			collect.dataQueryService.startTest(query, function() {
-				var jobDialog = new OF.UI.JobDialog();
-				new OF.JobMonitor($this.itemEditService.contextPath + "test-job.json", function() {
-					jobDialog.close();
-					$this.dataQueryTestResultDataGrid.refresh();
-					$this.dataQueryTestResultDataGrid.$container.show();
+				monitorJob($this.itemEditService.contextPath + "test-job.json", function() {
+					$this.testResultDataGrid.refresh();
+					$this.testResultDataGrid.$container.show();
 				});
 			});
 		}, $this));
 		
-		$this.content.find(".export-btn").click($.proxy(function() {
+		$this.content.find(".export-to-csv-btn").click($.proxy(function() {
 			var query = $this.extractJSONItem();
+			query.recordStep = $this.recordStepSelectPicker.val();
 			collect.dataQueryService.startExport(query, function() {
-				var jobDialog = new OF.UI.JobDialog();
-				new OF.JobMonitor($this.itemEditService.contextPath + "export-job.json", function() {
-					jobDialog.close();
-					$this.dataQueryService.downloadResult();
+				monitorJob($this.itemEditService.contextPath + "export-job.json", function() {
+					collect.dataQueryService.downloadResult();
 				});
 			});
 		}, $this));

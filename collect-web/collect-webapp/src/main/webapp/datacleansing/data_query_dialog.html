@@ -30,31 +30,28 @@
 						<input type="text" class="form-control" name="description" />
 					</div>
 				</form>
-				<fieldset>
-					<legend>Test and Run</legend>
-					<div class="form-group">
-			    		<label class="control-label">Record step</label>
-						<select class="form-control selectpicker" name="recordStep"></select>
-					</div>
-					<button type="button" class="btn btn-default test-btn">Test</button>
-					<button type="button" class="btn btn-default export-to-csv-btn">Run and Export to CSV</button>
-				</fieldset>
-
-				
 			</div>
 			
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default cancel-btn">Cancel</button>
-				
+
 				<button type="button" class="btn btn-primary apply-btn">Apply</button>
+				
+				<button type="button" class="btn btn-primary save-and-close-btn">Save and Close</button>
 			</div>
-
-			<div class="row">
-				<div class="col-md-offset-2 col-md-8">
-					<div class="test-result-grid"></div>
+			
+			<fieldset>
+				<legend>Test and Run</legend>
+				<div class="form-group">
+		    		<label class="control-label">Record step</label>
+					<select class="form-control selectpicker" name="recordStep"></select>
 				</div>
-			</div>
-
+				<button type="button" class="btn btn-default test-btn">Test</button>
+				<button type="button" class="btn btn-default export-to-csv-btn">Run and Export to CSV</button>
+				
+				<div class="test-result-grid"></div>
+			</fieldset>
+			
 		</div>
 	</div>
 </div>
