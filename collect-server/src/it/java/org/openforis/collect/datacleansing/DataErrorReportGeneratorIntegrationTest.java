@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationTest {
 
 	@Autowired
-	private DataErrorReportGenerator reportGenerator;
+	private DataErrorReportGeneratorJob reportGenerator;
 	@Autowired
 	private DataQueryManager dataQueryManager;
 	@Autowired

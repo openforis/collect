@@ -5,9 +5,15 @@ import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.datacleansing.manager.DataCleansingChainManager;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.manager.RecordManager;
@@ -19,6 +25,7 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.openforis.idm.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -35,9 +42,7 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
-	private DataQueryExecutor queryExecutor;
-	@Autowired
-	private DataCleansingChainExecutor chainExecutor;
+	private CollectJobManager jobManager;
 	
 	private RecordUpdater updater;
 	
@@ -84,13 +89,28 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 	}
 
 	private int countResults(DataQuery query) {
-		int count = 0;
-		DataQueryResultIterator it = queryExecutor.execute(query, Step.ENTRY);
-		while (it.hasNext()) {
-			it.next();
-			count ++;
-		}
-		return count;
+		final List<Node<?>> nodes = new ArrayList<Node<?>>();
+		DataQueryExecutorJob job = jobManager.createJob(DataQueryExecutorJob.class);
+		DataQueryExecutorJobInput dataQueryExecutorJobInput = new DataQueryExecutorJobInput(query, Step.ENTRY, new DataQueryResultItemProcessor() {
+			
+			@Override
+			public void close() throws IOException {
+				
+			}
+			
+			@Override
+			public void process(DataQueryResultItem item) throws Exception {
+				
+			}
+			
+			@Override
+			public void init() throws Exception {
+				
+			}
+		};
+		job.setInput(dataQueryExecutorJobInput);
+		jobManager.start(job, false);
+		return nodes.size();
 	}
 	
 	private void initRecords() {

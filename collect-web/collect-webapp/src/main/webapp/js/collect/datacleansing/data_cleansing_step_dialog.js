@@ -34,6 +34,31 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 			select.selectpicker();
 			$this.querySelectPicker = select.data().selectpicker;
 		}
+		{//init record step select
+			var select = $this.content.find('select[name="recordStep"]');
+			OF.UI.Forms.populateSelect(select, Collect.DataCleansing.WORKFLOW_STEPS, "name", "label");
+			select.selectpicker();
+			$this.recordStepSelectPicker = select.data().selectpicker;
+			$this.recordStepSelectPicker.refresh();
+		}
+
+		var monitorJob = function(jobMonitorUrl, complete) {
+			var jobDialog = new OF.UI.JobDialog();
+			new OF.JobMonitor(jobMonitorUrl, function() {
+				jobDialog.close();
+				complete();
+			});
+		};
+		
+		$this.content.find(".run-btn").click($.proxy(function() {
+			var cleansingStep = $this.extractJSONItem();
+			var recordStep = $this.recordStepSelectPicker.val();
+			collect.dataCleansingStepService.run(cleansingStep.id, recordStep, function() {
+				monitorJob(collect.jobService.contextPath + "survey-job.json?surveyId=" + collect.activeSurvey.id, function() {
+				});
+			});
+		}, $this));
+		
 		callback();
 	});
 };

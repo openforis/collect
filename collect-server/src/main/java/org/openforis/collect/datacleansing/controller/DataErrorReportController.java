@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
-import org.openforis.collect.datacleansing.DataErrorReportGenerator;
+import org.openforis.collect.datacleansing.DataErrorReportGeneratorJob;
 import org.openforis.collect.datacleansing.DataErrorReportItem;
 import org.openforis.collect.datacleansing.form.DataErrorReportForm;
 import org.openforis.collect.datacleansing.form.DataErrorReportItemForm;
@@ -106,7 +106,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	private static class ReportGenerationJob extends Job {
 
 		@Autowired
-		private DataErrorReportGenerator reportGenerator;
+		private DataErrorReportGeneratorJob reportGenerator;
 		
 		//input
 		private DataErrorQuery query;

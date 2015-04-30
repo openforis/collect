@@ -8,15 +8,16 @@ Collect.SURVEY_CHANGED = "surveyChanged";
 
 Collect.prototype.init = function() {
 	this.activeSurvey = null;
-	this.sessionService = new Collect.SessionService();
-	this.surveyService = new Collect.SurveyService();
-	this.dataQueryService = new Collect.DataQueryService();
-	this.dataErrorTypeService = new Collect.DataErrorTypeService();
+	this.dataCleansingStepService = new Collect.DataCleansingStepService();
 	this.dataErrorQueryService = new Collect.DataErrorQueryService();
 	this.dataErrorReportService = new Collect.DataErrorReportService();
-	this.geoDataService = new Collect.GeoDataService();
+	this.dataErrorTypeService = new Collect.DataErrorTypeService();
+	this.dataQueryService = new Collect.DataQueryService();
 	this.dataUpdateService = new Collect.DataUpdateService();
-	this.dataCleansingStepService = new Collect.DataCleansingStepService();
+	this.geoDataService = new Collect.GeoDataService();
+	this.sessionService = new Collect.SessionService();
+	this.surveyService = new Collect.SurveyService();
+	this.jobService = new Collect.JobService();
 	
 	this.initDataQueryPanel();
 	this.initDataErrorTypePanel();
@@ -38,7 +39,21 @@ Collect.prototype.checkActiveSurveySelected = function() {
 	};
 	this.sessionService.getActiveSurvey(function(survey) {
 		if (survey == null) {
-			openSurveySelectDialog();
+			collect.surveyService.loadSummaries(function(summaries) {
+				switch(summaries.length) {
+				case 0:
+					alert("Please define a survey and publish it before using the Data Cleansing Toolkit");
+					break;
+				case 1:
+					var surveySummary = summaries[0];
+					collect.sessionService.setActiveSurvey(surveySummary.id, function() {
+						collect.setActiveSurvey(surveySummary);
+					});
+					break;
+				default:
+					openSurveySelectDialog();
+				}
+			});
 		} else {
 			$this.activeSurvey = new Collect.Metamodel.Survey(survey);
 			EventBus.dispatch(Collect.SURVEY_CHANGED, $this);

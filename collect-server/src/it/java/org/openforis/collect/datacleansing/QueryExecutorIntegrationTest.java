@@ -1,22 +1,27 @@
 package org.openforis.collect.datacleansing;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -35,7 +40,7 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
-	private DataQueryExecutor queryExecutor;
+	private CollectJobManager jobManager;
 	
 	private CollectSurvey survey;
 	private RecordUpdater updater;
@@ -57,11 +62,20 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 		query.setAttributeDefinition(dbhDef);
 		query.setConditions("dbh > 20");
 		
-		DataQueryResultIterator it = queryExecutor.execute(query, Step.ENTRY);
-		assertTrue(it.hasNext());
+		final List<Node<?>> nodes = new ArrayList<Node<?>>();
+		DataQueryExecutorJob job = jobManager.createJob(DataQueryExecutorJob.class);
+		DataQueryExecutorJobInput input = new DataQueryExecutorJobInput(survey, query, Step.ENTRY, new NodeProcessor() {
+			@Override
+			public void process(Node<?> node) {
+				nodes.add(node);
+			}
+		});
+		job.setInput(input);
+		jobManager.start(job, false);
+		assertFalse(nodes.isEmpty());
 		
 		//first result
-		Node<?> node = it.next();
+		Node<?> node = nodes.get(0);
 		assertTrue(node instanceof Attribute);
 		CollectRecord record = (CollectRecord) node.getRecord();
 		assertEquals(Arrays.asList("10_117"), record.getRootEntityKeyValues());

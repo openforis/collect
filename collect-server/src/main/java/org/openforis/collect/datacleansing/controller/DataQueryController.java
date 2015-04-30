@@ -1,7 +1,6 @@
 package org.openforis.collect.datacleansing.controller;
 
 import java.io.BufferedInputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,25 +18,23 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQuery;
-import org.openforis.collect.datacleansing.DataQueryExecutor;
+import org.openforis.collect.datacleansing.DataQueryExecutorJob;
+import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.datacleansing.DataQueryResultItem;
-import org.openforis.collect.datacleansing.DataQueryResultIterator;
+import org.openforis.collect.datacleansing.NodeProcessor;
 import org.openforis.collect.datacleansing.form.DataQueryForm;
 import org.openforis.collect.datacleansing.form.DataQueryResultItemForm;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -46,9 +43,7 @@ import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,8 +64,8 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	private CollectJobManager collectJobManager;
 	
 	private CSVWriterDataQueryResultItemProcessor csvExportItemProcessor;
-	private QueryExecutorJob exportJob;
-	private QueryExecutorJob testJob;
+	private DataQueryExecutorJob exportJob;
+	private DataQueryExecutorJob testJob;
 	
 	@Override
 	@Autowired
@@ -96,10 +91,8 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		DataQuery query = new DataQuery(survey);
 		form.copyTo(query);
 		csvExportItemProcessor = new CSVWriterDataQueryResultItemProcessor(query);
-		exportJob = collectJobManager.createJob(QueryExecutorJob.class);
-		exportJob.setQuery(query);
-		exportJob.setRecordStep(recordStep);
-		exportJob.setResultItemProcessor(csvExportItemProcessor);
+		exportJob = collectJobManager.createJob(DataQueryExecutorJob.class);
+		exportJob.setInput(new DataQueryExecutorJobInput(query, recordStep, csvExportItemProcessor));
 		collectJobManager.start(exportJob);
 		Response response = new Response();
 		return response;
@@ -111,11 +104,8 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataQuery query = new DataQuery(survey);
 		form.copyTo(query);
-		testJob = collectJobManager.createJob(QueryExecutorJob.class);
-		testJob.setQuery(query);
-		testJob.setRecordStep(recordStep);
-		testJob.setMaxRecords(TEST_MAX_RECORDS);
-		testJob.setResultItemProcessor(new MemoryStoreDataQueryResultItemProcessor());
+		testJob = collectJobManager.createJob(DataQueryExecutorJob.class);
+		testJob.setInput(new DataQueryExecutorJobInput(query, recordStep, new MemoryStoreDataQueryResultItemProcessor(query), TEST_MAX_RECORDS));
 		collectJobManager.start(testJob);
 		Response response = new Response();
 		return response;
@@ -135,7 +125,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 			return null;
 		}
 		List<DataQueryResultItem> items = ((MemoryStoreDataQueryResultItemProcessor) testJob
-				.getResultItemProcessor()).getItems();
+				.getInput().getNodeProcessor()).getItems();
 		List<DataQueryResultItemForm> result = new ArrayList<DataQueryResultItemForm>(items.size());
 		for (DataQueryResultItem item : items) {
 			result.add(new DataQueryResultItemForm(item));
@@ -182,117 +172,49 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		}
 	}
 	
-	@Component
-	@Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	private static class QueryExecutorJob extends Job {
+	private static abstract class AttributeQueryResultItemCollector implements NodeProcessor {
 
-		@Autowired
-		private DataQueryExecutor queryExecutor;
-		@Autowired
-		private RecordManager recordManager;
+		protected DataQuery query;
 		
-		private DataQueryResultItemProcessor resultItemProcessor;
-		
-		//input
-		private DataQuery query;
-		private Step recordStep;
-		private Integer maxRecords;
-		
-		@Override
-		protected void buildTasks() throws Throwable {
-			addTask(new Task() {
-				
-				private DataQueryResultIterator resultIterator;
-
-				@Override
-				protected long countTotalItems() {
-					RecordFilter filter = new RecordFilter((CollectSurvey) query.getSurvey());
-					filter.setRootEntityId(query.getEntityDefinition().getRootEntity().getId());
-					filter.setMaxNumberOfRecords(maxRecords);
-					filter.setStep(recordStep);
-					int total = recordManager.countRecords(filter);
-					if (maxRecords == null) {
-						return total;
-					} else {
-						return Math.min(maxRecords, total);
-					}
-				}
-				
-				@Override
-				protected void execute() throws Throwable {
-					try {
-						resultItemProcessor.init();
-						int lastRecordId = -1;
-						resultIterator = queryExecutor.execute(query, recordStep, maxRecords);
-						while(isRunning() && resultIterator.hasNext()) {
-							Node<?> node = resultIterator.next();
-							CollectRecord record = (CollectRecord) node.getRecord();
-							DataQueryResultItem item = new DataQueryResultItem(query);
-							item.setRecord(record);
-							item.setRecordId(record.getId());
-							item.setNodeIndex(node.getIndex());
-							item.setParentEntityId(node.getParent().getInternalId());
-							item.setValue(new JSONValueFormatter().formatValue((Attribute<?, ?>) node));
-							resultItemProcessor.process(item);
-							if (lastRecordId != node.getRecord().getId().intValue()) {
-								incrementItemsProcessed();
-							}
-						}
-					} finally {
-						resultItemProcessor.close();
-					}
-				}
-				
-				@Override
-				public void abort() {
-					super.abort();
-					resultIterator.deactivate();
-				}
-			});
-		}
-		
-		public DataQueryResultItemProcessor getResultItemProcessor() {
-			return resultItemProcessor;
-		}
-		
-		public void setResultItemProcessor(DataQueryResultItemProcessor resultItemProcessor) {
-			this.resultItemProcessor = resultItemProcessor;
-		}
-
-		public void setQuery(DataQuery query) {
+		public AttributeQueryResultItemCollector(DataQuery query) {
+			super();
 			this.query = query;
 		}
 		
-		public void setRecordStep(Step recordStep) {
-			this.recordStep = recordStep;
+		public void init() throws Exception {
 		}
 		
-		public void setMaxRecords(Integer maxRecords) {
-			this.maxRecords = maxRecords;
-		}
-		
-	}
-	
-	private static interface DataQueryResultItemProcessor extends Closeable {
-		void init() throws Exception;
-		void process(DataQueryResultItem item) throws Exception;
-	}
-	
-	private static class MemoryStoreDataQueryResultItemProcessor implements DataQueryResultItemProcessor {
-		private List<DataQueryResultItem> items;
-		
-		@Override
 		public void close() throws IOException {
 		}
 		
 		@Override
-		public void init() throws Exception {
+		public void process(Node<?> node) {
+			CollectRecord record = (CollectRecord) node.getRecord();
+			DataQueryResultItem item = new DataQueryResultItem(query);
+			item.setRecord(record);
+			item.setRecordId(record.getId());
+			item.setNode(node);
+			item.setNodeIndex(node.getIndex());
+			item.setParentEntityId(node.getParent().getInternalId());
+			item.setValue(new JSONValueFormatter().formatValue((Attribute<?, ?>) node));
+			process(item);
+		}
+
+		public abstract void process(DataQueryResultItem item);
+	}
+	
+	private static class MemoryStoreDataQueryResultItemProcessor extends AttributeQueryResultItemCollector {
+		
+		private List<DataQueryResultItem> items;
+		
+		public MemoryStoreDataQueryResultItemProcessor(DataQuery query) {
+			super(query);
 			items = new ArrayList<DataQueryResultItem>();
 		}
 		
 		@Override
-		public void process(DataQueryResultItem item) throws Exception {
-			items.add(item);
+		public void process(DataQueryResultItem item) {
+			items.add(item);			
 		}
 		
 		public List<DataQueryResultItem> getItems() {
@@ -300,17 +222,15 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		}
 	}
 	
-	private static class CSVWriterDataQueryResultItemProcessor implements DataQueryResultItemProcessor {
+	private static class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultItemCollector {
 		
 		private CsvWriter csvWriter;
-		
-		private DataQuery query;
 		
 		//output
 		private File tempFile;
 		
 		public CSVWriterDataQueryResultItemProcessor(DataQuery query) {
-			this.query = query;
+			super(query);
 		}
 		
 		@Override

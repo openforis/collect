@@ -16,6 +16,13 @@ Collect.DataQueryDialogController.prototype.dispatchItemSavedEvent = function() 
 Collect.DataQueryDialogController.prototype.initFormElements = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
+		var monitorJob = function(jobMonitorUrl, complete) {
+			var jobDialog = new OF.UI.JobDialog();
+			new OF.JobMonitor(jobMonitorUrl, function() {
+				jobDialog.close();
+				complete();
+			});
+		};
 		
 		{//init record step select
 			var select = $this.content.find('select[name="recordStep"]');
@@ -41,14 +48,6 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 		});
 		$this.testResultDataGrid = testResultGridContainer.data('bootstrap.table');
 		$this.testResultDataGrid.$container.hide();
-		
-		var monitorJob = function(jobMonitorUrl, complete) {
-			var jobDialog = new OF.UI.JobDialog();
-			new OF.JobMonitor(jobMonitorUrl, function() {
-				jobDialog.close();
-				complete();
-			});
-		};
 		
 		$this.content.find(".test-btn").click($.proxy(function() {
 			var query = $this.extractJSONItem();

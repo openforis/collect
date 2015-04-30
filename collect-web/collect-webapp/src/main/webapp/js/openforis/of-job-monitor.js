@@ -10,8 +10,8 @@ OF.JobMonitor = function(jobRetrievalUrl, onComplete) {
 
 //Events
 OF.JobMonitor.JOB_PROGRESS = "jobProgress";
-//Events
 OF.JobMonitor.CANCEL_JOB = "cancelJob";
+
 //internal
 OF.JobMonitor._JOB_UPDATE_INTERVAL = 2000;
 

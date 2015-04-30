@@ -10,6 +10,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 
 /**
@@ -25,6 +26,7 @@ public class DataQueryResultItem extends AbstractPersistedObject {
 	private int parentEntityId;
 	private int nodeIndex;
 	private String value;
+	private Node<?> node;
 
 	public DataQueryResultItem(DataQuery query) {
 		super();
@@ -81,6 +83,14 @@ public class DataQueryResultItem extends AbstractPersistedObject {
 
 	public void setParentEntityId(int parentEntityId) {
 		this.parentEntityId = parentEntityId;
+	}
+	
+	public Node<?> getNode() {
+		return node;
+	}
+
+	public void setNode(Node<?> node) {
+		this.node = node;
 	}
 
 	public int getNodeIndex() {
