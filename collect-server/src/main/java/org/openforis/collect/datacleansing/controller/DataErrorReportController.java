@@ -17,15 +17,11 @@ import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
+import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.commons.web.Response;
-import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
-import org.openforis.concurrency.Worker.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +41,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	@Autowired
 	private CollectJobManager collectJobManager;
 	
-	private ReportGenerationJob generationJob;
+	private DataErrorReportGeneratorJob generationJob;
 	
 	@Autowired
 	@Override
@@ -68,8 +64,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	Response generate(@RequestParam int queryId, @RequestParam Step recordStep) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataErrorQuery query = dataErrorQueryManager.loadById(survey, queryId);
-		generationJob = collectJobManager.createJob(ReportGenerationJob.class);
-		generationJob.setQuery(query);
+		generationJob = collectJobManager.createJob(DataErrorReportGeneratorJob.class);
+		generationJob.setErrorQuery(query);
 		generationJob.setRecordStep(recordStep);
 		collectJobManager.start(generationJob);
 		Response response = new Response();
@@ -101,63 +97,5 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		}
 	}
 	
-	@Component
-	@Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-	private static class ReportGenerationJob extends Job {
-
-		@Autowired
-		private DataErrorReportGeneratorJob reportGenerator;
-		
-		//input
-		private DataErrorQuery query;
-		private Step recordStep;
-		
-		//output
-		private DataErrorReport report;
-		
-		@Override
-		protected void buildTasks() throws Throwable {
-			ReportGenerationTask reportGenerationTask = new ReportGenerationTask();
-			addTask(reportGenerationTask);
-		}
-		
-		private class ReportGenerationTask extends Task {
-			protected void execute() throws Throwable {
-				report = reportGenerator.generate(query, recordStep);
-			}
-		}
-
-		public void setQuery(DataErrorQuery query) {
-			this.query = query;
-		}
-		
-		public void setRecordStep(Step recordStep) {
-			this.recordStep = recordStep;
-		}
-		
-		public DataErrorReport getReport() {
-			return report;
-		}
-	}
-	
-	private static class JobView {
-		
-		private int progressPercent;
-		private Status status;
-
-		public JobView(Job job) {
-			progressPercent = job.getProgressPercent();
-			status = job.getStatus();
-		}
-		
-		public int getProgressPercent() {
-			return progressPercent;
-		}
-		
-		public Status getStatus() {
-			return status;
-		}
-		
-	}
 	
 }

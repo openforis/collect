@@ -64,7 +64,7 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 		
 		final List<Node<?>> nodes = new ArrayList<Node<?>>();
 		DataQueryExecutorJob job = jobManager.createJob(DataQueryExecutorJob.class);
-		DataQueryExecutorJobInput input = new DataQueryExecutorJobInput(survey, query, Step.ENTRY, new NodeProcessor() {
+		DataQueryExecutorJobInput input = new DataQueryExecutorJobInput(query, Step.ENTRY, new NodeProcessor() {
 			@Override
 			public void process(Node<?> node) {
 				nodes.add(node);

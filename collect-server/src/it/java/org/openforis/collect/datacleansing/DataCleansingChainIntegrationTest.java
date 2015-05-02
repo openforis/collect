@@ -5,7 +5,6 @@ import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +81,11 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		
 		chainManager.save(chain);
 		
-		chainExecutor.execute(chain, Step.ENTRY);
+		DataCleansingChainExecutorJob job = jobManager.createJob(DataCleansingChainExecutorJob.class);
+		job.setSurvey(survey);
+		job.setChain(chain);
+		job.setRecordStep(Step.ENTRY);
+		jobManager.start(job, true);
 		
 		int finalCount = countResults(query);
 		assertEquals(0, finalCount);
@@ -91,23 +94,12 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 	private int countResults(DataQuery query) {
 		final List<Node<?>> nodes = new ArrayList<Node<?>>();
 		DataQueryExecutorJob job = jobManager.createJob(DataQueryExecutorJob.class);
-		DataQueryExecutorJobInput dataQueryExecutorJobInput = new DataQueryExecutorJobInput(query, Step.ENTRY, new DataQueryResultItemProcessor() {
-			
+		DataQueryExecutorJobInput dataQueryExecutorJobInput = new DataQueryExecutorJobInput(query, Step.ENTRY, new NodeProcessor() {
 			@Override
-			public void close() throws IOException {
-				
+			public void process(Node<?> node) throws Exception {
+				nodes.add(node);
 			}
-			
-			@Override
-			public void process(DataQueryResultItem item) throws Exception {
-				
-			}
-			
-			@Override
-			public void init() throws Exception {
-				
-			}
-		};
+		});
 		job.setInput(dataQueryExecutorJobInput);
 		jobManager.start(job, false);
 		return nodes.size();

@@ -1,18 +1,21 @@
 package org.openforis.collect.datacleansing;
 
-import java.util.Collection;
 import java.util.List;
 
+import org.openforis.collect.concurrency.SurveyLockingJob;
+import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask;
 import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask.DataQueryExecutorTaskInput;
+import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.concurrency.Task;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,7 +24,8 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class DataCleansingChainExecutorJob extends DataQueryExecutorJob {
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	
 	@Autowired
 	private RecordManager recordManager;
@@ -31,7 +35,7 @@ public class DataCleansingChainExecutorJob extends DataQueryExecutorJob {
 	private Step recordStep;
 	
 	@Override
-	protected <C extends Collection<? extends Task>> void addTasks(C tasks) {
+	protected void buildTasks() throws Throwable {
 		List<DataCleansingStep> steps = chain.getSteps();
 		for (DataCleansingStep s : steps) {
 			DataQueryExectutorTask task = addTask(DataQueryExectutorTask.class);
@@ -64,7 +68,7 @@ public class DataCleansingChainExecutorJob extends DataQueryExecutorJob {
 				CollectRecord record = (CollectRecord) node.getRecord();
 				ExpressionEvaluator expressionEvaluator = record.getSurveyContext().getExpressionEvaluator();
 				Value val = expressionEvaluator.evaluateAttributeValue(attrib.getParent(), attrib, attrib.getDefinition(), step.getFixExpression());
-				attrib.setValue(val);
+				recordManager.updateAttribute(attrib, val);
 				recordManager.save(record);
 			}
 		}

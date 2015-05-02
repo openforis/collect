@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.datacleansing.manager.DataErrorTypeManager;
@@ -37,8 +38,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationTest {
 
 	@Autowired
-	private DataErrorReportGeneratorJob reportGenerator;
-	@Autowired
 	private DataQueryManager dataQueryManager;
 	@Autowired
 	private DataErrorTypeManager dataErrorTypeManager;
@@ -48,6 +47,8 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 	private DataErrorReportManager dataErrorReportManager;
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private CollectJobManager jobManager;
 	
 	private CollectSurvey survey;
 	private DataErrorType invalidAttributeErrorType;
@@ -86,7 +87,11 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		
 		dataErrorQueryManager.save(dataErrorQuery);
 		
-		DataErrorReport report = reportGenerator.generate(dataErrorQuery, Step.ENTRY);
+		DataErrorReportGeneratorJob job = jobManager.createJob(DataErrorReportGeneratorJob.class);
+		job.setErrorQuery(dataErrorQuery);
+		job.setRecordStep(Step.ENTRY);
+		jobManager.start(job, true);
+		DataErrorReport report = job.getReport();
 		
 		DataErrorReport reloadedReport = dataErrorReportManager.loadById(survey, report.getId());
 		

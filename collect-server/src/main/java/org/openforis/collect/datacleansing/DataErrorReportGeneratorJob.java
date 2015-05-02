@@ -3,12 +3,16 @@ package org.openforis.collect.datacleansing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.datacleansing.DataErrorReportItem.Status;
+import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask;
+import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask.DataQueryExecutorTaskInput;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.concurrency.Job;
+import org.openforis.concurrency.Task;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -22,41 +26,63 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DataErrorReportGeneratorJob extends DataQueryExecutorJob {
+public class DataErrorReportGeneratorJob extends Job {
 	
 	@Autowired
 	private DataErrorReportManager reportManager;
 	
 	//input
-	private DataCleansingChain chain;
+	private DataErrorQuery errorQuery;
 	private Step recordStep;
+
+	//output
+	private DataErrorReport report;
+	
+	private transient ItemBatchPersister batchPersister;
 	
 	@Override
-	protected DataQueryExectutorTask addDataQueryExecutorTask() {
-		DataErrorReportGeneratorTask task = addTask(DataErrorReportGeneratorTask.class);
-		task.setInput(input);
+	protected void buildTasks() throws Throwable {
+		DataQueryExectutorTask task = addTask(DataQueryExectutorTask.class);
+		task.setInput(new DataQueryExecutorTaskInput(errorQuery.getQuery(), recordStep, new ReportItemPersisterNodeProcessor()));
 	}
 	
-	private class DataErrorReportGeneratorTask extends DataQueryExectutorTask {
-		
-	}
-	
-	public DataErrorReport generate(DataErrorQuery query, Step recordStep) {
-		CollectSurvey survey = query.getSurvey();
-		DataErrorReport report = new DataErrorReport(survey);
-		report.setQuery(query);
+	@Override
+	protected void prepareTask(Task task) {
+		super.prepareTask(task);
+		report = new DataErrorReport((CollectSurvey) errorQuery.getSurvey());
+		report.setQuery(errorQuery);
 		reportManager.save(report);
-		DataQueryResultIterator it = queryExecutor.execute(query.getQuery(), recordStep);
-		ItemBatchPersister batchPersister = new ItemBatchPersister(report);
-		while (it.hasNext()) {
-			Attribute<?, ?> attr = (Attribute<?, ?>) it.next();
+		batchPersister = new ItemBatchPersister(report);
+	}
+	
+	@Override
+	protected void onTaskCompleted(Task task) {
+		super.onTaskCompleted(task);
+		batchPersister.flush();
+	}
+	
+	public void setErrorQuery(DataErrorQuery errorQuery) {
+		this.errorQuery = errorQuery;
+	}
+	
+	public void setRecordStep(Step recordStep) {
+		this.recordStep = recordStep;
+	}
+	
+	public DataErrorReport getReport() {
+		return report;
+	}
+	
+	private class ReportItemPersisterNodeProcessor implements NodeProcessor {
+		
+		@Override
+		public void process(Node<?> node) throws Exception {
+			Attribute<?, ?> attr = (Attribute<?, ?>) node;
 			DataErrorReportItem item = createReportItem(report, attr);
 			batchPersister.add(item);
 		}
-		batchPersister.flush();
-		return report;
 	}
-
+	
 	private DataErrorReportItem createReportItem(DataErrorReport report,
 			Attribute<?, ?> attr) {
 		DataErrorReportItem item = new DataErrorReportItem(report);
@@ -64,7 +90,7 @@ public class DataErrorReportGeneratorJob extends DataQueryExecutorJob {
 		item.setParentEntityId(attr.getParent().getInternalId());
 		item.setNodeIndex(attr.getIndex());
 		item.setValue(new JSONValueFormatter().formatValue(attr));
-		item.setStatus(Status.PENDING);
+		item.setStatus(org.openforis.collect.datacleansing.DataErrorReportItem.Status.PENDING);
 		return item;
 	}
 
