@@ -20,7 +20,7 @@ public class CoordinateAttributeVM extends AttributeVM<CoordinateAttributeDefini
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") CoordinateAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.internalInit(parentEntity, attributeDefn, newItem);
+		super.initInternal(parentEntity, attributeDefn, newItem);
 	}
 	
 	

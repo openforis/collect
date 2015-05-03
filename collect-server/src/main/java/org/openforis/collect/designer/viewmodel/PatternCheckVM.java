@@ -17,10 +17,9 @@ import org.zkoss.bind.annotation.Init;
 public class PatternCheckVM extends CheckVM<PatternCheck> {
 
 	@Init(superclass=false)
-	@Override
 	public void init(@ExecutionArgParam("parentDefinition") AttributeDefinition parentDefinition,
 			@ExecutionArgParam("check") PatternCheck check, @ExecutionArgParam("newItem") Boolean newItem ) {
-		super.init(parentDefinition, check, newItem);
+		super.initInternal(parentDefinition, check, newItem);
 	}
 	
 	@Override

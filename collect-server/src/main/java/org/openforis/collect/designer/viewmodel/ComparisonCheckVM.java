@@ -17,10 +17,9 @@ import org.zkoss.bind.annotation.Init;
 public class ComparisonCheckVM extends CheckVM<ComparisonCheck> {
 
 	@Init(superclass=false)
-	@Override
 	public void init(@ExecutionArgParam("parentDefinition") AttributeDefinition parentDefinition,
 			@ExecutionArgParam("check") ComparisonCheck check, @ExecutionArgParam("newItem") Boolean newItem ) {
-		super.init(parentDefinition, check, newItem);
+		super.initInternal(parentDefinition, check, newItem);
 	}
 	
 	@Override

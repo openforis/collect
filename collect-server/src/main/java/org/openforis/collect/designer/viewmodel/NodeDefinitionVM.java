@@ -68,7 +68,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		fieldLabelKeyPrefixes.addAll(Arrays.asList("survey.schema.node"));
 	}
 	
-	protected void internalInit(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
+	protected void initInternal(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
 		super.init();
 		tempFormObject = new SimpleForm();
 		if ( nodeDefn != null ) {

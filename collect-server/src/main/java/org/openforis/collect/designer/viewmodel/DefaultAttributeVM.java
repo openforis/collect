@@ -18,7 +18,7 @@ public class DefaultAttributeVM extends AttributeVM<AttributeDefinition> {
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") AttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.internalInit(parentEntity, attributeDefn, newItem);
+		super.initInternal(parentEntity, attributeDefn, newItem);
 	}
 	
 }
