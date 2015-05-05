@@ -85,7 +85,7 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		job.setSurvey(survey);
 		job.setChain(chain);
 		job.setRecordStep(Step.ENTRY);
-		jobManager.start(job, true);
+		jobManager.start(job, false);
 		
 		int finalCount = countResults(query);
 		assertEquals(0, finalCount);

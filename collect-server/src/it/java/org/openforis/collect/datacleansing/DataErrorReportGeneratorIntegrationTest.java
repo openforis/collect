@@ -90,7 +90,7 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 		DataErrorReportGeneratorJob job = jobManager.createJob(DataErrorReportGeneratorJob.class);
 		job.setErrorQuery(dataErrorQuery);
 		job.setRecordStep(Step.ENTRY);
-		jobManager.start(job, true);
+		jobManager.start(job, false);
 		DataErrorReport report = job.getReport();
 		
 		DataErrorReport reloadedReport = dataErrorReportManager.loadById(survey, report.getId());
