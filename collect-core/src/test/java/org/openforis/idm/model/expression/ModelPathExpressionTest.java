@@ -9,8 +9,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.openforis.idm.AbstractTest;
-import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.Node;
@@ -38,6 +38,15 @@ public class ModelPathExpressionTest extends AbstractTest {
 		Entity plot = EntityBuilder.addEntity(cluster, "plot");
 		List<Node<?>> plots = iterateExpression("parent()", plot);
 		Assert.assertEquals(1, plots.size());
+	}
+
+	@Test
+	public void testThis() throws InvalidExpressionException{
+		Entity plot = EntityBuilder.addEntity(cluster, "plot");
+		CodeAttribute plotNum = EntityBuilder.addValue(plot, "no", new Code("1"));
+		
+		List<Node<?>> plotNums = iterateExpression("$this", plot, plotNum);
+		Assert.assertEquals(1, plotNums.size());
 	}
 
 	@Test
@@ -99,7 +108,11 @@ public class ModelPathExpressionTest extends AbstractTest {
 		Assert.assertEquals(2, list.size());
 	}
 
-	private List<Node<?>> iterateExpression(String expr, Node<? extends NodeDefinition> context) throws InvalidExpressionException {
-		return expressionEvaluator.evaluateNodes(context, null, expr);
+	private List<Node<?>> iterateExpression(String expr, Node<?> context) throws InvalidExpressionException {
+		return iterateExpression(expr, context, null);
+	}
+
+	private List<Node<?>> iterateExpression(String expr, Node<?> context, Node<?> thisNode) throws InvalidExpressionException {
+		return expressionEvaluator.evaluateNodes(context, thisNode, expr);
 	}
 }

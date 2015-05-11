@@ -3,14 +3,14 @@
  */
 package org.openforis.idm.model.expression.internal;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
+
 import org.apache.commons.jxpath.ri.JXPathCompiledExpression;
 import org.apache.commons.jxpath.ri.compiler.CoreFunction;
 import org.apache.commons.jxpath.ri.compiler.Expression;
 import org.apache.commons.jxpath.ri.compiler.Operation;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
 
 /**
  * @author M. Togna
@@ -25,7 +25,7 @@ public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
 	}
 
 	public Set<String> getReferencedPaths() {
-		return referencedPathEvaluator.determinePathsReferenced(getExpression());
+		return referencedPathEvaluator.determineReferencedPaths(getExpression());
 	}
 
 	public Set<String> getFunctionNames() {

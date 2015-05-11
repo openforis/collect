@@ -70,6 +70,21 @@ public class CalculatedAttributeDependencyGraphTest extends DependencyGraphTest 
 	}
 
 	@Test
+	public void testComplexCrossEntityDependency() {
+		Entity plot = entity(rootEntity, "plot");
+		Entity lucs = entity(plot, "lucs");
+		Attribute<?, ?> lucsNo = attribute(lucs, "lucs_no");
+		Attribute<?, ?> lucc = attribute(lucs, "lucc");
+		Entity tree = entity(plot, "tree");
+		Attribute<?, ?> treeLucsNo = attribute(tree, "tree_lucs_no");
+		Attribute<?, ?> calculatedAttr = calculatedAttribute(tree, "calculated", "parent()/lucs[lucs_no = $this/parent()/tree_lucs_no]/lucc");
+		
+		assertDependents(lucsNo, calculatedAttr);
+		assertDependents(treeLucsNo, calculatedAttr);
+		assertDependents(lucc, calculatedAttr);
+	}
+
+	@Test
 	public void testMultipleSources() {
 		Attribute<?, ?> first = attribute(rootEntity, "first");
 		Attribute<?, ?> second = attribute(rootEntity, "second");

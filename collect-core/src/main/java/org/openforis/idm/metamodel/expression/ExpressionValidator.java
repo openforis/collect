@@ -62,7 +62,7 @@ public class ExpressionValidator {
 			for (String path : referencedPaths) {
 				String normalizedPath = getNormalizedPath(path);
 				SchemaPathExpression schemaExpression = new SchemaPathExpression(normalizedPath);
-				schemaExpression.evaluate(parentDefinition);
+				schemaExpression.evaluate(parentDefinition, contextNodeDef);
 			}
 			return true;
 		} catch (Exception e) {
@@ -100,10 +100,10 @@ public class ExpressionValidator {
 		}
 	}
 	
-	private boolean isSyntaxValid(NodeDefinition parentNodeDef, NodeDefinition contextNodeDef, AbstractExpression expression) {
+	private boolean isSyntaxValid(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, AbstractExpression expression) {
 		try {
 			verifyFunctionNames(expression);
-			verifyPaths(parentNodeDef, expression);
+			verifyPaths(contextNodeDef, thisNodeDef, expression);
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -138,9 +138,9 @@ public class ExpressionValidator {
 	 *
 	 * @throws InvalidExpressionException if the path is invalid
 	 */
-	private void verifyPaths(NodeDefinition context, AbstractExpression expression) throws InvalidExpressionException {
+	private void verifyPaths(NodeDefinition context, NodeDefinition thisNodeDef, AbstractExpression expression) throws InvalidExpressionException {
 		//try to get referenced node definitions
-		expression.getReferencedNodeDefinitions(context);
+		expression.getReferencedNodeDefinitions(context, thisNodeDef);
 	}
 	
 	//TODO restore this validation

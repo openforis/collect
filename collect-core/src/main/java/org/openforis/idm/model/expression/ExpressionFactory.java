@@ -97,7 +97,7 @@ public class ExpressionFactory {
 		ModelPathExpression expr = new ModelPathExpression(compiledExpression, jxPathContext);
 		return expr;
 	}
-
+	
 	public AbsoluteModelPathExpression createAbsoluteModelPathExpression(String expression) throws InvalidExpressionException {
 		if (!expression.startsWith("/")) {
 			throw new InvalidExpressionException("Absolute paths must start with '/'");

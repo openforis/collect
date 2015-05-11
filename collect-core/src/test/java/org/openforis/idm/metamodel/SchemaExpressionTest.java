@@ -28,9 +28,10 @@ public class SchemaExpressionTest extends AbstractTest {
 	@Test
 	public void testExpression() {
 		EntityDefinition cluster = survey.getSchema().getRootEntityDefinitions().get(0);
-
+		NodeDefinition plot = cluster.getChildDefinition("plot");
+		
 		SchemaPathExpression expression = new SchemaPathExpression("plot/tree");
-		Object obj = expression.evaluate(cluster);
+		Object obj = expression.evaluate(cluster, plot);
 		assertEquals(EntityDefinition.class, obj.getClass());
 
 		EntityDefinition tree = (EntityDefinition) obj;
