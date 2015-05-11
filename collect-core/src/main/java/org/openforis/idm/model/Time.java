@@ -22,21 +22,26 @@ public final class Time implements Value {
 	 * Generic string format for Time value ("hh:mm" or "hh:mm:ss" . Please note that seconds will be ignored by the Time attribute)
 	 */
 	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
+	/**
+	 * Unbounded string format for Time value ("[h]:[m]" or "[h]:[m]:[s]". Please note that seconds will be ignored by the Time attribute)
+	 */
+	private static final Pattern UNBOUNDED_STRING_FORMAT = Pattern.compile("([0-9]+):([0-9]{1,2})(:[0-9]{1,2})?");
 
+	private static final Pattern[] PATTERNS = new Pattern[] {PRETTY_STRING_FORMAT, INTERNAL_STRING_FORMAT, UNBOUNDED_STRING_FORMAT};
+	
 	public static Time parseTime(String string) {
 		if ( StringUtils.isBlank(string) ) {
 			return null;
 		} else {
-			Matcher matcher = PRETTY_STRING_FORMAT.matcher(string);
-			if ( ! matcher.matches() ) {
-				matcher = INTERNAL_STRING_FORMAT.matcher(string);
-				if ( ! matcher.matches() ) {
-					throw new IllegalArgumentException("Invalid time " + string);
+			for (Pattern pattern : PATTERNS) {
+				Matcher matcher = pattern.matcher(string);
+				if (matcher.matches()) {
+					int hour = Integer.parseInt(matcher.group(1));
+					int minute = Integer.parseInt(matcher.group(2));
+					return new Time(hour, minute);
 				}
 			}
-			int hour = Integer.parseInt(matcher.group(1));
-			int minute = Integer.parseInt(matcher.group(2));
-			return new Time(hour, minute);
+			throw new IllegalArgumentException("Invalid time " + string);
 		}
 	}
 	
