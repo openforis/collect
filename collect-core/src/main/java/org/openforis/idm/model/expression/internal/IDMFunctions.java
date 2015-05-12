@@ -268,18 +268,10 @@ public class IDMFunctions extends CustomFunctions {
 	}
 	
 	private static Integer dateTimeDifference(ExpressionContext context, Date date1, Time time1, Date date2, Time time2, TimeUnit timeUnit) {
-		if (date1.isComplete() && date2.isComplete() && time1.isComplete() && time2.isComplete()) {
-			int calendarTruncateField = getCalendarField(timeUnit);
-			
-			Calendar cal1 = Calendar.getInstance(Locale.ENGLISH);
-			cal1.setLenient(false);
-			cal1.set(date1.getYear(), date1.getMonth() - 1, date1.getDay(), time1.getHour(), time1.getMinute());
-			cal1 = DateUtils.truncate(cal1, calendarTruncateField);
-			
-			Calendar cal2 = Calendar.getInstance(Locale.ENGLISH);
-			cal2.setLenient(false);
-			cal2.set(date2.getYear(), date2.getMonth() - 1, date2.getDay(), time2.getHour(), time2.getMinute());
-			cal2 = DateUtils.truncate(cal2, calendarTruncateField);
+		if (date1 != null && date1.isComplete() && date2 != null && date2.isComplete() && 
+				time1 != null && time1.isComplete() && time2 != null && time2.isComplete()) {
+			Calendar cal1 = getCalendar(date1, time1, timeUnit);
+			Calendar cal2 = getCalendar(date2, time2, timeUnit);
 			
 			long duration  = cal1.getTimeInMillis() - cal2.getTimeInMillis();
 			
@@ -302,6 +294,15 @@ public class IDMFunctions extends CustomFunctions {
 		} else {
 			return null;
 		}
+	}
+
+	private static Calendar getCalendar(Date date2, Time time2, TimeUnit timeUnit) {
+		int calendarTruncateField = getCalendarField(timeUnit);
+		Calendar cal2 = Calendar.getInstance(Locale.ENGLISH);
+		cal2.setLenient(false);
+		cal2.set(date2.getYear(), date2.getMonth() - 1, date2.getDay(), time2.getHour(), time2.getMinute());
+		cal2 = DateUtils.truncate(cal2, calendarTruncateField);
+		return cal2;
 	}
 
 	private static int getCalendarField(TimeUnit timeUnit) {
