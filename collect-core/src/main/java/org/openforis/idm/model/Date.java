@@ -58,6 +58,17 @@ public final class Date implements Value {
 		    return new Date(year, month + 1, day);
 		}
 	}
+
+	public static Date fromNumericValue(Integer value) {
+		if (value == null) {
+			return null;
+		}
+		//20150520
+		int yearPart = Double.valueOf(Math.floor((double) (value / 10000))).intValue();
+		int monthPart = Double.valueOf(Math.floor((double) ((value % 10000) / 100))).intValue();
+		int dayPart = value % 100;
+		return new Date(yearPart, monthPart, dayPart);
+	}
 	
 	public Integer getDay() {
 		return day;
@@ -71,15 +82,19 @@ public final class Date implements Value {
 		return year;
 	}
 	
+	public boolean isComplete() {
+		return year != null && month != null && day != null;
+	}
+	
 	public Calendar toCalendar() {
-		if ( year==null || month==null || day == null ) {
-			return null;
-		} else {
+		if (isComplete()) {
 			GregorianCalendar cal = new GregorianCalendar();
 			cal.clear();
 			cal.setLenient(false);
 			cal.set(year, month-1, day);
 			return cal;
+		} else {
+			return null;
 		}
 	}
 	
@@ -96,6 +111,14 @@ public final class Date implements Value {
 		return result;
 	}
 	
+
+	public Integer getNumericValue() {
+		if (isComplete()) {
+			return (year * 10000) + (month * 100) + day;
+		} else {
+			return null;
+		}
+	}
 	@Override
 	public String toString() {
 		return String.format("year: %d\tmonth: %d\tday: %d", year, month, day);
@@ -137,5 +160,5 @@ public final class Date implements Value {
 			return false;
 		return true;
 	}
-	
+
 }

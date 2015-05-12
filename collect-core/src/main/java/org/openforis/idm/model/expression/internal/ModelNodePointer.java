@@ -79,14 +79,14 @@ public class ModelNodePointer extends DynamicPointer {
 		} else if (value instanceof Time ) {
 			if ( attribute.isFilled() ) {
 				Time time = (Time) value;
-				return time.getHour() * 100 + time.getMinute();
+				return time.getNumericValue();
 			} else {
 				return null;
 			}
 		} else if (value instanceof Date) {
 			if ( attribute.isFilled() ) {
 				Date date = (Date) value;
-				return (date.getYear() * 10000) + (date.getMonth() * 100) + date.getDay();
+				return date.getNumericValue();
 			} else {
 				return null;
 			}
