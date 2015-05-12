@@ -25,15 +25,15 @@ public final class Time implements Value {
 
 	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("(\\d{1,2}):(\\d{1,2})(:\\d{1,2})?");
 	
-	private static final Pattern[] FORMATS = new Pattern[]{INTERNAL_STRING_FORMAT, PRETTY_STRING_FORMAT};
-
+	private static final Pattern[] PATTERNS = new Pattern[] {INTERNAL_STRING_FORMAT, PRETTY_STRING_FORMAT};
+	
 	public static Time parseTime(String value) {
 		if ( StringUtils.isBlank(value) ) {
 			return null;
 		} else {
-			for (Pattern pattern : FORMATS) {
+			for (Pattern pattern : PATTERNS) {
 				Matcher matcher = pattern.matcher(value);
-				if ( ! matcher.matches() ) {
+				if (matcher.matches()) {
 					int hour = Integer.parseInt(matcher.group(1));
 					int minute = Integer.parseInt(matcher.group(2));
 					return new Time(hour, minute);

@@ -111,11 +111,17 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
+		register("datetime-diff", 4, new CustomFunction() {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
+						(Integer) objects[2], (Integer) objects[3]);
+			}
+		});
+
 		register("datetime-diff", 5, new CustomFunction() {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
-				return dateTimeDifference(expressionContext, objects); 
-//				return dateTimeDifference(expressionContext, (Date) objects[0], (Time) objects[1], 
-//						(Date) objects[2], (Time) objects[3], (String) objects[4]);
+				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
+						(Integer) objects[2], (Integer) objects[3], (String) objects[4]);
 			}
 		});
 	}
@@ -248,9 +254,13 @@ public class IDMFunctions extends CustomFunctions {
 		}
 	}
 
-	private Object dateTimeDifference(ExpressionContext expressionContext, Object[] objects) {
-		return dateTimeDifference(expressionContext, Date.fromNumericValue((Integer) objects[0]), Time.fromNumericValue((Integer) objects[1]), 
-				Date.fromNumericValue((Integer) objects[2]), Time.fromNumericValue((Integer) objects[3]), (String) objects[4]);
+	private Object dateTimeDifference(ExpressionContext expressionContext, Integer date1, Integer time1, Integer date2, Integer time2) {
+		return dateTimeDifference(expressionContext, date1, time1, date2, time2, TimeUnit.MINUTE.name());
+	}
+	
+	private Object dateTimeDifference(ExpressionContext expressionContext, Integer date1, Integer time1, Integer date2, Integer time2, String timeUnit) {
+		return dateTimeDifference(expressionContext, Date.fromNumericValue(date1), Time.fromNumericValue(time1), 
+				Date.fromNumericValue(date2), Time.fromNumericValue(time2), timeUnit);
 	}
 	
 	private static Integer dateTimeDifference(ExpressionContext context, Date date1, Time time1, Date date2, Time time2, String timeUnit) {
@@ -319,9 +329,4 @@ public class IDMFunctions extends CustomFunctions {
 		return survey;
 	}
 	
-	public static void main(String[] args) {
-		int diff = IDMFunctions.dateTimeDifference(null, new Date(2015, 10, 20), new Time(10, 30), new Date(2015, 5, 20), new Time(9, 0), TimeUnit.DAY);
-		System.out.println(diff);
-	}
-
 }
