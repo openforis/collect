@@ -36,17 +36,7 @@ public class CoordinateAttributeVM extends AttributeVM<CoordinateAttributeDefini
 	
 	public String getFieldsOrderLabel(String value) {
 		CoordinateAttributeFieldsOrder enumValue = CoordinateAttributeFieldsOrder.valueOf(value);
-		String messageKey;
-		switch (enumValue) {
-		case SRS_X_Y:
-			messageKey = "survey.schema.attribute.coordinate.fields_order.srs_x_y";
-			break;
-		case SRS_Y_X:
-			messageKey = "survey.schema.attribute.coordinate.fields_order.srs_y_x";
-			break;
-		default:
-			messageKey = enumValue.name();
-		}
+		String messageKey = "survey.schema.attribute.coordinate.fields_order." + enumValue.name().toLowerCase();
 		return Labels.getLabel(messageKey);
 	}
 	

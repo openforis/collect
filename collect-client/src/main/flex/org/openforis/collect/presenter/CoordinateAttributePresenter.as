@@ -23,23 +23,50 @@ package org.openforis.collect.presenter
 			var attrDefn:CoordinateAttributeDefinitionProxy = CoordinateAttributeDefinitionProxy(view.attributeDefinition);
 			if(attrDefn.parentLayout == UIUtil.LAYOUT_TABLE) {
 				if ( attrDefn.parent.direction == UIOptions$Direction.BY_COLUMNS ) {
-					if ( attrDefn.fieldsOrder == UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y ) {
-						view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_SRS_X_Y;
-					} else {
-						view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_SRS_Y_X;
+					switch (attrDefn.fieldsOrder) {
+						case UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y:
+							view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_SRS_X_Y;
+							break;
+						case UIOptions$CoordinateAttributeFieldsOrder.SRS_Y_X:
+							view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_SRS_Y_X;
+							break;
+						case UIOptions$CoordinateAttributeFieldsOrder.X_Y_SRS:
+							view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_X_Y_SRS;
+							break;
+						case UIOptions$CoordinateAttributeFieldsOrder.Y_X_SRS:
+							view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_Y_X_SRS;
+							break;
 					}
 				} else {
-					if ( attrDefn.fieldsOrder == UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y ) {
-						view.currentState = CoordinateAttributeRenderer.STATE_HORIZONTAL_SRS_X_Y;
-					} else {
-						view.currentState = CoordinateAttributeRenderer.STATE_HORIZONTAL_SRS_Y_X;
+					switch (attrDefn.fieldsOrder) {
+						case UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y:
+							view.currentState = CoordinateAttributeRenderer.STATE_HORIZONTAL_SRS_X_Y;
+							break;
+						case UIOptions$CoordinateAttributeFieldsOrder.SRS_Y_X:
+							view.currentState = CoordinateAttributeRenderer.STATE_HORIZONTAL_SRS_Y_X;
+							break;
+						case UIOptions$CoordinateAttributeFieldsOrder.X_Y_SRS:
+							view.currentState = CoordinateAttributeRenderer.STATE_HORIZONTAL_X_Y_SRS;
+							break;
+						case UIOptions$CoordinateAttributeFieldsOrder.Y_X_SRS:
+							view.currentState = CoordinateAttributeRenderer.STATE_HORIZONTAL_Y_X_SRS;
+							break;
 					}
 				}
 			} else {
-				if ( attrDefn.fieldsOrder == UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y ) {
-					view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_SRS_X_Y;
-				} else {
-					view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_SRS_Y_X;
+				switch (attrDefn.fieldsOrder) {
+					case UIOptions$CoordinateAttributeFieldsOrder.SRS_X_Y:
+						view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_SRS_X_Y;
+						break;
+					case UIOptions$CoordinateAttributeFieldsOrder.SRS_Y_X:
+						view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_SRS_Y_X;
+						break;
+					case UIOptions$CoordinateAttributeFieldsOrder.X_Y_SRS:
+						view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_X_Y_SRS;
+						break;
+					case UIOptions$CoordinateAttributeFieldsOrder.Y_X_SRS:
+						view.currentState = CoordinateAttributeRenderer.STATE_VERTICAL_FORM_Y_X_SRS;
+						break;
 				}
 			}
 		}

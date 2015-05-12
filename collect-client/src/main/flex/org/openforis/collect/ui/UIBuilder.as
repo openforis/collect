@@ -620,6 +620,16 @@ package org.openforis.collect.ui {
 					compositeAttributeLabelsGroup.addElement(yLabel);
 					compositeAttributeLabelsGroup.addElement(xLabel);
 					break;
+				case UIOptions$CoordinateAttributeFieldsOrder.X_Y_SRS:
+					compositeAttributeLabelsGroup.addElement(xLabel);
+					compositeAttributeLabelsGroup.addElement(yLabel);
+					compositeAttributeLabelsGroup.addElement(srsLabel);
+					break;
+				case UIOptions$CoordinateAttributeFieldsOrder.Y_X_SRS:
+					compositeAttributeLabelsGroup.addElement(yLabel);
+					compositeAttributeLabelsGroup.addElement(xLabel);
+					compositeAttributeLabelsGroup.addElement(srsLabel);
+					break;
 			}
 		}
 		

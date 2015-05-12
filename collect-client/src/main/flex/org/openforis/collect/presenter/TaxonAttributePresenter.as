@@ -336,8 +336,9 @@ package org.openforis.collect.presenter {
 					) {
 					data.addItem(UNKNOWN_ITEM);
 				}
-				data.addItem(UNLISTED_ITEM);
 			}
+			data.addItem(UNLISTED_ITEM);
+			
 			autoCompletePopUp.dataGrid.dataProvider = data;
 			autoCompleteLastResult = data;
 			autoCompleteDataLoading = false;

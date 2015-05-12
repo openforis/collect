@@ -10,8 +10,11 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.input.AutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.LanguageAutoComplete;
 	import org.openforis.collect.ui.component.input.LanguageCodeAutoCompletePopUp;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
+	
+	import spark.components.gridClasses.GridColumn;
 
 	/**
 	 * 
@@ -50,7 +53,7 @@ package org.openforis.collect.presenter
 			if ( StringUtil.isNotBlank(code) ) {
 				var language:String = Languages.getLanguageLabel(code);
 				if ( language != null ) {
-					return language;
+					return language + " (" + code.toUpperCase() + ")";
 				} else {
 					return code;
 				}
@@ -62,7 +65,8 @@ package org.openforis.collect.presenter
 		protected function languagesFilterFunction(item:LanguageItem):Boolean {
 			var searchText:String = view.text;
 			if ( StringUtil.isNotBlank(searchText) ) {
-				return StringUtil.startsWith(item.label, searchText, true);
+				return StringUtil.startsWith(item.label, searchText, true) || 
+					StringUtil.startsWith(item.code, searchText, true);
 			} else {
 				return false;
 			}
@@ -97,9 +101,14 @@ package org.openforis.collect.presenter
 		
 		override protected function createPopUp():AutoCompletePopUp {
 			var popUp:LanguageCodeAutoCompletePopUp = new LanguageCodeAutoCompletePopUp();
+			popUp.itemLabelFunction = itemToLabel;
 			return popUp;
 		}
 		
+		private function itemToLabel(item:Object, gridColumn:GridColumn):String {
+			return item == null ? "" : (String(item.code).toUpperCase() + " - " + item.label);
+		}
+
 		override protected function performSelectValue(selectedValue:*):void {
 			if ( selectedValue != null ) {
 				view.text = (selectedValue as LanguageItem).label;
