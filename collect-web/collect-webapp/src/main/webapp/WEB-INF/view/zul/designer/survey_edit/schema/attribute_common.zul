@@ -22,8 +22,7 @@
 		  			<column />
 		  		</columns>
 		  		<rows>
-					<row
-		  				visible="@load(vm.attribute and not (vm.calculableAttribute and fx.calculated))">
+					<row visible="@load(not fx.calculated)">
 		  				<fieldErrorHandler message="@load(vmsgs['phaseToApplyDefaultValue'])">
 			  				<label value="${labels.survey.schema.attribute.phase_to_apply_default_value}:" />
 			  			</fieldErrorHandler>

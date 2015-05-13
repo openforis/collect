@@ -27,8 +27,6 @@ public class TextAttributeDefinition extends AttributeDefinition implements KeyA
 	}
 	
 	private Type type;
-	private Boolean key;
-	
 	protected TextAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
 	}
@@ -41,16 +39,6 @@ public class TextAttributeDefinition extends AttributeDefinition implements KeyA
 		this.type = type;
 	}
 	
-	@Override
-	public boolean isKey() {
-		return this.key == null ? false : key;
-	}
-	
-	@Override
-	public void setKey(boolean key) {
-		this.key = key;
-	}
-
 	@Override
 	public Node<?> createNode() {
 		return new TextAttribute(this);
@@ -91,11 +79,6 @@ public class TextAttributeDefinition extends AttributeDefinition implements KeyA
 		if (getClass() != obj.getClass())
 			return false;
 		TextAttributeDefinition other = (TextAttributeDefinition) obj;
-		if (key == null) {
-			if (other.key != null)
-				return false;
-		} else if (!key.equals(other.key))
-			return false;
 		if (type != other.type)
 			return false;
 		return true;

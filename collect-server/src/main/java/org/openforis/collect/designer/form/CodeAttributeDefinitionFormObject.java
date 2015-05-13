@@ -17,7 +17,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
  */
 public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormObject<CodeAttributeDefinition> {
 	
-	private boolean key;
 	private CodeList list;
 	private CodeAttributeDefinition parentCodeAttributeDefinition;
 	private boolean strict;
@@ -42,7 +41,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	public void saveTo(CodeAttributeDefinition dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		dest.setList(list);
-		dest.setKey(key);
 		dest.setAllowUnlisted(! strict);
 		dest.setParentCodeAttributeDefinition(parentCodeAttributeDefinition);
 		dest.setAllowValuesSorting(dest.isMultiple() && allowValuesSorting);
@@ -59,7 +57,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	@Override
 	public void loadFrom(CodeAttributeDefinition source, String languageCode) {
 		super.loadFrom(source, languageCode);
-		key = source.isKey();
 		list = source.getList();
 		parentCodeAttributeDefinition = source.getParentCodeAttributeDefinition();
 		hierarchicalLevel = list == null ? null : source.getHierarchicalLevel();
@@ -75,14 +72,6 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		showCode = uiOptions.getShowCode(source);
 	}
 	
-	public boolean isKey() {
-		return key;
-	}
-
-	public void setKey(boolean key) {
-		this.key = key;
-	}
-
 	public CodeList getList() {
 		return list;
 	}

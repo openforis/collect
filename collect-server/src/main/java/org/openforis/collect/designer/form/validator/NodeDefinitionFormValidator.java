@@ -40,7 +40,6 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 	protected void internalValidate(ValidationContext ctx) {
 		validateName(ctx);
 		validateDescription(ctx);
-		validateMaxCount(ctx);
 		
 		NodeDefinition contextNode = getEditedNode(ctx);
 		String requirenessTypeVal = getValue(ctx, REQUIRENESS_TYPE_FIELD);
@@ -50,6 +49,7 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 				validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
 			}
 		}
+		
 		String relevanceTypeVal = getValue(ctx, RELEVANCE_TYPE_FIELD);
 		RelevanceType relevanceType = RelevanceType.valueOf(relevanceTypeVal);
 		if (relevanceType == RelevanceType.RELEVANT_WHEN) {
@@ -57,8 +57,13 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 				validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
 			}
 		}
-		validateValueExpression(ctx, contextNode, MIN_COUNT_EXPRESSION_FIELD);
-		validateValueExpression(ctx, contextNode, MAX_COUNT_EXPRESSION_FIELD);
+		Boolean multiple = (Boolean) getValue(ctx, MULTIPLE_FIELD);
+		if (multiple != null && multiple.booleanValue()) {
+			validateValueExpression(ctx, contextNode, MIN_COUNT_EXPRESSION_FIELD);
+			validateValueExpression(ctx, contextNode, MAX_COUNT_EXPRESSION_FIELD);
+			validateMaxCount(ctx);
+		}
+		
 		validateColumn(ctx);
 	}
 

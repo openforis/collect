@@ -346,10 +346,16 @@ public class SurveyValidator {
 			addBooleanExpressionValidationResult(results, node, ((CustomCheck) check).getExpression(),
 					"survey.validation.check.custom.error.error.invalid_custom_expression");
 		} else if ( check instanceof DistanceCheck ) {
+			//validate source point
+			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getSourcePointExpression(), 
+					"survey.validation.check.distance.error.invalid_source_point_expression");
+			//validate destination point
+			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getDestinationPointExpression(), 
+					"survey.validation.check.distance.error.invalid_destination_point_expression");
 			//validate min distance
 			addBooleanExpressionValidationResult(results, node, ((DistanceCheck) check).getMinDistanceExpression(),
 					"survey.validation.check.distance.error.invalid_min_distance_expression");
-			//validate min distance
+			//validate max distance
 			addBooleanExpressionValidationResult(results, node, ((DistanceCheck) check).getMaxDistanceExpression(),
 					"survey.validation.check.distance.error.invalid_max_distance_expression");
 		} else if ( check instanceof PatternCheck ) {

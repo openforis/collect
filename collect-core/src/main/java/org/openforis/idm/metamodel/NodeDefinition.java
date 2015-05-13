@@ -409,12 +409,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	}
 	
 	public void setRequiredExpression(String requiredExpression) {
-		if (requiredExpression == null) {
-			this.minCountExpression = null;
-		} else {
-			this.minCountExpression = String.format(MIN_COUNT_FROM_REQUIRED_EXPRESSION_FORMAT, requiredExpression);
-		}
-		updateMinCountRelativeFields();
+		String minCountExp = requiredExpression == null ? null: String.format(MIN_COUNT_FROM_REQUIRED_EXPRESSION_FORMAT, requiredExpression);
+		setMinCountExpression(minCountExp);
 	}
 
 	/**
@@ -461,8 +457,8 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 
 	protected void updateMinCountRelativeFields() {
 		if (StringUtils.isBlank(minCountExpression)) {
-			fixedMinCount = null;
 			alwaysRequired = false;
+			fixedMinCount = null;
 		} else if ("1".equals(minCountExpression)) {
 			alwaysRequired = true;
 			fixedMinCount = 1;

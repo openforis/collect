@@ -25,6 +25,14 @@
   						onChange="@command('nameChanged', name=self.value)" />
   				</fieldErrorHandler>
   			</row>
+  			<row visible="${vm.attribute}">
+	    		<label value="${labels.survey.schema.attribute.key}:" />
+	    		<fieldErrorHandler message="@load(vmsgs['key'])">
+	    			<checkbox checked="@load(fx.key eq true) @save(fx.key)"
+	    				disabled="@load(fx.calculated)"
+	    				onCheck="@command('keyChanged', key=self.checked)" />
+	    		</fieldErrorHandler>
+	    	</row>
   		</rows>
   	</grid>
 
@@ -36,99 +44,6 @@
   			<column />
   		</columns>
   		<rows>
-  			<row visible="${vm.calculableAttribute}">
-	    		<fieldErrorHandler message="@load(vmsgs['calculated'])">
-	    			<label value="${labels.survey.schema.attribute.calculated.$}:" />
-					<image popup="calculatedInfoTooltip" style="cursor:pointer"
-						src="/assets/images/info-small.png" />
-	    		</fieldErrorHandler>
-	    		<fieldErrorHandler message="@load(vmsgs['calculated'])">
-	    			<checkbox
-	    				checked="@load(fx.calculated eq true) @save(fx.calculated)"
-	    				onCheck="@command('calculatedChanged', changed=self.checked)" />
-	    		</fieldErrorHandler>
-	    	</row>
-	      	<row visible="@load(vm.calculableAttribute and fx.calculated)">
-				<fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
-		        	<label value="${labels.survey.schema.attribute.include_in_data_export}:" />
-		        </fieldErrorHandler>
-		        <fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
-			        <checkbox checked="@load(fx.includeInDataExport eq true) @save(fx.includeInDataExport)"
-			        	onCheck="@command('applyChanges')" />
-			    </fieldErrorHandler>
-		    </row>
-	 		<row visible="@load(vm.calculableAttribute and fx.calculated)">
-		        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
-			    	<label value="${labels.survey.schema.attribute.show_in_ui}:" />
-		        </fieldErrorHandler>
-		        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
-			        <checkbox checked="@load(fx.showInUI eq true) @save(fx.showInUI)"
-			        	onCheck="@command('applyChanges')" />
-			    </fieldErrorHandler>
-		    </row>
-  			<row visible="${not vm.rootEntity and not (vm.calculableAttribute and fx.calculated)}">
-  				<fieldErrorHandler message="@load(vmsgs['multiple'])">
-	  				<label use="org.openforis.collect.designer.component.FieldLabel" 
-	  					value="${labels.survey.schema.node.multiple}" />
-	  			</fieldErrorHandler>
-  				<fieldErrorHandler
-  					message="@load(vmsgs['multiple'])">
-  					<checkbox
-  						checked="@load(fx.multiple eq true) @save(fx.multiple)"
-  						onCheck="@command('applyChanges')" />
-  				</fieldErrorHandler>
-  			</row>
-  			<row
-  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple ne true)">
-  				<label value="${labels.survey.schema.node.required}:" />
-  				<vlayout>
-	  				<radiogroup selectedItem="@bind(fx.requirenessType)"
-							onCheck="@command('applyChanges')">
-						<radio 
-							label="${labels.survey.schema.node.not_required}"
-							value="NOT_REQUIRED" />
-						<radio
-							label="${labels.survey.schema.node.always_required}"
-							value="ALWAYS_REQUIRED" />
-						<radio
-							label="${labels.survey.schema.node.required_when}"
-							value="REQUIRED_WHEN" />
-	  				</radiogroup>
-					<fieldErrorHandler
-						visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')"
-	  					message="@load(vmsgs['requiredWhenExpression'])">
-	  					<textbox width="250px"
-	  						value="@bind(fx.requiredWhenExpression)"
-	  						onChange="@command('applyChanges')"
-	  						rows="4" />
-	  					<image src="/assets/images/expression-small.png" />
-	  				</fieldErrorHandler>
-  				</vlayout>
-  			</row>
-  			<row
-  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple eq true)">
-  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
-  					<label value="${labels.survey.schema.node.min_count}:" />
-  				</fieldErrorHandler>
-  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
-  					<textbox value="@bind(fx.minCountExpression)"
-  						multiline="true"
-  						onChange="@command('applyChanges')" />
-  					<image src="/assets/images/expression-small.png" />
-  				</fieldErrorHandler>
-  			</row>
-  			<row
-  				visible="@load(not vm.rootEntity and not (vm.calculableAttribute and fx.calculated) and fx.multiple eq true)">
-  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
-	  				<label value="${labels.survey.schema.node.max_count}:" />
-	  			</fieldErrorHandler>
-  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
-  					<textbox value="@bind(fx.maxCountExpression)"
-  						multiline="true"
-  						onChange="@command('applyChanges')" />
-  					<image src="/assets/images/expression-small.png" />
-  				</fieldErrorHandler>
-  			</row>
   			<row visible="@load(not vm.rootEntity)">
   				<label value="${labels.survey.schema.node.relevant}:" />
   				<vlayout>
@@ -155,6 +70,102 @@
 	  						onCheck="@command('applyChanges')" />
 	  				</hlayout>
 	  			</vlayout>
+  			</row>
+  			<row visible="${vm.attribute}">
+	    		<fieldErrorHandler message="@load(vmsgs['calculated'])">
+	    			<label value="${labels.survey.schema.attribute.calculated.$}:" />
+					<image popup="calculatedInfoTooltip" style="cursor:pointer"
+						src="/assets/images/info-small.png" />
+	    		</fieldErrorHandler>
+	    		<hlayout spacing="20px">
+		    		<fieldErrorHandler message="@load(vmsgs['calculated'])">
+		    			<checkbox
+		    				checked="@load(fx.calculated eq true) @save(fx.calculated)"
+		    				onCheck="@command('calculatedChanged', changed=self.checked)" />
+		    		</fieldErrorHandler>
+		    		<hlayout visible="@load(fx.calculated)" spacing="15px">
+			    		<fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+				        	<label value="${labels.survey.schema.attribute.include_in_data_export}:" />
+				        </fieldErrorHandler>
+				        <fieldErrorHandler message="@load(vmsgs['includeInDataExport'])">
+					        <checkbox checked="@load(fx.includeInDataExport eq true) @save(fx.includeInDataExport)"
+					        	onCheck="@command('applyChanges')" />
+					    </fieldErrorHandler>
+				        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
+					    	<label value="${labels.survey.schema.attribute.show_in_ui}:" />
+				        </fieldErrorHandler>
+				        <fieldErrorHandler message="@load(vmsgs['showInUI'])">
+					        <checkbox checked="@load(fx.showInUI eq true) @save(fx.showInUI)"
+					        	onCheck="@command('applyChanges')" />
+					    </fieldErrorHandler>
+				 	</hlayout>
+	    		</hlayout>
+	    	</row>
+  			<row visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated))">
+  				<fieldErrorHandler message="@load(vmsgs['multiple'])">
+	  				<label use="org.openforis.collect.designer.component.FieldLabel" 
+	  					value="${labels.survey.schema.node.multiple}" />
+	  			</fieldErrorHandler>
+	  			<hlayout spacing="20px">
+		  			<fieldErrorHandler
+	  					message="@load(vmsgs['multiple'])">
+	  					<checkbox
+	  						checked="@load(fx.multiple eq true) @save(fx.multiple)"
+	  						onCheck="@command('applyChanges')" />
+	  				</fieldErrorHandler>
+	  				
+	  				<hlayout spacing="15px"
+		  				visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated) and fx.multiple eq true)">
+		  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
+		  					<label value="${labels.survey.schema.node.min_count}:" />
+		  				</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
+		  					<textbox value="@bind(fx.minCountExpression)"
+		  						multiline="true"
+		  						width="100px"
+		  						onChange="@command('applyChanges')" />
+		  					<image src="/assets/images/expression-small.png" />
+		  				</fieldErrorHandler>
+		  				
+		  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
+			  				<label value="${labels.survey.schema.node.max_count}:" />
+			  			</fieldErrorHandler>
+		  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
+		  					<textbox value="@bind(fx.maxCountExpression)"
+		  						multiline="true"
+		  						width="100px"
+		  						onChange="@command('applyChanges')" />
+		  					<image src="/assets/images/expression-small.png" />
+		  				</fieldErrorHandler>
+		  			</hlayout>
+		  		</hlayout>
+  			</row>
+  			<row
+  				visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated) and fx.multiple ne true)">
+  				<label value="${labels.survey.schema.node.required}:" />
+  				<vlayout>
+	  				<radiogroup selectedItem="@bind(fx.requirenessType)"
+							onCheck="@command('applyChanges')">
+						<radio 
+							label="${labels.survey.schema.node.not_required}"
+							value="NOT_REQUIRED" />
+						<radio
+							label="${labels.survey.schema.node.always_required}"
+							value="ALWAYS_REQUIRED" />
+						<radio
+							label="${labels.survey.schema.node.required_when}"
+							value="REQUIRED_WHEN" />
+	  				</radiogroup>
+					<fieldErrorHandler
+						visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')"
+	  					message="@load(vmsgs['requiredWhenExpression'])">
+	  					<textbox width="250px"
+	  						value="@bind(fx.requiredWhenExpression)"
+	  						onChange="@command('applyChanges')"
+	  						rows="4" />
+	  					<image src="/assets/images/expression-small.png" />
+	  				</fieldErrorHandler>
+  				</vlayout>
   			</row>
   		</rows>
   	</grid>

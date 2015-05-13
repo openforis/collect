@@ -33,7 +33,6 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 		new FieldDefinition<String>(QUALIFIER_FIELD, "q", "other", String.class, this)
 	);
 	
-	private boolean key;
 	private boolean allowUnlisted;
 	private CodeList list;
 	private CodeAttributeDefinition parentCodeAttributeDefinition;
@@ -213,7 +212,7 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 	 */
 	private boolean isAncestorCodeAttributeDefinitionOf(CodeAttributeDefinition codeAttrDefn) {
 		boolean isAncestor = false;
-		for (CodeAttributeDefinition ancestor : codeAttrDefn.getAncestorCodeAttributeDefinitions()) {
+		for (AttributeDefinition ancestor : codeAttrDefn.getAncestorCodeAttributeDefinitions()) {
 			if ( ancestor == this ) {
 				isAncestor = true;
 				break;
@@ -316,16 +315,6 @@ public class CodeAttributeDefinition extends AttributeDefinition implements KeyA
 	@Override
 	public Class<? extends Value> getValueType() {
 		return Code.class;
-	}
-
-	@Override
-	public boolean isKey() {
-		return key;
-	}
-	
-	@Override
-	public void setKey(boolean key) {
-		this.key = key;
 	}
 
 	public boolean isAllowUnlisted() {

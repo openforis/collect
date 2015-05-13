@@ -12,8 +12,13 @@ import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.BooleanAttribute;
+import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Coordinate;
+import org.openforis.idm.model.CoordinateAttribute;
+import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.FileAttribute;
@@ -22,6 +27,7 @@ import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextAttribute;
+import org.openforis.idm.model.TimeAttribute;
 
 /**
  * 
@@ -401,14 +407,28 @@ public class CollectRecord extends Record {
 	}
 	
 	private String getTextValue(Node<?> keyNode) {
-		if(keyNode instanceof CodeAttribute) {
+		if(keyNode instanceof BooleanAttribute) {
+			BooleanValue val = ((BooleanAttribute) keyNode).getValue();
+			return val == null ? null : val.toString();
+		} else if(keyNode instanceof CodeAttribute) {
 			Code code = ((CodeAttribute) keyNode).getValue();
 			return code == null ? null: code.getCode();
-		} else if(keyNode instanceof TextAttribute) {
-			return ((TextAttribute) keyNode).getText();
-		} else if(keyNode instanceof NumberAttribute<?,?>) {
+		} else if(keyNode instanceof CoordinateAttribute) {
+			Coordinate coordinate = ((CoordinateAttribute) keyNode).getValue();
+			return coordinate != null && coordinate.isComplete() ? coordinate.toString() : null;
+		} else if(keyNode instanceof DateAttribute) {
+			org.openforis.idm.model.Date date = ((DateAttribute) keyNode).getValue();
+			return date != null && date.isComplete() ? date.toXmlDate() : null;
+		} else if(keyNode instanceof FileAttribute) {
+			return ((FileAttribute) keyNode).getFilename();
+		} else if(keyNode instanceof NumberAttribute) {
 			Number number = ((NumberAttribute<?,?>) keyNode).getNumber();
 			return number == null ? null: number.toString();
+		} else if(keyNode instanceof TextAttribute) {
+			return ((TextAttribute) keyNode).getText();
+		} else if(keyNode instanceof TimeAttribute) {
+			org.openforis.idm.model.Time time = ((TimeAttribute) keyNode).getValue();
+			return time != null && time.isComplete() ? time.toXmlTime() : null;
 		} else {
 			throw new UnsupportedOperationException("Unsopported node type: " + keyNode.getClass().getName());
 		}

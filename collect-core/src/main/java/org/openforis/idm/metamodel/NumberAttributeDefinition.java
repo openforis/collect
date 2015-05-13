@@ -30,20 +30,8 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition implem
 	private final FieldDefinitionMap integerFieldDefinitionByName = new FieldDefinitionMap(integerValueField, unitNameField, unitIdField);
 	private final FieldDefinitionMap realFieldDefinitionByName = new FieldDefinitionMap(realValueField, unitNameField, unitIdField);
 	
-	private boolean key;
-
 	NumberAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
-	}
-
-	@Override
-	public boolean isKey() {
-		return key;
-	}
-	
-	@Override
-	public void setKey(boolean key) {
-		this.key = key;
 	}
 
 	@Override

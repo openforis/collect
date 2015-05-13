@@ -36,6 +36,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	//generic
 	private String name;
+	protected boolean key; //only for AttributeDefinition
 	private String description;
 	private boolean multiple;
 	private String requirenessType;
@@ -66,7 +67,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Integer labelWidth;
 	private String labelOrientation;
 
-	
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
 	}
@@ -190,24 +190,29 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		dest.setPrompt(Prompt.Type.PAPER, languageCode, paperPromptLabel);
 		dest.setPrompt(Prompt.Type.PC, languageCode, pcPromptLabel);
 		dest.setDescription(languageCode, description);
-		dest.setMultiple(multiple);
+
+		dest.setMultiple(false);
 		dest.setMinCountExpression(null);
 		dest.setMaxCountExpression(null);
 		dest.setRequiredExpression(null);
-		if ( multiple ) {
-			dest.setMinCountExpression(StringUtils.trimToNull(minCountExpression));
-			dest.setMaxCountExpression(StringUtils.trimToNull(maxCountExpression));
-		} else {
-			RequirenessType requirenessTypeEnum = RequirenessType.valueOf(requirenessType);
-			switch(requirenessTypeEnum) {
-			case ALWAYS_REQUIRED:
-				dest.setAlwaysRequired();
-				break;
-			case REQUIRED_WHEN:
-				dest.setRequiredExpression(StringUtils.trimToNull(requiredWhenExpression));
-				break;
-			default:
-				break;
+		
+		if ( ! (dest instanceof EntityDefinition && dest.getRootEntity() == dest || dest instanceof AttributeDefinition && calculated)) {
+			if (multiple) {
+				dest.setMultiple(true);
+				dest.setMinCountExpression(StringUtils.trimToNull(minCountExpression));
+				dest.setMaxCountExpression(StringUtils.trimToNull(maxCountExpression));
+			} else {
+				RequirenessType requirenessTypeEnum = RequirenessType.valueOf(requirenessType);
+				switch(requirenessTypeEnum) {
+				case ALWAYS_REQUIRED:
+					dest.setAlwaysRequired();
+					break;
+				case REQUIRED_WHEN:
+					dest.setRequiredExpression(StringUtils.trimToNull(requiredWhenExpression));
+					break;
+				default:
+					break;
+				}
 			}
 		}
 		
@@ -272,6 +277,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public boolean isKey() {
+		return key;
+	}
+
+	public void setKey(boolean key) {
+		this.key = key;
 	}
 	
 	public boolean isCalculated() {
@@ -481,5 +494,5 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	public void setFromCollectEarthCSV(boolean fromCollectEarthCSV) {
 		this.fromCollectEarthCSV = fromCollectEarthCSV;
 	}
-	
+
 }
