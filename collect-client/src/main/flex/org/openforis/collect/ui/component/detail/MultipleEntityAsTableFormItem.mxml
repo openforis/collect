@@ -166,8 +166,6 @@
 				icon="{Images.ADD}" 
 				labelPlacement="left" 
 				useHandCursor="true"
-				visible="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
-				includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
 				/>
 		</s:Group>
 		

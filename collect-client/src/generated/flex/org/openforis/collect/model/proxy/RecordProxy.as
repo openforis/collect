@@ -121,6 +121,12 @@ package org.openforis.collect.model.proxy {
 		}
 		
 		private function applyChange(change:NodeChangeProxy):void {
+			var node:NodeProxy = getNode(change.nodeId);
+			if (node != null) {
+				change.nodeName = node.name;
+				change.parentEntityId = node.parent == null ? NaN : node.parent.id;
+			}
+			
 			if ( change is NodeDeleteChangeProxy ) {
 				processNodeDeleteResponse(NodeDeleteChangeProxy(change));
 			} else {
@@ -172,6 +178,7 @@ package org.openforis.collect.model.proxy {
 				return;
 			}
 			var a:AttributeProxy = AttributeProxy(node);
+
 			if ( change.validationResults != null ) {
 				a.validationResults = change.validationResults;
 			}
@@ -211,7 +218,7 @@ package org.openforis.collect.model.proxy {
 		
 		public function showErrors():void {
 			traverse(function (node:NodeProxy):void {
-				if (node instanceof EntityProxy) {
+				if (node is EntityProxy) {
 					EntityProxy(node).showErrorsOnChildren();
 				}
 			});
