@@ -4,6 +4,7 @@
 package org.openforis.collect.metamodel.proxy;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
@@ -30,6 +31,12 @@ public class TextAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		} else {
 			return null;
 		}
+	}
+	
+	@ExternalizedProperty
+	public boolean isAutoUppercase() {
+		UIOptions uiOptions = getUIOptions();
+		return uiOptions.isAutoUppercase(attributeDefinition);
 	}
 	
 	

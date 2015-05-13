@@ -407,6 +407,7 @@ package org.openforis.collect.ui {
 						}
 						break;
 				}
+				StringInputField(inputField).upperCase = textAttributeDef.autoUppercase;
 			}
 			inputField.width = getInputFieldWidth(def);
 			inputField.attributeDefinition = def;

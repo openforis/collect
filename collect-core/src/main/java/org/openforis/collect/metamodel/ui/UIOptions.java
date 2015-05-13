@@ -27,6 +27,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 
 /**
@@ -736,6 +737,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		setAnnotationValue(defn, Annotation.LABEL_ORIENTATION, value);
 	}
 	
+	public boolean isAutoUppercase(TextAttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.AUTO_UPPERCASE);
+	}
+	
+	public void setAutoUppercase(TextAttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.AUTO_UPPERCASE, value);
+	}
+
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
