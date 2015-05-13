@@ -574,7 +574,7 @@
   <schema>
     <entity id="172" name="cluster" ui:tab="cluster" ui:tabSet="cluster">
       <label type="instance">Cluster</label>
-      <code id="276" name="cluster_id" required="true" key="true" strict="false" list="ofc_sampling_design">
+      <code id="276" name="cluster_no" required="true" key="true" strict="false" list="ofc_sampling_design">
         <label type="instance">Id</label>
       </code>
       <code id="220" name="measurement" key="true" list="measurement">
@@ -583,16 +583,9 @@
       </code>
       <entity id="235" name="plot" multiple="true" ui:layout="form" ui:tab="plot">
         <label type="instance">Plot</label>
-        <code id="82" name="plot_no" ui:tab="plot_det" key="true" strict="false" list="ofc_sampling_design" parent="parent()/cluster_id">
+        <code id="82" name="plot_no" ui:tab="plot_det" key="true" strict="false" list="ofc_sampling_design" parent="parent()/cluster_no">
           <label type="instance">No.</label>
         </code>
-        <text id="124" name="subplot" relevant="share &lt; 100" required="true" ui:tab="plot_det" type="short" key="true">
-          <label type="instance">Subplot</label>
-          <default value="A" />
-          <pattern flag="error" regex="[A-Z]">
-            <message xml:lang="en">Subplot letter must be a single letter (A-Z)</message>
-          </pattern>
-        </text>
         <number id="265" name="share" ui:tab="plot_det" type="real">
           <label type="instance">Share</label>
           <default value="100" />
@@ -614,8 +607,8 @@
         </number>
         <coordinate id="192" name="location" required="true" ui:tab="plot_det">
           <label type="instance">GPS reading</label>
-          <distance flag="error" max="100" to="idm:lookup('ofc_sampling_design', 'location','level1', parent()/id, 'level2', no)" />
-          <distance flag="warn" max="10" to="idm:lookup('ofc_sampling_design', 'location','level1', parent()/id, 'level2', no)" />
+          <distance flag="error" max="100" to="idm:samplingPointCoordinate(parent()/cluster_no, plot_no)" />
+          <distance flag="warn" max="10" to="idm:samplingPointCoordinate(parent()/cluster_no, plot_no)" />
         </coordinate>
         <code id="108" name="land_use" required="true" ui:tab="plot_det" list="land_use">
           <label type="instance">Land use</label>
