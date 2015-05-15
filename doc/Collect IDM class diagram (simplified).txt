@@ -1,0 +1,16 @@
+IDM stays for Inventory Data Model and it's modeled by classes inside the package org.openforis.idm.metamodel
+
+The main classes in this package are:
+- Survey: it describes the whole survey definition. It contains a Schema object and a list of CodeList, ModelVersion, SpacialReferenceSystem objects.
+- Schema: it describes the structure of the data. It contains a list of EntityDefinition objects (root entities). 
+	In theory for every survey there can be more than one root entity.
+- NodeDefinition: describes a node in the schema. It can be an EntityDefinition or an AttributeDefinition.
+- EntityDefinition: describes an Entity in the survey. It can contain other NodeDefinition objects.
+- AttributeDefinition: describes an Attribute in the survey. There are different subclasses of this class, one for every attribute type.
+	Every AttributeDefinition can have Check objects associated.
+- Check: describes a validation rule for a AttributeDefinition.
+
+A Record in the database is an object that contains the actual data stored into the system and it's created by a Survey definition object.
+The Record will be associated to one of the root EnityDefinition objects defined inside the Schema.
+Every record will contain a root Entity object, that is related to one of the root EntityDefinition objects in the Schema associated to the survey.
+In each Entity object there will be different Node objects, each one associated to a NodeDefinition in the Schema.

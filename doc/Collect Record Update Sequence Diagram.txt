@@ -1,0 +1,11 @@
+The file Collect Record Update Sequence Diagram.pdf describes the interactions among objects when a attribute update request is received by
+the server.
+
+First of all, the client contacts the DataService object with a HTTP request.
+It will get the active record object in the HTTP session, then it will ask the RecordUpdater to perform an update on the attribute's value.
+The RecordUpdater will update the value in the attribute and will update all the dependent attributes, asking every involved DependencyGraph object.
+For example, for the calculated attributes there is a DependencyGraph object that stores what are all the nodes that need to be recalculated 
+when the value of another node changes.
+The validations of all the dependent nodes are recalculated and a NodeChangeSet object is created and sent to the client as a response.
+This NodeChangeSet object will contain a list of all the changes to be applied to every node related to the one that have been modified, including 
+changes in the validation, relevance and requireness feedback.
