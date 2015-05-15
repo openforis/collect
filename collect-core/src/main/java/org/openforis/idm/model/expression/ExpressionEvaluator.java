@@ -100,9 +100,9 @@ public class ExpressionEvaluator {
 		return expr.getReferencedPaths();
 	}
 
-	public Set<NodeDefinition> determineReferencedNodeDefinitions(NodeDefinition context, String expr) throws InvalidExpressionException {
+	public Set<NodeDefinition> determineReferencedNodeDefinitions(NodeDefinition context, NodeDefinition thisNodeDef, String expr) throws InvalidExpressionException {
 		ModelPathExpression modelPathExpression = expressionFactory.createModelPathExpression(expr);
-		Set<NodeDefinition> referencedDefs = modelPathExpression.getReferencedNodeDefinitions(context);
+		Set<NodeDefinition> referencedDefs = modelPathExpression.getReferencedNodeDefinitions(context, thisNodeDef);
 		return referencedDefs;
 	}
 

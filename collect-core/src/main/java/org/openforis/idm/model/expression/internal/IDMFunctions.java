@@ -5,10 +5,13 @@ import static java.util.Arrays.asList;
 import static org.openforis.idm.path.Path.THIS_SYMBOL;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Locale;
 
 import org.apache.commons.jxpath.ExpressionContext;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.openforis.idm.geospatial.CoordinateOperationException;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.metamodel.Survey;
@@ -28,6 +31,10 @@ import org.openforis.idm.model.Time;
 public class IDMFunctions extends CustomFunctions {
 	private static final String LOCATION_ATTRIBUTE = "location";
 
+	private enum TimeUnit {
+		MINUTE, HOUR, DAY
+	}
+	
 	public IDMFunctions(String namespace) {
 		super(namespace);
 		register("blank", 1, new CustomFunction() {
@@ -101,6 +108,20 @@ public class IDMFunctions extends CustomFunctions {
 		register("distance", 2, new CustomFunction() {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return distance(expressionContext, objects[0], objects[1]);
+			}
+		});
+		
+		register("datetime-diff", 4, new CustomFunction() {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
+						(Integer) objects[2], (Integer) objects[3]);
+			}
+		});
+
+		register("datetime-diff", 5, new CustomFunction() {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return dateTimeDifference(expressionContext, (Integer) objects[0], (Integer) objects[1], 
+						(Integer) objects[2], (Integer) objects[3], (String) objects[4]);
 			}
 		});
 	}
@@ -232,6 +253,70 @@ public class IDMFunctions extends CustomFunctions {
 			return null;
 		}
 	}
+
+	private Object dateTimeDifference(ExpressionContext expressionContext, Integer date1, Integer time1, Integer date2, Integer time2) {
+		return dateTimeDifference(expressionContext, date1, time1, date2, time2, TimeUnit.MINUTE.name());
+	}
+	
+	private Object dateTimeDifference(ExpressionContext expressionContext, Integer date1, Integer time1, Integer date2, Integer time2, String timeUnit) {
+		return dateTimeDifference(expressionContext, Date.fromNumericValue(date1), Time.fromNumericValue(time1), 
+				Date.fromNumericValue(date2), Time.fromNumericValue(time2), timeUnit);
+	}
+	
+	private static Integer dateTimeDifference(ExpressionContext context, Date date1, Time time1, Date date2, Time time2, String timeUnit) {
+		return dateTimeDifference(context, date1, time1, date2, time2, TimeUnit.valueOf(timeUnit.toUpperCase()));
+	}
+	
+	private static Integer dateTimeDifference(ExpressionContext context, Date date1, Time time1, Date date2, Time time2, TimeUnit timeUnit) {
+		if (date1 != null && date1.isComplete() && date2 != null && date2.isComplete() && 
+				time1 != null && time1.isComplete() && time2 != null && time2.isComplete()) {
+			Calendar cal1 = getCalendar(date1, time1, timeUnit);
+			Calendar cal2 = getCalendar(date2, time2, timeUnit);
+			
+			long duration  = cal1.getTimeInMillis() - cal2.getTimeInMillis();
+			
+			long diff;
+
+			switch (timeUnit) {
+			case MINUTE:
+				diff = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(duration);
+				break;
+			case HOUR:
+				diff = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(duration);
+				break;
+			case DAY:
+				diff = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(duration);
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported time unit: " + timeUnit);
+			}
+			return Long.valueOf(diff).intValue();
+		} else {
+			return null;
+		}
+	}
+
+	private static Calendar getCalendar(Date date2, Time time2, TimeUnit timeUnit) {
+		int calendarTruncateField = getCalendarField(timeUnit);
+		Calendar cal2 = Calendar.getInstance(Locale.ENGLISH);
+		cal2.setLenient(false);
+		cal2.set(date2.getYear(), date2.getMonth() - 1, date2.getDay(), time2.getHour(), time2.getMinute());
+		cal2 = DateUtils.truncate(cal2, calendarTruncateField);
+		return cal2;
+	}
+
+	private static int getCalendarField(TimeUnit timeUnit) {
+		switch (timeUnit) {
+		case MINUTE:
+			return Calendar.MINUTE;
+		case HOUR:
+			return Calendar.HOUR_OF_DAY;
+		case DAY:
+			return Calendar.DAY_OF_MONTH;
+		default:
+			throw new IllegalArgumentException("Time unit not supported: " + timeUnit);
+		}
+	}
 	
 	private static LookupProvider getLookupProvider(ExpressionContext context) {
 		ModelJXPathContext jxPathContext = (ModelJXPathContext) context.getJXPathContext();
@@ -244,5 +329,5 @@ public class IDMFunctions extends CustomFunctions {
 		Survey survey = jxPathContext.getSurvey();
 		return survey;
 	}
-
+	
 }

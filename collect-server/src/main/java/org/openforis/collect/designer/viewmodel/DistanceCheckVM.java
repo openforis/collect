@@ -17,10 +17,9 @@ import org.zkoss.bind.annotation.Init;
 public class DistanceCheckVM extends CheckVM<DistanceCheck> {
 
 	@Init(superclass=false)
-	@Override
 	public void init(@ExecutionArgParam("parentDefinition") AttributeDefinition parentDefinition,
 			@ExecutionArgParam("check") DistanceCheck check, @ExecutionArgParam("newItem") Boolean newItem ) {
-		super.init(parentDefinition, check, newItem);
+		super.initInternal(parentDefinition, check, newItem);
 	}
 	
 	@Override

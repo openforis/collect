@@ -11,7 +11,6 @@ import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
-import org.zkoss.bind.annotation.Init;
 
 /**
  * @author S. Ricci
@@ -21,8 +20,7 @@ public abstract class CheckVM<T extends Check<?>> extends SurveyObjectBaseVM<T> 
 
 	protected AttributeDefinition parentDefinition;
 	
-	@Init(superclass=false)
-	public void init(AttributeDefinition parentDefinition, T check, Boolean newItem ) {
+	protected void initInternal(AttributeDefinition parentDefinition, T check, Boolean newItem ) {
 		super.init();
 		this.parentDefinition = parentDefinition;
 		this.newItem = newItem;

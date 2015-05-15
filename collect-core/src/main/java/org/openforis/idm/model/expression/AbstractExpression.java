@@ -31,7 +31,7 @@ import org.openforis.idm.path.Path;
  */
 public abstract class AbstractExpression {
 
-	private static final String THIS_VARIABLE_NAME = "this";
+	public static final String THIS_VARIABLE_NAME = "this";
 	private static final QName THIS = new QName(THIS_VARIABLE_NAME);
 	private ModelJXPathContext jxPathContext;
 	private ModelJXPathCompiledExpression compiledExpression;
@@ -49,24 +49,24 @@ public abstract class AbstractExpression {
 		return CollectionUtils.unmodifiableSet(paths);
 	}
 
-	public Set<NodeDefinition> getReferencedNodeDefinitions(NodeDefinition context) throws InvalidExpressionException {
+	public Set<NodeDefinition> getReferencedNodeDefinitions(NodeDefinition context, NodeDefinition thisNodeDef) throws InvalidExpressionException {
 		Set<NodeDefinition> result = new HashSet<NodeDefinition>();
 		Set<String> paths = compiledExpression.getReferencedPaths();
 		for (String path : paths) {
-			NodeDefinition nodeDef = getReferencedNodeDefinition(context, path);
+			NodeDefinition nodeDef = getReferencedNodeDefinition(context, thisNodeDef, path);
 			result.add(nodeDef);
 		}
 		return result;
 	}
 
-	private NodeDefinition getReferencedNodeDefinition(NodeDefinition context, String path) throws InvalidExpressionException {
+	private NodeDefinition getReferencedNodeDefinition(NodeDefinition context, NodeDefinition thisNodeDef, String path) throws InvalidExpressionException {
 		StringTokenizer tokenizer = new StringTokenizer(path, "/");
-		NodeDefinition definition = context;
+		NodeDefinition currentContext = context;
 		while (tokenizer.hasMoreTokens()) {
-			String section = tokenizer.nextToken();
-			definition = getChildDefinition(definition, section);
+			String pathSection = tokenizer.nextToken();
+			currentContext = getChildDefinition(currentContext, thisNodeDef, pathSection);
 		}
-		return definition;
+		return currentContext;
 	}
 
 	public Set<String> getFunctionNames() {
@@ -120,16 +120,18 @@ public abstract class AbstractExpression {
 		}
 	}
 
-	private NodeDefinition getChildDefinition(NodeDefinition parent, String pathSection) throws InvalidExpressionException {
+	private NodeDefinition getChildDefinition(NodeDefinition contextNode, NodeDefinition thisNodeDef, String pathSection) throws InvalidExpressionException {
 		if (Path.NORMALIZED_PARENT_FUNCTION.equals(pathSection)) {
-			return parent.getParentDefinition();
-		} else if (Path.THIS_ALIASES.contains(pathSection)) {
-			return parent;
+			return contextNode.getParentDefinition();
+		} else if (Path.THIS_VARIABLE.equals(pathSection)) {
+			return thisNodeDef;
+		} else if (Path.THIS_SYMBOL.equals(pathSection)) {
+			return contextNode;
 		} else {
 			String childName = pathSection.replaceAll("\\[.+]", "");
-			if (parent instanceof EntityDefinition) {
+			if (contextNode instanceof EntityDefinition) {
 				try {
-					NodeDefinition childDefinition = ((EntityDefinition) parent).getChildDefinition(childName);
+					NodeDefinition childDefinition = ((EntityDefinition) contextNode).getChildDefinition(childName);
 					return childDefinition;
 				} catch (Exception e) {
 					throw new InvalidExpressionException("Invalid path " + compiledExpression.toString());

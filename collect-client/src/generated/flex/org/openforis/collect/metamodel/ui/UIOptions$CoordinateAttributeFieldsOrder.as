@@ -15,6 +15,8 @@ package org.openforis.collect.metamodel.ui {
 
         public static const SRS_X_Y:UIOptions$CoordinateAttributeFieldsOrder = new UIOptions$CoordinateAttributeFieldsOrder("SRS_X_Y", _);
         public static const SRS_Y_X:UIOptions$CoordinateAttributeFieldsOrder = new UIOptions$CoordinateAttributeFieldsOrder("SRS_Y_X", _);
+        public static const X_Y_SRS:UIOptions$CoordinateAttributeFieldsOrder = new UIOptions$CoordinateAttributeFieldsOrder("X_Y_SRS", _);
+        public static const Y_X_SRS:UIOptions$CoordinateAttributeFieldsOrder = new UIOptions$CoordinateAttributeFieldsOrder("Y_X_SRS", _);
 
         function UIOptions$CoordinateAttributeFieldsOrder(value:String = null, restrictor:* = null) {
             super((value || SRS_X_Y.name), restrictor);
@@ -25,7 +27,7 @@ package org.openforis.collect.metamodel.ui {
         }
 
         public static function get constants():Array {
-            return [SRS_X_Y, SRS_Y_X];
+            return [SRS_X_Y, SRS_Y_X, X_Y_SRS, Y_X_SRS];
         }
 
         public static function valueOf(name:String):UIOptions$CoordinateAttributeFieldsOrder {

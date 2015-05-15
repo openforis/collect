@@ -52,7 +52,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") CodeAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.internalInit(parentEntity, attributeDefn, newItem);
+		super.initInternal(parentEntity, attributeDefn, newItem);
 	}
 
 	@Command

@@ -51,7 +51,7 @@ public class NumericAttributeVM extends AttributeVM<NumericAttributeDefinition> 
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") NumericAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
-		super.internalInit(parentEntity, attributeDefn, newItem);
+		super.initInternal(parentEntity, attributeDefn, newItem);
 	}
 	
 	@Override

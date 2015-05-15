@@ -14,11 +14,16 @@
 			
 			public static const STATE_HORIZONTAL_SRS_X_Y:String = "horizontal_srs_x_y";
 			public static const STATE_HORIZONTAL_SRS_Y_X:String = "horizontal_srs_y_x";
+			public static const STATE_HORIZONTAL_X_Y_SRS:String = "horizontal_x_y_srs";
+			public static const STATE_HORIZONTAL_Y_X_SRS:String = "horizontal_y_x_srs";
 			public static const STATE_VERTICAL_SRS_X_Y:String = "vertical_srs_x_y";
 			public static const STATE_VERTICAL_SRS_Y_X:String = "vertical_srs_y_x";
+			public static const STATE_VERTICAL_Y_X_SRS:String = "vertical_y_x_srs";
+			public static const STATE_VERTICAL_X_Y_SRS:String = "vertical_x_y_srs";
 			public static const STATE_VERTICAL_FORM_SRS_X_Y:String = "vertical_form_srs_x_y";
 			public static const STATE_VERTICAL_FORM_SRS_Y_X:String = "vertical_form_srs_y_x";
-			
+			public static const STATE_VERTICAL_FORM_Y_X_SRS:String = "vertical_form_y_x_srs";
+			public static const STATE_VERTICAL_FORM_X_Y_SRS:String = "vertical_form_x_y_srs";
 			
 			override protected function initPresenter():void {
 				this.presenter = new CoordinateAttributePresenter(this);
@@ -48,10 +53,16 @@
 	<detail:states>
 		<s:State name="horizontal_srs_x_y"/>
 		<s:State name="horizontal_srs_y_x"/>
+		<s:State name="horizontal_x_y_srs"/>
+		<s:State name="horizontal_y_x_srs"/>
 		<s:State name="vertical_srs_x_y"/>
 		<s:State name="vertical_srs_y_x"/>
+		<s:State name="vertical_x_y_srs"/>
+		<s:State name="vertical_y_x_srs"/>
 		<s:State basedOn="vertical_srs_x_y" name="vertical_form_srs_x_y"/>
 		<s:State basedOn="vertical_srs_y_x" name="vertical_form_srs_y_x"/>
+		<s:State basedOn="vertical_x_y_srs" name="vertical_form_x_y_srs"/>
+		<s:State basedOn="vertical_y_x_srs" name="vertical_form_y_x_srs"/>
 	</detail:states>
 	
 	<s:HGroup includeIn="horizontal_srs_x_y" gap="6">
@@ -81,6 +92,30 @@
 		</s:HGroup>
 		<s:HGroup>
 			<fx:Reparent includeIn="horizontal_srs_y_x" target="xTextInput"/>
+		</s:HGroup>
+	</s:HGroup>
+	
+	<s:HGroup includeIn="horizontal_x_y_srs" gap="6">
+		<s:HGroup>
+			<fx:Reparent includeIn="horizontal_x_y_srs" target="xTextInput"/>
+		</s:HGroup>
+		<s:HGroup>
+			<fx:Reparent includeIn="horizontal_x_y_srs" target="yTextInput"/>
+		</s:HGroup>
+		<s:HGroup>
+			<fx:Reparent includeIn="horizontal_x_y_srs" target="srsDropDownList"/>
+		</s:HGroup>
+	</s:HGroup>
+	
+	<s:HGroup includeIn="horizontal_y_x_srs" gap="6">
+		<s:HGroup>
+			<fx:Reparent includeIn="horizontal_y_x_srs" target="xTextInput"/>
+		</s:HGroup>
+		<s:HGroup>
+			<fx:Reparent includeIn="horizontal_y_x_srs" target="yTextInput"/>
+		</s:HGroup>
+		<s:HGroup>
+			<fx:Reparent includeIn="horizontal_y_x_srs" target="srsDropDownList"/>
 		</s:HGroup>
 	</s:HGroup>
 	
@@ -141,6 +176,76 @@
 											showTruncationTip="true" 
 						 					styleName="bold"/>
 				<fx:Reparent includeIn="vertical_srs_y_x" target="xTextInput"/>
+			</s:HGroup>
+		</s:VGroup>
+	</s:VGroup>
+	
+	<s:VGroup includeIn="vertical_y_x_srs, vertical_form_y_x_srs" gap="2">
+		<s:VGroup>
+			<s:HGroup gap="0">
+				<detail:AttributeFieldLabel includeIn="vertical_form_y_x_srs" 
+											width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.y')}"
+											field="y" 
+											showTruncationTip="true" 
+											styleName="bold"/>
+				<fx:Reparent includeIn="vertical_y_x_srs" target="yTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<detail:AttributeFieldLabel includeIn="vertical_form_y_x_srs" 
+											width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.x')}"
+											field="x"
+											showTruncationTip="true" 
+											styleName="bold"/>
+				<fx:Reparent includeIn="vertical_y_x_srs" target="xTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<detail:AttributeFieldLabel includeIn="vertical_form_y_x_srs" 
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.srs')}"
+											field="srs" 
+											width="{subLabelWidth}"
+											showTruncationTip="true" 
+											styleName="bold" />
+				<fx:Reparent includeIn="vertical_y_x_srs" target="srsDropDownList"/>
+			</s:HGroup>
+		</s:VGroup>
+	</s:VGroup>
+	
+	<s:VGroup includeIn="vertical_x_y_srs, vertical_form_x_y_srs" gap="2">
+		<s:VGroup>
+			<s:HGroup gap="0">
+				<detail:AttributeFieldLabel includeIn="vertical_form_x_y_srs" 
+											width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.x')}"
+											field="x"
+											showTruncationTip="true" 
+											styleName="bold"/>
+				<fx:Reparent includeIn="vertical_x_y_srs" target="xTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<detail:AttributeFieldLabel includeIn="vertical_form_x_y_srs" 
+											width="{subLabelWidth}"
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.y')}"
+											field="y" 
+											showTruncationTip="true" 
+											styleName="bold"/>
+				<fx:Reparent includeIn="vertical_x_y_srs" target="yTextInput"/>
+			</s:HGroup>
+			<s:HGroup gap="0">
+				<detail:AttributeFieldLabel includeIn="vertical_form_x_y_srs" 
+											attributeDefinition="{attributeDefinition}"
+											defaultText="{Message.get('edit.coordinate.srs')}"
+											field="srs" 
+											width="{subLabelWidth}"
+											showTruncationTip="true" 
+											styleName="bold" />
+				<fx:Reparent includeIn="vertical_x_y_srs" target="srsDropDownList"/>
 			</s:HGroup>
 		</s:VGroup>
 	</s:VGroup>

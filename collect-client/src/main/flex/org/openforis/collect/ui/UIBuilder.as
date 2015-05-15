@@ -407,6 +407,7 @@ package org.openforis.collect.ui {
 						}
 						break;
 				}
+				StringInputField(inputField).upperCase = textAttributeDef.autoUppercase;
 			}
 			inputField.width = getInputFieldWidth(def);
 			inputField.attributeDefinition = def;
@@ -619,6 +620,16 @@ package org.openforis.collect.ui {
 					compositeAttributeLabelsGroup.addElement(srsLabel);
 					compositeAttributeLabelsGroup.addElement(yLabel);
 					compositeAttributeLabelsGroup.addElement(xLabel);
+					break;
+				case UIOptions$CoordinateAttributeFieldsOrder.X_Y_SRS:
+					compositeAttributeLabelsGroup.addElement(xLabel);
+					compositeAttributeLabelsGroup.addElement(yLabel);
+					compositeAttributeLabelsGroup.addElement(srsLabel);
+					break;
+				case UIOptions$CoordinateAttributeFieldsOrder.Y_X_SRS:
+					compositeAttributeLabelsGroup.addElement(yLabel);
+					compositeAttributeLabelsGroup.addElement(xLabel);
+					compositeAttributeLabelsGroup.addElement(srsLabel);
 					break;
 			}
 		}

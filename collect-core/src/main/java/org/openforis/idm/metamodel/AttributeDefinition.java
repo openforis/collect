@@ -23,6 +23,7 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	
 	private static final long serialVersionUID = 1L;
 
+	protected boolean key;
 	private List<Check<?>> checks;
 	private List<AttributeDefault> attributeDefaults;
 	private boolean calculated;
@@ -88,6 +89,14 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	
 	public void moveAttributeDefault(AttributeDefault def, int toIndex) {
 		CollectionUtils.shiftItem(attributeDefaults, def, toIndex);
+	}
+
+	public boolean isKey() {
+		return key;
+	}
+
+	public void setKey(boolean key) {
+		this.key = key;
 	}
 
 	public abstract <V extends Value> V createValue(String string);
@@ -163,6 +172,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		if (getClass() != obj.getClass())
 			return false;
 		AttributeDefinition other = (AttributeDefinition) obj;
+		if (key != other.key)
+			return false;
 		if (attributeDefaults == null) {
 			if (other.attributeDefaults != null)
 				return false;

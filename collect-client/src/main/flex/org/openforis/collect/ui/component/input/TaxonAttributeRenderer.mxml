@@ -54,6 +54,7 @@
 								visible="{TaxonAttributeDefinitionProxy(attributeDefinition).scientificNameVisible}"
 								includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).scientificNameVisible}"
 								width="{SCIENTIFIC_NAME_WIDTH}" 
+								upperCase="false"
 								maxChars="255"
 								/>
 		<input:StringInputField id="vernacularNameTextInput" 
@@ -65,6 +66,7 @@
 								visible="{TaxonAttributeDefinitionProxy(attributeDefinition).vernacularNameVisible}"
 								includeInLayout="{TaxonAttributeDefinitionProxy(attributeDefinition).vernacularNameVisible}"
 								width="{VERNACULAR_NAME_WIDTH}" 
+								upperCase="false"
 								maxChars="255"
 								/>
 		<input:LanguageAutoComplete id="languageAutocomplete" 

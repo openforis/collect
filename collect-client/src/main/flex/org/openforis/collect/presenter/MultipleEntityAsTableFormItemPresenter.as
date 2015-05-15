@@ -6,11 +6,16 @@ package org.openforis.collect.presenter
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.EntityAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+	import org.openforis.collect.model.proxy.NodeDeleteChangeProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -46,6 +51,19 @@ package org.openforis.collect.presenter
 			eventDispatcher.removeEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
+		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
+			if(view.parentEntity != null) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if (change is NodeDeleteChangeProxy 
+						&& NodeDeleteChangeProxy(change).parentEntityId == view.parentEntity.id
+						&& NodeDeleteChangeProxy(change).nodeName == view.nodeDefinition.name) {
+						checkAddButtonVisibility();
+					}
+				}
+			}
+		}
+		
 		private function get view():MultipleEntityAsTableFormItem {
 			return MultipleEntityAsTableFormItem(_view);
 		}
@@ -63,7 +81,20 @@ package org.openforis.collect.presenter
 				entities = getEntities();
 			}
 			view.dataGroup.dataProvider = entities;
+			
+			checkAddButtonVisibility();
+
 			super.updateView();
+		}
+		
+		private function checkAddButtonVisibility():void {
+			if (view.parentEntity != null) {
+				var entities:IList = getEntities();
+				var maxCount:int = view.parentEntity.getMaxCount(view.entityDefinition);
+				view.addButton.visible = view.addButton.includeInLayout = 
+					Application.activeRecordEditable && ! view.entityDefinition.enumerable && (
+						CollectionUtil.isEmpty(entities) || entities.length < maxCount);
+			}
 		}
 		
 		protected function getEntities():IList {
@@ -101,6 +132,7 @@ package org.openforis.collect.presenter
 				if ( view.scroller != null && view.scroller.verticalScrollBar != null ) {
 					view.scroller.verticalScrollBar.value = view.scroller.verticalScrollBar.maximum;
 				}
+				checkAddButtonVisibility();
 				UIUtil.ensureElementIsVisible(view.addButton);
 			});
 		}

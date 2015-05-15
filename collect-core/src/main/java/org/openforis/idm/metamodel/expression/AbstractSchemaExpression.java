@@ -5,10 +5,12 @@ package org.openforis.idm.metamodel.expression;
 
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathIntrospector;
+import org.apache.commons.jxpath.Variables;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.expression.internal.NodeDefinitionPropertyHandler;
 import org.openforis.idm.metamodel.expression.internal.SchemaPropertyHandler;
+import org.openforis.idm.model.expression.AbstractExpression;
 import org.openforis.idm.path.Path;
 
 /**
@@ -32,12 +34,14 @@ abstract class AbstractSchemaExpression {
 		this.expression = expression;
 	}
 
-	public Object evaluate(NodeDefinition context) {
+	public Object evaluate(NodeDefinition context, NodeDefinition thisNode) {
 		if (!(Schema.class.isAssignableFrom(context.getClass()) || NodeDefinition.class.isAssignableFrom(context.getClass()))) {
 			throw new IllegalArgumentException("Unable to evaluate expression with context class " + context.getClass().getName());
 		}
 		JXPathContext jxPathContext = JXPathContext.newContext(CONTEXT, context);
-
+		Variables variables = jxPathContext.getVariables();
+		variables.declareVariable(AbstractExpression.THIS_VARIABLE_NAME, thisNode);
+		
 		String expr = Path.getNormalizedPath(expression);
 		Object result = jxPathContext.getValue(expr);
 		return result;

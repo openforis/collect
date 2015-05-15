@@ -41,6 +41,8 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
 		
+		dest.setKey(key);
+
 		//save attribute defaults
 		dest.removeAllAttributeDefaults();
 		if ( attributeDefaults != null ) {
@@ -68,6 +70,9 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	@Override
 	public void loadFrom(T source, String languageCode) {
 		super.loadFrom(source, languageCode);
+		
+		key = ((AttributeDefinition) source).isKey();
+
 		attributeDefaults = new ArrayList<AttributeDefault>(source.getAttributeDefaults());
 		
 		CollectSurvey survey = (CollectSurvey) source.getSurvey();

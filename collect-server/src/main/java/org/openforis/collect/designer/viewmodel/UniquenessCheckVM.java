@@ -17,10 +17,9 @@ import org.zkoss.bind.annotation.Init;
 public class UniquenessCheckVM extends CheckVM<UniquenessCheck> {
 
 	@Init(superclass=false)
-	@Override
 	public void init(@ExecutionArgParam("parentDefinition") AttributeDefinition parentDefinition,
 			@ExecutionArgParam("check") UniquenessCheck check, @ExecutionArgParam("newItem") Boolean newItem ) {
-		super.init(parentDefinition, check, newItem);
+		super.initInternal(parentDefinition, check, newItem);
 	}
 	
 	@Override

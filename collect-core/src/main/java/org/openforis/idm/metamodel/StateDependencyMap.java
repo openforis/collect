@@ -99,12 +99,13 @@ class StateDependencyMap {
 			EntityDefinition dependentParentDef = dependentDef.getParentEntityDefinition();
 			Set<String> sourcePaths = getReferencedPaths(expression);
 			for (String sourcePath : sourcePaths) {
-				String normalizedReferencedPath = getNormalizedPath(sourcePath);
-				SchemaPathExpression schemaExpression = new SchemaPathExpression(normalizedReferencedPath);
+				String sourceAbsolutePath = Path.getAbsolutePath(sourcePath);
+				
+				SchemaPathExpression sourceExpression = new SchemaPathExpression(sourceAbsolutePath);
 
-				NodeDefinition sourceDef = schemaExpression.evaluate(dependentParentDef);
+				NodeDefinition sourceDef = sourceExpression.evaluate(dependentParentDef, dependentDef);
 
-				EntityDefinition commonAncestor = getCommonAncestor(dependentParentDef, normalizedReferencedPath);
+				EntityDefinition commonAncestor = getCommonAncestor(dependentParentDef, sourceAbsolutePath);
 
 				registerDependent(commonAncestor, sourceDef, dependentDef);
 				registerSource(commonAncestor, sourceDef, dependentDef);
@@ -155,19 +156,8 @@ class StateDependencyMap {
 	}
 	
 	private Set<String> getReferencedPaths(String expression) throws InvalidExpressionException {
-		if (StringUtils.isBlank(expression)) {
-			return Collections.emptySet();
-		} else {
-			Set<String> paths = expressionEvaluator.determineReferencedPaths(expression);
-			return paths;
-		}
-	}
-
-	private String getNormalizedPath(String path) {
-		String result = Path.removeThisVariableToken(path);
-		//transform to absolute path
-		result = Path.getAbsolutePath(result);
-		return result;
+		Set<String> paths = expressionEvaluator.determineReferencedPaths(expression);
+		return paths;
 	}
 
 }

@@ -21,7 +21,7 @@ public class EntityDefinitionVM extends NodeDefinitionVM<EntityDefinition> {
 			@ExecutionArgParam("item") EntityDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem,
 			@ExecutionArgParam("doNotCommitChangesImmediately") Boolean doNotCommitChangesImmediately) {
-		super.internalInit(parentEntity, attributeDefn, newItem);
+		super.initInternal(parentEntity, attributeDefn, newItem);
 		boolean doNotCommitChangesImmediatelyBool = doNotCommitChangesImmediately == null ? false: doNotCommitChangesImmediately.booleanValue();
 		this.commitChangesOnApply = ! doNotCommitChangesImmediatelyBool;
 	}

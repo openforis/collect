@@ -20,5 +20,5 @@ public class NodeDeleteChangeProxy extends NodeChangeProxy<NodeDeleteChange> {
 	public Integer getDeletedNodeId() {
 		return change.getNode().getInternalId();
 	}
-
+	
 }

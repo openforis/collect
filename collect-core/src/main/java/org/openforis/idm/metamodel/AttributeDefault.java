@@ -91,18 +91,18 @@ public class AttributeDefault implements Serializable, DeepComparable {
 		return val;
 	}
 
-	public Set<NodeDefinition> determineReferencedNodes(NodeDefinition context) throws InvalidExpressionException {
+	public Set<NodeDefinition> determineReferencedNodes(NodeDefinition context, NodeDefinition thisNodeDef) throws InvalidExpressionException {
 		Set<NodeDefinition> result = new HashSet<NodeDefinition>();
-		result.addAll(calculateReferencedNodes(context, expression));
-		result.addAll(calculateReferencedNodes(context, condition));
+		result.addAll(calculateReferencedNodes(expression, context, thisNodeDef));
+		result.addAll(calculateReferencedNodes(condition, context, thisNodeDef));
 		return result;
 	}
 	
-	private Set<NodeDefinition> calculateReferencedNodes(NodeDefinition context, String expr) throws InvalidExpressionException {
+	private Set<NodeDefinition> calculateReferencedNodes(String expr, NodeDefinition context, NodeDefinition thisNodeDef) throws InvalidExpressionException {
 		if ( StringUtils.isBlank(expr) ) {
 			return Collections.emptySet();
 		}
-		Set<NodeDefinition> referencedNodes = getExpressionEvaluator(context).determineReferencedNodeDefinitions(context, expr);
+		Set<NodeDefinition> referencedNodes = getExpressionEvaluator(context).determineReferencedNodeDefinitions(context, thisNodeDef, expr);
 		return referencedNodes;
 	}
 	

@@ -85,7 +85,7 @@ import com.google.common.collect.Sets;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SchemaVM extends SurveyBaseVM {
 
-	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_record_type";
+	public static final String DEFAULT_ROOT_ENTITY_NAME = "change_it_to_your_sampling_unit";
 	public static final String DEFAULT_MAIN_TAB_LABEL = "Change it to your main tab label";
 	private static final String PATH_NULL_VALUES_REPLACE = "...";
 	

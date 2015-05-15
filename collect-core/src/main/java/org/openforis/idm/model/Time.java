@@ -25,24 +25,26 @@ public final class Time extends AbstractValue {
 	/**
 	 * Generic string format for Time value ("hh:mm" or "hh:mm:ss" . Please note that seconds will be ignored by the Time attribute)
 	 */
-	private static final Pattern PRETTY_STRING_PATTERN = Pattern.compile("([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
-	
 	private static final String PRETTY_FORMAT = "%02d:%02d";
+//	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
 	
-	public static Time parseTime(String string) {
-		if ( StringUtils.isBlank(string) ) {
+	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("(\\d{1,2}):(\\d{1,2})(:\\d{1,2})?");
+	
+	private static final Pattern[] PATTERNS = new Pattern[] {INTERNAL_STRING_PATTERN, PRETTY_STRING_FORMAT};
+	
+	public static Time parseTime(String value) {
+		if ( StringUtils.isBlank(value) ) {
 			return null;
 		} else {
-			Matcher matcher = PRETTY_STRING_PATTERN.matcher(string);
-			if ( ! matcher.matches() ) {
-				matcher = INTERNAL_STRING_PATTERN.matcher(string);
-				if ( ! matcher.matches() ) {
-					throw new IllegalArgumentException("Invalid time " + string);
+			for (Pattern pattern : PATTERNS) {
+				Matcher matcher = pattern.matcher(value);
+				if (matcher.matches()) {
+					int hour = Integer.parseInt(matcher.group(1));
+					int minute = Integer.parseInt(matcher.group(2));
+					return new Time(hour, minute);
 				}
 			}
-			int hour = Integer.parseInt(matcher.group(1));
-			int minute = Integer.parseInt(matcher.group(2));
-			return new Time(hour, minute);
+			throw new IllegalArgumentException("Invalid time " + value);
 		}
 	}
 	
@@ -61,12 +63,33 @@ public final class Time extends AbstractValue {
 		}
 	}
 	
+	public static Time fromNumericValue(Integer value) {
+		if (value == null) {
+			return null;
+		}
+		int hourPart = Double.valueOf(Math.floor((double) (value / 100))).intValue();
+		int minutePart = value % 100;
+		return new Time(hourPart, minutePart);
+	}
+	
 	private final Integer hour;
 	private final Integer minute;
 
 	public Time(Integer hour, Integer minute) {
 		this.hour = hour;
 		this.minute = minute;
+	}
+	
+	public boolean isComplete() {
+		return hour != null && minute != null;
+	}
+
+	public Integer getHour() {
+		return hour;
+	}
+
+	public Integer getMinute() {
+		return minute;
 	}
 	
 	public Calendar toCalendar() {
@@ -94,14 +117,6 @@ public final class Time extends AbstractValue {
 		}};
 	}
 	
-	public Integer getHour() {
-		return hour;
-	}
-
-	public Integer getMinute() {
-		return minute;
-	}
-	
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
@@ -111,14 +126,22 @@ public final class Time extends AbstractValue {
 	}
 
 	public String toXmlTime() {
-		if ( hour == null || minute == null ) {
-			return null;
-		} else {
+		if (isComplete()) {
 			Formatter formatter = new Formatter();
 			formatter.format("%02d:%02d:00", hour, minute);
 			String result = formatter.toString();
 			formatter.close();
 			return result;
+		} else {
+			return null;
+		}
+	}
+	
+	public Integer getNumericValue() {
+		if (isComplete()) {
+			return hour * 100 + minute;
+		} else {
+			return null;
 		}
 	}
 

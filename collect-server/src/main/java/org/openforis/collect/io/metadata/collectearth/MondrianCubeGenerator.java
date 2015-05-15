@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
@@ -75,7 +76,7 @@ public class MondrianCubeGenerator {
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
 					measure.column = "_" + rootEntityDef.getName() + "_" + nodeName;
-					measure.caption = extractLabel(rootEntityDef) + " Count";
+					measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(rootEntityDef) + " Count" );
 					measure.aggregator = "distinct count";
 					measure.datatype = "Integer";
 					cube.measures.add(measure);
@@ -83,7 +84,7 @@ public class MondrianCubeGenerator {
 					for (String aggregator : MEASURE_AGGREGATORS) {
 						Measure measure = new Measure(nodeName + "_" + aggregator);
 						measure.column = nodeName;
-						measure.caption = extractLabel(nodeDef) + " " + aggregator;
+						measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(nodeDef) + " " + aggregator );
 						measure.aggregator = aggregator;
 						measure.datatype = "Integer";
 						cube.measures.add(measure);
@@ -146,9 +147,20 @@ public class MondrianCubeGenerator {
 		List<Measure> measures = new ArrayList<Measure>();
 		//Expansion factor - Area
 		{
-			Measure measure = new Measure("Area (HA)");
+			Measure measure = new Measure("area");
 			measure.column = "expansion_factor";
 			measure.caption = "Area (HA)";
+			measure.aggregator = "sum";
+			measure.datatype = "Integer";
+			measure.formatString = "#,###";
+			measures.add(measure);
+		}
+		
+		// Plot weight
+		{
+			Measure measure = new Measure("plot_weight");
+			measure.column = "plot_weight";
+			measure.caption = "Plot Weight";
 			measure.aggregator = "sum";
 			measure.datatype = "Integer";
 			measure.formatString = "#,###";
@@ -306,7 +318,7 @@ public class MondrianCubeGenerator {
 
 		public MondrianSchemaObject(String name) {
 			super();
-			this.name = name;
+			this.name = StringEscapeUtils.escapeHtml4(name);
 		}
 		
 	}

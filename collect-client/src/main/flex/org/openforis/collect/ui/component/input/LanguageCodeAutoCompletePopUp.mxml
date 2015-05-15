@@ -29,6 +29,7 @@
 			override public function get listComponent():* {
 				return dataGrid;
 			}
+			
 		]]>
 	</fx:Script>
 	
@@ -43,7 +44,7 @@
 		<s:columns>
 			<s:ArrayList>
 				<s:GridColumn headerText="{Message.get('language.label')}" 
-							  dataField="label"
+							  labelFunction="{itemLabelFunction}"
 							  width="110" 
 							  />
 			</s:ArrayList>

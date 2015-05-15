@@ -214,6 +214,18 @@ public class SurveySelectVM extends BaseVM {
 			rdbExportJob.setTargetSchemaName(parameters.getRdbTargetSchemaName());
 			job = rdbExportJob;
 			break;
+		case MOBILE:
+			if (validateSurveyForCollectMobile(survey)) {
+				surveyBackupJob = springJobManager.createJob(SurveyBackupJob.class);
+				surveyBackupJob.setSurvey(survey);
+				surveyBackupJob.setIncludeData(parameters.isIncludeData());
+				surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
+				surveyBackupJob.setOutputFormat(OutputFormat.valueOf(parameters.getOutputFormat()));
+				job = surveyBackupJob;
+				break;
+			} else {
+				return;
+			}
 		default:
 			surveyBackupJob = springJobManager.createJob(SurveyBackupJob.class);
 			surveyBackupJob.setSurvey(survey);
@@ -428,6 +440,16 @@ public class SurveySelectVM extends BaseVM {
 			return true;
 		} else {
 			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(validationResults, ! validationResults.hasErrors());
+			return false;
+		}
+	}
+	
+	protected boolean validateSurveyForCollectMobile(CollectSurvey survey) {
+		SurveyValidationResults validationResults = surveyValidator.validate(survey);
+		if (validationResults.isOk()) {
+			return true;
+		} else {
+			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(validationResults, false);
 			return false;
 		}
 	}

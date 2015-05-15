@@ -23,6 +23,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.input.AutoCompletePopUp;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.TextInput;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.UIUtil;

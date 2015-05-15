@@ -1,9 +1,7 @@
 package org.openforis.collect.metamodel.ui;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
-import static org.openforis.idm.metamodel.TaxonAttributeDefinition.CODE_FIELD_NAME;
-import static org.openforis.idm.metamodel.TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME;
-import static org.openforis.idm.metamodel.TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,6 +27,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 
 /**
@@ -47,31 +46,33 @@ public class UIOptions implements ApplicationOptions, Serializable {
 
 	public static final List<String[]> TAXON_VISIBLE_FIELDS_TEMPLATES = Arrays.asList(
 		new String[] {
-				CODE_FIELD_NAME,
-				SCIENTIFIC_NAME_FIELD_NAME,
-				VERNACULAR_NAME_FIELD_NAME
+			CODE_FIELD_NAME,
+			SCIENTIFIC_NAME_FIELD_NAME,
+			VERNACULAR_NAME_FIELD_NAME
 		},
 		new String[] {
-				CODE_FIELD_NAME,
-				SCIENTIFIC_NAME_FIELD_NAME
+			CODE_FIELD_NAME,
+			SCIENTIFIC_NAME_FIELD_NAME
 		},
 		new String[] {
-				CODE_FIELD_NAME,
-				VERNACULAR_NAME_FIELD_NAME
+			CODE_FIELD_NAME,
+			VERNACULAR_NAME_FIELD_NAME
 		},
 		new String[] {
-				SCIENTIFIC_NAME_FIELD_NAME,
-				VERNACULAR_NAME_FIELD_NAME
+			SCIENTIFIC_NAME_FIELD_NAME,
+			VERNACULAR_NAME_FIELD_NAME
 		},
 		new String[] {
-				VERNACULAR_NAME_FIELD_NAME
+			VERNACULAR_NAME_FIELD_NAME
 		}
 	);
 	
 	public enum CoordinateAttributeFieldsOrder {
 		
 		SRS_X_Y("srs_x_y"), 
-		SRS_Y_X("srs_y_x");
+		SRS_Y_X("srs_y_x"),
+		X_Y_SRS("x_y_srs"), 
+		Y_X_SRS("y_x_srs");
 		
 		public static final CoordinateAttributeFieldsOrder DEFAULT = SRS_Y_X;
 		
@@ -736,6 +737,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		setAnnotationValue(defn, Annotation.LABEL_ORIENTATION, value);
 	}
 	
+	public boolean isAutoUppercase(TextAttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.AUTO_UPPERCASE);
+	}
+	
+	public void setAutoUppercase(TextAttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.AUTO_UPPERCASE, value);
+	}
+
 	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
 		String annotationValue = defn.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {

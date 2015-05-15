@@ -10,5 +10,24 @@ package org.openforis.collect.model.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.model.proxy.NodeChangeProxy")]
     public class NodeChangeProxy extends NodeChangeProxyBase {
+		
+		private var _nodeName:String;
+		private var _parentEntityId:Number;
+		
+		public function get nodeName():String {
+			return _nodeName;
+		}
+		
+		public function set nodeName(nodeName:String):void {
+			_nodeName = nodeName;
+		}
+		
+		public function get parentEntityId():Number {
+			return _parentEntityId;
+		}
+		
+		public function set parentEntityId(parentEntityId:Number):void {
+			_parentEntityId = parentEntityId;
+		}
     }
 }

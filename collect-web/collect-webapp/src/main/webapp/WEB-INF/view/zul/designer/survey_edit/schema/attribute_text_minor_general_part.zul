@@ -6,12 +6,20 @@
       <column />
     </columns>
     <rows>
-      <row>
+      <row visible="@load(not fx.calculated)">
         <label
           value="${labels.survey.schema.attribute.text.autocomplete_group}:" />
         <fieldErrorHandler message="@load(vmsgs['autocompleteGroup'])">
           <textbox width="150px" value="@bind(fx.autocompleteGroup)"
             onChange="@command('applyChanges')" />
+        </fieldErrorHandler>
+      </row>
+      <row visible="@load(not fx.calculated)">
+        <label
+          value="${labels.survey.schema.attribute.text.auto_uppercase}:" />
+        <fieldErrorHandler message="@load(vmsgs['autoUppercase'])">
+          <checkbox checked="@load(fx.autoUppercase eq true) @save(fx.autoUppercase)"
+    				onCheck="@command('applyChanges')" />
         </fieldErrorHandler>
       </row>
     </rows>

@@ -20,10 +20,11 @@ public class MetaModelExpressionTest extends AbstractTest {
 	public void testParentExpression(){
 		Schema schema = survey.getSchema();
 		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
-		NodeDefinition plotDefn = clusterDefn.getChildDefinition("plot");
+		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
+		NodeDefinition plotNoDefn = plotDefn.getChildDefinition("no");
 		
 		SchemaPathExpression expression = new SchemaPathExpression("parent()");
-		NodeDefinition resultDefn = expression.evaluate(plotDefn);
+		NodeDefinition resultDefn = expression.evaluate(plotDefn, plotNoDefn);
 		
 		Assert.assertEquals(clusterDefn, resultDefn);
 	}

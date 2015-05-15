@@ -18,6 +18,11 @@ public class ModelTreeCompiler extends TreeCompiler {
 	private boolean normalizeNumbers = false;
 	
 	@Override
+	public Object expressionPath(Object expression, Object[] predicates, Object[] steps) {
+		return super.expressionPath(expression, predicates, steps);
+	}
+	
+	@Override
 	public Object locationPath(boolean absolute, Object[] steps) {
 		return new ModelLocationPath(absolute, toStepArray(steps));
 	}

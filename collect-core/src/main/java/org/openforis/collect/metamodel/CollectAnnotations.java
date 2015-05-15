@@ -58,6 +58,7 @@ public class CollectAnnotations {
 		WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.WIDTH)),
 		LABEL_WIDTH(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_WIDTH)),
 		LABEL_ORIENTATION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.LABEL_ORIENTATION), Orientation.HORIZONTAL),
+		AUTO_UPPERCASE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTO_UPPERCASE), false),
 		
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),

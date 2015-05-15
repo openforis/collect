@@ -38,4 +38,5 @@ public interface UIOptionsConstants {
 	String LABEL_WIDTH = "labelWidth";
 	String LABEL_ORIENTATION = "labelOrientation";
 	
+	String AUTO_UPPERCASE = "autoUppercase";
 }

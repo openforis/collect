@@ -15,8 +15,8 @@ public class SchemaPathExpression extends AbstractSchemaExpression {
 		super(expression);
 	}
 
-	public NodeDefinition evaluate(NodeDefinition context) {
-		NodeDefinition nodeDefinition = (NodeDefinition) super.evaluate(context);
+	public NodeDefinition evaluate(NodeDefinition context, NodeDefinition thisNode) {
+		NodeDefinition nodeDefinition = (NodeDefinition) super.evaluate(context, thisNode);
 		return nodeDefinition;
 	}
 
