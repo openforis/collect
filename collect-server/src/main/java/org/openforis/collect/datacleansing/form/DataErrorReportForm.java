@@ -3,7 +3,6 @@ package org.openforis.collect.datacleansing.form;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorType;
-import org.openforis.collect.datacleansing.DataQuery;
 
 /**
  * 
@@ -14,7 +13,7 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 
 	//calculated members
 	private String typeCode;
-	private String queryTitle;
+	private DataErrorQueryForm errorQuery;
 	
 	public DataErrorReportForm() {
 		super();
@@ -23,8 +22,7 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 	public DataErrorReportForm(DataErrorReport obj) {
 		super(obj);
 		DataErrorQuery dataErrorQuery = obj.getQuery();
-		DataQuery query = dataErrorQuery.getQuery();
-		this.queryTitle = query.getTitle();
+		this.errorQuery = new DataErrorQueryForm(dataErrorQuery);
 		DataErrorType type = dataErrorQuery.getType();
 		this.typeCode = type.getCode();
 	}
@@ -33,8 +31,8 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 		return typeCode;
 	}
 	
-	public String getQueryTitle() {
-		return queryTitle;
+	public DataErrorQueryForm getErrorQuery() {
+		return errorQuery;
 	}
-
+	
 }

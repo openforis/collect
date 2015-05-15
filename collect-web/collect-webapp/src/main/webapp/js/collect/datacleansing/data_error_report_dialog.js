@@ -39,7 +39,7 @@ Collect.DataErrorReportDialogController.prototype.loadInstanceVariables = functi
 	Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables.call(this, function() {
 		collect.dataErrorQueryService.loadAll(function(queries) {
 			$this.queries = queries;
-			callback();
+			callback.call($this);
 		});
 	});
 };
@@ -49,7 +49,7 @@ Collect.DataErrorReportDialogController.prototype.initFormElements = function(ca
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
 		{
 			var select = $this.content.find('select[name="queryId"]');
-			OF.UI.Forms.populateSelect(select, $this.queries, "id", "title", true);
+			OF.UI.Forms.populateSelect(select, $this.queries, "id", "queryTitle", true);
 			select.selectpicker();
 			$this.querySelectPicker = select.data().selectpicker;
 		}
@@ -59,7 +59,7 @@ Collect.DataErrorReportDialogController.prototype.initFormElements = function(ca
 			select.selectpicker();
 			$this.recordStepSelectPicker = select.data().selectpicker;
 		}
-		callback();
+		callback.call($this);
 	});
 };
 
@@ -72,5 +72,6 @@ Collect.DataErrorReportDialogController.prototype.fillForm = function(callback) 
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
 		$this.querySelectPicker.val($this.item.queryId);
+		callback.call($this);
 	});
 };

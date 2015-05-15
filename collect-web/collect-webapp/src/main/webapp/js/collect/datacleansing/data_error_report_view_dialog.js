@@ -28,12 +28,12 @@ Collect.DataErrorReportViewDialogController.prototype.loadInstanceVariables = fu
 Collect.DataErrorReportViewDialogController.prototype.initFormElements = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
-//		{
-//			var select = $this.content.find('select[name="queryId"]');
-//			OF.UI.Forms.populateSelect(select, $this.queries, "id", "title", true);
-//			select.selectpicker();
-//			$this.querySelectPicker = select.data().selectpicker;
-//		}
+		{
+			var select = $this.content.find('select[name="queryId"]');
+			OF.UI.Forms.populateSelect(select, $this.queries, "id", "prettyFormatTitle", true);
+			select.selectpicker();
+			$this.querySelectPicker = select.data().selectpicker;
+		}
 //		{
 //			var select = $this.content.find('select[name="recordStep"]');
 //			OF.UI.Forms.populateSelect(select, [{name: "ENTRY", label: "Data Entry"}, 
@@ -73,7 +73,7 @@ Collect.DataErrorReportViewDialogController.prototype.extractJSONItem = function
 Collect.DataErrorReportViewDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
-//		$this.querySelectPicker.val($this.item.queryId);
+		$this.querySelectPicker.val($this.item.errorQuery.id);
 		callback();
 	});
 };

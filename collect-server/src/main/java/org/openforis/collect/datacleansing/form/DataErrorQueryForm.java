@@ -20,16 +20,22 @@ public class DataErrorQueryForm extends DataCleansingItemForm<DataErrorQuery> {
 	private String typeCode;
 	private String queryTitle;
 	private String queryDescription;
-
+	private String prettyFormatTitle;
+	
 	public DataErrorQueryForm() {
 		super();
 	}
 	
 	public DataErrorQueryForm(DataErrorQuery query) {
 		super(query);
-		typeCode = query == null ? null: query.getType() == null ? null: query.getType().getCode();
-		queryTitle = query == null ? null: query.getQuery().getTitle();
-		queryDescription = query == null ? null: query.getQuery().getDescription();
+		this.typeCode = query == null ? null: query.getType() == null ? null: query.getType().getCode();
+		this.queryTitle = query == null ? null: query.getQuery().getTitle();
+		this.queryDescription = query == null ? null: query.getQuery().getDescription();
+		this.prettyFormatTitle = String.format("Error type: %s - Data Query: %s", typeCode, query.getQuery().getTitle());
+	}
+	
+	public String getPrettyFormatTitle() {
+		return prettyFormatTitle;
 	}
 	
 	public String getTypeCode() {
