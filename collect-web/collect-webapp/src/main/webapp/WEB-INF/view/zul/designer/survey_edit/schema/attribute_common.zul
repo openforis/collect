@@ -15,7 +15,12 @@
 
 	<fieldErrorHandler message="@load(vmsgs['attributeDefaults'])">
 		<groupbox width="100%" closable="false" class="tableFieldSet">
-			<caption label="${labels.survey.schema.attribute.attribute_default.table_heading}" />
+			<caption>
+				<label value="${labels.survey.schema.attribute.attribute_default.table_heading}" 
+						visible="@load(not fx.calculated)" />
+				<label value="${labels.survey.schema.attribute.attribute_default.calculated_value.table_heading}" 
+						visible="@load(fx.calculated)" />
+			</caption>
 			<grid class="inner">
 		  		<columns>
 		  			<column width="200px" />
