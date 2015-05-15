@@ -34,12 +34,15 @@ public class AttributeDefaultVM extends SurveyObjectBaseVM<AttributeDefault> {
 	}
 	
 	@Init(superclass=false)
-	public void init(@ExecutionArgParam("parentDefinition") AttributeDefinition parentDefinition,
+	public void init(@ContextParam(ContextType.BINDER) Binder binder, @ExecutionArgParam("parentDefinition") AttributeDefinition parentDefinition,
 			@ExecutionArgParam("attributeDefault") AttributeDefault attributeDefault, @ExecutionArgParam("newItem") Boolean newItem) {
 		super.init();
 		this.parentDefinition = parentDefinition;
 		this.newItem = newItem;
 		setEditedItem(attributeDefault);
+		if (attributeDefault != null && ! newItem) {
+			validateForm(binder);
+		}
 	}
 
 	@Override
