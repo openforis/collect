@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * @author S. Ricci
  *
  */
-@Component
+@Component("dataErrorReportManager")
 public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErrorReport, DataErrorReportDao> {
 
 	@Autowired

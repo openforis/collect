@@ -85,9 +85,13 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	});
 	EventBus.addEventListener(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_SAVED, function() {
 		$this.dataErrorQueryDataGrid.refresh();
+		$this.dataErrorReportDataGrid.refresh();
+		$this.dataCleansingStepDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_DELETED, function() {
 		$this.dataErrorQueryDataGrid.refresh();
+		$this.dataErrorReportDataGrid.refresh();
+		$this.dataCleansingStepDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_CREATED, function() {
 		$this.dataErrorReportDataGrid.refresh();
@@ -97,9 +101,13 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	});
 	EventBus.addEventListener(Collect.DataQueryDialogController.DATA_QUERY_SAVED, function() {
 		$this.dataQueryDataGrid.refresh();
+		$this.dataErrorReportDataGrid.refresh();
+		$this.dataCleansingStepDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataQueryDialogController.DATA_QUERY_DELETED, function() {
 		$this.dataQueryDataGrid.refresh();
+		$this.dataErrorReportDataGrid.refresh();
+		$this.dataCleansingStepDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_SAVED, function() {
 		$this.dataCleansingStepDataGrid.refresh();

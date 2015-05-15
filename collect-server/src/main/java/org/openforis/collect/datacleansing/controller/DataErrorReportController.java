@@ -43,8 +43,9 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	
 	private DataErrorReportGeneratorJob generationJob;
 	
-	@Autowired
 	@Override
+	@Autowired
+	@Qualifier("dataErrorReportManager")
 	public void setItemManager(DataErrorReportManager itemManager) {
 		super.setItemManager(itemManager);
 	}

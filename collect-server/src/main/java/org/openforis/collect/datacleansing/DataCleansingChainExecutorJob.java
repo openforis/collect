@@ -3,8 +3,7 @@ package org.openforis.collect.datacleansing;
 import java.util.List;
 
 import org.openforis.collect.concurrency.SurveyLockingJob;
-import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask;
-import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask.DataQueryExecutorTaskInput;
+import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorTaskInput;
 import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;

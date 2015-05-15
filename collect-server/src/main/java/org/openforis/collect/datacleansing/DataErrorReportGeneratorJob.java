@@ -3,8 +3,7 @@ package org.openforis.collect.datacleansing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask;
-import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask.DataQueryExecutorTaskInput;
+import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorTaskInput;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;

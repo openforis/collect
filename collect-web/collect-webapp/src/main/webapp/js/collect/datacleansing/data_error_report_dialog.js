@@ -25,8 +25,10 @@ Collect.AbstractItemEditDialogController.prototype.generateClickHandler = functi
 	if ($this.validateForm()) {
 		var item = $this.extractJSONItem();
 		collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
-			new OF.JobMonitor("datacleansing/dataerrorreports/generate/job.json");
 			new OF.UI.JobDialog();
+			new OF.JobMonitor("datacleansing/dataerrorreports/generate/job.json", function() {
+				EventBus.dispatch(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_CREATED, $this);
+			});
 			$this.close();
 		});
 	}

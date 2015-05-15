@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.openforis.collect.concurrency.ApplicationLockingJob;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.concurrency.SurveyLockingJob;
-import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExectutorTask.DataQueryExecutorError;
+import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorError;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker.Status;
 import org.springframework.beans.factory.annotation.Autowired;
