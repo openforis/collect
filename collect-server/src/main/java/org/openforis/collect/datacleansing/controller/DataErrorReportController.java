@@ -120,6 +120,14 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		}
 	}
 	
+	@RequestMapping(value="generate/job.json", method = RequestMethod.DELETE)
+	public @ResponseBody Response cancelGenerationJob() {
+		if (generationJob != null) {
+			generationJob.abort();
+		}
+		return new Response();
+	}
+	
 	private static class CSVWriterDataErrorItemProcessor extends CSVWriterDataQueryResultItemProcessor {
 		
 		//input
