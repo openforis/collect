@@ -1,35 +1,26 @@
 package org.openforis.collect.datacleansing.controller;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportGeneratorJob;
 import org.openforis.collect.datacleansing.DataErrorReportItem;
-import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.form.DataErrorReportForm;
 import org.openforis.collect.datacleansing.form.DataErrorReportItemForm;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
-import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.web.Response;
-import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeLabel.Type;
-import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -84,19 +75,24 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		return response;
 	}
 	
-	@RequestMapping(value="start-export.json", method = RequestMethod.POST)
-	public @ResponseBody
-	Response startExport(@PathVariable int reportId) {
+	@RequestMapping(value="{reportId}/export.csv", method = RequestMethod.GET)
+	public void export(HttpServletResponse response, @PathVariable int reportId) throws Exception {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataErrorReport report = itemManager.loadById(survey, reportId);
-		List<DataErrorReportItem> items = itemManager.loadItems(report, 0, Integer.MAX_VALUE);
-		
-//		csvExportItemProcessor = new CSVWriterDataQueryResultItemProcessor(report);
-//		exportJob = collectJobManager.createJob(DataQueryExecutorJob.class);
-//		exportJob.setInput(new DataQueryExecutorJobInput(query, recordStep, csvExportItemProcessor));
-//		collectJobManager.start(exportJob);
-		Response response = new Response();
-		return response;
+		CSVWriterDataErrorItemProcessor itemProcessor = new CSVWriterDataErrorItemProcessor(report);
+		itemProcessor.init();
+		int count = itemManager.countItems(report);
+		int itemsPerPage = 100;
+		int pages = Double.valueOf(Math.ceil((double) count / itemsPerPage)).intValue();
+		for (int page = 1; page <= pages ; page++) {
+			List<DataErrorReportItem> items = itemManager.loadItems(report, (page - 1) * itemsPerPage, itemsPerPage);
+			for (DataErrorReportItem item : items) {
+				itemProcessor.process(item);
+			}
+		}
+		itemProcessor.close();
+		File file = itemProcessor.getOutputFile();
+		Controllers.writeFileToResponse(file, "text/csv", response, "data-error-report.csv");
 	}
 	
 	@RequestMapping(value="{reportId}/items.json", method = RequestMethod.GET)
@@ -124,72 +120,16 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		}
 	}
 	
-	private static class CSVWriterDataQueryResultItemProcessor {
+	private static class CSVWriterDataErrorItemProcessor extends CSVWriterDataQueryResultItemProcessor {
 		
 		//input
 		private DataErrorReport report;
 		
-		//output
-		private File tempFile;
-		
-		//temporary
-		private CsvWriter csvWriter;
-		
-		public CSVWriterDataQueryResultItemProcessor(DataErrorReport report) {
+		public CSVWriterDataErrorItemProcessor(DataErrorReport report) {
+			super(report.getQuery().getQuery());
 			this.report = report;
 		}
 		
-		public void init() throws Exception {
-			tempFile = File.createTempFile("collect-data-cleansing-query", ".csv");
-			csvWriter = new CsvWriter(new FileOutputStream(tempFile));
-			writeCSVHeader();
-		}
-		
-		private void writeCSVHeader() {
-			List<String> headers = new ArrayList<String>();
-			
-			DataQuery dataQuery = report.getQuery().getQuery();
-			EntityDefinition rootEntity = dataQuery.getEntityDefinition().getRootEntity();
-			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
-			for (AttributeDefinition def : keyAttributeDefinitions) {
-				String keyLabel = def.getLabel(Type.INSTANCE);
-				if (StringUtils.isBlank(keyLabel)) {
-					keyLabel = def.getName();
-				}
-				headers.add(keyLabel);
-			}
-			headers.add("Path");
-			AttributeDefinition attrDef = dataQuery.getAttributeDefinition();
-			String attrName = attrDef.getName();
-			List<String> fieldNames = attrDef.getFieldNames();
-			if (fieldNames.size() > 1) {
-				for (String fieldName : fieldNames) {
-					headers.add(attrName + "_" + fieldName);
-				}
-			} else {
-				headers.add(attrName);
-			}
-			csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
-		}
-		
-		public void process(DataErrorReportItem item) {
-			List<String> lineValues = new ArrayList<String>();
-			lineValues.addAll(item.getRecordKeyValues());
-			lineValues.add(item.extractNodePath());
-			Value value = item.extractAttributeValue();
-			AttributeDefinition attrDef = item.getAttributeDefinition();
-			Map<String, Object> valueMap = value.toMap();
-			List<String> fieldNames = attrDef.getFieldNames();
-			for (String fieldName : fieldNames) {
-				Object fieldValue = valueMap.get(fieldName);
-				lineValues.add(fieldValue == null ? "": fieldValue.toString());
-			}
-			csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
-		}
-		
-		public void close() {
-			IOUtils.closeQuietly(csvWriter);
-		}
 	}
 	
 }

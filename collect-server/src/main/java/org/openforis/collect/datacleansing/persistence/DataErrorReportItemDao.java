@@ -12,7 +12,8 @@ import org.jooq.Field;
 import org.jooq.Insert;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.Select;
+import org.jooq.SelectQuery;
+import org.jooq.SelectSeekStep1;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportItem;
@@ -44,12 +45,28 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		super(DataErrorReportItemDao.JooqDSLContext.class);
 	}
 
-	public List<DataErrorReportItem> loadByReport(DataErrorReport report, int offset, int limit) {
+	public List<DataErrorReportItem> loadByReport(DataErrorReport report) {
+		return loadByReport(report, null, null);
+	}
+
+	public int countByReport(DataErrorReport report) {
 		JooqDSLContext dsl = dsl(report);
-		Select<OfcDataErrorReportItemRecord> select = dsl
+		SelectQuery<?> q = dsl.selectCountQuery();
+		q.addConditions(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()));
+		Record record = q.fetchOne();
+		Integer count = (Integer) record.getValue(0);
+		return count;
+	}
+	
+	public List<DataErrorReportItem> loadByReport(DataErrorReport report, Integer offset, Integer limit) {
+		JooqDSLContext dsl = dsl(report);
+		SelectSeekStep1<OfcDataErrorReportItemRecord, Integer> select = dsl
 			.selectFrom(OFC_DATA_ERROR_REPORT_ITEM)
 			.where(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()))
-			.limit(offset, limit);
+			.orderBy(OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID);
+		if (offset != null && limit != null) {
+			select.limit(offset, limit);
+		}
 		Result<OfcDataErrorReportItemRecord> result = select.fetch();
 		return dsl.fromResult(result);
 	}
@@ -138,5 +155,6 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		}
 
 	}
+
 }
 

@@ -8,3 +8,7 @@ Collect.DataErrorReportService.prototype = Object.create(Collect.AbstractService
 Collect.DataErrorReportService.prototype.generateReport = function(queryId, recordStep, onSuccess, onError) {
 	this.send("generate.json", {queryId: queryId, recordStep: recordStep}, "POST", onSuccess, onError);
 };
+
+Collect.DataErrorReportService.prototype.exportToCSV = function(reportId) {
+	window.open(this.contextPath + reportId + "/export.csv", "_blank");
+};

@@ -61,6 +61,12 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 			});
 			$this.reportItemsDataGrid = el.data('bootstrap.table');
 		}
+		
+		$this.content.find(".export-to-csv-btn").click($.proxy(function() {
+			var report = $this.extractJSONItem();
+			collect.dataErrorReportService.exportToCSV(report.id);
+		}, $this));
+		
 		callback();
 	});
 };

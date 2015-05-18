@@ -101,6 +101,7 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	});
 	EventBus.addEventListener(Collect.DataQueryDialogController.DATA_QUERY_SAVED, function() {
 		$this.dataQueryDataGrid.refresh();
+		$this.dataErrorQueryDataGrid.refresh();
 		$this.dataErrorReportDataGrid.refresh();
 		$this.dataCleansingStepDataGrid.refresh();
 	});

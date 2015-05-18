@@ -16,11 +16,11 @@ Collect.DataErrorReportDialogController.prototype.initEventListeners = function(
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initEventListeners.call(this);
 	$this.content.find('.generate-btn').click(
-		$.proxy(Collect.AbstractItemEditDialogController.prototype.generateClickHandler, $this)
+		$.proxy($this.generateClickHandler, $this)
 	);
 };
 
-Collect.AbstractItemEditDialogController.prototype.generateClickHandler = function() {
+Collect.DataErrorReportDialogController.prototype.generateClickHandler = function() {
 	var $this = this;
 	if ($this.validateForm()) {
 		var item = $this.extractJSONItem();
@@ -59,6 +59,7 @@ Collect.DataErrorReportDialogController.prototype.initFormElements = function(ca
 			select.selectpicker();
 			$this.recordStepSelectPicker = select.data().selectpicker;
 		}
+		
 		callback.call($this);
 	});
 };

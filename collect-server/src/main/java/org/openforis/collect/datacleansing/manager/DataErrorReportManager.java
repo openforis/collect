@@ -45,7 +45,15 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 		errorReportItemDao.insert(report, items);
 	}
 	
-	public List<DataErrorReportItem> loadItems(DataErrorReport report, int offset, int limit) {
+	public int countItems(DataErrorReport report) {
+		return errorReportItemDao.countByReport(report);
+	}
+	
+	public List<DataErrorReportItem> loadItems(DataErrorReport report) {
+		return loadItems(report, null, null);
+	}
+	
+	public List<DataErrorReportItem> loadItems(DataErrorReport report, Integer offset, Integer limit) {
 		CollectSurvey survey = report.getSurvey();
 		Map<Integer, CollectRecord> recordCache = new HashMap<Integer, CollectRecord>();
 		List<DataErrorReportItem> items = errorReportItemDao.loadByReport(report, offset, limit);

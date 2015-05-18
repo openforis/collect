@@ -1,21 +1,13 @@
 package org.openforis.collect.datacleansing.controller;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.DataQueryExecutorJob;
@@ -30,17 +22,13 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
-import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
-import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -114,7 +102,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	@RequestMapping(value="result.csv", method = RequestMethod.GET)
 	public void downloadResult(HttpServletResponse response) throws FileNotFoundException, IOException {
 		File file = csvExportItemProcessor.getOutputFile();
-		writeFileToResponse(file, "text/csv", response, "collect-query.csv");
+		Controllers.writeFileToResponse(file, "text/csv", response, "collect-query.csv");
 	}
 	
 	@RequestMapping(value = "test-result.json", method = RequestMethod.GET)
@@ -172,11 +160,11 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		}
 	}
 	
-	private static abstract class AttributeQueryResultItemCollector implements NodeProcessor {
+	static abstract class AttributeQueryResultItemProcessor implements NodeProcessor {
 
 		protected DataQuery query;
 		
-		public AttributeQueryResultItemCollector(DataQuery query) {
+		public AttributeQueryResultItemProcessor(DataQuery query) {
 			super();
 			this.query = query;
 		}
@@ -203,7 +191,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		public abstract void process(DataQueryResultItem item);
 	}
 	
-	private static class MemoryStoreDataQueryResultItemProcessor extends AttributeQueryResultItemCollector {
+	private static class MemoryStoreDataQueryResultItemProcessor extends AttributeQueryResultItemProcessor {
 		
 		private List<DataQueryResultItem> items;
 		
@@ -222,99 +210,4 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		}
 	}
 	
-	private static class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultItemCollector {
-		
-		private CsvWriter csvWriter;
-		
-		//output
-		private File tempFile;
-		
-		public CSVWriterDataQueryResultItemProcessor(DataQuery query) {
-			super(query);
-		}
-		
-		@Override
-		public void init() throws Exception {
-			tempFile = File.createTempFile("collect-data-cleansing-query", ".csv");
-			csvWriter = new CsvWriter(new FileOutputStream(tempFile));
-			writeCSVHeader();
-		}
-		
-		private void writeCSVHeader() {
-			List<String> headers = new ArrayList<String>();
-			EntityDefinition rootEntity = query.getEntityDefinition().getRootEntity();
-			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getKeyAttributeDefinitions();
-			for (AttributeDefinition def : keyAttributeDefinitions) {
-				String keyLabel = def.getLabel(Type.INSTANCE);
-				if (StringUtils.isBlank(keyLabel)) {
-					keyLabel = def.getName();
-				}
-				headers.add(keyLabel);
-			}
-			headers.add("Path");
-			AttributeDefinition attrDef = (AttributeDefinition) query.getSchema().getDefinitionById(query.getAttributeDefinitionId());
-			String attrName = attrDef.getName();
-			List<String> fieldNames = attrDef.getFieldNames();
-			if (fieldNames.size() > 1) {
-				for (String fieldName : fieldNames) {
-					headers.add(attrName + "_" + fieldName);
-				}
-			} else {
-				headers.add(attrName);
-			}
-			csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
-		}
-
-		@Override
-		public void process(DataQueryResultItem item) {
-			List<String> lineValues = new ArrayList<String>();
-			lineValues.addAll(item.getRecordKeyValues());
-			lineValues.add(item.extractNodePath());
-			Value value = item.extractAttributeValue();
-			AttributeDefinition attrDef = item.getAttributeDefinition();
-			Map<String, Object> valueMap = value.toMap();
-			List<String> fieldNames = attrDef.getFieldNames();
-			for (String fieldName : fieldNames) {
-				Object fieldValue = valueMap.get(fieldName);
-				lineValues.add(fieldValue == null ? "": fieldValue.toString());
-			}
-			csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
-		}
-		
-		@Override
-		public void close() throws IOException {
-			csvWriter.close();
-		}
-
-		public File getOutputFile() {
-			return tempFile;
-		}
-	}
-	
-	private void writeFileToResponse(File file, String contentType, HttpServletResponse response,
-			String outputFileName) throws FileNotFoundException, IOException {
-		writeFileToResponse(new FileInputStream(file), contentType, new Long(file.length()).intValue(), response, outputFileName);
-	}
-	
-	private void writeFileToResponse(InputStream is,
-			String contentType, int fileSize, HttpServletResponse response,
-			String outputFileName) throws IOException {
-		ServletOutputStream outputStream = response.getOutputStream();
-		BufferedInputStream buf = null;
-		try {
-			response.setContentType(contentType); 
-			response.setContentLength(fileSize);
-			response.setHeader("Content-Disposition", "attachment; filename=" + outputFileName);
-			buf = new BufferedInputStream(is);
-			int readBytes = 0;
-			//read from the file; write to the ServletOutputStream
-			while ((readBytes = buf.read()) != -1) {
-				outputStream.write(readBytes);
-			}
-		} finally {
-			IOUtils.closeQuietly(buf);
-			IOUtils.closeQuietly(is);
-		}
-	}
-
 }
