@@ -16,7 +16,7 @@ import org.openforis.idm.model.Value;
  * @author G. Miceli
  * @author M. Togna
  */
-public class NumberAttributeDefinition extends NumericAttributeDefinition implements KeyAttributeDefinition {
+public class NumberAttributeDefinition extends NumericAttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 	

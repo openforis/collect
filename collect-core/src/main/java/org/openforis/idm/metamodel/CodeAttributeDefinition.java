@@ -21,7 +21,7 @@ import org.openforis.idm.path.InvalidPathException;
  * @author G. Miceli
  * @author M. Togna
  */
-public class CodeAttributeDefinition extends AttributeDefinition implements KeyAttributeDefinition {
+public class CodeAttributeDefinition extends AttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 	

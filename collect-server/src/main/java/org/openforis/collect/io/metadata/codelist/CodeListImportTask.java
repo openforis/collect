@@ -15,6 +15,7 @@ import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.ReferenceDataImportTask;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.codelistimport.CodeListCSVReader;
 import org.openforis.collect.manager.codelistimport.CodeListLine;
@@ -42,12 +43,17 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 	private InputStream inputStream;
 	private CodeList codeList;
 	private boolean overwriteData;
+	private CSVFileOptions csvFileOptions;
 	
 	//internal variables
 	private CodeListCSVReader reader;
 	private List<String> levels;
 	private Map<String, CodeListItem> codeToRootItem;
 
+	public CodeListImportTask() {
+		csvFileOptions = new CSVFileOptions();
+	}
+	
 	@Override
 	protected void initInternal() throws Throwable {
 		super.initInternal();
@@ -82,7 +88,7 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 			List<String> languages = survey.getLanguages();
 			String defaultLanguage = survey.getDefaultLanguage();
 			File file = OpenForisIOUtils.copyToTempFile(inputStream);
-			reader = new CodeListCSVReader(file, languages, defaultLanguage);
+			reader = new CodeListCSVReader(file, csvFileOptions, languages, defaultLanguage);
 			reader.init();
 			levels = reader.getLevels();
 			addProcessedRow(1);

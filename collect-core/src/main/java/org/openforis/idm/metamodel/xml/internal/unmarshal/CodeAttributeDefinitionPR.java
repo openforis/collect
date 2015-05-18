@@ -1,12 +1,11 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.ALLOW_VALUES_SORTING;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.CODE;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.KEY;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.LIST;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.PARENT;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.STRICT;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.ALLOW_VALUES_SORTING;
 
 import java.io.IOException;
 
@@ -27,13 +26,11 @@ class CodeAttributeDefinitionPR extends AttributeDefinitionPR {
 	@Override
 	protected void onStartDefinition() throws XmlParseException, XmlPullParserException, IOException {
 		super.onStartDefinition();
-		Boolean key = getBooleanAttribute(KEY, false);
 		String parent = getAttribute(PARENT, false);
 		Boolean strict = getBooleanAttribute(STRICT, false);
 		String listName = getAttribute(LIST, true);
 		Boolean allowValuesSorting = getBooleanAttribute(ALLOW_VALUES_SORTING, false);
 		CodeAttributeDefinition defn = (CodeAttributeDefinition) getDefinition();
-		defn.setKey(key == null ? false : key);
 		defn.setParentExpression(parent);
 		defn.setAllowUnlisted(strict == null ? false : ! strict);
 		defn.setListName(listName);

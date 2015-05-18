@@ -22,8 +22,5 @@ class TextAttributeXS extends AttributeDefinitionXS<TextAttributeDefinition> {
 	protected void attributes(TextAttributeDefinition defn) throws IOException {
 		super.attributes(defn);
 		attribute(TYPE, defn.getType().name().toLowerCase());
-		if ( defn.isKey() ) {
-			attribute(KEY, true);
-		}
 	}
 }

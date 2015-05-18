@@ -9,6 +9,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
+import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -25,7 +26,9 @@ import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
 import org.openforis.idm.model.NumberAttribute;
+import org.openforis.idm.model.NumericRangeAttribute;
 import org.openforis.idm.model.Record;
+import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TimeAttribute;
 
@@ -424,6 +427,17 @@ public class CollectRecord extends Record {
 		} else if(keyNode instanceof NumberAttribute) {
 			Number number = ((NumberAttribute<?,?>) keyNode).getNumber();
 			return number == null ? null: number.toString();
+		} else if(keyNode instanceof NumericRangeAttribute) {
+			NumericRangeAttribute<?, ?> attr = (NumericRangeAttribute<?, ?>) keyNode;
+			String format;
+			if (attr.getDefinition().getType() == Type.INTEGER) {
+				format = "%d - %d";
+			} else {
+				format = "%f - %f";
+			}
+			return String.format(format, attr.getFrom(), attr.getTo());
+		} else if(keyNode instanceof TaxonAttribute) {
+			return ((TaxonAttribute) keyNode).getCode();
 		} else if(keyNode instanceof TextAttribute) {
 			return ((TextAttribute) keyNode).getText();
 		} else if(keyNode instanceof TimeAttribute) {

@@ -84,6 +84,10 @@
                                 <includeClass>org.openforis.idm.model.species.Taxon$TaxonRank</includeClass>
                                 <includeClass>org.openforis.idm.metamodel.validation.ValidationResultFlag</includeClass>
                                 <includeClass>org.openforis.collect.Proxy</includeClass>
+                                <includeClass>org.openforis.collect.io.parsing.FileCharset</includeClass>
+                                <includeClass>org.openforis.collect.io.parsing.CSVFileOptions</includeClass>
+                                <includeClass>org.openforis.collect.io.parsing.CSVFileSeparator</includeClass>
+                                <includeClass>org.openforis.collect.io.parsing.CSVFileTextDelimiter</includeClass>
                                 <includeClass>org.openforis.collect.io.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataImportState$MainStep</includeClass>
                                 <includeClass>org.openforis.collect.io.data.DataImportState$SubStep</includeClass>

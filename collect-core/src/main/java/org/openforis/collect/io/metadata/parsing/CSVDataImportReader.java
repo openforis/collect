@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.commons.io.csv.CsvReader;
 
@@ -27,6 +28,13 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 	public CSVDataImportReader(File file) throws IOException, ParsingException {
 		super();
 		csvReader = new CsvReader(file);
+	}
+
+	public CSVDataImportReader(File file, CSVFileOptions csvFileOptions) throws IOException, ParsingException {
+		super();
+		csvReader = new CsvReader(file, csvFileOptions.getCharset().getCharsetName(), 
+				csvFileOptions.getSeparator().getCharacter(), 
+				csvFileOptions.getTextDelimiter().getCharacter());
 	}
 
 	@Deprecated

@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.io.exception.DataImportExeption;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
@@ -27,14 +28,14 @@ public class CodeListImportService extends ReferenceDataImportService<CodeListIm
 	private SessionManager sessionManager;
 	
 	@Secured("ROLE_ADMIN")
-	public CodeListImportStatusProxy start(int codeListId, String tempFileName, boolean overwriteData) throws DataImportExeption {
+	public CodeListImportStatusProxy start(int codeListId, String tempFileName, CSVFileOptions fileOptions, boolean overwriteData) throws DataImportExeption {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = new File(tempFileName);
 			SessionStatus designerSessionStatus = sessionManager.getDesignerSessionStatus();
 			CollectSurvey survey = designerSessionStatus.getSurvey();
 			String langCode = designerSessionStatus.getCurrentLanguageCode();
 			CodeList codeList = survey.getCodeListById(codeListId);
-			importProcess = new CodeListImportProcess(codeListManager, codeList, langCode, importFile, overwriteData);
+			importProcess = new CodeListImportProcess(codeListManager, codeList, langCode, importFile, fileOptions, overwriteData);
 			importProcess.init();
 			CodeListImportStatus status = importProcess.getStatus();
 			if ( status != null && ! importProcess.getStatus().isError() ) {

@@ -13,7 +13,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.KeyAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.CodeParentValidator;
 import org.openforis.idm.metamodel.validation.CodeValidator;
@@ -178,10 +178,18 @@ public class CollectValidator extends Validator {
 
 	private boolean isRootEntityKey(Attribute<?, ?> attribute) {
 		Record record = attribute.getRecord();
-		return attribute.getDefinition() instanceof KeyAttributeDefinition &&
-				((KeyAttributeDefinition) attribute.getDefinition()).isKey() &&
-				record.getRootEntity().equals(attribute.getParent()
-				);
+		AttributeDefinition attrDef = attribute.getDefinition();
+		if (attrDef.isKey()) {
+			Entity rootEntity = record.getRootEntity();
+			EntityDefinition rootEntityDef = rootEntity.getDefinition();
+			List<AttributeDefinition> keyAttributeDefs = rootEntityDef.getKeyAttributeDefinitions();
+			for (AttributeDefinition keyDef : keyAttributeDefs) {
+				if (keyDef.getId() == attrDef.getId()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	static boolean isErrorConfirmed(Attribute<?, ?> attribute) {

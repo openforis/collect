@@ -20,8 +20,5 @@ class NumberAttributeXS extends NumericAttributeXS<NumberAttributeDefinition> {
 	@Override
 	protected void attributes(NumberAttributeDefinition defn) throws IOException {
 		super.attributes(defn);
-		if ( defn.isKey() ) {
-			attribute(KEY, true);
-		}
 	}
 }

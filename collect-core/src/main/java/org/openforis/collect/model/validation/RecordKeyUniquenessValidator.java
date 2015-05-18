@@ -24,11 +24,12 @@ public class RecordKeyUniquenessValidator implements ValidationRule<Attribute<?,
 	@Override
 	public ValidationResultFlag evaluate(Attribute<?, ?> node) {
 		CollectRecord record = (CollectRecord) node.getRecord();
-		if ( record.getId() == null ) {
+		if (record.getSurvey().getId() == null) {
 			return ValidationResultFlag.OK;
+		} else {
+			boolean unique = recordManager.isUnique(record);
+			return ValidationResultFlag.valueOf(unique);
 		}
-		boolean unique = recordManager.isUnique(record);
-		return ValidationResultFlag.valueOf(unique);
 	}
 
 }

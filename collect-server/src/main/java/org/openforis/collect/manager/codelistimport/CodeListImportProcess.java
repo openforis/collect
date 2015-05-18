@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectSurvey;
@@ -40,6 +41,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	//parameters
 	private CodeListManager codeListManager;
 	private File file;
+	private CSVFileOptions csvFileOptions;
 	private CodeList codeList;
 	
 	//internal variables
@@ -49,11 +51,17 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private boolean overwriteData;
 
 	public CodeListImportProcess(CodeListManager codeListManager,
+			CodeList codeList, String langCode, File file, boolean overwriteData) {
+		this(codeListManager, codeList, langCode, file, new CSVFileOptions(), overwriteData);
+	}
+
+	public CodeListImportProcess(CodeListManager codeListManager,
 			CodeList codeList, String langCode, File file,
-			boolean overwriteData) {
+			CSVFileOptions csvFileOptions, boolean overwriteData) {
 		this.codeListManager = codeListManager;
 		this.codeList = codeList;
 		this.file = file;
+		this.csvFileOptions = csvFileOptions;
 		this.overwriteData = overwriteData;
 	}
 	
@@ -86,7 +94,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		String fileName = file.getName();
 		String extension = FilenameUtils.getExtension(fileName);
 		if ( CSV.equalsIgnoreCase(extension) ) {
-			parseCSVLines(file);
+			parseCSVLines();
 		} else {
 			String errorMessage = "File type not supported" + extension;
 			status.setErrorMessage(errorMessage);
@@ -124,13 +132,13 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 //		}
 //	}
 
-	protected void parseCSVLines(File file) {
+	protected void parseCSVLines() {
 		long currentRowNumber = 0;
 		try {
 			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 			List<String> languages = survey.getLanguages();
 			String defaultLanguage = survey.getDefaultLanguage();
-			reader = new CodeListCSVReader(file, languages, defaultLanguage);
+			reader = new CodeListCSVReader(file, csvFileOptions, languages, defaultLanguage);
 			reader.init();
 			levels = reader.getLevels();
 			status.addProcessedRow(1);
