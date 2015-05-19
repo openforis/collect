@@ -1,4 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="expressionInfoIcon" class="org.openforis.collect.designer.component.ExpressionInfoIcon"?>
 <zk>
   <custom-attributes parentDefinition="${arg.parentDefinition}"/>
   <custom-attributes check="${arg.check}"/>
@@ -51,7 +52,7 @@
           <fieldErrorHandler message="@load(vmsgs['condition'])">
             <textbox width="450px"  multiline="true" rows="4"
             	value="@bind(fx.condition)" onChange="@command('applyChanges')" />
-            <image src="/assets/images/expression-small.png" />
+            <expressionInfoIcon />
           </fieldErrorHandler>
         </row>
         <row>
@@ -62,7 +63,7 @@
 	            <textbox width="450px" multiline="true" rows="4"
 	            	value="@bind(fx.sourcePointExpression)"
 	                onChange="@command('applyChanges')" />
-	            <image src="/assets/images/expression-small.png" />
+	            <expressionInfoIcon />
           	</fieldErrorHandler>
         </row>
         <row>
@@ -73,7 +74,7 @@
 	            <textbox width="450px" multiline="true" rows="4"
 	            	value="@bind(fx.destinationPointExpression)"
 	                onChange="@command('applyChanges')" />
-	           	<image src="/assets/images/expression-small.png" />
+	           	<expressionInfoIcon />
           	</fieldErrorHandler>
         </row>
         <row>
@@ -84,7 +85,7 @@
 	            <textbox width="450px" multiline="true" rows="4"
 	            	 value="@bind(fx.minDistanceExpression)"
 	                 onChange="@command('applyChanges')" />
-	            <image src="/assets/images/expression-small.png" />
+	            <expressionInfoIcon />
           	</fieldErrorHandler>
         </row>
         <row>
@@ -95,7 +96,7 @@
 	            <textbox width="450px" multiline="true" rows="4"
 	            	value="@bind(fx.maxDistanceExpression)"
 	                onChange="@command('applyChanges')" />
-	            <image src="/assets/images/expression-small.png" />
+	            <expressionInfoIcon />
           	</fieldErrorHandler>
         </row>
       </rows>

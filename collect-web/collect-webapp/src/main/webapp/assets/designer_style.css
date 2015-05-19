@@ -245,3 +245,7 @@ button.icon {
 .small .z-listcell-cnt {
 	font-size: 10px;
 }
+
+.expression-info {
+	cursor: pointer;
+}
