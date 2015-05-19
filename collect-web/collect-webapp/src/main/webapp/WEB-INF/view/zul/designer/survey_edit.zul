@@ -150,9 +150,16 @@
 				<east border="none" size="20%">
 					<hlayout hflex="1"
 							style="text-align: right;">
-						<!-- Preview -->
-						<button label="${labels.survey.preview.show_preview}"
-		    					  onClick="@command('showPreview')" />
+		    					  
+    					<!-- Advanced options -->
+						<combobutton label="${labels.survey.preview.show_preview}" onClick="@command('showDataCleansingPreview')">
+							<menupopup>
+								<menuitem label="${labels.survey.preview.data_cleansing}"
+									onClick="@command('showDataCleansingPreview')" />
+								<menuitem label="${labels.survey.preview.data_entry}"
+									onClick="@command('showDataEntryPreview')" />
+							</menupopup>
+						</combobutton>
 		    		</hlayout>
 				</east>
 			</borderlayout>

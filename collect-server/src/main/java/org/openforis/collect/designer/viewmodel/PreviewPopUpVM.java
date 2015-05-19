@@ -25,7 +25,8 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 			@ExecutionArgParam("work") String work,
 			@ExecutionArgParam("rootEntityId") String rootEntityId,
 			@ExecutionArgParam("versionId") String versionId,
-			@ExecutionArgParam("locale") String locale
+			@ExecutionArgParam("locale") String locale,
+			@ExecutionArgParam("recordStep") String recordStep
 			) throws URISyntaxException {
 		super.init();
 		URIBuilder uriBuilder = new URIBuilder("/index.htm");
@@ -37,6 +38,7 @@ public class PreviewPopUpVM extends SurveyBaseVM {
 		if (StringUtils.isNotBlank(versionId)) {
 			uriBuilder.addParameter("versionId", versionId);
 		}
+		uriBuilder.addParameter("recordStep", recordStep);
 		this.uri = uriBuilder.build().toString();
 	}
 	

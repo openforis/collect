@@ -60,6 +60,7 @@ package org.openforis.collect.presenter {
 	import flash.events.UncaughtErrorEvent;
 	import flash.events.ErrorEvent;
 	import mx.rpc.Fault;
+	import org.openforis.collect.model.CollectRecord$Step;
 	
 	/**
 	 * 
@@ -157,7 +158,8 @@ package org.openforis.collect.presenter {
 			var work:Boolean = params.work == "true";
 			var rootEntityId:int = int(params.rootEntityId);
 			var versionId:Number = Number(params.versionId);
-			var token:Object = {surveyId: surveyId, work: work, rootEntityId: rootEntityId, versionId: versionId};
+			var recordStep:String = params.recordStep;
+			var token:Object = {surveyId: surveyId, work: work, rootEntityId: rootEntityId, versionId: versionId, recordStep: recordStep};
 			var previewResp:IResponder = new AsyncResponder(initSessionForPreviewResultHandler, faultHandler, token);
 			this._sessionClient.initSession(previewResp, localeString);
 		}
@@ -352,9 +354,10 @@ package org.openforis.collect.presenter {
 			var rootEntityId:int = token.rootEntityId;
 			var schema:SchemaProxy = survey.schema;
 			var rootEntityDef:EntityDefinitionProxy = EntityDefinitionProxy(schema.getDefinitionById(rootEntityId));
+			var recordStep:CollectRecord$Step = CollectRecord$Step.valueOf(token.recordStep);
 			Application.activeRootEntity = rootEntityDef;
 			var newRecordResponder:IResponder = new AsyncResponder(createRecordResultHandler, faultHandler);
-			ClientFactory.dataClient.createNewRecord(newRecordResponder, rootEntityDef.name, versionName);
+			ClientFactory.dataClient.createNewRecord(newRecordResponder, rootEntityDef.name, versionName, recordStep);
 		}
 		
 		protected function createRecordResultHandler(event:ResultEvent, token:Object = null):void {

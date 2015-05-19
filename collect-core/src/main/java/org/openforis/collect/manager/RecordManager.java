@@ -358,7 +358,7 @@ public class RecordManager {
 		record.setCreatedBy(user);
 
 		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.initializeRecord(record);
+		recordUpdater.initializeNewRecord(record);
 		return record;
 	}
 
@@ -416,9 +416,6 @@ public class RecordManager {
 		}
 		
 		record.setStep( nextStep );
-
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.applyDefaultValues(record);
 
 		validate(record);
 		

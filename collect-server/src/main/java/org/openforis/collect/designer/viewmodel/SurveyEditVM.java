@@ -24,6 +24,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.metamodel.SurveyTarget;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
@@ -86,6 +87,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private Window jobStatusPopUp;
 
 	private boolean showingPreview;
+	private Step previewStep;
 
 	@Init(superclass=false)
 	public void init(@QueryParam("temp_id") Integer tempId) {
@@ -409,6 +411,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 				if ( formVersion != null ) {
 					params.put("versionId", Integer.toString(formVersion.getId()));
 				}
+				params.put("recordStep", previewStep.name());
 				openPopUp(Resources.Component.PREVIEW_POP_UP.getLocation(), true, params);
 
 				closePreviewPreferencesPopUp();
@@ -429,11 +432,21 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	@Command
-	public void showPreview() {
+	public void showDataEntryPreview() {
+		showPreview(Step.ENTRY);
+	}
+	
+	@Command
+	public void showDataCleansingPreview() {
+		showPreview(Step.CLEANSING);
+	}
+
+	public void showPreview(Step recordStep) {
 		if (survey.getId() == null || changed)  {
 			MessageUtil.showWarning(LabelKeys.PREVIEW_ERROR_SAVE_SURVEY_FIRST);
 		} else {
 			showingPreview = true;
+			previewStep = recordStep;
 			if ( checkValidity(true) ) {
 				openPreviewPopUp();
 			}

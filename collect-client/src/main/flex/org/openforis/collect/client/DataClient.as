@@ -61,8 +61,8 @@ package org.openforis.collect.client {
 			this._moveRecordsOperation = getOperation("moveRecords");
 		}
 		
-		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String):void {
-			var token:AsyncToken = this._createRecordOperation.send(rootEntityName, versionName);
+		public function createNewRecord(responder:IResponder, rootEntityName:String, versionName:String, recordStep:CollectRecord$Step):void {
+			var token:AsyncToken = this._createRecordOperation.send(rootEntityName, versionName, recordStep);
 			token.addResponder(responder);
 		}
 		
