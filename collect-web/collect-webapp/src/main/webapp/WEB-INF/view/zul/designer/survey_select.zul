@@ -25,7 +25,7 @@
 		<box hflex="1"></box>
 	</hbox>
 	
-	<listbox id="surveysListbox" width="830px" vflex="true"
+	<listbox id="surveysListbox" width="900px" vflex="true"
 		model="@load(vm.surveySummaries)"
 		selectedItem="@bind(vm.selectedSurvey)">
 		<listhead>
@@ -33,21 +33,24 @@
 				sort="auto(name)" />
 			<listheader label="${labels.survey.project_name}"
 				sort="auto(projectName)" />
+			<listheader label="${labels.survey.last_change}" width="90px"
+				sort="auto(modifiedDate)" />
 			<listheader label="${labels.survey.target.$}" width="50px"
 				sort="auto(target)" />
 			<listheader label="${labels.survey.modified}" width="70px"
 				sort="auto(work, published, name)" />
 			<listheader label="${labels.survey.published}" width="70px"
 				sort="auto(published, work, name)" />
-			<listheader
-				label="${labels.survey.records_validation_status}" width="150px" />
 		</listhead>
 		<template name="model">
 			<listitem>
 				<listcell label="@load(each.name)"
-					onDoubleClick="@command('editSelectedSurvey')" />
+					onDoubleClick="@command('editSelectedSurvey')">
+				</listcell>
 				<listcell label="@load(each.projectName)"
 					onDoubleClick="@command('editSelectedSurvey')" />
+				<listcell label="@load(vm.prettyDateFormat(each.modifiedDate))"
+					onDoubleClick="@command('editSelectedSurvey')" sclass="small" />
 				<listcell
 					onDoubleClick="@command('editSelectedSurvey')">
 					<box align="center" width="100%" visible="${each.target.code eq 'CE'}" 
