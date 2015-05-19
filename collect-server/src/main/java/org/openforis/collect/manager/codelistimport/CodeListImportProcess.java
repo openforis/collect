@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +33,6 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 
 	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
 
-	private static final String CSV = "csv";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "codeListImport.error.internalErrorImportingFile";
 	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";
 	
@@ -91,16 +89,8 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	}
 
 	protected void processFile() throws IOException {
-		String fileName = file.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if ( CSV.equalsIgnoreCase(extension) ) {
-			parseCSVLines();
-		} else {
-			String errorMessage = "File type not supported" + extension;
-			status.setErrorMessage(errorMessage);
-			status.error();
-			LOG.error("Species import: " + errorMessage);
-		}
+		parseCSVLines();
+		
 		if ( status.hasErrors() ) {
 			status.error();
 		}
@@ -119,18 +109,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		codeListManager.deleteAllItems(codeList);
 		List<CodeListItem> rootItems = new ArrayList<CodeListItem>(codeToRootItem.values());
 		codeListManager.saveItemsAndDescendants(rootItems);
-		//saveItemsAndDescendants(rootItems, null);
 	}
-
-//	protected void saveItemsAndDescendants(Collection<CodeListItem> items,
-//			Integer parentItemId) {
-//		for (CodeListItem item : items) {
-//			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
-//			persistedChildItem.setParentId(parentItemId);
-//			codeListManager.save(persistedChildItem);
-//			saveItemsAndDescendants(item.getChildItems(), persistedChildItem.getSystemId());
-//		}
-//	}
 
 	protected void parseCSVLines() {
 		long currentRowNumber = 0;

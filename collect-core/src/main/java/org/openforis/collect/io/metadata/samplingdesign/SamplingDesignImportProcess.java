@@ -81,19 +81,8 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	@Override
 	public void startProcessing() throws Exception {
 		super.startProcessing();
-		String fileName = file.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if ( CSV.equalsIgnoreCase(extension) ) {
-			parseCSVLines(file);
-//		} else if (ZIP.equals(extension) ) {
-//			processPackagedFile();
-//			status.complete();
-		} else {
-			errorMessage = "File type not supported" + extension;
-			status.setErrorMessage(errorMessage);
-			status.error();
-			LOG.error("Species import: " + errorMessage);
-		}
+		parseCSVLines(file);
+
 		if ( status.isRunning() ) {
 			processLines();
 		}

@@ -103,19 +103,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 
 	protected void processFile() throws IOException {
-		String fileName = file.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if ( CSV.equalsIgnoreCase(extension) ) {
-			parseTaxonCSVLines(file);
-//		} else if (ZIP.equals(extension) ) {
-//			processPackagedFile();
-//			status.complete();
-		} else {
-			errorMessage = "File type not supported" + extension;
-			status.setErrorMessage(errorMessage);
-			status.error();
-			LOG.error("Species import: " + errorMessage);
-		}
+		parseTaxonCSVLines(file);
 		if ( status.isRunning() ) {
 			processLines();
 		}

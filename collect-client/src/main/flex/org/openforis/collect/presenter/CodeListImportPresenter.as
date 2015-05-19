@@ -87,10 +87,13 @@ package org.openforis.collect.presenter
 		
 		override protected function performProcessStart():void {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
-			var csvFileOptions:CSVFileOptions = new CSVFileOptions();
-			csvFileOptions.charset = FileCharset.valueOf(view.charsetDropDownList.selectedItem.name);
-			csvFileOptions.separator = CSVFileSeparator.valueOf(view.separatorDropDownList.selectedItem.name);
-			csvFileOptions.textDelimiter = CSVFileTextDelimiter.valueOf(view.textDelimiterDropDownList.selectedItem.name);
+			var csvFileOptions:CSVFileOptions = null;
+			if (view.charsetDropDownList != null) {
+				csvFileOptions = new CSVFileOptions();
+				csvFileOptions.charset = FileCharset.valueOf(view.charsetDropDownList.selectedItem.name);
+				csvFileOptions.separator = CSVFileSeparator.valueOf(view.separatorDropDownList.selectedItem.name);
+				csvFileOptions.textDelimiter = CSVFileTextDelimiter.valueOf(view.textDelimiterDropDownList.selectedItem.name);
+			}
 			_codeListImportClient.start(responder, view.codeListId, _uploadedTempFileName, csvFileOptions);
 		}
 		

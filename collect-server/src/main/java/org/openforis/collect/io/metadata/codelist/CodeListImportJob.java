@@ -20,7 +20,6 @@ import org.openforis.idm.metamodel.CodeList;
  */
 public class CodeListImportJob extends Job {
 
-	private static final String CSV = "csv";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "codeListImport.error.internalErrorImportingFile";
 	private static final String WRONG_FILE_TYPE_ERROR_MESSAGE_KEY = "codeListImport.error.wrongFileType";
 	
@@ -49,15 +48,7 @@ public class CodeListImportJob extends Job {
 	}
 	
 	private boolean validateFile() {
-		String fileName = file.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if ( CSV.equalsIgnoreCase(extension) ) {
-			return true;
-		} else {
-			String errorMessage = "File type not supported" + extension;
-			setErrorMessage(errorMessage);
-			return false;
-		}
+		return true;
 	}
 
 	@Override

@@ -32,6 +32,9 @@ public abstract class CSVDataImportReader<T extends Line> extends DataImportRead
 
 	public CSVDataImportReader(File file, CSVFileOptions csvFileOptions) throws IOException, ParsingException {
 		super();
+		if (csvFileOptions == null) {
+			csvFileOptions = new CSVFileOptions();
+		}
 		csvReader = new CsvReader(file, csvFileOptions.getCharset().getCharsetName(), 
 				csvFileOptions.getSeparator().getCharacter(), 
 				csvFileOptions.getTextDelimiter().getCharacter());
