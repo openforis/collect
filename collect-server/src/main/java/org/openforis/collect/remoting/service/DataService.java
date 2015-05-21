@@ -153,7 +153,7 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordProxy createRecord(String rootEntityName, String versionName, CollectRecord.Step recordStep) throws RecordPersistenceException, RecordIndexException {
+	public RecordProxy createRecord(String rootEntityName, String versionName, Step recordStep) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
@@ -161,13 +161,7 @@ public class DataService {
 		String sessionId = sessionState.getSessionId();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		Schema schema = activeSurvey.getSchema();
-		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
-		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
-		if (recordStep != Step.ENTRY) {
-			record.setStep(recordStep);
-			recordManager.validate(record);
-		}
+		CollectRecord record = recordManager.create(activeSurvey, rootEntityName, user, versionName, sessionId, recordStep);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
 		Locale locale = sessionState.getLocale();
