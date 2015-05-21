@@ -39,6 +39,7 @@
 	<externalizers>
         <externalizer type="org.granite.messaging.amf.io.util.externalizer.DefaultExternalizer">
 			<include instance-of="org.openforis.collect.Proxy" />
+			<include type="org.openforis.collect.io.parsing.CSVFileOptions"/>
 			<include type="org.openforis.collect.metamodel.NodeDefinitionSummary"/>
 <!-- 			<include type="org.openforis.collect.model.CollectRecord"/> -->
 			<include type="org.openforis.collect.model.Logo"/>

@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.io.exception.ParsingException;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.model.CollectSurvey;
@@ -33,13 +33,13 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 
 	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
 
-	private static final String CSV = "csv";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "codeListImport.error.internalErrorImportingFile";
 	private static final String DIFFERENT_LABEL_MESSAGE_KEY = "codeListImport.parsingError.differentLabel";
 	
 	//parameters
 	private CodeListManager codeListManager;
 	private File file;
+	private CSVFileOptions csvFileOptions;
 	private CodeList codeList;
 	
 	//internal variables
@@ -49,11 +49,17 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private boolean overwriteData;
 
 	public CodeListImportProcess(CodeListManager codeListManager,
+			CodeList codeList, String langCode, File file, boolean overwriteData) {
+		this(codeListManager, codeList, langCode, file, new CSVFileOptions(), overwriteData);
+	}
+
+	public CodeListImportProcess(CodeListManager codeListManager,
 			CodeList codeList, String langCode, File file,
-			boolean overwriteData) {
+			CSVFileOptions csvFileOptions, boolean overwriteData) {
 		this.codeListManager = codeListManager;
 		this.codeList = codeList;
 		this.file = file;
+		this.csvFileOptions = csvFileOptions;
 		this.overwriteData = overwriteData;
 	}
 	
@@ -83,16 +89,8 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	}
 
 	protected void processFile() throws IOException {
-		String fileName = file.getName();
-		String extension = FilenameUtils.getExtension(fileName);
-		if ( CSV.equalsIgnoreCase(extension) ) {
-			parseCSVLines(file);
-		} else {
-			String errorMessage = "File type not supported" + extension;
-			status.setErrorMessage(errorMessage);
-			status.error();
-			LOG.error("Species import: " + errorMessage);
-		}
+		parseCSVLines();
+		
 		if ( status.hasErrors() ) {
 			status.error();
 		}
@@ -111,26 +109,15 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		codeListManager.deleteAllItems(codeList);
 		List<CodeListItem> rootItems = new ArrayList<CodeListItem>(codeToRootItem.values());
 		codeListManager.saveItemsAndDescendants(rootItems);
-		//saveItemsAndDescendants(rootItems, null);
 	}
 
-//	protected void saveItemsAndDescendants(Collection<CodeListItem> items,
-//			Integer parentItemId) {
-//		for (CodeListItem item : items) {
-//			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
-//			persistedChildItem.setParentId(parentItemId);
-//			codeListManager.save(persistedChildItem);
-//			saveItemsAndDescendants(item.getChildItems(), persistedChildItem.getSystemId());
-//		}
-//	}
-
-	protected void parseCSVLines(File file) {
+	protected void parseCSVLines() {
 		long currentRowNumber = 0;
 		try {
 			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
 			List<String> languages = survey.getLanguages();
 			String defaultLanguage = survey.getDefaultLanguage();
-			reader = new CodeListCSVReader(file, languages, defaultLanguage);
+			reader = new CodeListCSVReader(file, csvFileOptions, languages, defaultLanguage);
 			reader.init();
 			levels = reader.getLevels();
 			status.addProcessedRow(1);

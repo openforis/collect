@@ -241,3 +241,11 @@ button.icon {
 .z-menubar-hor.withicons .z-menuitem-body-over {
 	background-image: none;
 }
+
+.small .z-listcell-cnt {
+	font-size: 10px;
+}
+
+.expression-info {
+	cursor: pointer;
+}

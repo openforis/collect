@@ -234,7 +234,7 @@ package org.openforis.collect.presenter {
 		protected function addNewRecord(version:ModelVersionProxy = null):void {
 			var rootEntityName:String = Application.activeRootEntity.name;
 			var versionName:String = version != null ? version.name: null;
-			_dataClient.createNewRecord(_newRecordResponder, rootEntityName, versionName);
+			_dataClient.createNewRecord(_newRecordResponder, rootEntityName, versionName, CollectRecord$Step.ENTRY);
 		}
 		
 		protected function cancelSelectVersionClickHandler(event:Event):void {

@@ -16,6 +16,7 @@ import org.openforis.collect.io.metadata.parsing.CSVDataImportReader;
 import org.openforis.collect.io.metadata.parsing.CSVLineParser;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
+import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.commons.io.csv.CsvLine;
 
 /**
@@ -34,8 +35,8 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 	private List<String> languages;
 	private String defaultLanguage;
 	
-	public CodeListCSVReader(File file, List<String> languages, String defaultLanguage) throws IOException, ParsingException {
-		super(file);
+	public CodeListCSVReader(File file, CSVFileOptions csvFileOptions, List<String> languages, String defaultLanguage) throws IOException, ParsingException {
+		super(file, csvFileOptions);
 		this.languages = languages;
 		this.defaultLanguage = defaultLanguage;
 	}

@@ -37,7 +37,7 @@ package org.openforis.collect.presenter {
 		
 		private static const PROGRESS_UPDATE_DELAY:int = 2000;
 		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
-		private static const ALLOWED_IMPORT_FILE_EXTENSIONS:Array = ["*.csv"];
+		private static const ALLOWED_IMPORT_FILE_EXTENSIONS:Array = new Array("*.csv", "*.xls", "*.xlsx");
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
 		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;
 		private static const VERANCULAR_NAMES_SEPARATOR:String = ", ";
@@ -68,8 +68,8 @@ package org.openforis.collect.presenter {
 			_recordsOffset = 0;
 			_recordsPerPage = MAX_SUMMARIES_PER_PAGE
 
-			var description:String = ALLOWED_IMPORT_FILE_EXTENSIONS.join(", ");
-			_fileFilter = new FileFilter(description, ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
+			//var description:String = ALLOWED_IMPORT_FILE_EXTENSIONS.join(", ");
+			_fileFilter = new FileFilter("Excel documents", ALLOWED_IMPORT_FILE_EXTENSIONS.join("; "));
 		}
 		
 		override public function init():void {

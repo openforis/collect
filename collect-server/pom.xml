@@ -103,6 +103,33 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<!-- copy Desginer options from user settings into the options.properties file -->
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>maven-replacer-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<includes>
+						<include>target/classes/org/openforis/collect/designer/options.properties</include>
+					</includes>
+					<regex>false</regex>
+					<replacements>
+						<replacement>
+							<token>IDM_EXPRESSION_LANGUAGE_WIKI_URL</token>
+							<value>${collect.wiki.idm.expression-language.url}</value>
+						</replacement>
+					</replacements>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

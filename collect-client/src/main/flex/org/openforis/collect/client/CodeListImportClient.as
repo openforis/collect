@@ -1,10 +1,8 @@
 package org.openforis.collect.client {
-	import mx.collections.IList;
-	import mx.controls.Alert;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.IResponder;
-	import mx.rpc.events.FaultEvent;
-	import mx.rpc.remoting.Operation;
+	
+	import org.openforis.collect.io.parsing.CSVFileOptions;
 	
 	/**
 	 * 
@@ -16,8 +14,8 @@ package org.openforis.collect.client {
 			super("codeListImportService");
 		}
 		
-		public function start(responder:IResponder, codeListId:int, tempFileName:String, overwriteAllData:Boolean = true):void {
-			var token:AsyncToken = this._startOperation.send(codeListId, tempFileName, overwriteAllData);
+		public function start(responder:IResponder, codeListId:int, tempFileName:String, csvFileOptions:CSVFileOptions, overwriteAllData:Boolean = true):void {
+			var token:AsyncToken = this._startOperation.send(codeListId, tempFileName, csvFileOptions, overwriteAllData);
 			token.addResponder(responder);
 		}
 

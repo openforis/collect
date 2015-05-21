@@ -15,6 +15,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.FROM;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.GT;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.GTE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.IF;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.KEY;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.LT;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.LTE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.MAX;
@@ -71,9 +72,13 @@ abstract class AttributeDefinitionPR extends NodeDefinitionPR {
 	@Override
 	protected void onStartDefinition() throws XmlParseException, XmlPullParserException, IOException {
 		super.onStartDefinition();
-		if ( getDefinition() instanceof Calculable ) {
+		Boolean key = getBooleanAttribute(KEY, false);
+		AttributeDefinition defn = (AttributeDefinition) getDefinition();
+		defn.setKey(key == null ? false : key);
+		
+		if ( defn instanceof Calculable ) {
 			boolean calculated = getBooleanAttributeWithDefault(CALCULATED, false);
-			((Calculable) getDefinition()).setCalculated(calculated);
+			((Calculable) defn).setCalculated(calculated);
 		}
 	}
 	

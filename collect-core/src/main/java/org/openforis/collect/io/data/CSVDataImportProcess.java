@@ -146,15 +146,6 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			status.error();
 			status.setErrorMessage(NO_MODEL_VERSION_FOUND_ERROR_MESSAGE_KEY);
 			status.setErrorMessageArgs(new String[]{settings.getNewRecordVersionName()});
-		} else {
-			String fileName = file.getName();
-			String extension = FilenameUtils.getExtension(fileName);
-			if ( !  CSV.equalsIgnoreCase(extension) ) {
-				String errorMessage = "File type not supported" + extension;
-				status.setErrorMessage(errorMessage);
-				status.error();
-				LOG.error("Error importing file: " + errorMessage);
-			}
 		}
 	}
 	

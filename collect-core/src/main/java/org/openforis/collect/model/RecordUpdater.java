@@ -148,7 +148,7 @@ public class RecordUpdater {
 		
 		setMissingValueApproved(parentEntity, entityName, false);
 
-		NodeChangeMap changeMap = initializeEntity(entity, true, addEmptyMultipleEntities);
+		NodeChangeMap changeMap = initializeEntity(entity, true, addEmptyMultipleEntities, true);
 		return changeMap;
 	}
 
@@ -181,7 +181,7 @@ public class RecordUpdater {
 		
 		setMissingValueApproved(parentEntity, attributeName, false);
 		
-		applyInitialValue(attribute);
+		applyInitialValue(attribute, true);
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addAttributeAddChange(attribute);
@@ -556,39 +556,6 @@ public class RecordUpdater {
 		return deletedNode;
 	}
 
-	/**
-	 * Applies default values on each descendant attribute of a record in which empty nodes have already been added.
-	 * Default values are applied only to "empty" attributes.
-	 * @param record 
-	 * 
-	 * @throws InvalidExpressionException 
-	 */
-	public void applyDefaultValues(CollectRecord record) {
-		Entity rootEntity = record.getRootEntity();
-		applyDefaultValues(rootEntity);
-	}
-
-	/**
-	 * Applies default values on each descendant attribute of an Entity in which empty nodes have already been added.
-	 * Default values are applied only to "empty" attributes.
-	 * 
-	 * @param entity
-	 * @throws InvalidExpressionException 
-	 */
-	private void applyDefaultValues(Entity entity) {
-		List<Node<?>> children = entity.getChildren();
-		for (Node<?> child: children) {
-			if ( child instanceof Attribute ) {
-				Attribute<?, ?> attribute = (Attribute<?, ?>) child;
-				if ( isDefaultValueToBeApplied(attribute) ) {
-					performDefaultValueApply(attribute);
-				}
-			} else if ( child instanceof Entity ) {
-				applyDefaultValues((Entity) child);
-			}
-		}
-	}
-	
 	private void setFieldSymbol(Field<?> field, FieldSymbol symbol){
 		Character symbolChar = null;
 		if (symbol != null) {
@@ -720,7 +687,11 @@ public class RecordUpdater {
 	}
 	
 	public void initializeRecord(Record record, boolean validate, boolean addEmptyMultipleEntities) {
-		initializeEntity(record.getRootEntity(), validate, addEmptyMultipleEntities);
+		initializeEntity(record.getRootEntity(), validate, addEmptyMultipleEntities, false);
+	}
+	
+	public void initializeNewRecord(Record record) {
+		initializeEntity(record.getRootEntity(), true, true, true);
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity) {
@@ -728,10 +699,10 @@ public class RecordUpdater {
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity, boolean validate) {
-		return initializeEntity(entity, validate, true);
+		return initializeEntity(entity, validate, true, false);
 	}
 	
-	protected NodeChangeMap initializeEntity(Entity entity, boolean validate, boolean addEmptyMultipleEntities) {
+	protected NodeChangeMap initializeEntity(Entity entity, boolean validate, boolean addEmptyMultipleEntities, boolean newEntity) {
 		Record record = entity.getRecord();
 		
 		List<Node<?>> entityAsList = new ArrayList<Node<?>>();
@@ -747,7 +718,7 @@ public class RecordUpdater {
 
 		addEmptyNodes(entity, addEmptyMultipleEntities);
 		
-		applyInitialValues(entity);
+		applyInitialValues(entity, newEntity);
 		
 		//recalculate attributes
 		//TODO exclude this when exporting for backup (not for Calc)
@@ -851,13 +822,13 @@ public class RecordUpdater {
 		return count;
 	}
 	
-	private List<Attribute<?, ?>> applyInitialValues(Entity entity) {
+	private List<Attribute<?, ?>> applyInitialValues(Entity entity, final boolean newEntity) {
 		final List<Attribute<?, ?>> attributes = new ArrayList<Attribute<?,?>>();
 		entity.traverse(new NodeVisitor() {
 			public void visit(Node<?> node, int idx) {
 				if (node instanceof Attribute && node.isEmpty()) {
 					Attribute<?, ?> attr = (Attribute<?, ?>) node;
-					Value value = applyInitialValue(attr);
+					Value value = applyInitialValue(attr, newEntity);
 					if (value != null) {
 						attributes.add(attr);
 					}
@@ -867,10 +838,10 @@ public class RecordUpdater {
 		return attributes;
 	}
 
-	private Value applyInitialValue(Attribute<?, ?> attr) {
+	private Value applyInitialValue(Attribute<?, ?> attr, boolean newEntity) {
 		Value value = null;
 		if (! attr.getDefinition().isCalculated()) {
-			if(isDefaultValueToBeApplied(attr)) {
+			if (newEntity && isDefaultValueToBeApplied(attr)) {
 				value = performDefaultValueApply(attr);
 			}
 			if(attr instanceof BooleanAttribute && ((BooleanAttributeDefinition) attr.getDefinition()).isAffirmativeOnly() && attr.isEmpty()) {
@@ -887,10 +858,10 @@ public class RecordUpdater {
 		Survey survey = attr.getSurvey();
 		if(survey instanceof CollectSurvey) {
 			CollectAnnotations annotations = ((CollectSurvey) survey).getAnnotations();
-			Step step = ((CollectRecord) attr.getRecord()).getStep();
+			Step recordStep = ((CollectRecord) attr.getRecord()).getStep();
 			AttributeDefinition def = attr.getDefinition();
-			Step phaseToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue(def);
-			return step.compareTo(phaseToApplyDefaultValue) <= 0;
+			Step stepToApplyDefaultValue = annotations.getPhaseToApplyDefaultValue(def);
+			return recordStep.compareTo(stepToApplyDefaultValue) >= 0;
 		} else {
 			return false;
 		}

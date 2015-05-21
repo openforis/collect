@@ -1,6 +1,8 @@
 package org.openforis.collect.designer.viewmodel;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -29,6 +31,8 @@ import org.zkoss.zul.Window;
  *
  */
 public abstract class BaseVM {
+	
+	private static final SimpleDateFormat PRETTY_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:ss");
 	
 	protected static final ServiceLoader<CollectEarthProjectFileCreator> COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER = 
 			ServiceLoader.load(CollectEarthProjectFileCreator.class);
@@ -119,5 +123,8 @@ public abstract class BaseVM {
 		return StringUtils.join(values, separator);
 	}
 	
+	public String prettyDateFormat(Date date) {
+		return PRETTY_DATE_FORMAT.format(date);
+	}
 }
 

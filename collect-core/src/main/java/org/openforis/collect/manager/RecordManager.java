@@ -352,13 +352,18 @@ public class RecordManager {
 	}
 	
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId) throws RecordPersistenceException {
+		return create(survey, rootEntityName, user, modelVersionName, sessionId, Step.ENTRY);
+	}
+	
+	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId, Step step) throws RecordPersistenceException {
 		CollectRecord record = survey.createRecord(modelVersionName);
 		record.createRootEntity(rootEntityName);
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
+		record.setStep(step);
 
 		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.initializeRecord(record);
+		recordUpdater.initializeNewRecord(record);
 		return record;
 	}
 
@@ -416,9 +421,6 @@ public class RecordManager {
 		}
 		
 		record.setStep( nextStep );
-
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.applyDefaultValues(record);
 
 		validate(record);
 		

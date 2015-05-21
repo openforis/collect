@@ -20,9 +20,6 @@ class CodeAttributeXS extends AttributeDefinitionXS<CodeAttributeDefinition> {
 	@Override
 	protected void attributes(CodeAttributeDefinition defn) throws IOException {
 		super.attributes(defn);
-		if ( defn.isKey() ) {
-			attribute(KEY, true);
-		}
 		if ( defn.isAllowUnlisted() ) {
 			attribute(STRICT, false);
 		}

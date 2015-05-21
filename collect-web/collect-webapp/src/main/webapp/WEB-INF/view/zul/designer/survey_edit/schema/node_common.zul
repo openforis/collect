@@ -1,4 +1,5 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
+<?component name="expressionInfoIcon" class="org.openforis.collect.designer.component.ExpressionInfoIcon"?>
 <zk>
   <custom-attributes otherGeneralDetailsForm="${arg.otherGeneralDetailsForm}"/>
   <custom-attributes otherMinorGeneralDetailsForm="${arg.otherMinorGeneralDetailsForm}"/>
@@ -62,7 +63,7 @@
 		  						value="@bind(fx.relevantExpression)"
 		  						onChange="@command('applyChanges')"
 		  						rows="4" />
-		  					<image src="/assets/images/expression-small.png" />
+		  					<expressionInfoIcon />
 		  				</fieldErrorHandler>
 	  					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />  					
 	  					<checkbox
@@ -124,7 +125,7 @@
 		  						multiline="true"
 		  						width="100px"
 		  						onChange="@command('applyChanges')" />
-		  					<image src="/assets/images/expression-small.png" />
+		  					<expressionInfoIcon />
 		  				</fieldErrorHandler>
 		  				
 		  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
@@ -135,7 +136,7 @@
 		  						multiline="true"
 		  						width="100px"
 		  						onChange="@command('applyChanges')" />
-		  					<image src="/assets/images/expression-small.png" />
+		  					<expressionInfoIcon />
 		  				</fieldErrorHandler>
 		  			</hlayout>
 		  		</hlayout>
@@ -163,7 +164,7 @@
 	  						value="@bind(fx.requiredWhenExpression)"
 	  						onChange="@command('applyChanges')"
 	  						rows="4" />
-	  					<image src="/assets/images/expression-small.png" />
+	  					<expressionInfoIcon />
 	  				</fieldErrorHandler>
   				</vlayout>
   			</row>

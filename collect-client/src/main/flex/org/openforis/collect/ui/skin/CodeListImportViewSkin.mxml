@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
-		xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*">
+		xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:datagrid="org.openforis.collect.ui.component.datagrid.*" xmlns:container="org.openforis.collect.ui.container.*">
 	<!-- host component -->
 	<fx:Metadata>
 		[HostComponent("org.openforis.collect.ui.view.CodeListImportView")]
@@ -50,7 +50,6 @@
 					  />
 		</s:HGroup>
 		
-		
 		<s:Form>
 			<s:FormItem label="{Message.get('referenceDataImport.sourceFile')}">
 				<s:layout>
@@ -65,8 +64,25 @@
 						  buttonMode="true"
 						  useHandCursor="true"
 						  />
-				
 			</s:FormItem>
+			<s:HGroup width="100%" horizontalAlign="center">
+				<container:CollapsiblePanel title="{Message.get('referenceDataImport.csv_options')}" collapsed="true" creationPolicy="all">
+					<s:Form creationPolicy="all">
+						<s:FormItem label="{Message.get('referenceDataImport.charset')}">
+							<s:DropDownList id="charsetDropDownList" selectedIndex="0" width="200"
+											dataProvider="{hostComponent.charsets}" />
+						</s:FormItem>
+						<s:FormItem label="{Message.get('referenceDataImport.separator')}">
+							<s:DropDownList id="separatorDropDownList" selectedIndex="0" width="50"
+											dataProvider="{hostComponent.separators}" />
+						</s:FormItem>
+						<s:FormItem label="{Message.get('referenceDataImport.text_delimiter')}">
+							<s:DropDownList id="textDelimiterDropDownList" selectedIndex="0" width="50"
+											dataProvider="{hostComponent.textDelimiters}" />
+						</s:FormItem>
+					</s:Form>
+				</container:CollapsiblePanel>
+			</s:HGroup>
 		</s:Form>
 		
 		<s:HGroup gap="50">

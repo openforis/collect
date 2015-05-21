@@ -19,7 +19,7 @@ import org.openforis.idm.util.DeepEquals;
  * @author S. Ricci
  * 
  */
-public abstract class AttributeDefinition extends NodeDefinition implements Calculable {
+public abstract class AttributeDefinition extends NodeDefinition implements Calculable, KeyAttributeDefinition {
 	
 	private static final long serialVersionUID = 1L;
 

@@ -38,13 +38,9 @@
 								model="@load(vm.editableRecordStepNames)">
 								<template name="model">
 									<listitem  value="@load(each)" 
-											label="${c:l('workflow.phase.'.concat(each.toLowerCase()))}" />
+											label="${c:l('workflow.data_entry_type.'.concat(each.toLowerCase()))}" />
 								</template>
 		   					</listbox>
-		   					<label value="${labels.survey.schema.attribute.editable}:" />
-		  					<checkbox 
-		  						checked="@load(fx.editable eq true) @save(fx.editable)"
-		  						onCheck="@command('applyChanges')" />
 		  				</fieldErrorHandler>
 		  			</row>
 				</rows>

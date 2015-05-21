@@ -1,5 +1,8 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TEXT;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.TYPE;
+
 import java.io.IOException;
 
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -8,7 +11,6 @@ import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition.Type;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
-import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 /**
  * @author G. Miceli
@@ -23,10 +25,8 @@ class TextAttributeDefinitionPR extends AttributeDefinitionPR {
 	@Override
 	protected void onStartDefinition() throws XmlParseException, XmlPullParserException, IOException {
 		super.onStartDefinition();
-		Boolean key = getBooleanAttribute(KEY, false);
 		String typeStr = getAttribute(TYPE, false); 
 		TextAttributeDefinition defn = (TextAttributeDefinition) getDefinition();
-		defn.setKey(key == null ? false : key);
 		try {
 			defn.setType(typeStr == null ? Type.SHORT : Type.valueOf(typeStr.toUpperCase()));
 		} catch (IllegalArgumentException e) {

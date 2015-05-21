@@ -12,7 +12,7 @@ import org.openforis.idm.model.Value;
  * @author G. Miceli
  * @author M. Togna
  */
-public class TextAttributeDefinition extends AttributeDefinition implements KeyAttributeDefinition {
+public class TextAttributeDefinition extends AttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 	

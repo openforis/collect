@@ -87,6 +87,7 @@ public class SurveySelectVM extends BaseVM {
 	private static final String COLLECT_EARTH_PROJECT_FILE_EXTENSION = "cep";
 
 	private static final CollectEarthProjectFileCreator COLLECT_EARTH_PROJECT_FILE_CREATOR;
+
 	static {
 		Iterator<CollectEarthProjectFileCreator> it = COLLECT_EARTH_PROJECT_FILE_CREATOR_LOADER.iterator();
 		COLLECT_EARTH_PROJECT_FILE_CREATOR = it.hasNext() ? it.next(): null;
@@ -619,6 +620,11 @@ public class SurveySelectVM extends BaseVM {
 		return new BindingListModelList<SurveySummary>(summaries, false);
 	}
 
+	public String getSurveyTooltip(SurveySummary summary) {
+		return Labels.getLabel("surveys_list.tooltip", 
+				new String[] {prettyDateFormat(summary.getCreationDate()), prettyDateFormat(summary.getModifiedDate())});
+	}
+	
 	public SurveySummary getSelectedSurvey() {
 		return selectedSurvey;
 	}

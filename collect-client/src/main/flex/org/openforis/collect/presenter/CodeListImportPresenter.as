@@ -3,16 +3,21 @@ package org.openforis.collect.presenter
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import mx.collections.ArrayList;
+	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.Application;
+	import org.granite.util.Enum;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.CodeListClient;
 	import org.openforis.collect.client.CodeListImportClient;
 	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.metamodel.proxy.CodeListProxy$CodeScope;
+	import org.openforis.collect.io.parsing.CSVFileOptions;
+	import org.openforis.collect.io.parsing.CSVFileSeparator;
+	import org.openforis.collect.io.parsing.CSVFileTextDelimiter;
+	import org.openforis.collect.io.parsing.FileCharset;
 	import org.openforis.collect.ui.view.CodeListImportView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
@@ -48,6 +53,24 @@ package org.openforis.collect.presenter
 			return MessageKeys(_messageKeys);
 		}
 		
+		override public function init():void {
+			super.init();
+			
+			view.charsets = enumToList(FileCharset, "referenceDataImport.charset.");
+			view.separators = enumToList(CSVFileSeparator, "referenceDataImport.separator.");
+			view.textDelimiters = enumToList(CSVFileTextDelimiter, "referenceDataImport.text_delimiter.");
+		}
+		
+		private function enumToList(enum:Class, labelKeyPrefix:String):IList {
+			var items:IList = new ArrayList();
+			var values:Array = enum["constants"];
+			for each (var value:Enum in values) {
+				var item:Object = {name: value.name, label: Message.get(labelKeyPrefix + value.name.toLowerCase())};
+				items.addItem(item);
+			}
+			return items;
+		}
+			
 		override protected function initEventListeners():void {
 			super.initEventListeners();
 			view.browseButton.addEventListener(MouseEvent.CLICK, browseButtonClickHandler);
@@ -64,7 +87,14 @@ package org.openforis.collect.presenter
 		
 		override protected function performProcessStart():void {
 			var responder:AsyncResponder = new AsyncResponder(startResultHandler, faultHandler);
-			_codeListImportClient.start(responder, view.codeListId, _uploadedTempFileName);
+			var csvFileOptions:CSVFileOptions = null;
+			if (view.charsetDropDownList != null) {
+				csvFileOptions = new CSVFileOptions();
+				csvFileOptions.charset = FileCharset.valueOf(view.charsetDropDownList.selectedItem.name);
+				csvFileOptions.separator = CSVFileSeparator.valueOf(view.separatorDropDownList.selectedItem.name);
+				csvFileOptions.textDelimiter = CSVFileTextDelimiter.valueOf(view.textDelimiterDropDownList.selectedItem.name);
+			}
+			_codeListImportClient.start(responder, view.codeListId, _uploadedTempFileName, csvFileOptions);
 		}
 		
 		override protected function performImportCancel():void {

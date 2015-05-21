@@ -13,6 +13,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.FROM;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.GT;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.GTE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.IF;
+import static org.openforis.idm.metamodel.xml.IdmlConstants.KEY;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.LT;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.LTE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.MAX;
@@ -59,6 +60,7 @@ abstract class AttributeDefinitionXS<T extends AttributeDefinition> extends Node
 	@Override
 	protected void attributes(T defn) throws IOException {
 		super.attributes(defn);
+		attribute(KEY, defn.isKey(), false);
 		attribute(CALCULATED, defn.isCalculated(), false);
 	}
 	
