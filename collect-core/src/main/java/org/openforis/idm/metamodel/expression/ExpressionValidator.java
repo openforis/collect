@@ -31,24 +31,28 @@ public class ExpressionValidator {
 		this.expressionFactory = expressionFactory;
 	}
 
-	public boolean validateBooleanExpression(NodeDefinition contextNodeDef, String expression) {
+	public boolean validateBooleanExpression(NodeDefinition thisNodeDef, String expression) {
+		return validateBooleanExpression(thisNodeDef.getParentDefinition(), thisNodeDef, expression);
+	}
+	
+	public boolean validateBooleanExpression(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, String expression) {
 		try {
 			BooleanExpression expr = expressionFactory.createBooleanExpression(expression);
-			return isSyntaxValid(contextNodeDef.getParentDefinition(), contextNodeDef, expr);
+			return isSyntaxValid(contextNodeDef, thisNodeDef, expr);
 		} catch (Exception e) {
 			return false;
 		}
 	}
 
-	public boolean validateValueExpression(NodeDefinition contextNodeDef, String expression) {
-		NodeDefinition parentDef = contextNodeDef.getParentDefinition();
-		return validateValueExpression(contextNodeDef, parentDef, expression);
+	public boolean validateValueExpression(NodeDefinition thisNodeDef, String expression) {
+		NodeDefinition contextDef = thisNodeDef.getParentDefinition();
+		return validateValueExpression(contextDef, thisNodeDef, expression);
 	}
 
-	public boolean validateValueExpression(NodeDefinition contextNodeDef, NodeDefinition parentNodeDef, String expression) {
+	public boolean validateValueExpression(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, String expression) {
 		try {
 			ValueExpression valueExpression = expressionFactory.createValueExpression(expression);
-			return isSyntaxValid(parentNodeDef, contextNodeDef, valueExpression);
+			return isSyntaxValid(contextNodeDef, thisNodeDef, valueExpression);
 		} catch (Exception e) {
 			return false;
 		}

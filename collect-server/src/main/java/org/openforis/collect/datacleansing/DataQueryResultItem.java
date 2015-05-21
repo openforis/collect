@@ -53,7 +53,12 @@ public class DataQueryResultItem extends AbstractPersistedObject {
 		Survey survey = record.getSurvey();
 		NodeDefinition attrDefn = survey.getSchema().getDefinitionById(query.getAttributeDefinitionId());
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
-		String path = String.format("%s/%s[%d]", parentEntity.getPath(), attrDefn.getName(), nodeIndex + 1);
+		String path;
+		if (attrDefn.isMultiple()) {
+			path = String.format("%s/%s[%d]", parentEntity.getPath(), attrDefn.getName(), nodeIndex + 1);
+		} else {
+			path = String.format("%s/%s", parentEntity.getPath(), attrDefn.getName());
+		}
 		return path;
 	}
 	

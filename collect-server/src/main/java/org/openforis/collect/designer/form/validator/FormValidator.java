@@ -109,19 +109,19 @@ public abstract class FormValidator extends BaseValidator {
 		return true;
 	}
 	
-	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition contextDefn, String field) {
-		NodeDefinition parentDefn = contextDefn.getParentDefinition();
-		return validateValueExpression(ctx, contextDefn, parentDefn, field);
+	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition thisNodeDefn, String field) {
+		NodeDefinition contextNodeDefn = thisNodeDefn.getParentDefinition();
+		return validateValueExpression(ctx, contextNodeDefn, thisNodeDefn, field);
 	}
 	
-	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition contextDefn, NodeDefinition parentEntityDefn, String field) {
+	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition contextNodeDefn, NodeDefinition thisNodeDefn, String field) {
 		String expression = getValue(ctx, field);
 		if ( StringUtils.isNotBlank(expression) ) {
 			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
-			if ( ! expressionValidator.validateValueExpression(contextDefn, parentEntityDefn, expression)) {
+			if ( ! expressionValidator.validateValueExpression(contextNodeDefn, thisNodeDefn, expression)) {
 				addInvalidMessage(ctx, field, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
 				return false;
-			} else if ( ! expressionValidator.validateCircularReferenceAbsence(parentEntityDefn, contextDefn, expression)) {
+			} else if ( ! expressionValidator.validateCircularReferenceAbsence(contextNodeDefn, thisNodeDefn, expression)) {
 				addInvalidMessage(ctx, field, Labels.getLabel(CIRCULAR_REFERENCE_IN_EXPRESSION_MESSAGE_KEY));
 				return false;
 			}
