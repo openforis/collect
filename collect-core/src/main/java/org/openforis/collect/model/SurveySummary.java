@@ -4,6 +4,7 @@
 package org.openforis.collect.model;
 
 import java.util.Date;
+import java.util.List;
 
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.metamodel.SurveyTarget;
@@ -26,6 +27,8 @@ public class SurveySummary {
 	private Date modifiedDate;
 	private SurveyTarget target;
 	private ProcessStatus recordValidationProcessStatus;
+	private String defaultLanguage;
+	private List<String> languages;
 	
 	public SurveySummary(Integer id, String name, String uri) {
 		this(id, name, uri, null);
@@ -55,6 +58,8 @@ public class SurveySummary {
 		summary.setCreationDate(survey.getCreationDate());
 		summary.setModifiedDate(survey.getModifiedDate());
 		summary.setTarget(survey.getTarget());
+		summary.setDefaultLanguage(survey.getDefaultLanguage());
+		summary.setLanguages(survey.getLanguages());
 		return summary;
 	}
 	
@@ -145,6 +150,22 @@ public class SurveySummary {
 
 	public void setTarget(SurveyTarget target) {
 		this.target = target;
+	}
+	
+	public String getDefaultLanguage() {
+		return defaultLanguage;
+	}
+	
+	public void setDefaultLanguage(String defaultLanguage) {
+		this.defaultLanguage = defaultLanguage;
+	}
+	
+	public List<String> getLanguages() {
+		return languages;
+	}
+	
+	public void setLanguages(List<String> languages) {
+		this.languages = languages;
 	}
 
 }

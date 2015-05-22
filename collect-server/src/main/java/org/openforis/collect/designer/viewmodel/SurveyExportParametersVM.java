@@ -1,6 +1,7 @@
 package org.openforis.collect.designer.viewmodel;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.viewmodel.SurveyExportParametersVM.SurveyExportParametersFormObject.OutputFormat;
@@ -47,6 +48,7 @@ public class SurveyExportParametersVM extends BaseVM {
 		this.formObject.setRdbDialect(RdbDialect.STANDARD.name());
 		this.formObject.setRdbDateTimeFormat(DEFAULT_DATE_TIME_FORMAT);
 		this.formObject.setRdbTargetSchemaName(survey.getName());
+		this.formObject.setLanguageCode(survey.getDefaultLanguage());
 	}
 	
 	@Command
@@ -129,6 +131,10 @@ public class SurveyExportParametersVM extends BaseVM {
 		return type;
 	}
 	
+	public List<String> getSurveyLanguages() {
+		return survey.getLanguages();
+	}
+	
 	public static class SurveyExportParametersFormObject {
 		
 		public enum SurveyType {
@@ -145,6 +151,7 @@ public class SurveyExportParametersVM extends BaseVM {
 		private String rdbDialect;
 		private String rdbDateTimeFormat;
 		private String rdbTargetSchemaName;
+		private String languageCode;
 		
 		public String getType() {
 			return type;
@@ -212,6 +219,14 @@ public class SurveyExportParametersVM extends BaseVM {
 		
 		public void setRdbTargetSchemaName(String rdbTargetSchemaName) {
 			this.rdbTargetSchemaName = rdbTargetSchemaName;
+		}
+		
+		public String getLanguageCode() {
+			return languageCode;
+		}
+		
+		public void setLanguageCode(String languageCode) {
+			this.languageCode = languageCode;
 		}
 	}
 

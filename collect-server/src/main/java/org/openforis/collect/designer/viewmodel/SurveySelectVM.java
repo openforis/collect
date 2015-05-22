@@ -193,10 +193,15 @@ public class SurveySelectVM extends BaseVM {
 			if (validateCollectEarthSurvey(survey)) {
 				try {
 					((CollectEarthProjectFileCreatorImpl) COLLECT_EARTH_PROJECT_FILE_CREATOR).setCodeListManager(codeListManager);
-					File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey);
+					String languageCode = parameters.getLanguageCode();
+					File file = COLLECT_EARTH_PROJECT_FILE_CREATOR.create(survey, languageCode);
 					String contentType = URLConnection.guessContentTypeFromName(file.getName());
 					FileInputStream is = new FileInputStream(file);
-					String outputFileName = String.format("%s_%s.%s", survey.getName(), Dates.formatLocalDateTime(survey.getModifiedDate()), COLLECT_EARTH_PROJECT_FILE_EXTENSION);
+					String outputFileName = String.format("%s_%s_%s.%s", 
+							survey.getName(), 
+							languageCode,
+							Dates.formatLocalDateTime(survey.getModifiedDate()),
+							COLLECT_EARTH_PROJECT_FILE_EXTENSION);
 					Filedownload.save(is, contentType, outputFileName);
 				} catch(Exception e) {
 					log.error(e);
