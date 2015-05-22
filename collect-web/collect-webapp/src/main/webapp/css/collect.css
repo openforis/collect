@@ -66,6 +66,12 @@ html, body {
 }
 */
 
+.modal.success, 
+.modal.warning, 
+.modal.error {
+	z-index: 2000;
+}
+
 .modal.success .modal-title {
 	color: blue;
 }

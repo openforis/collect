@@ -21,7 +21,7 @@ OF.UI.Forms.Validation.removeErrors = function ($form) {
  * @param $form
  * @param errors
  */
-OF.UI.Forms.Validation.updateErrors = function (form, errors) {
+OF.UI.Forms.Validation.updateErrors = function (form, errors, considerOnlyVisitedFields) {
 	function findError(fieldName) {
 		for (var i=0; i < errors.length; i++) {
 			var error = errors[i];
@@ -37,13 +37,16 @@ OF.UI.Forms.Validation.updateErrors = function (form, errors) {
 		var inputField = formGroup.find(".form-control");
 		if (inputField.length == 1) {
 			var oldTooltip = formGroup.data("tooltip");
+			if (oldTooltip == null) {
+				oldTooltip = formGroup.data("bs.tooltip");
+			}
 			var error = findError(inputField.attr("name"));
 			if (error == null) {
 				formGroup.removeClass('has-error');
 				if (oldTooltip) {
 					formGroup.tooltip('destroy');
 				}
-			} else {
+			} else if (! considerOnlyVisitedFields || inputField.data("visited")) {
 				formGroup.addClass('has-error');
 				var tooltipTitle = OF.UI.Forms.Validation._createErrorTooltipTitle(inputField, error);
 				if (oldTooltip) {
@@ -76,14 +79,16 @@ OF.UI.Forms.Validation.getFieldErrorMessage = function (errors, fieldName) {
  */
 OF.UI.Forms.Validation.getFormErrorMessage = function ($form, errors) {
 	var genericErrorMessage = OF.UI.Forms.Validation.getFieldErrorMessage(errors);
-	var errorMessage;
+	var errorMessage = "";
 	if ( genericErrorMessage == null ) {
-		var firstError = errors[0];
-		var fieldName = firstError.field;
-		var fieldErrorMessage = firstError.defaultMessage;
-		var field = $form.find( '[name="' + fieldName + '"]' );
-		var fieldLabel = OF.UI.Forms.getFieldLabel(field);
-		errorMessage =  fieldLabel + " " + fieldErrorMessage;
+		for (var i=0; i < errors.length; i++) {
+			var error = errors[i];
+			var fieldName = error.field;
+			var fieldErrorMessage = error.defaultMessage;
+			var field = $form.find( '[name="' + fieldName + '"]' );
+			var fieldLabel = OF.UI.Forms.getFieldLabel(field);
+			errorMessage += fieldLabel + " " + fieldErrorMessage + "<br/>";
+		}
 	} else {
 		errorMessage = genericErrorMessage;
 	}

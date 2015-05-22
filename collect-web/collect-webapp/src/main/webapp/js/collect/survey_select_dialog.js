@@ -45,7 +45,7 @@ Collect.SurveySelectDialogController.prototype.validateForm = function() {
 	var $this = this;
 	var surveyId = $this.surveySelectPicker.val();
 	if (surveyId == null || surveyId == '') {
-		alert('Please select a survey');
+		OF.Alerts.showWarning('Please select a survey');
 		return false;
 	} else {
 		return true;

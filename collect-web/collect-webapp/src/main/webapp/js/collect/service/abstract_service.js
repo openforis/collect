@@ -14,6 +14,10 @@ Collect.AbstractService.prototype.save = function(data, onSuccess, onError) {
 	this.send("save.json", data, "POST", onSuccess, onError);
 };
 
+Collect.AbstractService.prototype.validate = function(data, onSuccess, onError) {
+	this.send("validate.json", data, "POST", onSuccess, onError);
+};
+
 Collect.AbstractService.prototype.remove = function(id, onSuccess, onError) {
 	this.send(id + ".json", null, "DELETE", onSuccess, onError);
 };

@@ -62,6 +62,10 @@ public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorT
 		return e;
 	}
 
+	public DataErrorType loadByCode(CollectSurvey survey, String code) {
+		return dao.loadByCode(survey, code);
+	}
+	
 	@Override
 	public void save(DataErrorType obj) {
 		boolean newItem = obj.getId() == null;

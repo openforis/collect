@@ -53,6 +53,8 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	protected SessionManager sessionManager;
 	@Autowired
 	private CollectJobManager collectJobManager;
+	@Autowired
+	private DataQueryValidator validator;
 	
 	private CSVWriterDataQueryResultItemProcessor csvExportItemProcessor;
 	private DataQueryExecutorJob exportJob;
@@ -60,7 +62,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-		binder.setValidator(new DataQueryValidator());
+		binder.setValidator(validator);
 	}
 	
 	@Override

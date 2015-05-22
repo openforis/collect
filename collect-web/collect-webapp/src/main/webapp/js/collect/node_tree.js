@@ -1,8 +1,9 @@
-Collect.NodeTree = function(treeDiv, survey, disabledFilterFunction, startFromEntityId, creationCompleteHandler) {
+Collect.NodeTree = function(treeDiv, survey, disabledFilterFunction, startFromEntityId, hiddenFieldName, creationCompleteHandler) {
 	this.treeDiv = treeDiv;
 	this.survey = survey;
 	this.disabledFilterFunction = disabledFilterFunction;
 	this.startFromEntityId = startFromEntityId;
+	this.hiddenFieldName = hiddenFieldName;
 	this.creationCompleteHandler = creationCompleteHandler;
 	
 	this.init();
@@ -58,6 +59,11 @@ Collect.NodeTree.prototype.buildTreeNodes = function() {
 			'data' : rootTreeNodes
 		}
 	});
+	var hiddenField = $("<input type='hidden'>");
+	hiddenField.prop("name", this.hiddenFieldName);
+	
+	this.treeDiv.append(hiddenField);
+
 	$this.jstree = this.treeDiv.data().jstree;
 };
 
@@ -96,16 +102,16 @@ Collect.NodeTree.prototype.refresh = function() {
 	this.buildTreeNodes();
 };
 
-Collect.EntityTree = function(treeDiv, survey, creationCompleteHandler) {
+Collect.EntityTree = function(treeDiv, survey, hiddenFieldName, creationCompleteHandler) {
 	var disabledFilterFunction = function(node) {
 		return node.type == "ATTRIBUTE";
 	};
-	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, null, creationCompleteHandler);
+	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, null, hiddenFieldName, creationCompleteHandler);
 };
 
 Collect.EntityTree.prototype = Object.create(Collect.NodeTree.prototype);
 
-Collect.AttributeTree = function(treeDiv, survey, parentEntityTree, creationCompleteHandler) {
+Collect.AttributeTree = function(treeDiv, survey, parentEntityTree, hiddenFieldName, creationCompleteHandler) {
 	this.parentEntityTree = parentEntityTree;
 	var disabledFilterFunction = function(node) {
 		return node.type == "ENTITY";
@@ -120,7 +126,7 @@ Collect.AttributeTree = function(treeDiv, survey, parentEntityTree, creationComp
 		});
 	}
 
-	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, selectedEntityDefId, creationCompleteHandler);
+	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, selectedEntityDefId, hiddenFieldName, creationCompleteHandler);
 };
 
 Collect.AttributeTree.prototype = Object.create(Collect.NodeTree.prototype);

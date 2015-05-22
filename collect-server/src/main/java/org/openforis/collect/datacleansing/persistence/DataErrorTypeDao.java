@@ -37,6 +37,15 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErro
 		return dsl.fromResult(result);
 	}
 
+	public DataErrorType loadByCode(CollectSurvey survey, String code) {
+		JooqDSLContext dsl = dsl(survey);
+		Select<OfcDataErrorTypeRecord> select = dsl.selectFrom(OFC_DATA_ERROR_TYPE)
+			.where(OFC_DATA_ERROR_TYPE.SURVEY_ID.eq(survey.getId()), 
+					OFC_DATA_ERROR_TYPE.CODE.eq(code));
+		OfcDataErrorTypeRecord record = select.fetchOne();
+		return record == null ? null: dsl.fromRecord(record);
+	}
+	
 	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataErrorType> {
 
 		private static final long serialVersionUID = 1L;

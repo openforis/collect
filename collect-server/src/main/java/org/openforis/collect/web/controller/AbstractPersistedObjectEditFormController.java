@@ -71,6 +71,14 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		return response;
 	}
 
+	@RequestMapping(value="validate.json", method = RequestMethod.POST)
+	public @ResponseBody
+	Response validate(@Validated F form, BindingResult result) {
+		List<ObjectError> errors = result.getAllErrors();
+		Response response = new SimpleFormUpdateResponse(errors);
+		return response;
+	}
+	
 	@RequestMapping(value = "{id}.json", method = RequestMethod.DELETE)
 	public @ResponseBody
 	Response delete(@PathVariable int id) {

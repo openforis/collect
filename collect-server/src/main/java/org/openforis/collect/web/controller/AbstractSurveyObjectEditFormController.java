@@ -68,7 +68,7 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 	public @ResponseBody
 	Response save(@Validated F form, BindingResult result) {
 		List<ObjectError> errors = result.getAllErrors();
-		SimpleFormUpdateResponse response;
+		Response response;
 		if (errors.isEmpty()) {
 			CollectSurvey survey = sessionManager.getActiveSurvey();
 			T item;
@@ -86,5 +86,5 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 		}
 		return response;
 	}
-
+	
 }

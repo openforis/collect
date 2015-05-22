@@ -118,7 +118,7 @@ OF.UI.Forms.getInputType = function(inputField) {
  * @returns
  */
 OF.UI.Forms.getFieldLabel = function($field) {
-	$formGroup = $field.closest('.form-group');
-	$labelEl = $formGroup.find('.control-label');
+	var $formGroup = $field.closest('.form-group');
+	var $labelEl = $formGroup.find('.control-label');
 	return $labelEl == null ? "": $labelEl.text();
 };

@@ -76,3 +76,14 @@ Collect.DataErrorReportDialogController.prototype.fillForm = function(callback) 
 		callback.call($this);
 	});
 };
+
+Collect.DataErrorReportDialogController.prototype.validateForm = function() {
+	var $this = this;
+	var item = $this.extractJSONItem();
+	if (! item.queryId) {
+		OF.Alerts.showWarning('Please select an error query');
+		return false;
+	} else {
+		return true;
+	}
+};

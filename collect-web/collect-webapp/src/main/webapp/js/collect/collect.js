@@ -409,7 +409,7 @@ Collect.prototype.setActiveSurvey = function(surveySummary) {
 };
 
 Collect.prototype.error = function(jqXHR, status, errorThrown) {
-	alert(status);
+	OF.Alerts.showError(status);
 };
 
 $(function() {

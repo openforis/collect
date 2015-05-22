@@ -66,7 +66,7 @@ OF.Alerts.confirm = function(message, yesHandler, noHandler, title) {
 	 
 	 var $closeBtn = dialog.find(".close");
 	 $closeBtn.click(function(event) {
-		dialog.remove(); 
+		 dialog.modal('hide'); 
 	 });
 	 
  	 if (title && title != '') {
@@ -108,7 +108,7 @@ OF.Alerts.showSuccess = function(message, hide) {
 /**
  * Shows application message
  */
-OF.Alerts.showMessage = function(type, message, autoHide) {
+OF.Alerts.showMessage = function(type, message, autoDismiss) {
 	var container = OF.Alerts._messageContainer;
 	if (container == null) {
 		container = $(OF.Alerts._MESSAGE_CONTAINER_TEMPLATE);
@@ -140,15 +140,13 @@ OF.Alerts.showMessage = function(type, message, autoHide) {
  		alertClass = "success";
  	}
  	
- 	container.find(".modal-title").text(title);
- 	
  	container.removeClass("error", "warning", "success");
- 	
  	container.addClass(alertClass);
 
+ 	container.find(".modal-title").text(title);
  	container.find(".modal-body").html( message );
  	
- 	if ( autoHide == true ) {
+ 	if ( autoDismiss == true ) {
  		// fade out after 2 seconds
  		container.delay( 2000 ).fadeOut( 800 );
  	}

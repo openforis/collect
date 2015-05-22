@@ -43,6 +43,9 @@ Collect.AbstractItemEditDialogController.prototype.doOpen = function() {
 			callback.call($this);
 		}
 	};
+	$this.content.on('hide.bs.modal', function (e) {
+		 $this.content.remove();
+	 });
 	beforeOpen(function() {
 		$this.content.modal($this.doNotAllowCancel ? {backdrop: "static", keyboard: false} : 'show');
 	});
@@ -50,7 +53,6 @@ Collect.AbstractItemEditDialogController.prototype.doOpen = function() {
 
 Collect.AbstractItemEditDialogController.prototype.close = function() {
 	this.content.modal('hide');
-	this.content.remove();
 };
 
 Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables = function(callback) {
@@ -66,6 +68,7 @@ Collect.AbstractItemEditDialogController.prototype.initContent = function(callba
 		}
 		$this.initFormElements(function() {
 			$this.initEventListeners();
+			$this.initFormElementsChangeListeners();
 			callback.call($this);
 		});
 	});
@@ -90,6 +93,20 @@ Collect.AbstractItemEditDialogController.prototype.initFormElements = function(c
 	if (callback) {
 		callback.call($this);
 	}
+};
+
+Collect.AbstractItemEditDialogController.prototype.initFormElementsChangeListeners = function(callback) {
+	var $this = this;
+	$this.form.find(".form-control").each(function() {
+		var field = $(this);
+		field.focusout(function() {
+			field.data("visited", true);
+			$this.fieldChangeHandler();
+		});
+		field.change(function() {
+			$this.fieldChangeHandler();
+		});
+	});
 };
 
 Collect.AbstractItemEditDialogController.prototype.initEventListeners = function() {
@@ -119,6 +136,18 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close
 				OF.Alerts.showError("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
 			}
 			OF.UI.Forms.Validation.updateErrors($this.form, response.errors);
+		});
+	}
+};
+
+Collect.AbstractItemEditDialogController.prototype.fieldChangeHandler = function() {
+	var $this = this;
+	if ($this.itemEditService) {
+		var item = $this.extractJSONItem();
+		$this.itemEditService.validate(item, function(response) {
+			if (! response.statusOk) {
+				OF.UI.Forms.Validation.updateErrors($this.form, response.errors, true);
+			}
 		});
 	}
 };

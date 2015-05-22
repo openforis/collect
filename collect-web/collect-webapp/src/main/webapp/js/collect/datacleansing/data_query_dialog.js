@@ -70,8 +70,8 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 			});
 		}, $this));
 		
-		$this.entityTree = new Collect.EntityTree($this.content.find('.entity-tree'), collect.activeSurvey, function() {
-			$this.attributeTree = new Collect.AttributeTree($this.content.find('.attribute-tree'), collect.activeSurvey, $this.entityTree, callback);
+		$this.entityTree = new Collect.EntityTree($this.content.find('.entity-tree'), collect.activeSurvey, "entityDefinitionId", function() {
+			$this.attributeTree = new Collect.AttributeTree($this.content.find('.attribute-tree'), collect.activeSurvey, $this.entityTree, "attributeDefinitionId", callback);
 		});
 	});
 };

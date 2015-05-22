@@ -6,6 +6,7 @@ package org.openforis.collect.datacleansing.form.validation;
 import java.util.Locale;
 
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,16 +52,28 @@ public abstract class SimpleValidator<F> implements Validator {
 	
 	public abstract void validateForm(F target, Errors errors);
 
+	protected CollectSurvey getActiveSurvey() {
+		return sessionManager.getActiveSurvey();
+	}
+	
+	protected boolean validateRequiredFields(Errors errors, String... fields) {
+		boolean result = true;
+		for (String field : fields) {
+			result = result & validateRequiredField(errors, field);
+		}
+		return result;
+	}
+	
 	protected boolean validateRequiredField(Errors errors, String field) {
 		Assert.notNull(errors, "Errors object must not be null");
 		
-		String code = "validation.required_field";
+		String errorCode = "validation.required_field";
 		String[] messageArgs = new String[0];
-		String defaultMessage = messageSource.getMessage(code, messageArgs, Locale.ENGLISH);
+		String defaultMessage = messageSource.getMessage(errorCode, messageArgs, Locale.ENGLISH);
 		
 		Object value = errors.getFieldValue(field);
 		if (value == null || ! StringUtils.hasText(value.toString())) {
-			errors.rejectValue(field, code, messageArgs, defaultMessage);
+			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
 			return false;
 		} else {
 			return true;
@@ -72,10 +85,10 @@ public abstract class SimpleValidator<F> implements Validator {
 			String field, String expression) {
 		boolean valid = expressionValidator.validateBooleanExpression(contextNodeDef, thisNodeDef, expression);
 		if (! valid) {
-			String code = "validation.invalid_expression";
+			String errorCode = "validation.invalid_expression";
 			String[] messageArgs = new String[0];
-			String defaultMessage = messageSource.getMessage(code, new String[0], Locale.ENGLISH);
-			errors.rejectValue(field, code, messageArgs, defaultMessage);
+			String defaultMessage = messageSource.getMessage(errorCode, new String[0], Locale.ENGLISH);
+			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
 		}
 		return valid;
 	}
@@ -85,11 +98,17 @@ public abstract class SimpleValidator<F> implements Validator {
 			String field, String expression) {
 		boolean valid = expressionValidator.validateValueExpression(contextNodeDef, thisNodeDef, expression);
 		if (! valid) {
-			String code = "validation.invalid_expression";
+			String errorCode = "validation.invalid_expression";
 			String[] messageArgs = new String[0];
-			String defaultMessage = messageSource.getMessage(code, new String[0], Locale.ENGLISH);
-			errors.rejectValue(field, code, messageArgs, defaultMessage);
+			String defaultMessage = messageSource.getMessage(errorCode, new String[0], Locale.ENGLISH);
+			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
 		}
 		return valid;
 	}
+	
+	protected void rejectDuplicateValue(Errors errors, String field, Object... args) {
+		String errorCode = "validation.duplicate_value";
+		errors.rejectValue(field, errorCode, args, messageSource.getMessage(errorCode, args, Locale.ENGLISH));
+	}
+	
 }
