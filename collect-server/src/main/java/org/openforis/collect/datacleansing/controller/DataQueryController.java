@@ -16,6 +16,7 @@ import org.openforis.collect.datacleansing.DataQueryResultItem;
 import org.openforis.collect.datacleansing.NodeProcessor;
 import org.openforis.collect.datacleansing.form.DataQueryForm;
 import org.openforis.collect.datacleansing.form.DataQueryResultItemForm;
+import org.openforis.collect.datacleansing.form.validation.DataQueryValidator;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.manager.SessionManager;
@@ -34,6 +35,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,6 +57,11 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	private CSVWriterDataQueryResultItemProcessor csvExportItemProcessor;
 	private DataQueryExecutorJob exportJob;
 	private DataQueryExecutorJob testJob;
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.setValidator(new DataQueryValidator());
+	}
 	
 	@Override
 	@Autowired

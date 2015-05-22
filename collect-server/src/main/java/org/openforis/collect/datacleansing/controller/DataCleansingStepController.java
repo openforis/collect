@@ -5,6 +5,7 @@ import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingChainExecutorJob;
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.form.DataCleansingStepForm;
+import org.openforis.collect.datacleansing.form.validation.DataCleansingStepValidator;
 import org.openforis.collect.datacleansing.manager.DataCleansingStepManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +32,14 @@ public class DataCleansingStepController extends AbstractSurveyObjectEditFormCon
 	private DataCleansingStepManager dataCleansingStepManager;
 	@Autowired
 	private CollectJobManager collectJobManager;
+	@Autowired
+	private DataCleansingStepValidator dataCleansingStepValidator;
 
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.setValidator(dataCleansingStepValidator);
+	}
+	
 	@Override
 	@Autowired
 	@Qualifier("dataCleansingStepManager")

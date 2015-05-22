@@ -116,9 +116,9 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close
 					$this.close();
 				}
 			} else {
-				OF.UI.showError("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
-				OF.UI.Forms.Validation.updateErrors($this.form, response.errors);
+				OF.Alerts.showError("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
 			}
+			OF.UI.Forms.Validation.updateErrors($this.form, response.errors);
 		});
 	}
 };

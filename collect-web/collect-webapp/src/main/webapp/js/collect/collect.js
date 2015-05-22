@@ -142,7 +142,7 @@ Collect.prototype.initDataQueryPanel = function() {
 		if (selectedItem == null) {
 			return;
 		}
-		OF.UI.confirm("Do you want to delete this Data Query?", function() {
+		OF.Alerts.confirm("Do you want to delete this Data Query?", function() {
 			collect.dataQueryService.remove(selectedItem.id, function() {
 				EventBus.dispatch(Collect.DataQueryDialogController.DATA_QUERY_DELETED, $this);
 			});
@@ -180,7 +180,7 @@ Collect.prototype.initDataUpdatePanel = function() {
 		if (selectedItem == null) {
 			return;
 		}
-		OF.UI.confirm("Do you want to delete this Data Cleansing Step?", function() {
+		OF.Alerts.confirm("Do you want to delete this Data Cleansing Step?", function() {
 			collect.dataCleansingStepService.remove(selectedItem.id, function() {
 				EventBus.dispatch(Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_DELETED, $this);
 			});
@@ -213,7 +213,7 @@ Collect.prototype.initDataErrorReportsPanel = function() {
 		if (selectedItem == null) {
 			return;
 		}
-		OF.UI.confirm("Do you want to delete this Data Error Report?", function() {
+		OF.Alerts.confirm("Do you want to delete this Data Error Report?", function() {
 			collect.dataErrorReportService.remove(selectedItem.id, function() {
 				EventBus.dispatch(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_DELETED, $this);
 			});
@@ -248,7 +248,7 @@ Collect.prototype.initDataErrorTypePanel = function() {
 		if (selectedItem == null) {
 			return;
 		}
-		OF.UI.confirm("Do you want to delete this Data Error Type?", function() {
+		OF.Alerts.confirm("Do you want to delete this Data Error Type?", function() {
 			collect.dataErrorTypeService.remove(selectedItem.id, function() {
 				EventBus.dispatch(Collect.DataErrorTypeDialogController.DATA_ERROR_TYPE_DELETED, $this);
 			});
@@ -284,7 +284,7 @@ Collect.prototype.initDataErrorQueryPanel = function() {
 		if (selectedItem == null) {
 			return;
 		}
-		OF.UI.confirm("Do you want to delete this Data Error Query?", function() {
+		OF.Alerts.confirm("Do you want to delete this Data Error Query?", function() {
 			collect.dataErrorQueryService.remove(selectedItem.id, function() {
 				EventBus.dispatch(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_DELETED, $this);
 			});

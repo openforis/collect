@@ -1,9 +1,7 @@
 package org.openforis.collect.datacleansing.form;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
 import org.openforis.collect.datacleansing.DataCleansingStep;
+import org.openforis.collect.datacleansing.DataQuery;
 
 /**
  * 
@@ -12,11 +10,8 @@ import org.openforis.collect.datacleansing.DataCleansingStep;
  */
 public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingStep> {
 
-	@NotNull
 	private Integer queryId;
-	@NotBlank
 	private String title;
-	@NotBlank
 	private String fixExpression;
 
 	private String description;
@@ -31,8 +26,9 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 	
 	public DataCleansingStepForm(DataCleansingStep step) {
 		super(step);
-		queryTitle = step == null ? null: step.getQuery().getTitle();
-		queryDescription = step == null ? null: step.getQuery().getDescription();
+		DataQuery query = step.getQuery();
+		queryTitle = step == null ? null: query.getTitle();
+		queryDescription = step == null ? null: query.getDescription();
 	}
 	
 	public String getQueryTitle() {

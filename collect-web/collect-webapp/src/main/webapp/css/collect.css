@@ -65,3 +65,17 @@ html, body {
     clear: left;
 }
 */
+
+.modal.success .modal-title {
+	color: blue;
+}
+
+.modal.warning .modal-header {
+	background-color: #FFCC66;
+}
+
+.modal.error .modal-header {
+	background-color: #EE7777;
+	color: white;
+}
+

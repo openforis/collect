@@ -6,8 +6,13 @@ OF.UI.Forms.Validation = function() {};
  * @param $form
  */
 OF.UI.Forms.Validation.removeErrors = function ($form) {
-	$form.find('.form-group').removeClass('has-error');
-	$form.find('.form-control').tooltip('destroy');
+	$form.find('.form-group').each(function() {
+		var $this = $(this);
+		$this.removeClass('has-error');
+		if ($this.data("tooltip")) {
+			$this.tooltip('destroy');
+		}
+	});
 };
 
 /**
@@ -17,17 +22,35 @@ OF.UI.Forms.Validation.removeErrors = function ($form) {
  * @param errors
  */
 OF.UI.Forms.Validation.updateErrors = function (form, errors) {
-	OF.UI.Forms.Validation.removeErrors( form );
+	function findError(fieldName) {
+		for (var i=0; i < errors.length; i++) {
+			var error = errors[i];
+			if (error.field == fieldName) {
+				return error;
+			}
+		}
+		return null;
+	}
 	
-	$.each( errors, function( i, error ){
-		var fieldName = error.field;
-		var field = form.find( '[name="'+ fieldName + '"]' );
-		if ( field != null ) {
-			var formGroup = field.closest( '.form-group' );
-			if ( !formGroup.hasClass('has-error') ){
+	form.find('.form-group').each(function() {
+		var formGroup = $(this);
+		var inputField = formGroup.find(".form-control");
+		if (inputField.length == 1) {
+			var oldTooltip = formGroup.data("tooltip");
+			var error = findError(inputField.attr("name"));
+			if (error == null) {
+				formGroup.removeClass('has-error');
+				if (oldTooltip) {
+					formGroup.tooltip('destroy');
+				}
+			} else {
 				formGroup.addClass('has-error');
-	
-				OF.UI.Forms.Validation.createErrorTooltip(field, error);
+				var tooltipTitle = OF.UI.Forms.Validation._createErrorTooltipTitle(inputField, error);
+				if (oldTooltip) {
+					oldTooltip.options.title = tooltipTitle;
+				} else {
+					OF.UI.Forms.Validation.createErrorTooltipWithTitle(formGroup, tooltipTitle);
+				}
 			}
 		}
 	});
@@ -75,6 +98,25 @@ OF.UI.Forms.Validation.getFormErrorMessage = function ($form, errors) {
  * @param fieldLabel (optional) if not specified, field label will be assigned using getFieldLabel function
  */
 OF.UI.Forms.Validation.createErrorTooltip = function ($field, error, fieldLabel) {
+	var title = OF.UI.Forms.Validation._createErrorTooltipTitle($field, error, fieldLabel);
+	OF.UI.Forms.Validation.createErrorTooltipWithTitle($field, title);
+};
+
+OF.UI.Forms.Validation.createErrorTooltipWithTitle = function ($field, title) {
+	var $parentModal = $field.closest('.modal');
+	var container = $parentModal.length == 0 ? 'body': $parentModal; 
+	
+	var inputType = OF.UI.Forms.getInputType($field);
+	var $targetField = inputType == 'hidden' ? $field.siblings('.form-control'): $field;
+	
+	$targetField.tooltip({
+		title: title,
+		container: container,
+		template: '<div class="tooltip error"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+	});
+};
+
+OF.UI.Forms.Validation._createErrorTooltipTitle = function($field, error, fieldLabel) {
 	if ( ! fieldLabel ) {
 		fieldLabel = OF.UI.Forms.getFieldLabel($field);
 	}
@@ -87,16 +129,5 @@ OF.UI.Forms.Validation.createErrorTooltip = function ($field, error, fieldLabel)
 		errorMessage = "error";
 	}
 	var message = fieldLabel + " " + errorMessage;
-	
-	var $parentModal = $field.closest('.modal');
-	var container = $parentModal.length == 0 ? 'body': $parentModal; 
-	
-	var inputType = OF.UI.Forms.getInputType($field);
-	var $targetField = inputType == 'hidden' ? $targetField = $field.siblings('.form-control'): $field;
-	
-	$targetField.tooltip({
-		title: message,
-		container: container,
-		template: '<div class="tooltip error"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
-	});
+	return message;
 };

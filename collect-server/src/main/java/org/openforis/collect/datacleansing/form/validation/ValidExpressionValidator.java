@@ -53,9 +53,9 @@ public class ValidExpressionValidator implements
 			return true;
 		}
 		try {
-			String expression = (String) PropertyUtils.getProperty(bean, expressionFieldName);
-			Integer contextNodeDefId = (Integer) PropertyUtils.getProperty(bean, contextNodeDefinitionIdFieldName);
-			Integer thisNodeDefId = (Integer) PropertyUtils.getProperty(bean, thisNodeDefinitionIdFieldName);
+			String expression = (String) PropertyUtils.getNestedProperty(bean, expressionFieldName);
+			Integer contextNodeDefId = (Integer) PropertyUtils.getNestedProperty(bean, contextNodeDefinitionIdFieldName);
+			Integer thisNodeDefId = (Integer) PropertyUtils.getNestedProperty(bean, thisNodeDefinitionIdFieldName);
 			if (expression == null || contextNodeDefId == null || thisNodeDefId == null) {
 				return true;
 			}

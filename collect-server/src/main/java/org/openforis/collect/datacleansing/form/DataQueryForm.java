@@ -1,28 +1,17 @@
 package org.openforis.collect.datacleansing.form;
 
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.NotBlank;
 import org.openforis.collect.datacleansing.DataQuery;
-import org.openforis.collect.datacleansing.form.validation.ValidExpression;
-import org.openforis.collect.datacleansing.form.validation.ValidExpression.ExpressionType;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-@ValidExpression(expressionType = ExpressionType.BOOLEAN, contextNodeDefinitionIdFieldName = "entityDefinitionId", 
-	experssionFieldName = "conditions", thisNodeDefinitionIdFieldName = "attributeDefinitionId")
 public class DataQueryForm extends DataCleansingItemForm<DataQuery> {
 
-	@NotBlank
 	private String title;
-	@NotNull
 	private Integer entityDefinitionId;
-	@NotNull
 	private Integer attributeDefinitionId;
-	@NotBlank
 	private String conditions;
 
 	private String description;
