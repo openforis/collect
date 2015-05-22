@@ -88,7 +88,7 @@ public class SurveyController extends BasicController {
 		PrintWriter writer = null;
 		try {
 			CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
-			CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey);
+			CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, survey.getDefaultLanguage());
 			String html = generator.generateHTML();
 			writer = new PrintWriter(response.getOutputStream());
 			writer.print(html);
