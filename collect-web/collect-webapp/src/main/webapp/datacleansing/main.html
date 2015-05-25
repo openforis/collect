@@ -35,12 +35,12 @@
 		<script type="text/javascript" src="js/collect/service/abstract_service.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/service/session_service.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/service/survey_service.js?v=${PROJECT_VERSION}" ></script>
-		<script type="text/javascript" src="js/collect/service/data_cleansing_step_service.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/service/data_error_query_service.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/service/data_error_type_service.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/service/data_error_report_service.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/service/data_query_service.js?v=${PROJECT_VERSION}" ></script>
-		<script type="text/javascript" src="js/collect/service/data_update_service.js?v=${PROJECT_VERSION}" ></script>
+		<script type="text/javascript" src="js/collect/service/data_cleansing_step_service.js?v=${PROJECT_VERSION}" ></script>
+		<script type="text/javascript" src="js/collect/service/data_cleansing_chain_service.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/service/geo_data_service.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/service/job_service.js?v=${PROJECT_VERSION}" ></script>
 		
@@ -50,13 +50,13 @@
 
 		<script type="text/javascript" src="js/collect/datacleansing/datacleansing.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/map_panel_composer.js?v=${PROJECT_VERSION}" ></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_update_panel_composer.js?v=${PROJECT_VERSION}" ></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_step_dialog.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_type_dialog.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_dialog.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_dialog.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_view_dialog.js?v=${PROJECT_VERSION}" ></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_query_dialog.js?v=${PROJECT_VERSION}" ></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_step_dialog.js?v=${PROJECT_VERSION}" ></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_chain_dialog.js?v=${PROJECT_VERSION}" ></script>
 		
 		<link rel="stylesheet" href="css/bootstrap/3.3.1/bootstrap.min.css">
 		<link rel="stylesheet" href="data:text/css;charset=utf-8," 
@@ -83,25 +83,30 @@
 					<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Home</a>
 				</li>
 				<li role="presentation">
-					<a href="#data-error-reports-panel" aria-controls="data-error-reports-panel" 
-						role="tab" data-toggle="tab">Data Error Reports</a>
+					<a href="#data-error-type-panel" aria-controls="data-error-type-panel" 
+						role="tab" data-toggle="tab">Data Error Types</a>
 				</li>
 				<li role="presentation">
 					<a href="#data-query-panel" aria-controls="data-query-panel" 
 						role="tab" data-toggle="tab">Data Query</a>
 				</li>
 				<li role="presentation">
-					<a href="#data-update-panel" aria-controls="data-update-panel" 
-						role="tab" data-toggle="tab">Data Update</a>
-				</li>
-				<li role="presentation">
 					<a href="#dataErrorQueriesPanel" aria-controls="dataErrorQueriesPanel" 
 						role="tab" data-toggle="tab">Data Error Queries</a>
 				</li>
 				<li role="presentation">
-					<a href="#dataErrorTypesPanel" aria-controls="dataErrorTypesPanel" 
-						role="tab" data-toggle="tab">Data Error Types</a>
+					<a href="#data-error-reports-panel" aria-controls="data-error-reports-panel" 
+						role="tab" data-toggle="tab">Data Error Reports</a>
 				</li>
+				<li role="presentation">
+					<a href="#data-cleansing-step-panel" aria-controls="data-cleansing-step-panel" 
+						role="tab" data-toggle="tab">Data Cleansing Steps</a>
+				</li>
+				<li role="presentation">
+					<a href="#data-cleansing-chain-panel" aria-controls="data-cleansing-chain-panel" 
+						role="tab" data-toggle="tab">Data Cleansing Chains</a>
+				</li>
+				
 <!-- 				<li role="presentation"> -->
 <!-- 					<a href="#map-panel" aria-controls="map-panel"  -->
 <!-- 						role="tab" data-toggle="tab">Map</a> -->
@@ -113,26 +118,17 @@
 				<div id="homePanel" role="tabpanel" class="tab-pane active" >
 			
 				</div>
-				<div id="data-error-reports-panel" role="tabpanel" class="tab-pane" >
-					<div id="data-error-report-grid"></div>
+				<div id="data-error-type-panel" role="tabpanel" class="tab-pane" >
+					<div id="dataerrortypegrid"></div>
 					
 					<div class="btn-group" role="group" aria-label="...">
-						<button id="new-data-error-report-btn" type="button" class="btn btn-default">New</button>
-						<button id="view-data-error-report-btn" type="button" class="btn btn-default">View</button>
-						<button id="delete-data-error-report-btn" type="button" class="btn btn-default">Delete</button>
+						<button id="newDataErrorTypeBtn" type="button" class="btn btn-default new-btn">New</button>
+						<button id="editDataErrorTypeBtn" type="button" class="btn btn-default edit-btn">Edit</button>
+						<button id="deleteDataErrorTypeBtn" type="button" class="btn btn-default delete-btn">Delete</button>
 					</div>
 				</div>
 				<div id="data-query-panel" role="tabpanel" class="tab-pane" >
 					<div id="dataquerygrid"></div>
-					
-					<div class="btn-group" role="group" aria-label="...">
-						<button type="button" class="btn btn-default new-btn">New</button>
-						<button type="button" class="btn btn-default edit-btn">Edit</button>
-						<button type="button" class="btn btn-default delete-btn">Delete</button>
-					</div>
-				</div>
-				<div id="data-update-panel" role="tabpanel" class="tab-pane">
-					<div id="datacleansingstepgrid"></div>
 					
 					<div class="btn-group" role="group" aria-label="...">
 						<button type="button" class="btn btn-default new-btn">New</button>
@@ -149,13 +145,31 @@
 						<button id="delete-data-error-query-btn" type="button" class="btn btn-default">Delete</button>
 					</div>
 				</div>
-				<div id="dataErrorTypesPanel" role="tabpanel" class="tab-pane" >
-					<div id="dataerrortypegrid"></div>
+				<div id="data-error-reports-panel" role="tabpanel" class="tab-pane" >
+					<div id="data-error-report-grid"></div>
 					
 					<div class="btn-group" role="group" aria-label="...">
-						<button id="newDataErrorTypeBtn" type="button" class="btn btn-default">New</button>
-						<button id="editDataErrorTypeBtn" type="button" class="btn btn-default">Edit</button>
-						<button id="deleteDataErrorTypeBtn" type="button" class="btn btn-default">Delete</button>
+						<button id="new-data-error-report-btn" type="button" class="btn btn-default">New</button>
+						<button id="view-data-error-report-btn" type="button" class="btn btn-default">View</button>
+						<button id="delete-data-error-report-btn" type="button" class="btn btn-default">Delete</button>
+					</div>
+				</div>
+				<div id="data-cleansing-step-panel" role="tabpanel" class="tab-pane">
+					<div id="datacleansingstepgrid"></div>
+					
+					<div class="btn-group" role="group" aria-label="...">
+						<button type="button" class="btn btn-default new-btn">New</button>
+						<button type="button" class="btn btn-default edit-btn">Edit</button>
+						<button type="button" class="btn btn-default delete-btn">Delete</button>
+					</div>
+				</div>
+				<div id="data-cleansing-chain-panel" role="tabpanel" class="tab-pane">
+					<div id="datacleansingchaingrid"></div>
+					
+					<div class="btn-group" role="group" aria-label="...">
+						<button type="button" class="btn btn-default new-btn">New</button>
+						<button type="button" class="btn btn-default edit-btn">Edit</button>
+						<button type="button" class="btn btn-default delete-btn">Delete</button>
 					</div>
 				</div>
 				<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">
