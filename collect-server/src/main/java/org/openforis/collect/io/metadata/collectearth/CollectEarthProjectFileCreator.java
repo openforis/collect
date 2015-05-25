@@ -15,6 +15,6 @@ public interface CollectEarthProjectFileCreator {
 	public static final String PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER = "PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER";
 	public static final String PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES = "PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES";
 	
-	File create(CollectSurvey survey) throws Exception;
+	File create(CollectSurvey survey, String language) throws Exception;
 	
 }

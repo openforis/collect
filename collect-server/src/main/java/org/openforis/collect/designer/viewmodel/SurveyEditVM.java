@@ -241,6 +241,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 		sessionStatus.reset();
 	}
 	
+	public List<String> getAvailableLanguages() {
+		CollectSurvey survey = getSurvey();
+		if ( survey == null ) {
+			//TODO session expired?
+			return null;
+		} else {
+			List<String> languages = survey.getLanguages();
+			return new BindingListModelList<String>(languages, false);
+		}
+	}
+
 	@Command
 	@NotifyChange({"currentLanguageCode"})
 	public void languageCodeSelected(@BindingParam("code") final String selectedLanguageCode) {
@@ -482,17 +493,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 		selectLanguagePopUp = null;
 	}
 	
-	public List<String> getAvailableLanguages() {
-		CollectSurvey survey = getSurvey();
-		if ( survey == null ) {
-			//TODO session expired?
-			return null;
-		} else {
-			List<String> languages = survey.getLanguages();
-			return new BindingListModelList<String>(languages, false);
-		}
-	}
-
 	@Override
 	public boolean isSurveyChanged() {
 		return changed;

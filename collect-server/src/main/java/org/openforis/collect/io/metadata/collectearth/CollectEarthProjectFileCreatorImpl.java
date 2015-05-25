@@ -65,7 +65,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private CodeListManager codeListManager;
 	
 	@Override
-	public File create(CollectSurvey survey) throws Exception {
+	public File create(CollectSurvey survey, String language) throws Exception {
 		// create output zip file
 		File outputFile = File.createTempFile("openforis-collect-earth-temp", ".zip");
 		outputFile.delete(); //prevent exception creating zip file with zip4j
@@ -73,7 +73,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		// create placemark
 		File placemarkFile = createPlacemark(survey);
 		File projectProperties = generateProjectProperties(survey);
-		File balloon = generateBalloon(survey);
+		File balloon = generateBalloon(survey, language);
 		File cube = generateCube(survey);
 		File kmlTemplate = generateKMLTemplate(survey);
 		File testPlotsCSVFile = generateTestPlotsCSVFile(survey);
@@ -152,8 +152,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return file;
 	}
 
-	private File generateBalloon(CollectSurvey survey) throws IOException {
-		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey);
+	private File generateBalloon(CollectSurvey survey, String language) throws IOException {
+		CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, language);
 		String html = generator.generateHTML();
 		return Files.writeToTempFile(html, "collect-earth-project-file-creator", ".html");
 	}

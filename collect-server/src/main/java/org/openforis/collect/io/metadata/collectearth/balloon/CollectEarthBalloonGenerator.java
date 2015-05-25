@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
@@ -64,13 +63,15 @@ public class CollectEarthBalloonGenerator {
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
 
 	private CollectSurvey survey;
+	private String language;
 	private Map<String, CEComponent> componentByName;
 	
 	private BalloonInputFieldsUtils balloonInputFieldsUtils;
 	private Map<String, String> htmlParameterNameByNodePath;
 
-	public CollectEarthBalloonGenerator(CollectSurvey survey) {
+	public CollectEarthBalloonGenerator(CollectSurvey survey, String language) {
 		this.survey = survey;
+		this.language = language;
 		this.componentByName = new HashMap<String, CEComponent>();
 		this.balloonInputFieldsUtils = new BalloonInputFieldsUtils();
 		this.htmlParameterNameByNodePath = balloonInputFieldsUtils.getHtmlParameterNameByNodePath(getRootEntity());
@@ -92,7 +93,7 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private String fillWithSurveyDefinitionFields(String template) {
-		CEComponentHTMLFormatter htmlFormatter = new CEComponentHTMLFormatter();
+		CEComponentHTMLFormatter htmlFormatter = new CEComponentHTMLFormatter(language);
 		
 		CETabSet rootComponent = generateRootComponent();
 		
@@ -192,7 +193,12 @@ public class CollectEarthBalloonGenerator {
 	private CETab createTabComponent(EntityDefinition rootEntityDef, UIForm form, boolean main) {
 		List<String> nodeNamesFromCSV = getNodeNamesFromCSV();
 		
-		CETab tab = new CETab(rootEntityDef.getName(), form.getLabel("en"));
+		String label = form.getLabel(language);
+		if (label == null && ! isDefaultLanguage()) {
+			String defaultLanguage = survey.getDefaultLanguage();
+			label = form.getLabel(defaultLanguage);
+		}
+		CETab tab = new CETab(rootEntityDef.getName(), label);
 		tab.setMain(main); //consider the first tab as the main one
 		for (UIFormComponent formComponent : form.getChildren()) {
 			if (formComponent instanceof NodeDefinitionUIComponent) {
@@ -230,7 +236,13 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private CEComponent createComponent(NodeDefinition def, int entityPosition) {
-		String label = ObjectUtils.defaultIfNull(def.getLabel(Type.INSTANCE), def.getName());
+		String label = def.getLabel(Type.INSTANCE, language);
+		if (label == null && ! isDefaultLanguage()) {
+			label = def.getLabel(Type.INSTANCE);
+		}
+		if (label == null) {
+			label = def.getName();
+		}
 		
 		boolean multiple = def.isMultiple();
 		UIOptions uiOptions = survey.getUIOptions();
@@ -302,17 +314,23 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private CEComponent createEnumeratedEntityComponent(EntityDefinition def) {
-		String label = ObjectUtils.defaultIfNull(def.getLabel(Type.INSTANCE), def.getName());
+		String label = def.getLabel(Type.INSTANCE, language);
+		if (label == null && ! isDefaultLanguage()) {
+			label = def.getLabel(Type.INSTANCE);
+		}
+		if (label == null) {
+			label = def.getName();
+		}
 		UIOptions uiOptions = survey.getUIOptions();
 		
 		CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label);
 		for (NodeDefinition child : def.getChildDefinitions()) {
-			String heading = child.getLabel(Type.HEADING);
-			if (heading == null) {
+			String heading = child.getLabel(Type.INSTANCE, language);
+			if (heading == null && ! isDefaultLanguage()) {
 				heading = child.getLabel(Type.INSTANCE);
-				if (heading == null) {
-					heading = child.getName();
-				}
+			}
+			if (heading == null) {
+				heading = child.getName();
 			}
 			ceTable.addHeading(heading);
 		}
@@ -322,7 +340,11 @@ public class CollectEarthBalloonGenerator {
 		int codeItemIdx = 0;
 		for (CodeListItem item : codeItems) {
 			String key = item.getCode();
-			CETableRow row = new CETableRow(key, item.getLabel());
+			String itemLabel = item.getLabel(language);
+			if (itemLabel == null && ! isDefaultLanguage()) {
+				itemLabel = item.getLabel();
+			}
+			CETableRow row = new CETableRow(key, itemLabel);
 			for (NodeDefinition child : def.getChildDefinitions()) {
 				if (! uiOptions.isHidden(child)) {
 					row.addChild(createComponent(child, codeItemIdx + 1));
@@ -384,6 +406,10 @@ public class CollectEarthBalloonGenerator {
 		}  else {
 			throw new IllegalArgumentException("Attribute type not supported: " + def.getClass().getName());
 		}
+	}
+
+	private boolean isDefaultLanguage() {
+		return language.equals(survey.getDefaultLanguage());
 	}
 
 }

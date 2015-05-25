@@ -90,6 +90,26 @@
 			</rows>
 		</grid>
 		
+		<grid visible="@bind(fx.outputFormat eq 'EARTH')">
+			<columns>
+				<column width="170px" />
+				<column width="100%" />
+			</columns>
+			<rows>
+				<row>
+					<label value="${labels.survey.export.earth.language}:" />
+					<listbox id="languageListBox" model="@load(vm.surveyLanguages)"
+						selectedItem="@bind(fx.languageCode)"
+						mold="select">
+						<template name="model">
+							<listitem label="${c:l(each)}"
+								value="@load(each)" />
+						</template>
+					</listbox>				
+				</row>
+			</rows>
+		</grid>
+		
 		<box width="100%" align="center">
 			<button id="okButton" onClick="@command('export')" label="${labels.survey.export.$}" />
 		</box>

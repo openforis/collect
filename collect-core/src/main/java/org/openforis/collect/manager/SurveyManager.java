@@ -605,6 +605,8 @@ public class SurveyManager {
 					projectName = survey.getProjectName();
 				}
 				summary.setProjectName(projectName);
+				summary.setDefaultLanguage(survey.getDefaultLanguage());
+				summary.setLanguages(survey.getLanguages());
 			}
 		}
 		return result;

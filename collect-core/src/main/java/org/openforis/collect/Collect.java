@@ -13,7 +13,7 @@ import org.openforis.commons.versioning.Version;
 public class Collect {
 	
 	private static final String VOID_VERSION = "PROJECT_VERSION"; //token was not being replaced into version.properties in previous releases
-	public static Version DEV_VERSION = new Version("3.3.36-SNAPSHOT");
+	public static Version DEV_VERSION = new Version("3.6.2-SNAPSHOT");
 	
 	private static Properties VERSION_PROPERTIES;
 	private static final Version VERSION;

@@ -23,6 +23,13 @@ import com.jamesmurty.utils.XMLBuilder;
  */
 public class CEComponentHTMLFormatter {
 
+	private String language;
+
+	public CEComponentHTMLFormatter(String language) {
+		super();
+		this.language = language;
+	}
+
 	public String format(CETabSet tabSet) {
 		try {
 			XMLBuilder builder = createBuilder(tabSet, null);
@@ -322,8 +329,9 @@ public class CEComponentHTMLFormatter {
 							.a("data-code-item-id", String.valueOf(item.getId()))
 							.a("value", item.getCode())
 							.t(itemLabel);
-					if (StringUtils.isNotBlank(item.getDescription())) {
-						String description = item.getDescription();
+					
+					String description = getDescription(item);
+					if (StringUtils.isNotBlank(description)) {
 						if (item.hasUploadedImage()) {
 							String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
 							String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"150\">" + StringEscapeUtils.escapeHtml4(description) + "</span>";
@@ -357,11 +365,22 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private String getItemLabel(CodeListItem item) {
-		String itemLabel = item.getLabel();
+		String itemLabel = item.getLabel(language);
+		if (StringUtils.isBlank(itemLabel) && ! language.equals(item.getSurvey().getDefaultLanguage())) {
+			itemLabel = item.getLabel();
+		}
 		if (StringUtils.isBlank(itemLabel)) {
 			itemLabel = item.getCode();
 		}
 		return itemLabel;
+	}
+
+	private String getDescription(CodeListItem item) {
+		String description = item.getDescription(language);
+		if (StringUtils.isBlank(description) && ! language.equals(item.getSurvey().getDefaultLanguage())) {
+			description = item.getDescription();
+		}
+		return description;
 	}
 
 }
