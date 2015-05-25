@@ -3,6 +3,7 @@ Collect.DataCleansingChainDialogController = function() {
 	this.contentUrl = "datacleansing/data_cleansing_chain_dialog.html";
 	this.itemEditService = collect.dataCleansingChainService;
 	this.queries = null;
+	this.stepsDataGrid = null;
 	this.querySelectPicker = null;
 };
 
@@ -18,8 +19,20 @@ Collect.DataCleansingChainDialogController.prototype.dispatchItemSavedEvent = fu
 Collect.DataCleansingChainDialogController.prototype.loadInstanceVariables = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables.apply(this, [function() {
-		collect.dataQueryService.loadAll(function(queries) {
-			$this.queries = queries;
+		//load data cleansing steps
+		collect.dataCleansingStepService.loadAll(function(steps) {
+			if ($this.item == null || $this.item.steps == null || $this.item.steps.length == 0) {
+				$this.availableNewSteps = steps;
+			} else {
+				$this.availableNewSteps = new Array();
+				for (var idx = 0; idx < steps.length; idx++) {
+					var step = steps[idx];
+					var itemStep = OF.Arrays.findItem($this.item.steps, "id", step.id);
+					if (itemStep == null) {
+						$this.availableNewSteps.push(step);
+					}
+				}
+			}
 			callback();
 		});
 	}]);
@@ -35,7 +48,15 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			$this.recordStepSelectPicker = select.data().selectpicker;
 			$this.recordStepSelectPicker.refresh();
 		}
-
+		var initNewStepSelectPicker = function() {
+			var select = $this.content.find('select[name="cleansingStep"]');
+			OF.UI.Forms.populateSelect(select, $this.availableNewSteps, "id", "title", true);
+			select.selectpicker();
+			$this.addStepSelectPicker = select.data().selectpicker;
+			$this.addStepSelectPicker.refresh();
+		}
+		initNewStepSelectPicker();
+		
 		var monitorJob = function(jobMonitorUrl, complete) {
 			var jobDialog = new OF.UI.JobDialog();
 			new OF.JobMonitor(jobMonitorUrl, function() {
@@ -54,14 +75,54 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			});
 		}, $this));
 		
+		$this.content.find(".add-step-btn").click($.proxy(function() {
+			var selectedStepId = $this.addStepSelectPicker.val();
+			if (selectedStepId == null || selectedStepId == '') {
+				return;
+			}
+			var selectedStep = OF.Arrays.findItem($this.availableNewSteps, "id", selectedStepId);
+			$this.item.steps.push(selectedStep);
+			
+			OF.Arrays.removeItem($this.availableNewSteps, selectedStep);
+			
+			$this.initStepsDataGrid();
+			initNewStepSelectPicker();
+		}, $this));
+		
+		$this.initStepsDataGrid();
+		
 		callback();
 	});
 };
 
-//Collect.DataCleansingChainDialogController.prototype.fillForm = function(callback) {
-//	var $this = this;
-//	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
-//		callback();
-//	});
-//};
+Collect.DataCleansingChainDialogController.prototype.extractJSONItem = function() {
+	var item = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
+//	item.stepIds = new Array();
+	item.steps = new Array();
+	var steps = this.item.steps;
+	for (var idx = 0; idx < steps.length; idx++) {
+		var step = steps[idx];
+//		item.stepIds.push(step.id);
+		item.steps.push(step);
+	}
+	return item;
+};
+
+Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = function() {
+	var $this = this;
+	var gridContainer = $(".step-grid");
+	gridContainer.bootstrapTable({
+	    data: $this.item == null ? null : $this.item.steps,
+	    clickToSelect: true,
+	    columns: [
+          	{field: "selected", title: "", radio: true},
+			{field: "id", title: "Id", visible: false},
+			{field: "title", title: "Title"},
+			{field: "queryTitle", title: "Query Title"},
+			{field: "creationDate", title: "Creation Date"},
+			{field: "modifiedDate", title: "Modified Date"}
+		]
+	});
+	$this.stepsDataGrid = gridContainer.data('bootstrap.table');
+};
 

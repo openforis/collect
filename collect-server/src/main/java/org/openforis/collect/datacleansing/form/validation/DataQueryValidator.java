@@ -52,9 +52,11 @@ public class DataQueryValidator extends SimpleValidator<DataQueryForm> {
 		for (DataQuery dataQuery : queries) {
 			if (! dataQuery.getId().equals(target.getId()) 
 					&& Integer.valueOf(dataQuery.getEntityDefinitionId()).equals(target.getEntityDefinitionId())
-					&& Integer.valueOf(dataQuery.getAttributeDefinitionId()).equals(target.getAttributeDefinitionId()) ) {
+					&& Integer.valueOf(dataQuery.getAttributeDefinitionId()).equals(target.getAttributeDefinitionId()) 
+					&& dataQuery.getConditions().equals(target.getConditions())) {
 				rejectDuplicateValue(errors, ENTITY_DEFINITION_ID_FIELD);
 				rejectDuplicateValue(errors, ATTRIBUTE_DEFINITION_ID_FIELD);
+				rejectDuplicateValue(errors, CONDITIONS_FIELD);
 				return false;
 			}
 		}

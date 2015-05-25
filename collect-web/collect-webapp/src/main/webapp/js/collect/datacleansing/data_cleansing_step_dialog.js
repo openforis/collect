@@ -4,6 +4,8 @@ Collect.DataCleansingStepDialogController = function() {
 	this.itemEditService = collect.dataCleansingStepService;
 	this.queries = null;
 	this.querySelectPicker = null;
+	this.stepsDataGrid = null;
+	this.addStepSelectPicker = null;
 };
 
 Collect.DataCleansingStepDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
@@ -17,7 +19,9 @@ Collect.DataCleansingStepDialogController.prototype.dispatchItemSavedEvent = fun
 
 Collect.DataCleansingStepDialogController.prototype.loadInstanceVariables = function(callback) {
 	var $this = this;
+	
 	Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables.apply(this, [function() {
+		//load data queries
 		collect.dataQueryService.loadAll(function(queries) {
 			$this.queries = queries;
 			callback();
@@ -41,7 +45,6 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 			$this.recordStepSelectPicker = select.data().selectpicker;
 			$this.recordStepSelectPicker.refresh();
 		}
-
 		var monitorJob = function(jobMonitorUrl, complete) {
 			var jobDialog = new OF.UI.JobDialog();
 			new OF.JobMonitor(jobMonitorUrl, function() {
@@ -70,4 +73,3 @@ Collect.DataCleansingStepDialogController.prototype.fillForm = function(callback
 		callback();
 	});
 };
-
