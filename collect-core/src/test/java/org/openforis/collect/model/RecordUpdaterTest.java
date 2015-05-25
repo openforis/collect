@@ -3,7 +3,11 @@
  */
 package org.openforis.collect.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
@@ -437,6 +441,29 @@ public class RecordUpdaterTest {
 		update(treeNo, "3");
 		
 		assertTrue(test.isRelevant());
+	}
+	
+	@Test
+	public void testRelevanceUpdatedOnEmptyNodes() {
+		record(
+			rootEntityDef(
+				attributeDef("accessibility"),
+				entityDef("tree",
+					attributeDef("tree_no")
+				).relevant("accessibility = 'true'")
+			),
+			attribute("accessibility", "false"),
+			entity("tree")
+		);
+		
+		Entity tree = record.findNodeByPath("/root/tree[1]");
+		
+		assertFalse(tree.isRelevant());
+
+		Attribute<?, ?> accessibility = record.findNodeByPath("/root/accessibility");
+		update(accessibility, "true");
+		
+		assertTrue(tree.isRelevant());
 	}
 
 	@Test
