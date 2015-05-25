@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author S. Ricci
@@ -26,27 +25,26 @@ public class ReferenceDataImportExampleDownloadController extends BasicControlle
 	private static final String SAMPLING_DESIGN_IMPORT_EXAMPLE_FILE_NAME = "sampling-design-import-example.csv";
 	
 	@RequestMapping(value = "/codelist/import/example.htm", method = RequestMethod.GET)
-	public @ResponseBody String downloadCodeListImportExample(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		return downloadFile(request, response, CODE_LIST_IMPORT_EXAMPLE_FILE_NAME);
+	public void downloadCodeListImportExample(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		downloadFile(request, response, CODE_LIST_IMPORT_EXAMPLE_FILE_NAME);
 	}
 
 	@RequestMapping(value = "/species/import/example.htm", method = RequestMethod.GET)
-	public @ResponseBody String downloadSpeciesListImportExample(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		return downloadFile(request, response, SPECIES_IMPORT_EXAMPLE_FILE_NAME);
+	public void downloadSpeciesListImportExample(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		downloadFile(request, response, SPECIES_IMPORT_EXAMPLE_FILE_NAME);
 	}
 	
 	@RequestMapping(value = "/samplingdesign/import/example.htm", method = RequestMethod.GET)
-	public @ResponseBody String downloadSamplingDesignImportExample(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		return downloadFile(request, response, SAMPLING_DESIGN_IMPORT_EXAMPLE_FILE_NAME);
+	public void downloadSamplingDesignImportExample(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		downloadFile(request, response, SAMPLING_DESIGN_IMPORT_EXAMPLE_FILE_NAME);
 	}
 
-	private String downloadFile(HttpServletRequest request,
+	private void downloadFile(HttpServletRequest request,
 			HttpServletResponse response, String fileName) throws IOException {
 		ServletContext context = request.getSession().getServletContext();
 		String path = context.getRealPath(IO_RESOURCES_ROOT_PATH + fileName);
 		File file = new File(path);
 		writeFileToResponse(response, file);
-		return "ok";
 	}
 	
 
