@@ -16,6 +16,7 @@ public class DataCleansingChainForm extends DataCleansingItemForm<DataCleansingC
 	private String title;
 	private String description;
 	private List<DataCleansingStepForm> steps;
+	private List<Integer> stepIds;
 	
 	public DataCleansingChainForm() {
 		super();
@@ -52,8 +53,12 @@ public class DataCleansingChainForm extends DataCleansingItemForm<DataCleansingC
 		return steps;
 	}
 	
-	public void setSteps(List<DataCleansingStepForm> steps) {
-		this.steps = steps;
+	public List<Integer> getStepIds() {
+		return stepIds;
+	}
+	
+	public void setStepIds(List<Integer> stepIds) {
+		this.stepIds = stepIds;
 	}
 	
 }

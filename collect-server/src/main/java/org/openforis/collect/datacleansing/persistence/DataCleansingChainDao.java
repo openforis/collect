@@ -7,6 +7,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChai
 import java.sql.Connection;
 import java.util.List;
 
+import org.jooq.BatchBindStep;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -50,6 +51,25 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 					.where(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID.eq(chain.getId()));
 		List<Integer> ids = select.fetch(OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID);
 		return ids;
+	}
+	
+	public void deleteStepAssociations(DataCleansingChain chain) {
+		JooqDSLContext dsl = dsl((CollectSurvey) chain.getSurvey());
+		dsl.delete(OFC_DATA_CLEANSING_CHAIN_STEPS)
+			.where(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID.eq(chain.getId()))
+			.execute();
+	}
+	
+	public void insertStepAssociations(DataCleansingChain chain, List<Integer> stepIds) {
+		JooqDSLContext dsl = dsl((CollectSurvey) chain.getSurvey());
+		BatchBindStep batch = dsl.batch(dsl.insertInto(OFC_DATA_CLEANSING_CHAIN_STEPS, 
+				OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID, 
+				OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID)
+			.values((Integer) null, (Integer) null));
+		for (Integer stepId : stepIds) {
+			batch.bind(chain.getId(), stepId);
+		}
+		batch.execute();
 	}
 	
 	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataCleansingChain> {

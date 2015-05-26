@@ -44,7 +44,7 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 	@RequestMapping(value="list.json", method = RequestMethod.GET)
 	public @ResponseBody
 	List<F> loadAll() {
-		CollectSurvey survey = sessionManager.getActiveSurvey();
+		CollectSurvey survey = getActiveSurvey();
 		List<T> items = itemManager.loadBySurvey(survey);
 		List<F> forms = new ArrayList<F>(items.size());
 		for (T item : items) {
@@ -57,7 +57,7 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 	@RequestMapping(value = "/{id}.json", method = RequestMethod.GET)
 	public @ResponseBody
 	F load(@PathVariable int id) {
-		CollectSurvey survey = sessionManager.getActiveSurvey();
+		CollectSurvey survey = getActiveSurvey();
 		T item = itemManager.loadById(survey, id);
 		F form = createFormInstance(item);
 		return form;
@@ -70,14 +70,14 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 		List<ObjectError> errors = result.getAllErrors();
 		Response response;
 		if (errors.isEmpty()) {
-			CollectSurvey survey = sessionManager.getActiveSurvey();
+			CollectSurvey survey = getActiveSurvey();
 			T item;
 			if (form.getId() == null) {
 				item = createItemInstance(survey);
 			} else {
 				item = itemManager.loadById(survey, form.getId());
 			}
-			form.copyTo(item, IGNORE_FIELDS);
+			copyFormIntoItem(form, item);
 			itemManager.save(item);
 			F responseForm = createFormInstance(item);
 			response = new SimpleFormUpdateResponse(responseForm);
@@ -85,6 +85,14 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 			response = new SimpleFormUpdateResponse(errors);
 		}
 		return response;
+	}
+
+	protected CollectSurvey getActiveSurvey() {
+		return sessionManager.getActiveSurvey();
+	}
+
+	protected void copyFormIntoItem(F form, T item) {
+		form.copyTo(item, IGNORE_FIELDS);
 	}
 	
 }
