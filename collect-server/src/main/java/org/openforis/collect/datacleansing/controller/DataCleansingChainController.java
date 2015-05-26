@@ -3,6 +3,7 @@ package org.openforis.collect.datacleansing.controller;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingChainExecutorJob;
+import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.form.DataCleansingChainForm;
 import org.openforis.collect.datacleansing.form.validation.DataCleansingChainValidator;
 import org.openforis.collect.datacleansing.manager.DataCleansingChainManager;
@@ -67,6 +68,16 @@ public class DataCleansingChainController extends AbstractSurveyObjectEditFormCo
 		collectJobManager.startSurveyJob(job);
 		Response response = new Response();
 		return response;
+	}
+	
+	@Override
+	protected void copyFormIntoItem(DataCleansingChainForm form, DataCleansingChain item) {
+		super.copyFormIntoItem(form, item);
+		for (Integer stepId : form.getStepIds()) {
+			DataCleansingStep step = new DataCleansingStep(item.getSurvey());
+			step.setId(stepId);
+			item.addStep(step);
+		}
 	}
 	
 }

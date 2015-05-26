@@ -5,6 +5,7 @@ Collect.DataCleansingChainDialogController = function() {
 	this.queries = null;
 	this.stepsDataGrid = null;
 	this.querySelectPicker = null;
+	this.steps = [];
 };
 
 Collect.DataCleansingChainDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
@@ -49,6 +50,9 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			$this.recordStepSelectPicker.refresh();
 		}
 		var initNewStepSelectPicker = function() {
+			$this.availableNewSteps.sort(function(a, b) {
+				return a.title.localeCompare(b.title);
+			});
 			var select = $this.content.find('select[name="cleansingStep"]');
 			OF.UI.Forms.populateSelect(select, $this.availableNewSteps, "id", "title", true);
 			select.selectpicker();
@@ -81,12 +85,30 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 				return;
 			}
 			var selectedStep = OF.Arrays.findItem($this.availableNewSteps, "id", selectedStepId);
-			$this.item.steps.push(selectedStep);
+			$this.steps.push(selectedStep);
 			
 			OF.Arrays.removeItem($this.availableNewSteps, selectedStep);
 			
-			$this.initStepsDataGrid();
+			$this.refreshStepsDataGrid();
+			
 			initNewStepSelectPicker();
+		}, $this));
+		
+		$this.content.find(".remove-step-btn").click($.proxy(function() {
+			var $this = this;
+			OF.Alerts.confirm("Remove the cleansing step from this chain?", function() {
+				function getSelectedStep() {
+					var selections = $this.stepsDataGrid.getSelections();
+					return selections.length == 0 ? null : selections[0];
+				}
+				var selectedStep = getSelectedStep();
+
+				OF.Arrays.removeItem($this.steps, selectedStep);
+				$this.refreshStepsDataGrid();
+				
+				$this.availableNewSteps.push(selectedStep);
+				initNewStepSelectPicker();
+			})
 		}, $this));
 		
 		$this.initStepsDataGrid();
@@ -96,23 +118,37 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 };
 
 Collect.DataCleansingChainDialogController.prototype.extractJSONItem = function() {
-	var item = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
-//	item.stepIds = new Array();
-	item.steps = new Array();
-	var steps = this.item.steps;
+	var formItem = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
+	formItem.stepIds = new Array();
+	var steps = this.steps;
 	for (var idx = 0; idx < steps.length; idx++) {
 		var step = steps[idx];
-//		item.stepIds.push(step.id);
-		item.steps.push(step);
+		formItem.stepIds.push(step.id);
 	}
-	return item;
+	return formItem;
+};
+
+Collect.DataCleansingChainDialogController.prototype.fillForm = function(callback) {
+	var $this = this;
+	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
+		$this.steps = $this.item.steps.slice(0);
+		$this.refreshStepsDataGrid();
+		callback();
+	});
+};
+
+Collect.DataCleansingChainDialogController.prototype.validateForm = function(callback) {
+	if (this.steps.length == 0) {
+		OF.Alerts.showWarning("Please add at least one step");
+		return false;
+	}
+	return true;
 };
 
 Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = function() {
 	var $this = this;
-	var gridContainer = $(".step-grid");
+	var gridContainer = $this.content.find(".step-grid");
 	gridContainer.bootstrapTable({
-	    data: $this.item == null ? null : $this.item.steps,
 	    clickToSelect: true,
 	    columns: [
           	{field: "selected", title: "", radio: true},
@@ -126,3 +162,8 @@ Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = functio
 	$this.stepsDataGrid = gridContainer.data('bootstrap.table');
 };
 
+Collect.DataCleansingChainDialogController.prototype.refreshStepsDataGrid = function() {
+	var $this = this;
+	var data = $this.steps ? $this.steps : null;
+	$this.stepsDataGrid.load(data);
+};

@@ -27,9 +27,8 @@ Collect.AbstractService.prototype.send = function(url, data, method, onSuccess, 
 	$.ajax({
 		url: $this.contextPath + url,
 		cache: false,
-		dataType:"json",
 		method: method ? method: "GET",
-		data: data
+		data: data ? $this.param(data) : null
 	}).done(function(response) {
 		onSuccess(response);
 	}).error(function() {
@@ -38,4 +37,62 @@ Collect.AbstractService.prototype.send = function(url, data, method, onSuccess, 
 			onError();
 		}
 	});
-}
+};
+
+/**
+ * Serializes a complex object into a parameter query string.
+ * Copied from jQuery param function, the only difference is that nested bean properties
+ * are serialized with a different naming convention (e.g. step[1].id instead of step[1][id] 
+ * as jQuery param function does.
+ */
+Collect.AbstractService.prototype.param = function( a ) {
+	var r20 = /%20/g, 
+		rbracket = /\[\]$/;
+	
+	function buildParams(prefix, obj, add) {
+		if (jQuery.isArray(obj)) {
+			// Serialize array item.
+			jQuery.each(obj, function(i, v) {
+				if (rbracket.test(prefix)) {
+					// Treat each array item as a scalar.
+					add(prefix, v);
+
+				} else {
+					//buildParams(prefix + "[" + (typeof v === "object" || jQuery.isArray(v) ? i : "") + "]", v, add);
+					buildParams(prefix + "[" + i + "]", v, add);
+				}
+			});
+		} else if (obj != null && typeof obj === "object") {
+			// Serialize object item.
+			for ( var name in obj) {
+				buildParams(prefix + "." + name, obj[name], add);
+			}
+		} else {
+			// Serialize scalar item.
+			add(prefix, obj);
+		}
+	};
+	
+    var s = [],
+      add = function( key, value ) {
+        // If value is a function, invoke it and return its value
+        value = jQuery.isFunction( value ) ? value() : value;
+        s[ s.length ] = encodeURIComponent( key ) + "=" + encodeURIComponent( value );
+      };
+
+    // If an array was passed in, assume that it is an array of form elements.
+    if ( jQuery.isArray( a ) || ( a.jquery && !jQuery.isPlainObject( a ) ) ) {
+      // Serialize the form elements
+      jQuery.each( a, function() {
+        add( this.name, this.value );
+      });
+
+    } else {
+      for ( var prefix in a ) {
+        buildParams( prefix, a[ prefix ], add );
+      }
+    }
+
+    // Return the resulting serialization
+    return s.join( "&" ).replace( r20, "+" );
+  }

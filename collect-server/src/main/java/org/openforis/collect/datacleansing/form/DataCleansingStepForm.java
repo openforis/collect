@@ -27,8 +27,10 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 	public DataCleansingStepForm(DataCleansingStep step) {
 		super(step);
 		DataQuery query = step.getQuery();
-		queryTitle = step == null ? null: query.getTitle();
-		queryDescription = step == null ? null: query.getDescription();
+		if (query != null) {
+			queryTitle = step == null ? null: query.getTitle();
+			queryDescription = step == null ? null: query.getDescription();
+		}
 	}
 	
 	public String getQueryTitle() {

@@ -44,7 +44,7 @@ Collect.prototype.checkActiveSurveySelected = function() {
 			collect.surveyService.loadSummaries(function(summaries) {
 				switch(summaries.length) {
 				case 0:
-					alert("Please define a survey and publish it before using the Data Cleansing Toolkit");
+					OF.Alerts.warning("Please define a survey and publish it before using the Data Cleansing Toolkit");
 					break;
 				case 1:
 					var surveySummary = summaries[0];
@@ -120,10 +120,10 @@ Collect.prototype.initGlobalEventHandlers = function() {
 		$this.dataCleansingStepDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataCleansingChainDialogController.DATA_CLEANSING_CHAIN_SAVED, function() {
-		$this.dataCleansingStepDataGrid.refresh();
+		$this.dataCleansingChainDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataCleansingChainDialogController.DATA_CLEANSING_CHAIN_DELETED, function() {
-		$this.dataCleansingStepDataGrid.refresh();
+		$this.dataCleansingChainDataGrid.refresh();
 	});
 };
 
