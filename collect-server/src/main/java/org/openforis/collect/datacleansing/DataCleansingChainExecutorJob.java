@@ -76,10 +76,11 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 					recordManager.updateAttribute(attrib, val);
 				} else {
 					List<String> fieldFixExpressions = step.getFieldFixExpressions();
-					for (int fieldIdx = 0; fieldIdx < fieldFixExpressions.size(); fieldIdx++) {
-						FieldDefinition<?> fieldDefn = attrDefn.getFieldDefinitions().get(fieldIdx);
+					List<FieldDefinition<?>> fieldDefinitions = attrDefn.getFieldDefinitions();
+					for (int fieldIdx = 0; fieldIdx < fieldFixExpressions.size() && fieldIdx < fieldDefinitions.size(); fieldIdx++) {
 						String fieldFixExpression = fieldFixExpressions.get(fieldIdx);
 						if (StringUtils.isNotBlank(fieldFixExpression)) {
+							FieldDefinition<?> fieldDefn = fieldDefinitions.get(fieldIdx);
 							Object value = expressionEvaluator.evaluateFieldValue(attrib.getParent(), attrib, fieldDefn, fieldFixExpression);
 							@SuppressWarnings("unchecked")
 							Field<Object> field = (Field<Object>) attrib.getField(fieldIdx);

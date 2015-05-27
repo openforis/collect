@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = -1971816286;
+	private static final long serialVersionUID = 741971896;
 
 	/**
 	 * The reference instance of <code>collect</code>
@@ -52,8 +52,8 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 			org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_WORK_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_ID_SEQ,
-			org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_VERNACULAR_NAME_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_TAXONOMY_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_VERNACULAR_NAME_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_USER_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_USER_ROLE_ID_SEQ);
 	}
@@ -84,8 +84,8 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 			org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY,
 			org.openforis.collect.persistence.jooq.tables.OfcSurveyWork.OFC_SURVEY_WORK,
 			org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON,
-			org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME,
 			org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY,
+			org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME,
 			org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER,
 			org.openforis.collect.persistence.jooq.tables.OfcUserRole.OFC_USER_ROLE);
 	}

@@ -5,6 +5,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep
 import static org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DATA_QUERY;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jooq.DSLContext;
@@ -13,6 +14,7 @@ import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.StoreQuery;
+import org.jooq.TableField;
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
@@ -28,6 +30,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<DataCleansingStep, DataCleansingStepDao.JooqDSLContext> {
 
+	private static final TableField<?, ?>[] FIELD_FIX_EXPRESSION_FIELDS = new TableField<?, ?>[] {
+		OFC_DATA_CLEANSING_STEP.FIELD_FIX_EXPRESSION1, 
+		OFC_DATA_CLEANSING_STEP.FIELD_FIX_EXPRESSION2,
+		OFC_DATA_CLEANSING_STEP.FIELD_FIX_EXPRESSION3,
+		OFC_DATA_CLEANSING_STEP.FIELD_FIX_EXPRESSION4,
+		OFC_DATA_CLEANSING_STEP.FIELD_FIX_EXPRESSION5,
+		OFC_DATA_CLEANSING_STEP.FIELD_FIX_EXPRESSION6
+	};
+	
 	public DataCleansingStepDao() {
 		super(DataCleansingStepDao.JooqDSLContext.class);
 	}
@@ -77,6 +88,15 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			o.setModifiedDate(r.getValue(OFC_DATA_CLEANSING_STEP.MODIFIED_DATE));
 			o.setQueryId(r.getValue(OFC_DATA_CLEANSING_STEP.QUERY_ID));
 			o.setTitle(r.getValue(OFC_DATA_CLEANSING_STEP.TITLE));
+			
+			List<String> fieldFixExpressions = new ArrayList<String>(FIELD_FIX_EXPRESSION_FIELDS.length);
+			for (int i = 0; i < FIELD_FIX_EXPRESSION_FIELDS.length; i++) {
+				@SuppressWarnings("unchecked")
+				TableField<?, String> tableField = (TableField<?, String>) FIELD_FIX_EXPRESSION_FIELDS[i];
+				String value = r.getValue(tableField);
+				fieldFixExpressions.add(value);
+			}
+			o.setFieldFixExpressions(fieldFixExpressions);
 		}
 		
 		@Override
@@ -88,6 +108,18 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			q.addValue(OFC_DATA_CLEANSING_STEP.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
 			q.addValue(OFC_DATA_CLEANSING_STEP.QUERY_ID, o.getQueryId());
 			q.addValue(OFC_DATA_CLEANSING_STEP.TITLE, o.getTitle());
+			
+			for (int i = 0; i < FIELD_FIX_EXPRESSION_FIELDS.length; i++) {
+				@SuppressWarnings("unchecked")
+				TableField<?, String> tableField = (TableField<?, String>) FIELD_FIX_EXPRESSION_FIELDS[i];
+				String value;
+				if (i <= o.getFieldFixExpressions().size() - 1) {
+					value = o.getFieldFixExpressions().get(i);
+				} else {
+					value = null;
+				}
+				q.addValue(tableField, value);
+			}
 		}
 
 	}

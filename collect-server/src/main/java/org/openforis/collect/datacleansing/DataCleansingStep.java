@@ -3,6 +3,7 @@ package org.openforis.collect.datacleansing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.openforis.idm.metamodel.Survey;
 
@@ -15,6 +16,10 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	
 	private static final long serialVersionUID = 1L;
 	
+	public enum UpdateType {
+		ATTRIBUTE, FIELD
+	}
+	
 	private String title;
 	private String description;
 	private Integer queryId;
@@ -26,6 +31,10 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	public DataCleansingStep(Survey survey) {
 		super(survey);
 		fieldFixExpressions = new ArrayList<String>();
+	}
+	
+	public UpdateType getUpdateType() {
+		return CollectionUtils.isNotEmpty(fieldFixExpressions) ? UpdateType.FIELD: UpdateType.ATTRIBUTE;
 	}
 	
 	public Integer getQueryId() {

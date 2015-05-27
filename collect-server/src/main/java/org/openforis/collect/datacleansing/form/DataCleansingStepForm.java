@@ -1,6 +1,9 @@
 package org.openforis.collect.datacleansing.form;
 
+import java.util.List;
+
 import org.openforis.collect.datacleansing.DataCleansingStep;
+import org.openforis.collect.datacleansing.DataCleansingStep.UpdateType;
 import org.openforis.collect.datacleansing.DataQuery;
 
 /**
@@ -13,12 +16,14 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 	private Integer queryId;
 	private String title;
 	private String fixExpression;
+	private List<String> fieldFixExpressions;
 
 	private String description;
 
 	//calculated members
 	private String queryTitle;
 	private String queryDescription;
+	private UpdateType updateType;
 
 	public DataCleansingStepForm() {
 		super();
@@ -31,6 +36,7 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 			queryTitle = step == null ? null: query.getTitle();
 			queryDescription = step == null ? null: query.getDescription();
 		}
+		updateType = step.getUpdateType();
 	}
 	
 	public String getQueryTitle() {
@@ -71,6 +77,22 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 	
 	public void setFixExpression(String fixExpression) {
 		this.fixExpression = fixExpression;
+	}
+	
+	public List<String> getFieldFixExpressions() {
+		return fieldFixExpressions;
+	}
+	
+	public void setFieldFixExpressions(List<String> fieldFixExpressions) {
+		this.fieldFixExpressions = fieldFixExpressions;
+	}
+	
+	public UpdateType getUpdateType() {
+		return updateType;
+	}
+	
+	public void setUpdateType(UpdateType updateType) {
+		this.updateType = updateType;
 	}
 	
 }

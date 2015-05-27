@@ -82,14 +82,14 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> OFC_TAXON_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_taxon_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>collect.ofc_taxon_vernacular_name_id_seq</code>
-	 */
-	public static final org.jooq.Sequence<java.lang.Long> OFC_TAXON_VERNACULAR_NAME_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_taxon_vernacular_name_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
 	 * The sequence <code>collect.ofc_taxonomy_id_seq</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> OFC_TAXONOMY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_taxonomy_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_taxon_vernacular_name_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_TAXON_VERNACULAR_NAME_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_taxon_vernacular_name_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>collect.ofc_user_id_seq</code>

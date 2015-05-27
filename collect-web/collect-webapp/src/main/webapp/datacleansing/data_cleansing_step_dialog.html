@@ -22,9 +22,21 @@
 						<select class="form-control selectpicker" name="queryId"></select>
 					</div>
 					<div class="form-group">
-				   		<label class="control-label">Update With Value</label>
-						<textarea class="form-control" name="fixExpression" rows="5"></textarea>
+			    		<label class="control-label">Update Type</label>
+			    		<div>
+				    		<input type="radio" id="attributeUpdateTypeRadio" name="updateType" 
+				    			value="ATTRIBUTE" checked="checked"><label for="attributeUpdateTypeRadio">Attribute</label>
+				    		<input type="radio" id="fieldByFieldUpdateTypeRadio" name="updateType" 
+				    		value="FIELD"><label for="fieldByFieldUpdateTypeRadio">Field by field</label>
+			    		</div>
 					</div>
+					<div class="attributeFixExpressionContainer">
+						<div class="form-group">
+					   		<label class="control-label">Update With Value</label>
+							<textarea class="form-control" name="fixExpression" rows="5"></textarea>
+						</div>
+					</div>
+					<div class="fieldFixExpressionsContainer"></div>
 				</form>
 			</div>
 			<div class="modal-footer">

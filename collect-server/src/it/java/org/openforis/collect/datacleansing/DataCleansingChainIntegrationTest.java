@@ -119,7 +119,7 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		step.setTitle("Step 1");
 		step.setDescription("This is the step 1");
 		step.setQuery(query);
-		step.setFieldFixExpressions(Arrays.asList("PIN", "Pinus Sp.")); //set dbh = 20
+		step.setFieldFixExpressions(Arrays.asList("'PIN'", "'Pinus Sp.'")); //set dbh = 20
 		stepManager.save(step);
 		
 		chain.addStep(step);

@@ -42,7 +42,8 @@ public class SurveyViewGenerator {
 				if (def instanceof EntityDefinition) {
 					view = new EntityDefView(id, name, label);
 				} else {
-					view = new AttributeDefView(id, name, label, AttributeType.valueOf((AttributeDefinition) def));
+					AttributeDefinition attrDef = (AttributeDefinition) def;
+					view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames());
 				}
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
@@ -120,14 +121,20 @@ public class SurveyViewGenerator {
 	public static class AttributeDefView extends NodeDefView {
 
 		private AttributeType attributeType;
+		private List<String> fieldNames;
 		
-		public AttributeDefView(int id, String name, String label, AttributeType type) {
+		public AttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames) {
 			super(id, name, label, NodeType.ATTRIBUTE);
 			this.attributeType = type;
+			this.fieldNames = fieldNames;
 		}
 		
 		public AttributeType getAttributeType() {
 			return attributeType;
+		}
+		
+		public List<String> getFieldNames() {
+			return this.fieldNames;
 		}
 	}
 	

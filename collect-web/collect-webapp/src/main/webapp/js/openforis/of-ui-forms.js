@@ -62,28 +62,32 @@ OF.UI.Forms.toJSON = function($form) {
  */
 OF.UI.Forms.fill = function($form, $data) {
 	$.each($data, function(fieldName, value) {
-		var $inputFields = $('[name='+fieldName+']', $form);
-		if ( $inputFields.length == 1 ) {
-			var inputFieldEl = $inputFields[0];
-			switch(OF.UI.Forms.getInputType(inputFieldEl)) {
-				case "hidden":  
-				case "text" :   
-				case "textarea":  
-					inputFieldEl.value = value;   
-					break;
-			}
-		} else {
-			$inputFields.each(function(i, $inputField) {
-				switch(OF.UI.Forms.getInputType($inputField)) {
-					case "radio" : 
-					case "checkbox":
-						var checked = $(this).attr('value') == value;
-						$(this).attr("checked", checked); 
-						break;  
-				}
-			});
-		}
+		OF.UI.Forms.setFieldValue($form, fieldName, value);
     });
+};
+
+OF.UI.Forms.setFieldValue = function($form, fieldName, value) {
+	var $inputFields = $('[name='+fieldName+']', $form);
+	if ( $inputFields.length == 1 ) {
+		var inputFieldEl = $inputFields[0];
+		switch(OF.UI.Forms.getInputType(inputFieldEl)) {
+			case "hidden":  
+			case "text" :   
+			case "textarea":  
+				inputFieldEl.value = value;   
+				break;
+		}
+	} else {
+		$inputFields.each(function(i, $inputField) {
+			switch(OF.UI.Forms.getInputType($inputField)) {
+				case "radio" : 
+				case "checkbox":
+					var checked = $(this).attr('value') == value;
+					$(this).attr("checked", checked); 
+					break;  
+			}
+		});
+	}
 };
 
 /**
