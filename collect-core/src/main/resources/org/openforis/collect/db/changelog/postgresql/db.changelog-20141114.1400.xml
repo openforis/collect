@@ -176,6 +176,9 @@
 					foreignKeyName="ofc_data_cleansing_chain_steps_step_fkey" 
 					references="ofc_data_cleansing_step(id)" />
 			</column>
+			<column name="pos" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
 	    </createTable>
 	    
 	</changeSet>

@@ -94,8 +94,12 @@ OF.Alerts.confirm = function(message, yesHandler, noHandler, title) {
  /**
   * Shows application warning message
   */
-OF.Alerts.showWarning = function( message, hide ) {
+OF.Alerts.warn = function( message, hide ) {
 	OF.Alerts.showMessage("warning", message, hide);
+};
+
+OF.Alerts.showWarning = function( message, hide ) {
+	OF.Alerts.warn(message, hide);
 };
 
  /**

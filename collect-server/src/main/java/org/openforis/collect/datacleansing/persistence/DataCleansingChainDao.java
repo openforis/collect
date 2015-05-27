@@ -48,7 +48,8 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		Select<Record1<Integer>> select = 
 				dsl.select(OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID)
 					.from(OFC_DATA_CLEANSING_CHAIN_STEPS)
-					.where(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID.eq(chain.getId()));
+					.where(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID.eq(chain.getId()))
+					.orderBy(OFC_DATA_CLEANSING_CHAIN_STEPS.POS);
 		List<Integer> ids = select.fetch(OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID);
 		return ids;
 	}
@@ -64,10 +65,12 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		JooqDSLContext dsl = dsl((CollectSurvey) chain.getSurvey());
 		BatchBindStep batch = dsl.batch(dsl.insertInto(OFC_DATA_CLEANSING_CHAIN_STEPS, 
 				OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID, 
-				OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID)
-			.values((Integer) null, (Integer) null));
+				OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID,
+				OFC_DATA_CLEANSING_CHAIN_STEPS.POS)
+			.values((Integer) null, (Integer) null, (Integer) null));
+		int position = 0;
 		for (Integer stepId : stepIds) {
-			batch.bind(chain.getId(), stepId);
+			batch.bind(chain.getId(), stepId, position ++);
 		}
 		batch.execute();
 	}

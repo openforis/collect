@@ -79,12 +79,20 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			});
 		}, $this));
 		
-		$this.content.find(".add-step-btn").click($.proxy(function() {
+		var getSelectedStepToAdd = function() {
 			var selectedStepId = $this.addStepSelectPicker.val();
 			if (selectedStepId == null || selectedStepId == '') {
-				return;
+				return null;
 			}
 			var selectedStep = OF.Arrays.findItem($this.availableNewSteps, "id", selectedStepId);
+			return selectedStep;
+		};
+		
+		$this.content.find(".add-step-btn").click($.proxy(function() {
+			var selectedStep = getSelectedStepToAdd();
+			if (selectedStep == null) {
+				return;
+			}
 			$this.steps.push(selectedStep);
 			
 			OF.Arrays.removeItem($this.availableNewSteps, selectedStep);
@@ -94,21 +102,48 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			initNewStepSelectPicker();
 		}, $this));
 		
+		var getSelectedStep = function () {
+			var selections = $this.stepsDataGrid.getSelections();
+			return selections.length == 0 ? null : selections[0];
+		}
+
 		$this.content.find(".remove-step-btn").click($.proxy(function() {
 			var $this = this;
+			var selectedStep = getSelectedStep();
+			if (selectedStep == null) {
+				return;
+			}
 			OF.Alerts.confirm("Remove the cleansing step from this chain?", function() {
-				function getSelectedStep() {
-					var selections = $this.stepsDataGrid.getSelections();
-					return selections.length == 0 ? null : selections[0];
-				}
-				var selectedStep = getSelectedStep();
-
 				OF.Arrays.removeItem($this.steps, selectedStep);
 				$this.refreshStepsDataGrid();
 				
 				$this.availableNewSteps.push(selectedStep);
 				initNewStepSelectPicker();
 			})
+		}, $this));
+		
+		var moveSelectedStep = function(up) {
+			var $this = this;
+			var selectedStep = getSelectedStep();
+			if (selectedStep == null) {
+				return;
+			}
+			var stepIndex = $this.steps.indexOf(selectedStep);
+			if (up && stepIndex == 0 || ! up && stepIndex == $this.steps.length) {
+				return;
+			}
+			var toIndex = stepIndex + (up ? -1 : 1);
+			OF.Arrays.shiftItem($this.steps, selectedStep, toIndex);
+			
+			$this.refreshStepsDataGrid();
+		};
+		
+		$this.content.find(".move-step-up-btn").click($.proxy(function() {
+			$.proxy(moveSelectedStep, $this)(true);
+		}, $this));
+		
+		$this.content.find(".move-step-down-btn").click($.proxy(function() {
+			$.proxy(moveSelectedStep, $this)(false);
 		}, $this));
 		
 		$this.initStepsDataGrid();
@@ -131,7 +166,7 @@ Collect.DataCleansingChainDialogController.prototype.extractJSONItem = function(
 Collect.DataCleansingChainDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
-		$this.steps = $this.item.steps.slice(0);
+		$this.steps = OF.Arrays.clone($this.item.steps);
 		$this.refreshStepsDataGrid();
 		callback();
 	});

@@ -44,7 +44,7 @@ Collect.prototype.checkActiveSurveySelected = function() {
 			collect.surveyService.loadSummaries(function(summaries) {
 				switch(summaries.length) {
 				case 0:
-					OF.Alerts.warning("Please define a survey and publish it before using the Data Cleansing Toolkit");
+					OF.Alerts.warn("Please define a survey and publish it before using the Data Cleansing Toolkit");
 					break;
 				case 1:
 					var surveySummary = summaries[0];
@@ -276,7 +276,7 @@ Collect.prototype.initDataErrorReportsPanel = function() {
 
 Collect.prototype.initDataErrorTypePanel = function() {
 	var $this = this;
-	var panel = $("#data-errot-type-panel");
+	var panel = $("#data-error-type-panel");
 	
 	panel.find('.new-btn').click($.proxy(function() {
 		var dialogController = new Collect.DataErrorTypeDialogController();

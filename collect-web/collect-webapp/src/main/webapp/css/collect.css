@@ -66,6 +66,10 @@ html, body {
 }
 */
 
+.modal {
+	overflow-y: auto;
+}
+
 .modal.success, 
 .modal.warning, 
 .modal.error {
