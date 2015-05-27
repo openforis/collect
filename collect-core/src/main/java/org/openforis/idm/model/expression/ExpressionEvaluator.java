@@ -6,7 +6,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.Value;
@@ -65,6 +67,17 @@ public class ExpressionEvaluator {
 				V value = defn.createValue(stringValue);
 				return value;
 			}
+		}
+	}
+	
+	public Object evaluateFieldValue(Node<?> context, Node<?> thisNode, FieldDefinition<?> defn, String expression) throws InvalidExpressionException {
+		Object value = evaluateValue(context, thisNode, expression);
+		if ( value == null ) {
+			return null;
+		} else {
+			Field<?> field = (Field<?>) defn.createNode();
+			Object val = field.parseValue(value.toString());
+			return val;
 		}
 	}
 	
