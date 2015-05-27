@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import org.jooq.BatchBindStep;
+import org.jooq.DeleteConditionStep;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -56,9 +57,9 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 	
 	public void deleteStepAssociations(DataCleansingChain chain) {
 		JooqDSLContext dsl = dsl((CollectSurvey) chain.getSurvey());
-		dsl.delete(OFC_DATA_CLEANSING_CHAIN_STEPS)
-			.where(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID.eq(chain.getId()))
-			.execute();
+		DeleteConditionStep<?> query = dsl.delete(OFC_DATA_CLEANSING_CHAIN_STEPS)
+			.where(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID.eq(chain.getId()));
+		query.execute();
 	}
 	
 	public void insertStepAssociations(DataCleansingChain chain, List<Integer> stepIds) {

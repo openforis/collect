@@ -36,25 +36,28 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 	@Override
 	@Transactional
 	public void save(DataCleansingChain chain) {
+		List<Integer> stepIds = new ArrayList<Integer>();
+		for (DataCleansingStep step : chain.getSteps()) {
+			stepIds.add(step.getId());
+		}
 		if (chain.getId() != null) {
 			dao.deleteStepAssociations(chain);
 		}
 		super.save(chain);
 		
-		List<Integer> stepIds = new ArrayList<Integer>();
-		for (DataCleansingStep step : chain.getSteps()) {
-			stepIds.add(step.getId());
-		}
 		dao.insertStepAssociations(chain, stepIds);
+		
+		initializeItem(chain);
 	}
 	
 	@Override
-	protected void initializeItem(DataCleansingChain q) {
-		super.initializeItem(q);
-		List<Integer> stepIds = dao.loadStepIds(q);
+	protected void initializeItem(DataCleansingChain chain) {
+		super.initializeItem(chain);
+		chain.removeAllSteps();
+		List<Integer> stepIds = dao.loadStepIds(chain);
 		for (Integer stepId : stepIds) {
-			DataCleansingStep step = dataCleansingStepManager.loadById((CollectSurvey) q.getSurvey(), stepId);
-			q.addStep(step);
+			DataCleansingStep step = dataCleansingStepManager.loadById((CollectSurvey) chain.getSurvey(), stepId);
+			chain.addStep(step);
 		}
 	}
 	

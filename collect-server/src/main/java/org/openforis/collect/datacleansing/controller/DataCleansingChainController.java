@@ -73,6 +73,7 @@ public class DataCleansingChainController extends AbstractSurveyObjectEditFormCo
 	@Override
 	protected void copyFormIntoItem(DataCleansingChainForm form, DataCleansingChain item) {
 		super.copyFormIntoItem(form, item);
+		item.removeAllSteps();
 		for (Integer stepId : form.getStepIds()) {
 			DataCleansingStep step = new DataCleansingStep(item.getSurvey());
 			step.setId(stepId);
