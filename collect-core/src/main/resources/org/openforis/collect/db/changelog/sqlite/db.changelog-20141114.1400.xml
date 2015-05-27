@@ -127,7 +127,18 @@
 			</column>
 			<column name="modified_date" type="TIMESTAMP" />
 			<column name="fix_expression" type="TEXT">
-				<constraints nullable="false" />
+			</column>
+			<column name="field_fix_expression1" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression2" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression3" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression4" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression5" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression6" type="VARCHAR(512)">
 			</column>
 	    </createTable>
 		

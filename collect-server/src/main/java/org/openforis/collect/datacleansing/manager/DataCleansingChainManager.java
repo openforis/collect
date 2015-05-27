@@ -51,6 +51,12 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 	}
 	
 	@Override
+	public void delete(DataCleansingChain chain) {
+		dao.deleteStepAssociations(chain);
+		super.delete(chain);
+	}
+	
+	@Override
 	protected void initializeItem(DataCleansingChain chain) {
 		super.initializeItem(chain);
 		chain.removeAllSteps();

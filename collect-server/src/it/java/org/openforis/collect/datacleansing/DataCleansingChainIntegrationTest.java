@@ -6,6 +6,7 @@ import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -14,6 +15,7 @@ import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.datacleansing.manager.DataCleansingChainManager;
+import org.openforis.collect.datacleansing.manager.DataCleansingStepManager;
 import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
@@ -23,8 +25,10 @@ import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.TaxonOccurrence;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -36,6 +40,8 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 
 	@Autowired
 	private DataCleansingChainManager chainManager;
+	@Autowired
+	private DataCleansingStepManager stepManager;
 	@Autowired
 	private DataQueryManager dataQueryManager;
 	@Autowired
@@ -77,6 +83,45 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		step.setDescription("This is the step 1");
 		step.setQuery(query);
 		step.setFixExpression("20"); //set dbh = 20
+		chain.addStep(step);
+		
+		chainManager.save(chain);
+		
+		DataCleansingChainExecutorJob job = jobManager.createJob(DataCleansingChainExecutorJob.class);
+		job.setSurvey(survey);
+		job.setChain(chain);
+		job.setRecordStep(Step.ENTRY);
+		jobManager.start(job, false);
+		
+		int finalCount = countResults(query);
+		assertEquals(0, finalCount);
+	}
+
+	@Test
+	public void testUpdateFieldChain() {
+		DataCleansingChain chain = new DataCleansingChain(survey);
+		chain.setTitle("Test chain");
+		chain.setDescription("This is just a test");
+		
+		DataQuery query = new DataQuery(survey);
+		EntityDefinition treeDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree");
+		TaxonAttributeDefinition speciesDef = (TaxonAttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/species");
+		query.setTitle("Find trees with unlisted species");
+		query.setEntityDefinition(treeDef);
+		query.setAttributeDefinition(speciesDef);
+		query.setConditions("species/@code = 'UNL'");
+		dataQueryManager.save(query);
+		
+		int initialCount = countResults(query);
+		assertEquals(1, initialCount);
+		
+		DataCleansingStep step = new DataCleansingStep(survey);
+		step.setTitle("Step 1");
+		step.setDescription("This is the step 1");
+		step.setQuery(query);
+		step.setFieldFixExpressions(Arrays.asList("PIN", "Pinus Sp.")); //set dbh = 20
+		stepManager.save(step);
+		
 		chain.addStep(step);
 		
 		chainManager.save(chain);
@@ -135,10 +180,12 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 					attribute("no", "1"),
 					entity("tree",
 						attribute("tree_no", "1"),
+						attribute("species", new TaxonOccurrence("UNL", "Unlisted species")),
 						attribute("dbh", "20")
 					),
 					entity("tree",
 						attribute("tree_no", "2"),
+						attribute("species", new TaxonOccurrence("ACA", "Acacia Sp.")),
 						attribute("dbh", "30")
 					)
 				)

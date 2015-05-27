@@ -1,5 +1,8 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.openforis.idm.metamodel.Survey;
 
@@ -16,11 +19,13 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	private String description;
 	private Integer queryId;
 	private String fixExpression;
+	private List<String> fieldFixExpressions;
 	
 	private transient DataQuery query;
 	
 	public DataCleansingStep(Survey survey) {
 		super(survey);
+		fieldFixExpressions = new ArrayList<String>();
 	}
 	
 	public Integer getQueryId() {
@@ -62,6 +67,14 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	
 	public void setFixExpression(String fixExpression) {
 		this.fixExpression = fixExpression;
+	}
+	
+	public List<String> getFieldFixExpressions() {
+		return fieldFixExpressions;
+	}
+	
+	public void setFieldFixExpressions(List<String> fieldFixExpressions) {
+		this.fieldFixExpressions = fieldFixExpressions;
 	}
 	
 }
