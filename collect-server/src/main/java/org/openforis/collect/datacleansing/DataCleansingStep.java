@@ -3,7 +3,7 @@ package org.openforis.collect.datacleansing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.openforis.idm.metamodel.Survey;
 
@@ -34,7 +34,7 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	}
 	
 	public UpdateType getUpdateType() {
-		return CollectionUtils.isNotEmpty(fieldFixExpressions) ? UpdateType.FIELD: UpdateType.ATTRIBUTE;
+		return StringUtils.isNotBlank(fixExpression) ? UpdateType.ATTRIBUTE : UpdateType.FIELD;
 	}
 	
 	public Integer getQueryId() {

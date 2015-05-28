@@ -83,6 +83,8 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		step.setDescription("This is the step 1");
 		step.setQuery(query);
 		step.setFixExpression("20"); //set dbh = 20
+		stepManager.save(step);
+		
 		chain.addStep(step);
 		
 		chainManager.save(chain);

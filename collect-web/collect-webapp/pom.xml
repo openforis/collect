@@ -36,6 +36,33 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>maven-replacer-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<basedir>${project.build.directory}</basedir>
+					<includes>
+						<!-- replace the token in this file -->
+						<include>collect/datacleansing/main.html</include>
+					</includes>
+					<regex>false</regex>
+					<replacements>
+						<replacement>
+							<token>PROJECT_VERSION</token>
+							<value>${project.version}</value>
+						</replacement>
+					</replacements>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 

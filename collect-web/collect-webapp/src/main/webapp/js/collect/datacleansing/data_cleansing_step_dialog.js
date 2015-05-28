@@ -94,14 +94,11 @@ Collect.DataCleansingStepDialogController.prototype.updateView = function() {
 
 Collect.DataCleansingStepDialogController.prototype.initFieldFixExpressionFields = function() {
 	var $this = this;
-	var queryId = $this.querySelectPicker.val()
-	var query = OF.Arrays.findItem($this.queries, "id", queryId);
-	var attrDef = collect.activeSurvey.getDefinition(query.attributeDefinitionId);
+	var fieldNames = $this.getAttributeFieldNames();
 
 	var container = $this.content.find(".fieldFixExpressionsContainer");
 	container.empty();
 	
-	var fieldNames = attrDef.fieldNames;
 	for (var fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
 		var fieldName = fieldNames[fieldIdx];
 		var formGroup = $("<div>")
@@ -111,11 +108,26 @@ Collect.DataCleansingStepDialogController.prototype.initFieldFixExpressionFields
 		var textInput = $("<input>");
 		textInput.attr("type", "text");
 		textInput.attr("class", "form-control")
-		textInput.attr("name", "fieldFixExpressions[" + fieldIdx + "]");
+		textInput.attr("name", $this.getFieldFixExpressionInputFieldName(fieldIdx));
+		textInput.focusout($.proxy($this.fieldFocusOutHandler, $this, textInput));
+		
 		formGroup.append(label);
 		formGroup.append(textInput);
 		
 		container.append(formGroup);
+	}
+};
+
+Collect.DataCleansingStepDialogController.prototype.getAttributeFieldNames = function() {
+	var $this = this;
+	var queryId = $this.querySelectPicker.val();
+	if (! queryId || queryId.length == 0) {
+		return null;
+	} else {
+		var query = OF.Arrays.findItem($this.queries, "id", queryId);
+		var attrDef = collect.activeSurvey.getDefinition(query.attributeDefinitionId);
+		var fieldNames = attrDef.fieldNames;
+		return fieldNames;
 	}
 };
 
@@ -125,7 +137,50 @@ Collect.DataCleansingStepDialogController.prototype.fillForm = function(callback
 		$this.querySelectPicker.val($this.item.queryId);
 		
 		$this.initFieldFixExpressionFields();
+		$this.updateView();
+		
+		if ($this.item) {
+			var fixExpressions = $this.item.fieldFixExpressions;
+			for (var fieldIdx = 0; fieldIdx < fixExpressions.length; fieldIdx++) {
+				var fixExpression = fixExpressions[fieldIdx];
+				var inputFieldName = $this.getFieldFixExpressionInputFieldName(fieldIdx, true);
+				OF.UI.Forms.setFieldValue($this.content, inputFieldName, fixExpression);
+			}
+		}
 		
 		callback();
 	});
+};
+
+Collect.DataCleansingStepDialogController.prototype.getFieldFixExpressionInputFieldName = function(fieldIdx, escapeSpecialCharacters) {
+	var result = "fieldFixExpressions";
+	if (escapeSpecialCharacters) {
+		result += "\\";
+	}
+	result += "[" + fieldIdx;
+	if (escapeSpecialCharacters) {
+		result += "\\";
+	}
+	result += "]";
+	return result;
+};
+
+Collect.DataCleansingStepDialogController.prototype.extractJSONItem = function() {
+	var $this = this;
+	var formItem = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
+	var fieldNames = $this.getAttributeFieldNames();
+	switch(formItem.updateType) {
+	case "ATTRIBUTE":
+		if (fieldNames != null) {
+			for (var fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
+				var inputFieldName = $this.getFieldFixExpressionInputFieldName(fieldIdx);
+				delete formItem[inputFieldName];
+			}
+		}
+		break;
+	case "FIELD":
+		formItem.fixExpression = null;
+		break;
+	}
+	return formItem;
 };

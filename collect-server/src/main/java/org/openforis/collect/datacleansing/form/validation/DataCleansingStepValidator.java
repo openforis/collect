@@ -1,6 +1,5 @@
 package org.openforis.collect.datacleansing.form.validation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,12 +43,12 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 			UpdateType updateType = UpdateType.valueOf(updateTypeVal);
 			switch (updateType) {
 			case ATTRIBUTE:
-				if (validateRequiredFields(errors, FIX_EXPRESSION_FIELD) & validateFixExpression(target, errors)) {
+				if (validateRequiredFields(errors, FIX_EXPRESSION_FIELD) && validateFixExpression(target, errors)) {
 					validateUniqueness(target, errors);
 				}
 				break;
 			case FIELD:
-				if (validateRequiredFields(errors, FIELD_FIX_EXPRESSIONS_FIELD) & validateFieldFixExpressions(target, errors)) {
+				if (validateRequiredFields(errors, FIELD_FIX_EXPRESSIONS_FIELD) && validateFieldFixExpressions(target, errors)) {
 					validateUniqueness(target, errors);
 				}
 				break;

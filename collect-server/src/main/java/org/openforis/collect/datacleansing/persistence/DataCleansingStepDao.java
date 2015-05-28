@@ -109,11 +109,12 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			q.addValue(OFC_DATA_CLEANSING_STEP.QUERY_ID, o.getQueryId());
 			q.addValue(OFC_DATA_CLEANSING_STEP.TITLE, o.getTitle());
 			
+			int fieldFixExpressionsSize = o.getFieldFixExpressions() == null ? 0 : o.getFieldFixExpressions().size();
 			for (int i = 0; i < FIELD_FIX_EXPRESSION_FIELDS.length; i++) {
 				@SuppressWarnings("unchecked")
 				TableField<?, String> tableField = (TableField<?, String>) FIELD_FIX_EXPRESSION_FIELDS[i];
 				String value;
-				if (i <= o.getFieldFixExpressions().size() - 1) {
+				if (i <= fieldFixExpressionsSize - 1) {
 					value = o.getFieldFixExpressions().get(i);
 				} else {
 					value = null;

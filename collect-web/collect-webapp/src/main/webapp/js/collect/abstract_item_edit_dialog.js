@@ -99,14 +99,18 @@ Collect.AbstractItemEditDialogController.prototype.initFormElementsChangeListene
 	var $this = this;
 	$this.form.find(".form-control").each(function() {
 		var field = $(this);
-		field.focusout(function() {
-			field.data("visited", true);
-			$this.fieldChangeHandler();
-		});
+		field.focusout($.proxy($this.fieldFocusOutHandler, $this, field));
+		
 		field.change(function() {
-			$this.fieldChangeHandler();
+			$this.fieldChangeHandler(field);
 		});
 	});
+};
+
+Collect.AbstractItemEditDialogController.prototype.fieldFocusOutHandler = function(field) {
+	var $this = this;
+	field.data("visited", true);
+	$this.fieldChangeHandler();
 };
 
 Collect.AbstractItemEditDialogController.prototype.initEventListeners = function() {
@@ -145,7 +149,9 @@ Collect.AbstractItemEditDialogController.prototype.fieldChangeHandler = function
 	if ($this.itemEditService) {
 		var item = $this.extractJSONItem();
 		$this.itemEditService.validate(item, function(response) {
-			if (! response.statusOk) {
+			if (response.errors.length == 0) {
+				OF.UI.Forms.Validation.removeErrors($this.form);
+			} else {
 				OF.UI.Forms.Validation.updateErrors($this.form, response.errors, true);
 			}
 		});
