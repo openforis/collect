@@ -40,7 +40,7 @@ public class ConfigurationManager {
 	private void validateWritableDirectory(String path) {
 		File dir = new File(path);
 		if ( ! ( dir.exists() && dir.isDirectory() && dir.canWrite() ) ) {
-			throw new IllegalArgumentException("Invalid path: it has to be a writable directory");
+			throw new IllegalArgumentException(String.format("Invalid path: %s has to be a writable directory", dir.getAbsolutePath()));
 		}
 	}
 

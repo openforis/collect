@@ -38,6 +38,8 @@ import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
 import org.openforis.idm.metamodel.validation.CustomCheck;
@@ -360,48 +362,55 @@ public class SurveyValidator {
 					"survey.validation.check.distance.error.invalid_max_distance_expression");
 		} else if ( check instanceof PatternCheck ) {
 			String regEx = ((PatternCheck) check).getRegularExpression();
-			if ( StringUtils.isNotBlank(regEx) && ! expressionValidator.validateRegularExpression(regEx) ) {
-				results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.pattern.error.invalid_pattern_expression"));
+			if ( StringUtils.isNotBlank(regEx) ) {
+				ExpressionValidationResult result = expressionValidator.validateRegularExpression(regEx);
+				if (result.isError()) {
+					results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.pattern.error.invalid_pattern_expression", result.getMessage()));
+				}
 			}
 		} else if ( check instanceof UniquenessCheck ) {
 			String expression = ((UniquenessCheck) check).getExpression();
-			if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateUniquenessExpression(node.getParentEntityDefinition(), node, expression) ) {
-				results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.uniqueness.error.invalid_uniqueness_expression"));
+			if ( StringUtils.isNotBlank(expression) ) {
+				ExpressionValidationResult result = expressionValidator.validateUniquenessExpression(node.getParentEntityDefinition(), node, expression);
+				if (result.isError()) {
+					results.add(new SurveyValidationResult(node.getPath(), "survey.validation.check.uniqueness.error.invalid_uniqueness_expression", result.getMessage()));
+				}
 			}
 		}
 		return results;
 	}
 
-	private void addBooleanExpressionValidationResult(
-			List<SurveyValidationResult> results, NodeDefinition node,
+	private void addBooleanExpressionValidationResult(List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
-		if ( StringUtils.isNotBlank(expression) 
-				&& ! (expressionValidator.validateBooleanExpression(node, expression) 
-					&& expressionValidator.validateCircularReferenceAbsence(node, expression))) {
-			results.add(new SurveyValidationResult(node.getPath(), messageKey));
-		}
+		addExpressionValidationResult(results, node, ExpressionType.BOOLEAN, expression, messageKey);
 	}
 
-	private void addValueExpressionValidationResult(
-			List<SurveyValidationResult> results, NodeDefinition node,
+	private void addValueExpressionValidationResult(List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
-		if ( StringUtils.isNotBlank(expression) && 
-				! (expressionValidator.validateValueExpression(node, expression) 
-					&& expressionValidator.validateCircularReferenceAbsence(node, expression))) {
-			results.add(new SurveyValidationResult(node.getPath(), messageKey));
-		}
+		addExpressionValidationResult(results, node, ExpressionType.VALUE, expression, messageKey);
 	}
 
-	private void addSchemaPathExpressionValidationResult(
-			List<SurveyValidationResult> results, NodeDefinition node,
+	private void addSchemaPathExpressionValidationResult(List<SurveyValidationResult> results, NodeDefinition node,
 			String expression, String messageKey) {
-		if ( StringUtils.isNotBlank(expression) && 
-				! (expressionValidator.validateSchemaPathExpression(node, expression) 
-					&& expressionValidator.validateCircularReferenceAbsence(node, expression))) {
-			results.add(new SurveyValidationResult(node.getPath(), messageKey));
-		}
+		addExpressionValidationResult(results, node, ExpressionType.SCHEMA_PATH, expression, messageKey);
 	}
 
+	private void addExpressionValidationResult(
+			List<SurveyValidationResult> results, NodeDefinition node,
+			ExpressionType type, String expression, String messageKey) {
+		if ( StringUtils.isNotBlank(expression) ) {
+			ExpressionValidationResult result = expressionValidator.validateExpression(type, node.getParentDefinition(), node, expression);
+			if (result.isError()) {
+				results.add(new SurveyValidationResult(node.getPath(), messageKey, result.getMessage()));
+			} else {
+				result = expressionValidator.validateCircularReferenceAbsence(node, expression);
+				if (result.isError()) {
+					results.add(new SurveyValidationResult(node.getPath(), messageKey, result.getMessage()));
+				}
+			}
+		}
+	}
+	
 	protected List<SurveyValidationResult> validateParentRelationship(CollectSurvey oldPublishedSurvey, CollectSurvey newSurvey) {
 		final Schema oldSchema = oldPublishedSurvey.getSchema();
 		SurveyValidationNodeDefinitionVisitor visitor = new SurveyValidationNodeDefinitionVisitor() {

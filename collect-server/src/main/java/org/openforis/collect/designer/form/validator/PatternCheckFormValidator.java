@@ -3,8 +3,8 @@
  */
 package org.openforis.collect.designer.form.validator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -23,17 +23,16 @@ public class PatternCheckFormValidator extends CheckFormValidator {
 	}
 	
 	private boolean validateExpression(ValidationContext ctx) {
-		if ( validateRequired(ctx, REGULAR_EXPRESSION_FIELD) ) {
-			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
-			String expression = getValue(ctx, REGULAR_EXPRESSION_FIELD);
-			if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateRegularExpression(expression)) {
-				addInvalidMessage(ctx, REGULAR_EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
-				return false;
-			} else {
-				return true;
-			}
-		} else {
+		if (! validateRequired(ctx, REGULAR_EXPRESSION_FIELD) ) {
 			return false;
 		}
+		ExpressionValidator expressionValidator = getExpressionValidator(ctx);
+		String expression = getValue(ctx, REGULAR_EXPRESSION_FIELD);
+		ExpressionValidationResult result = expressionValidator.validateRegularExpression(expression);
+		if (result.isError()) {
+			addInvalidMessage(ctx, REGULAR_EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY, normalizeMessageArguments(result.getMessage())));
+			return false;
+		}
+		return true;
 	}
 }

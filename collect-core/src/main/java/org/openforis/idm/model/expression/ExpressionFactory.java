@@ -5,10 +5,14 @@ package org.openforis.idm.model.expression;
 
 import static java.util.Arrays.asList;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.jxpath.FunctionLibrary;
@@ -125,6 +129,23 @@ public class ExpressionFactory {
 		}
 		CustomFunctions functions = customFunctionsByNamespace.get(namespace);
 		return functions != null && functions.containsFunction(functionName);
+	}
+	
+	public List<String> getFunctionFullNames() {
+		List<String> result = new ArrayList<String>();
+		result.addAll(CORE_FUNCTION_NAMES);
+		Collections.sort(result);
+		List<String> customFunctionNames = new ArrayList<String>();
+		Set<Entry<String, CustomFunctions>> customFunctionEntries = customFunctionsByNamespace.entrySet();
+		for (Entry<String, CustomFunctions> customFunctionEntry : customFunctionEntries) {
+			Set<String> functionNames = customFunctionEntry.getValue().getFunctionNames();
+			for (String functionName : functionNames) {
+				customFunctionNames.add(customFunctionEntry.getKey() + ":" + functionName);
+			}
+		}
+		Collections.sort(customFunctionNames);
+		result.addAll(customFunctionNames);
+		return result;
 	}
 
 	public void setLookupProvider(LookupProvider lookupProvider) {

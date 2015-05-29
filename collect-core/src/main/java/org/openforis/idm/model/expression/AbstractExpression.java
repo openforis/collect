@@ -79,9 +79,9 @@ public abstract class AbstractExpression {
 			Object object = compiledExpression.getValue(jxPathContext);
 			return object;
 		} catch (IllegalArgumentException e) {
-			throw new InvalidExpressionException("Invalid path " + this.compiledExpression.toString());
+			throw new InvalidExpressionException(e.getMessage(), this.compiledExpression.toString());
 		} catch (JXPathInvalidSyntaxException e) {
-			throw new InvalidExpressionException(e.getMessage());
+			throw new InvalidExpressionException(e.getMessage(), this.compiledExpression.toString());
 		} catch (JXPathNotFoundException e) {
 			return null;
 		}
@@ -114,7 +114,7 @@ public abstract class AbstractExpression {
 			}
 			return list;
 		} catch (IllegalArgumentException e) {
-			throw new InvalidExpressionException("Invalid path " + this.compiledExpression.toString());
+			throw new InvalidExpressionException(e.getMessage(), this.compiledExpression.toString());
 		} catch (JXPathInvalidSyntaxException e) {
 			throw new InvalidExpressionException(e.getMessage());
 		}
@@ -134,11 +134,32 @@ public abstract class AbstractExpression {
 					NodeDefinition childDefinition = ((EntityDefinition) contextNode).getChildDefinition(childName);
 					return childDefinition;
 				} catch (Exception e) {
-					throw new InvalidExpressionException("Invalid path " + compiledExpression.toString());
+					Set<String> childNames = ((EntityDefinition) contextNode).getChildDefinitionNames();
+					String childNamesFormatted = "\t" + joinSplittingInGroups(childNames, 5, ',', "\n\t");
+					throw new InvalidExpressionException(String.format("Node '%s' not found\n - current parent entity: '%s'\n - possible valid values:\n %s", 
+							childName, contextNode.getPath(), childNamesFormatted), compiledExpression.toString());
+				}
+			} else {
+				throw new InvalidExpressionException(String.format("Context node %s is not a Entity and does not allow child definitions", contextNode.getPath()), compiledExpression.toString());
+			}
+		}
+	}
+
+	private String joinSplittingInGroups(Set<String> items, int groupSize,
+			char itemSeparator, String groupSeparator) {
+		StringBuilder childNamesFormattedSB = new StringBuilder();
+		int count = 0;
+		for (String name : items) {
+			childNamesFormattedSB.append(name);
+			count ++;
+			if (count < items.size()) {
+				childNamesFormattedSB.append(itemSeparator);
+				if (count % groupSize == 0) {
+					childNamesFormattedSB.append(groupSeparator);
 				}
 			}
-			throw new InvalidExpressionException("Invalid path " + compiledExpression.toString());
 		}
+		return childNamesFormattedSB.toString();
 	}
 
 	/**
