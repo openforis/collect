@@ -5,6 +5,7 @@ package org.openforis.collect.datacleansing.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
@@ -31,6 +32,12 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 	@Qualifier("dataCleansingChainDao")
 	public void setDao(DataCleansingChainDao dao) {
 		super.setDao(dao);
+	}
+	
+	public Set<DataCleansingChain> loadChainsByStep(DataCleansingStep step) {
+		Set<DataCleansingChain> chains = dao.loadChainsByStep(step);
+		initializeItems(chains);
+		return chains;
 	}
 	
 	@Override

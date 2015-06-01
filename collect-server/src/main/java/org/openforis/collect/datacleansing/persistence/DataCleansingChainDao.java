@@ -5,7 +5,9 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChai
 import static org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChainSteps.OFC_DATA_CLEANSING_CHAIN_STEPS;
 
 import java.sql.Connection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jooq.BatchBindStep;
 import org.jooq.DeleteConditionStep;
@@ -13,8 +15,10 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataCleansingChain;
+import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
@@ -44,6 +48,20 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		return dsl.fromResult(result);
 	}
 
+	public Set<DataCleansingChain> loadChainsByStep(DataCleansingStep step) {
+		JooqDSLContext dsl = dsl((CollectSurvey) step.getSurvey());
+		SelectConditionStep<Record1<Integer>> subselect = dsl.select(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID)
+			.from(OFC_DATA_CLEANSING_CHAIN_STEPS)
+			.where(OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID.eq(step.getId()));
+		
+		Select<OfcDataCleansingChainRecord> select = 
+			dsl.selectFrom(OFC_DATA_CLEANSING_CHAIN)
+				.having(OFC_DATA_CLEANSING_CHAIN.ID.in(subselect));
+		
+		Result<OfcDataCleansingChainRecord> result = select.fetch();
+		return new HashSet<DataCleansingChain>(dsl.fromResult(result));
+	}
+	
 	public List<Integer> loadStepIds(DataCleansingChain chain) {
 		JooqDSLContext dsl = dsl((CollectSurvey) chain.getSurvey());
 		Select<Record1<Integer>> select = 

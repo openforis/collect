@@ -3,6 +3,9 @@
  */
 package org.openforis.collect.datacleansing.manager;
 
+import java.util.Set;
+
+import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.persistence.DataCleansingStepDao;
@@ -21,12 +24,24 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 
 	@Autowired
 	private DataQueryManager dataQueryManager;
+	@Autowired
+	private DataCleansingChainManager dataCleansingChainManager;
 	
 	@Autowired
 	@Qualifier("dataCleansingStepDao")
 	@Override
 	public void setDao(DataCleansingStepDao dao) {
 		super.setDao(dao);
+	}
+	
+	@Override
+	public void delete(DataCleansingStep step) {
+		Set<DataCleansingChain> chainsUsingStep = dataCleansingChainManager.loadChainsByStep(step);
+		if (chainsUsingStep.isEmpty()) {
+			super.delete(step);
+		} else {
+			throw new IllegalStateException(String.format("Cannote delete steo with id %d: some chains are associated to it", step.getId()));
+		}
 	}
 	
 	@Override
