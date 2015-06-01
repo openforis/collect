@@ -181,11 +181,6 @@
     </menupopup>
     
     <menupopup id="singleEntityPopup">
-    	<!-- Add tab -->
-    	<menuitem label="${labels.survey.layout.tab.add}"
-    		image="/assets/images/node_types/tab-small.png"
-    		onClick="@command('addChildTab')" />
-    	<menuseparator />
     	<!-- Add entity -->
      	<menu label="${labels.survey.schema.add_entity}"
  			image="/assets/images/node_types/table-small.png">

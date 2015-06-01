@@ -156,9 +156,8 @@
 							label="${labels.survey.schema.node.required_when}"
 							value="REQUIRED_WHEN" />
 	  				</radiogroup>
-	  				<hlayout spacing="2px">
+	  				<hlayout spacing="2px" visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')">
 						<fieldErrorHandler
-							visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')"
 		  					message="@load(vmsgs['requiredWhenExpression'])">
 		  					<textbox width="250px"
 		  						value="@bind(fx.requiredWhenExpression)"
