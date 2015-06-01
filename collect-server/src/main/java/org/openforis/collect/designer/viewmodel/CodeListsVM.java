@@ -616,8 +616,8 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	}
 	
 	@Override
-	public void commitChanges() {
-		super.commitChanges();
+	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
+		super.commitChanges(binder);
 		dispatchCodeListsUpdatedCommand();
 	}
 
