@@ -17,7 +17,9 @@ import org.apache.commons.jxpath.Variables;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.VariablePointer;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.expression.internal.ModelJXPathCompiledExpression;
@@ -139,10 +141,22 @@ public abstract class AbstractExpression {
 							childName, contextNode.getPath(), contextNode.getPath(), childNamesFormatted);
 					throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
 				}
-			} else {
-				String message = String.format("Context node %s is not a Entity and does not allow child definitions", contextNode.getPath());
-				throw new InvalidExpressionException(message, compiledExpression.toString());
+			} else if (contextNode instanceof AttributeDefinition && childName.startsWith("@")) {
+				String fieldName = childName.substring(1);
+				AttributeDefinition attrDef = (AttributeDefinition) contextNode;
+				FieldDefinition<?> fieldDef = attrDef.getFieldDefinition(fieldName);
+				if (fieldDef != null) {
+					return fieldDef;
+				} else {
+					String message = String.format("Field '%s' not found", fieldName);
+					List<String> fieldNames = attrDef.getFieldNames();
+					String detailedMessage = String.format("Field '%s' not found\n - current attribute: '%s'\n - possible valid values in %s:\n %s", 
+							fieldName, contextNode.getPath(), contextNode.getPath(), fieldNames);
+					throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
+				}
 			}
+			String message = String.format("Cannot find child node %s in context node %s", childName, contextNode.getPath());
+			throw new InvalidExpressionException(message, compiledExpression.toString());
 		}
 	}
 
