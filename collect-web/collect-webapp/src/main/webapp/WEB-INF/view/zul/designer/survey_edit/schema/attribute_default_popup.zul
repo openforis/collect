@@ -33,23 +33,27 @@
           <row>
             <label
               value="${labels.survey.schema.attribute.attribute_default.expression}:" />
-            <fieldErrorHandler message="@load(vmsgs['expression'])">
-              <textbox width="300px" value="@bind(fx.expression)"
-                onChange="@command('applyChanges')"
-                rows="4" />
-              <expressionInfoIcon />
-            </fieldErrorHandler>
+            <hlayout spacing="2px">
+	            <fieldErrorHandler message="@load(vmsgs['expression'])">
+	              <textbox width="300px" value="@bind(fx.expression)"
+	                onChange="@command('applyChanges')"
+	                rows="4" />
+	            </fieldErrorHandler>
+	            <expressionInfoIcon />
+	        </hlayout>
           </row>
           <row>
             <label
               value="${labels.survey.schema.attribute.attribute_default.condition}:" />
-            <fieldErrorHandler message="@load(vmsgs['condition'])">
-              <textbox width="300px" 
-              	value="@bind(fx.condition)"
-                onChange="@command('applyChanges')"
-                rows="4" />
-              <expressionInfoIcon />
-            </fieldErrorHandler>
+            <hlayout spacing="2px">
+	            <fieldErrorHandler message="@load(vmsgs['condition'])">
+	              <textbox width="300px" 
+	              	value="@bind(fx.condition)"
+	                onChange="@command('applyChanges')"
+	                rows="4" />
+	            </fieldErrorHandler>
+	            <expressionInfoIcon />
+	        </hlayout>
           </row>
         </rows>
       </grid>

@@ -106,19 +106,21 @@ public abstract class FormValidator extends BaseValidator {
 	
 	private boolean validateExpression(ValidationContext ctx, ExpressionType type, String field,
 			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef) {
+		if (contextNodeDef == null) {
+			return true;
+		}
 		String epression = (String) getValue(ctx, field);
 		if ( StringUtils.isNotBlank(epression) ) {
 			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
 			ExpressionValidationResult result = expressionValidator.validateExpression(type, contextNodeDef, thisNodeDef, epression);
 			if ( result.isError() ) {
-				addInvalidMessage(ctx, field, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY, normalizeMessageArguments(result.getMessage())));
+				addInvalidMessage(ctx, field, generateErrorMessageLabel(result, INVALID_EXPRESSION_MESSAGE_KEY));
 				return false;
-			} else {
-				result = expressionValidator.validateCircularReferenceAbsence(contextNodeDef, thisNodeDef, epression);
-				if (result.isError()) {
-					addInvalidMessage(ctx, field, Labels.getLabel(CIRCULAR_REFERENCE_IN_EXPRESSION_MESSAGE_KEY, normalizeMessageArguments(result.getMessage())));
-					return false;
-				}
+			}
+			ExpressionValidationResult circularReferenceValidationResult = expressionValidator.validateCircularReferenceAbsence(contextNodeDef, thisNodeDef, epression);
+			if (circularReferenceValidationResult.isError()) {
+				addInvalidMessage(ctx, field, generateErrorMessageLabel(circularReferenceValidationResult, CIRCULAR_REFERENCE_IN_EXPRESSION_MESSAGE_KEY));
+				return false;
 			}
 		}
 		return true;
@@ -161,13 +163,19 @@ public abstract class FormValidator extends BaseValidator {
 		}
 	}
 
-	protected String[] normalizeMessageArguments(String... messages) {
+	protected String[] normalizeLabelArguments(String... messages) {
 		String[] result = new String[messages.length];
 		for (int i = 0; i < messages.length; i++) {
 			String message = messages[i];
 			result[i] = normalizeMessageArgument(message);			
 		}
 		return result;
+	}
+
+	private String generateErrorMessageLabel(ExpressionValidationResult result, String messageKey) {
+		String message = StringUtils.defaultIfBlank(result.getDetailedMessage(), result.getMessage());
+		String messageLabel = Labels.getLabel(messageKey, normalizeLabelArguments(message));
+		return messageLabel;
 	}
 
 	private String normalizeMessageArgument(String message) {

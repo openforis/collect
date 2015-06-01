@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.NodeDefinitionFormObject;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -86,7 +87,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	@Override
-	public void commitChanges() {
+	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
 		formObject.saveTo(editedItem, currentLanguageCode);
 		boolean editingRootEntity = parentEntity == null;
 		boolean wasNewItem = newItem;
@@ -99,6 +100,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 //				schema.addRootEntityDefinition((EntityDefinition) editedItem);
 			} else {
 				parentEntity.addChildDefinition(editedItem);
+				validateForm(binder);
 			}
 			newItem = false;
 		}
@@ -273,5 +275,14 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		}
 		return result;
 	}
-		
+	
+	protected boolean checkNodeAttached() {
+		if (editedItem == null || editedItem.getParentDefinition() == null) {
+			MessageUtil.showWarning("survey.schema.node.error.node_not_yet_attached");
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 }

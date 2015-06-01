@@ -123,10 +123,8 @@ public abstract class AbstractExpression {
 	private NodeDefinition getChildDefinition(NodeDefinition contextNode, NodeDefinition thisNodeDef, String pathSection) throws InvalidExpressionException {
 		if (Path.NORMALIZED_PARENT_FUNCTION.equals(pathSection)) {
 			return contextNode.getParentDefinition();
-		} else if (Path.THIS_VARIABLE.equals(pathSection)) {
+		} else if (Path.THIS_ALIASES.contains(pathSection)) {
 			return thisNodeDef;
-		} else if (Path.THIS_SYMBOL.equals(pathSection)) {
-			return contextNode;
 		} else {
 			String childName = pathSection.replaceAll("\\[.+]", "");
 			if (contextNode instanceof EntityDefinition) {
@@ -134,19 +132,21 @@ public abstract class AbstractExpression {
 					NodeDefinition childDefinition = ((EntityDefinition) contextNode).getChildDefinition(childName);
 					return childDefinition;
 				} catch (Exception e) {
+					String message = String.format("Node '%s' not found", childName);
 					Set<String> childNames = ((EntityDefinition) contextNode).getChildDefinitionNames();
 					String childNamesFormatted = "\t" + joinSplittingInGroups(childNames, 5, ',', "\n\t");
-					throw new InvalidExpressionException(String.format("Node '%s' not found\n - current parent entity: '%s'\n - possible valid values:\n %s", 
-							childName, contextNode.getPath(), childNamesFormatted), compiledExpression.toString());
+					String detailedMessage = String.format("Node '%s' not found\n - current parent entity: '%s'\n - possible valid values in %s:\n %s", 
+							childName, contextNode.getPath(), contextNode.getPath(), childNamesFormatted);
+					throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
 				}
 			} else {
-				throw new InvalidExpressionException(String.format("Context node %s is not a Entity and does not allow child definitions", contextNode.getPath()), compiledExpression.toString());
+				String message = String.format("Context node %s is not a Entity and does not allow child definitions", contextNode.getPath());
+				throw new InvalidExpressionException(message, compiledExpression.toString());
 			}
 		}
 	}
 
-	private String joinSplittingInGroups(Set<String> items, int groupSize,
-			char itemSeparator, String groupSeparator) {
+	private String joinSplittingInGroups(Set<String> items, int groupSize, char itemSeparator, String groupSeparator) {
 		StringBuilder childNamesFormattedSB = new StringBuilder();
 		int count = 0;
 		for (String name : items) {

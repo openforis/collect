@@ -75,8 +75,8 @@ public class TabVM extends SurveyObjectBaseVM<UITab> {
 	}
 	
 	@Override
-	public void commitChanges() {
-		super.commitChanges();
+	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
+		super.commitChanges(binder);
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("parentEntity", parentEntity);
 		args.put("node", editedItem);

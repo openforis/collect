@@ -3,7 +3,6 @@ package org.openforis.idm.metamodel.expression;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.expression.AbstractExpression;
@@ -57,7 +56,7 @@ public class ExpressionValidator {
 			BooleanExpression expr = expressionFactory.createBooleanExpression(expression);
 			return validateSyntax(contextNodeDef, thisNodeDef, expr);
 		} catch (Exception e) {
-			return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+			return createErrorValidationResult(e);
 		}
 	}
 		
@@ -69,10 +68,9 @@ public class ExpressionValidator {
 	public ExpressionValidationResult validateValueExpression(NodeDefinition parentNodeDef, NodeDefinition thisNodeDef, String expression) {
 		try {
 			ValueExpression valueExpression = expressionFactory.createValueExpression(expression);
-			ExpressionValidationResult result = validateSyntax(parentNodeDef, thisNodeDef, valueExpression);
-			return result;
+			return validateSyntax(parentNodeDef, thisNodeDef, valueExpression);
 		} catch (Exception e) {
-			return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+			return createErrorValidationResult(e);
 		}
 	}
 
@@ -90,12 +88,12 @@ public class ExpressionValidator {
 				try {
 					schemaExpression.evaluate(contextNodeDef, thisNodeDef);
 				} catch (Exception e) {
-					return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+					return createErrorValidationResult(e);
 				}
 			}
 			return new ExpressionValidationResult();
 		} catch (Exception e) {
-			return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+			return createErrorValidationResult(e);
 		}
 	}
 
@@ -107,8 +105,8 @@ public class ExpressionValidator {
 		try {
 			Pattern.compile(regEx);
 			return new ExpressionValidationResult();
-		} catch (PatternSyntaxException e) {
-			return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+		} catch (Exception e) {
+			return createErrorValidationResult(e);
 		}
 	}
 
@@ -121,7 +119,7 @@ public class ExpressionValidator {
 			ModelPathExpression pathExpression = expressionFactory.createModelPathExpression(expression);
 			return validateSyntax(parentNodeDef, contextNodeDef, pathExpression);
 		} catch (Exception e) {
-			return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+			return createErrorValidationResult(e);
 		}
 	}
 	
@@ -140,8 +138,12 @@ public class ExpressionValidator {
 		for (String name : names) {
 			valid = valid && isFunctionNameValid(expression, name);
 			if (! valid) {
-				String functionNames = expressionFactory.getFunctionFullNames().toString();
-				return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, String.format("function '%s' does not exist\n Possible function names:\n%s", name, functionNames));
+				String message = String.format("function '%s' does not exist", name);
+				String functionNames = expressionFactory.getFullFunctionNames().toString();
+				String detailedMessage = String.format("function '%s' does not exist\n Possible function names:\n%s", name, functionNames);
+				ExpressionValidationResult validationResult = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
+				validationResult.setDetailedMessage(detailedMessage);
+				return validationResult;
 			}
 		}
 		return new ExpressionValidationResult();
@@ -165,7 +167,7 @@ public class ExpressionValidator {
 			expression.getReferencedNodeDefinitions(context, thisNodeDef);
 			return new ExpressionValidationResult();
 		} catch (InvalidExpressionException e) {
-			return new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+			return createErrorValidationResult(e);
 		}
 	}
 	
@@ -215,6 +217,14 @@ public class ExpressionValidator {
 		return Path.removeThisVariableToken(path);
 	}
 	
+	private ExpressionValidationResult createErrorValidationResult(Exception e) {
+		ExpressionValidationResult result = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+		if (e instanceof InvalidExpressionException) {
+			result.setDetailedMessage(((InvalidExpressionException) e).getDetailedMessage());
+		}
+		return result;
+	}
+
 	public enum ExpressionValidationResultFlag {
 		OK, ERROR
 	}
@@ -224,6 +234,8 @@ public class ExpressionValidator {
 		private ExpressionValidationResultFlag flag;
 		private String message;
 		private String[] messageArgs;
+		private String detailedMessage;
+		private String[] detailedMessageArgs;
 		
 		public ExpressionValidationResult() {
 			this.flag = ExpressionValidationResultFlag.OK;
@@ -255,6 +267,22 @@ public class ExpressionValidator {
 		
 		public String[] getMessageArgs() {
 			return messageArgs;
+		}
+		
+		public String getDetailedMessage() {
+			return detailedMessage;
+		}
+		
+		public void setDetailedMessage(String detailedMessage) {
+			this.detailedMessage = detailedMessage;
+		}
+		
+		public String[] getDetailedMessageArgs() {
+			return detailedMessageArgs;
+		}
+		
+		public void setDetailedMessageArgs(String[] detailedMessageArgs) {
+			this.detailedMessageArgs = detailedMessageArgs;
 		}
 		
 	}

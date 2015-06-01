@@ -30,7 +30,7 @@ public class PatternCheckFormValidator extends CheckFormValidator {
 		String expression = getValue(ctx, REGULAR_EXPRESSION_FIELD);
 		ExpressionValidationResult result = expressionValidator.validateRegularExpression(expression);
 		if (result.isError()) {
-			addInvalidMessage(ctx, REGULAR_EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY, normalizeMessageArguments(result.getMessage())));
+			addInvalidMessage(ctx, REGULAR_EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY, normalizeLabelArguments(result.getDetailedMessage())));
 			return false;
 		}
 		return true;

@@ -627,7 +627,7 @@ public class SchemaVM extends SurveyBaseVM {
 		NodeDefinitionVM<?> vm = ComponentUtil.getViewModel(nodeFormContainer);
 		vm.dispatchValidateCommand(ComponentUtil.getBinder(nodeFormContainer));
 		if ( vm.isCurrentFormValid() ) {
-			vm.commitChanges();
+			vm.commitChanges(binder);
 			closeNodeEditPopUp();
 		} else {
 			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {

@@ -99,8 +99,8 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 	@Override
 	@Command
 	@NotifyChange({"editedItem","selectedItem"})
-	public void applyChanges() {
-		super.applyChanges();
+	public void applyChanges(@ContextParam(ContextType.BINDER) Binder binder) {
+		super.applyChanges(binder);
 		dispatchUnitsUpdatedCommand();
 	}
 

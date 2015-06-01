@@ -32,9 +32,9 @@ public class ExpressionValidatorTest extends AbstractTest {
 		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
 		NodeDefinition regionDefn = clusterDefn.getChildDefinition("region");
 		
-		Assert.assertFalse(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "region"));
-		Assert.assertFalse(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "region_district"));
-		Assert.assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "district"));
+		Assert.assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "region").isError());
+		Assert.assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "region_district").isError());
+		Assert.assertTrue(validator.validateCircularReferenceAbsence(clusterDefn, regionDefn, "district").isOk());
 	}
 	
 }

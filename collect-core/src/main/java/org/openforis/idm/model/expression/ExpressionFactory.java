@@ -131,7 +131,7 @@ public class ExpressionFactory {
 		return functions != null && functions.containsFunction(functionName);
 	}
 	
-	public List<String> getFunctionFullNames() {
+	public List<String> getFullFunctionNames() {
 		List<String> result = new ArrayList<String>();
 		result.addAll(CORE_FUNCTION_NAMES);
 		Collections.sort(result);

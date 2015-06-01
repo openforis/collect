@@ -74,7 +74,7 @@ public class PrecisionVM extends SurveyObjectBaseVM<Precision> {
 	public void commitChanges(@ContextParam(ContextType.BINDER) Binder binder) {
 		dispatchApplyChangesCommand(binder);
 		if ( checkCanLeaveForm() ) {
-			super.commitChanges();
+			super.commitChanges(binder);
 			BindUtils.postGlobalCommand(null, null, APPLY_CHANGES_TO_EDITED_PRECISION_GLOBAL_COMMAND, null);
 		}
 	}
