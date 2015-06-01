@@ -1,7 +1,9 @@
 package org.openforis.collect.metamodel.ui;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
-import static org.openforis.idm.metamodel.TaxonAttributeDefinition.*;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.CODE_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -291,31 +293,24 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public List<UITab> getAssignableTabs(EntityDefinition parentEntity, NodeDefinition contextNode) {
-		boolean contextNodeIsMultipleEntity = contextNode instanceof EntityDefinition && contextNode.isMultiple();
-		Layout contextNodeLayout = contextNode instanceof EntityDefinition ? getLayout((EntityDefinition) contextNode): null;
-		int contextNodeId = contextNode.getId();
-		return getAssignableTabs(parentEntity, contextNodeIsMultipleEntity,
-				contextNodeLayout, contextNodeId);
+		if (parentEntity.isMultiple() || parentEntity.isRoot()) {
+			boolean contextNodeIsFormLayoutMultipleEntity = contextNode instanceof EntityDefinition && contextNode.isMultiple() && 
+					getLayout((EntityDefinition) contextNode) == Layout.FORM;
+			List<UITab> result = new ArrayList<UITab>(getTabsAssignableToChildren(parentEntity));
+			Iterator<UITab> it = result.iterator();
+			while (it.hasNext()) {
+				UITab tab = (UITab) it.next();
+				boolean mainTab = isMainTab(tab);
+				if ( mainTab && contextNodeIsFormLayoutMultipleEntity ) {
+					it.remove();
+				}
+			}
+			return result;
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
-	public List<UITab> getAssignableTabs(EntityDefinition parentEntity,
-			boolean contextNodeIsMultipleEntity, Layout contextNodeLayout,
-			int contextNodeId) {
-		List<UITab> result = new ArrayList<UITab>(getTabsAssignableToChildren(parentEntity));
-		Iterator<UITab> it = result.iterator();
-		while (it.hasNext()) {
-			UITab tab = (UITab) it.next();
-			boolean mainTab = isMainTab(tab);
-			EntityDefinition associatedMultipleEntityForm = getFormLayoutMultipleEntity(tab);
-			if ( mainTab && contextNodeIsMultipleEntity && 
-					contextNodeLayout == Layout.FORM ||
-					associatedMultipleEntityForm != null && associatedMultipleEntityForm.getId() != contextNodeId ) {
-				it.remove();
-			}
-		}
-		return result;
-	}
-	
 	public UITabSet getAssignedTabSet(EntityDefinition entityDefn) {
 		if ( entityDefn.getParentDefinition() == null ) {
 			return getAssignedRootTabSet(entityDefn);

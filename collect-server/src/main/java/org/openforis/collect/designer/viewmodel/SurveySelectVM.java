@@ -452,11 +452,11 @@ public class SurveySelectVM extends BaseVM {
 	
 	protected boolean validateSurveyForCollectMobile(CollectSurvey survey) {
 		SurveyValidationResults validationResults = surveyValidator.validate(survey);
-		if (validationResults.isOk()) {
-			return true;
-		} else {
+		if (validationResults.hasErrors()) {
 			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(validationResults, false);
 			return false;
+		} else {
+			return true;
 		}
 	}
 	

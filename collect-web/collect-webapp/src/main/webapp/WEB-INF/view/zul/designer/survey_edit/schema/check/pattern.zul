@@ -48,11 +48,13 @@
           <fieldErrorHandler message="@load(vmsgs['condition'])">
 	          <label value="${labels.survey.schema.node.check.condition}:" />
 			</fieldErrorHandler>
-          <fieldErrorHandler message="@load(vmsgs['condition'])">
-            <textbox width="450px" multiline="true" rows="4"
-            	value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+			<hlayout spacing="2px">
+	          <fieldErrorHandler message="@load(vmsgs['condition'])">
+	            <textbox width="450px" multiline="true" rows="4"
+	            	value="@bind(fx.condition)" onChange="@command('applyChanges')" />
+	          </fieldErrorHandler>
             <expressionInfoIcon />
-          </fieldErrorHandler>
+			</hlayout>
         </row>
         <row>
             <fieldErrorHandler message="@load(vmsgs['regularExpression'])">

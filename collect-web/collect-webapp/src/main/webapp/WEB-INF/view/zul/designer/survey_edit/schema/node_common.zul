@@ -63,8 +63,8 @@
 		  						value="@bind(fx.relevantExpression)"
 		  						onChange="@command('applyChanges')"
 		  						rows="4" />
-		  					<expressionInfoIcon />
 		  				</fieldErrorHandler>
+	  					<expressionInfoIcon />
 	  					<label value="${labels.survey.schema.node.hide_when_not_relevant}:" />  					
 	  					<checkbox
 	  						checked="@load(fx.hideWhenNotRelevant eq true) @save(fx.hideWhenNotRelevant)"
@@ -117,27 +117,26 @@
 	  				
 	  				<hlayout spacing="15px"
 		  				visible="@load(not vm.rootEntity and not (vm.attribute and fx.calculated) and fx.multiple eq true)">
-		  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
-		  					<label value="${labels.survey.schema.node.min_count}:" />
-		  				</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
-		  					<textbox value="@bind(fx.minCountExpression)"
-		  						multiline="true"
-		  						width="100px"
-		  						onChange="@command('applyChanges')" />
+						<hlayout spacing="2px">
+			  				<fieldErrorHandler message="@load(vmsgs['minCountExpression'])">
+			  					<label value="${labels.survey.schema.node.min_count}:" />
+			  					<textbox value="@bind(fx.minCountExpression)"
+			  						multiline="true"
+			  						width="100px"
+			  						onChange="@command('applyChanges')" />
+			  				</fieldErrorHandler>
 		  					<expressionInfoIcon />
-		  				</fieldErrorHandler>
-		  				
-		  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
-			  				<label value="${labels.survey.schema.node.max_count}:" />
-			  			</fieldErrorHandler>
-		  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
-		  					<textbox value="@bind(fx.maxCountExpression)"
-		  						multiline="true"
-		  						width="100px"
-		  						onChange="@command('applyChanges')" />
+						</hlayout>
+						<hlayout spacing="2px">
+			  				<fieldErrorHandler message="@load(vmsgs['maxCountExpression'])">
+				  				<label value="${labels.survey.schema.node.max_count}:" />
+			  					<textbox value="@bind(fx.maxCountExpression)"
+			  						multiline="true"
+			  						width="100px"
+			  						onChange="@command('applyChanges')" />
+			  				</fieldErrorHandler>
 		  					<expressionInfoIcon />
-		  				</fieldErrorHandler>
+						</hlayout>		  				
 		  			</hlayout>
 		  		</hlayout>
   			</row>
@@ -157,15 +156,16 @@
 							label="${labels.survey.schema.node.required_when}"
 							value="REQUIRED_WHEN" />
 	  				</radiogroup>
-					<fieldErrorHandler
-						visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')"
-	  					message="@load(vmsgs['requiredWhenExpression'])">
-	  					<textbox width="250px"
-	  						value="@bind(fx.requiredWhenExpression)"
-	  						onChange="@command('applyChanges')"
-	  						rows="4" />
+	  				<hlayout spacing="2px" visible="@load(fx.requirenessType eq 'REQUIRED_WHEN')">
+						<fieldErrorHandler
+		  					message="@load(vmsgs['requiredWhenExpression'])">
+		  					<textbox width="250px"
+		  						value="@bind(fx.requiredWhenExpression)"
+		  						onChange="@command('applyChanges')"
+		  						rows="4" />
+		  				</fieldErrorHandler>
 	  					<expressionInfoIcon />
-	  				</fieldErrorHandler>
+	  				</hlayout>
   				</vlayout>
   			</row>
   		</rows>
@@ -475,13 +475,13 @@
     	</vlayout>
     </groupbox>
     
-	<groupbox closable="true" open="false" visible="@load(vm.attribute)"
+	<groupbox closable="true" open="${vm.collectEarthSurvey}" visible="@load(vm.attribute)"
       	sclass="collapsible"
       	mold="3d" width="100%">
       	<attribute name="onOpen"><![CDATA[
       	    collectEarthSectionCaption.setSclass("open-" + self.isOpen());
       	]]></attribute>
-      	<caption id="collectEarthSectionCaption" sclass="open-false">
+      	<caption id="collectEarthSectionCaption" sclass="open-${vm.collectEarthSurvey}">
       		<div align="left">
       			<label value="${labels.survey.schema.attribute.collect_earth.section_title}" />
       		</div>

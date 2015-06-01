@@ -33,11 +33,11 @@
 				sort="auto(name)" />
 			<listheader label="${labels.survey.project_name}"
 				sort="auto(projectName)" />
-			<listheader label="${labels.survey.last_change}" width="90px"
+			<listheader label="${labels.survey.last_change}" width="100px"
 				sort="auto(modifiedDate)" />
 			<listheader label="${labels.survey.target.$}" width="50px"
 				sort="auto(target)" />
-			<listheader label="${labels.survey.modified}" width="70px"
+			<listheader label="${labels.survey.modified}" width="60px"
 				sort="auto(work, published, name)" />
 			<listheader label="${labels.survey.published}" width="70px"
 				sort="auto(published, work, name)" />

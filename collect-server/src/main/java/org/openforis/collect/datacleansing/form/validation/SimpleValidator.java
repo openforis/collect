@@ -5,15 +5,17 @@ package org.openforis.collect.datacleansing.form.validation;
 
 import java.util.Locale;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -72,7 +74,7 @@ public abstract class SimpleValidator<F> implements Validator {
 		String defaultMessage = messageSource.getMessage(errorCode, messageArgs, Locale.ENGLISH);
 		
 		Object value = errors.getFieldValue(field);
-		if (value == null || ! StringUtils.hasText(value.toString())) {
+		if (value == null || StringUtils.isBlank(value.toString())) {
 			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
 			return false;
 		} else {
@@ -83,29 +85,28 @@ public abstract class SimpleValidator<F> implements Validator {
 	protected boolean validateBooleanExpression(Errors errors,
 			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef,
 			String field, String expression) {
-		boolean valid = expressionValidator.validateBooleanExpression(contextNodeDef, thisNodeDef, expression);
-		if (! valid) {
-			String errorCode = "validation.invalid_expression";
-			String[] messageArgs = new String[0];
-			String defaultMessage = messageSource.getMessage(errorCode, new String[0], Locale.ENGLISH);
-			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
-		}
-		return valid;
+		return validateExpression(errors, contextNodeDef, thisNodeDef, field, expression, ExpressionType.BOOLEAN);
 	}
 
 	protected boolean validateValueExpression(Errors errors,
 			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef,
 			String field, String expression) {
-		boolean valid = expressionValidator.validateValueExpression(contextNodeDef, thisNodeDef, expression);
-		if (! valid) {
-			String errorCode = "validation.invalid_expression";
-			String[] messageArgs = new String[0];
-			String defaultMessage = messageSource.getMessage(errorCode, new String[0], Locale.ENGLISH);
-			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
-		}
-		return valid;
+		return validateExpression(errors, contextNodeDef, thisNodeDef, field, expression, ExpressionType.VALUE);
 	}
 	
+	protected boolean validateExpression(Errors errors,
+			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef,
+			String field, String expression, ExpressionType type) {
+		ExpressionValidationResult result = expressionValidator.validateExpression(type, contextNodeDef, thisNodeDef, expression);
+		if (result.isError()) {
+			String errorCode = "validation.invalid_expression";
+			String validationMessage = StringUtils.defaultString(result.getDetailedMessage(), result.getMessage());
+			String[] errorMessageArgs = new String[] {validationMessage};
+			String defaultMessage = messageSource.getMessage(errorCode, errorMessageArgs, Locale.ENGLISH);
+			errors.rejectValue(field, errorCode, new String[0], defaultMessage);
+		}
+		return result.isOk();
+	}
 	protected void rejectDuplicateValue(Errors errors, String field, Object... args) {
 		String errorCode = "validation.duplicate_value";
 		errors.rejectValue(field, errorCode, args, messageSource.getMessage(errorCode, args, Locale.ENGLISH));

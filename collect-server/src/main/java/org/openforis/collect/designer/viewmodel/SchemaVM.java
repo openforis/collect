@@ -627,7 +627,7 @@ public class SchemaVM extends SurveyBaseVM {
 		NodeDefinitionVM<?> vm = ComponentUtil.getViewModel(nodeFormContainer);
 		vm.dispatchValidateCommand(ComponentUtil.getBinder(nodeFormContainer));
 		if ( vm.isCurrentFormValid() ) {
-			vm.commitChanges();
+			vm.commitChanges(binder);
 			closeNodeEditPopUp();
 		} else {
 			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
@@ -1091,21 +1091,12 @@ public class SchemaVM extends SurveyBaseVM {
 			if ( selectedSurveyObject instanceof UITab ) {
 				UITab parentTab = getSelectedNodeParentTab();
 				UIOptions uiOptions = survey.getUIOptions();
-				UITabSet rootTabSet = parentTab.getRootTabSet();
-				UITab mainTab = uiOptions.getMainTab(rootTabSet);
-				if ( parentTab == mainTab ) {
-					MessageUtil.showWarning("survey.schema.cannot_add_nested_tab.unsupported_nested_tabs_in_main_tab");
-					return false;
-				} else if ( uiOptions.isAssociatedWithMultipleEntityForm(parentTab) ) {
+				if ( uiOptions.isAssociatedWithMultipleEntityForm(parentTab) ) {
 					MessageUtil.showWarning("survey.schema.cannot_add_nested_tab.form_entity_assosicated");
 					return false;
-				} else {
-					MessageUtil.showWarning("survey.schema.cannot_add_nested_tab.maximum_depth_reached");
-					return false;
 				}
-			} else {
-				return true;
 			}
+			return true;
 		}
 	}
 
@@ -1290,7 +1281,8 @@ public class SchemaVM extends SurveyBaseVM {
 		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
 			@Override
 			public boolean evaluate(SurveyObject item) {
-				return item instanceof UITab || item instanceof EntityDefinition;
+				return item instanceof UITab || item instanceof EntityDefinition && 
+						! (selectedItem instanceof EntityDefinition && ((NodeDefinition) item).isDescendantOf((EntityDefinition) selectedItem));
 			}
 		};
 		Predicate<SurveyObject> disabledPredicate = new Predicate<SurveyObject>() {
@@ -1298,10 +1290,20 @@ public class SchemaVM extends SurveyBaseVM {
 			public boolean evaluate(SurveyObject item) {
 				if ( item instanceof UITab ) {
 					return ! assignableTabs.contains(item);
-				} else if ( item.equals(parentDefn) || 
-						(! survey.isPublished() && item instanceof EntityDefinition && ! item.equals(selectedItem)) ) {
-					return false;
+				} else if (item instanceof NodeDefinition) {
+					if (item.equals(parentDefn)) {
+						return false;
+					} else if (selectedItem instanceof EntityDefinition && ((NodeDefinition) item).isDescendantOf((EntityDefinition) selectedItem)) {
+						//is descendant of the selected item
+						return true;
+					} else if (! survey.isPublished() && item instanceof EntityDefinition && ! item.equals(selectedItem)) {
+						//allow reparenting node only if survey is not published
+						return false;
+					} else {
+						return true;
+					}
 				} else {
+					//do not allow selecting non-node definitions
 					return true;
 				}
 			}
@@ -1330,7 +1332,12 @@ public class SchemaVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void schemaTreeNodeSelected(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("node") SurveyObject surveyObject) {
 		if ( surveyObject instanceof UITab ) {
-			associateNodeToTab((NodeDefinition) editedNode, (UITab) surveyObject);
+			EntityDefinition futureParentEntityDef = ((UITab) surveyObject).getUIOptions().getParentEntityForAssignedNodes((UITab) surveyObject);
+			NodeDefinition editedNodeDef = (NodeDefinition) editedNode;
+			if (editedNodeDef.getParentDefinition() != futureParentEntityDef) {
+				changeEditedNodeParentEntity((EntityDefinition) surveyObject);
+			}
+			associateNodeToTab(editedNodeDef, (UITab) surveyObject);
 		} else if ( surveyObject instanceof EntityDefinition ) {
 			changeEditedNodeParentEntity((EntityDefinition) surveyObject);
 		}

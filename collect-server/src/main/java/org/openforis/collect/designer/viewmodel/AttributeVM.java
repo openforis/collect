@@ -110,10 +110,12 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	
 	@Command
 	public void addCheck(@BindingParam("checkType") String checkType) {
-		CheckType type = CheckType.valueOf(checkType.toUpperCase());
-		editingNewCheck = true;
-		editedCheck = CheckType.createCheck(type);
-		openCheckEditPopUp();
+		if (checkCanAddCheck()) {
+			CheckType type = CheckType.valueOf(checkType.toUpperCase());
+			editingNewCheck = true;
+			editedCheck = CheckType.createCheck(type);
+			openCheckEditPopUp();
+		}
 	}
 	
 	@Command
@@ -230,6 +232,9 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	}
 
 	protected boolean checkCanInsertAttributeDefault() {
+		if (! checkNodeAttached()) {
+			return false;
+		}
 		if ( attributeDefaults != null && ! attributeDefaults.isEmpty() ) {
 			String lastItemCondition = attributeDefaults.get(attributeDefaults.size() - 1).getCondition(); 
 			if ( StringUtils.isBlank(lastItemCondition) || lastItemCondition.trim().equalsIgnoreCase("true()") ) {
@@ -240,6 +245,10 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		return true;
 	}
 	
+	private boolean checkCanAddCheck() {
+		return checkNodeAttached();
+	}
+
 	@Command
 	public void editAttributeDefault() {
 		editingNewAttributeDefault = false;

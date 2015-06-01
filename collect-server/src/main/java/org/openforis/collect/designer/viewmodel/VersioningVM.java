@@ -20,6 +20,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.VersionableSurveyObject;
 import org.zkoss.bind.BindUtils;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -123,8 +124,8 @@ public class VersioningVM extends SurveyObjectBaseVM<ModelVersion> {
 	@Override
 	@Command
 	@NotifyChange({"editedItem","selectedItem"})
-	public void applyChanges() {
-		super.applyChanges();
+	public void applyChanges(@ContextParam(ContextType.BINDER) Binder binder) {
+		super.applyChanges(binder);
 		dispatchVersionsUpdatedCommand();
 	}
 	

@@ -331,16 +331,16 @@ public class CEComponentHTMLFormatter {
 							.t(itemLabel);
 					
 					String description = getDescription(item);
-					if (StringUtils.isNotBlank(description)) {
-						if (item.hasUploadedImage()) {
-							String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
-							String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"150\">" + StringEscapeUtils.escapeHtml4(description) + "</span>";
-							itemBuilder
-								.a("title", htmlTitle)
-								.a("data-html", "true");
-						} else {
-							itemBuilder.a("title", description);
-						}
+
+					if (item.hasUploadedImage()) {
+						String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
+						String titleText = StringUtils.isBlank(description) ? "" : StringEscapeUtils.escapeHtml4(description);
+						String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"150\">" + titleText + "</span>";
+						itemBuilder
+							.a("title", htmlTitle)
+							.a("data-html", "true");
+					} else if (StringUtils.isNotBlank(description)) {
+						itemBuilder.a("title", description);
 					}
 				}
 			}

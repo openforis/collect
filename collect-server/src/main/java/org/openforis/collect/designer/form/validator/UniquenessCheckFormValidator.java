@@ -5,6 +5,7 @@ package org.openforis.collect.designer.form.validator;
 
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.util.resource.Labels;
 
@@ -27,14 +28,12 @@ public class UniquenessCheckFormValidator extends CheckFormValidator {
 			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
 			NodeDefinition contextNode = getContextNode(ctx);
 			String expression = getValue(ctx, EXPRESSION_FIELD);
-			if ( ! expressionValidator.validateUniquenessExpression(contextNode.getParentDefinition(), contextNode, expression)) {
-				addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
+			ExpressionValidationResult result = expressionValidator.validateUniquenessExpression(contextNode.getParentDefinition(), contextNode, expression);
+			if ( result.isError() ) {
+				addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY, normalizeLabelArguments(result.getDetailedMessage())));
 				return false;
-			} else {
-				return true;
 			}
-		} else {
-			return true;
 		}
+		return true;
 	}
 }

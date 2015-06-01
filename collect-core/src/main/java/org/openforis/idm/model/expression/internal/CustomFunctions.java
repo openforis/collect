@@ -23,6 +23,10 @@ public abstract class CustomFunctions implements Functions {
 		return namespace;
 	}
 
+	public Set<String> getFunctionNames() {
+		return functionNames;
+	}
+	
 	public final boolean containsFunction(String functionName) {
 		return functionNames.contains(functionName);
 	}

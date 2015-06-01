@@ -107,7 +107,7 @@ public class CodeListItemVM extends SurveyObjectBaseVM<CodeListItem> {
 	@Command
 	public void apply(@ContextParam(ContextType.BINDER) Binder binder) {
 		if ( isCurrentFormValid() ) {
-			commitChanges();
+			commitChanges(binder);
 			postClosePopUpCommand(false, imageModified, newImageFileWrapper);
 		} else {
 			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {

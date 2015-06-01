@@ -49,55 +49,66 @@
           <fieldErrorHandler message="@load(vmsgs['condition'])">
 	          <label value="${labels.survey.schema.node.check.condition}:" />
 	      </fieldErrorHandler>
-          <fieldErrorHandler message="@load(vmsgs['condition'])">
-            <textbox width="450px"  multiline="true" rows="4"
-            	value="@bind(fx.condition)" onChange="@command('applyChanges')" />
-            <expressionInfoIcon />
-          </fieldErrorHandler>
+			<hlayout spacing="2px">
+	          <fieldErrorHandler message="@load(vmsgs['condition'])">
+	          	<textbox width="450px" multiline="true" rows="4"
+	          		value="@bind(fx.condition)"
+	          		onChange="@command('applyChanges')" />
+	          </fieldErrorHandler>
+	          <expressionInfoIcon />
+			</hlayout>
         </row>
-        <row>
+        <row visible="@load(not empty fx.sourcePointExpression)">
             <fieldErrorHandler message="@load(vmsgs['sourcePointExpression'])">
 	            <label value="${labels.survey.schema.node.check.distance.sourcePointExpression}:" />
 	        </fieldErrorHandler>
-            <fieldErrorHandler message="@load(vmsgs['sourcePointExpression'])">
-	            <textbox width="450px" multiline="true" rows="4"
-	            	value="@bind(fx.sourcePointExpression)"
-	                onChange="@command('applyChanges')" />
+			<hlayout spacing="2px">
+	            <fieldErrorHandler message="@load(vmsgs['sourcePointExpression'])">
+		            <textbox width="450px" multiline="true" rows="4"
+		            	value="@bind(fx.sourcePointExpression)"
+		                onChange="@command('applyChanges')" />
+	          	</fieldErrorHandler>
 	            <expressionInfoIcon />
-          	</fieldErrorHandler>
+	        </hlayout>
         </row>
         <row>
             <fieldErrorHandler message="@load(vmsgs['destinationPointExpression'])">
 	            <label value="${labels.survey.schema.node.check.distance.destinationPointExpression}:" />
 	        </fieldErrorHandler>
-            <fieldErrorHandler message="@load(vmsgs['destinationPointExpression'])">
-	            <textbox width="450px" multiline="true" rows="4"
-	            	value="@bind(fx.destinationPointExpression)"
-	                onChange="@command('applyChanges')" />
+	        <hlayout spacing="2px">
+	            <fieldErrorHandler message="@load(vmsgs['destinationPointExpression'])">
+		            <textbox width="450px" multiline="true" rows="4"
+		            	value="@bind(fx.destinationPointExpression)"
+		                onChange="@command('applyChanges')" />
+	          	</fieldErrorHandler>
 	           	<expressionInfoIcon />
-          	</fieldErrorHandler>
+	        </hlayout>
         </row>
         <row>
             <fieldErrorHandler message="@load(vmsgs['minDistanceExpression'])">
 	            <label value="${labels.survey.schema.node.check.distance.minDistanceExpression}:" />
 			</fieldErrorHandler>
-            <fieldErrorHandler message="@load(vmsgs['minDistanceExpression'])">
-	            <textbox width="450px" multiline="true" rows="4"
-	            	 value="@bind(fx.minDistanceExpression)"
-	                 onChange="@command('applyChanges')" />
+			<hlayout spacing="2px">
+	            <fieldErrorHandler message="@load(vmsgs['minDistanceExpression'])">
+		            <textbox width="450px" multiline="true" rows="4"
+		            	 value="@bind(fx.minDistanceExpression)"
+		                 onChange="@command('applyChanges')" />
+	          	</fieldErrorHandler>
 	            <expressionInfoIcon />
-          	</fieldErrorHandler>
+	       </hlayout>
         </row>
         <row>
             <fieldErrorHandler message="@load(vmsgs['maxDistanceExpression'])">
 	            <label value="${labels.survey.schema.node.check.distance.maxDistanceExpression}:" />
 			</fieldErrorHandler>
-            <fieldErrorHandler message="@load(vmsgs['maxDistanceExpression'])">
-	            <textbox width="450px" multiline="true" rows="4"
-	            	value="@bind(fx.maxDistanceExpression)"
-	                onChange="@command('applyChanges')" />
+			<hlayout spacing="2px">
+	            <fieldErrorHandler message="@load(vmsgs['maxDistanceExpression'])">
+		            <textbox width="450px" multiline="true" rows="4"
+		            	value="@bind(fx.maxDistanceExpression)"
+		                onChange="@command('applyChanges')" />
+	          	</fieldErrorHandler>
 	            <expressionInfoIcon />
-          	</fieldErrorHandler>
+			</hlayout>
         </row>
       </rows>
     </grid>

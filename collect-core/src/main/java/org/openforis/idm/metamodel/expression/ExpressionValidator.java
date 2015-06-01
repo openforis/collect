@@ -3,9 +3,7 @@ package org.openforis.idm.metamodel.expression;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.expression.AbstractExpression;
 import org.openforis.idm.model.expression.BooleanExpression;
@@ -23,6 +21,14 @@ import org.openforis.idm.path.Path;
 public class ExpressionValidator {
 
 	private static final Pattern FUNCTION_NAME_PATTERN = Pattern.compile("((\\w+):)?([a-zA-Z0-9-_]+)");
+
+	public enum ExpressionType {
+		BOOLEAN, VALUE, SCHEMA_PATH
+	}
+	
+	public enum ExpressionValidationResultFlag {
+		OK, ERROR
+	}
 	
 	private ExpressionFactory expressionFactory;
 
@@ -30,99 +36,123 @@ public class ExpressionValidator {
 		super();
 		this.expressionFactory = expressionFactory;
 	}
-
-	public boolean validateBooleanExpression(NodeDefinition thisNodeDef, String expression) {
+	
+	public ExpressionValidationResult validateExpression(ExpressionType type, NodeDefinition contextNodeDef, 
+			NodeDefinition thisNodeDef, String expression) {
+		switch(type) {
+		case BOOLEAN:
+			return validateBooleanExpression(contextNodeDef, thisNodeDef, expression);
+		case SCHEMA_PATH:
+			return validateSchemaPathExpression(contextNodeDef, thisNodeDef, expression);
+		case VALUE:
+			return validateValueExpression(contextNodeDef, thisNodeDef, expression);
+		default:
+			throw new IllegalArgumentException("Expression type not supported: " + type.name());
+		}
+	}
+	
+	public ExpressionValidationResult validateBooleanExpression(NodeDefinition thisNodeDef, String expression) {
 		return validateBooleanExpression(thisNodeDef.getParentDefinition(), thisNodeDef, expression);
 	}
 	
-	public boolean validateBooleanExpression(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, String expression) {
+	public ExpressionValidationResult validateBooleanExpression(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, String expression) {
 		try {
 			BooleanExpression expr = expressionFactory.createBooleanExpression(expression);
-			return isSyntaxValid(contextNodeDef, thisNodeDef, expr);
+			return validateSyntax(contextNodeDef, thisNodeDef, expr);
 		} catch (Exception e) {
-			return false;
+			return createErrorValidationResult(e);
 		}
 	}
 
-	public boolean validateValueExpression(NodeDefinition thisNodeDef, String expression) {
-		NodeDefinition contextDef = thisNodeDef.getParentDefinition();
-		return validateValueExpression(contextDef, thisNodeDef, expression);
+	public ExpressionValidationResult validateValueExpression(NodeDefinition contextNodeDef, String expression) {
+		return validateValueExpression(contextNodeDef.getParentDefinition(), contextNodeDef, expression);
 	}
 
-	public boolean validateValueExpression(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, String expression) {
+	public ExpressionValidationResult validateValueExpression(NodeDefinition parentNodeDef, NodeDefinition thisNodeDef, String expression) {
 		try {
 			ValueExpression valueExpression = expressionFactory.createValueExpression(expression);
-			return isSyntaxValid(contextNodeDef, thisNodeDef, valueExpression);
+			return validateSyntax(parentNodeDef, thisNodeDef, valueExpression);
 		} catch (Exception e) {
-			return false;
+			return createErrorValidationResult(e);
 		}
 	}
 
-	public boolean validateSchemaPathExpression(NodeDefinition contextNodeDef, String expression) {
+	public ExpressionValidationResult validateSchemaPathExpression(NodeDefinition contextNodeDef, String expression) {
+		return validateSchemaPathExpression(contextNodeDef.getParentDefinition(), contextNodeDef, expression);
+	}
+	
+	public ExpressionValidationResult validateSchemaPathExpression(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, String expression) {
 		try {
-			EntityDefinition parentDefinition = (EntityDefinition) contextNodeDef.getParentDefinition();
 			AbstractExpression pathExpression = expressionFactory.createModelPathExpression(expression);
 			Set<String> referencedPaths = pathExpression.getReferencedPaths();
 			for (String path : referencedPaths) {
 				String normalizedPath = getNormalizedPath(path);
 				SchemaPathExpression schemaExpression = new SchemaPathExpression(normalizedPath);
-				schemaExpression.evaluate(parentDefinition, contextNodeDef);
+				try {
+					schemaExpression.evaluate(contextNodeDef, thisNodeDef);
+				} catch (Exception e) {
+					return createErrorValidationResult(e);
+				}
 			}
-			return true;
+			return new ExpressionValidationResult();
 		} catch (Exception e) {
-			return false;
+			return createErrorValidationResult(e);
 		}
 	}
 
-	public boolean validateUniquenessExpression(NodeDefinition parentNodeDef, NodeDefinition contextNodeDef, String expression) {
-		try {
-			return isModelPathSyntaxValid(parentNodeDef, contextNodeDef, expression);
-		} catch (Exception e) {
-			return false;
-		}
+	public ExpressionValidationResult validateUniquenessExpression(NodeDefinition parentNodeDef, NodeDefinition contextNodeDef, String expression) {
+		return validteModelPathExpression(parentNodeDef, contextNodeDef, expression);
 	}
 
-	public boolean validateRegularExpression(String regEx) {
+	public ExpressionValidationResult validateRegularExpression(String regEx) {
 		try {
 			Pattern.compile(regEx);
-			return true;
-		} catch (PatternSyntaxException e) {
-			return false;
+			return new ExpressionValidationResult();
+		} catch (Exception e) {
+			return createErrorValidationResult(e);
 		}
 	}
 
-	public boolean validateCircularReferenceAbsence(NodeDefinition node, String expression) {
-		return validateCircularReferenceAbsence(node.getParentDefinition(), node, expression);
+	public ExpressionValidationResult validateCircularReferenceAbsence(NodeDefinition thisNodeDef, String expression) {
+		return validateCircularReferenceAbsence(thisNodeDef.getParentDefinition(), thisNodeDef, expression);
 	}
 	
-	private boolean isModelPathSyntaxValid(NodeDefinition parentNodeDef, NodeDefinition contextNodeDef, String expression) {
+	private ExpressionValidationResult validteModelPathExpression(NodeDefinition parentNodeDef, NodeDefinition contextNodeDef, String expression) {
 		try {
 			ModelPathExpression pathExpression = expressionFactory.createModelPathExpression(expression);
-			return isSyntaxValid(parentNodeDef, contextNodeDef, pathExpression);
+			return validateSyntax(parentNodeDef, contextNodeDef, pathExpression);
 		} catch (Exception e) {
-			return false;
+			return createErrorValidationResult(e);
 		}
 	}
 	
-	private boolean isSyntaxValid(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, AbstractExpression expression) {
-		try {
-			verifyFunctionNames(expression);
-			verifyPaths(contextNodeDef, thisNodeDef, expression);
-			return true;
-		} catch (Exception e) {
-			return false;
+	private ExpressionValidationResult validateSyntax(NodeDefinition contextNodeDef, NodeDefinition thisNodeDef, AbstractExpression expression) {
+		ExpressionValidationResult result = validateFunctionNames(expression);
+		if (result.isError()) {
+			return result;
 		}
+		result = validatePaths(contextNodeDef, thisNodeDef, expression);
+		return result;
 	}
 	
-	public void verifyFunctionNames(AbstractExpression expression) throws InvalidExpressionException {
+	public ExpressionValidationResult validateFunctionNames(AbstractExpression expression) {
 		Set<String> names = expression.getFunctionNames();
+		boolean valid = true;
 		for (String name : names) {
-			verifyFunctionName(expression, name);
+			valid = valid && isFunctionNameValid(expression, name);
+			if (! valid) {
+				String message = String.format("function '%s' does not exist", name);
+				String functionNames = expressionFactory.getFullFunctionNames().toString();
+				String detailedMessage = String.format("function '%s' does not exist\n Possible function names:\n%s", name, functionNames);
+				ExpressionValidationResult validationResult = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, message);
+				validationResult.setDetailedMessage(detailedMessage);
+				return validationResult;
+			}
 		}
+		return new ExpressionValidationResult();
 	}
 
-	public void verifyFunctionName(AbstractExpression expression, String name)
-			throws InvalidExpressionException {
+	public boolean isFunctionNameValid(AbstractExpression expression, String name) {
 		Matcher matcher = FUNCTION_NAME_PATTERN.matcher(name);
 		boolean valid;
 		if (matcher.matches()) {
@@ -132,24 +162,21 @@ public class ExpressionValidator {
 		} else {
 			valid = false;
 		}
-		if (!valid) {
-			throw new InvalidExpressionException(String.format("Invalid function '%s' in %s", name, expression));
-		}
+		return valid;
 	}
 
-	/**
-	 * Verifies that the reference paths of this expression matches the contextNodeDefinition
-	 *
-	 * @throws InvalidExpressionException if the path is invalid
-	 */
-	private void verifyPaths(NodeDefinition context, NodeDefinition thisNodeDef, AbstractExpression expression) throws InvalidExpressionException {
-		//try to get referenced node definitions
-		expression.getReferencedNodeDefinitions(context, thisNodeDef);
+	private ExpressionValidationResult validatePaths(NodeDefinition context, NodeDefinition thisNodeDef, AbstractExpression expression) {
+		try {
+			expression.getReferencedNodeDefinitions(context, thisNodeDef);
+			return new ExpressionValidationResult();
+		} catch (InvalidExpressionException e) {
+			return createErrorValidationResult(e);
+		}
 	}
 	
 	//TODO restore this validation
-	public boolean validateCircularReferenceAbsence(NodeDefinition context, NodeDefinition node, String expression) {
-		return true;
+	public ExpressionValidationResult validateCircularReferenceAbsence(NodeDefinition context, NodeDefinition node, String expression) {
+		return new ExpressionValidationResult();
 //		try {
 //			Set<NodeDefinition> referencedNodes = calculateReferencedNodes(context, expression);
 //			if ( referencedNodes.isEmpty() ) {
@@ -191,6 +218,72 @@ public class ExpressionValidator {
 //	
 	private String getNormalizedPath(String path) {
 		return Path.removeThisVariableToken(path);
+	}
+	
+	private ExpressionValidationResult createErrorValidationResult(Exception e) {
+		ExpressionValidationResult result = new ExpressionValidationResult(ExpressionValidationResultFlag.ERROR, e.getMessage());
+		if (e instanceof InvalidExpressionException) {
+			result.setDetailedMessage(((InvalidExpressionException) e).getDetailedMessage());
+		}
+		return result;
+	}
+
+	public static class ExpressionValidationResult {
+		
+		private ExpressionValidationResultFlag flag;
+		private String message;
+		private String[] messageArgs;
+		private String detailedMessage;
+		private String[] detailedMessageArgs;
+		
+		public ExpressionValidationResult() {
+			this.flag = ExpressionValidationResultFlag.OK;
+		}
+		
+		public ExpressionValidationResult(ExpressionValidationResultFlag flag,
+				String message, String... messageArgs) {
+			super();
+			this.flag = flag;
+			this.message = message;
+			this.messageArgs = messageArgs;
+		}
+		
+		public boolean isOk() {
+			return flag == ExpressionValidationResultFlag.OK;
+		}
+		
+		public boolean isError() {
+			return flag == ExpressionValidationResultFlag.ERROR;
+		}
+
+		public ExpressionValidationResultFlag getFlag() {
+			return flag;
+		}
+		
+		public String getMessage() {
+			return message;
+		}
+		
+		public String[] getMessageArgs() {
+			return messageArgs;
+		}
+		
+		public String getDetailedMessage() {
+			return detailedMessage;
+		}
+		
+		public void setDetailedMessage(String detailedMessage) {
+			this.detailedMessage = detailedMessage;
+		}
+		
+		public String[] getDetailedMessageArgs() {
+			return detailedMessageArgs;
+		}
+		
+		public void setDetailedMessageArgs(String[] detailedMessageArgs) {
+			this.detailedMessageArgs = detailedMessageArgs;
+		}
+		
 	}
 
 }

@@ -9,11 +9,12 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
 import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
+import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.zkoss.bind.ValidationContext;
 import org.zkoss.bind.impl.BinderImpl;
 import org.zkoss.bind.sys.ValidationMessages;
@@ -95,50 +96,47 @@ public abstract class FormValidator extends BaseValidator {
 
 	protected boolean validateBooleanExpression(ValidationContext ctx,
 			NodeDefinition contextNode, String field) {
+		return validateExpression(ctx, ExpressionType.BOOLEAN, field, contextNode);
+	}
+
+	private boolean validateExpression(ValidationContext ctx, ExpressionType type, String field,
+			NodeDefinition contextNode) {
+		return validateExpression(ctx, type, field, contextNode.getParentDefinition(), contextNode);
+	}
+	
+	private boolean validateExpression(ValidationContext ctx, ExpressionType type, String field,
+			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef) {
+		if (contextNodeDef == null) {
+			return true;
+		}
 		String epression = (String) getValue(ctx, field);
 		if ( StringUtils.isNotBlank(epression) ) {
 			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
-			if ( ! expressionValidator.validateBooleanExpression(contextNode, epression) ) {
-				addInvalidMessage(ctx, field, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
+			ExpressionValidationResult result = expressionValidator.validateExpression(type, contextNodeDef, thisNodeDef, epression);
+			if ( result.isError() ) {
+				addInvalidMessage(ctx, field, generateErrorMessageLabel(result, INVALID_EXPRESSION_MESSAGE_KEY));
 				return false;
-			} else if ( ! expressionValidator.validateCircularReferenceAbsence(contextNode.getParentDefinition(), contextNode, epression)) {
-				addInvalidMessage(ctx, field, Labels.getLabel(CIRCULAR_REFERENCE_IN_EXPRESSION_MESSAGE_KEY));
+			}
+			ExpressionValidationResult circularReferenceValidationResult = expressionValidator.validateCircularReferenceAbsence(contextNodeDef, thisNodeDef, epression);
+			if (circularReferenceValidationResult.isError()) {
+				addInvalidMessage(ctx, field, generateErrorMessageLabel(circularReferenceValidationResult, CIRCULAR_REFERENCE_IN_EXPRESSION_MESSAGE_KEY));
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition thisNodeDefn, String field) {
-		NodeDefinition contextNodeDefn = thisNodeDefn.getParentDefinition();
-		return validateValueExpression(ctx, contextNodeDefn, thisNodeDefn, field);
+
+	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition contextDefn, String field) {
+		NodeDefinition parentDefn = contextDefn.getParentDefinition();
+		return validateValueExpression(ctx, contextDefn, parentDefn, field);
 	}
 	
-	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition contextNodeDefn, NodeDefinition thisNodeDefn, String field) {
-		String expression = getValue(ctx, field);
-		if ( StringUtils.isNotBlank(expression) ) {
-			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
-			if ( ! expressionValidator.validateValueExpression(contextNodeDefn, thisNodeDefn, expression)) {
-				addInvalidMessage(ctx, field, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
-				return false;
-			} else if ( ! expressionValidator.validateCircularReferenceAbsence(contextNodeDefn, thisNodeDefn, expression)) {
-				addInvalidMessage(ctx, field, Labels.getLabel(CIRCULAR_REFERENCE_IN_EXPRESSION_MESSAGE_KEY));
-				return false;
-			}
-		}
-		return true;
+	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition contextDefn, NodeDefinition parentEntityDefn, String field) {
+		return validateExpression(ctx, ExpressionType.VALUE, field, parentEntityDefn, contextDefn);
 	}
 	
 	protected boolean validatePathExpression(ValidationContext ctx, NodeDefinition contextNode, String fieldName) {
-		String expression = getValue(ctx, fieldName);
-		NodeDefinitionVM<?> vm = (NodeDefinitionVM<?>) getVM(ctx);
-		ExpressionValidator expressionValidator = vm.getExpressionValidator();
-		if ( StringUtils.isNotBlank(expression) && ! expressionValidator.validateSchemaPathExpression(contextNode, expression)) {
-			addInvalidMessage(ctx, fieldName, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY));
-			return false;
-		} else {
-			return true;
-		}
+		return validateExpression(ctx, ExpressionType.SCHEMA_PATH, fieldName, contextNode);
 	}
 	
 	protected boolean validateNameNotReserved(ValidationContext ctx, String nameField, String[] reservedNames) {
@@ -163,6 +161,27 @@ public abstract class FormValidator extends BaseValidator {
 		} else {
 			return false;
 		}
+	}
+
+	protected String[] normalizeLabelArguments(String... messages) {
+		String[] result = new String[messages.length];
+		for (int i = 0; i < messages.length; i++) {
+			String message = messages[i];
+			result[i] = normalizeMessageArgument(message);			
+		}
+		return result;
+	}
+
+	private String generateErrorMessageLabel(ExpressionValidationResult result, String messageKey) {
+		String message = StringUtils.defaultIfBlank(result.getDetailedMessage(), result.getMessage());
+		String messageLabel = Labels.getLabel(messageKey, normalizeLabelArguments(message));
+		return messageLabel;
+	}
+
+	private String normalizeMessageArgument(String message) {
+		String result = StringUtils.replace(message, "\n", "<br>");
+		result = StringUtils.replace(result, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+		return result;
 	}
 
 }
