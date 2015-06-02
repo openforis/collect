@@ -27,6 +27,7 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
+import org.openforis.collect.utils.Strings;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -208,14 +209,15 @@ public abstract class SurveyBaseVM extends BaseVM {
 	private String getValidationMessageSummary() {
 		StringBuilder sb = new StringBuilder();
 		Set<Entry<String,List<String>>> entrySet = currentFormValidationMessages.entrySet();
+		int count = 0;
 		for (Entry<String, List<String>> entry : entrySet) {
 			String key = entry.getKey();
 			String fieldLabel = getFieldLabel(key);
 			List<String> messages = entry.getValue();
-			sb.append(" - ");
+			sb.append(++ count + ") ");
 			sb.append(fieldLabel);
 			sb.append(": ");
-			sb.append(StringUtils.join(messages, "; "));
+			sb.append(Strings.htmlToText(StringUtils.join(messages, "; ")));
 			sb.append("\n");
 		}
 		return sb.toString();
