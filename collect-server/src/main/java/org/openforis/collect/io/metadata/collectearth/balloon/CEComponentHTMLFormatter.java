@@ -40,8 +40,8 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CETabSet tabSet, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder tabSetBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div");
-		tabSetBuilder.a("class", "steps");
+		XMLBuilder tabSetBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div"); //$NON-NLS-1$ //$NON-NLS-2$
+		tabSetBuilder.a("class", "steps"); //$NON-NLS-1$ //$NON-NLS-2$
 		for (CETab tab : tabSet.getTabs()) {
 			createBuilder(tab, tabSetBuilder);
 		}
@@ -49,10 +49,10 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CETab tab, XMLBuilder parentBuilder) throws Exception {
-		parentBuilder.e("h3").t(tab.getLabel());
+		parentBuilder.e("h3").t(tab.getLabel()); //$NON-NLS-1$
 
-		XMLBuilder bodyContentBuilder = parentBuilder.e("section");
-		bodyContentBuilder.a("class", "step");
+		XMLBuilder bodyContentBuilder = parentBuilder.e("section"); //$NON-NLS-1$
+		bodyContentBuilder.a("class", "step"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		for (CEComponent component : tab.getChildren()) {
 			if (component instanceof CEField) {
@@ -67,24 +67,24 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder builder =  parentBuilder.e("fieldset");
+		XMLBuilder builder =  parentBuilder.e("fieldset"); //$NON-NLS-1$
 		String legend = comp.getLabelOrName();
-		builder.e("legend").t(legend);
-		XMLBuilder tableBuilder = builder.e("table").a("class", "table");
-		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr");
+		builder.e("legend").t(legend); //$NON-NLS-1$
+		XMLBuilder tableBuilder = builder.e("table").a("class", "table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr"); //$NON-NLS-1$ //$NON-NLS-2$
 		for (String heading : comp.getHeadings()) {
-			headerBuilder.e("th").t(heading);
+			headerBuilder.e("th").t(heading); //$NON-NLS-1$
 		}
-		XMLBuilder bodyBuilder = tableBuilder.e("tbody");
+		XMLBuilder bodyBuilder = tableBuilder.e("tbody"); //$NON-NLS-1$
 		List<CETableRow> rows = comp.getRows();
 		for (CETableRow row : rows) {
-			XMLBuilder rowBuilder = bodyBuilder.e("tr");
+			XMLBuilder rowBuilder = bodyBuilder.e("tr"); //$NON-NLS-1$
 			for (CEComponent child : row.getChildren()) {
-				XMLBuilder cellBuilder = rowBuilder.e("td");
+				XMLBuilder cellBuilder = rowBuilder.e("td"); //$NON-NLS-1$
 				if (child instanceof CEEnumeratingCodeField) {
 					cellBuilder
-						.e("label")
-							.a("class", "control-label col-sm-4")
+						.e("label") //$NON-NLS-1$
+							.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 							.t(row.getLabelOrName());
 				} else if (child instanceof CEField) {
 					createBuilder((CEField) child, false, cellBuilder);
@@ -95,13 +95,13 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
-		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset");
-		fieldSetBuilder.e("legend").t(comp.getLabelOrName());
+		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset"); //$NON-NLS-1$
+		fieldSetBuilder.e("legend").t(comp.getLabelOrName()); //$NON-NLS-1$
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
 				createBuilder((CEField) child, true, fieldSetBuilder);
 			} else {
-				throw new IllegalArgumentException("Only attribute fields supported inside single entity");
+				throw new IllegalArgumentException("Only attribute fields supported inside single entity"); //$NON-NLS-1$
 			}
 		}
 		return fieldSetBuilder;
@@ -112,18 +112,18 @@ public class CEComponentHTMLFormatter {
 		String elId = comp.getHtmlParameterName();
 		
 		//external form-group container
-		XMLBuilder formGroupBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div");
-		formGroupBuilder.a("class", "form-group");
+		XMLBuilder formGroupBuilder = parentBuilder == null ? XMLBuilder.create("div") : parentBuilder.e("div"); //$NON-NLS-1$ //$NON-NLS-2$
+		formGroupBuilder.a("class", "form-group"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (includeLabel) {
 			//label element
-			formGroupBuilder.e("label")
-				.a("for", elId)
-				.a("class", "control-label col-sm-4")
+			formGroupBuilder.e("label") //$NON-NLS-1$
+				.a("for", elId) //$NON-NLS-1$
+				.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
 				.t(comp.getLabelOrName());
 		}
 		//form control external container (for grid alignment)
-		XMLBuilder formControlContainer = formGroupBuilder.e("div")
-				.a("class", "col-sm-8");
+		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
+				.a("class", "col-sm-8"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		if (comp instanceof CECodeField) {
 			switch(((CEField) comp).getType()) {
@@ -144,28 +144,28 @@ public class CEComponentHTMLFormatter {
 		} else if (comp instanceof CEField) {
 			switch (((CEField) comp).getType()) {
 			case SHORT_TEXT:
-				formControlContainer.e("input")
-					.a("id", elId)
-					.a("name", elId)
-					.a("type", "text")
-					.a("class", "form-control");
+				formControlContainer.e("input") //$NON-NLS-1$
+					.a("id", elId) //$NON-NLS-1$
+					.a("name", elId) //$NON-NLS-1$
+					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "form-control"); //$NON-NLS-1$ //$NON-NLS-2$
 				break;
 			case LONG_TEXT:
-				formControlContainer.e("textarea")
-					.a("id", elId)
-					.a("rows", "3")
-					.a("name", elId)
-					.a("class", "form-control")
-					.t(" ");
+				formControlContainer.e("textarea") //$NON-NLS-1$
+					.a("id", elId) //$NON-NLS-1$
+					.a("rows", "3") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("name", elId) //$NON-NLS-1$
+					.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+					.t(" "); //$NON-NLS-1$
 				break;
 			case INTEGER:
 			case REAL:
-				formControlContainer.e("input")
-					.a("id", elId)
-					.a("name", elId)
-					.a("type", "text")
-					.a("value", "0")
-					.a("class", "form-control numeric");
+				formControlContainer.e("input") //$NON-NLS-1$
+					.a("id", elId) //$NON-NLS-1$
+					.a("name", elId) //$NON-NLS-1$
+					.a("type", "text") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("value", "0") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "form-control numeric"); //$NON-NLS-1$ //$NON-NLS-2$
 				break;
 			case BOOLEAN:
 //				formControlContainer.e("input")
@@ -174,41 +174,41 @@ public class CEComponentHTMLFormatter {
 //					.a("type", "checkbox")
 //					.a("class", "form-control numeric");
 				XMLBuilder container = formControlContainer
-					.e("div")
-					.a("class", "boolean-group")
-					.a("data-toggle", "buttons-radio");
-				container.e("input")
-					.a("id", elId)
-					.a("name", elId)
-					.a("type", "hidden")
-					.a("class", "form-control")
-					.a("data-field-type", comp.getType().name());
-				container.e("button")
-					.a("type", "button")
-					.a("class", "btn btn-info")
-					.a("value", "true")
-					.t("Yes");
-				container.e("button")
-					.a("type", "button")
-					.a("class", "btn btn-info")
-					.a("value", "false")
-					.t("No");
+					.e("div") //$NON-NLS-1$
+					.a("class", "boolean-group") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("data-toggle", "buttons-radio"); //$NON-NLS-1$ //$NON-NLS-2$
+				container.e("input") //$NON-NLS-1$
+					.a("id", elId) //$NON-NLS-1$
+					.a("name", elId) //$NON-NLS-1$
+					.a("type", "hidden") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("data-field-type", comp.getType().name()); //$NON-NLS-1$
+				container.e("button") //$NON-NLS-1$
+					.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("value", "true") //$NON-NLS-1$ //$NON-NLS-2$
+					.t( Messages.getString("CEComponentHTMLFormatter.0", language)); //$NON-NLS-1$
+				container.e("button") //$NON-NLS-1$
+					.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("value", "false") //$NON-NLS-1$ //$NON-NLS-2$
+					.t( Messages.getString("CEComponentHTMLFormatter.88", language)); //$NON-NLS-1$
 				break;
 			case COORDINATE:
 				break;
 			case DATE:
 			case TIME:
-				formControlContainer.e("div")
-					.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker"))
-					.e("input")
-						.a("id", elId)
-						.a("name", elId)
-						.a("class", "form-control")
+				formControlContainer.e("div") //$NON-NLS-1$
+					.a("class", "input-group date " + (((CEField) comp).getType() == CEFieldType.DATE ? "datepicker" : "timepicker")) //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					.e("input") //$NON-NLS-1$
+						.a("id", elId) //$NON-NLS-1$
+						.a("name", elId) //$NON-NLS-1$
+						.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
 						.up()
-					.e("span")
-						.a("class", "input-group-addon")
-						.e("span")
-							.a("class", "glyphicon glyphicon-time")
+					.e("span") //$NON-NLS-1$
+						.a("class", "input-group-addon") //$NON-NLS-1$ //$NON-NLS-2$
+						.e("span") //$NON-NLS-1$
+							.a("class", "glyphicon glyphicon-time") //$NON-NLS-1$ //$NON-NLS-2$
 					;
 				break;
 			default:
@@ -222,14 +222,14 @@ public class CEComponentHTMLFormatter {
 		String elId = comp.getHtmlParameterName();
 		
 		//build select
-		XMLBuilder selectBuilder = builder.e("select")
-			.a("id", elId)
-			.a("name", elId)
-			.a("data-field-type", comp.getType().name())
-			.a("class", "form-control selectboxit show-menu-arrow show-tick")
-			.a("data-width", "75px");
+		XMLBuilder selectBuilder = builder.e("select") //$NON-NLS-1$
+			.a("id", elId) //$NON-NLS-1$
+			.a("name", elId) //$NON-NLS-1$
+			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
+			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
 		if (comp.getParentName() != null) {
-			selectBuilder.a("data-parent-id-field-id", comp.getParentName());
+			selectBuilder.a("data-parent-id-field-id", comp.getParentName()); //$NON-NLS-1$
 		}
 		//add root items, if any
 		Map<Integer, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentId();
@@ -239,21 +239,21 @@ public class CEComponentHTMLFormatter {
 			boolean hasNAoption = false;
 			for (CodeListItem item : rootItems) {
 				if( 
-						item.getCode().equalsIgnoreCase("na") || 
-						item.getCode().equalsIgnoreCase("n/a")
+						item.getCode().equalsIgnoreCase("na") ||  //$NON-NLS-1$
+						item.getCode().equalsIgnoreCase("n/a") //$NON-NLS-1$
 				){
 					hasNAoption=true;	
 				}
 			}
 			
 			if(!hasNAoption){
-				selectBuilder.e("option").a("value", "").t("Nothing selected");
+				selectBuilder.e("option").a("value", "").t(Messages.getString("CEComponentHTMLFormatter.119", language)); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			
 			for (CodeListItem item : rootItems) {
 				String itemLabel = getItemLabel(item);
-				selectBuilder.e("option")
-					.a("value", item.getCode())
+				selectBuilder.e("option") //$NON-NLS-1$
+					.a("value", item.getCode()) //$NON-NLS-1$
 					.t(itemLabel);
 			}
 			
@@ -264,18 +264,18 @@ public class CEComponentHTMLFormatter {
 		String elId = comp.getHtmlParameterName();
 		
 		//build select
-		XMLBuilder selectBuilder = builder.e("select")
-			.a("id", elId)
-			.a("name", elId)
-			.a("data-field-type", comp.getType().name())
-			.a("class", "form-control selectboxit show-menu-arrow show-tick")
-			.a("data-width", "75px");
+		XMLBuilder selectBuilder = builder.e("select") //$NON-NLS-1$
+			.a("id", elId) //$NON-NLS-1$
+			.a("name", elId) //$NON-NLS-1$
+			.a("data-field-type", comp.getType().name()) //$NON-NLS-1$
+			.a("class", "form-control selectboxit show-menu-arrow show-tick") //$NON-NLS-1$ //$NON-NLS-2$
+			.a("data-width", "75px"); //$NON-NLS-1$ //$NON-NLS-2$
 	
 		//add root items, if any
 		for( int i=comp.getFrom(); i<comp.getTo(); i++ ){
-				String item = i+"";
-				selectBuilder.e("option")
-					.a("value", item)
+				String item = i+""; //$NON-NLS-1$
+				selectBuilder.e("option") //$NON-NLS-1$
+					.a("value", item) //$NON-NLS-1$
 					.t(item);
 		}
 	}
@@ -284,63 +284,63 @@ public class CEComponentHTMLFormatter {
 		String elId = comp.getHtmlParameterName();
 		
 		//button groups external container
-		String groupId = elId + "_group";
+		String groupId = elId + "_group"; //$NON-NLS-1$
 		
-		XMLBuilder itemsGroupExternalContainer = formControlContainer.e("div")
-			.a("id", groupId)
-			.a("class", "code-items-group");
+		XMLBuilder itemsGroupExternalContainer = formControlContainer.e("div") //$NON-NLS-1$
+			.a("id", groupId) //$NON-NLS-1$
+			.a("class", "code-items-group"); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		XMLBuilder hiddenInputField = itemsGroupExternalContainer.e("input")
-				.a("id", elId)
-				.a("name", elId)
-				.a("type", "hidden")
-				.a("class", "form-control")
-				.a("data-field-type", comp.getType().name());
+		XMLBuilder hiddenInputField = itemsGroupExternalContainer.e("input") //$NON-NLS-1$
+				.a("id", elId) //$NON-NLS-1$
+				.a("name", elId) //$NON-NLS-1$
+				.a("type", "hidden") //$NON-NLS-1$ //$NON-NLS-2$
+				.a("class", "form-control") //$NON-NLS-1$ //$NON-NLS-2$
+				.a("data-field-type", comp.getType().name()); //$NON-NLS-1$
 		
 		if (comp.getParentName() != null) {
-			hiddenInputField.a("data-parent-id-field-id", comp.getParentName());
+			hiddenInputField.a("data-parent-id-field-id", comp.getParentName()); //$NON-NLS-1$
 		}
 		
 		Map<Integer, List<CodeListItem>> itemsByParentCode = ((CECodeField) comp).getCodeItemsByParentId();
 		for (Entry<Integer, List<CodeListItem>> entry : itemsByParentCode.entrySet()) {
 			//one button group for every list of codes by parent code
 			Integer parentId = entry.getKey();
-			String itemsGroupId = groupId + "_" + parentId;
+			String itemsGroupId = groupId + "_" + parentId; //$NON-NLS-1$
 			XMLBuilder buttonsGroup = itemsGroupExternalContainer
-				.e("div")
-					.a("id", itemsGroupId)
-					.a("class", "code-items")
-					.a("data-toggle", comp.isMultiple() ? "buttons": "buttons-radio");
+				.e("div") //$NON-NLS-1$
+					.a("id", itemsGroupId) //$NON-NLS-1$
+					.a("class", "code-items") //$NON-NLS-1$ //$NON-NLS-2$
+					.a("data-toggle", comp.isMultiple() ? "buttons": "buttons-radio"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			if (parentId != 0) {
 				buttonsGroup
-					.a("data-parent-id", parentId.toString())
-					.a("style", "display: none;");
+					.a("data-parent-id", parentId.toString()) //$NON-NLS-1$
+					.a("style", "display: none;"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			List<CodeListItem> items = entry.getValue();
 			if (items == null || items.isEmpty()) {
-				buttonsGroup.t(" "); //always use close tag
+				buttonsGroup.t(" "); //always use close tag //$NON-NLS-1$
 			} else {
 				for (CodeListItem item : items) {
 					String itemLabel = getItemLabel(item);
 					XMLBuilder itemBuilder = buttonsGroup
-						.e("button")
-							.a("type", "button")
-							.a("class", "btn btn-info code-item")
-							.a("data-code-item-id", String.valueOf(item.getId()))
-							.a("value", item.getCode())
+						.e("button") //$NON-NLS-1$
+							.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
+							.a("class", "btn btn-info code-item") //$NON-NLS-1$ //$NON-NLS-2$
+							.a("data-code-item-id", String.valueOf(item.getId())) //$NON-NLS-1$
+							.a("value", item.getCode()) //$NON-NLS-1$
 							.t(itemLabel);
 					
 					String description = getDescription(item);
 
 					if (item.hasUploadedImage()) {
 						String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
-						String titleText = StringUtils.isBlank(description) ? "" : StringEscapeUtils.escapeHtml4(description);
-						String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"150\">" + titleText + "</span>";
+						String titleText = StringUtils.isBlank(description) ? "" : StringEscapeUtils.escapeHtml4(description); //$NON-NLS-1$
+						String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"150\">" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						itemBuilder
-							.a("title", htmlTitle)
-							.a("data-html", "true");
+							.a("title", htmlTitle) //$NON-NLS-1$
+							.a("data-html", "true"); //$NON-NLS-1$ //$NON-NLS-2$
 					} else if (StringUtils.isNotBlank(description)) {
-						itemBuilder.a("title", description);
+						itemBuilder.a("title", description); //$NON-NLS-1$
 					}
 				}
 			}
@@ -352,10 +352,10 @@ public class CEComponentHTMLFormatter {
 			StringWriter writer = new StringWriter();
 			@SuppressWarnings("serial")
 			Properties outputProperties = new Properties(){{
-				put(javax.xml.transform.OutputKeys.INDENT, "yes");
-				put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
-				put(javax.xml.transform.OutputKeys.STANDALONE, "yes");
-				put(javax.xml.transform.OutputKeys.METHOD, "html");
+				put(javax.xml.transform.OutputKeys.INDENT, "yes"); //$NON-NLS-1$
+				put(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes"); //$NON-NLS-1$
+				put(javax.xml.transform.OutputKeys.STANDALONE, "yes"); //$NON-NLS-1$
+				put(javax.xml.transform.OutputKeys.METHOD, "html"); //$NON-NLS-1$
 			}};
 			builder.toWriter(writer, outputProperties);
 			return writer.toString();
