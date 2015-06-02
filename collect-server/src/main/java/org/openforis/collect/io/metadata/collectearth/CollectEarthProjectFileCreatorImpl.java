@@ -72,7 +72,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		
 		// create placemark
 		File placemarkFile = createPlacemark(survey);
-		File projectProperties = generateProjectProperties(survey);
+		File projectProperties = generateProjectProperties(survey,language);
 		File balloon = generateBalloon(survey, language);
 		File cube = generateCube(survey);
 		File kmlTemplate = generateKMLTemplate(survey);
@@ -126,7 +126,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return file;
 	}
 
-	private File generateProjectProperties(CollectSurvey survey) throws IOException {
+	private File generateProjectProperties(CollectSurvey survey, String language) throws IOException {
 		Properties p = new Properties();
 		p.put("survey_name", survey.getName());
 		p.put("balloon", "${project_path}/balloon.html");
@@ -144,7 +144,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("open_gee_playground", "true");
 		p.put("db_driver", "SQLITE");
 		p.put("use_browser", "chrome");
-		p.put("ui_language", survey.getDefaultLanguage());
+		p.put("ui_language", language);
 
 		File file = File.createTempFile("collect-earth-project", ".properties");
 		FileWriter writer = new FileWriter(file);
