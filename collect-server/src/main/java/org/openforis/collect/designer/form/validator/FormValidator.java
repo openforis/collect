@@ -11,7 +11,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
 import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
-import org.openforis.collect.utils.Strings;
+import org.openforis.commons.lang.Strings;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
@@ -155,25 +155,28 @@ public abstract class FormValidator extends BaseValidator {
 		}
 	}
 
-	protected String[] normalizeLabelArguments(String... messages) {
+	private String generateErrorMessageLabel(ExpressionValidationResult result, String messageKey) {
+		String message = StringUtils.defaultIfBlank(result.getDetailedMessage(), result.getMessage());
+		String messageLabel = getMessage(messageKey, message);
+		return messageLabel;
+	}
+	
+	protected static String getMessage(String messageKey, String... messageArgs) {
+		String[] normalizedArguments = normalizeMessageArguments(messageArgs);
+		return Labels.getLabel(messageKey, normalizedArguments);
+	}
+
+	protected static String[] normalizeMessageArguments(String... messages) {
 		String[] result = new String[messages.length];
 		for (int i = 0; i < messages.length; i++) {
 			String message = messages[i];
-			result[i] = normalizeMessageArgument(message);			
+			result[i] = normalizeMessageArgument(message);
 		}
 		return result;
 	}
 
-	private String generateErrorMessageLabel(ExpressionValidationResult result, String messageKey) {
-		String message = StringUtils.defaultIfBlank(result.getDetailedMessage(), result.getMessage());
-		String messageLabel = Labels.getLabel(messageKey, normalizeLabelArguments(message));
-		return messageLabel;
-	}
-
-	private String normalizeMessageArgument(String message) {
-		String result = StringUtils.replace(message, "\n", "<br>");
-		result = StringUtils.replace(result, "\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
-		return result;
+	protected static String normalizeMessageArgument(String message) {
+		return Strings.textToHtml(message);
 	}
 
 }

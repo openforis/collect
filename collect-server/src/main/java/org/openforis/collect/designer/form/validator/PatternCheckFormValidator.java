@@ -3,10 +3,10 @@
  */
 package org.openforis.collect.designer.form.validator;
 
+import org.openforis.commons.lang.Strings;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionValidationResult;
 import org.zkoss.bind.ValidationContext;
-import org.zkoss.util.resource.Labels;
 
 /**
  * @author S. Ricci
@@ -30,7 +30,8 @@ public class PatternCheckFormValidator extends CheckFormValidator {
 		String expression = getValue(ctx, REGULAR_EXPRESSION_FIELD);
 		ExpressionValidationResult result = expressionValidator.validateRegularExpression(expression);
 		if (result.isError()) {
-			addInvalidMessage(ctx, REGULAR_EXPRESSION_FIELD, Labels.getLabel(INVALID_EXPRESSION_MESSAGE_KEY, normalizeLabelArguments(result.getDetailedMessage())));
+			String message = Strings.firstNotBlank(result.getDetailedMessage(), result.getMessage());
+			addInvalidMessage(ctx, REGULAR_EXPRESSION_FIELD, getMessage(INVALID_EXPRESSION_MESSAGE_KEY, message));
 			return false;
 		}
 		return true;
