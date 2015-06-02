@@ -1,6 +1,6 @@
 package org.openforis.collect.designer.form.validator;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.viewmodel.SurveyBaseVM;
 import org.openforis.collect.designer.viewmodel.SurveyObjectBaseVM;
+import org.openforis.collect.utils.Strings;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
@@ -55,25 +56,16 @@ public abstract class FormValidator extends BaseValidator {
 		ValidationMessages validationMessages = ((BinderImpl) ctx.getBindContext().getBinder()).getValidationMessages();
 		if ( validationMessages != null && validationMessages.getMessages() != null && validationMessages.getMessages().length > 0 ) {
 			for (String fieldName : fieldNames) {
-				List<String> notEmptyMessages = getNotEmptyStrings(validationMessages.getKeyMessages(fieldName));
-				if ( ! notEmptyMessages.isEmpty() ) {
-					validationMessagesByField.put(fieldName, notEmptyMessages);
+				String[] keyMessages = validationMessages.getKeyMessages(fieldName);
+				if (keyMessages != null) {
+					String[] notEmptyMessages = Strings.filterNotBlank(keyMessages);
+					if ( notEmptyMessages.length > 0 ) {
+						validationMessagesByField.put(fieldName, Arrays.asList(notEmptyMessages));
+					}
 				}
 			}
 		}
 		return validationMessagesByField;
-	}
-
-	private List<String> getNotEmptyStrings(String[] messages) {
-		List<String> notEmptyMessages = new ArrayList<String>();
-		if ( messages != null ) {
-			for (String message : messages) {
-				if ( StringUtils.isNotEmpty(message) ) {
-					notEmptyMessages.add(message);
-				}
-			}
-		}
-		return notEmptyMessages;
 	}
 
 	protected abstract void internalValidate(ValidationContext ctx);

@@ -144,7 +144,7 @@ public class UIOptionsTest {
 		assertEquals("cluster", assignedToParentTabSet.getName());
 	}
 	
-	@Test
+//	@Test
 	public void testAssignableTabs() throws InvalidPathException {
 		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
 		NodeDefinition region = clusterDefn.getChildDefinition("region");
@@ -160,7 +160,7 @@ public class UIOptionsTest {
 		assertEquals(6, treeAssignableTabs.size());
 	}
 
-	@Test
+//	@Test
 	public void testAssignableTabsToChildren() throws InvalidPathException {
 		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
 		List<UITab> clusterTabs = uiOptions.getTabsAssignableToChildren(clusterDefn);
@@ -177,7 +177,7 @@ public class UIOptionsTest {
 		assertEquals(6, treeAssignableTabs.size());
 	}
 
-	@Test
+//	@Test
 	public void testDetachedNodeAssignableTabs() throws InvalidPathException {
 		EntityDefinition clusterDefn = schema.getRootEntityDefinition("cluster");
 		EntityDefinition plotDefn = (EntityDefinition) clusterDefn.getChildDefinition("plot");
