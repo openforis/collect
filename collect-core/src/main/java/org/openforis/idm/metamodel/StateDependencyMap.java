@@ -99,7 +99,7 @@ class StateDependencyMap {
 			EntityDefinition dependentParentDef = dependentDef.getParentEntityDefinition();
 			Set<String> sourcePaths = getReferencedPaths(expression);
 			for (String sourcePath : sourcePaths) {
-				String sourceAbsolutePath = Path.getAbsolutePath(sourcePath);
+				String sourceAbsolutePath = toNodeDefinitionAbsolutePath(sourcePath);
 				
 				SchemaPathExpression sourceExpression = new SchemaPathExpression(sourceAbsolutePath);
 
@@ -153,6 +153,20 @@ class StateDependencyMap {
 			}
 		}
 		return commonAncestor;
+	}
+	
+	private String toNodeDefinitionAbsolutePath(String path) {
+		String absolutePath = Path.getAbsolutePath(path);
+		absolutePath = removeAttributeRef(absolutePath);
+		return absolutePath;
+	}
+
+	private String removeAttributeRef(String sourceAbsolutePath) {
+		int lastIndexOfAt = sourceAbsolutePath.lastIndexOf("/@");
+		if (lastIndexOfAt > 0) {
+			sourceAbsolutePath = sourceAbsolutePath.substring(0, lastIndexOfAt);
+		}
+		return sourceAbsolutePath;
 	}
 	
 	private Set<String> getReferencedPaths(String expression) throws InvalidExpressionException {

@@ -32,21 +32,20 @@ public class NodeDefinitionPropertyHandler implements DynamicPropertyHandler {
 
 	@Override
 	public Object getProperty(Object object, String propertyName) {
-		Object property = null;
 		if (propertyName.equals(Path.NORMALIZED_PARENT_FUNCTION)) {
 			NodeDefinition nodeDefinition = (NodeDefinition) object;
-			property = nodeDefinition.getParentDefinition();
+			return nodeDefinition.getParentDefinition();
 		} else if (object instanceof EntityDefinition) {
 			EntityDefinition entityDefinition = (EntityDefinition) object;
-			property = entityDefinition.getChildDefinition(propertyName);
+			return entityDefinition.getChildDefinition(propertyName);
 		} else if (object instanceof AttributeDefinition) {
 			try {
-				property = PropertyUtils.getProperty(object, propertyName);
+				return PropertyUtils.getProperty(object, propertyName);
 			} catch (Exception e) {
 				return null;
 			}
 		}
-		return property;
+		return null;
 	}
 
 	@Override
