@@ -7,10 +7,14 @@ OF.UI.Forms.Validation = function() {};
  */
 OF.UI.Forms.Validation.removeErrors = function ($form) {
 	$form.find('.form-group').each(function() {
-		var $this = $(this);
-		$this.removeClass('has-error');
-		if ($this.data("tooltip")) {
-			$this.tooltip('destroy');
+		var formGroup = $(this);
+		formGroup.removeClass('has-error');
+		var oldTooltip = formGroup.data("tooltip");
+		if (oldTooltip == null) {
+			oldTooltip = formGroup.data("bs.tooltip");
+		}
+		if (oldTooltip) {
+			formGroup.tooltip('destroy');
 		}
 	});
 };
