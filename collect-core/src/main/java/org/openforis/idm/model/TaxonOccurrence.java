@@ -3,6 +3,7 @@ package org.openforis.idm.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
@@ -107,7 +108,11 @@ public final class TaxonOccurrence extends AbstractValue {
 
 	@Override
 	public String toPrettyFormatString() {
-		return code;
+		if (StringUtils.isNotBlank(vernacularName)) {
+			return String.format("%s - %s - %s[%s]", code, scientificName, vernacularName, languageCode);
+		} else {
+			return String.format("%s - %s", code, scientificName);
+		}
 	}
 	
 	@Override
