@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.jxpath.DynamicPropertyHandler;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
+import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.path.Path;
 
@@ -26,7 +28,7 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 		} else if (object instanceof Entity) {
 			return extractNonEmptyChildren((Entity) object, propertyName);
 		} else if ( object instanceof Attribute ) {
-			return object;
+			return getAttributeProperty((Attribute<?, ?>) object, propertyName);
 		} else {
 			return null;
 		}
@@ -50,6 +52,20 @@ public class NodePropertyHandler implements DynamicPropertyHandler {
 	@Override
 	public void setProperty(Object object, String propertyName, Object value) {
 		throw new UnsupportedOperationException("setProperty() not supported in " + this.getClass().getSimpleName());
+	}
+
+	private Object getAttributeProperty(Attribute<?, ?> attr, String propertyName) {
+		Field<?> field = attr.getField(propertyName);
+		if (field == null) {
+			try {
+				Object prop = PropertyUtils.getProperty(attr, propertyName);
+				return prop;
+			} catch (Exception e) {
+				return null;
+			}
+		} else {
+			return field.getValue();
+		}
 	}
 
 	private Object extractNonEmptyChildren(Entity entity, String childName) {
