@@ -34,7 +34,7 @@ public class DataCleansingChainManager extends AbstractSurveyObjectManager<DataC
 		super.setDao(dao);
 	}
 	
-	public Set<DataCleansingChain> loadChainsByStep(DataCleansingStep step) {
+	public Set<DataCleansingChain> loadByStep(DataCleansingStep step) {
 		Set<DataCleansingChain> chains = dao.loadChainsByStep(step);
 		initializeItems(chains);
 		return chains;

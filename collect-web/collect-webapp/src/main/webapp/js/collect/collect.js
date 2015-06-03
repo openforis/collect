@@ -115,9 +115,11 @@ Collect.prototype.initGlobalEventHandlers = function() {
 	});
 	EventBus.addEventListener(Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_SAVED, function() {
 		$this.dataCleansingStepDataGrid.refresh();
+		$this.dataCleansingChainDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_DELETED, function() {
 		$this.dataCleansingStepDataGrid.refresh();
+		$this.dataCleansingChainDataGrid.refresh();
 	});
 	EventBus.addEventListener(Collect.DataCleansingChainDialogController.DATA_CLEANSING_CHAIN_SAVED, function() {
 		$this.dataCleansingChainDataGrid.refresh();
@@ -365,8 +367,8 @@ Collect.prototype.initDataQueryGrid = function() {
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title"},
-			{field: "creationDate", title: "Creation Date"},
-			{field: "modifiedDate", title: "Modified Date"}
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});
 	$this.dataQueryDataGrid = gridContainer.data('bootstrap.table');
@@ -385,8 +387,8 @@ Collect.prototype.initDataCleansingStepGrid = function() {
 			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title"},
 			{field: "queryTitle", title: "Query Title"},
-			{field: "creationDate", title: "Creation Date"},
-			{field: "modifiedDate", title: "Modified Date"}
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});
 	$this.dataCleansingStepDataGrid = gridContainer.data('bootstrap.table');
@@ -404,8 +406,8 @@ Collect.prototype.initDataCleansingChainGrid = function() {
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title"},
-			{field: "creationDate", title: "Creation Date"},
-			{field: "modifiedDate", title: "Modified Date"}
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});
 	$this.dataCleansingChainDataGrid = gridContainer.data('bootstrap.table');
@@ -444,8 +446,8 @@ Collect.prototype.initDataErrorQueryGrid = function() {
 			{field: "typeCode", title: "Error Type"},
 			{field: "queryTitle", title: "Query Title"},
 			{field: "queryDescription", title: "Query Description"},
-			{field: "creationDate", title: "Creation Date"},
-			{field: "modifiedDate", title: "Modified Date"}
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});
 	$this.dataErrorQueryDataGrid = gridContainer.data('bootstrap.table');
@@ -464,7 +466,7 @@ Collect.prototype.initDataErrorReportGrid = function() {
 			{field: "id", title: "Id", visible: false},
 			{field: "queryTitle", title: "Query"},
 			{field: "typeCode", title: "Error Type"},
-			{field: "creationDate", title: "Date"}
+			{field: "creationDate", title: "Date", formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});
 	$this.dataErrorReportDataGrid = gridContainer.data('bootstrap.table');

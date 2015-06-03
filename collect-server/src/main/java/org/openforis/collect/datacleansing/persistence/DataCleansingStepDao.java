@@ -16,6 +16,7 @@ import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.jooq.TableField;
 import org.openforis.collect.datacleansing.DataCleansingStep;
+import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
@@ -57,6 +58,16 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 		Select<OfcDataCleansingStepRecord> select = 
 			dsl.selectFrom(OFC_DATA_CLEANSING_STEP)
 				.where(OFC_DATA_CLEANSING_STEP.QUERY_ID.in(createQueryIdsSelect(dsl, survey)));
+		
+		Result<OfcDataCleansingStepRecord> result = select.fetch();
+		return dsl.fromResult(result);
+	}
+	
+	public List<DataCleansingStep> loadByQuery(DataQuery query) {
+		JooqDSLContext dsl = dsl((CollectSurvey) query.getSurvey());
+		Select<OfcDataCleansingStepRecord> select = 
+			dsl.selectFrom(OFC_DATA_CLEANSING_STEP)
+				.where(OFC_DATA_CLEANSING_STEP.QUERY_ID.eq(query.getId()));
 		
 		Result<OfcDataCleansingStepRecord> result = select.fetch();
 		return dsl.fromResult(result);
@@ -124,5 +135,6 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 		}
 
 	}
+
 }
 

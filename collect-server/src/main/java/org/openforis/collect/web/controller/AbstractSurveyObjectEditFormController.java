@@ -89,10 +89,15 @@ public abstract class AbstractSurveyObjectEditFormController<T extends Persisted
 
 	public @ResponseBody
 	Response delete(@PathVariable int id) {
-		CollectSurvey survey = getActiveSurvey();
-		T item = itemManager.loadById(survey, id);
-		itemManager.delete(item);
-		return new Response();
+//		try {
+			CollectSurvey survey = getActiveSurvey();
+			T item = itemManager.loadById(survey, id);
+			itemManager.delete(item);
+			return new Response();
+//		} catch (Exception e) {
+//			Response response = new Response();
+//			return response;
+//		}
 	}
 	
 	protected CollectSurvey getActiveSurvey() {

@@ -102,14 +102,8 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			initNewStepSelectPicker();
 		}, $this));
 		
-		var getSelectedStep = function () {
-			var selections = $this.stepsDataGrid.getSelections();
-			return selections.length == 0 ? null : selections[0];
-		}
-
 		$this.content.find(".remove-step-btn").click($.proxy(function() {
-			var $this = this;
-			var selectedStep = getSelectedStep();
+			var selectedStep = $this.getSelectedStep();
 			if (selectedStep == null) {
 				return;
 			}
@@ -124,7 +118,7 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 		
 		var moveSelectedStep = function(up) {
 			var $this = this;
-			var selectedStep = getSelectedStep();
+			var selectedStep = $this.getSelectedStep();
 			if (selectedStep == null) {
 				return;
 			}
@@ -147,6 +141,8 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 		}, $this));
 		
 		$this.initStepsDataGrid();
+		
+		$this.onStepSelectionChange();
 		
 		callback();
 	});
@@ -183,6 +179,7 @@ Collect.DataCleansingChainDialogController.prototype.validateForm = function(cal
 Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = function() {
 	var $this = this;
 	var gridContainer = $this.content.find(".step-grid");
+	
 	gridContainer.bootstrapTable({
 	    clickToSelect: true,
 	    columns: [
@@ -190,15 +187,33 @@ Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = functio
 			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title"},
 			{field: "queryTitle", title: "Query Title"},
-			{field: "creationDate", title: "Creation Date"},
-			{field: "modifiedDate", title: "Modified Date"}
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});
 	$this.stepsDataGrid = gridContainer.data('bootstrap.table');
+	gridContainer.on("check.bs.table", function() {
+		$this.onStepSelectionChange();
+	});
+	$this.onStepSelectionChange();
 };
+
+Collect.DataCleansingChainDialogController.prototype.onStepSelectionChange = function() {
+	var $this = this;
+	var selectedStep = $this.getSelectedStep();
+	var stepSelected = selectedStep != null;
+	$this.content.find(".step-selected-enabled").prop("disabled", ! stepSelected);
+};
+
+Collect.DataCleansingChainDialogController.prototype.getSelectedStep = function () {
+	var $this = this;
+	var selections = $this.stepsDataGrid.getSelections();
+	return selections.length == 0 ? null : selections[0];
+}
 
 Collect.DataCleansingChainDialogController.prototype.refreshStepsDataGrid = function() {
 	var $this = this;
 	var data = $this.steps ? $this.steps : null;
 	$this.stepsDataGrid.load(data);
+	$this.onStepSelectionChange();
 };

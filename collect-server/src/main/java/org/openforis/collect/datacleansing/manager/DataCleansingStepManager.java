@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.datacleansing.manager;
 
+import java.util.List;
 import java.util.Set;
 
 import org.openforis.collect.datacleansing.DataCleansingChain;
@@ -36,12 +37,18 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	
 	@Override
 	public void delete(DataCleansingStep step) {
-		Set<DataCleansingChain> chainsUsingStep = dataCleansingChainManager.loadChainsByStep(step);
+		Set<DataCleansingChain> chainsUsingStep = dataCleansingChainManager.loadByStep(step);
 		if (chainsUsingStep.isEmpty()) {
 			super.delete(step);
 		} else {
 			throw new IllegalStateException(String.format("Cannote delete steo with id %d: some chains are associated to it", step.getId()));
 		}
+	}
+	
+	public List<DataCleansingStep> loadByQuery(DataQuery query) {
+		List<DataCleansingStep> steps = dao.loadByQuery(query);
+		initializeItems(steps);
+		return steps;
 	}
 	
 	@Override
