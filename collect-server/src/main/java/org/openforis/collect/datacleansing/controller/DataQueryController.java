@@ -180,12 +180,6 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 			this.query = query;
 		}
 		
-		public void init() throws Exception {
-		}
-		
-		public void close() throws IOException {
-		}
-		
 		@Override
 		public void process(Node<?> node) {
 			CollectRecord record = (CollectRecord) node.getRecord();
@@ -212,9 +206,15 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 		}
 		
 		@Override
+		public void init() throws Exception {}
+		
+		@Override
 		public void process(DataQueryResultItem item) {
 			items.add(item);			
 		}
+
+		@Override
+		public void close() throws IOException {}
 		
 		public List<DataQueryResultItem> getItems() {
 			return items;

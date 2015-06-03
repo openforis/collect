@@ -64,6 +64,7 @@ public class DataCleansingStep extends PersistedSurveyObject {
 
 	public void setQueryId(Integer queryId) {
 		this.queryId = queryId;
+		this.query = null;
 	}
 	
 	public DataQuery getQuery() {

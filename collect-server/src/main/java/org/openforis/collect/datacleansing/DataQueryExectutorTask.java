@@ -1,8 +1,10 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.datacleansing.xpath.XPathDataQueryEvaluator;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -42,6 +45,19 @@ public class DataQueryExectutorTask extends Task {
 	}
 	
 	@Override
+	protected void initInternal() throws Throwable {
+		this.errors = new ArrayList<DataQueryExecutorError>();
+		super.initInternal();
+	}
+	
+	@Override
+	protected void onCompleted() {
+		super.onCompleted();
+		IOUtils.closeQuietly(input.nodeProcessor);
+	}
+	
+	@Override
+	@Transactional
 	protected void execute() throws Throwable {
 		CollectSurvey survey = input.query.getSurvey();
 		
@@ -59,14 +75,19 @@ public class DataQueryExectutorTask extends Task {
 			Iterator<Node<?>> nodesIt = nodes.iterator();
 			while (nodesIt.hasNext()) {
 				Node<?> node = (Node<?>) nodesIt.next();
-				try {
-					input.nodeProcessor.process(node);
-				} catch(Exception e) {
-					log().error(String.format("Error executing query %s", input.query.getId()), e);
-					errors.add(new DataQueryExecutorError(record.getRootEntityKeyValues(), record.getId(), node.getPath(), e.getMessage()));
-				}
+				processNode(node);
 			}
 			incrementItemsProcessed();
+		}
+	}
+
+	private void processNode(Node<?> node) {
+		try {
+			input.nodeProcessor.process(node);
+		} catch(Exception e) {
+			log().error(String.format("Error executing query %s", input.query.getId()), e);
+			CollectRecord record = (CollectRecord) node.getRecord();
+			errors.add(new DataQueryExecutorError(record.getRootEntityKeyValues(), record.getId(), node.getPath(), e.getMessage()));
 		}
 	}
 	

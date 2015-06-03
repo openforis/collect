@@ -47,7 +47,11 @@ Collect.AbstractItemEditDialogController.prototype.doOpen = function() {
 		 $this.content.remove();
 	 });
 	beforeOpen(function() {
-		$this.content.modal($this.doNotAllowCancel ? {backdrop: "static", keyboard: false} : 'show');
+		var options = {backdrop: "static"};
+		if ($this.doNotAllowCancel) {
+			options.keyboard = false;
+		}
+		$this.content.modal(options);
 	});
 };
 

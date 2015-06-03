@@ -106,29 +106,20 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		}
 		
 		private void enqueueRecordSave(CollectRecord record) {
-			if (lastRecord == null || lastRecord.getId() != record.getId()) {
-				if (recordStep == Step.ANALYSIS) {
-					record.setStep(Step.CLEANSING);
-					recordManager.save(record);
-					record.setStep(Step.ANALYSIS);
-					recordManager.save(record);
-				} else {
-					recordManager.save(record);
-				}
-				lastRecord = record;
-				saveRecord(record);
-				unsavedChanges = false;
-			} else {
-				unsavedChanges = true;
+			if (lastRecord != null && ! lastRecord.getId().equals(record.getId())) {
+				saveRecord(lastRecord);
 			}
+			lastRecord = record;
+			unsavedChanges = true;
 		}
 
 		private void saveRecord(CollectRecord record) {
-			Step originalRecordStep = record.getStep();
-			if (recordStep != originalRecordStep) {
-				record.setStep(recordStep);
+			if (recordStep == Step.ANALYSIS) {
+				record.setStep(Step.CLEANSING); //save the data
 				recordManager.save(record);
-				record.setStep(originalRecordStep);
+				record.setStep(Step.ANALYSIS); //restore the original record step
+				recordManager.save(record);
+			} else {
 				recordManager.save(record);
 			}
 		}

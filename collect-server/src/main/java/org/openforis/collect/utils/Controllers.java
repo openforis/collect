@@ -42,6 +42,7 @@ public class Controllers {
 		} finally {
 			IOUtils.closeQuietly(buf);
 			IOUtils.closeQuietly(is);
+			outputStream.flush();
 		}
 	}
 
