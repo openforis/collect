@@ -29,7 +29,7 @@ public class SurveyViewGenerator {
 		this.locale = locale;
 	}
 
-	public SurveyView generateView(CollectSurvey survey) {
+	public SurveyView generateView(final CollectSurvey survey) {
 		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName());
 		final String langCode = locale.getLanguage();
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();;
@@ -37,7 +37,7 @@ public class SurveyViewGenerator {
 			public void visit(NodeDefinition def) {
 				int id = def.getId();
 				String name = def.getName();
-				String label = def.getLabel(Type.INSTANCE, langCode);
+				String label = getLabel(def, langCode);
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
 					view = new EntityDefView(id, name, label);
@@ -54,10 +54,19 @@ public class SurveyViewGenerator {
 				}
 				viewById.put(id, view);
 			}
+
 		});
 		return surveyView;
 	}
 	
+	private String getLabel(NodeDefinition def, String langCode) {
+		String label = def.getLabel(Type.INSTANCE, langCode);
+		if (label == null && ! def.getSurvey().isDefaultLanguage(langCode)) {
+			label = def.getLabel(Type.INSTANCE);
+		}
+		return label;
+	}
+
 	public static abstract class NodeDefView {
 		
 		private int id;

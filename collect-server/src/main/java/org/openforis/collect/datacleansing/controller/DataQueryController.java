@@ -84,11 +84,12 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	
 	@RequestMapping(value="start-export.json", method = RequestMethod.POST)
 	public @ResponseBody
-	Response startExport(@Validated DataQueryForm form, @RequestParam Step recordStep) {
+	Response startExport(@Validated DataQueryForm form, @RequestParam Step recordStep) throws Exception {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataQuery query = new DataQuery(survey);
 		form.copyTo(query);
 		csvExportItemProcessor = new CSVWriterDataQueryResultItemProcessor(query);
+		csvExportItemProcessor.init();
 		exportJob = collectJobManager.createJob(DataQueryExecutorJob.class);
 		exportJob.setInput(new DataQueryExecutorJobInput(query, recordStep, csvExportItemProcessor));
 		collectJobManager.start(exportJob);

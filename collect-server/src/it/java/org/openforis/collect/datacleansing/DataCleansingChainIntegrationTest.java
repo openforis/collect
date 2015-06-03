@@ -5,6 +5,7 @@ import static org.openforis.idm.testfixture.NodeBuilder.attribute;
 import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.RecordBuilder.record;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -143,9 +144,13 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		DataQueryExecutorJob job = jobManager.createJob(DataQueryExecutorJob.class);
 		DataQueryExecutorJobInput dataQueryExecutorJobInput = new DataQueryExecutorJobInput(query, Step.ENTRY, new NodeProcessor() {
 			@Override
+			public void init() throws Exception {}
+			@Override
 			public void process(Node<?> node) throws Exception {
 				nodes.add(node);
 			}
+			@Override
+			public void close() throws IOException {}
 		});
 		job.setInput(dataQueryExecutorJobInput);
 		jobManager.start(job, false);

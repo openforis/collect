@@ -1,8 +1,10 @@
 package org.openforis.collect.datacleansing;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorTaskInput;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
@@ -57,7 +59,7 @@ public class DataErrorReportGeneratorJob extends Job {
 	@Override
 	protected void onTaskCompleted(Task task) {
 		super.onTaskCompleted(task);
-		batchPersister.flush();
+		IOUtils.closeQuietly(((DataQueryExectutorTask) task).getInput().getNodeProcessor());
 	}
 	
 	public void setErrorQuery(DataErrorQuery errorQuery) {
@@ -75,10 +77,18 @@ public class DataErrorReportGeneratorJob extends Job {
 	private class ReportItemPersisterNodeProcessor implements NodeProcessor {
 		
 		@Override
+		public void init() throws Exception {}
+		
+		@Override
 		public void process(Node<?> node) throws Exception {
 			Attribute<?, ?> attr = (Attribute<?, ?>) node;
 			DataErrorReportItem item = createReportItem(report, attr);
 			batchPersister.add(item);
+		}
+		
+		@Override
+		public void close() throws IOException {
+			batchPersister.flush();
 		}
 	}
 	

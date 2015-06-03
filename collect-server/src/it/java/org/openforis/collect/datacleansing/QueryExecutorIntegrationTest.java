@@ -66,9 +66,13 @@ public class QueryExecutorIntegrationTest extends CollectIntegrationTest {
 		DataQueryExecutorJob job = jobManager.createJob(DataQueryExecutorJob.class);
 		DataQueryExecutorJobInput input = new DataQueryExecutorJobInput(query, Step.ENTRY, new NodeProcessor() {
 			@Override
+			public void init() throws Exception {}
+			@Override
 			public void process(Node<?> node) {
 				nodes.add(node);
 			}
+			@Override
+			public void close() throws IOException {}
 		});
 		job.setInput(input);
 		jobManager.start(job, false);

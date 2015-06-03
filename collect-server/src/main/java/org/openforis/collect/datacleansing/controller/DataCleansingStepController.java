@@ -65,6 +65,7 @@ public class DataCleansingStepController extends AbstractSurveyObjectEditFormCon
 		DataCleansingChain chain = new DataCleansingChain(survey);
 		chain.addStep(cleansingStep);
 		DataCleansingChainExecutorJob job = collectJobManager.createJob(DataCleansingChainExecutorJob.class);
+		job.setSurvey(survey);
 		job.setChain(chain);
 		job.setRecordStep(recordStep);
 		collectJobManager.startSurveyJob(job);

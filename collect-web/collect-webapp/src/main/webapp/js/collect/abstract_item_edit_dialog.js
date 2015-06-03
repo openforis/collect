@@ -132,6 +132,7 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close
 		var item = $this.extractJSONItem();
 		$this.itemEditService.save(item, function(response) {
 			if (response.statusOk) {
+				$this.item = response.form;
 				$this.dispatchItemSavedEvent();
 				if (close) {
 					$this.close();

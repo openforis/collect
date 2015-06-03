@@ -1,9 +1,18 @@
 package org.openforis.collect.datacleansing;
 
+import java.io.Closeable;
+
 import org.openforis.idm.model.Node;
 
-public abstract interface NodeProcessor {
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
+public abstract interface NodeProcessor extends Closeable {
 	
-	abstract void process(Node<?> node) throws Exception;
+	void init() throws Exception;
+	
+	void process(Node<?> node) throws Exception;
 	
 }

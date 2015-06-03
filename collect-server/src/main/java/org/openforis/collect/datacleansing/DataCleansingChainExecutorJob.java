@@ -58,9 +58,15 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	private class DataCleansingChainNodeProcessor implements NodeProcessor {
 		
 		private DataCleansingStep step;
+		private CollectRecord lastRecord;
+		private boolean unsavedChanges;
 
 		public DataCleansingChainNodeProcessor(DataCleansingStep step) {
 			this.step = step;
+		}
+		
+		@Override
+		public void init() throws Exception {
 		}
 		
 		@Override
@@ -88,6 +94,41 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 						}
 					}
 				}
+				enqueueRecordSave(record);
+			}
+		}
+
+		@Override
+		public void close() {
+			if (lastRecord != null && unsavedChanges) {
+				saveRecord(lastRecord);
+			}
+		}
+		
+		private void enqueueRecordSave(CollectRecord record) {
+			if (lastRecord == null || lastRecord.getId() != record.getId()) {
+				if (recordStep == Step.ANALYSIS) {
+					record.setStep(Step.CLEANSING);
+					recordManager.save(record);
+					record.setStep(Step.ANALYSIS);
+					recordManager.save(record);
+				} else {
+					recordManager.save(record);
+				}
+				lastRecord = record;
+				saveRecord(record);
+				unsavedChanges = false;
+			} else {
+				unsavedChanges = true;
+			}
+		}
+
+		private void saveRecord(CollectRecord record) {
+			Step originalRecordStep = record.getStep();
+			if (recordStep != originalRecordStep) {
+				record.setStep(recordStep);
+				recordManager.save(record);
+				record.setStep(originalRecordStep);
 				recordManager.save(record);
 			}
 		}
