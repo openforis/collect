@@ -481,7 +481,8 @@ Collect.prototype.setActiveSurvey = function(surveySummary) {
 };
 
 Collect.prototype.error = function(jqXHR, status, errorThrown) {
-	OF.Alerts.showError(status);
+	var message = OF.Strings.firstNotBlank(errorThrown, status, "Internal server error");
+	OF.Alerts.showError(message);
 };
 
 $(function() {

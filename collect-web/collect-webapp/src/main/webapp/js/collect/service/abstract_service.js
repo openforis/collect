@@ -29,10 +29,19 @@ Collect.AbstractService.prototype.send = function(url, data, method, onSuccess, 
 		cache: false,
 		method: method ? method: "GET",
 		data: data ? $this.param(data) : null
-	}).done(function(response) {
-		onSuccess(response);
-	}).error(function() {
-		collect.error.apply(this, arguments);
+	}).done(function(response, textStatus, jqXHR) {
+		if (! response || ! response.hasOwnProperty("statusOk") || response.statusOk) {
+			onSuccess(response);
+		} else {
+			var errorMessage = response.errorMessage;
+			if (onError) {
+				onError(errorMessage);
+			} else {
+				collect.error.apply(this, [jqXHR, errorMessage]);
+			}
+		}
+	}).fail(function(jqXHR, textStatus, errorThrown) {
+		collect.error.apply(this, [jqXHR, textStatus, errorThrown]);
 		if (onError) {
 			onError();
 		}
