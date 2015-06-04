@@ -35,6 +35,7 @@ package org.openforis.collect.util {
 		private static const VALIDATION_REPORT_SERVLET_NAME:String = "validationReport";
 		
 		private static const _DESIGNER_URL_PART:String = "designer.htm";
+		private static const _DATA_CLEANSING_URL_PART:String = "datacleansing/main.html";
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		public static const XML_DATE_TIME_PATTERN:String = "yyyy-MM-dd\'T\'HH:mm:ss";
@@ -49,6 +50,7 @@ package org.openforis.collect.util {
 		private static var _VALIDATION_REPORT_URL:String;
 		private static var _CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_URL:String;
 		private static var _DESIGNER_URL:String;
+		private static var _DATA_CLEANSING_URL:String;
 		
 		private static var _HOST:String;
 		private static var _PORT:uint;
@@ -112,6 +114,10 @@ package org.openforis.collect.util {
 			return _DESIGNER_URL;
 		}
 		
+		public static function get DATA_CLEANSING_URL():String {
+			return _DATA_CLEANSING_URL;
+		}
+		
 		public static function get HOST():String {
 			return _HOST;
 		}
@@ -152,6 +158,7 @@ package org.openforis.collect.util {
 			_SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_URL = URL + SAMPLING_DESIGN_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME;
 			_CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_URL = URL + CODE_LIST_IMPORT_EXAMPLE_DOWNLOAD_SERVLET_NAME;
 			_DESIGNER_URL = _URL + _DESIGNER_URL_PART;
+			_DATA_CLEANSING_URL = _URL + _DATA_CLEANSING_URL_PART;
 		}
 
 	}

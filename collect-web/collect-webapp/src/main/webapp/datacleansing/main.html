@@ -74,111 +74,139 @@
 	
 	<body>
 		
-		<div class="home-survey-selector">
-			<label>Survey: </label>
-			<button id="home-survey-selector-button" type="button" class="btn btn-default"></button>
-		</div>
-	
-		<div role="tabpanel" class="tab-external-panel container-fluid">
-			<ul class="nav nav-tabs" role="tablist">
-				<li role="presentation" class="active">
-					<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Home</a>
-				</li>
-				<li role="presentation">
-					<a href="#data-error-type-panel" aria-controls="data-error-type-panel" 
-						role="tab" data-toggle="tab">Data Error Types</a>
-				</li>
-				<li role="presentation">
-					<a href="#data-query-panel" aria-controls="data-query-panel" 
-						role="tab" data-toggle="tab">Data Query</a>
-				</li>
-				<li role="presentation">
-					<a href="#dataErrorQueriesPanel" aria-controls="dataErrorQueriesPanel" 
-						role="tab" data-toggle="tab">Data Error Queries</a>
-				</li>
-				<li role="presentation">
-					<a href="#data-error-reports-panel" aria-controls="data-error-reports-panel" 
-						role="tab" data-toggle="tab">Data Error Reports</a>
-				</li>
-				<li role="presentation">
-					<a href="#data-cleansing-step-panel" aria-controls="data-cleansing-step-panel" 
-						role="tab" data-toggle="tab">Data Cleansing Steps</a>
-				</li>
-				<li role="presentation">
-					<a href="#data-cleansing-chain-panel" aria-controls="data-cleansing-chain-panel" 
-						role="tab" data-toggle="tab">Data Cleansing Chains</a>
-				</li>
-				
-<!-- 				<li role="presentation"> -->
-<!-- 					<a href="#map-panel" aria-controls="map-panel"  -->
-<!-- 						role="tab" data-toggle="tab">Map</a> -->
-<!-- 				</li> -->
-			</ul>
+		<!-- Wrap all page content here -->
+		<div id="wrap">
+
+			<!-- Fixed navbar -->
+			<div class="navbar navbar-default navbar-fixed-top">
+				<div class="container">
+					<div class="navbar-header">
+						<!-- HEADER -->
+						<div id="header">
+							<div id="headerLink" title="Collect Home Page"></div>
+							<img id="headerImg" alt="Loading..."></img> <img id="logoImg"
+								alt="Loading..." width="80px" height="80px"></img>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- Begin page content -->
+			<div class="center-container">
+				<div class="home-survey-selector">
+					<label>Survey: </label>
+					<button id="home-survey-selector-button" type="button" class="btn btn-default"></button>
+				</div>
 			
-			<!-- Tab panes -->
-			<div class="tab-content container-fluid">
-				<div id="homePanel" role="tabpanel" class="tab-pane active" >
-			
-				</div>
-				<div id="data-error-type-panel" role="tabpanel" class="tab-pane" >
-					<div id="dataerrortypegrid"></div>
+				<div role="tabpanel" class="tab-external-panel container-fluid">
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" class="active">
+							<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Data Cleansing Home</a>
+						</li>
+						<li role="presentation">
+							<a href="#data-error-type-panel" aria-controls="data-error-type-panel" 
+								role="tab" data-toggle="tab">Data Error Types</a>
+						</li>
+						<li role="presentation">
+							<a href="#data-query-panel" aria-controls="data-query-panel" 
+								role="tab" data-toggle="tab">Data Query</a>
+						</li>
+						<li role="presentation">
+							<a href="#dataErrorQueriesPanel" aria-controls="dataErrorQueriesPanel" 
+								role="tab" data-toggle="tab">Data Error Queries</a>
+						</li>
+						<li role="presentation">
+							<a href="#data-error-reports-panel" aria-controls="data-error-reports-panel" 
+								role="tab" data-toggle="tab">Data Error Reports</a>
+						</li>
+						<li role="presentation">
+							<a href="#data-cleansing-step-panel" aria-controls="data-cleansing-step-panel" 
+								role="tab" data-toggle="tab">Data Cleansing Steps</a>
+						</li>
+						<li role="presentation">
+							<a href="#data-cleansing-chain-panel" aria-controls="data-cleansing-chain-panel" 
+								role="tab" data-toggle="tab">Data Cleansing Chains</a>
+						</li>
+						
+		<!-- 				<li role="presentation"> -->
+		<!-- 					<a href="#map-panel" aria-controls="map-panel"  -->
+		<!-- 						role="tab" data-toggle="tab">Map</a> -->
+		<!-- 				</li> -->
+					</ul>
 					
-					<div class="btn-group" role="group" aria-label="...">
-						<button id="newDataErrorTypeBtn" type="button" class="btn btn-default new-btn">New</button>
-						<button id="editDataErrorTypeBtn" type="button" class="btn btn-default edit-btn">Edit</button>
-						<button id="deleteDataErrorTypeBtn" type="button" class="btn btn-default delete-btn">Delete</button>
-					</div>
-				</div>
-				<div id="data-query-panel" role="tabpanel" class="tab-pane" >
-					<div id="dataquerygrid"></div>
+					<!-- Tab panes -->
+					<div class="tab-content container-fluid">
+						<div id="homePanel" role="tabpanel" class="tab-pane active" >
 					
-					<div class="btn-group" role="group" aria-label="...">
-						<button type="button" class="btn btn-default new-btn">New</button>
-						<button type="button" class="btn btn-default edit-btn">Edit</button>
-						<button type="button" class="btn btn-default delete-btn">Delete</button>
+						</div>
+						<div id="data-error-type-panel" role="tabpanel" class="tab-pane" >
+							<div id="dataerrortypegrid"></div>
+							
+							<div>
+								<button id="newDataErrorTypeBtn" type="button" class="btn btn-default new-btn">New</button>
+								<button id="editDataErrorTypeBtn" type="button" class="btn btn-default edit-btn">Edit</button>
+								<button id="deleteDataErrorTypeBtn" type="button" class="btn btn-default delete-btn">Delete</button>
+							</div>
+						</div>
+						<div id="data-query-panel" role="tabpanel" class="tab-pane" >
+							<div id="dataquerygrid"></div>
+							
+							<div>
+								<button type="button" class="btn btn-default new-btn">New</button>
+								<button type="button" class="btn btn-default edit-btn">Edit</button>
+								<button type="button" class="btn btn-default delete-btn">Delete</button>
+							</div>
+						</div>
+						<div id="dataErrorQueriesPanel" role="tabpanel" class="tab-pane" >
+							<div id="dataerrorquerygrid"></div>
+							
+							<div>
+								<button id="new-data-error-query-btn" type="button" class="btn btn-default">New</button>
+								<button id="edit-data-error-query-btn" type="button" class="btn btn-default">Edit</button>
+								<button id="delete-data-error-query-btn" type="button" class="btn btn-default">Delete</button>
+							</div>
+						</div>
+						<div id="data-error-reports-panel" role="tabpanel" class="tab-pane" >
+							<div id="data-error-report-grid"></div>
+							
+							<div>
+								<button id="new-data-error-report-btn" type="button" class="btn btn-default">New</button>
+								<button id="view-data-error-report-btn" type="button" class="btn btn-default">View</button>
+								<button id="delete-data-error-report-btn" type="button" class="btn btn-default">Delete</button>
+							</div>
+						</div>
+						<div id="data-cleansing-step-panel" role="tabpanel" class="tab-pane">
+							<div id="datacleansingstepgrid"></div>
+							
+							<div>
+								<button type="button" class="btn btn-default new-btn">New</button>
+								<button type="button" class="btn btn-default edit-btn">Edit</button>
+								<button type="button" class="btn btn-default delete-btn">Delete</button>
+							</div>
+						</div>
+						<div id="data-cleansing-chain-panel" role="tabpanel" class="tab-pane">
+							<div id="datacleansingchaingrid"></div>
+							
+							<div>
+								<button type="button" class="btn btn-default new-btn">New</button>
+								<button type="button" class="btn btn-default edit-btn">Edit</button>
+								<button type="button" class="btn btn-default delete-btn">Delete</button>
+							</div>
+						</div>
+						<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">
+							<div class="map-canvas" style="height: 100%; width: 100%"></div>
+						</div>
 					</div>
-				</div>
-				<div id="dataErrorQueriesPanel" role="tabpanel" class="tab-pane" >
-					<div id="dataerrorquerygrid"></div>
-					
-					<div class="btn-group" role="group" aria-label="...">
-						<button id="new-data-error-query-btn" type="button" class="btn btn-default">New</button>
-						<button id="edit-data-error-query-btn" type="button" class="btn btn-default">Edit</button>
-						<button id="delete-data-error-query-btn" type="button" class="btn btn-default">Delete</button>
-					</div>
-				</div>
-				<div id="data-error-reports-panel" role="tabpanel" class="tab-pane" >
-					<div id="data-error-report-grid"></div>
-					
-					<div class="btn-group" role="group" aria-label="...">
-						<button id="new-data-error-report-btn" type="button" class="btn btn-default">New</button>
-						<button id="view-data-error-report-btn" type="button" class="btn btn-default">View</button>
-						<button id="delete-data-error-report-btn" type="button" class="btn btn-default">Delete</button>
-					</div>
-				</div>
-				<div id="data-cleansing-step-panel" role="tabpanel" class="tab-pane">
-					<div id="datacleansingstepgrid"></div>
-					
-					<div class="btn-group" role="group" aria-label="...">
-						<button type="button" class="btn btn-default new-btn">New</button>
-						<button type="button" class="btn btn-default edit-btn">Edit</button>
-						<button type="button" class="btn btn-default delete-btn">Delete</button>
-					</div>
-				</div>
-				<div id="data-cleansing-chain-panel" role="tabpanel" class="tab-pane">
-					<div id="datacleansingchaingrid"></div>
-					
-					<div class="btn-group" role="group" aria-label="...">
-						<button type="button" class="btn btn-default new-btn">New</button>
-						<button type="button" class="btn btn-default edit-btn">Edit</button>
-						<button type="button" class="btn btn-default delete-btn">Delete</button>
-					</div>
-				</div>
-				<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">
-					<div class="map-canvas" style="height: 100%; width: 100%"></div>
 				</div>
 			</div>
 		</div>
-		
+<!-- 		<div id="footer"> -->
+<!-- 			<div class="container"> -->
+<!-- 				<img id="footerImg" alt="Loading..." /> -->
+<!-- 				<div class="appliactionVersionContainer row"> -->
+<!-- 					<label>Application version: </label> -->
+<!-- 					<label class="applicationVersion">Loading...</label> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
 	</body>
 </html>

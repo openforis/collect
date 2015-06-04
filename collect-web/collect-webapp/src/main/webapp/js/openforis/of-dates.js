@@ -162,8 +162,17 @@ OF.Dates.format = function(date, format) {
 }
 
 OF.Dates.formatToPrettyDateTime = function(date) {
-	if (typeof date === 'string') {
+	if (date == null) {
+		return null;
+	}
+	switch(typeof date) {
+	case "string":
 		date = OF.Dates.parseInternalDateTime(date);
+		break;
+	case "date":
+		break;
+	default:
+		return null; //unsupported date type
 	}
 	return OF.Dates.format(date, OF.Dates.PRETTY_DATE_TIME_FORMAT);
 };
