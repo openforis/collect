@@ -40,16 +40,16 @@
 								image="/assets/images/delete-small.png"
 								disabled="@load(empty vm.selectedAssignedLanguage)"
 								onClick="@command('removeLanguage')" />
-							<toolbarbutton
-								tooltiptext="${labels.global.item.move_up}"
-								image="/assets/images/arrow-up-small.png"
-								disabled="@load(vm.moveSelectedAssignedLanguageUpDisabled)"
-								onClick="@command('moveSelectedAssignedLanguageUp')" />
-							<toolbarbutton
-								tooltiptext="${labels.global.item.move_down}"
-								image="/assets/images/arrow-down-small.png"
-								disabled="@load(vm.moveSelectedAssignedLanguageDownDisabled)"
-								onClick="@command('moveSelectedAssignedLanguageDown')" />
+<!-- 							<toolbarbutton -->
+<!-- 								tooltiptext="${labels.global.item.move_up}" -->
+<!-- 								image="/assets/images/arrow-up-small.png" -->
+<!-- 								disabled="@load(vm.moveSelectedAssignedLanguageUpDisabled)" -->
+<!-- 								onClick="@command('moveSelectedAssignedLanguageUp')" /> -->
+<!-- 							<toolbarbutton -->
+<!-- 								tooltiptext="${labels.global.item.move_down}" -->
+<!-- 								image="/assets/images/arrow-down-small.png" -->
+<!-- 								disabled="@load(vm.moveSelectedAssignedLanguageDownDisabled)" -->
+<!-- 								onClick="@command('moveSelectedAssignedLanguageDown')" /> -->
 						</toolbar>
 					</vbox>
 					<box align="center" hflex="true">

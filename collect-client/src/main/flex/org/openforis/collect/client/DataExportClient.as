@@ -13,6 +13,7 @@ package org.openforis.collect.client {
 		
 		private var _getCurrentJobOperation:Operation;
 		private var _exportOperation:Operation;
+		private var _backupOperation:Operation;
 		private var _fullExportOperation:Operation;
 		private var _abortOperation:Operation;
 		
@@ -20,6 +21,7 @@ package org.openforis.collect.client {
 			super("dataExportService");
 			
 			this._exportOperation = getOperation("export");
+			this._backupOperation = getOperation("backup");
 			this._fullExportOperation = getOperation("fullExport");
 			this._getCurrentJobOperation = getOperation("getCurrentJob", CONCURRENCY_LAST, false);
 			this._abortOperation = getOperation("abort");
@@ -42,6 +44,11 @@ package org.openforis.collect.client {
 		
 		public function fullExport(responder:IResponder, includeRecordFiles:Boolean = false, onlyOwnedRecords:Boolean = false, rootEntityKeyValues:Array = null):void {
 			var token:AsyncToken = this._fullExportOperation.send(includeRecordFiles, onlyOwnedRecords, rootEntityKeyValues);
+			token.addResponder(responder);
+		}
+		
+		public function backup(responder:IResponder, surveyName:String):void {
+			var token:AsyncToken = this._backupOperation.send(surveyName);
 			token.addResponder(responder);
 		}
 		
