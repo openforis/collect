@@ -29,6 +29,7 @@ public class SurveyLanguageVM extends BaseVM {
 	public static final String CURRENT_LANGUAGE_CHANGED_COMMAND = "currentLanguageChanged";
 	public static final String SURVEY_LANGUAGES_CHANGED_COMMAND = "surveyLanguagesChanged";
 	public static final String CLOSE_SURVEY_LANGUAGE_SELECT_POPUP_COMMAND = "closeSurveyLanguageSelectPopUp";
+	private static final int MAX_LANGUAGES = 3;
 	
 	private List<LabelledItem> languages;
 	private List<LabelledItem> assignedLanguages;
@@ -85,6 +86,10 @@ public class SurveyLanguageVM extends BaseVM {
 	@Command
 	@NotifyChange({"assignedLanguages", "selectedLanguageToAssign"})
 	public void addLanguage() {
+		if (assignedLanguages.size() == MAX_LANGUAGES) {
+			MessageUtil.showWarning("survey.language.error.maximum_number_of_languages_reached", new Object[]{MAX_LANGUAGES});
+			return;
+		}
 		assignedLanguages.add(selectedLanguageToAssign);
 		selectedLanguageToAssign = null;
 	}
@@ -92,6 +97,11 @@ public class SurveyLanguageVM extends BaseVM {
 	@Command
 	@NotifyChange({"assignedLanguages", "selectedAssignedLanguage"})
 	public void removeLanguage() {
+		String defaultLangCode = getSurveyAssignedLanguageCodes().get(0);
+		if (selectedAssignedLanguage.getCode().equals(defaultLangCode)) {
+			MessageUtil.showWarning("survey.language.error.cannot_remove_default_language");
+			return;
+		}
 		assignedLanguages.remove(selectedAssignedLanguage);
 		selectedAssignedLanguage = null;
 	}
