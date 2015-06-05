@@ -6,14 +6,17 @@ package org.openforis.collect.datacleansing.manager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorType;
 import org.openforis.collect.datacleansing.persistence.DataErrorTypeDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +25,11 @@ import org.springframework.stereotype.Component;
  */
 @Component("dataErrorTypeManager")
 public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorType, DataErrorTypeDao> {
+	
+	@Autowired
+	private DataErrorQueryManager dataErrorQueryManager;
+	@Autowired
+	private MessageSource messageSource;
 	
 	private ErrorTypeCache cache;
 	
@@ -78,10 +86,19 @@ public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorT
 	}
 	
 	@Override
-	public void delete(int id) {
-		DataErrorType errorType = cache.get(id);
+	public void delete(DataErrorType obj) {
+		DataErrorType errorType = cache.get(obj.getId());
+		checkErrorTypeUsedByErrorQuery(errorType);
 		super.delete(errorType.getId());
 		cache.remove(errorType);
+	}
+
+	private void checkErrorTypeUsedByErrorQuery(DataErrorType errorType) {
+		List<DataErrorQuery> dataErrorQueries = dataErrorQueryManager.loadByType(errorType);
+		if (! dataErrorQueries.isEmpty()) {
+			String message = messageSource.getMessage("data_error_type.delete.error.used_by_error_query", new String[]{errorType.getCode()}, Locale.ENGLISH);
+			throw new IllegalStateException(message);
+		}
 	} 
 	
 	private static class ErrorTypeCache {

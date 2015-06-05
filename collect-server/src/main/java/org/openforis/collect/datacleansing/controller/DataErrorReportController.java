@@ -54,7 +54,10 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	
 	@Override
 	protected DataErrorReportForm createFormInstance(DataErrorReport item) {
-		return new DataErrorReportForm(item);
+		DataErrorReportForm form = new DataErrorReportForm(item);
+		int itemCount = itemManager.countItems(item);
+		form.setItemCount(itemCount);
+		return form;
 	}
 	
 	@Override
@@ -131,11 +134,11 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	private static class CSVWriterDataErrorItemProcessor extends CSVWriterDataQueryResultItemProcessor {
 		
 		//input
-		private DataErrorReport report;
+//		private DataErrorReport report;
 		
 		public CSVWriterDataErrorItemProcessor(DataErrorReport report) {
 			super(report.getQuery().getQuery());
-			this.report = report;
+//			this.report = report;
 		}
 		
 	}

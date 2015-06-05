@@ -49,7 +49,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		return loadByReport(report, null, null);
 	}
 
-	public int countByReport(DataErrorReport report) {
+	public int countItems(DataErrorReport report) {
 		JooqDSLContext dsl = dsl(report);
 		SelectQuery<?> q = dsl.selectCountQuery();
 		q.addConditions(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()));

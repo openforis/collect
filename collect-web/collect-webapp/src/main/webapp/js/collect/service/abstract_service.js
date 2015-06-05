@@ -33,10 +33,10 @@ Collect.AbstractService.prototype.send = function(url, data, method, onSuccess, 
 		if (! response || ! response.hasOwnProperty("statusOk") || response.statusOk) {
 			onSuccess(response);
 		} else {
-			var errorMessage = response.errorMessage;
 			if (onError) {
-				onError(errorMessage);
+				onError(response);
 			} else {
+				var errorMessage = response.errorMessage;
 				collect.error.apply(this, [jqXHR, errorMessage]);
 			}
 		}

@@ -392,6 +392,34 @@ Collect.prototype.initDataQueryGrid = function() {
 	var $this = this;
 	var gridId = 'dataquerygrid';
 	var gridContainer = $("#" + gridId);
+	
+	var getPrettyNodeName = function(nodeId) {
+		if (! nodeId) {
+			return null;
+		}
+		var survey = collect.activeSurvey;
+		var def = survey.getDefinition(nodeId);
+		return "[" + def.name + "] " + def.label;
+	};
+	
+	var nodePrettyNameSorter = function (a, b) {
+		var aName = getPrettyNodeName(a);
+		var bName = getPrettyNodeName(b);
+		if (aName == null && bName == null) {
+			return 0;
+		} else if (aName == null) {
+			return -1;
+		} else if (bName == null) {
+			return 1;
+		} else if (aName > bName) {
+			return 1;
+		} else if (aName < bName) {
+			return -1;
+		} else {
+			return 0;
+		}
+	};
+	
 	gridContainer.bootstrapTable({
 	    url: "datacleansing/dataqueries/list.json",
 	    cache: false,
@@ -399,9 +427,12 @@ Collect.prototype.initDataQueryGrid = function() {
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "title", title: "Title"},
-			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
+			{field: "title", title: "Title", sortable: true},
+			{field: "entityDefinitionId", title: "Entity", sortable: true, sorter: nodePrettyNameSorter, formatter: getPrettyNodeName},
+			{field: "attributeDefinitionId", title: "Attribute", sortable: true, sorter: nodePrettyNameSorter, formatter: getPrettyNodeName},
+			{field: "conditions", title: "Conditions", sortable: true},
+			{field: "creationDate", title: "Creation Date", sortable: true, formatter: OF.Dates.formatToPrettyDateTime},
+			{field: "modifiedDate", title: "Modified Date", sortable: true, formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});
 	$this.dataQueryDataGrid = gridContainer.data('bootstrap.table');
@@ -497,6 +528,7 @@ Collect.prototype.initDataErrorReportGrid = function() {
 			{field: "id", title: "Id", visible: false},
 			{field: "queryTitle", title: "Query"},
 			{field: "typeCode", title: "Error Type"},
+			{field: "itemCount", title: "Errors found"},
 			{field: "creationDate", title: "Date", formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});

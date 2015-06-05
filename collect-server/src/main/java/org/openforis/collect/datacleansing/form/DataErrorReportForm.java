@@ -15,6 +15,7 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 	private String typeCode;
 	private String queryTitle;
 	private DataErrorQueryForm errorQuery;
+	private int itemCount;
 	
 	public DataErrorReportForm() {
 		super();
@@ -41,4 +42,12 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 		return errorQuery;
 	}
 	
+	public int getItemCount() {
+		return itemCount;
+	}
+
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
+	}
+
 }

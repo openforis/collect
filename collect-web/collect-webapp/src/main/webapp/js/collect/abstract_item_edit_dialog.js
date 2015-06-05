@@ -135,13 +135,14 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close
 	if ($this.validateForm()) {
 		var item = $this.extractJSONItem();
 		$this.itemEditService.save(item, function(response) {
-			if (response.statusOk) {
-				$this.item = response.form;
-				$this.dispatchItemSavedEvent();
-				if (close) {
-					$this.close();
-				}
-			} else {
+			$this.item = response.form;
+			$this.dispatchItemSavedEvent();
+			if (close) {
+				$this.close();
+			}
+			OF.UI.Forms.Validation.removeErrors($this.form);
+		}, function(response) {
+			if (response.errors.length > 0) {
 				OF.Alerts.showError("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
 			}
 			OF.UI.Forms.Validation.updateErrors($this.form, response.errors);
@@ -154,11 +155,9 @@ Collect.AbstractItemEditDialogController.prototype.fieldChangeHandler = function
 	if ($this.itemEditService) {
 		var item = $this.extractJSONItem();
 		$this.itemEditService.validate(item, function(response) {
-			if (response.errors.length == 0) {
-				OF.UI.Forms.Validation.removeErrors($this.form);
-			} else {
-				OF.UI.Forms.Validation.updateErrors($this.form, response.errors, true);
-			}
+			OF.UI.Forms.Validation.removeErrors($this.form);
+		}, function(response) {
+			OF.UI.Forms.Validation.updateErrors($this.form, response.errors, true);
 		});
 	}
 };

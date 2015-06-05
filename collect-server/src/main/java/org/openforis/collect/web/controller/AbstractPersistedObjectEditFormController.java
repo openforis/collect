@@ -25,6 +25,8 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 											F extends PersistedObjectForm<T>, 
 											M extends AbstractPersistedObjectManager<T, ?>> {
 	
+	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate"};
+	
 	protected M itemManager;
 	
 	protected abstract T createItemInstance();
@@ -33,18 +35,14 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 	@RequestMapping(value="list.json", method = RequestMethod.GET)
 	public @ResponseBody
 	List<F> loadAll() {
-		List<T> items = itemManager.loadAll();
-		List<F> forms = new ArrayList<F>(items.size());
-		for (T item : items) {
-			forms.add(createFormInstance(item));
-		}
-		return forms;
+		List<T> items = loadAllItems();
+		return createFormInstances(items);
 	}
 	
 	@RequestMapping(value = "/{id}.json", method = RequestMethod.GET)
 	public @ResponseBody
 	F load(@PathVariable int id) {
-		T item = itemManager.loadById(id);
+		T item = loadItem(id);
 		F form = createFormInstance(item);
 		return form;
 	}
@@ -55,13 +53,8 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		List<ObjectError> errors = result.getAllErrors();
 		SimpleFormUpdateResponse response;
 		if (errors.isEmpty()) {
-			T item;
-			if (form.getId() == null) {
-				item = createItemInstance();
-			} else {
-				item = itemManager.loadById(form.getId());
-			}
-			form.copyTo(item);
+			T item = loadOrCreateItem(form);
+			copyFormIntoItem(form, item);
 			itemManager.save(item);
 			F responseForm = createFormInstance(item);
 			response = new SimpleFormUpdateResponse(responseForm);
@@ -70,7 +63,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 		}
 		return response;
 	}
-
+	
 	@RequestMapping(value="validate.json", method = RequestMethod.POST)
 	public @ResponseBody
 	Response validate(@Validated F form, BindingResult result) {
@@ -82,8 +75,50 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 	@RequestMapping(value = "{id}.json", method = RequestMethod.DELETE)
 	public @ResponseBody
 	Response delete(@PathVariable int id) {
-		itemManager.delete(id);
-		return new Response();
+		try {
+			T item = loadItem(id);
+			itemManager.delete(item);
+			return new Response();
+		} catch (Exception e) {
+			return createErrorResponse(e);
+		}
+	}
+	
+	protected T loadOrCreateItem(F form) {
+		T item;
+		if (form.getId() == null) {
+			item = createItemInstance();
+		} else {
+			item = loadItem(form.getId());
+		}
+		return item;
+	}
+
+	protected T loadItem(int id) {
+		return itemManager.loadById(id);
+	}
+	
+	protected List<T> loadAllItems() {
+		return itemManager.loadAll();
+	}
+	
+	protected List<F> createFormInstances(List<T> items) {
+		List<F> forms = new ArrayList<F>(items.size());
+		for (T item : items) {
+			forms.add(createFormInstance(item));
+		}
+		return forms;
+	}
+
+	protected void copyFormIntoItem(F form, T item) {
+		form.copyTo(item, IGNORE_FIELDS);
+	}
+	
+	protected Response createErrorResponse(Exception e) {
+		Response response = new Response();
+		response.setErrorStatus();
+		response.setErrorMessage(e.getMessage());
+		return response;
 	}
 	
 	public void setItemManager(M itemManager) {

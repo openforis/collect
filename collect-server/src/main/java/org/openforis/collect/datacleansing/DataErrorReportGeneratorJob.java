@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.util.IOUtils;
 import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorTaskInput;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
@@ -54,12 +53,6 @@ public class DataErrorReportGeneratorJob extends Job {
 		report.setQuery(errorQuery);
 		reportManager.save(report);
 		batchPersister = new ItemBatchPersister(report);
-	}
-	
-	@Override
-	protected void onTaskCompleted(Task task) {
-		super.onTaskCompleted(task);
-		IOUtils.closeQuietly(((DataQueryExectutorTask) task).getInput().getNodeProcessor());
 	}
 	
 	public void setErrorQuery(DataErrorQuery errorQuery) {

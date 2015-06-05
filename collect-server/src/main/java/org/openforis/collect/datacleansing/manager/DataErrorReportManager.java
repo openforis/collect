@@ -46,11 +46,17 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 	}
 	
 	public int countItems(DataErrorReport report) {
-		return errorReportItemDao.countByReport(report);
+		return errorReportItemDao.countItems(report);
 	}
 	
 	public List<DataErrorReportItem> loadItems(DataErrorReport report) {
 		return loadItems(report, null, null);
+	}
+	
+	public List<DataErrorReport> loadByQuery(DataErrorQuery query) {
+		List<DataErrorReport> reports = dao.loadByQuery(query);
+		initializeItems(reports);
+		return reports;
 	}
 	
 	public List<DataErrorReportItem> loadItems(DataErrorReport report, Integer offset, Integer limit) {
@@ -79,5 +85,5 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 		DataErrorQuery query = errorQueryManager.loadById((CollectSurvey) report.getSurvey(), report.getQueryId());
 		report.setQuery(query);
 	}
-	
+
 }

@@ -14,6 +14,8 @@ import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.collect.datacleansing.DataErrorType;
+import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
@@ -46,6 +48,26 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 		Select<OfcDataErrorQueryRecord> select = 
 			dsl.selectFrom(OFC_DATA_ERROR_QUERY)
 				.where(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID.in(createErrorTypeIdsSelect(dsl, survey)));
+		
+		Result<OfcDataErrorQueryRecord> result = select.fetch();
+		return dsl.fromResult(result);
+	}
+	
+	public List<DataErrorQuery> loadByQuery(DataQuery query) {
+		JooqDSLContext dsl = dsl((CollectSurvey) query.getSurvey());
+		Select<OfcDataErrorQueryRecord> select = 
+			dsl.selectFrom(OFC_DATA_ERROR_QUERY)
+				.where(OFC_DATA_ERROR_QUERY.QUERY_ID.eq(query.getId()));
+		
+		Result<OfcDataErrorQueryRecord> result = select.fetch();
+		return dsl.fromResult(result);
+	}
+
+	public List<DataErrorQuery> loadByType(DataErrorType errorType) {
+		JooqDSLContext dsl = dsl((CollectSurvey) errorType.getSurvey());
+		Select<OfcDataErrorQueryRecord> select = 
+			dsl.selectFrom(OFC_DATA_ERROR_QUERY)
+				.where(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID.eq(errorType.getId()));
 		
 		Result<OfcDataErrorQueryRecord> result = select.fetch();
 		return dsl.fromResult(result);
@@ -83,5 +105,6 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 		}
 
 	}
+
 }
 

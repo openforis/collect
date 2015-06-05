@@ -13,7 +13,6 @@ public class DataQueryForm extends DataCleansingItemForm<DataQuery> {
 	private Integer entityDefinitionId;
 	private Integer attributeDefinitionId;
 	private String conditions;
-
 	private String description;
 	
 	public DataQueryForm() {
