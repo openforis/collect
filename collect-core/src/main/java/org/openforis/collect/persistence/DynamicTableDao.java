@@ -66,8 +66,7 @@ public class DynamicTableDao extends JooqDaoSupport {
 	
 	@Transactional
 	public List<Map<String, String>> loadRows(String table, NameValueEntry[] filters, String[] notNullColumns) {
-		Lookup lookupTable = Lookup.getInstance(table);
-		initTable(table);
+		Lookup lookupTable = getLookupTable(table);
 		CollectDSLContext dsl = dsl();
 		Field<?>[] fields = lookupTable.fields();
 		SelectJoinStep<Record> select = dsl.select(fields).from(lookupTable);
@@ -88,14 +87,21 @@ public class DynamicTableDao extends JooqDaoSupport {
 
 	@Transactional
 	public boolean exists(String table, NameValueEntry[] filters, String[] notNullColumns) {
-		Lookup lookupTable = Lookup.getInstance(table);
-		initTable(table);
+		Lookup lookupTable = getLookupTable(table);
 		SelectJoinStep<Record1<Integer>> select = dsl().selectCount().from(lookupTable);
 		addFilterConditions(lookupTable, select, filters);
 		addNotNullConditions(lookupTable, select, notNullColumns);
 		Record record = select.fetchOne();
 		Integer count = (Integer) record.getValue(0);
 		return count > 0;
+	}
+
+	private Lookup getLookupTable(String table) {
+		Lookup lookupTable = Lookup.getInstance(table);
+		if (! lookupTable.isInitialized()) {
+			initializeTable(lookupTable);
+		}
+		return lookupTable;
 	}
 	
 	protected void addFilterConditions(Lookup lookupTable,
@@ -136,22 +142,14 @@ public class DynamicTableDao extends JooqDaoSupport {
 		}
 	}
 
-	protected void initTable(String table) {
-		Lookup lookupTable = Lookup.getInstance(table);
-		Collection<Map<String, ?>> colsMetadata = getColumnsMetadata(table);
-		for (Map<String, ?> colMetadata : colsMetadata) {
-			String colName = (String) colMetadata.get("COLUMN_NAME");
-			if ( lookupTable.field(colName) == null ) {
-				Integer dataType = (Integer) colMetadata.get("DATA_TYPE");
-				lookupTable.createField(colName, dataType);
-			}
-			
-		}
+	private void initializeTable(Lookup table) {
+		Collection<Map<String, ?>> colsMetadata = loadColumnsMetadata(table.getName());
+		table.initialize(colsMetadata);
 	}
-	
-	private List<Map<String, ?>> getColumnsMetadata(String table) {
+
+	private List<Map<String, ?>> loadColumnsMetadata(String table) {
 		List<Map<String, ?>> result = new ArrayList<Map<String,?>>();
-		try { 
+		try {
 			CollectDSLContext dsl = dsl();
 			Connection connection = dsl.configuration().connectionProvider().acquire();
 			DatabaseMetaData metaData = connection.getMetaData();

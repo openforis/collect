@@ -183,8 +183,8 @@ public class CollectRecord extends Record {
 		this(survey, versionName, rootEntityName, true);
 	}
 
-	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean toBeUpdated) {
-		super(survey, versionName, toBeUpdated);
+	public CollectRecord(CollectSurvey survey, String versionName, String rootEntityName, boolean enableValidationDependencyGraphs) {
+		super(survey, versionName, enableValidationDependencyGraphs);
 		this.step = Step.ENTRY;
 		// use List to preserve the order of the keys and counts
 		this.rootEntityKeyValues = new ArrayList<String>();

@@ -172,7 +172,7 @@ public class ExpressionFactory {
 	}
 
 	private ModelJXPathCompiledExpression compileExpression(String expression, boolean normalizeNumber) throws InvalidExpressionException {
-		String key = expressionKey(expression, normalizeNumber);
+		ExpressionKey key = new ExpressionKey(expression, normalizeNumber);
 		ModelJXPathCompiledExpression compiled = COMPILED_EXPRESSIONS.get(key);
 		if (compiled == null) {
 			try {
@@ -187,18 +187,56 @@ public class ExpressionFactory {
 		return compiled;
 	}
 
-	private static String expressionKey(String expression, boolean normalizeNumbers) {
-		return expression + "|||" + normalizeNumbers;
+	private static class ExpressionKey {
+		
+		private String expression;
+		private boolean normalizeNumbers;
+		
+		public ExpressionKey(String expression, boolean normalizeNumbers) {
+			super();
+			this.expression = expression;
+			this.normalizeNumbers = normalizeNumbers;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ((expression == null) ? 0 : expression.hashCode());
+			result = prime * result + (normalizeNumbers ? 1231 : 1237);
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ExpressionKey other = (ExpressionKey) obj;
+			if (expression == null) {
+				if (other.expression != null)
+					return false;
+			} else if (!expression.equals(other.expression))
+				return false;
+			if (normalizeNumbers != other.normalizeNumbers)
+				return false;
+			return true;
+		}
+		
 	}
 
-	private static class ExpressionCache extends LinkedHashMap<String, ModelJXPathCompiledExpression> {
+	private static class ExpressionCache extends LinkedHashMap<ExpressionKey, ModelJXPathCompiledExpression> {
 
 		private static final long serialVersionUID = 1L;
 
 		private static final int MAX_ENTRIES = 1000;
 
 		@Override
-		protected boolean removeEldestEntry(java.util.Map.Entry<String, ModelJXPathCompiledExpression> eldest) {
+		protected boolean removeEldestEntry(Entry<ExpressionKey, ModelJXPathCompiledExpression> eldest) {
 			return size() > MAX_ENTRIES;
 		}
 

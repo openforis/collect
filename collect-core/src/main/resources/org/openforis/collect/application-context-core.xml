@@ -43,6 +43,7 @@
 	<bean id="codeListItemDao" class="org.openforis.collect.persistence.CodeListItemDao"
 		lazy-init="false" depends-on="liquibase">
 		<property name="dataSource" ref="dataSource" />
+<!-- 		<property name="useCache" value="true" /> -->
 	</bean>
 	
 	<bean id="configurationDao" class="org.openforis.collect.persistence.ConfigurationDao"
