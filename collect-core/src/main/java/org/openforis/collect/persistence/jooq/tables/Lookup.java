@@ -4,6 +4,7 @@
 package org.openforis.collect.persistence.jooq.tables;
 
 import java.sql.Types;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,9 @@ public class Lookup extends TableImpl<LookupRecord> {
 
 	private static final long serialVersionUID = 1L;
 	private static Map<String, Lookup> nameToLookup;
+	
+	private boolean initialized = false;
+	public final org.jooq.TableField<LookupRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER, this);
 
 	public static Lookup getInstance(String name) {
 		if (nameToLookup == null) {
@@ -34,12 +38,21 @@ public class Lookup extends TableImpl<LookupRecord> {
 		}
 		return lookup;
 	}
-
+	
 	private Lookup(String name) {
 		super(name, Collect.COLLECT);
 	}
-
-	public final org.jooq.TableField<LookupRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER, this);
+	
+	public void initialize(Collection<Map<String, ?>> colsMetadata) {
+		for (Map<String, ?> colMetadata : colsMetadata) {
+			String colName = (String) colMetadata.get("COLUMN_NAME");
+			if ( this.field(colName) == null ) {
+				Integer dataType = (Integer) colMetadata.get("DATA_TYPE");
+				this.createField(colName, dataType);
+			}
+		}
+		initialized = true;
+	}
 
 	public TableField<LookupRecord, String> createFieldByName(String name) {
 		return createField(name, org.jooq.impl.SQLDataType.VARCHAR, this);
@@ -69,5 +82,9 @@ public class Lookup extends TableImpl<LookupRecord> {
 			throw new IllegalArgumentException("Unsupported SQL data type: " + sqlDataType);
 		}
 	}
-
+	
+	public boolean isInitialized() {
+		return initialized;
+	}
+	
 }
