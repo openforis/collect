@@ -29,6 +29,9 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/database_designer.png")]
 		public static const DATABASE_DESIGNER:Class;
 		
+		[Embed("/assets/images/backup.png")]
+		public static const BACKUP:Class;
+		
 		[Embed("/assets/images/user_management.png")]
 		public static const USER_MANAGEMENT:Class;
 		

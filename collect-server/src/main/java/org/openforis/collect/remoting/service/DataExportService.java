@@ -71,7 +71,7 @@ public class DataExportService {
 			Schema schema = survey.getSchema();
 			EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntityName);
 			
-			RecordFilter recordFilter = createRecordFilter(rootEntityDefn.getId(), onlyOwnedRecords, rootEntityKeyValues);
+			RecordFilter recordFilter = createRecordFilter(survey, rootEntityDefn.getId(), onlyOwnedRecords, rootEntityKeyValues);
 			
 			//filter by record step
 			recordFilter.setStepGreaterOrEqual(step);
@@ -99,14 +99,24 @@ public class DataExportService {
 	}
 	
 	@Transactional
+	public Proxy backup(String surveyName) {
+		CollectSurvey survey = surveyManager.get(surveyName);
+		return fullExport(survey, true, false, null);
+	}
+
+	@Transactional
 	public Proxy fullExport(boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectSurvey survey = sessionState.getActiveSurvey();
+		return fullExport(survey, includeRecordFiles, onlyOwnedRecords, rootEntityKeyValues);
+	}
+	
+	@Transactional
+	public Proxy fullExport(CollectSurvey survey, boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
 		if ( backupJob == null || ! backupJob.isRunning() ) {
 			resetJobs();
 			
-			SessionState sessionState = sessionManager.getSessionState();
-			CollectSurvey survey = sessionState.getActiveSurvey();
-			
-			RecordFilter filter = createRecordFilter(null, onlyOwnedRecords, rootEntityKeyValues);
+			RecordFilter filter = createRecordFilter(survey, null, onlyOwnedRecords, rootEntityKeyValues);
 			
 			SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
 			job.setOutputFormat(OutputFormat.ONLY_DATA);
@@ -122,14 +132,12 @@ public class DataExportService {
 		return getCurrentJob();
 	}
 
-	private RecordFilter createRecordFilter(Integer rootEntityId, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
-		
-		RecordFilter recordFilter = new RecordFilter(activeSurvey, rootEntityId);
+	private RecordFilter createRecordFilter(CollectSurvey survey, Integer rootEntityId, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
+		RecordFilter recordFilter = new RecordFilter(survey, rootEntityId);
 		
 		//filter by record owner
 		if ( onlyOwnedRecords ) {
+			SessionState sessionState = sessionManager.getSessionState();
 			User user = sessionState.getUser();
 			recordFilter.setOwnerId(user.getId());
 		}

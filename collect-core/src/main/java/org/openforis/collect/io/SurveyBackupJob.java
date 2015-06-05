@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.data.RecordFileBackupTask;
@@ -41,7 +42,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class SurveyBackupJob extends Job {
+public class SurveyBackupJob extends SurveyLockingJob {
 
 	public static final String ZIP_FOLDER_SEPARATOR = "/";
 	public static final String SURVEY_XML_ENTRY_NAME = "idml.xml";
@@ -85,7 +86,6 @@ public class SurveyBackupJob extends Job {
 	private CodeListManager codeListManager;
 	
 	//input
-	private CollectSurvey survey;
 	private boolean includeData;
 	private boolean includeRecordFiles;
 	private RecordFilter recordFilter;
@@ -262,14 +262,6 @@ public class SurveyBackupJob extends Job {
 		this.dataMarshaller = dataMarshaller;
 	}
 
-	public CollectSurvey getSurvey() {
-		return survey;
-	}
-
-	public void setSurvey(CollectSurvey survey) {
-		this.survey = survey;
-	}
-	
 	public File getOutputFile() {
 		return outputFile;
 	}
