@@ -868,6 +868,31 @@ public class SurveyManager {
 		survey.removeVersion(version);
 		codeListManager.removeVersioningReference(survey, version);
 	}
+	
+	@Transactional
+	public void updateLanguages(CollectSurvey survey, List<String> newLanguageCodes) {
+		codeListManager.updateSurveyLanguages(survey, newLanguageCodes);
+		
+		List<String> oldLangCodes = new ArrayList<String>(survey.getLanguages());
+		// remove languages from survey
+		for (String oldLangCode : oldLangCodes) {
+			if (! newLanguageCodes.contains(oldLangCode)) {
+				survey.removeLanguage(oldLangCode);
+			}
+		}
+		// add new languages
+		for (String lang : newLanguageCodes) {
+			if ( ! oldLangCodes.contains(lang) ) {
+				survey.addLanguage(lang);
+			}
+		}
+		// sort languages
+		for (int i = 0; i < newLanguageCodes.size(); i++) {
+			String lang = newLanguageCodes.get(i);
+			survey.moveLanguage(lang, i);
+		}
+
+	}
 
 	protected ProcessStatus getRecordValidationProcessStatus(int surveyId) {
 		ProcessStatus status = recordValidationStatusBySurvey.get(surveyId);

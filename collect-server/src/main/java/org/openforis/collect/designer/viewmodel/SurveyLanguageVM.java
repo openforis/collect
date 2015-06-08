@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.model.LabelledItem.LabelComparator;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.Languages;
@@ -18,6 +21,7 @@ import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 /**
  * 
@@ -30,6 +34,9 @@ public class SurveyLanguageVM extends BaseVM {
 	public static final String SURVEY_LANGUAGES_CHANGED_COMMAND = "surveyLanguagesChanged";
 	public static final String CLOSE_SURVEY_LANGUAGE_SELECT_POPUP_COMMAND = "closeSurveyLanguageSelectPopUp";
 	private static final int MAX_LANGUAGES = 3;
+	
+	@WireVariable
+	private SurveyManager surveyManager;
 	
 	private List<LabelledItem> languages;
 	private List<LabelledItem> assignedLanguages;
@@ -98,7 +105,10 @@ public class SurveyLanguageVM extends BaseVM {
 	@NotifyChange({"assignedLanguages", "selectedAssignedLanguage"})
 	public void removeLanguage() {
 		String defaultLangCode = getSurveyAssignedLanguageCodes().get(0);
-		if (selectedAssignedLanguage.getCode().equals(defaultLangCode)) {
+		if (assignedLanguages.indexOf(selectedAssignedLanguage) != assignedLanguages.size() - 1) {
+			MessageUtil.showWarning("survey.language.error.only_last_language_can_be_removed");
+			return;
+		} else if (selectedAssignedLanguage.getCode().equals(defaultLangCode)) {
 			MessageUtil.showWarning("survey.language.error.cannot_remove_default_language");
 			return;
 		}
@@ -108,36 +118,53 @@ public class SurveyLanguageVM extends BaseVM {
 	
 	@Command
 	public void applyChanges() {
-		SessionStatus sessionStatus = getSessionStatus();
-		CollectSurvey survey = sessionStatus.getSurvey();
+		final SessionStatus sessionStatus = getSessionStatus();
+		final CollectSurvey survey = sessionStatus.getSurvey();
 		
-		List<String> selectedLanguageCodes = getSelectedLanguageCodes();
-		List<String> oldLangCodes = new ArrayList<String>(survey.getLanguages());
-		// remove languages from survey
-		for (String oldLangCode : oldLangCodes) {
-			if (! selectedLanguageCodes.contains(oldLangCode)) {
-				survey.removeLanguage(oldLangCode);
-			}
+		final List<String> newLanguageCodes = getSelectedLanguageCodes();
+		final List<String> removedLanguages = calculateRemovedLanguages();
+		
+		if (removedLanguages.isEmpty()) {
+			performLanguageUpdate(survey, newLanguageCodes);
+		} else {
+			ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.ConfirmHandler() {
+				@Override
+				public void onOk() {
+					performLanguageUpdate(survey, newLanguageCodes);
+				}
+			}, "survey.language.remove.confirm");
+			confirmParams.setOkLabelKey("global.remove_item");
+			
+			confirmParams.setMessageArgs(new String[] {StringUtils.join(removedLanguages, ", ")});
+			MessageUtil.showConfirm(confirmParams);
 		}
-		// add new languages
-		for (String lang : selectedLanguageCodes) {
-			if ( ! oldLangCodes.contains(lang) ) {
-				survey.addLanguage(lang);
-			}
-		}
-		// sort languages
-		for (int i = 0; i < selectedLanguageCodes.size(); i++) {
-			String lang = selectedLanguageCodes.get(i);
-			survey.moveLanguage(lang, i);
-		}
+	}
 
+	private void performLanguageUpdate(CollectSurvey survey, List<String> newLanguageCodes) {
+		surveyManager.updateLanguages(survey, newLanguageCodes);
+		
 		if ( assignedLanguages.isEmpty() ) {
 			MessageUtil.showWarning("survey.language.error.select_at_least_one_language");
 		} else {
+			SessionStatus sessionStatus = getSessionStatus();
 			sessionStatus.setCurrentLanguageCode(survey.getDefaultLanguage());
 			BindUtils.postGlobalCommand(null, null, SURVEY_LANGUAGES_CHANGED_COMMAND, null);
 			BindUtils.postGlobalCommand(null, null, CURRENT_LANGUAGE_CHANGED_COMMAND, null);
 		}
+	}
+	
+	private List<String> calculateRemovedLanguages() {
+		final SessionStatus sessionStatus = getSessionStatus();
+		CollectSurvey survey = sessionStatus.getSurvey();
+		List<String> oldLanguageCodes = survey.getLanguages();
+		List<String> newLanguageCodes = getSelectedLanguageCodes();
+		List<String> removedLanguages = new ArrayList<String>();
+		for (String oldLangCode : oldLanguageCodes) {
+			if (! newLanguageCodes.contains(oldLangCode)) {
+				removedLanguages.add(Labels.getLabel(oldLangCode));
+			}
+		}
+		return removedLanguages;
 	}
 	
 	@Command

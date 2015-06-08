@@ -597,6 +597,28 @@ public class CodeListManager {
 		list.removeAllItems();
 	}
 	
+	public void updateSurveyLanguages(CollectSurvey survey, List<String> newLanguageCodes) {
+		List<String> oldLanguageCodes = survey.getLanguages();
+		List<Integer> removedLanguageCodePositions = new ArrayList<Integer>();
+		for (int i = 0; i < oldLanguageCodes.size(); i++) {
+			String oldLangCode = oldLanguageCodes.get(i);
+			int newLangCodeIndex = newLanguageCodes.indexOf(oldLangCode);
+			if (newLangCodeIndex < 0) {
+				Integer lastRemovedLangCodePosition = removedLanguageCodePositions.isEmpty() ? null: removedLanguageCodePositions.get(removedLanguageCodePositions.size() - 1);
+				if (lastRemovedLangCodePosition != null && ! lastRemovedLangCodePosition.equals(i)) {
+					throw new IllegalArgumentException("Cannot remove a language in the middle, only last languages remove is supported");
+				}
+				removedLanguageCodePositions.add(i + 1);
+			} else if (newLangCodeIndex != i) {
+				throw new IllegalArgumentException("Cannot change position for language " + oldLangCode);
+			}
+		}
+		if (! removedLanguageCodePositions.isEmpty()) {
+			Integer fromLanguagePosition = removedLanguageCodePositions.get(0);
+			codeListItemDao.removeLabels(survey, fromLanguagePosition);
+		}
+	}
+	
 	public FileWrapper loadImageContent(PersistedCodeListItem item) {
 		return codeListItemDao.loadImageContent(item);
 	}

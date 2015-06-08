@@ -6,7 +6,9 @@ import static org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
@@ -439,6 +441,34 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 
 		if ( useCache && ! survey.isWork() ) {
 			cache.removeItemsByCodeList(survey.getId(), codeListId);
+		}
+	}
+
+	public void removeLabels(CollectSurvey survey, int fromLanguagePosition) {
+		JooqDSLContext jf = dsl(null);
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
+		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList codeList : codeLists) {
+			int codeListId = codeList.getId();
+			
+			Map<TableField<OfcCodeListRecord, String>, String> updateFields = new HashMap<TableField<OfcCodeListRecord,String>, String>();
+			for (int i = fromLanguagePosition - 1; i < LABEL_FIELDS.length; i++) {
+				@SuppressWarnings("unchecked")
+				TableField<OfcCodeListRecord, String> labelField = LABEL_FIELDS[i];
+				updateFields.put(labelField, (String) null);
+			}
+			jf.update(OFC_CODE_LIST)
+				.set(updateFields)
+				.where(surveyIdField.eq(survey.getId())
+					.and(oppositeSurveyIdField.isNull())
+					.and(OFC_CODE_LIST.CODE_LIST_ID.eq(codeListId))
+					)
+				.execute();
+			
+			if ( useCache && ! survey.isWork() ) {
+				cache.removeItemsByCodeList(survey.getId(), codeListId);
+			}
 		}
 	}
 
