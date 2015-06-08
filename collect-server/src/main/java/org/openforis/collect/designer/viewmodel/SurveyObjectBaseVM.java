@@ -23,7 +23,6 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.HtmlBasedComponent;
 import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
@@ -32,7 +31,6 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  * @author S. Ricci
  *
  */
-@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	
 	private static final String NAME_TEXTBOX_ID = "nameTextbox";
