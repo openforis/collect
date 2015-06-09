@@ -22,12 +22,10 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SpeciesManager;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.commons.collection.CollectionUtils;
-import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +54,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	
 	public enum OutputFormat {
 		DESKTOP("collect"), 
+		DESKTOP_FULL("collect-backup"),
 		MOBILE("collect-mobile"),
 		ONLY_DATA("collect-data");
 		

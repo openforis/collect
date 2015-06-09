@@ -80,14 +80,6 @@ package org.openforis.collect.presenter {
 			_fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 		}
 		
-		/*override protected function closeHandler(event:Event = null):void {
-			if ( _job != null && _job is JobProxy && JobProxy(_job).running ) {
-				AlertUtil.showMessage("restore.cannotClosePopUp");
-			} else {
-				PopUpManager.removePopUp(view);
-			}
-		}*/
-		
 		private function selectFileButtonClickHandler(event:MouseEvent):void {
 			_fileReference.browse([_fileFilter]);
 		}
@@ -110,7 +102,17 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function cancelButtonClickHandler(event:MouseEvent):void {
-			ClientFactory.dataImportClient.cancel(_cancelResponder);
+			switch (view.currentState) {
+			case RestoreView.STATE_UPLOADING:
+				_fileReference.cancel();
+				resetView();
+				break;
+			case RestoreView.STATE_PROCESSING:
+				if (StringUtil.isNotBlank(_jobLockId)) {
+					ClientFactory.collectJobClient.abortJob(_cancelResponder, _jobLockId);
+				}
+				break;
+			}
 		}
 		
 		private function restoreAnotherFileHandler(event:MouseEvent):void {

@@ -21,6 +21,13 @@ public class CollectJobService {
 		return job == null ? null : new JobProxy(job);
 	}
 	
+	public void abortJob(String lockId) {
+		Job job = jobManager.getJob(lockId);
+		if (job != null) {
+			job.abort();
+		}
+	}
+	
 	public ApplicationLockingJobProxy getApplicationJob() {
 		ApplicationLockingJob job = jobManager.getApplicationJob();
 		return job == null ? null : new ApplicationLockingJobProxy(job);

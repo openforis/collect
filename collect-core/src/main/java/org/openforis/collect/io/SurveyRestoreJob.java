@@ -37,7 +37,8 @@ import org.springframework.stereotype.Component;
 public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 
 	public static final String[] COMPLETE_BACKUP_FILE_EXTENSIONS = new String[] {
-		SurveyBackupJob.OutputFormat.DESKTOP.getOutputFileExtension()
+		SurveyBackupJob.OutputFormat.DESKTOP.getOutputFileExtension(),
+		SurveyBackupJob.OutputFormat.DESKTOP_FULL.getOutputFileExtension()
 	};
 
 	@Autowired

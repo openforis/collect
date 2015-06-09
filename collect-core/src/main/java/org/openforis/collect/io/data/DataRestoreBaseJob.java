@@ -67,6 +67,23 @@ public abstract class DataRestoreBaseJob extends Job {
 		}
 		super.prepareTask(task);
 	}
+	
+	@Override
+	protected void onTaskCompleted(Task task) {
+		super.onTaskCompleted(task);
+		if ( task instanceof IdmlUnmarshallTask ) {
+			CollectSurvey survey = ((IdmlUnmarshallTask) task).getSurvey();
+			if ( survey == null ) {
+				throw new RuntimeException("Error extracting packaged survey");
+			} else {
+				packagedSurvey = survey;
+				checkPackagedSurveyUri();
+				initExistingSurvey();
+			}
+			this.packagedSurvey = survey;
+		}
+	}
+
 
 	protected void checkPackagedSurveyUri() {
 		String packagedSurveyUri = packagedSurvey.getUri();
