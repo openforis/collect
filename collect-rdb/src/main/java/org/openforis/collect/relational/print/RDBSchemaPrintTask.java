@@ -1,5 +1,7 @@
 package org.openforis.collect.relational.print;
 
+import static org.openforis.collect.relational.util.SQLUtils.doubleQuote;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 	protected void execute() throws Throwable {
 		if ( ! isSchemaless() ) {
 			writer.write("CREATE SCHEMA ");
-			writer.write(schema.getName());
+			writer.write(doubleQuote(schema.getName()));
 			writer.write(';');
 			writer.write('\n');
 		}
@@ -42,10 +44,10 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 	private void writeTable(Table<?> table) throws IOException {
 		writer.write("CREATE TABLE ");
 		if ( ! isSchemaless() ) {
-			writer.write(schema.getName());
+			writer.write(doubleQuote(schema.getName()));
 			writer.write('.');
 		}
-		writer.write(table.getName());
+		writer.write(doubleQuote(table.getName()));
 		writer.write(" (");
 		writer.write('\n');
 		List<Column<?>> columns = table.getColumns();
@@ -77,7 +79,7 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 
 	private void writeColumn(Column<?> column) throws IOException {
 		writer.write('\t');
-		writer.write(column.getName());
+		writer.write(doubleQuote(column.getName()));
 		writer.write(' ');
 		writer.write(column.getTypeName());
 		if ( column.getLength() != null ) {
@@ -137,17 +139,17 @@ public class RDBSchemaPrintTask extends RDBPrintTask {
 			if ( i > 0 ) {
 				writer.write(',');
 			}
-			writer.write(referencedColumns.get(i).getName());
+			writer.write(doubleQuote(referencedColumns.get(i).getName()));
 		}
 	}
 
 	private String getQualifiedTableName(Table<?> table) {
 		StringBuffer sb = new StringBuffer();
 		if( ! isSchemaless() ) {
-			sb.append(schema.getName());
+			sb.append(doubleQuote(schema.getName()));
 			sb.append('.');
 		}
-		sb.append(table.getName());
+		sb.append(doubleQuote(table.getName()));
 		return sb.toString();
 	}
 

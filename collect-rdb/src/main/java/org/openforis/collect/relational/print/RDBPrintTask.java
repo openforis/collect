@@ -1,5 +1,8 @@
 package org.openforis.collect.relational.print;
 
+import static org.openforis.collect.relational.util.SQLUtils.doubleQuote;
+import static org.openforis.collect.relational.util.SQLUtils.quote;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
@@ -48,7 +51,7 @@ public abstract class RDBPrintTask extends Task {
 			writer.write("INSERT INTO ");
 			writer.write(getQualifiedName(table));
 			writer.write('(');
-			writer.write(StringUtils.join(getColumnNames(table), ", "));
+			writer.write(StringUtils.join(doubleQuote(getColumnNames(table)), ", "));
 			writer.write(')');
 			writer.write(" VALUES ");
 			writer.write('\n');
@@ -86,14 +89,14 @@ public abstract class RDBPrintTask extends Task {
 			return "null";
 		} else if ( val instanceof String ) {
 			String escapedVal = StringUtils.replace((String) val, "'", "''");
-			return "'" + escapedVal + "'";
+			return quote(escapedVal);
 		} else if ( val instanceof Date ) {
-			return "'" + dateFormatter.format(val) + "'";
+			return quote(dateFormatter.format(val));
 		} else {
 			return val.toString();
 		}
 	}
-
+	
 	private List<String> getColumnNames(Table<?> table) {
 		List<Column<?>> columns = table.getColumns();
 		List<String> names = new ArrayList<String>();
@@ -106,10 +109,10 @@ public abstract class RDBPrintTask extends Task {
 	private String getQualifiedName(Table<?> table) {
 		StringBuilder sb = new StringBuilder();
 		if ( ! isSchemaless() ) {
-			sb.append(schema.getName());
+			sb.append(doubleQuote(schema.getName()));
 			sb.append('.');
 		}
-		sb.append(table.getName());
+		sb.append(doubleQuote(table.getName()));
 		return sb.toString();
 	}
 	
