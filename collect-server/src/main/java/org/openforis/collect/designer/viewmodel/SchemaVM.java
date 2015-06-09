@@ -1287,7 +1287,7 @@ public class SchemaVM extends SurveyBaseVM {
 			@Override
 			public boolean evaluate(SurveyObject item) {
 				if ( item instanceof UITab ) {
-					return ! assignableTabs.contains(item);
+					return survey.isPublished() && ! assignableTabs.contains(item);
 				} else if (item instanceof NodeDefinition) {
 					if (item.equals(parentDefn)) {
 						return false;
@@ -1330,12 +1330,13 @@ public class SchemaVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void schemaTreeNodeSelected(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("node") SurveyObject surveyObject) {
 		if ( surveyObject instanceof UITab ) {
-			EntityDefinition futureParentEntityDef = ((UITab) surveyObject).getUIOptions().getParentEntityForAssignedNodes((UITab) surveyObject);
+			UITab tab = (UITab) surveyObject;
+			EntityDefinition newParentEntityDef = tab.getUIOptions().getParentEntityForAssignedNodes(tab);
 			NodeDefinition editedNodeDef = (NodeDefinition) editedNode;
-			if (editedNodeDef.getParentDefinition() != futureParentEntityDef) {
-				changeEditedNodeParentEntity((EntityDefinition) surveyObject);
+			if (editedNodeDef.getParentDefinition() != newParentEntityDef) {
+				changeEditedNodeParentEntity(newParentEntityDef);
 			}
-			associateNodeToTab(editedNodeDef, (UITab) surveyObject);
+			associateNodeToTab(editedNodeDef, tab);
 		} else if ( surveyObject instanceof EntityDefinition ) {
 			changeEditedNodeParentEntity((EntityDefinition) surveyObject);
 		}
@@ -1349,8 +1350,7 @@ public class SchemaVM extends SurveyBaseVM {
 		schema.changeParentEntity(node, newParentEntity);
 		//update tab
 		UIOptions uiOptions = survey.getUIOptions();
-		UITab newTab = uiOptions.getAssignedTab(newParentEntity);
-		uiOptions.assignToTab(node, newTab);
+		uiOptions.removeTabAssociation(node);
 		//update ui
 		refreshTreeModel();
 		editedNodeParentEntity = newParentEntity;
