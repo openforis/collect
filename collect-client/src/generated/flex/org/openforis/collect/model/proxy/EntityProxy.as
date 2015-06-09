@@ -581,7 +581,7 @@ package org.openforis.collect.model.proxy {
 		private function getChildDefinitionIndex(childDefn:NodeDefinitionProxy):int {
 			var version:ModelVersionProxy = this.record.version;
 			var defs:IList = EntityDefinitionProxy(definition).getDefinitionsInVersion(version);
-			var index:int = defs.getItemIndex(childDefn);
+			var index:int = CollectionUtil.getItemIndex(defs, "id", childDefn.id);
 			return index;
 		}
 		
