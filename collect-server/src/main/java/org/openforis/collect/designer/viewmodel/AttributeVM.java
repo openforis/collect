@@ -164,7 +164,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	public void calculatedChanged(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("changed") boolean changed) {
 		setTempFormObjectFieldValue("key", false);
 		setTempFormObjectFieldValue("multiple", false);
-		setTempFormObjectFieldValue("showInUI", ! changed);
+		setTempFormObjectFieldValue("showInUI", true);
 		setTempFormObjectFieldValue("includeInDataExport", Annotation.INCLUDE_IN_DATA_EXPORT.getDefaultValue());
 		setTempFormObjectFieldValue("editable", Annotation.EDITABLE.getDefaultValue());
 		setTempFormObjectFieldValue("phaseToApplyDefaultValue", ((Step) Annotation.PHASE_TO_APPLY_DEFAULT_VALUE.getDefaultValue()).name());
