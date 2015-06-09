@@ -20,7 +20,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
-	import org.openforis.collect.ui.component.BackupPopUp;
+	import org.openforis.collect.ui.component.BackupView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.DateUtil;
@@ -34,15 +34,11 @@ package org.openforis.collect.presenter {
 	 * @author S. Ricci
 	 * 
 	 */
-	public class BackupPopUpPresenter extends PopUpPresenter {
+	public class BackupViewPresenter extends AbstractPresenter {
 		
 		private static const PROGRESS_DELAY:int = 2000;
-		private static const ALL_STEPS_ITEM:Object = {label: Message.get('global.allItemsLabel')};
 		
-		private static const TYPE_FULL:String = "full";
-		private static const TYPE_PARTIAL:String = "partial";
-		
-		private static const XML_EXPORT_FILE_NAME_FORMAT:String = "{0}_{1}.collect-backup";
+		private static const EXPORT_FILE_NAME_FORMAT:String = "{0}_{1}.collect-backup";
 		
 		private var _cancelResponder:IResponder;
 		private var _exportResponder:IResponder;
@@ -52,15 +48,15 @@ package org.openforis.collect.presenter {
 		private var _job:Proxy;
 		private var _firstOpen:Boolean = true;
 		
-		public function BackupPopUpPresenter(view:BackupPopUp) {
+		public function BackupViewPresenter(view:BackupView) {
 			super(view);
 			this._exportResponder = new AsyncResponder(exportResultHandler, faultHandler);
 			this._cancelResponder = new AsyncResponder(cancelResultHandler, faultHandler);
 			this._getStateResponder = new AsyncResponder(getStateResultHandler, faultHandler);
 		}
 		
-		private function get view():BackupPopUp {
-			return BackupPopUp(_view);
+		private function get view():BackupView {
+			return BackupView(_view);
 		}
 		
 		override public function init():void {
@@ -74,17 +70,17 @@ package org.openforis.collect.presenter {
 			view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
 			view.cancelExportButton.addEventListener(MouseEvent.CLICK, cancelExportButtonClickHandler);
 			view.downloadButton.addEventListener(MouseEvent.CLICK, downloadButtonClickHandler);
-			view.closeButton1.addEventListener(MouseEvent.CLICK, closeHandler);
-			view.closeButton3.addEventListener(MouseEvent.CLICK, closeHandler);
+			//view.closeButton1.addEventListener(MouseEvent.CLICK, closeHandler);
+			//view.closeButton3.addEventListener(MouseEvent.CLICK, closeHandler);
 		}
 		
-		override protected function closeHandler(event:Event = null):void {
+		/*override protected function closeHandler(event:Event = null):void {
 			if ( _job != null && _job is JobProxy && JobProxy(_job).running ) {
 				AlertUtil.showMessage("export.cannotClosePopUp");
 			} else {
 				PopUpManager.removePopUp(view);
 			}
-		}
+		}*/
 		
 		protected function exportButtonClickHandler(event:MouseEvent):void {
 			if ( ! validateForm() ) {
@@ -92,7 +88,7 @@ package org.openforis.collect.presenter {
 			}
 			var surveyName:String = view.surveyDropDown.selectedItem.name;
 			ClientFactory.dataExportClient.backup(_exportResponder, surveyName);
-			view.currentState = BackupPopUp.STATE_EXPORTING;
+			view.currentState = BackupView.STATE_EXPORTING;
 			view.progressBar.setProgress(0, 0);
 		}
 		
@@ -109,7 +105,7 @@ package org.openforis.collect.presenter {
 			var dateStr:String = DateUtil.formatToXML(new Date());
 			var fileName:String = SurveyBackupJobProxy(_job).outputFileName;
 			var surveyName:String = view.surveyDropDown.selectedItem.name;
-			var outputFileName:String = mx.utils.StringUtil.substitute(XML_EXPORT_FILE_NAME_FORMAT, [surveyName, dateStr]); 
+			var outputFileName:String = mx.utils.StringUtil.substitute(EXPORT_FILE_NAME_FORMAT, [surveyName, dateStr]); 
 
 			var req:URLRequest = new URLRequest(url);
 			req.data = new URLVariables();
@@ -164,7 +160,7 @@ package org.openforis.collect.presenter {
 				var job:JobProxy = _job as JobProxy;
 				var progress:int = job.progressPercent;
 				if ( job.running && progress <= 100 ) {
-					view.currentState = BackupPopUp.STATE_EXPORTING;
+					view.currentState = BackupView.STATE_EXPORTING;
 					view.progressBar.setProgress(progress, 100);
 					var progressText:String = Message.get("export.processing");
 					view.progressLabel.text = progressText;
@@ -176,7 +172,7 @@ package org.openforis.collect.presenter {
 				} else {
 					switch ( job.status ) {
 					case JobProxy$Status.COMPLETED:
-						view.currentState = BackupPopUp.STATE_COMPLETE;
+						view.currentState = BackupView.STATE_COMPLETE;
 						stopProgressTimer();
 						if (SurveyBackupJobProxy(job).dataBackupErrorsFound) { 
 							AlertUtil.showError("export.complete_with_errors");
@@ -204,7 +200,7 @@ package org.openforis.collect.presenter {
 		protected function resetView():void {
 			stopProgressTimer();
 			_job = null;
-			view.currentState = BackupPopUp.STATE_PARAMETERS_SELECTION;
+			view.currentState = BackupView.STATE_PARAMETERS_SELECTION;
 			checkEnabledFields();
 		}
 		
@@ -213,7 +209,7 @@ package org.openforis.collect.presenter {
 			
 			populateForm();
 			
-			view.currentState = BackupPopUp.STATE_PARAMETERS_SELECTION;
+			view.currentState = BackupView.STATE_PARAMETERS_SELECTION;
 
 			//try to see if there is an export still running
 			updateExportState();

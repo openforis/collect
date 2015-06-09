@@ -1,46 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<component:PopUp xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				 xmlns:s="library://ns.adobe.com/flex/spark" 
 				 xmlns:mx="library://ns.adobe.com/flex/mx"
 				 xmlns:component="org.openforis.collect.ui.component.*"
 				 xmlns:container="org.openforis.collect.ui.container.*" 
 				 xmlns:detail="org.openforis.collect.ui.component.detail.*" 
 				 xmlns:input="org.openforis.collect.ui.component.input.*"
-				 width="400" height="300" 
-				 title="{Message.get('backup.popUp.title')}" 
 				 xmlns:layout="org.openforis.collect.ui.layout.*"
+				 creationComplete="creationCompleteHandler(event)"
 				 >
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
+			
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.SurveySummary;
-			import org.openforis.collect.presenter.BackupPopUpPresenter;
-			import org.openforis.collect.presenter.PopUpPresenter;
+			import org.openforis.collect.presenter.BackupViewPresenter;
 			
 			public static const STATE_LOADING:String = "loading";
 			public static const STATE_PARAMETERS_SELECTION:String = "parametersSelection";
 			public static const STATE_EXPORTING:String = "exporting";
 			public static const STATE_COMPLETE:String = "complete";
 			
-			private var _presenter:BackupPopUpPresenter;
-			
-			override protected function createPresenter():PopUpPresenter {
-				return new BackupPopUpPresenter(this);
+			private var _presenter:BackupViewPresenter;
+
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new BackupViewPresenter(this);
+				_presenter.init();
 			}
 			
 			protected function surveyLabelFunction(survey:SurveySummary):String {
 				return survey.name;
 			}
+			
 		]]>
 	</fx:Script>
 	
-	<component:states>
+	<s:states>
 		<s:State name="loading" />
 		<s:State name="parametersSelection" />
 		<s:State name="exporting" />
 		<s:State name="complete" />
-	</component:states>
+	</s:states>
 	
 	<s:Group includeIn="loading"
 			 width="100%" height="100%">
@@ -82,10 +84,6 @@
 					  buttonMode="true"
 					  />
 			
-			<s:Button id="closeButton1"
-					  label="{Message.get('global.cancel')}"
-					  useHandCursor="true" 
-					  buttonMode="true" />
 		</s:HGroup>
 	</s:VGroup>
 	
@@ -130,13 +128,7 @@
 					  useHandCursor="true" 
 					  buttonMode="true"
 					  />
-			
-			<s:Button id="closeButton3"
-					  label="{Message.get('global.close')}"
-					  useHandCursor="true" 
-					  buttonMode="true"
-					  />
 		</s:HGroup>
 	</s:VGroup>
 	
-</component:PopUp>
+</s:VGroup>

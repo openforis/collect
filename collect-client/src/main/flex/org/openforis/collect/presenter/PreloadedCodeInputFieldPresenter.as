@@ -184,7 +184,7 @@ package org.openforis.collect.presenter
 				if(view.selectedItems.length > 0) {
 					for each (var item:Object in view.selectedItems) {
 						if (item is CodeListItemProxy) {
-							var codeListItem = CodeListItemProxy(item);
+							var codeListItem:CodeListItemProxy = CodeListItemProxy(item);
 							r = createAttributeAddRequest(getTextValue(codeListItem.code, codeListItem.qualifier), null, remarks);
 							addAttributesOperations.addItem(r);
 						} else if (DropDownInputFieldPresenter.isReasonBlankItem(item)) {
@@ -209,7 +209,7 @@ package org.openforis.collect.presenter
 				if ( view.selectedItems.length == 1 ) {
 					var selectedItem:Object = view.selectedItems[0];
 					if (selectedItem is CodeListItemProxy) {
-						var codeListItem = CodeListItemProxy(selectedItem);
+						var codeListItem:CodeListItemProxy = CodeListItemProxy(selectedItem);
 						value = getTextValue(codeListItem.code, codeListItem.qualifier);
 					} else {
 						value = selectedItem.shortCut;

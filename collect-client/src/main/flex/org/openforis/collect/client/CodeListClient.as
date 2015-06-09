@@ -12,7 +12,7 @@ package org.openforis.collect.client {
 	 * */
 	public class CodeListClient extends AbstractClient {
 		
-		var _isEditedSurveyCodeListEmptyOperation:Operation;
+		private var _isEditedSurveyCodeListEmptyOperation:Operation;
 		
 		public function CodeListClient() {
 			super("codeListSessionService");

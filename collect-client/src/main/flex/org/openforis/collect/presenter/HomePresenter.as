@@ -10,7 +10,8 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.Images;
-	import org.openforis.collect.ui.component.BackupPopUp;
+	import org.openforis.collect.ui.component.BackupRestorePopUp;
+	import org.openforis.collect.ui.component.BackupView;
 	import org.openforis.collect.ui.component.ConfigurationPopUp;
 	import org.openforis.collect.ui.component.user.UserManagementPopUp;
 	import org.openforis.collect.ui.view.HomePageView;
@@ -38,8 +39,8 @@ package org.openforis.collect.presenter {
 			label: Message.get('home.surveyDesigner'),
 			icon: Images.DATABASE_DESIGNER};
 
-		private static const BACKUP_MENU_ITEM:Object = {
-			label: Message.get('home.backup'),
+		private static const BACKUP_RESTORE_MENU_ITEM:Object = {
+			label: Message.get('home.backup_restore'),
 				icon: Images.BACKUP};
 
 		private static const CONFIGURATION_MENU_ITEM:Object = {
@@ -70,7 +71,7 @@ package org.openforis.collect.presenter {
 			
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(DESIGNER_MENU_ITEM);
-				result.addItem(BACKUP_MENU_ITEM);
+				result.addItem(BACKUP_RESTORE_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
 				result.addItem(CONFIGURATION_MENU_ITEM);
 			}
@@ -88,8 +89,8 @@ package org.openforis.collect.presenter {
 				case DESIGNER_MENU_ITEM:
 					navigateToURL(new URLRequest(ApplicationConstants.DESIGNER_URL), "_self");
 					break;
-				case BACKUP_MENU_ITEM:
-					PopUpUtil.createPopUp(BackupPopUp, true);
+				case BACKUP_RESTORE_MENU_ITEM:
+					PopUpUtil.createPopUp(BackupRestorePopUp, true);
 					break;
 				case USERS_MANAGEMENT_MENU_ITEM:
 					PopUpUtil.createPopUp(UserManagementPopUp, true);

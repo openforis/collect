@@ -152,7 +152,7 @@ mx|Alert {
 
 component|BlockingMessagePopUp,
 	concurrency|CollectJobStatusPopUp,
-	component|BackupPopUp, component|DataExportPopUp, component|DataImportPopUp, 
+	component|BackupRestorePopUp, component|DataExportPopUp, component|DataImportPopUp, 
 	component|SelectVersionPopUp, component|SpeciesImportPopUp, 
 	component|SurveySelectionPopUp,
 	component|ConfigurationPopUp,
@@ -170,7 +170,7 @@ component|BlockingMessagePopUp,
 }
 
 component|BlockingMessagePopUp, concurrency|CollectJobStatusPopUp, component|SurveySelectionPopUp, component|SelectVersionPopUp, 
-	component|DataExportPopUp, component|BackupPopUp, component|SpeciesImportPopUp {
+	component|DataExportPopUp, component|BackupView, component|SpeciesImportPopUp {
 	showCloseButton: false;
 }
 

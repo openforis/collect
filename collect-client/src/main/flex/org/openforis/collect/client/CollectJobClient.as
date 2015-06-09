@@ -9,6 +9,7 @@ package org.openforis.collect.client {
 	 * */
 	public class CollectJobClient extends AbstractClient {
 		
+		private var _getJobOperation:Operation;
 		private var _getApplicationJobOperation:Operation;
 		private var _abortApplicationJobOperation:Operation;
 		private var _getSurveyJobOperation:Operation;
@@ -17,12 +18,18 @@ package org.openforis.collect.client {
 		public function CollectJobClient() {
 			super("collectJobService");
 			
+			this._getJobOperation = getOperation("getJob", CONCURRENCY_LAST, false);
 			this._getApplicationJobOperation = getOperation("getApplicationJob", CONCURRENCY_LAST, false);
 			this._abortApplicationJobOperation = getOperation("abortApplicationJob");
 			this._getSurveyJobOperation = getOperation("getSurveyJob", CONCURRENCY_LAST, false);
 			this._abortSurveyJobOperation = getOperation("abortSurveyJob");
 		}
 		
+		public function getJob(responder:IResponder, lockId:String):void {
+			var token:AsyncToken = this._getJobOperation.send(lockId);
+			token.addResponder(responder);
+		}
+
 		public function getApplicationJob(responder:IResponder):void {
 			var token:AsyncToken = this._getApplicationJobOperation.send();
 			token.addResponder(responder);
@@ -38,7 +45,7 @@ package org.openforis.collect.client {
 			token.addResponder(responder);
 		}
 		
-		public function abortSurveyJob(responder:IResponder, surveyId):void {
+		public function abortSurveyJob(responder:IResponder, surveyId:int):void {
 			var token:AsyncToken = this._abortSurveyJobOperation.send(surveyId);
 			token.addResponder(responder);
 		}
