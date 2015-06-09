@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.servlet.ServletContext;
 
 import org.openforis.collect.Proxy;
+import org.openforis.collect.backup.BackupStorageManager;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.CSVDataExportProcess;
@@ -22,6 +23,9 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.concurrency.JobManager;
+import org.openforis.concurrency.Worker.Status;
+import org.openforis.concurrency.WorkerStatusChangeEvent;
+import org.openforis.concurrency.WorkerStatusChangeListener;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +53,8 @@ public class DataExportService {
 	private ApplicationContext appContext;
 	@Autowired
 	private JobManager jobManager;
+	@Autowired
+	private BackupStorageManager backupStorageManager;
 	
 	private CSVDataExportProcess dataExportProcess;
 	private SurveyBackupJob backupJob;
@@ -101,18 +107,28 @@ public class DataExportService {
 	@Transactional
 	public Proxy backup(String surveyName) {
 		CollectSurvey survey = surveyManager.get(surveyName);
-		return fullExport(survey, true, false, null);
+		WorkerStatusChangeListener statusChangeListener = new WorkerStatusChangeListener() {
+			@Override
+			public void statusChanged(WorkerStatusChangeEvent event) {
+				if (event.getTo() == Status.COMPLETED) {
+					SurveyBackupJob job = (SurveyBackupJob) event.getSource();
+					File file = job.getOutputFile();
+					backupStorageManager.store(file);
+				}
+			}
+		};
+		return fullExport(survey, true, false, null, statusChangeListener);
 	}
 
 	@Transactional
 	public Proxy fullExport(boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
-		return fullExport(survey, includeRecordFiles, onlyOwnedRecords, rootEntityKeyValues);
+		return fullExport(survey, includeRecordFiles, onlyOwnedRecords, rootEntityKeyValues, null);
 	}
 	
 	@Transactional
-	public Proxy fullExport(CollectSurvey survey, boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
+	public Proxy fullExport(CollectSurvey survey, boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues, WorkerStatusChangeListener statusChangeListener) {
 		if ( backupJob == null || ! backupJob.isRunning() ) {
 			resetJobs();
 			
@@ -124,7 +140,9 @@ public class DataExportService {
 			job.setIncludeData(true);
 			job.setIncludeRecordFiles(includeRecordFiles);
 			job.setRecordFilter(filter);
-			
+			if (statusChangeListener != null) {
+				job.addStatusChangeListener(statusChangeListener);
+			}
 			backupJob = job;
 			
 			jobManager.start(job);

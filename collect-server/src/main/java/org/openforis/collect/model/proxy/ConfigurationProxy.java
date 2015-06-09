@@ -16,12 +16,15 @@ public class ConfigurationProxy implements Proxy {
 	private transient Configuration configuration;
 	private String defaultRecordFileUploadPath;
 	private String defaultRecordIndexPath;
+	private String defaultBackupStoragePath;
 
-	public ConfigurationProxy(Configuration configuration, String defaultRecordFileUploadPath, String defaultRecordIndexPath) {
+	public ConfigurationProxy(Configuration configuration, String defaultRecordFileUploadPath, 
+			String defaultRecordIndexPath, String defaultBackupStoragePath) {
 		super();
 		this.configuration = configuration;
 		this.defaultRecordFileUploadPath = defaultRecordFileUploadPath;
 		this.defaultRecordIndexPath = defaultRecordIndexPath;
+		this.defaultBackupStoragePath = defaultBackupStoragePath;
 	}
 	
 	@ExternalizedProperty
@@ -50,6 +53,15 @@ public class ConfigurationProxy implements Proxy {
 	
 	public String getDefaultRecordIndexPath() {
 		return defaultRecordIndexPath;
+	}
+	
+	@ExternalizedProperty
+	public String getBackupStoragePath() {
+		return configuration.getBackupStoragePath();
+	}
+	
+	public String getDefaultBackupStoragePath() {
+		return defaultBackupStoragePath;
 	}
 	
 }
