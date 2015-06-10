@@ -105,7 +105,7 @@ public class DataExportService {
 	}
 	
 	@Transactional
-	public Proxy backup(String surveyName) {
+	public Proxy backup(final String surveyName) {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		WorkerStatusChangeListener statusChangeListener = new WorkerStatusChangeListener() {
 			@Override
@@ -113,7 +113,7 @@ public class DataExportService {
 				if (event.getTo() == Status.COMPLETED) {
 					SurveyBackupJob job = (SurveyBackupJob) event.getSource();
 					File file = job.getOutputFile();
-					backupStorageManager.store(file);
+					backupStorageManager.store(surveyName, file);
 				}
 			}
 		};
