@@ -1,4 +1,4 @@
-package org.openforis.collect.backup;
+package org.openforis.collect.io.data.restore;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -20,18 +20,18 @@ import org.openforis.collect.utils.Dates;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BackupStorageManager extends BaseStorageManager {
+public class RestoredBackupStorageManager extends BaseStorageManager {
 	
 	private static final long serialVersionUID = 1L;
 	
-	protected static Log LOG = LogFactory.getLog(BackupStorageManager.class);
+	protected static Log LOG = LogFactory.getLog(RestoredBackupStorageManager.class);
 	
-	private static final String DEFAULT_BACKUP_STORAGE_SUBFOLDER = "backup";
-	
+	private static final String DEFAULT_STORAGE_SUBFOLDER = "restore";
 	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss";
+	private static final String TEMP_DIRECTORY_NAME = "unsuccessfull";
 	
-	public BackupStorageManager() {
-		super(DEFAULT_BACKUP_STORAGE_SUBFOLDER);
+	public RestoredBackupStorageManager() {
+		super(DEFAULT_STORAGE_SUBFOLDER);
 	}
 	
 	@PostConstruct
@@ -40,22 +40,20 @@ public class BackupStorageManager extends BaseStorageManager {
 	}
 
 	protected void initStorageDirectory() {
-		super.initStorageDirectory(ConfigurationItem.BACKUP_STORAGE_PATH);
+		super.initStorageDirectory(ConfigurationItem.RESTORED_BACKUP_STORAGE_PATH);
 		if ( storageDirectory == null ) {
-			String message = "Survey backup directory not configured properly";
+			String message = "Restored backup directory not configured properly";
 			LOG.error(message);
 			throw new IllegalStateException(message);
 		} else if ( LOG.isInfoEnabled() ) {
-			LOG.info("Using survey backup storage directory: " + storageDirectory.getAbsolutePath());
+			LOG.info("Using restored backup storage directory: " + storageDirectory.getAbsolutePath());
 		}
 	}
 
-	public void store(String surveyName, File file) {
+	public void storeTemporaryFile(String surveyName, File file) {
 		try {
-			File directory = new File(storageDirectory, surveyName);
-			directory.mkdir();
-			String fileName = createNewBackupFileName(surveyName);
-			File newFile = new File(directory, fileName);
+			File tempDirectory = getOrCreateTempDirectory(surveyName);
+			File newFile = new File(tempDirectory, file.getName());
 			if (newFile.createNewFile()) {
 				FileUtils.copyFile(file, newFile);
 			} else {
@@ -67,10 +65,27 @@ public class BackupStorageManager extends BaseStorageManager {
 		}
 	}
 
-	private String createNewBackupFileName(String surveyName) {
-		String date = Dates.format(new Date(), DATE_TIME_FORMAT);
-		String fileName = surveyName + "_" + date + ".collect-backup";
-		return fileName;
+	public void moveToFinalFolder(String surveyName, String fileName) {
+		File tempDirectory = getOrCreateTempDirectory(surveyName);
+		File file = new File(tempDirectory, fileName);
+
+		File surveyDirectory = getOrCreateFinalDirectory(surveyName);
+		try {
+			FileUtils.moveFileToDirectory(file, surveyDirectory, false);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private File getOrCreateFinalDirectory(String surveyName) {
+		return new File(storageDirectory, surveyName);
+	}
+
+	private File getOrCreateTempDirectory(String surveyName) {
+		File surveyDirectory = getOrCreateFinalDirectory(surveyName);
+		File tempDirectory = new File(surveyDirectory, TEMP_DIRECTORY_NAME);
+		tempDirectory.mkdirs();
+		return tempDirectory;
 	}
 	
 	public Date getLastBackupDate(final String surveyName) {

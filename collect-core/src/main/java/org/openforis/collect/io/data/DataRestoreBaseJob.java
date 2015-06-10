@@ -25,13 +25,14 @@ public abstract class DataRestoreBaseJob extends Job {
 	
 	//input
 	protected transient File file;
-	protected transient String surveyUri;
 	protected transient CollectSurvey packagedSurvey;
-	protected transient CollectSurvey publishedSurvey;
 	
 	//temporary instance variables
 	protected transient ZipFile zipFile;
-
+	protected transient String surveyUri;
+	protected transient String surveyName;
+	protected transient CollectSurvey publishedSurvey;
+	
 	@Override
 	protected void buildTasks() throws Throwable {
 		if ( packagedSurvey == null ) {
@@ -45,6 +46,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		if ( packagedSurvey != null ) {
 			checkPackagedSurveyUri();
 			surveyUri = packagedSurvey.getUri();
+			surveyName = packagedSurvey.getName();
 			initExistingSurvey();
 		}
 		super.initInternal();

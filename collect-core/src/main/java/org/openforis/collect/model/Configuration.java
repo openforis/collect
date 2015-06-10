@@ -14,7 +14,8 @@ public class Configuration implements Cloneable {
 	public enum ConfigurationItem {
 		RECORD_FILE_UPLOAD_PATH("upload_path"),
 		RECORD_INDEX_PATH("index_path"),
-		BACKUP_STORAGE_PATH("backup_path");
+		BACKUP_STORAGE_PATH("backup_path"),
+		RESTORED_BACKUP_STORAGE_PATH("restored_backup_path");
 		
 		private String key;
 		

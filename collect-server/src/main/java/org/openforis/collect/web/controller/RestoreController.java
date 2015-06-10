@@ -30,12 +30,13 @@ public class RestoreController extends BasicController {
 	private CollectJobManager jobManager;
 	
 	@RequestMapping(value = "/survey-data/restore.json", method = RequestMethod.POST)
-	public @ResponseBody String importData(UploadItem uploadItem) throws IOException {
+	public @ResponseBody String restoreData(UploadItem uploadItem) throws IOException {
 		File tempFile = copyContentToFile(uploadItem);
 		
 		String surveyUri = extractSurveyUri(tempFile);
 		
 		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
+		job.setStoreRestoredFile(true);
 		job.setSurveyUri(surveyUri);
 		job.setFile(tempFile);
 		job.setOverwriteAll(true);

@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.remoting.service;
 
-import org.openforis.collect.backup.BackupStorageManager;
+import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;

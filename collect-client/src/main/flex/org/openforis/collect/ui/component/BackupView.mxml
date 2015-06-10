@@ -79,7 +79,7 @@
 			<s:Button id="exportButton"
 					  visible="false" visible.parametersSelection="true"
 					  includeInLayout="false" includeInLayout.parametersSelection="true"
-					  label="{Message.get('export.exportLabel')}"
+					  label="{Message.get('backup.backupButtonLabel')}"
 					  useHandCursor="true" 
 					  buttonMode="true"
 					  />
@@ -118,7 +118,7 @@
 			  verticalAlign="middle"
 			  gap="20"
 			  >
-		<s:Label text="{Message.get('export.complete')}"
+		<s:Label text="{Message.get('backup.complete')}"
 				 styleName="infoMessageBig"
 				 />
 		

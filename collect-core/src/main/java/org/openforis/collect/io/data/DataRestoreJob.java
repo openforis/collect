@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
+import org.openforis.collect.io.data.restore.RestoredBackupStorageManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
@@ -31,18 +32,24 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private RecordManager recordManager;
 	@Autowired
 	private UserManager userManager;
+	@Autowired
+	private RestoredBackupStorageManager restoredBackupStorageManager;
 
 	//parameters
 	private boolean overwriteAll;
 	private boolean restoreUploadedFiles;
 	private List<Integer> entryIdsToImport;
 	private boolean oldBackupFormat;
+	private boolean storeRestoredFile;
 
 	@Override
 	public void initInternal() throws Throwable {
 		super.initInternal();
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-		oldBackupFormat = backupFileExtractor.isOldFormat(); 
+		oldBackupFormat = backupFileExtractor.isOldFormat();
+		if (storeRestoredFile) {
+			restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
+		}
 	}
 	
 	@Override
@@ -83,6 +90,12 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setSurvey(publishedSurvey);
 		}
 		super.prepareTask(task);
+	}
+	
+	@Override
+	protected void onCompleted() {
+		super.onCompleted();
+		restoredBackupStorageManager.moveToFinalFolder(surveyName, file.getName());
 	}
 
 	public RecordManager getRecordManager() {
@@ -131,6 +144,14 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 
 	public void setOverwriteAll(boolean overwriteAll) {
 		this.overwriteAll = overwriteAll;
+	}
+	
+	public boolean isStoreRestoredFile() {
+		return storeRestoredFile;
+	}
+	
+	public void setStoreRestoredFile(boolean storeRestoredFile) {
+		this.storeRestoredFile = storeRestoredFile;
 	}
 
 }
