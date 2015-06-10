@@ -28,6 +28,8 @@ public class BackupStorageManager extends BaseStorageManager {
 	
 	private static final String DEFAULT_BACKUP_STORAGE_SUBFOLDER = "backup";
 	
+	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss";
+	
 	public BackupStorageManager() {
 		super(DEFAULT_BACKUP_STORAGE_SUBFOLDER);
 	}
@@ -50,14 +52,25 @@ public class BackupStorageManager extends BaseStorageManager {
 
 	public void store(String surveyName, File file) {
 		try {
-			String date = Dates.formatDateTime(new Date());
-			String fileName = surveyName + "_" + date + ".collect-backup";
-			File newFile = new File(storageDirectory, fileName);
-			FileUtils.copyFile(file, newFile);
+			File directory = new File(storageDirectory, surveyName);
+			directory.mkdir();
+			String fileName = createNewBackupFileName(surveyName);
+			File newFile = new File(directory, fileName);
+			if (newFile.createNewFile()) {
+				FileUtils.copyFile(file, newFile);
+			} else {
+				throw new RuntimeException("Cannot create file or file already exists: " + newFile.getAbsolutePath());
+			}
 		} catch (IOException e) {
 			LOG.error(e);
 			throw new RuntimeException(e);
 		}
+	}
+
+	private String createNewBackupFileName(String surveyName) {
+		String date = Dates.format(new Date(), DATE_TIME_FORMAT);
+		String fileName = surveyName + "_" + date + ".collect-backup";
+		return fileName;
 	}
 	
 	public Date getLastBackupDate(final String surveyName) {
@@ -73,7 +86,7 @@ public class BackupStorageManager extends BaseStorageManager {
 			String baseName = FilenameUtils.getBaseName(backupFile.getName());
 			try {
 				String dateStr = baseName.substring(surveyName.length() + 1);
-				Date date = Dates.parseDateTime(dateStr);
+				Date date = Dates.parse(dateStr, DATE_TIME_FORMAT);
 				return date;
 			} catch (Exception e) {}
 		}
