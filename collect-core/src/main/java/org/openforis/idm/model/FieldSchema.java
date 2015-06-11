@@ -59,15 +59,15 @@ public class FieldSchema extends SchemaSupport<Field> {
 				return;
 			case 1:
 				if ( fld.valueType == Boolean.class ) {
-					fld.value = in.readInt32() != 0;
+					fld.setValue(in.readInt32() != 0);
 				} else if ( fld.valueType == Integer.class ) {
-					fld.value = in.readInt32();
+					fld.setValue(in.readInt32());
 				} else if ( fld.valueType ==  Long.class ) {
-					fld.value = in.readInt64();
+					fld.setValue(in.readInt64());
 				} else if ( fld.valueType ==  Double.class ) {
-					fld.value = in.readDouble();
+					fld.setValue(in.readDouble());
 				} else if ( fld.valueType == String.class ) {
-					fld.value = in.readString();
+					fld.setValue(in.readString());
 				} else {
 					throw new UnsupportedOperationException("Cannot deserialize type "+Field.class.getSimpleName()+"<"+fld.valueType.getClass().getSimpleName()+">");
 				}

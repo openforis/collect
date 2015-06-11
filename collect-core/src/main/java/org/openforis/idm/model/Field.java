@@ -15,6 +15,9 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 	
 	private static final long serialVersionUID = 1;
 	
+	private static final Double ZERO = Double.valueOf(0d);
+	private static final Double NEGATIVE_ZERO = Double.valueOf(-0d);
+
 	/* WARNING: deleting or reordering fields will break protostuff deserialization! */
 	
 	Class<T> valueType;
@@ -39,7 +42,12 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 		return value;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setValue(T value) {
+		//replace -0 with 0 to avoid issues with XPath comparison 
+		if (value instanceof Double && ((Double) value).equals(NEGATIVE_ZERO)) {
+			value = (T) ZERO;
+		}
 		this.value = value;
 		this.symbol = null;
 	}
@@ -100,7 +108,7 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 	}
 
 	public void setValueFromString(String s) {
-		this.value = parseValue(s);
+		setValue(parseValue(s));
 	}
 	
 	public Class<T> getValueType() {
@@ -180,5 +188,6 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 	
 	public void setAttribute(Attribute<?, ?> attribute) {
 		this.attribute = attribute;
-	}	
+	}
+	
 }
