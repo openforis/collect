@@ -8,6 +8,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.model.Configuration;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,12 +40,12 @@ public class ConfigurationDaoIntegrationTest {
 		Configuration reloaded = configurationDao.load();
 		assertNotNull(reloaded);
 		
-		Set<String> properties = reloaded.getProperties();
-		assertEquals(2, properties.size());
-		for (String name : properties) {
-			String oldValue = config.get(name);
+		Set<ConfigurationItem> items = reloaded.getProperties();
+		assertEquals(2, items.size());
+		for (ConfigurationItem item : items) {
+			String oldValue = config.get(item);
 			assertNotNull(oldValue);
-			String newValue = reloaded.get(name);
+			String newValue = reloaded.get(item);
 			assertEquals(oldValue, newValue);
 		}
 	}

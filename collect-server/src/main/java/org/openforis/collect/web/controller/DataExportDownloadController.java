@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author S. Ricci
@@ -23,7 +22,7 @@ public class DataExportDownloadController extends BasicController {
 	private static Log LOG = LogFactory.getLog(DataExportDownloadController.class);
 	
 	@RequestMapping(value = "/downloadDataExport.htm", method = RequestMethod.GET)
-	public @ResponseBody String downloadDataExport(
+	public void downloadDataExport(
 				HttpServletResponse response, 
 				@RequestParam("fileName") String fileName, 
 				@RequestParam("outputFileName") String outputFileName
@@ -35,7 +34,6 @@ public class DataExportDownloadController extends BasicController {
 			LOG.error(e);
 			throw e;
 		}
-		return "ok";
 	}
 	
 }

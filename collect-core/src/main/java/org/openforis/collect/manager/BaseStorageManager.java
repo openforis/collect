@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.Configuration;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -85,10 +86,10 @@ public abstract class BaseStorageManager implements Serializable {
 		}
 	}
 	
-	protected void initStorageDirectory(String pathConfigurationKey) {
+	protected void initStorageDirectory(ConfigurationItem configurationItem) {
 		Configuration configuration = configurationManager.getConfiguration();
 		
-		String customStoragePath = configuration.get(pathConfigurationKey);
+		String customStoragePath = configuration.get(configurationItem);
 		
 		if ( StringUtils.isBlank(customStoragePath) ) {
 			storageDirectory = getDefaultStorageDirectory();

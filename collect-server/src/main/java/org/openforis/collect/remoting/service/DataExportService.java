@@ -9,6 +9,7 @@ import org.openforis.collect.Proxy;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.CSVDataExportProcess;
+import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
@@ -49,6 +50,8 @@ public class DataExportService {
 	private ApplicationContext appContext;
 	@Autowired
 	private JobManager jobManager;
+	@Autowired
+	private BackupStorageManager backupStorageManager;
 	
 	private CSVDataExportProcess dataExportProcess;
 	private SurveyBackupJob backupJob;
@@ -99,32 +102,36 @@ public class DataExportService {
 	}
 	
 	@Transactional
-	public Proxy backup(String surveyName) {
+	public Proxy backup(final String surveyName) {
 		CollectSurvey survey = surveyManager.get(surveyName);
-		return fullExport(survey, true, false, null);
+		return fullExport(survey, true, false, null, true);
 	}
 
 	@Transactional
 	public Proxy fullExport(boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
-		return fullExport(survey, includeRecordFiles, onlyOwnedRecords, rootEntityKeyValues);
+		return fullExport(survey, includeRecordFiles, onlyOwnedRecords, rootEntityKeyValues, false);
 	}
 	
 	@Transactional
-	public Proxy fullExport(CollectSurvey survey, boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
+	public Proxy fullExport(CollectSurvey survey, boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues, boolean full) {
 		if ( backupJob == null || ! backupJob.isRunning() ) {
 			resetJobs();
 			
 			RecordFilter filter = createRecordFilter(survey, null, onlyOwnedRecords, rootEntityKeyValues);
 			
 			SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
-			job.setOutputFormat(OutputFormat.ONLY_DATA);
+			job.setFull(full);
+			if (full) {
+				job.setOutputFormat(OutputFormat.DESKTOP_FULL);
+			} else {
+				job.setOutputFormat(OutputFormat.ONLY_DATA);
+			}
 			job.setSurvey(survey);
 			job.setIncludeData(true);
 			job.setIncludeRecordFiles(includeRecordFiles);
 			job.setRecordFilter(filter);
-			
 			backupJob = job;
 			
 			jobManager.start(job);

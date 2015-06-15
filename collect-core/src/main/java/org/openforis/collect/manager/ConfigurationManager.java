@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.Configuration;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.persistence.ConfigurationDao;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,18 +23,22 @@ public class ConfigurationManager {
 	}
 	
 	public void updateUploadPath(String uploadPath) {
-		if ( StringUtils.isNotBlank(uploadPath) ) {
-			validateWritableDirectory(uploadPath);
-		}
-		configuration.put(Configuration.UPLOAD_PATH_KEY, uploadPath);
-		configurationDao.save(configuration);
+		updateConfigurationPathItem(ConfigurationItem.RECORD_FILE_UPLOAD_PATH, uploadPath);
 	}
 
 	public void updateIndexPath(String indexPath) {
-		if ( StringUtils.isNotBlank(indexPath) ) {
-			validateWritableDirectory(indexPath);
+		updateConfigurationPathItem(ConfigurationItem.RECORD_INDEX_PATH, indexPath);
+	}
+	
+	public void updateBakcupStoragePath(String indexPath) {
+		updateConfigurationPathItem(ConfigurationItem.BACKUP_STORAGE_PATH, indexPath);
+	}
+	
+	private void updateConfigurationPathItem(ConfigurationItem configurationItem, String path) {
+		if ( StringUtils.isNotBlank(path) ) {
+			validateWritableDirectory(path);
 		}
-		configuration.put(Configuration.INDEX_PATH_KEY, indexPath);
+		configuration.put(configurationItem, path);
 		configurationDao.save(configuration);
 	}
 
