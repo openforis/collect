@@ -560,12 +560,12 @@ package org.openforis.collect.presenter {
 		}
 
 		protected function textToRequestValue():String {
-			var result:String = null;
 			var text:String = view.text;
 			if(StringUtil.isNotBlank(text)) {
-				result = StringUtil.trim(text);
+				return StringUtil.trim(text);
+			} else {
+				return null;
 			}
-			return result;
 		}
 		
 		protected function updateView():void {
