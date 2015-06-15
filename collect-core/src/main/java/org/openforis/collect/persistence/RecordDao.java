@@ -192,6 +192,23 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		//join with user table to get owner name
 		q.addJoin(OFC_USER, JoinType.LEFT_OUTER_JOIN, OFC_RECORD.OWNER_ID.equal(OFC_USER.ID));
 
+		addFilterConditions(q, filter);
+
+		//add ordering fields
+		if ( sortFields != null ) {
+			for (RecordSummarySortField sortField : sortFields) {
+				addOrderBy(q, sortField, ownerNameField);
+			}
+		}
+		
+		//fetch results
+		Result<Record> result = q.fetch();
+		
+		return jf.fromResult(result);
+	}
+
+	private void addFilterConditions(SelectQuery<?> q, RecordFilter filter) {
+		CollectSurvey survey = filter.getSurvey();
 		//survey
 		q.addConditions(OFC_RECORD.SURVEY_ID.equal(survey.getId()));
 		
@@ -225,13 +242,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
 			addFilterByKeyConditions(q, filter.isCaseSensitiveKeyValues(), filter.getKeyValues());
 		}
-
-		//add ordering fields
-		if ( sortFields != null ) {
-			for (RecordSummarySortField sortField : sortFields) {
-				addOrderBy(q, sortField, ownerNameField);
-			}
-		}
 		
 		//add limit
 		if (filter.getOffset() != null && filter.getMaxNumberOfRecords() != null) {
@@ -239,11 +249,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			//always order by ID to avoid pagination issues
 			q.addOrderBy(OFC_RECORD.ID);
 		}
-		
-		//fetch results
-		Result<Record> result = q.fetch();
-		
-		return jf.fromResult(result);
 	}
 	
 	public int countRecords(CollectSurvey survey) {
@@ -265,18 +270,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 	public int countRecords(RecordFilter filter) {
 		RecordDSLContext dsl = dsl();
 		SelectQuery q = dsl.selectCountQuery();
-		
-		q.addConditions(OFC_RECORD.SURVEY_ID.equal(filter.getSurveyId()));
-		
-		if ( filter.getRootEntityId() != null ) {
-			q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.eq(filter.getRootEntityId()));
-		}
-		if ( filter.getStepGreaterOrEqual() != null ) {
-			q.addConditions(OFC_RECORD.STEP.ge(filter.getStepGreaterOrEqual().getStepNumber()));
-		}
-		if ( CollectionUtils.isNotEmpty( filter.getKeyValues() ) ) {
-			addFilterByKeyConditions(q, filter.getKeyValues());
-		}
+		addFilterConditions(q, filter);
 		Record record = q.fetchOne();
 		int result = record.getValue(DSL.count());
 		return result;
@@ -287,10 +281,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		RecordFilter filter = new RecordFilter(survey, rootDefinitionId);
 		filter.setKeyValues(keyValues);
 		return countRecords(filter);
-	}
-	
-	private void addFilterByKeyConditions(SelectQuery q, List<String> keyValues) {
-		addFilterByKeyConditions(q, true, keyValues);
 	}
 	
 	private void addFilterByKeyConditions(SelectQuery q, boolean caseSensitiveKeyValues, List<String> keyValues) {

@@ -57,14 +57,14 @@
 			  >
 		
 		<s:VGroup id="parametersSelectionContainer"
-				  horizontalAlign="center"
+				  horizontalAlign="left"
 				  width="100%" height="100%"
 				  gap="15"
 				  visible="false" includeInLayout="false"
 				  visible.parametersSelection="true" includeInLayout.parametersSelection="true"
 				  >
 			<s:HGroup verticalAlign="middle">
-				<s:Label text="{Message.get('backup.selectSurveyLabel')}"
+				<s:Label text="{Message.get('backup.selectSurveyLabel')}" width="150"
 						 styleName="formLabel"/>
 				<s:DropDownList id="surveyDropDown" 
 								labelFunction="surveyLabelFunction" 
@@ -72,7 +72,16 @@
 								width="150"
 								/>
 			</s:HGroup>
-			
+			<s:HGroup verticalAlign="middle">
+				<s:Label text="{Message.get('backup.last_backup_date')}" width="150"
+						 styleName="formLabel"/>
+				<s:TextInput editable="false" id="lastBackupDateLabel" />
+			</s:HGroup>
+			<s:HGroup verticalAlign="middle">
+				<s:Label text="{Message.get('backup.updated_records_since_last_backup_count')}"
+						 styleName="formLabel"/>
+				<s:TextInput editable="false" id="updatedRecordsSinceLastBackupCountLabel" width="50" />
+			</s:HGroup>
 		</s:VGroup>
 		
 		<s:HGroup horizontalAlign="center" width="100%" gap="40">
@@ -121,6 +130,15 @@
 		<s:Label text="{Message.get('backup.complete')}"
 				 styleName="infoMessageBig"
 				 />
+		
+		<s:VGroup>
+			<s:Button id="sendToRemoteCloneButton" label="{Message.get('backup.send_to_remote_clone')}" />
+			<s:HGroup verticalAlign="middle">
+				<s:Label text="{Message.get('backup.remote_clone_url')}"
+						 styleName="formLabel"/>
+				<s:TextInput id="remoteCloneUrl" enabled="false" />
+			</s:HGroup>
+		</s:VGroup>
 		
 		<s:HGroup gap="30">
 			<s:Button id="downloadButton" 

@@ -50,28 +50,26 @@ public class RestoredBackupStorageManager extends BaseStorageManager {
 		}
 	}
 
-	public void storeTemporaryFile(String surveyName, File file) {
+	public File storeTemporaryFile(String surveyName, File file) {
 		try {
 			File tempDirectory = getOrCreateTempDirectory(surveyName);
-			File newFile = new File(tempDirectory, file.getName());
-			if (newFile.createNewFile()) {
-				FileUtils.copyFile(file, newFile);
+			File tempFile = new File(tempDirectory, file.getName());
+			if (tempFile.createNewFile()) {
+				FileUtils.copyFile(file, tempFile);
 			} else {
-				throw new RuntimeException("Cannot create file or file already exists: " + newFile.getAbsolutePath());
+				throw new RuntimeException("Cannot create file or file already exists: " + tempFile.getAbsolutePath());
 			}
+			return tempFile;
 		} catch (IOException e) {
 			LOG.error(e);
 			throw new RuntimeException(e);
 		}
 	}
 
-	public void moveToFinalFolder(String surveyName, String fileName) {
-		File tempDirectory = getOrCreateTempDirectory(surveyName);
-		File file = new File(tempDirectory, fileName);
-
+	public void moveToFinalFolder(String surveyName, File tempFile) {
 		File surveyDirectory = getOrCreateFinalDirectory(surveyName);
 		try {
-			FileUtils.moveFileToDirectory(file, surveyDirectory, false);
+			FileUtils.moveFileToDirectory(tempFile, surveyDirectory, false);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

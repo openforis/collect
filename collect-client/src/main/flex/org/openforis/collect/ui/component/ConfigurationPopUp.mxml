@@ -12,11 +12,13 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			import mx.rpc.AsyncResponder;
+			import mx.rpc.IResponder;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
 			import org.openforis.collect.client.ClientFactory;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.Configuration$ConfigurationItem;
 			import org.openforis.collect.model.LogoPosition;
 			import org.openforis.collect.model.proxy.ConfigurationProxy;
 			import org.openforis.collect.ui.Images;
@@ -24,10 +26,19 @@
 			
 			private var _initialized:Boolean;
 			
+			private var textInputToConfigurationItem:Dictionary;
+			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
 				_initialized = false;
 				loadConfiguration();
+			}
+			
+			private function backupRestoreSettingsContainerCreationCompleteHandler(event:FlexEvent):void {
+				textInputToConfigurationItem = new Dictionary();
+				textInputToConfigurationItem[this.allowedRestoreKeyTextInput.id] = Configuration$ConfigurationItem.ALLOWED_RESTORE_KEY;
+				textInputToConfigurationItem[this.remoteCloneUrlTextInput.id] = Configuration$ConfigurationItem.REMOTE_CLONE_URL;
+				textInputToConfigurationItem[this.remoteCloneRestoreKeyTextInput.id] = Configuration$ConfigurationItem.REMOTE_RESTORE_KEY;
 			}
 			
 			private function loadConfiguration():void {
@@ -49,6 +60,10 @@
 				//default paths
 				defaultUploadPathTextInput.text = conf.defaultUploadPath;
 				defaultRecordIndexPathTextInput.text = conf.defaultIndexPath;
+				//backup-restore
+				allowedRestoreKeyTextInput.text = conf.allowedRestoreKey;
+				remoteCloneUrlTextInput.text = conf.remoteCloneUrl;
+				remoteCloneRestoreKeyTextInput.text = conf.remoteCloneRestoreKey;
 			}
 			
 			private function loadConfigurationFaultHandler(event:FaultEvent, token:Object = null):void {
@@ -81,6 +96,18 @@
 					}), recordIndexPathTextInput.text);
 			}
 			
+			protected function configurationItemChangeHandler(event:Event):void {
+				var textInput:TextInput = TextInput(event.target);
+				var configurationItem:Configuration$ConfigurationItem = textInputToConfigurationItem[textInput.id];
+				var value:String = textInput.text;
+				var responder:IResponder = new AsyncResponder(function(event:ResultEvent):void {
+					
+				}, function(event:FaultEvent, token:Object = null):void {
+					AlertUtil.showError(event.fault.message);
+				});
+				ClientFactory.configurationClient.updateConfigurationItem(responder, configurationItem, value);
+			}
+			
 		]]>
 	</fx:Script>
 	
@@ -100,31 +127,6 @@
 			<s:Form width="100%">
 				<s:VGroup gap="30" width="100%">
 					
-					<!-- Storage path customization -->
-					<container:FieldSet legend="{Message.get('configuration.storagePaths')}" width="100%">
-						
-						<!-- record upload path -->
-						<s:FormItem label="{Message.get('configuration.uploadPath')}" width="100%">
-							<s:VGroup width="100%">
-								<s:TextInput id="uploadPathTextInput" width="100%" />
-								<s:HGroup verticalAlign="middle" width="100%">
-									<s:Label text="{Message.get('global.default')}:" />
-									<s:TextInput id="defaultUploadPathTextInput" width="100%" editable="false" />
-								</s:HGroup>
-							</s:VGroup>
-						</s:FormItem>
-						
-						<!-- record index path -->
-						<s:FormItem label="{Message.get('configuration.recordIndexPath')}" width="100%">
-							<s:VGroup width="100%">
-								<s:TextInput id="recordIndexPathTextInput" width="100%" />
-								<s:HGroup verticalAlign="middle" width="100%">
-									<s:Label text="{Message.get('global.default')}:" />
-									<s:TextInput id="defaultRecordIndexPathTextInput" width="100%" editable="false" />
-								</s:HGroup>
-							</s:VGroup>
-						</s:FormItem>
-					</container:FieldSet>
 					<!-- Layout customization -->
 					<container:FieldSet legend="{Message.get('configuration.layoutImages')}" width="100%">
 						
@@ -153,6 +155,62 @@
 						</container:FieldSet>
 						
 					</container:FieldSet>
+					
+					<!-- Backup / Restore configuration -->
+					<container:FieldSet legend="{Message.get('configuration.backup_restore')}" width="100%"
+										creationComplete="backupRestoreSettingsContainerCreationCompleteHandler(event)">
+						
+						<!-- allowed restore key -->
+						<s:FormItem label="{Message.get('configuration.allowed_restore_key')}" width="100%">
+							<s:VGroup width="100%">
+								<s:TextInput id="allowedRestoreKeyTextInput" 
+											 change="configurationItemChangeHandler(event)" width="100%" />
+							</s:VGroup>
+						</s:FormItem>
+						
+						<!-- remote clone url -->
+						<s:FormItem label="{Message.get('configuration.remote_clone_url')}" width="100%">
+							<s:VGroup width="100%">
+								<s:TextInput id="remoteCloneUrlTextInput"
+											 change="configurationItemChangeHandler(event)" width="100%" />
+							</s:VGroup>
+						</s:FormItem>
+						
+						<!-- remote clone restore key -->
+						<s:FormItem label="{Message.get('configuration.remote_clone_restore_key')}" width="100%">
+							<s:VGroup width="100%">
+								<s:TextInput id="remoteCloneRestoreKeyTextInput" 
+											 change="configurationItemChangeHandler(event)" width="100%" />
+							</s:VGroup>
+						</s:FormItem>
+					</container:FieldSet>
+					
+					<!-- Storage path customization -->
+					<container:FieldSet legend="{Message.get('configuration.storagePaths')}" width="100%">
+						
+						<!-- record upload path -->
+						<s:FormItem label="{Message.get('configuration.uploadPath')}" width="100%">
+							<s:VGroup width="100%">
+								<s:TextInput id="uploadPathTextInput" width="100%" />
+								<s:HGroup verticalAlign="middle" width="100%">
+									<s:Label text="{Message.get('global.default')}:" />
+									<s:TextInput id="defaultUploadPathTextInput" width="100%" editable="false" />
+								</s:HGroup>
+							</s:VGroup>
+						</s:FormItem>
+						
+						<!-- record index path -->
+						<s:FormItem label="{Message.get('configuration.recordIndexPath')}" width="100%">
+							<s:VGroup width="100%">
+								<s:TextInput id="recordIndexPathTextInput" width="100%" />
+								<s:HGroup verticalAlign="middle" width="100%">
+									<s:Label text="{Message.get('global.default')}:" />
+									<s:TextInput id="defaultRecordIndexPathTextInput" width="100%" editable="false" />
+								</s:HGroup>
+							</s:VGroup>
+						</s:FormItem>
+					</container:FieldSet>
+					
 				</s:VGroup>
 			</s:Form>
 		</s:VGroup>

@@ -38,8 +38,7 @@ public class ConfigurationManager {
 		if ( StringUtils.isNotBlank(path) ) {
 			validateWritableDirectory(path);
 		}
-		configuration.put(configurationItem, path);
-		configurationDao.save(configuration);
+		updateConfigurationItem(configurationItem, path);
 	}
 
 	private void validateWritableDirectory(String path) {
@@ -49,6 +48,11 @@ public class ConfigurationManager {
 		}
 	}
 
+	public void updateConfigurationItem(ConfigurationItem item, String value) {
+		configuration.put(item, value);
+		configurationDao.save(configuration);
+	}
+	
 	public void save(Configuration configuration) {
 		configurationDao.save(configuration);
 		this.configuration = configuration;

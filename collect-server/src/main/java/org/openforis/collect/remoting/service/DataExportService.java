@@ -2,9 +2,20 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
@@ -13,11 +24,13 @@ import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
+import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
 import org.openforis.collect.utils.ExecutorServiceUtil;
@@ -27,6 +40,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -52,6 +66,8 @@ public class DataExportService {
 	private JobManager jobManager;
 	@Autowired
 	private BackupStorageManager backupStorageManager;
+	@Autowired
+	private ConfigurationManager configurationManager;
 	
 	private CSVDataExportProcess dataExportProcess;
 	private SurveyBackupJob backupJob;
@@ -102,7 +118,7 @@ public class DataExportService {
 	}
 	
 	@Transactional
-	public Proxy backup(final String surveyName) {
+	public Proxy backup(String surveyName) {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		return fullExport(survey, true, false, null, true);
 	}
@@ -137,6 +153,48 @@ public class DataExportService {
 			jobManager.start(job);
 		}
 		return getCurrentJob();
+	}
+	
+	public Map<String, Object> getLastBackupInfo(String surveyName) {
+		final Date date = backupStorageManager.getLastBackupDate(surveyName);
+		CollectSurvey survey = surveyManager.get(surveyName);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setModifiedSince(date);
+		final int updatedRecordsSinceBackupDateCount = recordManager.countRecords(filter);
+		@SuppressWarnings("serial")
+		Map<String, Object> map = new HashMap<String, Object>() {{
+			put("date", date);
+			put("updatedRecordsSinceBackup", updatedRecordsSinceBackupDateCount);
+		}};
+		return map;
+	}
+	
+	@Secured("ROLE_ADMIN")
+	public String sendBackupToRemoteClone(String surveyName) throws ClientProtocolException, IOException {
+		String remoteCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
+		File lastBackupFile = backupStorageManager.getLastBackupFile(surveyName);
+		
+		HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+		HttpPost httppost = new HttpPost(remoteCloneUrl);
+		// Request parameters and other properties.
+		MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+		multipartEntityBuilder.addBinaryBody("file", lastBackupFile);
+	    httppost.setEntity(multipartEntityBuilder.build());
+	    
+		//Execute and get the response.
+		CloseableHttpClient httpClient = clientBuilder.build();
+		HttpResponse response = httpClient.execute(httppost);
+		HttpEntity entity = response.getEntity();
+
+		if (entity != null) {
+		    InputStream instream = entity.getContent();
+		    try {
+		        // do something useful
+		    } finally {
+		        instream.close();
+		    }
+		}
+		return null;
 	}
 
 	private RecordFilter createRecordFilter(CollectSurvey survey, Integer rootEntityId, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {

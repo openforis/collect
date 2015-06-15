@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,20 +42,21 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private List<Integer> entryIdsToImport;
 	private boolean oldBackupFormat;
 	private boolean storeRestoredFile;
+	private File tempFile;
 
 	@Override
 	public void initInternal() throws Throwable {
 		super.initInternal();
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		oldBackupFormat = backupFileExtractor.isOldFormat();
-		if (storeRestoredFile) {
-			restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
-		}
 	}
 	
 	@Override
 	protected void buildTasks() throws Throwable {
 		super.buildTasks();
+		if (storeRestoredFile) {
+			addTask(new StoreBackupFileTask());
+		}
 		addTask(DataRestoreTask.class);
 		if ( restoreUploadedFiles && isUploadedFilesIncluded() ) {
 			addTask(RecordFileRestoreTask.class);
@@ -95,7 +97,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	@Override
 	protected void onCompleted() {
 		super.onCompleted();
-		restoredBackupStorageManager.moveToFinalFolder(surveyName, file.getName());
+		restoredBackupStorageManager.moveToFinalFolder(surveyName, tempFile);
 	}
 
 	public RecordManager getRecordManager() {
@@ -154,4 +156,11 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		this.storeRestoredFile = storeRestoredFile;
 	}
 
+	private class StoreBackupFileTask extends Task {
+		@Override
+		protected void execute() throws Throwable {
+			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
+		}
+		
+	}
 }

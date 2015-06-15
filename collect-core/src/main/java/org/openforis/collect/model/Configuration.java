@@ -12,11 +12,14 @@ import org.apache.commons.lang3.StringUtils;
 public class Configuration implements Cloneable {
 
 	public enum ConfigurationItem {
-		RECORD_FILE_UPLOAD_PATH("upload_path"),
-		RECORD_INDEX_PATH("index_path"),
-		BACKUP_STORAGE_PATH("backup_path"),
-		RESTORED_BACKUP_STORAGE_PATH("restored_backup_path");
-		
+		  RECORD_FILE_UPLOAD_PATH("upload_path")
+		, RECORD_INDEX_PATH("index_path")
+		, BACKUP_STORAGE_PATH("backup_path")
+		, RESTORED_BACKUP_STORAGE_PATH("restored_backup_path")
+		, ALLOWED_RESTORE_KEY("allowed_restore_key")
+		, REMOTE_CLONE_URL("remote_clone")
+		, REMOTE_RESTORE_KEY("remote_clone_restore_key")
+		;
 		private String key;
 		
 		public static ConfigurationItem fromKey(String key) {

@@ -28,7 +28,7 @@ public class BackupStorageManager extends BaseStorageManager {
 	
 	private static final String DEFAULT_BACKUP_STORAGE_SUBFOLDER = "backup";
 	
-	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss";
+	private static final String DATE_TIME_FORMAT = "yyyy-MM-dd_HH-mm-ss-SSSZ";
 	
 	public BackupStorageManager() {
 		super(DEFAULT_BACKUP_STORAGE_SUBFOLDER);
@@ -52,7 +52,7 @@ public class BackupStorageManager extends BaseStorageManager {
 
 	public void store(String surveyName, File file) {
 		try {
-			File directory = new File(storageDirectory, surveyName);
+			File directory = getSuveyBackupStorageDirectory(surveyName);
 			directory.mkdir();
 			String fileName = createNewBackupFileName(surveyName);
 			File newFile = new File(directory, fileName);
@@ -67,23 +67,23 @@ public class BackupStorageManager extends BaseStorageManager {
 		}
 	}
 
+	private File getSuveyBackupStorageDirectory(String surveyName) {
+		File directory = new File(storageDirectory, surveyName);
+		return directory;
+	}
+
 	private String createNewBackupFileName(String surveyName) {
 		String date = Dates.format(new Date(), DATE_TIME_FORMAT);
 		String fileName = surveyName + "_" + date + ".collect-backup";
 		return fileName;
 	}
 	
-	public Date getLastBackupDate(final String surveyName) {
-		FilenameFilter filenameFilter = new FilenameFilter() {
-			@Override
-			public boolean accept(File file, String fileName) {
-				return StringUtils.startsWith(fileName, surveyName + "_");
-			}
-		};
-		File[] backupFiles = storageDirectory.listFiles(filenameFilter);
-		sortByName(backupFiles);
-		for (File backupFile : backupFiles) {
-			String baseName = FilenameUtils.getBaseName(backupFile.getName());
+	public Date getLastBackupDate(String surveyName) {
+		File lastBackupFile = getLastBackupFile(surveyName);
+		if (lastBackupFile == null) {
+			return null;
+		} else {
+			String baseName = FilenameUtils.getBaseName(lastBackupFile.getName());
 			try {
 				String dateStr = baseName.substring(surveyName.length() + 1);
 				Date date = Dates.parse(dateStr, DATE_TIME_FORMAT);
@@ -91,6 +91,23 @@ public class BackupStorageManager extends BaseStorageManager {
 			} catch (Exception e) {}
 		}
 		return null;
+	}
+
+	public File getLastBackupFile(final String surveyName) {
+		FilenameFilter filenameFilter = new FilenameFilter() {
+			@Override
+			public boolean accept(File file, String fileName) {
+				return StringUtils.startsWith(fileName, surveyName + "_");
+			}
+		};
+		File directory = getSuveyBackupStorageDirectory(surveyName);
+		File[] backupFiles = directory.listFiles(filenameFilter);
+		if (backupFiles != null && backupFiles.length > 0) {
+			sortByName(backupFiles);
+			return backupFiles[backupFiles.length - 1];
+		} else {
+			return null;
+		}
 	}
 
 	private void sortByName(File[] files) {

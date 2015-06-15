@@ -8,6 +8,7 @@ import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.model.proxy.ConfigurationProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,6 +57,11 @@ public class ConfigurationService {
 		if ( ! initialized ) {
 			throw new RuntimeException("Error initializing index path");
 		}
+	}
+	
+	public void updateConfigurationItem(String configurationItemName, String value) {
+		ConfigurationItem item = ConfigurationItem.valueOf(configurationItemName);
+		configurationManager.updateConfigurationItem(item, value);
 	}
 	
 }

@@ -107,6 +107,7 @@
                                 <includeClass>org.openforis.collect.metamodel.ui.UIOptions$Orientation</includeClass>
                                 <includeClass>org.openforis.collect.model.AbstractSummaries</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
+                                <includeClass>org.openforis.collect.model.Configuration$ConfigurationItem</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectTaxonomy</includeClass>
                                 <includeClass>org.openforis.collect.model.Logo</includeClass>
                                 <includeClass>org.openforis.collect.model.LogoPosition</includeClass>
@@ -115,6 +116,7 @@
                                 <includeClass>org.openforis.collect.model.SurveySummary</includeClass>
                                 <includeClass>org.openforis.collect.model.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.model.FieldSymbol</includeClass>
+                                <includeClass>org.openforis.collect.remoting.SurveyBackupInfo</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.DataExportStatus$Format</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.FileWrapper</includeClass>
