@@ -228,7 +228,6 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function populateForm():void {
-			updateSelectedSurveyInfo();
 		}
 		
 		protected function initSurveyDropDown():void {
@@ -237,6 +236,7 @@ package org.openforis.collect.presenter {
 			dropDownList.dataProvider = surveys;
 			dropDownList.callLater(function():void {
 				dropDownList.selectedIndex = 0;
+				updateSelectedSurveyInfo();
 			});
 			dropDownList.addEventListener(IndexChangeEvent.CHANGE, function(event:IndexChangeEvent):void {
 				updateSelectedSurveyInfo();

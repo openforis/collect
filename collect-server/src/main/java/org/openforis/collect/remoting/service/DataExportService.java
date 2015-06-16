@@ -3,15 +3,18 @@ package org.openforis.collect.remoting.service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -50,7 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class DataExportService {
 
-	//private static Log LOG = LogFactory.getLog(DataExportService.class);
+	private static Log LOG = LogFactory.getLog(DataExportService.class);
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -170,29 +173,37 @@ public class DataExportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public String sendBackupToRemoteClone(String surveyName) throws ClientProtocolException, IOException {
-		String remoteCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
-		File lastBackupFile = backupStorageManager.getLastBackupFile(surveyName);
-		
-		HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-		HttpPost httppost = new HttpPost(remoteCloneUrl);
-		// Request parameters and other properties.
-		MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
-		multipartEntityBuilder.addBinaryBody("file", lastBackupFile);
-	    httppost.setEntity(multipartEntityBuilder.build());
-	    
-		//Execute and get the response.
-		CloseableHttpClient httpClient = clientBuilder.build();
-		HttpResponse response = httpClient.execute(httppost);
-		HttpEntity entity = response.getEntity();
-
-		if (entity != null) {
-		    InputStream instream = entity.getContent();
-		    try {
-		        // do something useful
-		    } finally {
-		        instream.close();
-		    }
+	public String sendBackupToRemoteClone(String surveyName) {
+		try {
+			String remoteCollectCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
+			File lastBackupFile = backupStorageManager.getLastBackupFile(surveyName);
+			
+			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+			String postUrl = remoteCollectCloneUrl + "/survey-data/restore-remotely.json";
+			HttpPost httppost = new HttpPost(postUrl);
+			// Request parameters and other properties.
+			MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+			multipartEntityBuilder.addBinaryBody("file", lastBackupFile);
+		    httppost.setEntity(multipartEntityBuilder.build());
+		    
+			//Execute and get the response.
+			CloseableHttpClient httpClient = clientBuilder.build();
+			HttpResponse response = httpClient.execute(httppost);
+			HttpEntity entity = response.getEntity();
+	
+			if (entity != null) {
+			    InputStream is = entity.getContent();
+			    try {
+			    	StringWriter writer = new StringWriter();
+			    	IOUtils.copy(is, writer, "UTF-8");
+			    	String result = writer.toString();
+			    	System.out.println(result);
+			    } finally {
+			        is.close();
+			    }
+			}
+		} catch (Exception e) {
+			LOG.error(e);
 		}
 		return null;
 	}

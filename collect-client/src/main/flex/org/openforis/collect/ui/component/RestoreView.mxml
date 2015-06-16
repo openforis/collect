@@ -32,6 +32,9 @@
 				_presenter.init();
 			}
 			
+			protected function surveyLabelFunction(survey:SurveySummary):String {
+				return survey.name;
+			}
 		]]>
 	</fx:Script>
 	
@@ -56,12 +59,31 @@
 			  >
 		
 		<s:VGroup id="parameterSelectionContainer"
-				  horizontalAlign="center"
+				  horizontalAlign="left"
 				  width="100%" height="100%"
 				  gap="15"
 				  visible="false" includeInLayout="false"
 				  visible.parameterSelection="true" includeInLayout.parameterSelection="true"
 				  >
+		  	<s:HGroup verticalAlign="middle">
+				<s:Label text="{Message.get('backup.selectSurveyLabel')}" width="150"
+						 styleName="formLabel"/>
+				<s:DropDownList id="surveyDropDown" 
+								labelFunction="surveyLabelFunction" 
+								prompt="{Message.get('global.dropDownPrompt')}"
+								width="150"
+								/>
+			</s:HGroup>
+			<s:HGroup verticalAlign="middle">
+				<s:Label text="{Message.get('backup.last_backup_date')}" width="150"
+						 styleName="formLabel"/>
+				<s:TextInput editable="false" id="lastBackupDateLabel" />
+			</s:HGroup>
+			<s:HGroup verticalAlign="middle">
+				<s:Label text="{Message.get('backup.updated_records_since_last_backup_count')}"
+						 styleName="formLabel"/>
+				<s:TextInput editable="false" id="updatedRecordsSinceLastBackupCountLabel" width="50" />
+			</s:HGroup>
 			<s:HGroup width="100%" verticalAlign="middle">
 				<s:Label text="{Message.get('global.file')}" />
 				

@@ -15,6 +15,8 @@ import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.manager.ConfigurationManager;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.web.controller.upload.UploadItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,31 +39,34 @@ public class RestoreController extends BasicController {
 	//private static Log LOG = LogFactory.getLog(RestoreController.class);
 	
 	@Autowired
+	private SurveyManager surveyManager;
+	@Autowired
 	private ConfigurationManager configurationManager;
 	@Autowired
 	private CollectJobManager jobManager;
 	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(value = "/survey-data/restore.json", method = RequestMethod.POST)
-	public @ResponseBody String restoreData(UploadItem uploadItem) throws IOException {
-		return startRestoreJob(uploadItem);
+	public @ResponseBody String restoreData(UploadItem uploadItem, @RequestParam String surveyName) throws IOException {
+		return startRestoreJob(uploadItem, surveyName);
 	}
 	
 	@RequestMapping(value = "/survey-data/restore-remotely.json", method = RequestMethod.POST)
-	public @ResponseBody String restoreDataRemotely(UploadItem uploadItem, @RequestParam String restoreKey) throws IOException {
+	public @ResponseBody String restoreDataRemotely(UploadItem uploadItem, @RequestParam String surveyName, @RequestParam String restoreKey) throws IOException {
 		String allowedRestoreKey = configurationManager.getConfiguration().get(ConfigurationItem.ALLOWED_RESTORE_KEY);
 		if (StringUtils.isNotBlank(allowedRestoreKey) && allowedRestoreKey.equals(restoreKey)) {
-			return startRestoreJob(uploadItem);
+			return startRestoreJob(uploadItem, surveyName);
 		} else {
 			throw new IllegalArgumentException("Restore not allowed: invalid restore key");
 		}
 	}
 	
-	private String startRestoreJob(UploadItem uploadItem) throws IOException,
+	private String startRestoreJob(UploadItem uploadItem, String expectedSurveyName) throws IOException,
 	FileNotFoundException, ZipException {
 		File tempFile = copyContentToFile(uploadItem);
 		
 		String surveyUri = extractSurveyUri(tempFile);
+		checkValidSurvey(expectedSurveyName, surveyUri);
 		
 		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
 		job.setStoreRestoredFile(true);
@@ -74,6 +79,14 @@ public class RestoreController extends BasicController {
 		jobManager.start(job, lockId);
 		
 		return lockId;
+	}
+
+	private void checkValidSurvey(String surveyName, String surveyUri) {
+		CollectSurvey expectedSurvey = surveyManager.get(surveyName);
+		String expectedSurveyUri = expectedSurvey.getUri();
+		if (! surveyUri.equals(expectedSurveyUri)) {
+			throw new IllegalArgumentException("The backup file is not related to the specified survey");
+		}
 	}
 	
 	private String extractSurveyUri(File tempFile) throws ZipException,

@@ -96,6 +96,7 @@ public abstract class BaseStorageManager implements Serializable {
 		} else {
 			storageDirectory = new File(customStoragePath);
 		}
+		storageDirectory.mkdirs();
 	}
 
 	protected File getDefaultStorageRootDirectory() {

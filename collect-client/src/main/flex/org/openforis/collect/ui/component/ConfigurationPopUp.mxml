@@ -62,8 +62,11 @@
 				defaultRecordIndexPathTextInput.text = conf.defaultIndexPath;
 				//backup-restore
 				allowedRestoreKeyTextInput.text = conf.allowedRestoreKey;
+				allowedRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 				remoteCloneUrlTextInput.text = conf.remoteCloneUrl;
+				remoteCloneUrlTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 				remoteCloneRestoreKeyTextInput.text = conf.remoteCloneRestoreKey;
+				remoteCloneRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 			}
 			
 			private function loadConfigurationFaultHandler(event:FaultEvent, token:Object = null):void {
@@ -100,7 +103,7 @@
 				var textInput:TextInput = TextInput(event.target);
 				var configurationItem:Configuration$ConfigurationItem = textInputToConfigurationItem[textInput.id];
 				var value:String = textInput.text;
-				var responder:IResponder = new AsyncResponder(function(event:ResultEvent):void {
+				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
 					
 				}, function(event:FaultEvent, token:Object = null):void {
 					AlertUtil.showError(event.fault.message);
@@ -163,24 +166,21 @@
 						<!-- allowed restore key -->
 						<s:FormItem label="{Message.get('configuration.allowed_restore_key')}" width="100%">
 							<s:VGroup width="100%">
-								<s:TextInput id="allowedRestoreKeyTextInput" 
-											 change="configurationItemChangeHandler(event)" width="100%" />
+								<s:TextInput id="allowedRestoreKeyTextInput" width="100%" />
 							</s:VGroup>
 						</s:FormItem>
 						
 						<!-- remote clone url -->
 						<s:FormItem label="{Message.get('configuration.remote_clone_url')}" width="100%">
 							<s:VGroup width="100%">
-								<s:TextInput id="remoteCloneUrlTextInput"
-											 change="configurationItemChangeHandler(event)" width="100%" />
+								<s:TextInput id="remoteCloneUrlTextInput" width="100%" />
 							</s:VGroup>
 						</s:FormItem>
 						
 						<!-- remote clone restore key -->
 						<s:FormItem label="{Message.get('configuration.remote_clone_restore_key')}" width="100%">
 							<s:VGroup width="100%">
-								<s:TextInput id="remoteCloneRestoreKeyTextInput" 
-											 change="configurationItemChangeHandler(event)" width="100%" />
+								<s:TextInput id="remoteCloneRestoreKeyTextInput" width="100%" />
 							</s:VGroup>
 						</s:FormItem>
 					</container:FieldSet>

@@ -22,7 +22,7 @@ package org.openforis.collect.client {
 			_loadConfigurationOperation = getOperation("loadConfiguration", CONCURRENCY_MULTIPLE);
 			_updateUploadPathOperation = getOperation("updateUploadPath");
 			_updateIndexPathOperation = getOperation("updateIndexPath");
-			_updateConfigurationItemOperation = getOperation("updateConfigurationItem");
+			_updateConfigurationItemOperation = getOperation("updateConfigurationItem", CONCURRENCY_MULTIPLE);
 		}
 		
 		public function loadConfiguration(responder:IResponder):void {

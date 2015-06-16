@@ -12,6 +12,7 @@ import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.restore.RestoredBackupStorageManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	
 	@Autowired
 	private RecordFileManager recordFileManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
@@ -97,7 +100,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	@Override
 	protected void onCompleted() {
 		super.onCompleted();
-		restoredBackupStorageManager.moveToFinalFolder(surveyName, tempFile);
+		restoredBackupStorageManager.moveToFinalFolder(publishedSurvey.getName(), tempFile);
 	}
 
 	public RecordManager getRecordManager() {
@@ -159,7 +162,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private class StoreBackupFileTask extends Task {
 		@Override
 		protected void execute() throws Throwable {
-			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
+			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(publishedSurvey.getName(), file);
 		}
 		
 	}

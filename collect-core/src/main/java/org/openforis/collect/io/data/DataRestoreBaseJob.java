@@ -30,7 +30,6 @@ public abstract class DataRestoreBaseJob extends Job {
 	//temporary instance variables
 	protected transient ZipFile zipFile;
 	protected transient String surveyUri;
-	protected transient String surveyName;
 	protected transient CollectSurvey publishedSurvey;
 	
 	@Override
@@ -46,8 +45,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		if ( packagedSurvey != null ) {
 			checkPackagedSurveyUri();
 			surveyUri = packagedSurvey.getUri();
-			surveyName = packagedSurvey.getName();
-			initExistingSurvey();
+			initPublishedSurvey();
 		}
 		super.initInternal();
 	}
@@ -80,7 +78,7 @@ public abstract class DataRestoreBaseJob extends Job {
 			} else {
 				packagedSurvey = survey;
 				checkPackagedSurveyUri();
-				initExistingSurvey();
+				initPublishedSurvey();
 			}
 			this.packagedSurvey = survey;
 		}
@@ -94,7 +92,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		}
 	}
 
-	protected void initExistingSurvey() {
+	protected void initPublishedSurvey() {
 		publishedSurvey = surveyManager.getByUri(surveyUri);
 		if ( publishedSurvey == null ) {
 			throw new RuntimeException(String.format("Published survey with uri %s not found", surveyUri));

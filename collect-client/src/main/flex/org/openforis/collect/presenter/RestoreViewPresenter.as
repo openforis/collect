@@ -13,18 +13,25 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
+	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.Proxy;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.event.BackupEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.component.RestoreView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.DateUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.concurrency.proxy.JobProxy;
 	import org.openforis.concurrency.proxy.JobProxy$Status;
+	
+	import spark.components.DropDownList;
+	import spark.events.IndexChangeEvent;
 	
 	/**
 	 * 
@@ -46,6 +53,7 @@ package org.openforis.collect.presenter {
 		private var _job:Proxy;
 		private var _firstOpen:Boolean = true;
 		private var _jobLockId:String;
+		private var selectedSurveyInfo:Object;
 		
 		public function RestoreViewPresenter(view:RestoreView) {
 			super(view);
@@ -80,6 +88,18 @@ package org.openforis.collect.presenter {
 			_fileReference.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, fileReferenceUploadCompleteDataHandler);
 		}
 		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
+			eventDispatcher.addEventListener(BackupEvent.BACKUP_COMPLETE, backupCompleteHandler);
+		}
+		
+		protected function backupCompleteHandler(event:BackupEvent):void{
+			if (event.surveyName == getSelectedSurveyName()) {
+				updateSelectedSurveyInfo();
+			}
+		}		
+		
+		
 		private function selectFileButtonClickHandler(event:MouseEvent):void {
 			_fileReference.browse([_fileFilter]);
 		}
@@ -88,12 +108,22 @@ package org.openforis.collect.presenter {
 			if ( ! validateForm() ) {
 				return;
 			}
-			AlertUtil.showConfirm("Data will be restored, continue?", null, 
+			var message:String;
+			if (selectedSurveyInfo.updatedRecordsSinceBackup > 0) {
+				message = "restore.confirm.not_backed_up_records";
+			} else {
+				message = "restore.confirm.message";
+			}
+			AlertUtil.showConfirm(message, null, 
 				"Confirm data restore",
 				startUpload);
 		}
 		
 		private function validateForm():Boolean {
+			if (view.surveyDropDown.selectedItem == null) {
+				AlertUtil.showMessage("restore.validation.select_survey");
+				return false;
+			}
 			if (StringUtil.isBlank(view.selectedFileName.text)) {
 				AlertUtil.showError("restore.error.select_file");
 				return false;
@@ -181,7 +211,7 @@ package org.openforis.collect.presenter {
 						stopProgressTimer();
 						break;
 					case JobProxy$Status.FAILED:
-						AlertUtil.showError("restore.error");
+						AlertUtil.showError("restore.error", [job.errorMessage]);
 						resetView();
 						break;
 					case JobProxy$Status.ABORTED:
@@ -207,6 +237,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initView():void {
+			initSurveyDropDown();
+			
 			populateForm();
 			
 			view.currentState = RestoreView.STATE_PARAMETER_SELECTION;
@@ -256,6 +288,7 @@ package org.openforis.collect.presenter {
 			
 			request.data = new URLVariables();
 			request.data.name = _fileReference.name;
+			request.data.surveyName = getSelectedSurveyName();
 			
 			_fileReference.upload(request, "fileData");
 		}
@@ -264,6 +297,42 @@ package org.openforis.collect.presenter {
 			view.currentState = RestoreView.STATE_UPLOADING;
 		}
 		
-
+		protected function initSurveyDropDown():void {
+			var surveys:IList = Application.surveySummaries;
+			var dropDownList:DropDownList = view.surveyDropDown;
+			dropDownList.dataProvider = surveys;
+			dropDownList.callLater(function():void {
+				dropDownList.selectedIndex = 0;
+				updateSelectedSurveyInfo();
+			});
+			dropDownList.addEventListener(IndexChangeEvent.CHANGE, function(event:IndexChangeEvent):void {
+				updateSelectedSurveyInfo();
+			});
+		}
+		
+		private function getSelectedSurveyName():String {
+			var selectedSurvey:Object = view.surveyDropDown.selectedItem
+			return selectedSurvey == null ? null: selectedSurvey.name;
+		}
+		
+		private function updateSelectedSurveyInfo():void {
+			selectedSurveyInfo = null;
+			var surveyName:String = getSelectedSurveyName();
+			if (surveyName == null) {
+				view.lastBackupDateLabel.text = view.updatedRecordsSinceLastBackupCountLabel.text = "-";
+			} else {
+				view.currentState = RestoreView.STATE_LOADING;
+				
+				var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					selectedSurveyInfo = event.result;
+					view.lastBackupDateLabel.text = DateUtil.format(selectedSurveyInfo.date);
+					view.updatedRecordsSinceLastBackupCountLabel.text = String(selectedSurveyInfo.updatedRecordsSinceBackup);
+					view.currentState = RestoreView.STATE_PARAMETER_SELECTION;
+				}, faultHandler);
+				
+				ClientFactory.dataExportClient.getLastBackupInfo(responder, surveyName);
+			}
+		}
+		
 	}
 }
