@@ -2,24 +2,14 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.CSVDataExportProcess;
@@ -33,12 +23,10 @@ import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
 import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
-import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class DataExportService {
 
-	private static Log LOG = LogFactory.getLog(DataExportService.class);
+//	private static Log LOG = LogFactory.getLog(DataExportService.class);
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -66,7 +54,7 @@ public class DataExportService {
 	@Autowired
 	private ApplicationContext appContext;
 	@Autowired
-	private JobManager jobManager;
+	private CollectJobManager jobManager;
 	@Autowired
 	private BackupStorageManager backupStorageManager;
 	@Autowired
@@ -174,38 +162,10 @@ public class DataExportService {
 	
 	@Secured("ROLE_ADMIN")
 	public String sendBackupToRemoteClone(String surveyName) {
-		try {
-			String remoteCollectCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
-			File lastBackupFile = backupStorageManager.getLastBackupFile(surveyName);
-			
-			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-			String postUrl = remoteCollectCloneUrl + "/survey-data/restore-remotely.json";
-			HttpPost httppost = new HttpPost(postUrl);
-			// Request parameters and other properties.
-			MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
-			multipartEntityBuilder.addBinaryBody("file", lastBackupFile);
-		    httppost.setEntity(multipartEntityBuilder.build());
-		    
-			//Execute and get the response.
-			CloseableHttpClient httpClient = clientBuilder.build();
-			HttpResponse response = httpClient.execute(httppost);
-			HttpEntity entity = response.getEntity();
-	
-			if (entity != null) {
-			    InputStream is = entity.getContent();
-			    try {
-			    	StringWriter writer = new StringWriter();
-			    	IOUtils.copy(is, writer, "UTF-8");
-			    	String result = writer.toString();
-			    	System.out.println(result);
-			    } finally {
-			        is.close();
-			    }
-			}
-		} catch (Exception e) {
-			LOG.error(e);
-		}
-		return null;
+		RemoteCollectCloneDataRestoreJob job = jobManager.createJob(RemoteCollectCloneDataRestoreJob.class);
+		job.setSurveyName(surveyName);
+		jobManager.start(job);
+		return job.getId().toString();
 	}
 
 	private RecordFilter createRecordFilter(CollectSurvey survey, Integer rootEntityId, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {

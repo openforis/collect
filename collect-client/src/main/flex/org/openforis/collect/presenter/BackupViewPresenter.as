@@ -17,6 +17,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.Proxy;
 	import org.openforis.collect.client.ClientFactory;
+	import org.openforis.collect.concurrency.CollectJobStatusPopUp;
 	import org.openforis.collect.event.BackupEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
@@ -264,7 +265,10 @@ package org.openforis.collect.presenter {
 		
 		private function sendToRemoteUrlClickHandler(event:Event):void {
 			var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
-				
+				var jobId:String = event.result as String;
+				var jobMonitor:JobMonitor = new JobMonitor(jobId);
+				CollectJobStatusPopUp.openPopUp();
+				jobMonitor.start();
 			}, faultHandler);
 			ClientFactory.dataExportClient.sendBackupToRemoteClone(responder, getSelectedSurveyName());
 		}

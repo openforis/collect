@@ -18,18 +18,20 @@ package org.openforis.collect.presenter {
 	/**
 	 * @author S. Ricci
 	 */
-	public class CollectJobMonitor extends AbstractPresenter {
+	public class JobMonitor extends AbstractPresenter {
 		
 		private static const STATUS_UPDATE_DELAY:int = 2000;
 		
 		private var _progressTimer:Timer;
-		private static var _job:JobProxy;
+		private var jobId:String;
+		private var _job:JobProxy;
 
-		public function CollectJobMonitor() {
+		public function JobMonitor(jobId:String) {
 			super(null);
+			this.jobId = jobId;
 		}
 		
-		public function startProgressTimer():void {
+		public function start():void {
 			if ( _progressTimer == null ) {
 				_progressTimer = new Timer(STATUS_UPDATE_DELAY);
 				_progressTimer.addEventListener(TimerEvent.TIMER, progressTimerHandler);
@@ -37,11 +39,11 @@ package org.openforis.collect.presenter {
 			_progressTimer.start();
 		}
 		
-		public static function get currentJob():JobProxy {
+		public function get currentJob():JobProxy {
 			return _job;
 		}
 		
-		protected function stopProgressTimer():void {
+		protected function stop():void {
 			if ( _progressTimer != null ) {
 				_progressTimer.stop();
 				_progressTimer = null;
@@ -53,58 +55,32 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function loadCurrentJobAndUpdateState():void {
-			var oldJob:JobProxy = _job;
 			function onComplete():void {
-				if (_job != null && (oldJob == null || oldJob.id != _job.id || oldJob.status != _job.status || _job.running)) {
-					if (_job.running) {
-						if (! CollectJobStatusPopUp.popUpOpen) {
-							CollectJobStatusPopUp.openPopUp(_job);
-						} else {
-							CollectJobStatusPopUp.setActiveJob(_job);
-						}
-					}
-					dispatchJobUpdateEvent();
+				if (_job == null || ! _job.running) {
+					stop();
 				}
+				if (CollectJobStatusPopUp.popUpOpen) {
+					CollectJobStatusPopUp.setActiveJob(_job);
+				} else {
+					CollectJobStatusPopUp.openPopUp(_job);
+				}
+				dispatchJobUpdateEvent();
 			}
 			if (_job == null) {
-				loadApplicationJob(function():void {
-					if (_job == null && Application.activeSurvey != null) {
-						loadSurveyJob(function():void {
-							onComplete();
-						});
-					} else {
-						onComplete();
-					}
-				});
-			} else if (_job is ApplicationLockingJobProxy) {
-				loadApplicationJob(function():void {
-					onComplete();
-				});
-			} else if (Application.activeSurvey != null) {
-				loadSurveyJob(function():void {
+				loadJob(function():void {
 					onComplete();
 				});
 			}
 		}
 		
-		private function loadApplicationJob(complete:Function):void {
-			ClientFactory.collectJobClient.getApplicationJob(new AsyncResponder(
+		private function loadJob(complete:Function):void {
+			ClientFactory.collectJobClient.getJob(new AsyncResponder(
 				function(event:ResultEvent, token:Object = null):void {
 					_job = event.result as JobProxy;
 					complete();
-				}, faultHandler
-			));
+				}, faultHandler), jobId);
 		}
 		
-		private function loadSurveyJob(complete:Function):void {
-			ClientFactory.collectJobClient.getSurveyJob(new AsyncResponder(
-				function(event:ResultEvent, token:Object = null):void {
-					_job = event.result as JobProxy;
-					complete();
-				}, faultHandler
-			), Application.activeSurvey.id);
-		}
-
 		private function dispatchJobUpdateEvent():void {
 			if (_job != null) {
 				eventDispatcher.dispatchEvent(new CollectJobEvent(CollectJobEvent.COLLECT_JOB_STATUS_UPDATE, _job));

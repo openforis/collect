@@ -16,13 +16,25 @@ public class CollectJobService {
 	@Autowired
 	private CollectJobManager jobManager;
 	
-	public JobProxy getJob(String lockId) {
-		Job job = jobManager.getJob(lockId);
-		return job == null ? null : new JobProxy(job);
+	public JobProxy getJob(String jobId) {
+		Job job = jobManager.getJob(jobId);
+		return toJobProxy(job);
 	}
 	
-	public void abortJob(String lockId) {
-		Job job = jobManager.getJob(lockId);
+	public JobProxy getLockingJob(String lockId) {
+		Job job = jobManager.getLockingJob(lockId);
+		return toJobProxy(job);
+	}
+
+	public void abortJob(String jobId) {
+		Job job = jobManager.getJob(jobId);
+		if (job != null) {
+			job.abort();
+		}
+	}
+	
+	public void abortLockingJob(String lockId) {
+		Job job = jobManager.getLockingJob(lockId);
 		if (job != null) {
 			job.abort();
 		}
@@ -50,6 +62,10 @@ public class CollectJobService {
 		if (job != null) {
 			job.abort();
 		}
+	}
+	
+	private JobProxy toJobProxy(Job job) {
+		return job == null ? null : new JobProxy(job);
 	}
 	
 }

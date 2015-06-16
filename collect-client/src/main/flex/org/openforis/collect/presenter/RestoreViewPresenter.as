@@ -175,7 +175,7 @@ package org.openforis.collect.presenter {
 		
 		protected function updateRestoreState():void {
 			if (_jobLockId != null) {
-				ClientFactory.collectJobClient.getJob(_getStateResponder, _jobLockId);
+				ClientFactory.collectJobClient.getLockingJob(_getStateResponder, _jobLockId);
 			} else {
 				resetView();
 			}

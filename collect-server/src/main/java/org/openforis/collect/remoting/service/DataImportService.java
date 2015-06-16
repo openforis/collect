@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.data.DataImportSummary;
 import org.openforis.collect.io.data.DataRestoreJob;
 import org.openforis.collect.io.data.DataRestoreSummaryJob;
@@ -15,7 +16,6 @@ import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 import org.openforis.collect.web.session.SessionState;
-import org.openforis.concurrency.JobManager;
 import org.openforis.concurrency.proxy.JobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -32,7 +32,7 @@ public class DataImportService {
 	@Autowired
 	private SessionManager sessionManager;
 	@Autowired
-	private JobManager jobManager;
+	private CollectJobManager jobManager;
 	
 	private File packagedFile;
 	

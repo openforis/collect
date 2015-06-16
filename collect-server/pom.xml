@@ -156,6 +156,10 @@
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.openforis.commons</groupId>
+			<artifactId>commons-web</artifactId>
+		</dependency>
 		
 		<dependency>
 			<groupId>junit</groupId>

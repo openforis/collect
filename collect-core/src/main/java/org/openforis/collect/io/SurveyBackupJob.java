@@ -150,6 +150,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	protected void onCompleted() {
 		super.onCompleted();
 		if (full) {
+			IOUtils.closeQuietly(zipOutputStream);
 			backupStorageManager.store(survey.getName(), outputFile);
 		}
 	}

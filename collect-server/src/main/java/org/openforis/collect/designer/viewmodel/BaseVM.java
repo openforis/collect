@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -40,7 +41,9 @@ public abstract class BaseVM {
 			ServiceLoader.load(CollectEarthProjectFileCreator.class);
 
 	@WireVariable
-	private UserManager userManager;
+	protected UserManager userManager;
+	@WireVariable
+	protected CollectJobManager jobManager;
 
 	void init() {
 	}
