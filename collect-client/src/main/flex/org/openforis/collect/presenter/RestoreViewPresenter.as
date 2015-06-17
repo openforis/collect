@@ -99,7 +99,6 @@ package org.openforis.collect.presenter {
 			}
 		}		
 		
-		
 		private function selectFileButtonClickHandler(event:MouseEvent):void {
 			_fileReference.browse([_fileFilter]);
 		}

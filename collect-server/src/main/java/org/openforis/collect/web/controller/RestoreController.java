@@ -55,12 +55,17 @@ public class RestoreController extends BasicController {
 	}
 	
 	@RequestMapping(value = "/survey-data/restore-remotely.json", method = RequestMethod.POST)
-	public @ResponseBody RemoteDataRestoreResponse restoreDataRemotely(UploadItem uploadItem, @RequestParam String surveyName, @RequestParam String restoreKey) throws IOException {
+	public @ResponseBody RemoteDataRestoreResponse restoreDataRemotely(UploadItem uploadItem, @RequestParam String surveyName, @RequestParam String restoreKey) {
 		RemoteDataRestoreResponse response = new RemoteDataRestoreResponse();
 		String allowedRestoreKey = configurationManager.getConfiguration().get(ConfigurationItem.ALLOWED_RESTORE_KEY);
 		if (StringUtils.isNotBlank(allowedRestoreKey) && allowedRestoreKey.equals(restoreKey)) {
-			String jobId = startRestoreJob(uploadItem, surveyName);
-			response.setJobId(jobId);
+			try {
+				String jobId = startRestoreJob(uploadItem, surveyName);
+				response.setJobId(jobId);
+			} catch (Exception e) {
+				response.setErrorStatus();
+				response.setErrorMessage(e.getMessage());
+			}
 		} else {
 			response.setErrorStatus();
 			response.setErrorMessage("Restore not allowed: invalid restore key");
@@ -86,6 +91,7 @@ public class RestoreController extends BasicController {
 		RemoteDataRestoreResponse response = new RemoteDataRestoreResponse();
 		response.setJobId(job.getId().toString());
 		response.setJobStatus(job.getStatus());
+		response.setJobProgress(job.getProgressPercent());
 		response.setErrorMessage(job.getErrorMessage());
 		return response;
 	}
