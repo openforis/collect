@@ -70,6 +70,7 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 	private class BackupSendTask extends Task {
 
 		private static final int BACKUP_SEND_TIMEOUT_MINS = 30;
+		private static final int BACKUP_SEND_TIMEOUT_MILLIS = BACKUP_SEND_TIMEOUT_MINS * 60 * 1000;
 		private HttpUriRequest request;
 		
 		@Override
@@ -113,7 +114,7 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 			
 			String postUrl = remoteCollectCloneUrl + "/survey-data/restore-remotely.json";
 			HttpPost post = new HttpPost(postUrl);
-			RequestConfig config = RequestConfig.custom().setConnectTimeout(BACKUP_SEND_TIMEOUT_MINS * 60 * 1000).build();
+			RequestConfig config = RequestConfig.custom().setConnectTimeout(BACKUP_SEND_TIMEOUT_MILLIS).build();
 			post.setConfig(config);
 			// Request parameters and other properties.
 			MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
@@ -138,7 +139,8 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 		
 		private static final long UPDATE_PERIOD = 5000;
 		private static final int REQUEST_TIMEOUT_MINS = 2;
-		private HttpRequestBase request;
+		private static final int REQUEST_TIMEOUT_MILLIS = REQUEST_TIMEOUT_MINS * 60 * 1000;
+		private HttpRequestBase jobStatusRequest;
 		
 		@Override
 		protected long countTotalItems() {
@@ -148,7 +150,7 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 		@Override
 		protected void initInternal() throws Throwable {
 			super.initInternal();
-			request = createRequest();
+			jobStatusRequest = createRequest();
 		}
 		
 		private HttpRequestBase createRequest() {
@@ -156,33 +158,46 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 //				String restoreKey = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_RESTORE_KEY);
 			String url = remoteCollectCloneUrl + String.format("/survey-data/restore-jobs/%s/status.json", remoteJobId);
 			HttpGet request = new HttpGet(url);
+			request.setConfig(RequestConfig.custom().setConnectTimeout(REQUEST_TIMEOUT_MILLIS).build());
+			return request;
+		}
+		
+		private HttpRequestBase createRemoteJobAbortRequest() {
+			String remoteCollectCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
+			String url = remoteCollectCloneUrl + String.format("/survey-data/restore-jobs/%s/abort.json", remoteJobId);
+			HttpGet request = new HttpGet(url);
+			request.setConfig(RequestConfig.custom().setConnectTimeout(REQUEST_TIMEOUT_MILLIS).build());
 			return request;
 		}
 		
 		@Override
 		protected void execute() throws Throwable {
 			while (isRunning()) {
-				fetchRemoteJobStatus();
+				updateRemoteJobStatus();
 				if (isRunning()) {
 					Thread.sleep(UPDATE_PERIOD);
 				}
 			}
 		}
 
-		protected void fetchRemoteJobStatus() {
-			RemoteDataRestoreResponse dataRestoreStatusResponse = fetchDataRestoreStatus();
-			if (dataRestoreStatusResponse == null || dataRestoreStatusResponse.isStatusError()) {
-				String errorMessage = dataRestoreStatusResponse == null ? "Error fetching data restore status" : dataRestoreStatusResponse.getErrorMessage();
+		private void updateRemoteJobStatus() {
+			RemoteDataRestoreResponse response = fetchDataRestoreStatus();
+			handleResponse(response);
+		}
+
+		private void handleResponse(RemoteDataRestoreResponse response) {
+			if (response == null || response.isStatusError()) {
+				String errorMessage = response == null ? "Error fetching data restore status" : response.getErrorMessage();
 				errorOccurred(errorMessage);
 			} else {
-				switch (dataRestoreStatusResponse.getJobStatus()) {
+				switch (response.getJobStatus()) {
 				case PENDING:
 					break;
 				case RUNNING:
-			    	setItemsProcessed(dataRestoreStatusResponse.getJobProgress());
+			    	setItemsProcessed(response.getJobProgress());
 			    	break;
 				case FAILED:
-					setErrorMessage(dataRestoreStatusResponse.getJobErrorMessage());
+					setErrorMessage(response.getJobErrorMessage());
 					break;
 				case ABORTED:
 					changeStatus(Status.ABORTED);
@@ -198,17 +213,18 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 		@Override
 		public void abort() {
 			super.abort();
-			if (request != null) {
-				request.abort();
+			if (jobStatusRequest != null) {
+				jobStatusRequest.abort();
 			}
+			abortRemoteJob();
 		}
 
 		private RemoteDataRestoreResponse fetchDataRestoreStatus() {
+			return executeRequest(this.jobStatusRequest);
+		}
+
+		private RemoteDataRestoreResponse executeRequest(HttpRequestBase request) {
 			try {
-				RequestConfig config = RequestConfig.custom().setConnectTimeout(REQUEST_TIMEOUT_MINS * 60 * 1000).build();
-				request.setConfig(config);
-				
-				//Execute and get the response.
 				HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 				CloseableHttpClient httpClient = clientBuilder.build();
 				HttpResponse response = httpClient.execute(request);
@@ -228,6 +244,12 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 			}
 		}
 
+		private void abortRemoteJob() {
+			HttpRequestBase request = createRemoteJobAbortRequest();
+			RemoteDataRestoreResponse response = executeRequest(request);
+			handleResponse(response);
+		}
+		
 		private void errorOccurred(String errorMessage) {
 			changeStatus(Status.FAILED);
 			setErrorMessage(errorMessage);

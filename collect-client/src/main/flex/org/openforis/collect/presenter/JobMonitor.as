@@ -66,11 +66,9 @@ package org.openforis.collect.presenter {
 				}
 				dispatchJobUpdateEvent();
 			}
-			if (_job == null) {
-				loadJob(function():void {
-					onComplete();
-				});
-			}
+			loadJob(function():void {
+				onComplete();
+			});
 		}
 		
 		private function loadJob(complete:Function):void {

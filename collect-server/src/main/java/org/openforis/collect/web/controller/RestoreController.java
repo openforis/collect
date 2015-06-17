@@ -87,6 +87,21 @@ public class RestoreController extends BasicController {
 		return response;
 	}
 
+	@RequestMapping(value = "/survey-data/restore-jobs/{jobId}/abort.json", method = RequestMethod.GET)
+	public @ResponseBody RemoteDataRestoreResponse abortRestoreDataRemotelyJob(@PathVariable String jobId) throws IOException {
+		RemoteDataRestoreResponse response;
+		Job job = jobManager.getJob(jobId);
+		if (job == null || ! (job instanceof DataRestoreJob)) {
+			response = new RemoteDataRestoreResponse();
+			response.setErrorStatus();
+			response.setErrorMessage("Job not found");
+		} else {
+			job.abort();
+			response = createResponse(job);
+		}
+		return response;
+	}
+	
 	private RemoteDataRestoreResponse createResponse(Job job) {
 		RemoteDataRestoreResponse response = new RemoteDataRestoreResponse();
 		response.setJobId(job.getId().toString());
