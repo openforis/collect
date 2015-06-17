@@ -9,10 +9,10 @@ package org.openforis.collect.presenter {
 	import flash.utils.Timer;
 	
 	import mx.collections.IList;
+	import mx.events.FlexEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
-	import mx.utils.StringUtil;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.Proxy;
@@ -21,10 +21,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.BackupEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
+	import org.openforis.collect.model.proxy.ConfigurationProxy;
 	import org.openforis.collect.ui.component.BackupView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.DateUtil;
+	import org.openforis.collect.util.StringUtil;
 	import org.openforis.concurrency.proxy.JobProxy;
 	import org.openforis.concurrency.proxy.JobProxy$Status;
 	
@@ -56,6 +58,12 @@ package org.openforis.collect.presenter {
 			this._exportResponder = new AsyncResponder(exportResultHandler, faultHandler);
 			this._cancelResponder = new AsyncResponder(cancelResultHandler, faultHandler);
 			this._getStateResponder = new AsyncResponder(getStateResultHandler, faultHandler);
+			
+			view.remoteCloneContainer.addEventListener(FlexEvent.CREATION_COMPLETE, remoteCloneContainerCreationCompleteHandler);
+		}
+		
+		private function remoteCloneContainerCreationCompleteHandler(event:FlexEvent):void {
+			initSendToRemoteCloneContainer();
 		}
 		
 		private function get view():BackupView {
@@ -70,23 +78,17 @@ package org.openforis.collect.presenter {
 		override protected function initEventListeners():void {
 			super.initEventListeners();
 			
-			view.exportButton.addEventListener(MouseEvent.CLICK, exportButtonClickHandler);
+			view.exportButton.addEventListener(MouseEvent.CLICK, backupButtonClickHandler);
 			view.cancelExportButton.addEventListener(MouseEvent.CLICK, cancelExportButtonClickHandler);
-			view.downloadButton.addEventListener(MouseEvent.CLICK, downloadButtonClickHandler);
-			//view.closeButton1.addEventListener(MouseEvent.CLICK, closeHandler);
-			//view.closeButton3.addEventListener(MouseEvent.CLICK, closeHandler);
-			view.sendToRemoteCloneButton.addEventListener(MouseEvent.CLICK, sendToRemoteUrlClickHandler);
+			view.downloadButton.addEventListener(MouseEvent.CLICK, downloadLastBackupButtonClickHandler);
+			view.backButton.addEventListener(MouseEvent.CLICK, backButtonClickHandler);
 		}
 		
-		/*override protected function closeHandler(event:Event = null):void {
-			if ( _job != null && _job is JobProxy && JobProxy(_job).running ) {
-				AlertUtil.showMessage("export.cannotClosePopUp");
-			} else {
-				PopUpManager.removePopUp(view);
-			}
-		}*/
+		protected function backButtonClickHandler(event:MouseEvent):void {
+			resetView();
+		}
 		
-		protected function exportButtonClickHandler(event:MouseEvent):void {
+		protected function backupButtonClickHandler(event:MouseEvent):void {
 			if ( ! validateForm() ) {
 				return;
 			}
@@ -104,17 +106,12 @@ package org.openforis.collect.presenter {
 			return true;
 		}
 		
-		protected function downloadButtonClickHandler(event:MouseEvent):void {
-			var url:String = ApplicationConstants.DOWNLOAD_EXPORTED_DATA_URL;
-			var dateStr:String = DateUtil.formatToXML(new Date());
-			var fileName:String = SurveyBackupJobProxy(_job).outputFileName;
-			var surveyName:String = view.surveyDropDown.selectedItem.name;
-			var outputFileName:String = mx.utils.StringUtil.substitute(EXPORT_FILE_NAME_FORMAT, [surveyName, dateStr]); 
-
+		private function downloadLastBackupButtonClickHandler(event:MouseEvent):void {
+			var surveyName:String = getSelectedSurveyName();
+			var url:String = ApplicationConstants.URL + "surveys/" + surveyName + "/data/backup/last";
+			
 			var req:URLRequest = new URLRequest(url);
 			req.data = new URLVariables();
-			req.data.fileName = fileName;
-			req.data.outputFileName = outputFileName;
 			navigateToURL(req, "_new");
 		}
 		
@@ -202,15 +199,27 @@ package org.openforis.collect.presenter {
 			_firstOpen = false;
 		}
 		
+		private function getSelectedSurvey():Object {
+			var selectedSurvey:Object = view.surveyDropDown.selectedItem;
+			return selectedSurvey;
+		}
+		
 		private function getSelectedSurveyName():String {
-			var selectedSurvey:Object = view.surveyDropDown.selectedItem
+			var selectedSurvey:Object = getSelectedSurvey();
 			return selectedSurvey == null ? null: selectedSurvey.name;
+		}
+		
+		private function getSelectedSurveyId():Number {
+			var selectedSurvey:Object = getSelectedSurvey();
+			return selectedSurvey == null ? NaN: selectedSurvey.id;
 		}
 		
 		protected function resetView():void {
 			stopProgressTimer();
 			_job = null;
 			view.currentState = BackupView.STATE_PARAMETERS_SELECTION;
+			view.surveyDropDown.selectedIndex = 0;
+			populateForm();
 			checkEnabledFields();
 		}
 		
@@ -225,6 +234,19 @@ package org.openforis.collect.presenter {
 			updateExportState();
 		}
 		
+		private function initSendToRemoteCloneContainer():void {
+			view.sendToRemoteCloneButton.addEventListener(MouseEvent.CLICK, sendToRemoteUrlClickHandler);
+
+			ClientFactory.configurationClient.loadConfiguration(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+				var conf:ConfigurationProxy = event.result as ConfigurationProxy;
+				if (org.openforis.collect.util.StringUtil.isNotBlank(conf.remoteCloneUrl)) {
+					view.sendToRemoteCloneContainer.visible = view.sendToRemoteCloneContainer.includeInLayout = true;
+					view.remoteCloneUrlTextInput.text = conf.remoteCloneUrl;
+					view.remoteCloneNotConfiguredLabel.visible = view.remoteCloneNotConfiguredLabel.includeInLayout = false;
+				}
+			}, faultHandler));			
+		}
+		
 		protected function checkEnabledFields():void {
 		}
 		
@@ -237,9 +259,8 @@ package org.openforis.collect.presenter {
 			dropDownList.dataProvider = surveys;
 			dropDownList.callLater(function():void {
 				dropDownList.selectedIndex = 0;
-				updateSelectedSurveyInfo();
 			});
-			dropDownList.addEventListener(IndexChangeEvent.CHANGE, function(event:IndexChangeEvent):void {
+			dropDownList.addEventListener(FlexEvent.VALUE_COMMIT, function(event:Event):void {
 				updateSelectedSurveyInfo();
 			});
 		}
@@ -252,9 +273,13 @@ package org.openforis.collect.presenter {
 			} else {
 				view.currentState = BackupView.STATE_LOADING;
 				
+				view.lastBackupDateLabel.text = "";
+				
 				var responder:AsyncResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
 					selectedSurveyInfo = event.result;
-					view.lastBackupDateLabel.text = DateUtil.format(selectedSurveyInfo.date);
+					if (selectedSurveyInfo.date != null) {
+						view.lastBackupDateLabel.text = DateUtil.format(selectedSurveyInfo.date);
+					}
 					view.updatedRecordsSinceLastBackupCountLabel.text = String(selectedSurveyInfo.updatedRecordsSinceBackup);
 					view.currentState = BackupView.STATE_PARAMETERS_SELECTION;
 				}, faultHandler);

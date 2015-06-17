@@ -22,7 +22,6 @@ import org.openforis.collect.web.controller.upload.UploadItem;
 import org.openforis.commons.web.JobStatusResponse;
 import org.openforis.concurrency.Job;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +36,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
  *
  */
 @Controller
-public class RestoreController extends BasicController {
+public class DataRestoreController extends BasicController {
 
 	//private static Log LOG = LogFactory.getLog(RestoreController.class);
 	
@@ -48,20 +47,27 @@ public class RestoreController extends BasicController {
 	@Autowired
 	private CollectJobManager jobManager;
 	
-	@Secured("ROLE_ADMIN")
-	@RequestMapping(value = "/survey-data/restore.json", method = RequestMethod.POST)
-	public @ResponseBody String restoreData(UploadItem uploadItem, @RequestParam String surveyName) throws IOException {
-		return startRestoreJob(uploadItem, surveyName);
+	@RequestMapping(value = "/surveys/{surveyName}/data/restore.json", method = RequestMethod.POST)
+	public @ResponseBody JobStatusResponse restoreData(UploadItem uploadItem, @PathVariable String surveyName) throws IOException {
+		try {
+			DataRestoreJob job = startRestoreJob(uploadItem, surveyName);
+			return createResponse(job);
+		} catch (Exception e) {
+			JobStatusResponse response = new JobStatusResponse();
+			response.setErrorStatus();
+			response.setErrorMessage(e.getMessage());
+			return response;
+		}
 	}
 	
-	@RequestMapping(value = "/survey-data/restore-remotely.json", method = RequestMethod.POST)
-	public @ResponseBody RemoteDataRestoreResponse restoreDataRemotely(UploadItem uploadItem, @RequestParam String surveyName, @RequestParam String restoreKey) {
+	@RequestMapping(value = "/surveys/{surveyName}/data/restore-remotely.json", method = RequestMethod.POST)
+	public @ResponseBody RemoteDataRestoreResponse restoreDataRemotely(UploadItem uploadItem, @PathVariable String surveyName, @RequestParam String restoreKey) {
 		RemoteDataRestoreResponse response = new RemoteDataRestoreResponse();
 		String allowedRestoreKey = configurationManager.getConfiguration().get(ConfigurationItem.ALLOWED_RESTORE_KEY);
-		if (StringUtils.isNotBlank(allowedRestoreKey) && allowedRestoreKey.equals(restoreKey)) {
+		if (StringUtils.isBlank(allowedRestoreKey) || allowedRestoreKey.equals(restoreKey)) {
 			try {
-				String jobId = startRestoreJob(uploadItem, surveyName);
-				response.setJobId(jobId);
+				DataRestoreJob job = startRestoreJob(uploadItem, surveyName);
+				response.setJobId(job.getId().toString());
 			} catch (Exception e) {
 				response.setErrorStatus();
 				response.setErrorMessage(e.getMessage());
@@ -73,7 +79,7 @@ public class RestoreController extends BasicController {
 		return response;
 	}
 	
-	@RequestMapping(value = "/survey-data/restore-jobs/{jobId}/status.json", method = RequestMethod.GET)
+	@RequestMapping(value = "/surveys/data/restore/jobs/{jobId}/status.json", method = RequestMethod.GET)
 	public @ResponseBody RemoteDataRestoreResponse getRestoreDataRemotelyStatus(@PathVariable String jobId) throws IOException {
 		RemoteDataRestoreResponse response;
 		Job job = jobManager.getJob(jobId);
@@ -82,12 +88,12 @@ public class RestoreController extends BasicController {
 			response.setErrorStatus();
 			response.setErrorMessage("Job not found");
 		} else {
-			response = createResponse(job);
+			response = createRemoteDataRestoreResponse(job);
 		}
 		return response;
 	}
 
-	@RequestMapping(value = "/survey-data/restore-jobs/{jobId}/abort.json", method = RequestMethod.GET)
+	@RequestMapping(value = "/surveys/data/restore/jobs/{jobId}/abort.json", method = RequestMethod.GET)
 	public @ResponseBody RemoteDataRestoreResponse abortRestoreDataRemotelyJob(@PathVariable String jobId) throws IOException {
 		RemoteDataRestoreResponse response;
 		Job job = jobManager.getJob(jobId);
@@ -97,21 +103,31 @@ public class RestoreController extends BasicController {
 			response.setErrorMessage("Job not found");
 		} else {
 			job.abort();
-			response = createResponse(job);
+			response = createRemoteDataRestoreResponse(job);
 		}
 		return response;
 	}
 	
-	private RemoteDataRestoreResponse createResponse(Job job) {
+	private JobStatusResponse createResponse(Job job) {
+		JobStatusResponse response = new JobStatusResponse();
+		fillResponse(response, job);
+		return response;
+	}
+	
+	private RemoteDataRestoreResponse createRemoteDataRestoreResponse(Job job) {
 		RemoteDataRestoreResponse response = new RemoteDataRestoreResponse();
+		fillResponse(response, job);
+		return response;
+	}
+
+	private void fillResponse(JobStatusResponse response, Job job) {
 		response.setJobId(job.getId().toString());
 		response.setJobStatus(job.getStatus());
 		response.setJobProgress(job.getProgressPercent());
 		response.setErrorMessage(job.getErrorMessage());
-		return response;
 	}
 	
-	private String startRestoreJob(UploadItem uploadItem, String expectedSurveyName) throws IOException,
+	private DataRestoreJob startRestoreJob(UploadItem uploadItem, String expectedSurveyName) throws IOException,
 	FileNotFoundException, ZipException {
 		File tempFile = copyContentToFile(uploadItem);
 		
@@ -128,7 +144,7 @@ public class RestoreController extends BasicController {
 		String lockId = surveyUri;
 		jobManager.start(job, lockId);
 		
-		return job.getId().toString();
+		return job;
 	}
 
 	private void checkValidSurvey(String surveyName, String surveyUri) {

@@ -23,7 +23,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
-import org.openforis.collect.web.controller.RestoreController.RemoteDataRestoreResponse;
+import org.openforis.collect.web.controller.DataRestoreController.RemoteDataRestoreResponse;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,7 +112,7 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 			String restoreKey = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_RESTORE_KEY);
 			File lastBackupFile = backupStorageManager.getLastBackupFile(surveyName);
 			
-			String postUrl = remoteCollectCloneUrl + "/survey-data/restore-remotely.json";
+			String postUrl = remoteCollectCloneUrl + String.format("/surveys/%s/data/restore-remotely.json", surveyName);
 			HttpPost post = new HttpPost(postUrl);
 			RequestConfig config = RequestConfig.custom().setConnectTimeout(BACKUP_SEND_TIMEOUT_MILLIS).build();
 			post.setConfig(config);
@@ -156,7 +156,7 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 		private HttpRequestBase createRequest() {
 			String remoteCollectCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
 //				String restoreKey = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_RESTORE_KEY);
-			String url = remoteCollectCloneUrl + String.format("/survey-data/restore-jobs/%s/status.json", remoteJobId);
+			String url = remoteCollectCloneUrl + String.format("/surveys/data/restore/jobs/%s/status.json", remoteJobId);
 			HttpGet request = new HttpGet(url);
 			request.setConfig(RequestConfig.custom().setConnectTimeout(REQUEST_TIMEOUT_MILLIS).build());
 			return request;
@@ -164,7 +164,7 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 		
 		private HttpRequestBase createRemoteJobAbortRequest() {
 			String remoteCollectCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
-			String url = remoteCollectCloneUrl + String.format("/survey-data/restore-jobs/%s/abort.json", remoteJobId);
+			String url = remoteCollectCloneUrl + String.format("/surveys/data/restore/jobs/%s/abort.json", remoteJobId);
 			HttpGet request = new HttpGet(url);
 			request.setConfig(RequestConfig.custom().setConnectTimeout(REQUEST_TIMEOUT_MILLIS).build());
 			return request;

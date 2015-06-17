@@ -1,5 +1,7 @@
 package org.openforis.collect.presenter {
 	
+	import com.adobe.serialization.json.JSON;
+	
 	import flash.events.DataEvent;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -25,6 +27,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.component.RestoreView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.DateUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.concurrency.proxy.JobProxy;
@@ -52,7 +55,7 @@ package org.openforis.collect.presenter {
 		private var _type:String;
 		private var _job:Proxy;
 		private var _firstOpen:Boolean = true;
-		private var _jobLockId:String;
+		private var _jobId:String;
 		private var selectedSurveyInfo:Object;
 		
 		public function RestoreViewPresenter(view:RestoreView) {
@@ -137,8 +140,8 @@ package org.openforis.collect.presenter {
 				resetView();
 				break;
 			case RestoreView.STATE_PROCESSING:
-				if (StringUtil.isNotBlank(_jobLockId)) {
-					ClientFactory.collectJobClient.abortJob(_cancelResponder, _jobLockId);
+				if (StringUtil.isNotBlank(_jobId)) {
+					ClientFactory.collectJobClient.abortJob(_cancelResponder, _jobId);
 				}
 				break;
 			}
@@ -173,11 +176,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function updateRestoreState():void {
-			if (_jobLockId != null) {
-				ClientFactory.collectJobClient.getLockingJob(_getStateResponder, _jobLockId);
+			if (_jobId != null) {
+				ClientFactory.collectJobClient.getJob(_getStateResponder, _jobId);
 			} else {
 				resetView();
 			}
+			_firstOpen = false;
 		}
 		
 		protected function cancelResultHandler(event:ResultEvent, token:Object = null):void {
@@ -225,7 +229,6 @@ package org.openforis.collect.presenter {
 			} else {
 				resetView();
 			}
-			_firstOpen = false;
 		}
 		
 		protected function resetView():void {
@@ -263,28 +266,35 @@ package org.openforis.collect.presenter {
 		private function fileReferenceUploadCompleteDataHandler(event:DataEvent):void {
 			view.currentState = RestoreView.STATE_LOADING;
 			
-			_jobLockId = event.data;
+			var response:Object = JSON.decode(event.data as String);
 			
-			updateRestoreState();
-			startProgressTimer();
+			if (response.statusOk) {
+				_jobId = response.jobId;
+				
+				updateRestoreState();
+				startProgressTimer();
+			} else {
+				AlertUtil.showError("referenceDataImport.file.error", [response.errorMessage]);
+				view.currentState = RestoreView.STATE_PARAMETER_SELECTION;
+			}
 		}
 		
 		private function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
-			AlertUtil.showError("Error uploading file", [event.text]);
+			AlertUtil.showError("referenceDataImport.file.error", [event.text]);
 			view.currentState = RestoreView.STATE_PARAMETER_SELECTION;
 		}
 		
 		private function startUpload():void {
 			updateViewForUploading();
 			
-			//workaround for firefox/chrome flahplayer bug
-			//url +=";jsessionid=" + Application.sessionId;
-			
-			var restoreUrl:String = "/collect/survey-data/restore.json";
+			var surveyName:String = getSelectedSurveyName();
+
+			var restoreUrl:String = ApplicationConstants.getSurveyDataRestoreUrl(surveyName);;
+
 			var request:URLRequest = new URLRequest(restoreUrl);
-			//request paramters
 			request.method = URLRequestMethod.POST;
 			
+			//request paramters
 			request.data = new URLVariables();
 			request.data.name = _fileReference.name;
 			request.data.surveyName = getSelectedSurveyName();

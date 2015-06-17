@@ -10,6 +10,10 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import com.shortybmc.utils.StringUtils;
+			
+			import org.openforis.collect.util.StringUtil;
+			
 			import mx.events.FlexEvent;
 			import mx.rpc.AsyncResponder;
 			import mx.rpc.IResponder;
@@ -101,6 +105,7 @@
 			
 			protected function configurationItemChangeHandler(event:Event):void {
 				var textInput:TextInput = TextInput(event.target);
+				textInput.text = StringUtil.trim(textInput.text);
 				var configurationItem:Configuration$ConfigurationItem = textInputToConfigurationItem[textInput.id];
 				var value:String = textInput.text;
 				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
@@ -162,6 +167,7 @@
 					<!-- Backup / Restore configuration -->
 					<container:FieldSet legend="{Message.get('configuration.backup_restore')}" width="100%"
 										creationComplete="backupRestoreSettingsContainerCreationCompleteHandler(event)">
+						<s:Label text="{Message.get('configuration.backup_restoer_notes')}" width="100%" />
 						
 						<!-- allowed restore key -->
 						<s:FormItem label="{Message.get('configuration.allowed_restore_key')}" width="100%">

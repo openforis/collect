@@ -299,5 +299,11 @@
             <version>${graniteds.version}</version>
             <type>swc</type>
         </dependency>
+		<dependency>
+			<groupId>com.adobe</groupId>
+			<artifactId>as3corelib</artifactId>
+			<version>0.93</version>
+			<type>swc</type>
+		</dependency>
 	</dependencies>
 </project>

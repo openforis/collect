@@ -3,7 +3,7 @@
 				 xmlns:s="library://ns.adobe.com/flex/spark" 
 				 xmlns:mx="library://ns.adobe.com/flex/mx" 
 				 xmlns:component="org.openforis.collect.ui.component.*" 
-				 width="400" height="300"
+				 width="450" height="400"
 				 title="{Message.get('backup_restore.popup.title')}" 
 				 >
 	<fx:Script>

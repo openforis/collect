@@ -64,7 +64,7 @@
 				  visible.parametersSelection="true" includeInLayout.parametersSelection="true"
 				  >
 			<s:HGroup verticalAlign="middle">
-				<s:Label text="{Message.get('backup.selectSurveyLabel')}" width="150"
+				<s:Label text="{Message.get('backup.survey')}" width="120"
 						 styleName="formLabel"/>
 				<s:DropDownList id="surveyDropDown" 
 								labelFunction="surveyLabelFunction" 
@@ -73,14 +73,14 @@
 								/>
 			</s:HGroup>
 			<s:HGroup verticalAlign="middle">
-				<s:Label text="{Message.get('backup.last_backup_date')}" width="150"
+				<s:Label text="{Message.get('backup.last_backup_date')}" width="120"
 						 styleName="formLabel"/>
-				<s:TextInput editable="false" id="lastBackupDateLabel" />
+				<s:Label id="lastBackupDateLabel" />
 			</s:HGroup>
 			<s:HGroup verticalAlign="middle">
 				<s:Label text="{Message.get('backup.updated_records_since_last_backup_count')}"
 						 styleName="formLabel"/>
-				<s:TextInput editable="false" id="updatedRecordsSinceLastBackupCountLabel" width="50" />
+				<s:Label id="updatedRecordsSinceLastBackupCountLabel" width="50" />
 			</s:HGroup>
 		</s:VGroup>
 		
@@ -124,29 +124,50 @@
 	<s:VGroup includeIn="complete" itemCreationPolicy="immediate"
 			  height="100%" width="100%"
 			  horizontalAlign="center"
-			  verticalAlign="middle"
-			  gap="20"
+			  gap="30"
 			  >
-		<s:Label text="{Message.get('backup.complete')}"
-				 styleName="infoMessageBig"
-				 />
-		
-		<s:VGroup>
-			<s:Button id="sendToRemoteCloneButton" label="{Message.get('backup.send_to_remote_clone')}" />
-			<s:HGroup verticalAlign="middle">
-				<s:Label text="{Message.get('backup.remote_clone_url')}"
-						 styleName="formLabel"/>
-				<s:TextInput id="remoteCloneUrl" enabled="false" />
-			</s:HGroup>
-		</s:VGroup>
-		
-		<s:HGroup gap="30">
-			<s:Button id="downloadButton" 
-					  label="{Message.get('global.download')}"
+		<s:HGroup width="100%">
+			<s:Button id="backButton"
+					  label="{Message.get('backup.back')}"
 					  useHandCursor="true" 
 					  buttonMode="true"
 					  />
 		</s:HGroup>
+
+		<s:Label text="{Message.get('backup.complete')}"
+				 styleName="infoMessageBig"
+				 />
+		
+		<s:Button id="downloadButton" 
+				  label="{Message.get('global.download')}"
+				  useHandCursor="true" 
+				  buttonMode="true"
+				  />
+
+		<container:CollapsiblePanel id="remoteCloneContainer" 
+									collapsed="true"
+									title="{Message.get('backup.remote_clone')}"
+									creationPolicy="all" width="100%">
+			<container:layout>
+				<s:VerticalLayout horizontalAlign="center" gap="10" 
+								  paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" />
+			</container:layout>
+			
+			<s:Label id="remoteCloneNotConfiguredLabel" text="{Message.get('backup.remote_clone.not_configured')}" width="100%" />
+			
+			<s:VGroup id="sendToRemoteCloneContainer" visible="false" includeInLayout="false" 
+					  horizontalAlign="center" width="100%">
+				<s:VGroup verticalAlign="middle" width="100%" gap="10">
+					<s:Label text="{Message.get('backup.remote_clone.url')}"
+							 width="100%"
+							 styleName="formLabel"/>
+					<s:Label id="remoteCloneUrlTextInput" />
+				</s:VGroup>
+				<s:Button id="sendToRemoteCloneButton" label="{Message.get('backup.remote_clone.send')}" />
+			</s:VGroup>
+			
+		</container:CollapsiblePanel>
+		
 	</s:VGroup>
 	
 </s:VGroup>
