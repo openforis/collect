@@ -30,7 +30,6 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
@@ -79,8 +78,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private SurveyManager surveyManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
-	@WireVariable(value="springJobManager")
-	private SpringJobManager jobManager;
 
 	private boolean changed;
 	private Window validationResultsPopUp;

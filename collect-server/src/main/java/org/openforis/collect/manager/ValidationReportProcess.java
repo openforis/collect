@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.model.CollectRecord;
@@ -105,7 +106,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	protected void initWriter() throws UnsupportedEncodingException {
 		switch (reportType) {
 		case CSV:
-			csvWriter = new CsvWriter(outputStream);
+			csvWriter = new CsvWriter(outputStream, IOUtils.UTF_8, ',', '"');
 			break;
 		}
 	}
@@ -116,7 +117,6 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 			csvWriter.close();
 			break;
 		}
-		
 	}
 
 	protected void writeValidationReport(CollectRecord record) throws IOException {

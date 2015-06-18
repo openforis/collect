@@ -3,13 +3,16 @@
  */
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
+import org.openforis.collect.io.data.restore.RestoredBackupStorageManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,26 +31,35 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	@Autowired
 	private RecordFileManager recordFileManager;
 	@Autowired
+	private SurveyManager surveyManager;
+	@Autowired
 	private RecordManager recordManager;
 	@Autowired
 	private UserManager userManager;
+	@Autowired
+	private RestoredBackupStorageManager restoredBackupStorageManager;
 
 	//parameters
 	private boolean overwriteAll;
 	private boolean restoreUploadedFiles;
 	private List<Integer> entryIdsToImport;
 	private boolean oldBackupFormat;
+	private boolean storeRestoredFile;
+	private File tempFile;
 
 	@Override
 	public void initInternal() throws Throwable {
 		super.initInternal();
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-		oldBackupFormat = backupFileExtractor.isOldFormat(); 
+		oldBackupFormat = backupFileExtractor.isOldFormat();
 	}
 	
 	@Override
 	protected void buildTasks() throws Throwable {
 		super.buildTasks();
+		if (storeRestoredFile) {
+			addTask(new StoreBackupFileTask());
+		}
 		addTask(DataRestoreTask.class);
 		if ( restoreUploadedFiles && isUploadedFilesIncluded() ) {
 			addTask(RecordFileRestoreTask.class);
@@ -83,6 +95,12 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setSurvey(publishedSurvey);
 		}
 		super.prepareTask(task);
+	}
+	
+	@Override
+	protected void onCompleted() {
+		super.onCompleted();
+		restoredBackupStorageManager.moveToFinalFolder(publishedSurvey.getName(), tempFile);
 	}
 
 	public RecordManager getRecordManager() {
@@ -132,5 +150,20 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	public void setOverwriteAll(boolean overwriteAll) {
 		this.overwriteAll = overwriteAll;
 	}
+	
+	public boolean isStoreRestoredFile() {
+		return storeRestoredFile;
+	}
+	
+	public void setStoreRestoredFile(boolean storeRestoredFile) {
+		this.storeRestoredFile = storeRestoredFile;
+	}
 
+	private class StoreBackupFileTask extends Task {
+		@Override
+		protected void execute() throws Throwable {
+			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(publishedSurvey.getName(), file);
+		}
+		
+	}
 }

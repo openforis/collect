@@ -8,6 +8,7 @@ import java.util.Set;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.openforis.collect.model.Configuration;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +30,10 @@ public class ConfigurationDao extends JooqDaoSupport {
 				.from(OFC_CONFIG)
 				.fetch();
 		for (Record record : fetch) {
-			String name = record.getValue(OFC_CONFIG.NAME);
+			String key = record.getValue(OFC_CONFIG.NAME);
 			String value = record.getValue(OFC_CONFIG.VALUE);
-			c.put(name, value);
+			ConfigurationItem configurationItem = ConfigurationItem.fromKey(key);
+			c.put(configurationItem, value);
 		}
 		return c;
 	}
@@ -41,11 +43,11 @@ public class ConfigurationDao extends JooqDaoSupport {
 		//delete old records
 		dsl.delete(OFC_CONFIG).execute();
 		//insert new records
-		Set<String> keySet = config.getProperties();
-		for (String name : keySet) {
-			String value = config.get(name);
+		Set<ConfigurationItem> items = config.getProperties();
+		for (ConfigurationItem item : items) {
+			String value = config.get(item);
 			dsl.insertInto(OFC_CONFIG)
-				.set(OFC_CONFIG.NAME, name)
+				.set(OFC_CONFIG.NAME, item.getKey())
 				.set(OFC_CONFIG.VALUE, value)
 				.execute();
 		}

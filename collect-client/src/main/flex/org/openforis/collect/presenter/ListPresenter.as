@@ -105,7 +105,7 @@ package org.openforis.collect.presenter {
 		override protected function initEventListeners():void {
 			eventDispatcher.addEventListener(UIEvent.LOAD_RECORD_SUMMARIES, loadRecordSummariesHandler);
 			eventDispatcher.addEventListener(UIEvent.RELOAD_RECORD_SUMMARIES, reloadRecordSummariesHandler);
-			eventDispatcher.addEventListener(CollectJobEvent.COLLECT_JOB_COMPLETE, jobCompleteHandler);
+			eventDispatcher.addEventListener(CollectJobEvent.COLLECT_JOB_END, jobEndHandler);
 
 			view.backToMainMenuButton.addEventListener(MouseEvent.CLICK, backToMainMenuClickHandler);
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
@@ -120,7 +120,7 @@ package org.openforis.collect.presenter {
 			view.stage.addEventListener(MouseEvent.CLICK, stageClickHandler);
 		}
 		
-		private function jobCompleteHandler(event:CollectJobEvent):void {
+		private function jobEndHandler(event:CollectJobEvent):void {
 			if (event.job is SurveyLockingJobProxy) {
 				reloadRecordSummaries();
 			}

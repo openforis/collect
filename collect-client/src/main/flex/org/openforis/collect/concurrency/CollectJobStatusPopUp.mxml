@@ -20,6 +20,7 @@
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.presenter.PopUpPresenter;
 			import org.openforis.collect.util.PopUpUtil;
+			import org.openforis.concurrency.proxy.JobProxy;
 			
 			public static const STATE_LOADING:String = "loading";
 			public static const STATE_RUNNING:String = "running";
@@ -28,12 +29,14 @@
 			
 			private var _presenter:CollectJobStatusPopUpPresenter;
 			private var _autoclose:Boolean;
+			private var _job:JobProxy;
 			private static var _instance:CollectJobStatusPopUp;
 			
-			public static function openPopUp(autoclose:Boolean = false):void {
+			public static function openPopUp(job:JobProxy = null, autoclose:Boolean = false):void {
 				if (_instance == null) {
 					var popUp:CollectJobStatusPopUp = new CollectJobStatusPopUp();
 					popUp._autoclose = autoclose;
+					popUp._job = job;
 					PopUpUtil.showPopUp(popUp);
 					_instance = popUp;
 				}
@@ -52,6 +55,16 @@
 			
 			override protected function createPresenter():PopUpPresenter {
 				return new CollectJobStatusPopUpPresenter(this);
+			}
+
+			public function get job():JobProxy {
+				return _job;
+			}
+			
+			public static function setActiveJob(job:JobProxy):void {
+				if (_instance != null) {
+					_instance._job = job;
+				}
 			}
 			
 			public function get autoclose():Boolean {

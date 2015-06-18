@@ -39,7 +39,7 @@ import org.apache.lucene.util.Version;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.Configuration;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -83,7 +83,7 @@ public class RecordIndexManager extends BaseStorageManager {
 	
 	public synchronized boolean init() throws RecordIndexException {
 		unlock();
-		initStorageDirectory(Configuration.INDEX_PATH_KEY);
+		initStorageDirectory(ConfigurationItem.RECORD_INDEX_PATH);
 		if ( storageDirectory != null ) {
 			if ( LOG.isInfoEnabled() ) {
 				LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());

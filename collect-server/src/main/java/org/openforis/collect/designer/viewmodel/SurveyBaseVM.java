@@ -43,7 +43,6 @@ import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
 
@@ -52,7 +51,6 @@ import org.zkoss.zkplus.databind.BindingListModelList;
  * @author S. Ricci
  *
  */
-@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class SurveyBaseVM extends BaseVM {
 	
 	public enum SurveyType {

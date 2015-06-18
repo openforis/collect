@@ -46,7 +46,6 @@ import org.openforis.collect.relational.print.RDBPrintJob;
 import org.openforis.collect.utils.Dates;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
-import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
@@ -103,8 +102,6 @@ public class SurveySelectVM extends BaseVM {
 	private SurveyValidator surveyValidator;
 	@WireVariable
 	private CollectEarthSurveyValidator collectEarthSurveyValidator;
-	@WireVariable
-	private SpringJobManager springJobManager;
 
 	private Window surveyImportPopUp;
 
@@ -222,7 +219,7 @@ public class SurveySelectVM extends BaseVM {
 			break;
 		case MOBILE:
 			if (validateSurveyForCollectMobile(survey)) {
-				surveyBackupJob = springJobManager.createJob(SurveyBackupJob.class);
+				surveyBackupJob = jobManager.createJob(SurveyBackupJob.class);
 				surveyBackupJob.setSurvey(survey);
 				surveyBackupJob.setIncludeData(parameters.isIncludeData());
 				surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
@@ -233,7 +230,7 @@ public class SurveySelectVM extends BaseVM {
 				return;
 			}
 		default:
-			surveyBackupJob = springJobManager.createJob(SurveyBackupJob.class);
+			surveyBackupJob = jobManager.createJob(SurveyBackupJob.class);
 			surveyBackupJob.setSurvey(survey);
 			surveyBackupJob.setIncludeData(parameters.isIncludeData());
 			surveyBackupJob.setIncludeRecordFiles(parameters.isIncludeUploadedFiles());
@@ -241,7 +238,7 @@ public class SurveySelectVM extends BaseVM {
 			job = surveyBackupJob;
 			break;
 		}
-		springJobManager.start(job, String.valueOf(surveyId));
+		jobManager.start(job, String.valueOf(surveyId));
 
 		closePopUp(surveyExportPopup);
 		surveyExportPopup = null;
@@ -274,7 +271,7 @@ public class SurveySelectVM extends BaseVM {
 		surveyCloneJob.setOriginalSurvey(selectedSurvey);
 		surveyCloneJob.setNewName(newName);
 		surveyCloneJob.setOriginalSurveyIsWork(originalSurveyIsWork);
-		springJobManager.start(surveyCloneJob);
+		jobManager.start(surveyCloneJob);
 		
 		closePopUp(surveyClonePopup);
 		

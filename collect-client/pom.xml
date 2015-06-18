@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.6.3-SNAPSHOT</version>
+		<version>3.6.7-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-client</artifactId>
@@ -107,6 +107,7 @@
                                 <includeClass>org.openforis.collect.metamodel.ui.UIOptions$Orientation</includeClass>
                                 <includeClass>org.openforis.collect.model.AbstractSummaries</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
+                                <includeClass>org.openforis.collect.model.Configuration$ConfigurationItem</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectTaxonomy</includeClass>
                                 <includeClass>org.openforis.collect.model.Logo</includeClass>
                                 <includeClass>org.openforis.collect.model.LogoPosition</includeClass>
@@ -115,6 +116,7 @@
                                 <includeClass>org.openforis.collect.model.SurveySummary</includeClass>
                                 <includeClass>org.openforis.collect.model.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.model.FieldSymbol</includeClass>
+                                <includeClass>org.openforis.collect.remoting.SurveyBackupInfo</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.DataExportStatus$Format</includeClass>
                                 <includeClass>org.openforis.collect.remoting.manager.dataexport.proxy.DataExportStatusProxy</includeClass>
                                 <includeClass>org.openforis.collect.remoting.service.FileWrapper</includeClass>
@@ -297,5 +299,11 @@
             <version>${graniteds.version}</version>
             <type>swc</type>
         </dependency>
+		<dependency>
+			<groupId>com.adobe</groupId>
+			<artifactId>as3corelib</artifactId>
+			<version>0.93</version>
+			<type>swc</type>
+		</dependency>
 	</dependencies>
 </project>

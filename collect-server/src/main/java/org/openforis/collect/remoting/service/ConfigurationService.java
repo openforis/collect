@@ -3,10 +3,12 @@
  */
 package org.openforis.collect.remoting.service;
 
+import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.model.proxy.ConfigurationProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,22 +23,27 @@ public class ConfigurationService {
 	@Autowired
 	private RecordFileManager recordFileManager;
 	@Autowired
+	private BackupStorageManager backupStorageManager;
+	@Autowired
 	@Qualifier("persistedRecordIndexManager")
 	private RecordIndexManager recordIndexManager;
 	
 	//transient instance variables
 	private transient String defaultRecordFileUploadPath;
 	private transient String defaultRecordIndexPath;
+	private transient String defaultBackupStoragePath;
 
 	public void init() {
 		defaultRecordFileUploadPath = recordFileManager.getDefaultStorageDirectory().getAbsolutePath();
 		defaultRecordIndexPath = recordIndexManager.getDefaultStorageDirectory().getAbsolutePath();
+		defaultBackupStoragePath = backupStorageManager.getDefaultStorageDirectory().getAbsolutePath();
 	}
 	
 	public ConfigurationProxy loadConfiguration() {
 		return new ConfigurationProxy(configurationManager.getConfiguration(), 
 				defaultRecordFileUploadPath,
-				defaultRecordIndexPath);
+				defaultRecordIndexPath,
+				defaultBackupStoragePath);
 	}
 	
 	public void updateUploadPath(String uploadPath) {
@@ -50,6 +57,11 @@ public class ConfigurationService {
 		if ( ! initialized ) {
 			throw new RuntimeException("Error initializing index path");
 		}
+	}
+	
+	public void updateConfigurationItem(String configurationItemName, String value) {
+		ConfigurationItem item = ConfigurationItem.valueOf(configurationItemName);
+		configurationManager.updateConfigurationItem(item, value);
 	}
 	
 }

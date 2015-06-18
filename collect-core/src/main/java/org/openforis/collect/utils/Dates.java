@@ -50,7 +50,7 @@ public class Dates {
 		return parse(date, DATE_FORMAT);
 	}
 
-	private static Date parse(String dateString, String format) {
+	public static Date parse(String dateString, String format) {
 		if ( dateString == null ) {
 			return null;
 		} else {
@@ -80,7 +80,7 @@ public class Dates {
 		return value;
 	}
 
-	private static String format(Date dateTime, String format) {
+	public static String format(Date dateTime, String format) {
 		if ( dateTime == null ) {
 			return null;
 		} else {

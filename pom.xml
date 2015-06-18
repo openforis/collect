@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.6.3-SNAPSHOT</version>
+	<version>3.6.7-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -24,7 +24,7 @@
 		<installer-version-id>${buildNumber}</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.0.21-SNAPSHOT</openforis.commons.version>
+		<openforis.commons.version>0.0.22</openforis.commons.version>
 		<spring.version>3.2.8.RELEASE</spring.version>
 		<spring-security.version>3.2.4.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
@@ -66,11 +66,11 @@
 					</execution>
 				</executions>
 				<configuration>
-						<format>{0,date,yyyyMMddHHmm}</format>
-						<items>
-							<item>timestamp</item>
-						</items>
-					</configuration>
+					<format>{0,date,yyyyMMddHHmm}</format>
+					<items>
+						<item>timestamp</item>
+					</items>
+				</configuration>
 			</plugin>
 			
 			<!--  Set Eclipse project text encoding to UTF-8 -->
@@ -317,7 +317,6 @@
 				<artifactId>commons-web</artifactId>
 				<version>${openforis.commons.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>

@@ -11,6 +11,7 @@ import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.data.RecordFileBackupTask;
+import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.internal.SurveyBackupInfoCreatorTask;
 import org.openforis.collect.io.metadata.CodeListImagesExportTask;
 import org.openforis.collect.io.metadata.CollectMobileBackupConvertTask;
@@ -22,12 +23,10 @@ import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SpeciesManager;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.commons.collection.CollectionUtils;
-import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +55,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	
 	public enum OutputFormat {
 		DESKTOP("collect"), 
+		DESKTOP_FULL("collect-backup"),
 		MOBILE("collect-mobile"),
 		ONLY_DATA("collect-data");
 		
@@ -84,8 +84,11 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	private SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private CodeListManager codeListManager;
+	@Autowired
+	private BackupStorageManager backupStorageManager;
 	
 	//input
+	private boolean full;
 	private boolean includeData;
 	private boolean includeRecordFiles;
 	private RecordFilter recordFilter;
@@ -100,6 +103,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	
 	public SurveyBackupJob() {
 		outputFormat = OutputFormat.DEFAULT;
+		full = false;
 	}
 	
 	@Override
@@ -143,10 +147,19 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 	
 	@Override
+	protected void onCompleted() {
+		super.onCompleted();
+		if (full) {
+			IOUtils.closeQuietly(zipOutputStream);
+			backupStorageManager.store(survey.getName(), outputFile);
+		}
+	}
+
+	@Override
 	protected void onEnd() {
 		IOUtils.closeQuietly(zipOutputStream);
 	}
-	
+
 	@Override
 	protected void onTaskCompleted(Task task) {
 		if (task instanceof DataBackupTask) {
@@ -300,6 +313,14 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	
 	public void setIncludeRecordFiles(boolean includeRecordFiles) {
 		this.includeRecordFiles = includeRecordFiles;
+	}
+	
+	public boolean isFull() {
+		return full;
+	}
+	
+	public void setFull(boolean full) {
+		this.full = full;
 	}
 
 	public List<DataBackupError> getDataBackupErrors() {

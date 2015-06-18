@@ -87,6 +87,15 @@
 	<bean id="userSessionService" class="org.openforis.collect.remoting.service.UserSessionService"
 		autowire="byName" scope="session" />
 		
+<!-- 	<bean id="dataRestoreService" class="org.openforis.collect.remoting.service.io.data.restore.DataRestoreServiceImpl" /> -->
+	
+<!-- 	<bean class="org.springframework.remoting.rmi.RmiServiceExporter"> -->
+<!-- 		<property name="serviceName" value="dataRestoreService" /> -->
+<!-- 		<property name="service" ref="dataRestoreService" /> -->
+<!-- 		<property name="serviceInterface" value="org.openforis.collect.remoting.service.io.data.restore.RestoreService"/> -->
+<!-- 		<property name="registryPort" value="1099" /> -->
+<!-- 	</bean> -->
+		
 	<!-- ===================================== -->
 	<!-- Security -->
 	<!-- ===================================== -->

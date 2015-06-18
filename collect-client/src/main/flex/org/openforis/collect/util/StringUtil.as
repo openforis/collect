@@ -9,12 +9,18 @@ package org.openforis.collect.util
 	public class StringUtil	{
 		
 		public static function trim(value:String, trimChar:String = null):String {
+			var result:String;
 			if(trimChar == null) {
-				return mx.utils.StringUtil.trim(value);
+				result = mx.utils.StringUtil.trim(value);
 			} else {
 				var temp:String = leftTrim(value, trimChar);
 				temp = rightTrim(temp, trimChar);
-				return temp;
+				result = temp;
+			}
+			if (isDelCharacter(result)) {
+				return '';
+			} else {
+				return result;
 			}
 		}
 		
@@ -143,6 +149,20 @@ package org.openforis.collect.util
 				return pad(number.toString(), length, "0");
 			} else {
 				return "";
+			}
+		}
+		
+		public static function isDelCharacter(value:String):Boolean {
+			if (value != null && value.length == 1) {
+				var charCode:Number = value.charCodeAt(0);
+				switch(charCode) {
+					case 127: //DEL
+						return true;
+					default:
+						return false;
+				}
+			} else {
+				return false;
 			}
 		}
 		

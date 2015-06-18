@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.Configuration;
+import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.FileAttribute;
@@ -39,7 +39,7 @@ public class RecordFileManager extends BaseStorageManager {
 	}
 
 	protected void initStorageDirectory() {
-		super.initStorageDirectory(Configuration.UPLOAD_PATH_KEY);
+		super.initStorageDirectory(ConfigurationItem.RECORD_FILE_UPLOAD_PATH);
 		if ( storageDirectory == null ) {
 			String message = "Upload directory not configured properly";
 			LOG.error(message);

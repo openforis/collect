@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
 import org.openforis.collect.io.metadata.parsing.ParsingError.ErrorType;
 import org.openforis.collect.io.metadata.species.SpeciesBackupFileColumn;
@@ -29,7 +30,6 @@ import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.TaxonDao;
 import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
-import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.species.Taxon;
@@ -68,7 +68,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	@Autowired
 	private TaxonVernacularNameDao taxonVernacularNameDao;
 	@Autowired
-	private JobManager jobManager;
+	private CollectJobManager jobManager;
 	
 	private CollectSurvey survey;
 	

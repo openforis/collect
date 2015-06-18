@@ -49,7 +49,7 @@ package org.openforis.collect.concurrency {
 		}
 		
 		override protected function closeHandler(event:Event = null):void {
-			var _job:JobProxy = CollectJobMonitor.currentJob;
+			var _job:JobProxy = view.job;
 			if ( _job != null && ((_job is JobProxy && JobProxy(_job).running))) {
 				AlertUtil.showMessage("job.cannot_close_popup_job_still_running");
 			} else {
@@ -58,13 +58,9 @@ package org.openforis.collect.concurrency {
 		}
 
 		protected function cancelButtonClickHandler(event:MouseEvent):void {
-			var _job:JobProxy = CollectJobMonitor.currentJob;
+			var _job:JobProxy = view.job;
 			if (_job != null) {
-				if (_job is SurveyLockingJobProxy) {
-					ClientFactory.collectJobClient.abortSurveyJob(_cancelJobResponder, SurveyLockingJobProxy(_job).surveyId);
-				} else {
-					ClientFactory.collectJobClient.abortApplicationJob(_cancelJobResponder);
-				}
+				ClientFactory.collectJobClient.abortJob(_cancelJobResponder, _job.id);
 			}
 		}
 		
@@ -76,8 +72,8 @@ package org.openforis.collect.concurrency {
 			updateView();
 		}
 		
-		private function updateView():void {
-			var _job:JobProxy = CollectJobMonitor.currentJob;
+		public function updateView():void {
+			var _job:JobProxy = view.job;
 			if (_job == null) {
 				resetView();
 			} else {

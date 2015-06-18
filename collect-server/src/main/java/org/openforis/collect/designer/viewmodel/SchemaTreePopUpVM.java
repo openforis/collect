@@ -6,8 +6,8 @@ package org.openforis.collect.designer.viewmodel;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.SchemaTreeModel;
+import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.UITreeModelCreator;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
