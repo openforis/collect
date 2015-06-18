@@ -1,5 +1,6 @@
 package org.openforis.collect.io.metadata.collectearth.balloon;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 
@@ -26,7 +27,7 @@ class CEComponent {
 	}
 
 	public String getLabelOrName() {
-		return StringUtils.isBlank(label) ? name: label;
+		return StringEscapeUtils.escapeHtml4( StringUtils.isBlank(label) ? name: label );
 	}
 
 	public String getHtmlParameterName() {

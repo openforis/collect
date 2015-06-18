@@ -49,7 +49,7 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CETab tab, XMLBuilder parentBuilder) throws Exception {
-		parentBuilder.e("h3").t(tab.getLabel()); //$NON-NLS-1$
+		parentBuilder.e("h3").t( StringEscapeUtils.escapeHtml4(  tab.getLabel() ) ); //$NON-NLS-1$
 
 		XMLBuilder bodyContentBuilder = parentBuilder.e("section"); //$NON-NLS-1$
 		bodyContentBuilder.a("class", "step"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -68,7 +68,7 @@ public class CEComponentHTMLFormatter {
 	
 	private XMLBuilder createBuilder(CEEnumeratedEntityTable comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder builder =  parentBuilder.e("fieldset"); //$NON-NLS-1$
-		String legend = comp.getLabelOrName();
+		String legend =  comp.getLabelOrName() ;
 		builder.e("legend").t(legend); //$NON-NLS-1$
 		XMLBuilder tableBuilder = builder.e("table").a("class", "table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -85,7 +85,7 @@ public class CEComponentHTMLFormatter {
 					cellBuilder
 						.e("label") //$NON-NLS-1$
 							.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
-							.t(row.getLabelOrName());
+							.t( row.getLabelOrName() );
 				} else if (child instanceof CEField) {
 					createBuilder((CEField) child, false, cellBuilder);
 				}
@@ -96,7 +96,7 @@ public class CEComponentHTMLFormatter {
 	
 	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset"); //$NON-NLS-1$
-		fieldSetBuilder.e("legend").t(comp.getLabelOrName()); //$NON-NLS-1$
+		fieldSetBuilder.e("legend").t( comp.getLabelOrName()); //$NON-NLS-1$
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
 				createBuilder((CEField) child, true, fieldSetBuilder);
@@ -119,7 +119,7 @@ public class CEComponentHTMLFormatter {
 			formGroupBuilder.e("label") //$NON-NLS-1$
 				.a("for", elId) //$NON-NLS-1$
 				.a("class", "control-label col-sm-4") //$NON-NLS-1$ //$NON-NLS-2$
-				.t(comp.getLabelOrName());
+				.t(  comp.getLabelOrName() ) ;
 		}
 		//form control external container (for grid alignment)
 		XMLBuilder formControlContainer = formGroupBuilder.e("div") //$NON-NLS-1$
@@ -334,7 +334,7 @@ public class CEComponentHTMLFormatter {
 
 					if (item.hasUploadedImage()) {
 						String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
-						String titleText = StringUtils.isBlank(description) ? "" : StringEscapeUtils.escapeHtml4(description); //$NON-NLS-1$
+						String titleText = StringUtils.isBlank(description) ? "" : description; //$NON-NLS-1$
 						String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"150\">" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						itemBuilder
 							.a("title", htmlTitle) //$NON-NLS-1$
@@ -372,7 +372,7 @@ public class CEComponentHTMLFormatter {
 		if (StringUtils.isBlank(itemLabel)) {
 			itemLabel = item.getCode();
 		}
-		return itemLabel;
+		return   StringEscapeUtils.escapeHtml4( itemLabel );
 	}
 
 	private String getDescription(CodeListItem item) {
@@ -380,7 +380,7 @@ public class CEComponentHTMLFormatter {
 		if (StringUtils.isBlank(description) && ! language.equals(item.getSurvey().getDefaultLanguage())) {
 			description = item.getDescription();
 		}
-		return description;
+		return StringEscapeUtils.escapeHtml4( description );
 	}
 
 }
