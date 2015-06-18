@@ -1,5 +1,5 @@
 <div class="modal fade">
-	<div class="modal-dialog">
+	<div class="modal-dialog data-query-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">
@@ -8,28 +8,78 @@
 				<h4 class="modal-title">Data Query</h4>
 			</div>
 			<div class="modal-body">
-				<form role="form">
-					<div class="form-group">
-				   		<label class="control-label">Title</label>
-						<input type="text" class="form-control" name="title" />
+				<div role="tabpanel" class="tab-external-panel container-fluid">
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" class="active">
+							<a href="#query-details-container" aria-controls="query-details-container" role="tab" data-toggle="tab">Query definition</a>
+						</li>
+						<li role="presentation">
+							<a href="#query-test-and-run-container" aria-controls="query-test-and-run-container" role="tab" data-toggle="tab">Test and run</a>
+						</li>
+					</ul>
+				</div>
+				<!-- Tab panes -->
+				<div class="tab-content container-fluid">
+					<div id="query-details-container" role="tabpanel" class="tab-pane active" >
+						<form role="form">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+								   		<label class="control-label">Title</label>
+										<input type="text" class="form-control" name="title" />
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+								   		<label class="control-label">Entity</label>
+										<div class="entity-tree" style="height: 100%; overflow: auto;"></div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+								   		<label class="control-label">Attribute</label>
+										<div class="attribute-tree" style="height: 150px; overflow: auto;"></div>
+									</div>
+									<div class="form-group">
+								   		<label class="control-label">Conditions</label>
+										<textarea class="form-control" name="conditions" rows="5"></textarea>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+								   		<label class="control-label">Description</label>
+										<textarea class="form-control" name="description" rows="4"></textarea>
+									</div>
+								</div>
+							</div>
+						</form>
 					</div>
-					<div class="form-group">
-				   		<label class="control-label">Entity</label>
-						<div class="entity-tree" style="height: 150px; overflow: auto;"></div>
+					<div id="query-test-and-run-container" role="tabpanel" class="tab-pane" >
+						<div class="row">
+							<div class="col-md-2">
+								<label class="control-label">Record step</label>
+							</div>
+							<div class="col-md-3">
+								<select class="form-control selectpicker" name="recordStep"></select>
+							</div>
+							<div class="col-md-2"></div>
+							<div class="col-md-1">
+								<button type="button" class="btn btn-default test-btn">Test</button>
+							</div>
+							<div class="col-md-2">
+								<button type="button" class="btn btn-default export-to-csv-btn">Run and Export to CSV</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="test-result-grid"></div>
+						</div>					
 					</div>
-					<div class="form-group">
-				   		<label class="control-label">Attribute</label>
-						<div class="attribute-tree" style="height: 150px; overflow: auto;"></div>
-					</div>
-					<div class="form-group">
-				   		<label class="control-label">Conditions</label>
-						<textarea class="form-control" name="conditions" rows="5"></textarea>
-					</div>
-					<div class="form-group">
-				   		<label class="control-label">Description</label>
-						<input type="text" class="form-control" name="description" />
-					</div>
-				</form>
+				</div>
+						
 			</div>
 			
 			<div class="modal-footer">
@@ -39,18 +89,6 @@
 				
 				<button type="button" class="btn btn-primary save-and-close-btn">Save and Close</button>
 			</div>
-			
-			<fieldset>
-				<legend>Test and Run</legend>
-				<div class="form-group">
-		    		<label class="control-label">Record step</label>
-					<select class="form-control selectpicker" name="recordStep"></select>
-				</div>
-				<button type="button" class="btn btn-default test-btn">Test</button>
-				<button type="button" class="btn btn-default export-to-csv-btn">Run and Export to CSV</button>
-				
-				<div class="test-result-grid"></div>
-			</fieldset>
 			
 		</div>
 	</div>

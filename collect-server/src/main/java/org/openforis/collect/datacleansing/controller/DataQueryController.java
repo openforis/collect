@@ -34,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -99,15 +101,19 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	
 	@RequestMapping(value="start-test.json", method = RequestMethod.POST)
 	public @ResponseBody
-	Response startTest(@Validated DataQueryForm form, @RequestParam Step recordStep) {
-		CollectSurvey survey = sessionManager.getActiveSurvey();
-		DataQuery query = new DataQuery(survey);
-		form.copyTo(query);
-		testJob = collectJobManager.createJob(DataQueryExecutorJob.class);
-		testJob.setInput(new DataQueryExecutorJobInput(query, recordStep, new MemoryStoreDataQueryResultItemProcessor(query), TEST_MAX_RECORDS));
-		collectJobManager.start(testJob);
-		Response response = new Response();
-		return response;
+	Response startTest(@Validated DataQueryForm form, @RequestParam Step recordStep, BindingResult result) {
+		List<ObjectError> errors = result.getAllErrors();
+		if (errors.isEmpty()) {
+			CollectSurvey survey = sessionManager.getActiveSurvey();
+			DataQuery query = new DataQuery(survey);
+			form.copyTo(query);
+			testJob = collectJobManager.createJob(DataQueryExecutorJob.class);
+			testJob.setInput(new DataQueryExecutorJobInput(query, recordStep, new MemoryStoreDataQueryResultItemProcessor(query), TEST_MAX_RECORDS));
+			collectJobManager.start(testJob);
+			return new Response();
+		} else {
+			return new SimpleFormUpdateResponse(errors);
+		}
 	}
 	
 	@RequestMapping(value="result.csv", method = RequestMethod.GET)

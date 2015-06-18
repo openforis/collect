@@ -41,9 +41,10 @@ Collect.AbstractService.prototype.send = function(url, data, method, onSuccess, 
 			}
 		}
 	}).fail(function(jqXHR, textStatus, errorThrown) {
-		collect.error.apply(this, [jqXHR, textStatus, errorThrown]);
 		if (onError) {
 			onError();
+		} else {
+			collect.error.apply(this, [jqXHR, textStatus, errorThrown]);
 		}
 	});
 };

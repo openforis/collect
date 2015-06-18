@@ -47,7 +47,9 @@ Collect.AbstractItemEditDialogController.prototype.doOpen = function() {
 		 $this.content.remove();
 	 });
 	beforeOpen(function() {
-		var options = {backdrop: "static"};
+		var options = {
+			backdrop: "static"
+		};
 		if ($this.doNotAllowCancel) {
 			options.keyboard = false;
 		}
