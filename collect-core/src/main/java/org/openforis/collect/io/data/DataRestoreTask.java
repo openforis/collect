@@ -72,10 +72,10 @@ public class DataRestoreTask extends Task {
 
 	@Override
 	protected void initInternal() throws Throwable {
-		super.initInternal();
 		dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
 		backupFileExtractor = new BackupFileExtractor(zipFile);
 		oldBackupFormat = backupFileExtractor.isOldFormat();
+		super.initInternal();
 	}
 	
 	@Override

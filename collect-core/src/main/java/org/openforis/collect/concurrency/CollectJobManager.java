@@ -20,7 +20,7 @@ public class CollectJobManager extends SpringJobManager {
 	}
 	
 	public ApplicationLockingJob getApplicationJob() {
-		return (ApplicationLockingJob) getJob(APP_LOCK_ID);
+		return (ApplicationLockingJob) getLockingJob(APP_LOCK_ID);
 	}
 	
 	public void startSurveyJob(SurveyLockingJob job) {
@@ -28,7 +28,7 @@ public class CollectJobManager extends SpringJobManager {
 	}
 	
 	public SurveyLockingJob getSurveyJob(int surveyId) {
-		return (SurveyLockingJob) getJob(getLockId(surveyId));
+		return (SurveyLockingJob) getLockingJob(getLockId(surveyId));
 	}
 	
 	private String getLockId(int surveyId) {

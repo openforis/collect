@@ -2,16 +2,22 @@ package org.openforis.collect.remoting.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 
 import org.openforis.collect.Proxy;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.CSVDataExportProcess;
+import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
+import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -21,11 +27,11 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.User;
 import org.openforis.collect.utils.ExecutorServiceUtil;
 import org.openforis.collect.web.session.SessionState;
-import org.openforis.concurrency.JobManager;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -35,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class DataExportService {
 
-	//private static Log LOG = LogFactory.getLog(DataExportService.class);
+//	private static Log LOG = LogFactory.getLog(DataExportService.class);
 
 	@Autowired
 	private SessionManager sessionManager;
@@ -48,7 +54,11 @@ public class DataExportService {
 	@Autowired
 	private ApplicationContext appContext;
 	@Autowired
-	private JobManager jobManager;
+	private CollectJobManager jobManager;
+	@Autowired
+	private BackupStorageManager backupStorageManager;
+	@Autowired
+	private ConfigurationManager configurationManager;
 	
 	private CSVDataExportProcess dataExportProcess;
 	private SurveyBackupJob backupJob;
@@ -71,7 +81,7 @@ public class DataExportService {
 			Schema schema = survey.getSchema();
 			EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntityName);
 			
-			RecordFilter recordFilter = createRecordFilter(rootEntityDefn.getId(), onlyOwnedRecords, rootEntityKeyValues);
+			RecordFilter recordFilter = createRecordFilter(survey, rootEntityDefn.getId(), onlyOwnedRecords, rootEntityKeyValues);
 			
 			//filter by record step
 			recordFilter.setStepGreaterOrEqual(step);
@@ -99,37 +109,71 @@ public class DataExportService {
 	}
 	
 	@Transactional
+	public Proxy backup(String surveyName) {
+		CollectSurvey survey = surveyManager.get(surveyName);
+		return fullExport(survey, true, false, null, true);
+	}
+
+	@Transactional
 	public Proxy fullExport(boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
+		SessionState sessionState = sessionManager.getSessionState();
+		CollectSurvey survey = sessionState.getActiveSurvey();
+		return fullExport(survey, includeRecordFiles, onlyOwnedRecords, rootEntityKeyValues, false);
+	}
+	
+	@Transactional
+	public Proxy fullExport(CollectSurvey survey, boolean includeRecordFiles, boolean onlyOwnedRecords, String[] rootEntityKeyValues, boolean full) {
 		if ( backupJob == null || ! backupJob.isRunning() ) {
 			resetJobs();
 			
-			SessionState sessionState = sessionManager.getSessionState();
-			CollectSurvey survey = sessionState.getActiveSurvey();
-			
-			RecordFilter filter = createRecordFilter(null, onlyOwnedRecords, rootEntityKeyValues);
+			RecordFilter filter = createRecordFilter(survey, null, onlyOwnedRecords, rootEntityKeyValues);
 			
 			SurveyBackupJob job = jobManager.createJob(SurveyBackupJob.class);
-			job.setOutputFormat(OutputFormat.ONLY_DATA);
+			job.setFull(full);
+			if (full) {
+				job.setOutputFormat(OutputFormat.DESKTOP_FULL);
+			} else {
+				job.setOutputFormat(OutputFormat.ONLY_DATA);
+			}
 			job.setSurvey(survey);
 			job.setIncludeData(true);
 			job.setIncludeRecordFiles(includeRecordFiles);
 			job.setRecordFilter(filter);
-			
 			backupJob = job;
 			
 			jobManager.start(job);
 		}
 		return getCurrentJob();
 	}
+	
+	public Map<String, Object> getLastBackupInfo(String surveyName) {
+		final Date date = backupStorageManager.getLastBackupDate(surveyName);
+		CollectSurvey survey = surveyManager.get(surveyName);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setModifiedSince(date);
+		final int updatedRecordsSinceBackupDateCount = recordManager.countRecords(filter);
+		@SuppressWarnings("serial")
+		Map<String, Object> map = new HashMap<String, Object>() {{
+			put("date", date);
+			put("updatedRecordsSinceBackup", updatedRecordsSinceBackupDateCount);
+		}};
+		return map;
+	}
+	
+	@Secured("ROLE_ADMIN")
+	public String sendBackupToRemoteClone(String surveyName) {
+		RemoteCollectCloneDataRestoreJob job = jobManager.createJob(RemoteCollectCloneDataRestoreJob.class);
+		job.setSurveyName(surveyName);
+		jobManager.start(job);
+		return job.getId().toString();
+	}
 
-	private RecordFilter createRecordFilter(Integer rootEntityId, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
-		SessionState sessionState = sessionManager.getSessionState();
-		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
-		
-		RecordFilter recordFilter = new RecordFilter(activeSurvey, rootEntityId);
+	private RecordFilter createRecordFilter(CollectSurvey survey, Integer rootEntityId, boolean onlyOwnedRecords, String[] rootEntityKeyValues) {
+		RecordFilter recordFilter = new RecordFilter(survey, rootEntityId);
 		
 		//filter by record owner
 		if ( onlyOwnedRecords ) {
+			SessionState sessionState = sessionManager.getSessionState();
 			User user = sessionState.getUser();
 			recordFilter.setOwnerId(user.getId());
 		}

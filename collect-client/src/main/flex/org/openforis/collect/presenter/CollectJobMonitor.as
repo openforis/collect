@@ -56,8 +56,12 @@ package org.openforis.collect.presenter {
 			var oldJob:JobProxy = _job;
 			function onComplete():void {
 				if (_job != null && (oldJob == null || oldJob.id != _job.id || oldJob.status != _job.status || _job.running)) {
-					if (!  CollectJobStatusPopUp.popUpOpen && _job.running) {
-						CollectJobStatusPopUp.openPopUp();
+					if (_job.running) {
+						if (! CollectJobStatusPopUp.popUpOpen) {
+							CollectJobStatusPopUp.openPopUp(_job);
+						} else {
+							CollectJobStatusPopUp.setActiveJob(_job);
+						}
 					}
 					dispatchJobUpdateEvent();
 				}
@@ -105,7 +109,7 @@ package org.openforis.collect.presenter {
 			if (_job != null) {
 				eventDispatcher.dispatchEvent(new CollectJobEvent(CollectJobEvent.COLLECT_JOB_STATUS_UPDATE, _job));
 				if (_job.completed || _job.aborted || _job.failed) {
-					eventDispatcher.dispatchEvent(new CollectJobEvent(CollectJobEvent.COLLECT_JOB_COMPLETE, _job));
+					eventDispatcher.dispatchEvent(new CollectJobEvent(CollectJobEvent.COLLECT_JOB_END, _job));
 				}
 			}
 		}

@@ -427,7 +427,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 
-	public EntityDefinition getParentEntityForAssignedNodes(final UITab tab) {
+	public EntityDefinition getParentEntityForAssignedNodes(UITab tab) {
 		UITabSet root = tab.getRootTabSet();
 		EntityDefinition rootEntity = getRootEntityDefinition(root);
 		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
@@ -445,6 +445,10 @@ public class UIOptions implements ApplicationOptions, Serializable {
 					stack.push(child);
 				}
 			}
+		}
+		UITabSet parentTab = tab.getParent();
+		if (parentTab != null && parentTab instanceof UITab) {
+			return getParentEntityForAssignedNodes((UITab) parentTab);
 		}
 		throw new IllegalStateException("Parent entity for assigned nodes not found for tab: " + tab.getName());
 	}

@@ -13,7 +13,6 @@ import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 /**
@@ -21,7 +20,6 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
  * @author S. Ricci
  *
  */
-@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SurveyMainInfoVM extends SurveyObjectBaseVM<CollectSurvey> {
 	
 	@WireVariable

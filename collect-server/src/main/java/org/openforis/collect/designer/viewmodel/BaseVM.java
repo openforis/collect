@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
@@ -22,6 +23,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.WebApp;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Window;
 
@@ -30,6 +32,7 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public abstract class BaseVM {
 	
 	private static final SimpleDateFormat PRETTY_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:ss");
@@ -38,7 +41,9 @@ public abstract class BaseVM {
 			ServiceLoader.load(CollectEarthProjectFileCreator.class);
 
 	@WireVariable
-	private UserManager userManager;
+	protected UserManager userManager;
+	@WireVariable
+	protected CollectJobManager jobManager;
 
 	void init() {
 	}

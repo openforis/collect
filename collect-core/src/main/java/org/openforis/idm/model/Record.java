@@ -36,7 +36,7 @@ public class Record implements DeepComparable {
 	private int nextId;
 	private Entity rootEntity;
 
-	boolean toBeUpdated; //if true, enables validation dependency graph
+	boolean enableValidationDependencyGraphs;
 	NodeDependencyGraph calculatedAttributeDependencies;
 	RelevanceDependencyGraph relevanceDependencies;
 	MinCountDependencyGraph minCountDependencies;
@@ -50,7 +50,7 @@ public class Record implements DeepComparable {
 		this(survey, version, true);
 	}
 	
-	public Record(Survey survey, String version, boolean toBeUpdated) {
+	public Record(Survey survey, String version, boolean enableValidationDependencyGraphs) {
 		if (survey == null) {
 			throw new IllegalArgumentException("Survey required");
 		}
@@ -66,7 +66,7 @@ public class Record implements DeepComparable {
 				throw new IllegalArgumentException("Version not specified");
 			}
 		}
-		this.toBeUpdated = toBeUpdated;
+		this.enableValidationDependencyGraphs = enableValidationDependencyGraphs;
 		reset();
 	}
 
@@ -221,7 +221,7 @@ public class Record implements DeepComparable {
 
 	void put(Node<?> node) {
 		initialize(node);
-		if ( toBeUpdated ) {
+		if ( enableValidationDependencyGraphs ) {
 			registerInAllDependencyGraphs(node);
 		} else {
 			//register only calculated attribute dependencies

@@ -114,7 +114,14 @@ public enum NodeType {
 		default:
 			throw new IllegalStateException("Node type not supported: " + nodeType);
 		}
+		
+		setDefaults(result);
+		
 		return result;
+	}
+
+	private static void setDefaults(NodeDefinition result) {
+		result.setAlwaysRequired();
 	}
 
 }

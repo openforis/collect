@@ -72,6 +72,10 @@ package org.openforis.collect.util {
 			return mx.utils.StringUtil.substitute(baseUrl, surveyId);
 		}
 
+		public static function getSurveyDataRestoreUrl(surveyName:String):String {
+			return _URL + "surveys/" + surveyName + "/data/restore.json";
+		}
+
 		public static function get RECORD_FILE_DOWNLOAD_URL():String {
 			return _RECORD_FILE_DOWNLOAD_URL;
 		}
@@ -137,8 +141,8 @@ package org.openforis.collect.util {
 			var contextNameLenght:int = url.indexOf("/", originalRootUrl.length) - originalRootUrl.length;
 			var contextName:String = url.substr(originalRootUrl.length, contextNameLenght);
 			var rootUrl:String = protocol + "://"+ _HOST + ":" + _PORT + "/";
-			var applicationUrl:String = rootUrl + contextName + "/";
-			_URL = applicationUrl;
+			
+			_URL = rootUrl + contextName + "/";
 			
 			_FILE_UPLOAD_URL = _URL + FILE_UPLOAD_SERVLET_NAME;
 			

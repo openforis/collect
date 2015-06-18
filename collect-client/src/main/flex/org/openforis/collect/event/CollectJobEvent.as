@@ -10,7 +10,7 @@ package org.openforis.collect.event
 	public class CollectJobEvent extends Event {
 		
 		public static const COLLECT_JOB_STATUS_UPDATE:String = "collect_job_status_update";
-		public static const COLLECT_JOB_COMPLETE:String = "collect_job_complete";
+		public static const COLLECT_JOB_END:String = "collect_job_end";
 		private var _job:JobProxy;
 		
 		public function CollectJobEvent(type:String, job:JobProxy, bubbles:Boolean=false, cancelable:Boolean=false) {

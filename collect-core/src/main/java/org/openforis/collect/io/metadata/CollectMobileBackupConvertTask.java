@@ -12,11 +12,11 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyRestoreJob;
 import org.openforis.commons.io.OpenForisIOUtils;
-import org.openforis.concurrency.JobManager;
 import org.openforis.concurrency.Task;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -79,7 +79,7 @@ public class CollectMobileBackupConvertTask extends Task {
 	@Override
 	protected void execute() throws Throwable {
 		//import survey into db file
-		JobManager jobManager = (JobManager) ctx.getBean("springJobManager");
+		CollectJobManager jobManager = (CollectJobManager) ctx.getBean("jobManager");
 		SurveyRestoreJob restoreJob = ctx.getBean(SurveyRestoreJob.class);
 
 		restoreJob.setFile(collectBackupFile);

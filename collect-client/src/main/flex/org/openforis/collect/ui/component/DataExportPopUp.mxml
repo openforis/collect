@@ -182,6 +182,7 @@
 					
 					<s:CheckBox id="includeRecordFilesCheckBox"
 								label="{Message.get('export.includeRecordFiles')}"
+								selected="true"
 								visible="true" 
 								includeInLayout="true" 
 								visible.partialExportParametersSelection="false"

@@ -54,6 +54,10 @@ package org.openforis.collect.presenter {
 		
 		private static const PROGRESS_UPDATE_DELAY:int = 2000;
 		
+		private static const COLLECT_DATA_FILTER:FileFilter = new FileFilter("Collect Data", "*.collect-data");
+		private static const COLLECT_BACKUP_FILTER:FileFilter = new FileFilter("Collect Backup", "*.collect-backup");
+		private static const FILE_FILTERS:Array = [COLLECT_DATA_FILTER, COLLECT_BACKUP_FILTER];
+		
 		private var _fileReference:FileReference;
 		private var _dataImportClient:DataImportClient;
 		private var _progressTimer:Timer;
@@ -118,8 +122,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function uploadButtonClickHandler(event:MouseEvent):void {
-			var collectDataFilter:FileFilter = new FileFilter("Collect Data", "*.collect-data");
-			_fileReference.browse([collectDataFilter]);
+			_fileReference.browse(FILE_FILTERS);
 		}
 		
 		protected function cancelButtonClickHandler(event:MouseEvent):void {

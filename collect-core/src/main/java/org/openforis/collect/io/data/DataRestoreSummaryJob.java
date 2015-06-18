@@ -7,12 +7,10 @@ import java.util.List;
 
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
-import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,17 +75,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 		super.onTaskCompleted(task);
 		if ( task instanceof DataRestoreSummaryTask ) {
 			//get output survey and set it into job instance instance variable
-			DataRestoreSummaryJob.this.summary = ((DataRestoreSummaryTask) task).getSummary();
-		} else if ( task instanceof IdmlUnmarshallTask ) {
-			CollectSurvey survey = ((IdmlUnmarshallTask) task).getSurvey();
-			if ( survey == null ) {
-				throw new RuntimeException("Error extracting packaged survey");
-			} else {
-				packagedSurvey = survey;
-				checkPackagedSurveyUri();
-				initExistingSurvey();
-			}
-			DataRestoreSummaryJob.this.packagedSurvey = survey;
+			this.summary = ((DataRestoreSummaryTask) task).getSummary();
 		}
 	}
 

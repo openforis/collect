@@ -37,7 +37,6 @@ import org.openforis.collect.model.FileWrapper;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.spring.SpringJobManager;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
@@ -67,7 +66,6 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.UploadEvent;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Listitem;
@@ -78,7 +76,6 @@ import org.zkoss.zul.Window;
  * @author S. Ricci
  *
  */
-@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 
 	public static final String EDITING_ATTRIBUTE_PARAM = "editingAttribute";
@@ -105,8 +102,7 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	private SurveyManager surveyManager;
 	@WireVariable
 	private CodeListManager codeListManager;
-	@WireVariable
-	private SpringJobManager springJobManager;
+	
 	private Window jobStatusPopUp;
 	private CodeListBatchExportJob batchExportJob;
 	private CodeListBatchImportJob batchImportJob;
@@ -408,22 +404,22 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 		File tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), extension);
 
 		batchImportJob = new CodeListBatchImportJob();
-		batchImportJob.setJobManager(springJobManager);
+		batchImportJob.setJobManager(jobManager);
 		batchImportJob.setCodeListManager(codeListManager);
 		batchImportJob.setSurvey(survey);
 		batchImportJob.setOverwriteData(true);
 		batchImportJob.setFile(tempFile);
-		springJobManager.start(batchImportJob);
+		jobManager.start(batchImportJob);
 		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.batch_import"), batchImportJob, true);
 	}
 	
 	@Command
 	public void batchExport() {
 		batchExportJob = new CodeListBatchExportJob();
-		batchExportJob.setJobManager(springJobManager);
+		batchExportJob.setJobManager(jobManager);
 		batchExportJob.setCodeListManager(codeListManager);
 		batchExportJob.setSurvey(survey);
-		springJobManager.start(batchExportJob);
+		jobManager.start(batchExportJob);
 		jobStatusPopUp = JobStatusPopUpVM.openPopUp(Labels.getLabel("survey.code_list.batch_export"), batchExportJob, true);
 	}
 	

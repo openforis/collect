@@ -29,7 +29,6 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.versioning.Version.Significance;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.JobManager;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Validator;
@@ -66,8 +65,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private SurveyManager surveyManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
-	@WireVariable
-	private JobManager jobManager;
 
 	private Map<String,String> form;
 	

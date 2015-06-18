@@ -21,14 +21,12 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Init;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class SpatialReferenceSystemsVM extends SurveyObjectBaseVM<SpatialReferenceSystem> {
 
 	private static final ServiceLoader<CoordinateOperations> COORDINATE_OPERATIONS_LOADER = ServiceLoader.load(CoordinateOperations.class);

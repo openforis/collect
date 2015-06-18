@@ -6,7 +6,9 @@ import static org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.BatchBindStep;
@@ -226,9 +228,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		JooqDSLContext jf = dsl(codeList);
 		jf.updateQuery(item).execute();
 		
-		if ( useCache ) {
-			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
-			cache.removeItemsByCodeList(survey.getId(), survey.isWork(), codeList.getId());
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		if ( useCache && ! survey.isWork() ) {
+			cache.removeItemsByCodeList(survey.getId(), codeList.getId());
 		}
 	}
 	
@@ -309,18 +311,18 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			//delete referencing items programmatically
 			deleteInvalidParentReferenceItems(codeList);
 		}
-		if ( useCache ) {
-			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
-			cache.removeItemsByCodeList(survey.getId(), survey.isWork(), codeList.getId());
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		if ( useCache && ! survey.isWork() ) {
+			cache.removeItemsByCodeList(survey.getId(), codeList.getId());
 		}
 	}
 
 	public void deleteByCodeList(CodeList list) {
 		DeleteConditionStep<OfcCodeListRecord> q = createDeleteQuery(list);
 		q.execute();
-		if ( useCache ) {
-			CollectSurvey survey = (CollectSurvey) list.getSurvey();
-			cache.removeItemsByCodeList(survey.getId(), survey.isWork(), list.getId());
+		CollectSurvey survey = (CollectSurvey) list.getSurvey();
+		if ( useCache && ! survey.isWork() ) {
+			cache.removeItemsByCodeList(survey.getId(), list.getId());
 		}
 	}
 	
@@ -356,8 +358,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 						and(oppositeSurveyIdField.isNull())
 			.execute();
 		
-		if ( useCache ) {
-			cache.removeItemsBySurvey(surveyId, work);;
+		if ( useCache && ! work ) {
+			cache.removeItemsBySurvey(surveyId);
 		}
 	}
 	
@@ -381,9 +383,9 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		JooqDSLContext jf = dsl(null);
 		jf.delete(OFC_CODE_LIST).where(whereCondition).execute();
 		
-		if ( useCache ) {
+		if ( useCache && ! survey.isWork() ) {
 			for (Integer codeListId : codeListsIds) {
-				cache.removeItemsByCodeList(survey.getId(), survey.isWork(), codeListId);
+				cache.removeItemsByCodeList(survey.getId(), codeListId);
 			}
 		}
 	}
@@ -408,8 +410,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				)
 			.execute();
 		
-		if ( useCache ) {
-			cache.removeItemsByCodeList(survey.getId(), survey.isWork(), codeListId);
+		if ( useCache && ! survey.isWork() ) {
+			cache.removeItemsByCodeList(survey.getId(), codeListId);
 		}
 	}
 	
@@ -437,8 +439,36 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 				)
 			.execute();
 
-		if ( useCache ) {
-			cache.removeItemsByCodeList(survey.getId(), survey.isWork(), codeListId);
+		if ( useCache && ! survey.isWork() ) {
+			cache.removeItemsByCodeList(survey.getId(), codeListId);
+		}
+	}
+
+	public void removeLabels(CollectSurvey survey, int fromLanguagePosition) {
+		JooqDSLContext jf = dsl(null);
+		TableField<OfcCodeListRecord, Integer> surveyIdField = getSurveyIdField(survey.isWork());
+		TableField<OfcCodeListRecord, Integer> oppositeSurveyIdField = getSurveyIdField(! survey.isWork());
+		List<CodeList> codeLists = survey.getCodeLists();
+		for (CodeList codeList : codeLists) {
+			int codeListId = codeList.getId();
+			
+			Map<TableField<OfcCodeListRecord, String>, String> updateFields = new HashMap<TableField<OfcCodeListRecord,String>, String>();
+			for (int i = fromLanguagePosition - 1; i < LABEL_FIELDS.length; i++) {
+				@SuppressWarnings("unchecked")
+				TableField<OfcCodeListRecord, String> labelField = LABEL_FIELDS[i];
+				updateFields.put(labelField, (String) null);
+			}
+			jf.update(OFC_CODE_LIST)
+				.set(updateFields)
+				.where(surveyIdField.eq(survey.getId())
+					.and(oppositeSurveyIdField.isNull())
+					.and(OFC_CODE_LIST.CODE_LIST_ID.eq(codeListId))
+					)
+				.execute();
+			
+			if ( useCache && ! survey.isWork() ) {
+				cache.removeItemsByCodeList(survey.getId(), codeListId);
+			}
 		}
 	}
 
@@ -450,10 +480,6 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 			.where(OFC_CODE_LIST.SURVEY_WORK_ID.equal(surveyWorkId)
 					.and(OFC_CODE_LIST.SURVEY_ID.isNull()))
 			.execute();
-		
-		if ( useCache ) {
-			cache.removeItemsBySurvey(surveyWorkId, true);
-		}
 	}
 
 	public List<PersistedCodeListItem> loadRootItems(CodeList codeList) {
@@ -547,10 +573,11 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	}
 	
 	public PersistedCodeListItem loadItem(CodeList codeList, Integer parentItemId, String code, ModelVersion version) {
-		if ( useCache && version == null ) {
-			CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
-			PersistedCodeListItem item = cache.getItem(survey.getId(), survey.isWork(), codeList.getId(), parentItemId, code);
-			if ( item != null ) {
+		CollectSurvey survey = (CollectSurvey) codeList.getSurvey();
+		boolean usingCache = useCache && ! survey.isWork();
+		if ( usingCache ) {
+			PersistedCodeListItem item = cache.getItem(survey.getId(), codeList.getId(), parentItemId, code);
+			if ( item != null && (version == null || version.isApplicable(item)) ) {
 				return item;
 			}
 		}
@@ -566,8 +593,8 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		
 		PersistedCodeListItem item = filteredByVersion.isEmpty() ? null: filteredByVersion.get(0);
 		
-		if ( useCache && version == null ) {
-			cache.addItem(codeList, parentItemId, code,item);
+		if ( usingCache ) {
+			cache.addItem(codeList, parentItemId, code, item);
 		}
 		return item;
 	}

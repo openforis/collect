@@ -212,7 +212,7 @@ public class DataRestoreSummaryTask extends Task {
 
 	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
 		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
-		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey);
+		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey, false);
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
 		return dataUnmarshaller;
 	}

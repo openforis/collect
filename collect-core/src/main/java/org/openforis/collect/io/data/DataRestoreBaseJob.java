@@ -25,13 +25,13 @@ public abstract class DataRestoreBaseJob extends Job {
 	
 	//input
 	protected transient File file;
-	protected transient String surveyUri;
 	protected transient CollectSurvey packagedSurvey;
-	protected transient CollectSurvey publishedSurvey;
 	
 	//temporary instance variables
 	protected transient ZipFile zipFile;
-
+	protected transient String surveyUri;
+	protected transient CollectSurvey publishedSurvey;
+	
 	@Override
 	protected void buildTasks() throws Throwable {
 		if ( packagedSurvey == null ) {
@@ -45,7 +45,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		if ( packagedSurvey != null ) {
 			checkPackagedSurveyUri();
 			surveyUri = packagedSurvey.getUri();
-			initExistingSurvey();
+			initPublishedSurvey();
 		}
 		super.initInternal();
 	}
@@ -67,6 +67,23 @@ public abstract class DataRestoreBaseJob extends Job {
 		}
 		super.prepareTask(task);
 	}
+	
+	@Override
+	protected void onTaskCompleted(Task task) {
+		super.onTaskCompleted(task);
+		if ( task instanceof IdmlUnmarshallTask ) {
+			CollectSurvey survey = ((IdmlUnmarshallTask) task).getSurvey();
+			if ( survey == null ) {
+				throw new RuntimeException("Error extracting packaged survey");
+			} else {
+				packagedSurvey = survey;
+				checkPackagedSurveyUri();
+				initPublishedSurvey();
+			}
+			this.packagedSurvey = survey;
+		}
+	}
+
 
 	protected void checkPackagedSurveyUri() {
 		String packagedSurveyUri = packagedSurvey.getUri();
@@ -75,7 +92,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		}
 	}
 
-	protected void initExistingSurvey() {
+	protected void initPublishedSurvey() {
 		publishedSurvey = surveyManager.getByUri(surveyUri);
 		if ( publishedSurvey == null ) {
 			throw new RuntimeException(String.format("Published survey with uri %s not found", surveyUri));

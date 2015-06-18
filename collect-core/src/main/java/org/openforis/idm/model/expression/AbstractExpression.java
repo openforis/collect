@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.JXPathInvalidSyntaxException;
 import org.apache.commons.jxpath.JXPathNotFoundException;
@@ -21,6 +22,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.expression.internal.ModelJXPathCompiledExpression;
 import org.openforis.idm.model.expression.internal.ModelJXPathContext;
@@ -66,7 +68,16 @@ public abstract class AbstractExpression {
 		NodeDefinition currentContext = context;
 		while (tokenizer.hasMoreTokens()) {
 			String pathSection = tokenizer.nextToken();
-			currentContext = getChildDefinition(currentContext, thisNodeDef, pathSection);
+			if (currentContext instanceof AttributeDefinition && pathSection.startsWith("@")) {
+				if (tokenizer.hasMoreTokens()) {
+					String message = String.format("cannot have nested levels inside %s", currentContext.getPath());
+					throw new InvalidExpressionException(message, compiledExpression.toString());
+				}
+				checkPropertyExists((AttributeDefinition) currentContext, pathSection);
+				return currentContext;
+			} else {
+				currentContext = getChildDefinition(currentContext, thisNodeDef, pathSection);
+			}
 		}
 		return currentContext;
 	}
@@ -141,25 +152,39 @@ public abstract class AbstractExpression {
 							childName, contextNode.getPath(), contextNode.getPath(), childNamesFormatted);
 					throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
 				}
-			} else if (contextNode instanceof AttributeDefinition && childName.startsWith("@")) {
-				String fieldName = childName.substring(1);
-				AttributeDefinition attrDef = (AttributeDefinition) contextNode;
-				FieldDefinition<?> fieldDef = attrDef.getFieldDefinition(fieldName);
-				if (fieldDef != null) {
-					return fieldDef;
-				} else {
-					String message = String.format("Field '%s' not found", fieldName);
-					List<String> fieldNames = attrDef.getFieldNames();
-					String detailedMessage = String.format("Field '%s' not found\n - current attribute: '%s'\n - possible valid values in %s:\n %s", 
-							fieldName, contextNode.getPath(), contextNode.getPath(), fieldNames);
-					throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
-				}
 			}
 			String message = String.format("Cannot find child node %s in context node %s", childName, contextNode.getPath());
 			throw new InvalidExpressionException(message, compiledExpression.toString());
 		}
 	}
 
+	private void checkPropertyExists(AttributeDefinition attrDef, String childName) throws InvalidExpressionException {
+		String fieldName = childName.substring(1);
+		FieldDefinition<?> fieldDef = getField(attrDef, fieldName);
+		if (fieldDef == null) {
+			Attribute<?, ?> attr = (Attribute<?, ?>) attrDef.createNode();
+			try {
+				PropertyUtils.getPropertyDescriptor(attr, fieldName);
+			} catch (Exception e) {
+				String message = String.format("Field '%s' not found", fieldName);
+				List<String> fieldNames = attrDef.getFieldNames();
+				String detailedMessage = String.format("Field '%s' not found\n - current attribute: '%s'\n - possible valid values in %s:\n %s", 
+						fieldName, attrDef.getPath(), attrDef.getPath(), fieldNames);
+				throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
+			}
+		}
+	}
+
+	private FieldDefinition<?> getField(AttributeDefinition attrDef, String fieldName) {
+		FieldDefinition<?> fieldDef = attrDef.getFieldDefinition(fieldName);
+		if (fieldDef == null) {
+			//try to replace uppercase letters with an underscore
+			String newFieldName = fieldName.replaceAll("(.)([A-Z])", "$1_$2").toLowerCase();
+			fieldDef = attrDef.getFieldDefinition(newFieldName);
+		}
+		return fieldDef;
+	}
+	
 	private String joinSplittingInGroups(Set<String> items, int groupSize, char itemSeparator, String groupSeparator) {
 		StringBuilder childNamesFormattedSB = new StringBuilder();
 		int count = 0;
