@@ -3,6 +3,7 @@
  */
 package org.openforis.idm.model.expression;
 
+import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -162,10 +163,14 @@ public abstract class AbstractExpression {
 		String fieldName = childName.substring(1);
 		FieldDefinition<?> fieldDef = getField(attrDef, fieldName);
 		if (fieldDef == null) {
-			Attribute<?, ?> attr = (Attribute<?, ?>) attrDef.createNode();
+			boolean propertyFound = false;
 			try {
-				PropertyUtils.getPropertyDescriptor(attr, fieldName);
-			} catch (Exception e) {
+				Attribute<?, ?> attr = (Attribute<?, ?>) attrDef.createNode();
+				PropertyDescriptor propertyDescriptor = PropertyUtils.getPropertyDescriptor(attr, fieldName);
+				propertyFound = propertyDescriptor != null;
+			} catch (Exception e) {}
+			
+			if (! propertyFound) {
 				String message = String.format("Field '%s' not found", fieldName);
 				List<String> fieldNames = attrDef.getFieldNames();
 				String detailedMessage = String.format("Field '%s' not found\n - current attribute: '%s'\n - possible valid values in %s:\n %s", 
