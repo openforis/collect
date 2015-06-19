@@ -1,7 +1,8 @@
-Collect.NodeTree = function(treeDiv, survey, disabledFilterFunction, startFromEntityId, hiddenFieldName, creationCompleteHandler) {
+Collect.NodeTree = function(treeDiv, survey, disabledFilterFunction, visibleFilterFunction, startFromEntityId, hiddenFieldName, creationCompleteHandler) {
 	this.treeDiv = treeDiv;
 	this.survey = survey;
 	this.disabledFilterFunction = disabledFilterFunction;
+	this.visibleFilterFunction = visibleFilterFunction;
 	this.startFromEntityId = startFromEntityId;
 	this.hiddenFieldName = hiddenFieldName;
 	this.creationCompleteHandler = creationCompleteHandler;
@@ -14,6 +15,7 @@ Collect.NodeTree.prototype.init = function() {
 	$this.buildTreeNodes();
 	if (this.creationCompleteHandler) {
 		setTimeout(function() {
+			$this.jstree.open_all();
 			$this.creationCompleteHandler();
 		}, 100);
 	}
@@ -35,8 +37,10 @@ Collect.NodeTree.prototype.buildTreeNodes = function() {
 			var children = new Array();
 			for (var idx = 0; idx < node.children.length; idx++) {
 				var child = node.children[idx];
-				var childTreeNode = createTreeNode(child);
-				children.push(childTreeNode);
+				if ($this.visibleFilterFunction == null || $this.visibleFilterFunction(child)) {
+					var childTreeNode = createTreeNode(child);
+					children.push(childTreeNode);
+				}
 			}
 			treeNode.children = children;
 		}
@@ -52,7 +56,9 @@ Collect.NodeTree.prototype.buildTreeNodes = function() {
 	var rootTreeNodes = new Array();
 	for (var idx = 0; idx < rootNodes.length; idx++) {
 		var rootEntity = rootNodes[idx];
-		rootTreeNodes.push(createTreeNode(rootEntity));
+		if ($this.visibleFilterFunction == null || $this.visibleFilterFunction(rootEntity)) {
+			rootTreeNodes.push(createTreeNode(rootEntity));
+		}
 	}
 	var jstree = this.treeDiv.jstree({
 		'core' : {
@@ -103,10 +109,10 @@ Collect.NodeTree.prototype.refresh = function() {
 };
 
 Collect.EntityTree = function(treeDiv, survey, hiddenFieldName, creationCompleteHandler) {
-	var disabledFilterFunction = function(node) {
-		return node.type == "ATTRIBUTE";
+	var visibleFilterFunction = function(node) {
+		return node.type == "ENTITY";
 	};
-	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, null, hiddenFieldName, creationCompleteHandler);
+	Collect.NodeTree.call(this, treeDiv, survey, null, visibleFilterFunction, null, hiddenFieldName, creationCompleteHandler);
 };
 
 Collect.EntityTree.prototype = Object.create(Collect.NodeTree.prototype);
@@ -126,7 +132,7 @@ Collect.AttributeTree = function(treeDiv, survey, parentEntityTree, hiddenFieldN
 		});
 	}
 
-	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, selectedEntityDefId, hiddenFieldName, creationCompleteHandler);
+	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, null, selectedEntityDefId, hiddenFieldName, creationCompleteHandler);
 };
 
 Collect.AttributeTree.prototype = Object.create(Collect.NodeTree.prototype);

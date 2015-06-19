@@ -8,10 +8,10 @@ OF.UI.Forms = function() {};
  * @param $select
  * @param items
  * @param valueKey (optional, default value will be item.toString())
- * @param labelKey (optional, default is valueKey, if specified)
+ * @param labelKeyOrFunction (optional, default is valueKey, if specified)
  * @param callback
  */
-OF.UI.Forms.populateSelect = function($select, items, valueKey, labelKey, addEmptyOption) {
+OF.UI.Forms.populateSelect = function($select, items, valueKey, labelKeyOrFunction, addEmptyOption) {
 	$select.empty();
 
 	if (addEmptyOption) {
@@ -20,7 +20,18 @@ OF.UI.Forms.populateSelect = function($select, items, valueKey, labelKey, addEmp
 	
 	$.each(items, function(i, item) {
 		var value = item.hasOwnProperty(valueKey) ? item[valueKey]: item;
-		var label = item.hasOwnProperty(labelKey) ? item[labelKey]: value;
+		var label = null;
+		if (labelKeyOrFunction) {
+			var typeOfLabelKey = typeof labelKeyOrFunction;
+			switch (typeOfLabelKey) {
+			case "function":
+				label = labelKeyOrFunction(item);
+				break;
+			case "string":
+				label = OF.Objects.getProperty(labelKeyOrFunction);
+				break;
+			}
+		}
 		if (label == null || label == "") {
 			label = "(" + value + ")";
 		}

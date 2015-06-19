@@ -18,7 +18,10 @@ Collect.SurveySelectDialogController.prototype.initFormElements = function(callb
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
 		var select = $this.content.find('.survey-select');
-		OF.UI.Forms.populateSelect(select, $this.surveySummaries, "id", "projectName", true);
+		var surveyLabelFunction = function(survey) {
+			return survey.name + (OF.Strings.isBlank(survey.projectName) ? "":  " - " + survey.projectName);
+		}
+		OF.UI.Forms.populateSelect(select, $this.surveySummaries, "id", surveyLabelFunction, true);
 		$this.surveySelectPicker = select.selectpicker();
 		
 		callback();
