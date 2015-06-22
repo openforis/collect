@@ -962,6 +962,9 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 	
 	public List<String> getAttributeTypeValues() {
+		if (survey == null) {
+			return Collections.emptyList(); //TODO session expired
+		}
 		List<String> result = new ArrayList<String>();
 		AttributeType[] values = AttributeType.values();
 		for (AttributeType type : values) {
