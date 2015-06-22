@@ -335,7 +335,7 @@ public class CEComponentHTMLFormatter {
 					if (item.hasUploadedImage()) {
 						String imgFilePath = CollectEarthProjectFileCreatorImpl.getCodeListImageFilePath(item);
 						String titleText = StringUtils.isBlank(description) ? "" : description; //$NON-NLS-1$
-						String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"150\">" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"250\"><br/>" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						itemBuilder
 							.a("title", htmlTitle) //$NON-NLS-1$
 							.a("data-html", "true"); //$NON-NLS-1$ //$NON-NLS-2$

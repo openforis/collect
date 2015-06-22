@@ -61,6 +61,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String TEST_PLOTS_FILE_NAME = "test_plots.ced";
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
+	private static final double HECTARES_TO_METERS_CONVERSION_FACTOR = 10000d;
 	
 	private CodeListManager codeListManager;
 	
@@ -134,9 +135,9 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("template", "${project_path}/kml_template.fmt");
 		p.put("csv", "${project_path}/test_plots.ced");
 		p.put("sample_shape", "SQUARE");
-		p.put("distance_between_sample_points", "20");
+		p.put("distance_between_sample_points", String.valueOf(calculateDistanceBetweenSamplePoints(survey)));
 		p.put("distance_to_plot_boundaries", "10");
-		p.put("number_of_sampling_points_in_plot", "25");
+		p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
 		p.put("inner_point_side", "2");
 		p.put("open_bing_maps", "true");
 		p.put("open_earth_engine", "true");
@@ -150,6 +151,14 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		FileWriter writer = new FileWriter(file);
 		p.store(writer, null);
 		return file;
+	}
+
+	private int calculateDistanceBetweenSamplePoints(CollectSurvey survey) {
+		CollectAnnotations annotations = survey.getAnnotations();
+		double plotWidthInMeters = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_METERS_CONVERSION_FACTOR);
+		double pointsPerWidth = Math.sqrt(annotations.getCollectEarthSamplePoints());
+		int distanceInMeters = Double.valueOf(Math.ceil((double) (plotWidthInMeters / pointsPerWidth))).intValue();
+		return distanceInMeters;
 	}
 
 	private File generateBalloon(CollectSurvey survey, String language) throws IOException {

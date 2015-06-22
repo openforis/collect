@@ -62,6 +62,8 @@ public class CollectAnnotations {
 		
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
+		COLLECT_EARTH_PLOT_AREA(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotarea"), 1d),
+		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25) //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
 		;
 		
 		private QName qName;
@@ -159,6 +161,22 @@ public class CollectAnnotations {
 		setAnnotationValue(defn, Annotation.COLLECT_EARTH_FROM_CSV, value);
 	}
 	
+	public Double getCollectEarthPlotArea() {
+		return getAnnotationDoubleValue(survey, Annotation.COLLECT_EARTH_PLOT_AREA);
+	}
+	
+	public void setCollectEarthPlotArea(Double value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLOT_AREA, value);
+	}
+
+	public Integer getCollectEarthSamplePoints() {
+		return getAnnotationIntegerValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS);
+	}
+	
+	public void setCollectEarthSamplePoints(Integer value) {
+		setAnnotationValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS, value);
+	}
+
 	private Step getAnnotaionEnumValue(AttributeDefinition def, Annotation annotation) {
 		String enumName = def.getAnnotation(annotation.getQName());
 		if(StringUtils.isBlank(enumName)) {
@@ -178,8 +196,8 @@ public class CollectAnnotations {
 		def.setAnnotation(annotation.getQName(), enumName);
 	}
 	
-	private boolean getAnnotationBooleanValue(NodeDefinition defn, Annotation annotation) {
-		String annotationValue = defn.getAnnotation(annotation.getQName());
+	private boolean getAnnotationBooleanValue(Annotatable annotatable, Annotation annotation) {
+		String annotationValue = annotatable.getAnnotation(annotation.getQName());
 		if ( StringUtils.isBlank(annotationValue) ) {
 			Boolean defaultValue = annotation.getDefaultValue();
 			return defaultValue.booleanValue();
@@ -188,19 +206,39 @@ public class CollectAnnotations {
 		}
 	}
 
-	private void setAnnotationValue(NodeDefinition defn, Annotation annotation, boolean value) {
+	private void setAnnotationValue(Annotatable annotatable, Annotation annotation, boolean value) {
 		String annotationValue;
-		if ( annotation.getDefaultValue().equals(value) ) {
+		if ( annotation.getDefaultValue() != null && annotation.getDefaultValue().equals(value) ) {
 			annotationValue = null;
 		} else {
 			annotationValue = Boolean.toString(value);
 		}
-		defn.setAnnotation(annotation.getQName(), annotationValue);
+		annotatable.setAnnotation(annotation.getQName(), annotationValue);
+	}
+
+	private Integer getAnnotationIntegerValue(Annotatable annotatable, Annotation annotation) {
+		String annotationValue = annotatable.getAnnotation(annotation.getQName());
+		if ( StringUtils.isBlank(annotationValue) ) {
+			Integer defaultValue = annotation.getDefaultValue();
+			return defaultValue;
+		} else {
+			return Integer.parseInt(annotationValue);
+		}
+	}
+	
+	private Double getAnnotationDoubleValue(Annotatable annotatable, Annotation annotation) {
+		String annotationValue = annotatable.getAnnotation(annotation.getQName());
+		if ( StringUtils.isBlank(annotationValue) ) {
+			Double defaultValue = annotation.getDefaultValue();
+			return defaultValue;
+		} else {
+			return Double.parseDouble(annotationValue);
+		}		
 	}
 	
 	private void setAnnotationValue(Annotatable annotatable, Annotation annotation, Object value) {
 		String annotationValue;
-		if ( annotation.getDefaultValue().equals(value) ) {
+		if ( value == null || value.equals(annotation.getDefaultValue()) ) {
 			annotationValue = null;
 		} else {
 			annotationValue = value.toString();

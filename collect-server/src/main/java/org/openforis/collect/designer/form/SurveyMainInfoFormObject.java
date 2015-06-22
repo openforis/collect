@@ -1,6 +1,8 @@
 package org.openforis.collect.designer.form;
 
+import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
+import org.springframework.util.StringUtils;
 
 /**
  * 
@@ -13,6 +15,8 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 	private boolean published;
 	private String description;
 	private String projectName;
+	private String collectEarthSamplePoints;
+	private String collectEarthPlotArea;
 	
 	@Override
 	public void loadFrom(CollectSurvey source, String languageCode) {
@@ -20,6 +24,14 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		description = source.getDescription(languageCode);
 		published = source.isPublished();
 		projectName = source.getProjectName(languageCode);
+		CollectAnnotations annotations = source.getAnnotations();
+		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
+		collectEarthSamplePoints = annotations.getCollectEarthSamplePoints().toString();
+	}
+
+	protected String toListitemValue(Double number) {
+		return StringUtils.trimTrailingCharacter(
+				StringUtils.trimTrailingCharacter(number.toString().replace('.', '_'), '0'), '_');
 	}
 	
 	@Override
@@ -28,6 +40,13 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		dest.setDescription(languageCode, description);
 		dest.setProjectName(languageCode, projectName);
 		dest.setPublished(published);
+		CollectAnnotations annotations = dest.getAnnotations();
+		annotations.setCollectEarthPlotArea(fromListitemValueToDouble(collectEarthPlotArea));
+		annotations.setCollectEarthSamplePoints(Integer.parseInt(collectEarthSamplePoints));
+	}
+
+	protected double fromListitemValueToDouble(String value) {
+		return Double.parseDouble(value.replace('_', '.'));
 	}
 	
 	@Override
@@ -65,6 +84,22 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
+	}
+	
+	public String getCollectEarthSamplePoints() {
+		return collectEarthSamplePoints;
+	}
+	
+	public void setCollectEarthSamplePoints(String collectEarthSamplePoints) {
+		this.collectEarthSamplePoints = collectEarthSamplePoints;
+	}
+	
+	public String getCollectEarthPlotArea() {
+		return collectEarthPlotArea;
+	}
+	
+	public void setCollectEarthPlotArea(String collectEarthPlotArea) {
+		this.collectEarthPlotArea = collectEarthPlotArea;
 	}
 
 }
