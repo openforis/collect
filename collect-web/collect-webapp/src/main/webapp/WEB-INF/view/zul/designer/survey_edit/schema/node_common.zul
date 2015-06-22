@@ -405,7 +405,7 @@
     				<column />
     			</columns>
     			<rows>
-    				<row>
+    				<row visible="@load(not vm.collectEarthSurvey)">
 		  				<fieldErrorHandler message="@load(vmsgs['column'])">
 		  					<label value="${labels.survey.schema.node.layout.column.$}:" />
 							<image popup="columnInfoTooltip" style="cursor:pointer"
@@ -435,7 +435,7 @@
     				<column />
     			</columns>
     			<rows>
-    				<row>
+    				<row visible="@load(not vm.collectEarthSurvey)">
 		  				<fieldErrorHandler message="@load(vmsgs['width'])">
 		  					<label value="${labels.survey.schema.node.layout.width}:" />
 		  				</fieldErrorHandler>
@@ -451,7 +451,7 @@
 		  						onChange="@command('applyChanges')" />
 		  				</fieldErrorHandler>
 		  			</row>
-			  		<row>
+			  		<row visible="@load(not vm.collectEarthSurvey)">
 		  				<fieldErrorHandler message="@load(vmsgs['labelOrientation'])">
 		  					<label value="${labels.survey.schema.node.layout.label_orientation.$}:" />
 		  				</fieldErrorHandler>
