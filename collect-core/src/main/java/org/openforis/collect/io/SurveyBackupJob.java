@@ -107,12 +107,12 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 	
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void initalizeInternalVariables() throws Throwable {
 		if ( outputFile == null ) {
 			createOutputFile();
 		}
 		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
-		super.initInternal();
+		super.initalizeInternalVariables();
 	}
 
 	private void createOutputFile() throws IOException {

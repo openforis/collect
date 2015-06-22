@@ -32,10 +32,10 @@ public class CodeListImportJob extends Job {
 	private InputStream is;
 
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void initalizeInternalVariables() throws Throwable {
 		validateParameters();
 		is = new FileInputStream(file);
-		super.initInternal();
+		super.initalizeInternalVariables();
 		
 	}
 	

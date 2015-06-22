@@ -45,13 +45,13 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	private ZipFile zipFile;
 	
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void initalizeInternalVariables() throws Throwable {
 		String ext = FilenameUtils.getExtension(file.getName());
 		fullBackup = ArrayUtils.contains(SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS, ext);
 		if ( fullBackup ) {
 			this.zipFile = new ZipFile(file);
 		}
-		super.initInternal();
+		super.initalizeInternalVariables();
 	}
 	
 	@Override

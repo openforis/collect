@@ -48,8 +48,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private File tempFile;
 
 	@Override
-	public void initInternal() throws Throwable {
-		super.initInternal();
+	public void initalizeInternalVariables() throws Throwable {
+		super.initalizeInternalVariables();
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		oldBackupFormat = backupFileExtractor.isOldFormat();
 	}

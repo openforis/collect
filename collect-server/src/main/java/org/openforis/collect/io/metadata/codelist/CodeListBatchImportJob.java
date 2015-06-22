@@ -37,11 +37,11 @@ public class CodeListBatchImportJob extends Job {
 	private Enumeration<ZipArchiveEntry> zipEntries;
 
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void initalizeInternalVariables() throws Throwable {
 		validateParameters();
 		zipFile = new ZipFile(file);
 		zipEntries = zipFile.getEntries();
-		super.initInternal();
+		super.initalizeInternalVariables();
 	}
 	
 	private void validateParameters() throws Throwable {

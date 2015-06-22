@@ -43,8 +43,8 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	private boolean oldFormat;
 	
 	@Override
-	public void initInternal() throws Throwable {
-		super.initInternal();
+	public void initalizeInternalVariables() throws Throwable {
+		super.initalizeInternalVariables();
 		oldFormat = ! isDataFolderIncluded();
 	}
 

@@ -29,10 +29,10 @@ public class CodeListBatchExportJob extends Job {
 	private ZipOutputStream zipOutputStream;
 
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void initalizeInternalVariables() throws Throwable {
 		outputFile = File.createTempFile("batch_code_list_export", ".zip");
 		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
-		super.initInternal();
+		super.initalizeInternalVariables();
 	}
 	
 	@Override

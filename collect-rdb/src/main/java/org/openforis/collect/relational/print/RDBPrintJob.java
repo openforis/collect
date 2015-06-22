@@ -49,10 +49,10 @@ public class RDBPrintJob extends Job {
 	}
 	
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void initalizeInternalVariables() throws Throwable {
 		outputFile = File.createTempFile("rdb", ".sql");
 		writer = new FileWriter(outputFile);
-		super.initInternal();
+		super.initalizeInternalVariables();
 	}
 	
 	@Override

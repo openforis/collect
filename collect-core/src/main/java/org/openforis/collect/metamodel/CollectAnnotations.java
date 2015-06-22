@@ -169,7 +169,7 @@ public class CollectAnnotations {
 		setAnnotationValue(survey, Annotation.COLLECT_EARTH_PLOT_AREA, value);
 	}
 
-	public Integer getCollectEarthSamplePoints() {
+	public int getCollectEarthSamplePoints() {
 		return getAnnotationIntegerValue(survey, Annotation.COLLECT_EARTH_SAMPLE_POINTS);
 	}
 	

@@ -56,11 +56,11 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	private BackupFileExtractor backupFileExtractor;
 	
 	@Override
-	public void initInternal() throws Throwable {
+	public void initalizeInternalVariables() throws Throwable {
 		if ( isCompleteBackupFile() ) {
 			this.zipFile = new ZipFile(file);
 			this.backupFileExtractor = new BackupFileExtractor(zipFile);
-			super.initInternal();
+			super.initalizeInternalVariables();
 		} else {
 			throw new IllegalArgumentException("File is not a valid survey backup ZIP file: " + file.getName());
 		}

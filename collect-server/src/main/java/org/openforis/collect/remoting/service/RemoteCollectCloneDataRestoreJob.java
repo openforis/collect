@@ -74,8 +74,8 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 		private HttpUriRequest request;
 		
 		@Override
-		protected void initInternal() throws Throwable {
-			super.initInternal();
+		protected void initalizeInternalVariables() throws Throwable {
+			super.initalizeInternalVariables();
 			request = createRequest();
 		}
 		
@@ -148,8 +148,8 @@ public class RemoteCollectCloneDataRestoreJob extends Job {
 		}
 		
 		@Override
-		protected void initInternal() throws Throwable {
-			super.initInternal();
+		protected void initalizeInternalVariables() throws Throwable {
+			super.initalizeInternalVariables();
 			jobStatusRequest = createRequest();
 		}
 		

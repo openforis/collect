@@ -45,10 +45,10 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 	private transient SpeciesBackupCSVReader reader;
 	
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void initalizeInternalVariables() throws Throwable {
 		taxonTree = new TaxonTree();
 		reader = new SpeciesBackupCSVReader(file);
-		super.initInternal();
+		super.initalizeInternalVariables();
 	}
 	
 	protected void validateParameters() {

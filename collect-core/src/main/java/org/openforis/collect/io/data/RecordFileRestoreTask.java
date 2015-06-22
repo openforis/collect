@@ -55,8 +55,8 @@ public class RecordFileRestoreTask extends Task {
 	}
 	
 	@Override
-	protected void initInternal() throws Throwable {
-		super.initInternal();
+	protected void initalizeInternalVariables() throws Throwable {
+		super.initalizeInternalVariables();
 		sessionRecordFileManager.setRecordFileManager(recordFileManager);
 	}
 	

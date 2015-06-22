@@ -40,14 +40,14 @@ public abstract class DataRestoreBaseJob extends Job {
 	}
 
 	@Override
-	public void initInternal() throws Throwable {
+	public void initalizeInternalVariables() throws Throwable {
 		zipFile = new ZipFile(file);
 		if ( packagedSurvey != null ) {
 			checkPackagedSurveyUri();
 			surveyUri = packagedSurvey.getUri();
 			initPublishedSurvey();
 		}
-		super.initInternal();
+		super.initalizeInternalVariables();
 	}
 
 	private void addIdmlUnmarshallTask() {
