@@ -136,7 +136,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		p.put("csv", "${project_path}/test_plots.ced");
 		p.put("sample_shape", "SQUARE");
 		p.put("distance_between_sample_points", String.valueOf(calculateDistanceBetweenSamplePoints(survey)));
-		p.put("distance_to_plot_boundaries", "10");
+		p.put("distance_to_plot_boundaries", String.valueOf(calculateFrameDistance(survey)));
 		p.put("number_of_sampling_points_in_plot", String.valueOf(survey.getAnnotations().getCollectEarthSamplePoints()));
 		p.put("inner_point_side", "2");
 		p.put("open_bing_maps", "true");
@@ -153,11 +153,29 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return file;
 	}
 
+	private int calculateFrameDistance(CollectSurvey survey) {
+		CollectAnnotations annotations = survey.getAnnotations();
+		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_METERS_CONVERSION_FACTOR);
+		int samplePoints = annotations.getCollectEarthSamplePoints();
+		if (samplePoints == 0) {
+			return Double.valueOf(Math.floor((double) (plotWidth / 2))).intValue();
+		}
+		double pointsPerSide = Math.sqrt(samplePoints);
+		int frameDistance = Double.valueOf(Math.floor((double) ((plotWidth / pointsPerSide) / 2))).intValue(); 
+		return frameDistance;
+	}
+		
 	private int calculateDistanceBetweenSamplePoints(CollectSurvey survey) {
 		CollectAnnotations annotations = survey.getAnnotations();
-		double plotWidthInMeters = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_METERS_CONVERSION_FACTOR);
-		double pointsPerWidth = Math.sqrt(annotations.getCollectEarthSamplePoints());
-		int distanceInMeters = Double.valueOf(Math.ceil((double) (plotWidthInMeters / pointsPerWidth))).intValue();
+		
+		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_METERS_CONVERSION_FACTOR);
+		int samplePoints = annotations.getCollectEarthSamplePoints();
+		if (samplePoints == 0) {
+			return 0;
+		}
+		double pointsPerWidth = Math.sqrt(samplePoints);
+		int frameDistance = calculateFrameDistance(survey); 
+		int distanceInMeters = Double.valueOf(Math.floor((double) ((plotWidth - (frameDistance * 2)) / pointsPerWidth))).intValue();
 		return distanceInMeters;
 	}
 
