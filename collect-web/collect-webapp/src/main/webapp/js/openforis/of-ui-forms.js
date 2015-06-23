@@ -60,7 +60,15 @@ OF.UI.Forms.toJSON = function($form) {
 	var result = {};
 	var array = $form.serializeArray();
     $.each(array, function() {
-    	result[this.name] = this.value || '';
+    	var correctedValue;
+    	if (this.value == null) {
+    		correctedValue = '';
+    	} else if (typeof this.value === 'string') {
+    		correctedValue = this.value.trim();
+    	} else {
+    		correctedValue = this.value;
+    	}
+    	result[this.name] = correctedValue;
     });
     return result;
 };
