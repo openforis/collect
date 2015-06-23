@@ -70,7 +70,7 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 		};
 		
 		$this.content.find(".run-btn").click($.proxy(function() {
-			var chain = $this.extractJSONItem();
+			var chain = $this.extractFormObject();
 			var recordStep = $this.recordStepSelectPicker.val();
 			collect.dataCleansingChainService.run(chain.id, recordStep, function() {
 				monitorJob(collect.jobService.contextPath + "survey-job.json?surveyId=" + collect.activeSurvey.id, function() {
@@ -148,8 +148,8 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 	});
 };
 
-Collect.DataCleansingChainDialogController.prototype.extractJSONItem = function() {
-	var formItem = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
+Collect.DataCleansingChainDialogController.prototype.extractFormObject = function() {
+	var formItem = Collect.AbstractItemEditDialogController.prototype.extractFormObject.apply(this);
 	formItem.stepIds = new Array();
 	var steps = this.steps;
 	for (var idx = 0; idx < steps.length; idx++) {

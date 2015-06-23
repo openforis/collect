@@ -33,7 +33,7 @@ OF.UI.Forms.populateSelect = function($select, items, valueKey, labelKeyOrFuncti
 			}
 		}
 		if (label == null || label == "") {
-			label = "(" + value + ")";
+			label = value;
 		}
 		$select.append($("<option />").val(value).text(label));
 	});

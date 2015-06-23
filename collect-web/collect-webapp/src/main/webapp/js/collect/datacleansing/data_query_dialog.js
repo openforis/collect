@@ -50,7 +50,7 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 		$this.testResultDataGrid.$container.hide();
 		
 		$this.content.find(".test-btn").click($.proxy(function() {
-			var query = $this.extractJSONItem();
+			var query = $this.extractFormObject();
 			query.recordStep = $this.recordStepSelectPicker.val();
 			collect.dataQueryService.startTest(query, function() {
 				monitorJob($this.itemEditService.contextPath + "test-job.json", function() {
@@ -61,7 +61,7 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 		}, $this));
 		
 		$this.content.find(".export-to-csv-btn").click($.proxy(function() {
-			var query = $this.extractJSONItem();
+			var query = $this.extractFormObject();
 			query.recordStep = $this.recordStepSelectPicker.val();
 			collect.dataQueryService.startExport(query, function() {
 				monitorJob($this.itemEditService.contextPath + "export-job.json", function() {
@@ -74,13 +74,6 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 			$this.attributeTree = new Collect.AttributeTree($this.content.find('.attribute-tree'), collect.activeSurvey, $this.entityTree, "attributeDefinitionId", callback);
 		});
 	});
-};
-
-Collect.DataQueryDialogController.prototype.extractJSONItem = function() {
-	var item = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
-	item.entityDefinitionId = this.entityTree.getSelectedNodeId();
-	item.attributeDefinitionId = this.attributeTree.getSelectedNodeId();
-	return item;
 };
 
 Collect.DataQueryDialogController.prototype.fillForm = function(callback) {

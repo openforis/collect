@@ -23,7 +23,7 @@ Collect.DataErrorReportDialogController.prototype.initEventListeners = function(
 Collect.DataErrorReportDialogController.prototype.generateClickHandler = function() {
 	var $this = this;
 	if ($this.validateForm()) {
-		var item = $this.extractJSONItem();
+		var item = $this.extractFormObject();
 		collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
 			new OF.UI.JobDialog();
 			new OF.JobMonitor("datacleansing/dataerrorreports/generate/job.json", function() {
@@ -64,8 +64,8 @@ Collect.DataErrorReportDialogController.prototype.initFormElements = function(ca
 	});
 };
 
-Collect.DataErrorReportDialogController.prototype.extractJSONItem = function() {
-	var item = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
+Collect.DataErrorReportDialogController.prototype.extractFormObject = function() {
+	var item = Collect.AbstractItemEditDialogController.prototype.extractFormObject.apply(this);
 	return item;
 };
 
@@ -79,7 +79,7 @@ Collect.DataErrorReportDialogController.prototype.fillForm = function(callback) 
 
 Collect.DataErrorReportDialogController.prototype.validateForm = function() {
 	var $this = this;
-	var item = $this.extractJSONItem();
+	var item = $this.extractFormObject();
 	if (! item.queryId) {
 		OF.Alerts.showWarning('Please select an error query');
 		return false;

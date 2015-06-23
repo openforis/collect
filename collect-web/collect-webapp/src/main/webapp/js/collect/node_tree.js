@@ -65,12 +65,22 @@ Collect.NodeTree.prototype.buildTreeNodes = function() {
 			'data' : rootTreeNodes
 		}
 	});
-	var hiddenField = $("<input type='hidden'>");
+	$this.jstree = this.treeDiv.data().jstree;
+	
+	$this.treeDiv.on("changed.jstree", function() {
+		var hiddenField = $this.getHiddenField();
+		hiddenField.val($this.getSelectedNodeId());
+		hiddenField.data("visited", true);
+	});
+
+	this.appendHiddenField();
+};
+
+Collect.NodeTree.prototype.appendHiddenField = function() {
+	var hiddenField = $("<input type='hidden' class='form-control'>");
 	hiddenField.prop("name", this.hiddenFieldName);
 	
-	this.treeDiv.append(hiddenField);
-
-	$this.jstree = this.treeDiv.data().jstree;
+	this.treeDiv.after(hiddenField);
 };
 
 Collect.NodeTree.prototype.addSelectNodeHandler = function(handler) {
@@ -101,6 +111,12 @@ Collect.NodeTree.prototype.onReady = function(callback) {
 
 Collect.NodeTree.prototype.destroy = function() {
 	this.jstree.destroy();
+	var hiddenField = this.getHiddenField();
+	hiddenField.remove();
+};
+
+Collect.NodeTree.prototype.getHiddenField = function() {
+	return this.treeDiv.parent().find("input[name='" + this.hiddenFieldName +"']");
 };
 
 Collect.NodeTree.prototype.refresh = function() {

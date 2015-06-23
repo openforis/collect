@@ -63,7 +63,7 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 		}
 		
 		$this.content.find(".export-to-csv-btn").click($.proxy(function() {
-			var report = $this.extractJSONItem();
+			var report = $this.extractFormObject();
 			collect.dataErrorReportService.exportToCSV(report.id);
 		}, $this));
 		
@@ -71,8 +71,8 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 	});
 };
 
-Collect.DataErrorReportViewDialogController.prototype.extractJSONItem = function() {
-	var item = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
+Collect.DataErrorReportViewDialogController.prototype.extractFormObject = function() {
+	var item = Collect.AbstractItemEditDialogController.prototype.extractFormObject.apply(this);
 	return item;
 };
 

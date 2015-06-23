@@ -63,7 +63,7 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 		};
 		
 		$this.content.find(".run-btn").click($.proxy(function() {
-			var cleansingStep = $this.extractJSONItem();
+			var cleansingStep = $this.extractFormObject();
 			var recordStep = $this.recordStepSelectPicker.val();
 			collect.dataCleansingStepService.run(cleansingStep.id, recordStep, function() {
 				monitorJob(collect.jobService.contextPath + "survey-job.json?surveyId=" + collect.activeSurvey.id, function() {
@@ -79,7 +79,7 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 
 Collect.DataCleansingStepDialogController.prototype.updateView = function() {
 	var $this = this;
-	var item = $this.extractJSONItem();
+	var item = $this.extractFormObject();
 	switch(item.updateType) {
 	case "ATTRIBUTE":
 		$this.content.find(".attributeFixExpressionContainer").show();
@@ -165,9 +165,9 @@ Collect.DataCleansingStepDialogController.prototype.getFieldFixExpressionInputFi
 	return result;
 };
 
-Collect.DataCleansingStepDialogController.prototype.extractJSONItem = function() {
+Collect.DataCleansingStepDialogController.prototype.extractFormObject = function() {
 	var $this = this;
-	var formItem = Collect.AbstractItemEditDialogController.prototype.extractJSONItem.apply(this);
+	var formItem = Collect.AbstractItemEditDialogController.prototype.extractFormObject.apply(this);
 	var fieldNames = $this.getAttributeFieldNames();
 	switch(formItem.updateType) {
 	case "ATTRIBUTE":

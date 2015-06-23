@@ -116,7 +116,7 @@ Collect.AbstractItemEditDialogController.prototype.initFormElementsChangeListene
 Collect.AbstractItemEditDialogController.prototype.fieldFocusOutHandler = function(field) {
 	var $this = this;
 	field.data("visited", true);
-	$this.fieldChangeHandler();
+	$this.fieldChangeHandler(field);
 };
 
 Collect.AbstractItemEditDialogController.prototype.initEventListeners = function() {
@@ -135,7 +135,7 @@ Collect.AbstractItemEditDialogController.prototype.initEventListeners = function
 Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close) {
 	var $this = this;
 	if ($this.validateForm()) {
-		var item = $this.extractJSONItem();
+		var item = $this.extractFormObject();
 		$this.itemEditService.save(item, function(response) {
 			$this.item = response.form;
 			$this.dispatchItemSavedEvent();
@@ -152,10 +152,10 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close
 	}
 };
 
-Collect.AbstractItemEditDialogController.prototype.fieldChangeHandler = function() {
+Collect.AbstractItemEditDialogController.prototype.fieldChangeHandler = function(field) {
 	var $this = this;
 	if ($this.itemEditService) {
-		var item = $this.extractJSONItem();
+		var item = $this.extractFormObject();
 		$this.itemEditService.validate(item, function(response) {
 			OF.UI.Forms.Validation.removeErrors($this.form);
 		}, function(response) {
@@ -178,7 +178,7 @@ Collect.AbstractItemEditDialogController.prototype.fillForm = function(callback)
 	callback.call($this);
 };
 
-Collect.AbstractItemEditDialogController.prototype.extractJSONItem = function() {
+Collect.AbstractItemEditDialogController.prototype.extractFormObject = function() {
 	var $this = this;
 	var oldItem = $this.item;
 	var item = OF.UI.Forms.toJSON($this.form);
