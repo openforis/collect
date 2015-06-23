@@ -10,7 +10,7 @@ import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +47,8 @@ public class DataErrorReportGeneratorJob extends Job {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
-		super.prepareTask(task);
+	protected void initializeTask(Worker task) {
+		super.initializeTask(task);
 		report = new DataErrorReport((CollectSurvey) errorQuery.getSurvey());
 		report.setQuery(errorQuery);
 		reportManager.save(report);

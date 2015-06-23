@@ -22,7 +22,7 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyStoreException;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -56,11 +56,11 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	private BackupFileExtractor backupFileExtractor;
 	
 	@Override
-	public void initInternal() throws Throwable {
+	public void createInternalVariables() throws Throwable {
 		if ( isCompleteBackupFile() ) {
+			super.createInternalVariables();
 			this.zipFile = new ZipFile(file);
 			this.backupFileExtractor = new BackupFileExtractor(zipFile);
-			super.initInternal();
 		} else {
 			throw new IllegalArgumentException("File is not a valid survey backup ZIP file: " + file.getName());
 		}
@@ -100,7 +100,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	}
 
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		if ( task instanceof SurveyBackupInfoExtractorTask ) {
 			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
 			File infoFile = backupFileExtractor.extract(SurveyBackupJob.INFO_FILE_NAME);
@@ -138,11 +138,11 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setSpeciesManager(speciesManager);
 			t.setSurvey(survey);
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 	
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
 		if ( task instanceof SurveyBackupInfoExtractorTask ) {
 			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;

@@ -27,7 +27,7 @@ import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
 import org.openforis.commons.collection.CollectionUtils;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -107,12 +107,12 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 	
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		if ( outputFile == null ) {
 			createOutputFile();
 		}
 		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
-		super.initInternal();
 	}
 
 	private void createOutputFile() throws IOException {
@@ -161,7 +161,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		if (task instanceof DataBackupTask) {
 			this.dataBackupErrors = ((DataBackupTask) task).getErrors();
 		} else if ( task instanceof CollectMobileBackupConvertTask ) {
@@ -256,11 +256,11 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		if ( task instanceof CollectMobileBackupConvertTask ) {
 			IOUtils.closeQuietly(zipOutputStream);
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 
 	public void setRecordManager(RecordManager recordManager) {
@@ -277,10 +277,6 @@ public class SurveyBackupJob extends SurveyLockingJob {
 
 	public File getOutputFile() {
 		return outputFile;
-	}
-	
-	public void setOutputFile(File outputFile) {
-		this.outputFile = outputFile;
 	}
 	
 	public OutputFormat getOutputFormat() {

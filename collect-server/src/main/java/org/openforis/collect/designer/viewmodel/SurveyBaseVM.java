@@ -342,7 +342,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 		CollectSurvey survey = getSurvey();
 		if ( survey == null ) {
 			//TODO session expired...?
-			return null;
+			return Collections.emptyList();
 		} else {
 			Schema schema = survey.getSchema();
 			List<EntityDefinition> result = schema.getRootEntityDefinitions();

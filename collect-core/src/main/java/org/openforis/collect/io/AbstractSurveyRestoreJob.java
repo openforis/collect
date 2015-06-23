@@ -10,7 +10,7 @@ import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,7 +49,7 @@ public abstract class AbstractSurveyRestoreJob extends Job {
 	protected CollectSurvey survey;
 
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
 		if ( task instanceof IdmlUnmarshallTask ) {
 			CollectSurvey s = ((IdmlUnmarshallTask) task).getSurvey();

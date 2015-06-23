@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,6 +134,10 @@ public class CodeListsVM extends SurveyObjectBaseVM<CodeList> {
 	@Override
 	protected List<CodeList> getItemsInternal() {
 		CollectSurvey survey = getSurvey();
+		if (survey == null) {
+			//TODO session expired
+			return Collections.emptyList();
+		}
 		List<CodeList> codeLists = survey.getCodeLists(false);
 		codeLists = sort(codeLists);
 		return codeLists;

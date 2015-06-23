@@ -19,7 +19,6 @@
             <label value="${labels.survey.name}:" />
             <fieldErrorHandler message="@load(vmsgs['name'])">
               <textbox width="350px" value="@bind(fx.name)"
-                onChange="@command('applyChanges')" 
                 readonly="true" />
             </fieldErrorHandler>
           </row>
@@ -51,42 +50,62 @@
          </rows>
 	   </grid>
     </groupbox>
-    <grid>
-      <columns>
-        <column width="150px" />
-        <column />
-      </columns>
-      <rows>
-        <row>
-          <label value="${labels.survey.versioning_manager}:" />
-          <cell>
+    
+    <hlayout spacing="30px" style="padding: 30px">
+    	<hlayout>
+    		<label value="${labels.survey.versioning_manager}:" />
             <button sclass="icon"
               tooltiptext="${labels.survey.versioning_manager}"
               onClick="@global-command('openVersioningManagerPopUp')"
               image="/assets/images/edit-small.png" />
-          </cell>
-        </row>
-        <row>
-          <label value="${labels.survey.srs.$}:" />
-          <cell>
-            <button sclass="icon"
+         </hlayout>
+    	<hlayout>
+			<label value="${labels.survey.srs.$}:" />
+			<button sclass="icon"
               tooltiptext="${labels.survey.srs.$}"
               onClick="@global-command('openSRSManagerPopUp')"
               image="/assets/images/edit-small.png" />
-          </cell>
-        </row>
-        <row>
-          <label value="${labels.survey.units}:" />
-          <cell>
+         </hlayout>
+    	<hlayout>
+    		<label value="${labels.survey.units}:" />
             <button sclass="icon" 
               tooltiptext="${labels.survey.unit.manager.title}"
               onClick="@global-command('openUnitsManagerPopUp')"
               image="/assets/images/edit-small.png" />
-          </cell>
-        </row>
-      </rows>
-    </grid>
-
+         </hlayout>
+    </hlayout>
+    
+	 <groupbox width="100%" closable="false"
+	 	visible="@load(vm.collectEarthSurvey)">
+      <caption label="${labels.survey.collect_earth_details.$}"/>
+      <hlayout style="padding: 10px">
+            <label value="${labels.survey.collect_earth_details.plot_area}:" />
+            <fieldErrorHandler message="@load(vmsgs['collectEarthPlotArea'])">
+				<listbox mold="select" rows="1" 
+					selectedItem="@load(fx.collectEarthPlotArea) @save(fx.collectEarthPlotArea)"
+					onSelect="@command('applyChanges')">
+					<listitem label="0.25 ha" value="0_25" />
+					<listitem label="0.50 ha" value="0_5" />
+					<listitem label="1 ha" value="1" />
+					<listitem label="5 ha" value="5" />
+					<listitem label="10 ha" value="10" />
+				</listbox>
+            </fieldErrorHandler>
+            <space width="100px" />
+            <label value="${labels.survey.collect_earth_details.sample_points}:" />
+            <fieldErrorHandler message="@load(vmsgs['collectEarthSamplePoints'])">
+            	<listbox mold="select" rows="1" 
+					selectedItem="@load(fx.collectEarthSamplePoints) @save(fx.collectEarthSamplePoints)"
+					onSelect="@command('applyChanges')">
+					<listitem label="Empty square" value="0" />
+					<listitem label="Central point" value="1" />
+					<listitem label="3x3" value="9" />
+					<listitem label="5x5" value="25" />
+					<listitem label="7x7" value="49" />
+				</listbox>
+            </fieldErrorHandler>
+      </hlayout>
+     </groupbox>
   </div>
 
 </zk>

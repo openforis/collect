@@ -1,6 +1,7 @@
 <?component name="fieldErrorHandler" class="org.openforis.collect.designer.component.FieldErrorHandler"?>
 <zk>
-  <groupbox width="100%" closable="false" class="tableFieldSet">
+  <groupbox width="100%" closable="false" class="tableFieldSet"
+  	visible="@load(not vm.collectEarthSurvey)">
     <caption
       label="${labels.survey.schema.attribute.numeric.precisions.$}:" />
     <vlayout>

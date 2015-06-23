@@ -25,12 +25,14 @@ public class DataRestoreServiceImpl implements DataRestoreService {
 	
 	@Override
 	public String startSurveyDataRestore(String surveyName, File backupFile) {
+		CollectSurvey survey = surveyManager.get(surveyName);
+		
 		String surveyUri = extractSurveyUri(backupFile);
 		checkValidSurvey(surveyName, surveyUri);
 		
 		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
 		job.setStoreRestoredFile(true);
-		job.setSurveyUri(surveyUri);
+		job.setPublishedSurvey(survey);
 		job.setFile(backupFile);
 		job.setOverwriteAll(true);
 		job.setRestoreUploadedFiles(true);

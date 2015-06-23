@@ -27,9 +27,9 @@ public class SchemaSummaryCSVExportJob extends Job {
 	private File outputFile;
 	
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		outputFile = File.createTempFile("collect_schema_export", ".csv");
-		super.initInternal();
 	}
 	
 	@Override

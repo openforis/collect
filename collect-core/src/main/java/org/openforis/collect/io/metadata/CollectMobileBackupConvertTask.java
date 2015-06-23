@@ -43,7 +43,7 @@ public class CollectMobileBackupConvertTask extends Task {
 	private ConfigurableApplicationContext ctx;
 	
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
 		outputDbFile = File.createTempFile("collect_mobile_" + surveyName, ".db");
 
 		//initialize application context
@@ -57,7 +57,7 @@ public class CollectMobileBackupConvertTask extends Task {
 				"/" + dataSourceConfigFile.getAbsolutePath()
 				);
 
-		super.initInternal();
+		super.createInternalVariables();
 	}
 	
 	private File createDataSourceConfigFile() throws IOException {

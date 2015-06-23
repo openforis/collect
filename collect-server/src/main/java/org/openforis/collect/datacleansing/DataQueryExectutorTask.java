@@ -45,9 +45,9 @@ public class DataQueryExectutorTask extends Task {
 	}
 	
 	@Override
-	protected void initInternal() throws Throwable {
+	protected void initializeInternalVariables() throws Throwable {
+		super.initializeInternalVariables();
 		this.errors = new ArrayList<DataQueryExecutorError>();
-		super.initInternal();
 	}
 	
 	@Override

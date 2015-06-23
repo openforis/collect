@@ -14,6 +14,8 @@ import org.openforis.collect.io.data.proxy.DataRestoreJobProxy;
 import org.openforis.collect.io.data.proxy.DataRestoreSummaryJobProxy;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.concurrency.proxy.JobProxy;
@@ -33,6 +35,8 @@ public class DataImportService {
 	private SessionManager sessionManager;
 	@Autowired
 	private CollectJobManager jobManager;
+	@Autowired
+	private SurveyManager surveyManager;
 	
 	private File packagedFile;
 	
@@ -47,10 +51,12 @@ public class DataImportService {
 			packagedFile = new File(filePath);
 
 			log.info("Using file: " + packagedFile.getAbsolutePath());
+			
+			CollectSurvey survey = surveyManager.getByUri(selectedSurveyUri);
 
 			DataRestoreSummaryJob job = jobManager.createJob(DataRestoreSummaryJob.class);
 			job.setFile(packagedFile);
-			job.setSurveyUri(selectedSurveyUri);
+			job.setPublishedSurvey(survey);
 
 			resetJobs();
 			this.summaryJob = job;

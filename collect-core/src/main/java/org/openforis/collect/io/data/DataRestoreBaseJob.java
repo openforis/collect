@@ -8,10 +8,12 @@ import java.util.zip.ZipFile;
 
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
+import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -21,16 +23,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class DataRestoreBaseJob extends Job {
 
 	@Autowired
-	protected transient SurveyManager surveyManager;
+	protected SurveyManager surveyManager;
+	@Autowired
+	protected RecordManager recordManager;
+	@Autowired
+	protected UserManager userManager;
 	
 	//input
 	protected transient File file;
-	protected transient CollectSurvey packagedSurvey;
+	protected transient CollectSurvey publishedSurvey;
+	protected transient CollectSurvey packagedSurvey; //optional: if not specified, it will be extracted from zip file
 	
 	//temporary instance variables
 	protected transient ZipFile zipFile;
-	protected transient String surveyUri;
-	protected transient CollectSurvey publishedSurvey;
 	
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -40,14 +45,17 @@ public abstract class DataRestoreBaseJob extends Job {
 	}
 
 	@Override
-	public void initInternal() throws Throwable {
+	public void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		zipFile = new ZipFile(file);
+	}
+	
+	@Override
+	protected void validateInput() throws Throwable {
+		super.validateInput();
 		if ( packagedSurvey != null ) {
 			checkPackagedSurveyUri();
-			surveyUri = packagedSurvey.getUri();
-			initPublishedSurvey();
 		}
-		super.initInternal();
 	}
 
 	private void addIdmlUnmarshallTask() {
@@ -56,7 +64,7 @@ public abstract class DataRestoreBaseJob extends Job {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		if ( task instanceof IdmlUnmarshallTask ) {
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
@@ -65,11 +73,11 @@ public abstract class DataRestoreBaseJob extends Job {
 			t.setFile(idmlFile);
 			t.setValidate(false);
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 	
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
 		if ( task instanceof IdmlUnmarshallTask ) {
 			CollectSurvey survey = ((IdmlUnmarshallTask) task).getSurvey();
@@ -78,7 +86,6 @@ public abstract class DataRestoreBaseJob extends Job {
 			} else {
 				packagedSurvey = survey;
 				checkPackagedSurveyUri();
-				initPublishedSurvey();
 			}
 			this.packagedSurvey = survey;
 		}
@@ -87,18 +94,12 @@ public abstract class DataRestoreBaseJob extends Job {
 
 	protected void checkPackagedSurveyUri() {
 		String packagedSurveyUri = packagedSurvey.getUri();
-		if ( surveyUri != null && ! surveyUri.equals(packagedSurveyUri) ) {
-			throw new RuntimeException(String.format("Packaged survey uri (%s) is different from the expected one (%s)", packagedSurveyUri, surveyUri));
+		String publishedSurveyUri = publishedSurvey.getUri();
+		if (! publishedSurveyUri.equals(packagedSurveyUri)) {
+			throw new RuntimeException(String.format("Packaged survey uri (%s) is different from the expected one (%s)", packagedSurveyUri, publishedSurveyUri));
 		}
 	}
 
-	protected void initPublishedSurvey() {
-		publishedSurvey = surveyManager.getByUri(surveyUri);
-		if ( publishedSurvey == null ) {
-			throw new RuntimeException(String.format("Published survey with uri %s not found", surveyUri));
-		}
-	}
-	
 	public SurveyManager getSurveyManager() {
 		return surveyManager;
 	}
@@ -129,14 +130,6 @@ public abstract class DataRestoreBaseJob extends Job {
 	
 	public void setPackagedSurvey(CollectSurvey packagedSurvey) {
 		this.packagedSurvey = packagedSurvey;
-	}
-	
-	public String getSurveyUri() {
-		return surveyUri;
-	}
-	
-	public void setSurveyUri(String surveyUri) {
-		this.surveyUri = surveyUri;
 	}
 	
 }
