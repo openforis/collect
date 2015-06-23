@@ -135,10 +135,13 @@ Collect.EntityTree.prototype = Object.create(Collect.NodeTree.prototype);
 
 Collect.AttributeTree = function(treeDiv, survey, parentEntityTree, hiddenFieldName, creationCompleteHandler) {
 	this.parentEntityTree = parentEntityTree;
+	
+	var selectedEntityDefId = parentEntityTree ? parentEntityTree.getSelectedNodeId(): null;
+	
 	var disabledFilterFunction = function(node) {
 		return node.type == "ENTITY";
 	};
-	var selectedEntityDefId = parentEntityTree ? parentEntityTree.getSelectedNodeId(): null;
+	var visibleFilterFunction = null;
 	
 	var $this = this;
 	if (parentEntityTree) {
@@ -146,9 +149,12 @@ Collect.AttributeTree = function(treeDiv, survey, parentEntityTree, hiddenFieldN
 			$this.startFromEntityId = parentEntityTree.getSelectedNodeId();
 			$this.refresh();
 		});
+		visibleFilterFunction = function(node) {
+			return parentEntityTree.getSelectedNodeId() != null;
+		};
 	}
 
-	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, null, selectedEntityDefId, hiddenFieldName, creationCompleteHandler);
+	Collect.NodeTree.call(this, treeDiv, survey, disabledFilterFunction, visibleFilterFunction, selectedEntityDefId, hiddenFieldName, creationCompleteHandler);
 };
 
 Collect.AttributeTree.prototype = Object.create(Collect.NodeTree.prototype);
