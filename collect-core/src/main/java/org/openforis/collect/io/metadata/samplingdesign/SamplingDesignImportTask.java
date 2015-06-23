@@ -50,10 +50,10 @@ public class SamplingDesignImportTask extends ReferenceDataImportTask<ParsingErr
 	}
 	
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
 		lines = new ArrayList<SamplingDesignLine>();
 		reader = new SamplingDesignCSVReader(file);
-		super.initalizeInternalVariables();
+		super.createInternalVariables();
 	}
 	
 	@Override

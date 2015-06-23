@@ -7,11 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.openforis.idm.metamodel.CodeList;
 
 /**
@@ -32,18 +31,20 @@ public class CodeListImportJob extends Job {
 	private InputStream is;
 
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
-		validateParameters();
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		is = new FileInputStream(file);
-		super.initalizeInternalVariables();
 		
 	}
 	
-	private void validateParameters() {
+	@Override
+	protected void validateInput() throws Throwable {
 		if ( ! file.exists() && ! file.canRead() ) {
 			setErrorMessage(IMPORTING_FILE_ERROR_MESSAGE_KEY);
+			changeStatus(Status.FAILED);
 		} else if (!validateFile()) {
 			setErrorMessage(WRONG_FILE_TYPE_ERROR_MESSAGE_KEY);
+			changeStatus(Status.FAILED);
 		}
 	}
 	
@@ -57,7 +58,7 @@ public class CodeListImportJob extends Job {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		CodeListImportTask t = (CodeListImportTask) task;
 		t.setCodeListManager(codeListManager);
 		t.setInputStream(is);

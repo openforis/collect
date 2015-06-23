@@ -13,7 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.Survey;
 
@@ -37,14 +37,15 @@ public class CodeListBatchImportJob extends Job {
 	private Enumeration<ZipArchiveEntry> zipEntries;
 
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
-		validateParameters();
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		zipFile = new ZipFile(file);
 		zipEntries = zipFile.getEntries();
-		super.initalizeInternalVariables();
 	}
 	
-	private void validateParameters() throws Throwable {
+	@Override
+	protected void validateInput() throws Throwable {
+		super.validateInput();
 		if (!validateExtension(file.getName(), ZIP)) {
 			throw new IllegalArgumentException("survey.code_list.import_data.error.invalid_extension");
 		}
@@ -82,13 +83,13 @@ public class CodeListBatchImportJob extends Job {
 	}
 
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		try {
 			ZipArchiveEntry entry = zipEntries.nextElement();
 			InputStream is = zipFile.getInputStream(entry);
 			((CodeListImportTask) task).setInputStream(is);
 			((CodeListImportTask) task).setEntryName(entry.getName());
-			super.prepareTask(task);
+			super.initializeTask(task);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

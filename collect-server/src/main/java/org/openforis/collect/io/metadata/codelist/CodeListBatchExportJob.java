@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.openforis.idm.metamodel.CodeList;
 
 /**
@@ -29,10 +29,10 @@ public class CodeListBatchExportJob extends Job {
 	private ZipOutputStream zipOutputStream;
 
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		outputFile = File.createTempFile("batch_code_list_export", ".zip");
 		zipOutputStream = new ZipOutputStream(new FileOutputStream(outputFile));
-		super.initalizeInternalVariables();
 	}
 	
 	@Override
@@ -55,7 +55,7 @@ public class CodeListBatchExportJob extends Job {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		CodeList codeList = ((CodeListExportTask) task).getList();
 		String zipEntryName = codeList.getName() + ".csv";
 		try {
@@ -63,11 +63,11 @@ public class CodeListBatchExportJob extends Job {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 	
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
 		try {
 			zipOutputStream.closeEntry();

@@ -5,7 +5,7 @@ package org.openforis.collect.io;
 
 import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class XMLSurveyRestoreJob extends AbstractSurveyRestoreJob {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		if ( task instanceof IdmlUnmarshallTask ) {
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			t.setFile(file);
@@ -43,7 +43,7 @@ public class XMLSurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
 			t.setValidate(validateSurvey);
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 	
 }

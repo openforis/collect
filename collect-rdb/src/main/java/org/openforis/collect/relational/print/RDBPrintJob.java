@@ -17,6 +17,7 @@ import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 
 /**
  * 
@@ -49,10 +50,10 @@ public class RDBPrintJob extends Job {
 	}
 	
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		outputFile = File.createTempFile("rdb", ".sql");
 		writer = new FileWriter(outputFile);
-		super.initalizeInternalVariables();
 	}
 	
 	@Override
@@ -66,7 +67,7 @@ public class RDBPrintJob extends Job {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		if ( task instanceof SchemaGenerationTask ) {
 			((SchemaGenerationTask) task).setSurvey(survey);
 			((SchemaGenerationTask) task).setTargetSchemaName(targetSchemaName);
@@ -83,11 +84,11 @@ public class RDBPrintJob extends Job {
 				((RecordDataPrintTask) task).setRecordIterator(recordIterator);
 			}
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 	
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		if ( task instanceof SchemaGenerationTask ) {
 			this.schema = ((SchemaGenerationTask) task).getSchema();
 		}

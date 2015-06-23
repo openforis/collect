@@ -11,7 +11,7 @@ import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -40,14 +40,14 @@ public abstract class DataRestoreBaseJob extends Job {
 	}
 
 	@Override
-	public void initalizeInternalVariables() throws Throwable {
+	public void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		zipFile = new ZipFile(file);
 		if ( packagedSurvey != null ) {
 			checkPackagedSurveyUri();
 			surveyUri = packagedSurvey.getUri();
 			initPublishedSurvey();
 		}
-		super.initalizeInternalVariables();
 	}
 
 	private void addIdmlUnmarshallTask() {
@@ -56,7 +56,7 @@ public abstract class DataRestoreBaseJob extends Job {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		if ( task instanceof IdmlUnmarshallTask ) {
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
@@ -65,11 +65,11 @@ public abstract class DataRestoreBaseJob extends Job {
 			t.setFile(idmlFile);
 			t.setValidate(false);
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 	
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
 		if ( task instanceof IdmlUnmarshallTask ) {
 			CollectSurvey survey = ((IdmlUnmarshallTask) task).getSurvey();

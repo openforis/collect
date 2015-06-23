@@ -15,7 +15,7 @@ import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.concurrency.Job;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -45,13 +45,13 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	private ZipFile zipFile;
 	
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		String ext = FilenameUtils.getExtension(file.getName());
 		fullBackup = ArrayUtils.contains(SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS, ext);
 		if ( fullBackup ) {
 			this.zipFile = new ZipFile(file);
 		}
-		super.initalizeInternalVariables();
 	}
 	
 	@Override
@@ -64,7 +64,7 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		if ( task instanceof SurveyBackupVerifierTask ) {
 			SurveyBackupVerifierTask t = (SurveyBackupVerifierTask) task;
 			t.setZipFile(zipFile);
@@ -89,7 +89,7 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	}
 	
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
 		if ( task instanceof SurveyBackupInfoExtractorTask ) {
 			this.info = ((SurveyBackupInfoExtractorTask) task).getInfo();

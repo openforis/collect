@@ -9,12 +9,15 @@ import java.util.List;
 
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
+import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.restore.RestoredBackupStorageManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -48,8 +51,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private File tempFile;
 
 	@Override
-	public void initalizeInternalVariables() throws Throwable {
-		super.initalizeInternalVariables();
+	public void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		oldBackupFormat = backupFileExtractor.isOldFormat();
 	}
@@ -58,6 +61,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	protected void buildTasks() throws Throwable {
 		super.buildTasks();
 		if (storeRestoredFile) {
+			addTask(SurveyBackupJob.class);
 			addTask(new StoreBackupFileTask());
 		}
 		addTask(DataRestoreTask.class);
@@ -73,8 +77,16 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	}
 
 	@Override
-	protected void prepareTask(Task task) {
-		if ( task instanceof DataRestoreTask ) {
+	protected void initializeTask(Worker task) {
+		if (task instanceof SurveyBackupJob) {
+			SurveyBackupJob t = (SurveyBackupJob) task;
+			t.setFull(true);
+			t.setIncludeData(true);
+			t.setIncludeRecordFiles(true);
+			t.setOutputFormat(OutputFormat.DESKTOP_FULL);
+			t.setRecordFilter(new RecordFilter(publishedSurvey));
+			t.setSurvey(publishedSurvey);
+		} else if ( task instanceof DataRestoreTask ) {
 			DataRestoreTask t = (DataRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
@@ -94,7 +106,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setEntryIdsToImport(entryIdsToImport);
 			t.setSurvey(publishedSurvey);
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 	
 	@Override

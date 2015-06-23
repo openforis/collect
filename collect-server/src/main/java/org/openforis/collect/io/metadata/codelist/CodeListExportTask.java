@@ -36,8 +36,8 @@ public class CodeListExportTask extends Task {
 	private CsvWriter writer;
 
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
-		super.initalizeInternalVariables();
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		OutputStreamWriter osWriter = new OutputStreamWriter(out, OpenForisIOUtils.UTF_8);
 		writer = new CsvWriter(osWriter, SEPARATOR, QUOTECHAR);
 	}

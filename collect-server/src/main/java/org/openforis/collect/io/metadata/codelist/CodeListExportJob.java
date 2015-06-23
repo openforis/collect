@@ -23,10 +23,10 @@ public class CodeListExportJob extends Job {
 	private FileOutputStream outputStream;
 
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		outputFile = File.createTempFile("batch_code_list_export", ".zip");
 		outputStream = new FileOutputStream(outputFile);
-		super.initalizeInternalVariables();
 	}
 	
 	@Override

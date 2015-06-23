@@ -46,11 +46,11 @@ public class DataBackupTask extends Task {
 	}
 	
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
 		if ( recordFilter == null ) {
 			recordFilter = new RecordFilter(survey);
 		}
-		super.initalizeInternalVariables();
+		super.createInternalVariables();
 	}
 	
 	@Override

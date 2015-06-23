@@ -55,8 +55,8 @@ public class CodeListImportTask extends ReferenceDataImportTask<ParsingError> {
 	}
 	
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
-		super.initalizeInternalVariables();
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		codeToRootItem = new LinkedHashMap<String, CodeListItem>();
 	}
 	

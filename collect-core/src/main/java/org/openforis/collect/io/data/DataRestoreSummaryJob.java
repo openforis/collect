@@ -12,7 +12,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.commons.collection.Predicate;
-import org.openforis.concurrency.Task;
+import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -43,8 +43,8 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	private boolean oldFormat;
 	
 	@Override
-	public void initalizeInternalVariables() throws Throwable {
-		super.initalizeInternalVariables();
+	public void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		oldFormat = ! isDataFolderIncluded();
 	}
 
@@ -55,7 +55,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	}
 	
 	@Override
-	protected void prepareTask(Task task) {
+	protected void initializeTask(Worker task) {
 		if ( task instanceof DataRestoreSummaryTask ) {
 			DataRestoreSummaryTask t = (DataRestoreSummaryTask) task;
 			t.setRecordManager(recordManager);
@@ -67,11 +67,11 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setPackagedSurvey(DataRestoreSummaryJob.this.packagedSurvey);
 			t.setIncludeRecordPredicate(includeRecordPredicate);
 		}
-		super.prepareTask(task);
+		super.initializeTask(task);
 	}
 	
 	@Override
-	protected void onTaskCompleted(Task task) {
+	protected void onTaskCompleted(Worker task) {
 		super.onTaskCompleted(task);
 		if ( task instanceof DataRestoreSummaryTask ) {
 			//get output survey and set it into job instance instance variable

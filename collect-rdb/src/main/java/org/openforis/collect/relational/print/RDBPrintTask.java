@@ -41,8 +41,8 @@ public abstract class RDBPrintTask extends Task {
 	}
 	
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
-		super.initalizeInternalVariables();
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
 		this.dateFormatter = new SimpleDateFormat(dateTimeFormat);
 	}
 	

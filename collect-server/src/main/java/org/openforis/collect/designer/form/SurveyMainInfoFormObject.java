@@ -26,7 +26,7 @@ public class SurveyMainInfoFormObject extends FormObject<CollectSurvey> {
 		projectName = source.getProjectName(languageCode);
 		CollectAnnotations annotations = source.getAnnotations();
 		collectEarthPlotArea = toListitemValue(annotations.getCollectEarthPlotArea());
-		collectEarthSamplePoints = annotations.getCollectEarthSamplePoints().toString();
+		collectEarthSamplePoints = String.valueOf(annotations.getCollectEarthSamplePoints());
 	}
 
 	protected String toListitemValue(Double number) {

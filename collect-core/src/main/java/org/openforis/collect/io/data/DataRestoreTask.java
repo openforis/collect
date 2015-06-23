@@ -71,11 +71,11 @@ public class DataRestoreTask extends Task {
 	}
 
 	@Override
-	protected void initalizeInternalVariables() throws Throwable {
+	protected void createInternalVariables() throws Throwable {
 		dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
 		backupFileExtractor = new BackupFileExtractor(zipFile);
 		oldBackupFormat = backupFileExtractor.isOldFormat();
-		super.initalizeInternalVariables();
+		super.createInternalVariables();
 	}
 	
 	@Override
