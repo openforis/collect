@@ -132,11 +132,12 @@ public class DataRestoreController extends BasicController {
 		File tempFile = copyContentToFile(uploadItem);
 		
 		String surveyUri = extractSurveyUri(tempFile);
+		CollectSurvey survey = surveyManager.getByUri(surveyUri);
 		checkValidSurvey(expectedSurveyName, surveyUri);
 		
 		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
 		job.setStoreRestoredFile(true);
-		job.setSurveyUri(surveyUri);
+		job.setPublishedSurvey(survey);
 		job.setFile(tempFile);
 		job.setOverwriteAll(true);
 		job.setRestoreUploadedFiles(true);

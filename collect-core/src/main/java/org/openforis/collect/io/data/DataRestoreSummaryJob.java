@@ -8,12 +8,10 @@ import java.util.List;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.commons.collection.Predicate;
 import org.openforis.concurrency.Worker;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -26,13 +24,6 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 
-	@Autowired
-	private RecordManager recordManager;
-	@Autowired
-	private UserManager userManager;
-	@Autowired
-	private SurveyManager surveyManager;
-	
 	//input
 	private Predicate<CollectRecord> includeRecordPredicate;
 	

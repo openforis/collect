@@ -5,15 +5,16 @@ package org.openforis.collect.io.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
+import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.data.restore.RestoredBackupStorageManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.concurrency.Task;
@@ -34,18 +35,14 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	@Autowired
 	private RecordFileManager recordFileManager;
 	@Autowired
-	private SurveyManager surveyManager;
+	protected RestoredBackupStorageManager restoredBackupStorageManager;
 	@Autowired
-	private RecordManager recordManager;
-	@Autowired
-	private UserManager userManager;
-	@Autowired
-	private RestoredBackupStorageManager restoredBackupStorageManager;
+	protected BackupStorageManager backupStorageManager;
 
-	//parameters
+	//input parameters
 	private boolean overwriteAll;
 	private boolean restoreUploadedFiles;
-	private List<Integer> entryIdsToImport;
+	private List<Integer> entryIdsToImport; //ignored when overwriteAll is true
 	private boolean oldBackupFormat;
 	private boolean storeRestoredFile;
 	private File tempFile;
@@ -61,7 +58,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	protected void buildTasks() throws Throwable {
 		super.buildTasks();
 		if (storeRestoredFile) {
-			addTask(SurveyBackupJob.class);
+			if (isBackupNeeded()) {
+				addTask(SurveyBackupJob.class);
+			}
 			addTask(new StoreBackupFileTask());
 		}
 		addTask(DataRestoreTask.class);
@@ -70,6 +69,14 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		}
 	}
 	
+	private boolean isBackupNeeded() {
+		String surveyName = publishedSurvey.getName();
+		Date lastBackupDate = backupStorageManager.getLastBackupDate(surveyName);
+		RecordFilter recordFilter = new RecordFilter(publishedSurvey);
+		recordFilter.setModifiedSince(lastBackupDate);
+		return recordManager.countRecords(recordFilter) > 0 || publishedSurvey.getModifiedDate().after(lastBackupDate);
+	}
+
 	private boolean isUploadedFilesIncluded() throws IOException {
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.UPLOADED_FILES_FOLDER);
