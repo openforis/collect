@@ -80,7 +80,7 @@
 				<absolutechildren hflex="true" vflex="true">
 		      		<hbox sclass="footer" hflex="true" vflex="true">
 				    	<zscript>
-				    		org.openforis.commons.versioning.Version version = org.openforis.collect.Collect.getVersion();
+				    		org.openforis.commons.versioning.Version version = org.openforis.collect.CollectInfo.getInstance().getVersion();
 				    		String appVersion = version == null ? "DEV_VERSION": version.toString();
 				    		
 				    		org.springframework.security.core.Authentication authentication = org.zkoss.spring.security.SecurityUtil.getAuthentication();

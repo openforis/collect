@@ -103,7 +103,7 @@
 				</executions>
 			</plugin>
 
-			<!-- replace version in file -->
+			<!-- replace version in info file -->
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>replacer</artifactId>
@@ -120,7 +120,7 @@
 				<configuration>
 					<includes>
 						<!-- replace the token in this file -->
-						<include>target/classes/org/openforis/collect/version.properties</include>
+						<include>target/classes/org/openforis/collect/info.properties</include>
 					</includes>
 					<regex>false</regex>
 					<!-- the name of the token to replace -->

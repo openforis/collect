@@ -4,7 +4,7 @@
 package org.openforis.collect.manager;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.Collect;
+import org.openforis.collect.CollectInfo;
 import org.openforis.collect.model.ApplicationInfo;
 import org.openforis.collect.persistence.ApplicationInfoDao;
 import org.openforis.commons.versioning.Version;
@@ -29,7 +29,7 @@ public class DatabaseVersionManager {
 		if ( info != null && StringUtils.isNotBlank(info.getVersion()) ) {
 			schemaVersion = new Version(info.getVersion());
 		}
-		Version appVersion = Collect.getVersion();
+		Version appVersion = CollectInfo.getInstance().getVersion();
 		if ( ! isVersionCompatible(appVersion, schemaVersion) ) {
 			throw new DatabaseVersionNotCompatibleException("Database version (" + 
 					(schemaVersion != null ? schemaVersion: "not specified") + 
