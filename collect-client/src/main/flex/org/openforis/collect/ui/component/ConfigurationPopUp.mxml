@@ -12,8 +12,6 @@
 		<![CDATA[
 			import com.shortybmc.utils.StringUtils;
 			
-			import org.openforis.collect.util.StringUtil;
-			
 			import mx.events.FlexEvent;
 			import mx.rpc.AsyncResponder;
 			import mx.rpc.IResponder;
@@ -27,6 +25,7 @@
 			import org.openforis.collect.model.proxy.ConfigurationProxy;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.util.AlertUtil;
+			import org.openforis.collect.util.StringUtil;
 			
 			private var _initialized:Boolean;
 			
@@ -71,6 +70,8 @@
 				remoteCloneUrlTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 				remoteCloneRestoreKeyTextInput.text = conf.remoteCloneRestoreKey;
 				remoteCloneRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
+				
+				remoteCloneUrlTestButton.addEventListener(MouseEvent.CLICK, remoteCloneUrlTestClickHandler);
 			}
 			
 			private function loadConfigurationFaultHandler(event:FaultEvent, token:Object = null):void {
@@ -109,11 +110,20 @@
 				var configurationItem:Configuration$ConfigurationItem = textInputToConfigurationItem[textInput.id];
 				var value:String = textInput.text;
 				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
-					
-				}, function(event:FaultEvent, token:Object = null):void {
-					AlertUtil.showError(event.fault.message);
-				});
+				}, faultHandler);
 				ClientFactory.configurationClient.updateConfigurationItem(responder, configurationItem, value);
+			}
+			
+			private function remoteCloneUrlTestClickHandler(event:MouseEvent):void {
+				ClientFactory.configurationClient.testRemoteCloneUrl(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					AlertUtil.showMessage("Ok");
+				}, function(event:FaultEvent, token:Object = null):void {
+					AlertUtil.showError("configuration.remote_clone.test.error", [event.fault.message]);
+				}));
+			}
+			
+			private function faultHandler(event:FaultEvent, token:Object = null):void {
+				AlertUtil.showError(event.fault.message);
 			}
 			
 		]]>
@@ -177,14 +187,15 @@
 						</s:FormItem>
 						
 						<!-- remote clone url -->
-						<s:FormItem label="{Message.get('configuration.remote_clone_url')}" width="100%">
-							<s:VGroup width="100%">
+						<s:FormItem label="{Message.get('configuration.remote_clone.url')}" width="100%">
+							<s:HGroup width="100%">
 								<s:TextInput id="remoteCloneUrlTextInput" width="100%" />
-							</s:VGroup>
+								<s:Button id="remoteCloneUrlTestButton" label="{Message.get('configuration.remote_clone.test')}" />
+							</s:HGroup>
 						</s:FormItem>
 						
 						<!-- remote clone restore key -->
-						<s:FormItem label="{Message.get('configuration.remote_clone_restore_key')}" width="100%">
+						<s:FormItem label="{Message.get('configuration.remote_clone.restore_key')}" width="100%">
 							<s:VGroup width="100%">
 								<s:TextInput id="remoteCloneRestoreKeyTextInput" width="100%" />
 							</s:VGroup>

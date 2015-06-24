@@ -16,6 +16,7 @@ package org.openforis.collect.client {
 		private var _updateUploadPathOperation:Operation;
 		private var _updateIndexPathOperation:Operation;
 		private var _updateConfigurationItemOperation:Operation;
+		private var _testRemoteCloneUrlOperation:Operation;
 
 		public function ConfigurationClient() {
 			super("configurationService");
@@ -23,6 +24,7 @@ package org.openforis.collect.client {
 			_updateUploadPathOperation = getOperation("updateUploadPath");
 			_updateIndexPathOperation = getOperation("updateIndexPath");
 			_updateConfigurationItemOperation = getOperation("updateConfigurationItem", CONCURRENCY_MULTIPLE);
+			_testRemoteCloneUrlOperation = getOperation("testRemoteCloneUrl", CONCURRENCY_LAST);
 		}
 		
 		public function loadConfiguration(responder:IResponder):void {
@@ -42,6 +44,11 @@ package org.openforis.collect.client {
 		
 		public function updateConfigurationItem(responder:IResponder, item:Configuration$ConfigurationItem, value:String):void {
 			var token:AsyncToken = this._updateConfigurationItemOperation.send(item.name, value);
+			token.addResponder(responder);
+		}
+		
+		public function testRemoteCloneUrl(responder:IResponder):void {
+			var token:AsyncToken = this._testRemoteCloneUrlOperation.send();
 			token.addResponder(responder);
 		}
 		

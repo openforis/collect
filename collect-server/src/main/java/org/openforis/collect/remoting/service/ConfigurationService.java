@@ -3,6 +3,18 @@
  */
 package org.openforis.collect.remoting.service;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.openforis.collect.CollectInfo;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordFileManager;
@@ -13,11 +25,16 @@ import org.openforis.collect.model.proxy.ConfigurationProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author S. Ricci
  */
 public class ConfigurationService {
 
+	protected static Log LOG = LogFactory.getLog(ConfigurationService.class);
+	
 	@Autowired
 	private ConfigurationManager configurationManager;
 	@Autowired
@@ -64,4 +81,33 @@ public class ConfigurationService {
 		configurationManager.updateConfigurationItem(item, value);
 	}
 	
+	public void testRemoteCloneUrl() {
+		String remoteCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
+		String remoteInfoUrl = remoteCloneUrl + "/info.json";
+		try {
+			HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+			CloseableHttpClient httpClient = clientBuilder.build();
+			
+			HttpGet request = new HttpGet(remoteInfoUrl);
+			request.setConfig(RequestConfig.custom().setConnectTimeout(20000).build());
+			HttpResponse response = httpClient.execute(request);
+			HttpEntity entity = response.getEntity();
+
+			if (entity == null) {
+				throw new IllegalStateException("Invalid response");
+			} else {
+			    InputStream is = entity.getContent();
+			    CollectInfo info = extractCollectInfo(is);
+			}
+		} catch (Exception e) {
+			LOG.error(e);
+		}
+	}
+	
+	private CollectInfo extractCollectInfo(InputStream is) throws IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		CollectInfo info = mapper.readValue(is, CollectInfo.class);
+		return info;
+	}
 }
