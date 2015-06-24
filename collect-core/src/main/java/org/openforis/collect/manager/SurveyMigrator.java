@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openforis.collect.Collect;
+import org.openforis.collect.CollectInfo;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
@@ -26,7 +26,7 @@ public class SurveyMigrator {
 	public void migrate(CollectSurvey survey) {
 		fixCodeListHierarchyLevelNames(survey);
 		
-		survey.setCollectVersion(Collect.getVersion());
+		survey.setCollectVersion(CollectInfo.getInstance().getVersion());
 	}
 	
 	public boolean isMigrationNeeded(CollectSurvey survey) {

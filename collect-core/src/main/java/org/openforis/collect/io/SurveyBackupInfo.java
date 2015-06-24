@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Properties;
 
-import org.openforis.collect.Collect;
+import org.openforis.collect.CollectInfo;
 import org.openforis.collect.utils.Dates;
 import org.openforis.commons.versioning.Version;
 
@@ -31,7 +31,7 @@ public class SurveyBackupInfo {
 	private String surveyName;
 	
 	public SurveyBackupInfo() {
-		this.collectVersion = Collect.getVersion();
+		this.collectVersion = CollectInfo.getInstance().getVersion();
 		this.timestamp = new Date();
 	}
 	

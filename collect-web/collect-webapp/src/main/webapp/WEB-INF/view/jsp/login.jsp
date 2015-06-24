@@ -1,4 +1,4 @@
-<%@page import="org.openforis.collect.Collect"%>
+<%@page import="org.openforis.collect.CollectInfo"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page pageEncoding="UTF-8" %>
 
@@ -197,7 +197,7 @@
 		<!-- FOOTER -->
 		<div id="footer">
 			<img id="footerImg" alt="Loading..." />
-			<label>Application version: <%= org.openforis.collect.Collect.getVersion()%></label>
+			<label>Application version: <%= org.openforis.collect.CollectInfo.getInstance().getVersion()%></label>
 		</div>
   	</div>
   </body>
