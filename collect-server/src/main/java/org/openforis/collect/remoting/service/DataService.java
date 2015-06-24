@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.io.data.BulkRecordMoveJob;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
@@ -81,6 +82,8 @@ public class DataService {
 	private transient RecordIndexService recordIndexService;
 	@Autowired
 	private transient CollectJobManager collectJobManager;
+	@Autowired
+	private transient EventProducer eventProducer;
 	
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -164,8 +167,10 @@ public class DataService {
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityName, user, versionName, sessionId, recordStep);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
-		Locale locale = sessionState.getLocale();
-		RecordProxy recordProxy = new RecordProxy(record, locale);
+		
+		eventProducer.produceForNew(record);
+		
+		RecordProxy recordProxy = new RecordProxy(record, sessionState.getLocale());
 		return recordProxy;
 	}
 	
@@ -178,6 +183,8 @@ public class DataService {
 		CollectRecord record = recordManager.load(survey, id, Step.ENTRY);
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
+		
+		eventProducer.produceForDeleted(record);
 	}
 	
 	@Transactional
@@ -210,8 +217,10 @@ public class DataService {
 		if ( ! changeSet.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
-		Locale currentLocale = getCurrentLocale();
-		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, currentLocale);
+		
+		eventProducer.produceFor(changeSet);
+		
+		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getCurrentLocale());
 		if ( requestSet.isAutoSave() ) {
 			try {
 				saveActiveRecord();
@@ -223,7 +232,7 @@ public class DataService {
 		return result;
 	}
 
-	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequestSet nodeUpdateRequestSet) throws RecordPersistenceException, RecordIndexException {
+	private NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequestSet nodeUpdateRequestSet) throws RecordPersistenceException, RecordIndexException {
 		List<NodeUpdateRequest> opts = nodeUpdateRequestSet.getRequests();
 		NodeChangeMap result = new NodeChangeMap();
 		for (NodeUpdateRequest req : opts) {
