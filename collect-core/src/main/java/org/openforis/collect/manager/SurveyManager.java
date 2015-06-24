@@ -22,7 +22,7 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.CollectInfo;
+import org.openforis.collect.Collect;
 import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
@@ -659,7 +659,7 @@ public class SurveyManager {
 	@Transactional
 	public void saveSurveyWork(CollectSurvey survey) throws SurveyStoreException {
 		survey.setModifiedDate(new Date());
-		survey.setCollectVersion(CollectInfo.getInstance().getVersion());
+		survey.setCollectVersion(Collect.VERSION);
 		Integer id = survey.getId();
 		if ( id == null ) {
 			surveyWorkDao.insert(survey);
@@ -763,7 +763,7 @@ public class SurveyManager {
 		survey.setWork(false);
 		survey.setPublished(true);
 		survey.setModifiedDate(new Date());
-		survey.setCollectVersion(CollectInfo.getInstance().getVersion());
+		survey.setCollectVersion(Collect.VERSION);
 		
 		CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
 		if ( oldPublishedSurvey == null ) {
