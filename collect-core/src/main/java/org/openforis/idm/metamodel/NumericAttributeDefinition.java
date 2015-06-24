@@ -24,7 +24,7 @@ public abstract class NumericAttributeDefinition extends AttributeDefinition {
 		private Type(Class<? extends Number> numberType) {
 			this.numberType = numberType;
 		}
-		public Class<?> getNumberType() {
+		public Class<? extends Number> getNumberType() {
 			return numberType;
 		}
 	}

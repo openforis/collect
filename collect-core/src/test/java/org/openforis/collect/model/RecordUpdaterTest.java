@@ -13,38 +13,39 @@ import static org.openforis.idm.testfixture.NodeBuilder.entity;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.attributeDef;
 import static org.openforis.idm.testfixture.NodeDefinitionBuilder.entityDef;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.utils.Dates;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.TextValue;
-import org.openforis.idm.model.Value;
 import org.openforis.idm.testfixture.NodeBuilder;
-import org.openforis.idm.testfixture.NodeDefinitionBuilder;
 
 /**
  * @author D. Wiell
  * @author S. Ricci
  *
  */
-@SuppressWarnings("unchecked")
-public class RecordUpdaterTest {
-	private RecordUpdater updater;
-	private Survey survey;
-	private Record record;
+public class RecordUpdaterTest extends AbstractRecordTest {
 
-	@Before
-	public void init() {
-		survey = createTestSurvey();
-		updater = new RecordUpdater();
+	@Override
+	protected CollectSurvey createTestSurvey() {
+		CollectSurveyContext surveyContext = new CollectSurveyContext();
+		CollectSurvey survey = (CollectSurvey) surveyContext.createSurvey();
+		addModelVersion(survey, "1.0", "2014-12-01");
+		addModelVersion(survey, "2.0", "2014-12-02");
+		addModelVersion(survey, "3.0", "2014-12-03");
+		return survey;
+	}
+
+	private void addModelVersion(CollectSurvey survey, String name, String date) {
+		ModelVersion version = survey.createModelVersion();
+		version.setName(name);
+		version.setDate(Dates.parseDate(date));
+		survey.addVersion(version);
 	}
 	
 	@Test
@@ -220,7 +221,7 @@ public class RecordUpdaterTest {
 		Entity rootEntity = record.getRootEntity();
 		
 		assertEquals(1, rootEntity.getCount("time_study"));
-		Entity timeStudy2 = (Entity) rootEntity.get("time_study", 0);
+		Entity timeStudy2 = (Entity) rootEntity.getChild("time_study", 0);
 		Attribute<?, ?> startTime2 = (Attribute<?, ?>) timeStudy2.getChild("start_time");
 		
 		assertEquals(new TextValue("start second"), startTime2.getValue());
@@ -652,59 +653,6 @@ public class RecordUpdaterTest {
 		ValidationResultFlag maxTimeStudyCountValidation = rootEntityChange.getChildrenMaxCountValidation().get("time_study");
 		assertEquals(ValidationResultFlag.OK, maxTimeStudyCountValidation);
 		assertEquals(ValidationResultFlag.OK, rootEntity.getMaxCountValidationResult("time_study"));
-	}
-	
-	protected void record(EntityDefinition rootDef, NodeBuilder... builders) {
-		record = NodeBuilder.record(survey, builders);
-		updater.initializeRecord(record);
-	}
-	
-	protected void record(EntityDefinition rootDef, String versionName, NodeBuilder... builders) {
-		record = NodeBuilder.record(survey, rootDef.getName(), versionName, builders);
-		updater.initializeRecord(record);
-	}
-	
-	protected EntityDefinition rootEntityDef(NodeDefinitionBuilder... builders) {
-		EntityDefinition rootEntityDef = NodeDefinitionBuilder.rootEntityDef(survey, "root", builders);
-		return rootEntityDef;
-	}
-
-	protected Entity entityByPath(String path) {
-		return (Entity) record.findNodeByPath(path);
-	}
-	
-	protected NodeChangeSet updateAttribute(String path, String value) {
-		Attribute<?,?> attr = attributeByPath(path);
-		NodeChangeSet result = update(attr, value);
-		return result;
-	}
-
-	protected NodeChangeSet update(String path, String value) {
-		return update(attributeByPath(path), value);
-	}
-	
-	protected NodeChangeSet update(Attribute<?, ?> attr, String value) {
-		return updater.updateAttribute((Attribute<?, Value>) attr, new TextValue(value));
-	}
-
-	protected Attribute<?,?> attributeByPath(String path) {
-		return (Attribute<?, ?>) record.findNodeByPath(path);
-	}
-	
-	private CollectSurvey createTestSurvey() {
-		CollectSurveyContext surveyContext = new CollectSurveyContext();
-		CollectSurvey survey = (CollectSurvey) surveyContext.createSurvey();
-		addModelVersion(survey, "1.0", "2014-12-01");
-		addModelVersion(survey, "2.0", "2014-12-02");
-		addModelVersion(survey, "3.0", "2014-12-03");
-		return survey;
-	}
-
-	private void addModelVersion(CollectSurvey survey, String name, String date) {
-		ModelVersion version = survey.createModelVersion();
-		version.setName(name);
-		version.setDate(Dates.parseDate(date));
-		survey.addVersion(version);
 	}
 	
 }

@@ -21,6 +21,7 @@ import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
+import org.openforis.collect.manager.SessionEventDispatcher;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
@@ -84,6 +85,8 @@ public class DataService {
 	private transient CollectJobManager collectJobManager;
 	@Autowired
 	private transient EventProducer eventProducer;
+	@Autowired
+	private transient SessionEventDispatcher sessionEventDispatcher;
 	
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -185,6 +188,7 @@ public class DataService {
 		recordManager.delete(id);
 		
 		eventProducer.produceForDeleted(record);
+		sessionEventDispatcher.recordDeleted(record, sessionState.getUser().getName());
 	}
 	
 	@Transactional
@@ -205,6 +209,8 @@ public class DataService {
 		if ( isCurrentRecordIndexable() ) {
 			recordIndexService.permanentlyIndex(record);
 		}
+		
+		sessionEventDispatcher.recordSaved();
 	}
 
 	@Transactional
@@ -218,7 +224,8 @@ public class DataService {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
 		
-		eventProducer.produceFor(changeSet);
+		String userName = sessionManager.getSessionState().getUser().getName();
+		eventProducer.produceFor(changeSet, userName);
 		
 		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getCurrentLocale());
 		if ( requestSet.isAutoSave() ) {

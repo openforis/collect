@@ -1,7 +1,10 @@
 package org.openforis.collect.manager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -11,6 +14,8 @@ import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.webapp.HttpGraniteContext;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.event.EventListener;
+import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
@@ -28,7 +33,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * 
  * @author M. Togna
  */
-public class SessionManager {
+public class SessionManager implements EventListener {
 
 	private static Log LOG = LogFactory.getLog(SessionManager.class);
 
@@ -40,7 +45,15 @@ public class SessionManager {
 	private transient RecordManager recordManager;
 	@Autowired
 	private transient SessionRecordFileManager fileManager;
-
+	
+	private transient List<RecordEvent> pendingEvents = new CopyOnWriteArrayList<RecordEvent>();
+	
+	@Override
+	public void onEvents(List<? extends RecordEvent> events) {
+		//TODO filter events by active record
+		pendingEvents.addAll(events);
+	}
+	
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
@@ -204,6 +217,14 @@ public class SessionManager {
 		}
 		fileManager.deleteAllTempFiles();
 		sessionState.setActiveRecord(null);
+		
+		pendingEvents.clear();
 	}
-	
+
+	public List<RecordEvent> flushPendingEvents() {
+		List<RecordEvent> events = new ArrayList<RecordEvent>(pendingEvents);
+		pendingEvents.clear();
+		return events;
+	}
+
 }
