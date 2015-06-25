@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import mx.events.FlexEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
@@ -235,16 +236,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function initSendToRemoteCloneContainer():void {
-			view.sendToRemoteCloneButton.addEventListener(MouseEvent.CLICK, sendToRemoteUrlClickHandler);
-
 			ClientFactory.configurationClient.loadConfiguration(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
 				var conf:ConfigurationProxy = event.result as ConfigurationProxy;
 				if (org.openforis.collect.util.StringUtil.isNotBlank(conf.remoteCloneUrl)) {
 					view.sendToRemoteCloneContainer.visible = view.sendToRemoteCloneContainer.includeInLayout = true;
+					view.sendToRemoteCloneButton.addEventListener(MouseEvent.CLICK, sendToRemoteUrlClickHandler);
 					view.remoteCloneUrlTextInput.text = conf.remoteCloneUrl;
 					view.remoteCloneNotConfiguredLabel.visible = view.remoteCloneNotConfiguredLabel.includeInLayout = false;
 				}
-			}, faultHandler));			
+			}, faultHandler));
 		}
 		
 		protected function checkEnabledFields():void {
@@ -289,13 +289,21 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function sendToRemoteUrlClickHandler(event:Event):void {
-			var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
-				var jobId:String = event.result as String;
-				var jobMonitor:JobMonitor = new JobMonitor(jobId);
-				CollectJobStatusPopUp.openPopUp();
-				jobMonitor.start();
-			}, faultHandler);
-			ClientFactory.dataExportClient.sendBackupToRemoteClone(responder, getSelectedSurveyName());
+			ClientFactory.configurationClient.isRemoteCloneValid(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+				if (! event.result) {
+					AlertUtil.showError(Message.get("backup.remote_clone.not_valid"));
+					return;
+				}
+				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					var jobId:String = event.result as String;
+					var jobMonitor:JobMonitor = new JobMonitor(jobId);
+					CollectJobStatusPopUp.openPopUp();
+					jobMonitor.start();
+				}, faultHandler);
+				ClientFactory.dataExportClient.sendBackupToRemoteClone(responder, getSelectedSurveyName());
+			}, function(event:FaultEvent, token:Object = null):void {
+				AlertUtil.showError(Message.get("configuration.remote_clone.error_verifying_validity", [event.fault.message]));
+			}));
 		}
 		
 	}

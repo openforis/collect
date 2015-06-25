@@ -68,10 +68,9 @@
 				allowedRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 				remoteCloneUrlTextInput.text = conf.remoteCloneUrl;
 				remoteCloneUrlTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
+				loadRemoteCloneInfo();
 				remoteCloneRestoreKeyTextInput.text = conf.remoteCloneRestoreKey;
 				remoteCloneRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
-				
-				remoteCloneUrlTestButton.addEventListener(MouseEvent.CLICK, remoteCloneUrlTestClickHandler);
 			}
 			
 			private function loadConfigurationFaultHandler(event:FaultEvent, token:Object = null):void {
@@ -108,17 +107,26 @@
 				var textInput:TextInput = TextInput(event.target);
 				textInput.text = StringUtil.trim(textInput.text);
 				var configurationItem:Configuration$ConfigurationItem = textInputToConfigurationItem[textInput.id];
+				if (configurationItem == Configuration$ConfigurationItem.REMOTE_CLONE_URL) {
+					remoteCloneValidityLabel.text = Message.get("global.loading_short");
+				}
 				var value:String = textInput.text;
 				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					if (configurationItem == Configuration$ConfigurationItem.REMOTE_CLONE_URL) {
+						loadRemoteCloneInfo();
+					}
 				}, faultHandler);
 				ClientFactory.configurationClient.updateConfigurationItem(responder, configurationItem, value);
 			}
 			
-			private function remoteCloneUrlTestClickHandler(event:MouseEvent):void {
-				ClientFactory.configurationClient.testRemoteCloneUrl(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
-					AlertUtil.showMessage("Ok");
+			private function loadRemoteCloneInfo():void {
+				remoteCloneValidityLabel.text = Message.get("global.loading_short");
+				
+				ClientFactory.configurationClient.isRemoteCloneValid(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					var valid:Boolean = Boolean(event.result);
+					remoteCloneValidityLabel.text = valid ? Message.get("global.ok") : Message.get("configuration.remote_clone.not_valid");
 				}, function(event:FaultEvent, token:Object = null):void {
-					AlertUtil.showError("configuration.remote_clone.test.error", [event.fault.message]);
+					AlertUtil.showError("configuration.remote_clone.error_verifying_validity", [event.fault.message]);
 				}));
 			}
 			
@@ -188,9 +196,9 @@
 						
 						<!-- remote clone url -->
 						<s:FormItem label="{Message.get('configuration.remote_clone.url')}" width="100%">
-							<s:HGroup width="100%">
+							<s:HGroup width="100%" verticalAlign="middle">
 								<s:TextInput id="remoteCloneUrlTextInput" width="100%" />
-								<s:Button id="remoteCloneUrlTestButton" label="{Message.get('configuration.remote_clone.test')}" />
+								<s:Label id="remoteCloneValidityLabel" width="100" />
 							</s:HGroup>
 						</s:FormItem>
 						

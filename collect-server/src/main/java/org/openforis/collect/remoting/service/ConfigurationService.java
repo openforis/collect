@@ -14,6 +14,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.openforis.collect.Collect;
 import org.openforis.collect.CollectInfo;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.manager.ConfigurationManager;
@@ -22,6 +23,7 @@ import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.openforis.collect.model.proxy.ConfigurationProxy;
+import org.openforis.commons.versioning.Version;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -81,7 +83,7 @@ public class ConfigurationService {
 		configurationManager.updateConfigurationItem(item, value);
 	}
 	
-	public void testRemoteCloneUrl() {
+	public CollectInfo loadRemoteCloneInfo() {
 		String remoteCloneUrl = configurationManager.getConfiguration().get(ConfigurationItem.REMOTE_CLONE_URL);
 		String remoteInfoUrl = remoteCloneUrl + "/info.json";
 		try {
@@ -93,15 +95,22 @@ public class ConfigurationService {
 			HttpResponse response = httpClient.execute(request);
 			HttpEntity entity = response.getEntity();
 
-			if (entity == null) {
-				throw new IllegalStateException("Invalid response");
-			} else {
+			if (entity != null) {
 			    InputStream is = entity.getContent();
 			    CollectInfo info = extractCollectInfo(is);
+			    return info;
+			} else {
+				LOG.error("Error getting remote Collect version information: Invalid response");
 			}
 		} catch (Exception e) {
-			LOG.error(e);
+			LOG.error("Error getting remote Collect version information: " + e.getMessage());
 		}
+		return null;
+	}
+	
+	public boolean isRemoteCloneValid() {
+		CollectInfo remoteCloneInfo = loadRemoteCloneInfo();
+		return remoteCloneInfo != null && Collect.VERSION.compareTo(new Version(remoteCloneInfo.getVersion())) >= 0;
 	}
 	
 	private CollectInfo extractCollectInfo(InputStream is) throws IOException {
