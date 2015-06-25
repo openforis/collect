@@ -18,7 +18,7 @@ import javax.xml.validation.Validator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.CollectInfo;
+import org.openforis.collect.Collect;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult.Flag;
@@ -524,7 +524,7 @@ public class SurveyValidator {
 	}
 	
 	public void validateAgainstSchema(InputStream is) throws SurveyValidationException {
-		validateAgainstSchema(is, CollectInfo.getInstance().getVersion());
+		validateAgainstSchema(is, Collect.VERSION);
 	}
 	
 	public void validateAgainstSchema(InputStream is, Version version) throws SurveyValidationException {
