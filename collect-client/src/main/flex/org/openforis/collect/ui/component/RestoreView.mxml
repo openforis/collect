@@ -32,8 +32,9 @@
 				_presenter.init();
 			}
 			
-			protected function surveyLabelFunction(survey:SurveySummary):String {
-				return survey.name;
+			protected function surveyLabelFunction(survey:Object):String {
+				var label:String = survey is SurveySummary ? survey.name: "--- NEW ---";
+				return label;
 			}
 		]]>
 	</fx:Script>

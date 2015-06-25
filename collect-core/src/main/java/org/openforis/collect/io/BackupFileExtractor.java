@@ -1,6 +1,7 @@
 package org.openforis.collect.io;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -32,6 +33,16 @@ public class BackupFileExtractor {
 	
 	public File extractInfoFile() {
 		return extract(SurveyBackupJob.INFO_FILE_NAME);
+	}
+	
+	public SurveyBackupInfo extractInfo() {
+		try {
+			File infoFile = extractInfoFile();
+			SurveyBackupInfo info = SurveyBackupInfo.parse(new FileInputStream(infoFile));
+			return info;
+		} catch (Exception e) {
+			throw new RuntimeException("Error extracting info file from archive", e);
+		}
 	}
 	
 	public File extractIdmlFile() {

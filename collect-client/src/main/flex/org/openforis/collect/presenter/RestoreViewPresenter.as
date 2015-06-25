@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
+	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -111,7 +112,7 @@ package org.openforis.collect.presenter {
 				return;
 			}
 			var message:String;
-			if (selectedSurveyInfo.updatedRecordsSinceBackup > 0) {
+			if (selectedSurveyInfo != null && selectedSurveyInfo.updatedRecordsSinceBackup > 0) {
 				message = "restore.confirm.not_backed_up_records";
 			} else {
 				message = "restore.confirm.message";
@@ -287,9 +288,7 @@ package org.openforis.collect.presenter {
 		private function startUpload():void {
 			updateViewForUploading();
 			
-			var surveyName:String = getSelectedSurveyName();
-
-			var restoreUrl:String = ApplicationConstants.getSurveyDataRestoreUrl(surveyName);;
+			var restoreUrl:String = ApplicationConstants.getSurveyDataRestoreUrl();;
 
 			var request:URLRequest = new URLRequest(restoreUrl);
 			request.method = URLRequestMethod.POST;
@@ -297,8 +296,10 @@ package org.openforis.collect.presenter {
 			//request paramters
 			request.data = new URLVariables();
 			request.data.name = _fileReference.name;
-			request.data.surveyName = getSelectedSurveyName();
-			
+			var surveyName:String = getSelectedSurveyName();
+			if (surveyName != null) {
+				request.data.surveyName = surveyName;
+			}
 			_fileReference.upload(request, "fileData");
 		}
 		
@@ -307,7 +308,9 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initSurveyDropDown():void {
-			var surveys:IList = Application.surveySummaries;
+			var surveys:IList = new ArrayList(Application.surveySummaries.toArray());
+			surveys.addItemAt({newSurvey: true, name: null, label: "--- NEW ---"}, 0);
+			
 			var dropDownList:DropDownList = view.surveyDropDown;
 			dropDownList.dataProvider = surveys;
 			dropDownList.callLater(function():void {
