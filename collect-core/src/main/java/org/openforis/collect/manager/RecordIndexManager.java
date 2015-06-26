@@ -84,18 +84,9 @@ public class RecordIndexManager extends BaseStorageManager {
 	public synchronized boolean init() throws RecordIndexException {
 		unlock();
 		initStorageDirectory(ConfigurationItem.RECORD_INDEX_PATH);
-		if ( storageDirectory != null ) {
-			if ( LOG.isInfoEnabled() ) {
-				LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());
-			}
-			initIndexDirectory();
-			cancelled = false;
-			initialized = true;
-		} else {
-			LOG.warn("Record index manager not inited correctly");
-			indexDirectory = null;
-			initialized = false;
-		}
+		initIndexDirectory();
+		cancelled = false;
+		initialized = true;
 		return initialized;
 	}
 	

@@ -2,7 +2,7 @@ package org.openforis.collect.event;
 
 import java.util.Date;
 
-public class IntegerAttributeUpdatedEvent extends NumericAttributeUpdatedEvent<Integer> {
+public class IntegerAttributeUpdatedEvent extends NumberAttributeUpdatedEvent<Integer> {
 
 	public IntegerAttributeUpdatedEvent(Integer recordId, int definitionId,
 			Integer parentEntityId, int nodeId, Integer value, Integer unitId, Date timestamp,

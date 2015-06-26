@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public abstract class BaseStorageManager implements Serializable {
 
+	private static Log LOG = LogFactory.getLog(BaseStorageManager.class);
+	
 	private static final long serialVersionUID = 1L;
 
 	private static final String DEFAULT_BASE_DATA_SUBDIR = "data";
@@ -97,6 +101,10 @@ public abstract class BaseStorageManager implements Serializable {
 			storageDirectory = new File(customStoragePath);
 		}
 		storageDirectory.mkdirs();
+		
+		if ( LOG.isInfoEnabled() ) {
+			LOG.info(String.format("Using %s directory: %s", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
+		}
 	}
 
 	protected File getDefaultStorageRootDirectory() {

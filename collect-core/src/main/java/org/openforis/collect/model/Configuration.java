@@ -12,15 +12,17 @@ import org.apache.commons.lang3.StringUtils;
 public class Configuration implements Cloneable {
 
 	public enum ConfigurationItem {
-		  RECORD_FILE_UPLOAD_PATH("upload_path")
-		, RECORD_INDEX_PATH("index_path")
-		, BACKUP_STORAGE_PATH("backup_path")
-		, RESTORED_BACKUP_STORAGE_PATH("restored_backup_path")
-		, ALLOWED_RESTORE_KEY("allowed_restore_key")
-		, REMOTE_CLONE_URL("remote_clone")
-		, REMOTE_RESTORE_KEY("remote_clone_restore_key")
+		  RECORD_FILE_UPLOAD_PATH("upload_path", "Record file upload path")
+		, RECORD_INDEX_PATH("index_path", "Record index path")
+		, BACKUP_STORAGE_PATH("backup_path", "Data backup storage path")
+		, LOCAL_RDB_PATH("local_rdb_path", "Local RDB path")
+		, RESTORED_BACKUP_STORAGE_PATH("restored_backup_path", "Restored backup files path")
+		, ALLOWED_RESTORE_KEY("allowed_restore_key", "Allowed restore key")
+		, REMOTE_CLONE_URL("remote_clone", "Remote Collect clone address")
+		, REMOTE_RESTORE_KEY("remote_clone_restore_key", "Remote Collect clone allowed key")
 		;
 		private String key;
+		private String label;
 		
 		public static ConfigurationItem fromKey(String key) {
 			ConfigurationItem[] values = values();
@@ -32,12 +34,17 @@ public class Configuration implements Cloneable {
 			throw new IllegalArgumentException("Invalid Configuration Key specified: " + key);
 		}
 		
-		ConfigurationItem(String key) {
+		ConfigurationItem(String key, String label) {
 			this.key = key;
+			this.label = label;
 		}
 		
 		public String getKey() {
 			return key;
+		}
+		
+		public String getLabel() {
+			return label;
 		}
 	}
 	
