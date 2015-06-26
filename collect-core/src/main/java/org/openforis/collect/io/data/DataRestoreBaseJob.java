@@ -105,6 +105,7 @@ public abstract class DataRestoreBaseJob extends Job {
 		super.onTaskCompleted(task);
 		if (task instanceof SurveyRestoreJob) {
 			publishedSurvey = ((SurveyRestoreJob) task).getSurvey();
+			packagedSurvey = publishedSurvey;
 		} else if ( task instanceof IdmlUnmarshallTask ) {
 			CollectSurvey survey = ((IdmlUnmarshallTask) task).getSurvey();
 			if ( survey == null ) {

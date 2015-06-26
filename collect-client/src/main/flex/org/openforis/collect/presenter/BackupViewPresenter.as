@@ -20,6 +20,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.concurrency.CollectJobStatusPopUp;
 	import org.openforis.collect.event.BackupEvent;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 	import org.openforis.collect.model.proxy.ConfigurationProxy;
@@ -32,7 +33,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.concurrency.proxy.JobProxy$Status;
 	
 	import spark.components.DropDownList;
-	import spark.events.IndexChangeEvent;
 	
 	/**
 	 * 
@@ -83,6 +83,11 @@ package org.openforis.collect.presenter {
 			view.cancelExportButton.addEventListener(MouseEvent.CLICK, cancelExportButtonClickHandler);
 			view.downloadButton.addEventListener(MouseEvent.CLICK, downloadLastBackupButtonClickHandler);
 			view.backButton.addEventListener(MouseEvent.CLICK, backButtonClickHandler);
+		}
+		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
+			eventDispatcher.addEventListener(UIEvent.SURVEYS_UPDATED, surveysUpdatedHandler);
 		}
 		
 		protected function backButtonClickHandler(event:MouseEvent):void {
@@ -254,15 +259,20 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initSurveyDropDown():void {
-			var surveys:IList = Application.surveySummaries;
 			var dropDownList:DropDownList = view.surveyDropDown;
-			dropDownList.dataProvider = surveys;
+			
 			dropDownList.callLater(function():void {
 				dropDownList.selectedIndex = 0;
 			});
 			dropDownList.addEventListener(FlexEvent.VALUE_COMMIT, function(event:Event):void {
 				updateSelectedSurveyInfo();
 			});
+		}
+		
+		private function refreshSurveyDropDown():void {
+			var surveys:IList = Application.surveySummaries;
+			var dropDownList:DropDownList = view.surveyDropDown;
+			dropDownList.dataProvider = surveys;
 		}
 		
 		private function updateSelectedSurveyInfo():void {
@@ -306,5 +316,8 @@ package org.openforis.collect.presenter {
 			}));
 		}
 		
+		private function surveysUpdatedHandler(event:UIEvent):void {
+			refreshSurveyDropDown();
+		}
 	}
 }

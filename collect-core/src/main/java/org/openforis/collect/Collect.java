@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.poi.util.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.openforis.commons.versioning.Version;
 
 /**

@@ -13,6 +13,8 @@ package org.openforis.collect.event {
 		public static const SHOW_SURVEY_SELECTION:String = "showSurveySelection";
 		public static const SHOW_ROOT_ENTITY_SELECTION:String = "showRootEntitySelection";
 		public static const SURVEY_SELECTED:String = "surveySelected";
+		public static const SURVEYS_UPDATED:String = "surveysUpdated";
+		public static const RELOAD_SURVEYS:String = "reloadSurveys";
 		public static const ROOT_ENTITY_SELECTED:String = "rootEntitySelected";
 		public static const BACK_TO_LIST:String = "backToList";
 		public static const SHOW_ERROR_PAGE:String = "showErrorPage";
