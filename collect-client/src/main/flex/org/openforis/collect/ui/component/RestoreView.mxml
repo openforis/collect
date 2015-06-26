@@ -33,7 +33,10 @@
 			}
 			
 			protected function surveyLabelFunction(survey:Object):String {
-				var label:String = survey is SurveySummary ? survey.name: "--- NEW ---";
+				var label:String = 
+					survey is SurveySummary ? survey.name : 
+					survey.hasOwnProperty("label") ? survey["label"] : 
+					survey.toString();
 				return label;
 			}
 		]]>

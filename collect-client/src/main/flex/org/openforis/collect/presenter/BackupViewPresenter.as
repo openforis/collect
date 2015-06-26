@@ -259,6 +259,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initSurveyDropDown():void {
+			refreshSurveyDropDown();
+			
 			var dropDownList:DropDownList = view.surveyDropDown;
 			
 			dropDownList.callLater(function():void {
