@@ -14,6 +14,7 @@ import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.validation.Validator;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
 import org.openforis.idm.model.expression.ExpressionFactory;
 
@@ -38,18 +39,23 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	
 	private transient ExpressionFactory expressionFactory;
 	private transient ExpressionEvaluator expressionEvaluator;
-	private transient CollectValidator validator;
+	private transient Validator validator;
 	private transient ExternalCodeListProvider externalCodeListProvider;
 	private transient CodeListService codeListService;
 
 	public CollectSurveyContext() {
 		this(new ExpressionFactory(), new CollectValidator());
 	}
+
+	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator) {
+		this(expressionFactory, validator, (CodeListService) null);
+	}
 	
-	public CollectSurveyContext(ExpressionFactory expressionFactory, CollectValidator validator) {
+	public CollectSurveyContext(ExpressionFactory expressionFactory, Validator validator, CodeListService codeListService) {
 		this.expressionFactory = expressionFactory;
-		this.expressionEvaluator = new ExpressionEvaluator(expressionFactory);
 		this.validator = validator;
+		this.codeListService = codeListService;
+		this.expressionEvaluator = new ExpressionEvaluator(expressionFactory);
 	}
 	
 	@Override
@@ -72,7 +78,7 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 	}
 	
 	@Override
-	public CollectValidator getValidator() {
+	public Validator getValidator() {
 		return validator;
 	}
 

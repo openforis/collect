@@ -1,5 +1,7 @@
 package org.openforis.collect.manager.validation;
 
+import static org.openforis.collect.metamodel.ui.UIOptions.Layout.TABLE;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,6 +24,8 @@ import org.openforis.collect.Collect;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult.Flag;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.versioning.Version;
@@ -181,28 +185,39 @@ public class SurveyValidator {
 	 * @return
 	 */
 	protected List<SurveyValidationResult> validateEntities(CollectSurvey survey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		final List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
-		Stack<EntityDefinition> entitiesStack = new Stack<EntityDefinition>();
-		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
-		entitiesStack.addAll(rootEntities);
-		while ( ! entitiesStack.isEmpty() ) {
-			EntityDefinition entity = entitiesStack.pop();
-			List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
-			if ( childDefinitions.size() == 0 ) {
-				SurveyValidationResult validationResult = new SurveyValidationResult(entity.getPath(), "survey.validation.error.empty_entity");
-				results.add(validationResult);
-			} else {
-				for (NodeDefinition childDefn : childDefinitions) {
-					if ( childDefn instanceof EntityDefinition ) {
-						entitiesStack.push((EntityDefinition) childDefn);
-					}
+		schema.traverse(new NodeDefinitionVisitor() {
+			@Override
+			public void visit(NodeDefinition def) {
+				if (def instanceof EntityDefinition) {
+					EntityDefinition entity = (EntityDefinition) def;
+					validateEntity(results, entity);
 				}
 			}
-		}
+		});
 		return results;
 	}
 
+	protected void validateEntity(List<SurveyValidationResult> results, EntityDefinition entity) {
+		List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
+		if ( childDefinitions.size() == 0 ) {
+			//empty entity
+			results.add(new SurveyValidationResult(entity.getPath(), "survey.validation.error.empty_entity"));
+		}
+		if (entity.isMultiple()) {
+			UIOptions uiOptions = ((CollectSurvey) entity.getSurvey()).getUIOptions();
+			EntityDefinition parentEntity = entity.getParentEntityDefinition();
+			if (parentEntity != null && parentEntity.isMultiple()) {
+				Layout layout = uiOptions.getLayout(entity);
+				Layout parentLayout = uiOptions.getLayout(parentEntity);
+				if (TABLE == layout && TABLE == parentLayout) {
+					results.add(new SurveyValidationResult(entity.getPath(), "survey.validation.error.nested_tables"));
+				}
+			}
+		}
+	}
+	
 	protected List<SurveyValidationResult> validateKeyAttributes(CollectSurvey survey) {
 		final List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
@@ -524,7 +539,7 @@ public class SurveyValidator {
 	}
 	
 	public void validateAgainstSchema(InputStream is) throws SurveyValidationException {
-		validateAgainstSchema(is, Collect.getVersion());
+		validateAgainstSchema(is, Collect.VERSION);
 	}
 	
 	public void validateAgainstSchema(InputStream is, Version version) throws SurveyValidationException {

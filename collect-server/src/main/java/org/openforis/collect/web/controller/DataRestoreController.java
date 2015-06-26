@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
@@ -47,10 +48,10 @@ public class DataRestoreController extends BasicController {
 	@Autowired
 	private CollectJobManager jobManager;
 	
-	@RequestMapping(value = "/surveys/{surveyName}/data/restore.json", method = RequestMethod.POST)
-	public @ResponseBody JobStatusResponse restoreData(UploadItem uploadItem, @PathVariable String surveyName) throws IOException {
+	@RequestMapping(value = "/surveys/data/restore.json", method = RequestMethod.POST)
+	public @ResponseBody JobStatusResponse restoreData(UploadItem uploadItem, @RequestParam(required=false) String surveyName) throws IOException {
 		try {
-			DataRestoreJob job = startRestoreJob(uploadItem, surveyName);
+			DataRestoreJob job = startRestoreJob(uploadItem, surveyName == null, surveyName);
 			return createResponse(job);
 		} catch (Exception e) {
 			JobStatusResponse response = new JobStatusResponse();
@@ -66,7 +67,7 @@ public class DataRestoreController extends BasicController {
 		String allowedRestoreKey = configurationManager.getConfiguration().get(ConfigurationItem.ALLOWED_RESTORE_KEY);
 		if (StringUtils.isBlank(allowedRestoreKey) || allowedRestoreKey.equals(restoreKey)) {
 			try {
-				DataRestoreJob job = startRestoreJob(uploadItem, surveyName);
+				DataRestoreJob job = startRestoreJob(uploadItem, false, surveyName);
 				response.setJobId(job.getId().toString());
 			} catch (Exception e) {
 				response.setErrorStatus();
@@ -127,35 +128,67 @@ public class DataRestoreController extends BasicController {
 		response.setErrorMessage(job.getErrorMessage());
 	}
 	
-	private DataRestoreJob startRestoreJob(UploadItem uploadItem, String expectedSurveyName) throws IOException,
+	private DataRestoreJob startRestoreJob(UploadItem uploadItem, boolean newSurvey, String expectedSurveyName) throws IOException,
 	FileNotFoundException, ZipException {
 		File tempFile = copyContentToFile(uploadItem);
+		SurveyBackupInfo info = extractInfo(tempFile);
 		
-		String surveyUri = extractSurveyUri(tempFile);
-		CollectSurvey survey = surveyManager.getByUri(surveyUri);
-		checkValidSurvey(expectedSurveyName, surveyUri);
+		CollectSurvey publishedSurvey = findPublishedSurvey(info);
+		if (newSurvey) {
+			checkPackagedNewSurveyValidity(info);
+		} else {
+			checkPackagedSurveyValidity(info, expectedSurveyName);
+		}
 		
 		DataRestoreJob job = jobManager.createJob(DataRestoreJob.class);
 		job.setStoreRestoredFile(true);
-		job.setPublishedSurvey(survey);
+		job.setPublishedSurvey(publishedSurvey);
 		job.setFile(tempFile);
 		job.setOverwriteAll(true);
 		job.setRestoreUploadedFiles(true);
 		
-		String lockId = surveyUri;
+		String lockId = extractSurveyUri(tempFile);
 		jobManager.start(job, lockId);
 		
 		return job;
 	}
 
-	private void checkValidSurvey(String surveyName, String surveyUri) {
-		CollectSurvey expectedSurvey = surveyManager.get(surveyName);
-		String expectedSurveyUri = expectedSurvey.getUri();
-		if (! surveyUri.equals(expectedSurveyUri)) {
-			throw new IllegalArgumentException("The backup file is not related to the specified survey");
+	private void checkPackagedSurveyValidity(SurveyBackupInfo info,
+			String expectedSurveyName) throws ZipException, FileNotFoundException, IOException {
+		CollectSurvey publishedSurvey = findPublishedSurvey(info);
+		if (publishedSurvey == null) {
+			throw new IllegalArgumentException("The backup file is not related to the published survey");
+		} else {
+			String publishedSurveyUri = publishedSurvey.getUri();
+			String packagedSurveyUri = info.getSurveyUri();
+			if (! packagedSurveyUri.equals(publishedSurveyUri)) {
+				throw new IllegalArgumentException("The backup file is not related to the specified survey");
+			}
 		}
 	}
-	
+
+	private CollectSurvey findPublishedSurvey(SurveyBackupInfo info) throws ZipException, IOException {
+		CollectSurvey survey = surveyManager.get(info.getSurveyName());
+		if (survey == null) {
+			survey = surveyManager.getByUri(info.getSurveyUri());
+		}
+		return survey;
+	}
+
+	private SurveyBackupInfo extractInfo(File tempFile) throws ZipException,
+			IOException {
+		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(tempFile);
+		SurveyBackupInfo info = backupFileExtractor.extractInfo();
+		return info;
+	}
+
+	private void checkPackagedNewSurveyValidity(SurveyBackupInfo info) throws ZipException, IOException {
+		CollectSurvey publishedSurvey = findPublishedSurvey(info);
+		if (publishedSurvey != null) {
+			throw new IllegalArgumentException("The backup file is associated to a survey with name " + publishedSurvey.getName());
+		}
+	}
+
 	private String extractSurveyUri(File tempFile) throws ZipException,
 			IOException, FileNotFoundException {
 		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(tempFile);
@@ -169,7 +202,9 @@ public class DataRestoreController extends BasicController {
 			FileNotFoundException {
 		CommonsMultipartFile fileData = uploadItem.getFileData();
 		InputStream is = fileData.getInputStream();
-		File tempFile = File.createTempFile("collect-upload-item", ".temp");
+		String fileName = uploadItem.getName();
+		String extension = FilenameUtils.getExtension(fileName);
+		File tempFile = File.createTempFile("collect-upload-item", "." + extension);
 		FileOutputStream os = new FileOutputStream(tempFile);
 		IOUtils.copy(is, os);
 		return tempFile;

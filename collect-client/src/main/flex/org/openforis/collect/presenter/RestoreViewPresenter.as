@@ -15,6 +15,7 @@ package org.openforis.collect.presenter {
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
 	
+	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
@@ -24,6 +25,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Proxy;
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.BackupEvent;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.ui.component.RestoreView;
 	import org.openforis.collect.util.AlertUtil;
@@ -49,7 +51,6 @@ package org.openforis.collect.presenter {
 		protected var _fileReference:FileReference;
 		protected var _fileFilter:FileFilter;
 		private var _cancelResponder:IResponder;
-		private var _restoreResponder:IResponder;
 		private var _getStateResponder:IResponder;
 		private var _progressTimer:Timer;
 		private var _type:String;
@@ -60,7 +61,6 @@ package org.openforis.collect.presenter {
 		
 		public function RestoreViewPresenter(view:RestoreView) {
 			super(view);
-			this._restoreResponder = new AsyncResponder(restoreResultHandler, faultHandler);
 			this._cancelResponder = new AsyncResponder(cancelResultHandler, faultHandler);
 			this._getStateResponder = new AsyncResponder(getStateResultHandler, faultHandler);
 			
@@ -94,6 +94,7 @@ package org.openforis.collect.presenter {
 		override protected function initBroadcastEventListeners():void {
 			super.initBroadcastEventListeners();
 			eventDispatcher.addEventListener(BackupEvent.BACKUP_COMPLETE, backupCompleteHandler);
+			eventDispatcher.addEventListener(UIEvent.SURVEYS_UPDATED, surveysUpdatedHandler);
 		}
 		
 		protected function backupCompleteHandler(event:BackupEvent):void{
@@ -111,7 +112,7 @@ package org.openforis.collect.presenter {
 				return;
 			}
 			var message:String;
-			if (selectedSurveyInfo.updatedRecordsSinceBackup > 0) {
+			if (selectedSurveyInfo != null && selectedSurveyInfo.updatedRecordsSinceBackup > 0) {
 				message = "restore.confirm.not_backed_up_records";
 			} else {
 				message = "restore.confirm.message";
@@ -212,14 +213,17 @@ package org.openforis.collect.presenter {
 					case JobProxy$Status.COMPLETED:
 						view.currentState = RestoreView.STATE_COMPLETE;
 						stopProgressTimer();
+						eventDispatcher.dispatchEvent(new UIEvent(UIEvent.RELOAD_SURVEYS));
 						break;
 					case JobProxy$Status.FAILED:
 						AlertUtil.showError("restore.error", [job.errorMessage]);
 						resetView();
+						eventDispatcher.dispatchEvent(new UIEvent(UIEvent.RELOAD_SURVEYS));
 						break;
 					case JobProxy$Status.ABORTED:
 						AlertUtil.showError("restore.cancelled");
 						resetView();
+						eventDispatcher.dispatchEvent(new UIEvent(UIEvent.RELOAD_SURVEYS));
 						break;
 					default:
 						//process starting in a while...
@@ -287,9 +291,7 @@ package org.openforis.collect.presenter {
 		private function startUpload():void {
 			updateViewForUploading();
 			
-			var surveyName:String = getSelectedSurveyName();
-
-			var restoreUrl:String = ApplicationConstants.getSurveyDataRestoreUrl(surveyName);;
+			var restoreUrl:String = ApplicationConstants.getSurveyDataRestoreUrl();;
 
 			var request:URLRequest = new URLRequest(restoreUrl);
 			request.method = URLRequestMethod.POST;
@@ -297,8 +299,10 @@ package org.openforis.collect.presenter {
 			//request paramters
 			request.data = new URLVariables();
 			request.data.name = _fileReference.name;
-			request.data.surveyName = getSelectedSurveyName();
-			
+			var surveyName:String = getSelectedSurveyName();
+			if (surveyName != null) {
+				request.data.surveyName = surveyName;
+			}
 			_fileReference.upload(request, "fileData");
 		}
 		
@@ -307,9 +311,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initSurveyDropDown():void {
-			var surveys:IList = Application.surveySummaries;
+			refreshSurveyDropDown();
+			
 			var dropDownList:DropDownList = view.surveyDropDown;
-			dropDownList.dataProvider = surveys;
+			
 			dropDownList.callLater(function():void {
 				dropDownList.selectedIndex = 0;
 				updateSelectedSurveyInfo();
@@ -317,6 +322,14 @@ package org.openforis.collect.presenter {
 			dropDownList.addEventListener(IndexChangeEvent.CHANGE, function(event:IndexChangeEvent):void {
 				updateSelectedSurveyInfo();
 			});
+		}
+		
+		private function refreshSurveyDropDown():void {
+			var surveys:IList = new ArrayList(Application.surveySummaries.toArray());
+			surveys.addItemAt({newSurvey: true, name: null, label: Message.get("restore.new_survey")}, 0);
+			
+			var dropDownList:DropDownList = view.surveyDropDown;
+			dropDownList.dataProvider = surveys;
 		}
 		
 		private function getSelectedSurveyName():String {
@@ -341,6 +354,10 @@ package org.openforis.collect.presenter {
 				
 				ClientFactory.dataExportClient.getLastBackupInfo(responder, surveyName);
 			}
+		}
+		
+		private function surveysUpdatedHandler(event:UIEvent):void {
+			refreshSurveyDropDown();
 		}
 		
 	}

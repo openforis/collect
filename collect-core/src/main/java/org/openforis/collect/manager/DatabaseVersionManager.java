@@ -29,7 +29,7 @@ public class DatabaseVersionManager {
 		if ( info != null && StringUtils.isNotBlank(info.getVersion()) ) {
 			schemaVersion = new Version(info.getVersion());
 		}
-		Version appVersion = Collect.getVersion();
+		Version appVersion = Collect.VERSION;
 		if ( ! isVersionCompatible(appVersion, schemaVersion) ) {
 			throw new DatabaseVersionNotCompatibleException("Database version (" + 
 					(schemaVersion != null ? schemaVersion: "not specified") + 

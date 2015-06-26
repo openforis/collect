@@ -30,26 +30,32 @@ public class CollectUserDetailsService implements UserDetailsService {
 	@Transactional
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userManager.loadByUserName(username, true);
-		
 		if (user == null) {
 			throw new UsernameNotFoundException(username);
 		} else {
-			Collection<GrantedAuthority> authorities = getAuthorities(user);
-			boolean accountNonLocked = true;
-			boolean credentialsNonExpired = true;
-			boolean accountNonExpired = true;
-			String password = user.getPassword();
-			boolean enabled = true;
-			
-			org.springframework.security.core.userdetails.User userDetails = 
-					new org.springframework.security.core.userdetails.User(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
-			return userDetails;
+			return createUserDetails(user);
 		}
 	}
 
+	private UserDetails createUserDetails(User user) {
+		String username = user.getName();
+		boolean accountNonLocked = true;
+		boolean credentialsNonExpired = true;
+		boolean accountNonExpired = true;
+		String password = user.getPassword();
+		boolean enabled = true;
+		Collection<GrantedAuthority> authorities = getAuthorities(user);
+		
+		org.springframework.security.core.userdetails.User userDetails = 
+				new org.springframework.security.core.userdetails.User(username, password, enabled, 
+						accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+		return userDetails;
+	}
+
 	private Collection<GrantedAuthority> getAuthorities(User user) {
-		List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>(2);
-		for (UserRole role : user.getRoles()) {
+		List<UserRole> roles = user.getRoles();
+		List<GrantedAuthority> authList = new ArrayList<GrantedAuthority>(roles.size());
+		for (UserRole role : roles) {
 			authList.add(new SimpleGrantedAuthority(role.getCode()));
 		}
 		return authList;

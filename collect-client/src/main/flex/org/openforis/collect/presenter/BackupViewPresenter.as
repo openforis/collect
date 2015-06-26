@@ -12,6 +12,7 @@ package org.openforis.collect.presenter {
 	import mx.events.FlexEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
@@ -19,6 +20,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.concurrency.CollectJobStatusPopUp;
 	import org.openforis.collect.event.BackupEvent;
+	import org.openforis.collect.event.UIEvent;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 	import org.openforis.collect.model.proxy.ConfigurationProxy;
@@ -31,7 +33,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.concurrency.proxy.JobProxy$Status;
 	
 	import spark.components.DropDownList;
-	import spark.events.IndexChangeEvent;
 	
 	/**
 	 * 
@@ -82,6 +83,11 @@ package org.openforis.collect.presenter {
 			view.cancelExportButton.addEventListener(MouseEvent.CLICK, cancelExportButtonClickHandler);
 			view.downloadButton.addEventListener(MouseEvent.CLICK, downloadLastBackupButtonClickHandler);
 			view.backButton.addEventListener(MouseEvent.CLICK, backButtonClickHandler);
+		}
+		
+		override protected function initBroadcastEventListeners():void {
+			super.initBroadcastEventListeners();
+			eventDispatcher.addEventListener(UIEvent.SURVEYS_UPDATED, surveysUpdatedHandler);
 		}
 		
 		protected function backButtonClickHandler(event:MouseEvent):void {
@@ -235,16 +241,15 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function initSendToRemoteCloneContainer():void {
-			view.sendToRemoteCloneButton.addEventListener(MouseEvent.CLICK, sendToRemoteUrlClickHandler);
-
 			ClientFactory.configurationClient.loadConfiguration(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
 				var conf:ConfigurationProxy = event.result as ConfigurationProxy;
 				if (org.openforis.collect.util.StringUtil.isNotBlank(conf.remoteCloneUrl)) {
 					view.sendToRemoteCloneContainer.visible = view.sendToRemoteCloneContainer.includeInLayout = true;
+					view.sendToRemoteCloneButton.addEventListener(MouseEvent.CLICK, sendToRemoteUrlClickHandler);
 					view.remoteCloneUrlTextInput.text = conf.remoteCloneUrl;
 					view.remoteCloneNotConfiguredLabel.visible = view.remoteCloneNotConfiguredLabel.includeInLayout = false;
 				}
-			}, faultHandler));			
+			}, faultHandler));
 		}
 		
 		protected function checkEnabledFields():void {
@@ -254,15 +259,22 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initSurveyDropDown():void {
-			var surveys:IList = Application.surveySummaries;
+			refreshSurveyDropDown();
+			
 			var dropDownList:DropDownList = view.surveyDropDown;
-			dropDownList.dataProvider = surveys;
+			
 			dropDownList.callLater(function():void {
 				dropDownList.selectedIndex = 0;
 			});
 			dropDownList.addEventListener(FlexEvent.VALUE_COMMIT, function(event:Event):void {
 				updateSelectedSurveyInfo();
 			});
+		}
+		
+		private function refreshSurveyDropDown():void {
+			var surveys:IList = Application.surveySummaries;
+			var dropDownList:DropDownList = view.surveyDropDown;
+			dropDownList.dataProvider = surveys;
 		}
 		
 		private function updateSelectedSurveyInfo():void {
@@ -289,14 +301,25 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function sendToRemoteUrlClickHandler(event:Event):void {
-			var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
-				var jobId:String = event.result as String;
-				var jobMonitor:JobMonitor = new JobMonitor(jobId);
-				CollectJobStatusPopUp.openPopUp();
-				jobMonitor.start();
-			}, faultHandler);
-			ClientFactory.dataExportClient.sendBackupToRemoteClone(responder, getSelectedSurveyName());
+			ClientFactory.configurationClient.isRemoteCloneValid(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+				if (! event.result) {
+					AlertUtil.showError(Message.get("backup.remote_clone.not_valid"));
+					return;
+				}
+				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					var jobId:String = event.result as String;
+					var jobMonitor:JobMonitor = new JobMonitor(jobId);
+					CollectJobStatusPopUp.openPopUp();
+					jobMonitor.start();
+				}, faultHandler);
+				ClientFactory.dataExportClient.sendBackupToRemoteClone(responder, getSelectedSurveyName());
+			}, function(event:FaultEvent, token:Object = null):void {
+				AlertUtil.showError(Message.get("configuration.remote_clone.error_verifying_validity", [event.fault.message]));
+			}));
 		}
 		
+		private function surveysUpdatedHandler(event:UIEvent):void {
+			refreshSurveyDropDown();
+		}
 	}
 }

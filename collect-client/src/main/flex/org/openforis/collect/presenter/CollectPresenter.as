@@ -135,6 +135,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(UIEvent.CLOSE_SPECIES_IMPORT_POPUP, closeSpeciesImportPopUpHandler);
 			eventDispatcher.addEventListener(UIEvent.TOGGLE_DETAIL_VIEW_SIZE, toggleDetailViewSizeHandler);
 			eventDispatcher.addEventListener(UIEvent.CHECK_VIEW_SIZE, checkViewSizeHandler);
+			eventDispatcher.addEventListener(UIEvent.RELOAD_SURVEYS, reloadSurveysHandler);
 			
 			//add uncaught error hanlder
 			view.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
@@ -484,7 +485,13 @@ package org.openforis.collect.presenter {
 			}
 			AlertUtil.showBlockingMessage("global.error.uncaught", error);
 		}
-
+	
+		private function reloadSurveysHandler(event:UIEvent):void {
+			_modelClient.getSurveySummaries(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+				Application.surveySummaries = event.result as IList;
+				eventDispatcher.dispatchEvent(new UIEvent(UIEvent.SURVEYS_UPDATED));
+			}, faultHandler));
+		}
 	}
 }
 

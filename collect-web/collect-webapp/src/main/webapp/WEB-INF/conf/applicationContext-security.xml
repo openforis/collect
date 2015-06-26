@@ -28,6 +28,7 @@
 		<intercept-url pattern="/error.htm" access="permitAll" />
 		<intercept-url pattern="/importSurvey.htm" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/index.htm" access="hasRole('ROLE_USER')" />
+		<intercept-url pattern="/info.json" access="permitAll" />
 		<intercept-url pattern="/keepSessionAlive.htm" access="permitAll" />
 		<intercept-url pattern="/login.htm" access="permitAll" />
 		<intercept-url pattern="/logout.htm" access="permitAll" />

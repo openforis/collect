@@ -36,7 +36,6 @@ package org.openforis.collect.presenter {
 	public class AbstractReferenceDataImportPresenter extends AbstractPresenter {
 		
 		private static const PROGRESS_UPDATE_DELAY:int = 2000;
-		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
 		private static const ALLOWED_IMPORT_FILE_EXTENSIONS:Array = new Array("*.csv", "*.xls", "*.xlsx");
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
 		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 3;

@@ -197,7 +197,7 @@
 		<!-- FOOTER -->
 		<div id="footer">
 			<img id="footerImg" alt="Loading..." />
-			<label>Application version: <%= org.openforis.collect.Collect.getVersion()%></label>
+			<label>Application version: <%= org.openforis.collect.Collect.VERSION %></label>
 		</div>
   	</div>
   </body>

@@ -42,7 +42,6 @@ package org.openforis.collect.presenter {
 		
 		private static const MAX_SUMMARIES_PER_PAGE:int = 20;
 		private static const LATIN_LANGUAGE_CODE:String = "lat";
-		private static const VALID_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
 		private static const FIXED_SUMMARY_COLUMNS_LENGTH:int = 4;
 		private static const VERANCULAR_NAMES_SEPARATOR:String = " / ";
 		
@@ -263,7 +262,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function checkValidTaxonomyName(name:String, newTaxonomy:Boolean):Boolean {
-			if ( VALID_NAME_REGEX.test(name) ) {
+			if ( ApplicationConstants.VALID_INTERNAL_NAME_REGEX.test(name) ) {
 				return checkDuplicateTaxonomyName(name, newTaxonomy);
 			} else {
 				AlertUtil.showMessage(messageKeys.INVALID_TAXONOMY_NAME);
