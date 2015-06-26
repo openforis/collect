@@ -68,7 +68,9 @@
 				allowedRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 				remoteCloneUrlTextInput.text = conf.remoteCloneUrl;
 				remoteCloneUrlTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
-				loadRemoteCloneInfo();
+				if (StringUtil.isNotBlank(conf.remoteCloneUrl)) {
+					loadRemoteCloneInfo();
+				}
 				remoteCloneRestoreKeyTextInput.text = conf.remoteCloneRestoreKey;
 				remoteCloneRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 			}
@@ -107,16 +109,18 @@
 				var textInput:TextInput = TextInput(event.target);
 				textInput.text = StringUtil.trim(textInput.text);
 				var configurationItem:Configuration$ConfigurationItem = textInputToConfigurationItem[textInput.id];
-				if (configurationItem == Configuration$ConfigurationItem.REMOTE_CLONE_URL) {
-					remoteCloneValidityLabel.text = Message.get("global.loading_short");
-				}
 				var value:String = textInput.text;
-				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
-					if (configurationItem == Configuration$ConfigurationItem.REMOTE_CLONE_URL) {
-						loadRemoteCloneInfo();
-					}
-				}, faultHandler);
-				ClientFactory.configurationClient.updateConfigurationItem(responder, configurationItem, value);
+				if (configurationItem == Configuration$ConfigurationItem.REMOTE_CLONE_URL) {
+					remoteCloneValidityLabel.text = StringUtil.isBlank(value) ? null : Message.get("global.loading_short");
+				}
+				ClientFactory.configurationClient.updateConfigurationItem(new AsyncResponder(
+					function(event:ResultEvent, token:Object = null):void {
+						if (configurationItem == Configuration$ConfigurationItem.REMOTE_CLONE_URL && StringUtil.isNotBlank(value)) {
+							loadRemoteCloneInfo();
+						}
+					}, faultHandler), 
+					configurationItem, value
+				);
 			}
 			
 			private function loadRemoteCloneInfo():void {
