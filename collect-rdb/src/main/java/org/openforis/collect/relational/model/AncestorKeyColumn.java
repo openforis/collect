@@ -6,7 +6,6 @@ package org.openforis.collect.relational.model;
 import java.sql.Types;
 
 import org.openforis.idm.metamodel.FieldDefinition;
-import org.openforis.idm.model.Node;
 import org.openforis.idm.path.Path;
 
 /**
@@ -59,9 +58,4 @@ public class AncestorKeyColumn extends DataColumn {
 		}
 	}
 	
-	@Override
-	public Object extractValue(Node<?> context) {
-		return super.extractValue(context);
-	}
-
 }

@@ -23,6 +23,4 @@ public interface Column<T> {
 
 	boolean isNullable();
 	
-	Object extractValue(T source);
-	
 }

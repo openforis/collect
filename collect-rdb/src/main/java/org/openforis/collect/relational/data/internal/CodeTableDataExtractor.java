@@ -1,20 +1,27 @@
-package org.openforis.collect.relational.data;
+package org.openforis.collect.relational.data.internal;
 
 import java.util.List;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.relational.data.DataExtractor;
+import org.openforis.collect.relational.data.Row;
 import org.openforis.collect.relational.model.CodeLabelColumn;
 import org.openforis.collect.relational.model.CodeListCodeColumn;
+import org.openforis.collect.relational.model.CodeListDescriptionColumn;
+import org.openforis.collect.relational.model.CodeParentKeyColumn;
 import org.openforis.collect.relational.model.CodePrimaryKeyColumn;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.CodeListService;
+import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 
 /**
  * 
- * @author ste
+ * @author S. Ricci
  *
  */
 //TODO do not extract all code list items in level with a single query
@@ -84,16 +91,50 @@ public class CodeTableDataExtractor extends DataExtractor {
 		return false;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Row extractRow(CodeListItem source) {
 		Row row = new Row(table);
 		List<Column<?>> columns = table.getColumns();
 		for (int i=0; i < columns.size(); i++) {
-			Column col = columns.get(i);
-			Object val = col.extractValue(source);
+			Column<?> col = columns.get(i);
+			Object val = extractValue(source, col);
 			row.setValue(i, val);
 		}
 		return row;
+	}
+
+	private Object extractValue(CodeListItem item, Column<?> col) {
+		if (col instanceof CodeLabelColumn) {
+			String langCode = ((CodeLabelColumn) col).getLanguageCode();
+			return item.getLabel(langCode);
+		} else if (col instanceof CodeListCodeColumn) {
+			return item.getCode();
+		} else if (col instanceof CodeListDescriptionColumn) {
+			String langCode = ((CodeListDescriptionColumn) col).getLanguageCode();
+			return item.getDescription(langCode);
+		} else if (col instanceof CodeParentKeyColumn) {
+			CodeList list = item.getCodeList();
+			if ( list.isExternal() ) {
+				throw new UnsupportedOperationException(String.format(
+						"External code list not supported (survey: %s, code list: %s)", 
+						list.getSurvey().getName(), list.getName()));
+			}
+			CodeListItem parent;
+			if (item instanceof PersistedCodeListItem) {
+				parent = getCodeListService(list).loadParentItem((PersistedCodeListItem) item);
+			} else {
+				parent = item.getParentItem();
+			}
+			return parent.getId();
+		} else if (col instanceof CodePrimaryKeyColumn) {
+			Integer id = item.getId();
+			if ( id == null ) {
+				throw new NullPointerException(String.format("Code list item id is null( survey: %s, code list: %s, item: %s)", 
+						item.getSurvey().getName(), item.getCodeList().getName(), item.getCode()));
+			}
+			return id;
+		} else {
+			throw new UnsupportedOperationException("Code List Table Column type not supported: " + col.getClass().getName());
+		}
 	}
 	
 	protected Row createDefaultCodeRow() {
@@ -115,6 +156,13 @@ public class CodeTableDataExtractor extends DataExtractor {
 			row.setValue(i, val);
 		}
 		return row;
+	}
+	
+	private CodeListService getCodeListService(CodeList list) {
+		Survey survey = list.getSurvey();
+		SurveyContext context = survey.getContext();
+		CodeListService codeListService = context.getCodeListService();
+		return codeListService;
 	}
 
 }

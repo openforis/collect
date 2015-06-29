@@ -18,7 +18,7 @@ public final class Row {
 	private Table<?> table;
 	private List<Object> values;
 
-	Row(Table<?> table) {
+	public Row(Table<?> table) {
 		this.table = table;
 		int cnt = table.getColumns().size();
 		this.values = Arrays.asList(new Object[cnt]);
@@ -32,7 +32,7 @@ public final class Row {
 		return Collections.unmodifiableList(values);
 	}
 	
-	void setValue(int i, Object o) {
+	public void setValue(int i, Object o) {
 		values.set(i, o);
 	}
 	

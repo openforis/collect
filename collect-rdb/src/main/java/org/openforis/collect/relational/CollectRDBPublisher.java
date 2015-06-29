@@ -88,7 +88,7 @@ public class CollectRDBPublisher {
 //			if ( LOG.isInfoEnabled() ) {
 //				LOG.info("Exporting record #" + (++i) + " id: " + summary.getId());
 //			}
-			CollectRecord record = recordManager.load(survey, summary.getId(), step);
+			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
 			databaseExporter.insertData(targetSchema, record);
 		}
 		try {

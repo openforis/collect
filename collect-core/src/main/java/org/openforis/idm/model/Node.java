@@ -66,7 +66,7 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 		return ancestors;
 	}
 	
-	public Entity getNearestAncestorMultipleEntity() {
+	public Entity getNearestMultipleEntityAncestor() {
 		Entity currentParent = getParent();
 		while ( currentParent != null && ! currentParent.getDefinition().isRoot() && ! currentParent.getDefinition().isMultiple() ) {
 			currentParent = currentParent.getParent();

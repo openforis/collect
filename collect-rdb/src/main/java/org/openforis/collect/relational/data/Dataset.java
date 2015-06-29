@@ -14,7 +14,7 @@ import java.util.List;
 public final class Dataset {
 	private List<Row> rows;
 	
-	Dataset() {
+	public Dataset() {
 		rows = new ArrayList<Row>();
 	}
 	
@@ -22,11 +22,11 @@ public final class Dataset {
 		return Collections.unmodifiableList(rows);
 	}
 	
-	void addRow(Row row) {
+	public void addRow(Row row) {
 		rows.add(row);
 	}
 	
-	void addRows(List<Row> rows) {
+	public void addRows(List<Row> rows) {
 		this.rows.addAll(rows);
 	}
 	

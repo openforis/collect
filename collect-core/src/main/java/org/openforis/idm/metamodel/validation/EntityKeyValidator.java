@@ -16,7 +16,7 @@ public class EntityKeyValidator implements ValidationRule<Attribute<?, ?>> {
 
 	@Override
 	public ValidationResultFlag evaluate(Attribute<?, ?> keyAttribute) {
-		Entity multipleEntity = keyAttribute.getNearestAncestorMultipleEntity();
+		Entity multipleEntity = keyAttribute.getNearestMultipleEntityAncestor();
 		
 		EntityDefinition multipleEntityDef = multipleEntity.getDefinition();
 		

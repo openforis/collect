@@ -37,10 +37,11 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-@Lazy(false)
+//@Lazy(false)
 public class CollectRDBGenerator implements EventListener {
 
-	private static Log LOG = LogFactory.getLog(CollectRDBGenerator.class);
+	private static final Log LOG = LogFactory.getLog(CollectRDBGenerator.class);
+	private static final String SQLITE_DRIVER_CLASS_NAME = "org.sqlite.JDBC";
 
 	@Autowired
 	private SurveyManager surveyManager;
@@ -58,6 +59,7 @@ public class CollectRDBGenerator implements EventListener {
 	@PostConstruct
 	public void init() {
 		initializeRelationalSchemas();
+		generateRDBs();
 	}
 
 	private void initializeRelationalSchemas() {
@@ -69,14 +71,23 @@ public class CollectRDBGenerator implements EventListener {
 			try {
 				RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, survey.getName());
 				surveyIdToRelationalSchema.put(survey.getId(), relationalSchema);
-				
-				for (Step step : Step.values()) {
-					if (! localRDBStorageManager.existsRDBFile(survey, step)) {
+			} catch(CollectRdbException e) {
+				LOG.error("Error generating relational schema for survey " + survey.getName(), e);
+			}
+		}
+	}
+	
+	private void generateRDBs() {
+		List<CollectSurvey> surveys = surveyManager.getAll();
+		for (CollectSurvey survey : surveys) {
+			for (Step step : Step.values()) {
+				if (! localRDBStorageManager.existsRDBFile(survey, step)) {
+					try {
 						generateRDB(survey, step);
+					} catch(CollectRdbException e) {
+						LOG.error("Error generating RDB for survey " + survey.getName(), e);
 					}
 				}
-			} catch(Exception e) {
-				LOG.error("Error generating relational schema for survey " + survey.getName(), e);
 			}
 		}
 	}
@@ -102,11 +113,11 @@ public class CollectRDBGenerator implements EventListener {
 			File rdbFile = localRDBStorageManager.getRDBFile(survey, step);
 			String pathToDbFile = rdbFile.getAbsolutePath();
 			String connectionUrl = "jdbc:sqlite:" + pathToDbFile;
-			Class.forName("org.sqlite.JDBC");
+			Class.forName(SQLITE_DRIVER_CLASS_NAME);
 			Connection c = DriverManager.getConnection(connectionUrl);
 			return c;
 		} catch (Exception e) {
-			throw new CollectRdbException(String.format("Error inserting records related to survey %s into RDB", survey.getName()), e);
+			throw new CollectRdbException(String.format("Error creating connection to RDB for survey %s", survey.getName()), e);
 		}
 	}
 
@@ -130,6 +141,5 @@ public class CollectRDBGenerator implements EventListener {
 	public void onEvents(List<? extends RecordEvent> events) {
 		
 	}
-	
 
 }

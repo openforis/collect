@@ -1,0 +1,84 @@
+package org.openforis.collect.relational.data.internal;
+
+import java.util.List;
+
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.relational.model.DataColumn;
+import org.openforis.collect.relational.model.DataTable;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Date;
+import org.openforis.idm.model.DateAttribute;
+import org.openforis.idm.model.Field;
+import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Time;
+import org.openforis.idm.model.TimeAttribute;
+
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
+public class DataTableDataColumnValueExtractor extends ColumnValueExtractor<DataTable, DataColumn> {
+
+	private static final Log LOG = LogFactory.getLog(DataTableDataColumnValueExtractor.class);
+	
+	public DataTableDataColumnValueExtractor(DataTable table, DataColumn column) {
+		super(table, column);
+	}
+	
+	@Override
+	public Object extractValue(Node<?> context) {
+		Node<?> valNode = extractValueNode(context);
+		Object val = extractNodeValue(valNode);
+		Integer colLength = column.getLength();
+		int valLength = val == null ? -1: val.toString().length();
+		if ( column.getTypeName().equals("varchar") && val != null && valLength > colLength) {
+			LOG.warn(String.format("Record: %d. Value of node %s (%s) has a length of %d characters that exceeds the maximum allowed (%d), so it has been cut", 
+					context.getRecord().getId(), valNode.getPath(), val, valLength, colLength));
+			val = ((String) val).substring(0, colLength);
+		}
+		return ObjectUtils.defaultIfNull(val, column.getDefaultValue());
+	}
+	
+	protected Node<?> extractValueNode(Node<?> context) {
+		List<Node<?>> vals = column.getRelativePath().evaluate(context);
+		if ( vals.size() > 1 ) {
+			throw new RuntimeException("Path "+ column.getRelativePath() +" returned more than one value");
+		}
+		if ( vals.isEmpty() ) {
+			return null;
+		} else {
+			return vals.get(0);
+		}
+	}
+	
+	private Object extractNodeValue(Node<?> valNode) {
+		if ( valNode == null ) {
+			return null;
+		}
+		try {
+			if ( valNode instanceof Field ) {
+				return ((Field<?>) valNode).getValue();
+			} else if ( valNode instanceof DateAttribute ) {
+				Date date = ((DateAttribute) valNode).getValue();
+				return date.toJavaDate();
+			} else if ( valNode instanceof TimeAttribute ) {
+				Time time = ((TimeAttribute) valNode).getValue();
+				return time.toXmlTime();
+			} else if ( valNode instanceof Attribute ) {
+				return ((Attribute<?,?>) valNode).getValue();
+			} else {
+				throw new RuntimeException("Unknown data node type "+valNode.getClass());
+			}
+		} catch ( Exception e) {
+			//ERRORS in data?
+			String messageFormat = "Error converting attribute value in record: %d - node: %s";
+			String message = String.format(messageFormat, valNode.getRecord().getId(), valNode.getPath());
+			LOG.error(message);
+			System.out.println(message);
+			return null;
+		}
+	}
+}

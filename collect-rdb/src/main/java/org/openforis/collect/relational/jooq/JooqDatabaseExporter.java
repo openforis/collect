@@ -14,10 +14,11 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
-import org.openforis.collect.relational.data.CodeTableDataExtractor;
+import org.openforis.collect.relational.DatabaseUpdater;
 import org.openforis.collect.relational.data.DataExtractor;
-import org.openforis.collect.relational.data.DataTableDataExtractor;
 import org.openforis.collect.relational.data.Row;
+import org.openforis.collect.relational.data.internal.CodeTableDataExtractor;
+import org.openforis.collect.relational.data.internal.DataTableDataExtractor;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
 import org.openforis.collect.relational.model.DataTable;
@@ -30,7 +31,7 @@ import org.openforis.collect.relational.model.Table;
  * @author S. Ricci
  *
  */
-public class JooqDatabaseExporter implements DatabaseExporter {
+public class JooqDatabaseExporter implements DatabaseUpdater {
 
 	private DSLContext dsl;
 	
@@ -66,6 +67,20 @@ public class JooqDatabaseExporter implements DatabaseExporter {
 		batchExecutor.flush();
 	}
 
+	@Override
+	public void updateData(RelationalSchema schema, CollectRecord record)
+			throws CollectRdbException {
+		deleteData(schema, record);
+		insertData(schema, record);
+	}
+	
+	@Override
+	public void deleteData(RelationalSchema schema, CollectRecord record)
+			throws CollectRdbException {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	private class BatchInsertExecutor {
 		
 		private static final int BATCH_MAX_SIZE = 10000;

@@ -14,13 +14,4 @@ public class CodePrimaryKeyColumn extends IdColumn<CodeListItem> implements Prim
 		super(name);
 	}
 
-	@Override
-	public Object extractValue(CodeListItem source) {
-		Integer id = source.getId();
-		if ( id == null ) {
-			throw new NullPointerException("Node id");
-		}
-		return id;
-	}
-	
 }
