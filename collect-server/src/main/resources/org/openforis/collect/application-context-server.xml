@@ -91,4 +91,20 @@
 	<!-- ===================================== -->
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
 	
+	<bean id="relationalDBGenerator" class="org.openforis.collect.manager.CollectRDBGenerator">
+		<constructor-arg ref="surveyManager" />
+		<constructor-arg ref="recordManager" />
+		<constructor-arg ref="collectLocalRDBStorageManager" />
+	</bean>
+	
+	<bean id="sessionEventDispatcher" class="org.openforis.collect.manager.SessionEventDispatcher"
+		scope="session" lazy-init="false">
+		<constructor-arg>
+			<list>
+				<ref bean="relationalDBGenerator" />
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	
 </beans>

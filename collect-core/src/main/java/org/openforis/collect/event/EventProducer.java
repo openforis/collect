@@ -16,6 +16,9 @@ import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.metamodel.Survey;
+import org.openforis.idm.model.Code;
+import org.openforis.idm.model.CodeAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NumberAttribute;
@@ -49,6 +52,8 @@ public class EventProducer implements EventSource {
 
 	private List<? extends RecordEvent> toEvent(NodeChange<?> change, String userName) {
 		Node<?> node = change.getNode();
+		Survey survey = node.getSurvey();
+		String surveyName = survey.getName();
 		Integer recordId = node.getRecord().getId();
 		NodeDefinition nodeDef = node.getDefinition();
 		int definitionId = nodeDef.getId();
@@ -59,31 +64,35 @@ public class EventProducer implements EventSource {
 		if (change instanceof EntityAddChange) {
 			Entity entity = (Entity) change.getNode();
 			if (entity.isRoot()) {
-				return asList(new RootEntityCreatedEvent(recordId, definitionId, 
+				return asList(new RootEntityCreatedEvent(surveyName, recordId, definitionId, 
 						nodeId, timestamp, userName));
 			} else {
-				return asList(new EntityCreatedEvent(recordId, definitionId, 
+				return asList(new EntityCreatedEvent(surveyName, recordId, definitionId, 
 						parentId, nodeId, timestamp, userName));
 			}
 		} else if (change instanceof AttributeChange) {
-			if (node instanceof NumberAttribute<?, ?>) {
+			if (node instanceof CodeAttribute) {
+				Code value = ((CodeAttribute) node).getValue();
+				return asList(new CodeAttributeUpdatedEvent(surveyName, recordId, definitionId, parentId, nodeId, value.getCode(), 
+						value.getQualifier(), timestamp, userName));
+			} else if (node instanceof NumberAttribute<?, ?>) {
 				Type valueType = ((NumericAttributeDefinition) nodeDef).getType();
 				NumberAttribute<?, ?> attribute = (NumberAttribute<?, ?>) node;
 				Number value = attribute.getNumber();
 				Integer unitId = attribute.getUnitId();
 				switch(valueType) {
 				case INTEGER:
-					return asList(new IntegerAttributeUpdatedEvent(recordId, definitionId, parentId, nodeId, 
+					return asList(new IntegerAttributeUpdatedEvent(surveyName, recordId, definitionId, parentId, nodeId, 
 							(Integer) value, unitId, timestamp, userName));
 				case REAL:
-					return asList(new DoubleAttributeUpdatedEvent(recordId, definitionId, parentId, nodeId, 
+					return asList(new DoubleAttributeUpdatedEvent(surveyName, recordId, definitionId, parentId, nodeId, 
 							(Double) value, unitId, timestamp, userName));
 				default:
 					throw new IllegalArgumentException("Numeric type not supported: " + valueType);
 				}
 			} else if (node instanceof TextAttribute) {
 				String text = ((TextAttribute) node).getText();
-				return asList(new TextAttributeUpdatedEvent(recordId, definitionId, parentId, nodeId, text, timestamp, userName));
+				return asList(new TextAttributeUpdatedEvent(surveyName, recordId, definitionId, parentId, nodeId, text, timestamp, userName));
 			}
 		}
 		return emptyList();

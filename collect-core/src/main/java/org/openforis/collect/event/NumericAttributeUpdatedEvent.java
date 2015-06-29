@@ -7,9 +7,9 @@ public abstract class NumericAttributeUpdatedEvent<T extends Number> extends Att
 	private final Class<T> valueType;
 	private final Integer unitId;
 
-	public NumericAttributeUpdatedEvent(Integer recordId, int definitionId,
+	public NumericAttributeUpdatedEvent(String surveyName, Integer recordId, int definitionId,
 			Integer parentEntityId, int nodeId, Class<T> valueType, Integer unitId, Date timestamp, String userName) {
-		super(recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
+		super(surveyName, recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
 		this.valueType = valueType;
 		this.unitId = unitId;
 	}

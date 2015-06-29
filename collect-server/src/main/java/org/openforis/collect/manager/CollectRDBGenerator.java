@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.event.EventListener;
@@ -27,37 +25,34 @@ import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreat
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-@Component
-//@Lazy(false)
 public class CollectRDBGenerator implements EventListener {
 
 	private static final Log LOG = LogFactory.getLog(CollectRDBGenerator.class);
 	private static final String SQLITE_DRIVER_CLASS_NAME = "org.sqlite.JDBC";
 
-	@Autowired
 	private SurveyManager surveyManager;
-	@Autowired
 	private RecordManager recordManager;
-	@Autowired
 	private CollectLocalRDBStorageManager localRDBStorageManager;
 	
 	private Map<Integer, RelationalSchema> surveyIdToRelationalSchema;
 	
-	public CollectRDBGenerator() {
-		surveyIdToRelationalSchema = new HashMap<Integer, RelationalSchema>();
+	public CollectRDBGenerator(SurveyManager surveyManager, RecordManager recordManager, 
+			CollectLocalRDBStorageManager localRDBStorageManager) {
+		this.surveyManager = surveyManager;
+		this.recordManager = recordManager;
+		this.localRDBStorageManager = localRDBStorageManager;
+		this.surveyIdToRelationalSchema = new HashMap<Integer, RelationalSchema>();
+		
+		init();
 	}
-	
-	@PostConstruct
-	public void init() {
+
+	private void init() {
 		initializeRelationalSchemas();
 		generateRDBs();
 	}
@@ -139,7 +134,13 @@ public class CollectRDBGenerator implements EventListener {
 	
 	@Override
 	public void onEvents(List<? extends RecordEvent> events) {
-		
+		for (RecordEvent event : events) {
+			String surveyName = event.getSurveyName();
+			CollectSurvey survey = surveyManager.get(surveyName);
+			if (survey != null) {
+				RelationalSchema relationalSchema = surveyIdToRelationalSchema.get(survey.getId());
+			}
+		}
 	}
 
 }

@@ -16,9 +16,8 @@ import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
 import org.openforis.collect.relational.DatabaseUpdater;
 import org.openforis.collect.relational.data.DataExtractor;
+import org.openforis.collect.relational.data.DataExtractorFactory;
 import org.openforis.collect.relational.data.Row;
-import org.openforis.collect.relational.data.internal.CodeTableDataExtractor;
-import org.openforis.collect.relational.data.internal.DataTableDataExtractor;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
 import org.openforis.collect.relational.model.DataTable;
@@ -31,7 +30,7 @@ import org.openforis.collect.relational.model.Table;
  * @author S. Ricci
  *
  */
-public class JooqDatabaseExporter implements DatabaseUpdater {
+public class JooqDatabaseExporter implements DatabaseUpdater, DatabaseExporter {
 
 	private DSLContext dsl;
 	
@@ -51,7 +50,7 @@ public class JooqDatabaseExporter implements DatabaseUpdater {
 	public void insertReferenceData(RelationalSchema schema) throws CollectRdbException {
 		BatchInsertExecutor batchExecutor = new BatchInsertExecutor(schema);
 		for (CodeTable codeTable : schema.getCodeListTables()) {
-			CodeTableDataExtractor extractor = new CodeTableDataExtractor(codeTable);
+			DataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
 			batchExecutor.addInserts(extractor);
 		}
 		batchExecutor.flush();
@@ -61,7 +60,7 @@ public class JooqDatabaseExporter implements DatabaseUpdater {
 	public void insertData(RelationalSchema schema, CollectRecord record) throws CollectRdbException  {
 		BatchInsertExecutor batchExecutor = new BatchInsertExecutor(schema);
 		for (DataTable table : schema.getDataTables()) {
-			DataTableDataExtractor extractor = new DataTableDataExtractor(table, record);
+			DataExtractor extractor = DataExtractorFactory.getRecordDataExtractor(table, record);
 			batchExecutor.addInserts(extractor);
 		}
 		batchExecutor.flush();

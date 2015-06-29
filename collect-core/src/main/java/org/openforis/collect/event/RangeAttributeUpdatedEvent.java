@@ -7,10 +7,10 @@ public abstract class RangeAttributeUpdatedEvent<T extends Number> extends Numer
 	private final T from;
 	private final T to;
 
-	public RangeAttributeUpdatedEvent(Integer recordId, int definitionId,
+	public RangeAttributeUpdatedEvent(String surveyName, Integer recordId, int definitionId,
 			Integer parentEntityId, int nodeId, T from, T to, Class<T> valueType,
 			Integer unitId, Date timestamp, String userName) {
-		super(recordId, definitionId, parentEntityId, nodeId, valueType, unitId,
+		super(surveyName, recordId, definitionId, parentEntityId, nodeId, valueType, unitId,
 				timestamp, userName);
 		this.from = from;
 		this.to = to;

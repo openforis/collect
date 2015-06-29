@@ -32,12 +32,14 @@ public class DataTableDataColumnValueExtractor extends ColumnValueExtractor<Data
 	public Object extractValue(Node<?> context) {
 		Node<?> valNode = extractValueNode(context);
 		Object val = extractNodeValue(valNode);
-		Integer colLength = column.getLength();
-		int valLength = val == null ? -1: val.toString().length();
-		if ( column.getTypeName().equals("varchar") && val != null && valLength > colLength) {
-			LOG.warn(String.format("Record: %d. Value of node %s (%s) has a length of %d characters that exceeds the maximum allowed (%d), so it has been cut", 
-					context.getRecord().getId(), valNode.getPath(), val, valLength, colLength));
-			val = ((String) val).substring(0, colLength);
+		if ( column.getTypeName().equals("varchar") && val != null) {
+			Integer colLength = column.getLength();
+			int valLength = val.toString().length();
+			if (valLength > colLength) {
+				LOG.warn(String.format("Record: %d. Value of node %s (%s) has a length of %d characters that exceeds the maximum allowed (%d), so it has been cut", 
+						context.getRecord().getId(), valNode.getPath(), val, valLength, colLength));
+				val = ((String) val).substring(0, colLength);
+			}
 		}
 		return ObjectUtils.defaultIfNull(val, column.getDefaultValue());
 	}

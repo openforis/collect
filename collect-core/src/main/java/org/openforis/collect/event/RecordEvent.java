@@ -10,6 +10,7 @@ import java.util.Date;
  */
 public abstract class RecordEvent {
 
+	private String surveyName;
 	private Integer recordId;
 	private final int definitionId;
 	private final Integer parentEntityId;
@@ -17,8 +18,9 @@ public abstract class RecordEvent {
 	private final Date timestamp;
 	private final String userName;
 	
-	public RecordEvent(Integer recordId, int definitionId, Integer parentEntityId, int nodeId, Date timestamp, String userName) {
+	public RecordEvent(String surveyName, Integer recordId, int definitionId, Integer parentEntityId, int nodeId, Date timestamp, String userName) {
 		super();
+		this.surveyName = surveyName;
 		this.recordId = recordId;
 		this.definitionId = definitionId;
 		this.parentEntityId = parentEntityId;
@@ -32,6 +34,10 @@ public abstract class RecordEvent {
 			throw new IllegalStateException("Record id already initialized");
 		}
 		this.recordId = recordId;
+	}
+	
+	public String getSurveyName() {
+		return surveyName;
 	}
 	
 	public Integer getRecordId() {

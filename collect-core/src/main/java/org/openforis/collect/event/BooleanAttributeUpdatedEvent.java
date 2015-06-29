@@ -6,9 +6,9 @@ public class BooleanAttributeUpdatedEvent extends AttributeUpdatedEvent {
 
 	private final Boolean value;
 	
-	public BooleanAttributeUpdatedEvent(Integer recordId, int definitionId,
+	public BooleanAttributeUpdatedEvent(String surveyName, Integer recordId, int definitionId,
 			Integer parentEntityId, int nodeId, Boolean value, Date timestamp, String userName) {
-		super(recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
+		super(surveyName, recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
 		this.value = value;
 	}
 

@@ -10,10 +10,10 @@ public class TaxonAttributeUpdatedEvent extends AttributeUpdatedEvent {
 	private String languageCode;
 	private String languageVariety;
 	
-	public TaxonAttributeUpdatedEvent(Integer recordId, int definitionId,
+	public TaxonAttributeUpdatedEvent(String surveyName, Integer recordId, int definitionId,
 			Integer parentEntityId, int nodeId, String code, String scientificName, String vernacularName,
 			String languageCode, String languageVariety, Date timestamp, String userName) {
-		super(recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
+		super(surveyName, recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
 		this.code = code;
 		this.scientificName = scientificName;
 		this.vernacularName = vernacularName;

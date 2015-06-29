@@ -4,9 +4,9 @@ import java.util.Date;
 
 public abstract class AttributeUpdatedEvent extends RecordEvent {
 
-	public AttributeUpdatedEvent(Integer recordId, int definitionId,
+	public AttributeUpdatedEvent(String surveyName, Integer recordId, int definitionId,
 			Integer parentEntityId, int nodeId, Date timestamp, String userName) {
-		super(recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
+		super(surveyName, recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
 	}
 
 }

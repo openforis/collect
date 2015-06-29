@@ -4,9 +4,9 @@ import java.util.Date;
 
 public class EntityCreatedEvent extends RecordEvent {
 
-	public EntityCreatedEvent(Integer recordId, int definitionId,
+	public EntityCreatedEvent(String surveyName, Integer recordId, int definitionId,
 			Integer parentId, int entityId, Date timestamp, String userName) {
-		super(recordId, definitionId, parentId, entityId, timestamp, userName);
+		super(surveyName, recordId, definitionId, parentId, entityId, timestamp, userName);
 	}
 	
 }
