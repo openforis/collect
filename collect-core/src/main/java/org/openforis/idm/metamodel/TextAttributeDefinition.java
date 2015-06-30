@@ -16,7 +16,7 @@ public class TextAttributeDefinition extends AttributeDefinition {
 
 	private static final long serialVersionUID = 1L;
 	
-	private static final String VALUE_FIELD = "value";
+	public static final String VALUE_FIELD = "value";
 	
 	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
 		new FieldDefinition<String>(VALUE_FIELD, "v", null, String.class, this)

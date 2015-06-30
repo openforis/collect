@@ -118,12 +118,12 @@ public class CollectRDBGenerator implements EventListener {
 
 	private void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
 			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
-		DatabaseExporter databaseExporter = new JooqDatabaseExporter(targetConn);
-		databaseExporter.insertReferenceData(targetSchema);
+		DatabaseExporter databaseUpdater = createRDBUpdater(targetConn);
+		databaseUpdater.insertReferenceData(targetSchema);
 		for (int i = 0; i < summaries.size(); i++) {
 			CollectRecord summary = summaries.get(i);
 			CollectRecord record = recordManager.load(survey, summary.getId(), step);
-			databaseExporter.insertData(targetSchema, record);
+			databaseUpdater.insertData(targetSchema, record);
 		}
 		try {
 			targetConn.commit();
@@ -131,16 +131,57 @@ public class CollectRDBGenerator implements EventListener {
 			throw new CollectRdbException(String.format("Error inserting records related to survey %s into RDB", survey.getName()), e);
 		}
 	}
-	
+
 	@Override
 	public void onEvents(List<? extends RecordEvent> events) {
+		Step entry = Step.ENTRY;
+		RelationalSchema rdbSchema = getRelatedRelationalSchema(events);
+		CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
+		try {
+			Connection rdbConnection = createTargetConnection(survey, entry);
+			JooqDatabaseExporter rdbUpdater = createRDBUpdater(rdbConnection);
+			boolean notProcessedEvents = false;
+			Integer lastRecordId = null;
+			for (RecordEvent recordEvent : events) {
+				Integer recordId = recordEvent.getRecordId();
+				if (lastRecordId != null && ! lastRecordId.equals(recordId)) {
+					udpateRecordData(rdbSchema, survey, rdbUpdater, recordId);
+					notProcessedEvents = false;
+				} else {
+					notProcessedEvents = true;
+				}
+				lastRecordId = recordId;
+			}
+			if (notProcessedEvents) {
+				udpateRecordData(rdbSchema, survey, rdbUpdater, lastRecordId);
+			}
+			rdbConnection.commit();
+		} catch (Exception e) {
+			LOG.error("Error processing record events: " + e.getMessage(), e);
+		}
+	}
+
+	private void udpateRecordData(RelationalSchema rdbSchema,
+			CollectSurvey survey, JooqDatabaseExporter rdbUpdater,
+			Integer recordId) throws CollectRdbException {
+		CollectRecord record = recordManager.load(survey, recordId);
+		rdbUpdater.updateData(rdbSchema, record);
+	}
+
+	private RelationalSchema getRelatedRelationalSchema(
+			List<? extends RecordEvent> events) {
 		for (RecordEvent event : events) {
 			String surveyName = event.getSurveyName();
 			CollectSurvey survey = surveyManager.get(surveyName);
 			if (survey != null) {
-				RelationalSchema relationalSchema = surveyIdToRelationalSchema.get(survey.getId());
+				return surveyIdToRelationalSchema.get(survey.getId());
 			}
 		}
+		return null;
 	}
-
+	
+	private JooqDatabaseExporter createRDBUpdater(Connection targetConn) {
+		return new JooqDatabaseExporter(targetConn);
+	}
+	
 }

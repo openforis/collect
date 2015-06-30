@@ -223,19 +223,37 @@ public class RelationalSchemaGenerator {
 			addAncestorKeyColumns(table);
 		}
 		
+		//add parent (or ancestors) FK columns
 		if ( parentTable != null ) {
 			// Create FK column
 			Column<?> fkColumn = new DataParentKeyColumn(getTablePKColumnName(parentTable));
 			table.addColumn(fkColumn);
 			// Create FK constraint
-			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + parentTable.getBaseName();
-			PrimaryKeyConstraint parentPKConstraint = parentTable.getPrimaryKeyConstraint();
-			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, parentPKConstraint, fkColumn);
-			table.addConstraint(fkConstraint);
+			addForeignKeyConstraint(table, parentTable, fkColumn);
 			// Attach to parent table
 			parentTable.addChildTable(table);
+			
+			if (config.isAncestorFKColumnsIncluded()) {
+				DataTable ancestorTable = parentTable.getParent();
+				while (ancestorTable != null) {
+					// Create FK column
+					Column<?> ancestorFKColumn = new DataAncestorFKColumn(getTablePKColumnName(ancestorTable));
+					table.addColumn(ancestorFKColumn);
+					// Create FK constraint
+					addForeignKeyConstraint(table, ancestorTable, ancestorFKColumn);
+					
+					ancestorTable = ancestorTable.getParent();
+				}
+			}
 		}
 		return table;
+	}
+
+	private void addForeignKeyConstraint(DataTable table, DataTable referencedTable, Column<?> fkColumn) {
+		String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + referencedTable.getBaseName();
+		PrimaryKeyConstraint referencedTablePKConstraint = referencedTable.getPrimaryKeyConstraint();
+		ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, referencedTablePKConstraint, fkColumn);
+		table.addConstraint(fkConstraint);
 	}
 
 	protected void addPKColumn(DataTable table) {
@@ -270,14 +288,8 @@ public class RelationalSchemaGenerator {
 	
 	protected FieldDefinition<?> getKeyAttributeValueFieldDefinition(
 			AttributeDefinition defn) {
-		FieldDefinition<?> fieldDefn;
-		if ( defn instanceof CodeAttributeDefinition ) {
-			fieldDefn = defn.getFieldDefinition(CodeAttributeDefinition.CODE_FIELD);
-		} else if ( defn instanceof NumberAttributeDefinition ) {
-			fieldDefn = defn.getFieldDefinition(NumberAttributeDefinition.VALUE_FIELD);
-		} else if ( defn instanceof TextAttributeDefinition ) {
-			fieldDefn = defn.getFieldDefinition("value"); //TODO create constant in TextAttributeDefinition
-		} else {
+		FieldDefinition<?> fieldDefn = defn.getMainFieldDefinition();
+		if (fieldDefn == null) {
 			throw new IllegalArgumentException("Invalid key attribute definition type: " + defn.getClass().getName());
 		}
 		return fieldDefn;

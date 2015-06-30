@@ -71,6 +71,10 @@ public final class RelationalSchema {
 		return rootDataTables.values();
 	}
 	
+	public DataTable getRootDataTable(String rootEntityName) {
+		return rootDataTables.get(rootEntityName);
+	}
+	
 	public Table<?> getTable(String name) {
 		Table<?> table = tables.get(name);
 		if ( table == null ) {

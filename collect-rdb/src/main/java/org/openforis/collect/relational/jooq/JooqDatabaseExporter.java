@@ -1,12 +1,16 @@
 package org.openforis.collect.relational.jooq;
 
+import java.math.BigInteger;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
+import org.jooq.DeleteQuery;
+import org.jooq.Field;
 import org.jooq.InsertQuery;
+import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
@@ -14,12 +18,14 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
-import org.openforis.collect.relational.DatabaseUpdater;
+import org.openforis.collect.relational.RDBUpdater;
 import org.openforis.collect.relational.data.DataExtractor;
 import org.openforis.collect.relational.data.DataExtractorFactory;
 import org.openforis.collect.relational.data.Row;
+import org.openforis.collect.relational.data.internal.DataTableDataExtractor;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
@@ -30,7 +36,7 @@ import org.openforis.collect.relational.model.Table;
  * @author S. Ricci
  *
  */
-public class JooqDatabaseExporter implements DatabaseUpdater, DatabaseExporter {
+public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 
 	private DSLContext dsl;
 	
@@ -48,7 +54,7 @@ public class JooqDatabaseExporter implements DatabaseUpdater, DatabaseExporter {
 
 	@Override
 	public void insertReferenceData(RelationalSchema schema) throws CollectRdbException {
-		BatchInsertExecutor batchExecutor = new BatchInsertExecutor(schema);
+		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
 		for (CodeTable codeTable : schema.getCodeListTables()) {
 			DataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
 			batchExecutor.addInserts(extractor);
@@ -58,7 +64,7 @@ public class JooqDatabaseExporter implements DatabaseUpdater, DatabaseExporter {
 
 	@Override
 	public void insertData(RelationalSchema schema, CollectRecord record) throws CollectRdbException  {
-		BatchInsertExecutor batchExecutor = new BatchInsertExecutor(schema);
+		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
 		for (DataTable table : schema.getDataTables()) {
 			DataExtractor extractor = DataExtractorFactory.getRecordDataExtractor(table, record);
 			batchExecutor.addInserts(extractor);
@@ -76,20 +82,24 @@ public class JooqDatabaseExporter implements DatabaseUpdater, DatabaseExporter {
 	@Override
 	public void deleteData(RelationalSchema schema, CollectRecord record)
 			throws CollectRdbException {
-		// TODO Auto-generated method stub
-		
+		DataTable table = schema.getRootDataTable(record.getRootEntity().getName());
+		DataPrimaryKeyColumn pkColumn = table.getPrimaryKeyColumn();
+		BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(record.getRootEntity());
+		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
+		batchExecutor.addDelete(table, pkColumn, pkValue);
+		batchExecutor.flush();
 	}
 	
-	private class BatchInsertExecutor {
+	private class BatchQueryExecutor {
 		
 		private static final int BATCH_MAX_SIZE = 10000;
 		
-		private List<InsertQuery<Record>> buffer;
 		private RelationalSchema schema;
+		private List<Query> queries;
 		
-		public BatchInsertExecutor(RelationalSchema schema) {
+		public BatchQueryExecutor(RelationalSchema schema) {
 			this.schema = schema;
-			this.buffer = new ArrayList<InsertQuery<Record>>();
+			this.queries = new ArrayList<Query>();
 		}
 
 		public void addInserts(DataExtractor extractor) {
@@ -100,27 +110,31 @@ public class JooqDatabaseExporter implements DatabaseUpdater, DatabaseExporter {
 		}
 
 		public void addInsert(Row row) {
-			buffer.add(createInsertQuery(schema, row));
-			if ( buffer.size() == BATCH_MAX_SIZE ) {
+			queries.add(createInsertQuery(row));
+			if ( queries.size() == BATCH_MAX_SIZE ) {
 				flush();
 			}
 		}
+		
+		public void addDelete(Table<?> table, Column<?> pkColumn, BigInteger pkValue) {
+			queries.add(createDeleteQuery(table, pkColumn, pkValue));
+		}
 
 		public void flush() {
-			if ( buffer.isEmpty() ) {
+			if ( queries.isEmpty() ) {
 				return;
 			}
 			try {
-				dsl.batch(buffer).execute();
-				buffer.clear();
+				dsl.batch(queries).execute();
+				queries.clear();
 			} catch(Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
 		
-		private InsertQuery<Record> createInsertQuery(RelationalSchema schema, Row row) {
+		private InsertQuery<Record> createInsertQuery(Row row) {
 			Table<?> table = row.getTable();
-			InsertQuery<Record> insert = dsl.insertQuery(getJooqTable(schema, table));
+			InsertQuery<Record> insert = dsl.insertQuery(getJooqTable(table));
 			List<Object> values = row.getValues();
 			List<Column<?>> cols = table.getColumns();
 			for (int i = 0; i < cols.size(); i++) {
@@ -133,7 +147,15 @@ public class JooqDatabaseExporter implements DatabaseUpdater, DatabaseExporter {
 			return insert;
 		}
 		
-		private org.jooq.Table<Record> getJooqTable(RelationalSchema schema, Table<?> table) {
+		private DeleteQuery<Record> createDeleteQuery(Table<?> table, Column<?> pkColumn, BigInteger pkValue) {
+			org.jooq.Table<Record> jooqTable = getJooqTable(table);
+			Field<BigInteger> jooqPKColumn = DSL.field(pkColumn.getName(), BigInteger.class);
+			DeleteQuery<Record> query = dsl.deleteQuery(jooqTable);
+			query.addConditions(jooqPKColumn.equal(pkValue));
+			return query;
+		}
+		
+		private org.jooq.Table<Record> getJooqTable(Table<?> table) {
 			if ( isSchemaLess() ) {
 				return DSL.tableByName(table.getName());
 			} else {

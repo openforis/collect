@@ -1,5 +1,6 @@
 package org.openforis.collect.relational.model;
 
+import org.openforis.idm.model.Node;
 
 /**
  * 
@@ -7,9 +8,9 @@ package org.openforis.collect.relational.model;
  * @author S. Ricci
  *
  */
-public class DataParentKeyColumn extends DataAncestorFKColumn {
+public class DataAncestorFKColumn extends IdColumn<Node<?>> {
 
-	DataParentKeyColumn(String name) {
+	DataAncestorFKColumn(String name) {
 		super(name);
 	}
 

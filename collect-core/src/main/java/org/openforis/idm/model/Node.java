@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -64,6 +65,16 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 			parent = parent.getParent();
 		}
 		return ancestors;
+	}
+	
+	public Entity getAncestorByDefinition(EntityDefinition def) {
+		List<Entity> ancestors = getAncestors();
+		for (Entity ancestor : ancestors) {
+			if (ancestor.getDefinition() == def) {
+				return ancestor;
+			}
+		}
+		return null;
 	}
 	
 	public Entity getNearestMultipleEntityAncestor() {
