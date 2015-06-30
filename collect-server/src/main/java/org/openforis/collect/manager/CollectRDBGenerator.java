@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.event.EventListener;
+import org.openforis.collect.event.RecordDeletedEvent;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -144,16 +145,18 @@ public class CollectRDBGenerator implements EventListener {
 			Integer lastRecordId = null;
 			for (RecordEvent recordEvent : events) {
 				Integer recordId = recordEvent.getRecordId();
-				if (lastRecordId != null && ! lastRecordId.equals(recordId)) {
-					udpateRecordData(rdbSchema, survey, rdbUpdater, recordId);
+				if (notProcessedEvents && ! lastRecordId.equals(recordId)) {
+					udpateRecordData(rdbSchema, rdbUpdater, lastRecordId);
 					notProcessedEvents = false;
+				} else if (recordEvent instanceof RecordDeletedEvent) {
+					deleteRecordData(rdbSchema, rdbUpdater, recordId);
 				} else {
 					notProcessedEvents = true;
 				}
 				lastRecordId = recordId;
 			}
 			if (notProcessedEvents) {
-				udpateRecordData(rdbSchema, survey, rdbUpdater, lastRecordId);
+				udpateRecordData(rdbSchema, rdbUpdater, lastRecordId);
 			}
 			rdbConnection.commit();
 		} catch (Exception e) {
@@ -161,9 +164,16 @@ public class CollectRDBGenerator implements EventListener {
 		}
 	}
 
-	private void udpateRecordData(RelationalSchema rdbSchema,
-			CollectSurvey survey, JooqDatabaseExporter rdbUpdater,
+	private void deleteRecordData(RelationalSchema rdbSchema, JooqDatabaseExporter rdbUpdater,
 			Integer recordId) throws CollectRdbException {
+		CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
+		CollectRecord record = recordManager.load(survey, recordId);
+		rdbUpdater.deleteData(rdbSchema, record);
+	}
+
+	private void udpateRecordData(RelationalSchema rdbSchema, JooqDatabaseExporter rdbUpdater,
+			Integer recordId) throws CollectRdbException {
+		CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
 		CollectRecord record = recordManager.load(survey, recordId);
 		rdbUpdater.updateData(rdbSchema, record);
 	}
