@@ -1092,7 +1092,7 @@ public class SchemaVM extends SurveyBaseVM {
 			if ( selectedSurveyObject instanceof UITab ) {
 				UITab parentTab = getSelectedNodeParentTab();
 				UIOptions uiOptions = survey.getUIOptions();
-				if ( uiOptions.isAssociatedWithMultipleEntityForm(parentTab) ) {
+				if (parentTab != null && uiOptions.isAssociatedWithMultipleEntityForm(parentTab) ) {
 					MessageUtil.showWarning("survey.schema.cannot_add_nested_tab.form_entity_assosicated");
 					return false;
 				}
