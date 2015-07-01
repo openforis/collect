@@ -170,12 +170,12 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		
 		double plotWidth = Math.sqrt(annotations.getCollectEarthPlotArea() * HECTARES_TO_METERS_CONVERSION_FACTOR);
 		int samplePoints = annotations.getCollectEarthSamplePoints();
-		if (samplePoints == 0) {
+		if (samplePoints <= 1) {
 			return 0;
 		}
 		double pointsPerWidth = Math.sqrt(samplePoints);
 		int frameDistance = calculateFrameDistance(survey); 
-		int distanceInMeters = Double.valueOf(Math.floor((double) ((plotWidth - (frameDistance * 2)) / pointsPerWidth))).intValue();
+		int distanceInMeters = Double.valueOf(Math.floor((double) ((plotWidth - (frameDistance * 2)) / ( pointsPerWidth - 1 ) ))).intValue();
 		return distanceInMeters;
 	}
 
