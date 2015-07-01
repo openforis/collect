@@ -77,9 +77,9 @@
     
 	 <groupbox width="100%" closable="false"
 	 	visible="@load(vm.collectEarthSurvey)">
-      <caption label="${labels.survey.collect_earth_details.$}"/>
+      <caption label="${labels.survey.collect_earth.plot_layout.$}"/>
       <hlayout style="padding: 10px">
-            <label value="${labels.survey.collect_earth_details.plot_area}:" />
+            <label value="${labels.survey.collect_earth.plot_layout.plot_area}:" />
             <fieldErrorHandler message="@load(vmsgs['collectEarthPlotArea'])">
 				<listbox mold="select" rows="1" 
 					selectedItem="@load(fx.collectEarthPlotArea) @save(fx.collectEarthPlotArea)"
@@ -92,7 +92,7 @@
 				</listbox>
             </fieldErrorHandler>
             <space width="100px" />
-            <label value="${labels.survey.collect_earth_details.sample_points}:" />
+            <label value="${labels.survey.collect_earth.plot_layout.sample_points}:" />
             <fieldErrorHandler message="@load(vmsgs['collectEarthSamplePoints'])">
             	<listbox mold="select" rows="1" 
 					selectedItem="@load(fx.collectEarthSamplePoints) @save(fx.collectEarthSamplePoints)"

@@ -62,12 +62,14 @@ public class DataRestoreController extends BasicController {
 	}
 	
 	@RequestMapping(value = "/surveys/{surveyName}/data/restore-remotely.json", method = RequestMethod.POST)
-	public @ResponseBody RemoteDataRestoreResponse restoreDataRemotely(UploadItem uploadItem, @PathVariable String surveyName, @RequestParam String restoreKey) {
+	public @ResponseBody RemoteDataRestoreResponse restoreDataRemotely(UploadItem uploadItem, @PathVariable String surveyName, 
+			@RequestParam String restoreKey) {
 		RemoteDataRestoreResponse response = new RemoteDataRestoreResponse();
 		String allowedRestoreKey = configurationManager.getConfiguration().get(ConfigurationItem.ALLOWED_RESTORE_KEY);
 		if (StringUtils.isBlank(allowedRestoreKey) || allowedRestoreKey.equals(restoreKey)) {
 			try {
-				DataRestoreJob job = startRestoreJob(uploadItem, false, surveyName);
+				boolean newSurvey = surveyManager.get(surveyName) == null;
+				DataRestoreJob job = startRestoreJob(uploadItem, newSurvey, surveyName);
 				response.setJobId(job.getId().toString());
 			} catch (Exception e) {
 				response.setErrorStatus();
