@@ -34,7 +34,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class EventProducer implements EventSource {
 
-	private final List<EventListener> listeners = new ArrayList<EventListener>();
+	private final List<EventListener> listeners;
+
+	public EventProducer(List<EventListener> listeners) {
+		super();
+		this.listeners = listeners;
+	}
 
 	@Override
 	public void register(EventListener listener) {

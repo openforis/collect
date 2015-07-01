@@ -28,9 +28,8 @@ public class EventProducerTest extends AbstractRecordTest {
 	@Override
 	public void init() {
 		super.init();
-		eventProducer = new EventProducer();
 		listener = new FakeEventListener();
-		eventProducer.register(listener);
+		eventProducer = new EventProducer(Arrays.<EventListener>asList(listener));
 	}
 	
 	@Test

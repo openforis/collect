@@ -123,17 +123,20 @@ public class DataTableDataExtractor extends DataExtractor {
 	}
 	
 	public static BigInteger getTableArtificialPK(Entity entity) {
-		Record record = entity.getRecord();
-		if (entity.isRoot()) {
-			return BigInteger.valueOf(record.getId());
+		return getArtificialPK(entity.getRecord().getId(), entity.getDefinition(), entity.getInternalId());
+	}
+
+	public static BigInteger getArtificialPK(Integer recordId,
+			EntityDefinition entityDef, Integer entityId) {
+		if (entityDef.isRoot()) {
+			return BigInteger.valueOf(recordId);
 		} else {
-			Integer id = entity.getInternalId();
-			if ( id == null ) {
-				throw new NullPointerException(String.format("Node id is null for node %s in record %d", entity.getPath(), entity.getRecord().getId()));
+			if ( entityId == null ) {
+				throw new NullPointerException(String.format("Node id is null for node %d in record %d", entityId, recordId));
 			}
 			//result = id + recordId * NODE_ID_MAX_VALUE
-			return BigInteger.valueOf(id).add(
-					BigInteger.valueOf(record.getId()).multiply(BigInteger.valueOf(NODE_ID_MAX_VALUE))
+			return BigInteger.valueOf(entityId).add(
+					BigInteger.valueOf(recordId).multiply(BigInteger.valueOf(NODE_ID_MAX_VALUE))
 			);
 		}
 	}

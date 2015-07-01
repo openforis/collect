@@ -3,7 +3,9 @@ package org.openforis.collect.relational.jooq;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
@@ -13,18 +15,21 @@ import org.jooq.InsertQuery;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
+import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
 import org.openforis.collect.relational.RDBUpdater;
+import org.openforis.collect.relational.data.ColumnValuePair;
 import org.openforis.collect.relational.data.DataExtractor;
 import org.openforis.collect.relational.data.DataExtractorFactory;
 import org.openforis.collect.relational.data.Row;
 import org.openforis.collect.relational.data.internal.DataTableDataExtractor;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
@@ -80,6 +85,14 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 	
 	@Override
+	public void updateData(RelationalSchema rdbSchema, DataTable dataTable,
+			BigInteger pkValue,
+			List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
+		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(rdbSchema);
+		batchExecutor.addUpdate(dataTable, pkValue, columnValuePairs);
+	}
+	
+	@Override
 	public void deleteData(RelationalSchema schema, CollectRecord record)
 			throws CollectRdbException {
 		DataTable table = schema.getRootDataTable(record.getRootEntity().getName());
@@ -114,6 +127,20 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			if ( queries.size() == BATCH_MAX_SIZE ) {
 				flush();
 			}
+		}
+
+		public void addUpdate(Table<?> table, BigInteger pkValue, List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
+			Map<Field<?>, Object> fieldToValue = new HashMap<Field<?>, Object>();
+			for (ColumnValuePair<DataColumn, ?> columnValuePair : columnValuePairs) {
+				Field<?> field = DSL.field(columnValuePair.getColumn().getName());
+				Object value = columnValuePair.getValue();
+				fieldToValue.put(field, value);
+			}
+			@SuppressWarnings("unchecked")
+			Column<BigInteger> pkColumn = (Column<BigInteger>) table.getPrimaryKeyConstraint().getColumns().get(0);
+			Field<Object> pkField = DSL.field(pkColumn.getName());
+			UpdateConditionStep<Record> query = dsl.update(getJooqTable(table)).set(fieldToValue).where(pkField.eq(pkValue));
+			queries.add(query);
 		}
 		
 		public void addDelete(Table<?> table, Column<?> pkColumn, BigInteger pkValue) {

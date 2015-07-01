@@ -105,6 +105,13 @@
 			</list>
 		</constructor-arg>
 	</bean>
-	
+
+	<bean id="eventProducer" class="org.openforis.collect.event.EventProducer" scope="session">
+		<constructor-arg>
+			<list>
+				<ref bean="sessionManager" />
+			</list>
+		</constructor-arg>
+	</bean>
 	
 </beans>
