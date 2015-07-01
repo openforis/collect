@@ -25,18 +25,18 @@ public final class RelationalSchema {
 
 	private Survey survey;
 	private String name;
-	private LinkedHashMap<String, Table<?>> tables;
-	private Map<Integer, DataTable> dataTableByNodeId;
+	private Map<String, Table<?>> tablesByName;
+	private Map<Integer, DataTable> dataTableByDefinitionId;
 	private Map<CodeListTableKey, CodeTable> codeListTables;
 	private Map<String, DataTable> rootDataTables;
 	
 	RelationalSchema(Survey survey, String name) throws CollectRdbException {
 		this.survey = survey;
 		this.name = name;
-		this.tables = new LinkedHashMap<String, Table<?>>();
+		this.tablesByName = new LinkedHashMap<String, Table<?>>();
 		this.codeListTables = new LinkedHashMap<CodeListTableKey, CodeTable>();
 		this.rootDataTables = new HashMap<String, DataTable>();
-		this.dataTableByNodeId = new HashMap<Integer, DataTable>();
+		this.dataTableByDefinitionId = new HashMap<Integer, DataTable>();
 	}
 
 	public Survey getSurvey() {
@@ -48,7 +48,7 @@ public final class RelationalSchema {
 	}
 	
 	public List<Table<?>> getTables() {
-		List<Table<?>> tableList = new ArrayList<Table<?>>(tables.values());
+		List<Table<?>> tableList = new ArrayList<Table<?>>(tablesByName.values());
 		return Collections.unmodifiableList(tableList);
 	}
 	
@@ -57,16 +57,29 @@ public final class RelationalSchema {
 	 */
 	public List<DataTable> getDataTables() {
 		List<DataTable> result = new ArrayList<DataTable>();
-		Queue<DataTable> queue = new LinkedList<DataTable>();
-		queue.addAll(getRootDataTables());
-		while(!queue.isEmpty()) {
-			DataTable table = queue.poll();
-			result.add(table);
-			queue.addAll(table.getChildTables());
+		for (DataTable dataTable : getRootDataTables()) {
+			int rootDefId = dataTable.getNodeDefinition().getId();
+			result.addAll(getDescendantTablesForDefinition(rootDefId));
 		}
 		return result;
 	}
 	
+	public List<? extends DataTable> getDescendantTablesForDefinition(
+			int definitionId) {
+		List<DataTable> result = new ArrayList<DataTable>();
+		Queue<DataTable> queue = new LinkedList<DataTable>();
+		
+		queue.add(getDataTableByDefinitionId(definitionId));
+		
+		while(! queue.isEmpty()) {
+			DataTable table = queue.poll();
+			result.add(table);
+			queue.addAll(table.getChildTables());
+		}
+		//do not include the actual data table
+		return result.subList(1, result.size());
+	}
+
 	public Collection<DataTable> getRootDataTables() {
 		return rootDataTables.values();
 	}
@@ -76,7 +89,7 @@ public final class RelationalSchema {
 	}
 	
 	public Table<?> getTable(String name) {
-		Table<?> table = tables.get(name);
+		Table<?> table = tablesByName.get(name);
 		if ( table == null ) {
 			throw new IllegalArgumentException("Table not found: " + name);
 		} else {
@@ -95,7 +108,7 @@ public final class RelationalSchema {
 	}
 
 	public boolean containsTable(String name) {
-		return tables.containsKey(name);
+		return tablesByName.containsKey(name);
 	}
 
 	/**
@@ -105,11 +118,11 @@ public final class RelationalSchema {
 	 */
 	void addTable(Table<?> table) {
 		String name = table.getName();
-		tables.put(name, table);
+		tablesByName.put(name, table);
 		if ( table instanceof DataTable ) {
 			DataTable dataTable = (DataTable) table;
 			NodeDefinition defn = dataTable.getNodeDefinition();
-			dataTableByNodeId.put(defn.getId(), dataTable);
+			dataTableByDefinitionId.put(defn.getId(), dataTable);
 			if ( dataTable.getParent() == null ) {
 				rootDataTables.put(defn.getName(), dataTable);
 			}
@@ -126,12 +139,16 @@ public final class RelationalSchema {
 		while( ! entityDefn.isMultiple() ) {
 				entityDefn = entityDefn.getParentEntityDefinition();
 		}
-		dataTableByNodeId.put( nodeId, dataTableByNodeId.get(entityDefn.getId()) );
+		dataTableByDefinitionId.put( nodeId, dataTableByDefinitionId.get(entityDefn.getId()) );
 	}
 
 	public DataTable getDataTable(NodeDefinition nodeDefinition) {
 		int id = nodeDefinition.getId();
-		return dataTableByNodeId.get(id);
+		return getDataTableByDefinitionId(id);
+	}
+
+	public DataTable getDataTableByDefinitionId(int id) {
+		return dataTableByDefinitionId.get(id);
 	}
 	
 	private static class CodeListTableKey {

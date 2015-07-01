@@ -3,6 +3,7 @@ package org.openforis.collect.relational.jooq;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,6 @@ import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
-import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.DatabaseExporter;
 import org.openforis.collect.relational.RDBUpdater;
 import org.openforis.collect.relational.data.ColumnValuePair;
@@ -29,11 +29,12 @@ import org.openforis.collect.relational.data.Row;
 import org.openforis.collect.relational.data.internal.DataTableDataExtractor;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.DataAncestorFKColumn;
 import org.openforis.collect.relational.model.DataColumn;
-import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
+import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
  * 
@@ -58,7 +59,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 
 	@Override
-	public void insertReferenceData(RelationalSchema schema) throws CollectRdbException {
+	public void insertReferenceData(RelationalSchema schema) {
 		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
 		for (CodeTable codeTable : schema.getCodeListTables()) {
 			DataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
@@ -68,7 +69,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 
 	@Override
-	public void insertData(RelationalSchema schema, CollectRecord record) throws CollectRdbException  {
+	public void insertData(RelationalSchema schema, CollectRecord record) {
 		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
 		for (DataTable table : schema.getDataTables()) {
 			DataExtractor extractor = DataExtractorFactory.getRecordDataExtractor(table, record);
@@ -78,9 +79,8 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 
 	@Override
-	public void updateData(RelationalSchema schema, CollectRecord record)
-			throws CollectRdbException {
-		deleteData(schema, record);
+	public void updateData(RelationalSchema schema, CollectRecord record) {
+		deleteData(schema, record.getId(), record.getRootEntity().getDefinition().getId());
 		insertData(schema, record);
 	}
 	
@@ -93,13 +93,28 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 	
 	@Override
-	public void deleteData(RelationalSchema schema, CollectRecord record)
-			throws CollectRdbException {
-		DataTable table = schema.getRootDataTable(record.getRootEntity().getName());
-		DataPrimaryKeyColumn pkColumn = table.getPrimaryKeyColumn();
-		BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(record.getRootEntity());
+	public void deleteData(RelationalSchema schema, int recordId, int rootDefId) {
+		deleteDataForEntity(schema, recordId, recordId, rootDefId);
+	}
+	
+	@Override
+	public void deleteDataForEntity(RelationalSchema schema, int recordId, int entityId, int entityDefinitionId) {
+		DataTable tableToDeleteFor = schema.getDataTableByDefinitionId(entityDefinitionId);
+		EntityDefinition entityDefToDeleteFor = (EntityDefinition) tableToDeleteFor.getNodeDefinition();
+		BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordId, entityDefToDeleteFor, entityId);
+		
 		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
-		batchExecutor.addDelete(table, pkColumn, pkValue);
+		
+		//delete data from the actual table
+		batchExecutor.addDelete(tableToDeleteFor, tableToDeleteFor.getPrimaryKeyColumn(), pkValue);
+
+		//delete data from descendant tables
+		List<DataTable> descendantTables = new ArrayList<DataTable>(schema.getDescendantTablesForDefinition(entityDefinitionId));
+		Collections.reverse(descendantTables);
+		for (DataTable dataTable : descendantTables) {
+			DataAncestorFKColumn ancestorIdColumn = dataTable.getAncestorIdColumn(entityDefinitionId);
+			batchExecutor.addDelete(dataTable, ancestorIdColumn, pkValue);
+		}
 		batchExecutor.flush();
 	}
 	

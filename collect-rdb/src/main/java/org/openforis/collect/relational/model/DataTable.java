@@ -9,6 +9,7 @@ import java.util.Map;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
@@ -43,6 +44,23 @@ public class DataTable extends AbstractTable<Node<?>> {
 			int attrDefnId = ((CodeValueFKColumn) column).getAttributeDefinition().getId();
 			foreignKeyCodeColumns.put(attrDefnId, (CodeValueFKColumn) column);
 		}
+	}
+	
+	public DataAncestorFKColumn getRecordIdColumn() {
+		EntityDefinition rootEntityDef = definition.getRootEntity();
+		return getAncestorIdColumn(rootEntityDef.getId());
+	}
+	
+	public DataAncestorFKColumn getAncestorIdColumn(int definitionId) {
+		List<Column<?>> columns = getColumns();
+		for (Column<?> column : columns) {
+			if (column instanceof DataAncestorFKColumn) {
+				if (((DataAncestorFKColumn) column).getAncestorDefinitionId() == definitionId) {
+					return (DataAncestorFKColumn) column;
+				}
+			}
+		}
+		throw new IllegalStateException("No ancestor id column found in table " + getName() + " for definition id " + definitionId);
 	}
 	
 	public CodeValueFKColumn getForeignKeyCodeColumn(CodeAttributeDefinition defn) {

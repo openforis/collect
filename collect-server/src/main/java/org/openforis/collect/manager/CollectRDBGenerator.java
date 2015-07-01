@@ -160,121 +160,50 @@ public class CollectRDBGenerator implements EventListener {
 	}
 
 	@Override
-	public void onEvents(List<? extends RecordEvent> events) {
-		Step entry = Step.ENTRY;
-		RelationalSchema rdbSchema = getRelatedRelationalSchema(events);
-		CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
+	public void onEvents(final List<? extends RecordEvent> events) {
+		Step recordStep = Step.ENTRY;
+		final RelationalSchema rdbSchema = getRelatedRelationalSchema(events);
+		final CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
+
+		withConnection(survey, recordStep, new Callback() {
+			public void execute(Connection connection) {
+				RDBUpdater rdbUpdater = createRDBUpdater(connection);
+				for (RecordEvent recordEvent : events) {
+					EventHandler handler = new EventHandler(recordEvent, rdbSchema, survey, rdbUpdater);
+					handler.handle();
+				}
+			}
+		});
+		
+	}
+
+	private void withConnection(CollectSurvey survey, Step entry, Callback job) {
+		Connection connection = null;
 		try {
-			Connection rdbConnection = createTargetConnection(survey, entry);
-			JooqDatabaseExporter rdbUpdater = createRDBUpdater(rdbConnection);
-			boolean notProcessedEvents = false;
-			Integer lastRecordId = null;
-			for (RecordEvent recordEvent : events) {
-				if (recordEvent instanceof AttributeUpdatedEvent) {
-					updateAttributeData(rdbSchema, rdbUpdater, (AttributeUpdatedEvent) recordEvent);
-				}
-				
-				Integer recordId = recordEvent.getRecordId();
-				if (notProcessedEvents && ! lastRecordId.equals(recordId)) {
-					udpateRecordData(rdbSchema, rdbUpdater, lastRecordId);
-					notProcessedEvents = false;
-				} else if (recordEvent instanceof RecordDeletedEvent) {
-					deleteRecordData(rdbSchema, rdbUpdater, recordId);
-				} else {
-					notProcessedEvents = true;
-				}
-				lastRecordId = recordId;
-			}
-			if (notProcessedEvents) {
-				udpateRecordData(rdbSchema, rdbUpdater, lastRecordId);
-			}
-			rdbConnection.commit();
+			connection = createTargetConnection(survey, entry);
+			connection.setAutoCommit(false);
+			job.execute(connection);
+			connection.commit();
 		} catch (Exception e) {
 			LOG.error("Error processing record events: " + e.getMessage(), e);
-		}
-	}
-
-	private void updateAttributeData(RelationalSchema rdbSchema,
-			RDBUpdater rdbUpdater, AttributeUpdatedEvent recordEvent) {
-		CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
-		AttributeDefinition def = (AttributeDefinition) survey.getSchema().getDefinitionById(recordEvent.getDefinitionId());
-		EntityDefinition multipleEntityDef = def.getNearestAncestorMultipleEntity();
-		BigInteger pkValue = DataTableDataExtractor.getArtificialPK(recordEvent.getRecordId(), multipleEntityDef, recordEvent.getParentEntityId());
-		DataTable dataTable = rdbSchema.getDataTable(multipleEntityDef);
-		List<ColumnValuePair<DataColumn, ?>> columnValuePairs = toColumnValueParis(dataTable, def, recordEvent);
-		rdbUpdater.updateData(rdbSchema, dataTable, pkValue, columnValuePairs);
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<ColumnValuePair<DataColumn, ?>> toColumnValueParis(
-			DataTable dataTable, AttributeDefinition attributeDef,
-			AttributeUpdatedEvent recordEvent) {
-		List<DataColumn> dataColumns = dataTable.getDataColumns(attributeDef);
-		List<ColumnValuePair<DataColumn, ?>> columnValuePairs = new ArrayList<ColumnValuePair<DataColumn, ?>>();
-		if (recordEvent instanceof BooleanAttributeUpdatedEvent) {
-			columnValuePairs.add(new ColumnValuePair<DataColumn, Boolean>(dataColumns.get(0), ((BooleanAttributeUpdatedEvent) recordEvent).getValue()));
-		} else if (recordEvent instanceof CodeAttributeUpdatedEvent) {
-			CodeAttributeUpdatedEvent evt = (CodeAttributeUpdatedEvent) recordEvent;
-			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attributeDef;
-			DataColumn codeColumn = dataTable.getDataColumn(codeAttrDef.getCodeFieldDefinition());
-			DataColumn qualifierColumn = dataTable.getDataColumn(codeAttrDef.getQualifierFieldDefinition());
-			columnValuePairs = Arrays.<ColumnValuePair<DataColumn, ?>>asList(
-					new ColumnValuePair<DataColumn, String>(codeColumn, evt.getCode()),
-					new ColumnValuePair<DataColumn, String>(qualifierColumn, evt.getQualifier())
-			);
-		} else if (recordEvent instanceof DateAttributeUpdatedEvent) {
-			columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), ((DateAttributeUpdatedEvent) recordEvent).getDate()));
-		} else if (recordEvent instanceof NumericAttributeUpdatedEvent) {
-			NumericAttributeUpdatedEvent<?> numericAttributeUpdatedEvent = (NumericAttributeUpdatedEvent<?>) recordEvent;
-			NumberAttributeDefinition numberAttrDef = (NumberAttributeDefinition) attributeDef;
-			FieldDefinition<Integer> unitIdFieldDef = numberAttrDef.getUnitIdFieldDefinition();
-			DataColumn unitColumn = dataTable.getDataColumn(unitIdFieldDef);
-			columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, numericAttributeUpdatedEvent.getUnitId()));
-			if (recordEvent instanceof NumberAttributeUpdatedEvent) {
-				DataColumn valueColumn = dataTable.getDataColumn(((NumberAttributeDefinition) attributeDef).getValueFieldDefinition());
-				Number value = ((NumberAttributeUpdatedEvent<?>) recordEvent).getValue();
-				columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(valueColumn, value));
-			} else if (recordEvent instanceof RangeAttributeUpdatedEvent) {
-				Number from = ((RangeAttributeUpdatedEvent<Number>) recordEvent).getFrom();
-				DataColumn fromColumn = dataTable.getDataColumn(((RangeAttributeDefinition) attributeDef).getFromFieldDefinition());
-				columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(fromColumn, from));
-				Number to = ((RangeAttributeUpdatedEvent<Number>) recordEvent).getTo();
-				DataColumn toColumn = dataTable.getDataColumn(((RangeAttributeDefinition) attributeDef).getToFieldDefinition());
-				columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(toColumn, to));
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				LOG.error("Rollback failed: " + e.getMessage(), e);
 			}
-		} else if (recordEvent instanceof TaxonAttributeUpdatedEvent) {
-			TaxonAttributeUpdatedEvent evt = (TaxonAttributeUpdatedEvent) recordEvent;
-			TaxonAttributeDefinition taxonAttrDef = (TaxonAttributeDefinition) attributeDef;
-			DataColumn codeColumn = dataTable.getDataColumn(taxonAttrDef.getCodeFieldDefinition());
-			DataColumn scientificNameColumn = dataTable.getDataColumn(taxonAttrDef.getScientificNameFieldDefinition());
-			DataColumn vernacularNameColumn = dataTable.getDataColumn(taxonAttrDef.getVernacularNameFieldDefinition());
-			DataColumn languageCodeColumn = dataTable.getDataColumn(taxonAttrDef.getLanguageCodeFieldDefinition());
-			DataColumn languageVarietyColumn = dataTable.getDataColumn(taxonAttrDef.getLanguageVarietyFieldDefinition());
-			columnValuePairs = Arrays.<ColumnValuePair<DataColumn, ?>>asList(
-					new ColumnValuePair<DataColumn, String>(codeColumn, evt.getCode()),
-					new ColumnValuePair<DataColumn, String>(scientificNameColumn, evt.getScientificName()),
-					new ColumnValuePair<DataColumn, String>(vernacularNameColumn, evt.getVernacularName()),
-					new ColumnValuePair<DataColumn, String>(languageCodeColumn, evt.getLanguageCode()),
-					new ColumnValuePair<DataColumn, String>(languageVarietyColumn, evt.getLanguageVariety())
-			);
-		} else if (recordEvent instanceof TextAttributeUpdatedEvent) {
-			columnValuePairs.add(new ColumnValuePair<DataColumn, String>(dataColumns.get(0), ((TextAttributeUpdatedEvent) recordEvent).getText()));
-		} else if (recordEvent instanceof TimeAttributeUpdatedEvent) {
-			columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), ((TimeAttributeUpdatedEvent) recordEvent).getTime()));
-		} else {
-			throw new UnsupportedOperationException("Unsupported record event type: " + recordEvent.getClass().getName());
+		} finally {
+			try {
+				if (connection != null) { 
+					connection.close();
+				}
+			} catch (SQLException e) {
+			}
 		}
-		return columnValuePairs;
 	}
 
-	private void deleteRecordData(RelationalSchema rdbSchema, JooqDatabaseExporter rdbUpdater,
-			Integer recordId) throws CollectRdbException {
-		CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
-		CollectRecord record = recordManager.load(survey, recordId);
-		rdbUpdater.deleteData(rdbSchema, record);
-	}
+	
 
-	private void udpateRecordData(RelationalSchema rdbSchema, JooqDatabaseExporter rdbUpdater,
+	private void udpateRecordData(RelationalSchema rdbSchema, RDBUpdater rdbUpdater,
 			Integer recordId) throws CollectRdbException {
 		CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
 		CollectRecord record = recordManager.load(survey, recordId);
@@ -295,6 +224,115 @@ public class CollectRDBGenerator implements EventListener {
 	
 	private JooqDatabaseExporter createRDBUpdater(Connection targetConn) {
 		return new JooqDatabaseExporter(targetConn);
+	}
+	
+
+	private interface Callback {
+		
+		void execute(Connection connection);
+		
+	}
+	
+	private class EventHandler {
+		
+		private RecordEvent recordEvent;
+		private RelationalSchema rdbSchema;
+		private CollectSurvey survey;
+		private RDBUpdater rdbUpdater;
+		
+		public EventHandler(RecordEvent recordEvent,
+				RelationalSchema rdbSchema, CollectSurvey survey, RDBUpdater rdbUpdater) {
+			super();
+			this.recordEvent = recordEvent;
+			this.rdbSchema = rdbSchema;
+			this.survey = survey;
+			this.rdbUpdater = rdbUpdater;
+		}
+		
+		public void handle() {
+			if (recordEvent instanceof AttributeUpdatedEvent) {
+				updateAttributeData();
+			} else if (recordEvent instanceof RecordDeletedEvent) {
+				rdbUpdater.deleteData(rdbSchema, recordEvent.getRecordId());
+			}
+		}
+		
+		private void updateAttributeData() {
+			CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
+			AttributeDefinition def = (AttributeDefinition) survey.getSchema().getDefinitionById(recordEvent.getDefinitionId());
+			EntityDefinition multipleEntityDef = def.getNearestAncestorMultipleEntity();
+			BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordEvent.getRecordId(), multipleEntityDef, recordEvent.getParentEntityId());
+			DataTable dataTable = rdbSchema.getDataTable(multipleEntityDef);
+			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = toColumnValueParis(dataTable, def);
+			rdbUpdater.updateData(rdbSchema, dataTable, pkValue, columnValuePairs);
+		}
+
+		@SuppressWarnings("unchecked")
+		public List<ColumnValuePair<DataColumn, ?>> toColumnValueParis(
+				DataTable dataTable, AttributeDefinition attributeDef) {
+			List<DataColumn> dataColumns = dataTable.getDataColumns(attributeDef);
+			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = new ArrayList<ColumnValuePair<DataColumn, ?>>();
+			if (recordEvent instanceof BooleanAttributeUpdatedEvent) {
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Boolean>(dataColumns.get(0), ((BooleanAttributeUpdatedEvent) recordEvent).getValue()));
+			} else if (recordEvent instanceof CodeAttributeUpdatedEvent) {
+				CodeAttributeUpdatedEvent evt = (CodeAttributeUpdatedEvent) recordEvent;
+				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attributeDef;
+				DataColumn codeColumn = dataTable.getDataColumn(codeAttrDef.getCodeFieldDefinition());
+				DataColumn qualifierColumn = dataTable.getDataColumn(codeAttrDef.getQualifierFieldDefinition());
+				columnValuePairs = Arrays.<ColumnValuePair<DataColumn, ?>>asList(
+						new ColumnValuePair<DataColumn, String>(codeColumn, evt.getCode()),
+						new ColumnValuePair<DataColumn, String>(qualifierColumn, evt.getQualifier())
+				);
+			} else if (recordEvent instanceof DateAttributeUpdatedEvent) {
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), ((DateAttributeUpdatedEvent) recordEvent).getDate()));
+			} else if (recordEvent instanceof NumericAttributeUpdatedEvent) {
+				NumericAttributeUpdatedEvent<?> numericAttributeUpdatedEvent = (NumericAttributeUpdatedEvent<?>) recordEvent;
+				NumberAttributeDefinition numberAttrDef = (NumberAttributeDefinition) attributeDef;
+				FieldDefinition<Integer> unitIdFieldDef = numberAttrDef.getUnitIdFieldDefinition();
+				DataColumn unitColumn = dataTable.getDataColumn(unitIdFieldDef);
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, numericAttributeUpdatedEvent.getUnitId()));
+				if (recordEvent instanceof NumberAttributeUpdatedEvent) {
+					DataColumn valueColumn = dataTable.getDataColumn(((NumberAttributeDefinition) attributeDef).getValueFieldDefinition());
+					Number value = ((NumberAttributeUpdatedEvent<?>) recordEvent).getValue();
+					columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(valueColumn, value));
+				} else if (recordEvent instanceof RangeAttributeUpdatedEvent) {
+					Number from = ((RangeAttributeUpdatedEvent<Number>) recordEvent).getFrom();
+					DataColumn fromColumn = dataTable.getDataColumn(((RangeAttributeDefinition) attributeDef).getFromFieldDefinition());
+					columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(fromColumn, from));
+					Number to = ((RangeAttributeUpdatedEvent<Number>) recordEvent).getTo();
+					DataColumn toColumn = dataTable.getDataColumn(((RangeAttributeDefinition) attributeDef).getToFieldDefinition());
+					columnValuePairs.add(new ColumnValuePair<DataColumn, Number>(toColumn, to));
+				}
+			} else if (recordEvent instanceof TaxonAttributeUpdatedEvent) {
+				TaxonAttributeUpdatedEvent evt = (TaxonAttributeUpdatedEvent) recordEvent;
+				TaxonAttributeDefinition taxonAttrDef = (TaxonAttributeDefinition) attributeDef;
+				DataColumn codeColumn = dataTable.getDataColumn(taxonAttrDef.getCodeFieldDefinition());
+				DataColumn scientificNameColumn = dataTable.getDataColumn(taxonAttrDef.getScientificNameFieldDefinition());
+				DataColumn vernacularNameColumn = dataTable.getDataColumn(taxonAttrDef.getVernacularNameFieldDefinition());
+				DataColumn languageCodeColumn = dataTable.getDataColumn(taxonAttrDef.getLanguageCodeFieldDefinition());
+				DataColumn languageVarietyColumn = dataTable.getDataColumn(taxonAttrDef.getLanguageVarietyFieldDefinition());
+				columnValuePairs = Arrays.<ColumnValuePair<DataColumn, ?>>asList(
+						new ColumnValuePair<DataColumn, String>(codeColumn, evt.getCode()),
+						new ColumnValuePair<DataColumn, String>(scientificNameColumn, evt.getScientificName()),
+						new ColumnValuePair<DataColumn, String>(vernacularNameColumn, evt.getVernacularName()),
+						new ColumnValuePair<DataColumn, String>(languageCodeColumn, evt.getLanguageCode()),
+						new ColumnValuePair<DataColumn, String>(languageVarietyColumn, evt.getLanguageVariety())
+				);
+			} else if (recordEvent instanceof TextAttributeUpdatedEvent) {
+				columnValuePairs.add(new ColumnValuePair<DataColumn, String>(dataColumns.get(0), ((TextAttributeUpdatedEvent) recordEvent).getText()));
+			} else if (recordEvent instanceof TimeAttributeUpdatedEvent) {
+				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), ((TimeAttributeUpdatedEvent) recordEvent).getTime()));
+			} else {
+				throw new UnsupportedOperationException("Unsupported record event type: " + recordEvent.getClass().getName());
+			}
+			return columnValuePairs;
+		}
+		
+		private void deleteRecordData(int recordId) throws CollectRdbException {
+			CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
+			CollectRecord record = recordManager.load(survey, recordId);
+			rdbUpdater.deleteData(rdbSchema, record);
+		}
 	}
 	
 }

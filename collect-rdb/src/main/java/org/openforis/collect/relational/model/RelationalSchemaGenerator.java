@@ -237,7 +237,8 @@ public class RelationalSchemaGenerator {
 				DataTable ancestorTable = parentTable.getParent();
 				while (ancestorTable != null) {
 					// Create FK column
-					Column<?> ancestorFKColumn = new DataAncestorFKColumn(getTablePKColumnName(ancestorTable));
+					int ancestorDefId = ancestorTable.getNodeDefinition().getId();
+					Column<?> ancestorFKColumn = new DataAncestorFKColumn(getTablePKColumnName(ancestorTable), ancestorDefId);
 					table.addColumn(ancestorFKColumn);
 					// Create FK constraint
 					addForeignKeyConstraint(table, ancestorTable, ancestorFKColumn);

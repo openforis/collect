@@ -10,8 +10,15 @@ import org.openforis.idm.model.Node;
  */
 public class DataAncestorFKColumn extends IdColumn<Node<?>> {
 
-	DataAncestorFKColumn(String name) {
+	private final int ancestorDefinitionId;
+	
+	DataAncestorFKColumn(String name, int ancestorDefinitionId) {
 		super(name);
+		this.ancestorDefinitionId = ancestorDefinitionId;
+	}
+	
+	public int getAncestorDefinitionId() {
+		return ancestorDefinitionId;
 	}
 
 }

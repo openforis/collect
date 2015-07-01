@@ -14,12 +14,15 @@ import org.openforis.collect.relational.model.RelationalSchema;
  */
 public interface RDBUpdater {
 	
-	void updateData(RelationalSchema schema, CollectRecord record) throws CollectRdbException;
+	void updateData(RelationalSchema schema, CollectRecord record);
 	
 	void updateData(RelationalSchema rdbSchema, DataTable dataTable,
 			BigInteger pkValue,
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs);
 	
-	void deleteData(RelationalSchema schema, CollectRecord record) throws CollectRdbException;
+	void deleteData(RelationalSchema schema, int recordId, int rootDefId);
+
+	void deleteDataForEntity(RelationalSchema schema, int recordId,
+			int entityId, int entityDefinitionId);
 
 }
