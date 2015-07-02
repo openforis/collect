@@ -225,29 +225,29 @@ public class RelationalSchemaGenerator {
 		
 		//add parent (or ancestors) FK columns
 		if ( parentTable != null ) {
-			// Create FK column
-			Column<?> fkColumn = new DataParentKeyColumn(getTablePKColumnName(parentTable));
-			table.addColumn(fkColumn);
-			// Create FK constraint
-			addForeignKeyConstraint(table, parentTable, fkColumn);
-			// Attach to parent table
+			int parentLevel = 1;
+			addForeignKey(table, parentTable, parentLevel);
+			
 			parentTable.addChildTable(table);
 			
 			if (config.isAncestorFKColumnsIncluded()) {
-				DataTable ancestorTable = parentTable.getParent();
-				while (ancestorTable != null) {
-					// Create FK column
-					int ancestorDefId = ancestorTable.getNodeDefinition().getId();
-					Column<?> ancestorFKColumn = new DataAncestorFKColumn(getTablePKColumnName(ancestorTable), ancestorDefId);
-					table.addColumn(ancestorFKColumn);
-					// Create FK constraint
-					addForeignKeyConstraint(table, ancestorTable, ancestorFKColumn);
-					
+				List<DataTable> ancestorTables = parentTable.getAncestors();
+				for (int i = 0; i < ancestorTables.size(); i++) {
+					DataTable ancestorTable = ancestorTables.get(i);
+					int level = parentLevel + (i + 1);
+					addForeignKey(table, ancestorTable, level);
 					ancestorTable = ancestorTable.getParent();
 				}
 			}
 		}
 		return table;
+	}
+
+	private void addForeignKey(DataTable fromTable, DataTable toTable, int level) {
+		int parentDefId = toTable.getNodeDefinition().getId();
+		DataAncestorFKColumn fkColumn = new DataAncestorFKColumn(getTablePKColumnName(toTable), parentDefId, level);
+		fromTable.addColumn(fkColumn);
+		addForeignKeyConstraint(fromTable, toTable, fkColumn);
 	}
 
 	private void addForeignKeyConstraint(DataTable table, DataTable referencedTable, Column<?> fkColumn) {

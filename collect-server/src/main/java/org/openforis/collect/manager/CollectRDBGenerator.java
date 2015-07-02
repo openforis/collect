@@ -18,6 +18,8 @@ import org.openforis.collect.event.AttributeUpdatedEvent;
 import org.openforis.collect.event.BooleanAttributeUpdatedEvent;
 import org.openforis.collect.event.CodeAttributeUpdatedEvent;
 import org.openforis.collect.event.DateAttributeUpdatedEvent;
+import org.openforis.collect.event.EntityCreatedEvent;
+import org.openforis.collect.event.EntityDeletedEvent;
 import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.NumberAttributeUpdatedEvent;
 import org.openforis.collect.event.NumericAttributeUpdatedEvent;
@@ -201,15 +203,6 @@ public class CollectRDBGenerator implements EventListener {
 		}
 	}
 
-	
-
-	private void udpateRecordData(RelationalSchema rdbSchema, RDBUpdater rdbUpdater,
-			Integer recordId) throws CollectRdbException {
-		CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
-		CollectRecord record = recordManager.load(survey, recordId);
-		rdbUpdater.updateData(rdbSchema, record);
-	}
-
 	private RelationalSchema getRelatedRelationalSchema(
 			List<? extends RecordEvent> events) {
 		for (RecordEvent event : events) {
@@ -250,15 +243,22 @@ public class CollectRDBGenerator implements EventListener {
 		}
 		
 		public void handle() {
-			if (recordEvent instanceof AttributeUpdatedEvent) {
+			if (recordEvent instanceof EntityCreatedEvent) {
+				insertEntity();
+			} else if (recordEvent instanceof AttributeUpdatedEvent) {
 				updateAttributeData();
+			} else if (recordEvent instanceof EntityDeletedEvent) {
+				deleteEntity();
 			} else if (recordEvent instanceof RecordDeletedEvent) {
-				rdbUpdater.deleteData(rdbSchema, recordEvent.getRecordId());
+				deleteRecord();
 			}
 		}
-		
+
+		private void insertEntity() {
+			rdbUpdater.insertEntity(rdbSchema, recordEvent.getRecordId(), recordEvent.getParentEntityId(), recordEvent.getNodeId(), recordEvent.getDefinitionId());
+		}
+
 		private void updateAttributeData() {
-			CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
 			AttributeDefinition def = (AttributeDefinition) survey.getSchema().getDefinitionById(recordEvent.getDefinitionId());
 			EntityDefinition multipleEntityDef = def.getNearestAncestorMultipleEntity();
 			BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordEvent.getRecordId(), multipleEntityDef, recordEvent.getParentEntityId());
@@ -327,12 +327,15 @@ public class CollectRDBGenerator implements EventListener {
 			}
 			return columnValuePairs;
 		}
-		
-		private void deleteRecordData(int recordId) throws CollectRdbException {
-			CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
-			CollectRecord record = recordManager.load(survey, recordId);
-			rdbUpdater.deleteData(rdbSchema, record);
+
+		private void deleteEntity() {
+			rdbUpdater.deleteEntity(rdbSchema, recordEvent.getRecordId(), recordEvent.getNodeId(), recordEvent.getDefinitionId());
 		}
+
+		private void deleteRecord() {
+			rdbUpdater.deleteData(rdbSchema, recordEvent.getRecordId(), recordEvent.getDefinitionId());
+		}
+		
 	}
 	
 }

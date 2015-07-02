@@ -157,21 +157,22 @@ public class DataService {
 		return result;
 	}
 
-	@Transactional
 	@Secured("ROLE_ENTRY")
 	public RecordProxy createRecord(String rootEntityName, String versionName, Step recordStep) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
 		}
-		String sessionId = sessionState.getSessionId();
 		CollectSurvey activeSurvey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
-		CollectRecord record = recordManager.create(activeSurvey, rootEntityName, user, versionName, sessionId, recordStep);
+		CollectRecord record = recordManager.instantiateRecord(activeSurvey, rootEntityName, user, versionName, recordStep);
+		NodeChangeSet changeSet = recordManager.initializeRecord(record);
+
+		eventProducer.produceForNewRecord(record, changeSet, user.getName());
+		
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
 		
-		eventProducer.produceForNew(record);
 		
 		RecordProxy recordProxy = new RecordProxy(record, sessionState.getLocale());
 		return recordProxy;
@@ -187,8 +188,13 @@ public class DataService {
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
 		
-		eventProducer.produceForDeleted(record);
-		sessionEventDispatcher.recordDeleted(record, sessionState.getUser().getName());
+		//TODO notify listeners with a RecordDeletedEvent
+//		Survey survey1 = record.getSurvey();
+//		String surveyName = survey1.getName();
+//		Entity rootEntity = record.getRootEntity();
+//		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
+//		
+//		Arrays.asList(new RecordDeletedEvent(surveyName, record.getId(), rootEntityDefn.getId(), rootEntity.getInternalId(), new Date(), sessionState.getUser().getName()));
 	}
 	
 	@Transactional
@@ -210,7 +216,7 @@ public class DataService {
 			recordIndexService.permanentlyIndex(record);
 		}
 		
-		sessionEventDispatcher.recordSaved();
+		sessionEventDispatcher.recordSaved(record);
 	}
 
 	@Transactional

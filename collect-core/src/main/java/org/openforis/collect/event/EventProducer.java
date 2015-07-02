@@ -47,12 +47,16 @@ public class EventProducer implements EventSource {
 	}
 
 	public void produceFor(NodeChangeSet changeSet, String userName) {
+		notifyListeners(toEvents(changeSet, userName));
+	}
+
+	private List<RecordEvent> toEvents(NodeChangeSet changeSet, String userName) {
 		List<RecordEvent> events = new ArrayList<RecordEvent>();
 		List<NodeChange<?>> changes = changeSet.getChanges();
 		for (NodeChange<?> change : changes) {
 			events.addAll(toEvent(change, userName));
 		}
-		notifyListeners(events);
+		return events;
 	}
 
 	private List<? extends RecordEvent> toEvent(NodeChange<?> change, String userName) {
@@ -109,14 +113,12 @@ public class EventProducer implements EventSource {
 		}
 	}
 
-	public void produceForNew(CollectRecord record) {
-		
+	public void produceForNewRecord(CollectRecord record, NodeChangeSet changeSet, String userName) {
+		List<RecordEvent> events = toEvents(changeSet, userName);
+		Entity rootEntity = record.getRootEntity();
+		int rootDefId = rootEntity.getDefinition().getId();
+		events.add(0, new RootEntityCreatedEvent(record.getSurvey().getName(), record.getId(), 
+				rootDefId, rootEntity.getInternalId(), new Date(), userName));
 	}
-
-	public void produceForDeleted(CollectRecord record) {
-		
-	}
-	
-	
 
 }

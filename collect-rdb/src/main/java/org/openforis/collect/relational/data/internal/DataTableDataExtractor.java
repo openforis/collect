@@ -13,10 +13,10 @@ import org.openforis.collect.relational.model.CodeValueFKColumn;
 import org.openforis.collect.relational.model.Column;
 import org.openforis.collect.relational.model.DataAncestorFKColumn;
 import org.openforis.collect.relational.model.DataColumn;
-import org.openforis.collect.relational.model.DataParentKeyColumn;
 import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
@@ -28,7 +28,7 @@ import org.openforis.idm.path.Path;
  */
 public class DataTableDataExtractor extends DataExtractor {
 
-	private static final int NODE_ID_MAX_VALUE = 1000000;
+	private static final int NODE_ID_MAX_VALUE = Integer.MAX_VALUE;
 
 	private DataTable table;
 	private Record record;
@@ -93,18 +93,10 @@ public class DataTableDataExtractor extends DataExtractor {
 
 	private Object extractColumnValue(Node<?> context, Column<?> column) {
 		if (column instanceof DataPrimaryKeyColumn) {
-			return getTableArtificialPK((Entity) context);
+			return getTableArtificialPK(context);
 		} else if (column instanceof CodeValueFKColumn) {
 			CodeValueFKColumnValueExtractor valueExtractor = new CodeValueFKColumnValueExtractor(table, (CodeValueFKColumn) column);
 			return valueExtractor.extractValue(context);
-		} else if (column instanceof DataParentKeyColumn) {
-			Entity nearestAncestorMultipleEntity = context.getNearestMultipleEntityAncestor();
-			if ( nearestAncestorMultipleEntity == null ) {
-				throw new NullPointerException(String.format(
-						"Cannot find neareast multiple entity ancestor for node %s in record %d", 
-						context.getPath(), context.getRecord().getId()));
-			}
-			return getTableArtificialPK(nearestAncestorMultipleEntity);
 		} else if (column instanceof DataAncestorFKColumn) {
 			EntityDefinition referencedEntityDefinition = table.getReferencedEntityDefinition((DataAncestorFKColumn) column);
 			Entity ancestor = context.getAncestorByDefinition(referencedEntityDefinition);
@@ -122,16 +114,16 @@ public class DataTableDataExtractor extends DataExtractor {
 		}
 	}
 	
-	public static BigInteger getTableArtificialPK(Entity entity) {
-		return getTableArtificialPK(entity.getRecord().getId(), entity.getDefinition(), entity.getInternalId());
+	public static BigInteger getTableArtificialPK(Node<?> node) {
+		return getTableArtificialPK(node.getRecord().getId(), node.getDefinition(), node.getInternalId());
 	}
 
 	public static BigInteger getTableArtificialPK(int recordId,
-			EntityDefinition entityDef, int entityId) {
-		if (entityDef.isRoot()) {
+			NodeDefinition nodeDef, int entityId) {
+		if (nodeDef instanceof EntityDefinition && ((EntityDefinition) nodeDef).isRoot()) {
 			return BigInteger.valueOf(recordId);
 		} else {
-			//result = id + recordId * NODE_ID_MAX_VALUE
+			//result = recordId * NODE_ID_MAX_VALUE + node_id 
 			return BigInteger.valueOf(entityId).add(
 					BigInteger.valueOf(recordId).multiply(BigInteger.valueOf(NODE_ID_MAX_VALUE))
 			);

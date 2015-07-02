@@ -14,6 +14,10 @@ import org.openforis.collect.relational.model.RelationalSchema;
  */
 public interface RDBUpdater {
 	
+	void insertEntity(RelationalSchema schema, int recordId, 
+			Integer parentId, int entityId,
+			int entityDefinitionId);
+
 	void updateData(RelationalSchema schema, CollectRecord record);
 	
 	void updateData(RelationalSchema rdbSchema, DataTable dataTable,
@@ -22,7 +26,7 @@ public interface RDBUpdater {
 	
 	void deleteData(RelationalSchema schema, int recordId, int rootDefId);
 
-	void deleteDataForEntity(RelationalSchema schema, int recordId,
+	void deleteEntity(RelationalSchema schema, int recordId,
 			int entityId, int entityDefinitionId);
 
 }

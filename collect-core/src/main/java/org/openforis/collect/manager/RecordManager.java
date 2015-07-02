@@ -236,8 +236,7 @@ public class RecordManager {
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate, boolean addEmptyMultipleEntities) {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber(), validate);
 		recordConverter.convertToLatestVersion(record);
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.initializeRecord(record, validate, addEmptyMultipleEntities);
+		updater.initializeRecord(record, validate, addEmptyMultipleEntities);
 		return record;
 	}
 	
@@ -343,6 +342,7 @@ public class RecordManager {
 		}
 		return true;
 	}
+	
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName) throws RecordPersistenceException {
 		return create(survey, rootEntityName, user, modelVersionName, (String) null);
 	}
@@ -356,14 +356,23 @@ public class RecordManager {
 	}
 	
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId, Step step) throws RecordPersistenceException {
+		CollectRecord record = instantiateRecord(survey, rootEntityName, user,
+				modelVersionName, step);
+		initializeRecord(record);
+		return record;
+	}
+
+	public NodeChangeSet initializeRecord(CollectRecord record) {
+		return updater.initializeNewRecord(record);
+	}
+
+	public CollectRecord instantiateRecord(CollectSurvey survey,
+			String rootEntityName, User user, String modelVersionName, Step step) {
 		CollectRecord record = survey.createRecord(modelVersionName);
 		record.createRootEntity(rootEntityName);
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 		record.setStep(step);
-
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.initializeNewRecord(record);
 		return record;
 	}
 

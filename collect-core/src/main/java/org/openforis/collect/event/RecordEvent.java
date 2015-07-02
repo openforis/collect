@@ -29,10 +29,7 @@ public abstract class RecordEvent {
 		this.userName = userName;
 	}
 	
-	public void initializeRecordId(Integer recordId) {
-		if (this.recordId != null) {
-			throw new IllegalStateException("Record id already initialized");
-		}
+	public void initializeRecordId(int recordId) {
 		this.recordId = recordId;
 	}
 	

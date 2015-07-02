@@ -2,8 +2,6 @@ package org.openforis.collect.relational.model;
 
 import java.util.List;
 
-import org.openforis.idm.metamodel.NodeDefinition;
-
 /**
  * 
  * @author G. Miceli

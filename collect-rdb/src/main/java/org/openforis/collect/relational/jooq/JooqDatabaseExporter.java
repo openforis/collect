@@ -1,5 +1,7 @@
 package org.openforis.collect.relational.jooq;
 
+import static org.openforis.collect.relational.data.internal.DataTableDataExtractor.getTableArtificialPK;
+
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -7,15 +9,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.DeleteQuery;
 import org.jooq.Field;
 import org.jooq.InsertQuery;
+import org.jooq.InsertSetMoreStep;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
+import org.jooq.SelectConditionStep;
+import org.jooq.Update;
 import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
@@ -26,11 +32,11 @@ import org.openforis.collect.relational.data.ColumnValuePair;
 import org.openforis.collect.relational.data.DataExtractor;
 import org.openforis.collect.relational.data.DataExtractorFactory;
 import org.openforis.collect.relational.data.Row;
-import org.openforis.collect.relational.data.internal.DataTableDataExtractor;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.Column;
 import org.openforis.collect.relational.model.DataAncestorFKColumn;
 import org.openforis.collect.relational.model.DataColumn;
+import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
@@ -79,6 +85,68 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 
 	@Override
+	public void insertEntity(RelationalSchema schema, int recordId, Integer parentId, int entityId, int entityDefinitionId) {
+		DataTable table = schema.getDataTableByDefinitionId(entityDefinitionId);
+		EntityDefinition entityDef = (EntityDefinition) table.getNodeDefinition();
+		BigInteger pkValue = getTableArtificialPK(recordId, entityDef, entityId);
+		
+		QueryCreator queryCreator = new QueryCreator(dsl, schema.getName());
+		DataPrimaryKeyColumn pkColumn = table.getPrimaryKeyColumn();
+		org.jooq.Table<Record> jooqTable = queryCreator.getJooqTable(table);
+		InsertSetMoreStep<Record> insert = dsl
+				.insertInto(jooqTable)
+				.set(DSL.field(pkColumn.getName()), pkValue);
+		
+		if (parentId != null) {
+			Map<String, BigInteger> ancestorFKByColumnName = findAncestorFKByColumnName(schema, table, recordId, parentId);
+			for (Entry<String, BigInteger> entry : ancestorFKByColumnName.entrySet()) {
+				insert.set(DSL.field(entry.getKey()), entry.getValue());
+			}
+		}
+		insert.execute();
+	}
+
+	private Map<String, BigInteger> findAncestorFKByColumnName(RelationalSchema schema, DataTable table, int recordId, int parentId) {
+		Map<String, BigInteger> result = new HashMap<String, BigInteger>();
+		
+		DataTable parentTable = table.getParent();
+		
+		List<DataAncestorFKColumn> parentAncestorFKColumns = new ArrayList<DataAncestorFKColumn>(parentTable.getAncestorFKColumns());
+		
+		List<Field<?>> parentAncestorColumns = toFields(parentAncestorFKColumns);
+		
+		BigInteger parentPKValue = getTableArtificialPK(recordId, parentTable.getNodeDefinition(), parentId);
+		DataPrimaryKeyColumn parentPKColumn = parentTable.getPrimaryKeyColumn();		
+		QueryCreator queryCreator = new QueryCreator(dsl, schema.getName());
+		SelectConditionStep<Record> selectAncestorFKs = dsl
+			.select(parentAncestorColumns)
+			.from(queryCreator.getJooqTable(parentTable))
+			.where(DSL.field(parentPKColumn.getName()).eq(parentPKValue));
+		Record record = selectAncestorFKs.fetchOne();
+		
+		for (int i = 0; i < parentAncestorColumns.size(); i++) {
+			Field<?> parentAncestorField = parentAncestorColumns.get(i);
+			
+			DataAncestorFKColumn parentColumn = parentAncestorFKColumns.get(i);
+			int ancestorDefinitionId = parentColumn.getAncestorDefinitionId();
+			DataAncestorFKColumn column = table.getAncestorFKColumn(ancestorDefinitionId);
+			BigInteger ancestorPK = record.getValue(parentAncestorField, BigInteger.class);
+			result.put(column.getName(), ancestorPK);
+		}
+		result.put(table.getParentFKColumn().getName(), parentPKValue);
+
+		return result;
+	}
+	
+	private List<Field<?>> toFields(List<? extends Column<?>> columns) {
+		List<Field<?>> ancestorColumns = new ArrayList<Field<?>>(columns.size());
+		for (Column<?> column : columns) {
+			ancestorColumns.add(DSL.field(column.getName()));
+		}
+		return ancestorColumns;
+	}
+	
+	@Override
 	public void updateData(RelationalSchema schema, CollectRecord record) {
 		deleteData(schema, record.getId(), record.getRootEntity().getDefinition().getId());
 		insertData(schema, record);
@@ -94,14 +162,14 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	
 	@Override
 	public void deleteData(RelationalSchema schema, int recordId, int rootDefId) {
-		deleteDataForEntity(schema, recordId, recordId, rootDefId);
+		deleteEntity(schema, recordId, recordId, rootDefId);
 	}
 	
 	@Override
-	public void deleteDataForEntity(RelationalSchema schema, int recordId, int entityId, int entityDefinitionId) {
+	public void deleteEntity(RelationalSchema schema, int recordId, int entityId, int entityDefinitionId) {
 		DataTable tableToDeleteFor = schema.getDataTableByDefinitionId(entityDefinitionId);
 		EntityDefinition entityDefToDeleteFor = (EntityDefinition) tableToDeleteFor.getNodeDefinition();
-		BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordId, entityDefToDeleteFor, entityId);
+		BigInteger pkValue = getTableArtificialPK(recordId, entityDefToDeleteFor, entityId);
 		
 		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
 		
@@ -112,7 +180,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		List<DataTable> descendantTables = new ArrayList<DataTable>(schema.getDescendantTablesForDefinition(entityDefinitionId));
 		Collections.reverse(descendantTables);
 		for (DataTable dataTable : descendantTables) {
-			DataAncestorFKColumn ancestorIdColumn = dataTable.getAncestorIdColumn(entityDefinitionId);
+			DataAncestorFKColumn ancestorIdColumn = dataTable.getAncestorFKColumn(entityDefinitionId);
 			batchExecutor.addDelete(dataTable, ancestorIdColumn, pkValue);
 		}
 		batchExecutor.flush();
@@ -122,12 +190,12 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		
 		private static final int BATCH_MAX_SIZE = 10000;
 		
-		private RelationalSchema schema;
 		private List<Query> queries;
+		private QueryCreator queryCreator;
 		
 		public BatchQueryExecutor(RelationalSchema schema) {
-			this.schema = schema;
 			this.queries = new ArrayList<Query>();
+			this.queryCreator = new QueryCreator(dsl, schema.getName());
 		}
 
 		public void addInserts(DataExtractor extractor) {
@@ -138,28 +206,26 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		}
 
 		public void addInsert(Row row) {
-			queries.add(createInsertQuery(row));
+			queries.add(queryCreator.createInsertQuery(row));
 			if ( queries.size() == BATCH_MAX_SIZE ) {
 				flush();
 			}
 		}
 
-		public void addUpdate(Table<?> table, BigInteger pkValue, List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
+		public void addUpdate(DataTable table, BigInteger pkValue, List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
 			Map<Field<?>, Object> fieldToValue = new HashMap<Field<?>, Object>();
 			for (ColumnValuePair<DataColumn, ?> columnValuePair : columnValuePairs) {
 				Field<?> field = DSL.field(columnValuePair.getColumn().getName());
 				Object value = columnValuePair.getValue();
 				fieldToValue.put(field, value);
 			}
-			@SuppressWarnings("unchecked")
-			Column<BigInteger> pkColumn = (Column<BigInteger>) table.getPrimaryKeyConstraint().getColumns().get(0);
-			Field<Object> pkField = DSL.field(pkColumn.getName());
-			UpdateConditionStep<Record> query = dsl.update(getJooqTable(table)).set(fieldToValue).where(pkField.eq(pkValue));
+			Update<Record> query = queryCreator.createUpdateQuery(table, pkValue, fieldToValue);
 			queries.add(query);
 		}
+
 		
 		public void addDelete(Table<?> table, Column<?> pkColumn, BigInteger pkValue) {
-			queries.add(createDeleteQuery(table, pkColumn, pkValue));
+			queries.add(queryCreator.createDeleteQuery(table, pkColumn, pkValue));
 		}
 
 		public void flush() {
@@ -173,8 +239,20 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+	
+	private class QueryCreator {
 		
-		private InsertQuery<Record> createInsertQuery(Row row) {
+		private final DSLContext dsl;
+		private final String schemaName;
+		
+		public QueryCreator(DSLContext dsl, String schemaName) {
+			super();
+			this.dsl = dsl;
+			this.schemaName = schemaName;
+		}
+
+		public InsertQuery<Record> createInsertQuery(Row row) {
 			Table<?> table = row.getTable();
 			InsertQuery<Record> insert = dsl.insertQuery(getJooqTable(table));
 			List<Object> values = row.getValues();
@@ -189,7 +267,15 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			return insert;
 		}
 		
-		private DeleteQuery<Record> createDeleteQuery(Table<?> table, Column<?> pkColumn, BigInteger pkValue) {
+		public Update<Record> createUpdateQuery(DataTable table,
+				BigInteger pkValue, Map<Field<?>, Object> fieldToValue) {
+			DataPrimaryKeyColumn pkColumn = table.getPrimaryKeyColumn();
+			Field<Object> pkField = DSL.field(pkColumn.getName());
+			UpdateConditionStep<Record> query = dsl.update(getJooqTable(table)).set(fieldToValue).where(pkField.eq(pkValue));
+			return query;
+		}
+		
+		public DeleteQuery<Record> createDeleteQuery(Table<?> table, Column<?> pkColumn, BigInteger pkValue) {
 			org.jooq.Table<Record> jooqTable = getJooqTable(table);
 			Field<BigInteger> jooqPKColumn = DSL.field(pkColumn.getName(), BigInteger.class);
 			DeleteQuery<Record> query = dsl.deleteQuery(jooqTable);
@@ -201,14 +287,14 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			if ( isSchemaLess() ) {
 				return DSL.tableByName(table.getName());
 			} else {
-				return DSL.tableByName(schema.getName(), table.getName());
+				return DSL.tableByName(schemaName, table.getName());
 			}
 		}
 		
 		private boolean isSchemaLess() {
 			return dsl.configuration().dialect() == SQLDialect.SQLITE;
 		}
-
+		
 	}
 	
 }

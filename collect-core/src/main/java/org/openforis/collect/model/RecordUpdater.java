@@ -678,20 +678,20 @@ public class RecordUpdater {
 		return entity;
 	}
 
-	public void initializeRecord(Record record) {
-		initializeRecord(record, true);
+	public NodeChangeSet initializeRecord(Record record) {
+		return initializeRecord(record, true);
 	}
 	
-	public void initializeRecord(Record record, boolean validate) {
-		initializeRecord(record, validate, true);
+	public NodeChangeSet initializeRecord(Record record, boolean validate) {
+		return initializeRecord(record, validate, true);
 	}
 	
-	public void initializeRecord(Record record, boolean validate, boolean addEmptyMultipleEntities) {
-		initializeEntity(record.getRootEntity(), validate, addEmptyMultipleEntities, false);
+	public NodeChangeSet initializeRecord(Record record, boolean validate, boolean addEmptyMultipleEntities) {
+		return initializeEntity(record.getRootEntity(), validate, addEmptyMultipleEntities, false);
 	}
 	
-	public void initializeNewRecord(Record record) {
-		initializeEntity(record.getRootEntity(), true, true, true);
+	public NodeChangeSet initializeNewRecord(Record record) {
+		return initializeEntity(record.getRootEntity(), true, true, true);
 	}
 	
 	protected NodeChangeMap initializeEntity(Entity entity) {
