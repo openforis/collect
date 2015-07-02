@@ -2,7 +2,7 @@ var SEPARATOR_MULTIPLE_PARAMETERS = "==="; //used to separate multiple attribute
 var SEPARATOR_MULTIPLE_VALUES = ";";
 var DATE_FORMAT = 'MM/DD/YYYY';
 var TIME_FORMAT = 'HH:ss';
-var SUBMIT_LABEL = "Finish";
+
 var ACTIVELY_SAVED_FIELD_ID = "collect_boolean_actively_saved";
 var NESTED_ATTRIBUTE_ID_PATTERN = /\w+\[\w+\]\.\w+/;
 
@@ -455,7 +455,10 @@ var initSteps = function() {
 		autoFocus : true,
 		titleTemplate : "#title#",
 		labels : {
-			finish : SUBMIT_LABEL
+			// These values come from the balloon.html file as they need to be localized (spanish,english,portuguese and french)
+			finish : SUBMIT_LABEL,
+		    next: NEXT_LABEL,
+		    previous: PREVIOUS_LABEL
 		},
 		onStepChanged : function(event, currentIndex, priorIndex) {
 			var stepHeading = $($form.find(".steps .steps ul li")[currentIndex]);

@@ -57,10 +57,15 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class CollectEarthBalloonGenerator {
 	
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"id", "operator", "location", "plot_file", "actively_saved", "actively_saved_on")));
+			"id", "operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	
-	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt";
-	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS";
+	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt"; //$NON-NLS-1$
+	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS"; //$NON-NLS-1$
+	
+	private static final String PLACEHOLDER_FOR_FINISH_TRANSLATION = "PLACEHOLDER_FINISH"; //$NON-NLS-1$
+	private static final String PLACEHOLDER_FOR_NEXT_TRANSLATION = "PLACEHOLDER_NEXT"; //$NON-NLS-1$
+	private static final String PLACEHOLDER_FOR_PREVIOUS_TRANSLATION = "PLACEHOLDER_PREVIOUS"; //$NON-NLS-1$
+
 
 	private CollectSurvey survey;
 	private String language;
@@ -81,13 +86,21 @@ public class CollectEarthBalloonGenerator {
 		String htmlTemplate = getHTMLTemplate();
 		String result = fillWithExtraCSVFields(htmlTemplate);
 		result = fillWithSurveyDefinitionFields(result);
+		result = replaceButtonLocalizationText(result);
 		return result;
+	}
+
+	private String replaceButtonLocalizationText(String htmlForBalloon) {
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_FINISH_TRANSLATION, Messages.getString("CollectEarthBalloonGenerator.11", language)); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_NEXT_TRANSLATION, Messages.getString("CollectEarthBalloonGenerator.12", language)); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_PREVIOUS_TRANSLATION, Messages.getString("CollectEarthBalloonGenerator.13", language)); //$NON-NLS-1$
+		return htmlForBalloon;
 	}
 
 	private String getHTMLTemplate() throws IOException {
 		InputStream is = getClass().getClassLoader().getResourceAsStream(BALLOON_TEMPLATE_TXT);
 		StringWriter writer = new StringWriter();
-		IOUtils.copy(is, writer, "UTF-8");
+		IOUtils.copy(is, writer, "UTF-8"); //$NON-NLS-1$
 		String template = writer.toString();
 		return template;
 	}
@@ -122,13 +135,13 @@ public class CollectEarthBalloonGenerator {
 		StringBuilder sb = new StringBuilder();
 		for (AttributeDefinition def : nodesFromCSV) {
 			String name = getHtmlParameterName(def);
-			sb.append("<input type=\"hidden\" id=\"");
+			sb.append("<input type=\"hidden\" id=\""); //$NON-NLS-1$
 			sb.append(name);
-			sb.append("\" name=\"");
+			sb.append("\" name=\""); //$NON-NLS-1$
 			sb.append(name);
-			sb.append("\" value=\"$[");
+			sb.append("\" value=\"$["); //$NON-NLS-1$
 			sb.append(def.getName());
-			sb.append("]\" />");
+			sb.append("]\" />"); //$NON-NLS-1$
 			sb.append('\n');
 		}
 		String result = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, sb.toString());
@@ -165,12 +178,12 @@ public class CollectEarthBalloonGenerator {
 		UIOptions uiOptions = survey.getUIOptions();
 		UIConfiguration uiConfiguration = survey.getUIConfiguration();
 		if (uiConfiguration == null) {
-			throw new IllegalStateException("Error unmarshalling the survey");
+			throw new IllegalStateException("Error unmarshalling the survey"); //$NON-NLS-1$
 		}
 		if (uiConfiguration.getFormSets().isEmpty()) {
 			//no ui configuration defined
-			CETabSet tabSet = new CETabSet("", "");
-			CETab tab = new CETab(rootEntityDef.getName(), "");
+			CETabSet tabSet = new CETabSet("", ""); //$NON-NLS-1$ //$NON-NLS-2$
+			CETab tab = new CETab(rootEntityDef.getName(), ""); //$NON-NLS-1$
 			for (NodeDefinition childDef : rootEntityDef.getChildDefinitions()) {
 				if (! uiOptions.isHidden(childDef)) {
 					tab.addChild(createComponent(childDef));
@@ -179,7 +192,7 @@ public class CollectEarthBalloonGenerator {
 			tabSet.addTab(tab);
 			return tabSet;
 		} else {
-			CETabSet tabSet = new CETabSet("", "");
+			CETabSet tabSet = new CETabSet("", ""); //$NON-NLS-1$ //$NON-NLS-2$
 			UIFormSet formSet = uiConfiguration.getMainFormSet();
 			for (UIForm form : formSet.getForms()) {
 				boolean main = tabSet.getTabs().isEmpty();
@@ -218,7 +231,7 @@ public class CollectEarthBalloonGenerator {
 					CEComponent component = createComponent(nodeDef);
 					tab.addChild(component);
 				} else {
-					throw new IllegalArgumentException("Form component not supported: " + formComponent.getClass().getName());
+					throw new IllegalArgumentException("Form component not supported: " + formComponent.getClass().getName()); //$NON-NLS-1$
 				}
 			}
 		}
@@ -361,7 +374,7 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private String getEnumeratedEntityComponentHtmlParameterName(EntityDefinition entityDef, int entityPosition, NodeDefinition childDef) {
-		String nodePath = entityDef.getPath() + "[" + entityPosition + "]/" + childDef.getName();
+		String nodePath = entityDef.getPath() + "[" + entityPosition + "]/" + childDef.getName(); //$NON-NLS-1$ //$NON-NLS-2$
 		return htmlParameterNameByNodePath.get(nodePath);
 	}
 	
@@ -400,11 +413,11 @@ public class CollectEarthBalloonGenerator {
 				return CEFieldType.CODE_RANGE;
 			}else{
 				// SLIDER NOT SUPPRTED YET!
-				throw new IllegalArgumentException("REAL TYPE RANGES NOT SUPPRTED YET!");
+				throw new IllegalArgumentException("REAL TYPE RANGES NOT SUPPRTED YET!"); //$NON-NLS-1$
 			}
 			
 		}  else {
-			throw new IllegalArgumentException("Attribute type not supported: " + def.getClass().getName());
+			throw new IllegalArgumentException("Attribute type not supported: " + def.getClass().getName()); //$NON-NLS-1$
 		}
 	}
 
