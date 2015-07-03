@@ -1,6 +1,7 @@
 package org.openforis.collect.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -222,6 +223,9 @@ public class SessionManager implements EventListener {
 	}
 
 	public List<RecordEvent> flushPendingEvents() {
+		if (pendingEvents.isEmpty()) {
+			return Collections.emptyList();
+		}
 		List<RecordEvent> events = new ArrayList<RecordEvent>(pendingEvents);
 		pendingEvents.clear();
 		return events;

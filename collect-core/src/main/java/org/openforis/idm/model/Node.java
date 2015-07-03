@@ -29,26 +29,21 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 
 //	private final Log log = LogFactory.getLog(Node.class);
 	
-	transient D definition;
+	transient final D definition;
 	transient Record record;
 	transient Integer id;
 	transient Integer internalId;
 	transient Entity parent;
 	transient int index;
 	transient String path;
-	
-	Integer definitionId;
-
-	protected Node() {
-		this.index = 0;
-	}
+	transient boolean detached;
 	
 	public Node(D definition) {
 		if ( definition == null ) {
 			throw new NullPointerException("Definition required");
 		}
 		this.definition = definition;
-		this.definitionId = definition.getId();
+		this.detached = true;
 	}
 	
 	protected abstract void write(StringWriter sw, int indent);
@@ -121,8 +116,7 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	}
 
 	public <C extends SurveyContext> C getSurveyContext() {
-		Survey survey = getSurvey();
-		return survey.getContext();
+		return getSurvey().getContext();
 	}
 	
 	public int getIndex() {
@@ -143,19 +137,27 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	}
 	
 	public Survey getSurvey() {
-		return record == null ? null : record.getSurvey();
+		return definition.getSurvey();
 	}
 	
 	public Schema getSchema() {
-		return getSurvey() == null ? null : getSurvey().getSchema();
+		return getSurvey().getSchema();
 	}
 	
 	public ModelVersion getModelVersion() {
 		return record == null ? null: record.getVersion();
 	}
 
+	public String getName() {
+		return getDefinition().getName();
+	}
+
+	public Integer getParentId() {
+		return parent == null ? null : parent.getInternalId();
+	}
+
 	public boolean isDetached() {
-		return record == null;
+		return detached;
 	}
 
 	public Integer getId() {
@@ -172,10 +174,6 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	
 	public D getDefinition() {
 		return this.definition;
-	}
-
-	public String getName() {
-		return getDefinition().getName();
 	}
 
 	public Record getRecord() {

@@ -28,7 +28,7 @@ public final class Field<T> extends Node<FieldDefinition<T>> implements Serializ
 	State state;
 	
 	public Field(FieldDefinition<T> definition, Class<T> valueType, Attribute<?,?> attribute) {
-		this.definition = definition;
+		super(definition);
 		this.valueType = valueType;
 		this.attribute = attribute;
 		this.state = new State();

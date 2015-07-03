@@ -477,9 +477,11 @@ public class RecordUpdater {
 		Set<Attribute<?, ?>> validationDependenciesToDeleted = record.determineValidationDependentNodes(nodesToBeDeleted);
 		validationDependenciesToDeleted.removeAll(nodesToBeDeleted);
 		
+		Integer parentId = node.getParentId();
+		
 		performNodeDeletion(node);
 
-		changeMap.addNodeDeleteChange(node);
+		changeMap.addNodeDeleteChange(record.getId(), parentId, node);
 
 		// calculated attributes
 		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);

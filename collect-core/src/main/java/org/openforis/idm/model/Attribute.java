@@ -245,4 +245,5 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 		}
 		return compareToBuilder.toComparison();
 	}
+
 }

@@ -38,8 +38,6 @@ public class SessionService {
 	 * Method used to keep the session alive
 	 * @throws RecordUnlockedException 
 	 */
-	//@Secured("isAuthenticated()")
-	@Transactional
 	public void keepAlive(Boolean editing) throws RecordUnlockedException {
 		sessionManager.keepSessionAlive();
 		if(editing) {

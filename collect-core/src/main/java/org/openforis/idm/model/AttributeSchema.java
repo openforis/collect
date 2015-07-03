@@ -19,7 +19,7 @@ public class AttributeSchema<T extends Attribute<?,?>> extends SchemaSupport<T> 
 	
 	@Override
 	public boolean isInitialized(T attr) {
-		return attr.definitionId != null;
+		return ! attr.detached;
 	}
 
 	@Override

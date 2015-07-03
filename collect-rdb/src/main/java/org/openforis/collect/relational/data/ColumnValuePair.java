@@ -25,4 +25,9 @@ public class ColumnValuePair<C extends Column<?>, T> {
 	public T getValue() {
 		return value;
 	}
+	
+	@Override
+	public String toString() {
+		return column + " = " + value;
+	}
 }

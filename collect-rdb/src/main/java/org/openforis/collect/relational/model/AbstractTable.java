@@ -127,4 +127,9 @@ abstract class AbstractTable<T> implements Table<T>  {
 	public boolean containsColumn(String name) {
 		return columns.containsKey(name);
 	}
+	
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

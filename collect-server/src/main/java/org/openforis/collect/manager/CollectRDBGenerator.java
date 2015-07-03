@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.event.AttributeUpdatedEvent;
 import org.openforis.collect.event.BooleanAttributeUpdatedEvent;
 import org.openforis.collect.event.CodeAttributeUpdatedEvent;
+import org.openforis.collect.event.CoordinateAttributeUpdatedEvent;
 import org.openforis.collect.event.DateAttributeUpdatedEvent;
 import org.openforis.collect.event.EntityCreatedEvent;
 import org.openforis.collect.event.EntityDeletedEvent;
@@ -49,6 +50,7 @@ import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
@@ -116,20 +118,17 @@ public class CollectRDBGenerator implements EventListener {
 		}
 	}
 	
-	private void generateRDB(CollectSurvey survey, Step step) throws CollectRdbException {
-		RelationalSchema relationalSchema = surveyIdToRelationalSchema.get(survey.getId());
+	private void generateRDB(final CollectSurvey survey, final Step recordStep) throws CollectRdbException {
+		final RelationalSchema relationalSchema = surveyIdToRelationalSchema.get(survey.getId());
 		
-		Connection targetConn = createTargetConnection(survey, step);
-		
-		RelationalSchemaCreator relationalSchemaCreator = new LiquibaseRelationalSchemaCreator();
-		relationalSchemaCreator.createRelationalSchema(relationalSchema, targetConn);
-		
-		// Insert data
-		RecordFilter recordFilter = new RecordFilter(survey);
-		recordFilter.setStep(step);
-		
-		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
-		insertRecords(survey, summaries, step, relationalSchema, targetConn);
+		withConnection(survey, recordStep, new Callback() {
+			public void execute(Connection connection) {
+				RelationalSchemaCreator relationalSchemaCreator = new LiquibaseRelationalSchemaCreator();
+				relationalSchemaCreator.createRelationalSchema(relationalSchema, connection);
+				
+				insertRecords(survey, recordStep, relationalSchema, connection);
+			}
+		});
 	}
 	
 	private Connection createTargetConnection(CollectSurvey survey, Step step) throws CollectRdbException {
@@ -145,19 +144,17 @@ public class CollectRDBGenerator implements EventListener {
 		}
 	}
 
-	private void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
+	private void insertRecords(CollectSurvey survey, Step step, 
 			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
 		DatabaseExporter databaseUpdater = createRDBUpdater(targetConn);
 		databaseUpdater.insertReferenceData(targetSchema);
+		RecordFilter recordFilter = new RecordFilter(survey);
+		recordFilter.setStep(step);
+		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
 		for (int i = 0; i < summaries.size(); i++) {
 			CollectRecord summary = summaries.get(i);
 			CollectRecord record = recordManager.load(survey, summary.getId(), step);
 			databaseUpdater.insertData(targetSchema, record);
-		}
-		try {
-			targetConn.commit();
-		} catch (SQLException e) {
-			throw new CollectRdbException(String.format("Error inserting records related to survey %s into RDB", survey.getName()), e);
 		}
 	}
 
@@ -176,13 +173,12 @@ public class CollectRDBGenerator implements EventListener {
 				}
 			}
 		});
-		
 	}
 
-	private void withConnection(CollectSurvey survey, Step entry, Callback job) {
+	private void withConnection(CollectSurvey survey, Step recordStep, Callback job) {
 		Connection connection = null;
 		try {
-			connection = createTargetConnection(survey, entry);
+			connection = createTargetConnection(survey, recordStep);
 			connection.setAutoCommit(false);
 			job.execute(connection);
 			connection.commit();
@@ -279,9 +275,17 @@ public class CollectRDBGenerator implements EventListener {
 				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attributeDef;
 				DataColumn codeColumn = dataTable.getDataColumn(codeAttrDef.getCodeFieldDefinition());
 				DataColumn qualifierColumn = dataTable.getDataColumn(codeAttrDef.getQualifierFieldDefinition());
+				columnValuePairs.add(new ColumnValuePair<DataColumn, String>(codeColumn, evt.getCode()));
+				if (qualifierColumn != null) {
+					columnValuePairs.add(new ColumnValuePair<DataColumn, String>(qualifierColumn, evt.getQualifier()));	
+				}
+			} else if (recordEvent instanceof CoordinateAttributeUpdatedEvent) {
+				CoordinateAttributeDefinition coordinateAttrDef = (CoordinateAttributeDefinition) attributeDef;
+				CoordinateAttributeUpdatedEvent e = (CoordinateAttributeUpdatedEvent) recordEvent;
 				columnValuePairs = Arrays.<ColumnValuePair<DataColumn, ?>>asList(
-						new ColumnValuePair<DataColumn, String>(codeColumn, evt.getCode()),
-						new ColumnValuePair<DataColumn, String>(qualifierColumn, evt.getQualifier())
+						new ColumnValuePair<DataColumn, Double>(dataTable.getDataColumn(coordinateAttrDef.getXField()), e.getX()),
+						new ColumnValuePair<DataColumn, Double>(dataTable.getDataColumn(coordinateAttrDef.getYField()), e.getX()),
+						new ColumnValuePair<DataColumn, String>(dataTable.getDataColumn(coordinateAttrDef.getSrsIdField()), e.getSrsId())
 				);
 			} else if (recordEvent instanceof DateAttributeUpdatedEvent) {
 				columnValuePairs.add(new ColumnValuePair<DataColumn, Date>(dataColumns.get(0), ((DateAttributeUpdatedEvent) recordEvent).getDate()));
@@ -290,7 +294,9 @@ public class CollectRDBGenerator implements EventListener {
 				NumberAttributeDefinition numberAttrDef = (NumberAttributeDefinition) attributeDef;
 				FieldDefinition<Integer> unitIdFieldDef = numberAttrDef.getUnitIdFieldDefinition();
 				DataColumn unitColumn = dataTable.getDataColumn(unitIdFieldDef);
-				columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, numericAttributeUpdatedEvent.getUnitId()));
+				if (unitColumn != null) {
+					columnValuePairs.add(new ColumnValuePair<DataColumn, Integer>(unitColumn, numericAttributeUpdatedEvent.getUnitId()));
+				}
 				if (recordEvent instanceof NumberAttributeUpdatedEvent) {
 					DataColumn valueColumn = dataTable.getDataColumn(((NumberAttributeDefinition) attributeDef).getValueFieldDefinition());
 					Number value = ((NumberAttributeUpdatedEvent<?>) recordEvent).getValue();

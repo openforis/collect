@@ -20,11 +20,13 @@ public class SessionEventDispatcher {
 	
 	public void recordSaved(CollectRecord record) {
 		List<RecordEvent> events = sessionManager.flushPendingEvents();
-		for (RecordEvent event : events) {
-			//TODO remove this, assign an ID to the record immediately when it's created
-			event.initializeRecordId(record.getId());
+		if (! events.isEmpty()) {
+			for (RecordEvent event : events) {
+				//TODO remove this, assign an ID to the record immediately when it's created
+				event.initializeRecordId(record.getId());
+			}
+			notifyListeners(events);
 		}
-		notifyListeners(events);
 	}
 
 	private void notifyListeners(List<? extends RecordEvent> events) {

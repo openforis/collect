@@ -58,6 +58,7 @@ public final class RelationalSchema {
 	public List<DataTable> getDataTables() {
 		List<DataTable> result = new ArrayList<DataTable>();
 		for (DataTable dataTable : getRootDataTables()) {
+			result.add(dataTable);
 			int rootDefId = dataTable.getNodeDefinition().getId();
 			result.addAll(getDescendantTablesForDefinition(rootDefId));
 		}

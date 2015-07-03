@@ -168,7 +168,7 @@ public class DataService {
 		CollectRecord record = recordManager.instantiateRecord(activeSurvey, rootEntityName, user, versionName, recordStep);
 		NodeChangeSet changeSet = recordManager.initializeRecord(record);
 
-		eventProducer.produceForNewRecord(record, changeSet, user.getName());
+		eventProducer.produceFor(changeSet, user.getName());
 		
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();

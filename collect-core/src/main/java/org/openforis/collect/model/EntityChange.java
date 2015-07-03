@@ -25,8 +25,8 @@ public class EntityChange extends NodeChange<Entity> {
 	protected Map<String, ValidationResultFlag> minCountValidationByChildName;
 	protected Map<String, ValidationResultFlag> maxCountValidationByChildName;
 	
-	public EntityChange(Entity node) {
-		super(node);
+	public EntityChange(Integer recordId, Integer parentId, Entity node) {
+		super(recordId, parentId, node);
 		List<NodeDefinition> childDefs = node.getDefinition().getChildDefinitions();
 		int numChildren = childDefs.size();
 		minCountByChildDefinitionId = new HashMap<Integer, Integer>(numChildren);

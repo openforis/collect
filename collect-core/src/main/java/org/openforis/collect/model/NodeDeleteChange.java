@@ -10,8 +10,8 @@ import org.openforis.idm.model.Node;
  */
 public class NodeDeleteChange extends NodeChange<Node<?>> {
 	
-	public NodeDeleteChange(Node<?> node) {
-		super(node);
+	public NodeDeleteChange(Integer recordId, Integer parentEntityId, Node<?> node) {
+		super(recordId, parentEntityId, node);
 	}
 	
 }

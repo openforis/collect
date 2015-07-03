@@ -158,6 +158,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
 		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(rdbSchema);
 		batchExecutor.addUpdate(dataTable, pkValue, columnValuePairs);
+		batchExecutor.flush();
 	}
 	
 	@Override
@@ -206,10 +207,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		}
 
 		public void addInsert(Row row) {
-			queries.add(queryCreator.createInsertQuery(row));
-			if ( queries.size() == BATCH_MAX_SIZE ) {
-				flush();
-			}
+			addQuery(queryCreator.createInsertQuery(row));
 		}
 
 		public void addUpdate(DataTable table, BigInteger pkValue, List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
@@ -220,12 +218,18 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 				fieldToValue.put(field, value);
 			}
 			Update<Record> query = queryCreator.createUpdateQuery(table, pkValue, fieldToValue);
-			queries.add(query);
+			addQuery(query);
 		}
 
-		
 		public void addDelete(Table<?> table, Column<?> pkColumn, BigInteger pkValue) {
-			queries.add(queryCreator.createDeleteQuery(table, pkColumn, pkValue));
+			addQuery(queryCreator.createDeleteQuery(table, pkColumn, pkValue));
+		}
+
+		private void addQuery(Query query) {
+			queries.add(query);
+			if ( queries.size() == BATCH_MAX_SIZE ) {
+				flush();
+			}
 		}
 
 		public void flush() {
@@ -239,6 +243,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 				throw new RuntimeException(e);
 			}
 		}
+		
 	}
 	
 	private class QueryCreator {

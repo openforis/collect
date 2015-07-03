@@ -102,6 +102,11 @@ public final class Time implements Value {
 			return cal;
 		}
 	}
+	
+	public java.util.Date toJavaDate() {
+		Calendar cal = toCalendar();
+		return cal == null ? null: cal.getTime();
+	}
 
 	@Override
 	public String toString() {

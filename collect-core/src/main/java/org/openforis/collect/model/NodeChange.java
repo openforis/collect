@@ -11,16 +11,28 @@ import org.openforis.idm.model.Node;
  */
 public abstract class NodeChange<T extends Node<?>> {
 
-	protected T node;
+	protected final Integer recordId;
+	protected final Integer parentId;
+	protected final T node;
 	
-	public NodeChange(T node) {
+	public NodeChange(Integer recordId, Integer parentId, T node) {
+		this.recordId = recordId;
+		this.parentId = parentId;
 		this.node = node;
 	}
 
+	public Integer getRecordId() {
+		return recordId;
+	}
+
+	public Integer getParentId() {
+		return parentId;
+	}
+	
 	public T getNode() {
 		return node;
 	}
-
+	
 	@Override
 	public String toString() {
 		return String.format("%s for node %s", 

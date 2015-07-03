@@ -39,7 +39,7 @@ public class EntitySchema extends SchemaSupport<Entity> {
 		List<Node<? extends NodeDefinition>> children = entity.getChildren();
         for(Node<?> node : children) {
         	if(isNodeToBeSaved(node)) {
-				out.writeUInt32(DEFINITION_ID_FIELD_NUMBER, node.definitionId, false);
+				out.writeUInt32(DEFINITION_ID_FIELD_NUMBER, node.getDefinition().getId(), false);
 				out.writeObject(NODE_FIELD_NUMBER, node, getSchema(node.getClass()), false);
         	}
         }
