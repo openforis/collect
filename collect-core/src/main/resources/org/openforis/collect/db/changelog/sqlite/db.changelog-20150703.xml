@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="event-queue" author="ricci" dbms="sqlite">
+
+	    <preConditions onFail="MARK_RAN">
+	    	<not>
+		    	<tableExists tableName="ofc_event" />
+	    	</not>
+	    </preConditions>
+	    
+	    <comment>Event queue storage</comment>
+	    
+	    <createTable tableName="ofc_event">
+			<column name="sequence_number" type="INTEGER">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="broker_id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="published_timestamp" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="contents" type="TEXT">
+				<constraints nullable="false" />
+			</column>
+	    </createTable>
+    	
+	    <createTable tableName="ofc_event_processing_status">
+			<column name="version" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="event_sequence_number" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_event_processing_status_event_fkey"	
+					references="ofc_event(sequence_number)" />
+			</column>
+			<column name="subscriber_id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="done" type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_updated" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="failed_attempts" type="INTEGER" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_error" type="TEXT" />
+		</createTable>
+		
+		<!-- INDEXES -->
+		<createIndex
+            indexName="ofc_event_idx"
+            tableName="ofc_event"
+            unique="true">
+	        <column name="id" type="VARCHAR"/>
+    	</createIndex>
+    	
+		<createIndex
+            indexName="ofc_event_processing_status_pkey"
+            tableName="ofc_event_processing_status"
+            unique="true">
+            <column name="event_sequence_number" type="INTEGER"/>
+	        <column name="subscriber_id" type="VARCHAR"/>
+    	</createIndex>
+	</changeSet>
+	
+</databaseChangeLog>

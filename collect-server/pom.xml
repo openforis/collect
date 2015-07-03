@@ -160,6 +160,11 @@
 			<groupId>org.openforis.commons</groupId>
 			<artifactId>commons-web</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.fao.foris.simpleeventbroker</groupId>
+			<artifactId>simple-event-broker</artifactId>
+			<version>1.2.3</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>junit</groupId>

@@ -32,9 +32,9 @@
 
 	<distributionManagement>
 		<repository>
-			<id>openforis-releases</id>
+			<id>openforis</id>
 			<name>Open Foris Repository</name>
-			<url>http://www.openforis.org/nexus/content/repositories/releases/</url>
+			<url>http://www.openforis.org/nexus/content/groups/public/</url>
 		</repository>
 		<snapshotRepository>
 			<id>openforis-snapshots</id>

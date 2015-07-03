@@ -98,13 +98,23 @@
 		<constructor-arg ref="collectLocalRDBStorageManager" />
 	</bean>
 	
-	<bean id="sessionEventDispatcher" class="org.openforis.collect.manager.SessionEventDispatcher"
-		scope="session">
+	<bean id="eventQueue" class="org.fao.foris.simpleeventbroker.SpringEventBroker" 
+			init-method="start" destroy-method="shutdown">
+		<constructor-arg value="recordEventQueue" />
+		<constructor-arg ref="dataSource" />
 		<constructor-arg>
 			<list>
-				<ref bean="relationalDBGenerator" />
+				<bean class="org.openforis.collect.event.RDBGenerationRecordEventHandler">
+					<constructor-arg ref="relationalDBGenerator" />
+				</bean>
 			</list>
 		</constructor-arg>
+		<property name="tableNamePrefix" value="ofc_" />
+	</bean>
+	
+	<bean id="sessionEventDispatcher" class="org.openforis.collect.manager.SessionEventDispatcher"
+		scope="session">
+		<constructor-arg ref="eventQueue" />
 	</bean>
 
 	<bean id="eventProducer" class="org.openforis.collect.event.EventProducer" 
