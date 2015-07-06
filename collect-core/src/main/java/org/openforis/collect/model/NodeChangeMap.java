@@ -70,7 +70,7 @@ public class NodeChangeMap implements NodeChangeSet {
 	public EntityChange prepareEntityChange(Entity entity) {
 		EntityChange c = (EntityChange) getChange(entity);
 		if(c == null){
-			c = new EntityChange(entity.getRecord().getId(), entity.getParentId(), entity);
+			c = new EntityChange(entity);
 			addOrMergeChange(c);
 		}
 		return c;
@@ -86,7 +86,7 @@ public class NodeChangeMap implements NodeChangeSet {
 	public AttributeChange prepareAttributeChange(Attribute<?, ?> attribute) {
 		AttributeChange c = (AttributeChange) getChange(attribute);
 		if(c == null){
-			c = new AttributeChange(attribute.getRecord().getId(), attribute.getParentId(), attribute);
+			c = new AttributeChange(attribute);
 			addOrMergeChange(c);
 		}
 		return c;
@@ -96,11 +96,12 @@ public class NodeChangeMap implements NodeChangeSet {
 	 * Create a new NodeDeleteChange and puts it in the internal cache
 	 * 
 	 * @param recordId 
+	 * @param ancestorIds 
 	 * @param node
 	 * @return
 	 */
-	public NodeDeleteChange addNodeDeleteChange(Integer recordId, Integer parentEntityId, Node<?> node) {
-		NodeDeleteChange c = new NodeDeleteChange(recordId, parentEntityId, node);
+	public NodeDeleteChange addNodeDeleteChange(Integer recordId, List<Integer> ancestorIds, Node<?> node) {
+		NodeDeleteChange c = new NodeDeleteChange(recordId, ancestorIds, node);
 		nodeIdToChange.put(node.getInternalId(), c); //overwrite change if already present
 		return c;
 	}
@@ -116,7 +117,7 @@ public class NodeChangeMap implements NodeChangeSet {
 		Integer nodeId = entity.getInternalId();
 		NodeChange<?> c = getChange(entity);
 		if ( c == null ) {
-			c = new EntityAddChange(entity.getRecord().getId(), entity.getParentId(), entity);
+			c = new EntityAddChange(entity);
 			nodeIdToChange.put(nodeId, c);
 			return c;
 		} else {
@@ -135,7 +136,7 @@ public class NodeChangeMap implements NodeChangeSet {
 		Integer nodeId = attribute.getInternalId();
 		NodeChange<?> c = getChange(attribute);
 		if ( c == null ) {
-			c = new AttributeAddChange(attribute.getRecord().getId(), attribute.getParentId(), attribute);
+			c = new AttributeAddChange(attribute);
 			nodeIdToChange.put(nodeId, c);
 			return c;
 		} else {

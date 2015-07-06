@@ -1,6 +1,7 @@
 package org.openforis.collect.event;
 
 import java.util.Date;
+import java.util.List;
 
 public class TaxonAttributeUpdatedEvent extends AttributeUpdatedEvent {
 	
@@ -10,10 +11,10 @@ public class TaxonAttributeUpdatedEvent extends AttributeUpdatedEvent {
 	private String languageCode;
 	private String languageVariety;
 	
-	public TaxonAttributeUpdatedEvent(String surveyName, Integer recordId, int definitionId,
-			Integer parentEntityId, int nodeId, String code, String scientificName, String vernacularName,
+	public TaxonAttributeUpdatedEvent(String surveyName, Integer recordId, String definitionId, List<String> ancestorIds, 
+			String nodeId, String code, String scientificName, String vernacularName,
 			String languageCode, String languageVariety, Date timestamp, String userName) {
-		super(surveyName, recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
+		super(surveyName, recordId, definitionId, ancestorIds, nodeId, timestamp, userName);
 		this.code = code;
 		this.scientificName = scientificName;
 		this.vernacularName = vernacularName;

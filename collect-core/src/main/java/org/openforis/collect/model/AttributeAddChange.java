@@ -10,8 +10,8 @@ import org.openforis.idm.model.Attribute;
  */
 public class AttributeAddChange extends AttributeChange implements NodeAddChange {
 	
-	public AttributeAddChange(Integer recordId, Integer parentId, Attribute<?, ?> node) {
-		super(recordId, parentId, node);
+	public AttributeAddChange(Attribute<?, ?> node) {
+		super(node);
 	}
 	
 }

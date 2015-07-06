@@ -62,6 +62,15 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 		return ancestors;
 	}
 	
+	protected static List<Integer> getAncestorIds(Node<?> node) {
+		List<Entity> ancestors = node.getAncestors();
+		List<Integer> ancestorIds = new ArrayList<Integer>(ancestors.size());
+		for (Entity ancestor : ancestors) {
+			ancestorIds.add(ancestor.getInternalId());
+		}
+		return ancestorIds;
+	}
+
 	public Entity getAncestorByDefinition(EntityDefinition def) {
 		List<Entity> ancestors = getAncestors();
 		for (Entity ancestor : ancestors) {
@@ -87,6 +96,15 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 			nodesToBeDeleted.addAll(((Entity) this).getDescendants());
 		}
 		return nodesToBeDeleted;
+	}
+
+	public List<Integer> getAncestorIds() {
+		List<Entity> ancestors = getAncestors();
+		List<Integer> ancestorIds = new ArrayList<Integer>(ancestors.size());
+		for (Entity ancestor : ancestors) {
+			ancestorIds.add(ancestor.getInternalId());
+		}
+		return ancestorIds;
 	}
 
 	public String getPath() {

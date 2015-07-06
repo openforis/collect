@@ -18,6 +18,10 @@ public interface RDBUpdater {
 			Integer parentId, int entityId,
 			int entityDefinitionId);
 
+	void insertAttribute(RelationalSchema schema, int recordId, 
+			Integer parentId, int attributeId,
+			int attributeDefinitionId);
+
 	void updateData(RelationalSchema schema, CollectRecord record);
 	
 	void updateData(RelationalSchema rdbSchema, DataTable dataTable,
@@ -27,6 +31,9 @@ public interface RDBUpdater {
 	void deleteData(RelationalSchema schema, int recordId, int rootDefId);
 
 	void deleteEntity(RelationalSchema schema, int recordId,
-			int entityId, int entityDefinitionId);
+			int entityId, int definitionId);
+	
+	void deleteAttribute(RelationalSchema schema, int recordId,
+			int attributeId, int definitionId);
 
 }

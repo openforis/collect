@@ -1,5 +1,7 @@
 package org.openforis.collect.model;
 
+import java.util.List;
+
 import org.openforis.idm.model.Node;
 
 /**
@@ -10,8 +12,8 @@ import org.openforis.idm.model.Node;
  */
 public class NodeDeleteChange extends NodeChange<Node<?>> {
 	
-	public NodeDeleteChange(Integer recordId, Integer parentEntityId, Node<?> node) {
-		super(recordId, parentEntityId, node);
+	public NodeDeleteChange(Integer recordId, List<Integer> ancestoIds, Node<?> node) {
+		super(recordId, ancestoIds, node);
 	}
 	
 }

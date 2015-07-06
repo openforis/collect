@@ -75,7 +75,7 @@ public class SingleFieldAttributeColumnProvider extends BasicAttributeColumnProv
 	 */
 	private Entity getParentEntity(Entity axis) {
 		EntityDefinition entityDef = axis.getDefinition();
-		List<EntityDefinition> ancestorEntityDefinitions = attributeDefinition.getAncestorEntityDefinitions();
+		List<EntityDefinition> ancestorEntityDefinitions = attributeDefinition.getAncestorEntityDefinitionsInReverseOrder();
 		int indexOfAxis = ancestorEntityDefinitions.indexOf(entityDef);
 		Entity nearestParentEntity = axis;
 		if (indexOfAxis + 1 < ancestorEntityDefinitions.size()) {

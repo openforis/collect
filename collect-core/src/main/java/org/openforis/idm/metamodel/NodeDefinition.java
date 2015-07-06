@@ -282,6 +282,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
 		EntityDefinition currentParent = getParentEntityDefinition();
 		while ( currentParent != null ) {
+			result.add(currentParent);
+			currentParent = currentParent.getParentEntityDefinition();
+		}
+		return result;
+	}
+	
+	public List<EntityDefinition> getAncestorEntityDefinitionsInReverseOrder() {
+		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
+		EntityDefinition currentParent = getParentEntityDefinition();
+		while ( currentParent != null ) {
 			result.add(0, currentParent);
 			currentParent = currentParent.getParentEntityDefinition();
 		}
@@ -291,21 +301,13 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	public EntityDefinition getNearestCommonAncestor(NodeDefinition nodeDefinition) {
 		List<EntityDefinition> thisAncestorEntityDefinitions = this.getAncestorEntityDefinitions();
 		List<EntityDefinition> otherAncestors = nodeDefinition.getAncestorEntityDefinitions();
-		EntityDefinition lastCommonAncestor = null;
-		for (int i = 0; i < thisAncestorEntityDefinitions.size(); i++) {
-			if ( otherAncestors.size() > i ) {
-				EntityDefinition thisAncestor = thisAncestorEntityDefinitions.get(i);
-				EntityDefinition otherAncestor = otherAncestors.get(i);
-				if ( thisAncestor == otherAncestor ) {
-					lastCommonAncestor = thisAncestor;
-				} else {
-					break;
-				}
-			} else {
-				break;
+		
+		for (EntityDefinition thisAncestor : thisAncestorEntityDefinitions) {
+			if (otherAncestors.contains(thisAncestor)) {
+				return thisAncestor;
 			}
 		}
-		return lastCommonAncestor;
+		return null;
 	}
 	
 	public EntityDefinition getNearestAncestorMultipleEntity() {

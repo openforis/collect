@@ -119,12 +119,12 @@ public class DataTableDataExtractor extends DataExtractor {
 	}
 
 	public static BigInteger getTableArtificialPK(int recordId,
-			NodeDefinition nodeDef, int entityId) {
+			NodeDefinition nodeDef, int nodeId) {
 		if (nodeDef instanceof EntityDefinition && ((EntityDefinition) nodeDef).isRoot()) {
 			return BigInteger.valueOf(recordId);
 		} else {
 			//result = recordId * NODE_ID_MAX_VALUE + node_id 
-			return BigInteger.valueOf(entityId).add(
+			return BigInteger.valueOf(nodeId).add(
 					BigInteger.valueOf(recordId).multiply(BigInteger.valueOf(NODE_ID_MAX_VALUE))
 			);
 		}

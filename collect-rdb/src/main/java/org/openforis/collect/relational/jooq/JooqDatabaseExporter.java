@@ -41,6 +41,7 @@ import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * 
@@ -85,10 +86,22 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 
 	@Override
-	public void insertEntity(RelationalSchema schema, int recordId, Integer parentId, int entityId, int entityDefinitionId) {
-		DataTable table = schema.getDataTableByDefinitionId(entityDefinitionId);
-		EntityDefinition entityDef = (EntityDefinition) table.getNodeDefinition();
-		BigInteger pkValue = getTableArtificialPK(recordId, entityDef, entityId);
+	public void insertEntity(RelationalSchema schema, int recordId, 
+			Integer parentId, int entityId, int entityDefinitionId) {
+		insertNode(schema, recordId, parentId, entityId, entityDefinitionId);
+	}
+
+	@Override
+	public void insertAttribute(RelationalSchema schema, int recordId,
+			Integer parentId, int attributeId, int attributeDefinitionId) {
+		insertNode(schema, recordId, parentId, attributeId, attributeDefinitionId);
+	}
+	
+	private void insertNode(RelationalSchema schema, int recordId,
+			Integer parentId, int nodeId, int nodeDefinitionId) {
+		DataTable table = schema.getDataTableByDefinitionId(nodeDefinitionId);
+		NodeDefinition nodeDef = table.getNodeDefinition();
+		BigInteger pkValue = getTableArtificialPK(recordId, nodeDef, nodeId);
 		
 		QueryCreator queryCreator = new QueryCreator(dsl, schema.getName());
 		DataPrimaryKeyColumn pkColumn = table.getPrimaryKeyColumn();
@@ -105,7 +118,6 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		}
 		insert.execute();
 	}
-
 	private Map<String, BigInteger> findAncestorFKByColumnName(RelationalSchema schema, DataTable table, int recordId, int parentId) {
 		Map<String, BigInteger> result = new HashMap<String, BigInteger>();
 		
@@ -187,6 +199,18 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		batchExecutor.flush();
 	}
 	
+	@Override
+	public void deleteAttribute(RelationalSchema schema, int recordId,
+			int attributeId, int definitionId) {
+		DataTable tableToDeleteFor = schema.getDataTableByDefinitionId(definitionId);
+		NodeDefinition defToDeleteFor = tableToDeleteFor.getNodeDefinition();
+		BigInteger pkValue = getTableArtificialPK(recordId, defToDeleteFor, attributeId);
+		
+		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
+		batchExecutor.addDelete(tableToDeleteFor, tableToDeleteFor.getPrimaryKeyColumn(), pkValue);
+		batchExecutor.flush();
+	}
+	
 	private class BatchQueryExecutor {
 		
 		private static final int BATCH_MAX_SIZE = 10000;
@@ -211,7 +235,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		}
 
 		public void addUpdate(DataTable table, BigInteger pkValue, List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
-			Map<Field<?>, Object> fieldToValue = new HashMap<Field<?>, Object>();
+			Map<Field<?>, Object> fieldToValue = new HashMap<Field<?>, Object>(columnValuePairs.size() );
 			for (ColumnValuePair<DataColumn, ?> columnValuePair : columnValuePairs) {
 				Field<?> field = DSL.field(columnValuePair.getColumn().getName());
 				Object value = columnValuePair.getValue();

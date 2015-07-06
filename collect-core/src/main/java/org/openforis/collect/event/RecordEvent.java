@@ -1,6 +1,7 @@
 package org.openforis.collect.event;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 
@@ -12,18 +13,19 @@ public abstract class RecordEvent {
 
 	private String surveyName;
 	private Integer recordId;
-	private final int definitionId;
-	private final Integer parentEntityId;
-	private final int nodeId;
+	private final String definitionId;
+	private final String nodeId;
 	private final Date timestamp;
 	private final String userName;
+	private List<String> ancestorIds;
 	
-	public RecordEvent(String surveyName, Integer recordId, int definitionId, Integer parentEntityId, int nodeId, Date timestamp, String userName) {
+	public RecordEvent(String surveyName, Integer recordId, String definitionId, 
+			List<String> ancestorIds, String nodeId, Date timestamp, String userName) {
 		super();
 		this.surveyName = surveyName;
 		this.recordId = recordId;
 		this.definitionId = definitionId;
-		this.parentEntityId = parentEntityId;
+		this.ancestorIds = ancestorIds;
 		this.nodeId = nodeId;
 		this.timestamp = timestamp;
 		this.userName = userName;
@@ -41,16 +43,16 @@ public abstract class RecordEvent {
 		return recordId;
 	}
 	
-	public int getDefinitionId() {
+	public String getDefinitionId() {
 		return definitionId;
 	}
 	
-	public Integer getParentEntityId() {
-		return parentEntityId;
+	public String getNodeId() {
+		return nodeId;
 	}
 	
-	public int getNodeId() {
-		return nodeId;
+	public List<String> getAncestorIds() {
+		return ancestorIds;
 	}
 	
 	public Date getTimestamp() {

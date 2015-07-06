@@ -456,7 +456,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 
 	private Entity getOrCreateParentEntity(Entity ancestorEntity, AttributeDefinition attrDefn) {
 		EntityDefinition ancestorEntityDefn = ancestorEntity.getDefinition();
-		List<EntityDefinition> attributeAncestors = attrDefn.getAncestorEntityDefinitions();
+		List<EntityDefinition> attributeAncestors = attrDefn.getAncestorEntityDefinitionsInReverseOrder();
 		int indexOfAncestorEntity = attributeAncestors.indexOf(ancestorEntityDefn);
 		if ( indexOfAncestorEntity < 0 ) {
 			throw new IllegalArgumentException("AttributeDefinition is not among the ancestor entity descendants");
@@ -517,7 +517,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		EntityDefinition parentEntityDefn = (EntityDefinition) schema.getDefinitionById(parentEntityDefinitionId);
 		Entity rootEntity = record.getRootEntity();
 		Entity currentParent = rootEntity;
-		List<EntityDefinition> ancestorEntityDefns = parentEntityDefn.getAncestorEntityDefinitions();
+		List<EntityDefinition> ancestorEntityDefns = parentEntityDefn.getAncestorEntityDefinitionsInReverseOrder();
 		ancestorEntityDefns.add(parentEntityDefn);
 		//skip the root entity
 		for (int i = 1; i < ancestorEntityDefns.size(); i++) {

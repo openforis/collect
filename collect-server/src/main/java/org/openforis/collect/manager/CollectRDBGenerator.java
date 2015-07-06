@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.event.AttributeCreatedEvent;
+import org.openforis.collect.event.AttributeEvent;
 import org.openforis.collect.event.AttributeUpdatedEvent;
 import org.openforis.collect.event.BooleanAttributeUpdatedEvent;
 import org.openforis.collect.event.CodeAttributeUpdatedEvent;
@@ -53,6 +55,7 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.RangeAttributeDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
@@ -241,8 +244,14 @@ public class CollectRDBGenerator implements EventListener {
 		public void handle() {
 			if (recordEvent instanceof EntityCreatedEvent) {
 				insertEntity();
-			} else if (recordEvent instanceof AttributeUpdatedEvent) {
-				updateAttributeData();
+			} else if (recordEvent instanceof AttributeEvent) {
+				if (recordEvent instanceof AttributeCreatedEvent) {
+					insertAttribute();
+				} else if (recordEvent instanceof AttributeUpdatedEvent) {
+					updateAttributeData();
+				} else {
+					deleteAttribute();
+				}
 			} else if (recordEvent instanceof EntityDeletedEvent) {
 				deleteEntity();
 			} else if (recordEvent instanceof RecordDeletedEvent) {
@@ -251,20 +260,36 @@ public class CollectRDBGenerator implements EventListener {
 		}
 
 		private void insertEntity() {
-			rdbUpdater.insertEntity(rdbSchema, recordEvent.getRecordId(), recordEvent.getParentEntityId(), recordEvent.getNodeId(), recordEvent.getDefinitionId());
+			rdbUpdater.insertEntity(rdbSchema, recordEvent.getRecordId(), getParentEntityId(), 
+					getNodeId(), getDefinitionId());
+		}
+		
+		private void insertAttribute() {
+			rdbUpdater.insertAttribute(rdbSchema, recordEvent.getRecordId(), getParentEntityId(), 
+					getNodeId(), getDefinitionId());
 		}
 
 		private void updateAttributeData() {
-			AttributeDefinition def = (AttributeDefinition) survey.getSchema().getDefinitionById(recordEvent.getDefinitionId());
-			EntityDefinition multipleEntityDef = def.getNearestAncestorMultipleEntity();
-			BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordEvent.getRecordId(), multipleEntityDef, recordEvent.getParentEntityId());
-			DataTable dataTable = rdbSchema.getDataTable(multipleEntityDef);
-			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = toColumnValueParis(dataTable, def);
+			AttributeDefinition def = (AttributeDefinition) survey.getSchema().getDefinitionById(getDefinitionId());
+			Integer rowNodeId;
+			DataTable dataTable;
+			if (def.isMultiple()) {
+				dataTable = rdbSchema.getDataTable(def);
+				rowNodeId = getNodeId();
+			} else {
+				EntityDefinition multipleEntityDef = def.getNearestAncestorMultipleEntity();
+				dataTable = rdbSchema.getDataTable(multipleEntityDef);
+				rowNodeId = getParentEntityId();
+			}
+			NodeDefinition tableNodeDef = dataTable.getNodeDefinition();
+
+			BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordEvent.getRecordId(), tableNodeDef, rowNodeId);
+			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = toColumnValuePairs(dataTable, def);
 			rdbUpdater.updateData(rdbSchema, dataTable, pkValue, columnValuePairs);
 		}
 
 		@SuppressWarnings("unchecked")
-		public List<ColumnValuePair<DataColumn, ?>> toColumnValueParis(
+		public List<ColumnValuePair<DataColumn, ?>> toColumnValuePairs(
 				DataTable dataTable, AttributeDefinition attributeDef) {
 			List<DataColumn> dataColumns = dataTable.getDataColumns(attributeDef);
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = new ArrayList<ColumnValuePair<DataColumn, ?>>();
@@ -335,13 +360,38 @@ public class CollectRDBGenerator implements EventListener {
 		}
 
 		private void deleteEntity() {
-			rdbUpdater.deleteEntity(rdbSchema, recordEvent.getRecordId(), recordEvent.getNodeId(), recordEvent.getDefinitionId());
+			rdbUpdater.deleteEntity(rdbSchema, recordEvent.getRecordId(), getNodeId(), getDefinitionId());
+		}
+		
+		private void deleteAttribute() {
+			rdbUpdater.deleteAttribute(rdbSchema, recordEvent.getRecordId(), getNodeId(), getDefinitionId());
 		}
 
 		private void deleteRecord() {
-			rdbUpdater.deleteData(rdbSchema, recordEvent.getRecordId(), recordEvent.getDefinitionId());
+			rdbUpdater.deleteData(rdbSchema, recordEvent.getRecordId(), getDefinitionId());
 		}
 		
+		private Integer getParentEntityId() {
+			String definitionId = recordEvent.getDefinitionId();
+			NodeDefinition def = survey.getSchema().getDefinitionById(Integer.parseInt(definitionId));
+			boolean isRootEntity = def instanceof EntityDefinition && ((EntityDefinition) def).isRoot();
+			if (isRootEntity) {
+				return null;
+			}
+			boolean inCollection = def.isMultiple();
+			int parentIdx = inCollection ? 1 : 0;
+			List<String> ancestorIds = recordEvent.getAncestorIds();
+			return Integer.parseInt(ancestorIds.get(parentIdx));
+		}
+
+		private int getNodeId() {
+			return Integer.parseInt(recordEvent.getNodeId());
+		}
+
+		private int getDefinitionId() {
+			return Integer.parseInt(recordEvent.getDefinitionId());
+		}
+
 	}
 	
 }

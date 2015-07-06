@@ -1,6 +1,7 @@
 package org.openforis.collect.event;
 
 import java.util.Date;
+import java.util.List;
 
 public class CoordinateAttributeUpdatedEvent extends AttributeUpdatedEvent {
 
@@ -8,9 +9,9 @@ public class CoordinateAttributeUpdatedEvent extends AttributeUpdatedEvent {
 	private Double y;
 	private String srsId;
 	
-	public CoordinateAttributeUpdatedEvent(String surveyName, Integer recordId, int definitionId,
-			Integer parentEntityId, int nodeId, Double x, Double y, String srsId, Date timestamp, String userName) {
-		super(surveyName, recordId, definitionId, parentEntityId, nodeId, timestamp, userName);
+	public CoordinateAttributeUpdatedEvent(String surveyName, Integer recordId, String definitionId, List<String> ancestorIds, 
+			String nodeId, Double x, Double y, String srsId, Date timestamp, String userName) {
+		super(surveyName, recordId, definitionId, ancestorIds, nodeId, timestamp, userName);
 		this.x = x;
 		this.y = y;
 		this.srsId = srsId;

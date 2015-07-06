@@ -5,6 +5,7 @@ package org.openforis.collect.remoting.service;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,8 +13,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fao.foris.simpleeventbroker.EventBroker;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.RecordDeletedEvent;
 import org.openforis.collect.io.data.BulkRecordMoveJob;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
@@ -87,6 +90,8 @@ public class DataService {
 	private transient EventProducer eventProducer;
 	@Autowired
 	private transient SessionEventDispatcher sessionEventDispatcher;
+	@Autowired
+	private transient EventBroker eventQueue;
 	
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -188,13 +193,11 @@ public class DataService {
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
 		
-		//TODO notify listeners with a RecordDeletedEvent
-//		Survey survey1 = record.getSurvey();
-//		String surveyName = survey1.getName();
-//		Entity rootEntity = record.getRootEntity();
-//		EntityDefinition rootEntityDefn = rootEntity.getDefinition();
-//		
-//		Arrays.asList(new RecordDeletedEvent(surveyName, record.getId(), rootEntityDefn.getId(), rootEntity.getInternalId(), new Date(), sessionState.getUser().getName()));
+		Entity rootEntity = record.getRootEntity();
+		EntityDefinition rootEntityDef = rootEntity.getDefinition();
+		String userName = sessionState.getUser().getName();
+		eventQueue.publish(Arrays.asList(new RecordDeletedEvent(survey.getName(), record.getId(), String.valueOf(rootEntityDef.getId()), 
+				String.valueOf(rootEntity.getInternalId()), new Date(), userName)));
 	}
 	
 	@Transactional
@@ -215,7 +218,6 @@ public class DataService {
 		if ( isCurrentRecordIndexable() ) {
 			recordIndexService.permanentlyIndex(record);
 		}
-		
 		sessionEventDispatcher.recordSaved(record);
 	}
 

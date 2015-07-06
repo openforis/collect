@@ -1,6 +1,8 @@
 package org.openforis.collect.model;
 
 
+import java.util.List;
+
 import org.openforis.idm.model.Node;
 
 /**
@@ -12,23 +14,27 @@ import org.openforis.idm.model.Node;
 public abstract class NodeChange<T extends Node<?>> {
 
 	protected final Integer recordId;
-	protected final Integer parentId;
+	protected final List<Integer> ancestorIds;
 	protected final T node;
 	
-	public NodeChange(Integer recordId, Integer parentId, T node) {
+	public NodeChange(Integer recordId, List<Integer> ancestorIds, T node) {
 		this.recordId = recordId;
-		this.parentId = parentId;
+		this.ancestorIds = ancestorIds;
 		this.node = node;
 	}
 
 	public Integer getRecordId() {
 		return recordId;
 	}
-
-	public Integer getParentId() {
-		return parentId;
+	
+	public List<Integer> getAncestorIds() {
+		return ancestorIds;
 	}
 	
+	public Integer getParentId() {
+		return ancestorIds.isEmpty() ? null : ancestorIds.get(0);
+	}
+
 	public T getNode() {
 		return node;
 	}

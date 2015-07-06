@@ -17,10 +17,10 @@ public class AttributeChange extends NodeChange<Attribute<?, ?>> {
 	private ValidationResults validationResults;
 	private Map<Integer, Object> updatedFieldValues;
 	
-	public AttributeChange(Integer recordId, Integer parentId, Attribute<?, ?> node) {
-		super(recordId, node.getParentId(), node);
+	public AttributeChange(Attribute<?, ?> node) {
+		super(node.getRecord().getId(), node.getAncestorIds(), node);
 	}
-
+	
 	public void merge(AttributeChange newChange) {
 		if ( updatedFieldValues == null ) {
 			updatedFieldValues = newChange.updatedFieldValues;

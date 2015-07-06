@@ -273,7 +273,7 @@ public class RelationalSchemaGenerator {
 	
 	protected void addAncestorKeyColumns(DataTable table) throws CollectRdbException {
 		NodeDefinition nodeDefn = table.getNodeDefinition();
-		List<EntityDefinition> ancestors = nodeDefn.getAncestorEntityDefinitions();
+		List<EntityDefinition> ancestors = nodeDefn.getAncestorEntityDefinitionsInReverseOrder();
 		for (int levelIdx = 0; levelIdx < ancestors.size(); levelIdx++) {
 			EntityDefinition ancestor = ancestors.get(levelIdx);
 			List<AttributeDefinition> keyAttrDefns = ancestor.getKeyAttributeDefinitions();

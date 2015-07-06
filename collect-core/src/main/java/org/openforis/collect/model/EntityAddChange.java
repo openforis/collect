@@ -10,8 +10,8 @@ import org.openforis.idm.model.Entity;
  */
 public class EntityAddChange extends EntityChange implements NodeAddChange {
 	
-	public EntityAddChange(Integer recordId, Integer parentId, Entity node) {
-		super(recordId, parentId, node);
+	public EntityAddChange(Entity node) {
+		super(node);
 	}
 	
 }

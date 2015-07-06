@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.Test;
 import org.openforis.collect.model.AbstractRecordTest;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.idm.model.Entity;
 
 /**
  * @author D. Wiell
@@ -45,6 +46,26 @@ public class EventProducerTest extends AbstractRecordTest {
 				EntityCreatedEvent.class, TextAttributeUpdatedEvent.class);
 	}
 	
+	@Test
+	public void testEntityCollectionAddedEvent() {
+		record(
+			rootEntityDef(
+				entityDef("plot",
+					entityDef("tree",
+							attributeDef("tree_count")
+					).multiple()
+				).multiple()
+			)
+		);
+		assertEventTypes(updater.addEntity(record.getRootEntity(), "plot"),
+				EntityCreatedEvent.class, EntityCollectionCreatedEvent.class);
+		
+		Entity plot = entityByPath("/root/plot[1]");
+		assertEventTypes(updater.addEntity(plot, "tree"),
+				EntityCreatedEvent.class, TextAttributeUpdatedEvent.class);
+		
+	}
+	
 	private void assertEventTypes(NodeChangeSet changeSet, Class<?>... eventTypes) {
 		eventProducer.produceFor(changeSet, "user_name");
 		List<? extends RecordEvent> listenerEvents = listener.events;
@@ -52,7 +73,7 @@ public class EventProducerTest extends AbstractRecordTest {
 		for (RecordEvent event : listenerEvents) {
 			listenerEventTypes.add(event.getClass());
 		}
-		assertEquals(listenerEventTypes, Arrays.asList(eventTypes));
+		assertEquals(Arrays.asList(eventTypes), listenerEventTypes);
 	}
 
 	static class FakeEventListener implements EventListener {
