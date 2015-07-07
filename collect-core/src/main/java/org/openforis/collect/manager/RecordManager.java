@@ -82,6 +82,12 @@ public class RecordManager {
 	}
 	
 	@Transactional
+	public void saveAndRun(CollectRecord record, Runnable callback) {
+		save(record);
+		callback.run();
+	}
+	
+	@Transactional
 	public void save(CollectRecord record) {
 		try {
 			save(record, null);

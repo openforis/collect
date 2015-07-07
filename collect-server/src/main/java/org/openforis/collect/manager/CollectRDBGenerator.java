@@ -163,6 +163,9 @@ public class CollectRDBGenerator implements EventListener {
 
 	@Override
 	public void onEvents(final List<? extends RecordEvent> events) {
+		if (events.isEmpty()) {
+			return;
+		}
 		Step recordStep = Step.ENTRY;
 		final RelationalSchema rdbSchema = getRelatedRelationalSchema(events);
 		final CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
@@ -190,8 +193,9 @@ public class CollectRDBGenerator implements EventListener {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				LOG.error("Rollback failed: " + e.getMessage(), e);
+				LOG.error("Rollback failed: " + e1.getMessage(), e1);
 			}
+			throw new RuntimeException("Error processing RDB generation events", e);
 		} finally {
 			try {
 				if (connection != null) { 

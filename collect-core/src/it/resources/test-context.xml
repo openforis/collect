@@ -35,5 +35,9 @@
 		<property name="username" value="${collect.devdb.username}" />
 		<property name="password" value="${collect.devdb.password}" />
 	</bean>
-
+	
+	<bean id="recordEventBatchPublisher" class="org.openforis.collect.io.data.FakeNodeChangeBatchProcessor"
+		scope="prototype">
+	</bean>
+	
 </beans>

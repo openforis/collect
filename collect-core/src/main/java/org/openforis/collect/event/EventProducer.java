@@ -37,7 +37,6 @@ import org.openforis.idm.model.TaxonAttribute;
 import org.openforis.idm.model.TextAttribute;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.TimeAttribute;
-import org.springframework.stereotype.Component;
 
 /**
  * 
@@ -45,7 +44,6 @@ import org.springframework.stereotype.Component;
  * @author S. Ricci
  *
  */
-@Component
 public class EventProducer implements EventSource {
 
 	private final List<EventListener> listeners;
@@ -87,7 +85,7 @@ public class EventProducer implements EventSource {
 		
 		if (change instanceof EntityAddChange) {
 			List<RecordEvent> events = new ArrayList<RecordEvent>();
-			Entity entity = (Entity) change.getNode();
+			Entity entity = (Entity) node;
 			if (entity.isRoot()) {
 				events.add(new RootEntityCreatedEvent(surveyName, recordId, String.valueOf(definitionId), 
 						String.valueOf(nodeId), timestamp, userName));
@@ -98,7 +96,7 @@ public class EventProducer implements EventSource {
 			//add node collection created events
 			for (NodeDefinition childDef : ((EntityDefinition) nodeDef).getChildDefinitions()) {
 				if (childDef.isMultiple()) {
-					String collectionId = getNodeCollectionId(entity.getParentId(), childDef);
+					String collectionId = getNodeCollectionId(nodeId, childDef);
 					String collectionDefId = getNodeCollectionDefinitionId(entity.getDefinition(), childDef);
 					if (childDef instanceof AttributeDefinition) {
 						events.add(new AttributeCollectionCreatedEvent(surveyName, recordId, collectionDefId, 
