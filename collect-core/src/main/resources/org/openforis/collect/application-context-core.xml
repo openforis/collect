@@ -149,6 +149,7 @@
 		<property name="basename">
 			<value>org/openforis/collect/resourcebundles/validation</value>
 		</property>
+		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
 	
 	<!-- Async job executor -->

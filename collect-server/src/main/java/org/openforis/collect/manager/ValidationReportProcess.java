@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,9 +38,11 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	private CollectSurvey survey;
 	private String rootEntityName;
 	private boolean includeConfirmedErrors;
+	private Locale locale;
 
 	private ValidationMessageBuilder validationMessageBuilder;
 	private CsvWriter csvWriter;
+
 	
 	public enum ReportType {
 		CSV
@@ -51,6 +54,15 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 			ReportType reportType, 
 			User user, String sessionId, 
 			CollectSurvey survey, String rootEntityName, boolean includeConfirmedErrors) {
+		this(outputStream, recordManager, messageSource, reportType, user, sessionId, survey, rootEntityName, includeConfirmedErrors, Locale.ENGLISH);
+	}
+	
+	public ValidationReportProcess(OutputStream outputStream,
+			RecordManager recordManager,
+			MessageSource messageSource,
+			ReportType reportType, 
+			User user, String sessionId, 
+			CollectSurvey survey, String rootEntityName, boolean includeConfirmedErrors, Locale locale) {
 		super();
 		this.outputStream = outputStream;
 		this.recordManager = recordManager;
@@ -59,6 +71,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 		this.rootEntityName = rootEntityName;
 		this.includeConfirmedErrors = includeConfirmedErrors;
 		this.validationMessageBuilder = ValidationMessageBuilder.createInstance(messageSource);
+		this.locale = locale;
 	}
 	
 	@Override
@@ -122,7 +135,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	protected void writeValidationReport(CollectRecord record) throws IOException {
 		RecordValidationReportGenerator reportGenerator = new RecordValidationReportGenerator(record);
 		List<RecordValidationReportItem> validationItems = reportGenerator.generateValidationItems(
-				ValidationResultFlag.ERROR, includeConfirmedErrors);
+				locale, ValidationResultFlag.ERROR, includeConfirmedErrors);
 		for (RecordValidationReportItem item : validationItems) {
 			writeValidationReportLine(record, item);
 		}

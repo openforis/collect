@@ -118,7 +118,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	@Override
 	protected void onCompleted() {
 		super.onCompleted();
-		restoredBackupStorageManager.moveToFinalFolder(surveyName, tempFile);
+		if (storeRestoredFile) {
+			restoredBackupStorageManager.moveToFinalFolder(surveyName, tempFile);
+		}
 	}
 
 	public RecordManager getRecordManager() {

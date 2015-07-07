@@ -20,7 +20,7 @@
 	<system-config>
         <disable-event-thread/>
 		<!-- labels -->
-        <label-location>/WEB-INF/labels/designer/label_en.properties</label-location>
+        <label-location>/WEB-INF/labels/designer/label.properties</label-location>
         <label-location>/WEB-INF/labels/language_codes_iso_639_1.properties</label-location>
     </system-config>
     

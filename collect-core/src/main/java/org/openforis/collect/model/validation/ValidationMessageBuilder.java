@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.manager.MessageSource;
 import org.openforis.collect.manager.ResourceBundleMessageSource;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -360,12 +359,8 @@ public class ValidationMessageBuilder {
 	protected String getLabelText(NodeDefinition definition, String language,
 			Type type) {
 		String result = definition.getLabel(type, language);
-		if ( result == null ) {
-			CollectSurvey survey = (CollectSurvey) definition.getSurvey();
-			String defaultLanguage = survey.getDefaultLanguage();
-			if ( ! defaultLanguage.equals(language) ) {
-				result = definition.getLabel(type, defaultLanguage);
-			}
+		if ( result == null && ! definition.getSurvey().isDefaultLanguage(language)) {
+			result = definition.getLabel(type);
 		}
 		return result;
 	}
@@ -375,13 +370,22 @@ public class ValidationMessageBuilder {
 	}
 	
 	public String getPrettyLabelText(NodeDefinition definition, String language) {
-		String result = getLabelText(definition, language, new Type[]{Type.INSTANCE, Type.HEADING});
+		String validLanguage = getValidLanguage(definition.getSurvey(), language);
+		String result = getLabelText(definition, validLanguage, new Type[]{Type.INSTANCE, Type.HEADING});
 		if ( result == null ) {
 			result = definition.getName();
 		}
 		return result;
 	}
 	
+	private String getValidLanguage(Survey survey, String preferredLanguage) {
+		if (survey.getLanguages().contains(preferredLanguage)) {
+			return preferredLanguage;
+		} else {
+			return survey.getDefaultLanguage();
+		}
+	}
+
 	private String getLabelText(NodeDefinition definition, String language,
 			Type[] types) {
 		for (Type type : types) {

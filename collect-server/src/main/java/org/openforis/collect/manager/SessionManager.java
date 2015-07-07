@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
@@ -124,17 +124,7 @@ public class SessionManager implements EventListener {
 	}
 	
 	public void setLocale(String string) {
-		StringTokenizer stringTokenizer = new StringTokenizer(string, "_");
-		int tokens = stringTokenizer.countTokens();
-		if (tokens < 1 || tokens > 2) {
-			throw new IllegalArgumentException("Invalid locale string: " + string);
-		}
-		String language = stringTokenizer.nextToken();
-		String country = "";
-		if (stringTokenizer.hasMoreTokens()) {
-			country = stringTokenizer.nextToken();
-		}
-		Locale locale = new Locale(language, country);
+		Locale locale = LocaleUtils.toLocale(string);
 		SessionState sessionState = getSessionState();
 		sessionState.setLocale(locale);
 	}

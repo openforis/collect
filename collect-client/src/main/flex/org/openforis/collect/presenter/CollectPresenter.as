@@ -94,6 +94,10 @@ package org.openforis.collect.presenter {
 		
 		override public function init():void {
 			super.init();
+			if (Application.locale == null) {
+				//locale not specified, cannot continue
+				return;
+			}
 			//init keep alive timer
 			_keepAliveRetryTimes = 0;
 			_keepAliveTimer = new Timer(KEEP_ALIVE_FREQUENCY)
@@ -106,10 +110,9 @@ package org.openforis.collect.presenter {
 			var speciesImport:Boolean = params.species_import == "true";
 			var codeListImport:Boolean = params.code_list_import == "true";
 			var samplingDesignImport:Boolean = params.sampling_design_import == "true";
+			
 			var localeString:String = params.locale as String;
-			if ( StringUtil.isEmpty(localeString) ) {
-				AlertUtil.showError("global.error.invalidLocaleSpecified");
-			} else if ( preview ) {
+			if ( preview ) {
 				initPreview(params, localeString);
 			} else if ( edit ) {
 				initEditRecord(params, localeString);
@@ -124,7 +127,7 @@ package org.openforis.collect.presenter {
 				this._sessionClient.initSession(responder, localeString);
 			}
 		}
-		
+			
 		override protected function initEventListeners():void {
 			//mouse wheel handler to increment scroll step size
 			FlexGlobals.topLevelApplication.systemManager.addEventListener(MouseEvent.MOUSE_WHEEL, mouseWheelHandler, true);
@@ -304,7 +307,6 @@ package org.openforis.collect.presenter {
 		internal function initSessionCommonResultHandler(event:ResultEvent, token:Object = null):void {
 			Application.user = event.result.user;
 			Application.sessionId = event.result.sessionId;
-			Application.initLocale();
 		}
 		
 		internal function initSessionResultHandler(event:ResultEvent, token:Object = null):void {
