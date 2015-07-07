@@ -147,23 +147,18 @@
 					<loadConfig>${project.build.outputDirectory}/flex-config.xml</loadConfig>
 					<locales>
 						<locale>en_US</locale>
+						<locale>pt_BR</locale>
 					</locales>
 					<localesCompiled>
 						<locale>en_US</locale>
+						<locale>pt_BR</locale>
 					</localesCompiled>
 					<includeResourceBundles>
 						<bundle>messages</bundle>
 					</includeResourceBundles>
-					<mergeResourceBundle>true</mergeResourceBundle>
-<!--                     <modules> -->
-<!--                       <module> -->
-<!--                         <finalName>SpeciesImport</finalName> -->
-<!--                         <sourceFile>org/openforis/collect/module/SpeciesImport.mxml</sourceFile> -->
-<!--                         <optimize>true</optimize> -->
-<!--                         <destinationPath>org/openforis/collect/module</destinationPath> -->
-<!--                       </module> -->
-<!--                     </modules> -->
-					<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath>
+<!-- 					<mergeResourceBundle>true</mergeResourceBundle> -->
+					<localesSourcePath>${basedir}/src/main/locales/{locale}</localesSourcePath>
+<!-- 					<resourceBundlePath>{basedir}/src/main/locales/{locale}</resourceBundlePath> -->
 					<showWarnings>false</showWarnings>					
 					<sourceDirectory>${basedir}/src/main/flex</sourceDirectory>
                     <sourceFile>collect.mxml</sourceFile>

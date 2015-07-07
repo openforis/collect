@@ -8,6 +8,7 @@ package org.openforis.collect {
 	import mx.managers.CursorManager;
 	import mx.managers.ToolTipManager;
 	import mx.resources.Locale;
+	import mx.resources.ResourceManager;
 	
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -15,8 +16,10 @@ package org.openforis.collect {
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.RecordProxy;
 	import org.openforis.collect.model.proxy.UserProxy;
+	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.ModelClassInitializer;
+	import org.openforis.collect.util.StringUtil;
 
 	/**
 	 * @author M. Togna
@@ -61,6 +64,8 @@ package org.openforis.collect {
 				
 				ModelClassInitializer.init();
 				
+				initLocale();
+				
 				initialized = true;
 				CursorManager.removeBusyCursor();
 			}
@@ -74,10 +79,16 @@ package org.openforis.collect {
 			}
 		}
 		
-		public static function initLocale():void {
+		private static function initLocale():Boolean {
 			var localeString:String = FlexGlobals.topLevelApplication.parameters.locale as String;
+			if ( StringUtil.isEmpty(localeString) ) {
+				AlertUtil.showError("global.error.invalidLocaleSpecified");
+				return false;
+			}
 			var locale:Locale = new Locale(localeString);
 			Application.locale = locale;
+			ResourceManager.getInstance().localeChain = [locale.toString(), Message.DEFAULT_LOCALE];
+			return true;
 		}
 		
 		//called from External Interface (javascript)

@@ -85,16 +85,17 @@
 						</tabpanels>
 					</tabbox>
 				</absolutechildren>
-				<absolutechildren x="480" width="50%">
+				<absolutechildren x="650" width="300px">
 					<hlayout hflex="1"
 							spacing="20px" 
 							style="text-align: right;" 
 							sclass="controlBar">
 							
 						<!-- Language selector -->
-						<hlayout id="languageSelector"
+						<hlayout id="languageSelector" hflex="1"
 							sclass="controlBar">
-							<label value="${labels.survey.language.current_language}:" />
+							<label value="${labels.survey.language.current_language}:" 
+								width="150px" style="white-space: nowrap;" />
 							<listbox model="@load(vm.availableLanguages)"
 								selectedItem="@load(vm.currentLanguageCode)"
 								onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
