@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.manager;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -144,6 +145,23 @@ public class RecordManager {
 	@Transactional
 	public void execute(List<RecordStoreQuery> queries) {
 		recordDao.execute(queries);
+	}
+	
+	@Transactional
+	public void executeRecordOperations(List<RecordOperation> operations) {
+		int nextId = nextId();
+		List<RecordStoreQuery> queries = new ArrayList<RecordStoreQuery>();
+		for (RecordOperation operation : operations) {
+			CollectRecord record = operation.getRecord();
+			if (operation.isInsert()) {
+				record.setId(nextId ++);
+				queries.add(createInsertQuery(record));
+			} else {
+				queries.add(createUpdateQuery(record));
+			}
+		}
+		execute(queries);
+		restartIdSequence(nextId);
 	}
 	
 	@Transactional
@@ -732,5 +750,33 @@ public class RecordManager {
     	void run(CollectRecord record);
     	
     }
-    
+
+	public static class RecordOperation {
+		
+		private CollectRecord record;
+		private boolean insert;
+		
+		public RecordOperation(CollectRecord record, boolean insert) {
+			super();
+			this.record = record;
+			this.insert = insert;
+		}
+		
+		public static RecordOperation createUpdate(CollectRecord record) {
+			return new RecordOperation(record, false);
+		}
+		
+		public static RecordOperation createInsert(CollectRecord record) {
+			return new RecordOperation(record, true);
+		}
+		
+		public CollectRecord getRecord() {
+			return record;
+		}
+		
+		public boolean isInsert() {
+			return insert;
+		}
+	}
+
 }

@@ -97,7 +97,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
 			t.setZipFile(zipFile);
-			t.setOldBackupFormat(oldBackupFormat);
+//			t.setOldBackupFormat(oldBackupFormat);
 			t.setPackagedSurvey(packagedSurvey);
 			t.setExistingSurvey(publishedSurvey);
 			t.setOverwriteAll(overwriteAll);
