@@ -17,6 +17,7 @@ import org.fao.foris.simpleeventbroker.EventBroker;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.RecordDeletedEvent;
+import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.data.BulkRecordMoveJob;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
@@ -189,15 +190,19 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		//TODO check that the record is in ENTRY phase: only delete in ENTRY phase is allowed
-		CollectRecord record = recordManager.load(survey, id, Step.ENTRY);
+		Step recordStep = Step.ENTRY;
+		CollectRecord record = recordManager.load(survey, id, recordStep);
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
 		
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		String userName = sessionState.getUser().getName();
-		eventQueue.publish(Arrays.asList(new RecordDeletedEvent(survey.getName(), record.getId(), String.valueOf(rootEntityDef.getId()), 
-				String.valueOf(rootEntity.getInternalId()), new Date(), userName)));
+		List<RecordDeletedEvent> events = Arrays.asList(new RecordDeletedEvent(survey.getName(), 
+				record.getId(), recordStep.toRecordStep(), String.valueOf(rootEntityDef.getId()), 
+				String.valueOf(rootEntity.getInternalId()), new Date(), userName));
+		String surveyName = record.getSurvey().getName();
+		eventQueue.publish(new RecordTransaction(surveyName, record.getId(), record.getStep().toRecordStep(), events));
 	}
 	
 	@Transactional

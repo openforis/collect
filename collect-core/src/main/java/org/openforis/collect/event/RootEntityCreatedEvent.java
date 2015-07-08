@@ -5,9 +5,11 @@ import java.util.Date;
 
 public class RootEntityCreatedEvent extends EntityCreatedEvent {
 
-	public RootEntityCreatedEvent(String surveyName, Integer recordId, String definitionId,
-			String rootEntityId, Date timestamp, String userName) {
-		super(surveyName, recordId, definitionId, Collections.<String>emptyList(), rootEntityId, timestamp, userName);
+	public RootEntityCreatedEvent(String surveyName, Integer recordId,
+			RecordStep step, String definitionId, String rootEntityId,
+			Date timestamp, String userName) {
+		super(surveyName, recordId, step, definitionId, Collections
+				.<String> emptyList(), rootEntityId, timestamp, userName);
 	}
 
 }

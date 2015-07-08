@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.fao.foris.simpleeventbroker.EventBroker;
 import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.model.CollectRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +26,8 @@ public class SessionEventDispatcher {
 				//TODO remove this, assign an ID to the record immediately when it's created
 				event.initializeRecordId(record.getId());
 			}
-			eventQueue.publish(events);
+			String surveyName = record.getSurvey().getName();
+			eventQueue.publish(new RecordTransaction(surveyName, record.getId(), record.getStep().toRecordStep(), events));
 		}
 	}
 

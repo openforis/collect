@@ -6,10 +6,12 @@ import java.util.List;
 public class DateAttributeUpdatedEvent extends AttributeUpdatedEvent {
 
 	private final Date date;
-	
-	public DateAttributeUpdatedEvent(String surveyName, Integer recordId, String definitionId, List<String> ancestorIds, 
+
+	public DateAttributeUpdatedEvent(String surveyName, Integer recordId,
+			RecordStep step, String definitionId, List<String> ancestorIds,
 			String nodeId, Date date, Date timestamp, String userName) {
-		super(surveyName, recordId, definitionId, ancestorIds, nodeId, timestamp, userName);
+		super(surveyName, recordId, step, definitionId, ancestorIds, nodeId,
+				timestamp, userName);
 		this.date = date;
 	}
 

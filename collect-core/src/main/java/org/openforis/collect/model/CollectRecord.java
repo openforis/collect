@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -46,18 +47,26 @@ public class CollectRecord extends Record {
 	public static final int DEFAULT_APPLIED_POSITION = 1;
 	
 	public enum Step {
-		ENTRY(1), CLEANSING(2), ANALYSIS(3);
+		ENTRY		(1, RecordStep.ENTRY), 
+		CLEANSING	(2, RecordStep.CLEANSING), 
+		ANALYSIS	(3, RecordStep.ANALYSIS);
 
 		private int stepNumber;
+		private RecordStep recordStep;
 
-		private Step(int stepNumber) {
+		private Step(int stepNumber, RecordStep recordStep) {
 			this.stepNumber = stepNumber;
+			this.recordStep = recordStep;
 		}
 
 		public int getStepNumber() {
 			return stepNumber;
 		}
 
+		public RecordStep toRecordStep() {
+			return recordStep;
+		}
+		
 		public static Step valueOf(int stepNumber) {
 			Step[] values = Step.values();
 			for (Step step : values) {
@@ -66,6 +75,16 @@ public class CollectRecord extends Record {
 				}
 			}
 			return null;
+		}
+		
+		public static Step fromRecordStep(RecordStep recordStep) {
+			Step[] values = Step.values();
+			for (Step step : values) {
+				if (step.recordStep == recordStep) {
+					return step;
+				}
+			}
+			throw new IllegalArgumentException("Unknown record step: " + recordStep);
 		}
 		
 		public boolean hasNext() {

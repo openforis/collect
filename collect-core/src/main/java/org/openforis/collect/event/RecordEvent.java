@@ -13,17 +13,19 @@ public abstract class RecordEvent {
 
 	private String surveyName;
 	private Integer recordId;
+	private RecordStep recordStep;
 	private final String definitionId;
+	private List<String> ancestorIds;
 	private final String nodeId;
 	private final Date timestamp;
 	private final String userName;
-	private List<String> ancestorIds;
 	
-	public RecordEvent(String surveyName, Integer recordId, String definitionId, 
+	public RecordEvent(String surveyName, Integer recordId, RecordStep recordStep, String definitionId, 
 			List<String> ancestorIds, String nodeId, Date timestamp, String userName) {
 		super();
 		this.surveyName = surveyName;
 		this.recordId = recordId;
+		this.recordStep = recordStep;
 		this.definitionId = definitionId;
 		this.ancestorIds = ancestorIds;
 		this.nodeId = nodeId;
@@ -41,6 +43,10 @@ public abstract class RecordEvent {
 	
 	public Integer getRecordId() {
 		return recordId;
+	}
+	
+	public RecordStep getRecordStep() {
+		return recordStep;
 	}
 	
 	public String getDefinitionId() {

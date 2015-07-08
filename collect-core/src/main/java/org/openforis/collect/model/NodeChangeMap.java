@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -100,8 +101,8 @@ public class NodeChangeMap implements NodeChangeSet {
 	 * @param node
 	 * @return
 	 */
-	public NodeDeleteChange addNodeDeleteChange(Integer recordId, List<Integer> ancestorIds, Node<?> node) {
-		NodeDeleteChange c = new NodeDeleteChange(recordId, ancestorIds, node);
+	public NodeDeleteChange addNodeDeleteChange(Integer recordId, Step recordStep, List<Integer> ancestorIds, Node<?> node) {
+		NodeDeleteChange c = new NodeDeleteChange(recordId, recordStep, ancestorIds, node);
 		nodeIdToChange.put(node.getInternalId(), c); //overwrite change if already present
 		return c;
 	}

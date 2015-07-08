@@ -481,7 +481,7 @@ public class RecordUpdater {
 		
 		performNodeDeletion(node);
 
-		changeMap.addNodeDeleteChange(record.getId(), ancestorIds, node);
+		changeMap.addNodeDeleteChange(record.getId(), ((CollectRecord) record).getStep(), ancestorIds, node);
 
 		// calculated attributes
 		List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);

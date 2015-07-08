@@ -1,7 +1,5 @@
 package org.openforis.collect.event;
 
-import java.util.List;
-
 import org.fao.foris.simpleeventbroker.AbstractEventHandler;
 import org.fao.foris.simpleeventbroker.EventHandlerMonitor;
 import org.openforis.collect.manager.CollectRDBGenerator;
@@ -16,10 +14,9 @@ public class RDBGenerationRecordEventHandler extends AbstractEventHandler {
 		this.rdbGenerator = rdbGenerator;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void handle(Object event, EventHandlerMonitor eventHandlerMonitor) {
-		rdbGenerator.onEvents((List<? extends RecordEvent>) event);
+	public void handle(Object recordTransaction, EventHandlerMonitor eventHandlerMonitor) {
+		rdbGenerator.process((RecordTransaction) recordTransaction);
 	}
 
 	

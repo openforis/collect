@@ -19,7 +19,7 @@
          the following appenders write to files  
     -->
     <appender name="openforis" class="org.apache.log4j.DailyRollingFileAppender">
-        <param value="loggerdir/application.log" name="File"/>
+        <param value="${collect.root}/../../logs/collect.log" name="File"/>
         <param name="Encoding" value="UTF-8"/>
         <param name="DatePattern" value="'.'yyyy-MM-dd" />
         <layout class="org.apache.log4j.PatternLayout">
@@ -45,6 +45,11 @@
         <appender-ref ref="openforis"/>
     </category>
     
+    <category name="org.granite" additivity="false">
+        <priority value="info"/>
+        <appender-ref ref="openforis"/>
+    </category>
+
     <category name="httpclient" additivity="false">    
         <priority value="info"/>
         <appender-ref ref="console"/>        
@@ -54,7 +59,7 @@
         <priority value="off"/>
         <appender-ref ref="console"/>
     </category>
-
+    
     <!-- Section: ROOT logger -->
     <root>
         <priority value="debug"/>

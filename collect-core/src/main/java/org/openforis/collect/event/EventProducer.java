@@ -75,6 +75,7 @@ public class EventProducer implements EventSource {
 		Node<?> node = change.getNode();
 		List<String> ancestorIds = getAncestorIds(change);
 		Integer recordId = change.getRecordId();
+		RecordStep recordStep = change.getRecordStep().toRecordStep();
 
 		Survey survey = node.getSurvey();
 		String surveyName = survey.getName();
@@ -87,10 +88,10 @@ public class EventProducer implements EventSource {
 			List<RecordEvent> events = new ArrayList<RecordEvent>();
 			Entity entity = (Entity) node;
 			if (entity.isRoot()) {
-				events.add(new RootEntityCreatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+				events.add(new RootEntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						String.valueOf(nodeId), timestamp, userName));
 			} else {
-				 events.add(new EntityCreatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+				 events.add(new EntityCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						ancestorIds, String.valueOf(nodeId), timestamp, userName));
 			}
 			//add node collection created events
@@ -99,10 +100,10 @@ public class EventProducer implements EventSource {
 					String collectionId = getNodeCollectionId(nodeId, childDef);
 					String collectionDefId = getNodeCollectionDefinitionId(entity.getDefinition(), childDef);
 					if (childDef instanceof AttributeDefinition) {
-						events.add(new AttributeCollectionCreatedEvent(surveyName, recordId, collectionDefId, 
+						events.add(new AttributeCollectionCreatedEvent(surveyName, recordId, recordStep, collectionDefId, 
 								ancestorIds, collectionId, timestamp, userName));
 					} else {
-						events.add(new EntityCollectionCreatedEvent(surveyName, recordId, collectionDefId, 
+						events.add(new EntityCollectionCreatedEvent(surveyName, recordId, recordStep, collectionDefId, 
 								ancestorIds, collectionId, timestamp, userName));
 					}
 				}
@@ -111,7 +112,7 @@ public class EventProducer implements EventSource {
 		} else if (change instanceof AttributeChange) {
 			List<RecordEvent> result = new ArrayList<RecordEvent>();
 			if (change instanceof AttributeAddChange) {
-				result.add(new AttributeCreatedEvent(surveyName, recordId,  String.valueOf(definitionId), 
+				result.add(new AttributeCreatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						ancestorIds, String.valueOf(nodeId), timestamp, userName));
 			}
 			AttributeUpdatedEvent event = toAttributeUpdatedEvent(change, userName);
@@ -121,10 +122,10 @@ public class EventProducer implements EventSource {
 			return result;
 		} else if (change instanceof NodeDeleteChange) {
 			if (node instanceof Entity) {
-				return asList(new EntityDeletedEvent(surveyName, recordId,  String.valueOf(definitionId), 
+				return asList(new EntityDeletedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						ancestorIds, String.valueOf(nodeId), timestamp, userName));
 			} else {
-				return asList(new AttributeDeletedEvent(surveyName, recordId,  String.valueOf(definitionId),
+				return asList(new AttributeDeletedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId),
 						ancestorIds, String.valueOf(nodeId), timestamp, userName));	
 			}
 		}
@@ -169,6 +170,7 @@ public class EventProducer implements EventSource {
 			String userName) {
 		Node<?> node = change.getNode();
 		Integer recordId = change.getRecordId();
+		RecordStep recordStep = change.getRecordStep().toRecordStep();
 		List<String> ancestorIds = getAncestorIds(change);
 		
 		Survey survey = node.getSurvey();
@@ -181,21 +183,21 @@ public class EventProducer implements EventSource {
 		AttributeUpdatedEvent event = null;
 		if (node instanceof BooleanAttribute) {
 			BooleanValue value = ((BooleanAttribute) node).getValue();
-			event = new BooleanAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+			event = new BooleanAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 					ancestorIds, String.valueOf(nodeId), value.getValue(), timestamp, userName);
 		} else if (node instanceof CodeAttribute) {
 			Code value = ((CodeAttribute) node).getValue();
-			event = new CodeAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+			event = new CodeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 					ancestorIds, String.valueOf(nodeId), value.getCode(), 
 					value.getQualifier(), timestamp, userName);
 		} else if (node instanceof CoordinateAttribute) {
 			Coordinate value = ((CoordinateAttribute) node).getValue();
-			event = new CoordinateAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+			event = new CoordinateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 					ancestorIds, String.valueOf(nodeId), value.getX(), value.getY(), value.getSrsId(), 
 					timestamp, userName);
 		} else if (node instanceof DateAttribute) {
 			org.openforis.idm.model.Date value = ((DateAttribute) node).getValue();
-			event = new DateAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+			event = new DateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 					ancestorIds, String.valueOf(nodeId), value.toJavaDate(), timestamp, userName);
 		//TODO
 //			} else if (node instanceof FileAttribute) {
@@ -206,12 +208,12 @@ public class EventProducer implements EventSource {
 			Type valueType = ((NumericAttributeDefinition) nodeDef).getType();
 			switch(valueType) {
 			case INTEGER:
-				event = new IntegerAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+				event = new IntegerAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						ancestorIds, String.valueOf(nodeId), 
 						(Integer) value, unitId, timestamp, userName);
 				break;
 			case REAL:
-				event = new DoubleAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+				event = new DoubleAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						ancestorIds, String.valueOf(nodeId), 
 						(Double) value, unitId, timestamp, userName);
 				break;
@@ -226,12 +228,12 @@ public class EventProducer implements EventSource {
 			Type valueType = ((RangeAttributeDefinition) nodeDef).getType();
 			switch(valueType) {
 			case INTEGER:
-				event = new IntegerRangeAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+				event = new IntegerRangeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						ancestorIds, String.valueOf(nodeId), 
 						(Integer) from, (Integer) to, unitId, timestamp, userName);
 				break;
 			case REAL:
-				event = new DoubleRangeAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+				event = new DoubleRangeAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 						ancestorIds, String.valueOf(nodeId), 
 						(Double) from, (Double) to, unitId, timestamp, userName);
 				break;
@@ -240,17 +242,17 @@ public class EventProducer implements EventSource {
 			}
 		} else if (node instanceof TaxonAttribute) {
 			TaxonAttribute taxonAttr = (TaxonAttribute) node;
-			event = new TaxonAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+			event = new TaxonAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 					ancestorIds, String.valueOf(nodeId), 
 					taxonAttr.getCode(), taxonAttr.getScientificName(), taxonAttr.getVernacularName(), taxonAttr.getLanguageCode(), 
 					taxonAttr.getLanguageVariety(), timestamp, userName);
 		} else if (node instanceof TextAttribute) {
 			String text = ((TextAttribute) node).getText();
-			event = new TextAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+			event = new TextAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 					ancestorIds, String.valueOf(nodeId), text, timestamp, userName);
 		} else if (node instanceof TimeAttribute) {
 			Time value = ((TimeAttribute) node).getValue();
-			event = new DateAttributeUpdatedEvent(surveyName, recordId, String.valueOf(definitionId), 
+			event = new DateAttributeUpdatedEvent(surveyName, recordId, recordStep, String.valueOf(definitionId), 
 					ancestorIds, String.valueOf(nodeId), value.toJavaDate(), timestamp, userName);
 //		} else {
 //			throw new IllegalArgumentException("Unexpected node type: " + node.getClass().getSimpleName());

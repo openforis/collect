@@ -3,6 +3,7 @@ package org.openforis.collect.model;
 
 import java.util.List;
 
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.model.Node;
 
 /**
@@ -35,6 +36,11 @@ public abstract class NodeChange<T extends Node<?>> {
 		return ancestorIds.isEmpty() ? null : ancestorIds.get(0);
 	}
 
+	public Step getRecordStep() {
+		CollectRecord record = (CollectRecord) node.getRecord();
+		return record.getStep();
+	}
+	
 	public T getNode() {
 		return node;
 	}

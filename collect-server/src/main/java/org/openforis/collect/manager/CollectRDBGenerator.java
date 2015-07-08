@@ -23,12 +23,12 @@ import org.openforis.collect.event.CoordinateAttributeUpdatedEvent;
 import org.openforis.collect.event.DateAttributeUpdatedEvent;
 import org.openforis.collect.event.EntityCreatedEvent;
 import org.openforis.collect.event.EntityDeletedEvent;
-import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.NumberAttributeUpdatedEvent;
 import org.openforis.collect.event.NumericAttributeUpdatedEvent;
 import org.openforis.collect.event.RangeAttributeUpdatedEvent;
 import org.openforis.collect.event.RecordDeletedEvent;
 import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.event.TaxonAttributeUpdatedEvent;
 import org.openforis.collect.event.TextAttributeUpdatedEvent;
 import org.openforis.collect.event.TimeAttributeUpdatedEvent;
@@ -65,7 +65,7 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
  * @author S. Ricci
  *
  */
-public class CollectRDBGenerator implements EventListener {
+public class CollectRDBGenerator {
 
 	private static final Log LOG = LogFactory.getLog(CollectRDBGenerator.class);
 	private static final String SQLITE_DRIVER_CLASS_NAME = "org.sqlite.JDBC";
@@ -161,19 +161,15 @@ public class CollectRDBGenerator implements EventListener {
 		}
 	}
 
-	@Override
-	public void onEvents(final List<? extends RecordEvent> events) {
-		if (events.isEmpty()) {
-			return;
-		}
-		Step recordStep = Step.ENTRY;
-		final RelationalSchema rdbSchema = getRelatedRelationalSchema(events);
+	public void process(final RecordTransaction recordTransaction) {
+		final RelationalSchema rdbSchema = getRelatedRelationalSchema(recordTransaction);
 		final CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
+		Step recordStep = Step.fromRecordStep(recordTransaction.getRecordStep());
 
 		withConnection(survey, recordStep, new Callback() {
 			public void execute(Connection connection) {
 				RDBUpdater rdbUpdater = createRDBUpdater(connection);
-				for (RecordEvent recordEvent : events) {
+				for (RecordEvent recordEvent : recordTransaction.getEvents()) {
 					EventHandler handler = new EventHandler(recordEvent, rdbSchema, survey, rdbUpdater);
 					handler.handle();
 				}
@@ -207,15 +203,10 @@ public class CollectRDBGenerator implements EventListener {
 	}
 
 	private RelationalSchema getRelatedRelationalSchema(
-			List<? extends RecordEvent> events) {
-		for (RecordEvent event : events) {
-			String surveyName = event.getSurveyName();
-			CollectSurvey survey = surveyManager.get(surveyName);
-			if (survey != null) {
-				return surveyIdToRelationalSchema.get(survey.getId());
-			}
-		}
-		return null;
+			RecordTransaction recordTransaction) {
+		String surveyName = recordTransaction.getSurveyName();
+		CollectSurvey survey = surveyManager.get(surveyName);
+		return survey == null ? null : surveyIdToRelationalSchema.get(survey.getId());
 	}
 	
 	private JooqDatabaseExporter createRDBUpdater(Connection targetConn) {
