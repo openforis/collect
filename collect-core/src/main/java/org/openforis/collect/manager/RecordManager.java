@@ -21,12 +21,12 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordNotOwnedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.RecordValidationInProgressException;
-import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -384,9 +384,16 @@ public class RecordManager {
 
 
 	@Transactional
-	public void promote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPromoteException, MissingRecordKeyException {
+	public CollectRecord promote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPromoteException, MissingRecordKeyException {
 		CollectRecord record = load(survey, recordId, currentStep);
 		performPromote(record, user);
+		return record;
+	}
+	
+	@Transactional
+	public void promote(CollectSurvey survey, int recordId, Step currentStep, User user, RecordCallback callback) throws RecordPromoteException, MissingRecordKeyException {
+		CollectRecord record = promote(survey, recordId, currentStep, user);
+		callback.run(record);
 	}
 	
 	/**
@@ -443,7 +450,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
+	public CollectRecord demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
 		CollectRecord record = recordDao.load( survey, recordId, prevStep.getStepNumber() );
 		record.setModifiedBy( user );
@@ -453,6 +460,13 @@ public class RecordManager {
 		record.setState( State.REJECTED );
 		validate(record);
 		recordDao.update( record );
+		return record;
+	}
+
+	@Transactional
+	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user, RecordCallback callback) throws RecordPersistenceException {
+		CollectRecord record = demote(survey, recordId, currentStep, user);
+		callback.run(record);
 	}
 	
 	@Transactional
@@ -713,4 +727,10 @@ public class RecordManager {
         this.surveyManager = surveyManager;
     }
 
+    public interface RecordCallback {
+    	
+    	void run(CollectRecord record);
+    	
+    }
+    
 }

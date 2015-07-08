@@ -13,10 +13,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.fao.foris.simpleeventbroker.EventBroker;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.event.CollectEventQueue;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.RecordDeletedEvent;
+import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.io.data.BulkRecordMoveJob;
 import org.openforis.collect.manager.CodeListManager;
@@ -88,11 +90,9 @@ public class DataService {
 	@Autowired
 	private transient CollectJobManager collectJobManager;
 	@Autowired
-	private transient EventProducer eventProducer;
-	@Autowired
 	private transient SessionEventDispatcher sessionEventDispatcher;
 	@Autowired
-	private transient EventBroker eventQueue;
+	private transient CollectEventQueue eventQueue;
 	
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -174,7 +174,8 @@ public class DataService {
 		CollectRecord record = recordManager.instantiateRecord(activeSurvey, rootEntityName, user, versionName, recordStep);
 		NodeChangeSet changeSet = recordManager.initializeRecord(record);
 
-		eventProducer.produceFor(changeSet, user.getName());
+		List<RecordEvent> events = new EventProducer().produceFor(changeSet, user.getName());
+		sessionManager.onEvents(events);
 		
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
@@ -189,22 +190,18 @@ public class DataService {
 	public void deleteRecord(int id) throws RecordPersistenceException {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
-		//TODO check that the record is in ENTRY phase: only delete in ENTRY phase is allowed
-		Step recordStep = Step.ENTRY;
-		CollectRecord record = recordManager.load(survey, id, recordStep);
+		String userName = sessionState.getUser().getName();
+
+		CollectRecord record = recordManager.load(survey, id);
+		if (record.getStep() != Step.ENTRY) {
+			throw new IllegalStateException("Cannot delete a record not in ENTRY phase");
+		}
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
 		
-		Entity rootEntity = record.getRootEntity();
-		EntityDefinition rootEntityDef = rootEntity.getDefinition();
-		String userName = sessionState.getUser().getName();
-		List<RecordDeletedEvent> events = Arrays.asList(new RecordDeletedEvent(survey.getName(), 
-				record.getId(), recordStep.toRecordStep(), String.valueOf(rootEntityDef.getId()), 
-				String.valueOf(rootEntity.getInternalId()), new Date(), userName));
-		String surveyName = record.getSurvey().getName();
-		eventQueue.publish(new RecordTransaction(surveyName, record.getId(), record.getStep().toRecordStep(), events));
+		publishRecordDeletedEvent(record, record.getStep().toRecordStep(), userName);
 	}
-	
+
 	@Transactional
 	@Secured("ROLE_ENTRY")
 	public void saveActiveRecord() throws RecordPersistenceException, RecordIndexException {
@@ -238,7 +235,8 @@ public class DataService {
 		}
 		
 		String userName = sessionManager.getSessionState().getUser().getName();
-		eventProducer.produceFor(changeSet, userName);
+		List<RecordEvent> events = new EventProducer().produceFor(changeSet, userName);
+		sessionManager.onEvents(events);
 		
 		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet, getCurrentLocale());
 		if ( requestSet.isAutoSave() ) {
@@ -315,26 +313,30 @@ public class DataService {
 		}
 	}
 	
+	@Transactional
 	@Secured("ROLE_ENTRY")
 	public void promoteToCleansing() throws RecordPersistenceException, RecordPromoteException  {
 		promote(Step.CLEANSING);
 	}
 
+	@Transactional
 	@Secured("ROLE_CLEANSING")
 	public void promoteToAnalysis() throws RecordPersistenceException, RecordPromoteException  {
 		promote(Step.ANALYSIS);
 	}
 	
-	@Transactional
 	protected void promote(Step to) throws RecordPersistenceException, RecordPromoteException  {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
+		String userName = sessionState.getUser().getName();
 		Step currentStep = record.getStep();
 		Step exptectedStep = to.getPrevious();
 		if ( exptectedStep == currentStep ) {
 			User user = sessionState.getUser();
+			sessionEventDispatcher.recordSaved(record);
 			recordManager.promote(record, user);
+			publishRecordPromotedEvents(record, userName);
 			recordManager.releaseLock(record.getId());
 			sessionManager.clearActiveRecord();
 			if ( isCurrentRecordIndexable() ) {
@@ -344,7 +346,7 @@ public class DataService {
 			throw new IllegalStateException("The active record cannot be submitted: it is not in the exptected phase: " + exptectedStep);
 		}
 	}
-	
+
 	protected boolean isRecordIndexEnabled() {
 		return recordIndexService.isInited();
 	}
@@ -353,33 +355,35 @@ public class DataService {
 		return isRecordIndexEnabled() && hasActiveSurveyIndexedNodes;
 	}
 
+	@Transactional
 	@Secured("ROLE_ANALYSIS")
 	public void demoteToCleansing() throws RecordPersistenceException {
 		demote(Step.CLEANSING);
 	}
 	
+	@Transactional
 	@Secured("ROLE_CLEANSING")
 	public void demoteToEntry() throws RecordPersistenceException {
 		demote(Step.ENTRY);
 	}
 		
-	@Transactional
-	protected void demote(Step to) throws RecordPersistenceException {
+	protected void demote(Step toStep) throws RecordPersistenceException {
 		sessionManager.checkIsActiveRecordLocked();
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectRecord record = sessionState.getActiveRecord();
-		Step currentStep = record.getStep();
-		Step exptectedStep = to.getNext();
-		if ( exptectedStep == currentStep ) {
-			CollectSurvey survey = sessionState.getActiveSurvey();
-			User user = sessionState.getUser();
-			Integer recordId = record.getId();
-			recordManager.demote(survey, recordId, record.getStep(), user);
-			recordManager.releaseLock(recordId);
-			sessionManager.clearActiveRecord();
-		} else {
-			throw new IllegalStateException("The active record cannot be demoted: it is not in the exptected phase: " + exptectedStep);
+		Step fromStep = record.getStep();
+		Step exptectedFromStep = toStep.getNext();
+		if ( exptectedFromStep != fromStep ) {
+			throw new IllegalStateException("The active record cannot be demoted: it is not in the exptected phase: " + exptectedFromStep);
 		}
+		CollectSurvey survey = sessionState.getActiveSurvey();
+		String userName = sessionState.getUser().getName();
+		User user = sessionState.getUser();
+		Integer recordId = record.getId();
+		publishRecordDeletedEvent(record, fromStep.toRecordStep(), userName);
+		recordManager.demote(survey, recordId, record.getStep(), user);
+		recordManager.releaseLock(recordId);
+		sessionManager.clearActiveRecord();
 	}
 
 	/**
@@ -488,17 +492,46 @@ public class DataService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public void moveRecords(String rootEntity, int fromStepNumber, boolean promote) {
+	public void moveRecords(String rootEntity, int fromStepNumber, final boolean promote) {
 		BulkRecordMoveJob job = collectJobManager.createJob(BulkRecordMoveJob.class);
 		SessionState sessionState = getSessionState();
+		final String userName = sessionState.getUser().getName();
 		job.setSurvey(sessionState.getActiveSurvey());
 		job.setRootEntity(rootEntity);
 		job.setPromote(promote);
-		job.setFromStep(Step.valueOf(fromStepNumber));
+		final Step fromStep = Step.valueOf(fromStepNumber);
+		job.setFromStep(fromStep);
 		job.setAdminUser(sessionState.getUser());
+		job.setRecordMovedCallback(new BulkRecordMoveJob.Callback() {
+			@Override
+			public void recordMoved(CollectRecord record) {
+				if (promote) {
+					publishRecordPromotedEvents(record, userName);
+				} else {
+					publishRecordDeletedEvent(record, fromStep.toRecordStep(), userName);
+				}
+			}
+		});
 		collectJobManager.startSurveyJob(job);
+		
+		
 	}
 
+	private void publishRecordPromotedEvents(CollectRecord record, String userName) {
+		List<RecordEvent> events = new EventProducer().produceFor(record, userName);
+		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), events));
+	}
+	
+	private void publishRecordDeletedEvent(CollectRecord record, RecordStep recordStep, String userName) {
+		Entity rootEntity = record.getRootEntity();
+		EntityDefinition rootEntityDef = rootEntity.getDefinition();
+		List<RecordDeletedEvent> events = Arrays.asList(new RecordDeletedEvent(record.getSurvey().getName(), 
+				record.getId(), recordStep, String.valueOf(rootEntityDef.getId()), 
+				String.valueOf(rootEntity.getInternalId()), new Date(), userName));
+		String surveyName = record.getSurvey().getName();
+		eventQueue.publish(new RecordTransaction(surveyName, record.getId(), recordStep, events));
+	}
+	
 	protected CollectRecord getActiveRecord() {
 		SessionState sessionState = getSessionState();
 		CollectRecord activeRecord = sessionState.getActiveRecord();

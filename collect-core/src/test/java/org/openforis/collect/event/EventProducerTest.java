@@ -24,13 +24,11 @@ import org.openforis.idm.model.Entity;
 public class EventProducerTest extends AbstractRecordTest {
 
 	private EventProducer eventProducer;
-	private FakeEventListener listener;
 	
 	@Override
 	public void init() {
 		super.init();
-		listener = new FakeEventListener();
-		eventProducer = new EventProducer(Arrays.<EventListener>asList(listener));
+		eventProducer = new EventProducer();
 	}
 	
 	@Test
@@ -66,25 +64,13 @@ public class EventProducerTest extends AbstractRecordTest {
 		
 	}
 	
-	private void assertEventTypes(NodeChangeSet changeSet, Class<?>... eventTypes) {
-		eventProducer.produceFor(changeSet, "user_name");
-		List<? extends RecordEvent> listenerEvents = listener.events;
-		List<Class<?>> listenerEventTypes = new ArrayList<Class<?>>(listenerEvents.size());
-		for (RecordEvent event : listenerEvents) {
-			listenerEventTypes.add(event.getClass());
+	private void assertEventTypes(NodeChangeSet changeSet, Class<?>... expectedEventTypes) {
+		List<RecordEvent> events = eventProducer.produceFor(changeSet, "user_name");
+		List<Class<?>> actualEventTypes = new ArrayList<Class<?>>(events.size());
+		for (RecordEvent event : events) {
+			actualEventTypes.add(event.getClass());
 		}
-		assertEquals(Arrays.asList(eventTypes), listenerEventTypes);
-	}
-
-	static class FakeEventListener implements EventListener {
-
-		private List<? extends RecordEvent> events;
-
-		@Override
-		public void onEvents(List<? extends RecordEvent> events) {
-			this.events = events;
-		}
-		
+		assertEquals(Arrays.asList(expectedEventTypes), actualEventTypes);
 	}
 
 }

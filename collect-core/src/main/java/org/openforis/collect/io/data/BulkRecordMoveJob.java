@@ -32,6 +32,8 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 	private User adminUser;
 	private Step fromStep;
 	private boolean promote;
+
+	private Callback recordMovedCallback;
 	
 	@Override
 	protected void buildTasks() throws Throwable {
@@ -54,6 +56,10 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 		this.promote = promote;
 	}
 	
+	public void setRecordMovedCallback(Callback recordMovedCallback) {
+		this.recordMovedCallback = recordMovedCallback;
+	}
+
 	private class BulkRecordMoveTask extends Task {
 
 		@Override
@@ -69,15 +75,27 @@ public class BulkRecordMoveJob extends SurveyLockingJob {
 				if (isAborted()) {
 					break;
 				}
+				RecordManager.RecordCallback recordCallback = new RecordManager.RecordCallback() {
+					public void run(CollectRecord record) {
+						recordMovedCallback.recordMoved(record);
+					}
+				};
 				if (promote) {
-					recordManager.promote(survey, summary.getId(), summary.getStep(), adminUser);
+					recordManager.promote(survey, summary.getId(), summary.getStep(), adminUser, recordCallback);
 				} else {
-					recordManager.demote(survey, summary.getId(), summary.getStep(), adminUser);
+					recordManager.demote(survey, summary.getId(), summary.getStep(), adminUser, recordCallback);
 				}
+				
 				incrementItemsProcessed();
 			}
 		}
 		
 	}
 	
+	public static interface Callback {
+
+		void recordMoved(CollectRecord record);
+		
+	}
+
 }

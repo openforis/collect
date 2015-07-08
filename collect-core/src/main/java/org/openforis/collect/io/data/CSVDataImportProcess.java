@@ -209,7 +209,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			//create new record
 			EntityDefinition rootEntityDefn = survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId);
 			CollectRecord record = recordManager.instantiateRecord(survey, rootEntityDefn.getName(), adminUser, settings.getNewRecordVersionName(), Step.ENTRY);
-			nodeChangeBatchProcessor.add(recordManager.initializeRecord(record), adminUser.getName());
+			NodeChangeSet changes = recordManager.initializeRecord(record);
+			nodeChangeBatchProcessor.add(changes, adminUser.getName());
 			setRecordKeys(line, record);
 			setValuesInRecord(line, record, Step.ENTRY);
 			insertRecord(record);
@@ -265,7 +266,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		String parentEntitiesPath = getParentEntityDefinition().getPath();
 		List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
 		for (Entity entity : entitiesToBeDeleted) {
-			nodeChangeBatchProcessor.add(recordManager.deleteNode(entity), adminUser.getName());
+			NodeChangeSet changes = recordManager.deleteNode(entity);
+			nodeChangeBatchProcessor.add(changes, adminUser.getName());
 		}
 	}
 

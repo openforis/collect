@@ -1,10 +1,9 @@
 package org.openforis.collect.io.data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import org.fao.foris.simpleeventbroker.EventBroker;
+import org.openforis.collect.event.CollectEventQueue;
 import org.openforis.collect.event.EventListener;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.RecordEvent;
@@ -16,10 +15,9 @@ import org.openforis.collect.model.NodeChangeSet;
 public class RecordEventBatchPublisher implements EventListener, NodeChangeBatchProcessor {
 
 	private List<RecordEvent> events = new ArrayList<RecordEvent>();
-	private EventProducer eventProducer = new EventProducer(Arrays.<EventListener>asList(this));
-	private EventBroker eventQueue;
+	private CollectEventQueue eventQueue;
 	
-	public RecordEventBatchPublisher(EventBroker eventQueue) {
+	public RecordEventBatchPublisher(CollectEventQueue eventQueue) {
 		this.eventQueue = eventQueue;
 	}
 	
@@ -28,8 +26,9 @@ public class RecordEventBatchPublisher implements EventListener, NodeChangeBatch
 		this.events.addAll(events);
 	}
 	
+	@Override
 	public void add(NodeChangeSet nodeChanges, String userName) {
-		eventProducer.produceFor(nodeChanges, userName);
+		this.events.addAll(new EventProducer().produceFor(nodeChanges, userName));
 	}
 	
 	public void process(CollectRecord record) {
