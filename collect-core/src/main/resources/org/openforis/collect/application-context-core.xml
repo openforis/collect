@@ -158,6 +158,7 @@
 	</bean>
 	
 	<!-- Async job executor -->
-	<bean id="jobManager" class="org.openforis.collect.concurrency.CollectJobManager" />
+	<bean id="jobManager" class="org.openforis.collect.concurrency.CollectJobManager" 
+		destroy-method="destroy" />
 
 </beans>
