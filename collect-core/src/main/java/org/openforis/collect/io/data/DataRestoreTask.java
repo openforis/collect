@@ -2,16 +2,30 @@ package org.openforis.collect.io.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipFile;
 
-import org.openforis.collect.io.exception.DataImportExeption;
+import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.EventQueue;
+import org.openforis.collect.event.RecordDeletedEvent;
+import org.openforis.collect.event.RecordEvent;
+import org.openforis.collect.event.RecordStep;
+import org.openforis.collect.event.RecordTransaction;
+import org.openforis.collect.io.data.RecordImportError.Level;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.RecordManager.RecordOperation;
+import org.openforis.collect.manager.RecordManager.RecordOperations;
+import org.openforis.collect.manager.RecordManager.RecordStepOperation;
 import org.openforis.collect.manager.UserManager;
+import org.openforis.collect.model.CollectRecord;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
+import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
+import org.openforis.collect.utils.Consumer;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.model.Entity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,26 +39,32 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataRestoreTask extends Task {
 
+	@Autowired
+	private EventQueue eventQueue;
+	
 	private RecordManager recordManager;
 	private UserManager userManager;
 
 	//input
 	private ZipFile zipFile;
-	
 	private CollectSurvey packagedSurvey;
 	private CollectSurvey existingSurvey;
 	private List<Integer> entryIdsToImport;
 	private boolean overwriteAll;
 	
+	//output
+	private final List<RecordImportError> errors;
+	
 	//temporary instance variables
-	private List<Integer> processedRecords;
-	private RecordUpdateBuffer updateBuffer;
-	private RecordProvider recordProvider;
+	private final List<Integer> processedRecords;
+	private final RecordUpdateBuffer updateBuffer;
+	private XMLParsingRecordProvider recordProvider;
 	
 	public DataRestoreTask() {
 		super();
 		this.processedRecords = new ArrayList<Integer>();
 		this.updateBuffer = new RecordUpdateBuffer();
+		this.errors = new ArrayList<RecordImportError>();
 	}
 
 	@Override
@@ -71,7 +91,6 @@ public class DataRestoreTask extends Task {
 	
 	@Override
 	protected void execute() throws Throwable {
-		processedRecords = new ArrayList<Integer>();
 		List<Integer> idsToImport = calculateEntryIdsToImport();
 		for (Integer entryId : idsToImport) {
 			if ( isRunning() && ! processedRecords.contains(entryId) ) {
@@ -85,22 +104,40 @@ public class DataRestoreTask extends Task {
 		updateBuffer.flush();
 	}
 	
-	private void importEntries(int entryId) throws IOException, DataImportExeption, RecordPersistenceException {
-		RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, entryId);
-		List<RecordOperation> operations = operationGenerator.generate();
-		updateBuffer.append(operations);
+	private void importEntries(int entryId) throws IOException, MissingStepsException {
+		try {
+			RecordOperationGenerator operationGenerator = new RecordOperationGenerator(recordProvider, recordManager, entryId);
+			RecordOperations recordOperations = operationGenerator.generate();
+			if (! recordOperations.isEmpty()) {
+				updateBuffer.append(recordOperations);
+			}
+		} catch(MissingStepsException e) {
+			reportMissingStepsErrors(entryId, e);
+		} catch (RecordParsingException e) {
+			reportRecordParsingErrors(entryId, e);
+		}
 	}
-	
-//	private void replaceData(CollectRecord fromRecord, CollectRecord toRecord) {
-//		toRecord.setCreatedBy(fromRecord.getCreatedBy());
-//		toRecord.setCreationDate(fromRecord.getCreationDate());
-//		toRecord.setModifiedBy(fromRecord.getModifiedBy());
-//		toRecord.setModifiedDate(fromRecord.getModifiedDate());
-//		toRecord.setStep(fromRecord.getStep());
-//		toRecord.setState(fromRecord.getState());
-//		toRecord.replaceRootEntity(fromRecord.getRootEntity());
-//		validateRecord(toRecord);
-//	}
+
+	private void reportMissingStepsErrors(int entryId, MissingStepsException e) {
+		Step originalStep = e.getOperations().getOriginalStep();
+		String entryName = recordProvider.getBackupEntryName(entryId, originalStep);
+		errors.add(new RecordImportError(entryId, entryName, originalStep, 
+				"Missing data for step", Level.ERROR));
+	}
+
+	private void reportRecordParsingErrors(int entryId, RecordParsingException e) {
+		Step recordStep = e.getRecordStep();
+		String entryName = recordProvider.getBackupEntryName(entryId, recordStep);
+		ParseRecordResult parseResult = e.getParseRecordResult();
+		for (NodeUnmarshallingError failure : parseResult.getFailures()) {
+			errors.add(new RecordImportError(entryId, entryName, recordStep, 
+					String.format("%s : %s", failure.getPath(), failure.getMessage()), Level.ERROR));
+		}
+		for (NodeUnmarshallingError warn : parseResult.getWarnings()) {
+			errors.add(new RecordImportError(entryId, entryName, recordStep, 
+					String.format("%s : %s", warn.getPath(), warn.getMessage()), Level.WARNING));
+		}
+	}
 	
 	public RecordManager getRecordManager() {
 		return recordManager;
@@ -160,21 +197,45 @@ public class DataRestoreTask extends Task {
 
 	private class RecordUpdateBuffer {
 		
-		public static final int BUFFER_SIZE = 50;
+		public static final int BUFFER_SIZE = 20;
 		
-		private List<RecordOperation> operations = new ArrayList<RecordOperation>();
+		private List<RecordOperations> operations = new ArrayList<RecordOperations>();
 		
-		public void append(List<RecordOperation> opts) {
-			this.operations.addAll(opts);
+		public void append(RecordOperations opts) {
+			this.operations.add(opts);
 			if (this.operations.size() >= BUFFER_SIZE) {
 				flush();
 			}
 		}
 
 		void flush() {
-			recordManager.executeRecordOperations(operations);
+			recordManager.executeRecordOperations(operations, new EventPublisher());
 			operations.clear();
 		}
 	}
 	
+	private final class EventPublisher implements Consumer<RecordStepOperation> {
+		
+		final EventProducer eventProducer = new EventProducer();
+		
+		@Override
+		public void consume(RecordStepOperation operation) {
+			CollectRecord record = operation.getRecord();
+			String surveyName = record.getSurvey().getName();
+			int recordId = record.getId();
+			RecordStep recordStep = record.getStep().toRecordStep();
+			Entity rootEntity = record.getRootEntity();
+			
+			String userName = record.getModifiedBy().getName();
+			List<RecordEvent> events = eventProducer.produceFor(record, userName);
+			
+			if (! operation.isInsert()) {
+				events.add(0, new RecordDeletedEvent(surveyName, recordId, recordStep, 
+						String.valueOf(rootEntity.getDefinition().getId()), 
+						String.valueOf(rootEntity.getInternalId()), new Date(), userName));
+			}
+			eventQueue.publish(new RecordTransaction(surveyName, 
+					recordId, recordStep, events));
+		}
+	}
 }

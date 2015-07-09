@@ -28,6 +28,7 @@ import org.openforis.collect.persistence.RecordNotOwnedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.RecordValidationInProgressException;
+import org.openforis.collect.utils.Consumer;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -148,16 +149,20 @@ public class RecordManager {
 	}
 	
 	@Transactional
-	public void executeRecordOperations(List<RecordOperation> operations) {
+	public void executeRecordOperations(List<RecordOperations> operationsForRecords, Consumer<RecordStepOperation> consumer) {
 		int nextId = nextId();
 		List<RecordStoreQuery> queries = new ArrayList<RecordStoreQuery>();
-		for (RecordOperation operation : operations) {
-			CollectRecord record = operation.getRecord();
-			if (operation.isInsert()) {
-				record.setId(nextId ++);
-				queries.add(createInsertQuery(record));
-			} else {
-				queries.add(createUpdateQuery(record));
+		for (RecordOperations recordOperations : operationsForRecords) {
+			List<RecordStepOperation> operations = recordOperations.getOperations();
+			for (RecordStepOperation operation : operations) {
+				CollectRecord record = operation.getRecord();
+				if (operation.isInsert()) {
+					recordOperations.initializeRecordId(nextId ++);
+					queries.add(createInsertQuery(record));
+				} else {
+					queries.add(createUpdateQuery(record));
+				}
+				consumer.consume(operation);
 			}
 		}
 		execute(queries);
@@ -751,32 +756,87 @@ public class RecordManager {
     	
     }
 
-	public static class RecordOperation {
+	public static class RecordStepOperation {
 		
 		private CollectRecord record;
+		private Step step;
 		private boolean insert;
 		
-		public RecordOperation(CollectRecord record, boolean insert) {
+		public RecordStepOperation(CollectRecord record, Step step, boolean insert) {
 			super();
 			this.record = record;
+			this.step = step;
 			this.insert = insert;
-		}
-		
-		public static RecordOperation createUpdate(CollectRecord record) {
-			return new RecordOperation(record, false);
-		}
-		
-		public static RecordOperation createInsert(CollectRecord record) {
-			return new RecordOperation(record, true);
 		}
 		
 		public CollectRecord getRecord() {
 			return record;
 		}
 		
+		private Step getStep() {
+			return step;
+		}
+		
 		public boolean isInsert() {
 			return insert;
 		}
+	}
+	
+	public static class RecordOperations {
+		
+		private Integer recordId;
+		private Step originalStep;
+		private Step lastUpdatedStep;
+		private List<RecordStepOperation> operations = new ArrayList<RecordStepOperation>();
+		
+		public void initializeRecordId(Integer recordId) {
+			this.recordId = recordId;
+			for (RecordStepOperation operation : operations) {
+				operation.getRecord().setId(recordId);
+			}
+		}
+		
+		public boolean isEmpty() {
+			return operations.isEmpty();
+		}
+		
+		public boolean hasMissingSteps() {
+			return originalStep != null && originalStep.after(lastUpdatedStep);
+		}
+
+		public void addUpdate(CollectRecord record, Step step) {
+			add(new RecordStepOperation(record, step, false));
+		}
+
+		public void addInsert(CollectRecord record, Step step) {
+			add(new RecordStepOperation(record, step, true));
+		}
+		
+		private void add(RecordStepOperation operation) {
+			operations.add(operation);
+			lastUpdatedStep = operation.getStep();
+		}
+		
+		public List<RecordStepOperation> getOperations() {
+			return operations;
+		}
+		
+		public Integer getRecordId() {
+			return recordId;
+		}
+		
+		public Step getOriginalStep() {
+			return originalStep;
+		}
+		
+		public void setOriginalStep(Step originalStep) {
+			this.originalStep = originalStep;
+		}
+		
+		public Step getLastUpdatedStep() {
+			return lastUpdatedStep;
+		}
+
 	}
 
 }

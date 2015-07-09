@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -17,8 +16,9 @@ import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
@@ -33,7 +33,7 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	//internal
 	private final BackupFileExtractor backupFileExtractor;
 	private final DataUnmarshaller dataUnmarshaller;
-	private final HashMap<String, String> errorByEntryName;
+	private final RecordUpdater recordUpdater;
 	
 	public XMLParsingRecordProvider(ZipFile zipFile, CollectSurvey packagedSurvey, 
 			CollectSurvey existingSurvey, UserManager userManager) {
@@ -44,11 +44,11 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		//init internal variables
 		this.backupFileExtractor = new BackupFileExtractor(zipFile);
 		this.dataUnmarshaller = initDataUnmarshaller();
-		this.errorByEntryName = new HashMap<String, String>();
+		this.recordUpdater = new RecordUpdater();
 	}
 	
 	@Override
-	public CollectRecord provideRecord(int entryId, Step step) throws IOException {
+	public CollectRecord provideRecord(int entryId, Step step) throws IOException, RecordParsingException {
 		String entryName = getBackupEntryName(entryId, step);
 		InputStream entryIS = backupFileExtractor.findEntryInputStream(entryName);
 		if (entryIS == null) {
@@ -56,16 +56,15 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		}
 		InputStreamReader reader = OpenForisIOUtils.toReader(entryIS);
 		ParseRecordResult parseRecordResult = parseRecord(reader);
-		CollectRecord parsedRecord = parseRecordResult.getRecord();
-		if (parsedRecord == null) {
-			//error parsing record
-			addError(entryName, parseRecordResult.getMessage());
-			return null;
+		if (parseRecordResult.isSuccess()) {
+			CollectRecord record = parseRecordResult.getRecord();
+			recordUpdater.initializeRecord(record);
+			return record;
 		} else {
-			return parsedRecord;
+			throw new RecordParsingException(parseRecordResult, step);
 		}
 	}
-	
+
 	@Override
 	public List<Integer> findEntryIds() {
 		Set<Integer> result = new TreeSet<Integer>();
@@ -105,8 +104,4 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		}
 	}
 	
-	private void addError(String entryName, String message) {
-		errorByEntryName.put(entryName, message);
-	}
-
 }

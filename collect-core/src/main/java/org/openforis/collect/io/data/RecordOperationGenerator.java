@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.RecordManager.RecordOperation;
+import org.openforis.collect.manager.RecordManager.RecordOperations;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.model.Entity;
 
 public class RecordOperationGenerator {
@@ -24,58 +24,35 @@ public class RecordOperationGenerator {
 		this.entryId = entryId;
 	}
 
-	public List<RecordOperation> generate() throws IOException {
-		List<RecordOperation> operations = new ArrayList<RecordOperation>();
-		CollectRecord lastProcessedRecord = null;
-		Step originalRecordStep = null;
+	public RecordOperations generate() throws IOException, MissingStepsException, RecordParsingException {
+		RecordOperations operations = new RecordOperations();
+		Integer lastRecordId = null;
 		for (Step step : Step.values()) {
-			CollectRecord parsedRecord = recordProvider.provideRecord(entryId,
-					step);
+			CollectRecord parsedRecord = recordProvider.provideRecord(entryId, step);
 			if (parsedRecord == null) {
 				continue;
 			}
-
-			// record parsed successfully
 			parsedRecord.setStep(step);
 
-			if (lastProcessedRecord == null) {
+			if (lastRecordId == null) {
 				CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
-				if (oldRecordSummary == null) {
-					// insert new record
-					// parsedRecord.setId(nextRecordId ++);
-					operations.addAll(insertRecordDataUntilStep(parsedRecord,
-							step));
+				boolean newRecord = oldRecordSummary == null;
+				if (newRecord) {
+					insertRecordDataUntilStep(operations, parsedRecord, step);
 				} else {
 					// overwrite existing record
-					originalRecordStep = oldRecordSummary.getStep();
+					operations.setOriginalStep(oldRecordSummary.getStep());
 					parsedRecord.setId(oldRecordSummary.getId());
-					operations.add(RecordOperation.createUpdate(parsedRecord));
+					operations.addUpdate(parsedRecord, step);
 				}
-				lastProcessedRecord = parsedRecord;
 			} else {
-				parsedRecord.setId(lastProcessedRecord.getId());
-				// replaceData(parsedRecord, lastProcessedRecord);
-				operations.add(RecordOperation.createUpdate(parsedRecord));
+				parsedRecord.setId(lastRecordId);
+				operations.addUpdate(parsedRecord, step);
 			}
-			// if ( parseRecordResult.hasWarnings() ) {
-			// addWarnings(entryName, parseRecordResult.getWarnings());
-			// }
+			lastRecordId = parsedRecord.getId();
 		}
-		if (lastProcessedRecord != null) {
-			// if the original record step is after the imported record one,
-			// restore record step to the original one and revalidate the record
-			// e.g. importing data from data entry step and the original record
-			// was in analysis step
-			if (originalRecordStep != null
-					&& originalRecordStep.after(lastProcessedRecord.getStep())) {
-				operations.add(restoreRecordStep(lastProcessedRecord,
-						originalRecordStep));
-			} else {
-				// validate record and save the validation result
-				validateRecord(lastProcessedRecord);
-				operations.add(RecordOperation
-						.createUpdate(lastProcessedRecord));
-			}
+		if (operations.hasMissingSteps()) {
+			throw new MissingStepsException(operations);
 		}
 		return operations;
 	}
@@ -99,10 +76,8 @@ public class RecordOperationGenerator {
 		}
 	}
 
-	private List<RecordOperation> insertRecordDataUntilStep(
+	private void insertRecordDataUntilStep(RecordOperations operations,
 			CollectRecord record, Step step) {
-		List<RecordOperation> operations = new ArrayList<RecordOperation>();
-
 		List<Step> previousSteps = new ArrayList<Step>();
 		for (Step s : Step.values()) {
 			if (s.beforeEqual(step)) {
@@ -113,31 +88,12 @@ public class RecordOperationGenerator {
 			record.setStep(previousStep);
 			switch (previousStep) {
 			case ENTRY:
-				operations.add(RecordOperation.createInsert(record));
+				operations.addInsert(record, step);
 				break;
 			default:
-				operations.add(RecordOperation.createUpdate(record));
+				operations.addUpdate(record, step);
 			}
 		}
-		return operations;
 	}
 
-	private RecordOperation restoreRecordStep(CollectRecord record,
-			Step originalRecordStep) {
-		CollectSurvey survey = (CollectSurvey) record.getSurvey();
-		CollectRecord originalRecord = recordManager.load(survey,
-				record.getId(), originalRecordStep);
-		originalRecord.setStep(originalRecordStep);
-		validateRecord(originalRecord);
-		return RecordOperation.createUpdate(originalRecord);
-	}
-
-	private void validateRecord(CollectRecord record) {
-		try {
-			recordManager.validate(record);
-		} catch (Exception e) {
-			// log().warn("Error validating record: " +
-			// record.getRootEntityKeyValues(), e);
-		}
-	}
 }

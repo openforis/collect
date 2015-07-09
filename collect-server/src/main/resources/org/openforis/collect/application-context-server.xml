@@ -98,7 +98,7 @@
 		<constructor-arg ref="collectLocalRDBStorageManager" />
 	</bean>
 	
-	<bean id="eventQueue" class="org.openforis.collect.event.CollectEventQueue">
+	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue">
 		<constructor-arg>
 			<bean class="org.fao.foris.simpleeventbroker.SpringEventBroker" 
 					init-method="start" destroy-method="shutdown">

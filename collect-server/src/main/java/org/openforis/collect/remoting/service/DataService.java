@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
-import org.openforis.collect.event.CollectEventQueue;
+import org.openforis.collect.event.EventBrokerEventQueue;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.RecordDeletedEvent;
 import org.openforis.collect.event.RecordEvent;
@@ -92,7 +92,7 @@ public class DataService {
 	@Autowired
 	private transient SessionEventDispatcher sessionEventDispatcher;
 	@Autowired
-	private transient CollectEventQueue eventQueue;
+	private transient EventBrokerEventQueue eventQueue;
 	
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation

@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class RecordDeletedEvent extends RecordEvent {
 
-	public RecordDeletedEvent(String surveyName, Integer recordId,
+	public RecordDeletedEvent(String surveyName, int recordId,
 			RecordStep step, String definitionId, String nodeId,
 			Date timestamp, String userName) {
 		super(surveyName, recordId, step, definitionId, Collections

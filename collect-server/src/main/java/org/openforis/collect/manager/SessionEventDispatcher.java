@@ -2,7 +2,7 @@ package org.openforis.collect.manager;
 
 import java.util.List;
 
-import org.openforis.collect.event.CollectEventQueue;
+import org.openforis.collect.event.EventBrokerEventQueue;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.model.CollectRecord;
@@ -13,9 +13,9 @@ public class SessionEventDispatcher {
 	@Autowired
 	private SessionManager sessionManager;
 
-	private CollectEventQueue eventQueue;
+	private EventBrokerEventQueue eventQueue;
 	
-	public SessionEventDispatcher(CollectEventQueue eventQueue) {
+	public SessionEventDispatcher(EventBrokerEventQueue eventQueue) {
 		this.eventQueue = eventQueue;
 	}
 	

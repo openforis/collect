@@ -7,7 +7,9 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 
 public interface RecordProvider {
-	CollectRecord provideRecord(int entryId, Step step) throws IOException;
+	
+	CollectRecord provideRecord(int entryId, Step step) throws IOException, RecordParsingException;
 	
 	List<Integer> findEntryIds();
+	
 }
