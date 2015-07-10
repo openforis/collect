@@ -11,6 +11,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.i18n.Message;
@@ -30,6 +31,7 @@
 			private var _presenter:DataImportPresenter;
 			
 			private var _allConflictingRecordsSelected:Boolean;
+			private var _dataImportErrors:IList = null;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new DataImportPresenter(this);
@@ -45,6 +47,15 @@
 				_allConflictingRecordsSelected = value;
 			}
 			 
+			[Bindable]
+			public function get dataImportErrors():IList {
+				return _dataImportErrors;
+			}
+			
+			public function set dataImportErrors(value:IList):void {
+				_dataImportErrors = value;
+			}
+			
 		]]>
 		
 	</fx:Script>
@@ -421,6 +432,34 @@
 		<s:Label text="{Message.get('dataImport.complete')}"
 				 styleName="infoMessage" />
 		
+		<s:VGroup id="dataImportErrorsContainer" 
+				  visible="{dataImportErrorsDataGrid.dataProvider.length > 0}"
+				  includeInLayout="{dataImportErrorsDataGrid.dataProvider.length > 0}"
+				  horizontalAlign="center"
+				  height="100%">
+			<s:Label text="{Message.get('dataImport.errors')}"
+					 styleName="formLabel" />
+			
+			<s:DataGrid id="dataImportErrorsDataGrid"
+						selectionMode="none"
+						height="100%"
+						dataProvider="{dataImportErrors}"
+						>
+				<s:columns>
+					<s:ArrayList>
+						<s:GridColumn dataField="level" 
+									  width="60"
+									  headerText="{Message.get('dataImport.errors.level')}" />
+						<s:GridColumn dataField="entryName" 
+									  width="200"
+									  headerText="{Message.get('dataImport.errors.entry_name')}" />
+						<s:GridColumn dataField="errorMessage" 
+									  width="200"
+									  headerText="{Message.get('dataImport.errors.message')}" />
+					</s:ArrayList>
+				</s:columns>
+			</s:DataGrid>
+		</s:VGroup>
 	</s:VGroup>
 
 </s:Group>

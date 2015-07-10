@@ -331,7 +331,8 @@ package org.openforis.collect.presenter {
 						if ( _job is DataRestoreSummaryJobProxy ) {
 							updateViewSummaryCompleted();
 						} else if ( _job is DataRestoreJobProxy ) {
-							updateViewImportCompleted();
+							var errors:ListCollectionView = DataRestoreJobProxy(_job).errors;
+							updateViewImportCompleted(errors);
 						}
 						break;
 					case JobProxy$Status.FAILED:
@@ -349,8 +350,10 @@ package org.openforis.collect.presenter {
 			_firstOpen = false;
 		}
 		
-		protected function updateViewImportCompleted():void {
+		protected function updateViewImportCompleted(errors:IList = null):void {
 			view.currentState = DataImportView.STATE_IMPORT_COMPLETE;
+			view.dataImportErrors = errors;
+			
 			//reload record summaries
 			var uiEvent:UIEvent = new UIEvent(UIEvent.RELOAD_RECORD_SUMMARIES);
 			eventDispatcher.dispatchEvent(uiEvent);
