@@ -2,7 +2,8 @@ package org.openforis.collect.event;
 
 import org.fao.foris.simpleeventbroker.AbstractEventHandler;
 import org.fao.foris.simpleeventbroker.EventHandlerMonitor;
-import org.openforis.collect.manager.CollectRDBGenerator;
+import org.openforis.collect.relational.CollectRDBGenerator;
+import org.openforis.collect.relational.event.InitializeRDBEvent;
 
 public class RDBGenerationRecordEventHandler extends AbstractEventHandler {
 
@@ -15,8 +16,19 @@ public class RDBGenerationRecordEventHandler extends AbstractEventHandler {
 	}
 
 	@Override
-	public void handle(Object recordTransaction, EventHandlerMonitor eventHandlerMonitor) {
-		rdbGenerator.process((RecordTransaction) recordTransaction);
+	public void handle(Object event, EventHandlerMonitor eventHandlerMonitor) {
+		if (event instanceof RecordTransaction) {
+			rdbGenerator.process((RecordTransaction) event);
+		} else if (event instanceof SurveyEvent) {
+			if (event instanceof SurveyCreatedEvent) {
+				rdbGenerator.createRDBs(((SurveyCreatedEvent) event).getSurveyName());
+			} else if (event instanceof SurveyDeletedEvent) {
+				rdbGenerator.deleteRDBs(((SurveyDeletedEvent) event).getSurveyName());
+			}
+		} else if (event instanceof InitializeRDBEvent) {
+			InitializeRDBEvent evt = (InitializeRDBEvent) event;
+			rdbGenerator.createRDB(evt.getSurveyName(), evt.getStep());
+		}
 	}
 
 	

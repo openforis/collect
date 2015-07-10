@@ -4,9 +4,8 @@ import java.io.File;
 
 import javax.annotation.PostConstruct;
 
+import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.BaseStorageManager;
-import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.springframework.stereotype.Component;
 
@@ -35,13 +34,17 @@ public class CollectLocalRDBStorageManager extends BaseStorageManager {
 		super.initStorageDirectory(ConfigurationItem.LOCAL_RDB_PATH);
 	}
 
-	public boolean existsRDBFile(CollectSurvey survey, Step step) {
-		File rdbFile = getRDBFile(survey, step);
+	public boolean existsRDBFile(String surveyName, RecordStep step) {
+		File rdbFile = getRDBFile(surveyName, step);
 		return rdbFile.exists();
 	}
 	
-	public File getRDBFile(CollectSurvey survey, Step step) {
-		return new File(storageDirectory, survey.getName() + "_" + step.getStepNumber() + ".db");
+	public File getRDBFile(String surveyName, RecordStep step) {
+		return new File(storageDirectory, getRDBFileName(surveyName, step));
+	}
+
+	private String getRDBFileName(String surveyName, RecordStep step) {
+		return String.format("%s_%s.db", surveyName, step.name().toLowerCase());
 	}
 
 }

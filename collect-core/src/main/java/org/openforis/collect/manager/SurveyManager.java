@@ -23,6 +23,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.Collect;
+import org.openforis.collect.event.EventQueue;
+import org.openforis.collect.event.SurveyDeletedEvent;
 import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
@@ -79,6 +81,8 @@ public class SurveyManager {
 	private ApplicationContext applicationContext;
 	@Autowired
 	private CollectSurveyIdmlBinder surveySerializer;
+	@Autowired(required=false)
+	private EventQueue eventQueue;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
@@ -852,6 +856,9 @@ public class SurveyManager {
 			codeListManager.deleteAllItemsBySurvey(id, false);
 			surveyDao.delete(id);
 			removeFromCache(survey);
+			if (eventQueue != null) {
+				eventQueue.publish(new SurveyDeletedEvent(survey.getName()));
+			}
 		}
 	}
 	

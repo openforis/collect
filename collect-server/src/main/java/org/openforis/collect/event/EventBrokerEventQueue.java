@@ -1,6 +1,7 @@
 package org.openforis.collect.event;
 
 import org.fao.foris.simpleeventbroker.EventBroker;
+import org.openforis.collect.relational.event.InitializeRDBEvent;
 
 public class EventBrokerEventQueue implements EventQueue {
 	
@@ -14,6 +15,15 @@ public class EventBrokerEventQueue implements EventQueue {
 	@Override
 	public void publish(RecordTransaction recordTransaction) {
 		queue.publish(recordTransaction);
+	}
+	
+	@Override
+	public void publish(SurveyEvent event) {
+		queue.publish(event);
+	}
+
+	public void publish(InitializeRDBEvent initializeRDBEvent) {
+		queue.publish(initializeRDBEvent);
 	}
 
 }
