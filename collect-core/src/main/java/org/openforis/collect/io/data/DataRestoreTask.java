@@ -194,6 +194,10 @@ public class DataRestoreTask extends Task {
 	public void setEntryIdsToImport(List<Integer> entryIdsToImport) {
 		this.entryIdsToImport = entryIdsToImport;
 	}
+	
+	public List<RecordImportError> getErrors() {
+		return errors;
+	}
 
 	private class RecordUpdateBuffer {
 		

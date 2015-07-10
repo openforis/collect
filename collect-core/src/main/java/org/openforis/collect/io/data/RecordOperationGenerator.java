@@ -26,6 +26,7 @@ public class RecordOperationGenerator {
 
 	public RecordOperations generate() throws IOException, MissingStepsException, RecordParsingException {
 		RecordOperations operations = new RecordOperations();
+		boolean firstStepToBeProcessed = true;
 		Integer lastRecordId = null;
 		for (Step step : Step.values()) {
 			CollectRecord parsedRecord = recordProvider.provideRecord(entryId, step);
@@ -34,22 +35,23 @@ public class RecordOperationGenerator {
 			}
 			parsedRecord.setStep(step);
 
-			if (lastRecordId == null) {
+			if (firstStepToBeProcessed) {
 				CollectRecord oldRecordSummary = findAlreadyExistingRecordSummary(parsedRecord);
 				boolean newRecord = oldRecordSummary == null;
 				if (newRecord) {
 					insertRecordDataUntilStep(operations, parsedRecord, step);
 				} else {
 					// overwrite existing record
+					lastRecordId = oldRecordSummary.getId();
+					parsedRecord.setId(lastRecordId);
 					operations.setOriginalStep(oldRecordSummary.getStep());
-					parsedRecord.setId(oldRecordSummary.getId());
 					operations.addUpdate(parsedRecord, step);
 				}
+				firstStepToBeProcessed = false;
 			} else {
 				parsedRecord.setId(lastRecordId);
 				operations.addUpdate(parsedRecord, step);
 			}
-			lastRecordId = parsedRecord.getId();
 		}
 		if (operations.hasMissingSteps()) {
 			throw new MissingStepsException(operations);

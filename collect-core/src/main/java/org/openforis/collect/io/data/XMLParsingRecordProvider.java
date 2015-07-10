@@ -48,7 +48,8 @@ public class XMLParsingRecordProvider implements RecordProvider {
 	}
 	
 	@Override
-	public CollectRecord provideRecord(int entryId, Step step) throws IOException, RecordParsingException {
+	public ParseRecordResult provideRecordParsingResult(int entryId, Step step)
+			throws IOException {
 		String entryName = getBackupEntryName(entryId, step);
 		InputStream entryIS = backupFileExtractor.findEntryInputStream(entryName);
 		if (entryIS == null) {
@@ -56,6 +57,15 @@ public class XMLParsingRecordProvider implements RecordProvider {
 		}
 		InputStreamReader reader = OpenForisIOUtils.toReader(entryIS);
 		ParseRecordResult parseRecordResult = parseRecord(reader);
+		return parseRecordResult;
+	}
+	
+	@Override
+	public CollectRecord provideRecord(int entryId, Step step) throws IOException, RecordParsingException {
+		ParseRecordResult parseRecordResult = provideRecordParsingResult(entryId, step);
+		if (parseRecordResult == null) {
+			return null;
+		}
 		if (parseRecordResult.isSuccess()) {
 			CollectRecord record = parseRecordResult.getRecord();
 			recordUpdater.initializeRecord(record);

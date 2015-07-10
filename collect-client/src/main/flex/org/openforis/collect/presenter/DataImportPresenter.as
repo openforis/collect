@@ -91,6 +91,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function initEventListeners():void {
+			super.initEventListeners();
 			_fileReference.addEventListener(Event.SELECT, fileReferenceSelectHandler);
 			_fileReference.addEventListener(Event.COMPLETE, fileReferenceCompleteHandler);
 			_fileReference.addEventListener(ProgressEvent.PROGRESS, fileReferenceProgressHandler);
