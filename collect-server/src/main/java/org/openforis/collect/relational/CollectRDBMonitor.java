@@ -7,35 +7,47 @@ import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.event.InitializeRDBEvent;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
-@Transactional
 public class CollectRDBMonitor {
 
-	private final EventBrokerEventQueue eventQueue;
-	private final SurveyManager surveyManager;
-	private final CollectLocalRDBStorageManager localRDBStorageManager;
+	@Autowired
+    private PlatformTransactionManager transactionManager;
+	@Autowired
+	private EventBrokerEventQueue eventQueue;
+	@Autowired
+	private SurveyManager surveyManager;
+	@Autowired
+	private CollectLocalRDBStorageManager localRDBStorageManager;
 
-	public CollectRDBMonitor(EventBrokerEventQueue eventQueue,
-			SurveyManager surveyManager,
-			CollectLocalRDBStorageManager localRDBStorageManager) {
-		super();
-		this.eventQueue = eventQueue;
-		this.surveyManager = surveyManager;
-		this.localRDBStorageManager = localRDBStorageManager;
-	}
-
-	@Transactional
 	public void init() {
-		List<CollectSurvey> surveys = surveyManager.getAll();
-		for (CollectSurvey survey : surveys) {
-			for (RecordStep step : RecordStep.values()) {
-				if (rdbMissing(survey, step)) {
-					eventQueue.publish(new InitializeRDBEvent(survey.getName(),
-							step));
+		doInTransaction(new Runnable() {
+			public void run() {
+				List<CollectSurvey> surveys = surveyManager.getAll();
+				for (CollectSurvey survey : surveys) {
+					for (RecordStep step : RecordStep.values()) {
+						if (rdbMissing(survey, step)) {
+							eventQueue.publish(new InitializeRDBEvent(survey.getName(),
+									step));
+						}
+					}
 				}
 			}
-		}
+		});
+	}
+
+	private void doInTransaction(final Runnable runnable) {
+		TransactionTemplate tmpl = new TransactionTemplate(transactionManager);
+        tmpl.execute(new TransactionCallbackWithoutResult() {
+        	@Override
+			protected void doInTransactionWithoutResult(TransactionStatus status) {
+				runnable.run();
+			}
+        });
 	}
 
 	private boolean rdbMissing(CollectSurvey survey, RecordStep step) {

@@ -97,14 +97,8 @@
 	<!-- =============== RDB ================= -->
 	<!-- ===================================== -->
 	
-	<bean id="relationalDBGenerator" class="org.openforis.collect.relational.CollectRDBGenerator"
-			init-method="init">
-		<constructor-arg ref="surveyManager" />
-		<constructor-arg ref="recordManager" />
-		<constructor-arg ref="collectLocalRDBStorageManager" />
-	</bean>
-	
-	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue">
+	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue"
+			lazy-init="false">
 		<constructor-arg>
 			<bean class="org.fao.foris.simpleeventbroker.SpringEventBroker" 
 					init-method="start" destroy-method="shutdown">
@@ -122,13 +116,16 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
+	<bean id="relationalDBGenerator" class="org.openforis.collect.relational.CollectRDBGenerator"
 			lazy-init="false" init-method="init">
-		<constructor-arg ref="eventQueue" />
 		<constructor-arg ref="surveyManager" />
+		<constructor-arg ref="recordManager" />
 		<constructor-arg ref="collectLocalRDBStorageManager" />
 	</bean>
 	
+	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
+			lazy-init="false" init-method="init" />
+
 	<bean id="sessionEventDispatcher" class="org.openforis.collect.manager.SessionEventDispatcher"
 		scope="session">
 		<constructor-arg ref="eventQueue" />

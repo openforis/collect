@@ -28,7 +28,8 @@
     <!-- ===================================== -->
 	<!-- Liquibase -->
 	<!-- ===================================== -->
-	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase">
+	<bean id="liquibase" class="org.openforis.collect.persistence.liquibase.DatabaseAwareSpringLiquibase"
+			lazy-init="false">
 		<property name="dataSource" ref="dataSource" />
 		<property name="changeLog" value="classpath:org/openforis/collect/db/changelog/db.changelog-master.xml" />
 		<property name="defaultSchema" value="collect" />

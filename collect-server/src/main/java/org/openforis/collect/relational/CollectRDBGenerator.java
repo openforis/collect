@@ -93,20 +93,8 @@ public class CollectRDBGenerator {
 		}
 	}
 
-	private void initializeRelationSchemaDefinition(CollectSurvey survey) {
-		// Generate relational model
-		try {
-			RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(RelationalSchemaConfig.createDefault());
-			RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, survey.getName());
-			relationalSchemaDefinitionBySurveyName.put(survey.getName(), relationalSchema);
-		} catch(CollectRdbException e) {
-			LOG.error("Error generating relational schema for survey " + survey.getName(), e);
-		}
-	}
-	
 	public void createRDBs(String surveyName) {
-		CollectSurvey survey = surveyManager.get(surveyName);
-		initializeRelationSchemaDefinition(survey);
+		initializeRelationalSchemaDefinition(surveyName);
 		for (RecordStep step : RecordStep.values()) {
 			try {
 				createRDB(surveyName, step);
@@ -117,7 +105,9 @@ public class CollectRDBGenerator {
 	}
 
 	public void createRDB(final String surveyName, final RecordStep recordStep) throws CollectRdbException {
-		final RelationalSchema relationalSchema = relationalSchemaDefinitionBySurveyName.get(surveyName);
+		deleteRDB(surveyName, recordStep);
+		
+		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
 		
 		withConnection(surveyName, recordStep, new Callback() {
 			public void execute(Connection connection) {
@@ -128,7 +118,16 @@ public class CollectRDBGenerator {
 			}
 		});
 	}
-	
+
+	private RelationalSchema getOrInitializeRelationalSchemaDefinition(
+			final String surveyName) {
+		if (! relationalSchemaDefinitionBySurveyName.containsKey(surveyName)) {
+			initializeRelationalSchemaDefinition(surveyName);
+		}
+		final RelationalSchema relationalSchema = relationalSchemaDefinitionBySurveyName.get(surveyName);
+		return relationalSchema;
+	}
+
 	private Connection createTargetConnection(String surveyName, RecordStep step) throws CollectRdbException {
 		try {
 			File rdbFile = localRDBStorageManager.getRDBFile(surveyName, step);
@@ -176,12 +175,16 @@ public class CollectRDBGenerator {
 
 	public void deleteRDBs(String surveyName) {
 		for (RecordStep step : RecordStep.values()) {
-			File rdbFile = localRDBStorageManager.getRDBFile(surveyName, step);
-			if (rdbFile != null && rdbFile.exists()) {
-				rdbFile.delete();
-			}
+			deleteRDB(surveyName, step);
 		}
 		relationalSchemaDefinitionBySurveyName.remove(surveyName);
+	}
+
+	private void deleteRDB(String surveyName, RecordStep step) {
+		File rdbFile = localRDBStorageManager.getRDBFile(surveyName, step);
+		if (rdbFile != null && rdbFile.exists()) {
+			rdbFile.delete();
+		}
 	}
 	
 	private void withConnection(String surveyName, RecordStep recordStep, Callback job) {
@@ -216,11 +219,26 @@ public class CollectRDBGenerator {
 		return survey == null ? null : relationalSchemaDefinitionBySurveyName.get(survey.getName());
 	}
 	
+	private void initializeRelationalSchemaDefinition(final String surveyName) {
+		CollectSurvey survey = surveyManager.get(surveyName);
+		initializeRelationSchemaDefinition(survey);
+	}
+	
+	private void initializeRelationSchemaDefinition(CollectSurvey survey) {
+		// Generate relational model
+		try {
+			RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(RelationalSchemaConfig.createDefault());
+			RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, survey.getName());
+			relationalSchemaDefinitionBySurveyName.put(survey.getName(), relationalSchema);
+		} catch(CollectRdbException e) {
+			LOG.error("Error generating relational schema for survey " + survey.getName(), e);
+		}
+	}
+	
 	private JooqDatabaseExporter createRDBUpdater(Connection targetConn) {
 		return new JooqDatabaseExporter(targetConn);
 	}
 	
-
 	private interface Callback {
 		
 		void execute(Connection connection);
