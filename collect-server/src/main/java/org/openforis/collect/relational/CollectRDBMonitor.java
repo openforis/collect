@@ -2,14 +2,14 @@ package org.openforis.collect.relational;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.openforis.collect.event.EventBrokerEventQueue;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.event.InitializeRDBEvent;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class CollectRDBMonitor {
 
 	private final EventBrokerEventQueue eventQueue;
@@ -25,7 +25,7 @@ public class CollectRDBMonitor {
 		this.localRDBStorageManager = localRDBStorageManager;
 	}
 
-	@PostConstruct
+	@Transactional
 	public void init() {
 		List<CollectSurvey> surveys = surveyManager.getAll();
 		for (CollectSurvey survey : surveys) {
@@ -39,7 +39,7 @@ public class CollectRDBMonitor {
 	}
 
 	private boolean rdbMissing(CollectSurvey survey, RecordStep step) {
-		return localRDBStorageManager.existsRDBFile(survey.getName(), step);
+		return ! localRDBStorageManager.existsRDBFile(survey.getName(), step);
 	}
 
 }

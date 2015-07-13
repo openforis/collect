@@ -89,10 +89,16 @@
 	<!-- ===================================== -->
 	<!-- Security -->
 	<!-- ===================================== -->
+	
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
 	
-	<bean id="relationalDBGenerator" class="org.openforis.collect.relational.CollectRDBGenerator" 
-		lazy-init="false">
+	
+	<!-- ===================================== -->
+	<!-- =============== RDB ================= -->
+	<!-- ===================================== -->
+	
+	<bean id="relationalDBGenerator" class="org.openforis.collect.relational.CollectRDBGenerator"
+			init-method="init">
 		<constructor-arg ref="surveyManager" />
 		<constructor-arg ref="recordManager" />
 		<constructor-arg ref="collectLocalRDBStorageManager" />
@@ -116,7 +122,8 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor">
+	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
+			lazy-init="false" init-method="init">
 		<constructor-arg ref="eventQueue" />
 		<constructor-arg ref="surveyManager" />
 		<constructor-arg ref="collectLocalRDBStorageManager" />

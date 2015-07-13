@@ -80,15 +80,13 @@ public class CollectRDBGenerator {
 		this.recordManager = recordManager;
 		this.localRDBStorageManager = localRDBStorageManager;
 		this.relationalSchemaDefinitionBySurveyName = new HashMap<String, RelationalSchema>();
-		
-		init();
 	}
 
-	private void init() {
-		initializeRelationalSchemas();
+	public void init() {
+		initializeRelationalSchemaDefinitions();
 	}
 
-	private void initializeRelationalSchemas() {
+	private void initializeRelationalSchemaDefinitions() {
 		List<CollectSurvey> surveys = surveyManager.getAll();
 		for (CollectSurvey survey : surveys) {
 			initializeRelationSchemaDefinition(survey);
