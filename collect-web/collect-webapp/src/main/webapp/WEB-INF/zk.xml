@@ -29,10 +29,10 @@
 	</session-config>
 
 	<!-- Center the progress box -->
-  <library-property>
-     <name>org.zkoss.zul.progressbox.position</name>
-     <value>center</value>
-  </library-property>
+	<library-property>
+		<name>org.zkoss.zul.progressbox.position</name>
+		<value>center</value>
+	</library-property>
   
 	<!-- Start of JavaScript debug part -->
 <!-- 	<client-config> -->
