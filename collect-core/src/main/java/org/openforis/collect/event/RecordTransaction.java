@@ -2,24 +2,18 @@ package org.openforis.collect.event;
 
 import java.util.List;
 
-public class RecordTransaction {
+public class RecordTransaction extends SurveyEvent {
 
-	private String surveyName;
 	private int recordId;
 	private RecordStep recordStep;
 	private List<? extends RecordEvent> events;
 	
 	public RecordTransaction(String surveyName, int recordId,
 			RecordStep recordStep, List<? extends RecordEvent> events) {
-		super();
-		this.surveyName = surveyName;
+		super(surveyName);
 		this.recordId = recordId;
 		this.recordStep = recordStep;
 		this.events = events;
-	}
-
-	public String getSurveyName() {
-		return surveyName;
 	}
 
 	public int getRecordId() {

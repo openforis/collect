@@ -106,8 +106,8 @@
 				<constructor-arg ref="dataSource" />
 				<constructor-arg>
 					<list>
-						<bean class="org.openforis.collect.event.RDBGenerationRecordEventHandler">
-							<constructor-arg ref="relationalDBGenerator" />
+						<bean class="org.openforis.collect.event.RepositoryEventHandler">
+							<constructor-arg ref="reportingRepositories" />
 						</bean>
 					</list>
 				</constructor-arg>
@@ -116,7 +116,7 @@
 		</constructor-arg>
 	</bean>
 	
-	<bean id="relationalDBGenerator" class="org.openforis.collect.relational.CollectRDBGenerator"
+	<bean id="reportingRepositories" class="org.openforis.collect.relational.RDBReportingRepositories"
 			lazy-init="false" init-method="init">
 		<constructor-arg ref="surveyManager" />
 		<constructor-arg ref="recordManager" />

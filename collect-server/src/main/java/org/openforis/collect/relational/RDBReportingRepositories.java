@@ -63,9 +63,9 @@ import org.openforis.idm.metamodel.TaxonAttributeDefinition;
  * @author S. Ricci
  *
  */
-public class CollectRDBGenerator {
+public class RDBReportingRepositories implements ReportingRepositories {
 
-	private static final Log LOG = LogFactory.getLog(CollectRDBGenerator.class);
+	private static final Log LOG = LogFactory.getLog(RDBReportingRepositories.class);
 	private static final String SQLITE_DRIVER_CLASS_NAME = "org.sqlite.JDBC";
 
 	private SurveyManager surveyManager;
@@ -74,7 +74,7 @@ public class CollectRDBGenerator {
 	
 	private Map<String, RelationalSchema> relationalSchemaDefinitionBySurveyName;
 	
-	public CollectRDBGenerator(SurveyManager surveyManager, RecordManager recordManager, 
+	public RDBReportingRepositories(SurveyManager surveyManager, RecordManager recordManager, 
 			CollectLocalRDBStorageManager localRDBStorageManager) {
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
@@ -93,18 +93,18 @@ public class CollectRDBGenerator {
 		}
 	}
 
-	public void createRDBs(String surveyName) {
+	public void createRepositories(String surveyName) {
 		initializeRelationalSchemaDefinition(surveyName);
 		for (RecordStep step : RecordStep.values()) {
 			try {
-				createRDB(surveyName, step);
+				createRepository(surveyName, step);
 			} catch(CollectRdbException e) {
 				LOG.error("Error generating RDB for survey " + surveyName, e);
 			}
 		}
 	}
 
-	public void createRDB(final String surveyName, final RecordStep recordStep) throws CollectRdbException {
+	public void createRepository(final String surveyName, final RecordStep recordStep) throws CollectRdbException {
 		deleteRDB(surveyName, recordStep);
 		
 		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
@@ -173,11 +173,20 @@ public class CollectRDBGenerator {
 		});
 	}
 
-	public void deleteRDBs(String surveyName) {
+	public void deleteRepositories(String surveyName) {
 		for (RecordStep step : RecordStep.values()) {
 			deleteRDB(surveyName, step);
 		}
 		relationalSchemaDefinitionBySurveyName.remove(surveyName);
+	}
+
+	public List<String> getRepositoryPaths(String surveyName) {
+		List<String> result = new ArrayList<String>();
+		for (RecordStep recordStep : RecordStep.values()) {
+			File rdbFile = localRDBStorageManager.getRDBFile(surveyName, recordStep);
+			result.add(rdbFile.getAbsolutePath());
+		}
+		return result;
 	}
 
 	private void deleteRDB(String surveyName, RecordStep step) {
