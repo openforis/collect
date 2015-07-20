@@ -1,5 +1,4 @@
 package org.openforis.collect.presenter {
-	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
@@ -10,10 +9,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.concurrency.CollectJobStatusPopUp;
 	import org.openforis.collect.event.CollectJobEvent;
-	import org.openforis.collect.i18n.Message;
-	import org.openforis.collect.remoting.service.concurrency.proxy.ApplicationLockingJobProxy;
 	import org.openforis.concurrency.proxy.JobProxy;
-	import org.openforis.concurrency.proxy.JobProxy$Status;
 
 	/**
 	 * @author S. Ricci
@@ -76,23 +72,15 @@ package org.openforis.collect.presenter {
 				loadJob(_job.id, function():void {
 					onJobLoaded();
 				});
-/*			} else if (_job is ApplicationLockingJobProxy) {
-				loadApplicationJob(function():void {
-					onComplete();
-				});
-			} else if (Application.activeSurvey != null) {
-				loadSurveyJob(function():void {
-					onComplete();
-				});
-*/			}
+			}
 			
 			function onJobLoaded():void {
 				var jobChanged:Boolean = _job != null && (oldJob == null || oldJob.id != _job.id);
 				var jobStatusChanged:Boolean = _job != null && oldJob != null && oldJob.status != _job.status;
-				
+				/*
 				trace("job loaded: " + (_job == null ? null : _job.id) + " - status: " + (_job == null ? null: _job.status) 
 					+ " - changed: " + jobChanged + " - status changed: " + jobStatusChanged);
-				
+				*/
 				if (_job != null && (_job.running || jobChanged || jobStatusChanged)) {
 					if (_job.running) {
 						if (CollectJobStatusPopUp.popUpOpen) {
@@ -139,7 +127,7 @@ package org.openforis.collect.presenter {
 
 		private function dispatchJobUpdateEvent():void {
 			if (_job != null) {
-				trace("dispatch job update event - job status: " + _job.status);
+				//trace("dispatch job update event - job status: " + _job.status);
 
 				eventDispatcher.dispatchEvent(new CollectJobEvent(CollectJobEvent.COLLECT_JOB_STATUS_UPDATE, _job));
 				if (_job.completed || _job.aborted || _job.failed) {
