@@ -55,6 +55,7 @@ import org.openforis.collect.remoting.service.NodeUpdateRequest.FieldUpdateReque
 import org.openforis.collect.remoting.service.NodeUpdateRequest.MissingValueApproveRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.NodeDeleteRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateRequest;
+import org.openforis.collect.remoting.service.concurrency.proxy.SurveyLockingJobProxy;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -492,7 +493,7 @@ public class DataService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public void moveRecords(String rootEntity, int fromStepNumber, final boolean promote) {
+	public SurveyLockingJobProxy moveRecords(String rootEntity, int fromStepNumber, final boolean promote) {
 		BulkRecordMoveJob job = collectJobManager.createJob(BulkRecordMoveJob.class);
 		SessionState sessionState = getSessionState();
 		final String userName = sessionState.getUser().getName();
@@ -513,8 +514,7 @@ public class DataService {
 			}
 		});
 		collectJobManager.startSurveyJob(job);
-		
-		
+		return new SurveyLockingJobProxy(job);
 	}
 
 	private void publishRecordPromotedEvents(CollectRecord record, String userName) {

@@ -65,7 +65,9 @@ public class CollectJobService {
 	}
 	
 	private JobProxy toJobProxy(Job job) {
-		return job == null ? null : new JobProxy(job);
+		return job == null ? null : 
+			job instanceof SurveyLockingJob ? new SurveyLockingJobProxy((SurveyLockingJob) job) : 
+			new JobProxy(job);
 	}
 	
 }
