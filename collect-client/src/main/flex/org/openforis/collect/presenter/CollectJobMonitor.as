@@ -55,12 +55,19 @@ package org.openforis.collect.presenter {
 		private function loadCurrentJobAndUpdateState():void {
 			var oldJob:JobProxy = _job;
 			function onComplete():void {
-				if (_job != null && (oldJob == null || oldJob.id != _job.id || oldJob.status != _job.status || _job.running)) {
+				var jobChanged:Boolean = _job != null && (oldJob == null || oldJob.id != _job.id);
+				var jobStatusChanged:Boolean = _job != null && oldJob != null && oldJob.status != _job.status;
+				if (_job == null && oldJob != null) {
+					//job complete?
+					if (CollectJobStatusPopUp.popUpOpen) {
+						CollectJobStatusPopUp.closePopUp();
+					}
+				} else if (_job != null && (_job.running || jobChanged || jobStatusChanged)) {
 					if (_job.running) {
-						if (! CollectJobStatusPopUp.popUpOpen) {
-							CollectJobStatusPopUp.openPopUp(_job);
-						} else {
+						if (CollectJobStatusPopUp.popUpOpen) {
 							CollectJobStatusPopUp.setActiveJob(_job);
+						} else {
+							CollectJobStatusPopUp.openPopUp(_job);
 						}
 					}
 					dispatchJobUpdateEvent();
@@ -76,7 +83,11 @@ package org.openforis.collect.presenter {
 						onComplete();
 					}
 				});
-			} else if (_job is ApplicationLockingJobProxy) {
+			} else {
+				loadJob(_job.id, function():void {
+					onComplete();
+				});
+/*			} else if (_job is ApplicationLockingJobProxy) {
 				loadApplicationJob(function():void {
 					onComplete();
 				});
@@ -84,25 +95,34 @@ package org.openforis.collect.presenter {
 				loadSurveyJob(function():void {
 					onComplete();
 				});
-			}
+*/			}
 		}
 		
-		private function loadApplicationJob(complete:Function):void {
+		private function loadApplicationJob(callback:Function):void {
 			ClientFactory.collectJobClient.getApplicationJob(new AsyncResponder(
 				function(event:ResultEvent, token:Object = null):void {
 					_job = event.result as JobProxy;
-					complete();
+					callback();
 				}, faultHandler
 			));
 		}
 		
-		private function loadSurveyJob(complete:Function):void {
+		private function loadSurveyJob(callback:Function):void {
 			ClientFactory.collectJobClient.getSurveyJob(new AsyncResponder(
 				function(event:ResultEvent, token:Object = null):void {
 					_job = event.result as JobProxy;
-					complete();
+					callback();
 				}, faultHandler
 			), Application.activeSurvey.id);
+		}
+		
+		private function loadJob(id:String, callback:Function):void {
+			ClientFactory.collectJobClient.getJob(new AsyncResponder(
+				function(event:ResultEvent, token:Object = null):void {
+					_job = event.result as JobProxy;
+					callback();
+				}, faultHandler
+			), id);
 		}
 
 		private function dispatchJobUpdateEvent():void {
