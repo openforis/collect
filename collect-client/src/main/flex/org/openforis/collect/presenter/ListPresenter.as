@@ -52,6 +52,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
+	import org.openforis.concurrency.proxy.JobProxy;
 	
 	import spark.events.GridSortEvent;
 
@@ -214,8 +215,9 @@ package org.openforis.collect.presenter {
 						promote = false;
 						break;
 				}
-				var responder:IResponder = new AsyncResponder(function(result:ResultEvent, token:Object = null):void {
-					CollectJobStatusPopUp.openPopUp();
+				var responder:IResponder = new AsyncResponder(function(resultEvent:ResultEvent, token:Object = null):void {
+					var job:JobProxy = resultEvent.result as JobProxy;
+					CollectJobStatusPopUp.openPopUp(job);
 				}, faultHandler);
 				AlertUtil.showConfirm(confirmMessageKey, null, null, function():void {
 					ClientFactory.dataClient.moveRecords(Application.activeRootEntity.name, initialStep, promote, responder);
