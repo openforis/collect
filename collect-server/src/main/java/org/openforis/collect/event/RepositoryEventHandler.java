@@ -89,6 +89,7 @@ public class RepositoryEventHandler extends AbstractEventHandler {
 				repositories.deleteRepositories(surveyName);
 				repositories.createRepositories(surveyName);
 				handleEvent(event);
+				considerSurveyEvents(surveyName);
 			} catch (Exception e) {
 				logEventProcessFailed(event, e);
 				ignoreSurveyEvents(surveyName);
@@ -101,6 +102,10 @@ public class RepositoryEventHandler extends AbstractEventHandler {
 
 	private void ignoreSurveyEvents(String surveyName) {
 		processBlockedBySurvey.put(surveyName, true);
+	}
+	
+	private void considerSurveyEvents(String surveyName) {
+		processBlockedBySurvey.remove(surveyName);
 	}
 	
 	private boolean isIgnoringSurveyEvents(String surveyName) {
