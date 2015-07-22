@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- This is the configuration for 
-	LOG4J --><!-- $Id: log4j.xml 10418 2009-11-09 
-	16:18:59Z ixitar $ -->
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
 	threshold="null" debug="null">
@@ -31,6 +29,11 @@
 	</category>
 
 	<category name="org.fao.foris.simpleeventbroker" additivity="false">
+		<priority value="info" />
+		<appender-ref ref="openforis" />
+	</category>
+
+	<category name="liquibase">
 		<priority value="info" />
 		<appender-ref ref="openforis" />
 	</category>
