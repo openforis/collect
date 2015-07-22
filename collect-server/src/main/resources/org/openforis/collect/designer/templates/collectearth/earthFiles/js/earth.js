@@ -500,7 +500,7 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 			checkCount = checkCount + 1;
 			checkIfPlacemarkAlreadyFilled(checkCount);
 		} else {
-			showErrorMessage("The Collect Earth server is not running!");
+			showErrorMessage(COLLECT_NOT_RUNNING);
 		}
 	})
 	.done(function(json) {
@@ -509,7 +509,7 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 			if (json.activelySaved
 					&& json.inputFieldInfoByParameterName.collect_text_id.value != 'testPlacemark') { // 
 	
-				showErrorMessage("The data for this placemark has already been filled");
+				showErrorMessage(PLACEMARK_ALREADY_FILLED);
 	
 				if (json.skipFilled) {
 					forceWindowCloseAfterDialogCloses($("#dialogSuccess"));
