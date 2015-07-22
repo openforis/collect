@@ -69,15 +69,15 @@ package org.openforis.collect.concurrency {
 		}
 
 		private function jobStatusUpdateHandler(event:CollectJobEvent):void {
+			view.job = event.job;
 			updateView();
 		}
 		
 		public function updateView():void {
-			var _job:JobProxy = view.job;
-			if (_job == null) {
+			var job:JobProxy = view.job;
+			if (job == null) {
 				resetView();
 			} else {
-				var job:JobProxy = _job;
 				view.title = Message.get(job.name);
 				var progress:int = job.progressPercent;
 				if ( job.running && progress <= 100 ) {
@@ -86,19 +86,19 @@ package org.openforis.collect.concurrency {
 					view.progressLabel.text = Message.get("job.running");
 					view.cancelButton.visible = view.cancelButton.includeInLayout = Application.user.canCancelApplicationLockingJob;
 				} else {
-					switch ( job.status ) {
-						case JobProxy$Status.COMPLETED:
+					switch ( job.status.name ) {
+						case JobProxy$Status.COMPLETED.name:
 							view.currentState = CollectJobStatusPopUp.STATE_COMPLETE;
 							if (view.autoclose) {
 								closeHandler();
 							}
 							break;
-						case JobProxy$Status.FAILED:
+						case JobProxy$Status.FAILED.name:
 							AlertUtil.showError("job.error");
 							resetView();
 							closeHandler();
 							break;
-						case JobProxy$Status.ABORTED:
+						case JobProxy$Status.ABORTED.name:
 							resetView();
 							closeHandler();
 							break;

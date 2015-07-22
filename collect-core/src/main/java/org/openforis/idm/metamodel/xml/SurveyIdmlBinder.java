@@ -1,5 +1,7 @@
 package org.openforis.idm.metamodel.xml;
 
+import static org.apache.lucene.util.IOUtils.UTF_8;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,7 +21,6 @@ import org.openforis.idm.metamodel.xml.internal.unmarshal.SurveyUnmarshaller;
  * @author G. Miceli
  */
 public class SurveyIdmlBinder {
-	private static final String UTF8_ENCODING = "UTF-8";
 	
 	private SurveyContext surveyContext;
 	private List<ApplicationOptionsBinder<?>> optionsBinders;
@@ -62,7 +63,7 @@ public class SurveyIdmlBinder {
 			boolean marshalExternalCodeLists) throws IOException {
 		SurveyMarshaller ser = new SurveyMarshaller(this, marshalCodeLists,
 				marshalPersistedCodeLists, marshalExternalCodeLists);
-		ser.marshal(survey, os, UTF8_ENCODING);
+		ser.marshal(survey, os, UTF_8);
 	}
 
 	public void marshal(Survey survey, Writer wr) throws IOException {
@@ -75,7 +76,7 @@ public class SurveyIdmlBinder {
 			boolean marshalPersistedCodeLists) throws IOException {
 		SurveyMarshaller ser = new SurveyMarshaller(this, marshalCodeLists,
 				marshalPersistedCodeLists, marshalExternalCodeLists);
-		ser.marshal(survey, wr, UTF8_ENCODING);
+		ser.marshal(survey, wr, UTF_8);
 	}
 		
 	public Survey unmarshal(InputStream is) throws IdmlParseException {
@@ -85,7 +86,7 @@ public class SurveyIdmlBinder {
 	public Survey unmarshal(InputStream is, boolean includeCodeListItems) throws IdmlParseException {
 		try {
 			SurveyUnmarshaller unmarshaller = new SurveyUnmarshaller(this, includeCodeListItems);
-			unmarshaller.parse(is, UTF8_ENCODING);
+			unmarshaller.parse(is, UTF_8);
 			Survey survey = unmarshaller.getSurvey();
 			onUnmarshallingComplete(survey);
 			return survey;

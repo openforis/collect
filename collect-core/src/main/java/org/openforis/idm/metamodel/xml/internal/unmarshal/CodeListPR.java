@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLabel;
+import org.openforis.idm.metamodel.CodeListLabel.Type;
 import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
@@ -137,12 +138,15 @@ class CodeListPR extends IdmlPullReader {
 		
 		@Override
 		protected void processText(String lang, String typeStr, String text) throws XmlParseException {
+			CodeListLabel label = new CodeListLabel(parseType(typeStr), lang, text);
+			list.addLabel(label);
+		}
+
+		private Type parseType(String typeStr) throws XmlParseException {
 			try {
-				CodeListLabel.Type type = CodeListLabel.Type.valueOf(typeStr.toUpperCase());
-				CodeListLabel label = new CodeListLabel(type, lang, text);
-				list.addLabel(label);
+				return CodeListLabel.Type.valueOf(typeStr.toUpperCase());
 			} catch (IllegalArgumentException e) {
-				throw new XmlParseException(getParser(), "invalid type "+typeStr);
+				throw new XmlParseException(getParser(), "invalid type for code list label: " + typeStr, e);
 			}
 		}
 	}

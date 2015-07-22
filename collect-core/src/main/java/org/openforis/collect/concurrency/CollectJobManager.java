@@ -2,14 +2,12 @@ package org.openforis.collect.concurrency;
 
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.spring.SpringJobManager;
-import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-@Component
 public class CollectJobManager extends SpringJobManager {
 
 	private static final String APP_LOCK_ID = "app";

@@ -104,7 +104,7 @@
 			</folderList>
 			<startMenuShortcutList>
 				<startMenuShortcut>
-					<name>Startup OF Collect</name>
+					<name>Startup Open Foris Collect</name>
 					<comment>Startup Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
@@ -114,7 +114,7 @@
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
 				<startMenuShortcut>
-					<name>Shutdown OF Collect</name>
+					<name>Shutdown Open Foris Collect</name>
 					<comment>Shutdown Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
@@ -124,15 +124,15 @@
 					<windowsPath></windowsPath>
 				</startMenuShortcut>
 				<startMenuLinkShortcut>
-					<name>Open OF Collect in browser</name>
-					<comment>Open your default browser</comment>
+					<name>Open Collect in default browser</name>
+					<comment>Open Collect in your default browser</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
 					<url>http://localhost:8080/collect</url>
 					<windowsIcon>${installdir}/images/browser.ico</windowsIcon>
 				</startMenuLinkShortcut>
 				<startMenuShortcut>
-					<name>Update OF Collect</name>
+					<name>Update Open Foris Collect</name>
 					<comment>Update Open Foris Collect</comment>
 					<runAsAdmin>0</runAsAdmin>
 					<runInTerminal>0</runInTerminal>
