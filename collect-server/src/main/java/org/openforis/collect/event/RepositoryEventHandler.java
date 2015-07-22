@@ -75,6 +75,8 @@ public class RepositoryEventHandler extends AbstractEventHandler {
 			repositories.process((RecordTransaction) event);
 		} else if (event instanceof SurveyCreatedEvent) {
 			repositories.createRepositories(surveyName);
+		} else if (event instanceof SurveyUpdatedEvent) {
+			repositories.updateRepositories(surveyName);
 		} else if (event instanceof SurveyDeletedEvent) {
 			repositories.deleteRepositories(surveyName);
 		} else if (event instanceof InitializeRDBEvent) {

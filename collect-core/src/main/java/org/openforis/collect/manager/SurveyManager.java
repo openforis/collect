@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.Collect;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.SurveyDeletedEvent;
+import org.openforis.collect.event.SurveyUpdatedEvent;
 import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
@@ -786,6 +787,10 @@ public class SurveyManager {
 			removeFromCache(oldPublishedSurvey);
 		}
 		addToCache(survey);
+		
+		if (eventQueue != null) {
+			eventQueue.publish(new SurveyUpdatedEvent(survey.getName()));
+		}
 	}
 	
 	/**

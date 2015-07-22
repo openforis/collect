@@ -1,13 +1,12 @@
 package org.openforis.collect.event;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.ReportingRepositories;
 
 public class RepositoryEventHandlerTest {
@@ -93,16 +92,55 @@ public class RepositoryEventHandlerTest {
 	private static final class FakeReportingRepositories implements
 			ReportingRepositories {
 		int processCalls;
-		int getRepositoryPathsCalls;
-		int deleteRepositoriesCalls;
 		int createRepositoryCalls;
 		int createRepositoriesCalls;
-		int processFails;
+		int updateRepositoriesCalls;
+		int deleteRepositoriesCalls;
 		int getRepositoryPathsFails;
-		int deleteRepositoriesFails;
 		int createRepositoryFails;
 		int createRepositoriesFails;
+		int updateRepositoriesFails;
+		int deleteRepositoriesFails;
+		int processFails;
+		int getRepositoryPathsCalls;
 		
+		@Override
+		public void createRepository(String surveyName, RecordStep recordStep) {
+			createRepositoryCalls ++;
+			if (createRepositoryFails > 0) {
+				createRepositoryFails --;
+				throw new RuntimeException("createRepository failed");
+			}
+		}
+		
+		@Override
+		public void createRepositories(String surveyName) {
+			createRepositoriesCalls ++;
+			if (createRepositoriesFails > 0) {
+				createRepositoriesFails --;
+				throw new RuntimeException("createRepositories failed");
+			}
+		}
+		
+		@Override
+		public void updateRepositories(String surveyName) {
+			updateRepositoriesCalls ++;
+			if (updateRepositoriesFails > 0) {
+				updateRepositoriesFails --;
+				throw new RuntimeException("updateRepositories failed");
+			}
+		}
+		
+		@Override
+		public void deleteRepositories(String surveyName) {
+			deleteRepositoriesCalls ++;
+			if (deleteRepositoriesFails > 0) {
+				deleteRepositoriesFails --;
+				throw new RuntimeException("deleteRepositories failed");
+			}
+		}
+		
+		@Override
 		public void process(RecordTransaction recordTransaction) {
 			processCalls ++;
 			if (processFails > 0) {
@@ -111,6 +149,7 @@ public class RepositoryEventHandlerTest {
 			}
 		}
 		
+		@Override
 		public List<String> getRepositoryPaths(String surveyName) {
 			getRepositoryPathsCalls ++;
 			if (getRepositoryPathsFails > 0) {
@@ -120,44 +159,21 @@ public class RepositoryEventHandlerTest {
 			return Collections.emptyList();
 		}
 		
-		public void deleteRepositories(String surveyName) {
-			deleteRepositoriesCalls ++;
-			if (deleteRepositoriesFails > 0) {
-				deleteRepositoriesFails --;
-				throw new RuntimeException("deleteRepositories failed");
-			}
-
-		}
-		
-		public void createRepository(String surveyName, RecordStep recordStep)
-				throws CollectRdbException {
-			createRepositoryCalls ++;
-			if (createRepositoryFails > 0) {
-				createRepositoryFails --;
-				throw new RuntimeException("createRepository failed");
-			}
-		}
-		
-		public void createRepositories(String surveyName) {
-			createRepositoriesCalls ++;
-			if (createRepositoriesFails > 0) {
-				createRepositoriesFails --;
-				throw new RuntimeException("createRepositories failed");
-			}
-		}
-		
 		public void reset() {
 			processCalls = 0;
 			getRepositoryPathsCalls = 0;
-			deleteRepositoriesCalls = 0;
 			createRepositoryCalls = 0;
 			createRepositoriesCalls = 0;
+			updateRepositoriesCalls = 0;
+			deleteRepositoriesCalls = 0;
 			processFails = 0;
 			getRepositoryPathsFails = 0;
-			deleteRepositoriesFails = 0;
 			createRepositoryFails = 0;
 			createRepositoriesFails = 0;
+			deleteRepositoriesFails = 0;
+			updateRepositoriesFails = 0;
 		}
+
 	}
 	
 }

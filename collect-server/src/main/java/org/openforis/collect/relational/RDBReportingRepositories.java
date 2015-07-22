@@ -92,7 +92,8 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			initializeRelationSchemaDefinition(survey);
 		}
 	}
-
+	
+	@Override
 	public void createRepositories(String surveyName) {
 		initializeRelationalSchemaDefinition(surveyName);
 		for (RecordStep step : RecordStep.values()) {
@@ -104,7 +105,8 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 	}
 
-	public void createRepository(final String surveyName, final RecordStep recordStep) throws CollectRdbException {
+	@Override
+	public void createRepository(final String surveyName, final RecordStep recordStep) {
 		deleteRDB(surveyName, recordStep);
 		
 		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
@@ -117,28 +119,6 @@ public class RDBReportingRepositories implements ReportingRepositories {
 				insertRecords(surveyName, recordStep, relationalSchema, connection);
 			}
 		});
-	}
-
-	private RelationalSchema getOrInitializeRelationalSchemaDefinition(
-			final String surveyName) {
-		if (! relationalSchemaDefinitionBySurveyName.containsKey(surveyName)) {
-			initializeRelationalSchemaDefinition(surveyName);
-		}
-		final RelationalSchema relationalSchema = relationalSchemaDefinitionBySurveyName.get(surveyName);
-		return relationalSchema;
-	}
-
-	private Connection createTargetConnection(String surveyName, RecordStep step) throws CollectRdbException {
-		try {
-			File rdbFile = localRDBStorageManager.getRDBFile(surveyName, step);
-			String pathToDbFile = rdbFile.getAbsolutePath();
-			String connectionUrl = "jdbc:sqlite:" + pathToDbFile;
-			Class.forName(SQLITE_DRIVER_CLASS_NAME);
-			Connection c = DriverManager.getConnection(connectionUrl);
-			return c;
-		} catch (Exception e) {
-			throw new CollectRdbException(String.format("Error creating connection to RDB for survey %s", surveyName), e);
-		}
 	}
 
 	private void insertRecords(String surveyName, RecordStep recordStep, 
@@ -157,6 +137,20 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 	}
 
+	@Override
+	public void updateRepositories(String surveyName) {
+		createRepositories(surveyName);
+	}
+
+	@Override
+	public void deleteRepositories(String surveyName) {
+		for (RecordStep step : RecordStep.values()) {
+			deleteRDB(surveyName, step);
+		}
+		relationalSchemaDefinitionBySurveyName.remove(surveyName);
+	}
+
+	@Override
 	public void process(final RecordTransaction recordTransaction) {
 		final RelationalSchema rdbSchema = getRelatedRelationalSchema(recordTransaction);
 		final CollectSurvey survey = (CollectSurvey) rdbSchema.getSurvey();
@@ -172,14 +166,8 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			}
 		});
 	}
-
-	public void deleteRepositories(String surveyName) {
-		for (RecordStep step : RecordStep.values()) {
-			deleteRDB(surveyName, step);
-		}
-		relationalSchemaDefinitionBySurveyName.remove(surveyName);
-	}
-
+	
+	@Override
 	public List<String> getRepositoryPaths(String surveyName) {
 		List<String> result = new ArrayList<String>();
 		for (RecordStep recordStep : RecordStep.values()) {
@@ -196,6 +184,15 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 	}
 	
+	private RelationalSchema getOrInitializeRelationalSchemaDefinition(
+			final String surveyName) {
+		if (! relationalSchemaDefinitionBySurveyName.containsKey(surveyName)) {
+			initializeRelationalSchemaDefinition(surveyName);
+		}
+		final RelationalSchema relationalSchema = relationalSchemaDefinitionBySurveyName.get(surveyName);
+		return relationalSchema;
+	}
+
 	private void withConnection(String surveyName, RecordStep recordStep, Callback job) {
 		Connection connection = null;
 		try {
@@ -216,8 +213,20 @@ public class RDBReportingRepositories implements ReportingRepositories {
 				if (connection != null) { 
 					connection.close();
 				}
-			} catch (SQLException e) {
-			}
+			} catch (SQLException e) {}
+		}
+	}
+
+	private Connection createTargetConnection(String surveyName, RecordStep step) throws CollectRdbException {
+		try {
+			File rdbFile = localRDBStorageManager.getRDBFile(surveyName, step);
+			String pathToDbFile = rdbFile.getAbsolutePath();
+			String connectionUrl = "jdbc:sqlite:" + pathToDbFile;
+			Class.forName(SQLITE_DRIVER_CLASS_NAME);
+			Connection c = DriverManager.getConnection(connectionUrl);
+			return c;
+		} catch (Exception e) {
+			throw new CollectRdbException(String.format("Error creating connection to RDB for survey %s", surveyName), e);
 		}
 	}
 

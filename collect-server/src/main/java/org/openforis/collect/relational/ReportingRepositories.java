@@ -9,12 +9,13 @@ public interface ReportingRepositories {
 
 	void createRepositories(String surveyName);
 
-	void createRepository(String surveyName, RecordStep recordStep)
-			throws CollectRdbException;
+	void createRepository(String surveyName, RecordStep recordStep);
 
-	void process(RecordTransaction recordTransaction);
+	void updateRepositories(String surveyName);
 
 	void deleteRepositories(String surveyName);
+
+	void process(RecordTransaction recordTransaction);
 
 	List<String> getRepositoryPaths(String surveyName);
 
