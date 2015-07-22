@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.DeleteQuery;
@@ -23,9 +25,11 @@ import org.jooq.SQLDialect;
 import org.jooq.SelectConditionStep;
 import org.jooq.Update;
 import org.jooq.UpdateConditionStep;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
+import org.openforis.collect.persistence.jooq.JooqDaoSupport;
 import org.openforis.collect.relational.DatabaseExporter;
 import org.openforis.collect.relational.RDBUpdater;
 import org.openforis.collect.relational.data.ColumnValuePair;
@@ -50,7 +54,9 @@ import org.openforis.idm.metamodel.NodeDefinition;
  *
  */
 public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
-
+	
+	private static final Log LOG = LogFactory.getLog(JooqDatabaseExporter.class);
+	
 	private DSLContext dsl;
 	
 	public JooqDatabaseExporter(Connection connection) {
@@ -116,7 +122,16 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 				insert.set(DSL.field(entry.getKey()), entry.getValue());
 			}
 		}
-		insert.execute();
+		try {
+			insert.execute();
+		} catch (DataAccessException e) {
+			if (JooqDaoSupport.isConstraintViolation(e)) {
+				LOG.warn(String.format("Duplicate node already inserted: survey = %s, node path = %s, record id = %d, parent id = %d, node id = %d", 
+						schema.getSurvey().getName(), nodeDef.getPath(), recordId, parentId, nodeId));
+			} else {
+				throw new DataAccessException("Failed to insert node into RDB", e);
+			}
+		}
 	}
 	private Map<String, BigInteger> findAncestorFKByColumnName(RelationalSchema schema, DataTable table, int recordId, int parentId) {
 		Map<String, BigInteger> result = new HashMap<String, BigInteger>();
