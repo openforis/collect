@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
@@ -91,9 +92,9 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private String replaceButtonLocalizationText(String htmlForBalloon) {
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_FINISH_TRANSLATION, Messages.getString("CollectEarthBalloonGenerator.11", language)); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_NEXT_TRANSLATION, Messages.getString("CollectEarthBalloonGenerator.12", language)); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_PREVIOUS_TRANSLATION, Messages.getString("CollectEarthBalloonGenerator.13", language)); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_FINISH_TRANSLATION, StringEscapeUtils.escapeHtml4( Messages.getString("CollectEarthBalloonGenerator.11", language) ) ); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_NEXT_TRANSLATION, StringEscapeUtils.escapeHtml4(Messages.getString("CollectEarthBalloonGenerator.12", language)) ); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_PREVIOUS_TRANSLATION,StringEscapeUtils.escapeHtml4(Messages.getString("CollectEarthBalloonGenerator.13", language)) ); //$NON-NLS-1$
 		return htmlForBalloon;
 	}
 
