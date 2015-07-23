@@ -8,122 +8,16 @@
   	<meta http-equiv="Pragma" content="no-cache">
   	<script type="text/javascript" src="script/jquery-1.6.2.min.js"></script>
     <script type="text/javascript" src="script/sessionping.js"></script>
-    <style type="text/css" media="screen">
-		html,body {
-			height: 100%;
-		}
-		
-		body {
-			font-family: verdana, serif, monospace;
-			font-size: 1.0em;
-			margin: 0 5 5 5;
-			padding: 0 10 10 10;
-			overflow: hidden;
-			text-align: center;
-			background-color: #F0F0F0;
-		}
-		
-		#header {
-			position: relative;
-			width: 974px; 
-			height: 102px;
-		}
-		
-		#mainContainer {
-			margin: auto;
-			width: 974px;
-			height: 100%;
-			background-color: #FFFFFF;
-		}
-		
-		#internalContainer {
-			min-height: 100%; 
-			height: 100%;
-			padding-bottom: 30px;
-		}
-		
-		#internalContainer:after {
-		    content:" ";
-		    display:block;
-		    clear:both;
-		}
-
-		#footer {
-			position: absolute;
-			bottom: 0px;
-			text-align: left;
-			height: 30px;
-			width: 974px;
-			/*background: url("assets/images/footer.jpg");*/
-		}
-		
-		#footer label {
-			font-size: 0.7em;
-			font-style: italic;
-			color: #EEE;
-			position: absolute;
-			left: 10px;
-			top: 10px;
-			z-index: 2;
-		}
-		
-		form {
-			padding-top: 40px;
-		}
-		
-		fieldset {
-			width: 80%;
-			padding-top: 10px;
-		}
-		
-		legend {
-			font-weight: bold;
-			font-size: 0.8em;
-		}
-		
-		.login td {
-			font-size: small;
-			font-family: verdana, serif, monospace;
-			line-height: 1em;
-			font-size: 0.7em;
-			padding-top: 10;
-		}
-		
-		input.button {
-			font-family: verdana, serif, monospace;
-			line-height: 1em;
-			font-size: 1em;
-			padding: 3 8 5 8;
-			background-color: #DDDDDD;
-			border: 1px outset #DDDDDD;
-			color: #000000;
-			border-style: outset;
-		}
-		
-		.login input {
-			height: 20;
-			border: 1px solid #DDDDDD;
-			font-family: verdana, serif, monospace;
-			line-height: 1em;
-			font-size: 1em;
-		}
-		
-		div.error {
-			font-weight: bold;
-			font-size: 0.8em;
-			color: red;
-		}
-		
-		div.warn {
-			font-weight: bold;
-			font-size: 0.8em;
-			color: blue;
-		}
-	</style>
+<!--     <script type="text/javascript" src="script/js.cookie-2.0.3.min.js"></script> -->
+<!--     <script type="text/javascript" src="script/of_collect_cookie.js"></script> -->
 	<script type="text/javascript">
 		$(function() {
 			var DOWNLOAD_LOGO_URL = "downloadLogo.htm";
-
+			loadImages(DOWNLOAD_LOGO_URL);
+// 			checkFirstTimeLogin();
+		});
+		
+		var loadImages = function(downloadLogoUrl) {
 			var loadImage = function ( elId, position, defaultImageUrl ) {
 				var imgEl = document.getElementById(elId);
 				var tmpImg = new Image();
@@ -133,14 +27,23 @@
 				tmpImg.onload = function() {
 					imgEl.src = this.height > 0 ? this.src : defaultImageUrl;
 				};
-				tmpImg.src = DOWNLOAD_LOGO_URL + "?position=" + position + "&time=" + new Date().getTime();
+				tmpImg.src = downloadLogoUrl + "?position=" + position + "&time=" + new Date().getTime();
 			};
 
 			loadImage("headerImg", "header", "assets/images/header.jpg");
 			loadImage("logoImg", "top_right", "assets/images/default-logo.png");
 			loadImage("footerImg", "footer", "assets/images/footer.jpg");
-		});
+		};
+		
+// 		var checkFirstTimeLogin = function() {
+// 			var cookie = OF.Collect.getCookie();
+// 			if (cookie == null) {
+// 				$("#firstTimeLoginAdviceDiv").show();
+// 				OF.Collect.initCookie();
+// 			}
+// 		};
 	</script>
+    <link rel="stylesheet" type="text/css" href="assets/login.css" />
   </head>
 
   <body onload="document.f.j_username.focus();">
@@ -189,6 +92,13 @@
 					<tr>
 						<td colspan='2' width="100%" style="text-align: center;">
 							<input name="submit" type="submit" class="button" value="Login" /> 
+						</td>
+					</tr>
+					<tr><td></td></tr>
+					<tr><td></td></tr>
+					<tr id="firstTimeLoginAdviceDiv">
+						<td colspan="2" align="center" style="font-size: 10px;">
+							<i>*Default user/password : <b>admin</b>/<b>admin</b></i>
 						</td>
 					</tr>
 				</table>
