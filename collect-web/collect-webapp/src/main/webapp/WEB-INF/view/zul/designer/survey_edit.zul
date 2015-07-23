@@ -87,19 +87,20 @@
 				</absolutechildren>
 				<absolutechildren x="650" width="300px">
 					<hlayout hflex="1"
-							spacing="20px" 
+							spacing="10px" 
 							style="text-align: right;" 
 							sclass="controlBar">
 							
 						<!-- Language selector -->
-						<hlayout id="languageSelector" hflex="1"
+						<hlayout id="languageSelector" width="245px"
 							sclass="controlBar">
 							<label value="${labels.survey.language.current_language}:" 
 								width="150px" style="white-space: nowrap;" />
 							<listbox model="@load(vm.availableLanguages)"
 								selectedItem="@load(vm.currentLanguageCode)"
 								onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
-								mold="select">
+								mold="select"
+								width="110px">
 								<template name="model">
 									<listitem label="${c:l(each)}"
 										value="@load(each)" />
