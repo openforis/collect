@@ -338,7 +338,8 @@ public class CEComponentHTMLFormatter {
 						String htmlTitle = "<span><img src=\"" + imgFilePath + "\" width=\"250\"><br/>" + titleText + "</span>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 						itemBuilder
 							.a("title", htmlTitle) //$NON-NLS-1$
-							.a("data-html", "true"); //$NON-NLS-1$ //$NON-NLS-2$
+							.a("data-html", "true") //$NON-NLS-1$ //$NON-NLS-2$
+							.a("data-placement", "auto bottom"); //$NON-NLS-1$ //$NON-NLS-2$
 					} else if (StringUtils.isNotBlank(description)) {
 						itemBuilder.a("title", description); //$NON-NLS-1$
 					}

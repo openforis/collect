@@ -1,0 +1,110 @@
+html, body {
+	height: 100%;
+}
+
+body {
+	font-family: verdana, serif, monospace;
+	font-size: 1.0em;
+	margin: 0 5 5 5;
+	padding: 0 10 10 10;
+	overflow: hidden;
+	text-align: center;
+	background-color: #F0F0F0;
+}
+
+#header {
+	position: relative;
+	width: 974px;
+	height: 102px;
+}
+
+#mainContainer {
+	margin: auto;
+	width: 974px;
+	height: 100%;
+	background-color: #FFFFFF;
+}
+
+#internalContainer {
+	min-height: 100%;
+	height: 100%;
+	padding-bottom: 30px;
+}
+
+#internalContainer:after {
+	content: " ";
+	display: block;
+	clear: both;
+}
+
+#footer {
+	position: absolute;
+	bottom: 0px;
+	text-align: left;
+	height: 30px;
+	width: 974px;
+	/*background: url("assets/images/footer.jpg");*/
+}
+
+#footer label {
+	font-size: 0.7em;
+	font-style: italic;
+	color: #EEE;
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	z-index: 2;
+}
+
+form {
+	padding-top: 40px;
+}
+
+fieldset {
+	width: 80%;
+	padding-top: 10px;
+}
+
+legend {
+	font-weight: bold;
+	font-size: 0.8em;
+}
+
+.login td {
+	font-size: small;
+	font-family: verdana, serif, monospace;
+	line-height: 1em;
+	font-size: 0.7em;
+	padding-top: 10;
+}
+
+input.button {
+	font-family: verdana, serif, monospace;
+	line-height: 1em;
+	font-size: 1em;
+	padding: 3 8 5 8;
+	background-color: #DDDDDD;
+	border: 1px outset #DDDDDD;
+	color: #000000;
+	border-style: outset;
+}
+
+.login input {
+	height: 20;
+	border: 1px solid #DDDDDD;
+	font-family: verdana, serif, monospace;
+	line-height: 1em;
+	font-size: 1em;
+}
+
+div.error {
+	font-weight: bold;
+	font-size: 0.8em;
+	color: red;
+}
+
+div.warn {
+	font-weight: bold;
+	font-size: 0.8em;
+	color: blue;
+}
