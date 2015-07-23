@@ -8,14 +8,13 @@
   	<meta http-equiv="Pragma" content="no-cache">
   	<script type="text/javascript" src="script/jquery-1.6.2.min.js"></script>
     <script type="text/javascript" src="script/sessionping.js"></script>
-    <script type="text/javascript" src="js/of_collect_cookie.js"></script>
-    <script type="text/javascript" src="js/js.cookie-2.0.3.min.js"></script>
+<!--     <script type="text/javascript" src="script/js.cookie-2.0.3.min.js"></script> -->
+<!--     <script type="text/javascript" src="script/of_collect_cookie.js"></script> -->
 	<script type="text/javascript">
 		$(function() {
 			var DOWNLOAD_LOGO_URL = "downloadLogo.htm";
 			loadImages(DOWNLOAD_LOGO_URL);
-			
-			checkFirstTimeLogin();
+// 			checkFirstTimeLogin();
 		});
 		
 		var loadImages = function(downloadLogoUrl) {
@@ -36,9 +35,13 @@
 			loadImage("footerImg", "footer", "assets/images/footer.jpg");
 		};
 		
-		var checkFirstTimeLogin = function() {
-			Cookies.get("of.collect")
-		};
+// 		var checkFirstTimeLogin = function() {
+// 			var cookie = OF.Collect.getCookie();
+// 			if (cookie == null) {
+// 				$("#firstTimeLoginAdviceDiv").show();
+// 				OF.Collect.initCookie();
+// 			}
+// 		};
 	</script>
     <link rel="stylesheet" type="text/css" href="assets/login.css" />
   </head>
@@ -89,6 +92,13 @@
 					<tr>
 						<td colspan='2' width="100%" style="text-align: center;">
 							<input name="submit" type="submit" class="button" value="Login" /> 
+						</td>
+					</tr>
+					<tr><td></td></tr>
+					<tr><td></td></tr>
+					<tr id="firstTimeLoginAdviceDiv">
+						<td colspan="2" align="center" style="font-size: 10px;">
+							<i>*Default user/password : <b>admin</b>/<b>admin</b></i>
 						</td>
 					</tr>
 				</table>
