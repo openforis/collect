@@ -73,6 +73,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private CollectLocalRDBStorageManager localRDBStorageManager;
 	
 	private Map<String, RelationalSchema> relationalSchemaDefinitionBySurveyName;
+	private RelationalSchemaConfig rdbConfig = RelationalSchemaConfig.createDefault();
 	
 	public RDBReportingRepositories(SurveyManager surveyManager, RecordManager recordManager, 
 			CollectLocalRDBStorageManager localRDBStorageManager) {
@@ -89,7 +90,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private void initializeRelationalSchemaDefinitions() {
 		List<CollectSurvey> surveys = surveyManager.getAll();
 		for (CollectSurvey survey : surveys) {
-			initializeRelationSchemaDefinition(survey);
+			initializeRelationalSchemaDefinition(survey);
 		}
 	}
 	
@@ -239,13 +240,13 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	
 	private void initializeRelationalSchemaDefinition(final String surveyName) {
 		CollectSurvey survey = surveyManager.get(surveyName);
-		initializeRelationSchemaDefinition(survey);
+		initializeRelationalSchemaDefinition(survey);
 	}
 	
-	private void initializeRelationSchemaDefinition(CollectSurvey survey) {
+	private void initializeRelationalSchemaDefinition(CollectSurvey survey) {
 		// Generate relational model
 		try {
-			RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(RelationalSchemaConfig.createDefault());
+			RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(rdbConfig);
 			RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, survey.getName());
 			relationalSchemaDefinitionBySurveyName.put(survey.getName(), relationalSchema);
 		} catch(CollectRdbException e) {

@@ -25,7 +25,7 @@ public class CollectRDBMonitor {
 	private CollectLocalRDBStorageManager localRDBStorageManager;
 
 	public void init() {
-		doInTransaction(new Runnable() {
+		runInTransaction(new Runnable() {
 			public void run() {
 				List<CollectSurvey> surveys = surveyManager.getAll();
 				for (CollectSurvey survey : surveys) {
@@ -40,12 +40,12 @@ public class CollectRDBMonitor {
 		});
 	}
 
-	private void doInTransaction(final Runnable runnable) {
+	private void runInTransaction(final Runnable task) {
 		TransactionTemplate tmpl = new TransactionTemplate(transactionManager);
         tmpl.execute(new TransactionCallbackWithoutResult() {
         	@Override
 			protected void doInTransactionWithoutResult(TransactionStatus status) {
-				runnable.run();
+				task.run();
 			}
         });
 	}

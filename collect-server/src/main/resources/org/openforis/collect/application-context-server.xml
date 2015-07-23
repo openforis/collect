@@ -123,6 +123,11 @@
 		<constructor-arg ref="collectLocalRDBStorageManager" />
 	</bean>
 	
+	<bean id="saikuReporting" class="org.openforis.collect.relational.SaikuReporting"
+			lazy-init="false" init-method="init">
+		<constructor-arg ref="surveyManager" />
+	</bean>
+	
 	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
 			lazy-init="false" init-method="init" />
 
