@@ -3,24 +3,63 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
     http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-  <display-name>collect</display-name>
+	
+	<display-name>collect</display-name>
 
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>collect.root</param-value>
+	</context-param>
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/conf/log4j.xml</param-value>
+	</context-param>
+
+	<!-- start of Saiku -->
+	<context-param>
+		<param-name>db.url</param-name>
+		<param-value>jdbc:h2:mem:collect-saiku;MODE=MySQL</param-value>
+	</context-param>
+	<context-param>
+		<param-name>db.user</param-name>
+		<param-value>sa</param-value>
+	</context-param>
+	<context-param>
+		<param-name>db.password</param-name>
+		<param-value></param-value>
+	</context-param>
+	<context-param>
+		<param-name>db.encryptpassword</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	<context-param>
+		<param-name>foodmart.url</param-name>
+		<param-value>jdbc:h2:mem:foodmart;MODE=MySQL</param-value>
+	</context-param>
+	<context-param>
+		<param-name>foodmart.user</param-name>
+		<param-value>sa</param-value>
+	</context-param>
+	<context-param>
+		<param-name>foodmart.password</param-name>
+		<param-value></param-value>
+	</context-param>
+	<context-param>
+		<param-name>db.tcpServer</param-name>
+		<param-value>-tcpAllowOthers</param-value>
+	</context-param>
+	<!-- enf of Saiku -->
+	
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>
             /WEB-INF/conf/applicationContext.xml
             /WEB-INF/conf/applicationContext-database.xml
+<!--             /WEB-INF/conf/saiku/applicationContext-saiku-security.xml -->
+<!--             /WEB-INF/conf/saiku/applicationContext-saiku-beans.xml -->
 			/WEB-INF/conf/applicationContext-security.xml
 			/WEB-INF/conf/applicationContext-graniteds.xml
         </param-value>
-  </context-param>
-  <context-param>
-    <param-name>webAppRootKey</param-name>
-    <param-value>collect.root</param-value>
-  </context-param>
-  <context-param>
-    <param-name>log4jConfigLocation</param-name>
-    <param-value>/WEB-INF/conf/log4j.xml</param-value>
   </context-param>
 
   <listener>

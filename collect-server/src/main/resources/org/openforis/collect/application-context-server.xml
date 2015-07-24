@@ -128,8 +128,8 @@
 		<constructor-arg ref="surveyManager" />
 	</bean>
 	
-	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
-			lazy-init="false" init-method="init" />
+<!-- 	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor" -->
+<!-- 			lazy-init="false" init-method="init" /> -->
 
 	<bean id="sessionEventDispatcher" class="org.openforis.collect.manager.SessionEventDispatcher"
 		scope="session">

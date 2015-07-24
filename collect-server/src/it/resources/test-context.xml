@@ -44,21 +44,4 @@
 	<!-- enables interpretation of the @Transactional annotations for declarative transaction management-->
 	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 	
-	<!-- RDB DataSource -->
-	<bean id="rdbDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-		<property name="driverClassName" value="${collect.devrdb.driver}" />
-		<property name="url" value="${collect.devrdb.url}"/>
-		<property name="username" value="${collect.devrdb.username}" />
-		<property name="password" value="${collect.devrdb.password}" />
-	</bean>
-
-	<bean id="rdbTransactionManager"
-		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<qualifier value="rdbTransactionManager" />
-		<property name="dataSource" ref="rdbDataSource" />
-	</bean>
-
-	<!-- enables interpretation of the @Transactional annotations for declarative transaction management-->
-	<tx:annotation-driven transaction-manager="rdbTransactionManager" proxy-target-class="true"/>
-	
 </beans>

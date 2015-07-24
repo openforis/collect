@@ -7,31 +7,29 @@
 	xmlns:context="http://www.springframework.org/schema/context" 
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation=
-		"http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
-        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+		"http://www.springframework.org/schema/security 
+		http://www.springframework.org/schema/security/spring-security-4.0.xsd
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util-3.2.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 
 	<!-- Enables Method Security and Expression-based access control -->
 	<global-method-security pre-post-annotations="enabled" secured-annotations="enabled" access-decision-manager-ref="methodAccessDecisionManager" >
 		<expression-handler ref="expressionHandler"  />
 		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER"/>
 	</global-method-security>
-
+	
 	<http use-expressions="true" auto-config="true"
 		access-decision-manager-ref="accessDecisionManager">
 		<intercept-url pattern="/codelist/export/**/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/codelist/import/**/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/designer.htm" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/downloadLogo.htm" access="permitAll" />
 		<intercept-url pattern="/editSurvey.htm" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/error.htm" access="permitAll" />
 		<intercept-url pattern="/importSurvey.htm" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/index.htm" access="hasRole('ROLE_USER')" />
-		<intercept-url pattern="/info.json" access="permitAll" />
-		<intercept-url pattern="/keepSessionAlive.htm" access="permitAll" />
-		<intercept-url pattern="/login.htm" access="permitAll" />
-		<intercept-url pattern="/logout.htm" access="permitAll" />
 		<intercept-url pattern="/logoUpload" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/rdbpublish" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/samplingdesign/export/*" access="hasRole('ROLE_ADMIN')" />
@@ -40,31 +38,42 @@
 		<intercept-url pattern="/species/import/*" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/speciesImport" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/surveys" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/surveys/summaries.json" access="permitAll" />
-		<intercept-url pattern="/uploadData.htm" access="permitAll" />
-		<intercept-url pattern="/uploadFile.htm" access="permitAll" />
 		<intercept-url pattern="/validateAllRecords.htm" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/validationReport" access="hasRole('ROLE_ADMIN')" />
-		<intercept-url pattern="/zkau" access="permitAll" />
 		
-		<!-- security disabled for these urls because of an issue with flash player 
-			for netscape compatible browser and uplaod to a secured url -->
-		<intercept-url pattern="/uploadRecordFile.htm" access="permitAll" />
-		<intercept-url pattern="/downloadRecordFile.htm" access="permitAll" />
-
-		<intercept-url pattern="/*" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/**/*.swf" access="hasRole('ROLE_USER')" />
+<!-- 		<intercept-url pattern="/*" access="hasRole('ROLE_USER')" /> -->
 		<!-- <intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" 
 			/> -->
-
+		
 		<form-login login-page="/login.htm"
-			authentication-failure-url="/login.htm?login_error=1" />
+					username-parameter="j_username" 
+					password-parameter="j_password" 
+					login-processing-url="/j_spring_security_check" 
+					authentication-failure-url="/login.htm?login_error=1" 
+		/>
 		<http-basic />
-		<logout logout-success-url="/index.htm" />
+		<logout logout-success-url="/login.htm" />
 		<!-- remember-me / -->
 	</http>
 
-	<authentication-manager alias="authManager">
+	<http security="none" pattern="/*" />
+<!-- 	<http security="none" pattern="/downloadLogo.htm" /> -->
+<!-- 	<http security="none" pattern="/error.htm" /> -->
+<!-- 	<http security="none" pattern="/info.json" /> -->
+<!-- 	<http security="none" pattern="/keepSessionAlive.htm" /> -->
+<!-- 	<http security="none" pattern="/login.htm" /> -->
+<!-- 	<http security="none" pattern="/logout.htm" /> -->
+<!-- 	<http security="none" pattern="/surveys/summaries.json" /> -->
+<!-- 	<http security="none" pattern="/uploadData.htm" /> -->
+<!-- 	<http security="none" pattern="/uploadFile.htm" /> -->
+<!-- 	<http security="none" pattern="/zkau" /> -->
+		<!-- security disabled for these urls because of an issue with flash player -->
+<!-- 		for netscape compatible browser and uplaod to a secured url -->
+<!-- 	<http security="none" pattern="/uploadRecordFile.htm" /> -->
+<!-- 	<http security="none" pattern="/downloadRecordFile.htm" /> -->
+	
+	<authentication-manager alias="authenticationManager">
 		<authentication-provider user-service-ref="userDetailsService">
 			<password-encoder hash="md5" />
 		</authentication-provider>
@@ -78,7 +87,7 @@
 	</b:bean>
 
 	<b:bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
-		<b:property name="decisionVoters">
+		<b:constructor-arg>
 			<b:list>
 				<b:bean class="org.springframework.security.web.access.expression.WebExpressionVoter">
 					<b:property name="expressionHandler">
@@ -88,15 +97,15 @@
 					</b:property>
 				</b:bean>
 			</b:list>
-		</b:property>
+		</b:constructor-arg>
 	</b:bean>
 
 	<b:bean id="methodAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
-		<b:property name="decisionVoters">
+		<b:constructor-arg>
 			<b:list>
 				<b:ref bean="roleVoter" />
 			</b:list>
-		</b:property>
+		</b:constructor-arg>
 	</b:bean>
 	
 	<b:bean id="roleVoter" class="org.springframework.security.access.vote.RoleHierarchyVoter">

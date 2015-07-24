@@ -63,14 +63,15 @@
 			        Your session has expired.<br/>
 			      </div>
 			    </c:if>
-			    <c:if test="${not empty param.login_error}">
+			    <c:if test="${param.error != null}">
 			      <div class="error">
 			        Your login attempt was not successful, try again.<br/><br/>
 			        Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/>.
 			      </div>
 			    </c:if>
 	    	</div>
-			<form name="f" action="<c:url value='j_spring_security_check'/>" method="POST">
+	    	<c:url var="loginUrl" value="/j_spring_security_check"/>
+			<form name="f" action="${loginUrl}" method="POST">
 				<table class="login" width="100%" align="center" style="vertical-align: top; height: 100">
 					<tr>
 						<td colspan="2" align="center"><strong style="font-size: 13px;">Please Log In</strong></td>
@@ -79,7 +80,7 @@
 						<td width="50%" align="right">User:</td>
 						<td width="50%" align="left">
 							<input type='text' name='j_username'
-								value='<c:if test="${not empty param.login_error}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>' />
+								value='<c:if test="${param.error != null}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>' />
 						</td>
 					</tr>
 					<tr>
@@ -91,7 +92,7 @@
 					<!-- tr><td><input type="checkbox" name="_spring_security_remember_me"></td><td>Don't ask for my password for two weeks</td></tr-->
 					<tr>
 						<td colspan='2' width="100%" style="text-align: center;">
-							<input name="submit" type="submit" class="button" value="Login" /> 
+							<input name="submit" type="submit" class="button" /> 
 						</td>
 					</tr>
 					<tr><td></td></tr>
