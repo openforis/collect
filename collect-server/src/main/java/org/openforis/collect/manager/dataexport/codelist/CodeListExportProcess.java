@@ -78,6 +78,9 @@ public class CodeListExportProcess {
 			for (String lang : langs) {
 				colNames.add(levelName + CodeListCSVReader.LABEL_COLUMN_SUFFIX + "_" + lang);
 			}
+			for (String lang : langs) {
+				colNames.add(levelName + CodeListCSVReader.DESCRIPTION_COLUMN_SUFFIX + "_" + lang);
+			}
 		}
 		writer.writeHeaders(colNames.toArray(new String[0]));
 	}
@@ -101,9 +104,15 @@ public class CodeListExportProcess {
 		lineValues.add(item.getCode());
 		CollectSurvey survey = (CollectSurvey) item.getSurvey();
 		List<String> langs = survey.getLanguages();
+		//add labels
 		for (String lang : langs) {
-			String label = item.getLabel(lang);
-			lineValues.add(label);
+			String text = item.getLabel(lang);
+			lineValues.add(text);
+		}
+		//add description
+		for (String lang : langs) {
+			String text = item.getDescription(lang);
+			lineValues.add(text);
 		}
 	}
 
