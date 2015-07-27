@@ -58,7 +58,7 @@
 <!--             /WEB-INF/conf/saiku/applicationContext-saiku-security.xml -->
 <!--             /WEB-INF/conf/saiku/applicationContext-saiku-beans.xml -->
 			/WEB-INF/conf/applicationContext-security.xml
-			/WEB-INF/conf/applicationContext-graniteds.xml
+<!-- 			/WEB-INF/conf/applicationContext-graniteds.xml -->
         </param-value>
   </context-param>
 

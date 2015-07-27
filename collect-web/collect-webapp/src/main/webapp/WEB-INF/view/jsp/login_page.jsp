@@ -15,6 +15,7 @@
 			var DOWNLOAD_LOGO_URL = "downloadLogo.htm";
 			loadImages(DOWNLOAD_LOGO_URL);
 // 			checkFirstTimeLogin();
+			document.f.username.focus();
 		});
 		
 		var loadImages = function(downloadLogoUrl) {
@@ -46,7 +47,7 @@
     <link rel="stylesheet" type="text/css" href="assets/login.css" />
   </head>
 
-  <body onload="document.f.j_username.focus();">
+  <body>
   	<div id="mainContainer">
   		<!-- HEADER -->
   		<div id="header">
@@ -70,23 +71,31 @@
 			      </div>
 			    </c:if>
 	    	</div>
-	    	<c:url var="loginUrl" value="/j_spring_security_check"/>
+	    	<c:url var="loginUrl" value="/login"/>
 			<form name="f" action="${loginUrl}" method="POST">
+				<input type="hidden"                        6
+					name="${_csrf.parameterName}"
+					value="${_csrf.token}"/>
 				<table class="login" width="100%" align="center" style="vertical-align: top; height: 100">
+					<c:if test="${param.logout != null}">       3
+						<tr>
+							<td>You have been logged out.</td>
+						</tr>
+					</c:if>
 					<tr>
 						<td colspan="2" align="center"><strong style="font-size: 13px;">Please Log In</strong></td>
 					</tr>
 					<tr>
 						<td width="50%" align="right">User:</td>
 						<td width="50%" align="left">
-							<input type='text' name='j_username'
+							<input type='text' name='username'
 								value='<c:if test="${param.error != null}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>' />
 						</td>
 					</tr>
 					<tr>
 						<td width="50%" align="right">Password:</td>
 						<td width="50%" align="left">
-							<input type='password' name='j_password'>
+							<input type='password' name='password'>
 						</td>
 					</tr>
 					<!-- tr><td><input type="checkbox" name="_spring_security_remember_me"></td><td>Don't ask for my password for two weeks</td></tr-->
