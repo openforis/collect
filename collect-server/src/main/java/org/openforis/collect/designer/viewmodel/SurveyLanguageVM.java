@@ -33,7 +33,7 @@ public class SurveyLanguageVM extends BaseVM {
 	public static final String CURRENT_LANGUAGE_CHANGED_COMMAND = "currentLanguageChanged";
 	public static final String SURVEY_LANGUAGES_CHANGED_COMMAND = "surveyLanguagesChanged";
 	public static final String CLOSE_SURVEY_LANGUAGE_SELECT_POPUP_COMMAND = "closeSurveyLanguageSelectPopUp";
-	private static final int MAX_LANGUAGES = 3;
+	private static final int MAX_LANGUAGES = 5;
 	
 	@WireVariable
 	private SurveyManager surveyManager;
