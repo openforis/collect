@@ -49,14 +49,18 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 	private static final TableField[] LABEL_FIELDS = {
 		OFC_CODE_LIST.LABEL1, 
 		OFC_CODE_LIST.LABEL2, 
-		OFC_CODE_LIST.LABEL3
+		OFC_CODE_LIST.LABEL3,
+		OFC_CODE_LIST.LABEL4,
+		OFC_CODE_LIST.LABEL5
 	}; 
 	
 	@SuppressWarnings("rawtypes")
 	private static final TableField[] DESCRIPTION_FIELDS = {
 		OFC_CODE_LIST.DESCRIPTION1, 
 		OFC_CODE_LIST.DESCRIPTION2, 
-		OFC_CODE_LIST.DESCRIPTION3
+		OFC_CODE_LIST.DESCRIPTION3,
+		OFC_CODE_LIST.DESCRIPTION4,
+		OFC_CODE_LIST.DESCRIPTION5
 	};
 	
 	@SuppressWarnings("rawtypes")
@@ -77,9 +81,13 @@ public class CodeListItemDao extends MappingJooqDaoSupport<PersistedCodeListItem
 		OFC_CODE_LIST.LABEL1, 
 		OFC_CODE_LIST.LABEL2, 
 		OFC_CODE_LIST.LABEL3,
+		OFC_CODE_LIST.LABEL4,
+		OFC_CODE_LIST.LABEL5, 
 		OFC_CODE_LIST.DESCRIPTION1, 
 		OFC_CODE_LIST.DESCRIPTION2, 
-		OFC_CODE_LIST.DESCRIPTION3
+		OFC_CODE_LIST.DESCRIPTION3,
+		OFC_CODE_LIST.DESCRIPTION4,
+		OFC_CODE_LIST.DESCRIPTION5
 	};
 	
 	@SuppressWarnings("rawtypes")
