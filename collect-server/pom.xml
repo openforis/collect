@@ -18,7 +18,7 @@
 		<aspectj.version>1.8.0</aspectj.version>
 		<zk.version>6.5.1.1</zk.version>
 		<zk.spring.version>3.1.1</zk.spring.version>
-		<repository-message-broker.version>0.1.0</repository-message-broker.version>
+		<repository-message-broker.version>0.1.1</repository-message-broker.version>
 	</properties>
 
 	<repositories>

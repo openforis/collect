@@ -97,18 +97,9 @@
 	<!-- =============== RDB ================= -->
 	<!-- ===================================== -->
 	
-    <bean id="messageBroker" class="org.openforis.rmb.spring.SpringJdbcMessageBroker" 
+    <bean id="messageBroker" class="org.openforis.collect.event.ConfiguredMessageBroker" 
     		init-method="start" destroy-method="stop">
         <constructor-arg ref="dataSource" />
-        <property name="tablePrefix" value="ofc_"/>
-        <property name="messageSerializer">
-            <bean class="org.openforis.rmb.xstream.XStreamMessageSerializer"/>
-        </property>
-        <property name="monitors">
-            <list>
-                <bean class="org.openforis.rmb.slf4j.Slf4jLoggingMonitor" />
-            </list>
-        </property>
     </bean>
 
 	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue"
