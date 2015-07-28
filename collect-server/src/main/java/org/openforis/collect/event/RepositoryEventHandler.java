@@ -6,16 +6,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.fao.foris.simpleeventbroker.AbstractEventHandler;
-import org.fao.foris.simpleeventbroker.EventHandlerMonitor;
 import org.openforis.collect.relational.ReportingRepositories;
 import org.openforis.collect.relational.event.InitializeRDBEvent;
+import org.openforis.rmb.KeepAlive;
+import org.openforis.rmb.KeepAliveMessageHandler;
 
-public class RepositoryEventHandler extends AbstractEventHandler {
+public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 
 	private static final Log LOG = LogFactory.getLog(RepositoryEventHandler.class);
 	
-	private static final int DEFAULT_TIMEOUT_MILLIS = 60000;
 	private static final int DEFAULT_MAX_TRY_COUNT = 3;
 	private static final long DEFAULT_RETRY_DELAY = 3000;
 	
@@ -25,12 +24,11 @@ public class RepositoryEventHandler extends AbstractEventHandler {
 	private int maxTryCount = DEFAULT_MAX_TRY_COUNT;
 
 	protected RepositoryEventHandler(ReportingRepositories repositories) {
-		super(RepositoryEventHandler.class.getSimpleName(), DEFAULT_TIMEOUT_MILLIS);
 		this.repositories = repositories;
 	}
-
+	
 	@Override
-	public void handle(Object event, EventHandlerMonitor eventHandlerMonitor) {
+	public void handle(Object event, KeepAlive keepAlive) {
 		if (event instanceof SurveyEvent) {
 			final SurveyEvent surveyEvent = (SurveyEvent) event;
 			String surveyName = surveyEvent.getSurveyName();
@@ -135,5 +133,6 @@ public class RepositoryEventHandler extends AbstractEventHandler {
 	public void setRetryDelay(long retryDelay) {
 		this.retryDelay = retryDelay;
 	}
+
 	
 }

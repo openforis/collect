@@ -97,22 +97,41 @@
 	<!-- =============== RDB ================= -->
 	<!-- ===================================== -->
 	
+    <bean id="messageBroker" class="org.openforis.rmb.spring.SpringJdbcMessageBroker" 
+    		init-method="start" destroy-method="stop">
+        <constructor-arg ref="dataSource" />
+        <property name="tablePrefix" value="ofc_"/>
+        <property name="messageSerializer">
+            <bean class="org.openforis.rmb.xstream.XStreamMessageSerializer"/>
+        </property>
+        <property name="monitors">
+            <list>
+                <bean class="org.openforis.rmb.slf4j.Slf4jLoggingMonitor" />
+            </list>
+        </property>
+    </bean>
+
 	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue"
 			lazy-init="false">
 		<constructor-arg>
-			<bean class="org.fao.foris.simpleeventbroker.SpringEventBroker" 
-					init-method="start" destroy-method="shutdown">
-				<constructor-arg value="recordEventQueue" />
-				<constructor-arg ref="dataSource" />
-				<constructor-arg>
-					<list>
-						<bean class="org.openforis.collect.event.RepositoryEventHandler">
-							<constructor-arg ref="reportingRepositories" />
-						</bean>
-					</list>
-				</constructor-arg>
-				<property name="tableNamePrefix" value="ofc_" />
-			</bean>
+			 <bean class="org.openforis.rmb.spring.SpringMessageQueue">
+		        <constructor-arg ref="messageBroker"/>
+		        <constructor-arg value="collect_events"/>
+		        <constructor-arg>
+		            <list>
+		                <bean class="org.openforis.rmb.spring.SpringMessageConsumer">
+		                    <constructor-arg value="collect_reporting_repository_event_consumer"/>
+		                    <constructor-arg>
+								<bean class="org.openforis.collect.event.RepositoryEventHandler">
+									<constructor-arg ref="reportingRepositories" />
+								</bean>
+		                    </constructor-arg>
+		                    <property name="messagesHandledInParallel" value="1"/>
+		                    <property name="timeoutSeconds" value="3600"/>
+		                </bean>
+		            </list>
+		        </constructor-arg>
+		    </bean>
 		</constructor-arg>
 	</bean>
 	
@@ -123,10 +142,10 @@
 		<constructor-arg ref="collectLocalRDBStorageManager" />
 	</bean>
 	
-	<bean id="saikuReporting" class="org.openforis.collect.relational.SaikuReporting"
-			lazy-init="false" init-method="init">
-		<constructor-arg ref="surveyManager" />
-	</bean>
+<!-- 	<bean id="saikuReporting" class="org.openforis.collect.relational.SaikuReporting" -->
+<!-- 			lazy-init="false" init-method="init"> -->
+<!-- 		<constructor-arg ref="surveyManager" /> -->
+<!-- 	</bean> -->
 	
 	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
 			lazy-init="false" init-method="init" />

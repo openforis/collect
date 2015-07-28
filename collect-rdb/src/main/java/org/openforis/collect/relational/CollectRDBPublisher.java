@@ -40,9 +40,6 @@ public class CollectRDBPublisher {
 	@Autowired
 	@Qualifier("dataSource")
 	private DataSource dataSource;
-	@Autowired(required=false)
-	@Qualifier("rdbDataSource")
-	private DataSource rdbDataSource;
 	
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName) throws CollectRdbException {
@@ -99,8 +96,7 @@ public class CollectRDBPublisher {
 	}
 	
 	private Connection getTargetConnection() {
-		DataSource targetDataSource = rdbDataSource == null ? dataSource: rdbDataSource;
-		Connection targetConn = DataSourceUtils.getConnection(targetDataSource);
+		Connection targetConn = DataSourceUtils.getConnection(dataSource);
 		return targetConn;
 	}
 	/*
