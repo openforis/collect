@@ -18,6 +18,7 @@ import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreat
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.concurrency.ProgressListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -75,18 +76,17 @@ public class CollectRDBPublisher {
 		}
 	}
 	
-	@Transactional("rdbTransactionManager")
 	private void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
 			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
 		DatabaseExporter databaseExporter = new JooqDatabaseExporter(targetConn);
-		databaseExporter.insertReferenceData(targetSchema);
+		databaseExporter.insertReferenceData(targetSchema, ProgressListener.NULL_PROGRESS_LISTENER);
 		for (int i = 0; i < summaries.size(); i++) {
 			CollectRecord summary = summaries.get(i);
 //			if ( LOG.isInfoEnabled() ) {
 //				LOG.info("Exporting record #" + (++i) + " id: " + summary.getId());
 //			}
 			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
-			databaseExporter.insertData(targetSchema, record);
+			databaseExporter.insertRecordData(targetSchema, record, ProgressListener.NULL_PROGRESS_LISTENER);
 		}
 		try {
 			targetConn.commit();

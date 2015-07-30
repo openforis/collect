@@ -2,6 +2,7 @@ package org.openforis.collect.relational;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.relational.model.RelationalSchema;
+import org.openforis.concurrency.ProgressListener;
 
 /**
  * @author G. Miceli
@@ -9,7 +10,7 @@ import org.openforis.collect.relational.model.RelationalSchema;
  */
 public interface DatabaseExporter {
 	
-	void insertReferenceData(RelationalSchema schema) throws CollectRdbException;
-	void insertData(RelationalSchema schema, CollectRecord record) throws CollectRdbException;
+	void insertReferenceData(RelationalSchema schema, ProgressListener progressListener) throws CollectRdbException;
+	void insertRecordData(RelationalSchema schema, CollectRecord record, ProgressListener progressListener) throws CollectRdbException;
 	
 }

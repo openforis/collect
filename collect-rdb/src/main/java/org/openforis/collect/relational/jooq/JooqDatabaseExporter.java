@@ -44,6 +44,7 @@ import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
+import org.openforis.concurrency.ProgressListener;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 
@@ -72,8 +73,8 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 
 	@Override
-	public void insertReferenceData(RelationalSchema schema) {
-		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
+	public void insertReferenceData(RelationalSchema schema, ProgressListener progressListener) {
+		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema, progressListener);
 		for (CodeTable codeTable : schema.getCodeListTables()) {
 			DataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
 			batchExecutor.addInserts(extractor);
@@ -82,8 +83,8 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 
 	@Override
-	public void insertData(RelationalSchema schema, CollectRecord record) {
-		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema);
+	public void insertRecordData(RelationalSchema schema, CollectRecord record, ProgressListener progressListener) {
+		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema, progressListener);
 		for (DataTable table : schema.getDataTables()) {
 			DataExtractor extractor = DataExtractorFactory.getRecordDataExtractor(table, record);
 			batchExecutor.addInserts(extractor);
@@ -174,13 +175,13 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 	
 	@Override
-	public void updateData(RelationalSchema schema, CollectRecord record) {
-		deleteData(schema, record.getId(), record.getRootEntity().getDefinition().getId());
-		insertData(schema, record);
+	public void replaceRecordData(RelationalSchema schema, CollectRecord record, ProgressListener progressListener) {
+		deleteRecordData(schema, record.getId(), record.getRootEntity().getDefinition().getId());
+		insertRecordData(schema, record, progressListener);
 	}
 	
 	@Override
-	public void updateData(RelationalSchema rdbSchema, DataTable dataTable,
+	public void updateEntityData(RelationalSchema rdbSchema, DataTable dataTable,
 			BigInteger pkValue,
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
 		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(rdbSchema);
@@ -189,7 +190,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	}
 	
 	@Override
-	public void deleteData(RelationalSchema schema, int recordId, int rootDefId) {
+	public void deleteRecordData(RelationalSchema schema, int recordId, int rootDefId) {
 		deleteEntity(schema, recordId, recordId, rootDefId);
 	}
 	
@@ -228,12 +229,18 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	
 	private class BatchQueryExecutor {
 		
-		private static final int BATCH_MAX_SIZE = 10000;
+		private static final int BATCH_MAX_SIZE = 500;
 		
 		private List<Query> queries;
 		private QueryCreator queryCreator;
+		private ProgressListener progressListener;
 		
 		public BatchQueryExecutor(RelationalSchema schema) {
+			this(schema, null);
+		}
+		
+		public BatchQueryExecutor(RelationalSchema schema, ProgressListener progressListener) {
+			this.progressListener = progressListener;
 			this.queries = new ArrayList<Query>();
 			this.queryCreator = new QueryCreator(dsl, schema.getName());
 		}
@@ -278,11 +285,17 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			try {
 				dsl.batch(queries).execute();
 				queries.clear();
+				notifyProgressListener();
 			} catch(Exception e) {
 				throw new RuntimeException(e);
 			}
 		}
-		
+
+		private void notifyProgressListener() {
+			if (progressListener != null) {
+				progressListener.progressMade();
+			}
+		}
 	}
 	
 	private class QueryCreator {

@@ -118,7 +118,6 @@
 								</bean>
 		                    </constructor-arg>
 		                    <property name="messagesHandledInParallel" value="1"/>
-		                    <property name="timeoutSeconds" value="3600"/>
 		                </bean>
 		            </list>
 		        </constructor-arg>

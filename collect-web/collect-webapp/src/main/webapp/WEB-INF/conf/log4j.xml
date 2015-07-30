@@ -28,6 +28,11 @@
 		<appender-ref ref="openforis" />
 	</category>
 
+	<category name="org.openforis.rmb" additivity="false">
+		<priority value="debug" />
+		<appender-ref ref="openforis" />
+	</category>
+	
 	<category name="flex.messaging" additivity="false">
 		<priority value="error" />
 		<appender-ref ref="openforis" />

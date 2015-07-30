@@ -8,6 +8,7 @@ import org.openforis.collect.relational.data.ColumnValuePair;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
+import org.openforis.concurrency.ProgressListener;
 
 /**
  * @author S. Ricci
@@ -22,13 +23,13 @@ public interface RDBUpdater {
 			Integer parentId, int attributeId,
 			int attributeDefinitionId);
 
-	void updateData(RelationalSchema schema, CollectRecord record);
+	void replaceRecordData(RelationalSchema schema, CollectRecord record, ProgressListener progressListener);
 	
-	void updateData(RelationalSchema rdbSchema, DataTable dataTable,
+	void updateEntityData(RelationalSchema rdbSchema, DataTable dataTable,
 			BigInteger pkValue,
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs);
 	
-	void deleteData(RelationalSchema schema, int recordId, int rootDefId);
+	void deleteRecordData(RelationalSchema schema, int recordId, int rootDefId);
 
 	void deleteEntity(RelationalSchema schema, int recordId,
 			int entityId, int definitionId);

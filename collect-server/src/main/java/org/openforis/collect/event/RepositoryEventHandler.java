@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.relational.ReportingRepositories;
 import org.openforis.collect.relational.event.InitializeRDBEvent;
+import org.openforis.concurrency.ProgressListener;
 import org.openforis.rmb.KeepAlive;
 import org.openforis.rmb.KeepAliveMessageHandler;
 
@@ -28,7 +29,7 @@ public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 	}
 	
 	@Override
-	public void handle(Object event, KeepAlive keepAlive) {
+	public void handle(Object event, final KeepAlive keepAlive) {
 		if (event instanceof SurveyEvent) {
 			final SurveyEvent surveyEvent = (SurveyEvent) event;
 			String surveyName = surveyEvent.getSurveyName();
@@ -38,12 +39,12 @@ public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 			}
 			boolean succeded = tryToRun(new Runnable() {
 				public void run() {
-					handleEvent(surveyEvent);
+					handleEvent(surveyEvent, keepAlive);
 				}
 			}, maxTryCount, retryDelay);
 			
 			if (! succeded) {
-				handleFailingEvent(surveyEvent);
+				handleFailingEvent(surveyEvent, keepAlive);
 			}
 		}
 	}
@@ -67,28 +68,39 @@ public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 		return false;
 	}
 
-	private void handleEvent(SurveyEvent event) {
+	private void handleEvent(SurveyEvent event, final KeepAlive keepAlive) {
+		ProgressListener keepAliveListener = createProgressListener(keepAlive);
 		String surveyName = event.getSurveyName();
 		if (event instanceof RecordTransaction) {
 			repositories.process((RecordTransaction) event);
 		} else if (event instanceof SurveyCreatedEvent) {
-			repositories.createRepositories(surveyName);
+			repositories.createRepositories(surveyName, keepAliveListener);
 		} else if (event instanceof SurveyUpdatedEvent) {
-			repositories.updateRepositories(surveyName);
+			repositories.updateRepositories(surveyName, keepAliveListener);
 		} else if (event instanceof SurveyDeletedEvent) {
 			repositories.deleteRepositories(surveyName);
 		} else if (event instanceof InitializeRDBEvent) {
-			repositories.createRepository(surveyName, ((InitializeRDBEvent) event).getStep());
+			repositories.createRepository(surveyName, ((InitializeRDBEvent) event).getStep(), keepAliveListener);
 		}
 	}
 
-	private void handleFailingEvent(SurveyEvent event) {
+	private ProgressListener createProgressListener(final KeepAlive keepAlive) {
+		ProgressListener keepAliveListener = new ProgressListener() {
+			public void progressMade() {
+				keepAlive.send();	
+			}
+		};
+		return keepAliveListener;
+	}
+
+	private void handleFailingEvent(SurveyEvent event, KeepAlive keepAlive) {
 		String surveyName = ((SurveyEvent) event).getSurveyName();
 		if (event instanceof RecordTransaction) {
 			try {
+				ProgressListener keepAliveListener = createProgressListener(keepAlive);
 				repositories.deleteRepositories(surveyName);
-				repositories.createRepositories(surveyName);
-				handleEvent(event);
+				repositories.createRepositories(surveyName, keepAliveListener);
+				handleEvent(event, keepAlive);
 				considerSurveyEvents(surveyName);
 			} catch (Exception e) {
 				logEventProcessFailed(event, e);

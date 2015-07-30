@@ -11,8 +11,8 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<jooq.version>3.5.4</jooq.version>
-		<jooq-codegen.version>3.5.4</jooq-codegen.version>
+		<jooq.version>3.6.2</jooq.version>
+		<jooq-codegen.version>3.6.2</jooq-codegen.version>
 		<protostuff.version>1.0.4</protostuff.version>
 	</properties>
 
