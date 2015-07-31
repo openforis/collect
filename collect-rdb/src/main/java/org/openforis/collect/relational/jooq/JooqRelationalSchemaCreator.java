@@ -7,6 +7,7 @@ import static org.jooq.impl.DSL.table;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jooq.CreateTableAsStep;
@@ -19,7 +20,9 @@ import org.jooq.impl.DefaultDataType;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.RelationalSchemaCreator;
+import org.openforis.collect.relational.model.CodeValueFKColumn;
 import org.openforis.collect.relational.model.Column;
+import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.PrimaryKeyColumn;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
@@ -62,11 +65,40 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 			dsl.createIndex(table.getName() + "_pk")
 				.on(jooqTable, field(pkColumn.getName()))
 				.execute();
+
+			if (table instanceof DataTable) {
+				int count = 1;
+				List<Column<?>> codeValueFKColumns = getCodeValueFKColumns(table);
+				for (Column<?> column : codeValueFKColumns) {
+					createIndex(dsl, count++, schema, table, Arrays.<Column<?>>asList(column));
+				}
+				if (codeValueFKColumns.size() > 1) {
+					createIndex(dsl, count++, schema, table, codeValueFKColumns);
+				}
+			}
 		}
-		
-		if(dsl.isForeignKeySupported()){
+		if(dsl.isForeignKeySupported()) {
 			createForeignKeys(schema, dsl);
 		}
+	}
+
+	private void createIndex(CollectDSLContext dsl, int indexNum, RelationalSchema schema, 
+			Table<?> table, List<Column<?>> columns) {
+		org.jooq.Table<Record> jooqTable = createJooqTable(schema, table, ! dsl.isSchemaLess());
+		String name = String.format("%s_%d_idx", table.getName(), indexNum);
+		dsl.createIndex(name)
+			.on(jooqTable, toJooqFields(columns))
+			.execute();
+	}
+
+	private List<Column<?>> getCodeValueFKColumns(Table<?> table) {
+		List<Column<?>> columns = new ArrayList<Column<?>>();
+		for (Column<?> column : table.getColumns()) {
+			if (column instanceof CodeValueFKColumn) {
+				columns.add(column);
+			}
+		}
+		return columns;
 	}
 
 	private void createForeignKeys(RelationalSchema schema, CollectDSLContext dsl) {

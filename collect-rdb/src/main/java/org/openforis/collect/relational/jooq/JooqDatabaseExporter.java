@@ -1,5 +1,8 @@
 package org.openforis.collect.relational.jooq;
 
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.name;
+import static org.jooq.impl.DSL.table;
 import static org.openforis.collect.relational.data.internal.DataTableDataExtractor.getTableArtificialPK;
 
 import java.math.BigInteger;
@@ -26,7 +29,6 @@ import org.jooq.SelectConditionStep;
 import org.jooq.Update;
 import org.jooq.UpdateConditionStep;
 import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
@@ -115,12 +117,12 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		org.jooq.Table<Record> jooqTable = queryCreator.getJooqTable(table);
 		InsertSetMoreStep<Record> insert = dsl
 				.insertInto(jooqTable)
-				.set(DSL.field(pkColumn.getName()), pkValue);
+				.set(field(pkColumn.getName()), pkValue);
 		
 		if (parentId != null) {
 			Map<String, BigInteger> ancestorFKByColumnName = findAncestorFKByColumnName(schema, table, recordId, parentId);
 			for (Entry<String, BigInteger> entry : ancestorFKByColumnName.entrySet()) {
-				insert.set(DSL.field(entry.getKey()), entry.getValue());
+				insert.set(field(entry.getKey()), entry.getValue());
 			}
 		}
 		try {
@@ -149,7 +151,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		SelectConditionStep<Record> selectAncestorFKs = dsl
 			.select(parentAncestorColumns)
 			.from(queryCreator.getJooqTable(parentTable))
-			.where(DSL.field(parentPKColumn.getName()).eq(parentPKValue));
+			.where(field(parentPKColumn.getName()).eq(parentPKValue));
 		Record record = selectAncestorFKs.fetchOne();
 		
 		for (int i = 0; i < parentAncestorColumns.size(); i++) {
@@ -169,7 +171,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 	private List<Field<?>> toFields(List<? extends Column<?>> columns) {
 		List<Field<?>> ancestorColumns = new ArrayList<Field<?>>(columns.size());
 		for (Column<?> column : columns) {
-			ancestorColumns.add(DSL.field(column.getName()));
+			ancestorColumns.add(field(column.getName()));
 		}
 		return ancestorColumns;
 	}
@@ -259,7 +261,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		public void addUpdate(DataTable table, BigInteger pkValue, List<ColumnValuePair<DataColumn, ?>> columnValuePairs) {
 			Map<Field<?>, Object> fieldToValue = new HashMap<Field<?>, Object>(columnValuePairs.size() );
 			for (ColumnValuePair<DataColumn, ?> columnValuePair : columnValuePairs) {
-				Field<?> field = DSL.field(columnValuePair.getColumn().getName());
+				Field<?> field = field(columnValuePair.getColumn().getName());
 				Object value = columnValuePair.getValue();
 				fieldToValue.put(field, value);
 			}
@@ -318,7 +320,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 				Object val = values.get(i);
 				if ( val != null ) {
 					String col = cols.get(i).getName();
-					insert.addValue(DSL.fieldByName(col), val);
+					insert.addValue(field(name(col)), val);
 				}
 			}
 			return insert;
@@ -327,14 +329,14 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		public Update<Record> createUpdateQuery(DataTable table,
 				BigInteger pkValue, Map<Field<?>, Object> fieldToValue) {
 			DataPrimaryKeyColumn pkColumn = table.getPrimaryKeyColumn();
-			Field<Object> pkField = DSL.field(pkColumn.getName());
+			Field<Object> pkField = field(pkColumn.getName());
 			UpdateConditionStep<Record> query = dsl.update(getJooqTable(table)).set(fieldToValue).where(pkField.eq(pkValue));
 			return query;
 		}
 		
 		public DeleteQuery<Record> createDeleteQuery(Table<?> table, Column<?> pkColumn, BigInteger pkValue) {
 			org.jooq.Table<Record> jooqTable = getJooqTable(table);
-			Field<BigInteger> jooqPKColumn = DSL.field(pkColumn.getName(), BigInteger.class);
+			Field<BigInteger> jooqPKColumn = field(pkColumn.getName(), BigInteger.class);
 			DeleteQuery<Record> query = dsl.deleteQuery(jooqTable);
 			query.addConditions(jooqPKColumn.equal(pkValue));
 			return query;
@@ -342,9 +344,9 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		
 		private org.jooq.Table<Record> getJooqTable(Table<?> table) {
 			if ( isSchemaLess() ) {
-				return DSL.tableByName(table.getName());
+				return table(name(table.getName()));
 			} else {
-				return DSL.tableByName(schemaName, table.getName());
+				return table(schemaName, table.getName());
 			}
 		}
 		

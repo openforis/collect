@@ -1,11 +1,20 @@
 package org.openforis.collect.event;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Logger;
 import org.openforis.rmb.MessageBroker;
 import org.openforis.rmb.MessageQueue.Builder;
 import org.openforis.rmb.metrics.MetricsMonitor;
@@ -16,13 +25,22 @@ import org.openforis.rmb.spring.SpringJdbcMessageBroker;
 import org.openforis.rmb.xstream.XStreamMessageSerializer;
 
 import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.ScheduledReporter;
+import com.codahale.metrics.Timer;
 
 public class ConfiguredMessageBroker implements MessageBroker {
 
+	private static final Logger LOG = Logger.getLogger(ConfiguredMessageBroker.class);
 	private static final String TABLE_PREFIX = "ofc_";
 	
 	private final SpringJdbcMessageBroker messageBroker;
+	private FileReporter fileReporter;
 
 	public ConfiguredMessageBroker(DataSource dataSource) throws Exception {
 		messageBroker = new SpringJdbcMessageBroker(dataSource);
@@ -37,26 +55,26 @@ public class ConfiguredMessageBroker implements MessageBroker {
 		List<Monitor<Event>> monitors = new ArrayList<Monitor<Event>>();
 		
 		monitors.add(new Slf4jLoggingMonitor());
-		monitors.add(createMetricsMonitor());
-		
+		MetricsMonitor metricsMonitor = createMetricsMonitor();
+		if (metricsMonitor != null) {
+			monitors.add(metricsMonitor);
+		}
 		messageBroker.setMonitors(monitors);
 	}
 
 	private MetricsMonitor createMetricsMonitor() {
 		MetricRegistry metrics = new MetricRegistry();
-		ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
-				.convertRatesTo(TimeUnit.SECONDS)
-				.convertDurationsTo(TimeUnit.MILLISECONDS).build();
-//		Slf4jReporter reporter = Slf4jReporter.forRegistry(metrics)
-//                .outputTo(LoggerFactory.getLogger(ConfiguredMessageBroker.class.getName()))
-//                .convertRatesTo(TimeUnit.SECONDS)
-//                .convertDurationsTo(TimeUnit.MILLISECONDS)
-//                .build();
-		reporter.start(1, TimeUnit.MINUTES);
-		MetricsMonitor metricsMonitor = new MetricsMonitor(metrics);
-		return metricsMonitor;
+		try {
+			fileReporter = new FileReporter(metrics);
+			fileReporter.start(1, TimeUnit.MINUTES);
+			MetricsMonitor metricsMonitor = new MetricsMonitor(metrics);
+			return metricsMonitor;
+		} catch (IOException e) {
+			LOG.warn("Metrics output file not found");
+			return null;
+		}
 	}
-
+	
 	@Override
 	public <M> Builder<M> queueBuilder(String queueId) {
 		return messageBroker.queueBuilder(queueId);
@@ -75,6 +93,61 @@ public class ConfiguredMessageBroker implements MessageBroker {
 	@Override
 	public void stop() {
 		messageBroker.stop();
+		fileReporter.stop();
+	}
+	
+	private static class FileReporter extends ScheduledReporter {
+
+		private static final String OPENFORIS_APPENDER = "openforis";
+		private static final String METRICS_LOG_FILE_NAME = "metrics.log";
+		private File outputFile;
+		private ConsoleReporter reporter;
+
+		protected FileReporter(MetricRegistry registry) throws IOException {
+			super(registry, "file-reporter", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+			outputFile = getMetricsOutputFile();
+			PrintStream output = new PrintStream(outputFile);
+			reporter = ConsoleReporter.forRegistry(registry)
+					.convertRatesTo(TimeUnit.SECONDS)
+					.convertDurationsTo(TimeUnit.MILLISECONDS)
+					.outputTo(output)
+					.build();
+		}
+
+		@Override
+		public void report(@SuppressWarnings("rawtypes") SortedMap<String, Gauge> gauges,
+				SortedMap<String, Counter> counters,
+				SortedMap<String, Histogram> histograms,
+				SortedMap<String, Meter> meters,
+				SortedMap<String, Timer> timers) {
+			PrintWriter writer = null;
+			try {
+				writer = new PrintWriter(outputFile);
+				writer.print("");
+				reporter.report(gauges, counters, histograms, meters, timers);
+			} catch (FileNotFoundException e) {
+				LOG.warn("Failed to write to metrics log file: " + outputFile.getAbsolutePath(), e);
+			} finally {
+				IOUtils.closeQuietly(writer);
+			}
+		}
+		
+		private File getMetricsOutputFile() throws IOException {
+			FileAppender appender = (FileAppender) LOG.getAppender(OPENFORIS_APPENDER);
+			File openforisAppenderFile = new File(appender.getFile());
+			File logDir = openforisAppenderFile.getParentFile();
+			File file = new File(logDir, METRICS_LOG_FILE_NAME);
+			if (! file.exists()) {
+				file.createNewFile();
+			}
+			return file;
+		}
+		
+		@Override
+		public void close() {
+			super.close();
+			IOUtils.closeQuietly(reporter);
+		}
 	}
 
 }
