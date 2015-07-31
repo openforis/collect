@@ -1,5 +1,10 @@
 package org.openforis.collect.relational.jooq;
 
+import static org.jooq.impl.DSL.constraint;
+import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.name;
+import static org.jooq.impl.DSL.table;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +15,12 @@ import org.jooq.DataType;
 import org.jooq.Field;
 import org.jooq.Query;
 import org.jooq.Record;
-import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultDataType;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.model.Column;
 import org.openforis.collect.relational.model.PrimaryKeyColumn;
-import org.openforis.collect.relational.model.PrimaryKeyConstraint;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
@@ -42,18 +45,23 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 				CreateTableColumnStep columnStep = createTableStep.column(column.getName(), dataType);
 				
 				if (column instanceof PrimaryKeyColumn) {
-					//TODO
-//					columnStep.
+					//TODO use Jooq to add primary key constraint at table creation time (not supported yet)
 				}
 				createTableFinalQuery = columnStep;
 			}
 			createTableFinalQuery.execute();
 
-			PrimaryKeyConstraint pkConstraint = table.getPrimaryKeyConstraint();
-			String pkColumnName = pkConstraint.getPrimaryKeyColumn().getName();
-			dsl.alterTable(jooqTable).add(
-					DSL.constraint(table.getName() + "_pk").primaryKey(pkColumnName)
-				).execute();
+			//TODO add primary key constraint ?
+//			PrimaryKeyConstraint pkConstraint = table.getPrimaryKeyConstraint();
+//			String pkColumnName = pkConstraint.getPrimaryKeyColumn().getName();
+//			dsl.alterTable(jooqTable).add(
+//					constraint(table.getName() + "_pk").primaryKey(pkColumnName)
+//				).execute();
+			
+			Column<?> pkColumn = table.getPrimaryKeyConstraint().getPrimaryKeyColumn();
+			dsl.createIndex(table.getName() + "_pk")
+				.on(jooqTable, field(pkColumn.getName()))
+				.execute();
 		}
 		
 		if(dsl.isForeignKeySupported()){
@@ -70,7 +78,7 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 				List<Column<?>> referencedColumns = fk.getReferencedKey().getColumns();
 				String[] referencedColumnNames = extractNames(referencedColumns);
 				dsl.alterTable(createJooqTable(schema, table, ! dsl.isSchemaLess()))
-					.add(DSL.constraint(fk.getName())
+					.add(constraint(fk.getName())
 							.foreignKey(fields)
 							.references(referencedTableName, referencedColumnNames))
 					.execute();
@@ -81,7 +89,7 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 	private Field<?>[] toJooqFields(List<Column<?>> fkColumns) {
 		List<Field<?>> fields = new ArrayList<Field<?>>(fkColumns.size());
 		for (Column<?> fkColumn : fkColumns) {
-			fields.add(DSL.field(fkColumn.getName()));
+			fields.add(field(fkColumn.getName()));
 		}
 		return fields.toArray(new Field<?>[fields.size()]);
 	}
@@ -97,52 +105,10 @@ public class JooqRelationalSchemaCreator implements RelationalSchemaCreator {
 	private org.jooq.Table<Record> createJooqTable(RelationalSchema schema,
 			org.openforis.collect.relational.model.Table<?> table, boolean renderSchema) {
 		if (renderSchema) {
-			return DSL.tableByName(schema.getName(), table.getName());
+			return table(name(schema.getName(), table.getName()));
 		} else {
-			return DSL.tableByName(table.getName());
+			return table(name(table.getName()));
 		}
 	}
 
-//	synchronized
-//	public DatabaseSnapshot createSnapshot(RelationalSchema relationalSchema, boolean dbSupportsFKs) throws DatabaseException {
-//		this.schema = relationalSchema;
-//		UnsupportedDatabase db = new UnsupportedDatabase();
-//		snapshot = new DatabaseSnapshot(db, null);
-//
-//		createTables();
-//		
-//		if( dbSupportsFKs ){
-//			createForeignKeys();
-//		}
-//		
-//		// TODO
-//		
-//		return snapshot;
-//	}
-//
-//	protected void createForeignKeys() {
-//		for (org.openforis.collect.relational.model.Table<?> itable : schema.getTables()) {
-//			Table ltable = snapshot.getTable(itable.getName());
-//			List<ReferentialConstraint> ifks = itable.getReferentialContraints();
-//			for (ReferentialConstraint ifk : ifks) {
-//				ForeignKey lfk = new ForeignKey();
-//				lfk.setName(ifk.getName());
-//				//set base table columns
-//				lfk.setForeignKeyTable(ltable);
-//				for (org.openforis.collect.relational.model.Column<?> ifcCol : ifk.getColumns()) {
-//					lfk.addForeignKeyColumn(ifcCol.getName());
-//				}
-//				//set referenced key columns
-//				UniquenessConstraint iReferencedKey = ifk.getReferencedKey();
-//				org.openforis.collect.relational.model.Table<?> iReferencedTable = iReferencedKey.getTable();
-//				Table lReferencedTable = snapshot.getTable(iReferencedTable.getName());
-//				lfk.setPrimaryKeyTable(lReferencedTable);
-//				for (org.openforis.collect.relational.model.Column<?> refCol : iReferencedKey.getColumns()) {
-//					lfk.addPrimaryKeyColumn(refCol.getName());
-//				}
-//				//Add fk
-//				snapshot.getForeignKeys().add(lfk);
-//			}
-//		}
-//	}
 }
