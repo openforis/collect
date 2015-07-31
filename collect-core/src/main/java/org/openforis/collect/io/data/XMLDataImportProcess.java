@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observer;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.zip.ZipException;
@@ -150,6 +151,11 @@ public class XMLDataImportProcess implements Callable<Void> {
 			}
 		}
 		return null;
+	}
+	
+	public void callAndObserve(Observer observer) throws Exception{
+		call();
+		state.addObserver( observer );
 	}
 
 	private void beforeStart() throws ZipException, IOException {
