@@ -1,8 +1,10 @@
 package org.openforis.collect.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
@@ -40,4 +42,21 @@ public class Files {
 		return (temp);
 	}
 
+	public static void eraseFileContent(File file) throws FileNotFoundException {
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(file);
+			writer.print("");
+			writer.flush();
+		} finally {
+			if (writer != null) {
+				try {
+					writer.close();
+				} catch(Exception e) {
+					System.out.println(e);
+				}
+			}
+		}
+	}
+	
 }

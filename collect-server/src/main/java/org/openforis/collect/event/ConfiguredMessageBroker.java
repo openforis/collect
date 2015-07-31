@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
@@ -13,8 +13,10 @@ import java.util.concurrent.TimeUnit;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import static org.openforis.collect.utils.Files.*;
 import org.openforis.rmb.MessageBroker;
 import org.openforis.rmb.MessageQueue.Builder;
 import org.openforis.rmb.metrics.MetricsMonitor;
@@ -98,19 +100,19 @@ public class ConfiguredMessageBroker implements MessageBroker {
 	
 	private static class FileReporter extends ScheduledReporter {
 
-		private static final String OPENFORIS_APPENDER = "openforis";
 		private static final String METRICS_LOG_FILE_NAME = "metrics.log";
 		private File outputFile;
+		private PrintStream outputStream;
 		private ConsoleReporter reporter;
 
 		protected FileReporter(MetricRegistry registry) throws IOException {
 			super(registry, "file-reporter", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
 			outputFile = getMetricsOutputFile();
-			PrintStream output = new PrintStream(outputFile);
+			outputStream = new PrintStream(outputFile);
 			reporter = ConsoleReporter.forRegistry(registry)
 					.convertRatesTo(TimeUnit.SECONDS)
 					.convertDurationsTo(TimeUnit.MILLISECONDS)
-					.outputTo(output)
+					.outputTo(outputStream)
 					.build();
 		}
 
@@ -120,27 +122,34 @@ public class ConfiguredMessageBroker implements MessageBroker {
 				SortedMap<String, Histogram> histograms,
 				SortedMap<String, Meter> meters,
 				SortedMap<String, Timer> timers) {
-			PrintWriter writer = null;
-			try {
-				writer = new PrintWriter(outputFile);
-				writer.print("");
+//			try {
+//				outputStream.flush();
+//				eraseFileContent(outputFile); TODO it does not work!!!
 				reporter.report(gauges, counters, histograms, meters, timers);
-			} catch (FileNotFoundException e) {
-				LOG.warn("Failed to write to metrics log file: " + outputFile.getAbsolutePath(), e);
-			} finally {
-				IOUtils.closeQuietly(writer);
-			}
+//			} catch (FileNotFoundException e) {
+//				LOG.warn("Failed to write to metrics log file: " + outputFile.getAbsolutePath(), e);
+//			}
 		}
 		
 		private File getMetricsOutputFile() throws IOException {
-			FileAppender appender = (FileAppender) LOG.getAppender(OPENFORIS_APPENDER);
-			File openforisAppenderFile = new File(appender.getFile());
-			File logDir = openforisAppenderFile.getParentFile();
-			File file = new File(logDir, METRICS_LOG_FILE_NAME);
-			if (! file.exists()) {
-				file.createNewFile();
+			@SuppressWarnings("unchecked")
+			Enumeration<Appender> e = Logger.getRootLogger().getAllAppenders();
+			while (e.hasMoreElements()) {
+				Appender app = e.nextElement();
+				if (app instanceof FileAppender) {
+					FileAppender fileAppender = (FileAppender) app;
+					File openforisAppenderFile = new File(fileAppender.getFile());
+					File logDir = openforisAppenderFile.getParentFile();
+					File file = new File(logDir, METRICS_LOG_FILE_NAME);
+					if (file.exists()) {
+						eraseFileContent(file);
+					} else {
+						file.createNewFile();
+					}
+					return file;
+				}
 			}
-			return file;
+			throw new IOException("Error writing metrics log file");
 		}
 		
 		@Override
