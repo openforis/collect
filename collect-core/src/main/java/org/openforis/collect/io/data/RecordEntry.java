@@ -29,7 +29,11 @@ public class RecordEntry {
 	
 	public static boolean isValidRecordEntry(ZipEntry zipEntry) {
 		String name = zipEntry.getName();
-		return ! (zipEntry.isDirectory() || XMLDataExportProcess.IDML_FILE_NAME.equals(name) || 
+		return isValidRecordEntry(name);
+	}
+
+	public static boolean isValidRecordEntry(String name) {
+		return name.endsWith(".xml") && ! (XMLDataExportProcess.IDML_FILE_NAME.equals(name) || 
 				name.startsWith(XMLDataExportProcess.RECORD_FILE_DIRECTORY_NAME));
 	}
 	

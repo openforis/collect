@@ -6,18 +6,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.io.NewBackupFileExtractor;
 import org.openforis.collect.io.data.DataImportState.MainStep;
 import org.openforis.collect.io.data.DataImportState.SubStep;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
@@ -94,26 +93,17 @@ public class XMLDataImportProcess implements Callable<Void> {
 	 * Survey stored in the system with the same uri as the packaged one
 	 */
 	private CollectSurvey existingSurvey;
-
 	private boolean overwriteAll;
-
 	private DataUnmarshaller dataUnmarshaller;
-	
 	private List<Integer> processedRecords;
-
 	private DataImportSummary summary;
-	
 	private List<Integer> entryIdsToImport;
-
 	private boolean includesRecordFiles;
-	
 	private Predicate<CollectRecord> includeRecordPredicate;
-	
 	private boolean validateRecords;
-
 	private List<RecordStoreQuery> queryBuffer;
-
 	private Integer nextRecordId;
+	private NewBackupFileExtractor backupFileExtractor;
 
 	public XMLDataImportProcess() {
 		super();
@@ -148,6 +138,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 	@Override
 	public Void call() throws Exception {
 		if ( state.getSubStep() == SubStep.PREPARING ) {
+			beforeStart(); 
 			switch ( state.getMainStep() ) {
 			case SUMMARY_CREATION:
 				createDataImportSummary();
@@ -161,8 +152,12 @@ public class XMLDataImportProcess implements Callable<Void> {
 		return null;
 	}
 
+	private void beforeStart() throws ZipException, IOException {
+		backupFileExtractor = new NewBackupFileExtractor(file);
+		backupFileExtractor.init();
+	}
+
 	private void createDataImportSummary() throws DataImportExeption {
-		ZipFile zipFile = null;
 		try {
 			state.setSubStep(SubStep.RUNNING);
 			summary = null;
@@ -182,18 +177,21 @@ public class XMLDataImportProcess implements Callable<Void> {
 			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors = new HashMap<String, List<NodeUnmarshallingError>>();
 			Map<Integer, CollectRecord> conflictingPackagedRecords = new HashMap<Integer, CollectRecord>();
 			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings = new HashMap<Integer, Map<Step,List<NodeUnmarshallingError>>>();
-			zipFile = new ZipFile(file);
-			Enumeration<? extends ZipEntry> entries = zipFile.entries();
-			state.setTotal(zipFile.size());
+			
+			state.setTotal(backupFileExtractor.size());
 			state.resetCount();
-			while (entries.hasMoreElements()) {
-				if ( state.getSubStep() == DataImportState.SubStep.RUNNING ) {
-					createSummaryForEntry(entries, zipFile, packagedSkippedFileErrors, 
-							packagedRecords, packagedStepsPerRecord, totalPerStep, 
-							conflictingPackagedRecords, warnings);
-				} else {
+			
+			List<String> entryNames = backupFileExtractor.getEntryNames();
+			for (String entryName : entryNames) {
+				if ( state.getSubStep() != DataImportState.SubStep.RUNNING ) {
 					break;
 				}
+				if ( ! RecordEntry.isValidRecordEntry(entryName) ) {
+					continue;
+				}
+				createSummaryForEntry(entryName, packagedSkippedFileErrors, 
+						packagedRecords, packagedStepsPerRecord, totalPerStep, 
+						conflictingPackagedRecords, warnings);
 			}
 			if ( state.getSubStep() == SubStep.RUNNING ) {
 				String oldSurveyName = existingSurvey == null ? null: existingSurvey.getName();
@@ -202,19 +200,13 @@ public class XMLDataImportProcess implements Callable<Void> {
 						conflictingPackagedRecords, warnings);
 				state.setSubStep(DataImportState.SubStep.COMPLETE);
 			}
-			includesRecordFiles = isIncludingRecordFiles(zipFile);
+			includesRecordFiles = backupFileExtractor.isIncludingRecordFiles();
 		} catch (Exception e) {
 			state.setSubStep(SubStep.ERROR);
 			state.setErrorMessage(e.getMessage());
 			LOG.error(e.getMessage(), e);
 		} finally {
-			if ( zipFile != null ) {
-				try {
-					zipFile.close();
-				} catch (IOException e) {
-					LOG.error(e.getMessage(), e);
-				}
-			}
+			IOUtils.closeQuietly(backupFileExtractor);
 		}
 	}
 
@@ -257,18 +249,12 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 	
-	private void createSummaryForEntry(Enumeration<? extends ZipEntry> entries, ZipFile zipFile, 
-			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
+	private void createSummaryForEntry(String entryName, Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
 			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
 			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
-		ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-		if ( ! RecordEntry.isValidRecordEntry(zipEntry) ) {
-			return;
-		}
-		String entryName = zipEntry.getName();
 		RecordEntry recordEntry = RecordEntry.parse(entryName);
 		Step step = recordEntry.getStep();
-		InputStream is = zipFile.getInputStream(zipEntry);
+		InputStream is = backupFileExtractor.findEntryInputStream(entryName);
 		InputStreamReader reader = OpenForisIOUtils.toReader(is);
 		ParseRecordResult parseRecordResult = parseRecord(reader);
 		CollectRecord parsedRecord = parseRecordResult.getRecord();
@@ -361,18 +347,16 @@ public class XMLDataImportProcess implements Callable<Void> {
 
 	@Transactional
 	protected void importPackagedFile() {
-		ZipFile zipFile = null;
 		try {
 			state.setSubStep(DataImportState.SubStep.RUNNING);
 			processedRecords = new ArrayList<Integer>();
 			state.setTotal(entryIdsToImport.size());
 			state.resetCount();
-			zipFile = new ZipFile(file);
 			state.setRunning(true);
 			nextRecordId = recordManager.nextId();
 			for (Integer entryId : entryIdsToImport) {
 				if ( state.getSubStep() == SubStep.RUNNING && ! processedRecords.contains(entryId) ) {
-					importEntries(zipFile, entryId);
+					importEntries(entryId);
 					processedRecords.add(entryId);
 					state.incrementCount();
 				} else {
@@ -393,18 +377,18 @@ public class XMLDataImportProcess implements Callable<Void> {
 				recordManager.restartIdSequence(nextRecordId);
 			}
 			state.setRunning(false);
-			IOUtils.closeQuietly(zipFile);
+			IOUtils.closeQuietly(backupFileExtractor);
 		}
 	}
 	
-	private void importEntries(ZipFile zipFile, int recordId) throws IOException, DataImportExeption, RecordPersistenceException {
+	private void importEntries(int recordId) throws IOException, DataImportExeption, RecordPersistenceException {
 		CollectRecord lastProcessedRecord = null;
 		Step originalRecordStep = null;
 		Step[] steps = Step.values();
 		for (Step step : steps) {
 			RecordEntry recordEntry = new RecordEntry(step, recordId);
 			String entryName = recordEntry.getName();
-			InputStream inputStream = getRecordEntryInputStream(zipFile, recordEntry);
+			InputStream inputStream = backupFileExtractor.findEntryInputStream(entryName);
 			if ( inputStream != null ) {
 				InputStreamReader reader = OpenForisIOUtils.toReader(inputStream);
 				ParseRecordResult parseRecordResult = parseRecord(reader);
@@ -450,7 +434,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 			appendQuery(recordManager.createUpdateQuery(originalRecord));
 		}
 		if ( includesRecordFiles ) {
-			importRecordFiles(zipFile, lastProcessedRecord);
+			importRecordFiles(lastProcessedRecord);
 		}
 	}
 
@@ -466,13 +450,13 @@ public class XMLDataImportProcess implements Callable<Void> {
 		queryBuffer.clear();
 	}
 
-	private void importRecordFiles(ZipFile zipFile, CollectRecord record) throws IOException, RecordPersistenceException {
+	private void importRecordFiles(CollectRecord record) throws IOException, RecordPersistenceException {
 		sessionRecordFileManager.resetTempInfo();
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		String sessionId = "admindataimport";
 		for (FileAttribute fileAttribute : fileAttributes) {
 			String recordFileEntryName = XMLDataExportProcess.calculateRecordFileEntryName(fileAttribute);
-			InputStream is = getEntryInputStream(zipFile, recordFileEntryName);
+			InputStream is = backupFileExtractor.findEntryInputStream(recordFileEntryName);
 			if ( is != null ) {
 				sessionRecordFileManager.saveToTempFile(is, fileAttribute.getFilename(), 
 						record, fileAttribute.getInternalId());
@@ -488,40 +472,10 @@ public class XMLDataImportProcess implements Callable<Void> {
 		}
 	}
 
-	private InputStream getEntryInputStream(ZipFile zipFile, String entryName)
-			throws IOException {
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-			if ( zipEntry.getName().equals(entryName) ) {
-				return zipFile.getInputStream(zipEntry);
-			}
-		}
-		return null;
-	}
-	
-	private boolean isIncludingRecordFiles(ZipFile zipFile) {
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-			if ( zipEntry.getName().startsWith(XMLDataExportProcess.RECORD_FILE_DIRECTORY_NAME)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private InputStream getRecordEntryInputStream(ZipFile zipFile, RecordEntry entry) throws IOException, DataImportExeption {
-		String entryName = entry.getName();
-		InputStream result = getEntryInputStream(zipFile, entryName);
-		return result;
-	}
-
 	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
 		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
 		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey, validateRecords);
-		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
-		return dataUnmarshaller;
+		return new DataUnmarshaller(handler);
 	}
 
 	private CollectRecord findAlreadyExistingRecordSummary(CollectRecord parsedRecord) {
@@ -529,7 +483,7 @@ public class XMLDataImportProcess implements Callable<Void> {
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
 		Entity rootEntity = parsedRecord.getRootEntity();
 		String rootEntityName = rootEntity.getName();
-		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[0]));
+		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[keyValues.size()]));
 		if ( oldRecords == null || oldRecords.isEmpty() ) {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {
@@ -540,33 +494,21 @@ public class XMLDataImportProcess implements Callable<Void> {
 	}
 
 	public CollectSurvey extractPackagedSurvey() throws IOException, IdmlParseException, DataImportExeption, SurveyValidationException {
-		ZipFile zipFile = null;
-		CollectSurvey survey = null;
-		try {
-			zipFile = new ZipFile(file);
-			Enumeration<? extends ZipEntry> entries = zipFile.entries();
-			while (entries.hasMoreElements()) {
-				ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-				if (zipEntry.isDirectory()) {
-					continue;
-				}
-				String entryName = zipEntry.getName();
-				if (XMLDataExportProcess.IDML_FILE_NAME.equals(entryName)) {
-					InputStream is = zipFile.getInputStream(zipEntry);
-					survey = surveyManager.unmarshalSurvey(is);
-					SurveyValidationResults validationResults = surveyValidator.validate(survey);
-					if ( validationResults.hasErrors() ) {
-						throw new IllegalStateException("Packaged survey is not valid." +
-								"\nPlease try to import it using the Designer to get the list of errors.");
-					}
-				}
-			}
-		} finally {
-			if ( zipFile != null) {
-				zipFile.close();
-			}
+		File idmlFile = backupFileExtractor.extractIdmlFile();
+		if (idmlFile == null) {
+			return null;
 		}
+		CollectSurvey survey = surveyManager.unmarshalSurvey(idmlFile, false, true);
+		validateSurvey(survey);
 		return survey;
+	}
+
+	private void validateSurvey(CollectSurvey survey) {
+		SurveyValidationResults validationResults = surveyValidator.validate(survey);
+		if ( validationResults.hasErrors() ) {
+			throw new IllegalStateException("Packaged survey is not valid." +
+					"\nPlease try to import it using the Designer to get the list of errors.");
+		}
 	}
 
 	private ParseRecordResult parseRecord(Reader reader) throws IOException {
