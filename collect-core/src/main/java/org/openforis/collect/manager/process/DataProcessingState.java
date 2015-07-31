@@ -40,6 +40,7 @@ public class DataProcessingState extends Observable implements Serializable {
 	
 	public void incrementCount() {
 		count++;
+		setChanged();
 		notifyObservers();
 	}
 	
