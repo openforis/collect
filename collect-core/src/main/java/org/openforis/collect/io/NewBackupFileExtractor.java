@@ -14,24 +14,40 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.openforis.collect.utils.Files;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class BackupFileExtractor implements Closeable {
+public class NewBackupFileExtractor implements Closeable {
 
 	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
 
+	private File file;
+	private File tempUncompressedFolder;
 	private ZipFile zipFile;
 
-	public BackupFileExtractor(File file) throws ZipException, IOException {
-		this(new ZipFile(file));
+	public NewBackupFileExtractor(File file) throws ZipException, IOException {
+		this.file = file;
 	}
-	
-	public BackupFileExtractor(ZipFile zipFile) {
-		this.zipFile = zipFile;
+
+	public void init() throws IOException {
+		tempUncompressedFolder = Files.createTempDirectory();
+		zipFile = new ZipFile(file);
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		while (entries.hasMoreElements()) {
+			ZipEntry zipEntry = entries.nextElement();
+			InputStream is = zipFile.getInputStream(zipEntry);
+
+			String entryName = zipEntry.getName();
+			File folder = getOrCreateEntryFolder(entryName);
+			String fileName = extractFileName(entryName);
+			File newFile = new File(folder, fileName);
+			newFile.createNewFile();
+			FileUtils.copyInputStreamToFile(is, newFile);
+		}
 	}
 	
 	public File extractInfoFile() {
@@ -57,43 +73,18 @@ public class BackupFileExtractor implements Closeable {
 	}
 	
 	public File extract(String entryName, boolean required) {
-		ZipEntry entry = findEntry(entryName);
-		if ( entry == null ) {
-			if ( required ) {
-				throw new RuntimeException("Entry not found in packaged file: " + entryName);
-			} else {
-				return null;
-			}
-		} else {
-			return extract(entry);
-		}
+		File folder = getOrCreateEntryFolder(entryName);
+		String fileName = extractFileName(entryName);
+		File result = new File(folder, fileName);
+		return result.exists() ? result: null;
 	}
 
-	private File extract(ZipEntry entry) {
-		String entryName = entry.getName();
-		try {
-			InputStream is = zipFile.getInputStream(entry);
-			String fileName = FilenameUtils.getName(entryName);
-			File tempFile = File.createTempFile("collect", fileName);
-			FileUtils.copyInputStreamToFile(is, tempFile);
-			return tempFile;
-		} catch (IOException e) {
-			throw new RuntimeException(String.format("Error extracting file %s from backup archive: %s", entryName, e.getMessage()), e);
-		}
-	}
-	
 	public List<String> listEntriesInPath(String path) {
-		if ( ! path.endsWith(SurveyBackupJob.ZIP_FOLDER_SEPARATOR) ) {
-			path += SurveyBackupJob.ZIP_FOLDER_SEPARATOR;
-		}
 		List<String> result = new ArrayList<String>();
-		Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-		while ( zipEntries.hasMoreElements() ) {
-			ZipEntry zipEntry = zipEntries.nextElement();
-			String name = zipEntry.getName();
-			if ( ! zipEntry.isDirectory() && name.startsWith(path) ) {
-				result.add(name);
-			}
+		File folder = getOrCreateEntryFolder(path);
+		File[] files = folder.listFiles();
+		for (File file : files) {
+			result.add(file.getName());
 		}
 		return result;
 	}
@@ -113,31 +104,18 @@ public class BackupFileExtractor implements Closeable {
 		return result;
 	}
 	
-	public ZipEntry findEntry(String entryName) {
-		Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
-		while ( zipEntries.hasMoreElements() ) {
-			ZipEntry zipEntry = zipEntries.nextElement();
-			String name = zipEntry.getName();
-			if ( ! zipEntry.isDirectory() && name.equals(entryName)  ) {
-				return zipEntry;
-			}
-		}
-		return null;
-	}
-	
 	public InputStream findEntryInputStream(String entryName) throws IOException {
-		ZipEntry entry = findEntry(entryName);
-		if ( entry == null ) {
+		File file = extract(entryName, false);
+		if (file == null) {
 			return null;
 		} else {
-			InputStream is = zipFile.getInputStream(entry);
-			return is;
+			return new FileInputStream(file);
 		}
 	}
 
 	public boolean containsEntry(String name) {
-		ZipEntry entry = findEntry(name);
-		return entry != null;
+		File file = extract(name, false);
+		return file != null;
 	}
 	
 	public boolean containsEntriesInPath(String path) {
@@ -157,14 +135,8 @@ public class BackupFileExtractor implements Closeable {
 	}
 	
 	public boolean isIncludingRecordFiles() {
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-			if ( zipEntry.getName().startsWith(RECORD_FILE_DIRECTORY_NAME)) {
-				return true;
-			}
-		}
-		return false;
+		File recordFilesDir = new File(tempUncompressedFolder, RECORD_FILE_DIRECTORY_NAME);
+		return recordFilesDir.exists() && recordFilesDir.isDirectory();
 	}
 
 	public boolean isOldFormat() {
@@ -174,12 +146,32 @@ public class BackupFileExtractor implements Closeable {
 	public int size() {
 		return zipFile.size();
 	}
+	
+	private File getOrCreateEntryFolder(String entryName) {
+		String path = FilenameUtils.getPathNoEndSeparator(entryName);
+		String[] entryParts = path.split("\\|/");
+		File folder = tempUncompressedFolder;
+		for (int i = 0; i < entryParts.length; i++) {
+			String part = entryParts[i];
+			folder = new File(folder, part);
+		}
+		if (! folder.exists()) {
+			folder.mkdirs();
+		}
+		return folder;
+	}
+
+	private String extractFileName(String entryName) {
+		String name = FilenameUtils.getName(entryName);
+		return name;
+	}
 
 	@Override
 	public void close() throws IOException {
 		if (zipFile != null ) {
 			zipFile.close();
 		}
+		FileUtils.deleteQuietly(tempUncompressedFolder);
 	}
 	
 }

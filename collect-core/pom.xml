@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.7.1-SNAPSHOT</version>
+		<version>3.7.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
@@ -371,6 +371,11 @@
 			<groupId>com.dyuproject.protostuff</groupId>
 			<artifactId>protostuff-xml</artifactId>
 			<version>${protostuff.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.lingala.zip4j</groupId>
+			<artifactId>zip4j</artifactId>
+			<version>1.3.2</version>
 		</dependency>
 
 		<!-- TEST DEPENDENCIES -->

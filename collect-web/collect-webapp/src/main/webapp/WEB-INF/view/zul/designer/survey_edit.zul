@@ -12,6 +12,7 @@
 			}
 		}
 	]]></script>
+
 	<borderlayout id="surveyEditBox" 
 		hflex="1" vflex="1"
 		self="@define(content)"
@@ -20,7 +21,7 @@
 		<north border="none">
 			<box width="100%" align="center">
 				<label sclass="mainTitleEditing"
-					value="${labels.designer_title}" />
+					value="@load(vm.surveyEditTitle)" />
 			</box>
 		</north>
 		<center border="none">
