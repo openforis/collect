@@ -8,13 +8,13 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="
 	    http://www.springframework.org/schema/beans
-	    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+	    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
 	    http://www.springframework.org/schema/context
-	    http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	    http://www.springframework.org/schema/context/spring-context-4.1.xsd
 	    http://www.springframework.org/schema/mvc
-	    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+	    http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
 	    http://www.springframework.org/schema/util
-	    http://www.springframework.org/schema/util/spring-util-3.2.xsd"
+	    http://www.springframework.org/schema/util/spring-util-4.1.xsd"
 	default-lazy-init="true">
 	
 	<import resource="classpath:org/openforis/collect/application-context-server.xml"/>
@@ -45,7 +45,6 @@
 		<entry key="/accessDenied.htm" value-ref="fileNameViewController" />
 		<entry key="/exitUser.htm" value-ref="fileNameViewController" />
 		<entry key="/importSurvey.htm" value-ref="fileNameViewController" />
-		<entry key="/login_page.htm" value-ref="fileNameViewController" />
 		<entry key="/logout.htm" value-ref="fileNameViewController" />
 		<entry key="/logoUpload" value-ref="fileNameViewController" />
 

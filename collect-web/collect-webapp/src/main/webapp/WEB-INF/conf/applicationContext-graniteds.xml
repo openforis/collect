@@ -24,12 +24,9 @@
   	xmlns="http://www.springframework.org/schema/beans"
   	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   	xmlns:graniteds="http://www.graniteds.org/config"
-  	xmlns:flex="http://www.springframework.org/schema/flex"
     xsi:schemaLocation="
-    	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-       	http://www.graniteds.org/config http://www.graniteds.org/public/dtd/2.1.0/granite-config-2.1.xsd
-       	http://www.springframework.org/schema/flex 
-    	http://www.springframework.org/schema/flex/spring-flex-1.0.xsd"
+    	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+       	http://www.graniteds.org/config http://www.graniteds.org/public/dtd/2.1.0/granite-config-2.1.xsd"
     default-autowire="byName"
     default-lazy-init="false">
   	    

@@ -71,13 +71,14 @@
 			      </div>
 			    </c:if>
 	    	</div>
+	    	
 	    	<c:url var="loginUrl" value="/login"/>
 			<form name="f" action="${loginUrl}" method="POST">
-				<input type="hidden"                        6
+				<input type="hidden" 
 					name="${_csrf.parameterName}"
 					value="${_csrf.token}"/>
 				<table class="login" width="100%" align="center" style="vertical-align: top; height: 100">
-					<c:if test="${param.logout != null}">       3
+					<c:if test="${param.logout != null}">
 						<tr>
 							<td>You have been logged out.</td>
 						</tr>
