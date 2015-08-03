@@ -8,6 +8,12 @@ import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.model.CollectRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * 
+ * @author D. Wiell
+ * @author S. Ricci
+ *
+ */
 public class SessionEventDispatcher {
 	
 	@Autowired

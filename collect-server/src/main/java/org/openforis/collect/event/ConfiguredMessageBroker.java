@@ -3,6 +3,7 @@ package org.openforis.collect.event;
 import static org.openforis.collect.utils.Files.eraseFileContent;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -37,6 +38,12 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.ScheduledReporter;
 import com.codahale.metrics.Timer;
 
+/**
+ * 
+ * @author D. Wiell
+ * @author S. Ricci
+ *
+ */
 public class ConfiguredMessageBroker implements MessageBroker {
 
 	private static final Logger LOG = Logger.getLogger(ConfiguredMessageBroker.class);
@@ -103,18 +110,12 @@ public class ConfiguredMessageBroker implements MessageBroker {
 
 		private static final String METRICS_LOG_FILE_NAME = "metrics.log";
 		private File outputFile;
-		private ConsoleReporter reporter;
-		private FileOutputStream fileOutputStream;
+		private MetricRegistry registry;
 
 		protected FileReporter(MetricRegistry registry) throws IOException {
 			super(registry, "file-reporter", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
+			this.registry = registry;
 			outputFile = getMetricsOutputFile();
-			fileOutputStream = new FileOutputStream(outputFile);
-			reporter = ConsoleReporter.forRegistry(registry)
-					.convertRatesTo(TimeUnit.SECONDS)
-					.convertDurationsTo(TimeUnit.MILLISECONDS)
-					.outputTo(new PrintStream(fileOutputStream))
-					.build();
 		}
 
 		@Override
@@ -123,11 +124,14 @@ public class ConfiguredMessageBroker implements MessageBroker {
 				SortedMap<String, Histogram> histograms,
 				SortedMap<String, Meter> meters,
 				SortedMap<String, Timer> timers) {
+			ScheduledReporter reporter = null;
 			try {
-				eraseOutputFileContent();
+				reporter = createInternalReporter();
 				reporter.report(gauges, counters, histograms, meters, timers);
 			} catch (IOException e) {
 				LOG.warn("Failed to write to metrics log file: " + outputFile.getAbsolutePath(), e);
+			} finally {
+				IOUtils.closeQuietly(reporter);
 			}
 		}
 
@@ -152,15 +156,16 @@ public class ConfiguredMessageBroker implements MessageBroker {
 			throw new IOException("Error writing metrics log file");
 		}
 		
-		private void eraseOutputFileContent() throws IOException {
-			fileOutputStream.write(new byte[] {});
+		private ScheduledReporter createInternalReporter() throws FileNotFoundException {
+			FileOutputStream fileOutputStream = new FileOutputStream(this.outputFile);
+			ScheduledReporter reporter = ConsoleReporter.forRegistry(this.registry)
+							.convertRatesTo(TimeUnit.SECONDS)
+							.convertDurationsTo(TimeUnit.MILLISECONDS)
+							.outputTo(new PrintStream(fileOutputStream))
+							.build();
+			return reporter;	
 		}
-		
-		@Override
-		public void close() {
-			super.close();
-			IOUtils.closeQuietly(reporter);
-		}
+
 	}
 
 }

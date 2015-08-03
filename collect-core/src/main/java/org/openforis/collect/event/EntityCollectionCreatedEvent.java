@@ -3,6 +3,12 @@ package org.openforis.collect.event;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 
+ * @author D. Wiell
+ * @author S. Ricci
+ *
+ */
 public class EntityCollectionCreatedEvent extends RecordEvent {
 
 	public EntityCollectionCreatedEvent(String surveyName, Integer recordId,

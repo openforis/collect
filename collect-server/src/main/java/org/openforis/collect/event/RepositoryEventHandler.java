@@ -12,6 +12,12 @@ import org.openforis.concurrency.ProgressListener;
 import org.openforis.rmb.KeepAlive;
 import org.openforis.rmb.KeepAliveMessageHandler;
 
+/**
+ * 
+ * @author D. Wiell
+ * @author S. Ricci
+ *
+ */
 public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 
 	private static final Log LOG = LogFactory.getLog(RepositoryEventHandler.class);

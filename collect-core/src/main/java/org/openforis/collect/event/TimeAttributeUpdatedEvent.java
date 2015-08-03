@@ -3,6 +3,12 @@ package org.openforis.collect.event;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 
+ * @author D. Wiell
+ * @author S. Ricci
+ *
+ */
 public class TimeAttributeUpdatedEvent extends AttributeUpdatedEvent {
 
 	private final Date time;
