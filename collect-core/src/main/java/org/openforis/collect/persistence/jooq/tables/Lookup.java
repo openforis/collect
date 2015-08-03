@@ -62,10 +62,6 @@ public class Lookup extends TableImpl<LookupRecord> {
 		return createField(name, org.jooq.impl.SQLDataType.INTEGER, this);
 	}
 	
-	public <T> TableField<LookupRecord, T> createField(String name, DataType<T> type) {
-		return createField(name, type, this);
-	}
-
 	public TableField<LookupRecord, ?> createField(String name, int sqlDataType) {
 		return createField(name, getDataType(sqlDataType), this);
 	}

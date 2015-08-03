@@ -42,12 +42,13 @@ import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.relational.data.ColumnValuePair;
 import org.openforis.collect.relational.data.internal.DataTableDataExtractor;
 import org.openforis.collect.relational.jooq.JooqDatabaseExporter;
-import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreator;
+import org.openforis.collect.relational.jooq.JooqRelationalSchemaCreator;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.concurrency.ProgressListener;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
@@ -95,11 +96,11 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	}
 	
 	@Override
-	public void createRepositories(String surveyName) {
+	public void createRepositories(String surveyName, ProgressListener progressListener) {
 		initializeRelationalSchemaDefinition(surveyName);
 		for (RecordStep step : RecordStep.values()) {
 			try {
-				createRepository(surveyName, step);
+				createRepository(surveyName, step, progressListener);
 			} catch(CollectRdbException e) {
 				LOG.error("Error generating RDB for survey " + surveyName, e);
 			}
@@ -107,46 +108,46 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	}
 
 	@Override
-	public void createRepository(final String surveyName, final RecordStep recordStep) {
-		deleteRDB(surveyName, recordStep);
+	public void createRepository(final String surveyName, final RecordStep recordStep, final ProgressListener progressListener) {
+		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
 		
 		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
 		
 		withConnection(surveyName, recordStep, new Callback() {
 			public void execute(Connection connection) {
-				RelationalSchemaCreator relationalSchemaCreator = new LiquibaseRelationalSchemaCreator();
+				RelationalSchemaCreator relationalSchemaCreator = new JooqRelationalSchemaCreator();
 				relationalSchemaCreator.createRelationalSchema(relationalSchema, connection);
-				
-				insertRecords(surveyName, recordStep, relationalSchema, connection);
+				insertRecords(surveyName, recordStep, relationalSchema, connection, progressListener);
 			}
 		});
 	}
 
 	private void insertRecords(String surveyName, RecordStep recordStep, 
-			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
+			RelationalSchema targetSchema, Connection targetConn,
+			ProgressListener progressListener) throws CollectRdbException {
 		CollectSurvey survey = surveyManager.get(surveyName);
 		DatabaseExporter databaseUpdater = createRDBUpdater(targetConn);
-		databaseUpdater.insertReferenceData(targetSchema);
+		databaseUpdater.insertReferenceData(targetSchema, progressListener);
 		RecordFilter recordFilter = new RecordFilter(survey);
 		Step step = Step.fromRecordStep(recordStep);
-		recordFilter.setStep(step);
+		recordFilter.setStepGreaterOrEqual(step);
 		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
 		for (int i = 0; i < summaries.size(); i++) {
 			CollectRecord summary = summaries.get(i);
 			CollectRecord record = recordManager.load(survey, summary.getId(), step);
-			databaseUpdater.insertData(targetSchema, record);
+			databaseUpdater.insertRecordData(targetSchema, record, progressListener);
 		}
 	}
 
 	@Override
-	public void updateRepositories(String surveyName) {
-		createRepositories(surveyName);
+	public void updateRepositories(String surveyName, ProgressListener progressListener) {
+		createRepositories(surveyName, progressListener);
 	}
 
 	@Override
 	public void deleteRepositories(String surveyName) {
 		for (RecordStep step : RecordStep.values()) {
-			deleteRDB(surveyName, step);
+			localRDBStorageManager.deleteRDBFile(surveyName, step);
 		}
 		relationalSchemaDefinitionBySurveyName.remove(surveyName);
 	}
@@ -178,13 +179,6 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		return result;
 	}
 
-	private void deleteRDB(String surveyName, RecordStep step) {
-		File rdbFile = localRDBStorageManager.getRDBFile(surveyName, step);
-		if (rdbFile != null && rdbFile.exists()) {
-			rdbFile.delete();
-		}
-	}
-	
 	private RelationalSchema getOrInitializeRelationalSchemaDefinition(
 			final String surveyName) {
 		if (! relationalSchemaDefinitionBySurveyName.containsKey(surveyName)) {
@@ -324,7 +318,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 			BigInteger pkValue = DataTableDataExtractor.getTableArtificialPK(recordEvent.getRecordId(), tableNodeDef, rowNodeId);
 			List<ColumnValuePair<DataColumn, ?>> columnValuePairs = toColumnValuePairs(dataTable, def);
-			rdbUpdater.updateData(rdbSchema, dataTable, pkValue, columnValuePairs);
+			rdbUpdater.updateEntityData(rdbSchema, dataTable, pkValue, columnValuePairs);
 		}
 
 		@SuppressWarnings("unchecked")
@@ -407,7 +401,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 
 		private void deleteRecord() {
-			rdbUpdater.deleteData(rdbSchema, recordEvent.getRecordId(), getDefinitionId());
+			rdbUpdater.deleteRecordData(rdbSchema, recordEvent.getRecordId(), getDefinitionId());
 		}
 		
 		private Integer getParentEntityId() {

@@ -11,7 +11,7 @@ import org.openforis.collect.manager.process.DataProcessingState;
  * @author S. Ricci
  *
  */
-public class DataImportState extends DataProcessingState {
+public class DataImportState extends DataProcessingState{
 
 	/**
 	 * 

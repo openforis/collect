@@ -42,9 +42,19 @@ public class CollectLocalRDBStorageManager extends BaseStorageManager {
 	public File getRDBFile(String surveyName, RecordStep step) {
 		return new File(storageDirectory, getRDBFileName(surveyName, step));
 	}
+	
+	public boolean deleteRDBFile(String surveyName, RecordStep step) {
+		File rdbFile = getRDBFile(surveyName, step);
+		File rdbJournalFile = new File(getRDBJournalFileName(surveyName, step));
+		rdbJournalFile.delete(); //don't care if it exists or not
+		return rdbFile.delete();
+	}
 
 	private String getRDBFileName(String surveyName, RecordStep step) {
 		return String.format("%s_%s.db", surveyName, step.name().toLowerCase());
 	}
 
+	private String getRDBJournalFileName(String surveyName, RecordStep step) {
+		return String.format("%s_%s.db-journal", surveyName, step.name().toLowerCase());
+	}
 }

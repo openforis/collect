@@ -4,15 +4,15 @@
 	<parent>
 		<groupId>org.openforis.collect</groupId>
 		<artifactId>collect</artifactId>
-		<version>3.6.18-SNAPSHOT</version>
+		<version>3.7.4-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>collect-core</artifactId>
 	<packaging>jar</packaging>
 
 	<properties>
-		<jooq.version>3.5.4</jooq.version>
-		<jooq-codegen.version>3.5.4</jooq-codegen.version>
+		<jooq.version>3.6.2</jooq.version>
+		<jooq-codegen.version>3.6.2</jooq-codegen.version>
 		<protostuff.version>1.0.4</protostuff.version>
 	</properties>
 
@@ -371,6 +371,11 @@
 			<groupId>com.dyuproject.protostuff</groupId>
 			<artifactId>protostuff-xml</artifactId>
 			<version>${protostuff.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.lingala.zip4j</groupId>
+			<artifactId>zip4j</artifactId>
+			<version>1.3.2</version>
 		</dependency>
 
 		<!-- TEST DEPENDENCIES -->

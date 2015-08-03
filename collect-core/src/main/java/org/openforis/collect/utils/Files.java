@@ -26,5 +26,29 @@ public class Files {
 		return file;
 	}
 	
+	public static File createTempDirectory() throws IOException {
+		File temp = File.createTempFile("temp", Long.toString(System.nanoTime()));
+		if (! temp.delete()) {
+			throw new IOException("Could not delete temp file: "
+					+ temp.getAbsolutePath());
+		}
+		if (! temp.mkdir()) {
+			throw new IOException("Could not create temp directory: "
+					+ temp.getAbsolutePath());
+		}
+
+		return (temp);
+	}
+
+	public static void eraseFileContent(File file) throws IOException {
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(file);
+			writer.write("");
+			writer.flush();
+		} finally {
+			IOUtils.closeQuietly(writer);
+		}
+	}
 	
 }

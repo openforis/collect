@@ -1,13 +1,19 @@
 package org.openforis.collect.event;
 
-import org.fao.foris.simpleeventbroker.EventBroker;
 import org.openforis.collect.relational.event.InitializeRDBEvent;
+import org.openforis.rmb.MessageQueue;
 
+/**
+ * 
+ * @author D. Wiell
+ * @author S. Ricci
+ *
+ */
 public class EventBrokerEventQueue implements EventQueue {
 	
-	private EventBroker queue;
+	private MessageQueue<Object> queue;
 	
-	public EventBrokerEventQueue(EventBroker queue) {
+	public EventBrokerEventQueue(MessageQueue<Object> queue) {
 		super();
 		this.queue = queue;
 	}

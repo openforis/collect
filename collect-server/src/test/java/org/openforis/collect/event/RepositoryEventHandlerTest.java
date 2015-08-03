@@ -8,6 +8,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.relational.ReportingRepositories;
+import org.openforis.concurrency.ProgressListener;
+import org.openforis.rmb.KeepAlive;
 
 public class RepositoryEventHandlerTest {
 	
@@ -86,7 +88,11 @@ public class RepositoryEventHandlerTest {
 	}
 	
 	private void handle(SurveyEvent event) {
-		handler.handle(event, null);
+		handler.handle(event, new KeepAlive() {
+			@Override
+			public void send() {
+			}
+		});
 	}
 
 	private static final class FakeReportingRepositories implements
@@ -105,7 +111,7 @@ public class RepositoryEventHandlerTest {
 		int getRepositoryPathsCalls;
 		
 		@Override
-		public void createRepository(String surveyName, RecordStep recordStep) {
+		public void createRepository(String surveyName, RecordStep recordStep, ProgressListener progressListener) {
 			createRepositoryCalls ++;
 			if (createRepositoryFails > 0) {
 				createRepositoryFails --;
@@ -114,7 +120,7 @@ public class RepositoryEventHandlerTest {
 		}
 		
 		@Override
-		public void createRepositories(String surveyName) {
+		public void createRepositories(String surveyName, ProgressListener progressListener) {
 			createRepositoriesCalls ++;
 			if (createRepositoriesFails > 0) {
 				createRepositoriesFails --;
@@ -123,7 +129,7 @@ public class RepositoryEventHandlerTest {
 		}
 		
 		@Override
-		public void updateRepositories(String surveyName) {
+		public void updateRepositories(String surveyName, ProgressListener progressListener) {
 			updateRepositoriesCalls ++;
 			if (updateRepositoriesFails > 0) {
 				updateRepositoriesFails --;

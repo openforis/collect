@@ -27,6 +27,7 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 
 	public static final String CODE_COLUMN_SUFFIX = "_code";
 	public static final String LABEL_COLUMN_SUFFIX = "_label";
+	public static final String DESCRIPTION_COLUMN_SUFFIX = "_description";
 	public static final String LEVEL_NAME_COLUMN_EXPR = "[a-z][a-z0-9_]*";
 	public static final String CODE_COLUMN_EXPR = "^" + LEVEL_NAME_COLUMN_EXPR + CODE_COLUMN_SUFFIX + "$";
 	public static final String LABEL_COLUMN_EXPR = "^" + LEVEL_NAME_COLUMN_EXPR + "$";
@@ -83,6 +84,11 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 		return colNames;
 	}
 
+	private static String[] getPossibleDefaultLanguageDescriptionColumnNames(String defaultLanguage, String level) {
+		String[] colNames = {level, level + DESCRIPTION_COLUMN_SUFFIX, level + DESCRIPTION_COLUMN_SUFFIX + "_" + defaultLanguage};
+		return colNames;
+	}
+	
 	public List<String> getLevels() {
 		return levels;
 	}
@@ -116,6 +122,7 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 				if ( code != null ) {
 					line.addLevelCode(code);
 					addLabels(line, languages, level, i);
+					addDescriptions(line, languages, level, i);
 				} else {
 					break;
 				}
@@ -133,10 +140,28 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 			}
 			//add labels per each language
 			for (String lang : languages) {
-				String labelColumnName = level + LABEL_COLUMN_SUFFIX + "_" + lang;
-				String l = getColumnValue(labelColumnName, false, String.class);
+				String textColumnName = level + LABEL_COLUMN_SUFFIX + "_" + lang;
+				String l = getColumnValue(textColumnName, false, String.class);
 				if ( l != null ) {
 					line.addLabel(levelIdx, lang, l);
+				}
+			}
+		}
+
+		private void addDescriptions(CodeListLine line, List<String> languages,
+				String level, int levelIdx) throws ParsingException {
+			//add default language description
+			String defaultLangLabel = getDefaultLanguageDescription(level);
+			if ( defaultLangLabel != null ) {
+				String defaultLang = ((CodeListCSVReader) reader).getDefaultLanguage();
+				line.addDescription(levelIdx, defaultLang, defaultLangLabel);
+			}
+			//add labels per each language
+			for (String lang : languages) {
+				String textColumnName = level + DESCRIPTION_COLUMN_SUFFIX + "_" + lang;
+				String l = getColumnValue(textColumnName, false, String.class);
+				if ( l != null ) {
+					line.addDescription(levelIdx, lang, l);
 				}
 			}
 		}
@@ -145,9 +170,24 @@ public class CodeListCSVReader extends CSVDataImportReader<CodeListLine> {
 				throws ParsingException {
 			String defaultLangLabel = null;
 			String defaultLang = ((CodeListCSVReader) reader).getDefaultLanguage();
-			String[] defaultLangLabelColNames = getPossibleDefaultLanguageLabelColumnNames(defaultLang, levelName);
-			for (String defaultLangLabelColName : defaultLangLabelColNames) {
-				String label = getColumnValue(defaultLangLabelColName, false, String.class);
+			String[] defaultLangColNames = getPossibleDefaultLanguageLabelColumnNames(defaultLang, levelName);
+			for (String defaultLangColName : defaultLangColNames) {
+				String label = getColumnValue(defaultLangColName, false, String.class);
+				if ( label != null ) {
+					defaultLangLabel = label;
+					break;
+				}
+			}
+			return defaultLangLabel;
+		}
+
+		private String getDefaultLanguageDescription(String levelName)
+				throws ParsingException {
+			String defaultLangLabel = null;
+			String defaultLang = ((CodeListCSVReader) reader).getDefaultLanguage();
+			String[] defaultLangColNames = getPossibleDefaultLanguageDescriptionColumnNames(defaultLang, levelName);
+			for (String defaultLangColName : defaultLangColNames) {
+				String label = getColumnValue(defaultLangColName, false, String.class);
 				if ( label != null ) {
 					defaultLangLabel = label;
 					break;

@@ -1,5 +1,11 @@
 package org.openforis.collect.event;
 
+/**
+ * 
+ * @author D. Wiell
+ * @author S. Ricci
+ *
+ */
 public interface EventQueue {
 
 	void publish(RecordTransaction recordTransaction);

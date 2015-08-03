@@ -72,7 +72,15 @@ public class CollectDSLContext extends DefaultDSLContext {
 			return true;
 		}
 	}
-
+	
+	public boolean isSchemaLess() {
+		return ! configuration().settings().isRenderSchema();
+	}
+	
+	public boolean isForeignKeySupported() {
+		return ! isSQLite();
+	}
+	
 	public boolean isSQLite() {
 		return getDialect() == SQLDialect.SQLITE;
 	}

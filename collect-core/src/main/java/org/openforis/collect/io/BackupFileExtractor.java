@@ -1,5 +1,6 @@
 package org.openforis.collect.io;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,7 +20,9 @@ import org.apache.commons.io.FilenameUtils;
  * @author S. Ricci
  *
  */
-public class BackupFileExtractor {
+public class BackupFileExtractor implements Closeable {
+
+	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
 
 	private ZipFile zipFile;
 
@@ -141,9 +144,42 @@ public class BackupFileExtractor {
 		List<String> entryNames = listEntriesInPath(path);
 		return ! entryNames.isEmpty();
 	}
+	
+	public List<String> getEntryNames() {
+		List<String> result = new ArrayList<String>();
+		Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+		while ( zipEntries.hasMoreElements() ) {
+			ZipEntry zipEntry = zipEntries.nextElement();
+			String name = zipEntry.getName();
+			result.add(name);
+		}
+		return result;
+	}
+	
+	public boolean isIncludingRecordFiles() {
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		while (entries.hasMoreElements()) {
+			ZipEntry zipEntry = (ZipEntry) entries.nextElement();
+			if ( zipEntry.getName().startsWith(RECORD_FILE_DIRECTORY_NAME)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public boolean isOldFormat() {
 		return ! containsEntry(SurveyBackupJob.INFO_FILE_NAME);
+	}
+	
+	public int size() {
+		return zipFile.size();
+	}
+
+	@Override
+	public void close() throws IOException {
+		if (zipFile != null ) {
+			zipFile.close();
+		}
 	}
 	
 }
