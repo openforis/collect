@@ -14,13 +14,12 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.jooq.JooqDatabaseExporter;
-import org.openforis.collect.relational.liquibase.LiquibaseRelationalSchemaCreator;
+import org.openforis.collect.relational.jooq.JooqRelationalSchemaCreator;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.concurrency.ProgressListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +38,6 @@ public class CollectRDBPublisher {
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
-	@Qualifier("dataSource")
 	private DataSource dataSource;
 	
 	public void export(String surveyName, String rootEntityName, Step step,
@@ -61,7 +59,7 @@ public class CollectRDBPublisher {
 		RelationalSchemaGenerator schemaGenerator = new RelationalSchemaGenerator(config);
 		RelationalSchema relationalSchema = schemaGenerator.generateSchema(survey, targetSchemaName);
 		
-		RelationalSchemaCreator relationalSchemaCreator = new LiquibaseRelationalSchemaCreator();
+		RelationalSchemaCreator relationalSchemaCreator = createRelationalSchemaCreator();
 		relationalSchemaCreator.createRelationalSchema(relationalSchema, targetConn);
 		
 		// Insert data
@@ -75,10 +73,10 @@ public class CollectRDBPublisher {
 			LOG.info("\nAll records exported");
 		}
 	}
-	
+
 	private void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
 			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
-		DatabaseExporter databaseExporter = new JooqDatabaseExporter(targetConn);
+		DatabaseExporter databaseExporter = createDatabaseExporter(targetConn);
 		databaseExporter.insertReferenceData(targetSchema, ProgressListener.NULL_PROGRESS_LISTENER);
 		for (int i = 0; i < summaries.size(); i++) {
 			CollectRecord summary = summaries.get(i);
@@ -94,11 +92,20 @@ public class CollectRDBPublisher {
 			throw new RuntimeException("Error inserting records into relational database", e);
 		}
 	}
-	
+
 	private Connection getTargetConnection() {
 		Connection targetConn = DataSourceUtils.getConnection(dataSource);
 		return targetConn;
 	}
+	
+	private JooqRelationalSchemaCreator createRelationalSchemaCreator() {
+		return new JooqRelationalSchemaCreator();
+	}
+	
+	private DatabaseExporter createDatabaseExporter(Connection targetConn) {
+		return new JooqDatabaseExporter(targetConn);
+	}
+	
 	/*
 	public static void main(String[] args) throws CollectRdbException {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("application-context.xml");

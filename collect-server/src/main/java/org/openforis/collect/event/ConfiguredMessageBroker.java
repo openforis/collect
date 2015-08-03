@@ -1,7 +1,9 @@
 package org.openforis.collect.event;
 
+import static org.openforis.collect.utils.Files.eraseFileContent;
+
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -16,7 +18,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import static org.openforis.collect.utils.Files.*;
 import org.openforis.rmb.MessageBroker;
 import org.openforis.rmb.MessageQueue.Builder;
 import org.openforis.rmb.metrics.MetricsMonitor;
@@ -102,17 +103,17 @@ public class ConfiguredMessageBroker implements MessageBroker {
 
 		private static final String METRICS_LOG_FILE_NAME = "metrics.log";
 		private File outputFile;
-		private PrintStream outputStream;
 		private ConsoleReporter reporter;
+		private FileOutputStream fileOutputStream;
 
 		protected FileReporter(MetricRegistry registry) throws IOException {
 			super(registry, "file-reporter", MetricFilter.ALL, TimeUnit.SECONDS, TimeUnit.MILLISECONDS);
 			outputFile = getMetricsOutputFile();
-			outputStream = new PrintStream(outputFile);
+			fileOutputStream = new FileOutputStream(outputFile);
 			reporter = ConsoleReporter.forRegistry(registry)
 					.convertRatesTo(TimeUnit.SECONDS)
 					.convertDurationsTo(TimeUnit.MILLISECONDS)
-					.outputTo(outputStream)
+					.outputTo(new PrintStream(fileOutputStream))
 					.build();
 		}
 
@@ -122,15 +123,14 @@ public class ConfiguredMessageBroker implements MessageBroker {
 				SortedMap<String, Histogram> histograms,
 				SortedMap<String, Meter> meters,
 				SortedMap<String, Timer> timers) {
-//			try {
-//				outputStream.flush();
-//				eraseFileContent(outputFile); TODO it does not work!!!
+			try {
+				eraseOutputFileContent();
 				reporter.report(gauges, counters, histograms, meters, timers);
-//			} catch (FileNotFoundException e) {
-//				LOG.warn("Failed to write to metrics log file: " + outputFile.getAbsolutePath(), e);
-//			}
+			} catch (IOException e) {
+				LOG.warn("Failed to write to metrics log file: " + outputFile.getAbsolutePath(), e);
+			}
 		}
-		
+
 		private File getMetricsOutputFile() throws IOException {
 			@SuppressWarnings("unchecked")
 			Enumeration<Appender> e = Logger.getRootLogger().getAllAppenders();
@@ -150,6 +150,10 @@ public class ConfiguredMessageBroker implements MessageBroker {
 				}
 			}
 			throw new IOException("Error writing metrics log file");
+		}
+		
+		private void eraseOutputFileContent() throws IOException {
+			fileOutputStream.write(new byte[] {});
 		}
 		
 		@Override
