@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
     http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-	
+
 	<display-name>collect</display-name>
 
 	<context-param>
@@ -32,131 +32,319 @@
 		<param-name>db.encryptpassword</param-name>
 		<param-value>true</param-value>
 	</context-param>
-	<context-param>
-		<param-name>foodmart.url</param-name>
-		<param-value>jdbc:h2:mem:foodmart;MODE=MySQL</param-value>
-	</context-param>
-	<context-param>
-		<param-name>foodmart.user</param-name>
-		<param-value>sa</param-value>
-	</context-param>
-	<context-param>
-		<param-name>foodmart.password</param-name>
-		<param-value></param-value>
-	</context-param>
+	<!-- <context-param> -->
+	<!-- <param-name>foodmart.url</param-name> -->
+	<!-- <param-value>jdbc:h2:mem:foodmart;MODE=MySQL</param-value> -->
+	<!-- </context-param> -->
+	<!-- <context-param> -->
+	<!-- <param-name>foodmart.user</param-name> -->
+	<!-- <param-value>sa</param-value> -->
+	<!-- </context-param> -->
+	<!-- <context-param> -->
+	<!-- <param-name>foodmart.password</param-name> -->
+	<!-- <param-value></param-value> -->
+	<!-- </context-param> -->
 	<context-param>
 		<param-name>db.tcpServer</param-name>
 		<param-value>-tcpAllowOthers</param-value>
 	</context-param>
-	<!-- enf of Saiku -->
-	
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>
+	<!-- end of Saiku -->
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
             /WEB-INF/conf/applicationContext.xml
             /WEB-INF/conf/applicationContext-database.xml
-<!--             /WEB-INF/conf/saiku/applicationContext-saiku-security.xml -->
-<!--             /WEB-INF/conf/saiku/applicationContext-saiku-beans.xml -->
+            /WEB-INF/conf/saiku/applicationContext-saiku.xml
 			/WEB-INF/conf/applicationContext-security.xml
-			/WEB-INF/conf/applicationContext-graniteds.xml
+<!-- 			/WEB-INF/conf/applicationContext-graniteds.xml -->
         </param-value>
-  </context-param>
+	</context-param>
 
-  <listener>
-    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.granite.config.GraniteConfigListener</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.openforis.collect.web.listener.SessionListener</listener-class>
-  </listener>
-  <listener>
-    <description>Used to cleanup when a session is destroyed</description>
-    <display-name>ZK Session cleaner</display-name>
-    <listener-class>org.zkoss.zk.ui.http.HttpSessionListener</listener-class>
-  </listener>
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+	<listener>
+		<listener-class>org.granite.config.GraniteConfigListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.openforis.collect.web.listener.SessionListener</listener-class>
+	</listener>
+	<listener>
+		<description>Used to cleanup when a session is destroyed</description>
+		<display-name>ZK Session cleaner</display-name>
+		<listener-class>org.zkoss.zk.ui.http.HttpSessionListener</listener-class>
+	</listener>
 
-  <filter>
-    <filter-name>localizationFilter</filter-name>
-    <filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
-  </filter>
-  <filter>
-    <filter-name>characterEncodingFilter</filter-name>
-    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-    <init-param>
-      <param-name>encoding</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-  </filter>
-  <filter>
-    <filter-name>springSecurityFilterChain</filter-name>
-    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-  </filter>
-  <!-- swf cache filter (adds max-age=0 in response header to prevent wrong 
-    caching of swf files) -->
-  <filter>
-    <filter-name>swfCache</filter-name>
-    <filter-class>com.samaxes.filter.CacheFilter</filter-class>
-    <init-param>
-      <param-name>private</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <init-param>
-      <param-name>expirationTime</param-name>
-      <param-value>0</param-value>
-    </init-param>
-  </filter>
+	<filter>
+		<filter-name>localizationFilter</filter-name>
+		<filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
+	</filter>
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<!-- swf cache filter (adds max-age=0 in response header to prevent wrong 
+		caching of swf files) -->
+	<filter>
+		<filter-name>swfCache</filter-name>
+		<filter-class>com.samaxes.filter.CacheFilter</filter-class>
+		<init-param>
+			<param-name>private</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>expirationTime</param-name>
+			<param-value>0</param-value>
+		</init-param>
+	</filter>
 
-  <filter-mapping>
-    <filter-name>localizationFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>characterEncodingFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>springSecurityFilterChain</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <!-- start of cache filter mapping -->
-  <filter-mapping>
-    <filter-name>swfCache</filter-name>
-    <url-pattern>*.swf</url-pattern>
-  </filter-mapping>
-  <!-- end of cache filter mapping -->
+	<filter-mapping>
+		<filter-name>localizationFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- start of cache filter mapping -->
+	<filter-mapping>
+		<filter-name>swfCache</filter-name>
+		<url-pattern>*.swf</url-pattern>
+	</filter-mapping>
+	<!-- end of cache filter mapping -->
 
-  <servlet>
-    <servlet-name>dispatcher</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet>
-    <servlet-name>openforis-collect-init-servlet</servlet-name>
-    <servlet-class>org.openforis.collect.web.servlet.InitServlet</servlet-class>
-    <load-on-startup>2</load-on-startup>
-  </servlet>
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>openforis-collect-init-servlet</servlet-name>
+		<servlet-class>org.openforis.collect.web.servlet.InitServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<!-- Saiku -->
+	<!-- ====================================================================== -->
+	<!-- W E B D A V S E R V L E T -->
+	<!-- ====================================================================== -->
+	<servlet>
+		<servlet-name>Webdav</servlet-name>
+		<servlet-class>org.saiku.repository.SaikuWebdavServlet</servlet-class>
+		<!-- <description> -->
+		<!-- The webdav servlet that connects HTTP request to the repository. -->
+		<!-- </description> -->
+		<init-param>
+			<param-name>resource-path-prefix</param-name>
+			<param-value>/repository</param-value>
+			<!-- <description> -->
+			<!-- defines the prefix for spooling resources out of the repository. -->
+			<!-- </description> -->
+		</init-param>
+		<init-param>
+			<param-name>resource-config</param-name>
+			<param-value>/WEB-INF/conf/saiku/webdav-config.xml</param-value>
+			<!-- <description> -->
+			<!-- Defines various dav-resource configuration parameters. -->
+			<!-- </description> -->
+		</init-param>
+		<load-on-startup>4</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>jersey2</servlet-name>
+		<servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+		<init-param>
+			<param-name>com.sun.jersey.config.property.packages</param-name>
+			<param-value>org.saiku.web;com.fasterxml.jackson.jaxrs.json</param-value>
+		</init-param>
+		<init-param>
+			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<!--<init-param> <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name> 
+			<param-value>com.sun.jersey.api.container.filter.PostReplaceFilter</param-value> 
+			</init-param> -->
+		<init-param>
+			<param-name>com.sun.jersey.config.feature.Trace</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxrs.providers</param-name>
+			<param-value>org.saiku.web.rest.SerializableProvider</param-value>
+		</init-param>
+		<!-- <init-param> <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name> 
+			<param-value>com.sun.jersey.api.container.filter.GZIPContentEncodingFilter</param-value> 
+			</init-param> -->
+	
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>xmla</servlet-name>
+		<servlet-class>org.saiku.olap.util.SaikuXmlaServlet</servlet-class>
 
-  <servlet-mapping>
-    <servlet-name>dispatcher</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
+		<init-param>
+			<param-name>OlapDriverUsePreConfiguredDiscoverDatasourcesResponse</param-name>
+			<param-value>true</param-value>
+		</init-param>
 
-  <session-config>
-    <session-timeout>2</session-timeout>
-  </session-config>
+		<init-param>
+			<param-name>OlapDriverDiscoverDatasources.dataSourceName</param-name>
+			<param-value>[XMLA olap4ld]</param-value>
+		</init-param>
 
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-  </welcome-file-list>
+		<init-param>
+			<param-name>OlapDriverDiscoverDatasources.dataSourceInfo</param-name>
+			<param-value>[LdCatalogSchema]</param-value>
+		</init-param>
+		<init-param>
+			<param-name>OlapDriverDiscoverDatasources.url</param-name>
+			<param-value>@datasourceUrl@</param-value>
+		</init-param>
+		<init-param>
+			<param-name>OlapDriverDiscoverDatasources.providerType</param-name>
+			<param-value>TDP</param-value>
+		</init-param>
 
-  <error-page>
-    <error-code>403</error-code>
-    <location>/error.htm</location>
-  </error-page>
+		<init-param>
+			<param-name>OlapDriverDiscoverDatasources.authenticationMode</param-name>
+			<param-value>Unauthenticated</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverMaxNumConnectionsPerUser</param-name>
+			<param-value>15</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverClassName</param-name>
+			<param-value>org.olap4j.driver.olap4ld.Olap4ldDriver</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionString</param-name>
+			<param-value>jdbc:ld://olap4ld;Catalog=LdCatalog;JdbcDrivers=com.mysql.jdbc.Driver;Server=http://;Database=EMBEDDEDSESAME;Datastructuredefinitions=;Datasets=;</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.Prefix</param-name>
+			<param-value>@connectionPrefix@</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.FetchLevelProperties</param-name>
+			<param-value>false</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.FetchMemberProperties</param-name>
+			<param-value>false</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.FetchMembers</param-name>
+			<param-value>true</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.QueryTimeoutMs</param-name>
+			<param-value>@queryTimeout@</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.AuthenticationProvider</param-name>
+			<param-value>com.someotherclass.XmlaAuthenticationProvider</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.ConnectionTimeoutMs</param-name>
+			<param-value>@connectionTimeout@</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.TotalCellLimit</param-name>
+			<param-value>@totalCellLimit@</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.PerPivotCellLimit</param-name>
+			<param-value>@perPivotCellLimit@</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>OlapDriverConnectionProperty.Source</param-name>
+			<param-value>Excel</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>IdleConnectionsTimeoutMinutes</param-name>
+			<param-value>@idleConnectionCleanupTimeout@</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>EnableConnectionReuse</param-name>
+			<param-value>@enableConnectionsReuse@</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>EnableCubesMetadataPrefetch</param-name>
+			<param-value>@enableCubesMetadataPrefetch@</param-value>
+		</init-param>
+	</servlet>
+	<!-- end of Saiku -->
+
+	<!-- ====================================================================== -->
+	<!-- S E R V L E T M A P P I N G -->
+	<!-- ====================================================================== -->
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<!-- Saiku -->
+	<servlet-mapping>
+		<servlet-name>Webdav</servlet-name>
+		<url-pattern>/repository/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>jersey2</servlet-name>
+		<url-pattern>/saiku-rest/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>xmla</servlet-name>
+		<url-pattern>/xmla/*</url-pattern>
+	</servlet-mapping>
+	<!-- end of Saiku -->
+
+	<session-config>
+		<session-timeout>2</session-timeout>
+	</session-config>
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<error-page>
+		<error-code>403</error-code>
+		<location>/error.htm</location>
+	</error-page>
 
 </web-app>

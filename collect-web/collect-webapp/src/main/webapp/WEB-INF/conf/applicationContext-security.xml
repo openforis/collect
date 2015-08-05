@@ -17,8 +17,15 @@
 		<protect-pointcut expression="execution(* org.openforis.collect.remoting.service.*Service.*(..))" access="ROLE_USER"/>
 	</global-method-security>
 	
+	<!-- SAIKU -->
+<!-- 	<http security="none" pattern="/rest/saiku/info" /> -->
+<!-- 	<http security="none" pattern="/rest/saiku/info/ui-settings" /> -->
+<!-- 	<http security="none" pattern="/repository" /> -->
+<!-- 	<http security="none" pattern="/saiku-ui" /> -->
+	<!-- end of SAIKU -->
+	
 	<http access-decision-manager-ref="accessDecisionManager">
-		<headers disabled="true"/>
+<!-- 		<headers disabled="true"/> -->
 		<csrf disabled="true"/>
 		
 		<intercept-url access="permitAll" pattern="collect.swf" />
@@ -54,6 +61,19 @@
 		<intercept-url access="hasRole('ADMIN')" pattern="/validateAllRecords.htm" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/validationReport" />
 		
+		<!-- SAIKU -->
+		<intercept-url access="permitAll" pattern="/repository" />
+		<intercept-url access="permitAll" pattern="/saiku-rest/saiku/info" />
+		<intercept-url access="permitAll" pattern="/saiku-rest/saiku/info/ui-settings" />
+		<intercept-url access="permitAll" pattern="/saiku-ui/**" />
+		<intercept-url access="isAnonymous()" pattern="/serverdocs/**" />
+		<intercept-url access="isAnonymous()" pattern="/WEB-INF/classes/legacy-schema" />
+		<intercept-url access="isAnonymous() or isFullyAuthenticated()" pattern="/saiku-rest/saiku/session*" />
+		<intercept-url access="isAnonymous() or isFullyAuthenticated()" pattern="/saiku-rest/saiku/session/" />
+		<intercept-url access="isFullyAuthenticated()" pattern="/saiku-rest/**" />
+		<intercept-url access="isFullyAuthenticated()" pattern="/json/**" />
+		<!-- END OF SAIKU -->
+		
 		<intercept-url access="hasRole('USER')" pattern="/**" />
 
 		<form-login login-page="/login" 
@@ -63,7 +83,7 @@
 		<logout logout-url="/j_spring_security_logout" />
 	</http>
 	
-	<authentication-manager>
+	<authentication-manager alias="authenticationManager">
 		<authentication-provider user-service-ref="userDetailsService">
 			<password-encoder hash="md5" />
 		</authentication-provider>

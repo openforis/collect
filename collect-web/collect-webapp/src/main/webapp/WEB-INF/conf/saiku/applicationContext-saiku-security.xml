@@ -50,7 +50,9 @@
 			access="isFullyAuthenticated()" />
 		<security:intercept-url pattern="/WEB-INF/classes/legacy-schema"
 			access="isAnonymous()" />
+		
 		<security:logout logout-url="/logout" />
+		
 		<security:http-basic />
 
 	</security:http>

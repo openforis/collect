@@ -48,14 +48,14 @@
 		<appender-ref ref="console" />
 	</category>
 
-	<category name="org.springframework.aop.framework.CglibAopProxy" additivity="false">
-		<priority value="error" />
-		<appender-ref ref="openforis" />
-	</category>
+<!-- 	<category name="org.springframework.aop.framework.CglibAopProxy" additivity="false"> -->
+<!-- 		<priority value="error" /> -->
+<!-- 		<appender-ref ref="openforis" /> -->
+<!-- 	</category> -->
 
 	<!-- Section: ROOT logger -->
 	<root>
-		<priority value="warn" />
+		<priority value="info" />
 		<appender-ref ref="openforis" />
 	</root>
 </log4j:configuration>
