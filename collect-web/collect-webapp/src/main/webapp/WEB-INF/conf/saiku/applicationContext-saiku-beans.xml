@@ -8,14 +8,14 @@
             class="org.saiku.service.datasource.ClassPathResourceDatasourceManager">
             <property name="path" value="res:saiku-datasources" />
         </bean>-->
-    <bean id="repositoryDsManager" class="org.saiku.service.datasource.RepositoryDatasourceManager" init-method="load" destroy-method="unload">
-        <property name="userService" ref="userServiceBean"/>
-        <property name="configurationpath" value="${collect.root}/WEB-INF/conf/saiku/repository/configuration.xml"/>
-        <property name="datadir" value="${collect.root}/WEB-INF/conf/saiku/repository/data"/>
-        <property name="foodmartdir" value="../../data"/>
-        <property name="foodmartschema" value="../../data/FoodMart4.xml"/>
-        <property name="foodmarturl" value="jdbc:h2:mem:foodmart;MODE=MySQL"/>
-    </bean>
+<!--     <bean id="repositoryDsManager" class="org.saiku.service.datasource.RepositoryDatasourceManager" init-method="load" destroy-method="unload"> -->
+<!--         <property name="userService" ref="userServiceBean"/> -->
+<!--         <property name="configurationpath" value="${collect.root}/WEB-INF/conf/saiku/repository/configuration.xml"/> -->
+<!--         <property name="datadir" value="${collect.root}/WEB-INF/conf/saiku/repository/data"/> -->
+<!--         <property name="foodmartdir" value="../../data"/> -->
+<!--         <property name="foodmartschema" value="../../data/FoodMart4.xml"/> -->
+<!--         <property name="foodmarturl" value="jdbc:h2:mem:foodmart;MODE=MySQL"/> -->
+<!--     </bean> -->
 
     <!-- <property name="path" value="file:///var/saiku/saiku-datasources/"/> -->
     <bean id="h2database" class="org.saiku.database.Database" init-method="init">
@@ -25,7 +25,6 @@
 <!--     <bean id="sessionService" class="org.saiku.web.service.SessionService"> -->
 <!--         <property name="authenticationManager" ref="authenticationManager"/> -->
 <!--     </bean> -->
-	<bean id="sessionService" class="org.openforis.collect.saiku.SaikuSessionService" />
 	
     <bean id="securityContextPersistenceFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter"/>
     <bean class="org.saiku.datasources.connection.MondrianVFS" init-method="init" id="mondrianVFS">

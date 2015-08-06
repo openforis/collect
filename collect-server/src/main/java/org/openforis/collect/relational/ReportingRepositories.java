@@ -20,4 +20,6 @@ public interface ReportingRepositories {
 
 	List<String> getRepositoryPaths(String surveyName);
 
+	String getRepositoryPath(String surveyName, RecordStep recordStep);
+	
 }

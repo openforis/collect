@@ -173,10 +173,16 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	public List<String> getRepositoryPaths(String surveyName) {
 		List<String> result = new ArrayList<String>();
 		for (RecordStep recordStep : RecordStep.values()) {
-			File rdbFile = localRDBStorageManager.getRDBFile(surveyName, recordStep);
-			result.add(rdbFile.getAbsolutePath());
+			result.add(getRepositoryPath(surveyName, recordStep));
 		}
 		return result;
+	}
+
+	@Override
+	public String getRepositoryPath(String surveyName, RecordStep recordStep) {
+		File rdbFile = localRDBStorageManager.getRDBFile(surveyName, recordStep);
+		String path = rdbFile.getAbsolutePath();
+		return path;
 	}
 
 	private RelationalSchema getOrInitializeRelationalSchemaDefinition(
@@ -214,8 +220,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 	private Connection createTargetConnection(String surveyName, RecordStep step) throws CollectRdbException {
 		try {
-			File rdbFile = localRDBStorageManager.getRDBFile(surveyName, step);
-			String pathToDbFile = rdbFile.getAbsolutePath();
+			String pathToDbFile = getRepositoryPath(surveyName, step);
 			String connectionUrl = "jdbc:sqlite:" + pathToDbFile;
 			Class.forName(SQLITE_DRIVER_CLASS_NAME);
 			Connection c = DriverManager.getConnection(connectionUrl);

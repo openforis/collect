@@ -1,4 +1,4 @@
-package org.openforis.collect.relational;
+package org.openforis.collect.saiku;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,13 +10,18 @@ import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.mondrian.MondrianSchemaGenerator;
 import org.openforis.collect.relational.mondrian.Schema;
 
-public class SaikuReporting {
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
+public class SaikuMondrianSchemaProvider {
 	
 	private SurveyManager surveyManager;
 	private Map<String, Schema> mondrianSchemaDefinitionBySurveyName;
 	private RelationalSchemaConfig rdbConfig = RelationalSchemaConfig.createDefault();
 
-	public SaikuReporting(SurveyManager surveyManager) {
+	public SaikuMondrianSchemaProvider(SurveyManager surveyManager) {
 		this.surveyManager = surveyManager;
 		this.mondrianSchemaDefinitionBySurveyName = new HashMap<String, Schema>();
 	}
@@ -25,6 +30,10 @@ public class SaikuReporting {
 		initializeMondrianSchemaDefinitions();
 	}
 
+	public Schema getMondrianSchema(String surveyName) {
+		return mondrianSchemaDefinitionBySurveyName.get(surveyName);
+	}
+	
 	private void initializeMondrianSchemaDefinitions() {
 		List<CollectSurvey> surveys = surveyManager.getAll();
 		for (CollectSurvey survey : surveys) {
