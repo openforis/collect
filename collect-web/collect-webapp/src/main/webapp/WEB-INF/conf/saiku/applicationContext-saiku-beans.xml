@@ -22,9 +22,11 @@
         <property name="datasourceManager" ref="repositoryDsManager"/>
     </bean>
 
-    <bean id="sessionService" class="org.saiku.web.service.SessionService">
-        <property name="authenticationManager" ref="authenticationManager"/>
-    </bean>
+<!--     <bean id="sessionService" class="org.saiku.web.service.SessionService"> -->
+<!--         <property name="authenticationManager" ref="authenticationManager"/> -->
+<!--     </bean> -->
+	<bean id="sessionService" class="org.openforis.collect.saiku.SaikuSessionService" />
+	
     <bean id="securityContextPersistenceFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter"/>
     <bean class="org.saiku.datasources.connection.MondrianVFS" init-method="init" id="mondrianVFS">
         <property name="datasourceManager" ref="repositoryDsManager"/>

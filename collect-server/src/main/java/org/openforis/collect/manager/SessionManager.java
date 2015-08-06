@@ -1,10 +1,6 @@
 package org.openforis.collect.manager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -15,8 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.granite.context.GraniteContext;
 import org.granite.messaging.webapp.HttpGraniteContext;
 import org.openforis.collect.designer.session.SessionStatus;
-import org.openforis.collect.event.EventListener;
-import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
@@ -34,7 +28,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * 
  * @author M. Togna
  */
-public class SessionManager implements EventListener {
+public class SessionManager {
 
 	private static Log LOG = LogFactory.getLog(SessionManager.class);
 
@@ -44,28 +38,33 @@ public class SessionManager implements EventListener {
 	private transient UserManager userManager;
 	@Autowired
 	private transient RecordManager recordManager;
-	@Autowired
-	private transient SessionRecordFileManager fileManager;
 	
-	private transient List<RecordEvent> pendingEvents = new CopyOnWriteArrayList<RecordEvent>();
-	
-	@Override
-	public void onEvents(List<? extends RecordEvent> events) {
-		//TODO filter events by active record
-		pendingEvents.addAll(events);
+	public void createSessionState(HttpSession session) {
+		String sessionId = session.getId();
+		SessionState sessionState = new SessionState(sessionId);
+		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
 	}
-	
+
+	public void sessionDestroyed() {
+		CollectRecord activeRecord = getActiveRecord();
+		if (activeRecord != null) {
+			try {
+				releaseRecord();
+			} catch (RecordUnlockedException e) {}
+		}
+	}
+
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
 			throw new InvalidSessionException();
 		}
-		User user = getLoggedInUser();
-		sessionState.setUser(user);
-
+		if (sessionState.getUser() == null) {
+			sessionState.setUser(loadAuthenticatedUser());
+		}
 		return sessionState;
 	}
-	
+
 	public CollectRecord getActiveRecord() {
 		SessionState sessionState = getSessionState();
 		return sessionState.getActiveRecord();
@@ -146,22 +145,43 @@ public class SessionManager implements EventListener {
 			}
 		}
 	}
+
+	public void invalidateSession() {
+		try {
+			releaseRecord();
+		} catch (RecordUnlockedException e) {
+			//do nothing
+		}
+		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
+		if ( graniteContext != null && graniteContext instanceof HttpGraniteContext ) {
+			HttpGraniteContext httpGraniteContext = (HttpGraniteContext) graniteContext;
+			HttpServletRequest request = httpGraniteContext.getRequest();
+			HttpSession session = request.getSession();
+			session.invalidate();
+		}
+	}
 	
-	private User getLoggedInUser() {
-		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-		if (sessionState != null) {
-			User user = sessionState.getUser();
-			if (user == null) {
-				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-				String name = authentication.getName();
-				user = userManager.loadByUserName(name);
-			}
+	public void releaseRecord() throws RecordUnlockedException {
+		checkIsActiveRecordLocked();
+		SessionState sessionState = getSessionState();
+		CollectRecord activeRecord = sessionState.getActiveRecord();
+		if ( activeRecord != null && activeRecord.getId() != null ) {
+			recordManager.releaseLock(activeRecord.getId());
+		}
+		sessionState.setActiveRecord(null);
+	}
+	
+	private User loadAuthenticatedUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null) {
+			String name = authentication.getName();
+			User user = userManager.loadByUserName(name);
 			return user;
 		} else {
 			return null;
 		}
 	}
-
+	
 	private Object getSessionAttribute(String attributeName) {
 		Object result = null;
 		
@@ -177,48 +197,7 @@ public class SessionManager implements EventListener {
 				result = session.getAttribute(attributeName);
 			}
 		}
-		if ( result == null ) {
-			throw new IllegalStateException("Error getting session attribute: " + attributeName);
-		} else {
-			return result;
-		}
-	}
-	
-	public void invalidateSession() {
-		try {
-			releaseRecord();
-		} catch (RecordUnlockedException e) {
-			//do nothing
-		}
-		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
-		if ( graniteContext != null && graniteContext instanceof HttpGraniteContext ) {
-			HttpGraniteContext httpGraniteContext = (HttpGraniteContext) graniteContext;
-			HttpServletRequest request = httpGraniteContext.getRequest();
-			HttpSession session = request.getSession();
-			session.invalidate();
-		}
-	}
-
-	public void releaseRecord() throws RecordUnlockedException {
-		checkIsActiveRecordLocked();
-		SessionState sessionState = getSessionState();
-		CollectRecord activeRecord = sessionState.getActiveRecord();
-		if ( activeRecord != null && activeRecord.getId() != null ) {
-			recordManager.releaseLock(activeRecord.getId());
-		}
-		fileManager.deleteAllTempFiles();
-		sessionState.setActiveRecord(null);
-		
-		pendingEvents.clear();
-	}
-
-	public List<RecordEvent> flushPendingEvents() {
-		if (pendingEvents.isEmpty()) {
-			return Collections.emptyList();
-		}
-		List<RecordEvent> events = new ArrayList<RecordEvent>(pendingEvents);
-		pendingEvents.clear();
-		return events;
+		return result;
 	}
 
 }

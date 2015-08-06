@@ -7,7 +7,7 @@ import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.utils.URIBuilder;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -44,7 +44,7 @@ public class RecordController extends BasicController implements Serializable {
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	
 	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/steps/{step}/binary_data.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody

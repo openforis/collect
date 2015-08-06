@@ -230,6 +230,13 @@ if (! Settings.BIPLUGIN) {
 
         plugins.fetch({
             success: function () {
+            	Saiku.session = new Session({}, {
+                    username: Settings.USERNAME,
+                    password: Settings.PASSWORD
+                });
+            	
+                Saiku.toolbar = new Toolbar();
+                /*
                 var settingsoverride = new SettingsOverrideCollection();
 
                 settingsoverride.fetch({
@@ -350,6 +357,7 @@ if (! Settings.BIPLUGIN) {
 
                     }
                 });
+             	*/
             }
         });
     });

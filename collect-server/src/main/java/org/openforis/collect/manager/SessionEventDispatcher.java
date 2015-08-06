@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SessionEventDispatcher {
 	
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager recordSessionManager;
 
 	private EventBrokerEventQueue eventQueue;
 	
@@ -26,7 +26,7 @@ public class SessionEventDispatcher {
 	}
 	
 	public void recordSaved(CollectRecord record) {
-		List<RecordEvent> events = sessionManager.flushPendingEvents();
+		List<RecordEvent> events = recordSessionManager.flushPendingEvents();
 		if (! events.isEmpty()) {
 			for (RecordEvent event : events) {
 				//TODO remove this, assign an ID to the record immediately when it's created

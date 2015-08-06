@@ -122,10 +122,10 @@
 				</properties>
 			</destination>
 
-			<destination id="sessionService">
+			<destination id="collectSessionService">
 				<properties>
 					<factory>springFactory</factory>
-					<source>sessionService</source>
+					<source>collectSessionService</source>
 					<scope>application</scope>
 				</properties>
 			</destination>

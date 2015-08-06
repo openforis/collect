@@ -4,8 +4,7 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.manager.SessionRecordFileManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.FieldSymbol;
 import org.openforis.collect.remoting.service.FileWrapper;
@@ -42,23 +41,23 @@ public abstract class BaseAttributeUpdateRequestProxy<T extends BaseAttributeUpd
 		throw new UnsupportedOperationException();
 	}
 	
-	public abstract T toAttributeUpdateRequest(CodeListManager codeListManager, SessionRecordFileManager fileManager, 
-			SessionManager sessionManager, CollectRecord record);
+	public abstract T toAttributeUpdateRequest(CodeListManager codeListManager, RecordSessionManager sessionManager, 
+			CollectRecord record);
 	
-	protected File parseFileAttributeValue(SessionRecordFileManager fileManager, CollectRecord record,
-			SessionManager sessionManager, Integer nodeId, Object value) {
+	protected File parseFileAttributeValue(RecordSessionManager sessionManager, CollectRecord record,
+			Integer nodeId, Object value) {
 		File result;
 		if ( value != null ) {
 			if ( value instanceof FileWrapper ) {
 				FileWrapper fileWrapper = (FileWrapper) value;
 				java.io.File tempFile = new java.io.File(fileWrapper.getFilePath());
-				fileManager.indexTempFile(tempFile, nodeId);
+				sessionManager.indexTempRecordFile(tempFile, nodeId);
 				result = new File(tempFile.getAbsolutePath(), tempFile.length());
 			} else {
 				throw new IllegalArgumentException("Invalid value type: expected byte[]");
 			}
 		} else {
-			fileManager.prepareDeleteFile(record, nodeId);
+			sessionManager.prepareDeleteTempRecordFile(record, nodeId);
 			result = null;
 		}
 		return result;

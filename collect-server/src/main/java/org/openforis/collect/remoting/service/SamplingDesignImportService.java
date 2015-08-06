@@ -6,7 +6,7 @@ import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportProcess;
 import org.openforis.collect.io.metadata.samplingdesign.SamplingDesignImportStatus;
 import org.openforis.collect.manager.SamplingDesignManager;
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -28,7 +28,7 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	
 	@Secured("ROLE_ADMIN")
 	public SamplingDesignImportStatusProxy start(String tempFileName, int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption, SurveyImportException {

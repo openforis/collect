@@ -27,9 +27,8 @@ import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordPromoteException;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SessionEventDispatcher;
-import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.manager.SessionRecordFileManager;
 import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -77,15 +76,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataService {
 	
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	@Autowired
 	private transient RecordManager recordManager;
 	@Autowired
 	private transient CodeListManager codeListManager;
 	@Autowired
 	private transient RecordFileManager fileManager;
-	@Autowired
-	private transient SessionRecordFileManager sessionFileManager;
 	@Autowired
 	private transient RecordIndexService recordIndexService;
 	@Autowired
@@ -112,7 +109,6 @@ public class DataService {
 		Step step = stepNumber == null ? null: Step.valueOf(stepNumber);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
 		sessionManager.setActiveRecord(record);
-		sessionFileManager.resetTempInfo();
 		prepareRecordIndexing();
 		Locale locale = sessionState.getLocale();
 		return new RecordProxy(record, locale);
@@ -215,7 +211,7 @@ public class DataService {
 		record.setOwner(user);
 		String sessionId = sessionState.getSessionId();
 		recordManager.save(record, sessionId);
-		if ( sessionFileManager.commitChanges(record) ) {
+		if ( sessionManager.commitRecordFileChanges(record) ) {
 			recordManager.save(record, sessionId);
 		}
 		if ( isCurrentRecordIndexable() ) {
@@ -229,7 +225,7 @@ public class DataService {
 	public NodeChangeSetProxy updateActiveRecord(NodeUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		CollectRecord activeRecord = getActiveRecord();
-		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateRequestSet(codeListManager, sessionFileManager, sessionManager, activeRecord);
+		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateRequestSet(codeListManager, sessionManager, activeRecord);
 		NodeChangeSet changeSet = updateRecord(activeRecord, reqSet);
 		if ( ! changeSet.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
@@ -549,7 +545,7 @@ public class DataService {
 		return sessionState;
 	}
 
-	protected SessionManager getSessionManager() {
+	protected RecordSessionManager getSessionManager() {
 		return sessionManager;
 	}
 

@@ -19,7 +19,7 @@ import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
 import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordManager;
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -44,7 +44,7 @@ public class DataExportService {
 //	private static Log LOG = LogFactory.getLog(DataExportService.class);
 
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired

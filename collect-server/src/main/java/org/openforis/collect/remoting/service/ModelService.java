@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.NodeDefinitionSummary;
 import org.openforis.collect.model.CollectSurvey;
@@ -28,7 +28,7 @@ public class ModelService {
 	private SurveyManager surveyManager;
 
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 
 	@Transactional
 	public List<SurveySummary> getSurveySummaries() {
@@ -72,7 +72,7 @@ public class ModelService {
 		return lang;
 	}
 	
-	protected SessionManager getSessionManager() {
+	protected RecordSessionManager getSessionManager() {
 		return sessionManager;
 	}
 

@@ -6,7 +6,7 @@ import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.io.parsing.CSVFileOptions;
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.codelistimport.CodeListImportProcess;
 import org.openforis.collect.manager.codelistimport.CodeListImportStatus;
 import org.openforis.collect.model.CollectSurvey;
@@ -25,7 +25,7 @@ public class CodeListImportService extends ReferenceDataImportService<CodeListIm
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	
 	@Secured("ROLE_ADMIN")
 	public CodeListImportStatusProxy start(int codeListId, String tempFileName, CSVFileOptions fileOptions, boolean overwriteData) throws DataImportExeption {

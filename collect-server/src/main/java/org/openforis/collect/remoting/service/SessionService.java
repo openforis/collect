@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.openforis.collect.manager.DatabaseVersionManager;
 import org.openforis.collect.manager.DatabaseVersionNotCompatibleException;
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.proxy.SurveyProxy;
 import org.openforis.collect.model.CollectSurvey;
@@ -28,7 +28,7 @@ public class SessionService {
 
 	//private static Log LOG = LogFactory.getLog(SessionService.class);
 	@Autowired
-	protected SessionManager sessionManager;
+	protected RecordSessionManager sessionManager;
 	@Autowired
 	protected SurveyManager surveyManager;
 	@Autowired

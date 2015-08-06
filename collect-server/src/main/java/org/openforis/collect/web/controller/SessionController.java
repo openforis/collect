@@ -1,6 +1,6 @@
 package org.openforis.collect.web.controller;
 
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -20,7 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 public class SessionController {
 	
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	
 	@RequestMapping(value = "/keepSessionAlive.htm", method = RequestMethod.GET)
 	public @ResponseBody String keepSessionAlive(@RequestParam( value="editing", required = false, defaultValue = "false" ) Boolean editing) throws RecordUnlockedException {
