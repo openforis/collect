@@ -6,12 +6,14 @@ import liquibase.database.Database;
 import liquibase.database.core.UnsupportedDatabase;
 import liquibase.database.structure.Column;
 import liquibase.database.structure.ForeignKey;
+import liquibase.database.structure.Index;
 import liquibase.database.structure.PrimaryKey;
 import liquibase.database.structure.Table;
 import liquibase.exception.DatabaseException;
 import liquibase.snapshot.DatabaseSnapshot;
 
 import org.openforis.collect.relational.model.PrimaryKeyColumn;
+import org.openforis.collect.relational.model.PrimaryKeyConstraint;
 import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.UniquenessConstraint;
@@ -34,6 +36,8 @@ class LiquidbaseDatabaseSnapshotBuilder {
 		snapshot = new DatabaseSnapshot(db, null);
 
 		createTables();
+		
+		createPKIndexes();
 		
 		if( dbSupportsFKs ){
 			createForeignKeys();
@@ -105,6 +109,22 @@ class LiquidbaseDatabaseSnapshotBuilder {
 				//Add fk
 				snapshot.getForeignKeys().add(lfk);
 			}
+		}
+	}
+	
+	private void createPKIndexes() {
+		for (org.openforis.collect.relational.model.Table<?> itable : schema.getTables()) {
+			Table ltable = snapshot.getTable(itable.getName());
+			PrimaryKeyConstraint pkConstraint = itable.getPrimaryKeyConstraint();
+			Index index = new Index();
+			index.setTable(ltable);
+			index.setName(pkConstraint.getName() + "_idx");
+			List<org.openforis.collect.relational.model.Column<?>> columns = pkConstraint.getColumns();
+			for (org.openforis.collect.relational.model.Column<?> column : columns) {
+				index.addAssociatedWith(Index.MARK_PRIMARY_KEY);
+				index.getColumns().add(column.getName());
+			}
+			snapshot.getIndexes().add(index);
 		}
 	}
 }
