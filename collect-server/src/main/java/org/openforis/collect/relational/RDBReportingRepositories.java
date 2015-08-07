@@ -134,7 +134,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		List<CollectRecord> summaries = recordManager.loadSummaries(recordFilter);
 		for (int i = 0; i < summaries.size(); i++) {
 			CollectRecord summary = summaries.get(i);
-			CollectRecord record = recordManager.load(survey, summary.getId(), step);
+			CollectRecord record = recordManager.load(survey, summary.getId(), step, false);
 			databaseUpdater.insertRecordData(targetSchema, record, progressListener);
 		}
 	}

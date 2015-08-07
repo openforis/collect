@@ -9,6 +9,7 @@ import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.RDBReportingRepositories;
+import org.saiku.datasources.connection.RepositoryFile;
 import org.saiku.datasources.datasource.SaikuDatasource;
 import org.saiku.service.datasource.RepositoryDatasourceManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,9 +47,11 @@ public class CollectSaikuDatasourceManager extends RepositoryDatasourceManager {
 			RecordStep recordStep) {
 		String id = surveyName + "_" + recordStep.name();
 		String repositoryPath = rdbReportingRepositories.getRepositoryPath(surveyName, recordStep);
-		String jdbcUrl = "jdbc:sqlite:" + repositoryPath;
+		String repositoryJdbcUrl = "jdbc:sqlite:" + repositoryPath;
+		String jdbcDriver = "org.sqlite.JDBC";
+		String jdbcUrl = String.format("jdbc:mondrian:Jdbc=%s;Catalog=mondrian:///datasources/%s.xml;JdbcDrivers=%s", repositoryJdbcUrl, repositoryPath, id, jdbcDriver);
 		Properties props = new Properties();
-		props.put("driver", "org.sqlite.JDBC");
+		props.put("driver", "mondrian.olap4j.MondrianOlap4jDriver");
 		props.put("location", jdbcUrl);
 		props.put("username", "");
 		props.put("password", "");
@@ -75,6 +78,16 @@ public class CollectSaikuDatasourceManager extends RepositoryDatasourceManager {
 	public void unload() {
 	}
 
+	@Override
+	public RepositoryFile getFile(String file) {
+		return null;
+	}
+	
+	@Override
+	public void createUser(String username) {
+		//DO NOTHING
+	}
+	
 	@Override
 	public Map<String, SaikuDatasource> getDatasources() {
 		return datasourceById;

@@ -102,12 +102,14 @@ public class RepositoryEventHandlerTest {
 		int createRepositoriesCalls;
 		int updateRepositoriesCalls;
 		int deleteRepositoriesCalls;
+		int getRepositoryPathFails;
 		int getRepositoryPathsFails;
 		int createRepositoryFails;
 		int createRepositoriesFails;
 		int updateRepositoriesFails;
 		int deleteRepositoriesFails;
 		int processFails;
+		int getRepositoryPathCalls;
 		int getRepositoryPathsCalls;
 		
 		@Override
@@ -165,14 +167,25 @@ public class RepositoryEventHandlerTest {
 			return Collections.emptyList();
 		}
 		
+		@Override
+		public String getRepositoryPath(String surveyName, RecordStep recordStep) {
+			getRepositoryPathCalls ++;
+			if (getRepositoryPathFails > 0) {
+				getRepositoryPathFails --;
+				throw new RuntimeException("getRepositoryPathCalls failed");
+			}
+			return null;
+		}
 		public void reset() {
 			processCalls = 0;
+			getRepositoryPathCalls = 0;
 			getRepositoryPathsCalls = 0;
 			createRepositoryCalls = 0;
 			createRepositoriesCalls = 0;
 			updateRepositoriesCalls = 0;
 			deleteRepositoriesCalls = 0;
 			processFails = 0;
+			getRepositoryPathFails = 0;
 			getRepositoryPathsFails = 0;
 			createRepositoryFails = 0;
 			createRepositoriesFails = 0;
