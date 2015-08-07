@@ -3,6 +3,13 @@ package org.openforis.collect.relational.mondrian;
 import java.util.Arrays;
 import java.util.List;
 
+import mondrian.olap.Cube;
+import mondrian.olap.MondrianDef;
+import mondrian.olap.MondrianDef.Column;
+import mondrian.olap.MondrianDef.Key;
+import mondrian.olap.MondrianDef.PhysicalSchema;
+import mondrian.olap.MondrianDef.Table;
+
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.RelationalSchemaCreator;
 import org.openforis.collect.relational.jooq.JooqRelationalSchemaCreator;
@@ -10,11 +17,13 @@ import org.openforis.collect.relational.model.PrimaryKeyConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
-import org.openforis.collect.relational.mondrian4.Column;
-import org.openforis.collect.relational.mondrian4.Key;
-import org.openforis.collect.relational.mondrian4.PhysicalSchema;
-import org.openforis.collect.relational.mondrian4.Table;
+import org.openforis.idm.metamodel.EntityDefinition;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class Mondrian4SchemaGenerator {
 
 	private CollectSurvey survey;
@@ -33,25 +42,31 @@ public class Mondrian4SchemaGenerator {
 		rdbSchema = schemaGenerator.generateSchema(survey, survey.getName());
 	}
 	
-	public PhysicalSchema generateSchema() {
-		PhysicalSchema schema = new PhysicalSchema();
-		for (org.openforis.collect.relational.model.Table<?> table : rdbSchema.getTables()) {
-			Table mondrianTable = new Table();
-			mondrianTable.setName(table.getName());
-			PrimaryKeyConstraint pkConstraint = table.getPrimaryKeyConstraint();
-//			mondrianTable.setKeyColumn(pkConstraint.getPrimaryKeyColumn().getName());
-			if (pkConstraint != null) {
-				Key key = new Key();
-				for (org.openforis.collect.relational.model.Column<?> pkColumn : pkConstraint.getColumns()) {
-					Column mondrianPkColumn = new Column();
-					mondrianPkColumn.setName(pkColumn.getName());
-					key.getColumn().add(mondrianPkColumn);
-				}
-				mondrianTable.getTableElement().add(key);
-			}
-//			schema.getPhysicalSchemaElement().add(mondrianTable);
+	public MondrianDef.Schema generateSchema() {
+		MondrianDef.Schema schema = new MondrianDef.Schema();
+		PhysicalSchema physicalSchema = generatePhysicalSchema();
+		schema.children.add(physicalSchema);
+		
+		List<EntityDefinition> rootEntityDefinitions = survey.getSchema().getRootEntityDefinitions();
+		for (EntityDefinition rootEntityDef : rootEntityDefinitions) {
+			MondrianDef.Cube cube = new MondrianDef.Cube();
+			cube.name = rootEntityDef.getName();
+//			cube.getDimensions()
 		}
 		return schema;
+	}
+
+	private PhysicalSchema generatePhysicalSchema() {
+		PhysicalSchema physicalSchema = new PhysicalSchema();
+		for (org.openforis.collect.relational.model.Table<?> table : rdbSchema.getTables()) {
+			MondrianDef.Table mondrianTable = new MondrianDef.Table();
+			mondrianTable.name = table.getName();
+			PrimaryKeyConstraint pkConstraint = table.getPrimaryKeyConstraint();
+			mondrianTable.keyColumn = pkConstraint.getPrimaryKeyColumn().getName();
+			//TODO Foreign Keys
+			physicalSchema.children.add(mondrianTable);
+		}
+		return physicalSchema;
 	}
 	
 }

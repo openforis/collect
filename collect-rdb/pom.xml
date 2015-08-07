@@ -20,7 +20,7 @@
 			<plugin>
 				<groupId>org.jvnet.jaxb2.maven2</groupId>
 				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.8.3</version>
+				<version>0.12.3</version>
 				<executions>
 					<execution>
 						<id>generate-mondrian-classes</id>
@@ -44,28 +44,28 @@
 							<removeOldOutput>true</removeOldOutput>
 						</configuration>
 					</execution>
-					<execution>
-						<id>generate-mondrian4-classes</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemas>
-								<schema>
-							        <fileset>
-							            <directory>${basedir}/src/main/resources/schemas</directory>
-							            <includes>
-							                <include>mondrian4.xsd</include>
-							            </includes>
-							        </fileset>
-							    </schema>
-							</schemas>
-							<generatePackage>org.openforis.collect.relational.mondrian4</generatePackage>
-							<generateDirectory>${mondrian4-generated-files-dir}</generateDirectory>
-							<removeOldOutput>true</removeOldOutput>
-						</configuration>
-					</execution>
+<!-- 					<execution> -->
+<!-- 						<id>generate-mondrian4-classes</id> -->
+<!-- 						<phase>generate-sources</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>generate</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<schemas> -->
+<!-- 								<schema> -->
+<!-- 							        <fileset> -->
+<!-- 							            <directory>${basedir}/src/main/resources/schemas</directory> -->
+<!-- 							            <includes> -->
+<!-- 							                <include>mondrian4.xsd</include> -->
+<!-- 							            </includes> -->
+<!-- 							        </fileset> -->
+<!-- 							    </schema> -->
+<!-- 							</schemas> -->
+<!-- 							<generatePackage>org.openforis.collect.relational.mondrian4</generatePackage> -->
+<!-- 							<generateDirectory>${mondrian4-generated-files-dir}</generateDirectory> -->
+<!-- 							<removeOldOutput>true</removeOldOutput> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
 				</executions>
 				<configuration>
 					<forceRegenerate>true</forceRegenerate>
@@ -93,6 +93,13 @@
 		</plugins>
 	</build>
 	
+	<repositories>
+		<repository>
+			<id>pentaho</id>
+			<url>http://repository.pentaho.org/artifactory/repo/</url>
+		</repository>
+	</repositories>
+		
 	<dependencies>
 		<dependency>
 			<groupId>org.openforis.collect</groupId>
@@ -108,6 +115,22 @@
 			<groupId>org.apache.ddlutils</groupId>
 			<artifactId>ddlutils</artifactId>
 			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>pentaho</groupId>
+			<artifactId>mondrian</artifactId>
+			<version>4.3.0.1-130</version>
+			 <exclusions>
+		    	<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>jsp-api</artifactId>
+		    	</exclusion>
+		    </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>eigenbase</groupId>
+			<artifactId>eigenbase-xom</artifactId>
+			<version>1.3.4</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

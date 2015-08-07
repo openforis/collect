@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mondrian.olap.MondrianDef.Schema;
+
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
-import org.openforis.collect.relational.mondrian.MondrianSchemaGenerator;
-import org.openforis.collect.relational.mondrian.Schema;
+import org.openforis.collect.relational.mondrian.Mondrian4SchemaGenerator;
 
 /**
  * 
@@ -42,7 +43,7 @@ public class SaikuMondrianSchemaProvider {
 	}
 	
 	private void initializeMondrianSchemaDefinition(CollectSurvey survey) {
-		MondrianSchemaGenerator generator = new MondrianSchemaGenerator(survey, rdbConfig);
+		Mondrian4SchemaGenerator generator = new Mondrian4SchemaGenerator(survey, rdbConfig);
 		Schema schema = generator.generateSchema();
 		mondrianSchemaDefinitionBySurveyName.put(survey.getName(), schema);
 	}
