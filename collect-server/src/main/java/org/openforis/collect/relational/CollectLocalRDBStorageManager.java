@@ -36,7 +36,7 @@ public class CollectLocalRDBStorageManager extends BaseStorageManager {
 
 	public boolean existsRDBFile(String surveyName, RecordStep step) {
 		File rdbFile = getRDBFile(surveyName, step);
-		return rdbFile.exists();
+		return rdbFile.exists() && rdbFile.length() > 0;
 	}
 	
 	public File getRDBFile(String surveyName, RecordStep step) {

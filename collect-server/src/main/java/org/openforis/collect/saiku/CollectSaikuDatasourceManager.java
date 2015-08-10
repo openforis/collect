@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import javax.jcr.RepositoryException;
+
 import mondrian.olap.MondrianDef.Schema;
 
 import org.openforis.collect.event.RecordStep;
@@ -83,16 +85,27 @@ public class CollectSaikuDatasourceManager extends RepositoryDatasourceManager {
 	}
 
 	@Override
-	public RepositoryFile getFile(String name) {
-		if (name.startsWith(DATASOURCE_PATH) && name.endsWith(".xml")) {
-			String datasourceId = name.substring(DATASOURCE_PATH.length(), name.length() - 4);
+	public RepositoryFile getFile(String fileName) {
+		try {
+			String internalFileData = getInternalFileData(fileName);
+			return internalFileData == null ? null: new RepositoryFile(fileName, null, internalFileData.getBytes());
+		} catch (RepositoryException e) {
+			return null;
+		}
+	}
+	
+	@Override
+	public String getInternalFileData(String fileName) throws RepositoryException {
+		if (fileName.startsWith(DATASOURCE_PATH) && fileName.endsWith(".xml")) {
+			String datasourceId = fileName.substring(DATASOURCE_PATH.length(), fileName.length() - 4);
 			DatasourceKey datasourceKey = DatasourceKey.fromString(datasourceId);
 			String surveyName = datasourceKey.surveyName;
 			Schema mondrianSchema = mondrianSchemaProvider.getMondrianSchema(surveyName);
 			String xml = mondrianSchema.toXML();
-			return new RepositoryFile(name, null, xml.getBytes());
+			return xml;
+		} else {
+			return null;
 		}
-		return null;
 	}
 	
 	@Override
