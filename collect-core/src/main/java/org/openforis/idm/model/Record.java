@@ -226,6 +226,7 @@ public class Record implements DeepComparable {
 		} else {
 			//register only calculated attribute dependencies
 			registerInDependencyGraph(calculatedAttributeDependencies, node);
+			registerInDependencyGraph(codeAttributeDependencies, node);
 		}
 	}
 
