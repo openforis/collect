@@ -13,6 +13,7 @@ import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.util.CodeListTables;
+import org.openforis.collect.relational.util.DataTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -440,7 +441,7 @@ public class RelationalSchemaGenerator {
 		String codeListTableName = CodeListTables.getTableName(config, list, levelIdx);
 		DataColumn codeValueColumn = table.getDataColumn(attrDefn.getFieldDefinition(CodeAttributeDefinition.CODE_FIELD));
 		String codeValueColumnName = codeValueColumn.getName();
-		String fkColumnName = codeValueColumnName + config.getCodeListTableSuffix() + config.getIdColumnSuffix();
+		String fkColumnName = DataTables.getCodeFKColumnName(config, table, attrDefn);
 		CodeValueFKColumn col = new CodeValueFKColumn(fkColumnName, attrDefn, relativePath,
 				config.getDefaultCode());
 		addColumn(table, col);

@@ -104,8 +104,8 @@ public class DataTable extends AbstractTable<Node<?>> {
 			if ( column instanceof DataColumn ) {
 				DataColumn dataCol = (DataColumn) column;
 				AttributeDefinition columnAttrDefn = dataCol.getAttributeDefinition();
-				if ( ! ( dataCol instanceof CodeValueFKColumn ) && 
-						columnAttrDefn.getId() == attributeDefinitionId ) {
+				if ( columnAttrDefn.getId() == attributeDefinitionId 
+						&& ! ( dataCol instanceof CodeValueFKColumn )) {
 					result.add(dataCol); 
 				}
 			}
