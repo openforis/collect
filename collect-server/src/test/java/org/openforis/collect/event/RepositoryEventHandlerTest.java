@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openforis.collect.relational.ReportingRepositories;
+import org.openforis.collect.reporting.ReportingRepositories;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.rmb.KeepAlive;
 

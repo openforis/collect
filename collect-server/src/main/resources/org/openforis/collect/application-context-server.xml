@@ -19,9 +19,6 @@
 	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager" 
 		init-method="init" />
 	
-	<!-- RDB -->
-	<bean id="rdbPublisher" class="org.openforis.collect.relational.CollectRDBPublisher" />
-	
 	<bean id="volatileRecordIndexManager"
 		class="org.openforis.collect.remoting.service.recordindex.VolatileRecordIndexManager"
 		init-method="init" scope="session" lazy-init="false" autowire="byName" />
@@ -99,6 +96,9 @@
 	<!-- =============== RDB ================= -->
 	<!-- ===================================== -->
 	
+	<!-- deprecated -->
+	<bean id="rdbPublisher" class="org.openforis.collect.relational.CollectRDBPublisher" />
+	
     <bean id="messageBroker" class="org.openforis.collect.event.ConfiguredMessageBroker" 
     		init-method="start" destroy-method="stop">
         <constructor-arg ref="dataSource" />
@@ -132,6 +132,7 @@
 		<constructor-arg ref="surveyManager" />
 		<constructor-arg ref="recordManager" />
 		<constructor-arg ref="collectLocalRDBStorageManager" />
+		<constructor-arg ref="mondrianSchemaStorageManager" />
 	</bean>
 	
 	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"

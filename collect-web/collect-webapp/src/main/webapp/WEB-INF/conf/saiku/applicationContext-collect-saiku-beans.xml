@@ -6,12 +6,7 @@
 
 	<bean id="sessionService" class="org.openforis.collect.saiku.SaikuSessionService" />
 
-	<bean id="saikuMondrianSchemaProvider" class="org.openforis.collect.saiku.SaikuMondrianSchemaProvider"
-			lazy-init="false" init-method="init">
-		<constructor-arg ref="surveyManager" />
-	</bean>
-	
-	<bean id="repositoryDsManager" class="org.openforis.collect.saiku.CollectSaikuDatasourceManager" 
+	<bean id="repositoryDsManager" class="org.openforis.collect.saiku.SaikuDatasourceManager" 
 		init-method="load" destroy-method="unload"/>
 	
 </beans>

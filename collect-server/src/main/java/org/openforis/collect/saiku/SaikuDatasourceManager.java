@@ -8,12 +8,11 @@ import java.util.Properties;
 
 import javax.jcr.RepositoryException;
 
-import mondrian.olap.MondrianDef.Schema;
-
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.RDBReportingRepositories;
+import org.openforis.collect.reporting.MondrianSchemaStorageManager;
 import org.saiku.datasources.connection.RepositoryFile;
 import org.saiku.datasources.datasource.SaikuDatasource;
 import org.saiku.service.datasource.RepositoryDatasourceManager;
@@ -24,13 +23,15 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
-public class CollectSaikuDatasourceManager extends RepositoryDatasourceManager {
+public class SaikuDatasourceManager extends RepositoryDatasourceManager {
 
+	private static final String SQLITE_JDBC_DRIVER = "org.sqlite.JDBC";
+	private static final String MONDRIAN_OLAP4J_DRIVER = "mondrian.olap4j.MondrianOlap4jDriver";
 	private static final String DATASOURCE_PATH = "/datasources/";
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private SaikuMondrianSchemaProvider mondrianSchemaProvider;
+	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
 	@Autowired
 	private RDBReportingRepositories rdbReportingRepositories;
 	
@@ -54,30 +55,15 @@ public class CollectSaikuDatasourceManager extends RepositoryDatasourceManager {
 		String id = surveyName + "_" + recordStep.name();
 		String repositoryPath = rdbReportingRepositories.getRepositoryPath(surveyName, recordStep);
 		String repositoryJdbcUrl = "jdbc:sqlite:" + repositoryPath;
-		String jdbcDriver = "org.sqlite.JDBC";
-		String jdbcUrl = String.format("jdbc:mondrian:Jdbc=%s;Catalog=mondrian://%s%s.xml;JdbcDrivers=%s", repositoryJdbcUrl, DATASOURCE_PATH, id, jdbcDriver);
+		String jdbcUrl = String.format("jdbc:mondrian:Jdbc=%s;Catalog=mondrian://%s%s.xml;JdbcDrivers=%s", repositoryJdbcUrl, DATASOURCE_PATH, id, SQLITE_JDBC_DRIVER);
 		Properties props = new Properties();
-		props.put("driver", "mondrian.olap4j.MondrianOlap4jDriver");
+		props.put("id", id);
+		props.put("driver", MONDRIAN_OLAP4J_DRIVER);
 		props.put("location", jdbcUrl);
 		props.put("username", "");
 		props.put("password", "");
 		props.put("path", "");
-		props.put("id", id);
-//				if (file.getSecurityenabled() != null) {
-//					props.put("security.enabled", file.getSecurityenabled());
-//				}
-//				if (file.getSecuritytype() != null) {
-//					props.put("security.type", file.getSecuritytype());
-//				}
-//				if (file.getSecuritymapping() != null) {
-//					props.put("security.mapping", file.getSecuritymapping());
-//				}
-//				if (file.getAdvanced() != null) {
-//					props.put("advanced", file.getAdvanced());
-//				}
-		SaikuDatasource.Type t = SaikuDatasource.Type.valueOf("OLAP");
-		SaikuDatasource ds = new SaikuDatasource(id, t, props);
-		return ds;
+		return new SaikuDatasource(id, SaikuDatasource.Type.OLAP, props);
 	}
 
 	@Override
@@ -90,7 +76,7 @@ public class CollectSaikuDatasourceManager extends RepositoryDatasourceManager {
 			String internalFileData = getInternalFileData(fileName);
 			return internalFileData == null ? null: new RepositoryFile(fileName, null, internalFileData.getBytes());
 		} catch (RepositoryException e) {
-			return null;
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -100,14 +86,12 @@ public class CollectSaikuDatasourceManager extends RepositoryDatasourceManager {
 			String datasourceId = fileName.substring(DATASOURCE_PATH.length(), fileName.length() - 4);
 			DatasourceKey datasourceKey = DatasourceKey.fromString(datasourceId);
 			String surveyName = datasourceKey.surveyName;
-			Schema mondrianSchema = mondrianSchemaProvider.getMondrianSchema(surveyName);
-			String xml = mondrianSchema.toXML();
-			return xml;
+			return mondrianSchemaStorageManager.readSchemaFile(surveyName);
 		} else {
 			return null;
 		}
 	}
-	
+
 	@Override
 	public void createUser(String username) {
 		//DO NOTHING

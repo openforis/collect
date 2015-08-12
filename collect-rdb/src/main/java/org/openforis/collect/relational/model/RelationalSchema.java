@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.openforis.collect.relational.CollectRdbException;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -101,6 +102,10 @@ public final class RelationalSchema {
 	public List<CodeTable> getCodeListTables() {
 		List<CodeTable> tableList = new ArrayList<CodeTable>(codeListTables.values());
 		return Collections.unmodifiableList(tableList);
+	}
+	
+	public CodeTable getCodeListTable(CodeAttributeDefinition attrDef) {
+		return getCodeListTable(attrDef.getList(), attrDef.getListLevelIndex());
 	}
 	
 	public CodeTable getCodeListTable(CodeList list, Integer levelIdx) {

@@ -1,33 +1,42 @@
 package org.openforis.collect.relational.mondrian;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 import mondrian.olap.MondrianDef;
 import mondrian.olap.MondrianDef.Attribute;
 import mondrian.olap.MondrianDef.Attributes;
+import mondrian.olap.MondrianDef.Column;
 import mondrian.olap.MondrianDef.Cube;
 import mondrian.olap.MondrianDef.Dimension;
 import mondrian.olap.MondrianDef.DimensionLinks;
 import mondrian.olap.MondrianDef.Dimensions;
+import mondrian.olap.MondrianDef.ForeignKey;
 import mondrian.olap.MondrianDef.Hierarchies;
 import mondrian.olap.MondrianDef.Hierarchy;
 import mondrian.olap.MondrianDef.Level;
+import mondrian.olap.MondrianDef.Link;
 import mondrian.olap.MondrianDef.Measure;
 import mondrian.olap.MondrianDef.MeasureGroup;
 import mondrian.olap.MondrianDef.MeasureGroups;
 import mondrian.olap.MondrianDef.Measures;
 import mondrian.olap.MondrianDef.NoLink;
+import mondrian.olap.MondrianDef.Table;
 import mondrian.olap.MondrianDef.PhysicalSchema;
 import mondrian.rolap.RolapAggregator;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.PrimaryKeyConstraint;
+import org.openforis.collect.relational.model.ReferentialConstraint;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
+import org.openforis.collect.relational.model.UniquenessConstraint;
+import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -145,12 +154,14 @@ public class Mondrian4SchemaGenerator {
 		
 		if (attrDefn instanceof CodeAttributeDefinition && ! ((CodeAttributeDefinition) attrDefn).getList().isExternal()) {
 			CodeAttributeDefinition codeAttrDefn = (CodeAttributeDefinition) attrDefn;
-			FieldDefinition<String> codeFieldDef = codeAttrDefn.getCodeFieldDefinition();
+			CodeTable codeListTable = rdbSchema.getCodeListTable(codeAttrDefn);
+			String codeListTableName = codeListTable.getName();
 			Attribute attribute = new Attribute();
-			attribute.name = codeFieldDef.getName();
-			attribute.table = dataTable.getName();
-			attribute.nameColumn = dataTable.getDataColumn(codeFieldDef).getName();
-			attribute.keyColumn = dataTable.getForeignKeyCodeColumn(codeAttrDefn).getName();
+			attribute.name = attrDefn.getName();
+			attribute.table = codeListTableName;
+			String codeColumnName = CodeListTables.getCodeColumnName(rdbConfig, codeListTableName);
+			attribute.keyColumn = codeColumnName;
+			attribute.nameColumn = CodeListTables.getLabelColumnName(rdbConfig, codeListTableName);
 			attributes.add(attribute);
 		} else if (attrDefn.hasMainField()) {
 			for (FieldDefinition<?> fieldDef : attrDefn.getFieldDefinitions()) {
@@ -204,12 +215,28 @@ public class Mondrian4SchemaGenerator {
 
 	private PhysicalSchema generatePhysicalSchema() {
 		PhysicalSchema physicalSchema = new PhysicalSchema();
-		for (org.openforis.collect.relational.model.Table<?> table : rdbSchema.getTables()) {
-			MondrianDef.Table mondrianTable = new MondrianDef.Table();
-			mondrianTable.name = table.getName();
-			PrimaryKeyConstraint pkConstraint = table.getPrimaryKeyConstraint();
+		for (org.openforis.collect.relational.model.Table<?> rdbTable : rdbSchema.getTables()) {
+			Table mondrianTable = new Table();
+			mondrianTable.name = rdbTable.getName();
+			PrimaryKeyConstraint pkConstraint = rdbTable.getPrimaryKeyConstraint();
 			mondrianTable.keyColumn = pkConstraint.getPrimaryKeyColumn().getName();
-			//TODO Foreign Keys
+			
+			List<ReferentialConstraint> referentialContraints = rdbTable.getReferentialContraints();
+			for (ReferentialConstraint referentialConstraint : referentialContraints) {
+				UniquenessConstraint referencedKey = referentialConstraint.getReferencedKey();
+				org.openforis.collect.relational.model.Table<?> referencedRdbTable = referencedKey.getTable();
+				Link link = new Link();
+				link.source = rdbTable.getName();
+				link.target = referencedRdbTable.getName();
+				ForeignKey foreignKey = new ForeignKey();
+				for (org.openforis.collect.relational.model.Column<?> referencedRdbColumn : referencedKey.getColumns()) {
+					Column fkColumn = new Column();
+					fkColumn.name = referencedRdbColumn.getName();
+					foreignKey.list().add(fkColumn);
+				}
+				link.foreignKey = foreignKey;
+			}
+			
 			physicalSchema.children.add(mondrianTable);
 		}
 		return physicalSchema;

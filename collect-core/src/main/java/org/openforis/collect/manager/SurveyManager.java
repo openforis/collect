@@ -100,7 +100,6 @@ public class SurveyManager {
 		recordValidationStatusBySurvey = Collections.synchronizedMap(new HashMap<Integer, ProcessStatus>());
 	}
 
-	@Transactional
 	public void init() {
 		initSurveysCache();
 	}

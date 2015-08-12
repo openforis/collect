@@ -1,4 +1,4 @@
-package org.openforis.collect.relational;
+package org.openforis.collect.reporting;
 
 import java.util.List;
 

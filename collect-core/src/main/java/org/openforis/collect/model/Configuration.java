@@ -16,6 +16,7 @@ public class Configuration implements Cloneable {
 		, RECORD_INDEX_PATH("index_path", "Record index path")
 		, BACKUP_STORAGE_PATH("backup_path", "Data backup storage path")
 		, LOCAL_RDB_PATH("local_rdb_path", "Local RDB path")
+		, LOCAL_MONDRIAN_SCHEMA_PATH("local_mondrian_schema_path", "Local RDB path")
 		, RESTORED_BACKUP_STORAGE_PATH("restored_backup_path", "Restored backup files path")
 		, ALLOWED_RESTORE_KEY("allowed_restore_key", "Allowed restore key")
 		, REMOTE_CLONE_URL("remote_clone", "Remote Collect clone address")
