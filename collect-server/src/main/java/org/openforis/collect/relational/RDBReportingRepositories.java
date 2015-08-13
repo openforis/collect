@@ -127,12 +127,6 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		createMondrianSchemaFile(surveyName);
 	}
 
-	private void createMondrianSchemaFileIfNotExists(String surveyName) {
-		if (! mondrianSchemaStorageManager.existsSchemaFile(surveyName)) {
-			recreateMondrianSchemaFile(surveyName);
-		}
-	}
-
 	private void createMondrianSchemaFile(String surveyName) {
 		try {
 			mondrianSchemaStorageManager.createBackupCopy(surveyName);
@@ -148,7 +142,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	public void createRepository(final String surveyName, final RecordStep recordStep, final ProgressListener progressListener) {
 		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
 		
-		createMondrianSchemaFileIfNotExists(surveyName);
+		recreateMondrianSchemaFile(surveyName);
 		
 		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
 		
@@ -296,7 +290,6 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		Mondrian4SchemaGenerator mondrian4SchemaGenerator = new Mondrian4SchemaGenerator(survey, rdbConfig);
 		Schema mondrianSchema = mondrian4SchemaGenerator.generateSchema();
 		mondrianSchemaDefinitionBySurvey.put(survey.getName(), mondrianSchema);
-		createMondrianSchemaFileIfNotExists(survey.getName());
 	}
 
 	private JooqDatabaseExporter createRDBUpdater(Connection targetConn) {

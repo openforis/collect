@@ -22,8 +22,8 @@ import mondrian.olap.MondrianDef.MeasureGroup;
 import mondrian.olap.MondrianDef.MeasureGroups;
 import mondrian.olap.MondrianDef.Measures;
 import mondrian.olap.MondrianDef.NoLink;
-import mondrian.olap.MondrianDef.Table;
 import mondrian.olap.MondrianDef.PhysicalSchema;
+import mondrian.olap.MondrianDef.Table;
 import mondrian.rolap.RolapAggregator;
 
 import org.openforis.collect.model.CollectSurvey;
@@ -128,8 +128,9 @@ public class Mondrian4SchemaGenerator {
 		} else {
 			Dimension dimension = new Dimension();
 			dimension.name = attrDefn.getName();
-			dimension.caption = extractLabel(attrDefn);
+			dimension.caption = getDimensionCaption(attrDefn);
 			dimension.key = attrDefn.getMainFieldName();
+			dimension.table = dataTable.getName();
 			
 			Attributes attributes = new Attributes();
 			attributes.list().addAll(attrs);
@@ -157,23 +158,24 @@ public class Mondrian4SchemaGenerator {
 			CodeTable codeListTable = rdbSchema.getCodeListTable(codeAttrDefn);
 			String codeListTableName = codeListTable.getName();
 			Attribute attribute = new Attribute();
-			attribute.name = attrDefn.getName();
+			attribute.name = codeAttrDefn.getCodeFieldDefinition().getName();
 			attribute.table = codeListTableName;
-			String codeColumnName = CodeListTables.getCodeColumnName(rdbConfig, codeListTableName);
-			attribute.keyColumn = codeColumnName;
+			attribute.keyColumn = CodeListTables.getCodeColumnName(rdbConfig, codeListTableName);
 			attribute.nameColumn = CodeListTables.getLabelColumnName(rdbConfig, codeListTableName);
 			attributes.add(attribute);
 		} else if (attrDefn.hasMainField()) {
 			for (FieldDefinition<?> fieldDef : attrDefn.getFieldDefinitions()) {
 				DataColumn col = dataTable.getDataColumn(fieldDef);
 				if (col != null) {
+					String fieldName = fieldDef.getName();
 					Attribute attribute = new Attribute();
-					attribute.name = fieldDef.getName();
-					attribute.table = dataTable.getName();
-					attribute.hasHierarchy = false;
+					attribute.name = fieldName;
+					attribute.caption = getAttributeCaption(fieldDef);
+//					attribute.table = dataTable.getName();
+//					attribute.hasHierarchy = false;
 					attribute.keyColumn = col.getName();
 					if (attrDefn instanceof DateAttributeDefinition) {
-						attribute.levelType = getDateFieldLevelType(fieldDef.getName());
+						attribute.levelType = getDateFieldLevelType(fieldName);
 					}
 					attributes.add(attribute);
 				}
@@ -185,26 +187,17 @@ public class Mondrian4SchemaGenerator {
 	private List<Level> getHierarchyLevels(
 			AttributeDefinition attrDef) {
 		List<Level> levels = new ArrayList<Level>();
-		if (attrDef instanceof DateAttributeDefinition) {
-			for (FieldDefinition<?> fieldDef : attrDef.getFieldDefinitions()) {
-				String fieldName = fieldDef.getName();
-				Level level = new Level();
-				level.name = level.attribute = fieldName;
-				levels.add(level);
-			}
-		} else if (attrDef.hasMainField()) {
-			Level level = new Level();
-			level.name = level.attribute = attrDef.getMainFieldName();
-			levels.add(level);
-		}
-		
-//		if (attrDef instanceof CodeAttributeDefinition) {
-//			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attrDef;
-//			CodeList list = codeAttrDef.getList();
-//			if (! list.isExternal()) {
-//				CodeTable codeListTable = rdbSchema.getCodeListTable(list, codeAttrDef.getListLevelIndex());
-//				dimension.table = codeListTable.getName();
+//		if (attrDef instanceof DateAttributeDefinition) {
+//			for (FieldDefinition<?> fieldDef : attrDef.getFieldDefinitions()) {
+//				String fieldName = fieldDef.getName();
+//				Level level = new Level();
+//				level.name = level.attribute = fieldName;
+//				levels.add(level);
 //			}
+//		} else if (attrDef.hasMainField()) {
+//			Level level = new Level();
+//			level.name = level.attribute = attrDef.getMainFieldName();
+//			levels.add(level);
 //		}
 		return levels;
 	}
@@ -216,13 +209,14 @@ public class Mondrian4SchemaGenerator {
 	private PhysicalSchema generatePhysicalSchema() {
 		PhysicalSchema physicalSchema = new PhysicalSchema();
 		for (org.openforis.collect.relational.model.Table<?> rdbTable : rdbSchema.getTables()) {
-			Table mondrianTable = new Table();
-			mondrianTable.name = rdbTable.getName();
+			Table table = new Table();
+			table.name = rdbTable.getName();
 			PrimaryKeyConstraint pkConstraint = rdbTable.getPrimaryKeyConstraint();
-			mondrianTable.keyColumn = pkConstraint.getPrimaryKeyColumn().getName();
+			table.keyColumn = pkConstraint.getPrimaryKeyColumn().getName();
+			physicalSchema.children.add(table);
 			
-			List<ReferentialConstraint> referentialContraints = rdbTable.getReferentialContraints();
-			for (ReferentialConstraint referentialConstraint : referentialContraints) {
+			//add foreign keys
+			for (ReferentialConstraint referentialConstraint : rdbTable.getReferentialContraints()) {
 				UniquenessConstraint referencedKey = referentialConstraint.getReferencedKey();
 				org.openforis.collect.relational.model.Table<?> referencedRdbTable = referencedKey.getTable();
 				Link link = new Link();
@@ -235,9 +229,8 @@ public class Mondrian4SchemaGenerator {
 					foreignKey.list().add(fkColumn);
 				}
 				link.foreignKey = foreignKey;
+				physicalSchema.children.add(link);
 			}
-			
-			physicalSchema.children.add(mondrianTable);
 		}
 		return physicalSchema;
 	}
@@ -249,4 +242,13 @@ public class Mondrian4SchemaGenerator {
 		}
 		return attrLabel;
 	}
+	
+	private String getDimensionCaption(AttributeDefinition attrDefn) {
+		return String.format("%s [%s]", extractLabel(attrDefn), attrDefn.getName());
+	}
+
+	private String getAttributeCaption(FieldDefinition<?> fieldDef) {
+		return extractLabel(fieldDef.getAttributeDefinition()) + " - " + fieldDef.getName();
+	}
+
 }
