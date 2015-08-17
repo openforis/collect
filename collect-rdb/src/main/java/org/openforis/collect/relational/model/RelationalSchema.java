@@ -152,7 +152,7 @@ public final class RelationalSchema {
 		int id = nodeDefinition.getId();
 		return getDataTableByDefinitionId(id);
 	}
-
+	
 	public DataTable getDataTableByDefinitionId(int id) {
 		return dataTableByDefinitionId.get(id);
 	}

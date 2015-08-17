@@ -10,9 +10,12 @@ import mondrian.olap.MondrianDef.Attributes;
 import mondrian.olap.MondrianDef.Column;
 import mondrian.olap.MondrianDef.Cube;
 import mondrian.olap.MondrianDef.Dimension;
+import mondrian.olap.MondrianDef.DimensionLink;
 import mondrian.olap.MondrianDef.DimensionLinks;
 import mondrian.olap.MondrianDef.Dimensions;
+import mondrian.olap.MondrianDef.FactLink;
 import mondrian.olap.MondrianDef.ForeignKey;
+import mondrian.olap.MondrianDef.ForeignKeyLink;
 import mondrian.olap.MondrianDef.Hierarchies;
 import mondrian.olap.MondrianDef.Hierarchy;
 import mondrian.olap.MondrianDef.Level;
@@ -28,6 +31,7 @@ import mondrian.rolap.RolapAggregator;
 
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.CodeTable;
+import org.openforis.collect.relational.model.CodeValueFKColumn;
 import org.openforis.collect.relational.model.DataColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.PrimaryKeyConstraint;
@@ -77,48 +81,76 @@ public class Mondrian4SchemaGenerator {
 		
 		List<EntityDefinition> rootEntityDefinitions = survey.getSchema().getRootEntityDefinitions();
 		for (EntityDefinition rootEntityDef : rootEntityDefinitions) {
-			final DataTable dataTable = rdbSchema.getDataTable(rootEntityDef);
-
-			Cube cube = new Cube();
-			cube.name = rootEntityDef.getName();
-			MeasureGroups measureGroups = new MondrianDef.MeasureGroups();
-			MeasureGroup measureGroup = new MeasureGroup();
-			measureGroup.name = cube.getName();
-			Measures measures = new Measures();
-			Measure measure = new Measure();
-			measure.name = rootEntityDef.getName() + " count";
-			measure.column = dataTable.getPrimaryKeyColumn().getName();
-			measure.aggregator = RolapAggregator.Count.name;
-			measure.table = dataTable.getName();
-			measures.list().add(measure);
-			measureGroup.children.add(measures);
-			measureGroup.table = dataTable.getName();
-			DimensionLinks dimensionLinks = new DimensionLinks();
-			measureGroup.children.add(dimensionLinks);
-			measureGroups.list().add(measureGroup);
-			cube.children.add(measureGroups);
-			
-			final Dimensions dimensions = new Dimensions();
-			
-			List<NodeDefinition> childDefinitions = rootEntityDef.getChildDefinitions();
-			for (NodeDefinition def : childDefinitions) {
-				if (def instanceof AttributeDefinition) {
-					AttributeDefinition attrDef = (AttributeDefinition) def;
-					Dimension dimension = createDimension(dataTable, attrDef);
-					if (dimension != null) {
-						dimensions.list().add(dimension);
-						//add dimension link
-						NoLink dimensionLink = new NoLink();
-						dimensionLink.dimension = dimension.name;
-						dimensionLinks.list().add(dimensionLink);
-					}
-				}
-			}
-			cube.children.add(dimensions);
-			
-			schema.children.add(cube);
+			schema.children.addAll(createCubes(rootEntityDef));
 		}
 		return schema;
+	}
+
+	private List<Cube> createCubes(EntityDefinition entityDef) {
+		List<Cube> result = new ArrayList<MondrianDef.Cube>();
+		DataTable dataTable = rdbSchema.getDataTable(entityDef);
+
+		Cube cube = new Cube();
+		cube.name = entityDef.getName();
+		MeasureGroups measureGroups = new MondrianDef.MeasureGroups();
+		MeasureGroup measureGroup = new MeasureGroup();
+		measureGroup.name = cube.getName();
+		Measures measures = new Measures();
+		Measure measure = new Measure();
+		measure.name = entityDef.getName() + " count";
+		measure.column = dataTable.getPrimaryKeyColumn().getName();
+		measure.aggregator = RolapAggregator.Count.name;
+		measure.table = dataTable.getName();
+		measures.list().add(measure);
+		measureGroup.children.add(measures);
+		measureGroup.table = dataTable.getName();
+		DimensionLinks dimensionLinks = new DimensionLinks();
+		measureGroup.children.add(dimensionLinks);
+		measureGroups.list().add(measureGroup);
+		cube.children.add(measureGroups);
+		
+		Dimensions dimensions = new Dimensions();
+		
+		for (NodeDefinition def : entityDef.getChildDefinitions()) {
+			if (def instanceof AttributeDefinition) {
+				AttributeDefinition attrDef = (AttributeDefinition) def;
+				Dimension dimension = createDimension(dataTable, attrDef);
+				if (dimension != null) {
+					dimensions.list().add(dimension);
+					//add dimension link
+					DimensionLink dimensionLink = createDimensionLink(dimension, attrDef);
+					dimensionLinks.list().add(dimensionLink);
+				}
+			}
+		}
+		cube.children.add(dimensions);
+		result.add(cube);
+		
+		for (NodeDefinition def : entityDef.getChildDefinitions()) {
+			if (def instanceof EntityDefinition && def.isMultiple()) {
+				result.addAll(createCubes((EntityDefinition) def));
+			}
+		}
+		return result;
+	}
+
+	private DimensionLink createDimensionLink(Dimension dimension, AttributeDefinition attrDef) {
+		DimensionLink dimensionLink;
+		if (attrDef instanceof CodeAttributeDefinition) {
+			if (((CodeAttributeDefinition) attrDef).getList().isExternal()) {
+				dimensionLink = new FactLink();
+			} else {
+				ForeignKeyLink fkLink = new ForeignKeyLink();
+				DataTable dataTable = rdbSchema.getDataTable(attrDef.getParentEntityDefinition());
+				CodeValueFKColumn fkColumn = dataTable.getForeignKeyCodeColumn((CodeAttributeDefinition) attrDef);
+				fkLink.foreignKeyColumn = fkColumn.getName();
+				dimensionLink = fkLink;
+			}
+		} else {
+			dimensionLink = new FactLink();
+		}
+		dimensionLink.dimension = dimension.name;
+		return dimensionLink;
 	}
 
 	private Dimension createDimension(DataTable dataTable, AttributeDefinition attrDefn) {
@@ -158,7 +190,9 @@ public class Mondrian4SchemaGenerator {
 			CodeTable codeListTable = rdbSchema.getCodeListTable(codeAttrDefn);
 			String codeListTableName = codeListTable.getName();
 			Attribute attribute = new Attribute();
-			attribute.name = codeAttrDefn.getCodeFieldDefinition().getName();
+			FieldDefinition<String> codeFieldDef = codeAttrDefn.getCodeFieldDefinition();
+			attribute.name = codeFieldDef.getName();
+			attribute.caption = getAttributeCaption(codeFieldDef);
 			attribute.table = codeListTableName;
 			attribute.keyColumn = CodeListTables.getCodeColumnName(rdbConfig, codeListTableName);
 			attribute.nameColumn = CodeListTables.getLabelColumnName(rdbConfig, codeListTableName);
