@@ -154,7 +154,9 @@ public class Record implements DeepComparable {
 	public String toString() {
 		StringWriter sw = new StringWriter();
 		sw.append("id: ").append(String.valueOf(id)).append("\n");
-		rootEntity.write(sw, 0);
+		if (rootEntity != null) {
+			rootEntity.write(sw, 0);
+		}
 		return sw.toString();
 	}
 
@@ -226,6 +228,7 @@ public class Record implements DeepComparable {
 		} else {
 			//register only calculated attribute dependencies
 			registerInDependencyGraph(calculatedAttributeDependencies, node);
+			registerInDependencyGraph(codeAttributeDependencies, node);
 		}
 	}
 
