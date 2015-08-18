@@ -250,7 +250,6 @@ public class CodeListManager {
 	
 	protected CodeListItem findCodeListItem(List<CodeListItem> siblings, String code, ModelVersion version) {
 		String adaptedCode = code.trim();
-		adaptedCode = adaptedCode.toUpperCase();
 		//remove initial zeros
 		adaptedCode = adaptedCode.replaceFirst("^0+", "");
 		adaptedCode = Pattern.quote(adaptedCode);
