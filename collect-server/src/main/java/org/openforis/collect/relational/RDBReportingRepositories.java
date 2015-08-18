@@ -98,15 +98,16 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	}
 
 	public void init() {
+		initializeSchemaDefinitions();
 	}
 
-//	private void initializeSchemaDefinitions() {
-//		List<CollectSurvey> surveys = surveyManager.getAll();
-//		for (CollectSurvey survey : surveys) {
-//			initializeRelationalSchemaDefinition(survey);
-//			initializeMondrianSchemaDefinition(survey);
-//		}
-//	}
+	private void initializeSchemaDefinitions() {
+		List<CollectSurvey> surveys = surveyManager.getAll();
+		for (CollectSurvey survey : surveys) {
+			initializeRelationalSchemaDefinition(survey);
+			initializeMondrianSchemaDefinition(survey);
+		}
+	}
 	
 	@Override
 	public void createRepositories(String surveyName, ProgressListener progressListener) {

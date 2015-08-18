@@ -2,7 +2,9 @@ package org.openforis.collect.relational.mondrian;
 
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import mondrian.olap.MondrianDef;
 import mondrian.olap.MondrianDef.Attribute;
@@ -18,6 +20,7 @@ import mondrian.olap.MondrianDef.ForeignKey;
 import mondrian.olap.MondrianDef.ForeignKeyLink;
 import mondrian.olap.MondrianDef.Hierarchies;
 import mondrian.olap.MondrianDef.Hierarchy;
+import mondrian.olap.MondrianDef.Key;
 import mondrian.olap.MondrianDef.Level;
 import mondrian.olap.MondrianDef.Link;
 import mondrian.olap.MondrianDef.Measure;
@@ -94,14 +97,10 @@ public class Mondrian4SchemaGenerator {
 		cube.name = entityDef.getName();
 		MeasureGroups measureGroups = new MondrianDef.MeasureGroups();
 		MeasureGroup measureGroup = new MeasureGroup();
-		measureGroup.name = cube.getName();
+		measureGroup.name = cube.name;
 		Measures measures = new Measures();
-		Measure measure = new Measure();
-		measure.name = entityDef.getName() + " count";
-		measure.column = dataTable.getPrimaryKeyColumn().getName();
-		measure.aggregator = RolapAggregator.Count.name;
-		measure.table = dataTable.getName();
-		measures.list().add(measure);
+		List<Measure> measureList = createMeasures(entityDef);
+		measures.list().addAll(measureList);
 		measureGroup.children.add(measures);
 		measureGroup.table = dataTable.getName();
 		DimensionLinks dimensionLinks = new DimensionLinks();
@@ -111,7 +110,10 @@ public class Mondrian4SchemaGenerator {
 		
 		Dimensions dimensions = new Dimensions();
 		
-		for (NodeDefinition def : entityDef.getChildDefinitions()) {
+		Queue<NodeDefinition> queue = new LinkedList<NodeDefinition>();
+		queue.addAll(entityDef.getChildDefinitions());
+		while (! queue.isEmpty()) {
+			NodeDefinition def = queue.poll();
 			if (def instanceof AttributeDefinition) {
 				AttributeDefinition attrDef = (AttributeDefinition) def;
 				Dimension dimension = createDimension(dataTable, attrDef);
@@ -121,30 +123,54 @@ public class Mondrian4SchemaGenerator {
 					DimensionLink dimensionLink = createDimensionLink(dimension, attrDef);
 					dimensionLinks.list().add(dimensionLink);
 				}
+			} else if (! def.isMultiple()) {
+				queue.addAll(((EntityDefinition) def).getChildDefinitions());
 			}
 		}
 		cube.children.add(dimensions);
 		result.add(cube);
 		
-		for (NodeDefinition def : entityDef.getChildDefinitions()) {
-			if (def instanceof EntityDefinition && def.isMultiple()) {
-				result.addAll(createCubes((EntityDefinition) def));
+		//create cubes for nested multiple entities
+		queue.addAll(entityDef.getChildDefinitions());
+		while (! queue.isEmpty()) {
+			NodeDefinition def = queue.poll();
+			if (def instanceof EntityDefinition) {
+				EntityDefinition childEntityDef = (EntityDefinition) def;
+				if (def.isMultiple()) {
+					result.addAll(createCubes(childEntityDef));
+				} else {
+					queue.addAll(childEntityDef.getChildDefinitions());
+				}
 			}
 		}
 		return result;
 	}
 
+	private List<Measure> createMeasures(EntityDefinition entityDef) {
+		List<Measure> measureList = new ArrayList<Measure>();
+		DataTable dataTable = rdbSchema.getDataTable(entityDef);
+		Measure measure = new Measure();
+		measure.name = entityDef.getName() + " count";
+		measure.column = dataTable.getPrimaryKeyColumn().getName();
+		measure.aggregator = RolapAggregator.DistinctCount.name;
+		measure.table = dataTable.getName();
+		measureList.add(measure);
+		return measureList;
+	}
+
 	private DimensionLink createDimensionLink(Dimension dimension, AttributeDefinition attrDef) {
 		DimensionLink dimensionLink;
 		if (attrDef instanceof CodeAttributeDefinition) {
-			if (((CodeAttributeDefinition) attrDef).getList().isExternal()) {
+			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attrDef;
+			if (codeAttrDef.isMultiple()) {
+				dimensionLink = new NoLink();
+			} else if (codeAttrDef.getList().isExternal()) {
 				dimensionLink = new FactLink();
 			} else {
-				ForeignKeyLink fkLink = new ForeignKeyLink();
+				dimensionLink = new ForeignKeyLink();
 				DataTable dataTable = rdbSchema.getDataTable(attrDef.getParentEntityDefinition());
 				CodeValueFKColumn fkColumn = dataTable.getForeignKeyCodeColumn((CodeAttributeDefinition) attrDef);
-				fkLink.foreignKeyColumn = fkColumn.getName();
-				dimensionLink = fkLink;
+				((ForeignKeyLink) dimensionLink).foreignKeyColumn = fkColumn.getName();
 			}
 		} else {
 			dimensionLink = new FactLink();
@@ -154,21 +180,25 @@ public class Mondrian4SchemaGenerator {
 	}
 
 	private Dimension createDimension(DataTable dataTable, AttributeDefinition attrDefn) {
-		List<Attribute> attrs = getDimensionAttributes(dataTable, attrDefn);
+		List<Attribute> attrs = createDimensionAttributes(dataTable, attrDefn);
 		if (attrs.isEmpty()) {
 			return null;
 		} else {
 			Dimension dimension = new Dimension();
 			dimension.name = attrDefn.getName();
 			dimension.caption = getDimensionCaption(attrDefn);
-			dimension.key = attrDefn.getMainFieldName();
+			if (attrDefn.hasMainField()) {
+				dimension.key = attrDefn.getMainFieldName();
+			} else {
+				dimension.key = attrDefn.getName();
+			}
 			dimension.table = dataTable.getName();
 			
 			Attributes attributes = new Attributes();
 			attributes.list().addAll(attrs);
 			dimension.children.add(attributes);
-
-			List<Level> hierarchyLevels = getHierarchyLevels(attrDefn);
+			
+			List<Level> hierarchyLevels = createHierarchyLevels(attrDefn);
 			if (! hierarchyLevels.isEmpty()) {
 				Hierarchies hierarchies = new Hierarchies();
 				Hierarchy hierarchy = new Hierarchy();
@@ -181,7 +211,7 @@ public class Mondrian4SchemaGenerator {
 		}
 	}
 
-	private List<Attribute> getDimensionAttributes(DataTable dataTable,
+	private List<Attribute> createDimensionAttributes(DataTable dataTable,
 			AttributeDefinition attrDefn) {
 		List<Attribute> attributes = new ArrayList<Attribute>();
 		
@@ -201,12 +231,10 @@ public class Mondrian4SchemaGenerator {
 			for (FieldDefinition<?> fieldDef : attrDefn.getFieldDefinitions()) {
 				DataColumn col = dataTable.getDataColumn(fieldDef);
 				if (col != null) {
-					String fieldName = fieldDef.getName();
 					Attribute attribute = new Attribute();
+					String fieldName = fieldDef.getName();
 					attribute.name = fieldName;
 					attribute.caption = getAttributeCaption(fieldDef);
-//					attribute.table = dataTable.getName();
-//					attribute.hasHierarchy = false;
 					attribute.keyColumn = col.getName();
 					if (attrDefn instanceof DateAttributeDefinition) {
 						attribute.levelType = getDateFieldLevelType(fieldName);
@@ -214,30 +242,52 @@ public class Mondrian4SchemaGenerator {
 					attributes.add(attribute);
 				}
 			}
+		} else {
+			// every field makes the Key of the Attribute
+			Attribute attribute = new Attribute();
+			attribute.name = attrDefn.getName();
+			attribute.caption = getDimensionCaption(attrDefn);
+			Key key = new Key();
+			for (FieldDefinition<?> fieldDef : attrDefn.getFieldDefinitions()) {
+				DataColumn dataColumn = dataTable.getDataColumn(fieldDef);
+				if (dataColumn != null) {
+					Column column = new Column();
+					column.name = dataColumn.getName();
+					key.list().add(column);
+				}
+			}
+			attribute.children.add(key);
+			attributes.add(attribute);
 		}
 		return attributes;
 	}
 
-	private List<Level> getHierarchyLevels(
+	private List<Level> createHierarchyLevels(
 			AttributeDefinition attrDef) {
 		List<Level> levels = new ArrayList<Level>();
-//		if (attrDef instanceof DateAttributeDefinition) {
-//			for (FieldDefinition<?> fieldDef : attrDef.getFieldDefinitions()) {
-//				String fieldName = fieldDef.getName();
-//				Level level = new Level();
-//				level.name = level.attribute = fieldName;
-//				levels.add(level);
-//			}
-//		} else if (attrDef.hasMainField()) {
-//			Level level = new Level();
-//			level.name = level.attribute = attrDef.getMainFieldName();
-//			levels.add(level);
-//		}
+		if (attrDef instanceof DateAttributeDefinition) {
+			for (FieldDefinition<?> fieldDef : attrDef.getFieldDefinitions()) {
+				String fieldName = fieldDef.getName();
+				Level level = new Level();
+				level.name = level.attribute = fieldName;
+				levels.add(level);
+			}
+		} else {
+			
+		}
 		return levels;
 	}
 
-	private String getDateFieldLevelType(String name) {
-		return null;
+	private String getDateFieldLevelType(String fieldName) {
+		if (DateAttributeDefinition.YEAR_FIELD_NAME.equals(fieldName)) {
+			return "TimeYears";
+		} else if (DateAttributeDefinition.MONTH_FIELD_NAME.equals(fieldName)) {
+			return "TimeMonths";
+		} else if(DateAttributeDefinition.DAY_FIELD_NAME.equals(fieldName)) {
+			return "TimeDays";
+		} else {
+			throw new IllegalArgumentException("Unexpected date attribute field name: " + fieldName);
+		}
 	}
 
 	private PhysicalSchema generatePhysicalSchema() {
@@ -282,7 +332,12 @@ public class Mondrian4SchemaGenerator {
 	}
 
 	private String getAttributeCaption(FieldDefinition<?> fieldDef) {
-		return extractLabel(fieldDef.getAttributeDefinition()) + " - " + fieldDef.getName();
+		AttributeDefinition attrDef = fieldDef.getAttributeDefinition();
+		String caption = extractLabel(attrDef);
+		if (! (attrDef.hasMainField() && attrDef.getMainFieldDefinition() == fieldDef)) {
+			caption += " - " + fieldDef.getName();
+		}
+		return caption;
 	}
 
 }
