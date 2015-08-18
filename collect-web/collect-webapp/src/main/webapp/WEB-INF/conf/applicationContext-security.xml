@@ -19,6 +19,9 @@
 	
 	<http access-decision-manager-ref="accessDecisionManager">
 		<csrf disabled="true"/>
+		<headers>
+			<frame-options policy="SAMEORIGIN"/>
+		</headers>
 		
 		<intercept-url access="permitAll" pattern="collect.swf" />
 		<intercept-url access="permitAll" pattern="/assets/**" />
