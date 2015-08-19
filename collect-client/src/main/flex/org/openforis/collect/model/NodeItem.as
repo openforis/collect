@@ -7,6 +7,7 @@ package org.openforis.collect.model
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeLabelProxy$Type;
 
 	/**
 	 * @author S. Ricci
@@ -29,7 +30,8 @@ package org.openforis.collect.model
 										   includeSingleEntities:Boolean = true):NodeItem {
 			var item:NodeItem = new NodeItem();
 			item.id = nodeDef.id;
-			item.label = nodeDef.getInstanceOrHeadingLabelText();
+			var label:String = nodeDef.getSpecificLabelText([NodeLabelProxy$Type.INSTANCE], false);
+			item.label = (label == null ? "" : label) + " [" + nodeDef.name + "]";
 			item.nodeDefinition = nodeDef;
 			if(includeChildren) {
 				var children:IList = new ArrayCollection();

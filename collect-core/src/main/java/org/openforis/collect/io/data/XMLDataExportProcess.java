@@ -163,7 +163,7 @@ public class XMLDataExportProcess extends AbstractProcess<Void, DataExportStatus
 	private void backup(ZipOutputStream zipOutputStream, CollectRecord summary, Step step) {
 		Integer id = summary.getId();
 		try {
-			CollectRecord record = recordManager.load(survey, id, step);
+			CollectRecord record = recordManager.load(survey, id, step, false);
 			RecordEntry recordEntry = new RecordEntry(step, id);
 			String entryName = recordEntry.getName();
 			ZipEntry entry = new ZipEntry(entryName);

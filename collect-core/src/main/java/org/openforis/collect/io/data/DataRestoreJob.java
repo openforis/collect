@@ -43,15 +43,12 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private boolean overwriteAll;
 	private boolean restoreUploadedFiles;
 	private List<Integer> entryIdsToImport; //ignored when overwriteAll is true
-	private boolean oldBackupFormat;
 	private boolean storeRestoredFile;
 	private File tempFile;
 
 	@Override
 	public void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-		oldBackupFormat = backupFileExtractor.isOldFormat();
 	}
 	
 	@Override
@@ -70,7 +67,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	}
 	
 	private boolean isBackupNeeded() {
-		String surveyName = publishedSurvey.getName();
+		if (newSurvey) {
+			return false;
+		}
 		Date lastBackupDate = backupStorageManager.getLastBackupDate(surveyName);
 		RecordFilter recordFilter = new RecordFilter(publishedSurvey);
 		recordFilter.setModifiedSince(lastBackupDate);
@@ -119,7 +118,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	@Override
 	protected void onCompleted() {
 		super.onCompleted();
-		restoredBackupStorageManager.moveToFinalFolder(publishedSurvey.getName(), tempFile);
+		if (storeRestoredFile) {
+			restoredBackupStorageManager.moveToFinalFolder(surveyName, tempFile);
+		}
 	}
 
 	public RecordManager getRecordManager() {
@@ -181,7 +182,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private class StoreBackupFileTask extends Task {
 		@Override
 		protected void execute() throws Throwable {
-			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(publishedSurvey.getName(), file);
+			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
 		}
 		
 	}

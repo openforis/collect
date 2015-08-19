@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-other-code-list-label-columns" author="ricci" dbms="postgresql">
+		<comment>Add other code list table columns</comment>
+		
+		<addColumn tableName="ofc_code_list">
+			<column name="label4" type="VARCHAR(255)" />
+			<column name="label5" type="VARCHAR(255)" />
+			<column name="description4" type="VARCHAR(255)" />
+			<column name="description5" type="VARCHAR(255)" />
+	    </addColumn>
+	    
+	</changeSet>
+  
+</databaseChangeLog>

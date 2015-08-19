@@ -430,6 +430,9 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	public EntityDefinition getParentEntityForAssignedNodes(UITab tab) {
 		UITabSet root = tab.getRootTabSet();
 		EntityDefinition rootEntity = getRootEntityDefinition(root);
+		if (tab.getDepth() == 1) {
+			return rootEntity;
+		}
 		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
 		stack.push(rootEntity);
 		while ( ! stack.isEmpty() ) {

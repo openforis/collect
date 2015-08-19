@@ -65,20 +65,21 @@
 				<label xml:lang="es">Operador</label>
 				<label xml:lang="fr">Opérateur</label>
 			</text>
+
 			<number id="5" name="elevation" type="integer" collectearth:fromcsv="true">
 				<label xml:lang="en">Elevation</label>
 				<label xml:lang="es">Elevacion</label>
 				<label xml:lang="fr">Elevation</label>
 			</number>
-			<number id="6" name="aspect"  type="real" collectearth:fromcsv="true">
-				<label xml:lang="en">Aspect</label>
-				<label xml:lang="es">Exposicion</label>
-				<label xml:lang="fr">Aspect</label>
-			</number>
 			<number id="7" name="slope" type="real" collectearth:fromcsv="true">
 				<label xml:lang="en">Slope</label>
 				<label xml:lang="es">Pendiente</label>
 				<label xml:lang="fr">Pente</label>
+			</number>
+			<number id="6" name="aspect"  type="real" collectearth:fromcsv="true">
+				<label xml:lang="en">Aspect</label>
+				<label xml:lang="es">Exposicion</label>
+				<label xml:lang="fr">Aspect</label>
 			</number>
 			<boolean id="8" name="actively_saved">
 				<label xml:lang="en">Actively saved by user</label>

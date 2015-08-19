@@ -259,7 +259,7 @@
 			  gap="20" 
 			  verticalAlign="middle" horizontalAlign="right">
 		<s:HGroup verticalAlign="middle">
-			<s:Label text="{Message.get('Records per page')}:" />
+			<s:Label text="{Message.get('list.recordsPerPage')}:" />
 			<s:DropDownList id="recordPerPageDropDown" 
 							dataProvider="{new ArrayList([10, 20, 50])}" 
 							width="50"

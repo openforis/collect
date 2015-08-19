@@ -78,6 +78,7 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 			org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM,
 			org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC_DATA_ERROR_TYPE,
 			org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DATA_QUERY,
+			org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo.OFC_APPLICATION_INFO,
 			org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO,
 			org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD,
 			org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OFC_SAMPLING_DESIGN,

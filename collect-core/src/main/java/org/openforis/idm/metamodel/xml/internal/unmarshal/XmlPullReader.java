@@ -24,6 +24,8 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public abstract class XmlPullReader {
 	
+//	private static Log LOG = LogFactory.getLog(XmlPullReader.class);
+	
 	private String tagName;
 	private String namespace;
 	private List<XmlPullReader> childPullReaders;
@@ -78,7 +80,7 @@ public abstract class XmlPullReader {
 			parser.nextTag();
 			parseElement(parser);
 		} catch (XmlPullParserException e) {
-			throw new XmlParseException(parser, e.getMessage());
+			throw new XmlParseException(parser, e.getMessage(), e);
 		}
 	}
 	
@@ -89,7 +91,7 @@ public abstract class XmlPullReader {
 		}
 		try {
 			XmlPullParser parser = createParser();
-			parser.setInput(is, enc);			
+			parser.setInput(is, enc);
 			parse(parser);
 		} catch (XmlPullParserException e) {
 			throw new XmlParseException(getParser(), e.getMessage());
@@ -103,7 +105,7 @@ public abstract class XmlPullReader {
 			parser.setInput(reader);
 			parse(parser);
 		} catch (XmlPullParserException e) {
-			throw new XmlParseException(getParser(), e.getMessage());
+			throw new XmlParseException(getParser(), e.getMessage(), e);
 		}
 	}
 
@@ -337,6 +339,7 @@ public abstract class XmlPullReader {
 	
 	protected static String getAttributeValue(XmlPullParser parser, String namespace, String attr) {
 		String val = parser.getAttributeValue(namespace, attr);
+		
 		if ( val == null && namespace!=null ) {
 			// If attribute is not qualified it will be returned as being in the default 
 			// namespace.  Instead, as per W3c, it should be considered as having the same 

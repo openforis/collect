@@ -1,6 +1,8 @@
 package org.openforis.collect.io.metadata;
 
 import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -37,16 +39,14 @@ public class CodeListImagesImportTask extends Task {
 		while (entries.hasMoreElements()) {
 			ZipEntry entry = entries.nextElement();
 			String entryName = entry.getName();
-			if (isCodeListImageEntry(entryName)) {
-				int codeListId = extractCodeListId(entryName);
-				CodeList codeList = survey.getCodeListById(codeListId);
+			if (CodeListImageEntry.isValidEntry(entryName)) {
+				CodeListImageEntry codeListImageEntry = CodeListImageEntry.parseEntryName(entryName);
+				CodeList codeList = survey.getCodeListById(codeListImageEntry.getListId());
 				if (codeList != null) {
-					int itemId = extractCodeListItemId(entryName);
-					String imageFileName = extractImageFileName(entryName);
-					CodeListItem item = codeListManager.loadItem(codeList, itemId);
+					CodeListItem item = codeListManager.loadItem(codeList, codeListImageEntry.getItemId());
 					if (item != null && item instanceof PersistedCodeListItem) {
 						byte[] content = IOUtils.toByteArray(zipFile.getInputStream(entry));
-						codeListManager.saveImageContent((PersistedCodeListItem) item, new FileWrapper(content, imageFileName));
+						codeListManager.saveImageContent((PersistedCodeListItem) item, new FileWrapper(content, codeListImageEntry.getFileName()));
 					} else {
 						log().warn("Error restoring code list image file : " + entry.getName());
 					}
@@ -55,25 +55,6 @@ public class CodeListImagesImportTask extends Task {
 		}
 	}
 
-	private boolean isCodeListImageEntry(String entryName) {
-		return entryName.startsWith(SurveyBackupJob.CODE_LIST_IMAGES_FOLDER);
-	}
-	
-	private int extractCodeListId(String entryName) {
-		String[] parts = entryName.split(SurveyBackupJob.ZIP_FOLDER_SEPARATOR);
-		return Integer.parseInt(parts[1]);
-	}
-
-	private int extractCodeListItemId(String entryName) {
-		String[] parts = entryName.split(SurveyBackupJob.ZIP_FOLDER_SEPARATOR);
-		return Integer.parseInt(parts[2]);
-	}
-	
-	private String extractImageFileName(String entryName) {
-		String[] parts = entryName.split(SurveyBackupJob.ZIP_FOLDER_SEPARATOR);
-		return parts[3];
-	}
-	
 	public void setCodeListManager(CodeListManager codeListManager) {
 		this.codeListManager = codeListManager;
 	}
@@ -84,5 +65,49 @@ public class CodeListImagesImportTask extends Task {
 	
 	public void setSurvey(CollectSurvey survey) {
 		this.survey = survey;
+	}
+	
+	private static class CodeListImageEntry {
+		private static final Pattern PATTERN = Pattern.compile("^" + Pattern.quote(SurveyBackupJob.CODE_LIST_IMAGES_FOLDER) + "[/|\\\\](\\d+)[/|\\\\](\\d+)[/|\\\\](.+)$");
+		
+		private int listId;
+		private int itemId;
+		private String fileName;
+		
+		public CodeListImageEntry(int listId, int itemId, String fileName) {
+			super();
+			this.listId = listId;
+			this.itemId = itemId;
+			this.fileName = fileName;
+		}
+		
+		public static boolean isValidEntry(String entryName) {
+			return PATTERN.matcher(entryName).matches();
+		}
+		
+		public static CodeListImageEntry parseEntryName(String entryName) {
+			Matcher matcher = PATTERN.matcher(entryName);
+			if (matcher.find()) {
+				String listId = matcher.group(1);
+				String itemId = matcher.group(2);
+				String fileName = matcher.group(3);
+				return new CodeListImageEntry(Integer.parseInt(listId), Integer.parseInt(itemId), fileName);
+			} else {
+				return null;
+			}
+		}
+		
+		public int getListId() {
+			return listId;
+		}
+		
+		public int getItemId() {
+			return itemId;
+		}
+		
+		public String getFileName() {
+			return fileName;
+		}
+		
 	}
 }

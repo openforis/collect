@@ -53,7 +53,7 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 				UIConfiguration uiConfiguration = new UIOptionsMigrator().migrateToUIConfiguration(collectSurvey.getUIOptions());
 				collectSurvey.setUIConfiguration(uiConfiguration);
 			} catch(Exception e) {
-				log.error(e);
+				log.error("Error generating UI model for survey " + collectSurvey.getUri(), e);
 			}
 		}
 	}

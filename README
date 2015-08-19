@@ -6,9 +6,11 @@ Available Maven profiles:
 - updater: 		builds the updaters (used by the autoupdater)
 - publish:		publish the udpate using the specified parameters (
  
-Activate all the profiles during the release, spcifying the "release" property (value does not matter):
+Release a new version:
 
-mvn release:prepare -Drelease
-mvn release:perform -Drelease
+mvn release:prepare
+mvn release:perform
+
+(All profiles are active during the release).
 
 See http://www.openforis.org/wiki/index.php/Open_Foris_Collect_Development_Environment for detailed instructions/

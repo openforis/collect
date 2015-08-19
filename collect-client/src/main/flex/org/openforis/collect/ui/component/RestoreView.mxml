@@ -32,8 +32,12 @@
 				_presenter.init();
 			}
 			
-			protected function surveyLabelFunction(survey:SurveySummary):String {
-				return survey.name;
+			protected function surveyLabelFunction(survey:Object):String {
+				var label:String = 
+					survey is SurveySummary ? survey.name : 
+					survey.hasOwnProperty("label") ? survey["label"] : 
+					survey.toString();
+				return label;
 			}
 		]]>
 	</fx:Script>

@@ -31,7 +31,7 @@ public class SurveyBackupInfo {
 	private String surveyName;
 	
 	public SurveyBackupInfo() {
-		this.collectVersion = Collect.getVersion();
+		this.collectVersion = Collect.VERSION;
 		this.timestamp = new Date();
 	}
 	

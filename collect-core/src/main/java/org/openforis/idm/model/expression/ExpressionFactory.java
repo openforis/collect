@@ -49,7 +49,7 @@ public class ExpressionFactory {
 
 	private static final Set<String> CORE_FUNCTION_NAMES = new HashSet<String>(asList(
 			"boolean", "not", "true", "false", // boolean values functions
-			"number", "round", "floor", "ceiling", //math functions
+			"number", "round", "floor", "ceiling", "format-number", // math functions
 			"string", "concat", "substring", "string-length", "normalize-space", "contains", "starts-with", "ends-with", // string functions
 			"count", "sum", // aggregate functions
 			"position", "last" // context functions

@@ -39,6 +39,8 @@ package org.openforis.collect.util {
 		
 		public static const DATE_TIME_PATTERN:String = "dd-MM-yyyy HH:mm";
 		public static const XML_DATE_TIME_PATTERN:String = "yyyy-MM-dd\'T\'HH:mm:ss";
+
+		public static const VALID_INTERNAL_NAME_REGEX:RegExp = /^[a-z][a-z0-9_]*$/;
 		
 		private static var _RECORD_FILE_DOWNLOAD_URL:String; 
 		private static var _RECORD_FILE_DELETE_URL:String; 
@@ -74,8 +76,8 @@ package org.openforis.collect.util {
 			return mx.utils.StringUtil.substitute(baseUrl, surveyId);
 		}
 
-		public static function getSurveyDataRestoreUrl(surveyName:String):String {
-			return _URL + "surveys/" + surveyName + "/data/restore.json";
+		public static function getSurveyDataRestoreUrl():String {
+			return _URL + "surveys/data/restore.json";
 		}
 
 		public static function get RECORD_FILE_DOWNLOAD_URL():String {

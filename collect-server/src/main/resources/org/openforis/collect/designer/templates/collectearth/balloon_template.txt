@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<script type="text/javascript">
@@ -56,6 +57,19 @@
 	var DEBUG = false; // if set to true, log messages will appear in a box in the bottom part of the balloon
  	var NEXT_ID = "$[next_id]";
  	var HOST = "$[host]";
+ 	
+ 	var SUBMIT_LABEL = "PLACEHOLDER_FINISH";
+    var NEXT_LABEL = "PLACEHOLDER_NEXT";
+    var PREVIOUS_LABEL = "PLACEHOLDER_PREVIOUS";
+    var SUBMIT_LABEL = "PLACEHOLDER_FINISH";
+    var NEXT_LABEL = "PLACEHOLDER_NEXT";
+    var PREVIOUS_LABEL = "PLACEHOLDER_PREVIOUS";
+    
+    var COLLECT_NOT_RUNNING = "PLACEHOLDER_COLLECT_NOT_RUNNING";
+    var PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";
+    
+    
+    
 	</script>
 	
 	<script src="earthFiles/jquery/jquery.js?v=$[randomNumber]"></script>

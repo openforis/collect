@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcCodeList extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord> {
 
-	private static final long serialVersionUID = -133854695;
+	private static final long serialVersionUID = -532442149;
 
 	/**
 	 * The reference instance of <code>collect.ofc_code_list</code>
@@ -132,6 +132,29 @@ public class OfcCodeList extends org.jooq.impl.TableImpl<org.openforis.collect.p
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord, java.lang.String> IMAGE_FILE_NAME = createField("image_file_name", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
+<<<<<<< HEAD
+=======
+	 * The column <code>collect.ofc_code_list.label4</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord, java.lang.String> LABEL4 = createField("label4", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_code_list.label5</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord, java.lang.String> LABEL5 = createField("label5", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_code_list.description4</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord, java.lang.String> DESCRIPTION4 = createField("description4", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+	 * The column <code>collect.ofc_code_list.description5</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord, java.lang.String> DESCRIPTION5 = createField("description5", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
+>>>>>>> 9ade6bb437819b9f436e826893c74805edc724e5
 	 * Create a <code>collect.ofc_code_list</code> table reference
 	 */
 	public OfcCodeList() {

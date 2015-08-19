@@ -1,5 +1,7 @@
 package org.openforis.collect.manager.validation;
 
+import static org.openforis.collect.metamodel.ui.UIOptions.Layout.TABLE;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -8,7 +10,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Stack;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -20,9 +21,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.Collect;
 import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult.Flag;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.commons.versioning.Version;
 import org.openforis.idm.metamodel.AttributeDefault;
@@ -77,7 +82,8 @@ public class SurveyValidator {
 
 	@Autowired
 	private CodeListManager codeListManager;
-	
+	@Autowired
+	private SpeciesManager speciesManager;
 	@Autowired
 	private ExpressionValidator expressionValidator;
 
@@ -104,20 +110,9 @@ public class SurveyValidator {
 	public SurveyValidationResults validate(CollectSurvey survey) {
 		SurveyValidationResults results = new SurveyValidationResults();
 		
-		//root entity key required
 		results.addResults(validateRootKeyAttributeSpecified(survey));
-		
-		//empty or unused code lists not allowed
+		results.addResults(validateSchemaNodes(survey));
 		results.addResults(validateCodeLists(survey));
-
-		//empty entities not allowed
-		results.addResults(validateEntities(survey));
-		
-		//key attributes cannot be multiple
-		results.addResults(validateKeyAttributes(survey));
-		
-		//validate expressions
-		results.addResults(validateExpressions(survey));
 		return results;
 	}
 	
@@ -180,77 +175,78 @@ public class SurveyValidator {
 	 * @param survey
 	 * @return
 	 */
-	protected List<SurveyValidationResult> validateEntities(CollectSurvey survey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
-		Schema schema = survey.getSchema();
-		Stack<EntityDefinition> entitiesStack = new Stack<EntityDefinition>();
-		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
-		entitiesStack.addAll(rootEntities);
-		while ( ! entitiesStack.isEmpty() ) {
-			EntityDefinition entity = entitiesStack.pop();
-			List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
-			if ( childDefinitions.size() == 0 ) {
-				SurveyValidationResult validationResult = new SurveyValidationResult(entity.getPath(), "survey.validation.error.empty_entity");
-				results.add(validationResult);
-			} else {
-				for (NodeDefinition childDefn : childDefinitions) {
-					if ( childDefn instanceof EntityDefinition ) {
-						entitiesStack.push((EntityDefinition) childDefn);
-					}
-				}
-			}
-		}
-		return results;
-	}
-
-	protected List<SurveyValidationResult> validateKeyAttributes(CollectSurvey survey) {
+	protected List<SurveyValidationResult> validateSchemaNodes(CollectSurvey survey) {
 		final List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
 		Schema schema = survey.getSchema();
 		schema.traverse(new NodeDefinitionVisitor() {
 			@Override
-			public void visit(NodeDefinition node) {
-				if ( node instanceof KeyAttributeDefinition ) {
-					SurveyValidationResult result = validateKeyAttributes((KeyAttributeDefinition) node);
-					if ( result != null ) {
-						results.add(result);
-					}
-				}
+			public void visit(NodeDefinition def) {
+				results.addAll(validateSchemaNode(def));
 			}
 		});
 		return results;
 	}
-	
-	protected SurveyValidationResult validateKeyAttributes(KeyAttributeDefinition keyDefn) {
-		if ( keyDefn.isKey() && ((NodeDefinition) keyDefn).isMultiple() ) {
-			return new SurveyValidationResult(((NodeDefinition) keyDefn).getPath(), 
-					"survey.validation.attribute.key_attribute_cannot_be_multiple");
-		} else {
-			return null;
-		}
-	}
 
-	protected List<SurveyValidationResult> validateExpressions(CollectSurvey survey) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
-		Schema schema = survey.getSchema();
-		Stack<NodeDefinition> nodesStack = new Stack<NodeDefinition>();
-		List<EntityDefinition> rootEntities = schema.getRootEntityDefinitions();
-		nodesStack.addAll(rootEntities);
-		while ( ! nodesStack.isEmpty() ) {
-			NodeDefinition node = nodesStack.pop();
-			List<SurveyValidationResult> nodeValidationResults = validateExpressions(node);
-			if ( ! nodeValidationResults.isEmpty() ) {
-				results.addAll(nodeValidationResults);
-			}
-			if ( node instanceof EntityDefinition ) {
-				List<NodeDefinition> childDefns = ((EntityDefinition) node).getChildDefinitions();
-				if ( ! childDefns.isEmpty() ) {
-					nodesStack.addAll(childDefns);
+	private List<SurveyValidationResult> validateSchemaNode(NodeDefinition def) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		
+		results.addAll(validateExpressions(def));
+		
+		if (def instanceof EntityDefinition) {
+			results.addAll(validateEntity((EntityDefinition) def));
+		} else {
+			results.addAll(validateAttribute((AttributeDefinition) def));
+		}
+		return results;
+	}
+	
+	private List<SurveyValidationResult> validateEntity(EntityDefinition entity) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<NodeDefinition> childDefinitions = entity.getChildDefinitions();
+		if ( childDefinitions.size() == 0 ) {
+			//empty entity
+			results.add(new SurveyValidationResult(entity.getPath(), "survey.validation.error.empty_entity"));
+		}
+		if (entity.isMultiple()) {
+			UIOptions uiOptions = ((CollectSurvey) entity.getSurvey()).getUIOptions();
+			EntityDefinition parentEntity = entity.getParentEntityDefinition();
+			if (parentEntity != null && parentEntity.isMultiple()) {
+				Layout layout = uiOptions.getLayout(entity);
+				Layout parentLayout = uiOptions.getLayout(parentEntity);
+				if (TABLE == layout && TABLE == parentLayout) {
+					results.add(new SurveyValidationResult(entity.getPath(), "survey.validation.error.nested_tables"));
 				}
 			}
 		}
 		return results;
 	}
 	
+	protected List<SurveyValidationResult> validateAttribute(AttributeDefinition attrDef) {
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		if (attrDef instanceof TaxonAttributeDefinition) {
+			String taxonomyName = ((TaxonAttributeDefinition) attrDef).getTaxonomy();
+			CollectTaxonomy taxonomy = findTaxonomy((CollectSurvey) attrDef.getSurvey(), taxonomyName);
+			if (taxonomy == null) {
+				results.add(new SurveyValidationResult(attrDef.getPath(), "survey.validation.attribute.taxon.invalid_taxonomy", taxonomyName));
+			}
+		}
+		if ( attrDef instanceof KeyAttributeDefinition ) {
+			SurveyValidationResult result = validateKeyAttribute((KeyAttributeDefinition) attrDef);
+			if ( result != null ) {
+				results.add(result);
+			}
+		}
+		return results;
+	}
+
+	protected SurveyValidationResult validateKeyAttribute(KeyAttributeDefinition keyDefn) {
+		if ( keyDefn.isKey() && ((NodeDefinition) keyDefn).isMultiple() ) {
+			return new SurveyValidationResult(((NodeDefinition) keyDefn).getPath(), 
+					"survey.validation.attribute.key_attribute_cannot_be_multiple");
+		}
+		return null;
+	}
+
 	private List<SurveyValidationResult> validateExpressions(NodeDefinition node) {
 		List<SurveyValidationResult> results = validateGenericNodeExpressions(node);
 		if ( node instanceof AttributeDefinition ) {
@@ -524,7 +520,7 @@ public class SurveyValidator {
 	}
 	
 	public void validateAgainstSchema(InputStream is) throws SurveyValidationException {
-		validateAgainstSchema(is, Collect.getVersion());
+		validateAgainstSchema(is, Collect.VERSION);
 	}
 	
 	public void validateAgainstSchema(InputStream is, Version version) throws SurveyValidationException {
@@ -561,6 +557,21 @@ public class SurveyValidator {
 		return result;
 	}
 
+	private CollectTaxonomy findTaxonomy(CollectSurvey survey, String taxonomyName) {
+		List<CollectTaxonomy> taxonomies;
+		if (survey.isWork()) {
+			taxonomies = speciesManager.loadTaxonomiesBySurveyWork(survey.getId());
+		} else {
+			taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
+		}
+		for (CollectTaxonomy taxonomy : taxonomies) {
+			if (taxonomy.getName().equals(taxonomyName)) {
+				return taxonomy;
+			}
+		}
+		return null;
+	}
+	
 	public static class SurveyValidationResults implements Serializable {
 
 		private static final long serialVersionUID = 1L;

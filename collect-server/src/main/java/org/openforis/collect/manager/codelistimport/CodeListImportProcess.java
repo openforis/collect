@@ -182,7 +182,8 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		result = getChildItem(parent, code);
 		if ( result == null ) {
 			result = codeList.createItem(levelIdx + 1);
-			fillItem(result, code, labels);
+			List<LanguageSpecificText> descriptions = line.getDescriptionItems(levelIdx);
+			fillItem(result, code, labels, descriptions);
 			if ( parent == null ) {
 				codeToRootItem.put(code, result);
 			} else {
@@ -277,10 +278,14 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 		}
 		return null;
 	}
-	protected void fillItem(CodeListItem item, String code, List<LanguageSpecificText> labelItems) {
+	protected void fillItem(CodeListItem item, String code, List<LanguageSpecificText> labelItems, 
+			List<LanguageSpecificText> descriptionItems) {
 		item.setCode(code);
-		for (LanguageSpecificText labelItem : labelItems) {
-			item.setLabel(labelItem.getLanguage(), labelItem.getText());
+		for (LanguageSpecificText textItem : labelItems) {
+			item.setLabel(textItem.getLanguage(), textItem.getText());
+		}
+		for (LanguageSpecificText textItem : descriptionItems) {
+			item.setDescription(textItem.getLanguage(), textItem.getText());
 		}
 	}
 

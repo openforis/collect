@@ -829,11 +829,69 @@ public class OfcCodeListRecord extends org.jooq.impl.UpdatableRecordImpl<org.ope
 		setImageFileName(value);
 		return this;
 	}
+	/**
+	 * Setter for <code>collect.ofc_code_list.label4</code>.
+	 */
+	public void setLabel4(java.lang.String value) {
+		setValue(20, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_code_list.label4</code>.
+	 */
+	public java.lang.String getLabel4() {
+		return (java.lang.String) getValue(20);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_code_list.label5</code>.
+	 */
+	public void setLabel5(java.lang.String value) {
+		setValue(21, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_code_list.label5</code>.
+	 */
+	public java.lang.String getLabel5() {
+		return (java.lang.String) getValue(21);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_code_list.description4</code>.
+	 */
+	public void setDescription4(java.lang.String value) {
+		setValue(22, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_code_list.description4</code>.
+	 */
+	public java.lang.String getDescription4() {
+		return (java.lang.String) getValue(22);
+	}
+
+	/**
+	 * Setter for <code>collect.ofc_code_list.description5</code>.
+	 */
+	public void setDescription5(java.lang.String value) {
+		setValue(23, value);
+	}
+
+	/**
+	 * Getter for <code>collect.ofc_code_list.description5</code>.
+	 */
+	public java.lang.String getDescription5() {
+		return (java.lang.String) getValue(23);
+	}
+
+	// -------------------------------------------------------------------------
+	// Primary key information
+	// -------------------------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public OfcCodeListRecord values(java.lang.Integer value1, java.lang.Integer value2, java.lang.Integer value3, java.lang.Integer value4, java.lang.Integer value5, java.lang.Integer value6, java.lang.Integer value7, java.lang.String value8, java.lang.Boolean value9, java.lang.Integer value10, java.lang.Integer value11, java.lang.String value12, java.lang.String value13, java.lang.String value14, java.lang.String value15, java.lang.String value16, java.lang.String value17, java.lang.Integer value18, byte[] value19, java.lang.String value20) {
 		return this;
 	}
@@ -852,7 +910,7 @@ public class OfcCodeListRecord extends org.jooq.impl.UpdatableRecordImpl<org.ope
 	/**
 	 * Create a detached, initialised OfcCodeListRecord
 	 */
-	public OfcCodeListRecord(java.lang.Integer id, java.lang.Integer surveyId, java.lang.Integer surveyWorkId, java.lang.Integer codeListId, java.lang.Integer itemId, java.lang.Integer parentId, java.lang.Integer sortOrder, java.lang.String code, java.lang.Boolean qualifiable, java.lang.Integer sinceVersionId, java.lang.Integer deprecatedVersionId, java.lang.String label1, java.lang.String label2, java.lang.String label3, java.lang.String description1, java.lang.String description2, java.lang.String description3, java.lang.Integer level, byte[] imageContent, java.lang.String imageFileName) {
+	public OfcCodeListRecord(java.lang.Integer id, java.lang.Integer surveyId, java.lang.Integer surveyWorkId, java.lang.Integer codeListId, java.lang.Integer itemId, java.lang.Integer parentId, java.lang.Integer sortOrder, java.lang.String code, java.lang.Boolean qualifiable, java.lang.Integer sinceVersionId, java.lang.Integer deprecatedVersionId, java.lang.String label1, java.lang.String label2, java.lang.String label3, java.lang.String description1, java.lang.String description2, java.lang.String description3, java.lang.Integer level, byte[] imageContent, java.lang.String imageFileName, java.lang.String label4, java.lang.String label5, java.lang.String description4, java.lang.String description5) {
 		super(org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE_LIST);
 
 		setValue(0, id);
@@ -875,5 +933,9 @@ public class OfcCodeListRecord extends org.jooq.impl.UpdatableRecordImpl<org.ope
 		setValue(17, level);
 		setValue(18, imageContent);
 		setValue(19, imageFileName);
+		setValue(20, label4);
+		setValue(21, label5);
+		setValue(22, description4);
+		setValue(23, description5);
 	}
 }

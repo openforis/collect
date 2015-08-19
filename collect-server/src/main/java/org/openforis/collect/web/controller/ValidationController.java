@@ -7,6 +7,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.RecordManager;
@@ -15,9 +16,9 @@ import org.openforis.collect.manager.ValidationReportProcess;
 import org.openforis.collect.manager.ValidationReportProcess.ReportType;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.validation.ValidationMessageBuilder;
 import org.openforis.collect.spring.SpringMessageSource;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +105,7 @@ public class ValidationController extends BasicController {
 			User user = sessionState.getUser();
 			String sessionId = sessionState.getSessionId();
 			ValidationReportProcess process = new ValidationReportProcess(outputStream, recordManager, messageContextHolder, 
-					ReportType.CSV, user, sessionId, survey, r, true);
+					ReportType.CSV, user, sessionId, survey, r, true, LocaleUtils.toLocale(locale));
 			process.init();
 			process.call();
 		} catch (Exception e) {

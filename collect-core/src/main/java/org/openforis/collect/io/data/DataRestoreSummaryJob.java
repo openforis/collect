@@ -3,10 +3,6 @@
  */
 package org.openforis.collect.io.data;
 
-import java.util.List;
-
-import org.openforis.collect.io.BackupFileExtractor;
-import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
@@ -30,15 +26,6 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 	//output
 	private DataImportSummary summary;
 
-	//transient
-	private boolean oldFormat;
-	
-	@Override
-	public void createInternalVariables() throws Throwable {
-		super.createInternalVariables();
-		oldFormat = ! isDataFolderIncluded();
-	}
-
 	@Override
 	protected void buildTasks() throws Throwable {
 		super.buildTasks();
@@ -52,7 +39,7 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
 			t.setZipFile(zipFile);
-			t.setOldFormat(oldFormat);
+			t.setOldFormat(oldBackupFormat);
 			t.setPackagedSurvey(packagedSurvey);
 			t.setExistingSurvey(publishedSurvey);
 			t.setPackagedSurvey(DataRestoreSummaryJob.this.packagedSurvey);
@@ -68,12 +55,6 @@ public class DataRestoreSummaryJob extends DataRestoreBaseJob {
 			//get output survey and set it into job instance instance variable
 			this.summary = ((DataRestoreSummaryTask) task).getSummary();
 		}
-	}
-
-	private boolean isDataFolderIncluded() {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.DATA_FOLDER);
-		return ! dataEntries.isEmpty();
 	}
 
 	public UserManager getUserManager() {

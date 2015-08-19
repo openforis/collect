@@ -76,8 +76,13 @@ public class CodeListExportTask extends Task {
 		for (String levelName : levelNames) {
 			colNames.add(levelName + CodeListCSVReader.CODE_COLUMN_SUFFIX);
 			List<String> langs = list.getSurvey().getLanguages();
+			//add label columns
 			for (String lang : langs) {
 				colNames.add(levelName + CodeListCSVReader.LABEL_COLUMN_SUFFIX + "_" + lang);
+			}
+			//add description columns
+			for (String lang : langs) {
+				colNames.add(levelName + CodeListCSVReader.DESCRIPTION_COLUMN_SUFFIX + "_" + lang);
 			}
 		}
 		writer.writeHeaders(colNames.toArray(new String[colNames.size()]));
@@ -105,6 +110,10 @@ public class CodeListExportTask extends Task {
 		for (String lang : langs) {
 			String label = item.getLabel(lang);
 			lineValues.add(label);
+		}
+		for (String lang : langs) {
+			String descr = item.getDescription(lang);
+			lineValues.add(descr);
 		}
 	}
 

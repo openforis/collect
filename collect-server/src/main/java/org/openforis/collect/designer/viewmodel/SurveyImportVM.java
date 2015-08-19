@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import static org.openforis.collect.Collect.VERSION;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +14,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openforis.collect.Collect;
 import org.openforis.collect.designer.form.validator.SurveyNameValidator;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
@@ -27,6 +28,7 @@ import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidation
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.commons.io.OpenForisIOUtils;
+import org.openforis.commons.versioning.Version;
 import org.openforis.commons.versioning.Version.Significance;
 import org.openforis.concurrency.Job;
 import org.zkoss.bind.BindContext;
@@ -269,8 +271,9 @@ public class SurveyImportVM extends SurveyBaseVM {
 	protected void onSummaryCreationComplete() {
 		SurveyBackupInfo info = summaryJob.getInfo();
 		
-		if ( Collect.getVersion() != null && 
-				Collect.getVersion().compareTo(info.getCollectVersion(), VERSION_SIGNIFICANCE) < 0 ) {
+		Version version = VERSION;
+		if ( version != null && 
+				version.compareTo(info.getCollectVersion(), VERSION_SIGNIFICANCE) < 0 ) {
 			MessageUtil.showError("survey.import_survey.error.outdated_system_version");
 		} else {
 			survey = summaryJob.getSurvey();

@@ -659,7 +659,7 @@ public class SurveyManager {
 	@Transactional
 	public void saveSurveyWork(CollectSurvey survey) throws SurveyStoreException {
 		survey.setModifiedDate(new Date());
-		survey.setCollectVersion(Collect.getVersion());
+		survey.setCollectVersion(Collect.VERSION);
 		Integer id = survey.getId();
 		if ( id == null ) {
 			surveyWorkDao.insert(survey);
@@ -763,7 +763,7 @@ public class SurveyManager {
 		survey.setWork(false);
 		survey.setPublished(true);
 		survey.setModifiedDate(new Date());
-		survey.setCollectVersion(Collect.getVersion());
+		survey.setCollectVersion(Collect.VERSION);
 		
 		CollectSurvey oldPublishedSurvey = getByUri(survey.getUri());
 		if ( oldPublishedSurvey == null ) {

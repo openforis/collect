@@ -3,11 +3,12 @@
  */
 package org.openforis.collect.model;
 
+import static org.openforis.collect.Collect.VERSION;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.openforis.collect.Collect;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
@@ -43,7 +44,7 @@ public class CollectSurvey extends Survey {
 		super(surveyContext);
 		this.work = false;
 		this.target = SurveyTarget.COLLECT_DESKTOP;
-		this.collectVersion = Collect.getVersion();
+		this.collectVersion = VERSION;
 		this.annotations = new CollectAnnotations(this);
 	}
 

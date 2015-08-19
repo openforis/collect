@@ -12,6 +12,7 @@
 			}
 		}
 	]]></script>
+
 	<borderlayout id="surveyEditBox" 
 		hflex="1" vflex="1"
 		self="@define(content)"
@@ -20,7 +21,7 @@
 		<north border="none">
 			<box width="100%" align="center">
 				<label sclass="mainTitleEditing"
-					value="${labels.designer_title}" />
+					value="@load(vm.surveyEditTitle)" />
 			</box>
 		</north>
 		<center border="none">
@@ -85,20 +86,22 @@
 						</tabpanels>
 					</tabbox>
 				</absolutechildren>
-				<absolutechildren x="480" width="50%">
+				<absolutechildren x="650" width="300px">
 					<hlayout hflex="1"
-							spacing="20px" 
+							spacing="10px" 
 							style="text-align: right;" 
 							sclass="controlBar">
 							
 						<!-- Language selector -->
-						<hlayout id="languageSelector"
+						<hlayout id="languageSelector" width="245px"
 							sclass="controlBar">
-							<label value="${labels.survey.language.current_language}:" />
+							<label value="${labels.survey.language.current_language}:" 
+								width="150px" style="white-space: nowrap;" />
 							<listbox model="@load(vm.availableLanguages)"
 								selectedItem="@load(vm.currentLanguageCode)"
 								onSelect="@command('languageCodeSelected', code=self.selectedItem.value)"
-								mold="select">
+								mold="select"
+								width="110px">
 								<template name="model">
 									<listitem label="${c:l(each)}"
 										value="@load(each)" />

@@ -12,8 +12,6 @@
 		<![CDATA[
 			import com.shortybmc.utils.StringUtils;
 			
-			import org.openforis.collect.util.StringUtil;
-			
 			import mx.events.FlexEvent;
 			import mx.rpc.AsyncResponder;
 			import mx.rpc.IResponder;
@@ -27,6 +25,7 @@
 			import org.openforis.collect.model.proxy.ConfigurationProxy;
 			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.util.AlertUtil;
+			import org.openforis.collect.util.StringUtil;
 			
 			private var _initialized:Boolean;
 			
@@ -69,6 +68,9 @@
 				allowedRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 				remoteCloneUrlTextInput.text = conf.remoteCloneUrl;
 				remoteCloneUrlTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
+				if (StringUtil.isNotBlank(conf.remoteCloneUrl)) {
+					loadRemoteCloneInfo();
+				}
 				remoteCloneRestoreKeyTextInput.text = conf.remoteCloneRestoreKey;
 				remoteCloneRestoreKeyTextInput.addEventListener(FlexEvent.VALUE_COMMIT, configurationItemChangeHandler);
 			}
@@ -108,12 +110,32 @@
 				textInput.text = StringUtil.trim(textInput.text);
 				var configurationItem:Configuration$ConfigurationItem = textInputToConfigurationItem[textInput.id];
 				var value:String = textInput.text;
-				var responder:IResponder = new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
-					
+				if (configurationItem == Configuration$ConfigurationItem.REMOTE_CLONE_URL) {
+					remoteCloneValidityLabel.text = StringUtil.isBlank(value) ? null : Message.get("global.loading_short");
+				}
+				ClientFactory.configurationClient.updateConfigurationItem(new AsyncResponder(
+					function(event:ResultEvent, token:Object = null):void {
+						if (configurationItem == Configuration$ConfigurationItem.REMOTE_CLONE_URL && StringUtil.isNotBlank(value)) {
+							loadRemoteCloneInfo();
+						}
+					}, faultHandler), 
+					configurationItem, value
+				);
+			}
+			
+			private function loadRemoteCloneInfo():void {
+				remoteCloneValidityLabel.text = Message.get("global.loading_short");
+				
+				ClientFactory.configurationClient.isRemoteCloneValid(new AsyncResponder(function(event:ResultEvent, token:Object = null):void {
+					var valid:Boolean = Boolean(event.result);
+					remoteCloneValidityLabel.text = valid ? Message.get("global.ok") : Message.get("configuration.remote_clone.not_valid");
 				}, function(event:FaultEvent, token:Object = null):void {
-					AlertUtil.showError(event.fault.message);
-				});
-				ClientFactory.configurationClient.updateConfigurationItem(responder, configurationItem, value);
+					AlertUtil.showError("configuration.remote_clone.error_verifying_validity", [event.fault.message]);
+				}));
+			}
+			
+			private function faultHandler(event:FaultEvent, token:Object = null):void {
+				AlertUtil.showError(event.fault.message);
 			}
 			
 		]]>
@@ -177,14 +199,15 @@
 						</s:FormItem>
 						
 						<!-- remote clone url -->
-						<s:FormItem label="{Message.get('configuration.remote_clone_url')}" width="100%">
-							<s:VGroup width="100%">
+						<s:FormItem label="{Message.get('configuration.remote_clone.url')}" width="100%">
+							<s:HGroup width="100%" verticalAlign="middle">
 								<s:TextInput id="remoteCloneUrlTextInput" width="100%" />
-							</s:VGroup>
+								<s:Label id="remoteCloneValidityLabel" width="100" />
+							</s:HGroup>
 						</s:FormItem>
 						
 						<!-- remote clone restore key -->
-						<s:FormItem label="{Message.get('configuration.remote_clone_restore_key')}" width="100%">
+						<s:FormItem label="{Message.get('configuration.remote_clone.restore_key')}" width="100%">
 							<s:VGroup width="100%">
 								<s:TextInput id="remoteCloneRestoreKeyTextInput" width="100%" />
 							</s:VGroup>

@@ -1,6 +1,7 @@
 package org.openforis.collect.manager.process;
 
 import java.io.Serializable;
+import java.util.Observable;
 
 
 /**
@@ -8,7 +9,7 @@ import java.io.Serializable;
  * @author S. Ricci
  *
  */
-public class DataProcessingState implements Serializable {
+public class DataProcessingState extends Observable implements Serializable {
 
 	/**
 	 * 
@@ -39,6 +40,8 @@ public class DataProcessingState implements Serializable {
 	
 	public void incrementCount() {
 		count++;
+		setChanged();
+		notifyObservers();
 	}
 	
 	public void resetCount() {
@@ -79,6 +82,7 @@ public class DataProcessingState implements Serializable {
 
 	public void setTotal(int total) {
 		this.total = total;
+		notifyObservers();
 	}
 
 	public boolean isComplete() {
