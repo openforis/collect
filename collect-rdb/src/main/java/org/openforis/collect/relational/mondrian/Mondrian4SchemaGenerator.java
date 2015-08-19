@@ -20,7 +20,6 @@ import mondrian.olap.MondrianDef.ForeignKey;
 import mondrian.olap.MondrianDef.ForeignKeyLink;
 import mondrian.olap.MondrianDef.Hierarchies;
 import mondrian.olap.MondrianDef.Hierarchy;
-import mondrian.olap.MondrianDef.Key;
 import mondrian.olap.MondrianDef.Level;
 import mondrian.olap.MondrianDef.Link;
 import mondrian.olap.MondrianDef.Measure;
@@ -51,6 +50,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * 
@@ -202,7 +202,7 @@ public class Mondrian4SchemaGenerator {
 			if (! hierarchyLevels.isEmpty()) {
 				Hierarchies hierarchies = new Hierarchies();
 				Hierarchy hierarchy = new Hierarchy();
-				hierarchy.name = attrDefn.getName();
+				hierarchy.name = attrDefn.getName() + "_full_hierarchy";
 				hierarchy.children.addAll(hierarchyLevels);
 				hierarchies.list().add(hierarchy);
 				dimension.children.add(hierarchies);
@@ -228,36 +228,59 @@ public class Mondrian4SchemaGenerator {
 			attribute.nameColumn = CodeListTables.getLabelColumnName(rdbConfig, codeListTableName);
 			attributes.add(attribute);
 		} else if (attrDefn.hasMainField()) {
-			for (FieldDefinition<?> fieldDef : attrDefn.getFieldDefinitions()) {
-				DataColumn col = dataTable.getDataColumn(fieldDef);
-				if (col != null) {
-					Attribute attribute = new Attribute();
-					String fieldName = fieldDef.getName();
-					attribute.name = fieldName;
-					attribute.caption = getAttributeCaption(fieldDef);
-					attribute.keyColumn = col.getName();
-					if (attrDefn instanceof DateAttributeDefinition) {
-						attribute.levelType = getDateFieldLevelType(fieldName);
-					}
-					attributes.add(attribute);
-				}
-			}
-		} else {
-			// every field makes the Key of the Attribute
+			attributes.addAll(createAttributesForFields(dataTable, attrDefn));
+		} else if (attrDefn instanceof DateAttributeDefinition || attrDefn instanceof TimeAttributeDefinition) {
+			List<DataColumn> dataColumns = dataTable.getDataColumns(attrDefn);
+			DataColumn dataColumn = dataColumns.get(0);
 			Attribute attribute = new Attribute();
 			attribute.name = attrDefn.getName();
 			attribute.caption = getDimensionCaption(attrDefn);
-			Key key = new Key();
-			for (FieldDefinition<?> fieldDef : attrDefn.getFieldDefinitions()) {
-				DataColumn dataColumn = dataTable.getDataColumn(fieldDef);
-				if (dataColumn != null) {
-					Column column = new Column();
-					column.name = dataColumn.getName();
-					key.list().add(column);
-				}
-			}
-			attribute.children.add(key);
+			attribute.keyColumn = dataColumn.getName();
 			attributes.add(attribute);
+			attributes.addAll(createAttributesForFields(dataTable, attrDefn));
+		} else {
+			//TODO
+			// every field makes the Key of the Attribute ?! then nameColumn must be specified
+//			Attribute attribute = new Attribute();
+//			attribute.name = attrDefn.getName();
+//			attribute.caption = getDimensionCaption(attrDefn);
+//			Key key = new Key();
+//			for (FieldDefinition<?> fieldDef : attrDefn.getFieldDefinitions()) {
+//				DataColumn dataColumn = dataTable.getDataColumn(fieldDef);
+//				if (dataColumn != null) {
+//					Column column = new Column();
+//					column.name = dataColumn.getName();
+//					key.list().add(column);
+//				}
+//			}
+//			attribute.children.add(key);
+//			Name name = new Name();
+//			name.list().add(e)
+//			attribute.children.add(name);
+//			attributes.add(attribute);
+		}
+		return attributes;
+	}
+
+	private List<Attribute> createAttributesForFields(DataTable dataTable,
+			AttributeDefinition attrDefn) {
+		List<FieldDefinition<?>> fieldDefs = attrDefn.getFieldDefinitions();
+		
+		List<Attribute> attributes = new ArrayList<Attribute>(fieldDefs.size());
+		
+		for (FieldDefinition<?> fieldDef : fieldDefs) {
+			DataColumn col = dataTable.getDataColumn(fieldDef);
+			if (col != null) {
+				Attribute attribute = new Attribute();
+				String fieldName = fieldDef.getName();
+				attribute.name = fieldName;
+				attribute.caption = getAttributeCaption(fieldDef);
+				attribute.keyColumn = col.getName();
+//				if (attrDefn instanceof DateAttributeDefinition) {
+//					attribute.levelType = getDateFieldLevelType(fieldName);
+//				}
+				attributes.add(attribute);
+			}
 		}
 		return attributes;
 	}
@@ -265,30 +288,30 @@ public class Mondrian4SchemaGenerator {
 	private List<Level> createHierarchyLevels(
 			AttributeDefinition attrDef) {
 		List<Level> levels = new ArrayList<Level>();
-		if (attrDef instanceof DateAttributeDefinition) {
-			for (FieldDefinition<?> fieldDef : attrDef.getFieldDefinitions()) {
-				String fieldName = fieldDef.getName();
-				Level level = new Level();
-				level.name = level.attribute = fieldName;
-				levels.add(level);
-			}
-		} else {
-			
-		}
+//		if (attrDef instanceof DateAttributeDefinition) {
+//			for (FieldDefinition<?> fieldDef : attrDef.getFieldDefinitions()) {
+//				String fieldName = fieldDef.getName();
+//				Level level = new Level();
+//				level.name = level.attribute = fieldName;
+//				levels.add(level);
+//			}
+//		} else {
+//			
+//		}
 		return levels;
 	}
 
-	private String getDateFieldLevelType(String fieldName) {
-		if (DateAttributeDefinition.YEAR_FIELD_NAME.equals(fieldName)) {
-			return "TimeYears";
-		} else if (DateAttributeDefinition.MONTH_FIELD_NAME.equals(fieldName)) {
-			return "TimeMonths";
-		} else if(DateAttributeDefinition.DAY_FIELD_NAME.equals(fieldName)) {
-			return "TimeDays";
-		} else {
-			throw new IllegalArgumentException("Unexpected date attribute field name: " + fieldName);
-		}
-	}
+//	private String getDateFieldLevelType(String fieldName) {
+//		if (DateAttributeDefinition.YEAR_FIELD_NAME.equals(fieldName)) {
+//			return "TimeYears";
+//		} else if (DateAttributeDefinition.MONTH_FIELD_NAME.equals(fieldName)) {
+//			return "TimeMonths";
+//		} else if(DateAttributeDefinition.DAY_FIELD_NAME.equals(fieldName)) {
+//			return "TimeDays";
+//		} else {
+//			throw new IllegalArgumentException("Unexpected date attribute field name: " + fieldName);
+//		}
+//	}
 
 	private PhysicalSchema generatePhysicalSchema() {
 		PhysicalSchema physicalSchema = new PhysicalSchema();

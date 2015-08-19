@@ -445,12 +445,12 @@
 					<artifactId>mondrian</artifactId>
 		    	</exclusion>
 		    	<exclusion>
-					<groupId>javax.el</groupId>
-					<artifactId>el-api</artifactId>
-		    	</exclusion>
-		    	<exclusion>
 					<groupId>org.glassfish.web</groupId>
 					<artifactId>javax.el</artifactId>
+		    	</exclusion>
+		    	<exclusion>
+		    		<groupId>javax.el</groupId>
+		    		<artifactId>javax.el-api</artifactId>
 		    	</exclusion>
 		    	<exclusion>
    					<groupId>javax.servlet</groupId>
