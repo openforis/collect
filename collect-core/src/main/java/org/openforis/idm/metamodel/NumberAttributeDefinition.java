@@ -50,12 +50,15 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 	@Override
 	public NumberValue<? extends Number> createValue(String stringValue) {
 		Unit defaultUnit = getDefaultUnit();
-		if(isInteger()){
-			return new IntegerValue(Integer.parseInt(stringValue), defaultUnit);
-		} else if(isReal()) {
-			return new RealValue(Double.parseDouble(stringValue), defaultUnit);
+		double doubleValue = Double.parseDouble(stringValue);
+		switch(getType()) {
+		case INTEGER:
+			return new IntegerValue(Double.valueOf(Math.round(doubleValue)).intValue(), defaultUnit);
+		case REAL:
+			return new RealValue(doubleValue, defaultUnit);
+		default:
+			throw new RuntimeException("Invalid type " + getType());
 		}
-		throw new RuntimeException("Invalid type " + getType());
 	}
 	
 	@Override

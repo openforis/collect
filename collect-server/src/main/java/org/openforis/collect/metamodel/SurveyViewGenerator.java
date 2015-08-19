@@ -40,10 +40,11 @@ public class SurveyViewGenerator {
 				String label = getLabel(def, langCode);
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
-					view = new EntityDefView(id, name, label);
+					view = new EntityDefView(((EntityDefinition) def).isRoot(), id, name, label, def.isMultiple());
 				} else {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
-					view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames());
+					view = new AttributeDefView(id, name, label, AttributeType.valueOf(attrDef), attrDef.getFieldNames(),
+							attrDef.isKey(), attrDef.isMultiple());
 				}
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
@@ -73,13 +74,17 @@ public class SurveyViewGenerator {
 		private String name;
 		private String label;
 		private NodeType type;
+		private boolean key;
+		private boolean multiple;
 		
-		public NodeDefView(int id, String name, String label, NodeType type) {
+		public NodeDefView(int id, String name, String label, NodeType type, boolean key, boolean multiple) {
 			super();
 			this.id = id;
 			this.name = name;
 			this.label = label;
 			this.type = type;
+			this.key = key;
+			this.multiple = multiple;
 		}
 
 		public int getId() {
@@ -102,17 +107,32 @@ public class SurveyViewGenerator {
 			return type;
 		}
 		
+		public boolean isKey() {
+			return key;
+		}
+		
+		public boolean isMultiple() {
+			return multiple;
+		}
+		
 	}
 	
 	public static class EntityDefView extends NodeDefView {
 
 		private List<NodeDefView> children;
+		private boolean root;
 		
-		public EntityDefView(int id, String name, String label) {
-			super(id, name, label, NodeType.ENTITY);
+		public EntityDefView(boolean root, int id, String name, String label, 
+				boolean multiple) {
+			super(id, name, label, NodeType.ENTITY, false, multiple);
+			this.root = root;
 			children = new ArrayList<NodeDefView>();
 		}
 
+		public boolean isRoot() {
+			return root;
+		}
+		
 		public List<NodeDefView> getChildren() {
 			return children;
 		}
@@ -132,8 +152,9 @@ public class SurveyViewGenerator {
 		private AttributeType attributeType;
 		private List<String> fieldNames;
 		
-		public AttributeDefView(int id, String name, String label, AttributeType type, List<String> fieldNames) {
-			super(id, name, label, NodeType.ATTRIBUTE);
+		public AttributeDefView(int id, String name, String label, AttributeType type, 
+				List<String> fieldNames, boolean key, boolean multiple) {
+			super(id, name, label, NodeType.ATTRIBUTE, key, multiple);
 			this.attributeType = type;
 			this.fieldNames = fieldNames;
 		}

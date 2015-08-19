@@ -44,20 +44,23 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 //			$this.recordStepSelectPicker = select.data().selectpicker;
 //		}
 		{
+			var columns = [
+               {field: "selected", title: "", radio: true},
+               {field: "id", title: "Id", visible: false}
+	        ];
+			columns = columns.concat(Collect.Grids.createRootEntityKeyColumns(collect.activeSurvey));
+			columns = columns.concat([
+				{field: "nodePath", title: "Path"},
+				{field: "attributeValue", title: "Value"}
+			]);
 			var el = $this.content.find('.data-error-report-items-grid');
 			el.bootstrapTable({
 			    url: "datacleansing/dataerrorreports/" + $this.item.id + "/items.json",
 			    cache: false,
 			    clickToSelect: true,
-			    columns: [
-		          	{field: "selected", title: "", radio: true},
-					{field: "id", title: "Id", visible: false},
-					{field: "key1", title: "Key1"},
-					{field: "key2", title: "Key2"},
-					{field: "key3", title: "Key3"},
-					{field: "nodePath", title: "Path"},
-					{field: "attributeValue", title: "Value"}
-				]
+			    width: 800,
+			    height: 300,
+			    columns: columns
 			});
 			$this.reportItemsDataGrid = el.data('bootstrap.table');
 		}

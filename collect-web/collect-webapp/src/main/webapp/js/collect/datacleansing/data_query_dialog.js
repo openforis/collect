@@ -33,18 +33,17 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 		}
 		
 		var testResultGridContainer = $this.content.find(".test-result-grid");
+		
+		var columns = Collect.Grids.createRootEntityKeyColumns(collect.activeSurvey);
+		columns = columns.concat([
+              {field: "nodePath", title: "Path", width: 400},
+              {field: "attributeValue", title: "Value", width: 400}
+        ]);
 		testResultGridContainer.bootstrapTable({
 			url: this.itemEditService.contextPath + "test-result.json",
 			cache: false,
-			clickToSelect: true,
 			height: 200,
-			columns: [
-		          {field: "key1", title: "Key1"},
-		          {field: "key2", title: "Key2"},
-		          {field: "key3", title: "Key3"},
-		          {field: "nodePath", title: "Path"},
-		          {field: "attributeValue", title: "Value"}
-		          ]
+			columns: columns
 		});
 		$this.testResultDataGrid = testResultGridContainer.data('bootstrap.table');
 		$this.testResultDataGrid.$container.hide();

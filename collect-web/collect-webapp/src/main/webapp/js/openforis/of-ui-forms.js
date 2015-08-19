@@ -28,7 +28,7 @@ OF.UI.Forms.populateSelect = function($select, items, valueKey, labelKeyOrFuncti
 				label = labelKeyOrFunction(item);
 				break;
 			case "string":
-				label = OF.Objects.getProperty(labelKeyOrFunction);
+				label = OF.Objects.getProperty(item, labelKeyOrFunction);
 				break;
 			}
 		}

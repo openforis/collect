@@ -11,7 +11,7 @@
 		<script type="text/javascript" src="js/jquery/jquery-ui/1.11.2/jquery-ui.js"></script>
 		<script type="text/javascript" src="js/bootstrap/3.3.1/bootstrap.js"></script>
 		<script type="text/javascript" src="js/bootstrap/bootstrap-select/1.6.3/bootstrap-select.min.js"></script>
-		<script type="text/javascript" src="js/bootstrap/bootstrap-table/1.5.0/bootstrap-table.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>
 		<script type="text/javascript" src="js/jstree/jstree-3.0.8.js"></script>
 		
 <!-- 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script> -->
@@ -32,6 +32,7 @@
 <!-- 		<script type="text/javascript" src="js/openforis/google_maps_extensions/layer_overlay.js?v=PROJECT_VERSION"></script> -->
 		
 		<script type="text/javascript" src="js/collect/collect.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/util/grids.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/node_tree.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/metamodel/survey.js?v=PROJECT_VERSION"></script>
 		
@@ -65,7 +66,7 @@
 		<link rel="stylesheet" href="data:text/css;charset=utf-8," 
 			data-href="css/bootstrap/3.3.1/bootstrap-theme.min.css" id="bs-theme-stylesheet">
 		<link rel="stylesheet" href="css/bootstrap/bootstrap-select/1.6.3/bootstrap-select.min.css">
-		<link rel="stylesheet" href="css/bootstrap/bootstrap-table/1.5.0/bootstrap-table.min.css">
+		<link rel="stylesheet" href="css/bootstrap/bootstrap-table/1.8.1/bootstrap-table.min.css">
 		<link rel="stylesheet" href="css/jquery/jquery-ui/1.11.2/jquery-ui.min.css">
 		<link rel="stylesheet" href="css/jstree/themes/default/style.min.css" />
 		<link rel="stylesheet" href="assets/font-awesome-4.3.0/css/font-awesome.min.css">
@@ -141,57 +142,69 @@
 					
 						</div>
 						<div id="data-error-type-panel" role="tabpanel" class="tab-pane" >
-							<div id="dataerrortypegrid"></div>
-							
-							<div>
-								<button id="newDataErrorTypeBtn" type="button" class="btn btn-success new-btn">New</button>
-								<button id="editDataErrorTypeBtn" type="button" class="btn btn-primary edit-btn">Edit</button>
-								<button id="deleteDataErrorTypeBtn" type="button" class="btn btn-danger delete-btn">Delete</button>
+							<div class="container">
+								<table id="dataerrortypegrid"></table>
+								
+								<div>
+									<button id="newDataErrorTypeBtn" type="button" class="btn btn-success new-btn">New</button>
+									<button id="editDataErrorTypeBtn" type="button" class="btn btn-primary edit-btn">Edit</button>
+									<button id="deleteDataErrorTypeBtn" type="button" class="btn btn-danger delete-btn">Delete</button>
+								</div>
 							</div>
 						</div>
 						<div id="data-query-panel" role="tabpanel" class="tab-pane" >
-							<div id="dataquerygrid"></div>
-							
-							<div>
-								<button type="button" class="btn btn-success new-btn">New</button>
-								<button type="button" class="btn btn-primary edit-btn">Edit</button>
-								<button type="button" class="btn btn-danger delete-btn">Delete</button>
+							<div class="container">
+								<table id="dataquerygrid"></table>
+								
+								<div>
+									<button type="button" class="btn btn-success new-btn">New</button>
+									<button type="button" class="btn btn-primary edit-btn">Edit</button>
+									<button type="button" class="btn btn-danger delete-btn">Delete</button>
+								</div>
 							</div>
 						</div>
 						<div id="dataErrorQueriesPanel" role="tabpanel" class="tab-pane" >
-							<div id="dataerrorquerygrid"></div>
-							
-							<div>
-								<button id="new-data-error-query-btn" type="button" class="btn btn-success">New</button>
-								<button id="edit-data-error-query-btn" type="button" class="btn btn-primary">Edit</button>
-								<button id="delete-data-error-query-btn" type="button" class="btn btn-danger">Delete</button>
+							<div class="container">
+								<table id="dataerrorquerygrid"></table>
+								
+								<div>
+									<button id="new-data-error-query-btn" type="button" class="btn btn-success">New</button>
+									<button id="edit-data-error-query-btn" type="button" class="btn btn-primary">Edit</button>
+									<button id="delete-data-error-query-btn" type="button" class="btn btn-danger">Delete</button>
+								</div>
 							</div>
 						</div>
 						<div id="data-error-reports-panel" role="tabpanel" class="tab-pane" >
-							<div id="data-error-report-grid"></div>
-							
-							<div>
-								<button id="new-data-error-report-btn" type="button" class="btn btn-success">New</button>
-								<button id="view-data-error-report-btn" type="button" class="btn btn-primary">View</button>
-								<button id="delete-data-error-report-btn" type="button" class="btn btn-danger">Delete</button>
+							<div class="container">
+								<table id="data-error-report-grid"></table>
+								
+								<div>
+									<button id="new-data-error-report-btn" type="button" class="btn btn-success">New</button>
+									<button id="view-data-error-report-btn" type="button" class="btn btn-primary">View</button>
+									<button id="delete-data-error-report-btn" type="button" class="btn btn-danger">Delete</button>
+								</div>
 							</div>
 						</div>
 						<div id="data-cleansing-step-panel" role="tabpanel" class="tab-pane">
-							<div id="datacleansingstepgrid"></div>
-							
-							<div>
-								<button type="button" class="btn btn-success new-btn">New</button>
-								<button type="button" class="btn btn-primary edit-btn">Edit</button>
-								<button type="button" class="btn btn-danger delete-btn">Delete</button>
+							<div class="container">
+								<table id="datacleansingstepgrid"></table>
+								
+								<div>
+									<button type="button" class="btn btn-success new-btn">New</button>
+									<button type="button" class="btn btn-primary edit-btn">Edit</button>
+									<button type="button" class="btn btn-danger delete-btn">Delete</button>
+								</div>
 							</div>
 						</div>
 						<div id="data-cleansing-chain-panel" role="tabpanel" class="tab-pane">
-							<div id="datacleansingchaingrid"></div>
-							
-							<div>
-								<button type="button" class="btn btn-success new-btn">New</button>
-								<button type="button" class="btn btn-primary edit-btn">Edit</button>
-								<button type="button" class="btn btn-danger delete-btn">Delete</button>
+							<div class="container">
+								<table id="datacleansingchaingrid"></table>
+								
+								<div>
+									<button type="button" class="btn btn-success new-btn">New</button>
+									<button type="button" class="btn btn-primary edit-btn">Edit</button>
+									<button type="button" class="btn btn-danger delete-btn">Delete</button>
+								</div>
 							</div>
 						</div>
 						<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">

@@ -286,8 +286,12 @@ Collect.prototype.initDataErrorReportsPanel = function() {
 	}, this));
 	
 	$('#view-data-error-report-btn').click($.proxy(function() {
+		var selectedItem = $.proxy(getSelectedItem, this)();
+		if (selectedItem == null) {
+			return;
+		}
 		var dialogController = new Collect.DataErrorReportViewDialogController();
-		dialogController.open($.proxy(getSelectedItem, this)());
+		dialogController.open(selectedItem);
 	}, this));
 	
 	$('#delete-data-error-report-btn').click($.proxy(function() {
@@ -424,17 +428,33 @@ Collect.prototype.initDataQueryGrid = function() {
 	    url: "datacleansing/dataqueries/list.json",
 	    cache: false,
 	    clickToSelect: true,
+	    singleSelect: true,
+	    detailView: true,
+	    detailFormatter: detailFormatter,
+	    height: 400,
+	    width: "950px",
 	    columns: [
+	        {field: "id", title: "Id", visible: false},
           	{field: "selected", title: "", radio: true},
-			{field: "id", title: "Id", visible: false},
-			{field: "title", title: "Title", sortable: true},
-			{field: "entityDefinitionId", title: "Entity", sortable: true, sorter: nodePrettyNameSorter, formatter: getPrettyNodeName},
-			{field: "attributeDefinitionId", title: "Attribute", sortable: true, sorter: nodePrettyNameSorter, formatter: getPrettyNodeName},
-			{field: "conditions", title: "Conditions", sortable: true},
-			{field: "creationDate", title: "Creation Date", sortable: true, formatter: OF.Dates.formatToPrettyDateTime},
-			{field: "modifiedDate", title: "Modified Date", sortable: true, formatter: OF.Dates.formatToPrettyDateTime}
+			{field: "title", title: "Title", sortable: true, width: "40%"},
+			{field: "entityDefinitionId", title: "Entity", sortable: true, width: "20%",  
+				sorter: nodePrettyNameSorter, formatter: getPrettyNodeName},
+			{field: "attributeDefinitionId", title: "Attribute", sortable: true, width: "20%", 
+				sorter: nodePrettyNameSorter, formatter: getPrettyNodeName},
+			{field: "creationDate", title: "Creation Date", sortable: true, width: "10%", 
+				formatter: OF.Dates.formatToPrettyDateTime},
+			{field: "modifiedDate", title: "Modified Date", sortable: true, width: "10%", 
+				formatter: OF.Dates.formatToPrettyDateTime}
 		]
 	});
+	
+	function detailFormatter(index, query) {
+		var html = [];
+		html.push('<p><b>Conditions:</b> ' + query.conditions + '</p>');
+		html.push('<p><b>Description:</b> ' + query.description + '</p>');
+		return html.join('');
+	}
+	
 	$this.dataQueryDataGrid = gridContainer.data('bootstrap.table');
 };
 
@@ -488,9 +508,9 @@ Collect.prototype.initDataErrorTypeGrid = function() {
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "code", title: "Code"},
-			{field: "label", title: "Label"},
-			{field: "description", title: "Description"}
+			{field: "code", title: "Code", width: "200px", sortable: true},
+			{field: "label", title: "Label", width: "400px", sortable: true},
+			{field: "description", title: "Description", width: "400px", sortable: true}
 		]
 	});
 	$this.dataErrorTypeDataGrid = gridContainer.data('bootstrap.table');
@@ -504,12 +524,13 @@ Collect.prototype.initDataErrorQueryGrid = function() {
 	    url: "datacleansing/dataerrorqueries/list.json",
 	    cache: false,
 	    clickToSelect: true,
+	    height: 400,
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "typeCode", title: "Error Type"},
-			{field: "queryTitle", title: "Query Title"},
-			{field: "queryDescription", title: "Query Description"}
+			{field: "typeCode", title: "Error Type", sortable: true, width: 50},
+			{field: "queryTitle", title: "Query Title", sortable: true, width: 400},
+			{field: "queryDescription", title: "Query Description", sortable: false, width: 400}
 		]
 	});
 	$this.dataErrorQueryDataGrid = gridContainer.data('bootstrap.table');
@@ -526,10 +547,10 @@ Collect.prototype.initDataErrorReportGrid = function() {
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "queryTitle", title: "Query"},
-			{field: "typeCode", title: "Error Type"},
-			{field: "itemCount", title: "Errors found"},
-			{field: "creationDate", title: "Date", formatter: OF.Dates.formatToPrettyDateTime}
+			{field: "queryTitle", title: "Query", sortable: true, width: 400},
+			{field: "typeCode", title: "Error Type", sortable: true, width: 100},
+			{field: "itemCount", title: "Errors found", sortable: true, width: 100},
+			{field: "creationDate", title: "Date", formatter: OF.Dates.formatToPrettyDateTime, sortable: true, width: 100}
 		]
 	});
 	$this.dataErrorReportDataGrid = gridContainer.data('bootstrap.table');

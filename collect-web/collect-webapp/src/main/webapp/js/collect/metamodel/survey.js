@@ -21,6 +21,23 @@ Collect.Metamodel.Survey.prototype.getDefinition = function(id) {
 	return node;
 };
 
+Collect.Metamodel.Survey.prototype.getKeyDefinitions = function(rootEntity) {
+	var result = new Array();
+	var stack = new Array();
+	stack.push(rootEntity);
+	while (stack.length > 0) {
+		var nodeDef = stack.pop();
+		if (nodeDef.type == "ATTRIBUTE" && nodeDef.key) {
+			result.push(nodeDef);
+		} else if(nodeDef.type == "ENTITY" && (nodeDef.root || ! nodeDef.multiple)) {
+			nodeDef.children.forEach(function(childDef) {
+				stack.push(childDef);
+			});
+		}
+	}
+	return result;
+};
+
 Collect.Metamodel.Survey.prototype.traverse = function(fun) {
 	var stack = new Array();
 	stack = stack.concat(this.rootEntities);
