@@ -41,7 +41,7 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 		if (chainsUsingStep.isEmpty()) {
 			super.delete(step);
 		} else {
-			throw new IllegalStateException(String.format("Cannote delete steo with id %d: some chains are associated to it", step.getId()));
+			throw new IllegalStateException(String.format("Cannote delete step with id %d: some chains are associated to it", step.getId()));
 		}
 	}
 	

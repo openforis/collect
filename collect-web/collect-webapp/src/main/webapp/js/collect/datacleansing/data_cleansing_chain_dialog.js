@@ -10,11 +10,8 @@ Collect.DataCleansingChainDialogController = function() {
 
 Collect.DataCleansingChainDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
 
-Collect.DataCleansingChainDialogController.DATA_CLEANSING_CHAIN_SAVED = "dataCleansingChainSaved";
-Collect.DataCleansingChainDialogController.DATA_CLEANSING_CHAIN_DELETED = "dataCleansingChainDeleted";
-
 Collect.DataCleansingChainDialogController.prototype.dispatchItemSavedEvent = function() {
-	EventBus.dispatch(Collect.DataCleansingChainDialogController.DATA_CLEANSING_CHAIN_SAVED, this);
+	EventBus.dispatch(Collect.DataCleansing.DATA_CLEANSING_CHAIN_SAVED, this);
 };
 
 Collect.DataCleansingChainDialogController.prototype.loadInstanceVariables = function(callback) {
@@ -49,17 +46,8 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			$this.recordStepSelectPicker = select.data().selectpicker;
 			$this.recordStepSelectPicker.refresh();
 		}
-		var initNewStepSelectPicker = function() {
-			$this.availableNewSteps.sort(function(a, b) {
-				return a.title.localeCompare(b.title);
-			});
-			var select = $this.content.find('select[name="cleansingStep"]');
-			OF.UI.Forms.populateSelect(select, $this.availableNewSteps, "id", "title", true);
-			select.selectpicker();
-			$this.addStepSelectPicker = select.data().selectpicker;
-			$this.addStepSelectPicker.refresh();
-		}
-		initNewStepSelectPicker();
+		
+		$this.initNewStepSelectPicker();
 		
 		var monitorJob = function(jobMonitorUrl, complete) {
 			var jobDialog = new OF.UI.JobDialog();
@@ -99,7 +87,7 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			
 			$this.refreshStepsDataGrid();
 			
-			initNewStepSelectPicker();
+			$this.initNewStepSelectPicker();
 		}, $this));
 		
 		$this.content.find(".remove-step-btn").click($.proxy(function() {
@@ -107,13 +95,7 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			if (selectedStep == null) {
 				return;
 			}
-			OF.Alerts.confirm("Remove the cleansing step from this chain?", function() {
-				OF.Arrays.removeItem($this.steps, selectedStep);
-				$this.refreshStepsDataGrid();
-				
-				$this.availableNewSteps.push(selectedStep);
-				initNewStepSelectPicker();
-			})
+			$this.deleteStep(selectedStep);
 		}, $this));
 		
 		var moveSelectedStep = function(up) {
@@ -190,7 +172,8 @@ Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = functio
 			{field: "title", title: "Title", width: 400},
 			{field: "queryTitle", title: "Query Title", width: 200},
 			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100}
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},
+			Collect.Grids.createDeleteColumn($this.deleteStep, $this)
 		]
 	});
 	$this.stepsDataGrid = gridContainer.data('bootstrap.table');
@@ -198,6 +181,29 @@ Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = functio
 		$this.onStepSelectionChange();
 	});
 	$this.onStepSelectionChange();
+};
+
+Collect.DataCleansingChainDialogController.prototype.initNewStepSelectPicker = function() {
+	var $this = this;
+	$this.availableNewSteps.sort(function(a, b) {
+		return a.title.localeCompare(b.title);
+	});
+	var select = $this.content.find('select[name="cleansingStep"]');
+	OF.UI.Forms.populateSelect(select, $this.availableNewSteps, "id", "title", true);
+	select.selectpicker();
+	$this.addStepSelectPicker = select.data().selectpicker;
+	$this.addStepSelectPicker.refresh();
+};
+
+Collect.DataCleansingChainDialogController.prototype.deleteStep = function(step) {
+	var $this = this;
+	OF.Alerts.confirm("Remove the cleansing step from this chain?", function() {
+		OF.Arrays.removeItem($this.steps, step);
+		$this.refreshStepsDataGrid();
+		
+		$this.availableNewSteps.push(step);
+		$this.initNewStepSelectPicker();
+	});
 };
 
 Collect.DataCleansingChainDialogController.prototype.onStepSelectionChange = function() {

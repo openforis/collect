@@ -56,7 +56,7 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		
 		Select<OfcDataCleansingChainRecord> select = 
 			dsl.selectFrom(OFC_DATA_CLEANSING_CHAIN)
-				.having(OFC_DATA_CLEANSING_CHAIN.ID.in(subselect));
+				.where(OFC_DATA_CLEANSING_CHAIN.ID.in(subselect));
 		
 		Result<OfcDataCleansingChainRecord> result = select.fetch();
 		return new HashSet<DataCleansingChain>(dsl.fromResult(result));

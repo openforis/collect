@@ -10,11 +10,8 @@ Collect.DataErrorQueryDialogController = function() {
 
 Collect.DataErrorQueryDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
 
-Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_SAVED = "dataErrorQuerySaved";
-Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_DELETED = "dataErrorQueryDeleted";
-
 Collect.DataErrorQueryDialogController.prototype.dispatchItemSavedEvent = function() {
-	EventBus.dispatch(Collect.DataErrorQueryDialogController.DATA_ERROR_QUERY_SAVED, this);
+	EventBus.dispatch(Collect.DataCleansing.DATA_ERROR_QUERY_SAVED, this);
 };
 
 Collect.DataErrorQueryDialogController.prototype.loadInstanceVariables = function(callback) {

@@ -13,3 +13,15 @@ Collect.Grids.createRootEntityKeyColumns = function(survey, rootEntity, sortable
 	}
 	return columns;
 };
+
+Collect.Grids.createDeleteColumn = function(deleteFunction, context) {
+	return {
+		formatter: '<span class="glyphicon glyphicon-remove-circle" style="cursor: pointer"></span>', 
+		width: 30, 
+		events: {
+			"click span": function(event, value, item, index) {
+				deleteFunction.apply(context, [item]);
+			}
+		}
+	}
+};

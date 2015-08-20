@@ -9,9 +9,6 @@ Collect.DataErrorReportDialogController = function() {
 
 Collect.DataErrorReportDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
 
-Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_DELETED = "dataErrorReportDeleted";
-Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_CREATED = "dataErrorReportCreated";
-
 Collect.DataErrorReportDialogController.prototype.initEventListeners = function() {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initEventListeners.call(this);
@@ -27,7 +24,7 @@ Collect.DataErrorReportDialogController.prototype.generateClickHandler = functio
 		collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
 			new OF.UI.JobDialog();
 			new OF.JobMonitor("datacleansing/dataerrorreports/generate/job.json", function() {
-				EventBus.dispatch(Collect.DataErrorReportDialogController.DATA_ERROR_REPORT_CREATED, $this);
+				EventBus.dispatch(Collect.DataCleansing.DATA_ERROR_REPORT_CREATED, $this);
 			});
 			$this.close();
 		});

@@ -10,11 +10,8 @@ Collect.DataCleansingStepDialogController = function() {
 
 Collect.DataCleansingStepDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
 
-Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_SAVED = "dataCleansingStepSaved";
-Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_DELETED = "dataCleansingStepDeleted";
-
 Collect.DataCleansingStepDialogController.prototype.dispatchItemSavedEvent = function() {
-	EventBus.dispatch(Collect.DataCleansingStepDialogController.DATA_CLEANSING_STEP_SAVED, this);
+	EventBus.dispatch(Collect.DataCleansing.DATA_CLEANSING_STEP_SAVED, this);
 };
 
 Collect.DataCleansingStepDialogController.prototype.loadInstanceVariables = function(callback) {

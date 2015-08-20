@@ -6,11 +6,8 @@ Collect.DataQueryDialogController = function() {
 
 Collect.DataQueryDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
 
-Collect.DataQueryDialogController.DATA_QUERY_SAVED = "dataQuerySaved";
-Collect.DataQueryDialogController.DATA_QUERY_DELETED = "dataQueryDeleted";
-
 Collect.DataQueryDialogController.prototype.dispatchItemSavedEvent = function() {
-	EventBus.dispatch(Collect.DataQueryDialogController.DATA_QUERY_SAVED, this);
+	EventBus.dispatch(Collect.DataCleansing.DATA_QUERY_SAVED, this);
 };
 
 Collect.DataQueryDialogController.prototype.initFormElements = function(callback) {
