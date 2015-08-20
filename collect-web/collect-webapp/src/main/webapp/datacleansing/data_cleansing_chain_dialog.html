@@ -1,5 +1,5 @@
 <div class="modal fade">
-	<div class="modal-dialog">
+	<div class="modal-dialog" style="width: 1000px">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">
@@ -18,21 +18,27 @@
 						<input type="text" class="form-control" name="description" />
 					</div>
 					<div class="form-group">
-				   		<label class="control-label">Steps</label>
-						<div class="step-grid"></div>
-						<div class="row">
-							<button type="button" class="btn btn-default col-md-3 move-step-up-btn step-selected-enabled">Move step up</button>
-							<button type="button" class="btn btn-default col-md-3 move-step-down-btn step-selected-enabled">Move step down</button>
-							<div class="col-md-2"></div>
-							<button type="button" class="btn btn-default col-md-3 remove-step-btn step-selected-enabled">Remove step</button>
-						</div>
-					</div>
-					<div class="row form-group">
-			   			<label class="control-label">New Calculation Step</label>
-						<div class="col-md-10">
-							<select class="form-control selectpicker" name="cleansingStep"></select>
-						</div>
-						<button type="button" class="btn btn-default add-step-btn col-md-2">Add step</button>
+						<fieldset>
+							<legend>Steps</legend>
+							<div>
+								<table class="step-grid"></table>
+								<div class="row">
+									<button type="button" class="btn btn-default col-md-3 move-step-up-btn step-selected-enabled">Move step up</button>
+									<button type="button" class="btn btn-default col-md-3 move-step-down-btn step-selected-enabled">Move step down</button>
+									<div class="col-md-2"></div>
+									<button type="button" class="btn btn-default col-md-3 remove-step-btn step-selected-enabled">Remove step</button>
+						   		</div>
+								<fieldset>
+									<legend>Add new Calculation Step</legend>
+									<div>
+										<div class="col-md-10">
+											<select class="form-control selectpicker" name="cleansingStep"></select>
+										</div>
+										<button type="button" class="btn btn-default add-step-btn col-md-2">Add step</button>
+									</div>
+								</fieldset>
+							</div>
+						</fieldset>
 					</div>
 				</form>
 			</div>
@@ -44,11 +50,17 @@
 			
 			<fieldset>
 				<legend>Run</legend>
-				<div class="form-group">
-		    		<label class="control-label">Record step</label>
-					<select class="form-control selectpicker" name="recordStep"></select>
+				<div class="row">
+		    		<div class="col-md-2">
+			    		<label>Record step</label>
+			    	</div>
+			    	<div class="col-md-4">
+						<select class="form-control selectpicker" name="recordStep"></select>
+		    		</div>
+		    		<div class="col-md-2">
+						<button type="button" class="btn btn-primary run-btn">Run</button>
+					</div>
 				</div>
-				<button type="button" class="btn btn-default run-btn">Run</button>
 			</fieldset>
 		</div>
 	</div>

@@ -44,8 +44,16 @@ OF.JobMonitor.prototype.init = function() {
 OF.JobMonitor.prototype.loadJob = function(onSuccess) {
 	var $this = this;
 	$this.service.send($this.jobRetrievalUrl, null, "GET", function(job) {
-		$this.job = job;
-		onSuccess();
+		if (job != null) {
+			$this.job = job;
+			onSuccess();
+		} else if ($this.job != null) {
+			//monitoring a survey or application locking job that is completed, retrieve it using job ID
+			$this.service.send("job.json", {jobId: $this.job.id}, "GET", function(job) {
+				$this.job = job;
+				onSuccess();
+			});
+		}
 	});
 };
 

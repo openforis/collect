@@ -36,8 +36,7 @@ OF.UI.JobDialog.prototype.init = function() {
 	} else {
 		this.cancelBtn.click(function() {
 			EventBus.dispatch(OF.JobMonitor.CANCEL_JOB);
-			$this.content.modal('hide');
-			$this.content.remove();
+			$this.close();
 		});
 	}
 	this.okBtn.click(function() {

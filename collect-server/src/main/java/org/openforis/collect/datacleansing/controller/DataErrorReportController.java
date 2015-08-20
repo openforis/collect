@@ -19,6 +19,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
+import org.openforis.collect.web.controller.PaginatedResponse;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.commons.web.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,16 +101,17 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	
 	@RequestMapping(value="{reportId}/items.json", method = RequestMethod.GET)
 	public @ResponseBody
-	List<DataErrorReportItemForm> loadItems(@PathVariable int reportId, 
+	PaginatedResponse loadItems(@PathVariable int reportId, 
 			@RequestParam int offset, @RequestParam int limit) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataErrorReport report = itemManager.loadById(survey, reportId);
+		int total = itemManager.countItems(report);
 		List<DataErrorReportItem> items = itemManager.loadItems(report, offset, limit);
-		List<DataErrorReportItemForm> result = new ArrayList<DataErrorReportItemForm>(items.size());
+		List<DataErrorReportItemForm> rows = new ArrayList<DataErrorReportItemForm>(items.size());
 		for (DataErrorReportItem item : items) {
-			result.add(new DataErrorReportItemForm(item));
+			rows.add(new DataErrorReportItemForm(item));
 		}
-		return result;
+		return new PaginatedResponse(total, rows);
 	}
 	
 	@RequestMapping(value="generate/job.json", method = RequestMethod.GET)

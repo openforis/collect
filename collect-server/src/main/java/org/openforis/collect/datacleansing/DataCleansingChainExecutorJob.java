@@ -49,6 +49,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	
 	public void setChain(DataCleansingChain chain) {
 		this.chain = chain;
+		this.survey = chain.getSurvey();
 	}
 	
 	public void setRecordStep(Step recordStep) {
@@ -100,7 +101,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 
 		@Override
 		public void close() {
-			if (lastRecord != null && unsavedChanges) {
+			if (unsavedChanges && lastRecord != null) {
 				saveRecord(lastRecord);
 			}
 		}
@@ -108,9 +109,11 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		private void enqueueRecordSave(CollectRecord record) {
 			if (lastRecord != null && ! lastRecord.getId().equals(record.getId())) {
 				saveRecord(lastRecord);
+				unsavedChanges = false;
+			} else {
+				unsavedChanges = true;
 			}
 			lastRecord = record;
-			unsavedChanges = true;
 		}
 
 		private void saveRecord(CollectRecord record) {

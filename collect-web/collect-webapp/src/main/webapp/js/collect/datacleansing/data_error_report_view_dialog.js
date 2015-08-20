@@ -50,16 +50,19 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 	        ];
 			columns = columns.concat(Collect.Grids.createRootEntityKeyColumns(collect.activeSurvey));
 			columns = columns.concat([
-				{field: "nodePath", title: "Path"},
-				{field: "attributeValue", title: "Value"}
+				{field: "nodePath", title: "Path", width: 400},
+				{field: "attributeValue", title: "Value", width: 400}
 			]);
 			var el = $this.content.find('.data-error-report-items-grid');
 			el.bootstrapTable({
 			    url: "datacleansing/dataerrorreports/" + $this.item.id + "/items.json",
 			    cache: false,
 			    clickToSelect: true,
+			    pagination: true,
+			    sidePagination: "server",
+			    pageList: [10, 20, 50, 100],
 			    width: 800,
-			    height: 300,
+			    height: 400,
 			    columns: columns
 			});
 			$this.reportItemsDataGrid = el.data('bootstrap.table');

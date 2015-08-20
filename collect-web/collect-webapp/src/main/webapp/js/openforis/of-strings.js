@@ -18,3 +18,7 @@ OF.Strings.firstNotBlank = function() {
 	}
 	return null;
 };
+
+OF.Strings.escapeHtml = function(str) {
+	return $('<div>').text(str).html();
+};

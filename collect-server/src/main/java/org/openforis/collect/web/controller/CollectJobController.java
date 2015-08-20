@@ -55,6 +55,13 @@ public class CollectJobController extends BasicController {
 		SurveyLockingJob job = jobManager.getSurveyJob(surveyId);
 		return abortJob(response, job);
 	}
+	
+	@RequestMapping(value="job.json", method = RequestMethod.GET)
+	public @ResponseBody
+	JobView getJob(HttpServletResponse response, @RequestParam("jobId") String jobId) {
+		Job job = jobManager.getJob(jobId);
+		return createJobView(response, job);
+	}
 
 	private JobView abortJob(HttpServletResponse response, Job job) {
 		if (job != null) {
@@ -74,6 +81,7 @@ public class CollectJobController extends BasicController {
 
 	public static class JobView {
 		
+		private String id;
 		private String name;
 		private int progressPercent;
 		private Status status;
@@ -81,10 +89,15 @@ public class CollectJobController extends BasicController {
 		private List<DataQueryExecutorError> errors;
 
 		public JobView(Job job) {
+			id = job.getId().toString();
 			name = job.getName();
 			progressPercent = job.getProgressPercent();
 			status = job.getStatus();
 			errorMessage = job.getErrorMessage();
+		}
+		
+		public String getId() {
+			return id;
 		}
 		
 		public String getName() {

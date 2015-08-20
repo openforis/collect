@@ -466,13 +466,14 @@ Collect.prototype.initDataCleansingStepGrid = function() {
 	    url: "datacleansing/datacleansingsteps/list.json",
 	    cache: false,
 	    clickToSelect: true,
+	    height: 400,
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "title", title: "Title"},
-			{field: "queryTitle", title: "Query Title"},
-			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
+			{field: "title", title: "Title", width: 400, sortable: true},
+			{field: "queryTitle", title: "Query Title", width: 400, sortable: true},
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true}
 		]
 	});
 	$this.dataCleansingStepDataGrid = gridContainer.data('bootstrap.table');
@@ -486,15 +487,42 @@ Collect.prototype.initDataCleansingChainGrid = function() {
 	    url: "datacleansing/datacleansingchains/list.json",
 	    cache: false,
 	    clickToSelect: true,
+	    detailView: true,
+	    detailFormatter: detailFormatter,
+	    height: 400,
+	    onExpandRow: onExpandRow,
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "title", title: "Title"},
-			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
+			{field: "title", title: "Title", width: 800, sortable: true},
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true}
 		]
 	});
 	$this.dataCleansingChainDataGrid = gridContainer.data('bootstrap.table');
+	
+	function onExpandRow(index, chain, $rowEl) {
+		var table = $rowEl.find("table");
+		table.bootstrapTable({
+			width: 600,
+			columns: [
+				{field: "id", title: "Id", visible: false},
+				{field: "title", title: "Title", width: 400},
+				{field: "queryTitle", title: "Query Title", width: 200}
+		    ],
+		    data: chain.steps
+		});
+	};
+	
+	function detailFormatter(index, chain) {
+		var html = 
+        	'<fieldset style="margin-left: 60px !important;" ' +
+				'class="compact">' +
+	        	'<legend>Steps</legend>' +
+	        	'<table></table>' +
+           '</fieldset>';
+        return html;
+	}
 };
 
 Collect.prototype.initDataErrorTypeGrid = function() {
@@ -505,6 +533,7 @@ Collect.prototype.initDataErrorTypeGrid = function() {
 	    url: "datacleansing/dataerrortypes/list.json",
 	    cache: false,
 	    clickToSelect: true,
+	    height: 400,
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
@@ -544,6 +573,7 @@ Collect.prototype.initDataErrorReportGrid = function() {
 	    url: "datacleansing/dataerrorreports/list.json",
 	    cache: false,
 	    clickToSelect: true,
+	    height: 400,
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},

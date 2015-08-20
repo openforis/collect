@@ -182,13 +182,15 @@ Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = functio
 	
 	gridContainer.bootstrapTable({
 	    clickToSelect: true,
+	    height: 150,
+	    width: 800,
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "title", title: "Title"},
-			{field: "queryTitle", title: "Query Title"},
-			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime}
+			{field: "title", title: "Title", width: 400},
+			{field: "queryTitle", title: "Query Title", width: 200},
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100}
 		]
 	});
 	$this.stepsDataGrid = gridContainer.data('bootstrap.table');
