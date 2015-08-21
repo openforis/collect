@@ -438,14 +438,14 @@ public class CodeListManager {
 	}
 	
 	@Transactional
-	public void publishCodeLists(int surveyWorkId, int publishedSurveyId) {
+	public void publishCodeLists(int temporarySurveyId, int publishedSurveyId) {
 		codeListItemDao.deleteBySurvey(publishedSurveyId);
-		codeListItemDao.moveItemsToPublishedSurvey(surveyWorkId, publishedSurveyId);
+		codeListItemDao.moveItems(temporarySurveyId, publishedSurveyId);
 	}
 	
 	@Transactional
-	public void cloneCodeLists(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
-		codeListItemDao.cloneItems(fromSurvey.getId(), fromSurvey.isWork(), toSurvey.getId(), toSurvey.isWork());
+	public void copyCodeLists(CollectSurvey fromSurvey, CollectSurvey toSurvey) {
+		codeListItemDao.copyItems(fromSurvey.getId(), toSurvey.getId());
 	}
 	
 	public void save(PersistedCodeListItem item) {

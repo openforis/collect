@@ -57,7 +57,7 @@ public class IdmlImportTask extends Task {
 				throw new SurveyImportException(String.format("Cannot import as published survey - " +
 						"survey work already exists for this uri (%s) delete it before proceed", surveyUri));
 			}
-		} else if ( oldSurveySummary.isWork() ) {
+		} else if ( oldSurveySummary.isTemporary() ) {
 			//survey work already exists, update it
 			survey = surveyManager.updateWorkModel(file, validate);
 		} else {

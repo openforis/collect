@@ -39,9 +39,7 @@ public class SamplingDesignExportProcess {
 		CsvWriter writer = null;
 		try {
 			writer = new CsvWriter(out);
-			SamplingDesignSummaries summaries = survey.isWork() ? 
-				samplingDesignManager.loadBySurveyWork(survey.getId()): 
-				samplingDesignManager.loadBySurvey(survey.getId());
+			SamplingDesignSummaries summaries = samplingDesignManager.loadBySurvey(survey.getId());
 				
 			ArrayList<String> colNames = new ArrayList<String>();
 			colNames.addAll(Arrays.asList(SamplingDesignFileColumn.LEVEL_COLUMN_NAMES));

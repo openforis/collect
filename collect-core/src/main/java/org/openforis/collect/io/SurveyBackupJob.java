@@ -135,7 +135,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		addCodeListImagesExportTask();
 		addSamplingDesignExportTask();
 		addSpeciesExportTask();
-		if ( includeData && ! survey.isWork() ) {
+		if ( includeData && ! survey.isTemporary() ) {
 			addDataExportTask();
 			if ( includeRecordFiles ) {
 				addRecordFilesBackupTask();
@@ -207,12 +207,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	}
 
 	private void addSpeciesExportTask() {
-		List<CollectTaxonomy> taxonomies;
-		if (survey.isWork()) {
-			taxonomies = speciesManager.loadTaxonomiesBySurveyWork(survey.getId());
-		} else {
-			taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
-		}
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(survey.getId());
 		for (CollectTaxonomy taxonomy : taxonomies) {
 //			if ( speciesManager.hasTaxons(taxonomy.getId()) ) {
 				SpeciesBackupExportTask task = createTask(SpeciesBackupExportTask.class);

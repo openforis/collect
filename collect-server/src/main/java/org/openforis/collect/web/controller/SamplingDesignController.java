@@ -46,7 +46,7 @@ public class SamplingDesignController {
 		String fileName = SAMPLING_DESIGN_CSV_FILE_NAME;
 		response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
 		ServletOutputStream out = response.getOutputStream();
-		CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);
+		CollectSurvey survey = work ? surveyManager.loadSurvey(surveyId): surveyManager.getById(surveyId);
 		process.exportToCSV(out, survey);
 		return "ok";
 	}

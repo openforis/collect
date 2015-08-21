@@ -41,7 +41,6 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 	private static final TableField[] FIELDS = {
 		OFC_SAMPLING_DESIGN.ID,
 		OFC_SAMPLING_DESIGN.SURVEY_ID,
-		OFC_SAMPLING_DESIGN.SURVEY_WORK_ID,
 		OFC_SAMPLING_DESIGN.LOCATION,
 		OFC_SAMPLING_DESIGN.LEVEL1,
 		OFC_SAMPLING_DESIGN.LEVEL2,
@@ -104,57 +103,25 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		super.delete(id);
 	}
 
-	public int countPerSurvey(int surveyId) {
-		return count(false, surveyId);
-	}
-	
-	public int countPerSurveyWork(int surveyWorkId) {
-		return count(true, surveyWorkId);
-	}
-	
-	public int count(boolean work, int surveyId) {
+	public int countBySurvey(int surveyId) {
 		SelectQuery<?> q = dsl().selectCountQuery();
-		TableField<OfcSamplingDesignRecord, Integer> surveyIdField = getSurveyIdField(work);
-		q.addConditions(surveyIdField.equal(surveyId));
+		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
 		Record r = q.fetchOne();
 		return (Integer) r.getValue(0);
 	}
 	
 	public void deleteBySurvey(int surveyId) {
-		deleteBySurvey(false, surveyId);
-	}
-	
-	public void deleteBySurveyWork(int surveyId) {
-		deleteBySurvey(true, surveyId);
-	}
-	
-	public void deleteBySurvey(boolean work, int surveyId) {
-		TableField<OfcSamplingDesignRecord, Integer> surveyIdField = getSurveyIdField(work);
 		dsl().delete(OFC_SAMPLING_DESIGN)
-			.where(surveyIdField.equal(surveyId))
+			.where(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId))
 			.execute();
 	}
 
-	protected TableField<OfcSamplingDesignRecord, Integer> getSurveyIdField(
-			boolean work) {
-		return work ? OFC_SAMPLING_DESIGN.SURVEY_WORK_ID: OFC_SAMPLING_DESIGN.SURVEY_ID;
-	}
-	
-	public List<SamplingDesignItem> loadItemsBySurvey(int surveyId, int offset, int maxRecords) {
-		return loadItems(false, surveyId, offset, maxRecords);
-	}
-	
-	public List<SamplingDesignItem> loadItemsBySurveyWork(int surveyId, int offset, int maxRecords) {
-		return loadItems(true, surveyId, offset, maxRecords);
-	}
-	
 	@SuppressWarnings("rawtypes")
-	protected List<SamplingDesignItem> loadItems(boolean work, int surveyId, int offset, int maxRecords) {
+	public List<SamplingDesignItem> loadItems(int surveyId, int offset, int maxRecords) {
 		SamplingDesignDSLContext dsl = dsl();
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_SAMPLING_DESIGN);
-		TableField<OfcSamplingDesignRecord, Integer> surveyIdField = getSurveyIdField(work);
-		q.addConditions(surveyIdField.equal(surveyId));
+		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
 		for (TableField field : LEVEL_CODE_FIELDS) {
 			q.addOrderBy(field);
 		}
@@ -192,26 +159,22 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		}
 	}
 	
-	public void duplicateItems(int oldSurveyId, boolean oldSurveyWork, int newSurveyId, boolean newSurveyWork) {
+	public void copyItems(int oldSurveyId, int newSurveyId) {
 		SamplingDesignDSLContext dsl = dsl();
-		int minId = loadMinId(dsl, oldSurveyId, oldSurveyWork);
+		int minId = loadMinId(dsl, oldSurveyId);
 		int nextId = dsl.nextId(OFC_SAMPLING_DESIGN.ID, OFC_SAMPLING_DESIGN_ID_SEQ);
 		int idGap = nextId - minId;
-		Integer selectSurveyIdValue = newSurveyWork ? null: newSurveyId;
-		Integer selectSurveyWorkIdValue = newSurveyWork ? newSurveyId: null;
 		Field<?>[] selectFields = {
 				OFC_SAMPLING_DESIGN.ID.add(idGap),
-				DSL.val(selectSurveyIdValue, OFC_SAMPLING_DESIGN.SURVEY_ID),
-				DSL.val(selectSurveyWorkIdValue, OFC_SAMPLING_DESIGN.SURVEY_WORK_ID),
+				DSL.val(newSurveyId, OFC_SAMPLING_DESIGN.SURVEY_ID),
 				OFC_SAMPLING_DESIGN.LOCATION
 			};
 		selectFields = ArrayUtils.addAll(selectFields, LEVEL_CODE_FIELDS);
 		selectFields = ArrayUtils.addAll(selectFields, INFO_FIELDS);
 		
-		TableField<OfcSamplingDesignRecord, Integer> oldSurveyIdField = getSurveyIdField(oldSurveyWork);
 		Select<?> select = dsl.select(selectFields)
 			.from(OFC_SAMPLING_DESIGN)
-			.where(oldSurveyIdField.equal(oldSurveyId))
+			.where(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(oldSurveyId))
 			.orderBy(OFC_SAMPLING_DESIGN.ID);
 		TableField<?, ?>[] insertFields = FIELDS;
 		Insert<OfcSamplingDesignRecord> insert = dsl.insertInto(OFC_SAMPLING_DESIGN, insertFields).select(select);
@@ -220,20 +183,18 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		dsl.restartSequence(OFC_SAMPLING_DESIGN_ID_SEQ, nextId);
 	}
 	
-	protected int loadMinId(SamplingDesignDSLContext jf, int surveyId, boolean work) {
-		TableField<OfcSamplingDesignRecord, Integer> surveyIdField = getSurveyIdField(work);
+	protected int loadMinId(SamplingDesignDSLContext jf, int surveyId) {
 		Integer minId = jf.select(DSL.min(OFC_SAMPLING_DESIGN.ID))
 				.from(OFC_SAMPLING_DESIGN)
-				.where(surveyIdField.equal(surveyId))
+				.where(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId))
 				.fetchOne(0, Integer.class);
 		return minId == null ? 0: minId.intValue();
 	}
 
-	public void moveItemsToPublishedSurvey(int surveyWorkId, int publishedSurveyId) {
+	public void moveItems(int fromSurveyId, int toSurveyId) {
 		dsl().update(OFC_SAMPLING_DESIGN)
-			.set(OFC_SAMPLING_DESIGN.SURVEY_ID, publishedSurveyId)
-			.set(OFC_SAMPLING_DESIGN.SURVEY_WORK_ID, (Integer) null)
-			.where(OFC_SAMPLING_DESIGN.SURVEY_WORK_ID.equal(surveyWorkId))
+			.set(OFC_SAMPLING_DESIGN.SURVEY_ID, toSurveyId)
+			.where(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(fromSurveyId))
 			.execute();
 	}
 
@@ -253,7 +214,6 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		public void fromRecord(Record r, SamplingDesignItem s) {
 			s.setId(r.getValue(OFC_SAMPLING_DESIGN.ID));
 			s.setSurveyId(r.getValue(OFC_SAMPLING_DESIGN.SURVEY_ID));
-			s.setSurveyWorkId(r.getValue(OFC_SAMPLING_DESIGN.SURVEY_WORK_ID));
 			String locationValue = r.getValue(OFC_SAMPLING_DESIGN.LOCATION);
 			Coordinate coordinate = Coordinate.parseCoordinate(locationValue);
 			s.setSrsId(coordinate == null ? null : coordinate.getSrsId());
@@ -279,7 +239,6 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		public void fromObject(SamplingDesignItem s, StoreQuery<?> q) {
 			q.addValue(OFC_SAMPLING_DESIGN.ID, s.getId());
 			q.addValue(OFC_SAMPLING_DESIGN.SURVEY_ID, s.getSurveyId());
-			q.addValue(OFC_SAMPLING_DESIGN.SURVEY_WORK_ID, s.getSurveyWorkId());
 			q.addValue(OFC_SAMPLING_DESIGN.LOCATION, extractLocation(s));
 			String[] levelCodeValues = extractLevelCodeValues(s);
 			for ( int i = 0; i < levelCodeValues.length; i++ ) {
@@ -307,7 +266,6 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			values.addAll(Arrays.asList(
 				item.getId(), 
 				item.getSurveyId(),
-				item.getSurveyWorkId(),
 				extractLocation(item)
 			));
 			//add level codes

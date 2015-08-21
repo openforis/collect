@@ -38,9 +38,9 @@
 			<listheader label="${labels.survey.target.$}" width="50px"
 				sort="auto(target)" />
 			<listheader label="${labels.survey.modified}" width="60px"
-				sort="auto(work, published, name)" />
+				sort="auto(temporary, published, name)" />
 			<listheader label="${labels.survey.published}" width="70px"
-				sort="auto(published, work, name)" />
+				sort="auto(published, temporary, name)" />
 		</listhead>
 		<template name="model">
 			<listitem>
@@ -67,7 +67,7 @@
 				<listcell
 					onDoubleClick="@command('editSelectedSurvey')">
 					<box align="center" width="100%"
-						visible="${each.work}">
+						visible="${each.temporary}">
 						<image src="/assets/images/tick-small.png" />
 					</box>
 				</listcell>
@@ -122,11 +122,11 @@
 							
 						<menuitem label="${labels.survey.publish_latest_changes}"
 							onClick="@command('publishSelectedSurvey')"
-							visible="@load(not vm.publishDisabled and vm.selectedSurvey.work and not vm.selectedSurvey.onlyWork)" />
+							visible="@load(not vm.publishDisabled and vm.selectedSurvey.temporary and not vm.selectedSurvey.notLinkedToPublishedSurvey)" />
 							
 						<menuitem label="${labels.survey.publish.$}"
 							onClick="@command('publishSelectedSurvey')"
-							visible="@load(not vm.publishDisabled and vm.selectedSurvey.onlyWork)" />
+							visible="@load(not vm.publishDisabled and vm.selectedSurvey.notLinkedToPublishedSurvey)" />
 				
 						<menuseparator visible="@load(not vm.publishDisabled)" />
 						

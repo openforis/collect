@@ -33,7 +33,7 @@ public class CollectSurvey extends Survey {
 	
 	public static final String SAMPLING_DESIGN_CODE_LIST_NAME = "sampling_design";
 	
-	private boolean work;
+	private boolean temporary;
 	private Version collectVersion;
 	private SurveyTarget target;
 	
@@ -42,7 +42,7 @@ public class CollectSurvey extends Survey {
 	
 	protected CollectSurvey(SurveyContext surveyContext) {
 		super(surveyContext);
-		this.work = false;
+		this.temporary = false;
 		this.target = SurveyTarget.COLLECT_DESKTOP;
 		this.collectVersion = VERSION;
 		this.annotations = new CollectAnnotations(this);
@@ -133,12 +133,12 @@ public class CollectSurvey extends Survey {
 		return annotations;
 	}
 	
-	public boolean isWork() {
-		return work;
+	public boolean isTemporary() {
+		return temporary;
 	}
 
-	public void setWork(boolean work) {
-		this.work = work;
+	public void setTemporary(boolean temporary) {
+		this.temporary = temporary;
 	}
 	
 	public SurveyTarget getTarget() {

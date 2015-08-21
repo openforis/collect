@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 741971896;
+	private static final long serialVersionUID = 562322152;
 
 	/**
 	 * The reference instance of <code>collect</code>
@@ -50,7 +50,6 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 			org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_SAMPLING_DESIGN_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ,
-			org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_WORK_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_TAXONOMY_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_TAXON_VERNACULAR_NAME_ID_SEQ,
@@ -78,12 +77,10 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 			org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM,
 			org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC_DATA_ERROR_TYPE,
 			org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DATA_QUERY,
-			org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo.OFC_APPLICATION_INFO,
 			org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO,
 			org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD,
 			org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OFC_SAMPLING_DESIGN,
 			org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY,
-			org.openforis.collect.persistence.jooq.tables.OfcSurveyWork.OFC_SURVEY_WORK,
 			org.openforis.collect.persistence.jooq.tables.OfcTaxon.OFC_TAXON,
 			org.openforis.collect.persistence.jooq.tables.OfcTaxonomy.OFC_TAXONOMY,
 			org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME,

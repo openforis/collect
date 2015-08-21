@@ -28,10 +28,10 @@
 							selectedItem="@bind(fx.originalType)">
 						<radio id="publishedTypeRadio" label="${labels.survey.clone.original_type.published}" 
 								value="PUBLISHED"
-								disabled="@load(vm.originalSurvey.onlyWork)" />
+								disabled="@load(vm.originalSurvey.notLinkedToPublishedSurvey)" />
 						<radio id="temporaryTypeRadio" label="${labels.survey.clone.original_type.temporary}" 
 								value="TEMPORARY" 
-								disabled="@load(! vm.originalSurvey.work)" />
+								disabled="@load(! vm.originalSurvey.temporary)" />
 					</radiogroup>
 				</row>
 				<row>

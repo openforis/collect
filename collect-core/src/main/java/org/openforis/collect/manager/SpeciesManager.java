@@ -66,11 +66,6 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
-	public List<CollectTaxonomy> loadTaxonomiesBySurveyWork(int surveyId) {
-		return taxonomyDao.loadAllBySurveyWork(surveyId);
-	}
-	
-	@Transactional
 	public CollectTaxonomy loadTaxonomyById(int id) {
 		return taxonomyDao.loadById(id);
 	}
@@ -209,11 +204,6 @@ public class SpeciesManager {
 	
 	@Transactional
 	public void save(CollectTaxonomy taxonomy) {
-		if ( taxonomy.getSurveyId() == null && taxonomy.getSurveyWorkId() == null ) {
-			throw new IllegalArgumentException("Cannot save taxonomy: surveyId or surveyWorkId must be defined");
-		} else if ( taxonomy.getSurveyId() != null && taxonomy.getSurveyWorkId() != null ) {
-			throw new IllegalArgumentException("Cannot save taxonomy: surveyId and surveyWorkId must not be both defined");
-		}
 		if ( taxonomy.getId() == null ) {
 			taxonomyDao.insert(taxonomy);
 		} else {
@@ -321,12 +311,11 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
-	public void publishTaxonomies(Integer surveyWorkId, int publishedSurveyId) {
-		deleteTaxonomiesBySurvey(publishedSurveyId);
-		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurveyWork(surveyWorkId);
+	public void moveTaxonomies(Integer fromSurveyId, int toSurveyId) {
+		deleteTaxonomiesBySurvey(toSurveyId);
+		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurvey(fromSurveyId);
 		for (CollectTaxonomy taxonomy : taxonomies) {
-			taxonomy.setSurveyWorkId(null);
-			taxonomy.setSurveyId(publishedSurveyId);
+			taxonomy.setSurveyId(toSurveyId);
 			taxonomyDao.update(taxonomy);
 		}
 	}
@@ -340,48 +329,20 @@ public class SpeciesManager {
 	}
 	
 	@Transactional
-	public void deleteTaxonomiesBySurveyWork(int surveyId) {
-		List<CollectTaxonomy> taxonomies = taxonomyDao.loadAllBySurveyWork(surveyId);
-		for (CollectTaxonomy taxonomy : taxonomies) {
-			delete(taxonomy);
-		}
-	}
-	
-	@Transactional
-	public void duplicateTaxonomyForWork(int publishedSurveyId, int surveyWorkId) {
-		duplicateTaxonomy(publishedSurveyId, false, surveyWorkId, true);
-	}
-	
-	@Transactional
-	public void duplicateWorkTaxonomyForWork(int oldSurveyWorkId, int newSurveyWorkId) {
-		duplicateTaxonomy(oldSurveyWorkId, true, newSurveyWorkId, true);
-	}
-	
-	@Transactional
-	public void duplicateTaxonomy(int oldSurveyId, boolean oldSurveyWork, int newSurveyId, boolean newSurveyWork) {
+	public void copyTaxonomy(int fromSurveyId, int toSurveyId) {
 		List<CollectTaxonomy> taxonomies;
-		if (oldSurveyWork) {
-			taxonomies = taxonomyDao.loadAllBySurveyWork(oldSurveyId);
-		} else {
-			taxonomies = taxonomyDao.loadAllBySurvey(oldSurveyId);
-		}
+		taxonomies = taxonomyDao.loadAllBySurvey(fromSurveyId);
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			int oldTaxonomyId = taxonomy.getId();
 			taxonomy.setId(null);
-			if (newSurveyWork) {
-				taxonomy.setSurveyId(null);
-				taxonomy.setSurveyWorkId(newSurveyId);
-			} else {
-				taxonomy.setSurveyId(newSurveyId);
-				taxonomy.setSurveyWorkId(null);
-			}
+			taxonomy.setSurveyId(toSurveyId);
 			taxonomyDao.insert(taxonomy);
 			Integer newTaxonomyId = taxonomy.getId();
-			duplicateTaxons(oldTaxonomyId, newTaxonomyId);
+			copyTaxons(oldTaxonomyId, newTaxonomyId);
 		}
 	}
 
-	protected void duplicateTaxons(int oldTaxonomyId, Integer newTaxonomyId) {
+	protected void copyTaxons(int oldTaxonomyId, Integer newTaxonomyId) {
 		int taxonIdShift = taxonDao.duplicateTaxons(oldTaxonomyId, newTaxonomyId);
 		taxonVernacularNameDao.duplicateVernacularNames(oldTaxonomyId, taxonIdShift);
 		/*

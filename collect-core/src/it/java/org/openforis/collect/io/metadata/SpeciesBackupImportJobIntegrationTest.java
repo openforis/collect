@@ -75,7 +75,7 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
 		survey = loadSurvey();
-		survey.setWork(false);
+		survey.setTemporary(false);
 		surveyManager.importModel(survey);
 	}
 	

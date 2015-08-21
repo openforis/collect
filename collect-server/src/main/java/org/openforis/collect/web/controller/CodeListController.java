@@ -49,7 +49,7 @@ public class CodeListController {
 	
 	protected String exportCodeList(HttpServletResponse response,
 			int surveyId, boolean work, int codeListId) throws IOException {
-		CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);
+		CollectSurvey survey = work ? surveyManager.loadSurvey(surveyId): surveyManager.getById(surveyId);
 		CodeList list = survey.getCodeListById(codeListId);
 		String fileName = list.getName() + CSV_EXTENSION;
 		response.setHeader("Content-Disposition", "attachment; filename=" + fileName);

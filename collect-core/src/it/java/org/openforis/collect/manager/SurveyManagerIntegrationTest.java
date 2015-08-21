@@ -58,7 +58,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void duplicatePublishedSurveyTest() {
 		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
-		assertTrue(surveyWork.isWork());
+		assertTrue(surveyWork.isTemporary());
 		{
 			CodeList list = survey.getCodeList("admin_unit");
 			List<CodeListItem> rootItems = codeListManager.loadRootItems(list);
@@ -84,7 +84,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 		surveyManager.publish(surveyWork);
 		
 		CollectSurvey survey = surveyManager.getByUri(surveyWork.getUri());
-		assertFalse(survey.isWork());
+		assertFalse(survey.isTemporary());
 		assertEquals("New Project Name", survey.getProjectName("en"));
 	}
 	
@@ -143,7 +143,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	public void duplicateSurveySamplingDesignForEditTest() {
 		insertTestSamplingDesign();
 		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
-		SamplingDesignSummaries summaries = samplingDesignManager.loadBySurveyWork(surveyWork.getId());
+		SamplingDesignSummaries summaries = samplingDesignManager.loadBySurvey(surveyWork.getId());
 		List<SamplingDesignItem> records = summaries.getRecords();
 		assertEquals(3, records.size());
 		{

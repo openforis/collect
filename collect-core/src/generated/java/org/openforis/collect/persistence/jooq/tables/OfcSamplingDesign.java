@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSamplingDesign extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord> {
 
-	private static final long serialVersionUID = -1229574719;
+	private static final long serialVersionUID = -490133046;
 
 	/**
 	 * The reference instance of <code>collect.ofc_sampling_design</code>
@@ -40,11 +40,6 @@ public class OfcSamplingDesign extends org.jooq.impl.TableImpl<org.openforis.col
 	 * The column <code>collect.ofc_sampling_design.survey_id</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord, java.lang.Integer> SURVEY_ID = createField("survey_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>collect.ofc_sampling_design.survey_work_id</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord, java.lang.Integer> SURVEY_WORK_ID = createField("survey_work_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * The column <code>collect.ofc_sampling_design.level1</code>.
@@ -151,7 +146,7 @@ public class OfcSamplingDesign extends org.jooq.impl.TableImpl<org.openforis.col
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord>>asList(org.openforis.collect.persistence.jooq.Keys.PK_OFC_SAMPLING_DESIGN, org.openforis.collect.persistence.jooq.Keys.OFC_SAMPLING_DESIGN_KEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord>>asList(org.openforis.collect.persistence.jooq.Keys.PK_OFC_SAMPLING_DESIGN);
 	}
 
 	/**
@@ -159,7 +154,7 @@ public class OfcSamplingDesign extends org.jooq.impl.TableImpl<org.openforis.col
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_FKEY, org.openforis.collect.persistence.jooq.Keys.OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_WORK_FKEY);
+		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcSamplingDesignRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_SAMPLING_DESIGN__OFC_SAMPLING_DESIGN_SURVEY_FKEY);
 	}
 
 	/**

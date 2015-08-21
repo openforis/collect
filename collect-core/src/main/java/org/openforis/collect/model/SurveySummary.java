@@ -21,7 +21,7 @@ public class SurveySummary {
 	private String name;
 	private String uri;
 	private String projectName;
-	private boolean work;
+	private boolean temporary;
 	private boolean published;
 	private Date creationDate;
 	private Date modifiedDate;
@@ -41,7 +41,7 @@ public class SurveySummary {
 		this.uri = uri;
 		this.projectName = projectName;
 		this.published = true;
-		this.work = false;
+		this.temporary = false;
 	}
 	
 	public static SurveySummary createFromSurvey(CollectSurvey survey) {
@@ -54,7 +54,7 @@ public class SurveySummary {
 		String name = survey.getName();
 		String uri = survey.getUri();
 		SurveySummary summary = new SurveySummary(id, name, uri, projectName);
-		summary.setWork(survey.isWork());
+		summary.setTemporary(survey.isTemporary());
 		summary.setCreationDate(survey.getCreationDate());
 		summary.setModifiedDate(survey.getModifiedDate());
 		summary.setTarget(survey.getTarget());
@@ -75,12 +75,12 @@ public class SurveySummary {
 		return id;
 	}
 	
-	public boolean isWork() {
-		return work;
+	public boolean isTemporary() {
+		return temporary;
 	}
 
-	public void setWork(boolean work) {
-		this.work = work;
+	public void setTemporary(boolean temporary) {
+		this.temporary = temporary;
 	}
 	
 	public String getName() {
@@ -124,8 +124,8 @@ public class SurveySummary {
 		this.recordValidationProcessStatus = recordValidationProcessStatus;
 	}
 	
-	public boolean isOnlyWork() {
-		return work && publishedId == null;
+	public boolean isNotLinkedToPublishedSurvey() {
+		return temporary && publishedId == null;
 	}
 
 	public Date getCreationDate() {

@@ -89,7 +89,7 @@ public class SurveyController extends BasicController {
 	public void showCollectEarthBalloonPreview(HttpServletResponse response, @RequestParam("surveyId") Integer surveyId)  {
 		PrintWriter writer = null;
 		try {
-			CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
+			CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 			CollectEarthBalloonGenerator generator = new CollectEarthBalloonGenerator(survey, survey.getDefaultLanguage());
 			String html = generator.generateHTML();
 			writer = new PrintWriter(response.getOutputStream());

@@ -61,7 +61,7 @@ public class DataMarshallerTest extends CollectIntegrationTest {
 	@Test
 	public void testMarshal() throws Exception  {
 		// LOAD MODEL
-		CollectSurvey survey = surveyDao.load("archenland1");
+		CollectSurvey survey = surveyDao.loadByName("archenland1");
 
 		if ( survey == null ) {
 			// IMPORT MODEL

@@ -36,12 +36,11 @@ public class SamplingDesignService {
 		SamplingDesignSummaries summaries;
 		CollectSurvey survey;
 		if (work) {
-			summaries = samplingDesignManager.loadBySurveyWork(surveyId, offset, maxRecords);
-			survey = surveyManager.loadSurveyWork(surveyId);
+			survey = surveyManager.loadSurvey(surveyId);
 		} else {
-			summaries = samplingDesignManager.loadBySurvey(surveyId, offset, maxRecords);
 			survey = surveyManager.getById(surveyId);
 		}
+		summaries = samplingDesignManager.loadBySurvey(surveyId, offset, maxRecords);
 		return new SamplingDesignSummariesProxy(survey, summaries);
 	}
 

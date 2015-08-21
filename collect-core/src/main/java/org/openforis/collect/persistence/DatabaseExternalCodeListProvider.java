@@ -223,7 +223,7 @@ public class DatabaseExternalCodeListProvider implements
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
 		Integer surveyId = survey.getId();
 		if ( surveyId != null ) {
-			String surveyIdFieldName = survey.isWork() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
+			String surveyIdFieldName = survey.isTemporary() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
 			NameValueEntry keyValue = new NameValueEntry(surveyIdFieldName, surveyId.toString());
 			return keyValue;
 		} else {

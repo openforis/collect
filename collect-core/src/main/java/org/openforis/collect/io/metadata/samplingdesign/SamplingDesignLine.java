@@ -78,12 +78,7 @@ public class SamplingDesignLine extends Line {
 	
 	public SamplingDesignItem toSamplingDesignItem(CollectSurvey survey, List<String> infoColumnNames) {
 		SamplingDesignItem item = new SamplingDesignItem();
-		Integer surveyId = survey.getId();
-		if ( survey.isWork() ) {
-			item.setSurveyWorkId(surveyId);
-		} else {
-			item.setSurveyId(surveyId);
-		}
+		item.setSurveyId(survey.getId());
 		item.setX(Double.parseDouble(x));
 		item.setY(Double.parseDouble(y));
 		item.setSrsId(srsId);

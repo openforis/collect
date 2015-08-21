@@ -83,7 +83,7 @@ public class SessionService {
 
 	@Transactional
 	public SurveyProxy setActivePreviewSurvey(int surveyId) {
-		CollectSurvey survey = surveyManager.loadSurveyWork(surveyId);
+		CollectSurvey survey = surveyManager.loadSurvey(surveyId);
 		return setActiveSurvey(survey, true);
 	}
 
@@ -92,7 +92,7 @@ public class SessionService {
 		CollectSurvey survey = sessionManager.getActiveDesignerSurvey();
 		if ( survey == null ) {
 			if ( work ) {
-				survey = surveyManager.loadSurveyWork(surveyId);
+				survey = surveyManager.loadSurvey(surveyId);
 			} else {
 				survey = surveyManager.getById(surveyId);
 			}

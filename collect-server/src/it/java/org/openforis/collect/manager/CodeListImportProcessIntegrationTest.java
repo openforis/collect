@@ -46,7 +46,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyStoreException {
 		survey = loadSurvey();
-		surveyManager.saveSurveyWork(survey);
+		surveyManager.save(survey);
 	}
 	
 	public CodeListImportProcess importCSVFile(String fileName, CodeList codeList) throws Exception {

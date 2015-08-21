@@ -9,6 +9,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.internal.SurveyBackupVerifierTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
@@ -69,17 +70,16 @@ public class SurveyBackupInfoExtractorJob extends Job {
 			SurveyBackupVerifierTask t = (SurveyBackupVerifierTask) task;
 			t.setZipFile(zipFile);
 		} else if ( task instanceof SurveyBackupInfoExtractorTask ) {
-			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
+			File infoFile = extractInfoFile();
 			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
-			File infoFile = backupFileExtractor.extractInfoFile();
 			t.setFile(infoFile);
 		} else if ( task instanceof IdmlUnmarshallTask ) {
 			File idmlFile;
 			if ( zipFile == null ) {
 				idmlFile = file;
 			} else {
-				BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-				idmlFile = zipFile == null ? file: backupFileExtractor.extractIdmlFile();
+				File idmFile = extractIdmFile();
+				idmlFile = zipFile == null ? file: idmFile;
 			}
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			t.setSurveyManager(surveyManager);
@@ -114,6 +114,29 @@ public class SurveyBackupInfoExtractorJob extends Job {
 		}
 	}
 	
+
+	private File extractIdmFile() {
+		BackupFileExtractor backupFileExtractor = null;
+		try {
+			backupFileExtractor = new BackupFileExtractor(zipFile);
+			File idmFile = backupFileExtractor.extractIdmlFile();
+			return idmFile;
+		} finally {
+			IOUtils.closeQuietly(backupFileExtractor);
+		}
+	}
+
+	private File extractInfoFile() {
+		BackupFileExtractor backupFileExtractor = null;
+		try {
+			backupFileExtractor = new BackupFileExtractor(zipFile);
+			File infoFile = backupFileExtractor.extractInfoFile();
+			return infoFile;
+		} finally {
+			IOUtils.closeQuietly(backupFileExtractor);
+		}
+	}
+
 	public SurveyManager getSurveyManager() {
 		return surveyManager;
 	}

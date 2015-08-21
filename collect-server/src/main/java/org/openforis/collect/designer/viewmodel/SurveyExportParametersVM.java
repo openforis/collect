@@ -44,7 +44,7 @@ public class SurveyExportParametersVM extends BaseVM {
 			outputFormat = OutputFormat.DESKTOP.name();
 		}
 		this.formObject.setOutputFormat(outputFormat);
-		this.formObject.setType(survey.isOnlyWork() ? SurveyType.TEMPORARY.name(): SurveyType.PUBLISHED.name());
+		this.formObject.setType(survey.isNotLinkedToPublishedSurvey() ? SurveyType.TEMPORARY.name(): SurveyType.PUBLISHED.name());
 		this.formObject.setRdbDialect(RdbDialect.STANDARD.name());
 		this.formObject.setRdbDateTimeFormat(DEFAULT_DATE_TIME_FORMAT);
 		this.formObject.setRdbTargetSchemaName(survey.getName());

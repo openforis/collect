@@ -98,7 +98,7 @@ public class SessionManager {
 			CollectSurvey survey = getActiveDesignerSurvey();
 			boolean activeSurveyWork = sessionState.isActiveSurveyWork();
 			if ( activeSurveyWork ) {
-				surveyManager.saveSurveyWork(survey);
+				surveyManager.save(survey);
 			} else {
 				throw new IllegalArgumentException("Active designer survey should be a 'work' survey");
 			}
