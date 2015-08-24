@@ -12,7 +12,7 @@
 				SELECT max(id) AS max_survey_id 
 				FROM collect.ofc_survey;
 			
-			ALTER TABLE collect.ofc_survey ADD COLUMN temporary BOOLEAN NOT NULL DEFAULT TRUE;
+			ALTER TABLE collect.ofc_survey ADD COLUMN temporary BOOLEAN NOT NULL DEFAULT FALSE;
 			ALTER TABLE collect.ofc_survey DROP CONSTRAINT ofc_survey_name_key;
 			ALTER TABLE collect.ofc_survey DROP CONSTRAINT ofc_survey_uri_key;
 			
