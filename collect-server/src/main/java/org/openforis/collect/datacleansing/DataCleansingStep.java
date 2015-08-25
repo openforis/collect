@@ -2,10 +2,11 @@ package org.openforis.collect.datacleansing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
-import org.openforis.idm.metamodel.Survey;
 
 /**
  * 
@@ -28,11 +29,15 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	
 	private transient DataQuery query;
 	
-	public DataCleansingStep(Survey survey) {
+	public DataCleansingStep(CollectSurvey survey) {
 		super(survey);
-		fieldFixExpressions = new ArrayList<String>();
 	}
 	
+	public DataCleansingStep(CollectSurvey survey, UUID uuid) {
+		super(survey, uuid);
+		fieldFixExpressions = new ArrayList<String>();
+	}
+
 	public UpdateType getUpdateType() {
 		return StringUtils.isNotBlank(fixExpression) ? UpdateType.ATTRIBUTE : UpdateType.FIELD;
 	}

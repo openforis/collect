@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataErrorReportItem extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportItemRecord> {
 
-	private static final long serialVersionUID = -327987059;
+	private static final long serialVersionUID = -632121067;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_error_report_item</code>
@@ -35,6 +35,11 @@ public class OfcDataErrorReportItem extends org.jooq.impl.TableImpl<org.openfori
 	 * The column <code>collect.ofc_data_error_report_item.id</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportItemRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_error_report_item.uuid</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportItemRecord, java.lang.String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR.length(50), this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_error_report_item.report_id</code>.

@@ -1,5 +1,7 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.UUID;
+
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 
@@ -20,6 +22,10 @@ public class DataErrorQuery extends PersistedSurveyObject {
 	
 	public DataErrorQuery(CollectSurvey survey) {
 		super(survey);
+	}
+
+	public DataErrorQuery(CollectSurvey survey, UUID uuid) {
+		super(survey, uuid);
 	}
 
 	public Integer getQueryId() {

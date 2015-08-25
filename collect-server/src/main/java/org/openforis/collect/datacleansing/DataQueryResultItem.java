@@ -1,11 +1,12 @@
 package org.openforis.collect.datacleansing;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.openforis.collect.datacleansing.json.JSONValueParser;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.AbstractPersistedObject;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
@@ -20,6 +21,7 @@ import org.openforis.idm.model.Value;
  */
 public class DataQueryResultItem extends AbstractPersistedObject {
 	
+	private UUID uuid;
 	private DataQuery query;
 	private CollectRecord record;
 	private int recordId;
@@ -29,8 +31,13 @@ public class DataQueryResultItem extends AbstractPersistedObject {
 	private Node<?> node;
 
 	public DataQueryResultItem(DataQuery query) {
+		this(query, UUID.randomUUID());
+	}
+	
+	public DataQueryResultItem(DataQuery query, UUID uuid) {
 		super();
 		this.query = query;
+		this.uuid = uuid;
 	}
 	
 	public AttributeDefinition getAttributeDefinition() {
@@ -112,6 +119,14 @@ public class DataQueryResultItem extends AbstractPersistedObject {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+	
+	public UUID getUuid() {
+		return uuid;
+	}
+	
+	public void setUuid(UUID uuid) {
+		this.uuid = uuid;
 	}
 
 }

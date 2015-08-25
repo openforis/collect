@@ -8,6 +8,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
+import org.openforis.collect.datacleansing.DataCleansingExportTask;
 import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.data.RecordFileBackupTask;
@@ -26,11 +27,15 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.persistence.xml.DataMarshaller;
+import org.openforis.collect.utils.ZipFiles;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +53,8 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	public static final String SAMPLING_DESIGN_ENTRY_NAME = "sampling_design" + ZIP_FOLDER_SEPARATOR + "sampling_design.csv";
 	public static final String SPECIES_FOLDER = "species";
 	public static final String SPECIES_ENTRY_FORMAT = SPECIES_FOLDER + ZIP_FOLDER_SEPARATOR + "%s.csv";
+	public static final String CLEANSING_FOLDER_NAME = "cleansing";
+	public static final String DATA_CLEANSING_ENTRY_NAME = CLEANSING_FOLDER_NAME + ZIP_FOLDER_SEPARATOR + "cleansing_metadata.json";
 	public static final String INFO_FILE_NAME = "info.properties";
 	public static final String DATA_FOLDER = "data";
 	public static final String CODE_LIST_IMAGES_FOLDER = "code_list_images";
@@ -86,6 +93,8 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	private CodeListManager codeListManager;
 	@Autowired
 	private BackupStorageManager backupStorageManager;
+	@Autowired
+	private ApplicationContext applicationContext;
 	
 	//input
 	private boolean full;
@@ -135,6 +144,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		addCodeListImagesExportTask();
 		addSamplingDesignExportTask();
 		addSpeciesExportTask();
+		addCleansingExportTask();
 		if ( includeData && ! survey.isTemporary() ) {
 			addDataExportTask();
 			if ( includeRecordFiles ) {
@@ -167,6 +177,9 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		} else if ( task instanceof CollectMobileBackupConvertTask ) {
 			this.zipOutputStream = null;
 			this.outputFile = ((CollectMobileBackupConvertTask) task).getOutputFile();
+		} else if (task instanceof DataCleansingExportTask) {
+			ZipFiles.writeFile(zipOutputStream, ((DataCleansingExportTask) task).getResultFile(), 
+					DATA_CLEANSING_ENTRY_NAME);
 		}
 		super.onTaskCompleted(task);
 	}
@@ -248,6 +261,16 @@ public class SurveyBackupJob extends SurveyLockingJob {
 		task.setCollectBackupFile(outputFile);
 		task.setSurveyName(survey.getName());
 		addTask(task);
+	}
+	
+	private void addCleansingExportTask() {
+		try {
+			DataCleansingExportTask task = applicationContext.getBean(DataCleansingExportTask.class);
+			task.setSurvey(survey);
+			addTask((Task) task);
+		} catch (BeansException e) {
+			//do nothing
+		}
 	}
 	
 	@Override

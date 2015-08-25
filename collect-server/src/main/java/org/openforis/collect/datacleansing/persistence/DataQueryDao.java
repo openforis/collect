@@ -5,6 +5,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DAT
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Record;
 import org.jooq.Result;
@@ -67,6 +68,7 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 			o.setDescription(r.getValue(OFC_DATA_QUERY.DESCRIPTION));
 			o.setEntityDefinitionId(r.getValue(OFC_DATA_QUERY.ENTITY_ID));
 			o.setTitle(r.getValue(OFC_DATA_QUERY.TITLE));
+			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_QUERY.UUID)));
 		}
 		
 		@Override
@@ -80,6 +82,7 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 			q.addValue(OFC_DATA_QUERY.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
 			q.addValue(OFC_DATA_QUERY.SURVEY_ID, o.getSurvey().getId());
 			q.addValue(OFC_DATA_QUERY.TITLE, o.getTitle());
+			q.addValue(OFC_DATA_QUERY.UUID, o.getUuid().toString());
 		}
 
 	}

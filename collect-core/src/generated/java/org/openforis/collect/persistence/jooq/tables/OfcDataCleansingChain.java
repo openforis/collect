@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataCleansingChain extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingChainRecord> {
 
-	private static final long serialVersionUID = 530473944;
+	private static final long serialVersionUID = 1114507985;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_cleansing_chain</code>
@@ -35,6 +35,11 @@ public class OfcDataCleansingChain extends org.jooq.impl.TableImpl<org.openforis
 	 * The column <code>collect.ofc_data_cleansing_chain.id</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingChainRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_cleansing_chain.uuid</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingChainRecord, java.lang.String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR.length(50), this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_cleansing_chain.survey_id</code>.

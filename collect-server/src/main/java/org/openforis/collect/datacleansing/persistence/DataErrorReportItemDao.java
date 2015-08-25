@@ -6,6 +6,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportIt
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.BatchBindStep;
 import org.jooq.Field;
@@ -124,6 +125,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 			o.setRecordId(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID));
 			o.setStatus(Status.fromCode(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.STATUS).charAt(0)));
 			o.setValue(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.VALUE));
+			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.UUID)));
 		}
 		
 		@Override
@@ -134,6 +136,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID, o.getRecordId());
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID, o.getReport().getId());
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.STATUS, String.valueOf(o.getStatus().getCode()));
+			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.UUID, o.getUuid().toString());
 		}
 		
 		public Insert<OfcDataErrorReportItemRecord> createInsertStatement() {

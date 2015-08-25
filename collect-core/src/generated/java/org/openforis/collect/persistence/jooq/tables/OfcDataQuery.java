@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataQuery extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord> {
 
-	private static final long serialVersionUID = 1926490024;
+	private static final long serialVersionUID = -1087314232;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_query</code>
@@ -35,6 +35,11 @@ public class OfcDataQuery extends org.jooq.impl.TableImpl<org.openforis.collect.
 	 * The column <code>collect.ofc_data_query.id</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_query.uuid</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord, java.lang.String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR.length(50), this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_query.survey_id</code>.

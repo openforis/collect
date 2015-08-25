@@ -2,9 +2,10 @@ package org.openforis.collect.datacleansing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
-import org.openforis.idm.metamodel.Survey;
 
 /**
  * 
@@ -20,9 +21,13 @@ public class DataCleansingChain extends PersistedSurveyObject {
 	
 	private List<DataCleansingStep> steps;
 	
-	public DataCleansingChain(Survey survey) {
+	public DataCleansingChain(CollectSurvey survey) {
 		super(survey);
-		steps = new ArrayList<DataCleansingStep>();
+	}
+
+	public DataCleansingChain(CollectSurvey survey, UUID uuid) {
+		super(survey, uuid);
+		this.steps = new ArrayList<DataCleansingStep>();
 	}
 
 	public void addStep(DataCleansingStep step) {

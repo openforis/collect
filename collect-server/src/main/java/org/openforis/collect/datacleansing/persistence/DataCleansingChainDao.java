@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.jooq.BatchBindStep;
 import org.jooq.DeleteConditionStep;
@@ -118,6 +119,7 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 			o.setDescription(r.getValue(OFC_DATA_CLEANSING_CHAIN.DESCRIPTION));
 			o.setModifiedDate(r.getValue(OFC_DATA_CLEANSING_CHAIN.MODIFIED_DATE));
 			o.setTitle(r.getValue(OFC_DATA_CLEANSING_CHAIN.TITLE));
+			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_CLEANSING_CHAIN.UUID)));
 		}
 		
 		@Override
@@ -128,6 +130,7 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 			q.addValue(OFC_DATA_CLEANSING_CHAIN.DESCRIPTION, o.getDescription());
 			q.addValue(OFC_DATA_CLEANSING_CHAIN.MODIFIED_DATE, toTimestamp(o.getCreationDate()));
 			q.addValue(OFC_DATA_CLEANSING_CHAIN.TITLE, o.getTitle());
+			q.addValue(OFC_DATA_CLEANSING_CHAIN.UUID, o.getUuid().toString());
 		}
 
 	}

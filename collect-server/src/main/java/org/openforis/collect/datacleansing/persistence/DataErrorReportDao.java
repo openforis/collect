@@ -6,6 +6,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport.O
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -88,6 +89,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 			super.fromRecord(r, o);
 			o.setCreationDate(r.getValue(OFC_DATA_ERROR_REPORT.CREATION_DATE));
 			o.setQueryId(r.getValue(OFC_DATA_ERROR_REPORT.QUERY_ID));
+			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_REPORT.UUID)));
 		}
 		
 		@Override
@@ -95,6 +97,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 			super.fromObject(o, q);
 			q.addValue(OFC_DATA_ERROR_REPORT.CREATION_DATE, toTimestamp(o.getCreationDate()));
 			q.addValue(OFC_DATA_ERROR_REPORT.QUERY_ID, o.getQueryId());
+			q.addValue(OFC_DATA_ERROR_REPORT.UUID, o.getUuid().toString());
 		}
 
 	}

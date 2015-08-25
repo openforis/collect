@@ -7,6 +7,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DAT
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -99,6 +100,7 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			o.setModifiedDate(r.getValue(OFC_DATA_CLEANSING_STEP.MODIFIED_DATE));
 			o.setQueryId(r.getValue(OFC_DATA_CLEANSING_STEP.QUERY_ID));
 			o.setTitle(r.getValue(OFC_DATA_CLEANSING_STEP.TITLE));
+			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_CLEANSING_STEP.UUID)));
 			
 			List<String> fieldFixExpressions = new ArrayList<String>(FIELD_FIX_EXPRESSION_FIELDS.length);
 			for (int i = 0; i < FIELD_FIX_EXPRESSION_FIELDS.length; i++) {
@@ -119,6 +121,7 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			q.addValue(OFC_DATA_CLEANSING_STEP.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
 			q.addValue(OFC_DATA_CLEANSING_STEP.QUERY_ID, o.getQueryId());
 			q.addValue(OFC_DATA_CLEANSING_STEP.TITLE, o.getTitle());
+			q.addValue(OFC_DATA_CLEANSING_STEP.UUID, o.getUuid().toString());
 			
 			int fieldFixExpressionsSize = o.getFieldFixExpressions() == null ? 0 : o.getFieldFixExpressions().size();
 			for (int i = 0; i < FIELD_FIX_EXPRESSION_FIELDS.length; i++) {

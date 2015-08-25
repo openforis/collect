@@ -18,6 +18,7 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_query_pkey" />
 			</column>
+			<column name="uuid" type="VARCHAR(50)" />
 			<column name="survey_id" type="INTEGER">
 				<constraints nullable="false" 
 					foreignKeyName="ofc_data_query_survey_fkey" 
@@ -43,6 +44,7 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_error_type_pkey" />
 			</column>
+			<column name="uuid" type="VARCHAR(50)" />
 			<column name="survey_id" type="INTEGER">
 				<constraints nullable="false" 
 					foreignKeyName="ofc_data_error_type_survey_fkey" 
@@ -60,6 +62,7 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_error_query_pkey" />
 			</column>
+			<column name="uuid" type="VARCHAR(50)" />
 			<column name="error_type_id" type="INTEGER">
 				<constraints nullable="false" 
 					foreignKeyName="ofc_data_error_query_type_fkey" 
@@ -77,6 +80,7 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_error_report_pkey" />
 			</column>
+			<column name="uuid" type="VARCHAR(50)" />
 			<column name="query_id" type="INTEGER">
 				<constraints nullable="false" 
 					foreignKeyName="ofc_data_error_report_query_fkey" 
@@ -90,6 +94,7 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_error_report_item_pkey" />
 			</column>
+			<column name="uuid" type="VARCHAR(50)" />
 			<column name="report_id" type="INTEGER">
 				<constraints nullable="false" 
 					foreignKeyName="ofc_data_error_report_item_report_fkey" 
@@ -113,6 +118,7 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_cleansing_step_pkey" />
 			</column>
+			<column name="uuid" type="VARCHAR(50)" />
 			<column name="query_id" type="INTEGER">
 				<constraints nullable="false" 
 					foreignKeyName="ofc_data_cleansing_step_query_fkey" 
@@ -147,6 +153,7 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_cleansing_chain_pkey" />
 			</column>
+			<column name="uuid" type="VARCHAR(50)" />
 			<column name="survey_id" type="INTEGER">
 				<constraints nullable="false" 
 					foreignKeyName="ofc_data_cleansing_chain_survey_fkey" 

@@ -1,5 +1,7 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.UUID;
+
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -25,6 +27,10 @@ public class DataQuery extends PersistedSurveyObject {
 		super(survey);
 	}
 	
+	public DataQuery(CollectSurvey survey, UUID uuid) {
+		super(survey, uuid);
+	}
+
 	public EntityDefinition getEntityDefinition() {
 		NodeDefinition def = getSurvey().getSchema().getDefinitionById(entityDefinitionId);
 		return (EntityDefinition) def;

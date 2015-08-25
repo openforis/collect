@@ -5,6 +5,7 @@ import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Record;
 import org.jooq.Result;
@@ -69,6 +70,7 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErro
 			o.setCode(r.getValue(OFC_DATA_ERROR_TYPE.CODE));
 			o.setDescription(r.getValue(OFC_DATA_ERROR_TYPE.DESCRIPTION));
 			o.setLabel(r.getValue(OFC_DATA_ERROR_TYPE.LABEL));
+			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_TYPE.UUID)));
 		}
 		
 		@Override
@@ -78,6 +80,7 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErro
 			q.addValue(OFC_DATA_ERROR_TYPE.DESCRIPTION, o.getDescription());
 			q.addValue(OFC_DATA_ERROR_TYPE.LABEL, o.getLabel());
 			q.addValue(OFC_DATA_ERROR_TYPE.SURVEY_ID, o.getSurvey().getId());
+			q.addValue(OFC_DATA_ERROR_TYPE.UUID, o.getUuid().toString());
 		}
 
 	}

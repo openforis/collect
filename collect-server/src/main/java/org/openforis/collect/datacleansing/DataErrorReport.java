@@ -2,6 +2,7 @@ package org.openforis.collect.datacleansing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
@@ -21,9 +22,13 @@ public class DataErrorReport extends PersistedSurveyObject {
 	
 	public DataErrorReport(CollectSurvey survey) {
 		super(survey);
-		items = new ArrayList<DataErrorReportItem>();
 	}
 	
+	public DataErrorReport(CollectSurvey survey, UUID uuid) {
+		super(survey, uuid);
+		items = new ArrayList<DataErrorReportItem>();
+	}
+
 	public void addItem(DataErrorReportItem item) {
 		items.add(item);
 	}
