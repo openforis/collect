@@ -18,7 +18,7 @@ public class DataErrorReport extends PersistedSurveyObject {
 	
 	private int queryId;
 	private DataErrorQuery query;
-	private List<DataErrorReportItem> items;
+	private List<DataErrorReportItem> items = new ArrayList<DataErrorReportItem>();
 	
 	public DataErrorReport(CollectSurvey survey) {
 		super(survey);
@@ -26,7 +26,6 @@ public class DataErrorReport extends PersistedSurveyObject {
 	
 	public DataErrorReport(CollectSurvey survey, UUID uuid) {
 		super(survey, uuid);
-		items = new ArrayList<DataErrorReportItem>();
 	}
 
 	public void addItem(DataErrorReportItem item) {

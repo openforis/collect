@@ -25,7 +25,7 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	private String description;
 	private Integer queryId;
 	private String fixExpression;
-	private List<String> fieldFixExpressions;
+	private List<String> fieldFixExpressions = new ArrayList<String>();
 	
 	private transient DataQuery query;
 	
@@ -35,7 +35,6 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	
 	public DataCleansingStep(CollectSurvey survey, UUID uuid) {
 		super(survey, uuid);
-		fieldFixExpressions = new ArrayList<String>();
 	}
 
 	public UpdateType getUpdateType() {

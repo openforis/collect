@@ -4,6 +4,11 @@ import java.util.List;
 
 import org.openforis.collect.model.CollectSurvey;
 
+/**
+ * 
+ * @author S. Ricci
+ *
+ */
 public class DataCleansingMetadata {
 	
 	private CollectSurvey survey;

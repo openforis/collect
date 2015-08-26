@@ -46,15 +46,21 @@ public class SurveyController extends BasicController {
 
 	@RequestMapping(value = "summaries.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	List<SurveySummary> loadSummaries(@RequestParam(value="include_record_ids", required=false) boolean includeRecordIds) throws Exception {
-		List<SurveySummary> surveys = surveyManager.getSurveySummaries(Locale.ENGLISH.getLanguage());
-		return surveys;
+	List<SurveySummary> loadSummaries(
+			@RequestParam(required=false) boolean includeTemporary,
+			@RequestParam(required=false) boolean includeRecordIds) throws Exception {
+		String language = Locale.ENGLISH.getLanguage();
+		if (includeTemporary) {
+			return surveyManager.loadCombinedSummaries(language, true);
+		} else {
+			return surveyManager.getSurveySummaries(language);
+		}
 	}
 
 	@RequestMapping(value = "{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id) throws Exception {
-		CollectSurvey survey = surveyManager.getById(id);
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
 		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH);
 		SurveyView view = viewGenerator.generateView(survey);
 		return view;

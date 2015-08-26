@@ -12,17 +12,17 @@
 				SELECT max(id) AS max_survey_id 
 				FROM ofc_survey;
 			
-			CREATE TABLE _temp_survey (id INTEGER NOT NULL, name TEXT NOT NULL, uri TEXT NOT NULL, idml TEXT NOT NULL, target varchar(5) NOT NULL default 'CD', date_created timestamp, date_modified timestamp, collect_version varchar(55) NOT NULL DEFAULT '3.4.0', temporary bool NOT NULL default 0, CONSTRAINT ofc_survey_pkey PRIMARY KEY (id), CONSTRAINT ofc_survey_uri_key UNIQUE(uri, temporary), CONSTRAINT ofc_survey_name_key UNIQUE(name, temporary));
+			CREATE TABLE _temp_survey (id INTEGER NOT NULL, name TEXT NOT NULL, uri TEXT NOT NULL, idml TEXT NOT NULL, target varchar(5) NOT NULL default 'CD', date_created timestamp, date_modified timestamp, collect_version varchar(55) NOT NULL DEFAULT '3.4.0', temporary bool NOT NULL default 0, published_id INTEGER, CONSTRAINT ofc_survey_pkey PRIMARY KEY (id), CONSTRAINT ofc_survey_uri_key UNIQUE(uri, temporary), CONSTRAINT ofc_survey_name_key UNIQUE(name, temporary));
 			CREATE TABLE _temp_code_list (id INTEGER NOT NULL, survey_id INTEGER, code_list_id INTEGER NOT NULL, item_id INTEGER NOT NULL, parent_id INTEGER, sort_order INTEGER NOT NULL, code TEXT NOT NULL, qualifiable BOOLEAN, since_version_id INTEGER, deprecated_version_id INTEGER, label1 TEXT, label2 TEXT, label3 TEXT, label4 TEXT, label5 TEXT, description1 TEXT, description2 TEXT, description3 TEXT, description4 TEXT, description5 TEXT, level integer, image_content bytea, image_file_name varchar(255), CONSTRAINT PK_OFC_CODE_LIST PRIMARY KEY (id), CONSTRAINT ofc_code_list_parent_fkey FOREIGN KEY (parent_id) REFERENCES ofc_code_list(id), CONSTRAINT ofc_code_list_survey_fkey FOREIGN KEY (survey_id) REFERENCES ofc_survey(id));
 			CREATE TABLE _temp_taxonomy (id INTEGER NOT NULL, survey_id INTEGER NOT NULL, name TEXT NOT NULL, metadata TEXT NOT NULL, CONSTRAINT ofc_taxonomy_pkey PRIMARY KEY (id), CONSTRAINT ofc_taxonomy_survey_fkey FOREIGN KEY (survey_id) REFERENCES ofc_survey(id));
 			CREATE TABLE _temp_sampling_design (id INTEGER NOT NULL, survey_id INTEGER NOT NULL, level1 TEXT NOT NULL, level2 TEXT, level3 TEXT, location TEXT NOT NULL, info1 varchar(255), info2 varchar(255), info3 varchar(255), info4 varchar(255), info5 varchar(255), info6 varchar(255), info7 varchar(255), info8 varchar(255), info9 varchar(255), info10 varchar(255), CONSTRAINT ofc_sampling_design_pkey PRIMARY KEY (id), CONSTRAINT ofc_sampling_design_survey_fkey FOREIGN KEY (survey_id) REFERENCES ofc_survey(id));
 			
 			--insert survey table values
-			INSERT INTO _temp_survey (id, name, uri, idml, target, date_created, date_modified, collect_version, temporary) 
-				SELECT id, name, uri, idml, target, date_created, date_modified, collect_version, 0 
+			INSERT INTO _temp_survey (id, name, uri, idml, target, date_created, date_modified, collect_version, temporary, published_id) 
+				SELECT id, name, uri, idml, target, date_created, date_modified, collect_version, 0, null 
 				FROM ofc_survey
 				UNION
-				SELECT (id + _temp_info.max_survey_id), name, uri, idml, target, date_created, date_modified, collect_version, 1 
+				SELECT (id + _temp_info.max_survey_id), name, uri, idml, target, date_created, date_modified, collect_version, 1, (select s.id from ofc_survey s where s.uri = uri) 
 				FROM ofc_survey_work, _temp_info;
 			
 			--insert code_list table values

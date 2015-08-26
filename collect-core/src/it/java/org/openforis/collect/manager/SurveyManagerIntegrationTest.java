@@ -56,8 +56,8 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	}
 	
 	@Test
-	public void duplicatePublishedSurveyTest() {
-		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
+	public void createTemporarySurveyFromPublishedTest() {
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
 		assertTrue(surveyWork.isTemporary());
 		{
 			CodeList list = survey.getCodeList("admin_unit");
@@ -77,7 +77,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	
 	@Test
 	public void publishSurveyTest() throws SurveyImportException {
-		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
 		assertEquals("Archenland NFI", surveyWork.getProjectName());
 		
 		surveyWork.setProjectName("en", "New Project Name");
@@ -90,7 +90,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	
 	@Test
 	public void publishSurveyCodeListsTest() throws SurveyImportException {
-		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
 		{
 			//modify item in list
 			CodeList list = surveyWork.getCodeList("admin_unit");
@@ -119,7 +119,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void publishSurveyTaxonomyTest() throws SurveyImportException {
 		insertTestTaxonomy();
-		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
 		{
 			CollectTaxonomy taxonomy = speciesManager.loadTaxonomyWorkByName(surveyWork.getId(), "tree");
 			assertNotNull(taxonomy);
@@ -142,7 +142,7 @@ public class SurveyManagerIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void duplicateSurveySamplingDesignForEditTest() {
 		insertTestSamplingDesign();
-		CollectSurvey surveyWork = surveyManager.duplicatePublishedSurveyForEdit(survey.getUri());
+		CollectSurvey surveyWork = surveyManager.createTemporarySurveyFromPublished(survey.getUri());
 		SamplingDesignSummaries summaries = samplingDesignManager.loadBySurvey(surveyWork.getId());
 		List<SamplingDesignItem> records = summaries.getRecords();
 		assertEquals(3, records.size());

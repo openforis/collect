@@ -438,7 +438,7 @@ public class CodeListManager {
 	}
 	
 	@Transactional
-	public void publishCodeLists(int temporarySurveyId, int publishedSurveyId) {
+	public void moveCodeLists(int temporarySurveyId, int publishedSurveyId) {
 		codeListItemDao.deleteBySurvey(publishedSurveyId);
 		codeListItemDao.moveItems(temporarySurveyId, publishedSurveyId);
 	}

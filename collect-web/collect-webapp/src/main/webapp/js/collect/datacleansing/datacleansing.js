@@ -20,6 +20,10 @@ Collect.DataCleansing.DATA_CLEANSING_STEP_DELETED = "dataCleansingStepDeleted";
 Collect.DataCleansing.DATA_CLEANSING_CHAIN_SAVED = "dataCleansingChainSaved";
 Collect.DataCleansing.DATA_CLEANSING_CHAIN_DELETED = "dataCleansingChainDeleted";
 
+Collect.DataCleansing.VIEW_STATE_NO_SURVEY_SELECTED = "noSurveySelected";
+Collect.DataCleansing.VIEW_STATE_SURVEY_SELECTED = "surveySelected";
+Collect.DataCleansing.VIEW_STATE_TEMPORARY_SURVEY_SELECTED = "temporarySurveySelected";
+
 Collect.DataCleansing.prototype.init = function() {
 	this.initDataErrorTypePanel();
 	this.initDataQueryPanel();
@@ -37,6 +41,32 @@ Collect.DataCleansing.prototype.init = function() {
 
 
 Collect.DataCleansing.prototype.initView = function() {
+	this.checkViewState();
+};
+
+Collect.DataCleansing.prototype.checkViewState = function() {
+	var state = null;
+	if (collect.activeSurvey == null) {
+		state = Collect.DataCleansing.VIEW_STATE_NO_SURVEY_SELECTED;
+	} else if (collect.activeSurvey.temporary) {
+		state = Collect.DataCleansing.VIEW_STATE_TEMPORARY_SURVEY_SELECTED;
+	} else {
+		state = Collect.DataCleansing.VIEW_STATE_SURVEY_SELECTED;
+	}
+	this.changeViewState(state);
+};
+
+Collect.DataCleansing.prototype.changeViewState = function(state) {
+	switch (state) {
+	case Collect.DataCleansing.VIEW_STATE_NO_SURVEY_SELECTED:
+		break;
+	case Collect.DataCleansing.VIEW_STATE_SURVEY_SELECTED:
+		$("#data-error-report-tab").show();
+		break;
+	case Collect.DataCleansing.VIEW_STATE_TEMPORARY_SURVEY_SELECTED:
+		$("#data-error-report-tab").hide();
+		break;
+	};
 };
 
 Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
@@ -52,6 +82,8 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 		$this.dataCleansingStepPanel.initDataGrid();
 		$this.dataCleansingChainPanel.initDataGrid();
 		//$this.initMapPanel();
+		
+		$this.checkViewState();
 	});
 	EventBus.addEventListener(Collect.DataCleansing.DATA_ERROR_TYPE_SAVED, function() {
 		$this.dataErrorTypePanel.refreshDataGrid();

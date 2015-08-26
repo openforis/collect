@@ -18,8 +18,7 @@ public class DataCleansingChain extends PersistedSurveyObject {
 	
 	private String title;
 	private String description;
-	
-	private List<DataCleansingStep> steps;
+	private List<DataCleansingStep> steps = new ArrayList<DataCleansingStep>();;
 	
 	public DataCleansingChain(CollectSurvey survey) {
 		super(survey);
@@ -27,7 +26,6 @@ public class DataCleansingChain extends PersistedSurveyObject {
 
 	public DataCleansingChain(CollectSurvey survey, UUID uuid) {
 		super(survey, uuid);
-		this.steps = new ArrayList<DataCleansingStep>();
 	}
 
 	public void addStep(DataCleansingStep step) {

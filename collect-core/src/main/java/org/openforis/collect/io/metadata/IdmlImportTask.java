@@ -45,7 +45,7 @@ public class IdmlImportTask extends Task {
 			if ( importInPublishedSurvey ) {
 				survey = surveyManager.importModel(file, surveyName, validate);
 			} else {
-				survey = surveyManager.importWorkModel(file, surveyName, validate);
+				survey = surveyManager.importTemporaryModel(file, surveyName, validate);
 			}
 		} else if ( importInPublishedSurvey ) {
 			//survey already exists
@@ -59,10 +59,10 @@ public class IdmlImportTask extends Task {
 			}
 		} else if ( oldSurveySummary.isTemporary() ) {
 			//survey work already exists, update it
-			survey = surveyManager.updateWorkModel(file, validate);
+			survey = surveyManager.updateTemporaryModel(file, validate);
 		} else {
 			//duplicates published survey into work and update it with packaged file
-			survey = surveyManager.importInPublishedWorkModel(surveyUri, file, validate);
+			survey = surveyManager.importInPublishedTemporaryModel(surveyUri, file, validate);
 		}
 	}
 

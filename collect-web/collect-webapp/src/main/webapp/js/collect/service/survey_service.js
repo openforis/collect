@@ -5,6 +5,6 @@ Collect.SurveyService = function() {
 
 Collect.SurveyService.prototype = Object.create(Collect.AbstractService.prototype);
 
-Collect.SurveyService.prototype.loadSummaries = function(onSuccess, onError) {
-	this.send("summaries.json", null, "GET",  onSuccess, onError);
+Collect.SurveyService.prototype.loadSummaries = function(onSuccess, onError, excludeTemporary) {
+	this.send("summaries.json", {includeTemporary: ! excludeTemporary}, "GET",  onSuccess, onError);
 };

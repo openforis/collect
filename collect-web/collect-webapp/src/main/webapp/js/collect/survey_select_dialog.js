@@ -19,7 +19,14 @@ Collect.SurveySelectDialogController.prototype.initFormElements = function(callb
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
 		var select = $this.content.find('.survey-select');
 		var surveyLabelFunction = function(survey) {
-			return survey.name + (OF.Strings.isBlank(survey.projectName) ? "":  " - " + survey.projectName);
+			var label = survey.name;
+			if (OF.Strings.isNotBlank(survey.projectName)) {
+				label += " " + survey.projectName;
+			}
+			if (survey.temporary) {
+				label += " (temp)"; 
+			}
+			return label;
 		}
 		OF.UI.Forms.populateSelect(select, $this.surveySummaries, "id", surveyLabelFunction, true);
 		$this.surveySelectPicker = select.selectpicker();

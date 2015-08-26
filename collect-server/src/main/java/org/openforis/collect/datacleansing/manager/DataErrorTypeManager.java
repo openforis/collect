@@ -55,7 +55,7 @@ public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorT
 				}
 			}
 		}
-		return types;
+		return new ArrayList<DataErrorType>(types);
 	}
 	
 	@Override
@@ -89,17 +89,18 @@ public class DataErrorTypeManager extends AbstractSurveyObjectManager<DataErrorT
 	public void delete(DataErrorType obj) {
 		DataErrorType errorType = cache.get(obj.getId());
 		checkErrorTypeUsedByErrorQuery(errorType);
-		super.delete(errorType.getId());
+		super.delete(errorType);
 		cache.remove(errorType);
 	}
 
 	private void checkErrorTypeUsedByErrorQuery(DataErrorType errorType) {
 		List<DataErrorQuery> dataErrorQueries = dataErrorQueryManager.loadByType(errorType);
 		if (! dataErrorQueries.isEmpty()) {
-			String message = messageSource.getMessage("data_error_type.delete.error.used_by_error_query", new String[]{errorType.getCode()}, Locale.ENGLISH);
+			String message = messageSource.getMessage("data_error_type.delete.error.used_by_error_query", 
+					new String[]{errorType.getCode()}, Locale.ENGLISH);
 			throw new IllegalStateException(message);
 		}
-	} 
+	}
 	
 	private static class ErrorTypeCache {
 		

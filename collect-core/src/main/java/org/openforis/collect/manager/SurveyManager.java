@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.Collect;
+import org.openforis.collect.datacleansing.manager.SurveyDataCleansingManager;
 import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
@@ -76,6 +77,8 @@ public class SurveyManager {
 	private ApplicationContext applicationContext;
 	@Autowired
 	private CollectSurveyIdmlBinder surveySerializer;
+	@Autowired(required=false)
+	private SurveyDataCleansingManager dataCleansingManager;
 	
 	private List<CollectSurvey> surveys;
 	private Map<Integer, CollectSurvey> surveysById;
@@ -146,12 +149,12 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public CollectSurvey importWorkModel(InputStream is, String name, boolean validate)
+	public CollectSurvey importTemporaryModel(InputStream is, String name, boolean validate)
 			throws SurveyImportException, SurveyValidationException {
 		File tempFile = null;
 		try {
 			tempFile = OpenForisIOUtils.copyToTempFile(is);
-			return importWorkModel(tempFile, name, validate);
+			return importTemporaryModel(tempFile, name, validate);
 		} finally {
 			if ( tempFile != null && tempFile.exists() ) {
 				tempFile.delete();
@@ -160,7 +163,7 @@ public class SurveyManager {
 	}
 
 	@Transactional
-	public CollectSurvey importWorkModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
+	public CollectSurvey importTemporaryModel(File surveyFile, String name, boolean validate) throws SurveyImportException, SurveyValidationException {
 		try {
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, false);
 			survey.setName(name);
@@ -176,14 +179,14 @@ public class SurveyManager {
 	}
 
 	/**
-	 * Duplicates a published survey into a work survey and import the survey file into this new survey work
+	 * Duplicates a published survey into a temporary survey and import the survey file into this new temporary survey
 	 */
 	@Transactional
-	public CollectSurvey importInPublishedWorkModel(String uri, File surveyFile, boolean validate) 
+	public CollectSurvey importInPublishedTemporaryModel(String uri, File surveyFile, boolean validate) 
 			throws SurveyStoreException, SurveyValidationException {
-		duplicatePublishedSurveyForEdit(uri);
-		CollectSurvey newSurveyWork = updateWorkModel(surveyFile, validate);
-		return newSurveyWork;
+		createTemporarySurveyFromPublished(uri);
+		CollectSurvey newTemporarySurvey = updateTemporaryModel(surveyFile, validate);
+		return newTemporarySurvey;
 	}
 	
 	/**
@@ -242,9 +245,9 @@ public class SurveyManager {
 	}
 	
 	/**
-	 * Updates a published or a work survey and overwrites it with the specified one.
+	 * Updates a published or a temporary survey and overwrites it with the specified one.
 	 * The existing survey will be searched by his URI.
-	 * If a work survey with the same URI as the survey in the surveyFile exists,
+	 * If a temporary survey with the same URI as the survey in the surveyFile exists,
 	 * than it will be overwritten with the passed one, otherwise the published survey will be overwritten.
 	 */
 	@Transactional
@@ -303,7 +306,7 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public CollectSurvey updateWorkModel(File surveyFile, boolean validate)
+	public CollectSurvey updateTemporaryModel(File surveyFile, boolean validate)
 			throws SurveyValidationException, SurveyStoreException {
 		CollectSurvey parsedSurvey;
 		try {
@@ -312,13 +315,14 @@ public class SurveyManager {
 			throw new SurveyImportException(e);
 		}
 		String uri = parsedSurvey.getUri();
-		SurveySummary oldSurveyWork = loadTemporarySummaryByUri(uri);
-		if ( oldSurveyWork == null ) {
+		SurveySummary oldTemporarySurvey = loadTemporarySummaryByUri(uri);
+		if ( oldTemporarySurvey == null ) {
 			throw new IllegalArgumentException("Survey to update not found: " + uri);
 		} else {
-			int oldSurveyId = oldSurveyWork.getId();
+			int oldSurveyId = oldTemporarySurvey.getId();
 			parsedSurvey.setId(oldSurveyId);
-			parsedSurvey.setName(oldSurveyWork.getName());
+			parsedSurvey.setName(oldTemporarySurvey.getName());
+			parsedSurvey.setPublishedId(oldTemporarySurvey.getPublishedId());
 			parsedSurvey.setTemporary(true);
 			
 			//clean code list items
@@ -505,8 +509,8 @@ public class SurveyManager {
 	 * @return
 	 */
 	@Transactional
-	public List<SurveySummary> loadSummaries() {
-		return loadSummaries(null, false);
+	public List<SurveySummary> loadCombinedSummaries() {
+		return loadCombinedSummaries(null, false);
 	}
 	
 	/**
@@ -517,9 +521,9 @@ public class SurveyManager {
 	 * @return list of published and temporary surveys.
 	 */
 	@Transactional
-	public List<SurveySummary> loadSummaries(String labelLang, boolean includeDetails) {
+	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang);
-		List<SurveySummary> temporarySurveySummaries = loadWorkSummaries(labelLang, includeDetails);
+		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails);
 		List<SurveySummary> result = new ArrayList<SurveySummary>();
 		Map<String, SurveySummary> summariesByUri = new HashMap<String, SurveySummary>();
 		for (SurveySummary summary : temporarySurveySummaries) {
@@ -528,14 +532,13 @@ public class SurveyManager {
 			result.add(summary);
 			summariesByUri.put(summary.getUri(), summary);
 		}
-		for (SurveySummary summary : publishedSurveySummaries) {
-			SurveySummary summaryWork = summariesByUri.get(summary.getUri());
-			if ( summaryWork == null ) {
-				result.add(summary);
+		for (SurveySummary publishedSurveySummary : publishedSurveySummaries) {
+			SurveySummary temporarySurveySummary = summariesByUri.get(publishedSurveySummary.getUri());
+			if ( temporarySurveySummary == null ) {
+				result.add(publishedSurveySummary);
 			} else {
-				summaryWork.setPublished(true);
-				summaryWork.setPublishedId(summary.getId());
-				summaryWork.setRecordValidationProcessStatus(summary.getRecordValidationProcessStatus());
+				temporarySurveySummary.setPublished(true);
+				temporarySurveySummary.setRecordValidationProcessStatus(publishedSurveySummary.getRecordValidationProcessStatus());
 			}
 		}
 		sortByName(result);
@@ -544,29 +547,27 @@ public class SurveyManager {
 	
 	@Transactional
 	public SurveySummary loadSummaryByUri(String uri) {
-		SurveySummary workSummary = loadTemporarySummaryByUri(uri);
+		SurveySummary temporarySummary = loadTemporarySummaryByUri(uri);
 		SurveySummary publishedSummary = getPublishedSummaryByUri(uri);
-		SurveySummary result; 
-		if ( workSummary != null ) {
-			result = workSummary;
-			if ( publishedSummary != null ) {
-				result.setPublished(true);
-				result.setPublishedId(publishedSummary.getId());
-			}
-		} else {
-			result = publishedSummary;
-		}
+		SurveySummary result = combineSummaries(temporarySummary,
+				publishedSummary);
 		return result;
 	}
-	
 
 	@Transactional
 	public SurveySummary loadSummaryByName(String name) {
-		SurveySummary workSummary = loadTemporarySummaryByName(name);
+		SurveySummary temporarySummary = loadTemporarySummaryByName(name);
 		SurveySummary publishedSummary = getPublishedSummaryByName(name);
+		SurveySummary result = combineSummaries(temporarySummary,
+				publishedSummary);
+		return result;
+	}
+	
+	private SurveySummary combineSummaries(SurveySummary temporarySummary,
+			SurveySummary publishedSummary) {
 		SurveySummary result; 
-		if ( workSummary != null ) {
-			result = workSummary;
+		if ( temporarySummary != null ) {
+			result = temporarySummary;
 			if ( publishedSummary != null ) {
 				result.setPublished(true);
 				result.setPublishedId(publishedSummary.getId());
@@ -591,11 +592,19 @@ public class SurveyManager {
 		return survey;
 	}
 	
+	public CollectSurvey getOrLoadSurveyById(int id) {
+		CollectSurvey survey = getById(id);
+		if (survey == null) {
+			survey = loadSurvey(id);
+		}
+		return survey;
+	}
+	
 	@Transactional
-	protected List<SurveySummary> loadWorkSummaries(String labelLang, boolean includeDetails) {
-		List<SurveySummary> result = surveyDao.loadTemporarySummaries();
+	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails) {
+		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		if ( includeDetails ) {
-			for (SurveySummary summary : result) {
+			for (SurveySummary summary : summaries) {
 				CollectSurvey survey = surveyDao.loadById(summary.getId());
 				String projectName = survey.getProjectName(labelLang);
 				if ( projectName == null && labelLang != null && ! labelLang.equals(survey.getDefaultLanguage()) ) {
@@ -606,7 +615,7 @@ public class SurveyManager {
 				summary.setLanguages(survey.getLanguages());
 			}
 		}
-		return result;
+		return summaries;
 	}
 	
 	@Transactional
@@ -619,11 +628,11 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public boolean isSurveyWork(CollectSurvey survey) {
+	public boolean isSurveyTemporary(CollectSurvey survey) {
 		Integer id = survey.getId();
 		String uri = survey.getUri();
-		SurveySummary workSurveySummary = loadTemporarySummaryByUri(uri);
-		if (workSurveySummary == null || ! workSurveySummary.getId().equals(id) ) {
+		SurveySummary temporarySurveySummary = loadTemporarySummaryByUri(uri);
+		if (temporarySurveySummary == null || ! temporarySurveySummary.getId().equals(id) ) {
 			CollectSurvey publishedSurvey = getByUri(uri);
 			if (publishedSurvey == null || ! publishedSurvey.getId().equals(id) ) {
 				throw new IllegalStateException("Survey with uri '" + uri
@@ -666,33 +675,33 @@ public class SurveyManager {
 	}
 	
 	@Transactional
-	public CollectSurvey duplicatePublishedSurveyForEdit(String uri) {
-		return duplicatePublishedSurveyForEdit(uri, true);
+	public CollectSurvey createTemporarySurveyFromPublished(String uri) {
+		return createTemporarySurveyFromPublished(uri, true);
 	}
 	
 	@Transactional
-	public CollectSurvey duplicatePublishedSurveyForEdit(String uri, boolean markCopyAsPublished) {
+	public CollectSurvey createTemporarySurveyFromPublished(String uri, boolean markCopyAsPublished) {
 		try {
-			SurveySummary existingSurveyWork = surveyDao.loadSurveySummaryByUri(uri, true);
-			if ( existingSurveyWork != null ) {
-				throw new IllegalArgumentException("Survey work with uri " + uri + " already existing");
+			SurveySummary existingTemporarySurvey = surveyDao.loadSurveySummaryByUri(uri, true);
+			if ( existingTemporarySurvey != null ) {
+				throw new IllegalArgumentException("Temporary survey with uri " + uri + " already existing");
 			}
 			CollectSurvey publishedSurvey = surveyDao.loadByUri(uri, false);
+			int publishedSurveyId = publishedSurvey.getId();
+
 			CollectSurvey temporarySurvey = publishedSurvey; //the published survey object should be cloned...
 			temporarySurvey.setId(null);
 			temporarySurvey.setPublished(markCopyAsPublished);
 			temporarySurvey.setTemporary(true);
+			temporarySurvey.setPublishedId(publishedSurveyId);
 			if ( temporarySurvey.getSamplingDesignCodeList() == null ) {
 				temporarySurvey.addSamplingDesignCodeList();
 			}
 			surveyDao.insert(temporarySurvey);
 			
 			publishedSurvey = getByUri(uri);
-			int temporarySurveyId = temporarySurvey.getId();
-			int publishedSurveyId = publishedSurvey.getId();
-			samplingDesignManager.copySamplingDesign(publishedSurveyId, temporarySurveyId);
-			speciesManager.copyTaxonomy(publishedSurveyId, temporarySurveyId);
-			codeListManager.copyCodeLists(publishedSurvey, temporarySurvey);
+			
+			copyReferencedMetadata(publishedSurvey, temporarySurvey);
 			
 			return temporarySurvey;
 		} catch (SurveyImportException e) {
@@ -700,18 +709,18 @@ public class SurveyManager {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Transactional
-	public CollectSurvey duplicateSurveyForEdit(String originalSurveyName, boolean originalSurveyIsWork, String newName) {
+	public CollectSurvey duplicateSurveyIntoTemporary(String originalSurveyName, boolean originalSurveyIsTemporary, String newName) {
 		try {
-			CollectSurvey oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsWork);
-			int oldSurveyId = oldSurvey.getId();
+			CollectSurvey oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsTemporary);
 
 			//TODO : clone it
 			CollectSurvey newSurvey = oldSurvey;
 			newSurvey.setId(null);
 			newSurvey.setPublished(false);
 			newSurvey.setTemporary(true);
+			newSurvey.setPublishedId(null);
 			newSurvey.setName(newName);
 			newSurvey.setUri(generateSurveyUri(newName));
 			newSurvey.setCreationDate(new Date());
@@ -721,14 +730,11 @@ public class SurveyManager {
 				newSurvey.addSamplingDesignCodeList();
 			}
 			surveyDao.insert(newSurvey);
-			int newSurveyId = newSurvey.getId();
 			
 			//reload old survey, it has been modified previously
-			oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsWork);
+			oldSurvey = loadSurvey(originalSurveyName, originalSurveyIsTemporary);
 			
-			samplingDesignManager.copySamplingDesign(oldSurveyId, newSurveyId);
-			speciesManager.copyTaxonomy(oldSurveyId, newSurveyId);
-			codeListManager.copyCodeLists(oldSurvey, newSurvey);
+			copyReferencedMetadata(oldSurvey, newSurvey);
 			
 			return newSurvey;
 		} catch (SurveyImportException e) {
@@ -737,7 +743,19 @@ public class SurveyManager {
 		}
 	}
 
-	private CollectSurvey loadSurvey(String name, boolean work) {
+	private void copyReferencedMetadata(CollectSurvey fromSurvey,
+			CollectSurvey toSurvey) {
+		int toSurveyId = toSurvey.getId();
+		int fromSurveyId = fromSurvey.getId();
+		samplingDesignManager.copySamplingDesign(fromSurveyId, toSurveyId);
+		speciesManager.copyTaxonomy(fromSurveyId, toSurveyId);
+		codeListManager.copyCodeLists(fromSurvey, toSurvey);
+		if (dataCleansingManager != null) {
+			dataCleansingManager.duplicateMetadata(fromSurvey, toSurvey);
+		}
+	}
+	
+	private CollectSurvey loadSurvey(String name, boolean temporary) {
 		return surveyDao.loadByName(name);
 	}
 	
@@ -746,25 +764,34 @@ public class SurveyManager {
 		codeListManager.deleteInvalidCodeListReferenceItems(survey);
 		
 		Integer temporarySurveyId = survey.getId();
+		
+		Integer oldPublishedSurveyId = survey.getPublishedId();
+		boolean existsPublishedSurvey = oldPublishedSurveyId != null;
+		if (existsPublishedSurvey) {
+			cancelRecordValidation(oldPublishedSurveyId);
+			survey.setId(oldPublishedSurveyId);
+		}
 		survey.setTemporary(false);
 		survey.setPublished(true);
+		survey.setPublishedId(null);
 		survey.setModifiedDate(new Date());
 		survey.setCollectVersion(Collect.VERSION);
-		
-		CollectSurvey existingPublishedSurvey = getByUri(survey.getUri());
-		if ( existingPublishedSurvey != null ) {
-			cancelRecordValidation(survey.getId());
-			survey.setId(existingPublishedSurvey.getId());
-		}
+
 		surveyDao.update(survey);
 		int newSurveyId = survey.getId();
 		
 		if (newSurveyId != temporarySurveyId) {
+			if (dataCleansingManager != null) {
+				//do not overwrite published cleansing metadata
+				CollectSurvey temporarySurvey = surveyDao.loadById(temporarySurveyId);
+				dataCleansingManager.moveMetadata(temporarySurvey, survey);
+			}
 			samplingDesignManager.moveSamplingDesign(temporarySurveyId, newSurveyId);
 			speciesManager.moveTaxonomies(temporarySurveyId, newSurveyId);
-			codeListManager.publishCodeLists(temporarySurveyId, newSurveyId);
+			codeListManager.moveCodeLists(temporarySurveyId, newSurveyId);
 			surveyDao.delete(temporarySurveyId);
-			removeFromCache(existingPublishedSurvey);
+			CollectSurvey oldPublishedSurvey = getById(oldPublishedSurveyId);
+			removeFromCache(oldPublishedSurvey);
 		}
 		addToCache(survey);
 	}
@@ -775,17 +802,21 @@ public class SurveyManager {
 	 */
 	@Transactional
 	public CollectSurvey unpublish(int surveyId) throws SurveyStoreException {
-		CollectSurvey oldPublishedSurvey = getById(surveyId);
-		String uri = oldPublishedSurvey.getUri();
+		CollectSurvey publishedSurvey = getById(surveyId);
+		String uri = publishedSurvey.getUri();
 		
 		SurveySummary temporarySurveySummary = surveyDao.loadSurveySummaryByUri(uri, true);
 		CollectSurvey temporarySurvey;
 		if (temporarySurveySummary == null) {
-			temporarySurvey = duplicatePublishedSurveyForEdit(uri, false);
+			temporarySurvey = createTemporarySurveyFromPublished(uri, false);
 		} else {
 			temporarySurvey = loadSurvey(temporarySurveySummary.getId());
 			temporarySurvey.setPublished(false);
 			save(temporarySurvey);
+			if (dataCleansingManager != null) {
+				//overwrite temporary cleansing metadata with published one
+				dataCleansingManager.moveMetadata(publishedSurvey, temporarySurvey);
+			}
 		}
 		//delete published survey
 		deleteSurvey(surveyId);
@@ -830,13 +861,18 @@ public class SurveyManager {
 			cancelRecordValidation(id);
 		}
 		CollectSurvey publishedSurvey = getById(id);
-		if ( publishedSurvey != null ) {
+		boolean temporary = publishedSurvey == null;
+		if ( ! temporary ) {
 			recordDao.deleteBySurvey(id);
 			removeFromCache(publishedSurvey);
 		}
 		speciesManager.deleteTaxonomiesBySurvey(id);
 		samplingDesignManager.deleteBySurvey(id);
-		codeListManager.deleteAllItemsBySurvey(id, publishedSurvey == null);
+		codeListManager.deleteAllItemsBySurvey(id, temporary);
+		if (dataCleansingManager != null) {
+			CollectSurvey survey = loadSurvey(id);
+			dataCleansingManager.deleteMetadata(survey);
+		}
 		surveyDao.delete(id);
 	}
 	

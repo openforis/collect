@@ -552,7 +552,7 @@ public class SurveySelectVM extends BaseVM {
 			//skip survey list update
 			return;
 		}
-		List<SurveySummary> newSummaries = surveyManager.loadSummaries(null, true);
+		List<SurveySummary> newSummaries = surveyManager.loadCombinedSummaries(null, true);
 		if (summaries == null) {
 			summaries = newSummaries;
 		} else {
@@ -575,7 +575,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	private void loadSurveySummaries() {
-		summaries = surveyManager.loadSummaries(null, true);
+		summaries = surveyManager.loadCombinedSummaries(null, true);
 	}
 
 	private SurveySummary findSummary(Integer id, boolean published, boolean work) {
@@ -595,7 +595,7 @@ public class SurveySelectVM extends BaseVM {
 		if (selectedSurvey.isTemporary()) {
 			temporarySurvey = surveyManager.loadSurvey(selectedSurvey.getId());
 		} else if (selectedSurvey.isPublished()) {
-			temporarySurvey = surveyManager.duplicatePublishedSurveyForEdit(uri);
+			temporarySurvey = surveyManager.createTemporarySurveyFromPublished(uri);
 		} else {
 			throw new IllegalStateException(
 					"Trying to load an invalid survey: " + uri);
@@ -708,7 +708,7 @@ public class SurveySelectVM extends BaseVM {
 				
 				@Override
 				protected void execute() throws Throwable {
-					outputSurvey = surveyManager.duplicateSurveyForEdit(originalSurvey.getName(), originalSurveyIsWork, newName);
+					outputSurvey = surveyManager.duplicateSurveyIntoTemporary(originalSurvey.getName(), originalSurveyIsWork, newName);
 				}
 			});
 		}

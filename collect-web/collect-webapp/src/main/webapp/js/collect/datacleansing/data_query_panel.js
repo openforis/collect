@@ -23,19 +23,7 @@ Collect.DataCleansing.DataQueryPanelController.prototype.initDataGrid = function
 	var nodePrettyNameSorter = function (a, b) {
 		var aName = getPrettyNodeName(a);
 		var bName = getPrettyNodeName(b);
-		if (aName == null && bName == null) {
-			return 0;
-		} else if (aName == null) {
-			return -1;
-		} else if (bName == null) {
-			return 1;
-		} else if (aName > bName) {
-			return 1;
-		} else if (aName < bName) {
-			return -1;
-		} else {
-			return 0;
-		}
+		return a.localeCompare(b);
 	};
 	
 	gridContainer.bootstrapTable({

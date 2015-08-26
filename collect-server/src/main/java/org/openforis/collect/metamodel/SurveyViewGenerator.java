@@ -29,8 +29,8 @@ public class SurveyViewGenerator {
 		this.locale = locale;
 	}
 
-	public SurveyView generateView(final CollectSurvey survey) {
-		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName());
+	public SurveyView generateView(CollectSurvey survey) {
+		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName(), survey.isTemporary());
 		final String langCode = locale.getLanguage();
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();;
 		survey.getSchema().traverse(new NodeDefinitionVisitor() {
@@ -172,11 +172,13 @@ public class SurveyViewGenerator {
 		
 		private Integer id;
 		private String name;
+		private boolean temporary;
 		private List<EntityDefView> rootEntities;
 		
-		public SurveyView(Integer id, String name) {
+		public SurveyView(Integer id, String name, boolean temporary) {
 			this.id = id;
 			this.name = name;
+			this.temporary = temporary;
 			this.rootEntities = new ArrayList<EntityDefView>();
 		}
 		
@@ -186,6 +188,14 @@ public class SurveyViewGenerator {
 		
 		public String getName() {
 			return name;
+		}
+		
+		public boolean isTemporary() {
+			return temporary;
+		}
+		
+		public void setTemporary(boolean temporary) {
+			this.temporary = temporary;
 		}
 		
 		public void addRootEntity(EntityDefView rootEntity) {

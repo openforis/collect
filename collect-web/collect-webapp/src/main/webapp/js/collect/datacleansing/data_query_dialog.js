@@ -29,13 +29,27 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 			$this.recordStepSelectPicker.refresh();
 		}
 		
+		$this.initTestAndRunContainer();
+		
+		$this.entityTree = new Collect.EntityTree($this.content.find('.entity-tree'), collect.activeSurvey, "entityDefinitionId", function() {
+			$this.attributeTree = new Collect.AttributeTree($this.content.find('.attribute-tree'), collect.activeSurvey, $this.entityTree, "attributeDefinitionId", callback);
+		});
+	});
+};
+
+Collect.DataQueryDialogController.prototype.initTestAndRunContainer = function() {
+	var $this = this;
+	
+	if (collect.activeSurvey.temporary) {
+		$this.content.find("#query-test-and-run-tab").hide();
+	} else {
 		var testResultGridContainer = $this.content.find(".test-result-grid");
 		
 		var columns = Collect.Grids.createRootEntityKeyColumns(collect.activeSurvey);
 		columns = columns.concat([
-              {field: "nodePath", title: "Path", width: 400},
-              {field: "attributeValue", title: "Value", width: 400}
-        ]);
+	          {field: "nodePath", title: "Path", width: 400},
+	          {field: "attributeValue", title: "Value", width: 400}
+	    ]);
 		testResultGridContainer.bootstrapTable({
 			url: this.itemEditService.contextPath + "test-result.json",
 			cache: false,
@@ -65,11 +79,7 @@ Collect.DataQueryDialogController.prototype.initFormElements = function(callback
 				});
 			});
 		}, $this));
-		
-		$this.entityTree = new Collect.EntityTree($this.content.find('.entity-tree'), collect.activeSurvey, "entityDefinitionId", function() {
-			$this.attributeTree = new Collect.AttributeTree($this.content.find('.attribute-tree'), collect.activeSurvey, $this.entityTree, "attributeDefinitionId", callback);
-		});
-	});
+	}
 };
 
 Collect.DataQueryDialogController.prototype.fillForm = function(callback) {

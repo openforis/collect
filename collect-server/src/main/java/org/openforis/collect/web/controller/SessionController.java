@@ -44,7 +44,7 @@ public class SessionController {
 	
 	@RequestMapping(value = "survey.json", method = RequestMethod.POST)
 	public @ResponseBody Response setActiveSurvey(@RequestParam int surveyId) {
-		CollectSurvey survey = surveyManager.getById(surveyId);
+		CollectSurvey survey = surveyManager.getOrLoadSurveyById(surveyId);
 		sessionManager.setActiveSurvey(survey);
 		return new Response();
 	}

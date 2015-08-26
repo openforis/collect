@@ -4,7 +4,6 @@
 package org.openforis.collect.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
@@ -44,6 +43,7 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	//internal variables
 	private boolean fullBackup;
 	private ZipFile zipFile;
+	private BackupFileExtractor backupFileExtractor;
 	
 	@Override
 	protected void createInternalVariables() throws Throwable {
@@ -52,6 +52,7 @@ public class SurveyBackupInfoExtractorJob extends Job {
 		fullBackup = ArrayUtils.contains(SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS, ext);
 		if ( fullBackup ) {
 			this.zipFile = new ZipFile(file);
+			this.backupFileExtractor = new BackupFileExtractor(zipFile);
 		}
 	}
 	
@@ -70,17 +71,11 @@ public class SurveyBackupInfoExtractorJob extends Job {
 			SurveyBackupVerifierTask t = (SurveyBackupVerifierTask) task;
 			t.setZipFile(zipFile);
 		} else if ( task instanceof SurveyBackupInfoExtractorTask ) {
-			File infoFile = extractInfoFile();
+			File infoFile = backupFileExtractor.extractInfoFile();
 			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
 			t.setFile(infoFile);
 		} else if ( task instanceof IdmlUnmarshallTask ) {
-			File idmlFile;
-			if ( zipFile == null ) {
-				idmlFile = file;
-			} else {
-				File idmFile = extractIdmFile();
-				idmlFile = zipFile == null ? file: idmFile;
-			}
+			File idmlFile = zipFile == null ? file: backupFileExtractor.extractIdmlFile();
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			t.setSurveyManager(surveyManager);
 			t.setValidate(validate);
@@ -105,38 +100,10 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	@Override
 	protected void onEnd() {
 		super.onEnd();
-		if ( zipFile != null ) {
-			try {
-				zipFile.close();
-			} catch (IOException e) {
-				log().warn("Error closing zip file", e);
-			}
-		}
+		IOUtils.closeQuietly(backupFileExtractor);
+		IOUtils.closeQuietly(zipFile);
 	}
 	
-
-	private File extractIdmFile() {
-		BackupFileExtractor backupFileExtractor = null;
-		try {
-			backupFileExtractor = new BackupFileExtractor(zipFile);
-			File idmFile = backupFileExtractor.extractIdmlFile();
-			return idmFile;
-		} finally {
-			IOUtils.closeQuietly(backupFileExtractor);
-		}
-	}
-
-	private File extractInfoFile() {
-		BackupFileExtractor backupFileExtractor = null;
-		try {
-			backupFileExtractor = new BackupFileExtractor(zipFile);
-			File infoFile = backupFileExtractor.extractInfoFile();
-			return infoFile;
-		} finally {
-			IOUtils.closeQuietly(backupFileExtractor);
-		}
-	}
-
 	public SurveyManager getSurveyManager() {
 		return surveyManager;
 	}

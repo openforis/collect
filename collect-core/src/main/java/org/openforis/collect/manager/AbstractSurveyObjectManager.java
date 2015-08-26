@@ -45,6 +45,13 @@ public abstract class AbstractSurveyObjectManager
 		return result;
 	}
 	
+	public void deleteBySurvey(CollectSurvey survey) {
+		List<T> items = loadBySurvey(survey);
+		for (T item : items) {
+			delete(item);
+		}
+	}
+	
 	protected final void initializeItems(Collection<T> items) {
 		for (T i : items) {
 			initializeItem(i);

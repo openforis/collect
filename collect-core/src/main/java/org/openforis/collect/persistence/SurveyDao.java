@@ -6,9 +6,11 @@ import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jooq.InsertSetMoreStep;
+import org.jooq.InsertQuery;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.StoreQuery;
+import org.jooq.UpdateQuery;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.metamodel.SurveyTarget;
@@ -31,22 +33,13 @@ public class SurveyDao extends SurveyBaseDao {
 
 	@Transactional
 	public void insert(CollectSurvey survey) throws SurveyImportException {
-		String idml = marshalSurvey(survey);
-
-		// Insert into OFC_SURVEY table
 		CollectDSLContext dsl = dsl();
+		
+		//fetch next id
 		int surveyId = dsl.nextId(OFC_SURVEY.ID, OFC_SURVEY_ID_SEQ);
-		InsertSetMoreStep<OfcSurveyRecord> insert = dsl.insertInto(OFC_SURVEY)
-				.set(OFC_SURVEY.ID, surveyId)
-				.set(OFC_SURVEY.NAME, survey.getName())
-				.set(OFC_SURVEY.URI, survey.getUri())
-				.set(OFC_SURVEY.TEMPORARY, survey.isTemporary())
-				.set(OFC_SURVEY.IDML, DSL.val(idml, SQLDataType.CLOB))
-				.set(OFC_SURVEY.TARGET, survey.getTarget().getCode())
-				.set(OFC_SURVEY.COLLECT_VERSION, survey.getCollectVersion().toString())
-				.set(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()))
-				.set(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()))
-				;
+		
+		InsertQuery<OfcSurveyRecord> insert = dsl.insertQuery(OFC_SURVEY);
+		addNewSurveyValues(insert, survey, surveyId);
 		insert.execute();
 
 		survey.setId(surveyId);
@@ -177,18 +170,32 @@ public class SurveyDao extends SurveyBaseDao {
 	}
 
 	public void update(CollectSurvey survey) throws SurveyImportException {
-		String idml = marshalSurvey(survey);
-
-		dsl().update(OFC_SURVEY)
-				.set(OFC_SURVEY.TEMPORARY, survey.isTemporary())
-				.set(OFC_SURVEY.IDML, DSL.val(idml, SQLDataType.CLOB))
-				.set(OFC_SURVEY.TARGET, survey.getTarget().getCode())
-				.set(OFC_SURVEY.COLLECT_VERSION, survey.getCollectVersion().toString())
-				.set(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()))
-				.set(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()))
-				.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
+		UpdateQuery<OfcSurveyRecord> update = dsl().updateQuery(OFC_SURVEY);
+		addUpdateValues(update, survey);
+		update.addConditions(OFC_SURVEY.ID.equal(survey.getId()));
+		update.execute();
 	}
 
+	private void addUpdateValues(StoreQuery<OfcSurveyRecord> storeQuery,
+			CollectSurvey survey) throws SurveyImportException {
+		String idml = marshalSurvey(survey);
+		storeQuery.addValue(OFC_SURVEY.TEMPORARY, survey.isTemporary());
+		storeQuery.addValue(OFC_SURVEY.PUBLISHED_ID, survey.getPublishedId());
+		storeQuery.addValue(OFC_SURVEY.IDML, DSL.val(idml, SQLDataType.CLOB));
+		storeQuery.addValue(OFC_SURVEY.TARGET, survey.getTarget().getCode());
+		storeQuery.addValue(OFC_SURVEY.COLLECT_VERSION, survey.getCollectVersion().toString());
+		storeQuery.addValue(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()));
+		storeQuery.addValue(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()));
+	}
+
+	private void addNewSurveyValues(StoreQuery<OfcSurveyRecord> storeQuery,
+			CollectSurvey survey, int surveyId) throws SurveyImportException {
+		storeQuery.addValue(OFC_SURVEY.ID, surveyId);
+		storeQuery.addValue(OFC_SURVEY.NAME, survey.getName());
+		storeQuery.addValue(OFC_SURVEY.URI, survey.getUri());
+		addUpdateValues(storeQuery, survey);
+	}
+	
 	@Override
 	protected CollectSurvey processSurveyRow(Record row) {
 		try {
@@ -200,6 +207,7 @@ public class SurveyDao extends SurveyBaseDao {
 			survey.setId(row.getValue(OFC_SURVEY.ID));
 			survey.setName(row.getValue(OFC_SURVEY.NAME));
 			survey.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
+			survey.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
 			survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
 			survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
 			survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
@@ -218,11 +226,12 @@ public class SurveyDao extends SurveyBaseDao {
 		Integer id = row.getValue(OFC_SURVEY.ID);
 		String name = row.getValue(OFC_SURVEY.NAME);
 		String uri = row.getValue(OFC_SURVEY.URI);
-		SurveySummary survey = new SurveySummary(id, name, uri);
-		survey.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
-		survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
-		survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
-		survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
-		return survey;
+		SurveySummary summary = new SurveySummary(id, name, uri);
+		summary.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
+		summary.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
+		summary.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
+		summary.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
+		summary.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
+		return summary;
 	}
 }

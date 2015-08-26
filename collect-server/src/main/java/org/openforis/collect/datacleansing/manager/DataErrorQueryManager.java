@@ -53,6 +53,13 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 		}
 	}
 	
+	@Override
+	public List<DataErrorQuery> loadBySurvey(CollectSurvey survey) {
+		List<DataErrorQuery> queries = super.loadBySurvey(survey);
+		initializeItems(queries);
+		return queries;
+	}
+	
 	public List<DataErrorQuery> loadByQuery(DataQuery query) {
 		List<DataErrorQuery> queries = dao.loadByQuery(query);
 		initializeItems(queries);

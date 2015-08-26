@@ -17,6 +17,12 @@ Collect.AbstractItemEditDialogController.prototype.init = function(callback) {
 	});
 };
 
+Collect.AbstractItemEditDialogController.prototype.checkViewState = function() {
+};
+
+Collect.AbstractItemEditDialogController.prototype.changeViewState = function(state) {
+};
+
 Collect.AbstractItemEditDialogController.prototype.open = function(item, doNotAllowCancel) {
 	var $this = this;
 	$this.item = item;

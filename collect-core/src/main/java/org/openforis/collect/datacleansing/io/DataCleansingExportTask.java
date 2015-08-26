@@ -1,4 +1,4 @@
-package org.openforis.collect.datacleansing;
+package org.openforis.collect.datacleansing.io;
 
 import java.io.File;
 

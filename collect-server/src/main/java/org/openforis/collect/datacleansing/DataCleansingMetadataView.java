@@ -27,12 +27,17 @@ public class DataCleansingMetadataView {
 	private List<DataCleansingStepForm> cleansingSteps;
 	private List<DataCleansingChainForm> cleansingChains;
 	
-	public DataCleansingMetadataView(DataCleansingMetadata metadata) {
-		dataQueries = CollectionUtils.convert(metadata.getDataQueries(), DataQueryForm.class);
-		dataErrorTypes = CollectionUtils.convert(metadata.getDataErrorTypes(), DataErrorTypeForm.class);
-		dataErrorQueries = CollectionUtils.convert(metadata.getDataErrorQueries(), DataErrorQueryForm.class);
-		cleansingSteps = CollectionUtils.convert(metadata.getCleansingSteps(), DataCleansingStepForm.class);
-		cleansingChains = CollectionUtils.convert(metadata.getCleansingChains(), DataCleansingChainForm.class);
+	public DataCleansingMetadataView() {
+	}
+	
+	public static DataCleansingMetadataView fromMetadata(DataCleansingMetadata metadata) {
+		DataCleansingMetadataView view = new DataCleansingMetadataView();
+		view.dataQueries = CollectionUtils.convert(metadata.getDataQueries(), DataQueryForm.class);
+		view.dataErrorTypes = CollectionUtils.convert(metadata.getDataErrorTypes(), DataErrorTypeForm.class);
+		view.dataErrorQueries = CollectionUtils.convert(metadata.getDataErrorQueries(), DataErrorQueryForm.class);
+		view.cleansingSteps = CollectionUtils.convert(metadata.getCleansingSteps(), DataCleansingStepForm.class);
+		view.cleansingChains = CollectionUtils.convert(metadata.getCleansingChains(), DataCleansingChainForm.class);
+		return view;
 	}
 	
 	public DataCleansingMetadata toMetadata(CollectSurvey survey) {

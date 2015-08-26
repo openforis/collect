@@ -36,6 +36,7 @@ public class CollectSurvey extends Survey {
 	private boolean temporary;
 	private Version collectVersion;
 	private SurveyTarget target;
+	private Integer publishedId;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -150,6 +151,14 @@ public class CollectSurvey extends Survey {
 		if (annotations.getSurveyTarget() != target) {
 			annotations.setSurveyTarget(target);
 		}
+	}
+	
+	public Integer getPublishedId() {
+		return publishedId;
+	}
+	
+	public void setPublishedId(Integer publishedId) {
+		this.publishedId = publishedId;
 	}
 	
 	public Version getCollectVersion() {

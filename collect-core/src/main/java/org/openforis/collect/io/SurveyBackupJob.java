@@ -8,7 +8,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
-import org.openforis.collect.datacleansing.DataCleansingExportTask;
+import org.openforis.collect.datacleansing.io.DataCleansingExportTask;
 import org.openforis.collect.io.data.DataBackupError;
 import org.openforis.collect.io.data.DataBackupTask;
 import org.openforis.collect.io.data.RecordFileBackupTask;
@@ -54,7 +54,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 	public static final String SPECIES_FOLDER = "species";
 	public static final String SPECIES_ENTRY_FORMAT = SPECIES_FOLDER + ZIP_FOLDER_SEPARATOR + "%s.csv";
 	public static final String CLEANSING_FOLDER_NAME = "cleansing";
-	public static final String DATA_CLEANSING_ENTRY_NAME = CLEANSING_FOLDER_NAME + ZIP_FOLDER_SEPARATOR + "cleansing_metadata.json";
+	public static final String DATA_CLEANSING_METADATA_ENTRY_NAME = CLEANSING_FOLDER_NAME + ZIP_FOLDER_SEPARATOR + "cleansing_metadata.json";
 	public static final String INFO_FILE_NAME = "info.properties";
 	public static final String DATA_FOLDER = "data";
 	public static final String CODE_LIST_IMAGES_FOLDER = "code_list_images";
@@ -179,7 +179,7 @@ public class SurveyBackupJob extends SurveyLockingJob {
 			this.outputFile = ((CollectMobileBackupConvertTask) task).getOutputFile();
 		} else if (task instanceof DataCleansingExportTask) {
 			ZipFiles.writeFile(zipOutputStream, ((DataCleansingExportTask) task).getResultFile(), 
-					DATA_CLEANSING_ENTRY_NAME);
+					DATA_CLEANSING_METADATA_ENTRY_NAME);
 		}
 		super.onTaskCompleted(task);
 	}

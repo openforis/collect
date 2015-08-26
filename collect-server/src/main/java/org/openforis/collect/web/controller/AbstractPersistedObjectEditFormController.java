@@ -25,7 +25,7 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 											F extends PersistedObjectForm<T>, 
 											M extends AbstractPersistedObjectManager<T, ?>> {
 	
-	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate"};
+	private static final String[] IGNORE_FIELDS = new String[] {"creationDate", "modifiedDate", "uuid"};
 	
 	protected M itemManager;
 	
@@ -85,13 +85,11 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 	}
 	
 	protected T loadOrCreateItem(F form) {
-		T item;
 		if (form.getId() == null) {
-			item = createItemInstance();
+			return createItemInstance();
 		} else {
-			item = loadItem(form.getId());
+			return loadItem(form.getId());
 		}
-		return item;
 	}
 
 	protected T loadItem(int id) {
