@@ -75,12 +75,12 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 		new Collect.SurveySelectDialogController().open();
 	});
 	EventBus.addEventListener(Collect.SURVEY_CHANGED, function() {
-		$this.dataErrorTypePanel.initDataGrid();
-		$this.dataQueryPanel.initDataGrid();
-		$this.dataErrorQueryPanel.initDataGrid();
-		$this.dataErrorReportPanel.initDataGrid();
-		$this.dataCleansingStepPanel.initDataGrid();
-		$this.dataCleansingChainPanel.initDataGrid();
+		$this.dataErrorTypePanel.refreshDataGrid();
+		$this.dataQueryPanel.refreshDataGrid();
+		$this.dataErrorQueryPanel.refreshDataGrid();
+		$this.dataErrorReportPanel.refreshDataGrid();
+		$this.dataCleansingStepPanel.refreshDataGrid();
+		$this.dataCleansingChainPanel.refreshDataGrid();
 		//$this.initMapPanel();
 		
 		$this.checkViewState();

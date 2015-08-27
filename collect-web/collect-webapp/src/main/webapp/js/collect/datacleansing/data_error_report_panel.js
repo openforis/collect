@@ -7,14 +7,10 @@ Collect.DataCleansing.DataErrorReportPanelController = function($panel) {
 
 Collect.DataCleansing.DataErrorReportPanelController.prototype = Object.create(Collect.AbstractItemPanel.prototype);
 
-Collect.DataCleansing.DataErrorReportPanelController.prototype.initDataGrid = function() {
+Collect.DataCleansing.DataErrorReportPanelController.prototype.getDataGridOptions = function() {
 	var $this = this;
-	var gridId = 'data-error-report-grid';
-	var gridContainer = $("#" + gridId);
-	gridContainer.bootstrapTable({
+	return {
 	    url: "datacleansing/dataerrorreports/list.json",
-	    cache: false,
-	    clickToSelect: true,
 	    height: 400,
 	    columns: [
           	{field: "selected", title: "", radio: true},
@@ -25,11 +21,8 @@ Collect.DataCleansing.DataErrorReportPanelController.prototype.initDataGrid = fu
 			{field: "creationDate", title: "Date", formatter: OF.Dates.formatToPrettyDateTime, sortable: true, width: 100},
 			$this.createGridItemDeleteColumn()
 		]
-	});
-	
-	$this.dataGrid = gridContainer.data('bootstrap.table');
+	};
 };
-
 
 Collect.DataCleansing.DataErrorReportPanelController.prototype.openItemEditDialog = function(item) {
 	if (item) {

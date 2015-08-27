@@ -20,6 +20,7 @@ public abstract class AbstractSurveyObjectManager
 		extends AbstractPersistedObjectManager<T, D> {
 
 	protected D dao;
+//	private PersistedSurveyObjectCache<T> cache;
 	
 	@Override
 	public T loadById(int id) {
@@ -88,4 +89,45 @@ public abstract class AbstractSurveyObjectManager
 		this.dao = dao;
 	}
 	
+//	private static class PersistedSurveyObjectCache<S extends PersistedSurveyObject> {
+//		
+//		private Map<Integer, List<S>> typesBySurvey;
+//		private Map<Integer, S> typesById;
+//		
+//		public PersistedSurveyObjectCache() {
+//			typesBySurvey = new HashMap<Integer, List<S>>();
+//			typesById = new HashMap<Integer, S>();
+//		}
+//		
+//		public void put(S e) {
+//			typesById.put(e.getId(), e);
+//			Integer surveyId = e.getSurvey().getId();
+//			List<S> surveyErrorTypes = typesBySurvey.get(surveyId);
+//			if (surveyErrorTypes == null) {
+//				surveyErrorTypes = new ArrayList<S>();
+//				typesBySurvey.put(surveyId, surveyErrorTypes);
+//			}
+//			surveyErrorTypes.add(e);
+//		}
+//		
+//		public void update(S t) {
+//			remove(t);
+//			put(t);
+//		}
+//		
+//		public S get(int id) {
+//			return typesById.get(id);
+//		}
+//		
+//		public List<S> getBySurvey(CollectSurvey survey) {
+//			return typesBySurvey.get(survey.getId());
+//		}
+//		
+//		public void remove(S e) {
+//			typesById.remove(e.getId());
+//			List<S> list = typesBySurvey.get(e.getSurvey().getId());
+//			list.remove(e);
+//		}
+//	}
+
 }

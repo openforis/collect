@@ -7,28 +7,8 @@ Collect.DataCleansing.DataCleansingChainPanelController = function($panel) {
 
 Collect.DataCleansing.DataCleansingChainPanelController.prototype = Object.create(Collect.AbstractItemPanel.prototype);
 
-Collect.DataCleansing.DataCleansingChainPanelController.prototype.initDataGrid = function() {
+Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOptions = function() {
 	var $this = this;
-	var gridId = 'datacleansingchaingrid';
-	var gridContainer = $("#" + gridId);
-	gridContainer.bootstrapTable({
-	    url: "datacleansing/datacleansingchains/list.json",
-	    cache: false,
-	    clickToSelect: true,
-	    detailView: true,
-	    detailFormatter: detailFormatter,
-	    height: 400,
-	    onExpandRow: onExpandRow,
-	    columns: [
-          	{field: "selected", title: "", radio: true},
-			{field: "id", title: "Id", visible: false},
-			{field: "title", title: "Title", width: 800, sortable: true},
-			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
-			$this.createGridItemDeleteColumn()
-		]
-	});
-	$this.dataGrid = gridContainer.data('bootstrap.table');
 	
 	function onExpandRow(index, chain, $rowEl) {
 		var table = $rowEl.find("table");
@@ -52,4 +32,20 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.initDataGrid =
            '</fieldset>';
         return html;
 	}
+	
+	return {
+	    url: "datacleansing/datacleansingchains/list.json",
+	    detailView: true,
+	    detailFormatter: detailFormatter,
+	    height: 400,
+	    onExpandRow: onExpandRow,
+	    columns: [
+          	{field: "selected", title: "", radio: true},
+			{field: "id", title: "Id", visible: false},
+			{field: "title", title: "Title", width: 800, sortable: true},
+			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+			$this.createGridItemDeleteColumn()
+		]
+	};
 };

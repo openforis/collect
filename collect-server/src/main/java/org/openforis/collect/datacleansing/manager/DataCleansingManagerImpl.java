@@ -2,13 +2,13 @@ package org.openforis.collect.datacleansing.manager;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
 import org.openforis.collect.datacleansing.DataCleansingMetadata;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +95,7 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 		List<T> oldItems = manager.loadBySurvey(survey);
 		for (T item : items) {
 			item.replaceSurvey(survey);
-			T oldItem = findItem(oldItems, item.getUuid());
+			T oldItem = CollectionUtils.findItem(oldItems, item.getUuid(), "uuid");
 			if (oldItem == null) {
 				//new item
 				item.setId(null);
@@ -103,24 +103,16 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 			} else {
 				BeanUtils.copyProperties(item, oldItem, "id", "uuid");
 				manager.save(oldItem);
+				item.setId(oldItem.getId());
 			}
 		}
 		//delete removed items
 		for (T oldItem : oldItems) {
-			T newItem = findItem(items, oldItem.getUuid());
+			T newItem = CollectionUtils.findItem(items, oldItem.getUuid(), "uuid");
 			if (newItem == null) {
 				manager.delete(oldItem);
 			}
 		}
-	}
-	
-	private <T extends PersistedSurveyObject> T findItem(List<T> objects, UUID uuid) {
-		for (T item : objects) {
-			if (item.getUuid().equals(uuid)) {
-				return item;
-			}
-		}
-		return null;
 	}
 	
 }

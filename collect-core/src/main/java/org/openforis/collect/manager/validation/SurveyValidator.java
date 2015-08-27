@@ -525,7 +525,7 @@ public class SurveyValidator {
 	
 	public void validateAgainstSchema(InputStream is, Version version) throws SurveyValidationException {
 	    try {
-	    	SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+	    	SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.XML_NS_URI);
 	    	String[] schemaFileNames = getSchemaFileNames(version);
 	    	Source[] schemas = getSourcesFromClassPath(schemaFileNames);
 	    	javax.xml.validation.Schema schema = factory.newSchema(schemas);

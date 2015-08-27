@@ -7,13 +7,10 @@ Collect.DataCleansing.DataErrorTypePanelController = function($panel) {
 
 Collect.DataCleansing.DataErrorTypePanelController.prototype = Object.create(Collect.AbstractItemPanel.prototype);
 
-Collect.DataCleansing.DataErrorTypePanelController.prototype.initDataGrid = function() {
+Collect.DataCleansing.DataErrorTypePanelController.prototype.getDataGridOptions = function() {
 	var $this = this;
-	var gridContainer = $("#dataerrortypegrid");
-	gridContainer.bootstrapTable({
+	return {
 	    url: "datacleansing/dataerrortypes/list.json",
-	    cache: false,
-	    clickToSelect: true,
 	    height: 400,
 	    columns: [
           	{field: "selected", title: "", radio: true},
@@ -23,6 +20,5 @@ Collect.DataCleansing.DataErrorTypePanelController.prototype.initDataGrid = func
 			{field: "description", title: "Description", width: "400px", sortable: true},
 			$this.createGridItemDeleteColumn()
 		]
-	});
-	$this.dataGrid = gridContainer.data('bootstrap.table');
+	};
 };

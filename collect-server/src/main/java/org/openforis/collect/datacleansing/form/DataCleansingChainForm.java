@@ -21,15 +21,18 @@ public class DataCleansingChainForm extends DataCleansingItemForm<DataCleansingC
 	public DataCleansingChainForm() {
 		super();
 		this.steps = new ArrayList<DataCleansingStepForm>();
+		this.stepIds = new ArrayList<Integer>();
 	}
 	
 	public DataCleansingChainForm(DataCleansingChain chain) {
 		super(chain);
 		List<DataCleansingStep> steps = chain.getSteps();
 		this.steps = new ArrayList<DataCleansingStepForm>(steps.size());
+		this.stepIds = new ArrayList<Integer>(steps.size());
 		for (DataCleansingStep step : steps) {
 			DataCleansingStepForm stepForm = new DataCleansingStepForm(step);
 			this.steps.add(stepForm);
+			this.stepIds.add(step.getId());
 		}
 	}
 	

@@ -7,13 +7,12 @@ Collect.DataCleansing.DataQueryPanelController = function($panel) {
 
 Collect.DataCleansing.DataQueryPanelController.prototype = Object.create(Collect.AbstractItemPanel.prototype);
 
-Collect.DataCleansing.DataQueryPanelController.prototype.initDataGrid = function() {
+Collect.DataCleansing.DataQueryPanelController.prototype.getDataGridOptions = function() {
 	var $this = this;
-	var gridContainer = $("#dataquerygrid");
 	
 	var getPrettyNodeName = function(nodeId) {
 		if (! nodeId) {
-			return null;
+			return "";
 		}
 		var survey = collect.activeSurvey;
 		var def = survey.getDefinition(nodeId);
@@ -23,14 +22,18 @@ Collect.DataCleansing.DataQueryPanelController.prototype.initDataGrid = function
 	var nodePrettyNameSorter = function (a, b) {
 		var aName = getPrettyNodeName(a);
 		var bName = getPrettyNodeName(b);
-		return a.localeCompare(b);
+		return aName.localeCompare(bName);
 	};
 	
-	gridContainer.bootstrapTable({
+	function detailFormatter(index, query) {
+		var html = [];
+		html.push('<p><b>Conditions:</b> ' + query.conditions + '</p>');
+		html.push('<p><b>Description:</b> ' + query.description + '</p>');
+		return html.join('');
+	}
+	
+	var options = {
 	    url: "datacleansing/dataqueries/list.json",
-	    cache: false,
-	    clickToSelect: true,
-	    singleSelect: true,
 	    detailView: true,
 	    detailFormatter: detailFormatter,
 	    height: 400,
@@ -49,14 +52,6 @@ Collect.DataCleansing.DataQueryPanelController.prototype.initDataGrid = function
 				formatter: OF.Dates.formatToPrettyDateTime},
 			$this.createGridItemDeleteColumn()
 		]
-	});
-	
-	function detailFormatter(index, query) {
-		var html = [];
-		html.push('<p><b>Conditions:</b> ' + query.conditions + '</p>');
-		html.push('<p><b>Description:</b> ' + query.description + '</p>');
-		return html.join('');
-	}
-	
-	$this.dataGrid = gridContainer.data('bootstrap.table');
+	};
+	return options;
 };

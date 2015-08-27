@@ -7,14 +7,10 @@ Collect.DataCleansing.DataCleansingStepPanelController = function($panel) {
 
 Collect.DataCleansing.DataCleansingStepPanelController.prototype = Object.create(Collect.AbstractItemPanel.prototype);
 
-Collect.DataCleansing.DataCleansingStepPanelController.prototype.initDataGrid = function() {
+Collect.DataCleansing.DataCleansingStepPanelController.prototype.getDataGridOptions = function() {
 	var $this = this;
-	var gridId = 'datacleansingstepgrid';
-	var gridContainer = $("#" + gridId);
-	gridContainer.bootstrapTable({
+	return {
 	    url: "datacleansing/datacleansingsteps/list.json",
-	    cache: false,
-	    clickToSelect: true,
 	    height: 400,
 	    columns: [
           	{field: "selected", title: "", radio: true},
@@ -25,6 +21,5 @@ Collect.DataCleansing.DataCleansingStepPanelController.prototype.initDataGrid = 
 			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
 			$this.createGridItemDeleteColumn()
 		]
-	});
-	$this.dataGrid = gridContainer.data('bootstrap.table');
+	};
 };

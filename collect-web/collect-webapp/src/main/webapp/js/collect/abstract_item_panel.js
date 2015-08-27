@@ -14,32 +14,54 @@ Collect.AbstractItemPanel.prototype.init = function() {
 		$this.openItemEditDialog();
 	}, this));
 	
-	panel.find('.edit-btn').click($.proxy(function() {
-		var $this = this;
-		var selectedItem = $.proxy(getSelectedItem, $this)();
-		if (selectedItem == null) {
-			return;
-		}
-		$this.openItemEditDialog(selectedItem);
-	}, this));
+	panel.find('.edit-btn').click($.proxy($this.editSelectedItem, $this));
 	
 	panel.find('.delete-btn').click($.proxy(function() {
 		var $this = this;
-		var selectedItem = $.proxy(getSelectedItem, $this)();
+		var selectedItem = $this.getSelectedItem();
 		if (selectedItem == null) {
 			return;
 		}
 		$this.deleteItem(selectedItem);
 	}, this));
-	
-	function getSelectedItem() {
-		var $this = this;
-		var selections = $this.dataGrid.getSelections();
-		return selections.length == 0 ? null : selections[0];
+};
+
+Collect.AbstractItemPanel.prototype.getSelectedItem = function() {
+	var $this = this;
+	var selections = $this.dataGrid.getSelections();
+	return selections.length == 0 ? null : selections[0];
+};
+
+Collect.AbstractItemPanel.prototype.editSelectedItem = function() {
+	var $this = this;
+	var selectedItem = $this.getSelectedItem();
+	if (selectedItem == null) {
+		return;
 	}
+	$this.openItemEditDialog(selectedItem);
 };
 
 Collect.AbstractItemPanel.prototype.initDataGrid = function() {
+	var $this = this;
+	var gridContainer = $this.$panel.find(".grid");
+	
+	var options = $.extend($this.getCommonDataGridOptions(), $this.getDataGridOptions());
+	
+	gridContainer.bootstrapTable(options);
+	
+	$this.dataGrid = gridContainer.data('bootstrap.table');
+};
+
+Collect.AbstractItemPanel.prototype.getCommonDataGridOptions = function() {
+	return {
+		cache: false,
+		clickToSelect: true,
+	    singleSelect: true,
+		onDblClickRow: $.proxy(this.editSelectedItem, this)
+	};
+};
+
+Collect.AbstractItemPanel.prototype.getDataGridOptions = function() {
 };
 
 Collect.AbstractItemPanel.prototype.openItemEditDialog = function(item) {
@@ -48,7 +70,11 @@ Collect.AbstractItemPanel.prototype.openItemEditDialog = function(item) {
 };
 
 Collect.AbstractItemPanel.prototype.refreshDataGrid = function() {
-	this.dataGrid.refresh();
+	if (this.dataGrid == null) {
+		this.initDataGrid();
+	} else {
+		this.dataGrid.refresh();
+	}
 };
 
 Collect.AbstractItemPanel.prototype.createGridItemDeleteColumn = function() {

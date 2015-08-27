@@ -220,3 +220,8 @@ fieldset.compact {
 fieldset.compact legend {
 	margin: 0 !important;
 }
+
+.remove-icon {
+	cursor: pointer;
+	color: #c9302c;
+}

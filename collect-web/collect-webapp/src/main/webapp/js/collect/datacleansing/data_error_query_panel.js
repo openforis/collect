@@ -7,13 +7,10 @@ Collect.DataCleansing.DataErrorQueryPanelController = function($panel) {
 
 Collect.DataCleansing.DataErrorQueryPanelController.prototype = Object.create(Collect.AbstractItemPanel.prototype);
 
-Collect.DataCleansing.DataErrorQueryPanelController.prototype.initDataGrid = function() {
+Collect.DataCleansing.DataErrorQueryPanelController.prototype.getDataGridOptions = function() {
 	var $this = this;
-	var gridContainer = $("#dataerrorquerygrid");
-	gridContainer.bootstrapTable({
+	return {
 	    url: "datacleansing/dataerrorqueries/list.json",
-	    cache: false,
-	    clickToSelect: true,
 	    height: 400,
 	    columns: [
           	{field: "selected", title: "", radio: true},
@@ -23,6 +20,5 @@ Collect.DataCleansing.DataErrorQueryPanelController.prototype.initDataGrid = fun
 			{field: "queryDescription", title: "Query Description", sortable: false, width: 400},
 			$this.createGridItemDeleteColumn()
 		]
-	});
-	$this.dataGrid = gridContainer.data('bootstrap.table');
+	};
 };
