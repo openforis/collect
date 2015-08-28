@@ -86,7 +86,8 @@ public class MondrianCubeGenerator {
 						measure.column = nodeName;
 						measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(nodeDef) + " " + aggregator );
 						measure.aggregator = aggregator;
-						measure.datatype = "Integer";
+						measure.datatype = "Numeric";
+						measure.formatString = "#.##";
 						cube.measures.add(measure);
 					}
 				} 
