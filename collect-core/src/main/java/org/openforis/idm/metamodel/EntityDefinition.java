@@ -16,7 +16,6 @@ import java.util.Stack;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.util.DeepEquals;
 
 /**
  * @author G. Miceli
@@ -316,7 +315,7 @@ public class EntityDefinition extends NodeDefinition {
 		if (childDefinitions == null) {
 			if (other.childDefinitions != null)
 				return false;
-		} else if (! DeepEquals.deepEquals(childDefinitions, other.childDefinitions))
+		} else if (! CollectionUtils.deepEquals(childDefinitions, other.childDefinitions))
 			return false;
 		return true;
 	}

@@ -94,15 +94,19 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 		@Override
 		protected void fromRecord(Record r, DataErrorQuery o) {
 			super.fromRecord(r, o);
+			o.setCreationDate(r.getValue(OFC_DATA_ERROR_QUERY.CREATION_DATE));
 			o.setTypeId(r.getValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID));
 			o.setQueryId(r.getValue(OFC_DATA_ERROR_QUERY.QUERY_ID));
+			o.setModifiedDate(r.getValue(OFC_DATA_ERROR_QUERY.MODIFIED_DATE));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_QUERY.UUID)));
 		}
 		
 		@Override
 		protected void fromObject(DataErrorQuery o, StoreQuery<?> q) {
 			super.fromObject(o, q);
+			q.addValue(OFC_DATA_ERROR_QUERY.CREATION_DATE, toTimestamp(o.getCreationDate()));
 			q.addValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID, o.getTypeId());
+			q.addValue(OFC_DATA_ERROR_QUERY.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
 			q.addValue(OFC_DATA_ERROR_QUERY.QUERY_ID, o.getQueryId());
 			q.addValue(OFC_DATA_ERROR_QUERY.UUID, o.getUuid().toString());
 		}

@@ -1,5 +1,7 @@
 package org.openforis.idm.metamodel;
 
+import org.openforis.commons.lang.Identifiable;
+
 /**
  * An object that will be persisted in a database, so it will be identifiable
  * using a unique integer identifier

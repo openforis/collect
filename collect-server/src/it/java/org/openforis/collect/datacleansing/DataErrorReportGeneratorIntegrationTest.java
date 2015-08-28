@@ -9,9 +9,7 @@ import static org.openforis.idm.testfixture.RecordBuilder.record;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
@@ -20,7 +18,6 @@ import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -35,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
-public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationTest {
+public class DataErrorReportGeneratorIntegrationTest extends DataCleansingIntegrationTest {
 
 	@Autowired
 	private DataQueryManager dataQueryManager;
@@ -50,14 +47,13 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 	@Autowired
 	private CollectJobManager jobManager;
 	
-	private CollectSurvey survey;
 	private DataErrorType invalidAttributeErrorType;
 	private RecordUpdater updater;
 	
-	@Before
+	@Override
 	public void init() throws SurveyImportException, IdmlParseException {
+		super.init();
 		updater = new RecordUpdater();
-		survey = importModel();
 		initRecords();
 		initDataErrorTypes();
 	}
@@ -71,19 +67,22 @@ public class DataErrorReportGeneratorIntegrationTest extends CollectIntegrationT
 	
 	@Test
 	public void testSimpleQuery() {
-		DataQuery query = new DataQuery(survey);
 		EntityDefinition treeDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree");
 		NumberAttributeDefinition dbhDef = (NumberAttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/dbh");
-		query.setTitle("Find trees with invalid DBH");
-		query.setEntityDefinition(treeDef);
-		query.setAttributeDefinition(dbhDef);
-		query.setConditions("dbh > 20");
+		
+		DataQuery query = dataQuery()
+			.title("Find trees with invalid DBH")
+			.entity(treeDef)
+			.attribute(dbhDef)
+			.conditions("dbh > 20")
+			.build();
 		
 		dataQueryManager.save(query);
 		
-		DataErrorQuery dataErrorQuery = new DataErrorQuery(survey);
-		dataErrorQuery.setQuery(query);
-		dataErrorQuery.setType(invalidAttributeErrorType);
+		DataErrorQuery dataErrorQuery = dataErrorQuery()
+			.type(invalidAttributeErrorType)
+			.query(query)
+			.build();
 		
 		dataErrorQueryManager.save(dataErrorQuery);
 		

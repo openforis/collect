@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record1;
@@ -102,14 +103,16 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			o.setTitle(r.getValue(OFC_DATA_CLEANSING_STEP.TITLE));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_CLEANSING_STEP.UUID)));
 			
-			List<String> fieldFixExpressions = new ArrayList<String>(FIELD_FIX_EXPRESSION_FIELDS.length);
-			for (int i = 0; i < FIELD_FIX_EXPRESSION_FIELDS.length; i++) {
-				@SuppressWarnings("unchecked")
-				TableField<?, String> tableField = (TableField<?, String>) FIELD_FIX_EXPRESSION_FIELDS[i];
-				String value = r.getValue(tableField);
-				fieldFixExpressions.add(value);
+			if (StringUtils.isBlank(o.getFixExpression())) {
+				List<String> fieldFixExpressions = new ArrayList<String>(FIELD_FIX_EXPRESSION_FIELDS.length);
+				for (int i = 0; i < FIELD_FIX_EXPRESSION_FIELDS.length; i++) {
+					@SuppressWarnings("unchecked")
+					TableField<?, String> tableField = (TableField<?, String>) FIELD_FIX_EXPRESSION_FIELDS[i];
+					String value = r.getValue(tableField);
+					fieldFixExpressions.add(value);
+				}
+				o.setFieldFixExpressions(fieldFixExpressions);
 			}
-			o.setFieldFixExpressions(fieldFixExpressions);
 		}
 		
 		@Override

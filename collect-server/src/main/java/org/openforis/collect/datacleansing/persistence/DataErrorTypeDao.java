@@ -68,8 +68,10 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErro
 		protected void fromRecord(Record r, DataErrorType o) {
 			super.fromRecord(r, o);
 			o.setCode(r.getValue(OFC_DATA_ERROR_TYPE.CODE));
+			o.setCreationDate(r.getValue(OFC_DATA_ERROR_TYPE.CREATION_DATE));
 			o.setDescription(r.getValue(OFC_DATA_ERROR_TYPE.DESCRIPTION));
 			o.setLabel(r.getValue(OFC_DATA_ERROR_TYPE.LABEL));
+			o.setModifiedDate(r.getValue(OFC_DATA_ERROR_TYPE.MODIFIED_DATE));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_TYPE.UUID)));
 		}
 		
@@ -77,8 +79,10 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErro
 		protected void fromObject(DataErrorType o, StoreQuery<?> q) {
 			super.fromObject(o, q);
 			q.addValue(OFC_DATA_ERROR_TYPE.CODE, o.getCode());
+			q.addValue(OFC_DATA_ERROR_TYPE.CREATION_DATE, toTimestamp(o.getCreationDate()));
 			q.addValue(OFC_DATA_ERROR_TYPE.DESCRIPTION, o.getDescription());
 			q.addValue(OFC_DATA_ERROR_TYPE.LABEL, o.getLabel());
+			q.addValue(OFC_DATA_ERROR_TYPE.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
 			q.addValue(OFC_DATA_ERROR_TYPE.SURVEY_ID, o.getSurvey().getId());
 			q.addValue(OFC_DATA_ERROR_TYPE.UUID, o.getUuid().toString());
 		}

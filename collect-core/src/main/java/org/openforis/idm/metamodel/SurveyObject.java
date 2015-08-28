@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.lang.DeepComparable;
 
 /**
  * @author G. Miceli

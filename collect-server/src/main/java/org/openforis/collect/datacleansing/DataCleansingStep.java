@@ -90,5 +90,50 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	public void setFieldFixExpressions(List<String> fieldFixExpressions) {
 		this.fieldFixExpressions = fieldFixExpressions;
 	}
+
+	@Override
+	public boolean deepEquals(Object obj, boolean ignoreId) {
+		if (this == obj)
+			return true;
+		if (!super.deepEquals(obj, ignoreId))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DataCleansingStep other = (DataCleansingStep) obj;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (fieldFixExpressions == null) {
+			if (other.fieldFixExpressions != null)
+				return false;
+		} else if (!fieldFixExpressions.equals(other.fieldFixExpressions))
+			return false;
+		if (fixExpression == null) {
+			if (other.fixExpression != null)
+				return false;
+		} else if (!fixExpression.equals(other.fixExpression))
+			return false;
+		if (query == null) {
+			if (other.query != null)
+				return false;
+		} else if (!query.deepEquals(other.query, ignoreId))
+			return false;
+		if (! ignoreId) {
+			if (queryId == null) {
+				if (other.queryId != null)
+					return false;
+			} else if (!queryId.equals(other.queryId))
+				return false;
+		}
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+	
 	
 }

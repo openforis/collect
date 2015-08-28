@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.lang.IdentifiableDeepComparable;
 
 /**
  * A survey object that will be persisted in a database
@@ -11,7 +12,7 @@ import org.openforis.collect.model.CollectSurvey;
  * 
  * @author A. Modragon
  */
-public abstract class PersistedSurveyObject extends SurveyObject implements PersistedObject {
+public abstract class PersistedSurveyObject extends SurveyObject implements PersistedObject, IdentifiableDeepComparable {
 	private static final long serialVersionUID = 1L;
 	
 	private Integer id;
@@ -61,6 +62,43 @@ public abstract class PersistedSurveyObject extends SurveyObject implements Pers
 	
 	public void setUuid(UUID uuid) {
 		this.uuid = uuid;
+	}
+
+	public boolean deepEquals(Object obj) {
+		return deepEquals(obj, true);
+	}
+	
+	public boolean deepEquals(Object obj, boolean ignoreId) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PersistedSurveyObject other = (PersistedSurveyObject) obj;
+		if (creationDate == null) {
+			if (other.creationDate != null)
+				return false;
+		} else if (!creationDate.equals(other.creationDate))
+			return false;
+		if (! ignoreId) {
+			if (id == null) {
+				if (other.id != null)
+					return false;
+			} else if (!id.equals(other.id))
+				return false;
+		}
+		if (modifiedDate == null) {
+			if (other.modifiedDate != null)
+				return false;
+		} else if (!modifiedDate.equals(other.modifiedDate))
+			return false;
+		if (uuid == null) {
+			if (other.uuid != null)
+				return false;
+		} else if (!uuid.equals(other.uuid))
+			return false;
+		return true;
 	}
 	
 	@Override

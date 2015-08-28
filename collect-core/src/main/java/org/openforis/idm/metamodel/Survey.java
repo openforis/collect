@@ -17,10 +17,10 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.utils.Dates;
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.geospatial.CoordinateOperations;
 import org.openforis.idm.model.NodePathPointer;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.util.DeepEquals;
 
 
 /**
@@ -694,7 +694,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		if (codeLists == null) {
 			if (other.codeLists != null)
 				return false;
-		} else if (! DeepEquals.deepEquals(codeLists, other.codeLists))
+		} else if (! CollectionUtils.deepEquals(codeLists, other.codeLists))
 			return false;
 		if (applicationOptionsMap == null) {
 			if (other.applicationOptionsMap != null)
@@ -719,7 +719,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		if (modelVersions == null) {
 			if (other.modelVersions != null)
 				return false;
-		} else if (! DeepEquals.deepEquals(modelVersions, other.modelVersions))
+		} else if (! CollectionUtils.deepEquals(modelVersions, other.modelVersions))
 			return false;
 		if (name == null) {
 			if (other.name != null)
@@ -749,7 +749,7 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 		if (units == null) {
 			if (other.units != null)
 				return false;
-		} else if (!DeepEquals.deepEquals(units,  other.units))
+		} else if (! CollectionUtils.deepEquals(units,  other.units))
 			return false;
 		if (uri == null) {
 			if (other.uri != null)

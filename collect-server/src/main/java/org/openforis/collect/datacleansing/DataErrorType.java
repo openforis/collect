@@ -52,4 +52,31 @@ public class DataErrorType extends PersistedSurveyObject {
 		this.description = description;
 	}
 
+	@Override
+	public boolean deepEquals(Object obj, boolean ignoreId) {
+		if (this == obj)
+			return true;
+		if (!super.deepEquals(obj, ignoreId))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DataErrorType other = (DataErrorType) obj;
+		if (code == null) {
+			if (other.code != null)
+				return false;
+		} else if (!code.equals(other.code))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (label == null) {
+			if (other.label != null)
+				return false;
+		} else if (!label.equals(other.label))
+			return false;
+		return true;
+	}
+
 }

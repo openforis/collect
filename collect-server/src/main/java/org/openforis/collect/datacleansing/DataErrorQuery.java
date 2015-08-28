@@ -63,5 +63,41 @@ public class DataErrorQuery extends PersistedSurveyObject {
 		this.type = type;
 		this.typeId = type == null ? null: type.getId();
 	}
-	
+
+	@Override
+	public boolean deepEquals(Object obj, boolean ignoreId) {
+		if (this == obj)
+			return true;
+		if (!super.deepEquals(obj, ignoreId))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DataErrorQuery other = (DataErrorQuery) obj;
+		if (query == null) {
+			if (other.query != null)
+				return false;
+		} else if (!query.deepEquals(other.query, ignoreId))
+			return false;
+		if (! ignoreId) {
+			if (queryId == null) {
+				if (other.queryId != null)
+					return false;
+			} else if (!queryId.equals(other.queryId))
+				return false;
+		}
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.deepEquals(other.type, ignoreId))
+			return false;
+		if (! ignoreId) {
+			if (typeId == null) {
+				if (other.typeId != null)
+					return false;
+			} else if (!typeId.equals(other.typeId))
+				return false;
+		}
+		return true;
+	}
+
 }

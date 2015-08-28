@@ -1,0 +1,126 @@
+{
+  "dataQueries": [
+    {
+      "id": 1,
+      "uuid": "98beaf86-7a03-4593-9171-a6643e8cb451",
+      "creationDate": "2015-08-26T11:57:53.312+02:00",
+      "modifiedDate": "2015-08-27T17:28:35.889+02:00",
+      "title": "Empty cluster remarks",
+      "entityDefinitionId": 727,
+      "attributeDefinitionId": 747,
+      "conditions": "idm:blank($this)",
+      "description": "Query 1 description"
+    },
+    {
+      "id": 2,
+      "uuid": "2e697d32-6ce5-4a06-b174-7873f1702702",
+      "creationDate": "2015-08-26T11:58:32.031+02:00",
+      "modifiedDate": "2015-08-27T17:28:35.089+02:00",
+      "title": "Empty plot remarks",
+      "entityDefinitionId": 748,
+      "attributeDefinitionId": 813,
+      "conditions": "idm:blank($this)",
+      "description": "Query 2 description"
+    }
+  ],
+  "dataErrorTypes": [
+    {
+      "id": 1,
+      "uuid": "28ddb51f-8499-4dea-be9c-0c08d93918ff",
+      "creationDate": "2015-08-27T17:40:01.741+02:00",
+      "modifiedDate": "2015-08-27T18:45:01.741+02:00",
+      "code": "E1",
+      "label": "Error 1",
+      "description": "Error 1 description"
+    },
+    {
+      "id": 2,
+      "uuid": "b1349656-6115-4087-8bf4-6f49b4004809",
+      "creationDate": "2015-08-27T17:40:01.741+02:00",
+      "modifiedDate": "2015-08-27T18:45:01.741+02:00",
+      "code": "E2",
+      "label": "Error 2",
+      "description": "Error 2 description"
+    }
+  ],
+  "dataErrorQueries": [
+    {
+      "id": 5,
+      "uuid": "89b9682f-9267-41da-80e2-f8a5444f3cae",
+      "creationDate": "2015-08-27T17:40:01.741+02:00",
+      "modifiedDate": "2015-08-27T18:45:01.741+02:00",
+      "typeId": 1,
+      "queryId": 1,
+      "typeCode": "E1",
+      "queryTitle": "Empty sampling unit notes",
+      "queryDescription": "",
+      "prettyFormatTitle": "Error type: E1 - Data Query: Empty sampling unit notes"
+    }
+  ],
+  "cleansingSteps": [
+    {
+      "id": 5,
+      "uuid": "02fd4fb7-505c-4b0b-8868-1c6adef3c4ac",
+      "creationDate": "2015-08-27T15:25:01.928+02:00",
+      "modifiedDate": "2015-08-27T17:28:35.896+02:00",
+      "queryId": 1,
+      "title": "Update empty sampling unit notes with \"NA\"",
+      "fixExpression": "\"NA\"",
+      "fieldFixExpressions": [],
+      "description": "Calculation step 1 description",
+      "updateType": "ATTRIBUTE"
+    },
+    {
+      "id": 6,
+      "uuid": "fb279de6-fa19-4f55-841d-8d8d700a68f7",
+      "creationDate": "2015-08-27T17:29:24.325+02:00",
+      "modifiedDate": "2015-08-27T17:30:23.519+02:00",
+      "queryId": 2,
+      "title": "Update empty plot notes with \"NA\"",
+      "fixExpression": "\"NA\"",
+      "fieldFixExpressions": [],
+      "description": "Calculation step 2 description",
+      "updateType": "ATTRIBUTE"
+    }
+  ],
+  "cleansingChains": [
+    {
+      "id": 1,
+      "uuid": "ff917a6a-b9dd-429d-b187-8205cd280238",
+      "creationDate": "2015-08-26T12:15:00.936+02:00",
+      "modifiedDate": "2015-08-26T12:15:00.936+02:00",
+      "title": "Replace empty values",
+      "description": "Chain 1 description",
+      "steps": [
+        {
+	      "id": 5,
+	      "uuid": "02fd4fb7-505c-4b0b-8868-1c6adef3c4ac",
+	      "creationDate": "2015-08-27T15:25:01.928+02:00",
+	      "modifiedDate": "2015-08-27T17:28:35.896+02:00",
+	      "queryId": 1,
+	      "title": "Update empty sampling unit notes with \"NA\"",
+	      "fixExpression": "\"NA\"",
+	      "fieldFixExpressions": [],
+	      "description": "Calculation step 1 description",
+	      "updateType": "ATTRIBUTE"
+	    },
+	    {
+	      "id": 6,
+	      "uuid": "fb279de6-fa19-4f55-841d-8d8d700a68f7",
+	      "creationDate": "2015-08-27T17:29:24.325+02:00",
+	      "modifiedDate": "2015-08-27T17:30:23.519+02:00",
+	      "queryId": 2,
+	      "title": "Update empty plot notes with \"NA\"",
+	      "fixExpression": "\"NA\"",
+	      "fieldFixExpressions": [],
+	      "description": "Calculation step 2 description",
+	      "updateType": "ATTRIBUTE"
+	    }
+      ],
+      "stepIds": [
+        5,
+        6
+      ]
+    }
+  ]
+}

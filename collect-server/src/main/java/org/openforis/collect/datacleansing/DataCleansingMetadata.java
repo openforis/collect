@@ -1,15 +1,18 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.lang.DeepComparable;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataCleansingMetadata {
+public class DataCleansingMetadata implements DeepComparable {
 	
 	private CollectSurvey survey;
 	private List<DataQuery> dataQueries;
@@ -18,6 +21,16 @@ public class DataCleansingMetadata {
 	private List<DataCleansingStep> cleansingSteps;
 	private List<DataCleansingChain> cleansingChains;
 
+	public DataCleansingMetadata(CollectSurvey survey) {
+		super();
+		this.survey = survey;
+		this.dataQueries = new ArrayList<DataQuery>();
+		this.dataErrorTypes = new ArrayList<DataErrorType>();
+		this.dataErrorQueries = new ArrayList<DataErrorQuery>();
+		this.cleansingSteps = new ArrayList<DataCleansingStep>();
+		this.cleansingChains = new ArrayList<DataCleansingChain>();
+	}
+	
 	public DataCleansingMetadata(
 			CollectSurvey survey,
 			List<DataQuery> dataQueries,
@@ -34,6 +47,35 @@ public class DataCleansingMetadata {
 		this.cleansingChains = cleansingChains;
 	}
 	
+	@Override
+	public boolean deepEquals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DataCleansingMetadata other = (DataCleansingMetadata) obj;
+		if (! CollectionUtils.<DataQuery>deepEquals(dataQueries, other.dataQueries, true))
+			return false;
+		if (! CollectionUtils.<DataErrorType>deepEquals(dataErrorTypes, other.dataErrorTypes, true))
+			return false;
+		if (! CollectionUtils.<DataErrorQuery>deepEquals(dataErrorQueries, other.dataErrorQueries, true))
+			return false;
+		if (! CollectionUtils.<DataCleansingStep>deepEquals(cleansingSteps, other.cleansingSteps, true))
+			return false;
+		if (! CollectionUtils.<DataCleansingChain>deepEquals(cleansingChains, other.cleansingChains, true))
+			return false;
+		
+		//do not deep compare surveys
+		if (survey == null) {
+			if (other.survey != null)
+				return false;
+		} else if (!survey.equals(other.survey))
+			return false;
+		return true;
+	}
+
 	public CollectSurvey getSurvey() {
 		return survey;
 	}

@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.idm.metamodel.DeepComparable;
+import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;

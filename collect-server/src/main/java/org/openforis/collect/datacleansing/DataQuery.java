@@ -89,4 +89,37 @@ public class DataQuery extends PersistedSurveyObject {
 		this.conditions = conditions;
 	}
 
+	@Override
+	public boolean deepEquals(Object obj, boolean ignoreId) {
+		if (this == obj)
+			return true;
+		if (!super.deepEquals(obj, ignoreId))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DataQuery other = (DataQuery) obj;
+		if (attributeDefinitionId != other.attributeDefinitionId)
+			return false;
+		if (conditions == null) {
+			if (other.conditions != null)
+				return false;
+		} else if (!conditions.equals(other.conditions))
+			return false;
+		if (description == null) {
+			if (other.description != null)
+				return false;
+		} else if (!description.equals(other.description))
+			return false;
+		if (entityDefinitionId != other.entityDefinitionId)
+			return false;
+		if (title == null) {
+			if (other.title != null)
+				return false;
+		} else if (!title.equals(other.title))
+			return false;
+		return true;
+	}
+	
+	
+
 }

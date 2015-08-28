@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataErrorQuery extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord> {
 
-	private static final long serialVersionUID = 510854522;
+	private static final long serialVersionUID = -1613282396;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_error_query</code>
@@ -50,6 +50,16 @@ public class OfcDataErrorQuery extends org.jooq.impl.TableImpl<org.openforis.col
 	 * The column <code>collect.ofc_data_error_query.query_id</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.lang.Integer> QUERY_ID = createField("query_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_error_query.creation_date</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.sql.Timestamp> CREATION_DATE = createField("creation_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_error_query.modified_date</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryRecord, java.sql.Timestamp> MODIFIED_DATE = createField("modified_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
 	/**
 	 * Create a <code>collect.ofc_data_error_query</code> table reference
