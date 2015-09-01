@@ -219,7 +219,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		String templateContent = writer.toString();
 		
 		//find "fromCSV" attributes
-		List<AttributeDefinition> fromCsvAttributes = getFromCSVAttributes(survey);
+		List<AttributeDefinition> fromCsvAttributes = getExtendedDataFields(survey);
 		
 		//write the dynamic content to be replaced into the template
 		StringBuffer sb = new StringBuffer();
@@ -241,16 +241,21 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");
 	}
 
-	private List<AttributeDefinition> getFromCSVAttributes(CollectSurvey survey) {
+	/**
+	 * Goes though the attributes on the survey finding those that are marked as being key attributes or that are coming "From CSV" meaning that the popup-up will not show the attributes and they will be kept as hidden inputs
+	 * @param survey
+	 * @return The list of attributes that are marked as coming "From CSV" or that are key attributes
+	 */
+	private List<AttributeDefinition> getExtendedDataFields(CollectSurvey survey) {
 		final CollectAnnotations annotations = survey.getAnnotations();
 		final List<AttributeDefinition> fromCsvAttributes = new ArrayList<AttributeDefinition>();
 		survey.getSchema().traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
 				if (def instanceof AttributeDefinition) {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
-					if (annotations.isFromCollectEarthCSV(attrDef)) {
+					if (annotations.isFromCollectEarthCSV(attrDef) ||  attrDef.isKey() ) {
 						fromCsvAttributes.add(attrDef);
-					}
+					}					
 				}
 			}
 		});
@@ -265,7 +270,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		String templateContent = writer.toString();
 		
 		//find "fromCSV" attributes
-		List<AttributeDefinition> fromCsvAttributes = getFromCSVAttributes(survey);
+		List<AttributeDefinition> fromCsvAttributes = getExtendedDataFields(survey);
 		
 		//write the dynamic content to be replaced into the template
 		StringBuffer headerSB = new StringBuffer();
