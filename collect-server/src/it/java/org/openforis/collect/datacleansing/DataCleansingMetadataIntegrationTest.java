@@ -20,14 +20,14 @@ import org.springframework.context.ApplicationContext;
  * @author S. Ricci
  *
  */
-public class CleansingMetadataIntegrationTest extends DataCleansingIntegrationTest {
+public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrationTest {
 
 	@Autowired
 	private ApplicationContext applicationContext;
 	@Autowired
 	private CollectJobManager jobManager;
 	@Autowired
-	private DataCleansingMetadataManager dataCleansingMetadataManager;
+	private DataCleansingMetadataManager metadataManager;
 	
 	@Test
 	public void importTest() {
@@ -39,9 +39,9 @@ public class CleansingMetadataIntegrationTest extends DataCleansingIntegrationTe
 	@Test
 	public void roundTripTest() {
 		DataCleansingMetadata metadata = createTestMetadata();
-		dataCleansingMetadataManager.saveMetadata(survey, metadata);
+		metadataManager.saveMetadata(survey, metadata);
 		
-		DataCleansingMetadata reloadedMetadata = dataCleansingMetadataManager.loadMetadata(survey);
+		DataCleansingMetadata reloadedMetadata = metadataManager.loadMetadata(survey);
 		assertDeepEquals(metadata, reloadedMetadata);
 	}
 
@@ -56,7 +56,7 @@ public class CleansingMetadataIntegrationTest extends DataCleansingIntegrationTe
 			}
 		};
 		jobManager.start(job, false);
-		DataCleansingMetadata metadata = dataCleansingMetadataManager.loadMetadata(survey);
+		DataCleansingMetadata metadata = metadataManager.loadMetadata(survey);
 		return metadata;
 	}
 

@@ -55,6 +55,12 @@ public class DataErrorReportGeneratorJob extends Job {
 		batchPersister = new ItemBatchPersister(report);
 	}
 	
+	@Override
+	protected void onCompleted() {
+		super.onCompleted();
+		batchPersister.flush();
+	}
+	
 	public void setErrorQuery(DataErrorQuery errorQuery) {
 		this.errorQuery = errorQuery;
 	}
@@ -92,7 +98,6 @@ public class DataErrorReportGeneratorJob extends Job {
 		item.setParentEntityId(attr.getParent().getInternalId());
 		item.setNodeIndex(attr.getIndex());
 		item.setValue(new JSONValueFormatter().formatValue(attr));
-		item.setStatus(org.openforis.collect.datacleansing.DataErrorReportItem.Status.PENDING);
 		return item;
 	}
 

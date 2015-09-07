@@ -39,6 +39,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID,
 		OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID,
 		OFC_DATA_ERROR_REPORT_ITEM.STATUS,
+		OFC_DATA_ERROR_REPORT_ITEM.UUID,
 		OFC_DATA_ERROR_REPORT_ITEM.VALUE
 	};
 	
@@ -153,6 +154,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 				item.getRecordId(),
 				item.getReport().getId(),
 				item.getStatus(),
+				item.getUuid(),
 				item.getValue()
 			};
 		}
