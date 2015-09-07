@@ -36,6 +36,7 @@ import org.openforis.idm.model.expression.internal.NodePropertyHandler;
 import org.openforis.idm.model.expression.internal.RecordPropertyHandler;
 import org.openforis.idm.model.expression.internal.ReferencedPathEvaluator;
 import org.openforis.idm.model.expression.internal.RegExFunctions;
+import org.openforis.idm.model.expression.internal.UtilFunctions;
 import org.openforis.idm.path.Path;
 
 /**
@@ -46,6 +47,7 @@ public class ExpressionFactory {
 	public static final String IDM_PREFIX = "idm";
 	public static final String MATH_PREFIX = "math";
 	public static final String REGEX_PREFIX = "regex";
+	public static final String UTIL_PREFIX = "util";
 
 	private static final Set<String> CORE_FUNCTION_NAMES = new HashSet<String>(asList(
 			"boolean", "not", "true", "false", // boolean values functions
@@ -74,7 +76,8 @@ public class ExpressionFactory {
 		registerFunctions(
 				new MathFunctions(MATH_PREFIX),
 				new IDMFunctions(IDM_PREFIX),
-				new RegExFunctions(REGEX_PREFIX)
+				new RegExFunctions(REGEX_PREFIX),
+				new UtilFunctions(UTIL_PREFIX)
 		);
 
 		referencedPathEvaluator = new ReferencedPathEvaluator(customFunctionsByNamespace);

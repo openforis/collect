@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +40,8 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.PersistedCodeListItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -51,6 +54,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
  */
 public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFileCreator{
 
+	private static final String README_FILE_PATH = "org/openforis/collect/designer/templates/collectearth/README.txt";
 	private static final String EARTH_FILES_RESOURCE_PATH = "org/openforis/collect/designer/templates/collectearth/earthFiles/";
 	private static final String EARTH_FILES_FOLDER_NAME = "earthFiles";
 	private static final String KML_TEMPLATE_PATH = "org/openforis/collect/designer/templates/collectearth/kml_template.txt";
@@ -62,8 +66,10 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String CUBE_FILE_NAME = "collectEarthCubes.xml.fmt";
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	private static final double HECTARES_TO_METERS_CONVERSION_FACTOR = 10000d;
-	
+	private static final String README_FILE = "README.txt";
+		
 	private CodeListManager codeListManager;
+	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
 	
 	@Override
 	public File create(CollectSurvey survey, String language) throws Exception {
@@ -78,6 +84,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		File cube = generateCube(survey);
 		File kmlTemplate = generateKMLTemplate(survey);
 		File testPlotsCSVFile = generateTestPlotsCSVFile(survey);
+		File readmeFile = getFileFromResouces(README_FILE_PATH);
 		
 		ZipFile zipFile = new ZipFile(outputFile);
 		
@@ -94,6 +101,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		ZipFiles.addFile(zipFile, balloon, BALLOON_FILE_NAME, zipParameters);
 		ZipFiles.addFile(zipFile, cube, CUBE_FILE_NAME, zipParameters);
 		ZipFiles.addFile(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME, zipParameters);
+		ZipFiles.addFile(zipFile, readmeFile, README_FILE, zipParameters);
 		ZipFiles.addFile(zipFile, testPlotsCSVFile, TEST_PLOTS_FILE_NAME, zipParameters);
 		
 		addCodeListImages(zipFile, survey, zipParameters);
@@ -101,6 +109,24 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		includeEarthFiles(zipFile, zipParameters);
 		
 		return outputFile;
+	}
+
+	public File getFileFromResouces( String pathToResource ) throws URISyntaxException {
+		InputStream readmeContents = this.getClass().getClassLoader().getResourceAsStream( pathToResource );
+		File tempFile = null;
+		try {
+			tempFile = File.createTempFile("readme", "txt");
+			tempFile.deleteOnExit();
+			FileOutputStream fos = new FileOutputStream(tempFile);
+			IOUtils.copy(readmeContents,fos);
+			readmeContents.close();
+			fos.close();
+		} catch (FileNotFoundException e) {
+			logger.error("Error finding file " + pathToResource, e);
+		} catch (IOException e) {
+			logger.error("Error copying file " + pathToResource, e);
+		}
+		return tempFile;
 	}
 
 	private void includeEarthFiles(ZipFile zipFile, ZipParameters zipParameters)
@@ -193,7 +219,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		String templateContent = writer.toString();
 		
 		//find "fromCSV" attributes
-		List<AttributeDefinition> fromCsvAttributes = getFromCSVAttributes(survey);
+		List<AttributeDefinition> fromCsvAttributes = getExtendedDataFields(survey);
 		
 		//write the dynamic content to be replaced into the template
 		StringBuffer sb = new StringBuffer();
@@ -215,16 +241,21 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");
 	}
 
-	private List<AttributeDefinition> getFromCSVAttributes(CollectSurvey survey) {
+	/**
+	 * Goes though the attributes on the survey finding those that are marked as being key attributes or that are coming "From CSV" meaning that the popup-up will not show the attributes and they will be kept as hidden inputs
+	 * @param survey
+	 * @return The list of attributes that are marked as coming "From CSV" or that are key attributes
+	 */
+	private List<AttributeDefinition> getExtendedDataFields(CollectSurvey survey) {
 		final CollectAnnotations annotations = survey.getAnnotations();
 		final List<AttributeDefinition> fromCsvAttributes = new ArrayList<AttributeDefinition>();
 		survey.getSchema().traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
 				if (def instanceof AttributeDefinition) {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
-					if (annotations.isFromCollectEarthCSV(attrDef)) {
+					if (annotations.isFromCollectEarthCSV(attrDef) ||  attrDef.isKey() ) {
 						fromCsvAttributes.add(attrDef);
-					}
+					}					
 				}
 			}
 		});
@@ -239,7 +270,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		String templateContent = writer.toString();
 		
 		//find "fromCSV" attributes
-		List<AttributeDefinition> fromCsvAttributes = getFromCSVAttributes(survey);
+		List<AttributeDefinition> fromCsvAttributes = getExtendedDataFields(survey);
 		
 		//write the dynamic content to be replaced into the template
 		StringBuffer headerSB = new StringBuffer();

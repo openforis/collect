@@ -60,7 +60,7 @@ import org.xml.sax.SAXException;
  */
 public class SurveyValidator {
 
-	private static final String W3_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+	private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 	private static final String XML_XSD_FILE_NAME = "xml.xsd";
 	private static final String IDML_XSD_FILE_NAME = "idml3.xsd";
 	private static final String IDML_XSD_3_1_3_FILE_NAME = "idml3.1.3.xsd";
@@ -79,7 +79,7 @@ public class SurveyValidator {
 	};
 	
 	private static final String CODE_LIST_PATH_FORMAT = "codeList/%s";
-
+	
 	@Autowired
 	private CodeListManager codeListManager;
 	@Autowired
@@ -525,7 +525,7 @@ public class SurveyValidator {
 	
 	public void validateAgainstSchema(InputStream is, Version version) throws SurveyValidationException {
 	    try {
-	    	SchemaFactory factory = SchemaFactory.newInstance(W3_XML_SCHEMA);
+	    	SchemaFactory factory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
 	    	String[] schemaFileNames = getSchemaFileNames(version);
 	    	Source[] schemas = getSourcesFromClassPath(schemaFileNames);
 	    	javax.xml.validation.Schema schema = factory.newSchema(schemas);

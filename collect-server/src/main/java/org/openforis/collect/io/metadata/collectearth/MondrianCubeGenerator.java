@@ -86,7 +86,8 @@ public class MondrianCubeGenerator {
 						measure.column = nodeName;
 						measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(nodeDef) + " " + aggregator );
 						measure.aggregator = aggregator;
-						measure.datatype = "Integer";
+						measure.datatype = "Numeric";
+						measure.formatString = "#.##";
 						cube.measures.add(measure);
 					}
 				} 
@@ -136,7 +137,8 @@ public class MondrianCubeGenerator {
 			}
 		}
 		//add predefined dimensions
-		cube.dimensions.addAll(generatePredefinedDimensions());
+		// DEPRECATED 07/08/2015 : From now on all the operations to calculate the aspect,elevation,slope and initial land use class are made through Calculated Members
+//		cube.dimensions.addAll(generatePredefinedDimensions());
 		//add predefined measures
 		cube.measures.addAll(0, generatePredefinedMeasures());
 		return cube;
@@ -170,7 +172,7 @@ public class MondrianCubeGenerator {
 		return measures;
 	}
 	
-	private List<Dimension> generatePredefinedDimensions() {
+/*	private List<Dimension> generatePredefinedDimensions() {
 		List<Dimension> dimensions = new ArrayList<Dimension>();
 		//Slope category
 		{
@@ -230,7 +232,7 @@ public class MondrianCubeGenerator {
 		}
 		return dimensions;
 	}
-
+*/
 	private Dimension generateDimension(NodeDefinition nodeDef) {
 		String attrName = nodeDef.getName();
 		String attrLabel = extractLabel(nodeDef);
