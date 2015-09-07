@@ -17,6 +17,8 @@ Collect.VERSION = "${PROJECT_VERSION}";
 Collect.SURVEY_CHANGED = "surveyChanged";
 
 Collect.prototype.init = function() {
+	this.initI18n();
+	
 	this.initGlobalEventHandlers();
 	
 	this.checkActiveSurveySelected();
@@ -25,6 +27,17 @@ Collect.prototype.init = function() {
 	
 	this.dataCleansing = new Collect.DataCleansing();
 	this.dataCleansing.init();
+};
+
+Collect.prototype.initI18n = function() {
+	jQuery.i18n.properties({
+	    name:'messages', 
+	    path:'assets/bundle/', 
+	    mode:'both', // We specified mode: 'both' so translated values will be available as JS vars/functions and as a map
+	    language:'en_US'
+	});
+	
+	OF.i18n.initAll();
 };
 
 Collect.prototype.initView = function() {
@@ -91,10 +104,6 @@ Collect.prototype.checkActiveSurveySelected = function() {
 };
 
 Collect.prototype.initGlobalEventHandlers = function() {
-	var $this = this;
-	EventBus.addEventListener(Collect.SURVEY_CHANGED, function() {
-		$("#home-survey-selector-button").text($this.activeSurvey.name);
-	});
 };
 
 Collect.prototype.setActiveSurvey = function(surveySummary) {

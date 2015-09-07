@@ -39,7 +39,6 @@ Collect.DataCleansing.prototype.init = function() {
 	this.initView();
 };
 
-
 Collect.DataCleansing.prototype.initView = function() {
 	this.checkViewState();
 };
@@ -81,6 +80,7 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 		$this.dataErrorReportPanel.refreshDataGrid();
 		$this.dataCleansingStepPanel.refreshDataGrid();
 		$this.dataCleansingChainPanel.refreshDataGrid();
+		$("#home-survey-selector-button").text(Collect.SurveySelectDialogController.getPrettyShortLabel(collect.activeSurvey));
 		//$this.initMapPanel();
 		
 		$this.checkViewState();

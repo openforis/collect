@@ -9,6 +9,7 @@
 		<script type="text/javascript" src="js/eventbus.js"></script>
 		<script type="text/javascript" src="js/jquery/2.1.1/jquery-2.1.1.js"></script>
 		<script type="text/javascript" src="js/jquery/jquery-ui/1.11.2/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-i18n-properties/1.2.0/jquery.i18n.properties.js"></script>
 		<script type="text/javascript" src="js/bootstrap/3.3.1/bootstrap.js"></script>
 		<script type="text/javascript" src="js/bootstrap/bootstrap-select/1.6.3/bootstrap-select.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap/bootstrap-table/1.8.1/bootstrap-table.js"></script>
@@ -22,6 +23,7 @@
 		<script type="text/javascript" src="js/openforis/of-strings.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/openforis/of-dates.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/openforis/of-arrays.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/openforis/of-i18n.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/openforis/of-remote.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/openforis/of-job-monitor.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/openforis/of-alerts.js?v=PROJECT_VERSION"></script>
@@ -118,7 +120,7 @@
 						</li>
 						<li role="presentation">
 							<a href="#data-query-panel" aria-controls="data-query-panel" 
-								role="tab" data-toggle="tab">Data Query</a>
+								role="tab" data-toggle="tab">Data Queries</a>
 						</li>
 						<li role="presentation">
 							<a href="#data-error-query-panel" aria-controls="data-error-query-panel" 
@@ -146,7 +148,7 @@
 					<!-- Tab panes -->
 					<div class="tab-content container-fluid">
 						<div id="homePanel" role="tabpanel" class="tab-pane active" >
-					
+							<p data-messagekey="data_cleansing.home.introduction"></p>
 						</div>
 						<div id="data-error-type-panel" role="tabpanel" class="tab-pane" >
 							<div class="container">

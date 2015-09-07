@@ -4,6 +4,25 @@ Collect.SurveySelectDialogController = function() {
 	this.surveySummaries = null;
 };
 
+Collect.SurveySelectDialogController.getPrettyShortLabel = function(surveySummary) {
+	var label = surveySummary.name;
+	if (surveySummary.temporary) {
+		label += " (temp)"; 
+	}
+	return label;
+};
+
+Collect.SurveySelectDialogController.getPrettyLabel = function(surveySummary) {
+	var label = surveySummary.name;
+	if (OF.Strings.isNotBlank(surveySummary.projectName)) {
+		label += " " + surveySummary.projectName;
+	}
+	if (surveySummary.temporary) {
+		label += " (temp)"; 
+	}
+	return label;
+};
+
 Collect.SurveySelectDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
 
 Collect.SurveySelectDialogController.prototype.loadInstanceVariables = function(callback) {
@@ -19,14 +38,7 @@ Collect.SurveySelectDialogController.prototype.initFormElements = function(callb
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
 		var select = $this.content.find('.survey-select');
 		var surveyLabelFunction = function(survey) {
-			var label = survey.name;
-			if (OF.Strings.isNotBlank(survey.projectName)) {
-				label += " " + survey.projectName;
-			}
-			if (survey.temporary) {
-				label += " (temp)"; 
-			}
-			return label;
+			return Collect.SurveySelectDialogController.getPrettyLabel(survey);
 		}
 		OF.UI.Forms.populateSelect(select, $this.surveySummaries, "id", surveyLabelFunction, true);
 		$this.surveySelectPicker = select.selectpicker();
