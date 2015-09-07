@@ -13,14 +13,6 @@ Collect.DataQueryDialogController.prototype.dispatchItemSavedEvent = function() 
 Collect.DataQueryDialogController.prototype.initFormElements = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
-		var monitorJob = function(jobMonitorUrl, complete) {
-			var jobDialog = new OF.UI.JobDialog();
-			new OF.JobMonitor(jobMonitorUrl, function() {
-				jobDialog.close();
-				complete();
-			});
-		};
-		
 		{//init record step select
 			var select = $this.content.find('select[name="recordStep"]');
 			OF.UI.Forms.populateSelect(select, Collect.DataCleansing.WORKFLOW_STEPS, "name", "label");
@@ -79,6 +71,14 @@ Collect.DataQueryDialogController.prototype.initTestAndRunContainer = function()
 				});
 			});
 		}, $this));
+		
+		var monitorJob = function(jobMonitorUrl, complete) {
+			var jobDialog = new OF.UI.JobDialog();
+			new OF.JobMonitor(jobMonitorUrl, function() {
+				jobDialog.close();
+				complete();
+			});
+		};
 	}
 };
 

@@ -60,7 +60,6 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		
 		private DataCleansingStep step;
 		private CollectRecord lastRecord;
-		private boolean unsavedChanges;
 
 		public DataCleansingChainNodeProcessor(DataCleansingStep step) {
 			this.step = step;
@@ -78,10 +77,12 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 				AttributeDefinition attrDefn = attrib.getDefinition();
 				CollectRecord record = (CollectRecord) node.getRecord();
 				ExpressionEvaluator expressionEvaluator = record.getSurveyContext().getExpressionEvaluator();
-				if (StringUtils.isNotBlank(step.getFixExpression())) {
+				switch(step.getUpdateType()) {
+				case ATTRIBUTE:
 					Value val = expressionEvaluator.evaluateAttributeValue(attrib.getParent(), attrib, attrDefn, step.getFixExpression());
 					recordManager.updateAttribute(attrib, val);
-				} else {
+					break;
+				case FIELD:
 					List<String> fieldFixExpressions = step.getFieldFixExpressions();
 					List<FieldDefinition<?>> fieldDefinitions = attrDefn.getFieldDefinitions();
 					for (int fieldIdx = 0; fieldIdx < fieldFixExpressions.size() && fieldIdx < fieldDefinitions.size(); fieldIdx++) {
@@ -94,24 +95,22 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 							recordManager.updateField(field, value);
 						}
 					}
+					break;
 				}
-				enqueueRecordSave(record);
+				appendRecordSave(record);
 			}
 		}
 
 		@Override
 		public void close() {
-			if (unsavedChanges && lastRecord != null) {
+			if (lastRecord != null) {
 				saveRecord(lastRecord);
 			}
 		}
 		
-		private void enqueueRecordSave(CollectRecord record) {
+		private void appendRecordSave(CollectRecord record) {
 			if (lastRecord != null && ! lastRecord.getId().equals(record.getId())) {
 				saveRecord(lastRecord);
-				unsavedChanges = false;
-			} else {
-				unsavedChanges = true;
 			}
 			lastRecord = record;
 		}
