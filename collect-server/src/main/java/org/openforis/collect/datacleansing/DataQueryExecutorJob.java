@@ -2,9 +2,7 @@ package org.openforis.collect.datacleansing;
 
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorTaskInput;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord.Step;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -18,9 +16,6 @@ import org.springframework.stereotype.Component;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class DataQueryExecutorJob extends SurveyLockingJob {
 
-	@Autowired
-	private RecordManager recordManager;
-	
 	private DataQueryExecutorJobInput input;
 
 	@Override

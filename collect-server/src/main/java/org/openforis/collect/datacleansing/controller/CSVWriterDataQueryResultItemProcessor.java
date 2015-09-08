@@ -54,8 +54,14 @@ public class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultI
 		}
 		headers.add("Path");
 		AttributeDefinition attrDef = (AttributeDefinition) query.getSchema().getDefinitionById(query.getAttributeDefinitionId());
-		String attrName = attrDef.getName();
+		headers.addAll(extractFieldHeaders(attrDef));
+		csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
+	}
+
+	private List<String> extractFieldHeaders(AttributeDefinition attrDef) {
 		List<String> fieldNames = attrDef.getFieldNames();
+		List<String> headers = new ArrayList<String>(fieldNames.size());
+		String attrName = attrDef.getName();
 		if (fieldNames.size() > 1) {
 			for (String fieldName : fieldNames) {
 				headers.add(attrName + "_" + fieldName);
@@ -63,9 +69,9 @@ public class CSVWriterDataQueryResultItemProcessor extends AttributeQueryResultI
 		} else {
 			headers.add(attrName);
 		}
-		csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
+		return headers;
 	}
-
+	
 	@Override
 	public void process(DataQueryResultItem item) {
 		List<String> lineValues = new ArrayList<String>();
