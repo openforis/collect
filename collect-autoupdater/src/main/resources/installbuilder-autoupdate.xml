@@ -5,6 +5,7 @@
 	<vendor>Open Foris</vendor>
 	<singleInstanceCheck>1</singleInstanceCheck>
 	<requireInstallationByRootUser>0</requireInstallationByRootUser>
+	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
 	<logoImage>images/of-collect-logo-small.png</logoImage>
 	<enableSslSupport>1</enableSslSupport>
 	<createOsxBundleZip>1</createOsxBundleZip>
