@@ -70,7 +70,7 @@ public class DataQueryExectutorTask extends Task {
 		Iterator<CollectRecord> it = recordSummaries.iterator();
 		while (it.hasNext() && isRunning()) {
 			CollectRecord recordSummary = (CollectRecord) it.next();
-			CollectRecord record = recordManager.load(survey, recordSummary.getId());
+			CollectRecord record = recordManager.load(survey, recordSummary.getId(), input.step, false);
 			List<Node<?>> nodes = queryEvaluator.evaluate(record);
 			for (Node<?> node : nodes) {
 				processNode(node);

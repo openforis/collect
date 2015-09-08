@@ -23,7 +23,6 @@ import javax.xml.xpath.XPathFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -38,7 +37,6 @@ import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.testfixture.RecordBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -50,8 +48,6 @@ import org.xml.sax.SAXException;
 public class DataMarshallerTest extends CollectIntegrationTest {
 	
 	private DataMarshaller dataMarshaller;
-	@Autowired
-	private RecordManager recordManager;
 	
 	@Before
 	public void init() {

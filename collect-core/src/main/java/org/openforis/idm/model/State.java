@@ -36,17 +36,13 @@ public class State {
 	}
 
 	public int intValue() {
-		String booleanString = getBooleanString();
-		return Integer.parseInt( booleanString, 2 );
-	}
-
-	private String getBooleanString() {
-		StringBuilder str = new StringBuilder(N_BITS);
-		for (int i = N_BITS - 1; i >= 0; i--) {
-			boolean b = bitSet.get(i);
-			str.append( b ? TRUE_SYMBOL : FALSE_SYMBOL );
+		int value = 0;
+		for (int i = 0; i < N_BITS; i++) {
+			if (bitSet.get(i)) {
+				value += (1 << i); //value += 2 powered by i
+			}
 		}
-		return str.toString();
+		return value;
 	}
 
 	public void set(int value) {
@@ -77,7 +73,7 @@ public class State {
 
 	@Override
 	public String toString() {
-		return getBooleanString();
+		return Integer.toString(intValue(), 2);
 	}
 
 	@Override
@@ -104,4 +100,5 @@ public class State {
 			return false;
 		return true;
 	}
+	
 }

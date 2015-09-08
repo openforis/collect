@@ -9,6 +9,7 @@ import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecuto
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.model.Attribute;
@@ -60,9 +61,11 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		
 		private DataCleansingStep step;
 		private CollectRecord lastRecord;
+		private RecordUpdater recordUpdater;
 
 		public DataCleansingChainNodeProcessor(DataCleansingStep step) {
 			this.step = step;
+			this.recordUpdater = new RecordUpdater();
 		}
 		
 		@Override
@@ -80,7 +83,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 				switch(step.getUpdateType()) {
 				case ATTRIBUTE:
 					Value val = expressionEvaluator.evaluateAttributeValue(attrib.getParent(), attrib, attrDefn, step.getFixExpression());
-					recordManager.updateAttribute(attrib, val);
+					recordUpdater.updateAttribute(attrib, val);
 					break;
 				case FIELD:
 					List<String> fieldFixExpressions = step.getFieldFixExpressions();
@@ -92,7 +95,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 							Object value = expressionEvaluator.evaluateFieldValue(attrib.getParent(), attrib, fieldDefn, fieldFixExpression);
 							@SuppressWarnings("unchecked")
 							Field<Object> field = (Field<Object>) attrib.getField(fieldIdx);
-							recordManager.updateField(field, value);
+							recordUpdater.updateField(field, value);
 						}
 					}
 					break;

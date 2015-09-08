@@ -533,10 +533,6 @@ public class Entity extends Node<EntityDefinition> {
 			// Insert this list in order
 			for (int i = 0; i < nodes.size(); i++) {
 				Node<?> node = nodes.get(i);
-
-				if ( node == null ) {
-					throw new IllegalStateException("Null node in entity children list");
-				}
 				visitor.visit(node, i);
 
 				// For entities, add existing child nodes to the stack
