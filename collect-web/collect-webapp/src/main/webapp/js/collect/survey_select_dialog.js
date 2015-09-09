@@ -7,7 +7,7 @@ Collect.SurveySelectDialogController = function() {
 Collect.SurveySelectDialogController.getPrettyShortLabel = function(surveySummary) {
 	var label = surveySummary.name;
 	if (surveySummary.temporary) {
-		label += " (temp)"; 
+		label += " (temporary)"; 
 	}
 	return label;
 };
@@ -15,10 +15,10 @@ Collect.SurveySelectDialogController.getPrettyShortLabel = function(surveySummar
 Collect.SurveySelectDialogController.getPrettyLabel = function(surveySummary) {
 	var label = surveySummary.name;
 	if (OF.Strings.isNotBlank(surveySummary.projectName)) {
-		label += " " + surveySummary.projectName;
+		label += " - " + surveySummary.projectName;
 	}
 	if (surveySummary.temporary) {
-		label += " (temp)"; 
+		label += " (temporary)"; 
 	}
 	return label;
 };
