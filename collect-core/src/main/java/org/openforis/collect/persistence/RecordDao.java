@@ -429,6 +429,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		private CollectSurvey survey;
 		private boolean recordToBeUpdated;
 		private Field<byte[]> dataAlias;
+		private ModelSerializer modelSerializer;
 		
 		public RecordDSLContext(Connection conn) {
 			this(conn, null);
@@ -450,6 +451,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 				throw new IllegalArgumentException("Invalid step "+step);
 			}
 			this.dataAlias = step == null ? null: (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as("DATA");
+			this.modelSerializer = new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
 		}
 
 		public SelectQuery selectRecordQuery(int id) {
@@ -614,7 +616,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 
 		private ModelSerializer getSerializer() {
-			return new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
+			return modelSerializer;
 		}
 		
 		@Override

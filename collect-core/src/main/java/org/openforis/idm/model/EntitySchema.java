@@ -91,14 +91,16 @@ public class EntitySchema extends SchemaSupport<Entity> {
 	}
 
 	protected boolean isNodeToBeSaved(Node<?> node) {
-		if ( node instanceof Attribute<?, ?> && ! (((AttributeDefinition) node.getDefinition()).isCalculated() ) ) {
-			Entity parent = node.getParent();
-    		int count = parent.getCount(node.getDefinition());
-    		if ( count == 1 && ! ((Attribute<?, ?>) node).hasData() ) {
-    			return false;
+		if (node instanceof Attribute) {
+			AttributeDefinition attrDef = (AttributeDefinition) node.getDefinition();
+			if (attrDef.isCalculated()) {
+				return false;
+			} else {
+				return node.hasData();
     		}
+    	} else {
+    		return true;
     	}
-		return true;
 	}
 
 	protected void skipNode(Input input) throws IOException, ProtostuffException {

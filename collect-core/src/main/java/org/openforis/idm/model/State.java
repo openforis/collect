@@ -5,17 +5,12 @@ package org.openforis.idm.model;
 
 import java.util.BitSet;
 
-import org.apache.commons.lang3.StringUtils;
-
 /**
  * @author M. Togna
  * 
  */
 public class State {
 	
-	private static final char TRUE_SYMBOL = '1';
-	private static final char FALSE_SYMBOL = '0';
-
 	private static final int N_BITS = 8;
 	private static final double MAX_VALUE = Math.pow( 2, N_BITS );
 
@@ -25,20 +20,26 @@ public class State {
 		bitSet = new BitSet(N_BITS);
 	}
 
+	public static State parseState(int value) {
+		State state = new State();
+		state.set(value);
+		return state;
+	}
+	
 	public void set(int position, boolean state) {
 		ensurePositionInRange(position);
-		bitSet.set(position, state);
+		setInternal(position, state);
 	}
 
 	public boolean get(int position) {
 		ensurePositionInRange(position);
-		return bitSet.get(position);
+		return getInternal(position);
 	}
 
 	public int intValue() {
 		int value = 0;
 		for (int i = 0; i < N_BITS; i++) {
-			if (bitSet.get(i)) {
+			if (getInternal(i)) {
 				value += (1 << i); //value += 2 powered by i
 			}
 		}
@@ -49,26 +50,25 @@ public class State {
 		if ( value > MAX_VALUE ) {
 			throw new IllegalArgumentException("Value cannot be grater than " + MAX_VALUE + ", but it was " + value);
 		}
-		String binaryString = Integer.toBinaryString(value);
-		binaryString = StringUtils.leftPad(binaryString, N_BITS, FALSE_SYMBOL);
-		char[] charArray = binaryString.toCharArray();
-
-		int pos = binaryString.length();
-		for ( char c : charArray ) {
-			set(--pos, c == TRUE_SYMBOL);
+		int currentValue = value;
+		for (int i = 0; i < N_BITS; i++) {
+			setInternal(i, currentValue % 2 > 0);
+			currentValue >>= 1;
 		}
-	}
-	
-	public static State parseState(int value) {
-		State state = new State();
-		state.set(value);
-		return state;
 	}
 	
 	private void ensurePositionInRange(int position) {
 		if( position < 0 || position >= N_BITS ) {
 			throw new IllegalArgumentException("Posion must be greather than 0 and less that  " + (N_BITS-1) );
 		}
+	}
+	
+	private boolean getInternal(int position) {
+		return bitSet.get(position);
+	}
+
+	private void setInternal(int position, boolean state) {
+		bitSet.set(position, state);
 	}
 
 	@Override

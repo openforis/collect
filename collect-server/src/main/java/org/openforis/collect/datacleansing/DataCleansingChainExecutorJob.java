@@ -1,5 +1,6 @@
 package org.openforis.collect.datacleansing;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.RecordUpdater;
+import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.model.Attribute;
@@ -62,10 +64,12 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		private DataCleansingStep step;
 		private CollectRecord lastRecord;
 		private RecordUpdater recordUpdater;
-
+		private QueryBuffer queryBuffer;
+		
 		public DataCleansingChainNodeProcessor(DataCleansingStep step) {
 			this.step = step;
 			this.recordUpdater = new RecordUpdater();
+			this.queryBuffer = new QueryBuffer();
 		}
 		
 		@Override
@@ -100,32 +104,66 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 					}
 					break;
 				}
-				appendRecordSave(record);
+				appendRecordUpdate(record);
 			}
 		}
 
 		@Override
 		public void close() {
 			if (lastRecord != null) {
-				saveRecord(lastRecord);
+				appendLastRecordUpdate();
 			}
+			queryBuffer.flush();
 		}
-		
-		private void appendRecordSave(CollectRecord record) {
+
+		private void appendRecordUpdate(CollectRecord record) {
 			if (lastRecord != null && ! lastRecord.getId().equals(record.getId())) {
-				saveRecord(lastRecord);
+				appendLastRecordUpdate();
 			}
 			lastRecord = record;
 		}
 
-		private void saveRecord(CollectRecord record) {
+		private void appendLastRecordUpdate() {
 			if (recordStep == Step.ANALYSIS) {
-				record.setStep(Step.CLEANSING); //save the data
-				recordManager.save(record);
-				record.setStep(Step.ANALYSIS); //restore the original record step
-				recordManager.save(record);
+				lastRecord.setStep(Step.CLEANSING); //save the data
+				appendRecordUpdateQuery(lastRecord);
+				lastRecord.setStep(Step.ANALYSIS); //restore the original record step
+				appendRecordUpdateQuery(lastRecord);
 			} else {
-				recordManager.save(record);
+				appendRecordUpdateQuery(lastRecord);
+			}
+		}
+		
+		private void appendRecordUpdateQuery(CollectRecord record) {
+			queryBuffer.append(recordManager.createUpdateQuery(record));
+		}
+		
+		private class QueryBuffer {
+			
+			private static final int DEFAULT_BATCH_SIZE = 100;
+			
+			private int bufferSize;
+			private List<RecordStoreQuery> buffer;
+			
+			public QueryBuffer() {
+				this(DEFAULT_BATCH_SIZE);
+			}
+			
+			public QueryBuffer(int size) {
+				this.bufferSize = size;
+				this.buffer = new ArrayList<RecordStoreQuery>(size);
+			}
+			
+			void append(RecordStoreQuery query) {
+				buffer.add(query);
+				if (buffer.size() == bufferSize) {
+					flush();
+				}
+			}
+
+			void flush() {
+				recordManager.execute(buffer);
+				buffer.clear();
 			}
 		}
 	}

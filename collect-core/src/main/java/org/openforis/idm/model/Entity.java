@@ -33,6 +33,7 @@ public class Entity extends Node<EntityDefinition> {
 
 	private static final long serialVersionUID = 1L;
 	
+	List<Node<?>> children;
 	Map<Integer, List<Node<?>>> childrenByDefinitionId;
 	private ValidationState derivedStateCache;
 	Map<Integer, State> childStates;
@@ -40,10 +41,11 @@ public class Entity extends Node<EntityDefinition> {
 	public Entity(EntityDefinition definition) {
 		super(definition);
 		List<NodeDefinition> childDefs = definition.getChildDefinitions();
-		int numChildren = childDefs.size();
-		this.childrenByDefinitionId = new HashMap<Integer, List<Node<?>>>(numChildren);
-		this.derivedStateCache = new ValidationState(numChildren);
-		this.childStates = new HashMap<Integer, State>(numChildren);
+		int numChildDefs = childDefs.size();
+		this.children = new ArrayList<Node<?>>();
+		this.childrenByDefinitionId = new HashMap<Integer, List<Node<?>>>(numChildDefs);
+		this.derivedStateCache = new ValidationState(numChildDefs);
+		this.childStates = new HashMap<Integer, State>(numChildDefs);
 	}
 
 	@Override
@@ -80,7 +82,7 @@ public class Entity extends Node<EntityDefinition> {
 		}
 		return state;
 	}
-	
+
 	public void setChildState(String childName, int intState) {
 		setChildState(definition.getChildDefinition(childName), intState);
 	}
@@ -349,7 +351,7 @@ public class Entity extends Node<EntityDefinition> {
 	 * @return
 	 */
 	public int size(){
-		return childrenByDefinitionId.size();
+		return children.size();
 	}
 
 	public void move(String name, int oldIndex, int newIndex) {
@@ -378,6 +380,8 @@ public class Entity extends Node<EntityDefinition> {
 			return null;
 		} else {
 			Node<?> node = list.remove(index);
+			
+			this.children.remove(node);
 			
 			decreaseNodeIndexes(list, index);
 			
@@ -424,6 +428,8 @@ public class Entity extends Node<EntityDefinition> {
 		}
 		child.setParent(this);
 		
+		this.children.add(child);
+		
 		if ( record != null ) {
 			record.put(child);
 		}
@@ -457,11 +463,12 @@ public class Entity extends Node<EntityDefinition> {
 	}
 
 	public List<Node<? extends NodeDefinition>> getChildren() {
-		List<Node<?>> result = new ArrayList<Node<?>>();
-		for (List<Node<?>> list : childrenByDefinitionId.values()) {
-			result.addAll(list);
-		}
-		return Collections.unmodifiableList(result);
+		return Collections.unmodifiableList(children);
+//		List<Node<?>> result = new ArrayList<Node<?>>();
+//		for (List<Node<?>> list : childrenByDefinitionId.values()) {
+//			result.addAll(list);
+//		}
+//		return Collections.unmodifiableList(result);
 	}
 	
 	/**
@@ -783,6 +790,7 @@ public class Entity extends Node<EntityDefinition> {
 			List<Node<?>> nodes = entry.getValue();
 			if ( nodes == null || nodes.isEmpty()) {
 				iterator.remove();
+				children.removeAll(nodes);
 			}
 		}
 	}

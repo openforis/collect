@@ -277,15 +277,44 @@ public abstract class DependencyGraph<T> {
 			return result;
 		}
 		
+		public Object getItemId() {
+			return graph.getId(item);
+		}
+		
 		@Override
 		public String toString() {
 			return DependencyGraph.this.toString(this.item);
 		}
 
-		public Object getItemId() {
-			return graph.getId(item);
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			Object itemId = getItemId();
+			result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
+			return result;
 		}
-		
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			@SuppressWarnings("unchecked")
+			GraphNode other = (GraphNode) obj;
+			Object itemId = getItemId();
+			Object otherItemId = other.getItemId();
+			if (itemId == null) {
+				if (otherItemId != null)
+					return false;
+			} else if (!itemId.equals(otherItemId))
+				return false;
+			return true;
+		}
+
 	}
 
 	/**
