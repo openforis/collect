@@ -39,14 +39,15 @@ public class NewBackupFileExtractor implements Closeable {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {
 			ZipEntry zipEntry = entries.nextElement();
-			InputStream is = zipFile.getInputStream(zipEntry);
-
-			String entryName = zipEntry.getName();
-			File folder = getOrCreateEntryFolder(entryName);
-			String fileName = extractFileName(entryName);
-			File newFile = new File(folder, fileName);
-			newFile.createNewFile();
-			FileUtils.copyInputStreamToFile(is, newFile);
+			if (! zipEntry.isDirectory()) {
+				String entryName = zipEntry.getName();
+				File folder = getOrCreateEntryFolder(entryName);
+				String fileName = extractFileName(entryName);
+				File newFile = new File(folder, fileName);
+				newFile.createNewFile();
+				InputStream is = zipFile.getInputStream(zipEntry);
+				FileUtils.copyInputStreamToFile(is, newFile);
+			}
 		}
 	}
 	
