@@ -74,8 +74,7 @@ public class ModelNodePointerFactory implements NodePointerFactory {
 		if (bean instanceof Collection<?>) {
 			Collection<?> collection = (Collection<?>) bean;
 			if (collection.size() == 1) {
-				Object nextObj = collection.iterator().next();
-				return nextObj;
+				return collection.iterator().next();
 			}
 		}
 		return null;
