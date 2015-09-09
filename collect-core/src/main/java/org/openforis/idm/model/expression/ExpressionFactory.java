@@ -21,7 +21,6 @@ import org.apache.commons.jxpath.JXPathContextFactory;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.apache.commons.jxpath.JXPathInvalidSyntaxException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.model.NodePointerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Node;
@@ -67,8 +66,7 @@ public class ExpressionFactory {
 	public ExpressionFactory() {
 		System.setProperty(JXPathContextFactory.FACTORY_NAME_PROPERTY, "org.openforis.idm.model.expression.internal.ModelJXPathContextFactory");
 
-		NodePointerFactory nodePointerFactory = new ModelNodePointerFactory();
-		JXPathContextReferenceImpl.addNodePointerFactory(nodePointerFactory);
+		JXPathContextReferenceImpl.addNodePointerFactory(new ModelNodePointerFactory());
 
 		JXPathIntrospector.registerDynamicClass(Node.class, NodePropertyHandler.class);
 		JXPathIntrospector.registerDynamicClass(Record.class, RecordPropertyHandler.class);

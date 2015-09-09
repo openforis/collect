@@ -14,8 +14,6 @@ import org.apache.commons.jxpath.ri.model.NodePointer;
 import org.apache.commons.jxpath.ri.model.NodePointerFactory;
 import org.apache.commons.jxpath.ri.model.beans.NullPointer;
 import org.apache.commons.jxpath.util.ValueUtils;
-import org.openforis.idm.model.Node;
-import org.openforis.idm.model.Record;
 
 /**
  * @author M. Togna
@@ -32,17 +30,16 @@ public class ModelNodePointerFactory implements NodePointerFactory {
 	}
 
 	public NodePointer createNodePointer(QName name, Object bean, Locale locale) {
-		if (bean instanceof Node) {
-			return new ModelNodePointer(name, bean, new NodePropertyHandler(), locale);
-		} else if (bean instanceof Record) {
-			return new ModelNodePointer(name, bean, new RecordPropertyHandler(), locale);
-		} else {
+		DynamicPropertyHandler propertyHandler = determineDynamicPropertyHandler(bean);
+		if (propertyHandler == null) {
 			Object obj = getHeadElement(bean);
 			if (obj == null) {
 				return null;
 			} else {
 				return createNodePointer(name, obj, locale);
 			}
+		} else {
+			return new ModelNodePointer(name, bean, propertyHandler, locale);
 		}
 	}
 
@@ -50,18 +47,27 @@ public class ModelNodePointerFactory implements NodePointerFactory {
 		if (bean == null) {
 			return new NullPointer(parent, name);
 		}
+		DynamicPropertyHandler propertyHandler = determineDynamicPropertyHandler(bean);
+		if (propertyHandler == null) {
+			Object obj = getHeadElement(bean);
+			if (obj == null) {
+				return null;
+			} else {
+				return createNodePointer(parent, name, obj);
+			}
+		} else {
+			return new ModelNodePointer(parent, name, bean, propertyHandler);
+		}
+	}
 
+	private DynamicPropertyHandler determineDynamicPropertyHandler(Object bean) {
 		JXPathBeanInfo bi = JXPathIntrospector.getBeanInfo(bean.getClass());
 		if (bi.isDynamic()) {
 			DynamicPropertyHandler handler = ValueUtils.getDynamicPropertyHandler(bi.getDynamicPropertyHandlerClass());
-			return new ModelNodePointer(parent, name, bean, handler);
+			return handler;
 		} else {
-			Object obj = getHeadElement(bean);
-			if (obj != null) {
-				return createNodePointer(parent, name, obj);
-			}
+			return null;
 		}
-		return null;
 	}
 
 	private Object getHeadElement(Object bean) {
