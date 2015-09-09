@@ -28,10 +28,12 @@ Collect.NodeTree.prototype.buildTreeNodes = function() {
 		if (node.label != null) {
 			text += " - " + node.label;
 		}
+		var imagesFolder = "assets/images/node_types/";
 		var treeNode = {
 			id: 	node.id,
 			text: 	text, 
-			state: 	{disabled: $this.disabledFilterFunction ? $this.disabledFilterFunction(node) : false}
+			state: 	{disabled: $this.disabledFilterFunction ? $this.disabledFilterFunction(node) : false},
+			icon: imagesFolder + (node.type == "ENTITY" ? "form" : node.attributeType.toLocaleLowerCase()) + "-small.png"
 		};
 		if (node.type == "ENTITY") {
 			var children = new Array();
