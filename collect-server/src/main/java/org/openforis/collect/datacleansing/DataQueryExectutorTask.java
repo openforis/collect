@@ -154,15 +154,16 @@ public class DataQueryExectutorTask extends Task {
 		private Integer maxRecords;
 		private NodeProcessor nodeProcessor;
 		
-		public DataQueryExecutorTaskInput(DataQuery query, Step step, NodeProcessor nodeProcessor, Integer maxRecords) {
-			this(query, step, nodeProcessor);
+		public DataQueryExecutorTaskInput(DataQuery query, Step step, NodeProcessor nodeProcessor) {
+			this(query, step, nodeProcessor, null);
 		}
 
-		public DataQueryExecutorTaskInput(DataQuery query, Step step, NodeProcessor nodeProcessor) {
+		public DataQueryExecutorTaskInput(DataQuery query, Step step, NodeProcessor nodeProcessor, Integer maxRecords) {
 			super();
 			this.query = query;
 			this.step = step;
 			this.nodeProcessor = nodeProcessor;
+			this.maxRecords = maxRecords;
 		}
 
 		public DataQuery getQuery() {
