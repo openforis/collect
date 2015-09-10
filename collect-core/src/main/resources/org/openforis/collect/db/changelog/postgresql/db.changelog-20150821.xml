@@ -23,8 +23,8 @@
 			DROP INDEX IF EXISTS collect.ofc_code_list_survey_idx;
 			
 			INSERT INTO collect.ofc_survey (id, name, uri, idml, target, date_created, date_modified, collect_version, temporary, published_id) 
-				SELECT (id + _temp_info.max_survey_id), name, uri, idml, target, date_created, date_modified, collect_version, TRUE, (select s.id from collect.ofc_survey s where s.uri = uri)
-				FROM collect.ofc_survey_work, collect._temp_info;
+				SELECT (sw.id + _temp_info.max_survey_id), sw.name, sw.uri, sw.idml, sw.target, sw.date_created, sw.date_modified, sw.collect_version, TRUE, (select s.id from collect.ofc_survey s where s.uri = sw.uri)
+				FROM collect.ofc_survey_work sw, collect._temp_info;
 			
 			UPDATE collect.ofc_code_list 
 				SET survey_id = (survey_work_id + (SELECT max_survey_id FROM collect._temp_info))
