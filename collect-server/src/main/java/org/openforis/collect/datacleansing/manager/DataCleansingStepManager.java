@@ -8,8 +8,10 @@ import java.util.Set;
 
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
+import org.openforis.collect.datacleansing.DataCleansingStepValue;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.persistence.DataCleansingStepDao;
+import org.openforis.collect.datacleansing.persistence.DataCleansingStepValueDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	private DataQueryManager dataQueryManager;
 	@Autowired
 	private DataCleansingChainManager dataCleansingChainManager;
+	@Autowired
+	private DataCleansingStepValueDao dataCleansingStepValueDao;
 	
 	@Autowired
 	@Qualifier("dataCleansingStepDao")
@@ -39,6 +43,7 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	public void delete(DataCleansingStep step) {
 		Set<DataCleansingChain> chainsUsingStep = dataCleansingChainManager.loadByStep(step);
 		if (chainsUsingStep.isEmpty()) {
+			dataCleansingStepValueDao.deleteByStep(step);
 			super.delete(step);
 		} else {
 			throw new IllegalStateException(String.format("Cannote delete step with id %d: some chains are associated to it", step.getId()));
@@ -57,9 +62,19 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 		initializeQuery(i);
 	}
 	
+	@Override
+	public void save(DataCleansingStep step) {
+		super.save(step);
+		dataCleansingStepValueDao.deleteByStep(step);
+		for (DataCleansingStepValue stepValue : step.getValues()) {
+			dataCleansingStepValueDao.insert(stepValue);
+		}
+	}
+	
 	private void initializeQuery(DataCleansingStep step) {
 		DataQuery query = dataQueryManager.loadById((CollectSurvey) step.getSurvey(), step.getQueryId());
 		step.setQuery(query);
+		step.setValues(dataCleansingStepValueDao.loadByStep(step));
 	}
 
 }

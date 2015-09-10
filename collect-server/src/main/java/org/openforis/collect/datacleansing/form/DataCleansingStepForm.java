@@ -1,9 +1,10 @@
 package org.openforis.collect.datacleansing.form;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openforis.collect.datacleansing.DataCleansingStep;
-import org.openforis.collect.datacleansing.DataCleansingStep.UpdateType;
+import org.openforis.collect.datacleansing.DataCleansingStepValue;
 import org.openforis.collect.datacleansing.DataQuery;
 
 /**
@@ -20,11 +21,12 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 
 	private String description;
 
+	private List<DataCleansingStepValueForm> values;
+	
 	//calculated members
 	private String queryTitle;
 	private String queryDescription;
-	private UpdateType updateType;
-
+	
 	public DataCleansingStepForm() {
 		super();
 	}
@@ -36,7 +38,12 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 			queryTitle = step == null ? null: query.getTitle();
 			queryDescription = step == null ? null: query.getDescription();
 		}
-		updateType = step.getUpdateType();
+		List<DataCleansingStepValue> values = step.getValues();
+		this.values = new ArrayList<DataCleansingStepValueForm>(values.size());
+		for (DataCleansingStepValue stepValue : values) {
+			DataCleansingStepValueForm valueForm = new DataCleansingStepValueForm(stepValue);
+			this.values.add(valueForm);
+		}
 	}
 	
 	public String getQueryTitle() {
@@ -87,12 +94,11 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 		this.fieldFixExpressions = fieldFixExpressions;
 	}
 	
-	public UpdateType getUpdateType() {
-		return updateType;
+	public List<DataCleansingStepValueForm> getValues() {
+		return values;
 	}
 	
-	public void setUpdateType(UpdateType updateType) {
-		this.updateType = updateType;
+	public void setValues(List<DataCleansingStepValueForm> values) {
+		this.values = values;
 	}
-	
 }

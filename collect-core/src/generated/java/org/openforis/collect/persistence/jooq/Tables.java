@@ -47,6 +47,11 @@ public class Tables {
 	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep OFC_DATA_CLEANSING_STEP = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep.OFC_DATA_CLEANSING_STEP;
 
 	/**
+	 * The table collect.ofc_data_cleansing_step_value
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStepValue OFC_DATA_CLEANSING_STEP_VALUE = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStepValue.OFC_DATA_CLEANSING_STEP_VALUE;
+
+	/**
 	 * The table collect.ofc_data_error_query
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery OFC_DATA_ERROR_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;

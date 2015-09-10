@@ -19,6 +19,7 @@ import org.openforis.idm.model.Field;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
+import org.openforis.idm.model.expression.InvalidExpressionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -84,13 +85,16 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 				AttributeDefinition attrDefn = attrib.getDefinition();
 				CollectRecord record = (CollectRecord) node.getRecord();
 				ExpressionEvaluator expressionEvaluator = record.getSurveyContext().getExpressionEvaluator();
-				switch(step.getUpdateType()) {
+				
+				DataCleansingStepValue stepValue = getApplicableValue(attrib);
+				
+				switch(stepValue.getUpdateType()) {
 				case ATTRIBUTE:
-					Value val = expressionEvaluator.evaluateAttributeValue(attrib.getParent(), attrib, attrDefn, step.getFixExpression());
+					Value val = expressionEvaluator.evaluateAttributeValue(attrib.getParent(), attrib, attrDefn, stepValue.getFixExpression());
 					recordUpdater.updateAttribute(attrib, val);
 					break;
 				case FIELD:
-					List<String> fieldFixExpressions = step.getFieldFixExpressions();
+					List<String> fieldFixExpressions = stepValue.getFieldFixExpressions();
 					List<FieldDefinition<?>> fieldDefinitions = attrDefn.getFieldDefinitions();
 					for (int fieldIdx = 0; fieldIdx < fieldFixExpressions.size() && fieldIdx < fieldDefinitions.size(); fieldIdx++) {
 						String fieldFixExpression = fieldFixExpressions.get(fieldIdx);
@@ -106,6 +110,20 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 				}
 				appendRecordUpdate(record);
 			}
+		}
+
+		private DataCleansingStepValue getApplicableValue(Attribute<?, Value> attrib) throws InvalidExpressionException {
+			List<DataCleansingStepValue> values = step.getValues();
+			for (DataCleansingStepValue stepValue : values) {
+				if (StringUtils.isNotBlank(stepValue.getCondition())) {
+					ExpressionEvaluator expressionEvaluator = step.getSurvey().getContext().getExpressionEvaluator();
+					boolean result = expressionEvaluator.evaluateBoolean(attrib, attrib, stepValue.getCondition());
+					if (result) {
+						return stepValue;
+					}
+				}
+			}
+			throw new IllegalStateException("Cannot find a default applicable cleansing step value for cleansing step with id " + step.getId());
 		}
 
 		@Override

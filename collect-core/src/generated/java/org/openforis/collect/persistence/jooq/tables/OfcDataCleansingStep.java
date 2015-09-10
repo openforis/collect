@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataCleansingStep extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord> {
 
-	private static final long serialVersionUID = -1278634497;
+	private static final long serialVersionUID = 1935365389;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_cleansing_step</code>
@@ -65,41 +65,6 @@ public class OfcDataCleansingStep extends org.jooq.impl.TableImpl<org.openforis.
 	 * The column <code>collect.ofc_data_cleansing_step.modified_date</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord, java.sql.Timestamp> MODIFIED_DATE = createField("modified_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_cleansing_step.fix_expression</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord, java.lang.String> FIX_EXPRESSION = createField("fix_expression", org.jooq.impl.SQLDataType.CLOB, this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_cleansing_step.field_fix_expression1</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord, java.lang.String> FIELD_FIX_EXPRESSION1 = createField("field_fix_expression1", org.jooq.impl.SQLDataType.VARCHAR.length(512), this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_cleansing_step.field_fix_expression2</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord, java.lang.String> FIELD_FIX_EXPRESSION2 = createField("field_fix_expression2", org.jooq.impl.SQLDataType.VARCHAR.length(512), this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_cleansing_step.field_fix_expression3</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord, java.lang.String> FIELD_FIX_EXPRESSION3 = createField("field_fix_expression3", org.jooq.impl.SQLDataType.VARCHAR.length(512), this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_cleansing_step.field_fix_expression4</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord, java.lang.String> FIELD_FIX_EXPRESSION4 = createField("field_fix_expression4", org.jooq.impl.SQLDataType.VARCHAR.length(512), this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_cleansing_step.field_fix_expression5</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord, java.lang.String> FIELD_FIX_EXPRESSION5 = createField("field_fix_expression5", org.jooq.impl.SQLDataType.VARCHAR.length(512), this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_cleansing_step.field_fix_expression6</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataCleansingStepRecord, java.lang.String> FIELD_FIX_EXPRESSION6 = createField("field_fix_expression6", org.jooq.impl.SQLDataType.VARCHAR.length(512), this, "");
 
 	/**
 	 * Create a <code>collect.ofc_data_cleansing_step</code> table reference
