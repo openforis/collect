@@ -16,12 +16,9 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 
 	private Integer queryId;
 	private String title;
-	private String fixExpression;
-	private List<String> fieldFixExpressions;
-
 	private String description;
 
-	private List<DataCleansingStepValueForm> values;
+	private List<DataCleansingStepValue> updateValues;
 	
 	//calculated members
 	private String queryTitle;
@@ -38,12 +35,12 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 			queryTitle = step == null ? null: query.getTitle();
 			queryDescription = step == null ? null: query.getDescription();
 		}
-		List<DataCleansingStepValue> values = step.getValues();
-		this.values = new ArrayList<DataCleansingStepValueForm>(values.size());
-		for (DataCleansingStepValue stepValue : values) {
-			DataCleansingStepValueForm valueForm = new DataCleansingStepValueForm(stepValue);
-			this.values.add(valueForm);
-		}
+		List<DataCleansingStepValue> values = step.getUpdateValues();
+		this.updateValues = new ArrayList<DataCleansingStepValue>(values);
+//		for (DataCleansingStepValue stepValue : values) {
+//			DataCleansingStepValueForm valueForm = new DataCleansingStepValueForm(stepValue);
+//			this.updateValues.add(valueForm);
+//		}
 	}
 	
 	public String getQueryTitle() {
@@ -78,27 +75,12 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 		this.description = description;
 	}
 	
-	public String getFixExpression() {
-		return fixExpression;
+	public List<DataCleansingStepValue> getUpdateValues() {
+		return updateValues;
 	}
 	
-	public void setFixExpression(String fixExpression) {
-		this.fixExpression = fixExpression;
+	public void setUpdateValues(List<DataCleansingStepValue> values) {
+		this.updateValues = values;
 	}
-	
-	public List<String> getFieldFixExpressions() {
-		return fieldFixExpressions;
-	}
-	
-	public void setFieldFixExpressions(List<String> fieldFixExpressions) {
-		this.fieldFixExpressions = fieldFixExpressions;
-	}
-	
-	public List<DataCleansingStepValueForm> getValues() {
-		return values;
-	}
-	
-	public void setValues(List<DataCleansingStepValueForm> values) {
-		this.values = values;
-	}
+
 }

@@ -3,9 +3,12 @@ Collect.DataCleansingStepDialogController = function() {
 	this.contentUrl = "datacleansing/data_cleansing_step_dialog.html";
 	this.itemEditService = collect.dataCleansingStepService;
 	this.queries = null;
+	this.updateValues = [];
 	this.querySelectPicker = null;
 	this.stepsDataGrid = null;
 	this.addStepSelectPicker = null;
+	
+	this.maxFieldNumber = 6;
 };
 
 Collect.DataCleansingStepDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
@@ -35,9 +38,19 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 			select.selectpicker();
 			$this.querySelectPicker = select.data().selectpicker;
 			select.change(function() {
-				$this.initFieldFixExpressionFields();
+				$this.initUpdateValueGrid();
 			});
 		}
+		$this.content.find(".update-value-add-btn").click(function() {
+			var newItem = {updateType: "ATTRIBUTE", condition: "", fixExpression: ""};
+			var maxFieldNumber = 6;
+			for (var i=0; i < $this.maxFieldNumber; i++) {
+				newItem["fieldFixExpression_" + i] = "";
+			}
+			$this.updateValues.push(newItem);
+			$this.initUpdateValueGrid();
+		});
+		
 		{//init record step select
 			var select = $this.content.find('select[name="recordStep"]');
 			OF.UI.Forms.populateSelect(select, Collect.DataCleansing.WORKFLOW_STEPS, "name", "label");
@@ -89,10 +102,82 @@ Collect.DataCleansingStepDialogController.prototype.updateView = function() {
 	}
 };
 
-Collect.DataCleansingStepDialogController.prototype.initFieldFixExpressionFields = function() {
+Collect.DataCleansingStepDialogController.prototype.initUpdateValueGrid = function() {
 	var $this = this;
 	var fieldNames = $this.getAttributeFieldNames();
-
+	
+	var gridContainer = $this.content.find(".update-value-grid");
+	var gridWidget = gridContainer.data("shieldWidgetGrid");
+	if (gridWidget) {
+		gridWidget.destroy();
+	}
+	var schemaFields = {
+    	updateType : { path: "updateType", type: String },
+        condition : { path: "condition", type: String },
+        fixExpression : { path: "fixExpression", type: String }
+    };
+	for (var i=0; i < $this.maxFieldNumber; i++) {
+		schemaFields["fieldFixExpression_" + i] = {path: "fieldFixExpressions_" + i, type: String};
+	}
+	
+	var updateTypeEditor = function(cell, item) {
+		var fieldName = "updateType";
+		var data = [ "By attribute", "Field By Field" ];
+		$('<div class="dropdown"/>')
+			.appendTo(cell)
+			.shieldDropDown({
+				dataSource : {data : data},
+				value : ! item[fieldName] ? null : item[fieldName].toString()
+		}).swidget().focus();
+	};
+	
+	var columns = [
+	     { field: "updateType", title: "Update Type", width: "150px", editor: updateTypeEditor },
+	     { field: "condition", title: "Condition", width: "150px" },
+	     { field: "fixExpression", title: "Fix Expression", width: "150px" }
+	];
+	for (var i=0; i < fieldNames.length; i++) {
+		columns.push({
+			field: "fieldFixExpression_" + i,
+			title: fieldNames[i],
+			type: String
+		});
+	}
+	
+	//add delete column
+	columns.push({
+		width : "40px",
+		title : " ",
+		buttons : [ {
+			cls : "deleteButton",
+			commandName : "delete",
+			caption : Collect.Grids.getDeleteColumnIconTemplate()
+		} ]
+	});
+	
+	gridContainer.shieldGrid({
+		dataSource: {
+            data: $this.updateValues,
+            schema: {
+                fields: schemaFields
+            }
+		},
+        columns: columns,
+          editing: {
+              enabled: true,
+              event: "click",
+              type: "cell",
+              confirmation: {
+                  "delete": {
+                      enabled: true,
+                      template: function (item) {
+                          return "Delete row";
+                      }
+                  }
+              }
+          }
+	});
+	
 	var container = $this.content.find(".fieldFixExpressionsContainer");
 	container.empty();
 	
@@ -133,7 +218,7 @@ Collect.DataCleansingStepDialogController.prototype.fillForm = function(callback
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
 		$this.querySelectPicker.val($this.item.queryId);
 		
-		$this.initFieldFixExpressionFields();
+		$this.initUpdateValueGrid();
 		$this.updateView();
 		
 		if ($this.item) {

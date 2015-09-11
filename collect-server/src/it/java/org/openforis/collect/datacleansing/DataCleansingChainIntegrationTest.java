@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.datacleansing.DataCleansingStepValue.UpdateType;
 import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
 import org.openforis.collect.datacleansing.manager.DataCleansingChainManager;
 import org.openforis.collect.datacleansing.manager.DataCleansingStepManager;
@@ -83,7 +84,10 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		step.setTitle("Step 1");
 		step.setDescription("This is the step 1");
 		step.setQuery(query);
-		step.setFixExpression("20"); //set dbh = 20
+		DataCleansingStepValue updateValue = new DataCleansingStepValue();
+		updateValue.setUpdateType(UpdateType.ATTRIBUTE);
+		updateValue.setFixExpression("20"); //set dbh = 20
+		step.addUpdateValue(updateValue);
 		stepManager.save(step);
 		
 		chain.addStep(step);
@@ -122,7 +126,10 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		step.setTitle("Step 1");
 		step.setDescription("This is the step 1");
 		step.setQuery(query);
-		step.setFieldFixExpressions(Arrays.asList("'PIN'", "'Pinus Sp.'")); //set dbh = 20
+		DataCleansingStepValue updateValue = new DataCleansingStepValue();
+		updateValue.setUpdateType(UpdateType.FIELD);
+		updateValue.setFieldFixExpressions(Arrays.asList("'PIN'", "'Pinus Sp.'")); //set dbh = 20
+		step.addUpdateValue(updateValue);
 		stepManager.save(step);
 		
 		chain.addStep(step);

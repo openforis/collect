@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.junit.Before;
 import org.openforis.collect.CollectIntegrationTest;
+import org.openforis.collect.datacleansing.DataCleansingStepValue.UpdateType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -240,16 +241,6 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 			return this;
 		}
 		
-		public DataCleansingStepBuilder fieldFixExpressions(String... fieldFixExpressions) {
-			obj.setFieldFixExpressions(Arrays.asList(fieldFixExpressions));
-			return this;
-		}
-		
-		public DataCleansingStepBuilder fixExpression(String fixExpression) {
-			obj.setFixExpression(fixExpression);
-			return this;
-		}
-		
 		public DataCleansingStepBuilder queryId(int queryId) {
 			obj.setQueryId(queryId);
 			return this;
@@ -265,8 +256,32 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 			return this;
 		}
 		
-	}
+		public DataCleansingStepBuilder attributeFixExpression(String fixExpression) {
+			return attributeFixExpression(null, fixExpression);
+		}
 		
+		public DataCleansingStepBuilder attributeFixExpression(String condition, String fixExpression) {
+			DataCleansingStepValue value = new DataCleansingStepValue();
+			value.setUpdateType(UpdateType.ATTRIBUTE);
+			value.setFixExpression(fixExpression);
+			obj.getUpdateValues().add(value);
+			return this;
+		}
+
+		public DataCleansingStepBuilder fieldFixExpressions(String... fixExpressions) {
+			return fieldFixExpressions(null, fixExpressions);
+		}
+		
+		public DataCleansingStepBuilder fieldFixExpressions(String condition, String... fixExpressions) {
+			DataCleansingStepValue value = new DataCleansingStepValue();
+			value.setUpdateType(UpdateType.FIELD);
+			value.setFieldFixExpressions(Arrays.asList(fixExpressions));
+			obj.getUpdateValues().add(value);
+			return this;
+		}
+		
+	}
+	
 	public static class DataCleansingChainBuilder extends PersistedSurveyObjectBuilder<DataCleansingChain> {
 
 		public DataCleansingChainBuilder(CollectSurvey survey) {

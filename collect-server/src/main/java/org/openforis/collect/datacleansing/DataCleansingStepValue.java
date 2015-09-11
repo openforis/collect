@@ -3,18 +3,14 @@ package org.openforis.collect.datacleansing;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.lang.DeepComparable;
-import org.openforis.idm.metamodel.SurveyObject;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class DataCleansingStepValue extends SurveyObject implements DeepComparable {
-	
-	private static final long serialVersionUID = 1L;
+public class DataCleansingStepValue implements DeepComparable {
 	
 	public enum UpdateType {
 		ATTRIBUTE('a'), FIELD('f');
@@ -52,11 +48,7 @@ public class DataCleansingStepValue extends SurveyObject implements DeepComparab
 	private String fixExpression;
 	private List<String> fieldFixExpressions = new ArrayList<String>();
 	
-	private transient DataCleansingStep step;
-	
-	public DataCleansingStepValue(DataCleansingStep step) {
-		super((CollectSurvey) step.getSurvey());
-		this.step = step;
+	public DataCleansingStepValue() {
 	}
 	
 	public String getCondition() {
@@ -91,16 +83,10 @@ public class DataCleansingStepValue extends SurveyObject implements DeepComparab
 		this.fieldFixExpressions = fieldFixExpressions;
 	}
 	
-	public DataCleansingStep getStep() {
-		return step;
-	}
-	
 	@Override
 	public boolean deepEquals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!super.deepEquals(obj))
-			return false;
 		if (getClass() != obj.getClass())
 			return false;
 		DataCleansingStepValue other = (DataCleansingStepValue) obj;

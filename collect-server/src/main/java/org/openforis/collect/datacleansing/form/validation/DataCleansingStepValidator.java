@@ -34,7 +34,8 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 	@Override
 	public void validateForm(DataCleansingStepForm target, Errors errors) {
 		validateRequiredFields(errors, TITLE_FIELD);
-//		if (validateRequiredFields(errors, QUERY_ID_FIELD) & validateRequiredField(errors, UPDATE_TYPE_FIELD)) {
+		if (validateRequiredFields(errors, QUERY_ID_FIELD)) {
+			validateUniqueness(target, errors);
 //			String updateTypeVal = (String) errors.getFieldValue(UPDATE_TYPE_FIELD);
 //			UpdateType updateType = UpdateType.valueOf(updateTypeVal);
 //			switch (updateType) {
@@ -49,7 +50,7 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 //				}
 //				break;
 //			}
-//		}
+		}
 	}
 
 //	@SuppressWarnings("unchecked")
@@ -89,11 +90,9 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 		for (DataCleansingStep step : steps) {
 			if (! step.getId().equals(target.getId()) 
 					&& step.getQueryId().equals(target.getQueryId())
-					&& CollectionUtils.deepEquals(step.getValues(), target.getValues())
-//					&& step.getFixExpression().equals(target.getFixExpression())
+					&& CollectionUtils.deepEquals(step.getUpdateValues(), target.getUpdateValues())
 					) {
 				rejectDuplicateValue(errors, QUERY_ID_FIELD);
-//				rejectDuplicateValue(errors, FIX_EXPRESSION_FIELD);
 			}
 		}
 	}

@@ -112,7 +112,9 @@ Collect.NodeTree.prototype.onReady = function(callback) {
 };
 
 Collect.NodeTree.prototype.destroy = function() {
-	this.jstree.destroy();
+	try {
+		this.jstree.destroy();
+	} catch(e) {}
 	var hiddenField = this.getHiddenField();
 	hiddenField.remove();
 };

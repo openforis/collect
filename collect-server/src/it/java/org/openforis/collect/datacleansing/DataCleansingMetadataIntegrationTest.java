@@ -56,8 +56,12 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 			}
 		};
 		jobManager.start(job, false);
-		DataCleansingMetadata metadata = metadataManager.loadMetadata(survey);
-		return metadata;
+		if (job.isCompleted()) {
+			DataCleansingMetadata metadata = metadataManager.loadMetadata(survey);
+			return metadata;
+		} else {
+			throw new RuntimeException("Error importing metadata file: " + job.getErrorMessage(), job.getLastException());
+		}
 	}
 
 	private DataCleansingMetadata createTestMetadata() {
@@ -102,7 +106,7 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 				.title("Update empty sampling unit notes with \"NA\"")
 				.description("Calculation step 1 description")
 				.query(dataQueryBuilder1.build())
-				.fixExpression("\"NA\"")
+				.attributeFixExpression("\"NA\"")
 				.creationDate(Dates.parseDateTime("2015-08-27T15:25:01.928+02:00"))
 				.modifiedDate(Dates.parseDateTime("2015-08-27T17:28:35.896+02:00"));
 			
@@ -111,7 +115,7 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 				.title("Update empty plot notes with \"NA\"")
 				.description("Calculation step 2 description")
 				.query(dataQueryBuilder2.build())
-				.fixExpression("\"NA\"")
+				.attributeFixExpression("\"NA\"")
 				.creationDate(Dates.parseDateTime("2015-08-27T17:29:24.325+02:00"))
 				.modifiedDate(Dates.parseDateTime("2015-08-27T17:30:23.519+02:00"));
 		

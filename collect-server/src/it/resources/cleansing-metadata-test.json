@@ -65,10 +65,14 @@
       "modifiedDate": "2015-08-27T17:28:35.896+02:00",
       "queryId": 1,
       "title": "Update empty sampling unit notes with \"NA\"",
-      "fixExpression": "\"NA\"",
-      "fieldFixExpressions": [],
       "description": "Calculation step 1 description",
-      "updateType": "ATTRIBUTE"
+      "updateValues": [
+      		{
+		      "fixExpression": "\"NA\"",
+		      "fieldFixExpressions": [],
+		      "updateType": "ATTRIBUTE"
+	      }
+	   ]
     },
     {
       "id": 6,
@@ -77,10 +81,14 @@
       "modifiedDate": "2015-08-27T17:30:23.519+02:00",
       "queryId": 2,
       "title": "Update empty plot notes with \"NA\"",
-      "fixExpression": "\"NA\"",
-      "fieldFixExpressions": [],
       "description": "Calculation step 2 description",
-      "updateType": "ATTRIBUTE"
+      "updateValues": [
+      		{
+		      "fixExpression": "\"NA\"",
+		      "fieldFixExpressions": [],
+		      "updateType": "ATTRIBUTE"
+		    }
+		]
     }
   ],
   "cleansingChains": [
@@ -99,10 +107,14 @@
 	      "modifiedDate": "2015-08-27T17:28:35.896+02:00",
 	      "queryId": 1,
 	      "title": "Update empty sampling unit notes with \"NA\"",
-	      "fixExpression": "\"NA\"",
-	      "fieldFixExpressions": [],
 	      "description": "Calculation step 1 description",
-	      "updateType": "ATTRIBUTE"
+	      "updateValues": [
+      		{
+		      "fixExpression": "\"NA\"",
+		      "fieldFixExpressions": [],
+		      "updateType": "ATTRIBUTE"
+		   	}
+		   ]
 	    },
 	    {
 	      "id": 6,
@@ -111,10 +123,14 @@
 	      "modifiedDate": "2015-08-27T17:30:23.519+02:00",
 	      "queryId": 2,
 	      "title": "Update empty plot notes with \"NA\"",
-	      "fixExpression": "\"NA\"",
-	      "fieldFixExpressions": [],
 	      "description": "Calculation step 2 description",
-	      "updateType": "ATTRIBUTE"
+	      "updateValues": [
+      		{
+		      "fixExpression": "\"NA\"",
+		      "fieldFixExpressions": [],
+		      "updateType": "ATTRIBUTE"
+		    }
+		   ]
 	    }
       ],
       "stepIds": [

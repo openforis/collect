@@ -113,17 +113,23 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		}
 
 		private DataCleansingStepValue getApplicableValue(Attribute<?, Value> attrib) throws InvalidExpressionException {
-			List<DataCleansingStepValue> values = step.getValues();
+			List<DataCleansingStepValue> values = step.getUpdateValues();
 			for (DataCleansingStepValue stepValue : values) {
-				if (StringUtils.isNotBlank(stepValue.getCondition())) {
-					ExpressionEvaluator expressionEvaluator = step.getSurvey().getContext().getExpressionEvaluator();
-					boolean result = expressionEvaluator.evaluateBoolean(attrib, attrib, stepValue.getCondition());
-					if (result) {
-						return stepValue;
-					}
+				if (StringUtils.isBlank(stepValue.getCondition())) {
+					return stepValue;
+				}
+				if (evaluateCondition(attrib, stepValue)) {
+					return stepValue;
 				}
 			}
 			throw new IllegalStateException("Cannot find a default applicable cleansing step value for cleansing step with id " + step.getId());
+		}
+
+		private boolean evaluateCondition(Attribute<?, Value> attrib, DataCleansingStepValue stepValue)
+				throws InvalidExpressionException {
+			ExpressionEvaluator expressionEvaluator = step.getSurvey().getContext().getExpressionEvaluator();
+			boolean result = expressionEvaluator.evaluateBoolean(attrib, attrib, stepValue.getCondition());
+			return result;
 		}
 
 		@Override
