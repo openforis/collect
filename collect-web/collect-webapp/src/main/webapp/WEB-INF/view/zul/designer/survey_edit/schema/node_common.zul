@@ -503,6 +503,17 @@
 		    		</fieldErrorHandler>
 	    				
     			</row>
+    			<row>
+					<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])">
+		    			<label value="${labels.survey.schema.attribute.collect_earth.includeInHeader}:" />
+		    		</fieldErrorHandler>
+		    		<fieldErrorHandler message="@load(vmsgs['includedInCollectEarthHeader'])">
+		    			<checkbox
+		    				checked="@load(fx.includedInCollectEarthHeader eq true) @save(fx.includedInCollectEarthHeader)" 
+		    				onCheck="@command('applyChanges')" />
+		    		</fieldErrorHandler>
+	    				
+    			</row>
     		</rows>
     	</grid>
     </groupbox>

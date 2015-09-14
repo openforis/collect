@@ -154,7 +154,7 @@ public class MondrianCubeGenerator {
 			measure.caption = "Area (HA)";
 			measure.aggregator = "sum";
 			measure.datatype = "Integer";
-			measure.formatString = "#,###";
+			measure.formatString = "###,###";
 			measures.add(measure);
 		}
 		

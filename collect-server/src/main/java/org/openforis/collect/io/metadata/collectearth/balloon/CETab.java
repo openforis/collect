@@ -8,7 +8,17 @@ package org.openforis.collect.io.metadata.collectearth.balloon;
 public class CETab extends CEFieldSet {
 
 	private boolean main;
+	private CEAncillaryFields ancillaryDataHeader;
 	
+	
+	public CEAncillaryFields getAncillaryDataHeader() {
+		return ancillaryDataHeader;
+	}
+
+	public void setAncillaryDataHeader(CEAncillaryFields ancillaryDataHeader) {
+		this.ancillaryDataHeader = ancillaryDataHeader;
+	}
+
 	public CETab(String name, String label) {
 		super(name, label);
 	}

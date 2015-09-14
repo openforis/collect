@@ -54,6 +54,10 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder bodyContentBuilder = parentBuilder.e("section"); //$NON-NLS-1$
 		bodyContentBuilder.a("class", "step"); //$NON-NLS-1$ //$NON-NLS-2$
 
+		if (tab.getAncillaryDataHeader() != null) {
+			createBuilder( tab.getAncillaryDataHeader(), bodyContentBuilder);
+		}
+		
 		for (CEComponent component : tab.getChildren()) {
 			if (component instanceof CEField) {
 				createBuilder((CEField) component, true, bodyContentBuilder);
@@ -105,6 +109,25 @@ public class CEComponentHTMLFormatter {
 			}
 		}
 		return fieldSetBuilder;
+	}
+	
+	private XMLBuilder createBuilder(CEAncillaryFields comp, XMLBuilder parentBuilder) throws Exception {
+		XMLBuilder informationFieldsBuilder =  parentBuilder.e("div").attr("class", "ancillay-data" ); //$NON-NLS-1$
+		informationFieldsBuilder.e("span").t( comp.getLabelOrName() ); //$NON-NLS-1$
+		informationFieldsBuilder.e("br");
+		boolean firstChild = true;
+		for (CEComponent child : comp.getChildren()) {
+			if (child instanceof CEField) {
+
+				informationFieldsBuilder.e("span" ).t( (firstChild?" ":", ") + child.getLabelOrName() + ": $[" + child.getName()+ "]" );
+				firstChild = false;
+				
+			} else {
+				throw new IllegalArgumentException("Only attribute fields supported inside single entity"); //$NON-NLS-1$
+			}
+		}
+		
+		return informationFieldsBuilder;
 	}
 	
 	private XMLBuilder createBuilder(CEField comp, boolean includeLabel, XMLBuilder parentBuilder) throws Exception {

@@ -253,7 +253,11 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			public void visit(NodeDefinition def) {
 				if (def instanceof AttributeDefinition) {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
-					if (annotations.isFromCollectEarthCSV(attrDef) ||  attrDef.isKey() ) {
+					if (annotations.isFromCollectEarthCSV(attrDef)
+							// TODO Prepare for multiple ID surveys
+							//||  attrDef.isKey() 
+							
+					) {
 						fromCsvAttributes.add(attrDef);
 					}					
 				}

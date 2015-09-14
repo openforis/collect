@@ -50,7 +50,8 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private boolean includeInDataExport;
 	private boolean showInUI;
 	private boolean fromCollectEarthCSV;
-
+	private boolean includedInCollectEarthHeader;
+	
 	//labels
 	private String headingLabel;
 	private String instanceLabel;
@@ -66,6 +67,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Integer width;
 	private Integer labelWidth;
 	private String labelOrientation;
+
 
 	NodeDefinitionFormObject(EntityDefinition parentDefn) {
 		this.parentDefinition = parentDefn;
@@ -165,6 +167,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		
 		if (source instanceof AttributeDefinition) {
 			fromCollectEarthCSV = annotations.isFromCollectEarthCSV((AttributeDefinition) source);
+			includedInCollectEarthHeader =  annotations.isIncludedInCollectEarthHeader((AttributeDefinition) source);
 		}
 		
 		if ( source instanceof Calculable ) {
@@ -234,6 +237,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		
 		if (dest instanceof AttributeDefinition) {
 			annotations.setFromCollectEarthCSV((AttributeDefinition) dest, fromCollectEarthCSV);
+			annotations.setIncludedInCollectEarthHeader((AttributeDefinition) dest, includedInCollectEarthHeader);
 		}
 		
 		//layout
@@ -493,6 +497,14 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	
 	public void setFromCollectEarthCSV(boolean fromCollectEarthCSV) {
 		this.fromCollectEarthCSV = fromCollectEarthCSV;
+	}
+
+	public boolean isIncludedInCollectEarthHeader() {
+		return includedInCollectEarthHeader;
+	}
+
+	public void setIncludedInCollectEarthHeader(boolean includedInCollectEarthHeader) {
+		this.includedInCollectEarthHeader = includedInCollectEarthHeader;
 	}
 
 }

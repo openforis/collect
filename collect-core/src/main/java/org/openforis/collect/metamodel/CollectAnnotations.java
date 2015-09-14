@@ -62,6 +62,7 @@ public class CollectAnnotations {
 		
 		//collect earth
 		COLLECT_EARTH_FROM_CSV(new QName(COLLECT_EARTH_NAMESPACE_URI, "fromcsv"), false),
+		COLLECT_EARTH_INCLUDE_IN_HEADER(new QName(COLLECT_EARTH_NAMESPACE_URI, "includeinheader"), false),
 		COLLECT_EARTH_PLOT_AREA(new QName(COLLECT_EARTH_NAMESPACE_URI, "plotarea"), 1d),
 		COLLECT_EARTH_SAMPLE_POINTS(new QName(COLLECT_EARTH_NAMESPACE_URI, "samplepoints"), 25) //0, 1, 9 (3x3), 25 (5x5), 49 (7x7)
 		;
@@ -159,6 +160,14 @@ public class CollectAnnotations {
 	
 	public void setFromCollectEarthCSV(AttributeDefinition defn, boolean value) {
 		setAnnotationValue(defn, Annotation.COLLECT_EARTH_FROM_CSV, value);
+	}
+	
+	public boolean isIncludedInCollectEarthHeader(AttributeDefinition defn) {
+		return getAnnotationBooleanValue(defn, Annotation.COLLECT_EARTH_INCLUDE_IN_HEADER);
+	}
+	
+	public void setIncludedInCollectEarthHeader(AttributeDefinition defn, boolean value) {
+		setAnnotationValue(defn, Annotation.COLLECT_EARTH_INCLUDE_IN_HEADER, value);
 	}
 	
 	public Double getCollectEarthPlotArea() {

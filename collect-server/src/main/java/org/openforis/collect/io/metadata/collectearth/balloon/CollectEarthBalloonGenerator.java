@@ -163,7 +163,13 @@ public class CollectEarthBalloonGenerator {
 		schema.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition definition) {
 				if (definition instanceof AttributeDefinition && 
-						annotations.isFromCollectEarthCSV((AttributeDefinition) definition)) {
+						(
+						annotations.isFromCollectEarthCSV((AttributeDefinition) definition)
+						// TODO Fix how to treat surveys with multi-key combinations
+						// || 
+						//( (AttributeDefinition) definition ).isKey() 
+				)
+					) {
 					nodesFromCSV.add((AttributeDefinition) definition);
 				}
 			}
@@ -213,7 +219,7 @@ public class CollectEarthBalloonGenerator {
 
 	private CETab createTabComponent(EntityDefinition rootEntityDef, UIForm form, boolean main) {
 		List<String> nodeNamesFromCSV = getNodeNamesFromCSV();
-		
+		final CollectAnnotations annotations = survey.getAnnotations();
 		String label = form.getLabel(language);
 		if (label == null && ! isDefaultLanguage()) {
 			String defaultLanguage = survey.getDefaultLanguage();
@@ -231,10 +237,22 @@ public class CollectEarthBalloonGenerator {
 							|| nodeNamesFromCSV.contains(nodeName) 
 							|| ((UIField) formComponent).isHidden()
 							);
+					
+					boolean includeAsAncillaryData = annotations.isIncludedInCollectEarthHeader((AttributeDefinition) nodeDef) ;
+					
 					if (includeInHTML) {
 						CEComponent component = createComponent(nodeDef);
 						tab.addChild(component);
+					}else if ( includeAsAncillaryData){
+						CEAncillaryFields ancillaryDataHeader = tab.getAncillaryDataHeader();
+						if( ancillaryDataHeader == null ){
+							ancillaryDataHeader = new CEAncillaryFields("ancillary_data", "Ancillary data");
+							tab.setAncillaryDataHeader(ancillaryDataHeader);
+						}
+						CEComponent component = createComponent(nodeDef);
+						ancillaryDataHeader.addChild( component );
 					}
+					
 				} else if (formComponent instanceof UITable || formComponent instanceof UIFormSection) {
 					CEComponent component = createComponent(nodeDef);
 					tab.addChild(component);
