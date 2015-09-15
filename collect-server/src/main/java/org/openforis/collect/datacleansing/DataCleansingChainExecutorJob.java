@@ -86,7 +86,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 				CollectRecord record = (CollectRecord) node.getRecord();
 				ExpressionEvaluator expressionEvaluator = record.getSurveyContext().getExpressionEvaluator();
 				
-				DataCleansingStepValue stepValue = getApplicableValue(attrib);
+				DataCleansingStepValue stepValue = determineApplicableValue(attrib);
 				
 				switch(stepValue.getUpdateType()) {
 				case ATTRIBUTE:
@@ -112,7 +112,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 			}
 		}
 
-		private DataCleansingStepValue getApplicableValue(Attribute<?, Value> attrib) throws InvalidExpressionException {
+		private DataCleansingStepValue determineApplicableValue(Attribute<?, Value> attrib) throws InvalidExpressionException {
 			List<DataCleansingStepValue> values = step.getUpdateValues();
 			for (DataCleansingStepValue stepValue : values) {
 				if (StringUtils.isBlank(stepValue.getCondition())) {
