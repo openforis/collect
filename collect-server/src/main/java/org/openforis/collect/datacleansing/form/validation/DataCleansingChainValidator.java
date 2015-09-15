@@ -7,7 +7,6 @@ import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
 import org.openforis.collect.datacleansing.form.DataCleansingChainForm;
 import org.openforis.collect.datacleansing.manager.DataCleansingChainManager;
-import org.openforis.collect.datacleansing.manager.DataQueryManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,8 +23,6 @@ public class DataCleansingChainValidator extends SimpleValidator<DataCleansingCh
 	private static final String TITLE_FIELD = "title";
 	private static final String STEP_IDS_FIELD = "stepIds";
 	
-	@Autowired
-	private DataQueryManager dataQueryManager;
 	@Autowired
 	private DataCleansingChainManager dataCleansingChainManager;
 	

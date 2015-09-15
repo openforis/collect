@@ -51,7 +51,8 @@ Collect.AbstractItemEditDialogController.prototype.doOpen = function() {
 	};
 	$this.content.on('hide.bs.modal', function (e) {
 		 $this.content.remove();
-	 });
+	});
+	
 	beforeOpen(function() {
 		var options = {
 			backdrop: "static"
@@ -60,7 +61,12 @@ Collect.AbstractItemEditDialogController.prototype.doOpen = function() {
 			options.keyboard = false;
 		}
 		$this.content.modal(options);
+		
+		$this.afterOpen();
 	});
+};
+
+Collect.AbstractItemEditDialogController.prototype.afterOpen = function() {
 };
 
 Collect.AbstractItemEditDialogController.prototype.close = function() {

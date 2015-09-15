@@ -26,6 +26,7 @@ public class DataCleansingStepForm extends DataCleansingItemForm<DataCleansingSt
 	
 	public DataCleansingStepForm() {
 		super();
+		this.updateValues = new ArrayList<DataCleansingStepValue>();
 	}
 	
 	public DataCleansingStepForm(DataCleansingStep step) {

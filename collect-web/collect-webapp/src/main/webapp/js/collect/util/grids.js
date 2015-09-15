@@ -14,8 +14,9 @@ Collect.Grids.createRootEntityKeyColumns = function(survey, rootEntity, sortable
 	return columns;
 };
 
-Collect.Grids.getDeleteColumnIconTemplate = function() {
-	return '<span class="glyphicon glyphicon-remove-circle remove-icon"></span>';
+Collect.Grids.getDeleteColumnIconTemplate = function(label) {
+	var content = OF.Strings.escapeHtml(label ? label: "");
+	return '<span class="glyphicon glyphicon-remove-circle remove-icon">' + content + '</span>';
 };
 
 Collect.Grids.createDeleteColumn = function(deleteFunction, context) {

@@ -19,7 +19,7 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	private String title;
 	private String description;
 	private Integer queryId;
-	private List<DataCleansingStepValue> udpateValues = new ArrayList<DataCleansingStepValue>();
+	private List<DataCleansingStepValue> updateValues = new ArrayList<DataCleansingStepValue>();
 	
 	private transient DataQuery query;
 	
@@ -32,10 +32,10 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	}
 	
 	public void addUpdateValue(DataCleansingStepValue updateValue) {
-		if (this.udpateValues == null) {
-			this.udpateValues = new ArrayList<DataCleansingStepValue>();
+		if (this.updateValues == null) {
+			this.updateValues = new ArrayList<DataCleansingStepValue>();
 		}
-		this.udpateValues.add(updateValue);
+		this.updateValues.add(updateValue);
 	}
 
 	public Integer getQueryId() {
@@ -73,11 +73,11 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	}
 	
 	public List<DataCleansingStepValue> getUpdateValues() {
-		return udpateValues;
+		return updateValues;
 	}
 	
 	public void setUpdateValues(List<DataCleansingStepValue> values) {
-		this.udpateValues = values;
+		this.updateValues = values;
 	}
 
 	@Override

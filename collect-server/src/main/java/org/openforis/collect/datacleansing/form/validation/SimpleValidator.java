@@ -69,12 +69,11 @@ public abstract class SimpleValidator<F> implements Validator {
 	protected boolean validateRequiredField(Errors errors, String field) {
 		Assert.notNull(errors, "Errors object must not be null");
 		
-		String errorCode = "validation.required_field";
-		String[] messageArgs = new String[0];
-		String defaultMessage = messageSource.getMessage(errorCode, messageArgs, Locale.ENGLISH);
-		
 		Object value = errors.getFieldValue(field);
 		if (value == null || StringUtils.isBlank(value.toString())) {
+			String errorCode = "validation.required_field";
+			String[] messageArgs = new String[0];
+			String defaultMessage = messageSource.getMessage(errorCode, messageArgs, Locale.ENGLISH);
 			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
 			return false;
 		} else {
