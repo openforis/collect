@@ -71,7 +71,7 @@ public class MondrianCubeGenerator {
 		for (NodeDefinition nodeDef : children) {
 			String nodeName = nodeDef.getName();
 			if (nodeDef instanceof AttributeDefinition) {
-				Dimension dimension = generateDimension(nodeDef);
+				Dimension dimension = generateDimension(nodeDef, rootEntityDef );
 				
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
@@ -93,7 +93,7 @@ public class MondrianCubeGenerator {
 				} 
 				cube.dimensions.add(dimension);
 			} else {
-				String rootEntityIdColumnName = rdbConfig.getIdColumnPrefix() + rootEntityDef.getName() + rdbConfig.getIdColumnSuffix();
+				String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
 				
 				String entityName = nodeName;
 				String entityLabel = extractLabel(nodeDef);
@@ -129,7 +129,7 @@ public class MondrianCubeGenerator {
 						dimension.hierarchy = hierarchy;
 						
 					}else{
-						dimension = generateDimension(childDef);
+						dimension = generateDimension(childDef, rootEntityDef);
 					}
 					
 					cube.dimensions.add(dimension);
@@ -142,6 +142,10 @@ public class MondrianCubeGenerator {
 		//add predefined measures
 		cube.measures.addAll(0, generatePredefinedMeasures());
 		return cube;
+	}
+
+	public String getRootEntityIdColumnName(EntityDefinition rootEntityDef) {
+		return rdbConfig.getIdColumnPrefix() + rootEntityDef.getName() + rdbConfig.getIdColumnSuffix();
 	}
 	
 	
@@ -233,7 +237,7 @@ public class MondrianCubeGenerator {
 		return dimensions;
 	}
 */
-	private Dimension generateDimension(NodeDefinition nodeDef) {
+	private Dimension generateDimension(NodeDefinition nodeDef, EntityDefinition rootEntityDef ) {
 		String attrName = nodeDef.getName();
 		String attrLabel = extractLabel(nodeDef);
 		Dimension dimension = new Dimension(attrLabel);
@@ -241,10 +245,35 @@ public class MondrianCubeGenerator {
 		Hierarchy hierarchy = dimension.hierarchy;
 		
 		if (nodeDef instanceof CodeAttributeDefinition) {
-			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDef;
-			String codeTableName = extractCodeListTableName(codeAttrDef);
-			dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();						
-			hierarchy.table = new Table(codeTableName);
+			String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
+			
+			String entityName = attrName;
+			String entityLabel = extractLabel(nodeDef);
+			
+			if( nodeDef.isMultiple() ){
+				
+				dimension.foreignKey = rootEntityIdColumnName;
+				hierarchy.primaryKey = rootEntityIdColumnName;
+				hierarchy.primaryKeyTable = entityName;
+					
+				Join join = new Join(null);
+				String codeListName = ((CodeAttributeDefinition) nodeDef).getList().getName();
+				join.leftKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+				join.rightKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+				
+				join.tables = Arrays.asList(
+						new Table(entityName), 
+						new Table(codeListName + rdbConfig.getCodeListTableSuffix())
+				);
+				
+				hierarchy.join = join;
+										
+			}else{			
+				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDef;
+				String codeTableName = extractCodeListTableName(codeAttrDef);
+				dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();						
+				hierarchy.table = new Table(codeTableName);
+			}
 		}
 		
 		if (nodeDef instanceof DateAttributeDefinition) {
