@@ -54,17 +54,17 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 
 			switch (updateValue.getUpdateType()) {
 			case ATTRIBUTE:
-				validateAttributeUpdate(errors, updateValue, attrDef, updateValueIndex);
+				validateUpdateByAttribute(errors, updateValue, attrDef, updateValueIndex);
 				break;
 			case FIELD:
-				validateFieldFix(errors, attrDef, updateValueIndex, updateValue);
+				validateUpdateByField(errors, attrDef, updateValueIndex, updateValue);
 				break;
 			}
 			updateValueIndex ++;
 		}
 	}
 
-	private void validateFieldFix(Errors errors, AttributeDefinition attrDef, int fixIndex,
+	private void validateUpdateByField(Errors errors, AttributeDefinition attrDef, int fixIndex,
 			DataCleansingStepValue updateValue) {
 		if (StringUtils.isNotBlank(updateValue.getFixExpression())) {
 			Object[] args = new Object[] {fixIndex + 1};
@@ -85,7 +85,7 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 		}
 	}
 
-	private void validateAttributeUpdate(Errors errors, DataCleansingStepValue updateValue, AttributeDefinition attrDef,
+	private void validateUpdateByAttribute(Errors errors, DataCleansingStepValue updateValue, AttributeDefinition attrDef,
 			int rowIndex) {
 		List<String> values = updateValue.getFieldFixExpressions();
 		if (! isEmpty(values)) {

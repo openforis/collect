@@ -5,7 +5,7 @@ OF.Strings.isBlank = function(value) {
 };
 
 OF.Strings.isNotBlank = function(value) {
-	return value != null && value.trim().length >= 0;
+	return ! OF.Strings.isBlank(value);
 };
 
 OF.Strings.firstNotBlank = function() {

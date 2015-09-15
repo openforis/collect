@@ -3,14 +3,17 @@ Collect.DataCleansingStepDialogController = function() {
 	this.contentUrl = "datacleansing/data_cleansing_step_dialog.html";
 	this.itemEditService = collect.dataCleansingStepService;
 	this.queries = null;
-	this.updateValues = [];
 	this.querySelectPicker = null;
 	this.stepsDataGrid = null;
 	this.addStepSelectPicker = null;
-	
+	this.updateValuesFieldset = null;
+		
 	this.maxFieldNumber = 6;
 	
 	this.updateTypes = [{name: "ATTRIBUTE", label : "Attribute"}, {name: "FIELD", label : "Field"}];
+	
+	this.updateValues = [];
+	this.addNewUpdateValue();
 };
 
 Collect.DataCleansingStepDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
@@ -41,17 +44,11 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 			$this.querySelectPicker = select.data().selectpicker;
 			select.change(function() {
 				$this.updateView();
-				$this.initUpdateValueGrid();
 			});
 		}
 		$this.content.find(".update-value-add-btn").click(function() {
-			var newItem = {updateType: "ATTRIBUTE", condition: "", fixExpression: ""};
-			var maxFieldNumber = 6;
-			for (var i=0; i < $this.maxFieldNumber; i++) {
-				newItem["fieldFixExpression_" + i] = "";
-			}
-			$this.updateValues.push(newItem);
-			$this.initUpdateValueGrid();
+			$this.addNewUpdateValue();
+			$this.refreshUpdateValueGrid();
 		});
 		
 		{//init record step select
@@ -60,11 +57,6 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 			select.selectpicker();
 			$this.recordStepSelectPicker = select.data().selectpicker;
 			$this.recordStepSelectPicker.refresh();
-		}
-		
-		{//
-			var radioButtons = $this.content.find('input[name="updateType"]');
-			radioButtons.change($.proxy($this.updateView, $this));
 		}
 		
 		var monitorJob = function(jobMonitorUrl, complete) {
@@ -84,8 +76,17 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 			});
 		}, $this));
 		
+		$this.updateValuesFieldset = $this.content.find(".update-values");
+		
 		$this.updateView();
 		
+		callback();
+	});
+};
+
+Collect.DataCleansingStepDialogController.prototype.beforeOpen = function(callback) {
+	var $this = this;
+	Collect.AbstractItemEditDialogController.prototype.beforeOpen.call(this, function() {
 		callback();
 	});
 };
@@ -94,14 +95,38 @@ Collect.DataCleansingStepDialogController.prototype.afterOpen = function(callbac
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.afterOpen.call(this);
 	setTimeout(function() {
-		$this.updateValueGrid.refresh();
+		$this.refreshUpdateValueGrid();
 	}, 200);
 };
 
 Collect.DataCleansingStepDialogController.prototype.updateView = function() {
 	var $this = this;
 	var item = $this.extractFormObject();
-	$("#update-values-fieldset").toggle(item.queryId != null);
+	var querySelected = OF.Strings.isNotBlank(item.queryId);
+	$this.updateValuesFieldset.toggle(querySelected);
+	if (querySelected) {
+		$this.initUpdateValueGrid();
+	}
+};
+
+Collect.DataCleansingStepDialogController.prototype.removeErrorsInForm = function() {
+	var $this = this;
+	Collect.AbstractItemEditDialogController.prototype.removeErrorsInForm.call($this);
+	OF.UI.Forms.Validation.removeErrorFromElement($this.updateValuesFieldset);
+	$this.refreshUpdateValueGrid();
+};
+
+Collect.DataCleansingStepDialogController.prototype.showErrorsInForm = function(errors, considerOnlyVisitedFields) {
+	var $this = this;
+	
+	Collect.AbstractItemEditDialogController.prototype.showErrorsInForm.call(this, errors, considerOnlyVisitedFields);
+	
+	var error = OF.UI.Forms.Validation.findError(errors, "updateValues");
+	if (error) {
+		$this.updateValuesFieldset.addClass('has-error');
+		OF.UI.Forms.Validation.createErrorTooltip($this.updateValuesFieldset, error, "Update with values");
+		$this.updateValueGrid.refresh();
+	}
 };
 
 Collect.DataCleansingStepDialogController.prototype.initUpdateValueGrid = function() {
@@ -115,15 +140,15 @@ Collect.DataCleansingStepDialogController.prototype.initUpdateValueGrid = functi
 	var gridFields = [
 	     { name: "updateType", title: "Update Type", width: "115px", type : "select", 
 	    	 items : $this.updateTypes, valueField : "name", textField : "label" },
-	     { name: "condition", title: "Condition", width: "100px", type : "text"},
-	     { name: "fixExpression", title: "Fix Expression", width: "150px", type : "text"}
+	     { name: "condition", title: "Condition", width: "100px", type : "textarea"},
+	     { name: "fixExpression", title: "Attribute fix expression", width: "150px", type : "textarea"}
 	];
 	var fieldNames = $this.getAttributeFieldNames();
 	for (var i=0; i < fieldNames.length; i++) {
 		gridFields.push({
 			name : "fieldFixExpressions[" + i + "]",
 			title : fieldNames[i],
-			type : "text",
+			type : "textarea",
 			width : "120px"
 		});
 	}
@@ -148,6 +173,23 @@ Collect.DataCleansingStepDialogController.prototype.initUpdateValueGrid = functi
 	$this.updateValueGrid = gridContainer.data("JSGrid");
 };
 
+Collect.DataCleansingStepDialogController.prototype.refreshUpdateValueGrid = function() {
+	var $this = this;
+	if ($this.updateValueGrid) {
+		$this.updateValueGrid.refresh();
+	}
+};
+
+Collect.DataCleansingStepDialogController.prototype.addNewUpdateValue = function() {
+	var $this = this;
+	var newItem = {updateType: "ATTRIBUTE", condition: "", fixExpression: ""};
+	var maxFieldNumber = 6;
+	for (var i=0; i < $this.maxFieldNumber; i++) {
+		newItem["fieldFixExpression_" + i] = "";
+	}
+	$this.updateValues.push(newItem);
+}
+
 Collect.DataCleansingStepDialogController.prototype.getAttributeFieldNames = function() {
 	var $this = this;
 	var queryId = $this.querySelectPicker.val();
@@ -167,7 +209,6 @@ Collect.DataCleansingStepDialogController.prototype.fillForm = function(callback
 		$this.querySelectPicker.val($this.item.queryId);
 		$this.updateValues = $this.item.updateValues;
 		
-		$this.initUpdateValueGrid();
 		$this.updateView();
 		
 		callback();
@@ -190,21 +231,6 @@ Collect.DataCleansingStepDialogController.prototype.getFieldFixExpressionInputFi
 Collect.DataCleansingStepDialogController.prototype.extractFormObject = function() {
 	var $this = this;
 	var formItem = Collect.AbstractItemEditDialogController.prototype.extractFormObject.apply(this);
-	var fieldNames = $this.getAttributeFieldNames();
-	switch(formItem.updateType) {
-	case "ATTRIBUTE":
-		if (fieldNames != null) {
-			for (var fieldIdx = 0; fieldIdx < fieldNames.length; fieldIdx++) {
-				var inputFieldName = $this.getFieldFixExpressionInputFieldName(fieldIdx);
-				delete formItem[inputFieldName];
-			}
-		}
-		break;
-	case "FIELD":
-		formItem.fixExpression = null;
-		break;
-	}
 	formItem.updateValues = $this.updateValues;
-	
 	return formItem;
 };

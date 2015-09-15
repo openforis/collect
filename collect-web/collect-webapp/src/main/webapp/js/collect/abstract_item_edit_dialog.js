@@ -37,23 +37,25 @@ Collect.AbstractItemEditDialogController.prototype.open = function(item, doNotAl
 	}
 };
 
+Collect.AbstractItemEditDialogController.prototype.beforeOpen = function(callback) {
+	var $this = this;
+	if ($this.item) {
+		$this.fillForm(function() {
+			callback.call($this);
+		});
+	} else {
+		callback.call($this);
+	}
+};
+
 Collect.AbstractItemEditDialogController.prototype.doOpen = function() {
 	var $this = this;
 	
-	function beforeOpen(callback) {
-		if ($this.item) {
-			$this.fillForm(function() {
-				callback.call($this);
-			});
-		} else {
-			callback.call($this);
-		}
-	};
 	$this.content.on('hide.bs.modal', function (e) {
 		 $this.content.remove();
 	});
 	
-	beforeOpen(function() {
+	$this.beforeOpen(function() {
 		var options = {
 			backdrop: "static"
 		};
@@ -84,6 +86,9 @@ Collect.AbstractItemEditDialogController.prototype.initContent = function(callba
 			$this.content.find(".close").hide();
 			$this.content.find(".cancel-btn").hide();
 		}
+		
+		OF.i18n.initializeAll($this.content);
+		
 		$this.initFormElements(function() {
 			$this.initEventListeners();
 			$this.initFormElementsChangeListeners();
@@ -156,12 +161,12 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close
 			if (close) {
 				$this.close();
 			}
-			OF.UI.Forms.Validation.removeErrors($this.form);
+			$this.removeErrorsInForm();
 		}, function(response) {
 			if (response.errors.length > 0) {
 				OF.Alerts.showError("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
 			}
-			OF.UI.Forms.Validation.updateErrors($this.form, response.errors);
+			$this.showErrorsInForm(response.errors, false);
 		});
 	}
 };
@@ -171,11 +176,19 @@ Collect.AbstractItemEditDialogController.prototype.fieldChangeHandler = function
 	if ($this.itemEditService) {
 		var item = $this.extractFormObject();
 		$this.itemEditService.validate(item, function(response) {
-			OF.UI.Forms.Validation.removeErrors($this.form);
+			$this.removeErrorsInForm();
 		}, function(response) {
-			OF.UI.Forms.Validation.updateErrors($this.form, response.errors, true);
+			$this.showErrorsInForm(response.errors, true);
 		});
 	}
+};
+
+Collect.AbstractItemEditDialogController.prototype.removeErrorsInForm = function() {
+	OF.UI.Forms.Validation.removeErrors(this.form);
+};
+
+Collect.AbstractItemEditDialogController.prototype.showErrorsInForm = function(errors, considerOnlyVisitedFields) {
+	OF.UI.Forms.Validation.updateErrors(this.form, errors, considerOnlyVisitedFields);
 };
 
 Collect.AbstractItemEditDialogController.prototype.cancelHandler = function() {

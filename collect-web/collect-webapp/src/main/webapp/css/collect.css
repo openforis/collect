@@ -221,6 +221,14 @@ fieldset.compact legend {
 	margin: 0 !important;
 }
 
+fieldset.has-error {
+	border: 2px groove #a94442 !important;
+}
+
+fieldset.has-error legend {
+	color: #a94442;
+}
+
 .remove-icon {
 	cursor: pointer;
 	color: #c9302c;

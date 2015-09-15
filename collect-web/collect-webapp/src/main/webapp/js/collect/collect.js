@@ -37,7 +37,7 @@ Collect.prototype.initI18n = function() {
 	    language:'en_US'
 	});
 	
-	OF.i18n.initAll();
+	OF.i18n.initializeAll();
 };
 
 Collect.prototype.initView = function() {
