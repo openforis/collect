@@ -224,11 +224,7 @@ public class SurveyValidator {
 	protected List<SurveyValidationResult> validateAttribute(AttributeDefinition attrDef) {
 		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		if (attrDef instanceof TaxonAttributeDefinition) {
-			String taxonomyName = ((TaxonAttributeDefinition) attrDef).getTaxonomy();
-			CollectTaxonomy taxonomy = findTaxonomy((CollectSurvey) attrDef.getSurvey(), taxonomyName);
-			if (taxonomy == null) {
-				results.add(new SurveyValidationResult(attrDef.getPath(), "survey.validation.attribute.taxon.invalid_taxonomy", taxonomyName));
-			}
+			validateTaxonomy((TaxonAttributeDefinition) attrDef, results);
 		}
 		if ( attrDef instanceof KeyAttributeDefinition ) {
 			SurveyValidationResult result = validateKeyAttribute((KeyAttributeDefinition) attrDef);
@@ -237,6 +233,18 @@ public class SurveyValidator {
 			}
 		}
 		return results;
+	}
+
+	private void validateTaxonomy(TaxonAttributeDefinition attrDef, List<SurveyValidationResult> results) {
+		boolean surveyIsStored = attrDef.getSurvey().getId() != null;
+		if (surveyIsStored) {
+			//validate taxonomies only when survey is stored
+			String taxonomyName = attrDef.getTaxonomy();
+			CollectTaxonomy taxonomy = findTaxonomy((CollectSurvey) attrDef.getSurvey(), taxonomyName);
+			if (taxonomy == null) {
+				results.add(new SurveyValidationResult(attrDef.getPath(), "survey.validation.attribute.taxon.invalid_taxonomy", taxonomyName));
+			}
+		}
 	}
 
 	protected SurveyValidationResult validateKeyAttribute(KeyAttributeDefinition keyDefn) {
