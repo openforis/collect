@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.datacleansing.form.validation;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
@@ -71,13 +73,19 @@ public abstract class SimpleValidator<F> implements Validator {
 		
 		Object value = errors.getFieldValue(field);
 		if (value == null || StringUtils.isBlank(value.toString())) {
-			String errorCode = "validation.required_field";
-			String[] messageArgs = new String[0];
-			String defaultMessage = messageSource.getMessage(errorCode, messageArgs, Locale.ENGLISH);
-			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
+			rejectRequiredFields(errors, field);
 			return false;
 		} else {
 			return true;
+		}
+	}
+
+	protected void rejectRequiredFields(Errors errors, String... fields) {
+		String errorCode = "validation.required_field";
+		String[] messageArgs = new String[0];
+		String defaultMessage = messageSource.getMessage(errorCode, messageArgs, Locale.ENGLISH);
+		for (String field : fields) {
+			errors.rejectValue(field, errorCode, messageArgs, defaultMessage);
 		}
 	}
 
@@ -107,8 +115,13 @@ public abstract class SimpleValidator<F> implements Validator {
 		return result.isOk();
 	}
 	protected void rejectDuplicateValue(Errors errors, String field, Object... args) {
-		String errorCode = "validation.duplicate_value";
-		errors.rejectValue(field, errorCode, args, messageSource.getMessage(errorCode, args, Locale.ENGLISH));
+		rejectDuplicateValues(errors, Arrays.asList(field), args);
 	}
-	
+
+	protected void rejectDuplicateValues(Errors errors, List<String> fields, Object... args) {
+		String errorCode = "validation.duplicate_value";
+		for (String field : fields) {
+			errors.rejectValue(field, errorCode, args, messageSource.getMessage(errorCode, args, Locale.ENGLISH));
+		}
+	}
 }

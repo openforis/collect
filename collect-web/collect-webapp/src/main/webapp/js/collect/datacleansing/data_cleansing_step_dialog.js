@@ -51,6 +51,15 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 			$this.refreshUpdateValueGrid();
 		});
 		
+		$this.content.find(".update-value-edit-btn").click(function() {
+			var selectedItem = $this.getSelectedUpdateValue();
+			if (selectedItem != null) {
+				var index = $this.updateValues.indexOf(selectedItem);
+				var dialog = new Collect.DataCleansingStepValueDialogController(index, $this.getSelectedQuery());
+				dialog.open(selectedItem);
+			}
+		});
+		
 		{//init record step select
 			var select = $this.content.find('select[name="recordStep"]');
 			OF.UI.Forms.populateSelect(select, Collect.DataCleansing.WORKFLOW_STEPS, "name", "label");
@@ -80,13 +89,6 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 		
 		$this.updateView();
 		
-		callback();
-	});
-};
-
-Collect.DataCleansingStepDialogController.prototype.beforeOpen = function(callback) {
-	var $this = this;
-	Collect.AbstractItemEditDialogController.prototype.beforeOpen.call(this, function() {
 		callback();
 	});
 };
@@ -180,6 +182,18 @@ Collect.DataCleansingStepDialogController.prototype.refreshUpdateValueGrid = fun
 	}
 };
 
+Collect.DataCleansingStepDialogController.prototype.getSelectedUpdateValue = function() {
+	var $this = this;
+	var grid = $this.updateValueGrid;
+	var editingRow = grid._editingRow;
+	if (editingRow == null) {
+		return null;
+	} else {
+		var selectedItem = editingRow.data().JSGridItem;
+		return selectedItem;
+	}
+}
+
 Collect.DataCleansingStepDialogController.prototype.addNewUpdateValue = function() {
 	var $this = this;
 	var newItem = {updateType: "ATTRIBUTE", condition: "", fixExpression: ""};
@@ -192,14 +206,22 @@ Collect.DataCleansingStepDialogController.prototype.addNewUpdateValue = function
 
 Collect.DataCleansingStepDialogController.prototype.getAttributeFieldNames = function() {
 	var $this = this;
+	var query = $this.getSelectedQuery();
+	if (query != null) {
+		var attrDef = collect.activeSurvey.getDefinition(query.attributeDefinitionId);
+		var fieldNames = attrDef.fieldNames;
+		return fieldNames;
+	}
+};
+
+Collect.DataCleansingStepDialogController.prototype.getSelectedQuery = function() {
+	var $this = this;
 	var queryId = $this.querySelectPicker.val();
 	if (! queryId || queryId.length == 0) {
 		return null;
 	} else {
 		var query = OF.Arrays.findItem($this.queries, "id", queryId);
-		var attrDef = collect.activeSurvey.getDefinition(query.attributeDefinitionId);
-		var fieldNames = attrDef.fieldNames;
-		return fieldNames;
+		return query;
 	}
 };
 
@@ -215,22 +237,9 @@ Collect.DataCleansingStepDialogController.prototype.fillForm = function(callback
 	});
 };
 
-Collect.DataCleansingStepDialogController.prototype.getFieldFixExpressionInputFieldName = function(fieldIdx, escapeSpecialCharacters) {
-	var result = "fieldFixExpressions";
-	if (escapeSpecialCharacters) {
-		result += "\\";
-	}
-	result += "[" + fieldIdx;
-	if (escapeSpecialCharacters) {
-		result += "\\";
-	}
-	result += "]";
-	return result;
-};
-
 Collect.DataCleansingStepDialogController.prototype.extractFormObject = function() {
 	var $this = this;
-	var formItem = Collect.AbstractItemEditDialogController.prototype.extractFormObject.apply(this);
+	var formItem = Collect.AbstractItemEditDialogController.prototype.extractFormObject.call(this);
 	formItem.updateValues = $this.updateValues;
 	return formItem;
 };

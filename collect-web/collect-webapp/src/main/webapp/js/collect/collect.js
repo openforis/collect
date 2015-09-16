@@ -8,6 +8,7 @@ Collect = function() {
 	this.dataErrorReportService = new Collect.DataErrorReportService();
 	this.geoDataService = new Collect.GeoDataService();
 	this.dataCleansingStepService = new Collect.DataCleansingStepService();
+	this.dataCleansingStepValueService = new Collect.DataCleansingStepValueService();
 	this.dataCleansingChainService = new Collect.DataCleansingChainService();
 	this.jobService = new Collect.JobService();
 };

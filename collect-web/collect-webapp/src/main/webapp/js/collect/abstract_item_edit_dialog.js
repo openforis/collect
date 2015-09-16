@@ -41,11 +41,33 @@ Collect.AbstractItemEditDialogController.prototype.beforeOpen = function(callbac
 	var $this = this;
 	if ($this.item) {
 		$this.fillForm(function() {
-			callback.call($this);
+			$this.afterFillForm(function() {
+				$this.updateViewState(function() {
+					callback.call($this);
+				});
+			});
 		});
 	} else {
-		callback.call($this);
+		$this.updateViewState(function() {
+			callback.call($this);
+		});
 	}
+};
+
+/**
+ * Called during the beforeOpen phase, after the filling of the form (if it occurs).
+ * 
+ * @param callback
+ */
+Collect.AbstractItemEditDialogController.prototype.afterFillForm = function(callback) {
+	this.updateViewState(function() {
+		callback();
+	});
+};
+
+Collect.AbstractItemEditDialogController.prototype.updateViewState = function(callback) {
+	var $this = this;
+	callback.call($this);
 };
 
 Collect.AbstractItemEditDialogController.prototype.doOpen = function() {

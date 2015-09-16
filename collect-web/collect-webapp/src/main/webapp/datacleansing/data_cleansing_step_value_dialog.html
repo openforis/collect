@@ -1,0 +1,40 @@
+<div class="modal fade">
+	<div class="modal-dialog" style="width: 500px">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title">Data Cleansing Step Value</h4>
+			</div>
+			<div class="modal-body">
+				<form role="form">
+					<div class="form-group">
+			    		<label class="control-label">Update Type</label>
+			    		<div>
+				    		<input type="radio" id="attributeUpdateTypeRadio" name="updateType" 
+				    			value="ATTRIBUTE" checked="checked"><label for="attributeUpdateTypeRadio">Attribute</label>
+				    		<input type="radio" id="fieldByFieldUpdateTypeRadio" name="updateType" 
+				    			value="FIELD"><label for="fieldByFieldUpdateTypeRadio">Field by field</label>
+			    		</div>
+					</div>
+					<div class="form-group">
+				   		<label class="control-label">Condition</label>
+						<input type="text" class="form-control" name="condition"/>
+					</div>
+					<div class="attributeFixExpressionContainer">
+						<div class="form-group">
+					   		<label class="control-label">Update With Value</label>
+							<textarea class="form-control" name="fixExpression" rows="5"></textarea>
+						</div>
+					</div>
+					<div class="fieldFixExpressionsContainer"></div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default cancel-btn">Cancel</button>
+				<button type="button" class="btn btn-primary save-and-close-btn">Save and Close</button>
+			</div>
+		</div>
+	</div>
+</div>

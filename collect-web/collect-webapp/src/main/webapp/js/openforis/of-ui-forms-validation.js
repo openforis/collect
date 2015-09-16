@@ -46,7 +46,7 @@ OF.UI.Forms.Validation.updateErrorInFormGroup = function(formGroup, errors, cons
 	if (inputField.length == 1) {
 		var oldTooltip = OF.UI.Forms.Validation._getErrorTooltip(formGroup);
 		var fieldName = inputField.attr("name");
-		var error = OF.UI.Forms.Validation.findError(fieldName);
+		var error = OF.UI.Forms.Validation.findError(errors, fieldName);
 		if (error == null) {
 			formGroup.removeClass('has-error');
 			if (oldTooltip) {
