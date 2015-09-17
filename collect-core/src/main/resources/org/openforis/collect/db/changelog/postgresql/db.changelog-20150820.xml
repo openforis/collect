@@ -85,6 +85,38 @@
 			<column name="modified_date" type="TIMESTAMP" />
 	    </createTable>
 
+		<createSequence sequenceName="ofc_data_error_query_group_id_seq" />
+		
+		<createTable tableName="ofc_data_error_query_group">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_query_group_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="creation_date" type="TIMESTAMP" />
+		</createTable>
+		
+		<createTable tableName="ofc_data_error_query_group_query">
+			<column name="group_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_group_group_fkey" 
+					references="ofc_data_error_query_group(id)" />
+			</column>
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_group_query_fkey" 
+					references="ofc_data_error_query(id)" />
+			</column>
+			<column name="sort_order" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		
+		<addPrimaryKey 
+			tableName="ofc_data_error_query_group_query"
+			columnNames="group_id, query_id"
+            constraintName="ofc_data_error_query_group_query_pkey" />
+		
 		<createSequence sequenceName="ofc_data_error_report_id_seq" />
 		
 		<createTable tableName="ofc_data_error_report">
@@ -92,12 +124,12 @@
 				<constraints nullable="false" primaryKey="true"
 					primaryKeyName="ofc_data_error_report_pkey" />
 			</column>
-			<column name="uuid" type="VARCHAR(50)" />
-			<column name="query_id" type="INTEGER">
+			<column name="query_group_id" type="INTEGER">
 				<constraints nullable="false" 
-					foreignKeyName="ofc_data_error_report_query_fkey" 
-					references="ofc_data_error_query(id)" />
+					foreignKeyName="ofc_data_error_report_query_group_fkey" 
+					references="ofc_data_error_query_group(id)" />
 			</column>
+			<column name="uuid" type="VARCHAR(50)" />
 			<column name="creation_date" type="TIMESTAMP" />
 		</createTable>
 		
@@ -113,6 +145,11 @@
 				<constraints nullable="false" 
 					foreignKeyName="ofc_data_error_report_item_report_fkey" 
 					references="ofc_data_error_report(id)" />
+			</column>
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_report_item_query_fkey" 
+					references="ofc_data_error_query(id)" />
 			</column>
 			<column name="record_id" type="INTEGER">
 				<constraints nullable="false" 

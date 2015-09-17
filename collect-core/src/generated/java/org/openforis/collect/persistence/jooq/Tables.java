@@ -57,6 +57,16 @@ public class Tables {
 	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery OFC_DATA_ERROR_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;
 
 	/**
+	 * The table collect.ofc_data_error_query_group
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup OFC_DATA_ERROR_QUERY_GROUP = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup.OFC_DATA_ERROR_QUERY_GROUP;
+
+	/**
+	 * The table collect.ofc_data_error_query_group_query
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery OFC_DATA_ERROR_QUERY_GROUP_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery.OFC_DATA_ERROR_QUERY_GROUP_QUERY;
+
+	/**
 	 * The table collect.ofc_data_error_report
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport OFC_DATA_ERROR_REPORT = org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport.OFC_DATA_ERROR_REPORT;

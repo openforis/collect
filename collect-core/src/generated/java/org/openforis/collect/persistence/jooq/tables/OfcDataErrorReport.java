@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataErrorReport extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord> {
 
-	private static final long serialVersionUID = -1300217817;
+	private static final long serialVersionUID = 1484248637;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_error_report</code>
@@ -37,14 +37,14 @@ public class OfcDataErrorReport extends org.jooq.impl.TableImpl<org.openforis.co
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
+	 * The column <code>collect.ofc_data_error_report.report_id</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, java.lang.Integer> REPORT_ID = createField("report_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
 	 * The column <code>collect.ofc_data_error_report.uuid</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, java.lang.String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR.length(50), this, "");
-
-	/**
-	 * The column <code>collect.ofc_data_error_report.query_id</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, java.lang.Integer> QUERY_ID = createField("query_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_error_report.creation_date</code>.
@@ -94,7 +94,7 @@ public class OfcDataErrorReport extends org.jooq.impl.TableImpl<org.openforis.co
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_DATA_ERROR_REPORT__OFC_DATA_ERROR_REPORT_QUERY_FKEY);
+		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_DATA_ERROR_REPORT__OFC_DATA_ERROR_REPORT_QUERY_GROUP_FKEY);
 	}
 
 	/**

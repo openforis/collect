@@ -34,16 +34,22 @@ public class DataErrorReportItem extends DataQueryResultItem {
 	}
 	
 	private DataErrorReport report;
+	private DataErrorQuery errorQuery;
 	private Status status;
 
-	public DataErrorReportItem(DataErrorReport report) {
-		super(report.getQuery().getQuery());
+	public DataErrorReportItem(DataErrorReport report, DataErrorQuery errorQuery) {
+		super(errorQuery.getQuery());
+		this.errorQuery = errorQuery;
 		this.report = report;
 		this.status = Status.PENDING;
 	}
 	
 	public DataErrorReport getReport() {
 		return report;
+	}
+	
+	public DataErrorQuery getErrorQuery() {
+		return errorQuery;
 	}
 
 	public Status getStatus() {

@@ -1,6 +1,8 @@
 package org.openforis.collect.datacleansing.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_REPORT_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup.OFC_DATA_ERROR_QUERY_GROUP;
+import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery.OFC_DATA_ERROR_QUERY_GROUP_QUERY;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport.OFC_DATA_ERROR_REPORT;
 
@@ -15,6 +17,7 @@ import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
@@ -34,10 +37,14 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		super(DataErrorReportDao.JooqDSLContext.class);
 	}
 
-	public static Select<Record1<Integer>> createErrorQueryIdsSelect(DSLContext dsl, CollectSurvey survey) {
+	public static Select<Record1<Integer>> createErrorQueryGroupIdsSelect(DSLContext dsl, CollectSurvey survey) {
 		Select<Record1<Integer>> select = dsl
-			.select(OFC_DATA_ERROR_QUERY.ID)
-			.from(OFC_DATA_ERROR_QUERY)
+			.select(OFC_DATA_ERROR_QUERY_GROUP.ID)
+			.from(OFC_DATA_ERROR_QUERY_GROUP)
+				.join(OFC_DATA_ERROR_QUERY_GROUP_QUERY)
+					.on(OFC_DATA_ERROR_QUERY_GROUP_QUERY.GROUP_ID.eq(OFC_DATA_ERROR_QUERY_GROUP.ID))
+				.join(OFC_DATA_ERROR_QUERY)
+					.on(OFC_DATA_ERROR_QUERY.ID.eq(OFC_DATA_ERROR_QUERY_GROUP_QUERY.QUERY_ID))
 			.where(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID
 				.in(DataErrorQueryDao.createErrorTypeIdsSelect(dsl, survey))
 			);
@@ -48,20 +55,20 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorReportRecord> select = dsl
 			.selectFrom(OFC_DATA_ERROR_REPORT)
-			.where(OFC_DATA_ERROR_REPORT.QUERY_ID
-				.in(createErrorQueryIdsSelect(dsl, survey))
+			.where(OFC_DATA_ERROR_REPORT.REPORT_ID
+				.in(createErrorQueryGroupIdsSelect(dsl, survey))
 			);
 		Result<OfcDataErrorReportRecord> result = select.fetch();
 		return dsl.fromResult(result);
 	}
 
-	public List<DataErrorReport> loadByQuery(DataErrorQuery query) {
-		CollectSurvey survey = (CollectSurvey) query.getSurvey();
+	public List<DataErrorReport> loadByQueryGroup(DataErrorQueryGroup queryGroup) {
+		CollectSurvey survey = (CollectSurvey) queryGroup.getSurvey();
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorReportRecord> select = dsl
 			.selectFrom(OFC_DATA_ERROR_REPORT)
-			.where(OFC_DATA_ERROR_REPORT.QUERY_ID
-				.eq(query.getId())
+			.where(OFC_DATA_ERROR_REPORT.REPORT_ID
+				.eq(queryGroup.getId())
 			);
 		Result<OfcDataErrorReportRecord> result = select.fetch();
 		return dsl.fromResult(result);
@@ -88,7 +95,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		protected void fromRecord(Record r, DataErrorReport o) {
 			super.fromRecord(r, o);
 			o.setCreationDate(r.getValue(OFC_DATA_ERROR_REPORT.CREATION_DATE));
-			o.setQueryId(r.getValue(OFC_DATA_ERROR_REPORT.QUERY_ID));
+			o.setQueryGroupId(r.getValue(OFC_DATA_ERROR_REPORT.REPORT_ID));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_REPORT.UUID)));
 		}
 		
@@ -96,7 +103,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		protected void fromObject(DataErrorReport o, StoreQuery<?> q) {
 			super.fromObject(o, q);
 			q.addValue(OFC_DATA_ERROR_REPORT.CREATION_DATE, toTimestamp(o.getCreationDate()));
-			q.addValue(OFC_DATA_ERROR_REPORT.QUERY_ID, o.getQueryId());
+			q.addValue(OFC_DATA_ERROR_REPORT.REPORT_ID, o.getQueryGroupId());
 			q.addValue(OFC_DATA_ERROR_REPORT.UUID, o.getUuid().toString());
 		}
 

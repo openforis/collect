@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorTaskInput;
 import org.openforis.collect.datacleansing.json.JSONValueFormatter;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -32,7 +31,7 @@ public class DataErrorReportGeneratorJob extends Job {
 	private DataErrorReportManager reportManager;
 	
 	//input
-	private DataErrorQuery errorQuery;
+	private DataErrorQueryGroup errorQueryGroup;
 	private Step recordStep;
 
 	//output
@@ -42,15 +41,16 @@ public class DataErrorReportGeneratorJob extends Job {
 	
 	@Override
 	protected void buildTasks() throws Throwable {
-		DataQueryExectutorTask task = addTask(DataQueryExectutorTask.class);
-		task.setInput(new DataQueryExecutorTaskInput(errorQuery.getQuery(), recordStep, new ReportItemPersisterNodeProcessor()));
+		DataErrorQueryGroupExectutorTask task = addTask(DataErrorQueryGroupExectutorTask.class);
+		task.setInput(new DataErrorQueryGroupExectutorTask.DataErrorQueryGroupExecutorTaskInput((CollectSurvey) errorQueryGroup.getSurvey(), 
+				errorQueryGroup.getQueries(), recordStep, new ReportItemPersisterNodeProcessor()));
 	}
 	
 	@Override
 	protected void initializeTask(Worker task) {
 		super.initializeTask(task);
-		report = new DataErrorReport((CollectSurvey) errorQuery.getSurvey());
-		report.setQuery(errorQuery);
+		report = new DataErrorReport((CollectSurvey) errorQueryGroup.getSurvey());
+		report.setQueryGroup(errorQueryGroup);
 		reportManager.save(report);
 		batchPersister = new ItemBatchPersister(report);
 	}
@@ -61,8 +61,8 @@ public class DataErrorReportGeneratorJob extends Job {
 		batchPersister.flush();
 	}
 	
-	public void setErrorQuery(DataErrorQuery errorQuery) {
-		this.errorQuery = errorQuery;
+	public void setErrorQueryGroup(DataErrorQueryGroup errorQueryGroup) {
+		this.errorQueryGroup = errorQueryGroup;
 	}
 	
 	public void setRecordStep(Step recordStep) {
@@ -73,15 +73,15 @@ public class DataErrorReportGeneratorJob extends Job {
 		return report;
 	}
 	
-	private class ReportItemPersisterNodeProcessor implements NodeProcessor {
+	private class ReportItemPersisterNodeProcessor implements DataErrorQueryResultProcessor {
 		
 		@Override
 		public void init() throws Exception {}
 		
 		@Override
-		public void process(Node<?> node) throws Exception {
+		public void process(DataErrorQuery query, Node<?> node) throws Exception {
 			Attribute<?, ?> attr = (Attribute<?, ?>) node;
-			DataErrorReportItem item = createReportItem(report, attr);
+			DataErrorReportItem item = createReportItem(report, query, attr);
 			batchPersister.add(item);
 		}
 		
@@ -92,8 +92,8 @@ public class DataErrorReportGeneratorJob extends Job {
 	}
 	
 	private DataErrorReportItem createReportItem(DataErrorReport report,
-			Attribute<?, ?> attr) {
-		DataErrorReportItem item = new DataErrorReportItem(report);
+			DataErrorQuery query, Attribute<?, ?> attr) {
+		DataErrorReportItem item = new DataErrorReportItem(report, query);
 		item.setRecordId(attr.getRecord().getId());
 		item.setParentEntityId(attr.getParent().getInternalId());
 		item.setNodeIndex(attr.getIndex());

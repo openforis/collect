@@ -32,6 +32,11 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_CLEANSING_STEP_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_cleansing_step_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>collect.ofc_data_error_query_group_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_ERROR_QUERY_GROUP_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_error_query_group_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>collect.ofc_data_error_query_id_seq</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_ERROR_QUERY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_error_query_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

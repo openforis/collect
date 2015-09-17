@@ -16,8 +16,8 @@ public class DataErrorReport extends PersistedSurveyObject {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private int queryId;
-	private DataErrorQuery query;
+	private int queryGroupId;
+	private DataErrorQueryGroup queryGroup;
 	private List<DataErrorReportItem> items = new ArrayList<DataErrorReportItem>();
 	
 	public DataErrorReport(CollectSurvey survey) {
@@ -36,23 +36,23 @@ public class DataErrorReport extends PersistedSurveyObject {
 		items.remove(item);
 	}
 	
-	public int getQueryId() {
-		return queryId;
+	public int getQueryGroupId() {
+		return queryGroupId;
 	}
 	
-	public void setQueryId(int queryId) {
-		this.queryId = queryId;
+	public void setQueryGroupId(int queryGroupId) {
+		this.queryGroupId = queryGroupId;
 	}
 	
-	public DataErrorQuery getQuery() {
-		return query;
+	public DataErrorQueryGroup getQueryGroup() {
+		return queryGroup;
+	}
+	
+	public void setQueryGroup(DataErrorQueryGroup queryGroup) {
+		this.queryGroup = queryGroup;
+		this.queryGroupId = queryGroup.getId();
 	}
 
-	public void setQuery(DataErrorQuery query) {
-		this.query = query;
-		this.queryId = query.getId();
-	}
-	
 	public List<DataErrorReportItem> getItems() {
 		return items;
 	}

@@ -72,7 +72,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataErrorQuery query = dataErrorQueryManager.loadById(survey, queryId);
 		generationJob = collectJobManager.createJob(DataErrorReportGeneratorJob.class);
-		generationJob.setErrorQuery(query);
+		generationJob.setErrorQueryGroup(errorQueryGroup);
 		generationJob.setRecordStep(recordStep);
 		collectJobManager.start(generationJob);
 		Response response = new Response();
