@@ -1,27 +1,39 @@
 package org.openforis.collect.datacleansing.controller;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
-import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportGeneratorJob;
 import org.openforis.collect.datacleansing.DataErrorReportItem;
+import org.openforis.collect.datacleansing.DataQueryResultItem;
 import org.openforis.collect.datacleansing.form.DataErrorReportForm;
 import org.openforis.collect.datacleansing.form.DataErrorReportItemForm;
-import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
+import org.openforis.collect.datacleansing.manager.DataErrorQueryGroupManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
-import org.openforis.collect.web.controller.PaginatedResponse;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
+import org.openforis.collect.web.controller.PaginatedResponse;
+import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.web.Response;
+import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -39,8 +51,7 @@ import org.springframework.web.context.WebApplicationContext;
 public class DataErrorReportController extends AbstractSurveyObjectEditFormController<DataErrorReport, DataErrorReportForm, DataErrorReportManager> {
 	
 	@Autowired
-	@Qualifier("dataErrorQueryManager")
-	private DataErrorQueryManager dataErrorQueryManager;
+	private DataErrorQueryGroupManager dataErrorQueryGroupManager;
 	@Autowired
 	private CollectJobManager collectJobManager;
 	
@@ -68,11 +79,11 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	
 	@RequestMapping(value="generate.json", method = RequestMethod.POST)
 	public @ResponseBody
-	Response generate(@RequestParam int queryId, @RequestParam Step recordStep) {
+	Response generate(@RequestParam int queryGroupId, @RequestParam Step recordStep) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
-		DataErrorQuery query = dataErrorQueryManager.loadById(survey, queryId);
+		DataErrorQueryGroup queryGroup = dataErrorQueryGroupManager.loadById(survey, queryGroupId);
 		generationJob = collectJobManager.createJob(DataErrorReportGeneratorJob.class);
-		generationJob.setErrorQueryGroup(errorQueryGroup);
+		generationJob.setErrorQueryGroup(queryGroup);
 		generationJob.setRecordStep(recordStep);
 		collectJobManager.start(generationJob);
 		Response response = new Response();
@@ -83,7 +94,9 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	public void export(HttpServletResponse response, @PathVariable int reportId) throws Exception {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataErrorReport report = itemManager.loadById(survey, reportId);
-		CSVWriterDataErrorItemProcessor itemProcessor = new CSVWriterDataErrorItemProcessor(report);
+		
+		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinitions().get(0);
+		CSVWriterDataErrorItemProcessor itemProcessor = new CSVWriterDataErrorItemProcessor(rootEntityDefinition);
 		itemProcessor.init();
 		int count = itemManager.countItems(report);
 		int itemsPerPage = 100;
@@ -133,16 +146,62 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		return new Response();
 	}
 	
-	private static class CSVWriterDataErrorItemProcessor extends CSVWriterDataQueryResultItemProcessor {
+	private static class CSVWriterDataErrorItemProcessor implements Closeable {
 		
-		//input
-//		private DataErrorReport report;
+		private CsvWriter csvWriter;
 		
-		public CSVWriterDataErrorItemProcessor(DataErrorReport report) {
-			super(report.getQuery().getQuery());
-//			this.report = report;
+		//output
+		private File tempFile;
+
+		private EntityDefinition rootEntityDefinition;
+		
+		public CSVWriterDataErrorItemProcessor(EntityDefinition rootEntityDefinition) {
+			this.rootEntityDefinition = rootEntityDefinition;
 		}
 		
+		public void init() throws Exception {
+			tempFile = File.createTempFile("collect-data-error-report", ".csv");
+			csvWriter = new CsvWriter(new FileOutputStream(tempFile), IOUtils.UTF_8, ',', '"');
+			writeCSVHeader();
+		}
+		
+		private void writeCSVHeader() {
+			List<String> headers = new ArrayList<String>();
+			List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
+			for (AttributeDefinition def : keyAttributeDefinitions) {
+				String keyLabel = def.getLabel(Type.INSTANCE);
+				if (StringUtils.isBlank(keyLabel)) {
+					keyLabel = def.getName();
+				}
+				headers.add(keyLabel);
+			}
+			headers.add("Path");
+			csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
+		}
+
+		public void process(DataQueryResultItem item) {
+			List<String> lineValues = new ArrayList<String>();
+			lineValues.addAll(item.getRecordKeyValues());
+			lineValues.add(item.extractNodePath());
+			AttributeDefinition attrDef = item.getAttributeDefinition();
+			Value value = item.extractAttributeValue();
+			Map<String, Object> valueMap = value == null ? null : value.toMap();
+			List<String> fieldNames = attrDef.getFieldNames();
+			for (String fieldName : fieldNames) {
+				Object fieldValue = valueMap == null ? null : valueMap.get(fieldName);
+				lineValues.add(fieldValue == null ? "": fieldValue.toString());
+			}
+			csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
+		}
+		
+		@Override
+		public void close() throws IOException {
+			csvWriter.close();
+		}
+
+		public File getOutputFile() {
+			return tempFile;
+		}
 	}
 	
 }

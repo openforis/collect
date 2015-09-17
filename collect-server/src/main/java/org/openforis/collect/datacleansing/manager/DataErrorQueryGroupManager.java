@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.openforis.collect.datacleansing.DataCleansingChain;
-import org.openforis.collect.datacleansing.DataCleansingStep;
+import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorQueryGroup;
-import org.openforis.collect.datacleansing.persistence.DataCleansingChainDao;
-import org.openforis.collect.datacleansing.persistence.DataErrorQueryDao;
+import org.openforis.collect.datacleansing.persistence.DataErrorQueryGroupDao;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,52 +25,52 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataErrorQueryGroupManager extends AbstractSurveyObjectManager<DataErrorQueryGroup, DataErrorQueryGroupDao> {
 
 	@Autowired
-	private DataCleansingStepManager dataCleansingStepManager;
+	private DataErrorQueryManager dataErrorQueryManager;
 	
 	@Override
 	@Autowired
-	@Qualifier("dataCleansingChainDao")
-	public void setDao(DataCleansingChainDao dao) {
+	@Qualifier("dataErrorQueryGroupDao")
+	public void setDao(DataErrorQueryGroupDao dao) {
 		super.setDao(dao);
 	}
 	
-	public Set<DataCleansingChain> loadByStep(DataCleansingStep step) {
-		Set<DataCleansingChain> chains = dao.loadChainsByStep(step);
-		initializeItems(chains);
-		return chains;
+	public Set<DataErrorQueryGroup> loadByStep(DataErrorQuery query) {
+		Set<DataErrorQueryGroup> groups = dao.loadGroupsByQuery(query);
+		initializeItems(groups);
+		return groups;
 	}
 	
 	@Override
 	@Transactional
-	public void save(DataCleansingChain chain) {
-		List<Integer> stepIds = new ArrayList<Integer>();
-		for (DataCleansingStep step : chain.getSteps()) {
-			stepIds.add(step.getId());
+	public void save(DataErrorQueryGroup group) {
+		List<Integer> queryIds = new ArrayList<Integer>();
+		for (DataErrorQuery query : group.getQueries()) {
+			queryIds.add(query.getId());
 		}
-		if (chain.getId() != null) {
-			dao.deleteStepAssociations(chain);
+		if (group.getId() != null) {
+			dao.deleteQueryAssociations(group);
 		}
-		super.save(chain);
+		super.save(group);
 		
-		dao.insertStepAssociations(chain, stepIds);
+		dao.insertQueryAssociations(group, queryIds);
 		
-		initializeItem(chain);
+		initializeItem(group);
 	}
 	
 	@Override
-	public void delete(DataCleansingChain chain) {
-		dao.deleteStepAssociations(chain);
+	public void delete(DataErrorQueryGroup chain) {
+		dao.deleteQueryAssociations(chain);
 		super.delete(chain);
 	}
 	
 	@Override
-	protected void initializeItem(DataCleansingChain chain) {
-		super.initializeItem(chain);
-		chain.removeAllSteps();
-		List<Integer> stepIds = dao.loadStepIds(chain);
-		for (Integer stepId : stepIds) {
-			DataCleansingStep step = dataCleansingStepManager.loadById((CollectSurvey) chain.getSurvey(), stepId);
-			chain.addStep(step);
+	protected void initializeItem(DataErrorQueryGroup group) {
+		super.initializeItem(group);
+		group.removeAllQueries();
+		List<Integer> queryIds = dao.loadQueryIds(group);
+		for (Integer queryId : queryIds) {
+			DataErrorQuery query = dataErrorQueryManager.loadById((CollectSurvey) group.getSurvey(), queryId);
+			group.addQuery(query);
 		}
 	}
 	

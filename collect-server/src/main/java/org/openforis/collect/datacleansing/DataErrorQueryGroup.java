@@ -28,6 +28,16 @@ public class DataErrorQueryGroup extends PersistedSurveyObject {
 		super(survey, uuid);
 	}
 	
+	public void addQuery(DataErrorQuery query) {
+		this.queries.add(query);
+		this.queryIds.add(query.getId());
+	}
+	
+	public void removeAllQueries() {
+		this.queries.clear();
+		this.queryIds.clear();
+	}
+	
 	public List<DataErrorQuery> getQueries() {
 		return queries;
 	}
