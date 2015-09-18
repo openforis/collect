@@ -1,8 +1,7 @@
 package org.openforis.collect.datacleansing.form;
 
-import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
-import org.openforis.collect.datacleansing.DataErrorType;
 
 /**
  * 
@@ -12,9 +11,8 @@ import org.openforis.collect.datacleansing.DataErrorType;
 public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> {
 
 	//calculated members
-	private String typeCode;
-	private String queryTitle;
-	private DataErrorQueryForm errorQuery;
+	private String queryGroupTitle;
+	private DataErrorQueryGroupForm errorQueryGroup;
 	private int itemCount;
 	
 	public DataErrorReportForm() {
@@ -23,23 +21,17 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 
 	public DataErrorReportForm(DataErrorReport obj) {
 		super(obj);
-		DataErrorQuery dataErrorQuery = obj.getQuery();
-		this.errorQuery = new DataErrorQueryForm(dataErrorQuery);
-		this.queryTitle = this.errorQuery.getQueryTitle();
-		DataErrorType type = dataErrorQuery.getType();
-		this.typeCode = type.getCode();
+		DataErrorQueryGroup dataErrorQueryGroup = obj.getQueryGroup();
+		this.errorQueryGroup = new DataErrorQueryGroupForm(dataErrorQueryGroup);
+		this.queryGroupTitle = this.errorQueryGroup.getTitle();
 	}
 
-	public String getTypeCode() {
-		return typeCode;
+	public String getQueryGroupTitle() {
+		return queryGroupTitle;
 	}
 	
-	public String getQueryTitle() {
-		return queryTitle;
-	}
-	
-	public DataErrorQueryForm getErrorQuery() {
-		return errorQuery;
+	public DataErrorQueryGroupForm getErrorQueryGroup() {
+		return errorQueryGroup;
 	}
 	
 	public int getItemCount() {

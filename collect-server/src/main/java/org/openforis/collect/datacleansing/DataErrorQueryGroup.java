@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 
 /**
@@ -16,6 +17,8 @@ public class DataErrorQueryGroup extends PersistedSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 	
+	private String title;
+	private String description;
 	private List<Integer> queryIds = new ArrayList<Integer>();
 	
 	private transient List<DataErrorQuery> queries = new ArrayList<DataErrorQuery>();
@@ -28,6 +31,11 @@ public class DataErrorQueryGroup extends PersistedSurveyObject {
 		super(survey, uuid);
 	}
 	
+	public DataErrorQuery getErrorQuery(int id) {
+		DataErrorQuery query = CollectionUtils.findItem(queries, id);
+		return query;
+	}
+	
 	public void addQuery(DataErrorQuery query) {
 		this.queries.add(query);
 		this.queryIds.add(query.getId());
@@ -38,6 +46,22 @@ public class DataErrorQueryGroup extends PersistedSurveyObject {
 		this.queryIds.clear();
 	}
 	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public List<DataErrorQuery> getQueries() {
 		return queries;
 	}

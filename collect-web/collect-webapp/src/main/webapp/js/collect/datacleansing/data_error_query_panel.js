@@ -16,6 +16,7 @@ Collect.DataCleansing.DataErrorQueryPanelController.prototype.getDataGridOptions
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
 			{field: "typeCode", title: "Error Type", sortable: true, width: 50},
+			{field: "severity", title: "Severity", sortable: true, width: 50},
 			{field: "queryTitle", title: "Query Title", sortable: true, width: 400},
 			{field: "queryDescription", title: "Query Description", sortable: false, width: 400},
 			$this.createGridItemDeleteColumn()

@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataErrorReport extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord> {
 
-	private static final long serialVersionUID = 1484248637;
+	private static final long serialVersionUID = -1402352729;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_error_report</code>
@@ -37,14 +37,14 @@ public class OfcDataErrorReport extends org.jooq.impl.TableImpl<org.openforis.co
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, java.lang.Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>collect.ofc_data_error_report.report_id</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, java.lang.Integer> REPORT_ID = createField("report_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
-
-	/**
 	 * The column <code>collect.ofc_data_error_report.uuid</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, java.lang.String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR.length(50), this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_error_report.query_group_id</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorReportRecord, java.lang.Integer> QUERY_GROUP_ID = createField("query_group_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_error_report.creation_date</code>.

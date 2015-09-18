@@ -29,6 +29,8 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	@Autowired
 	private DataErrorQueryManager dataErrorQueryManager;
 	@Autowired
+	private DataErrorQueryGroupManager dataErrorQueryGroupManager;
+	@Autowired
 	private DataErrorTypeManager dataErrorTypeManager;
 	@Autowired
 	private DataCleansingStepManager dataCleansingStepManager;
@@ -51,6 +53,7 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 				dataQueryManager.loadBySurvey(survey), 
 				dataErrorTypeManager.loadBySurvey(survey), 
 				dataErrorQueryManager.loadBySurvey(survey), 
+				dataErrorQueryGroupManager.loadBySurvey(survey),
 				dataCleansingStepManager.loadBySurvey(survey), 
 				dataCleansingChainManager.loadBySurvey(survey));
 		return metadata;
@@ -62,6 +65,7 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 		saveItems(dataQueryManager, survey, metadata.getDataQueries());
 		saveItems(dataErrorTypeManager, survey, metadata.getDataErrorTypes());
 		saveItems(dataErrorQueryManager, survey, metadata.getDataErrorQueries());
+		saveItems(dataErrorQueryGroupManager, survey, metadata.getDataErrorQueryGroups());
 		saveItems(dataCleansingStepManager, survey, metadata.getCleansingSteps());
 		saveItems(dataCleansingChainManager, survey, metadata.getCleansingChains());
 	}

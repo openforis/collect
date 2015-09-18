@@ -34,7 +34,7 @@ public class DataErrorQueryGroupManager extends AbstractSurveyObjectManager<Data
 		super.setDao(dao);
 	}
 	
-	public Set<DataErrorQueryGroup> loadByStep(DataErrorQuery query) {
+	public Set<DataErrorQueryGroup> loadByQuery(DataErrorQuery query) {
 		Set<DataErrorQueryGroup> groups = dao.loadGroupsByQuery(query);
 		initializeItems(groups);
 		return groups;

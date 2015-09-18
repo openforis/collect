@@ -43,7 +43,7 @@ public class DataErrorQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<Da
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorQueryGroupRecord> select = 
 			dsl.selectFrom(OFC_DATA_ERROR_QUERY_GROUP)
-//				.where(OFC_DATA_ERROR_QUERY_GROUP.SURVEY_ID.eq(survey.getId()))
+				.where(OFC_DATA_ERROR_QUERY_GROUP.SURVEY_ID.eq(survey.getId()))
 			;
 		
 		Result<OfcDataErrorQueryGroupRecord> result = select.fetch();
@@ -116,22 +116,22 @@ public class DataErrorQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<Da
 		@Override
 		protected void fromRecord(Record r, DataErrorQueryGroup o) {
 			super.fromRecord(r, o);
-//			o.setCreationDate(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.CREATION_DATE));
-//			o.setDescription(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.DESCRIPTION));
-//			o.setModifiedDate(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.MODIFIED_DATE));
-//			o.setTitle(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.TITLE));
-//			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.UUID)));
+			o.setCreationDate(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.CREATION_DATE));
+			o.setDescription(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.DESCRIPTION));
+			o.setModifiedDate(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.MODIFIED_DATE));
+			o.setTitle(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.TITLE));
+			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_QUERY_GROUP.UUID)));
 		}
 		
 		@Override
 		protected void fromObject(DataErrorQueryGroup o, StoreQuery<?> q) {
 			super.fromObject(o, q);
-//			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.SURVEY_ID, o.getSurvey().getId());
-//			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.CREATION_DATE, toTimestamp(o.getCreationDate()));
-//			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.DESCRIPTION, o.getDescription());
-//			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.MODIFIED_DATE, toTimestamp(o.getCreationDate()));
-//			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.TITLE, o.getTitle());
-//			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.UUID, o.getUuid().toString());
+			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.CREATION_DATE, toTimestamp(o.getCreationDate()));
+			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.DESCRIPTION, o.getDescription());
+			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
+			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.SURVEY_ID, o.getSurvey().getId());
+			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.TITLE, o.getTitle());
+			q.addValue(OFC_DATA_ERROR_QUERY_GROUP.UUID, o.getUuid().toString());
 		}
 
 	}

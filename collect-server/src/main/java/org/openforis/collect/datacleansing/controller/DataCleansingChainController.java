@@ -29,8 +29,6 @@ import org.springframework.web.context.WebApplicationContext;
 public class DataCleansingChainController extends AbstractSurveyObjectEditFormController<DataCleansingChain, DataCleansingChainForm, DataCleansingChainManager> {
 	
 	@Autowired
-	private DataCleansingChainManager dataCleansingChainManager;
-	@Autowired
 	private CollectJobManager collectJobManager;
 	@Autowired
 	private DataCleansingChainValidator dataCleansingChainValidator;
@@ -61,7 +59,7 @@ public class DataCleansingChainController extends AbstractSurveyObjectEditFormCo
 	public @ResponseBody
 	Response run(@RequestParam int chainId, @RequestParam Step recordStep) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
-		DataCleansingChain chain = dataCleansingChainManager.loadById(survey, chainId);
+		DataCleansingChain chain = itemManager.loadById(survey, chainId);
 		DataCleansingChainExecutorJob job = collectJobManager.createJob(DataCleansingChainExecutorJob.class);
 		job.setChain(chain);
 		job.setRecordStep(recordStep);

@@ -51,10 +51,21 @@
       "modifiedDate": "2015-08-27T18:45:01.741+02:00",
       "typeId": 1,
       "queryId": 1,
+      "severity": "ERROR",
       "typeCode": "E1",
       "queryTitle": "Empty sampling unit notes",
       "queryDescription": "",
       "prettyFormatTitle": "Error type: E1 - Data Query: Empty sampling unit notes"
+    }
+  ],
+  "dataErrorQueryGroups": [
+    {
+      "id": 5,
+      "uuid": "89b9682f-9267-41da-80e2-f8a6444f3cae",
+      "title": "Errors",
+      "creationDate": "2015-08-27T17:40:01.741+02:00",
+      "modifiedDate": "2015-08-27T18:45:01.741+02:00",
+      "queryIds": [5]
     }
   ],
   "cleansingSteps": [

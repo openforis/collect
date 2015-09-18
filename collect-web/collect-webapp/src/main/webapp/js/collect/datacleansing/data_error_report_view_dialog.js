@@ -3,7 +3,7 @@ Collect.DataErrorReportViewDialogController = function() {
 	this.contentUrl = "datacleansing/data_error_report_view_dialog.html";
 	this.itemEditService = collect.dataErrorReportService;
 	this.queries = null;
-	this.querySelectPicker = null;
+	this.queryGroupSelectPicker = null;
 	this.recordStepSelectPicker = null;
 	this.reportItemsDataGrid = null;
 };
@@ -29,20 +29,17 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
 		{
-			var select = $this.content.find('select[name="queryId"]');
-			OF.UI.Forms.populateSelect(select, $this.queries, "id", "prettyFormatTitle", true);
+			var select = $this.content.find('select[name="queryGroupId"]');
+			OF.UI.Forms.populateSelect(select, $this.queries, "id", "title", true);
 			select.selectpicker();
-			$this.querySelectPicker = select.data().selectpicker;
+			$this.queryGroupSelectPicker = select.data().selectpicker;
 		}
-//		{
-//			var select = $this.content.find('select[name="recordStep"]');
-//			OF.UI.Forms.populateSelect(select, [{name: "ENTRY", label: "Data Entry"}, 
-//			                                    {name: "CLEANSING", label: "Data Cleansing"},
-//			                                    {name: "ANALYSIS", label: "Data Analysis"}
-//			                                    ], "name", "label");
-//			select.selectpicker();
-//			$this.recordStepSelectPicker = select.data().selectpicker;
-//		}
+		{
+			var select = $this.content.find('select[name="recordStep"]');
+			OF.UI.Forms.populateSelect(select, Collect.DataCleansing.WORKFLOW_STEPS, "name", "label");
+			select.selectpicker();
+			$this.recordStepSelectPicker = select.data().selectpicker;
+		}
 		{
 			var columns = [
                {field: "selected", title: "", radio: true},
@@ -85,7 +82,7 @@ Collect.DataErrorReportViewDialogController.prototype.extractFormObject = functi
 Collect.DataErrorReportViewDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
-		$this.querySelectPicker.val($this.item.errorQuery.id);
+		$this.queryGroupSelectPicker.val($this.item.errorQueryGroup.id);
 		callback();
 	});
 };

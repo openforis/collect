@@ -5,9 +5,10 @@ package org.openforis.collect.datacleansing.manager;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.openforis.collect.datacleansing.DataErrorQuery;
-import org.openforis.collect.datacleansing.DataErrorReport;
+import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorType;
 import org.openforis.collect.datacleansing.DataQuery;
 import org.openforis.collect.datacleansing.persistence.DataErrorQueryDao;
@@ -30,7 +31,7 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 	@Autowired
 	private DataQueryManager dataQueryManager;
 	@Autowired
-	private DataErrorReportManager dataErrorReportManager;
+	private DataErrorQueryGroupManager dataErrorQueryGroupManager;
 	@Autowired
 	private MessageSource messageSource;
 	
@@ -43,12 +44,12 @@ public class DataErrorQueryManager extends AbstractSurveyObjectManager<DataError
 	
 	@Override
 	public void delete(DataErrorQuery query) {
-		List<DataErrorReport> reports = dataErrorReportManager.loadByQuery(query);
-		if (reports.isEmpty()) {
+		Set<DataErrorQueryGroup> groups = dataErrorQueryGroupManager.loadByQuery(query);
+		if (groups.isEmpty()) {
 			super.delete(query);
 		} else {
 			String queryCompleteTitle = query.getType().getCode() + " - " + query.getQuery().getTitle();
-			String message = messageSource.getMessage("data_error_query.delete.error.used_by_report", new String[]{queryCompleteTitle}, Locale.ENGLISH);
+			String message = messageSource.getMessage("data_error_query.delete.error.used_by_query_group", new String[]{queryCompleteTitle}, Locale.ENGLISH);
 			throw new IllegalStateException(message);
 		}
 	}

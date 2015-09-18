@@ -5,8 +5,8 @@ Collect.DataErrorReportService = function() {
 
 Collect.DataErrorReportService.prototype = Object.create(Collect.AbstractService.prototype);
 
-Collect.DataErrorReportService.prototype.generateReport = function(queryId, recordStep, onSuccess, onError) {
-	this.send("generate.json", {queryId: queryId, recordStep: recordStep}, "POST", onSuccess, onError);
+Collect.DataErrorReportService.prototype.generateReport = function(queryGroupId, recordStep, onSuccess, onError) {
+	this.send("generate.json", {queryGroupId: queryGroupId, recordStep: recordStep}, "POST", onSuccess, onError);
 };
 
 Collect.DataErrorReportService.prototype.exportToCSV = function(reportId) {

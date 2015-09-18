@@ -5,6 +5,7 @@ Collect = function() {
 	this.dataErrorTypeService = new Collect.DataErrorTypeService();
 	this.dataQueryService = new Collect.DataQueryService();
 	this.dataErrorQueryService = new Collect.DataErrorQueryService();
+	this.dataErrorQueryGroupService = new Collect.DataErrorQueryGroupService();
 	this.dataErrorReportService = new Collect.DataErrorReportService();
 	this.geoDataService = new Collect.GeoDataService();
 	this.dataCleansingStepService = new Collect.DataCleansingStepService();

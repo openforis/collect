@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.datacleansing.DataCleansingStepValue.UpdateType;
+import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -208,6 +209,44 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 			return this;
 		}
 		
+		public DataErrorQueryBuilder severity(Severity severity) {
+			obj.setSeverity(severity);
+			return this;
+		}
+		
+	}
+	
+	public static class DataErrorQueryGroupBuilder extends PersistedSurveyObjectBuilder<DataErrorQueryGroup> {
+		
+		public DataErrorQueryGroupBuilder(CollectSurvey survey) {
+			super(survey, DataErrorQueryGroup.class);
+		}
+
+		@Override
+		public DataErrorQueryGroupBuilder id(Integer id) {
+			return (DataErrorQueryGroupBuilder) super.id(id);
+		}
+		
+		@Override
+		public DataErrorQueryGroupBuilder uuid(String uuid) {
+			return (DataErrorQueryGroupBuilder) super.uuid(uuid);
+		}
+		
+		@Override
+		public DataErrorQueryGroupBuilder creationDate(Date date) {
+			return (DataErrorQueryGroupBuilder) super.creationDate(date);
+		}
+		
+		@Override
+		public DataErrorQueryGroupBuilder modifiedDate(Date date) {
+			return (DataErrorQueryGroupBuilder) super.modifiedDate(date);
+		}
+		
+		public DataErrorQueryGroupBuilder query(DataErrorQuery query) {
+			obj.addQuery(query);
+			return this;
+		}
+		
 	}
 
 	public static class DataCleansingStepBuilder extends PersistedSurveyObjectBuilder<DataCleansingStep> {
@@ -344,6 +383,8 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 					metadata.getDataErrorTypes().add((DataErrorType) builder.build());
 				} else if (builder instanceof DataErrorQueryBuilder) {
 					metadata.getDataErrorQueries().add((DataErrorQuery) builder.build());
+				} else if (builder instanceof DataErrorQueryGroupBuilder) {
+					metadata.getDataErrorQueryGroups().add((DataErrorQueryGroup) builder.build());
 				} else if (builder instanceof DataCleansingStepBuilder) {
 					metadata.getCleansingSteps().add((DataCleansingStep) builder.build());
 				} else if (builder instanceof DataCleansingChainBuilder) {
@@ -369,6 +410,10 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 	
 	public DataErrorQueryBuilder dataErrorQuery() {
 		return new DataErrorQueryBuilder(survey);
+	}
+	
+	public DataErrorQueryGroupBuilder dataErrorQueryGroup() {
+		return new DataErrorQueryGroupBuilder(survey);
 	}
 	
 	public DataCleansingStepBuilder dataCleansingStep() {

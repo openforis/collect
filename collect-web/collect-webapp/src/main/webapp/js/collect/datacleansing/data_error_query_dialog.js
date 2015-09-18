@@ -6,6 +6,9 @@ Collect.DataErrorQueryDialogController = function() {
 	this.errorTypeSelectPicker = null;
 	this.queries = null;
 	this.querySelectPicker = null;
+	this.severitySelectPicker = null;
+	this.severities = [{code: "ERROR", label: "Error"}, 
+	                   {code: "WARNING", label: "Warning"}];
 };
 
 Collect.DataErrorQueryDialogController.prototype = Object.create(Collect.AbstractItemEditDialogController.prototype);
@@ -37,6 +40,12 @@ Collect.DataErrorQueryDialogController.prototype.initFormElements = function(cal
 			select.selectpicker();
 			$this.errorTypeSelectPicker = select.data().selectpicker;
 		}
+		{//init severity select picker
+			var select = $this.content.find('select[name="severity"]');
+			OF.UI.Forms.populateSelect(select, $this.severities, "code", "label");
+			select.selectpicker();
+			$this.severitySelectPicker = select.data().selectpicker;
+		}
 		{//init query select picker
 			var select = $this.content.find('select[name="queryId"]');
 			OF.UI.Forms.populateSelect(select, $this.queries, "id", "title", true);
@@ -51,6 +60,7 @@ Collect.DataErrorQueryDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
 		$this.errorTypeSelectPicker.val($this.item.typeId);
+		$this.severitySelectPicker.val($this.item.severity);
 		$this.querySelectPicker.val($this.item.queryId);
 		callback();
 	});

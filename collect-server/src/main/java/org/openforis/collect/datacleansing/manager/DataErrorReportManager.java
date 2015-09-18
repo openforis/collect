@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportItem;
 import org.openforis.collect.datacleansing.persistence.DataErrorReportDao;
@@ -30,7 +30,7 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 	@Autowired
 	private RecordManager recordManager;
 	@Autowired
-	private DataErrorQueryManager errorQueryManager;
+	private DataErrorQueryGroupManager errorQueryGroupManager;
 	@Autowired
 	private DataErrorReportItemDao errorReportItemDao;
 
@@ -53,8 +53,8 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 		return loadItems(report, null, null);
 	}
 	
-	public List<DataErrorReport> loadByQuery(DataErrorQuery query) {
-		List<DataErrorReport> reports = dao.loadByQuery(query);
+	public List<DataErrorReport> loadByQueryGroup(DataErrorQueryGroup queryGroup) {
+		List<DataErrorReport> reports = dao.loadByQueryGroup(queryGroup);
 		initializeItems(reports);
 		return reports;
 	}
@@ -78,12 +78,13 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 	@Override
 	protected void initializeItem(DataErrorReport i) {
 		super.initializeItem(i);
-		initQuery(i);
+		initQueryGroup(i);
 	}
 	
-	private void initQuery(DataErrorReport report) {
-		DataErrorQuery query = errorQueryManager.loadById((CollectSurvey) report.getSurvey(), report.getQueryId());
-		report.setQuery(query);
+	private void initQueryGroup(DataErrorReport report) {
+		DataErrorQueryGroup queryGroup = errorQueryGroupManager.loadById(
+				(CollectSurvey) report.getSurvey(), report.getQueryGroupId());
+		report.setQueryGroup(queryGroup);
 	}
 
 }

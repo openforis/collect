@@ -11,6 +11,8 @@ Collect.DataCleansing.DATA_ERROR_TYPE_SAVED = "dataErrorTypeSaved";
 Collect.DataCleansing.DATA_ERROR_TYPE_DELETED = "dataErrorTypeSaved";
 Collect.DataCleansing.DATA_ERROR_QUERY_SAVED = "dataErrorQuerySaved";
 Collect.DataCleansing.DATA_ERROR_QUERY_DELETED = "dataErrorQueryDeleted";
+Collect.DataCleansing.DATA_ERROR_QUERY_GROUP_SAVED = "dataErrorQueryGroupSaved";
+Collect.DataCleansing.DATA_ERROR_QUERY_GROUP_DELETED = "dataErrorQueryGroupDeleted";
 Collect.DataCleansing.DATA_ERROR_REPORT_CREATED = "dataErrorReportCreated";
 Collect.DataCleansing.DATA_ERROR_REPORT_DELETED = "dataErrorReportDeleted";
 Collect.DataCleansing.DATA_QUERY_SAVED = "dataQuerySaved";
@@ -28,6 +30,7 @@ Collect.DataCleansing.prototype.init = function() {
 	this.initDataErrorTypePanel();
 	this.initDataQueryPanel();
 	this.initDataErrorQueryPanel();
+	this.initDataErrorQueryGroupPanel();
 	this.initDataCleansingStepPanel();
 	this.initDataCleansingChainPanel();
 	this.initDataErrorReportPanel();
@@ -77,6 +80,8 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 		$this.dataErrorTypePanel.refreshDataGrid();
 		$this.dataQueryPanel.refreshDataGrid();
 		$this.dataErrorQueryPanel.refreshDataGrid();
+		$this.dataErrorQueryGroupPanel.refreshDataGrid();
+		$this.dataErrorQueryGroupPanel.refreshDataGrid();
 		$this.dataErrorReportPanel.refreshDataGrid();
 		$this.dataCleansingStepPanel.refreshDataGrid();
 		$this.dataCleansingChainPanel.refreshDataGrid();
@@ -93,10 +98,18 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 	});
 	EventBus.addEventListener(Collect.DataCleansing.DATA_ERROR_QUERY_SAVED, function() {
 		$this.dataErrorQueryPanel.refreshDataGrid();
-		$this.dataErrorReportPanel.refreshDataGrid();
+		$this.dataErrorQueryGroupPanel.refreshDataGrid();
 	});
 	EventBus.addEventListener(Collect.DataCleansing.DATA_ERROR_QUERY_DELETED, function() {
 		$this.dataErrorQueryPanel.refreshDataGrid();
+		$this.dataErrorQueryGroupPanel.refreshDataGrid();
+	});
+	EventBus.addEventListener(Collect.DataCleansing.DATA_ERROR_QUERY_GROUP_SAVED, function() {
+		$this.dataErrorQueryGroupPanel.refreshDataGrid();
+		$this.dataErrorReportPanel.refreshDataGrid();
+	});
+	EventBus.addEventListener(Collect.DataCleansing.DATA_ERROR_QUERY_GROUP_DELETED, function() {
+		$this.dataErrorQueryGroupPanel.refreshDataGrid();
 		$this.dataErrorReportPanel.refreshDataGrid();
 	});
 	EventBus.addEventListener(Collect.DataCleansing.DATA_ERROR_REPORT_CREATED, function() {
@@ -108,6 +121,7 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 	EventBus.addEventListener(Collect.DataCleansing.DATA_QUERY_SAVED, function() {
 		$this.dataQueryPanel.refreshDataGrid();
 		$this.dataErrorQueryPanel.refreshDataGrid();
+		$this.dataErrorQueryGroupPanel.refreshDataGrid();
 		$this.dataErrorReportPanel.refreshDataGrid();
 		$this.dataCleansingStepPanel.refreshDataGrid();
 		$this.dataCleansingChainPanel.refreshDataGrid();
@@ -115,6 +129,7 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 	EventBus.addEventListener(Collect.DataCleansing.DATA_QUERY_DELETED, function() {
 		$this.dataQueryPanel.refreshDataGrid();
 		$this.dataErrorQueryPanel.refreshDataGrid();
+		$this.dataErrorQueryGroupPanel.refreshDataGrid();
 		$this.dataErrorReportPanel.refreshDataGrid();
 		$this.dataCleansingStepPanel.refreshDataGrid();
 		$this.dataCleansingChainPanel.refreshDataGrid();
@@ -148,6 +163,11 @@ Collect.DataCleansing.prototype.initDataQueryPanel = function() {
 Collect.DataCleansing.prototype.initDataErrorQueryPanel = function() {
 	this.dataErrorQueryPanel = new Collect.DataCleansing.DataErrorQueryPanelController($("#data-error-query-panel"));
 	this.dataErrorQueryPanel.init();
+};
+
+Collect.DataCleansing.prototype.initDataErrorQueryGroupPanel = function() {
+	this.dataErrorQueryGroupPanel = new Collect.DataCleansing.DataErrorQueryGroupPanelController($("#data-error-query-group-panel"));
+	this.dataErrorQueryGroupPanel.init();
 };
 
 Collect.DataCleansing.prototype.initDataErrorReportPanel = function() {

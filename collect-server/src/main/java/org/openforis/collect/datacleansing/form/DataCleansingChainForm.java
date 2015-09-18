@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
+import org.openforis.commons.web.Forms;
 
 /**
  * 
@@ -27,11 +28,9 @@ public class DataCleansingChainForm extends DataCleansingItemForm<DataCleansingC
 	public DataCleansingChainForm(DataCleansingChain chain) {
 		super(chain);
 		List<DataCleansingStep> steps = chain.getSteps();
-		this.steps = new ArrayList<DataCleansingStepForm>(steps.size());
+		this.steps = Forms.toForms(steps, DataCleansingStepForm.class);
 		this.stepIds = new ArrayList<Integer>(steps.size());
 		for (DataCleansingStep step : steps) {
-			DataCleansingStepForm stepForm = new DataCleansingStepForm(step);
-			this.steps.add(stepForm);
 			this.stepIds.add(step.getId());
 		}
 	}

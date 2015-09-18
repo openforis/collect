@@ -6,18 +6,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.util.IOUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
 import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportGeneratorJob;
 import org.openforis.collect.datacleansing.DataErrorReportItem;
-import org.openforis.collect.datacleansing.DataQueryResultItem;
 import org.openforis.collect.datacleansing.form.DataErrorReportForm;
 import org.openforis.collect.datacleansing.form.DataErrorReportItemForm;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryGroupManager;
@@ -33,7 +32,6 @@ import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
-import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -154,6 +152,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		private File tempFile;
 
 		private EntityDefinition rootEntityDefinition;
+
+		private RecordReportInfo lastRecordReportInfo;
 		
 		public CSVWriterDataErrorItemProcessor(EntityDefinition rootEntityDefinition) {
 			this.rootEntityDefinition = rootEntityDefinition;
@@ -175,32 +175,84 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 				}
 				headers.add(keyLabel);
 			}
-			headers.add("Path");
+			headers.add("Errors");
+			headers.add("Warnings");
 			csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
 		}
 
-		public void process(DataQueryResultItem item) {
-			List<String> lineValues = new ArrayList<String>();
-			lineValues.addAll(item.getRecordKeyValues());
-			lineValues.add(item.extractNodePath());
-			AttributeDefinition attrDef = item.getAttributeDefinition();
-			Value value = item.extractAttributeValue();
-			Map<String, Object> valueMap = value == null ? null : value.toMap();
-			List<String> fieldNames = attrDef.getFieldNames();
-			for (String fieldName : fieldNames) {
-				Object fieldValue = valueMap == null ? null : valueMap.get(fieldName);
-				lineValues.add(fieldValue == null ? "": fieldValue.toString());
+		public void process(DataErrorReportItem item) {
+			if (lastRecordReportInfo != null && lastRecordReportInfo.getRecordId() != item.getRecordId()) {
+				writeLastRecordInfo();
 			}
+			if (lastRecordReportInfo == null) {
+				lastRecordReportInfo = new RecordReportInfo(item.getRecordId(), item.getRecordKeyValues());
+			} else {
+				String queryTitle = item.getQuery().getTitle();
+				if (item.getErrorQuery().getSeverity() == Severity.ERROR) {
+					lastRecordReportInfo.addError(queryTitle);
+				} else {
+					lastRecordReportInfo.addWarning(queryTitle);
+				}
+			}
+		}
+
+		private void writeLastRecordInfo() {
+			List<String> lineValues = new ArrayList<String>();
+			lineValues.addAll(lastRecordReportInfo.getKeyValues());
+			lineValues.add(StringUtils.join(lastRecordReportInfo.getErrors(), "\r\n;"));
+			lineValues.add(StringUtils.join(lastRecordReportInfo.getWarnings(), "\r\n;"));
 			csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
 		}
 		
 		@Override
 		public void close() throws IOException {
+			if (lastRecordReportInfo != null) {
+				writeLastRecordInfo();
+			}
 			csvWriter.close();
 		}
 
 		public File getOutputFile() {
 			return tempFile;
+		}
+		
+		private static class RecordReportInfo {
+			
+			private int recordId;
+			private List<String> keyValues;
+			private List<String> errors = new ArrayList<String>();
+			private List<String> warnings = new ArrayList<String>();
+			
+			public RecordReportInfo(int recordId, List<String> keyValues) {
+				super();
+				this.recordId = recordId;
+				this.keyValues = keyValues;
+			}
+			
+			public List<String> getKeyValues() {
+				return keyValues;
+			}
+			
+			public void addError(String error) {
+				this.errors.add(error);
+			}
+			
+			public void addWarning(String warning) {
+				this.warnings.add(warning);
+			}
+
+			public int getRecordId() {
+				return recordId;
+			}
+			
+			public List<String> getErrors() {
+				return errors;
+			}
+			
+			public List<String> getWarnings() {
+				return warnings;
+			}
+			
 		}
 	}
 	

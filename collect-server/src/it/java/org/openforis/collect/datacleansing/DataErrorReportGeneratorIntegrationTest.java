@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.junit.Test;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
+import org.openforis.collect.datacleansing.manager.DataErrorQueryGroupManager;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
 import org.openforis.collect.datacleansing.manager.DataErrorTypeManager;
@@ -41,6 +43,8 @@ public class DataErrorReportGeneratorIntegrationTest extends DataCleansingIntegr
 	@Autowired
 	private DataErrorQueryManager dataErrorQueryManager;
 	@Autowired
+	private DataErrorQueryGroupManager dataErrorQueryGroupManager;
+	@Autowired
 	private DataErrorReportManager dataErrorReportManager;
 	@Autowired
 	private RecordManager recordManager;
@@ -66,7 +70,7 @@ public class DataErrorReportGeneratorIntegrationTest extends DataCleansingIntegr
 	}
 	
 	@Test
-	public void testSimpleQuery() {
+	public void testSimpleErrorReport() {
 		EntityDefinition treeDef = (EntityDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree");
 		NumberAttributeDefinition dbhDef = (NumberAttributeDefinition) survey.getSchema().getDefinitionByPath("/cluster/plot/tree/dbh");
 		
@@ -82,12 +86,19 @@ public class DataErrorReportGeneratorIntegrationTest extends DataCleansingIntegr
 		DataErrorQuery dataErrorQuery = dataErrorQuery()
 			.type(invalidAttributeErrorType)
 			.query(query)
+			.severity(Severity.ERROR)
 			.build();
 		
 		dataErrorQueryManager.save(dataErrorQuery);
 		
+		DataErrorQueryGroup queryGroup = new DataErrorQueryGroup(survey);
+		queryGroup.setTitle("Simple query group");
+		queryGroup.addQuery(dataErrorQuery);
+		
+		dataErrorQueryGroupManager.save(queryGroup);
+		
 		DataErrorReportGeneratorJob job = jobManager.createJob(DataErrorReportGeneratorJob.class);
-		job.setErrorQuery(dataErrorQuery);
+		job.setErrorQueryGroup(queryGroup);
 		job.setRecordStep(Step.ENTRY);
 		jobManager.start(job, false);
 		DataErrorReport report = job.getReport();

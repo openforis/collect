@@ -15,10 +15,43 @@ public class DataErrorQuery extends PersistedSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 	
+	public enum Severity {
+		ERROR('e'), WARNING('w');
+		
+		private char code;
+
+		Severity(char code) {
+			this.code = code;
+		}
+		
+		public static Severity fromCode(String code) {
+			if (code == null || code.length() > 1) {
+				throw new IllegalArgumentException("Invalid code for Severity: " + code);
+			}
+			return fromCode(code.charAt(0));
+		}
+		
+		public static Severity fromCode(char code) {
+			Severity[] values = values();
+			for (Severity severity : values) {
+				if (severity.code == code) {
+					return severity;
+				}
+			}
+			throw new IllegalArgumentException("Severity with code '" + code + "' not found");
+		}
+		
+		public char getCode() {
+			return code;
+		}
+	}
+	
 	private Integer queryId;
-	private DataQuery query;
+	private Severity severity;
 	private Integer typeId;
-	private DataErrorType type;
+	
+	private transient DataErrorType type;
+	private transient DataQuery query;
 	
 	public DataErrorQuery(CollectSurvey survey) {
 		super(survey);
@@ -28,6 +61,14 @@ public class DataErrorQuery extends PersistedSurveyObject {
 		super(survey, uuid);
 	}
 
+	public Severity getSeverity() {
+		return severity;
+	}
+	
+	public void setSeverity(Severity severity) {
+		this.severity = severity;
+	}
+	
 	public Integer getQueryId() {
 		return query == null ? queryId: query.getId();
 	}

@@ -16,6 +16,8 @@ import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.SelectSeekStep1;
 import org.jooq.StoreQuery;
+import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.datacleansing.DataErrorReportItem;
 import org.openforis.collect.datacleansing.DataErrorReportItem.Status;
@@ -36,6 +38,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		OFC_DATA_ERROR_REPORT_ITEM.ID,
 		OFC_DATA_ERROR_REPORT_ITEM.NODE_INDEX,
 		OFC_DATA_ERROR_REPORT_ITEM.PARENT_ENTITY_ID,
+		OFC_DATA_ERROR_REPORT_ITEM.QUERY_ID,
 		OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID,
 		OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID,
 		OFC_DATA_ERROR_REPORT_ITEM.STATUS,
@@ -115,18 +118,25 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		
 		@Override
 		protected DataErrorReportItem newEntity() {
-			return new DataErrorReportItem(report);
+			throw new UnsupportedOperationException();
 		}
 		
 		@Override
-		protected void fromRecord(Record r, DataErrorReportItem o) {
-			super.fromRecord(r, o);
+		public DataErrorReportItem fromRecord(Record r) {
+			Integer queryId = r.getValue(OFC_DATA_ERROR_REPORT_ITEM.QUERY_ID);
+			DataErrorQueryGroup queryGroup = this.report.getQueryGroup();
+			DataErrorQuery dataErrorQuery = queryGroup.getErrorQuery(queryId);
+			
+			DataErrorReportItem o = new DataErrorReportItem(report, dataErrorQuery);
+			o.setId(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.ID));
 			o.setNodeIndex(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.NODE_INDEX));
 			o.setParentEntityId(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.PARENT_ENTITY_ID));
 			o.setRecordId(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID));
 			o.setStatus(Status.fromCode(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.STATUS).charAt(0)));
-			o.setValue(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.VALUE));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.UUID)));
+			o.setValue(r.getValue(OFC_DATA_ERROR_REPORT_ITEM.VALUE));
+			
+			return o;
 		}
 		
 		@Override
@@ -134,10 +144,12 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 			super.fromObject(o, q);
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.NODE_INDEX, o.getNodeIndex());
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.PARENT_ENTITY_ID, o.getParentEntityId());
+			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.QUERY_ID, o.getErrorQuery().getId());
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID, o.getRecordId());
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID, o.getReport().getId());
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.STATUS, String.valueOf(o.getStatus().getCode()));
 			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.UUID, o.getUuid().toString());
+			q.addValue(OFC_DATA_ERROR_REPORT_ITEM.VALUE, o.getValue());
 		}
 		
 		public Insert<OfcDataErrorReportItemRecord> createInsertStatement() {
@@ -151,6 +163,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 				item.getId(),
 				item.getNodeIndex(),
 				item.getParentEntityId(),
+				item.getErrorQuery().getId(),
 				item.getRecordId(),
 				item.getReport().getId(),
 				item.getStatus(),

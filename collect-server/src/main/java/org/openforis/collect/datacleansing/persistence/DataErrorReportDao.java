@@ -1,9 +1,9 @@
 package org.openforis.collect.datacleansing.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_REPORT_ID_SEQ;
+import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup.OFC_DATA_ERROR_QUERY_GROUP;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery.OFC_DATA_ERROR_QUERY_GROUP_QUERY;
-import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;
 import static org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport.OFC_DATA_ERROR_REPORT;
 
 import java.sql.Connection;
@@ -16,7 +16,6 @@ import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.StoreQuery;
-import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
 import org.openforis.collect.model.CollectSurvey;
@@ -55,7 +54,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorReportRecord> select = dsl
 			.selectFrom(OFC_DATA_ERROR_REPORT)
-			.where(OFC_DATA_ERROR_REPORT.REPORT_ID
+			.where(OFC_DATA_ERROR_REPORT.QUERY_GROUP_ID
 				.in(createErrorQueryGroupIdsSelect(dsl, survey))
 			);
 		Result<OfcDataErrorReportRecord> result = select.fetch();
@@ -67,7 +66,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataErrorReportRecord> select = dsl
 			.selectFrom(OFC_DATA_ERROR_REPORT)
-			.where(OFC_DATA_ERROR_REPORT.REPORT_ID
+			.where(OFC_DATA_ERROR_REPORT.QUERY_GROUP_ID
 				.eq(queryGroup.getId())
 			);
 		Result<OfcDataErrorReportRecord> result = select.fetch();
@@ -95,7 +94,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		protected void fromRecord(Record r, DataErrorReport o) {
 			super.fromRecord(r, o);
 			o.setCreationDate(r.getValue(OFC_DATA_ERROR_REPORT.CREATION_DATE));
-			o.setQueryGroupId(r.getValue(OFC_DATA_ERROR_REPORT.REPORT_ID));
+			o.setQueryGroupId(r.getValue(OFC_DATA_ERROR_REPORT.QUERY_GROUP_ID));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_REPORT.UUID)));
 		}
 		
@@ -103,7 +102,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		protected void fromObject(DataErrorReport o, StoreQuery<?> q) {
 			super.fromObject(o, q);
 			q.addValue(OFC_DATA_ERROR_REPORT.CREATION_DATE, toTimestamp(o.getCreationDate()));
-			q.addValue(OFC_DATA_ERROR_REPORT.REPORT_ID, o.getQueryGroupId());
+			q.addValue(OFC_DATA_ERROR_REPORT.QUERY_GROUP_ID, o.getQueryGroupId());
 			q.addValue(OFC_DATA_ERROR_REPORT.UUID, o.getUuid().toString());
 		}
 

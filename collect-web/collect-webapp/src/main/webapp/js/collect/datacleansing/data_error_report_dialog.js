@@ -2,8 +2,8 @@ Collect.DataErrorReportDialogController = function() {
 	Collect.AbstractItemEditDialogController.apply(this, arguments);
 	this.contentUrl = "datacleansing/data_error_report_dialog.html";
 	this.itemEditService = collect.dataErrorReportService;
-	this.queries = null;
-	this.querySelectPicker = null;
+	this.queryGroups = null;
+	this.queryGroupSelectPicker = null;
 	this.recordStepSelectPicker = null;
 };
 
@@ -21,7 +21,7 @@ Collect.DataErrorReportDialogController.prototype.generateClickHandler = functio
 	var $this = this;
 	if ($this.validateForm()) {
 		var item = $this.extractFormObject();
-		collect.dataErrorReportService.generateReport(item.queryId, item.recordStep, function() {
+		collect.dataErrorReportService.generateReport(item.queryGroupId, item.recordStep, function() {
 			new OF.UI.JobDialog();
 			new OF.JobMonitor("datacleansing/dataerrorreports/generate/job.json", function() {
 				EventBus.dispatch(Collect.DataCleansing.DATA_ERROR_REPORT_CREATED, $this);
@@ -34,8 +34,8 @@ Collect.DataErrorReportDialogController.prototype.generateClickHandler = functio
 Collect.DataErrorReportDialogController.prototype.loadInstanceVariables = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables.call(this, function() {
-		collect.dataErrorQueryService.loadAll(function(queries) {
-			$this.queries = queries;
+		collect.dataErrorQueryGroupService.loadAll(function(queryGroups) {
+			$this.queryGroups = queryGroups;
 			callback.call($this);
 		});
 	});
@@ -45,10 +45,10 @@ Collect.DataErrorReportDialogController.prototype.initFormElements = function(ca
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
 		{
-			var select = $this.content.find('select[name="queryId"]');
-			OF.UI.Forms.populateSelect(select, $this.queries, "id", "queryTitle", true);
+			var select = $this.content.find('select[name="queryGroupId"]');
+			OF.UI.Forms.populateSelect(select, $this.queryGroups, "id", "title", true);
 			select.selectpicker();
-			$this.querySelectPicker = select.data().selectpicker;
+			$this.queryGroupSelectPicker = select.data().selectpicker;
 		}
 		{
 			var select = $this.content.find('select[name="recordStep"]');
@@ -69,7 +69,7 @@ Collect.DataErrorReportDialogController.prototype.extractFormObject = function()
 Collect.DataErrorReportDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
-		$this.querySelectPicker.val($this.item.queryId);
+		$this.queryGroupSelectPicker.val($this.item.queryGroupId);
 		callback.call($this);
 	});
 };
@@ -77,8 +77,8 @@ Collect.DataErrorReportDialogController.prototype.fillForm = function(callback) 
 Collect.DataErrorReportDialogController.prototype.validateForm = function() {
 	var $this = this;
 	var item = $this.extractFormObject();
-	if (! item.queryId) {
-		OF.Alerts.showWarning('Please select an error query');
+	if (! item.queryGroupId) {
+		OF.Alerts.showWarning('Please select an error query group');
 		return false;
 	} else {
 		return true;

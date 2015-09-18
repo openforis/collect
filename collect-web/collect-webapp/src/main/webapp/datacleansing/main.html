@@ -43,6 +43,7 @@
 		<script type="text/javascript" src="js/collect/service/session_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/survey_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_error_query_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_error_query_group_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_error_type_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_error_report_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_query_service.js?v=PROJECT_VERSION"></script>
@@ -62,7 +63,9 @@
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_type_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_type_panel.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_dialog.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_group_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_panel.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_group_panel.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_view_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_panel.js?v=PROJECT_VERSION"></script>
@@ -131,6 +134,10 @@
 							<a href="#data-error-query-panel" aria-controls="data-error-query-panel" 
 								role="tab" data-toggle="tab">Data Error Queries</a>
 						</li>
+						<li role="presentation">
+							<a href="#data-error-query-group-panel" aria-controls="data-error-query-group-panel" 
+								role="tab" data-toggle="tab">Data Error Query Groups</a>
+						</li>
 						<li id="data-error-report-tab" role="presentation">
 							<a href="#data-error-report-panel" aria-controls="data-error-report-panel" 
 								role="tab" data-toggle="tab">Data Error Reports</a>
@@ -178,6 +185,17 @@
 							</div>
 						</div>
 						<div id="data-error-query-panel" role="tabpanel" class="tab-pane" >
+							<div class="container">
+								<table class="grid"></table>
+								
+								<div>
+									<button type="button" class="btn btn-success new-btn">New</button>
+									<button type="button" class="btn btn-primary edit-btn">Edit</button>
+									<button type="button" class="btn btn-danger delete-btn">Delete</button>
+								</div>
+							</div>
+						</div>
+						<div id="data-error-query-group-panel" role="tabpanel" class="tab-pane" >
 							<div class="container">
 								<table class="grid"></table>
 								

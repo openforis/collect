@@ -3,6 +3,7 @@ package org.openforis.collect.datacleansing.form;
 import javax.validation.constraints.NotNull;
 
 import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
 
 /**
  * 
@@ -15,6 +16,8 @@ public class DataErrorQueryForm extends DataCleansingItemForm<DataErrorQuery> {
 	private Integer typeId;
 	@NotNull
 	private Integer queryId;
+	@NotNull
+	private Severity severity;
 	
 	//calculated members
 	private String typeCode;
@@ -32,6 +35,14 @@ public class DataErrorQueryForm extends DataCleansingItemForm<DataErrorQuery> {
 		this.queryTitle = query == null ? null: query.getQuery().getTitle();
 		this.queryDescription = query == null ? null: query.getQuery().getDescription();
 		this.prettyFormatTitle = String.format("Error type: %s - Data Query: %s", typeCode, query.getQuery().getTitle());
+	}
+	
+	public Severity getSeverity() {
+		return severity;
+	}
+	
+	public void setSeverity(Severity severity) {
+		this.severity = severity;
 	}
 	
 	public String getPrettyFormatTitle() {

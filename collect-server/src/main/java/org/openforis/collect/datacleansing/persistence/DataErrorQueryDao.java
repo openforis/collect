@@ -17,6 +17,7 @@ import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorType;
 import org.openforis.collect.datacleansing.DataQuery;
+import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
@@ -95,9 +96,10 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 		protected void fromRecord(Record r, DataErrorQuery o) {
 			super.fromRecord(r, o);
 			o.setCreationDate(r.getValue(OFC_DATA_ERROR_QUERY.CREATION_DATE));
-			o.setTypeId(r.getValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID));
-			o.setQueryId(r.getValue(OFC_DATA_ERROR_QUERY.QUERY_ID));
 			o.setModifiedDate(r.getValue(OFC_DATA_ERROR_QUERY.MODIFIED_DATE));
+			o.setQueryId(r.getValue(OFC_DATA_ERROR_QUERY.QUERY_ID));
+			o.setSeverity(Severity.fromCode(r.getValue(OFC_DATA_ERROR_QUERY.SEVERITY)));
+			o.setTypeId(r.getValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_QUERY.UUID)));
 		}
 		
@@ -108,6 +110,7 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 			q.addValue(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID, o.getTypeId());
 			q.addValue(OFC_DATA_ERROR_QUERY.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
 			q.addValue(OFC_DATA_ERROR_QUERY.QUERY_ID, o.getQueryId());
+			q.addValue(OFC_DATA_ERROR_QUERY.SEVERITY, String.valueOf(o.getSeverity().getCode()));
 			q.addValue(OFC_DATA_ERROR_QUERY.UUID, o.getUuid().toString());
 		}
 

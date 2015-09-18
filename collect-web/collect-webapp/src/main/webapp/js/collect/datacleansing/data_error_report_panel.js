@@ -15,8 +15,7 @@ Collect.DataCleansing.DataErrorReportPanelController.prototype.getDataGridOption
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "queryTitle", title: "Query", sortable: true, width: 400},
-			{field: "typeCode", title: "Error Type", sortable: true, width: 100},
+			{field: "queryGroupTitle", title: "Query Group", sortable: true, width: 400},
 			{field: "itemCount", title: "Errors found", sortable: true, width: 100},
 			{field: "creationDate", title: "Date", formatter: OF.Dates.formatToPrettyDateTime, sortable: true, width: 100},
 			$this.createGridItemDeleteColumn()

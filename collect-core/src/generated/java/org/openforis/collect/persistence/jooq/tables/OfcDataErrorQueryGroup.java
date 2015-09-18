@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataErrorQueryGroup extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord> {
 
-	private static final long serialVersionUID = 2072780448;
+	private static final long serialVersionUID = 2031548521;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_error_query_group</code>
@@ -42,9 +42,29 @@ public class OfcDataErrorQueryGroup extends org.jooq.impl.TableImpl<org.openfori
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord, java.lang.String> UUID = createField("uuid", org.jooq.impl.SQLDataType.VARCHAR.length(50), this, "");
 
 	/**
+	 * The column <code>collect.ofc_data_error_query_group.survey_id</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord, java.lang.Integer> SURVEY_ID = createField("survey_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_error_query_group.title</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord, java.lang.String> TITLE = createField("title", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_error_query_group.description</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord, java.lang.String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
+
+	/**
 	 * The column <code>collect.ofc_data_error_query_group.creation_date</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord, java.sql.Timestamp> CREATION_DATE = createField("creation_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_error_query_group.modified_date</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord, java.sql.Timestamp> MODIFIED_DATE = createField("modified_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
 	/**
 	 * Create a <code>collect.ofc_data_error_query_group</code> table reference
@@ -82,6 +102,14 @@ public class OfcDataErrorQueryGroup extends org.jooq.impl.TableImpl<org.openfori
 	@Override
 	public java.util.List<org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord>> getKeys() {
 		return java.util.Arrays.<org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_DATA_ERROR_QUERY_GROUP_PKEY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public java.util.List<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord, ?>> getReferences() {
+		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataErrorQueryGroupRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_DATA_ERROR_QUERY_GROUP__OFC_DATA_ERROR_QUERY_GROUP_SURVEY_FKEY);
 	}
 
 	/**
