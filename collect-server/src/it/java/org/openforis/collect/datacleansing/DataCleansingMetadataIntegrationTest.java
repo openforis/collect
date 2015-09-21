@@ -6,6 +6,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.openforis.collect.concurrency.CollectJobManager;
+import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
 import org.openforis.collect.datacleansing.io.DataCleansingImportTask;
 import org.openforis.collect.datacleansing.manager.DataCleansingMetadataManager;
 import org.openforis.collect.utils.Dates;
@@ -100,6 +101,14 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 				.description("Error 2 description")
 				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
 				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"));
+
+		DataErrorQueryBuilder errorQueryBuilder = dataErrorQuery()
+				.uuid("89b9682f-9267-41da-80e2-f8a5444f3cae")
+				.type(errorTypeBuilder1.build())
+				.severity(Severity.ERROR)
+				.query(dataQueryBuilder1.build())
+				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
+				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"));
 		
 		DataCleansingStepBuilder cleansingStepBuilder1 = dataCleansingStep()
 				.uuid("02fd4fb7-505c-4b0b-8868-1c6adef3c4ac")
@@ -124,10 +133,12 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 			, dataQueryBuilder2
 			, errorTypeBuilder1
 			, errorTypeBuilder2
-			, dataErrorQuery()
-				.uuid("89b9682f-9267-41da-80e2-f8a5444f3cae")
-				.type(errorTypeBuilder1.build())
-				.query(dataQueryBuilder1.build())
+			, errorQueryBuilder
+			, dataErrorQueryGroup()
+				.uuid("89b9682f-9267-41da-80e2-f8a6444f3cae")
+				.title("Only errors")
+				.description("Group of errors")
+				.query(errorQueryBuilder.build())
 				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
 				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"))
 			, cleansingStepBuilder1

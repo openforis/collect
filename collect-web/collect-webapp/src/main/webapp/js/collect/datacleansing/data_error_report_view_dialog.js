@@ -47,8 +47,11 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 	        ];
 			columns = columns.concat(Collect.Grids.createRootEntityKeyColumns(collect.activeSurvey));
 			columns = columns.concat([
-				{field: "nodePath", title: "Path", width: 400},
-				{field: "attributeValue", title: "Value", width: 400}
+              {field: "errorTypeCode", title: "Type", width: 100},
+              {field: "severity", title: "Severity", width: 100},
+              {field: "queryTitle", title: "Query", width: 400},
+              {field: "nodePath", title: "Path", width: 400},
+              {field: "attributeValue", title: "Value", width: 400},
 			]);
 			var el = $this.content.find('.data-error-report-items-grid');
 			el.bootstrapTable({
@@ -68,6 +71,11 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 		$this.content.find(".export-to-csv-btn").click($.proxy(function() {
 			var report = $this.extractFormObject();
 			collect.dataErrorReportService.exportToCSV(report.id);
+		}, $this));
+		
+		$this.content.find(".export-to-csv-for-collect-earth-btn").click($.proxy(function() {
+			var report = $this.extractFormObject();
+			collect.dataErrorReportService.exportToCSVForCollectEarth(report.id);
 		}, $this));
 		
 		callback();

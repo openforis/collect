@@ -242,6 +242,16 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 			return (DataErrorQueryGroupBuilder) super.modifiedDate(date);
 		}
 		
+		public DataErrorQueryGroupBuilder title(String title) {
+			obj.setTitle(title);
+			return this;
+		}
+		
+		public DataErrorQueryGroupBuilder description(String description) {
+			obj.setDescription(description);
+			return this;
+		}
+		
 		public DataErrorQueryGroupBuilder query(DataErrorQuery query) {
 			obj.addQuery(query);
 			return this;

@@ -87,10 +87,7 @@ public class DataErrorQueryGroup extends PersistedSurveyObject {
 		if (getClass() != obj.getClass())
 			return false;
 		DataErrorQueryGroup other = (DataErrorQueryGroup) obj;
-		if (queryIds == null) {
-			if (other.queryIds != null)
-				return false;
-		} else if (!queryIds.equals(other.queryIds))
+		if (! CollectionUtils.<DataErrorQuery>deepEquals(queries, other.queries, true))
 			return false;
 		return true;
 	}

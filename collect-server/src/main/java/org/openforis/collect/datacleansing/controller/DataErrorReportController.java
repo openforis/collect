@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +22,9 @@ import org.openforis.collect.datacleansing.form.DataErrorReportForm;
 import org.openforis.collect.datacleansing.form.DataErrorReportItemForm;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryGroupManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
+import org.openforis.collect.manager.RecordManager;
+import org.openforis.collect.metamodel.CollectAnnotations;
+import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
@@ -28,10 +32,16 @@ import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormControll
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.PaginatedResponse;
 import org.openforis.commons.io.csv.CsvWriter;
+import org.openforis.commons.lang.Objects;
 import org.openforis.commons.web.Response;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
+import org.openforis.idm.model.AbstractValue;
+import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -52,6 +62,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	private DataErrorQueryGroupManager dataErrorQueryGroupManager;
 	@Autowired
 	private CollectJobManager collectJobManager;
+	@Autowired
+	private RecordManager recordManager;
 	
 	private DataErrorReportGeneratorJob generationJob;
 	
@@ -90,11 +102,23 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	
 	@RequestMapping(value="{reportId}/export.csv", method = RequestMethod.GET)
 	public void export(HttpServletResponse response, @PathVariable int reportId) throws Exception {
+		export(response, reportId, GroupedByRecordCSVWriterDataErrorProcessor.class);
+	}
+
+	@RequestMapping(value="{reportId}/export-for-collect-earth.csv", method = RequestMethod.GET)
+	public void exportForCollectEarth(HttpServletResponse response, @PathVariable int reportId) throws Exception {
+		export(response, reportId, CollectEarthCSVWriterDataErrorProcessor.class);
+	}
+	
+	private void export(HttpServletResponse response, int reportId,
+			Class<? extends CSVWriterDataErrorItemProcessor> itemProcessorType)
+			throws Exception {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataErrorReport report = itemManager.loadById(survey, reportId);
 		
 		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinitions().get(0);
-		CSVWriterDataErrorItemProcessor itemProcessor = new CSVWriterDataErrorItemProcessor(rootEntityDefinition);
+		CSVWriterDataErrorItemProcessor itemProcessor = Objects.newInstance(itemProcessorType, 
+				new RecordProvider(recordManager), rootEntityDefinition);
 		itemProcessor.init();
 		int count = itemManager.countItems(report);
 		int itemsPerPage = 100;
@@ -144,18 +168,19 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		return new Response();
 	}
 	
-	private static class CSVWriterDataErrorItemProcessor implements Closeable {
+	private static abstract class CSVWriterDataErrorItemProcessor implements Closeable {
 		
-		private CsvWriter csvWriter;
+		protected CsvWriter csvWriter;
+		protected RecordProvider recordProvider;
 		
 		//output
 		private File tempFile;
 
-		private EntityDefinition rootEntityDefinition;
+		protected EntityDefinition rootEntityDefinition;
 
-		private RecordReportInfo lastRecordReportInfo;
-		
-		public CSVWriterDataErrorItemProcessor(EntityDefinition rootEntityDefinition) {
+
+		public CSVWriterDataErrorItemProcessor(RecordProvider recordProvider, EntityDefinition rootEntityDefinition) {
+			this.recordProvider = recordProvider;
 			this.rootEntityDefinition = rootEntityDefinition;
 		}
 		
@@ -166,6 +191,11 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		}
 		
 		private void writeCSVHeader() {
+			List<String> headers = determineHeaders();
+			csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
+		}
+
+		protected List<String> determineHeaders() {
 			List<String> headers = new ArrayList<String>();
 			List<AttributeDefinition> keyAttributeDefinitions = rootEntityDefinition.getKeyAttributeDefinitions();
 			for (AttributeDefinition def : keyAttributeDefinitions) {
@@ -175,30 +205,66 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 				}
 				headers.add(keyLabel);
 			}
-			headers.add("Errors");
-			headers.add("Warnings");
-			csvWriter.writeHeaders(headers.toArray(new String[headers.size()]));
+			headers.addAll(determineExtraHeaders());
+			return headers;
 		}
 
+		protected List<String> determineExtraHeaders() {
+			return new ArrayList<String>();
+		}
+
+		public abstract void process(DataErrorReportItem item);
+
+		@Override
+		public void close() throws IOException {
+			csvWriter.close();
+		}
+
+		public File getOutputFile() {
+			return tempFile;
+		}
+		
+	}
+	
+	public static class GroupedByRecordCSVWriterDataErrorProcessor extends CSVWriterDataErrorItemProcessor {
+
+		private static final String WARNINGS_HEADER = "warnings";
+		private static final String ERRORS_HEADER = "errors";
+
+		private RecordReportInfo lastRecordReportInfo;
+		
+		public GroupedByRecordCSVWriterDataErrorProcessor(
+				RecordProvider recordProvider,
+				EntityDefinition rootEntityDefinition) {
+			super(recordProvider, rootEntityDefinition);
+		}
+		
+		@Override
 		public void process(DataErrorReportItem item) {
 			if (lastRecordReportInfo != null && lastRecordReportInfo.getRecordId() != item.getRecordId()) {
 				writeLastRecordInfo();
+				lastRecordReportInfo = null;
 			}
 			if (lastRecordReportInfo == null) {
 				lastRecordReportInfo = new RecordReportInfo(item.getRecordId(), item.getRecordKeyValues());
-			} else {
-				String queryTitle = item.getQuery().getTitle();
-				if (item.getErrorQuery().getSeverity() == Severity.ERROR) {
-					lastRecordReportInfo.addError(queryTitle);
-				} else {
-					lastRecordReportInfo.addWarning(queryTitle);
-				}
+				lastRecordReportInfo.setExtraValues(determineExtraValues(item));
 			}
+			String queryTitle = item.getQuery().getTitle();
+			if (item.getErrorQuery().getSeverity() == Severity.ERROR) {
+				lastRecordReportInfo.addError(queryTitle);
+			} else {
+				lastRecordReportInfo.addWarning(queryTitle);
+			}
+		}
+		
+		protected List<String> determineExtraValues(DataErrorReportItem item) {
+			return Collections.emptyList();
 		}
 
 		private void writeLastRecordInfo() {
 			List<String> lineValues = new ArrayList<String>();
 			lineValues.addAll(lastRecordReportInfo.getKeyValues());
+			lineValues.addAll(lastRecordReportInfo.getExtraValues());
 			lineValues.add(StringUtils.join(lastRecordReportInfo.getErrors(), "\r\n;"));
 			lineValues.add(StringUtils.join(lastRecordReportInfo.getWarnings(), "\r\n;"));
 			csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
@@ -209,17 +275,22 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 			if (lastRecordReportInfo != null) {
 				writeLastRecordInfo();
 			}
-			csvWriter.close();
-		}
-
-		public File getOutputFile() {
-			return tempFile;
+			super.close();
 		}
 		
-		private static class RecordReportInfo {
+		@Override
+		protected List<String> determineExtraHeaders() {
+			List<String> headers = new ArrayList<String>();
+			headers.add(ERRORS_HEADER);
+			headers.add(WARNINGS_HEADER);
+			return headers;
+		}
+
+		protected class RecordReportInfo {
 			
 			private int recordId;
 			private List<String> keyValues;
+			private List<String> extraValues;
 			private List<String> errors = new ArrayList<String>();
 			private List<String> warnings = new ArrayList<String>();
 			
@@ -245,6 +316,14 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 				return recordId;
 			}
 			
+			public List<String> getExtraValues() {
+				return extraValues;
+			}
+			
+			public void setExtraValues(List<String> extraValues) {
+				this.extraValues = extraValues;
+			}
+			
 			public List<String> getErrors() {
 				return errors;
 			}
@@ -253,6 +332,82 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 				return warnings;
 			}
 			
+		}
+	}
+	
+	public static class CollectEarthCSVWriterDataErrorProcessor extends GroupedByRecordCSVWriterDataErrorProcessor {
+
+		private List<AttributeDefinition> fromCSVAttributes;
+
+		public CollectEarthCSVWriterDataErrorProcessor(
+				RecordProvider recordProvider,
+				EntityDefinition rootEntityDefinition) {
+			super(recordProvider, rootEntityDefinition);
+			fromCSVAttributes = determineFromCSVAttributes();
+		}
+		
+		@Override
+		protected List<String> determineExtraHeaders() {
+			List<String> extraHeaders = new ArrayList<String>(super.determineExtraHeaders());
+			for (AttributeDefinition def : fromCSVAttributes) {
+				extraHeaders.add(def.getName());
+			}
+			return extraHeaders;
+		}
+		
+		@Override
+		protected List<String> determineExtraValues(DataErrorReportItem item) {
+			List<String> values = new ArrayList<String>(fromCSVAttributes.size());
+			CollectRecord record = recordProvider.load((CollectSurvey) rootEntityDefinition.getSurvey(), item.getRecordId());
+			for (AttributeDefinition def : fromCSVAttributes) {
+				Attribute<?, ?> attr = record.findNodeByPath(rootEntityDefinition.getName() + "/" + def.getName());
+				Value value = attr.getValue();
+				values.add(toCSVValue(value));
+			}
+			return values;
+		}
+		
+		private String toCSVValue(Value value) {
+			if (value == null) {
+				return "";
+			} else if (value instanceof AbstractValue) {
+				return ((AbstractValue) value).toPrettyFormatString();
+			} else {
+				return value.toString();
+			}
+		}
+
+		private List<AttributeDefinition> determineFromCSVAttributes() {
+			CollectSurvey survey = (CollectSurvey) rootEntityDefinition.getSurvey();
+
+			final CollectAnnotations annotations = survey.getAnnotations();
+			final List<AttributeDefinition> defs = new ArrayList<AttributeDefinition>();
+			rootEntityDefinition.traverse(new NodeDefinitionVisitor() {
+				public void visit(NodeDefinition def) {
+					if (def instanceof AttributeDefinition) {
+						if (annotations.isFromCollectEarthCSV((AttributeDefinition) def)) {
+							defs.add((AttributeDefinition) def);
+						}
+					}
+				}
+			});
+			return defs;
+		}
+		
+	}
+	
+	public static class RecordProvider {
+		
+		private RecordManager recordManager;
+
+		public RecordProvider(RecordManager recordManager) {
+			super();
+			this.recordManager = recordManager;
+		}
+		
+		public CollectRecord load(CollectSurvey survey, int recordId) {
+			CollectRecord record = recordManager.load(survey, recordId);
+			return record;
 		}
 	}
 	

@@ -62,7 +62,8 @@
     {
       "id": 5,
       "uuid": "89b9682f-9267-41da-80e2-f8a6444f3cae",
-      "title": "Errors",
+      "title": "Only errors",
+      "description": "Group of errors",
       "creationDate": "2015-08-27T17:40:01.741+02:00",
       "modifiedDate": "2015-08-27T18:45:01.741+02:00",
       "queryIds": [5]

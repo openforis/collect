@@ -67,10 +67,10 @@ public class DataCleansingMetadataView {
 			errorQuery.setType(errorTypeByOriginalId.get(errorQuery.getTypeId()));
 		}
 		for (DataErrorQueryGroup queryGroup : errorQueryGroups) {
-			List<DataErrorQuery> groupQueries = queryGroup.getQueries();
-			List<DataErrorQuery> originalQueries = new ArrayList<DataErrorQuery>(groupQueries.size());
-			for (DataErrorQuery query : groupQueries) {
-				originalQueries.add(errorQueryByOriginalId.get(query.getId()));
+			List<Integer> originalQueryIds = queryGroup.getQueryIds();
+			List<DataErrorQuery> originalQueries = new ArrayList<DataErrorQuery>(originalQueryIds.size());
+			for (Integer originalQueryId : originalQueryIds) {
+				originalQueries.add(errorQueryByOriginalId.get(originalQueryId));
 			}
 			queryGroup.removeAllQueries();
 			queryGroup.setQueries(originalQueries);
@@ -92,6 +92,7 @@ public class DataCleansingMetadataView {
 		PersistedSurveyObjects.resetIds(queries);
 		PersistedSurveyObjects.resetIds(errorTypes);
 		PersistedSurveyObjects.resetIds(errorQueries);
+		PersistedSurveyObjects.resetIds(errorQueryGroups);
 		PersistedSurveyObjects.resetIds(cleansingSteps);
 		PersistedSurveyObjects.resetIds(cleansingChains);
 		

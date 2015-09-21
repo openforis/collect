@@ -85,7 +85,7 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 		$this.dataErrorReportPanel.refreshDataGrid();
 		$this.dataCleansingStepPanel.refreshDataGrid();
 		$this.dataCleansingChainPanel.refreshDataGrid();
-		$("#home-survey-selector-button").text(Collect.SurveySelectDialogController.getPrettyShortLabel(collect.activeSurvey));
+		$("#selected-survey-label").text(Collect.SurveySelectDialogController.getPrettyShortLabel(collect.activeSurvey));
 		//$this.initMapPanel();
 		
 		$this.checkViewState();
