@@ -146,6 +146,6 @@ OF.UI.Forms.Validation._createErrorTooltipTitle = function($field, error, fieldL
 	} else {
 		errorMessage = "error";
 	}
-	var message = fieldLabel + " " + errorMessage;
+	var message = fieldLabel + " - " + errorMessage;
 	return message;
 };

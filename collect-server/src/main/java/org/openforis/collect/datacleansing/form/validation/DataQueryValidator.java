@@ -50,14 +50,23 @@ public class DataQueryValidator extends SimpleValidator<DataQueryForm> {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		List<DataQuery> queries = dataQueryManager.loadBySurvey(survey);
 		for (DataQuery dataQuery : queries) {
-			if (! dataQuery.getId().equals(target.getId()) 
-					&& Integer.valueOf(dataQuery.getEntityDefinitionId()).equals(target.getEntityDefinitionId())
+			if (! dataQuery.getId().equals(target.getId())) {
+				boolean valid = true;
+				if (dataQuery.getTitle().equalsIgnoreCase(target.getTitle())) {
+					rejectDuplicateValue(errors, TITLE_FIELD);
+					valid = false;
+				} else if (
+					Integer.valueOf(dataQuery.getEntityDefinitionId()).equals(target.getEntityDefinitionId())
 					&& Integer.valueOf(dataQuery.getAttributeDefinitionId()).equals(target.getAttributeDefinitionId()) 
 					&& dataQuery.getConditions().equals(target.getConditions())) {
-				rejectDuplicateValue(errors, ENTITY_DEFINITION_ID_FIELD);
-				rejectDuplicateValue(errors, ATTRIBUTE_DEFINITION_ID_FIELD);
-				rejectDuplicateValue(errors, CONDITIONS_FIELD);
-				return false;
+					rejectDuplicateValue(errors, ENTITY_DEFINITION_ID_FIELD);
+					rejectDuplicateValue(errors, ATTRIBUTE_DEFINITION_ID_FIELD);
+					rejectDuplicateValue(errors, CONDITIONS_FIELD);
+					valid = false;
+				}
+				if (! valid) {
+					return false;
+				}
 			}
 		}
 		return true;
