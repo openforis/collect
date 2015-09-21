@@ -41,7 +41,10 @@ import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.model.AbstractValue;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Coordinate;
+import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Value;
+import org.openforis.idm.path.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -230,6 +233,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 
 		private static final String WARNINGS_HEADER = "warnings";
 		private static final String ERRORS_HEADER = "errors";
+		private static final String ERRORS_SEPARATOR = "; \r\n";
 
 		private RecordReportInfo lastRecordReportInfo;
 		
@@ -265,8 +269,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 			List<String> lineValues = new ArrayList<String>();
 			lineValues.addAll(lastRecordReportInfo.getKeyValues());
 			lineValues.addAll(lastRecordReportInfo.getExtraValues());
-			lineValues.add(StringUtils.join(lastRecordReportInfo.getErrors(), "\r\n;"));
-			lineValues.add(StringUtils.join(lastRecordReportInfo.getWarnings(), "\r\n;"));
+			lineValues.add(StringUtils.join(lastRecordReportInfo.getErrors(), ERRORS_SEPARATOR));
+			lineValues.add(StringUtils.join(lastRecordReportInfo.getWarnings(), ERRORS_SEPARATOR));
 			csvWriter.writeNext(lineValues.toArray(new String[lineValues.size()]));
 		}
 		
@@ -337,18 +341,34 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	
 	public static class CollectEarthCSVWriterDataErrorProcessor extends GroupedByRecordCSVWriterDataErrorProcessor {
 
+		private static final String X_COORDINATE_HEADER = "XCoordinate";
+		private static final String Y_COORDINATE_HEADER = "YCoordinate";
+		private static final String LOCATION_ATTRIBUTE_NAME = "location";
+		
 		private List<AttributeDefinition> fromCSVAttributes;
+
+		private String locationAttributePath;
+		private List<String> fromCSVAttributePaths;
 
 		public CollectEarthCSVWriterDataErrorProcessor(
 				RecordProvider recordProvider,
 				EntityDefinition rootEntityDefinition) {
 			super(recordProvider, rootEntityDefinition);
-			fromCSVAttributes = determineFromCSVAttributes();
+			this.locationAttributePath = rootEntityDefinition.getName() + Path.SEPARATOR + LOCATION_ATTRIBUTE_NAME;
+			this.fromCSVAttributes = determineFromCSVAttributes();
+			this.fromCSVAttributePaths = new ArrayList<String>(fromCSVAttributes.size());
+			for (AttributeDefinition def : fromCSVAttributes) {
+				String attrPath = rootEntityDefinition.getName() + Path.SEPARATOR + def.getName();
+				this.fromCSVAttributePaths.add(attrPath);
+			}
 		}
 		
 		@Override
 		protected List<String> determineExtraHeaders() {
-			List<String> extraHeaders = new ArrayList<String>(super.determineExtraHeaders());
+			List<String> extraHeaders = new ArrayList<String>();
+			extraHeaders.add(X_COORDINATE_HEADER);
+			extraHeaders.add(Y_COORDINATE_HEADER);
+			extraHeaders.addAll(super.determineExtraHeaders());
 			for (AttributeDefinition def : fromCSVAttributes) {
 				extraHeaders.add(def.getName());
 			}
@@ -357,20 +377,29 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		
 		@Override
 		protected List<String> determineExtraValues(DataErrorReportItem item) {
-			List<String> values = new ArrayList<String>(fromCSVAttributes.size());
+			List<String> values = new ArrayList<String>();
 			CollectRecord record = recordProvider.load((CollectSurvey) rootEntityDefinition.getSurvey(), item.getRecordId());
-			for (AttributeDefinition def : fromCSVAttributes) {
-				Attribute<?, ?> attr = record.findNodeByPath(rootEntityDefinition.getName() + "/" + def.getName());
-				Value value = attr.getValue();
-				values.add(toCSVValue(value));
+			
+			CoordinateAttribute locationAttr = record.findNodeByPath(locationAttributePath);
+			Coordinate location = locationAttr.getValue();
+			values.add(String.valueOf(location.getX()));
+			values.add(String.valueOf(location.getY()));
+			
+			values.addAll(super.determineExtraValues(item));
+			
+			for (String attrPath : fromCSVAttributePaths) {
+				Attribute<?, ?> attr = record.findNodeByPath(attrPath);
+				values.add(extractCSVValue(attr));
 			}
 			return values;
 		}
-		
-		private String toCSVValue(Value value) {
-			if (value == null) {
+
+		private String extractCSVValue(Attribute<?, ?> attr) {
+			if (attr == null || attr.isEmpty()) {
 				return "";
-			} else if (value instanceof AbstractValue) {
+			}
+			Value value = attr.getValue();
+			if (value instanceof AbstractValue) {
 				return ((AbstractValue) value).toPrettyFormatString();
 			} else {
 				return value.toString();

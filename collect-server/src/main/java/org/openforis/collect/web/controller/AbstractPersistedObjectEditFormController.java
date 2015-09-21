@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
@@ -62,6 +63,17 @@ public abstract class AbstractPersistedObjectEditFormController<T extends Persis
 			response = new SimpleFormUpdateResponse(errors);
 		}
 		return response;
+	}
+	
+	@RequestMapping(value="duplicate.json", method = RequestMethod.POST)
+	public @ResponseBody
+	Response duplicate(@RequestParam int itemId, BindingResult result) {
+		T item = itemManager.loadById(itemId);
+		T newItem = item; //TODO clone?!
+		newItem.setId(null);
+		itemManager.save(newItem);
+		F responseForm = createFormInstance(newItem);
+		return new SimpleFormUpdateResponse(responseForm);
 	}
 	
 	@RequestMapping(value="validate.json", method = RequestMethod.POST)

@@ -186,7 +186,7 @@ Collect.AbstractItemEditDialogController.prototype.applyHandler = function(close
 			$this.removeErrorsInForm();
 		}, function(response) {
 			if (response.errors.length > 0) {
-				OF.Alerts.showError("Errors in the form: " + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
+				OF.Alerts.showError("Errors in the form: \n" + OF.UI.Forms.Validation.getFormErrorMessage($this.form, response.errors));
 			}
 			$this.showErrorsInForm(response.errors, false);
 		});
@@ -224,6 +224,7 @@ Collect.AbstractItemEditDialogController.prototype.validateForm = function() {
 Collect.AbstractItemEditDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	OF.UI.Forms.fill($this.form, $this.item);
+	//field.data("visited", true);
 	callback.call($this);
 };
 

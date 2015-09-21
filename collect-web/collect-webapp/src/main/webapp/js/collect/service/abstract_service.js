@@ -14,6 +14,10 @@ Collect.AbstractService.prototype.save = function(data, onSuccess, onError) {
 	this.send("save.json", data, "POST", onSuccess, onError);
 };
 
+Collect.AbstractService.prototype.duplicate = function(itemId, onSuccess, onError) {
+	this.send("duplicate.json", itemId, "POST", onSuccess, onError);
+};
+
 Collect.AbstractService.prototype.validate = function(data, onSuccess, onError) {
 	this.send("validate.json", data, "POST", onSuccess, onError);
 };

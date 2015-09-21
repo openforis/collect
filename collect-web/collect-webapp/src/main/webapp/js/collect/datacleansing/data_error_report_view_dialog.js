@@ -2,7 +2,7 @@ Collect.DataErrorReportViewDialogController = function() {
 	Collect.AbstractItemEditDialogController.apply(this, arguments);
 	this.contentUrl = "datacleansing/data_error_report_view_dialog.html";
 	this.itemEditService = collect.dataErrorReportService;
-	this.queries = null;
+	this.queryGroups = null;
 	this.queryGroupSelectPicker = null;
 	this.recordStepSelectPicker = null;
 	this.reportItemsDataGrid = null;
@@ -18,8 +18,8 @@ Collect.DataErrorReportViewDialogController.prototype.initEventListeners = funct
 Collect.DataErrorReportViewDialogController.prototype.loadInstanceVariables = function(callback) {
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.loadInstanceVariables.call(this, function() {
-		collect.dataErrorQueryService.loadAll(function(queries) {
-			$this.queries = queries;
+		collect.dataErrorQueryGroupService.loadAll(function(queryGroups) {
+			$this.queryGroups = queryGroups;
 			callback();
 		});
 	});
@@ -30,7 +30,7 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
 		{
 			var select = $this.content.find('select[name="queryGroupId"]');
-			OF.UI.Forms.populateSelect(select, $this.queries, "id", "title", true);
+			OF.UI.Forms.populateSelect(select, $this.queryGroups, "id", "title", true);
 			select.selectpicker();
 			$this.queryGroupSelectPicker = select.data().selectpicker;
 		}
@@ -47,7 +47,7 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 	        ];
 			columns = columns.concat(Collect.Grids.createRootEntityKeyColumns(collect.activeSurvey));
 			columns = columns.concat([
-              {field: "errorTypeCode", title: "Type", width: 100},
+              {field: "errorType.prettyLabel", title: "Error Type", width: 120},
               {field: "severity", title: "Severity", width: 100},
               {field: "queryTitle", title: "Query", width: 400},
               {field: "nodePath", title: "Path", width: 400},

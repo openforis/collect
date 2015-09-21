@@ -4,6 +4,7 @@ import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
 import org.openforis.collect.datacleansing.DataErrorReportItem;
 import org.openforis.collect.datacleansing.DataQuery;
+import org.openforis.commons.web.Forms;
 
 /**
  * 
@@ -14,7 +15,7 @@ public class DataErrorReportItemForm extends DataQueryResultItemForm {
 
 	private String queryTitle;
 	private Severity severity;
-	private String errorTypeCode;
+	private DataErrorTypeForm errorType;
 
 	public DataErrorReportItemForm() {
 		super();
@@ -26,7 +27,7 @@ public class DataErrorReportItemForm extends DataQueryResultItemForm {
 		DataQuery query = errorQuery.getQuery();
 		this.queryTitle = query.getTitle();
 		this.severity = errorQuery.getSeverity();
-		this.errorTypeCode = errorQuery.getType().getCode();
+		this.errorType = Forms.toForm(errorQuery.getType(), DataErrorTypeForm.class);
 	}
 	
 	public Severity getSeverity() {
@@ -37,7 +38,8 @@ public class DataErrorReportItemForm extends DataQueryResultItemForm {
 		return queryTitle;
 	}
 
-	public String getErrorTypeCode() {
-		return errorTypeCode;
+	public DataErrorTypeForm getErrorType() {
+		return errorType;
 	}
+	
 }

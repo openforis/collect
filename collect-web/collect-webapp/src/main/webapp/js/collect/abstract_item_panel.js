@@ -1,9 +1,10 @@
-Collect.AbstractItemPanel = function($panel, itemName, dialogControllerClass, itemService, deletedEventName) {
+Collect.AbstractItemPanel = function($panel, itemName, dialogControllerClass, itemService, deletedEventName, savedEventName) {
 	this.$panel = $panel;
 	this.itemName = itemName;
 	this.dialogControllerClass = dialogControllerClass;
 	this.itemService = itemService;
 	this.deletedEventName = deletedEventName;
+	this.savedEventName = savedEventName;
 };
 
 Collect.AbstractItemPanel.prototype.init = function() {
@@ -15,6 +16,8 @@ Collect.AbstractItemPanel.prototype.init = function() {
 	}, this));
 	
 	panel.find('.edit-btn').click($.proxy($this.editSelectedItem, $this));
+	
+	panel.find('.duplicate-btn').click($.proxy($this.duplicateSelectedItem, $this));
 	
 	panel.find('.delete-btn').click($.proxy(function() {
 		var $this = this;
@@ -39,6 +42,17 @@ Collect.AbstractItemPanel.prototype.editSelectedItem = function() {
 		return;
 	}
 	$this.openItemEditDialog(selectedItem);
+};
+
+Collect.AbstractItemPanel.prototype.duplicateSelectedItem = function() {
+	var $this = this;
+	var selectedItem = $this.getSelectedItem();
+	if (selectedItem == null) {
+		return;
+	}
+	var newItem = jQuery.extend({}, selectedItem);
+	newItem.id = null;
+	$this.openItemEditDialog(newItem);
 };
 
 Collect.AbstractItemPanel.prototype.initDataGrid = function() {

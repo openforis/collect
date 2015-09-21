@@ -1,6 +1,9 @@
 package org.openforis.collect.datacleansing.form;
 
+import java.util.Arrays;
+
 import org.openforis.collect.datacleansing.DataErrorType;
+import org.openforis.commons.lang.Strings;
 
 /**
  * 
@@ -21,6 +24,10 @@ public class DataErrorTypeForm extends DataCleansingItemForm<DataErrorType> {
 		super(obj);
 	}
 
+	public String getPrettyLabel() {
+		return Strings.joinNotBlank(Arrays.asList(code, label), " - ");
+	}
+	
 	public String getCode() {
 		return code;
 	}

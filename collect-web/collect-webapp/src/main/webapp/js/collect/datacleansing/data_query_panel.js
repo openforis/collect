@@ -2,7 +2,8 @@ Collect.DataCleansing.DataQueryPanelController = function($panel) {
 	Collect.AbstractItemPanel.apply(this, [$panel, "Data Query", 
 			Collect.DataQueryDialogController,
 			collect.dataQueryService, 
-			Collect.DataCleansing.DATA_QUERY_DELETED]);
+			Collect.DataCleansing.DATA_QUERY_DELETED,
+			Collect.DataCleansing.DATA_QUERY_SAVED]);
 };
 
 Collect.DataCleansing.DataQueryPanelController.prototype = Object.create(Collect.AbstractItemPanel.prototype);
