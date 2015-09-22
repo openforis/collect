@@ -154,7 +154,7 @@ Collect.AbstractItemEditDialogController.prototype.initFormElementsChangeListene
 
 Collect.AbstractItemEditDialogController.prototype.fieldFocusOutHandler = function(field) {
 	var $this = this;
-	field.data("visited", true);
+	OF.UI.Forms.setVisited(field);
 	$this.fieldChangeHandler(field);
 };
 
@@ -224,6 +224,7 @@ Collect.AbstractItemEditDialogController.prototype.validateForm = function() {
 Collect.AbstractItemEditDialogController.prototype.fillForm = function(callback) {
 	var $this = this;
 	OF.UI.Forms.fill($this.form, $this.item);
+	
 	//field.data("visited", true);
 	callback.call($this);
 };

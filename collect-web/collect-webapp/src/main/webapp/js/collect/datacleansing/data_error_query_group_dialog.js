@@ -58,7 +58,7 @@ Collect.DataErrorQueryGroupDialogController.prototype.initFormElements = functio
 			
 			OF.Arrays.removeItem($this.availableNewQueries, selectedQuery);
 			
-			$this.refreshQueryDataGrid();
+			$this.reloadQueryDataGrid();
 			
 			$this.initNewQuerySelectPicker();
 		}, $this));
@@ -78,13 +78,15 @@ Collect.DataErrorQueryGroupDialogController.prototype.initFormElements = functio
 				return;
 			}
 			var queryIndex = $this.queries.indexOf(selectedQuery);
-			if (up && queryIndex == 0 || ! up && queryIndex == $this.queries.length) {
+			var toIndex = queryIndex + (up ? -1 : 1);
+			if (toIndex < 0 || toIndex == $this.queries.length) {
 				return;
 			}
-			var toIndex = queryIndex + (up ? -1 : 1);
 			OF.Arrays.shiftItem($this.queries, selectedQuery, toIndex);
 			
-			$this.refreshQueryDataGrid();
+			$this.reloadQueryDataGrid();
+			
+			$this.scrollQueryDataGridToIndex(toIndex);
 		};
 		
 		$this.content.find(".move-query-up-btn").click($.proxy(function() {
@@ -118,7 +120,7 @@ Collect.DataErrorQueryGroupDialogController.prototype.fillForm = function(callba
 	var $this = this;
 	Collect.AbstractItemEditDialogController.prototype.fillForm.call(this, function() {
 		$this.queries = OF.Arrays.clone($this.item.queries);
-		$this.refreshQueryDataGrid();
+		$this.reloadQueryDataGrid();
 		callback();
 	});
 };
@@ -138,15 +140,15 @@ Collect.DataErrorQueryGroupDialogController.prototype.initQueryDataGrid = functi
 	gridContainer.bootstrapTable({
 	    clickToSelect: true,
 	    reorderableRows: true,
-	    height: 150,
+	    height: 200,
 	    width: 800,
 	    columns: [
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
-			{field: "title", title: "Title", width: 400},
-			{field: "queryTitle", title: "Query Title", width: 200},
-			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},
+			{field: "typeCode", title: "Type", width: 40},
+			{field: "queryTitle", title: "Query Title", width: 500},
+			//{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},
+			//{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},
 			Collect.Grids.createDeleteColumn($this.deleteQuery, $this)
 		]
 	});
@@ -171,9 +173,13 @@ Collect.DataErrorQueryGroupDialogController.prototype.initNewQuerySelectPicker =
 
 Collect.DataErrorQueryGroupDialogController.prototype.deleteQuery = function(query) {
 	var $this = this;
-	OF.Alerts.confirm("Remove the cleansing query from this chain?", function() {
+	OF.Alerts.confirm("Remove the query '" + query.queryTitle + "' from this group?", function() {
+		var oldScrollPosition = $this.queryDataGrid.getScrollPosition();
+		
 		OF.Arrays.removeItem($this.queries, query);
-		$this.refreshQueryDataGrid();
+		$this.reloadQueryDataGrid();
+		
+		$this.queryDataGrid.scrollTo(oldScrollPosition);
 		
 		$this.availableNewQueries.push(query);
 		$this.initNewQuerySelectPicker();
@@ -193,9 +199,17 @@ Collect.DataErrorQueryGroupDialogController.prototype.getSelectedQuery = functio
 	return selections.length == 0 ? null : selections[0];
 }
 
-Collect.DataErrorQueryGroupDialogController.prototype.refreshQueryDataGrid = function() {
+Collect.DataErrorQueryGroupDialogController.prototype.reloadQueryDataGrid = function() {
 	var $this = this;
 	var data = $this.queries ? $this.queries : null;
 	$this.queryDataGrid.load(data);
 	$this.onQuerySelectionChange();
+};
+
+Collect.DataErrorQueryGroupDialogController.prototype.scrollQueryDataGridToIndex = function(index) {
+	var $this = this;
+	var grid = $this.queryDataGrid;
+	var row = $(grid.$tableBody.find("tbody").children()[index]);
+	var rowScrollPosition = row.position().top - ($(grid.$tableBody).prop("clientHeight") + row.prop("clientHeight")) / 2;
+	grid.scrollTo(rowScrollPosition);
 };

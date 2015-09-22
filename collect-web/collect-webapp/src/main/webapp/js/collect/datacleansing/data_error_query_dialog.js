@@ -36,7 +36,7 @@ Collect.DataErrorQueryDialogController.prototype.initFormElements = function(cal
 	Collect.AbstractItemEditDialogController.prototype.initFormElements.call(this, function() {
 		{//init error type select picker
 			var select = $this.content.find('select[name="typeId"]');
-			OF.UI.Forms.populateSelect(select, $this.errorTypes, "id", "code", true);
+			OF.UI.Forms.populateSelect(select, $this.errorTypes, "id", "prettyLabel", true);
 			select.selectpicker();
 			$this.errorTypeSelectPicker = select.data().selectpicker;
 		}

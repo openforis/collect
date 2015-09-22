@@ -16,7 +16,7 @@ Collect.DataCleansing.DataErrorQueryGroupPanelController.prototype.getDataGridOp
 			width: 600,
 			columns: [
 				{field: "id", title: "Id", visible: false},
-				{field: "title", title: "Title", width: 400}
+				{field: "queryTitle", title: "Title", width: 400}
 		    ],
 		    data: group.queries
 		});
@@ -42,8 +42,8 @@ Collect.DataCleansing.DataErrorQueryGroupPanelController.prototype.getDataGridOp
           	{field: "selected", title: "", radio: true},
 			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title", width: 800, sortable: true},
-			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+//			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+//			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
 			$this.createGridItemDeleteColumn()
 		]
 	};

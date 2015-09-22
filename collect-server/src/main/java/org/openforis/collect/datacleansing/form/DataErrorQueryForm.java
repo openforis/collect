@@ -20,10 +20,10 @@ public class DataErrorQueryForm extends DataCleansingItemForm<DataErrorQuery> {
 	private Severity severity;
 	
 	//calculated members
-	private String typeCode;
-	private String queryTitle;
-	private String queryDescription;
-	private String prettyFormatTitle;
+	private transient String typeCode;
+	private transient String queryTitle;
+	private transient String queryDescription;
+	private transient String prettyFormatTitle;
 	
 	public DataErrorQueryForm() {
 		super();

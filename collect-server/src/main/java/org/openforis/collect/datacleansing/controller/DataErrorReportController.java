@@ -378,7 +378,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		@Override
 		protected List<String> determineExtraValues(DataErrorReportItem item) {
 			List<String> values = new ArrayList<String>();
-			CollectRecord record = recordProvider.load((CollectSurvey) rootEntityDefinition.getSurvey(), item.getRecordId());
+			CollectRecord record = item.getRecord();
 			
 			CoordinateAttribute locationAttr = record.findNodeByPath(locationAttributePath);
 			Coordinate location = locationAttr.getValue();

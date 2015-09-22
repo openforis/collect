@@ -73,6 +73,45 @@ OF.UI.Forms.toJSON = function($form) {
     return result;
 };
 
+OF.UI.Forms.getFieldNames = function(form) {
+	var fields = [];
+	var array = form.serializeArray();
+    $.each(array, function() {
+    	fields.push(this.name);
+    });
+    return fields;
+};
+
+OF.UI.Forms.getParentForm = function(inputField) {
+	if (typeof inputField == "form") {
+		return inputField;
+	} else {
+		var form = inputField.closest("form");
+		return form;
+	}
+};
+
+OF.UI.Forms.getInputFields = function($form, fieldName) {
+	var fieldNames = [];
+	var inputFields = [];
+	if (fieldName) {
+		fieldNames.push(fieldName);
+	} else {
+		fieldNames = OF.UI.Forms.getFieldNames($form);
+	}
+	fieldNames.each(function(i, fieldName) {
+		var field = $('[name='+fieldName+']', $form);
+		if ( field.length == 1 ) {
+			inputFields.push(field);
+		} else {
+			field.each(function(i, $inputField) {
+				inputFields.push($inputField);
+			});
+		}
+	});
+	return inputFields;
+}
+
 /**
  * Set the specified values into a form according to the field names
  * 
@@ -83,6 +122,24 @@ OF.UI.Forms.fill = function($form, $data) {
 	$.each($data, function(fieldName, value) {
 		OF.UI.Forms.setFieldValue($form, fieldName, value);
     });
+};
+/**
+ * Sets the metadata "visited" on the field with the specified value
+ */
+OF.UI.Forms.setVisited = function(formOrField, value) {
+	var fieldNames;
+	if (typeof formOrField == "form") {
+		fieldNames = OF.UI.Forms.getFieldNames(formOrField);
+	} else {
+		fieldNames = [formOrField];
+	}
+	$.each(fieldNames, function(i, fieldName) {
+		var form = OF.UI.Forms.getParentForm(formOrField);
+		var fields = OF.UI.Forms.getInputFields(form);
+		fields.each(function(i, field) {
+			field.data("visited", typeof value == 'undefined' || value);
+		});
+	});
 };
 
 OF.UI.Forms.setFieldValue = function($form, fieldName, value) {
