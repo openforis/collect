@@ -58,9 +58,10 @@ public class DataErrorQueryGroupManager extends AbstractSurveyObjectManager<Data
 	}
 	
 	@Override
-	public void delete(DataErrorQueryGroup chain) {
-		dao.deleteQueryAssociations(chain);
-		super.delete(chain);
+	@Transactional
+	public void delete(DataErrorQueryGroup group) {
+		dao.deleteQueryAssociations(group);
+		super.delete(group);
 	}
 	
 	@Override

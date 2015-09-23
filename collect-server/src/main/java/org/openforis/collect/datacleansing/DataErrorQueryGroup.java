@@ -46,6 +46,12 @@ public class DataErrorQueryGroup extends PersistedSurveyObject {
 		this.queryIds.clear();
 	}
 	
+	public void allAllQueries(List<DataErrorQuery> queries) {
+		for (DataErrorQuery query : queries) {
+			addQuery(query);
+		}
+	}
+
 	public String getTitle() {
 		return title;
 	}

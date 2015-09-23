@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.jooq.BatchBindStep;
-import org.jooq.DeleteConditionStep;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -52,7 +51,8 @@ public class DataErrorQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<Da
 
 	public Set<DataErrorQueryGroup> loadGroupsByQuery(DataErrorQuery query) {
 		JooqDSLContext dsl = dsl((CollectSurvey) query.getSurvey());
-		SelectConditionStep<Record1<Integer>> subselect = dsl.select(OFC_DATA_ERROR_QUERY_GROUP_QUERY.GROUP_ID)
+		SelectConditionStep<Record1<Integer>> subselect = dsl
+			.select(OFC_DATA_ERROR_QUERY_GROUP_QUERY.GROUP_ID)
 			.from(OFC_DATA_ERROR_QUERY_GROUP_QUERY)
 			.where(OFC_DATA_ERROR_QUERY_GROUP_QUERY.QUERY_ID.eq(query.getId()));
 		
@@ -77,9 +77,9 @@ public class DataErrorQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<Da
 	
 	public void deleteQueryAssociations(DataErrorQueryGroup group) {
 		JooqDSLContext dsl = dsl((CollectSurvey) group.getSurvey());
-		DeleteConditionStep<?> query = dsl.delete(OFC_DATA_ERROR_QUERY_GROUP_QUERY)
-			.where(OFC_DATA_ERROR_QUERY_GROUP_QUERY.GROUP_ID.eq(group.getId()));
-		query.execute();
+		dsl.delete(OFC_DATA_ERROR_QUERY_GROUP_QUERY)
+			.where(OFC_DATA_ERROR_QUERY_GROUP_QUERY.GROUP_ID.eq(group.getId()))
+			.execute();
 	}
 	
 	public void insertQueryAssociations(DataErrorQueryGroup chain, List<Integer> queryIds) {

@@ -54,6 +54,14 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		return loadByReport(report, null, null);
 	}
 
+	public void deleteByReport(DataErrorReport report) {
+		JooqDSLContext dsl = dsl(report);
+		dsl
+			.delete(OFC_DATA_ERROR_REPORT_ITEM)
+			.where(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()))
+			.execute();
+	}
+
 	public int countItems(DataErrorReport report) {
 		JooqDSLContext dsl = dsl(report);
 		SelectQuery<?> q = dsl.selectCountQuery();

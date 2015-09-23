@@ -41,6 +41,12 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 		super.setDao(dao);
 	}
 	
+	@Override
+	public void delete(DataErrorReport obj) {
+		errorReportItemDao.deleteByReport(obj);
+		super.delete(obj);
+	}
+	
 	public void saveItems(DataErrorReport report, List<DataErrorReportItem> items) {
 		errorReportItemDao.insert(report, items);
 	}
@@ -67,7 +73,7 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 			int recordId = item.getRecordId();
 			CollectRecord record = recordCache.get(recordId);
 			if (record == null) {
-				record = recordManager.load(survey, recordId);
+				record = recordManager.load(survey, recordId, report.getRecordStep(), false);
 				recordCache.put(recordId, record);
 			}
 			item.setRecord(record);

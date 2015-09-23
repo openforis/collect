@@ -16,8 +16,8 @@ public class DataErrorQueryGroupForm extends DataCleansingItemForm<DataErrorQuer
 
 	private String title;
 	private String description;
-	private List<DataErrorQueryForm> queries;
 	private List<Integer> queryIds;
+	private transient List<DataErrorQueryForm> queries;
 	
 	public DataErrorQueryGroupForm() {
 		super();

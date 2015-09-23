@@ -176,6 +176,13 @@
 			<column name="status" type="CHAR(1)" />
 		</createTable>
 		
+		<createIndex 
+	            indexName="ofc_data_error_report_item_report_record_idx"
+	            tableName="ofc_data_error_report_item">
+        	<column name="report_id" type="INTEGER"/>
+        	<column name="record_id" type="INTEGER"/>
+       </createIndex>
+       
 		<createSequence sequenceName="ofc_data_cleansing_step_id_seq" />
 		
 	    <createTable tableName="ofc_data_cleansing_step">

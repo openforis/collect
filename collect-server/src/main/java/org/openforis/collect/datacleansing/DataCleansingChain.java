@@ -33,6 +33,12 @@ public class DataCleansingChain extends PersistedSurveyObject {
 		steps.add(step);
 	}
 	
+	public void addAllSteps(List<DataCleansingStep> steps) {
+		for (DataCleansingStep step : steps) {
+			addStep(step);
+		}
+	}
+
 	public void removeStep(DataCleansingStep step) {
 		steps.remove(step);
 	}

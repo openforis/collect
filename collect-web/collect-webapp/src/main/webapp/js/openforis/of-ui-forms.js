@@ -126,18 +126,16 @@ OF.UI.Forms.fill = function($form, $data) {
 /**
  * Sets the metadata "visited" on the field with the specified value
  */
-OF.UI.Forms.setVisited = function(formOrField, value) {
-	var fieldNames;
-	if (typeof formOrField == "form") {
-		fieldNames = OF.UI.Forms.getFieldNames(formOrField);
-	} else {
-		fieldNames = [formOrField];
-	}
+OF.UI.Forms.setFieldVisited = function(field, visited) {
+	field.data("visited", typeof visited == 'undefined' || visited);
+};
+
+OF.UI.Forms.setAllFieldsVisited = function(form, visited) {
+	var fieldNames = OF.UI.Forms.getFieldNames(form);
 	$.each(fieldNames, function(i, fieldName) {
-		var form = OF.UI.Forms.getParentForm(formOrField);
-		var fields = OF.UI.Forms.getInputFields(form);
+		var fields = OF.UI.Forms.getInputFields(form, fieldName);
 		fields.each(function(i, field) {
-			field.data("visited", typeof value == 'undefined' || value);
+			field.data("visited", typeof visited == 'undefined' || visited);
 		});
 	});
 };

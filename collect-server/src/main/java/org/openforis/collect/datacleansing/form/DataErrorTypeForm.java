@@ -24,8 +24,18 @@ public class DataErrorTypeForm extends DataCleansingItemForm<DataErrorType> {
 		super(obj);
 	}
 
+	/**
+	 * Calculated property: returns a pretty representation of the object
+	 */
 	public String getPrettyLabel() {
 		return Strings.joinNotBlank(Arrays.asList(code, label), " - ");
+	}
+	
+	/**
+	 * Void: avoids deserialization issues
+	 */
+	public void setPrettyLabel(String label) {
+		return;
 	}
 	
 	public String getCode() {

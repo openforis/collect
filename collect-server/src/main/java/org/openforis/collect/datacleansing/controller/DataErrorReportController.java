@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +23,6 @@ import org.openforis.collect.datacleansing.form.DataErrorReportForm;
 import org.openforis.collect.datacleansing.form.DataErrorReportItemForm;
 import org.openforis.collect.datacleansing.manager.DataErrorQueryGroupManager;
 import org.openforis.collect.datacleansing.manager.DataErrorReportManager;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -65,8 +65,6 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	private DataErrorQueryGroupManager dataErrorQueryGroupManager;
 	@Autowired
 	private CollectJobManager collectJobManager;
-	@Autowired
-	private RecordManager recordManager;
 	
 	private DataErrorReportGeneratorJob generationJob;
 	
@@ -99,8 +97,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		generationJob.setErrorQueryGroup(queryGroup);
 		generationJob.setRecordStep(recordStep);
 		collectJobManager.start(generationJob);
-		Response response = new Response();
-		return response;
+		return new Response();
 	}
 	
 	@RequestMapping(value="{reportId}/export.csv", method = RequestMethod.GET)
@@ -121,10 +118,10 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		
 		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinitions().get(0);
 		CSVWriterDataErrorItemProcessor itemProcessor = Objects.newInstance(itemProcessorType, 
-				new RecordProvider(recordManager), rootEntityDefinition);
+				rootEntityDefinition);
 		itemProcessor.init();
 		int count = itemManager.countItems(report);
-		int itemsPerPage = 100;
+		int itemsPerPage = 200;
 		int pages = Double.valueOf(Math.ceil((double) count / itemsPerPage)).intValue();
 		for (int page = 1; page <= pages ; page++) {
 			List<DataErrorReportItem> items = itemManager.loadItems(report, (page - 1) * itemsPerPage, itemsPerPage);
@@ -174,7 +171,6 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	private static abstract class CSVWriterDataErrorItemProcessor implements Closeable {
 		
 		protected CsvWriter csvWriter;
-		protected RecordProvider recordProvider;
 		
 		//output
 		private File tempFile;
@@ -182,8 +178,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		protected EntityDefinition rootEntityDefinition;
 
 
-		public CSVWriterDataErrorItemProcessor(RecordProvider recordProvider, EntityDefinition rootEntityDefinition) {
-			this.recordProvider = recordProvider;
+		public CSVWriterDataErrorItemProcessor(EntityDefinition rootEntityDefinition) {
 			this.rootEntityDefinition = rootEntityDefinition;
 		}
 		
@@ -213,7 +208,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		}
 
 		protected List<String> determineExtraHeaders() {
-			return new ArrayList<String>();
+			return Collections.emptyList();
 		}
 
 		public abstract void process(DataErrorReportItem item);
@@ -238,9 +233,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		private RecordReportInfo lastRecordReportInfo;
 		
 		public GroupedByRecordCSVWriterDataErrorProcessor(
-				RecordProvider recordProvider,
 				EntityDefinition rootEntityDefinition) {
-			super(recordProvider, rootEntityDefinition);
+			super(rootEntityDefinition);
 		}
 		
 		@Override
@@ -284,10 +278,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		
 		@Override
 		protected List<String> determineExtraHeaders() {
-			List<String> headers = new ArrayList<String>();
-			headers.add(ERRORS_HEADER);
-			headers.add(WARNINGS_HEADER);
-			return headers;
+			return Arrays.asList(ERRORS_HEADER, WARNINGS_HEADER);
 		}
 
 		protected class RecordReportInfo {
@@ -351,9 +342,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		private List<String> fromCSVAttributePaths;
 
 		public CollectEarthCSVWriterDataErrorProcessor(
-				RecordProvider recordProvider,
 				EntityDefinition rootEntityDefinition) {
-			super(recordProvider, rootEntityDefinition);
+			super(rootEntityDefinition);
 			this.locationAttributePath = rootEntityDefinition.getName() + Path.SEPARATOR + LOCATION_ATTRIBUTE_NAME;
 			this.fromCSVAttributes = determineFromCSVAttributes();
 			this.fromCSVAttributePaths = new ArrayList<String>(fromCSVAttributes.size());
@@ -368,10 +358,10 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 			List<String> extraHeaders = new ArrayList<String>();
 			extraHeaders.add(X_COORDINATE_HEADER);
 			extraHeaders.add(Y_COORDINATE_HEADER);
-			extraHeaders.addAll(super.determineExtraHeaders());
 			for (AttributeDefinition def : fromCSVAttributes) {
 				extraHeaders.add(def.getName());
 			}
+			extraHeaders.addAll(super.determineExtraHeaders());
 			return extraHeaders;
 		}
 		
@@ -385,12 +375,11 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 			values.add(String.valueOf(location.getX()));
 			values.add(String.valueOf(location.getY()));
 			
-			values.addAll(super.determineExtraValues(item));
-			
 			for (String attrPath : fromCSVAttributePaths) {
 				Attribute<?, ?> attr = record.findNodeByPath(attrPath);
 				values.add(extractCSVValue(attr));
 			}
+			values.addAll(super.determineExtraValues(item));
 			return values;
 		}
 
@@ -423,21 +412,6 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 			return defs;
 		}
 		
-	}
-	
-	public static class RecordProvider {
-		
-		private RecordManager recordManager;
-
-		public RecordProvider(RecordManager recordManager) {
-			super();
-			this.recordManager = recordManager;
-		}
-		
-		public CollectRecord load(CollectSurvey survey, int recordId) {
-			CollectRecord record = recordManager.load(survey, recordId);
-			return record;
-		}
 	}
 	
 }

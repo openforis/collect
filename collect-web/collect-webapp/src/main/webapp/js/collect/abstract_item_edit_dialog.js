@@ -154,7 +154,7 @@ Collect.AbstractItemEditDialogController.prototype.initFormElementsChangeListene
 
 Collect.AbstractItemEditDialogController.prototype.fieldFocusOutHandler = function(field) {
 	var $this = this;
-	OF.UI.Forms.setVisited(field);
+	OF.UI.Forms.setFieldVisited(field);
 	$this.fieldChangeHandler(field);
 };
 

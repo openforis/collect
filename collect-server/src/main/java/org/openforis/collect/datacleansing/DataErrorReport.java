@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
 
@@ -16,16 +17,19 @@ public class DataErrorReport extends PersistedSurveyObject {
 	
 	private static final long serialVersionUID = 1L;
 	
+	private Step recordStep;
 	private int queryGroupId;
 	private DataErrorQueryGroup queryGroup;
 	private List<DataErrorReportItem> items = new ArrayList<DataErrorReportItem>();
 	
 	public DataErrorReport(CollectSurvey survey) {
 		super(survey);
+		this.recordStep = Step.ENTRY;
 	}
 	
 	public DataErrorReport(CollectSurvey survey, UUID uuid) {
 		super(survey, uuid);
+		this.recordStep = Step.ENTRY;
 	}
 
 	public void addItem(DataErrorReportItem item) {
@@ -59,6 +63,14 @@ public class DataErrorReport extends PersistedSurveyObject {
 
 	public void setItems(List<DataErrorReportItem> items) {
 		this.items = items;
+	}
+	
+	public Step getRecordStep() {
+		return recordStep;
+	}
+	
+	public void setRecordStep(Step recordStep) {
+		this.recordStep = recordStep;
 	}
 
 }

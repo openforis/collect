@@ -37,6 +37,25 @@ public class DataErrorQueryForm extends DataCleansingItemForm<DataErrorQuery> {
 		this.prettyFormatTitle = String.format("Error type: %s - Data Query: %s", typeCode, query.getQuery().getTitle());
 	}
 	
+	/**
+	 * Void methods: avoid deserialization issues
+	 */
+	public void setTypeCode(String typeCode) {
+		return;
+	}
+	
+	public void setQueryTitle(String queryTitle) {
+		return;
+	}
+	
+	public void setQueryDescription(String queryDescription) {
+		return;
+	}
+	
+	public void setPrettyFormatTitle(String prettyFormatTitle) {
+		return;
+	}
+	
 	public Severity getSeverity() {
 		return severity;
 	}
