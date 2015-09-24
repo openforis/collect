@@ -56,7 +56,8 @@ package org.openforis.collect.presenter {
 		
 		private static const COLLECT_DATA_FILTER:FileFilter = new FileFilter("Collect Data", "*.collect-data");
 		private static const COLLECT_BACKUP_FILTER:FileFilter = new FileFilter("Collect Backup", "*.collect-backup");
-		private static const FILE_FILTERS:Array = [COLLECT_DATA_FILTER, COLLECT_BACKUP_FILTER];
+		private static const COLLECT_EARTH_DATA_FILTER:FileFilter = new FileFilter("Collect Earth Data", "*.zip");
+		private static const FILE_FILTERS:Array = [COLLECT_DATA_FILTER, COLLECT_BACKUP_FILTER, COLLECT_EARTH_DATA_FILTER];
 		
 		private var _fileReference:FileReference;
 		private var _dataImportClient:DataImportClient;
