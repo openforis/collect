@@ -32,6 +32,7 @@ public abstract class SurveyObjectMappingDSLContext<T extends PersistedSurveyObj
 
 	@Override
 	protected void fromObject(T o, StoreQuery<?> q) {
+		q.addValue(getIdField(), o.getId());
 	}
 
 	@Override
