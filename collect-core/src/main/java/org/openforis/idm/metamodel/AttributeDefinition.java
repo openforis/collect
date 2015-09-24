@@ -11,7 +11,6 @@ import java.util.List;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.model.Value;
-import org.openforis.idm.util.DeepEquals;
 
 /**
  * @author G. Miceli
@@ -177,12 +176,12 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		if (attributeDefaults == null) {
 			if (other.attributeDefaults != null)
 				return false;
-		} else if (! DeepEquals.deepEquals(attributeDefaults, other.attributeDefaults))
+		} else if (! CollectionUtils.deepEquals(attributeDefaults, other.attributeDefaults))
 			return false;
 		if (checks == null) {
 			if (other.checks != null)
 				return false;
-		} else if (! DeepEquals.deepEquals(checks, other.checks))
+		} else if (! CollectionUtils.deepEquals(checks, other.checks))
 			return false;
 		return true;
 	}

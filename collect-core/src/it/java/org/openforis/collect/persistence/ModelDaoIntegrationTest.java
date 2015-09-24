@@ -39,7 +39,7 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	//@Test
 	public void testCRUD() throws Exception  {
 		// LOAD MODEL
-		CollectSurvey survey = surveyDao.load("archenland1");
+		CollectSurvey survey = surveyDao.loadByName("archenland1");
 
 		if ( survey == null ) {
 			// IMPORT MODEL
@@ -61,7 +61,7 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	@Test
 	public void testLoadSummariesByKey() throws Exception  {
 		// LOAD MODEL
-		CollectSurvey survey = surveyDao.load("archenland1");
+		CollectSurvey survey = surveyDao.loadByName("archenland1");
 
 		if ( survey == null ) {
 			// IMPORT MODEL
@@ -92,13 +92,13 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 	
 	@Test
 	public void testSurveyNotFoundById() {		
-		Survey survey = surveyDao.load(-100);
+		Survey survey = surveyDao.loadById(-100);
 		assertNull(survey);
 	}
 	
 	@Test
 	public void testSurveyNotFoundByName() {		
-		Survey survey = surveyDao.load("!!!!!!");
+		Survey survey = surveyDao.loadByName("!!!!!!");
 		assertNull(survey);
 	}
 
@@ -174,7 +174,7 @@ public class ModelDaoIntegrationTest extends CollectIntegrationTest {
 
 //	@Test
 	public void testLoadRecordSummaries() {
-		CollectSurvey survey = surveyDao.load("archenland1");
+		CollectSurvey survey = surveyDao.loadByName("archenland1");
 		//get the first root entity
 		EntityDefinition rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
 		String rootEntityName = rootEntity.getName();

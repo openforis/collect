@@ -66,7 +66,7 @@ public class UIOptionsMigrator {
 				UIModelObject uiModelObj = uiConfig.getModelObjectByNodeDefinitionId(nodeId);
 				if ( uiModelObj == null ) {
 					throw new IllegalStateException(String.format("No UI model object found for node with id %d in %s survey with uri %s", nodeId, 
-							survey.isWork() ? "temporary": "published", survey.getUri()));
+							survey.isTemporary() ? "temporary": "published", survey.getUri()));
 				}
 			}
 		});

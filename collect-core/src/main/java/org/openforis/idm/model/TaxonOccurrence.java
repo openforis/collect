@@ -1,6 +1,10 @@
 package org.openforis.idm.model;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
 
@@ -9,7 +13,7 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  * @author M. Togna
  * @author S. Ricci
  */
-public final class TaxonOccurrence implements Value {
+public final class TaxonOccurrence extends AbstractValue {
 
 	private Integer taxonId;
 	private String code;
@@ -62,6 +66,18 @@ public final class TaxonOccurrence implements Value {
 					vernacularName.getLanguageVariety());
 	}
 	
+	@Override
+	@SuppressWarnings("serial")
+	public Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(TaxonAttributeDefinition.CODE_FIELD_NAME, code);
+			put(TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME, scientificName);
+			put(TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME, vernacularName);
+			put(TaxonAttributeDefinition.LANGUAGE_CODE_FIELD_NAME, languageCode);
+			put(TaxonAttributeDefinition.LANGUAGE_VARIETY_FIELD_NAME, languageVariety);
+		}};
+	}
+	
 	public Integer getTaxonId() {
 		return taxonId;
 	}
@@ -91,17 +107,14 @@ public final class TaxonOccurrence implements Value {
 	}
 
 	@Override
-	public String toString() {
-		return new ToStringBuilder(this)
-			.append("taxonId", taxonId)
-			.append("code", code)
-			.append("scientificName", scientificName)
-			.append("vernacularName", vernacularName)
-			.append("languageCode", languageCode)
-			.append("languageVariety", languageVariety)
-			.toString();
+	public String toPrettyFormatString() {
+		if (StringUtils.isNotBlank(vernacularName)) {
+			return String.format("%s - %s - %s[%s]", code, scientificName, vernacularName, languageCode);
+		} else {
+			return String.format("%s - %s", code, scientificName);
+		}
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

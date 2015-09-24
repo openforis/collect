@@ -82,6 +82,11 @@ public class SessionManager {
 		sessionState.keepActiveRecordAlive();
 	}
 
+	public void setActiveSurvey(CollectSurvey survey) {
+		SessionState sessionState = getSessionState();
+		sessionState.setActiveSurvey(survey);
+	}
+	
 	public void clearActiveRecord() {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(null);
@@ -93,7 +98,7 @@ public class SessionManager {
 			CollectSurvey survey = getActiveDesignerSurvey();
 			boolean activeSurveyWork = sessionState.isActiveSurveyWork();
 			if ( activeSurveyWork ) {
-				surveyManager.saveSurveyWork(survey);
+				surveyManager.save(survey);
 			} else {
 				throw new IllegalArgumentException("Active designer survey should be a 'work' survey");
 			}

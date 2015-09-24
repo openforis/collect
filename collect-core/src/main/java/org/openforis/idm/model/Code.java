@@ -1,5 +1,8 @@
 package org.openforis.idm.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 
@@ -7,8 +10,11 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
  * @author G. Miceli
  * @author M. Togna
  */
-public final class Code implements Value {
+public final class Code extends AbstractValue {
 
+	private static final String CODE_FIELD = "code";
+	private static final String QUALIFIER_FIELD = "qualifier";
+	
 	private final String code;
 	private final String qualifier;
 
@@ -22,14 +28,6 @@ public final class Code implements Value {
 		this.qualifier = qualifier;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public String getQualifier() {
-		return qualifier;
-	}
-	
 	public int compareTo(Value o) {
 		if ( o instanceof Code ) {
 			CompareToBuilder compareToBuilder = new CompareToBuilder();
@@ -42,10 +40,27 @@ public final class Code implements Value {
 	}
 	
 	@Override
-	public String toString() {
-		return String.format("code: %s - qualififer: %s", code, qualifier);
+	@SuppressWarnings("serial")
+	public Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(CODE_FIELD, code);
+			put(QUALIFIER_FIELD, qualifier);
+		}};
+	}
+	
+	@Override
+	public String toPrettyFormatString() {
+		return code == null ? null: code + (qualifier == null ? "": ": " + qualifier);
+	}
+	
+	public String getCode() {
+		return code;
 	}
 
+	public String getQualifier() {
+		return qualifier;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

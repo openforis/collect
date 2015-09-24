@@ -320,7 +320,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			} else {
 				//updating existing survey
 				updatingExistingSurvey = true;
-				updatingPublishedSurvey = ! surveySummary.isWork();
+				updatingPublishedSurvey = ! surveySummary.isTemporary();
 				surveyName = surveySummary.getName();
 			}
 		}

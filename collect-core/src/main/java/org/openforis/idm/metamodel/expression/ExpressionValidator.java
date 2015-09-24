@@ -26,6 +26,10 @@ public class ExpressionValidator {
 		BOOLEAN, VALUE, SCHEMA_PATH
 	}
 	
+	public enum ExpressionValidationResultFlag {
+		OK, ERROR
+	}
+	
 	private ExpressionFactory expressionFactory;
 
 	public ExpressionValidator(ExpressionFactory expressionFactory) {
@@ -59,7 +63,6 @@ public class ExpressionValidator {
 			return createErrorValidationResult(e);
 		}
 	}
-		
 
 	public ExpressionValidationResult validateValueExpression(NodeDefinition contextNodeDef, String expression) {
 		return validateValueExpression(contextNodeDef.getParentDefinition(), contextNodeDef, expression);
@@ -225,10 +228,6 @@ public class ExpressionValidator {
 		return result;
 	}
 
-	public enum ExpressionValidationResultFlag {
-		OK, ERROR
-	}
-	
 	public static class ExpressionValidationResult {
 		
 		private ExpressionValidationResultFlag flag;

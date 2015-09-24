@@ -94,7 +94,7 @@ public abstract class DatabaseLookupProvider implements LookupProvider {
 		if ( survey instanceof CollectSurvey ) {
 			Integer surveyId = survey.getId();
 			if ( surveyId != null ) {
-				String surveyIdFieldName = ((CollectSurvey) survey).isWork() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
+				String surveyIdFieldName = ((CollectSurvey) survey).isTemporary() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
 				NameValueEntry keyValue = new NameValueEntry(surveyIdFieldName, surveyId.toString());
 				filters.add(keyValue);
 			}

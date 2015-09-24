@@ -22,6 +22,46 @@ public class Sequences {
 	public static final org.jooq.Sequence<java.lang.Long> OFC_CODE_LIST_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_code_list_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>collect.ofc_data_cleansing_chain_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_CLEANSING_CHAIN_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_cleansing_chain_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_data_cleansing_step_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_CLEANSING_STEP_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_cleansing_step_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_data_error_query_group_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_ERROR_QUERY_GROUP_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_error_query_group_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_data_error_query_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_ERROR_QUERY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_error_query_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_data_error_report_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_ERROR_REPORT_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_error_report_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_data_error_report_item_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_ERROR_REPORT_ITEM_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_error_report_item_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_data_error_type_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_ERROR_TYPE_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_error_type_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>collect.ofc_data_query_id_seq</code>
+	 */
+	public static final org.jooq.Sequence<java.lang.Long> OFC_DATA_QUERY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_data_query_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>collect.ofc_record_id_seq</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> OFC_RECORD_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_record_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -35,11 +75,6 @@ public class Sequences {
 	 * The sequence <code>collect.ofc_survey_id_seq</code>
 	 */
 	public static final org.jooq.Sequence<java.lang.Long> OFC_SURVEY_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_survey_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
-	 * The sequence <code>collect.ofc_survey_work_id_seq</code>
-	 */
-	public static final org.jooq.Sequence<java.lang.Long> OFC_SURVEY_WORK_ID_SEQ = new org.jooq.impl.SequenceImpl<java.lang.Long>("ofc_survey_work_id_seq", org.openforis.collect.persistence.jooq.Collect.COLLECT, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>collect.ofc_taxon_id_seq</code>

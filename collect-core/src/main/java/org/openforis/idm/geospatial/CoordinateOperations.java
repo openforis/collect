@@ -33,4 +33,6 @@ public interface CoordinateOperations {
 	SpatialReferenceSystem fetchSRS(String code, Set<String> labelLanguages);
 	
 	Set<String> getAvailableSRSs();
+	
+	Coordinate convertToWgs84(Coordinate coordinate);
 }

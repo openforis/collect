@@ -147,7 +147,7 @@ public abstract class AbstractExpression {
 					return childDefinition;
 				} catch (Exception e) {
 					String message = String.format("Node '%s' not found", childName);
-					Set<String> childNames = ((EntityDefinition) contextNode).getChildDefinitionNames();
+					String[] childNames = ((EntityDefinition) contextNode).getChildDefinitionNames();
 					String childNamesFormatted = "\t" + joinSplittingInGroups(childNames, 5, ',', "\n\t");
 					String detailedMessage = String.format("Node '%s' not found\n - current parent entity: '%s'\n - possible valid values in %s:\n %s", 
 							childName, contextNode.getPath(), contextNode.getPath(), childNamesFormatted);
@@ -190,13 +190,13 @@ public abstract class AbstractExpression {
 		return fieldDef;
 	}
 	
-	private String joinSplittingInGroups(Set<String> items, int groupSize, char itemSeparator, String groupSeparator) {
+	private String joinSplittingInGroups(String[] items, int groupSize, char itemSeparator, String groupSeparator) {
 		StringBuilder childNamesFormattedSB = new StringBuilder();
 		int count = 0;
 		for (String name : items) {
 			childNamesFormattedSB.append(name);
 			count ++;
-			if (count < items.size()) {
+			if (count < items.length) {
 				childNamesFormattedSB.append(itemSeparator);
 				if (count % groupSize == 0) {
 					childNamesFormattedSB.append(groupSeparator);

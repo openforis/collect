@@ -72,11 +72,6 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="surveyWorkDao" class="org.openforis.collect.persistence.SurveyWorkDao"
-		init-method="init">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-
 	<bean id="taxonomyDao" class="org.openforis.collect.persistence.TaxonomyDao">
   		<property name="dataSource" ref="dataSource"/>
 	</bean>

@@ -4,12 +4,13 @@
 package org.openforis.collect.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.util.IOUtils;
+import org.openforis.collect.datacleansing.io.DataCleansingImportTask;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.metadata.CodeListImagesImportTask;
 import org.openforis.collect.io.metadata.IdmlImportTask;
@@ -22,9 +23,12 @@ import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyStoreException;
+import org.openforis.concurrency.Task;
 import org.openforis.concurrency.Worker;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -47,13 +51,15 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	private transient SamplingDesignManager samplingDesignManager;
 	@Autowired
 	private transient CodeListManager codeListManager;
+	@Autowired
+	private transient ApplicationContext applicationContext;
 	
 	//output
 	private SurveyBackupInfo backupInfo;
 
 	//temporary instance variables
 	private transient ZipFile zipFile;
-	private BackupFileExtractor backupFileExtractor;
+	private transient BackupFileExtractor backupFileExtractor;
 	
 	@Override
 	public void createInternalVariables() throws Throwable {
@@ -97,6 +103,9 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		if ( backupFileExtractor.containsEntriesInPath(SurveyBackupJob.SPECIES_FOLDER) ) {
 			addSpeciesImportTasks();
 		}
+		if (backupFileExtractor.containsEntry(SurveyBackupJob.DATA_CLEANSING_METADATA_ENTRY_NAME)) {
+			addDataCleansingImportTask();
+		}
 	}
 
 	@Override
@@ -137,6 +146,10 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			SpeciesBackupImportTask t = (SpeciesBackupImportTask) task;
 			t.setSpeciesManager(speciesManager);
 			t.setSurvey(survey);
+		} else if (task instanceof DataCleansingImportTask) {
+			DataCleansingImportTask t = (DataCleansingImportTask) task;
+			t.setSurvey(survey);
+			t.setInputFile(backupFileExtractor.extract(SurveyBackupJob.DATA_CLEANSING_METADATA_ENTRY_NAME));
 		}
 		super.initializeTask(task);
 	}
@@ -162,8 +175,8 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 	@SuppressWarnings("deprecation")
 	private void saveSurvey() {
 		try {
-			if ( survey.isWork() ) {
-				surveyManager.saveSurveyWork(survey);
+			if ( survey.isTemporary() ) {
+				surveyManager.save(survey);
 			} else {
 				surveyManager.updateModel(survey);
 			}
@@ -187,16 +200,19 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 		}
 	}
 	
+	private void addDataCleansingImportTask() {
+		try {
+			DataCleansingImportTask task = applicationContext.getBean(DataCleansingImportTask.class);
+			addTask((Task) task);
+		} catch (BeansException e) {
+			//do nothing
+		}
+	}
+
 	@Override
 	protected void onEnd() {
 		super.onEnd();
-		if ( zipFile != null ) {
-			try {
-				zipFile.close();
-			} catch (IOException e) {
-				log().warn("Error closing zip file", e);
-			}
-		}
+		IOUtils.closeQuietly(zipFile);
 	}
 
 	public SurveyManager getSurveyManager() {

@@ -17,7 +17,6 @@ public class TaxonomyProxy implements Proxy {
 	private String name;
 	private String uri;
 	private Integer surveyId;
-	private Integer surveyWorkId;
 	
 	public TaxonomyProxy() {
 	}
@@ -28,7 +27,6 @@ public class TaxonomyProxy implements Proxy {
 		name = taxonomy.getName();
 		uri = taxonomy.getUri();
 		surveyId = taxonomy.getSurveyId();
-		surveyWorkId = taxonomy.getSurveyWorkId();
 	}
 	
 	public static List<TaxonomyProxy> fromList(List<CollectTaxonomy> list) {
@@ -45,7 +43,6 @@ public class TaxonomyProxy implements Proxy {
 		taxonomy.setName(name);
 		taxonomy.setUri(uri);
 		taxonomy.setSurveyId(surveyId);
-		taxonomy.setSurveyWorkId(surveyWorkId);
 	}
 
 	public Integer getId() {
@@ -80,12 +77,4 @@ public class TaxonomyProxy implements Proxy {
 		this.surveyId = surveyId;
 	}
 
-	public Integer getSurveyWorkId() {
-		return surveyWorkId;
-	}
-
-	public void setSurveyWorkId(Integer surveyWorkId) {
-		this.surveyWorkId = surveyWorkId;
-	}
-	
 }

@@ -179,9 +179,14 @@ public class DataRestoreController extends BasicController {
 
 	private SurveyBackupInfo extractInfo(File tempFile) throws ZipException,
 			IOException {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(tempFile);
-		SurveyBackupInfo info = backupFileExtractor.extractInfo();
-		return info;
+		BackupFileExtractor backupFileExtractor = null;
+		try {
+			backupFileExtractor = new BackupFileExtractor(tempFile);
+			SurveyBackupInfo info = backupFileExtractor.extractInfo();
+			return info;
+		} finally {
+			IOUtils.closeQuietly(backupFileExtractor);
+		}
 	}
 
 	private void checkPackagedNewSurveyValidity(SurveyBackupInfo info) throws ZipException, IOException {
@@ -193,11 +198,16 @@ public class DataRestoreController extends BasicController {
 
 	private String extractSurveyUri(File tempFile) throws ZipException,
 			IOException, FileNotFoundException {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(tempFile);
-		File infoFile = backupFileExtractor.extractInfoFile();
-		SurveyBackupInfo backupInfo = SurveyBackupInfo.parse(new FileInputStream(infoFile));
-		String surveyUri = backupInfo.getSurveyUri();
-		return surveyUri;
+		BackupFileExtractor backupFileExtractor = null;
+		try {
+			backupFileExtractor = new BackupFileExtractor(tempFile);
+			File infoFile = backupFileExtractor.extractInfoFile();
+			SurveyBackupInfo backupInfo = SurveyBackupInfo.parse(new FileInputStream(infoFile));
+			String surveyUri = backupInfo.getSurveyUri();
+			return surveyUri;
+		} finally {
+			IOUtils.closeQuietly(backupFileExtractor);
+		}
 	}
 	
 	private File copyContentToFile(UploadItem uploadItem) throws IOException,

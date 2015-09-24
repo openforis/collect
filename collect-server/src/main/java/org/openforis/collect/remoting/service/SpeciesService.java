@@ -40,11 +40,7 @@ public class SpeciesService {
 	@Secured("ROLE_ENTRY")
 	public List<TaxonomyProxy> loadTaxonomiesBySurvey(int surveyId, boolean work) {
 		List<CollectTaxonomy> result;
-		if ( work ) {
-			result = speciesManager.loadTaxonomiesBySurveyWork(surveyId);
-		} else {
-			result = speciesManager.loadTaxonomiesBySurvey(surveyId);
-		}
+		result = speciesManager.loadTaxonomiesBySurvey(surveyId);
 		List<TaxonomyProxy> proxies = TaxonomyProxy.fromList(result);
 		return proxies;
 	}

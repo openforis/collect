@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Value;
@@ -85,27 +86,10 @@ public class AttributeDefault implements Serializable, DeepComparable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private <V extends Value> V evaluateExpression(Attribute<?, V> attrib) throws InvalidExpressionException {
 		ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(attrib);
-		Object object = expressionEvaluator.evaluateValue(attrib.getParent(), attrib, expression);
-		if ( object == null ) {
-			return null;
-		} else {
-			AttributeDefinition defn = attrib.getDefinition();
-			Class<? extends Value> expectedValueType = defn.getValueType();
-			if ( object instanceof Value ) {
-				if ( expectedValueType.isAssignableFrom(object.getClass()) ) {
-					return (V) object;
-				} else {
-					throw new IllegalArgumentException(String.format("Unexpected value type. Found %s expected %s", expectedValueType.getName(), object.getClass().getName()));
-				}
-			} else {
-				String stringValue = object.toString();
-				V value = defn.createValue(stringValue);
-				return value;
-			}
-		}
+		V val = expressionEvaluator.evaluateAttributeValue(attrib.getParent(), attrib, attrib.getDefinition(), expression);
+		return val;
 	}
 
 	public Set<NodeDefinition> determineReferencedNodes(NodeDefinition context, NodeDefinition thisNodeDef) throws InvalidExpressionException {

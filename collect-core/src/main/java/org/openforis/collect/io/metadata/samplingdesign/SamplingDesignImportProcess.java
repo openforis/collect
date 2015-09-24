@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,15 +32,12 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 	
 	private static Log LOG = LogFactory.getLog(SamplingDesignImportProcess.class);
 	
-	private static final String CSV = "csv";
-
 	private SamplingDesignManager samplingDesignManager;
 	private SurveyManager surveyManager;
 	private File file;
 	private boolean overwriteAll;
 	
 	private SamplingDesignCSVReader reader;
-	private String errorMessage;
 	private List<SamplingDesignLine> lines;
 
 	private CollectSurvey survey;
@@ -210,8 +206,8 @@ public class SamplingDesignImportProcess extends AbstractProcess<Void, SamplingD
 
 	@SuppressWarnings("deprecation")
 	private void saveSurvey() throws SurveyStoreException {
-		if ( survey.isWork() ) {
-			surveyManager.saveSurveyWork(survey);
+		if ( survey.isTemporary() ) {
+			surveyManager.save(survey);
 		} else {
 			surveyManager.updateModel(survey);
 		}

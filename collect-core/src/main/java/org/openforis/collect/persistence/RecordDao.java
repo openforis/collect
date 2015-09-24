@@ -36,6 +36,7 @@ import org.openforis.collect.persistence.RecordDao.RecordDSLContext;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
 import org.openforis.collect.persistence.jooq.tables.records.OfcUserRecord;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -428,6 +429,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		private CollectSurvey survey;
 		private boolean recordToBeUpdated;
 		private Field<byte[]> dataAlias;
+		private ModelSerializer modelSerializer;
 		
 		public RecordDSLContext(Connection conn) {
 			this(conn, null);
@@ -449,6 +451,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 				throw new IllegalArgumentException("Invalid step "+step);
 			}
 			this.dataAlias = step == null ? null: (step == 1 ? OFC_RECORD.DATA1 : OFC_RECORD.DATA2).as("DATA");
+			this.modelSerializer = new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
 		}
 
 		public SelectQuery selectRecordQuery(int id) {
@@ -514,22 +517,25 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			}
 			c.setEntityCounts(counts);
 
-			// create list of keys
-			List<String> keys = new ArrayList<String>(KEY_FIELDS.length);
-			for (TableField tableField : KEY_FIELDS) {
-				keys.add((String) r.getValue(tableField));
-			}
-			c.setRootEntityKeyValues(keys);
-
-			int rootEntityId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
+			int rootEntityDefId = r.getValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID);
 
 			if ( dataAlias != null ) {
 				byte[] data = r.getValue(dataAlias);
 				//System.out.println("r.getValue(dataAlias) = " + r.getValue(dataAlias));
-				Entity rootEntity = c.createRootEntity(rootEntityId);
+				Entity rootEntity = c.createRootEntity(rootEntityDefId);
 				ModelSerializer modelSerializer = getSerializer();
 				modelSerializer.mergeFrom(data, rootEntity);
 			}
+
+			// create list of keys
+			EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinition(rootEntityDefId);
+			List<AttributeDefinition> keyDefs = rootEntityDef.getKeyAttributeDefinitions();
+			List<String> keys = new ArrayList<String>(keyDefs.size());
+			for (int i = 0; i < keyDefs.size(); i++) {
+				TableField tableField = KEY_FIELDS[i];
+				keys.add((String) r.getValue(tableField));
+			}
+			c.setRootEntityKeyValues(keys);
 		}
 
 		private User loadUser(Integer userId) {
@@ -553,10 +559,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			q.addValue(OFC_RECORD.ID, id);
 			Entity rootEntity = record.getRootEntity();
 			EntityDefinition rootEntityDefn = rootEntity.getDefinition();
-			Integer rootEntityDefnId = rootEntityDefn.getId();
-			if (rootEntityDefnId == null) {
-				throw new IllegalArgumentException("Null schema object definition id");
-			}
+			int rootEntityDefnId = rootEntityDefn.getId();
 			q.addValue(OFC_RECORD.SURVEY_ID, survey.getId());
 			q.addValue(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID, rootEntityDefnId);
 			q.addValue(OFC_RECORD.DATE_CREATED, toTimestamp(record.getCreationDate()));
@@ -613,16 +616,16 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 
 		private ModelSerializer getSerializer() {
-			return new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
+			return modelSerializer;
 		}
 		
 		@Override
-		protected int nextId() {
+		public int nextId() {
 			return super.nextId();
 		}
 		
 		@Override
-		protected void restartSequence(Number value) {
+		public void restartSequence(Number value) {
 			super.restartSequence(value);
 		}
 		

@@ -29,9 +29,9 @@
 							onCheck="@command('typeChanged')"
 							selectedItem="@bind(fx.type)">
 						<radio id="publishedTypeRadio" label="${labels.survey.export.type.published}" value="PUBLISHED"
-								disabled="@load(vm.survey.onlyWork)" />
+								disabled="@load(vm.survey.notLinkedToPublishedSurvey)" />
 						<radio id="temporaryTypeRadio" label="${labels.survey.export.type.temporary}" value="TEMPORARY" 
-								disabled="@load(! vm.survey.work)" />
+								disabled="@load(! vm.survey.temporary)" />
 					</radiogroup>
 				</row>
 				<row>

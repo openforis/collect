@@ -135,18 +135,18 @@ public class SurveySelectVM extends BaseVM {
 
 	@Command
 	public void editSelectedSurvey() throws IOException {
-		CollectSurvey surveyWork = loadSelectedSurveyForEdit();
+		CollectSurvey temporarySurvey = loadSelectedSurveyForEdit();
 		SessionStatus sessionStatus = getSessionStatus();
 		Integer publishedSurveyId = null;
 		if (selectedSurvey.isPublished()) {
-			if (selectedSurvey.isWork()) {
+			if (selectedSurvey.isTemporary()) {
 				publishedSurveyId = selectedSurvey.getPublishedId();
 			} else {
 				publishedSurveyId = selectedSurvey.getId();
 			}
 		}
 		sessionStatus.setPublishedSurveyId(publishedSurveyId);
-		sessionStatus.setSurvey(surveyWork);
+		sessionStatus.setSurvey(temporarySurvey);
 		sessionStatus.setCurrentLanguageCode(null);
 		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 	}
@@ -176,8 +176,8 @@ public class SurveySelectVM extends BaseVM {
 		
 		String uri = selectedSurvey.getUri();
 		CollectSurvey survey;
-		if ( selectedSurvey.isWork() && SurveyType.valueOf(parameters.getType()) == SurveyType.TEMPORARY ) {
-			survey = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		if ( selectedSurvey.isTemporary() && SurveyType.valueOf(parameters.getType()) == SurveyType.TEMPORARY ) {
+			survey = surveyManager.loadSurvey(selectedSurvey.getId());
 		} else {
 			survey = surveyManager.getByUri(uri);
 		}
@@ -362,7 +362,7 @@ public class SurveySelectVM extends BaseVM {
 	public void unpublishSelectedSurvey() throws IOException {
 		final String surveyName = selectedSurvey.getName();
 		//ask for a confirmation about survey unpublishing
-		String messageKey = selectedSurvey.isWork() ? "survey.unpublish_overwrite_temporary.confirm" : "survey.unpublish.confirm";
+		String messageKey = selectedSurvey.isTemporary() ? "survey.unpublish_overwrite_temporary.confirm" : "survey.unpublish.confirm";
 		MessageUtil.ConfirmParams confirmParams = new MessageUtil.ConfirmParams(new MessageUtil.ConfirmHandler() {
 			public void onOk() {
 				//ask for a second confirmation about records deletion
@@ -386,7 +386,7 @@ public class SurveySelectVM extends BaseVM {
 	@Command
 	public void deleteSelectedSurvey() {
 		String messageKey;
-		if (selectedSurvey.isWork()) {
+		if (selectedSurvey.isTemporary()) {
 			if (selectedSurvey.isPublished()) {
 				messageKey = "survey.delete.published_work.confirm.message";
 			} else {
@@ -416,11 +416,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	protected void performSelectedSurveyDeletion() {
-		if (selectedSurvey.isWork()) {
-			surveyManager.deleteSurveyWork(selectedSurvey.getId());
-		} else {
-			surveyManager.deleteSurvey(selectedSurvey.getId());
-		}
+		surveyManager.deleteSurvey(selectedSurvey.getId());
 		selectedSurvey = null;
 		loadSurveySummaries();
 		notifyChange("selectedSurvey","surveySummaries");
@@ -490,7 +486,7 @@ public class SurveySelectVM extends BaseVM {
 
 	private void performSelectedSurveyUnpublishing() {
 		try {
-			Integer publishedSurveyId = selectedSurvey.isWork() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
+			Integer publishedSurveyId = selectedSurvey.isTemporary() ? selectedSurvey.getPublishedId() : selectedSurvey.getId();
 			CollectSurvey temporarySurvey = surveyManager.unpublish(publishedSurveyId);
 			loadSurveySummaries();
 			selectedSurvey = null;
@@ -539,7 +535,7 @@ public class SurveySelectVM extends BaseVM {
 
 	private Integer getSelectedPublishedSurveyId() {
 		return !selectedSurvey.isPublished() ? null
-				: selectedSurvey.isWork() ? selectedSurvey.getPublishedId()
+				: selectedSurvey.isTemporary() ? selectedSurvey.getPublishedId()
 						: selectedSurvey.getId();
 	}
 
@@ -556,12 +552,12 @@ public class SurveySelectVM extends BaseVM {
 			//skip survey list update
 			return;
 		}
-		List<SurveySummary> newSummaries = surveyManager.loadSummaries(null, true);
+		List<SurveySummary> newSummaries = surveyManager.loadCombinedSummaries(null, true);
 		if (summaries == null) {
 			summaries = newSummaries;
 		} else {
 			for (SurveySummary newSummary : newSummaries) {
-				SurveySummary oldSummary = findSummary(newSummary.getId(), newSummary.isPublished(), newSummary.isWork());
+				SurveySummary oldSummary = findSummary(newSummary.getId(), newSummary.isPublished(), newSummary.isTemporary());
 				if (oldSummary == null) {
 					// TODO handle this??
 				} else {
@@ -579,14 +575,14 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	private void loadSurveySummaries() {
-		summaries = surveyManager.loadSummaries(null, true);
+		summaries = surveyManager.loadCombinedSummaries(null, true);
 	}
 
 	private SurveySummary findSummary(Integer id, boolean published, boolean work) {
 		for (SurveySummary summary : summaries) {
 			if (summary.getId().equals(id)
 					&& summary.isPublished() == published
-					&& summary.isWork() == work) {
+					&& summary.isTemporary() == work) {
 				return summary;
 			}
 		}
@@ -595,23 +591,23 @@ public class SurveySelectVM extends BaseVM {
 
 	protected CollectSurvey loadSelectedSurveyForEdit() {
 		String uri = selectedSurvey.getUri();
-		CollectSurvey surveyWork;
-		if (selectedSurvey.isWork()) {
-			surveyWork = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		CollectSurvey temporarySurvey;
+		if (selectedSurvey.isTemporary()) {
+			temporarySurvey = surveyManager.loadSurvey(selectedSurvey.getId());
 		} else if (selectedSurvey.isPublished()) {
-			surveyWork = surveyManager.duplicatePublishedSurveyForEdit(uri);
+			temporarySurvey = surveyManager.createTemporarySurveyFromPublished(uri);
 		} else {
 			throw new IllegalStateException(
 					"Trying to load an invalid survey: " + uri);
 		}
-		return surveyWork;
+		return temporarySurvey;
 	}
 
 	protected CollectSurvey loadSelectedSurvey() {
 		String uri = selectedSurvey.getUri();
 		CollectSurvey survey;
-		if (selectedSurvey.isWork()) {
-			survey = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		if (selectedSurvey.isTemporary()) {
+			survey = surveyManager.loadSurvey(selectedSurvey.getId());
 		} else {
 			survey = surveyManager.getByUri(uri);
 		}
@@ -652,7 +648,7 @@ public class SurveySelectVM extends BaseVM {
 
 	@DependsOn("selectedSurvey")
 	public boolean isPublishDisabled() {
-		return this.selectedSurvey == null || !this.selectedSurvey.isWork();
+		return this.selectedSurvey == null || !this.selectedSurvey.isTemporary();
 	}
 
 	@DependsOn("selectedSurvey")
@@ -712,7 +708,7 @@ public class SurveySelectVM extends BaseVM {
 				
 				@Override
 				protected void execute() throws Throwable {
-					outputSurvey = surveyManager.duplicateSurveyForEdit(originalSurvey.getName(), originalSurveyIsWork, newName);
+					outputSurvey = surveyManager.duplicateSurveyIntoTemporary(originalSurvey.getName(), originalSurveyIsWork, newName);
 				}
 			});
 		}

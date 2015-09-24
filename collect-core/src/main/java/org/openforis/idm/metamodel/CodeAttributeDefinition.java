@@ -271,7 +271,7 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 			return null;
 		}
 	}
-	
+
 	public String getHierarchicalLevel() {
 		Integer levelIndex = getListLevelIndex();
 		if (levelIndex == null) {
@@ -287,8 +287,8 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 		return new CodeAttribute(this);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings("unchecked")
 	public Code createValue(String string) {
 		if ( StringUtils.isBlank(string) ) {
 			return null;

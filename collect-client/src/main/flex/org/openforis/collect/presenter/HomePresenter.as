@@ -39,6 +39,10 @@ package org.openforis.collect.presenter {
 			label: Message.get('home.surveyDesigner'),
 			icon: Images.DATABASE_DESIGNER};
 
+		private static const DATA_CLEANSING_MENU_ITEM:Object = {
+			label: Message.get('home.dataCleansing'),
+			icon: Images.DATA_CLEANSING};
+		
 		private static const BACKUP_RESTORE_MENU_ITEM:Object = {
 			label: Message.get('home.backup_restore'),
 				icon: Images.BACKUP};
@@ -72,6 +76,7 @@ package org.openforis.collect.presenter {
 			if ( Application.user.hasEffectiveRole(UserProxy.ROLE_ADMIN) ) {
 				result.addItem(DESIGNER_MENU_ITEM);
 				result.addItem(BACKUP_RESTORE_MENU_ITEM);
+				result.addItem(DATA_CLEANSING_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
 				result.addItem(CONFIGURATION_MENU_ITEM);
 			}
@@ -89,6 +94,8 @@ package org.openforis.collect.presenter {
 				case DESIGNER_MENU_ITEM:
 					navigateToURL(new URLRequest(ApplicationConstants.DESIGNER_URL), "_self");
 					break;
+				case DATA_CLEANSING_MENU_ITEM:
+					navigateToURL(new URLRequest(ApplicationConstants.DATA_CLEANSING_URL), "_self");
 				case BACKUP_RESTORE_MENU_ITEM:
 					PopUpUtil.createPopUp(BackupRestorePopUp, true);
 					break;
@@ -100,7 +107,6 @@ package org.openforis.collect.presenter {
 					break;
 			}
 		}
-		
 		
 	}
 }

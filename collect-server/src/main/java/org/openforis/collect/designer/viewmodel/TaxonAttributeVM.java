@@ -9,12 +9,10 @@ import static org.openforis.collect.designer.model.LabelKeys.RANK_PREFIX;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
-import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -126,18 +124,7 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	@DependsOn("surveyId")
 	public List<String> getTaxonomyNames() {
 		Integer surveyId = getSurveyId();
-		List<CollectTaxonomy> taxonomies;
-		if  (surveyId == null ) {
-			SessionStatus sessionStatus = getSessionStatus();
-			Integer publishedSurveyId = sessionStatus.getPublishedSurveyId();
-			if ( publishedSurveyId == null ) {
-				return Collections.emptyList();
-			} else {
-				taxonomies = speciesManager.loadTaxonomiesBySurvey(publishedSurveyId);
-			}
-		} else {
-			taxonomies = speciesManager.loadTaxonomiesBySurveyWork(surveyId);
-		}
+		List<CollectTaxonomy> taxonomies = speciesManager.loadTaxonomiesBySurvey(surveyId);
 		List<String> result = new ArrayList<String>();
 		for (CollectTaxonomy taxonomy : taxonomies) {
 			result.add(taxonomy.getName());

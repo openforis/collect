@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.lang.DeepComparable;
 
 /**
  * @author G. Miceli
@@ -29,10 +30,15 @@ public abstract class SurveyObject implements Serializable, Annotatable, DeepCom
 		this.survey = survey;
 	}
 
-	public final Survey getSurvey() {
-		return survey;
+	@SuppressWarnings("unchecked")
+	public final <S extends Survey> S getSurvey() {
+		return (S) survey;
 	}
-
+	
+	public <S extends Survey> void replaceSurvey(S survey) {
+		this.survey = survey;
+	}
+	
 	public final Schema getSchema() {
 		return survey == null ? null : survey.getSchema();
 	}

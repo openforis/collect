@@ -89,7 +89,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
 		survey = loadSurvey();
-		survey.setWork(false);
+		survey.setTemporary(false);
 		surveyManager.importModel(survey);
 		meterUnit = survey.getUnit("m");
 		centimeterUnit = survey.getUnit("cm");

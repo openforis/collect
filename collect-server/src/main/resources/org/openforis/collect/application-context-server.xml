@@ -15,6 +15,16 @@
 	
 	<import resource="classpath:org/openforis/collect/application-context-core.xml"/>
 	
+	<bean name="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>org/openforis/collect/resourcebundles/validation</value>
+				<value>org/openforis/collect/resourcebundles/datacleansing</value>
+			</list>
+		</property>
+	</bean>
+	
 	<!-- Override scope for Collect core sessionRecordFileManager bean, use "session" scope -->
 	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager" 
 		init-method="init" />

@@ -4,11 +4,11 @@
 package org.openforis.collect.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.io.internal.SurveyBackupInfoExtractorTask;
 import org.openforis.collect.io.internal.SurveyBackupVerifierTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
@@ -43,6 +43,7 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	//internal variables
 	private boolean fullBackup;
 	private ZipFile zipFile;
+	private BackupFileExtractor backupFileExtractor;
 	
 	@Override
 	protected void createInternalVariables() throws Throwable {
@@ -51,6 +52,7 @@ public class SurveyBackupInfoExtractorJob extends Job {
 		fullBackup = ArrayUtils.contains(SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS, ext);
 		if ( fullBackup ) {
 			this.zipFile = new ZipFile(file);
+			this.backupFileExtractor = new BackupFileExtractor(zipFile);
 		}
 	}
 	
@@ -69,18 +71,11 @@ public class SurveyBackupInfoExtractorJob extends Job {
 			SurveyBackupVerifierTask t = (SurveyBackupVerifierTask) task;
 			t.setZipFile(zipFile);
 		} else if ( task instanceof SurveyBackupInfoExtractorTask ) {
-			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
 			File infoFile = backupFileExtractor.extractInfoFile();
+			SurveyBackupInfoExtractorTask t = (SurveyBackupInfoExtractorTask) task;
 			t.setFile(infoFile);
 		} else if ( task instanceof IdmlUnmarshallTask ) {
-			File idmlFile;
-			if ( zipFile == null ) {
-				idmlFile = file;
-			} else {
-				BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
-				idmlFile = zipFile == null ? file: backupFileExtractor.extractIdmlFile();
-			}
+			File idmlFile = zipFile == null ? file: backupFileExtractor.extractIdmlFile();
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
 			t.setSurveyManager(surveyManager);
 			t.setValidate(validate);
@@ -105,13 +100,8 @@ public class SurveyBackupInfoExtractorJob extends Job {
 	@Override
 	protected void onEnd() {
 		super.onEnd();
-		if ( zipFile != null ) {
-			try {
-				zipFile.close();
-			} catch (IOException e) {
-				log().warn("Error closing zip file", e);
-			}
-		}
+		IOUtils.closeQuietly(backupFileExtractor);
+		IOUtils.closeQuietly(zipFile);
 	}
 	
 	public SurveyManager getSurveyManager() {

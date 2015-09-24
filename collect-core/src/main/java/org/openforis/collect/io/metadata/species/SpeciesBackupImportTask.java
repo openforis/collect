@@ -126,7 +126,7 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 
 	private CollectTaxonomy loadTaxonomy() {
 		CollectTaxonomy taxonomy = taxonomyName == null ? null:
-			survey.isWork() ? 
+			survey.isTemporary() ? 
 				speciesManager.loadTaxonomyWorkByName(survey.getId(), taxonomyName):
 				speciesManager.loadTaxonomyByName(survey.getId(), taxonomyName);
 		return taxonomy;
@@ -139,11 +139,7 @@ public class SpeciesBackupImportTask extends ReferenceDataImportTask<ParsingErro
 				//create taxonomy
 				taxonomy = new CollectTaxonomy();
 				taxonomy.setName(taxonomyName);
-				if ( survey.isWork() ) {
-					taxonomy.setSurveyWorkId(survey.getId());
-				} else {
-					taxonomy.setSurveyId(survey.getId());
-				}
+				taxonomy.setSurveyId(survey.getId());
 				speciesManager.save(taxonomy);
 			} else {
 				throw new RuntimeException("Cannot insert new taxonomy: overwriteAll parameter not specified");

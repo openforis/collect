@@ -253,7 +253,7 @@ package org.openforis.collect.presenter {
 				if ( newTaxonomy ) {
 					_selectedTaxonomy = new TaxonomyProxy();
 				} 
-				_selectedTaxonomy.surveyWorkId = view.surveyId;
+				_selectedTaxonomy.surveyId = view.surveyId;
 				_selectedTaxonomy.name = name;
 				
 				var responder:IResponder = new AsyncResponder(taxonomySaveResultHandler, faultHandler);
