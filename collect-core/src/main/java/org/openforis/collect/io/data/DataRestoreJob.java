@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
@@ -77,7 +76,6 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	}
 
 	private boolean isUploadedFilesIncluded() throws IOException {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.UPLOADED_FILES_FOLDER);
 		return ! dataEntries.isEmpty();
 	}
