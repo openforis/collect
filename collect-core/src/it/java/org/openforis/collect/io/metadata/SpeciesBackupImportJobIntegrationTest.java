@@ -28,7 +28,6 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.collect.persistence.TaxonDao;
-import org.openforis.collect.persistence.TaxonVernacularNameDao;
 import org.openforis.collect.persistence.TaxonomyDao;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.model.TaxonOccurrence;
@@ -66,12 +65,11 @@ public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTes
 	@Autowired
 	private TaxonDao taxonDao;
 	@Autowired
-	private TaxonVernacularNameDao taxonVernacularNameDao;
-	@Autowired
 	private CollectJobManager jobManager;
 	
 	private CollectSurvey survey;
 	
+	@SuppressWarnings("deprecation")
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
 		survey = loadSurvey();

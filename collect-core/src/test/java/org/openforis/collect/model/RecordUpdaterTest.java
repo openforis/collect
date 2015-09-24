@@ -220,7 +220,7 @@ public class RecordUpdaterTest {
 		Entity rootEntity = record.getRootEntity();
 		
 		assertEquals(1, rootEntity.getCount("time_study"));
-		Entity timeStudy2 = (Entity) rootEntity.get("time_study", 0);
+		Entity timeStudy2 = (Entity) rootEntity.getChild("time_study", 0);
 		Attribute<?, ?> startTime2 = (Attribute<?, ?>) timeStudy2.getChild("start_time");
 		
 		assertEquals(new TextValue("start second"), startTime2.getValue());

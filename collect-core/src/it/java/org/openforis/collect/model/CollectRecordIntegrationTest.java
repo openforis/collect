@@ -66,7 +66,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		assertEquals(84, changeSet.size());
 		assertEquals(3, cluster.getCount("plot"));
 		{
-			Entity plot = (Entity) cluster.get("plot", 2);
+			Entity plot = (Entity) cluster.getChild("plot", 2);
 			NodeChange<?> plotUpdateChange = changeSet.getChange(plot);
 			assertTrue(plotUpdateChange instanceof EntityAddChange);
 		}
@@ -84,7 +84,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 			changeSet = recordUpdater.addEntity(cluster, "time_study");
 			assertEquals(5, changeSet.size());
 			{
-				Entity timeStudy = (Entity) cluster.get("time_study", 2);
+				Entity timeStudy = (Entity) cluster.getChild("time_study", 2);
 				NodeChange<?> timeStudyChange = changeSet.getChange(timeStudy); 
 				assertTrue(timeStudyChange instanceof EntityAddChange);
 			}
@@ -107,7 +107,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
-		Entity timeStudy = (Entity) cluster.get("time_study", 0);
+		Entity timeStudy = (Entity) cluster.getChild("time_study", 0);
 		
 		NodeChangeSet changeSet = recordUpdater.deleteNode(timeStudy);
 		assertEquals(2, changeSet.size());
@@ -138,7 +138,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		Entity cluster = record.getRootEntity();
 		int missingCount = cluster.getMissingCount("time_study");
 		assertEquals(0, missingCount);
-		Entity timeStudy = (Entity) cluster.get("time_study", 0);
+		Entity timeStudy = (Entity) cluster.getChild("time_study", 0);
 		{
 			//delete node (min count error expected)
 			NodeChangeSet changeSet = recordUpdater.deleteNode(timeStudy);
@@ -169,7 +169,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
-		CodeAttribute region = (CodeAttribute) cluster.get("region", 0);
+		CodeAttribute region = (CodeAttribute) cluster.getChild("region", 0);
 		{
 			NodeChangeSet nodeChangeSet = recordUpdater.updateAttribute(region, FieldSymbol.BLANK_ON_FORM);
 			assertTrue(region.isEmpty());
@@ -207,7 +207,7 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		CollectSurvey survey = loadSurvey();
 		CollectRecord record = createTestRecord(survey);
 		Entity cluster = record.getRootEntity();
-		CodeAttribute region = (CodeAttribute) cluster.get("region", 0);
+		CodeAttribute region = (CodeAttribute) cluster.getChild("region", 0);
 		//add wrong value
 		{
 			NodeChangeSet changeSet = recordUpdater.updateAttribute(region, new Code("ZZZ"));
@@ -241,9 +241,9 @@ public class CollectRecordIntegrationTest extends CollectIntegrationTest {
 		
 		Entity rootEntity = record.getRootEntity();
 		
-		CodeAttribute code1 = (CodeAttribute) rootEntity.get("code1", 0);
-		CodeAttribute code2 = (CodeAttribute) rootEntity.get("code2", 0);
-		CodeAttribute code3 = (CodeAttribute) rootEntity.get("code3", 0);
+		CodeAttribute code1 = (CodeAttribute) rootEntity.getChild("code1", 0);
+		CodeAttribute code2 = (CodeAttribute) rootEntity.getChild("code2", 0);
+		CodeAttribute code3 = (CodeAttribute) rootEntity.getChild("code3", 0);
 		
 		recordUpdater.updateAttribute(code1, new Code("WRONG"));
 		

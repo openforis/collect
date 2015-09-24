@@ -42,7 +42,7 @@ public class DefaultValueTest {
 		NumericAttributeDefinition totalDefn = (NumericAttributeDefinition) schema.getDefinitionByPath("bill/item/total");
 		Entity rootEntity = record.getRootEntity();
 		Entity item = addItem(rootEntity, 10, 5.5d);
-		RealAttribute total = (RealAttribute) item.get("total", 0);
+		RealAttribute total = (RealAttribute) item.getChild("total", 0);
 		List<AttributeDefault> attributeDefaults = totalDefn.getAttributeDefaults();
 		AttributeDefault exprAttributeDefault = attributeDefaults.get(0);
 		RealValue calculatedTotal = exprAttributeDefault.evaluate(total);
@@ -56,7 +56,7 @@ public class DefaultValueTest {
 		AttributeDefault exprAttributeDefault = attributeDefaults.get(0);
 		Entity rootEntity = record.getRootEntity();
 		Entity item = addItem(rootEntity, null, 5.5d);
-		RealAttribute total = (RealAttribute) item.get("total", 0);
+		RealAttribute total = (RealAttribute) item.getChild("total", 0);
 		RealValue calculatedTotal = exprAttributeDefault.evaluate(total);
 		assertEquals(0d, calculatedTotal.getValue(), 0);
 	}
@@ -67,7 +67,7 @@ public class DefaultValueTest {
 		List<AttributeDefault> attributeDefaults = totalDefn.getAttributeDefaults();
 		Entity rootEntity = record.getRootEntity();
 		Entity item = addItem(rootEntity, 10, 0d);
-		RealAttribute total = (RealAttribute) item.get("total", 0);
+		RealAttribute total = (RealAttribute) item.getChild("total", 0);
 		AttributeDefault constantAttributeDefault = attributeDefaults.get(1);
 		RealValue calculatedTotal = constantAttributeDefault.evaluate(total);
 		assertEquals(new RealValue(0d, null), calculatedTotal);
@@ -80,7 +80,7 @@ public class DefaultValueTest {
 		AttributeDefault exprAttributeDefault = attributeDefaults.get(0);
 		Entity rootEntity = record.getRootEntity();
 		Entity item = addItem(rootEntity, 10, 0d);
-		RealAttribute total = (RealAttribute) item.get("total", 0);
+		RealAttribute total = (RealAttribute) item.getChild("total", 0);
 		boolean condition = exprAttributeDefault.evaluateCondition(total);
 		assertFalse(condition);
 	}

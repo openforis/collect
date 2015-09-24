@@ -39,7 +39,7 @@ public class CalculatedAttributeTest {
 	public void testNotNullValues() throws InvalidExpressionException {
 		Entity rootEntity = record.getRootEntity();
 		Entity item = addItem(rootEntity, 10, 5.5d);
-		RealAttribute total = (RealAttribute) item.get("total", 0);
+		RealAttribute total = (RealAttribute) item.getChild("total", 0);
 		RealValue calculatedTotal = total.getValue();
 		assertEquals(new RealValue(55d, null), calculatedTotal);
 	}
@@ -49,7 +49,7 @@ public class CalculatedAttributeTest {
 	public void testNullValue() throws InvalidExpressionException {
 		Entity rootEntity = record.getRootEntity();
 		Entity item = addItem(rootEntity, null, 5.5d);
-		RealAttribute total = (RealAttribute) item.get("total", 0);
+		RealAttribute total = (RealAttribute) item.getChild("total", 0);
 		assertEquals(Double.valueOf(0d), total.getValue().getValue());
 	}
 	
@@ -59,12 +59,12 @@ public class CalculatedAttributeTest {
 		Entity rootEntity = record.getRootEntity();
 		Entity item = addItem(rootEntity, 10, 5.5d);
 		
-		RealAttribute total = (RealAttribute) item.get("total", 0);
+		RealAttribute total = (RealAttribute) item.getChild("total", 0);
 		RealValue calculatedTotal = total.getValue();
 		assertEquals(new RealValue(55d, null), calculatedTotal);
 		
 		//change dependent attribute
-		IntegerAttribute qty = (IntegerAttribute) item.get("qty", 0);
+		IntegerAttribute qty = (IntegerAttribute) item.getChild("qty", 0);
 		qty.setNumber(20);
 //		qty.clearDependentCalculatedAttributes();
 		
