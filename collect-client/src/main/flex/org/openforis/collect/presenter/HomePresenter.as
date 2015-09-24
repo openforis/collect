@@ -96,6 +96,7 @@ package org.openforis.collect.presenter {
 					break;
 				case DATA_CLEANSING_MENU_ITEM:
 					navigateToURL(new URLRequest(ApplicationConstants.DATA_CLEANSING_URL), "_self");
+					break;
 				case BACKUP_RESTORE_MENU_ITEM:
 					PopUpUtil.createPopUp(BackupRestorePopUp, true);
 					break;
