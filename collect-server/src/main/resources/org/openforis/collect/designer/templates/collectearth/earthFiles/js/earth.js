@@ -160,7 +160,7 @@ var submitForm = function(submitCounter) {
 		timeout : 10000,
 		beforeSend : function() {
 			$.blockUI({
-				message : 'Sumitting data..'
+				message : 'Submitting data..'
 			});
 		}
 	})
