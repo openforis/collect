@@ -18,6 +18,7 @@ import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
@@ -95,7 +96,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 			super.fromRecord(r, o);
 			o.setCreationDate(r.getValue(OFC_DATA_ERROR_REPORT.CREATION_DATE));
 			o.setQueryGroupId(r.getValue(OFC_DATA_ERROR_REPORT.QUERY_GROUP_ID));
-//			o.setRecordStep(Step.valueOf(r.getValue(OFC_DATA_ERROR_REPORT.RECORD_STEP)));
+			o.setRecordStep(Step.valueOf(r.getValue(OFC_DATA_ERROR_REPORT.RECORD_STEP)));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_REPORT.UUID)));
 		}
 		
@@ -104,7 +105,7 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 			super.fromObject(o, q);
 			q.addValue(OFC_DATA_ERROR_REPORT.CREATION_DATE, toTimestamp(o.getCreationDate()));
 			q.addValue(OFC_DATA_ERROR_REPORT.QUERY_GROUP_ID, o.getQueryGroupId());
-//			q.addValue(OFC_DATA_ERROR_REPORT.RECORD_STEP, o.getRecordStep().getStepNumber());
+			q.addValue(OFC_DATA_ERROR_REPORT.RECORD_STEP, o.getRecordStep().getStepNumber());
 			q.addValue(OFC_DATA_ERROR_REPORT.UUID, o.getUuid().toString());
 		}
 

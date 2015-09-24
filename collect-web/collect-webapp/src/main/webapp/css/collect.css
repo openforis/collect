@@ -167,6 +167,17 @@ html, body {
 }
 */
 
+.section-title {
+	text-align: center;
+	font-size: 18px;
+	margin-bottom: 10px;
+	margin-top: 5px;
+	font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: inherit;
+}
+
 .modal {
 	overflow-y: auto;
 }

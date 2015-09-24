@@ -126,6 +126,7 @@
 					foreignKeyName="ofc_data_error_report_query_group_fkey" 
 					references="ofc_data_error_query_group(id)" />
 			</column>
+			<column name="record_step" type="int4" />
 			<column name="creation_date" type="TIMESTAMP" />
 		</createTable>
 		

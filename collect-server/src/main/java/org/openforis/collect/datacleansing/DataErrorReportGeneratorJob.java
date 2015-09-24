@@ -51,6 +51,7 @@ public class DataErrorReportGeneratorJob extends Job {
 		super.initializeTask(task);
 		report = new DataErrorReport((CollectSurvey) errorQueryGroup.getSurvey());
 		report.setQueryGroup(errorQueryGroup);
+		report.setRecordStep(recordStep);
 		reportManager.save(report);
 		batchPersister = new ItemBatchPersister(report);
 	}

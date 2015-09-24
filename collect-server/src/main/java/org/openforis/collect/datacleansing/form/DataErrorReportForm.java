@@ -2,6 +2,7 @@ package org.openforis.collect.datacleansing.form;
 
 import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
+import org.openforis.collect.model.CollectRecord.Step;
 
 /**
  * 
@@ -10,6 +11,8 @@ import org.openforis.collect.datacleansing.DataErrorReport;
  */
 public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> {
 
+	private Step recordStep;
+	
 	//calculated members
 	private String queryGroupTitle;
 	private DataErrorQueryGroupForm errorQueryGroup;
@@ -24,6 +27,14 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 		DataErrorQueryGroup dataErrorQueryGroup = obj.getQueryGroup();
 		this.errorQueryGroup = new DataErrorQueryGroupForm(dataErrorQueryGroup);
 		this.queryGroupTitle = this.errorQueryGroup.getTitle();
+	}
+	
+	public Step getRecordStep() {
+		return recordStep;
+	}
+	
+	public void setRecordStep(Step recordStep) {
+		this.recordStep = recordStep;
 	}
 
 	public String getQueryGroupTitle() {
