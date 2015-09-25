@@ -22,11 +22,11 @@
 			<s:Label text="{Message.get('dataImport.fileFormat')}"
 					  styleName="formLabel"/>
 			
-			<s:DropDownList id="typeDropDownList" selectedIndex="0" width="250">
+			<s:DropDownList id="typeDropDownList" selectedIndex="0" width="350">
 				<mx:ArrayCollection>
 					<fx:String>-- Select one --</fx:String>
-					<fx:String>From Backup file (.collect-data, .collect-backup or .zip file)</fx:String>
-					<fx:String>From CSV file</fx:String>
+					<fx:String>Backup file (.collect-data, .collect-backup or .zip file)</fx:String>
+					<fx:String>CSV file</fx:String>
 				</mx:ArrayCollection>
 			</s:DropDownList>
 		</s:HGroup>

@@ -357,7 +357,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 			if(sortField.isDescending()) {
 				q.addOrderBy(orderBy.desc());
 			} else {
-				q.addOrderBy(orderBy);
+				q.addOrderBy(orderBy.asc());
 			}
 		}
 	}

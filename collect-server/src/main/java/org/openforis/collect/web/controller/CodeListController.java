@@ -6,7 +6,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.SamplingDesignManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.dataexport.codelist.CodeListExportProcess;
 import org.openforis.collect.model.CollectSurvey;
@@ -26,10 +25,6 @@ public class CodeListController {
 	
 	@Autowired
 	private SurveyManager surveyManager;
-	
-	@Autowired
-	private SamplingDesignManager samplingDesignManager;
-	
 	@Autowired
 	private CodeListManager codeListManager;
 	
