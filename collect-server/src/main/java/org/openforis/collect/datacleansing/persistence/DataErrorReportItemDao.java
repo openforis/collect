@@ -174,7 +174,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 				item.getErrorQuery().getId(),
 				item.getRecordId(),
 				item.getReport().getId(),
-				item.getStatus(),
+				item.getStatus().getCode(),
 				item.getUuid(),
 				item.getValue()
 			};
