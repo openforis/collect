@@ -26,4 +26,17 @@ public class JSONValueFormatter {
 		return jsonObj.toJSONString();
 	}
 	
+//	@SuppressWarnings("unchecked")
+//	public String format(Value value) {
+//		JSONObject jsonObj = new JSONObject();
+//		Map<String, Object> map = value.toMap();
+//		Set<Entry<String,Object>> entrySet = map.entrySet();
+//		for (Entry<String, Object> entry : entrySet) {
+//			Object val = entry.getValue();
+//			if (val != null && ! (val instanceof String && StringUtils.isBlank((String) val))) {
+//				jsonObj.put(entry.getKey(), val);
+//			}
+//		}
+//		return jsonObj.toJSONString();
+//	}
 }
