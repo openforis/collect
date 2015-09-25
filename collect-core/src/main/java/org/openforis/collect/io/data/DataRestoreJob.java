@@ -44,6 +44,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private List<Integer> entryIdsToImport; //ignored when overwriteAll is true
 	private boolean storeRestoredFile;
 	private File tempFile;
+	private boolean validateRecords;
 
 	@Override
 	public void createInternalVariables() throws Throwable {
@@ -94,12 +95,12 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			DataRestoreTask t = (DataRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
-			t.setZipFile(zipFile);
-			t.setOldBackupFormat(oldBackupFormat);
+			t.setFile(file);
 			t.setPackagedSurvey(packagedSurvey);
 			t.setExistingSurvey(publishedSurvey);
 			t.setOverwriteAll(overwriteAll);
 			t.setEntryIdsToImport(entryIdsToImport);
+			t.setValidateRecords(validateRecords);
 		} else if ( task instanceof RecordFileRestoreTask ) {
 			RecordFileRestoreTask t = (RecordFileRestoreTask) task;
 			t.setRecordManager(recordManager);
@@ -177,6 +178,10 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		this.storeRestoredFile = storeRestoredFile;
 	}
 
+	public void setValidateRecords(boolean validateRecords) {
+		this.validateRecords = validateRecords;
+	}
+
 	private class StoreBackupFileTask extends Task {
 		@Override
 		protected void execute() throws Throwable {
@@ -184,4 +189,5 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		}
 		
 	}
+
 }

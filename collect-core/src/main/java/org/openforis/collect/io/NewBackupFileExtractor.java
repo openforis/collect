@@ -25,9 +25,12 @@ public class NewBackupFileExtractor implements Closeable {
 
 	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
 
+	//input variables
 	private File file;
+	
 	private File tempUncompressedFolder;
-	private ZipFile zipFile;
+	//temporary variables
+	private transient ZipFile zipFile;
 
 	public NewBackupFileExtractor(File file) throws ZipException, IOException {
 		this.file = file;

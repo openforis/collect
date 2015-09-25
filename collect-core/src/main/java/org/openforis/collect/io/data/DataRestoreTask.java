@@ -1,5 +1,6 @@
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FilenameUtils;
-import org.openforis.collect.io.BackupFileExtractor;
+import org.apache.commons.io.IOUtils;
+import org.openforis.collect.io.NewBackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.exception.DataImportExeption;
@@ -20,6 +21,7 @@ import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.SurveyImportException;
@@ -46,7 +48,7 @@ public class DataRestoreTask extends Task {
 	private UserManager userManager;
 
 	//input
-	private ZipFile zipFile;
+	private File file;
 	
 	private CollectSurvey packagedSurvey;
 	private CollectSurvey existingSurvey;
@@ -55,25 +57,29 @@ public class DataRestoreTask extends Task {
 	
 	//temporary instance variables
 	private DataUnmarshaller dataUnmarshaller;
+	private RecordUpdater recordUpdater;
 	private List<Integer> processedRecords;
 	private HashMap<String, String> errorByEntryName;
-	private BackupFileExtractor backupFileExtractor;
+	private NewBackupFileExtractor backupFileExtractor;
 	private boolean oldBackupFormat;
 	private QueryBuffer queryBuffer;
 	private Integer nextRecordId;
+	private boolean validateRecords;
 	
 	public DataRestoreTask() {
 		super();
 		this.processedRecords = new ArrayList<Integer>();
 		this.errorByEntryName = new HashMap<String, String>();
 		this.oldBackupFormat = false;
+		this.validateRecords = true;
 		this.queryBuffer = new QueryBuffer();
 	}
 
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
-		backupFileExtractor = new BackupFileExtractor(zipFile);
+		backupFileExtractor = new NewBackupFileExtractor(file);
+		backupFileExtractor.init();
 		oldBackupFormat = backupFileExtractor.isOldFormat();
 		super.createInternalVariables();
 	}
@@ -132,6 +138,12 @@ public class DataRestoreTask extends Task {
 		}
 	}
 	
+	@Override
+	protected void onEnd() {
+		super.onEnd();
+		IOUtils.closeQuietly(backupFileExtractor);
+	}
+	
 	private void importEntries(int entryId) throws IOException, DataImportExeption, RecordPersistenceException {
 		CollectRecord lastProcessedRecord = null;
 		Step originalRecordStep = null;
@@ -182,7 +194,7 @@ public class DataRestoreTask extends Task {
 				restoreRecordStep(lastProcessedRecord, originalRecordStep);
 			} else {
 				//validate record and save the validation result
-				validateRecord(lastProcessedRecord);
+				initializeRecord(lastProcessedRecord);
 				queryBuffer.append(recordManager.createUpdateQuery(lastProcessedRecord));
 			}
 		}
@@ -192,7 +204,7 @@ public class DataRestoreTask extends Task {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		CollectRecord originalRecord = recordManager.load(survey, record.getId(), originalRecordStep);
 		originalRecord.setStep(originalRecordStep);
-		validateRecord(originalRecord);
+		initializeRecord(originalRecord);
 		queryBuffer.append(recordManager.createUpdateQuery(originalRecord));
 	}
 
@@ -232,7 +244,7 @@ public class DataRestoreTask extends Task {
 
 	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
 		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
-		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey);
+		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey, validateRecords);
 		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
 		return dataUnmarshaller;
 	}
@@ -242,7 +254,7 @@ public class DataRestoreTask extends Task {
 		List<String> keyValues = parsedRecord.getRootEntityKeyValues();
 		Entity rootEntity = parsedRecord.getRootEntity();
 		String rootEntityName = rootEntity.getName();
-		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[0]));
+		List<CollectRecord> oldRecords = recordManager.loadSummaries(survey, rootEntityName, keyValues.toArray(new String[keyValues.size()]));
 		if ( oldRecords == null || oldRecords.isEmpty() ) {
 			return null;
 		} else if ( oldRecords.size() == 1 ) {
@@ -257,9 +269,13 @@ public class DataRestoreTask extends Task {
 		return result;
 	}
 
-	private void validateRecord(CollectRecord record) {
+	private void initializeRecord(CollectRecord record) {
 		try {
-			recordManager.validate(record);
+			if (validateRecords) {
+				recordManager.validate(record);
+			} else {
+				recordUpdater.initializeRecord(record, false);
+			}
 		} catch (Exception e) {
 			log().warn("Error validating record: " + record.getRootEntityKeyValues(), e);
 		}
@@ -273,7 +289,7 @@ public class DataRestoreTask extends Task {
 		toRecord.setStep(fromRecord.getStep());
 		toRecord.setState(fromRecord.getState());
 		toRecord.replaceRootEntity(fromRecord.getRootEntity());
-		validateRecord(toRecord);
+		initializeRecord(toRecord);
 	}
 	
 	public RecordManager getRecordManager() {
@@ -292,14 +308,10 @@ public class DataRestoreTask extends Task {
 		this.userManager = userManager;
 	}
 
-	public ZipFile getZipFile() {
-		return zipFile;
+	public void setFile(File file) {
+		this.file = file;
 	}
-	
-	public void setZipFile(ZipFile zipFile) {
-		this.zipFile = zipFile;
-	}
-	
+
 	public CollectSurvey getPackagedSurvey() {
 		return packagedSurvey;
 	}
@@ -332,14 +344,10 @@ public class DataRestoreTask extends Task {
 		this.entryIdsToImport = entryIdsToImport;
 	}
 
-	public boolean isOldBackupFormat() {
-		return oldBackupFormat;
+	public void setValidateRecords(boolean validateRecords) {
+		this.validateRecords = validateRecords;
 	}
-	
-	public void setOldBackupFormat(boolean oldBackupFormat) {
-		this.oldBackupFormat = oldBackupFormat;
-	}
-	
+
 	private class QueryBuffer {
 		
 		private static final int DEFAULT_BATCH_SIZE = 100;
@@ -368,4 +376,5 @@ public class DataRestoreTask extends Task {
 			buffer.clear();
 		}
 	}
+
 }

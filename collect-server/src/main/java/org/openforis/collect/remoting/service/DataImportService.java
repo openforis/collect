@@ -69,7 +69,7 @@ public class DataImportService {
 	}
 	
 	@Secured("ROLE_ADMIN")
-	public JobProxy startImport(List<Integer> entryIdsToImport) throws Exception {
+	public JobProxy startImport(List<Integer> entryIdsToImport, boolean validateRecords) throws Exception {
 		if ( dataRestoreJob == null || ! dataRestoreJob.isRunning() ) {
 			log.info("Starting data restore");
 
@@ -79,6 +79,7 @@ public class DataImportService {
 			job.setPublishedSurvey(summaryJob.getPublishedSurvey());
 			job.setEntryIdsToImport(entryIdsToImport);
 			job.setRestoreUploadedFiles(true);
+			job.setValidateRecords(validateRecords);
 			
 			resetJobs();
 			this.dataRestoreJob = job;
