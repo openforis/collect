@@ -16,6 +16,7 @@ import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.jooq.SelectSeekStep1;
 import org.jooq.StoreQuery;
+import org.jooq.impl.DSL;
 import org.openforis.collect.datacleansing.DataErrorQuery;
 import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
@@ -67,6 +68,21 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		SelectQuery<?> q = dsl.selectCountQuery();
 		q.addConditions(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()));
 		Record record = q.fetchOne();
+		Integer count = (Integer) record.getValue(0);
+		return count;
+	}
+	
+	public int countAffectedRecords(DataErrorReport report) {
+		JooqDSLContext dsl = dsl(report);
+		SelectQuery<?> subSelect = dsl.selectQuery();
+		subSelect.addFrom(OFC_DATA_ERROR_REPORT_ITEM);
+		subSelect.addConditions(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()));
+		subSelect.addGroupBy(OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID);
+		subSelect.asTable("report_record");
+		SelectQuery<?> select = dsl.selectQuery();
+		select.addSelect(DSL.count());
+		select.addFrom(subSelect);
+		Record record = select.fetchOne();
 		Integer count = (Integer) record.getValue(0);
 		return count;
 	}

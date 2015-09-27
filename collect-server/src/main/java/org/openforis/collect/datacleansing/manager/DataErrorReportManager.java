@@ -55,6 +55,10 @@ public class DataErrorReportManager extends AbstractSurveyObjectManager<DataErro
 		return errorReportItemDao.countItems(report);
 	}
 	
+	public int countAffectedRecords(DataErrorReport report) {
+		return errorReportItemDao.countAffectedRecords(report);
+	}
+	
 	public List<DataErrorReportItem> loadItems(DataErrorReport report) {
 		return loadItems(report, null, null);
 	}

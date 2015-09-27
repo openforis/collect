@@ -78,8 +78,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	@Override
 	protected DataErrorReportForm createFormInstance(DataErrorReport item) {
 		DataErrorReportForm form = new DataErrorReportForm(item);
-		int itemCount = itemManager.countItems(item);
-		form.setItemCount(itemCount);
+		form.setItemCount(itemManager.countItems(item));
+		form.setAffectedRecordsCount(itemManager.countAffectedRecords(item));
 		return form;
 	}
 	

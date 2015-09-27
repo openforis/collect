@@ -17,6 +17,7 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 	private String queryGroupTitle;
 	private DataErrorQueryGroupForm errorQueryGroup;
 	private int itemCount;
+	private int affectedRecordsCount;
 	
 	public DataErrorReportForm() {
 		super();
@@ -51,6 +52,15 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 
 	public void setItemCount(int itemCount) {
 		this.itemCount = itemCount;
+	}
+
+	public int getAffectedRecordsCount() {
+		return affectedRecordsCount;
+	}
+	
+	public void setAffectedRecordsCount(int affectedRecordsCount) {
+		this.affectedRecordsCount = affectedRecordsCount;
+		
 	}
 
 }

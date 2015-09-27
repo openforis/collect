@@ -21,7 +21,7 @@ import org.openforis.idm.model.Record;
  */
 public final class Path implements Axis, Iterable<PathElement> {
 
-	public static final String SEPARATOR = "/";
+	public static final char SEPARATOR = '/';
 	public static final String SEPARATOR_REGEX = "\\/";
 	public static final String THIS_FUNCTION = "this()";
 	public static final String THIS_SYMBOL = ".";
@@ -164,39 +164,34 @@ public final class Path implements Axis, Iterable<PathElement> {
 	}
 	
 	public static String getRelativePath(String source, String destination) {
-		StringBuilder pathBuilder = new StringBuilder();
-		String[] sourceParts = source.split(SEPARATOR_REGEX);
-		String[] destParts = destination.split(SEPARATOR_REGEX);
-		
-		int commonPartsIndex = 0;
-		for (; commonPartsIndex < sourceParts.length; commonPartsIndex++) {
-			if(destParts.length == commonPartsIndex){
-				break;
-			}
-			if (destParts[commonPartsIndex].equals(sourceParts[commonPartsIndex])) {
-				continue;
+		char[] sourceChars = source.toCharArray();
+		char[] destChars = destination.toCharArray();
+
+		int commonPathElementsCount = 0;
+		int commonPartIndex = -1;
+		int nextCharIndex = 0;
+		while (nextCharIndex < sourceChars.length && nextCharIndex < destChars.length) {
+			if (sourceChars[nextCharIndex] == destChars[nextCharIndex]) {
+				if (sourceChars[nextCharIndex] == SEPARATOR) {
+					commonPathElementsCount ++;
+				}
+				commonPartIndex ++;
+				nextCharIndex ++;
 			} else {
 				break;
 			}
 		}
+		int sourcePathElementsCount = countOccurrences(sourceChars, SEPARATOR);
 		
-		for (int k = commonPartsIndex; k < sourceParts.length; k++) {
-			if (pathBuilder.length() > 0 ) {
-				pathBuilder.append(SEPARATOR);
-			}
-			pathBuilder.append(PARENT_FUNCTION);
+		StringBuilder pathBuilder = new StringBuilder();
+		
+		append(pathBuilder, PARENT_FUNCTION, SEPARATOR, sourcePathElementsCount - commonPathElementsCount);
+
+		int destLastPartIdx = commonPartIndex + 2;
+		if (destChars.length > destLastPartIdx) {
+			pathBuilder.append(Arrays.copyOfRange(destChars, destLastPartIdx, destChars.length));
 		}
 
-		for (int k = commonPartsIndex; k < destParts.length; k++) {
-			if (pathBuilder.length() > 0 ) {
-				pathBuilder.append(SEPARATOR);
-			}
-			pathBuilder.append(destParts[k]);
-		}
-		
-		//appendToPath(pathBuilder, PARENT_FUNCTION, sources.length - i);
-		//appendToPath(pathBuilder, PARENT_FUNCTION, dests.length - i);
-		
 		if ( pathBuilder.length() == 0 ) {
 			return THIS_FUNCTION;
 		} else {
@@ -204,11 +199,31 @@ public final class Path implements Axis, Iterable<PathElement> {
 		}
 	}
 
+	private static void append(StringBuilder pathBuilder, String value,
+			char separator, int count) {
+		for (int i = 0; i < count; i++) {
+			pathBuilder.append(value);
+			if (i < count - 1) {
+				pathBuilder.append(separator);
+			}
+		}
+	}
+
+	private static int countOccurrences(char[] sourceChars, char value) {
+		int count = 0;
+		for (int i = 0; i < sourceChars.length; i++) {
+			if (sourceChars[i] == value) {
+				count++;
+			}
+		}
+		return count;
+	}
+
 //	private static void appendToPath(StringBuilder pathBuilder, String value, int count) {
 //		if (count > 0) {
 //			for (int i = 0; i < count; i++) {
 //				if (pathBuilder.length() > 0) {
-//					pathBuilder.append(SEPARATOR);
+//					pathBuilder.append(SEPARATOR_CHAR);
 //				}
 //				pathBuilder.append(value);
 //			}
