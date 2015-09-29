@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.form;
 
+import java.util.Locale;
+
 import org.openforis.collect.designer.viewmodel.UnitsVM;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.metamodel.Unit.Dimension;
@@ -38,7 +40,7 @@ public class UnitFormObject extends SurveyObjectFormObject<Unit> {
 		dest.setLabel(languageCode, label);
 		dest.setAbbreviation(languageCode, abbreviation);
 		Dimension dimension = getDimensionFromLabel(dimensionLabel);
-		dest.setDimension(dimension == null ? null: dimension.name().toLowerCase());
+		dest.setDimension(dimension == null ? null: dimension.name().toLowerCase(Locale.ENGLISH));
 		dest.setConversionFactor(conversionFactor);
 	}
 	

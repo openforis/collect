@@ -3,6 +3,7 @@ package org.openforis.idm.metamodel.xml.internal.marshal;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
@@ -21,6 +22,6 @@ class TextAttributeXS extends AttributeDefinitionXS<TextAttributeDefinition> {
 	@Override
 	protected void attributes(TextAttributeDefinition defn) throws IOException {
 		super.attributes(defn);
-		attribute(TYPE, defn.getType().name().toLowerCase());
+		attribute(TYPE, defn.getType().name().toLowerCase(Locale.ENGLISH));
 	}
 }

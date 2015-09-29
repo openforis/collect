@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -158,7 +159,7 @@ public class SchemaVM extends SurveyBaseVM {
 		Selectors.wireComponents(view, this, false);
 		Selectors.wireEventListeners(view, this);
 		 
-		selectedTreeViewType = TreeViewType.ENTRY.name().toLowerCase();
+		selectedTreeViewType = TreeViewType.ENTRY.name().toLowerCase(Locale.ENGLISH);
 
 		//select first root entity
 		List<EntityDefinition> rootEntities = getRootEntities();
@@ -504,7 +505,7 @@ public class SchemaVM extends SurveyBaseVM {
 			} else {
 				AttributeType attributeType = AttributeType.valueOf((AttributeDefinition) editedNode);
 				String locationFormat = Resources.Component.ATTRIBUTE.getLocation();
-				String attributeTypeShort = attributeType.name().toLowerCase();
+				String attributeTypeShort = attributeType.name().toLowerCase(Locale.ENGLISH);
 				location = MessageFormat.format(locationFormat, attributeTypeShort);
 				nodeNameTextboxPath = ATTRIBUTE_NAME_TEXTBOX_PATH;
 			}
@@ -575,7 +576,7 @@ public class SchemaVM extends SurveyBaseVM {
 			confirmMessageKey = CONFIRM_REMOVE_NODE_MESSAGE_KEY;
 		}
 		NodeType type = NodeType.valueOf(nodeDefn);
-		String typeLabel = type.getLabel().toLowerCase();
+		String typeLabel = type.getLabel().toLowerCase(Locale.ENGLISH);
 		boolean isRootEntity = nodeDefn.getParentDefinition() == null;
 		if ( isRootEntity ) {
 			typeLabel = Labels.getLabel("survey.schema.root_entity");
@@ -1042,7 +1043,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	public static String getAttributeIcon(String type) {
 		AttributeType attributeType = AttributeType.valueOf(type);
-		String result = NODE_TYPES_IMAGES_PATH + attributeType.name().toLowerCase() + "-small.png";
+		String result = NODE_TYPES_IMAGES_PATH + attributeType.name().toLowerCase(Locale.ENGLISH) + "-small.png";
 		return result;
 	}
 	
@@ -1410,7 +1411,7 @@ public class SchemaVM extends SurveyBaseVM {
 		String[] result = new String[values.length];
 		for (int i = 0; i < values.length; i++) {
 			TreeViewType type = values[i];
-			result[i] = type.name().toLowerCase();
+			result[i] = type.name().toLowerCase(Locale.ENGLISH);
 		}
 		return result;
 	}

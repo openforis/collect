@@ -1,5 +1,7 @@
 package org.openforis.collect.relational.liquibase;
 
+import java.util.Locale;
+
 import liquibase.database.DatabaseConnection;
 import liquibase.database.core.PostgresDatabase;
 
@@ -16,6 +18,6 @@ class CollectPostgresDatabase extends PostgresDatabase {
 
 	@Override
 	public String escapeDatabaseObject(String objectName) {
-		return "\"" + objectName.toLowerCase() + "\"";
+		return "\"" + objectName.toLowerCase(Locale.ENGLISH) + "\"";
 	}
 }

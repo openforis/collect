@@ -104,10 +104,10 @@ public class ExpressionFactory {
 	}
 	
 	public AbsoluteModelPathExpression createAbsoluteModelPathExpression(String expression) throws InvalidExpressionException {
-		if (!expression.startsWith("/")) {
+		if (!expression.startsWith(String.valueOf(Path.SEPARATOR))) {
 			throw new InvalidExpressionException("Absolute paths must start with '/'");
 		}
-		int pos = expression.indexOf('/', 1);
+		int pos = expression.indexOf(Path.SEPARATOR, 1);
 		if (pos < 0) {
 			String root = expression.substring(1);
 			return new AbsoluteModelPathExpression(root);

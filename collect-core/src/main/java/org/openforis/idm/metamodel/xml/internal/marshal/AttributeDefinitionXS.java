@@ -26,6 +26,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.UNIQUE;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.VALUE;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -103,7 +104,7 @@ abstract class AttributeDefinitionXS<T extends AttributeDefinition> extends Node
 		
 		@Override
 		protected void attributes(C check) throws IOException {
-			attribute(FLAG, check.getFlag().name().toLowerCase());
+			attribute(FLAG, check.getFlag().name().toLowerCase(Locale.ENGLISH));
 			attribute(IF, check.getCondition());
 		}
 		

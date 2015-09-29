@@ -3,6 +3,7 @@ package org.openforis.collect.io.metadata.collectearth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
@@ -248,7 +249,6 @@ public class MondrianCubeGenerator {
 			String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
 			
 			String entityName = attrName;
-			String entityLabel = extractLabel(nodeDef);
 			
 			if( nodeDef.isMultiple() ){
 				
@@ -283,7 +283,7 @@ public class MondrianCubeGenerator {
 			String[] levelNames = new String[] {"Year", "Month", "Day"};
 			for (String levelName : levelNames) {
 				Level level = new Level(attrLabel + " - " + levelName);
-				level.column = nodeDef.getName() + "_" + levelName.toLowerCase();
+				level.column = nodeDef.getName() + "_" + levelName.toLowerCase(Locale.ENGLISH);
 				level.levelType = String.format("Time%ss", levelName);
 				level.type = "Numeric";
 				hierarchy.levels.add(level);
@@ -454,10 +454,6 @@ public class MondrianCubeGenerator {
 		
 		@XStreamImplicit
 		private List<Level> levels = new ArrayList<Level>();
-		
-		public Hierarchy() {
-			this(null);
-		}
 		
 		public Hierarchy(String name) {
 			super(name);

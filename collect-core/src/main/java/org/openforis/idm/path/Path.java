@@ -231,7 +231,7 @@ public final class Path implements Axis, Iterable<PathElement> {
 //	}
 	
 	public static String removeThisVariableToken(String path) {
-		return path.replaceAll(Pattern.quote(Path.THIS_VARIABLE) + SEPARATOR, "");
+		return path.replaceAll(Pattern.quote(THIS_VARIABLE) + SEPARATOR, "");
 	}
 	
 	public static String getNormalizedPath(String path) {

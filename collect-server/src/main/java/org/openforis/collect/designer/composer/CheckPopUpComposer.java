@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.composer;
 
+import java.util.Locale;
+
 import org.openforis.collect.designer.model.CheckType;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.validation.Check;
@@ -55,7 +57,7 @@ public class CheckPopUpComposer extends BindComposer<Window> {
 			return null;
 		} else {
 			CheckType type = CheckType.valueOf(check);
-			return type.name().toLowerCase();
+			return type.name().toLowerCase(Locale.ENGLISH);
 		}
 	}
 	

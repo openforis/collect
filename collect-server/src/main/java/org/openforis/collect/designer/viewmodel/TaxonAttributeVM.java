@@ -10,6 +10,7 @@ import static org.openforis.collect.designer.model.LabelKeys.RANK_PREFIX;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.TaxonAttributeDefinitionFormObject;
@@ -116,7 +117,7 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	}
 	
 	public String getRankLabel(String name) {
-		String labelKey = RANK_PREFIX + name.toLowerCase();
+		String labelKey = RANK_PREFIX + name.toLowerCase(Locale.ENGLISH);
 		String label = Labels.getLabel(labelKey);
 		return label;
 	}

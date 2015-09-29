@@ -1,6 +1,7 @@
 package org.openforis.idm.model;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import com.dyuproject.protostuff.Input;
 import com.dyuproject.protostuff.Output;
@@ -29,7 +30,7 @@ public class AttributeSchema<T extends Attribute<?,?>> extends SchemaSupport<T> 
 
 	@Override
 	public String messageName() {
-		return typeClass().getSimpleName().replace("Attribute", "").toLowerCase();
+		return typeClass().getSimpleName().replace("Attribute", "").toLowerCase(Locale.ENGLISH);
 	}
 
 	@Override

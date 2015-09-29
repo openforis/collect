@@ -4,6 +4,7 @@
 package org.openforis.collect.metamodel.proxy;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
@@ -49,7 +50,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		CollectSurvey survey = (CollectSurvey) entityDefinition.getSurvey();
 		UIOptions uiOpts = survey.getUIOptions();
 		Layout layout = uiOpts.getLayout(entityDefinition);
-		return layout.name().toLowerCase();
+		return layout.name().toLowerCase(Locale.ENGLISH);
 	}
 	
 	@ExternalizedProperty

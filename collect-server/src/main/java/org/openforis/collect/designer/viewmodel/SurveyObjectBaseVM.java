@@ -5,6 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.designer.form.FormObject;
@@ -257,7 +258,7 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 	}
 
 	protected String suggestInternalName(String label) {
-		String name = label.trim().toLowerCase().replaceAll("\\W", "_");
+		String name = label.trim().toLowerCase(Locale.ENGLISH).replaceAll("\\W", "_");
 		name = StringUtils.strip(name, "_");
 		return name;
 	}

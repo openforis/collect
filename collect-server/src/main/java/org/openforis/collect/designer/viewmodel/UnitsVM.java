@@ -5,6 +5,7 @@ package org.openforis.collect.designer.viewmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Stack;
 
 import org.openforis.collect.designer.form.SurveyObjectFormObject;
@@ -42,7 +43,7 @@ public class UnitsVM extends SurveyObjectBaseVM<Unit> {
 	private Window confirmDeleteItemWithErrorsPopUp;
 
 	public static String getDimensionLabel(Dimension dimension) {
-		String labelKey = "survey.unit.dimension." + dimension.name().toLowerCase();
+		String labelKey = "survey.unit.dimension." + dimension.name().toLowerCase(Locale.ENGLISH);
 		String label = Labels.getLabel(labelKey);
 		return label;
 	}

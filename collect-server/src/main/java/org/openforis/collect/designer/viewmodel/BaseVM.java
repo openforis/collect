@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ServiceLoader;
 
@@ -116,7 +117,7 @@ public abstract class BaseVM {
 	
 	protected String adjustInternalName(String name) {
 		String result = StringUtils.trimToEmpty(name);
-		result = result.toLowerCase();
+		result = result.toLowerCase(Locale.ENGLISH);
 		return result;
 	}
 	

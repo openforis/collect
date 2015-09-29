@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.viewmodel;
 
+import java.util.Locale;
+
 import org.openforis.collect.metamodel.ui.UIOptions.CoordinateAttributeFieldsOrder;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -36,7 +38,7 @@ public class CoordinateAttributeVM extends AttributeVM<CoordinateAttributeDefini
 	
 	public String getFieldsOrderLabel(String value) {
 		CoordinateAttributeFieldsOrder enumValue = CoordinateAttributeFieldsOrder.valueOf(value);
-		String messageKey = "survey.schema.attribute.coordinate.fields_order." + enumValue.name().toLowerCase();
+		String messageKey = "survey.schema.attribute.coordinate.fields_order." + enumValue.name().toLowerCase(Locale.ENGLISH);
 		return Labels.getLabel(messageKey);
 	}
 	
