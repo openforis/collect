@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="add-data-error-report-columns" author="ricci" dbms="sqlite">
+		<comment>Add columns to the data error report table</comment>
+		
+		<sql>
+			alter table ofc_data_error_report add column dataset_size INTEGER;
+			alter table ofc_data_error_report add column last_record_modified_date TIMESTAMP;
+		</sql>
+		
+	</changeSet>
+  
+</databaseChangeLog>

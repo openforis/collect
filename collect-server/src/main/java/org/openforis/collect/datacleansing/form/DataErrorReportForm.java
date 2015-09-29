@@ -1,8 +1,13 @@
 package org.openforis.collect.datacleansing.form;
 
+import java.util.Date;
+
 import org.openforis.collect.datacleansing.DataErrorQueryGroup;
 import org.openforis.collect.datacleansing.DataErrorReport;
+import org.openforis.collect.datacleansing.json.CollectDateSerializer;
 import org.openforis.collect.model.CollectRecord.Step;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * 
@@ -12,6 +17,8 @@ import org.openforis.collect.model.CollectRecord.Step;
 public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> {
 
 	private Step recordStep;
+	private int datasetSize;
+	private Date lastRecordModifiedDate;
 	
 	//calculated members
 	private String queryGroupTitle;
@@ -36,6 +43,23 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 	
 	public void setRecordStep(Step recordStep) {
 		this.recordStep = recordStep;
+	}
+	
+	public int getDatasetSize() {
+		return datasetSize;
+	}
+	
+	public void setDatasetSize(int datasetSize) {
+		this.datasetSize = datasetSize;
+	}
+	
+	@JsonSerialize(using = CollectDateSerializer.class)
+	public Date getLastRecordModifiedDate() {
+		return lastRecordModifiedDate;
+	}
+	
+	public void setLastRecordModifiedDate(Date lastRecordModifiedDate) {
+		this.lastRecordModifiedDate = lastRecordModifiedDate;
 	}
 
 	public String getQueryGroupTitle() {

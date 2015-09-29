@@ -37,6 +37,7 @@ public class DataErrorReportGeneratorJob extends Job {
 	//output
 	private DataErrorReport report;
 	
+	//temporary
 	private transient ItemBatchPersister batchPersister;
 	
 	@Override
@@ -54,6 +55,17 @@ public class DataErrorReportGeneratorJob extends Job {
 		report.setRecordStep(recordStep);
 		reportManager.save(report);
 		batchPersister = new ItemBatchPersister(report);
+	}
+	
+	@Override
+	protected void onTaskCompleted(Worker task) {
+		if (task instanceof DataErrorQueryGroupExectutorTask) {
+			DataErrorQueryGroupExectutorTask t = (DataErrorQueryGroupExectutorTask) task;
+			report.setDatasetSize(Long.valueOf(t.getTotalItems()).intValue());
+			report.setLastRecordModifiedDate(t.getLastRecordModifiedDate());
+			reportManager.save(report);
+		}
+		super.onTaskCompleted(task);
 	}
 	
 	@Override
@@ -81,8 +93,7 @@ public class DataErrorReportGeneratorJob extends Job {
 		
 		@Override
 		public void process(DataErrorQuery query, Node<?> node) throws Exception {
-			Attribute<?, ?> attr = (Attribute<?, ?>) node;
-			DataErrorReportItem item = createReportItem(report, query, attr);
+			DataErrorReportItem item = createReportItem(report, query, (Attribute<?, ?>) node);
 			batchPersister.add(item);
 		}
 		

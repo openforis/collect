@@ -1,6 +1,7 @@
 package org.openforis.collect.datacleansing;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,19 +18,19 @@ public class DataErrorReport extends PersistedSurveyObject {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Step recordStep;
 	private int queryGroupId;
+	private Step recordStep = Step.ENTRY;
+	private int datasetSize = 0;
+	private Date lastRecordModifiedDate;
 	private DataErrorQueryGroup queryGroup;
 	private List<DataErrorReportItem> items = new ArrayList<DataErrorReportItem>();
 	
 	public DataErrorReport(CollectSurvey survey) {
 		super(survey);
-		this.recordStep = Step.ENTRY;
 	}
 	
 	public DataErrorReport(CollectSurvey survey, UUID uuid) {
 		super(survey, uuid);
-		this.recordStep = Step.ENTRY;
 	}
 
 	public void addItem(DataErrorReportItem item) {
@@ -71,6 +72,22 @@ public class DataErrorReport extends PersistedSurveyObject {
 	
 	public void setRecordStep(Step recordStep) {
 		this.recordStep = recordStep;
+	}
+	
+	public int getDatasetSize() {
+		return datasetSize;
+	}
+	
+	public void setDatasetSize(int datasetSize) {
+		this.datasetSize = datasetSize;
+	}
+	
+	public Date getLastRecordModifiedDate() {
+		return lastRecordModifiedDate;
+	}
+	
+	public void setLastRecordModifiedDate(Date lastRecordModifiedDate) {
+		this.lastRecordModifiedDate = lastRecordModifiedDate;
 	}
 
 }
