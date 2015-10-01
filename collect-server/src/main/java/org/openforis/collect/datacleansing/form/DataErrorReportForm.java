@@ -19,12 +19,12 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 	private Step recordStep;
 	private int datasetSize;
 	private Date lastRecordModifiedDate;
+	private int itemCount;
+	private int affectedRecordsCount;
 	
 	//calculated members
 	private String queryGroupTitle;
 	private DataErrorQueryGroupForm errorQueryGroup;
-	private int itemCount;
-	private int affectedRecordsCount;
 	
 	public DataErrorReportForm() {
 		super();
@@ -35,6 +35,14 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 		DataErrorQueryGroup dataErrorQueryGroup = obj.getQueryGroup();
 		this.errorQueryGroup = new DataErrorQueryGroupForm(dataErrorQueryGroup);
 		this.queryGroupTitle = this.errorQueryGroup.getTitle();
+	}
+	
+	public double getAffectedRecordsPercent() {
+		if (affectedRecordsCount > 0) {
+			return (double) (affectedRecordsCount * 100) / datasetSize;
+		} else {
+			return 0;
+		}
 	}
 	
 	public Step getRecordStep() {
@@ -84,7 +92,6 @@ public class DataErrorReportForm extends DataCleansingItemForm<DataErrorReport> 
 	
 	public void setAffectedRecordsCount(int affectedRecordsCount) {
 		this.affectedRecordsCount = affectedRecordsCount;
-		
 	}
-
+	
 }
