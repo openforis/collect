@@ -10,6 +10,7 @@ import org.openforis.collect.metamodel.SurveyViewGenerator;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.RecordUnlockedException;
+import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -51,19 +52,41 @@ public class SessionController {
 	
 	@RequestMapping(value = "survey.json", method = RequestMethod.GET)
 	public @ResponseBody SurveyView getActiveSurvey(HttpServletResponse response) {
-		CollectSurvey survey = sessionManager.getActiveSurvey();
-		Locale locale = sessionManager.getSessionState().getLocale();
-		if (locale == null) {
-			locale = Locale.ENGLISH;
-		}
-		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
+		CollectSurvey survey = getUpdatedActiveSurvey();
 		if (survey == null) {
-			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			HttpResponses.setNoContentStatus(response);
 			return null;
 		} else {
+			Locale locale = sessionManager.getSessionState().getLocale();
+			if (locale == null) {
+				locale = Locale.ENGLISH;
+			}
+			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
 			SurveyView view = viewGenerator.generateView(survey);
 			return view;
 		}
 	}
 	
+	private CollectSurvey getUpdatedActiveSurvey() {
+		CollectSurvey sessionSurvey = sessionManager.getActiveSurvey();
+		if (sessionSurvey == null) {
+			return null;
+		}
+		CollectSurvey storedSurvey;
+		if (sessionSurvey.isTemporary()) {
+			storedSurvey = surveyManager.loadSurvey(sessionSurvey.getId());
+		} else {
+			storedSurvey = surveyManager.getById(sessionSurvey.getId());
+		}
+		if (storedSurvey == null || storedSurvey.isTemporary() != sessionSurvey.isTemporary()) {
+			return null;
+		} else if (storedSurvey.getModifiedDate().compareTo(sessionSurvey.getModifiedDate()) > 0) {
+			//survey updated
+			sessionManager.setActiveSurvey(storedSurvey);
+			return storedSurvey;
+		} else {
+			return sessionSurvey;
+		}
+	}
+
 }
