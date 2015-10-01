@@ -11,6 +11,7 @@ import org.openforis.collect.concurrency.ApplicationLockingJob;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorError;
+import org.openforis.commons.web.HttpResponses;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker.Status;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +73,7 @@ public class CollectJobController extends BasicController {
 	
 	private JobView createJobView(HttpServletResponse response, Job job) {
 		if (job == null) {
-			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			HttpResponses.setNoContentStatus(response);
 			return null;
 		} else {
 			return new JobView(job);
