@@ -24,7 +24,7 @@ Collect.DataCleansing.DataErrorReportPanelController.prototype.getDataGridOption
 			{field: "datasetSize", title: "Dataset Size", align: "right", sortable: true, width: 100},
 			{field: "lastRecordModifiedDate", title: "Last Record Modified", formatter: OF.Dates.formatToPrettyDateTime, align: "right", sortable: true, width: 130},
 			{field: "itemCount", title: "Errors found", align: "right", sortable: true, width: 100},
-			{field: "affectedRecordsCount", title: "Affected Records", align: "right", sortable: false, width: 120},
+			{field: "affectedRecordsCount", title: "Affected Records", align: "right", sortable: true, width: 120},
 			{field: "affectedRecordsPercent", title: "Affected Records %", formatter: percentFormatter, align: "right", sortable: true, width: 100},
 			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, align: "right", sortable: true, width: 130},
 			$this.createGridItemDeleteColumn()
