@@ -160,7 +160,7 @@ var submitForm = function(submitCounter) {
 		timeout : 10000,
 		beforeSend : function() {
 			$.blockUI({
-				message : 'Sumitting data..'
+				message : 'Submitting data..'
 			});
 		}
 	})
@@ -265,11 +265,13 @@ var updateInputFieldsState = function(inputFieldInfoByParameterName) {
 					var groupContainer = el.closest(".code-items-group");
 					
 					var itemsContainers = groupContainer.find(".code-items");
-					itemsContainers.hide();
+					//itemsContainers.hide();
+					itemsContainers.css( "display", "none")
 
 					var validItemsContainer = groupContainer.find(".code-items[data-parent-id='" + parentCodeItemId + "']");
 					if (validItemsContainer.length > 0 && validItemsContainer.is(':hidden')) {
-						validItemsContainer.show();
+						//validItemsContainer.show();
+						validItemsContainer.css( "display", "block")
 					}
 					break;
 				}
@@ -415,6 +417,8 @@ var initCodeButtonGroups = function() {
 		inputField.val(value);
 
 		ajaxDataUpdate();
+		
+		return false;
 	});
 };
 
@@ -426,6 +430,7 @@ var initBooleanButtons = function() {
 			var btn = $(this);
 			hiddenField.val(btn.val());
 			ajaxDataUpdate();
+			return false;
 		});
 	});
 };

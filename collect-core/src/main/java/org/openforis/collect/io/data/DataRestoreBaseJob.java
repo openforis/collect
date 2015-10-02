@@ -6,6 +6,7 @@ package org.openforis.collect.io.data;
 import java.io.File;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
 import org.openforis.collect.io.SurveyRestoreJob;
@@ -56,19 +57,31 @@ public abstract class DataRestoreBaseJob extends Job {
 	@Override
 	protected void validateInput() throws Throwable {
 		super.validateInput();
-		boolean newSurvey = publishedSurvey == null;
-		SurveyBackupInfo backupInfo = new BackupFileExtractor(file).extractInfo();
-		CollectSurvey existingPublishedSurvey = findExistingPublishedSurvey(backupInfo);
-		if (newSurvey) {
-			if (existingPublishedSurvey != null) {
-				throw new IllegalArgumentException(String.format("The backup file is associated to an already published survey: %s", existingPublishedSurvey.getName()));
+		BackupFileExtractor backupFileExtractor = null;
+		try {
+			backupFileExtractor = new BackupFileExtractor(file);
+			if (backupFileExtractor.isOldFormat()) {
+				if (publishedSurvey == null) {
+					throw new IllegalArgumentException("Please specify a published survey to witch restore data into");
+				}
+			} else {
+				SurveyBackupInfo backupInfo = backupFileExtractor.extractInfo();
+				CollectSurvey existingPublishedSurvey = findExistingPublishedSurvey(backupInfo);
+				boolean newSurvey = publishedSurvey == null;
+				if (newSurvey) {
+					if (existingPublishedSurvey != null) {
+						throw new IllegalArgumentException(String.format("The backup file is associated to an already published survey: %s", existingPublishedSurvey.getName()));
+					}
+				} else {
+					String publishedSurveyUri = publishedSurvey.getUri();
+					String packagedSurveyUri = backupInfo.getSurveyUri();
+					if (! publishedSurveyUri.equals(packagedSurveyUri)) {
+						throw new RuntimeException(String.format("Packaged survey uri (%s) is different from the expected one (%s)", packagedSurveyUri, publishedSurveyUri));
+					}
+				}
 			}
-		} else {
-			String publishedSurveyUri = publishedSurvey.getUri();
-			String packagedSurveyUri = backupInfo.getSurveyUri();
-			if (! publishedSurveyUri.equals(packagedSurveyUri)) {
-				throw new RuntimeException(String.format("Packaged survey uri (%s) is different from the expected one (%s)", packagedSurveyUri, publishedSurveyUri));
-			}
+		} finally {
+			IOUtils.closeQuietly(backupFileExtractor);
 		}
 	}
 
@@ -91,7 +104,6 @@ public abstract class DataRestoreBaseJob extends Job {
 			t.setValidateSurvey(true);
 		} else if ( task instanceof IdmlUnmarshallTask ) {
 			IdmlUnmarshallTask t = (IdmlUnmarshallTask) task;
-			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 			File idmlFile = backupFileExtractor.extractIdmlFile();
 			t.setSurveyManager(surveyManager);
 			t.setFile(idmlFile);

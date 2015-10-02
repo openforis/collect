@@ -56,7 +56,8 @@ package org.openforis.collect.presenter {
 		
 		private static const COLLECT_DATA_FILTER:FileFilter = new FileFilter("Collect Data", "*.collect-data");
 		private static const COLLECT_BACKUP_FILTER:FileFilter = new FileFilter("Collect Backup", "*.collect-backup");
-		private static const FILE_FILTERS:Array = [COLLECT_DATA_FILTER, COLLECT_BACKUP_FILTER];
+		private static const COLLECT_EARTH_DATA_FILTER:FileFilter = new FileFilter("Collect Earth Data", "*.zip");
+		private static const FILE_FILTERS:Array = [COLLECT_DATA_FILTER, COLLECT_BACKUP_FILTER, COLLECT_EARTH_DATA_FILTER];
 		
 		private var _fileReference:FileReference;
 		private var _dataImportClient:DataImportClient;
@@ -112,6 +113,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.addEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
 			eventDispatcher.addEventListener(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS, selectAllConflictingRecords);
 			eventDispatcher.addEventListener(DataImportEvent.CONFLICTING_RECORDS_SELECTION_CHANGE, conflictingRecordsSelectionChange);
+			eventDispatcher.addEventListener(DataImportEvent.RECORDS_TO_IMPORT_SELECTION_CHANGE, recordsToImportSelectionChange);
 		}
 		
 		override protected function removeBroadcastEventListeners():void {
@@ -120,6 +122,7 @@ package org.openforis.collect.presenter {
 			eventDispatcher.removeEventListener(DataImportEvent.SHOW_SKIPPED_FILE_ERRORS, showSkippedFileErrorsPopUp);
 			eventDispatcher.removeEventListener(DataImportEvent.SELECT_ALL_CONFLICTING_RECORDS, selectAllConflictingRecords);
 			eventDispatcher.removeEventListener(DataImportEvent.CONFLICTING_RECORDS_SELECTION_CHANGE, conflictingRecordsSelectionChange);
+			eventDispatcher.removeEventListener(DataImportEvent.RECORDS_TO_IMPORT_SELECTION_CHANGE, recordsToImportSelectionChange);
 		}
 		
 		protected function uploadButtonClickHandler(event:MouseEvent):void {
@@ -203,9 +206,11 @@ package org.openforis.collect.presenter {
 			view.skippedFilesDataGrid.dataProvider = _summary.skippedFileErrors;
 			//default selected
 			setItemsSelected(_summary.recordsToImport);
+			view.selectedRecordsToImportCount = _summary.recordsToImport.length;
 			view.recordToImportDataGrid.dataProvider = _summary.recordsToImport;
 			//default not selected
 			_allConflictingRecordsSelected = false;
+			view.selectedConflictingRecordsCount = 0;
 			setItemsSelected(_summary.conflictingRecords, _allConflictingRecordsSelected);
 			view.conflictDataGrid.dataProvider = _summary.conflictingRecords;
 		}
@@ -221,8 +226,9 @@ package org.openforis.collect.presenter {
 					AlertUtil.showError("dataImport.error.emptyImportSelection");
 					return;
 				}
+				var validateRecords:Boolean = view.validateRecordsCheckBox.selected;
 				var responder:AsyncResponder = new AsyncResponder(startImportResultHandler, faultHandler);
-				_dataImportClient.startImport(responder, entryIdsToImport);
+				_dataImportClient.startImport(responder, entryIdsToImport, validateRecords);
 				view.progressBar.setProgress(0, 0);
 				view.currentState = DataImportView.STATE_IMPORT_RUNNING;
 			}
@@ -256,6 +262,20 @@ package org.openforis.collect.presenter {
 					}
 				}
 				return true;
+			}
+		}
+		
+		protected function countSelectedItems(items:IList):int {
+			if ( CollectionUtil.isEmpty(items) ) {
+				return 0;
+			} else {
+				var count:int = 0;
+				for each (var item:DataImportSummaryItemProxy in items) {
+					if (item.selected ) {
+						count ++;
+					}
+				}
+				return count;
 			}
 		}
 		
@@ -420,14 +440,20 @@ package org.openforis.collect.presenter {
 		protected function selectAllConflictingRecords(event:DataImportEvent):void {
 			_allConflictingRecordsSelected = ! _allConflictingRecordsSelected;
 			view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
+			view.selectedConflictingRecordsCount = _summary.conflictingRecords.length;
 			setItemsSelected(_summary.conflictingRecords, _allConflictingRecordsSelected);
 		}
 		
 		protected function conflictingRecordsSelectionChange(event:DataImportEvent):void {
+			view.selectedConflictingRecordsCount = countSelectedItems(_summary.conflictingRecords);
 			_allConflictingRecordsSelected = isAllItemsSelected(_summary.conflictingRecords);
 			view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
 		}
 
+		protected function recordsToImportSelectionChange(event:DataImportEvent):void {
+			view.selectedRecordsToImportCount = countSelectedItems(_summary.recordsToImport);
+		}
+		
 		protected function conflictDataGridHeaderReleaseHandler(event:AdvancedDataGridEvent):void {
 			if ( event.triggerEvent.target is CheckBox) {
 				event.preventDefault();

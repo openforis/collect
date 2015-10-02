@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="merge-survey-tables" author="ricci" dbms="postgresql">
+
+	    <comment>Merge ofc_survey and ofc_survey_work into one table</comment>
+	    
+	    <sql>
+	    	CREATE TABLE collect._temp_info AS 
+				SELECT max(id) AS max_survey_id 
+				FROM collect.ofc_survey;
+			
+			ALTER TABLE collect.ofc_survey ADD COLUMN temporary BOOLEAN NOT NULL DEFAULT FALSE;
+			ALTER TABLE collect.ofc_survey ADD COLUMN published_id int4;
+			ALTER TABLE collect.ofc_survey DROP CONSTRAINT ofc_survey_name_key;
+			ALTER TABLE collect.ofc_survey DROP CONSTRAINT ofc_survey_uri_key;
+			
+			DROP INDEX IF EXISTS collect.ofc_code_list_child_item_idx;
+			DROP INDEX IF EXISTS collect.ofc_code_list_child_items_idx;
+			DROP INDEX IF EXISTS collect.ofc_code_list_parent_id_idx;
+			DROP INDEX IF EXISTS collect.ofc_code_list_survey_idx;
+			
+			INSERT INTO collect.ofc_survey (id, name, uri, idml, target, date_created, date_modified, collect_version, temporary, published_id) 
+				SELECT (sw.id + _temp_info.max_survey_id), sw.name, sw.uri, sw.idml, sw.target, sw.date_created, sw.date_modified, sw.collect_version, TRUE, (select s.id from collect.ofc_survey s where s.uri = sw.uri)
+				FROM collect.ofc_survey_work sw, collect._temp_info;
+			
+			UPDATE collect.ofc_code_list 
+				SET survey_id = (survey_work_id + (SELECT max_survey_id FROM collect._temp_info))
+				WHERE survey_work_id IS NOT NULL;
+			
+			UPDATE collect.ofc_taxonomy 
+				SET survey_id = (survey_work_id + (SELECT max_survey_id FROM collect._temp_info))
+				WHERE survey_work_id IS NOT NULL;
+			
+			UPDATE collect.ofc_sampling_design
+				SET survey_id = (survey_work_id + (SELECT max_survey_id FROM collect._temp_info))
+				WHERE survey_work_id IS NOT NULL;
+				
+			ALTER TABLE collect.ofc_code_list DROP COLUMN survey_work_id;
+			ALTER TABLE collect.ofc_taxonomy DROP COLUMN survey_work_id;
+			ALTER TABLE collect.ofc_sampling_design DROP COLUMN survey_work_id;
+			DROP SEQUENCE collect.ofc_survey_work_id_seq;
+			DROP TABLE collect._temp_info;
+			DROP TABLE collect.ofc_survey_work;
+			
+			--create new indexes
+			CREATE INDEX ofc_code_list_survey_idx 
+				ON collect.ofc_code_list(survey_id);
+			CREATE INDEX ofc_code_list_child_items_idx 
+				ON collect.ofc_code_list(survey_id, code_list_id, parent_id);
+			CREATE UNIQUE INDEX ofc_code_list_child_item_idx 
+				ON collect.ofc_code_list(survey_id, code_list_id, parent_id, code);
+			CREATE INDEX ofc_code_list_parent_id_idx 
+				ON collect.ofc_code_list(parent_id);
+			CREATE INDEX ofc_taxonomy_survey_idx 
+				ON collect.ofc_taxonomy(survey_id);
+			CREATE UNIQUE INDEX ofc_sampling_design_key_idx 
+				ON collect.ofc_sampling_design(survey_id, level1, level2, level3);
+				
+			ALTER TABLE collect.ofc_survey ADD CONSTRAINT ofc_survey_name_key UNIQUE (name, temporary);
+			ALTER TABLE collect.ofc_survey ADD CONSTRAINT ofc_survey_uri_key UNIQUE (uri, temporary);
+			
+			--restart survey sequence
+			select setval('collect.ofc_survey_id_seq', (select max(id)+1 from collect.ofc_survey), false);
+	    </sql>
+	</changeSet>
+	
+</databaseChangeLog>

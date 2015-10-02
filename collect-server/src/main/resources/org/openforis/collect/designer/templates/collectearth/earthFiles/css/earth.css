@@ -43,6 +43,17 @@ body {
 	width: 60px !important;
 }
 
+div.ancillary-data {
+	padding: 10px 16px;
+	font-size: 11px;
+	line-height: 1.33;
+	border-radius: 6px;
+	font-weight: bold;
+	display: inline-block;
+	text-align: left;
+}
+
+
 .input-prepend .add-on, .input-prepend .btn {
 	margin-left: 4px;
 }

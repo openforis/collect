@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.SurveyBackupJob.OutputFormat;
 import org.openforis.collect.io.data.backup.BackupStorageManager;
@@ -50,6 +49,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	//output
 	private List<RecordImportError> errors;
 		
+	private boolean validateRecords;
+
 	@Override
 	public void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
@@ -82,7 +83,6 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	}
 
 	private boolean isUploadedFilesIncluded() throws IOException {
-		BackupFileExtractor backupFileExtractor = new BackupFileExtractor(zipFile);
 		List<String> dataEntries = backupFileExtractor.listEntriesInPath(SurveyBackupJob.UPLOADED_FILES_FOLDER);
 		return ! dataEntries.isEmpty();
 	}
@@ -101,12 +101,12 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 			DataRestoreTask t = (DataRestoreTask) task;
 			t.setRecordManager(recordManager);
 			t.setUserManager(userManager);
-			t.setZipFile(zipFile);
-//			t.setOldBackupFormat(oldBackupFormat);
+			t.setFile(file);
 			t.setPackagedSurvey(packagedSurvey);
 			t.setExistingSurvey(publishedSurvey);
 			t.setOverwriteAll(overwriteAll);
 			t.setEntryIdsToImport(entryIdsToImport);
+			t.setValidateRecords(validateRecords);
 		} else if ( task instanceof RecordFileRestoreTask ) {
 			RecordFileRestoreTask t = (RecordFileRestoreTask) task;
 			t.setRecordManager(recordManager);
@@ -196,6 +196,10 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		return errors;
 	}
 
+	public void setValidateRecords(boolean validateRecords) {
+		this.validateRecords = validateRecords;
+	}
+
 	private class StoreBackupFileTask extends Task {
 		@Override
 		protected void execute() throws Throwable {
@@ -203,4 +207,5 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		}
 		
 	}
+
 }

@@ -3,7 +3,6 @@
  */
 package org.openforis.idm.metamodel;
 
-import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.IntegerAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.Node;
@@ -49,17 +48,17 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public NumberValue<? extends Number> createValue(String string) {
-		if ( StringUtils.isBlank(string) ) {
-			return null;
-		} 
-		Unit unit = getDefaultUnit();
-		if(isInteger()){
-			return new IntegerValue(Double.valueOf(string).intValue(), unit);
-		} else if(isReal()) {
-			return new RealValue(Double.valueOf(string), unit);
+	public NumberValue<? extends Number> createValue(String stringValue) {
+		Unit defaultUnit = getDefaultUnit();
+		double doubleValue = Double.parseDouble(stringValue);
+		switch(getType()) {
+		case INTEGER:
+			return new IntegerValue(Double.valueOf(Math.round(doubleValue)).intValue(), defaultUnit);
+		case REAL:
+			return new RealValue(doubleValue, defaultUnit);
+		default:
+			throw new RuntimeException("Invalid type " + getType());
 		}
-		throw new RuntimeException("Invalid type " + getType());
 	}
 	
 	@Override

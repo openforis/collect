@@ -24,10 +24,14 @@ import org.openforis.collect.utils.Files;
 public class NewBackupFileExtractor implements Closeable {
 
 	public static final String RECORD_FILE_DIRECTORY_NAME = "upload";
+	private static final String ZIP_SEPARATOR_PATTERN = "[\\\\|/]";
 
+	//input variables
 	private File file;
+	
 	private File tempUncompressedFolder;
-	private ZipFile zipFile;
+	//temporary variables
+	private transient ZipFile zipFile;
 
 	public NewBackupFileExtractor(File file) throws ZipException, IOException {
 		this.file = file;
@@ -39,14 +43,15 @@ public class NewBackupFileExtractor implements Closeable {
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {
 			ZipEntry zipEntry = entries.nextElement();
-			InputStream is = zipFile.getInputStream(zipEntry);
-
-			String entryName = zipEntry.getName();
-			File folder = getOrCreateEntryFolder(entryName);
-			String fileName = extractFileName(entryName);
-			File newFile = new File(folder, fileName);
-			newFile.createNewFile();
-			FileUtils.copyInputStreamToFile(is, newFile);
+			if (! zipEntry.isDirectory()) {
+				String entryName = zipEntry.getName();
+				File folder = getOrCreateEntryFolder(entryName);
+				String fileName = extractFileName(entryName);
+				File newFile = new File(folder, fileName);
+				newFile.createNewFile();
+				InputStream is = zipFile.getInputStream(zipEntry);
+				FileUtils.copyInputStreamToFile(is, newFile);
+			}
 		}
 	}
 	
@@ -79,9 +84,9 @@ public class NewBackupFileExtractor implements Closeable {
 		return result.exists() ? result: null;
 	}
 
-	public List<String> listEntriesInPath(String path) {
+	public List<String> listFilesInFolder(String folderPath) {
 		List<String> result = new ArrayList<String>();
-		File folder = getOrCreateEntryFolder(path);
+		File folder = getOrCreateFolder(folderPath);
 		File[] files = folder.listFiles();
 		for (File file : files) {
 			result.add(file.getName());
@@ -90,13 +95,13 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 	
 	public List<String> listSpeciesEntryNames() {
-		List<String> entries = listEntriesInPath(SurveyBackupJob.SPECIES_FOLDER);
+		List<String> entries = listFilesInFolder(SurveyBackupJob.SPECIES_FOLDER);
 		return entries;
 	}
 	
 	public List<File> extractFilesInPath(String folder) throws IOException {
 		List<File> result = new ArrayList<File>();
-		List<String> entryNames = listEntriesInPath(folder);
+		List<String> entryNames = listFilesInFolder(folder);
 		for (String name : entryNames) {
 			File tempFile = extract(name);
 			result.add(tempFile);
@@ -119,8 +124,8 @@ public class NewBackupFileExtractor implements Closeable {
 	}
 	
 	public boolean containsEntriesInPath(String path) {
-		List<String> entryNames = listEntriesInPath(path);
-		return ! entryNames.isEmpty();
+		List<String> fileNames = listFilesInFolder(path);
+		return ! fileNames.isEmpty();
 	}
 	
 	public List<String> getEntryNames() {
@@ -149,7 +154,11 @@ public class NewBackupFileExtractor implements Closeable {
 	
 	private File getOrCreateEntryFolder(String entryName) {
 		String path = FilenameUtils.getPathNoEndSeparator(entryName);
-		String[] entryParts = path.split("\\|/");
+		return getOrCreateFolder(path);
+	}
+
+	private File getOrCreateFolder(String path) {
+		String[] entryParts = path.split(ZIP_SEPARATOR_PATTERN);
 		File folder = tempUncompressedFolder;
 		for (int i = 0; i < entryParts.length; i++) {
 			String part = entryParts[i];

@@ -1,5 +1,6 @@
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.zip.ZipFile;
 
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
@@ -41,7 +41,7 @@ public class DataRestoreSummaryTask extends Task {
 	private UserManager userManager;
 
 	//input
-	private ZipFile zipFile;
+	private File file;
 	private boolean oldFormat;
 
 	/**
@@ -81,7 +81,7 @@ public class DataRestoreSummaryTask extends Task {
 	@Override
 	protected void initializeInternalVariables() throws Throwable {
 		super.initializeInternalVariables();
-		this.recordProvider = new XMLParsingRecordProvider(zipFile, packagedSurvey, existingSurvey, userManager);
+		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, false);
 	}
 	
 	@Override
@@ -330,12 +330,8 @@ public class DataRestoreSummaryTask extends Task {
 		this.userManager = userManager;
 	}
 	
-	public ZipFile getZipFile() {
-		return zipFile;
-	}
-	
-	public void setZipFile(ZipFile zipFile) {
-		this.zipFile = zipFile;
+	public void setFile(File file) {
+		this.file = file;
 	}
 	
 	public CollectSurvey getPackagedSurvey() {

@@ -1,14 +1,21 @@
 package org.openforis.idm.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.openforis.idm.metamodel.Unit;
 
 /**
  * 
  * @author G. Miceli
+ * @author S. Ricci
  *
  */
-public abstract class NumberValue<T extends Number> implements Value {
+public abstract class NumberValue<T extends Number> extends AbstractValue {
 
+	public static final String VALUE_FIELD = "value";
+	public static final String UNIT_ID_FIELD = "unit_id";
+	
 	private T value;
 	private Unit unit;
 	
@@ -29,6 +36,19 @@ public abstract class NumberValue<T extends Number> implements Value {
 		return unit;
 	}
 
+	@Override
+	public String toPrettyFormatString() {
+		return getValue() == null ? null: getValue().toString();
+	}
+
+	@Override
+	@SuppressWarnings("serial")
+	public Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(VALUE_FIELD, value);
+			put(UNIT_ID_FIELD, unit == null ? null: unit.getId());
+		}};
+	}
 	
 	@Override
 	public int hashCode() {
@@ -62,8 +82,4 @@ public abstract class NumberValue<T extends Number> implements Value {
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return String.format("value: %s ; unit: %s", value, unit);
-	}
 }

@@ -76,7 +76,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		List<LabelledItem> templates = new ArrayList<LabelledItem>();
 		for (TemplateType templateType : TemplateType.values()) {
 			String name = templateType.name();
-			templates.add(new LabelledItem(name, Labels.getLabel("survey.template.type." + name.toLowerCase())));
+			templates.add(new LabelledItem(name, Labels.getLabel("survey.template.type." + name.toLowerCase(Locale.ENGLISH))));
 		}
 		templateModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(templates));
 		templateModel.setMultiple(false);
@@ -116,7 +116,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		default:
 			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
-		surveyManager.saveSurveyWork(survey);
+		surveyManager.save(survey);
 		//put survey in session and redirect into survey edit page
 		SessionStatus sessionStatus = getSessionStatus();
 		sessionStatus.setSurvey(survey);
@@ -126,11 +126,11 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	protected CollectSurvey createNewSurveyFromTemplate(String name, String langCode, TemplateType templateType)
 			throws IdmlParseException, SurveyValidationException {
-		String templateFileName = String.format(IDM_TEMPLATE_FILE_NAME_FORMAT, templateType.name().toLowerCase());
+		String templateFileName = String.format(IDM_TEMPLATE_FILE_NAME_FORMAT, templateType.name().toLowerCase(Locale.ENGLISH));
 		InputStream surveyFileIs = this.getClass().getResourceAsStream(templateFileName);
 		CollectSurvey survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
 		survey.setName(name);
-		survey.setWork(true);
+		survey.setTemporary(true);
 		survey.setUri(surveyManager.generateSurveyUri(name));
 		survey.setDefaultLanguage(langCode);
 		SurveyTarget target;
@@ -152,7 +152,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	protected CollectSurvey createEmptySurvey(String name, String langCode) {
 		//create empty survey
-		CollectSurvey survey = surveyManager.createSurveyWork(name, langCode);
+		CollectSurvey survey = surveyManager.createTemporarySurvey(name, langCode);
 		//add default root entity
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntity = schema.createEntityDefinition();

@@ -3,6 +3,7 @@ package org.openforis.collect.io.metadata.collectearth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
@@ -71,7 +72,7 @@ public class MondrianCubeGenerator {
 		for (NodeDefinition nodeDef : children) {
 			String nodeName = nodeDef.getName();
 			if (nodeDef instanceof AttributeDefinition) {
-				Dimension dimension = generateDimension(nodeDef);
+				Dimension dimension = generateDimension(nodeDef, rootEntityDef );
 				
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
@@ -86,13 +87,14 @@ public class MondrianCubeGenerator {
 						measure.column = nodeName;
 						measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(nodeDef) + " " + aggregator );
 						measure.aggregator = aggregator;
-						measure.datatype = "Integer";
+						measure.datatype = "Numeric";
+						measure.formatString = "#.##";
 						cube.measures.add(measure);
 					}
 				} 
 				cube.dimensions.add(dimension);
 			} else {
-				String rootEntityIdColumnName = rdbConfig.getIdColumnPrefix() + rootEntityDef.getName() + rdbConfig.getIdColumnSuffix();
+				String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
 				
 				String entityName = nodeName;
 				String entityLabel = extractLabel(nodeDef);
@@ -128,7 +130,7 @@ public class MondrianCubeGenerator {
 						dimension.hierarchy = hierarchy;
 						
 					}else{
-						dimension = generateDimension(childDef);
+						dimension = generateDimension(childDef, rootEntityDef);
 					}
 					
 					cube.dimensions.add(dimension);
@@ -136,10 +138,15 @@ public class MondrianCubeGenerator {
 			}
 		}
 		//add predefined dimensions
-		cube.dimensions.addAll(generatePredefinedDimensions());
+		// DEPRECATED 07/08/2015 : From now on all the operations to calculate the aspect,elevation,slope and initial land use class are made through Calculated Members
+//		cube.dimensions.addAll(generatePredefinedDimensions());
 		//add predefined measures
 		cube.measures.addAll(0, generatePredefinedMeasures());
 		return cube;
+	}
+
+	public String getRootEntityIdColumnName(EntityDefinition rootEntityDef) {
+		return rdbConfig.getIdColumnPrefix() + rootEntityDef.getName() + rdbConfig.getIdColumnSuffix();
 	}
 	
 	
@@ -152,7 +159,7 @@ public class MondrianCubeGenerator {
 			measure.caption = "Area (HA)";
 			measure.aggregator = "sum";
 			measure.datatype = "Integer";
-			measure.formatString = "#,###";
+			measure.formatString = "###,###";
 			measures.add(measure);
 		}
 		
@@ -170,7 +177,7 @@ public class MondrianCubeGenerator {
 		return measures;
 	}
 	
-	private List<Dimension> generatePredefinedDimensions() {
+/*	private List<Dimension> generatePredefinedDimensions() {
 		List<Dimension> dimensions = new ArrayList<Dimension>();
 		//Slope category
 		{
@@ -230,8 +237,8 @@ public class MondrianCubeGenerator {
 		}
 		return dimensions;
 	}
-
-	private Dimension generateDimension(NodeDefinition nodeDef) {
+*/
+	private Dimension generateDimension(NodeDefinition nodeDef, EntityDefinition rootEntityDef ) {
 		String attrName = nodeDef.getName();
 		String attrLabel = extractLabel(nodeDef);
 		Dimension dimension = new Dimension(attrLabel);
@@ -239,10 +246,34 @@ public class MondrianCubeGenerator {
 		Hierarchy hierarchy = dimension.hierarchy;
 		
 		if (nodeDef instanceof CodeAttributeDefinition) {
-			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDef;
-			String codeTableName = extractCodeListTableName(codeAttrDef);
-			dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();						
-			hierarchy.table = new Table(codeTableName);
+			String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
+			
+			String entityName = attrName;
+			
+			if( nodeDef.isMultiple() ){
+				
+				dimension.foreignKey = rootEntityIdColumnName;
+				hierarchy.primaryKey = rootEntityIdColumnName;
+				hierarchy.primaryKeyTable = entityName;
+					
+				Join join = new Join(null);
+				String codeListName = ((CodeAttributeDefinition) nodeDef).getList().getName();
+				join.leftKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+				join.rightKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+				
+				join.tables = Arrays.asList(
+						new Table(entityName), 
+						new Table(codeListName + rdbConfig.getCodeListTableSuffix())
+				);
+				
+				hierarchy.join = join;
+										
+			}else{			
+				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDef;
+				String codeTableName = extractCodeListTableName(codeAttrDef);
+				dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();						
+				hierarchy.table = new Table(codeTableName);
+			}
 		}
 		
 		if (nodeDef instanceof DateAttributeDefinition) {
@@ -252,7 +283,7 @@ public class MondrianCubeGenerator {
 			String[] levelNames = new String[] {"Year", "Month", "Day"};
 			for (String levelName : levelNames) {
 				Level level = new Level(attrLabel + " - " + levelName);
-				level.column = nodeDef.getName() + "_" + levelName.toLowerCase();
+				level.column = nodeDef.getName() + "_" + levelName.toLowerCase(Locale.ENGLISH);
 				level.levelType = String.format("Time%ss", levelName);
 				level.type = "Numeric";
 				hierarchy.levels.add(level);
@@ -423,10 +454,6 @@ public class MondrianCubeGenerator {
 		
 		@XStreamImplicit
 		private List<Level> levels = new ArrayList<Level>();
-		
-		public Hierarchy() {
-			this(null);
-		}
 		
 		public Hierarchy(String name) {
 			super(name);

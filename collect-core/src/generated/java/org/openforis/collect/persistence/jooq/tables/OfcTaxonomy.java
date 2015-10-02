@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcTaxonomy extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord> {
 
-	private static final long serialVersionUID = 1734749361;
+	private static final long serialVersionUID = -552041098;
 
 	/**
 	 * The reference instance of <code>collect.ofc_taxonomy</code>
@@ -50,11 +50,6 @@ public class OfcTaxonomy extends org.jooq.impl.TableImpl<org.openforis.collect.p
 	 * The column <code>collect.ofc_taxonomy.survey_id</code>.
 	 */
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord, java.lang.Integer> SURVEY_ID = createField("survey_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>collect.ofc_taxonomy.survey_work_id</code>.
-	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord, java.lang.Integer> SURVEY_WORK_ID = createField("survey_work_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>collect.ofc_taxonomy</code> table reference
@@ -91,7 +86,7 @@ public class OfcTaxonomy extends org.jooq.impl.TableImpl<org.openforis.collect.p
 	 */
 	@Override
 	public java.util.List<org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord>> getKeys() {
-		return java.util.Arrays.<org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY_PKEY, org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY_NAME_KEY, org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY_NAME_WORK_KEY);
+		return java.util.Arrays.<org.jooq.UniqueKey<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY_PKEY, org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY_NAME_KEY);
 	}
 
 	/**
@@ -99,7 +94,7 @@ public class OfcTaxonomy extends org.jooq.impl.TableImpl<org.openforis.collect.p
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_FKEY, org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_WORK_FKEY);
+		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcTaxonomyRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_TAXONOMY__OFC_TAXONOMY_SURVEY_FKEY);
 	}
 
 	/**

@@ -53,6 +53,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 	private CodeList hierarchicalList;
 	private CodeList flatList;
 	
+	@SuppressWarnings("deprecation")
 	@Before
 	public void before() throws IdmlParseException, IOException, SurveyImportException, SQLException, LiquibaseException {
 		SQLiteDatabase database = new SQLiteDatabase();

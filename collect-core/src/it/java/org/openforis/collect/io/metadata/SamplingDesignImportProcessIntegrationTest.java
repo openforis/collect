@@ -56,8 +56,8 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyStoreException {
 		survey = loadSurvey();
-		survey.setWork(true);
-		surveyManager.saveSurveyWork(survey);
+		survey.setTemporary(true);
+		surveyManager.save(survey);
 	}
 	
 	public SamplingDesignImportProcess importCSVFile(String fileName) throws Exception {
@@ -75,7 +75,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(27, status.getProcessed());
 		
-		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurveyWork(survey.getId(), 0, 30);
+		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
 		assertEquals(26, samplingDesignSummaries.getTotalCount());
 		
@@ -93,7 +93,7 @@ public class SamplingDesignImportProcessIntegrationTest extends CollectIntegrati
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
 		
-		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurveyWork(survey.getId(), 0, 30);
+		SamplingDesignSummaries samplingDesignSummaries = samplingDesignManager.loadBySurvey(survey.getId(), 0, 30);
 		assertNotNull(samplingDesignSummaries);
 		assertEquals(6, samplingDesignSummaries.getTotalCount());
 		

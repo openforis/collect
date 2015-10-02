@@ -14,7 +14,6 @@ public class SamplingDesignItem {
 
 	private Integer id;
 	private Integer surveyId;
-	private Integer surveyWorkId;
 	private List<String> levelCodes;
 	private String srsId;
 	private Double x;
@@ -50,14 +49,6 @@ public class SamplingDesignItem {
 
 	public void setSurveyId(Integer surveyId) {
 		this.surveyId = surveyId;
-	}
-
-	public Integer getSurveyWorkId() {
-		return surveyWorkId;
-	}
-
-	public void setSurveyWorkId(Integer surveyWorkId) {
-		this.surveyWorkId = surveyWorkId;
 	}
 
 	public List<String> getLevelCodes() {

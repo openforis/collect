@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.designer.composer;
 
+import java.util.Locale;
+
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -61,7 +63,7 @@ public class AttributePopUpComposer extends BindComposer<Window> {
 			return null;
 		} else {
 			AttributeType type = AttributeType.valueOf(item);
-			return type.name().toLowerCase();
+			return type.name().toLowerCase(Locale.ENGLISH);
 		}
 	}
 

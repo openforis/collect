@@ -208,7 +208,7 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 			String wkt = srs.getWellKnownText();
 			try {
 				transform = findMathTransform(wkt);
-				TO_WGS84_TRANSFORMS.put(srsId, transform);
+			TO_WGS84_TRANSFORMS.put(srsId, transform);
 			} catch (Exception e) {
 				//TODO throw exception
 				//throw new CoordinateOperationException(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
@@ -217,6 +217,13 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public Coordinate convertToWgs84(Coordinate coordinate) {
+		Position position = toWgs84(coordinate.getX(), coordinate.getY(), coordinate.getSrsId());
+		DirectPosition directPosition = position.getDirectPosition();
+		return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), WGS84_ID);
 	}
 
 	private static Position toWgs84(double x, double y, String srsId) {

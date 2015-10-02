@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables.records;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcCodeListRecord extends org.jooq.impl.UpdatableRecordImpl<org.openforis.collect.persistence.jooq.tables.records.OfcCodeListRecord> {
 
-	private static final long serialVersionUID = 201338555;
+	private static final long serialVersionUID = -1155256448;
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.id</code>.
@@ -47,311 +47,297 @@ public class OfcCodeListRecord extends org.jooq.impl.UpdatableRecordImpl<org.ope
 	}
 
 	/**
-	 * Setter for <code>collect.ofc_code_list.survey_work_id</code>.
-	 */
-	public void setSurveyWorkId(java.lang.Integer value) {
-		setValue(2, value);
-	}
-
-	/**
-	 * Getter for <code>collect.ofc_code_list.survey_work_id</code>.
-	 */
-	public java.lang.Integer getSurveyWorkId() {
-		return (java.lang.Integer) getValue(2);
-	}
-
-	/**
 	 * Setter for <code>collect.ofc_code_list.code_list_id</code>.
 	 */
 	public void setCodeListId(java.lang.Integer value) {
-		setValue(3, value);
+		setValue(2, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.code_list_id</code>.
 	 */
 	public java.lang.Integer getCodeListId() {
-		return (java.lang.Integer) getValue(3);
+		return (java.lang.Integer) getValue(2);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.item_id</code>.
 	 */
 	public void setItemId(java.lang.Integer value) {
-		setValue(4, value);
+		setValue(3, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.item_id</code>.
 	 */
 	public java.lang.Integer getItemId() {
-		return (java.lang.Integer) getValue(4);
+		return (java.lang.Integer) getValue(3);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.parent_id</code>.
 	 */
 	public void setParentId(java.lang.Integer value) {
-		setValue(5, value);
+		setValue(4, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.parent_id</code>.
 	 */
 	public java.lang.Integer getParentId() {
-		return (java.lang.Integer) getValue(5);
+		return (java.lang.Integer) getValue(4);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.sort_order</code>.
 	 */
 	public void setSortOrder(java.lang.Integer value) {
-		setValue(6, value);
+		setValue(5, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.sort_order</code>.
 	 */
 	public java.lang.Integer getSortOrder() {
-		return (java.lang.Integer) getValue(6);
+		return (java.lang.Integer) getValue(5);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.code</code>.
 	 */
 	public void setCode(java.lang.String value) {
-		setValue(7, value);
+		setValue(6, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.code</code>.
 	 */
 	public java.lang.String getCode() {
-		return (java.lang.String) getValue(7);
+		return (java.lang.String) getValue(6);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.qualifiable</code>.
 	 */
 	public void setQualifiable(java.lang.Boolean value) {
-		setValue(8, value);
+		setValue(7, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.qualifiable</code>.
 	 */
 	public java.lang.Boolean getQualifiable() {
-		return (java.lang.Boolean) getValue(8);
+		return (java.lang.Boolean) getValue(7);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.since_version_id</code>.
 	 */
 	public void setSinceVersionId(java.lang.Integer value) {
-		setValue(9, value);
+		setValue(8, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.since_version_id</code>.
 	 */
 	public java.lang.Integer getSinceVersionId() {
-		return (java.lang.Integer) getValue(9);
+		return (java.lang.Integer) getValue(8);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.deprecated_version_id</code>.
 	 */
 	public void setDeprecatedVersionId(java.lang.Integer value) {
-		setValue(10, value);
+		setValue(9, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.deprecated_version_id</code>.
 	 */
 	public java.lang.Integer getDeprecatedVersionId() {
-		return (java.lang.Integer) getValue(10);
+		return (java.lang.Integer) getValue(9);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.label1</code>.
 	 */
 	public void setLabel1(java.lang.String value) {
-		setValue(11, value);
+		setValue(10, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.label1</code>.
 	 */
 	public java.lang.String getLabel1() {
-		return (java.lang.String) getValue(11);
+		return (java.lang.String) getValue(10);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.label2</code>.
 	 */
 	public void setLabel2(java.lang.String value) {
-		setValue(12, value);
+		setValue(11, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.label2</code>.
 	 */
 	public java.lang.String getLabel2() {
-		return (java.lang.String) getValue(12);
+		return (java.lang.String) getValue(11);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.label3</code>.
 	 */
 	public void setLabel3(java.lang.String value) {
-		setValue(13, value);
+		setValue(12, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.label3</code>.
 	 */
 	public java.lang.String getLabel3() {
-		return (java.lang.String) getValue(13);
+		return (java.lang.String) getValue(12);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.description1</code>.
 	 */
 	public void setDescription1(java.lang.String value) {
-		setValue(14, value);
+		setValue(13, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.description1</code>.
 	 */
 	public java.lang.String getDescription1() {
-		return (java.lang.String) getValue(14);
+		return (java.lang.String) getValue(13);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.description2</code>.
 	 */
 	public void setDescription2(java.lang.String value) {
-		setValue(15, value);
+		setValue(14, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.description2</code>.
 	 */
 	public java.lang.String getDescription2() {
-		return (java.lang.String) getValue(15);
+		return (java.lang.String) getValue(14);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.description3</code>.
 	 */
 	public void setDescription3(java.lang.String value) {
-		setValue(16, value);
+		setValue(15, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.description3</code>.
 	 */
 	public java.lang.String getDescription3() {
-		return (java.lang.String) getValue(16);
+		return (java.lang.String) getValue(15);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.level</code>.
 	 */
 	public void setLevel(java.lang.Integer value) {
-		setValue(17, value);
+		setValue(16, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.level</code>.
 	 */
 	public java.lang.Integer getLevel() {
-		return (java.lang.Integer) getValue(17);
+		return (java.lang.Integer) getValue(16);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.image_content</code>.
 	 */
 	public void setImageContent(byte[] value) {
-		setValue(18, value);
+		setValue(17, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.image_content</code>.
 	 */
 	public byte[] getImageContent() {
-		return (byte[]) getValue(18);
+		return (byte[]) getValue(17);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.image_file_name</code>.
 	 */
 	public void setImageFileName(java.lang.String value) {
-		setValue(19, value);
+		setValue(18, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.image_file_name</code>.
 	 */
 	public java.lang.String getImageFileName() {
-		return (java.lang.String) getValue(19);
+		return (java.lang.String) getValue(18);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.label4</code>.
 	 */
 	public void setLabel4(java.lang.String value) {
-		setValue(20, value);
+		setValue(19, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.label4</code>.
 	 */
 	public java.lang.String getLabel4() {
-		return (java.lang.String) getValue(20);
+		return (java.lang.String) getValue(19);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.label5</code>.
 	 */
 	public void setLabel5(java.lang.String value) {
-		setValue(21, value);
+		setValue(20, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.label5</code>.
 	 */
 	public java.lang.String getLabel5() {
-		return (java.lang.String) getValue(21);
+		return (java.lang.String) getValue(20);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.description4</code>.
 	 */
 	public void setDescription4(java.lang.String value) {
-		setValue(22, value);
+		setValue(21, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.description4</code>.
 	 */
 	public java.lang.String getDescription4() {
-		return (java.lang.String) getValue(22);
+		return (java.lang.String) getValue(21);
 	}
 
 	/**
 	 * Setter for <code>collect.ofc_code_list.description5</code>.
 	 */
 	public void setDescription5(java.lang.String value) {
-		setValue(23, value);
+		setValue(22, value);
 	}
 
 	/**
 	 * Getter for <code>collect.ofc_code_list.description5</code>.
 	 */
 	public java.lang.String getDescription5() {
-		return (java.lang.String) getValue(23);
+		return (java.lang.String) getValue(22);
 	}
 
 	// -------------------------------------------------------------------------
@@ -380,32 +366,31 @@ public class OfcCodeListRecord extends org.jooq.impl.UpdatableRecordImpl<org.ope
 	/**
 	 * Create a detached, initialised OfcCodeListRecord
 	 */
-	public OfcCodeListRecord(java.lang.Integer id, java.lang.Integer surveyId, java.lang.Integer surveyWorkId, java.lang.Integer codeListId, java.lang.Integer itemId, java.lang.Integer parentId, java.lang.Integer sortOrder, java.lang.String code, java.lang.Boolean qualifiable, java.lang.Integer sinceVersionId, java.lang.Integer deprecatedVersionId, java.lang.String label1, java.lang.String label2, java.lang.String label3, java.lang.String description1, java.lang.String description2, java.lang.String description3, java.lang.Integer level, byte[] imageContent, java.lang.String imageFileName, java.lang.String label4, java.lang.String label5, java.lang.String description4, java.lang.String description5) {
+	public OfcCodeListRecord(java.lang.Integer id, java.lang.Integer surveyId, java.lang.Integer codeListId, java.lang.Integer itemId, java.lang.Integer parentId, java.lang.Integer sortOrder, java.lang.String code, java.lang.Boolean qualifiable, java.lang.Integer sinceVersionId, java.lang.Integer deprecatedVersionId, java.lang.String label1, java.lang.String label2, java.lang.String label3, java.lang.String description1, java.lang.String description2, java.lang.String description3, java.lang.Integer level, byte[] imageContent, java.lang.String imageFileName, java.lang.String label4, java.lang.String label5, java.lang.String description4, java.lang.String description5) {
 		super(org.openforis.collect.persistence.jooq.tables.OfcCodeList.OFC_CODE_LIST);
 
 		setValue(0, id);
 		setValue(1, surveyId);
-		setValue(2, surveyWorkId);
-		setValue(3, codeListId);
-		setValue(4, itemId);
-		setValue(5, parentId);
-		setValue(6, sortOrder);
-		setValue(7, code);
-		setValue(8, qualifiable);
-		setValue(9, sinceVersionId);
-		setValue(10, deprecatedVersionId);
-		setValue(11, label1);
-		setValue(12, label2);
-		setValue(13, label3);
-		setValue(14, description1);
-		setValue(15, description2);
-		setValue(16, description3);
-		setValue(17, level);
-		setValue(18, imageContent);
-		setValue(19, imageFileName);
-		setValue(20, label4);
-		setValue(21, label5);
-		setValue(22, description4);
-		setValue(23, description5);
+		setValue(2, codeListId);
+		setValue(3, itemId);
+		setValue(4, parentId);
+		setValue(5, sortOrder);
+		setValue(6, code);
+		setValue(7, qualifiable);
+		setValue(8, sinceVersionId);
+		setValue(9, deprecatedVersionId);
+		setValue(10, label1);
+		setValue(11, label2);
+		setValue(12, label3);
+		setValue(13, description1);
+		setValue(14, description2);
+		setValue(15, description3);
+		setValue(16, level);
+		setValue(17, imageContent);
+		setValue(18, imageFileName);
+		setValue(19, label4);
+		setValue(20, label5);
+		setValue(21, description4);
+		setValue(22, description5);
 	}
 }

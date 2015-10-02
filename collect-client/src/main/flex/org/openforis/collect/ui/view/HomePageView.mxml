@@ -106,7 +106,7 @@
 													paddingRight="5"
 													paddingTop="5" />
 							</s:layout>
-							<s:Image source="{data.icon}" />
+							<s:Image source="{data.icon}" width="48" height="48" />
 							<s:Label styleName="functionLabel" 
 									 text="{data.label}" />
 						</s:ItemRenderer>

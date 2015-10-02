@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.Stack;
 
@@ -387,7 +388,7 @@ public class RecordIndexManager extends BaseStorageManager {
 	}
 
 	protected Query createQuery(SearchType searchType, String indexFieldKey, String searchText) throws ParseException {
-		String escapedSearchText = QueryParser.escape(searchText.trim().toLowerCase());
+		String escapedSearchText = QueryParser.escape(searchText.trim().toLowerCase(Locale.ENGLISH));
 		String queryText = escapedSearchText;
 		
 		if ( StringUtils.isNotBlank(queryText) ) {

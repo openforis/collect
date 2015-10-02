@@ -30,43 +30,51 @@ public class ModelNodePointerFactory implements NodePointerFactory {
 	}
 
 	public NodePointer createNodePointer(QName name, Object bean, Locale locale) {
-		JXPathBeanInfo bi = JXPathIntrospector.getBeanInfo(bean.getClass());
-		if (bi.isDynamic()) {
-			DynamicPropertyHandler handler = ValueUtils.getDynamicPropertyHandler(bi.getDynamicPropertyHandlerClass());
-			return new ModelNodePointer(name, bean, handler, locale);
-		} else {
+		DynamicPropertyHandler propertyHandler = determineDynamicPropertyHandler(bean);
+		if (propertyHandler == null) {
 			Object obj = getHeadElement(bean);
-			if (obj != null) {
+			if (obj == null) {
+				return null;
+			} else {
 				return createNodePointer(name, obj, locale);
 			}
+		} else {
+			return new ModelNodePointer(name, bean, propertyHandler, locale);
 		}
-		return null;
 	}
 
 	public NodePointer createNodePointer(NodePointer parent, QName name, Object bean) {
 		if (bean == null) {
 			return new NullPointer(parent, name);
 		}
+		DynamicPropertyHandler propertyHandler = determineDynamicPropertyHandler(bean);
+		if (propertyHandler == null) {
+			Object obj = getHeadElement(bean);
+			if (obj == null) {
+				return null;
+			} else {
+				return createNodePointer(parent, name, obj);
+			}
+		} else {
+			return new ModelNodePointer(parent, name, bean, propertyHandler);
+		}
+	}
 
+	private DynamicPropertyHandler determineDynamicPropertyHandler(Object bean) {
 		JXPathBeanInfo bi = JXPathIntrospector.getBeanInfo(bean.getClass());
 		if (bi.isDynamic()) {
 			DynamicPropertyHandler handler = ValueUtils.getDynamicPropertyHandler(bi.getDynamicPropertyHandlerClass());
-			return new ModelNodePointer(parent, name, bean, handler);
+			return handler;
 		} else {
-			Object obj = getHeadElement(bean);
-			if (obj != null) {
-				return createNodePointer(parent, name, obj);
-			}
+			return null;
 		}
-		return null;
 	}
 
 	private Object getHeadElement(Object bean) {
 		if (bean instanceof Collection<?>) {
 			Collection<?> collection = (Collection<?>) bean;
 			if (collection.size() == 1) {
-				Object nextObj = collection.iterator().next();
-				return nextObj;
+				return collection.iterator().next();
 			}
 		}
 		return null;

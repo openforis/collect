@@ -6,12 +6,11 @@ import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jooq.InsertSetMoreStep;
+import org.jooq.InsertQuery;
 import org.jooq.Record;
-import org.jooq.Record1;
 import org.jooq.Result;
-import org.jooq.SelectConditionStep;
+import org.jooq.StoreQuery;
+import org.jooq.UpdateQuery;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.openforis.collect.metamodel.SurveyTarget;
@@ -20,7 +19,6 @@ import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
 import org.openforis.commons.versioning.Version;
-import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,76 +32,63 @@ public class SurveyDao extends SurveyBaseDao {
 //	private final Log LOG = LogFactory.getLog(SurveyDao.class);
 
 	@Transactional
-	public void importModel(Survey survey) throws SurveyImportException {
-		String name = survey.getName();
-		if (StringUtils.isBlank(name)) {
-			throw new SurveyImportException(
-					"Survey name must be set before importing");
-		}
-
-		String idml = marshalSurvey(survey);
-
-		// Insert into OFC_SURVEY table
+	public void insert(CollectSurvey survey) throws SurveyImportException {
 		CollectDSLContext dsl = dsl();
+		
+		//fetch next id
 		int surveyId = dsl.nextId(OFC_SURVEY.ID, OFC_SURVEY_ID_SEQ);
-		InsertSetMoreStep<OfcSurveyRecord> insert = dsl.insertInto(OFC_SURVEY).set(OFC_SURVEY.ID, surveyId);
-		insert
-				.set(OFC_SURVEY.NAME, survey.getName())
-				.set(OFC_SURVEY.URI, survey.getUri())
-				.set(OFC_SURVEY.IDML, DSL.val(idml, SQLDataType.CLOB))
-				;
-		if (survey instanceof CollectSurvey) {
-			CollectSurvey cs = (CollectSurvey) survey;
-			insert
-				.set(OFC_SURVEY.TARGET, cs.getTarget().getCode())
-				.set(OFC_SURVEY.COLLECT_VERSION, cs.getCollectVersion().toString())
-				.set(OFC_SURVEY.DATE_CREATED, toTimestamp(cs.getCreationDate()))
-				.set(OFC_SURVEY.DATE_MODIFIED, toTimestamp(cs.getModifiedDate()))
-				;
-		}
+		
+		InsertQuery<OfcSurveyRecord> insert = dsl.insertQuery(OFC_SURVEY);
+		addNewSurveyValues(insert, survey, surveyId);
 		insert.execute();
 
 		survey.setId(surveyId);
 	}
 
-	public Survey load(int id) {
+	public CollectSurvey loadById(int id) {
 		Record record = dsl()
 				.select()
 				.from(OFC_SURVEY)
-				.where(OFC_SURVEY.ID.equal(id)).fetchOne();
-		Survey survey = processSurveyRow(record);
-		return survey;
-	}
-
-	public CollectSurvey load(String name) {
-		Record record = dsl()
-				.select()
-				.from(OFC_SURVEY)
-				.where(OFC_SURVEY.NAME.equal(name))
+				.where(OFC_SURVEY.ID.equal(id))
 				.fetchOne();
 		CollectSurvey survey = processSurveyRow(record);
 		return survey;
 	}
-
+	
 	public CollectSurvey loadByUri(String uri) {
-		Record record = dsl().select().from(OFC_SURVEY)
-				.where(OFC_SURVEY.URI.equal(uri)).fetchOne();
+		return loadByUri(uri, false);
+	}
+
+	public CollectSurvey loadByUri(String uri, boolean temporary) {
+		Record record = dsl()
+				.select()
+				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.URI.equal(uri).and(OFC_SURVEY.TEMPORARY.equal(temporary)))
+				.fetchOne();
 		CollectSurvey survey = processSurveyRow(record);
 		return survey;
 	}
 	
 	public CollectSurvey loadByName(String name) {
-		Record record = dsl().select().from(OFC_SURVEY)
-				.where(OFC_SURVEY.NAME.equal(name)).fetchOne();
+		return loadByName(name, false);
+	}
+	
+	public CollectSurvey loadByName(String name, boolean temporary) {
+		Record record = dsl()
+				.select()
+				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.NAME.equal(name).and(OFC_SURVEY.TEMPORARY.equal(temporary)))
+				.fetchOne();
 		CollectSurvey survey = processSurveyRow(record);
 		return survey;
 	}
 	
 	@Transactional
-	public List<SurveySummary> loadSummaries() {
+	public List<SurveySummary> loadTemporarySummaries() {
 		List<SurveySummary> surveys = new ArrayList<SurveySummary>();
 		Result<Record> results = dsl().select()
 				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.TEMPORARY.equal(true))
 				.fetch();
 		for (Record row : results) {
 			SurveySummary survey = processSurveySummaryRow(row);
@@ -124,9 +109,26 @@ public class SurveyDao extends SurveyBaseDao {
 	}
 	
 	public SurveySummary loadSurveySummaryByName(String name) {
+		return loadSurveySummaryByName(name, false);
+	}
+
+	public SurveySummary loadSurveySummaryByName(String name, boolean temporary) {
 		Record record = dsl().select()
 				.from(OFC_SURVEY)
-				.where(OFC_SURVEY.NAME.equal(name))
+				.where(OFC_SURVEY.NAME.equal(name).and(OFC_SURVEY.TEMPORARY.equal(temporary)))
+				.fetchOne();
+		SurveySummary result = processSurveySummaryRow(record);
+		return result;
+	}
+	
+	public SurveySummary loadSurveySummaryByUri(String uri) {
+		return loadSurveySummaryByUri(uri, false);
+	}
+	
+	public SurveySummary loadSurveySummaryByUri(String uri, boolean temporary) {
+		Record record = dsl().select()
+				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.URI.equal(uri).and(OFC_SURVEY.TEMPORARY.equal(temporary)))
 				.fetchOne();
 		SurveySummary result = processSurveySummaryRow(record);
 		return result;
@@ -135,59 +137,63 @@ public class SurveyDao extends SurveyBaseDao {
 	@Transactional
 	public List<CollectSurvey> loadAll() {
 		List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();
-		Result<Record> results = dsl().select().from(OFC_SURVEY).fetch();
+		Result<Record> results = dsl()
+				.select()
+				.from(OFC_SURVEY)
+				.fetch();
 		for (Record row : results) {
 			CollectSurvey survey = processSurveyRow(row);
-			if (survey != null) {
-				//loadNodeDefinitions(survey);
-				surveys.add(survey);
-			}
+			surveys.add(survey);
 		}
 		return surveys;
 	}
 
+	@Transactional
+	public List<CollectSurvey> loadAllPublished() {
+		List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();
+		Result<Record> results = dsl()
+				.select()
+				.from(OFC_SURVEY)
+				.where(OFC_SURVEY.TEMPORARY.equal(false))
+				.fetch();
+		for (Record row : results) {
+			CollectSurvey survey = processSurveyRow(row);
+			surveys.add(survey);
+		}
+		return surveys;
+	}
+	
 	public void delete(int id) {
 		dsl().delete(OFC_SURVEY)
 			.where(OFC_SURVEY.ID.equal(id))
 			.execute();
 	}
 
-	public void updateModel(CollectSurvey survey) throws SurveyImportException {
-		//validate name
-		if (StringUtils.isBlank(survey.getName())) {
-			throw new SurveyImportException(
-					"Survey name must be set before importing");
-		}
-		// Get OFC_SURVEY record id by survey uri
-		CollectDSLContext dsl = dsl();
-		Integer oldSurveyId = getSurveyId(dsl, survey.getUri());
-		if ( oldSurveyId == null ) {
-			throw new SurveyImportException(String.format("Published survey with uri %s not found", survey.getUri()));
-		}
-		survey.setId(oldSurveyId);
-		
-		String idml = marshalSurvey(survey);
-
-		dsl.update(OFC_SURVEY)
-				.set(OFC_SURVEY.IDML, DSL.val(idml, SQLDataType.CLOB))
-				.set(OFC_SURVEY.TARGET, survey.getTarget().getCode())
-				.set(OFC_SURVEY.COLLECT_VERSION, survey.getCollectVersion().toString())
-				.set(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()))
-				.set(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()))
-				.where(OFC_SURVEY.ID.equal(survey.getId())).execute();
+	public void update(CollectSurvey survey) throws SurveyImportException {
+		UpdateQuery<OfcSurveyRecord> update = dsl().updateQuery(OFC_SURVEY);
+		addUpdateValues(update, survey);
+		update.addConditions(OFC_SURVEY.ID.equal(survey.getId()));
+		update.execute();
 	}
 
-	private Integer getSurveyId(CollectDSLContext dsl, String uri) {
-		SelectConditionStep<Record1<Integer>> query = dsl
-				.select(OFC_SURVEY.ID)
-				.from(OFC_SURVEY)
-				.where(OFC_SURVEY.URI.equal(uri));
-		query.execute();
-		Result<Record1<Integer>> result = query.getResult();
+	private void addUpdateValues(StoreQuery<OfcSurveyRecord> storeQuery,
+			CollectSurvey survey) throws SurveyImportException {
+		String idml = marshalSurvey(survey);
+		storeQuery.addValue(OFC_SURVEY.TEMPORARY, survey.isTemporary());
+		storeQuery.addValue(OFC_SURVEY.PUBLISHED_ID, survey.getPublishedId());
+		storeQuery.addValue(OFC_SURVEY.IDML, DSL.val(idml, SQLDataType.CLOB));
+		storeQuery.addValue(OFC_SURVEY.TARGET, survey.getTarget().getCode());
+		storeQuery.addValue(OFC_SURVEY.COLLECT_VERSION, survey.getCollectVersion().toString());
+		storeQuery.addValue(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()));
+		storeQuery.addValue(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()));
+	}
 
-		Record record = result.get(0);			
-		Integer surveyId = record.getValue(OFC_SURVEY.ID);
-		return surveyId;
+	private void addNewSurveyValues(StoreQuery<OfcSurveyRecord> storeQuery,
+			CollectSurvey survey, int surveyId) throws SurveyImportException {
+		storeQuery.addValue(OFC_SURVEY.ID, surveyId);
+		storeQuery.addValue(OFC_SURVEY.NAME, survey.getName());
+		storeQuery.addValue(OFC_SURVEY.URI, survey.getUri());
+		addUpdateValues(storeQuery, survey);
 	}
 	
 	@Override
@@ -198,12 +204,15 @@ public class SurveyDao extends SurveyBaseDao {
 			}
 			String idml = row.getValue(OFC_SURVEY.IDML);
 			CollectSurvey survey = unmarshalIdml(idml);
-			survey.setId(row.getValue(OFC_SURVEY.ID));
-			survey.setName(row.getValue(OFC_SURVEY.NAME));
-			survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
-			survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
-			survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
 			survey.setCollectVersion(new Version(row.getValue(OFC_SURVEY.COLLECT_VERSION)));
+			survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
+			survey.setId(row.getValue(OFC_SURVEY.ID));
+			survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
+			survey.setName(row.getValue(OFC_SURVEY.NAME));
+			survey.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
+			survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
+			survey.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
+			survey.setUri(row.getValue(OFC_SURVEY.URI));
 			return survey;
 		} catch (IdmlParseException e) {
 			throw new RuntimeException("Error deserializing IDML from database", e);
@@ -218,10 +227,12 @@ public class SurveyDao extends SurveyBaseDao {
 		Integer id = row.getValue(OFC_SURVEY.ID);
 		String name = row.getValue(OFC_SURVEY.NAME);
 		String uri = row.getValue(OFC_SURVEY.URI);
-		SurveySummary survey = new SurveySummary(id, name, uri);
-		survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
-		survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
-		survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
-		return survey;
+		SurveySummary summary = new SurveySummary(id, name, uri);
+		summary.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
+		summary.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
+		summary.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
+		summary.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
+		summary.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
+		return summary;
 	}
 }

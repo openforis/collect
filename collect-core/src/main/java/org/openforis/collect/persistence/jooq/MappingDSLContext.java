@@ -113,11 +113,11 @@ public abstract class MappingDSLContext<E> extends CollectDSLContext {
 		return insert;
 	}
 
-	protected int nextId() {
+	public int nextId() {
 		return nextId(idField, idSequence);
 	}
 	
-	protected void restartSequence(Number value) {
+	public void restartSequence(Number value) {
 		restartSequence(idSequence, value);
 	}
 	

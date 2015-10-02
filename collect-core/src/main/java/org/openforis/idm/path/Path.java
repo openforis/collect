@@ -21,6 +21,8 @@ import org.openforis.idm.model.Record;
  */
 public final class Path implements Axis, Iterable<PathElement> {
 
+	public static final char SEPARATOR = '/';
+	public static final String SEPARATOR_REGEX = "\\/";
 	public static final String THIS_FUNCTION = "this()";
 	public static final String THIS_SYMBOL = ".";
 	public static final String THIS_VARIABLE = "$this";
@@ -162,45 +164,74 @@ public final class Path implements Axis, Iterable<PathElement> {
 	}
 	
 	public static String getRelativePath(String source, String destination) {
-		StringBuilder pathBuilder = new StringBuilder();
-		String[] sources = source.split("\\/");
-		String[] dests = destination.split("\\/");
-		int i = 0;
-		for (; i < sources.length; i++) {
-			if(dests.length == i){
-				break;
-			}
-			String src = sources[i];
-			String dest = dests[i];
-			if (dest.equals(src)) {
-				continue;
+		char[] sourceChars = source.toCharArray();
+		char[] destChars = destination.toCharArray();
+
+		int commonPathElementsCount = 0;
+		int commonPartIndex = -1;
+		int nextCharIndex = 0;
+		while (nextCharIndex < sourceChars.length && nextCharIndex < destChars.length) {
+			if (sourceChars[nextCharIndex] == destChars[nextCharIndex]) {
+				if (sourceChars[nextCharIndex] == SEPARATOR) {
+					commonPathElementsCount ++;
+				}
+				commonPartIndex ++;
+				nextCharIndex ++;
 			} else {
 				break;
 			}
 		}
+		int sourcePathElementsCount = countOccurrences(sourceChars, SEPARATOR);
+		
+		StringBuilder pathBuilder = new StringBuilder();
+		
+		append(pathBuilder, PARENT_FUNCTION, SEPARATOR, sourcePathElementsCount - commonPathElementsCount);
 
-		for (int k = i; k < sources.length; k++) {
-			if (pathBuilder.length() > 0 ) {
-				pathBuilder.append("/");
-			}
-			pathBuilder.append(PARENT_FUNCTION);
+		int destLastPartIdx = commonPartIndex + 2;
+		if (destChars.length > destLastPartIdx) {
+			pathBuilder.append(Arrays.copyOfRange(destChars, destLastPartIdx, destChars.length));
 		}
 
-		for (int k = i; k < dests.length; k++) {
-			if (pathBuilder.length() > 0 ) {
-				pathBuilder.append("/");
-			}
-			pathBuilder.append(dests[k]);
-		}
 		if ( pathBuilder.length() == 0 ) {
 			return THIS_FUNCTION;
 		} else {
 			return pathBuilder.toString();
 		}
 	}
+
+	private static void append(StringBuilder pathBuilder, String value,
+			char separator, int count) {
+		for (int i = 0; i < count; i++) {
+			pathBuilder.append(value);
+			if (i < count - 1) {
+				pathBuilder.append(separator);
+			}
+		}
+	}
+
+	private static int countOccurrences(char[] sourceChars, char value) {
+		int count = 0;
+		for (int i = 0; i < sourceChars.length; i++) {
+			if (sourceChars[i] == value) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+//	private static void appendToPath(StringBuilder pathBuilder, String value, int count) {
+//		if (count > 0) {
+//			for (int i = 0; i < count; i++) {
+//				if (pathBuilder.length() > 0) {
+//					pathBuilder.append(SEPARATOR_CHAR);
+//				}
+//				pathBuilder.append(value);
+//			}
+//		}
+//	}
 	
 	public static String removeThisVariableToken(String path) {
-		return path.replaceAll(Pattern.quote(Path.THIS_VARIABLE) + "/", "");
+		return path.replaceAll(Pattern.quote(THIS_VARIABLE) + SEPARATOR, "");
 	}
 	
 	public static String getNormalizedPath(String path) {

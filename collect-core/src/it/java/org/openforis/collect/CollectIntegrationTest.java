@@ -43,6 +43,7 @@ public abstract class CollectIntegrationTest {
 		return survey;
 	}
 
+	@SuppressWarnings("deprecation")
 	protected CollectSurvey importModel() throws SurveyImportException, IdmlParseException {
 		CollectSurvey survey = (CollectSurvey) loadSurvey();
 		surveyManager.importModel(survey);
@@ -54,9 +55,12 @@ public abstract class CollectIntegrationTest {
 		return createSurvey;
 	}
 	
-	protected File getSystemResourceFile(String fileName) throws URISyntaxException {
-		URL fileUrl = ClassLoader.getSystemResource(fileName);
-		File file = new File(fileUrl.toURI());
-		return file;
+	protected File getSystemResourceFile(String fileName) {
+		try {
+			URL fileUrl = ClassLoader.getSystemResource(fileName);
+			return new File(fileUrl.toURI());
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

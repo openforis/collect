@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-web</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.7.9-SNAPSHOT</version>
+		<version>3.8.7-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	
@@ -47,11 +47,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.3</version>
-			</plugin>
-			<plugin>
 				<groupId>org.sonatype.flexmojos</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
 				<executions>
@@ -63,6 +58,49 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<id>prepare-war</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exploded</goal>
+						</goals>
+					</execution>
+					<execution>
+			            <id>default-war</id>
+			            <phase>package</phase>
+			            <goals>
+			                <goal>war</goal>
+			            </goals>
+			            <configuration>
+			                <warSourceDirectory>${project.build.directory}/${project.build.finalName}</warSourceDirectory>
+			            </configuration>
+			        </execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>1.5.3</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<file>${project.build.directory}/${project.build.finalName}/datacleansing/main.html</file>
+					<regex>false</regex>
+					<token>PROJECT_VERSION</token>
+					<value>${project.version}</value>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

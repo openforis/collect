@@ -237,7 +237,7 @@ public class RecordManager {
 	}
 
 	private void checkSurveyRecordValidationNotInProgress(CollectSurvey survey) throws RecordValidationInProgressException {
-		if ( survey.isPublished() && ! survey.isWork() && surveyManager.isRecordValidationInProgress(survey.getId()) ) {
+		if ( survey.isPublished() && ! survey.isTemporary() && surveyManager.isRecordValidationInProgress(survey.getId()) ) {
 			throw new RecordValidationInProgressException();
 		}
 	}

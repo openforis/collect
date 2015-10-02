@@ -3,6 +3,7 @@ package org.openforis.collect.manager;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -102,7 +103,7 @@ public class SurveyObjectsGenerator {
 			Set<String> labelLanguages) {
 		Unit unit = survey.createUnit();
 		unit.setName(name);
-		unit.setDimension(dimension.name());
+		unit.setDimension(dimension.name().toLowerCase(Locale.ENGLISH));
 		unit.setConversionFactor(conversionFactor);
 		for (String label : labels) {
 			for (String lang : labelLanguages) {

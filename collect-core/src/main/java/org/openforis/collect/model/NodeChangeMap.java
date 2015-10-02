@@ -201,14 +201,14 @@ public class NodeChangeMap implements NodeChangeSet {
 		}
 	}
 
-	public void addMinCountChanges(Set<NodePointer> pointers) {
+	public void addMinCountChanges(Collection<NodePointer> pointers) {
 		for (NodePointer nodePointer : pointers) {
 			EntityChange change = prepareEntityChange(nodePointer.getEntity());
 			change.setMinCount(nodePointer.getChildDefinitionId(), nodePointer.getNodesMinCount());
 		}
 	}
 
-	public void addMaxCountChanges(Set<NodePointer> pointers) {
+	public void addMaxCountChanges(Collection<NodePointer> pointers) {
 		for (NodePointer nodePointer : pointers) {
 			EntityChange change = prepareEntityChange(nodePointer.getEntity());
 			change.setMaxCount(nodePointer.getChildDefinitionId(), nodePointer.getNodesMaxCount());

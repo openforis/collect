@@ -89,7 +89,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 	@Before
 	public void init() throws IdmlParseException, IOException, SurveyImportException {
 		survey = loadSurvey();
-		survey.setWork(false);
+		survey.setTemporary(false);
 		surveyManager.importModel(survey);
 		meterUnit = survey.getUnit("m");
 		centimeterUnit = survey.getUnit("cm");
@@ -168,11 +168,11 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			
 			assertEquals(2, cluster.getCount("map_sheet"));
 			{
-				TextAttribute mapSheet = (TextAttribute) cluster.get("map_sheet", 0);
+				TextAttribute mapSheet = (TextAttribute) cluster.getChild("map_sheet", 0);
 				assertEquals("new map sheet 1", mapSheet.getValue().getValue());
 			}
 			{
-				TextAttribute mapSheet = (TextAttribute) cluster.get("map_sheet", 1);
+				TextAttribute mapSheet = (TextAttribute) cluster.getChild("map_sheet", 1);
 				assertEquals("new map sheet 2", mapSheet.getValue().getValue());
 			}
 		}
@@ -213,7 +213,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 			CollectRecord reloadedRecord = loadRecord("10_111");
 			Entity cluster = reloadedRecord.getRootEntity();
 			{
-				Entity timeStudy = (Entity) cluster.get("time_study", 0);
+				Entity timeStudy = (Entity) cluster.getChild("time_study", 0);
 				DateAttribute date = (DateAttribute) timeStudy.getChild("date");
 				Date dateVal = date.getValue();
 				assertEquals(Integer.valueOf(2013), dateVal.getYear());
@@ -221,7 +221,7 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 				assertEquals(Integer.valueOf(24), dateVal.getDay());
 			}
 			{
-				Entity timeStudy = (Entity) cluster.get("time_study", 1);
+				Entity timeStudy = (Entity) cluster.getChild("time_study", 1);
 				DateAttribute date = (DateAttribute) timeStudy.getChild("date");
 				Date dateVal = date.getValue();
 				assertEquals(Integer.valueOf(2013), dateVal.getYear());
@@ -416,9 +416,9 @@ public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest 
 		{
 			CollectRecord reloadedRecord = loadRecord("10_111");
 			Entity cluster = reloadedRecord.getRootEntity();
-			Entity plot = (Entity) cluster.get("plot", 0);
+			Entity plot = (Entity) cluster.getChild("plot", 0);
 			assertEquals(3, plot.getCount("tree"));
-			Entity tree = (Entity) plot.get("tree", 2);
+			Entity tree = (Entity) plot.getChild("tree", 2);
 			IntegerAttribute treeNo = (IntegerAttribute) tree.getChild("tree_no");
 			assertEquals(Integer.valueOf(2), treeNo.getValue().getValue());
 			IntegerAttribute stemNo = (IntegerAttribute) tree.getChild("stem_no");

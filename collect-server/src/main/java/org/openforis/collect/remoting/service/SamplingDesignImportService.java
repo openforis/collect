@@ -31,10 +31,10 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 	private RecordSessionManager sessionManager;
 	
 	@Secured("ROLE_ADMIN")
-	public SamplingDesignImportStatusProxy start(String tempFileName, int surveyId, boolean work, boolean overwriteAll) throws DataImportExeption, SurveyImportException {
+	public SamplingDesignImportStatusProxy start(String tempFileName, int surveyId, boolean temporary, boolean overwriteAll) throws DataImportExeption, SurveyImportException {
 		if ( importProcess == null || ! importProcess.getStatus().isRunning() ) {
 			File importFile = new File(tempFileName);
-			CollectSurvey survey = work ? surveyManager.loadSurveyWork(surveyId): surveyManager.getById(surveyId);
+			CollectSurvey survey = temporary ? surveyManager.loadSurvey(surveyId): surveyManager.getById(surveyId);
 			importProcess = new SamplingDesignImportProcess(samplingDesignManager, surveyManager, 
 					survey, importFile, overwriteAll);
 			importProcess.init();
@@ -61,7 +61,7 @@ public class SamplingDesignImportService extends ReferenceDataImportService<Samp
 
 	private void updateSessionSurvey() {
 		CollectSurvey processSurvey = importProcess.getSurvey();
-		if ( processSurvey.isWork() ) {
+		if ( processSurvey.isTemporary() ) {
 			ReferenceDataSchema processReferenceDataSchema = processSurvey.getReferenceDataSchema();
 			SamplingPointDefinition processSamplingPoint = processReferenceDataSchema == null ? null: processReferenceDataSchema.getSamplingPointDefinition();
 

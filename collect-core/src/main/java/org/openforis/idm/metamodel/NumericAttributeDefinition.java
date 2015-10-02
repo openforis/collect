@@ -132,6 +132,14 @@ public abstract class NumericAttributeDefinition extends AttributeDefinition {
 		return unit;
 	}
 	
+	public Unit getActualUnit(Integer unitId) {
+		Unit unit = unitId == null ? null: getSurvey().getUnit(unitId.intValue());
+		if (unit == null) {
+			unit = getDefaultUnit();
+		}
+		return unit;
+	}
+	
 	public List<Unit> getUnits() {
 		List<Unit> units = new ArrayList<Unit>();
 		if ( precisionDefinitions != null ) {

@@ -17,16 +17,6 @@ package org.openforis.collect.persistence.jooq;
 public class Tables {
 
 	/**
-	 * The table collect.databasechangelog
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.Databasechangelog DATABASECHANGELOG = org.openforis.collect.persistence.jooq.tables.Databasechangelog.DATABASECHANGELOG;
-
-	/**
-	 * The table collect.databasechangeloglock
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.Databasechangeloglock DATABASECHANGELOGLOCK = org.openforis.collect.persistence.jooq.tables.Databasechangeloglock.DATABASECHANGELOGLOCK;
-
-	/**
 	 * The table collect.ofc_application_info
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo OFC_APPLICATION_INFO = org.openforis.collect.persistence.jooq.tables.OfcApplicationInfo.OFC_APPLICATION_INFO;
@@ -40,6 +30,61 @@ public class Tables {
 	 * The table collect.ofc_config
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcConfig OFC_CONFIG = org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG;
+
+	/**
+	 * The table collect.ofc_data_cleansing_chain
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChain OFC_DATA_CLEANSING_CHAIN = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChain.OFC_DATA_CLEANSING_CHAIN;
+
+	/**
+	 * The table collect.ofc_data_cleansing_chain_steps
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChainSteps OFC_DATA_CLEANSING_CHAIN_STEPS = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChainSteps.OFC_DATA_CLEANSING_CHAIN_STEPS;
+
+	/**
+	 * The table collect.ofc_data_cleansing_step
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep OFC_DATA_CLEANSING_STEP = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep.OFC_DATA_CLEANSING_STEP;
+
+	/**
+	 * The table collect.ofc_data_cleansing_step_value
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStepValue OFC_DATA_CLEANSING_STEP_VALUE = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStepValue.OFC_DATA_CLEANSING_STEP_VALUE;
+
+	/**
+	 * The table collect.ofc_data_error_query
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery OFC_DATA_ERROR_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;
+
+	/**
+	 * The table collect.ofc_data_error_query_group
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup OFC_DATA_ERROR_QUERY_GROUP = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup.OFC_DATA_ERROR_QUERY_GROUP;
+
+	/**
+	 * The table collect.ofc_data_error_query_group_query
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery OFC_DATA_ERROR_QUERY_GROUP_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery.OFC_DATA_ERROR_QUERY_GROUP_QUERY;
+
+	/**
+	 * The table collect.ofc_data_error_report
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport OFC_DATA_ERROR_REPORT = org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport.OFC_DATA_ERROR_REPORT;
+
+	/**
+	 * The table collect.ofc_data_error_report_item
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem OFC_DATA_ERROR_REPORT_ITEM = org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM;
+
+	/**
+	 * The table collect.ofc_data_error_type
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorType OFC_DATA_ERROR_TYPE = org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC_DATA_ERROR_TYPE;
+
+	/**
+	 * The table collect.ofc_data_query
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataQuery OFC_DATA_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DATA_QUERY;
 
 	/**
 	 * The table collect.ofc_logo
@@ -60,11 +105,6 @@ public class Tables {
 	 * The table collect.ofc_survey
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcSurvey OFC_SURVEY = org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
-
-	/**
-	 * The table collect.ofc_survey_work
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.OfcSurveyWork OFC_SURVEY_WORK = org.openforis.collect.persistence.jooq.tables.OfcSurveyWork.OFC_SURVEY_WORK;
 
 	/**
 	 * The table collect.ofc_taxon

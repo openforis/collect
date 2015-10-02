@@ -9,7 +9,6 @@ import java.util.List;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.StoreQuery;
-import org.jooq.TableField;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.persistence.jooq.MappingDSLContext;
 import org.openforis.collect.persistence.jooq.MappingJooqDaoSupport;
@@ -37,10 +36,9 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 	}
 	
 	protected CollectTaxonomy loadBySurvey(int surveyId, String name, boolean work) {
-		TableField<OfcTaxonomyRecord, Integer> surveyIdField = work ? OFC_TAXONOMY.SURVEY_WORK_ID: OFC_TAXONOMY.SURVEY_ID;
 		TaxonomyDSLContext dsl = dsl();
 		Record r = dsl.selectFrom(OFC_TAXONOMY)
-				.where(surveyIdField.equal(surveyId))
+				.where(OFC_TAXONOMY.SURVEY_ID.equal(surveyId))
 				.and(OFC_TAXONOMY.NAME.equal(name))
 				.fetchOne();
 		if ( r == null ) {
@@ -51,18 +49,9 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 	}
 	
 	public List<CollectTaxonomy> loadAllBySurvey(int surveyId) {
-		return loadBySurvey(surveyId, false);
-	}
-	
-	public List<CollectTaxonomy> loadAllBySurveyWork(int surveyId) {
-		return loadBySurvey(surveyId, true);
-	}
-	
-	protected List<CollectTaxonomy> loadBySurvey(int surveyId, boolean work) {
 		TaxonomyDSLContext dsl = dsl();
-		TableField<OfcTaxonomyRecord, Integer> surveyIdField = work ? OFC_TAXONOMY.SURVEY_WORK_ID: OFC_TAXONOMY.SURVEY_ID;
 		Result<OfcTaxonomyRecord> r = dsl.selectFrom(OFC_TAXONOMY)
-				.where(surveyIdField.equal(surveyId))
+				.where(OFC_TAXONOMY.SURVEY_ID.equal(surveyId))
 				.orderBy(OFC_TAXONOMY.NAME)
 				.fetch();
 		if ( r == null ) {
@@ -104,7 +93,6 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 		public void fromRecord(Record r, CollectTaxonomy t) {
 			t.setId(r.getValue(OFC_TAXONOMY.ID));
 			t.setSurveyId(r.getValue(OFC_TAXONOMY.SURVEY_ID));
-			t.setSurveyWorkId(r.getValue(OFC_TAXONOMY.SURVEY_WORK_ID));
 			t.setName(r.getValue(OFC_TAXONOMY.NAME));
 		}
 		
@@ -112,7 +100,6 @@ public class TaxonomyDao extends MappingJooqDaoSupport<CollectTaxonomy, Taxonomy
 		public void fromObject(CollectTaxonomy t, StoreQuery<?> q) {
 			q.addValue(OFC_TAXONOMY.ID, t.getId());
 			q.addValue(OFC_TAXONOMY.SURVEY_ID, t.getSurveyId());
-			q.addValue(OFC_TAXONOMY.SURVEY_WORK_ID, t.getSurveyWorkId());
 			q.addValue(OFC_TAXONOMY.NAME, t.getName());
 			q.addValue(OFC_TAXONOMY.METADATA, " ");
 		}

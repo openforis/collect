@@ -1,0 +1,2 @@
+OF.UI = function() {};
+

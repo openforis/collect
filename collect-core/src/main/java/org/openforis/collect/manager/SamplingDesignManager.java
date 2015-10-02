@@ -37,26 +37,22 @@ public class SamplingDesignManager {
 
 	@Transactional
 	public SamplingDesignSummaries loadBySurvey(int surveyId, int offset, int maxRecords) {
-		return load(false, surveyId, offset, maxRecords);
+		int totalCount = samplingDesignDao.countBySurvey(surveyId);
+		List<SamplingDesignItem> records;
+		if ( totalCount > 0 ) {
+			records = samplingDesignDao.loadItems(surveyId, offset, maxRecords); 
+		} else {
+			records = Collections.emptyList();
+		}
+		SamplingDesignSummaries result = new SamplingDesignSummaries(totalCount, records);
+		return result;
 	}
 	
-	@Transactional
-	public SamplingDesignSummaries loadBySurveyWork(int surveyWorkId) {
-		return loadBySurveyWork(surveyWorkId, 0, Integer.MAX_VALUE);
-	}
-	
-	@Transactional
-	public SamplingDesignSummaries loadBySurveyWork(int surveyWorkId, int offset, int maxRecords) {
-		return load(true, surveyWorkId, offset, maxRecords);
-	}
-
 	@Transactional
 	public boolean hasSamplingDesign(CollectSurvey survey) {
 		Integer id = survey.getId();
 		if ( id == null ) {
 			return false;
-		} else if ( survey.isWork() ) {
-			return countBySurveyWork(id) > 0;
 		} else {
 			return countBySurvey(id) > 0;
 		}
@@ -64,30 +60,7 @@ public class SamplingDesignManager {
 	
 	@Transactional
 	public int countBySurvey(int surveyId) {
-		return count(surveyId, false);
-	}
-	
-	@Transactional
-	public int countBySurveyWork(int surveyWorkId) {
-		return count(surveyWorkId, true);
-	}
-	
-	private int count(int surveyId, boolean work) {
-		return samplingDesignDao.count(work, surveyId);
-	}
-
-	@Transactional
-	protected SamplingDesignSummaries load(boolean work, int surveyId, int offset, int maxRecords) {
-		int totalCount = work ? samplingDesignDao.countPerSurveyWork(surveyId): samplingDesignDao.countPerSurvey(surveyId);
-		List<SamplingDesignItem> records;
-		if ( totalCount > 0 ) {
-			records = work ? samplingDesignDao.loadItemsBySurveyWork(surveyId, offset, maxRecords): 
-				samplingDesignDao.loadItemsBySurvey(surveyId, offset, maxRecords);;
-		} else {
-			records = Collections.emptyList();
-		}
-		SamplingDesignSummaries result = new SamplingDesignSummaries(totalCount, records);
-		return result;
+		return samplingDesignDao.countBySurvey(surveyId);
 	}
 
 	@Transactional
@@ -111,35 +84,20 @@ public class SamplingDesignManager {
 	}
 	
 	@Transactional
-	public void deleteBySurveyWork(int surveyId) {
-		samplingDesignDao.deleteBySurveyWork(surveyId);
+	public void moveSamplingDesign(int fromSurveyId, int toSurveyId) {
+		samplingDesignDao.deleteBySurvey(toSurveyId);
+		samplingDesignDao.moveItems(fromSurveyId, toSurveyId);
 	}
 	
 	@Transactional
-	public void publishSamplingDesign(int surveyWorkId, int publishedSurveyId) {
-		samplingDesignDao.deleteBySurvey(publishedSurveyId);
-		samplingDesignDao.moveItemsToPublishedSurvey(surveyWorkId, publishedSurveyId);
-	}
-	
-	@Transactional
-	public void duplicateSamplingDesignForWork(int publishedSurveyId, int surveyWorkId) {
-		samplingDesignDao.duplicateItems(publishedSurveyId, false, surveyWorkId, true);
-	}
-
-	@Transactional
-	public void duplicateWorkSamplingDesignForWork(int oldSurveyWorkId, int newSurveyWorkId) {
-		samplingDesignDao.duplicateItems(oldSurveyWorkId, true, newSurveyWorkId, true);
+	public void copySamplingDesign(int fromSurveyId, int toSurveyId) {
+		samplingDesignDao.copyItems(fromSurveyId, toSurveyId);
 	}
 
 	@Transactional
 	public void insert(CollectSurvey survey, List<SamplingDesignItem> items, boolean overwriteAll) {
 		if ( overwriteAll ) {
-			Integer surveyId = survey.getId();
-			if ( survey.isWork() ) {
-				deleteBySurveyWork(surveyId);
-			} else {
-				deleteBySurvey(surveyId);
-			}
+			deleteBySurvey(survey.getId());
 		}
 		samplingDesignDao.insert(items);
 	}

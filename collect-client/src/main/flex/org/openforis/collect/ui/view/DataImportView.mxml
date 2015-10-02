@@ -32,6 +32,8 @@
 			
 			private var _allConflictingRecordsSelected:Boolean;
 			private var _dataImportErrors:IList = null;
+			private var _selectedConflictingRecordsCount:int;
+			private var _selectedRecordsToImportCount:int;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 				_presenter = new DataImportPresenter(this);
@@ -56,6 +58,23 @@
 				_dataImportErrors = value;
 			}
 			
+			[Bindable]
+			public function get selectedConflictingRecordsCount():int {
+				return _selectedConflictingRecordsCount;
+			}
+			
+			 public function set selectedConflictingRecordsCount(value:int):void {
+				_selectedConflictingRecordsCount = value;
+			}
+			
+			[Bindable]
+			public function get selectedRecordsToImportCount():int {
+				return _selectedRecordsToImportCount;
+			}
+			
+			 public function set selectedRecordsToImportCount(value:int):void {
+				_selectedRecordsToImportCount = value;
+			}
 		]]>
 		
 	</fx:Script>
@@ -100,8 +119,11 @@
 		<s:Form id="form">
 			<s:FormItem label="{Message.get('dataImport.surveyNameLabel')}" 
 						label.summaryCreationCompleteNewSurvey="{Message.get('dataImport.newSurveyNameLabel')}">
-				<s:TextInput id="surveyNameTextInput" editable="false" 
+				<s:TextInput id="surveyNameTextInput" editable="false" width="300"
 							 editable.summaryCreationCompleteNewSurvey="true" />
+			</s:FormItem>
+			<s:FormItem label="{Message.get('dataImport.validateRecords')}">
+				<s:CheckBox id="validateRecordsCheckBox" selected="true" />
 			</s:FormItem>
 		</s:Form>
 		
@@ -111,7 +133,7 @@
 				  horizontalAlign="center"
 				  height="100%"
 				  >
-			<s:Label text="{Message.get('dataImport.recordsInConflict')}"
+			<s:Label text="{Message.get('dataImport.recordsInConflict')} ({selectedConflictingRecordsCount} selected /{conflictDataGrid.dataProvider.length})"
 					 styleName="formLabel" />
 			
 			<mx:AdvancedDataGrid id="conflictDataGrid"
@@ -254,7 +276,7 @@
 				  includeInLayout="{recordToImportDataGrid.dataProvider.length > 0}"
 				  horizontalAlign="center"
 				  height="100%">
-			<s:Label text="{Message.get('dataImport.recordsToBeImported')}"
+			<s:Label text="{Message.get('dataImport.recordsToBeImported')} ({selectedRecordsToImportCount} selected/{recordToImportDataGrid.dataProvider.length})"
 					 styleName="formLabel" />
 	
 			<mx:AdvancedDataGrid id="recordToImportDataGrid"
@@ -328,9 +350,17 @@
 						<mx:itemRenderer>
 							<fx:Component>
 								<mx:Canvas width="100%" height="100%">
+									<fx:Script>
+										<![CDATA[
+											import org.openforis.collect.event.DataImportEvent;
+											import org.openforis.collect.event.EventDispatcherFactory;
+										]]>
+									</fx:Script>
 									<mx:CheckBox horizontalCenter="0" verticalCenter="0" 
 												 selected="{data.selected}" 
-												 change="{data.selected = event.target.selected}" />
+												 change="{data.selected = event.target.selected;
+												 	EventDispatcherFactory.getEventDispatcher().dispatchEvent(
+												 		new DataImportEvent(DataImportEvent.RECORDS_TO_IMPORT_SELECTION_CHANGE));}" />
 								</mx:Canvas>
 							</fx:Component>
 						</mx:itemRenderer>

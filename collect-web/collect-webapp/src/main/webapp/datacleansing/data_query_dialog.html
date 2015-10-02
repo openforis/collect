@@ -1,0 +1,93 @@
+<div class="modal fade">
+	<div class="modal-dialog data-query-dialog" style="width: 1020px">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
+				</button>
+				<h4 class="modal-title">Data Query</h4>
+			</div>
+			<div class="modal-body">
+				<div role="tabpanel" class="tab-external-panel container-fluid">
+					<ul class="nav nav-tabs" role="tablist">
+						<li role="presentation" class="active">
+							<a href="#query-details-container" aria-controls="query-details-container" role="tab" data-toggle="tab">Query definition</a>
+						</li>
+						<li id="query-test-and-run-tab" role="presentation">
+							<a href="#query-test-and-run-container" aria-controls="query-test-and-run-container" role="tab" data-toggle="tab">Test and run</a>
+						</li>
+					</ul>
+				</div>
+				<!-- Tab panes -->
+				<div class="tab-content container-fluid">
+					<div id="query-details-container" role="tabpanel" class="tab-pane active" >
+						<form role="form">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+								   		<label class="control-label">Title</label>
+										<input type="text" class="form-control" name="title" />
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+								   		<label class="control-label">Entity</label>
+										<div class="entity-tree" style="height: 150px; overflow: auto;"></div>
+									</div>
+									<div class="form-group">
+								   		<label class="control-label">Attribute</label>
+										<div class="attribute-tree" style="height: 250px; overflow: auto;"></div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+								   		<label class="control-label">Conditions</label>
+										<textarea class="form-control" name="conditions" rows="8" spellcheck="false"></textarea>
+									</div>
+									<div class="form-group">
+								   		<label class="control-label">Description</label>
+										<textarea class="form-control" name="description" rows="5"></textarea>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div id="query-test-and-run-container" role="tabpanel" class="tab-pane" >
+						<div class="row">
+							<div class="col-md-2">
+								<label class="control-label">Record step</label>
+							</div>
+							<div class="col-md-3">
+								<select class="form-control selectpicker" name="recordStep"></select>
+							</div>
+							<div class="col-md-2"></div>
+							<div class="col-md-1">
+								<button type="button" class="btn btn-success test-btn">Test</button>
+							</div>
+							<div class="col-md-2">
+								<button type="button" class="btn btn-info export-to-csv-btn">
+									<i class="fa fa-file-text-o" aria-hidden="true"></i>Run and Export to CSV
+								</button>
+							</div>
+						</div>
+						<div class="row">
+							<table class="test-result-grid"></table>
+						</div>					
+					</div>
+				</div>
+						
+			</div>
+			
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default cancel-btn">Cancel</button>
+
+				<button type="button" class="btn btn-primary apply-btn">Apply</button>
+				
+				<button type="button" class="btn btn-primary save-and-close-btn">Save and Close</button>
+			</div>
+			
+		</div>
+	</div>
+</div>

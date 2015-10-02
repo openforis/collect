@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -147,7 +148,7 @@ public abstract class AbstractExpression {
 					return childDefinition;
 				} catch (Exception e) {
 					String message = String.format("Node '%s' not found", childName);
-					Set<String> childNames = ((EntityDefinition) contextNode).getChildDefinitionNames();
+					String[] childNames = ((EntityDefinition) contextNode).getChildDefinitionNames();
 					String childNamesFormatted = "\t" + joinSplittingInGroups(childNames, 5, ',', "\n\t");
 					String detailedMessage = String.format("Node '%s' not found\n - current parent entity: '%s'\n - possible valid values in %s:\n %s", 
 							childName, contextNode.getPath(), contextNode.getPath(), childNamesFormatted);
@@ -184,19 +185,19 @@ public abstract class AbstractExpression {
 		FieldDefinition<?> fieldDef = attrDef.getFieldDefinition(fieldName);
 		if (fieldDef == null) {
 			//try to replace uppercase letters with an underscore
-			String newFieldName = fieldName.replaceAll("(.)([A-Z])", "$1_$2").toLowerCase();
+			String newFieldName = fieldName.replaceAll("(.)([A-Z])", "$1_$2").toLowerCase(Locale.ENGLISH);
 			fieldDef = attrDef.getFieldDefinition(newFieldName);
 		}
 		return fieldDef;
 	}
 	
-	private String joinSplittingInGroups(Set<String> items, int groupSize, char itemSeparator, String groupSeparator) {
+	private String joinSplittingInGroups(String[] items, int groupSize, char itemSeparator, String groupSeparator) {
 		StringBuilder childNamesFormattedSB = new StringBuilder();
 		int count = 0;
 		for (String name : items) {
 			childNamesFormattedSB.append(name);
 			count ++;
-			if (count < items.size()) {
+			if (count < items.length) {
 				childNamesFormattedSB.append(itemSeparator);
 				if (count % groupSize == 0) {
 					childNamesFormattedSB.append(groupSeparator);

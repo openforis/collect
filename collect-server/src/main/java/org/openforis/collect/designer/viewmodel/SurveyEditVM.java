@@ -274,7 +274,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	@GlobalCommand
 	public void backgroundSurveySave() throws SurveyStoreException {
 		//survey.refreshSurveyDependencies();
-		surveyManager.saveSurveyWork(survey);
+		surveyManager.save(survey);
 		BindUtils.postNotifyChange(null, null, survey, "id");
 		BindUtils.postNotifyChange(null, null, survey, "published");
 		changed = false;

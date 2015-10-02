@@ -15,6 +15,10 @@
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20150407.1800.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20150413.1000.xml" />
   <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20150727.xml" />
-  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20150728.xml" />
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20150820.xml" />
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20150821.xml" />
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20150928.xml" />
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20150930.xml" />
+  <include file="org/openforis/collect/db/changelog/sqlite/db.changelog-20151010.xml" />
   
 </databaseChangeLog>

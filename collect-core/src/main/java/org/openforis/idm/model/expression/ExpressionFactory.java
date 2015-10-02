@@ -21,7 +21,6 @@ import org.apache.commons.jxpath.JXPathContextFactory;
 import org.apache.commons.jxpath.JXPathIntrospector;
 import org.apache.commons.jxpath.JXPathInvalidSyntaxException;
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
-import org.apache.commons.jxpath.ri.model.NodePointerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.metamodel.validation.LookupProvider;
 import org.openforis.idm.model.Node;
@@ -36,6 +35,7 @@ import org.openforis.idm.model.expression.internal.NodePropertyHandler;
 import org.openforis.idm.model.expression.internal.RecordPropertyHandler;
 import org.openforis.idm.model.expression.internal.ReferencedPathEvaluator;
 import org.openforis.idm.model.expression.internal.RegExFunctions;
+import org.openforis.idm.model.expression.internal.UtilFunctions;
 import org.openforis.idm.path.Path;
 
 /**
@@ -46,6 +46,7 @@ public class ExpressionFactory {
 	public static final String IDM_PREFIX = "idm";
 	public static final String MATH_PREFIX = "math";
 	public static final String REGEX_PREFIX = "regex";
+	public static final String UTIL_PREFIX = "util";
 
 	private static final Set<String> CORE_FUNCTION_NAMES = new HashSet<String>(asList(
 			"boolean", "not", "true", "false", // boolean values functions
@@ -65,8 +66,7 @@ public class ExpressionFactory {
 	public ExpressionFactory() {
 		System.setProperty(JXPathContextFactory.FACTORY_NAME_PROPERTY, "org.openforis.idm.model.expression.internal.ModelJXPathContextFactory");
 
-		NodePointerFactory nodePointerFactory = new ModelNodePointerFactory();
-		JXPathContextReferenceImpl.addNodePointerFactory(nodePointerFactory);
+		JXPathContextReferenceImpl.addNodePointerFactory(new ModelNodePointerFactory());
 
 		JXPathIntrospector.registerDynamicClass(Node.class, NodePropertyHandler.class);
 		JXPathIntrospector.registerDynamicClass(Record.class, RecordPropertyHandler.class);
@@ -74,7 +74,8 @@ public class ExpressionFactory {
 		registerFunctions(
 				new MathFunctions(MATH_PREFIX),
 				new IDMFunctions(IDM_PREFIX),
-				new RegExFunctions(REGEX_PREFIX)
+				new RegExFunctions(REGEX_PREFIX),
+				new UtilFunctions(UTIL_PREFIX)
 		);
 
 		referencedPathEvaluator = new ReferencedPathEvaluator(customFunctionsByNamespace);
@@ -103,10 +104,10 @@ public class ExpressionFactory {
 	}
 	
 	public AbsoluteModelPathExpression createAbsoluteModelPathExpression(String expression) throws InvalidExpressionException {
-		if (!expression.startsWith("/")) {
+		if (!expression.startsWith(String.valueOf(Path.SEPARATOR))) {
 			throw new InvalidExpressionException("Absolute paths must start with '/'");
 		}
-		int pos = expression.indexOf('/', 1);
+		int pos = expression.indexOf(Path.SEPARATOR, 1);
 		if (pos < 0) {
 			String root = expression.substring(1);
 			return new AbsoluteModelPathExpression(root);

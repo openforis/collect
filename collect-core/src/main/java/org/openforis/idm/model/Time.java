@@ -3,29 +3,33 @@ package org.openforis.idm.model;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 /**
  * @author G. Miceli
  * @author M. Togna
  */
-public final class Time implements Value {
+public final class Time extends AbstractValue {
+
 	/**
 	 * Internal string format for Time value ("hhss")
 	 */
-	private static final Pattern INTERNAL_STRING_FORMAT = Pattern.compile("([01][0-9]|2[0-3])([0-5][0-9])");
+	private static final Pattern INTERNAL_STRING_PATTERN = Pattern.compile("([01]|[0-9]|2[0-3])([0-5][0-9])");
 	/**
 	 * Generic string format for Time value ("hh:mm" or "hh:mm:ss" . Please note that seconds will be ignored by the Time attribute)
 	 */
+	private static final String PRETTY_FORMAT = "%02d:%02d";
 //	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("([0-9]|0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])(:[0-5][0-9])?");
-
 	private static final Pattern PRETTY_STRING_FORMAT = Pattern.compile("(\\d+):(\\d{1,2})(:\\d{1,2})?");
 	
-	private static final Pattern[] PATTERNS = new Pattern[] {INTERNAL_STRING_FORMAT, PRETTY_STRING_FORMAT};
+	private static final Pattern[] PATTERNS = new Pattern[] {INTERNAL_STRING_PATTERN, PRETTY_STRING_FORMAT};
 	
 	public static Time parseTime(String value) {
 		if ( StringUtils.isBlank(value) ) {
@@ -57,7 +61,7 @@ public final class Time implements Value {
 		    return new Time(hour, minute);
 		}
 	}
-
+	
 	public static Time fromNumericValue(Integer value) {
 		if (value == null) {
 			return null;
@@ -109,6 +113,15 @@ public final class Time implements Value {
 	}
 
 	@Override
+	@SuppressWarnings("serial")
+	public Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(TimeAttributeDefinition.HOUR_FIELD, hour);
+			put(TimeAttributeDefinition.MINUTE_FIELD, minute);
+		}};
+	}
+	
+	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
 			.append("hour", hour)
@@ -134,6 +147,11 @@ public final class Time implements Value {
 		} else {
 			return null;
 		}
+	}
+
+	@Override
+	public String toPrettyFormatString() {
+		return String.format(PRETTY_FORMAT, hour, minute);
 	}
 	
 	@Override

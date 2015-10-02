@@ -95,6 +95,11 @@ public class SessionManager {
 		sessionState.keepActiveRecordAlive();
 	}
 
+	public void setActiveSurvey(CollectSurvey survey) {
+		SessionState sessionState = getSessionState();
+		sessionState.setActiveSurvey(survey);
+	}
+	
 	public void clearActiveRecord() {
 		SessionState sessionState = getSessionState();
 		sessionState.setActiveRecord(null);
@@ -106,7 +111,7 @@ public class SessionManager {
 			CollectSurvey survey = getActiveDesignerSurvey();
 			boolean activeSurveyWork = sessionState.isActiveSurveyWork();
 			if ( activeSurveyWork ) {
-				surveyManager.saveSurveyWork(survey);
+				surveyManager.save(survey);
 			} else {
 				throw new IllegalArgumentException("Active designer survey should be a 'work' survey");
 			}
@@ -146,6 +151,28 @@ public class SessionManager {
 		}
 	}
 
+	private Object getSessionAttribute(String attributeName) {
+		Object result = null;
+		
+		//try to get session attribute from GraniteDS context
+		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
+		if (graniteContext != null) {
+			result = graniteContext.getSessionMap().get(attributeName);
+		} else {
+			//try to get session attribute from current request context holder session
+			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+			if ( requestAttributes != null ) {
+				HttpSession session = requestAttributes.getRequest().getSession();
+				result = session.getAttribute(attributeName);
+			}
+		}
+		if ( result == null ) {
+			throw new IllegalStateException("Error getting session attribute: " + attributeName);
+		} else {
+			return result;
+		}
+	}
+	
 	public void invalidateSession() {
 		try {
 			releaseRecord();
@@ -182,22 +209,4 @@ public class SessionManager {
 		}
 	}
 	
-	private Object getSessionAttribute(String attributeName) {
-		Object result = null;
-		
-		//try to get session attribute from GraniteDS context
-		GraniteContext graniteContext = GraniteContext.getCurrentInstance();
-		if (graniteContext != null) {
-			result = graniteContext.getSessionMap().get(attributeName);
-		} else {
-			//try to get session attribute from current request context holder session
-			ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-			if ( requestAttributes != null ) {
-				HttpSession session = requestAttributes.getRequest().getSession();
-				result = session.getAttribute(attributeName);
-			}
-		}
-		return result;
-	}
-
 }

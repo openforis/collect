@@ -1,11 +1,12 @@
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.zip.ZipFile;
 
+import org.apache.commons.io.IOUtils;
 import org.openforis.collect.event.EventProducer;
 import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordDeletedEvent;
@@ -46,7 +47,8 @@ public class DataRestoreTask extends Task {
 	private UserManager userManager;
 
 	//input
-	private ZipFile zipFile;
+	private File file;
+	
 	private CollectSurvey packagedSurvey;
 	private CollectSurvey existingSurvey;
 	private List<Integer> entryIdsToImport;
@@ -59,18 +61,27 @@ public class DataRestoreTask extends Task {
 	private final List<Integer> processedRecords;
 	private final RecordUpdateBuffer updateBuffer;
 	private XMLParsingRecordProvider recordProvider;
+
+	private boolean validateRecords;
 	
 	public DataRestoreTask() {
 		super();
 		this.processedRecords = new ArrayList<Integer>();
 		this.updateBuffer = new RecordUpdateBuffer();
 		this.errors = new ArrayList<RecordImportError>();
+		this.validateRecords = true;
 	}
 
 	@Override
 	protected void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
-		this.recordProvider = new XMLParsingRecordProvider(zipFile, packagedSurvey, existingSurvey, userManager);
+		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, validateRecords);
+	}
+	
+	@Override
+	protected void initializeInternalVariables() throws Throwable {
+		super.initializeInternalVariables();
+		this.recordProvider.init();
 	}
 	
 	@Override
@@ -102,6 +113,12 @@ public class DataRestoreTask extends Task {
 			}
 		}
 		updateBuffer.flush();
+	}
+	
+	@Override
+	protected void onEnd() {
+		super.onEnd();
+		IOUtils.closeQuietly(recordProvider);
 	}
 	
 	private void importEntries(int entryId) throws IOException, MissingStepsException {
@@ -138,7 +155,7 @@ public class DataRestoreTask extends Task {
 					String.format("%s : %s", warn.getPath(), warn.getMessage()), Level.WARNING));
 		}
 	}
-	
+
 	public RecordManager getRecordManager() {
 		return recordManager;
 	}
@@ -155,14 +172,10 @@ public class DataRestoreTask extends Task {
 		this.userManager = userManager;
 	}
 
-	public ZipFile getZipFile() {
-		return zipFile;
+	public void setFile(File file) {
+		this.file = file;
 	}
-	
-	public void setZipFile(ZipFile zipFile) {
-		this.zipFile = zipFile;
-	}
-	
+
 	public CollectSurvey getPackagedSurvey() {
 		return packagedSurvey;
 	}
@@ -199,6 +212,10 @@ public class DataRestoreTask extends Task {
 		return errors;
 	}
 
+	public void setValidateRecords(boolean validateRecords) {
+		this.validateRecords = validateRecords;
+	}
+
 	private class RecordUpdateBuffer {
 		
 		public static final int BUFFER_SIZE = 20;
@@ -217,7 +234,7 @@ public class DataRestoreTask extends Task {
 			operations.clear();
 		}
 	}
-	
+
 	private final class EventPublisher implements Consumer<RecordStepOperation> {
 		
 		final EventProducer eventProducer = new EventProducer();
@@ -242,4 +259,5 @@ public class DataRestoreTask extends Task {
 					recordId, recordStep, events));
 		}
 	}
+
 }

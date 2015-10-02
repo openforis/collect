@@ -1,5 +1,8 @@
 package org.openforis.idm.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,8 +11,10 @@ import org.apache.commons.lang3.StringUtils;
  * @author G. Miceli
  *
  */
-public final class BooleanValue implements Value {
+public final class BooleanValue extends AbstractValue {
 
+	public static final String VALUE_FIELD = "value";
+	
 	private Boolean value;
 	
 	public BooleanValue(Boolean value) {
@@ -23,10 +28,6 @@ public final class BooleanValue implements Value {
 			this.value = Boolean.parseBoolean(string);
 		}
 	}
-
-	public Boolean getValue() {
-		return value;
-	}
 	
 	public int compareTo(Value o) {
 		if ( o instanceof BooleanValue ) {
@@ -37,10 +38,27 @@ public final class BooleanValue implements Value {
 	}
 	
 	@Override
+	@SuppressWarnings("serial")
+	public Map<String, Object> toMap() {
+		return new HashMap<String, Object>() {{
+			put(VALUE_FIELD, value);
+		}};
+	}
+	
+	public Boolean getValue() {
+		return value;
+	}
+	
+	@Override
 	public String toString() {
-		return value == null ? null: value.toString();
+		return toPrettyFormatString();
 	}
 
+	@Override
+	public String toPrettyFormatString() {
+		return value == null ? null: value.toString();
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

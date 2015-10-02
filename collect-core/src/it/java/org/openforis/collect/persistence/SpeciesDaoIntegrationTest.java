@@ -217,7 +217,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		Integer tId = t.getId();
 		
 		CollectTaxonomy t2 = new CollectTaxonomy();
-		t.setSurveyId(surveyId);
+		t2.setSurveyId(surveyId);
 		t2.setName("it_bamboos");
 		taxonomyDao.insert(t2);
 		Integer t2Id = t2.getId();
@@ -397,7 +397,7 @@ public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 		survey.setName("surveyTest");
 		survey.setUri("http://www.openforis.org/idm/species_dao_it");
 		try {
-			surveyDao.importModel(survey);
+			surveyDao.insert(survey);
 		} catch (SurveyImportException e) {
 			throw new RuntimeException(e);
 		}

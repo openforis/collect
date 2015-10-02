@@ -7,6 +7,7 @@ import static org.openforis.collect.Collect.VERSION;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
@@ -320,7 +321,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 			} else {
 				//updating existing survey
 				updatingExistingSurvey = true;
-				updatingPublishedSurvey = ! surveySummary.isWork();
+				updatingPublishedSurvey = ! surveySummary.isTemporary();
 				surveyName = surveySummary.getName();
 			}
 		}
@@ -390,7 +391,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		//remove extension
 		String result = FilenameUtils.removeExtension(fileName);
 		//make it all lowercase
-		result = result.toLowerCase();
+		result = result.toLowerCase(Locale.ENGLISH);
 		//replace invalid characters with underscore character (_)
 		result = result.replaceAll("[^0-9a-z_]", "_");
 		//remove trailing underscore character

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,7 +65,7 @@ public class SpeciesCSVReader extends CSVDataImportReader<SpeciesLine> {
 		List<String> columnNames = getColumnNames();
 		List<String> result = new ArrayList<String>();
 		for (String colName : columnNames) {
-			String colNameAdapted = StringUtils.trimToEmpty(colName).toLowerCase();
+			String colNameAdapted = StringUtils.trimToEmpty(colName).toLowerCase(Locale.ENGLISH);
 			if ( Languages.exists(Languages.Standard.ISO_639_3, colNameAdapted) ) {
 				result.add(colName);
 			}

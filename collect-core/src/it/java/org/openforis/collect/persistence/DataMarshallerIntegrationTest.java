@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
-import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.UserPersistenceException;
 import org.openforis.collect.model.CollectRecord;
@@ -58,8 +57,6 @@ public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	
 	@Autowired
 	private DataMarshaller dataMarshaller;
-	@Autowired
-	private RecordManager recordManager;
 	@Autowired
 	private UserManager userManager;
 

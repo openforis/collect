@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="merge-survey-tables" author="ricci" dbms="sqlite">
+		<comment>Merge survey and survey_work table into one</comment>
+		
+		<sql>
+			--create temp tables
+			CREATE TABLE _temp_info AS 
+				SELECT max(id) AS max_survey_id 
+				FROM ofc_survey;
+			
+			CREATE TABLE _temp_survey (id INTEGER NOT NULL, name TEXT NOT NULL, uri TEXT NOT NULL, idml TEXT NOT NULL, target varchar(5) NOT NULL default 'CD', date_created timestamp, date_modified timestamp, collect_version varchar(55) NOT NULL DEFAULT '3.4.0', temporary bool NOT NULL default 0, published_id INTEGER, CONSTRAINT ofc_survey_pkey PRIMARY KEY (id), CONSTRAINT ofc_survey_uri_key UNIQUE(uri, temporary), CONSTRAINT ofc_survey_name_key UNIQUE(name, temporary));
+			CREATE TABLE _temp_code_list (id INTEGER NOT NULL, survey_id INTEGER, code_list_id INTEGER NOT NULL, item_id INTEGER NOT NULL, parent_id INTEGER, sort_order INTEGER NOT NULL, code TEXT NOT NULL, qualifiable BOOLEAN, since_version_id INTEGER, deprecated_version_id INTEGER, label1 TEXT, label2 TEXT, label3 TEXT, label4 TEXT, label5 TEXT, description1 TEXT, description2 TEXT, description3 TEXT, description4 TEXT, description5 TEXT, level integer, image_content bytea, image_file_name varchar(255), CONSTRAINT PK_OFC_CODE_LIST PRIMARY KEY (id), CONSTRAINT ofc_code_list_parent_fkey FOREIGN KEY (parent_id) REFERENCES ofc_code_list(id), CONSTRAINT ofc_code_list_survey_fkey FOREIGN KEY (survey_id) REFERENCES ofc_survey(id));
+			CREATE TABLE _temp_taxonomy (id INTEGER NOT NULL, survey_id INTEGER NOT NULL, name TEXT NOT NULL, metadata TEXT NOT NULL, CONSTRAINT ofc_taxonomy_pkey PRIMARY KEY (id), CONSTRAINT ofc_taxonomy_survey_fkey FOREIGN KEY (survey_id) REFERENCES ofc_survey(id));
+			CREATE TABLE _temp_sampling_design (id INTEGER NOT NULL, survey_id INTEGER NOT NULL, level1 TEXT NOT NULL, level2 TEXT, level3 TEXT, location TEXT NOT NULL, info1 varchar(255), info2 varchar(255), info3 varchar(255), info4 varchar(255), info5 varchar(255), info6 varchar(255), info7 varchar(255), info8 varchar(255), info9 varchar(255), info10 varchar(255), CONSTRAINT ofc_sampling_design_pkey PRIMARY KEY (id), CONSTRAINT ofc_sampling_design_survey_fkey FOREIGN KEY (survey_id) REFERENCES ofc_survey(id));
+			
+			--insert survey table values
+			INSERT INTO _temp_survey (id, name, uri, idml, target, date_created, date_modified, collect_version, temporary, published_id) 
+				SELECT id, name, uri, idml, target, date_created, date_modified, collect_version, 0, null 
+				FROM ofc_survey
+				UNION
+				SELECT (id + _temp_info.max_survey_id), name, uri, idml, target, date_created, date_modified, collect_version, 1, (select s.id from ofc_survey s where s.uri = uri) 
+				FROM ofc_survey_work, _temp_info;
+			
+			--insert code_list table values
+			INSERT INTO _temp_code_list (id, survey_id, code_list_id, item_id, parent_id, sort_order, code, qualifiable, since_version_id, deprecated_version_id, label1, label2, label3, label4, label5, description1, description2, description3, description4, description5, level, image_content, image_file_name)
+				SELECT id, survey_id, code_list_id, item_id, parent_id, sort_order, code, qualifiable, since_version_id, deprecated_version_id, label1, label2, label3, label4, label5, description1, description2, description3, description4, description5, level, image_content, image_file_name
+				FROM ofc_code_list 
+				WHERE survey_id is not null and survey_work_id is null
+				UNION
+				SELECT id, (survey_work_id + _temp_info.max_survey_id), code_list_id, item_id, parent_id, sort_order, code, qualifiable, since_version_id, deprecated_version_id, label1, label2, label3, label4, label5, description1, description2, description3, description4, description5, level, image_content, image_file_name
+				FROM ofc_code_list, _temp_info 
+				WHERE survey_id is null and survey_work_id is not null;
+			
+			INSERT INTO _temp_taxonomy (id, survey_id, name, metadata)
+				SELECT id, survey_id, name, metadata 
+				FROM ofc_taxonomy 
+				WHERE survey_id is not null
+				UNION
+				SELECT id, (survey_work_id + _temp_info.max_survey_id), name, metadata 
+				FROM ofc_taxonomy, _temp_info 
+				WHERE survey_work_id is not null;
+			
+			INSERT INTO _temp_sampling_design (id, survey_id, level1, level2, level3, location, info1, info2, info3, info4, info5, info6, info7, info8, info9, info10)
+				SELECT id, survey_id, level1, level2, level3, location, info1, info2, info3, info4, info5, info6, info7, info8, info9, info10
+				FROM ofc_sampling_design
+				WHERE survey_id is not null
+				UNION
+				SELECT id, (survey_work_id + _temp_info.max_survey_id), level1, level2, level3, location, info1, info2, info3, info4, info5, info6, info7, info8, info9, info10
+				FROM ofc_sampling_design, _temp_info 
+				WHERE survey_work_id is not null;
+			
+			--drop old indexes
+			DROP INDEX IF EXISTS ofc_code_list_child_item_idx;
+			DROP INDEX IF EXISTS ofc_code_list_child_items_idx;
+			DROP INDEX IF EXISTS ofc_code_list_parent_id_idx;
+			DROP INDEX IF EXISTS ofc_code_list_survey_idx;
+			
+			--drop old tables
+			DROP TABLE _temp_info;
+			DROP TABLE ofc_survey;
+			DROP TABLE ofc_survey_work;
+			DROP TABLE ofc_taxonomy;
+			DROP TABLE ofc_code_list;
+			DROP TABLE ofc_sampling_design;
+			
+			--rename temp tables
+			ALTER TABLE _temp_survey RENAME TO ofc_survey;
+			ALTER TABLE _temp_code_list RENAME TO ofc_code_list;
+			ALTER TABLE _temp_taxonomy RENAME TO ofc_taxonomy;
+			ALTER TABLE _temp_sampling_design RENAME TO ofc_sampling_design;
+
+			--create new indexes
+			CREATE INDEX ofc_code_list_survey_idx ON ofc_code_list(survey_id);
+			CREATE INDEX ofc_code_list_child_items_idx ON ofc_code_list(survey_id, code_list_id, parent_id);
+			CREATE UNIQUE INDEX ofc_code_list_child_item_idx ON ofc_code_list(survey_id, code_list_id, parent_id, code);
+			CREATE INDEX ofc_code_list_parent_id_idx ON ofc_code_list(parent_id);
+			CREATE INDEX ofc_taxonomy_survey_idx ON ofc_taxonomy(survey_id);
+			CREATE UNIQUE INDEX ofc_sampling_design_key_idx ON ofc_sampling_design(survey_id, level1, level2, level3);
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>

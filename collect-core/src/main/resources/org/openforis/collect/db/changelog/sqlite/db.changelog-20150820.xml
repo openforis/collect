@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="data-cleansing-toolkit" author="ricci" dbms="sqlite">
+
+	    <preConditions onFail="MARK_RAN">
+	    	<not>
+		    	<tableExists tableName="ofc_data_error_query" />
+	    	</not>
+	    </preConditions>
+	    
+	    <comment>Data error query storage table</comment>
+	    
+	    <createTable tableName="ofc_data_query">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_query_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_query_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP" />
+			<column name="modified_date" type="TIMESTAMP" />
+			<column name="entity_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="attribute_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="conditions" type="TEXT" />
+	    </createTable>
+
+	    <createTable tableName="ofc_data_error_type">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_type_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_type_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="code" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="label" type="VARCHAR(255)" />
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP" />
+			<column name="modified_date" type="TIMESTAMP" />
+		</createTable>
+		
+	    <createTable tableName="ofc_data_error_query">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_query_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="error_type_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_type_fkey" 
+					references="ofc_data_error_type(id)" />
+			</column>
+			<column name="severity" type="CHAR(1)" />
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_fkey" 
+					references="ofc_data_query(id)" />
+			</column>
+			<column name="creation_date" type="TIMESTAMP" />
+			<column name="modified_date" type="TIMESTAMP" />
+	    </createTable>
+	
+		<createTable tableName="ofc_data_error_query_group">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_query_group_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_group_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP" />
+			<column name="modified_date" type="TIMESTAMP" />
+		</createTable>
+		
+		<createTable tableName="ofc_data_error_query_group_query">
+			<column name="group_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_group_group_fkey" 
+					references="ofc_data_error_query_group(id)" />
+			</column>
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_query_group_query_fkey" 
+					references="ofc_data_error_query(id)" />
+			</column>
+			<column name="sort_order" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		
+		<createTable tableName="ofc_data_error_report">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_report_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="query_group_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_report_query_group_fkey" 
+					references="ofc_data_error_query_group(id)" />
+			</column>
+			<column name="record_step" type="int4" />
+			<column name="creation_date" type="TIMESTAMP" />
+		</createTable>
+		
+		<createTable tableName="ofc_data_error_report_item">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_error_report_item_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="report_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_report_item_report_fkey" 
+					references="ofc_data_error_report(id)" />
+			</column>
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_report_item_query_fkey" 
+					references="ofc_data_error_query(id)" />
+			</column>
+			<column name="record_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_error_report_item_record_fkey" 
+					references="ofc_record(id)" />
+			</column>
+			<column name="parent_entity_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="node_index" type="INTEGER" />
+			<column name="value" type="VARCHAR(255)" />
+			<column name="status" type="CHAR(1)" />
+		</createTable>
+		
+		<createIndex 
+	            indexName="ofc_data_error_report_item_report_record_idx"
+	            tableName="ofc_data_error_report_item">
+        	<column name="report_id" type="INTEGER"/>
+        	<column name="record_id" type="INTEGER"/>
+		</createIndex>
+		
+	    <createTable tableName="ofc_data_cleansing_step">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_cleansing_step_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_cleansing_step_query_fkey" 
+					references="ofc_data_query(id)" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="TIMESTAMP" />
+	    </createTable>
+		
+		<createTable tableName="ofc_data_cleansing_step_value">
+			<column name="step_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_cleansing_step_value_fkey" 
+					references="ofc_data_cleansing_step(id)" />
+			</column>
+			<column name="sort_order" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="condition" type="VARCHAR(512)">
+			</column>
+			<column name="type" type="char(1)">
+			</column>
+			<column name="fix_expression" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression1" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression2" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression3" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression4" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression5" type="VARCHAR(512)">
+			</column>
+			<column name="field_fix_expression6" type="VARCHAR(512)">
+			</column>
+	    </createTable>
+	    
+	    <createIndex 
+	            indexName="ofc_data_cleansing_step_value_idx"
+	            tableName="ofc_data_cleansing_step_value">
+        	<column name="step_id" type="INTEGER"/>
+       </createIndex>
+       
+	    <createTable tableName="ofc_data_cleansing_chain">
+	    	<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_cleansing_chain_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_cleansing_chain_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="TIMESTAMP" />
+		</createTable>
+		
+		<createTable tableName="ofc_data_cleansing_chain_steps">
+			<column name="chain_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_cleansing_chain_steps_chain_fkey" 
+					references="ofc_data_cleansing_chain(id)" />
+			</column>
+			<column name="step_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_cleansing_chain_steps_step_fkey" 
+					references="ofc_data_cleansing_step(id)" />
+			</column>
+			<column name="pos" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+	    </createTable>
+	    
+	</changeSet>
+	
+</databaseChangeLog>

@@ -13,10 +13,10 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
-import org.openforis.idm.util.DeepEquals;
 
 /**
  * @author G. Miceli
@@ -31,6 +31,9 @@ public class EntityDefinition extends NodeDefinition {
     private Map<String, NodeDefinition> childDefinitionByName;
     private Map<Integer, NodeDefinition> childDefinitionById;
 
+    //cache of child definition names
+    private String[] childDefinitionNames;
+    
 	public enum TraversalType {
 		DFS //depth first search
 		,
@@ -39,6 +42,7 @@ public class EntityDefinition extends NodeDefinition {
 
 	EntityDefinition(Survey survey, int id) {
 		super(survey, id);
+		childDefinitionNames = new String[0];
 		childDefinitions = new ArrayList<NodeDefinition>();
 		childDefinitionByName = new HashMap<String, NodeDefinition>();
         childDefinitionById = new HashMap<Integer, NodeDefinition>();
@@ -51,14 +55,15 @@ public class EntityDefinition extends NodeDefinition {
 		NodeDefinition childDef = childDefinitionByName.get(oldName);
 		childDefinitionByName.remove(oldName);
 		childDefinitionByName.put(newName, childDef);
+		updateChildDefinitionNames();
 	}
 
 	public boolean isRoot() {
 		return getParentDefinition() == null;
 	}
 
-	public Set<String> getChildDefinitionNames() {
-		return childDefinitionByName.keySet();
+	public String[] getChildDefinitionNames() {
+		return childDefinitionNames;
 	}
 	
 	public List<NodeDefinition> getChildDefinitions() {
@@ -126,15 +131,17 @@ public class EntityDefinition extends NodeDefinition {
 	}
 
 	public void addChildDefinition(NodeDefinition defn) {
-		if ( defn.getName() == null ) {
+		String name = defn.getName();
+		if ( name == null ) {
 			throw new NullPointerException("name");
 		}
 
 		if ( defn.isDetached() ) {
 			throw new IllegalArgumentException("Detached definitions cannot be added");
 		}
+		childDefinitionNames = ArrayUtils.add(childDefinitionNames, name);
 		childDefinitions.add(defn);
-        childDefinitionByName.put(defn.getName(), defn);
+        childDefinitionByName.put(name, defn);
         childDefinitionById.put(defn.getId(), defn);
 		defn.setParentDefinition(this);
 	}
@@ -155,6 +162,7 @@ public class EntityDefinition extends NodeDefinition {
 		if ( detach ) {
 			defn.detach();
 		}
+		updateChildDefinitionNames();
 	}
 
 	public void moveChildDefinition(int id, int index) {
@@ -303,6 +311,11 @@ public class EntityDefinition extends NodeDefinition {
 		}
 		return false;
 	}
+	
+	private void updateChildDefinitionNames() {
+		Set<String> names = childDefinitionByName.keySet();
+		childDefinitionNames = names.toArray(new String[names.size()]);
+	}
 
 	@Override
 	public boolean deepEquals(Object obj) {
@@ -316,7 +329,7 @@ public class EntityDefinition extends NodeDefinition {
 		if (childDefinitions == null) {
 			if (other.childDefinitions != null)
 				return false;
-		} else if (! DeepEquals.deepEquals(childDefinitions, other.childDefinitions))
+		} else if (! CollectionUtils.deepEquals(childDefinitions, other.childDefinitions))
 			return false;
 		return true;
 	}

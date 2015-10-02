@@ -38,9 +38,7 @@ public class SamplingDesignExportTask extends Task {
 	@Override
 	protected long countTotalItems() {
 		Integer surveyId = survey.getId();
-		int count = survey.isWork() ? 
-				samplingDesignManager.countBySurveyWork(surveyId): 
-				samplingDesignManager.countBySurvey(surveyId);
+		int count = samplingDesignManager.countBySurvey(surveyId);
 		return count;
 	}
 	
@@ -48,12 +46,9 @@ public class SamplingDesignExportTask extends Task {
 	protected void execute() throws Throwable {
 		if ( getTotalItems() > 0 ) {
 			Integer surveyId = survey.getId();
-			boolean work = survey.isWork();
 			
 			CsvWriter writer = new CsvWriter(outputStream, OpenForisIOUtils.UTF_8, ',', '"');
-			SamplingDesignSummaries summaries = work ? 
-					samplingDesignManager.loadBySurveyWork(surveyId): 
-					samplingDesignManager.loadBySurvey(surveyId);
+			SamplingDesignSummaries summaries = samplingDesignManager.loadBySurvey(surveyId);
 					
 			ArrayList<String> colNames = getHeaders();
 			writer.writeHeaders(colNames.toArray(new String[0]));
