@@ -1,6 +1,7 @@
 package org.openforis.collect.datacleansing;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class DataErrorQueryGroupExectutorTask extends Task {
 	
 	//output
 	private List<DataErrorQueryExecutorError> errors;
+	private Date lastRecordModifiedDate;
 
 	@Override
 	protected long countTotalItems() {
@@ -67,6 +69,12 @@ public class DataErrorQueryGroupExectutorTask extends Task {
 		Iterator<CollectRecord> it = recordSummaries.iterator();
 		while (it.hasNext() && isRunning()) {
 			CollectRecord recordSummary = (CollectRecord) it.next();
+			Date modifiedDate = recordSummary.getModifiedDate();
+			if (lastRecordModifiedDate == null) {
+				lastRecordModifiedDate = modifiedDate;
+			} else if (modifiedDate.compareTo(lastRecordModifiedDate) > 0) {
+				lastRecordModifiedDate = modifiedDate;
+			}
 			CollectRecord record = recordManager.load(survey, recordSummary.getId(), input.step, false);
 			List<DataErrorQuery> queries = input.getQueries();
 			for (DataErrorQuery query : queries) {
@@ -109,6 +117,10 @@ public class DataErrorQueryGroupExectutorTask extends Task {
 	
 	public void setInput(DataErrorQueryGroupExecutorTaskInput input) {
 		this.input = input;
+	}
+	
+	public Date getLastRecordModifiedDate() {
+		return lastRecordModifiedDate;
 	}
 	
 	public static class DataErrorQueryExecutorError {

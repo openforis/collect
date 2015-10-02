@@ -1,5 +1,7 @@
 package org.openforis.collect.designer.model;
 
+import java.util.Locale;
+
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -52,7 +54,7 @@ public enum NodeType {
 		}
 		String result;
 		if ( detached ) {
-			Object[] args = new String[]{nodeTypeLabel.toLowerCase()};
+			Object[] args = new String[]{nodeTypeLabel.toLowerCase(Locale.ENGLISH)};
 			result = Labels.getLabel("survey.schema.node_detail_title.new_node", args);
 		} else {
 			result = nodeTypeLabel;

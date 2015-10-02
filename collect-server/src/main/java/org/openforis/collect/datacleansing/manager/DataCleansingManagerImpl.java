@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingMetadata;
 import org.openforis.collect.datacleansing.DataCleansingStep;
@@ -46,16 +44,8 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	private DataCleansingStepManager dataCleansingStepManager;
 	@Autowired
 	private DataCleansingChainManager dataCleansingChainManager;
-	
-	private List<AbstractSurveyObjectManager<?, ?>> managers;
-
-	@PostConstruct
-	private void init() {
-		managers = Arrays.<AbstractSurveyObjectManager<?, ?>> asList(
-				dataCleansingChainManager, dataCleansingStepManager,
-				dataErrorQueryGroupManager, dataErrorQueryManager, 
-				dataErrorTypeManager, dataQueryManager);
-	}
+	@Autowired
+	private DataErrorReportManager dataErrorReportManager;
 	
 	@Override
 	public DataCleansingMetadata loadMetadata(CollectSurvey survey) {
@@ -124,6 +114,10 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	@Transactional
 	@Override
 	public void deleteMetadata(CollectSurvey survey) {
+		List<AbstractSurveyObjectManager<?, ?>> managers = Arrays.<AbstractSurveyObjectManager<?, ?>>asList(
+				dataCleansingChainManager, dataCleansingStepManager, 
+				dataErrorReportManager, dataErrorQueryGroupManager, dataErrorQueryManager,
+				dataErrorTypeManager, dataQueryManager);
 		for (AbstractSurveyObjectManager<?, ?> manager : managers) {
 			manager.deleteBySurvey(survey);
 		}

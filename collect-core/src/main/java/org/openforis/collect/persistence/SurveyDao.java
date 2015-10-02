@@ -204,14 +204,15 @@ public class SurveyDao extends SurveyBaseDao {
 			}
 			String idml = row.getValue(OFC_SURVEY.IDML);
 			CollectSurvey survey = unmarshalIdml(idml);
+			survey.setCollectVersion(new Version(row.getValue(OFC_SURVEY.COLLECT_VERSION)));
+			survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
 			survey.setId(row.getValue(OFC_SURVEY.ID));
+			survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
 			survey.setName(row.getValue(OFC_SURVEY.NAME));
-			survey.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
 			survey.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
 			survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
-			survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
-			survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
-			survey.setCollectVersion(new Version(row.getValue(OFC_SURVEY.COLLECT_VERSION)));
+			survey.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
+			survey.setUri(row.getValue(OFC_SURVEY.URI));
 			return survey;
 		} catch (IdmlParseException e) {
 			throw new RuntimeException("Error deserializing IDML from database", e);

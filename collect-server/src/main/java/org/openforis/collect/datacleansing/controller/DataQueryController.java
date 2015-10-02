@@ -26,6 +26,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
+import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
 import org.openforis.idm.model.Attribute;
@@ -126,7 +127,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	public @ResponseBody List<DataQueryResultItemForm> downloadTestResult(HttpServletResponse response)
 			throws FileNotFoundException, IOException {
 		if (testJob == null) {
-			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			HttpResponses.setNoContentStatus(response);
 			return null;
 		}
 		List<DataQueryResultItem> items = ((MemoryStoreDataQueryResultItemProcessor) testJob
@@ -170,7 +171,7 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	
 	private JobView createJobView(HttpServletResponse response, Job job) {
 		if (job == null) {
-			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+			HttpResponses.setNoContentStatus(response);
 			return null;
 		} else {
 			return new JobView(job);

@@ -95,6 +95,8 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		protected void fromRecord(Record r, DataErrorReport o) {
 			super.fromRecord(r, o);
 			o.setCreationDate(r.getValue(OFC_DATA_ERROR_REPORT.CREATION_DATE));
+			o.setDatasetSize(r.getValue(OFC_DATA_ERROR_REPORT.DATASET_SIZE));
+			o.setLastRecordModifiedDate(r.getValue(OFC_DATA_ERROR_REPORT.LAST_RECORD_MODIFIED_DATE));
 			o.setQueryGroupId(r.getValue(OFC_DATA_ERROR_REPORT.QUERY_GROUP_ID));
 			o.setRecordStep(Step.valueOf(r.getValue(OFC_DATA_ERROR_REPORT.RECORD_STEP)));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_ERROR_REPORT.UUID)));
@@ -104,6 +106,8 @@ public class DataErrorReportDao extends SurveyObjectMappingJooqDaoSupport<DataEr
 		protected void fromObject(DataErrorReport o, StoreQuery<?> q) {
 			super.fromObject(o, q);
 			q.addValue(OFC_DATA_ERROR_REPORT.CREATION_DATE, toTimestamp(o.getCreationDate()));
+			q.addValue(OFC_DATA_ERROR_REPORT.DATASET_SIZE, o.getDatasetSize());
+			q.addValue(OFC_DATA_ERROR_REPORT.LAST_RECORD_MODIFIED_DATE, toTimestamp(o.getLastRecordModifiedDate()));
 			q.addValue(OFC_DATA_ERROR_REPORT.QUERY_GROUP_ID, o.getQueryGroupId());
 			q.addValue(OFC_DATA_ERROR_REPORT.RECORD_STEP, o.getRecordStep().getStepNumber());
 			q.addValue(OFC_DATA_ERROR_REPORT.UUID, o.getUuid().toString());

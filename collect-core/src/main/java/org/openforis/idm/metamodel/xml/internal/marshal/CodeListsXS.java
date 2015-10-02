@@ -21,6 +21,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.TYPE;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeList.CodeScope;
@@ -77,7 +78,7 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 		@Override
 		protected void attributes(LanguageSpecificText txt, boolean includeLanguage) throws IOException {
 			CodeListLabel label = (CodeListLabel) txt;
-			attribute(TYPE, label.getType().name().toLowerCase());
+			attribute(TYPE, label.getType().name().toLowerCase(Locale.ENGLISH));
 			super.attributes(txt, includeLanguage);
 		}
 		
@@ -113,7 +114,7 @@ class CodeListsXS extends VersionableSurveyObjectXS<CodeList, Survey> {
 		}
 		
 		protected void attributes(CodeScope scope) throws IOException {
-			attribute(SCOPE, scope == null ? null : scope.name().toLowerCase());
+			attribute(SCOPE, scope == null ? null : scope.name().toLowerCase(Locale.ENGLISH));
 		}
 	}
 

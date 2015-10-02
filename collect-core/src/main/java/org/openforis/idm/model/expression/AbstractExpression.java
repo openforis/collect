@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -184,7 +185,7 @@ public abstract class AbstractExpression {
 		FieldDefinition<?> fieldDef = attrDef.getFieldDefinition(fieldName);
 		if (fieldDef == null) {
 			//try to replace uppercase letters with an underscore
-			String newFieldName = fieldName.replaceAll("(.)([A-Z])", "$1_$2").toLowerCase();
+			String newFieldName = fieldName.replaceAll("(.)([A-Z])", "$1_$2").toLowerCase(Locale.ENGLISH);
 			fieldDef = attrDef.getFieldDefinition(newFieldName);
 		}
 		return fieldDef;

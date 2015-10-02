@@ -5,6 +5,7 @@ package org.openforis.collect.designer.viewmodel.referencedata;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.openforis.collect.designer.util.PopUpUtil;
@@ -53,7 +54,7 @@ public class ReferenceDataImportErrorPopUpVM extends BaseVM {
 	
 	public String getErrorTypeLabel(ParsingError error) {
 		return Labels.getLabel(String.format("survey.reference_data.import_error.type.%s", 
-				error.getErrorType().name().toLowerCase()));
+				error.getErrorType().name().toLowerCase(Locale.ENGLISH)));
 	}
 	
 

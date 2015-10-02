@@ -19,7 +19,7 @@ import org.apache.commons.io.IOUtils;
  * @author S. Ricci
  *
  */
-public class ZipFiles {
+public class Zip4jFiles {
 	
 	@SuppressWarnings("unchecked")
 	public static void copyFiles(ZipFile sourceFile, ZipFile destFile, ZipParameters zipParameters) throws ZipException, IOException {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="set-published-survey-id" author="ricci" dbms="sqlite">
+		<comment>Set published survey id in temporary surveys</comment>
+		
+		<sql>
+			UPDATE ofc_survey SET published_id = (SELECT s.id from ofc_survey s where s.uri = ofc_survey.uri and not s.temporary) WHERE temporary;
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>

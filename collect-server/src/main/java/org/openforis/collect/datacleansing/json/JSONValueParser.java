@@ -89,7 +89,7 @@ public class JSONValueParser implements ValueParser {
 
 	public BooleanValue parseBoolean(String value) {
 		Map<String, Object> map = parseJSONToMap(value, BooleanValue.VALUE_FIELD);
-		return map == null ? null: new BooleanValue((String) map.get(BooleanValue.VALUE_FIELD));
+		return map == null ? null: new BooleanValue((Boolean) map.get(BooleanValue.VALUE_FIELD));
 	}
 	
 	public Code parseCode(String value) {

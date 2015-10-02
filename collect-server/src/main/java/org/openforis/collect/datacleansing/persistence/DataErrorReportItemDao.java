@@ -68,13 +68,13 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		SelectQuery<?> q = dsl.selectCountQuery();
 		q.addConditions(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()));
 		Record record = q.fetchOne();
-		Integer count = (Integer) record.getValue(0);
-		return count;
+		return (Integer) record.getValue(0);
 	}
 	
 	public int countAffectedRecords(DataErrorReport report) {
 		JooqDSLContext dsl = dsl(report);
 		SelectQuery<?> subSelect = dsl.selectQuery();
+		subSelect.addSelect(OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID);
 		subSelect.addFrom(OFC_DATA_ERROR_REPORT_ITEM);
 		subSelect.addConditions(OFC_DATA_ERROR_REPORT_ITEM.REPORT_ID.eq(report.getId()));
 		subSelect.addGroupBy(OFC_DATA_ERROR_REPORT_ITEM.RECORD_ID);
@@ -83,8 +83,7 @@ public class DataErrorReportItemDao extends MappingJooqDaoSupport<DataErrorRepor
 		select.addSelect(DSL.count());
 		select.addFrom(subSelect);
 		Record record = select.fetchOne();
-		Integer count = (Integer) record.getValue(0);
-		return count;
+		return (Integer) record.getValue(0);
 	}
 	
 	public List<DataErrorReportItem> loadByReport(DataErrorReport report, Integer offset, Integer limit) {

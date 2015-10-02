@@ -76,7 +76,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		List<LabelledItem> templates = new ArrayList<LabelledItem>();
 		for (TemplateType templateType : TemplateType.values()) {
 			String name = templateType.name();
-			templates.add(new LabelledItem(name, Labels.getLabel("survey.template.type." + name.toLowerCase())));
+			templates.add(new LabelledItem(name, Labels.getLabel("survey.template.type." + name.toLowerCase(Locale.ENGLISH))));
 		}
 		templateModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(templates));
 		templateModel.setMultiple(false);
@@ -126,7 +126,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	protected CollectSurvey createNewSurveyFromTemplate(String name, String langCode, TemplateType templateType)
 			throws IdmlParseException, SurveyValidationException {
-		String templateFileName = String.format(IDM_TEMPLATE_FILE_NAME_FORMAT, templateType.name().toLowerCase());
+		String templateFileName = String.format(IDM_TEMPLATE_FILE_NAME_FORMAT, templateType.name().toLowerCase(Locale.ENGLISH));
 		InputStream surveyFileIs = this.getClass().getResourceAsStream(templateFileName);
 		CollectSurvey survey = surveyManager.unmarshalSurvey(surveyFileIs, false, true);
 		survey.setName(name);

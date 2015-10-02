@@ -28,7 +28,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.FileWrapper;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
-import org.openforis.collect.utils.ZipFiles;
+import org.openforis.collect.utils.Zip4jFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -96,13 +96,13 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		// DEFLATE_LEVEL_ULTRA = maximum compression
 		zipParameters.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_ULTRA);
 		
-		ZipFiles.addFile(zipFile, projectProperties, PROJECT_PROPERTIES_FILE_NAME, zipParameters);
-		ZipFiles.addFile(zipFile, placemarkFile, PLACEMARK_FILE_NAME, zipParameters);
-		ZipFiles.addFile(zipFile, balloon, BALLOON_FILE_NAME, zipParameters);
-		ZipFiles.addFile(zipFile, cube, CUBE_FILE_NAME, zipParameters);
-		ZipFiles.addFile(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME, zipParameters);
-		ZipFiles.addFile(zipFile, readmeFile, README_FILE, zipParameters);
-		ZipFiles.addFile(zipFile, testPlotsCSVFile, TEST_PLOTS_FILE_NAME, zipParameters);
+		Zip4jFiles.addFile(zipFile, projectProperties, PROJECT_PROPERTIES_FILE_NAME, zipParameters);
+		Zip4jFiles.addFile(zipFile, placemarkFile, PLACEMARK_FILE_NAME, zipParameters);
+		Zip4jFiles.addFile(zipFile, balloon, BALLOON_FILE_NAME, zipParameters);
+		Zip4jFiles.addFile(zipFile, cube, CUBE_FILE_NAME, zipParameters);
+		Zip4jFiles.addFile(zipFile, kmlTemplate, KML_TEMPLATE_FILE_NAME, zipParameters);
+		Zip4jFiles.addFile(zipFile, readmeFile, README_FILE, zipParameters);
+		Zip4jFiles.addFile(zipFile, testPlotsCSVFile, TEST_PLOTS_FILE_NAME, zipParameters);
 		
 		addCodeListImages(zipFile, survey, zipParameters);
 		
@@ -136,7 +136,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			if (resource.exists() && resource.isReadable() && StringUtils.isNotBlank(resource.getFilename())) {
 				String path = ((ClassPathResource) resource).getPath();
 				String relativePath = StringUtils.removeStart(path, EARTH_FILES_RESOURCE_PATH);
-				ZipFiles.addFile(zipFile, resource.getInputStream(), EARTH_FILES_FOLDER_NAME + "/" + relativePath, zipParameters);
+				Zip4jFiles.addFile(zipFile, resource.getInputStream(), EARTH_FILES_FOLDER_NAME + "/" + relativePath, zipParameters);
 			}
 		}
 	}
@@ -342,7 +342,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 					
 					String zipImageFileName = getCodeListImageFilePath(item);
 					
-					ZipFiles.addFile(zipFile, imageFile, zipImageFileName, zipParameters);
+					Zip4jFiles.addFile(zipFile, imageFile, zipImageFileName, zipParameters);
 				}
 				List<CodeListItem> childItems = codeListManager.loadChildItems(item);
 				for (CodeListItem childItem : childItems) {

@@ -1,6 +1,7 @@
 package org.openforis.idm.metamodel.xml.internal.unmarshal;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.Survey;
@@ -32,7 +33,7 @@ public class UnitsPR extends IdmlPullReader {
 		protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 			int id = getIntegerAttribute(ID, true);
 			String name = getAttribute(NAME, true);
-			String dimension = getAttribute(DIMENSION, true);
+			String dimension = getAttribute(DIMENSION, true).toLowerCase(Locale.ENGLISH);
 			Double conversionFactor = getDoubleAttribute(CONVERSION_FACTOR, false);
 			Survey survey = getSurvey();
 			this.unit = survey.createUnit(id);

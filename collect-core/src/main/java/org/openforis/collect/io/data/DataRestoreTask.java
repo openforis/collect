@@ -73,6 +73,7 @@ public class DataRestoreTask extends Task {
 		this.oldBackupFormat = false;
 		this.validateRecords = true;
 		this.queryBuffer = new QueryBuffer();
+		this.recordUpdater = new RecordUpdater();
 	}
 
 	@Override
@@ -98,7 +99,7 @@ public class DataRestoreTask extends Task {
 					int stepNumber = step.getStepNumber();
 					String path = SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + stepNumber;
 					if ( backupFileExtractor.containsEntriesInPath(path) ) {
-						List<String> listEntriesInPath = backupFileExtractor.listEntriesInPath(path);
+						List<String> listEntriesInPath = backupFileExtractor.listFilesInFolder(path);
 						for (String entry : listEntriesInPath) {
 							String entryId = FilenameUtils.getBaseName(entry);
 							result.add(Integer.parseInt(entryId));

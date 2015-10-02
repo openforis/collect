@@ -128,7 +128,7 @@ public class SurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setSurveyUri(surveyUri);
 			t.setSurveyName(surveyName);
 			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
-			t.setValidate(validateSurvey);
+			t.setValidate(false);
 		} else if (task instanceof CodeListImagesImportTask) {
 			CodeListImagesImportTask t = (CodeListImagesImportTask) task;
 			t.setCodeListManager(codeListManager);

@@ -752,12 +752,12 @@
 				<label xml:lang="es">Guardado por el usuario activamente</label>
 				<label xml:lang="fr">Sauvé par l'utilisateur</label>
 			</boolean>
-			<text id="32" name="actively_saved_on" required="false"
+			<date id="32" name="actively_saved_on" required="false"
 				relevant="false()">
 				<label xml:lang="en">Last saved on</label>
 				<label xml:lang="es">Guardado por ultima vez</label>
 				<label xml:lang="fr">Sauvé la dernière fois sur</label>
-			</text>
+			</date>
 			<text id="34" name="plot_file" required="false" relevant="false()">
 				<label xml:lang="en">CSV file that contains the plot</label>
 				<label xml:lang="es">Archivo CSV que contiene al plot</label>

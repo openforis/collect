@@ -4,6 +4,7 @@ import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.Unit;
@@ -31,7 +32,7 @@ class UnitsXS extends XmlSerializerSupport<Unit, Survey> {
 	protected void attributes(Unit unit) throws IOException {
 		attribute(ID, unit.getId());
 		attribute(NAME, unit.getName());
-		attribute(DIMENSION, unit.getDimension());
+		attribute(DIMENSION, unit.getDimension().toLowerCase(Locale.ENGLISH));
 		attribute(CONVERSION_FACTOR, unit.getConversionFactor());
 	}
 	

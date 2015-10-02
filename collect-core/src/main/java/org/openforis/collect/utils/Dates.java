@@ -96,6 +96,12 @@ public class Dates {
 		return onlyDate1.compareTo(onlyDate2);
 	}
 
+	public static int compareUpToMinutesOnly(Date date1, Date date2) {
+		Date dt1 = toOnlyDateAndTimeToMinutes(date1);
+		Date dt2 = toOnlyDateAndTimeToMinutes(date2);
+		return dt1.compareTo(dt2);
+	}
+
 	public static Date toOnlyDate(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
@@ -106,4 +112,11 @@ public class Dates {
 		return cal.getTime();
 	}
 	
+	public static Date toOnlyDateAndTimeToMinutes(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.SECOND, 0);
+		cal.set(Calendar.MILLISECOND, 0);
+		return cal.getTime();
+	}
 }

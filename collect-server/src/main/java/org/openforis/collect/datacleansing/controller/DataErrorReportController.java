@@ -1,5 +1,9 @@
 package org.openforis.collect.datacleansing.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,7 +37,10 @@ import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.PaginatedResponse;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.commons.lang.Objects;
+import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
+import org.openforis.concurrency.Job;
+import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -51,7 +58,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
@@ -67,6 +73,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	private CollectJobManager collectJobManager;
 	
 	private DataErrorReportGeneratorJob generationJob;
+	private ReportExportJob exportJob;
 	
 	@Override
 	@Autowired
@@ -88,7 +95,7 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		return new DataErrorReport(survey);
 	}
 	
-	@RequestMapping(value="generate.json", method = RequestMethod.POST)
+	@RequestMapping(value="generate.json", method=POST)
 	public @ResponseBody
 	Response generate(@RequestParam int queryGroupId, @RequestParam Step recordStep) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
@@ -100,41 +107,38 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		return new Response();
 	}
 	
-	@RequestMapping(value="{reportId}/export.csv", method = RequestMethod.GET)
-	public void export(HttpServletResponse response, @PathVariable int reportId) throws Exception {
-		export(response, reportId, GroupedByRecordCSVWriterDataErrorProcessor.class);
+	@RequestMapping(value="{reportId}/start-export.json", method=POST)
+	public @ResponseBody JobView startExport(@PathVariable int reportId) throws Exception {
+		return startExport(reportId, GroupedByRecordCSVWriterDataErrorProcessor.class);
 	}
 
-	@RequestMapping(value="{reportId}/export-for-collect-earth.csv", method = RequestMethod.GET)
-	public void exportForCollectEarth(HttpServletResponse response, @PathVariable int reportId) throws Exception {
-		export(response, reportId, CollectEarthCSVWriterDataErrorProcessor.class);
+	@RequestMapping(value="{reportId}/start-export-for-collect-earth.json", method=POST)
+	public @ResponseBody JobView startExportForCollectEarth(@PathVariable int reportId) throws Exception {
+		return startExport(reportId, CollectEarthCSVWriterDataErrorProcessor.class);
 	}
 	
-	private void export(HttpServletResponse response, int reportId,
+	private JobView startExport(int reportId,
 			Class<? extends CSVWriterDataErrorItemProcessor> itemProcessorType)
 			throws Exception {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataErrorReport report = itemManager.loadById(survey, reportId);
 		
-		EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinitions().get(0);
-		CSVWriterDataErrorItemProcessor itemProcessor = Objects.newInstance(itemProcessorType, 
-				rootEntityDefinition);
-		itemProcessor.init();
-		int count = itemManager.countItems(report);
-		int itemsPerPage = 200;
-		int pages = Double.valueOf(Math.ceil((double) count / itemsPerPage)).intValue();
-		for (int page = 1; page <= pages ; page++) {
-			List<DataErrorReportItem> items = itemManager.loadItems(report, (page - 1) * itemsPerPage, itemsPerPage);
-			for (DataErrorReportItem item : items) {
-				itemProcessor.process(item);
-			}
-		}
-		itemProcessor.close();
-		File file = itemProcessor.getOutputFile();
+		exportJob = new ReportExportJob();
+		exportJob.setSurvey(survey);
+		exportJob.setReport(report);
+		exportJob.setItemProcessorType(itemProcessorType);
+		exportJob.setReportManager(itemManager);
+		collectJobManager.start(exportJob);
+		return new JobView(exportJob);
+	}
+	
+	@RequestMapping(value="{reportId}/report.csv", method=GET)
+	private void downloadExportedFile(HttpServletResponse response, @PathVariable int reportId) throws Exception {
+		File file = exportJob.getOutputFile();
 		Controllers.writeFileToResponse(file, "text/csv", response, "data-error-report.csv");
 	}
 	
-	@RequestMapping(value="{reportId}/items.json", method = RequestMethod.GET)
+	@RequestMapping(value="{reportId}/items.json", method=GET)
 	public @ResponseBody
 	PaginatedResponse loadItems(@PathVariable int reportId, 
 			@RequestParam int offset, @RequestParam int limit) {
@@ -149,18 +153,28 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		return new PaginatedResponse(total, rows);
 	}
 	
-	@RequestMapping(value="generate/job.json", method = RequestMethod.GET)
+	@RequestMapping(value="generate/job.json", method=GET)
 	public @ResponseBody
 	JobView getCurrentGenearationJob(HttpServletResponse response) {
-		if (generationJob == null) {
-			response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+		return getJobView(response, generationJob);
+	}
+
+	@RequestMapping(value="export/job.json", method=GET)
+	public @ResponseBody
+	JobView getCurrentExportJob(HttpServletResponse response) {
+		return getJobView(response, exportJob);
+	}
+	
+	private JobView getJobView(HttpServletResponse response, Job job) {
+		if (job == null) {
+			HttpResponses.setNoContentStatus(response);
 			return null;
 		} else {
-			return new JobView(generationJob);
+			return new JobView(job);
 		}
 	}
 	
-	@RequestMapping(value="generate/job.json", method = RequestMethod.DELETE)
+	@RequestMapping(value="generate/job.json", method=DELETE)
 	public @ResponseBody Response cancelGenerationJob() {
 		if (generationJob != null) {
 			generationJob.abort();
@@ -412,6 +426,85 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 			return defs;
 		}
 		
+	}
+
+	private static class ReportExportJob extends Job {
+		
+		//input
+		private CollectSurvey survey;
+		private DataErrorReport report;
+		private Class<? extends CSVWriterDataErrorItemProcessor> itemProcessorType;
+		private DataErrorReportManager reportManager;
+
+		//output
+		private File outputFile;
+		
+		public ReportExportJob() {
+		}
+		
+		@Override
+		protected void buildTasks() throws Throwable {
+			ReportExportTask task = new ReportExportTask();
+			addTask(task);
+		}
+		
+		public void setReportManager(DataErrorReportManager reportManager) {
+			this.reportManager = reportManager;
+		}
+		
+		public void setSurvey(CollectSurvey survey) {
+			this.survey = survey;
+		}
+		
+		public void setReport(DataErrorReport report) {
+			this.report = report;
+		}
+		
+		public void setItemProcessorType(Class<? extends CSVWriterDataErrorItemProcessor> itemProcessorType) {
+			this.itemProcessorType = itemProcessorType;
+		}
+		
+		public File getOutputFile() {
+			return outputFile;
+		}
+		
+		private class ReportExportTask extends Task {
+		
+			public ReportExportTask() {
+			}
+			
+			@Override
+			protected long countTotalItems() {
+				return Long.valueOf(reportManager.countItems(report));
+			}
+			
+			@Override
+			protected void execute() throws Throwable {
+				EntityDefinition rootEntityDefinition = survey.getSchema().getRootEntityDefinitions().get(0);
+				CSVWriterDataErrorItemProcessor itemProcessor = Objects.newInstance(itemProcessorType, 
+						rootEntityDefinition);
+				itemProcessor.init();
+				long total = getTotalItems();
+				int itemsPerPage = 200;
+				int pages = Double.valueOf(Math.ceil((double) total / itemsPerPage)).intValue();
+				for (int page = 1; page <= pages ; page++) {
+					if (! isRunning()) {
+						break;
+					}
+					List<DataErrorReportItem> items = reportManager.loadItems(report, (page - 1) * itemsPerPage, itemsPerPage);
+					for (DataErrorReportItem item : items) {
+						if (! isRunning()) {
+							break;
+						}
+						itemProcessor.process(item);
+						incrementItemsProcessed();
+					}
+				}
+				itemProcessor.close();
+				outputFile = itemProcessor.getOutputFile();
+			}
+			
+		}
 	}
 	
 }

@@ -3,6 +3,7 @@ package org.openforis.idm.metamodel.xml.internal.marshal;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -52,7 +53,7 @@ public abstract class NodeDefinitionXS<T extends NodeDefinition, P> extends Vers
 		@Override
 		protected void attributes(LanguageSpecificText txt, boolean includeLanguage) throws IOException {
 			NodeLabel label = (NodeLabel) txt;
-			attribute(TYPE, label.getType().name().toLowerCase());
+			attribute(TYPE, label.getType().name().toLowerCase(Locale.ENGLISH));
 			super.attributes(txt, includeLanguage);
 		}
 		
@@ -85,7 +86,7 @@ public abstract class NodeDefinitionXS<T extends NodeDefinition, P> extends Vers
 		@Override
 		protected void attributes(LanguageSpecificText txt, boolean includeLanguage) throws IOException {
 			Prompt prompt = (Prompt) txt;
-			attribute(TYPE, prompt.getType().name().toLowerCase());
+			attribute(TYPE, prompt.getType().name().toLowerCase(Locale.ENGLISH));
 			super.attributes(txt, includeLanguage);
 		}
 		

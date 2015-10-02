@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -99,7 +100,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		
 		@Override
 		public String toString() {
-			return name().toLowerCase();
+			return name().toLowerCase(Locale.ENGLISH);
 		}
 		
 	}
@@ -559,7 +560,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 
 	public void setLayout(EntityDefinition entityDefn, Layout layout) {
-		String layoutValue = layout != null ? layout.name().toLowerCase(): null;
+		String layoutValue = layout != null ? layout.name().toLowerCase(Locale.ENGLISH): null;
 		entityDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
 	}
 	
@@ -598,7 +599,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		if ( fieldsOrder == null || fieldsOrder == CoordinateAttributeFieldsOrder.DEFAULT ) {
 			value = null;
 		} else {
-			value = fieldsOrder.name().toLowerCase();
+			value = fieldsOrder.name().toLowerCase(Locale.ENGLISH);
 		}
 		defn.setAnnotation(Annotation.FIELDS_ORDER.getQName(), value);
 	}

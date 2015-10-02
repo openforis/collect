@@ -3,6 +3,7 @@ package org.openforis.collect.manager;
 import static org.openforis.collect.Collect.VERSION;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,7 +54,7 @@ public class SurveyMigrator {
 	}
 
 	protected String fixInternalName(String name) {
-		name = name.toLowerCase();
+		name = name.toLowerCase(Locale.ENGLISH);
 		name = name.replaceAll(" ", "_");
 		return name;
 	}

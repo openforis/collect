@@ -862,10 +862,13 @@ public class SurveyManager {
 		}
 		CollectSurvey publishedSurvey = getById(id);
 		boolean temporary = publishedSurvey == null;
+
+		//delete records
 		if ( ! temporary ) {
 			recordDao.deleteBySurvey(id);
-			removeFromCache(publishedSurvey);
 		}
+
+		//delete metadata
 		speciesManager.deleteTaxonomiesBySurvey(id);
 		samplingDesignManager.deleteBySurvey(id);
 		codeListManager.deleteAllItemsBySurvey(id, temporary);
@@ -873,7 +876,13 @@ public class SurveyManager {
 			CollectSurvey survey = loadSurvey(id);
 			dataCleansingManager.deleteMetadata(survey);
 		}
+		
+		//delete survey
 		surveyDao.delete(id);
+		
+		if ( ! temporary ) {
+			removeFromCache(publishedSurvey);
+		}
 	}
 	
 	@Transactional

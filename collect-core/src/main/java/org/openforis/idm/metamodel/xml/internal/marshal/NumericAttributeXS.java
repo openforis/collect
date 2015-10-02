@@ -3,6 +3,7 @@ package org.openforis.idm.metamodel.xml.internal.marshal;
 import static org.openforis.idm.metamodel.xml.IdmlConstants.*;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Precision;
@@ -22,7 +23,7 @@ abstract class NumericAttributeXS<T extends NumericAttributeDefinition> extends 
 	@Override
 	protected void attributes(T defn) throws IOException {
 		super.attributes(defn);
-		attribute(TYPE, defn.getType().name().toLowerCase());
+		attribute(TYPE, defn.getType().name().toLowerCase(Locale.ENGLISH));
 	}
 	
 	private class PrecisionXS extends XmlSerializerSupport<Precision, NumericAttributeDefinition> {

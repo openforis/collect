@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openforis.idm.model.BooleanAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 
@@ -83,7 +84,6 @@ public class ExpressionTest extends AbstractExpressionTest {
 		Assert.assertNull(object);
 	}
 
-
 	@Test
 	public void testConstant() throws InvalidExpressionException {
 		Entity plot = EntityBuilder.addEntity(cluster, "plot");
@@ -95,4 +95,34 @@ public class ExpressionTest extends AbstractExpressionTest {
 		Assert.assertEquals(Double.valueOf(expr), object);
 	}
 
+	@Test
+	public void testFalseBoolean() throws InvalidExpressionException {
+		EntityBuilder.addValue(cluster, "gps_realtime", Boolean.FALSE);
+		Assert.assertFalse((Boolean) evaluateExpression("gps_realtime"));
+	}
+	
+	@Test
+	public void testNotWithThisTrueBoolean() throws InvalidExpressionException {
+		BooleanAttribute gpsRealtime = EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
+		Assert.assertFalse((Boolean) evaluateExpression(cluster, gpsRealtime, "not($this)"));
+	}
+	
+	@Test
+	public void testNotWithThisFalseBoolean() throws InvalidExpressionException {
+		BooleanAttribute gpsRealtime = EntityBuilder.addValue(cluster, "gps_realtime", Boolean.FALSE);
+		Assert.assertTrue((Boolean) evaluateExpression(cluster, gpsRealtime, "not($this = true())"));
+	}
+	
+	@Test
+	public void testFalseThisBoolean() throws InvalidExpressionException {
+		BooleanAttribute gpsRealtime = EntityBuilder.addValue(cluster, "gps_realtime", Boolean.FALSE);
+		Assert.assertFalse((Boolean) evaluateExpression(cluster, gpsRealtime, "$this"));
+	}
+	
+	@Test
+	public void testTrueThisBoolean() throws InvalidExpressionException {
+		BooleanAttribute gpsRealtime = EntityBuilder.addValue(cluster, "gps_realtime", Boolean.TRUE);
+		Assert.assertTrue((Boolean) evaluateExpression(cluster, gpsRealtime, "$this"));
+	}
+	
 }

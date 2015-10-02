@@ -70,13 +70,34 @@ Collect.DataErrorReportViewDialogController.prototype.initFormElements = functio
 		
 		$this.content.find(".export-to-csv-btn").click($.proxy(function() {
 			var report = $this.extractFormObject();
-			collect.dataErrorReportService.exportToCSV(report.id);
+			collect.dataErrorReportService.startExportToCSV(report.id, $.proxy(startExportSuccessHandler, $this, report));
 		}, $this));
+
+		var exportCSVToCollectEarthBtn = $this.content.find(".export-to-csv-for-collect-earth-btn");
+		var collectEarthTarget = collect.activeSurvey.target == "COLLECT_EARTH";
+		if (collectEarthTarget) {
+			exportCSVToCollectEarthBtn.click($.proxy(function() {
+				var report = $this.extractFormObject();
+				collect.dataErrorReportService.startExportToCSVForCollectEarth(report.id, $.proxy(startExportSuccessHandler, $this, report));
+			}, $this));
+		}
+		exportCSVToCollectEarthBtn.toggle(collectEarthTarget);
 		
-		$this.content.find(".export-to-csv-for-collect-earth-btn").click($.proxy(function() {
-			var report = $this.extractFormObject();
-			collect.dataErrorReportService.exportToCSVForCollectEarth(report.id);
-		}, $this));
+		var startExportSuccessHandler = function(report, job) {
+			var jobDialog = new OF.UI.JobDialog();
+			new OF.JobMonitor("datacleansing/dataerrorreports/export/job.json", function() {
+				jobDialog.close();
+				collect.dataErrorReportService.downloadGeneratedExport(report.id);
+			});
+		};
+		
+		var monitorJob = function(jobMonitorUrl, complete) {
+			var jobDialog = new OF.UI.JobDialog();
+			new OF.JobMonitor(jobMonitorUrl, function() {
+				jobDialog.close();
+				complete();
+			});
+		};
 		
 		callback();
 	});
