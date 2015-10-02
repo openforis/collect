@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
-import org.openforis.collect.datacleansing.DataQueryExectutorTask.DataQueryExecutorTaskInput;
-import org.openforis.collect.datacleansing.DataQueryExecutorJob.DataQueryExecutorJobInput;
+import org.openforis.collect.datacleansing.DataCleansingChainExectutorTask.DataCleansingChainExecutorTaskInput;
+import org.openforis.collect.datacleansing.DataCleansingChainExectutorTask.DataCleansingStepNodeProcessor;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -43,12 +43,8 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	
 	@Override
 	protected void buildTasks() throws Throwable {
-		List<DataCleansingStep> steps = chain.getSteps();
-		for (DataCleansingStep s : steps) {
-			DataQueryExectutorTask task = addTask(DataQueryExectutorTask.class);
-			DataQueryExecutorTaskInput input = new DataQueryExecutorJobInput(s.getQuery(), recordStep, new DataCleansingChainNodeProcessor(s));
-			task.setInput(input);
-		}
+		DataCleansingChainExectutorTask task = addTask(DataCleansingChainExectutorTask.class);
+		task.setInput(new DataCleansingChainExecutorTaskInput(chain, recordStep, new DataCleansingChainNodeProcessor(chain)));
 	}
 	
 	public void setChain(DataCleansingChain chain) {
@@ -60,25 +56,21 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		this.recordStep = recordStep;
 	}
 	
-	private class DataCleansingChainNodeProcessor implements NodeProcessor {
+	private class DataCleansingChainNodeProcessor implements DataCleansingStepNodeProcessor {
 		
-		private DataCleansingStep step;
+		private DataCleansingChain chain;
 		private CollectRecord lastRecord;
 		private RecordUpdater recordUpdater;
 		private QueryBuffer queryBuffer;
 		
-		public DataCleansingChainNodeProcessor(DataCleansingStep step) {
-			this.step = step;
+		public DataCleansingChainNodeProcessor(DataCleansingChain chain) {
+			this.chain = chain;
 			this.recordUpdater = new RecordUpdater();
 			this.queryBuffer = new QueryBuffer();
 		}
 		
 		@Override
-		public void init() throws Exception {
-		}
-		
-		@Override
-		public void process(Node<?> node) throws Exception {
+		public void process(DataCleansingStep step, Node<?> node) throws Exception {
 			if (node instanceof Attribute) {
 				@SuppressWarnings("unchecked")
 				Attribute<?, Value> attrib = (Attribute<?, Value>) node;
@@ -86,7 +78,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 				CollectRecord record = (CollectRecord) node.getRecord();
 				ExpressionEvaluator expressionEvaluator = record.getSurveyContext().getExpressionEvaluator();
 				
-				DataCleansingStepValue stepValue = determineApplicableValue(attrib);
+				DataCleansingStepValue stepValue = determineApplicableValue(step, attrib);
 				
 				switch(stepValue.getUpdateType()) {
 				case ATTRIBUTE:
@@ -112,7 +104,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 			}
 		}
 
-		private DataCleansingStepValue determineApplicableValue(Attribute<?, Value> attrib) throws InvalidExpressionException {
+		private DataCleansingStepValue determineApplicableValue(DataCleansingStep step, Attribute<?, Value> attrib) throws InvalidExpressionException {
 			List<DataCleansingStepValue> values = step.getUpdateValues();
 			for (DataCleansingStepValue stepValue : values) {
 				if (StringUtils.isBlank(stepValue.getCondition())) {
@@ -122,12 +114,12 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 					return stepValue;
 				}
 			}
-			throw new IllegalStateException("Cannot find a default applicable cleansing step value for cleansing step with id " + step.getId());
+			throw new IllegalStateException("Cannot find a default applicable cleansing step value for cleansing step with id " + chain.getId());
 		}
 
 		private boolean evaluateCondition(Attribute<?, Value> attrib, DataCleansingStepValue stepValue)
 				throws InvalidExpressionException {
-			ExpressionEvaluator expressionEvaluator = step.getSurvey().getContext().getExpressionEvaluator();
+			ExpressionEvaluator expressionEvaluator = chain.getSurvey().getContext().getExpressionEvaluator();
 			boolean result = expressionEvaluator.evaluateBoolean(attrib, attrib, stepValue.getCondition());
 			return result;
 		}
