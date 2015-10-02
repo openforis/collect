@@ -41,6 +41,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<DataCleansingStep, DataCleansingStepDao.JooqDSLContext> {
 
+	private static final TableField<?, ?>[] FIELD_FIX_EXPRESSION_FIELDS = new TableField<?, ?>[] {
+		OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION1, 
+		OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION2,
+		OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION3,
+		OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION4,
+		OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION5,
+		OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION6
+	};
+	
 	public DataCleansingStepDao() {
 		super(DataCleansingStepDao.JooqDSLContext.class);
 	}
@@ -73,19 +82,64 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 		Result<OfcDataCleansingStepRecord> result = select.fetch();
 		return dsl.fromResult(result);
 	}
+	
+	public void insertStepValues(int stepId, List<DataCleansingStepValue> values) {
+		JooqDSLContext dsl = dsl();
+		List<Field<?>> fields = new ArrayList<Field<?>>(Arrays.<Field<?>>asList(
+				OFC_DATA_CLEANSING_STEP_VALUE.STEP_ID,
+				OFC_DATA_CLEANSING_STEP_VALUE.SORT_ORDER,
+				OFC_DATA_CLEANSING_STEP_VALUE.TYPE,
+				OFC_DATA_CLEANSING_STEP_VALUE.CONDITION,
+				OFC_DATA_CLEANSING_STEP_VALUE.FIX_EXPRESSION
+		));
+		fields.addAll(Arrays.asList(FIELD_FIX_EXPRESSION_FIELDS));
+		InsertValuesStepN<OfcDataCleansingStepValueRecord> insert = 
+				dsl.insertInto(OFC_DATA_CLEANSING_STEP_VALUE, fields)
+				.values(Collections.nCopies(fields.size(), "?")); //add ? placeholders
+		BatchBindStep batch = dsl.batch(insert);
+
+		int stepIndex = 0;
+		for (DataCleansingStepValue stepValue : values) {
+			List<Object> insertValues = new ArrayList<Object>(Arrays.<Object>asList(
+				stepId,
+				stepIndex + 1,
+				String.valueOf(stepValue.getUpdateType().getCode()),
+				stepValue.getCondition(),
+				stepValue.getFixExpression()
+			));
+			List<String> fieldFixExpressions = getFieldFixExpressionValues(stepValue);
+			insertValues.addAll(fieldFixExpressions);
+			
+			batch.bind(insertValues.toArray(new Object[insertValues.size()]));
+			stepIndex ++;
+		}
+		batch.execute();
+	}
+
+	private List<String> getFieldFixExpressionValues(DataCleansingStepValue stepValue) {
+		List<String> fieldFixExpressions = new ArrayList<String>(FIELD_FIX_EXPRESSION_FIELDS.length);
+		for (int i = 0; i < FIELD_FIX_EXPRESSION_FIELDS.length; i++) {
+			String fieldFixExpression = null;
+			if (stepValue.getUpdateType() == UpdateType.FIELD) {
+				List<String> stepValueFieldFixExpressions = stepValue.getFieldFixExpressions();
+				if (i < stepValueFieldFixExpressions.size()) {
+					fieldFixExpression = stepValueFieldFixExpressions.get(i);
+				}
+			}
+			fieldFixExpressions.add(fieldFixExpression);
+		}
+		return fieldFixExpressions;
+	}
+	
+	public void deleteStepValues(int stepId) {
+		dsl().delete(OFC_DATA_CLEANSING_STEP_VALUE)
+			.where(OFC_DATA_CLEANSING_STEP_VALUE.STEP_ID.eq(stepId))
+			.execute();
+	}
 
 	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataCleansingStep> {
 
 		private static final long serialVersionUID = 1L;
-		
-		private static final TableField<?, ?>[] FIELD_FIX_EXPRESSION_FIELDS = new TableField<?, ?>[] {
-			OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION1, 
-			OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION2,
-			OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION3,
-			OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION4,
-			OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION5,
-			OFC_DATA_CLEANSING_STEP_VALUE.FIELD_FIX_EXPRESSION6
-		};
 		
 		public JooqDSLContext(Connection connection) {
 			this(connection, null);
@@ -122,11 +176,6 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			q.addValue(OFC_DATA_CLEANSING_STEP.QUERY_ID, o.getQueryId());
 			q.addValue(OFC_DATA_CLEANSING_STEP.TITLE, o.getTitle());
 			q.addValue(OFC_DATA_CLEANSING_STEP.UUID, o.getUuid().toString());
-			
-			deleteStepValues(o.getId());
-			if (! o.getUpdateValues().isEmpty()) {
-				insertStepValues(o.getId(), o.getUpdateValues());
-			}
 		}
 
 		private List<DataCleansingStepValue> loadValues(DataCleansingStep step) {
@@ -162,43 +211,7 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 			return values;
 		}
 		
-		protected void insertStepValues(int stepId, List<DataCleansingStepValue> values) {
-			List<Field<?>> fields = new ArrayList<Field<?>>(Arrays.<Field<?>>asList(
-					OFC_DATA_CLEANSING_STEP_VALUE.STEP_ID,
-					OFC_DATA_CLEANSING_STEP_VALUE.SORT_ORDER,
-					OFC_DATA_CLEANSING_STEP_VALUE.TYPE,
-					OFC_DATA_CLEANSING_STEP_VALUE.CONDITION,
-					OFC_DATA_CLEANSING_STEP_VALUE.FIX_EXPRESSION
-			));
-			fields.addAll(Arrays.asList(FIELD_FIX_EXPRESSION_FIELDS));
-			InsertValuesStepN<OfcDataCleansingStepValueRecord> insert = 
-					insertInto(OFC_DATA_CLEANSING_STEP_VALUE, fields)
-					.values(Collections.nCopies(fields.size(), "?")); //add ? placeholders
-			BatchBindStep batch = batch(insert);
 
-			int stepIndex = 0;
-			for (DataCleansingStepValue stepValue : values) {
-				List<Object> insertValues = new ArrayList<Object>(Arrays.<Object>asList(
-					stepId,
-					stepIndex + 1,
-					String.valueOf(stepValue.getUpdateType().getCode()),
-					stepValue.getCondition(),
-					stepValue.getFixExpression()
-				));
-				if (stepValue.getUpdateType() == UpdateType.FIELD) {
-					insertValues.addAll(stepValue.getFieldFixExpressions());
-				}
-				batch.bind(insertValues.toArray(new Object[insertValues.size()]));
-				stepIndex ++;
-			}
-			batch.execute();
-		}
-		
-		private void deleteStepValues(Integer stepId) {
-			delete(OFC_DATA_CLEANSING_STEP_VALUE)
-				.where(OFC_DATA_CLEANSING_STEP_VALUE.STEP_ID.eq(stepId))
-				.execute();
-		}
 	}
 
 	

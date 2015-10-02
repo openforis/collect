@@ -15,6 +15,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
@@ -36,9 +37,11 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	}
 	
 	@Override
+	@Transactional
 	public void delete(DataCleansingStep step) {
 		Set<DataCleansingChain> chainsUsingStep = dataCleansingChainManager.loadByStep(step);
 		if (chainsUsingStep.isEmpty()) {
+			dao.deleteStepValues(step.getId());
 			super.delete(step);
 		} else {
 			throw new IllegalStateException(String.format("Cannote delete step with id %d: some chains are associated to it", step.getId()));
@@ -58,8 +61,13 @@ public class DataCleansingStepManager extends AbstractSurveyObjectManager<DataCl
 	}
 	
 	@Override
+	@Transactional
 	public void save(DataCleansingStep step) {
 		super.save(step);
+		dao.deleteStepValues(step.getId());
+		if (! step.getUpdateValues().isEmpty()) {
+			dao.insertStepValues(step.getId(), step.getUpdateValues());
+		}
 	}
 	
 	private void initializeQuery(DataCleansingStep step) {
