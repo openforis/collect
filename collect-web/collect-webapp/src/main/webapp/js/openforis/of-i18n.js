@@ -14,7 +14,13 @@ OF.i18n.initializeAll = function(el) {
 OF.i18n.initializeEl = function(el) {
 	var messageKey = $(el).data(OF.i18n.MESSAGE_KEY_DATA_PROPERTY_NAME);
 	if (messageKey) {
-		var message = jQuery.i18n.prop(messageKey);
+		var message = OF.i18n.prop(messageKey);
 		$(el).html(message);
 	}
 };
+
+OF.i18n.prop = function(messageKey) {
+	var args = Array.prototype.slice.call(arguments, 1);
+	var message = jQuery.i18n.prop(messageKey, args);
+	return message;
+}

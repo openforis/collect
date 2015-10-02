@@ -16,8 +16,17 @@ OF.UI.JobDialog._CONTENT_TEMPLATE =
 					'<h4 class="modal-title">Process status</h4>' +
 				'</div>' +
 				'<div class="modal-body">' +
-					'<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="height: 15px">' +
-				    	'<span class="sr-only"></span>' +
+					'<div class="row">' +
+						'<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"' + 
+							' style="min-width: 2em; height: 22px;">' +
+						'</div>' +
+					'</div>' +
+					'<div class="row">' +
+					    '<div style="text-align: right">' +
+					    	'<label data-i180n="collect.global.remaining_time.label">Remaining time</label>' +
+					    	'<label> : </label>' +
+					    	'<label class="remaining-time-content"></label>' +
+					    '</div>' +
 				    '</div>' +
 			    '</div>' +
 			    '<div class="modal-footer">' + 
@@ -86,9 +95,19 @@ OF.UI.JobDialog.prototype.updateUI = function(job) {
 		this.okBtn.show();
 		this.cancelBtn.hide();
 	}
+	var remainingTimeText;
+	if (job.remainingMinutes == null) {
+		remainingTimeText = OF.i18n.prop("collect.global.remaining_time.calculating");
+	} else if (job.remainingMinutes == 1) {
+		remainingTimeText = OF.i18n.prop("collect.global.remaining_time.less_than_one_minute");
+	} else {
+		remainingTimeText = remainingTimeText = OF.i18n.prop("collect.global.remaining_time.remaining_minutes", job.remainingMinutes);
+	}
+	$this.progressBarEl.text(percentWidth + "%");
 	$this.progressBarEl.css("width", percentWidth + "%");
 	$this.progressBarEl.removeClass("progress-bar-info progress-bar-striped");
 	$this.progressBarEl.addClass(styleName);
+	$this.content.find(".remaining-time-content").text(remainingTimeText);
 };
 
 OF.UI.JobDialog.prototype.initContent = function() {
