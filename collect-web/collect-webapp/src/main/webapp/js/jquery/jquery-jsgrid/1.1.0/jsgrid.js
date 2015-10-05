@@ -579,10 +579,78 @@
             });
             return this;
         },
-
+        
+        _getFieldValue: function(item, field) {
+        	var fieldName = field.name;
+        	var parts = fieldName.split(".");
+        	var currentValue = item;
+        	for (i = 0; i < parts.length && currentValue != null; i++) {
+        		var part = parts[i];
+        		var match = part.match(/(\w*)\[(\d+)\]/);
+        		if (match == null) {
+        			currentValue = currentValue[part];
+        		} else {
+        			var propName = match[1];
+        			var index = match[2];
+        			var child = currentValue[propName];
+        			if (child == null) {
+        				return null; //TODO handle exception?
+        			}
+        			currentValue = child[index];
+        		}
+        	}
+        	return currentValue;
+        },
+        
+        _setFieldValue: function(item, field, value) {
+        	var fieldName = field.name;
+        	var parts = fieldName.split(".");
+        	var currentParent = item;
+        	for (i = 0; i < parts.length - 1 && currentParent != null; i++) {
+        		var part = parts[i];
+        		var match = part.match(/(\w*)\[(\d+)\]/);
+        		if (match == null) {
+        			currentParent = currentParent[part];
+        		} else {
+        			var propName = match[1];
+        			var index = match[2];
+        			var child = currentParent[propName];
+        			if (child == null) {
+        				return; //TODO handle exception?
+        			}
+        			currentParent = child[index];
+        		}
+        	}
+			if (currentParent == null) {
+				return; //TODO handle exception?
+			}
+        	var lastPart = parts[parts.length - 1];
+    		var match = lastPart.match(/(\w*)\[(\d+)\]/);
+    		if (match == null) {
+    			currentParent[lastPart] = value;
+    		} else {
+    			var childName = match[1];
+    			var index = match[2];
+    			var child = currentParent[childName];
+    			if (child == null) {
+    				child = new Array();
+    				currentParent[childName] = child;
+    			}
+				if (child instanceof Array) {
+    				if (child.length <= index) {
+    					child.push(value);
+    				} else {
+    					child[index] = value;
+    				}
+    			} else {
+    				//unexpected type
+    			}
+    		}
+        },
+        
         _createCell: function(item, field) {
             var $result;
-            var fieldValue = item[field.name];
+            var fieldValue = this._getFieldValue(item, field);
 
             if($.isFunction(field.cellRenderer)) {
                 $result = $(field.cellRenderer(fieldValue, item));
@@ -597,7 +665,7 @@
 
             return $result;
         },
-
+        
         sort: function(field, order) {
             if($.isPlainObject(field)) {
                 order = field.order;
@@ -939,10 +1007,11 @@
         },
 
         getFilter: function() {
+        	var $this = this;
             var result = {};
             this._eachField(function(field) {
                 if(field.filtering) {
-                    result[field.name] = field.filterValue();
+                	$this._setFieldValue(result, field, field.filterValue());
                 }
             });
             return result;
@@ -984,9 +1053,10 @@
 
         _getInsertItem: function() {
             var result = {};
+            var $this = this;
             this._eachField(function(field) {
                 if(field.inserting) {
-                    result[field.name] = field.insertValue();
+                	$this._setFieldValue(result, field, field.insertValue());
                 }
             });
             return result;
@@ -1033,16 +1103,16 @@
         },
 
         _createEditRow: function(item) {
+        	var $this = this;
             if($.isFunction(this.editRowRenderer)) {
                 return $(this.editRowRenderer(item, this._itemIndex(item)));
             }
 
             var $result = $("<tr>").addClass(this.editRowClass);
-
             this._eachField(function(field) {
                 $("<td>").addClass(field.editcss || field.css)
                     .appendTo($result)
-                    .append(field.editTemplate ? field.editTemplate(item[field.name], item) : "")
+                    .append(field.editTemplate ? field.editTemplate($this._getFieldValue(item, field), item) : "")
                     .width(field.width || "auto");
             });
 
@@ -1098,10 +1168,11 @@
         },
 
         _getEditedItem: function() {
+        	var $this = this;
             var result = {};
             this._eachField(function(field) {
                 if(field.editing) {
-                    result[field.name] = field.editValue();
+                	$this._setFieldValue(result, field, field.editValue());
                 }
             });
             return result;

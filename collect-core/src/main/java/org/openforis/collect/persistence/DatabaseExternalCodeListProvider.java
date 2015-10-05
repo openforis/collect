@@ -39,7 +39,6 @@ public class DatabaseExternalCodeListProvider implements
 	private static final String LABEL_COLUMN_PREFIX = "label";
 	
 	private static final String SURVEY_ID_FIELD = "survey_id";
-	private static final String SURVEY_WORK_ID_FIELD = "survey_work_id";
 
 	@Autowired
 	private DynamicTableDao dynamicTableDao;
@@ -141,7 +140,7 @@ public class DatabaseExternalCodeListProvider implements
 		String childrenKeyColName = getLevelKeyColumnName(list, childrenLevel);
 		String[] notNullColumns = new String[]{childrenKeyColName};
 		List<Map<String, String>> rows = dynamicTableDao.loadRows(list.getLookupTable(), 
-				filters.toArray(new NameValueEntry[0]),
+				filters.toArray(new NameValueEntry[filters.size()]),
 				notNullColumns);
 		List<ExternalCodeListItem> result = new ArrayList<ExternalCodeListItem>();
 		for (Map<String, String> row : rows) {
@@ -223,9 +222,7 @@ public class DatabaseExternalCodeListProvider implements
 		CollectSurvey survey = (CollectSurvey) list.getSurvey();
 		Integer surveyId = survey.getId();
 		if ( surveyId != null ) {
-			String surveyIdFieldName = survey.isTemporary() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
-			NameValueEntry keyValue = new NameValueEntry(surveyIdFieldName, surveyId.toString());
-			return keyValue;
+			return new NameValueEntry(SURVEY_ID_FIELD, surveyId.toString());
 		} else {
 			return null;
 		}

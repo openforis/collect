@@ -28,7 +28,6 @@ import org.openforis.idm.model.Coordinate;
 public abstract class DatabaseLookupProvider implements LookupProvider {
 
 	private static final String SURVEY_ID_FIELD = "survey_id";
-	private static final String SURVEY_WORK_ID_FIELD = "survey_work_id";
 
 	@Override
 	public Object lookup(Survey survey, String name, String attribute, Object... columns) {
@@ -94,9 +93,7 @@ public abstract class DatabaseLookupProvider implements LookupProvider {
 		if ( survey instanceof CollectSurvey ) {
 			Integer surveyId = survey.getId();
 			if ( surveyId != null ) {
-				String surveyIdFieldName = ((CollectSurvey) survey).isTemporary() ? SURVEY_WORK_ID_FIELD : SURVEY_ID_FIELD;
-				NameValueEntry keyValue = new NameValueEntry(surveyIdFieldName, surveyId.toString());
-				filters.add(keyValue);
+				filters.add(new NameValueEntry(SURVEY_ID_FIELD, surveyId.toString()));
 			}
 		}
 	}

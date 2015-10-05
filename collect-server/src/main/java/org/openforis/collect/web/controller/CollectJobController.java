@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.web.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -88,6 +89,9 @@ public class CollectJobController extends BasicController {
 		private Status status;
 		private String errorMessage;
 		private List<DataQueryExecutorError> errors;
+		private long elapsedTime;
+		private Long remainingTime;
+		private Integer remainingMinutes;
 
 		public JobView(Job job) {
 			id = job.getId().toString();
@@ -95,6 +99,28 @@ public class CollectJobController extends BasicController {
 			progressPercent = job.getProgressPercent();
 			status = job.getStatus();
 			errorMessage = job.getErrorMessage();
+			elapsedTime = calculateElapsedTime(job);
+			remainingTime = calculateRemainingTime();
+			remainingMinutes = calculateRemainingMinutes();
+		}
+
+		private long calculateElapsedTime(Job job) {
+			return new Date().getTime() - job.getStartTime();
+		}
+		
+		public Long calculateRemainingTime() {
+			if (progressPercent <= 0) {
+				return null;
+			}
+			long estimatedTotalTime = (100 * elapsedTime) / progressPercent;
+			return estimatedTotalTime - elapsedTime;
+		}
+		
+		public Integer calculateRemainingMinutes() {
+			if (remainingTime == null) {
+				return null;
+			}
+			return Double.valueOf(Math.ceil((double) remainingTime / 60000)).intValue();
 		}
 		
 		public String getId() {
@@ -120,7 +146,18 @@ public class CollectJobController extends BasicController {
 		public List<DataQueryExecutorError> getErrors() {
 			return errors;
 		}
+
+		public long getElapsedTime() {
+			return elapsedTime;
+		}
 		
+		public Long getRemainingTime() {
+			return remainingTime;
+		}
+		
+		public Integer getRemainingMinutes() {
+			return remainingMinutes;
+		}
 	}
-	
+
 }
