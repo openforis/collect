@@ -105,7 +105,11 @@ public class CollectJobController extends BasicController {
 		}
 
 		private long calculateElapsedTime(Job job) {
-			return new Date().getTime() - job.getStartTime();
+			if (job.isEnded()) {
+				return job.getEndTime() - job.getStartTime();
+			} else {
+				return new Date().getTime() - job.getStartTime();
+			}
 		}
 		
 		public Long calculateRemainingTime() {
