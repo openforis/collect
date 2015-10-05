@@ -61,11 +61,17 @@ Collect.DataCleansing.prototype.checkViewState = function() {
 Collect.DataCleansing.prototype.changeViewState = function(state) {
 	switch (state) {
 	case Collect.DataCleansing.VIEW_STATE_NO_SURVEY_SELECTED:
+		$("#no-survey-selected-container").show();
+		$("#survey-selected-container").hide();
 		break;
 	case Collect.DataCleansing.VIEW_STATE_SURVEY_SELECTED:
+		$("#no-survey-selected-container").hide();
+		$("#survey-selected-container").show();
 		$("#data-error-report-tab").show();
 		break;
 	case Collect.DataCleansing.VIEW_STATE_TEMPORARY_SURVEY_SELECTED:
+		$("#no-survey-selected-container").hide();
+		$("#survey-selected-container").show();
 		$("#data-error-report-tab").hide();
 		break;
 	};

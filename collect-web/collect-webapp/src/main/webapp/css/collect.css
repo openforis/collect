@@ -244,3 +244,12 @@ fieldset.has-error legend {
 	cursor: pointer;
 	color: #c9302c;
 }
+
+.hcenter {
+	text-align: center;
+}
+
+.vcenter {
+	position: relative;
+    top: 30%;
+}
