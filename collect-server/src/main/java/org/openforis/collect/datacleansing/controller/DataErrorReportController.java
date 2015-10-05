@@ -32,6 +32,7 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
+import org.openforis.collect.utils.Dates;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.openforis.collect.web.controller.PaginatedResponse;
@@ -67,6 +68,7 @@ import org.springframework.web.context.WebApplicationContext;
 @RequestMapping(value = "/datacleansing/dataerrorreports")
 public class DataErrorReportController extends AbstractSurveyObjectEditFormController<DataErrorReport, DataErrorReportForm, DataErrorReportManager> {
 	
+	private static final String DATA_ERROR_REPORT_CSV_FILE_NAME_FORMAT = "%s (data error report - %s).csv";
 	@Autowired
 	private DataErrorQueryGroupManager dataErrorQueryGroupManager;
 	@Autowired
@@ -135,7 +137,11 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	@RequestMapping(value="{reportId}/report.csv", method=GET)
 	private void downloadExportedFile(HttpServletResponse response, @PathVariable int reportId) throws Exception {
 		File file = exportJob.getOutputFile();
-		Controllers.writeFileToResponse(file, "text/csv", response, "data-error-report.csv");
+		DataErrorReport report = exportJob.report;
+		String outputFileName = String.format(DATA_ERROR_REPORT_CSV_FILE_NAME_FORMAT, 
+				report.getQueryGroup().getTitle(), 
+				Dates.formatDate(report.getCreationDate()));
+		Controllers.writeFileToResponse(file, "text/csv", response, outputFileName);
 	}
 	
 	@RequestMapping(value="{reportId}/items.json", method=GET)
@@ -346,8 +352,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 	
 	public static class CollectEarthCSVWriterDataErrorProcessor extends GroupedByRecordCSVWriterDataErrorProcessor {
 
-		private static final String X_COORDINATE_HEADER = "XCoordinate";
-		private static final String Y_COORDINATE_HEADER = "YCoordinate";
+		private static final String X_COORDINATE_HEADER = "XCOORD";
+		private static final String Y_COORDINATE_HEADER = "YCOORD";
 		private static final String LOCATION_ATTRIBUTE_NAME = "location";
 		
 		private List<AttributeDefinition> fromCSVAttributes;
@@ -370,8 +376,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 		@Override
 		protected List<String> determineExtraHeaders() {
 			List<String> extraHeaders = new ArrayList<String>();
-			extraHeaders.add(X_COORDINATE_HEADER);
 			extraHeaders.add(Y_COORDINATE_HEADER);
+			extraHeaders.add(X_COORDINATE_HEADER);
 			for (AttributeDefinition def : fromCSVAttributes) {
 				extraHeaders.add(def.getName());
 			}
@@ -386,8 +392,8 @@ public class DataErrorReportController extends AbstractSurveyObjectEditFormContr
 			
 			CoordinateAttribute locationAttr = record.findNodeByPath(locationAttributePath);
 			Coordinate location = locationAttr.getValue();
-			values.add(String.valueOf(location.getX()));
 			values.add(String.valueOf(location.getY()));
+			values.add(String.valueOf(location.getX()));
 			
 			for (String attrPath : fromCSVAttributePaths) {
 				Attribute<?, ?> attr = record.findNodeByPath(attrPath);
