@@ -16,8 +16,22 @@ OF.UI.JobDialog._CONTENT_TEMPLATE =
 					'<h4 class="modal-title">Process status</h4>' +
 				'</div>' +
 				'<div class="modal-body">' +
-					'<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="height: 15px">' +
-				    	'<span class="sr-only"></span>' +
+					'<div class="row">' +
+						'<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"' + 
+							' style="min-width: 2em; height: 22px;">' +
+						'</div>' +
+					'</div>' +
+					'<div class="row">' +
+						'<div class="col-sm-6">' +
+						    '<label data-i180n="collect.global.elapsed_time.label">Elapsed time</label>' +
+					    	'<label> : </label>' +
+					    	'<label class="elapsed-time-content"></label>' +
+					    '</div>' +
+				    	'<div style="text-align: right" id="remaining-time-container" class="col-sm-6">' +
+					    	'<label data-i180n="collect.global.remaining_time.label">Remaining time</label>' +
+					    	'<label> : </label>' +
+					    	'<label class="remaining-time-content"></label>' +
+					    '</div>' +
 				    '</div>' +
 			    '</div>' +
 			    '<div class="modal-footer">' + 
@@ -53,30 +67,30 @@ OF.UI.JobDialog.prototype.updateUI = function(job) {
 	var $this = this;
 
 	var styleName = null;
-	var percentWidth = null;
+	var completionPercent = null;
 	var running = false;
 	
 	switch(job.status) {
 	case "PENDING":
 		styleName = "progress-bar-info progress-bar-striped";
-		percentWidth = 100;
+		completionPercent = 100;
 		break;
 	case "RUNNING":
 		styleName = "progress-bar-info";
-		percentWidth = job.progressPercent;
+		completionPercent = job.progressPercent;
 		running = true;
 		break;
 	case "COMPLETED":
 		styleName = "progress-bar-success";
-		percentWidth = 100;
+		completionPercent = 100;
 		break;
 	case "FAILED":
 		styleName = "progress-bar-danger";
-		percentWidth = 100;
+		completionPercent = 100;
 		break;
 	case "ABORTED":
 		styleName = "progress-bar-warning";
-		percentWidth = 100;
+		completionPercent = 100;
 		break;
 	}
 	if (running) {
@@ -86,9 +100,36 @@ OF.UI.JobDialog.prototype.updateUI = function(job) {
 		this.okBtn.show();
 		this.cancelBtn.hide();
 	}
-	$this.progressBarEl.css("width", percentWidth + "%");
+	$this.progressBarEl.text(completionPercent + "%");
+	$this.progressBarEl.css("width", completionPercent + "%");
 	$this.progressBarEl.removeClass("progress-bar-info progress-bar-striped");
 	$this.progressBarEl.addClass(styleName);
+	if (job.status == "RUNNING") {
+		$this.content.find(".remaining-time-content").text($this._getRemainingTimeText(job.remainingMinutes));
+	} else {
+		$this.content.find("#remaining-time-container").hide();
+	}
+	$this.content.find(".elapsed-time-content").text($this._getElapsedTimeText(job.elapsedTime));
+};
+
+OF.UI.JobDialog.prototype._getElapsedTimeText = function(elapsedTime) {
+	if (elapsedTime == null) {
+		return OF.i18n.prop("collect.global.remaining_time.calculating");
+	} else {
+		var elapsedSeconds = OF.Strings.leftPad("" + (Math.floor(elapsedTime / 1000) % 60), "0", 2);
+		var elapsedMinutes = Math.floor(elapsedTime / 60000);
+		return elapsedMinutes + ":" + elapsedSeconds;
+	}
+}
+
+OF.UI.JobDialog.prototype._getRemainingTimeText = function(remainingMinutes) {
+	if (remainingMinutes == null) {
+		return OF.i18n.prop("collect.global.remaining_time.calculating");
+	} else if (remainingMinutes <= 1) {
+		return OF.i18n.prop("collect.global.remaining_time.less_than_one_minute");
+	} else {
+		return OF.i18n.prop("collect.global.remaining_time.remaining_minutes", remainingMinutes);
+	}
 };
 
 OF.UI.JobDialog.prototype.initContent = function() {

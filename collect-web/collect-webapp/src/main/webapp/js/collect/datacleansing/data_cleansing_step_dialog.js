@@ -127,8 +127,10 @@ Collect.DataCleansingStepDialogController.prototype.showErrorsInForm = function(
 	if (error) {
 		$this.updateValuesFieldset.addClass('has-error');
 		OF.UI.Forms.Validation.createErrorTooltip($this.updateValuesFieldset, error, "Update with values");
-		$this.updateValueGrid.refresh();
+	} else {
+		OF.UI.Forms.Validation.removeErrorFromElement($this.updateValuesFieldset);
 	}
+	$this.refreshUpdateValueGrid();
 };
 
 Collect.DataCleansingStepDialogController.prototype.initUpdateValueGrid = function() {

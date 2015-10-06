@@ -84,7 +84,7 @@ Collect.prototype.checkActiveSurveySelected = function() {
 			collect.surveyService.loadSummaries(function(summaries) {
 				switch(summaries.length) {
 				case 0:
-					OF.Alerts.warn("Please define a survey and publish it before using the Data Cleansing Toolkit");
+					OF.Alerts.warn("Please define a survey before using the Data Cleansing Toolkit");
 					break;
 				case 1:
 					var surveySummary = summaries[0];

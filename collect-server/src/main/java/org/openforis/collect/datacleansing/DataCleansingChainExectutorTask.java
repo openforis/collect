@@ -1,5 +1,6 @@
 package org.openforis.collect.datacleansing;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,15 +28,15 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class DataQueryExectutorTask extends Task {
+public class DataCleansingChainExectutorTask extends Task {
 	
 	@Autowired
 	private RecordManager recordManager;
 	
-	DataQueryExectutorTask.DataQueryExecutorTaskInput input;
+	private DataCleansingChainExecutorTaskInput input;
 	
 	//output
-	private List<DataQueryExectutorTask.DataQueryExecutorError> errors;
+	private List<DataCleansingChainExectutorTask.DataQueryExecutorError> errors;
 
 	@Override
 	protected long countTotalItems() {
@@ -59,40 +60,40 @@ public class DataQueryExectutorTask extends Task {
 	@Override
 	@Transactional
 	protected void execute() throws Throwable {
-		CollectSurvey survey = input.query.getSurvey();
+		CollectSurvey survey = input.chain.getSurvey();
 		
-		DataQueryEvaluator queryEvaluator = createQueryEvaluator(input.query);
-
 		RecordFilter filter = createRecordsFilter();
-		
 		List<CollectRecord> recordSummaries = recordManager.loadSummaries(filter);
 		
 		Iterator<CollectRecord> it = recordSummaries.iterator();
 		while (it.hasNext() && isRunning()) {
 			CollectRecord recordSummary = (CollectRecord) it.next();
 			CollectRecord record = recordManager.load(survey, recordSummary.getId(), input.step, false);
-			List<Node<?>> nodes = queryEvaluator.evaluate(record);
-			for (Node<?> node : nodes) {
-				processNode(node);
+			
+			for (DataCleansingStep step : input.chain.getSteps()) {
+				DataQueryEvaluator queryEvaluator = createQueryEvaluator(step.getQuery());
+				List<Node<?>> nodes = queryEvaluator.evaluate(record);
+				for (Node<?> node : nodes) {
+					processNode(step, node);
+				}
 			}
 			incrementItemsProcessed();
 		}
 	}
 
-	private void processNode(Node<?> node) {
+	private void processNode(DataCleansingStep step, Node<?> node) {
 		try {
-			input.nodeProcessor.process(node);
+			input.nodeProcessor.process(step, node);
 		} catch(Exception e) {
-			log().error(String.format("Error executing query %s", input.query.getId()), e);
+			log().error(String.format("Error executing cleansing step %s", step.getId()), e);
 			CollectRecord record = (CollectRecord) node.getRecord();
 			errors.add(new DataQueryExecutorError(record.getRootEntityKeyValues(), record.getId(), node.getPath(), e.getMessage()));
 		}
 	}
 	
 	private RecordFilter createRecordsFilter() {
-		CollectSurvey survey = input.query.getSurvey();
-		EntityDefinition entityDef = (EntityDefinition) survey.getSchema().getDefinitionById(input.query.getEntityDefinitionId());
-		EntityDefinition rootEntityDef = entityDef.getRootEntity();
+		CollectSurvey survey = input.chain.getSurvey();
+		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
 		Integer rootEntityId = rootEntityDef.getId();
 
 		RecordFilter filter = new RecordFilter(survey);
@@ -107,11 +108,11 @@ public class DataQueryExectutorTask extends Task {
 		return new XPathDataQueryEvaluator(query);
 	}
 	
-	public DataQueryExectutorTask.DataQueryExecutorTaskInput getInput() {
+	public DataCleansingChainExectutorTask.DataCleansingChainExecutorTaskInput getInput() {
 		return input;
 	}
 	
-	public void setInput(DataQueryExectutorTask.DataQueryExecutorTaskInput input) {
+	public void setInput(DataCleansingChainExectutorTask.DataCleansingChainExecutorTaskInput input) {
 		this.input = input;
 	}
 	
@@ -147,31 +148,31 @@ public class DataQueryExectutorTask extends Task {
 		}
 	}
 	
-	public static class DataQueryExecutorTaskInput {
+	public static class DataCleansingChainExecutorTaskInput {
 		
-		private DataQuery query;
+		private DataCleansingChain chain;
 		private Step step;
 		private Integer maxRecords;
-		private NodeProcessor nodeProcessor;
+		private DataCleansingStepNodeProcessor nodeProcessor;
 		
-		public DataQueryExecutorTaskInput(DataQuery query, Step step, NodeProcessor nodeProcessor) {
-			this(query, step, nodeProcessor, null);
+		public DataCleansingChainExecutorTaskInput(DataCleansingChain chain, Step step, DataCleansingStepNodeProcessor nodeProcessor) {
+			this(chain, step, nodeProcessor, null);
 		}
 
-		public DataQueryExecutorTaskInput(DataQuery query, Step step, NodeProcessor nodeProcessor, Integer maxRecords) {
+		public DataCleansingChainExecutorTaskInput(DataCleansingChain chain, Step step, DataCleansingStepNodeProcessor nodeProcessor, Integer maxRecords) {
 			super();
-			this.query = query;
+			this.chain = chain;
 			this.step = step;
 			this.nodeProcessor = nodeProcessor;
 			this.maxRecords = maxRecords;
 		}
 
-		public DataQuery getQuery() {
-			return query;
+		public DataCleansingChain getChain() {
+			return chain;
 		}
 		
-		public void setQuery(DataQuery query) {
-			this.query = query;
+		public void setChain(DataCleansingChain chain) {
+			this.chain = chain;
 		}
 		
 		public Step getStep() {
@@ -190,12 +191,17 @@ public class DataQueryExectutorTask extends Task {
 			this.maxRecords = maxRecords;
 		}
 		
-		public NodeProcessor getNodeProcessor() {
+		public DataCleansingStepNodeProcessor getNodeProcessor() {
 			return nodeProcessor;
 		}
 		
-		public void setNodeProcessor(NodeProcessor nodeProcessor) {
+		public void setNodeProcessor(DataCleansingStepNodeProcessor nodeProcessor) {
 			this.nodeProcessor = nodeProcessor;
 		}
+	}
+	
+	public interface DataCleansingStepNodeProcessor extends Closeable {
+		
+		void process(DataCleansingStep step, Node<?> node) throws Exception;
 	}
 }
