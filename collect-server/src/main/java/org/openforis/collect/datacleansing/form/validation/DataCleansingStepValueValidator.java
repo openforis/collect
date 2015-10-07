@@ -64,7 +64,7 @@ public class DataCleansingStepValueValidator extends SimpleValidator<DataCleansi
 			int fieldIndex = 0;
 			for (String expr : fieldFixExpressions) {
 				if (StringUtils.isNotBlank(expr)) {
-					validateValueExpression(errors, attrDef, attrDef, getFieldUpdateExpressionFieldName(fieldIndex), expr);
+					validateValueExpression(errors, attrDef.getParentEntityDefinition(), attrDef, getFieldUpdateExpressionFieldName(fieldIndex), expr);
 				}
 				fieldIndex ++;
 			}
@@ -93,7 +93,7 @@ public class DataCleansingStepValueValidator extends SimpleValidator<DataCleansi
 			String defaultMessage = messageSource.getMessage(errorCode, args, Locale.ENGLISH);
 			errors.rejectValue(FIX_EXPRESSION_FIELD, errorCode, args, defaultMessage);
 		} else {
-			validateValueExpression(errors, attrDef, attrDef, FIX_EXPRESSION_FIELD, fixExpression);
+			validateValueExpression(errors, attrDef.getParentEntityDefinition(), attrDef, FIX_EXPRESSION_FIELD, fixExpression);
 		}
 	}
 
@@ -102,7 +102,7 @@ public class DataCleansingStepValueValidator extends SimpleValidator<DataCleansi
 		if (StringUtils.isBlank(condition)) {
 			return;
 		}
-		validateBooleanExpression(errors, attrDef, attrDef, CONDITION_FIELD, condition);
+		validateBooleanExpression(errors, attrDef.getParentEntityDefinition(), attrDef, CONDITION_FIELD, condition);
 	}
 	
 	private String[] getFieldUpdateExpressionFieldNames() {
