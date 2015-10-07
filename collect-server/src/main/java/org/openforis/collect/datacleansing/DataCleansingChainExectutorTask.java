@@ -38,6 +38,9 @@ public class DataCleansingChainExectutorTask extends Task {
 	//output
 	private List<DataCleansingChainExectutorTask.DataQueryExecutorError> errors;
 
+	private int updatedRecords;
+	private int processedNodes;
+
 	@Override
 	protected long countTotalItems() {
 		RecordFilter recordsFilter = createRecordsFilter();
@@ -48,6 +51,8 @@ public class DataCleansingChainExectutorTask extends Task {
 	@Override
 	protected void initializeInternalVariables() throws Throwable {
 		super.initializeInternalVariables();
+		this.updatedRecords = 0;
+		this.processedNodes = 0;
 		this.errors = new ArrayList<DataQueryExecutorError>();
 	}
 	
@@ -69,25 +74,32 @@ public class DataCleansingChainExectutorTask extends Task {
 		while (it.hasNext() && isRunning()) {
 			CollectRecord recordSummary = (CollectRecord) it.next();
 			CollectRecord record = recordManager.load(survey, recordSummary.getId(), input.step, false);
-			
+			boolean recordNodesProcessed = false;
 			for (DataCleansingStep step : input.chain.getSteps()) {
 				DataQueryEvaluator queryEvaluator = createQueryEvaluator(step.getQuery());
 				List<Node<?>> nodes = queryEvaluator.evaluate(record);
 				for (Node<?> node : nodes) {
-					processNode(step, node);
+					if (processNode(step, node)) {
+						processedNodes ++;
+						recordNodesProcessed = true;
+					}
 				}
+			}
+			if (recordNodesProcessed) {
+				updatedRecords ++;
 			}
 			incrementItemsProcessed();
 		}
 	}
 
-	private void processNode(DataCleansingStep step, Node<?> node) {
+	private boolean processNode(DataCleansingStep step, Node<?> node) {
 		try {
-			input.nodeProcessor.process(step, node);
+			return input.nodeProcessor.process(step, node);
 		} catch(Exception e) {
 			log().error(String.format("Error executing cleansing step %s", step.getId()), e);
 			CollectRecord record = (CollectRecord) node.getRecord();
 			errors.add(new DataQueryExecutorError(record.getRootEntityKeyValues(), record.getId(), node.getPath(), e.getMessage()));
+			return false;
 		}
 	}
 	
@@ -114,6 +126,14 @@ public class DataCleansingChainExectutorTask extends Task {
 	
 	public void setInput(DataCleansingChainExectutorTask.DataCleansingChainExecutorTaskInput input) {
 		this.input = input;
+	}
+	
+	public int getProcessedNodes() {
+		return processedNodes;
+	}
+	
+	public int getUpdatedRecords() {
+		return updatedRecords;
 	}
 	
 	public static class DataQueryExecutorError {
@@ -202,6 +222,6 @@ public class DataCleansingChainExectutorTask extends Task {
 	
 	public interface DataCleansingStepNodeProcessor extends Closeable {
 		
-		void process(DataCleansingStep step, Node<?> node) throws Exception;
+		boolean process(DataCleansingStep step, Node<?> node) throws Exception;
 	}
 }

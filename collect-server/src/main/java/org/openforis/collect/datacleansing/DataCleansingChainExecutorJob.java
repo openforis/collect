@@ -40,7 +40,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	//input
 	private DataCleansingChain chain;
 	private Step recordStep;
-	
+
 	@Override
 	protected void buildTasks() throws Throwable {
 		DataCleansingChainExectutorTask task = addTask(DataCleansingChainExectutorTask.class);
@@ -54,6 +54,26 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	
 	public void setRecordStep(Step recordStep) {
 		this.recordStep = recordStep;
+	}
+	
+	private DataCleansingChainExectutorTask getChainExecutorTask() {
+		DataCleansingChainExectutorTask task;
+		if (getTasks().isEmpty()) {
+			task = null;
+		} else {
+			task = (DataCleansingChainExectutorTask) getTasks().get(0);
+		}
+		return task;
+	}
+	
+	public int getUpdatedRecords() {
+		DataCleansingChainExectutorTask task = getChainExecutorTask();
+		return task == null ? 0 : task.getUpdatedRecords();
+	}
+	
+	public int getProcessedNodes() {
+		DataCleansingChainExectutorTask task = getChainExecutorTask();
+		return task == null ? 0 : task.getProcessedNodes();
 	}
 	
 	private class DataCleansingChainNodeProcessor implements DataCleansingStepNodeProcessor {
@@ -70,7 +90,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		}
 		
 		@Override
-		public void process(DataCleansingStep step, Node<?> node) throws Exception {
+		public boolean process(DataCleansingStep step, Node<?> node) throws Exception {
 			if (node instanceof Attribute) {
 				@SuppressWarnings("unchecked")
 				Attribute<?, Value> attrib = (Attribute<?, Value>) node;
@@ -79,7 +99,9 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 				ExpressionEvaluator expressionEvaluator = record.getSurveyContext().getExpressionEvaluator();
 				
 				DataCleansingStepValue stepValue = determineApplicableValue(step, attrib);
-				
+				if (stepValue == null) {
+					return false;
+				}
 				switch(stepValue.getUpdateType()) {
 				case ATTRIBUTE:
 					Value val = expressionEvaluator.evaluateAttributeValue(attrib.getParent(), attrib, attrDefn, stepValue.getFixExpression());
@@ -101,7 +123,9 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 					break;
 				}
 				appendRecordUpdate(record);
+				return true;
 			}
+			return false;
 		}
 
 		private DataCleansingStepValue determineApplicableValue(DataCleansingStep step, Attribute<?, Value> attrib) throws InvalidExpressionException {
@@ -120,7 +144,7 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 		private boolean evaluateCondition(Attribute<?, Value> attrib, DataCleansingStepValue stepValue)
 				throws InvalidExpressionException {
 			ExpressionEvaluator expressionEvaluator = chain.getSurvey().getContext().getExpressionEvaluator();
-			boolean result = expressionEvaluator.evaluateBoolean(attrib, attrib, stepValue.getCondition());
+			boolean result = expressionEvaluator.evaluateBoolean(attrib.getParent(), attrib, stepValue.getCondition());
 			return result;
 		}
 
