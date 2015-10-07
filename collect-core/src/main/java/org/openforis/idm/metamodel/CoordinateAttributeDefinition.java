@@ -30,6 +30,10 @@ public class CoordinateAttributeDefinition extends AttributeDefinition  {
 		super(survey, id);
 	}
 
+	CoordinateAttributeDefinition(CoordinateAttributeDefinition obj, int id) {
+		super(obj, id);
+	}
+	
 	@Override
 	public Node<?> createNode() {
 		return new CoordinateAttribute(this);

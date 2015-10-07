@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.lang.Objects;
 
 /**
  * @author G. Miceli
@@ -34,6 +35,12 @@ public abstract class NumericAttributeDefinition extends AttributeDefinition {
 
 	protected NumericAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
+	}
+	
+	protected NumericAttributeDefinition(NumericAttributeDefinition obj, int id) {
+		super(obj, id);
+		this.type = obj.type;
+		this.precisionDefinitions = Objects.clone(obj.precisionDefinitions);
 	}
 
 	public Type getType() {

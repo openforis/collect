@@ -14,11 +14,15 @@ import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.SurveyObject;
-import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Window;
 
 /**
@@ -27,7 +31,7 @@ import org.zkoss.zul.Window;
  */
 public class SchemaTreePopUpVM extends SurveyBaseVM {
 
-	public static final String SCHEMA_TREE_NODE_SELECTED_COMMAND = "schemaTreeNodeSelected";
+	public static final String NODE_SELECTED_EVENT_NAME = "onNodeSelected";
 	
 	private SchemaTreeModel treeModel;
 	private SurveyObject selectedNode;
@@ -73,19 +77,18 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	}
 	
 	@Command
-	public void apply(@BindingParam("selectedSurveyObject") SurveyObject selectedSurveyObject) {
+	public void apply(@BindingParam("selectedSurveyObject") SurveyObject selectedSurveyObject, 
+			@ContextParam(ContextType.VIEW) Component view) {
 		if ( selectedSurveyObject == null || 
 				( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
 				&& ( selectableNodePredicate == null || selectableNodePredicate.evaluate(selectedSurveyObject) ) ) {
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("node", selectedSurveyObject);
-			BindUtils.postGlobalCommand(null, null, SCHEMA_TREE_NODE_SELECTED_COMMAND, args);
+			Events.postEvent(new NodeSelectedEvent(view, selectedSurveyObject));
 		}
 	}
 	
 	@Command
-	public void cancel() {
-		BindUtils.postGlobalCommand(null, null, "closeSchemaNodeSelector", null);
+	public void cancel(@ContextParam(ContextType.VIEW) Component view) {
+		Events.postEvent("onClose", view, null);
 	}
 	
 	@Command
@@ -105,4 +108,17 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 		return treeModel;
 	}
 	
+	public static class NodeSelectedEvent extends Event {
+		
+		private static final long serialVersionUID = 1L;
+
+		public NodeSelectedEvent(Component target, SurveyObject selectedItem) {
+			super(NODE_SELECTED_EVENT_NAME, target, selectedItem);
+		}
+
+		public SurveyObject getSelectedItem() {
+			return (SurveyObject) getData();
+		}
+		
+	}
 }

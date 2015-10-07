@@ -11,6 +11,14 @@ public class LanguageSpecificTextMap extends LanguageSpecificTextAbstractMap<Lan
 
 	private static final long serialVersionUID = 1L;
 
+	public LanguageSpecificTextMap() {
+		super();
+	}
+	
+	public LanguageSpecificTextMap(LanguageSpecificTextMap obj) {
+		super(obj);
+	}
+	
 	public static void assignDefaultToVoidLanguageText(LanguageSpecificTextMap labels, String defaultLanguageCode) {
 		if ( labels != null ) {
 			String voidLanguageText = labels.getText(null);

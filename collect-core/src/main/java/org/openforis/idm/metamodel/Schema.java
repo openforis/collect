@@ -278,6 +278,33 @@ public class Schema extends SurveyObject {
 		return index(createCoordinateAttributeDefinition(nextId()));
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <T extends NodeDefinition> T cloneDefinition(T def) {
+		if (def instanceof BooleanAttributeDefinition) {
+			return index((T) new BooleanAttributeDefinition((BooleanAttributeDefinition) def, nextId()));
+		} else if (def instanceof CodeAttributeDefinition) {
+			return index((T) new CodeAttributeDefinition((CodeAttributeDefinition) def, nextId()));
+		} else if (def instanceof CoordinateAttributeDefinition) {
+			return index((T) new CoordinateAttributeDefinition((CoordinateAttributeDefinition) def, nextId()));
+		} else if (def instanceof DateAttributeDefinition) {
+			return index((T) new DateAttributeDefinition((DateAttributeDefinition) def, nextId()));
+		} else if (def instanceof FileAttributeDefinition) {
+			return index((T) new FileAttributeDefinition((FileAttributeDefinition) def, nextId()));
+		} else if (def instanceof NumberAttributeDefinition) {
+			return index((T) new NumberAttributeDefinition((NumberAttributeDefinition) def, nextId()));
+		} else if (def instanceof RangeAttributeDefinition) {
+			return index((T) new RangeAttributeDefinition((RangeAttributeDefinition) def, nextId()));
+		} else if (def instanceof TaxonAttributeDefinition) {
+			return index((T) new TaxonAttributeDefinition((TaxonAttributeDefinition) def, nextId()));
+		} else if (def instanceof TextAttributeDefinition) {
+			return index((T) new TextAttributeDefinition((TextAttributeDefinition) def, nextId()));
+		} else if (def instanceof TimeAttributeDefinition) {
+			return index((T) new TimeAttributeDefinition((TimeAttributeDefinition) def, nextId()));
+		} else {
+			throw new UnsupportedOperationException("Clone not supported for node type: " + def.getClass().getName());
+		}
+	}
+	
 	public void detach(NodeDefinition defn) {
 		int id = defn.getId();
 		definitionsById.remove(id);	
@@ -325,7 +352,6 @@ public class Schema extends SurveyObject {
 	public void changeParentEntity(NodeDefinition node, EntityDefinition newParent) {
 		EntityDefinition oldParent = node.getParentEntityDefinition();
 		oldParent.removeChildDefinition(node, false);
-		node.setParentDefinition(null);
 		newParent.addChildDefinition(node);
 	}
 

@@ -36,6 +36,12 @@ public abstract class TypedLanguageSpecificTextAbstractMap<L extends TypedLangua
 		map = new LinkedHashMap<MapKey<T>, L>();
 	}
 	
+	@SuppressWarnings("unchecked")
+	TypedLanguageSpecificTextAbstractMap(TypedLanguageSpecificTextAbstractMap<?, ?> obj) {
+		this();
+		this.map = (LinkedHashMap<MapKey<T>, L>) obj.map.clone();
+	}
+	
 	public L get(T type, String language) {
 		MapKey<T> key = new MapKey<T>(type, language);
 		return map.get(key);

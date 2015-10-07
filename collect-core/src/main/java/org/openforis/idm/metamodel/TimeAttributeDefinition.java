@@ -24,10 +24,14 @@ public class TimeAttributeDefinition extends AttributeDefinition {
 		new FieldDefinition<Integer>(MINUTE_FIELD, "m", "m", Integer.class, this)
 	);
 	
-	protected TimeAttributeDefinition(Survey survey, int id) {
+	TimeAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
 	}
 
+	TimeAttributeDefinition(TimeAttributeDefinition obj, int id) {
+		super(obj, id);
+	}
+	
 	@Override
 	public Node<?> createNode() {
 		return new TimeAttribute(this);

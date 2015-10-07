@@ -36,6 +36,7 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	private boolean allowUnlisted;
 	private CodeList list;
 	private CodeAttributeDefinition parentCodeAttributeDefinition;
+
 	private String tempParentExpression;
 	
 	/**
@@ -46,6 +47,14 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 	CodeAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
 		this.allowValuesSorting = false;
+	}
+	
+	CodeAttributeDefinition(CodeAttributeDefinition obj, int id) {
+		super(obj, id);
+		this.allowUnlisted = obj.allowUnlisted;
+		this.list = obj.list;
+		this.parentCodeAttributeDefinition = obj.parentCodeAttributeDefinition;
+		this.allowValuesSorting = obj.allowValuesSorting;
 	}
 	
 	@Override
