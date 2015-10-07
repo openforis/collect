@@ -210,12 +210,12 @@ public class CEComponentHTMLFormatter {
 					.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("value", "true") //$NON-NLS-1$ //$NON-NLS-2$
-					.t( Messages.getString("CEComponentHTMLFormatter.0", language)); //$NON-NLS-1$
+					.t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.0", language)) ); //$NON-NLS-1$
 				container.e("button") //$NON-NLS-1$
 					.a("type", "button") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("class", "btn btn-info") //$NON-NLS-1$ //$NON-NLS-2$
 					.a("value", "false") //$NON-NLS-1$ //$NON-NLS-2$
-					.t( Messages.getString("CEComponentHTMLFormatter.88", language)); //$NON-NLS-1$
+					.t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.88", language) )); //$NON-NLS-1$
 				break;
 			case COORDINATE:
 				break;
@@ -270,7 +270,7 @@ public class CEComponentHTMLFormatter {
 			}
 			
 			if(!hasNAoption){
-				selectBuilder.e("option").a("value", "").t(Messages.getString("CEComponentHTMLFormatter.119", language)); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				selectBuilder.e("option").a("value", "").t( HtmlUnicodeEscaperUtil.escapeForBalloon( Messages.getString("CEComponentHTMLFormatter.119", language) )); //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 			
 			for (CodeListItem item : rootItems) {
