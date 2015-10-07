@@ -25,11 +25,14 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 	
 	private boolean affirmativeOnly;
 
-
 	BooleanAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
 	}
 
+	BooleanAttributeDefinition(BooleanAttributeDefinition obj, int id) {
+		super(obj, id);
+	}
+	
 	public boolean isAffirmativeOnly() {
 		return affirmativeOnly;
 	}

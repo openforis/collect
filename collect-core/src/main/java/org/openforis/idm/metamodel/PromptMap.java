@@ -9,4 +9,12 @@ public class PromptMap extends TypedLanguageSpecificTextAbstractMap<Prompt, Prom
 
 	private static final long serialVersionUID = 1L;
 
+	public PromptMap() {
+	}
+	
+	public PromptMap(PromptMap prompts) {
+		super(prompts);
+	}
+
+
 }

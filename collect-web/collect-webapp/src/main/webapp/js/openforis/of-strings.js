@@ -22,3 +22,17 @@ OF.Strings.firstNotBlank = function() {
 OF.Strings.escapeHtml = function(str) {
 	return $('<div>').text(str).html();
 };
+
+OF.Strings.leftPad = function(str, pad, length) {
+	while (str.length < length) {
+		str = pad + str;
+	}
+	return str;
+}
+
+OF.Strings.rightPad = function(str, pad, length) {
+	while (str.length < length) {
+		str = str + pad;
+	}
+	return str;
+}

@@ -30,6 +30,10 @@ public class DateAttributeDefinition extends AttributeDefinition {
 		super(survey, id);
 	}
 
+	DateAttributeDefinition(DateAttributeDefinition obj, int id) {
+		super(obj, id);
+	}
+	
 	@Override
 	public Node<?> createNode() {
 		return new DateAttribute(this);

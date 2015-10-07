@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author G. Miceli
  * @author M. Togna
  */
-public class Precision implements Serializable {
+public class Precision implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,6 +41,13 @@ public class Precision implements Serializable {
 		this.defaultPrecision = defaultPrecision;
 	}
 
+	@Override
+	public Precision clone() throws CloneNotSupportedException {
+		Precision clone = (Precision) super.clone();
+		clone.setUnit(this.unit);
+		return clone;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

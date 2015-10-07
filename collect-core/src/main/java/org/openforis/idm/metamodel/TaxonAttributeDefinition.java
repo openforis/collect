@@ -48,7 +48,11 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	TaxonAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
 	}
-
+	
+	TaxonAttributeDefinition(TaxonAttributeDefinition obj, int id) {
+		super(obj, id);
+	}
+	
 	@Override
 	public Node<?> createNode() {
 		return new TaxonAttribute(this);

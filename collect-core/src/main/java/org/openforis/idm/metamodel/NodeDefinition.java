@@ -36,7 +36,9 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	private NodeLabelMap labels;
 	private PromptMap prompts;
 	private LanguageSpecificTextMap descriptions;
-	private String path;
+	
+	//calculated properties
+	private transient String path;
 	private transient Integer fixedMaxCount;
 	private transient Integer fixedMinCount;
 	private transient boolean alwaysRequired;
@@ -45,6 +47,19 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		super(survey, id);
 	}
 
+	NodeDefinition(NodeDefinition nodeDef, int id) {
+		super(nodeDef, id);
+		this.parentDefinition = nodeDef.parentDefinition;
+		this.name = nodeDef.name;
+		this.relevantExpression = nodeDef.relevantExpression;
+		this.multiple = nodeDef.multiple;
+		this.minCountExpression = nodeDef.minCountExpression;
+		this.maxCountExpression = nodeDef.maxCountExpression;
+		this.labels = nodeDef.labels == null ? null: new NodeLabelMap(nodeDef.labels);
+		this.prompts = nodeDef.prompts == null ? null: new PromptMap(nodeDef.prompts);
+		this.descriptions = nodeDef.descriptions == null ? null: new LanguageSpecificTextMap(nodeDef.descriptions);
+	}
+	
 	public abstract Node<?> createNode();
 
 	/**

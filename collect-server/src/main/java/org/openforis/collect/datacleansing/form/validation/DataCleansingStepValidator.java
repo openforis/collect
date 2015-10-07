@@ -79,7 +79,7 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 		} else {
 			for (String expr : fieldFixExpressions) {
 				if (StringUtils.isNotBlank(expr)) {
-					validateValueExpression(errors, attrDef, attrDef, UPDATE_VALUES_FIELD, expr);
+					validateValueExpression(errors, attrDef.getParentEntityDefinition(), attrDef, UPDATE_VALUES_FIELD, expr);
 				}
 			}
 		}
@@ -101,7 +101,7 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 			String defaultMessage = messageSource.getMessage(errorCode, args, Locale.ENGLISH);
 			errors.rejectValue(UPDATE_VALUES_FIELD, errorCode, args, defaultMessage);
 		} else {
-			validateValueExpression(errors, attrDef, attrDef, UPDATE_VALUES_FIELD, fixExpression);
+			validateValueExpression(errors, attrDef.getParentEntityDefinition(), attrDef, UPDATE_VALUES_FIELD, fixExpression);
 		}
 	}
 
@@ -113,7 +113,7 @@ public class DataCleansingStepValidator extends SimpleValidator<DataCleansingSte
 		CollectSurvey survey = getActiveSurvey();
 		DataQuery query = dataQueryManager.loadById(survey, target.getQueryId());
 		AttributeDefinition attrDef = query.getAttributeDefinition();
-		validateBooleanExpression(errors, attrDef, attrDef, UPDATE_VALUES_FIELD, condition);
+		validateBooleanExpression(errors, attrDef.getParentEntityDefinition(), attrDef, UPDATE_VALUES_FIELD, condition);
 	}
 
 	private boolean isEmpty(List<String> values) {

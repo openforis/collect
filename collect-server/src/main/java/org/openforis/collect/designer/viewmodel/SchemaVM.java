@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +39,7 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -65,6 +68,7 @@ import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
@@ -104,6 +108,8 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private static final Set<AttributeType> SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES = Sets.immutableEnumSet(BOOLEAN, CODE, DATE, NUMBER, TEXT, TIME);
 	
+	private static final Pattern CLONED_NAME_PATTERN = Pattern.compile("(.*)_(\\d+)");
+
 	private SchemaNodeData selectedTreeNode;
 	private SurveyObject editedNode;
 	private boolean newNode;
@@ -135,7 +141,6 @@ public class SchemaVM extends SurveyBaseVM {
 	
 	//transient
 	private Window rootEntityEditPopUp;
-	private Window nodeMovePopUp;
 
 	private SchemaTreeModel treeModel;
 
@@ -1249,11 +1254,25 @@ public class SchemaVM extends SurveyBaseVM {
 			NodeDefinition selectedNode = (NodeDefinition) selectedItem;
 			boolean changeParentNodeAllowed = checkChangeParentNodeAllowed(selectedNode);
 			if ( changeParentNodeAllowed ) {
-				openSelectParentNodePopup(selectedNode);
+				openSelectParentNodePopupForReparent(selectedNode);
 			}
 		} else {
 			//TODO support tab moving
 			return;
+		}
+	}
+
+	@Command
+	public void openDuplicateNodePopup() {
+		SchemaNodeData selectedTreeNode = getSelectedTreeNode();
+		if ( selectedTreeNode == null ) {
+			return;
+		}
+		SurveyObject selectedItem = selectedTreeNode.getSurveyObject();
+		
+		if ( selectedItem instanceof AttributeDefinition ) {
+			AttributeDefinition selectedNode = (AttributeDefinition) selectedItem;
+			openSelectParentNodePopupForDuplicate(selectedNode);
 		}
 	}
 
@@ -1273,7 +1292,7 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 
-	private void openSelectParentNodePopup(final NodeDefinition selectedItem) {
+	private void openSelectParentNodePopupForReparent(final NodeDefinition selectedItem) {
 		UIOptions uiOptions = survey.getUIOptions();
 		final Set<UITab> assignableTabs = new HashSet<UITab>(uiOptions.getAssignableTabs(editedNodeParentEntity, selectedItem));
 		final NodeDefinition parentDefn = selectedItem.getParentDefinition();
@@ -1320,33 +1339,98 @@ public class SchemaVM extends SurveyBaseVM {
 		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
 		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
 
-		nodeMovePopUp = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, true, disabledPredicate, null, parentItem);
-	}
-	
-	@GlobalCommand
-	public void closeSchemaNodeSelector() {
-		if ( nodeMovePopUp != null ) {
-			closePopUp(nodeMovePopUp);
-			nodeMovePopUp = null;
-		}
-	}
-	
-	@GlobalCommand
-	public void schemaTreeNodeSelected(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("node") SurveyObject surveyObject) {
-		if ( surveyObject instanceof UITab ) {
-			UITab tab = (UITab) surveyObject;
-			EntityDefinition newParentEntityDef = tab.getUIOptions().getParentEntityForAssignedNodes(tab);
-			NodeDefinition editedNodeDef = (NodeDefinition) editedNode;
-			if (editedNodeDef.getParentDefinition() != newParentEntityDef) {
-				changeEditedNodeParentEntity(newParentEntityDef);
+		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, true, disabledPredicate, null, parentItem);
+		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+			public void onEvent(NodeSelectedEvent event) throws Exception {
+				SurveyObject selectedParent = event.getSelectedItem();
+				changeEditedNodeParent(selectedParent, false);
+				closePopUp(popup);
 			}
-			associateNodeToTab(editedNodeDef, tab);
-		} else if ( surveyObject instanceof EntityDefinition ) {
-			changeEditedNodeParentEntity((EntityDefinition) surveyObject);
+		});
+	}
+	
+	private void openSelectParentNodePopupForDuplicate(final NodeDefinition node) {
+		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
+			@Override
+			public boolean evaluate(SurveyObject item) {
+				return item instanceof UITab || item instanceof EntityDefinition;
+			}
+		};
+		Predicate<SurveyObject> disabledPredicate = new Predicate<SurveyObject>() {
+			@Override
+			public boolean evaluate(SurveyObject item) {
+				return ! ( item instanceof UITab || item instanceof EntityDefinition);
+			}
+		};
+		String nodeName = node.getName();
+		UITab assignedTab = survey.getUIOptions().getAssignedTab((NodeDefinition) node);
+		String assignedTabLabel = assignedTab.getLabel(currentLanguageCode);
+		String title = Labels.getLabel("survey.schema.duplicate_node_popup_title", new String[]{getNodeTypeHeaderLabel(), nodeName, assignedTabLabel});
+		
+		//calculate parent item (tab or entity)
+		SchemaTreeNode treeNode = treeModel.getTreeNode(node);
+		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
+		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
+
+		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, true, disabledPredicate, null, parentItem);
+		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+			public void onEvent(NodeSelectedEvent event) throws Exception {
+				SurveyObject selectedParent = event.getSelectedItem();
+				NodeDefinition clone = survey.getSchema().cloneDefinition(node);
+				clone.setName(createDuplicateNodeName(node, determineRelatedEntity(selectedParent)));
+				editedNode = clone;
+				changeEditedNodeParent(selectedParent, true);
+				closePopUp(popup);
+			}
+		});
+	}
+	
+	/**
+	 * Creates a name for node that will be the dupliacte of the specified one.
+	 * The new name will be unique inside the specified parent entity.
+	 */
+	private String createDuplicateNodeName(NodeDefinition nodeToBeDuplicate, EntityDefinition parent) {
+		String name = nodeToBeDuplicate.getName();
+		Matcher matcher = CLONED_NAME_PATTERN.matcher(name);
+		String prefix;
+		int progressiveNum;
+		if (matcher.matches()) {
+			prefix = matcher.group(1);
+			progressiveNum = Integer.parseInt(matcher.group(2));
+		} else {
+			prefix = name;
+			progressiveNum = 0;
 		}
-		closeSchemaNodeSelector();
+		//find unique new name
+		String newName;
+		do {
+			progressiveNum ++;
+			newName = prefix + "_" + progressiveNum;
+		} while (parent.containsChildDefinition(newName));
+		return newName;
 	}
 
+	private void changeEditedNodeParent(SurveyObject newParent, boolean forceReassignment) {
+		EntityDefinition newParentEntityDef = determineRelatedEntity(newParent);
+		NodeDefinition editedNodeDef = (NodeDefinition) editedNode;
+		if (forceReassignment || editedNodeDef.getParentDefinition() != newParentEntityDef) {
+			changeEditedNodeParentEntity(newParentEntityDef);
+		}
+		if ( newParent instanceof UITab ) {
+			associateNodeToTab(editedNodeDef, (UITab) newParent);
+		}
+	}
+
+	private EntityDefinition determineRelatedEntity(SurveyObject newParent) {
+		EntityDefinition newParentEntityDef;
+		if ( newParent instanceof UITab ) {
+			newParentEntityDef = ((UITab) newParent).getUIOptions().getParentEntityForAssignedNodes((UITab) newParent);
+		} else {
+			newParentEntityDef = (EntityDefinition) newParent;
+		}
+		return newParentEntityDef;
+	}
+	
 	private void changeEditedNodeParentEntity(EntityDefinition newParentEntity) {
 		//update parent entity
 		NodeDefinition node = (NodeDefinition) editedNode;

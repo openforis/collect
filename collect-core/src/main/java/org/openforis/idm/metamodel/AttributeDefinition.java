@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.commons.lang.Objects;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.model.Value;
 
@@ -36,6 +37,14 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		this.calculated = false;
 	}
 
+	AttributeDefinition(AttributeDefinition attrDef, int id) {
+		super(attrDef, id);
+		this.key = attrDef.key;
+		this.calculated = attrDef.calculated;
+		this.checks = Objects.clone(attrDef.checks);
+		this.attributeDefaults = Objects.clone(attrDef.attributeDefaults);
+	}
+	
 	@Override
 	public boolean isCalculated() {
 		return calculated;
