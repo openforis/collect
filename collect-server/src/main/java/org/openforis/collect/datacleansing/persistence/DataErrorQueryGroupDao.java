@@ -43,8 +43,8 @@ public class DataErrorQueryGroupDao extends SurveyObjectMappingJooqDaoSupport<Da
 		Select<OfcDataErrorQueryGroupRecord> select = 
 			dsl.selectFrom(OFC_DATA_ERROR_QUERY_GROUP)
 				.where(OFC_DATA_ERROR_QUERY_GROUP.SURVEY_ID.eq(survey.getId()))
+				.orderBy(OFC_DATA_ERROR_QUERY_GROUP.TITLE)
 			;
-		
 		Result<OfcDataErrorQueryGroupRecord> result = select.fetch();
 		return dsl.fromResult(result);
 	}
