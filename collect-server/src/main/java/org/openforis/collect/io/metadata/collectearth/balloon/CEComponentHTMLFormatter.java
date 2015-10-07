@@ -49,7 +49,7 @@ public class CEComponentHTMLFormatter {
 	}
 	
 	private XMLBuilder createBuilder(CETab tab, XMLBuilder parentBuilder) throws Exception {
-		parentBuilder.e("h3").t( StringEscapeUtils.escapeHtml4(  tab.getLabel() ) ); //$NON-NLS-1$
+		parentBuilder.e("h3").t(  HtmlUnicodeEscaperUtil.escapeHtmlUnicode(  tab.getLabel() ) ); //$NON-NLS-1$
 
 		XMLBuilder bodyContentBuilder = parentBuilder.e("section"); //$NON-NLS-1$
 		bodyContentBuilder.a("class", "step"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -396,7 +396,7 @@ public class CEComponentHTMLFormatter {
 		if (StringUtils.isBlank(itemLabel)) {
 			itemLabel = item.getCode();
 		}
-		return   StringEscapeUtils.escapeHtml4( itemLabel );
+		return   HtmlUnicodeEscaperUtil.escapeHtmlUnicode( itemLabel );
 	}
 
 	private String getDescription(CodeListItem item) {
@@ -404,7 +404,7 @@ public class CEComponentHTMLFormatter {
 		if (StringUtils.isBlank(description) && ! language.equals(item.getSurvey().getDefaultLanguage())) {
 			description = item.getDescription();
 		}
-		return StringEscapeUtils.escapeHtml4( description );
+		return HtmlUnicodeEscaperUtil.escapeHtmlUnicode( description );
 	}
 
 }

@@ -95,12 +95,12 @@ public class CollectEarthBalloonGenerator {
 	}
 
 	private String replaceButtonLocalizationText(String htmlForBalloon) {
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_FINISH_TRANSLATION, StringEscapeUtils.escapeHtml4( Messages.getString("CollectEarthBalloonGenerator.11", language) ) ); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_NEXT_TRANSLATION, StringEscapeUtils.escapeHtml4(Messages.getString("CollectEarthBalloonGenerator.12", language)) ); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_PREVIOUS_TRANSLATION,StringEscapeUtils.escapeHtml4(Messages.getString("CollectEarthBalloonGenerator.13", language)) ); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_FINISH_TRANSLATION, HtmlUnicodeEscaperUtil.escapeHtmlUnicode( Messages.getString("CollectEarthBalloonGenerator.11", language) ) ); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_NEXT_TRANSLATION, HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.12", language)) ); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_FOR_PREVIOUS_TRANSLATION,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.13", language)) ); //$NON-NLS-1$
 		
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_COLLECT_NOT_RUNNING,StringEscapeUtils.escapeHtml4(Messages.getString("CollectEarthBalloonGenerator.14", language)) ); //$NON-NLS-1$
-		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_PLACEMARK_ALREADY_FILLED,StringEscapeUtils.escapeHtml4(Messages.getString("CollectEarthBalloonGenerator.15", language)) ); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_COLLECT_NOT_RUNNING,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.14", language)) ); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_PLACEMARK_ALREADY_FILLED,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.15", language)) ); //$NON-NLS-1$
 		
 		return htmlForBalloon;
 	}
