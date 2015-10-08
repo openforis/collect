@@ -72,22 +72,6 @@
   "cleansingSteps": [
     {
       "id": 5,
-      "uuid": "02fd4fb7-505c-4b0b-8868-1c6adef3c4ac",
-      "creationDate": "2015-08-27T15:25:01.928+02:00",
-      "modifiedDate": "2015-08-27T17:28:35.896+02:00",
-      "queryId": 1,
-      "title": "Update empty sampling unit notes with \"NA\"",
-      "description": "Calculation step 1 description",
-      "updateValues": [
-      		{
-		      "fixExpression": "\"NA\"",
-		      "fieldFixExpressions": [],
-		      "updateType": "ATTRIBUTE"
-	      }
-	   ]
-    },
-    {
-      "id": 6,
       "uuid": "fb279de6-fa19-4f55-841d-8d8d700a68f7",
       "creationDate": "2015-08-27T17:29:24.325+02:00",
       "modifiedDate": "2015-08-27T17:30:23.519+02:00",
@@ -101,6 +85,22 @@
 		      "updateType": "ATTRIBUTE"
 		    }
 		]
+    },
+    {
+      "id": 6,
+      "uuid": "02fd4fb7-505c-4b0b-8868-1c6adef3c4ac",
+      "creationDate": "2015-08-27T15:25:01.928+02:00",
+      "modifiedDate": "2015-08-27T17:28:35.896+02:00",
+      "queryId": 1,
+      "title": "Update empty sampling unit notes with \"NA\"",
+      "description": "Calculation step 1 description",
+      "updateValues": [
+      		{
+		      "fixExpression": "\"NA\"",
+		      "fieldFixExpressions": [],
+		      "updateType": "ATTRIBUTE"
+	      }
+	   ]
     }
   ],
   "cleansingChains": [
@@ -114,22 +114,6 @@
       "steps": [
         {
 	      "id": 5,
-	      "uuid": "02fd4fb7-505c-4b0b-8868-1c6adef3c4ac",
-	      "creationDate": "2015-08-27T15:25:01.928+02:00",
-	      "modifiedDate": "2015-08-27T17:28:35.896+02:00",
-	      "queryId": 1,
-	      "title": "Update empty sampling unit notes with \"NA\"",
-	      "description": "Calculation step 1 description",
-	      "updateValues": [
-      		{
-		      "fixExpression": "\"NA\"",
-		      "fieldFixExpressions": [],
-		      "updateType": "ATTRIBUTE"
-		   	}
-		   ]
-	    },
-	    {
-	      "id": 6,
 	      "uuid": "fb279de6-fa19-4f55-841d-8d8d700a68f7",
 	      "creationDate": "2015-08-27T17:29:24.325+02:00",
 	      "modifiedDate": "2015-08-27T17:30:23.519+02:00",
@@ -142,6 +126,22 @@
 		      "fieldFixExpressions": [],
 		      "updateType": "ATTRIBUTE"
 		    }
+		   ]
+	    },
+	    {
+	      "id": 6,
+	      "uuid": "02fd4fb7-505c-4b0b-8868-1c6adef3c4ac",
+	      "creationDate": "2015-08-27T15:25:01.928+02:00",
+	      "modifiedDate": "2015-08-27T17:28:35.896+02:00",
+	      "queryId": 1,
+	      "title": "Update empty sampling unit notes with \"NA\"",
+	      "description": "Calculation step 1 description",
+	      "updateValues": [
+      		{
+		      "fixExpression": "\"NA\"",
+		      "fieldFixExpressions": [],
+		      "updateType": "ATTRIBUTE"
+		   	}
 		   ]
 	    }
       ],

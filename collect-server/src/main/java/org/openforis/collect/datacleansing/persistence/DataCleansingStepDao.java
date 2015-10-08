@@ -67,7 +67,8 @@ public class DataCleansingStepDao extends SurveyObjectMappingJooqDaoSupport<Data
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataCleansingStepRecord> select = 
 			dsl.selectFrom(OFC_DATA_CLEANSING_STEP)
-				.where(OFC_DATA_CLEANSING_STEP.QUERY_ID.in(createQueryIdsSelect(dsl, survey)));
+				.where(OFC_DATA_CLEANSING_STEP.QUERY_ID.in(createQueryIdsSelect(dsl, survey)))
+				.orderBy(OFC_DATA_CLEANSING_STEP.TITLE);
 		
 		Result<OfcDataCleansingStepRecord> result = select.fetch();
 		return dsl.fromResult(result);

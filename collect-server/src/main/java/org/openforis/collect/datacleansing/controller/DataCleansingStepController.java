@@ -10,7 +10,7 @@ import org.openforis.collect.datacleansing.manager.DataCleansingStepManager;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
-import org.openforis.commons.web.Response;
+import org.openforis.collect.web.controller.CollectJobController.JobView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -59,7 +59,7 @@ public class DataCleansingStepController extends AbstractSurveyObjectEditFormCon
 	
 	@RequestMapping(value="run.json", method = RequestMethod.POST)
 	public @ResponseBody
-	Response run(@RequestParam int cleansingStepId, @RequestParam Step recordStep) {
+	DataCleangingChainExecutorJobView run(@RequestParam int cleansingStepId, @RequestParam Step recordStep) {
 		CollectSurvey survey = sessionManager.getActiveSurvey();
 		DataCleansingStep cleansingStep = dataCleansingStepManager.loadById(survey, cleansingStepId);
 		DataCleansingChain chain = new DataCleansingChain(survey);
@@ -69,8 +69,27 @@ public class DataCleansingStepController extends AbstractSurveyObjectEditFormCon
 		job.setChain(chain);
 		job.setRecordStep(recordStep);
 		collectJobManager.startSurveyJob(job);
-		Response response = new Response();
-		return response;
+		return new DataCleangingChainExecutorJobView(job);
+	}
+	
+	public static class DataCleangingChainExecutorJobView extends JobView {
+
+		private int updatedRecords;
+		private int processedNodes;
+
+		public DataCleangingChainExecutorJobView(DataCleansingChainExecutorJob job) {
+			super(job);
+			this.updatedRecords = job.getUpdatedRecords();
+			processedNodes = job.getProcessedNodes();
+		}
+		
+		public int getUpdatedRecords() {
+			return updatedRecords;
+		}
+		
+		public int getProcessedNodes() {
+			return processedNodes;
+		}
 	}
 	
 }

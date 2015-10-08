@@ -32,8 +32,10 @@ public class DataErrorTypeDao extends SurveyObjectMappingJooqDaoSupport<DataErro
 	
 	public List<DataErrorType> loadBySurvey(CollectSurvey survey) {
 		JooqDSLContext dsl = dsl(survey);
-		Select<OfcDataErrorTypeRecord> select = dsl.selectFrom(OFC_DATA_ERROR_TYPE)
-			.where(OFC_DATA_ERROR_TYPE.SURVEY_ID.eq(survey.getId()));
+		Select<OfcDataErrorTypeRecord> select = dsl
+			.selectFrom(OFC_DATA_ERROR_TYPE)
+			.where(OFC_DATA_ERROR_TYPE.SURVEY_ID.eq(survey.getId()))
+			.orderBy(OFC_DATA_ERROR_TYPE.CODE);
 		Result<OfcDataErrorTypeRecord> result = select.fetch();
 		return dsl.fromResult(result);
 	}

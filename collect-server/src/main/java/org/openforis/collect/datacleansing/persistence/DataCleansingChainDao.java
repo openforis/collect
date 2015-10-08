@@ -16,7 +16,6 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.Select;
-import org.jooq.SelectConditionStep;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingStep;
@@ -43,7 +42,8 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataCleansingChainRecord> select = 
 			dsl.selectFrom(OFC_DATA_CLEANSING_CHAIN)
-				.where(OFC_DATA_CLEANSING_CHAIN.SURVEY_ID.eq(survey.getId()));
+				.where(OFC_DATA_CLEANSING_CHAIN.SURVEY_ID.eq(survey.getId()))
+				.orderBy(OFC_DATA_CLEANSING_CHAIN.TITLE);
 		
 		Result<OfcDataCleansingChainRecord> result = select.fetch();
 		return dsl.fromResult(result);
@@ -51,9 +51,11 @@ public class DataCleansingChainDao extends SurveyObjectMappingJooqDaoSupport<Dat
 
 	public Set<DataCleansingChain> loadChainsByStep(DataCleansingStep step) {
 		JooqDSLContext dsl = dsl((CollectSurvey) step.getSurvey());
-		SelectConditionStep<Record1<Integer>> subselect = dsl.select(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID)
+		Select<Record1<Integer>> subselect = dsl
+			.select(OFC_DATA_CLEANSING_CHAIN_STEPS.CHAIN_ID)
 			.from(OFC_DATA_CLEANSING_CHAIN_STEPS)
-			.where(OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID.eq(step.getId()));
+			.where(OFC_DATA_CLEANSING_CHAIN_STEPS.STEP_ID.eq(step.getId()))
+			.orderBy(OFC_DATA_CLEANSING_CHAIN_STEPS.POS);
 		
 		Select<OfcDataCleansingChainRecord> select = 
 			dsl.selectFrom(OFC_DATA_CLEANSING_CHAIN)

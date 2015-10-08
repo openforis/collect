@@ -35,7 +35,8 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 		JooqDSLContext dsl = dsl(survey);
 		Select<OfcDataQueryRecord> select = 
 			dsl.selectFrom(OFC_DATA_QUERY)
-				.where(OFC_DATA_QUERY.SURVEY_ID.eq(survey.getId()));
+				.where(OFC_DATA_QUERY.SURVEY_ID.eq(survey.getId()))
+				.orderBy(OFC_DATA_QUERY.TITLE);
 		
 		Result<OfcDataQueryRecord> result = select.fetch();
 		return dsl.fromResult(result);
