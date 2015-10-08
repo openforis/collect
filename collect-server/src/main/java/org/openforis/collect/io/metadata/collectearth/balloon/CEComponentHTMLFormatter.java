@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreatorImpl;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
@@ -77,7 +76,7 @@ public class CEComponentHTMLFormatter {
 		XMLBuilder tableBuilder = builder.e("table").a("class", "table"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		XMLBuilder headerBuilder = tableBuilder.e("thead").e("tr"); //$NON-NLS-1$ //$NON-NLS-2$
 		for (String heading : comp.getHeadings()) {
-			headerBuilder.e("th").t(heading); //$NON-NLS-1$
+			headerBuilder.e("th").t( HtmlUnicodeEscaperUtil.escapeHtmlUnicode( heading) ); //$NON-NLS-1$
 		}
 		XMLBuilder bodyBuilder = tableBuilder.e("tbody"); //$NON-NLS-1$
 		List<CETableRow> rows = comp.getRows();
