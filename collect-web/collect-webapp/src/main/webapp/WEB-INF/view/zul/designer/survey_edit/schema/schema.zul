@@ -311,6 +311,11 @@
     		image="/assets/images/move-small.png"
     		onClick="@command('openMoveNodePopup')" />
     	<menuseparator />
+    	<!-- Duplicate node -->
+    	<menuitem label="${labels.survey.schema.duplicate_node}"
+    		image="/assets/images/duplicate-small.png"
+    		onClick="@command('openDuplicateNodePopup')" />
+    	<menuseparator />
     	<!-- Remove node -->
     	<menuitem label="${labels.survey.schema.remove_node}"
     		image="/assets/images/delete-small.png"

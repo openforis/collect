@@ -79,6 +79,20 @@ public class DataCleansingStep extends PersistedSurveyObject {
 	public void setUpdateValues(List<DataCleansingStepValue> values) {
 		this.updateValues = values;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if (getId() != null) {
+			sb.append('[');
+			sb.append(getId());
+			sb.append(']');
+		}
+		if (title != null) {
+			sb.append(title);
+		}
+		return sb.toString();
+	}
 
 	@Override
 	public boolean deepEquals(Object obj, boolean ignoreId) {

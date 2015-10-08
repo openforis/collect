@@ -21,7 +21,7 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  * @author M. Togna
  * @author S. Ricci
  */
-public class AttributeDefault implements Serializable, DeepComparable {
+public class AttributeDefault implements Serializable, DeepComparable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -117,6 +117,12 @@ public class AttributeDefault implements Serializable, DeepComparable {
 		return context.getExpressionEvaluator();
 	}
 
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		AttributeDefault clone = (AttributeDefault) super.clone();
+		return clone;
+	}
+	
 	@Override
 	public boolean deepEquals(Object obj) {
 		if (this == obj)

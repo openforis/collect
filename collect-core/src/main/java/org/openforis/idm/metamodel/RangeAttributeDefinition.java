@@ -37,6 +37,10 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		super(survey, id);
 	}
 
+	RangeAttributeDefinition(RangeAttributeDefinition obj, int id) {
+		super(obj, id);
+	}
+	
 	@Override
 	public Node<?> createNode() {
 		Type effectiveType = getType();

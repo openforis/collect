@@ -162,6 +162,7 @@ public class EntityDefinition extends NodeDefinition {
 		if ( detach ) {
 			defn.detach();
 		}
+		defn.setParentDefinition(null);
 		updateChildDefinitionNames();
 	}
 
@@ -261,7 +262,7 @@ public class EntityDefinition extends NodeDefinition {
 	}
 
 	@Override
-	public void detach() {
+	void detach() {
 		if ( childDefinitions != null ) {
 			for (NodeDefinition child : childDefinitions) {
 				child.detach();

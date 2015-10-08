@@ -33,6 +33,10 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 		super(survey, id);
 	}
 
+	NumberAttributeDefinition(NumberAttributeDefinition obj, int id) {
+		super(obj, id);
+	}
+	
 	@Override
 	public Node<?> createNode() {
 		Type effectiveType = getType();

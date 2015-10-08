@@ -22,7 +22,7 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
  * @author G. Miceli
  * @author M. Togna
  */
-public abstract class Check<T extends Attribute<?, ?>> implements Serializable, ValidationRule<T>, DeepComparable {
+public abstract class Check<T extends Attribute<?, ?>> implements Serializable, ValidationRule<T>, DeepComparable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -34,6 +34,9 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 	private String condition;
 	private LanguageSpecificTextMap messages;
 	private String expression;
+	
+	public Check() {
+	}
 	
 	protected abstract String buildExpression();
 
@@ -109,6 +112,14 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 				throw new IdmInterpretationError("Unable to evaluate condition " + condition, e);
 			}
 		}
+	}
+	
+	@Override
+	public Check<T> clone() throws CloneNotSupportedException {
+		@SuppressWarnings("unchecked")
+		Check<T> clone = (Check<T>) super.clone();
+		clone.messages = this.messages == null ? null : new LanguageSpecificTextMap(this.messages);
+		return clone;
 	}
 	
 	@Override

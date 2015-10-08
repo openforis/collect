@@ -14,10 +14,19 @@ public abstract class IdentifiableSurveyObject extends SurveyObject {
 		this.id = id;
 	}
 
+	protected IdentifiableSurveyObject(IdentifiableSurveyObject object, int id) {
+		super(object);
+		this.id = id;
+	}
+	
 	public final int getId() {
 		return id;
 	}
 
+	void setId(int id) {
+		this.id = id;
+	}
+	
 	@Override
 	public boolean deepEquals(Object obj) {
 		if (this == obj)

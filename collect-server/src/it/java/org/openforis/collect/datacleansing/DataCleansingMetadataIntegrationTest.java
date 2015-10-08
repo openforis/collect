@@ -111,15 +111,6 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"));
 		
 		DataCleansingStepBuilder cleansingStepBuilder1 = dataCleansingStep()
-				.uuid("02fd4fb7-505c-4b0b-8868-1c6adef3c4ac")
-				.title("Update empty sampling unit notes with \"NA\"")
-				.description("Calculation step 1 description")
-				.query(dataQueryBuilder1.build())
-				.attributeFixExpression("\"NA\"")
-				.creationDate(Dates.parseDateTime("2015-08-27T15:25:01.928+02:00"))
-				.modifiedDate(Dates.parseDateTime("2015-08-27T17:28:35.896+02:00"));
-			
-		DataCleansingStepBuilder cleansingStepBuilder2 = dataCleansingStep()
 				.uuid("fb279de6-fa19-4f55-841d-8d8d700a68f7")
 				.title("Update empty plot notes with \"NA\"")
 				.description("Calculation step 2 description")
@@ -128,6 +119,15 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 				.creationDate(Dates.parseDateTime("2015-08-27T17:29:24.325+02:00"))
 				.modifiedDate(Dates.parseDateTime("2015-08-27T17:30:23.519+02:00"));
 		
+		DataCleansingStepBuilder cleansingStepBuilder2 = dataCleansingStep()
+				.uuid("02fd4fb7-505c-4b0b-8868-1c6adef3c4ac")
+				.title("Update empty sampling unit notes with \"NA\"")
+				.description("Calculation step 1 description")
+				.query(dataQueryBuilder1.build())
+				.attributeFixExpression("\"NA\"")
+				.creationDate(Dates.parseDateTime("2015-08-27T15:25:01.928+02:00"))
+				.modifiedDate(Dates.parseDateTime("2015-08-27T17:28:35.896+02:00"));
+			
 		DataCleansingMetadata expectedMetadata = metadata(
 			dataQueryBuilder1
 			, dataQueryBuilder2

@@ -126,10 +126,19 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 		step.setTitle("Step 1");
 		step.setDescription("This is the step 1");
 		step.setQuery(query);
-		DataCleansingStepValue updateValue = new DataCleansingStepValue();
-		updateValue.setUpdateType(UpdateType.FIELD);
-		updateValue.setFieldFixExpressions(Arrays.asList("'PIN'", "'Pinus Sp.'")); //set dbh = 20
-		step.addUpdateValue(updateValue);
+		{
+			DataCleansingStepValue updateValue = new DataCleansingStepValue();
+			updateValue.setUpdateType(UpdateType.FIELD);
+			updateValue.setCondition("idm:blank(species/@code)");
+			updateValue.setFieldFixExpressions(Arrays.asList("'UNL'", "'Will not be applied'"));
+			step.addUpdateValue(updateValue);
+		}
+		{
+			DataCleansingStepValue updateValue = new DataCleansingStepValue();
+			updateValue.setUpdateType(UpdateType.FIELD);
+			updateValue.setFieldFixExpressions(Arrays.asList("'PIN'", "'Pinus Sp.'"));
+			step.addUpdateValue(updateValue);
+		}	
 		stepManager.save(step);
 		
 		chain.addStep(step);
