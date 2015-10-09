@@ -68,7 +68,7 @@ public class CollectEarthBalloonGenerator {
 	private static final String PLACEHOLDER_FOR_PREVIOUS_TRANSLATION = "PLACEHOLDER_PREVIOUS"; //$NON-NLS-1$
 	private static final String PLACEHOLDER_COLLECT_NOT_RUNNING = "PLACEHOLDER_COLLECT_NOT_RUNNING";//$NON-NLS-1$
 	private static final String PLACEHOLDER_PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";//$NON-NLS-1$
-
+	private static final String PLACEHOLDER_UI_LANGUAGE = "PLACEHOLDER_UI_LANGUAGE";
 
 
 	private CollectSurvey survey;
@@ -101,6 +101,7 @@ public class CollectEarthBalloonGenerator {
 		
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_COLLECT_NOT_RUNNING,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.14", language)) ); //$NON-NLS-1$
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_PLACEMARK_ALREADY_FILLED,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.15", language)) ); //$NON-NLS-1$
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_UI_LANGUAGE, language ); //$NON-NLS-1$
 		
 		return htmlForBalloon;
 	}
