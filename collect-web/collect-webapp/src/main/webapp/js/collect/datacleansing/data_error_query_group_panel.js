@@ -1,7 +1,7 @@
 Collect.DataCleansing.DataErrorQueryGroupPanelController = function($panel) {
 	Collect.AbstractItemPanel.apply(this, [$panel, "Data Error Group", 
 			Collect.DataErrorQueryGroupDialogController,
-			collect.DataErrorQueryGroupService, 
+			collect.dataErrorQueryGroupService, 
 			Collect.DataCleansing.DATA_ERROR_QUERY_GROUP_DELETED]);
 };
 
