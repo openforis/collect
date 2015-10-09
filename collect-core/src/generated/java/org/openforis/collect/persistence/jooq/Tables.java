@@ -42,6 +42,11 @@ public class Tables {
 	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChainSteps OFC_DATA_CLEANSING_CHAIN_STEPS = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChainSteps.OFC_DATA_CLEANSING_CHAIN_STEPS;
 
 	/**
+	 * The table collect.ofc_data_cleansing_report
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingReport OFC_DATA_CLEANSING_REPORT = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingReport.OFC_DATA_CLEANSING_REPORT;
+
+	/**
 	 * The table collect.ofc_data_cleansing_step
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep OFC_DATA_CLEANSING_STEP = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep.OFC_DATA_CLEANSING_STEP;

@@ -8,16 +8,15 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
-import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataErrorQuery;
+import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
 import org.openforis.collect.datacleansing.DataErrorType;
 import org.openforis.collect.datacleansing.DataQuery;
-import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
@@ -36,30 +35,23 @@ public class DataErrorQueryDao extends SurveyObjectMappingJooqDaoSupport<DataErr
 		super(DataErrorQueryDao.JooqDSLContext.class);
 	}
 	
-	public static Select<Record1<Integer>> createErrorTypeIdsSelect(DSLContext dsl, CollectSurvey survey) {
-		Select<Record1<Integer>> select = 
-			dsl.select(OFC_DATA_ERROR_TYPE.ID)
-				.from(OFC_DATA_ERROR_TYPE)
-				.where(OFC_DATA_ERROR_TYPE.SURVEY_ID.eq(survey.getId()));
-		return select;
-	}
-
 	@Override
 	public List<DataErrorQuery> loadBySurvey(CollectSurvey survey) {
 		JooqDSLContext dsl = dsl(survey);
-		Select<OfcDataErrorQueryRecord> select = 
-			dsl.selectFrom(OFC_DATA_ERROR_QUERY)
-				.where(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID.in(createErrorTypeIdsSelect(dsl, survey)));
-		
-		Result<OfcDataErrorQueryRecord> result = select.fetch();
-		return dsl.fromResult(result);
+		SelectConditionStep<Record> select = dsl
+			.select(OFC_DATA_ERROR_QUERY.fields())
+			.from(OFC_DATA_ERROR_QUERY)
+			.join(OFC_DATA_ERROR_TYPE)
+				.on(OFC_DATA_ERROR_TYPE.ID.eq(OFC_DATA_ERROR_QUERY.ERROR_TYPE_ID))
+			.where(OFC_DATA_ERROR_TYPE.SURVEY_ID.eq(survey.getId()));
+		return dsl.fromResult(select.fetch());
 	}
 	
 	public List<DataErrorQuery> loadByQuery(DataQuery query) {
 		JooqDSLContext dsl = dsl((CollectSurvey) query.getSurvey());
-		Select<OfcDataErrorQueryRecord> select = 
-			dsl.selectFrom(OFC_DATA_ERROR_QUERY)
-				.where(OFC_DATA_ERROR_QUERY.QUERY_ID.eq(query.getId()));
+		Select<OfcDataErrorQueryRecord> select =  dsl
+			.selectFrom(OFC_DATA_ERROR_QUERY)
+			.where(OFC_DATA_ERROR_QUERY.QUERY_ID.eq(query.getId()));
 		
 		Result<OfcDataErrorQueryRecord> result = select.fetch();
 		return dsl.fromResult(result);

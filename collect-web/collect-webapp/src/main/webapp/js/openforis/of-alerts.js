@@ -105,8 +105,12 @@ OF.Alerts.showWarning = function( message, hide ) {
  /**
   * Shows application success  message
   */
-OF.Alerts.showSuccess = function(message, hide) {
+OF.Alerts.success = function( message, hide ) {
 	OF.Alerts.showMessage("success", message, hide);
+};
+
+OF.Alerts.showSuccess = function(message, hide) {
+	OF.Alerts.success(message, hide);
 };
 
 /**
@@ -125,6 +129,14 @@ OF.Alerts.showMessage = function(type, message, autoDismiss) {
 		});
 		
 		OF.Alerts._messageContainer = container;
+	}
+	
+	//try to look for an internationalized message
+	if (OF.i18n) {
+		var i18nMessage = OF.i18n.prop(message);
+		if (i18nMessage) {
+			message = i18nMessage;
+		}
 	}
 	
 	var title;

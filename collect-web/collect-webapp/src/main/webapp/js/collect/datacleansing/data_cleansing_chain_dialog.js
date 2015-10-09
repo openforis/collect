@@ -62,7 +62,8 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			var recordStep = $this.recordStepSelectPicker.val();
 			collect.dataCleansingChainService.run(chain.id, recordStep, function() {
 				monitorJob(collect.jobService.contextPath + "survey-job.json?surveyId=" + collect.activeSurvey.id, function() {
-					//TODO
+					EventBus.dispatch(Collect.DataCleansing.DATA_CLEANSING_CHAIN_SAVED, $this);
+					OF.Alerts.success("collect.data_cleansing.cleansing_chain.run_successfully");
 				});
 			});
 		}, $this));

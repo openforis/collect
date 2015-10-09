@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="data-cleansing-report" author="ricci" dbms="postgresql">
+
+	    <preConditions onFail="MARK_RAN">
+	    	<not>
+		    	<tableExists tableName="ofc_data_cleansing_report" />
+	    	</not>
+	    </preConditions>
+	    
+	    <comment>Data cleansing report storage table</comment>
+	    
+		<createSequence sequenceName="ofc_data_cleansing_report_id_seq" />
+		
+	    <createTable tableName="ofc_data_cleansing_report">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_cleansing_report_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="cleansing_chain_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_cleansing_chain_fkey" 
+					references="ofc_data_cleansing_chain(id)" />
+			</column>
+			<column name="record_step" type="int4" />
+			<column name="dataset_size" type="int4" />
+			<column name="last_record_modified_date" type="TIMESTAMP" />
+			<column name="cleansed_records" type="int4" />
+			<column name="cleansed_nodes" type="int4" />
+			<column name="creation_date" type="TIMESTAMP" />
+			<column name="modified_date" type="TIMESTAMP" />
+	    </createTable>
+
+	</changeSet>
+	
+</databaseChangeLog>

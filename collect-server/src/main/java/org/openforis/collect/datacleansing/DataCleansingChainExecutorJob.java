@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.SurveyLockingJob;
 import org.openforis.collect.datacleansing.DataCleansingChainExectutorTask.DataCleansingChainExecutorTaskInput;
 import org.openforis.collect.datacleansing.DataCleansingChainExectutorTask.DataCleansingStepNodeProcessor;
+import org.openforis.collect.datacleansing.manager.DataCleansingReportManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -36,6 +37,8 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	
 	@Autowired
 	private RecordManager recordManager;
+	@Autowired
+	private DataCleansingReportManager reportManager;
 	
 	//input
 	private DataCleansingChain chain;
@@ -45,6 +48,22 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	protected void buildTasks() throws Throwable {
 		DataCleansingChainExectutorTask task = addTask(DataCleansingChainExectutorTask.class);
 		task.setInput(new DataCleansingChainExecutorTaskInput(chain, recordStep, new DataCleansingChainNodeProcessor(chain)));
+	}
+	
+	@Override
+	protected void onCompleted() {
+		super.onCompleted();
+		DataCleansingChainExectutorTask task = getChainExecutorTask();
+		if (chain.getId() != null) {
+			DataCleansingReport report = new DataCleansingReport(survey);
+			report.setDatasetSize(task.getDatasetSize());
+			report.setRecordStep(recordStep);
+			report.setLastRecordModifiedDate(task.getLastRecordModifiedDate());
+			report.setCleansingChainId(chain.getId());
+			report.setCleansedRecords(task.getCleansedRecords());
+			report.setCleansedNodes(task.getCleansedNodes());
+			reportManager.save(report);
+		}
 	}
 	
 	public void setChain(DataCleansingChain chain) {
@@ -68,12 +87,12 @@ public class DataCleansingChainExecutorJob extends SurveyLockingJob {
 	
 	public int getUpdatedRecords() {
 		DataCleansingChainExectutorTask task = getChainExecutorTask();
-		return task == null ? 0 : task.getUpdatedRecords();
+		return task == null ? 0 : task.getCleansedRecords();
 	}
 	
 	public int getProcessedNodes() {
 		DataCleansingChainExectutorTask task = getChainExecutorTask();
-		return task == null ? 0 : task.getProcessedNodes();
+		return task == null ? 0 : task.getCleansedNodes();
 	}
 	
 	private class DataCleansingChainNodeProcessor implements DataCleansingStepNodeProcessor {

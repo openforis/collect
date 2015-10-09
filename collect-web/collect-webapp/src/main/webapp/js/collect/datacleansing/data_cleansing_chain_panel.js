@@ -11,8 +11,8 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 	var $this = this;
 	
 	function onExpandRow(index, chain, $rowEl) {
-		var table = $rowEl.find("table");
-		table.bootstrapTable({
+		var stepsTableEl = $rowEl.find("table.steps");
+		stepsTableEl.bootstrapTable({
 			width: 600,
 			columns: [
 				{field: "id", title: "Id", visible: false},
@@ -21,15 +21,37 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 		    ],
 		    data: chain.steps
 		});
+		
+		$this.itemService.loadReports(chain.id, function(reports) {
+			var reportsTableEl = $rowEl.find("table.reports");
+			reportsTableEl.bootstrapTable({
+				width: 600,
+				columns: [
+					{field: "id", title: "Id", visible: false},
+					{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, align: "right", sortable: true, width: 130},
+					{field: "datasetSize", title: "Dataset Size", align: "right", sortable: true, width: 100, align: "right"},
+					{field: "lastRecordModifiedDate", title: "Last Record Modified", 
+						formatter: OF.Dates.formatToPrettyDateTime, align: "right", sortable: true, width: 130},
+					{field: "cleansedRecords", title: "Cleansed Records", width: 100, align: "right"},
+					{field: "cleansedNodes", title: "Cleansed Nodes", width: 100, align: "right"}
+			    ],
+			    data: reports
+			});
+		});
 	};
 	
 	function detailFormatter(index, chain) {
 		var html = 
-        	'<fieldset style="margin-left: 60px !important;" ' +
+			'<fieldset style="margin-left: 60px !important;" ' +
 				'class="compact">' +
-	        	'<legend>Steps</legend>' +
-	        	'<table></table>' +
-           '</fieldset>';
+	        	'<legend>Cleansing Steps</legend>' +
+	        	'<table class="steps"></table>' +
+        	'</fieldset>' +
+       		'<fieldset style="margin-left: 60px !important;" ' +
+				'class="compact">' +
+				'<legend>Reports</legend>' +
+				'<table class="reports"></table>' +
+			'</fieldset>';
         return html;
 	}
 	
