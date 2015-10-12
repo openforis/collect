@@ -194,14 +194,16 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		q.addJoin(OFC_USER, JoinType.LEFT_OUTER_JOIN, OFC_RECORD.OWNER_ID.equal(OFC_USER.ID));
 
 		addFilterConditions(q, filter);
-
+		
 		//add ordering fields
 		if ( sortFields != null ) {
 			for (RecordSummarySortField sortField : sortFields) {
 				addOrderBy(q, sortField, ownerNameField);
 			}
 		}
-		
+		//always order by ID to avoid pagination issues
+		q.addOrderBy(OFC_RECORD.ID);
+
 		//fetch results
 		Result<Record> result = q.fetch();
 		
@@ -247,8 +249,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		//add limit
 		if (filter.getOffset() != null && filter.getMaxNumberOfRecords() != null) {
 			q.addLimit(filter.getOffset(), filter.getMaxNumberOfRecords());
-			//always order by ID to avoid pagination issues
-			q.addOrderBy(OFC_RECORD.ID);
 		}
 	}
 	
