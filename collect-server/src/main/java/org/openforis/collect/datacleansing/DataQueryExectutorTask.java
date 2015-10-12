@@ -39,7 +39,7 @@ public class DataQueryExectutorTask extends Task {
 
 	@Override
 	protected long countTotalItems() {
-		RecordFilter recordsFilter = createRecordsFilter();
+		RecordFilter recordsFilter = createRecordsFilter(false);
 		int count = recordManager.countRecords(recordsFilter);
 		return count;
 	}
@@ -63,7 +63,7 @@ public class DataQueryExectutorTask extends Task {
 		
 		DataQueryEvaluator queryEvaluator = createQueryEvaluator(input.query);
 
-		RecordFilter filter = createRecordsFilter();
+		RecordFilter filter = createRecordsFilter(true);
 		
 		List<CollectRecord> recordSummaries = recordManager.loadSummaries(filter);
 		
@@ -89,7 +89,7 @@ public class DataQueryExectutorTask extends Task {
 		}
 	}
 	
-	private RecordFilter createRecordsFilter() {
+	private RecordFilter createRecordsFilter(boolean limitResults) {
 		CollectSurvey survey = input.query.getSurvey();
 		EntityDefinition entityDef = (EntityDefinition) survey.getSchema().getDefinitionById(input.query.getEntityDefinitionId());
 		EntityDefinition rootEntityDef = entityDef.getRootEntity();
@@ -98,8 +98,10 @@ public class DataQueryExectutorTask extends Task {
 		RecordFilter filter = new RecordFilter(survey);
 		filter.setStep(input.step);
 		filter.setRootEntityId(rootEntityId);
-		filter.setOffset(0);
-		filter.setMaxNumberOfRecords(input.maxRecords);
+		if (limitResults) {
+			filter.setOffset(0);
+			filter.setMaxNumberOfRecords(input.maxRecords);
+		}
 		return filter;
 	}
 	
