@@ -168,6 +168,7 @@ Collect.DataCleansingStepDialogController.prototype.initUpdateValueGrid = functi
 		onItemUpdated : function() {
 			$this.fieldChangeHandler();
 		},
+		rowClick : function() {}, //disable default behavior (do not edit row when clicking on it)
 		width: "100%"
 	});
 	
