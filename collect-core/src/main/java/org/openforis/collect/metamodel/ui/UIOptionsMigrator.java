@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.metamodel.CollectAnnotations;
-import org.openforis.collect.metamodel.ui.UITable.Direction;
 import org.openforis.collect.metamodel.ui.UIOptions.CoordinateAttributeFieldsOrder;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
+import org.openforis.collect.metamodel.ui.UITable.Direction;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
@@ -27,7 +27,7 @@ import org.openforis.idm.metamodel.TextAttributeDefinition;
  */
 public class UIOptionsMigrator {
 	
-	public UIConfiguration migrateToUIConfiguration(UIOptions oldUIOptions) {
+	public UIConfiguration migrateToUIConfiguration(UIOptions oldUIOptions) throws UIOptionsMigrationException {
 		CollectSurvey survey = oldUIOptions.getSurvey();
 		UIConfiguration result = new UIConfiguration(survey);
 		List<UITabSet> tabSets = oldUIOptions.getTabSets();
@@ -35,7 +35,7 @@ public class UIOptionsMigrator {
 			UIFormSet formSet;
 			EntityDefinition associatedRootEntity = findAssociatedRootEntity(tabSet);
 			if ( associatedRootEntity == null ) {
-				throw new IllegalStateException("Cannot find associated root entity. Tab set: " + tabSet.getName());
+				throw new UIOptionsMigrationException("Cannot find associated root entity. Tab set: " + tabSet.getName());
 			} else {
 				formSet = result.createFormSet();
 				formSet.setRootEntityDefinition(associatedRootEntity);
@@ -50,7 +50,7 @@ public class UIOptionsMigrator {
 		return result;
 	}
 
-	private void verifyMigration(final UIConfiguration uiConfig) {
+	private void verifyMigration(final UIConfiguration uiConfig) throws UIOptionsMigrationException {
 //		
 //		StringWriter writer = new StringWriter();
 //		UIConfigurationSerializer serializer = new UIConfigurationSerializer();
@@ -65,7 +65,7 @@ public class UIOptionsMigrator {
 				int nodeId = definition.getId();
 				UIModelObject uiModelObj = uiConfig.getModelObjectByNodeDefinitionId(nodeId);
 				if ( uiModelObj == null ) {
-					throw new IllegalStateException(String.format("No UI model object found for node with id %d in %s survey with uri %s", nodeId, 
+					throw new UIOptionsMigrationException(String.format("No UI model object found for node with id %d in %s survey with uri %s", nodeId, 
 							survey.isTemporary() ? "temporary": "published", survey.getUri()));
 				}
 			}
@@ -73,7 +73,7 @@ public class UIOptionsMigrator {
 
 	}
 
-	protected void createForm(UIFormContentContainer parent, UITab tab) {
+	protected void createForm(UIFormContentContainer parent, UITab tab) throws UIOptionsMigrationException {
 		UIOptions oldUIOptions = tab.getUIOptions();
 		UIForm form = parent.createForm();
 		copyLabels(tab, form);
@@ -110,7 +110,7 @@ public class UIOptionsMigrator {
 		parent.addForm(form);
 	}
 
-	private void createInnerForms(UITab tab, UIFormSection parent) {
+	private void createInnerForms(UITab tab, UIFormSection parent) throws UIOptionsMigrationException {
 //		UIOptions oldUIOptions = tab.getUIOptions();
 //		List<NodeDefinition> nodesPerTab = oldUIOptions.getNodesPerTab(tab, false);
 //		for (NodeDefinition nodeDefn : nodesPerTab) {
@@ -150,7 +150,7 @@ public class UIOptionsMigrator {
 		return null;
 	}
 
-	protected void addFormComponent(UIFormContentContainer parent, NodeDefinition nodeDefn) {
+	protected void addFormComponent(UIFormContentContainer parent, NodeDefinition nodeDefn) throws UIOptionsMigrationException {
 		CollectSurvey survey = (CollectSurvey) nodeDefn.getSurvey();
 		UIOptions oldUIOptions = survey.getUIOptions();
 		UIFormComponent component;
@@ -185,7 +185,7 @@ public class UIOptionsMigrator {
 		return field;
 	}
 
-	protected UIFormSection createFormSection(UIFormContentContainer parent, EntityDefinition entityDefn) {
+	protected UIFormSection createFormSection(UIFormContentContainer parent, EntityDefinition entityDefn) throws UIOptionsMigrationException {
 		CollectSurvey survey = (CollectSurvey) entityDefn.getSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
 		UITab parentTab = uiOptions.getAssignedTab(entityDefn, true);
@@ -212,7 +212,7 @@ public class UIOptionsMigrator {
 		return formSection;
 	}
 
-	protected UITable createTable(UIFormContentContainer section, EntityDefinition entityDefn) {
+	protected UITable createTable(UIFormContentContainer section, EntityDefinition entityDefn) throws UIOptionsMigrationException {
 		UITable table = section.createTable();
 		table.setEntityDefinition(entityDefn);
 		CollectSurvey survey = (CollectSurvey) entityDefn.getSurvey();
@@ -228,12 +228,12 @@ public class UIOptionsMigrator {
 		return table;
 	}
 	
-	protected UITableHeadingComponent createTableHeadingComponent(UITableHeadingContainer parent, NodeDefinition nodeDefn) {
+	protected UITableHeadingComponent createTableHeadingComponent(UITableHeadingContainer parent, NodeDefinition nodeDefn) throws UIOptionsMigrationException {
 		UITableHeadingComponent component;
 		if ( nodeDefn instanceof EntityDefinition ) {
 			EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
 			if ( entityDefn.isMultiple() ) {
-				throw new IllegalStateException("Nested multiple entity inside table layout entity is not supported: " + nodeDefn.getPath());
+				throw new UIOptionsMigrationException("Nested multiple entity inside table layout entity is not supported: " + nodeDefn.getPath());
 			}
 			component = parent.createColumnGroup();
 			((UIColumnGroup) component).setEntityDefinition(entityDefn);
@@ -287,6 +287,16 @@ public class UIOptionsMigrator {
 			}
 		}
 		return result;
+	}
+	
+	public static class UIOptionsMigrationException extends RuntimeException {
+
+		private static final long serialVersionUID = 1L;
+		
+		public UIOptionsMigrationException(String message) {
+			super(message);
+		}
+		
 	}
 
 }
