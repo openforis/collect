@@ -34,7 +34,6 @@ import org.springframework.web.servlet.ModelAndView;
  *
  */
 @Controller
-@RequestMapping("/surveys/")
 public class SurveyController extends BasicController {
 
 	private static final String EDIT_SURVEY_VIEW = "editSurvey";
@@ -44,7 +43,7 @@ public class SurveyController extends BasicController {
 	@Autowired
 	private SurveyManager surveyManager;
 
-	@RequestMapping(value = "summaries.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/surveys/summaries.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	List<SurveySummary> loadSummaries(
 			@RequestParam(required=false) boolean includeTemporary,
@@ -57,7 +56,7 @@ public class SurveyController extends BasicController {
 		}
 	}
 
-	@RequestMapping(value = "{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/surveys/{id}.json", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id) throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
@@ -79,13 +78,13 @@ public class SurveyController extends BasicController {
 		return recordIds;
 	}
 	
-	@RequestMapping(value = "temp/{surveyId}/edit.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "/surveys/temp/{surveyId}/edit.htm", method = RequestMethod.GET)
 	public ModelAndView editTemp(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("temp_id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
 	}
 	
-	@RequestMapping(value = "{surveyId}/edit.htm", method = RequestMethod.GET)
+	@RequestMapping(value = "/surveys/{surveyId}/edit.htm", method = RequestMethod.GET)
 	public ModelAndView edit(@PathVariable("surveyId") Integer surveyId, Model model) {
 		model.addAttribute("id", surveyId);
 		return new ModelAndView(EDIT_SURVEY_VIEW);
