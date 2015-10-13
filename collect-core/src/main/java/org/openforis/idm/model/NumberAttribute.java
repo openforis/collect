@@ -101,4 +101,9 @@ public abstract class NumberAttribute<N extends Number, T extends NumberValue<N>
 		return ! getNumberField().hasValue();
 	}
 	
+	@Override
+	public String extractTextValue() {
+		Number number = getNumber();
+		return number == null ? null: number.toString();
+	}
 }

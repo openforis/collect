@@ -127,4 +127,9 @@ public class CodeAttribute extends Attribute<CodeAttributeDefinition, Code> {
 		return codeList.isExternal();
 	}
 
+	@Override
+	public String extractTextValue() {
+		Code code = getValue();
+		return code == null ? null: code.getCode();
+	}
 }
