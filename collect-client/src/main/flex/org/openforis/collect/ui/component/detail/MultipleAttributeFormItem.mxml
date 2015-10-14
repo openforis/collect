@@ -24,9 +24,19 @@
 			
 			import spark.components.supportClasses.ItemRenderer;
 			
+			private var _showLabel:Boolean = true;
+			
 			override protected function initPresenter():void {
 				presenter = new MultipleAttributeFormItemPresenter(this);
 				presenter.init();
+			}
+			
+			public function get showLabel():Boolean {
+				return _showLabel;
+			}
+			
+			public function set showLabel(value:Boolean):void {
+				this._showLabel = value;
 			}
 			
 		]]>
@@ -45,6 +55,8 @@
 		<detail:FormItemLabel id="formItemLabel"
 						  nodeDefinition="{attributeDefinition}" 
 						  width="{labelWidth}"
+						  visible="{showLabel}"
+						  includeInLayout="{showLabel}"
 						  />
 		
 		<s:VGroup gap="2">

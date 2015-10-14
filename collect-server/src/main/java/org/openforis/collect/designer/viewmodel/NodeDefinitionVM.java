@@ -19,6 +19,7 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
@@ -244,6 +245,12 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		UIOptions uiOptions = getSurvey().getUIOptions();
 		return editedItem != null && parentEntity != null && parentEntity.isMultiple() && 
 				uiOptions.getLayout(parentEntity) == Layout.TABLE; 
+	}
+	
+	@DependsOn("editedItem")
+	public boolean isMultipleFieldEditingDisabled() {
+//		return editedItem == null || ! (editedItem instanceof CodeAttributeDefinition);
+		return false;
 	}
 	
 	public boolean isRequiredApplied() {
