@@ -44,7 +44,7 @@ Collect.DataErrorQueryGroupDialogController.prototype.initFormElements = functio
 
 Collect.DataErrorQueryGroupDialogController.prototype.extractFormObject = function() {
 	var formItem = Collect.AbstractItemEditDialogController.prototype.extractFormObject.apply(this);
-	formItem.queryIds = this.queriesDualListBox.getSelectedItemIds();
+	formItem.queryIds = this.queriesDualListBox.getSelectedValues();
 	return formItem;
 };
 
@@ -57,7 +57,7 @@ Collect.DataErrorQueryGroupDialogController.prototype.fillForm = function(callba
 };
 
 Collect.DataErrorQueryGroupDialogController.prototype.validateForm = function(callback) {
-	var selectedQueryIds = this.queriesDualListBox.getSelectedItemIds();
+	var selectedQueryIds = this.queriesDualListBox.getSelectedValues();
 	if (selectedQueryIds.length == 0) {
 		OF.Alerts.showWarning("Please add at least one query");
 		return false;

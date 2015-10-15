@@ -7,32 +7,31 @@
 	function DoubleList(element, paramOptions, selected) {
 		var defaults = {
                 uri:        'local.json',       // JSON file that can be opened for the data.
-                value:      'id',               // Value that is assigned to the value field in the option.
-                text:       'name',             // Text that is assigned to the option field.
+                valueKey:   'id',               // Value that is assigned to the value field in the option.
+                labelKey:   'name',             // Text that is assigned to the option field.
                 title:      'Example',          // Title of the dual list box.
                 json:       true,               // Whether to retrieve the data through JSON.
                 filterApplyDelay:500,           // Timeout for when a filter search is started.
                 horizontal: false,              // Whether to layout the dual list box as horizontal or vertical.
-                maxTextLength: 45,              // Maximum text length that is displayed in the select.
+                maxTextLength: 90,              // Maximum text length that is displayed in the select.
                 moveAllBtn: true,               // Whether the append all button is available.
                 maxAllBtn:  500,                // Maximum size of list in which the all button works without warning. See below.
                 selectClass:'form-control',
+                listHtmlFormat: 				//the format string will be filled by 4 parameters: 
+                								// - column size (6 when horizontal buttons are shown, 5 otherwise)
+                								// - list class prefix (unselected or selected)
+                								// - horizontal buttons HTML
+                								// - select class 
+	            	'   <div class="col-md-{0}">' +
+					'       <h4><span class="{1}-title"></span> <small>- showing <span class="{1}-count"></span></small></h4>' +
+					'       <input class="filter form-control filter-{1}" type="text" placeholder="Filter" style="margin-bottom: 5px;">' +
+					'		{2}' +
+					'       <select class="{1} {3}" style="height: 200px; width: 100%;" multiple></select>' +
+					'   </div>',
                 warning:    'Are you sure you want to move this many items? Doing so can cause your browser to become unresponsive.'
         };
 
-        var htmlOptions = {
-            uri:        element.data('source'),
-            value:      element.data('value'),
-            text:       element.data('text'),
-            title:      element.data('title'),
-            json:       element.data('json'),
-            filterApplyDelay:    element.data('filterApplyDelay'),
-            horizontal: element.data('horizontal'),
-            maxTextLength: element.data('maxTextLength'),
-            moveAllBtn: element.data('moveAllBtn'),
-            maxAllBtn:  element.data('maxAllBtn'),
-            selectClass:element.data('selectClass')
-        };
+        var htmlOptions = element.data();
         
         var options = $.extend({}, defaults, htmlOptions, paramOptions);
 
@@ -41,8 +40,8 @@
         });
         	
         this.options = options;
-        this.element = $(element.context);
-        this.parentElement = this.element.parent();
+        this.originalElement = $(element.context);
+        this.parentElement = this.originalElement.parent();
 
         selected = $.extend([{}], selected);
 
@@ -56,7 +55,7 @@
 	DoubleList.prototype = {
 		selectItems : function(items) {
 			var $this = this;
-			var valueKey = $this.options.value;
+			var valueKey = $this.options.valueKey;
 			$.each(items, function(i, item) {
 				var itemValue = item[valueKey];
 				var optionEl = $this.unselectedList.find('option[value="' + itemValue + '"]');
@@ -65,13 +64,13 @@
 				}
 			});
 		},
-		getSelectedItemIds : function() {
+		getSelectedValues : function() {
 			var $this = this;
-			var ids = new Array();
+			var values = new Array();
 			var options = $this.selectedList.find('option').each(function(i, option) {
-				ids.push(option.value);
+				values.push(option.value);
 			});
-			return ids;
+			return values;
 		},
 		
 		/** Retrieves all the option elements through a JSON request. */
@@ -80,8 +79,8 @@
 			var options = this.options;
 			var multipleTextFields = false;
 			
-			if (options.text.indexOf(':') > -1) {
-				var textToUse = options.text.split(':');
+			if (options.labelKey.indexOf(':') > -1) {
+				var textToUse = options.labelKey.split(':');
 				
 				if (textToUse.length > 1) {
 					multipleTextFields = true;
@@ -95,13 +94,13 @@
 					if (multipleTextFields) {
 						textToUse.forEach(function (entry) { text += item[entry] + ' '; });
 					} else {
-						text = item[options.text];
+						text = item[options.labelKey];
 					}
 					
 					$('<option>', {
-						value: item[options.value],
+						value: item[options.valueKey],
 						text: text,
-						selected: (selected.some(function (e) { return e[options.value] === item[options.value] }) === true)
+						selected: (selected.some(function (e) { return e[options.valueKey] === item[options.valueKey] }) === true)
 					}).appendTo(options.element);
 				});
 				
@@ -114,40 +113,24 @@
 			var $this = this;
 			var options = this.options;
 			var parentElement = this.parentElement;
-			var unselected = this.unselectedList;
-			var selected = this.selectedList;
+			var unselectedList = this.unselectedList;
+			var selectedList = this.selectedList;
 			
 			this.parentElement.find('button').bind('click', function() {
 				switch ($(this).data('type')) {
 				case 'str': /* Selected to the right. */
-					unselected.find('option:selected').appendTo(selected);
+					moveSelectedOption(unselectedList, selectedList);
 					$(this).prop('disabled', true);
 					break;
 				case 'atr': /* All to the right. */
-					var optionElements = unselected.find('option');
-					if (optionElements.length >= options.maxAllBtn && confirm(options.warning) ||
-							optionElements.length < options.maxAllBtn) {
-						optionElements.each(function () {
-							if ($(this).isVisible()) {
-								$(this).remove().appendTo(selected);
-							}
-						});
-					}
+					moveVisibleOptions(unselectedList, selectedList);
 					break;
 				case 'stl': /* Selected to the left. */
-					selected.find('option:selected').remove().appendTo(unselected);
+					moveSelectedOption(selectedList, unselectedList);
 					$(this).prop('disabled', true);
 					break;
 				case 'atl': /* All to the left. */
-					var selectedOptionElements = selected.find('option');
-					if (selectedOptionElements.length >= options.maxAllBtn && confirm(options.warning) ||
-							selectedOptionElements.length < options.maxAllBtn) {
-						selectedOptionElements.each(function () {
-							if ($(this).isVisible()) {
-								$(this).remove().appendTo(unselected);
-							}
-						});
-					}
+					moveVisibleOptions(selectedList, unselectedList);
 					break;
 				default: break;
 				}
@@ -157,8 +140,23 @@
 				$this._handleMovement();
 			});
 			
+			function moveSelectedOption(fromSelect, toSelect) {
+				fromSelect.find('option:selected').appendTo(toSelect);
+			}
+			
+			function moveVisibleOptions(fromSelect, toSelect) {
+				var optionElements = fromSelect.find('option');
+				if (optionElements.length < options.maxAllBtn || confirm(options.warning)) {
+					optionElements.each(function () {
+						if (isVisible($(this))) {
+							$(this).appendTo(toSelect);
+						}
+					});
+				}
+			};
+			
 			this.parentElement.closest('form').submit(function() {
-				selected.find('option').prop('selected', true);
+				selectedList.find('option').prop('selected', true);
 			});
 			
 			this.parentElement.find('input[type="text"]').keypress(function(e) {
@@ -167,15 +165,10 @@
 				}
 			});
 			
+			this.selectedItemsFilter.bind('change keyup', $.proxy($this._filterChangeHandler, $this, selectedList));
+			this.unselectedItemsFilter.bind('change keyup', $.proxy($this._filterChangeHandler, $this, unselectedList));
+			
 			$this._updateFilteredItems();
-			
-			this.selectedItemsFilter.bind('change keyup', function() {
-                $this._filterSelectByText(selected, $(this).val());
-            }).scrollTop(0).sortOptions();
-			
-			this.unselectedItemsFilter.bind('change keyup', function() {
-                $this._filterSelectByText(unselected, $(this).val());
-            }).scrollTop(0).sortOptions();
 		},
 		
 		/** Constructs the jQuery plugin after the elements have been retrieved. */
@@ -189,8 +182,8 @@
 		_updateSelectedElementsCount : function(parentElement) {
 			var countUnselected = 0, countSelected = 0;
 			
-			this.unselectedList.find('option').each(function() { if ($(this).isVisible()) { countUnselected++; } });
-			this.selectedList.find('option').each(function() { if ($(this).isVisible()) { countSelected++ } });
+			this.unselectedList.find('option').each(function() { if (isVisible($(this))) { countUnselected++; } });
+			this.selectedList.find('option').each(function() { if (isVisible($(this))) { countSelected++ } });
 			
 			this.unselectedCountField.text(countUnselected);
 			this.selectedCountField.text(countSelected);
@@ -198,7 +191,17 @@
 			this._toggleButtons();
 		},
 		
-		_filterSelectByText : function(select, text) {
+		_filterChangeHandler : function(select, event) {
+			var text = $(event.target).val();
+			this._filterItems(select, text);
+		},
+		
+		_updateFilteredItems : function() {
+			this._filterItems(this.selectedList, this.selectedItemsFilter.val());
+			this._filterItems(this.unselectedList, this.unselectedItemsFilter.val());
+		},
+		
+		_filterItems : function(select, text) {
 			var $this = this;
 			delay(function() {
                 var options = $(select).find('option');
@@ -214,35 +217,24 @@
                 });
                 $this._updateSelectedElementsCount();
             }, $this.options.filterApplyDelay);
-		},
-		
-		_updateFilteredItems : function() {
-			this._filterSelectByText(this.selectedList, this.selectedItemsFilter.val());
-			this.selectedList.scrollTop(0).sortOptions();;
-			this._filterSelectByText(this.unselectedList, this.unselectedItemsFilter.val());
-			this.unselectedList.scrollTop(0).sortOptions();;
+
+			select.scrollTop(0);
+			sortOptions(select);
 		},
 		
 		/** Creates a new dual list box with the right buttons and filter. */
 		_createDoubleList : function() {
 			var $this = this;
 			var options = this.options;
+			var colSize = options.horizontal == false ? 5 : 6;
+			var unselectedHorizontalButtonsHtml = options.horizontal == false ? '' : $this._createHorizontalButtons(1, options.moveAllBtn);
+			var selectedHorizontalButtonsHtml = options.horizontal == false ? '' : $this._createHorizontalButtons(2, options.moveAllBtn);
+			
 			this.parentElement.addClass('row').append(
-					(options.horizontal == false ? 
-					'   <div class="col-md-5">' : '   <div class="col-md-6">') +
-					'       <h4><span class="unselected-title"></span> <small>- showing <span class="unselected-count"></span></small></h4>' +
-					'       <input class="filter form-control filter-unselected" type="text" placeholder="Filter" style="margin-bottom: 5px;">' +
-					(options.horizontal == false ? '' : $this._createHorizontalButtons(1, options.moveAllBtn)) +
-					'       <select class="unselected ' + options.selectClass + '" style="height: 200px; width: 100%;" multiple></select>' +
-					'   </div>' +
+					formatString($this.options.listHtmlFormat, colSize, 'unselected', unselectedHorizontalButtonsHtml, options.selectClass) +
 					(options.horizontal == false ? $this._createVerticalButtons(options.moveAllBtn) : '') +
-					(options.horizontal == false ? 
-					'   <div class="col-md-5">' : '   <div class="col-md-6">') +
-					'       <h4><span class="selected-title"></span> <small>- showing <span class="selected-count"></span></small></h4>' +
-					'       <input class="filter form-control filter-selected" type="text" placeholder="Filter" style="margin-bottom: 5px;">' +
-					(options.horizontal == false ? '' : $this._createHorizontalButtons(2, options.moveAllBtn)) +
-					'       <select class="selected ' + options.selectClass + '" style="height: 200px; width: 100%;" multiple></select>' +
-					'   </div>');
+					formatString($this.options.listHtmlFormat, colSize, 'selected', selectedHorizontalButtonsHtml, options.selectClass)
+			);
 			
 			this.selectedList = this.parentElement.find(".selected");
 			this.unselectedList = this.parentElement.find(".unselected");
@@ -250,6 +242,10 @@
 			this.unselectedItemsFilter = this.parentElement.find('.filter-unselected');
 			this.selectedCountField = this.parentElement.find('.selected-count');
 			this.unselectedCountField = this.parentElement.find('.unselected-count');
+			this.selectedToRightBtn = this.parentElement.find('.str');
+			this.selectedToLeftBtn = this.parentElement.find('.stl');
+			this.allToRightBtn = this.parentElement.find('.atr');
+			this.allToLeftBtn = this.parentElement.find('.atl');
 			
 			this.selectedList.prop('name', $(options.element).prop('name'));
 			this.parentElement.find('.unselected-title').text('Available ' + options.title);
@@ -304,7 +300,7 @@
 			
 			var textIsTooLong = false;
 			
-			this.element.find('option').text(function (i, text) {
+			this.originalElement.find('option').text(function (i, text) {
 				$(this).data('title', text);
 				
 				if (text.length > options.maxTextLength) {
@@ -324,64 +320,57 @@
 				$(this).appendTo(list);
 			});
 			
-			this.element.remove();
+			this.originalElement.remove();
 			this._handleMovement();
 		},
 		
 		/** Toggles the buttons based on the length of the selects. */
 		_toggleButtons : function() {
+			var $this = this;
 			var parentElement = this.parentElement;
 			this.unselectedList.change(function() {
-				parentElement.find('.str').prop('disabled', false);
+				$this.selectedToRightBtn.prop('disabled', false);
 			});
 			
 			this.selectedList.change(function() {
-				parentElement.find('.stl').prop('disabled', false);
+				$this.selectedToLeftBtn.prop('disabled', false);
 			});
 			
 			if (this.unselectedList.has('option').length == 0) {
-				parentElement.find('.atr').prop('disabled', true);
-				parentElement.find('.str').prop('disabled', true);
+				$this.allToRightBtn.prop('disabled', true);
+				$this.selectedToRightBtn.prop('disabled', true);
 			} else {
-				parentElement.find('.atr').prop('disabled', false);
+				$this.allToRightBtn.prop('disabled', false);
 			}
 			
 			if (this.selectedList.has('option').length == 0) {
-				parentElement.find('.atl').prop('disabled', true);
-				parentElement.find('.stl').prop('disabled', true);
+				$this.allToLeftBtn.prop('disabled', true);
+				$this.selectedToLeftBtn.prop('disabled', true);
 			} else {
-				parentElement.find('.atl').prop('disabled', false);
+				$this.allToLeftBtn.prop('disabled', false);
 			}
 		}
 		
 	};
 		
-    $.fn.doubleList = function(paramOptions, selected) {
-    	return this.each(function () {
-            $(this).data("doubleList", new DoubleList($(this), paramOptions, selected));
-        })
-    };
-
-    /** Checks whether or not an element is visible. The default jQuery implementation doesn't work. */
-    $.fn.isVisible = function() {
-        return !($(this).css('visibility') == 'hidden' || $(this).css('display') == 'none');
+   /** Checks whether or not an element is visible. The default jQuery implementation doesn't work. */
+    var isVisible = function(el) {
+        return !(el.css('visibility') == 'hidden' || el.css('display') == 'none');
     };
 
     /** Sorts options in a select / list box. */
-    $.fn.sortOptions = function() {
-        return this.each(function() {
-            $(this).append($(this).find('option').remove().sort(function(a, b) {
-                var at = $(a).text(), bt = $(b).text();
-                return (at > bt) ? 1 : ((at < bt) ? -1 : 0);
-            }));
-        });
+    var sortOptions = function(select) {
+        select.append(select.find('option').remove().sort(function(a, b) {
+            var at = $(a).text(), bt = $(b).text();
+            return (at > bt) ? 1 : ((at < bt) ? -1 : 0);
+        }));
     };
     
     var specialCharactersRegExp = /[.?*+^$[\]\\(){}|-]/g;
     
     var escapeRegExp = function(text) {
-	  var result = text.replace(specialCharactersRegExp, '\\$&');
-	  return result;
+		var result = text.replace(specialCharactersRegExp, '\\$&');
+		return result;
 	}
 
     /** Simple delay function that can wrap around an existing function and provides a callback. */
@@ -392,4 +381,17 @@
             timer = setTimeout(callback, ms);
         };
     })();
+    
+    var formatString = function(format) {
+        var args = Array.prototype.slice.call(arguments, 1);
+    	return format.replace(/{(\d+)}/g, function(match, number) {
+    		return typeof args[number] != 'undefined' ? args[number] : match;
+    	});
+    };
+    
+    $.fn.doubleList = function(paramOptions, selected) {
+    	return this.each(function () {
+            $(this).data("doubleList", new DoubleList($(this), paramOptions, selected));
+        })
+    };
 })(jQuery);
