@@ -116,15 +116,12 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 			.execute();
 	}
 
-	@SuppressWarnings("rawtypes")
 	public List<SamplingDesignItem> loadItems(int surveyId, int offset, int maxRecords) {
 		SamplingDesignDSLContext dsl = dsl();
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_SAMPLING_DESIGN);
 		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
-		for (TableField field : LEVEL_CODE_FIELDS) {
-			q.addOrderBy(field);
-		}
+		q.addOrderBy(OFC_SAMPLING_DESIGN.ID);
 		//add limit
 		q.addLimit(offset, maxRecords);
 		
