@@ -15,10 +15,9 @@ import org.openforis.commons.lang.DeepComparable;
 public class DataCleansingMetadata implements DeepComparable {
 	
 	private CollectSurvey survey;
+	private List<DataQueryType> dataQueryTypes;
 	private List<DataQuery> dataQueries;
-	private List<DataErrorType> dataErrorTypes;
-	private List<DataErrorQuery> dataErrorQueries;
-	private List<DataErrorQueryGroup> dataErrorQueryGroups;
+	private List<DataQueryGroup> dataQueryGroups;
 	private List<DataCleansingStep> cleansingSteps;
 	private List<DataCleansingChain> cleansingChains;
 
@@ -26,27 +25,24 @@ public class DataCleansingMetadata implements DeepComparable {
 		super();
 		this.survey = survey;
 		this.dataQueries = new ArrayList<DataQuery>();
-		this.dataErrorTypes = new ArrayList<DataErrorType>();
-		this.dataErrorQueries = new ArrayList<DataErrorQuery>();
-		this.dataErrorQueryGroups = new ArrayList<DataErrorQueryGroup>();
+		this.dataQueryTypes = new ArrayList<DataQueryType>();
+		this.dataQueryGroups = new ArrayList<DataQueryGroup>();
 		this.cleansingSteps = new ArrayList<DataCleansingStep>();
 		this.cleansingChains = new ArrayList<DataCleansingChain>();
 	}
 	
 	public DataCleansingMetadata(
 			CollectSurvey survey,
+			List<DataQueryType> dataQueryTypes,
 			List<DataQuery> dataQueries,
-			List<DataErrorType> dataErrorTypes,
-			List<DataErrorQuery> dataErrorQueries,
-			List<DataErrorQueryGroup> dataErrorQueryGroups,
+			List<DataQueryGroup> dataQueryGroups,
 			List<DataCleansingStep> cleansingSteps,
 			List<DataCleansingChain> cleansingChains) {
 		super();
 		this.survey = survey;
 		this.dataQueries = dataQueries;
-		this.dataErrorTypes = dataErrorTypes;
-		this.dataErrorQueries = dataErrorQueries;
-		this.dataErrorQueryGroups = dataErrorQueryGroups;
+		this.dataQueryTypes = dataQueryTypes;
+		this.dataQueryGroups = dataQueryGroups;
 		this.cleansingSteps = cleansingSteps;
 		this.cleansingChains = cleansingChains;
 	}
@@ -60,13 +56,11 @@ public class DataCleansingMetadata implements DeepComparable {
 		if (getClass() != obj.getClass())
 			return false;
 		DataCleansingMetadata other = (DataCleansingMetadata) obj;
+		if (! CollectionUtils.<DataQueryType>deepEquals(dataQueryTypes, other.dataQueryTypes, true))
+			return false;
 		if (! CollectionUtils.<DataQuery>deepEquals(dataQueries, other.dataQueries, true))
 			return false;
-		if (! CollectionUtils.<DataErrorType>deepEquals(dataErrorTypes, other.dataErrorTypes, true))
-			return false;
-		if (! CollectionUtils.<DataErrorQuery>deepEquals(dataErrorQueries, other.dataErrorQueries, true))
-			return false;
-		if (! CollectionUtils.<DataErrorQueryGroup>deepEquals(dataErrorQueryGroups, other.dataErrorQueryGroups, true))
+		if (! CollectionUtils.<DataQueryGroup>deepEquals(dataQueryGroups, other.dataQueryGroups, true))
 			return false;
 		if (! CollectionUtils.<DataCleansingStep>deepEquals(cleansingSteps, other.cleansingSteps, true))
 			return false;
@@ -90,16 +84,12 @@ public class DataCleansingMetadata implements DeepComparable {
 		return dataQueries;
 	}
 	
-	public List<DataErrorType> getDataErrorTypes() {
-		return dataErrorTypes;
+	public List<DataQueryType> getDataQueryTypes() {
+		return dataQueryTypes;
 	}
 	
-	public List<DataErrorQuery> getDataErrorQueries() {
-		return dataErrorQueries;
-	}
-	
-	public List<DataErrorQueryGroup> getDataErrorQueryGroups() {
-		return dataErrorQueryGroups;
+	public List<DataQueryGroup> getDataQueryGroups() {
+		return dataQueryGroups;
 	}
 	
 	public List<DataCleansingStep> getCleansingSteps() {

@@ -10,10 +10,9 @@ import java.util.UUID;
 import org.openforis.collect.datacleansing.form.DataCleansingChainForm;
 import org.openforis.collect.datacleansing.form.DataCleansingItemForm;
 import org.openforis.collect.datacleansing.form.DataCleansingStepForm;
-import org.openforis.collect.datacleansing.form.DataErrorQueryForm;
-import org.openforis.collect.datacleansing.form.DataErrorQueryGroupForm;
-import org.openforis.collect.datacleansing.form.DataErrorTypeForm;
+import org.openforis.collect.datacleansing.form.DataQueryGroupForm;
 import org.openforis.collect.datacleansing.form.DataQueryForm;
+import org.openforis.collect.datacleansing.form.DataQueryTypeForm;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.PersistedSurveyObject;
@@ -25,10 +24,9 @@ import org.openforis.idm.metamodel.PersistedSurveyObject;
  */
 public class DataCleansingMetadataView {
 	
+	private List<DataQueryTypeForm> dataQueryTypes;
 	private List<DataQueryForm> dataQueries;
-	private List<DataErrorTypeForm> dataErrorTypes;
-	private List<DataErrorQueryForm> dataErrorQueries;
-	private List<DataErrorQueryGroupForm> dataErrorQueryGroups;
+	private List<DataQueryGroupForm> dataQueryGroups;
 	private List<DataCleansingStepForm> cleansingSteps;
 	private List<DataCleansingChainForm> cleansingChains;
 	
@@ -37,10 +35,9 @@ public class DataCleansingMetadataView {
 	
 	public static DataCleansingMetadataView fromMetadata(DataCleansingMetadata metadata) {
 		DataCleansingMetadataView view = new DataCleansingMetadataView();
+		view.dataQueryTypes = PersistedSurveyObjects.convert(metadata.getDataQueryTypes(), DataQueryTypeForm.class);
 		view.dataQueries = PersistedSurveyObjects.convert(metadata.getDataQueries(), DataQueryForm.class);
-		view.dataErrorTypes = PersistedSurveyObjects.convert(metadata.getDataErrorTypes(), DataErrorTypeForm.class);
-		view.dataErrorQueries = PersistedSurveyObjects.convert(metadata.getDataErrorQueries(), DataErrorQueryForm.class);
-		view.dataErrorQueryGroups = PersistedSurveyObjects.convert(metadata.getDataErrorQueryGroups(), DataErrorQueryGroupForm.class);
+		view.dataQueryGroups = PersistedSurveyObjects.convert(metadata.getDataQueryGroups(), DataQueryGroupForm.class);
 		view.cleansingSteps = PersistedSurveyObjects.convert(metadata.getCleansingSteps(), DataCleansingStepForm.class);
 		view.cleansingChains = PersistedSurveyObjects.convert(metadata.getCleansingChains(), DataCleansingChainForm.class);
 		return view;
@@ -48,29 +45,26 @@ public class DataCleansingMetadataView {
 	
 	public DataCleansingMetadata toMetadata(CollectSurvey survey) {
 		//convert view items to metadata items
+		List<DataQueryType> queryTypes = PersistedSurveyObjects.toItems(survey, this.dataQueryTypes, DataQueryType.class);
 		List<DataQuery> queries = PersistedSurveyObjects.toItems(survey, this.dataQueries, DataQuery.class);
-		List<DataErrorType> errorTypes = PersistedSurveyObjects.toItems(survey, this.dataErrorTypes, DataErrorType.class);
-		List<DataErrorQuery> errorQueries = PersistedSurveyObjects.toItems(survey, this.dataErrorQueries, DataErrorQuery.class);
-		List<DataErrorQueryGroup> errorQueryGroups = PersistedSurveyObjects.toItems(survey, this.dataErrorQueryGroups, DataErrorQueryGroup.class);
+		List<DataQueryGroup> errorQueryGroups = PersistedSurveyObjects.toItems(survey, this.dataQueryGroups, DataQueryGroup.class);
 		List<DataCleansingStep> cleansingSteps = PersistedSurveyObjects.toItems(survey, this.cleansingSteps, DataCleansingStep.class);
 		List<DataCleansingChain> cleansingChains = PersistedSurveyObjects.toItems(survey, this.cleansingChains, DataCleansingChain.class);
 
 		//create maps to facilitate object searching
-		Map<Integer, DataErrorType> errorTypeByOriginalId = PersistedSurveyObjects.createObjectFromIdMap(errorTypes);
+		Map<Integer, DataQueryType> queryTypeByOriginalId = PersistedSurveyObjects.createObjectFromIdMap(queryTypes);
 		Map<Integer, DataQuery> queryByOriginalId = PersistedSurveyObjects.createObjectFromIdMap(queries);
-		Map<Integer, DataErrorQuery> errorQueryByOriginalId = PersistedSurveyObjects.createObjectFromIdMap(errorQueries);
 		Map<Integer, DataCleansingStep> cleansingStepByOriginalId = PersistedSurveyObjects.createObjectFromIdMap(cleansingSteps);
 		
 		//replace objects with same instances
-		for (DataErrorQuery errorQuery : errorQueries) {
-			errorQuery.setQuery(queryByOriginalId.get(errorQuery.getQueryId()));
-			errorQuery.setType(errorTypeByOriginalId.get(errorQuery.getTypeId()));
+		for (DataQuery query : queries) {
+			query.setType(queryTypeByOriginalId.get(query.getTypeId()));
 		}
-		for (DataErrorQueryGroup queryGroup : errorQueryGroups) {
+		for (DataQueryGroup queryGroup : errorQueryGroups) {
 			List<Integer> originalQueryIds = queryGroup.getQueryIds();
-			List<DataErrorQuery> originalQueries = new ArrayList<DataErrorQuery>(originalQueryIds.size());
+			List<DataQuery> originalQueries = new ArrayList<DataQuery>(originalQueryIds.size());
 			for (Integer originalQueryId : originalQueryIds) {
-				originalQueries.add(errorQueryByOriginalId.get(originalQueryId));
+				originalQueries.add(queryByOriginalId.get(originalQueryId));
 			}
 			queryGroup.removeAllQueries();
 			queryGroup.setQueries(originalQueries);
@@ -89,17 +83,15 @@ public class DataCleansingMetadataView {
 			}
 		}		
 		
+		PersistedSurveyObjects.resetIds(queryTypes);
 		PersistedSurveyObjects.resetIds(queries);
-		PersistedSurveyObjects.resetIds(errorTypes);
-		PersistedSurveyObjects.resetIds(errorQueries);
 		PersistedSurveyObjects.resetIds(errorQueryGroups);
 		PersistedSurveyObjects.resetIds(cleansingSteps);
 		PersistedSurveyObjects.resetIds(cleansingChains);
 		
 		DataCleansingMetadata metadata = new DataCleansingMetadata(survey, 
+				queryTypes, 
 				queries, 
-				errorTypes, 
-				errorQueries,
 				errorQueryGroups,
 				cleansingSteps,
 				cleansingChains);
@@ -152,20 +144,16 @@ public class DataCleansingMetadataView {
 		}
 	}
 	
+	public List<DataQueryTypeForm> getDataQueryTypes() {
+		return dataQueryTypes;
+	}
+
 	public List<DataQueryForm> getDataQueries() {
 		return dataQueries;
 	}
-
-	public List<DataErrorTypeForm> getDataErrorTypes() {
-		return dataErrorTypes;
-	}
-
-	public List<DataErrorQueryForm> getDataErrorQueries() {
-		return dataErrorQueries;
-	}
 	
-	public List<DataErrorQueryGroupForm> getDataErrorQueryGroups() {
-		return dataErrorQueryGroups;
+	public List<DataQueryGroupForm> getDataQueryGroups() {
+		return dataQueryGroups;
 	}
 
 	public List<DataCleansingStepForm> getCleansingSteps() {

@@ -307,18 +307,9 @@
 					textIsTooLong = true;
 					return text.substr(0, options.maxTextLength) + '...';
 				}
-			}).each(function () {
-				if (textIsTooLong) {
-					$(this).prop('title', $(this).data('title'));
-				}
-				var list;
-				if ($(this).is(':selected')) {
-					list = $this.selectedList;
-				} else {
-					list = $this.unselectedList;
-				}
-				$(this).appendTo(list);
 			});
+			this.originalElement.find('option:not(selected)').appendTo($this.unselectedList);
+			this.originalElement.find('option:selected').appendTo($this.selectedList);
 			
 			this.originalElement.remove();
 			this._handleMovement();

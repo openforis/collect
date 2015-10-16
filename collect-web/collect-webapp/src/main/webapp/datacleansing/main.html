@@ -43,11 +43,10 @@
 		<script type="text/javascript" src="js/collect/service/abstract_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/session_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/survey_service.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/service/data_error_query_service.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/service/data_error_query_group_service.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/service/data_error_type_service.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/service/data_error_report_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_query_type_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_query_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_query_group_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_report_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_cleansing_step_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_cleansing_step_value_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_cleansing_chain_service.js?v=PROJECT_VERSION"></script>
@@ -61,17 +60,15 @@
 
 		<script type="text/javascript" src="js/collect/datacleansing/datacleansing.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/map_panel_composer.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_type_dialog.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_type_panel.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_dialog.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_group_dialog.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_panel.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_query_group_panel.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_dialog.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_view_dialog.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/data_error_report_panel.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_query_type_dialog.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_query_type_panel.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_query_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_query_panel.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_query_group_dialog.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_query_group_panel.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_report_dialog.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_report_view_dialog.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/datacleansing/data_report_panel.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_step_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_step_value_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_step_panel.js?v=PROJECT_VERSION"></script>
@@ -123,32 +120,28 @@
 						<li class="active">
 							<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Data Cleansing Home</a>
 						</li>
-						<li>
-							<a href="#data-query-panel" aria-controls="data-query-panel" 
-								role="tab" data-toggle="tab">Data Queries</a>
-						</li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle"
 								data-toggle="dropdown" role="button" aria-haspopup="true"
-								aria-expanded="false">Data Errors <span class="caret"></span></a>
+								aria-expanded="false">Data Queries <span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li>
-									<a href="#data-error-type-panel" aria-controls="data-error-type-panel" 
-										role="tab" data-toggle="tab">Data Error Types</a>
+									<a href="#data-query-type-panel" aria-controls="data-query-type-panel" 
+										role="tab" data-toggle="tab">Data Query Types</a>
 								</li>
 								<li>
-									<a href="#data-error-query-panel" aria-controls="data-error-query-panel" 
-										role="tab" data-toggle="tab">Data Error Queries</a>
+									<a href="#data-query-panel" aria-controls="data-query-panel" 
+										role="tab" data-toggle="tab">Data Queries</a>
 								</li>
 								<li>
-									<a href="#data-error-query-group-panel" aria-controls="data-error-query-group-panel" 
-										role="tab" data-toggle="tab">Data Error Query Groups</a>
-								</li>
-								<li id="data-error-report-tab">
-									<a href="#data-error-report-panel" aria-controls="data-error-report-panel" 
-										role="tab" data-toggle="tab">Data Error Reports</a>
+									<a href="#data-query-group-panel" aria-controls="data-query-group-panel" 
+										role="tab" data-toggle="tab">Data Query Groups</a>
 								</li>
 							</ul>
+						</li>
+						<li id="data-report-tab">
+							<a href="#data-report-panel" aria-controls="data-report-panel" 
+								role="tab" data-toggle="tab">Data Reports</a>
 						</li>
 						<li>
 							<a href="#data-cleansing-step-panel" aria-controls="data-cleansing-step-panel" 
@@ -179,9 +172,9 @@
 						<div id="homePanel" role="tabpanel" class="tab-pane active" >
 							<p data-i18n="data_cleansing.home.introduction"></p>
 						</div>
-						<div id="data-error-type-panel" role="tabpanel" class="tab-pane" >
+						<div id="data-query-type-panel" role="tabpanel" class="tab-pane" >
 							<div class="container">
-								<div class="section-title">Data Error Types</div>
+								<div class="section-title">Data Query Types</div>
 								
 								<table class="grid"></table>
 								
@@ -206,9 +199,9 @@
 								</div>
 							</div>
 						</div>
-						<div id="data-error-query-panel" role="tabpanel" class="tab-pane" >
+						<div id="data-query-group-panel" role="tabpanel" class="tab-pane" >
 							<div class="container">
-								<div class="section-title">Data Error Queries</div>
+								<div class="section-title">Data Query Groups</div>
 								
 								<table class="grid"></table>
 								
@@ -219,22 +212,9 @@
 								</div>
 							</div>
 						</div>
-						<div id="data-error-query-group-panel" role="tabpanel" class="tab-pane" >
+						<div id="data-report-panel" role="tabpanel" class="tab-pane" >
 							<div class="container">
-								<div class="section-title">Data Error Query Groups</div>
-								
-								<table class="grid"></table>
-								
-								<div>
-									<button type="button" class="btn btn-success new-btn">New</button>
-									<button type="button" class="btn btn-primary edit-btn">Edit</button>
-									<button type="button" class="btn btn-danger delete-btn">Delete</button>
-								</div>
-							</div>
-						</div>
-						<div id="data-error-report-panel" role="tabpanel" class="tab-pane" >
-							<div class="container">
-								<div class="section-title">Data Error Reports</div>
+								<div class="section-title">Data Reports</div>
 								
 								<table class="grid"></table>
 								

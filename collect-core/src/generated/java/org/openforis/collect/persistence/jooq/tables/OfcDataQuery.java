@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataQuery extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord> {
 
-	private static final long serialVersionUID = -1087314232;
+	private static final long serialVersionUID = -390118734;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_query</code>
@@ -82,6 +82,16 @@ public class OfcDataQuery extends org.jooq.impl.TableImpl<org.openforis.collect.
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord, java.lang.String> CONDITIONS = createField("conditions", org.jooq.impl.SQLDataType.CLOB, this, "");
 
 	/**
+	 * The column <code>collect.ofc_data_query.type_id</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord, java.lang.Integer> TYPE_ID = createField("type_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>collect.ofc_data_query.severity</code>.
+	 */
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord, java.lang.String> SEVERITY = createField("severity", org.jooq.impl.SQLDataType.CHAR.length(1), this, "");
+
+	/**
 	 * Create a <code>collect.ofc_data_query</code> table reference
 	 */
 	public OfcDataQuery() {
@@ -124,7 +134,7 @@ public class OfcDataQuery extends org.jooq.impl.TableImpl<org.openforis.collect.
 	 */
 	@Override
 	public java.util.List<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord, ?>> getReferences() {
-		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_DATA_QUERY__OFC_DATA_QUERY_SURVEY_FKEY);
+		return java.util.Arrays.<org.jooq.ForeignKey<org.openforis.collect.persistence.jooq.tables.records.OfcDataQueryRecord, ?>>asList(org.openforis.collect.persistence.jooq.Keys.OFC_DATA_QUERY__OFC_DATA_QUERY_SURVEY_FKEY, org.openforis.collect.persistence.jooq.Keys.OFC_DATA_QUERY__OFC_DATA_QUERY_TYPE_FKEY);
 	}
 
 	/**

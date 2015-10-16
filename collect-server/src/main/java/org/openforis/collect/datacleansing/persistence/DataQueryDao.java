@@ -7,11 +7,14 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.StoreQuery;
 import org.openforis.collect.datacleansing.DataQuery;
+import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
+import org.openforis.collect.datacleansing.DataQueryType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingDSLContext;
 import org.openforis.collect.persistence.jooq.SurveyObjectMappingJooqDaoSupport;
@@ -42,6 +45,16 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 		return dsl.fromResult(result);
 	}
 
+	public List<DataQuery> loadByType(DataQueryType type) {
+		JooqDSLContext dsl = dsl((CollectSurvey) type.getSurvey());
+		Select<OfcDataQueryRecord> select = 
+			dsl.selectFrom(OFC_DATA_QUERY)
+				.where(OFC_DATA_QUERY.TYPE_ID.eq(type.getId()));
+		
+		Result<OfcDataQueryRecord> result = select.fetch();
+		return dsl.fromResult(result);
+	}
+	
 	protected static class JooqDSLContext extends SurveyObjectMappingDSLContext<DataQuery> {
 
 		private static final long serialVersionUID = 1L;
@@ -65,11 +78,22 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 			o.setAttributeDefinitionId(r.getValue(OFC_DATA_QUERY.ATTRIBUTE_ID));
 			o.setConditions(r.getValue(OFC_DATA_QUERY.CONDITIONS));
 			o.setCreationDate(r.getValue(OFC_DATA_QUERY.CREATION_DATE));
+			o.setErrorSeverity(extractSeverity(r));
 			o.setModifiedDate(r.getValue(OFC_DATA_QUERY.MODIFIED_DATE));
 			o.setDescription(r.getValue(OFC_DATA_QUERY.DESCRIPTION));
 			o.setEntityDefinitionId(r.getValue(OFC_DATA_QUERY.ENTITY_ID));
 			o.setTitle(r.getValue(OFC_DATA_QUERY.TITLE));
+			o.setTypeId(r.getValue(OFC_DATA_QUERY.TYPE_ID));
 			o.setUuid(UUID.fromString(r.getValue(OFC_DATA_QUERY.UUID)));
+		}
+
+		private ErrorSeverity extractSeverity(Record r) {
+			String severityCode = r.getValue(OFC_DATA_QUERY.SEVERITY);
+			ErrorSeverity severity = null;
+			if (StringUtils.isNotBlank(severityCode)) {
+				severity = ErrorSeverity.fromCode(severityCode);
+			}
+			return severity;
 		}
 		
 		@Override
@@ -81,8 +105,12 @@ public class DataQueryDao extends SurveyObjectMappingJooqDaoSupport<DataQuery, D
 			q.addValue(OFC_DATA_QUERY.DESCRIPTION, o.getDescription());
 			q.addValue(OFC_DATA_QUERY.ENTITY_ID, o.getEntityDefinitionId());
 			q.addValue(OFC_DATA_QUERY.MODIFIED_DATE, toTimestamp(o.getModifiedDate()));
+			ErrorSeverity severity = o.getErrorSeverity();
+			String severityCode = severity == null ? null : String.valueOf(severity.getCode());
+			q.addValue(OFC_DATA_QUERY.SEVERITY, severityCode);
 			q.addValue(OFC_DATA_QUERY.SURVEY_ID, o.getSurvey().getId());
 			q.addValue(OFC_DATA_QUERY.TITLE, o.getTitle());
+			q.addValue(OFC_DATA_QUERY.TYPE_ID, o.getTypeId());
 			q.addValue(OFC_DATA_QUERY.UUID, o.getUuid().toString());
 		}
 

@@ -47,6 +47,8 @@ Collect.DataCleansing.DataQueryPanelController.prototype.getDataGridOptions = fu
 				sorter: nodePrettyNameSorter, formatter: getPrettyNodeName},
 			{field: "attributeDefinitionId", title: "Attribute", sortable: true, width: "20%", 
 				sorter: nodePrettyNameSorter, formatter: getPrettyNodeName},
+			{field: "typeCode", title: "Error Type", sortable: true, width: 50},
+			{field: "errorSeverity", title: "Error Severity", sortable: true, width: 50},
 			{field: "creationDate", title: "Creation Date", sortable: true, width: "10%", 
 				formatter: OF.Dates.formatToPrettyDateTime},
 			{field: "modifiedDate", title: "Modified Date", sortable: true, width: "10%", 

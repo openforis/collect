@@ -17,12 +17,47 @@ public class DataQuery extends PersistedSurveyObject {
 
 	private static final long serialVersionUID = 1L;
 	
+	public enum ErrorSeverity {
+		ERROR('e'), WARNING('w'), NO_ERROR('n');
+		
+		private char code;
+
+		ErrorSeverity(char code) {
+			this.code = code;
+		}
+		
+		public static ErrorSeverity fromCode(String code) {
+			if (code == null || code.length() > 1) {
+				throw new IllegalArgumentException("Invalid code for Severity: " + code);
+			}
+			return fromCode(code.charAt(0));
+		}
+		
+		public static ErrorSeverity fromCode(char code) {
+			ErrorSeverity[] values = values();
+			for (ErrorSeverity severity : values) {
+				if (severity.code == code) {
+					return severity;
+				}
+			}
+			throw new IllegalArgumentException("Invalid code for Severity: " + code);
+		}
+		
+		public char getCode() {
+			return code;
+		}
+	}
+	
 	private String title;
 	private String description;
 	private int entityDefinitionId;
 	private int attributeDefinitionId;
 	private String conditions;
-
+	private ErrorSeverity errorSeverity;
+	private Integer typeId;
+	
+	private transient DataQueryType type;
+		
 	public DataQuery(CollectSurvey survey) {
 		super(survey);
 	}
@@ -89,6 +124,32 @@ public class DataQuery extends PersistedSurveyObject {
 		this.conditions = conditions;
 	}
 
+	public ErrorSeverity getErrorSeverity() {
+		return errorSeverity;
+	}
+	
+	public void setErrorSeverity(ErrorSeverity severity) {
+		this.errorSeverity = severity;
+	}
+	
+	public Integer getTypeId() {
+		return type == null ? typeId: type.getId();
+	}
+	
+	public void setTypeId(Integer typeId) {
+		this.typeId = typeId;
+		this.type = null;
+	}
+	
+	public DataQueryType getType() {
+		return type;
+	}
+	
+	public void setType(DataQueryType type) {
+		this.type = type;
+		this.typeId = type == null ? null: type.getId();
+	}
+	
 	@Override
 	public boolean deepEquals(Object obj, boolean ignoreId) {
 		if (this == obj)
@@ -112,11 +173,25 @@ public class DataQuery extends PersistedSurveyObject {
 			return false;
 		if (entityDefinitionId != other.entityDefinitionId)
 			return false;
+		if (errorSeverity != other.errorSeverity)
+			return false;
 		if (title == null) {
 			if (other.title != null)
 				return false;
 		} else if (!title.equals(other.title))
 			return false;
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.deepEquals(other.type, ignoreId))
+			return false;
+		if (! ignoreId) {
+			if (typeId == null) {
+				if (other.typeId != null)
+					return false;
+			} else if (!typeId.equals(other.typeId))
+				return false;
+		}
 		return true;
 	}
 	
