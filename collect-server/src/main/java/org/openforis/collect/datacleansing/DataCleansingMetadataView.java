@@ -2,6 +2,7 @@ package org.openforis.collect.datacleansing;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +131,9 @@ public class DataCleansingMetadataView {
 		
 		private static <I extends PersistedSurveyObject, F extends DataCleansingItemForm<I>> List<I> toItems(
 				CollectSurvey survey, List<F> formItems, Class<I> itemType) {
+			if (org.apache.commons.collections.CollectionUtils.isEmpty(formItems)) {
+				return Collections.emptyList();
+			}
 			List<I> items = new ArrayList<I>(formItems.size());
 			for (F form : formItems) {
 				try {
