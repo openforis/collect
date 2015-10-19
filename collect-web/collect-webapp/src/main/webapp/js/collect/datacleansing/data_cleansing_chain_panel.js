@@ -14,6 +14,7 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 		var stepsTableEl = $rowEl.find("table.steps");
 		stepsTableEl.bootstrapTable({
 			width: 600,
+			height: "100%",
 			columns: [
 				{field: "id", title: "Id", visible: false},
 				{field: "title", title: "Title", width: 400},
@@ -62,11 +63,10 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 	    height: 400,
 	    onExpandRow: onExpandRow,
 	    columns: [
-          	{field: "selected", title: "", radio: true},
-			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title", width: 800, sortable: true},
 			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
 			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+			$this.createGridItemEditColumn(),
 			$this.createGridItemDeleteColumn()
 		]
 	};

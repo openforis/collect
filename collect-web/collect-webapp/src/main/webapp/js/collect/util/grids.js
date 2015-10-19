@@ -16,7 +16,7 @@ Collect.Grids.createRootEntityKeyColumns = function(survey, rootEntity, sortable
 
 Collect.Grids.getDeleteColumnIconTemplate = function(label) {
 	var content = OF.Strings.escapeHtml(label ? label: "");
-	return '<span class="glyphicon glyphicon-remove-circle remove-icon">' + content + '</span>';
+	return '<span title="Delete" class="glyphicon glyphicon-remove-circle remove-icon">' + content + '</span>';
 };
 
 Collect.Grids.createDeleteColumn = function(deleteFunction, context) {
@@ -30,3 +30,24 @@ Collect.Grids.createDeleteColumn = function(deleteFunction, context) {
 		}
 	}
 };
+
+Collect.Grids.createEditColumn = function(editFunction, context) {
+	return {
+		formatter: Collect.Grids.getEditColumnIconTemplate(), 
+		width: 50, 
+		align: "center",
+		events: {
+			"click .edit-icon": function(event, value, item, index) {
+				editFunction.apply(context, [item]);
+			}
+		}
+	}
+};
+
+Collect.Grids.getEditColumnIconTemplate = function(label) {
+	var content = OF.Strings.escapeHtml(label ? label: "");
+	return '<span title="Edit" class="glyphicon glyphicon glyphicon-edit edit-icon">' + content + '</span>';
+};
+
+
+
