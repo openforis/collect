@@ -53,15 +53,31 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 	@SuppressWarnings("unchecked")
 	@Override
 	public NumberValue<? extends Number> createValue(String stringValue) {
-		Unit defaultUnit = getDefaultUnit();
 		double doubleValue = Double.parseDouble(stringValue);
+		return createValue(doubleValue);
+	}
+
+	private NumberValue<? extends Number> createValue(double val) {
+		Unit defaultUnit = getDefaultUnit();
 		switch(getType()) {
 		case INTEGER:
-			return new IntegerValue(Double.valueOf(Math.round(doubleValue)).intValue(), defaultUnit);
+			return new IntegerValue(Double.valueOf(Math.round(val)).intValue(), defaultUnit);
 		case REAL:
-			return new RealValue(doubleValue, defaultUnit);
+			return new RealValue(val, defaultUnit);
 		default:
 			throw new RuntimeException("Invalid type " + getType());
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public NumberValue<? extends Number> createValue(Object val) {
+		if (val == null) {
+			return null;
+		} else if (val instanceof Double) {
+			return createValue(((Double) val).doubleValue());
+		} else {
+			return createValue(val.toString());
 		}
 	}
 	

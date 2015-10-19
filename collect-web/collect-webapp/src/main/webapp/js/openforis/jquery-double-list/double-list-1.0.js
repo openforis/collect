@@ -311,6 +311,9 @@
 			this.originalElement.find('option:not(selected)').appendTo($this.unselectedList);
 			this.originalElement.find('option:selected').appendTo($this.selectedList);
 			
+			this.originalElement.find('option:not(selected)').appendTo($this.unselectedList);
+			this.originalElement.find('option:selected').appendTo($this.selectedList);
+			
 			this.originalElement.remove();
 			this._handleMovement();
 		},

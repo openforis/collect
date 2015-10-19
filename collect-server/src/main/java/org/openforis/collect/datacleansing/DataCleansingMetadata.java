@@ -47,6 +47,16 @@ public class DataCleansingMetadata implements DeepComparable {
 		this.cleansingChains = cleansingChains;
 	}
 	
+	public boolean isEmpty() {
+		return 	org.apache.commons.collections.CollectionUtils.isEmpty(dataQueries) &&
+				org.apache.commons.collections.CollectionUtils.isEmpty(dataErrorQueries) &&
+				org.apache.commons.collections.CollectionUtils.isEmpty(dataErrorTypes) &&
+				org.apache.commons.collections.CollectionUtils.isEmpty(dataErrorQueries) &&
+				org.apache.commons.collections.CollectionUtils.isEmpty(dataErrorQueryGroups) &&
+				org.apache.commons.collections.CollectionUtils.isEmpty(cleansingSteps) &&
+				org.apache.commons.collections.CollectionUtils.isEmpty(cleansingChains);
+	}
+	
 	@Override
 	public boolean deepEquals(Object obj) {
 		if (this == obj)

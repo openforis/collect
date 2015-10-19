@@ -65,6 +65,12 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
+	public TaxonOccurrence createValue(Object val) {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
 		return fieldDefinitionByName;
 	}

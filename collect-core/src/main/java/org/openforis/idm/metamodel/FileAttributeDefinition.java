@@ -96,6 +96,12 @@ public class FileAttributeDefinition extends AttributeDefinition {
 	public File createValue(String string) {
 		throw new UnsupportedOperationException();
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public File createValue(Object val) {
+		throw new UnsupportedOperationException();
+	}
 	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
