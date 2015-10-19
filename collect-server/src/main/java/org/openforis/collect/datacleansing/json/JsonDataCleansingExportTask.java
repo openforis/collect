@@ -42,9 +42,11 @@ public class JsonDataCleansingExportTask extends Task implements DataCleansingEx
 	@Override
 	protected void execute() throws Throwable {
 		DataCleansingMetadata metadata = dataCleansingManager.loadMetadata(survey);
-		DataCleansingMetadataView metadataView = DataCleansingMetadataView.fromMetadata(metadata);
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(resultFile, metadataView);
+		if (! metadata.isEmpty()) {
+			DataCleansingMetadataView metadataView = DataCleansingMetadataView.fromMetadata(metadata);
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.writeValue(resultFile, metadataView);
+		}
 	}
 	
 	@Override
