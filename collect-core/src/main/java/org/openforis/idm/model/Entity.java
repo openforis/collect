@@ -22,6 +22,7 @@ import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
+import org.openforis.idm.path.Path;
 
 /**
  * @author G. Miceli
@@ -236,7 +237,7 @@ public class Entity extends Node<EntityDefinition> {
 			for (int i = 0; i < keyDefns.size(); i++) {
 				AttributeDefinition keyDefn = keyDefns.get(i);
 				Attribute<?, Value> keyAttr = getKeyAttribute(keyDefn);
-				String keyValue = keyAttr == null ? null: getKeyValue(keyAttr);
+				String keyValue = keyAttr == null ? null: keyAttr.extractTextValue();
 				result[i] = keyValue;
 			}
 			return result;
@@ -253,7 +254,7 @@ public class Entity extends Node<EntityDefinition> {
 			// key definition is inside single entities
 			String relativePath = this.getDefinition().getRelativePath(keyDefn.getParentDefinition());
 			keyAttrParent = this;
-			String[] parts = relativePath.split("/");
+			String[] parts = relativePath.split(Path.SEPARATOR_REGEX);
 			for (String part : parts) {
 				keyAttrParent = (Entity) keyAttrParent.getChild(part, 0);
 			}
@@ -265,23 +266,6 @@ public class Entity extends Node<EntityDefinition> {
 		return keyAttr;
 	}
 	
-	private String getKeyValue(Attribute<?, Value> keyAttr) {
-		Value value = keyAttr.getValue();
-		if ( value == null ) {
-			return null;
-		} else if ( value instanceof Code ) {
-			return ((Code) value).getCode();
-		} else if ( value instanceof TextValue ) {
-			return ((TextValue) value).getValue();
-		} else if ( value instanceof NumberValue ) {
-			Number num = ((NumberValue<?>) value).getValue();
-			return num == null ? null : num.toString();
-		} else {
-			AttributeDefinition defn = keyAttr.getDefinition();
-			throw new IllegalArgumentException("Attribute is not a KeyAttribute: " + defn.getClass().getName());
-		}
-	}
-
     public Entity getEnumeratedEntity(EntityDefinition childEntityDefn,
 			CodeAttributeDefinition enumeratingCodeAttributeDef, String enumeratingCode) {
 		List<Node<?>> children = getChildren(childEntityDefn);

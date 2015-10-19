@@ -56,6 +56,12 @@ public class TextAttributeDefinition extends AttributeDefinition {
 		return new TextValue(string);
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public TextValue createValue(Object val) {
+		return val == null ? null : createValue(val.toString());
+	}
+	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
 		return fieldDefinitionByName;

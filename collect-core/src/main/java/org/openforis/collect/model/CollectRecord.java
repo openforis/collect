@@ -9,28 +9,15 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
-import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.BooleanAttribute;
-import org.openforis.idm.model.BooleanValue;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.CodeAttribute;
-import org.openforis.idm.model.Coordinate;
-import org.openforis.idm.model.CoordinateAttribute;
-import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Field;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.NodeVisitor;
-import org.openforis.idm.model.NumberAttribute;
-import org.openforis.idm.model.NumericRangeAttribute;
 import org.openforis.idm.model.Record;
-import org.openforis.idm.model.TaxonAttribute;
-import org.openforis.idm.model.TextAttribute;
-import org.openforis.idm.model.TimeAttribute;
 
 /**
  * 
@@ -386,12 +373,12 @@ public class CollectRecord extends Record {
 			List<String> values = new ArrayList<String>();
 			List<AttributeDefinition> keyAttributeDefinitions = rootEntity.getDefinition().getKeyAttributeDefinitions();
 			for (AttributeDefinition keyDefn : keyAttributeDefinitions) {
-				Node<?> keyNode = this.findNodeByPath(keyDefn.getPath());
+				Attribute<?, ?> keyNode = this.findNodeByPath(keyDefn.getPath());
 				if ( keyNode == null || keyNode.isEmpty() ) {
 					//TODO throw error in this case?
 					values.add(null);
 				} else {
-					String keyValue = getTextValue(keyNode);
+					String keyValue = keyNode.extractTextValue();
 					values.add(keyValue);
 				}
 			}
@@ -409,45 +396,6 @@ public class CollectRecord extends Record {
 		this.entityCounts = counts;
 	}
 	
-	private String getTextValue(Node<?> keyNode) {
-		if(keyNode instanceof BooleanAttribute) {
-			BooleanValue val = ((BooleanAttribute) keyNode).getValue();
-			return val == null ? null : val.toString();
-		} else if(keyNode instanceof CodeAttribute) {
-			Code code = ((CodeAttribute) keyNode).getValue();
-			return code == null ? null: code.getCode();
-		} else if(keyNode instanceof CoordinateAttribute) {
-			Coordinate coordinate = ((CoordinateAttribute) keyNode).getValue();
-			return coordinate != null && coordinate.isComplete() ? coordinate.toString() : null;
-		} else if(keyNode instanceof DateAttribute) {
-			org.openforis.idm.model.Date date = ((DateAttribute) keyNode).getValue();
-			return date != null && date.isComplete() ? date.toXmlDate() : null;
-		} else if(keyNode instanceof FileAttribute) {
-			return ((FileAttribute) keyNode).getFilename();
-		} else if(keyNode instanceof NumberAttribute) {
-			Number number = ((NumberAttribute<?,?>) keyNode).getNumber();
-			return number == null ? null: number.toString();
-		} else if(keyNode instanceof NumericRangeAttribute) {
-			NumericRangeAttribute<?, ?> attr = (NumericRangeAttribute<?, ?>) keyNode;
-			String format;
-			if (attr.getDefinition().getType() == Type.INTEGER) {
-				format = "%d - %d";
-			} else {
-				format = "%f - %f";
-			}
-			return String.format(format, attr.getFrom(), attr.getTo());
-		} else if(keyNode instanceof TaxonAttribute) {
-			return ((TaxonAttribute) keyNode).getCode();
-		} else if(keyNode instanceof TextAttribute) {
-			return ((TextAttribute) keyNode).getText();
-		} else if(keyNode instanceof TimeAttribute) {
-			org.openforis.idm.model.Time time = ((TimeAttribute) keyNode).getValue();
-			return time != null && time.isComplete() ? time.toXmlTime() : null;
-		} else {
-			throw new UnsupportedOperationException("Unsopported node type: " + keyNode.getClass().getName());
-		}
-	}
-
 	/**
 	 * Returns first level entity definitions that have the attribute countInSummaryList set to true
 	 * 

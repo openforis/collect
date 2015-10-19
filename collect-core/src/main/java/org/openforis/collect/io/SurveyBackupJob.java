@@ -178,8 +178,11 @@ public class SurveyBackupJob extends SurveyLockingJob {
 			this.zipOutputStream = null;
 			this.outputFile = ((CollectMobileBackupConvertTask) task).getOutputFile();
 		} else if (task instanceof DataCleansingExportTask) {
-			ZipFiles.writeFile(zipOutputStream, ((DataCleansingExportTask) task).getResultFile(), 
-					DATA_CLEANSING_METADATA_ENTRY_NAME);
+			File metadataFile = ((DataCleansingExportTask) task).getResultFile();
+			if (metadataFile.length() > 0) {
+				ZipFiles.writeFile(zipOutputStream, metadataFile, 
+						DATA_CLEANSING_METADATA_ENTRY_NAME);
+			}
 		}
 		super.onTaskCompleted(task);
 	}

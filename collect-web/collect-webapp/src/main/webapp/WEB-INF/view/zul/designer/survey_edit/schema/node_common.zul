@@ -111,6 +111,7 @@
 		  			<fieldErrorHandler
 	  					message="@load(vmsgs['multiple'])">
 	  					<checkbox
+	  						disabled="@load(vm.multipleFieldEditingDisabled)"
 	  						checked="@load(fx.multiple eq true) @save(fx.multiple)"
 	  						onCheck="@command('applyChanges')" />
 	  				</fieldErrorHandler>

@@ -72,6 +72,8 @@ check_for_updates = 1</text>
 			<showMessageOnError>0</showMessageOnError>
   		</deleteFile>
 	</readyToInstallActionList>
+	<requireInstallationByRootUser>0</requireInstallationByRootUser>
+	<requestedExecutionLevel>asInvoker</requestedExecutionLevel>
 	<defaultUnixDirectoryPermissions>777</defaultUnixDirectoryPermissions>
 	<defaultUnixFilePermissions>777</defaultUnixFilePermissions>
 	<enableRollback>1</enableRollback>

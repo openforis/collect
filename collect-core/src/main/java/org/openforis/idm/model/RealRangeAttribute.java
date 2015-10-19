@@ -10,6 +10,7 @@ import org.openforis.idm.metamodel.Unit;
 public class RealRangeAttribute extends NumericRangeAttribute<RealRange, Double> {
 
 	private static final long serialVersionUID = 1L;
+	private static final String TEXT_VALUE_FORMAT = "%f - %f";
 
 	public RealRangeAttribute(RangeAttributeDefinition definition) {
 		super(definition);
@@ -21,5 +22,10 @@ public class RealRangeAttribute extends NumericRangeAttribute<RealRange, Double>
 	@Override
 	protected RealRange createRange(Double from, Double to, Unit unit) {
 		return new RealRange(from, to, unit);
+	}
+	
+	@Override
+	public String extractTextValue() {
+		return String.format(TEXT_VALUE_FORMAT, this.getFrom(), this.getTo());
 	}
 }

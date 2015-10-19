@@ -246,6 +246,12 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 				uiOptions.getLayout(parentEntity) == Layout.TABLE; 
 	}
 	
+	@DependsOn("editedItem")
+	public boolean isMultipleFieldEditingDisabled() {
+//		return editedItem == null || ! (editedItem instanceof CodeAttributeDefinition);
+		return false;
+	}
+	
 	public boolean isRequiredApplied() {
 		return true;
 	}

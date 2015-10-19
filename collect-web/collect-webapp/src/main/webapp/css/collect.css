@@ -245,6 +245,11 @@ fieldset.has-error legend {
 	color: #c9302c;
 }
 
+.edit-icon {
+	cursor: pointer;
+	color: #1E3BB6;
+}
+
 .hcenter {
 	text-align: center;
 }

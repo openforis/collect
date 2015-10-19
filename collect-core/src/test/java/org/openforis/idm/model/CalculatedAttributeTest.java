@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -17,6 +18,7 @@ import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 import org.openforis.idm.model.expression.InvalidExpressionException;
 
 /**
@@ -27,9 +29,11 @@ public class CalculatedAttributeTest {
 
 	private Survey survey;
 	private Record record;
+	private RecordUpdater recordUpdater;
 	
 	@Before
 	public void before() {
+		recordUpdater = new RecordUpdater();
 		survey = createTestSurvey();
 		record = createTestRecord(survey);
 	}
@@ -71,6 +75,8 @@ public class CalculatedAttributeTest {
 		calculatedTotal = total.getValue();
 		assertEquals(new RealValue(110d, null), calculatedTotal);
 	}
+	
+	
 	
 //	@Test
 //	@Ignore
@@ -122,6 +128,7 @@ public class CalculatedAttributeTest {
 	private Record createTestRecord(Survey survey) {
 		Record record = new Record(survey, null);
 		record.createRootEntity("bill");
+		recordUpdater.initializeNewRecord(record);
 		return record;
 	}
 
@@ -150,7 +157,10 @@ public class CalculatedAttributeTest {
 		IntegerAttribute discount = (IntegerAttribute) discountDefn.createNode();
 		item.add(discount);
 		
+		EntityBuilder.addValue(item, "time", new Time(110, 5));
+		
 		parentEntity.add(item);
+		recordUpdater.initializeRecord(record);
 		return item;
 	}
 
@@ -183,6 +193,15 @@ public class CalculatedAttributeTest {
 		total.setCalculated(true);
 		total.addAttributeDefault(new AttributeDefault("qty * (price - (price * discount_percent div 100))"));
 		item.addChildDefinition(total);
+		TimeAttributeDefinition time = schema.createTimeAttributeDefinition();
+		time.setName("time");
+		time.addAttributeDefault(new AttributeDefault("idm:currentTime()"));
+		item.addChildDefinition(time);
+		TimeAttributeDefinition timeAlias = schema.createTimeAttributeDefinition();
+		timeAlias.setName("time_alias");
+		timeAlias.setCalculated(true);
+		timeAlias.addAttributeDefault(new AttributeDefault("time"));
+		item.addChildDefinition(timeAlias);
 		
 		NumberAttributeDefinition discountPercent = schema.createNumberAttributeDefinition();
 		discountPercent.setType(Type.INTEGER);

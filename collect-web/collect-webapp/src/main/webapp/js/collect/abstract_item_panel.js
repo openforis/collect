@@ -41,7 +41,11 @@ Collect.AbstractItemPanel.prototype.editSelectedItem = function() {
 	if (selectedItem == null) {
 		return;
 	}
-	$this.openItemEditDialog(selectedItem);
+	$this.editItem(selectedItem);
+};
+
+Collect.AbstractItemPanel.prototype.editItem = function(item) {
+	this.openItemEditDialog(item);
 };
 
 Collect.AbstractItemPanel.prototype.duplicateSelectedItem = function() {
@@ -69,9 +73,7 @@ Collect.AbstractItemPanel.prototype.initDataGrid = function() {
 Collect.AbstractItemPanel.prototype.getCommonDataGridOptions = function() {
 	return {
 		cache: false,
-		clickToSelect: true,
-	    singleSelect: true,
-		onDblClickRow: $.proxy(this.editSelectedItem, this)
+		onDblClickRow: $.proxy(this.editItem, this)
 	};
 };
 
@@ -93,6 +95,10 @@ Collect.AbstractItemPanel.prototype.refreshDataGrid = function() {
 
 Collect.AbstractItemPanel.prototype.createGridItemDeleteColumn = function() {
 	return Collect.Grids.createDeleteColumn(this.deleteItem, this);
+};
+
+Collect.AbstractItemPanel.prototype.createGridItemEditColumn = function() {
+	return Collect.Grids.createEditColumn(this.editItem, this);
 };
 
 Collect.AbstractItemPanel.prototype.deleteItem = function(item) {

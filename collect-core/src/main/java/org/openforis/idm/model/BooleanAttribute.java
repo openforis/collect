@@ -28,4 +28,10 @@ public class BooleanAttribute extends Attribute<BooleanAttributeDefinition, Bool
 		field.setValue(value == null ? null : value.getValue());
 	}
 
+	@Override
+	public String extractTextValue() {
+		BooleanValue val = getValue();
+		return val == null ? null : val.toString();
+	}
+	
 }

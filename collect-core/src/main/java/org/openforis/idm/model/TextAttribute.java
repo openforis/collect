@@ -37,4 +37,9 @@ public class TextAttribute extends Attribute<TextAttributeDefinition, TextValue>
 		getTextField().setValue(value.getValue());
 	}
 	
+	@Override
+	public String extractTextValue() {
+		return getText();
+	}
+	
 }

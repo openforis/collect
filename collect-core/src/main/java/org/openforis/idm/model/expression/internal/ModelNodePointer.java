@@ -18,17 +18,12 @@ import org.openforis.idm.model.BooleanValue;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.Date;
-import org.openforis.idm.model.IntegerAttribute;
-import org.openforis.idm.model.IntegerRange;
-import org.openforis.idm.model.IntegerRangeAttribute;
 import org.openforis.idm.model.IntegerValue;
 import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.NumberValue;
 import org.openforis.idm.model.NumericRange;
 import org.openforis.idm.model.NumericRangeAttribute;
-import org.openforis.idm.model.RealAttribute;
 import org.openforis.idm.model.RealRange;
-import org.openforis.idm.model.RealRangeAttribute;
 import org.openforis.idm.model.RealValue;
 import org.openforis.idm.model.TaxonOccurrence;
 import org.openforis.idm.model.TextValue;
@@ -78,24 +73,20 @@ public class ModelNodePointer extends DynamicPointer {
 			return ((BooleanValue) value).getValue(); 
 		} else if (value instanceof Time ) {
 			if ( attribute.isFilled() ) {
-				Time time = (Time) value;
-				return time.getNumericValue();
+				return ((Time) value).getNumericValue();
 			} else {
 				return null;
 			}
 		} else if (value instanceof Date) {
 			if ( attribute.isFilled() ) {
-				Date date = (Date) value;
-				return date.getNumericValue();
+				return ((Date) value).getNumericValue();
 			} else {
 				return null;
 			}
 		} else if (value instanceof Code) {
-			Code code = (Code) value;
-			return code.getCode();
+			return ((Code) value).getCode();
 		} else if (value instanceof TaxonOccurrence) {
-			TaxonOccurrence taxonOcc = (TaxonOccurrence) value;
-			return taxonOcc.getCode();
+			return ((TaxonOccurrence) value).getCode();
 		} else if (value instanceof Coordinate) {
 			return value;
 		} else {
@@ -105,91 +96,46 @@ public class ModelNodePointer extends DynamicPointer {
 	
 	private Number getNumericValue(NumberAttribute<?, ?> attr) {
 		if ( normalizeNumbers ) {
-			if ( attr instanceof IntegerAttribute ) {
-				return getNormalizedValue((IntegerAttribute) attr);
-			} else {
-				return getNormalizedValue((RealAttribute) attr);
-			}
+			return getNormalizedValue(attr);
 		} else {
 			return attr.getValue().getValue();
 		}
 	}
 	
-	private Number getNormalizedValue(IntegerAttribute attr) {
+	private Number getNormalizedValue(NumberAttribute<?, ?> attr) {
 		NumberAttributeDefinition defn = attr.getDefinition();
 		List<Unit> units = defn.getUnits();
-		IntegerValue value = attr.getValue();
 		if ( units != null && units.size() > 1 ) {
 			Unit unit = attr.getUnit();
 			Unit defaultUnit = defn.getDefaultUnit();
 			if ( unit != null && defaultUnit != null ) {
-				double normalizedValue = getNormalizedValue(value, defaultUnit).doubleValue();
+				double normalizedValue = getNormalizedValue(attr.getValue(), defaultUnit).doubleValue();
 				return normalizedValue;
 			}
 		}
+		NumberValue<?> value = attr.getValue();
 		return value.getValue();
 	}
 
-	private Number getNormalizedValue(RealAttribute attr) {
-		NumberAttributeDefinition defn = attr.getDefinition();
-		List<Unit> units = defn.getUnits();
-		RealValue value = attr.getValue();
-		if ( units != null && units.size() > 1 ) {
-			Unit unit = attr.getUnit();
-			Unit defaultUnit = defn.getDefaultUnit();
-			if ( unit != null && defaultUnit != null ) {
-				double normalizedValue = getNormalizedValue(value, defaultUnit).doubleValue();
-				return normalizedValue;
-			}
-		}
-		return value.getValue();
-	}
-	
 	private NumericRange<?> getNumericRangeValue(NumericRangeAttribute<?, ?> attr) {
 		if ( normalizeNumbers ) {
-			if ( attr instanceof RealRangeAttribute ) {
-				return getNormalizedValue((RealRangeAttribute) attr);
-			} else {
-				return getNormalizedValue((IntegerRangeAttribute) attr);
-			}
+			return getNormalizedValue(attr);
 		} else {
 			return attr.getValue();
 		}
 	}
 	
 
-	private NumericRange<?> getNormalizedValue(IntegerRangeAttribute attr) {
-		IntegerRange value = attr.getValue();
+	private NumericRange<?> getNormalizedValue(NumericRangeAttribute<?, ?> attr) {
+		NumericRange<?> value = attr.getValue();
 		RangeAttributeDefinition defn = attr.getDefinition();
 		List<Unit> units = defn.getUnits();
 		if ( units != null && units.size() > 1 ) {
 			Unit unit = attr.getUnit();
 			Unit defaultUnit = defn.getDefaultUnit();
 			if ( unit != null && defaultUnit != null && unit != defaultUnit ) {
-				Integer from = value.getFrom();
-				Integer to = value.getTo();
-				double normalizedFrom = getNormalizedValue(from, unit, defaultUnit).doubleValue();
-				double normalizedTo = getNormalizedValue(to, unit, defaultUnit).doubleValue();
-				RealRange normalizedValue = new RealRange(normalizedFrom, normalizedTo, defaultUnit);
-				return normalizedValue;
-			} else {
-				return value;
-			}
-		} else {
-			return value;
-		}
-	}
-	
-	private NumericRange<?> getNormalizedValue(RealRangeAttribute attr) {
-		RealRange value = attr.getValue();
-		RangeAttributeDefinition defn = attr.getDefinition();
-		List<Unit> units = defn.getUnits();
-		if ( units != null && units.size() > 1 ) {
-			Unit unit = attr.getUnit();
-			Unit defaultUnit = defn.getDefaultUnit();
-			if ( unit != null && defaultUnit != null && unit != defaultUnit ) {
-				Double from = value.getFrom();
-				Double to = value.getTo();
+				Number from = value.getFrom();
+				Number to = value.getTo();
 				double normalizedFrom = getNormalizedValue(from, unit, defaultUnit).doubleValue();
 				double normalizedTo = getNormalizedValue(to, unit, defaultUnit).doubleValue();
 				RealRange normalizedValue = new RealRange(normalizedFrom, normalizedTo, defaultUnit);
@@ -215,11 +161,7 @@ public class ModelNodePointer extends DynamicPointer {
 		}
 	}
 	
-	private Number getNormalizedValue(IntegerValue value, Unit defaultUnit) {
-		return getNormalizedValue(value.getValue(), value.getUnit(), defaultUnit);
-	}
-
-	private Number getNormalizedValue(RealValue value, Unit defaultUnit) {
+	private Number getNormalizedValue(NumberValue<?> value, Unit defaultUnit) {
 		return getNormalizedValue(value.getValue(), value.getUnit(), defaultUnit);
 	}
 
