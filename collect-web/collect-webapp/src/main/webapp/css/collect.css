@@ -250,6 +250,11 @@ fieldset.has-error legend {
 	color: #1E3BB6;
 }
 
+.duplicate-icon {
+	cursor: pointer;
+	color: darkgrey;
+}
+
 .hcenter {
 	text-align: center;
 }

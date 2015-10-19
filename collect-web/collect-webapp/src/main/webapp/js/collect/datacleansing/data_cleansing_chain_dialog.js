@@ -165,11 +165,10 @@ Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = functio
 	
 	gridContainer.bootstrapTable({
 	    clickToSelect: true,
-	    height: 150,
+	    height: 200,
 	    width: 800,
 	    columns: [
           	{field: "selected", title: "", radio: true},
-			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title", width: 400},
 			{field: "queryTitle", title: "Query Title", width: 200},
 			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},

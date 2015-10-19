@@ -17,8 +17,6 @@ Collect.AbstractItemPanel.prototype.init = function() {
 	
 	panel.find('.edit-btn').click($.proxy($this.editSelectedItem, $this));
 	
-	panel.find('.duplicate-btn').click($.proxy($this.duplicateSelectedItem, $this));
-	
 	panel.find('.delete-btn').click($.proxy(function() {
 		var $this = this;
 		var selectedItem = $this.getSelectedItem();
@@ -48,13 +46,9 @@ Collect.AbstractItemPanel.prototype.editItem = function(item) {
 	this.openItemEditDialog(item);
 };
 
-Collect.AbstractItemPanel.prototype.duplicateSelectedItem = function() {
+Collect.AbstractItemPanel.prototype.duplicateItem = function(item) {
 	var $this = this;
-	var selectedItem = $this.getSelectedItem();
-	if (selectedItem == null) {
-		return;
-	}
-	var newItem = jQuery.extend({}, selectedItem);
+	var newItem = jQuery.extend({}, item);
 	newItem.id = null;
 	$this.openItemEditDialog(newItem);
 };
@@ -67,12 +61,17 @@ Collect.AbstractItemPanel.prototype.initDataGrid = function() {
 	
 	gridContainer.bootstrapTable(options);
 	
+	$(window).resize(function() {
+		$this.resizeDataGrid();
+	});
+	
 	$this.dataGrid = gridContainer.data('bootstrap.table');
 };
 
 Collect.AbstractItemPanel.prototype.getCommonDataGridOptions = function() {
 	return {
 		cache: false,
+		height: this.calculateTableHeight(),
 		onDblClickRow: $.proxy(this.editItem, this)
 	};
 };
@@ -90,7 +89,21 @@ Collect.AbstractItemPanel.prototype.refreshDataGrid = function() {
 		this.initDataGrid();
 	} else {
 		this.dataGrid.refresh();
+		this.resizeDataGrid();
 	}
+};
+
+Collect.AbstractItemPanel.prototype.resizeDataGrid = function() {
+	var $this = this;
+	var gridContainer = $this.$panel.find(".grid");
+	gridContainer.bootstrapTable('resetView', {
+		height : $this.calculateTableHeight()
+	});
+};
+
+Collect.AbstractItemPanel.prototype.calculateTableHeight = function() {
+	var $this = this;
+    return $(window).height() - 270;
 };
 
 Collect.AbstractItemPanel.prototype.createGridItemDeleteColumn = function() {
@@ -99,6 +112,10 @@ Collect.AbstractItemPanel.prototype.createGridItemDeleteColumn = function() {
 
 Collect.AbstractItemPanel.prototype.createGridItemEditColumn = function() {
 	return Collect.Grids.createEditColumn(this.editItem, this);
+};
+
+Collect.AbstractItemPanel.prototype.createGridItemDuplicateColumn = function() {
+	return Collect.Grids.createDuplicateColumn(this.duplicateItem, this);
 };
 
 Collect.AbstractItemPanel.prototype.deleteItem = function(item) {

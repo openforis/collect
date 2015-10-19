@@ -7,10 +7,9 @@ import java.util.List;
 import org.openforis.collect.datacleansing.DataCleansingChain;
 import org.openforis.collect.datacleansing.DataCleansingMetadata;
 import org.openforis.collect.datacleansing.DataCleansingStep;
-import org.openforis.collect.datacleansing.DataErrorQuery;
-import org.openforis.collect.datacleansing.DataErrorQueryGroup;
-import org.openforis.collect.datacleansing.DataErrorType;
 import org.openforis.collect.datacleansing.DataQuery;
+import org.openforis.collect.datacleansing.DataQueryGroup;
+import org.openforis.collect.datacleansing.DataQueryType;
 import org.openforis.collect.manager.AbstractSurveyObjectManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
@@ -35,33 +34,30 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	@Autowired
 	private DataQueryManager dataQueryManager;
 	@Autowired
-	private DataErrorQueryManager dataErrorQueryManager;
+	private DataQueryGroupManager dataQueryGroupManager;
 	@Autowired
-	private DataErrorQueryGroupManager dataErrorQueryGroupManager;
-	@Autowired
-	private DataErrorTypeManager dataErrorTypeManager;
+	private DataQueryTypeManager dataTypeManager;
 	@Autowired
 	private DataCleansingStepManager dataCleansingStepManager;
 	@Autowired
 	private DataCleansingChainManager dataCleansingChainManager;
 	@Autowired
-	private DataErrorReportManager dataErrorReportManager;
+	private DataReportManager dataReportManager;
 	
 	@Override
 	public DataCleansingMetadata loadMetadata(CollectSurvey survey) {
 		List<DataQuery> dataQueries = dataQueryManager.loadBySurvey(survey);
-		List<DataErrorType> dataErrorTypes = dataErrorTypeManager.loadBySurvey(survey);
-		List<DataErrorQuery> dataErrorQueries = dataErrorQueryManager.loadBySurvey(survey);
-		for (DataErrorQuery dataErrorQuery : dataErrorQueries) {
-			dataErrorQuery.setQuery(CollectionUtils.findItem(dataQueries, dataErrorQuery.getQueryId()));
-			dataErrorQuery.setType(CollectionUtils.findItem(dataErrorTypes, dataErrorQuery.getTypeId()));
+		List<DataQueryType> dataQueryTypes = dataTypeManager.loadBySurvey(survey);
+		for (DataQuery dataQuery : dataQueries) {
+			Integer typeId = dataQuery.getTypeId();
+			dataQuery.setType(typeId == null ? null : CollectionUtils.findItem(dataQueryTypes, typeId));
 		}
-		List<DataErrorQueryGroup> dataErrorQueryGroups = dataErrorQueryGroupManager.loadBySurvey(survey);
-		for (DataErrorQueryGroup group : dataErrorQueryGroups) {
-			List<DataErrorQuery> queries = group.getQueries();
-			List<DataErrorQuery> correctQueries = new ArrayList<DataErrorQuery>(queries.size());
-			for (DataErrorQuery dataErrorQuery : queries) {
-				correctQueries.add(CollectionUtils.findItem(dataErrorQueries, dataErrorQuery.getId()));
+		List<DataQueryGroup> dataQueryGroups = dataQueryGroupManager.loadBySurvey(survey);
+		for (DataQueryGroup group : dataQueryGroups) {
+			List<DataQuery> queries = group.getQueries();
+			List<DataQuery> correctQueries = new ArrayList<DataQuery>(queries.size());
+			for (DataQuery dataQuery : queries) {
+				correctQueries.add(CollectionUtils.findItem(dataQueries, dataQuery.getId()));
 			}
 			group.removeAllQueries();
 			group.allAllQueries(correctQueries);
@@ -83,10 +79,9 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 		
 		DataCleansingMetadata metadata = new DataCleansingMetadata(
 				survey,
+				dataQueryTypes, 
 				dataQueries, 
-				dataErrorTypes, 
-				dataErrorQueries, 
-				dataErrorQueryGroups,
+				dataQueryGroups,
 				cleansingSteps, 
 				cleansingChains);
 		return metadata;
@@ -95,10 +90,9 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	@Transactional
 	@Override
 	public void saveMetadata(CollectSurvey survey, DataCleansingMetadata metadata) {
+		saveItems(dataTypeManager, survey, metadata.getDataQueryTypes());
 		saveItems(dataQueryManager, survey, metadata.getDataQueries());
-		saveItems(dataErrorTypeManager, survey, metadata.getDataErrorTypes());
-		saveItems(dataErrorQueryManager, survey, metadata.getDataErrorQueries());
-		saveItems(dataErrorQueryGroupManager, survey, metadata.getDataErrorQueryGroups());
+		saveItems(dataQueryGroupManager, survey, metadata.getDataQueryGroups());
 		saveItems(dataCleansingStepManager, survey, metadata.getCleansingSteps());
 		saveItems(dataCleansingChainManager, survey, metadata.getCleansingChains());
 	}
@@ -116,8 +110,8 @@ public class DataCleansingManagerImpl implements DataCleansingMetadataManager {
 	public void deleteMetadata(CollectSurvey survey) {
 		List<AbstractSurveyObjectManager<?, ?>> managers = Arrays.<AbstractSurveyObjectManager<?, ?>>asList(
 				dataCleansingChainManager, dataCleansingStepManager, 
-				dataErrorReportManager, dataErrorQueryGroupManager, dataErrorQueryManager,
-				dataErrorTypeManager, dataQueryManager);
+				dataReportManager, dataQueryGroupManager,
+				dataQueryManager, dataTypeManager);
 		for (AbstractSurveyObjectManager<?, ?> manager : managers) {
 			manager.deleteBySurvey(survey);
 		}

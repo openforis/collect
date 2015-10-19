@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.junit.Before;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.datacleansing.DataCleansingStepValue.UpdateType;
-import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
+import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -128,131 +128,97 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 			return this;
 		}
 		
+		public DataQueryBuilder type(DataQueryType type) {
+			obj.setType(type);
+			return this;
+		}
+		
+		public DataQueryBuilder severity(ErrorSeverity severity) {
+			obj.setErrorSeverity(severity);
+			return this;
+		}
 	}
 	
-	public static class DataErrorTypeBuilder extends PersistedSurveyObjectBuilder<DataErrorType> {
+	public static class DataQueryTypeBuilder extends PersistedSurveyObjectBuilder<DataQueryType> {
 		
-		public DataErrorTypeBuilder(CollectSurvey survey) {
-			super(survey, DataErrorType.class);
+		public DataQueryTypeBuilder(CollectSurvey survey) {
+			super(survey, DataQueryType.class);
 		}
 
 		@Override
-		public DataErrorTypeBuilder id(Integer id) {
-			return (DataErrorTypeBuilder) super.id(id);
+		public DataQueryTypeBuilder id(Integer id) {
+			return (DataQueryTypeBuilder) super.id(id);
 		}
 		
 		@Override
-		public DataErrorTypeBuilder uuid(String uuid) {
-			return (DataErrorTypeBuilder) super.uuid(uuid);
+		public DataQueryTypeBuilder uuid(String uuid) {
+			return (DataQueryTypeBuilder) super.uuid(uuid);
 		}
 		
 		@Override
-		public DataErrorTypeBuilder creationDate(Date date) {
-			return (DataErrorTypeBuilder) super.creationDate(date);
+		public DataQueryTypeBuilder creationDate(Date date) {
+			return (DataQueryTypeBuilder) super.creationDate(date);
 		}
 		
 		@Override
-		public DataErrorTypeBuilder modifiedDate(Date date) {
-			return (DataErrorTypeBuilder) super.modifiedDate(date);
+		public DataQueryTypeBuilder modifiedDate(Date date) {
+			return (DataQueryTypeBuilder) super.modifiedDate(date);
 		}
 		
-		public DataErrorTypeBuilder code(String code) {
+		public DataQueryTypeBuilder code(String code) {
 			obj.setCode(code);
 			return this;
 		}
 		
-		public DataErrorTypeBuilder description(String description) {
+		public DataQueryTypeBuilder description(String description) {
 			obj.setDescription(description);
 			return this;
 		}
 
-		public DataErrorTypeBuilder label(String label) {
+		public DataQueryTypeBuilder label(String label) {
 			obj.setLabel(label);
 			return this;
 		}
 		
 	}
 	
-	public static class DataErrorQueryBuilder extends PersistedSurveyObjectBuilder<DataErrorQuery> {
+	public static class DataQueryGroupBuilder extends PersistedSurveyObjectBuilder<DataQueryGroup> {
 		
-		public DataErrorQueryBuilder(CollectSurvey survey) {
-			super(survey, DataErrorQuery.class);
+		public DataQueryGroupBuilder(CollectSurvey survey) {
+			super(survey, DataQueryGroup.class);
 		}
 
 		@Override
-		public DataErrorQueryBuilder id(Integer id) {
-			return (DataErrorQueryBuilder) super.id(id);
+		public DataQueryGroupBuilder id(Integer id) {
+			return (DataQueryGroupBuilder) super.id(id);
 		}
 		
 		@Override
-		public DataErrorQueryBuilder uuid(String uuid) {
-			return (DataErrorQueryBuilder) super.uuid(uuid);
+		public DataQueryGroupBuilder uuid(String uuid) {
+			return (DataQueryGroupBuilder) super.uuid(uuid);
 		}
 		
 		@Override
-		public DataErrorQueryBuilder creationDate(Date date) {
-			return (DataErrorQueryBuilder) super.creationDate(date);
+		public DataQueryGroupBuilder creationDate(Date date) {
+			return (DataQueryGroupBuilder) super.creationDate(date);
 		}
 		
 		@Override
-		public DataErrorQueryBuilder modifiedDate(Date date) {
-			return (DataErrorQueryBuilder) super.modifiedDate(date);
+		public DataQueryGroupBuilder modifiedDate(Date date) {
+			return (DataQueryGroupBuilder) super.modifiedDate(date);
 		}
 		
-		public DataErrorQueryBuilder query(DataQuery query) {
-			obj.setQuery(query);
-			return this;
-		}
-		
-		public DataErrorQueryBuilder type(DataErrorType type) {
-			obj.setType(type);
-			return this;
-		}
-		
-		public DataErrorQueryBuilder severity(Severity severity) {
-			obj.setSeverity(severity);
-			return this;
-		}
-		
-	}
-	
-	public static class DataErrorQueryGroupBuilder extends PersistedSurveyObjectBuilder<DataErrorQueryGroup> {
-		
-		public DataErrorQueryGroupBuilder(CollectSurvey survey) {
-			super(survey, DataErrorQueryGroup.class);
-		}
-
-		@Override
-		public DataErrorQueryGroupBuilder id(Integer id) {
-			return (DataErrorQueryGroupBuilder) super.id(id);
-		}
-		
-		@Override
-		public DataErrorQueryGroupBuilder uuid(String uuid) {
-			return (DataErrorQueryGroupBuilder) super.uuid(uuid);
-		}
-		
-		@Override
-		public DataErrorQueryGroupBuilder creationDate(Date date) {
-			return (DataErrorQueryGroupBuilder) super.creationDate(date);
-		}
-		
-		@Override
-		public DataErrorQueryGroupBuilder modifiedDate(Date date) {
-			return (DataErrorQueryGroupBuilder) super.modifiedDate(date);
-		}
-		
-		public DataErrorQueryGroupBuilder title(String title) {
+		public DataQueryGroupBuilder title(String title) {
 			obj.setTitle(title);
 			return this;
 		}
 		
-		public DataErrorQueryGroupBuilder description(String description) {
+		public DataQueryGroupBuilder description(String description) {
 			obj.setDescription(description);
 			return this;
 		}
 		
-		public DataErrorQueryGroupBuilder query(DataErrorQuery query) {
+		public DataQueryGroupBuilder query(DataQuery query) {
 			obj.addQuery(query);
 			return this;
 		}
@@ -387,14 +353,12 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 		public DataCleansingMetadata build() {
 			DataCleansingMetadata metadata = new DataCleansingMetadata(survey);
 			for (PersistedSurveyObjectBuilder<?> builder : builders) {
-				if (builder instanceof DataQueryBuilder) {
+				if (builder instanceof DataQueryTypeBuilder) {
+					metadata.getDataQueryTypes().add((DataQueryType) builder.build());
+				} else if (builder instanceof DataQueryBuilder) {
 					metadata.getDataQueries().add((DataQuery) builder.build());
-				} else if (builder instanceof DataErrorTypeBuilder) {
-					metadata.getDataErrorTypes().add((DataErrorType) builder.build());
-				} else if (builder instanceof DataErrorQueryBuilder) {
-					metadata.getDataErrorQueries().add((DataErrorQuery) builder.build());
-				} else if (builder instanceof DataErrorQueryGroupBuilder) {
-					metadata.getDataErrorQueryGroups().add((DataErrorQueryGroup) builder.build());
+				} else if (builder instanceof DataQueryGroupBuilder) {
+					metadata.getDataQueryGroups().add((DataQueryGroup) builder.build());
 				} else if (builder instanceof DataCleansingStepBuilder) {
 					metadata.getCleansingSteps().add((DataCleansingStep) builder.build());
 				} else if (builder instanceof DataCleansingChainBuilder) {
@@ -414,16 +378,12 @@ public abstract class DataCleansingIntegrationTest extends CollectIntegrationTes
 		return new DataQueryBuilder(survey);
 	}
 	
-	public DataErrorTypeBuilder dataErrorType() {
-		return new DataErrorTypeBuilder(survey);
+	public DataQueryTypeBuilder dataQueryType() {
+		return new DataQueryTypeBuilder(survey);
 	}
 	
-	public DataErrorQueryBuilder dataErrorQuery() {
-		return new DataErrorQueryBuilder(survey);
-	}
-	
-	public DataErrorQueryGroupBuilder dataErrorQueryGroup() {
-		return new DataErrorQueryGroupBuilder(survey);
+	public DataQueryGroupBuilder dataQueryGroup() {
+		return new DataQueryGroupBuilder(survey);
 	}
 	
 	public DataCleansingStepBuilder dataCleansingStep() {

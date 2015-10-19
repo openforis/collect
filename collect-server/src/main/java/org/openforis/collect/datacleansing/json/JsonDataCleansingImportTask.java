@@ -13,6 +13,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -34,6 +35,7 @@ public class JsonDataCleansingImportTask extends Task implements DataCleansingIm
 	@Override
 	protected void execute() throws Throwable {
 		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		DataCleansingMetadataView metadataView = objectMapper.readValue(inputFile, DataCleansingMetadataView.class);
 		DataCleansingMetadata metadata = metadataView.toMetadata(survey);
 		dataCleansingManager.saveMetadata(survey, metadata);

@@ -13,11 +13,10 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 	function onExpandRow(index, chain, $rowEl) {
 		var stepsTableEl = $rowEl.find("table.steps");
 		stepsTableEl.bootstrapTable({
-			width: 600,
-			height: "100%",
+			width: 500,
+			height: 200,
 			columns: [
-				{field: "id", title: "Id", visible: false},
-				{field: "title", title: "Title", width: 400},
+				{field: "title", title: "Title", width: 300},
 				{field: "queryTitle", title: "Query Title", width: 200}
 		    ],
 		    data: chain.steps
@@ -26,15 +25,15 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 		$this.itemService.loadReports(chain.id, function(reports) {
 			var reportsTableEl = $rowEl.find("table.reports");
 			reportsTableEl.bootstrapTable({
-				width: 600,
+				height: 120,
+				width: 480,
 				columns: [
-					{field: "id", title: "Id", visible: false},
 					{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, align: "right", sortable: true, width: 130},
 					{field: "datasetSize", title: "Dataset Size", align: "right", sortable: true, width: 100, align: "right"},
 					{field: "lastRecordModifiedDate", title: "Last Record Modified", 
-						formatter: OF.Dates.formatToPrettyDateTime, align: "right", sortable: true, width: 130},
-					{field: "cleansedRecords", title: "Cleansed Records", width: 100, align: "right"},
-					{field: "cleansedNodes", title: "Cleansed Nodes", width: 100, align: "right"}
+						formatter: OF.Dates.formatToPrettyDateTime, align: "right", sortable: true, width: 80},
+					{field: "cleansedRecords", title: "Cleansed Records", width: 70, align: "right"},
+					{field: "cleansedNodes", title: "Cleansed Nodes", width: 70, align: "right"}
 			    ],
 			    data: reports
 			});
@@ -60,7 +59,6 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 	    url: "datacleansing/datacleansingchains/list.json",
 	    detailView: true,
 	    detailFormatter: detailFormatter,
-	    height: 400,
 	    onExpandRow: onExpandRow,
 	    columns: [
 			{field: "title", title: "Title", width: 800, sortable: true},
