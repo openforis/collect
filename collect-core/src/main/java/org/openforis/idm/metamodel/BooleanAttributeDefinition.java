@@ -52,6 +52,18 @@ public class BooleanAttributeDefinition extends AttributeDefinition {
 		return new BooleanValue(string);
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public BooleanValue createValue(Object val) {
+		if (val == null) {
+			return null;
+		} else if (val instanceof Boolean) {
+			return new BooleanValue((Boolean) val);
+		} else {
+			return createValue(val.toString());
+		}
+	}
+	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
 		return fieldDefinitionByName;

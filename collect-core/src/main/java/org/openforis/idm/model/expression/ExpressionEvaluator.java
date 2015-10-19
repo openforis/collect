@@ -63,9 +63,8 @@ public class ExpressionEvaluator {
 					throw new IllegalArgumentException(String.format("Unexpected value type. Found %s expected %s", expectedValueType.getName(), object.getClass().getName()));
 				}
 			} else {
-				String stringValue = object.toString();
-				V value = defn.createValue(stringValue);
-				return value;
+				V val = defn.createValue(object);
+				return val;
 			}
 		}
 	}

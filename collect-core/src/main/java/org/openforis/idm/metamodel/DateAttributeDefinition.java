@@ -45,6 +45,20 @@ public class DateAttributeDefinition extends AttributeDefinition {
 		return Date.parse(string);
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Date createValue(Object val) {
+		if (val == null) {
+			return null;
+		} else if (val instanceof java.util.Date) {
+			return Date.parse((java.util.Date) val);
+		} else if (val instanceof Integer) {
+			return Date.fromNumericValue((Integer) val); 
+		} else {
+			return Date.parse((String) val);
+		}
+	}
+	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
 		return fieldDefinitionByName;

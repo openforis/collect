@@ -21,7 +21,7 @@ public final class Time extends AbstractValue {
 	/**
 	 * Internal string format for Time value ("hhss")
 	 */
-	private static final Pattern INTERNAL_STRING_PATTERN = Pattern.compile("(\\d*)([0-5]?[0-9])");
+	private static final Pattern INTERNAL_STRING_PATTERN = Pattern.compile("(\\d*)([0-5][0-9])");
 	/**
 	 * Generic string format for Time value ("hh:mm" or "hh:mm:ss" . Please note that seconds will be ignored by the Time attribute)
 	 */

@@ -157,7 +157,7 @@ public class CalculatedAttributeTest {
 		IntegerAttribute discount = (IntegerAttribute) discountDefn.createNode();
 		item.add(discount);
 		
-		EntityBuilder.addValue(item, "time", new Time(0, 0));
+		EntityBuilder.addValue(item, "time", new Time(110, 5));
 		
 		parentEntity.add(item);
 		recordUpdater.initializeRecord(record);
