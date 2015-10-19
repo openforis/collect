@@ -123,7 +123,9 @@ public class MondrianCubeGenerator {
 							
 							hierarchy.join = join;
 							
-						}						
+						}else{
+							hierarchy.table = new Table(entityName);
+						}
 						
 						hierarchy.levels.add(generateLevel(childDef));
 						
