@@ -25,7 +25,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<openforis.commons.version>0.1.9</openforis.commons.version>
-		<spring.version>4.1.6.RELEASE</spring.version>
+		<spring.version>4.2.2.RELEASE</spring.version>
 		<spring-security.version>4.0.2.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
 		<saiku.version>3.2.5</saiku.version>
