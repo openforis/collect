@@ -42,12 +42,12 @@ Collect.DataCleansing.DataCleansingChainPanelController.prototype.getDataGridOpt
 	
 	function detailFormatter(index, chain) {
 		var html = 
-			'<fieldset style="margin-left: 60px !important;" ' +
+			'<fieldset style="margin-left: 60px !important; width: 950px;" ' +
 				'class="compact">' +
 	        	'<legend>Cleansing Steps</legend>' +
 	        	'<table class="steps"></table>' +
         	'</fieldset>' +
-       		'<fieldset style="margin-left: 60px !important;" ' +
+       		'<fieldset style="margin-left: 60px !important; width: 950px" ' +
 				'class="compact">' +
 				'<legend>Reports</legend>' +
 				'<table class="reports"></table>' +
