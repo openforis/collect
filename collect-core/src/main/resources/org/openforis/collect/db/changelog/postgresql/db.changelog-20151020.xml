@@ -7,68 +7,68 @@
 
 	    <preConditions onFail="MARK_RAN">
 	    	<not>
-		    	<tableExists tableName="ofc_event" />
+		    	<tableExists tableName="ofc_message" />
 	    	</not>
 	    </preConditions>
 	    
-	    <comment>Event queue storage</comment>
+	    <comment>Message queue storage</comment>
 	    
-	    <createTable tableName="ofc_event">
-			<column name="sequence_number" type="INTEGER">
-				<constraints nullable="false" primaryKey="true" />
-			</column>
+	    <createTable tableName="ofc_message">
 			<column name="id" type="VARCHAR">
 				<constraints nullable="false" />
 			</column>
-			<column name="broker_id" type="VARCHAR">
+			<column name="sequence_no" type="SERIAL">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="publication_time" type="TIMESTAMP">
 				<constraints nullable="false" />
 			</column>
-			<column name="published_timestamp" type="TIMESTAMP">
+			<column name="queue_id" type="VARCHAR">
 				<constraints nullable="false" />
 			</column>
-			<column name="contents" type="TEXT">
-				<constraints nullable="false" />
-			</column>
-	    </createTable>
+			<column name="message_string" type="VARCHAR" />
+			<column name="message_bytes" type="bytea" />
+		</createTable>
     	
-	    <createTable tableName="ofc_event_processing_status">
-			<column name="version" type="INTEGER">
+	    <createTable tableName="ofc_message_processing">
+			<column name="message_id" type="VARCHAR">
 				<constraints nullable="false" />
 			</column>
-			<column name="event_sequence_number" type="INTEGER">
-				<constraints nullable="false" 
-					foreignKeyName="ofc_event_processing_status_event_fkey"	
-					references="ofc_event(sequence_number)" />
-			</column>
-			<column name="subscriber_id" type="VARCHAR">
+			<column name="consumer_id" type="VARCHAR">
 				<constraints nullable="false" />
 			</column>
-			<column name="done" type="BOOLEAN">
+			<column name="version_id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="state" type="VARCHAR">
 				<constraints nullable="false" />
 			</column>
 			<column name="last_updated" type="TIMESTAMP">
 				<constraints nullable="false" />
 			</column>
-			<column name="failed_attempts" type="INTEGER" defaultValue="0">
+			<column name="times_out" type="TIMESTAMP">
 				<constraints nullable="false" />
 			</column>
-			<column name="last_error" type="TEXT" />
+			<column name="retries" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="error_message" type="TEXT" />
 		</createTable>
 		
 		<!-- INDEXES -->
 		<createIndex
-            indexName="ofc_event_idx"
-            tableName="ofc_event"
+            indexName="ofc_message_idx"
+            tableName="ofc_message"
             unique="true">
 	        <column name="id" type="VARCHAR"/>
     	</createIndex>
     	
 		<createIndex
-            indexName="ofc_event_processing_status_pkey"
-            tableName="ofc_event_processing_status"
+            indexName="ofc_message_processing_pkey"
+            tableName="ofc_message_processing"
             unique="true">
-            <column name="event_sequence_number" type="INTEGER"/>
-	        <column name="subscriber_id" type="VARCHAR"/>
+            <column name="message_id" type="VARCHAR"/>
+	        <column name="consumer_id" type="VARCHAR"/>
     	</createIndex>
 	</changeSet>
 	

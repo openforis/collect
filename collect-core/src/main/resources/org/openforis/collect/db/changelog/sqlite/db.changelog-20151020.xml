@@ -11,7 +11,7 @@
 	    	</not>
 	    </preConditions>
 	    
-	    <comment>Event queue storage</comment>
+	    <comment>Message queue storage</comment>
 	    
 	    <createTable tableName="ofc_message">
 			<column name="id" type="VARCHAR">
