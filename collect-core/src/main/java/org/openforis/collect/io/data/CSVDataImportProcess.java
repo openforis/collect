@@ -38,6 +38,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeAddChange;
 import org.openforis.collect.model.NodeChange;
 import org.openforis.collect.model.NodeChangeSet;
+import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -110,6 +111,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private CSVDataImportSettings settings;
 
 	//transient variables
+	private RecordUpdater recordUpdater;
 	private CollectRecord lastModifiedRecordSummary;
 	private CollectRecord lastModifiedRecord;
 	private User adminUser;
@@ -119,6 +121,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	public CSVDataImportProcess() {
 		settings = new CSVDataImportSettings();
 		deletedEntitiesRecordKeys = new HashSet<RecordStepKey>();
+		recordUpdater = new RecordUpdater();
 	}
 	
 	@Override
@@ -247,7 +250,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private CollectRecord loadRecord(Integer recordId, Step step) {
-		CollectRecord record = recordManager.load(survey, recordId, step);
+		CollectRecord record = recordManager.load(survey, recordId, step, settings.recordValidationEnabled);
 		//delete existing entities
 		RecordStepKey recordStepKey = new RecordStepKey(record.getId(), step);
 		if (settings.isDeleteExistingEntities() && ! deletedEntitiesRecordKeys.contains(recordStepKey) && ! getParentEntityDefinition().isRoot()) {
@@ -261,7 +264,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		String parentEntitiesPath = getParentEntityDefinition().getPath();
 		List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
 		for (Entity entity : entitiesToBeDeleted) {
-			recordManager.deleteNode(entity);
+			recordUpdater.deleteNode(entity, settings.recordValidationEnabled);
 		}
 	}
 
@@ -284,7 +287,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		
 		if ( step.compareTo(originalStep) < 0 ) {
 			//reset record step to the original one
-			CollectRecord record = recordManager.load(survey, lastModifiedRecordSummary.getId(), originalStep);
+			CollectRecord record = recordManager.load(survey, lastModifiedRecordSummary.getId(), originalStep, settings.recordValidationEnabled);
 			record.setStep(originalStep);
 			
 			updateRecord(record, originalStep, originalStep);
@@ -362,7 +365,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				int tot = attributes.size();
 				for (int i = 0; i < tot; i++) {
 					Node<?> node = attributes.get(0);
-					recordManager.deleteNode(node);
+					recordUpdater.deleteNode(node, settings.recordValidationEnabled);
 				}
 			}
 		}
@@ -411,7 +414,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			@SuppressWarnings("unchecked")
 			Field<Object> field = (Field<Object>) attr.getField(fieldName);
 			Object fieldValue = field.parseValue(value);
-			recordManager.updateField(field, fieldValue);
+			recordUpdater.updateField(field, fieldValue, false, settings.recordValidationEnabled);
 		}
 	}
 
@@ -431,7 +434,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 		if ( valid ) {
 			Field<String> field = ((CoordinateAttribute) attr).getSrsIdField();
-			recordManager.updateField(field, value);
+			recordUpdater.updateField(field, value, false, settings.recordValidationEnabled);
 		}
 	}
 
@@ -449,7 +452,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				status.addParsingError(parsingError);
 			} else {
 				Field<Integer> field = ((NumberAttribute<?, ?>) attr).getUnitField();
-				recordManager.updateField(field, unit.getId());
+				recordUpdater.updateField(field, unit.getId(), false, settings.recordValidationEnabled);
 			}
 		}
 	}
@@ -605,7 +608,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private Node<?> performNodeAdd(Entity parent, String childName) {
-		NodeChangeSet changeSet = recordManager.addNode(parent, childName);
+		NodeChangeSet changeSet = recordUpdater.addNode(parent, childName);
 		for (NodeChange<?> nodeChange : changeSet.getChanges()) {
 			if ( nodeChange instanceof NodeAddChange ) {
 				return nodeChange.getNode();
