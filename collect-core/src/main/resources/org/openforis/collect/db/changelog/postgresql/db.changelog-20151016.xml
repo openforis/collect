@@ -40,7 +40,7 @@
 					foreignKeyName="ofc_data_query_type_fkey" 
 					references="ofc_data_query_type(id)" />
 			</column>
-			<column name="severity" type="CHAR(1)" />
+			<column name="severity" type="CHAR(1)" defaultValue="n" />
 	    </addColumn>
 
 		<sql>
@@ -57,6 +57,10 @@
 	    		FROM collect.ofc_data_error_query deq 
 	    		WHERE deq.query_id = collect.ofc_data_query.id
 	    	);
+	    	
+	    	UPDATE collect.ofc_data_query 
+	    	SET severity = 'n' 
+	    	WHERE severity is null;
 		</sql>
 		
 		<createSequence sequenceName="ofc_data_query_group_id_seq" />

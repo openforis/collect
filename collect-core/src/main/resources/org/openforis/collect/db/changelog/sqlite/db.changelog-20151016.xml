@@ -34,7 +34,7 @@
 		
 		<sql>
 			ALTER TABLE ofc_data_query ADD COLUMN type_id INTEGER REFERENCES ofc_data_query_type(id);
-			ALTER TABLE ofc_data_query ADD COLUMN severity CHAR(1);
+			ALTER TABLE ofc_data_query ADD COLUMN severity CHAR(1) DEFAULT 'n';
 		</sql>
 
 		<sql>
@@ -51,6 +51,10 @@
 	    		FROM ofc_data_error_query deq 
 	    		WHERE deq.query_id = ofc_data_query.id
 	    	);
+	    	
+	    	UPDATE ofc_data_query 
+	    	SET severity = 'n' 
+	    	WHERE severity is null;
 		</sql>
 		
 		<createTable tableName="ofc_data_query_group">
