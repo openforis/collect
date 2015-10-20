@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.utils.Controllers;
 import org.openforis.collect.web.controller.AbstractSurveyObjectEditFormController;
 import org.openforis.collect.web.controller.CollectJobController.JobView;
+import org.openforis.commons.web.Forms;
 import org.openforis.commons.web.HttpResponses;
 import org.openforis.commons.web.Response;
 import org.openforis.concurrency.Job;
@@ -127,15 +129,11 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	public @ResponseBody List<DataQueryResultItemForm> downloadTestResult(HttpServletResponse response)
 			throws FileNotFoundException, IOException {
 		if (testJob == null) {
-			HttpResponses.setNoContentStatus(response);
-			return null;
+			return Collections.emptyList();
 		}
 		List<DataQueryResultItem> items = ((MemoryStoreDataQueryResultItemProcessor) testJob
 				.getInput().getNodeProcessor()).getItems();
-		List<DataQueryResultItemForm> result = new ArrayList<DataQueryResultItemForm>(items.size());
-		for (DataQueryResultItem item : items) {
-			result.add(new DataQueryResultItemForm(item));
-		}
+		List<DataQueryResultItemForm> result = Forms.toForms(items, DataQueryResultItemForm.class);
 		return result;
 	}
 	
