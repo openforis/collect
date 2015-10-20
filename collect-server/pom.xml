@@ -19,7 +19,6 @@
 		<aspectj.version>1.8.0</aspectj.version>
 		<zk.version>6.5.1.1</zk.version>
 		<zk.spring.version>3.1.1</zk.spring.version>
-		<jersey.version>1.19</jersey.version>
 	</properties>
 
 	<repositories>
@@ -411,113 +410,6 @@
 			<version>1.1</version>
 		</dependency>
 		
-		<!-- Saiku -->
-		<dependency>
-			<groupId>org.saiku</groupId>
-		    <artifactId>saiku-web</artifactId>
-		    <version>${saiku.version}</version>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>org.saiku</groupId>
-					<artifactId>saiku-query</artifactId>
-		    	</exclusion>
-		    	<exclusion>
-		    		<groupId>org.olap4j</groupId>
-		    		<artifactId>olap4j-xmlaserver-noclose</artifactId>
-		    	</exclusion>
-		    	<exclusion>
-		    		<groupId>org.apache.pdfbox</groupId>
-		    		<artifactId>pdfbox</artifactId>
-		    	</exclusion>
-		    	<exclusion>
-					<groupId>pentaho</groupId>
-					<artifactId>mondrian</artifactId>
-		    	</exclusion>
-		    	<exclusion>
-					<groupId>org.glassfish.web</groupId>
-					<artifactId>javax.el</artifactId>
-		    	</exclusion>
-		    	<exclusion>
-		    		<groupId>javax.el</groupId>
-		    		<artifactId>javax.el-api</artifactId>
-		    	</exclusion>
-		    	<exclusion>
-   					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-		    	</exclusion>
-		    	<exclusion>
-		    		<groupId>org.mortbay.jetty</groupId>
-		    		<artifactId>servlet-api-2.5</artifactId>
-		    	</exclusion>
-		    </exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.saiku</groupId>
-			<artifactId>saiku-query</artifactId>
-			<version>0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>2.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.olap4j</groupId>
-			<artifactId>olap4j-xmlaserver-noclose</artifactId>
-			<version>0.0.1</version>
-		</dependency>
-		<dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>2.5.1</version>
-        </dependency>
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
-		</dependency>
-		<dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-            <version>${jersey.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-beans</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-aop</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-asm</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-multipart</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-		<!-- end of Saiku -->
-
 		<dependency>
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>

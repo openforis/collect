@@ -57,19 +57,6 @@
 		<intercept-url access="hasRole('ADMIN')" pattern="/validateAllRecords.htm" />
 		<intercept-url access="hasRole('ADMIN')" pattern="/validationReport" />
 		
-		<!-- SAIKU -->
-		<intercept-url access="permitAll" pattern="/repository" />
-		<intercept-url access="permitAll" pattern="/saiku-rest/saiku/info" />
-		<intercept-url access="permitAll" pattern="/saiku-rest/saiku/info/ui-settings" />
-		<intercept-url access="permitAll" pattern="/saiku/**" />
-		<intercept-url access="isAnonymous()" pattern="/serverdocs/**" />
-		<intercept-url access="isAnonymous()" pattern="/WEB-INF/classes/legacy-schema" />
-		<intercept-url access="isAnonymous() or isFullyAuthenticated()" pattern="/saiku-rest/saiku/session*" />
-		<intercept-url access="isAnonymous() or isFullyAuthenticated()" pattern="/saiku-rest/saiku/session/" />
-		<intercept-url access="isFullyAuthenticated()" pattern="/saiku-rest/**" />
-		<intercept-url access="isFullyAuthenticated()" pattern="/json/**" />
-		<!-- END OF SAIKU -->
-		
 		<intercept-url access="hasRole('USER')" pattern="/**" />
 
 		<form-login login-page="/login" 

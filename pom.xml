@@ -28,7 +28,6 @@
 		<spring.version>4.2.2.RELEASE</spring.version>
 		<spring-security.version>4.0.2.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>
-		<saiku.version>3.2.5</saiku.version>
 	</properties>
 
 	<distributionManagement>
@@ -276,30 +275,6 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		
-		<!-- Saiku -->	
-		<!-- Proxied by OpenForis Nexus --> 
-		<repository>
-			<id>saiku-releases</id>
-				<url>http://repo.meteorite.bi/content/repositories/alabs-release-local</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>saiku-snapshots</id>
-				<url>http://repo.meteorite.bi/content/repositories/alabs-snapshot-local</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<!-- end of Saiku -->
 		
 		<!-- GeoTools -->
 		<repository>

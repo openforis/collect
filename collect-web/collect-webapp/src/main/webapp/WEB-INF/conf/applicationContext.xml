@@ -34,7 +34,6 @@
 	<mvc:resources mapping="/js/**" location="/js/" />
 	<mvc:resources mapping="/script/**" location="/script/" />
 	<mvc:resources mapping="/org/**" location="/org/" />
-	<mvc:resources mapping="/saiku/**" location="/saiku/" />
 	
 	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
