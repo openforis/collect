@@ -69,6 +69,16 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		throw new RuntimeException("Invalid range type " + getType());
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public NumericRange<? extends Number> createValue(Object val) {
+		if (val == null) {
+			return null;
+		} else {
+			return createValue(val.toString());
+		}
+	}
+	
 	@Override
 	public FieldDefinition<?> getFieldDefinition(String name) {
 		for (FieldDefinition<?> def : getFieldDefinitions()) {

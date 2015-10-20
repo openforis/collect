@@ -62,7 +62,8 @@ Collect.DataCleansingChainDialogController.prototype.initFormElements = function
 			var recordStep = $this.recordStepSelectPicker.val();
 			collect.dataCleansingChainService.run(chain.id, recordStep, function() {
 				monitorJob(collect.jobService.contextPath + "survey-job.json?surveyId=" + collect.activeSurvey.id, function() {
-					//TODO
+					EventBus.dispatch(Collect.DataCleansing.DATA_CLEANSING_CHAIN_SAVED, $this);
+					OF.Alerts.success("collect.data_cleansing.cleansing_chain.run_successfully");
 				});
 			});
 		}, $this));
@@ -164,11 +165,10 @@ Collect.DataCleansingChainDialogController.prototype.initStepsDataGrid = functio
 	
 	gridContainer.bootstrapTable({
 	    clickToSelect: true,
-	    height: 150,
+	    height: 200,
 	    width: 800,
 	    columns: [
           	{field: "selected", title: "", radio: true},
-			{field: "id", title: "Id", visible: false},
 			{field: "title", title: "Title", width: 400},
 			{field: "queryTitle", title: "Query Title", width: 200},
 			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100},

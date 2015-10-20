@@ -174,14 +174,11 @@ package org.openforis.collect.ui {
 			var formItem:AttributeFormItem = null;
 			if(def is CodeAttributeDefinitionProxy) {
 				formItem = new CodeAttributeFormItem();
+			} else if(def.multiple) {
+				formItem = new MultipleAttributeFormItem();
+				MultipleAttributeFormItem(formItem).showLabel = false;
 			} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
 				formItem = new CompositeAttributeFormItem();
-			} else if(def.multiple) {
-				if(parentLayout == UIUtil.LAYOUT_TABLE){
-					formItem = new MultipleAttributeDataGroupFormItem();
-				} else {
-					formItem = new MultipleAttributeFormItem();
-				}
 			} else {
 				formItem = new SingleAttributeFormItem();
 			}

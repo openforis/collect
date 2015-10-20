@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends org.jooq.impl.SchemaImpl {
 
-	private static final long serialVersionUID = 305229447;
+	private static final long serialVersionUID = -1548402546;
 
 	/**
 	 * The reference instance of <code>collect</code>
@@ -41,13 +41,13 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 		return java.util.Arrays.<org.jooq.Sequence<?>>asList(
 			org.openforis.collect.persistence.jooq.Sequences.OFC_CODE_LIST_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_CLEANSING_CHAIN_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_CLEANSING_REPORT_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_CLEANSING_STEP_ID_SEQ,
-			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_QUERY_GROUP_ID_SEQ,
-			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_QUERY_ID_SEQ,
-			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_REPORT_ID_SEQ,
-			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_REPORT_ITEM_ID_SEQ,
-			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_ERROR_TYPE_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_QUERY_GROUP_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_QUERY_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_QUERY_TYPE_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_REPORT_ID_SEQ,
+			org.openforis.collect.persistence.jooq.Sequences.OFC_DATA_REPORT_ITEM_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_RECORD_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_SAMPLING_DESIGN_ID_SEQ,
 			org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ,
@@ -72,15 +72,15 @@ public class Collect extends org.jooq.impl.SchemaImpl {
 			org.openforis.collect.persistence.jooq.tables.OfcConfig.OFC_CONFIG,
 			org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChain.OFC_DATA_CLEANSING_CHAIN,
 			org.openforis.collect.persistence.jooq.tables.OfcDataCleansingChainSteps.OFC_DATA_CLEANSING_CHAIN_STEPS,
+			org.openforis.collect.persistence.jooq.tables.OfcDataCleansingReport.OFC_DATA_CLEANSING_REPORT,
 			org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStep.OFC_DATA_CLEANSING_STEP,
 			org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStepValue.OFC_DATA_CLEANSING_STEP_VALUE,
-			org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY,
-			org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup.OFC_DATA_ERROR_QUERY_GROUP,
-			org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery.OFC_DATA_ERROR_QUERY_GROUP_QUERY,
-			org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport.OFC_DATA_ERROR_REPORT,
-			org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM,
-			org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC_DATA_ERROR_TYPE,
 			org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DATA_QUERY,
+			org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroup.OFC_DATA_QUERY_GROUP,
+			org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroupQuery.OFC_DATA_QUERY_GROUP_QUERY,
+			org.openforis.collect.persistence.jooq.tables.OfcDataQueryType.OFC_DATA_QUERY_TYPE,
+			org.openforis.collect.persistence.jooq.tables.OfcDataReport.OFC_DATA_REPORT,
+			org.openforis.collect.persistence.jooq.tables.OfcDataReportItem.OFC_DATA_REPORT_ITEM,
 			org.openforis.collect.persistence.jooq.tables.OfcLogo.OFC_LOGO,
 			org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD,
 			org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign.OFC_SAMPLING_DESIGN,

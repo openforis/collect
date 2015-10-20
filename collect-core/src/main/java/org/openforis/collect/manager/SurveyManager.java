@@ -679,11 +679,11 @@ public class SurveyManager {
 	
 	@Transactional
 	public CollectSurvey createTemporarySurveyFromPublished(String uri) {
-		return createTemporarySurveyFromPublished(uri, true);
+		return createTemporarySurveyFromPublished(uri, true, true);
 	}
 	
 	@Transactional
-	public CollectSurvey createTemporarySurveyFromPublished(String uri, boolean markCopyAsPublished) {
+	public CollectSurvey createTemporarySurveyFromPublished(String uri, boolean markCopyAsPublished, boolean preserveReferenceToPublishedSurvey) {
 		try {
 			SurveySummary existingTemporarySurvey = surveyDao.loadSurveySummaryByUri(uri, true);
 			if ( existingTemporarySurvey != null ) {
@@ -696,7 +696,7 @@ public class SurveyManager {
 			temporarySurvey.setId(null);
 			temporarySurvey.setPublished(markCopyAsPublished);
 			temporarySurvey.setTemporary(true);
-			temporarySurvey.setPublishedId(publishedSurveyId);
+			temporarySurvey.setPublishedId(preserveReferenceToPublishedSurvey ? publishedSurveyId : null);
 			if ( temporarySurvey.getSamplingDesignCodeList() == null ) {
 				temporarySurvey.addSamplingDesignCodeList();
 			}
@@ -794,7 +794,9 @@ public class SurveyManager {
 			codeListManager.moveCodeLists(temporarySurveyId, newSurveyId);
 			surveyDao.delete(temporarySurveyId);
 			CollectSurvey oldPublishedSurvey = getById(oldPublishedSurveyId);
+			if (oldPublishedSurvey != null) {
 			removeFromCache(oldPublishedSurvey);
+		}
 		}
 		addToCache(survey);
 		
@@ -815,10 +817,11 @@ public class SurveyManager {
 		SurveySummary temporarySurveySummary = surveyDao.loadSurveySummaryByUri(uri, true);
 		CollectSurvey temporarySurvey;
 		if (temporarySurveySummary == null) {
-			temporarySurvey = createTemporarySurveyFromPublished(uri, false);
+			temporarySurvey = createTemporarySurveyFromPublished(uri, false, false);
 		} else {
 			temporarySurvey = loadSurvey(temporarySurveySummary.getId());
 			temporarySurvey.setPublished(false);
+			temporarySurvey.setPublishedId(null);
 			save(temporarySurvey);
 			if (dataCleansingManager != null) {
 				//overwrite temporary cleansing metadata with published one

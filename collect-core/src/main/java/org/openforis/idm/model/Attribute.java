@@ -191,6 +191,8 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 		allFieldsFilled = empty ? false: calculateAllFieldsFilled();
 	}
 
+	public abstract String extractTextValue();
+	
 	@Override
 	protected void write(StringWriter sw, int indent) {
 		for (int i = 0; i < indent; i++) {

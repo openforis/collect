@@ -46,5 +46,11 @@ public class DateAttribute extends Attribute<DateAttributeDefinition, Date> {
 		getMonthField().setValue(month);
 		getDayField().setValue(day);
 	}
+	
+	@Override
+	public String extractTextValue() {
+		org.openforis.idm.model.Date date = getValue();
+		return date != null && date.isComplete() ? date.toXmlDate() : null;
+	}
 
 }

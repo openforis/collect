@@ -245,6 +245,16 @@ fieldset.has-error legend {
 	color: #c9302c;
 }
 
+.edit-icon {
+	cursor: pointer;
+	color: #1E3BB6;
+}
+
+.duplicate-icon {
+	cursor: pointer;
+	color: darkgrey;
+}
+
 .hcenter {
 	text-align: center;
 }

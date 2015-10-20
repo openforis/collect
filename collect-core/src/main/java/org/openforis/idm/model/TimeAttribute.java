@@ -55,4 +55,9 @@ public class TimeAttribute extends Attribute<TimeAttributeDefinition, Time> {
 		getMinuteField().setValue(minute);
 	}
 
+	@Override
+	public String extractTextValue() {
+		Time time = getValue();
+		return time != null && time.isComplete() ? time.toXmlTime() : null;
+	}
 }

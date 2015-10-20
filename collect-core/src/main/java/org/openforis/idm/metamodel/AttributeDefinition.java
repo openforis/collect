@@ -107,6 +107,8 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		this.key = key;
 	}
 
+	public abstract <V extends Value> V createValue(Object val);
+	
 	public abstract <V extends Value> V createValue(String string);
 
 //	public Set<NodePathPointer> getCheckDependencyPaths() {

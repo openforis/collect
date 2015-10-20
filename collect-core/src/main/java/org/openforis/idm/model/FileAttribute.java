@@ -61,4 +61,9 @@ public class FileAttribute extends Attribute<FileAttributeDefinition, File> {
 		File f = getValue();
 		return f == null || (f.getSize() == null && StringUtils.isBlank(f.getFilename()));
 	}
+	
+	@Override
+	public String extractTextValue() {
+		return getFilename();
+	}
 }

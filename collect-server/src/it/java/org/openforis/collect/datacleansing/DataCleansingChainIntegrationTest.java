@@ -8,6 +8,7 @@ import static org.openforis.idm.testfixture.RecordBuilder.record;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -191,6 +192,8 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 					)
 				)
 			).build(survey, "cluster", "2.0");
+			record.setCreationDate(new Date());
+			record.setModifiedDate(new Date());
 			updater.initializeRecord(record);
 			recordManager.save(record);
 		}
@@ -213,6 +216,8 @@ public class DataCleansingChainIntegrationTest extends CollectIntegrationTest {
 					)
 				)
 			).build(survey, "cluster", "2.0");
+			record.setCreationDate(new Date());
+			record.setModifiedDate(new Date());
 			updater.initializeRecord(record);
 			recordManager.save(record);
 		}

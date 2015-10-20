@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
+import org.openforis.collect.metamodel.ui.UIOptionsMigrator.UIOptionsMigrationException;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.commons.io.OpenForisIOUtils;
@@ -52,8 +53,10 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 			try {
 				UIConfiguration uiConfiguration = new UIOptionsMigrator().migrateToUIConfiguration(collectSurvey.getUIOptions());
 				collectSurvey.setUIConfiguration(uiConfiguration);
+			} catch(UIOptionsMigrationException e) {
+				log.error("Error generating UI model for survey " + collectSurvey.getUri() + ": " + e.getMessage());
 			} catch(Exception e) {
-				log.error("Error generating UI model for survey " + collectSurvey.getUri(), e);
+				log.error("Error generating UI model for survey " + collectSurvey.getUri() + ": " + e.getMessage(), e);
 			}
 		}
 	}

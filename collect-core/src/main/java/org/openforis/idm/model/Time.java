@@ -21,7 +21,7 @@ public final class Time extends AbstractValue {
 	/**
 	 * Internal string format for Time value ("hhss")
 	 */
-	private static final Pattern INTERNAL_STRING_PATTERN = Pattern.compile("([01]|[0-9]|2[0-3])([0-5][0-9])");
+	private static final Pattern INTERNAL_STRING_PATTERN = Pattern.compile("(\\d*)([0-5][0-9])");
 	/**
 	 * Generic string format for Time value ("hh:mm" or "hh:mm:ss" . Please note that seconds will be ignored by the Time attribute)
 	 */
@@ -38,12 +38,20 @@ public final class Time extends AbstractValue {
 			for (Pattern pattern : PATTERNS) {
 				Matcher matcher = pattern.matcher(value);
 				if (matcher.matches()) {
-					int hour = Integer.parseInt(matcher.group(1));
-					int minute = Integer.parseInt(matcher.group(2));
+					int hour = toInt(matcher.group(1));
+					int minute = toInt(matcher.group(2));
 					return new Time(hour, minute);
 				}
 			}
 			throw new IllegalArgumentException("Invalid time " + value);
+		}
+	}
+	
+	private static int toInt(String str) {
+		if (StringUtils.isBlank(str)) {
+			return 0;
+		} else {
+			return Integer.parseInt(str);
 		}
 	}
 	

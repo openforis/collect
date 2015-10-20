@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="merge-data-query-and-data-error-query" author="ricci" dbms="sqlite">
+		<comment>Add columns to the data error report table</comment>
+		
+	    <createTable tableName="ofc_data_query_type">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_query_type_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_query_type_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="code" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="label" type="VARCHAR(255)" />
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP" />
+			<column name="modified_date" type="TIMESTAMP" />
+		</createTable>
+		
+		<sql>
+			INSERT INTO ofc_data_query_type (id, uuid, survey_id, code, label, description, creation_date, modified_date)
+				SELECT t.id, t.uuid, t.survey_id, t.code, t.label, t.description, t.creation_date, t.modified_date
+				FROM ofc_data_error_type t;
+		</sql>
+		
+		<sql>
+			ALTER TABLE ofc_data_query ADD COLUMN type_id INTEGER REFERENCES ofc_data_query_type(id);
+			ALTER TABLE ofc_data_query ADD COLUMN severity CHAR(1) DEFAULT 'n';
+		</sql>
+
+		<sql>
+	    	UPDATE ofc_data_query 
+	    	SET type_id = (
+	    		SELECT deq.error_type_id 
+	    		FROM ofc_data_error_query deq 
+	    		WHERE deq.query_id = ofc_data_query.id
+	    	);
+	    	
+	    	UPDATE ofc_data_query 
+	    	SET severity = (
+	    		SELECT deq.severity 
+	    		FROM ofc_data_error_query deq 
+	    		WHERE deq.query_id = ofc_data_query.id
+	    	);
+	    	
+	    	UPDATE ofc_data_query 
+	    	SET severity = 'n' 
+	    	WHERE severity is null;
+		</sql>
+		
+		<createTable tableName="ofc_data_query_group">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_query_group_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="survey_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_query_group_survey_fkey" 
+					references="ofc_survey(id)" />
+			</column>
+			<column name="title" type="VARCHAR(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="description" type="VARCHAR(255)" />
+			<column name="creation_date" type="TIMESTAMP" />
+			<column name="modified_date" type="TIMESTAMP" />
+		</createTable>
+		
+		<createTable tableName="ofc_data_query_group_query">
+			<column name="group_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_query_group_group_fkey" 
+					references="ofc_data_query_group(id)" />
+			</column>
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_query_group_query_fkey" 
+					references="ofc_data_query(id)" />
+			</column>
+			<column name="sort_order" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		
+        <sql>
+        	INSERT INTO ofc_data_query_group (id, uuid, survey_id, title, description, creation_date, modified_date)
+        		SELECT deqg.id, deqg.uuid, deqg.survey_id, deqg.title, deqg.description, deqg.creation_date, deqg.modified_date
+        		FROM ofc_data_error_query_group deqg
+        	;
+        	
+        	INSERT INTO ofc_data_query_group_query (group_id, query_id, sort_order) 
+        		SELECT deqgq.group_id, deq.query_id, deqgq.sort_order 
+        		FROM ofc_data_error_query_group_query deqgq 
+        			JOIN ofc_data_error_query deq ON deq.id = deqgq.query_id
+        	;
+        </sql>
+        
+		<createTable tableName="ofc_data_report">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_report_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="query_group_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_report_query_group_fkey" 
+					references="ofc_data_query_group(id)" />
+			</column>
+			<column name="record_step" type="int4" />
+			<column name="dataset_size" type="int4" />
+			<column name="last_record_modified_date" type="TIMESTAMP" />
+			<column name="creation_date" type="TIMESTAMP" />
+		</createTable>
+		
+		<createTable tableName="ofc_data_report_item">
+			<column name="id" type="INTEGER">
+				<constraints nullable="false" primaryKey="true"
+					primaryKeyName="ofc_data_report_item_pkey" />
+			</column>
+			<column name="uuid" type="VARCHAR(50)" />
+			<column name="report_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_report_item_report_fkey" 
+					references="ofc_data_report(id)" />
+			</column>
+			<column name="query_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_report_item_query_fkey" 
+					references="ofc_data_query(id)" />
+			</column>
+			<column name="record_id" type="INTEGER">
+				<constraints nullable="false" 
+					foreignKeyName="ofc_data_report_item_record_fkey" 
+					references="ofc_record(id)" />
+			</column>
+			<column name="parent_entity_id" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="node_index" type="INTEGER" />
+			<column name="value" type="VARCHAR(255)" />
+			<column name="status" type="CHAR(1)" />
+		</createTable>
+		
+		<createIndex 
+	            indexName="ofc_data_report_item_report_record_idx"
+	            tableName="ofc_data_report_item">
+        	<column name="report_id" type="INTEGER"/>
+        	<column name="record_id" type="INTEGER"/>
+       </createIndex>
+       
+       <sql>
+       		INSERT INTO ofc_data_report (id, uuid, query_group_id, record_step, creation_date, dataset_size, last_record_modified_date)
+       			SELECT r.id, r.uuid, r.query_group_id, r.record_step, r.creation_date, dataset_size, last_record_modified_date 
+       			FROM ofc_data_error_report r
+       		;
+       		
+       		INSERT INTO ofc_data_report_item (id, uuid, report_id, query_id, record_id, parent_entity_id, node_index, value, status)
+       			SELECT ri.id, ri.uuid, ri.report_id, deq.query_id, ri.record_id, ri.parent_entity_id, ri.node_index, ri.value, ri.status
+       			FROM ofc_data_error_report_item ri
+       				JOIN ofc_data_error_query deq ON deq.id = ri.query_id
+       		;
+       </sql>
+       
+       <dropTable tableName="ofc_data_error_report_item" />
+       <dropTable tableName="ofc_data_error_report" />
+       <dropTable tableName="ofc_data_error_query_group_query" />
+       <dropTable tableName="ofc_data_error_query_group" />
+       <dropTable tableName="ofc_data_error_query" />
+       <dropTable tableName="ofc_data_error_type" />
+	</changeSet>
+  
+</databaseChangeLog>

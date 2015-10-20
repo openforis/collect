@@ -2,6 +2,7 @@ package org.openforis.collect.datacleansing;
 
 import java.io.Closeable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,8 +39,10 @@ public class DataCleansingChainExectutorTask extends Task {
 	//output
 	private List<DataCleansingChainExectutorTask.DataQueryExecutorError> errors;
 
-	private int updatedRecords;
-	private int processedNodes;
+	private int cleansedRecords;
+	private int cleansedNodes;
+	private int datasetSize;
+	private Date lastRecordModifiedDate;
 
 	@Override
 	protected long countTotalItems() {
@@ -51,8 +54,8 @@ public class DataCleansingChainExectutorTask extends Task {
 	@Override
 	protected void initializeInternalVariables() throws Throwable {
 		super.initializeInternalVariables();
-		this.updatedRecords = 0;
-		this.processedNodes = 0;
+		this.cleansedRecords = 0;
+		this.cleansedNodes = 0;
 		this.errors = new ArrayList<DataQueryExecutorError>();
 	}
 	
@@ -69,10 +72,14 @@ public class DataCleansingChainExectutorTask extends Task {
 		
 		RecordFilter filter = createRecordsFilter();
 		List<CollectRecord> recordSummaries = recordManager.loadSummaries(filter);
+		datasetSize = recordSummaries.size();
+		lastRecordModifiedDate = null;
 		
 		Iterator<CollectRecord> it = recordSummaries.iterator();
 		while (it.hasNext() && isRunning()) {
 			CollectRecord recordSummary = (CollectRecord) it.next();
+			udpateLastRecordModifiedDate(recordSummary);
+			
 			CollectRecord record = recordManager.load(survey, recordSummary.getId(), input.step, false);
 			boolean recordNodesProcessed = false;
 			for (DataCleansingStep step : input.chain.getSteps()) {
@@ -80,15 +87,22 @@ public class DataCleansingChainExectutorTask extends Task {
 				List<Node<?>> nodes = queryEvaluator.evaluate(record);
 				for (Node<?> node : nodes) {
 					if (processNode(step, node)) {
-						processedNodes ++;
+						cleansedNodes ++;
 						recordNodesProcessed = true;
 					}
 				}
 			}
 			if (recordNodesProcessed) {
-				updatedRecords ++;
+				cleansedRecords ++;
 			}
 			incrementItemsProcessed();
+		}
+	}
+
+	private void udpateLastRecordModifiedDate(CollectRecord recordSummary) {
+		Date modifiedDate = recordSummary.getModifiedDate();
+		if (lastRecordModifiedDate == null || lastRecordModifiedDate.compareTo(modifiedDate) < 0) {
+			lastRecordModifiedDate = modifiedDate;
 		}
 	}
 
@@ -128,12 +142,20 @@ public class DataCleansingChainExectutorTask extends Task {
 		this.input = input;
 	}
 	
-	public int getProcessedNodes() {
-		return processedNodes;
+	public int getCleansedNodes() {
+		return cleansedNodes;
 	}
 	
-	public int getUpdatedRecords() {
-		return updatedRecords;
+	public int getCleansedRecords() {
+		return cleansedRecords;
+	}
+	
+	public int getDatasetSize() {
+		return datasetSize;
+	}
+	
+	public Date getLastRecordModifiedDate() {
+		return lastRecordModifiedDate;
 	}
 	
 	public static class DataQueryExecutorError {
@@ -224,4 +246,5 @@ public class DataCleansingChainExectutorTask extends Task {
 		
 		boolean process(DataCleansingStep step, Node<?> node) throws Exception;
 	}
+
 }

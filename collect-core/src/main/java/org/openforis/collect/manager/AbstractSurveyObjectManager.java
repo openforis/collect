@@ -65,15 +65,14 @@ public abstract class AbstractSurveyObjectManager
 	@Override
 	public void save(T obj) {
 		Date now = new Date();
-		if (obj.getModifiedDate() == null) {
-			obj.setModifiedDate(now);
-		}
 		if (obj.getId() == null) {
 			if (obj.getCreationDate() == null) {
 				obj.setCreationDate(now);
+				obj.setModifiedDate(now);
 			}
 			dao.insert(obj);
 		} else {
+			obj.setModifiedDate(now);
 			dao.update(obj);
 		}
 		initializeItem(obj);

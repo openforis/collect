@@ -96,7 +96,25 @@
 	<link href="earthFiles/bootstrap/bootstrap-datetimepicker.min.css?v=$[randomNumber]" rel="stylesheet"  />
 	
 	<link href="earthFiles/css/earth.css?v=$[randomNumber]" rel="stylesheet" />
+	<!--
 	
+		Handle the fonts for different languages that don't have their own glyphs opn the standard interface
+		Right now we only have Lao
+		
+		The TTF file needs to be loaded through the same URL than the balloon to avoid cross referencing issues
+		Use the two character code of the language as the name of the font  
+	-->
+	<style  type="text/css">
+	        @font-face {
+		      font-family: 'lo'; 
+			  src: url('$[host]generated/earthFiles/fonts/Phetsarath_OT.ttf');
+			}
+		
+			body {
+				font-family: "PLACEHOLDER_UI_LANGUAGE","Trebuchet MS", "Helvetica", "Arial", "Verdana",
+					"sans-serif";
+			}
+	</style>
 </head>
 
 <body>

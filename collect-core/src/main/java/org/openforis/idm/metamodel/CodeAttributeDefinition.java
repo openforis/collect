@@ -306,6 +306,12 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Code createValue(Object val) {
+		return val == null ? null : new Code((String) val);
+	}
+	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
 		return fieldDefinitionByName;

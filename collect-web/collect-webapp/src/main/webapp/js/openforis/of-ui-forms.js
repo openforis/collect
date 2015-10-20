@@ -40,6 +40,14 @@ OF.UI.Forms.populateSelect = function($select, items, valueKey, labelKeyOrFuncti
 	$select.val([]);
 };
 
+OF.UI.Forms.selectOptionsInSelect = function($select, items, valueKey) {
+	var options = $select.find("option");
+	$.each(options, function(i, option) {
+		var item = OF.Arrays.findItem(items, valueKey, option.value);
+		var selected = item != null;
+		$(option).attr('selected', selected ? 'selected': null);
+	});
+};
 
 OF.UI.Forms.populateDropdown = function($dropdownContainer, items, valueKey, labelKey) {
 	var dropdownMenu = $dropdownContainer.find(".dropdown-menu");

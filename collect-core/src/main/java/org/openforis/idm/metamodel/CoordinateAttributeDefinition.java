@@ -45,6 +45,18 @@ public class CoordinateAttributeDefinition extends AttributeDefinition  {
 		return Coordinate.parseCoordinate(string);
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Coordinate createValue(Object val) {
+		if (val == null) {
+			return null;
+		} else if (val instanceof String) {
+			return createValue((String) val);
+		} else {
+			throw new IllegalArgumentException("Invalid value type: " + val.getClass());
+		}
+	}
+	
 	@Override
 	protected FieldDefinitionMap getFieldDefinitionMap() {
 		return fieldDefinitionByName;

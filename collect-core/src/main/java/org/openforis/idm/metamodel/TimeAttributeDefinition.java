@@ -3,6 +3,8 @@
  */
 package org.openforis.idm.metamodel;
 
+import java.util.Date;
+
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.model.TimeAttribute;
@@ -41,6 +43,20 @@ public class TimeAttributeDefinition extends AttributeDefinition {
 	@Override
 	public Time createValue(String string) {
 		return Time.parseTime(string);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public Time createValue(Object val) {
+		if (val == null) {
+			return null;
+		} else if (val instanceof Integer) {
+			return Time.fromNumericValue((Integer) val);
+		} else if (val instanceof Date) {
+			return Time.parse((Date) val);
+		} else {
+			return Time.parseTime(val.toString());
+		}
 	}
 	
 	@Override

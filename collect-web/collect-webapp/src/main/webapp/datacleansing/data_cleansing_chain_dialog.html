@@ -21,22 +21,22 @@
 						<fieldset>
 							<legend>Steps</legend>
 							<div>
-								<table class="step-grid"></table>
+								<div class="row" style="height: 250px">
+									<table class="step-grid"></table>
+								</div>
 								<div class="row">
 									<button type="button" class="btn btn-default col-md-3 move-step-up-btn step-selected-enabled">Move step up</button>
 									<button type="button" class="btn btn-default col-md-3 move-step-down-btn step-selected-enabled">Move step down</button>
-									<div class="col-md-2"></div>
-									<button type="button" class="btn btn-default col-md-3 remove-step-btn step-selected-enabled">Remove step</button>
 						   		</div>
-								<fieldset>
-									<legend>Add new Calculation Step</legend>
-									<div>
-										<div class="col-md-10">
-											<select class="form-control selectpicker" name="cleansingStep"></select>
-										</div>
-										<button type="button" class="btn btn-default add-step-btn col-md-2">Add step</button>
+								<div class="row">
+									<div class="col-md-3"><label style="margin-top: 10px;">New Calculation Step:</label></div>
+									<div class="col-md-7">
+										<select class="form-control selectpicker" name="cleansingStep"></select>
 									</div>
-								</fieldset>
+									<div class="col-md-2">
+										<button type="button" class="btn btn-default add-step-btn">Add</button>
+									</div>
+								</div>
 							</div>
 						</fieldset>
 					</div>
@@ -44,7 +44,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default cancel-btn">Cancel</button>
-				<button type="button" class="btn btn-primary apply-btn">Apply</button>
+				<button type="button" class="btn btn-primary apply-btn">Save</button>
 				<button type="button" class="btn btn-primary save-and-close-btn">Save and Close</button>
 			</div>
 			
