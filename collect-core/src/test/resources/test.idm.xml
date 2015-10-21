@@ -3797,6 +3797,7 @@
 		          cluster.</description>
 				<date id="744" name="date">
 					<label>Date</label>
+					<compare flag="error" lt="idm:currentDate()" />
 				</date>
 				<time id="745" name="start_time" required="true">
 					<label>Start time</label>

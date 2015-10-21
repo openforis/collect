@@ -33,7 +33,6 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	private static final int CLEANUP_THRESHOLD = 500;
 	private LookupProvider lookupProvider;
 	private final Map<String, Object> compiled;
-	private boolean normalizeNumbers;
 	private static volatile ModelJXPathContext compilationContext;
 	private ReferencedPathEvaluator referencedPathEvaluator;
 	private Survey survey;
@@ -41,7 +40,6 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	protected ModelJXPathContext(JXPathContext parentContext, Object contextNode) {
 		super(parentContext, contextNode);
 		this.compiled = new HashMap<String, Object>();
-		this.normalizeNumbers = false;
 		if (contextNode instanceof Node<?>) {
 			this.survey = ((Node) contextNode).getSurvey();
 		} else if (contextNode instanceof SurveyObject) {
@@ -62,10 +60,10 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 	public synchronized static CompiledExpression compile(ReferencedPathEvaluator referencedPathEvaluator, String xpath, boolean normalizeNumbers) {
 		if (compilationContext == null) {
 			compilationContext = (ModelJXPathContext) JXPathContext.newContext(null);
+			compilationContext.referencedPathEvaluator = referencedPathEvaluator;
 		}
-		compilationContext.setNormalizeNumbers(normalizeNumbers);
-		compilationContext.referencedPathEvaluator = referencedPathEvaluator;
-		return compilationContext.compilePath(xpath);
+		ModelJXPathCompiledExpression compiledExpression = compilationContext.compilePath(xpath, normalizeNumbers);
+		return compiledExpression;
 	}
 
 	public static ModelJXPathContext newContext(JXPathContext parentContext, Object contextNode) {
@@ -84,18 +82,26 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 
 	@Override
 	protected ModelJXPathCompiledExpression compilePath(String xpath) {
-		Expression expr = compileExpression(xpath);
+		return compilePath(xpath, false);
+	}
+
+	private ModelJXPathCompiledExpression compilePath(String xpath, boolean normalizeNumbers) {
+		Expression expr = compileExpression(xpath, normalizeNumbers);
 		ModelJXPathCompiledExpression compiledExpression = new ModelJXPathCompiledExpression(referencedPathEvaluator, xpath, expr);
 		return compiledExpression;
 	}
 
 	@Override
 	protected Compiler getCompiler() {
-		ModelTreeCompiler treeCompiler = new ModelTreeCompiler();
+		return new ModelTreeCompiler();
+	}
+	
+	protected Compiler getCompiler(boolean normalizeNumbers) {
+		ModelTreeCompiler compiler = (ModelTreeCompiler) getCompiler();
 		if (normalizeNumbers) {
-			treeCompiler.setNormalizeNumbers(normalizeNumbers);
+			compiler.setNormalizeNumbers(normalizeNumbers);
 		}
-		return treeCompiler;
+		return compiler;
 	}
 
 	public LookupProvider getLookupProvider() {
@@ -106,16 +112,12 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 		this.lookupProvider = lookupProvider;
 	}
 
-	public void setNormalizeNumbers(boolean normalizeNumbers) {
-		this.normalizeNumbers = normalizeNumbers;
-	}
-
 	public Survey getSurvey() {
 		return survey;
 	}
 
 	@SuppressWarnings("unchecked")
-	private Expression compileExpression(String xpath) {
+	private Expression compileExpression(String xpath, boolean normalizeNumbers) {
 		Expression expr;
 
 		synchronized (compiled) {
@@ -134,7 +136,7 @@ public class ModelJXPathContext extends JXPathContextReferenceImpl {
 			return expr;
 		}
 
-		expr = (Expression) Parser.parseExpression(xpath, getCompiler());
+		expr = (Expression) Parser.parseExpression(xpath, getCompiler(normalizeNumbers));
 
 		synchronized (compiled) {
 			if (USE_SOFT_CACHE) {

@@ -60,6 +60,11 @@ public final class TaxonOccurrence extends AbstractValue {
 		this.languageVariety = languageVariety;
 	}
 
+	public TaxonOccurrence(TaxonOccurrence o) {
+		this(o.code, o.scientificName, o.vernacularName,
+				o.languageCode, o.languageVariety);
+	}
+	
 	public TaxonOccurrence(Taxon taxon, TaxonVernacularName vernacularName) {
 		this(taxon.getTaxonId(), taxon.getCode(), taxon.getScientificName(), 
 					vernacularName.getVernacularName(), vernacularName.getLanguageCode(),
