@@ -15,7 +15,6 @@ Collect.DataCleansing.DataQueryGroupPanelController.prototype.getDataGridOptions
 		table.bootstrapTable({
 			width: 600,
 			columns: [
-				{field: "id", title: "Id", visible: false},
 				{field: "typeCode", title: "Type", width: 100},
 				{field: "errorSeverity", title: "Error Severity", width: 100},
 				{field: "title", title: "Title", width: 400}

@@ -56,7 +56,6 @@ Collect.DataReportDialogController.prototype.initFormElements = function(callbac
 			select.selectpicker();
 			$this.recordStepSelectPicker = select.data().selectpicker;
 		}
-		
 		callback.call($this);
 	});
 };
