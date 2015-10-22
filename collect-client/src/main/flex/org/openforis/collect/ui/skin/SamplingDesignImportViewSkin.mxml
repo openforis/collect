@@ -50,7 +50,7 @@
 						  width="100%"
 						  horizontalAlign="center">
 					<s:DataGrid id="summaryDataGrid" 
-								height="100%"
+								height="100%" width="100%"
 								rowHeight="22">
 						<s:columns>
 							<s:ArrayList>
@@ -84,7 +84,6 @@
 							</s:ArrayList>
 						</s:columns>
 					</s:DataGrid>
-					
 					<datagrid:PaginationBar id="paginationBar" 
 											width="80%"
 											/>

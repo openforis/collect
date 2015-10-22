@@ -16,7 +16,7 @@ package org.openforis.collect.persistence.jooq.tables;
 @java.lang.SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcDataReport extends org.jooq.impl.TableImpl<org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord> {
 
-	private static final long serialVersionUID = -2071621069;
+	private static final long serialVersionUID = 956012659;
 
 	/**
 	 * The reference instance of <code>collect.ofc_data_report</code>
@@ -52,9 +52,9 @@ public class OfcDataReport extends org.jooq.impl.TableImpl<org.openforis.collect
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord, java.lang.Integer> RECORD_STEP = createField("record_step", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
-	 * The column <code>collect.ofc_data_report.creation_date</code>.
+	 * The column <code>collect.ofc_data_report.dataset_size</code>.
 	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord, java.sql.Timestamp> CREATION_DATE = createField("creation_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord, java.lang.Integer> DATASET_SIZE = createField("dataset_size", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * The column <code>collect.ofc_data_report.last_record_modified_date</code>.
@@ -62,9 +62,9 @@ public class OfcDataReport extends org.jooq.impl.TableImpl<org.openforis.collect
 	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord, java.sql.Timestamp> LAST_RECORD_MODIFIED_DATE = createField("last_record_modified_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
 	/**
-	 * The column <code>collect.ofc_data_report.dataset_size</code>.
+	 * The column <code>collect.ofc_data_report.creation_date</code>.
 	 */
-	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord, java.lang.Integer> DATASET_SIZE = createField("dataset_size", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final org.jooq.TableField<org.openforis.collect.persistence.jooq.tables.records.OfcDataReportRecord, java.sql.Timestamp> CREATION_DATE = createField("creation_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
 	/**
 	 * Create a <code>collect.ofc_data_report</code> table reference
