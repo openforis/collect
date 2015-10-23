@@ -257,21 +257,23 @@ package org.openforis.collect.model.proxy {
 			return entities;
 		}
 		
-		public function addChild(node:NodeProxy):void {
-			var childDef:NodeDefinitionProxy = node.definition
-			var children:IList = getChildren(childDef);
-			if(children == null) {
-				children = new ArrayCollection();
-				childrenByDefinitionId.put(childDef.id, children);
+		public function addChild(child:NodeProxy):void {
+			var childDef:NodeDefinitionProxy = child.definition
+			var siblings:IList = getChildren(childDef);
+			if(siblings == null) {
+				siblings = new ArrayCollection();
+				childrenByDefinitionId.put(childDef.id, siblings);
 			}
-			node.parent = this;
-			node.init();
-			children.addItem(node);
+			child.parent = this;
+			child.init();
+			siblings.addItem(child);
 			showErrorsOnChild(childDef);
 			
-			if ( node is EntityProxy && CollectionUtil.isEmpty(EntityDefinitionProxy(childDef).keyAttributeDefinitions)) {
-				for each (var sibling:EntityProxy in children) {
-					sibling.updateKeyText();
+			if ( child is EntityProxy ) {
+				if (CollectionUtil.isEmpty(EntityDefinitionProxy(childDef).keyAttributeDefinitions)) {
+					for each (var sibling:EntityProxy in siblings) {
+						sibling.updateKeyText();
+					}
 				}
 			}
 		}
@@ -385,6 +387,17 @@ package org.openforis.collect.model.proxy {
 		
 		public function updateChildrenMaxCount(map:IMap):void {
 			updateList(childrenMaxCount, map);
+		}
+		
+		public function showErrorsOnNotEmptyDescendants():void {
+			this.traverse(function(node:NodeProxy):void {
+				if (! node.empty) {
+					var parent:EntityProxy = node.parent;
+					if (parent != null && node.definition != null) {
+						parent.showErrorsOnChild(node.definition);
+					}
+				}
+			});
 		}
 		
 		public function showErrorsOnChildren():void {

@@ -151,7 +151,10 @@ package org.openforis.collect.model.proxy {
 			parent.addChild(node);
 			initNode(node);
 			if(node is EntityProxy) {
+				//initialize descendants
 				EntityProxy(node).traverse(initNode);
+				//show errors on descendants if they are not empty (default value applied)
+				EntityProxy(node).showErrorsOnNotEmptyDescendants();
 			}
 		}
 		
