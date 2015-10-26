@@ -94,13 +94,19 @@ public class FileAttributeDefinition extends AttributeDefinition {
 	@SuppressWarnings("unchecked")
 	@Override
 	public File createValue(String string) {
-		throw new UnsupportedOperationException();
+		return new File((String) string, null);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public File createValue(Object val) {
-		throw new UnsupportedOperationException();
+		if (val instanceof File) {
+			return new File((File) val);
+		} else if (val instanceof String) {
+			return createValue((String) val);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	@Override

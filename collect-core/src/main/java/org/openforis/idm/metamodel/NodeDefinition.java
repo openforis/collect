@@ -293,6 +293,9 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return false;
 	}
 
+	/**
+	 * Returns the ancestor definitions from the nearest parent entity to the root
+	 */
 	public List<EntityDefinition> getAncestorEntityDefinitions() {
 		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
 		EntityDefinition currentParent = getParentEntityDefinition();
@@ -303,12 +306,13 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return result;
 	}
 	
+	/**
+	 * Returns the ancestor definitions from the root to the nearest parent entity
+	 */
 	public List<EntityDefinition> getAncestorEntityDefinitionsInReverseOrder() {
-		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
-		EntityDefinition currentParent = getParentEntityDefinition();
-		while ( currentParent != null ) {
-			result.add(0, currentParent);
-			currentParent = currentParent.getParentEntityDefinition();
+		List<EntityDefinition> result = getAncestorEntityDefinitions();
+		if (result.size() > 1) {
+			Collections.reverse(result); 
 		}
 		return result;
 	}

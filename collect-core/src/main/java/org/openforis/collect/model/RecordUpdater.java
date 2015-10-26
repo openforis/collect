@@ -67,6 +67,10 @@ public class RecordUpdater {
 	 * Updates an attribute with a new value
 	 */
 	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value, boolean clearChildCodeAttributes) {
+		return updateAttribute(attribute, value, clearChildCodeAttributes, true);
+	}
+	
+	public <V extends Value> NodeChangeSet updateAttribute(Attribute<?, V> attribute, V value, boolean clearChildCodeAttributes, boolean validate) {
 		beforeAttributeUpdate(attribute);
 		attribute.setValue(value);
 		return afterAttributeUpdate(attribute, clearChildCodeAttributes);
@@ -96,12 +100,16 @@ public class RecordUpdater {
 	 * @param clearDependentCodeAttributes 
 	 */
 	public <V> NodeChangeSet updateField(Field<V> field, V value, boolean clearDependentCodeAttributes) {
+		return updateField(field, value, clearDependentCodeAttributes, true);
+	}
+	
+	public <V> NodeChangeSet updateField(Field<V> field, V value, boolean clearDependentCodeAttributes, boolean validate) {
 		Attribute<?, ?> attribute = field.getAttribute();
 		beforeAttributeUpdate(attribute);
 		
 		field.setValue(value);
 		
-		return afterAttributeUpdate(attribute, clearDependentCodeAttributes);
+		return afterAttributeUpdate(attribute, clearDependentCodeAttributes, validate);
 	}
 
 	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol) {
@@ -113,6 +121,10 @@ public class RecordUpdater {
 	 * @param clearChildCodeAttributes 
 	 */
 	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol, boolean clearChildCodeAttributes) {
+		return updateField(field, symbol, clearChildCodeAttributes, true);
+	}
+	
+	public <V> NodeChangeSet updateField(Field<V> field, FieldSymbol symbol, boolean clearChildCodeAttributes, boolean validate) {
 		Attribute<?, ?> attribute = field.getAttribute();
 
 		beforeAttributeUpdate(attribute);
@@ -120,7 +132,7 @@ public class RecordUpdater {
 		field.setValue(null);
 		setFieldSymbol(field, symbol);
 		
-		return afterAttributeUpdate(attribute, clearChildCodeAttributes);
+		return afterAttributeUpdate(attribute, clearChildCodeAttributes, validate);
 	}
 	
 	public NodeChangeSet addNode(Entity parentEntity, String nodeName) {
@@ -177,6 +189,15 @@ public class RecordUpdater {
 									  Value value, 
 									  FieldSymbol symbol, 
 									  String remarks) {
+		return addAttribute(parentEntity, attributeName, value, symbol, remarks, true);
+	}
+	
+	public NodeChangeSet addAttribute(Entity parentEntity, 
+			  String attributeName, 
+			  Value value, 
+			  FieldSymbol symbol, 
+			  String remarks,
+			  boolean validate) {
 		Attribute<?, ?> attribute = performAttributeAdd(parentEntity, attributeName, value, symbol, remarks);
 		
 		setMissingValueApproved(parentEntity, attributeName, false);
@@ -186,7 +207,7 @@ public class RecordUpdater {
 		NodeChangeMap changeMap = new NodeChangeMap();
 		changeMap.addAttributeAddChange(attribute);
 		
-		return afterAttributeInsertOrUpdate(changeMap, attribute, false);
+		return afterAttributeInsertOrUpdate(changeMap, attribute, false, validate);
 	}
 
 	/**
@@ -252,12 +273,16 @@ public class RecordUpdater {
 	}
 
 	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute, boolean clearDependentCodeAttributes) {
-		NodeChangeMap changeMap = new NodeChangeMap();
-		changeMap.addValueChange(attribute);
-		return afterAttributeInsertOrUpdate(changeMap, attribute, clearDependentCodeAttributes);
+		return afterAttributeUpdate(attribute, clearDependentCodeAttributes, true);
 	}
 	
-	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute, boolean clearDependentCodeAttributes) {
+	private NodeChangeSet afterAttributeUpdate(Attribute<?, ?> attribute, boolean clearDependentCodeAttributes, boolean validate) {
+		NodeChangeMap changeMap = new NodeChangeMap();
+		changeMap.addValueChange(attribute);
+		return afterAttributeInsertOrUpdate(changeMap, attribute, clearDependentCodeAttributes, validate);
+	}
+	
+	private NodeChangeSet afterAttributeInsertOrUpdate(NodeChangeMap changeMap, Attribute<?, ?> attribute, boolean clearDependentCodeAttributes, boolean validate) {
 		attribute.updateSummaryInfo();
 
 		Record record = attribute.getRecord();
@@ -274,6 +299,7 @@ public class RecordUpdater {
 		}
 		changeMap.addValueChanges(updatedCodeAttributes);
 		
+		if (validate) {
 		// relevance
 		Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
 		nodesToCheckRelevanceFor.add(attribute);
@@ -332,6 +358,7 @@ public class RecordUpdater {
 		Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
 
 		validateAttributes(record, attributesToRevalidate, changeMap);
+		}
 		return changeMap;
 	}
 
@@ -450,6 +477,10 @@ public class RecordUpdater {
 	 * @return
 	 */
 	public NodeChangeSet deleteNode(Node<?> node) {
+		return deleteNode(node, true);
+	}
+	
+	public NodeChangeSet deleteNode(Node<?> node, boolean validate) {
 		Record record = node.getRecord();
 		
 		NodeChangeMap changeMap = new NodeChangeMap();
@@ -464,6 +495,7 @@ public class RecordUpdater {
 		List<Attribute<?, ?>> dependentCalculatedAttributes = record.determineCalculatedAttributes(nodesToBeDeleted);
 		dependentCalculatedAttributes.removeAll(nodesToBeDeleted);
 		
+		if (validate) {
 		// relevance
 		List<NodePointer> relevanceDependenciesToDeleted = record.determineRelevanceDependentNodes(nodesToBeDeleted);
 
@@ -488,7 +520,6 @@ public class RecordUpdater {
 		changeMap.addValueChanges(updatedCalculatedAttributes);
 		
 		// relevance
-		
 		Collection<Node<?>> nodesToCheckRelevanceFor = new ArrayList<Node<?>>(updatedCalculatedAttributes);
 		nodesToCheckRelevanceFor.addAll(pointersToNodes(relevanceDependenciesToDeleted));
 		
@@ -537,6 +568,11 @@ public class RecordUpdater {
 		Set<Attribute<?, ?>> attributesToRevalidate = record.determineValidationDependentNodes(nodesToCheckValidationFor);
 
 		validateAttributes(record, attributesToRevalidate, changeMap);
+		} else {
+			// calculated attributes
+			List<Attribute<?, ?>> updatedCalculatedAttributes = recalculateValues(dependentCalculatedAttributes);
+			changeMap.addValueChanges(updatedCalculatedAttributes);
+		}
 		return changeMap;
 	}
 
@@ -754,7 +790,6 @@ public class RecordUpdater {
 			changeMap.addRelevanceChanges(updatedRelevancePointers);
 			
 			//cardinality
-			
 			Collection<NodePointer> nodePointersToCheckCardinalityFor = new HashSet<NodePointer>(entityDescendantPointers);
 			if ( entity.getParent() != null ) {
 				nodePointersToCheckCardinalityFor.add(new NodePointer(entity));

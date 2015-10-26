@@ -26,11 +26,11 @@ public class DistanceCheckFormValidator extends CheckFormValidator {
 		super.internalValidate(ctx);
 		NodeDefinition contextNode = getContextNode(ctx);
 		if ( validateMinOrMaxExpressionRequireness(ctx) ) {
-			validateValueExpression(ctx, contextNode, MIN_DISTANCE_FIELD);
-			validateValueExpression(ctx, contextNode, MAX_DISTANCE_FIELD);
+			validateValueExpressionField(ctx, contextNode, MIN_DISTANCE_FIELD);
+			validateValueExpressionField(ctx, contextNode, MAX_DISTANCE_FIELD);
 		}
-		validateValueExpression(ctx, contextNode, SOURCE_POINT_EXPRESSION_FIELD);
-		validateValueExpression(ctx, contextNode, DESTINATION_POINT_EXPRESSION_FIELD);
+		validateValueExpressionField(ctx, contextNode, SOURCE_POINT_EXPRESSION_FIELD);
+		validateValueExpressionField(ctx, contextNode, DESTINATION_POINT_EXPRESSION_FIELD);
 	}
 
 	protected boolean validateMinOrMaxExpressionRequireness(ValidationContext ctx) {

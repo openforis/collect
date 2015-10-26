@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.8.15-SNAPSHOT</version>
+	<version>3.8.16-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -24,7 +24,7 @@
 		<installer-version-id>${buildNumber}</installer-version-id> 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<openforis.commons.version>0.1.9</openforis.commons.version>
+		<openforis.commons.version>0.1.10</openforis.commons.version>
 		<spring.version>4.2.2.RELEASE</spring.version>
 		<spring-security.version>4.0.2.RELEASE</spring-security.version>
 		<flexmojos.version>4.2-beta</flexmojos.version>

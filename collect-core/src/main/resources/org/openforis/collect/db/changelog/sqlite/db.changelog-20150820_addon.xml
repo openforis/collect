@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="delete-duplicate-code-list-items" author="ricci" dbms="sqlite">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="ofc_survey_work" />
+		</preConditions>
+
+		<comment>Remove duplicate code list items</comment>
+				
+		<sql>
+			delete from ofc_code_list where exists (select l2.id from ofc_code_list l2 where l2.id != ofc_code_list.id and l2.survey_work_id = ofc_code_list.survey_work_id and l2.parent_id = ofc_code_list.parent_id and l2.code = ofc_code_list.code);
+			delete from ofc_code_list where exists (select l2.id from ofc_code_list l2 where l2.id != ofc_code_list.id and l2.survey_id = ofc_code_list.survey_id and l2.parent_id = ofc_code_list.parent_id and l2.code = ofc_code_list.code);
+		</sql>
+		
+	</changeSet>
+	
+</databaseChangeLog>

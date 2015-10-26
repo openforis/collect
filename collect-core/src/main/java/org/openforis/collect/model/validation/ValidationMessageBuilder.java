@@ -83,7 +83,7 @@ public class ValidationMessageBuilder {
 		String surveyDefaultLanguage = attribute.getSurvey().getDefaultLanguage();
 		ValidationRule<?> validator = validationResult.getValidator();
 		if ( validator instanceof Check ) {
-			String message = getCustomMessage((Check<?>) validator, locale, surveyDefaultLanguage);
+			String message = getCustomMessage(attribute, (Check<?>) validator, locale);
 			if (message != null ) {
 				return message;
 			}
@@ -111,14 +111,9 @@ public class ValidationMessageBuilder {
 		return message;
 	}
 
-	private String getCustomMessage(Check<?> check, Locale locale, String surveyDefaultLanguageCode) {
-		String langCode = locale.getLanguage();
-		String customMessage = check.getMessage(langCode);
-		if ( customMessage == null && ! langCode.equals(surveyDefaultLanguageCode) ) {
-			//get survey default language message
-			customMessage = check.getMessage(surveyDefaultLanguageCode);
-		}
-		return customMessage;
+	private String getCustomMessage(Attribute<?, ?> context, Check<?> check, Locale locale) {
+		String message = check.getMessageWithEvaluatedExpressions(context, locale.getLanguage());
+		return message;
 	}
 	
 	public List<String> getValidationMessages(Attribute<?,?> attribute, ValidationResults validationResults, Flag flag, Locale locale) {
@@ -224,7 +219,6 @@ public class ValidationMessageBuilder {
 	
 	protected String[] getMessageArgs(Attribute<?, ?> attribute, ValidationResult validationResult, Locale locale) {
 		ValidationRule<?> validator = validationResult.getValidator();
-		String[] result = null;
 		if(validator instanceof ComparisonCheck) {
 			ComparisonCheck check = (ComparisonCheck) validator;
 			ArrayList<String> args = new ArrayList<String>();
@@ -244,9 +238,19 @@ public class ValidationMessageBuilder {
 					args.add(arg);
 				}
 			}
-			result = args.toArray(new String[args.size()]);
+			return args.toArray(new String[args.size()]);
+		} else if (validator instanceof EntityKeyValidator) {
+			EntityDefinition parentDefn = attribute.getDefinition().getParentEntityDefinition();
+			String parentLabel = getPrettyLabelText(parentDefn, locale.getLanguage());
+			List<AttributeDefinition> keyDefns = parentDefn.getKeyAttributeDefinitions();
+			List<String> keyDefnLabels = new ArrayList<String>(keyDefns.size());
+			for (AttributeDefinition keyDefn : keyDefns) {
+				keyDefnLabels.add(getPrettyLabelText(keyDefn, locale.getLanguage()));
+			}
+			return new String[] {parentLabel, StringUtils.join(keyDefnLabels, ", ")}; //TODO localize separator
+		} else {
+			return null;
 		}
-		return result;
 	}
 	
 	protected String getComparisonCheckMessageArg(Attribute<?,?> attribute, String expression, Locale locale) {

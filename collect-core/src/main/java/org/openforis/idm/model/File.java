@@ -20,6 +20,10 @@ public final class File extends AbstractValue {
 		this.size = size;
 	}
 
+	public File(File val) {
+		this(val.filename, val.size);
+	}
+
 	public String getFilename() {
 		return filename;
 	}

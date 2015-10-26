@@ -17,6 +17,7 @@ import org.apache.commons.jxpath.ri.compiler.Operation;
  * @author D. Wiell
  */
 public class ModelJXPathCompiledExpression extends JXPathCompiledExpression {
+	
 	private final ReferencedPathEvaluator referencedPathEvaluator;
 
 	public ModelJXPathCompiledExpression(ReferencedPathEvaluator referencedPathEvaluator, String xpath, Expression expression) {

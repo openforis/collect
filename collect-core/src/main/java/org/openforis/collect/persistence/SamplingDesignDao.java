@@ -38,33 +38,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem, SamplingDesignDao.SamplingDesignDSLContext> {
 	
 	@SuppressWarnings("rawtypes")
-	private static final TableField[] FIELDS = {
-		OFC_SAMPLING_DESIGN.ID,
-		OFC_SAMPLING_DESIGN.SURVEY_ID,
-		OFC_SAMPLING_DESIGN.LOCATION,
-		OFC_SAMPLING_DESIGN.LEVEL1,
-		OFC_SAMPLING_DESIGN.LEVEL2,
-		OFC_SAMPLING_DESIGN.LEVEL3,
-		OFC_SAMPLING_DESIGN.INFO1,
-		OFC_SAMPLING_DESIGN.INFO2,
-		OFC_SAMPLING_DESIGN.INFO3,
-		OFC_SAMPLING_DESIGN.INFO4,
-		OFC_SAMPLING_DESIGN.INFO5,
-		OFC_SAMPLING_DESIGN.INFO6,
-		OFC_SAMPLING_DESIGN.INFO7,
-		OFC_SAMPLING_DESIGN.INFO8,
-		OFC_SAMPLING_DESIGN.INFO9,
-		OFC_SAMPLING_DESIGN.INFO10
+	private static final TableField[] BASE_FIELDS = {
+			OFC_SAMPLING_DESIGN.ID,
+			OFC_SAMPLING_DESIGN.SURVEY_ID,
+			OFC_SAMPLING_DESIGN.LOCATION
 	};
-	
 
 	@SuppressWarnings("rawtypes")
 	public static final TableField[] LEVEL_CODE_FIELDS = {
 		OFC_SAMPLING_DESIGN.LEVEL1, 
 		OFC_SAMPLING_DESIGN.LEVEL2, 
 		OFC_SAMPLING_DESIGN.LEVEL3
-	}; 
-	
+	};
+
 	@SuppressWarnings("rawtypes")
 	public static final TableField[] INFO_FIELDS = {
 		OFC_SAMPLING_DESIGN.INFO1, 
@@ -76,9 +62,23 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		OFC_SAMPLING_DESIGN.INFO7,
 		OFC_SAMPLING_DESIGN.INFO8,
 		OFC_SAMPLING_DESIGN.INFO9,
-		OFC_SAMPLING_DESIGN.INFO10
+		OFC_SAMPLING_DESIGN.INFO10,
+		OFC_SAMPLING_DESIGN.INFO11,
+		OFC_SAMPLING_DESIGN.INFO12,
+		OFC_SAMPLING_DESIGN.INFO13,
+		OFC_SAMPLING_DESIGN.INFO14,
+		OFC_SAMPLING_DESIGN.INFO15,
+		OFC_SAMPLING_DESIGN.INFO16,
+		OFC_SAMPLING_DESIGN.INFO17,
+		OFC_SAMPLING_DESIGN.INFO18,
+		OFC_SAMPLING_DESIGN.INFO19,
+		OFC_SAMPLING_DESIGN.INFO20
 	}; 
 	
+	@SuppressWarnings("rawtypes")
+	private static final TableField[] FIELDS = org.openforis.commons.collection.ArrayUtils.join(TableField.class, 
+			BASE_FIELDS, LEVEL_CODE_FIELDS, INFO_FIELDS);
+
 	public SamplingDesignDao() {
 		super(SamplingDesignDao.SamplingDesignDSLContext.class);
 	}

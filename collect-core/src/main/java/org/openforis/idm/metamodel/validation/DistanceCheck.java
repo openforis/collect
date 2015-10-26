@@ -6,6 +6,7 @@ package org.openforis.idm.metamodel.validation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.idm.geospatial.CoordinateOperations;
+import org.openforis.idm.model.Coordinate;
 import org.openforis.idm.model.CoordinateAttribute;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.expression.ExpressionEvaluator;
@@ -63,6 +64,23 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 				LOG.info("Unable to evaluate distance check " , e);
 			}
 			return ValidationResultFlag.OK;
+		}
+	}
+	
+	public Coordinate evaluateDestinationPoint(CoordinateAttribute attr) {
+		if (destinationPointExpression == null) {
+			return null;
+		}
+		ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(attr);
+		try {
+			Coordinate destinationPoint = expressionEvaluator.evaluateAttributeValue(attr.getParent(), attr, attr.getDefinition(), destinationPointExpression);
+			return destinationPoint;
+		} catch (InvalidExpressionException e) {
+			if( LOG.isWarnEnabled() ){
+				LOG.warn(String.format("[survey %s: coordinate attribute: %s] Unable to evaluate destination point using expression %s" + 
+						attr.getSurvey().getName(), attr.getPath(), destinationPointExpression), e);
+			}
+			return null;
 		}
 	}
 	

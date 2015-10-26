@@ -17,6 +17,7 @@ import org.apache.commons.jxpath.ri.model.NodePointer;
 import org.apache.commons.jxpath.ri.model.VariablePointer;
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.idm.model.NumericRange;
+import org.openforis.idm.model.Value;
 
 /**
  * @author M. Togna
@@ -24,8 +25,6 @@ import org.openforis.idm.model.NumericRange;
  */
 public class ModelRelationalExpression extends CoreOperation {
 
-	private boolean normalizeNumbers = false;
-	
 	protected enum Operation {
 		LT("<"), LTE("<="), GT(">"), GTE(">="), EQ("="), NOTEQ("!=");
 
@@ -39,11 +38,11 @@ public class ModelRelationalExpression extends CoreOperation {
 		public String toString() {
 			return xpathOperator;
 		}
-
 	}
 
 	private Operation operation;
-
+	private boolean normalizeNumbers = false;
+	
 	protected ModelRelationalExpression(Operation operation, Expression... args) {
 		super(args);
 		this.operation = operation;
@@ -202,7 +201,6 @@ public class ModelRelationalExpression extends CoreOperation {
 		if ( object instanceof Number ) {
 			return ((Number) object).doubleValue();
 		}
-
 		if ( object instanceof Boolean ) {
 			return ((Boolean) object).booleanValue() ? 0.0 : 1.0;
 		}
@@ -233,7 +231,10 @@ public class ModelRelationalExpression extends CoreOperation {
 		}
 		if ( object instanceof Boolean ) {
 			return ((Boolean) object).booleanValue() ? 0.0 : 1.0;
+		} else if (object instanceof Value) {
+			return AttributeValueUtils.extractMainFieldValue((Value) object, normalizeNumbers);
 		}
+		
 		if ( object instanceof NodePointer ) {
 			if(object instanceof VariablePointer && normalizeNumbers){
 				ModelNodePointer valuePointer = (ModelNodePointer) ((NodePointer) object).getValuePointer();
@@ -248,14 +249,6 @@ public class ModelRelationalExpression extends CoreOperation {
 		}
 		return null;
 	}
-
-	// private String getStringValue(Object object) {
-	// if ( object instanceof Pointer ) {
-	// object = ((Pointer) object).getValue();
-	// }
-	//
-	// return object.toString();
-	// }
 
 	@Override
 	public String getSymbol() {

@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Code;
 import org.openforis.idm.model.CodeAttribute;
+import org.openforis.idm.model.Date;
+import org.openforis.idm.model.DateAttribute;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.openforis.idm.model.IntegerAttribute;
@@ -73,6 +75,22 @@ public class ComparisonCheckTest extends ValidationTest {
 		assertFalse(containsComparisonCheck(results.getErrors()));
 	}
 
+	@Test
+	public void testDateNotGreaterThanCurrentDate() {
+		Entity timeStudy = EntityBuilder.addEntity(cluster, "time_study");
+		DateAttribute date = EntityBuilder.addValue(timeStudy, "date", new Date(2015, 9, 20));
+		ValidationResults results = validate(date);
+		assertFalse(containsComparisonCheck(results.getErrors()));
+	}
+
+	@Test
+	public void testDateGreaterThanCurrentDate() {
+		Entity timeStudy = EntityBuilder.addEntity(cluster, "time_study");
+		DateAttribute date = EntityBuilder.addValue(timeStudy, "date", new Date(3015, 10, 20));
+		ValidationResults results = validate(date);
+		assertTrue(containsComparisonCheck(results.getErrors()));
+	}
+	
 	@Test
 	public void testCodeGtConstant() throws Exception {
 		ComparisonCheck check = new ComparisonCheck();

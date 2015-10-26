@@ -7,15 +7,15 @@
 		<base href="../"></base>
 		
 		<script type="text/javascript" src="js/eventbus.js"></script>
-		<script type="text/javascript" src="js/jquery/2.1.1/jquery-2.1.1.js"></script>
-		<script type="text/javascript" src="js/jquery/jquery-ui/1.11.2/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/jquery/2.1.1/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-ui/1.11.2/jquery-ui.min.js"></script>
 		<script type="text/javascript" src="js/jquery/jquery-i18n-properties/1.2.0/jquery.i18n.properties.js"></script>
-		<script type="text/javascript" src="js/jquery/jquery-jsgrid/1.1.0/jsgrid.js"></script>
+		<script type="text/javascript" src="js/jquery/jquery-jsgrid/1.1.0/jsgrid.min.js"></script>
 		<script type="text/javascript" src="js/openforis/jquery-double-list/double-list-1.0.js"></script>
-		<script type="text/javascript" src="js/bootstrap/3.3.5/bootstrap.js"></script>
+		<script type="text/javascript" src="js/bootstrap/3.3.1/bootstrap.min.js"></script>
 		<script type="text/javascript" src="js/bootstrap/bootstrap-select/1.6.3/bootstrap-select.min.js"></script>
-		<script type="text/javascript" src="js/bootstrap/bootstrap-table/1.9.0/bootstrap-table.js"></script>
-		<script type="text/javascript" src="js/jstree/jstree-3.0.8.js"></script>
+		<script type="text/javascript" src="js/bootstrap/bootstrap-table/1.9.0/bootstrap-table.min.js"></script>
+		<script type="text/javascript" src="js/jstree/jstree-3.0.8.min.js"></script>
 		
 <!-- 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script> -->
 		
@@ -75,13 +75,13 @@
 		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_chain_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_chain_panel.js?v=PROJECT_VERSION"></script>
 		
-		<link rel="stylesheet" href="css/bootstrap/3.3.5/bootstrap.min.css">
+		<link rel="stylesheet" href="css/bootstrap/3.3.1/bootstrap.min.css">
 		<link rel="stylesheet" href="data:text/css;charset=utf-8," 
 			data-href="css/bootstrap/3.3.5/bootstrap-theme.min.css" id="bs-theme-stylesheet">
 		<link rel="stylesheet" href="css/bootstrap/bootstrap-select/1.6.3/bootstrap-select.min.css">
 		<link rel="stylesheet" href="css/bootstrap/bootstrap-table/1.9.0/bootstrap-table.min.css">
 		<link rel="stylesheet" href="css/jquery/jquery-ui/1.11.2/jquery-ui.min.css">
-		<link rel="stylesheet" href="css/jquery/jquery-jsgrid/1.1.0/jsgrid.css">
+		<link rel="stylesheet" href="css/jquery/jquery-jsgrid/1.1.0/jsgrid.min.css">
 		<link rel="stylesheet" href="css/jquery/jquery-jsgrid/1.1.0/jsgrid-theme.min.css">
 		<link rel="stylesheet" href="css/jstree/themes/default/style.min.css" />
 		<link rel="stylesheet" href="assets/font-awesome-4.3.0/css/font-awesome.min.css">
@@ -118,38 +118,39 @@
 				<nav class="navbar navbar-default">
 					<ul class="nav navbar-nav">
 						<li class="active">
-							<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab">Data Cleansing Home</a>
+							<a href="#homePanel" aria-controls="homePanel" role="tab" data-toggle="tab" 
+								data-i18n="collect.data_cleansing.data_cleansing_home"></a>
 						</li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle"
 								data-toggle="dropdown" role="button" aria-haspopup="true"
-								aria-expanded="false">Data Queries <span class="caret"></span></a>
+								aria-expanded="false" data-i18n="collect.data_cleansing.data_queries"><span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li>
 									<a href="#data-query-type-panel" aria-controls="data-query-type-panel" 
-										role="tab" data-toggle="tab">Data Query Types</a>
+										role="tab" data-toggle="tab" data-i18n="collect.data_cleansing.data_query_types"></a>
 								</li>
 								<li>
 									<a href="#data-query-panel" aria-controls="data-query-panel" 
-										role="tab" data-toggle="tab">Data Queries</a>
+										role="tab" data-toggle="tab" data-i18n="collect.data_cleansing.data_queries"></a>
 								</li>
 								<li>
 									<a href="#data-query-group-panel" aria-controls="data-query-group-panel" 
-										role="tab" data-toggle="tab">Data Query Groups</a>
+										role="tab" data-toggle="tab" data-i18n="collect.data_cleansing.data_query_groups"></a>
 								</li>
 							</ul>
 						</li>
 						<li id="data-report-tab">
 							<a href="#data-report-panel" aria-controls="data-report-panel" 
-								role="tab" data-toggle="tab">Data Reports</a>
+								role="tab" data-toggle="tab" data-i18n="collect.data_cleansing.data_reports"></a>
 						</li>
 						<li>
 							<a href="#data-cleansing-step-panel" aria-controls="data-cleansing-step-panel" 
-								role="tab" data-toggle="tab">Data Cleansing Steps</a>
+								role="tab" data-toggle="tab" data-i18n="collect.data_cleansing.data_cleansing_steps"></a>
 						</li>
 						<li>
 							<a href="#data-cleansing-chain-panel" aria-controls="data-cleansing-chain-panel" 
-								role="tab" data-toggle="tab">Data Cleansing Chains</a>
+								role="tab" data-toggle="tab" data-i18n="collect.data_cleansing.data_cleansing_chains"></a>
 						</li>
 	<!-- 				<li role="presentation"> -->
 	<!-- 					<a href="#map-panel" aria-controls="map-panel"  -->
@@ -176,9 +177,9 @@
 							<div class="container">
 								<div class="row">
 									<div class="col-md-1">
-										<button type="button" class="btn btn-success new-btn">New</button>
+										<button type="button" class="btn btn-success new-btn" data-i18n="collect.global.new"></button>
 									</div>
-									<div class="col-md-10 section-title">Data Query Types</div>
+									<div class="col-md-10 section-title" data-i18n="collect.data_cleansing.data_query_types"></div>
 									<div class="col-md-1"></div>
 								</div>
 								<table class="grid"></table>
@@ -188,9 +189,9 @@
 							<div class="container">
 								<div class="row">
 									<div class="col-md-1">
-										<button type="button" class="btn btn-success new-btn">New</button>
+										<button type="button" class="btn btn-success new-btn" data-i18n="collect.global.new"></button>
 									</div>
-									<div class="col-md-10 section-title">Data Queries</div>
+									<div class="col-md-10 section-title" data-i18n="collect.data_cleansing.data_queries"></div>
 									<div class="col-md-1"></div>
 								</div>
 								<table class="grid"></table>
@@ -200,9 +201,9 @@
 							<div class="container">
 								<div class="row">
 									<div class="col-md-1">
-										<button type="button" class="btn btn-success new-btn">New</button>
+										<button type="button" class="btn btn-success new-btn" data-i18n="collect.global.new"></button>
 									</div>
-									<div class="col-md-10 section-title">Data Query Groups</div>
+									<div class="col-md-10 section-title" data-i18n="collect.data_cleansing.data_query_groups"></div>
 									<div class="col-md-1"></div>
 								</div>
 								<table class="grid"></table>
@@ -212,9 +213,9 @@
 							<div class="container">
 								<div class="row">
 									<div class="col-md-1">
-										<button type="button" class="btn btn-success new-btn">New</button>
+										<button type="button" class="btn btn-success new-btn" data-i18n="collect.global.new"></button>
 									</div>
-									<div class="col-md-10 section-title">Data Error Reports</div>
+									<div class="col-md-10 section-title" data-i18n="collect.data_cleansing.data_reports"></div>
 									<div class="col-md-1"></div>
 								</div>
 								<table class="grid"></table>
@@ -224,9 +225,9 @@
 							<div class="container">
 								<div class="row">
 									<div class="col-md-1">
-										<button type="button" class="btn btn-success new-btn">New</button>
+										<button type="button" class="btn btn-success new-btn" data-i18n="collect.global.new"></button>
 									</div>
-									<div class="col-md-10 section-title">Data Cleansing Steps</div>
+									<div class="col-md-10 section-title" data-i18n="collect.data_cleansing.data_cleansing_steps"></div>
 									<div class="col-md-1"></div>
 								</div>
 								<table class="grid"></table>
@@ -236,9 +237,9 @@
 							<div class="container">
 								<div class="row">
 									<div class="col-md-1">
-										<button type="button" class="btn btn-success new-btn">New</button>
+										<button type="button" class="btn btn-success new-btn" data-i18n="collect.global.new"></button>
 									</div>
-									<div class="col-md-10 section-title">Data Cleansing Chains</div>
+									<div class="col-md-10 section-title" data-i18n="collect.data_cleansing.data_cleansing_chains"></div>
 									<div class="col-md-1"></div>
 								</div>
 								<table class="grid"></table>

@@ -16,6 +16,7 @@ import org.openforis.idm.path.Path;
  * @author S. Ricci
  */
 public class ReferencedPathEvaluator {
+	
 	private final Map<String, CustomFunctions> customFunctionsByNamespace;
 
 	public ReferencedPathEvaluator(Map<String, CustomFunctions> customFunctionsByNamespace) {

@@ -759,7 +759,7 @@ public class SurveyManager {
 	}
 	
 	private CollectSurvey loadSurvey(String name, boolean temporary) {
-		return surveyDao.loadByName(name);
+		return surveyDao.loadByName(name, temporary);
 	}
 	
 	@Transactional
