@@ -46,7 +46,7 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 		RequirenessType requirenessType = RequirenessType.valueOf(requirenessTypeVal);
 		if (requirenessType == RequirenessType.REQUIRED_WHEN) {
 			if (validateRequired(ctx, REQUIRED_EXPR_FIELD)) {
-				validateBooleanExpression(ctx, contextNode, REQUIRED_EXPR_FIELD);
+				validateBooleanExpressionField(ctx, contextNode, REQUIRED_EXPR_FIELD);
 			}
 		}
 		
@@ -54,13 +54,13 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 		RelevanceType relevanceType = RelevanceType.valueOf(relevanceTypeVal);
 		if (relevanceType == RelevanceType.RELEVANT_WHEN) {
 			if (validateRequired(ctx, RELEVANT_EXPR_FIELD)) {
-				validateBooleanExpression(ctx, contextNode, RELEVANT_EXPR_FIELD);
+				validateBooleanExpressionField(ctx, contextNode, RELEVANT_EXPR_FIELD);
 			}
 		}
 		Boolean multiple = (Boolean) getValue(ctx, MULTIPLE_FIELD);
 		if (multiple != null && multiple.booleanValue()) {
-			validateValueExpression(ctx, contextNode, MIN_COUNT_EXPRESSION_FIELD);
-			validateValueExpression(ctx, contextNode, MAX_COUNT_EXPRESSION_FIELD);
+			validateValueExpressionField(ctx, contextNode, MIN_COUNT_EXPRESSION_FIELD);
+			validateValueExpressionField(ctx, contextNode, MAX_COUNT_EXPRESSION_FIELD);
 			validateMaxCount(ctx);
 		}
 		

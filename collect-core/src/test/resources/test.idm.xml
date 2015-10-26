@@ -4157,9 +4157,7 @@
 						<precision decimalDigits="1" unit="cm" />
 						<compare flag="error" gte="0.1" lte="700" />
 						<check expr="$this  &lt;= total_height * 8" flag="warn" if="health = 1">
-							<message>Unusual relationship between DBH and total
-								height.
-							</message>
+							<message>Unusual relationship between DBH and total height.</message>
 						</check>
 					</number>
 					<code id="827" list="tree_health" name="health" required="true">
@@ -4183,9 +4181,7 @@
 						<precision decimalDigits="1" unit="m" />
 						<compare flag="error" gte="1" lte="70" />
 						<check expr="dbh &lt;= $this  * 8" flag="warn" if="health = 1">
-							<message>Unusual relationship between dbh and total
-								height.
-							</message>
+							<message>Unusual relationship between dbh (${dbh}) and total height (${$this}).</message>
 						</check>
 					</number>
 					<number id="832" name="bole_height" relevant="dbh &gt;= 20"
