@@ -316,6 +316,7 @@ public class SurveySelectVM extends BaseVM {
 	
 	@GlobalCommand
 	public void jobCompleted(@BindingParam("job") Job job) {
+		boolean jobStartedByThis = isJobStartedByThis(job);
 		if ( job == surveyBackupJob ) {
 			File file = surveyBackupJob.getOutputFile();
 			CollectSurvey survey = surveyBackupJob.getSurvey();
@@ -341,7 +342,7 @@ public class SurveySelectVM extends BaseVM {
 			Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 			surveyCloneJob = null;
 		}
-		if (isJobStartedByThis(job)) {
+		if (jobStartedByThis) {
 			onJobEnd(job);
 		}
 	}
