@@ -43,15 +43,9 @@ html, body {
 	margin: 0px;
 }
 
-body .header {
-	position: fixed;
-	width: 100%;
-	background-color: #FFFFFF;
-	border-bottom: solid 3px #0087C9;
-}
-
 #header {
-	height: 99px;
+	height: 102px;
+	border-bottom: solid 3px #0087C9;
 }
 
 #headerLink {
