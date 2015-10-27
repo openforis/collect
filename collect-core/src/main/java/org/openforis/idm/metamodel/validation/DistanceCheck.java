@@ -67,18 +67,59 @@ public class DistanceCheck extends Check<CoordinateAttribute> {
 		}
 	}
 	
-	public Coordinate evaluateDestinationPoint(CoordinateAttribute attr) {
-		if (destinationPointExpression == null) {
+	public Coordinate evaluateDestinationPoint(CoordinateAttribute thisNode) {
+		return evaluateAttributeValueExpression(destinationPointExpression, thisNode);
+	}
+	
+	public Double evaluateMinDistance(CoordinateAttribute thisNode) {
+		return evaluateNumericExpression(minDistanceExpression, thisNode);
+	}
+	
+	public Double evaluateMaxDistance(CoordinateAttribute thisNode) {
+		return evaluateNumericExpression(maxDistanceExpression, thisNode);
+	}
+	
+	public Double evaluateNumericExpression(String expression, CoordinateAttribute thisNode) {
+		Object result = evaluateValueExpression(expression, thisNode);
+		if (result == null) {
+			return null;
+		} else if (result instanceof Double) {
+			return (Double) result;
+		} else {
+			return Double.valueOf(result.toString());
+		}
+	}
+	
+	public <T extends Object> T evaluateAttributeValueExpression(String expression, CoordinateAttribute thisNode) {
+		if (expression == null) {
 			return null;
 		}
-		ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(attr);
 		try {
-			Coordinate destinationPoint = expressionEvaluator.evaluateAttributeValue(attr.getParent(), attr, attr.getDefinition(), destinationPointExpression);
-			return destinationPoint;
+			ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(thisNode);
+			T result = expressionEvaluator.evaluateAttributeValue(thisNode.getParent(), thisNode, thisNode.getDefinition(), expression);
+			return result;
 		} catch (InvalidExpressionException e) {
 			if( LOG.isWarnEnabled() ){
-				LOG.warn(String.format("[survey %s: coordinate attribute: %s] Unable to evaluate destination point using expression %s" + 
-						attr.getSurvey().getName(), attr.getPath(), destinationPointExpression), e);
+				LOG.warn(String.format("[survey %s: coordinate attribute: %s] Unable to evaluate expression %s" + 
+						thisNode.getSurvey().getName(), thisNode.getPath(), expression), e);
+			}
+			return null;
+		}
+	}
+	
+	public <T extends Object> T evaluateValueExpression(String expression, CoordinateAttribute thisNode) {
+		if (expression == null) {
+			return null;
+		}
+		try {
+			ExpressionEvaluator expressionEvaluator = getExpressionEvaluator(thisNode);
+			@SuppressWarnings("unchecked")
+			T result = (T) expressionEvaluator.evaluateValue(thisNode.getParent(), thisNode, expression);
+			return result;
+		} catch (InvalidExpressionException e) {
+			if( LOG.isWarnEnabled() ){
+				LOG.warn(String.format("[survey %s: coordinate attribute: %s] Unable to evaluate expression %s" + 
+						thisNode.getSurvey().getName(), thisNode.getPath(), expression), e);
 			}
 			return null;
 		}

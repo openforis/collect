@@ -359,10 +359,10 @@ public class SurveyValidator {
 			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getDestinationPointExpression(), 
 					"survey.validation.check.distance.error.invalid_destination_point_expression");
 			//validate min distance
-			addBooleanExpressionValidationResult(results, node, ((DistanceCheck) check).getMinDistanceExpression(),
+			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getMinDistanceExpression(),
 					"survey.validation.check.distance.error.invalid_min_distance_expression");
 			//validate max distance
-			addBooleanExpressionValidationResult(results, node, ((DistanceCheck) check).getMaxDistanceExpression(),
+			addValueExpressionValidationResult(results, node, ((DistanceCheck) check).getMaxDistanceExpression(),
 					"survey.validation.check.distance.error.invalid_max_distance_expression");
 		} else if ( check instanceof PatternCheck ) {
 			String regEx = ((PatternCheck) check).getRegularExpression();
