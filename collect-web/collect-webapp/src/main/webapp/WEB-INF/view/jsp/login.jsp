@@ -13,9 +13,12 @@
 	<script type="text/javascript">
 		$(function() {
 			var DOWNLOAD_LOGO_URL = "downloadLogo.htm";
+			
 			loadImages(DOWNLOAD_LOGO_URL);
-// 			checkFirstTimeLogin();
-			document.f.username.focus();
+ 			
+			checkDefaultPasswordActive();
+
+ 			document.f.username.focus();
 		});
 		
 		var loadImages = function(downloadLogoUrl) {
@@ -36,13 +39,18 @@
 			loadImage("footerImg", "footer", "assets/images/footer.jpg");
 		};
 		
-// 		var checkFirstTimeLogin = function() {
+		var checkDefaultPasswordActive = function() {
+			$.ajax({
+				url: "default-password-active.json"
+			}).done(function(defaultPasswordActive) {
+				$("#defaultPasswordActiveContainer").toggle(defaultPasswordActive);
+			});
 // 			var cookie = OF.Collect.getCookie();
 // 			if (cookie == null) {
 // 				$("#firstTimeLoginAdviceDiv").show();
 // 				OF.Collect.initCookie();
 // 			}
-// 		};
+		};
 	</script>
     <link rel="stylesheet" type="text/css" href="assets/login.css" />
   </head>
@@ -107,7 +115,7 @@
 					</tr>
 					<tr><td></td></tr>
 					<tr><td></td></tr>
-					<tr id="firstTimeLoginAdviceDiv">
+					<tr id="defaultPasswordActiveContainer">
 						<td colspan="2" align="center" style="font-size: 10px;">
 							<i>*Default user/password : <b>admin</b>/<b>admin</b></i>
 						</td>

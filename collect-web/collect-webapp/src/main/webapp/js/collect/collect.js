@@ -69,7 +69,7 @@ Collect.prototype.loadViewImages = function() {
 
 	loadImage("headerImg", "header", "assets/images/header.jpg");
 	loadImage("logoImg", "top_right", "assets/images/default-logo.png");
-	//loadImage("footerImg", "footer", "assets/images/footer.jpg");	
+	loadImage("footerImg", "footer", "assets/images/footer.jpg");
 };
 
 Collect.prototype.checkActiveSurveySelected = function() {

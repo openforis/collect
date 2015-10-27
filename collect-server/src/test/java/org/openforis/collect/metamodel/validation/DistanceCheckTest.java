@@ -76,6 +76,17 @@ public class DistanceCheckTest extends ValidationTest {
 		Assert.assertEquals(TEST_COORDINATE, destinationPoint);
 	}
 
+	@Test
+	public void testEvalutateDistanceCheckMaxDistance() {
+		EntityBuilder.addValue(cluster, "id", new Code("001"));
+		Coordinate coord = Coordinate.parseCoordinate("SRID=EPSG:21035;POINT(885750 9333820)");
+		CoordinateAttribute vehicleLocation = EntityBuilder.addValue(cluster, "vehicle_location", coord);
+		CoordinateAttributeDefinition defn = vehicleLocation.getDefinition();
+		DistanceCheck check = (DistanceCheck) defn.getChecks().get(0);
+		Double maxDistance = check.evaluateMaxDistance(vehicleLocation);
+		Assert.assertEquals(Double.valueOf(100000d), maxDistance);
+	}
+	
 	private boolean containsDistanceCheck(List<ValidationResult> errors) {
 		for (ValidationResult result : errors) {
 			if (result.getValidator() instanceof DistanceCheck) {

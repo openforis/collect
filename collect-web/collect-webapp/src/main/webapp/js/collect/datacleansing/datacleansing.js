@@ -32,6 +32,11 @@ Collect.DataCleansing.prototype.init = function() {
 	this.initDataCleansingChainPanel();
 	this.initDataReportPanel();
 	
+	this.panels = [this.dataQueryTypePanel, this.dataQueryPanel, 
+	               this.dataQueryGroupPanel, this.dataQueryGroupPanel, 
+	               this.dataReportPanel, this.dataCleansingStepPanel,
+	               this.dataCleansingChainPanel];
+	
 	//this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
 	
 	this.initGlobalEventHandlers();
@@ -40,7 +45,16 @@ Collect.DataCleansing.prototype.init = function() {
 };
 
 Collect.DataCleansing.prototype.initView = function() {
+	var $this = this;
+	var mainNavBar = $("#survey-selected-container").find(".navbar-nav");
+	mainNavBar.on("shown.bs.tab", function(evt) {
+		$this.onTabChange();
+	});
 	this.checkViewState();
+};
+
+Collect.DataCleansing.prototype.onTabChange = function() {
+	this.resizePanels();
 };
 
 Collect.DataCleansing.prototype.checkViewState = function() {
@@ -74,19 +88,22 @@ Collect.DataCleansing.prototype.changeViewState = function(state) {
 	};
 };
 
+Collect.DataCleansing.prototype.resizePanels = function() {
+	var $this = this;
+	$.each($this.panels, function(idx, panel) {
+		panel.resizeDataGrid();
+	});
+};
+
 Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 	var $this = this;
 	$("#home-survey-selector-button").click(function() {
 		new Collect.SurveySelectDialogController().open();
 	});
 	EventBus.addEventListener(Collect.SURVEY_CHANGED, function() {
-		$this.dataQueryTypePanel.refreshDataGrid();
-		$this.dataQueryPanel.refreshDataGrid();
-		$this.dataQueryGroupPanel.refreshDataGrid();
-		$this.dataQueryGroupPanel.refreshDataGrid();
-		$this.dataReportPanel.refreshDataGrid();
-		$this.dataCleansingStepPanel.refreshDataGrid();
-		$this.dataCleansingChainPanel.refreshDataGrid();
+		$.each($this.panels, function(idx, panel) {
+			panel.refreshDataGrid();
+		});
 		$("#selected-survey-label").text(Collect.SurveySelectDialogController.getPrettyShortLabel(collect.activeSurvey));
 		//$this.initMapPanel();
 		

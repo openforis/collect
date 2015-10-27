@@ -8,6 +8,7 @@
 html, body {
 	height: 100%;
 	width: 100%;
+	overflow: hidden;
 }
 
 .appliactionVersionContainer {
@@ -42,10 +43,44 @@ html, body {
 	margin: 0px;
 }
 
+#header {
+	height: 102px;
+	border-bottom: solid 3px #0087C9;
+}
+
+#headerLink {
+	position: absolute;
+	z-index: 2;
+	height: 80px;
+	width: 90px;
+	cursor: pointer;
+}
+
+#headerImg {
+	position: absolute;
+	left: 0px;
+}
+
+#logoImg {
+	position: absolute;
+	right: 0px;
+	top: 10px;
+}
+
+body .content {
+	position: fixed;
+	width: 100%;
+	bottom: 30px;
+	top: 102px;
+}
+
 /* Set the fixed height of the footer here */
-#footer {
+body .footer {
   height: 30px;
   background-color: #B9E4ED;
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
 }
 
 #wrap > .center-container {
@@ -83,31 +118,6 @@ html, body {
   width:50%;
   display: table-cell;
   border:1px solid #eee
-}
-
-
-
-#header {
-	height: 103px;
-}
-
-#headerLink {
-	position: absolute;
-	z-index: 2;
-	height: 80px;
-	width: 90px;
-	cursor: pointer;
-}
-
-#headerImg {
-	position: absolute;
-	left: 0px;
-}
-
-#logoImg {
-	position: absolute;
-	right: 0px;
-	top: 10px;
 }
 
 .alert {
