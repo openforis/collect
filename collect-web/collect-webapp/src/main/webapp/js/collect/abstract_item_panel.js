@@ -103,7 +103,7 @@ Collect.AbstractItemPanel.prototype.resizeDataGrid = function() {
 
 Collect.AbstractItemPanel.prototype.calculateTableHeight = function() {
 	var $this = this;
-    return $(window).height() - 270;
+    return $(window).height() - 250;
 };
 
 Collect.AbstractItemPanel.prototype.createGridItemDeleteColumn = function() {
