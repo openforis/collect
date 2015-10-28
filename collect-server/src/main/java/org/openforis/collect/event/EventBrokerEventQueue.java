@@ -11,6 +11,7 @@ import org.openforis.rmb.MessageQueue;
  */
 public class EventBrokerEventQueue implements EventQueue {
 	
+	private boolean enabled = false;
 	private MessageQueue<Object> queue;
 	
 	public EventBrokerEventQueue(MessageQueue<Object> queue) {
@@ -30,6 +31,16 @@ public class EventBrokerEventQueue implements EventQueue {
 
 	public void publish(InitializeRDBEvent initializeRDBEvent) {
 		queue.publish(initializeRDBEvent);
+	}
+	
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	@Override
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 }

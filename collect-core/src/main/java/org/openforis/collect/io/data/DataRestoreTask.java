@@ -255,8 +255,10 @@ public class DataRestoreTask extends Task {
 						String.valueOf(rootEntity.getDefinition().getId()), 
 						String.valueOf(rootEntity.getInternalId()), new Date(), userName));
 			}
-			eventQueue.publish(new RecordTransaction(surveyName, 
-					recordId, recordStep, events));
+			if (eventQueue.isEnabled()) {
+				eventQueue.publish(new RecordTransaction(surveyName, 
+						recordId, recordStep, events));
+			}
 		}
 	}
 

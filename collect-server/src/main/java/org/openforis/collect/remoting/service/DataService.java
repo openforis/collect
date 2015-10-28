@@ -14,8 +14,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
-import org.openforis.collect.event.EventBrokerEventQueue;
 import org.openforis.collect.event.EventProducer;
+import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordDeletedEvent;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.event.RecordStep;
@@ -90,7 +90,7 @@ public class DataService {
 	@Autowired
 	private transient SessionEventDispatcher sessionEventDispatcher;
 	@Autowired
-	private transient EventBrokerEventQueue eventQueue;
+	private transient EventQueue eventQueue;
 	
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -514,11 +514,17 @@ public class DataService {
 	}
 
 	private void publishRecordPromotedEvents(CollectRecord record, String userName) {
+		if (! eventQueue.isEnabled()) {
+			return;
+		}
 		List<RecordEvent> events = new EventProducer().produceFor(record, userName);
 		eventQueue.publish(new RecordTransaction(record.getSurvey().getName(), record.getId(), record.getStep().toRecordStep(), events));
 	}
 	
 	private void publishRecordDeletedEvent(CollectRecord record, RecordStep recordStep, String userName) {
+		if (! eventQueue.isEnabled()) {
+			return;
+		}
 		Entity rootEntity = record.getRootEntity();
 		EntityDefinition rootEntityDef = rootEntity.getDefinition();
 		List<RecordDeletedEvent> events = Arrays.asList(new RecordDeletedEvent(record.getSurvey().getName(), 

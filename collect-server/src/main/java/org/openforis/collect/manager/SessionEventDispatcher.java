@@ -2,7 +2,7 @@ package org.openforis.collect.manager;
 
 import java.util.List;
 
-import org.openforis.collect.event.EventBrokerEventQueue;
+import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordEvent;
 import org.openforis.collect.event.RecordTransaction;
 import org.openforis.collect.model.CollectRecord;
@@ -19,9 +19,9 @@ public class SessionEventDispatcher {
 	@Autowired
 	private RecordSessionManager recordSessionManager;
 
-	private EventBrokerEventQueue eventQueue;
+	private EventQueue eventQueue;
 	
-	public SessionEventDispatcher(EventBrokerEventQueue eventQueue) {
+	public SessionEventDispatcher(EventQueue eventQueue) {
 		this.eventQueue = eventQueue;
 	}
 	
@@ -33,7 +33,9 @@ public class SessionEventDispatcher {
 				event.initializeRecordId(record.getId());
 			}
 			String surveyName = record.getSurvey().getName();
-			eventQueue.publish(new RecordTransaction(surveyName, record.getId(), record.getStep().toRecordStep(), events));
+			if (eventQueue.isEnabled()) {
+				eventQueue.publish(new RecordTransaction(surveyName, record.getId(), record.getStep().toRecordStep(), events));
+			}
 		}
 	}
 

@@ -800,7 +800,7 @@ public class SurveyManager {
 		}
 		addToCache(survey);
 		
-		if (eventQueue != null) {
+		if (eventQueue != null && eventQueue.isEnabled()) {
 			eventQueue.publish(new SurveyUpdatedEvent(survey.getName()));
 		}
 	}

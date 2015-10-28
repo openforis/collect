@@ -12,4 +12,8 @@ public interface EventQueue {
 	
 	void publish(SurveyEvent surveyEvent);
 	
+	boolean isEnabled();
+	
+	void setEnabled(boolean enabled);
+	
 }

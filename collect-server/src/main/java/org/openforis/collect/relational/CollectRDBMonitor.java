@@ -2,7 +2,7 @@ package org.openforis.collect.relational;
 
 import java.util.List;
 
-import org.openforis.collect.event.EventBrokerEventQueue;
+import org.openforis.collect.event.EventQueue;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
@@ -25,7 +25,7 @@ public class CollectRDBMonitor {
 	@Autowired
     private PlatformTransactionManager transactionManager;
 	@Autowired
-	private EventBrokerEventQueue eventQueue;
+	private EventQueue eventQueue;
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
@@ -34,19 +34,21 @@ public class CollectRDBMonitor {
 	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
 
 	public void init() {
-		runInTransaction(new Runnable() {
-			public void run() {
-				List<CollectSurvey> surveys = surveyManager.getAll();
-				for (CollectSurvey survey : surveys) {
-					for (RecordStep step : RecordStep.values()) {
-						if (rdbMissing(survey, step)) {
-							eventQueue.publish(new InitializeRDBEvent(survey.getName(),
-									step));
+		if (eventQueue.isEnabled()) {
+			runInTransaction(new Runnable() {
+				public void run() {
+					List<CollectSurvey> surveys = surveyManager.getAll();
+					for (CollectSurvey survey : surveys) {
+						for (RecordStep step : RecordStep.values()) {
+							if (rdbMissing(survey, step)) {
+								eventQueue.publish(new InitializeRDBEvent(survey.getName(),
+										step));
+							}
 						}
 					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	private void runInTransaction(final Runnable task) {
