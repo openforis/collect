@@ -149,7 +149,7 @@ public abstract class AbstractExpression {
 				} catch (Exception e) {
 					String message = String.format("Node '%s' not found", childName);
 					String[] childNames = ((EntityDefinition) contextNode).getChildDefinitionNames();
-					String childNamesFormatted = "\t" + joinSplittingInGroups(childNames, 5, ',', "\n\t");
+					String childNamesFormatted = "\t" + joinSplittingInGroups(childNames, 5, ", ", "\n\t");
 					String detailedMessage = String.format("Node '%s' not found\n - current parent entity: '%s'\n - possible valid values in %s:\n %s", 
 							childName, contextNode.getPath(), contextNode.getPath(), childNamesFormatted);
 					throw new InvalidExpressionException(message, compiledExpression.toString(), detailedMessage);
@@ -191,20 +191,20 @@ public abstract class AbstractExpression {
 		return fieldDef;
 	}
 	
-	private String joinSplittingInGroups(String[] items, int groupSize, char itemSeparator, String groupSeparator) {
-		StringBuilder childNamesFormattedSB = new StringBuilder();
+	private String joinSplittingInGroups(String[] items, int groupSize, String itemSeparator, String groupSeparator) {
+		StringBuilder sb = new StringBuilder();
 		int count = 0;
 		for (String name : items) {
-			childNamesFormattedSB.append(name);
+			sb.append(name);
 			count ++;
 			if (count < items.length) {
-				childNamesFormattedSB.append(itemSeparator);
+				sb.append(itemSeparator);
 				if (count % groupSize == 0) {
-					childNamesFormattedSB.append(groupSeparator);
+					sb.append(groupSeparator);
 				}
 			}
 		}
-		return childNamesFormattedSB.toString();
+		return sb.toString();
 	}
 
 	/**
