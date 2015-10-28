@@ -13,7 +13,7 @@ Collect = function() {
 	this.jobService = new Collect.JobService();
 };
 
-Collect.VERSION = "${PROJECT_VERSION}";
+Collect.VERSION = "PROJECT_VERSION";
 
 Collect.SURVEY_CHANGED = "surveyChanged";
 
