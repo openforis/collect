@@ -35,18 +35,6 @@
 					</radiogroup>
 				</row>
 				<row>
-					<label value="${labels.survey.export.include_data}:" />
-					<checkbox id="includeDataCheckbox"
-						checked="@bind(fx.includeData) @command('includeDataChanged')"
-						disabled="@load(vm.includeDataDisabled)" />
-				</row>
-				<row>
-					<label value="${labels.survey.export.include_uploaded_files}:" />
-					<checkbox id="includeUploadedFilesCheckbox" 
-						checked="@bind(fx.includeUploadedFiles)"
-						disabled="@load(vm.includeUploadedFilesDisabled)" />
-				</row>
-				<row>
 					<label value="${labels.survey.export.output_format.$}:" />
 					<radiogroup id="outputFormatRadiogroup" orient="vertical" 
 							selectedItem="@bind(fx.outputFormat)"
@@ -56,6 +44,11 @@
 						<radio label="${labels.survey.export.output_format.collect_earth}" value="EARTH" />
 						<radio label="${labels.survey.export.output_format.rdb}" value="RDB" />
 					</radiogroup>
+				</row>
+				<row visible="@load(vm.includeDataVisible)">
+					<label value="${labels.survey.export.include_data}:" />
+					<checkbox id="includeDataCheckbox"
+						checked="@bind(fx.includeData) @command('includeDataChanged')" />
 				</row>
 			</rows>
 		</grid>
