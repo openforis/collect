@@ -12,10 +12,13 @@ Collect.DataCleansing.DataCleansingStepPanelController.prototype.getDataGridOpti
 	return {
 	    url: "datacleansing/datacleansingsteps/list.json",
 	    columns: [
-			{field: "title", title: "Title", width: 400, sortable: true},
-			{field: "queryTitle", title: "Query Title", width: 400, sortable: true},
-			{field: "creationDate", title: "Creation Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
-			{field: "modifiedDate", title: "Modified Date", formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+			{field: "title", title: OF.i18n.prop("collect.global.title"), width: 400, sortable: true},
+			{field: "queryTitle", title: OF.i18n.prop("collect.data_cleansing.data_cleansing_step.query_title"), 
+				width: 400, sortable: true},
+			{field: "creationDate", title: OF.i18n.prop("collect.global.creation_date"), 
+				formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
+			{field: "modifiedDate", title: OF.i18n.prop("collect.global.modified_date"), 
+					formatter: OF.Dates.formatToPrettyDateTime, width: 100, sortable: true},
 			$this.createGridItemEditColumn(),
 			$this.createGridItemDeleteColumn()
 		]
