@@ -169,7 +169,7 @@ public class CollectEarthBalloonGenerator {
 			sb.append(name);
 			sb.append("\" name=\""); //$NON-NLS-1$
 			sb.append(name);
-			sb.append("\" value=\"$["); //$NON-NLS-1$
+			sb.append("\" value=\"$[EXTRA_"); //$NON-NLS-1$
 			sb.append(def.getName());
 			sb.append("]\" />"); //$NON-NLS-1$
 			sb.append('\n');
@@ -190,8 +190,7 @@ public class CollectEarthBalloonGenerator {
 						annotations.isFromCollectEarthCSV((AttributeDefinition) definition)
 						// TODO Fix how to treat surveys with multi-key combinations
 						|| 
-						( (AttributeDefinition) definition ).isKey() 
-				)
+						( (AttributeDefinition) definition ).isKey() && definition.getParentEntityDefinition().isRoot() )
 					) {
 					nodesFromCSV.add((AttributeDefinition) definition);
 				}

@@ -240,7 +240,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		for (AttributeDefinition attrDef : fromCsvAttributes) {
 			
 			String attrName = attrDef.getName();
-			sb.append("<Data name=\"" + attrName + "\">\n");
+			sb.append("<Data name=\"EXTRA_" + attrName + "\">\n");
 			String value;
 			value = "${placemark."+ nameOfField + "[" + extraInfoIndex + "]}";
 			extraInfoIndex ++;
