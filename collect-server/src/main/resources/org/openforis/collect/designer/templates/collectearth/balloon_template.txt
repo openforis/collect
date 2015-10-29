@@ -69,6 +69,11 @@
     var PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";
     
     
+    // By default all Collect Earth surveys are defined as having at least the id attribute "id" which is stored by the balloon as collect_text_id
+    // If more id attributes are present in the survey then their names ( using the protocoal for the transmission e.g. "collect_code_year") will be specified in this list :
+    // the value of this variable should be something like ['collect_text_id'] or ['collect_text_id','collect_code_measurement']
+    var EXTRA_ID_ATTRIBUTES = PLACEHOLDER_EXTRA_ID_ATTRIBUTES;
+    
     
 	</script>
 	
@@ -138,10 +143,7 @@
 		<div id="scrollingDiv" style="overflow :visible;" class="earthDiv">
 			<form id="formAll" class="form-horizontal" action="$[host]save-data-expanded">
 			<!-- <form id="formAll" class="form-horizontal" action="http://127.0.0.1:8028/earth/save-data-expanded"> -->
-			
-				<input type="hidden" id="collect_text_id"
-					name="collect_text_id" value="$[id]" />
-					
+								
 				<input type="hidden" id="collect_coord_location" 
 					name="collect_coord_location" value="$[latitude],$[longitude]" />
 				

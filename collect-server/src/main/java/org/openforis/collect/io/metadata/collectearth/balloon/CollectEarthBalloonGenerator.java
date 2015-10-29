@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.handlers.BalloonInputFieldsUtils;
 import org.openforis.collect.io.metadata.collectearth.CollectEarthProjectFileCreator;
 import org.openforis.collect.io.metadata.collectearth.balloon.CEField.CEFieldType;
@@ -58,7 +57,7 @@ import org.openforis.idm.metamodel.TimeAttributeDefinition;
 public class CollectEarthBalloonGenerator {
 	
 	private static final Set<String> HIDDEN_ATTRIBUTE_NAMES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			"id", "operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			"operator", "location", "plot_file", "actively_saved", "actively_saved_on"))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 	
 	private static final String BALLOON_TEMPLATE_TXT = "org/openforis/collect/designer/templates/collectearth/balloon_template.txt"; //$NON-NLS-1$
 	private static final String PLACEHOLDER_FOR_DYNAMIC_FIELDS = "PLACEHOLDER_FOR_DYNAMIC_FIELDS"; //$NON-NLS-1$
@@ -68,6 +67,7 @@ public class CollectEarthBalloonGenerator {
 	private static final String PLACEHOLDER_FOR_PREVIOUS_TRANSLATION = "PLACEHOLDER_PREVIOUS"; //$NON-NLS-1$
 	private static final String PLACEHOLDER_COLLECT_NOT_RUNNING = "PLACEHOLDER_COLLECT_NOT_RUNNING";//$NON-NLS-1$
 	private static final String PLACEHOLDER_PLACEMARK_ALREADY_FILLED = "PLACEHOLDER_PLACEMARK_ALREADY_FILLED";//$NON-NLS-1$
+	private static final String PLACEHOLDER_EXTRA_ID_ATTRIBUTES = "PLACEHOLDER_EXTRA_ID_ATTRIBUTES";//$NON-NLS-1$
 	private static final String PLACEHOLDER_UI_LANGUAGE = "PLACEHOLDER_UI_LANGUAGE";
 
 
@@ -88,7 +88,7 @@ public class CollectEarthBalloonGenerator {
 
 	public String generateHTML() throws IOException {
 		String htmlTemplate = getHTMLTemplate();
-		String result = fillWithExtraCSVFields(htmlTemplate);
+		String result = addHiddenFields(htmlTemplate);
 		result = fillWithSurveyDefinitionFields(result);
 		result = replaceButtonLocalizationText(result);
 		return result;
@@ -103,7 +103,28 @@ public class CollectEarthBalloonGenerator {
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_PLACEMARK_ALREADY_FILLED,HtmlUnicodeEscaperUtil.escapeHtmlUnicode(Messages.getString("CollectEarthBalloonGenerator.15", language)) ); //$NON-NLS-1$
 		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_UI_LANGUAGE, language ); //$NON-NLS-1$
 		
+		// Added to handle multiple id attributes within a survey
+		htmlForBalloon = htmlForBalloon.replace(PLACEHOLDER_EXTRA_ID_ATTRIBUTES,  getIdAttributesSurvey() ); //$NON-NLS-1$
+		
+		
 		return htmlForBalloon;
+	}
+
+	private String getIdAttributesSurvey() {
+		
+		String jsArrayKeys = "[";
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		BalloonInputFieldsUtils balloonUtils = new BalloonInputFieldsUtils();
+		
+		// TODO Fix better in the future, this is very very dirty!!
+		for (AttributeDefinition keyAttribute : keyAttributeDefinitions) {
+			jsArrayKeys += "'" + balloonUtils.getCollectBalloonParamName( keyAttribute )  + "',";
+		}
+		//Remove trailing comma
+		jsArrayKeys = jsArrayKeys.substring(0, jsArrayKeys.lastIndexOf(","));
+		jsArrayKeys += "]";
+		return jsArrayKeys;		
+		
 	}
 
 	private String getHTMLTemplate() throws IOException {
@@ -139,8 +160,8 @@ public class CollectEarthBalloonGenerator {
 		return result;
 	}
 	
-	private String fillWithExtraCSVFields(String templateContent) {
-		List<AttributeDefinition> nodesFromCSV = getNodesFromCSV();
+	private String addHiddenFields(String templateContent) {
+		List<AttributeDefinition> nodesFromCSV = getNodesFromCSVandIDs();
 		StringBuilder sb = new StringBuilder();
 		for (AttributeDefinition def : nodesFromCSV) {
 			String name = getHtmlParameterName(def);
@@ -157,8 +178,9 @@ public class CollectEarthBalloonGenerator {
 		return result;
 	}
 	
-	private List<AttributeDefinition> getNodesFromCSV() {
+	private List<AttributeDefinition> getNodesFromCSVandIDs() {
 		final List<AttributeDefinition> nodesFromCSV = new ArrayList<AttributeDefinition>();
+		
 		final CollectAnnotations annotations = survey.getAnnotations();
 		Schema schema = survey.getSchema();
 		schema.traverse(new NodeDefinitionVisitor() {
@@ -167,8 +189,8 @@ public class CollectEarthBalloonGenerator {
 						(
 						annotations.isFromCollectEarthCSV((AttributeDefinition) definition)
 						// TODO Fix how to treat surveys with multi-key combinations
-						// || 
-						//( (AttributeDefinition) definition ).isKey() 
+						|| 
+						( (AttributeDefinition) definition ).isKey() 
 				)
 					) {
 					nodesFromCSV.add((AttributeDefinition) definition);
@@ -179,7 +201,7 @@ public class CollectEarthBalloonGenerator {
 	}
 	
 	private List<String> getNodeNamesFromCSV() {
-		List<AttributeDefinition> nodes = getNodesFromCSV();
+		List<AttributeDefinition> nodes = getNodesFromCSVandIDs();
 		List<String> names = new ArrayList<String>(nodes.size());
 		for (AttributeDefinition def : nodes) {
 			names.add(def.getName());
@@ -237,7 +259,8 @@ public class CollectEarthBalloonGenerator {
 							HIDDEN_ATTRIBUTE_NAMES.contains(nodeName) 
 							|| nodeNamesFromCSV.contains(nodeName) 
 							|| ((UIField) formComponent).isHidden()
-							);
+							|| ((UIField) formComponent).getAttributeDefinition().isKey()
+					);
 					
 					boolean includeAsAncillaryData = annotations.isIncludedInCollectEarthHeader((AttributeDefinition) nodeDef) ;
 					

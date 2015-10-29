@@ -222,23 +222,35 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		List<AttributeDefinition> fromCsvAttributes = getExtendedDataFields(survey);
 		
 		//write the dynamic content to be replaced into the template
-		StringBuffer sb = new StringBuffer();
+		String nameOfField = "extraColumns";
+		StringBuffer extraHolders = addExtraDataHolders(fromCsvAttributes, nameOfField);
+		
+		nameOfField = "idColumns";
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		extraHolders.append( addExtraDataHolders( keyAttributeDefinitions, nameOfField) );
+		
+		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, extraHolders.toString());
+		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");
+	}
+
+	public StringBuffer addExtraDataHolders(
+			List<AttributeDefinition> fromCsvAttributes, String nameOfField) {
 		int extraInfoIndex = 0;
+		StringBuffer sb = new StringBuffer();
 		for (AttributeDefinition attrDef : fromCsvAttributes) {
+			
 			String attrName = attrDef.getName();
 			sb.append("<Data name=\"" + attrName + "\">\n");
 			String value;
-			value = "${placemark.extraColumns[" + extraInfoIndex + "]}";
+			value = "${placemark."+ nameOfField + "[" + extraInfoIndex + "]}";
 			extraInfoIndex ++;
 			
 			sb.append("<value>");
 			sb.append(value);
 			sb.append("</value>\n");
 		    sb.append("</Data>\n");
-		    
 		}
-		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_CSV_DATA, sb.toString());
-		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".xml");
+		return sb;
 	}
 
 	/**
@@ -254,9 +266,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 				if (def instanceof AttributeDefinition) {
 					AttributeDefinition attrDef = (AttributeDefinition) def;
 					if (annotations.isFromCollectEarthCSV(attrDef)
-							// TODO Prepare for multiple ID surveys
-							//||  attrDef.isKey() 
-							
+														
 					) {
 						fromCsvAttributes.add(attrDef);
 					}					
@@ -282,23 +292,58 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		for (AttributeDefinition attrDef : fromCsvAttributes) {
 			String attrName = attrDef.getName();
 			headerSB.append(",\"" + attrName + "\"");
-			String value;
-			if (attrDef instanceof NumericAttributeDefinition || 
-					attrDef instanceof BooleanAttributeDefinition) {
-				value = "0";
-			} else if (attrDef instanceof DateAttributeDefinition) {
-				value = "1/1/2000";
-			} else if (attrDef instanceof CodeAttributeDefinition) {
-				CodeListItem firstAvailableItem = getFirstAvailableCodeItem(attrDef);
-				value = firstAvailableItem == null ? "0": firstAvailableItem.getCode();
-			} else {
-				value = "value_" + attrName;
-			}
+			String value = getDummyValue(attrDef,null);
 			valuesSB.append(",\"").append(value).append("\"");
 		}
 		String content = templateContent.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_HEADER, headerSB.toString());
 		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_FOR_EXTRA_COLUMNS_VALUES, valuesSB.toString());
+		
+		List<AttributeDefinition> keyAttributeDefinitions = survey.getSchema().getRootEntityDefinitions().get(0).getKeyAttributeDefinitions();
+		String keyAttributes = "";
+		for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
+			keyAttributes += keyAttributeDefinition.getName() + ",";
+		}
+		keyAttributes = keyAttributes.substring(0, keyAttributes.lastIndexOf(",") );		
+		content = content.replace(CollectEarthProjectFileCreator.PLACEHOLDER_ID_COLUMNS_HEADER, keyAttributes);
+		
+		
+		for( int i=1; i<=15;i++){
+			String keyValues = "";
+			for (AttributeDefinition keyAttributeDefinition : keyAttributeDefinitions) {
+				String value = getDummyValue(keyAttributeDefinition,i);
+				keyValues += value + ",";
+			}
+			
+			String replaceIdsLine = CollectEarthProjectFileCreator.PLACEHOLDER_ID_COLUMNS_VALUES + "_" + i + ",";
+			content = content.replace(replaceIdsLine, keyValues );
+		}
+		
+		
 		return Files.writeToTempFile(content, "collect-earth-project-file-creator", ".ced");
+	}
+
+	public String getDummyValue(AttributeDefinition attrDef, Integer ord) {
+		String attrName = attrDef.getName();
+		
+		String value;
+		if (attrDef instanceof NumericAttributeDefinition || 
+				attrDef instanceof BooleanAttributeDefinition) {
+			value = "0";
+			if( ord!=null){
+				value = ord + "";
+			}
+		} else if (attrDef instanceof DateAttributeDefinition) {
+			value = "1/1/2000";
+		} else if (attrDef instanceof CodeAttributeDefinition) {
+			CodeListItem firstAvailableItem = getFirstAvailableCodeItem(attrDef);
+			value = firstAvailableItem == null ? "0": firstAvailableItem.getCode();
+		} else {
+			value = "value_" + attrName;
+			if( ord != null ){
+				value += "_"+ord;
+			}
+		}
+		return value;
 	}
 
 	private CodeListItem getFirstAvailableCodeItem(AttributeDefinition attrDef) {

@@ -63,7 +63,7 @@ ${html_for_balloon}
 			<listItemType>checkHideChildren</listItemType>
 			<ItemIcon id="icon_${placemark.placemarkId}">
 			   <state>open</state>
-			   <href>${host}placemarkIcon?collect_text_id=${placemark.placemarkId}&amp;listView=true<#if randomNumber??>&amp;forceUpdate=${randomNumber}</#if></href>
+			   <href>${host}placemarkIconExtd?id=${placemark.placemarkId}&amp;listView=true<#if randomNumber??>&amp;forceUpdate=${randomNumber}</#if></href>
 			</ItemIcon>
 		</ListStyle>
 	</Style>

@@ -128,6 +128,7 @@ var createPlacemarkUpdateRequest = function() {
 	});
 	
 	var data = {
+		// The placemarkId will be an array of the name and value pairs of the key attributes in the survey e.g. [{collect_text_id:1}] or [{collect_text_id:14554},{collect_code_measurement:1}]
 		placemarkId : getPlacemarkId(),
 		values : serializeFormToJSON($form),
 		currentStep : currentStepIndex
@@ -536,9 +537,34 @@ var checkIfPlacemarkAlreadyFilled = function(checkCount) {
 	});
 };
 
+var pushToArray = function(ary, name, val) {
+	   var obj = {};
+	   obj[name] = val;
+	   ary.push(obj);
+}
+
 var getPlacemarkId = function() {
-	var id = $form.find("input[name='collect_text_id']").val();
-	return id;
+	
+	return $form.find("input[name='collect_text_id']").val();
+	// There is a variable defines in the balloon (and filled by freemarker when generating the balloon) called EXTRA_ID_ATTRIBUTES
+	// This will contain an array with the names of the key attributes like ['collect_text_id'] or ['collect_text_id','collect_code_measurement']
+	
+	// This function should return then a jason like array of name/value pairs e.g. [{collect_text_id:1}] or [{collect_text_id:14554},{collect_code_measurement:1}]
+	/*var arrayKeyAttributes = "";
+	
+	//var arrayLength = EXTRA_ID_ATTRIBUTES.length;
+	//for (var i = 0; i < arrayLength; i++) {
+	    var keyAttrName = EXTRA_ID_ATTRIBUTES[i];
+	    var keyAttrVal = $form.find("input[name='"+keyAttrName+"']").val();
+		
+		arrayKeyAttributes += keyAttrVal ;
+		
+		if( i < arrayLength -1){
+			arrayKeyAttributes += ",";
+		}
+	}
+	
+	return arrayKeyAttributes;*/
 };
 
 var isActivelySaved = function() {
