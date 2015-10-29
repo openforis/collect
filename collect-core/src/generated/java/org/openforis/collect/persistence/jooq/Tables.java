@@ -57,39 +57,34 @@ public class Tables {
 	public static final org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStepValue OFC_DATA_CLEANSING_STEP_VALUE = org.openforis.collect.persistence.jooq.tables.OfcDataCleansingStepValue.OFC_DATA_CLEANSING_STEP_VALUE;
 
 	/**
-	 * The table collect.ofc_data_error_query
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery OFC_DATA_ERROR_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQuery.OFC_DATA_ERROR_QUERY;
-
-	/**
-	 * The table collect.ofc_data_error_query_group
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup OFC_DATA_ERROR_QUERY_GROUP = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroup.OFC_DATA_ERROR_QUERY_GROUP;
-
-	/**
-	 * The table collect.ofc_data_error_query_group_query
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery OFC_DATA_ERROR_QUERY_GROUP_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataErrorQueryGroupQuery.OFC_DATA_ERROR_QUERY_GROUP_QUERY;
-
-	/**
-	 * The table collect.ofc_data_error_report
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport OFC_DATA_ERROR_REPORT = org.openforis.collect.persistence.jooq.tables.OfcDataErrorReport.OFC_DATA_ERROR_REPORT;
-
-	/**
-	 * The table collect.ofc_data_error_report_item
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem OFC_DATA_ERROR_REPORT_ITEM = org.openforis.collect.persistence.jooq.tables.OfcDataErrorReportItem.OFC_DATA_ERROR_REPORT_ITEM;
-
-	/**
-	 * The table collect.ofc_data_error_type
-	 */
-	public static final org.openforis.collect.persistence.jooq.tables.OfcDataErrorType OFC_DATA_ERROR_TYPE = org.openforis.collect.persistence.jooq.tables.OfcDataErrorType.OFC_DATA_ERROR_TYPE;
-
-	/**
 	 * The table collect.ofc_data_query
 	 */
 	public static final org.openforis.collect.persistence.jooq.tables.OfcDataQuery OFC_DATA_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataQuery.OFC_DATA_QUERY;
+
+	/**
+	 * The table collect.ofc_data_query_group
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroup OFC_DATA_QUERY_GROUP = org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroup.OFC_DATA_QUERY_GROUP;
+
+	/**
+	 * The table collect.ofc_data_query_group_query
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroupQuery OFC_DATA_QUERY_GROUP_QUERY = org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroupQuery.OFC_DATA_QUERY_GROUP_QUERY;
+
+	/**
+	 * The table collect.ofc_data_query_type
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataQueryType OFC_DATA_QUERY_TYPE = org.openforis.collect.persistence.jooq.tables.OfcDataQueryType.OFC_DATA_QUERY_TYPE;
+
+	/**
+	 * The table collect.ofc_data_report
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataReport OFC_DATA_REPORT = org.openforis.collect.persistence.jooq.tables.OfcDataReport.OFC_DATA_REPORT;
+
+	/**
+	 * The table collect.ofc_data_report_item
+	 */
+	public static final org.openforis.collect.persistence.jooq.tables.OfcDataReportItem OFC_DATA_REPORT_ITEM = org.openforis.collect.persistence.jooq.tables.OfcDataReportItem.OFC_DATA_REPORT_ITEM;
 
 	/**
 	 * The table collect.ofc_logo

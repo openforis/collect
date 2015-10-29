@@ -285,23 +285,38 @@ public class SurveySelectVM extends BaseVM {
 	
 	@GlobalCommand
 	public void jobAborted(@BindingParam("job") Job job) {
-		closeJobStatusPopUp();
-		surveyBackupJob = null;
-	}
-	
-	@GlobalCommand
-	public void jobFailed(@BindingParam("job") Job job) {
-		closeJobStatusPopUp();
-		if ( job == surveyBackupJob ) {
-			surveyBackupJob = null;
-			String errorMessage = job.getErrorMessage();
-			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
+		if ( isJobStartedByThis(job)) {
+			onJobEnd(job);
 		}
 	}
 	
 	@GlobalCommand
-	public void jobCompleted(@BindingParam("job") Job job) {
+	public void jobFailed(@BindingParam("job") Job job) {
+		if ( isJobStartedByThis(job)) {
+			String errorMessage = job.getErrorMessage();
+			MessageUtil.showError("global.job_status.failed.message", new String[]{errorMessage});
+			onJobEnd(job);
+		}
+	}
+
+	private void onJobEnd(Job job) {
+		if (job == surveyBackupJob) {
+			surveyBackupJob = null;
+		} else if (job == surveyCloneJob) {
+			surveyCloneJob = null;
+		} else if (job == rdbExportJob) {
+			rdbExportJob = null;
+		}
 		closeJobStatusPopUp();
+	}
+
+	private boolean isJobStartedByThis(Job job) {
+		return job == surveyBackupJob || job == surveyCloneJob || job == rdbExportJob;
+	}
+	
+	@GlobalCommand
+	public void jobCompleted(@BindingParam("job") Job job) {
+		boolean jobStartedByThis = isJobStartedByThis(job);
 		if ( job == surveyBackupJob ) {
 			File file = surveyBackupJob.getOutputFile();
 			CollectSurvey survey = surveyBackupJob.getSurvey();
@@ -326,6 +341,9 @@ public class SurveySelectVM extends BaseVM {
 			sessionStatus.setCurrentLanguageCode(survey.getDefaultLanguage());
 			Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
 			surveyCloneJob = null;
+		}
+		if (jobStartedByThis) {
+			onJobEnd(job);
 		}
 	}
 	

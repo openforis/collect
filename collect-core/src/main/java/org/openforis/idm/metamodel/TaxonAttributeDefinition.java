@@ -61,13 +61,19 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	@Override
 	@SuppressWarnings("unchecked")
 	public TaxonOccurrence createValue(String string) {
-		throw new UnsupportedOperationException();
+		return new TaxonOccurrence(string, null);
 	}
 	
 	@Override
 	@SuppressWarnings("unchecked")
 	public TaxonOccurrence createValue(Object val) {
-		throw new UnsupportedOperationException();
+		if (val instanceof TaxonOccurrence) {
+			return new TaxonOccurrence((TaxonOccurrence) val);
+		} else if (val instanceof String) {
+			return createValue((String) val);
+		} else {
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	@Override

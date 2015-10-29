@@ -6,7 +6,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.openforis.collect.concurrency.CollectJobManager;
-import org.openforis.collect.datacleansing.DataErrorQuery.Severity;
+import org.openforis.collect.datacleansing.DataQuery.ErrorSeverity;
 import org.openforis.collect.datacleansing.io.DataCleansingImportTask;
 import org.openforis.collect.datacleansing.manager.DataCleansingMetadataManager;
 import org.openforis.collect.utils.Dates;
@@ -66,11 +66,29 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 	}
 
 	private DataCleansingMetadata createTestMetadata() {
+		DataQueryTypeBuilder queryTypeBuilder1 = dataQueryType()
+				.uuid("28ddb51f-8499-4dea-be9c-0c08d93918ff")
+				.code("E1")
+				.label("Error 1")
+				.description("Error 1 description")
+				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
+				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"));
+		
+		DataQueryTypeBuilder queryTypeBuilder2 = dataQueryType()
+				.uuid("b1349656-6115-4087-8bf4-6f49b4004809")
+				.code("E2")
+				.label("Error 2")
+				.description("Error 2 description")
+				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
+				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"));
+
 		DataQueryBuilder dataQueryBuilder1 = dataQuery()
 				.uuid("98beaf86-7a03-4593-9171-a6643e8cb451")
 				.entityId(727)
 				.attributeId(747)
 				.title("Empty cluster remarks")
+				.type(queryTypeBuilder1.build())
+				.severity(ErrorSeverity.ERROR)
 				.description("Query 1 description")
 				.conditions("idm:blank($this)")
 				.creationDate(Dates.parseDateTime("2015-08-26T11:57:53.312+02:00"))
@@ -81,35 +99,13 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 				.entityId(748)
 				.attributeId(813)
 				.title("Empty plot remarks")
+				.type(queryTypeBuilder2.build())
+				.severity(ErrorSeverity.ERROR)
 				.description("Query 2 description")
 				.conditions("idm:blank($this)")
 				.creationDate(Dates.parseDateTime("2015-08-26T11:58:32.031+02:00"))
 				.modifiedDate(Dates.parseDateTime("2015-08-27T17:28:35.089+02:00"));
 			
-		DataErrorTypeBuilder errorTypeBuilder1 = dataErrorType()
-				.uuid("28ddb51f-8499-4dea-be9c-0c08d93918ff")
-				.code("E1")
-				.label("Error 1")
-				.description("Error 1 description")
-				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
-				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"));
-		
-		DataErrorTypeBuilder errorTypeBuilder2 = dataErrorType()
-				.uuid("b1349656-6115-4087-8bf4-6f49b4004809")
-				.code("E2")
-				.label("Error 2")
-				.description("Error 2 description")
-				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
-				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"));
-
-		DataErrorQueryBuilder errorQueryBuilder = dataErrorQuery()
-				.uuid("89b9682f-9267-41da-80e2-f8a5444f3cae")
-				.type(errorTypeBuilder1.build())
-				.severity(Severity.ERROR)
-				.query(dataQueryBuilder1.build())
-				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
-				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"));
-		
 		DataCleansingStepBuilder cleansingStepBuilder1 = dataCleansingStep()
 				.uuid("fb279de6-fa19-4f55-841d-8d8d700a68f7")
 				.title("Update empty plot notes with \"NA\"")
@@ -129,16 +125,15 @@ public class DataCleansingMetadataIntegrationTest extends DataCleansingIntegrati
 				.modifiedDate(Dates.parseDateTime("2015-08-27T17:28:35.896+02:00"));
 			
 		DataCleansingMetadata expectedMetadata = metadata(
-			dataQueryBuilder1
+			queryTypeBuilder1
+			, queryTypeBuilder2
+			, dataQueryBuilder1
 			, dataQueryBuilder2
-			, errorTypeBuilder1
-			, errorTypeBuilder2
-			, errorQueryBuilder
-			, dataErrorQueryGroup()
+			, dataQueryGroup()
 				.uuid("89b9682f-9267-41da-80e2-f8a6444f3cae")
 				.title("Only errors")
 				.description("Group of errors")
-				.query(errorQueryBuilder.build())
+				.query(dataQueryBuilder1.build())
 				.creationDate(Dates.parseDateTime("2015-08-27T17:40:01.741+02:00"))
 				.modifiedDate(Dates.parseDateTime("2015-08-27T18:45:01.741+02:00"))
 			, cleansingStepBuilder1

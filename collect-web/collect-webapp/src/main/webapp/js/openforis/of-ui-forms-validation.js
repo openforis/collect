@@ -130,6 +130,7 @@ OF.UI.Forms.Validation.createErrorTooltipWithTitle = function ($field, title) {
 	$targetField.tooltip({
 		title: title,
 		container: container,
+		trigger: "focus",
 		template: '<div class="tooltip error"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
 	});
 };

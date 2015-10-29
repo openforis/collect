@@ -10,7 +10,7 @@ Collect.DataCleansingStepDialogController = function() {
 		
 	this.maxFieldNumber = 6;
 	
-	this.updateTypes = [{name: "ATTRIBUTE", label : "Attribute"}, {name: "FIELD", label : "Field"}];
+	this.updateTypes = [{name: "ATTRIBUTE", label : "Attribute"}, {name: "FIELD", label : "Field by Field"}];
 	
 	this.updateValues = [];
 	this.addNewUpdateValue();
@@ -59,31 +59,6 @@ Collect.DataCleansingStepDialogController.prototype.initFormElements = function(
 				dialog.open(selectedItem);
 			}
 		});
-		
-		{//init record step select
-			var select = $this.content.find('select[name="recordStep"]');
-			OF.UI.Forms.populateSelect(select, Collect.DataCleansing.WORKFLOW_STEPS, "name", "label");
-			select.selectpicker();
-			$this.recordStepSelectPicker = select.data().selectpicker;
-			$this.recordStepSelectPicker.refresh();
-		}
-		
-		var monitorJob = function(jobMonitorUrl, complete) {
-			var jobDialog = new OF.UI.JobDialog();
-			new OF.JobMonitor(jobMonitorUrl, function() {
-				jobDialog.close();
-				complete();
-			});
-		};
-		
-		$this.content.find(".run-btn").click($.proxy(function() {
-			var cleansingStep = $this.extractFormObject();
-			var recordStep = $this.recordStepSelectPicker.val();
-			collect.dataCleansingStepService.run(cleansingStep.id, recordStep, function() {
-				monitorJob(collect.jobService.contextPath + "survey-job.json?surveyId=" + collect.activeSurvey.id, function() {
-				});
-			});
-		}, $this));
 		
 		$this.updateValuesFieldset = $this.content.find(".update-values");
 		

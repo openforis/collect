@@ -24,8 +24,8 @@ public class ComparisonCheckFormValidator extends CheckFormValidator {
 		super.internalValidate(ctx);
 		if ( validateGreaterOrLessRequireness(ctx) ) {
 			NodeDefinition contextDefn = getContextNode(ctx);
-			validateValueExpression(ctx, contextDefn, GREATER_THAN_FIELD);
-			validateValueExpression(ctx, contextDefn, LESS_THAN_FIELD);
+			validateValueExpressionField(ctx, contextDefn, GREATER_THAN_FIELD);
+			validateValueExpressionField(ctx, contextDefn, LESS_THAN_FIELD);
 		}
 	}
 

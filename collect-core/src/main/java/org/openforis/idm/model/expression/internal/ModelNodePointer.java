@@ -3,31 +3,13 @@
  */
 package org.openforis.idm.model.expression.internal;
 
-import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.jxpath.DynamicPropertyHandler;
 import org.apache.commons.jxpath.ri.QName;
 import org.apache.commons.jxpath.ri.model.NodePointer;
 import org.apache.commons.jxpath.ri.model.dynamic.DynamicPointer;
-import org.openforis.idm.metamodel.NumberAttributeDefinition;
-import org.openforis.idm.metamodel.RangeAttributeDefinition;
-import org.openforis.idm.metamodel.Unit;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.BooleanValue;
-import org.openforis.idm.model.Code;
-import org.openforis.idm.model.Coordinate;
-import org.openforis.idm.model.Date;
-import org.openforis.idm.model.IntegerValue;
-import org.openforis.idm.model.NumberAttribute;
-import org.openforis.idm.model.NumberValue;
-import org.openforis.idm.model.NumericRange;
-import org.openforis.idm.model.NumericRangeAttribute;
-import org.openforis.idm.model.RealRange;
-import org.openforis.idm.model.RealValue;
-import org.openforis.idm.model.TaxonOccurrence;
-import org.openforis.idm.model.TextValue;
-import org.openforis.idm.model.Time;
 
 /**
  * @author M. Togna
@@ -54,115 +36,10 @@ public class ModelNodePointer extends DynamicPointer {
 	public Object getValue() {
 		Object node = super.getValue();
 		if (node instanceof Attribute) {
-			return getValue((Attribute<?, ?>) node);
+			return AttributeValueUtils.extractMainFieldValue((Attribute<?, ?>) node, normalizeNumbers);
 		} else {
 			return node;
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private Object getValue(Attribute<?, ?> attribute) {
-		Object value = attribute.getValue();
-		if ( value instanceof TextValue ) {
-			return ((TextValue) value).getValue(); 
-		} else if ( value instanceof IntegerValue || value instanceof RealValue) {
-			return getNumericValue((NumberAttribute<Number, NumberValue<Number>>) attribute);
-		} else if ( value instanceof NumericRange ) {
-			return getNumericRangeValue((NumericRangeAttribute<?, ?>) attribute);
-		} else if ( value instanceof BooleanValue ) {		
-			return ((BooleanValue) value).getValue(); 
-		} else if (value instanceof Time ) {
-			if ( attribute.isFilled() ) {
-				return ((Time) value).getNumericValue();
-			} else {
-				return null;
-			}
-		} else if (value instanceof Date) {
-			if ( attribute.isFilled() ) {
-				return ((Date) value).getNumericValue();
-			} else {
-				return null;
-			}
-		} else if (value instanceof Code) {
-			return ((Code) value).getCode();
-		} else if (value instanceof TaxonOccurrence) {
-			return ((TaxonOccurrence) value).getCode();
-		} else if (value instanceof Coordinate) {
-			return value;
-		} else {
-			throw new UnsupportedOperationException("Unsupported value type of "+attribute.getClass());
-		}
-	}
-	
-	private Number getNumericValue(NumberAttribute<?, ?> attr) {
-		if ( normalizeNumbers ) {
-			return getNormalizedValue(attr);
-		} else {
-			return attr.getValue().getValue();
-		}
-	}
-	
-	private Number getNormalizedValue(NumberAttribute<?, ?> attr) {
-		NumberAttributeDefinition defn = attr.getDefinition();
-		List<Unit> units = defn.getUnits();
-		if ( units != null && units.size() > 1 ) {
-			Unit unit = attr.getUnit();
-			Unit defaultUnit = defn.getDefaultUnit();
-			if ( unit != null && defaultUnit != null ) {
-				double normalizedValue = getNormalizedValue(attr.getValue(), defaultUnit).doubleValue();
-				return normalizedValue;
-			}
-		}
-		NumberValue<?> value = attr.getValue();
-		return value.getValue();
-	}
-
-	private NumericRange<?> getNumericRangeValue(NumericRangeAttribute<?, ?> attr) {
-		if ( normalizeNumbers ) {
-			return getNormalizedValue(attr);
-		} else {
-			return attr.getValue();
-		}
-	}
-	
-
-	private NumericRange<?> getNormalizedValue(NumericRangeAttribute<?, ?> attr) {
-		NumericRange<?> value = attr.getValue();
-		RangeAttributeDefinition defn = attr.getDefinition();
-		List<Unit> units = defn.getUnits();
-		if ( units != null && units.size() > 1 ) {
-			Unit unit = attr.getUnit();
-			Unit defaultUnit = defn.getDefaultUnit();
-			if ( unit != null && defaultUnit != null && unit != defaultUnit ) {
-				Number from = value.getFrom();
-				Number to = value.getTo();
-				double normalizedFrom = getNormalizedValue(from, unit, defaultUnit).doubleValue();
-				double normalizedTo = getNormalizedValue(to, unit, defaultUnit).doubleValue();
-				RealRange normalizedValue = new RealRange(normalizedFrom, normalizedTo, defaultUnit);
-				return normalizedValue;
-			} else {
-				return value;
-			}
-		} else {
-			return value;
-		}
-	}
-	
-	private Number getNormalizedValue(Number value, Unit unit, Unit defaultUnit) {
-		if ( value != null && unit.getConversionFactor() != null && defaultUnit.getConversionFactor() != null ) {
-			double unitConvFact = unit.getConversionFactor();
-			double defaultUnitConvFact = defaultUnit.getConversionFactor();
-			double doubleValue = value.doubleValue();
-			double normalized = doubleValue * unitConvFact;
-			double normalizedToDefault = normalized / defaultUnitConvFact;
-			return normalizedToDefault;
-		} else {
-			return value;
-		}
-	}
-	
-	private Number getNormalizedValue(NumberValue<?> value, Unit defaultUnit) {
-		return getNormalizedValue(value.getValue(), value.getUnit(), defaultUnit);
 	}
 
 	void setNormalizeNumbers(boolean normalizeNumbers) {

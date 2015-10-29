@@ -1,29 +1,5 @@
 {
-  "dataQueries": [
-    {
-      "id": 1,
-      "uuid": "98beaf86-7a03-4593-9171-a6643e8cb451",
-      "creationDate": "2015-08-26T11:57:53.312+02:00",
-      "modifiedDate": "2015-08-27T17:28:35.889+02:00",
-      "title": "Empty cluster remarks",
-      "entityDefinitionId": 727,
-      "attributeDefinitionId": 747,
-      "conditions": "idm:blank($this)",
-      "description": "Query 1 description"
-    },
-    {
-      "id": 2,
-      "uuid": "2e697d32-6ce5-4a06-b174-7873f1702702",
-      "creationDate": "2015-08-26T11:58:32.031+02:00",
-      "modifiedDate": "2015-08-27T17:28:35.089+02:00",
-      "title": "Empty plot remarks",
-      "entityDefinitionId": 748,
-      "attributeDefinitionId": 813,
-      "conditions": "idm:blank($this)",
-      "description": "Query 2 description"
-    }
-  ],
-  "dataErrorTypes": [
+   "dataQueryTypes": [
     {
       "id": 1,
       "uuid": "28ddb51f-8499-4dea-be9c-0c08d93918ff",
@@ -43,22 +19,37 @@
       "description": "Error 2 description"
     }
   ],
-  "dataErrorQueries": [
+  
+  "dataQueries": [
     {
-      "id": 5,
-      "uuid": "89b9682f-9267-41da-80e2-f8a5444f3cae",
-      "creationDate": "2015-08-27T17:40:01.741+02:00",
-      "modifiedDate": "2015-08-27T18:45:01.741+02:00",
+      "id": 1,
+      "uuid": "98beaf86-7a03-4593-9171-a6643e8cb451",
+      "creationDate": "2015-08-26T11:57:53.312+02:00",
+      "modifiedDate": "2015-08-27T17:28:35.889+02:00",
       "typeId": 1,
-      "queryId": 1,
-      "severity": "ERROR",
-      "typeCode": "E1",
-      "queryTitle": "Empty sampling unit notes",
-      "queryDescription": "",
-      "prettyFormatTitle": "Error type: E1 - Data Query: Empty sampling unit notes"
+      "errorSeverity": "ERROR",
+      "title": "Empty cluster remarks",
+      "entityDefinitionId": 727,
+      "attributeDefinitionId": 747,
+      "conditions": "idm:blank($this)",
+      "description": "Query 1 description"
+    },
+    {
+      "id": 2,
+      "uuid": "2e697d32-6ce5-4a06-b174-7873f1702702",
+      "creationDate": "2015-08-26T11:58:32.031+02:00",
+      "modifiedDate": "2015-08-27T17:28:35.089+02:00",
+      "typeId": 2,
+      "errorSeverity": "ERROR",
+      "title": "Empty plot remarks",
+      "entityDefinitionId": 748,
+      "attributeDefinitionId": 813,
+      "conditions": "idm:blank($this)",
+      "description": "Query 2 description"
     }
   ],
-  "dataErrorQueryGroups": [
+ 
+  "dataQueryGroups": [
     {
       "id": 5,
       "uuid": "89b9682f-9267-41da-80e2-f8a6444f3cae",
@@ -66,7 +57,7 @@
       "description": "Group of errors",
       "creationDate": "2015-08-27T17:40:01.741+02:00",
       "modifiedDate": "2015-08-27T18:45:01.741+02:00",
-      "queryIds": [5]
+      "queryIds": [1]
     }
   ],
   "cleansingSteps": [

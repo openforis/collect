@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.model.CollectTestSurveyContext;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.validation.DistanceCheck;
 import org.openforis.idm.metamodel.validation.ValidationResult;
 import org.openforis.idm.metamodel.validation.ValidationResults;
@@ -63,7 +64,29 @@ public class DistanceCheckTest extends ValidationTest {
 		Assert.assertFalse(containsDistanceCheck(results.getErrors()));
 		Assert.assertTrue(containsDistanceCheck(results.getWarnings()));
 	}
+	
+	@Test
+	public void testEvalutateDistanceCheckDestinationPoint() {
+		EntityBuilder.addValue(cluster, "id", new Code("001"));
+		Coordinate coord = Coordinate.parseCoordinate("SRID=EPSG:21035;POINT(885750 9333820)");
+		CoordinateAttribute vehicleLocation = EntityBuilder.addValue(cluster, "vehicle_location", coord);
+		CoordinateAttributeDefinition defn = vehicleLocation.getDefinition();
+		DistanceCheck check = (DistanceCheck) defn.getChecks().get(0);
+		Coordinate destinationPoint = check.evaluateDestinationPoint(vehicleLocation);
+		Assert.assertEquals(TEST_COORDINATE, destinationPoint);
+	}
 
+	@Test
+	public void testEvalutateDistanceCheckMaxDistance() {
+		EntityBuilder.addValue(cluster, "id", new Code("001"));
+		Coordinate coord = Coordinate.parseCoordinate("SRID=EPSG:21035;POINT(885750 9333820)");
+		CoordinateAttribute vehicleLocation = EntityBuilder.addValue(cluster, "vehicle_location", coord);
+		CoordinateAttributeDefinition defn = vehicleLocation.getDefinition();
+		DistanceCheck check = (DistanceCheck) defn.getChecks().get(0);
+		Double maxDistance = check.evaluateMaxDistance(vehicleLocation);
+		Assert.assertEquals(Double.valueOf(100000d), maxDistance);
+	}
+	
 	private boolean containsDistanceCheck(List<ValidationResult> errors) {
 		for (ValidationResult result : errors) {
 			if (result.getValidator() instanceof DistanceCheck) {

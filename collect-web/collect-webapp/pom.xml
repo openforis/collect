@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>collect-web</artifactId>
 		<groupId>org.openforis.collect</groupId>
-		<version>3.8.15-SNAPSHOT</version>
+		<version>3.8.18-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	
@@ -68,10 +68,13 @@
 					</execution>
 				</executions>
 				<configuration>
-					<file>${project.build.directory}/${project.build.finalName}/datacleansing/main.html</file>
 					<regex>false</regex>
 					<token>PROJECT_VERSION</token>
 					<value>${project.version}</value>
+					<includes>
+						<include>${project.build.directory}/${project.build.finalName}/datacleansing/main.html</include>
+						<include>${project.build.directory}/${project.build.finalName}/js/collect/collect.js</include>
+					</includes>
 				</configuration>
 			</plugin>
 		</plugins>

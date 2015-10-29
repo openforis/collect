@@ -4,14 +4,18 @@
 package org.openforis.idm.metamodel.validation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.commons.lang.DeepComparable;
 import org.openforis.idm.metamodel.IdmInterpretationError;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.LanguageSpecificTextMap;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Record;
@@ -25,6 +29,8 @@ import org.openforis.idm.model.expression.InvalidExpressionException;
 public abstract class Check<T extends Attribute<?, ?>> implements Serializable, ValidationRule<T>, DeepComparable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final Pattern MESSAGE_NESTED_EXPRESSION_PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
 	public enum Flag {
 		ERROR, WARN
@@ -75,6 +81,14 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 		return messages == null ? null: messages.getText(language);
 	}
 	
+	protected String getMessageInPreferredLanguage(Survey survey, String preferredLanguage) {
+		String message = getMessage(preferredLanguage);
+		if (message == null && ! survey.isDefaultLanguage(preferredLanguage)) {
+			message = getMessage(survey.getDefaultLanguage());
+		}
+		return message;
+	}
+	
 	public void setMessage(String language, String text) {
 		if ( messages == null ) {
 			messages = new LanguageSpecificTextMap();
@@ -95,6 +109,49 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 		}
 	}
 	
+	public List<String> extractExpressionsFromMessage(String message) {
+		List<String> result = new ArrayList<String>();
+		if (StringUtils.isNotBlank(message)) {
+			Matcher matcher = MESSAGE_NESTED_EXPRESSION_PATTERN.matcher(message);
+			while (matcher.find()) {
+				String expr = matcher.group(1);
+				result.add(expr);
+			}
+		}
+		return result;
+	}
+	
+	public String getMessageWithEvaluatedExpressions(Attribute<?, ?> context) {
+		return getMessageWithEvaluatedExpressions(context, null);
+	}
+	
+	public String getMessageWithEvaluatedExpressions(Attribute<?, ?> context, String preferredLanguage) {
+		Survey survey = context.getSurvey();
+		String message;
+		if (preferredLanguage == null || survey.isDefaultLanguage(preferredLanguage)) {
+			message = getMessage(survey.getDefaultLanguage());
+		} else {
+			message = getMessageInPreferredLanguage(survey, preferredLanguage);
+		}
+		if (StringUtils.isBlank(message)) {
+			return null;
+		} else {
+			try {
+				StringBuffer sb = new StringBuffer();
+				Matcher matcher = MESSAGE_NESTED_EXPRESSION_PATTERN.matcher(message);
+				while (matcher.find()) {
+					String expr = matcher.group(1);
+					Object val = getExpressionEvaluator(context).evaluateValue(context.getParent(), context, expr);
+					matcher.appendReplacement(sb, val.toString());
+				}
+				matcher.appendTail(sb);
+				return sb.toString();
+			} catch (InvalidExpressionException e) {
+				throw new IdmInterpretationError("Unable to evaluate condition " + condition, e);
+			}
+		}
+	}
+
 	public void setCondition(String condition) {
 		this.condition = condition;
 	}
@@ -104,16 +161,21 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 			return true;
 		} else {
 			try {
-				Record record = context.getRecord();
-				SurveyContext surveyContext = record.getSurveyContext();
-				ExpressionEvaluator evaluator = surveyContext.getExpressionEvaluator();
+				ExpressionEvaluator evaluator = getExpressionEvaluator(context);
 				return evaluator.evaluateBoolean(context.getParent(), context, condition);
 			} catch (InvalidExpressionException e) {
 				throw new IdmInterpretationError("Unable to evaluate condition " + condition, e);
 			}
 		}
 	}
-	
+
+	private ExpressionEvaluator getExpressionEvaluator(Attribute<?, ?> context) {
+		Record record = context.getRecord();
+		SurveyContext surveyContext = record.getSurveyContext();
+		ExpressionEvaluator evaluator = surveyContext.getExpressionEvaluator();
+		return evaluator;
+	}
+
 	@Override
 	public Check<T> clone() throws CloneNotSupportedException {
 		@SuppressWarnings("unchecked")

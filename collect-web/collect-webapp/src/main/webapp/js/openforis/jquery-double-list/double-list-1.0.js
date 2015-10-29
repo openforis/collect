@@ -308,6 +308,8 @@
 					return text.substr(0, options.maxTextLength) + '...';
 				}
 			});
+			this.originalElement.find('option:not(selected)').appendTo($this.unselectedList);
+			this.originalElement.find('option:selected').appendTo($this.selectedList);
 			
 			this.originalElement.find('option:not(selected)').appendTo($this.unselectedList);
 			this.originalElement.find('option:selected').appendTo($this.selectedList);

@@ -34,7 +34,7 @@ public class AttributeDefaultFormValidator extends FormValidator {
 
 	private void validateCondition(ValidationContext ctx) {
 		NodeDefinition contextNode = getContextNode(ctx);
-		validateBooleanExpression(ctx, contextNode, CONDITION_FIELD);
+		validateBooleanExpressionField(ctx, contextNode, CONDITION_FIELD);
 	}
 
 	private void validateValue(ValidationContext ctx) {
@@ -63,7 +63,7 @@ public class AttributeDefaultFormValidator extends FormValidator {
 			addInvalidMessage(ctx, EXPRESSION_FIELD, Labels.getLabel(CANNOT_SPECIFY_BOTH_VALUE_AND_EXPRESSION_MESSAGE_KEY));
 		} else {
 			NodeDefinition contextNode = getContextNode(ctx);
-			validateValueExpression(ctx, contextNode, EXPRESSION_FIELD);
+			validateValueExpressionField(ctx, contextNode, EXPRESSION_FIELD);
 		}
 	}
 	

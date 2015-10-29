@@ -55,8 +55,8 @@ public class ExpressionEvaluator {
 		if ( object == null ) {
 			return null;
 		} else {
-			Class<? extends Value> expectedValueType = defn.getValueType();
 			if ( object instanceof Value ) {
+				Class<? extends Value> expectedValueType = defn.getValueType();
 				if ( expectedValueType.isAssignableFrom(object.getClass()) ) {
 					return (V) object;
 				} else {

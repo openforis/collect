@@ -2,11 +2,10 @@ Collect = function() {
 	this.activeSurvey = null;
 	this.sessionService = new Collect.SessionService();
 	this.surveyService = new Collect.SurveyService();
-	this.dataErrorTypeService = new Collect.DataErrorTypeService();
+	this.dataQueryTypeService = new Collect.DataQueryTypeService();
 	this.dataQueryService = new Collect.DataQueryService();
-	this.dataErrorQueryService = new Collect.DataErrorQueryService();
-	this.dataErrorQueryGroupService = new Collect.DataErrorQueryGroupService();
-	this.dataErrorReportService = new Collect.DataErrorReportService();
+	this.dataQueryGroupService = new Collect.DataQueryGroupService();
+	this.dataReportService = new Collect.DataReportService();
 	this.geoDataService = new Collect.GeoDataService();
 	this.dataCleansingStepService = new Collect.DataCleansingStepService();
 	this.dataCleansingStepValueService = new Collect.DataCleansingStepValueService();
@@ -14,7 +13,7 @@ Collect = function() {
 	this.jobService = new Collect.JobService();
 };
 
-Collect.VERSION = "${PROJECT_VERSION}";
+Collect.VERSION = "PROJECT_VERSION";
 
 Collect.SURVEY_CHANGED = "surveyChanged";
 
@@ -70,7 +69,7 @@ Collect.prototype.loadViewImages = function() {
 
 	loadImage("headerImg", "header", "assets/images/header.jpg");
 	loadImage("logoImg", "top_right", "assets/images/default-logo.png");
-	//loadImage("footerImg", "footer", "assets/images/footer.jpg");	
+	loadImage("footerImg", "footer", "assets/images/footer.jpg");
 };
 
 Collect.prototype.checkActiveSurveySelected = function() {

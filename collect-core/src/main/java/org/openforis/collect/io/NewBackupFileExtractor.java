@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -91,6 +92,7 @@ public class NewBackupFileExtractor implements Closeable {
 		for (File file : files) {
 			result.add(file.getName());
 		}
+		Collections.sort(result);
 		return result;
 	}
 	

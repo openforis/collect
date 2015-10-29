@@ -297,8 +297,12 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
 		EntityDefinition currentParent = getParentEntityDefinition();
 		while ( currentParent != null ) {
-			result.add(0, currentParent);
+			result.add(currentParent);
 			currentParent = currentParent.getParentEntityDefinition();
+		}
+		if (result.size() > 1) {
+			//return the ancestor definitions from root to nearest parent entity
+			Collections.reverse(result); 
 		}
 		return result;
 	}

@@ -43,6 +43,14 @@
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
+							    		<label class="control-label">Query Type</label>
+										<select class="form-control selectpicker" name="typeId"></select>
+									</div>
+									<div class="form-group">
+							    		<label class="control-label">Error Severity</label>
+										<select class="form-control selectpicker" name="errorSeverity"></select>
+									</div>
+									<div class="form-group">
 								   		<label class="control-label">Conditions</label>
 										<textarea class="form-control" name="conditions" rows="8" spellcheck="false"></textarea>
 									</div>
@@ -82,8 +90,8 @@
 			
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default cancel-btn">Cancel</button>
-
-				<button type="button" class="btn btn-primary apply-btn">Apply</button>
+				
+				<button type="button" class="btn btn-primary apply-btn">Save</button>
 				
 				<button type="button" class="btn btn-primary save-and-close-btn">Save and Close</button>
 			</div>

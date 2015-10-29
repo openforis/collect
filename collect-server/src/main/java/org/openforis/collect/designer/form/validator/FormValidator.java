@@ -86,22 +86,27 @@ public abstract class FormValidator extends BaseValidator {
 		}
 	}
 
-	protected boolean validateBooleanExpression(ValidationContext ctx,
+	protected boolean validateBooleanExpressionField(ValidationContext ctx,
 			NodeDefinition contextNode, String field) {
-		return validateExpression(ctx, ExpressionType.BOOLEAN, field, contextNode);
+		return validateExpressionField(ctx, ExpressionType.BOOLEAN, field, contextNode);
 	}
 
-	private boolean validateExpression(ValidationContext ctx, ExpressionType type, String field,
+	private boolean validateExpressionField(ValidationContext ctx, ExpressionType type, String field,
 			NodeDefinition contextNode) {
-		return validateExpression(ctx, type, field, contextNode.getParentDefinition(), contextNode);
+		return validateExpressionField(ctx, type, field, contextNode.getParentDefinition(), contextNode);
 	}
 	
-	private boolean validateExpression(ValidationContext ctx, ExpressionType type, String field,
+	private boolean validateExpressionField(ValidationContext ctx, ExpressionType type, String field,
 			NodeDefinition contextNodeDef, NodeDefinition thisNodeDef) {
 		if (contextNodeDef == null) {
 			return true;
 		}
 		String epression = (String) getValue(ctx, field);
+		return validateExpression(ctx, type, contextNodeDef, thisNodeDef, field, epression);
+	}
+
+	protected boolean validateExpression(ValidationContext ctx, ExpressionType type, NodeDefinition contextNodeDef,
+			NodeDefinition thisNodeDef, String field, String epression) {
 		if ( StringUtils.isNotBlank(epression) ) {
 			ExpressionValidator expressionValidator = getExpressionValidator(ctx);
 			ExpressionValidationResult result = expressionValidator.validateExpression(type, contextNodeDef, thisNodeDef, epression);
@@ -118,17 +123,17 @@ public abstract class FormValidator extends BaseValidator {
 		return true;
 	}
 
-	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition contextDefn, String field) {
+	protected boolean validateValueExpressionField(ValidationContext ctx, NodeDefinition contextDefn, String field) {
 		NodeDefinition parentDefn = contextDefn.getParentDefinition();
-		return validateValueExpression(ctx, contextDefn, parentDefn, field);
+		return validateValueExpressionField(ctx, contextDefn, parentDefn, field);
 	}
 	
-	protected boolean validateValueExpression(ValidationContext ctx, NodeDefinition contextDefn, NodeDefinition parentEntityDefn, String field) {
-		return validateExpression(ctx, ExpressionType.VALUE, field, parentEntityDefn, contextDefn);
+	protected boolean validateValueExpressionField(ValidationContext ctx, NodeDefinition contextDefn, NodeDefinition parentEntityDefn, String field) {
+		return validateExpressionField(ctx, ExpressionType.VALUE, field, parentEntityDefn, contextDefn);
 	}
 	
-	protected boolean validatePathExpression(ValidationContext ctx, NodeDefinition contextNode, String fieldName) {
-		return validateExpression(ctx, ExpressionType.SCHEMA_PATH, fieldName, contextNode);
+	protected boolean validatePathExpressionField(ValidationContext ctx, NodeDefinition contextNode, String fieldName) {
+		return validateExpressionField(ctx, ExpressionType.SCHEMA_PATH, fieldName, contextNode);
 	}
 	
 	protected boolean validateNameNotReserved(ValidationContext ctx, String nameField, String[] reservedNames) {
@@ -169,8 +174,7 @@ public abstract class FormValidator extends BaseValidator {
 	protected static String[] normalizeMessageArguments(String... messages) {
 		String[] result = new String[messages.length];
 		for (int i = 0; i < messages.length; i++) {
-			String message = messages[i];
-			result[i] = normalizeMessageArgument(message);
+			result[i] = normalizeMessageArgument(messages[i]);
 		}
 		return result;
 	}

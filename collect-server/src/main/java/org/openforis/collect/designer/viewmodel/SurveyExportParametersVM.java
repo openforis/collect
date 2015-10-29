@@ -74,20 +74,12 @@ public class SurveyExportParametersVM extends BaseVM {
 	}
 	
 	@DependsOn({"tempForm.type","tempForm.outputFormat"})
-	public boolean isIncludeDataDisabled() {
+	public boolean isIncludeDataVisible() {
 		SurveyType type = SurveyType.valueOf(getTypeFormField());
 		OutputFormat outputFormat = OutputFormat.valueOf(getOutputFormatFormField());
-		return type == SurveyType.TEMPORARY || 
-				outputFormat == OutputFormat.MOBILE || 
-				outputFormat == OutputFormat.EARTH;
+		return type == SurveyType.PUBLISHED && outputFormat == OutputFormat.RDB;
 	}
 
-	@DependsOn("tempForm.includeData")
-	public boolean isIncludeUploadedFilesDisabled() {
-		Boolean includeData = (Boolean) tempForm.getField("includeData");
-		return includeData == null || ! includeData.booleanValue();
-	}
-	
 	public SurveyExportParametersFormObject getFormObject() {
 		return formObject;
 	}
@@ -109,7 +101,7 @@ public class SurveyExportParametersVM extends BaseVM {
 	}
 	
 	private void checkEnabledFields() {
-		if ( isIncludeDataDisabled() ) {
+		if ( ! isIncludeDataVisible() ) {
 			tempForm.setField("includeData", false);
 			BindUtils.postNotifyChange(null, null, tempForm, "includeData");
 		}

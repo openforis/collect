@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserManager {
 
 	public static final String ADMIN_USER_NAME = "admin";
-	
+	private static final String ADMIN_DEFAULT_PASSWORD = "admin";
 	protected static final String PASSWORD_PATTERN = "^\\w{5,}$"; // alphanumeric, at least 5 letters
 
 	@Autowired
@@ -72,7 +72,7 @@ public class UserManager {
 				user.setPassword(oldUser.getPassword());
 			}
 		} else {
-			String encodedPassword = encodePassword(password);
+			String encodedPassword = checkAndEncodePassword(password);
 			user.setPassword(encodedPassword);
 		}
 		if (userId == null) {
@@ -87,7 +87,7 @@ public class UserManager {
 		User user = userDao.loadById(userId);
 		String encodedOldPassword = encodePassword(oldPassword);
 		if ( user.getPassword().equals(encodedOldPassword) ) {
-			String encodedNewPassword = encodePassword(newPassword);
+			String encodedNewPassword = checkAndEncodePassword(newPassword);
 			user.setPassword(encodedNewPassword);
 			userDao.update(user);
 		} else {
@@ -95,22 +95,32 @@ public class UserManager {
 		}
 	}
 
-	protected String encodePassword(String password) throws UserPersistenceException {
+	protected String checkAndEncodePassword(String password) throws UserPersistenceException {
 		boolean matchesPattern = Pattern.matches(PASSWORD_PATTERN, password);
 		if (matchesPattern) {
-			MessageDigest messageDigest;
-			try {
-				messageDigest = MessageDigest.getInstance("MD5");
-				byte[] bytes = password.getBytes();
-				byte[] digest = messageDigest.digest(bytes);
-				char[] resultChar = Hex.encodeHex(digest);
-				return new String(resultChar);
-			} catch (NoSuchAlgorithmException e) {
-				throw new UserPersistenceException("Error encoding user password");
-			}
+			return encodePassword(password);
 		} else {
 			throw new InvalidUserPasswordException();
 		}
+	}
+	
+	protected String encodePassword(String password) {
+		MessageDigest messageDigest;
+		try {
+			messageDigest = MessageDigest.getInstance("MD5");
+			byte[] bytes = password.getBytes();
+			byte[] digest = messageDigest.digest(bytes);
+			char[] resultChar = Hex.encodeHex(digest);
+			return new String(resultChar);
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("Error encoding user password", e);
+		}
+	}
+	
+	public Boolean isDefaultAdminPasswordSet() {
+		User adminUser = loadAdminUser();
+		String encodedDefaultPassword = encodePassword(ADMIN_DEFAULT_PASSWORD);
+		return encodedDefaultPassword.equals(adminUser.getPassword());
 	}
 
 	@Transactional

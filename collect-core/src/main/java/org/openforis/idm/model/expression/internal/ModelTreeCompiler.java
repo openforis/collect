@@ -64,7 +64,7 @@ public class ModelTreeCompiler extends TreeCompiler {
 
 	private ModelRelationalExpression getRelationalExpression(Operation op, Expression left, Expression right) {
 		ModelRelationalExpression expression = new ModelRelationalExpression(op, left, right);
-		if(normalizeNumbers){
+		if (normalizeNumbers) {
 			expression.setNormalizeNumbers(normalizeNumbers);
 		}
 		return expression;
