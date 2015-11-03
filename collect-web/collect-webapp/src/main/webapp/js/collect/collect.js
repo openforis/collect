@@ -2,6 +2,7 @@ Collect = function() {
 	this.activeSurvey = null;
 	this.sessionService = new Collect.SessionService();
 	this.surveyService = new Collect.SurveyService();
+	this.dataService = new Collect.DataService();
 	this.dataQueryTypeService = new Collect.DataQueryTypeService();
 	this.dataQueryService = new Collect.DataQueryService();
 	this.dataQueryGroupService = new Collect.DataQueryGroupService();

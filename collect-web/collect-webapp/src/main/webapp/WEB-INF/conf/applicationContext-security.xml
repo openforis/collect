@@ -42,6 +42,7 @@
 		<intercept-url pattern="/speciesImport" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/surveys" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/surveys/summaries.json" access="permitAll" />
+		<intercept-url pattern="/surveys/**" access="hasRole('ROLE_USER')" />
 		<intercept-url pattern="/uploadData.htm" access="permitAll" />
 		<intercept-url pattern="/uploadFile.htm" access="permitAll" />
 		<intercept-url pattern="/validateAllRecords.htm" access="hasRole('ROLE_ADMIN')" />

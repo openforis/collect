@@ -36,11 +36,21 @@ public class SamplingDesignManager {
 	}
 
 	@Transactional
+	public SamplingDesignSummaries loadBySurvey(int surveyId, Integer upToLevel) {
+		return loadBySurvey(surveyId, upToLevel, 0, Integer.MAX_VALUE);
+	}
+
+	@Transactional
 	public SamplingDesignSummaries loadBySurvey(int surveyId, int offset, int maxRecords) {
+		return loadBySurvey(surveyId, null, offset, maxRecords);
+	}
+
+	@Transactional
+	public SamplingDesignSummaries loadBySurvey(int surveyId, Integer upToLevel, int offset, int maxRecords) {
 		int totalCount = samplingDesignDao.countBySurvey(surveyId);
 		List<SamplingDesignItem> records;
 		if ( totalCount > 0 ) {
-			records = samplingDesignDao.loadItems(surveyId, offset, maxRecords); 
+			records = samplingDesignDao.loadItems(surveyId, upToLevel, offset, maxRecords); 
 		} else {
 			records = Collections.emptyList();
 		}

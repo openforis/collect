@@ -1,9 +1,10 @@
-Collect.DataCleansing.MapPanelComposer = function(container) {
+Collect.DataCleansing.QueryResultMapDialog = function(container, queryId) {
 	this.container = container;
+	this.queryId = queryId;
 	this.map = null;
 };
 
-Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
+Collect.DataCleansing.QueryResultMapDialog.prototype.init = function() {
 	var mapCanvas = this.container.find(".map-canvas")[0];
 	var mapOptions = {
 		//center : new google.maps.LatLng(44.5403, -78.5463),
@@ -19,51 +20,13 @@ Collect.DataCleansing.MapPanelComposer.prototype.init = function() {
 	      shape: ""
 	    };
 	});
-	//TODO
 	
-//	var kmlLayer = new google.maps.KmlLayer('http://127.0.0.1:8280/collect/geo/data/samplingpoints.kml',
-//		{
-//			suppressInfoWindows: false,
-//			map: map
-//		}
-//	);
-//	kmlLayer.setMap(map);
-//	
-//	 var kmlLayer = new google.maps.KmlLayer({
-//		    url: 'http://kml-samples.googlecode.com/svn/trunk/kml/Placemark/placemark.kml',
-//		    suppressInfoWindows: true,
-//		    map: map
-//		  });
-//	
-//	var bound = new google.maps.LatLngBounds();
-
-//	for (i = 0; i < locations.length; i++) {
-//	  bound.extend( new google.maps.LatLng(locations[i][1], locations[i][2]) );
-//
-//	}
-
 	this.map = map;
-	//TODO
-	this.loadLayers();
 
-//	collect.geoDataService.loadCoordinateValues(collect.activeSurvey.name, 3, 0, 10, function(lngLats) {
-//		lngLats.forEach(function(lngLat) {
-//			var point = new google.maps.Circle({
-//				center : new google.maps.LatLng(lngLat[1], lngLat[0]),
-//				radius : 20000,
-//				strokeColor : "#0000FF",
-//				strokeOpacity : 0.8,
-//				strokeWeight : 2,
-//				fillColor : "#0000FF",
-//				fillOpacity : 0.4
-//			});
-//			point.setMap(map);
-//		});
-//	});
-	
+	this.loadLayers();
 };
 
-Collect.DataCleansing.MapPanelComposer.prototype.loadLayers = function() {
+Collect.DataCleansing.QueryResultMapDialog.prototype.loadLayers = function() {
 	var $this = this;
 	var survey = collect.activeSurvey;
 	var surveyName = survey.name;
