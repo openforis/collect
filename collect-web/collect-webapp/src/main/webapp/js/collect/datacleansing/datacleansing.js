@@ -37,7 +37,7 @@ Collect.DataCleansing.prototype.init = function() {
 	               this.dataReportPanel, this.dataCleansingStepPanel,
 	               this.dataCleansingChainPanel];
 	
-	//this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
+//	this.mapPanelComposer = new Collect.DataCleansing.MapPanelComposer($("#map-panel"));
 	
 	this.initGlobalEventHandlers();
 	
@@ -105,7 +105,7 @@ Collect.DataCleansing.prototype.initGlobalEventHandlers = function() {
 			panel.refreshDataGrid();
 		});
 		$("#selected-survey-label").text(Collect.SurveySelectDialogController.getPrettyShortLabel(collect.activeSurvey));
-		//$this.initMapPanel();
+//		$this.initMapPanel();
 		
 		$this.checkViewState();
 	});
@@ -189,6 +189,6 @@ Collect.DataCleansing.prototype.initDataCleansingChainPanel = function() {
 	this.dataCleansingChainPanel.init();
 };
 
-Collect.DataCleansing.prototype.initMapPanel = function() {
-	this.mapPanelComposer.init();
-};
+//Collect.DataCleansing.prototype.initMapPanel = function() {
+//	this.mapPanelComposer.init();
+//};

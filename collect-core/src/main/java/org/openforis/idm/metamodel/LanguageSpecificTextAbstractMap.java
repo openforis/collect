@@ -36,10 +36,9 @@ public abstract class LanguageSpecificTextAbstractMap<T extends LanguageSpecific
 		map = new LinkedHashMap<String, T>();
 	}
 	
-	@SuppressWarnings("unchecked")
-	LanguageSpecificTextAbstractMap(LanguageSpecificTextMap obj) {
+	LanguageSpecificTextAbstractMap(LanguageSpecificTextAbstractMap<T> obj) {
 		this();
-		this.map = (LinkedHashMap<String, T>) obj.map.clone();
+		CollectionUtils.cloneValuesInto(obj.map, this.map);
 	}
 
 	public T get(String language) {

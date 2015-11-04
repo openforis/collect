@@ -46,5 +46,10 @@ public class TypedLanguageSpecificText<T extends Object> extends LanguageSpecifi
 		return true;
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public TypedLanguageSpecificText<T> clone() throws CloneNotSupportedException {
+		return (TypedLanguageSpecificText<T>) super.clone();
+	}
 	
 }

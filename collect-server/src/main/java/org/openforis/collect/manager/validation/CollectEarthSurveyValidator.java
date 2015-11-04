@@ -2,11 +2,10 @@ package org.openforis.collect.manager.validation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
-import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
-import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
@@ -24,8 +23,10 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class CollectEarthSurveyValidator {
+public class CollectEarthSurveyValidator extends SurveyValidator {
 
+	private Pattern INVALID_NODE_NAME_PATTERN = Pattern.compile(".*_\\d*$");
+	
 	//TODO use CollectEarthBalloonGenerator.HIDDEN_ATTRIBUTE_NAMES 
 	private static final CollectEarthField[] REQUIRED_FIELDS = new CollectEarthField[] {
 		new CollectEarthField("id", TextAttributeDefinition.class),
@@ -56,19 +57,14 @@ public class CollectEarthSurveyValidator {
 	}
 	
 	public SurveyValidationResults validate(CollectSurvey survey) {
-		final SurveyValidationResults results = new SurveyValidationResults();
-		
-		//check missing required fields
-		Schema schema = survey.getSchema();
-		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
-		
-		EntityDefinition rootEntity = rootEntityDefinitions.get(0);
-		
+		final SurveyValidationResults results = super.validate(survey);
+
 		//check all required fields defined
+		EntityDefinition rootEntityDef = getMainRootEntityDefinition(survey);
 		for (CollectEarthField field: REQUIRED_FIELDS) {
 			String fieldName = field.getName();
 			try {
-				NodeDefinition foundFieldDef = rootEntity.getChildDefinition(fieldName);
+				NodeDefinition foundFieldDef = rootEntityDef.getChildDefinition(fieldName);
 				if (! field.getType().isAssignableFrom(foundFieldDef.getClass())) {
 					Class<? extends AttributeDefinition> type = field.getType();
 					AttributeType expectedAttributeType = AttributeType.valueOf(type);
@@ -81,18 +77,18 @@ public class CollectEarthSurveyValidator {
 					} else {
 						foundType = NodeType.ENTITY.getLabel();
 					}
-					results.addResult(new SurveyValidationResult(rootEntity.getPath() + "/" + fieldName, 
+					results.addResult(new SurveyValidationResult(rootEntityDef.getPath() + "/" + fieldName, 
 							"survey.validation.collect_earth.unexpected_field_type", expectedType, foundType));
 				}
 			} catch(Exception e) {
-				results.addResult(new SurveyValidationResult(rootEntity.getPath() + "/" + fieldName, 
+				results.addResult(new SurveyValidationResult(rootEntityDef.getPath() + "/" + fieldName, 
 						"survey.validation.collect_earth.missing_required_field"));
 			}
 		}
 		
-		//check valid node definitions (not nested multiple entities, only enumerable entities)ww
+		//check valid node definitions (not nested multiple entities, only enumerable entities)
 		List<NodeDefinition> nextLevelDefs = new ArrayList<NodeDefinition>();
-		nextLevelDefs.addAll(rootEntity.getChildDefinitions());
+		nextLevelDefs.addAll(rootEntityDef.getChildDefinitions());
 		
 		for (int currentLevelIndex = 0; currentLevelIndex < 2; currentLevelIndex ++) {
 			List<NodeDefinition> currentLevelDefs = nextLevelDefs;
@@ -113,6 +109,22 @@ public class CollectEarthSurveyValidator {
 			}
 		}
 		return results;
+	}
+
+	public boolean validateNodeName(String name) {
+		return super.validateNodeName(name) && 
+			! INVALID_NODE_NAME_PATTERN.matcher(name).matches();
+	}
+	
+	protected String getInvalidNodeNameMessageKey() {
+		return "survey.validation.collect_earth.invalid_node_name";
+	}
+	
+	protected EntityDefinition getMainRootEntityDefinition(CollectSurvey survey) {
+		Schema schema = survey.getSchema();
+		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
+		EntityDefinition rootEntityDef = rootEntityDefinitions.get(0);
+		return rootEntityDef;
 	}
 
 }

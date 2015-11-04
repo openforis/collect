@@ -29,6 +29,7 @@
 		<intercept-url access="permitAll" pattern="/earthFiles/**"  />
 		<intercept-url access="permitAll" pattern="/images/**" />
 		<intercept-url access="permitAll" pattern="/script/**" />
+		<intercept-url access="permitAll" pattern="/default-password-active.json" />
 		<intercept-url access="permitAll" pattern="/downloadLogo.htm" />
 		<intercept-url access="permitAll" pattern="/info.json" />
 		<intercept-url access="permitAll" pattern="/keepSessionAlive.htm" />

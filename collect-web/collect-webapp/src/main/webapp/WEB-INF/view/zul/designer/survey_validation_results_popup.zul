@@ -37,7 +37,7 @@
       <button id="confirmBtn" 
       	visible="@load(vm.showConfirm)"
       	label="${labels.global.confirm.$}"
-        onClick="@global-command('confirmValidationResultsPopUp')" />
+        onClick="@command('confirm')" />
     </vbox>
   </window>
 </zk>

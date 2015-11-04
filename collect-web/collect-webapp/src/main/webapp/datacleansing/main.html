@@ -17,7 +17,7 @@
 		<script type="text/javascript" src="js/bootstrap/bootstrap-table/1.9.0/bootstrap-table.min.js"></script>
 		<script type="text/javascript" src="js/jstree/jstree-3.0.8.min.js"></script>
 		
-<!-- 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script> -->
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.22"></script>
 		
 		<script type="text/javascript" src="script/sessionping.js"></script>
 		<script type="text/javascript" src="js/openforis/of.js?v=PROJECT_VERSION"></script>
@@ -33,7 +33,7 @@
 		<script type="text/javascript" src="js/openforis/of-ui-forms.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/openforis/of-ui-forms-validation.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/openforis/of-ui-job-dialog.js?v=PROJECT_VERSION"></script>
-<!-- 		<script type="text/javascript" src="js/openforis/google_maps_extensions/layer_overlay.js?v=PROJECT_VERSION"></script> -->
+		<script type="text/javascript" src="js/openforis/google_maps_extensions/layer_overlay.js?v=PROJECT_VERSION"></script>
 		
 		<script type="text/javascript" src="js/collect/collect.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/util/grids.js?v=PROJECT_VERSION"></script>
@@ -43,6 +43,7 @@
 		<script type="text/javascript" src="js/collect/service/abstract_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/session_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/survey_service.js?v=PROJECT_VERSION"></script>
+		<script type="text/javascript" src="js/collect/service/data_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_query_type_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_query_service.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/service/data_query_group_service.js?v=PROJECT_VERSION"></script>
@@ -59,7 +60,6 @@
 		<script type="text/javascript" src="js/collect/survey_select_dialog.js?v=PROJECT_VERSION"></script>
 
 		<script type="text/javascript" src="js/collect/datacleansing/datacleansing.js?v=PROJECT_VERSION"></script>
-		<script type="text/javascript" src="js/collect/datacleansing/map_panel_composer.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_query_type_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_query_type_panel.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_query_dialog.js?v=PROJECT_VERSION"></script>
@@ -74,6 +74,8 @@
 		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_step_panel.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_chain_dialog.js?v=PROJECT_VERSION"></script>
 		<script type="text/javascript" src="js/collect/datacleansing/data_cleansing_chain_panel.js?v=PROJECT_VERSION"></script>
+
+		<script type="text/javascript" src="js/collect/datacleansing/map_panel_composer.js?v=PROJECT_VERSION"></script>
 		
 		<link rel="stylesheet" href="css/bootstrap/3.3.1/bootstrap.min.css">
 		<link rel="stylesheet" href="data:text/css;charset=utf-8," 
@@ -115,7 +117,10 @@
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle"
 								data-toggle="dropdown" role="button" aria-haspopup="true"
-								aria-expanded="false" data-i18n="collect.data_cleansing.data_queries"><span class="caret"></span></a>
+								aria-expanded="false">
+								<span data-i18n="collect.data_cleansing.data_queries"></span>
+								<span class="caret"></span>
+							</a>
 							<ul class="dropdown-menu">
 								<li>
 									<a href="#data-query-type-panel" aria-controls="data-query-type-panel" 
@@ -143,10 +148,10 @@
 							<a href="#data-cleansing-chain-panel" aria-controls="data-cleansing-chain-panel" 
 								role="tab" data-toggle="tab" data-i18n="collect.data_cleansing.data_cleansing_chains"></a>
 						</li>
-	<!-- 				<li role="presentation"> -->
-	<!-- 					<a href="#map-panel" aria-controls="map-panel"  -->
-	<!-- 						role="tab" data-toggle="tab">Map</a> -->
-	<!-- 				</li> -->
+<!-- 						<li> -->
+<!-- 							<a href="#map-panel" aria-controls="map-panel"  -->
+<!-- 								role="tab" data-toggle="tab">Map</a> -->
+<!-- 						</li> -->
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						<li class="active">
@@ -236,9 +241,9 @@
 								<table class="grid"></table>
 							</div>
 						</div>
-						<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%">
-							<div class="map-canvas" style="height: 100%; width: 100%"></div>
-						</div>
+<!-- 						<div id="map-panel" role="tabpanel" class="tab-pane" style="height: 100%; width: 100%"> -->
+<!-- 							<div class="map-canvas" style="height: 400px; width: 1000px"></div> -->
+<!-- 						</div> -->
 					</div>
 				</div>
 			</div>

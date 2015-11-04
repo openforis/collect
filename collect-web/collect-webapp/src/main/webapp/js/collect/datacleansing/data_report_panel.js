@@ -20,9 +20,9 @@ Collect.DataCleansing.DataReportPanelController.prototype.getDataGridOptions = f
 		table.bootstrapTable({
 			width: 600,
 			columns: [
-				{field: "typeCode", title: "Type", width: 100},
-				{field: "errorSeverity", title: "Error Severity", width: 100},
-				{field: "title", title: "Title", width: 400}
+				{field: "typeCode", title: OF.i18n.prop("collect.data_cleansing.data_query.type"), width: 100},
+				{field: "errorSeverity", title: OF.i18n.prop("collect.data_cleansing.data_query.error_severity"), width: 100},
+				{field: "title", title: OF.i18n.prop("collect.global.title"), width: 400}
 		    ],
 		    data: report.queryGroup.queries
 		});
@@ -48,7 +48,7 @@ Collect.DataCleansing.DataReportPanelController.prototype.getDataGridOptions = f
 			{field: "datasetSize", title: "Dataset Size", align: "right", sortable: true, width: 100},
 			{field: "lastRecordModifiedDate", title: "Last Record Modified", formatter: OF.Dates.formatToPrettyDateTime, 
 				align: "right", sortable: true, width: 130},
-			{field: "itemCount", title: "Values found", align: "right", sortable: true, width: 100},
+			{field: "itemCount", title: "Affected Values", align: "right", sortable: true, width: 100},
 			{field: "affectedRecordsCount", title: "Affected Records", align: "right", sortable: true, width: 120},
 			{field: "affectedRecordsPercent", title: "Affected Records %", formatter: percentFormatter, 
 				align: "right", sortable: true, width: 100},

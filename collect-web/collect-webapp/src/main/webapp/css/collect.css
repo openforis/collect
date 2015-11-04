@@ -1,4 +1,4 @@
-	/**
+/**
 * Custom Open Foris Collect style
 *
 * @author Stefano Ricci
@@ -133,6 +133,10 @@ body .footer {
 /** Error Tooltip */
 .tooltip.error .tooltip-inner {
 	background: #e74c3c;
+	text-align: left;
+	overflow-y: auto;
+	max-width: 300px;
+	max-height: 300px;
 }
 
 .tooltip.top.error .tooltip-arrow {

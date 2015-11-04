@@ -40,6 +40,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.metamodel.expression.ExpressionValidator;
 import org.openforis.idm.metamodel.expression.ExpressionValidator.ExpressionType;
@@ -188,7 +189,11 @@ public class SurveyValidator {
 	}
 
 	private List<SurveyValidationResult> validateSchemaNode(NodeDefinition def) {
-		List<SurveyValidationResult> results = new ArrayList<SurveyValidator.SurveyValidationResult>();
+		List<SurveyValidationResult> results = new ArrayList<SurveyValidationResult>();
+		
+		if (! validateNodeName(def.getName())) {
+			results.add(new SurveyValidationResult(def.getPath(), getInvalidNodeNameMessageKey()));
+		}
 		
 		results.addAll(validateExpressions(def));
 		
@@ -198,6 +203,14 @@ public class SurveyValidator {
 			results.addAll(validateAttribute((AttributeDefinition) def));
 		}
 		return results;
+	}
+
+	protected String getInvalidNodeNameMessageKey() {
+		return "global.validation.internal_name.invalid_value";
+	}
+	
+	public boolean validateNodeName(String name) {
+		return Survey.INTERNAL_NAME_PATTERN.matcher(name).matches();
 	}
 	
 	private List<SurveyValidationResult> validateEntity(EntityDefinition entity) {
@@ -589,8 +602,8 @@ public class SurveyValidator {
 			warnings = new ArrayList<SurveyValidator.SurveyValidationResult>();
 		}
 		
-		public void addResults(Collection<SurveyValidationResult> reults) {
-			for (SurveyValidationResult result : reults) {
+		public void addResults(Collection<SurveyValidationResult> results) {
+			for (SurveyValidationResult result : results) {
 				addResult(result);
 			}
 		}
