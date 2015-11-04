@@ -115,6 +115,11 @@ public abstract class BaseVM {
 		BindUtils.postNotifyChange(null, null, form, field);
 	}
 	
+	@SuppressWarnings("unchecked")
+	protected <T> T getFormFieldValue(Form form, String field) {
+		return (T) form.getField(field);	
+	}
+
 	protected String adjustInternalName(String name) {
 		String result = StringUtils.trimToEmpty(name);
 		result = result.toLowerCase(Locale.ENGLISH);

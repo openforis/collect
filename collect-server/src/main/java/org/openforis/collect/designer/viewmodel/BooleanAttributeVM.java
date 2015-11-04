@@ -46,14 +46,14 @@ public class BooleanAttributeVM extends AttributeVM<BooleanAttributeDefinition> 
 	
 	protected void checkRequiredFieldValue() {
 		if ( ! isRequiredApplied() ) {
-			tempFormObject.setField(NodeDefinitionFormObject.REQUIRED_FIELD, false);
+			setValueOnFormField(tempFormObject, NodeDefinitionFormObject.REQUIRED_FIELD, false);
 			BindUtils.postNotifyChange(null, null, tempFormObject, NodeDefinitionFormObject.REQUIRED_FIELD);
 		}
 	}
 	
 	protected Type getCurrentType() {
 		Form tempFormObject = getTempFormObject();
-		String typeValue = (String) tempFormObject.getField(BooleanAttributeDefinitionFormObject.TYPE_FIELD);
+		String typeValue = getFormFieldValue(tempFormObject, BooleanAttributeDefinitionFormObject.TYPE_FIELD);
 		Type type = null;
 		if ( typeValue != null ) {
 			type = BooleanAttributeDefinitionFormObject.Type.valueOf(typeValue);
