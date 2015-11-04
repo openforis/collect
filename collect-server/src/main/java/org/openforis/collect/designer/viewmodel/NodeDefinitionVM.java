@@ -130,7 +130,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 		dispatchApplyChangesCommand(binder);
 		
 		((NodeDefinitionFormObject<?>) formObject).setInstanceLabel(value);
-		String name = (String) tempFormObject.getField("name");
+		String name = getFormFieldValue(tempFormObject, "name");
 		if ( StringUtils.isBlank(name) && StringUtils.isNotBlank(value) ) {
 			name = suggestInternalName(value);
 			nameChanged(binder, name);
@@ -190,7 +190,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	protected void setTempFormObjectFieldValue(String field, Object value) {
-		tempFormObject.setField(field, value);
+		setValueOnFormField(tempFormObject, field, value);
 		BindUtils.postNotifyChange(null, null, tempFormObject, field);
 	}
 	

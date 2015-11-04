@@ -102,24 +102,24 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	private void checkEnabledFields() {
 		if ( ! isIncludeDataVisible() ) {
-			tempForm.setField("includeData", false);
+			setValueOnFormField(tempForm, "includeData", false);
 			BindUtils.postNotifyChange(null, null, tempForm, "includeData");
 		}
 		
-		boolean includeData = (Boolean) tempForm.getField("includeData");
+		boolean includeData = getFormFieldValue(tempForm, "includeData");
 		if ( ! includeData ) {
-			tempForm.setField("includeUploadedFiles", false);
+			setValueOnFormField(tempForm, "includeUploadedFiles", false);
 			BindUtils.postNotifyChange(null, null, tempForm, "includeUploadedFiles");
 		}
 	}
 
 	private String getOutputFormatFormField() {
-		String outputFormat = (String) tempForm.getField("outputFormat");
+		String outputFormat = getFormFieldValue(tempForm, "outputFormat");
 		return outputFormat;
 	}
 
 	private String getTypeFormField() {
-		String type = (String) tempForm.getField("type");
+		String type = getFormFieldValue(tempForm, "type");
 		return type;
 	}
 	

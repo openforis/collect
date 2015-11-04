@@ -212,7 +212,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 		if ( editedItem != null ) {
 			attributeDefaults =  new ArrayList<AttributeDefault>(editedItem.getAttributeDefaults());
 			String field = AttributeDefinitionFormObject.ATTRIBUTE_DEFAULTS_FIELD;
-			tempFormObject.setField(field, attributeDefaults);
+			setValueOnFormField(tempFormObject, field, attributeDefaults);
 			((AttributeDefinitionFormObject<?>) formObject).setAttributeDefaults(attributeDefaults);
 			BindUtils.postNotifyChange(null, null, formObject, field);
 		} else {
