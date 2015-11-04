@@ -8,8 +8,14 @@ import org.openforis.collect.designer.util.PopUpUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Window;
 
@@ -19,6 +25,8 @@ import org.zkoss.zul.Window;
  *
  */
 public class SurveyValidationResultsVM {
+	
+	public static final String CONFIRM_EVENT_NAME = "onConfirm";
 
 	private boolean showConfirm;
 	private SurveyValidationResults validationResults;
@@ -37,6 +45,11 @@ public class SurveyValidationResultsVM {
 		this.validationResults = validationResults;
 	}
 	
+	@Command
+	public void confirm(@ContextParam(ContextType.VIEW) Component view) {
+		Events.postEvent(new ConfirmEvent(view));
+	}
+	
 	public List<SurveyValidationResult> getResults() {
 		return new ListModelList<SurveyValidationResult>(validationResults.getResults());
 	}
@@ -49,4 +62,13 @@ public class SurveyValidationResultsVM {
 		return this.showConfirm;
 	}
 	
+	public static class ConfirmEvent extends Event {
+		
+		private static final long serialVersionUID = 1L;
+
+		public ConfirmEvent(Component target) {
+			super(CONFIRM_EVENT_NAME, target);
+		}
+		
+	}
 }

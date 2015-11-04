@@ -19,6 +19,8 @@ import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
+import org.openforis.collect.designer.util.SuccessHandler;
+import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
 import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
@@ -48,6 +50,7 @@ import org.zkoss.bind.annotation.QueryParam;
 import org.zkoss.util.logging.Log;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.databind.BindingListModelList;
 import org.zkoss.zul.Filedownload;
@@ -83,10 +86,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private CollectEarthSurveyValidator collectEarthSurveyValidator;
 	
 	private boolean changed;
-	private Window validationResultsPopUp;
 	private Window jobStatusPopUp;
 
-	private boolean showingPreview;
 	private Step previewStep;
 
 	@Init(superclass=false)
@@ -327,42 +328,27 @@ public class SurveyEditVM extends SurveyBaseVM {
 	
 	@Command
 	public void validate() {
-		if ( checkValidity(false) ) {
-			MessageUtil.showInfo("survey.successfully_validated");
-		}
+		checkValidity(false, new SuccessHandler() {
+			public void onSuccess() {
+				MessageUtil.showInfo("survey.successfully_validated");
+			}
+		});
 	}
 	
-	private boolean checkValidity(boolean showConfirm) {
-		SurveyValidator surveyValidator;
-		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
-			surveyValidator = collectEarthSurveyValidator;
-		} else {
-			surveyValidator = this.surveyValidator;
-		}
+	private void checkValidity(boolean showConfirm, final SuccessHandler successHandler) {
+		SurveyValidator surveyValidator = getSurveyValidator(survey);
 		SurveyValidationResults results = surveyValidator.validate(survey);
 		if ( results.hasErrors() || results.hasWarnings() ) {
-			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm);
-			return false;
+			final Window validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm);
+			validationResultsPopUp.addEventListener(SurveyValidationResultsVM.CONFIRM_EVENT_NAME, new EventListener<ConfirmEvent>() {
+				public void onEvent(ConfirmEvent event) throws Exception {
+					successHandler.onSuccess();
+					closePopUp(validationResultsPopUp);
+				}
+			});
 		} else {
-			return true;
+			successHandler.onSuccess();;
 		}
-	}
-	
-	@GlobalCommand
-	public void confirmValidationResultsPopUp() {
-		if ( validationResultsPopUp != null ) {
-			closePopUp(validationResultsPopUp);
-			validationResultsPopUp = null;
-			if ( showingPreview ) {
-				openPreviewPopUp();
-			}
-		}
-	}
-	
-	@GlobalCommand
-	public void closeValidationResultsPopUp() {
-		closePopUp(validationResultsPopUp);
-		validationResultsPopUp = null;
 	}
 	
 	@Command
@@ -410,7 +396,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 
 	@GlobalCommand
-	public void openPreviewPopUp(@BindingParam("formVersion") ModelVersion formVersion, @BindingParam("rootEntity") EntityDefinition rootEntity) {
+	public void openPreviewPopUp(
+			@BindingParam("formVersion") ModelVersion formVersion, 
+			@BindingParam("rootEntity") EntityDefinition rootEntity) {
 		if ( validateShowPreview(rootEntity, formVersion) ) {
 			if ( rootEntity == null ) {
 				rootEntity = survey.getSchema().getRootEntityDefinitions().get(0);
@@ -462,11 +450,12 @@ public class SurveyEditVM extends SurveyBaseVM {
 		if (survey.getId() == null || changed)  {
 			MessageUtil.showWarning(LabelKeys.PREVIEW_ERROR_SAVE_SURVEY_FIRST);
 		} else {
-			showingPreview = true;
 			previewStep = recordStep;
-			if ( checkValidity(true) ) {
-				openPreviewPopUp();
-			}
+			checkValidity(true, new SuccessHandler() {
+				public void onSuccess() {
+					openPreviewPopUp();
+				}
+			});
 		}
 	}
 
@@ -478,7 +467,6 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public void closePreviewPreferencesPopUp() {
 		closePopUp(previewPreferencesPopUp);
 		previewPreferencesPopUp = null;
-		showingPreview = false;
 	}
 	
 	@GlobalCommand
@@ -525,4 +513,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 		return Labels.getLabel("designer_title_editing_survey", new Object[] {surveyName});
 	}
 	
+	private SurveyValidator getSurveyValidator(CollectSurvey survey) {
+		return survey.getTarget() == SurveyTarget.COLLECT_EARTH ? collectEarthSurveyValidator : surveyValidator;
+	}
+
 }
