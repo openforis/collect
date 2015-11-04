@@ -71,23 +71,35 @@ public abstract class BaseValidator extends AbstractValidator {
 	protected boolean validateRegEx(ValidationContext ctx,
 			String regex, String fieldName,
 			String errorMessageKey, String validationMessageKey) {
+		Pattern pattern = Pattern.compile(regex);  
+		return validateRegEx(ctx, pattern, fieldName, errorMessageKey, validationMessageKey);
+	}
+
+	protected boolean validateRegEx(ValidationContext ctx,
+			Pattern pattern, String fieldName,
+			String errorMessageKey) {
+		return validateRegEx(ctx, pattern, fieldName, errorMessageKey, fieldName);
+	}
+	
+	protected boolean validateRegEx(ValidationContext ctx,
+			Pattern pattern, String fieldName,
+			String errorMessageKey, String validationMessageKey) {
 		Object value = getValue(ctx, fieldName);
 		if ( value != null && value instanceof String && StringUtils.isNotBlank((String) value) ) {
-			Pattern pattern = Pattern.compile(regex);  
 			Matcher matcher = pattern.matcher((String) value);
 			if ( ! matcher.matches() ) {  
 				String message = Labels.getLabel(errorMessageKey);
-				if ( validationMessageKey != null ) {
-					addInvalidMessage(ctx, validationMessageKey, message);
-				} else {
+				if ( validationMessageKey == null ) {
 					addInvalidMessage(ctx, message);
+				} else {
+					addInvalidMessage(ctx, validationMessageKey, message);
 				}
 				return false;
 			}
 		}
 		return true;
 	}
-
+	
 	protected boolean validateUri(ValidationContext ctx, String fieldName) {
 		Object value = getValue(ctx, fieldName);
 		if ( value != null && value instanceof String && StringUtils.isNotBlank((String) value) ) {

@@ -21,6 +21,7 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.metamodel.SurveyTarget;
@@ -78,7 +79,9 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private SurveyManager surveyManager;
 	@WireVariable
 	private SurveyValidator surveyValidator;
-
+	@WireVariable
+	private CollectEarthSurveyValidator collectEarthSurveyValidator;
+	
 	private boolean changed;
 	private Window validationResultsPopUp;
 	private Window jobStatusPopUp;
@@ -330,6 +333,12 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	private boolean checkValidity(boolean showConfirm) {
+		SurveyValidator surveyValidator;
+		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+			surveyValidator = collectEarthSurveyValidator;
+		} else {
+			surveyValidator = this.surveyValidator;
+		}
 		SurveyValidationResults results = surveyValidator.validate(survey);
 		if ( results.hasErrors() || results.hasWarnings() ) {
 			validationResultsPopUp = SurveyValidationResultsVM.showPopUp(results, showConfirm);
