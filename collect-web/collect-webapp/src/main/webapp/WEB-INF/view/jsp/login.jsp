@@ -72,7 +72,7 @@
 			        Your session has expired.<br/>
 			      </div>
 			    </c:if>
-			    <c:if test="${param.error != null}">
+			    <c:if test="${param.login_error == 1}">
 			      <div class="error">
 			        Your login attempt was not successful, try again.<br/><br/>
 			        Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/>.
@@ -98,7 +98,7 @@
 						<td width="50%" align="right">User:</td>
 						<td width="50%" align="left">
 							<input type='text' name='username'
-								value='<c:if test="${param.error != null}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>' />
+								value='<c:if test="${param.login_error == 1}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>' />
 						</td>
 					</tr>
 					<tr>
