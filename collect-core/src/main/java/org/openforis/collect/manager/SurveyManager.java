@@ -133,19 +133,16 @@ public class SurveyManager {
 		return CollectionUtils.unmodifiableList(surveys);
 	}
 	
-	@Transactional
 	public CollectSurvey get(String name) {
 		CollectSurvey survey = surveysByName.get(name);
 		return survey;
 	}
 	
-	@Transactional
 	public CollectSurvey getById(int id) {
 		CollectSurvey survey = surveysById.get(id);
 		return survey;
 	}
 	
-	@Transactional
 	public CollectSurvey getByUri(String uri) {
 		CollectSurvey survey = surveysByUri.get(uri);
 		return survey;
@@ -603,7 +600,6 @@ public class SurveyManager {
 		return survey;
 	}
 	
-	@Transactional
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		if ( includeDetails ) {
@@ -621,16 +617,14 @@ public class SurveyManager {
 		return summaries;
 	}
 	
-	@Transactional
 	public SurveySummary loadTemporarySummaryByUri(String uri) {
 		return surveyDao.loadSurveySummaryByUri(uri, true);
 	}
-	@Transactional
+
 	public SurveySummary loadTemporarySummaryByName(String name) {
 		return surveyDao.loadSurveySummaryByName(name, true);
 	}
 	
-	@Transactional
 	public boolean isSurveyTemporary(CollectSurvey survey) {
 		Integer id = survey.getId();
 		String uri = survey.getUri();
