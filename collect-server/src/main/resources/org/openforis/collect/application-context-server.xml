@@ -144,7 +144,6 @@
 		<constructor-arg ref="surveyManager" />
 		<constructor-arg ref="recordManager" />
 		<constructor-arg ref="collectLocalRDBStorageManager" />
-		<constructor-arg ref="mondrianSchemaStorageManager" />
 	</bean>
 	
 	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"

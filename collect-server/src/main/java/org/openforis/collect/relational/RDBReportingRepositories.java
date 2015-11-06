@@ -1,9 +1,6 @@
 package org.openforis.collect.relational;
 
-import static org.openforis.commons.io.OpenForisIOUtils.UTF_8;
-
 import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,9 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mondrian.olap.MondrianDef.Schema;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.event.AttributeCreatedEvent;
@@ -54,8 +48,6 @@ import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
-import org.openforis.collect.relational.mondrian.Mondrian4SchemaGenerator;
-import org.openforis.collect.reporting.MondrianSchemaStorageManager;
 import org.openforis.collect.reporting.ReportingRepositories;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -81,20 +73,16 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private SurveyManager surveyManager;
 	private RecordManager recordManager;
 	private CollectLocalRDBStorageManager localRDBStorageManager;
-	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
 	
 	private RelationalSchemaConfig rdbConfig = RelationalSchemaConfig.createDefault();
 	private Map<String, RelationalSchema> relationalSchemaDefinitionBySurvey;
-	private Map<String, Schema> mondrianSchemaDefinitionBySurvey;
 	
 	public RDBReportingRepositories(SurveyManager surveyManager, RecordManager recordManager, 
-			CollectLocalRDBStorageManager localRDBStorageManager, MondrianSchemaStorageManager mondrianSchemaStorageManager) {
+			CollectLocalRDBStorageManager localRDBStorageManager) {
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
 		this.localRDBStorageManager = localRDBStorageManager;
-		this.mondrianSchemaStorageManager = mondrianSchemaStorageManager;
 		this.relationalSchemaDefinitionBySurvey = new HashMap<String, RelationalSchema>();
-		this.mondrianSchemaDefinitionBySurvey = new HashMap<String, Schema>();
 	}
 
 	public void init() {
@@ -105,7 +93,6 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		List<CollectSurvey> surveys = surveyManager.getAll();
 		for (CollectSurvey survey : surveys) {
 			initializeRelationalSchemaDefinition(survey);
-			initializeMondrianSchemaDefinition(survey);
 		}
 	}
 	
@@ -119,31 +106,11 @@ public class RDBReportingRepositories implements ReportingRepositories {
 				LOG.error("Error generating RDB for survey " + surveyName, e);
 			}
 		}
-		recreateMondrianSchemaFile(surveyName);
-	}
-
-	private void recreateMondrianSchemaFile(String surveyName) {
-		CollectSurvey survey = surveyManager.get(surveyName);
-		initializeMondrianSchemaDefinition(survey);
-		createMondrianSchemaFile(surveyName);
-	}
-
-	private void createMondrianSchemaFile(String surveyName) {
-		try {
-			mondrianSchemaStorageManager.createBackupCopy(surveyName);
-			File file = mondrianSchemaStorageManager.getSchemaFile(surveyName);
-			Schema schema = mondrianSchemaDefinitionBySurvey.get(surveyName);
-			FileUtils.write(file, schema.toXML(), UTF_8);
-		} catch (IOException e) {
-			throw new RuntimeException("Error generating mondrian schema for survey : "+ surveyName, e);
-		}
 	}
 
 	@Override
 	public void createRepository(final String surveyName, final RecordStep recordStep, final ProgressListener progressListener) {
 		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
-		
-		recreateMondrianSchemaFile(surveyName);
 		
 		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
 		
@@ -183,9 +150,6 @@ public class RDBReportingRepositories implements ReportingRepositories {
 			localRDBStorageManager.deleteRDBFile(surveyName, step);
 		}
 		relationalSchemaDefinitionBySurvey.remove(surveyName);
-
-		mondrianSchemaStorageManager.deleteSchemaFile(surveyName);
-		mondrianSchemaDefinitionBySurvey.remove(surveyName);
 	}
 
 	@Override
@@ -286,12 +250,6 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		}
 	}
 	
-	private void initializeMondrianSchemaDefinition(CollectSurvey survey) {
-		Mondrian4SchemaGenerator mondrian4SchemaGenerator = new Mondrian4SchemaGenerator(survey, rdbConfig);
-		Schema mondrianSchema = mondrian4SchemaGenerator.generateSchema();
-		mondrianSchemaDefinitionBySurvey.put(survey.getName(), mondrianSchema);
-	}
-
 	private JooqDatabaseExporter createRDBUpdater(Connection targetConn) {
 		return new JooqDatabaseExporter(targetConn);
 	}
