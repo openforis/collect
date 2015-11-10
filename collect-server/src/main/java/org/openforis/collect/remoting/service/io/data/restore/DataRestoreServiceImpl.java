@@ -3,6 +3,7 @@ package org.openforis.collect.remoting.service.io.data.restore;
 import java.io.File;
 import java.io.FileInputStream;
 
+import org.apache.poi.util.IOUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.BackupFileExtractor;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -52,14 +53,17 @@ public class DataRestoreServiceImpl implements DataRestoreService {
 	}
 
 	private String extractSurveyUri(File tempFile) {
+		BackupFileExtractor backupFileExtractor = null;
 		try {
-			BackupFileExtractor backupFileExtractor = new BackupFileExtractor(tempFile);
+			backupFileExtractor = new BackupFileExtractor(tempFile);
 			File infoFile = backupFileExtractor.extractInfoFile();
 			SurveyBackupInfo backupInfo = SurveyBackupInfo.parse(new FileInputStream(infoFile));
 			String surveyUri = backupInfo.getSurveyUri();
 			return surveyUri;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		} finally {
+			IOUtils.closeQuietly(backupFileExtractor);
 		}
 	}
 	

@@ -1,11 +1,11 @@
 package org.openforis.collect.manager.speciesimport;
 
 import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.FORM;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
-import static org.openforis.idm.model.species.Taxon.TaxonRank.FORM;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -50,9 +49,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY, FORM};
 	public static final String GENUS_SUFFIX = "sp.";
 
-	private static final String CSV = "csv";
-	//private static final String ZIP = "zip";
-	
 	private static Log LOG = LogFactory.getLog(SpeciesImportProcess.class);
 
 	private SpeciesManager speciesManager;
@@ -62,7 +58,6 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	
 	private TaxonTree taxonTree;
 	private SpeciesCSVReader reader;
-	private String errorMessage;
 	private List<SpeciesLine> lines;
 	
 	public SpeciesImportProcess(SpeciesManager speciesManager, int taxonomyId, File file, boolean overwriteAll) {

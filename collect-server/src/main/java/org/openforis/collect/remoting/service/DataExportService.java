@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.openforis.collect.Proxy;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.SurveyBackupJob;
@@ -17,7 +15,6 @@ import org.openforis.collect.io.data.backup.BackupStorageManager;
 import org.openforis.collect.io.data.csv.CSVExportConfiguration;
 import org.openforis.collect.io.data.proxy.DataExportProcessProxy;
 import org.openforis.collect.io.proxy.SurveyBackupJobProxy;
-import org.openforis.collect.manager.ConfigurationManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
@@ -49,16 +46,12 @@ public class DataExportService {
 	private SurveyManager surveyManager;
 	@Autowired
 	private RecordManager recordManager;
-	@Autowired 
-	private ServletContext servletContext;
 	@Autowired
 	private ApplicationContext appContext;
 	@Autowired
 	private CollectJobManager jobManager;
 	@Autowired
 	private BackupStorageManager backupStorageManager;
-	@Autowired
-	private ConfigurationManager configurationManager;
 	
 	private CSVDataExportProcess dataExportProcess;
 	private SurveyBackupJob backupJob;
