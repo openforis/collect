@@ -21,17 +21,15 @@ public class DatabaseAwareSpringLiquibase extends SpringLiquibase {
 
 	@Override
 	protected Database createDatabase(Connection c) throws DatabaseException {
-		Database database;
 		String dbProductName = getDatabaseProductName();
 		if ( SQLITE_DBNAME.equals(dbProductName) ) {
 			//schemas are not supported
 			DatabaseFactory dbFactory = DatabaseFactory.getInstance();
 			JdbcConnection jdbcConnection = new JdbcConnection(c);
-			database = dbFactory.findCorrectDatabaseImplementation(jdbcConnection);
+			return dbFactory.findCorrectDatabaseImplementation(jdbcConnection);
 		} else {
-			database = super.createDatabase(c);
+			return super.createDatabase(c);
 		}
-		return database;
 	}
 	
 }
