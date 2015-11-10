@@ -464,7 +464,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	private void validateSurvey(CollectSurvey survey, SurveyValidator validator, final SuccessHandler successHandler, boolean showWarningConfirm) {
-		SurveyValidationResults validationResults = collectEarthSurveyValidator.validate(survey);
+		SurveyValidationResults validationResults = validator.validate(survey);
 		if (validationResults.isOk()) {
 			successHandler.onSuccess();
 		} else {
