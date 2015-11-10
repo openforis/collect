@@ -72,7 +72,7 @@
 			<param-value>true</param-value>
 		</init-param>
 		<init-param>
-			<param-name>expirationTime</param-name>
+			<param-name>expiration</param-name>
 			<param-value>0</param-value>
 		</init-param>
 	</filter>
