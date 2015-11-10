@@ -75,6 +75,10 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function checkRecordsLockTimeoutHandler(event:TimerEvent = null, onSuccess:Function = null, onFault:Function = null):void {
+			if (Application.serverOffline) {
+				_checkRecordsLockTimer.stop();
+				return;
+			}
 			var resp:AsyncResponder = new AsyncResponder(isActiveSurveyRecordsLockedResultHandler, faultHandler);
 			
 			function isActiveSurveyRecordsLockedResultHandler(event:ResultEvent, token:Object = null):void {

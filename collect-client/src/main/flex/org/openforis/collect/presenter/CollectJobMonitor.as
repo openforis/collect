@@ -45,7 +45,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function progressTimerHandler(event:TimerEvent):void {
-			loadCurrentJobAndUpdateState();
+			if (Application.serverOffline) {
+				stopProgressTimer();
+			} else {
+				loadCurrentJobAndUpdateState();
+			}
 		}
 		
 		private function loadCurrentJobAndUpdateState():void {
