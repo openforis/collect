@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
  
-	<changeSet id="data-cleansing-report" author="ricci" dbms="sqlite">
+	<changeSet id="data-cleansing-report-rev" author="ricci" dbms="sqlite">
 
 	    <preConditions onFail="MARK_RAN">
 	    	<not>
@@ -13,8 +13,6 @@
 	    
 	    <comment>Data cleansing report storage table</comment>
 	    
-		<createSequence sequenceName="ofc_data_cleansing_report_id_seq" />
-		
 	    <createTable tableName="ofc_data_cleansing_report">
 			<column name="id" type="INTEGER">
 				<constraints nullable="false" primaryKey="true"

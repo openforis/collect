@@ -13,7 +13,6 @@ import java.util.GregorianCalendar;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.manager.UserPersistenceException;
@@ -39,20 +38,12 @@ import org.openforis.idm.model.NumberAttribute;
 import org.openforis.idm.model.Time;
 import org.openforis.idm.testfixture.RecordBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
 public class DataMarshallerIntegrationTest extends CollectIntegrationTest {
 	
 	@Autowired

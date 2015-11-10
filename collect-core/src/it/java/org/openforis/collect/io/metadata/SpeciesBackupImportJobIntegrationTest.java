@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.io.metadata.parsing.ParsingError;
@@ -35,18 +34,10 @@ import org.openforis.idm.model.species.Taxon;
 import org.openforis.idm.model.species.TaxonVernacularName;
 import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
 public class SpeciesBackupImportJobIntegrationTest extends CollectIntegrationTest {
 
 	private static final String VALID_TEST_CSV = "species-backup-test.csv";

@@ -10,12 +10,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import liquibase.Liquibase;
-import liquibase.database.core.SQLiteDatabase;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.exception.LiquibaseException;
-import liquibase.resource.ClassLoaderResourceAccessor;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
@@ -27,6 +21,12 @@ import org.openforis.idm.metamodel.ExternalCodeListItem;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+
+import liquibase.Liquibase;
+import liquibase.database.core.SQLiteDatabase;
+import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
+import liquibase.resource.ClassLoaderResourceAccessor;
 
 /**
  * 
@@ -60,7 +60,7 @@ public class ExternalCodeListIntegrationTest extends CollectIntegrationTest {
 		Connection connection = DataSourceUtils.getConnection(dataSource);
 		database.setConnection(new JdbcConnection(connection));
 		Liquibase liquibase = new Liquibase(LIQUIBASE_CHANGELOG, new ClassLoaderResourceAccessor(), database);
-		liquibase.update(null);
+		liquibase.update((String) null);
 		survey = loadSurvey();
 		createHierarchicalTestList();
 		createFlatTestList();

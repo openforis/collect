@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Stack;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectTaxonomy;
@@ -18,20 +17,12 @@ import org.openforis.idm.model.species.Taxon.TaxonRank;
 import org.openforis.idm.model.species.TaxonVernacularName;
 import org.openforis.idm.model.species.Taxonomy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
  * @author S. Ricci
  * @author E. Wibowo
  */
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
 public class SpeciesDaoIntegrationTest extends CollectIntegrationTest {
 //	private final Log log = LogFactory.getLog(ModelDaoIntegrationTest.class);
 

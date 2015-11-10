@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.io.ReferenceDataImportStatus;
 import org.openforis.collect.io.data.CSVDataImportProcess.CSVDataImportSettings;
@@ -46,18 +45,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
 public class CSVDataImportProcessIntegrationTest extends CollectIntegrationTest implements BeanFactoryAware {
 
 	private static final String VALID_TEST_CSV = "data-import-test.csv";

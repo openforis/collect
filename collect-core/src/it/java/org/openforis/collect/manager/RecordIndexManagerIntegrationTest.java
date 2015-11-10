@@ -10,7 +10,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
 import org.openforis.collect.model.CollectRecord;
@@ -21,18 +20,10 @@ import org.openforis.idm.model.Code;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.EntityBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
 public class RecordIndexManagerIntegrationTest extends CollectIntegrationTest {
 	//private final Log log = LogFactory.getLog(ConfigurationDaoIntegrationTest.class);
 	
