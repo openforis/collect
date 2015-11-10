@@ -232,14 +232,9 @@
 		<dependency>
 			<groupId>com.samaxes.filter</groupId>
 			<artifactId>cachefilter</artifactId>
-			<version>2.0</version>
+			<version>2.3.1</version>
 		</dependency>
 
-		<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache</artifactId>
-			<version>1.6.2</version>
-		</dependency>
 		<!-- start of aspectj dependencies -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -444,12 +439,12 @@
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-core</artifactId>
-		    <version>2.4.0</version>
+		    <version>2.6.3</version>
 		</dependency>
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-databind</artifactId>
-		    <version>2.4.0</version>
+		    <version>2.6.3</version>
 		</dependency>
 		
 		<dependency>
