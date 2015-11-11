@@ -29,5 +29,6 @@
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151016.xml" />
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151022.xml" />	
 	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151101.xml" />
+	<include file="org/openforis/collect/db/changelog/postgresql/db.changelog-20151111.xml" />
 	
 </databaseChangeLog>
