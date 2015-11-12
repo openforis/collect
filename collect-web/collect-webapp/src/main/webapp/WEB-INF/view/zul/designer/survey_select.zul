@@ -140,7 +140,11 @@
 							visible="@load(vm.selectedSurvey.published and not vm.selectedSurvey.recordValidationInProgress)"
 							label="${labels.survey.validateAllRecords}"
 							onClick="@command('validateAllRecords')" />
-				
+						
+						<menuitem
+							label="${labels.survey.print_selected_survey}"
+							onClick="@command('printSelectedSurveyForms')" />
+							
 						<menuitem
 							visible="@load(vm.selectedSurvey.recordValidationInProgress)"
 							label="${labels.survey.cancelRecordValidation}"

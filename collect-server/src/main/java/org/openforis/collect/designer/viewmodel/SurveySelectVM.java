@@ -6,6 +6,7 @@ package org.openforis.collect.designer.viewmodel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
+import org.openforis.collect.metamodel.SurveyFormPrinter;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
@@ -169,6 +171,16 @@ public class SurveySelectVM extends BaseVM {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("survey", selectedSurvey);
 		surveyExportPopup = openPopUp(Resources.Component.SURVEY_EXPORT_PARAMETERS_POPUP.getLocation(), true, args);
+	}
+
+	@Command
+	public void printSelectedSurveyForms() throws IOException {
+		SurveyFormPrinter printer = new SurveyFormPrinter();
+		CollectSurvey survey = loadSelectedSurvey();
+		File tempFile = File.createTempFile("of-collect-survey-forms", ".doc");
+		FileOutputStream out = new FileOutputStream(tempFile);
+		printer.print(survey, out);
+		Filedownload.save(tempFile, "application/msword");
 	}
 
 	@GlobalCommand
@@ -478,7 +490,6 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 		
-	
 	protected void performSurveyPublishing(CollectSurvey survey) {
 		try {
 			surveyManager.publish(survey);
