@@ -12,6 +12,7 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.openforis.collect.metamodel.ui.UIColumn;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.collect.metamodel.ui.UIField;
 import org.openforis.collect.metamodel.ui.UIForm;
@@ -20,6 +21,7 @@ import org.openforis.collect.metamodel.ui.UIFormContentContainer;
 import org.openforis.collect.metamodel.ui.UIFormSection;
 import org.openforis.collect.metamodel.ui.UIFormSet;
 import org.openforis.collect.metamodel.ui.UITable;
+import org.openforis.collect.metamodel.ui.UITableHeadingComponent;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -130,11 +132,11 @@ public class SurveyFormPrinter {
 		
 	}
 	
-	private class TablePaperFormRenderer extends UIObjectPaperFormRenderer {
+	private class UITablePaperFormRenderer extends UIObjectPaperFormRenderer {
 		
 		private UITable table;
 
-		TablePaperFormRenderer(UIFormContentPaperFormRenderer parentRenderer, UITable table) {
+		UITablePaperFormRenderer(UIFormContentPaperFormRenderer parentRenderer, UITable table) {
 			super(parentRenderer);
 			this.table = table;
 		}
@@ -142,12 +144,40 @@ public class SurveyFormPrinter {
 		@Override
 		public void render() throws IOException {
 			super.render();
-			XWPFTableRow row = ((UIFormContentPaperFormRenderer) parentRenderer).createRow();
-			XWPFTableCell labelCell = row.getCell(0);
+			XWPFTableRow contentRow = ((UIFormContentPaperFormRenderer) parentRenderer).createRow();
+			XWPFTableCell labelCell = contentRow.getCell(0);
 			EntityDefinition entityDef = table.getEntityDefinition();
 			labelCell.setText(getLabelOrName(entityDef, getRootRenderer().survey.getDefaultLanguage()));
+			
+			XWPFTable nestedTable = getRootRenderer().doc.createTable();
+			XWPFTableRow headerRow = nestedTable.createRow();
+			int pos = 0;
+			List<UITableHeadingComponent> headingComponents = table.getHeadingComponents();
+			for (UITableHeadingComponent headingComponent : headingComponents) {
+				if (pos > 0) {
+					headerRow.createCell();
+				}
+				XWPFTableCell cell = headerRow.getCell(pos);
+				if (headingComponent instanceof UIColumn) {
+					AttributeDefinition attrDef = ((UIColumn) headingComponent).getAttributeDefinition();
+					cell.setText(getLabelOrName(attrDef, getRootRenderer().language));
+				}
+				pos ++;
+			}
+			addRows(nestedTable, 10, table.getHeadingComponents().size());
+			
+			labelCell.insertTable(0, nestedTable);
+			
 //			XWPFTableCell contentCell = row.getCell(1);
 		}
+
+		private void addRows(XWPFTable table, int rowsCount, int cellsCount) {
+			for (int i=0; i < rowsCount; i++) {
+				XWPFTableRow row = table.createRow();
+				POIUtils.addCells(row, cellsCount - 1);
+			}
+		}
+
 		
 	}
 	
@@ -188,6 +218,9 @@ public class SurveyFormPrinter {
 				} else if (component instanceof UIFormSection) {
 					UIFormSectionPaperFormRenderer formSectionRenderer = new UIFormSectionPaperFormRenderer(this, (UIFormSection) component);
 					formSectionRenderer.render();
+				} else if (component instanceof UITable) {
+					UITablePaperFormRenderer childRenderer = new UITablePaperFormRenderer(this, (UITable) component);
+					childRenderer.render();
 				}
 			}
 			List<UIForm> forms = container.getForms();
@@ -197,7 +230,6 @@ public class SurveyFormPrinter {
 				formRenderer.render();;
 			}
 		}
-
 	}
 	
 	private class UIFormPaperFormRenderer extends UIFormContentPaperFormRenderer {
@@ -249,4 +281,14 @@ public class SurveyFormPrinter {
 		}
 		
 	}
+
+	private static class POIUtils {
+		
+		public static void addCells(XWPFTableRow row, int count) {
+			for (int i=0; i < count; i++) {
+				row.createCell();
+			}
+		}
+	}
+
 }
