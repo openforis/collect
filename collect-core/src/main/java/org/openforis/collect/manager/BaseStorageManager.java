@@ -91,6 +91,10 @@ public abstract class BaseStorageManager implements Serializable {
 	}
 	
 	protected void initStorageDirectory(ConfigurationItem configurationItem) {
+		initStorageDirectory(configurationItem, true);
+	}
+	
+	protected boolean initStorageDirectory(ConfigurationItem configurationItem, boolean createIfNotExists) {
 		Configuration configuration = configurationManager.getConfiguration();
 		
 		String customStoragePath = configuration.get(configurationItem);
@@ -100,11 +104,21 @@ public abstract class BaseStorageManager implements Serializable {
 		} else {
 			storageDirectory = new File(customStoragePath);
 		}
-		storageDirectory.mkdirs();
-		
-		if ( LOG.isInfoEnabled() ) {
-			LOG.info(String.format("Using %s directory: %s", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
+		boolean result = storageDirectory.exists();
+		if (! result) {
+			if (createIfNotExists) {
+				result = storageDirectory.mkdirs();
+			}
 		}
+		
+		if (LOG.isInfoEnabled() ) {
+			if (result) {
+				LOG.info(String.format("Using %s directory: %s", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
+			} else {
+				LOG.info(String.format("%s directory %s does not exist or it's not accessible", configurationItem.getLabel(), storageDirectory.getAbsolutePath()));
+			}
+		}
+		return result;
 	}
 
 	protected File getDefaultStorageRootDirectory() {

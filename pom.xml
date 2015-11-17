@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.openforis.collect</groupId>
 	<artifactId>collect</artifactId>
-	<version>3.8.19-SNAPSHOT</version>
+	<version>3.8.20-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
@@ -32,9 +32,9 @@
 
 	<distributionManagement>
 		<repository>
-			<id>openforis</id>
+			<id>openforis-releases</id>
 			<name>Open Foris Repository</name>
-			<url>http://www.openforis.org/nexus/content/groups/public/</url>
+			<url>http://www.openforis.org/nexus/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>openforis-snapshots</id>

@@ -10,7 +10,6 @@ import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.RecordDao;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -25,8 +24,6 @@ public class CSVDataImportService extends ReferenceDataImportService<ReferenceDa
 	
 	@Autowired
 	private RecordSessionManager sessionManager;
-	@Autowired
-	private RecordDao recordDao;
 	@Autowired
 	private ApplicationContext applicationContext;
 	
