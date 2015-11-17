@@ -100,6 +100,7 @@ public class CEComponentHTMLFormatter {
 	private XMLBuilder createBuilder(CEFieldSet comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder fieldSetBuilder =  parentBuilder.e("fieldset"); //$NON-NLS-1$
 		fieldSetBuilder.e("legend").t( comp.getLabelOrName()); //$NON-NLS-1$
+		
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
 				createBuilder((CEField) child, true, fieldSetBuilder);
@@ -112,8 +113,8 @@ public class CEComponentHTMLFormatter {
 	
 	private XMLBuilder createBuilder(CEAncillaryFields comp, XMLBuilder parentBuilder) throws Exception {
 		XMLBuilder informationFieldsBuilder =  parentBuilder.e("div").attr("class", "ancillay-data" ); //$NON-NLS-1$
-		informationFieldsBuilder.e("span").t( comp.getLabelOrName() ); //$NON-NLS-1$
-		informationFieldsBuilder.e("br");
+		//informationFieldsBuilder.e("span").t( comp.getLabelOrName() ); //$NON-NLS-1$
+		//informationFieldsBuilder.e("br");
 		boolean firstChild = true;
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {

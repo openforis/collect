@@ -38,20 +38,33 @@ public class SessionManager {
 	private transient UserManager userManager;
 	@Autowired
 	private transient RecordManager recordManager;
-	@Autowired
-	private transient SessionRecordFileManager fileManager;
+	
+	public void createSessionState(HttpSession session) {
+		String sessionId = session.getId();
+		SessionState sessionState = new SessionState(sessionId);
+		session.setAttribute(SessionState.SESSION_ATTRIBUTE_NAME, sessionState);
+	}
+
+	public void sessionDestroyed() {
+		CollectRecord activeRecord = getActiveRecord();
+		if (activeRecord != null) {
+			try {
+				releaseRecord();
+			} catch (RecordUnlockedException e) {}
+		}
+	}
 
 	public SessionState getSessionState() {
 		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
 		if (sessionState == null) {
 			throw new InvalidSessionException();
 		}
-		User user = getLoggedInUser();
-		sessionState.setUser(user);
-
+		if (sessionState.getUser() == null) {
+			sessionState.setUser(loadAuthenticatedUser());
+		}
 		return sessionState;
 	}
-	
+
 	public CollectRecord getActiveRecord() {
 		SessionState sessionState = getSessionState();
 		return sessionState.getActiveRecord();
@@ -137,21 +150,6 @@ public class SessionManager {
 			}
 		}
 	}
-	
-	private User getLoggedInUser() {
-		SessionState sessionState = (SessionState) getSessionAttribute(SessionState.SESSION_ATTRIBUTE_NAME);
-		if (sessionState != null) {
-			User user = sessionState.getUser();
-			if (user == null) {
-				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-				String name = authentication.getName();
-				user = userManager.loadByUserName(name);
-			}
-			return user;
-		} else {
-			return null;
-		}
-	}
 
 	private Object getSessionAttribute(String attributeName) {
 		Object result = null;
@@ -189,7 +187,7 @@ public class SessionManager {
 			session.invalidate();
 		}
 	}
-
+	
 	public void releaseRecord() throws RecordUnlockedException {
 		checkIsActiveRecordLocked();
 		SessionState sessionState = getSessionState();
@@ -197,8 +195,18 @@ public class SessionManager {
 		if ( activeRecord != null && activeRecord.getId() != null ) {
 			recordManager.releaseLock(activeRecord.getId());
 		}
-		fileManager.deleteAllTempFiles();
 		sessionState.setActiveRecord(null);
+	}
+	
+	private User loadAuthenticatedUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null) {
+			String name = authentication.getName();
+			User user = userManager.loadByUserName(name);
+			return user;
+		} else {
+			return null;
+		}
 	}
 	
 }

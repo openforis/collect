@@ -79,11 +79,18 @@ Collect.DataCleansingStepDialogController.prototype.afterOpen = function(callbac
 Collect.DataCleansingStepDialogController.prototype.updateView = function() {
 	var $this = this;
 	var item = $this.extractFormObject();
-	var querySelected = OF.Strings.isNotBlank(item.queryId);
-	$this.updateValuesFieldset.toggle(querySelected);
-	if (querySelected) {
+	var query = $this.getSelectedQuery();
+	$this.updateValuesFieldset.toggle(query != null);
+	var attributePath = null; 
+	var attributeType = null;
+	if (query != null) {
 		$this.initUpdateValueGrid();
+		var attrDef = collect.activeSurvey.getDefinition(query.attributeDefinitionId);
+		attributePath = attrDef.getPath();
+		attributeType = attrDef.attributeType;
 	}
+	$this.form.find("input[name=query-attribute-path]").val(attributePath);
+	$this.form.find("input[name=query-attribute-type]").val(attributeType);
 };
 
 Collect.DataCleansingStepDialogController.prototype.removeErrorsInForm = function() {

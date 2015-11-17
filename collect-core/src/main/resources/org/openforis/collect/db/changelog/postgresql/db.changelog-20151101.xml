@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+ 
+	<changeSet id="event-queue" author="ricci" dbms="postgresql">
+
+	    <preConditions onFail="MARK_RAN">
+	    	<not>
+		    	<tableExists tableName="ofc_message" />
+	    	</not>
+	    </preConditions>
+	    
+	    <comment>Message queue storage</comment>
+	    
+	    <createTable tableName="ofc_message">
+			<column name="id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="sequence_no" type="SERIAL">
+				<constraints nullable="false" primaryKey="true" />
+			</column>
+			<column name="publication_time" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="queue_id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="message_string" type="VARCHAR" />
+			<column name="message_bytes" type="bytea" />
+		</createTable>
+    	
+	    <createTable tableName="ofc_message_processing">
+			<column name="message_id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="consumer_id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="version_id" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="state" type="VARCHAR">
+				<constraints nullable="false" />
+			</column>
+			<column name="last_updated" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="times_out" type="TIMESTAMP">
+				<constraints nullable="false" />
+			</column>
+			<column name="retries" type="INTEGER">
+				<constraints nullable="false" />
+			</column>
+			<column name="error_message" type="TEXT" />
+		</createTable>
+		
+		<!-- INDEXES -->
+		<createIndex
+            indexName="ofc_message_idx"
+            tableName="ofc_message"
+            unique="true">
+	        <column name="id" type="VARCHAR"/>
+    	</createIndex>
+    	
+		<createIndex
+            indexName="ofc_message_processing_pkey"
+            tableName="ofc_message_processing"
+            unique="true">
+            <column name="message_id" type="VARCHAR"/>
+	        <column name="consumer_id" type="VARCHAR"/>
+    	</createIndex>
+	</changeSet>
+	
+</databaseChangeLog>

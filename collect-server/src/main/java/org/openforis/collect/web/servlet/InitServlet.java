@@ -37,13 +37,7 @@ public class InitServlet extends HttpServlet {
 		super.init();
 
 		if ( LOG.isInfoEnabled() ) {
-			LOG.info("============= Open Foris Collect Initialization =============");
-		}
-		
-		//add initialization code here... 
-		
-		if ( LOG.isInfoEnabled() ) {
-			LOG.info("====================================================");
+			LOG.info("============= Open Foris Collect Initialized =============");
 		}
 	}
 

@@ -5,7 +5,7 @@ import java.io.File;
 import org.openforis.collect.io.data.CSVDataImportProcess;
 import org.openforis.collect.io.data.CSVDataImportProcess.CSVDataImportSettings;
 import org.openforis.collect.io.exception.DataImportExeption;
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.process.ProcessStatus;
 import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
 import org.openforis.collect.model.CollectRecord;
@@ -24,7 +24,7 @@ import org.springframework.security.access.annotation.Secured;
 public class CSVDataImportService extends ReferenceDataImportService<ReferenceDataImportStatusProxy, CSVDataImportProcess> { 
 	
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	@Autowired
 	private RecordDao recordDao;
 	@Autowired

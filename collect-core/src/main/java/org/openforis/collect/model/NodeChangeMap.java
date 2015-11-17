@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 import org.openforis.idm.metamodel.validation.ValidationResults;
 import org.openforis.idm.model.Attribute;
@@ -95,11 +96,13 @@ public class NodeChangeMap implements NodeChangeSet {
 	/**
 	 * Create a new NodeDeleteChange and puts it in the internal cache
 	 * 
+	 * @param recordId 
+	 * @param ancestorIds 
 	 * @param node
 	 * @return
 	 */
-	public NodeDeleteChange addNodeDeleteChange(Node<?> node) {
-		NodeDeleteChange c = new NodeDeleteChange(node);
+	public NodeDeleteChange addNodeDeleteChange(Integer recordId, Step recordStep, List<Integer> ancestorIds, Node<?> node) {
+		NodeDeleteChange c = new NodeDeleteChange(recordId, recordStep, ancestorIds, node);
 		nodeIdToChange.put(node.getInternalId(), c); //overwrite change if already present
 		return c;
 	}

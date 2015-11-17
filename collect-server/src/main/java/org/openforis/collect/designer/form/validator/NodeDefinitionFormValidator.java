@@ -5,6 +5,9 @@ import org.openforis.collect.designer.form.NodeDefinitionFormObject.RelevanceTyp
 import org.openforis.collect.designer.form.NodeDefinitionFormObject.RequirenessType;
 import org.openforis.collect.designer.model.LabelKeys;
 import org.openforis.collect.designer.viewmodel.NodeDefinitionVM;
+import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
+import org.openforis.collect.metamodel.SurveyTarget;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -70,7 +73,16 @@ public abstract class NodeDefinitionFormValidator extends FormValidator {
 	protected boolean validateName(ValidationContext ctx) {
 		boolean valid = validateRequired(ctx, NAME_FIELD);
 		if (valid) {
-			valid = validateInternalName(ctx, NAME_FIELD);
+			CollectSurvey survey = getEditedNode(ctx).getSurvey();
+			if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+				String name = getValue(ctx, NAME_FIELD);
+				valid = new CollectEarthSurveyValidator().validateNodeName(name);
+				if (! valid) {
+					addInvalidMessage(ctx, NAME_FIELD, Labels.getLabel("survey.validation.collect_earth.invalid_node_name"));
+				}
+			} else {
+				valid = super.validateInternalName(ctx, NAME_FIELD);
+			}
 			if (valid) {
 				valid = validateNameUniqueness(ctx);
 			}

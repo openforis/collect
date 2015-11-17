@@ -6,10 +6,10 @@
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
-    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
-    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
-    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd"
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd"
 	default-lazy-init="true"
 	default-autowire="byName">
 	
@@ -29,14 +29,13 @@
 	<bean id="sessionRecordFileManager" class="org.openforis.collect.manager.SessionRecordFileManager" 
 		init-method="init" />
 	
-	<!-- RDB -->
-	<bean id="rdbPublisher" class="org.openforis.collect.relational.CollectRDBPublisher" />
-	
 	<bean id="volatileRecordIndexManager"
 		class="org.openforis.collect.remoting.service.recordindex.VolatileRecordIndexManager"
 		init-method="init" scope="session" lazy-init="false" autowire="byName" />
 	
-	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager"
+	<bean id="sessionManager" class="org.openforis.collect.manager.SessionManager" />
+	
+	<bean id="recordSessionManager" class="org.openforis.collect.manager.RecordSessionManager"
 		scope="session" />
 	
 	<!-- ===================================== -->
@@ -75,7 +74,7 @@
 	<bean id="samplingDesignImportService"
 		class="org.openforis.collect.remoting.service.SamplingDesignImportService"
 		autowire="byName" init-method="init" />
-	<bean id="sessionService" class="org.openforis.collect.remoting.service.SessionService"
+	<bean id="collectSessionService" class="org.openforis.collect.remoting.service.SessionService"
 		autowire="byName" />
 	<bean id="speciesService" class="org.openforis.collect.remoting.service.SpeciesService"
 		autowire="byName" />
@@ -99,6 +98,65 @@
 	<!-- ===================================== -->
 	<!-- Security -->
 	<!-- ===================================== -->
+	
 	<bean id="userDetailsService"	class="org.openforis.collect.security.CollectUserDetailsService" />
+	
+	
+	<!-- ===================================== -->
+	<!-- =============== RDB ================= -->
+	<!-- ===================================== -->
+	
+	<!-- deprecated -->
+	<bean id="rdbPublisher" class="org.openforis.collect.relational.CollectRDBPublisher" />
+	
+    <bean id="messageBroker" class="org.openforis.collect.event.ConfiguredMessageBroker" 
+    		init-method="start" destroy-method="stop">
+        <constructor-arg ref="dataSource" />
+    </bean>
+
+	<bean id="eventQueue" class="org.openforis.collect.event.EventBrokerEventQueue"
+			lazy-init="false">
+		<constructor-arg>
+			 <bean class="org.openforis.rmb.spring.SpringMessageQueue">
+		        <constructor-arg ref="messageBroker"/>
+		        <constructor-arg value="collect_events"/>
+		        <constructor-arg>
+		            <list>
+		                <bean class="org.openforis.rmb.spring.SpringMessageConsumer">
+		                    <constructor-arg value="collect_reporting_repository_event_consumer"/>
+		                    <constructor-arg>
+								<bean class="org.openforis.collect.event.RepositoryEventHandler">
+									<constructor-arg ref="reportingRepositories" />
+								</bean>
+		                    </constructor-arg>
+		                    <property name="messagesHandledInParallel" value="1"/>
+		                </bean>
+		            </list>
+		        </constructor-arg>
+		    </bean>
+		</constructor-arg>
+		<!-- Event Queue DISABLED by default -->
+		<property name="enabled" value="false" />
+	</bean>
+	
+	<bean id="reportingRepositories" class="org.openforis.collect.relational.RDBReportingRepositories"
+			lazy-init="false" init-method="init">
+		<constructor-arg ref="surveyManager" />
+		<constructor-arg ref="recordManager" />
+		<constructor-arg ref="collectLocalRDBStorageManager" />
+	</bean>
+	
+	<bean id="rdbMonitor" class="org.openforis.collect.relational.CollectRDBMonitor"
+			lazy-init="false" init-method="init" />
+
+	<bean id="sessionEventDispatcher" class="org.openforis.collect.manager.SessionEventDispatcher"
+		scope="session">
+		<constructor-arg ref="eventQueue" />
+	</bean>
+
+	<bean id="recordEventBatchPublisher" class="org.openforis.collect.io.data.RecordEventBatchPublisher"
+		scope="prototype">
+		<constructor-arg ref="eventQueue" />
+	</bean>
 	
 </beans>

@@ -34,12 +34,23 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 
 	private String qualifiers;
 	
+	private final FieldDefinition<String> codeFieldDefinition = 
+			new FieldDefinition<String>(CODE_FIELD_NAME, "c", "code", String.class, this);
+	private final FieldDefinition<String> scientificNameFieldDefinition = 
+			new FieldDefinition<String>(SCIENTIFIC_NAME_FIELD_NAME, "s", "name", String.class, this);
+	private final FieldDefinition<String> vernacularNameFieldDefinition = 
+			new FieldDefinition<String>(VERNACULAR_NAME_FIELD_NAME, "v", "vn", String.class, this);
+	private final FieldDefinition<String> languageCodeFieldDefinition = 
+			new FieldDefinition<String>(LANGUAGE_CODE_FIELD_NAME, "l", "lang", String.class, this);
+	private final FieldDefinition<String> languageVarietyFieldDefinition = 
+			new FieldDefinition<String>(LANGUAGE_VARIETY_FIELD_NAME, "lv", "lang_var", String.class, this);
+	
 	private final FieldDefinitionMap fieldDefinitionByName = new FieldDefinitionMap(
-		new FieldDefinition<String>(CODE_FIELD_NAME, "c", "code", String.class, this), 
-		new FieldDefinition<String>(SCIENTIFIC_NAME_FIELD_NAME, "s", "name", String.class, this), 
-		new FieldDefinition<String>(VERNACULAR_NAME_FIELD_NAME, "v", "vn", String.class, this),
-		new FieldDefinition<String>(LANGUAGE_CODE_FIELD_NAME, "l", "lang", String.class, this),
-		new FieldDefinition<String>(LANGUAGE_VARIETY_FIELD_NAME, "lv", "lang_var", String.class, this)
+		codeFieldDefinition, 
+		scientificNameFieldDefinition, 
+		vernacularNameFieldDefinition,
+		languageCodeFieldDefinition,
+		languageVarietyFieldDefinition
 	);
 	
 	private String taxonomy;
@@ -48,7 +59,7 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	TaxonAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
 	}
-	
+
 	TaxonAttributeDefinition(TaxonAttributeDefinition obj, int id) {
 		super(obj, id);
 	}
@@ -72,8 +83,8 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 		} else if (val instanceof String) {
 			return createValue((String) val);
 		} else {
-			throw new UnsupportedOperationException();
-		}
+		throw new UnsupportedOperationException();
+	}
 	}
 	
 	@Override
@@ -138,6 +149,26 @@ public class TaxonAttributeDefinition extends AttributeDefinition {
 	@Override
 	public String getMainFieldName() {
 		throw new IllegalArgumentException("Main field not defined");
+	}
+	
+	public FieldDefinition<String> getCodeFieldDefinition() {
+		return codeFieldDefinition;
+	}
+	
+	public FieldDefinition<String> getScientificNameFieldDefinition() {
+		return scientificNameFieldDefinition;
+	}
+	
+	public FieldDefinition<String> getVernacularNameFieldDefinition() {
+		return vernacularNameFieldDefinition;
+	}
+	
+	public FieldDefinition<String> getLanguageCodeFieldDefinition() {
+		return languageCodeFieldDefinition;
+	}
+	
+	public FieldDefinition<String> getLanguageVarietyFieldDefinition() {
+		return languageVarietyFieldDefinition;
 	}
 
 	@Override

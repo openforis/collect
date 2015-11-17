@@ -108,7 +108,7 @@ public class SchemaVM extends SurveyBaseVM {
 
 	private static final Set<AttributeType> SUPPORTED_COLLECT_EARTH_ATTRIBUTE_TYPES = Sets.immutableEnumSet(BOOLEAN, CODE, DATE, NUMBER, TEXT, TIME);
 	
-	private static final Pattern CLONED_NAME_PATTERN = Pattern.compile("(.*)_(\\d+)");
+	private static final Pattern CLONED_NAME_PATTERN = Pattern.compile("(.*)(\\d+)");
 
 	private SchemaNodeData selectedTreeNode;
 	private SurveyObject editedNode;
@@ -481,6 +481,10 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 	
+	private void editNode(boolean newNode, EntityDefinition parentEntity, SurveyObject node) {
+		editNode(null, newNode, parentEntity, node);
+	}
+	
 	protected void editNode(Binder binder, boolean newNode, EntityDefinition parentEntity, SurveyObject node) {
 		this.newNode = newNode;
 		editedNodeParentEntity = parentEntity;
@@ -489,7 +493,11 @@ public class SchemaVM extends SurveyBaseVM {
 			selectedTreeNode = treeModel.getNodeData(node);
 		}
 		refreshNodeForm();
-		validateForm(binder);
+		if (binder == null) {
+			validateForm();
+		} else {
+			validateForm(binder);
+		}
 		notifyChange("selectedTreeNode","editedNode");
 	}
 
@@ -524,7 +532,9 @@ public class SchemaVM extends SurveyBaseVM {
 	protected void validateForm() {
 		if ( editedNode != null ) {
 			Binder binder = (Binder) nodeFormInclude.getAttribute("$BINDER$");
-			validateForm(binder);
+			if (binder != null) {
+				validateForm(binder);
+			}
 		} else {
 			dispatchCurrentFormValidatedCommand(true);
 		}
@@ -1376,15 +1386,21 @@ public class SchemaVM extends SurveyBaseVM {
 		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
-				NodeDefinition clone = survey.getSchema().cloneDefinition(node);
-				clone.setName(createDuplicateNodeName(node, determineRelatedEntity(selectedParent)));
-				editedNode = clone;
-				changeEditedNodeParent(selectedParent, true);
+				duplicateEditedNodeInto(node, selectedParent);
 				closePopUp(popup);
 			}
 		});
 	}
-	
+
+	private void duplicateEditedNodeInto(NodeDefinition node, SurveyObject parent) {
+		NodeDefinition clone = survey.getSchema().cloneDefinition(node);
+		EntityDefinition parentEntity = determineRelatedEntity(parent);
+		clone.setName(createDuplicateNodeName(node, parentEntity));
+		editedNode = clone;
+		changeEditedNodeParent(parent, true);
+		editNode(false, parentEntity, editedNode);
+	}
+
 	/**
 	 * Creates a name for node that will be the dupliacte of the specified one.
 	 * The new name will be unique inside the specified parent entity.
@@ -1393,20 +1409,21 @@ public class SchemaVM extends SurveyBaseVM {
 		String name = nodeToBeDuplicate.getName();
 		Matcher matcher = CLONED_NAME_PATTERN.matcher(name);
 		String prefix;
-		int progressiveNum;
+		int currentProgressiveNum;
 		if (matcher.matches()) {
 			prefix = matcher.group(1);
-			progressiveNum = Integer.parseInt(matcher.group(2));
+			currentProgressiveNum = Integer.parseInt(matcher.group(2));
 		} else {
 			prefix = name;
-			progressiveNum = 0;
+			currentProgressiveNum = 0;
 		}
 		//find unique new name
 		String newName;
 		do {
-			progressiveNum ++;
-			newName = prefix + "_" + progressiveNum;
+			currentProgressiveNum ++;
+			newName = prefix + currentProgressiveNum;
 		} while (parent.containsChildDefinition(newName));
+		
 		return newName;
 	}
 

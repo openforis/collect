@@ -332,6 +332,16 @@ public class CodeAttributeDefinition extends AttributeDefinition {
 		return Code.class;
 	}
 
+	@SuppressWarnings("unchecked")
+	public FieldDefinition<String> getCodeFieldDefinition() {
+		return (FieldDefinition<String>) getFieldDefinition(CODE_FIELD);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public FieldDefinition<String> getQualifierFieldDefinition() {
+		return (FieldDefinition<String>) getFieldDefinition(QUALIFIER_FIELD);
+	}
+	
 	public boolean isAllowUnlisted() {
 		return allowUnlisted;
 	}

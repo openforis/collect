@@ -4,8 +4,7 @@
 package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.manager.CodeListManager;
-import org.openforis.collect.manager.SessionManager;
-import org.openforis.collect.manager.SessionRecordFileManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.remoting.service.NodeUpdateRequest;
 import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
@@ -25,14 +24,14 @@ public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public AttributeUpdateRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, SessionRecordFileManager fileManager, 
-			SessionManager sessionManager, CollectRecord record) {
+	public AttributeUpdateRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, RecordSessionManager sessionManager, 
+			CollectRecord record) {
 		AttributeUpdateRequest<Value> opts = new NodeUpdateRequest.AttributeUpdateRequest<Value>();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
 		opts.setAttribute((Attribute<?, Value>) attribute);
 		Value parsedValue;
 		if ( attribute instanceof FileAttribute ) {
-			parsedValue = parseFileAttributeValue(fileManager, record, sessionManager, nodeId, value);
+			parsedValue = parseFileAttributeValue(sessionManager, record, nodeId, value);
 		} else if ( value == null ) {
 			parsedValue = null;
 		} else {

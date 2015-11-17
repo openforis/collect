@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.openforis.collect.relational.CollectRdbException;
+import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
  * 
@@ -96,8 +97,39 @@ abstract class AbstractTable<T> implements Table<T>  {
 		return Collections.unmodifiableList(referentialConstraints);
 	}
 	
+	public List<ReferentialConstraint> getReferentialConstraintsByColumn(Column<?> column) {
+		List<ReferentialConstraint> result = new ArrayList<ReferentialConstraint>();
+		for (ReferentialConstraint constraint : referentialConstraints) {
+			for (Column<?> constraingColumn : constraint.getColumns()) {
+				if (constraingColumn.getName().equals(column.getName())) {
+					result.add(constraint);
+					break;
+				}
+			}
+		}
+		return result;
+	}
+	
+	public EntityDefinition getReferencedEntityDefinition(DataAncestorFKColumn fkColumn) {
+		List<ReferentialConstraint> constraints = getReferentialConstraintsByColumn(fkColumn);
+		for (ReferentialConstraint constraint : constraints) {
+			UniquenessConstraint referencedKey = constraint.getReferencedKey();
+			if (referencedKey instanceof PrimaryKeyConstraint) {
+				DataTable referencedTable = (DataTable) referencedKey.getTable();
+				EntityDefinition referencedEntityDef = (EntityDefinition) referencedTable.getNodeDefinition();
+				return referencedEntityDef;
+			}
+		}
+		throw new IllegalArgumentException(String.format("Referenced EntityDefinition not found for column %s in table %s", 
+				fkColumn.getName(), getName()));
+	}
 
 	public boolean containsColumn(String name) {
 		return columns.containsKey(name);
+	}
+	
+	@Override
+	public String toString() {
+		return getName();
 	}
 }

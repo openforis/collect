@@ -18,9 +18,9 @@ public class AttributeChange extends NodeChange<Attribute<?, ?>> {
 	private Map<Integer, Object> updatedFieldValues;
 	
 	public AttributeChange(Attribute<?, ?> node) {
-		super(node);
+		super(node.getRecord().getId(), node.getAncestorIds(), node);
 	}
-
+	
 	public void merge(AttributeChange newChange) {
 		if ( updatedFieldValues == null ) {
 			updatedFieldValues = newChange.updatedFieldValues;

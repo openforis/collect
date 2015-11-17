@@ -13,7 +13,7 @@ import org.openforis.collect.io.data.DataRestoreSummaryJob;
 import org.openforis.collect.io.data.proxy.DataRestoreJobProxy;
 import org.openforis.collect.io.data.proxy.DataRestoreSummaryJobProxy;
 import org.openforis.collect.io.exception.DataImportExeption;
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.remoting.service.dataimport.DataImportSummaryProxy;
@@ -32,7 +32,7 @@ public class DataImportService {
 	private static final Log log = LogFactory.getLog(DataImportService.class);	
 	
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	@Autowired
 	private CollectJobManager jobManager;
 	@Autowired

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -34,7 +35,8 @@ public class Survey implements Serializable, Annotatable, DeepComparable {
 	private static final long serialVersionUID = 1L;
 	
 	public static final String INTERNAL_NAME_REGEX = "[a-z][a-z0-9_]*";
-
+	public static final Pattern INTERNAL_NAME_PATTERN = Pattern.compile(INTERNAL_NAME_REGEX);
+	
 	private Integer id;
 	private String name;
 	private LanguageSpecificTextMap projectNames;

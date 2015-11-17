@@ -117,10 +117,19 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 	}
 
 	public List<SamplingDesignItem> loadItems(int surveyId, int offset, int maxRecords) {
+		return loadItems(surveyId, null, offset, maxRecords);
+	}
+
+	public List<SamplingDesignItem> loadItems(int surveyId, Integer upToLevel, int offset, int maxRecords) {
 		SamplingDesignDSLContext dsl = dsl();
 		SelectQuery<Record> q = dsl.selectQuery();	
 		q.addFrom(OFC_SAMPLING_DESIGN);
 		q.addConditions(OFC_SAMPLING_DESIGN.SURVEY_ID.equal(surveyId));
+		if (upToLevel != null) {
+			for (int levelIdx = upToLevel; levelIdx < LEVEL_CODE_FIELDS.length; levelIdx ++) {
+				q.addConditions(LEVEL_CODE_FIELDS[levelIdx].isNull());
+			}
+		}
 		q.addOrderBy(OFC_SAMPLING_DESIGN.ID);
 		//add limit
 		q.addLimit(offset, maxRecords);
@@ -130,7 +139,7 @@ public class SamplingDesignDao extends MappingJooqDaoSupport<SamplingDesignItem,
 		
 		return dsl.fromResult(result);
 	}
-	
+
 	/**
 	 * Inserts the items in batch.
 	 * 

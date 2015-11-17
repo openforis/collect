@@ -255,6 +255,7 @@ public class Record implements DeepComparable {
 		int id = this.nextId();
 		node.internalId = id;
 		node.setRecord(this);
+		node.detached = false;
 
 		nodesByInternalId.put(id, node);
 
@@ -268,6 +269,7 @@ public class Record implements DeepComparable {
 	protected void remove(Node<?> node) {
 		node.parent = null;
 		node.setRecord(null);
+		node.detached = true;
 		nodesByInternalId.remove(node.internalId);
 
 		for (DependencyGraph<?> graph : dependencyGraphs) {

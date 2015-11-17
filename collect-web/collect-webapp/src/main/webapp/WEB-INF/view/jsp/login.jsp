@@ -13,8 +13,12 @@
 	<script type="text/javascript">
 		$(function() {
 			var DOWNLOAD_LOGO_URL = "downloadLogo.htm";
+			
 			loadImages(DOWNLOAD_LOGO_URL);
- 			checkDefaultPasswordActive();
+ 			
+			checkDefaultPasswordActive();
+
+ 			document.f.username.focus();
 		});
 		
 		var loadImages = function(downloadLogoUrl) {
@@ -51,7 +55,7 @@
     <link rel="stylesheet" type="text/css" href="assets/login.css" />
   </head>
 
-  <body onload="document.f.j_username.focus();">
+  <body>
   	<div id="mainContainer">
   		<!-- HEADER -->
   		<div id="header">
@@ -68,35 +72,45 @@
 			        Your session has expired.<br/>
 			      </div>
 			    </c:if>
-			    <c:if test="${not empty param.login_error}">
+			    <c:if test="${param.login_error == 1}">
 			      <div class="error">
 			        Your login attempt was not successful, try again.<br/><br/>
 			        Reason: <c:out value="${SPRING_SECURITY_LAST_EXCEPTION.message}"/>.
 			      </div>
 			    </c:if>
 	    	</div>
-			<form name="f" action="<c:url value='j_spring_security_check'/>" method="POST">
+	    	
+	    	<c:url var="loginUrl" value="/login"/>
+			<form name="f" action="${loginUrl}" method="POST">
+				<input type="hidden" 
+					name="${_csrf.parameterName}"
+					value="${_csrf.token}"/>
 				<table class="login" width="100%" align="center" style="vertical-align: top; height: 100">
+					<c:if test="${param.logout != null}">
+						<tr>
+							<td>You have been logged out.</td>
+						</tr>
+					</c:if>
 					<tr>
 						<td colspan="2" align="center"><strong style="font-size: 13px;">Please Log In</strong></td>
 					</tr>
 					<tr>
 						<td width="50%" align="right">User:</td>
 						<td width="50%" align="left">
-							<input type='text' name='j_username'
-								value='<c:if test="${not empty param.login_error}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>' />
+							<input type='text' name='username'
+								value='<c:if test="${param.login_error == 1}"><c:out value="${SPRING_SECURITY_LAST_USERNAME}"/></c:if>' />
 						</td>
 					</tr>
 					<tr>
 						<td width="50%" align="right">Password:</td>
 						<td width="50%" align="left">
-							<input type='password' name='j_password'>
+							<input type='password' name='password'>
 						</td>
 					</tr>
 					<!-- tr><td><input type="checkbox" name="_spring_security_remember_me"></td><td>Don't ask for my password for two weeks</td></tr-->
 					<tr>
 						<td colspan='2' width="100%" style="text-align: center;">
-							<input name="submit" type="submit" class="button" value="Login" /> 
+							<input name="submit" type="submit" class="button" /> 
 						</td>
 					</tr>
 					<tr><td></td></tr>

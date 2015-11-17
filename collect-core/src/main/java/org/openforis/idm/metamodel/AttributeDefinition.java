@@ -129,6 +129,10 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 	public FieldDefinition<?> getFieldDefinition(String name) {
 		return getFieldDefinitionMap().get(name);
 	}
+	
+	public FieldDefinition<?> getMainFieldDefinition() {
+		return getFieldDefinition(getMainFieldName());
+	}
 
 	public List<FieldLabel> getFieldLabels() {
 		if ( this.fieldLabels == null ) {

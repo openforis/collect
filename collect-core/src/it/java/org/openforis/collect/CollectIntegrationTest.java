@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import org.junit.runner.RunWith;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
@@ -13,21 +12,13 @@ import org.openforis.collect.persistence.SurveyDao;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
-public abstract class CollectIntegrationTest {
+public abstract class CollectIntegrationTest extends CollectTest {
 
 	@Autowired
 	protected CollectSurveyContext collectSurveyContext;

@@ -1,6 +1,6 @@
 package org.openforis.idm.metamodel.xml;
 
-import static org.apache.lucene.util.IOUtils.UTF_8;
+import static org.openforis.commons.io.OpenForisIOUtils.UTF_8;
 
 import java.io.IOException;
 import java.io.InputStream;

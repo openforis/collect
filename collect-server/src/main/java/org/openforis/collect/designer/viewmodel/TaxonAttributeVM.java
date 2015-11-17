@@ -95,7 +95,7 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 	protected void initQualifiersList() {
 		if ( qualifiers == null ) {
 			qualifiers = new ArrayList<String>();
-			tempFormObject.setField(QUALIFIERS_FIELD, qualifiers);
+			setValueOnFormField(tempFormObject, QUALIFIERS_FIELD, qualifiers);
 			((TaxonAttributeDefinitionFormObject) formObject).setQualifiers(qualifiers);
 		}
 	}
@@ -105,7 +105,7 @@ public class TaxonAttributeVM extends AttributeVM<TaxonAttributeDefinition> {
 		super.setEditedItem(editedItem);
 		if ( editedItem != null ) {
 			qualifiers = ((TaxonAttributeDefinitionFormObject) formObject).getQualifiers();
-			tempFormObject.setField(QUALIFIERS_FIELD, qualifiers);
+			setValueOnFormField(tempFormObject, QUALIFIERS_FIELD, qualifiers);
 		}
 	}
 	

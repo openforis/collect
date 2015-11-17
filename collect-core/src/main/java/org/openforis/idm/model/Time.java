@@ -46,7 +46,7 @@ public final class Time extends AbstractValue {
 			throw new IllegalArgumentException("Invalid time " + value);
 		}
 	}
-
+	
 	private static int toInt(String str) {
 		if (StringUtils.isBlank(str)) {
 			return 0;
@@ -113,6 +113,11 @@ public final class Time extends AbstractValue {
 			cal.set(Calendar.MINUTE, minute);
 			return cal;
 		}
+	}
+	
+	public java.util.Date toJavaDate() {
+		Calendar cal = toCalendar();
+		return cal == null ? null: cal.getTime();
 	}
 
 	@Override

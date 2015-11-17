@@ -64,6 +64,7 @@ package org.openforis.collect.presenter {
 		private const VALIDATION_REPORT_MENU_ITEM:String = Message.get("list.admin.validationReport");
 		private const PROMOTE_ENTRY_RECORDS_MENU_ITEM:String = Message.get("list.admin.promote_entry_records");
 		private const PROMOTE_CLEANSING_RECORDS_MENU_ITEM:String = Message.get("list.admin.promote_cleansing_records");
+		private const DEMOTE_CLEANSING_RECORDS_MENU_ITEM:String = Message.get("list.admin.demote_cleansing_records");
 		private const DEMOTE_ANALYSIS_RECORDS_MENU_ITEM:String = Message.get("list.admin.demote_analysis_records");
 		
 		private var _dataClient:DataClient;
@@ -171,6 +172,7 @@ package org.openforis.collect.presenter {
 				result.addItem({type: "separator"});
 				result.addItem(PROMOTE_ENTRY_RECORDS_MENU_ITEM);
 				result.addItem(PROMOTE_CLEANSING_RECORDS_MENU_ITEM);
+				result.addItem(DEMOTE_CLEANSING_RECORDS_MENU_ITEM);
 				result.addItem(DEMOTE_ANALYSIS_RECORDS_MENU_ITEM);
 			}
 			view.advancedFunctionsButton.dataProvider = result;
@@ -196,18 +198,26 @@ package org.openforis.collect.presenter {
 				break;
 			case PROMOTE_ENTRY_RECORDS_MENU_ITEM:
 			case PROMOTE_CLEANSING_RECORDS_MENU_ITEM:
+			case DEMOTE_CLEANSING_RECORDS_MENU_ITEM:
 			case DEMOTE_ANALYSIS_RECORDS_MENU_ITEM:
 				var confirmMessageKey:String = null;
 				var initialStep:CollectRecord$Step = null;
-				var promote:Boolean = true;
+				var promote:Boolean;
 				switch(event.item) {
 					case PROMOTE_ENTRY_RECORDS_MENU_ITEM:
 						confirmMessageKey = "list.admin.promote_entry_records.confirm";
 						initialStep = CollectRecord$Step.ENTRY;
+						promote = true;
 						break;
 					case PROMOTE_CLEANSING_RECORDS_MENU_ITEM:
 						confirmMessageKey = "list.admin.promote_cleansing_records.confirm";
 						initialStep = CollectRecord$Step.CLEANSING;
+						promote = true;
+						break;
+					case DEMOTE_CLEANSING_RECORDS_MENU_ITEM:
+						confirmMessageKey = "list.admin.demote_cleansing_records.confirm";
+						initialStep = CollectRecord$Step.CLEANSING;
+						promote = false;
 						break;
 					case DEMOTE_ANALYSIS_RECORDS_MENU_ITEM:
 						confirmMessageKey = "list.admin.demote_analysis_records.confirm";

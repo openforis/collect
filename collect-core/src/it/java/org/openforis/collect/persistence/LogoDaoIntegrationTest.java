@@ -10,21 +10,12 @@ import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.openforis.collect.CollectTest;
 import org.openforis.collect.model.Logo;
 import org.openforis.collect.model.LogoPosition;
-import org.openforis.collect.persistence.LogoDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
-public class LogoDaoIntegrationTest {
+public class LogoDaoIntegrationTest extends CollectTest {
 
 	private static final int TEST_LOGO_ID = 100;
 	@Autowired

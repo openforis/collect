@@ -10,12 +10,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import liquibase.util.StringUtils;
-
 import org.openforis.collect.designer.form.CodeAttributeDefinitionFormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmParams;
 import org.openforis.collect.designer.util.Predicate;
+import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -35,7 +34,10 @@ import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zul.Window;
+
+import liquibase.util.StringUtils;
 
 /**
  * @author S. Ricci
@@ -45,8 +47,6 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
 	private static final String CODE_LIST_ASSIGNED_COMMAND = "codeListAssigned";
 	private static final String FORM_ID = "fx";
-
-	private Window parentSelectorPopUp;
 
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
@@ -158,7 +158,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	}
 
 	@Command
-	public void openParentAttributeSelector() {
+	public void openParentAttributeSelector(@ContextParam(ContextType.BINDER) final Binder binder) {
 		String title = Labels.getLabel("survey.schema.attribute.code.select_parent_for_node", new String[]{editedItem.getName()});
 
 		final Collection<CodeAttributeDefinition> assignableParentAttributes = editedItem.getAssignableParentCodeAttributeDefinitions();
@@ -179,33 +179,23 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 					return ! (item instanceof CodeAttributeDefinition);
 				}
 			};
-			parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title,
+			final Window parentSelectorPopUp = SchemaTreePopUpVM.openPopup(title,
 					editedItem.getRootEntity(), null, includedNodePredicate,
 					false, disabledNodePredicate, null,
 					parentCodeAttributeDefinition);
-		}
-	}
-
-	@GlobalCommand
-	public void closeSchemaNodeSelector() {
-		if ( parentSelectorPopUp != null ) {
-			closePopUp(parentSelectorPopUp);
-			parentSelectorPopUp = null;
-		}
-	}
-	
-	@GlobalCommand
-	public void schemaTreeNodeSelected(@ContextParam(ContextType.BINDER) Binder binder, @BindingParam("node") SurveyObject surveyObject) {
-		if ( parentSelectorPopUp != null ) {
-			CodeAttributeDefinition parentAttrDefn = surveyObject == null ? null : (CodeAttributeDefinition) surveyObject;
-			CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) formObject;
-			fo.setParentCodeAttributeDefinition(parentAttrDefn);
-			String hierarchicalLevel = getHierarchicalLevelName(parentAttrDefn);
-			fo.setHierarchicalLevel(hierarchicalLevel);
-			notifyChange("formObject");
-			dispatchApplyChangesCommand(binder);
-			closeSchemaNodeSelector();
-			notifyChange("dependentCodePaths");
+			parentSelectorPopUp.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+				public void onEvent(NodeSelectedEvent event) throws Exception {
+					CodeAttributeDefinition parentAttrDefn = (CodeAttributeDefinition) event.getSelectedItem();
+					CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) formObject;
+					fo.setParentCodeAttributeDefinition(parentAttrDefn);
+					String hierarchicalLevel = getHierarchicalLevelName(parentAttrDefn);
+					fo.setHierarchicalLevel(hierarchicalLevel);
+					notifyChange("formObject");
+					dispatchApplyChangesCommand(binder);
+					notifyChange("dependentCodePaths");
+					closePopUp(parentSelectorPopUp);
+				}
+			});
 		}
 	}
 

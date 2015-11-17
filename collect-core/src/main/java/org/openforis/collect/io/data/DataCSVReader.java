@@ -100,7 +100,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	
 	protected List<AttributeDefinition> getAncestorKeyAttributeDefinitions() {
 		List<AttributeDefinition> result = new ArrayList<AttributeDefinition>();
-		List<EntityDefinition> ancestors = parentEntityDefinition.getAncestorEntityDefinitions();
+		List<EntityDefinition> ancestors = parentEntityDefinition.getAncestorEntityDefinitionsInReverseOrder();
 		for (EntityDefinition ancestor : ancestors) {
 			result.addAll(ancestor.getKeyAttributeDefinitions());
 		}
@@ -171,7 +171,7 @@ public class DataCSVReader extends CSVDataImportReader<DataLine> {
 	}
 	
 	private List<EntityIdentifierDefinition> getAncestorIdentifiers() {
-		List<EntityDefinition> ancestorEntityDefns = parentEntityDefinition.getAncestorEntityDefinitions();
+		List<EntityDefinition> ancestorEntityDefns = parentEntityDefinition.getAncestorEntityDefinitionsInReverseOrder();
 		ancestorEntityDefns.add(parentEntityDefinition);
 		List<EntityIdentifierDefinition> entityIdentifierDefns = new ArrayList<DataLine.EntityIdentifierDefinition>();
 		for (EntityDefinition ancestorEntityDefn : ancestorEntityDefns) {

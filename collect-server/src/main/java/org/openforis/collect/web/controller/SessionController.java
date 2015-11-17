@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.SurveyViewGenerator;
 import org.openforis.collect.metamodel.SurveyViewGenerator.SurveyView;
@@ -31,7 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 public class SessionController {
 	
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	@Autowired
 	private SurveyManager surveyManager;
 	

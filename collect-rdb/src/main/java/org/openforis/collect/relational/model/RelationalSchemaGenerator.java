@@ -13,6 +13,7 @@ import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.util.CodeListTables;
+import org.openforis.collect.relational.util.DataTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -223,19 +224,38 @@ public class RelationalSchemaGenerator {
 			addAncestorKeyColumns(table);
 		}
 		
+		//add parent (or ancestors) FK columns
 		if ( parentTable != null ) {
-			// Create FK column
-			Column<?> fkColumn = new DataParentKeyColumn(getTablePKColumnName(parentTable));
-			table.addColumn(fkColumn);
-			// Create FK constraint
-			String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + parentTable.getBaseName();
-			PrimaryKeyConstraint parentPKConstraint = parentTable.getPrimaryKeyConstraint();
-			ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, parentPKConstraint, fkColumn);
-			table.addConstraint(fkConstraint);
-			// Attach to parent table
+			int parentLevel = 1;
+			addForeignKey(table, parentTable, parentLevel);
+			
 			parentTable.addChildTable(table);
+			
+			if (config.isAncestorFKColumnsIncluded()) {
+				List<DataTable> ancestorTables = parentTable.getAncestors();
+				for (int i = 0; i < ancestorTables.size(); i++) {
+					DataTable ancestorTable = ancestorTables.get(i);
+					int level = parentLevel + (i + 1);
+					addForeignKey(table, ancestorTable, level);
+					ancestorTable = ancestorTable.getParent();
+				}
+			}
 		}
 		return table;
+	}
+
+	private void addForeignKey(DataTable fromTable, DataTable toTable, int level) {
+		int parentDefId = toTable.getNodeDefinition().getId();
+		DataAncestorFKColumn fkColumn = new DataAncestorFKColumn(getTablePKColumnName(toTable), parentDefId, level);
+		fromTable.addColumn(fkColumn);
+		addForeignKeyConstraint(fromTable, toTable, fkColumn);
+	}
+
+	private void addForeignKeyConstraint(DataTable table, DataTable referencedTable, Column<?> fkColumn) {
+		String fkConstraintName = config.getFkConstraintPrefix() + table.getBaseName() + "_" + referencedTable.getBaseName();
+		PrimaryKeyConstraint referencedTablePKConstraint = referencedTable.getPrimaryKeyConstraint();
+		ReferentialConstraint fkConstraint = new ReferentialConstraint(fkConstraintName, table, referencedTablePKConstraint, fkColumn);
+		table.addConstraint(fkConstraint);
 	}
 
 	protected void addPKColumn(DataTable table) {
@@ -254,7 +274,7 @@ public class RelationalSchemaGenerator {
 	
 	protected void addAncestorKeyColumns(DataTable table) throws CollectRdbException {
 		NodeDefinition nodeDefn = table.getNodeDefinition();
-		List<EntityDefinition> ancestors = nodeDefn.getAncestorEntityDefinitions();
+		List<EntityDefinition> ancestors = nodeDefn.getAncestorEntityDefinitionsInReverseOrder();
 		for (int levelIdx = 0; levelIdx < ancestors.size(); levelIdx++) {
 			EntityDefinition ancestor = ancestors.get(levelIdx);
 			List<AttributeDefinition> keyAttrDefns = ancestor.getKeyAttributeDefinitions();
@@ -270,14 +290,8 @@ public class RelationalSchemaGenerator {
 	
 	protected FieldDefinition<?> getKeyAttributeValueFieldDefinition(
 			AttributeDefinition defn) {
-		FieldDefinition<?> fieldDefn;
-		if ( defn instanceof CodeAttributeDefinition ) {
-			fieldDefn = defn.getFieldDefinition(CodeAttributeDefinition.CODE_FIELD);
-		} else if ( defn instanceof NumberAttributeDefinition ) {
-			fieldDefn = defn.getFieldDefinition(NumberAttributeDefinition.VALUE_FIELD);
-		} else if ( defn instanceof TextAttributeDefinition ) {
-			fieldDefn = defn.getFieldDefinition("value"); //TODO create constant in TextAttributeDefinition
-		} else {
+		FieldDefinition<?> fieldDefn = defn.getMainFieldDefinition();
+		if (fieldDefn == null) {
 			throw new IllegalArgumentException("Invalid key attribute definition type: " + defn.getClass().getName());
 		}
 		return fieldDefn;
@@ -427,7 +441,7 @@ public class RelationalSchemaGenerator {
 		String codeListTableName = CodeListTables.getTableName(config, list, levelIdx);
 		DataColumn codeValueColumn = table.getDataColumn(attrDefn.getFieldDefinition(CodeAttributeDefinition.CODE_FIELD));
 		String codeValueColumnName = codeValueColumn.getName();
-		String fkColumnName = codeValueColumnName + config.getCodeListTableSuffix() + config.getIdColumnSuffix();
+		String fkColumnName = DataTables.getCodeFKColumnName(config, table, attrDefn);
 		CodeValueFKColumn col = new CodeValueFKColumn(fkColumnName, attrDefn, relativePath,
 				config.getDefaultCode());
 		addColumn(table, col);

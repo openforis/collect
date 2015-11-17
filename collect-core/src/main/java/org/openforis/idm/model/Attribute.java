@@ -6,9 +6,7 @@ package org.openforis.idm.model;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -25,7 +23,6 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 
 	private Field<?>[] fields;
 	private List<Field<?>> fieldList;
-	private Map<String, Field<?>> fieldByName;
 	private transient ValidationResults validationResults;
 	//summary info
 	private transient boolean empty;
@@ -56,28 +53,23 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 	private void initFields() {
 		List<FieldDefinition<?>> fieldsDefinitions = definition.getFieldDefinitions();
 		this.fields = new Field<?>[fieldsDefinitions.size()];
-		this.fieldByName = new LinkedHashMap<String, Field<?>>(fieldsDefinitions.size());
 		for (int i = 0; i < fieldsDefinitions.size(); i++) {
 			FieldDefinition<?> fieldDefn = fieldsDefinitions.get(i);
 			Field<?> field = (Field<?>) fieldDefn.createNode();
 			field.setAttribute(this);
 			field.index = i;
 			this.fields[i] = field;
-			this.fieldByName.put(fieldDefn.getName(), field);
 		}
-		fieldList = Collections.unmodifiableList(Arrays.asList(fields));
+		this.fieldList = Collections.unmodifiableList(Arrays.asList(fields));
 	}
 	
 	public Field<?> getField(int idx) {
 		return fields[idx];
 	}
 	
-	/**
-	 * @param name
-	 * @return the field requested, or null if field name is invalid
-	 */
 	public Field<?> getField(String name) {
-		return fieldByName.get(name);
+		int fieldIndex = definition.getFieldNames().indexOf(name);
+		return getField(fieldIndex);
 	}
 
 	public List<Field<?>> getFields() {
@@ -247,4 +239,5 @@ public abstract class Attribute<D extends AttributeDefinition, V extends Value> 
 		}
 		return compareToBuilder.toComparison();
 	}
+
 }

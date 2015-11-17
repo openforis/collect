@@ -19,9 +19,4 @@ public class CodeListCodeColumn extends AbstractColumn<CodeListItem> {
 		super(name, Types.VARCHAR, "varchar", MAX_LENGTH, false);
 	}
 
-	@Override
-	public Object extractValue(CodeListItem item) {
-		return item.getCode();
-	}
-
 }

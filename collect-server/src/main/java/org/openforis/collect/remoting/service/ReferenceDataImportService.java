@@ -1,6 +1,6 @@
 package org.openforis.collect.remoting.service;
 
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.proxy.ReferenceDataImportStatusProxy;
 import org.openforis.collect.utils.ExecutorServiceUtil;
@@ -15,7 +15,7 @@ import org.springframework.security.access.annotation.Secured;
 public abstract class ReferenceDataImportService<S extends ReferenceDataImportStatusProxy, P extends AbstractProcess<Void, ?>> {
 	
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	
 	protected P importProcess;
 	

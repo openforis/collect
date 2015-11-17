@@ -3,6 +3,7 @@
  */
 package org.openforis.collect.manager;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -21,12 +22,13 @@ import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.MissingRecordKeyException;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordDao;
+import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
 import org.openforis.collect.persistence.RecordLockedException;
 import org.openforis.collect.persistence.RecordNotOwnedException;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.persistence.RecordUnlockedException;
 import org.openforis.collect.persistence.RecordValidationInProgressException;
-import org.openforis.collect.persistence.RecordDao.RecordStoreQuery;
+import org.openforis.collect.utils.Consumer;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -79,6 +81,12 @@ public class RecordManager {
 
 	protected void init() {
 		lockManager = new RecordLockManager(lockTimeoutMillis);
+	}
+	
+	@Transactional
+	public void saveAndRun(CollectRecord record, Runnable callback) {
+		save(record);
+		callback.run();
 	}
 	
 	@Transactional
@@ -138,6 +146,27 @@ public class RecordManager {
 	@Transactional
 	public void execute(List<RecordStoreQuery> queries) {
 		recordDao.execute(queries);
+	}
+	
+	@Transactional
+	public void executeRecordOperations(List<RecordOperations> operationsForRecords, Consumer<RecordStepOperation> consumer) {
+		int nextId = nextId();
+		List<RecordStoreQuery> queries = new ArrayList<RecordStoreQuery>();
+		for (RecordOperations recordOperations : operationsForRecords) {
+			List<RecordStepOperation> operations = recordOperations.getOperations();
+			for (RecordStepOperation operation : operations) {
+				CollectRecord record = operation.getRecord();
+				if (operation.isInsert()) {
+					recordOperations.initializeRecordId(nextId ++);
+					queries.add(createInsertQuery(record));
+				} else {
+					queries.add(createUpdateQuery(record));
+				}
+				consumer.consume(operation);
+			}
+		}
+		execute(queries);
+		restartIdSequence(nextId);
 	}
 	
 	@Transactional
@@ -236,8 +265,7 @@ public class RecordManager {
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate, boolean addEmptyMultipleEntities) {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber(), validate);
 		recordConverter.convertToLatestVersion(record);
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.initializeRecord(record, validate, addEmptyMultipleEntities);
+		updater.initializeRecord(record, validate, addEmptyMultipleEntities);
 		return record;
 	}
 	
@@ -343,6 +371,7 @@ public class RecordManager {
 		}
 		return true;
 	}
+	
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName) throws RecordPersistenceException {
 		return create(survey, rootEntityName, user, modelVersionName, (String) null);
 	}
@@ -356,22 +385,38 @@ public class RecordManager {
 	}
 	
 	public CollectRecord create(CollectSurvey survey, String rootEntityName, User user, String modelVersionName, String sessionId, Step step) throws RecordPersistenceException {
+		CollectRecord record = instantiateRecord(survey, rootEntityName, user,
+				modelVersionName, step);
+		initializeRecord(record);
+		return record;
+	}
+
+	public NodeChangeSet initializeRecord(CollectRecord record) {
+		return updater.initializeNewRecord(record);
+	}
+
+	public CollectRecord instantiateRecord(CollectSurvey survey,
+			String rootEntityName, User user, String modelVersionName, Step step) {
 		CollectRecord record = survey.createRecord(modelVersionName);
 		record.createRootEntity(rootEntityName);
 		record.setCreationDate(new Date());
 		record.setCreatedBy(user);
 		record.setStep(step);
-
-		RecordUpdater recordUpdater = new RecordUpdater();
-		recordUpdater.initializeNewRecord(record);
 		return record;
 	}
 
 
 	@Transactional
-	public void promote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPromoteException, MissingRecordKeyException {
+	public CollectRecord promote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPromoteException, MissingRecordKeyException {
 		CollectRecord record = load(survey, recordId, currentStep);
 		performPromote(record, user);
+		return record;
+	}
+	
+	@Transactional
+	public void promote(CollectSurvey survey, int recordId, Step currentStep, User user, RecordCallback callback) throws RecordPromoteException, MissingRecordKeyException {
+		CollectRecord record = promote(survey, recordId, currentStep, user);
+		callback.run(record);
 	}
 	
 	/**
@@ -428,7 +473,7 @@ public class RecordManager {
 	}
 
 	@Transactional
-	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
+	public CollectRecord demote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPersistenceException {
 		Step prevStep = currentStep.getPrevious();
 		CollectRecord record = recordDao.load( survey, recordId, prevStep.getStepNumber() );
 		record.setModifiedBy( user );
@@ -438,6 +483,13 @@ public class RecordManager {
 		record.setState( State.REJECTED );
 		validate(record);
 		recordDao.update( record );
+		return record;
+	}
+
+	@Transactional
+	public void demote(CollectSurvey survey, int recordId, Step currentStep, User user, RecordCallback callback) throws RecordPersistenceException {
+		CollectRecord record = demote(survey, recordId, currentStep, user);
+		callback.run(record);
 	}
 	
 	@Transactional
@@ -697,5 +749,94 @@ public class RecordManager {
     public void setSurveyManager(SurveyManager surveyManager) {
         this.surveyManager = surveyManager;
     }
+
+    public interface RecordCallback {
+    	
+    	void run(CollectRecord record);
+    	
+    }
+
+	public static class RecordStepOperation {
+		
+		private CollectRecord record;
+		private Step step;
+		private boolean insert;
+		
+		public RecordStepOperation(CollectRecord record, Step step, boolean insert) {
+			super();
+			this.record = record;
+			this.step = step;
+			this.insert = insert;
+		}
+		
+		public CollectRecord getRecord() {
+			return record;
+		}
+		
+		private Step getStep() {
+			return step;
+		}
+		
+		public boolean isInsert() {
+			return insert;
+		}
+	}
+	
+	public static class RecordOperations {
+		
+		private Integer recordId;
+		private Step originalStep;
+		private Step lastUpdatedStep;
+		private List<RecordStepOperation> operations = new ArrayList<RecordStepOperation>();
+		
+		public void initializeRecordId(Integer recordId) {
+			this.recordId = recordId;
+			for (RecordStepOperation operation : operations) {
+				operation.getRecord().setId(recordId);
+			}
+		}
+		
+		public boolean isEmpty() {
+			return operations.isEmpty();
+		}
+		
+		public boolean hasMissingSteps() {
+			return originalStep != null && originalStep.after(lastUpdatedStep);
+		}
+
+		public void addUpdate(CollectRecord record, Step step) {
+			add(new RecordStepOperation(record, step, false));
+		}
+
+		public void addInsert(CollectRecord record, Step step) {
+			add(new RecordStepOperation(record, step, true));
+		}
+		
+		private void add(RecordStepOperation operation) {
+			operations.add(operation);
+			lastUpdatedStep = operation.getStep();
+		}
+		
+		public List<RecordStepOperation> getOperations() {
+			return operations;
+		}
+		
+		public Integer getRecordId() {
+			return recordId;
+		}
+		
+		public Step getOriginalStep() {
+			return originalStep;
+		}
+		
+		public void setOriginalStep(Step originalStep) {
+			this.originalStep = originalStep;
+		}
+		
+		public Step getLastUpdatedStep() {
+			return lastUpdatedStep;
+		}
+
+	}
 
 }

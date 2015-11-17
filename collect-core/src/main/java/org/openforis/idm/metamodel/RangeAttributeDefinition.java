@@ -36,7 +36,7 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 	RangeAttributeDefinition(Survey survey, int id) {
 		super(survey, id);
 	}
-	
+
 	RangeAttributeDefinition(RangeAttributeDefinition obj, int id) {
 		super(obj, id);
 	}
@@ -120,7 +120,29 @@ public class RangeAttributeDefinition extends NumericAttributeDefinition {
 		case REAL:
 			return realFieldDefinitionByName;
 		default:
-			throw new UnsupportedOperationException("Unknown type");
+			throw new UnsupportedOperationException("Unknown type: " + getType().name());
+		}
+	}
+	
+	public FieldDefinition<?> getFromFieldDefinition() {
+		switch (getType()) {
+		case INTEGER:
+			return integerFromField;
+		case REAL:
+			return realFromField;
+		default:
+			throw new UnsupportedOperationException("Unknown type: " + getType().name());
+		}
+	}
+	
+	public FieldDefinition<?> getToFieldDefinition() {
+		switch (getType()) {
+		case INTEGER:
+			return integerToField;
+		case REAL:
+			return realToField;
+		default:
+			throw new UnsupportedOperationException("Unknown type: " + getType().name());
 		}
 	}
 	

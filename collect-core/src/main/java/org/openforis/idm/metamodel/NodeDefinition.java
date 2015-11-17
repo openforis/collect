@@ -293,6 +293,9 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		return false;
 	}
 
+	/**
+	 * Returns the ancestor definitions from the nearest parent entity to the root
+	 */
 	public List<EntityDefinition> getAncestorEntityDefinitions() {
 		List<EntityDefinition> result = new ArrayList<EntityDefinition>();
 		EntityDefinition currentParent = getParentEntityDefinition();
@@ -300,8 +303,15 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 			result.add(currentParent);
 			currentParent = currentParent.getParentEntityDefinition();
 		}
+		return result;
+	}
+	
+	/**
+	 * Returns the ancestor definitions from the root to the nearest parent entity
+	 */
+	public List<EntityDefinition> getAncestorEntityDefinitionsInReverseOrder() {
+		List<EntityDefinition> result = getAncestorEntityDefinitions();
 		if (result.size() > 1) {
-			//return the ancestor definitions from root to nearest parent entity
 			Collections.reverse(result); 
 		}
 		return result;
@@ -310,21 +320,13 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 	public EntityDefinition getNearestCommonAncestor(NodeDefinition nodeDefinition) {
 		List<EntityDefinition> thisAncestorEntityDefinitions = this.getAncestorEntityDefinitions();
 		List<EntityDefinition> otherAncestors = nodeDefinition.getAncestorEntityDefinitions();
-		EntityDefinition lastCommonAncestor = null;
-		for (int i = 0; i < thisAncestorEntityDefinitions.size(); i++) {
-			if ( otherAncestors.size() > i ) {
-				EntityDefinition thisAncestor = thisAncestorEntityDefinitions.get(i);
-				EntityDefinition otherAncestor = otherAncestors.get(i);
-				if ( thisAncestor == otherAncestor ) {
-					lastCommonAncestor = thisAncestor;
-				} else {
-					break;
-				}
-			} else {
-				break;
+		
+		for (EntityDefinition thisAncestor : thisAncestorEntityDefinitions) {
+			if (otherAncestors.contains(thisAncestor)) {
+				return thisAncestor;
 			}
 		}
-		return lastCommonAncestor;
+		return null;
 	}
 	
 	public EntityDefinition getNearestAncestorMultipleEntity() {

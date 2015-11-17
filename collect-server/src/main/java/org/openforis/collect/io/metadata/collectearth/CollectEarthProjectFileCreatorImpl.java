@@ -81,7 +81,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		File placemarkFile = createPlacemark(survey);
 		File projectProperties = generateProjectProperties(survey,language);
 		File balloon = generateBalloon(survey, language);
-		File cube = generateCube(survey);
+		File cube = generateCube(survey, language);
 		File kmlTemplate = generateKMLTemplate(survey);
 		File testPlotsCSVFile = generateTestPlotsCSVFile(survey);
 		File readmeFile = getFileFromResouces(README_FILE_PATH);
@@ -365,8 +365,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		}
 	}
 	
-	private File generateCube(CollectSurvey survey) throws IOException {
-		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey);
+	private File generateCube(CollectSurvey survey, String language) throws IOException {
+		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey, language);
 		String xmlSchema = cubeGenerator.generateXMLSchema();
 		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
 	}

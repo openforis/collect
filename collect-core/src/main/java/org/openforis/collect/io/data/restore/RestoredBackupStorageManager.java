@@ -36,13 +36,6 @@ public class RestoredBackupStorageManager extends BaseStorageManager {
 
 	protected void initStorageDirectory() {
 		super.initStorageDirectory(ConfigurationItem.RESTORED_BACKUP_STORAGE_PATH);
-		if ( storageDirectory == null ) {
-			String message = "Restored backup directory not configured properly";
-			LOG.error(message);
-			throw new IllegalStateException(message);
-		} else if ( LOG.isInfoEnabled() ) {
-			LOG.info("Using restored backup storage directory: " + storageDirectory.getAbsolutePath());
-		}
 	}
 
 	public File storeTemporaryFile(String surveyName, File file) {

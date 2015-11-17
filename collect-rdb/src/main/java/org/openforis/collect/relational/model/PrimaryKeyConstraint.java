@@ -8,7 +8,11 @@ package org.openforis.collect.relational.model;
  */
 public class PrimaryKeyConstraint extends UniquenessConstraint {
 
-	PrimaryKeyConstraint(String name, Table<?> table, Column<?>... columns) {
-		super(name, table, columns);
+	PrimaryKeyConstraint(String name, Table<?> table, Column<?> column) {
+		super(name, table, column);
+	}
+	
+	public Column<?> getPrimaryKeyColumn() {
+		return getColumns().get(0);
 	}
 }

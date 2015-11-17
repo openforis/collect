@@ -7,10 +7,9 @@ import java.io.Writer;
 import org.apache.commons.io.IOUtils;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.relational.data.CodeTableDataExtractor;
-import org.openforis.collect.relational.data.DataTableDataExtractor;
+import org.openforis.collect.relational.data.DataExtractorFactory;
 import org.openforis.collect.relational.data.RecordIterator;
-import org.openforis.collect.relational.data.Row;
+import org.openforis.collect.relational.data.internal.CodeTableDataExtractor;
 import org.openforis.collect.relational.model.CodeTable;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
@@ -177,7 +176,7 @@ public class RDBPrintJob extends Job {
 		protected long countTotalItems() {
 			long total = 0;
 			for (CodeTable codeTable : schema.getCodeListTables()) {
-				CodeTableDataExtractor extractor = new CodeTableDataExtractor(codeTable);
+				CodeTableDataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
 				total += extractor.getTotal();
 			}
 			return total;
@@ -189,14 +188,15 @@ public class RDBPrintJob extends Job {
 				if(!isRunning()) {
 					return;
 				}
-				CodeTableDataExtractor extractor = new CodeTableDataExtractor(codeTable) {
-					public Row next() {
-						Row row = super.next();
-						incrementItemsProcessed();
-						return row;
-					}
-				};
-				writeBatchInsert(codeTable, extractor);
+//				CodeTableDataExtractor extractor = new CodeTableDataExtractor(codeTable) {
+//				public Row next() {
+//					Row row = super.next();
+//					incrementItemsProcessed();
+//					return row;
+//				}
+//			};
+				CodeTableDataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
+				setItemsProcessed(getItemsProcessed() + extractor.getTotal());
 			}
 		}
 		
@@ -219,8 +219,7 @@ public class RDBPrintJob extends Job {
 					if(!isRunning()) {
 						return;
 					}
-					DataTableDataExtractor extractor = new DataTableDataExtractor(table, record);
-					writeBatchInsert(table, extractor);
+					writeBatchInsert(table, DataExtractorFactory.getRecordDataExtractor(table, record));
 				}
 				incrementItemsProcessed();
 			}

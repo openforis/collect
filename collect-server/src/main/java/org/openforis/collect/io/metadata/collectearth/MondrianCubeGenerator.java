@@ -40,9 +40,11 @@ public class MondrianCubeGenerator {
 	
 	private CollectSurvey survey;
 	private RelationalSchemaConfig rdbConfig;
+	private String language;
 
-	public MondrianCubeGenerator(CollectSurvey survey) {
+	public MondrianCubeGenerator(CollectSurvey survey, String language) {
 		this.survey = survey;
+		this.language = language;
 		this.rdbConfig = new RelationalSchemaContext().getRdbConfig();
 	}
 	
@@ -143,7 +145,9 @@ public class MondrianCubeGenerator {
 		// DEPRECATED 07/08/2015 : From now on all the operations to calculate the aspect,elevation,slope and initial land use class are made through Calculated Members
 //		cube.dimensions.addAll(generatePredefinedDimensions());
 		//add predefined measures
-		cube.measures.addAll(0, generatePredefinedMeasures());
+		
+		// Add the measures AFTER the 1st measure, which shouyld be Plot Count
+		cube.measures.addAll(1, generatePredefinedMeasures());
 		return cube;
 	}
 
@@ -328,7 +332,7 @@ public class MondrianCubeGenerator {
 			String codeTableName = extractCodeListTableName(codeDef);
 			level.table = codeTableName;
 			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
-			level.nameColumn = codeTableName.substring(0, codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + survey.getDefaultLanguage();
+			level.nameColumn = codeTableName.substring(0, codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + language ;
 		} else {
 			level.column = attrName;
 		}
@@ -336,7 +340,7 @@ public class MondrianCubeGenerator {
 	}
 
 	private String extractLabel(NodeDefinition nodeDef) {
-		String attrLabel = nodeDef.getLabel(NodeLabel.Type.INSTANCE);
+		String attrLabel = nodeDef.getLabel(NodeLabel.Type.INSTANCE, language);
 		if (attrLabel == null) {
 			attrLabel = nodeDef.getName();
 		}

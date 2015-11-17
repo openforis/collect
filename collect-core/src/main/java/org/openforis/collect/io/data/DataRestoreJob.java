@@ -5,6 +5,7 @@ package org.openforis.collect.io.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,11 +45,16 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private List<Integer> entryIdsToImport; //ignored when overwriteAll is true
 	private boolean storeRestoredFile;
 	private File tempFile;
+	
+	//output
+	private List<RecordImportError> errors;
+		
 	private boolean validateRecords;
 
 	@Override
 	public void createInternalVariables() throws Throwable {
 		super.createInternalVariables();
+		this.errors = new ArrayList<RecordImportError>();
 	}
 	
 	@Override
@@ -115,6 +121,14 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	}
 	
 	@Override
+	protected void onTaskCompleted(Worker task) {
+		super.onTaskCompleted(task);
+		if (task instanceof DataRestoreTask) {
+			this.errors.addAll(((DataRestoreTask) task).getErrors());
+		}
+	}
+	
+	@Override
 	protected void onCompleted() {
 		super.onCompleted();
 		if (storeRestoredFile) {
@@ -176,6 +190,10 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	
 	public void setStoreRestoredFile(boolean storeRestoredFile) {
 		this.storeRestoredFile = storeRestoredFile;
+	}
+	
+	public List<RecordImportError> getErrors() {
+		return errors;
 	}
 
 	public void setValidateRecords(boolean validateRecords) {

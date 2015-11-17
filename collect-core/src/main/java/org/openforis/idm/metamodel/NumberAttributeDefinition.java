@@ -114,6 +114,21 @@ public class NumberAttributeDefinition extends NumericAttributeDefinition {
 	public String getMainFieldName() {
 		return VALUE_FIELD;
 	}
+	
+	public FieldDefinition<?> getValueFieldDefinition() {
+		switch(getType()) {
+		case INTEGER:
+			return integerValueField;
+		case REAL:
+			return realValueField;
+		default:
+			throw new UnsupportedOperationException("Unsupported number attribute value type: " + getType().name());
+		}
+	}
+	
+	public FieldDefinition<Integer> getUnitIdFieldDefinition() {
+		return unitIdField;
+	}
 
 	@Override
 	public int hashCode() {

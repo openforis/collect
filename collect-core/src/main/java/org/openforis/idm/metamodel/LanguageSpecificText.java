@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author G. Miceli
  * @author M. Togna
  */
-public class LanguageSpecificText implements Serializable {
+public class LanguageSpecificText implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -67,6 +67,11 @@ public class LanguageSpecificText implements Serializable {
 	@Override
 	public String toString() {
 		return String.format("%s [%s]", text, language);
+	}
+	
+	@Override
+	public LanguageSpecificText clone() throws CloneNotSupportedException {
+		return (LanguageSpecificText) super.clone();
 	}
 	
 }

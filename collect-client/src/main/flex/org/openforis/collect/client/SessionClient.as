@@ -19,7 +19,7 @@ package org.openforis.collect.client {
 		private var _setActivePreviewSurveyOperation:Operation;
 		
 		public function SessionClient() {
-			super("sessionService");
+			super("collectSessionService");
 			
 			this._keepAliveOperation = getOperation("keepAlive", CONCURRENCY_LAST);
 			this._initSessionOperation = getOperation("initSession");

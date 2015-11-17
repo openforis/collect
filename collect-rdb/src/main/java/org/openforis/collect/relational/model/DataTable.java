@@ -2,6 +2,7 @@ package org.openforis.collect.relational.model;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FieldDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.model.Node;
@@ -26,6 +28,8 @@ public class DataTable extends AbstractTable<Node<?>> {
 	private DataTable parent;
 	private List<DataTable> childTables;
 	private Map<Integer, CodeValueFKColumn> foreignKeyCodeColumns;
+	private Map<Integer, DataAncestorFKColumn> ancestorFKColumnsByDefinitionId;
+	private DataAncestorFKColumn parentFKColumn;
 	
 	DataTable(String prefix, String name, DataTable parent, NodeDefinition defn, Path relativePath) throws CollectRdbException {
 		super(prefix, name);
@@ -34,6 +38,7 @@ public class DataTable extends AbstractTable<Node<?>> {
 		this.relativePath = relativePath;
 		this.childTables = new ArrayList<DataTable>();
 		this.foreignKeyCodeColumns = new HashMap<Integer, CodeValueFKColumn>();
+		this.ancestorFKColumnsByDefinitionId = new HashMap<Integer, DataAncestorFKColumn>();
 	}
 
 	@Override
@@ -42,7 +47,30 @@ public class DataTable extends AbstractTable<Node<?>> {
 		if ( column instanceof CodeValueFKColumn ) {
 			int attrDefnId = ((CodeValueFKColumn) column).getAttributeDefinition().getId();
 			foreignKeyCodeColumns.put(attrDefnId, (CodeValueFKColumn) column);
+		} if (column instanceof DataAncestorFKColumn) {
+			DataAncestorFKColumn ancestorFKColumn = (DataAncestorFKColumn) column;
+			ancestorFKColumnsByDefinitionId.put(ancestorFKColumn.getAncestorDefinitionId(), ancestorFKColumn);
+			if (ancestorFKColumn.isParentFKColumn()) {
+				parentFKColumn = ancestorFKColumn;
+			}
 		}
+	}
+	
+	public DataAncestorFKColumn getRecordIdColumn() {
+		EntityDefinition rootEntityDef = definition.getRootEntity();
+		return getAncestorFKColumn(rootEntityDef.getId());
+	}
+	
+	public Collection<DataAncestorFKColumn> getAncestorFKColumns() {
+		return ancestorFKColumnsByDefinitionId.values();
+	}
+	
+	public DataAncestorFKColumn getAncestorFKColumn(int definitionId) {
+		DataAncestorFKColumn column = ancestorFKColumnsByDefinitionId.get(definitionId);
+		if (column == null) {
+			throw new IllegalStateException("No ancestor id column found in table " + getName() + " for definition id " + definitionId);
+		}
+		return column;
 	}
 	
 	public CodeValueFKColumn getForeignKeyCodeColumn(CodeAttributeDefinition defn) {
@@ -69,42 +97,6 @@ public class DataTable extends AbstractTable<Node<?>> {
 		out.flush();
 	}
 	
-	public DataTable getParent() {
-		return parent;
-	}
-	
-	public Path getRelativePath() {
-		return relativePath;
-	}
-	
-	void addChildTable(DataTable table) {
-		childTables.add(table);
-	}
-	
-	public List<DataTable> getChildTables() {
-		return childTables;
-	}
-
-	public DataPrimaryKeyColumn getPrimaryKeyColumn() {
-		List<Column<?>> columns = getColumns();
-		for (Column<?> c : columns) {
-			if ( c instanceof DataPrimaryKeyColumn ) {
-				return (DataPrimaryKeyColumn) c;
-			}
-		}
-		return null;
-	}
-	
-	public DataParentKeyColumn getParentKeyColumn() {
-		List<Column<?>> columns = getColumns();
-		for (Column<?> c : columns) {
-			if ( c instanceof DataParentKeyColumn ) {
-				return (DataParentKeyColumn) c;
-			}
-		}
-		return null;
-	}
-	
 	public List<DataColumn> getDataColumns(AttributeDefinition attributeDefinition) {
 		List<DataColumn> result = new ArrayList<DataColumn>();
 		int attributeDefinitionId = attributeDefinition.getId();
@@ -112,8 +104,8 @@ public class DataTable extends AbstractTable<Node<?>> {
 			if ( column instanceof DataColumn ) {
 				DataColumn dataCol = (DataColumn) column;
 				AttributeDefinition columnAttrDefn = dataCol.getAttributeDefinition();
-				if ( ! ( dataCol instanceof CodeValueFKColumn ) && 
-						columnAttrDefn.getId() == attributeDefinitionId ) {
+				if ( columnAttrDefn.getId() == attributeDefinitionId 
+						&& ! ( dataCol instanceof CodeValueFKColumn )) {
 					result.add(dataCol); 
 				}
 			}
@@ -134,4 +126,44 @@ public class DataTable extends AbstractTable<Node<?>> {
 		}
 		return null;
 	}
+	
+	public List<DataTable> getAncestors() {
+		List<DataTable> result = new ArrayList<DataTable>();
+		DataTable ancestor = getParent();
+		while (ancestor != null) {
+			result.add(ancestor);
+			ancestor = ancestor.getParent();
+		}
+		return result;
+	}
+
+	public DataTable getParent() {
+		return parent;
+	}
+	
+	public Path getRelativePath() {
+		return relativePath;
+	}
+	
+	void addChildTable(DataTable table) {
+		childTables.add(table);
+	}
+	
+	public List<DataTable> getChildTables() {
+		return childTables;
+	}
+
+	public DataPrimaryKeyColumn getPrimaryKeyColumn() {
+		PrimaryKeyConstraint pkConstraint = getPrimaryKeyConstraint();
+		return (DataPrimaryKeyColumn) pkConstraint.getPrimaryKeyColumn();
+	}
+	
+	public DataAncestorFKColumn getParentFKColumn() {
+		return parentFKColumn;
+	}
+	
+	public void setParentFKColumn(DataAncestorFKColumn parentFKColumn) {
+		this.parentFKColumn = parentFKColumn;
+	}
+	
 }

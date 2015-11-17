@@ -24,6 +24,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.Collect;
 import org.openforis.collect.datacleansing.manager.SurveyDataCleansingManager;
+import org.openforis.collect.event.EventQueue;
+import org.openforis.collect.event.SurveyUpdatedEvent;
 import org.openforis.collect.io.exception.CodeListImportException;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.manager.process.ProcessStatus;
@@ -78,6 +80,8 @@ public class SurveyManager {
 	@Autowired
 	private CollectSurveyIdmlBinder surveySerializer;
 	@Autowired(required=false)
+	private EventQueue eventQueue;
+	@Autowired(required=false)
 	private SurveyDataCleansingManager dataCleansingManager;
 	
 	private List<CollectSurvey> surveys;
@@ -95,7 +99,6 @@ public class SurveyManager {
 		recordValidationStatusBySurvey = Collections.synchronizedMap(new HashMap<Integer, ProcessStatus>());
 	}
 
-	@Transactional
 	public void init() {
 		initPublishedSurveysCache();
 	}
@@ -130,19 +133,16 @@ public class SurveyManager {
 		return CollectionUtils.unmodifiableList(surveys);
 	}
 	
-	@Transactional
 	public CollectSurvey get(String name) {
 		CollectSurvey survey = surveysByName.get(name);
 		return survey;
 	}
 	
-	@Transactional
 	public CollectSurvey getById(int id) {
 		CollectSurvey survey = surveysById.get(id);
 		return survey;
 	}
 	
-	@Transactional
 	public CollectSurvey getByUri(String uri) {
 		CollectSurvey survey = surveysByUri.get(uri);
 		return survey;
@@ -600,7 +600,6 @@ public class SurveyManager {
 		return survey;
 	}
 	
-	@Transactional
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		if ( includeDetails ) {
@@ -618,16 +617,14 @@ public class SurveyManager {
 		return summaries;
 	}
 	
-	@Transactional
 	public SurveySummary loadTemporarySummaryByUri(String uri) {
 		return surveyDao.loadSurveySummaryByUri(uri, true);
 	}
-	@Transactional
+
 	public SurveySummary loadTemporarySummaryByName(String name) {
 		return surveyDao.loadSurveySummaryByName(name, true);
 	}
 	
-	@Transactional
 	public boolean isSurveyTemporary(CollectSurvey survey) {
 		Integer id = survey.getId();
 		String uri = survey.getUri();
@@ -792,10 +789,14 @@ public class SurveyManager {
 			surveyDao.delete(temporarySurveyId);
 			CollectSurvey oldPublishedSurvey = getById(oldPublishedSurveyId);
 			if (oldPublishedSurvey != null) {
-				removeFromCache(oldPublishedSurvey);
-			}
+			removeFromCache(oldPublishedSurvey);
+		}
 		}
 		addToCache(survey);
+		
+		if (eventQueue != null && eventQueue.isEnabled()) {
+			eventQueue.publish(new SurveyUpdatedEvent(survey.getName()));
+		}
 	}
 	
 	/**

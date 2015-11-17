@@ -5,7 +5,7 @@ package org.openforis.collect.relational;
  * @author G. Miceli
  *
  */
-public class CollectRdbException extends Exception {
+public class CollectRdbException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

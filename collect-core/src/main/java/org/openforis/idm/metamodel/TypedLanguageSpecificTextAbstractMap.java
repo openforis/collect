@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.commons.collection.CollectionUtils;
 
 /**
  * 
@@ -36,10 +37,9 @@ public abstract class TypedLanguageSpecificTextAbstractMap<L extends TypedLangua
 		map = new LinkedHashMap<MapKey<T>, L>();
 	}
 	
-	@SuppressWarnings("unchecked")
-	TypedLanguageSpecificTextAbstractMap(TypedLanguageSpecificTextAbstractMap<?, ?> obj) {
+	TypedLanguageSpecificTextAbstractMap(TypedLanguageSpecificTextAbstractMap<L, T> obj) {
 		this();
-		this.map = (LinkedHashMap<MapKey<T>, L>) obj.map.clone();
+		CollectionUtils.cloneValuesInto(obj.map, this.map);
 	}
 	
 	public L get(T type, String language) {

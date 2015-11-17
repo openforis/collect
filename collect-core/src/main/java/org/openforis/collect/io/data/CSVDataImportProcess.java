@@ -37,6 +37,7 @@ import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.NodeAddChange;
 import org.openforis.collect.model.NodeChange;
+import org.openforis.collect.model.NodeChangeBatchProcessor;
 import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
@@ -60,7 +61,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
@@ -68,7 +68,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component("csvDataImportProcess")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@Transactional
 public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImportStatus<ParsingError>> {
 
 	private static Log LOG = LogFactory.getLog(CSVDataImportProcess.class);
@@ -89,6 +88,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	private RecordManager recordManager;
 	@Autowired
 	private UserManager userManager;
+	@Autowired
+	private NodeChangeBatchProcessor nodeChangeBatchProcessor;
 	
 	//parameters
 	/**
@@ -204,49 +205,53 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 	}
 
 	private void processLine(DataLine line) throws RecordPersistenceException {
-		if ( validateRecordKey(line) ) {
-			if ( settings.isInsertNewRecords() ) {
-				//create new record
-				EntityDefinition rootEntityDefn = survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId);
-				CollectRecord record = recordManager.create(survey, rootEntityDefn.getName(), adminUser, settings.getNewRecordVersionName());
-				setRecordKeys(line, record);
-				setValuesInRecord(line, record, Step.ENTRY);
-				insertRecord(record);
-			} else if ( step == null ) {
-				CollectRecord recordSummary = loadRecordSummary(line);
-				Step originalRecordStep = recordSummary.getStep();
-				//set values in each step data
-				for (Step currentStep : Step.values()) {
-					if ( currentStep.compareTo(originalRecordStep) <= 0  ) {
-						CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
-						setValuesInRecord(line, record, currentStep);
-						//always save record when updating multiple record steps in the same process
-						updateRecord(record, originalRecordStep, currentStep);
-					}
-				}
-			} else {
-				CollectRecord recordSummary = loadRecordSummary(line);
-				Step originalRecordStep = recordSummary.getStep();
-				if ( step.compareTo(originalRecordStep) <= 0 ) {
-					CollectRecord record;
-					if ( lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() ) ) {
-						//record changed
-						if ( lastModifiedRecordSummary != null ) {
-							saveLastModifiedRecord();
-						}
-						record = loadRecord(recordSummary.getId(), this.step);
-					} else {
-						record = lastModifiedRecord;
-					}
-					setValuesInRecord(line, record, step);
-					lastModifiedRecordSummary = recordSummary;
-					lastModifiedRecord = record;
-				} else {
-					status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
+		if (! validateRecordKey(line) ) {
+			return;
+		}
+		if ( settings.isInsertNewRecords() ) {
+			//create new record
+			EntityDefinition rootEntityDefn = survey.getSchema().getRootEntityDefinition(parentEntityDefinitionId);
+			CollectRecord record = recordManager.instantiateRecord(survey, rootEntityDefn.getName(), adminUser, settings.getNewRecordVersionName(), Step.ENTRY);
+			NodeChangeSet changes = recordManager.initializeRecord(record);
+			nodeChangeBatchProcessor.add(changes, adminUser.getName());
+			setRecordKeys(line, record);
+			setValuesInRecord(line, record, Step.ENTRY);
+			insertRecord(record);
+		} else if ( step == null ) {
+			CollectRecord recordSummary = loadRecordSummary(line);
+			Step originalRecordStep = recordSummary.getStep();
+			//set values in each step data
+			for (Step currentStep : Step.values()) {
+				if ( currentStep.beforeEqual(originalRecordStep) ) {
+					CollectRecord record = loadRecord(recordSummary.getId(), currentStep);
+					setValuesInRecord(line, record, currentStep);
+					//always save record when updating multiple record steps in the same process
+					updateRecord(record, originalRecordStep, currentStep);
 				}
 			}
-			status.addProcessedRow(line.getLineNumber());
+		} else {
+			CollectRecord recordSummary = loadRecordSummary(line);
+			Step originalRecordStep = recordSummary.getStep();
+			if ( step.beforeEqual(originalRecordStep) ) {
+				CollectRecord record;
+				boolean recordChanged = lastModifiedRecordSummary == null || ! recordSummary.getId().equals(lastModifiedRecordSummary.getId() );
+				if ( recordChanged ) {
+					//record changed
+					if ( lastModifiedRecordSummary != null ) {
+						saveLastModifiedRecord();
+					}
+					record = loadRecord(recordSummary.getId(), this.step);
+				} else {
+					record = lastModifiedRecord;
+				}
+				setValuesInRecord(line, record, step);
+				lastModifiedRecordSummary = recordSummary;
+				lastModifiedRecord = record;
+			} else {
+				status.addParsingError(new ParsingError(ErrorType.INVALID_VALUE, line.getLineNumber(), (String) null, RECORD_NOT_IN_SELECTED_STEP_MESSAGE_KEY));
+			}
 		}
+		status.addProcessedRow(line.getLineNumber());
 	}
 
 	private CollectRecord loadRecord(Integer recordId, Step step) {
@@ -264,7 +269,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		String parentEntitiesPath = getParentEntityDefinition().getPath();
 		List<Entity> entitiesToBeDeleted = record.findNodesByPath(parentEntitiesPath);
 		for (Entity entity : entitiesToBeDeleted) {
-			recordUpdater.deleteNode(entity, settings.recordValidationEnabled);
+			NodeChangeSet changes = recordUpdater.deleteNode(entity, settings.recordValidationEnabled);
+			nodeChangeBatchProcessor.add(changes, adminUser.getName());
 		}
 	}
 
@@ -365,7 +371,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				int tot = attributes.size();
 				for (int i = 0; i < tot; i++) {
 					Node<?> node = attributes.get(0);
-					recordUpdater.deleteNode(node, settings.recordValidationEnabled);
+					NodeChangeSet changes = recordUpdater.deleteNode(node, settings.recordValidationEnabled);
+					nodeChangeBatchProcessor.add(changes, adminUser.getName());
 				}
 			}
 		}
@@ -414,7 +421,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			@SuppressWarnings("unchecked")
 			Field<Object> field = (Field<Object>) attr.getField(fieldName);
 			Object fieldValue = field.parseValue(value);
-			recordUpdater.updateField(field, fieldValue, false, settings.recordValidationEnabled);
+			NodeChangeSet changes = recordUpdater.updateField(field, fieldValue, false, settings.recordValidationEnabled);
+			nodeChangeBatchProcessor.add(changes, adminUser.getName());
 		}
 	}
 
@@ -434,7 +442,8 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 		if ( valid ) {
 			Field<String> field = ((CoordinateAttribute) attr).getSrsIdField();
-			recordUpdater.updateField(field, value, false, settings.recordValidationEnabled);
+			NodeChangeSet changes = recordUpdater.updateField(field, value, false, settings.recordValidationEnabled);
+			nodeChangeBatchProcessor.add(changes, adminUser.getName());
 		}
 	}
 
@@ -452,14 +461,15 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 				status.addParsingError(parsingError);
 			} else {
 				Field<Integer> field = ((NumberAttribute<?, ?>) attr).getUnitField();
-				recordUpdater.updateField(field, unit.getId(), false, settings.recordValidationEnabled);
+				NodeChangeSet changes = recordUpdater.updateField(field, unit.getId(), false, settings.recordValidationEnabled);
+				nodeChangeBatchProcessor.add(changes, adminUser.getName());
 			}
 		}
 	}
 
 	private Entity getOrCreateParentEntity(Entity ancestorEntity, AttributeDefinition attrDefn) {
 		EntityDefinition ancestorEntityDefn = ancestorEntity.getDefinition();
-		List<EntityDefinition> attributeAncestors = attrDefn.getAncestorEntityDefinitions();
+		List<EntityDefinition> attributeAncestors = attrDefn.getAncestorEntityDefinitionsInReverseOrder();
 		int indexOfAncestorEntity = attributeAncestors.indexOf(ancestorEntityDefn);
 		if ( indexOfAncestorEntity < 0 ) {
 			throw new IllegalArgumentException("AttributeDefinition is not among the ancestor entity descendants");
@@ -481,7 +491,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		}
 	}
 
-	private void updateRecord(CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
+	private void updateRecord(final CollectRecord record, Step originalRecordStep, Step dataStep) throws RecordPersistenceException {
 		record.setModifiedDate(new Date());
 		record.setModifiedBy(adminUser);
 		
@@ -490,11 +500,19 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 			recordManager.save(record);
 			record.setStep(Step.ANALYSIS);
 		}
-		recordManager.save(record);
+		recordManager.saveAndRun(record, new Runnable() {
+			public void run() {
+				nodeChangeBatchProcessor.process(record);
+			}
+		});
 	}
 	
-	private void insertRecord(CollectRecord record) throws RecordPersistenceException {
-		recordManager.save(record);
+	private void insertRecord(final CollectRecord record) throws RecordPersistenceException {
+		recordManager.saveAndRun(record, new Runnable() {
+			public void run() {
+				nodeChangeBatchProcessor.process(record);
+			}
+		});
 	}
 	
 //	@SuppressWarnings("unchecked")
@@ -520,7 +538,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		EntityDefinition parentEntityDefn = (EntityDefinition) schema.getDefinitionById(parentEntityDefinitionId);
 		Entity rootEntity = record.getRootEntity();
 		Entity currentParent = rootEntity;
-		List<EntityDefinition> ancestorEntityDefns = parentEntityDefn.getAncestorEntityDefinitions();
+		List<EntityDefinition> ancestorEntityDefns = parentEntityDefn.getAncestorEntityDefinitionsInReverseOrder();
 		ancestorEntityDefns.add(parentEntityDefn);
 		//skip the root entity
 		for (int i = 1; i < ancestorEntityDefns.size(); i++) {
@@ -573,13 +591,7 @@ public class CSVDataImportProcess extends AbstractProcess<Void, ReferenceDataImp
 		} else {
 			EntityDefinition parentDefn = currentParent.getDefinition();
 			EntityDefinition childDefn = parentDefn.getChildDefinition(childName, EntityDefinition.class);
-			List<AttributeDefinition> keyDefns = childDefn.getKeyAttributeDefinitions();
-			String[] keys = new String[keyDefns.size()];
-			for (int i = 0; i < keyDefns.size(); i++) {
-				AttributeDefinition keyDefn = keyDefns.get(i);
-				String key = ((EntityKeysIdentifier) identifier).getKeyValue(keyDefn.getId());
-				keys[i] = key;
-			}
+			String[] keys = ((EntityKeysIdentifier) identifier).getKeyValues();
 			return currentParent.findChildEntitiesByKeys(childDefn, keys);
 		}
 	}

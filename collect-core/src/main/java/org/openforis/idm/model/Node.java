@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Schema;
@@ -28,26 +29,21 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 
 //	private final Log log = LogFactory.getLog(Node.class);
 	
-	transient D definition;
+	transient final D definition;
 	transient Record record;
 	transient Integer id;
 	transient Integer internalId;
 	transient Entity parent;
 	transient int index;
 	transient String path;
-	
-	Integer definitionId;
-
-	protected Node() {
-		this.index = 0;
-	}
+	transient boolean detached;
 	
 	public Node(D definition) {
 		if ( definition == null ) {
 			throw new NullPointerException("Definition required");
 		}
 		this.definition = definition;
-		this.definitionId = definition.getId();
+		this.detached = true;
 	}
 	
 	protected abstract void write(StringWriter sw, int indent);
@@ -66,7 +62,17 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 		return ancestors;
 	}
 	
-	public Entity getNearestAncestorMultipleEntity() {
+	public Entity getAncestorByDefinition(EntityDefinition def) {
+		List<Entity> ancestors = getAncestors();
+		for (Entity ancestor : ancestors) {
+			if (ancestor.getDefinition() == def) {
+				return ancestor;
+			}
+		}
+		return null;
+	}
+	
+	public Entity getNearestMultipleEntityAncestor() {
 		Entity currentParent = getParent();
 		while ( currentParent != null && ! currentParent.getDefinition().isRoot() && ! currentParent.getDefinition().isMultiple() ) {
 			currentParent = currentParent.getParent();
@@ -81,6 +87,15 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 			nodesToBeDeleted.addAll(((Entity) this).getDescendants());
 		}
 		return nodesToBeDeleted;
+	}
+
+	public List<Integer> getAncestorIds() {
+		List<Entity> ancestors = getAncestors();
+		List<Integer> ancestorIds = new ArrayList<Integer>(ancestors.size());
+		for (Entity ancestor : ancestors) {
+			ancestorIds.add(ancestor.getInternalId());
+		}
+		return ancestorIds;
 	}
 
 	public String getPath() {
@@ -110,8 +125,7 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	}
 
 	public <C extends SurveyContext> C getSurveyContext() {
-		Survey survey = getSurvey();
-		return survey.getContext();
+		return getSurvey().getContext();
 	}
 	
 	public int getIndex() {
@@ -132,19 +146,27 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	}
 	
 	public Survey getSurvey() {
-		return record == null ? null : record.getSurvey();
+		return definition.getSurvey();
 	}
 	
 	public Schema getSchema() {
-		return getSurvey() == null ? null : getSurvey().getSchema();
+		return getSurvey().getSchema();
 	}
 	
 	public ModelVersion getModelVersion() {
 		return record == null ? null: record.getVersion();
 	}
+	
+	public String getName() {
+		return getDefinition().getName();
+	}
+
+	public Integer getParentId() {
+		return parent == null ? null : parent.getInternalId();
+	}
 
 	public boolean isDetached() {
-		return record == null;
+		return detached;
 	}
 
 	public Integer getId() {
@@ -161,10 +183,6 @@ public abstract class Node<D extends NodeDefinition> implements Serializable {
 	
 	public D getDefinition() {
 		return this.definition;
-	}
-
-	public String getName() {
-		return getDefinition().getName();
 	}
 
 	public Record getRecord() {

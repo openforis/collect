@@ -1,17 +1,14 @@
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.TreeSet;
 
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.data.DataImportSummary.FileErrorItem;
@@ -21,13 +18,9 @@ import org.openforis.collect.manager.UserManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.persistence.SurveyImportException;
-import org.openforis.collect.persistence.xml.DataHandler;
 import org.openforis.collect.persistence.xml.DataHandler.NodeUnmarshallingError;
-import org.openforis.collect.persistence.xml.DataUnmarshaller;
 import org.openforis.collect.persistence.xml.DataUnmarshaller.ParseRecordResult;
 import org.openforis.commons.collection.Predicate;
-import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.concurrency.Task;
 import org.openforis.idm.metamodel.ModelVersion;
 import org.openforis.idm.model.Entity;
@@ -48,7 +41,7 @@ public class DataRestoreSummaryTask extends Task {
 	private UserManager userManager;
 
 	//input
-	private ZipFile zipFile;
+	private File file;
 	private boolean oldFormat;
 
 	/**
@@ -67,154 +60,213 @@ public class DataRestoreSummaryTask extends Task {
 	private Predicate<CollectRecord> includeRecordPredicate;
 
 	//temporary instance variables
-	private DataUnmarshaller dataUnmarshaller;
+	
+	private XMLParsingRecordProvider recordProvider;
+	
+	@SuppressWarnings("serial")
+	private final Map<Step, Integer> totalPerStep = new HashMap<Step, Integer>(){{
+		for (Step step : Step.values()) {
+			put(step, 0);
+		}
+	}};
+	private final Map<Integer, CollectRecord> recordSummaryByEntryId = new HashMap<Integer, CollectRecord>();
+	private final Map<Integer, Set<Step>> stepsByEntryId = new HashMap<Integer, Set<Step>>();
+	private final Map<String, List<NodeUnmarshallingError>> errorsByEntryName = new HashMap<String, List<NodeUnmarshallingError>>();
+	private final Map<Integer, CollectRecord> conflictingRecordByEntryId = new HashMap<Integer, CollectRecord>();
+	private final Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warningsByEntryId = new HashMap<Integer, Map<Step,List<NodeUnmarshallingError>>>();
+	
+	//output
 	private DataImportSummary summary;
 	
 	@Override
+	protected void initializeInternalVariables() throws Throwable {
+		super.initializeInternalVariables();
+		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, false);
+	}
+	
+	@Override
 	protected long countTotalItems() {
-		long total = 0;
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = entries.nextElement();
-			if ( BackupRecordEntry.isValidRecordEntry(zipEntry, oldFormat) ) {
-				total ++;
-			}
-		}
-		return total;
+		List<Integer> entryIds = recordProvider.findEntryIds();
+		return entryIds.size();
 	}
 	
 	@Override
 	protected void execute() throws Throwable {
-		summary = null;
-		dataUnmarshaller = initDataUnmarshaller(packagedSurvey, existingSurvey);
-		
-		Map<Step, Integer> totalPerStep = new HashMap<CollectRecord.Step, Integer>();
-		for (Step step : Step.values()) {
-			totalPerStep.put(step, 0);
-		}
-		Map<Integer, CollectRecord> entryIdToRecord = new HashMap<Integer, CollectRecord>();
-		Map<Integer, List<Step>> entryIdToSteps = new HashMap<Integer, List<Step>>();
-		Map<String, List<NodeUnmarshallingError>> skippedEntryNameToErrors = new HashMap<String, List<NodeUnmarshallingError>>();
-		Map<Integer, CollectRecord> entryIdToConflictingRecord = new HashMap<Integer, CollectRecord>();
-		Map<Integer, Map<Step, List<NodeUnmarshallingError>>> entryIdToWarnings = new HashMap<Integer, Map<Step,List<NodeUnmarshallingError>>>();
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
-		while (entries.hasMoreElements()) {
-			if ( isRunning() ) {
-				ZipEntry zipEntry = entries.nextElement();
-				if ( ! BackupDataExtractor.BackupRecordEntry.isValidRecordEntry(zipEntry, oldFormat) ) {
-					continue;
-				}
-				createSummaryForEntry(zipEntry, skippedEntryNameToErrors, 
-						entryIdToRecord, entryIdToSteps, totalPerStep, 
-						entryIdToConflictingRecord, entryIdToWarnings);
-			} else {
+		List<Integer> idsToImport = recordProvider.findEntryIds();
+		for (Integer entryId : idsToImport) {
+			if (! isRunning()) {
 				break;
 			}
-		}
-		if ( isRunning() ) {
-			String oldSurveyName = existingSurvey == null ? null: existingSurvey.getName();
-			summary = createSummary(skippedEntryNameToErrors, oldSurveyName,
-					totalPerStep, entryIdToRecord, entryIdToSteps,
-					entryIdToConflictingRecord, entryIdToWarnings);
-		}
-	}
-
-	private void createSummaryForEntry(ZipEntry zipEntry, 
-			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, Map<Integer, CollectRecord> packagedRecords, 
-			Map<Integer, List<Step>> packagedStepsPerRecord, Map<Step, Integer> totalPerStep, 
-			Map<Integer, CollectRecord> conflictingPackagedRecords, Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) throws IOException, DataParsingExeption {
-		String entryName = zipEntry.getName();
-		BackupRecordEntry recordEntry = BackupRecordEntry.parse(entryName, oldFormat);
-		Step step = recordEntry.getStep();
-		InputStream is = zipFile.getInputStream(zipEntry);
-		InputStreamReader reader = OpenForisIOUtils.toReader(is);
-		ParseRecordResult parseRecordResult = parseRecord(reader);
-		CollectRecord parsedRecord = parseRecordResult.getRecord();
-		if ( ! parseRecordResult.isSuccess()) {
-			List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
-			packagedSkippedFileErrors.put(entryName, failures);
-			incrementItemsSkipped();
-		} else if ( includeRecordPredicate == null || includeRecordPredicate.evaluate(parsedRecord) ) {
-			int entryId = recordEntry.getRecordId();
-			CollectRecord recordSummary = createRecordSummary(parsedRecord);
-			packagedRecords.put(entryId, recordSummary);
-			List<Step> stepsPerRecord = packagedStepsPerRecord.get(entryId);
-			if ( stepsPerRecord == null ) {
-				stepsPerRecord = new ArrayList<CollectRecord.Step>();
-				packagedStepsPerRecord.put(entryId, stepsPerRecord);
-			}
-			stepsPerRecord.add(step);
-			Integer totalPerStep1 = totalPerStep.get(step);
-			totalPerStep.put(step, totalPerStep1 + 1);
-			CollectRecord oldRecord = findAlreadyExistingRecordSummary(parsedRecord);
-			if ( oldRecord != null ) {
-				conflictingPackagedRecords.put(entryId, oldRecord);
-			}
-			if ( parseRecordResult.hasWarnings() ) {
-				Map<Step, List<NodeUnmarshallingError>> warningsPerEntry = warnings.get(entryId);
-				if ( warningsPerEntry == null ) {
-					warningsPerEntry = new HashMap<CollectRecord.Step, List<NodeUnmarshallingError>>();
-					warnings.put(entryId, warningsPerEntry);
+			for (Step step : Step.values()) {
+				if (! isRunning()) {
+					break;
 				}
-				warningsPerEntry.put(step, parseRecordResult.getWarnings());
+				createSummaryForEntry(entryId, step);
 			}
-			incrementItemsProcessed();
 		}
 	}
 	
-	private DataImportSummary createSummary(
-			Map<String, List<NodeUnmarshallingError>> packagedSkippedFileErrors, 
-			String surveyName,
-			Map<Step, Integer> totalPerStep,
-			Map<Integer, CollectRecord> packagedRecords,
-			Map<Integer, List<Step>> packagedStepsPerRecord,
-			Map<Integer, CollectRecord> conflictingPackagedRecords, 
-			Map<Integer, Map<Step, List<NodeUnmarshallingError>>> warnings) {
-		DataImportSummary summary = new DataImportSummary();
-		summary.setSurveyName(surveyName);
-		
-		List<DataImportSummaryItem> recordsToImport = new ArrayList<DataImportSummaryItem>();
-		Set<Integer> entryIds = packagedRecords.keySet();
-		for (Integer entryId: entryIds) {
-			CollectRecord record = packagedRecords.get(entryId);
-			if ( ! conflictingPackagedRecords.containsKey(entryId)) {
-				List<Step> steps = packagedStepsPerRecord.get(entryId);
-				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps);
-				item.setWarnings(warnings.get(entryId));
-				recordsToImport.add(item);
-			}
-		}
-		summary.setRecordsToImport(recordsToImport);
+	@Override
+	protected void afterExecuteInternal() {
+		super.afterExecuteInternal();
+		summary = createFinalSummary();
+	}
 
-		List<DataImportSummaryItem> conflictingRecordItems = new ArrayList<DataImportSummaryItem>();
-		Set<Integer> conflictingEntryIds = conflictingPackagedRecords.keySet();
-		for (Integer entryId: conflictingEntryIds) {
-			CollectRecord record = packagedRecords.get(entryId);
-			CollectRecord conflictingRecord = conflictingPackagedRecords.get(entryId);
-			List<Step> steps = packagedStepsPerRecord.get(entryId);
-			DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, steps, conflictingRecord);
-			item.setWarnings(warnings.get(entryId));
-			conflictingRecordItems.add(item);
+	private void createSummaryForEntry(int entryId, Step step)
+			throws IOException, DataParsingExeption {
+		ParseRecordResult recordParsingResult = recordProvider.provideRecordParsingResult(entryId, step);
+		if (recordParsingResult == null) {
+			return;
 		}
-		summary.setConflictingRecords(conflictingRecordItems);
+		CollectRecord parsedRecord = recordParsingResult.getRecord();
+		if ( ! recordParsingResult.isSuccess()) {
+			createParsingErrorSummary(entryId, step, recordParsingResult);
+		} else if ( isToBeIncluded(parsedRecord) ) {
+			createRecordParsedCorrectlySummary(entryId, step,
+					recordParsingResult);
+		}
+	}
+
+	private void createParsingErrorSummary(int entryId, Step step,
+			ParseRecordResult parseRecordResult) {
+		String entryName = getEntryName(entryId, step);
+		List<NodeUnmarshallingError> failures = parseRecordResult.getFailures();
+		errorsByEntryName.put(entryName, failures);
+		incrementItemsSkipped();
+	}
+
+	private void createRecordParsedCorrectlySummary(
+			int entryId, Step step,
+			ParseRecordResult parseRecordResult) {
+		CollectRecord parsedRecord = parseRecordResult.getRecord();
+		CollectRecord recordSummary = createRecordSummary(parsedRecord);
+		recordSummaryByEntryId.put(entryId, recordSummary);
 		
-		List<FileErrorItem> packagedSkippedFileErrorsList = new ArrayList<DataImportSummary.FileErrorItem>();
-		Set<String> skippedFileNames = packagedSkippedFileErrors.keySet();
-		for (String fileName : skippedFileNames) {
-			List<NodeUnmarshallingError> nodeErrors = packagedSkippedFileErrors.get(fileName);
-			FileErrorItem fileErrorItem = new FileErrorItem(fileName, nodeErrors);
-			packagedSkippedFileErrorsList.add(fileErrorItem);
+		addStepPerEntry(entryId, step);
+		
+		CollectRecord oldRecord = findAlreadyExistingRecordSummary(parsedRecord);
+		if ( oldRecord != null ) {
+			conflictingRecordByEntryId.put(entryId, oldRecord);
 		}
-		summary.setSkippedFileErrors(packagedSkippedFileErrorsList);
+		if ( parseRecordResult.hasWarnings() ) {
+			addWarningsPerStep(entryId, step, parseRecordResult.getWarnings());
+		}
+
+		incrementTotalPerStep(step);
+		incrementItemsProcessed();
+	}
+
+	private void incrementTotalPerStep(Step step) {
+		int oldTotal = totalPerStep.get(step);
+		totalPerStep.put(step, oldTotal + 1);
+	}
+
+	private void addStepPerEntry(int entryId, Step step) {
+		Set<Step> stepsPerRecord = stepsByEntryId.get(entryId);
+		if ( stepsPerRecord == null ) {
+			stepsPerRecord = new TreeSet<Step>();
+			stepsByEntryId.put(entryId, stepsPerRecord);
+		}
+		stepsPerRecord.add(step);
+	}
+
+	private void addWarningsPerStep(int entryId, Step step,
+			List<NodeUnmarshallingError> warnings) {
+		Map<Step, List<NodeUnmarshallingError>> warningsPerEntry = warningsByEntryId.get(entryId);
+		if ( warningsPerEntry == null ) {
+			warningsPerEntry = new HashMap<Step, List<NodeUnmarshallingError>>();
+			warningsByEntryId.put(entryId, warningsPerEntry);
+		}
+		warningsPerEntry.put(step, warnings);
+	}
+	
+	private DataImportSummary createFinalSummary() {
+		DataImportSummary summary = new DataImportSummary();
+		summary.setSurveyName(existingSurvey == null ? null: existingSurvey.getName());
+		summary.setRecordsToImport(createRecordToImportItems());
+		summary.setSkippedFileErrors(createSkippedFileErrorItems());
+		summary.setConflictingRecords(createConflictingRecordItems());
 		summary.setTotalPerStep(totalPerStep);
 		return summary;
 	}
 
-	private DataUnmarshaller initDataUnmarshaller(CollectSurvey packagedSurvey, CollectSurvey existingSurvey) throws SurveyImportException {
-		CollectSurvey currentSurvey = existingSurvey == null ? packagedSurvey : existingSurvey;
-		DataHandler handler = new DataHandler(userManager, currentSurvey, packagedSurvey, false);
-		DataUnmarshaller dataUnmarshaller = new DataUnmarshaller(handler);
-		return dataUnmarshaller;
+	private List<Integer> findIncompleteEntryIds() {
+		List<Integer> result = new ArrayList<Integer>();
+		for (Integer entryId: recordSummaryByEntryId.keySet()) {
+			CollectRecord conflictingRecord = conflictingRecordByEntryId.get(entryId);
+			if (conflictingRecord != null) {
+				Step lastStep = getLastStep(entryId);
+				if (conflictingRecord.getStep().after(lastStep)) {
+					result.add(entryId);
+				}
+			}
+		}
+		return result;
+	}
+
+	private Step getLastStep(Integer entryId) {
+		Set<Step> steps = stepsByEntryId.get(entryId);
+		return new ArrayList<Step>(steps).get(steps.size() - 1);
+	}
+	
+	private List<FileErrorItem> createSkippedFileErrorItems() {
+		List<FileErrorItem> errorItems = new ArrayList<FileErrorItem>();
+		
+		Set<String> skippedFileNames = errorsByEntryName.keySet();
+		for (String fileName : skippedFileNames) {
+			List<NodeUnmarshallingError> nodeErrors = errorsByEntryName.get(fileName);
+			FileErrorItem fileErrorItem = new FileErrorItem(fileName, nodeErrors);
+			errorItems.add(fileErrorItem);
+		}
+
+		List<Integer> incompleteEntryIds = findIncompleteEntryIds();
+		for (Integer entryId : incompleteEntryIds) {
+			CollectRecord conflictingRecordSummary = conflictingRecordByEntryId.get(entryId);
+			Step missingStep = conflictingRecordSummary.getStep();
+			Set<Step> steps = stepsByEntryId.get(entryId);
+			for (Step step : steps) {
+				String entryName = getEntryName(entryId, step);
+				if (! errorsByEntryName.containsKey(entryName)) {
+					NodeUnmarshallingError error = new NodeUnmarshallingError("Incomplete entry set, missing step: " + missingStep);
+					FileErrorItem fileErrorItem = new FileErrorItem(entryName, Arrays.asList(error));
+					errorItems.add(fileErrorItem);
+				}
+			}
+		}
+		return errorItems;
+	}
+
+	private List<DataImportSummaryItem> createRecordToImportItems() {
+		List<DataImportSummaryItem> recordsToImport = new ArrayList<DataImportSummaryItem>();
+		List<Integer> incompleteEntryIds = findIncompleteEntryIds();
+		Set<Integer> entryIds = recordSummaryByEntryId.keySet();
+		for (Integer entryId: entryIds) {
+			if ( ! conflictingRecordByEntryId.containsKey(entryId) && ! incompleteEntryIds.contains(entryId)) {
+				Set<Step> steps = stepsByEntryId.get(entryId);
+				CollectRecord record = recordSummaryByEntryId.get(entryId);
+				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, new ArrayList<Step>(steps));
+				item.setWarnings(warningsByEntryId.get(entryId));
+				recordsToImport.add(item);
+			}
+		}
+		return recordsToImport;
+	}
+
+	private List<DataImportSummaryItem> createConflictingRecordItems() {
+		List<DataImportSummaryItem> conflictingRecordItems = new ArrayList<DataImportSummaryItem>();
+		List<Integer> incompleteEntryIds = findIncompleteEntryIds();
+		Set<Integer> conflictingEntryIds = conflictingRecordByEntryId.keySet();
+		for (Integer entryId: conflictingEntryIds) {
+			if ( ! incompleteEntryIds.contains(entryId)) {
+				CollectRecord record = recordSummaryByEntryId.get(entryId);
+				CollectRecord conflictingRecord = conflictingRecordByEntryId.get(entryId);
+				Set<Step> steps = stepsByEntryId.get(entryId);
+				DataImportSummaryItem item = new DataImportSummaryItem(entryId, record, new ArrayList<Step>(steps), conflictingRecord);
+				item.setWarnings(warningsByEntryId.get(entryId));
+				conflictingRecordItems.add(item);
+			}
+		}
+		return conflictingRecordItems;
 	}
 
 	private CollectRecord findAlreadyExistingRecordSummary(CollectRecord parsedRecord) {
@@ -230,11 +282,6 @@ public class DataRestoreSummaryTask extends Task {
 		} else {
 			throw new IllegalStateException(String.format("Multiple records found in survey %s with key(s): %s", survey.getName(), keyValues));
 		}
-	}
-
-	private ParseRecordResult parseRecord(Reader reader) throws IOException {
-		ParseRecordResult result = dataUnmarshaller.parse(reader);
-		return result;
 	}
 
 	private CollectRecord createRecordSummary(CollectRecord record) {
@@ -257,6 +304,16 @@ public class DataRestoreSummaryTask extends Task {
 		return result;
 	}
 	
+	private String getEntryName(int entryId, Step step) {
+		BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId, oldFormat);
+		String entryName = recordEntry.getName();
+		return entryName;
+	}
+
+	private boolean isToBeIncluded(CollectRecord recordSummary) {
+		return includeRecordPredicate == null || includeRecordPredicate.evaluate(recordSummary);
+	}
+
 	public RecordManager getRecordManager() {
 		return recordManager;
 	}
@@ -273,12 +330,8 @@ public class DataRestoreSummaryTask extends Task {
 		this.userManager = userManager;
 	}
 	
-	public ZipFile getZipFile() {
-		return zipFile;
-	}
-	
-	public void setZipFile(ZipFile zipFile) {
-		this.zipFile = zipFile;
+	public void setFile(File file) {
+		this.file = file;
 	}
 	
 	public CollectSurvey getPackagedSurvey() {

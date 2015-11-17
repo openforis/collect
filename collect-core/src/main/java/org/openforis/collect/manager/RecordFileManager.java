@@ -40,13 +40,6 @@ public class RecordFileManager extends BaseStorageManager {
 
 	protected void initStorageDirectory() {
 		super.initStorageDirectory(ConfigurationItem.RECORD_FILE_UPLOAD_PATH);
-		if ( storageDirectory == null ) {
-			String message = "Upload directory not configured properly";
-			LOG.error(message);
-			throw new IllegalStateException(message);
-		} else if ( LOG.isInfoEnabled() ) {
-			LOG.info("Using storage directory: " + storageDirectory.getAbsolutePath());
-		}
 	}
 	
 	public void deleteAllFiles(CollectRecord record) {

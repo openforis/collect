@@ -6,23 +6,15 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.openforis.collect.CollectTest;
 import org.openforis.collect.model.Configuration;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TransactionConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author S. Ricci
  */
-@RunWith( SpringJUnit4ClassRunner.class )
-@ContextConfiguration( locations = {"classpath:test-context.xml"} )
-@TransactionConfiguration(defaultRollback=true)
-@Transactional
-public class ConfigurationDaoIntegrationTest {
+public class ConfigurationDaoIntegrationTest extends CollectTest {
 	//private final Log log = LogFactory.getLog(ConfigurationDaoIntegrationTest.class);
 	
 	@Autowired

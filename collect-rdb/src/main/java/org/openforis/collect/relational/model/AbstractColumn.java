@@ -44,5 +44,10 @@ abstract class AbstractColumn<T> implements Column<T> {
 	@Override
 	public boolean isNullable() {
 		return nullable;
-	}	
+	}
+	
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

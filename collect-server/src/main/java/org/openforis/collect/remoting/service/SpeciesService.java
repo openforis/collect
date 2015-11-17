@@ -5,7 +5,7 @@ package org.openforis.collect.remoting.service;
 
 import java.util.List;
 
-import org.openforis.collect.manager.SessionManager;
+import org.openforis.collect.manager.RecordSessionManager;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.metamodel.TaxonSummaries;
 import org.openforis.collect.metamodel.proxy.TaxonSummariesProxy;
@@ -35,7 +35,7 @@ public class SpeciesService {
 	@Autowired
 	private SpeciesManager speciesManager;
 	@Autowired
-	private SessionManager sessionManager;
+	private RecordSessionManager sessionManager;
 	
 	@Secured("ROLE_ENTRY")
 	public List<TaxonomyProxy> loadTaxonomiesBySurvey(int surveyId, boolean work) {

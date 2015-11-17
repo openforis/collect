@@ -40,4 +40,15 @@ public class Files {
 		return (temp);
 	}
 
+	public static void eraseFileContent(File file) throws IOException {
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter(file);
+			writer.write("");
+			writer.flush();
+		} finally {
+			IOUtils.closeQuietly(writer);
+		}
+	}
+	
 }
