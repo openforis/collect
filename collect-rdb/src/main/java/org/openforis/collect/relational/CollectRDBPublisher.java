@@ -20,6 +20,7 @@ import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
 import org.openforis.concurrency.ProgressListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,9 @@ public class CollectRDBPublisher {
 	private RecordManager recordManager;
 	@Autowired
 	private DataSource dataSource;
+	@Autowired(required=false)
+	@Qualifier("rdbDataSource")
+	private DataSource rdbDataSource;
 	
 	public void export(String surveyName, String rootEntityName, Step step,
 			String targetSchemaName) throws CollectRdbException {
@@ -76,6 +80,10 @@ public class CollectRDBPublisher {
 
 	private void insertRecords(CollectSurvey survey, List<CollectRecord> summaries, Step step, 
 			RelationalSchema targetSchema, Connection targetConn) throws CollectRdbException {
+		try {
+			targetConn.setAutoCommit(false);
+		} catch (SQLException e1) {
+		}
 		DatabaseExporter databaseExporter = createDatabaseExporter(targetConn);
 		databaseExporter.insertReferenceData(targetSchema, ProgressListener.NULL_PROGRESS_LISTENER);
 		for (int i = 0; i < summaries.size(); i++) {
@@ -94,7 +102,9 @@ public class CollectRDBPublisher {
 	}
 
 	private Connection getTargetConnection() {
-		Connection targetConn = DataSourceUtils.getConnection(dataSource);
+		// dO NOT REMOVE THIS, IT IS NECESSARY FOR sAIKU IN cOLLECT eARTH!
+		DataSource targetDataSource = rdbDataSource == null ? dataSource: rdbDataSource;
+		Connection targetConn = DataSourceUtils.getConnection(targetDataSource);
 		return targetConn;
 	}
 	
