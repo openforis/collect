@@ -134,30 +134,49 @@ public class Entity extends Node<EntityDefinition> {
 		return false;
 	}
 
-	public Node<? extends NodeDefinition> getChild(String name) {
+	public <N extends Node<? extends NodeDefinition>> N getChild(String name) {
 		NodeDefinition childDefn = definition.getChildDefinition(name);
 		return getChild(childDefn);
 	}
 	
-	public Node<? extends NodeDefinition> getChild(String name, int index) {
+	public <N extends Node<? extends NodeDefinition>> N getChild(String name, int index) {
 		NodeDefinition childDefn = definition.getChildDefinition(name);
 		return getChild(childDefn, index);
 	}
 	
-	public Node<? extends NodeDefinition> getChild(NodeDefinition childDef) {
+	public <N extends Node<? extends NodeDefinition>> N getChild(NodeDefinition childDef) {
 		if ( childDef.isMultiple() ) {
 			throw new IllegalArgumentException("Single child definition expected for " + childDef.getPath());
 		}
 		return getChild(childDef, 0);
 	}
 	
-	public Node<? extends NodeDefinition> getChild(NodeDefinition nodeDef, int index) {
+	@SuppressWarnings("unchecked")
+	public <N extends Node<? extends NodeDefinition>> N getChild(NodeDefinition nodeDef, int index) {
 		List<Node<?>> list = childrenByDefinitionId.get(nodeDef.getId());
 		if (list == null || index >= list.size()) {
 			return null;
 		} else {
-			return list.get(index);
+			return (N) list.get(index);
 		}
+	}
+	
+	public <N extends Node<? extends NodeDefinition>> N getFirstChild(String childName) {
+		NodeDefinition childDef = definition.getChildDefinition(childName);
+		return getFirstChild(childDef);
+	}
+	
+	public <N extends Node<? extends NodeDefinition>> N getFirstChild(NodeDefinition childDef) {
+		return getChild(childDef, 0);
+	}
+	
+	public <N extends Node<? extends NodeDefinition>> N getLastChild(String childName) {
+		NodeDefinition childDef = definition.getChildDefinition(childName);
+		return getLastChild(childDef);
+	}
+	
+	public <N extends Node<? extends NodeDefinition>> N getLastChild(NodeDefinition childDef) {
+		return getChild(childDef, getCount(childDef) - 1);
 	}
 	
 	/**
