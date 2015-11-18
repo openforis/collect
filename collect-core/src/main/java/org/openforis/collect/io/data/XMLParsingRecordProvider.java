@@ -51,6 +51,7 @@ public class XMLParsingRecordProvider implements RecordProvider, Closeable {
 	
 	public void init() throws ZipException, IOException {
 		this.backupFileExtractor = new NewBackupFileExtractor(file);
+		this.backupFileExtractor.init();
 		this.dataUnmarshaller = initDataUnmarshaller();
 		this.recordUpdater = new RecordUpdater();
 	}

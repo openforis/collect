@@ -230,7 +230,11 @@ public class DataRestoreTask extends Task {
 		}
 
 		void flush() {
-			recordManager.executeRecordOperations(operations, new EventPublisher());
+			if (eventQueue.isEnabled()) {
+				recordManager.executeRecordOperations(operations, new EventPublisher());
+			} else {
+				recordManager.executeRecordOperations(operations);
+			}
 			operations.clear();
 		}
 	}
@@ -255,10 +259,8 @@ public class DataRestoreTask extends Task {
 						String.valueOf(rootEntity.getDefinition().getId()), 
 						String.valueOf(rootEntity.getInternalId()), new Date(), userName));
 			}
-			if (eventQueue.isEnabled()) {
-				eventQueue.publish(new RecordTransaction(surveyName, 
-						recordId, recordStep, events));
-			}
+			eventQueue.publish(new RecordTransaction(surveyName, 
+					recordId, recordStep, events));
 		}
 	}
 

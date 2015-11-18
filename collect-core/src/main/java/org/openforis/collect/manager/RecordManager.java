@@ -149,6 +149,11 @@ public class RecordManager {
 	}
 	
 	@Transactional
+	public void executeRecordOperations(List<RecordOperations> operationsForRecords) {
+		executeRecordOperations(operationsForRecords, null);
+	}
+	
+	@Transactional
 	public void executeRecordOperations(List<RecordOperations> operationsForRecords, Consumer<RecordStepOperation> consumer) {
 		int nextId = nextId();
 		List<RecordStoreQuery> queries = new ArrayList<RecordStoreQuery>();
@@ -162,7 +167,9 @@ public class RecordManager {
 				} else {
 					queries.add(createUpdateQuery(record));
 				}
-				consumer.consume(operation);
+				if (consumer != null) {
+					consumer.consume(operation);
+				}
 			}
 		}
 		execute(queries);

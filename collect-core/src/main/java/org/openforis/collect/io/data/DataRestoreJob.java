@@ -79,7 +79,8 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		Date lastBackupDate = backupStorageManager.getLastBackupDate(surveyName);
 		RecordFilter recordFilter = new RecordFilter(publishedSurvey);
 		recordFilter.setModifiedSince(lastBackupDate);
-		return recordManager.countRecords(recordFilter) > 0 || publishedSurvey.getModifiedDate().after(lastBackupDate);
+		return recordManager.countRecords(recordFilter) > 0 || 
+				(lastBackupDate != null && publishedSurvey.getModifiedDate().after(lastBackupDate));
 	}
 
 	private boolean isUploadedFilesIncluded() throws IOException {

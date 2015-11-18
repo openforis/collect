@@ -32,11 +32,11 @@ public class RecordSessionManager extends SessionManager implements EventListene
 	}
 	
 	@Override
-		public void setActiveRecord(CollectRecord record) {
-			super.setActiveRecord(record);
-			recordFileManager.resetTempInfo();
-		}
-	
+	public void setActiveRecord(CollectRecord record) {
+		super.setActiveRecord(record);
+		recordFileManager.resetTempInfo();
+	}
+
 	@Override
 	public void releaseRecord() throws RecordUnlockedException {
 		super.releaseRecord();
