@@ -3,13 +3,17 @@
  */
 package org.openforis.collect.io.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipFile;
+import java.util.Set;
+import java.util.TreeSet;
 
-import org.openforis.collect.io.BackupFileExtractor;
+import org.apache.commons.io.FilenameUtils;
+import org.openforis.collect.io.NewBackupFileExtractor;
+import org.openforis.collect.io.SurveyBackupJob;
 import org.openforis.collect.io.data.BackupDataExtractor.BackupRecordEntry;
 import org.openforis.collect.io.exception.DataImportExeption;
 import org.openforis.collect.manager.RecordFileManager;
@@ -39,7 +43,7 @@ public class RecordFileRestoreTask extends Task {
 	private RecordFileManager recordFileManager;
 	
 	//input
-	private ZipFile zipFile;
+	private File file;
 	private CollectSurvey survey;
 	private List<Integer> entryIdsToImport;
 	private boolean overwriteAll;
@@ -47,7 +51,7 @@ public class RecordFileRestoreTask extends Task {
 	//temporary instance variables
 	private SessionRecordFileManager sessionRecordFileManager;
 	private List<Integer> processedRecords;
-	private BackupFileExtractor backupFileExtractor;
+	private NewBackupFileExtractor backupFileExtractor;
 	private boolean oldBackupFormat;
 	
 	public RecordFileRestoreTask() {
@@ -63,8 +67,10 @@ public class RecordFileRestoreTask extends Task {
 	@Override
 	protected void execute() throws Throwable {
 		processedRecords = new ArrayList<Integer>();
-		backupFileExtractor = new BackupFileExtractor(zipFile);
-		for (Integer entryId : entryIdsToImport) {
+		backupFileExtractor = new NewBackupFileExtractor(file);
+		backupFileExtractor.init();
+		List<Integer> idsToImport = calculateEntryIdsToImport();
+		for (Integer entryId : idsToImport) {
 			if ( isRunning() && ! processedRecords.contains(entryId) ) {
 				importRecordFiles(entryId);
 				processedRecords.add(entryId);
@@ -73,6 +79,28 @@ public class RecordFileRestoreTask extends Task {
 				break;
 			}
 		}
+	}
+	
+	private List<Integer> calculateEntryIdsToImport() {
+		if ( entryIdsToImport != null ) {
+			return entryIdsToImport;
+		} 
+		if ( ! overwriteAll ) {
+			throw new IllegalArgumentException("No entries to import specified and overwriteAll parameter is 'false'");
+		}
+		Set<Integer> result = new TreeSet<Integer>();
+		for (Step step : Step.values()) {
+			int stepNumber = step.getStepNumber();
+			String path = SurveyBackupJob.DATA_FOLDER + SurveyBackupJob.ZIP_FOLDER_SEPARATOR + stepNumber;
+			if ( backupFileExtractor.containsEntriesInPath(path) ) {
+				List<String> listEntriesInPath = backupFileExtractor.listFilesInFolder(path);
+				for (String entry : listEntriesInPath) {
+					String entryId = FilenameUtils.getBaseName(entry);
+					result.add(Integer.parseInt(entryId));
+				}
+			}
+		}
+		return new ArrayList<Integer>(result);
 	}
 
 	private void importRecordFiles(int entryId) throws IOException, DataImportExeption, RecordPersistenceException {
@@ -104,7 +132,7 @@ public class RecordFileRestoreTask extends Task {
 		for (int i = steps.length - 1; i >= 0; i--) {
 			Step step = steps[i];
 			BackupRecordEntry recordEntry = new BackupRecordEntry(step, entryId, oldBackupFormat);
-			BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, zipFile, step);
+			BackupDataExtractor backupDataExtractor = new BackupDataExtractor(survey, file, step);
 			backupDataExtractor.init();
 			ParseRecordResult parseRecordResult = backupDataExtractor.findRecord(recordEntry);
 			if ( parseRecordResult != null ) {
@@ -157,14 +185,14 @@ public class RecordFileRestoreTask extends Task {
 		this.recordFileManager = recordFileManager;
 	}
 
-	public ZipFile getZipFile() {
-		return zipFile;
+	public File getFile() {
+		return file;
 	}
 
-	public void setZipFile(ZipFile zipFile) {
-		this.zipFile = zipFile;
+	public void setFile(File file) {
+		this.file = file;
 	}
-
+	
 	public CollectSurvey getSurvey() {
 		return survey;
 	}
