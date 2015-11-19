@@ -117,7 +117,7 @@ public class RecordFileRestoreTask extends Task {
 		List<CollectRecord> summaries = recordManager.loadSummaries(survey, lastStepBackupRecord.getRootEntity().getName(), recordKeys);
 		if ( summaries.size() == 1 ) {
 			CollectRecord summary = summaries.get(0);
-			CollectRecord storedRecord = recordManager.load(survey, summary.getId(), summary.getStep());
+			CollectRecord storedRecord = recordManager.load(survey, summary.getId(), summary.getStep(), false);
 			return storedRecord;
 		} else if ( summaries.size() == 0 ) {
 			throw new RuntimeException(String.format("Record with keys %s not found", recordKeys.toString()));
