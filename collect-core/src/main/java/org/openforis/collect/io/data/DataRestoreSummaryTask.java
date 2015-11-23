@@ -79,9 +79,15 @@ public class DataRestoreSummaryTask extends Task {
 	private DataImportSummary summary;
 	
 	@Override
+	protected void createInternalVariables() throws Throwable {
+		super.createInternalVariables();
+		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, false);
+	}
+	
+	@Override
 	protected void initializeInternalVariables() throws Throwable {
 		super.initializeInternalVariables();
-		this.recordProvider = new XMLParsingRecordProvider(file, packagedSurvey, existingSurvey, userManager, false);
+		this.recordProvider.init();
 	}
 	
 	@Override
