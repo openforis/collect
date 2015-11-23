@@ -43,7 +43,6 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 	private ValidationMessageBuilder validationMessageBuilder;
 	private CsvWriter csvWriter;
 
-	
 	public enum ReportType {
 		CSV
 	}
@@ -94,7 +93,7 @@ public class ValidationReportProcess extends AbstractProcess<Void, ProcessStatus
 					if ( status.isRunning() ) {
 						Step step = summary.getStep();
 						Integer recordId = summary.getId();
-						final CollectRecord record = recordManager.load(survey, recordId, step);
+						CollectRecord record = recordManager.load(survey, recordId, step);
 						writeValidationReport(record);
 						status.incrementProcessed();
 						//long elapsedMillis = System.currentTimeMillis() - start;

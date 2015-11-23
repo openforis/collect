@@ -100,18 +100,13 @@ public class TaxonAttribute extends Attribute<TaxonAttributeDefinition, TaxonOcc
 
 	@Override
 	protected void setValueInFields(TaxonOccurrence value) {
-		String code = value.getCode();
-		String scientificName = value.getScientificName();
-		String vernacularName = value.getVernacularName();
-		String languageCode = value.getLanguageCode();
-		String languageVariety = value.getLanguageVariety();
-		checkValidLanguageCode(languageCode);
+		checkValidLanguageCode(value.getLanguageCode());
 
-		getCodeField().setValue(code);
-		getScientificNameField().setValue(scientificName);
-		getVernacularNameField().setValue(vernacularName);
-		getLanguageCodeField().setValue(languageCode);
-		getLanguageVarietyField().setValue(languageVariety);
+		setCode(value.getCode());
+		setScientificName(value.getScientificName());
+		setVernacularName(value.getVernacularName());
+		setLanguageCode(value.getLanguageCode());
+		setLanguageVariety(value.getLanguageVariety());
 	}
 	
 	@Override
