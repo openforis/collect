@@ -29,6 +29,7 @@ import org.openforis.idm.model.Time;
  * @author S. Ricci
  */
 public class IDMFunctions extends CustomFunctions {
+	
 	private static final String LOCATION_ATTRIBUTE = "location";
 
 	private enum TimeUnit {
@@ -245,12 +246,15 @@ public class IDMFunctions extends CustomFunctions {
 			return null;
 		}
 		CoordinateOperations coordinateOperations = getSurvey(context).getContext().getCoordinateOperations();
-		
-		try {
-			double distance = coordinateOperations.orthodromicDistance(fromC, toC);
-			return distance;
-		} catch (CoordinateOperationException e) {
+		if (coordinateOperations == null) {
 			return null;
+		} else {
+			try {
+				double distance = coordinateOperations.orthodromicDistance(fromC, toC);
+				return distance;
+			} catch (CoordinateOperationException e) {
+				return null;
+			}
 		}
 	}
 

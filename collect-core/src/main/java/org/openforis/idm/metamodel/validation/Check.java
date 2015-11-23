@@ -142,7 +142,8 @@ public abstract class Check<T extends Attribute<?, ?>> implements Serializable, 
 				while (matcher.find()) {
 					String expr = matcher.group(1);
 					Object val = getExpressionEvaluator(context).evaluateValue(context.getParent(), context, expr);
-					matcher.appendReplacement(sb, val.toString());
+					String replacement = val == null ? "": val.toString();
+					matcher.appendReplacement(sb, replacement);
 				}
 				matcher.appendTail(sb);
 				return sb.toString();
