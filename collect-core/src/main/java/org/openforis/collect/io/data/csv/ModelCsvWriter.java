@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
+import org.openforis.collect.io.data.NodeFilter;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
@@ -18,22 +19,28 @@ public class ModelCsvWriter extends CsvWriter {
 
 	private DataTransformation xform;
 	private AbsoluteModelPathExpression pivotExpression;
+	private NodeFilter nodeFilter;
 	
 	public ModelCsvWriter(Writer writer, DataTransformation xform) throws IOException, InvalidExpressionException {
+		this(writer, xform, null);
+	}
+	
+	public ModelCsvWriter(Writer writer, DataTransformation xform, NodeFilter nodeFilter) throws IOException, InvalidExpressionException {
 		super(writer, ',', '"');
 		this.xform = xform;
+		this.nodeFilter = nodeFilter;
 		ExpressionFactory expressionFactory = new ExpressionFactory();
 		this.pivotExpression = expressionFactory.createAbsoluteModelPathExpression(xform.getAxisPath());
 	}
 
 	public void printColumnHeadings() throws IOException {
 		List<String> columnHeadings = xform.getColumnProvider().getColumnHeadings();
-		writeHeaders(columnHeadings.toArray(new String[0]));
+		writeHeaders(columnHeadings.toArray(new String[columnHeadings.size()]));
 	}
 
 	public void printRow(Node<?> n) {
 		List<String> values = xform.getColumnProvider().extractValues(n);
-		writeNext(values.toArray(new String[0]));
+		writeNext(values.toArray(new String[values.size()]));
 	}
 
 	public int printData(Record record) throws InvalidExpressionException {
@@ -41,7 +48,9 @@ public class ModelCsvWriter extends CsvWriter {
 		List<Node<?>> rowNodes = pivotExpression.iterate(record);
 		if ( rowNodes != null ) {
 			for (Node<?> n : rowNodes) {
-				printRow(n);
+				if (nodeFilter == null || nodeFilter.accept(n)) {
+					printRow(n);
+				}
 				cnt++;
 			}
 		}

@@ -144,9 +144,9 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 //		*/
 //	}
 
-	private void exportData(OutputStream outputStream, int entityId) throws InvalidExpressionException, IOException, RecordPersistenceException {
+	private void exportData(OutputStream outputStream, int entityDefId) throws InvalidExpressionException, IOException, RecordPersistenceException {
 		Writer outputWriter = new OutputStreamWriter(outputStream, OpenForisIOUtils.UTF_8);
-		DataTransformation transform = getTransform(entityId);
+		DataTransformation transform = getTransform(entityDefId);
 		
 		@SuppressWarnings("resource")
 		//closing modelWriter will close referenced output stream
@@ -195,12 +195,12 @@ public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus
 		return result;
 	}
 
-	protected DataTransformation getTransform(int entityId) throws InvalidExpressionException {
+	protected DataTransformation getTransform(int entityDefId) throws InvalidExpressionException {
 		List<ColumnProvider> columnProviders = new ArrayList<ColumnProvider>();
 		
 		CollectSurvey survey = recordFilter.getSurvey();
 		Schema schema = survey.getSchema();
-		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityId);
+		EntityDefinition entityDefn = (EntityDefinition) schema.getDefinitionById(entityDefId);
 		
 		//entity children columns
 		AutomaticColumnProvider entityColumnProvider = createEntityColumnProvider(entityDefn);
