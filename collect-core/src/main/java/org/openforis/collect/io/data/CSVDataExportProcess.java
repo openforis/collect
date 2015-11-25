@@ -52,9 +52,12 @@ import org.springframework.stereotype.Component;
  * 
  * @author S. Ricci
  *
+ * @deprecated Use {@link CSVDataExportJob instead}
+ *
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Deprecated
 public class CSVDataExportProcess extends AbstractProcess<Void, DataExportStatus> {
 	
 	private static Log LOG = LogFactory.getLog(CSVDataExportProcess.class);
