@@ -171,6 +171,10 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		}
 	}
 	
+	public boolean hasField(String fieldName) {
+		return getFieldDefinitionMap().containsKey(fieldName);
+	}
+	
 	public abstract boolean hasMainField();
 	
 	public abstract String getMainFieldName();
@@ -264,4 +268,5 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		}
 		
 	}
+
 }
