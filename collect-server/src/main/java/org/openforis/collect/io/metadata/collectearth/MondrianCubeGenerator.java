@@ -13,6 +13,7 @@ import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.KeyAttributeDefinition;
@@ -294,6 +295,18 @@ public class MondrianCubeGenerator {
 				level.type = "Numeric";
 				hierarchy.levels.add(level);
 			}
+		} else if (nodeDef instanceof CoordinateAttributeDefinition) {
+			dimension.type = "";
+			hierarchy.type = "StandardDimension";
+
+			Level level = new Level(attrLabel + " - Latitude");
+			level.column = nodeDef.getName() + "_y";
+			hierarchy.levels.add(level);
+			
+			Level level2 = new Level(attrLabel + " - Longitude");
+			level2.column = nodeDef.getName() + "_x";
+			hierarchy.levels.add(level2);
+		
 		} else {
 			Level level = generateLevel(nodeDef);
 			hierarchy.levels.add(level);
