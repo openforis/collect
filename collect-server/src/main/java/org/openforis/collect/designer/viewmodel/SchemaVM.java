@@ -1438,14 +1438,14 @@ public class SchemaVM extends SurveyBaseVM {
 		}
 	}
 
-	private EntityDefinition determineRelatedEntity(SurveyObject newParent) {
-		EntityDefinition newParentEntityDef;
-		if ( newParent instanceof UITab ) {
-			newParentEntityDef = ((UITab) newParent).getUIOptions().getParentEntityForAssignedNodes((UITab) newParent);
+	private EntityDefinition determineRelatedEntity(SurveyObject obj) {
+		if ( obj instanceof UITab ) {
+			UITab tab = (UITab) obj;
+			EntityDefinition newParentEntityDef = tab.getUIOptions().getParentEntityForAssignedNodes(tab);
+			return newParentEntityDef;
 		} else {
-			newParentEntityDef = (EntityDefinition) newParent;
+			return (EntityDefinition) obj;
 		}
-		return newParentEntityDef;
 	}
 	
 	private void changeEditedNodeParentEntity(EntityDefinition newParentEntity) {

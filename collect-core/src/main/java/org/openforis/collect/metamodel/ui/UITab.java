@@ -2,6 +2,7 @@ package org.openforis.collect.metamodel.ui;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
@@ -121,6 +122,16 @@ public class UITab extends UITabSet {
 		return false;
 	}
 	
+	public void traverse(TabVisitor visitor) {
+		Stack<UITab> stack = new Stack<UITab>();
+		stack.push(this);
+		while (! stack.isEmpty()) {
+			UITab tab = stack.pop();
+			visitor.visit(tab);
+			stack.addAll(tab.getTabs());
+		}
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -146,4 +157,7 @@ public class UITab extends UITabSet {
 		return true;
 	}
 
+	public interface TabVisitor {
+		void visit(UITab tab);
+	}
 }
