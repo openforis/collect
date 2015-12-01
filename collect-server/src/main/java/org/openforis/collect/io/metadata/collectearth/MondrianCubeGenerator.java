@@ -147,7 +147,7 @@ public class MondrianCubeGenerator {
 //		cube.dimensions.addAll(generatePredefinedDimensions());
 		//add predefined measures
 		
-		// Add the measures AFTER the 1st measure, which shouyld be Plot Count
+		// Add the measures AFTER the 1st measure, which should be Plot Count
 		cube.measures.addAll(1, generatePredefinedMeasures());
 		return cube;
 	}

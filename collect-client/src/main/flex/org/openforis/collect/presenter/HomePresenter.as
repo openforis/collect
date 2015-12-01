@@ -43,6 +43,10 @@ package org.openforis.collect.presenter {
 			label: Message.get('home.dataCleansing'),
 			icon: Images.DATA_CLEANSING};
 		
+		private static const SAIKU_MENU_ITEM:Object = {
+			label: Message.get('home.saiku'),
+			icon: Images.SAIKU};
+
 		private static const BACKUP_RESTORE_MENU_ITEM:Object = {
 			label: Message.get('home.backup_restore'),
 				icon: Images.BACKUP};
@@ -77,6 +81,7 @@ package org.openforis.collect.presenter {
 				result.addItem(DESIGNER_MENU_ITEM);
 				result.addItem(BACKUP_RESTORE_MENU_ITEM);
 				result.addItem(DATA_CLEANSING_MENU_ITEM);
+				result.addItem(SAIKU_MENU_ITEM);
 				result.addItem(USERS_MANAGEMENT_MENU_ITEM);
 				result.addItem(CONFIGURATION_MENU_ITEM);
 			}
@@ -96,6 +101,9 @@ package org.openforis.collect.presenter {
 					break;
 				case DATA_CLEANSING_MENU_ITEM:
 					navigateToURL(new URLRequest(ApplicationConstants.DATA_CLEANSING_URL), "_self");
+					break;
+				case SAIKU_MENU_ITEM:
+					PopUpUtil.createPopUp(SaikuPopUp, true);
 					break;
 				case BACKUP_RESTORE_MENU_ITEM:
 					PopUpUtil.createPopUp(BackupRestorePopUp, true);

@@ -24,6 +24,7 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 	private static final long serialVersionUID = 1L;
 	
 	private static final String DATASOURCE_SUFFIX = "_ds";
+	private static final String SAIKU_WEBAPP_NAME = "saiku";
 	private static final String DATASOURCES_PATH = "WEB-INF" + File.separator + "classes" + File.separator + "saiku-datasources";
 
 	private static final String DATASOURCE_CONTENT_FORMAT = 
@@ -33,6 +34,10 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 			+ "location=jdbc:mondrian:Jdbc=%s;Catalog=%s;JdbcDrivers=org.sqlite.JDBC\r\n"
 			+ "username=dbuser\r\n"
 			+ "password=password";
+	
+	public SaikuDatasourceStorageManager() {
+		super(getCatalinaBaseWebappsFolderPath(), SAIKU_WEBAPP_NAME);
+	}
 	
 	@Autowired
 	private MondrianSchemaStorageManager mondrianSchemaStorageManager;

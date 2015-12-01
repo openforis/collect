@@ -129,6 +129,9 @@ public class RDBReportingRepositories implements ReportingRepositories {
 		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
 		
 		updateMondrianSchemaFile(surveyName);
+		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
+			writeSaikuDatasource(surveyName, recordStep);
+		}
 		
 		final RelationalSchema relationalSchema = getOrInitializeRelationalSchemaDefinition(surveyName);
 		
@@ -150,9 +153,13 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private void writeSaikuDatasources(String surveyName) {
 		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
 			for (RecordStep recordStep : RecordStep.values()) {
-				saikuDatasourceStorageManager.writeDatasourceFile(surveyName, recordStep);
+				writeSaikuDatasource(surveyName, recordStep);
 			}
 		}
+	}
+
+	private void writeSaikuDatasource(String surveyName, RecordStep recordStep) {
+		saikuDatasourceStorageManager.writeDatasourceFile(surveyName, recordStep);
 	}
 	
 	private void deleteSaikuDatasources(String surveyName) {

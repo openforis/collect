@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component:PopUp xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				 xmlns:s="library://ns.adobe.com/flex/spark" 
+				 xmlns:mx="library://ns.adobe.com/flex/mx"
+				 xmlns:component="org.openforis.collect.ui.component.*"
+				 width="700" height="500"
+				 title="{Message.get('home.saiku')}"
+				 currentState="loading" 
+				 xmlns:container="org.openforis.collect.ui.container.*"
+				 >
+	
+	<fx:Script>
+		<![CDATA[
+			import com.shortybmc.utils.StringUtils;
+			
+			import mx.events.FlexEvent;
+			import mx.rpc.AsyncResponder;
+			import mx.rpc.IResponder;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import org.openforis.collect.client.ClientFactory;
+			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.model.Configuration$ConfigurationItem;
+			import org.openforis.collect.model.LogoPosition;
+			import org.openforis.collect.model.proxy.ConfigurationProxy;
+			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.util.AlertUtil;
+			import org.openforis.collect.util.StringUtil;
+			
+			private var _initialized:Boolean;
+			
+			private var textInputToConfigurationItem:Dictionary;
+			
+			override protected function creationCompleteHandler(event:FlexEvent):void {
+				super.creationCompleteHandler(event);
+				_initialized = false;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<component:layout>
+		<s:BasicLayout />
+	</component:layout>
+
+	<component:states>
+		<s:State name="loading" />
+		<s:State name="loadComplete" />
+	</component:states>
+	
+	<component:LoadingContent includeIn="loading" />
+	
+	<s:Form width="100%" height="100%"  includeIn="loadComplete" >
+		<s:VGroup gap="30" width="100%">
+			
+			<!-- allowed restore key -->
+			<s:FormItem label="{Message.get('saiku.open')}" width="100%">
+				<s:TextInput id="" width="100%" />
+			</s:FormItem>
+			
+			<!-- remote clone url -->
+			<s:FormItem label="{Message.get('saiku.generate')}" width="100%">
+				<s:TextInput id="" width="100%" />
+			</s:FormItem>
+		</s:VGroup>
+	</s:Form>
+
+</component:PopUp>
