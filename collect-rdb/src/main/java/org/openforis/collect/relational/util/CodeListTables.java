@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
+import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.CodeListLevel;
 
@@ -17,6 +18,14 @@ import org.openforis.idm.metamodel.CodeListLevel;
  */
 public class CodeListTables {
 	
+	public static String getTableName(CodeAttributeDefinition attrDef) {
+		return getTableName(RelationalSchemaConfig.createDefault(), attrDef);
+	}
+	
+	public static String getTableName(RelationalSchemaConfig config, CodeAttributeDefinition attrDef) {
+		return getTableName(config, attrDef.getList(), attrDef.getListLevelIndex());
+	}
+	
 	public static String getTableName(CodeList codeList, Integer levelIdx) {
 		return getTableName(RelationalSchemaConfig.createDefault(), codeList, levelIdx);
 	}
@@ -25,7 +34,7 @@ public class CodeListTables {
 		String baseTableName = CodeListTables.getBaseTableName(codeList, levelIdx);
 		return baseTableName + config.getCodeListTableSuffix();
 	}
-
+	
 	public static String getIdColumnName(String tableName) {
 		return getIdColumnName(RelationalSchemaConfig.createDefault(), tableName);
 	}

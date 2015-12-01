@@ -21,6 +21,7 @@ import net.lingala.zip4j.util.Zip4jConstants;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
 import org.openforis.collect.io.metadata.collectearth.balloon.CollectEarthBalloonGenerator;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.metamodel.CollectAnnotations;
@@ -67,7 +68,8 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String PROJECT_PROPERTIES_FILE_NAME = "project_definition.properties";
 	private static final double HECTARES_TO_METERS_CONVERSION_FACTOR = 10000d;
 	private static final String README_FILE = "README.txt";
-		
+	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
+	
 	private CodeListManager codeListManager;
 	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
 	
@@ -366,7 +368,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	}
 	
 	private File generateCube(CollectSurvey survey, String language) throws IOException {
-		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey, language);
+		MondrianCubeGenerator cubeGenerator = new MondrianCubeGenerator(survey, language, SAIKU_SCHEMA_PLACEHOLDER, new RelationalSchemaContext().getRdbConfig());
 		String xmlSchema = cubeGenerator.generateXMLSchema();
 		return Files.writeToTempFile(xmlSchema, "collect-earth-project-file-creator", ".xml");
 	}

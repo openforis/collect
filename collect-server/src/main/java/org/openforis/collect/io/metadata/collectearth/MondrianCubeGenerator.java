@@ -6,14 +6,13 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
+import org.openforis.collect.relational.util.CodeListTables;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.CodeListLevel;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -37,29 +36,33 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  */
 public class MondrianCubeGenerator {
 	
-	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
 	private static final String[] MEASURE_AGGREGATORS = new String[] {"min", "max", "avg"};
 	
 	private CollectSurvey survey;
 	private RelationalSchemaConfig rdbConfig;
 	private String language;
+	private String dbSchemaName;
 
-	public MondrianCubeGenerator(CollectSurvey survey, String language) {
+	public MondrianCubeGenerator(CollectSurvey survey, String language, String dbSchemaName) {
+		this(survey, language, dbSchemaName, RelationalSchemaConfig.createDefault());
+	}
+	
+	public MondrianCubeGenerator(CollectSurvey survey, String language, String dbSchemaName, RelationalSchemaConfig rdbConfig) {
 		this.survey = survey;
 		this.language = language;
-		this.rdbConfig = new RelationalSchemaContext().getRdbConfig();
+		this.rdbConfig = rdbConfig;
+		this.dbSchemaName = dbSchemaName;
 	}
 	
 	private Schema generateSchema() {
 		Schema schema = new Schema(survey.getName());
 		Cube cube = generateCube();
 		schema.cube = cube;
-		
 		return schema;
 	}
 	
 	public String generateXMLSchema() {
-		org.openforis.collect.io.metadata.collectearth.MondrianCubeGenerator.Schema mondrianSchema = generateSchema();
+		MondrianCubeGenerator.Schema mondrianSchema = generateSchema();
 		XStream xStream = new XStream();
 		xStream.processAnnotations(MondrianCubeGenerator.Schema.class);
 		String xmlSchema = xStream.toXML(mondrianSchema);
@@ -67,9 +70,8 @@ public class MondrianCubeGenerator {
 	}
 
 	private Cube generateCube() {
-		
 		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
-		Table table = new Table(rootEntityDef.getName());
+		Table table = new Table(dbSchemaName, rootEntityDef.getName());
 		
 		Cube cube = new Cube("Collect Data - " + rootEntityDef.getLabel(NodeLabel.Type.INSTANCE, language) );
 		cube.table = table;
@@ -82,7 +84,11 @@ public class MondrianCubeGenerator {
 				
 				if (nodeDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) nodeDef).isKey()) {
 					Measure measure = new Measure(rootEntityDef.getName() + "_count");
-					measure.column = "_" + rootEntityDef.getName() + "_" + nodeName;
+					if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+						measure.column = "_" + rootEntityDef.getName() + "_" + nodeName;
+					} else {
+						measure.column = nodeName;
+					}
 					measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(rootEntityDef) + " Count" );
 					measure.aggregator = "distinct count";
 					measure.datatype = "Integer";
@@ -112,35 +118,34 @@ public class MondrianCubeGenerator {
 					
 					if( nodeDef.isMultiple() ){
 						dimension.foreignKey = rootEntityIdColumnName;
-						hierarchy.primaryKey = rootEntityIdColumnName;
-						hierarchy.primaryKeyTable = entityName;
 						
 						if (childDef instanceof CodeAttributeDefinition) {
-							
-							Join join = new Join(null);
-							String codeListName = ((CodeAttributeDefinition) childDef).getList().getName();
-							join.leftKey = childDef.getName() + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
-							join.rightKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
-							
-							join.tables = Arrays.asList(
-									new Table(entityName), 
-									new Table(codeListName + rdbConfig.getCodeListTableSuffix())
-							);
-							
-							hierarchy.join = join;
-							
-						}else{
-							hierarchy.table = new Table(entityName);
+							CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) childDef;
+							CodeList codeList = codeAttrDef.getList();
+							if (! codeList.isExternal()) {
+								hierarchy.primaryKey = rootEntityIdColumnName;
+								hierarchy.primaryKeyTable = entityName;
+								Join join = new Join(null);
+								join.leftKey =  childDef.getName() + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
+								String codeTableName = CodeListTables.getTableName(rdbConfig, codeList, codeAttrDef.getListLevelIndex());
+								join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeTableName);
+								
+								join.tables = Arrays.asList(
+										new Table(dbSchemaName, entityName), 
+										new Table(dbSchemaName, codeTableName)
+								);
+								hierarchy.join = join;
+							}
+						} else {
+							hierarchy.primaryKey = rootEntityIdColumnName;
+							hierarchy.primaryKeyTable = entityName;
+							hierarchy.table = new Table(dbSchemaName, entityName);
 						}
-						
 						hierarchy.levels.add(generateLevel(childDef));
-						
 						dimension.hierarchy = hierarchy;
-						
-					}else{
+					} else {
 						dimension = generateDimension(childDef, rootEntityDef);
 					}
-					
 					cube.dimensions.add(dimension);
 				}
 			}
@@ -259,37 +264,39 @@ public class MondrianCubeGenerator {
 		Hierarchy hierarchy = dimension.hierarchy;
 		
 		if (nodeDef instanceof CodeAttributeDefinition) {
-			String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
+			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDef;
 			
-			String entityName = attrName;
-			
-			if( nodeDef.isMultiple() ){
+			if (! codeAttrDef.getList().isExternal()) {
+				String rootEntityIdColumnName = getRootEntityIdColumnName(rootEntityDef);
 				
-				dimension.foreignKey = rootEntityIdColumnName;
-				hierarchy.primaryKey = rootEntityIdColumnName;
-				hierarchy.primaryKeyTable = entityName;
+				String entityName = attrName;
+				
+				if( nodeDef.isMultiple() ){
 					
-				Join join = new Join(null);
-				String codeListName = ((CodeAttributeDefinition) nodeDef).getList().getName();
-				join.leftKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
-				join.rightKey = codeListName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();
-				
-				join.tables = Arrays.asList(
-						new Table(entityName), 
-						new Table(codeListName + rdbConfig.getCodeListTableSuffix())
-				);
-				
-				hierarchy.join = join;
-										
-			}else{			
-				CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) nodeDef;
-				String codeTableName = extractCodeListTableName(codeAttrDef);
-				dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();						
-				hierarchy.table = new Table(codeTableName);
+					dimension.foreignKey = rootEntityIdColumnName;
+					hierarchy.primaryKey = rootEntityIdColumnName;
+					hierarchy.primaryKeyTable = entityName;
+						
+					Join join = new Join(null);
+					String codeListTableName = CodeListTables.getTableName(rdbConfig, codeAttrDef);
+	
+					join.leftKey = CodeListTables.getIdColumnName(rdbConfig, codeListTableName);
+					join.rightKey = CodeListTables.getIdColumnName(rdbConfig, codeListTableName);
+					
+					join.tables = Arrays.asList(
+							new Table(dbSchemaName, entityName), 
+							new Table(dbSchemaName, codeListTableName)
+					);
+					
+					hierarchy.join = join;
+				} else {			
+					String codeListTableName = CodeListTables.getTableName(rdbConfig, codeAttrDef);
+					dimension.foreignKey = attrName + rdbConfig.getCodeListTableSuffix() + rdbConfig.getIdColumnSuffix();						
+					hierarchy.table = new Table(dbSchemaName, codeListTableName);
+				}
 			}
-		}
-		
-		if (nodeDef instanceof DateAttributeDefinition) {
+			hierarchy.levels.add(generateLevel(nodeDef));
+		} else if (nodeDef instanceof DateAttributeDefinition) {
 			dimension.type = "";
 			hierarchy.type = "TimeDimension";
 			hierarchy.allMemberName = "attrLabel";
@@ -312,29 +319,27 @@ public class MondrianCubeGenerator {
 			Level level2 = new Level(attrLabel + " - Longitude");
 			level2.column = nodeDef.getName() + "_x";
 			hierarchy.levels.add(level2);
-		
 		} else {
-			Level level = generateLevel(nodeDef);
-			hierarchy.levels.add(level);
+			hierarchy.levels.add(generateLevel(nodeDef));
 		}
 		return dimension;
 	}
 
-	private String extractCodeListTableName(CodeAttributeDefinition codeAttrDef) {
-		StringBuffer codeListName = new StringBuffer( codeAttrDef.getList().getName() );
-		
-		int levelIdx = codeAttrDef.getLevelIndex();
-		if ( levelIdx != -1 ) {
-			CodeList codeList = codeAttrDef.getList();
-			List<CodeListLevel> codeHierarchy = codeList.getHierarchy();
-			if( !codeHierarchy.isEmpty() ){
-				CodeListLevel currentLevel = codeHierarchy.get(levelIdx);
-				codeListName.append("_");
-				codeListName.append(currentLevel.getName());
-			}
-		}
-		return codeListName.append(rdbConfig.getCodeListTableSuffix()).toString();
-	}
+//	private String extractCodeListTableName(CodeAttributeDefinition codeAttrDef) {
+//		StringBuffer codeListName = new StringBuffer( codeAttrDef.getList().getName() );
+//		
+//		int levelIdx = codeAttrDef.getLevelIndex();
+//		if ( levelIdx != -1 ) {
+//			CodeList codeList = codeAttrDef.getList();
+//			List<CodeListLevel> codeHierarchy = codeList.getHierarchy();
+//			if( !codeHierarchy.isEmpty() ){
+//				CodeListLevel currentLevel = codeHierarchy.get(levelIdx);
+//				codeListName.append("_");
+//				codeListName.append(currentLevel.getName());
+//			}
+//		}
+//		return codeListName.append(rdbConfig.getCodeListTableSuffix()).toString();
+//	}
 	
 	private Level generateLevel(NodeDefinition nodeDef) {
 		String attrName = nodeDef.getName();
@@ -346,9 +351,9 @@ public class MondrianCubeGenerator {
 			level.type = "String";	
 		}
 		level.levelType = "Regular";
-		if (nodeDef instanceof CodeAttributeDefinition) {
+		if (nodeDef instanceof CodeAttributeDefinition && ! ((CodeAttributeDefinition) nodeDef).getList().isExternal()) {
 			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
-			String codeTableName = extractCodeListTableName(codeDef);
+			String codeTableName = CodeListTables.getTableName(rdbConfig, codeDef);
 			level.table = codeTableName;
 			level.column = codeTableName + rdbConfig.getIdColumnSuffix();
 			level.nameColumn = codeTableName.substring(0, codeTableName.length() - rdbConfig.getCodeListTableSuffix().length()) + "_label_" + language ;
@@ -418,10 +423,11 @@ public class MondrianCubeGenerator {
 	private static class Table extends MondrianSchemaObject {
 
 		@XStreamAsAttribute
-		private final String schema = SAIKU_SCHEMA_PLACEHOLDER;
+		private final String schema;
 		
-		public Table(String name) {
+		public Table(String schema, String name) {
 			super(name);
+			this.schema = schema;
 		}
 		
 	}
