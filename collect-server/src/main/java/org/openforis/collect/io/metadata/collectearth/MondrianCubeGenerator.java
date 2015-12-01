@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.earth.core.rdb.RelationalSchemaContext;
+import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -49,7 +50,7 @@ public class MondrianCubeGenerator {
 		this.rdbConfig = new RelationalSchemaContext().getRdbConfig();
 	}
 	
-	public Schema generateSchema() {
+	private Schema generateSchema() {
 		Schema schema = new Schema(survey.getName());
 		Cube cube = generateCube();
 		schema.cube = cube;
@@ -66,9 +67,11 @@ public class MondrianCubeGenerator {
 	}
 
 	private Cube generateCube() {
-		Cube cube = new Cube("Collect Earth Plot");
+		
 		EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
 		Table table = new Table(rootEntityDef.getName());
+		
+		Cube cube = new Cube("Collect Data - " + rootEntityDef.getLabel(NodeLabel.Type.INSTANCE, language) );
 		cube.table = table;
 		
 		List<NodeDefinition> children = rootEntityDef.getChildDefinitions();
@@ -148,16 +151,19 @@ public class MondrianCubeGenerator {
 		//add predefined measures
 		
 		// Add the measures AFTER the 1st measure, which should be Plot Count
-		cube.measures.addAll(1, generatePredefinedMeasures());
+		// Only for Collect Earth surveys
+		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+			cube.measures.addAll(1, generateEarthSpecificMeasures());
+		}
 		return cube;
 	}
 
-	public String getRootEntityIdColumnName(EntityDefinition rootEntityDef) {
+	private String getRootEntityIdColumnName(EntityDefinition rootEntityDef) {
 		return rdbConfig.getIdColumnPrefix() + rootEntityDef.getName() + rdbConfig.getIdColumnSuffix();
 	}
 	
 	
-	private List<Measure> generatePredefinedMeasures() {
+	private List<Measure> generateEarthSpecificMeasures() {
 		List<Measure> measures = new ArrayList<Measure>();
 		//Expansion factor - Area
 		{
