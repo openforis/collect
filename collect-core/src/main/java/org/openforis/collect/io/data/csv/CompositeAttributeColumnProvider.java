@@ -101,22 +101,21 @@ public abstract class CompositeAttributeColumnProvider<T extends AttributeDefini
 		int maxAttributeValues = getMaxAttributeValues();
 		int totHeadings = fieldNames.length * maxAttributeValues;
 		List<String> values = new ArrayList<String>(totHeadings);
-		if (! attributes.isEmpty()) {
-			for (int attrIdx = 0; attrIdx < maxAttributeValues; attrIdx ++) {
-				Attribute<?, ?> attr = attrIdx < attributes.size() ? (Attribute<?, ?>) attributes.get(attrIdx): null;
-				if (isMergedValueSupported()) {
-					String val = extractMergedValue(attr);
-					values.add(val);
+		
+		for (int attrIdx = 0; attrIdx < maxAttributeValues; attrIdx ++) {
+			Attribute<?, ?> attr = attrIdx < attributes.size() ? (Attribute<?, ?>) attributes.get(attrIdx): null;
+			if (isMergedValueSupported()) {
+				String val = extractMergedValue(attr);
+				values.add(val);
+			}
+			for (String fieldName : fieldNames) {
+				String val;
+				if (attr == null) {
+					val = "";
+				} else {
+					val = extractValue(attr, fieldName);
 				}
-				for (String fieldName : fieldNames) {
-					String val;
-					if (attr == null) {
-						val = "";
-					} else {
-						val = extractValue(attr, fieldName);
-					}
-					values.add(val);
-				}
+				values.add(val);
 			}
 		}
 		return values;

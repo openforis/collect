@@ -440,7 +440,11 @@ package org.openforis.collect.presenter {
 		protected function selectAllConflictingRecords(event:DataImportEvent):void {
 			_allConflictingRecordsSelected = ! _allConflictingRecordsSelected;
 			view.allConflictingRecordsSelected = _allConflictingRecordsSelected;
-			view.selectedConflictingRecordsCount = _summary.conflictingRecords.length;
+			if (_allConflictingRecordsSelected) {
+				view.selectedConflictingRecordsCount = _summary.conflictingRecords.length;
+			} else {
+				view.selectedConflictingRecordsCount = 0;
+			}
 			setItemsSelected(_summary.conflictingRecords, _allConflictingRecordsSelected);
 		}
 		
