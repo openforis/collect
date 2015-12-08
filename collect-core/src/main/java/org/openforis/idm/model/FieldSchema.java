@@ -12,6 +12,11 @@ import com.dyuproject.protostuff.ProtostuffException;
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class FieldSchema extends SchemaSupport<Field> {
 
+	private static final int VALUE_FIELD_NUMBER = 1;
+	private static final int SYMBOL_FIELD_NUMBER = 2;
+	private static final int REMARKS_FIELD_NUMBER = 3;
+	private static final int STATE_FIELD_NUMBER = 4;
+	
 	public FieldSchema() {
 		super(Field.class, "value", "symbol", "remarks", "state" );
 	}
@@ -25,27 +30,27 @@ public class FieldSchema extends SchemaSupport<Field> {
 	public void writeTo(Output out, Field fld) throws IOException {
 		if ( fld.value != null ) { 
 			if ( fld.valueType == Boolean.class ) {
-				out.writeInt32(1, (Boolean) fld.value ? -1 : 0, false);
+				out.writeInt32(VALUE_FIELD_NUMBER, (Boolean) fld.value ? -1 : 0, false);
 			} else if ( fld.valueType == Integer.class ) {
-				out.writeInt32(1, (Integer) fld.value, false);
+				out.writeInt32(VALUE_FIELD_NUMBER, (Integer) fld.value, false);
 			} else if ( fld.valueType ==  Long.class ) {
-				out.writeInt64(1, (Long) fld.value, false);
+				out.writeInt64(VALUE_FIELD_NUMBER, (Long) fld.value, false);
 			} else if ( fld.valueType == Double.class ) {
-				out.writeDouble(1, (Double) fld.value, false);
+				out.writeDouble(VALUE_FIELD_NUMBER, (Double) fld.value, false);
 			} else if ( fld.valueType == String.class ) {
-				out.writeString(1, (String) fld.value, false);
+				out.writeString(VALUE_FIELD_NUMBER, (String) fld.value, false);
 			} else {
 				throw new UnsupportedOperationException("Cannot serialize "+Field.class.getSimpleName()+"<"+fld.valueType.getClass().getSimpleName()+">");
 			}
 		}
 		if ( fld.symbol != null ) {
-			out.writeString(2, fld.symbol.toString(), false);
+			out.writeString(SYMBOL_FIELD_NUMBER, fld.symbol.toString(), false);
 		}
 		if ( fld.remarks != null ) {
-			out.writeString(3, fld.remarks, false);
+			out.writeString(REMARKS_FIELD_NUMBER, fld.remarks, false);
 		}
 		if( fld.state != null ){
-			out.writeInt32(4, fld.state.intValue(), false);
+			out.writeInt32(STATE_FIELD_NUMBER, fld.state.intValue(), false);
 		}
 	}
 
@@ -57,30 +62,31 @@ public class FieldSchema extends SchemaSupport<Field> {
 			switch (number) {
 			case 0:
 				return;
-			case 1:
+			case VALUE_FIELD_NUMBER:
+				Object val;
 				if ( fld.valueType == Boolean.class ) {
-					fld.setValue(in.readInt32() != 0);
+					val = in.readInt32() != 0;
 				} else if ( fld.valueType == Integer.class ) {
-					fld.setValue(in.readInt32());
+					val = in.readInt32();
 				} else if ( fld.valueType ==  Long.class ) {
-					fld.setValue(in.readInt64());
+					val = in.readInt64();
 				} else if ( fld.valueType ==  Double.class ) {
-					fld.setValue(in.readDouble());
+					val = in.readDouble();
 				} else if ( fld.valueType == String.class ) {
-					fld.setValue(in.readString());
+					val = in.readString();
 				} else {
 					throw new UnsupportedOperationException("Cannot deserialize type "+Field.class.getSimpleName()+"<"+fld.valueType.getClass().getSimpleName()+">");
 				}
+				fld.setValue(val);
 				break;
-			case 2:
+			case SYMBOL_FIELD_NUMBER:
 				fld.symbol = in.readString().charAt(0);
 				break;
-			case 3:
+			case REMARKS_FIELD_NUMBER:
 				fld.remarks = in.readString();
 				break;
-			case 4:
-				State state = State.parseState(in.readInt32());
-				fld.state = state;
+			case STATE_FIELD_NUMBER:
+				fld.state = State.parseState(in.readInt32());
 				break;
 			default:
             	throw new ProtostuffException("Unexpected field number");

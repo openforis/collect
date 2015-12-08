@@ -12,6 +12,7 @@ import com.dyuproject.protostuff.ProtostuffException;
  */
 public class AttributeSchema<T extends Attribute<?,?>> extends SchemaSupport<T> {
 
+	private static final int ATTRIBUTE_FIELD_FIELD_NUMBER = 1;
 	private static FieldSchema ATTRIBUTE_FIELD_SCHEMA = new FieldSchema();
 
 	public AttributeSchema(Class<T> typeClass) {
@@ -43,7 +44,7 @@ public class AttributeSchema<T extends Attribute<?,?>> extends SchemaSupport<T> 
 		int cnt = attr.getFieldCount();
 		for (int i = 0; i < cnt; i++) {
 			Field<?> fld = attr.getField(i);
-			output.writeObject(1, fld, ATTRIBUTE_FIELD_SCHEMA, true);
+			output.writeObject(ATTRIBUTE_FIELD_FIELD_NUMBER, fld, ATTRIBUTE_FIELD_SCHEMA, true);
 		}
 	}
 
