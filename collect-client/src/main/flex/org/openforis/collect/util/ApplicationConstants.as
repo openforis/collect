@@ -56,6 +56,7 @@ package org.openforis.collect.util {
 		
 		private static var _HOST:String;
 		private static var _PORT:uint;
+		private static var _ROOT_URL:String;
 		private static var _URL:String;
 		
 		{
@@ -132,25 +133,25 @@ package org.openforis.collect.util {
 			return _PORT;
 		}
 		
+		public static function get ROOT_URL():String {
+			return _ROOT_URL;
+		}
+		
 		public static function get URL():String {
 			return _URL;
 		}
-		
-		internal static function setUrl(url:String):void {
-			var protocol:String = URLUtil.getProtocol(url);
-			var urlPort:uint = URLUtil.getPort(url);
-			if(urlPort == 0){
-				_PORT = 80;
-			} else {
-				_PORT = urlPort;
-			}
-			_HOST = URLUtil.getServerName(url); 
+
+		internal static function setUrl(applicationUrl:String):void {
+			var protocol:String = URLUtil.getProtocol(applicationUrl);
+			var urlPort:uint = URLUtil.getPort(applicationUrl);
+			_PORT = urlPort == 0 ? 80 : urlPort;
+			_HOST = URLUtil.getServerName(applicationUrl); 
 			var originalRootUrl:String = protocol + "://"+ _HOST + (urlPort > 0 ? (":" + urlPort): "") + "/";
-			var contextNameLenght:int = url.indexOf("/", originalRootUrl.length) - originalRootUrl.length;
-			var contextName:String = url.substr(originalRootUrl.length, contextNameLenght);
-			var rootUrl:String = protocol + "://"+ _HOST + ":" + _PORT + "/";
+			var contextNameLenght:int = applicationUrl.indexOf("/", originalRootUrl.length) - originalRootUrl.length;
+			var contextName:String = applicationUrl.substr(originalRootUrl.length, contextNameLenght);
+			_ROOT_URL = protocol + "://"+ _HOST + ":" + _PORT + "/";
 			
-			_URL = rootUrl + contextName + "/";
+			_URL = _ROOT_URL + contextName + "/";
 			
 			_FILE_UPLOAD_URL = _URL + FILE_UPLOAD_SERVLET_NAME;
 			

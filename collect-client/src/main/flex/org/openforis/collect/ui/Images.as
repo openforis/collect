@@ -32,7 +32,7 @@ package org.openforis.collect.ui {
 		[Embed("/assets/images/data_cleansing.png")]
 		public static const DATA_CLEANSING:Class;
 
-		[Embed("/assets/images/data_cleansing.png")]
+		[Embed("/assets/images/saiku.png")]
 		public static const SAIKU:Class;
 
 		[Embed("/assets/images/backup.png")]

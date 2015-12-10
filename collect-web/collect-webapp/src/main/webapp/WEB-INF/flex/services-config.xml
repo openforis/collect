@@ -105,6 +105,14 @@
 					<scope>application</scope>
 				</properties>
 			</destination>
+			
+			<destination id="saikuService">
+				<properties>
+					<factory>springFactory</factory>
+					<source>saikuService</source>
+					<scope>application</scope>
+				</properties>
+			</destination>
 
 			<destination id="samplingDesignService">
 				<properties>
