@@ -18,6 +18,7 @@ package org.openforis.collect.client {
 		private static var _dataImportClient:DataImportClient;
 		private static var _logoClient:LogoClient;
 		private static var _modelClient:ModelClient;
+		private static var _saikuClient:SaikuClient;
 		private static var _samplingDesignClient:SamplingDesignClient;
 		private static var _samplingDesignImportClient:SamplingDesignImportClient;
 		private static var _sessionClient:SessionClient;
@@ -108,6 +109,13 @@ package org.openforis.collect.client {
 				_samplingDesignClient = new SamplingDesignClient();
 			}
 			return _samplingDesignClient;
+		}
+
+		public static function get saikuClient():SaikuClient {
+			if(_saikuClient == null){
+				_saikuClient = new SaikuClient();
+			}
+			return _saikuClient;
 		}
 		
 		public static function get sessionClient():SessionClient {

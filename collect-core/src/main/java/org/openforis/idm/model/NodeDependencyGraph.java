@@ -69,9 +69,7 @@ public abstract class NodeDependencyGraph extends DependencyGraph<Node<?>> {
 	@Override
 	protected Set<Node<?>> determineRelatedItems(Node<?> node, NodeDefinition childDef) {
 		List<Node<?>> dependentNodes = node.getParent().getChildren(childDef);
-		Set<Node<?>> relatedNodes = new HashSet<Node<?>>();
-		relatedNodes.addAll(dependentNodes);
-		return relatedNodes;
+		return new HashSet<Node<?>>(dependentNodes);
 	}
 
 	@Override

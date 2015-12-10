@@ -9,6 +9,7 @@ import java.util.Map;
 import org.openforis.collect.designer.component.SchemaTreeModel;
 import org.openforis.collect.designer.component.SurveyObjectTreeModelCreator;
 import org.openforis.collect.designer.component.UITreeModelCreator;
+import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -79,16 +80,12 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	@Command
 	public void apply(@BindingParam("selectedSurveyObject") SurveyObject selectedSurveyObject, 
 			@ContextParam(ContextType.VIEW) Component view) {
-		if ( selectedSurveyObject == null || 
-				( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
+		if (selectedSurveyObject == null) {
+			MessageUtil.showWarning("survey.schema.tree.popup.select_a_node");
+		} else if(( disabledNodePredicate == null || ! disabledNodePredicate.evaluate(selectedSurveyObject) ) 
 				&& ( selectableNodePredicate == null || selectableNodePredicate.evaluate(selectedSurveyObject) ) ) {
 			Events.postEvent(new NodeSelectedEvent(view, selectedSurveyObject));
 		}
-	}
-	
-	@Command
-	public void cancel(@ContextParam(ContextType.VIEW) Component view) {
-		Events.postEvent("onClose", view, null);
 	}
 	
 	@Command
