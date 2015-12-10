@@ -119,7 +119,7 @@ public class CEComponentHTMLFormatter {
 		for (CEComponent child : comp.getChildren()) {
 			if (child instanceof CEField) {
 
-				informationFieldsBuilder.e("span" ).t( (firstChild?" ":", ") + child.getLabelOrName() + ": $[" + child.getName()+ "]" );
+				informationFieldsBuilder.e("span" ).t( (firstChild?" ":", ") + child.getLabelOrName() + ": $["+  CollectEarthBalloonGenerator.PREFIX_EXTRA_CSV_FIELD + child.getName()+ "]" );
 				firstChild = false;
 				
 			} else {
