@@ -214,7 +214,7 @@ public class CollectEarthBalloonGenerator {
 		UIOptions uiOptions = survey.getUIOptions();
 		UIConfiguration uiConfiguration = survey.getUIConfiguration();
 		if (uiConfiguration == null) {
-			throw new IllegalStateException("Error unmarshalling the survey"); //$NON-NLS-1$
+			throw new IllegalStateException("Error unmarshalling the survey - no UI configruration!"); //$NON-NLS-1$
 		}
 		if (uiConfiguration.getFormSets().isEmpty()) {
 			//no ui configuration defined
@@ -387,15 +387,18 @@ public class CollectEarthBalloonGenerator {
 		
 		CEEnumeratedEntityTable ceTable = new CEEnumeratedEntityTable(def.getName(), label);
 		for (NodeDefinition child : def.getChildDefinitions()) {
-			String heading = child.getLabel(Type.INSTANCE, language);
-			if (heading == null && ! isDefaultLanguage()) {
-				heading = child.getLabel(Type.INSTANCE);
+			if (! uiOptions.isHidden(child)) {
+				String heading = child.getLabel(Type.INSTANCE, language);
+				if (heading == null && ! isDefaultLanguage()) {
+					heading = child.getLabel(Type.INSTANCE);
+				}
+				if (heading == null) {
+					heading = child.getName();
+				}
+				ceTable.addHeading(heading);
 			}
-			if (heading == null) {
-				heading = child.getName();
-			}
-			ceTable.addHeading(heading);
 		}
+		
 		CodeAttributeDefinition enumeratingCodeAttribute = def.getEnumeratingKeyCodeAttribute();
 		CodeListService codeListService = def.getSurvey().getContext().getCodeListService();
 		List<CodeListItem> codeItems = codeListService.loadRootItems(enumeratingCodeAttribute.getList());
