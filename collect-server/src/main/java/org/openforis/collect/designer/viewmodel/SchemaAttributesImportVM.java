@@ -16,18 +16,24 @@ import org.apache.poi.util.IOUtils;
 import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.designer.model.NodeType;
 import org.openforis.collect.designer.util.MessageUtil;
+import org.openforis.collect.designer.util.Predicate;
+import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.io.csv.CsvLine;
 import org.openforis.commons.io.csv.CsvReader;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.SurveyObject;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
+import org.zkoss.util.resource.Labels;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.UploadEvent;
+import org.zkoss.zul.Window;
 
 /**
  * 
@@ -42,10 +48,19 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 	
 	private File uploadedFile;
 	private String uploadedFileName;
+	private EntityDefinition parentEntityDefinition;
 	
 	public SchemaAttributesImportVM() {
 		form = new HashMap<String, String>();
 		reset();
+	}
+	
+	@Override
+	@Init(superclass=false)
+	public void init() {
+		super.init();
+		parentEntityDefinition = survey.getSchema().getRootEntityDefinitions().get(0);
+		notifyChange("parentEntityDefinitionPath");
 	}
 
 	protected void reset() {
@@ -62,8 +77,6 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		if ( validateForm(ctx) ) {
 			try {
 				Map<String, AttributeType> attributeTypeByColumn = guessAttributeTypeByColumn();
-				Schema schema = getSurvey().getSchema();
-				EntityDefinition parentEntityDef = schema.getRootEntityDefinitions().get(0);
 				Set<Entry<String,AttributeType>> entrySet = attributeTypeByColumn.entrySet();
 				int newAttributesCount = 0;
 				int skippedAttributesCount = 0;
@@ -72,11 +85,11 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 					AttributeType attributeType = entry.getValue();
 					AttributeDefinition attrDef = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, attributeType);
 					String attributeName = adjustInternalName(colName);
-					if (parentEntityDef.containsChildDefinition(attributeName)) {
+					if (parentEntityDefinition.containsChildDefinition(attributeName)) {
 						skippedAttributesCount ++;
 					} else {
 						attrDef.setName(attributeName);
-						parentEntityDef.addChildDefinition(attrDef);
+						parentEntityDefinition.addChildDefinition(attrDef);
 						newAttributesCount ++;
 					}
 				}
@@ -158,6 +171,28 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		notifyChange("uploadedFileName");
 	}
 
+	@Command
+	public void openParentEntitySelectionButton() {
+		Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
+			public boolean evaluate(SurveyObject item) {
+				return item instanceof EntityDefinition;
+			}
+		};
+		String title = Labels.getLabel("survey.schema.attributes_import.select_entity.popup.title");
+		
+		//calculate parent item (tab or entity)
+		final Window popup = SchemaTreePopUpVM.openPopup(title, parentEntityDefinition.getRootEntity(), null, includedNodePredicate, 
+				true, true, null, null, parentEntityDefinition);
+		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
+			public void onEvent(NodeSelectedEvent event) throws Exception {
+				SurveyObject selectedParent = event.getSelectedItem();
+				parentEntityDefinition = (EntityDefinition) selectedParent;
+				notifyChange("parentEntityDefinitionPath");
+				closePopUp(popup);
+			}
+		});
+	}
+	
 	protected boolean validateForm(BindContext ctx) {
 		String messageKey = null;
 		if ( uploadedFile == null ) {
@@ -169,6 +204,10 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 			MessageUtil.showWarning(messageKey);
 			return false;
 		}
+	}
+	
+	public String getParentEntityDefinitionPath() {
+		return parentEntityDefinition == null ? null : parentEntityDefinition.getPath();
 	}
 	
 	public Map<String, String> getForm() {

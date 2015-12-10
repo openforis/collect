@@ -28,15 +28,15 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 
 	public UITreeModelCreator(ModelVersion version,
 			Predicate<SurveyObject> includeNodePredicate,
-			boolean includeEmptyNodes, String labelLanguage) {
-		this(version, null, includeNodePredicate, includeEmptyNodes, labelLanguage);
+			boolean includeRootEntity, boolean includeEmptyNodes, String labelLanguage) {
+		this(version, null, includeNodePredicate, includeRootEntity, includeEmptyNodes, labelLanguage);
 	}
 
 	public UITreeModelCreator(ModelVersion version,
 			Predicate<SurveyObject> disabledNodePredicate,
 			Predicate<SurveyObject> includeNodePredicate,
-			boolean includeEmptyNodes, String labelLanguage) {
-		super(version, disabledNodePredicate, includeNodePredicate, includeEmptyNodes, labelLanguage);
+			boolean includeRootEntity, boolean includeEmptyNodes, String labelLanguage) {
+		super(version, disabledNodePredicate, includeNodePredicate, includeRootEntity, includeEmptyNodes, labelLanguage);
 	}
 
 	@Override
@@ -79,18 +79,31 @@ public class UITreeModelCreator extends SurveyObjectTreeModelCreator {
 	@Override
 	protected List<AbstractNode<SchemaNodeData>> createFirstLevelNodes(EntityDefinition rootEntity) {
 		List<AbstractNode<SchemaNodeData>> firstLevelTreeNodes = new ArrayList<AbstractNode<SchemaNodeData>>();
-		CollectSurvey survey = (CollectSurvey) rootEntity.getSurvey();
-		UIOptions uiOptions = survey.getUIOptions();
-		UITabSet tabSet = uiOptions.getAssignedRootTabSet(rootEntity);
-		for (UITab tab : tabSet.getTabs()) {
-			SchemaTreeNode node = createNode(tab);
+		if (includeRootEntity) {
+			SchemaTreeNode node = createRootNode(rootEntity);
 			if ( node != null ) {
 				firstLevelTreeNodes.add(node);
+			}
+		} else {
+			CollectSurvey survey = (CollectSurvey) rootEntity.getSurvey();
+			UIOptions uiOptions = survey.getUIOptions();
+			UITabSet tabSet = uiOptions.getAssignedRootTabSet(rootEntity);
+			for (UITab tab : tabSet.getTabs()) {
+				SchemaTreeNode node = createNode(tab);
+				if ( node != null ) {
+					firstLevelTreeNodes.add(node);
+				}
 			}
 		}
 		return firstLevelTreeNodes;
 	}
 	
+	private SchemaTreeNode createRootNode(EntityDefinition rootEntity) {
+		SchemaNodeData data = new SchemaNodeData(rootEntity, rootEntity.getName(), false, false);
+		SchemaTreeNode treeNode = (SchemaTreeNode) createNode(data, false);
+		return treeNode;
+	}
+
 	private List<SchemaTreeNode> createChildNodes(UITab tab) {
 		List<SchemaTreeNode> result = new ArrayList<SchemaTreeNode>();
 		//add schema node definition tree nodes

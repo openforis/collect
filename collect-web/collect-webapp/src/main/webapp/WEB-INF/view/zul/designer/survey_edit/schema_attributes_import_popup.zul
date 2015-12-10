@@ -19,7 +19,7 @@
    
     <grid>
       <columns>
-        <column width="100px" />
+        <column width="130px" />
         <column width="100%" />
       </columns>
       <rows>
@@ -36,12 +36,26 @@
             </hbox>
           </cell>
         </row>
+        <row>
+        	<label value="${labels.survey.schema.attributes_import.import_into_entity}:" />
+			<cell>
+              <hbox hflex="true">
+	            <hbox hflex="true">
+	                <textbox value="@load(vm.parentEntityDefinitionPath)" readonly="true" hflex="true" />
+	            </hbox>
+                <button id="openParentEntitySelectionBtn" 
+                	label="${labels.survey.schema.attributes_import.select_entity.$}"
+                	width="100px"
+          			onClick="@command('openParentEntitySelectionButton')" />
+          		</hbox>
+			</cell>
+        </row>
       </rows>
     </grid>
 
     <box width="100%" align="center">
      <hlayout>
-       <button id="okBtn" label="${labels.survey.import_survey.$}"
+       <button id="okBtn" label="${labels.survey.schema.attributes_import.start_import}"
           onClick="@command('importAttributes')" />
      </hlayout>
     </box>

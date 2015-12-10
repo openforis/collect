@@ -839,10 +839,10 @@ public class SchemaVM extends SurveyBaseVM {
 			SurveyObjectTreeModelCreator modelCreator;
 			switch (viewType) {
 			case ENTRY:
-				modelCreator = new UITreeModelCreator(selectedVersion, null, true, currentLanguageCode);
+				modelCreator = new UITreeModelCreator(selectedVersion, null, false, true, currentLanguageCode);
 				break;
 			default:
-				modelCreator = new SchemaTreeModelCreator(selectedVersion, null, true, currentLanguageCode);
+				modelCreator = new SchemaTreeModelCreator(selectedVersion, null, false, true, currentLanguageCode);
 			}
 			treeModel = modelCreator.createModel(selectedRootEntity);
 		}
@@ -1354,7 +1354,8 @@ public class SchemaVM extends SurveyBaseVM {
 		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
 		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
 
-		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, true, disabledPredicate, null, parentItem);
+		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, 
+				false, true, disabledPredicate, null, parentItem);
 		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
@@ -1387,7 +1388,7 @@ public class SchemaVM extends SurveyBaseVM {
 		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
 		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
 
-		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, true, disabledPredicate, null, parentItem);
+		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, false, true, disabledPredicate, null, parentItem);
 		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
