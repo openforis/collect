@@ -63,7 +63,8 @@ public class Resources {
 		DATA_EXPORT_ERRORS_POPUP("component/data_export_errors_popup.zul"),
 		SURVEY_CLONE_PARAMETERS_POPUP("component/survey_clone_parameters_popup.zul"),
 		NODE_EDIT_POPUP("survey_edit/schema/node_popup.zul"),
-		SCHEMA_TREE_POPUP("survey_edit/schema/schema_tree_popup.zul");
+		SCHEMA_TREE_POPUP("survey_edit/schema/schema_tree_popup.zul"),
+		SCHEMA_ATTRIBUTES_IMPORT_POP_UP("survey_edit/schema_attributes_import_popup.zul");
 		
 		private String location;
 		

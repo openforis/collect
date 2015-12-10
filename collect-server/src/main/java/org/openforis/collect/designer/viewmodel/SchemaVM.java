@@ -435,6 +435,11 @@ public class SchemaVM extends SurveyBaseVM {
 		super.currentLanguageChanged();
 		refreshTreeModel();
 	}
+	
+	@GlobalCommand
+	public void schemaChanged() {
+		refreshTreeModel();
+	}
 
 	protected void resetEditingStatus() {
 		resetEditingStatus(true);

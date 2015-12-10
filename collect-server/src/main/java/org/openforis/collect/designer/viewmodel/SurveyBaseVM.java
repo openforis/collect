@@ -60,6 +60,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public static final String VERSIONS_UPDATED_GLOBAL_COMMAND = "versionsUpdated";
 	public static final String UNDO_LAST_CHANGES_GLOBAL_COMMAND = "undoLastChanges";
 	public static final String SURVEY_CHANGED_GLOBAL_COMMAND = "surveyChanged";
+	public static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
 	public static final String SURVEY_SAVED_GLOBAL_COMMAND = "surveySaved";
 	public static final String VALIDATE_ALL_GLOBAL_COMMAND = "validateAll";
 
@@ -154,6 +155,11 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	public void dispatchSurveyChangedCommand() {
 		BindUtils.postGlobalCommand(null, null, SURVEY_CHANGED_GLOBAL_COMMAND, null);
+	}
+
+	public void dispatchSchemaChangedCommand() {
+		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
+		dispatchSurveyChangedCommand();
 	}
 
 	protected void dispatchValidateAllCommand() {
