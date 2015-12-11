@@ -124,6 +124,8 @@
 										onClick="@command('exportSchemaSummary')" />
 									<menuitem  label="${labels.survey.schema.attributes_import.$}"
 										onClick="@command('openSchemaAttributesImportPopUp')" />
+									<menuitem  label="${labels.survey.schema.export_csv_data_import_template}"
+										onClick="@command('exportCsvDataExportTemplate')" />
 								</menupopup>
 							</menu>
 						</menubar>
