@@ -86,6 +86,14 @@ public abstract class AttributeDefinition extends NodeDefinition implements Calc
 		attributeDefaults.add(def);
 	}
 	
+	public void setAttributeDefaults(List<AttributeDefault> attributeDefaults) {
+		if (attributeDefaults == null) {
+			this.attributeDefaults = null;
+		} else {
+			this.attributeDefaults = new ArrayList<AttributeDefault>(attributeDefaults);
+		}
+	}
+	
 	public void removeAllAttributeDefaults() {
 		if ( attributeDefaults != null ) {
 			attributeDefaults.clear();

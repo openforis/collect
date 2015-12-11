@@ -64,7 +64,8 @@ public class Resources {
 		SURVEY_CLONE_PARAMETERS_POPUP("component/survey_clone_parameters_popup.zul"),
 		NODE_EDIT_POPUP("survey_edit/schema/node_popup.zul"),
 		SCHEMA_TREE_POPUP("survey_edit/schema/schema_tree_popup.zul"),
-		SCHEMA_ATTRIBUTES_IMPORT_POP_UP("survey_edit/schema_attributes_import_popup.zul");
+		SCHEMA_ATTRIBUTES_IMPORT_POP_UP("survey_edit/schema_attributes_import_popup.zul"),
+		ATTRIBUTE_CONVERSION_PARAMETERS_POPUP("survey_edit/schema/attribute_conversion_parameters_popup.zul");
 		
 		private String location;
 		

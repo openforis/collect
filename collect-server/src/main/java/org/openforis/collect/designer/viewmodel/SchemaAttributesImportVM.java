@@ -102,7 +102,7 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 		}
 	}
 	
-	private Map<String, AttributeType> guessAttributeTypeByColumn() throws Exception {
+	private Map<String, AttributeType> guessAttributeTypeByColumn() {
 		CsvReader reader = null;
 		try {
 			reader = new CsvReader(uploadedFile);
@@ -148,6 +148,8 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 				}
 			}
 			return typeByColumn;
+		} catch(Exception e) {
+			throw new RuntimeException(e);
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}

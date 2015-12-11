@@ -316,6 +316,11 @@
     		image="/assets/images/duplicate-small.png"
     		onClick="@command('openDuplicateNodePopup')" />
     	<menuseparator />
+    	<!-- Convert node -->
+    	<menuitem label="${labels.survey.schema.convert_node}"
+    		image="/assets/images/convert-small.png"
+    		onClick="@command('openNodeConversionPopup')" />
+    	<menuseparator />
     	<!-- Remove node -->
     	<menuitem label="${labels.survey.schema.remove_node}"
     		image="/assets/images/delete-small.png"

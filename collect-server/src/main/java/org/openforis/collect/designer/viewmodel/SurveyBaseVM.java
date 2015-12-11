@@ -29,6 +29,7 @@ import org.openforis.commons.lang.Strings;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.ModelVersion;
+import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.Precision;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Unit;
@@ -61,6 +62,7 @@ public abstract class SurveyBaseVM extends BaseVM {
 	public static final String UNDO_LAST_CHANGES_GLOBAL_COMMAND = "undoLastChanges";
 	public static final String SURVEY_CHANGED_GLOBAL_COMMAND = "surveyChanged";
 	public static final String SCHEMA_CHANGED_GLOBAL_COMMAND = "schemaChanged";
+	public static final String NODE_CONVERTED_GLOBAL_COMMAND = "nodeConverted";
 	public static final String SURVEY_SAVED_GLOBAL_COMMAND = "surveySaved";
 	public static final String VALIDATE_ALL_GLOBAL_COMMAND = "validateAll";
 
@@ -159,6 +161,15 @@ public abstract class SurveyBaseVM extends BaseVM {
 
 	public void dispatchSchemaChangedCommand() {
 		BindUtils.postGlobalCommand(null, null, SCHEMA_CHANGED_GLOBAL_COMMAND, null);
+		dispatchSurveyChangedCommand();
+	}
+
+	public void dispatchNodeConvertedCommand(final NodeDefinition nodeDef) {
+		@SuppressWarnings("serial")
+		HashMap<String, Object> args = new HashMap<String, Object>(){{
+			put("node", nodeDef);
+		}};
+		BindUtils.postGlobalCommand(null, null, NODE_CONVERTED_GLOBAL_COMMAND, args);
 		dispatchSurveyChangedCommand();
 	}
 
@@ -482,4 +493,8 @@ public abstract class SurveyBaseVM extends BaseVM {
 		}
 	}
 	
+	protected boolean isSurveyRelatedToPublishedSurvey() {
+		return survey.isTemporary() && survey.getPublishedId() != null;
+	}
+
 }
