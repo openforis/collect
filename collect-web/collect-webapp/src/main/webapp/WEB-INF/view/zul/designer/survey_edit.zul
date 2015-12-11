@@ -122,6 +122,8 @@
 										onClick="@command('validate')" />
 									<menuitem  label="${labels.survey.schema.export_summary.$}"
 										onClick="@command('exportSchemaSummary')" />
+									<menuitem  label="${labels.survey.schema.attributes_import.$}"
+										onClick="@command('openSchemaAttributesImportPopUp')" />
 								</menupopup>
 							</menu>
 						</menubar>

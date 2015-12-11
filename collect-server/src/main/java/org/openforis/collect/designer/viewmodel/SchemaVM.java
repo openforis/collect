@@ -40,6 +40,7 @@ import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.Predicate;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.viewmodel.SchemaTreePopUpVM.NodeSelectedEvent;
+import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -71,6 +72,7 @@ import org.zkoss.zk.ui.Path;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Menupopup;
 import org.zkoss.zul.Textbox;
@@ -138,6 +140,9 @@ public class SchemaVM extends SurveyBaseVM {
 	private Menupopup attributePopup;
 	@Wire
 	private Menupopup detachedNodePopup;
+	
+	@WireVariable
+	private SurveyManager surveyManager;
 	
 	//transient
 	private Window rootEntityEditPopUp;
@@ -434,6 +439,20 @@ public class SchemaVM extends SurveyBaseVM {
 	public void currentLanguageChanged() {
 		super.currentLanguageChanged();
 		refreshTreeModel();
+	}
+	
+	@GlobalCommand
+	public void schemaChanged() {
+		refreshTreeModel();
+	}
+	
+	@GlobalCommand
+	public void nodeConverted(@ContextParam(ContextType.BINDER) Binder binder, 
+			@BindingParam("node") NodeDefinition nodeDef) {
+		resetEditingStatus();
+		refreshTreeModel();
+		editNode(binder, false, nodeDef.getParentEntityDefinition(), nodeDef);
+		selectTreeNode(nodeDef);
 	}
 
 	protected void resetEditingStatus() {
@@ -834,10 +853,10 @@ public class SchemaVM extends SurveyBaseVM {
 			SurveyObjectTreeModelCreator modelCreator;
 			switch (viewType) {
 			case ENTRY:
-				modelCreator = new UITreeModelCreator(selectedVersion, null, true, currentLanguageCode);
+				modelCreator = new UITreeModelCreator(selectedVersion, null, false, true, currentLanguageCode);
 				break;
 			default:
-				modelCreator = new SchemaTreeModelCreator(selectedVersion, null, true, currentLanguageCode);
+				modelCreator = new SchemaTreeModelCreator(selectedVersion, null, false, true, currentLanguageCode);
 			}
 			treeModel = modelCreator.createModel(selectedRootEntity);
 		}
@@ -1274,6 +1293,9 @@ public class SchemaVM extends SurveyBaseVM {
 
 	@Command
 	public void openDuplicateNodePopup() {
+		if (! checkCanLeaveForm()) {
+			return;
+		}
 		SchemaNodeData selectedTreeNode = getSelectedTreeNode();
 		if ( selectedTreeNode == null ) {
 			return;
@@ -1284,6 +1306,35 @@ public class SchemaVM extends SurveyBaseVM {
 			AttributeDefinition selectedNode = (AttributeDefinition) selectedItem;
 			openSelectParentNodePopupForDuplicate(selectedNode);
 		}
+	}
+	
+	@Command
+	public void openNodeConversionPopup() {
+		if (! checkCanLeaveForm()) {
+			return;
+		}
+		SurveyObject selectedItem = selectedTreeNode.getSurveyObject();
+		
+		if ( selectedItem instanceof AttributeDefinition ) {
+			AttributeDefinition selectedNode = (AttributeDefinition) selectedItem;
+			
+			if(isDefinitionInPublishedSurvey(selectedNode)) {
+				MessageUtil.showWarning("survey.schema.cannot_convert_published_survey_node");
+				return;
+			} else {
+				AttributeConversionVM.openPopup(selectedNode);
+			}
+		}
+	}
+
+	private boolean isDefinitionInPublishedSurvey(NodeDefinition nodeDef) {
+		if (isSurveyRelatedToPublishedSurvey()) {
+			CollectSurvey publishedSurvey = surveyManager.getById(survey.getPublishedId());
+			if (publishedSurvey.getSchema().containsDefinitionWithId(nodeDef.getId())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean checkChangeParentNodeAllowed(NodeDefinition selectedNode) {
@@ -1349,7 +1400,8 @@ public class SchemaVM extends SurveyBaseVM {
 		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
 		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
 
-		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, true, disabledPredicate, null, parentItem);
+		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, 
+				false, true, disabledPredicate, null, parentItem);
 		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
@@ -1382,7 +1434,7 @@ public class SchemaVM extends SurveyBaseVM {
 		TreeNode<SchemaNodeData> parentTreeNode = treeNode.getParent();
 		SurveyObject parentItem = parentTreeNode.getData().getSurveyObject();
 
-		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, true, disabledPredicate, null, parentItem);
+		final Window popup = SchemaTreePopUpVM.openPopup(title, selectedRootEntity, null, includedNodePredicate, false, true, disabledPredicate, null, parentItem);
 		popup.addEventListener(SchemaTreePopUpVM.NODE_SELECTED_EVENT_NAME, new EventListener<NodeSelectedEvent>() {
 			public void onEvent(NodeSelectedEvent event) throws Exception {
 				SurveyObject selectedParent = event.getSelectedItem();
@@ -1402,7 +1454,7 @@ public class SchemaVM extends SurveyBaseVM {
 	}
 
 	/**
-	 * Creates a name for node that will be the dupliacte of the specified one.
+	 * Creates a name for node that will be the duplicate of the specified one.
 	 * The new name will be unique inside the specified parent entity.
 	 */
 	private String createDuplicateNodeName(NodeDefinition nodeToBeDuplicate, EntityDefinition parent) {
@@ -1520,4 +1572,5 @@ public class SchemaVM extends SurveyBaseVM {
 	public String getTreeViewTypeLabel(String type) {
 		return Labels.getLabel("survey.schema.tree.view_type." + type);
 	}
+	
 }

@@ -23,16 +23,18 @@ public abstract class SurveyObjectTreeModelCreator {
 	private Predicate<SurveyObject> disabledNodePredicate;
 	protected Predicate<SurveyObject> includeNodePredicate;
 	protected boolean includeEmptyNodes;
+	protected boolean includeRootEntity;
 	protected String labelLanguage;
 
 	public SurveyObjectTreeModelCreator(ModelVersion version,
 			Predicate<SurveyObject> disabledNodePredicate,
 			Predicate<SurveyObject> includeNodePredicate,
-			boolean includeEmptyNodes, String labelLanguage) {
+			boolean includeRootEntity, boolean includeEmptyNodes, String labelLanguage) {
 		super();
 		this.version = version;
 		this.disabledNodePredicate = disabledNodePredicate;
 		this.includeNodePredicate = includeNodePredicate;
+		this.includeRootEntity = includeRootEntity;
 		this.includeEmptyNodes = includeEmptyNodes;
 		this.labelLanguage = labelLanguage;
 	}

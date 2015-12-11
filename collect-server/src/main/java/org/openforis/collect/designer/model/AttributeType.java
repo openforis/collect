@@ -51,6 +51,15 @@ public enum AttributeType {
 		}
 	}
 	
+	public static AttributeType fromLabel(String label) {
+		for (AttributeType attributeType : values()) {
+			if (attributeType.getLabel().equals(label)) {
+				return attributeType;
+			}
+		}
+		return null;
+	}
+	
 	public String getLabel() {
 		String labelKey = null;
 		switch (this) {

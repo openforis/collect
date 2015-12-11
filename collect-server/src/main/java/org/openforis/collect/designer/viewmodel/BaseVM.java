@@ -123,6 +123,7 @@ public abstract class BaseVM {
 	protected String adjustInternalName(String name) {
 		String result = StringUtils.trimToEmpty(name);
 		result = result.toLowerCase(Locale.ENGLISH);
+		result = result.replaceAll("[^a-z0-9_]", "_");
 		return result;
 	}
 	

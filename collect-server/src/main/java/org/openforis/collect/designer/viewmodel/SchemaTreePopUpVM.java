@@ -44,12 +44,13 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	public void init(@ExecutionArgParam("rootEntity") EntityDefinition rootEntity, 
 			@ExecutionArgParam("version") ModelVersion version,
 			@ExecutionArgParam("includedNodePredicate") Predicate<SurveyObject> includedNodePredicate,
+			@ExecutionArgParam("includeRootEntity") boolean includeRootEntity,
 			@ExecutionArgParam("includeEmptyNodes") boolean includeEmtptyNodes,
 			@ExecutionArgParam("disabledNodePredicate") Predicate<SurveyObject> disabledNodePredicate,
 			@ExecutionArgParam("selectableNodePredicate") Predicate<SurveyObject> selectableNodePredicate,
 			@ExecutionArgParam("selection") SurveyObject selection) {
 		super.init();
-		SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(version, disabledNodePredicate, includedNodePredicate, includeEmtptyNodes, currentLanguageCode);
+		SurveyObjectTreeModelCreator modelCreator = new UITreeModelCreator(version, disabledNodePredicate, includedNodePredicate, includeRootEntity, includeEmtptyNodes, currentLanguageCode);
 		this.treeModel = modelCreator.createModel(rootEntity);
 		this.treeModel.openAllItems();
 		this.selectableNodePredicate = selectableNodePredicate;
@@ -62,8 +63,9 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 	}
 	
 	public static Window openPopup(String title, EntityDefinition rootEntity, ModelVersion version,  
-			Predicate<SurveyObject> includedNodePredicate, boolean includeEmptyNodes, Predicate<SurveyObject> disabledNodePredicate,
-			Predicate<SurveyObject> selectableNodePredicate, SurveyObject selection) {
+			Predicate<SurveyObject> includedNodePredicate, boolean includeRootEntity, boolean includeEmptyNodes, 
+			Predicate<SurveyObject> disabledNodePredicate, Predicate<SurveyObject> selectableNodePredicate, 
+			SurveyObject selection) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("rootEntity", rootEntity);
 		args.put("version", version);
@@ -72,6 +74,7 @@ public class SchemaTreePopUpVM extends SurveyBaseVM {
 		args.put("includedNodePredicate", includedNodePredicate);
 		args.put("selectableNodePredicate", selectableNodePredicate);
 		args.put("selection", selection);
+		args.put("includeRootEntity", includeRootEntity);
 		args.put("includeEmptyNodes", includeEmptyNodes);
 		
 		return openPopUp(Resources.Component.SCHEMA_TREE_POPUP.getLocation(), true, args);

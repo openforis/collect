@@ -22,8 +22,6 @@ import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
-import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.validation.Check;
 import org.openforis.idm.metamodel.validation.Check.Flag;
 import org.openforis.idm.metamodel.validation.ComparisonCheck;
@@ -386,15 +384,7 @@ public abstract class AttributeVM<T extends AttributeDefinition> extends NodeDef
 	}
 
 	public List<CheckType> getCheckTypes() {
-		CheckType[] values = CheckType.values();
-		List<CheckType> list = new ArrayList<CheckType>(Arrays.asList(values));
-		if ( !(editedItem instanceof CoordinateAttributeDefinition) ) {
-			list.remove(CheckType.DISTANCE);
-		}
-		if ( ! (editedItem instanceof TextAttributeDefinition) ) {
-			list.remove(CheckType.PATTERN);
-		}
-		return list;
+		return CheckType.compatibleValues(AttributeType.valueOf(editedItem));
 	}
 	
 	public String getCheckTypeLabel(Check<?> check) {

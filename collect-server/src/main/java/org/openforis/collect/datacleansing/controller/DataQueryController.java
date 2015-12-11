@@ -38,7 +38,6 @@ import org.openforis.idm.model.Attribute;
 import org.openforis.idm.model.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -64,8 +63,8 @@ public class DataQueryController extends AbstractSurveyObjectEditFormController<
 	private CollectJobManager collectJobManager;
 	@Autowired
 	private DataQueryValidator validator;
-	@Autowired
-	private ApplicationContext appContext;
+//	@Autowired
+//	private ApplicationContext appContext;
 	
 //	private CSVWriterDataQueryResultItemProcessor csvExportItemProcessor;
 //	private DataQueryExecutorJob exportJob;

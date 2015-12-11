@@ -115,7 +115,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 			selectLanguagePopUp = openPopUp(Resources.Component.SELECT_LANGUAGE_POP_UP.getLocation(), true);
 		}
 	}
-	
+
+	@Command
+	public void openSchemaAttributesImportPopUp() {
+		if ( checkCanLeaveForm() ) {
+			openPopUp(Resources.Component.SCHEMA_ATTRIBUTES_IMPORT_POP_UP.getLocation(), true);
+		}
+	}
+
 	@GlobalCommand
 	public void exportSurvey() {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
