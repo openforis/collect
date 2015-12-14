@@ -84,13 +84,14 @@ public class MondrianCubeGenerator {
 
 	private Cube generateCube() {
 		final EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
-		Table table = new Table(dbSchemaName, rootEntityDef.getName());
-		
 		final Cube cube = new Cube("Collect Data - " + rootEntityDef.getLabel(NodeLabel.Type.INSTANCE, language) );
-		cube.table = table;
 		
 		rootEntityDef.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition nodeDef) {
+				if (nodeDef instanceof EntityDefinition && (((EntityDefinition) nodeDef).isRoot() || nodeDef.isMultiple())) {
+					Table table = new Table(dbSchemaName, nodeDef.getName());
+					cube.tables.add(table);
+				}
 				EntityDefinition parentDef = nodeDef.getParentEntityDefinition();
 				if (nodeDef instanceof AttributeDefinition) {
 					AttributeDefinition attrDef = (AttributeDefinition) nodeDef;
@@ -416,8 +417,8 @@ public class MondrianCubeGenerator {
 		@XStreamAsAttribute
 		private String enabled = "true";
 		
-		@XStreamAlias("Table")
-		private Table table;
+		@XStreamImplicit
+		private List<Table> tables = new ArrayList<Table>();
 		
 		@XStreamImplicit
 		private List<Dimension> dimensions = new ArrayList<Dimension>();
