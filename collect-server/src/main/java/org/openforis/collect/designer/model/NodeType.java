@@ -70,91 +70,92 @@ public enum NodeType {
 		}
 	}
 	
-	public static NodeDefinition createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType) {
+	public static <T extends NodeDefinition> T createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType) {
 		return createNodeDefinition(survey, nodeType, attrType, null);
 	}
 	
-	public static NodeDefinition createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType, Integer id) {
-		NodeDefinition result;
+	@SuppressWarnings("unchecked")
+	public static <T extends NodeDefinition> T createNodeDefinition(Survey survey, NodeType nodeType, AttributeType attrType, Integer id) {
+		T result;
 		Schema schema = survey.getSchema();
 		switch(nodeType) {
 		case ENTITY:
 			if (id == null) {
-				result = schema.createEntityDefinition();
+				result = (T) schema.createEntityDefinition();
 			} else {
-				result = schema.createEntityDefinition(id);
+				result = (T) schema.createEntityDefinition(id);
 			}
 			break;
 		case ATTRIBUTE:
 			switch(attrType) {
 			case BOOLEAN:
 				if (id == null) {
-					result = schema.createBooleanAttributeDefinition();
+					result = (T) schema.createBooleanAttributeDefinition();
 				} else {
-					result = schema.createBooleanAttributeDefinition(id);
+					result = (T) schema.createBooleanAttributeDefinition(id);
 				}
 				break;
 			case CODE:
 				if (id == null) {
-					result = schema.createCodeAttributeDefinition();
+					result = (T) schema.createCodeAttributeDefinition();
 				} else {
-					result = schema.createCodeAttributeDefinition(id);
+					result = (T) schema.createCodeAttributeDefinition(id);
 				}
 				break;
 			case COORDINATE:
 				if (id == null) {
-					result = schema.createCoordinateAttributeDefinition();
+					result = (T) schema.createCoordinateAttributeDefinition();
 				} else {
-					result = schema.createCoordinateAttributeDefinition(id);
+					result = (T) schema.createCoordinateAttributeDefinition(id);
 				}
 				break;
 			case DATE:
 				if (id == null) {
-					result = schema.createDateAttributeDefinition();
+					result = (T) schema.createDateAttributeDefinition();
 				} else {
-					result = schema.createDateAttributeDefinition(id);
+					result = (T) schema.createDateAttributeDefinition(id);
 				}
 				break;
 			case FILE:
 				if (id == null) {
-					result = schema.createFileAttributeDefinition();
+					result = (T) schema.createFileAttributeDefinition();
 				} else {
-					result = schema.createFileAttributeDefinition(id);
+					result = (T) schema.createFileAttributeDefinition(id);
 				}
 				break;
 			case NUMBER:
 				if (id == null) {
-					result = schema.createNumberAttributeDefinition();
+					result = (T) schema.createNumberAttributeDefinition();
 				} else {
-					result = schema.createNumberAttributeDefinition(id);
+					result = (T) schema.createNumberAttributeDefinition(id);
 				}
 				break;
 			case RANGE:
 				if (id == null) {
-					result = schema.createRangeAttributeDefinition();
+					result = (T) schema.createRangeAttributeDefinition();
 				} else {
-					result = schema.createRangeAttributeDefinition(id);
+					result = (T) schema.createRangeAttributeDefinition(id);
 				}
 				break;
 			case TAXON:
 				if (id == null) {
-					result = schema.createTaxonAttributeDefinition();
+					result = (T) schema.createTaxonAttributeDefinition();
 				} else {
-					result = schema.createTaxonAttributeDefinition(id);
+					result = (T) schema.createTaxonAttributeDefinition(id);
 				}
 				break;
 			case TEXT:
 				if (id == null) {
-					result = schema.createTextAttributeDefinition();
+					result = (T) schema.createTextAttributeDefinition();
 				} else {
-					result = schema.createTextAttributeDefinition(id);
+					result = (T) schema.createTextAttributeDefinition(id);
 				}
 				break;
 			case TIME:
 				if (id == null) {
-					result = schema.createTimeAttributeDefinition();
+					result = (T) schema.createTimeAttributeDefinition();
 				} else {
-					result = schema.createTimeAttributeDefinition(id);
+					result = (T) schema.createTimeAttributeDefinition(id);
 				}
 				break;
 			default:
