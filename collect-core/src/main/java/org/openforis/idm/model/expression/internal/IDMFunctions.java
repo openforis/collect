@@ -241,8 +241,11 @@ public class IDMFunctions extends CustomFunctions {
 			return null;
 		}
 		Coordinate fromC = from instanceof Coordinate ? (Coordinate) from: Coordinate.parseCoordinate(from);
+		if (fromC == null || ! fromC.isComplete()) {
+			return null;
+		}
 		Coordinate toC = to instanceof Coordinate ? (Coordinate) to: Coordinate.parseCoordinate(to);
-		if (! fromC.isComplete() || ! toC.isComplete()) {
+		if (toC == null || ! toC.isComplete()) {
 			return null;
 		}
 		CoordinateOperations coordinateOperations = getSurvey(context).getContext().getCoordinateOperations();

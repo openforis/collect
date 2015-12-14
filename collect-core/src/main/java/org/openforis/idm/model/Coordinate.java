@@ -47,7 +47,8 @@ public final class Coordinate extends AbstractValue {
 			Coordinate coordinate = new Coordinate(x, y, srsId);
 			return coordinate;
 		} else {
-			throw new IllegalArgumentException("Unable to convert " + string + " to a valid coordinate");
+			//throw new IllegalArgumentException("Unable to convert " + string + " to a valid coordinate");
+			return null;
 		}
 	}
 	
