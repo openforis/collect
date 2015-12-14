@@ -5,7 +5,6 @@
     width="500px" border="normal" position="center"
     apply="org.zkoss.bind.BindComposer"
     viewModel="@id('vm') @init('org.openforis.collect.designer.viewmodel.SchemaAttributesImportVM')"
-    form="@id('fx') @load(vm.form) @save(vm.form,before='importAttributes')" 
     validationMessages="@id('vmsgs')"
     onUpload="@command('fileUploaded')"
     closable="true">
@@ -50,6 +49,18 @@
           		</hbox>
 			</cell>
         </row>
+        <row>
+    		<label
+    			value="${labels.survey.schema.attributes_import.boolean_as_code}:" />
+    		<checkbox
+    			checked="@bind(vm.booleanAsCode)" />
+    	</row>
+        <row>
+    		<label
+    			value="${labels.survey.schema.attributes_import.labels_in_second_row}:" />
+    		<checkbox
+    			checked="@bind(vm.labelsInSecondRow)" />
+    	</row>
       </rows>
     </grid>
 

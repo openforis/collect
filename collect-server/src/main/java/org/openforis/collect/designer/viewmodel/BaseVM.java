@@ -120,7 +120,7 @@ public abstract class BaseVM {
 		return (T) form.getField(field);	
 	}
 
-	protected String adjustInternalName(String name) {
+	protected static String adjustInternalName(String name) {
 		String result = StringUtils.trimToEmpty(name);
 		result = result.toLowerCase(Locale.ENGLISH);
 		result = result.replaceAll("[^a-z0-9_]", "_");

@@ -116,6 +116,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	public void nameChanged(@ContextParam(ContextType.BINDER) Binder binder,
 			@BindingParam("name") String name) {
 		name = adjustInternalName(name);
+		setTempFormObjectFieldValue("name", name);
 		((NodeDefinitionFormObject<?>) formObject).setName(name);
 		dispatchApplyChangesCommand(binder);
 		Map<String, Object> args = new HashMap<String, Object>();
@@ -135,12 +136,6 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 			name = suggestInternalName(value);
 			nameChanged(binder, name);
 		}
-	}
-	
-	protected String adjustInternalName(String name) {
-		String result = super.adjustInternalName(name);
-		setTempFormObjectFieldValue("name", result);
-		return result;
 	}
 	
 	protected String getInstanceLabel(NodeDefinition nodeDefn) {
