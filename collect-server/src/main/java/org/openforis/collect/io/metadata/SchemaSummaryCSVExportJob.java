@@ -6,10 +6,12 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
 import org.apache.commons.io.IOUtils;
+import org.openforis.collect.designer.model.AttributeType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.io.csv.CsvWriter;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Task;
+import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
@@ -40,7 +42,7 @@ public class SchemaSummaryCSVExportJob extends Job {
 				FileOutputStream out = new FileOutputStream(outputFile);
 				final CsvWriter csvWriter = new CsvWriter(new BufferedWriter(new OutputStreamWriter(out)), ',', '"');
 				try {
-					csvWriter.writeHeaders(new String[] {"id", "path", "type", "label"});
+					csvWriter.writeHeaders(new String[] {"id", "path", "type", "attribute_type", "label"});
 					
 					Schema schema = survey.getSchema();
 					schema.traverse(new NodeDefinitionVisitor() {
@@ -50,6 +52,7 @@ public class SchemaSummaryCSVExportJob extends Job {
 									Integer.toString(nodeDefn.getId()), 
 									nodeDefn.getPath(),
 									nodeDefn instanceof EntityDefinition ? "entity": "attribute",
+									nodeDefn instanceof AttributeDefinition ? AttributeType.valueOf((AttributeDefinition) nodeDefn).getLabel(): "",
 									nodeDefn.getLabel(Type.INSTANCE)
 								});
 						}

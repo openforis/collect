@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.SuccessHandler;
 import org.openforis.collect.designer.viewmodel.SurveyValidationResultsVM.ConfirmEvent;
+import org.openforis.collect.io.data.CSVDataExportJob;
 import org.openforis.collect.io.metadata.SchemaSummaryCSVExportJob;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.CollectEarthSurveyValidator;
@@ -29,6 +31,7 @@ import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidation
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.collect.utils.Dates;
@@ -70,6 +73,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
 	
 	private static final String SCHEMA_SUMMARY_FILE_NAME_PATTERN = "%s_schema_summary_%s.%s";
+	private static final String DATA_IMPORT_TEMPLATE_FILE_NAME_PATTERN = "%s_data_import_template_%s.%s";
 	
 	private Window selectLanguagePopUp;
 	private Window previewPreferencesPopUp;
@@ -115,7 +119,14 @@ public class SurveyEditVM extends SurveyBaseVM {
 			selectLanguagePopUp = openPopUp(Resources.Component.SELECT_LANGUAGE_POP_UP.getLocation(), true);
 		}
 	}
-	
+
+	@Command
+	public void openSchemaAttributesImportPopUp() {
+		if ( checkCanLeaveForm() ) {
+			openPopUp(Resources.Component.SCHEMA_ATTRIBUTES_IMPORT_POP_UP.getLocation(), true);
+		}
+	}
+
 	@GlobalCommand
 	public void exportSurvey() {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -360,6 +371,23 @@ public class SurveyEditVM extends SurveyBaseVM {
 		
 		String statusPopUpTitle = Labels.getLabel("survey.schema.export_summary.process_status_popup.message", new String[] { survey.getName() });
 		jobStatusPopUp = JobStatusPopUpVM.openPopUp(statusPopUpTitle, job, true);
+	}
+	
+	@Command
+	public void exportCsvDataExportTemplate() throws IOException {
+		CSVDataExportJob job = jobManager.createJob(CSVDataExportJob.class);
+		job.setOutputFile(File.createTempFile("data-export-template", ".zip"));
+		RecordFilter recordFilter = new RecordFilter(survey);
+		recordFilter.setRootEntityId(survey.getSchema().getRootEntityDefinitions().get(0).getId());
+		job.setRecordFilter(recordFilter);
+		job.setAlwaysGenerateZipFile(true);
+		jobManager.start(job, false);
+		File outputFile = job.getOutputFile();
+		String dateStr = Dates.formatLocalDateTime(new Date());
+		String fileName = String.format(DATA_IMPORT_TEMPLATE_FILE_NAME_PATTERN, survey.getName(), dateStr, "zip");
+		String contentType = URLConnection.guessContentTypeFromName(fileName);
+		FileInputStream is = new FileInputStream(outputFile);
+		Filedownload.save(is, contentType, fileName);
 	}
 	
 	@GlobalCommand

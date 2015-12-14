@@ -67,6 +67,18 @@ public abstract class SurveyObject implements Serializable, Annotatable, DeepCom
 		}
 	}
 
+	public Map<QName, String> getAnnotations() {
+		return annotations;
+	}
+	
+	public void setAnnotations(Map<QName, String> annotations) {
+		if (annotations == null) {
+			this.annotations = null;
+		} else {
+			this.annotations = new HashMap<QName, String>(annotations);
+		}
+	}
+	
 	@Override
 	public Set<QName> getAnnotationNames() {
 		if ( annotations == null ) {

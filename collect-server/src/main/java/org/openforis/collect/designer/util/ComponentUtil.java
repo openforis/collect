@@ -76,6 +76,18 @@ public class ComponentUtil {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T getClosest(Component from, Class<T> type) {
+		Component currentParent = from.getParent();
+		while ( currentParent != null ) {
+			if (type.isAssignableFrom(currentParent.getClass())) {
+				return (T) currentParent;
+			}
+			currentParent = currentParent.getParent();
+		}
+		return null;
+	}
+	
 	public static void addClass(HtmlBasedComponent component, String className) {
 		String oldSclass = component.getSclass();
 		if ( oldSclass == null ) {

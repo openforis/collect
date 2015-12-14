@@ -127,6 +127,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		}
 	}
 	
+	public void setLabels(List<NodeLabel> labels) {
+		if (labels == null) {
+			this.labels = null;
+		}
+		this.labels = new NodeLabelMap();
+		for (NodeLabel nodeLabel : labels) {
+			addLabel(nodeLabel);
+		}
+	}
+	
 	/**
 	 * Return the label of the specified type in the default language
 	 */
@@ -170,6 +180,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 		}
 	}
 	
+	public void setPrompts(List<Prompt> prompts) {
+		if (prompts == null) {
+			this.prompts = null;
+		}
+		this.prompts = new PromptMap();
+		for (Prompt prompt : prompts) {
+			addPrompt(prompt);
+		}
+	}
+	
 	public String getPrompt(Prompt.Type type, String language) {
 		return prompts == null ? null: prompts.getText(type, language);
 	}
@@ -199,6 +219,16 @@ public abstract class NodeDefinition extends VersionableSurveyObject {
 			return Collections.emptyList();
 		} else {
 			return this.descriptions.values();
+		}
+	}
+	
+	public void setDescriptions(List<LanguageSpecificText> descriptions) {
+		if (descriptions == null) {
+			this.descriptions = null;
+		}
+		this.descriptions = new LanguageSpecificTextMap();
+		for (LanguageSpecificText description : descriptions) {
+			addDescription(description);
 		}
 	}
 	
