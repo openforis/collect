@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Stack;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.RelationalSchemaConfig;
 import org.openforis.collect.relational.model.RelationalSchemaGenerator;
@@ -26,6 +28,8 @@ import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.NumberAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
+import org.openforis.idm.metamodel.TimeAttributeDefinition;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -62,9 +66,18 @@ public class MondrianCubeGenerator {
 	}
 	
 	private Schema generateSchema() {
-		Schema schema = new Schema(survey.getName());
-		Cube cube = generateCube();
-		schema.cube = cube;
+		final Schema schema = new Schema(survey.getName());
+		List<EntityDefinition> rootEntityDefs = survey.getSchema().getRootEntityDefinitions();
+		for (EntityDefinition entityDef : rootEntityDefs) {
+			entityDef.traverse(new NodeDefinitionVisitor() {
+				public void visit(NodeDefinition def) {
+					if (def instanceof EntityDefinition && def.isMultiple()) {
+						Cube cube = generateCube((EntityDefinition) def);
+						schema.cubes.add(cube);
+					}
+				}
+			});
+		}
 		return schema;
 	}
 	
@@ -82,16 +95,46 @@ public class MondrianCubeGenerator {
 		return xmlSchema;
 	}
 
+	private Cube generateCube(EntityDefinition entityDef) {
+		Cube cube = new Cube(entityDef.getLabel(NodeLabel.Type.INSTANCE, language) );
+		Table table = new Table(dbSchemaName, entityDef.getName());
+		cube.tables.add(table);
+		
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		stack.addAll(entityDef.getChildDefinitions());
+		while (! stack.isEmpty()) {
+			NodeDefinition def = stack.pop();
+			if (def instanceof AttributeDefinition && isAttributeIncluded((AttributeDefinition) def)) {
+				AttributeDefinition attrDef = (AttributeDefinition) def;
+				EntityDefinition parentDef = def.getParentEntityDefinition();
+				if (parentDef.isRoot()) {
+					addAttributeMeasuresAndDimension(cube, attrDef);
+				} else {
+					addNestedAttributeDimension(cube, attrDef);
+				}
+			} else if (def instanceof EntityDefinition && ! def.isMultiple()) {
+				stack.addAll(((EntityDefinition) def).getChildDefinitions());
+			}
+		}
+		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+			cube.measures.addAll(1, generateEarthSpecificMeasures());
+		}
+		return cube;
+	}
+
 	private Cube generateCube() {
 		final EntityDefinition rootEntityDef = survey.getSchema().getRootEntityDefinitions().get(0);
 		final Cube cube = new Cube("Collect Data - " + rootEntityDef.getLabel(NodeLabel.Type.INSTANCE, language) );
 		
+		Table table = new Table(dbSchemaName, rootEntityDef.getName());
+		cube.tables.add(table);
+		
 		rootEntityDef.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition nodeDef) {
-				if (nodeDef instanceof EntityDefinition && (((EntityDefinition) nodeDef).isRoot() || nodeDef.isMultiple())) {
-					Table table = new Table(dbSchemaName, nodeDef.getName());
-					cube.tables.add(table);
-				}
+//				if (nodeDef instanceof EntityDefinition && (((EntityDefinition) nodeDef).isRoot() || nodeDef.isMultiple())) {
+//					Table table = new Table(dbSchemaName, nodeDef.getName());
+//					cube.tables.add(table);
+//				}
 				EntityDefinition parentDef = nodeDef.getParentEntityDefinition();
 				if (nodeDef instanceof AttributeDefinition) {
 					AttributeDefinition attrDef = (AttributeDefinition) nodeDef;
@@ -287,9 +330,11 @@ public class MondrianCubeGenerator {
 	private Dimension generateDimension(AttributeDefinition attrDef) {
 		String attrName = attrDef.getName();
 		String attrLabel = extractLabel(attrDef);
-		Dimension dimension = new Dimension(attrLabel);
+		Dimension dimension = new Dimension(String.format("%s [%s]", attrLabel, attrDef.getName()));
 		
 		Hierarchy hierarchy = dimension.hierarchy;
+		DataTable dataTable = rdbSchema.getDataTable(attrDef.getParentEntityDefinition());
+		hierarchy.table = new Table(dbSchemaName, dataTable.getName());
 		
 		if (attrDef instanceof CodeAttributeDefinition) {
 			CodeAttributeDefinition codeAttrDef = (CodeAttributeDefinition) attrDef;
@@ -357,12 +402,12 @@ public class MondrianCubeGenerator {
 		String attrName = nodeDef.getName();
 		String attrLabel = extractLabel(nodeDef);
 		Level level = new Level(attrLabel);
+		level.levelType = "Regular";
 		if (nodeDef instanceof NumericAttributeDefinition) {
 			level.type = ((NumericAttributeDefinition) nodeDef).getType() == Type.INTEGER ? "Integer": "Numeric";
 		} else {
 			level.type = "String";	
 		}
-		level.levelType = "Regular";
 		if (nodeDef instanceof CodeAttributeDefinition && ! ((CodeAttributeDefinition) nodeDef).getList().isExternal()) {
 			CodeAttributeDefinition codeDef = (CodeAttributeDefinition) nodeDef;
 			String codeTableName = CodeListTables.getTableName(rdbConfig, codeDef);
@@ -383,6 +428,14 @@ public class MondrianCubeGenerator {
 		return attrLabel;
 	}
 	
+	private boolean isAttributeIncluded(AttributeDefinition def) {
+		return def instanceof CodeAttributeDefinition
+				|| def instanceof DateAttributeDefinition
+				|| def instanceof NumberAttributeDefinition
+				|| def instanceof TextAttributeDefinition
+				|| def instanceof TimeAttributeDefinition
+				;
+	}
 
 	private static class MondrianSchemaObject {
 		
@@ -399,8 +452,8 @@ public class MondrianCubeGenerator {
 	@XStreamAlias("Schema")
 	private static class Schema extends MondrianSchemaObject {
 		
-		@XStreamAlias("Cube")
-		private Cube cube;
+		@XStreamImplicit
+		private List<Cube> cubes = new ArrayList<Cube>();
 
 		public Schema(String name) {
 			super(name);
