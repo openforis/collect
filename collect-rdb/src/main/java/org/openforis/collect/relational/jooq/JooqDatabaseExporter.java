@@ -76,10 +76,15 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 
 	@Override
 	public void insertReferenceData(RelationalSchema schema, ProgressListener progressListener) {
-		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema, progressListener);
-		for (CodeTable codeTable : schema.getCodeListTables()) {
+		BatchQueryExecutor batchExecutor = new BatchQueryExecutor(schema, ProgressListener.NULL_PROGRESS_LISTENER);
+		List<CodeTable> codeListTables = schema.getCodeListTables();
+		long totalItems = codeListTables.size();
+		long processedItems = 0;
+		for (CodeTable codeTable : codeListTables) {
 			DataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
 			batchExecutor.addInserts(extractor);
+			processedItems++;
+			progressListener.progressMade(processedItems, totalItems);
 		}
 		batchExecutor.flush();
 	}
@@ -236,6 +241,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 		private List<Query> queries;
 		private QueryCreator queryCreator;
 		private ProgressListener progressListener;
+		private long processedQueries;
 		
 		public BatchQueryExecutor(RelationalSchema schema) {
 			this(schema, null);
@@ -286,6 +292,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			}
 			try {
 				dsl.batch(queries).execute();
+				processedQueries += queries.size();
 				queries.clear();
 				notifyProgressListener();
 			} catch(Exception e) {
@@ -295,7 +302,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 
 		private void notifyProgressListener() {
 			if (progressListener != null) {
-				progressListener.progressMade();
+				progressListener.progressMade(processedQueries, 0);
 			}
 		}
 	}
