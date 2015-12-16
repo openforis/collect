@@ -47,7 +47,7 @@ import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
 import org.openforis.concurrency.DetailedProgressListener;
-import org.openforis.concurrency.DetailedProgressListener.Progress;
+import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;

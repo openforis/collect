@@ -14,7 +14,8 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.reporting.ReportingRepositories;
 import org.openforis.collect.reporting.SaikuConfiguration;
-import org.openforis.concurrency.ProgressListener;
+import org.openforis.concurrency.DetailedProgressListener;
+import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.Task;
 import org.openforis.concurrency.proxy.JobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,14 @@ public class SaikuService {
 			protected void buildTasks() throws Throwable {
 				addTask(new Task() {
 					protected void execute() throws Throwable {
-						reportingRepositories.createRepositories(surveyName, ProgressListener.NULL_PROGRESS_LISTENER);
+						reportingRepositories.createRepositories(surveyName, new DetailedProgressListener() {
+							public void progressMade() {}
+
+							public void progressMade(Progress progress) {
+								setItemsProcessed(progress.getProcessedItems());
+								setTotalItems(progress.getTotalItems());
+							}
+						});
 					}
 				});
 			}
