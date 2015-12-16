@@ -3,7 +3,6 @@ package org.openforis.collect.designer.viewmodel;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -266,7 +265,7 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 
 		public Map<String, AttributeDetails> extractAttributeDetailsByColumn() {
 			Map<String, AttributeType> attributeTypeByColumn = guessAttributeTypeByColumn();
-			Map<String, AttributeDetails> result = new HashMap<String, AttributeDetails>(attributeTypeByColumn.size());
+			Map<String, AttributeDetails> result = new LinkedHashMap<String, AttributeDetails>(attributeTypeByColumn.size());
 			Map<String, String> labelByColumn = labelsInSecondRow ? extractLabelByColumn() : null;
 			for (Entry<String, AttributeType> entry : attributeTypeByColumn.entrySet()) {
 				AttributeDetails details = new AttributeDetails();
