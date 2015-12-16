@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.relational.CollectRdbException;
 import org.openforis.collect.relational.RDBReportingRepositories;
-import org.openforis.concurrency.DetailedProgressListener;
 import org.openforis.concurrency.Progress;
+import org.openforis.concurrency.ProgressListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,9 +31,7 @@ public class SaikuController {
 	public @ResponseBody String generateRepository(@PathVariable("surveyName") String surveyName,
 			@RequestParam("recordStep") RecordStep recordStep)
 			throws CollectRdbException, SQLException {
-		rdbReportingRepositories.createRepository(surveyName, recordStep, new DetailedProgressListener() {
-			public void progressMade() {
-			}
+		rdbReportingRepositories.createRepository(surveyName, recordStep, new ProgressListener() {
 			public void progressMade(Progress progress) {
 				System.out.println(String.format("progress made: %d", progress.getCompletionPercent()));
 			}
