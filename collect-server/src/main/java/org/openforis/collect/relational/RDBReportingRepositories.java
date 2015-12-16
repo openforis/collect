@@ -55,6 +55,8 @@ import org.openforis.collect.reporting.MondrianSchemaStorageManager;
 import org.openforis.collect.reporting.ReportingRepositories;
 import org.openforis.collect.reporting.SaikuDatasourceStorageManager;
 import org.openforis.commons.io.OpenForisIOUtils;
+import org.openforis.concurrency.DetailedProgressListener;
+import org.openforis.concurrency.DetailedProgressListener.Progress;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -113,9 +115,11 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	@Override
 	public void createRepositories(String surveyName, ProgressListener progressListener) {
 		initializeRelationalSchemaDefinition(surveyName);
+		ProcessProgressListener totalProgressListener = new ProcessProgressListener(RecordStep.values().length);
 		for (RecordStep step : RecordStep.values()) {
 			try {
-				createRepository(surveyName, step, progressListener);
+				createRepository(surveyName, step, new StepProgressListener(totalProgressListener, progressListener));
+				totalProgressListener.incrementStep();
 			} catch(CollectRdbException e) {
 				LOG.error("Error generating RDB for survey " + surveyName, e);
 			}
@@ -499,4 +503,69 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 	}
 
+	private static class ProcessProgressListener {
+		private int totalSteps;
+		private int processedSteps;
+		final Progress progress = new Progress(0, 0);
+		final List<Long> totalItemsPerStep = new ArrayList<Long>();
+		private int currentStep = 0;
+		
+		public ProcessProgressListener(int totalSteps) {
+			this.totalSteps = totalSteps;
+		}
+		
+		public void stepProgressMade(Progress stepProgress) {
+			if (totalItemsPerStep.size() < currentStep) {
+				totalItemsPerStep.add(stepProgress.getTotalItems());
+				progress.setTotalItems(estimateTotalItems());
+			}
+		}
+		
+		public void incrementStep() {
+			currentStep ++;
+		}
+		
+		private long estimateTotalItems() {
+			long maxTotalItems = 0;
+			for (Long stepTotalItems : totalItemsPerStep) {
+				maxTotalItems = Math.max(maxTotalItems, stepTotalItems);
+			}
+			if (processedSteps < totalSteps) {
+				return maxTotalItems * totalSteps;
+			} else {
+				long totalItems = 0;
+				for (Long stepTotalItems : totalItemsPerStep) {
+					totalItems += stepTotalItems;
+				}
+				return totalItems;
+			}
+		}
+		
+		public Progress getProgress() {
+			return progress;
+		}
+	}
+	
+	private static class StepProgressListener implements DetailedProgressListener {
+		
+		private ProcessProgressListener totalProgressListener;
+		private ProgressListener outerProgressListener;
+
+		public StepProgressListener(ProcessProgressListener totalProgressListener,
+				ProgressListener outerProgressListener) {
+			super();
+			this.totalProgressListener = totalProgressListener;
+			this.outerProgressListener = outerProgressListener;
+		}
+
+		public void progressMade() {}
+		
+		public void progressMade(Progress stepProgress) {
+			totalProgressListener.stepProgressMade(stepProgress);
+			outerProgressListener.progressMade();
+			if (outerProgressListener instanceof DetailedProgressListener) {
+				((DetailedProgressListener) outerProgressListener).progressMade(totalProgressListener.getProgress());
+			}
+		}
+	}
 }
