@@ -35,4 +35,5 @@ public interface CoordinateOperations {
 	Set<String> getAvailableSRSs();
 	
 	Coordinate convertToWgs84(Coordinate coordinate);
+	
 }
