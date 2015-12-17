@@ -46,8 +46,7 @@ import org.openforis.collect.relational.model.DataPrimaryKeyColumn;
 import org.openforis.collect.relational.model.DataTable;
 import org.openforis.collect.relational.model.RelationalSchema;
 import org.openforis.collect.relational.model.Table;
-import org.openforis.concurrency.DetailedProgressListener;
-import org.openforis.concurrency.DetailedProgressListener.Progress;
+import org.openforis.concurrency.Progress;
 import org.openforis.concurrency.ProgressListener;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -86,10 +85,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 			DataExtractor extractor = DataExtractorFactory.getExtractor(codeTable);
 			batchExecutor.addInserts(extractor);
 			processedItems++;
-			progressListener.progressMade();
-			if (progressListener instanceof DetailedProgressListener) {
-				((DetailedProgressListener) progressListener).progressMade(new Progress(processedItems, totalItems));
-			}
+			progressListener.progressMade(new Progress(processedItems, totalItems));
 		}
 		batchExecutor.flush();
 	}
@@ -307,10 +303,7 @@ public class JooqDatabaseExporter implements RDBUpdater, DatabaseExporter {
 
 		private void notifyProgressListener() {
 			if (progressListener != null) {
-				progressListener.progressMade();
-				if (progressListener instanceof DetailedProgressListener) {
-					((DetailedProgressListener) progressListener).progressMade(new Progress(processedQueries, 0));
-				}
+				progressListener.progressMade(new Progress(processedQueries, 0));
 			}
 		}
 	}
