@@ -310,6 +310,9 @@ public class IDMFunctions extends CustomFunctions {
 	}
 	
 	private Coordinate latLong(ExpressionContext expressionContext, Object coordinate) {
+		if (coordinate == null) {
+			return null;
+		}
 		if (coordinate instanceof Coordinate) {
 			return latLong(expressionContext, (Coordinate) coordinate);
 		} else {
@@ -318,8 +321,14 @@ public class IDMFunctions extends CustomFunctions {
 	}
 
 	private Coordinate latLong(ExpressionContext expressionContext, Coordinate coordinate) {
+		if (coordinate == null || ! coordinate.isComplete()) {
+			return null;
+		}
 		Survey survey = getSurvey(expressionContext);
 		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
+		if (coordinateOperations == null) {
+			return null;
+		}
 		Coordinate wgs84Coordinate = coordinateOperations.convertToWgs84(coordinate);
 		return wgs84Coordinate;
 	}
