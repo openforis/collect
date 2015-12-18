@@ -94,7 +94,7 @@ public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 	private ProgressListener createProgressListener(final KeepAlive keepAlive) {
 		ProgressListener keepAliveListener = new ProgressListener() {
 			public void progressMade(Progress progress) {
-				keepAlive.send();	
+				keepAlive.send();
 			}
 		};
 		return keepAliveListener;

@@ -125,6 +125,12 @@ public class IDMFunctions extends CustomFunctions {
 						(Integer) objects[2], (Integer) objects[3], (String) objects[4]);
 			}
 		});
+		
+		register("latlong", 1, new CustomFunction() {
+			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
+				return latLong(expressionContext, objects[0]);
+			}
+		});
 	}
 
 	private String[] toStringArray(Object[] objects) {
@@ -301,6 +307,30 @@ public class IDMFunctions extends CustomFunctions {
 		} else {
 			return null;
 		}
+	}
+	
+	private Coordinate latLong(ExpressionContext expressionContext, Object coordinate) {
+		if (coordinate == null) {
+			return null;
+		}
+		if (coordinate instanceof Coordinate) {
+			return latLong(expressionContext, (Coordinate) coordinate);
+		} else {
+			return latLong(expressionContext, Coordinate.parseCoordinate(coordinate));
+		}
+	}
+
+	private Coordinate latLong(ExpressionContext expressionContext, Coordinate coordinate) {
+		if (coordinate == null || ! coordinate.isComplete()) {
+			return null;
+		}
+		Survey survey = getSurvey(expressionContext);
+		CoordinateOperations coordinateOperations = survey.getContext().getCoordinateOperations();
+		if (coordinateOperations == null) {
+			return null;
+		}
+		Coordinate wgs84Coordinate = coordinateOperations.convertToWgs84(coordinate);
+		return wgs84Coordinate;
 	}
 
 	private static Calendar getCalendar(Date date2, Time time2, TimeUnit timeUnit) {

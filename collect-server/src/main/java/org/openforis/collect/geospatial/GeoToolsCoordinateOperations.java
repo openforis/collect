@@ -8,7 +8,7 @@ import static org.geotools.referencing.CRS.parseWKT;
 import static org.geotools.referencing.crs.DefaultGeographicCRS.WGS84;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -131,7 +131,7 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 
 	@Override
 	public SpatialReferenceSystem fetchSRS(String code) {
-		return fetchSRS(code, new HashSet<String>(Arrays.asList("en")));
+		return fetchSRS(code, Collections.singleton("en"));
 	}
 
 	@Override
@@ -207,8 +207,8 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 		if (transform == null) {
 			String wkt = srs.getWellKnownText();
 			try {
-				transform = findMathTransform(wkt);
-			TO_WGS84_TRANSFORMS.put(srsId, transform);
+				transform = findToWGS84MathTransform(wkt);
+				TO_WGS84_TRANSFORMS.put(srsId, transform);
 			} catch (Exception e) {
 				//TODO throw exception
 				//throw new CoordinateOperationException(String.format("Error parsing SpatialRefernceSystem with id %s and Well Known Text %s", srsId, wkt), e);
@@ -236,22 +236,20 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 				}
 				return new DirectPosition2D(0, 0);
 			}
-
 			DirectPosition directPosition = transform.transform(src, null);
 			return directPosition;
 		} catch (Throwable t) {
 			if (LOG.isErrorEnabled()) {
 				LOG.error("Error converting: x=" + x + " y=" + y + " srs=" + srsId, t);
-				throw new RuntimeException(t);
 			}
 			return new DirectPosition2D(0, 0);
 		}
 	}
 
-	private static MathTransform findMathTransform(String wkt) throws Exception {
+	private static MathTransform findToWGS84MathTransform(String wkt) throws Exception {
 		try {
 			CoordinateReferenceSystem crs = parseWKT(wkt);
-			MathTransform mathTransform = CRS.findMathTransform(crs, WGS84,true);
+			MathTransform mathTransform = CRS.findMathTransform(crs, WGS84, true);
 			return mathTransform;
 		} catch (Exception t) {
 			throw t;

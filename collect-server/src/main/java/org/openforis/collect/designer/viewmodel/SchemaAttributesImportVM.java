@@ -3,7 +3,6 @@ package org.openforis.collect.designer.viewmodel;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,6 +30,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.SurveyObject;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -210,8 +210,14 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 					type = foundType;
 				}
 				AttributeDefinition attrDef = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, type);
-				if (type == AttributeType.CODE) {
-					((CodeAttributeDefinition) attrDef).setList(codeList);
+				switch(type) {
+					case CODE:
+						((CodeAttributeDefinition) attrDef).setList(codeList);
+						break;
+					case TEXT:
+						((TextAttributeDefinition) attrDef).setType(TextAttributeDefinition.Type.SHORT);
+						break;
+					default:
 				}
 				String attributeName = adjustInternalName(colName);
 				if (! parentEntityDefinition.containsChildDefinition(attributeName)) {
@@ -266,7 +272,7 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 
 		public Map<String, AttributeDetails> extractAttributeDetailsByColumn() {
 			Map<String, AttributeType> attributeTypeByColumn = guessAttributeTypeByColumn();
-			Map<String, AttributeDetails> result = new HashMap<String, AttributeDetails>(attributeTypeByColumn.size());
+			Map<String, AttributeDetails> result = new LinkedHashMap<String, AttributeDetails>(attributeTypeByColumn.size());
 			Map<String, String> labelByColumn = labelsInSecondRow ? extractLabelByColumn() : null;
 			for (Entry<String, AttributeType> entry : attributeTypeByColumn.entrySet()) {
 				AttributeDetails details = new AttributeDetails();
