@@ -30,6 +30,7 @@ import org.openforis.idm.metamodel.CodeListItem;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.SurveyObject;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.zkoss.bind.BindContext;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -209,8 +210,14 @@ public class SchemaAttributesImportVM extends SurveyBaseVM {
 					type = foundType;
 				}
 				AttributeDefinition attrDef = (AttributeDefinition) NodeType.createNodeDefinition(survey, NodeType.ATTRIBUTE, type);
-				if (type == AttributeType.CODE) {
-					((CodeAttributeDefinition) attrDef).setList(codeList);
+				switch(type) {
+					case CODE:
+						((CodeAttributeDefinition) attrDef).setList(codeList);
+						break;
+					case TEXT:
+						((TextAttributeDefinition) attrDef).setType(TextAttributeDefinition.Type.SHORT);
+						break;
+					default:
 				}
 				String attributeName = adjustInternalName(colName);
 				if (! parentEntityDefinition.containsChildDefinition(attributeName)) {
