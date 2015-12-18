@@ -70,6 +70,8 @@ public class CollectEarthBalloonGenerator {
 	private static final String PLACEHOLDER_EXTRA_ID_ATTRIBUTES = "PLACEHOLDER_EXTRA_ID_ATTRIBUTES";//$NON-NLS-1$
 	private static final String PLACEHOLDER_UI_LANGUAGE = "PLACEHOLDER_UI_LANGUAGE";
 
+	public static final String PREFIX_EXTRA_CSV_FIELD = "EXTRA_";
+
 
 	private CollectSurvey survey;
 	private String language;
@@ -169,7 +171,7 @@ public class CollectEarthBalloonGenerator {
 			sb.append(name);
 			sb.append("\" name=\""); //$NON-NLS-1$
 			sb.append(name);
-			sb.append("\" value=\"$[EXTRA_"); //$NON-NLS-1$
+			sb.append("\" value=\"$[" + PREFIX_EXTRA_CSV_FIELD ); //$NON-NLS-1$
 			sb.append(def.getName());
 			sb.append("]\" />"); //$NON-NLS-1$
 			sb.append('\n');
