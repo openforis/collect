@@ -41,8 +41,6 @@ import org.opengis.util.GenericName;
  */
 public class GeoToolsCoordinateOperations implements CoordinateOperations {
 
-	private static final String WGS84_ID = "EPSG:4326";
-
 	private static final Log LOG = LogFactory.getLog(GeoToolsCoordinateOperations.class);
 
 	// private static CoordinateOperationFactory CO_FACTORY;
@@ -59,7 +57,7 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 			TO_WGS84_TRANSFORMS = new HashMap<String, MathTransform>();
 
 			MathTransform wgs84Transform = CRS.findMathTransform(WGS84, WGS84);
-			TO_WGS84_TRANSFORMS.put(WGS84_ID, wgs84Transform);
+			TO_WGS84_TRANSFORMS.put(CoordinateOperations.WGS84_SRS_ID, wgs84Transform);
 		} catch (Exception e) {
 			if (LOG.isErrorEnabled()) {
 				LOG.error("Error while initializing CoordinateOperations", e);
@@ -223,7 +221,7 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 	public Coordinate convertToWgs84(Coordinate coordinate) {
 		Position position = toWgs84(coordinate.getX(), coordinate.getY(), coordinate.getSrsId());
 		DirectPosition directPosition = position.getDirectPosition();
-		return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), WGS84_ID);
+		return new Coordinate(directPosition.getOrdinate(0), directPosition.getOrdinate(1), CoordinateOperations.WGS84_SRS_ID);
 	}
 
 	private static Position toWgs84(double x, double y, String srsId) {
