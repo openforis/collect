@@ -83,7 +83,6 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
-	@Transactional
 	public List<SurveySummary> loadTemporarySummaries() {
 		List<SurveySummary> surveys = new ArrayList<SurveySummary>();
 		Result<Record> results = dsl().select()

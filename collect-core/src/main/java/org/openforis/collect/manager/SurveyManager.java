@@ -379,7 +379,6 @@ public class SurveyManager {
 		addToCache(survey);
 	}
 
-	@Transactional
 	public List<SurveySummary> getSurveySummaries(String lang) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (CollectSurvey survey : surveys) {
@@ -508,7 +507,6 @@ public class SurveyManager {
 	 * 
 	 * @return
 	 */
-	@Transactional
 	public List<SurveySummary> loadCombinedSummaries() {
 		return loadCombinedSummaries(null, false);
 	}
@@ -520,7 +518,6 @@ public class SurveyManager {
 	 * @param includeDetails if true, survey info like project name will be included in the summary (it makes the loading process slower).
 	 * @return list of published and temporary surveys.
 	 */
-	@Transactional
 	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang);
 		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails);
@@ -545,7 +542,6 @@ public class SurveyManager {
 		return result;
 	}
 	
-	@Transactional
 	public SurveySummary loadSummaryByUri(String uri) {
 		SurveySummary temporarySummary = loadTemporarySummaryByUri(uri);
 		SurveySummary publishedSummary = getPublishedSummaryByUri(uri);
@@ -554,7 +550,6 @@ public class SurveyManager {
 		return result;
 	}
 
-	@Transactional
 	public SurveySummary loadSummaryByName(String name) {
 		SurveySummary temporarySummary = loadTemporarySummaryByName(name);
 		SurveySummary publishedSummary = getPublishedSummaryByName(name);
@@ -578,7 +573,6 @@ public class SurveyManager {
 		return result;
 	}
 	
-	@Transactional
 	public CollectSurvey loadSurvey(int id) {
 		CollectSurvey survey = surveyDao.loadById(id);
 		if ( survey != null ) {
