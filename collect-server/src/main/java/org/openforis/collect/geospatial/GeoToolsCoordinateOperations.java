@@ -236,13 +236,11 @@ public class GeoToolsCoordinateOperations implements CoordinateOperations {
 				}
 				return new DirectPosition2D(0, 0);
 			}
-
 			DirectPosition directPosition = transform.transform(src, null);
 			return directPosition;
 		} catch (Throwable t) {
 			if (LOG.isErrorEnabled()) {
 				LOG.error("Error converting: x=" + x + " y=" + y + " srs=" + srsId, t);
-				throw new RuntimeException(t);
 			}
 			return new DirectPosition2D(0, 0);
 		}
