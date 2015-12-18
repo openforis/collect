@@ -21,7 +21,6 @@ import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.EntityDefinition.TraversalType;
-import org.openforis.idm.metamodel.KeyAttributeDefinition;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
@@ -100,6 +99,8 @@ public class MondrianCubeGenerator {
 		Table table = new Table(dbSchemaName, entityDef.getName());
 		cube.tables.add(table);
 		
+		addCountMeasure(cube, entityDef);
+		
 		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
 		stack.addAll(entityDef.getChildDefinitions());
 		while (! stack.isEmpty()) {
@@ -128,6 +129,8 @@ public class MondrianCubeGenerator {
 		
 		Table table = new Table(dbSchemaName, rootEntityDef.getName());
 		cube.tables.add(table);
+		
+		addCountMeasure(cube, rootEntityDef);
 		
 		rootEntityDef.traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition nodeDef) {
@@ -161,25 +164,12 @@ public class MondrianCubeGenerator {
 	}
 
 	private void addAttributeMeasuresAndDimension(Cube cube, AttributeDefinition attrDef) {
-		EntityDefinition rootEntityDef = attrDef.getRootEntity();
-		String attrName = attrDef.getName();
-		
-		if (attrDef instanceof KeyAttributeDefinition && ((KeyAttributeDefinition) attrDef).isKey()) {
-			Measure measure = new Measure(rootEntityDef.getName() + "_count");
-			if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
-				measure.column = "_" + rootEntityDef.getName() + "_" + attrName;
-			} else {
-				measure.column = attrName;
-			}
-			measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(rootEntityDef) + " Count" );
-			measure.aggregator = "distinct count";
-			measure.datatype = "Integer";
-			cube.measures.add(measure);
-		} else if (attrDef instanceof NumberAttributeDefinition) {
+		if (attrDef instanceof NumberAttributeDefinition) {
+			String attrName = attrDef.getName();
 			for (String aggregator : MEASURE_AGGREGATORS) {
 				Measure measure = new Measure(attrName + "_" + aggregator);
 				measure.column = attrName;
-				measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(attrDef) + " " + aggregator );
+				measure.caption = StringEscapeUtils.escapeHtml4(String.format("%s [%s] %s", extractLabel(attrDef), attrName, aggregator));
 				measure.aggregator = aggregator;
 				measure.datatype = "Numeric";
 				measure.formatString = "#.##";
@@ -327,6 +317,19 @@ public class MondrianCubeGenerator {
 		return dimensions;
 	}
 */
+	private void addCountMeasure(Cube cube, EntityDefinition entityDef) {
+		Measure measure = new Measure(entityDef.getName() + "_count");
+		if (survey.getTarget() == SurveyTarget.COLLECT_EARTH) {
+			measure.column = "_" + entityDef.getName() + "_id";
+		} else {
+			measure.column = rdbSchema.getDataTable(entityDef).getPrimaryKeyColumn().getName();
+		}
+		measure.caption = StringEscapeUtils.escapeHtml4( extractLabel(entityDef) + " Count" );
+		measure.aggregator = "distinct count";
+		measure.datatype = "Integer";
+		cube.measures.add(measure);
+	}
+
 	private Dimension generateDimension(AttributeDefinition attrDef) {
 		String attrName = attrDef.getName();
 		String attrLabel = extractLabel(attrDef);
