@@ -43,7 +43,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
  */
 public class MondrianCubeGenerator {
 	
-	private static final String[] MEASURE_AGGREGATORS = new String[] {"min", "max", "avg"};
+	private static final String[] MEASURE_AGGREGATORS = new String[] {"min", "max", "avg", "sum"};
 	
 	private CollectSurvey survey;
 	private RelationalSchemaConfig rdbConfig;
