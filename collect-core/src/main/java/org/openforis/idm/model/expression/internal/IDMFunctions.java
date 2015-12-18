@@ -30,6 +30,7 @@ import org.openforis.idm.model.Time;
  */
 public class IDMFunctions extends CustomFunctions {
 	
+	public static final String LATLONG_FUNCTION_NAME = "latlong";
 	private static final String LOCATION_ATTRIBUTE = "location";
 
 	private enum TimeUnit {
@@ -126,7 +127,7 @@ public class IDMFunctions extends CustomFunctions {
 			}
 		});
 		
-		register("latlong", 1, new CustomFunction() {
+		register(LATLONG_FUNCTION_NAME, 1, new CustomFunction() {
 			public Object invoke(ExpressionContext expressionContext, Object[] objects) {
 				return latLong(expressionContext, objects[0]);
 			}
