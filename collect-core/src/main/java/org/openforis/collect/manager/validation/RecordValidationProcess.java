@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Transactional
 public class RecordValidationProcess extends AbstractProcess<Void, ProcessStatus> {
 
 //	private static Log LOG = LogFactory.getLog(RecordValidationProcess.class);
@@ -41,7 +43,7 @@ public class RecordValidationProcess extends AbstractProcess<Void, ProcessStatus
 	}
 
 	@Override
-	@Transactional
+	@Transactional(propagation=Propagation.NOT_SUPPORTED)
 	public void startProcessing() throws Exception {
 		super.startProcessing();
 		validateParameters();

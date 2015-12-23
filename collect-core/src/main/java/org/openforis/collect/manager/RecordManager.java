@@ -83,7 +83,6 @@ public class RecordManager {
 		lockManager = new RecordLockManager(lockTimeoutMillis);
 	}
 	
-	@Transactional
 	public void saveAndRun(CollectRecord record, Runnable callback) {
 		save(record);
 		callback.run();
@@ -104,7 +103,7 @@ public class RecordManager {
 		User lockingUser = record.getModifiedBy();
 		save(record, lockingUser, sessionId);
 	}
-	
+
 	@Transactional
 	public void save(CollectRecord record, User lockingUser, String sessionId) throws RecordPersistenceException {
 		record.updateSummaryFields();
@@ -127,10 +126,12 @@ public class RecordManager {
 		}
 	}
 	
+	@Transactional
 	public int nextId() {
 		return recordDao.nextId();
 	}
 	
+	@Transactional
 	public void restartIdSequence(Number value) {
 		recordDao.restartIdSequence(value);
 	}
@@ -217,12 +218,12 @@ public class RecordManager {
 	 * @throws RecordPersistence
 	 */
 	@Deprecated
-	@Transactional
+	@Transactional(readOnly=true)
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, int step, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
 		return checkout(survey, user, recordId, Step.valueOf(step), sessionId, forceUnlock);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public synchronized CollectRecord checkout(CollectSurvey survey, User user, int recordId, Step step, String sessionId, boolean forceUnlock) throws RecordPersistenceException {
 		if(isLockingEnabled()) {
 			checkSurveyRecordValidationNotInProgress(survey);
@@ -250,25 +251,29 @@ public class RecordManager {
 	}
 
 	@Deprecated
-	@Transactional
+	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId, int step) {
 		Step stepEnum = Step.valueOf(step);
 		return load(survey, recordId, stepEnum);
 	}
 	
+	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId) {
 		Step lastStep = determineLastStep(survey, recordId);
 		return load(survey, recordId, lastStep);
 	}
 
+	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
 		return load(survey, recordId, step, true);
 	}
 	
+	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate) {
 		return load(survey, recordId, step, validate, true);
 	}
 	
+	@Transactional(readOnly=true)
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step, boolean validate, boolean addEmptyMultipleEntities) {
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber(), validate);
 		recordConverter.convertToLatestVersion(record);
@@ -276,43 +281,44 @@ public class RecordManager {
 		return record;
 	}
 	
+	@Transactional(readOnly=true)
 	public byte[] loadBinaryData(CollectSurvey survey, int recordId, Step step) {
 		byte[] result = recordDao.loadBinaryData(survey, recordId, step.getStepNumber());
 		return result;
 	}
 
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
 		return loadSummaries(survey, rootEntity, (String[]) null);
 	}
 
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
 		return recordDao.loadSummaries(survey, rootEntity, step);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keys) {
 		return recordDao.loadSummaries(survey, rootEntity, keys);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, boolean caseSensitiveKeys, String... keys) {
 		return recordDao.loadSummaries(survey, rootEntity, caseSensitiveKeys, keys);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxNumberOfRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
 		List<CollectRecord> summaries = recordDao.loadSummaries(survey, rootEntity, offset, maxNumberOfRecords, sortFields, keyValues);
 		return summaries;
 	}
 
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(RecordFilter filter) {
 		return loadSummaries(filter, null);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		List<CollectRecord> recordSummaries = recordDao.loadSummaries(filter, sortFields);
 		return recordSummaries;
@@ -321,38 +327,38 @@ public class RecordManager {
 	/**
 	 * Returns only the records modified after the specified date.
 	 */
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Date modifiedSince) {
 		return recordDao.loadSummaries(survey, rootEntity, modifiedSince);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey) {
 		return recordDao.countRecords(survey);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId) {
 		return recordDao.countRecords(survey, rootEntityDefinitionId);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey, int rootEntityDefinitionId, int dataStepNumber) {
 		return recordDao.countRecords(survey, rootEntityDefinitionId, dataStepNumber);
 	}
 
-	@Transactional
+	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey, String rootEntityDefinition, Step step) {
 		EntityDefinition rootDef = survey.getSchema().getRootEntityDefinition(rootEntityDefinition);
 		return countRecords(survey, rootDef.getId(), step.getStepNumber());
 	}
 
-	@Transactional
+	@Transactional(readOnly=true)
 	public int countRecords(RecordFilter filter) {
 		return recordDao.countRecords(filter);
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public int countRecords(CollectSurvey survey, String rootEntity, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
@@ -364,6 +370,7 @@ public class RecordManager {
 	/**
 	 * Returns false if another record with the same root entity key values exists.
 	 */
+	@Transactional(readOnly=true)
 	public boolean isUnique(CollectRecord record) {
 		CollectSurvey survey = (CollectSurvey) record.getSurvey();
 		record.updateSummaryFields();
@@ -411,7 +418,6 @@ public class RecordManager {
 		record.setStep(step);
 		return record;
 	}
-
 
 	@Transactional
 	public CollectRecord promote(CollectSurvey survey, int recordId, Step currentStep, User user) throws RecordPromoteException, MissingRecordKeyException {
@@ -633,7 +639,7 @@ public class RecordManager {
 	 * 
 	 * @return 
 	 */
-	public void validate(final CollectRecord record) {
+	public void validate(CollectRecord record) {
 		updater.validate(record);
 	}
 

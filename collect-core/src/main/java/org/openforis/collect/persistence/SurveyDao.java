@@ -31,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class SurveyDao extends SurveyBaseDao {
 //	private final Log LOG = LogFactory.getLog(SurveyDao.class);
 
-	@Transactional
 	public void insert(CollectSurvey survey) throws SurveyImportException {
 		CollectDSLContext dsl = dsl();
 		
@@ -45,6 +44,7 @@ public class SurveyDao extends SurveyBaseDao {
 		survey.setId(surveyId);
 	}
 
+	@Transactional(readOnly=true)
 	public CollectSurvey loadById(int id) {
 		Record record = dsl()
 				.select()
@@ -55,10 +55,12 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
+	@Transactional(readOnly=true)
 	public CollectSurvey loadByUri(String uri) {
 		return loadByUri(uri, false);
 	}
 
+	@Transactional(readOnly=true)
 	public CollectSurvey loadByUri(String uri, boolean temporary) {
 		Record record = dsl()
 				.select()
@@ -69,10 +71,12 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
+	@Transactional(readOnly=true)
 	public CollectSurvey loadByName(String name) {
 		return loadByName(name, false);
 	}
 	
+	@Transactional(readOnly=true)
 	public CollectSurvey loadByName(String name, boolean temporary) {
 		Record record = dsl()
 				.select()
@@ -83,7 +87,7 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<SurveySummary> loadTemporarySummaries() {
 		List<SurveySummary> surveys = new ArrayList<SurveySummary>();
 		Result<Record> results = dsl().select()
@@ -99,6 +103,7 @@ public class SurveyDao extends SurveyBaseDao {
 		return surveys;
 	}
 	
+	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummary(int id) {
 		Record record = dsl().select()
 				.from(OFC_SURVEY)
@@ -108,10 +113,12 @@ public class SurveyDao extends SurveyBaseDao {
 		return result;
 	}
 	
+	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummaryByName(String name) {
 		return loadSurveySummaryByName(name, false);
 	}
 
+	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummaryByName(String name, boolean temporary) {
 		Record record = dsl().select()
 				.from(OFC_SURVEY)
@@ -121,10 +128,12 @@ public class SurveyDao extends SurveyBaseDao {
 		return result;
 	}
 	
+	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummaryByUri(String uri) {
 		return loadSurveySummaryByUri(uri, false);
 	}
 	
+	@Transactional(readOnly=true)
 	public SurveySummary loadSurveySummaryByUri(String uri, boolean temporary) {
 		Record record = dsl().select()
 				.from(OFC_SURVEY)
@@ -134,7 +143,7 @@ public class SurveyDao extends SurveyBaseDao {
 		return result;
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectSurvey> loadAll() {
 		List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();
 		Result<Record> results = dsl()
@@ -148,7 +157,7 @@ public class SurveyDao extends SurveyBaseDao {
 		return surveys;
 	}
 
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<CollectSurvey> loadAllPublished() {
 		List<CollectSurvey> surveys = new ArrayList<CollectSurvey>();
 		Result<Record> results = dsl()

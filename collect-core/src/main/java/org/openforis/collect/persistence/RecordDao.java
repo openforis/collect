@@ -44,7 +44,6 @@ import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.ModelSerializer;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author G. Miceli
@@ -52,7 +51,6 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  */
 @SuppressWarnings("rawtypes")
-@Transactional
 public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLContext> {
 	
 	private static final TableField[] KEY_FIELDS = 
@@ -118,7 +116,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		}
 	}
 
-	@Transactional
 	public boolean hasAssociatedRecords(int userId) {
 		SelectQuery q = dsl().selectCountQuery();
 		q.addConditions(OFC_RECORD.CREATED_BY_ID.equal(userId)
@@ -128,22 +125,18 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return count > 0;
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
 		return loadSummaries(survey, rootEntity, (String[]) null);
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
 		return loadSummaries(survey, rootEntity, step, null, null, null, null);
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
 		return loadSummaries(survey, rootEntity, true, keyValues);
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, boolean caseSensitiveKeys, String... keyValues) {
 		Schema schema = survey.getSchema();
 		EntityDefinition rootEntityDefn = schema.getRootEntityDefinition(rootEntity);
@@ -154,7 +147,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return loadSummaries(filter, null);
 	}
 	
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
 		return loadSummaries(survey, rootEntity, (Step) null, (Date) null, offset, maxRecords, sortFields, keyValues);
@@ -164,7 +156,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return loadSummaries(survey, rootEntity, (Step) null, modifiedSince, (Integer) null, (Integer) null, (List<RecordSummarySortField>) null, (String[]) null);
 	}
 
-	@Transactional
 	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, Date modifiedSince, Integer offset, Integer maxRecords, 
 			List<RecordSummarySortField> sortFields, String... keyValues) {
 		Schema schema = survey.getSchema();
@@ -179,7 +170,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return loadSummaries(filter, sortFields);
 	}
 	
-	@Transactional
 	public List<CollectRecord> loadSummaries(RecordFilter filter, List<RecordSummarySortField> sortFields) {
 		CollectSurvey survey = filter.getSurvey();
 		
@@ -277,7 +267,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		return result;
 	}
 
-	@Transactional
 	public int countRecords(CollectSurvey survey, int rootDefinitionId, String... keyValues) {
 		RecordFilter filter = new RecordFilter(survey, rootDefinitionId);
 		filter.setKeyValues(keyValues);
@@ -408,7 +397,6 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, RecordDSLCon
 		super.delete(id);
 	}
 
-	@Transactional
 	public void assignOwner(int recordId, Integer ownerId) {
 		dsl().update(OFC_RECORD)
 			.set(OFC_RECORD.OWNER_ID, ownerId)

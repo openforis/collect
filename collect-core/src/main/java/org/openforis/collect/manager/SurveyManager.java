@@ -49,6 +49,7 @@ import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -56,6 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author S. Ricci
  * 
  */
+@Transactional
 public class SurveyManager {
 	
 	private static Log LOG = LogFactory.getLog(SurveyManager.class);
@@ -379,7 +381,7 @@ public class SurveyManager {
 		addToCache(survey);
 	}
 
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<SurveySummary> getSurveySummaries(String lang) {
 		List<SurveySummary> summaries = new ArrayList<SurveySummary>();
 		for (CollectSurvey survey : surveys) {
@@ -508,7 +510,7 @@ public class SurveyManager {
 	 * 
 	 * @return
 	 */
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<SurveySummary> loadCombinedSummaries() {
 		return loadCombinedSummaries(null, false);
 	}
@@ -520,7 +522,7 @@ public class SurveyManager {
 	 * @param includeDetails if true, survey info like project name will be included in the summary (it makes the loading process slower).
 	 * @return list of published and temporary surveys.
 	 */
-	@Transactional
+	@Transactional(readOnly=true, isolation=Isolation.READ_UNCOMMITTED)
 	public List<SurveySummary> loadCombinedSummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> publishedSurveySummaries = getSurveySummaries(labelLang);
 		List<SurveySummary> temporarySurveySummaries = loadTemporarySummaries(labelLang, includeDetails);
@@ -545,7 +547,7 @@ public class SurveyManager {
 		return result;
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public SurveySummary loadSummaryByUri(String uri) {
 		SurveySummary temporarySummary = loadTemporarySummaryByUri(uri);
 		SurveySummary publishedSummary = getPublishedSummaryByUri(uri);
@@ -554,7 +556,7 @@ public class SurveyManager {
 		return result;
 	}
 
-	@Transactional
+	@Transactional(readOnly=true)
 	public SurveySummary loadSummaryByName(String name) {
 		SurveySummary temporarySummary = loadTemporarySummaryByName(name);
 		SurveySummary publishedSummary = getPublishedSummaryByName(name);
@@ -578,7 +580,7 @@ public class SurveyManager {
 		return result;
 	}
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public CollectSurvey loadSurvey(int id) {
 		CollectSurvey survey = surveyDao.loadById(id);
 		if ( survey != null ) {
@@ -592,6 +594,7 @@ public class SurveyManager {
 		return survey;
 	}
 	
+	@Transactional(readOnly=true)
 	public CollectSurvey getOrLoadSurveyById(int id) {
 		CollectSurvey survey = getById(id);
 		if (survey == null) {
@@ -600,6 +603,7 @@ public class SurveyManager {
 		return survey;
 	}
 	
+	@Transactional(readOnly=true)
 	public List<SurveySummary> loadTemporarySummaries(String labelLang, boolean includeDetails) {
 		List<SurveySummary> summaries = surveyDao.loadTemporarySummaries();
 		if ( includeDetails ) {
@@ -617,10 +621,12 @@ public class SurveyManager {
 		return summaries;
 	}
 	
+	@Transactional(readOnly=true)
 	public SurveySummary loadTemporarySummaryByUri(String uri) {
 		return surveyDao.loadSurveySummaryByUri(uri, true);
 	}
 
+	@Transactional(readOnly=true)
 	public SurveySummary loadTemporarySummaryByName(String name) {
 		return surveyDao.loadSurveySummaryByName(name, true);
 	}
