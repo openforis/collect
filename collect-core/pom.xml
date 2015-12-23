@@ -375,7 +375,7 @@
 			<artifactId>protostuff-xml</artifactId>
 			<version>${protostuff.version}</version>
 		</dependency>
-		
+	
 		<!-- TEST DEPENDENCIES -->
 		<dependency>
 			<groupId>org.springframework</groupId>

@@ -477,7 +477,6 @@ public class SurveySelectVM extends BaseVM {
 			});
 		}
 	}
-		
 	
 	protected void performSurveyPublishing(CollectSurvey survey) {
 		try {
