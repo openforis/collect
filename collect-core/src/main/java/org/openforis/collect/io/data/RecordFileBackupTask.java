@@ -101,7 +101,7 @@ public class RecordFileBackupTask extends Task {
 	
 	private void backup(CollectRecord summary) throws RecordFileException, IOException {
 		Integer id = summary.getId();
-		CollectRecord record = recordManager.load(survey, id, summary.getStep());
+		CollectRecord record = recordManager.load(survey, id, summary.getStep(), false);
 		List<FileAttribute> fileAttributes = record.getFileAttributes();
 		for (FileAttribute fileAttribute : fileAttributes) {
 			if ( ! fileAttribute.isEmpty() ) {
