@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.openforis.collect.designer.form.FormObject;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.MessageUtil.ConfirmHandler;
@@ -261,6 +262,12 @@ public abstract class SurveyObjectBaseVM<T> extends SurveyBaseVM {
 		String name = label.trim().toLowerCase(Locale.ENGLISH).replaceAll("\\W", "_");
 		name = StringUtils.strip(name, "_");
 		return name;
+	}
+	
+	protected String suggestLabel(String internalName) {
+		String label = internalName.replaceAll("_", " ");
+		label = WordUtils.capitalize(label);
+		return label;
 	}
 
 	protected abstract void deleteItemFromSurvey(T item);
