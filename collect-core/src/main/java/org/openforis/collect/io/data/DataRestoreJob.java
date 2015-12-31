@@ -50,6 +50,7 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 	private List<RecordImportError> errors;
 		
 	private boolean validateRecords;
+	private boolean deleteAllRecordsBeforeRestore = false;
 
 	@Override
 	public void createInternalVariables() throws Throwable {
@@ -65,6 +66,9 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 				addTask(SurveyBackupJob.class);
 			}
 			addTask(new StoreBackupFileTask());
+		}
+		if (deleteAllRecordsBeforeRestore) {
+			addTask(new DeleteRecordsTask());
 		}
 		addTask(DataRestoreTask.class);
 		if ( restoreUploadedFiles && isUploadedFilesIncluded() ) {
@@ -201,12 +205,21 @@ public class DataRestoreJob extends DataRestoreBaseJob {
 		this.validateRecords = validateRecords;
 	}
 
+	public void setDeleteAllRecordsBeforeRestore(boolean deleteAllRecords) {
+		this.deleteAllRecordsBeforeRestore = deleteAllRecords;
+	}
+
 	private class StoreBackupFileTask extends Task {
-		@Override
 		protected void execute() throws Throwable {
 			DataRestoreJob.this.tempFile = restoredBackupStorageManager.storeTemporaryFile(surveyName, file);
 		}
 		
+	}
+	
+	private class DeleteRecordsTask extends Task {
+		protected void execute() throws Throwable {
+			recordManager.deleteBySurvey(publishedSurvey.getId());
+		}
 	}
 
 }

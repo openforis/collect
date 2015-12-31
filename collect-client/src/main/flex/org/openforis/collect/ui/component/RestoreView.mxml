@@ -15,6 +15,7 @@
 		<![CDATA[
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.ui.Images;
 			import org.openforis.collect.i18n.Message;
 			import org.openforis.collect.model.SurveySummary;
 			import org.openforis.collect.presenter.RestoreViewPresenter;
@@ -88,6 +89,7 @@
 						 styleName="formLabel"/>
 				<s:Label id="updatedRecordsSinceLastBackupCountLabel" width="50" />
 			</s:HGroup>
+
 			<s:HGroup width="100%" verticalAlign="middle">
 				<s:Label text="{Message.get('global.file')}" />
 				
@@ -99,6 +101,19 @@
 						  buttonMode="true"
 						  />
 			</s:HGroup>
+			
+			<s:HGroup verticalAlign="middle">
+				<s:CheckBox id="validateRecordsCheckBox"
+							selected="true"
+							label="{Message.get('restore.validate_records')}" />
+				<s:Image source="{Images.INFO_VERY_SMALL}"
+						 toolTip="{Message.get('restore.validate_records.info')}"
+						 horizontalCenter="0"
+						 verticalCenter="0"
+						 />
+			</s:HGroup>
+			<s:CheckBox id="deleteAllExistingRecordsCheckBox" 
+						label="{Message.get('restore.delete_all_existing_records')}" />
 		</s:VGroup>
 		
 		<s:HGroup horizontalAlign="center" width="100%" gap="40">

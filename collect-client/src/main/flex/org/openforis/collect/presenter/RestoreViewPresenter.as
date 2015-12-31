@@ -239,6 +239,8 @@ package org.openforis.collect.presenter {
 			stopProgressTimer();
 			_job = null;
 			view.currentState = RestoreView.STATE_PARAMETER_SELECTION;
+			view.validateRecordsCheckBox.selected = true;
+			view.deleteAllExistingRecordsCheckBox.selected = false;
 			checkEnabledFields();
 		}
 		
@@ -299,6 +301,9 @@ package org.openforis.collect.presenter {
 			//request paramters
 			request.data = new URLVariables();
 			request.data.name = _fileReference.name;
+			request.data.validateRecords = view.validateRecordsCheckBox.selected;
+			request.data.deleteAllRecords = view.deleteAllExistingRecordsCheckBox.selected;
+
 			var surveyName:String = getSelectedSurveyName();
 			if (surveyName != null) {
 				request.data.surveyName = surveyName;

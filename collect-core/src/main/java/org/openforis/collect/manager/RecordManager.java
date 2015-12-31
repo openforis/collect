@@ -189,6 +189,11 @@ public class RecordManager {
 	}
 	
 	@Transactional
+	public void deleteBySurvey(int surveyId) {
+		recordDao.deleteBySurvey(surveyId);
+	}
+	
+	@Transactional
 	public void assignOwner(CollectSurvey survey, int recordId, Integer ownerId, User user, String sessionId) 
 			throws RecordLockedException, MultipleEditException {
 		if ( isLockingEnabled() ) {
